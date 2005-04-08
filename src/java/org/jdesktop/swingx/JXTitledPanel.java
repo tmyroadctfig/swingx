@@ -17,6 +17,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Paint;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -184,11 +185,9 @@ public class JXTitledPanel extends JPanel{
 		 * gradient'ed paint job so that I don't have to repaint it all the time.
 		 */
 		protected void paintComponent(Graphics g) {
-			if (gp == null) {
-				gp = new GradientPaint(0, 0, UIManager.getColor("JTitledPanel.title.darkBackground"), getWidth(), getHeight(), UIManager.getColor("JTitledPanel.title.lightBackground"));
-			}
 			//draw the gradient background
 			if (oldWidth != getWidth() || oldHeight != getHeight()) {
+				gp = new GradientPaint(0, 0, UIManager.getColor("JTitledPanel.title.darkBackground"), getWidth(), 0, UIManager.getColor("JTitledPanel.title.lightBackground"));
 				Image savedImg = createImage(getWidth(), getHeight());
 				Graphics2D imgg = (Graphics2D)savedImg.getGraphics();
 				imgg.setPaint(gp);
