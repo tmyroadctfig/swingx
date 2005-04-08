@@ -206,6 +206,11 @@ public class JXTitledPanel extends JPanel{
 	 * @return
 	 */
 	public Container getContentContainer() {
+        if (contentPanel == null) {
+            contentPanel = new JPanel();
+            ((JPanel)contentPanel).setBorder(BorderFactory.createEmptyBorder());
+            this.add(contentPanel, BorderLayout.CENTER);
+        }
 		return contentPanel;
 	}
 	
