@@ -71,7 +71,6 @@ public class JXPanel extends JPanel {
                    setOpaque(true);
                 }
             }
-            System.out.println(isOpaque());
             firePropertyChange("alpha", oldAlpha, alpha);
             repaint();
         }
