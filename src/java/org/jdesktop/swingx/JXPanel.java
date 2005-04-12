@@ -13,6 +13,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import javax.swing.JPanel;
+import javax.swing.RepaintManager;
 
 /**
  * A simple JPanel extension that adds translucency support.
@@ -26,6 +27,15 @@ public class JXPanel extends JPanel {
      * The alpha level for this component.
      */
     private float alpha = 1.0f;
+    /**
+     * If the old alpha value was 1.0, I keep track of the opaque setting because
+     * a translucent component is not opaque, but I want to be able to restore
+     * opacity to its default setting if the alpha is 1.0. Honestly, I don't know
+     * if this is necessary or not, but it sounded good on paper :)
+     * <p>TODO: Check whether this variable is necessary or not</p>
+     */
+    private boolean oldOpaque;
+    
     private transient Insets insets = new Insets(0,0,0,0); //scratch
     
     /** 
@@ -45,10 +55,26 @@ public class JXPanel extends JPanel {
     public void setAlpha(float alpha) {
         if (this.alpha != alpha) {
             assert alpha >= 0 && alpha <= 1.0;
-            float oldAlpha = alpha;
+            float oldAlpha = this.alpha;
             this.alpha = alpha;
+            if (alpha > 0f && alpha < 1f) {
+                if (oldAlpha == 1) {
+                    //it used to be 1, but now is not. Save the oldOpaque
+                    oldOpaque = isOpaque();
+                    setOpaque(false);
+                }
+                if (!(RepaintManager.currentManager(this) instanceof TranslucentRepaintManager)) {
+                    RepaintManager.setCurrentManager(new RepaintManagerX());
+                }
+            } else if (alpha == 1) {
+                //restore the oldOpaque if it was true (since opaque is false now)
+                if (oldOpaque) {
+                   setOpaque(true);
+                }
+            }
+            System.out.println(isOpaque());
             firePropertyChange("alpha", oldAlpha, alpha);
-            paintImmediately(0, 0, getWidth(), getHeight());
+            repaint();
         }
     }
     
@@ -60,16 +86,15 @@ public class JXPanel extends JPanel {
         return alpha;
     }
 
+    /**
+     * Overriden paint method to take into account the alpha setting
+     */
     public void paint(Graphics g) {
         insets = getInsets(insets);
         Graphics2D g2d = (Graphics2D)g;
         Composite oldComp = g2d.getComposite();
         Composite alphaComp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
         g2d.setComposite(alphaComp);
-        g2d.setColor(getBackground());
-        g2d.fillRect(insets.left, insets.top,
-                     getWidth() - insets.left - insets.right,
-                     getHeight() - insets.top - insets.bottom);
         super.paint(g2d);
         g2d.setComposite(oldComp);
     }
