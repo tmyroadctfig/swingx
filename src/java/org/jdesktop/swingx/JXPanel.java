@@ -8,12 +8,13 @@
 package org.jdesktop.swingx;
 
 import java.awt.AlphaComposite;
+import java.awt.Component;
 import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Insets;
 import javax.swing.JPanel;
 import javax.swing.RepaintManager;
+
 
 /**
  * A simple JPanel extension that adds translucency support.
@@ -35,8 +36,6 @@ public class JXPanel extends JPanel {
      * <p>TODO: Check whether this variable is necessary or not</p>
      */
     private boolean oldOpaque;
-    
-    private transient Insets insets = new Insets(0,0,0,0); //scratch
     
     /** 
      * Creates a new instance of JXPanel
@@ -87,15 +86,33 @@ public class JXPanel extends JPanel {
     }
 
     /**
+     * Unlike other properties, alpha can be set on a component, or on one of
+     * its parents. If the alpha of a parent component is .4, and the alpha on
+     * this component is .5, effectively the alpha for this component is .4
+     * because the lowest alpha in the heirarchy &quot;wins&quot;
+     */ 
+    public float getEffectiveAlpha() {
+        float a = alpha;
+        Component c = this;
+        while ((c = c.getParent()) != null) {
+            if (c instanceof JXPanel) {
+                a = Math.min(((JXPanel)c).getAlpha(), a);
+            }
+        }
+        return a;
+    }
+    
+    /**
      * Overriden paint method to take into account the alpha setting
      */
     public void paint(Graphics g) {
-        insets = getInsets(insets);
         Graphics2D g2d = (Graphics2D)g;
         Composite oldComp = g2d.getComposite();
+        float alpha = getEffectiveAlpha();
         Composite alphaComp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
         g2d.setComposite(alphaComp);
         super.paint(g2d);
         g2d.setComposite(oldComp);
     }
+    
 }
