@@ -76,8 +76,8 @@ public class JXTitledPanel extends JXPanel {
             defaults.put(uiClassID, "org.jdesktop.swingx.plaf.metal.MetalTitledPanelUI");
             //adds some keys to the UIDefaults for the JXTitledPanel component
             defaults.put("JXTitledPanel.title.foreground", UIManager.getColor("activeCaptionText"));
-            defaults.put("JXTitledPanel.title.darkBackground", UIManager.getColor("inactiveCaption"));
-            defaults.put("JXTitledPanel.title.lightBackground", UIManager.getColor("activeCaption"));
+            defaults.put("JXTitledPanel.title.lightBackground", UIManager.getColor("inactiveCaption"));
+            defaults.put("JXTitledPanel.title.darkBackground", UIManager.getColor("activeCaption"));
             defaults.put("JXTitledPanel.title.font", UIManager.getFont("Button.font"));
         } else if (laf.getID().equals("Mac")) {
             UIDefaults defaults = UIManager.getDefaults();
