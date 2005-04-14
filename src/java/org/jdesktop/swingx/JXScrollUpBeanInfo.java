@@ -11,7 +11,7 @@ import java.beans.*;
 /**
  * @author rbair
  */
-public class JXTitledPanelBeanInfo extends SimpleBeanInfo {
+public class JXScrollUpBeanInfo extends SimpleBeanInfo {
     
     // Bean descriptor information will be obtained from introspection.//GEN-FIRST:BeanDescriptor
     private static BeanDescriptor beanDescriptor = null;
@@ -19,7 +19,7 @@ public class JXTitledPanelBeanInfo extends SimpleBeanInfo {
 //GEN-HEADEREND:BeanDescriptor
         
         // Here you can add code for customizing the BeanDescriptor.
-        beanDescriptor = new BeanDescriptor(JXTitledPanel.class);
+        beanDescriptor = new BeanDescriptor(JXScrollUp.class);
         beanDescriptor.setValue("containerDelegate", "getContentContainer");
 //        beanDescriptor.setValue("isContainer", Boolean.TRUE);
         

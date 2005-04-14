@@ -4,7 +4,7 @@
  * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
  * Santa Clara, California 95054, U.S.A. All rights reserved.
  */
-package com.jgui.swing;
+package org.jdesktop.swingx;
 
 import java.awt.AlphaComposite;
 import java.awt.Composite;
@@ -18,8 +18,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import javax.swing.UIManager;
@@ -55,9 +57,21 @@ public class JXScrollUp extends JXTitledPanel {
      */
     private static final float ALPHA_END = 1.0f;
 	/**
-	 * Originally a chevron, this button is used to scroll and unscroll the JXScrollUp.
+	 * The button that is used to collapse &amp; expand the component
 	 */
-	private RoundButton chevron;
+	private JButton collapseButton;
+    /**
+     * The icon to show when the component is collapsed
+     */
+    private Icon collapsedIcon = new ImageIcon("/usr/local/src/swingx/swingx/src/java/org/jdesktop/swingx/downarrow.gif");//(ImageIcon)RES.get16x16Icon("nav_down_blue.png", false);
+    /**
+     * The icon to show when the component is expanded
+     */
+    private Icon expandedIcon = new ImageIcon("/usr/local/src/swingx/swingx/src/java/org/jdesktop/swingx/uparrow.gif");//(ImageIcon)RES.get16x16Icon("nav_up_blue.png", false);
+    /**
+     * Indicates whether the component is collapsed or expanded
+     */
+    private boolean collapsed = false;
     /**
      * Timer used for doing the transparency animation (fade-in)
      */
@@ -78,10 +92,15 @@ public class JXScrollUp extends JXTitledPanel {
 	 */
 	public JXScrollUp(String title) {
 		super(title);
+        try {
 //		UIManagerUtils.initDefault("JScrollUp.background", "primary2", UIManager.getColor("ComboBox.selectionBackground"));
 		initGui();
 		animator = new AnimationListener();
 		animateTimer = new Timer(WAIT_TIME, animator);
+        } catch (Error e) {
+            System.err.println(e);
+            e.printStackTrace();
+        }  
 	}	
     
 	/**
@@ -95,43 +114,83 @@ public class JXScrollUp extends JXTitledPanel {
 
 		//in reality, I'd like to have a peer that does all the drawing
 		//(as in swing).
-		JPanel contentPanel = createPanelContentContainer();
+//		JPanel contentPanel = createPanelContentContainer();
 
-		chevron = new RoundButton(this);
-		addRightDecoration(chevron);
-		setContentContainer(contentPanel);
+		collapseButton = new JButton(collapsed ? collapsedIcon : expandedIcon);
+        collapseButton.setBorderPainted(false);
+        collapseButton.setMargin(new Insets(0,0,0,0));
+        collapseButton.setFocusable(false);
+        collapseButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+                setCollapsed(!collapsed);
+			}
+        });
+        collapseButton.setOpaque(false);
+		addRightDecoration(collapseButton);
+//		setContentContainer(contentPanel);
 		
-		this.setBorder(BorderFactory.createLineBorder(UIManager.getColor("JScrollUp.background")));
+//		this.setBorder(BorderFactory.createLineBorder(UIManager.getColor("JScrollUp.background")));
 	}
 
+    public boolean isCollapsed() {
+        return collapsed;
+    }
+    
+	/**
+     * If the component is collapsed and <code>val</code> is false, then this call
+	 * scrolls down the JScrollUp, such that the entire JXScrollUp will be visible.
+	 * This also causes the content container to be faded in. However, if the
+     * component is expanded and <code>val</code> is true, then this call
+	 * scrolls up the JXScrollUp, such that only the title bar will be left
+	 * visible. Also, this will cause the content container to be faded out.
+	 */
+    public void setCollapsed(boolean val) {
+        if (collapsed != val) {
+            collapsed = val;
+            collapseButton.setIcon(collapsed ? collapsedIcon : expandedIcon);
+            if (collapsed) {
+                animator.reinit(getContentContainer().getHeight(), 0);
+                animateTimer.start();
+            } else {
+                animator.reinit(getContentContainer().getHeight(), getContentContainer().getPreferredSize().height);
+                animateTimer.start();
+            }
+            repaint();
+            firePropertyChange("collapsed", !collapsed, collapsed);
+        }
+    }
+    
 	/**
 	 * Factory method that will create a JPanel content creator designed to "look right" in a JXScrollUp.
 	 * That is, the colors and border will be set correctly.
 	 * @return
 	 */
-	public static JPanel createPanelContentContainer() {
-		JPanel contentPanel = new ContentContainer();
-		contentPanel.setBorder(BorderFactory.createEmptyBorder());
-		contentPanel.setBackground(UIManager.getColor("JScrollUp.background"));
-		return contentPanel;
-	}
+//	public static JPanel createPanelContentContainer() {
+//		JPanel contentPanel = new ContentContainer();
+//		contentPanel.setBorder(BorderFactory.createEmptyBorder());
+//		contentPanel.setBackground(UIManager.getColor("JScrollUp.background"));
+//		return contentPanel;
+//	}
 
 	/* (non-Javadoc)
 	 * @see com.jgui.swing.JTitledPanel#setContentContainer(java.awt.Container)
 	 */
-	public void setContentContainer(Container contentPanel) {
-		if (contentPanel instanceof ContentContainer) {
-			((ContentContainer)contentPanel).sup = this;
-		}
-		//need to readjust the RoundButton so it will work with the new content panel
-		super.setContentContainer(contentPanel);
-		chevron.cp = contentPanel;
-	}
+//	public void setContentContainer(Container contentPanel) {
+//		if (contentPanel instanceof ContentContainer) {
+//			((ContentContainer)contentPanel).sup = this;
+//		}
+//		//need to readjust the RoundButton so it will work with the new content panel
+//		super.setContentContainer(contentPanel);
+//		chevron.cp = contentPanel;
+//	}
 
 	/* (non-Javadoc)
 	 * @see java.awt.Component#getMinimumSize()
 	 */
 	public Dimension getMinimumSize() {
+        //TODO There is an error in this calculation if there is padding
+        //added to the component in GridBagLayout, probably others as well!
+        
 		//calculate the minimum size that this scrollup can be and still display all of its data
 		Dimension dim = new Dimension(super.getContentContainer().getMinimumSize());
 //		Dimension dim2 = super.getTopPanel().getMinimumSize();
@@ -150,85 +209,6 @@ public class JXScrollUp extends JXTitledPanel {
 		return getMinimumSize();
 	}
 	
-	/**
-	 * Scrolls up the JXScrollUp, such that only the title bar will be left
-	 * visible. Also, this will cause the content container to be faded out.
-	 */
-	public void scrollUp() {
-		animator.reinit(getContentContainer().getHeight(), 0);
-		animateTimer.start();
-	}
-	
-	/**
-	 * Scrolls down the JScrollUP, such that the entire JXScrollUp will be visible.
-	 * This also causes the content container to be faded in.
-	 */
-	public void scrollDown() {
-		animator.reinit(getContentContainer().getHeight(), getContentContainer().getPreferredSize().height);
-		animateTimer.start();
-	}
-
-	/**
-	 * RoundButton is always the same height and width.  It is the height and
-	 * width of the image. <future>A single background thread is shared among
-	 * all RoundButtons.<br>
-	 * This background thread will manage calling the paint method etc on the
-	 * content panes.</future>
-	 * @author Richard Bair
-	 * date: Jun 27, 2003
-	 */
-	private static final class RoundButton extends JButton {
-		private static ImageIcon pressedIcon = new ImageIcon(RoundButton.class.getResource("table/resources/downarrow.gif"));//(ImageIcon)RES.get16x16Icon("nav_down_blue.png", false);
-		private static ImageIcon unpressedIcon = new ImageIcon(RoundButton.class.getResource("table/resources/uparrow.gif"));//(ImageIcon)RES.get16x16Icon("nav_up_blue.png", false);
-		private static Insets EMPTY_INSETS = new Insets(0,0,0,0);
-		private boolean pressed = false;
-		private Container cp;
-		private JXScrollUp scrollUp;
-		
-		/**
-		 * Constructs the RoundButton. It will not be opaque, and will respond to click events
-		 * by scrolling up/down the given JXScrollUp.
-		 */
-		public RoundButton(JXScrollUp scrollUp) {
-			super(unpressedIcon);
-			cp = scrollUp.getContentContainer();
-			this.scrollUp = scrollUp;
-			super.setBorderPainted(false);
-			super.setMargin(EMPTY_INSETS);
-			super.setFocusable(false);
-			super.addActionListener(new ClickEvent());
-			super.setOpaque(false);
-		}
-
-		/**
-		 * Specialized method to handling scrolling up and down of the JXScrollUp content pane.
-		 * Uses the Animation thread for groovy animation. If the content pane is also a JGlassBox,
-		 * then the content pane will fade in/out as it is scrolled down/up.
-		 * @author John Bair
-		 */
-		private final class ClickEvent implements ActionListener {
-			public void actionPerformed(ActionEvent ae) {
-				pressed = !pressed;
-				if(pressed) {
-					setIcon(pressedIcon);
-					scrollUp.scrollUp();
-				} else {
-					setIcon(unpressedIcon);
-					scrollUp.scrollDown();
-				}
-				repaint();
-			}
-		}
-				
-		/**
-		 * @return
-		 */
-		public boolean isPressed() {
-			return pressed;
-		}
-		
-	}
-
 	/**
 	 * 
 	 * This class actual provides the animation support for scrolling up/down this component.
@@ -277,24 +257,28 @@ public class JXScrollUp extends JXTitledPanel {
             	
             	final boolean contracting = startHeight > finalHeight;
             	final int delta_y = contracting ? -1 * DELTA_Y : DELTA_Y;
-            	int newHeight = getContentContainer().getHeight();
+                final Container container = getContentContainer();
+            	int newHeight = container.getHeight();
             	newHeight += delta_y;
 				if (contracting) {
 					newHeight = newHeight < finalHeight ? finalHeight : newHeight;
 				} else {
 					newHeight = newHeight > finalHeight ? finalHeight : newHeight;
 				}
-            	animateAlpha = (float)newHeight/(float)getContentContainer().getPreferredSize().getHeight();
+            	animateAlpha = (float)newHeight/(float)container.getPreferredSize().getHeight();
             	
-            	Rectangle bounds = getContentContainer().getBounds();
+            	Rectangle bounds = container.getBounds();
             	int oldHeight = bounds.height;
             	bounds.height = newHeight;
-            	getContentContainer().setBounds(bounds);
+            	container.setBounds(bounds);
             	bounds = getBounds();
             	bounds.height = (bounds.height - oldHeight) + newHeight;
             	currentHeight = bounds.height;
             	setBounds(bounds);
             	startHeight = newHeight;
+                if (container instanceof JXPanel) {
+                    ((JXPanel)container).setAlpha(animateAlpha);
+                }
         		getParent().validate();
         	}
         }
@@ -311,31 +295,32 @@ public class JXScrollUp extends JXTitledPanel {
         		this.startHeight = startHeight;
         		this.finalHeight = stopHeight;
         		animateAlpha = startHeight < finalHeight ? ALPHA_START : ALPHA_END;
+                System.out.println("[startHeight=" + startHeight + ", finalHeight=" + stopHeight + ", animateAlpha=" + animateAlpha + "]");
         	}
         }
 	}
-	
-	private static final class ContentContainer extends JPanel {
-		private JXScrollUp sup;
-		
-		public ContentContainer() {
-			super();
-		}
-		
-		/* (non-Javadoc)
-		 * @see java.awt.Component#paint(java.awt.Graphics)
-		 */
-		public void paint(Graphics g) {
-			if (sup != null && sup.animateTimer.isRunning()) {
-				Graphics2D g2d = (Graphics2D)g;
-				Composite oldComp = g2d.getComposite();
-		        Composite alphaComp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, sup.animator.animateAlpha);
-	            g2d.setComposite(alphaComp);
-	            super.paint(g2d);
-	            g2d.setComposite(oldComp);
-			} else {
-				super.paint(g);
-			}
-		}
-	}
+//	
+//	private static final class ContentContainer extends JPanel {
+//		private JXScrollUp sup;
+//		
+//		public ContentContainer() {
+//			super();
+//		}
+//		
+//		/* (non-Javadoc)
+//		 * @see java.awt.Component#paint(java.awt.Graphics)
+//		 */
+//		public void paint(Graphics g) {
+//			if (sup != null && sup.animateTimer.isRunning()) {
+//				Graphics2D g2d = (Graphics2D)g;
+//				Composite oldComp = g2d.getComposite();
+//		        Composite alphaComp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, sup.animator.animateAlpha);
+//	            g2d.setComposite(alphaComp);
+//	            super.paint(g2d);
+//	            g2d.setComposite(oldComp);
+//			} else {
+//				super.paint(g);
+//			}
+//		}
+//	}
 }

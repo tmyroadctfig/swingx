@@ -36,6 +36,10 @@ public class JXPanel extends JPanel {
      * <p>TODO: Check whether this variable is necessary or not</p>
      */
     private boolean oldOpaque;
+    /**
+     * Indicates whether this component should inherit its parent alpha value
+     */
+    private boolean inheritAlpha = true;
     
     /** 
      * Creates a new instance of JXPanel
@@ -91,14 +95,29 @@ public class JXPanel extends JPanel {
      * because the lowest alpha in the heirarchy &quot;wins&quot;
      */ 
     public float getEffectiveAlpha() {
-        float a = alpha;
-        Component c = this;
-        while ((c = c.getParent()) != null) {
-            if (c instanceof JXPanel) {
-                a = Math.min(((JXPanel)c).getAlpha(), a);
+        if (inheritAlpha) {
+            float a = alpha;
+            Component c = this;
+            while ((c = c.getParent()) != null) {
+                if (c instanceof JXPanel) {
+                    a = Math.min(((JXPanel)c).getAlpha(), a);
+                }
             }
+            return a;
+        } else {
+            return alpha;
         }
-        return a;
+    }
+    
+    public void setInheritAlpha(boolean val) {
+        if (inheritAlpha != val) {
+            inheritAlpha = val;
+            firePropertyChange("inheritAlpha", !inheritAlpha, inheritAlpha);
+        }
+    }
+
+    public boolean isInheritAlpha() {
+        return inheritAlpha;
     }
     
     /**

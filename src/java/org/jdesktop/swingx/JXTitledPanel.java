@@ -16,13 +16,13 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 import javax.swing.LookAndFeel;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import org.jdesktop.swingx.plaf.TitledPanelUI;
+import org.jdesktop.swingx.plaf.metal.MetalTitledPanelUI;
 
 /**
  * A special type of Panel that has a Title section and a
@@ -188,7 +188,8 @@ public class JXTitledPanel extends JXPanel {
         Object ui = UIManager.getUI(this);
         if (!(ui instanceof TitledPanelUI)) {
             loadDefaults();
-            ui = UIManager.getUI(this);
+//            ui = UIManager.getUI(this);
+            ui = MetalTitledPanelUI.createUI(this);
         }
         setUI((TitledPanelUI)ui);
     }
@@ -260,8 +261,8 @@ public class JXTitledPanel extends JXPanel {
 	 */
 	public Container getContentContainer() {
         if (contentPanel == null) {
-            contentPanel = new JPanel();
-            ((JPanel)contentPanel).setBorder(BorderFactory.createEmptyBorder());
+            contentPanel = new JXPanel();
+            ((JXPanel)contentPanel).setBorder(BorderFactory.createEmptyBorder());
             this.add(contentPanel, BorderLayout.CENTER);
         }
 		return contentPanel;
