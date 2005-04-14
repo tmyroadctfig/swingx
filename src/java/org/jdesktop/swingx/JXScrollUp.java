@@ -5,27 +5,25 @@
  * Santa Clara, California 95054, U.S.A. All rights reserved.
  */
 package org.jdesktop.swingx;
-
-import java.awt.AlphaComposite;
-import java.awt.Composite;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+import javax.swing.LookAndFeel;
 import javax.swing.Timer;
+import javax.swing.UIDefaults;
 import javax.swing.UIManager;
-import org.jdesktop.swingx.JXTitledPanel;
+import org.jdesktop.swingx.plaf.TitledPanelUI;
+import org.jdesktop.swingx.plaf.metal.MetalScrollUpUI;
 import org.jdesktop.swingx.util.UIManagerUtils;
 
 /**
@@ -40,7 +38,63 @@ import org.jdesktop.swingx.util.UIManagerUtils;
  * @author rbair
  */
 public class JXScrollUp extends JXTitledPanel {
-	/**
+    /**
+     * @see #getUIClassID
+     * @see #readObject
+     */
+    private static final String uiClassID = "ScrollUpUI";
+    private static final PropertyChangeListener LAF_LISTENER;
+    
+    /**
+     * Initialization that would ideally be moved into various look and feel
+     * classes.
+     */
+    static {
+        loadDefaults();
+        LAF_LISTENER = new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (evt.getPropertyName().equals("lookAndFeel")) {
+                    loadDefaults();
+                }
+            }
+        };
+        UIManager.addPropertyChangeListener(LAF_LISTENER);
+    }
+    
+    private static void loadDefaults() {
+        LookAndFeel laf = UIManager.getLookAndFeel();
+        if (laf.getID().equals("GTK")) {
+            UIDefaults defaults = UIManager.getDefaults();
+            defaults.put(uiClassID, "org.jdesktop.swingx.plaf.metal.MetalScrollUpUI");
+    		defaults.put("JXScrollUp.background", UIManager.getColor("ComboBox.selectionBackground"));
+        } else if (laf.getID().equals("Motif")) {
+            UIDefaults defaults = UIManager.getDefaults();
+            defaults.put(uiClassID, "org.jdesktop.swingx.plaf.metal.MetalScrollUpUI");
+    		defaults.put("JXScrollUp.background", UIManager.getColor("ComboBox.selectionBackground"));
+        } else if (laf.getID().equals("Mac")) {
+            UIDefaults defaults = UIManager.getDefaults();
+            defaults.put(uiClassID, "org.jdesktop.swingx.plaf.metal.MetalScrollUpUI");
+    		defaults.put("JXScrollUp.background", UIManager.getColor("ComboBox.selectionBackground"));
+        } else if (laf.getID().equals("Windows")) {
+            UIDefaults defaults = UIManager.getDefaults();
+            defaults.put(uiClassID, "org.jdesktop.swingx.plaf.metal.MetalScrollUpUI");
+    		defaults.put("JXScrollUp.background", UIManager.getColor("ComboBox.selectionBackground"));
+        } else if (laf.getID().equals("Plastic")) {
+            UIDefaults defaults = UIManager.getDefaults();
+            defaults.put(uiClassID, "org.jdesktop.swingx.plaf.metal.MetalScrollUpUI");
+    		defaults.put("JXScrollUp.background", UIManager.getColor("ComboBox.selectionBackground"));
+        } else if (laf.getID().equals("Metal")) {
+            UIDefaults defaults = UIManager.getDefaults();
+            defaults.put(uiClassID, "org.jdesktop.swingx.plaf.metal.MetalScrollUpUI");
+    		defaults.put("JXScrollUp.background", UIManager.getColor("ComboBox.selectionBackground"));
+        } else {
+            UIDefaults defaults = UIManager.getDefaults();
+            defaults.put(uiClassID, "org.jdesktop.swingx.plaf.metal.MetalScrollUpUI");
+    		defaults.put("JXScrollUp.background", UIManager.getColor("ComboBox.selectionBackground"));
+        }
+    }
+
+    /**
 	 * The amount of time in milliseconds to wait between calls to the animation thread
 	 */
 	private static final int WAIT_TIME = 5;
@@ -63,11 +117,11 @@ public class JXScrollUp extends JXTitledPanel {
     /**
      * The icon to show when the component is collapsed
      */
-    private Icon collapsedIcon = new ImageIcon("/usr/local/src/swingx/swingx/src/java/org/jdesktop/swingx/downarrow.gif");//(ImageIcon)RES.get16x16Icon("nav_down_blue.png", false);
+    private Icon collapsedIcon = new ImageIcon(getClass().getResource("/org/jdesktop/swingx/table/resources/downarrow.gif"));
     /**
      * The icon to show when the component is expanded
      */
-    private Icon expandedIcon = new ImageIcon("/usr/local/src/swingx/swingx/src/java/org/jdesktop/swingx/uparrow.gif");//(ImageIcon)RES.get16x16Icon("nav_up_blue.png", false);
+    private Icon expandedIcon = new ImageIcon(getClass().getResource("/org/jdesktop/swingx/table/resources/uparrow.gif"));
     /**
      * Indicates whether the component is collapsed or expanded
      */
@@ -93,29 +147,51 @@ public class JXScrollUp extends JXTitledPanel {
 	public JXScrollUp(String title) {
 		super(title);
         try {
-//		UIManagerUtils.initDefault("JScrollUp.background", "primary2", UIManager.getColor("ComboBox.selectionBackground"));
-		initGui();
-		animator = new AnimationListener();
-		animateTimer = new Timer(WAIT_TIME, animator);
+            initGui();
+            animator = new AnimationListener();
+            animateTimer = new Timer(WAIT_TIME, animator);
         } catch (Error e) {
             System.err.println(e);
             e.printStackTrace();
         }  
 	}	
     
+    /**
+     * Resets the UI property with a value from the current look and feel.
+     *
+     * @see JComponent#updateUI
+     */
+    public void updateUI() {
+        //this check was added because apparently loadDefaults is not called
+        //in netbeans?? Maybe I just needed to close & restart netbeans???
+        Object ui = UIManager.getUI(this);
+        if (!(ui instanceof TitledPanelUI)) {
+            loadDefaults();
+//            ui = UIManager.getUI(this);
+            ui = MetalScrollUpUI.createUI(this);
+        }
+        setUI((TitledPanelUI)ui);
+    }
+
+    /**
+     * Returns a string that specifies the name of the L&F class
+     * that renders this component.
+     *
+     * @return "TitledPanelUI"
+     * @see JComponent#getUIClassID
+     * @see UIDefaults#getUI
+     * @beaninfo
+     *        expert: true
+     *   description: A string that specifies the name of the L&F class.
+     */
+    public String getUIClassID() {
+        return uiClassID;
+    }
+
 	/**
 	 * Utility method that initializes the gui
 	 */
 	private void initGui() {
-		//draw my beautiful self.
-		//the widget has a title bar, an expansion/contraction icon, and
-		//a content area.  The content area can in theory contain any
-		//component.
-
-		//in reality, I'd like to have a peer that does all the drawing
-		//(as in swing).
-//		JPanel contentPanel = createPanelContentContainer();
-
 		collapseButton = new JButton(collapsed ? collapsedIcon : expandedIcon);
         collapseButton.setBorderPainted(false);
         collapseButton.setMargin(new Insets(0,0,0,0));
@@ -127,9 +203,7 @@ public class JXScrollUp extends JXTitledPanel {
         });
         collapseButton.setOpaque(false);
 		addRightDecoration(collapseButton);
-//		setContentContainer(contentPanel);
-		
-//		this.setBorder(BorderFactory.createLineBorder(UIManager.getColor("JScrollUp.background")));
+		this.setBorder(BorderFactory.createLineBorder(UIManager.getColor("JXScrollUp.background")));
 	}
 
     public boolean isCollapsed() {
@@ -160,30 +234,6 @@ public class JXScrollUp extends JXTitledPanel {
         }
     }
     
-	/**
-	 * Factory method that will create a JPanel content creator designed to "look right" in a JXScrollUp.
-	 * That is, the colors and border will be set correctly.
-	 * @return
-	 */
-//	public static JPanel createPanelContentContainer() {
-//		JPanel contentPanel = new ContentContainer();
-//		contentPanel.setBorder(BorderFactory.createEmptyBorder());
-//		contentPanel.setBackground(UIManager.getColor("JScrollUp.background"));
-//		return contentPanel;
-//	}
-
-	/* (non-Javadoc)
-	 * @see com.jgui.swing.JTitledPanel#setContentContainer(java.awt.Container)
-	 */
-//	public void setContentContainer(Container contentPanel) {
-//		if (contentPanel instanceof ContentContainer) {
-//			((ContentContainer)contentPanel).sup = this;
-//		}
-//		//need to readjust the RoundButton so it will work with the new content panel
-//		super.setContentContainer(contentPanel);
-//		chevron.cp = contentPanel;
-//	}
-
 	/* (non-Javadoc)
 	 * @see java.awt.Component#getMinimumSize()
 	 */
@@ -299,28 +349,4 @@ public class JXScrollUp extends JXTitledPanel {
         	}
         }
 	}
-//	
-//	private static final class ContentContainer extends JPanel {
-//		private JXScrollUp sup;
-//		
-//		public ContentContainer() {
-//			super();
-//		}
-//		
-//		/* (non-Javadoc)
-//		 * @see java.awt.Component#paint(java.awt.Graphics)
-//		 */
-//		public void paint(Graphics g) {
-//			if (sup != null && sup.animateTimer.isRunning()) {
-//				Graphics2D g2d = (Graphics2D)g;
-//				Composite oldComp = g2d.getComposite();
-//		        Composite alphaComp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, sup.animator.animateAlpha);
-//	            g2d.setComposite(alphaComp);
-//	            super.paint(g2d);
-//	            g2d.setComposite(oldComp);
-//			} else {
-//				super.paint(g);
-//			}
-//		}
-//	}
 }

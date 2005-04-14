@@ -7,27 +7,18 @@
 
 package org.jdesktop.swingx.plaf.metal;
 
-import java.awt.GradientPaint;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.Image;
-import java.awt.Insets;
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
-import org.jdesktop.swingx.plaf.basic.BasicTitledPanelUI;
+import org.jdesktop.swingx.plaf.basic.BasicScrollUpUI;
 
 /**
  *
  * @author rbair
  */
-public class MetalTitledPanelUI extends BasicTitledPanelUI {
+public class MetalScrollUpUI extends BasicScrollUpUI {
     
-    /** Creates a new instance of MetalTitledPanelUI */
-    public MetalTitledPanelUI() {
+    /** Creates a new instance of MetalScrollUpUI */
+    public MetalScrollUpUI() {
     }
     
     /**
@@ -41,6 +32,6 @@ public class MetalTitledPanelUI extends BasicTitledPanelUI {
      * should never be invoked.
      */
     public static ComponentUI createUI(JComponent c) {
-        return new MetalTitledPanelUI();
+        return new MetalScrollUpUI();
     }	
 }

@@ -105,7 +105,7 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
 		panel.add(contentPanel, BorderLayout.CENTER);
 		caption = new JLabel(panel.getTitle());
 		caption.setFont(panel.getTitleFont());
-		topPanel = new JGradientPanel();
+		topPanel = createTopPanel();
 		topPanel.setBorder(BorderFactory.createEmptyBorder());
 		topPanel.setLayout(new GridBagLayout());
 		caption.setForeground(panel.getTitleForeground());
@@ -220,13 +220,17 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
 		topPanel.add(decoration, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 	}
 
+    protected JGradientPanel createTopPanel() {
+        return new JGradientPanel();
+    }
+    
     /**
 	 * A special inner class who's background is painted as a gradient.  This is used
 	 * as the Title section of the JTitledPanel
 	 * @author Richard Bair
 	 * date: Jan 13, 2004
 	 */
-	private final class JGradientPanel extends JXPanel {
+	protected class JGradientPanel extends JXPanel {
 		private GradientPaint gp;
 		private double oldWidth = -1;
 		private double oldHeight = -1;
