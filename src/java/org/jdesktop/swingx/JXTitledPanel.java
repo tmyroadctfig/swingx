@@ -27,12 +27,12 @@ import org.jdesktop.swingx.plaf.metal.MetalTitledPanelUI;
 /**
  * A special type of Panel that has a Title section and a
  * Content section.<br>
- * The following 4 properties can be set with the UIManager to
- * change the look and feel of the JTitledPanel:
+ * The following 3 properties can be set with the UIManager to
+ * change the look and feel of the JXTitledPanel:
  * <ul>
- * 	<li>JTitledPanel.title.foreground</li>
- * 	<li>JTitledPanel.title.background</li>
- * 	<li>JTitledPanel.title.font</li>
+ * 	<li>JXTitledPanel.title.foreground</li>
+ * 	<li>JXTitledPanel.title.background</li>
+ * 	<li>JXTitledPanel.title.font</li>
  * </ul>
  * @author Richard Bair
  * @author Nicola Ken Barozzi
@@ -164,6 +164,7 @@ public class JXTitledPanel extends JXPanel {
 	 */
 	public JXTitledPanel(String title) {
 		this.title = (title == null ? "" : title);
+        setContentContainer(new JXPanel());
 	}
 
 	/**
@@ -269,7 +270,9 @@ public class JXTitledPanel extends JXPanel {
 	}
 	
 	public void setContentContainer(Container contentPanel) {
-		remove(this.contentPanel);
+        if (this.contentPanel != null) {
+    		remove(this.contentPanel);
+        }
 		add(contentPanel, BorderLayout.CENTER);
 		this.contentPanel = contentPanel;
 	}
