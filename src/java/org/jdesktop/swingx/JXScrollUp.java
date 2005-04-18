@@ -83,7 +83,7 @@ public class JXScrollUp extends JXTitledPanel {
     		defaults.put("JXScrollUp.background", UIManager.getColor("ComboBox.selectionBackground"));
         } else if (laf.getID().equals("Windows")) {
             UIDefaults defaults = UIManager.getDefaults();
-            defaults.put(uiClassID, "org.jdesktop.swingx.plaf.metal.MetalScrollUpUI");
+            defaults.put(uiClassID, "org.jdesktop.swingx.plaf.windows.WindowsScrollUpUI");
     		defaults.put("JXScrollUp.background", UIManager.getColor("ComboBox.selectionBackground"));
         } else if (laf.getID().equals("Plastic")) {
             UIDefaults defaults = UIManager.getDefaults();
@@ -264,15 +264,14 @@ public class JXScrollUp extends JXTitledPanel {
          * component (as contained in the currentHeight variable)
          */
 		Dimension dim = new Dimension(getContentContainer().getPreferredSize());
-//		Dimension dim2 = super.getTopPanel().getMinimumSize();
-        Dimension dim2 = new Dimension(dim.width, 20);
+		Dimension dim2 = getUI().getTitleBar().getPreferredSize();
 		dim.width = dim.width > dim2.width ? dim.width : dim2.width;
 		if (currentHeight != -1) {
 			dim.height = currentHeight;
 		} else {
     		dim.height += dim2.height;
         }
-        System.out.println("PreferredSize: " + dim);
+//        System.out.println("PreferredSize: " + dim);
 		return dim;
 	}
 
@@ -358,7 +357,6 @@ public class JXScrollUp extends JXTitledPanel {
             	startHeight = newHeight;
                 wrapper.setAlpha(animateAlpha);
                 Container parent = getParent();
-//                parent.setPreferredSize(new Dimension(parent.getPreferredSize().width, parent.getPreferredSize().height + delta_y));
         		parent.invalidate();
                 parent.doLayout();
                 parent.repaint();
@@ -377,13 +375,8 @@ public class JXScrollUp extends JXTitledPanel {
         		this.startHeight = startHeight;
         		this.finalHeight = stopHeight;
         		animateAlpha = startHeight < finalHeight ? ALPHA_START : ALPHA_END;
-                System.out.println("[startHeight=" + startHeight + ", finalHeight=" + stopHeight + ", animateAlpha=" + animateAlpha + "]");
+//                System.out.println("[startHeight=" + startHeight + ", finalHeight=" + stopHeight + ", animateAlpha=" + animateAlpha + "]");
                 wrapper.showImage();
-//                //resize the parent container based on the new size of this scrollup
-//                Rectangle bounds = getParent().getBounds();
-//                bounds.height += finalHeight - startHeight;
-//                getParent().setBounds(bounds);
-//                System.out.println("Parent bounds: " + bounds);
         	}
         }
 	}
