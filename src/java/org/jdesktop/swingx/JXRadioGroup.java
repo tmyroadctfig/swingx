@@ -94,7 +94,7 @@ public class JXRadioGroup extends JPanel {
 
     public Object getSelectedValue() {
         int index = getSelectedIndex();
-        return (index <= 0 || index >= values.size()) ? null : values.get(index);
+        return (index < 0 || index >= values.size()) ? null : values.get(index);
     }
 
     public void setSelectedValue(Object value) {
