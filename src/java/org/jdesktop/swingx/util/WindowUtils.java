@@ -54,23 +54,28 @@ public final class WindowUtils {
 	 */
 	public static Point getPointForCentering(Window window) {
 		//assert window != null;
-		Point mousePoint = MouseInfo.getPointerInfo().getLocation();
-		GraphicsDevice[] devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
-		for (GraphicsDevice device : devices) {
-			Rectangle bounds = device.getDefaultConfiguration().getBounds();
-			//check to see if the mouse cursor is within these bounds
-			if (mousePoint.x >= bounds.x && mousePoint.y >= bounds.y
-					&& mousePoint.x <= (bounds.x + bounds.width)
-					&& mousePoint.y <= (bounds.y + bounds.height)) {
-				//this is it
-				int screenWidth = bounds.width;
-				int screenHeight = bounds.height;
-				int width = window.getWidth();
-				int height = window.getHeight();
-				Point p = new Point(((screenWidth - width) / 2) + bounds.x, ((screenHeight - height) / 2) + bounds.y);
-				return p;
-			}
-		}
+        try {
+            Point mousePoint = MouseInfo.getPointerInfo().getLocation();
+            GraphicsDevice[] devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
+            for (GraphicsDevice device : devices) {
+                Rectangle bounds = device.getDefaultConfiguration().getBounds();
+                //check to see if the mouse cursor is within these bounds
+                if (mousePoint.x >= bounds.x && mousePoint.y >= bounds.y
+                        && mousePoint.x <= (bounds.x + bounds.width)
+                        && mousePoint.y <= (bounds.y + bounds.height)) {
+                    //this is it
+                    int screenWidth = bounds.width;
+                    int screenHeight = bounds.height;
+                    int width = window.getWidth();
+                    int height = window.getHeight();
+                    Point p = new Point(((screenWidth - width) / 2) + bounds.x, ((screenHeight - height) / 2) + bounds.y);
+                    return p;
+                }
+            }
+        } catch (Exception e) {
+            //this can occur do to a Security exception in sandboxed apps
+            e.printStackTrace();
+        }
 		return new Point(0,0);
 	}
 	
@@ -91,24 +96,29 @@ public final class WindowUtils {
 	 * center that window on the given desktop
 	 */
 	public static Point getPointForCentering(JInternalFrame window, JDesktopPane desktop) {
-		//assert window != null;
-		Point mousePoint = MouseInfo.getPointerInfo().getLocation();
-		GraphicsDevice[] devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
-		for (GraphicsDevice device : devices) {
-			Rectangle bounds = device.getDefaultConfiguration().getBounds();
-			//check to see if the mouse cursor is within these bounds
-			if (mousePoint.x >= bounds.x && mousePoint.y >= bounds.y
-					&& mousePoint.x <= (bounds.x + bounds.width)
-					&& mousePoint.y <= (bounds.y + bounds.height)) {
-				//this is it
-				int screenWidth = bounds.width;
-				int screenHeight = bounds.height;
-				int width = window.getWidth();
-				int height = window.getHeight();
-				Point p = new Point(((screenWidth - width) / 2) + bounds.x, ((screenHeight - height) / 2) + bounds.y);
-				return p;
-			}
-		}
+        try {
+            //assert window != null;
+            Point mousePoint = MouseInfo.getPointerInfo().getLocation();
+            GraphicsDevice[] devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
+            for (GraphicsDevice device : devices) {
+                Rectangle bounds = device.getDefaultConfiguration().getBounds();
+                //check to see if the mouse cursor is within these bounds
+                if (mousePoint.x >= bounds.x && mousePoint.y >= bounds.y
+                        && mousePoint.x <= (bounds.x + bounds.width)
+                        && mousePoint.y <= (bounds.y + bounds.height)) {
+                    //this is it
+                    int screenWidth = bounds.width;
+                    int screenHeight = bounds.height;
+                    int width = window.getWidth();
+                    int height = window.getHeight();
+                    Point p = new Point(((screenWidth - width) / 2) + bounds.x, ((screenHeight - height) / 2) + bounds.y);
+                    return p;
+                }
+            }
+        } catch (Exception e) {
+            //this can occur do to a Security exception in sandboxed apps
+            e.printStackTrace();
+        }
 		return new Point(0,0);
 	}
 
