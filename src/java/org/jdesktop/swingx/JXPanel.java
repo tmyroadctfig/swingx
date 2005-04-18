@@ -45,7 +45,7 @@ public class JXPanel extends JPanel implements Scrollable {
     /**
      * Indicates whether this component should inherit its parent alpha value
      */
-    private boolean inheritAlpha;
+    private boolean inheritAlpha = true;
     
     /** 
      * Creates a new instance of JXPanel
