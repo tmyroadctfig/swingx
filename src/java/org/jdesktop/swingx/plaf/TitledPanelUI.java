@@ -7,6 +7,7 @@
 
 package org.jdesktop.swingx.plaf;
 
+import java.awt.Container;
 import javax.swing.JComponent;
 import javax.swing.plaf.PanelUI;
 
@@ -26,4 +27,6 @@ public abstract class TitledPanelUI extends PanelUI {
 	 * @param decoration
 	 */
 	public abstract void addLeftDecoration(JComponent decoration);
+    
+    public abstract Container getTitleBar();
 }

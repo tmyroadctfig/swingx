@@ -9,6 +9,7 @@ package org.jdesktop.swingx.plaf.basic;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
@@ -27,14 +28,12 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.plaf.UIResource;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.JXTitledPanel;
 import org.jdesktop.swingx.plaf.TitledPanelUI;
-import org.jdesktop.swingx.util.UIManagerUtils;
+
 
 /**
  * All TitledPanels contain a title section and a content section. The default
@@ -220,6 +219,10 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
 		topPanel.add(decoration, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 	}
 
+    public Container getTitleBar() {
+        return topPanel;
+    }
+    
     protected JGradientPanel createTopPanel() {
         return new JGradientPanel();
     }
