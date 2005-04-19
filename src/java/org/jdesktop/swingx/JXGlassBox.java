@@ -9,7 +9,6 @@ package org.jdesktop.swingx;
 
 import java.applet.Applet;
 import java.awt.AlphaComposite;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -27,16 +26,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.LineBorder;
+
 
 
 
@@ -57,31 +50,28 @@ import javax.swing.border.LineBorder;
  * @version 1.0
  */
 
-public class JXGlassBox extends JPanel {
+public class JXGlassBox extends JXPanel {
     private static final int SHOW_DELAY = 30; // ms
-    private static final int TIMER_INCREMENT = 5; // ms
+    private static final int TIMER_INCREMENT = 10; // ms
 
     private float alphaStart = 0.01f;
     private float alphaEnd = 0.8f;
 
     private Timer animateTimer;
-    private float animateAlpha = alphaStart;
     private float alphaIncrement = 0.02f;
 
     private boolean dismissOnClick = false;
     private MouseAdapter dismissListener = null;
 
-    private transient Insets insets = new Insets(0,0,0,0); //scatch
-
     public JXGlassBox() {
         setOpaque(false);
+        setAlpha(alphaStart);
         setBackground(Color.white);
         setDismissOnClick(true);
 
         animateTimer = new Timer(TIMER_INCREMENT, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                animateAlpha += alphaIncrement;
-                paintImmediately(0, 0, getWidth(), getHeight());
+                setAlpha(getAlpha() + alphaIncrement);
             }
         });
     }
@@ -92,12 +82,8 @@ public class JXGlassBox extends JPanel {
     }
 
     public void setAlpha(float alpha) {
-        this.alphaEnd = alpha;
+        super.setAlpha(alpha);
         this.alphaIncrement = (alphaEnd - alphaStart)/(SHOW_DELAY/TIMER_INCREMENT);
-    }
-
-    public float getAlpha() {
-        return alphaEnd;
     }
 
     public void setDismissOnClick(boolean dismissOnClick) {
@@ -124,29 +110,17 @@ public class JXGlassBox extends JPanel {
     }
 
     public void paint(Graphics g) {
-        insets = getInsets(insets);
-        Graphics2D g2d = (Graphics2D)g;
-        Composite oldComp = g2d.getComposite();
-        Composite alphaComp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
-            Math.min(alphaEnd, animateAlpha));
-        g2d.setComposite(alphaComp);
-        g2d.setColor(getBackground());
-        g2d.fillRect(insets.left, insets.top,
-                     getWidth() - insets.left - insets.right,
-                     getHeight() - insets.top - insets.bottom);
-        super.paint(g2d);
-        g2d.setComposite(oldComp);
-
-        if (!animateTimer.isRunning() && animateAlpha < alphaEnd ) {
+        super.paint(g);
+        if (!animateTimer.isRunning() && getAlpha() < alphaEnd ) {
             animateTimer.start();
         }
-        if (animateTimer.isRunning() && animateAlpha >= alphaEnd) {
+        if (animateTimer.isRunning() && getAlpha() >= alphaEnd) {
             animateTimer.stop();
         }
     }
 
     public void setVisible(boolean visible) {
-        animateAlpha = alphaStart;
+        setAlpha(alphaStart);
         super.setVisible(visible);
     }
 
