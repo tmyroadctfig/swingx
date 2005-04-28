@@ -27,6 +27,8 @@ public abstract class TitledPanelUI extends PanelUI {
 	 * @param decoration
 	 */
 	public abstract void addLeftDecoration(JComponent decoration);
-    
+    /**
+     * @return the Container acting as the title bar for this component
+     */
     public abstract Container getTitleBar();
 }
