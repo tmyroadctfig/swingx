@@ -26,7 +26,7 @@ public class BasicScrollUpUI extends BasicTitledPanelUI {
         return new ScrollUpTopPanel();
     }
     
-    private final class ScrollUpTopPanel extends JGradientPanel {
+    protected class ScrollUpTopPanel extends JGradientPanel {
         /**
          * rather than using the default algorithm, this panel will
          * <b>skip</b> its immediate parent in searching for an effective

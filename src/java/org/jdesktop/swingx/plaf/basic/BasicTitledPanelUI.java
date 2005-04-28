@@ -59,7 +59,7 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
     /**
      * The JXTitledPanel peered with this UI
      */
-    private JXTitledPanel titledPanel;
+    protected JXTitledPanel titledPanel;
     
     /** Creates a new instance of BasicTitledPanelUI */
     public BasicTitledPanelUI() {
@@ -108,7 +108,7 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
 		topPanel.setBorder(BorderFactory.createEmptyBorder());
 		topPanel.setLayout(new GridBagLayout());
 		caption.setForeground(panel.getTitleForeground());
-		topPanel.add(caption, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(2, 12, 2, 4), 0, 0));
+		topPanel.add(caption, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(4, 12, 4, 12), 0, 0));
 		panel.add(topPanel, BorderLayout.NORTH);
 		panel.setBorder(BorderFactory.createRaisedBevelBorder());
 		panel.setOpaque(false);
@@ -219,10 +219,13 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
 		topPanel.add(decoration, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 	}
 
+    /**
+     * @return the Container acting as the title bar for this component
+     */
     public Container getTitleBar() {
         return topPanel;
     }
-    
+
     protected JGradientPanel createTopPanel() {
         return new JGradientPanel();
     }
@@ -253,12 +256,7 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
 		protected void paintComponent(Graphics g) {
 			//draw the gradient background
 			if (oldWidth != getWidth() || oldHeight != getHeight()) {
-				gp = new GradientPaint(0, 
-                                       0, 
-                                       titledPanel.getTitleDarkBackground(), 
-                                       getWidth(), 
-                                       0, 
-                                       titledPanel.getTitleLightBackground());
+				gp = createGradientPaint();
 				Image savedImg = createImage(getWidth(), getHeight());
 				Graphics2D imgg = (Graphics2D)savedImg.getGraphics();
 				imgg.setPaint(gp);
@@ -270,6 +268,14 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
 			//draw the image
 			g.drawImage(helper.getImage(), 0, 0, getWidth(), getHeight(), helper.getImageObserver());
 		}
-
+        
+        protected GradientPaint createGradientPaint() {
+            return new GradientPaint(0, 
+                                     0, 
+                                     titledPanel.getTitleDarkBackground(), 
+                                     getWidth(), 
+                                     0, 
+                                     titledPanel.getTitleLightBackground());
+        }
 	}
 }
