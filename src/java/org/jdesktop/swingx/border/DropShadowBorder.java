@@ -17,8 +17,10 @@ import javax.swing.ImageIcon;
 import javax.swing.border.Border;
 
 /**
- * Implements a DropShadow for any component. Any drop shadow can be quickly
- * drawn
+ * Implements a DropShadow for components. In general, the DropShadowBorder will
+ * work with any rectangular components that do not have a default border installed
+ * as part of the look and feel, or otherwise. For example, DropShadowBorder works
+ * wonderfully with JPanel, but horribly with JComboBox.
  *
  * @author rbair
  */
