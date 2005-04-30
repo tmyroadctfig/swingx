@@ -247,27 +247,6 @@ public class FilterPipeline {
         return (last == null) ? row : last.convertRowIndexToModel(row);
     }
 
-    int convertRowIndexToModel(Filter filter, int row) {
-        if (contains(filter)) {
-            Filter  previous = previous(filter);
-            if (previous == null) {
-                return row;
-            }
-            else {
-                return previous.convertRowIndexToModel(row);
-            }
-        }
-        else {
-            Filter  last = last();
-            if (last == null) {
-                return row;
-            }
-            else {
-                return last.convertRowIndexToModel(row);
-            }
-        }
-    }
-
     /**
      * Convert row index from model coordinates to view coordinates
      * accounting for the presence of sorters and filters. This is essentially
@@ -283,27 +262,6 @@ public class FilterPipeline {
         return (last == null) ? row : last.convertRowIndexToView(row);
     }
 
-    int convertRowIndexToView(Filter filter, int row) {
-        if (contains(filter)) {
-            Filter  previous = previous(filter);
-            if (previous == null) {
-                return row;
-            }
-            else {
-                return previous.convertRowIndexToView(row);
-            }
-        }
-        else {
-            Filter  last = last();
-            if (last == null) {
-                return row;
-            }
-            else {
-                return last.convertRowIndexToView(row);
-            }
-        }
-    }
-
     /**
      * Returns the value of the cell at the specified coordinates.
      *
@@ -316,28 +274,6 @@ public class FilterPipeline {
         return (last == null) ? null : last.getValueAt(row, column);
     }
 
-
-    Object getInputValueFor(Filter filter, int row, int column) {
-        if (contains(filter)) {
-            Filter  previous = previous(filter);
-            if (previous == null) {
-                return adapter.getValueAt(row, adapter.modelToView(column));
-            }
-            else {
-                return previous.getValueAt(row, column);
-            }
-        }
-        else {
-            Filter  last = last();
-            if (last == null) {
-                return adapter.getValueAt(row, adapter.modelToView(column));
-            }
-            else {
-                return last.getValueAt(row, column);
-            }
-        }
-    }
-
     public void setValueAt(Object aValue, int row, int column) {
         Filter last = last();
         if (last != null) {
@@ -345,55 +281,9 @@ public class FilterPipeline {
         }
     }
 
-    void setInputValueFor(Object aValue, Filter filter, int row, int column) {
-        if (contains(filter)) {
-            Filter previous = previous(filter);
-            if (previous == null) {
-                adapter.setValueAt(aValue, row, adapter.modelToView(column));
-            }
-            else {
-                previous.setValueAt(aValue, row, column);
-            }
-        }
-        else {
-            Filter  last = last();
-            if (last == null) {
-                adapter.setValueAt(aValue, row, adapter.modelToView(column));
-            }
-            else {
-                last.setValueAt(aValue, row, column);
-            }
-        }
-    }
-
     public boolean isCellEditable(int row, int column) {
         Filter last = last();
         return (last == null) ? false : last.isCellEditable(row, column);
-    }
-
-    boolean isInputEditableFor(Filter filter, int row, int column) {
-        /** @todo test this. Why are we calling translateToPreviousFilter? */
-        // JW: because Filter isCellEditable didn't!
-//      int inputRow = filter.translateToPreviousFilter(row);
-        int inputRow = row; 
-        if (contains(filter)) {
-            Filter  previous = previous(filter);
-            if (previous == null) {
-                return adapter.isCellEditable(inputRow, adapter.modelToView(column));
-            }
-            else {
-                return previous.isCellEditable(inputRow, column);
-            }
-        }
-        else {
-            Filter  last = last();
-            if (last == null) {
-                return adapter.isCellEditable(inputRow, adapter.modelToView(column));
-            }
-            else {
-                return last.isCellEditable(inputRow, column);
-            }
-        }
     }
 
     /**
@@ -513,10 +403,4 @@ public class FilterPipeline {
 
         return outList;
     }
-/*
-    private void bind(Filter filter) {
-        filter.bind(this);
-        filter.bind(adapter);
-    }
-*/
 }

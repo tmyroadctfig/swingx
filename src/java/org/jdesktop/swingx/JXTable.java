@@ -100,7 +100,7 @@ public static boolean TRACE = false;
                 table.resetSorter();
             }
             else {
-                
+
                 int column = header.getColumnModel().getColumnIndexAtX(e.getX());
                 if (column >= 0) {
                     table.setSorter(column);
@@ -294,23 +294,23 @@ public static boolean TRACE = false;
         if (sorter != null) {
            contentsChanged(null);
         }
-        
+
     }
-    
+
     public boolean isSortable() {
         return sortable;
     }
 
-    
+
 //    public void setAutomaticSort(boolean automaticEnabled) {
 //        this.automaticSortDisabled = !automaticEnabled;
-//       
+//
 //    }
-//    
+//
 //    public boolean isAutomaticSort() {
 //        return !automaticSortDisabled;
 //    }
-    
+
     public void tableChanged(TableModelEvent e) {
         Selection   selection = new Selection(this);
         if (filters != null) {
@@ -320,9 +320,9 @@ public static boolean TRACE = false;
             sorter.refresh();
 //            if (isAutomaticSort()) {
 //                sorter.refresh();
-//            } 
+//            }
         }
-        
+
         super.tableChanged(e);
         restoreSelection(selection);
     }
@@ -403,6 +403,7 @@ public static boolean TRACE = false;
     public Object getValueAt(int row, int column) {
         if (sorter == null) {       // have interactive sorter?
             if (filters == null) {  // have filter pipeline?
+                // superclass will call convertColumnIndexToModel
                 return super.getValueAt(row, column);   // unsorted, unfiltered
             }
             else {  // filtered
@@ -444,7 +445,7 @@ public static boolean TRACE = false;
 
     public void setModel(TableModel newModel) {
         //JW: need to clear here because super.setModel
-        // calls tableChanged... 
+        // calls tableChanged...
         // fixing #173
         clearSelection();
         super.setModel(newModel);
@@ -480,10 +481,14 @@ public static boolean TRACE = false;
     private void restoreSelection(Selection selection) {
         clearSelection();   // call overridden version
 
+        // RG: calculate rowCount once, not inside a loop
+        final   int rowCount = getModel().getRowCount();
+
         for (int i = 0; i < selection.selected.length; i++) {
             // JW: make sure we convert valid row indices (in model coordinates) only
             // fix #16
-            if ((selection.selected[i] != selection.lead) && (selection.selected[i] < getModel().getRowCount())) {
+            int selected = selection.selected[i];
+            if ((selected != selection.lead) && (selected < rowCount)) {
                 int index = convertRowIndexToView(selection.selected[i]);
                 selectionModel.addSelectionInterval(index, index);
             }
@@ -491,7 +496,7 @@ public static boolean TRACE = false;
 
         // JW: make sure we convert valid row indices (in model coordinates) only
         // fix #16
-        if ((selection.lead >= 0) && (selection.lead < getModel().getRowCount())) {
+        if ((selection.lead >= 0) && (selection.lead < rowCount)) {
             selection.lead = convertRowIndexToView(selection.lead);
             selectionModel.addSelectionInterval(selection.lead, selection.lead);
         }
@@ -508,7 +513,7 @@ public static boolean TRACE = false;
      */
     private void use(FilterPipeline pipeline) {
         if (pipeline != null) {
-            // check JW: adding listener multiple times (after setModel)? 
+            // check JW: adding listener multiple times (after setModel)?
             if (initialUse(pipeline)) {
                 pipeline.addPipelineListener(this);
                 pipeline.assign(getComponentAdapter());
@@ -516,9 +521,9 @@ public static boolean TRACE = false;
             pipeline.flush();
         }
     }
-    
+
     /**
-     * 
+     *
      * @param pipeline must be != null
      * @return true is not yet used in this JXTable, false otherwise
      */
@@ -539,7 +544,7 @@ public static boolean TRACE = false;
         if (filters == null) return;
         // fix#125: cleanup old filters
         filters.removePipelineListener(this);
-        // hacking around - 
+        // hacking around -
         //brute force update of sorter by removing
         contentsChanged(null);
     }
@@ -561,13 +566,13 @@ public static boolean TRACE = false;
 //        // fixing #167: remove from pipeline
 //        // moved to refreshSorter
 //        if (sorter != null) {
-//           sorter.interpose(null, getComponentAdapter(), null); 
+//           sorter.interpose(null, getComponentAdapter(), null);
 //        }
         sorter = null;
         getTableHeader().repaint();
     }
-    
-    
+
+
     /*
      * Used by headerListener
      */
@@ -586,7 +591,7 @@ public static boolean TRACE = false;
             Sorter  newSorter = column.getSorter();
             if (newSorter != null) {
                 // JW: hacking around #167: un-assign from filters
-                // this should be done somewhere else! 
+                // this should be done somewhere else!
                 newSorter.interpose(null, getComponentAdapter(), null);
                 // filter pipeline may be null!
                 newSorter.interpose(filters, getComponentAdapter(), sorter);  // refresh
@@ -647,8 +652,8 @@ public static boolean TRACE = false;
      * <code>equals</code>.
      *
      * @return  the <code>TableColumn</code> object that matches the identifier
-     * @exception IllegalArgumentException      
-     *    if <code>identifier</code> is <code>null</code> 
+     * @exception IllegalArgumentException
+     *    if <code>identifier</code> is <code>null</code>
      *    or no <code>TableColumn</code> has this identifier
      *
      * @param   identifier                      the identifier object
@@ -689,7 +694,7 @@ public static boolean TRACE = false;
     }
 
 //------------------------- start of (meta)Data-aware code
-    
+
     protected TableColumn createAndConfigureColumn(TableModel model, int modelColumn) {
         TableColumn column = createColumn(modelColumn);
 //        if (model instanceof MetaDataProvider) {
@@ -700,15 +705,15 @@ public static boolean TRACE = false;
         return column;
     }
 
-    /** 
+    /**
      * set column properties from MetaData. <p>
      * Experimental, will be moved somewhere else when
      * going for a data-unaware swingx layer.<p>
-     * 
+     *
      * Note: the column must not be assumed to be already
      * added to the columnModel nor to have any relation
      * to the current tableModel!.
-     * 
+     *
      * @param column
      * @param metaData
      */
@@ -717,18 +722,18 @@ public static boolean TRACE = false;
 //        column.setHeaderValue(metaData.getLabel());
 //        if (column instanceof TableColumnExt) {
 //            TableColumnExt columnExt = (TableColumnExt) column;
-//            if (metaData.getElementClass() == String.class) { 
-//                    
+//            if (metaData.getElementClass() == String.class) {
+//
 ////                if (metaData.getDisplayWidth() > 0) {
 ////                    StringBuffer buf = new StringBuffer(metaData.getDisplayWidth());
 ////                    for (int i = 0; i < metaData.getDisplayWidth(); i++) {
 ////                        buf.append("r");
-////                        
+////
 ////                    }
 ////                    columnExt.setPrototypeValue(buf.toString());
 ////                }
-//                
-//                columnExt.putClientProperty(TableColumnExt.SORTER_COMPARATOR, 
+//
+//                columnExt.putClientProperty(TableColumnExt.SORTER_COMPARATOR,
 //                        Collator.getInstance());
 //            }
 //        }
@@ -746,7 +751,7 @@ public static boolean TRACE = false;
 //        return new DefaultTableModelExt();
 //    }
 //-------------------- end of (meta)Data-aware code
-    
+
     protected TableColumn createColumn(int modelIndex) {
         return new TableColumnExt(modelIndex);
     }
@@ -1368,7 +1373,8 @@ public static boolean TRACE = false;
          * {@inheritDoc}
          */
         public Object getValueAt(int row, int column) {
-            return table.getModel().getValueAt(row, viewToModel(column));
+            // RG: eliminate superfluous back-and-forth conversions
+            return table.getModel().getValueAt(row, column);
         }
 
         public Object getFilteredValueAt(int row, int column) {
@@ -1376,11 +1382,13 @@ public static boolean TRACE = false;
         }
 
         public void setValueAt(Object aValue, int row, int column) {
-            table.getModel().setValueAt(aValue, row, viewToModel(column));
+            // RG: eliminate superfluous back-and-forth conversions
+            table.getModel().setValueAt(aValue, row, column);
         }
 
         public boolean isCellEditable(int row, int column) {
-            return table.getModel().isCellEditable(row, viewToModel(column));
+            // RG: eliminate superfluous back-and-forth conversions
+            return table.getModel().isCellEditable(row, column);
         }
 
         /**

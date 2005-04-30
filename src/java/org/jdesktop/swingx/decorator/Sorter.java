@@ -18,53 +18,42 @@ import java.util.TreeSet;
  */
 public abstract class Sorter extends Filter {
     private boolean	ascending = true;
+    private final   Collator    collator;   // RG: compute this once
     private Comparator comparator;
-    
+
     public Sorter() {
         this(0, true);
     }
 
     public Sorter(int col, boolean ascending) {
         this(col, ascending, null);
-//        super(col);
-//        setAscending(ascending);
     }
 
     public Sorter(int col, boolean ascending, Comparator comparator) {
         super(col);
         this.comparator = comparator;
         setAscending(ascending);
-        
+        collator = Collator.getInstance();
     }
-    
+
     /**
      * set the Comparator to use when comparing values.
      * If not null every compare will be delegated to it.
      * If null the compare will follow the internal compare
-     * (no contract, but implemented here as: 
-     * first check if the values are Comparable, if so 
-     * delegate, then compare the String representation) 
-     * 
+     * (no contract, but implemented here as:
+     * first check if the values are Comparable, if so
+     * delegate, then compare the String representation)
+     *
      * @param comparator
      */
     public void setComparator(Comparator comparator) {
         this.comparator = comparator;
         refresh();
     }
-    
+
     public Comparator getComparator() {
         return this.comparator;
     }
-/*
-    public void contentsChanged(PipelineEvent ev) {
-		if (memberOf((FilterPipeline) ev.getSource())) {
-            // Do nothing (to avoid unbounded recursion
-        }
-        else {
-            purge();	// purge stale indices of stand-alone sorter
-        }
-    }
-*/
 
     /**
      * Adopts the row mappings of the specified sorter by cloning the mappings.
@@ -127,7 +116,7 @@ public abstract class Sorter extends Filter {
             Comparable c2 = (Comparable) o2;
             return c1.compareTo(c2);
         }
-        else if (o1 instanceof Boolean) {
+        else if (o1 instanceof Boolean) {   // RG: Dead branch? A Boolean is also a Comparable!
             try {
                 Boolean bool1 = (Boolean) o1;
                 boolean b1 = bool1.booleanValue();
@@ -150,7 +139,7 @@ public abstract class Sorter extends Filter {
             }
         }
         else {
-            return Collator.getInstance().compare(o1.toString(), o2.toString());
+            return collator.compare(o1.toString(), o2.toString());
             //return o1.toString().compareTo(o2.toString());
         }
 

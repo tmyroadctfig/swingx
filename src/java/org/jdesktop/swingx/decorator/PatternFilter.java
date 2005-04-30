@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
  * @author Ramesh Gupta
  */
 public class PatternFilter extends Filter implements PatternMatcher {
-    private ArrayList	toPrevious, fromPrevious;
+    private ArrayList<Integer>	toPrevious;
     protected Pattern	pattern = null;
 
     public PatternFilter() {
@@ -29,8 +29,7 @@ public class PatternFilter extends Filter implements PatternMatcher {
     }
 
     protected void init() {
-		toPrevious = new ArrayList();
-        fromPrevious = new ArrayList();
+		toPrevious = new ArrayList<Integer>();
     }
 
     public void setPattern(String regularExpr, int matchFlags) {
@@ -66,31 +65,22 @@ public class PatternFilter extends Filter implements PatternMatcher {
      */
     protected void reset() {
         toPrevious.clear();
-        Integer	none = new Integer(-1);
         int inputSize = getInputSize();
-        fromPrevious = new ArrayList(inputSize);
+        fromPrevious = new int[inputSize];  // fromPrevious is inherited protected
         for (int i = 0; i < inputSize; i++) {
-            fromPrevious.add(i, none);
-        }
-    }
-
-    /**
-     * Generates the row mappings from the previous filter to this filter.
-     */
-    protected void generateMappingFromPrevious() {
-        int	outputSize = toPrevious.size();
-        for (int i = 0; i < outputSize; i++) {
-            Integer	index = (Integer) toPrevious.get(i);
-            fromPrevious.set(index.intValue(), new Integer(i));
+            fromPrevious[i] = -1;
         }
     }
 
     protected void filter() {
         if (pattern != null) {
             int inputSize = getInputSize();
+            int current = 0;
             for (int i = 0; i < inputSize; i++) {
                 if (test(i)) {
                     toPrevious.add(new Integer(i));
+                    // generate inverse map entry while we are here
+                    fromPrevious[i] = current++;
                 }
             }
         }
@@ -121,33 +111,7 @@ public class PatternFilter extends Filter implements PatternMatcher {
         return toPrevious.size();
     }
 
-    /**
-     * Returns the row in this filter that maps to the specified row in the
-     * previous filter. If there is no previous filter in the pipeline, this returns
-     * the row in this filter that maps to the specified row in the data model.
-     * This method is called from
-     * {@link org.jdesktop.swing.decorator.Filter#convertRowIndexToView(int) convertRowIndexToView}
-     *
-     * @param row a row index in the previous filter's "view" of the data model
-     * @return the row in this filter that maps to the specified row in
-     * the previous filter
-     */
-    protected int translateFromPreviousFilter(int row) {
-        return ((Integer) fromPrevious.get(row)).intValue();
-    }
-
-    /**
-     * Returns the row in the previous filter that maps to the specified row in
-     * this filter. If there is no previous filter in the pipeline, this returns
-     * the row in the data model that maps to the specified row in this filter.
-     * This method is called from
-     * {@link org.jdesktop.swing.decorator.Filter#convertRowIndexToModel(int) convertRowIndexToModel}
-     *
-     * @param row a row index in this filter's "view" of the data model
-     * @return the row in the previous filter that maps to the specified row in
-     * this filter
-     */
-    protected int translateToPreviousFilter(int row) {
-        return ((Integer) toPrevious.get(row)).intValue();
+    protected int mapTowardModel(int row) {
+        return toPrevious.get(row);
     }
 }

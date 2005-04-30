@@ -13,7 +13,7 @@ package org.jdesktop.swingx.decorator;
  * @author Ramesh Gupta
  */
 public class ShuttleSorter extends Sorter {
-    private int[]	toPrevious, fromPrevious;
+    private int[]	toPrevious;
 
     public ShuttleSorter() {
         this(0, true);
@@ -25,7 +25,6 @@ public class ShuttleSorter extends Sorter {
 
     protected void init() {
         toPrevious = new int[0];
-        fromPrevious = new int[0];
     }
 
     /**
@@ -55,52 +54,21 @@ public class ShuttleSorter extends Sorter {
     }
 
     /**
-     * Generates the row mappings from the previous filter to this filter.
-     */
-    protected void generateMappingFromPrevious() {
-        for (int i = 0; i < toPrevious.length; i++) {
-            fromPrevious[toPrevious[i]] = i;
-        }
-    }
-
-    /**
      * Performs the sort.
      */
     protected void filter() {
         sort((int[]) toPrevious.clone(), toPrevious, 0, toPrevious.length);
+        // Generate inverse map for implementing convertRowIndexToView();
+        for (int i = 0; i < toPrevious.length; i++) {
+            fromPrevious[toPrevious[i]] = i;
+        }
     }
 
     public int getSize() {
         return toPrevious.length;
     }
 
-    /**
-     * Returns the row in this filter that maps to the specified row in the
-     * previous filter. If there is no previous filter in the pipeline, this returns
-     * the row in this filter that maps to the specified row in the data model.
-     * This method is called from
-     * {@link org.jdesktop.swing.decorator.Filter#convertRowIndexToView(int) convertRowIndexToView}
-     *
-     * @param row a row index in the previous filter's "view" of the data model
-     * @return the row in this filter that maps to the specified row in
-     * the previous filter
-     */
-    protected int translateFromPreviousFilter(int row) {
-        return fromPrevious[row];
-    }
-
-    /**
-     * Returns the row in the previous filter that maps to the specified row in
-     * this filter. If there is no previous filter in the pipeline, this returns
-     * the row in the data model that maps to the specified row in this filter.
-     * This method is called from
-     * {@link org.jdesktop.swing.decorator.Filter#convertRowIndexToModel(int) convertRowIndexToModel}
-     *
-     * @param row a row index in this filter's "view" of the data model
-     * @return the row in the previous filter that maps to the specified row in
-     * this filter
-     */
-    protected int translateToPreviousFilter(int row) {
+    protected int mapTowardModel(int row) {
         return toPrevious[row];
     }
 
