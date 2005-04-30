@@ -25,8 +25,8 @@ import javax.swing.border.Border;
  * @author rbair
  */
 public class DropShadowBorder implements Border {
-    private static final int SHADOW_WIDTH = 8;
-    private static final int SHADOW_HEIGHT = 8;
+    private static final int SHADOW_WIDTH = 4;
+    private static final int SHADOW_HEIGHT = 4;
     
     private ImageIcon topRight;
     private ImageIcon right;
@@ -73,7 +73,9 @@ public class DropShadowBorder implements Border {
         
         //draw a rectangular border.
         g.setColor(borderColor);
-        g.drawRect(leftEdge, topEdge, rightEdge - leftEdge, bottomEdge - topEdge);
+        if (lineWidth > 0) {
+            g.drawRect(leftEdge, topEdge, rightEdge - leftEdge, bottomEdge - topEdge);
+        }
         
         //draw the tiles
         g.drawImage(topRight.getImage(), rightEdge, 0, topRight.getImageObserver());
