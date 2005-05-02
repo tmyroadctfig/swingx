@@ -6,28 +6,19 @@
  */
 
 package org.jdesktop.swingx;
-
-import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Hashtable;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.Vector;
 import java.util.regex.Pattern;
-import javax.print.attribute.HashPrintRequestAttributeSet;
-import javax.print.attribute.PrintRequestAttributeSet;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.print.Printable;
 import java.awt.print.PrinterException;
-import java.awt.print.PrinterJob;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 
@@ -69,19 +60,7 @@ import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
 public class JXTable extends JTable implements PipelineListener, Searchable {
 
 public static boolean TRACE = false;
-    /**
-     * Printing mode that prints the table at its current size,
-     * spreading both columns and rows across multiple pages if necessary.
-     */
-    public static final int PRINT_MODE_NORMAL = 0;
-
-    /**
-     * Printing mode that scales the output smaller, if necessary,
-     * to fit the table's entire width (and thereby all columns) on each page;
-     * Rows are spread across multiple pages as necessary
-     */
-    public static final int PRINT_MODE_FIT_WIDTH = 1;
-
+  
     protected Sorter            sorter = null;
     protected FilterPipeline        filters = null;
     protected HighlighterPipeline   highlighters = null;
@@ -109,13 +88,6 @@ public static boolean TRACE = false;
             header.repaint();
         }
     };
-
-    /**
-     * A flag to indicate whether or not the table is currently being printed.
-     * Used by print() and prepareRenderer() to disable indication of the
-     * selection and focused cell while printing.
-     */
-    private transient boolean isPrinting = false;
 
     private boolean sortable = false;
     private int visibleRowCount = 18;
@@ -982,333 +954,6 @@ public static boolean TRACE = false;
         }
     }
 
-// Printing Support extracted from 1.5
-
-    /**
-     *
-     * @return boolean indicating whether or not this <code>JTable</code>
-     *         is currently being printed
-     */
-    public boolean isPrinting() {
-        return isPrinting;
-    }
-
-    /**
-     * A convenience method that displays a printing dialog, and then prints
-     * this <code>JTable</code> in mode <code>PRINT_MODE_FIT_WIDTH</code>,
-     * with no header or footer text.
-     *
-     * @return true, unless the user cancels the print dialog
-     * @throws PrinterException if an error in the print system causes the job
-     *                          to be aborted
-     * @see #print(int, MessageFormat, MessageFormat, boolean, PrintRequestAttributeSet)
-     * @see #getPrintable
-     *
-     * @since 1.5
-     */
-    public boolean print() throws PrinterException {
-        return print(PRINT_MODE_FIT_WIDTH);
-    }
-
-    /**
-     * A convenience method that displays a printing dialog, and then prints
-     * this <code>JTable</code> in the given printing mode,
-     * with no header or footer text.
-     *
-         * @param  printMode        the printing mode that the printable should use:
-     *                          <code>PRINT_MODE_NORMAL</code> or
-     *                          <code>PRINT_MODE_FIT_WIDTH</code>
-     * @return true, unless the user cancels the print dialog
-     * @throws PrinterException if an error in the print system causes the job
-     *                          to be aborted
-     * @throws IllegalArgumentException if passed an invalid print mode
-     * @see #print(int, MessageFormat, MessageFormat, boolean, PrintRequestAttributeSet)
-     * @see #getPrintable
-     *
-     * @since 1.5
-     */
-    public boolean print(int printMode) throws PrinterException {
-        return print(printMode, null, null);
-    }
-
-    /**
-     * A convenience method that displays a printing dialog, and then prints
-     * this <code>JTable</code> in the given printing mode,
-     * with the specified header and footer text.
-     *
-         * @param  printMode        the printing mode that the printable should use:
-     *                          <code>PRINT_MODE_NORMAL</code> or
-     *                          <code>PRINT_MODE_FIT_WIDTH</code>
-         * @param  headerFormat     a <code>MessageFormat</code> specifying the text
-     *                          to be used in printing a header,
-     *                          or null for none
-         * @param  footerFormat     a <code>MessageFormat</code> specifying the text
-     *                          to be used in printing a footer,
-     *                          or null for none
-     * @return true, unless the user cancels the print dialog
-     * @throws PrinterException if an error in the print system causes the job
-     *                          to be aborted
-     * @throws IllegalArgumentException if passed an invalid print mode
-     * @see #print(int, MessageFormat, MessageFormat, boolean, PrintRequestAttributeSet)
-     * @see #getPrintable
-     *
-     * @since 1.5
-     */
-    public boolean print(int printMode,
-                         MessageFormat headerFormat,
-                         MessageFormat footerFormat) throws PrinterException {
-        return print(printMode, headerFormat, footerFormat, true, null);
-    }
-
-    /**
-     * Print this <code>JTable</code>. Takes steps that the majority of
-     * developers would take in order to print a <code>JTable</code>.
-     * In short, it prepares the table, calls <code>getPrintable</code> to
-     * fetch an appropriate <code>Printable</code>, and then sends it to the
-     * printer.
-     * <p>
-     * A <code>boolean</code> parameter allows you to specify whether or not
-     * a printing dialog is displayed to the user. When it is, the user may
-     * use the dialog to change printing attributes or even cancel the print.
-     * Another parameter allows for printing attributes to be specified
-     * directly. This can be used either to provide the initial values for the
-     * print dialog, or to supply any needed attributes when the dialog is not
-     * shown.
-     * <p>
-     * Before fetching the printable, this method prepares the table in order
-     * to get the most desirable printed result. If the table is currently
-     * in an editing mode, it terminates the editing as gracefully as
-     * possible. It also ensures that the the table's current selection and
-     * focused cell are not indicated in the printed output. This is handled on
-     * the view level, and only for the duration of the printing, thus no
-     * notification needs to be sent to the selection models.
-     * <p>
-     * REMIND(aim): This method is temporarily hacked to execute the print
-     * asynchronously to get around the problem of having the damage from
-     * the print dialogs remain in the application window while the print
-     * process ties up the event dispatch thread; ultimately we need to
-     * find a way NOT to tie up the EDT during the print processing.
-     *
-     * See {@link #getPrintable} for further description on how the
-     * table is printed.
-     *
-         * @param  printMode        the printing mode that the printable should use:
-     *                          <code>PRINT_MODE_NORMAL</code> or
-     *                          <code>PRINT_MODE_FIT_WIDTH</code>
-         * @param  headerFormat     a <code>MessageFormat</code> specifying the text
-     *                          to be used in printing a header,
-     *                          or null for none
-         * @param  footerFormat     a <code>MessageFormat</code> specifying the text
-     *                          to be used in printing a footer,
-     *                          or null for none
-     * @param  showPrintDialog  whether or not to display a print dialog
-     * @param  attr             a <code>PrintRequestAttributeSet</code>
-     *                          specifying any printing attributes,
-     *                          or null for none
-     * @return true, unless the print dialog is shown and the user cancels it
-     * @throws PrinterException if an error in the print system causes the job
-     *                          to be aborted
-     * @throws IllegalArgumentException if passed an invalid print mode
-     * @see #getPrintable
-     *
-     * @since 1.5
-     */
-    public boolean print(int printMode,
-                         MessageFormat headerFormat,
-                         MessageFormat footerFormat,
-                         boolean showPrintDialog,
-                         PrintRequestAttributeSet attr) throws PrinterException {
-        if (isEditing()) {
-            // try to stop cell editing, and failing that, cancel it
-            if (!getCellEditor().stopCellEditing()) {
-                getCellEditor().cancelCellEditing();
-            }
-        }
-
-        if (attr == null) {
-            attr = new HashPrintRequestAttributeSet();
-        }
-        final PrintRequestAttributeSet attrset = attr;
-
-        final PrinterJob job = PrinterJob.getPrinterJob();
-        job.setPrintable(getPrintable(printMode, headerFormat, footerFormat));
-
-        if (showPrintDialog && !job.printDialog(attrset)) {
-            return false;
-        }
-
-        //REMIND(aim): temporary bandaid...
-        // Before we tie up the EDT with the printing process (which could
-        // take awhile), we want to ensure any damaged areas which appear
-        // when the print dialog(s) is dismissed are repainted, otherwise
-        // garbage will appear in the window while the print request executes.
-        // To ensure this, we must delay the print request momentarily while
-        // we wait for the native window system to deliver the paint event
-        // which results in the repaint of the areas damaged by the now
-        // hidden print dialogs.
-        //
-        Timer timer = new Timer();
-        TimerTask task = new TimerTask() {
-            public void run() {
-                EventQueue.invokeLater(new Runnable() {
-                    public void run() {
-                        // set a flag to disable indication of the selection and focused cell
-                        isPrinting = true;
-                        try {
-                            // do the printing
-                            job.print(attrset);
-                        }
-                        catch (PrinterException e) {
-                            //REMIND(aim): how to handle throwing exception from asynchronous call?
-                            e.printStackTrace();
-                        }
-                        finally {
-                            // restore the flag
-                            isPrinting = false;
-                        }
-                    }
-                });
-            }
-        };
-        timer.schedule(task, 100);
-
-        //REMIND(aim): return value is currently bogus with above hack
-        return true;
-    }
-
-    /**
-     * Return a <code>Printable</code> for use in printing this JTable.
-     * <p>
-         * The <code>Printable</code> can be requested in one of two printing modes.
-     * In both modes, it spreads table rows naturally in sequence across
-     * multiple pages, fitting as many rows as possible per page.
-     * <code>PRINT_MODE_NORMAL</code> specifies that the table be
-     * printed at its current size. In this mode, there may be a need to spread
-     * columns across pages in a similar manner to that of the rows. When the
-     * need arises, columns are distributed in an order consistent with the
-     * table's <code>ComponentOrientation</code>.
-     * <code>PRINT_MODE_FIT_WIDTH</code> specifies that the output be
-     * scaled smaller, if necessary, to fit the table's entire width
-     * (and thereby all columns) on each page. Width and height are scaled
-     * equally, maintaining the aspect ratio of the output.
-     * <p>
-     * The <code>Printable</code> heads the portion of table on each page
-     * with the appropriate section from the table's <code>JTableHeader</code>,
-     * if it has one.
-     * <p>
-     * Header and footer text can be added to the output by providing
-     * <code>MessageFormat</code> arguments. The printing code requests
-     * Strings from the formats, providing a single item which may be included
-         * in the formatted string: an <code>Integer</code> representing the current
-     * page number.
-     * <p>
-     * You are encouraged to read the documentation for
-     * <code>MessageFormat</code> as some characters, such as single-quote,
-     * are special and need to be escaped.
-     * <p>
-     * Here's an example of creating a <code>MessageFormat</code> that can be
-     * used to print "Duke's Table: Page - " and the current page number:
-     * <p>
-     * <pre>
-     *     // notice the escaping of the single quote
-     *     // notice how the page number is included with "{0}"
-         *     MessageFormat format = new MessageFormat("Duke''s Table: Page - {0}");
-     * </pre>
-     * <p>
-     * The <code>Printable</code> constrains what it draws to the printable
-     * area of each page that it prints. Under certain circumstances, it may
-     * find it impossible to fit all of a page's content into that area. In
-     * these cases the output may be clipped, but the implementation
-     * makes an effort to do something reasonable. Here are a few situations
-     * where this is known to occur, and how they may be handled by this
-     * particular implementation:
-     * <ul>
-     *   <li>In any mode, when the header or footer text is too wide to fit
-     *       completely in the printable area -- print as much of the text as
-     *       possible starting from the beginning, as determined by the table's
-     *       <code>ComponentOrientation</code>.
-     *   <li>In any mode, when a row is too tall to fit in the
-     *       printable area -- print the upper-most portion of the row
-     *       and paint no lower border on the table.
-     *   <li>In <code>JTable.PRINT_MODE_NORMAL</code> when a column
-     *       is too wide to fit in the printable area -- print the center
-     *       portion of the column and leave the left and right borders
-     *       off the table.
-     * </ul>
-     * <p>
-     * It is entirely valid for this <code>Printable</code> to be wrapped
-     * inside another in order to create complex reports and documents. You may
-     * even request that different pages be rendered into different sized
-     * printable areas. The implementation must be prepared to handle this
-     * (possibly by doing its layout calculations on the fly). However,
-     * providing different heights to each page will likely not work well
-     * with <code>PRINT_MODE_NORMAL</code> when it has to spread columns
-     * across pages.
-     * <p>
-     * It is important to note that this <code>Printable</code> prints the
-     * table at its current visual state, using the table's existing renderers.
-     * <i>Before</i> calling this method, you may wish to <i>first</i> modify
-     * the state of the table (such as to change the renderers, cancel editing,
-     * or hide the selection).
-     * <p>
-     * Here's a simple example that calls this method to fetch a
-     * <code>Printable</code>, shows a cross-platform print dialog, and then
-     * prints the <code>Printable</code> unless the user cancels the dialog:
-     * <p>
-     * <pre>
-         *     // prepare the table for printing here first (for example, hide selection)
-     *
-         *     // wrap in a try/finally so table can be restored even if something fails
-     *     try {
-     *         // fetch the printable
-         *         Printable printable = table.getPrintable(JTable.PRINT_MODE_FIT_WIDTH,
-     *                                                  new MessageFormat("My Table"),
-     *                                                  new MessageFormat("Page - {0}"));
-     *
-     *         // fetch a PrinterJob
-     *         PrinterJob job = PrinterJob.getPrinterJob();
-     *
-     *         // set the Printable on the PrinterJob
-     *         job.setPrintable(printable);
-     *
-         *         // create an attribute set to store attributes from the print dialog
-         *         PrintRequestAttributeSet attr = new HashPrintRequestAttributeSet();
-     *
-     *         // display a print dialog and record whether or not the user cancels it
-     *         boolean printAccepted = job.printDialog(attr);
-     *
-     *         // if the user didn't cancel the dialog
-     *         if (printAccepted) {
-     *             // do the printing (may need to handle PrinterException)
-     *             job.print(attr);
-     *         }
-     *     } finally {
-     *         // restore the original table state here (for example, restore selection)
-     *     }
-     * </pre>
-     *
-     * @param  printMode     the printing mode that the printable should use:
-     *                       <code>PRINT_MODE_NORMAL</code> or
-     *                       <code>PRINT_MODE_FIT_WIDTH</code>
-         * @param  headerFormat  a <code>MessageFormat</code> specifying the text to
-     *                       be used in printing a header, or null for none
-         * @param  footerFormat  a <code>MessageFormat</code> specifying the text to
-     *                       be used in printing a footer, or null for none
-     * @return a <code>Printable</code> for printing this JTable
-     * @throws IllegalArgumentException if passed an invalid print mode
-     * @see #PRINT_MODE_NORMAL
-     * @see #PRINT_MODE_FIT_WIDTH
-     * @see Printable
-     * @see PrinterJob
-     *
-     * @since 1.5
-     */
-    public Printable getPrintable(int printMode,
-                                  MessageFormat headerFormat,
-                                  MessageFormat footerFormat) {
-
-        return new TablePrintable(this, printMode, headerFormat, footerFormat);
-    }
 
     static class TableAdapter extends ComponentAdapter {
         private final JTable table;
@@ -1337,10 +982,7 @@ public static boolean TRACE = false;
          * {@inheritDoc}
          */
         public boolean hasFocus() {
-            //REMIND(aim): think through printing implications on decorators
-            if (table instanceof JXTable && ( (JXTable) table).isPrinting()) {
-                return false;
-            }
+        
             boolean rowIsLead = (table.getSelectionModel().
                                    getLeadSelectionIndex() == row);
             boolean colIsLead =
@@ -1395,10 +1037,6 @@ public static boolean TRACE = false;
          * {@inheritDoc}
          */
         public boolean isSelected() {
-            //REMIND(aim): think through printing implications on decorators
-            if (table instanceof JXTable && ( (JXTable) table).isPrinting()) {
-                return false;
-            }
             return table.isCellSelected(row, column);
         }
 
