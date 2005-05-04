@@ -9,7 +9,7 @@
 <h1>
 </h1>
 <h1 style="text-align: center;">TreeTable as an Object List</h1>
-<h5 style="text-align: center;">Brought to you by:<br>
+<h5 style="text-align: center;">Brought to you by:
 David John Burrowes -&nbsp; Interaction Designer - Sun Microsystems,
 Inc.</h5>
 <hr style="width: 100%; height: 1px;" noshade="noshade">
@@ -19,7 +19,7 @@ Inc.</h5>
 peridocially update it to include sections with information about more
 details, and to reflect feedback
 from the community. A revision history can be found a the bottom of the
-document.<br>
+document.
   </p>
 Feedback on this specification should be sent to the <a
  href="mailto:jdnc@jdnc.dev.java.net">jdnc@jdnc.dev.java.net</a>
@@ -40,7 +40,7 @@ which are a different presentation of the same information).</blockquote>
     <li>Column Sizing</li>
     <li>Column Sorting</li>
   </ul>
-  <li>Revision History<br>
+  <li>Revision History
   </li>
 </ul>
 <h2><a name="Introduction_"></a>Introduction</h2>
@@ -48,7 +48,7 @@ which are a different presentation of the same information).</blockquote>
 hierarchical list of objects. In this usage, each row represents an
 object, and each column represents some attribute of that object.
 Additionally, an object may have one or more "child" objects which are
-shown indented beneath the "parent" object.<br>
+shown indented beneath the "parent" object.
 </p>
 <p>Note: "object" means an
 object in the mind of the user (file, appointment, breakpoint, etc),
@@ -57,38 +57,38 @@ not a java.lang.Object.</p>
 TreeTable in JDNC (called a Hierarchical Object List in this document).
 It contains sections for all the behaviors and the appearance details
 of that usage, with sub-sections for four different looks and feels
-(JLF/Ocean, Windows XP, GNOME 2.x and Macintosh OS X 10.3).<br>
+(JLF/Ocean, Windows XP, GNOME 2.x and Macintosh OS X 10.3).
 </p>
 <p>Note: JDNC will not deliver a Macintosh look and feel. This is
 documented here to help demonstrate the breadth of features the
 component must be able to support, and to provide guidance to anyone
-that would like to provide this support.<br>
+that would like to provide this support.
 </p>
 <p>This specification covers two categories of details. The first
 is information that must be provided by the component itself. The
 second category is information that an application developer can use to
 make their application more professional and to avoid "re-inventing the
-wheel" for these common design decisions.<br>
+wheel" for these common design decisions.
 </p>
 Note that after the Overview section, the terms MUST, SHOULD and MAY in
 this document have the formal meaning found in <a
- href="http://rfc.net/rfc2119.html">http://rfc.net/rfc2119.html</a>. <br>
-<br>
+ href="http://rfc.net/rfc2119.html">http://rfc.net/rfc2119.html</a>. 
+
 Much of the information about what is standard on the various platforms
 comes from some demo applications. These are provided for <a
- href="ol/gtktvapp.tar">GNOME/GTK+2.0</a>, <a href="ol/mac.zip">Macintosh</a>.<br>
-<br>
+ href="ol/gtktvapp.tar">GNOME/GTK+2.0</a>, <a href="ol/mac.zip">Macintosh</a>.
+
 <h2><a name="Overview"></a>Overview</h2>
-<br>
-<br>
-<br>
-<h2><a name="List_Behaviors_"></a>List Behaviors<br>
+
+
+
+<h2><a name="List_Behaviors_"></a>List Behaviors
 </h2>
-<h3><a name="Row_Selection_"></a>Row Selection<br>
+<h3><a name="Row_Selection_"></a>Row Selection
 </h3>
 <p>A list must allow 0 or 1, or multiple rows to be selected.
 Continuous and
-discontinuous sets of rows may be selected.<br>
+discontinuous sets of rows may be selected.
 </p>
 <div style="text-align: center;">
 <table style="width: 100%; text-align: left;" border="0" cellpadding="2"
@@ -97,19 +97,19 @@ discontinuous sets of rows may be selected.<br>
     <tr>
       <td style="vertical-align: top; text-align: center;"><img
  alt="continuous selection example" src="ol/continuous.png"
- style="width: 332px; height: 232px;"><br>
+ style="width: 332px; height: 232px;">
       </td>
       <td style="vertical-align: top; text-align: center;"><img
  alt="discontinuous" src="ol/discontinuous.png"
- style="width: 332px; height: 232px;"><br>
+ style="width: 332px; height: 232px;">
       </td>
     </tr>
   </tbody>
 </table>
 <div style="text-align: left;">
-<p>When a row is selected, the whole row must be selected.<br>
+<p>When a row is selected, the whole row must be selected.
 </p>
-<p>One term will be useful to understand the rules below:<br>
+<p>One term will be useful to understand the rules below:
 </p>
 <ul>
   <li>Anchor
@@ -124,7 +124,7 @@ These have been derived from those in the Windows Explorer list view.
 Aside from
 being reasonably well defined and internally consistent, this is also
 the model used
-by other Swing components in the Windows look and feel.<br>
+by other Swing components in the Windows look and feel.
 </p>
 <p>There are written standards for <a
  href="http://www.msdn.microsoft.com/library/default.asp?url=/library/en-us/dnwue/html/appxA.asp">Mouse</a>
@@ -134,177 +134,177 @@ interfaces in <a
  href="http://www.msdn.microsoft.com/library/default.asp?url=/library/en-us/dnwue/html/welcome.asp">The
 Microsoft Windows User Experience</a> book. However, the list
 view doesn't fully adhere to those guidelines. These links are provided
-just for reference.<br>
+just for reference.
 </p>
 <p>The component must support two editing modes (detailed further
 below). The gestures below assume either that the cell clicked on is a
 non-editable cell, or the list is in select-click-to-edit mode. (this
-will make more sense when you read that editing section)<br>
+will make more sense when you read that editing section)
 </p>
 <p>This table documents the location of the focus indicator. Note that
-the focus indicator is not always shown to the user.<br>
+the focus indicator is not always shown to the user.
 </p>
 <table style="width: 100%; text-align: left;" border="1" cellpadding="2"
  cellspacing="0">
   <tbody>
     <tr>
-      <td style="vertical-align: top;"><br>
+      <td style="vertical-align: top;">
       </td>
-      <th style="vertical-align: top;">On a Selected Row<br>
+      <th style="vertical-align: top;">On a Selected Row
       </th>
-      <th style="vertical-align: top;">On a Non-Selected Row<br>
+      <th style="vertical-align: top;">On a Non-Selected Row
       </th>
-      <th style="vertical-align: top;">On Background<br>
+      <th style="vertical-align: top;">On Background
       </th>
     </tr>
     <tr>
-      <th style="vertical-align: top;">Left Click<br>
+      <th style="vertical-align: top;">Left Click
       </th>
       <td colspan="2" rowspan="1" style="vertical-align: top;">Selected:
-Clicked row (on mouseDown)<br>
+Clicked row (on mouseDown)
 Deselected: All others (on mouseUp when in selection, on mouseDown when
-outside)<br>
-Anchor: Clicked row<br>
-Focus: Clicked row<br>
+outside)
+Anchor: Clicked row
+Focus: Clicked row
       </td>
-      <td style="vertical-align: top;">Selected: None<br>
-Deselected: All (on mouseUp)<br>
-Anchor: No change<br>
-Focus: No change<br>
+      <td style="vertical-align: top;">Selected: None
+Deselected: All (on mouseUp)
+Anchor: No change
+Focus: No change
       </td>
     </tr>
     <tr>
-      <th style="vertical-align: top;">Shift Left Click<br>
+      <th style="vertical-align: top;">Shift Left Click
       </th>
       <td colspan="2" rowspan="1" style="vertical-align: top;">Selected:
-Rows between anchor and clicked (inclusive) (on mouseDown)<br>
-Deselected: All others (on mouseDown)<br>
-Anchor: No change<br>
-Focus: Clicked row<br>
+Rows between anchor and clicked (inclusive) (on mouseDown)
+Deselected: All others (on mouseDown)
+Anchor: No change
+Focus: Clicked row
       </td>
       <td colspan="1" rowspan="3" style="vertical-align: top;">Selected:
-None<br>
-Deselected: None<br>
-Anchor: No change<br>
-Focus: No change<br>
+None
+Deselected: None
+Anchor: No change
+Focus: No change
       </td>
     </tr>
     <tr>
-      <th style="vertical-align: top;">Ctrl Left Click<br>
+      <th style="vertical-align: top;">Ctrl Left Click
       </th>
-      <td style="vertical-align: top;">Selected: None<br>
-Deselected: Clicked row (on mouseUp)<br>
-Anchor: Clicked row<br>
-Focus: Clicked row<br>
+      <td style="vertical-align: top;">Selected: None
+Deselected: Clicked row (on mouseUp)
+Anchor: Clicked row
+Focus: Clicked row
       </td>
       <td style="vertical-align: top;">Selected: Clicked row (on
-mouseUp)<br>
-Deselected: None <br>
-Anchor: Clicked row<br>
-Focus: Clicked row<br>
+mouseUp)
+Deselected: None 
+Anchor: Clicked row
+Focus: Clicked row
       </td>
     </tr>
     <tr>
-      <th style="vertical-align: top;">Ctrl-Shift Left Click<br>
+      <th style="vertical-align: top;">Ctrl-Shift Left Click
       </th>
       <td colspan="2" rowspan="1" style="vertical-align: top;">Selected:
 If the Anchor is selected, then all rows between the anchor and the
-clicked row (inclusive). Otherwise, only the clicked row is selected<br>
+clicked row (inclusive). Otherwise, only the clicked row is selected
 Deselected: If the anchor is selected, then none. Otherwise, all rows
-between the anchor and the clicked row (exclusive).<br>
-Anchor: No change<br>
-Focus: Clicked row<br>
+between the anchor and the clicked row (exclusive).
+Anchor: No change
+Focus: Clicked row
       </td>
     </tr>
     <tr>
       <th style="vertical-align: top;">Arrow up/down</th>
       <td colspan="2" rowspan="1" style="vertical-align: top;">Selected:
-Row above/below row that had focus<br>
-Deselected: All others<br>
-Anchor: Row above/below row that had focus<br>
-Focus: The row above/below the row that had focus<br>
+Row above/below row that had focus
+Deselected: All others
+Anchor: Row above/below row that had focus
+Focus: The row above/below the row that had focus
       </td>
       <td colspan="1" rowspan="8" style="vertical-align: top;">n/a</td>
     </tr>
     <tr>
       <th style="vertical-align: top;">Shift Arrow up/down</th>
       <td colspan="2" rowspan="1" style="vertical-align: top;">Selected:
-Rows between anchor and row above/below row that had focus (inclusive)<br>
-Deselected: All others<br>
-Anchor: No change<br>
-Focus: The row above/below the row that had focus<br>
+Rows between anchor and row above/below row that had focus (inclusive)
+Deselected: All others
+Anchor: No change
+Focus: The row above/below the row that had focus
       </td>
     </tr>
     <tr>
       <th style="vertical-align: top;">Ctrl Arrow up/down</th>
       <td colspan="2" rowspan="1" style="vertical-align: top;">Selected:
-None<br>
-Deselected: None<br>
-Anchor: No change<br>
-Focus: The row above/below the row that had focus<br>
+None
+Deselected: None
+Anchor: No change
+Focus: The row above/below the row that had focus
       </td>
     </tr>
     <tr>
       <th style="vertical-align: top;">Ctrl-Shift Arrow up/down</th>
       <td colspan="2" rowspan="1" style="vertical-align: top;">Same as
-Shift Arrow up/down<br>
+Shift Arrow up/down
       </td>
     </tr>
     <tr>
-      <th style="vertical-align: top;">Space<br>
+      <th style="vertical-align: top;">Space
       </th>
-      <td style="vertical-align: top;">Selected: None<br>
-Deselected: None<br>
-Anchor: No change<br>
-Focus: No change<br>
+      <td style="vertical-align: top;">Selected: None
+Deselected: None
+Anchor: No change
+Focus: No change
       </td>
-      <td style="vertical-align: top;">Selected: Row with focus<br>
-Deselected: None<br>
-Anchor: No change<br>
-Focus: No change<br>
-      </td>
-    </tr>
-    <tr>
-      <th style="vertical-align: top;">Shift Space<br>
-      </th>
-      <td colspan="2" rowspan="1" style="vertical-align: top;">Selected:
-Rows between anchor and focused (inclusive)<br>
-Deselected: All others<br>
-Anchor: No change<br>
-Focus: No change<br>
+      <td style="vertical-align: top;">Selected: Row with focus
+Deselected: None
+Anchor: No change
+Focus: No change
       </td>
     </tr>
     <tr>
-      <th style="vertical-align: top;">Ctrl Space<br>
-      </th>
-      <td style="vertical-align: top;">Selected: None<br>
-Deselected: Row with focus<br>
-Anchor: Row with focus<br>
-Focus: No change<br>
-      </td>
-      <td style="vertical-align: top;">Selected: Row with focus<br>
-Deselected: None<br>
-Anchor: Row with focus<br>
-Focus: No change<br>
-      </td>
-    </tr>
-    <tr>
-      <th style="vertical-align: top;">Ctrl-Shift Space<br>
+      <th style="vertical-align: top;">Shift Space
       </th>
       <td colspan="2" rowspan="1" style="vertical-align: top;">Selected:
-Row with focus<br>
-Deselected: All others<br>
-Anchor: Row with focus<br>
-Focus: No change<br>
+Rows between anchor and focused (inclusive)
+Deselected: All others
+Anchor: No change
+Focus: No change
+      </td>
+    </tr>
+    <tr>
+      <th style="vertical-align: top;">Ctrl Space
+      </th>
+      <td style="vertical-align: top;">Selected: None
+Deselected: Row with focus
+Anchor: Row with focus
+Focus: No change
+      </td>
+      <td style="vertical-align: top;">Selected: Row with focus
+Deselected: None
+Anchor: Row with focus
+Focus: No change
+      </td>
+    </tr>
+    <tr>
+      <th style="vertical-align: top;">Ctrl-Shift Space
+      </th>
+      <td colspan="2" rowspan="1" style="vertical-align: top;">Selected:
+Row with focus
+Deselected: All others
+Anchor: Row with focus
+Focus: No change
       </td>
     </tr>
   </tbody>
 </table>
-<p>Other notes:<br>
+<p>Other notes:
 </p>
 <ul>
   <li>The keyboard focus indicator's visibility is controlled on a
-window basis. The general rules are:<br>
+window basis. The general rules are:
   </li>
   <ul>
     <li>It is not shown when a window is first displayed or when it is
@@ -317,7 +317,7 @@ component.</li>
       <li>Certain keys, however, have an immediate effect, and that
 action more or less captures the keydown so that the window doesn't get
 it and thus doesn't show the keyboard focus indicator (e.g. Alt,
-certain F-keys)<br>
+certain F-keys)
       </li>
     </ul>
   </ul>
@@ -334,7 +334,7 @@ deselects all others, Ctrl-Home must move the keyboard focus to the
 first
 row and changes no selection, etc.</li>
   <li>The End key must be like the Home key except it affects the last
-row (and last column) in the list.<br>
+row (and last column) in the list.
   </li>
   <li>The PageUp key must behave just like using the up arrow key,
 except that it moves the selection and focus to the first whole
@@ -377,40 +377,40 @@ able to be resized or repositioned.</p>
 <p>This image demonstrates a multiple selection, and the keyboard focus
 on the third row. Note: This is a mockup, which is based on a
 combination of the behavior in Windows Explorer details view, and the
-feedback in some of the MMC plugins (e.g. Event Viewer)<br>
+feedback in some of the MMC plugins (e.g. Event Viewer)
 </p>
 <p><img alt="selection" src="ol/selection1-winxp.png"
- style="border: 1px solid ; width: 511px; height: 117px;"><br>
+ style="border: 1px solid ; width: 511px; height: 117px;">
 </p>
 <p>This demonstrates the same list, but with the keyboard focus moved
-out of the selection (this also is a mockup):<br>
+out of the selection (this also is a mockup):
 </p>
 <p><img alt="keyboard focus outside" src="ol/selection2-winxp.png"
- style="border: 1px solid ; width: 511px; height: 117px;"><br>
+ style="border: 1px solid ; width: 511px; height: 117px;">
 </p>
 <p>This demonstrates the same list when some other component has the
 focus. Unsurprisingly, the keyboard focus is not shown at all.
 This is also a mockup, but note that the blue-tinted icons on the left
-are actually what Windows does in the Explorer.<br>
+are actually what Windows does in the Explorer.
 </p>
 <p><img alt="Not focused" src="ol/selection3-winxp.png"
- style="border: 1px solid ; width: 511px; height: 117px;"><br>
+ style="border: 1px solid ; width: 511px; height: 117px;">
 </p>
 <p>This demonstrates the keyboard focus existing in a single cell,
 which should be used any time there are editable cells. This is
-emphatically a mockup.<br>
+emphatically a mockup.
 </p>
 <p><img alt="cell focused" src="ol/selection4.png"
- style="border: 1px solid ; width: 511px; height: 117px;"><br>
+ style="border: 1px solid ; width: 511px; height: 117px;">
 </p>
 <h4>Details For <img alt="Java Emblem" src="ol/java-cropped.gif"
- style="width: 13px; height: 24px;"><br>
+ style="width: 13px; height: 24px;">
 </h4>
 <p>The JLF/Ocean behaviors should be identical to the Windows ones,
-above, with these exceptions:<br>
+above, with these exceptions:
 </p>
 <ul>
-  <li>Ctrl-/ must select all rows (anchor not affected)<br>
+  <li>Ctrl-/ must select all rows (anchor not affected)
   </li>
   <li>Ctrl-\ must deselect all rows (anchor not affected)</li>
 </ul>
@@ -419,23 +419,23 @@ above, with these exceptions:<br>
 and for <a
  href="http://java.sun.com/products/jlf/ed2/book/Appendix.A22.html">trees</a>
 in the <a href="http://java.sun.com/products/jlf/ed2/book/index.html">JLF
-Design Guidelines</a>.<br>
+Design Guidelines</a>.
 </p>
 <h4>Details For <img alt="Gnome Logo" src="ol/gnome.png"
- style="width: 24px; height: 24px;"><br>
+ style="width: 24px; height: 24px;">
 </h4>
 <p>The rules for keyboard navigation and row selection presented here
 are derived from those in the System Monitor tree view (type
 Ctrl-Alt-Del from the GNOME environment to get it). This seems to
 be basically consistent in its behavior with other similar components
-in the envrionment (e.g. the list view in Nautilus).<br>
+in the envrionment (e.g. the list view in Nautilus).
 </p>
 <p>There is some relevant material in the GNOME standards for <a
  href="http://www.gnome.org/learn/access-guide/2.8/ch03s08.html#keynav-34">keyboard
-accessibility</a>.<br>
+accessibility</a>.
 </p>
 <p>The rules are identical to the Windows ones, listed above, with
-these exceptions:<br>
+these exceptions:
 </p>
 <ul>
   <li>Ctrl-Shift Left Click must be identical to Ctrl Left Click</li>
@@ -450,120 +450,120 @@ list (including counting the one that started with the focus). PageUp
 counts the same number of rows up. (Put another way, pressing PageUp or
 PageDown on GNOME always skips a fixed number of rows, while on Windows
 the number of rows skipped will vary based on which row started out
-with the keyboard focus).<br>
+with the keyboard focus).
   </li>
   <li>Keyboard focus must be able to be put in the column headers</li>
   <li>If the keyboard focus indicator was showing in the component when
 it last had focus, and it is again given focus, the indicator must be
-visible, no matter how the component got focus.<br>
+visible, no matter how the component got focus.
   </li>
   <li>However, the focus indicator in rows must be hidden as a result
 of mouse
 operations in the component, and must be shown after keyboard gestures.
 [Note: This may be a bug in GNOME, since other components show the
-keyboard focus after a mouse gesture]<br>
+keyboard focus after a mouse gesture]
   </li>
 </ul>
-Appearance:<br>
+Appearance:
 <p>NOTE: The first three illustrations are of an actual use of a
 component like this in GNOME. In this case, whole rows are
 selected, and because no individual cells are ediable, the keyboard
 focus spans the whole row. It's also interesting to note the
-notable differences in sizes of text and widgets compared to Windows.<br>
+notable differences in sizes of text and widgets compared to Windows.
 </p>
 <p>This image demonstrates a multiple selection, and the keyboard focus
 on the fifth row.</p>
 <p><img alt="Demonstration of Selection" src="ol/selection1.png"
  style="border: 1px solid ; width: 467px; height: 233px;"></p>
 <p>This demonstrates the same list, but with the keyboard focus moved
-out of the selection:<br>
+out of the selection:
 </p>
 <p><img alt="Demonstration of selection" src="ol/selection2.png"
- style="border: 1px solid ; width: 467px; height: 234px;"><br>
+ style="border: 1px solid ; width: 467px; height: 234px;">
 </p>
 <p>This demonstrates the same list when some other component has the
 focus. Unsurprisingly, the keyboard focus is not shown at all.</p>
 <p><img alt="Demonstration of selection" src="ol/selection3.png"
- style="border: 1px solid ; width: 457px; height: 234px;"><br>
+ style="border: 1px solid ; width: 457px; height: 234px;">
 </p>
 <p>This demonstrates the keyboard focus existing in a single cell,
 which should be used any time there are editable cells. Note that
 this behavior does not exist "natively" in GNOME, but is provided to
 support the cross-platform accessibility requirements for column
 reordering and sizing. This is a
-simple extrapolation from the above patterns:<br>
+simple extrapolation from the above patterns:
 </p>
 <p><img alt="Selection of a single cell" src="ol/selection4-cell.png"
- style="border: 1px solid ; width: 467px; height: 233px;"><br>
+ style="border: 1px solid ; width: 467px; height: 233px;">
 </p>
 <h4>Details For<img alt="MacOS X 10.3 (Panther)" src="ol/panther.jpg"
  style="width: 24px; height: 24px;"></h4>
 <p>The Macintosh has a significantly different set of gestures for
-selecting rows.<br>
+selecting rows.
 </p>
 <table style="width: 100%; text-align: left;" border="1" cellpadding="2"
  cellspacing="0">
   <tbody>
     <tr>
-      <td style="vertical-align: top;"><br>
+      <td style="vertical-align: top;">
       </td>
-      <th style="vertical-align: top;">On a Selected Row<br>
+      <th style="vertical-align: top;">On a Selected Row
       </th>
-      <th style="vertical-align: top;">On a Non-Selected Row<br>
+      <th style="vertical-align: top;">On a Non-Selected Row
       </th>
-      <th style="vertical-align: top;">On Background<br>
+      <th style="vertical-align: top;">On Background
       </th>
     </tr>
     <tr>
-      <th style="vertical-align: top;">Left Click<br>
+      <th style="vertical-align: top;">Left Click
       </th>
       <td colspan="2" rowspan="1" style="vertical-align: top;">Selected:
-Clicked row (on mouseDown)<br>
-Deselected: All others (on mouseDown)<br>
-Anchor: Clicked row<br>
+Clicked row (on mouseDown)
+Deselected: All others (on mouseDown)
+Anchor: Clicked row
       </td>
       <td colspan="1" rowspan="4" style="vertical-align: top;">Selected:
-None<br>
-Deselected: All (on mouseDown)<br>
-Anchor: First row<br>
-      <br>
+None
+Deselected: All (on mouseDown)
+Anchor: First row
+      
       </td>
     </tr>
     <tr>
-      <th style="vertical-align: top;">Shift Left Click<br>
+      <th style="vertical-align: top;">Shift Left Click
       </th>
       <td colspan="2" rowspan="1" style="vertical-align: top;">Selected:
-Rows between the anchor and the clicked row (inclusive) (on mouseDown).<br>
-Deselected: None<br>
-Anchor: Clicked row<br>
+Rows between the anchor and the clicked row (inclusive) (on mouseDown).
+Deselected: None
+Anchor: Clicked row
       </td>
     </tr>
     <tr>
-      <th style="vertical-align: top;">Command Left Click<br>
+      <th style="vertical-align: top;">Command Left Click
       </th>
-      <td style="vertical-align: top;">Selected: None<br>
-Deselected: Clicked row (on mouseDown)<br>
-Anchor: No change<br>
+      <td style="vertical-align: top;">Selected: None
+Deselected: Clicked row (on mouseDown)
+Anchor: No change
       </td>
       <td style="vertical-align: top;">Selected: Clicked row (on
-mouseDown)<br>
-Deselected: None <br>
-Anchor: Clicked row<br>
+mouseDown)
+Deselected: None 
+Anchor: Clicked row
       </td>
     </tr>
     <tr>
-      <th style="vertical-align: top;">Command-Shift Left Click<br>
+      <th style="vertical-align: top;">Command-Shift Left Click
       </th>
       <td colspan="2" rowspan="1" style="vertical-align: top;">Same as
-Command Left Click<br>
+Command Left Click
       </td>
     </tr>
     <tr>
       <th style="vertical-align: top;">Arrow up/down</th>
       <td colspan="2" rowspan="1" style="vertical-align: top;">Selected:
-Row above/below the first/last selected row in the list<br>
-Deselected: All others<br>
-Anchor: Row that received the selection<br>
+Row above/below the first/last selected row in the list
+Deselected: All others
+Anchor: Row that received the selection
       </td>
       <td colspan="1" rowspan="4" style="vertical-align: top;">n/a</td>
     </tr>
@@ -572,14 +572,14 @@ Anchor: Row that received the selection<br>
       <td colspan="2" rowspan="1" style="vertical-align: top;">Selected:
 Rows between the last/first selected row and the first/last row
 above/below the selected row (or, if the first/last row, then the that
-row) (inclusive)<br>
-Deselected: none<br>
+row) (inclusive)
+Deselected: none
 Anchor: No change</td>
     </tr>
     <tr>
       <th style="vertical-align: top;">Command Arrow up/down</th>
       <td colspan="2" rowspan="1" style="vertical-align: top;">Same as
-Arrow up/down<br>
+Arrow up/down
       </td>
     </tr>
     <tr>
@@ -589,7 +589,7 @@ Arrow up/down </td>
     </tr>
   </tbody>
 </table>
-<br>
+
 <ul>
   <li>The component must provide the platform-specific scheme where no
 keyboard focus indicator is shown in the list.</li>
@@ -599,16 +599,16 @@ cell, or the cell above or below the one that had the focus indicator
 when the up/down arrow key was pressed.</li>
   <li>The PageUp and PageDown keys must scroll the component one full
 view-full (approximately six pixels less than the height of the
-component), but the selection, anchor and focus are not changed.<br>
+component), but the selection, anchor and focus are not changed.
   </li>
   <li>Option Up Arrow is the same as Left Clicking on the first row in
 the list</li>
   <li>Option Down Arrow is the same as Left Clicking the last row in
-the list<br>
+the list
   </li>
   <li>If the rows are not draggable, the Left Drag must be treated like
 a click followed by a series of shift-clicks, and Shift Left Drag must
-be treated like a Shift Click followed by a series of Shift Clicks<br>
+be treated like a Shift Click followed by a series of Shift Clicks
   </li>
   <li>If the list allows only one row to be selected at a time, then
 the shift and command modifiers must be ignored and all behavior should
@@ -623,716 +623,32 @@ click excpet that a contextual menu must be shown on mouseUp and any
 other mouseUp behavior (e.g. deselection) is not done.</li>
 </ul>
 <p>Appearance:</p>
-<p>This image demonstrates a multiple selection.<br>
+<p>This image demonstrates a multiple selection.
 </p>
 <p><img alt="x" src="ol/selection1-mac.png"
- style="border: 1px solid ; width: 300px; height: 125px;"><br>
+ style="border: 1px solid ; width: 300px; height: 125px;">
 </p>
 <p>This demonstrates the same list when some other component has the
-focus.<br>
+focus.
 </p>
 <img alt="x" src="ol/selection3-mac.png"
- style="border: 1px solid ; width: 300px; height: 125px;"><br>
+ style="border: 1px solid ; width: 300px; height: 125px;">
 <p>This demonstrates the keyboard focus existing in a single cell,
 which should be used any time there are editable cells. This is a
-mockup.<br>
+mockup.
 </p>
 <p><img alt="x" src="ol/selection4-mac.png"
- style="border: 1px solid ; width: 300px; height: 125px;"><br>
+ style="border: 1px solid ; width: 300px; height: 125px;">
 </p>
-<h4>Other General Details<br>
+<h4>Other General Details
 </h4>
 <p>An application should persist the selection in
 primary windows
 across
-runs of the application.<br>
+runs of the application.
 </p>
 </div>
 </div>
-<h3><a name="Column_Movement_"></a>Column Movement<br>
-</h3>
-<p>The user should be able to rearrange the columns in the list.</p>
-<table style="width: 100%; text-align: left;" border="0" cellpadding="2"
- cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top; text-align: center;"><img
- alt="before" src="ol/before.png"
- style="border: 1px solid ; width: 350px; height: 148px;"><br>
-Before moving Value<br>
-      </td>
-      <td style="vertical-align: top; text-align: center;"><img
- alt="after" src="ol/after.png"
- style="border: 1px solid ; width: 350px; height: 148px;"><br>
-After moving Value<br>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<p>To move a column with the mouse, the user must press anywhere in the
-column header and then drag the column either left or right and then
-drop it wherever she wishes. Doing this never changes any other aspect
-of
-the list.</p>
-<p>If Esc is pressed while dragging, the drag must be cancelled.</p>
-<p>To move a column with the keyboard, the application must provide
-Move Left and Move Right commands in the menus. The column which
-contains the keyboard focus
-marker must move to the right or left by one column (and the keyboard
-focus must move with it). If a column is leftmost or rightmost then
-the menu item(s) must be disabled.</p>
-<blockquote>
-  <p><span style="color: rgb(153, 0, 0);">It would be </span><em
- style="color: rgb(153, 0, 0);">much</em><span
- style="color: rgb(153, 0, 0);"> nicer if the component would provide a
-mode that a single "Move Column" command could invoke. This would start
-a mode where the column could be moved with repeated presses of the
-arrow keys, and any other key than Esc would exit the
-mode and leave the column in place. The mouse pointer would also
-moved to the center of the column header when this mode is started, and
-returned to its old position when the mode is ended. This would mimic
-the "Move Window" command found in Windows and GNOME. (nicer because it
-clutters the menu less, and allows more rapid column movement for
-keyboard users)</span> </p>
-</blockquote>
-<p>Note: There is no standard way to move columns with the keyboard on
-on any of these platforms. Several applications have dialog boxes
-which allow the user to change the column order (and sometimes the
-size) from there.
-The method presented here is "better" since it can coexist with these
-other schemes, and can be done uniformly across all platforms with a
-minimum of interface overhead.</p>
-<p>
-When the keyboard focus spans the whole row, then the columns must not
-be movable by the user.</p>
-<h4>Details For <img alt="WindowsXP" src="ol/winxp.gif"
- style="width: 120px; height: 24px;"></h4>
-<h5>Dragging Visual Feedback</h5>
-<p>The visual feedback when dragging a column on Windows is to only
-move a transparent version of the header, and to show some drop-target
-feedback as this is moved. The transparent version of the header is
-positioned under
-the pointer so that the point the user first pressed the mouse on
-remains under the pointer's hot spot.<br>
-</p>
-<p>There is no autoscrolling, but a column may be dropped "offscreen"
-if the drop point is offscreen.<br>
-</p>
-<p>Before any interaction:<br>
-</p>
-<p><img alt="x" src="ol/move1-before.png"
- style="width: 403px; height: 280px;"></p>
-<p>
-</p>
-<p>Mouse over feedback:<br>
-</p>
-<p><img alt="x" src="ol/move2-mouseover.png"
- style="width: 403px; height: 280px;"><br>
-</p>
-<p>Move down feedback:</p>
-<p><img alt="x" src="ol/move3-mousedown.png"
- style="width: 403px; height: 280px;"><br>
-</p>
-<p>Drag feedback. Node the transparent header being dragged, and note
-the dark blue drop feedback indicator. If the rightmost column is
-more than half-onscreen, and the header is dragged past the halfway
-point, the column can be dropped offscreen.</p>
-<p><img alt="x" src="ol/move4-drag.png"
- style="width: 403px; height: 280px;"><br>
-</p>
-<h5>Drop Regions</h5>
-<p>If column A is being moved with the mouse, then when the <em>pointer</em>
-is to the right of the
-midpoint of any other column, B, then when column A is released it must
-appear to the right of column B. If the pointer holding A is to
-the left of the midpoint of column B, then A will be dropped to the
-left of A.</p>
-<h5>Results of Canceling The Drag</h5>
-<p>When a drag is cancelled (with Esc), the user interaction must
-remain
-in a "dragging mode" until the mouse button is released, so that when
-the pointer is next over any column header, that column will start to
-be dragged.</p>
-<h4>Details For <img alt="Java Emblem" src="ol/java-cropped.gif"
- style="width: 13px; height: 24px;"></h4>
-<h5>Dragging Visual Feedback</h5>
-<p>When the column is dragged, the whole column (header and contents)
-is dragged onscreen. No autoscrolling occurs.<br>
-</p>
-<h5>Drop Regions</h5>
-<p>Same as Macintosh.</p>
-<h5>Results of Canceling The Drag</h5>
-<p>Same as GNOME.</p>
-<h4>Details For <img alt="Gnome Logo" src="ol/gnome.png"
- style="width: 24px; height: 24px;"></h4>
-<h5>Dragging Visual Feedback</h5>
-<p>When a column is dragged in GNOME, the column header jumps down to
-below the header row, leaving a gap in the header row. A black
-rectangle indicates the drop location. As the pointer is moved, drop
-location indicators are shown. When the column header reaches the edge
-of the visible portion of the list, then if the list may be scrolled
-scroll indicators are shown and the list will auto scroll left or right.</p>
-<p>
-In the process, the keyboard focus is transferred and displayed at the
-last position it was at within the list body.<br>
-</p>
-<p>This shows the result of starting a drag. Note the black rectangle
-indicating the drop location, and note how the header being dragged has
-been placed below the header row:<br>
-</p>
-<p><img alt="x" src="ol/move4-drag1-gnome.png"
- style="border: 1px solid ; width: 350px; height: 250px;"><br>
-</p>
-<p>This shows another aspect of drag feedback, this time showing the
-drop location between two other colunms:</p>
-<p><img alt="x" src="ol/move5-drag2-gnome.png"
- style="border: 1px solid ; width: 350px; height: 250px;"></p>
-<p>This shows the feedback when autoscrolling is happening.
-Mirrored feedback is shown on the right:</p>
-<p><img alt="x" src="ol/move6-drag3-gnome.png"
- style="border: 1px solid ; width: 350px; height: 250px;"><br>
-</p>
-<h5>Drop Regions</h5>
-<p>Same as Windows (the drop boundary is changed when the pointer
-passes the middle of a column).</p>
-<h5>Results of Canceling The Drag</h5>
-<p>The column is returned to its initial position. No further mouse
-actions can occur until the button is released.</p>
-<h4>Details For<img alt="MacOS X 10.3 (Panther)" src="ol/panther.jpg"
- style="width: 24px; height: 24px;"></h4>
-<h5>Dragging Visual Feedback</h5>
-<p>When the column is dragged, the whole column (header and contents)
-is dragged onscreen. The list will autoscroll left or right if part of
-the list are off the edges of the scrolling view and the pointer nears
-the edge (standard Mac autoscrolling behavior happens here).</p>
-<p>
-Note that as the column is dragged, drop indicators are not shown.
-Instead, the columns of the list are repositioned live during the drag
-to
-show the new drop location.<br>
-</p>
-<p>This shows the mouse-down appearance:<br>
-</p>
-<p><img alt="x" src="ol/move3-mousedown-mac.png"
- style="border: 1px solid ; width: 350px; height: 150px;"><br>
-</p>
-<p>This image shows a drag in progress. Note that column 3 has already
-been moved to the left to make room for Column 2, and a grey background
-area is shown to indicate where 2 will appar when dropped.<br>
-</p>
-<p><img alt="x" src="ol/move4-drag-mac.png"
- style="border: 1px solid ; width: 350px; height: 150px;"><br>
-</p>
-<h5>Drop Regions</h5>
-<p>If column A is being moved with the mouse, then when the right (or
-left)<em></em> edge of the <span style="font-style: italic;">header</span>
-is to the right (or left) of the
-midpoint of another column, B, then when column A is released it must
-appear to the right (or left) of column B.</p>
-<h5>Results of Canceling The Drag</h5>
-<p>Cancelling the drag is the same as simply releasing the mouse
-button. It drops the column at the current location.<br>
-</p>
-<h4>Application Details<br>
-</h4>
-<p>The application should remember the column order in both primary and
-secondary windows across restarts of the program so
-that the user is not forced to rearrange the columns every time.</p>
-<p>An application may have a dialog box (accessible from the View menu)
-which would allow the user to adjust which columns are shown in the
-component.</p>
-<h3><a name="Column_Resizing_"></a>Column Resizing<br>
-</h3>
-<p>The user should be allowed to change the width of columns
-(optionally with a minimum and/or maximum size).<br>
-</p>
-<table style="width: 100%; text-align: left;" border="0" cellpadding="2"
- cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top; text-align: center;"><img
- alt="before" src="ol/before.png"
- style="border: 1px solid ; width: 350px; height: 148px;"><br>
-Before Resizing Value<br>
-      </td>
-      <td style="vertical-align: top; text-align: center;"><img
- alt="after" src="ol/resized.png"
- style="border: 1px solid ; width: 350px; height: 148px;"><br>
-After Resizing Value<br>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<p>To resize with the mouse, the mouse pointer must be pressed in the
-region between the column headers, and then dragged. The exact result
-of this drag operation will depend on the resize mode for the whole
-list.<br>
-</p>
-<p>To resize with the keyboard, the Make Narrower and Make Wider menu
-commands must be used. These apply to the column that contains
-the
-keyboard focus. These commands change the width by 3 pixels.</p>
-<blockquote><span style="color: rgb(153, 0, 0);">As with column
-movement, it would be best if the component provided a "Resize Column"
-mode which would operate similar to the Resize command on Windows and
-GNOME. When invoked via a menu command, left and right arrow keys
-would adjust the right edge of the current column, any key other than
-arrows and Esc would leave the mode and leave the column at its new
-width, while Esc would return the column to the original size.</span><br
- style="color: rgb(153, 0, 0);">
-  <span style="color: rgb(153, 0, 0);">An alternate (and better-still)
-strategy would be that when the mode is first invoked, the arrow keys
-would first be used to choose a column to adjust, and then once that
-mode was ended a mode to adjust the selected column would start. This
-has the benefit of not forcing some of the unusual per-cell keyboard
-focus feedback that is required elsewhere in this spec.</span><br>
-</blockquote>
-<p>As with column movement, there is no standard way to adjust
-column widths with the keyboard on any of the platforms. This
-solution doesn't
-conflict with any conventions and so can be applied uniformly across
-looks and feels.</p>
-<h4>Details For <img alt="WindowsXP" src="ol/winxp.gif"
- style="width: 120px; height: 24px;"></h4>
-<h5>Resizing Edge</h5>
-<p>Resizing is always done on the rightmost edge of a column. The left
-edge of the leftmost column can not be resized.<br>
-</p>
-<h5>Resizing Pointer<br>
-</h5>
-<p>Standard left/right resize cursor is shown when it enters the region
-between the column headers, and during the drag.<br>
-</p>
-<h5>Resize Feedback</h5>
-<p>Columns are resized "live". If the pointer is moved outside of the
-component, the column will continue to be resized, even to the full
-width of the screen(s).<br>
-</p>
-<h5>Resizing Regions<br>
-</h5>
-<p>The region between the column headers is a 14 pixel region equally
-spanning the edges of two columns (the column divider appears fully in
-the leftmost of the two columns).<br>
-</p>
-<h4>Details For <img alt="Java Emblem" src="ol/java-cropped.gif"
- style="width: 13px; height: 24px;"><br>
-</h4>
-<h5>Resizing Edge</h5>
-<p>Resizing is always done on the rightmost edge of a column. The left
-edge of the leftmost column can not be resized. Whether the right edge
-can be resized depends on the autoresize mode.<br>
-</p>
-<h5>Resizing Pointer<br>
-</h5>
-<p>Standard left/right resize cursor is shown when it enters the region
-between the column headers, and during the drag.<br>
-</p>
-<h5>Resize Feedback</h5>
-<p>Columns are resized "live". If the pointer is moved outside of the
-component, the column will continue to be resized, even to the full
-width of the screen(s).<br>
-</p>
-<h5>Resizing Regions<br>
-</h5>
-<p>The "region between the column headers" is a 5 pixel region,
-including the one pixel boundary between columns.<br>
-</p>
-<h4><span style="font-weight: bold;"></span>Details For <img
- alt="Gnome Logo" src="ol/gnome.png" style="width: 24px; height: 24px;"></h4>
-<h5>Resizing Edge</h5>
-<p>Resizing is always done on the rightmost edge of a column. Thus, the
-left edge of the first column can not be moved.<br>
-</p>
-<h5>Resizing Pointer<br>
-</h5>
-<p>Standard platform left/right resize cursor is shown when it enters
-the region between the column headers, and during the drag.<br>
-</p>
-<h5>Resize Feedback</h5>
-<p>Columns are resized "live". If the pointer is moved outside of the
-component, the column will continue to be resized, even to the full
-width of the screen(s).<br>
-</p>
-<h5>Resizing Regions<br>
-</h5>
-<p>The "region between the column headers" is a 3 pixel region on each
-side of the boundary between columns.<br>
-</p>
-<h5>Other<br>
-</h5>
-<p>If not already there, this action places the keyboard focus in the
-list.<br>
-</p>
-<h4>Details For<img alt="MacOS X 10.3 (Panther)" src="ol/panther.jpg"
- style="width: 24px; height: 24px;"></h4>
-<h5>Resizing Edge</h5>
-<p>Resizing is always done on the rightmost edge of a column. The left
-edge of the leftmost column can not be resized.<br>
-</p>
-<h5>Resizing Pointer<br>
-</h5>
-<p>Standard platform left/right resize cursor is shown when it enters
-the region between the column headers, and during the drag.<br>
-</p>
-<h5>Resize Feedback</h5>
-<p>Columns are resized "live". If the pointer is moved outside of the
-component, the column will continue to be resized, even to the full
-width of the screen(s). The list will autoscroll to keep the edge
-being dragged onscreen.<br>
-</p>
-<h5>Resizing Regions<br>
-</h5>
-<p>The "region between the column headers" is a 5 pixel region,
-including the one pixel boundary between columns.<br>
-</p>
-<h4>Application Details<br>
-</h4>
-<p>The application should persist column widths in both primary and
-secondary windows across restarts.</p>
-It is up to the application to provide the menu commands to resize
-columns. (I assume that there would be methods to call that would
-trivially provide the column resizing functionality).<br>
-<h3><a name="Column_Sorting_"></a>Column Sorting<br>
-</h3>
-<h4>General<br>
-</h4>
-<p>A list may allow its rows to be sorted by the values in one of its
-columns.<br>
-</p>
-<p>
-</p>
-<table style="width: 100%; text-align: left;" border="0" cellpadding="2"
- cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top; text-align: center;"><img
- alt="Before sorting" src="hol_files/general-sort-before.png"
- style="border: 1px solid ; width: 280px; height: 204px;"><br>
-Before Sorting "Name" Ascending<br>
-      </td>
-      <td style="vertical-align: top; text-align: center;"><img
- alt="After sorting" src="hol_files/general-sort-after.png"
- style="border: 1px solid ; width: 280px; height: 204px;"><br>
-After Sorting "Name" Ascending </td>
-    </tr>
-  </tbody>
-</table>
-<p>
-</p>
-<p>If there are child objects in the list, then they must be
-sorted
-within
-the scope of their parent. That is, they are always kept under
-their parent, and are sorted relative only to one another.
-Alternately, the list may be "flattened" (that is, the hierarchy must
-be removed), in which case all objects would be sorted as siblings.<br>
-</p>
-<p>The sort should be done on the visible content of the column (e.g.
-an alphabetic or numeric sort). However, in some cases it may be
-done on an underlying value. For example in a list of bugs, the "S<span
- style="font-weight: bold;"></span>everity" column might contain values
-"Neutral", "Bad", and "Very
-bad", and these should be sorted in that order rather than an
-alphabetic
-order (Bad, Neutral, Very bad).</p>
-<p>Whenever a different column is made the sort column, the sort should
-be done as a stable sort (this keeps items in the old column in the
-same relative order when there are identically valued items in the new
-column). This may be ignored, however, if the list is switched to an
-"unsorted" state.<br>
-</p>
-<p>Most lists that allow sorting should require one column to be sorted
-at all times. In this case, the most appropriate column should be
-marked as sorted in the most appropriate direction by default. On
-rare occasion, however, a list may allow an "unsorted" or
-"natural order" state (this is only done for responsiveness reasons in
-lists that are updated very frequently and where a user-imposed sort is
-not crucial). In this case, the list may appear in the
-unsorted state by default.<br>
-</p>
-<p>
-</p>
-<p>On very rare occasion, a set of users may have a need to sort on
-multiple columns simultaneously. This specification doesn't
-discuss how that should be done.<br>
-</p>
-<h4>Details For <img alt="WindowsXP" src="hol_files/winxp.gif"
- style="width: 120px; height: 24px;"></h4>
-<span style="font-weight: bold;"></span>
-<h5>Sorting With a Mouse</h5>
-<ul>
-  <li>The user must click on the column header she wishes to sort the
-objects by.</li>
-  <ul>
-    <li>If the column wasn't already the sorted column, then the column
-must be sorted ascending</li>
-    <li>If the column was already the sorted column, then the sort
-order must be toggled (ascending to descending, or vice versa)</li>
-    <ul>
-      <li>If the list allows an "unsorted" state, then the list must
-cycle from ascending, to descending, to switching the whole list to an
-unsorted state). [Note: I know of no Windows apps which do this.
-However, this has proven to be a reasonable paradigm in the NetBeans
-envrionment]<br>
-      </li>
-    </ul>
-  </ul>
-</ul>
-<h5>Sorting With a Keyboard</h5>
-<ul>
-  <li>Lists should be able to be sorted with the "Sort By" menu (see
-below) which is provided by the application. This should be in
-the contextual menu for the
-list and may be in the View menu. [Note: This is not at all "standard"
-on Windows. It is specified here as a Sun-defined enhancement to
-provide a consistent cross-application/cross-platform way to accomplish
-this].<br>
-  </li>
-  <li>Some applications may provide other means to accomplish sorting
-from the keyboard. For example, Windows Explorer has a a dialog
-box available
-from the View menu may allow a variety of details to be specified about
-the list.</li>
-</ul>
-<h5>Sort Indicator Visual Feedback</h5>
-<p></p>
-<p>This shows a column sorted in ascending order. Note the light grey
-background color in the column, and the indicator in the colum header
-which is placed close to the column name. [this appears to be placed 10
-pixels away from the text].<br>
-</p>
-<p><img alt="Ascending Sort" src="hol_files/sort1-ascend-winxp.png"
- style="border: 1px solid ; width: 193px; height: 166px;"></p>
-<p>This shows the same column sorted descending. Note the change in the
-indicator in the column header:<br>
-</p>
-<p><img alt="Sorted Descending" src="hol_files/sort2-descend-winxp.png"
- style="border: 1px solid ; width: 192px; height: 166px;"></p>
-<p>This shows a column before it becomes a sorted column:<br>
-</p>
-<p><img alt="Before Sorting" src="hol_files/sort3-pre-sorted-winxp.png"
- style="border: 1px solid ; width: 99px; height: 130px;"><br>
-</p>
-<p>This shows the same column after its header was clicked on. Note
-that the text in the header has been moved to the side to accomodate
-the sort indicator.<br>
-</p>
-<p><img alt="After sorted" src="hol_files/sort4-post-sorted-winxp.png"
- style="border: 1px solid ; width: 99px; height: 130px;"><br>
-</p>
-<p>Finally, the next two images show that when a column is too narrow
-to accomodate both the text and the sort indicator, the text is
-ellided. Though not shown here, if the column is made less wide, the
-sort indocator ultimately occludes the text:<br>
-</p>
-<p><img alt="Before" src="hol_files/sort5-narrow-before-winxp.png"
- style="border: 1px solid ; width: 147px; height: 166px;"><br>
-</p>
-<p><img alt="After" src="hol_files/sort6-narrow-after-winxp.png"
- style="border: 1px solid ; width: 147px; height: 166px;"><br>
-</p>
-<h4>Details For <img alt="Java Emblem" src="hol_files/java-cropped.gif"
- style="width: 13px; height: 24px;"><br>
-</h4>
-<span style="font-weight: bold;"></span>
-<h5>Sorting With a Mouse</h5>
-<ul>
-  <li>Same as Windows<br>
-  </li>
-</ul>
-<h5>Sorting With a Keyboard</h5>
-<ul>
-  <li>Same as Windows</li>
-</ul>
-<h5>Sort Indicator Visual Feedback</h5>
-<p></p>
-<p>This shows a column sorted in ascending order. Note the light grey
-background color in the column, and the indicator in the colum header
-which is placed close to the column name.<br>
-</p>
-<p><img alt="ascend" src="hol_files/sort1-ascend-ocean.png"
- style="border: 1px solid ; width: 210px; height: 150px;"><br>
-</p>
-<p>This shows the same column sorted descending. Note the change in the
-indicator in the column header:<br>
-</p>
-<p><img alt="descend" src="hol_files/sort2-descend-ocean.png"
- style="border: 1px solid ; width: 210px; height: 150px;"><br>
-</p>
-<p>This shows a column before it becomes a sorted column:<br>
-</p>
-<p><img alt="before" src="hol_files/sort3-pre-sorted-ocean.png"
- style="border: 1px solid ; width: 210px; height: 150px;"><br>
-</p>
-<p>This shows the same column after its header was clicked on. Note
-that the text in the header has been made bold, and the sort indicate
-has been shown.<br>
-</p>
-<p><img alt="after" src="hol_files/sort4-post-sorted-ocean.png"
- style="border: 1px solid ; width: 210px; height: 150px;"><br>
-</p>
-<p>Finally, the next two images show that when a column is too narrow
-to accomodate both the text and the sort indicator, the text is
-ellided. As the column is made narrower, the text and the sort
-indicator both gradually push one another off the edges of the header.<br>
-</p>
-<p><img alt="before" src="hol_files/sort5-narrow-before-ocean.png"
- style="border: 1px solid ; width: 100px; height: 152px;"><br>
-</p>
-<p><img alt="after" src="hol_files/sort6-narrow-after-ocean.png"
- style="border: 1px solid ; width: 100px; height: 153px; font-family: monospace;"><br>
-</p>
-<h4>Details For <img alt="Gnome Logo" src="hol_files/gnome.png"
- style="width: 24px; height: 24px;"></h4>
-<h5>Sorting With a Mouse</h5>
-<ul>
-  <li>Identical to Windows.</li>
-</ul>
-<h5>Sorting With a Keyboard</h5>
-<ul>
-  <li>The method described for Windows should be used.</li>
-  <li>When the keyboard focus is in a column header, the sort order may
-be cycled by pressing space.</li>
-</ul>
-<h5>Sort Indicator Visual Feedback</h5>
-<p>This shows a column sorted in ascending order. Note that the column
-background is darker than an unsorted column. Also, note the sort
-indicator which points in the opposite direction from Windows, and is
-placed to the far right in the column header:<br>
-</p>
-<p><img alt="Ascending Sort" src="hol_files/sort1-ascend-gnome.png"
- style="border: 1px solid ;"></p>
-<p>This shows the same column sorted descending. Note the change in the
-indicator in the column header:<br>
-</p>
-<p><img alt="Descending Sort" src="hol_files/sort2-descend-gnome.png"
- style="border: 1px solid ;"></p>
-<p>This shows a column before it becomes a sorted column:<br>
-</p>
-<p><img alt="Pre sorted" src="hol_files/sort3-pre-sorted-gnome.png"
- style="border: 1px solid ; width: 92px; height: 174px;"><br>
-</p>
-<p>This shows the same column after its header was clicked on.<br>
-</p>
-<p><img alt="Post sorted" src="hol_files/sort4-post-sorted-gnome.png"
- style="border: 1px solid ; width: 90px; height: 173px;"><br>
-</p>
-<p>Narrow columns have two behaviors, depending on whether the user has
-explicitly set the width. The first illustration here shows "before"
-the column is made the sort column:<br>
-</p>
-<p><img alt="before" src="hol_files/sort5-narrow-before-gnome.png"
- style="border: 1px solid ; width: 103px; height: 100px;"><br>
-</p>
-<p>If the user hasn't set the width, then when the sort indicator is
-added, the column seems to resize automatically to accomodate the added
-width:<br>
-</p>
-<p><img alt="after2" src="hol_files/sort7-resize-after-gnome.png"
- style="border: 1px solid ; width: 103px; height: 100px;"><br>
-</p>
-<p>However, if the user has specified the width, then the column is not
-resized and the sort indicator occludes the column text (note that no
-ellipses are shown).<br>
-</p>
-<p><img alt="after" src="hol_files/sort6-narrow-after-gnome.png"
- style="border: 1px solid ; width: 103px; height: 100px;"><br>
-</p>
-<h4>Details For<img alt="MacOS X 10.3 (Panther)"
- src="hol_files/panther.jpg" style="width: 24px; height: 24px;"></h4>
-<h5>Sorting With a Mouse</h5>
-<ul>
-  <li>The same as Windows except: a column "remembers" its previous
-sort order. Thus an initial click on the column header must
-re-display that previous sort order. Subsequent clicks must cycle
-through the
-sort orders. The default sort order should be ascending.<br>
-  </li>
-</ul>
-<h5>Sorting With a Keyboard</h5>
-<ul>
-  <li>Same as Windows<br>
-  </li>
-</ul>
-<h5>Sort Indicator Visual Feedback</h5>
-<p>This shows a column sorted in ascending order. Note the sort
-indicator which is always placed on the right side. Note that the
-triangle points in the same direction as Windows, but opposite GNOME.<br>
-</p>
-<p><img alt="x" src="hol_files/sort1-ascend-panther.png"
- style="border: 1px solid ; width: 591px; height: 175px;"></p>
-<p>This shows the same column sorted descending. Note the change in the
-indicator in the column header:</p>
-<p><img alt="x" src="hol_files/sort2-descend-panther.png"
- style="border: 1px solid ; width: 591px; height: 175px;"><br>
-</p>
-<p>This shows a column before it is made the sorted column:<br>
-</p>
-<p><img alt="x" src="hol_files/sort3-pre-sorted-panther.png"
- style="border: 1px solid ; width: 190px; height: 175px;"><br>
-</p>
-<p>After it is made the sorted column.<br>
-</p>
-<p><img alt="x" src="hol_files/sort4-post-sorted-panther.png"
- style="border: 1px solid ; width: 190px; height: 175px;"><br>
-</p>
-<p>A narrow column with the text fully ellided. Note that unlike
-Windows, which ellides the trailing text, the Mac elides from the
-middle of a string of text.<br>
-</p>
-<p><img alt="x" src="hol_files/sort5-narrow-before-panther.png"
- style="border: 1px solid ; width: 50px; height: 175px;"><br>
-</p>
-<p>After the column is made the sort column. Note that there is
-always space on the sides of the header text to accomodate the sort
-indicator, so displaying it never disrupts the position of the header
-text.
-</p>
-<p><img alt="x" src="hol_files/sort6-narrow-after-panther.png"
- style="border: 1px solid ; width: 50px; height: 175px;">
-</p>
-<p>Open Question: Is it possible, via code, to make a column narrower
-than the width of, say, the right header border area? This can't be
-done with things built with IB.
-</p>
-<h4>Application Details</h4>
-<p>A program should persist the sorted column and the sort direction
-across
-runs of the program in lists found in both primary and secondary
-windows.
-</p>
-<p>The application developer must provide the Sort By menu and
-accompanying behavior.
-</p>
-<h3><a name="Column_HidingShowing"></a></h3>
-<br>
-<h2>Revision History</h2>
-<table style="width: 100%; text-align: left;" border="1" cellpadding="2"
- cellspacing="0">
-  <tbody>
-    <tr>
-      <th style="vertical-align: top;">Date<br>
-      </th>
-      <th style="vertical-align: top;">Details<br>
-      </th>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;">2005-May-03<br>
-      </td>
-      <td style="vertical-align: top;">Initial revision posted to <a
- href="https://swingx.dev.java.net/documentation/treetable/index.html">https://swingx.dev.java.net/documentation/treetable/index.html</a><br>
-      </td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top;"><br>
-      </td>
-      <td style="vertical-align: top;"><br>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<br>
-<p><br>
-</p>
+
 </body>
 </html>
