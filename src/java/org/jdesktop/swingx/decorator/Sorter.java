@@ -97,9 +97,6 @@ public abstract class Sorter extends Filter {
     private int compare(int row1, int row2, int col) {
         Object o1 = getInputValue(row1, col);
         Object o2 = getInputValue(row2, col);
-        if (comparator != null) {
-            return comparator.compare(o1, o2);
-        }
         // If both values are null return 0
         if (o1 == null && o2 == null) {
             return 0;
@@ -109,6 +106,11 @@ public abstract class Sorter extends Filter {
         }
         else if (o2 == null) {
             return 1;
+        }
+        // JW: have to handle null first of all
+        // Seemingly, Comparators are not required to handle null. Hmm...
+        if (comparator != null) {
+            return comparator.compare(o1, o2);
         }
 
         if (o1 instanceof Comparable) {

@@ -822,15 +822,19 @@ public static boolean TRACE = false;
         int rows = getRowCount();
         int endCol = getColumnCount();
 
-        int startRow = startIndex + 1;
         int matchRow = -1;
 
         if (backwards == true) {
+            if (startIndex < 0)
+                startIndex = rows;
+            int startRow = startIndex - 1;
             for (int r = startRow; r >= 0 && matchRow == -1; r--) {
-                for (int c = endCol; c >= 0; c--) {
+                for (int c = endCol - 1; c >= 0; c--) {
                     Object value = getValueAt(r, c);
-                    if ( (value != null) &&
+                    if ((value != null) &&
+                    // JW: differs from PatternHighlighter/Filter
                         pattern.matcher(value.toString()).find()) {
+                        // pattern.matcher(value.toString()).matches()) {
                         changeSelection(r, c, false, false);
                         matchRow = r;
                         lastCol = c;
@@ -841,13 +845,15 @@ public static boolean TRACE = false;
                     lastCol = endCol;
                 }
             }
-        }
-        else {
+        } else {
+            int startRow = startIndex + 1;
             for (int r = startRow; r < rows && matchRow == -1; r++) {
                 for (int c = lastCol; c < endCol; c++) {
                     Object value = getValueAt(r, c);
-                    if ( (value != null) &&
-                        pattern.matcher(value.toString()).find()) {
+                    if ((value != null) &&
+                    // JW: differs from PatternHighlighter/Filter
+                            pattern.matcher(value.toString()).find()) {
+                        // pattern.matcher(value.toString()).matches()) {
                         changeSelection(r, c, false, false);
                         matchRow = r;
                         lastCol = c;
@@ -864,13 +870,71 @@ public static boolean TRACE = false;
             Object viewport = getParent();
             if (viewport instanceof JViewport) {
                 Rectangle rect = getCellRect(getSelectedRow(), 0, true);
-                Point pt = ( (JViewport) viewport).getViewPosition();
+                Point pt = ((JViewport) viewport).getViewPosition();
                 rect.setLocation(rect.x - pt.x, rect.y - pt.y);
-                ( (JViewport) viewport).scrollRectToVisible(rect);
+                ((JViewport) viewport).scrollRectToVisible(rect);
             }
         }
         return matchRow;
     }
+    
+//    public int search(Pattern pattern, int startIndex, boolean backwards) {
+//        if (pattern == null) {
+//            lastCol = 0;
+//            return -1;
+//        }
+//        int rows = getRowCount();
+//        int endCol = getColumnCount();
+//
+//        int startRow = startIndex + 1;
+//        int matchRow = -1;
+//
+//        if (backwards == true) {
+//            for (int r = startRow; r >= 0 && matchRow == -1; r--) {
+//                for (int c = endCol; c >= 0; c--) {
+//                    Object value = getValueAt(r, c);
+//                    if ( (value != null) &&
+//                        pattern.matcher(value.toString()).find()) {
+//                        changeSelection(r, c, false, false);
+//                        matchRow = r;
+//                        lastCol = c;
+//                        break; // No need to search other columns
+//                    }
+//                }
+//                if (matchRow == -1) {
+//                    lastCol = endCol;
+//                }
+//            }
+//        }
+//        else {
+//            for (int r = startRow; r < rows && matchRow == -1; r++) {
+//                for (int c = lastCol; c < endCol; c++) {
+//                    Object value = getValueAt(r, c);
+//                    if ( (value != null) &&
+//                        pattern.matcher(value.toString()).find()) {
+//                        changeSelection(r, c, false, false);
+//                        matchRow = r;
+//                        lastCol = c;
+//                        break; // No need to search other columns
+//                    }
+//                }
+//                if (matchRow == -1) {
+//                    lastCol = 0;
+//                }
+//            }
+//        }
+//
+//        if (matchRow != -1) {
+//            Object viewport = getParent();
+//            if (viewport instanceof JViewport) {
+//                Rectangle rect = getCellRect(getSelectedRow(), 0, true);
+//                Point pt = ( (JViewport) viewport).getViewPosition();
+//                rect.setLocation(rect.x - pt.x, rect.y - pt.y);
+//                ( (JViewport) viewport).scrollRectToVisible(rect);
+//            }
+//        }
+//        return matchRow;
+//    }
 
     public void setVisibleRowCount(int visibleRowCount) {
         this.visibleRowCount = visibleRowCount;
