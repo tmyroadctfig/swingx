@@ -33,7 +33,6 @@ public class SwingIssues {
 //        suite.addTest(new TestSuite(JFormIssues.class));
 //        suite.addTest(new TestSuite(DefaultTableModelExtIssues.class));
         suite.addTest(new TestSuite(JXTableIssues.class));
-        suite.addTest(new TestSuite(TableColumnModelTest.class));
 
         return suite;
     }
