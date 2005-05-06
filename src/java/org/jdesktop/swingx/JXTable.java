@@ -190,24 +190,24 @@ public static boolean TRACE = false;
                         "javax.swing.table.DefaultTableCellRenderer");
 
         // Numbers
-        setLazyRenderer(Number.class, "org.jdesktop.swing.JXTable$NumberRenderer");
+        setLazyRenderer(Number.class, "org.jdesktop.swingx.JXTable$NumberRenderer");
 
         // Doubles and Floats
-        setLazyRenderer(Float.class, "org.jdesktop.swing.JXTable$DoubleRenderer");
-        setLazyRenderer(Double.class, "org.jdesktop.swing.JXTable$DoubleRenderer");
+        setLazyRenderer(Float.class, "org.jdesktop.swingx.JXTable$DoubleRenderer");
+        setLazyRenderer(Double.class, "org.jdesktop.swingx.JXTable$DoubleRenderer");
 
         // Dates
-        setLazyRenderer(Date.class, "org.jdesktop.swing.JXTable$DateRenderer");
+        setLazyRenderer(Date.class, "org.jdesktop.swingx.JXTable$DateRenderer");
 
         // Icons and ImageIcons
-        setLazyRenderer(Icon.class, "org.jdesktop.swing.JXTable$IconRenderer");
-        setLazyRenderer(ImageIcon.class, "org.jdesktop.swing.JXTable$IconRenderer");
+        setLazyRenderer(Icon.class, "org.jdesktop.swingx.JXTable$IconRenderer");
+        setLazyRenderer(ImageIcon.class, "org.jdesktop.swingx.JXTable$IconRenderer");
 
         // Booleans
-        setLazyRenderer(Boolean.class, "org.jdesktop.swing.JXTable$BooleanRenderer");
+        setLazyRenderer(Boolean.class, "org.jdesktop.swingx.JXTable$BooleanRenderer");
 
         // Other
-//        setLazyRenderer(Link.class, "org.jdesktop.swing.JXTable$LinkRenderer");
+//        setLazyRenderer(Link.class, "org.jdesktop.swingx.JXTable$LinkRenderer");
     }
 
 

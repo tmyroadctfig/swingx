@@ -43,7 +43,7 @@ public class TableColumnExt extends javax.swing.table.TableColumn
     static {
         Constructor	constructor = null;
         try {
-            Class	sorterClass = Class.forName("org.jdesktop.swing.decorator.ShuttleSorter", true,
+            Class	sorterClass = Class.forName("org.jdesktop.swingx.decorator.ShuttleSorter", true,
                                               TableColumnExt.class.getClassLoader());
             constructor = sorterClass.getConstructor(sorterConstructorSignature);
         }
