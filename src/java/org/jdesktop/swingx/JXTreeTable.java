@@ -1458,19 +1458,16 @@ public class JXTreeTable extends JXTable {
 
             // Draw the Table border if we have focus.
             if (highlightBorder != null) {
-//                highlightBorder.paintBorder(this, g, 0,
-//                    visibleRow * getRowHeight(),
-//                    getWidth(), getRowHeight());
                 // #170: border not drawn correctly
                 // JW: position the border to be drawn in translated area
                 // still not satifying in all cases...
+				// RG: Now it satisfies (at least for the row margins)
+				// Still need to make similar adjustments for column margins...
                 highlightBorder.paintBorder(this, g, 0, 
                         translationOffset,
                         getWidth(), 
-                        // uhhh
-                        getRowHeight() + 1 - 2 * (margins) );            
-                
-            
+                        // uhhh getRowHeight() + 1 - 2 * (margins) 
+						getRowHeight() - (rowMargin << 1) - rowMargin);	// RG: subtract (rowMargin * 3)
             }
         }
 
