@@ -310,16 +310,15 @@ public static boolean TRACE = false;
         repaint();
     }
 
+	@Override
     public int getRowCount() {
-        int count;
-        if (filters == null) {
-            count = getModel().getRowCount();
-        }
-        else {
-            count = filters.getOutputSize();
-        }
-        return count;
+        // RG: If there are no filters, call superclass version rather than accessing model directly
+        return filters == null ? super.getRowCount() : filters.getOutputSize();
     }
+	
+	public boolean isHierarchical(int column) {
+		return false;
+	}
 
     /**
      * Convert row index from view coordinates to model coordinates
@@ -1019,7 +1018,7 @@ public static boolean TRACE = false;
     }
 
 
-    static class TableAdapter extends ComponentAdapter {
+    protected static class TableAdapter extends ComponentAdapter {
         private final JTable table;
 
         /**
