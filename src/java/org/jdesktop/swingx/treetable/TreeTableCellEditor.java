@@ -62,16 +62,12 @@ import org.jdesktop.swingx.JXTreeTable;
  * @author Ramesh Gupta
  */
 public class TreeTableCellEditor extends DefaultCellEditor {
-    public TreeTableCellEditor(JXTreeTable treeTable, JTree tree) {
+    public TreeTableCellEditor(JTree tree) {
         super(new TreeTableTextField());
-        if (treeTable == null) {
-            throw new IllegalArgumentException("null treeTable");
-        }
         if (tree == null) {
             throw new IllegalArgumentException("null tree");
         }
 
-        this.treeTable = treeTable; // immutable
         this.tree = tree; // immutable
     }
 
@@ -149,6 +145,5 @@ public class TreeTableCellEditor extends DefaultCellEditor {
         }
     }
 
-    private final JXTreeTable treeTable; // immutable
     private final JTree tree; // immutable
 }

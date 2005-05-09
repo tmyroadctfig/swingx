@@ -158,7 +158,7 @@ public class JXTreeTable extends JXTable {
 
         // Install the default editor.
         setDefaultEditor(AbstractTreeTableModel.hierarchicalColumnClass,
-            new TreeTableCellEditor(this, renderer));
+            new TreeTableCellEditor(renderer));
 
         // No grid.
         setShowGrid(false); // superclass default is "true"
@@ -363,7 +363,7 @@ public class JXTreeTable extends JXTable {
 
         // Install the default editor.
         setDefaultEditor(AbstractTreeTableModel.hierarchicalColumnClass,
-            new TreeTableCellEditor(this, renderer));
+            new TreeTableCellEditor(renderer));
 
         // JTable supports row margins and intercell spacing, but JTree doesn't.
         // We must reconcile the differences in the semantics of rowHeight as
@@ -1003,7 +1003,7 @@ public class JXTreeTable extends JXTable {
             // from the tree. The renderer can potentially change each time
             // laf changes.
             setDefaultEditor(AbstractTreeTableModel.hierarchicalColumnClass,
-                new TreeTableCellEditor(this, renderer));
+                new TreeTableCellEditor(renderer));
 
             if (getBackground() == null || getBackground()instanceof UIResource) {
                 setBackground(renderer.getBackground());
