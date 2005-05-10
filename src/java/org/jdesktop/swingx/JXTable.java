@@ -673,6 +673,7 @@ public static boolean TRACE = false;
 //            MetaData metaData = provider.getMetaData(provider.getFieldNames()[modelColumn]);
 //            configureColumn(column, metaData);
 //        }
+        column.setHeaderValue(model.getColumnName(modelColumn));
         return column;
     }
 
