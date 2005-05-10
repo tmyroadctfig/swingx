@@ -10,9 +10,11 @@ package org.jdesktop.swingx.util;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A PropertyChangeListener that stores the received PropertyChangeEvents.
@@ -26,11 +28,15 @@ public class PropertyChangeReport implements PropertyChangeListener {
      * Holds a list of all received PropertyChangeEvents.
      */
     protected List events = new LinkedList();
+    protected Map eventMap = new HashMap();
     
 //------------------------ implement PropertyChangeListener
     
     public void propertyChange(PropertyChangeEvent evt) {
         events.add(0, evt);
+        if (evt.getPropertyName() != null) {
+            eventMap.put(evt.getPropertyName(), evt);
+        }
     }
     
     public int getEventCount() {
@@ -39,6 +45,7 @@ public class PropertyChangeReport implements PropertyChangeListener {
  
     public void clear() {
         events.clear();
+        eventMap.clear();
     }
     
     public boolean hasEvents() {
@@ -56,6 +63,11 @@ public class PropertyChangeReport implements PropertyChangeListener {
         }
         return count;
     }
+
+    public boolean hasEvents(String property) {
+        return eventMap.get(property) != null;
+    }
+    
     public int getMultiCastEventCount() {
         int count = 0;
         for (Iterator i = events.iterator(); i.hasNext();) {
@@ -75,13 +87,29 @@ public class PropertyChangeReport implements PropertyChangeListener {
             ? null
             : (PropertyChangeEvent) events.get(0);
     }
+
+    public PropertyChangeEvent getLastEvent(String property) {
+        return (PropertyChangeEvent) eventMap.get(property);
+    }
     
     public Object getLastOldValue() {
-        return getLastEvent().getOldValue();
+        PropertyChangeEvent last = getLastEvent();
+        return last != null ? last.getOldValue() : null;
     }
     
     public Object getLastNewValue() {
-        return getLastEvent().getNewValue();
+        PropertyChangeEvent last = getLastEvent();
+        return last != null ? last.getNewValue() : null;
+    }
+ 
+    public Object getLastOldValue(String property) {
+        PropertyChangeEvent last = getLastEvent(property);
+        return last != null ? last.getOldValue() : null;
+    }
+    
+    public Object getLastNewValue(String property) {
+        PropertyChangeEvent last = getLastEvent(property);
+        return last != null ? last.getNewValue() : null;
     }
     
     public boolean getLastOldBooleanValue() {
