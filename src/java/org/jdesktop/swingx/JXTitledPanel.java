@@ -250,11 +250,14 @@ public class JXTitledPanel extends JXPanel {
 	public void setTitle(String title) {
 		String oldTitle = this.title;
 		this.title = (title == null ? "" : title);
-		PropertyChangeEvent event = new PropertyChangeEvent(this, "title", oldTitle, title);
-		PropertyChangeListener[] listeners = this.getPropertyChangeListeners("title");
-		for (int i = 0; i < listeners.length; i++) {
-			listeners[i].propertyChange(event);
-		}
+        // JW: fix swingx #9 - missing/incorrect notification
+        // let standard notification handle
+        firePropertyChange("title", oldTitle, getTitle());
+//		PropertyChangeEvent event = new PropertyChangeEvent(this, "title", oldTitle, title);
+//		PropertyChangeListener[] listeners = this.getPropertyChangeListeners("title");
+//		for (int i = 0; i < listeners.length; i++) {
+//			listeners[i].propertyChange(event);
+//		}
 	}
 	
 	/**
