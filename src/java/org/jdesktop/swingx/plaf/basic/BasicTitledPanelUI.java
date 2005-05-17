@@ -24,12 +24,15 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
+
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.plaf.UIResource;
+
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.JXTitledPanel;
 import org.jdesktop.swingx.plaf.TitledPanelUI;
@@ -93,6 +96,7 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
     public void installUI(JComponent c) {
         assert c instanceof JXTitledPanel;
         JXTitledPanel panel = (JXTitledPanel)c;
+        
         installProperty(panel, "titleForeground", UIManager.getColor("JXTitledPanel.title.foreground"));
         installProperty(panel, "titleDarkBackground", UIManager.getColor("JXTitledPanel.title.darkBackground"));
         installProperty(panel, "titleLightBackground", UIManager.getColor("JXTitledPanel.title.lightBackground"));
@@ -112,7 +116,13 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
 		panel.add(topPanel, BorderLayout.NORTH);
 		panel.setBorder(BorderFactory.createRaisedBevelBorder());
 		panel.setOpaque(false);
+        titledPanel = panel;
         
+        installListeners();
+        
+    }
+
+    protected void installListeners() {
         titleChangeListener = new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 if (evt.getPropertyName().equals("title")) {
@@ -121,16 +131,28 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
                     caption.setForeground((Color)evt.getNewValue());
                 } else if (evt.getPropertyName().equals("titleFont")) {
                     caption.setFont((Font)evt.getNewValue());
-                }
+                } else if ("titleDarkBackground".equals(evt.getPropertyName())) {
+                    topPanel.revalidateGradient();
+               
+            } else if ("titleLightBackground".equals(evt.getPropertyName())) {
+                topPanel.revalidateGradient();
+            }
             }
         };
-        panel.addPropertyChangeListener("title", titleChangeListener);
-        panel.addPropertyChangeListener("titleForeground", titleChangeListener);
-        panel.addPropertyChangeListener("titleFont", titleChangeListener);
-        
-        titledPanel = panel;
+//        titledPanel.addPropertyChangeListener("title", titleChangeListener);
+//        titledPanel.addPropertyChangeListener("titleForeground", titleChangeListener);
+//        titledPanel.addPropertyChangeListener("titleFont", titleChangeListener);
+        titledPanel.addPropertyChangeListener(titleChangeListener);
     }
-    
+
+    protected void uninstallListeners(JXTitledPanel panel) {
+        titledPanel.removePropertyChangeListener(titleChangeListener);
+        //TODO
+//        panel.removePropertyChangeListener("title", titleChangeListener);
+//        panel.removePropertyChangeListener("titleForeground", titleChangeListener);
+//        panel.removePropertyChangeListener("titleFont", titleChangeListener);
+    }
+
     protected void installProperty(JComponent c, String propName, Object value) {
         try {
             BeanInfo bi = Introspector.getBeanInfo(c.getClass());
@@ -178,11 +200,9 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
     public void uninstallUI(JComponent c) {
         assert c instanceof JXTitledPanel;
         JXTitledPanel panel = (JXTitledPanel)c;
-        //TODO
-        panel.removePropertyChangeListener("title", titleChangeListener);
-        panel.removePropertyChangeListener("titleForeground", titleChangeListener);
-        panel.removePropertyChangeListener("titleFont", titleChangeListener);
+        uninstallListeners(panel);
     }
+
 
     /**
      * Paints the specified component appropriate for the look and feel.
@@ -243,7 +263,11 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
 		private ImageIcon helper = new ImageIcon();
 		public JGradientPanel() {
 		}
-		
+
+        public void revalidateGradient() {
+            gp = null;
+            repaint();
+        }
 		//override the background color to provide for a gradient
 		
 		/* (non-Javadoc)
@@ -255,7 +279,7 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
 		 */
 		protected void paintComponent(Graphics g) {
 			//draw the gradient background
-			if (oldWidth != getWidth() || oldHeight != getHeight()) {
+			if (gp == null || oldWidth != getWidth() || oldHeight != getHeight()) {
 				gp = createGradientPaint();
 				Image savedImg = createImage(getWidth(), getHeight());
 				Graphics2D imgg = (Graphics2D)savedImg.getGraphics();

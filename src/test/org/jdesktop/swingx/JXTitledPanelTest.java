@@ -6,6 +6,7 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 
@@ -108,12 +109,42 @@ public class JXTitledPanelTest extends InteractiveTestCase {
         String title = "starting title";
         final JXTitledPanel panel = new JXTitledPanel(title);
         panel.getContentContainer().setLayout(new BoxLayout(panel.getContentContainer(), BoxLayout.Y_AXIS));
+        Action toggleLight = new AbstractAction("toggle lightBackground") {
+            public void actionPerformed(ActionEvent e) {
+                Color oldFont = panel.getTitleLightBackground();
+                panel.setTitleLightBackground(oldFont.darker());
+                
+            }
+            
+        };
+
+        panel.getContentContainer().add(new JButton(toggleLight));
+        panel.getContentContainer().setLayout(new BoxLayout(panel.getContentContainer(), BoxLayout.Y_AXIS));
+        Action toggleDark = new AbstractAction("toggle darkbackground") {
+            public void actionPerformed(ActionEvent e) {
+                Color oldFont = panel.getTitleDarkBackground();
+                panel.setTitleDarkBackground(oldFont.darker());
+                
+            }
+            
+        };
+
+        panel.getContentContainer().add(new JButton(toggleDark));
+        Action toggleForeground = new AbstractAction("toggle Foreground") {
+            public void actionPerformed(ActionEvent e) {
+                Color oldColor = panel.getTitleForeground();
+                panel.setTitleForeground(oldColor.darker());
+                
+            }
+            
+        };
+
+        panel.getContentContainer().add(new JButton(toggleForeground));
         Action toggleFont = new AbstractAction("toggle Font") {
             public void actionPerformed(ActionEvent e) {
                 Font oldFont = panel.getTitleFont();
                 System.out.println("oldfont size: " + oldFont.getSize());
                 panel.setTitleFont(oldFont.deriveFont(oldFont.getSize()*2.f));
-                panel.revalidate();
                 
             }
             

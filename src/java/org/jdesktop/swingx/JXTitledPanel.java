@@ -252,6 +252,10 @@ public class JXTitledPanel extends JXPanel {
 		this.title = (title == null ? "" : title);
         // JW: fix swingx #9 - missing/incorrect notification
         // let standard notification handle
+        // NOTE - "getting" the new property in the fire method is 
+        //   intentional: there's no way of missing any transformations
+        //   on the parameter to set (like above: setting a  
+        //   value depending on whether the input is null). 
         firePropertyChange("title", oldTitle, getTitle());
 //		PropertyChangeEvent event = new PropertyChangeEvent(this, "title", oldTitle, title);
 //		PropertyChangeListener[] listeners = this.getPropertyChangeListeners("title");
@@ -301,7 +305,9 @@ public class JXTitledPanel extends JXPanel {
     }
 
     public void setTitleFont(Font titleFont) {
+        Font old = getTitleFont();
         this.titleFont = titleFont;
+        firePropertyChange("titleFont", old, getTitleFont());
     }
 
     public Color getTitleDarkBackground() {
@@ -309,7 +315,9 @@ public class JXTitledPanel extends JXPanel {
     }
 
     public void setTitleDarkBackground(Color titleDarkBackground) {
+        Color old = getTitleDarkBackground();
         this.titleDarkBackground = titleDarkBackground;
+        firePropertyChange("titleDarkBackground", old, getTitleDarkBackground());
     }
 
     public Color getTitleLightBackground() {
@@ -317,7 +325,9 @@ public class JXTitledPanel extends JXPanel {
     }
 
     public void setTitleLightBackground(Color titleLightBackground) {
+        Color old = getTitleLightBackground();
         this.titleLightBackground = titleLightBackground;
+        firePropertyChange("titleLightBackground", old, getTitleLightBackground());
     }
 
     public Color getTitleForeground() {
@@ -325,7 +335,9 @@ public class JXTitledPanel extends JXPanel {
     }
 
     public void setTitleForeground(Color titleForeground) {
+        Color old = getTitleForeground();
         this.titleForeground = titleForeground;
+        firePropertyChange("titleForeground", old, getTitleForeground());
     }
 
 }
