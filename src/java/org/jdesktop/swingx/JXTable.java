@@ -6,12 +6,8 @@
  */
 
 package org.jdesktop.swingx;
-import java.util.Date;
-import java.util.List;
-import java.util.Hashtable;
-import java.util.Vector;
-import java.util.regex.Pattern;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -21,6 +17,11 @@ import java.awt.event.MouseEvent;
 import java.awt.print.PrinterException;
 import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Vector;
+import java.util.regex.Pattern;
 
 import javax.swing.ActionMap;
 import javax.swing.Icon;
@@ -38,16 +39,16 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
+
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PipelineEvent;
 import org.jdesktop.swingx.decorator.PipelineListener;
 import org.jdesktop.swingx.decorator.Sorter;
-
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
-import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
+import org.jdesktop.swingx.table.TableColumnExt;
 
 
 /**
@@ -56,6 +57,7 @@ import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
  * @author Ramesh Gupta
  * @author Amy Fowler
  * @author Mark Davidson
+ * @author Jeanette Winzenburg
  */
 public class JXTable extends JTable implements PipelineListener, Searchable {
 
@@ -72,6 +74,10 @@ public static boolean TRACE = false;
     private final static MouseAdapter   headerListener = new MouseAdapter() {
         // MouseAdapter must be stateless
         public void mouseClicked(MouseEvent e) {
+            if (isInResizeRegion(e)) {
+                doResize(e);
+                return;
+            }
             JTableHeader    header = (JTableHeader) e.getSource();
             JXTable     table = (JXTable) header.getTable();
             if (!table.isSortable()) return;
@@ -86,6 +92,35 @@ public static boolean TRACE = false;
                 }
             }
             header.repaint();
+        }
+
+        private void doResize(MouseEvent e) {
+            if (e.getClickCount() < 2) return;
+            JTableHeader header = (JTableHeader) e.getSource();
+            if (header.getTable() instanceof JXTable) {
+                int column = header.getColumnModel().getColumnIndexAtX(e.getX());
+                if (column >= 0) {
+                    ((JXTable) header.getTable()).packColumn(column, 5);
+                }
+            }
+            
+        }
+
+        private boolean isInResizeRegion(MouseEvent e) {
+            JTableHeader header = (JTableHeader) e.getSource();
+            // JW: kind of a hack - there's no indication in the 
+            // JTableHeader api to find if we are in the resizing
+            // region before actually receiving a click
+            // checked the header.resizingColumn should be set on
+            // first click?
+            // doesn't work probably because this listener is messaged before
+            // ui-delegate listener
+            // return header.getResizingColumn() != null;
+            Cursor cursor = header.getCursor();
+            boolean inResize = cursor != null ? 
+                    (cursor.getType() == Cursor.E_RESIZE_CURSOR || cursor.getType() == Cursor.W_RESIZE_CURSOR ) :
+                     false;   
+            return inResize;
         }
     };
 
@@ -972,6 +1007,74 @@ public static boolean TRACE = false;
         return prefSize;
     }
 
+//---------------------------- support to "pack" columns to header/cell content width    
+    /**
+     * Packs all the columns to their optimal size. Works best with
+     * auto resizing turned off. 
+     * 
+     * Contributed by M. Hillary (Issue #60)
+     * 
+     * @param margin the margin to apply to each column.
+     */
+    public void packTable(int margin) {
+        for (int c = 0; c < getColumnCount(); c++)
+            packColumn(c, margin, -1 );
+    }
+    
+    /**
+     * Packs an indivudal column in the table.
+     * Contributed by M. Hillary (Issue #60)
+     * 
+     * @param column
+     *            The Column index to pack in View Coordinates
+     * @param margin
+     *            The Margin to apply to the column width.
+     */
+    public void packColumn(int column, int margin) {
+        packColumn(column, margin, -1);
+    }
+
+    /**
+     * Packs an indivual column in the table to less than or equal to the
+     * maximum witdth. If maximun is -1 then the column is made as wide
+     * as it needs.
+     * Contributed by M. Hillary (Issue #60)
+     * 
+     * @param column The Column index to pack in View Coordinates
+     * @param margin The margin to apply to the column
+     * @param max The maximum width the column can be resized to. -1 mean any size.
+     */
+    public void packColumn(int column, int margin, int max) {
+        TableColumnModel colModel = getColumnModel();
+        TableColumn col = colModel.getColumn(column);
+
+        /* Get width of column header */
+        TableCellRenderer renderer = col.getHeaderRenderer();
+        if (renderer == null) 
+            renderer = getTableHeader().getDefaultRenderer();
+        
+        int width = 0;
+        
+        Component comp = renderer.getTableCellRendererComponent(this, col
+                .getHeaderValue(), false, false, 0, 0);
+        width = comp.getPreferredSize().width;
+        
+        if(getRowCount() > 0)
+            renderer = getCellRenderer(0, column);
+        for (int r = 0; r < getRowCount(); r++) {
+            comp = renderer.getTableCellRendererComponent(this, getValueAt(r,
+                    column), false, false, r, column);
+            width = Math.max(width, comp.getPreferredSize().width);
+        }
+        width += 2 * margin;
+
+        /* Check if the width exceeds the max */
+        if( max != -1 && width > max )
+            width = max;
+        
+        col.setPreferredWidth(width);
+    }
+    
     /**
      * Initialize the preferredWidth of the specified column based on the
      * column's prototypeValue property.  If the column is not an
