@@ -54,8 +54,8 @@ import org.jdesktop.swingx.util.AncientSwingTeam;
 
 public class JXTableUnitTest extends InteractiveTestCase {
 
-    private DynamicTableModel tableModel = null;
-    private TableModel sortableTableModel;
+    protected DynamicTableModel tableModel = null;
+    protected TableModel sortableTableModel;
     
     public JXTableUnitTest() {
         super("JXTable unit test");
@@ -71,6 +71,9 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
     
 
+    public void testComponentAdapterCoordinates() {
+        
+    }
     /**
      * Issue #196: backward search broken.
      *
@@ -807,7 +810,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         table.getTableHeader().setForeground(Color.magenta);
         table.getTableHeader().setFont(new Font("Serif", Font.PLAIN, 10));
 
-        ColumnHeaderRenderer headerRenderer = new ColumnHeaderRenderer();
+        ColumnHeaderRenderer headerRenderer = ColumnHeaderRenderer.createColumnHeaderRenderer();
         headerRenderer.setHorizontalAlignment(JLabel.CENTER);
         headerRenderer.setBackground(Color.blue);
         headerRenderer.setForeground(Color.yellow);
@@ -944,7 +947,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JXTableUnitTest test = new JXTableUnitTest();
         try {
           test.runInteractiveTests();
-         //   test.runInteractiveTests("interactive.*Enable.*");
+          //  test.runInteractiveTests("interactive.*Siz.*");
          //   test.runInteractiveTests("interactive.*Render.*");
          //   test.runInteractiveTests("interactive.*Toggle.*");
         } catch (Exception e) {

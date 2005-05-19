@@ -31,6 +31,7 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.JViewport;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -71,16 +72,21 @@ public static boolean TRACE = false;
     private final ComponentAdapter dataAdapter = new TableAdapter(this);
 
     // No need to define a separate JTableHeader subclass!
+    // JW: on the contrary - should be moved to dedicated JTableHeader subclass
+    // (never act on behalf of other components - except with good reason <g>)
+    // there's some weirdness (caused by JTable) when overriding 
+    // createDefaultTableHeader - check!
     private final static MouseAdapter   headerListener = new MouseAdapter() {
         // MouseAdapter must be stateless
         public void mouseClicked(MouseEvent e) {
+            if (shouldIgnore(e)) return;
             if (isInResizeRegion(e)) {
                 doResize(e);
                 return;
             }
             JTableHeader    header = (JTableHeader) e.getSource();
             JXTable     table = (JXTable) header.getTable();
-            if (!table.isSortable()) return;
+            if (!table.isSortable() || (e.getClickCount() != 1)) return;
             if ((e.getModifiersEx() & e.SHIFT_DOWN_MASK) == e.SHIFT_DOWN_MASK) {
                 table.resetSorter();
             }
@@ -92,6 +98,11 @@ public static boolean TRACE = false;
                 }
             }
             header.repaint();
+        }
+
+        private boolean shouldIgnore(MouseEvent e) {
+            return !SwingUtilities.isLeftMouseButton(e);
+                   // && table.isEnabled());
         }
 
         private void doResize(MouseEvent e) {
@@ -469,16 +480,18 @@ public static boolean TRACE = false;
         // This method is also called during construction of JTable
         if (tableHeader != null) {
             tableHeader.addMouseListener(headerListener);
-            tableHeader.setDefaultRenderer(new ColumnHeaderRenderer());
+//            tableHeader.setDefaultRenderer(
+//                    new DelegatingHeaderRenderer((DefaultTableCellRenderer) tableHeader.getDefaultRenderer()));
+            tableHeader.setDefaultRenderer(ColumnHeaderRenderer.createColumnHeaderRenderer());
         }
         super.setTableHeader(tableHeader);
     }
 
-/*
-    protected JTableHeader createDefaultTableHeader() {
-        return new JTableHeaderExt(columnModel);
-    }
-*/
+
+//    protected JTableHeader createDefaultTableHeader() {
+//        return new JXTableHeader(columnModel);
+//    }
+
 
     protected TableColumnModel createDefaultColumnModel() {
         return new DefaultTableColumnModelExt();

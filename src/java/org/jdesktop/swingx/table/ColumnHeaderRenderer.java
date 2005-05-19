@@ -60,7 +60,11 @@ public class ColumnHeaderRenderer extends JPanel implements TableCellRenderer {
          return sharedInstance;
      }
 
-    public ColumnHeaderRenderer() {
+    public static ColumnHeaderRenderer createColumnHeaderRenderer() {
+        return new ColumnHeaderRenderer();
+    }
+    
+    private ColumnHeaderRenderer() {
         setLayout(new BorderLayout());
         // initialize default properties
         Font boldFont = label.getFont().deriveFont(Font.BOLD);
