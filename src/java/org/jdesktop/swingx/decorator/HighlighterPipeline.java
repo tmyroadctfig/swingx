@@ -32,6 +32,10 @@ public class HighlighterPipeline {
     private List highlighters;
     private final static Highlighter nullHighlighter = new Highlighter(null, null);
 
+    public HighlighterPipeline() {
+        highlighters = new ArrayList();
+    }
+    
     public HighlighterPipeline(Highlighter[] inList) {
         // always returns a new copy of inList
         // XXX seems like there is too much happening here
