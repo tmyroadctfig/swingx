@@ -50,8 +50,11 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      */
     public void interactiveTestShowsRootHandles() {
         JXTree tree = new JXTree(treeTableModel);
+        tree.setShowsRootHandles(false);
+        tree.setRootVisible(false);
         JXTree otherTree = new JXTree(treeTableModel);
-        otherTree.setShowsRootHandles(!tree.getShowsRootHandles());
+        otherTree.setRootVisible(true);
+        otherTree.setShowsRootHandles(false);
         JFrame frame = wrapWithScrollingInFrame(tree, otherTree, "ShowsRootHandles");
         frame.setVisible(true);  // RG: Changed from deprecated method show();
     }

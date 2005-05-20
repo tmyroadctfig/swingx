@@ -111,8 +111,11 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
 
     public void interactiveTestCompareTreeProperties() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
+        treeTable.setShowsRootHandles(false);
+        treeTable.setRootVisible(false);
         JXTreeTable other = new JXTreeTable(treeTableModel);
-        other.setRootVisible(!treeTable.isRootVisible());
+        other.setRootVisible(true);
+        other.setShowsRootHandles(false);
         JFrame frame = wrapWithScrollingInFrame(treeTable, other, "compare rootVisible");
         frame.setVisible(true);
     }
@@ -121,7 +124,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      */    
     public void interactiveTestTreeProperties() {
         final JXTreeTable treeTable = new JXTreeTable(treeTableModel);
-        treeTable.setRootVisible(true);
+        treeTable.setShowsRootHandles(false);
         // storing negates of properties
         Action toggle = new AbstractAction("Toggle Properties") {
 
@@ -139,12 +142,13 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
             }
             
         };
-        treeTable.getActionMap().put("toggleProperties", toggle);
-        treeTable.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("F5"), "toggleProperties");
+//        treeTable.getActionMap().put("toggleProperties", toggle);
+//        treeTable.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("F5"), "toggleProperties");
         treeTable.setRowHeight(22);
         treeTable.setRowMargin(1);
         JFrame frame = wrapWithScrollingInFrame(treeTable,
-                "Toggle Tree properties - press F5");
+                "Toggle Tree properties ");
+        addAction(frame, toggle);
         frame.setVisible(true);
     }
     
