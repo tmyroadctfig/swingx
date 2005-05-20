@@ -1115,6 +1115,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
-        } 
+        }
     }
 }
