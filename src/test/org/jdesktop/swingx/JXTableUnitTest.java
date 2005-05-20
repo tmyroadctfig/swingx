@@ -25,7 +25,6 @@ import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.Icon;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -51,7 +50,6 @@ import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.PipelineListener;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
-import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.util.AncientSwingTeam;
@@ -499,14 +497,59 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
     
 //-------------------------- tests for moving column control into swingx
+
     
-    
-    public void interactiveTestColumnControl() {
-        JXTable table = new JXTable(sortableTableModel);
+    /**
+     * hmm... sporadic ArrayIndexOOB after sequence:
+     * 
+     * filter(column), sort(column), hide(column), setFilter(null)
+     *
+     */
+    public void testColumnControlAndFilters() {
+        final JXTable table = new JXTable(sortableTableModel);
         table.setColumnControlVisible(true);
-        JFrame frame = wrapWithScrollingInFrame(table, "JXTable ColumnControl");
+        Filter filter = new PatternFilter(".*e.*", 0, 0);
+        table.setFilters(new FilterPipeline(new Filter[] {filter}));
+        // needed to make public in JXTable for testing
+        //   table.getTable().setSorter(0);
+        table.getColumnExt(0).setVisible(false);
+        table.setFilters(null);
+
+    }
+
+    /** 
+     * Issue #??: Problems with filters and ColumnControl
+     * 
+     * - sporadic ArrayIndexOOB after sequence:
+     * filter(column), sort(column), hide(column), setFilter(null)
+     * 
+     * - filtering invisible columns? Unclear state transitions.
+     *
+     */
+    public void interactiveTestJNTableColumnControlAndFilters() {
+        final JXTable table = new JXTable(sortableTableModel);
+        Action toggleFilter = new AbstractAction("Toggle Filter") {
+            
+            public void actionPerformed(ActionEvent e) {
+                if (table.getFilters() != null) {
+                    table.setFilters(null);
+                } else {
+                    Filter filter = new PatternFilter(".*e.*", 0, 0);
+                    table.setFilters(new FilterPipeline(new Filter[] {filter}));
+
+                }
+                
+            }
+            
+        };
+        toggleFilter.putValue(Action.SHORT_DESCRIPTION, "filtering first column - problem if invisible ");
+        table.setColumnControlVisible(true);
+        JFrame frame = wrapWithScrollingInFrame(table, "JXTable ColumnControl and Filters");
+        addAction(frame, toggleFilter);
         frame.setVisible(true);
     }
+ 
+    
 
     /** 
      * Issue #11: Column control not showing with few rows.
@@ -543,6 +586,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
             }
             
         };
+        toggleAction.putValue(Action.SHORT_DESCRIPTION, "does nothing visible - no scrollpane");
         table.setModel(new DefaultTableModel(10, 5));
         table.setColumnControlVisible(true);
         JFrame frame = wrapInFrame(table, "JXTable: Toggle ColumnControl outside ScrollPane");
@@ -551,7 +595,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
     /** 
-     * check behaviour of moving table around
+     * check behaviour of moving into/out of scrollpane.
      *
      */
     public void interactiveTestToggleScrollPaneWithColumnControlOn() {
@@ -559,19 +603,21 @@ public class JXTableUnitTest extends InteractiveTestCase {
         table.setModel(new DefaultTableModel(10, 5));
         table.setColumnControlVisible(true);
         final JFrame frame = wrapInFrame(table, "JXTable: Toggle ScrollPane with Columncontrol on");
-        Action toggleAction = new AbstractAction("Toggle Control") {
+        Action toggleAction = new AbstractAction("Toggle ScrollPane") {
 
             public void actionPerformed(ActionEvent e) {
                 Container parent = table.getParent();
                 boolean inScrollPane = parent instanceof JViewport;
                 if (inScrollPane) {
                     JScrollPane scrollPane = (JScrollPane) table.getParent().getParent();
+                    frame.getContentPane().remove(scrollPane);
+                    frame.getContentPane().add(table);
                 } else {
                   parent.remove(table);
                   parent.add(new JScrollPane(table));
-                  frame.pack();
                 }
-                
+                frame.pack();
+                              
             }
             
         };
@@ -586,9 +632,9 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     public void interactivetestColumnControlInvisibleColumns() {
         final JXTable table = new JXTable(sortableTableModel);
-//        table.getColumn("bugid").setVisible(false);
+//        table.getColumnExt("Last Name").setVisible(false);
         table.setColumnControlVisible(true);
-        ColumnControlButton columnControl = table.getColumnControl();
+        JComponent columnControl = table.getColumnControl();
         int totalColumnCount = table.getColumnCount();
         TableColumnExt priorityColumn = table.getColumnExt("First Name");
         priorityColumn.setVisible(false);

@@ -28,6 +28,7 @@ import javax.swing.ActionMap;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -143,9 +144,15 @@ public static boolean TRACE = false;
     private boolean sortable = false;
     private int visibleRowCount = 18;
 
-    private boolean hasColumnControl;
-
-    private ColumnControlButton columnControlButton;
+    /**
+     * flag to indicate if the column control is visible.
+     */
+    private boolean columnControlVisible;
+    /**
+     * A button that allows the user to select which columns to display, and
+     * which to hide
+     */
+    private JComponent columnControlButton;
 
     private int verticalScrollPolicy;
 
@@ -199,12 +206,23 @@ public static boolean TRACE = false;
     }
 
 
-    
+    /**
+     * overridden to addionally configure the upper right corner 
+     * of an enclosing scrollpane with the ColumnControl.
+     */
     protected void configureEnclosingScrollPane() {
         super.configureEnclosingScrollPane();
         configureColumnControl();
     }
 
+    /**
+     * configure the upper right corner of an enclosing scrollpane
+     * with/o the ColumnControl, depending on setting of 
+     * columnControl visibility flag.
+     *
+     * PENDING: should choose corner depending on 
+     * component orientation.
+     */
     private void configureColumnControl() {
         Container p = getParent();
         if (p instanceof JViewport) {
@@ -239,23 +257,40 @@ public static boolean TRACE = false;
         }
     }
 
+    /**
+     * returns visibility flag of column control. <p>
+     * 
+     * Note: if the table is not inside a JScrollPane
+     * the column control is not shown even if this returns true. 
+     * In this case it's the responsibility of the client code 
+     * to actually show it.
+     * 
+     * @return
+     */
     public boolean isColumnControlVisible() {
-        // TODO Auto-generated method stub
-        return hasColumnControl;
+        return columnControlVisible;
     }
 
-    public ColumnControlButton getColumnControl() {
+    /**
+     * returns the component for column control.
+     * @return
+     */
+    public JComponent getColumnControl() {
         if (columnControlButton == null) {
             columnControlButton = new ColumnControlButton(this, new ColumnControlIcon());
         }
         return columnControlButton;
     }
 
+    /**
+     * bound property to flag visibility state of column control.
+     * @param showColumnControl
+     */
     public void setColumnControlVisible(boolean showColumnControl) {
-        boolean old = hasColumnControl;
-        this.hasColumnControl = showColumnControl;
+        boolean old = columnControlVisible;
+        this.columnControlVisible = showColumnControl;
         configureColumnControl();
-        firePropertyChange("hasColumnControl", old, hasColumnControl);
+        firePropertyChange("hasColumnControl", old, columnControlVisible);
     }
     
     /**
