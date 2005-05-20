@@ -7,9 +7,11 @@
 package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Point;
 import java.lang.reflect.Method;
 
+import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -110,6 +112,20 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
      */
     public void runInteractiveTests() throws java.lang.Exception {
         runInteractiveTests("interactive.*");
+    }
+
+    public void addAction(JFrame frame, Action action) {
+        JToolBar toolbar = null;
+        Component[] components = frame.getContentPane().getComponents();
+        for (int i = 0; i < components.length; i++) {
+            if (components[i] instanceof JToolBar) {
+                toolbar = (JToolBar) components[i];
+                break;
+            }
+        }
+        if (toolbar != null) {
+            toolbar.add(action);
+        }
     }
 
 

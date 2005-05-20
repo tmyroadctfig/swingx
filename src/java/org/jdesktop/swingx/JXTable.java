@@ -7,6 +7,7 @@
 
 package org.jdesktop.swingx;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Point;
@@ -28,9 +29,11 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JViewport;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.event.TableModelEvent;
@@ -47,6 +50,8 @@ import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PipelineEvent;
 import org.jdesktop.swingx.decorator.PipelineListener;
 import org.jdesktop.swingx.decorator.Sorter;
+import org.jdesktop.swingx.icon.ColumnControlIcon;
+import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
 import org.jdesktop.swingx.table.TableColumnExt;
@@ -138,6 +143,12 @@ public static boolean TRACE = false;
     private boolean sortable = false;
     private int visibleRowCount = 18;
 
+    private boolean hasColumnControl;
+
+    private ColumnControlButton columnControlButton;
+
+    private int verticalScrollPolicy;
+
     public JXTable() {
         init();
     }
@@ -188,6 +199,65 @@ public static boolean TRACE = false;
     }
 
 
+    
+    protected void configureEnclosingScrollPane() {
+        super.configureEnclosingScrollPane();
+        configureColumnControl();
+    }
+
+    private void configureColumnControl() {
+        Container p = getParent();
+        if (p instanceof JViewport) {
+            Container gp = p.getParent();
+            if (gp instanceof JScrollPane) {
+                JScrollPane scrollPane = (JScrollPane)gp;
+                // Make certain we are the viewPort's view and not, for
+                // example, the rowHeaderView of the scrollPane -
+                // an implementor of fixed columns might do this.
+                JViewport viewport = scrollPane.getViewport();
+                if (viewport == null || viewport.getView() != this) {
+                    return;
+                }
+                if (isColumnControlVisible()) {
+                    verticalScrollPolicy = scrollPane.getVerticalScrollBarPolicy();
+                    scrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, getColumnControl());
+                    
+                    scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+                } else {
+                    scrollPane.setVerticalScrollBarPolicy(verticalScrollPolicy == 0 ? 
+                            ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED : verticalScrollPolicy);
+                    
+                    try {
+                        scrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, null);
+                    }
+                    catch (Exception ex) {
+                        // Ignore spurious exception thrown by JScrollPane. This is a Swing bug!
+                    }
+                    
+                }
+            }
+        }
+    }
+
+    public boolean isColumnControlVisible() {
+        // TODO Auto-generated method stub
+        return hasColumnControl;
+    }
+
+    public ColumnControlButton getColumnControl() {
+        if (columnControlButton == null) {
+            columnControlButton = new ColumnControlButton(this, new ColumnControlIcon());
+        }
+        return columnControlButton;
+    }
+
+    public void setColumnControlVisible(boolean showColumnControl) {
+        boolean old = hasColumnControl;
+        this.hasColumnControl = showColumnControl;
+        configureColumnControl();
+        firePropertyChange("hasColumnControl", old, hasColumnControl);
+    }
+    
     /**
      * Returns a new instance of the default renderer for the specified class.
      * This differs from <code>getDefaultRenderer()</code> in that it returns a <b>new</b>

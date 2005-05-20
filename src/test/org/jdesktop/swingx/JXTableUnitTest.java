@@ -9,13 +9,13 @@ package org.jdesktop.swingx;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -25,10 +25,13 @@ import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.Icon;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
@@ -48,6 +51,7 @@ import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.PipelineListener;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
+import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.util.AncientSwingTeam;
@@ -494,7 +498,115 @@ public class JXTableUnitTest extends InteractiveTestCase {
         
     }
     
+//-------------------------- tests for moving column control into swingx
+    
+    
+    public void interactiveTestColumnControl() {
+        JXTable table = new JXTable(sortableTableModel);
+        table.setColumnControlVisible(true);
+        JFrame frame = wrapWithScrollingInFrame(table, "JXTable ColumnControl");
+        frame.setVisible(true);
+    }
 
+    /** 
+     * Issue #11: Column control not showing with few rows.
+     *
+     */
+    public void interactiveTestColumnControlFewRows() {
+        final JXTable table = new JXTable();
+        Action toggleAction = new AbstractAction("Toggle Control") {
+
+            public void actionPerformed(ActionEvent e) {
+                table.setColumnControlVisible(!table.isColumnControlVisible());
+                
+            }
+            
+        };
+        table.setModel(new DefaultTableModel(10, 5));
+        table.setColumnControlVisible(true);
+        JFrame frame = wrapWithScrollingInFrame(table, "JXTable ColumnControl with few rows");
+        addAction(frame, toggleAction);
+        frame.setVisible(true);
+    }
+
+    /** 
+     * check behaviour outside scrollPane
+     *
+     */
+    public void interactiveTestColumnControlWithoutScrollPane() {
+        final JXTable table = new JXTable();
+        Action toggleAction = new AbstractAction("Toggle Control") {
+
+            public void actionPerformed(ActionEvent e) {
+                table.setColumnControlVisible(!table.isColumnControlVisible());
+                
+            }
+            
+        };
+        table.setModel(new DefaultTableModel(10, 5));
+        table.setColumnControlVisible(true);
+        JFrame frame = wrapInFrame(table, "JXTable: Toggle ColumnControl outside ScrollPane");
+        addAction(frame, toggleAction);
+        frame.setVisible(true);
+    }
+
+    /** 
+     * check behaviour of moving table around
+     *
+     */
+    public void interactiveTestToggleScrollPaneWithColumnControlOn() {
+        final JXTable table = new JXTable();
+        table.setModel(new DefaultTableModel(10, 5));
+        table.setColumnControlVisible(true);
+        final JFrame frame = wrapInFrame(table, "JXTable: Toggle ScrollPane with Columncontrol on");
+        Action toggleAction = new AbstractAction("Toggle Control") {
+
+            public void actionPerformed(ActionEvent e) {
+                Container parent = table.getParent();
+                boolean inScrollPane = parent instanceof JViewport;
+                if (inScrollPane) {
+                    JScrollPane scrollPane = (JScrollPane) table.getParent().getParent();
+                } else {
+                  parent.remove(table);
+                  parent.add(new JScrollPane(table));
+                  frame.pack();
+                }
+                
+            }
+            
+        };
+        addAction(frame, toggleAction);
+        frame.setVisible(true);
+    }
+
+    /** 
+     * Issue #192: initially invisibility columns are hidden
+     * but marked as visible in control.
+     *
+     */
+    public void interactivetestColumnControlInvisibleColumns() {
+        final JXTable table = new JXTable(sortableTableModel);
+//        table.getColumn("bugid").setVisible(false);
+        table.setColumnControlVisible(true);
+        ColumnControlButton columnControl = table.getColumnControl();
+        int totalColumnCount = table.getColumnCount();
+        TableColumnExt priorityColumn = table.getColumnExt("First Name");
+        priorityColumn.setVisible(false);
+//        assertNotNull("popup menu not null", columnControl.popupMenu);
+//        assertEquals("menu items must be equal to columns", totalColumnCount, 
+//                columnControl.popupMenu.getComponentCount());
+//        JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem) columnControl.popupMenu
+//            .getComponent(1);
+//        // sanit assert
+//        assertEquals(priorityColumn.getHeaderValue(), menuItem.getText());
+//        assertEquals("selection of menu must be equal to column visibility", 
+//                priorityColumn.isVisible(), menuItem.isSelected());
+        JFrame frame = wrapWithScrollingInFrame(table, "JXTable ColumnControl and Visibility");
+        frame.setVisible(true);
+    }
+
+//---------------------------------
+    
     /**
      * Issue #191: sorting and custom renderer
      * not reproducible ...
@@ -840,10 +952,14 @@ public class JXTableUnitTest extends InteractiveTestCase {
                 TableCellRenderer cellRenderer =
                     table.getNewDefaultRenderer(table.getColumnClass(i));
                 if (cellRenderer instanceof JLabel || cellRenderer instanceof AbstractButton) {
-                    JLabel labelCellRenderer = (JLabel)cellRenderer;
+                    JComponent labelCellRenderer = (JComponent)cellRenderer;
                     labelCellRenderer.setBackground(Color.gray);
                     labelCellRenderer.setForeground(Color.red);
-                    labelCellRenderer.setHorizontalAlignment(JLabel.CENTER);
+                    if (cellRenderer instanceof JLabel) {
+                        ((JLabel) labelCellRenderer).setHorizontalAlignment(JLabel.CENTER);
+                    } else {
+                        ((AbstractButton) labelCellRenderer).setHorizontalAlignment(JLabel.CENTER);
+                    }
                     column.setCellRenderer(cellRenderer);
                 }
             }
@@ -946,8 +1062,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public static void main(String args[]) {
         JXTableUnitTest test = new JXTableUnitTest();
         try {
-          test.runInteractiveTests();
-          //  test.runInteractiveTests("interactive.*Siz.*");
+         // test.runInteractiveTests();
+            test.runInteractiveTests("interactive.*Column.*");
          //   test.runInteractiveTests("interactive.*Render.*");
          //   test.runInteractiveTests("interactive.*Toggle.*");
         } catch (Exception e) {
