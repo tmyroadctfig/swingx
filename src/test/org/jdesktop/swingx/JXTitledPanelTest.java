@@ -39,7 +39,16 @@ public class JXTitledPanelTest extends InteractiveTestCase {
         final JXTitledPanel panel = new JXTitledPanel(title);
         PropertyChangeReport report = new PropertyChangeReport();
         panel.addPropertyChangeListener(report);
+        Font deriveFont = panel.getTitleFont().deriveFont(27f);
+        panel.setTitleFont(deriveFont);
         assertTrue("panel must notify on titleFont change", report.hasEvents("titleFont"));
+        panel.setTitleForeground(Color.black);
+        assertTrue("panel must notify on titleForeground change", report.hasEvents("titleForeground"));
+        panel.setTitleDarkBackground(Color.black);
+        assertTrue("panel must notify on titleDarkBackground change", report.hasEvents("titleDarkBackground"));
+        panel.setTitleLightBackground(Color.black);
+        assertTrue("panel must notify on titleLightBackground change", report.hasEvents("titleLightBackground"));
+        
     }
     
     /**
