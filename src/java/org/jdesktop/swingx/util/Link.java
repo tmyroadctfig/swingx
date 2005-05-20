@@ -7,6 +7,8 @@
 
 package org.jdesktop.swingx.util;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -26,6 +28,11 @@ public class Link implements Comparable {
 
     private boolean visited = false;
 
+    private PropertyChangeSupport propertyChangeSupport;
+
+    public static final String VISITED_PROPERTY = "visited";
+
+    
     public Link(String text, String target, URL url) {
         setText(text);
         setTarget(target);
@@ -53,6 +60,7 @@ public class Link implements Comparable {
      * Set the display text.
      */
     public void setText(String text) {
+        
         this.text = text;
     }
 
@@ -136,12 +144,43 @@ public class Link implements Comparable {
      * flag can be used to render the color of the link.
      */
     public void setVisited(boolean visited) {
+        boolean old = getVisited();
         this.visited = visited;
+        firePropertyChange(VISITED_PROPERTY , old, getVisited());
     }
 
     public boolean getVisited() {
         return visited;
     }
+
+//---------------------- property change notification
+    
+    public void addPropertyChangeListener(PropertyChangeListener l) {
+        getPropertyChangeSupport().addPropertyChangeListener(l);
+        
+    }
+    
+    public void removePropertyChangeListener(PropertyChangeListener l) {
+        if (propertyChangeSupport == null) return;
+        propertyChangeSupport.removePropertyChangeListener(l);
+    }
+    
+    protected void firePropertyChange(String property, Object oldValue, Object newValue) {
+        if (propertyChangeSupport == null) return;
+        propertyChangeSupport.firePropertyChange(property, oldValue, newValue);
+    }
+    
+    protected void firePropertyChange(String property, boolean oldValue, boolean newValue) {
+        if (propertyChangeSupport == null) return;
+        propertyChangeSupport.firePropertyChange(property, oldValue, newValue);
+        
+    }
+    private PropertyChangeSupport getPropertyChangeSupport() {
+     if (propertyChangeSupport == null) {
+         propertyChangeSupport = new PropertyChangeSupport(this);
+     }
+    return propertyChangeSupport;
+}
 
     // Comparable interface for sorting.
     public int compareTo(Object obj) {
