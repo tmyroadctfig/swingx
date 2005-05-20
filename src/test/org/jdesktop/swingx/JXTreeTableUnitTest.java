@@ -7,22 +7,26 @@
 
 package org.jdesktop.swingx;
 
-import java.util.regex.Pattern;
-
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.util.regex.Pattern;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
 
-import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.ConditionalHighlighter;
+import org.jdesktop.swingx.decorator.Filter;
+import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.HierarchicalColumnHighlighter;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
+import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
@@ -104,6 +108,50 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
 
     // ---------------------------- interactive tests
 
+
+    public void interactiveTestCompareTreeProperties() {
+        JXTreeTable treeTable = new JXTreeTable(treeTableModel);
+        JXTreeTable other = new JXTreeTable(treeTableModel);
+        other.setRootVisible(!treeTable.isRootVisible());
+        JFrame frame = wrapWithScrollingInFrame(treeTable, other, "compare rootVisible");
+        frame.setVisible(true);
+    }
+    /**    
+     * setting tree properties: tree not updated correctly.
+     */    
+    public void interactiveTestTreeProperties() {
+        final JXTreeTable treeTable = new JXTreeTable(treeTableModel);
+        treeTable.setRootVisible(true);
+        // storing negates of properties
+        Action toggle = new AbstractAction("Toggle Properties") {
+
+            public void actionPerformed(ActionEvent e) {
+                boolean expandsSelected = !treeTable.getExpandsSelectedPaths();
+                boolean scrollsOnExpand = !treeTable.getScrollsOnExpand();
+                boolean showRootHandles = !treeTable.getShowsRootHandles();
+                boolean rootVisible = !treeTable.isRootVisible();
+                // setting negates properties
+//                treeTable.setExpandsSelectedPaths(expandsSelected);
+//                treeTable.setScrollsOnExpand(scrollsOnExpand);
+//                treeTable.setShowsRootHandles(showRootHandles);
+                treeTable.setRootVisible(rootVisible);
+                
+            }
+            
+        };
+        treeTable.getActionMap().put("toggleProperties", toggle);
+        treeTable.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("F5"), "toggleProperties");
+        treeTable.setRowHeight(22);
+        treeTable.setRowMargin(1);
+        JFrame frame = wrapWithScrollingInFrame(treeTable,
+                "Toggle Tree properties - press F5");
+        frame.setVisible(true);
+    }
+    
+    /**    issue #148
+     *   did not work on LFs which normally respect lineStyle
+     *   winLF does not respect it anyway...
+     */    
     public void interactiveTestFilterAndLineStyle() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         // issue #148
@@ -122,6 +170,24 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         frame.setVisible(true);
     }
 
+    
+    /**
+     * Issue #204: weird filtering.
+     *
+     */
+    public void interactiveTestFilters() {
+        JXTreeTable treeTable = new JXTreeTable(treeTableModel);
+        treeTable.putClientProperty("JTree.lineStyle", "Angled");
+        treeTable.setRowHeight(22);
+        treeTable.setRowMargin(1);
+        treeTable.setFilters(new FilterPipeline(new Filter[] {
+                new PatternFilter( "d.*",
+                        Pattern.CASE_INSENSITIVE, 0), }));
+        JFrame frame = wrapWithScrollingInFrame(treeTable,
+                "PatternFilter");
+        frame.setVisible(true);
+    }
+    
     public void interactiveTestFiltersAndRowHeight() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         treeTable.setRowHeight(22);
@@ -249,210 +315,15 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     }
 
     public static void main(String[] args) {
+        // LFSwitcher.metalLF();
         JXTreeTableUnitTest test = new JXTreeTableUnitTest();
         try {
-            test.runInteractiveTests();
+         //   test.runInteractiveTests();
          //   test.runInteractiveTests("interactive.*HighLighters");
+         //      test.runInteractiveTests("interactive.*ilter.*");
+           test.runInteractiveTests("interactive.*Prop.*");
         } catch (Exception ex) {
 
         }
-        // LFSwitcher.metalLF();
-
-        // final TestCase[] testCases = createTestCases();
-        // if (testCases.length > 0) {
-        // // Automatically exit after last window is closed.
-        // testCases[testCases.length - 1].frame
-        // .setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //
-        // Point location = testCases[0].frame.getLocation();
-        //
-        // for (int i = testCases.length - 1; i >= 0; i--) {
-        // location.translate(30, 30); // stagger frames
-        // testCases[i].frame.setTitle("JXTreeTable Unit Test " + (i + 1));
-        // testCases[i].frame.setLocation(location);
-        // testCases[i].frame.setVisible(true);
-        // }
-        // }
     }
-
-    /**
-     * For unit testing only
-     * 
-     * @return
-     */
-    // private static TestCase[] createTestCases() {
-    //
-    // final TreeTableModel treeTableModel = new FileSystemModel(); // shared
-    //
-    // final TestCase[] testCases = new TestCase[] {
-    // new TestCase(treeTableModel) {
-    // public JComponent define() {
-    // JXTreeTable treeTable = new JXTreeTable(model);
-    // // issue #148
-    // // doesn't work on LFs which normally respect lineStyle
-    // // winLF does not respect it anyway...
-    // treeTable
-    // .putClientProperty("JTree.lineStyle", "Angled");
-    // treeTable.setRowHeight(22);
-    // treeTable.setRowMargin(1);
-    // treeTable
-    // .setHighlighters(new HighlighterPipeline(
-    // new Highlighter[] {
-    // AlternateRowHighlighter.quickSilver,
-    // new HierarchicalColumnHighlighter(),
-    // new PatternHighlighter(
-    // null,
-    // Color.red,
-    // "s.*",
-    // Pattern.CASE_INSENSITIVE,
-    // 0, -1), }));
-    // return treeTable;
-    // }
-    // },
-    // new TestCase(treeTableModel) {
-    // public JComponent define() {
-    // JXTreeTable treeTable = new JXTreeTable(model);
-    // treeTable.setRowHeight(22);
-    // treeTable.setRowMargin(1);
-    // treeTable
-    // .setHighlighters(new HighlighterPipeline(
-    // new Highlighter[] {
-    // AlternateRowHighlighter.linePrinter,
-    // new HierarchicalColumnHighlighter(), }));
-    // return treeTable;
-    // }
-    // },
-    // new TestCase(treeTableModel) {
-    // public JComponent define() {
-    // JXTreeTable treeTable = new JXTreeTable(model);
-    // treeTable
-    // .setHighlighters(new HighlighterPipeline(
-    // new Highlighter[] { AlternateRowHighlighter.classicLinePrinter, }));
-    // treeTable.setRowHeight(22);
-    // treeTable.setRowMargin(1);
-    // return treeTable;
-    // }
-    // },
-    // new TestCase(treeTableModel) {
-    // public JComponent define() {
-    // JXTreeTable treeTable = new JXTreeTable(model);
-    // treeTable
-    // .setHighlighters(new HighlighterPipeline(
-    // new Highlighter[] {
-    // AlternateRowHighlighter.notePadBackground,
-    // new HierarchicalColumnHighlighter(), }));
-    // treeTable.setBackground(new Color(0xFF, 0xFF, 0xCC)); // notepad
-    // treeTable.setGridColor(Color.cyan.darker());
-    // treeTable.setRowHeight(22);
-    // treeTable.setRowMargin(1);
-    // treeTable.setShowHorizontalLines(true);
-    // return treeTable;
-    // }
-    // },
-    // new TestCase(treeTableModel) {
-    // public JComponent define() {
-    // JXTreeTable treeTable = new JXTreeTable(model);
-    // treeTable.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
-    // treeTable.setGridColor(Color.cyan.darker());
-    // treeTable.setRowHeight(22);
-    // treeTable.setRowMargin(1);
-    // treeTable.setShowHorizontalLines(true);
-    // return treeTable;
-    // }
-    // },
-    // new TestCase(treeTableModel) {
-    // public JComponent define() {
-    // JXTreeTable treeTable = new JXTreeTable(model);
-    // treeTable
-    // .setHighlighters(new HighlighterPipeline(
-    // new Highlighter[] { new HierarchicalColumnHighlighter(), }));
-    // return treeTable;
-    // }
-    // },
-    // new TestCase(treeTableModel) {
-    // public JComponent define() {
-    // JXTreeTable treeTable = new JXTreeTable(model);
-    // treeTable.setShowGrid(true);
-    // return treeTable;
-    // }
-    // },
-    // new TestCase(treeTableModel) {
-    // public JComponent define() {
-    // JXTreeTable treeTable = new JXTreeTable(model);
-    // treeTable.setIntercellSpacing(new Dimension(1, 1));
-    // treeTable.setShowGrid(true);
-    // return treeTable;
-    // }
-    // },
-    //
-    // new TestCase(treeTableModel) {
-    // public JComponent define() {
-    // JXTreeTable treeTable = new JXTreeTable(model);
-    // treeTable.setIntercellSpacing(new Dimension(2, 2));
-    // treeTable.setShowGrid(true);
-    // return treeTable;
-    // }
-    // },
-    //
-    // new TestCase(treeTableModel) {
-    // public JComponent define() {
-    // JXTreeTable treeTable = new JXTreeTable(model);
-    // treeTable.setIntercellSpacing(new Dimension(3, 3));
-    // treeTable.setShowGrid(true);
-    // return treeTable;
-    // }
-    // },
-    //
-    // new TestCase(treeTableModel) {
-    // public JComponent define() {
-    // JXTreeTable treeTable = new JXTreeTable(model);
-    // treeTable.setHighlighters(new HighlighterPipeline(
-    // new Highlighter[] { new Highlighter(
-    // Color.orange, null), }));
-    // treeTable.setIntercellSpacing(new Dimension(15, 15));
-    // treeTable.setRowHeight(48);
-    // return treeTable;
-    // }
-    // },
-    // new TestCase(treeTableModel) {
-    // public JComponent define() {
-    // JXTreeTable treeTable = new JXTreeTable(model);
-    // treeTable.setIntercellSpacing(new Dimension(15, 15));
-    // treeTable.setRowHeight(48);
-    // // treeTable.setRowHeight(0, 96);
-    // treeTable.setShowGrid(true);
-    // treeTable.setHighlighters(new HighlighterPipeline(
-    // new Highlighter[] {
-    // new Highlighter(Color.orange, null),
-    // new HierarchicalColumnHighlighter(),
-    // new PatternHighlighter(null, Color.red,
-    // ".*TreeTable.*", 0, 0), }));
-    // return treeTable;
-    // }
-    // }, };
-    // return testCases;
-    // }
-    // private static abstract class TestCase {
-    //
-    // public TestCase(TreeTableModel model) {
-    // this.model = model;
-    // this.frame = wrap(define());
-    // }
-    //
-    // public abstract JComponent define();
-    //
-    // public JFrame wrap(JComponent component) {
-    // final JFrame frame = new JFrame();
-    // final JScrollPane scroller = new JScrollPane(component);
-    // scroller.setPreferredSize(new Dimension(600, 304));
-    // frame.getContentPane().add(scroller);
-    // frame.pack();
-    // frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    // return frame;
-    // }
-    //
-    // public final TreeTableModel model;
-    //
-    // public final JFrame frame;
-    // }
 }

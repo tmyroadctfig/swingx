@@ -10,6 +10,7 @@ import java.awt.BorderLayout;
 import java.awt.Point;
 import java.lang.reflect.Method;
 
+import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -48,6 +49,15 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
         JScrollPane scroller = new JScrollPane(component);
         return wrapInFrame(scroller, title);
     }
+
+    public JFrame wrapWithScrollingInFrame(JComponent leftComp, JComponent rightComp, String title) {
+        JComponent comp = Box.createHorizontalBox();
+        comp.add(new JScrollPane(leftComp));
+        comp.add(new JScrollPane(rightComp));
+        JFrame frame = wrapInFrame(comp, title);
+        return frame;
+    }
+
 
     public JFrame wrapInFrame(JComponent component, String title) {
         JFrame frame = new JFrame(title);

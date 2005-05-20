@@ -7,8 +7,8 @@
 package org.jdesktop.swingx;
 
 import javax.swing.JFrame;
+import javax.swing.JTree;
 
-import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 
@@ -44,14 +44,25 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         JFrame frame = wrapWithScrollingInFrame(tree, "LineStyle Test");
         frame.setVisible(true);  // RG: Changed from deprecated method show();
     }
-    
+ 
+    /**
+     * test if showsRootHandles client property is respected by JXTree.
+     */
+    public void interactiveTestShowsRootHandles() {
+        JXTree tree = new JXTree(treeTableModel);
+        JXTree otherTree = new JXTree(treeTableModel);
+        otherTree.setShowsRootHandles(!tree.getShowsRootHandles());
+        JFrame frame = wrapWithScrollingInFrame(tree, otherTree, "ShowsRootHandles");
+        frame.setVisible(true);  // RG: Changed from deprecated method show();
+    }
+
     protected void setUp() throws Exception {
         super.setUp();
         treeTableModel = new FileSystemModel();
     }
 
     public static void main(String[] args) {
-      //  LFSwitcher.metalLF();
+//        LFSwitcher.windowsLF();
         JXTreeUnitTest test = new JXTreeUnitTest();
         try {
             test.runInteractiveTests();
