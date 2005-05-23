@@ -56,6 +56,7 @@ import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
 import org.jdesktop.swingx.table.TableColumnExt;
+import org.jdesktop.swingx.util.Link;
 
 
 /**
@@ -203,8 +204,12 @@ public static boolean TRACE = false;
 //        LinkHandler handler = new LinkHandler();
 //        addMouseListener(handler);
 //        addMouseMotionListener(handler);
+        setDefaultEditor(Link.class, new LinkRenderer());
+        RolloverProducer linkHandler = new RolloverProducer();
+        addMouseListener(linkHandler);
+        addMouseMotionListener(linkHandler);
+        addPropertyChangeListener(new LinkController());
     }
-
 
     /**
      * overridden to addionally configure the upper right corner 
@@ -358,7 +363,7 @@ public static boolean TRACE = false;
         setLazyRenderer(Boolean.class, "org.jdesktop.swingx.JXTable$BooleanRenderer");
 
         // Other
-//        setLazyRenderer(Link.class, "org.jdesktop.swingx.JXTable$LinkRenderer");
+        setLazyRenderer(Link.class, "org.jdesktop.swingx.table.LinkRenderer");
     }
 
 

@@ -20,7 +20,7 @@ import javax.swing.JTable;
  * 
  * @author Jeanette Winzenburg
  */
-public class RolloverListener implements MouseListener, MouseMotionListener {
+public class RolloverProducer implements MouseListener, MouseMotionListener {
 
 //----------------- mouseListener
         
