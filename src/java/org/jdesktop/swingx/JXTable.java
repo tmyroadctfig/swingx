@@ -363,7 +363,7 @@ public static boolean TRACE = false;
         setLazyRenderer(Boolean.class, "org.jdesktop.swingx.JXTable$BooleanRenderer");
 
         // Other
-        setLazyRenderer(Link.class, "org.jdesktop.swingx.table.LinkRenderer");
+        setLazyRenderer(Link.class, "org.jdesktop.swingx.LinkRenderer");
     }
 
 
