@@ -6,6 +6,7 @@ package org.jdesktop.swingx;
 
 import java.awt.Cursor;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -51,10 +52,16 @@ public  class LinkController implements PropertyChangeListener {
 
     private void rollover(JTable table, Point oldLocation, Point newLocation) {
         if (oldLocation != null) {
-            table.repaint(table.getCellRect(oldLocation.y, oldLocation.x, false));
+            Rectangle r = table.getCellRect(oldLocation.y, oldLocation.x, false);
+            r.x = 0;
+            r.width = table.getWidth();
+            table.repaint(r);
         }
         if (newLocation != null) {
-            table.repaint(table.getCellRect(newLocation.y, newLocation.x, false));
+            Rectangle r = table.getCellRect(newLocation.y, newLocation.x, false);
+            r.x = 0;
+            r.width = table.getWidth();
+            table.repaint(r);
         }
         setLinkCursor(table, newLocation);
 //        table.repaint();

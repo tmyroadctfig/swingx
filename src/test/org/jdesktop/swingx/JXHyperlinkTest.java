@@ -20,6 +20,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
@@ -159,7 +160,7 @@ public class JXHyperlinkTest extends InteractiveTestCase {
     }
 
     public static void main(String[] args) throws Exception {
-    //    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         JXHyperlinkTest test = new JXHyperlinkTest();
         try {
             test.runInteractiveTests();

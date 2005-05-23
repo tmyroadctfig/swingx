@@ -13,6 +13,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -42,6 +43,7 @@ import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.ConditionalHighlighter;
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
@@ -53,6 +55,7 @@ import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.util.AncientSwingTeam;
+import org.jdesktop.swingx.util.Link;
 
 public class JXTableUnitTest extends InteractiveTestCase {
 
@@ -470,8 +473,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertEquals("default Number renderer", JXTable.NumberRenderer.class, table.getDefaultRenderer(Number.class).getClass());
         assertEquals("default Double renderer", JXTable.DoubleRenderer.class, table.getDefaultRenderer(Double.class).getClass());
         assertEquals("default Date renderer", JXTable.DateRenderer.class, table.getDefaultRenderer(Date.class).getClass());
-// PENDING: jw - Link should be moved out of databinding
-//        assertEquals("default Link renderer", JXTable.LinkRenderer.class, table.getDefaultRenderer(Link.class).getClass());
+        assertEquals("default Link renderer", LinkRenderer.class, table.getDefaultRenderer(Link.class).getClass());
         assertEquals("default Icon renderer", JXTable.IconRenderer.class, table.getDefaultRenderer(Icon.class).getClass());
     }
 
@@ -652,7 +654,24 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
 //---------------------------------
+
     
+    public void interactiveTestRolloverHighlight() {
+        JXTable table = new JXTable(sortableTableModel);
+        Highlighter conditional = new ConditionalHighlighter(Color.BLUE, null, -1, -1) {
+
+            protected boolean test(ComponentAdapter adapter) {
+                Point p = (Point) adapter.getComponent().getClientProperty(RolloverProducer.ROLLOVER_KEY);
+                
+                return p != null &&  p.y == adapter.row;
+            }
+            
+        };
+        table.setHighlighters(new HighlighterPipeline(new Highlighter[] {conditional }));
+        JFrame frame = wrapWithScrollingInFrame(table, "rollover highlight");
+        frame.setVisible(true);
+
+    }
     /**
      * Issue #191: sorting and custom renderer
      * not reproducible ...
@@ -1037,7 +1056,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
             columnSamples[3] = Boolean.TRUE;
             columnSamples[4] = new Date(100);
             columnSamples[5] = new Float(1.5);
-            columnSamples[IDX_COL_LINK] = "dummy link replacement"; //new Link("Sun Micro", "_blank", linkURL);
+            columnSamples[IDX_COL_LINK] = new Link("Sun Micro", "_blank", linkURL);
             columnSamples[7] = new Integer(3023);
             columnSamples[8] = "John Doh";
             columnSamples[9] = "23434 Testcase St";
@@ -1051,7 +1070,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
             columnSamples2[3] = Boolean.FALSE;
             columnSamples2[4] = new Date(333);
             columnSamples2[5] = new Float(22.22);
-            columnSamples2[IDX_COL_LINK] = "dummy link";//new Link("Sun Web", "new_frame", linkURL);
+            columnSamples2[IDX_COL_LINK] = new Link("Sun Web", "new_frame", linkURL);
             columnSamples[7] = new Integer(5503);
             columnSamples[8] = "Jane Smith";
             columnSamples[9] = "2343 Table Blvd.";
@@ -1108,8 +1127,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public static void main(String args[]) {
         JXTableUnitTest test = new JXTableUnitTest();
         try {
-         // test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*Column.*");
+          test.runInteractiveTests();
+         //   test.runInteractiveTests("interactive.*Roll.*");
          //   test.runInteractiveTests("interactive.*Render.*");
          //   test.runInteractiveTests("interactive.*Toggle.*");
         } catch (Exception e) {
