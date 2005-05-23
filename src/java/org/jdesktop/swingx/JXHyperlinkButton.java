@@ -2,13 +2,20 @@ package org.jdesktop.swingx;
 
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Graphics;
-import java.awt.event.*;
+import java.awt.Window;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import javax.swing.*;
-import javax.swing.plaf.metal.MetalButtonUI;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.jdesktop.swingx.util.Link;
 
@@ -27,7 +34,7 @@ public class JXHyperlinkButton extends JButton {
 	/**
 	 * Indicates whether the mouse has entered this hyper link
 	 */
-//	private boolean hasBeenEntered = false;
+	private boolean hasBeenEntered = false;
 
     /**
 	 * Color for the hyper link if it has not yet been clicked.
@@ -156,21 +163,34 @@ public class JXHyperlinkButton extends JButton {
         setBorder(BorderFactory.createEmptyBorder());
         setContentAreaFilled(false);
         setFocusPainted(false);
+        setRolloverEnabled(true);
+        addChangeListener(new RolloverListener());
 //        setHorizontalAlignment(LEADING);
-		addMouseListener(new HyperlinkMouseListener());
+//		addMouseListener(new HyperlinkMouseListener());
         addFocusListener(new HyperlinkFocusListener());
-//        addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent ev) {
-//                setVisited(true);
-//            }
-//        });
         setForeground(isVisited() ? getClickedColor() : getUnclickedColor());
+    }
+
+    
+    private class RolloverListener implements ChangeListener {
+
+        public void stateChanged(ChangeEvent e) {
+            if (getModel().isRollover() == hasBeenEntered) return;
+            hasBeenEntered = getModel().isRollover();
+            if (hasBeenEntered) {
+                entered(true);
+            } else {
+                exited(true);
+            }
+
+        }
+
     }
 
     private final class HyperlinkFocusListener implements FocusListener {
 
         public void focusGained(FocusEvent e) {
-            entered();
+            entered(false);
             
         }
 
@@ -180,67 +200,28 @@ public class JXHyperlinkButton extends JButton {
         }
         
     }
-	/**
-	 * Inner utility class that provides MouseListener capabilities for this
-	 * hyperlink.  Changes the color of the hyperlink when selected, the cursor
-	 * for the hyperlink when the mouse is over it, and so forth.
-	 * @author Richard Bair
-	 */
-	private final class HyperlinkMouseListener extends MouseAdapter {
-		/* (non-Javadoc)
-		 * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
-		 */
-		public void mouseEntered(MouseEvent e) {
-            entered();
-		}
-
-		/* (non-Javadoc)
-		 * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
-		 */
-		public void mouseExited(MouseEvent e) {
-            exited(true);
-		}
-	}
-
-	protected void paintComponent(Graphics g) {
-        // JW: _never ever_ change component properties in a paintXX!
-//        Color c = hasBeenClicked ? clickedColor : unclickedColor;
-//        
-//        //set the foreground color based on the click state
-//        setForeground(c);
-
-        super.paintComponent(g);
-
-        //add an underline to the font if necessary
-//        if(isEnabled() && isVisible()) {
-//            String text = getText();
-//            if (text != null && text.length() > 0) {
-//                if (hasBeenEntered) {
-////                    g.setColor(c);        
-//                    Icon ico = getIcon();
-//                    int y = getHeight();
-//                    int x = ico == null ? 0 : ico.getIconWidth() + 1;
-//                    // JW: causes #5 - instead need to get hold of textRect somehow
-//                    // probably possible only in UIDelegate?
-//                    g.drawLine(x, getHeight()-1, SwingUtilities.computeStringWidth(g.getFontMetrics(), text) + x, getHeight()-1);
-//                }
-//            }
-//        }
-	}
-
-    private void entered() {
-    //    repaint();
-        //change the cursor
-        oldCursor = SwingUtilities.getWindowAncestor(JXHyperlinkButton.this).getCursor();
-        SwingUtilities.getWindowAncestor(JXHyperlinkButton.this).setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    
+    /**
+     * 
+     * @param fromMouse
+     */
+    public void entered(boolean fromMouse) {
+         //change the cursor
+        // should happen as reaction to state change of rollover?
+        if (fromMouse) {
+            oldCursor = getCursor();
+            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        }
         setText("<html><u>" + getActionText() + "</u></html>");
     }
 
-    protected void exited(boolean fromMouse) {
-        if (fromMouse && hasFocus()) return;
-     //   repaint();
-        if (oldCursor != null) {
-        	SwingUtilities.getWindowAncestor(JXHyperlinkButton.this).setCursor(oldCursor);
+    public void exited(boolean fromMouse) {
+        if (fromMouse) {
+            setCursor(oldCursor);
+            oldCursor = null;
+            if (hasFocus()) return;
+        } else {
+            if (getModel().isRollover()) return;
         }
         setText(getActionText());
     }
