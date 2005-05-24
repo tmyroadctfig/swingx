@@ -61,11 +61,11 @@ public class LinkRenderer extends AbstractCellEditor implements
                 .getClientProperty(RolloverProducer.ROLLOVER_KEY);
         if (p != null && (p.x > 0) && (p.x == column) && (p.y == row)) {
             // JW: toggling model's rollover state is unreliable - hmmm...
-            // linkButton.getModel().setRollover(true);
-            linkButton.entered(true);
+             linkButton.getModel().setRollover(true);
+           // linkButton.entered(true);
         } else {
-            // linkButton.getModel().setRollover(false);
-            linkButton.exited(true);
+             linkButton.getModel().setRollover(false);
+          //  linkButton.exited(true);
         }
         return linkButton;
     }
@@ -77,7 +77,7 @@ public class LinkRenderer extends AbstractCellEditor implements
     public Component getTableCellEditorComponent(JTable table, Object value,
             boolean isSelected, int row, int column) {
         linkAction.setLink(value instanceof Link ? (Link) value : null);
-        linkButton.entered(true);
+        linkButton.getModel().setRollover(true); //entered(true);
         return linkButton;
     }
 

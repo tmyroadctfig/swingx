@@ -8,6 +8,8 @@
 package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -110,6 +112,12 @@ public class JXHyperlinkTest extends InteractiveTestCase {
         JXTable table = new JXTable(createModelWithLinks()) {
             public boolean editCellAt(int row, int col, EventObject event) {
                 boolean editing = super.editCellAt(row, col, event);
+                if (editing) {
+                    Component comp = getEditorComponent();
+                    Rectangle r = comp.getBounds();
+                    comp.setBounds(r.x, r.y, r.width / 2, r.height);
+                    comp.validate();
+                }
                 return editing;
             }
         };
