@@ -19,12 +19,14 @@ import java.awt.print.PrinterException;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
 import javax.swing.ActionMap;
+import javax.swing.DefaultCellEditor;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -40,6 +42,7 @@ import javax.swing.UIDefaults;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
@@ -216,15 +219,19 @@ public static boolean TRACE = false;
         map.put("find", new Actions("find"));
 
         // Add a link handler to to the table.
-        // XXX note: this listener represents overhead if no columns are links.
-        // Beter to detect if the table has a link column and add the handler.
 //        LinkHandler handler = new LinkHandler();
 //        addMouseListener(handler);
 //        addMouseMotionListener(handler);
-        setDefaultEditor(Link.class, new LinkRenderer());
+//        setDefaultEditor(Link.class, new LinkRenderer());
 //        setRolloverEnabled(true);
     }
 
+    /**
+     * Property to enable/disable rollover support. This can be enabled
+     * to show "live" rollover behaviour, f.i. the cursor over Link cells. 
+     * Default is disabled.
+     * @param rolloverEnabled
+     */
     public void setRolloverEnabled(boolean rolloverEnabled) {
         boolean old = isRolloverEnabled();
         if (rolloverEnabled == old) return;
@@ -244,6 +251,10 @@ public static boolean TRACE = false;
         firePropertyChange("rolloverEnabled", old, isRolloverEnabled());
     }
 
+    /**
+     * returns the rolloverEnabled property.
+     * @return
+     */
     public boolean isRolloverEnabled() {
         return rolloverProducer != null;
     }
@@ -364,6 +375,14 @@ public static boolean TRACE = false;
         setLazyValue(defaultRenderersByColumnClass, c, s);
     }
 
+    private void setLazyEditor(Class c, String s) {
+        setLazyValue(defaultEditorsByColumnClass, c, s);
+    }
+
+    protected void createDefaultEditors() {
+        super.createDefaultEditors();
+        setLazyEditor(Link.class, "org.jdesktop.swingx.LinkRenderer");
+    }
     /**
      * Creates default cell renderers for objects, numbers, doubles, dates,
      * booleans, icons, and links.
@@ -403,7 +422,37 @@ public static boolean TRACE = false;
         setLazyRenderer(Link.class, "org.jdesktop.swingx.LinkRenderer");
     }
 
-
+    
+    /**
+     * bug fix: super doesn't update all renderers/editors.
+     */
+    public void updateUI() {
+        super.updateUI();
+        // Update the UIs of all the default editors.
+        Enumeration defaultEditors = defaultEditorsByColumnClass.elements();
+        while (defaultEditors.hasMoreElements()) {
+          updateEditorUI(defaultEditors.nextElement());
+        }
+        // JW PENDING: do the same for renderers
+        // PENDING: do the same for all column specific editors/renderers
+        //   (don't forget hidden columns!)
+   
+    }
+    private void updateEditorUI(Object value) {
+        // maybe proxyValue
+        if (!(value instanceof TableCellEditor)) return;
+        // super handled this
+        if ((value instanceof JComponent) || (value instanceof DefaultCellEditor)) return;
+        // custom editors might balk about fake rows/columns
+        try {
+            Component comp = ((TableCellEditor) value).getTableCellEditorComponent(this, null, false, -1, -1);
+            if (comp instanceof JComponent) {
+                ((JComponent) comp).updateUI();
+            }
+        } catch (Exception e) {
+            // ignore - can't do anything
+        }
+    }
     /**
      * A small class which dispatches actions.
      * TODO: Is there a way that we can make this static?
