@@ -155,7 +155,24 @@ public static boolean TRACE = false;
      */
     private JComponent columnControlButton;
 
+    /**
+     * ScrollPane's original vertical scroll policy.
+     * If the columnControl is visible the policy is set to
+     * ALWAYS.
+     */
     private int verticalScrollPolicy;
+
+    /**
+     * Mouse/Motion/Listener keeping track of mouse moved in
+     * cell coordinates.
+     */
+    private RolloverProducer rolloverProducer;
+
+    /**
+     * RolloverController: listens to cell over events and
+     * repaints entered/exited rows.
+     */
+    private LinkController linkController;
 
     public JXTable() {
         init();
@@ -205,10 +222,30 @@ public static boolean TRACE = false;
 //        addMouseListener(handler);
 //        addMouseMotionListener(handler);
         setDefaultEditor(Link.class, new LinkRenderer());
-        RolloverProducer linkHandler = new RolloverProducer();
-        addMouseListener(linkHandler);
-        addMouseMotionListener(linkHandler);
-        addPropertyChangeListener(new LinkController());
+//        setRolloverEnabled(true);
+    }
+
+    public void setRolloverEnabled(boolean rolloverEnabled) {
+        boolean old = isRolloverEnabled();
+        if (rolloverEnabled == old) return;
+        if (rolloverEnabled) {
+            rolloverProducer = new RolloverProducer();
+            addMouseListener(rolloverProducer);
+            addMouseMotionListener(rolloverProducer);
+            linkController = new LinkController();
+            addPropertyChangeListener(linkController);
+        } else {
+            removeMouseListener(rolloverProducer);
+            removeMouseMotionListener(rolloverProducer);
+            rolloverProducer = null;
+            removePropertyChangeListener(linkController);
+            linkController = null;
+        }
+        firePropertyChange("rolloverEnabled", old, isRolloverEnabled());
+    }
+
+    public boolean isRolloverEnabled() {
+        return rolloverProducer != null;
     }
 
     /**
