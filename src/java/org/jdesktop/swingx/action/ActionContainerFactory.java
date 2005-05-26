@@ -29,10 +29,10 @@ import javax.swing.JToolBar;
 
 /**
  * Creates user interface elements based on action ids and lists of action ids.
- * All action ids must be represent actions managed by the ActionManager.
+ * All action ids must represent actions managed by the ActionManager.
  * <p>
  * <h3>Action Lists</h3>
- * Use a the create..(List) methods to construct containers of actions like menu 
+ * Use the createXXX(List) methods to construct containers of actions like menu 
  * bars, menus, popups and toolbars from actions represented as action ids in a 
  * <i>java.util.List</i>. Each element in the action-list can be one of 3 types:
  * <ul>
