@@ -56,6 +56,7 @@ import javax.swing.text.StyledEditorKit;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 import org.jdesktop.swingx.action.ActionManager;
+import org.jdesktop.swingx.action.Targetable;
 
 
 /**
@@ -68,7 +69,7 @@ import org.jdesktop.swingx.action.ActionManager;
  *
  * @author Mark Davidson
  */
-public class JXEditorPane extends JEditorPane implements Searchable {
+public class JXEditorPane extends JEditorPane implements Searchable, Targetable {
 
     private Matcher matcher;
 
@@ -81,7 +82,27 @@ public class JXEditorPane extends JEditorPane implements Searchable {
     private final static String ACTION_FIND = "find";
     private final static String ACTION_UNDO = "undo";
     private final static String ACTION_REDO = "redo";
+    /*
+     * These next 3 actions are part of a *HACK* to get cut/copy/paste
+     * support working in the same way as find, undo and redo. in JTextComponent
+     * the cut/copy/paste actions are _not_ added to the ActionMap. Instead,
+     * a default "transfer handler" system is used, apparently to get the text
+     * onto the system clipboard.
+     * Since there aren't any CUT/COPY/PASTE actions in the JTextComponent's action
+     * map, they cannot be referenced by the action framework the same way that
+     * find/undo/redo are. So, I added the actions here. The really hacky part
+     * is that by defining an Action to go along with the cut/copy/paste keys,
+     * I loose the default handling in the cut/copy/paste routines. So, I have
+     * to remove cut/copy/paste from the action map, call the appropriate 
+     * method (cut, copy, or paste) and then add the action back into the
+     * map. Yuck!
+     */
+    private final static String ACTION_CUT = "cut";
+    private final static String ACTION_COPY = "copy";
+    private final static String ACTION_PASTE = "paste";
 
+    private TargetableSupport targetSupport = new TargetableSupport(this);
+    
     public JXEditorPane() {
         init();
     }
@@ -161,6 +182,9 @@ public class JXEditorPane extends JEditorPane implements Searchable {
         map.put(ACTION_FIND, new Actions(ACTION_FIND));
         map.put(ACTION_UNDO, new Actions(ACTION_UNDO));
         map.put(ACTION_REDO, new Actions(ACTION_REDO));
+        map.put(ACTION_CUT, new Actions(ACTION_CUT));
+        map.put(ACTION_COPY, new Actions(ACTION_COPY));
+        map.put(ACTION_PASTE, new Actions(ACTION_PASTE));
     }
 
     // undo/redo implementation
@@ -216,6 +240,21 @@ public class JXEditorPane extends JEditorPane implements Searchable {
                     ex.printStackTrace();
                 }
                 updateActionState();
+            } else if (ACTION_CUT.equals(name)) {
+                ActionMap map = getActionMap();
+                map.remove(ACTION_CUT);
+                cut();
+                map.put(ACTION_CUT, this);
+            } else if (ACTION_COPY.equals(name)) {
+                ActionMap map = getActionMap();
+                map.remove(ACTION_COPY);
+                copy();
+                map.put(ACTION_COPY, this);
+            } else if (ACTION_PASTE.equals(name)) {
+                ActionMap map = getActionMap();
+                map.remove(ACTION_PASTE);
+                paste();
+                map.put(ACTION_PASTE, this);
             }
             else {
                 System.out.println("ActionHandled: " + name);
@@ -424,6 +463,18 @@ public class JXEditorPane extends JEditorPane implements Searchable {
             return -1;
         }
         return end;
+    }
+
+    public boolean hasCommand(Object command) {
+        return targetSupport.hasCommand(command);
+    }
+
+    public Object[] getCommands() {
+        return targetSupport.getCommands();
+    }
+
+    public boolean doCommand(Object command, Object value) {
+        return targetSupport.doCommand(command, value);
     }
 
     /**
