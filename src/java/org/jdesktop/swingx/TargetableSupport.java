@@ -1,11 +1,8 @@
 /*
- * TargetableSupport.java
+ * $Id$
  *
- * Created on May 26, 2005, 9:33 AM
- *
- * To change this template, choose Tools | Options and locate the template under
- * the Source Creation and Management node. Right-click the template and choose
- * Open. You can then make changes to the template in the Source Editor.
+ * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
+ * Santa Clara, California 95054, U.S.A. All rights reserved.
  */
 
 package org.jdesktop.swingx;
@@ -16,7 +13,7 @@ import javax.swing.JComponent;
 
 /**
  *
- * @author Richard
+ * @author rbair
  */
 public class TargetableSupport {
     private JComponent component;
@@ -47,8 +44,7 @@ public class TargetableSupport {
 
     public Object[] getCommands() {
         ActionMap map = component.getActionMap();
-        return map.keys();
-        // TODO: Should Return the keys the current JNComponent as well.
+        return map.allKeys();
     }
 
     public boolean hasCommand(Object command) {
