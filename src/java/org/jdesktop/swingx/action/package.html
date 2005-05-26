@@ -22,18 +22,18 @@
       semantics. These two types of actions are linked by the action id 
       which is the value of the <code>Action.ACTION_COMMAND_KEY</code>
     <p>
-      The {@link org.jdesktop.swing.actions.AbstractActionExt} class extends the Swing
+      The {@link org.jdesktop.swingx.actions.AbstractActionExt} class extends the Swing
       concept of the Action by adding support for toggle or two state actions.
       Toggle type actions may be grouped into a set of mutually exclusive actions.
       This binary actions are represented in the user interface as JToggleButtons,
       JCheckBoxMenuItems or JRadioButtonMenuItems. 
     <p>
-      There are two types of user actions: A {@link org.jdesktop.swing.actions.BoundAction} 
+      There are two types of user actions: A {@link org.jdesktop.swingx.actions.BoundAction} 
       is an action that will invoke a specific method. It may be bound to an explict
       component, a callback method on an object instance or one or more listeners. 
-      A {@link org.jdesktop.swing.actions.TargetableAction} is an action that doesn't have an
+      A {@link org.jdesktop.swingx.actions.TargetableAction} is an action that doesn't have an
       explicit binding and the invocation will be sent to an arbitrator 
-      (the {@link org.jdesktop.swing.actions.TargetManager}) which dispatches the Action 
+      (the {@link org.jdesktop.swingx.actions.TargetManager}) which dispatches the Action 
       to the "current component" - represented by a Targetable instance. 
       The current component may be explictly set by some programmatic 
       policy (for example, changes in state).
@@ -47,26 +47,26 @@
       These are the key classes or the actions architecture:
     <p>
     <dl>
-      <dt> {@link org.jdesktop.swing.actions.ActionManager}</dt>
+      <dt> {@link org.jdesktop.swingx.actions.ActionManager}</dt>
       <dd> A repository of all shared actions in the application.
 	There will be one instance per application which can be accessed
 	via the Application object (was ClientApp)
       </dd>
 
-      <dt>{@link org.jdesktop.swing.actions.ActionContainerFactory}</dt>
+      <dt>{@link org.jdesktop.swingx.actions.ActionContainerFactory}</dt>
       <dd>Constructs JMenuBars, JMenus, JPopupMenus and
 	JToolBars using lists of action ids. This functionality may
 	be migrated into ActionManager.
       </dd>
 
-      <dt>{@link org.jdesktop.swing.actions.TargetableAction}</dt>
+      <dt>{@link org.jdesktop.swingx.actions.TargetableAction}</dt>
       <dd>Represents an unbound Action. The invocation of this action
 	will be dispatched to the TargetManager.</dd>
 
-      <dt>{@link org.jdesktop.swing.actions.BoundAction}</dt>
+      <dt>{@link org.jdesktop.swingx.actions.BoundAction}</dt>
       <dd>Represents an action which has an exclicit binding.</dd>
 
-      <dt>{@link org.jdesktop.swing.actions.TargetManager}</dt>
+      <dt>{@link org.jdesktop.swingx.actions.TargetManager}</dt>
       <dd>Manages the targetable policy for actions which have no
 	explicit binding. The policy can be set by changes in application
 	state, event based criteria or whatever. If the policy has not been
@@ -74,7 +74,7 @@
 	component.
       </dd>
 
-      <dt>{@link org.jdesktop.swing.actions.Targetable}</dt>
+      <dt>{@link org.jdesktop.swingx.actions.Targetable}</dt>
       <dd>An interface that contains a few methods which expose actions to
 	the TargetManager. Targetable objects don't have to be visual
 	components they only have to be able to handle action invocations.
@@ -82,7 +82,7 @@
     </dl>
 
     <hr>
-    <address><a href="mailto:mark.davidson@sun.com">Mark Davidson</a></address>
+    <address><a href="mailto:richard.bair@sun.com">Richard Bair</a></address>
     <!-- Created: Thu Dec 11 15:15:06 PST 2003 -->
     <!-- hhmts start -->
 Last modified: Tue Sep  7 11:10:01 PDT 2004
