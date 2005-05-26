@@ -175,6 +175,16 @@ public class ActionContainerFactory {
 
     /**
      * Constructs a menu tree from a list of actions or lists of lists or actions.
+     * TODO This method is broken. It <em>should</em> expect either that every
+     * entry is a List (thus, the sub menus off the main MenuBar), or it should
+     * handle normal actions properly. By submitting a List of all Actions, nothing
+     * is created....
+     * <p>
+     * For example, If my list is [action, action, action], then nothing is added
+     * to the menu bar. However, if my list is [list[action], action, action, action] then
+     * I get a menu and under it the tree actions. This should not be, because if I
+     * wanted those actions to be on the sub menu, then they should have been
+     * listed within the sub list!
      *
      * @param list a list which represents the root item.
      * @return a menu bar which represents the menu bar tree
