@@ -49,6 +49,10 @@ public class DropShadowBorder implements Border {
         initImages();
     }
     
+    public DropShadowBorder(Color c, int width, boolean b, boolean b2) {
+        this(c, width);
+    }
+    
     private void initImages() {
         topRight = new ImageIcon(getClass().getResource("top-right.png"));
         right = new ImageIcon(getClass().getResource("right.png"));
