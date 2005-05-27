@@ -17,6 +17,7 @@ import java.io.File;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.net.URL;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -72,6 +73,15 @@ public class JXImagePanel extends JXPanel {
     private Style style = Style.CENTERED;
     
     public JXImagePanel() {
+    }
+    
+    public JXImagePanel(URL imageUrl) {
+        try {
+            setIcon(new ImageIcon(imageUrl));
+        } catch (Exception e) {
+            //TODO need to log
+            e.printStackTrace();
+        }
     }
     
     /**
