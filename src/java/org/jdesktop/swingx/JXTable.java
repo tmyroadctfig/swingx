@@ -18,9 +18,11 @@ import java.awt.event.MouseEvent;
 import java.awt.print.PrinterException;
 import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import java.util.regex.Pattern;
@@ -59,6 +61,7 @@ import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
 import org.jdesktop.swingx.table.TableColumnExt;
+import org.jdesktop.swingx.table.TableColumnModelExt;
 import org.jdesktop.swingx.util.Link;
 
 
@@ -218,12 +221,6 @@ public static boolean TRACE = false;
         map.put("print", new Actions("print"));
         map.put("find", new Actions("find"));
 
-        // Add a link handler to to the table.
-//        LinkHandler handler = new LinkHandler();
-//        addMouseListener(handler);
-//        addMouseMotionListener(handler);
-//        setDefaultEditor(Link.class, new LinkRenderer());
-//        setRolloverEnabled(true);
     }
 
     /**
@@ -428,18 +425,28 @@ public static boolean TRACE = false;
      */
     public void updateUI() {
         super.updateUI();
-        // Update the UIs of all the default editors.
-        Enumeration defaultEditors = defaultEditorsByColumnClass.elements();
-        while (defaultEditors.hasMoreElements()) {
+        // JW PENDING: update columnControl
+        for (Enumeration defaultEditors= defaultEditorsByColumnClass.elements(); defaultEditors.hasMoreElements();) {
           updateEditorUI(defaultEditors.nextElement());
         }
-        // JW PENDING: do the same for renderers
-        // PENDING: do the same for all column specific editors/renderers
-        //   (don't forget hidden columns!)
+        
+        for (Enumeration defaultRenderers = defaultRenderersByColumnClass.elements();defaultRenderers.hasMoreElements();) {
+          updateRendererUI(defaultRenderers.nextElement());
+        }
+        Enumeration columns = getColumnModel().getColumns();
+        if (getColumnModel() instanceof TableColumnModelExt) {
+            columns = Collections.enumeration(((TableColumnModelExt) getColumnModel()).getAllColumns());
+        }
+        while (columns.hasMoreElements()) {
+            TableColumn column = (TableColumn) columns.nextElement();
+            updateEditorUI(column.getCellEditor());
+            updateRendererUI(column.getCellRenderer());
+            updateRendererUI(column.getHeaderRenderer());
+        }
    
     }
     private void updateEditorUI(Object value) {
-        // maybe proxyValue
+        // maybe null or proxyValue
         if (!(value instanceof TableCellEditor)) return;
         // super handled this
         if ((value instanceof JComponent) || (value instanceof DefaultCellEditor)) return;
@@ -453,6 +460,23 @@ public static boolean TRACE = false;
             // ignore - can't do anything
         }
     }
+    
+    private void updateRendererUI(Object value) {
+        // maybe null or proxyValue
+        if (!(value instanceof TableCellRenderer)) return;
+        // super handled this
+        if (value instanceof JComponent) return;
+        // custom editors might balk about fake rows/columns
+        try {
+            Component comp = ((TableCellRenderer) value).getTableCellRendererComponent(this, null, false, false, -1, -1);
+            if (comp instanceof JComponent) {
+                ((JComponent) comp).updateUI();
+            }
+        } catch (Exception e) {
+            // ignore - can't do anything
+        }
+    }
+    
     /**
      * A small class which dispatches actions.
      * TODO: Is there a way that we can make this static?
@@ -557,7 +581,16 @@ public static boolean TRACE = false;
         // RG: If there are no filters, call superclass version rather than accessing model directly
         return filters == null ? super.getRowCount() : filters.getOutputSize();
     }
-	
+
+    /**
+     * workaround bug in JTable 
+     * (review ID: 458601 - negative y is mapped to row 0).
+     */
+    public int rowAtPoint(Point point) {
+        if (point.y < 0) return -1;
+        return super.rowAtPoint(point);
+    }
+    
 	public boolean isHierarchical(int column) {
 		return false;
 	}

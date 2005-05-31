@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFrame;
+import javax.swing.JTable;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
@@ -66,6 +67,34 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         assertNull("row >= getRowCount must return null path", treeTable.getPathForRow(treeTable.getRowCount()));
     }
     
+    public void testTableRowAtNegativePoint() {
+        JXTable treeTable = new JXTable(1, 4);
+        int negativeYRowHeight = - treeTable.getRowHeight();
+        int negativeYRowHeightPlusOne = negativeYRowHeight + 1;
+        int negativeYMinimal = -1;
+        assertEquals("negative y location rowheight " + negativeYRowHeight + " must return row -1", 
+                -1,  treeTable.rowAtPoint(new Point(-1, negativeYRowHeight)));
+        assertEquals("negative y location " + negativeYRowHeightPlusOne +" must return row -1", 
+                -1,  treeTable.rowAtPoint(new Point(-1, negativeYRowHeightPlusOne)));
+        assertEquals("minimal negative y location must return row -1", 
+                -1,  treeTable.rowAtPoint(new Point(-1, negativeYMinimal)));
+        
+    }
+
+    public void testTableRowAtOutsidePoint() {
+        JTable treeTable = new JTable(2, 4);
+        int negativeYRowHeight = (treeTable.getRowHeight()+ treeTable.getRowMargin()) * treeTable.getRowCount() ;
+        int negativeYRowHeightPlusOne = negativeYRowHeight - 1;
+        int negativeYMinimal = -1;
+        assertEquals("negative y location rowheight " + negativeYRowHeight + " must return row -1", 
+                -1,  treeTable.rowAtPoint(new Point(-1, negativeYRowHeight)));
+        assertEquals("negative y location " + negativeYRowHeightPlusOne +" must return row -1", 
+                -1,  treeTable.rowAtPoint(new Point(-1, negativeYRowHeightPlusOne)));
+//        assertEquals("minimal negative y location must return row -1", 
+//                -1,  treeTable.rowAtPoint(new Point(-1, negativeYMinimal)));
+        
+    }
+
     public void testPathForLocationContract() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         // this is actually a JTable rowAtPoint bug: falsely calculates
@@ -77,10 +106,10 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         int negativeYMinimal = -1;
         assertEquals("negative y location rowheight " + negativeYRowHeight + " must return row -1", 
                 -1,  treeTable.rowAtPoint(new Point(-1, negativeYRowHeight)));
-//        assertEquals("negative y location " + negativeYRowHeightPlusOne +" must return row -1", 
-//                -1,  treeTable.rowAtPoint(new Point(-1, negativeYRowHeightPlusOne)));
-//        assertEquals("minimal negative y location must return row -1", 
-//                -1,  treeTable.rowAtPoint(new Point(-1, negativeYMinimal)));
+        assertEquals("negative y location " + negativeYRowHeightPlusOne +" must return row -1", 
+                -1,  treeTable.rowAtPoint(new Point(-1, negativeYRowHeightPlusOne)));
+        assertEquals("minimal negative y location must return row -1", 
+                -1,  treeTable.rowAtPoint(new Point(-1, negativeYMinimal)));
     }
     /**
      * Issue #151: renderer properties ignored after setting treeTableModel.

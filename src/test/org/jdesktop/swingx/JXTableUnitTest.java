@@ -25,7 +25,9 @@ import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
+import javax.swing.DefaultCellEditor;
 import javax.swing.Icon;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -530,6 +532,10 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     public void interactiveTestJNTableColumnControlAndFilters() {
         final JXTable table = new JXTable(sortableTableModel);
+        // hmm bug regression with combos as editors - same in JTable
+//        JComboBox box = new JComboBox(new Object[] {"one", "two", "three" });
+//        box.setEditable(true);
+//        table.getColumnExt(0).setCellEditor(new DefaultCellEditor(box));
         Action toggleFilter = new AbstractAction("Toggle Filter") {
             
             public void actionPerformed(ActionEvent e) {
@@ -754,8 +760,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
         columns[3].setPrototypeValue(Boolean.TRUE);
         columns[4].setPrototypeValue(new Date(100));
         columns[5].setPrototypeValue(new Float(1.5));
-//        columns[6].setPrototypeValue(new Link("Sun Micro", "_blank",
-//                                              tableModel.linkURL));
+        columns[6].setPrototypeValue(new Link("Sun Micro", "_blank",
+                                              tableModel.linkURL));
         columns[7].setPrototypeValue(new Integer(3023));
         columns[8].setPrototypeValue("John Doh");
         columns[9].setPrototypeValue("23434 Testcase St");
@@ -1127,8 +1133,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public static void main(String args[]) {
         JXTableUnitTest test = new JXTableUnitTest();
         try {
-          test.runInteractiveTests();
-         //   test.runInteractiveTests("interactive.*Roll.*");
+         // test.runInteractiveTests();
+            test.runInteractiveTests("interactive.*Column.*");
          //   test.runInteractiveTests("interactive.*Render.*");
          //   test.runInteractiveTests("interactive.*Toggle.*");
         } catch (Exception e) {
