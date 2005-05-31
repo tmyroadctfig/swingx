@@ -9,14 +9,15 @@ package org.jdesktop.swingx;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.KeyStroke;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
@@ -42,6 +43,45 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         super("JXTreeTable Unit Test");
     }
 
+    
+    public void testRowForPath() {
+        JXTreeTable treeTable = new JXTreeTable(treeTableModel);
+        // @todo - make sure we find an expandible row instead of hardcoding
+        int row = 5;
+        TreePath path = treeTable.getPathForRow(row);
+        assertEquals("original row must be retrieved", row, treeTable.getRowForPath(path));
+        int rowCount = treeTable.getRowCount();
+        treeTable.expandRow(row - 1);
+        // sanity assert
+        assertTrue("really expanded", treeTable.getRowCount() > rowCount);
+        TreePath expanded = treeTable.getPathForRow(row);
+        assertNotSame("path at original row must be different when expanded", path, expanded);
+        assertEquals("original row must be retrieved", row, treeTable.getRowForPath(expanded));
+        
+    }
+    
+    public void testPathForRowContract() {
+        JXTreeTable treeTable = new JXTreeTable(treeTableModel);
+        assertNull("row < 0 must return null path", treeTable.getPathForRow(-1));
+        assertNull("row >= getRowCount must return null path", treeTable.getPathForRow(treeTable.getRowCount()));
+    }
+    
+    public void testPathForLocationContract() {
+        JXTreeTable treeTable = new JXTreeTable(treeTableModel);
+        // this is actually a JTable rowAtPoint bug: falsely calculates
+        // row == 0 if  - 1 >= y > - getRowHeight()
+        
+        //assertEquals("location outside must return null path", null, treeTable.getPathForLocation(-1, -(treeTable.getRowHeight() - 1)));
+        int negativeYRowHeight = - treeTable.getRowHeight();
+        int negativeYRowHeightPlusOne = negativeYRowHeight + 1;
+        int negativeYMinimal = -1;
+        assertEquals("negative y location rowheight " + negativeYRowHeight + " must return row -1", 
+                -1,  treeTable.rowAtPoint(new Point(-1, negativeYRowHeight)));
+//        assertEquals("negative y location " + negativeYRowHeightPlusOne +" must return row -1", 
+//                -1,  treeTable.rowAtPoint(new Point(-1, negativeYRowHeightPlusOne)));
+//        assertEquals("minimal negative y location must return row -1", 
+//                -1,  treeTable.rowAtPoint(new Point(-1, negativeYMinimal)));
+    }
     /**
      * Issue #151: renderer properties ignored after setting treeTableModel.
      * 
@@ -107,6 +147,55 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     }
 
     // ---------------------------- interactive tests
+
+    /**
+     * reported: boolean not showing - not reproducible 
+     * 
+     */
+    public void interactiveTestBooleanRenderer() {
+        final JXTreeTable treeTable = new JXTreeTable(new MyTreeTableModel());
+        treeTable.setRootVisible(true);
+        JFrame frame = wrapWithScrollingInFrame(treeTable, "boolean renderers");
+        frame.setVisible(true);
+  
+    }
+    private class MyTreeTableModel extends DefaultTreeTableModel {
+        
+        public MyTreeTableModel() {            
+            final DefaultMutableTreeNode root = 
+                new DefaultMutableTreeNode("Root");
+            
+            root.add(new DefaultMutableTreeNode("A"));
+            root.add(new DefaultMutableTreeNode("B"));
+            this.setRoot(root);
+        }
+        
+        public int getColumnCount() {
+            return 2;
+        }
+        
+        public Class getColumnClass(int column) {
+            if (column == 1) {
+                return Boolean.class;
+            }
+            return super.getColumnClass(column);
+        }
+        
+        public boolean isCellEditable(int row, int column) {
+            return true;
+        }
+        
+        public boolean isCellEditable(Object value, int column) {
+            return true;
+        }
+        public Object getValueAt(Object o, int column) {
+            if (column == 0) {
+                return o.toString();
+            }
+            
+            return new Boolean(true);
+        }
+    }
 
 
     public void interactiveTestCompareTreeProperties() {
@@ -322,10 +411,11 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         // LFSwitcher.metalLF();
         JXTreeTableUnitTest test = new JXTreeTableUnitTest();
         try {
-         //   test.runInteractiveTests();
+            test.runInteractiveTests();
          //   test.runInteractiveTests("interactive.*HighLighters");
          //      test.runInteractiveTests("interactive.*ilter.*");
-           test.runInteractiveTests("interactive.*Prop.*");
+         //  test.runInteractiveTests("interactive.*Prop.*");
+         //     test.runInteractiveTests("interactive.*Bool.*");
         } catch (Exception ex) {
 
         }

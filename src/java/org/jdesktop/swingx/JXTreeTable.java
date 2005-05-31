@@ -914,7 +914,17 @@ public class JXTreeTable extends JXTable {
      public TreePath getPathForRow(int row) {
         return renderer.getPathForRow(row);
      }
-     
+
+     /**
+      * Returns the row for a given TreePath.
+      *
+      * @param path
+      * @return the row for the given <code>TreePath</code>.
+      */
+     public int getRowForPath(TreePath path) {
+       return renderer.getRowForPath(path);
+     }
+
     /**
      * Sets the value of the <code>scrollsOnExpand</code> property for the tree
      * part. This property specifies whether the expanded paths should be scrolled
