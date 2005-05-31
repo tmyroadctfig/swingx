@@ -59,7 +59,7 @@ public class LinkRenderer extends AbstractCellEditor implements
         linkAction.setLink(value instanceof Link ? (Link) value : null);
         Point p = (Point) table
                 .getClientProperty(RolloverProducer.ROLLOVER_KEY);
-        if (p != null && (p.x > 0) && (p.x == column) && (p.y == row)) {
+        if (hasFocus || (p != null && (p.x > 0) && (p.x == column) && (p.y == row))) {
             // JW: toggling model's rollover state is unreliable - hmmm...
              linkButton.getModel().setRollover(true);
            // linkButton.entered(true);
