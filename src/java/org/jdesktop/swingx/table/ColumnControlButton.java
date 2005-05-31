@@ -149,6 +149,14 @@ public final class ColumnControlButton extends JButton {
         init();
     }
 
+    
+    public void updateUI() {
+        super.updateUI();
+        if (popupMenu != null) {
+            // Hmm, not really working....
+            popupMenu.updateUI();
+        }
+    }
     // public ColumnControlButton(Action action) {
     // super(action);
     // init();

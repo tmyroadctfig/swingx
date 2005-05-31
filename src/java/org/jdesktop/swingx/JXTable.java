@@ -426,6 +426,9 @@ public static boolean TRACE = false;
     public void updateUI() {
         super.updateUI();
         // JW PENDING: update columnControl
+        if (columnControlButton != null) {
+            columnControlButton.updateUI();
+        }
         for (Enumeration defaultEditors= defaultEditorsByColumnClass.elements(); defaultEditors.hasMoreElements();) {
           updateEditorUI(defaultEditors.nextElement());
         }
