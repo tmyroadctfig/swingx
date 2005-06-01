@@ -21,6 +21,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 
 import java.net.URL;
 
@@ -32,6 +34,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.html.HTMLEditorKit;
 
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -123,6 +127,7 @@ public class JXEditorPane extends JEditorPane implements Searchable, Targetable 
     }
 
     private void init() {
+        setEditorKitForContentType("text/html", new SloppyHTMLEditorKit());
         addPropertyChangeListener(new PropertyHandler());
         getDocument().addUndoableEditListener(getUndoableEditListener());
         initActions();
@@ -521,4 +526,31 @@ public class JXEditorPane extends JEditorPane implements Searchable, Targetable 
             }
         }
     }
+    
+    /**
+     * Handles sloppy HTML. This implementation currently only looks for
+     * tags that have a / at the end (self-closing tags) and fixes them
+     * to work with the version of HTML supported by HTMLEditorKit
+     * <p>TODO: Need to break this functionality out so it can take pluggable
+     * replacement code blocks, allowing people to write custom replacement
+     * routines. The idea is that with some simple modifications a lot more
+     * sloppy HTML can be rendered correctly.
+     *
+     * @author rbair
+     */
+    private static final class SloppyHTMLEditorKit extends HTMLEditorKit {
+        public void read(Reader in, Document doc, int pos) throws IOException, BadLocationException {
+            //read the reader into a String
+            StringBuffer buffer = new StringBuffer();
+            int length = -1;
+            char[] data = new char[1024];
+            while ((length = in.read(data)) != -1) {
+                buffer.append(data, 0, length);
+            }
+            //TODO is this regex right?
+            StringReader reader = new StringReader(buffer.toString().replaceAll("/>", ">"));
+            super.read(reader, doc, pos);
+        }
+    }    
 }
+
