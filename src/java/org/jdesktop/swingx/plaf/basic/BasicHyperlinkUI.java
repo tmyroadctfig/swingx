@@ -11,6 +11,7 @@ import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
@@ -31,7 +32,7 @@ import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.text.View;
 
 /**
- * Basic implementation of the <code>JLinkButton</code> UI. <br>
+ * Basic implementation of the <code>JXHyperlink</code> UI. <br>
  * This is copied from org.jdesktop.jdnc.plaf.basic.BasicLinkButtonUI
  */
 public class BasicHyperlinkUI extends BasicButtonUI {
@@ -127,6 +128,13 @@ public class BasicHyperlinkUI extends BasicButtonUI {
             paintIcon(g, c, iconRect);
         }
 
+//        Composite oldComposite = ((Graphics2D) g).getComposite();
+//
+//        if (model.isRollover()) {
+//            ((Graphics2D) g).setComposite(AlphaComposite.getInstance(
+//                    AlphaComposite.SRC_OVER, 0.5f));
+//        }
+
         if (text != null && !text.equals("")) {
             View v = (View) c.getClientProperty(BasicHTML.propertyKey);
             if (v != null) {
@@ -145,6 +153,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
             paintFocus(g, b, viewRect, textRect, iconRect);
         }
 
+//        ((Graphics2D) g).setComposite(oldComposite);
     }
 
     protected void paintText(Graphics g, AbstractButton b, Rectangle textRect,

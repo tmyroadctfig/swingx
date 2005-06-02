@@ -7,9 +7,9 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.Action;
 import javax.swing.JButton;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
 
+import org.jdesktop.swingx.plaf.JXHyperlinkAddon;
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.util.Link;
 
 /**
@@ -28,21 +28,26 @@ public class JXHyperlink extends JButton {
      */
     public static final String uiClassID = "HyperlinkUI";
 
+    // ensure at least the default ui is registered
+    static {
+      LookAndFeelAddons.contribute(new JXHyperlinkAddon());
+    }
+
     /**
      * Initialization that would ideally be moved into various look and feel
      * classes.
      */
-    static {
-        loadDefaults();
-    }
+//    static {
+//        loadDefaults();
+//    }
+//
+//    static void loadDefaults() {
+//        UIDefaults defaults = UIManager.getDefaults();
+//        defaults.put(uiClassID,
+//                "org.jdesktop.swingx.plaf.basic.BasicHyperlinkUI");
+//    }
 
-    static void loadDefaults() {
-        UIDefaults defaults = UIManager.getDefaults();
-        defaults.put(uiClassID,
-                "org.jdesktop.swingx.plaf.basic.BasicHyperlinkUI");
-    }
-
-    private boolean hasBeenClicked = false;
+    private boolean hasBeenVisited = false;
 
     /**
      * Color for the hyper link if it has not yet been clicked. This color can
@@ -58,9 +63,7 @@ public class JXHyperlink extends JButton {
      */
     private Color clickedColor = new Color(0x99, 0, 0x99);
 
-    private Cursor oldCursor = null;
-
-    /** Creates a new instance of JHyperlink */
+    /** Creates a new instance of JXHyperlink */
     public JXHyperlink() {
         super();
     }
@@ -110,13 +113,13 @@ public class JXHyperlink extends JButton {
 
     protected void setVisited(boolean visited) {
         boolean old = isVisited();
-        hasBeenClicked = visited;
+        hasBeenVisited = visited;
         setForeground(isVisited() ? getClickedColor() : getUnclickedColor());
         firePropertyChange("visited", old, isVisited());
     }
 
     protected boolean isVisited() {
-        return hasBeenClicked;
+        return hasBeenVisited;
     }
 
     protected PropertyChangeListener createActionPropertyChangeListener(
