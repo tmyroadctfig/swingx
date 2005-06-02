@@ -34,10 +34,10 @@ import javax.swing.text.View;
  * Basic implementation of the <code>JLinkButton</code> UI. <br>
  * This is copied from org.jdesktop.jdnc.plaf.basic.BasicLinkButtonUI
  */
-public class BasicHyperlinkButtonUI extends BasicButtonUI {
+public class BasicHyperlinkUI extends BasicButtonUI {
 
     public static ComponentUI createUI(JComponent c) {
-        return new BasicHyperlinkButtonUI();
+        return new BasicHyperlinkUI();
     }
 
     private static Rectangle viewRect = new Rectangle();

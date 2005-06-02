@@ -23,7 +23,7 @@ import org.jdesktop.swingx.util.Link;
  */
 public class LinkRenderer extends AbstractCellEditor implements
         TableCellRenderer, TableCellEditor {
-    private JXHyperlinkButton linkButton;
+    private JXHyperlink linkButton;
 
     private LinkAction linkAction;
 
@@ -33,7 +33,7 @@ public class LinkRenderer extends AbstractCellEditor implements
 
     public LinkRenderer(ActionListener openAction) {
         linkAction = new LinkAction(null);
-        linkButton = new JXHyperlinkButton(linkAction);
+        linkButton = new JXHyperlink(linkAction);
         linkButton.addActionListener(createEditorActionListener());
         setVisitingDelegate(openAction);
     }

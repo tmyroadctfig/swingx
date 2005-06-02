@@ -35,7 +35,7 @@ import org.jdesktop.swingx.util.Link;
 public class JXHyperlinkTest extends InteractiveTestCase {
 
     public JXHyperlinkTest() {
-        super("JXHyperlink Test");
+        super("JXHyperlinkLabel Test");
     }
     public void interactiveTestUnderline() {
         Action action = new AbstractAction("Link@somewhere") {
@@ -46,7 +46,7 @@ public class JXHyperlinkTest extends InteractiveTestCase {
             }
             
         };
-        JXHyperlink hyperlink = new JXHyperlink(action );
+        JXHyperlinkLabel hyperlink = new JXHyperlinkLabel(action );
         JFrame frame = wrapInFrame(hyperlink, "simple show label link");
         frame.setSize(200, 200);
         frame.setVisible(true);
@@ -62,7 +62,7 @@ public class JXHyperlinkTest extends InteractiveTestCase {
             }
             
         };
-        JXHyperlinkButton hyperlink = new JXHyperlinkButton(action );
+        JXHyperlink hyperlink = new JXHyperlink(action );
         JFrame frame = wrapInFrame(hyperlink, "simple show button link");
         frame.setSize(200, 200);
         frame.setVisible(true);
@@ -94,7 +94,7 @@ public class JXHyperlinkTest extends InteractiveTestCase {
 
         LinkAction linkAction = new LinkAction(link);
         linkAction.setVisitingDelegate(action);
-        JXHyperlinkButton hyperlink = new JXHyperlinkButton(linkAction);
+        JXHyperlink hyperlink = new JXHyperlink(linkAction);
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(new JScrollPane(editorPane));
         panel.add(hyperlink, BorderLayout.SOUTH);
@@ -109,18 +109,8 @@ public class JXHyperlinkTest extends InteractiveTestCase {
         final JXEditorPane editorPane = new JXEditorPane();
         editorPane.setEditable(false);
         editorPane.setContentType("text/html");
-        JXTable table = new JXTable(createModelWithLinks()) {
-            public boolean editCellAt(int row, int col, EventObject event) {
-                boolean editing = super.editCellAt(row, col, event);
-                if (editing) {
-                    Component comp = getEditorComponent();
-                    Rectangle r = comp.getBounds();
-                    comp.setBounds(r.x, r.y, r.width / 2, r.height);
-                    comp.validate();
-                }
-                return editing;
-            }
-        };
+        JXTable table = new JXTable(createModelWithLinks());
+        table.setRolloverEnabled(true);
         Action action = new AbstractAction() {
 
             public void actionPerformed(ActionEvent e) {

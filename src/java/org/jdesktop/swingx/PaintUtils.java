@@ -26,7 +26,7 @@ import javax.swing.border.Border;
  * 
  * @author Mark Davidson
  */
-class PaintUtils {
+public class PaintUtils {
 
     //  Utility methods. 
 
