@@ -220,6 +220,8 @@ public static boolean TRACE = false;
         ActionMap map = getActionMap();
         map.put("print", new Actions("print"));
         map.put("find", new Actions("find"));
+        map.put(ColumnControlButton.COLUMN_CONTROL_MARKER + "packAll", new Actions("packAll"));
+        map.put(ColumnControlButton.COLUMN_CONTROL_MARKER + "packSelected", new Actions("packSelected"));
 
     }
 
@@ -483,6 +485,7 @@ public static boolean TRACE = false;
     /**
      * A small class which dispatches actions.
      * TODO: Is there a way that we can make this static?
+     * JW: I hate those if constructs... we are in OO-land!
      */
     private class Actions extends UIAction {
         Actions(String name) {
@@ -501,8 +504,30 @@ public static boolean TRACE = false;
             }
             else if ("find".equals(getName())) {
                 find();
+            } else if ("packAll".equals(getName())) {
+                packAll();
+            } else if ("packSelected".equals(getName())) {
+                packSelected();
             }
         }
+
+
+    }
+
+    private void packAll() {
+        packTable(getDefaultPackMargin());
+    }
+
+    private void packSelected() {
+        int selected = getSelectedColumn();
+        if (selected >= 0) {
+            packColumn(selected, getDefaultPackMargin());
+        }
+    }
+
+    private int getDefaultPackMargin() {
+        
+        return 4;
     }
 
     private JXFindDialog dialog = null;
@@ -710,6 +735,10 @@ public static boolean TRACE = false;
      */
     public void setTableHeader(JTableHeader tableHeader) {
         // This method is also called during construction of JTable
+        JTableHeader old = getTableHeader();
+        if (old != null) {
+            old.removeMouseListener(headerListener);
+        }
         if (tableHeader != null) {
             tableHeader.addMouseListener(headerListener);
 //            tableHeader.setDefaultRenderer(
