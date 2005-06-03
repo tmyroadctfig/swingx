@@ -42,12 +42,16 @@ import org.jdesktop.swingx.plaf.metal.MetalTitledPanelUI;
  * @author Nicola Ken Barozzi
  */
 public class JXTitledPanel extends JXPanel {
+    
+    
     /**
      * @see #getUIClassID
      * @see #readObject
      */
     static public final String uiClassID = "TitledPanelUI";
 //    private static final PropertyChangeListener LAF_LISTENER;
+    public static final String LEFT_DECORATION = "JXTitledPanel.leftDecoration";
+    public static final String RIGHT_DECORATION = "JXTitledPanel.rightDecoration";
     
     /**
      * Initialization that would ideally be moved into various look and feel
@@ -168,8 +172,7 @@ public class JXTitledPanel extends JXPanel {
 	 * @param title
 	 */
 	public JXTitledPanel(String title) {
-		setTitle(title);
-        setContentContainer(new JXPanel());
+        this(title, new JXPanel());
 	}
 
 	/**
@@ -179,7 +182,8 @@ public class JXTitledPanel extends JXPanel {
 	 * @param content
 	 */
 	public JXTitledPanel(String title, Container content) {
-		this(title);
+//        setLayout(new BorderLayout());
+        setTitle(title);
 		setContentContainer(content);
 	}
 

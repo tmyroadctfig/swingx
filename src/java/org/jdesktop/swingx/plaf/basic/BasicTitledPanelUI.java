@@ -46,6 +46,8 @@ import org.jdesktop.swingx.plaf.TitledPanelUI;
  * @author rbair
  */
 public abstract class BasicTitledPanelUI extends TitledPanelUI {
+    
+    
 	/**
 	 * JLabel used for the title in the Title section of the JTitledPanel.
 	 */
@@ -62,6 +64,8 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
      * The JXTitledPanel peered with this UI
      */
     protected JXTitledPanel titledPanel;
+    private JComponent left;
+    private JComponent right;
     
     /** Creates a new instance of BasicTitledPanelUI */
     public BasicTitledPanelUI() {
@@ -100,24 +104,56 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
         installProperty(titledPanel, "titleDarkBackground", UIManager.getColor("JXTitledPanel.title.darkBackground"));
         installProperty(titledPanel, "titleLightBackground", UIManager.getColor("JXTitledPanel.title.lightBackground"));
         installProperty(titledPanel, "titleFont", UIManager.getFont("JXTitledPanel.title.font"));
+
         
+
+//        titledPanel.setLayout(new BorderLayout());
+////        JXPanel contentPanel = new JXPanel();
+////		contentPanel.setBorder(BorderFactory.createEmptyBorder());
+////		titledPanel.add(contentPanel, BorderLayout.CENTER);
+//		caption = new JLabel(titledPanel.getTitle());
+//		caption.setFont(titledPanel.getTitleFont());
+//		topPanel = createTopPanel(titledPanel);
+//		topPanel.setBorder(BorderFactory.createEmptyBorder());
+//		topPanel.setLayout(new GridBagLayout());
+//		caption.setForeground(titledPanel.getTitleForeground());
+//		topPanel.add(caption, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(4, 12, 4, 12), 0, 0));
+//		titledPanel.add(topPanel, BorderLayout.NORTH);
+
+      caption = createAndConfigureCaption(titledPanel);
+      topPanel = createAndConfigureTopPanel(titledPanel);
+        fillTopPanel();
         titledPanel.setLayout(new BorderLayout());
-//        JXPanel contentPanel = new JXPanel();
-//		contentPanel.setBorder(BorderFactory.createEmptyBorder());
-//		titledPanel.add(contentPanel, BorderLayout.CENTER);
-		caption = new JLabel(titledPanel.getTitle());
-		caption.setFont(titledPanel.getTitleFont());
-		topPanel = createTopPanel(titledPanel);
-		topPanel.setBorder(BorderFactory.createEmptyBorder());
-		topPanel.setLayout(new GridBagLayout());
-		caption.setForeground(titledPanel.getTitleForeground());
-		topPanel.add(caption, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(4, 12, 4, 12), 0, 0));
-		titledPanel.add(topPanel, BorderLayout.NORTH);
+        titledPanel.add(topPanel, BorderLayout.NORTH);
 		titledPanel.setBorder(BorderFactory.createRaisedBevelBorder());
 		titledPanel.setOpaque(false);
         
         installListeners();
         
+    }
+
+    private void fillTopPanel() {
+        topPanel.add(caption, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(4, 12, 4, 12), 0, 0));
+        if (titledPanel.getClientProperty(JXTitledPanel.RIGHT_DECORATION) instanceof JComponent) {
+            addRightDecoration((JComponent) titledPanel.getClientProperty(JXTitledPanel.RIGHT_DECORATION));
+        }
+        if (titledPanel.getClientProperty(JXTitledPanel.LEFT_DECORATION) instanceof JComponent) {
+            addLeftDecoration((JComponent) titledPanel.getClientProperty(JXTitledPanel.LEFT_DECORATION));
+        }
+    }
+
+    private JGradientPanel createAndConfigureTopPanel(JXTitledPanel titledPanel) {
+        JGradientPanel topPanel = createTopPanel(titledPanel);
+        topPanel.setBorder(BorderFactory.createEmptyBorder());
+        topPanel.setLayout(new GridBagLayout());
+        return topPanel;
+    }
+
+    private JLabel createAndConfigureCaption(JXTitledPanel titledPanel) {
+        JLabel caption = new JLabel(titledPanel.getTitle());
+        caption.setFont(titledPanel.getTitleFont());
+        caption.setForeground(titledPanel.getTitleForeground());
+        return caption;
     }
     /**
      * Reverses configuration which was done on the specified component during
@@ -149,10 +185,15 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
         uninstallListeners(titledPanel);
         // JW: this is needed to make the gradient paint work correctly... 
         // LF changes will remove the left/right components...
+        topPanel.removeAll();
         titledPanel.remove(topPanel);
+        titledPanel.putClientProperty(JXTitledPanel.LEFT_DECORATION, left);
+        titledPanel.putClientProperty(JXTitledPanel.RIGHT_DECORATION, right);
         caption =  null;
         topPanel = null;
         titledPanel = null;
+        left = null;
+        right = null;
     }
 
 
@@ -231,15 +272,23 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
 	 * @param decoration
 	 */
 	public void addRightDecoration(JComponent decoration) {
+        if (right != null) topPanel.remove(right);
+        right = decoration;
+        if (right != null) {
 		topPanel.add(decoration, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHEAST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
-	}
-
+	
+        }
+    }
 	/**
 	 * Adds the given JComponent as a decoration on the left of the title
 	 * @param decoration
 	 */
 	public void addLeftDecoration(JComponent decoration) {
-		topPanel.add(decoration, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+        if (left != null) topPanel.remove(left);
+        left = decoration;
+        if (left != null) {
+            topPanel.add(left, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+        }
 	}
 
     /**
