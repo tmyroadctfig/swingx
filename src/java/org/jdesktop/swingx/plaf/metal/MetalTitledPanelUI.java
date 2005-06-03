@@ -7,17 +7,9 @@
 
 package org.jdesktop.swingx.plaf.metal;
 
-import java.awt.GradientPaint;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.Image;
-import java.awt.Insets;
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
+
 import org.jdesktop.swingx.plaf.basic.BasicTitledPanelUI;
 
 /**

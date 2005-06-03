@@ -8,6 +8,7 @@
 package org.jdesktop.swingx.plaf;
 
 import java.awt.Container;
+
 import javax.swing.JComponent;
 import javax.swing.plaf.PanelUI;
 
