@@ -9,6 +9,7 @@ package org.jdesktop.swingx.plaf.metal;
 
 import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
+
 import org.jdesktop.swingx.plaf.basic.BasicScrollUpUI;
 
 /**

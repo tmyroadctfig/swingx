@@ -8,7 +8,9 @@
 package org.jdesktop.swingx.plaf.basic;
 
 import java.awt.Component;
+
 import org.jdesktop.swingx.JXPanel;
+import org.jdesktop.swingx.JXTitledPanel;
 
 /**
  * Adds logic for creating a different title bar component that handles
@@ -22,11 +24,17 @@ public class BasicScrollUpUI extends BasicTitledPanelUI {
     public BasicScrollUpUI() {
     }
 
-    protected JGradientPanel createTopPanel() {
-        return new ScrollUpTopPanel();
+    protected JGradientPanel createTopPanel(JXTitledPanel panel) {
+        return new ScrollUpTopPanel(panel);
     }
     
     protected class ScrollUpTopPanel extends JGradientPanel {
+        
+        public ScrollUpTopPanel(JXTitledPanel panel) {
+            super(panel);
+            // TODO Auto-generated constructor stub
+        }
+
         /**
          * rather than using the default algorithm, this panel will
          * <b>skip</b> its immediate parent in searching for an effective

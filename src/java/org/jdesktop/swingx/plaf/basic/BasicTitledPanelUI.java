@@ -29,7 +29,6 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.plaf.UIResource;
 
@@ -95,32 +94,67 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
      */
     public void installUI(JComponent c) {
         assert c instanceof JXTitledPanel;
-        JXTitledPanel panel = (JXTitledPanel)c;
+        titledPanel = (JXTitledPanel)c;
         
-        installProperty(panel, "titleForeground", UIManager.getColor("JXTitledPanel.title.foreground"));
-        installProperty(panel, "titleDarkBackground", UIManager.getColor("JXTitledPanel.title.darkBackground"));
-        installProperty(panel, "titleLightBackground", UIManager.getColor("JXTitledPanel.title.lightBackground"));
-        installProperty(panel, "titleFont", UIManager.getFont("JXTitledPanel.title.font"));
+        installProperty(titledPanel, "titleForeground", UIManager.getColor("JXTitledPanel.title.foreground"));
+        installProperty(titledPanel, "titleDarkBackground", UIManager.getColor("JXTitledPanel.title.darkBackground"));
+        installProperty(titledPanel, "titleLightBackground", UIManager.getColor("JXTitledPanel.title.lightBackground"));
+        installProperty(titledPanel, "titleFont", UIManager.getFont("JXTitledPanel.title.font"));
         
-        panel.setLayout(new BorderLayout());
-        JXPanel contentPanel = new JXPanel();
-		contentPanel.setBorder(BorderFactory.createEmptyBorder());
-		panel.add(contentPanel, BorderLayout.CENTER);
-		caption = new JLabel(panel.getTitle());
-		caption.setFont(panel.getTitleFont());
-		topPanel = createTopPanel();
+        titledPanel.setLayout(new BorderLayout());
+//        JXPanel contentPanel = new JXPanel();
+//		contentPanel.setBorder(BorderFactory.createEmptyBorder());
+//		titledPanel.add(contentPanel, BorderLayout.CENTER);
+		caption = new JLabel(titledPanel.getTitle());
+		caption.setFont(titledPanel.getTitleFont());
+		topPanel = createTopPanel(titledPanel);
 		topPanel.setBorder(BorderFactory.createEmptyBorder());
 		topPanel.setLayout(new GridBagLayout());
-		caption.setForeground(panel.getTitleForeground());
+		caption.setForeground(titledPanel.getTitleForeground());
 		topPanel.add(caption, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(4, 12, 4, 12), 0, 0));
-		panel.add(topPanel, BorderLayout.NORTH);
-		panel.setBorder(BorderFactory.createRaisedBevelBorder());
-		panel.setOpaque(false);
-        titledPanel = panel;
+		titledPanel.add(topPanel, BorderLayout.NORTH);
+		titledPanel.setBorder(BorderFactory.createRaisedBevelBorder());
+		titledPanel.setOpaque(false);
         
         installListeners();
         
     }
+    /**
+     * Reverses configuration which was done on the specified component during
+     * <code>installUI</code>.  This method is invoked when this 
+     * <code>UIComponent</code> instance is being removed as the UI delegate 
+     * for the specified component.  This method should undo the
+     * configuration performed in <code>installUI</code>, being careful to 
+     * leave the <code>JComponent</code> instance in a clean state (no 
+     * extraneous listeners, look-and-feel-specific property objects, etc.).
+     * This should include the following:
+     * <ol>
+     * <li>Remove any UI-set borders from the component.
+     * <li>Remove any UI-set layout managers on the component.
+     * <li>Remove any UI-added sub-components from the component.
+     * <li>Remove any UI-added event/property listeners from the component.
+     * <li>Remove any UI-installed keyboard UI from the component.
+     * <li>Nullify any allocated instance data objects to allow for GC.
+     * </ol>
+     * @param c the component from which this UI delegate is being removed;
+     *          this argument is often ignored,
+     *          but might be used if the UI object is stateless
+     *          and shared by multiple components
+     *
+     * @see #installUI
+     * @see javax.swing.JComponent#updateUI
+     */
+    public void uninstallUI(JComponent c) {
+        assert c instanceof JXTitledPanel;
+        uninstallListeners(titledPanel);
+        // JW: this is needed to make the gradient paint work correctly... 
+        // LF changes will remove the left/right components...
+        titledPanel.remove(topPanel);
+        caption =  null;
+        topPanel = null;
+        titledPanel = null;
+    }
+
 
     protected void installListeners() {
         titleChangeListener = new PropertyChangeListener() {
@@ -172,37 +206,6 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
         }
     }
 
-    /**
-     * Reverses configuration which was done on the specified component during
-     * <code>installUI</code>.  This method is invoked when this 
-     * <code>UIComponent</code> instance is being removed as the UI delegate 
-     * for the specified component.  This method should undo the
-     * configuration performed in <code>installUI</code>, being careful to 
-     * leave the <code>JComponent</code> instance in a clean state (no 
-     * extraneous listeners, look-and-feel-specific property objects, etc.).
-     * This should include the following:
-     * <ol>
-     * <li>Remove any UI-set borders from the component.
-     * <li>Remove any UI-set layout managers on the component.
-     * <li>Remove any UI-added sub-components from the component.
-     * <li>Remove any UI-added event/property listeners from the component.
-     * <li>Remove any UI-installed keyboard UI from the component.
-     * <li>Nullify any allocated instance data objects to allow for GC.
-     * </ol>
-     * @param c the component from which this UI delegate is being removed;
-     *          this argument is often ignored,
-     *          but might be used if the UI object is stateless
-     *          and shared by multiple components
-     *
-     * @see #installUI
-     * @see javax.swing.JComponent#updateUI
-     */
-    public void uninstallUI(JComponent c) {
-        assert c instanceof JXTitledPanel;
-        JXTitledPanel panel = (JXTitledPanel)c;
-        uninstallListeners(panel);
-    }
-
 
     /**
      * Paints the specified component appropriate for the look and feel.
@@ -246,8 +249,8 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
         return topPanel;
     }
 
-    protected JGradientPanel createTopPanel() {
-        return new JGradientPanel();
+    protected JGradientPanel createTopPanel(JXTitledPanel panel) {
+        return new JGradientPanel(panel);
     }
     
     /**
@@ -256,16 +259,22 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
 	 * @author Richard Bair
 	 * date: Jan 13, 2004
 	 */
-	protected class JGradientPanel extends JXPanel {
+	protected static 
+    class JGradientPanel extends JXPanel {
 		private GradientPaint gp;
 		private double oldWidth = -1;
 		private double oldHeight = -1;
 		private ImageIcon helper = new ImageIcon();
-		public JGradientPanel() {
+        private JXTitledPanel titledPanel;
+		public JGradientPanel(JXTitledPanel panel) {
+            this.titledPanel = panel;
 		}
 
-        public void revalidateGradient() {
+        public void invalidateGradient() {
             gp = null;
+        }
+        public void revalidateGradient() {
+            invalidateGradient();
             repaint();
         }
 		//override the background color to provide for a gradient
@@ -289,11 +298,18 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
 				oldHeight = getHeight();
 				helper.setImage(savedImg);
 			}
-			//draw the image
+			// draw the image
 			g.drawImage(helper.getImage(), 0, 0, getWidth(), getHeight(), helper.getImageObserver());
-		}
+		    // JW: saving the gradient doesn't update on LF change
+            // was: not removed from titledPanel on uninstall
+//            gp = createGradientPaint();
+//            ((Graphics2D) g).setPaint(gp);
+//            g.fillRect(0, 0, getWidth(), getHeight());
+            
+        }
         
         protected GradientPaint createGradientPaint() {
+          //  if (titledPanel == null) return null;
             return new GradientPaint(0, 
                                      0, 
                                      titledPanel.getTitleDarkBackground(), 

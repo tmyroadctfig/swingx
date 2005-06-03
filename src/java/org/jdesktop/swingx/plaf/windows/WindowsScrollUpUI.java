@@ -8,8 +8,11 @@
 package org.jdesktop.swingx.plaf.windows;
 
 import java.awt.GradientPaint;
+
 import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
+
+import org.jdesktop.swingx.JXTitledPanel;
 import org.jdesktop.swingx.plaf.basic.BasicScrollUpUI;
 
 /**
@@ -40,6 +43,11 @@ public class WindowsScrollUpUI extends BasicScrollUpUI {
 
 
     private final class WindowScrollUpTopPanel extends ScrollUpTopPanel {
+        public WindowScrollUpTopPanel(JXTitledPanel panel) {
+            super(panel);
+            // TODO Auto-generated constructor stub
+        }
+
         /**
          * Override createGradientPaint so that I can create a paint that does not
          * provide a smooth gradient, but rather starts the gradient towards the end
