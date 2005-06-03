@@ -6,6 +6,7 @@
  */
 package org.jdesktop.swingx.action;
 
+import java.awt.Insets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -54,7 +55,11 @@ import javax.swing.JToolBar;
  * @see ActionManager
  */
 public class ActionContainerFactory {
-
+    /**
+     * Standard margin for toolbar buttons to improve their look
+     */
+    private static Insets TOOLBAR_BUTTON_MARGIN = new Insets(1, 1, 1, 1);
+    
     private ActionManager manager;
 
     // Map between group id + component and the ButtonGroup
@@ -130,6 +135,15 @@ public class ActionContainerFactory {
                 AbstractButton button = createButton(element, toolbar);
                 // toolbar buttons shouldn't steal focus
                 button.setFocusable(false);
+                /*
+                 * TODO
+                 * The next two lines improve the default look of the buttons.
+                 * This code should be changed to retrieve the default look
+                 * from some UIDefaults object.
+                 */
+                button.setMargin(TOOLBAR_BUTTON_MARGIN);
+                button.setBorderPainted(false);
+                
                 toolbar.add(button);
             }
         }
