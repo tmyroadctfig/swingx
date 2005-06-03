@@ -57,6 +57,7 @@ public class LookAndFeelAddons {
 
     try {
       setAddon(addonClassname);
+      setTrackingLookAndFeelChanges(true);
     } catch (InstantiationException e) {
       e.printStackTrace();
     } catch (IllegalAccessException e) {
