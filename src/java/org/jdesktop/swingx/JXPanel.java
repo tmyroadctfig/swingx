@@ -28,8 +28,9 @@ import javax.swing.Scrollable;
  * @author rbair
  */
 public class JXPanel extends JPanel implements Scrollable {
-	private boolean scrollableTracksViewportHeight;
-	private boolean scrollableTracksViewportWidth;
+    private boolean scrollableTracksViewportHeight;
+    private boolean scrollableTracksViewportWidth;
+    
     /**
      * The alpha level for this component.
      */
@@ -53,27 +54,27 @@ public class JXPanel extends JPanel implements Scrollable {
     public JXPanel() {
     }
     
-	/**
-	 * @param isDoubleBuffered
-	 */
-	public JXPanel(boolean isDoubleBuffered) {
-		super(isDoubleBuffered);
-	}
+    /**
+     * @param isDoubleBuffered
+     */
+    public JXPanel(boolean isDoubleBuffered) {
+        super(isDoubleBuffered);
+    }
 
-	/**
-	 * @param layout
-	 */
-	public JXPanel(LayoutManager layout) {
-		super(layout);
-	}
+    /**
+     * @param layout
+     */
+    public JXPanel(LayoutManager layout) {
+        super(layout);
+    }
 
-	/**
-	 * @param layout
-	 * @param isDoubleBuffered
-	 */
-	public JXPanel(LayoutManager layout, boolean isDoubleBuffered) {
-		super(layout, isDoubleBuffered);
-	}
+    /**
+     * @param layout
+     * @param isDoubleBuffered
+     */
+    public JXPanel(LayoutManager layout, boolean isDoubleBuffered) {
+        super(layout, isDoubleBuffered);
+    }
     
     /**
      * Set the alpha transparency level for this component. This automatically
@@ -161,50 +162,50 @@ public class JXPanel extends JPanel implements Scrollable {
         }
     }
     
-	/* (non-Javadoc)
-	 * @see javax.swing.Scrollable#getScrollableTracksViewportHeight()
-	 */
-	public boolean getScrollableTracksViewportHeight() {
-		return scrollableTracksViewportHeight;
-	}
-	
-	/* (non-Javadoc)
-	 * @see javax.swing.Scrollable#getScrollableTracksViewportWidth()
-	 */
-	public boolean getScrollableTracksViewportWidth() {
-		return scrollableTracksViewportWidth;
-	}
-	
-	/* (non-Javadoc)
-	 * @see javax.swing.Scrollable#getPreferredScrollableViewportSize()
-	 */
-	public Dimension getPreferredScrollableViewportSize() {
-		return getPreferredSize();
-	}
-	
-	/* (non-Javadoc)
-	 * @see javax.swing.Scrollable#getScrollableBlockIncrement(java.awt.Rectangle, int, int)
-	 */
-	public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
-		return 10;
-	}
-	
-	/* (non-Javadoc)
-	 * @see javax.swing.Scrollable#getScrollableUnitIncrement(java.awt.Rectangle, int, int)
-	 */
-	public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
-		return 10;
-	}
-	/**
-	 * @param scrollableTracksViewportHeight The scrollableTracksViewportHeight to set.
-	 */
-	public void setScrollableTracksViewportHeight(boolean scrollableTracksViewportHeight) {
-		this.scrollableTracksViewportHeight = scrollableTracksViewportHeight;
-	}
-	/**
-	 * @param scrollableTracksViewportWidth The scrollableTracksViewportWidth to set.
-	 */
-	public void setScrollableTracksViewportWidth(boolean scrollableTracksViewportWidth) {
-		this.scrollableTracksViewportWidth = scrollableTracksViewportWidth;
-	}
+    /* (non-Javadoc)
+     * @see javax.swing.Scrollable#getScrollableTracksViewportHeight()
+     */
+    public boolean getScrollableTracksViewportHeight() {
+        return scrollableTracksViewportHeight;
+    }
+    
+    /* (non-Javadoc)
+     * @see javax.swing.Scrollable#getScrollableTracksViewportWidth()
+     */
+    public boolean getScrollableTracksViewportWidth() {
+        return scrollableTracksViewportWidth;
+    }
+    
+    /* (non-Javadoc)
+     * @see javax.swing.Scrollable#getPreferredScrollableViewportSize()
+     */
+    public Dimension getPreferredScrollableViewportSize() {
+        return getPreferredSize();
+    }
+    
+    /* (non-Javadoc)
+     * @see javax.swing.Scrollable#getScrollableBlockIncrement(java.awt.Rectangle, int, int)
+     */
+    public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+        return 10;
+    }
+    
+    /* (non-Javadoc)
+     * @see javax.swing.Scrollable#getScrollableUnitIncrement(java.awt.Rectangle, int, int)
+     */
+    public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+        return 10;
+    }
+    /**
+     * @param scrollableTracksViewportHeight The scrollableTracksViewportHeight to set.
+     */
+    public void setScrollableTracksViewportHeight(boolean scrollableTracksViewportHeight) {
+        this.scrollableTracksViewportHeight = scrollableTracksViewportHeight;
+    }
+    /**
+     * @param scrollableTracksViewportWidth The scrollableTracksViewportWidth to set.
+     */
+    public void setScrollableTracksViewportWidth(boolean scrollableTracksViewportWidth) {
+        this.scrollableTracksViewportWidth = scrollableTracksViewportWidth;
+    }
 }
