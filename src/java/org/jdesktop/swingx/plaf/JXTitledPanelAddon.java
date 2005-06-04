@@ -18,6 +18,7 @@ import javax.swing.plaf.metal.MetalLookAndFeel;
 import org.jdesktop.swingx.JXTitledPanel;
 import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.windows.WindowsLookAndFeelAddons;
+import org.jdesktop.swingx.util.OS;
 
 /**
  * Addon for <code>JXHyperlink</code>.<br>
@@ -104,13 +105,19 @@ public class JXTitledPanelAddon implements ComponentAddon {
     }
 
     private void addWindowsDefaults(LookAndFeelAddons addon, List defaults) {
-        defaults.addAll(Arrays.asList(new Object[] { 
-        "JXTitledPanel.title.foreground", new ColorUIResource(33, 93, 198),
-        "JXTitledPanel.title.darkBackground", new ColorUIResource(255, 255, 255),
-        "JXTitledPanel.title.lightBackground", new ColorUIResource(198, 211, 247),
-        }));
-
-        
+//        if (OS.isWindowsXP() && OS.getWindowsVisualStyle() == OS.WinXPTheme.LUNA) {
+            defaults.addAll(Arrays.asList(new Object[] { 
+            "JXTitledPanel.title.foreground", new ColorUIResource(255, 255, 255),
+            "JXTitledPanel.title.darkBackground", new ColorUIResource(49, 121, 242),
+            "JXTitledPanel.title.lightBackground", new ColorUIResource(198, 211, 247),
+            }));
+//        } else {
+//            defaults.addAll(Arrays.asList(new Object[] { 
+//            "JXTitledPanel.title.foreground", new ColorUIResource(255, 255, 255),
+//            "JXTitledPanel.title.darkBackground", new ColorUIResource(49, 121, 242),
+//            "JXTitledPanel.title.lightBackground", new ColorUIResource(198, 211, 247),
+//            }));
+//        }
     }
 
     private boolean isMetal(LookAndFeelAddons addon) {
