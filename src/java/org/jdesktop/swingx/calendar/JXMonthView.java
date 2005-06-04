@@ -9,6 +9,7 @@ package org.jdesktop.swingx.calendar;
 import java.awt.*;
 import java.awt.event.*;
 import java.text.SimpleDateFormat;
+import java.text.DateFormatSymbols;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -49,7 +50,7 @@ import javax.swing.border.Border;
  * <pre>
  *    monthView.setFirstDayOfWeek(Calendar.MONDAY);
  *    monthView.setDaysOfTheWeek(
- *            new String[]{"S", "M", "T", "W", "R", "F", "S"});
+ *            new String[]{"S", "M", "T", "W", "Th", "F", "S"});
  * </pre>
  * <p>
  * This component supports flagging days.  These flagged days, which must be
@@ -107,11 +108,16 @@ public class JXMonthView extends JComponent {
      */
     public static final int WEEK_SELECTION = 3;
 
+    /** Return value used to identify when the month down button is pressed. */
+    public static final int MONTH_DOWN = 1;
+    /** Return value used to identify when the month up button is pressed. */
+    public static final int MONTH_UP = 2;
+
     /**
      * Insets used in determining the rectangle for the month string
      * background.
      */
-    protected Insets _monthStringInsets = new Insets(0,8,0,8);
+    protected Insets _monthStringInsets = new Insets(0,0,0,0);
 
     private static final int MONTH_DROP_SHADOW = 1;
     private static final int MONTH_LINE_DROP_SHADOW = 2;
@@ -119,6 +125,8 @@ public class JXMonthView extends JComponent {
 
     private int _boxPaddingX = 3;
     private int _boxPaddingY = 3;
+    private int _arrowPaddingX = 3;
+    private int _arrowPaddingY = 3;
     private static final int CALENDAR_SPACING = 10;
     private static final int DAYS_IN_WEEK = 7;
     private static final int MONTHS_IN_YEAR = 12;
@@ -159,15 +167,17 @@ public class JXMonthView extends JComponent {
     private int _selectionMode = SINGLE_SELECTION;
     private int _boxHeight;
     private int _boxWidth;
+    private int _monthBoxHeight;
     private int _calendarWidth;
     private int _calendarHeight;
     private int _firstDayOfWeek = Calendar.SUNDAY;
     private int _startX;
     private int _startY;
-    private int _dropShadowMask = MONTH_DROP_SHADOW;
+    private int _dropShadowMask = 0;
     private boolean _dirty = false;
     private boolean _antiAlias = false;
     private boolean _ltr;
+    private boolean _traversable = false;
     private boolean _asKirkWouldSay_FIRE = false;
     private Calendar _cal;
     private String[] _daysOfTheWeek;
@@ -176,11 +186,14 @@ public class JXMonthView extends JComponent {
     private Rectangle _bounds = new Rectangle();
     private Rectangle _dirtyRect = new Rectangle();
     private Color _todayBackgroundColor;
-    private Color _monthStringBackground = Color.LIGHT_GRAY;
-    private Color _selectedBackground = Color.LIGHT_GRAY;
+    private Color _monthStringBackground;
+    private Color _monthStringForeground;
+    private Color _selectedBackground;
     private SimpleDateFormat _dayOfMonthFormatter = new SimpleDateFormat("d");
     private String _actionCommand = "selectionChanged";
     private Timer _todayTimer = null;
+    private ImageIcon _monthDownImage;
+    private ImageIcon _monthUpImage;
 
     /**
      * Create a new instance of the <code>JXMonthView</code> class using the
@@ -217,21 +230,10 @@ public class JXMonthView extends JComponent {
         setFirstDisplayedDate(_cal.getTimeInMillis());
 
         // Get string representation of the months of the year.
-        _cal.set(Calendar.MONTH, _cal.getMinimum(Calendar.MONTH));
-        _cal.set(Calendar.DAY_OF_MONTH,
-                _cal.getActualMinimum(Calendar.DAY_OF_MONTH));
-        _monthsOfTheYear = new String[MONTHS_IN_YEAR];
-        SimpleDateFormat fullMonthNameFormatter =
-                new SimpleDateFormat("MMMM");
-        for (int i = 0; i < MONTHS_IN_YEAR; i++) {
-            _monthsOfTheYear[i] =
-                    fullMonthNameFormatter.format(_cal.getTime());
-            _cal.add(Calendar.MONTH, 1);
-        }
+        _monthsOfTheYear = new DateFormatSymbols().getMonths();
 
         setOpaque(true);
         setBackground(Color.WHITE);
-        setFont(new Font("Dialog", Font.PLAIN, 12));
         _todayBackgroundColor = getForeground();
 
         // Restore original time value.
@@ -251,28 +253,55 @@ public class JXMonthView extends JComponent {
 
         String[] daysOfTheWeek =
                 (String[])UIManager.get("JXMonthView.daysOfTheWeek");
-        // Use some meaningful default if the UIManager doesn't have anything
-        // for us.
         if (daysOfTheWeek == null) {
-            daysOfTheWeek = new String[] {"S", "M", "T", "W", "R", "F", "S"};
+            String[] dateFormatSymbols =
+                new DateFormatSymbols().getShortWeekdays();
+            daysOfTheWeek = new String[DAYS_IN_WEEK];
+            for (int i = Calendar.SUNDAY; i <= Calendar.SATURDAY; i++) {
+                daysOfTheWeek[i - 1] = dateFormatSymbols[i];
+            }
         }
         setDaysOfTheWeek(daysOfTheWeek);
 
-        Color color = UIManager.getColor("JXMonthView.monthStringBackground");
-        // Use some meaningful default if the UIManager doesn't have anything
-        // for us.
+        Color color =
+            UIManager.getColor("JXMonthView.monthStringBackground");
         if (color == null) {
-            color = Color.LIGHT_GRAY;
+            color = new Color(138, 173, 209);
         }
         setMonthStringBackground(color);
 
-        color = UIManager.getColor("JXMonthView.selectedBackground");
-        // Use some meaningful default if the UIManager doesn't have anything
-        // for us.
+        color = UIManager.getColor("JXMonthView.monthStringForeground");
         if (color == null) {
-            color = Color.LIGHT_GRAY;
+            color = Color.WHITE;
+        }
+        setMonthStringForeground(color);
+
+        color = UIManager.getColor("JXMonthView.selectedBackground");
+        if (color == null) {
+            color = new Color(138, 173, 209);
         }
         setSelectedBackground(color);
+
+        Font font = UIManager.getFont("JXMonthView.font");
+        if (font == null) {
+            font = UIManager.getFont("Button.font");
+        }
+        setFont(font);
+
+        String imageLocation =
+            UIManager.getString("JXMonthView.monthDownFileName");
+        if (imageLocation == null) {
+            imageLocation = "resources/month-down.png";
+        }
+        _monthDownImage = new ImageIcon(
+            JXMonthView.class.getResource(imageLocation));
+
+        imageLocation = UIManager.getString("JXMonthView.monthUpFileName");
+        if (imageLocation == null) {
+            imageLocation = "resources/month-up.png";
+        }
+        _monthUpImage = new ImageIcon(
+            JXMonthView.class.getResource(imageLocation));
     }
 
 
@@ -565,6 +594,28 @@ public class JXMonthView extends JComponent {
     }
 
     /**
+     * Returns whether or not the month view supports traversing months.
+     *
+     * @param true if month traversing is enabled, false otherwise.
+     */
+    public boolean getTraversable() {
+        return _traversable;
+    }
+
+    /**
+     * Set whether or not the month view will display buttons to allow the
+     * user to traverse to previous or next months.
+     *
+     * @param traversable set to true to enable month traversing,
+     *        false otherwise.
+     */
+    public void setTraversable(boolean traversable) {
+        _traversable = traversable;
+        _dirty = true;
+        repaint();
+    }
+
+    /**
      * Sets the single character representation for each day of the
      * week.  For this method the first days of the week days[0] is assumed to
      * be <code>Calendar.SUNDAY</code>.
@@ -580,7 +631,13 @@ public class JXMonthView extends JComponent {
             throw new IllegalArgumentException(
                     "Array of days is not of length 7 as expected.");
         }
+
+        // TODO: This could throw off internal size information we should
+        // call update and then recalculate displayed calendars and start
+        // positions.
         _daysOfTheWeek = days;
+        _dirty = true;
+        repaint();
     }
 
     /**
@@ -687,7 +744,7 @@ public class JXMonthView extends JComponent {
 
     /**
      * Sets the selected background color to <code>c</code>.  The default color
-     * is <code>Color.LIGHT_GRAY</code>.
+     * is <code>138, 173, 209 (Blue-ish)</code>
      *
      * @param c Selected background.
      */
@@ -724,10 +781,28 @@ public class JXMonthView extends JComponent {
 
     /**
      * Sets the color used to draw the background of the month string.  The
-     * default is <code>Color.LIGHT_GRAY</code>.
+     * default is <code>138, 173, 209 (Blue-ish)</code>.
      */
     public void setMonthStringBackground(Color c) {
         _monthStringBackground = c;
+        repaint();
+    }
+
+    /**
+     * Returns the color used to paint the month string foreground.
+     *
+     * @return Color Color.
+     */
+    public Color getMonthStringForeground() {
+        return _monthStringForeground;
+    }
+
+    /**
+     * Sets the color used to draw the foreground of the month string.  The
+     * default is <code>Color.WHITE</code>.
+     */
+    public void setMonthStringForeground(Color c) {
+        _monthStringForeground = c;
         repaint();
     }
 
@@ -851,12 +926,21 @@ public class JXMonthView extends JComponent {
             _cal.add(Calendar.MONTH, 1);
         }
 
+        // Loop through the days of the week and adjust the box width
+        // accordingly.
+        _boxHeight = fm.getHeight();
+        for (int i = 0; i < _daysOfTheWeek.length; i++) {
+            currWidth = fm.stringWidth(_daysOfTheWeek[i]);
+            if (currWidth > _boxWidth) {
+                _boxWidth = currWidth;
+            }
+        }
+
         // Loop through longest month and get largest representation of the day
         // of the month.
         _cal.set(Calendar.MONTH, longestMonth);
         _cal.set(Calendar.DAY_OF_MONTH,
                 _cal.getActualMinimum(Calendar.DAY_OF_MONTH));
-        _boxHeight = fm.getHeight();
         for (int i = 0; i < daysInLongestMonth; i++) {
             currWidth = fm.stringWidth(
                     _dayOfMonthFormatter.format(_cal.getTime()));
@@ -866,17 +950,33 @@ public class JXMonthView extends JComponent {
             _cal.add(Calendar.DAY_OF_MONTH, 1);
         }
 
+        // If the calendar is traversable, check the icon heights and
+        // adjust the month box height accordingly.
+        _monthBoxHeight = _boxHeight;
+        if (_traversable) {
+            int newHeight = _monthDownImage.getIconHeight() +
+                _arrowPaddingY + _arrowPaddingY;
+            if (newHeight > _monthBoxHeight) {
+                _monthBoxHeight = newHeight;
+            }
+        }
+
         // Modify _boxWidth if month string is longer
         _dim.width = (_boxWidth + (2 * _boxPaddingX)) * DAYS_IN_WEEK;
         if (_dim.width < longestMonthWidth) {
             double diff = longestMonthWidth - _dim.width;
+            if (_traversable) {
+                diff += _monthDownImage.getIconWidth() +
+                        _monthUpImage.getIconWidth() + (_arrowPaddingX * 4);
+            }
             _boxWidth += Math.ceil(diff / (double)DAYS_IN_WEEK);
             _dim.width = (_boxWidth + (2 * _boxPaddingX)) * DAYS_IN_WEEK;
         }
 
         // Keep track of calendar width and height for use later.
         _calendarWidth = (_boxWidth + (2 * _boxPaddingX)) * DAYS_IN_WEEK;
-        _calendarHeight = (_boxPaddingY + _boxHeight + _boxPaddingY) * 8;
+        _calendarHeight = ((_boxPaddingY + _boxHeight + _boxPaddingY) * 7) +
+            (_boxPaddingY + _monthBoxHeight + _boxPaddingY);
 
         // Calculate minimum width/height for the component.
         _dim.height = (_calendarHeight * _minCalRows) +
@@ -892,6 +992,19 @@ public class JXMonthView extends JComponent {
 
         // Restore calendar.
         _cal.setTimeInMillis(_firstDisplayedDate);
+
+        calculateNumDisplayedCals();
+        calculateStartPosition();
+
+        if (_startSelectedDate != -1 || _endSelectedDate != -1) {
+            if (_startSelectedDate > _lastDisplayedDate ||
+                    _startSelectedDate < _firstDisplayedDate) {
+                // Already does the recalculation for the dirty rect.
+                ensureDateVisible(_startSelectedDate);
+            } else {
+                calculateDirtyRectForSelection();
+            }
+        }
     }
 
     private void updateToday() {
@@ -949,8 +1062,6 @@ public class JXMonthView extends JComponent {
      */
     public void setBorder(Border border) {
         super.setBorder(border);
-        calculateNumDisplayedCals();
-        calculateStartPosition();
         _dirty = true;
     }
 
@@ -967,18 +1078,7 @@ public class JXMonthView extends JComponent {
     public void setBounds(int x, int y, int width, int height) {
         super.setBounds(x, y, width, height);
 
-        calculateNumDisplayedCals();
-        calculateStartPosition();
-
-        if (_startSelectedDate != -1 || _endSelectedDate != -1) {
-            if (_startSelectedDate > _lastDisplayedDate ||
-                    _startSelectedDate < _firstDisplayedDate) {
-                // Already does the recalculation for the dirty rect.
-                ensureDateVisible(_startSelectedDate);
-            } else {
-                calculateDirtyRectForSelection();
-            }
-        }
+        _dirty = true;
     }
 
     /**
@@ -1009,6 +1109,7 @@ public class JXMonthView extends JComponent {
         super.setComponentOrientation(o);
         _ltr = o.isLeftToRight();
         calculateStartPosition();
+        calculateDirtyRectForSelection();
     }
 
     /**
@@ -1119,33 +1220,47 @@ public class JXMonthView extends JComponent {
                 _bounds.x = _ltr ? x : x - _calendarWidth;
                 _bounds.y = y + _boxPaddingY;
                 _bounds.width = _calendarWidth;
-                _bounds.height = _boxHeight;
+                _bounds.height = _monthBoxHeight;
 
                 if (_bounds.intersects(clip)) {
                     // Paint month name background.
                     paintMonthStringBackground(g, _bounds.x, _bounds.y,
                             _bounds.width, _bounds.height);
 
+                    // Paint arrow buttons for traversing months if enabled.
+                    if (_traversable) {
+                        tmpX = _bounds.x + _arrowPaddingX;
+                        tmpY = _bounds.y + (_bounds.height -
+                            _monthDownImage.getIconHeight()) / 2;
+                        g.drawImage(_monthDownImage.getImage(),
+                            tmpX, tmpY, null);
+
+                        tmpX = _bounds.x + _bounds.width - _arrowPaddingX -
+                                _monthUpImage.getIconWidth();
+                        g.drawImage(_monthUpImage.getImage(), tmpX, tmpY, null);
+                    }
+
                     // Paint month name.
-                    g.setColor(getForeground());
+                    g.setColor(_monthStringForeground);
                     tmpX = _ltr ? 
                             x + (_calendarWidth / 2) -
                                 (fm.stringWidth(monthName) / 2) :
                             x - (_calendarWidth / 2) -
                                 (fm.stringWidth(monthName) / 2) - 1;
-                    tmpY = y + _boxPaddingY + _boxHeight - fm.getDescent();
-
-                    g.drawString(monthName, tmpX, tmpY);
+                    tmpY = _bounds.y + ((_monthBoxHeight - _boxHeight) / 2) +
+                            fm.getAscent();
 
                     if ((_dropShadowMask & MONTH_DROP_SHADOW) != 0) {
                         g.setColor(shadowColor);
                         g.drawString(monthName, tmpX + 1, tmpY + 1);
-                        g.setColor(getForeground());
+                        g.setColor(_monthStringForeground);
                     }
+                    g.drawString(monthName, tmpX, tmpY);
                 }
+                g.setColor(getForeground());
 
                 _bounds.x = _ltr ? x : x - _calendarWidth;
-                _bounds.y = y + _boxPaddingY + _boxHeight +
+                _bounds.y = y + _boxPaddingY + _monthBoxHeight +
                     _boxPaddingY + _boxPaddingY;
                 _bounds.width = _calendarWidth;
                 _bounds.height = _boxHeight;
@@ -1156,6 +1271,8 @@ public class JXMonthView extends JComponent {
 
                     // Paint short representation of day of the week.
                     int dayIndex = _firstDayOfWeek - 1;
+                    Font oldFont = g.getFont();
+                    g.setFont(_derivedFont);
                     for (int i = 0; i < DAYS_IN_WEEK; i++) {
                         tmpX = _ltr ?
                                 x + (i * (_boxPaddingX + _boxWidth +
@@ -1168,41 +1285,20 @@ public class JXMonthView extends JComponent {
                                     (_boxWidth / 2) -
                                     (fm.stringWidth(_daysOfTheWeek[dayIndex]) /
                                     2);
-                        tmpY = y + _boxPaddingY + _boxHeight +
-                                    _boxPaddingY + _boxPaddingY +
-                                    fm.getAscent();
-                        g.drawString(_daysOfTheWeek[dayIndex], tmpX, tmpY);
+                        tmpY = _bounds.y + fm.getAscent();
                         if ((_dropShadowMask & WEEK_DROP_SHADOW) != 0) {
                             g.setColor(shadowColor);
                             g.drawString(_daysOfTheWeek[dayIndex],
                                     tmpX + 1, tmpY + 1);
                             g.setColor(getForeground());
                         }
+                        g.drawString(_daysOfTheWeek[dayIndex], tmpX, tmpY);
                         dayIndex++;
                         if (dayIndex == 7) {
                             dayIndex = 0;
                         }
                     }
-
-                    // Paint a line across bottom of days of the week.
-                    g.drawLine(_ltr ?
-                            x + 2 : x - 3,
-                            y + (_boxPaddingY * 3) + (_boxHeight * 2),
-                            _ltr ?
-                                x + _calendarWidth - 3 :
-                                x - _calendarWidth + 2,
-                            y + (_boxPaddingY * 3) + (_boxHeight * 2));
-                    if ((_dropShadowMask & MONTH_LINE_DROP_SHADOW) != 0) {
-                        g.setColor(shadowColor);
-                        g.drawLine(_ltr ?
-                                x + 3 : x - 2,
-                                y + (_boxPaddingY * 3) + (_boxHeight * 2) + 1,
-                                _ltr ?
-                                    x + _calendarWidth - 2 :
-                                    x - _calendarWidth + 3,
-                                y + (_boxPaddingY * 3) + (_boxHeight * 2) + 1);
-                        g.setColor(getForeground());
-                    }
+                    g.setFont(oldFont);
                 }
 
                 // Check if the month to paint falls in the clip.
@@ -1350,7 +1446,7 @@ public class JXMonthView extends JComponent {
     protected void paintMonthStringBackground(Graphics g, int x, int y,
             int width, int height) {
         // Modify bounds by the month string insets.
-        x = _ltr ? x + _monthStringInsets.left : x + _monthStringInsets.left;
+        x = _ltr ? x + _monthStringInsets.left : x + _monthStringInsets.right;
         y = y + _monthStringInsets.top;
         width = width - _monthStringInsets.left - _monthStringInsets.right;
         height = height - _monthStringInsets.top - _monthStringInsets.bottom;
@@ -1483,7 +1579,8 @@ public class JXMonthView extends JComponent {
         bounds.x = _ltr ? _startX + bounds.x : _startX - bounds.x;
 
         // Initial offset for Month and Days of the Week display.
-        bounds.y = 2 * (_boxPaddingY + _boxHeight + _boxPaddingY);
+        bounds.y = _boxPaddingY + _monthBoxHeight + _boxPaddingY +
+            + _boxPaddingY + _boxHeight + _boxPaddingY;
 
         // Offset for centering and row the calendar is displayed in.
         bounds.y += _startY + calRowIndex *
@@ -1523,9 +1620,10 @@ public class JXMonthView extends JComponent {
         }
 
         // Determine what row (week) in the selected month we're in.
-        int row;
-        row = ((y - _startY) -
-                (calRow * (_calendarHeight + CALENDAR_SPACING))) /
+        int row = 1;
+        row += (((y - _startY) -
+                (calRow * (_calendarHeight + CALENDAR_SPACING))) -
+                (_boxPaddingY + _monthBoxHeight + _boxPaddingY)) /
                 (_boxPaddingY + _boxHeight + _boxPaddingY);
         // The first two lines in the calendar are the month and the days
         // of the week.  Ignore them.
@@ -1571,6 +1669,52 @@ public class JXMonthView extends JComponent {
         _cal.setTimeInMillis(_firstDisplayedDate);
 
         return selected;
+    }
+
+    /**
+     * Returns an index defining which, if any, of the buttons for
+     * traversing the month was pressed.  This method should only be
+     * called when <code>setTraversable</code> is set to true.
+     *
+     * @return MONTH_UP, MONTH_DOWN or -1 when no button is selected.
+     */
+    protected int getTraversableButtonAt(int x, int y) {
+        if (_ltr ? (_startX > x) : (_startX < x) || _startY > y) {
+            return -1;
+        }
+
+        // Determine which column of calendars we're in.
+        int calCol = (_ltr ? (x - _startX) : (_startX - x)) /
+                (_calendarWidth + CALENDAR_SPACING);
+
+        // Determine which row of calendars we're in.
+        int calRow = (y - _startY) / (_calendarHeight + CALENDAR_SPACING);
+
+        if (calRow > _numCalRows - 1 || calCol > _numCalCols - 1) {
+            return -1;
+        }
+
+        // See if we're in the month string area.
+        y = ((y - _startY) -
+            (calRow * (_calendarHeight + CALENDAR_SPACING))) - _boxPaddingY;
+        if (y < _arrowPaddingY || y > (_monthBoxHeight - _arrowPaddingY)) {
+            return -1;
+        }
+
+        x = ((_ltr ? (x - _startX) : (_startX - x)) -
+            (calCol * (_calendarWidth + CALENDAR_SPACING)));
+
+        if (x > _arrowPaddingX && x < (_arrowPaddingX +
+                _monthDownImage.getIconWidth() + _arrowPaddingX)) {
+            return MONTH_DOWN;
+        }
+
+        if (x > (_calendarWidth - _arrowPaddingX * 2 -
+                _monthUpImage.getIconWidth()) &&
+                x < (_calendarWidth - _arrowPaddingX)) {
+            return MONTH_UP;
+        }
+        return -1;
     }
 
     private void calculateDirtyRectForSelection() {
@@ -1661,17 +1805,32 @@ public class JXMonthView extends JComponent {
      * {@inheritDoc}
      */
     protected void processMouseEvent(MouseEvent e) {
-        if (!isEnabled() || _selectionMode == NO_SELECTION) {
+        if (!isEnabled()) {
             return;
         }
 
         int id = e.getID();
 
-        if (id == MouseEvent.MOUSE_PRESSED) {
-            int x = e.getX();
-            int y = e.getY();
+        // Check if one of the month traverse buttons was pushed.
+        if (id == MouseEvent.MOUSE_PRESSED && _traversable) {
+            int arrowType = getTraversableButtonAt(e.getX(), e.getY());
+            if (arrowType == MONTH_DOWN) {
+                setFirstDisplayedDate(
+                    DateUtils.getPreviousMonth(getFirstDisplayedDate()));
+                return;
+            } else if (arrowType == MONTH_UP) {
+                setFirstDisplayedDate(
+                    DateUtils.getNextMonth(getFirstDisplayedDate()));
+                return;
+            }
+        }
 
-            long selected = getDayAt(x, y);
+        if (_selectionMode == NO_SELECTION) {
+            return;
+        }
+
+        if (id == MouseEvent.MOUSE_PRESSED) {
+            long selected = getDayAt(e.getX(), e.getY());
             if (selected == -1) {
                 return;
             }
@@ -1694,7 +1853,7 @@ public class JXMonthView extends JComponent {
             _cal.setTimeInMillis(_firstDisplayedDate);
 
             // Repaint the old dirty area.
-                repaint(_dirtyRect);
+            repaint(_dirtyRect);
 
             // Repaint the new dirty area.
             repaint(_bounds);
@@ -1766,7 +1925,7 @@ public class JXMonthView extends JComponent {
                     count++;
                 }
     
-                if (count > 7) {
+                if (count > DAYS_IN_WEEK) {
                     // Move the start date to the first day of the week.
                     _cal.setTimeInMillis(start);
                     int dayOfWeek = _cal.get(Calendar.DAY_OF_WEEK);

@@ -9,15 +9,15 @@ package org.jdesktop.swingx;
 import java.awt.*;
 import java.awt.event.*;
 import java.text.ParseException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.*;
+import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.border.*;
-import org.jdesktop.swingx.calendar.DateSpan;
-import org.jdesktop.swingx.calendar.DateUtils;
-import org.jdesktop.swingx.calendar.JXDatePickerFormatterFactory;
-import org.jdesktop.swingx.calendar.JXMonthView;
-
+import javax.swing.text.DefaultFormatterFactory;
+import org.jdesktop.swingx.calendar.*;
 
 /**
  * A component that combines a button, an editable field and a JXMonthView
@@ -31,12 +31,13 @@ import org.jdesktop.swingx.calendar.JXMonthView;
  */
 public class JXDatePicker extends JComponent {
     /** The editable date field that displays the date */
-    protected JFormattedTextField _dateField;
+    private JFormattedTextField _dateField;
+
     /**
      * Popup that displays the month view with controls for
      * traversing/selecting dates.
      */
-    protected JXDatePickerPopup _popup;
+    private JXDatePickerPopup _popup;
     private JButton _popupButton;
     private int _popupButtonWidth = 20;
     private JXMonthView _monthView;
@@ -45,7 +46,8 @@ public class JXDatePicker extends JComponent {
 
     /**
      * Create a new date picker using the current date as the initial
-     * selection.
+     * selection and the default abstract formatter
+     * <code>JXDatePickerFormatter</code>.
      */
     public JXDatePicker() {
         this(System.currentTimeMillis());
@@ -53,13 +55,16 @@ public class JXDatePicker extends JComponent {
 
     /**
      * Create a new date picker using the specified time as the initial
-     * seleciton.
+     * selection and the default abstract formatter
+     * <code>JXDatePickerFormatter</code>.
      *
      * @param millis initial time in milliseconds
      */
     public JXDatePicker(long millis) {
-        _dateField = new JFormattedTextField(
-            new JXDatePickerFormatterFactory());
+        _monthView = new JXMonthView();
+        _monthView.setTraversable(true);
+
+        _dateField = new JFormattedTextField(new JXDatePickerFormatter());
         _dateField.setName("dateField");
         _dateField.setBorder(null);
 
@@ -114,8 +119,7 @@ public class JXDatePicker extends JComponent {
 
         Icon icon = UIManager.getIcon("JXDatePicker.arrowDown.image");
         if (icon == null) {
-            icon = new ImageIcon(getClass().getResource(
-                    "/toolbarButtonGraphics/navigation/Down24.gif"));
+            icon = (Icon)UIManager.get("Tree.expandedIcon");
         }
         _popupButton.setIcon(icon);
 
@@ -126,6 +130,54 @@ public class JXDatePicker extends JComponent {
                     BorderFactory.createEmptyBorder(3, 3, 3, 3));
         }
         _dateField.setBorder(border);
+    }
+
+    /**
+     * Replaces the currently installed formatter and factory used by the
+     * editor.  These string formats are defined by the
+     * <code>java.text.SimpleDateFormat</code> class.
+     *
+     * @param formats The string formats to use.
+     * @see java.text.SimpleDateFormat
+     */
+    public void setFormats(String[] formats) {
+        DateFormat[] dateFormats = new DateFormat[formats.length];
+        for (int counter = formats.length - 1; counter >= 0; counter--) {
+            dateFormats[counter] = new SimpleDateFormat(formats[counter]);
+        }
+        setFormats(dateFormats);
+    }
+
+    /**
+     * Replaces the currently installed formatter and factory used by the
+     * editor.
+     *
+     * @param formats The date formats to use.
+     */
+    public void setFormats(DateFormat[] formats) {
+        _dateField.setFormatterFactory(new DefaultFormatterFactory(
+                                new JXDatePickerFormatter(formats)));
+    }
+
+    /**
+     * Returns an array of the formats used by the installed formatter
+     * if it is a subclass of <code>JXDatePickerFormatter<code>.
+     * <code>javax.swing.JFormattedTextField.AbstractFormatter</code>
+     * and <code>javax.swing.text.DefaultFormatter</code> do not have
+     * support for accessing the formats used.
+     *
+     * @return array of formats or null if unavailable.
+     */
+    public DateFormat[] getFormats() {
+        // Dig this out from the factory, if possible, otherwise return null.
+        AbstractFormatterFactory factory = _dateField.getFormatterFactory();
+        if (factory != null) {
+            AbstractFormatter formatter = factory.getFormatter(_dateField);
+            if (formatter instanceof JXDatePickerFormatter) {
+                return ((JXDatePickerFormatter)formatter).getFormats();
+            }
+        }
+        return null;
     }
 
     /**
@@ -165,33 +217,27 @@ public class JXDatePicker extends JComponent {
     }
 
     /**
+     * Return the <code>JXMonthView</code> used in the popup to
+     * select dates from.
+     *
+     * @return the month view component
+     */
+    public JXMonthView getMonthView() {
+        return _monthView;
+    }
+
+    public void setMonthView(JXMonthView monthView) {
+        _monthView = monthView;
+        _popup = null;
+    }
+
+    /**
      * Returns the formatted text field used to edit the date selection.
      *
      * @return the formatted text field
      */
     public JFormattedTextField getEditor() {
         return _dateField;
-    }
-
-    /**
-     * Return the AbstractFormatterFactory for this instance of the
-     * JXDatePicker.
-     *
-     * @return the AbstractFormatterFactory
-     */
-    public AbstractFormatterFactory getDateFormatterFactory() {
-        return _dateField.getFormatterFactory();
-    }
-
-    /**
-     * Set the AbstractFormatterFactory to be used by this instance of the
-     * JXDatePicker.
-     *
-     * @param dateFormatterFactory the AbstractFormatterFactory
-     */
-    public void setDateFormatterFactory(
-            AbstractFormatterFactory dateFormatterFactory) {
-        _dateField.setFormatterFactory(dateFormatterFactory);
     }
 
     /**
@@ -437,51 +483,30 @@ public class JXDatePicker extends JComponent {
      * popup will automatically hide itself and enter the selection into the
      * editable field of the JXDatePicker.
      */
-    private class JXDatePickerPopup extends JPopupMenu
+    protected class JXDatePickerPopup extends JPopupMenu
             implements ActionListener {
-        private JButton _nextButton;
-        private JButton _previousButton;
-        private JButton _todayButton;
+        private JLabel _todayLabel;
 
         public JXDatePickerPopup() {
-            _monthView = new JXMonthView();
             _monthView.setActionCommand("MONTH_VIEW");
             _monthView.addActionListener(this);
 
             JPanel panel = new JPanel(new FlowLayout());
-            Icon icon = UIManager.getIcon("JXMonthView.monthUp.image");
-            if (icon == null) {
-                icon = new ImageIcon(getClass().getResource(
-                        "/toolbarButtonGraphics/navigation/Up24.gif"));
-            }
-            _previousButton = new JButton(icon);
-            _previousButton.setActionCommand("PREVIOUS_MONTH");
-            _previousButton.addActionListener(this);
-
-            icon = UIManager.getIcon("JXMonthView.monthDown.image");
-            if (icon == null) {
-                icon = new ImageIcon(getClass().getResource(
-                        "/toolbarButtonGraphics/navigation/Down24.gif"));
-            }
-            _nextButton = new JButton(icon);
-            _nextButton.setActionCommand("NEXT_MONTH");
-            _nextButton.addActionListener(this);
-
-            icon = UIManager.getIcon("JXMonthView.monthCurrent.image");
-            if (icon == null) {
-                icon = new ImageIcon(getClass().getResource(
-                        "/toolbarButtonGraphics/media/Stop24.gif"));
-            }
-            _todayButton = new JButton(icon);
-            _todayButton.setActionCommand("TODAY");
-            _todayButton.addActionListener(this);
+            panel.setBackground(_monthView.getBackground());
 
             setLayout(new BorderLayout());
             add(_monthView, BorderLayout.CENTER);
 
-            panel.add(_previousButton);
-            panel.add(_todayButton);
-            panel.add(_nextButton);
+            _todayLabel = new JLabel("Today");
+            _todayLabel.addMouseListener(new MouseAdapter() {
+                public void mousePressed(MouseEvent ev) {
+                    DateSpan span = new DateSpan(System.currentTimeMillis(),
+                        System.currentTimeMillis());
+                    _monthView.ensureDateVisible(span.getStart());
+                }
+            });
+            _todayLabel.setForeground(Color.RED);
+            panel.add(_todayLabel);
             add(panel, BorderLayout.NORTH);
         }
 
@@ -492,17 +517,94 @@ public class JXDatePicker extends JComponent {
                 _dateField.setValue(span.getStartAsDate());
                 _popup.setVisible(false);
                 fireActionPerformed();
-            } else if ("PREVIOUS_MONTH" == command) {
-                _monthView.setFirstDisplayedDate(DateUtils.getPreviousMonth(
-                              _monthView.getFirstDisplayedDate()));
-            } else if ("NEXT_MONTH" == command) {
-                _monthView.setFirstDisplayedDate(DateUtils.getNextMonth(
-                                   _monthView.getFirstDisplayedDate()));
-            } else if ("TODAY" == command) {
-                DateSpan span = new DateSpan(System.currentTimeMillis(),
-                    System.currentTimeMillis());
-                _monthView.ensureDateVisible(span.getStart());
             }
+        }
+    }
+
+    /**
+     * Default formatter for the JXDatePicker component.  This factory
+     * creates and returns a formatter that can handle a variety of date
+     * formats.
+     */
+    static class JXDatePickerFormatter extends
+            JFormattedTextField.AbstractFormatter {
+        private DateFormat _formats[] = null;
+        private int _formatIndex = 0;
+
+        public JXDatePickerFormatter() {
+            _formats = new DateFormat[3];
+            String format = UIManager.getString("JXDatePicker.longFormat");
+            if (format == null) {
+                format = "EEE MM/dd/yyyy";
+            }
+            _formats[0] = new SimpleDateFormat(format);
+
+            format = UIManager.getString("JXDatePicker.mediumFormat");
+            if (format == null) {
+                format = "MM/dd/yyyy";
+            }
+            _formats[1] = new SimpleDateFormat(format);
+
+            format = UIManager.getString("JXDatePicker.shortFormat");
+            if (format == null) {
+                format = "MM/dd";
+            }
+            _formats[2] = new SimpleDateFormat(format);
+        }
+
+        public JXDatePickerFormatter(DateFormat formats[]) {
+            _formats = formats;
+        }
+
+        public DateFormat[] getFormats() {
+            return _formats;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public Object stringToValue(String text) throws ParseException {
+            Object result = null;
+            ParseException pex = null;
+
+            if (text == null || text.trim().length() == 0) {
+                return null;
+            }
+
+            // If the current formatter did not work loop through the other
+            // formatters and see if any of them can parse the string passed
+            // in.
+            if (result == null) {
+                for (int i = 0; i < _formats.length; i++) {
+                    try {
+                        result = ((DateFormat)_formats[i]).parse(text);
+
+                        // We got a successful formatter.  Update the
+                        // current formatter index.
+                        _formatIndex = i;
+                        pex = null;
+                        break;
+                    } catch (ParseException ex) {
+                        pex = ex;
+                    }
+                }
+            }
+
+            if (pex != null) {
+                throw pex;
+            }
+            
+            return result;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public String valueToString(Object value) throws ParseException {
+            if (value != null) {
+                return _formats[_formatIndex].format(value);
+            }
+            return null;
         }
     }
 }
