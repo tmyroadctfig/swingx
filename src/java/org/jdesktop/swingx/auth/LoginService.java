@@ -8,20 +8,25 @@ package org.jdesktop.swingx.auth;
  */
 
 
+import java.io.IOException;
 import java.util.*;
 import java.awt.EventQueue;
+import javax.swing.SwingUtilities;
 /**
  * <b>LoginService</b> is the abstract base class for all classes implementing
  * a login mechanism. It allows you to customize the threading behaviour
  * used to perform the login. Subclasses need to override the <b>authenticate</b>
  * method.
+ * Subclasses may implement the getUserRoles() method to return a meaningful value
+ * this method will be called once upon a successful login to determine the user roles.
+ * It is not defined as abstract to simplify the task of implementing a login service
+ * for those who do not require this functionality.
  *
  * @author Bino George
+ * @authro Shai Almog
  */
 public abstract class LoginService {
-    
      private Vector<LoginListener> listenerList = new Vector<LoginListener>();
-
      private Thread loginThread;
     
      /*
@@ -32,9 +37,11 @@ public abstract class LoginService {
      private boolean canceled;
      private String server;
      
+     public LoginService() {
+     }
      
-     public LoginService(String serverName) {
-     	setServer(serverName);
+     public LoginService(String server) {
+         setServer(server);
      }
      
     /**
@@ -48,7 +55,15 @@ public abstract class LoginService {
      * @param password password
      * @param server server (optional)
      */
-    public abstract boolean authenticate(String name, char[] password, String server);
+    public abstract boolean authenticate(String name, char[] password, String server) throws IOException;
+    
+    /**
+     * Called immediately after a successful authentication. This method should return an array
+     * of user roles or null if role based permissions are not used.
+     */
+    public String[] getUserRoles() {
+        return null;
+    }
     
     /**
      * Notifies the LoginService that an already running
@@ -61,7 +76,7 @@ public abstract class LoginService {
     	canceled = true;
     	EventQueue.invokeLater(new Runnable() {
             public void run() {
-                fireLoginCanceled(new EventObject(this)); 
+                fireLoginCanceled(new LoginEvent(this)); 
             } 
          });
     }
@@ -85,29 +100,37 @@ public abstract class LoginService {
      * @param password password
      * @param server server
      */
-    public void startAuthentication(final String user, final char[] password, final String server) {
+    public void startAuthentication(final String user, final char[] password, final String server) throws IOException {
        canceled = false;
        if (getSynchronous()) {
          if (authenticate(user,password,server)) {
-           fireLoginSucceeded(new EventObject(this));  
+           fireLoginSucceeded(new LoginEvent(this));  
          } else {
-           fireLoginFailed(new EventObject(this));  
+           fireLoginFailed(new LoginEvent(this));  
          }  
        } else {
          Runnable runnable = new Runnable() {
            public void run() {
-             final boolean result = authenticate(user,password,server);
-             if (!canceled) {
-             EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                   if (result) {
-                      fireLoginSucceeded(new EventObject(this));  
-                   }
-                   else {
-                      fireLoginFailed(new EventObject(this)); 
-                   }
-                } 
-             });
+             try {
+                 final boolean result = authenticate(user,password,server);
+                 if (!canceled) {
+                     EventQueue.invokeLater(new Runnable() {
+                        public void run() {
+                           if (result) {
+                              fireLoginSucceeded(new LoginEvent(LoginService.this));  
+                           }
+                           else {
+                              fireLoginFailed(new LoginEvent(LoginService.this)); 
+                           }
+                        } 
+                     });
+                 }
+             } catch(final IOException failed) {
+                 SwingUtilities.invokeLater(new Runnable() {
+                     public void run() {
+                         fireLoginFailed(new LoginEvent(LoginService.this, failed));
+                     }
+                 });
              }
            }  
          };  
@@ -151,7 +174,7 @@ public abstract class LoginService {
     }
     
     
-    void fireLoginSucceeded(final EventObject source) {
+    void fireLoginSucceeded(final LoginEvent source) {
         Iterator iter = listenerList.iterator();
         while (iter.hasNext()) {
             LoginListener listener = (LoginListener) iter.next();
@@ -159,7 +182,7 @@ public abstract class LoginService {
         }
     }
     
-    void fireLoginFailed(final EventObject source) {
+    void fireLoginFailed(final LoginEvent source) {
         Iterator iter = listenerList.iterator();
         while (iter.hasNext()) {
             LoginListener listener = (LoginListener) iter.next();
@@ -167,7 +190,7 @@ public abstract class LoginService {
         }
     }
     
-    void fireLoginCanceled(final EventObject source) {
+    void fireLoginCanceled(final LoginEvent source) {
         Iterator iter = listenerList.iterator();
         while (iter.hasNext()) {
             LoginListener listener = (LoginListener) iter.next();
