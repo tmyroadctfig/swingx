@@ -208,4 +208,8 @@ public class JXPanel extends JPanel implements Scrollable {
     public void setScrollableTracksViewportWidth(boolean scrollableTracksViewportWidth) {
         this.scrollableTracksViewportWidth = scrollableTracksViewportWidth;
     }
+    
+    public void setDrawGradient(boolean value) {
+        //STUB -- the real code is in my other workspace :(
+    }
 }
