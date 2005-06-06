@@ -1,11 +1,10 @@
-package org.jdesktop.swingx;
-
 /*
  * $Id$
  *
  * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
  * Santa Clara, California 95054, U.S.A. All rights reserved.
  */
+package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -60,6 +59,7 @@ import org.jdesktop.swingx.auth.*;
  *
  * @author Bino George
  * @author Shai Almog
+ * @author rbair
  */
 
 public class JXLoginPanel extends JXImagePanel {

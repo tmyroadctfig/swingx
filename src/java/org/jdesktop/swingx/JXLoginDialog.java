@@ -1,11 +1,8 @@
 /*
- * JXLoginDialog.java
+ * $Id$
  *
- * Created on June 4, 2005, 1:24 PM
- *
- * To change this template, choose Tools | Options and locate the template under
- * the Source Creation and Management node. Right-click the template and choose
- * Open. You can then make changes to the template in the Source Editor.
+ * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
+ * Santa Clara, California 95054, U.S.A. All rights reserved.
  */
 
 package org.jdesktop.swingx;
