@@ -38,6 +38,8 @@ import javax.swing.JLabel;
  * <code>JXImagePanel</code> a FileChooser is shown allowing the user to pick
  * some other image to use within the <code>JXImagePanel</code>.</p>
  *
+ * <p>Images to be displayed can be set based on URL, Image, etc.
+ *
  * @author unattributed, rbair
  */
 public class JXImagePanel extends JXPanel {
@@ -50,7 +52,7 @@ public class JXImagePanel extends JXPanel {
     /**
      * The image to draw
      */
-    private ImageIcon img;
+    private BufferedImage img;
     /**
      * If true, then the image can be changed. Perhaps a better name is
      * &quot;readOnly&quot;, but editable was chosen to be more consistent
@@ -77,7 +79,7 @@ public class JXImagePanel extends JXPanel {
     
     public JXImagePanel(URL imageUrl) {
         try {
-            setIcon(new ImageIcon(imageUrl));
+            setImage((BufferedImage)new ImageIcon(imageUrl).getImage());
         } catch (Exception e) {
             //TODO need to log
             e.printStackTrace();
@@ -91,10 +93,10 @@ public class JXImagePanel extends JXPanel {
      * image to be painted. If the preferred size has not been explicitly set,
      * then the image dimensions will alter the preferred size of the panel.
      */
-    public void setIcon(ImageIcon image) {
+    public void setImage(BufferedImage image) {
         if (image != img) {
-            ImageIcon oldImage = img;
-            img = (ImageIcon)image;
+            BufferedImage oldImage = img;
+            img = image;
             firePropertyChange("icon", oldImage, img);
             invalidate();
             repaint();
@@ -104,7 +106,7 @@ public class JXImagePanel extends JXPanel {
     /**
      * @return the image used for painting the background of this panel
      */
-    public ImageIcon getIcon() {
+    public BufferedImage getImage() {
         return img;
     }
     
@@ -166,7 +168,7 @@ public class JXImagePanel extends JXPanel {
     public Dimension getPreferredSize() {
         if (preferredSize == null && img != null) {
             //it has not been explicitly set, so return the width/height of the image
-            return new Dimension(img.getIconWidth(), img.getIconHeight());
+            return new Dimension(img.getWidth(), img.getHeight());
         } else {
             return super.getPreferredSize();
         }
@@ -177,19 +179,19 @@ public class JXImagePanel extends JXPanel {
      */
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D)g;
         if (img != null) {
             switch (style) {
                 case CENTERED:
-                    g.drawImage(img.getImage(),
-                            (getWidth() - img.getIconWidth()) / 2,
-                            (getHeight() - img.getIconHeight()) / 2,
-                            img.getImageObserver());
+                    g2.drawImage(img, null,
+                            (getWidth() - img.getWidth()) / 2,
+                            (getHeight() - img.getHeight()) / 2);
                     break;
                 case TILED:
                 case SCALED:
                 default:
                     System.err.println("unimplemented");
-                    g.drawImage(img.getImage(), 0, 0, img.getImageObserver());
+                    g2.drawImage(img, null, 0, 0);
                     break;
             }
         }
@@ -210,7 +212,7 @@ public class JXImagePanel extends JXPanel {
             if (retVal == JFileChooser.APPROVE_OPTION) {
                 File file = chooser.getSelectedFile();
                 try {
-                    setIcon(new ImageIcon(file.toURL()));
+                    setImage((BufferedImage)new ImageIcon(file.toURL()).getImage());
                 } catch (Exception ex) {
                 }
             }
