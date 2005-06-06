@@ -85,129 +85,6 @@ public static boolean TRACE = false;
     // MUST ALWAYS ACCESS dataAdapter through accessor method!!!
     private final ComponentAdapter dataAdapter = new TableAdapter(this);
 
-    // No need to define a separate JTableHeader subclass!
-    // JW: on the contrary - should be moved to dedicated JTableHeader subclass
-    // (never act on behalf of other components - except with good reason <g>)
-    // there's some weirdness (caused by JTable) when overriding 
-    // createDefaultTableHeader - check!
-    private final static MouseInputListener   headerListener = new MouseInputListener () {
-        private TableColumn resizingColumn;
-
-        public void mouseClicked(MouseEvent e) {
-            if (shouldIgnore(e)) {
-                return;
-            }
-            if (isInResizeRegion(e)) {
-                doResize(e);
-                return;
-            }
-            JTableHeader    header = (JTableHeader) e.getSource();
-            JXTable     table = (JXTable) header.getTable();
-            if (!table.isSortable() || (e.getClickCount() != 1)) return;
-            if ((e.getModifiersEx() & e.SHIFT_DOWN_MASK) == e.SHIFT_DOWN_MASK) {
-                table.resetSorter();
-            }
-            else {
-
-                int column = header.columnAtPoint(e.getPoint());
-                if (column >= 0) {
-                    table.setSorter(column);
-                }
-            }
-            uncacheResizingColumn();
-            header.repaint();
-        }
-
-        private boolean shouldIgnore(MouseEvent e) {
-            return !SwingUtilities.isLeftMouseButton(e);
-                   // && table.isEnabled());
-        }
-
-        private void doResize(MouseEvent e) {
-            if (e.getClickCount() != 2) return;
-                JTableHeader header = (JTableHeader) e.getSource();
-                if (header.getTable() instanceof JXTable) {
-                 //   int column = header.columnAtPoint(e.getPoint());
-                    int column = getViewIndexForColumn(header, resizingColumn);
-                    System.out.println(column);
-                    if (column >= 0) {
-                        ((JXTable) header.getTable()).packColumn(column, 5);
-                    }
-                }
-                uncacheResizingColumn();
-
-        }
-
-        private int getViewIndexForColumn(JTableHeader header, TableColumn aColumn) {
-            if (aColumn == null) return -1;
-            TableColumnModel cm = header.getColumnModel();
-            for (int column = 0; column < cm.getColumnCount(); column++) {
-                if (cm.getColumn(column) == aColumn) {
-                    return column;
-                }
-            }
-            return -1;
-        }
-        
-        public void mouseReleased(MouseEvent e) {
-            cacheResizingColumn(e);
-        }
-
-        public void mousePressed(MouseEvent e) {
-            cacheResizingColumn(e);
-        }
-        
-        private void cacheResizingColumn(MouseEvent e) {
-            if (e.getClickCount() != 1) return;
-            TableColumn column = ((JTableHeader)e.getSource()).getResizingColumn();
-            if (column != null) {
-                resizingColumn = column;
-            }
-        }
-
-        private void uncacheResizingColumn() {
-            resizingColumn = null;
-        }
-
-        private boolean isInResizeRegion(MouseEvent e) {
-//            JTableHeader header = (JTableHeader) e.getSource();
-//            // JW: kind of a hack - there's no indication in the 
-//            // JTableHeader api to find if we are in the resizing
-//            // region before actually receiving a click
-//            // checked the header.resizingColumn should be set on
-//            // first click?
-//            // doesn't work probably because this listener is messaged before
-//            // ui-delegate listener
-//            // return header.getResizingColumn() != null;
-//            Cursor cursor = header.getCursor();
-//            boolean inResize = cursor != null ? 
-//                    (cursor.getType() == Cursor.E_RESIZE_CURSOR || cursor.getType() == Cursor.W_RESIZE_CURSOR ) :
-//                     false;   
-            return resizingColumn != null; //inResize;
-            //return inResize;
-        }
-
-        public void mouseEntered(MouseEvent e) {
-            // TODO Auto-generated method stub
-            
-        }
-
-        public void mouseExited(MouseEvent e) {
-            uncacheResizingColumn();
-            
-        }
-
-        public void mouseDragged(MouseEvent e) {
-            uncacheResizingColumn();
-            
-        }
-
-        public void mouseMoved(MouseEvent e) {
-            //uncacheResizingColumn();
-            
-        }
-    };
-
     private boolean sortable = false;
     private int visibleRowCount = 18;
 
@@ -787,33 +664,9 @@ public static boolean TRACE = false;
     }
 
 
-    /**
-     * Adds private mouse listener to the table header (for sorting support)
-     * before handing it off to the super class for processing.
-     *
-     * @param tableHeader
-     */
-    public void setTableHeader(JTableHeader tableHeader) {
-        // This method is also called during construction of JTable
-        JTableHeader old = getTableHeader();
-        if (old != null) {
-            old.removeMouseListener(headerListener);
-            old.removeMouseMotionListener(headerListener);
-        }
-        if (tableHeader != null) {
-            tableHeader.addMouseListener(headerListener);
-            tableHeader.addMouseMotionListener(headerListener);
-//            tableHeader.setDefaultRenderer(
-//                    new DelegatingHeaderRenderer((DefaultTableCellRenderer) tableHeader.getDefaultRenderer()));
-            tableHeader.setDefaultRenderer(ColumnHeaderRenderer.createColumnHeaderRenderer());
-        }
-        super.setTableHeader(tableHeader);
+    protected JTableHeader createDefaultTableHeader() {
+        return new JXTableHeader(columnModel);
     }
-
-
-//    protected JTableHeader createDefaultTableHeader() {
-//        return new JXTableHeader(columnModel);
-//    }
 
 
     protected TableColumnModel createDefaultColumnModel() {
