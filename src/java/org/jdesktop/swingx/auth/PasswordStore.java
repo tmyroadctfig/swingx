@@ -1,11 +1,10 @@
-package org.jdesktop.swingx.auth;
-
 /*
  * $Id$
  *
  * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
  * Santa Clara, California 95054, U.S.A. All rights reserved.
  */
+package org.jdesktop.swingx.auth;
 
 /**
  *  PasswordStore specifies a mechanism to store passwords used to authenticate
@@ -14,8 +13,7 @@ package org.jdesktop.swingx.auth;
  *
  *	@author Bino George
  */
-public interface PasswordStore {
-    
+public abstract class PasswordStore {
     /**
      *  Saves a password for future use. 
      *
@@ -23,13 +21,13 @@ public interface PasswordStore {
      *  @param server server used for authentication
      *  @param password password to save
      */
+    public abstract boolean set(String username, String server, char[] password);
     
-    public boolean set(String username, String server, char[] password);
     /** 
      * Fetches the password for a given server and username
      *  @param username username
      *  @param server server
      *  @return password 
      */
-    public char[] get(String username, String server);
+    public abstract char[] get(String username, String server);
 }

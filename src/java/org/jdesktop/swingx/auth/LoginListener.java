@@ -22,25 +22,25 @@ public interface LoginListener {
      *
      * @param source panel that fired the event
      */
-    public void loginFailed(EventObject source);
+    public void loginFailed(LoginEvent source);
     /**
      *  Called by the <strong>JXLoginPanel</strong> when the Authentication
      *  operation is started.
      * @param source panel that fired the event
      */
-    public void loginStarted(EventObject source);
+    public void loginStarted(LoginEvent source);
     /**
      *  Called by the <strong>JXLoginPanel</strong> in the event of a login
      *  cancellation by the user.
      *
      * @param source panel that fired the event
      */
-    public void loginCanceled(EventObject source);
+    public void loginCanceled(LoginEvent source);
     /**
      *  Called by the <strong>JXLoginPanel</strong> in the event of a
      *  successful login.
      *
      * @param source panel that fired the event
      */
-    public void loginSucceeded(EventObject source);
+    public void loginSucceeded(LoginEvent source);
 }

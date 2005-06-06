@@ -1,12 +1,10 @@
-package org.jdesktop.swingx.auth;
-
 /*
  * $Id$
  *
  * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
  * Santa Clara, California 95054, U.S.A. All rights reserved.
  */
-
+package org.jdesktop.swingx.auth;
 
 import java.io.IOException;
 import java.util.*;
@@ -136,6 +134,7 @@ public abstract class LoginService {
          };  
          loginThread = getLoginThread(runnable) ; 
          loginThread.start();
+         fireLoginStarted(new LoginEvent(this));
        }
     }
     
@@ -173,6 +172,14 @@ public abstract class LoginService {
         listenerList.remove(listener);
     }
     
+    
+    void fireLoginStarted(final LoginEvent source) {
+        Iterator iter = listenerList.iterator();
+        while (iter.hasNext()) {
+            LoginListener listener = (LoginListener) iter.next();
+            listener.loginStarted(source);
+        }
+    }
     
     void fireLoginSucceeded(final LoginEvent source) {
         Iterator iter = listenerList.iterator();
