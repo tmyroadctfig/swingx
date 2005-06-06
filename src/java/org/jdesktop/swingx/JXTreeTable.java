@@ -7,8 +7,6 @@
 
 
 package org.jdesktop.swingx;
-import java.util.EventObject;
-import java.util.Enumeration;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -19,6 +17,8 @@ import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Enumeration;
+import java.util.EventObject;
 
 import javax.swing.ActionMap;
 import javax.swing.Icon;
@@ -34,6 +34,8 @@ import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.event.TreeWillExpandListener;
 import javax.swing.plaf.UIResource;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.table.AbstractTableModel;
@@ -44,6 +46,7 @@ import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
+
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
@@ -968,6 +971,65 @@ public class JXTreeTable extends JXTable {
         return renderer.getShowsRootHandles();
     }
 
+    /**
+     * Adds a listener for <code>TreeExpansion</code> events.
+     * 
+     * TODO (JW): redirect event source to this. 
+     * 
+     * @param tel a TreeExpansionListener that will be notified 
+     * when a tree node is expanded or collapsed
+     */
+    public void addTreeExpansionListener(TreeExpansionListener tel) {
+        renderer.addTreeExpansionListener(tel);
+    }
+
+    /**
+     * Removes a listener for <code>TreeExpansion</code> events.
+     * @param tel the <code>TreeExpansionListener</code> to remove
+     */
+    public void removeTreeExpansionListener(TreeExpansionListener tel) {
+        renderer.removeTreeExpansionListener(tel);
+    }
+
+    /**
+     * Adds a listener for <code>TreeSelection</code> events.
+     * TODO (JW): redirect event source to this. 
+     * 
+     * @param tsl a TreeSelectionListener that will be notified 
+     * when a tree node is selected or deselected
+     */
+    public void addTreeSelectionListener(TreeSelectionListener tsl) {
+        renderer.addTreeSelectionListener(tsl);
+    }
+
+    /**
+     * Removes a listener for <code>TreeSelection</code> events.
+     * @param tsl the <code>TreeSelectionListener</code> to remove
+     */
+    public void removeTreeSelectionListener(TreeSelectionListener tsl) {
+        renderer.removeTreeSelectionListener(tsl);
+    }
+
+    /**
+     * Adds a listener for <code>TreeWillExpand</code> events.
+     * TODO (JW): redirect event source to this. 
+     * 
+     * @param tel a TreeWillExpandListener that will be notified 
+     * when a tree node will be expanded or collapsed 
+     */
+    public void addTreeWillExpandListener(TreeWillExpandListener tel) {
+        renderer.addTreeWillExpandListener(tel);
+    }
+
+    /**
+     * Removes a listener for <code>TreeWillExpand</code> events.
+     * @param tel the <code>TreeWillExpandListener</code> to remove
+     */
+    public void removeTreeWillExpandListener(TreeWillExpandListener tel) {
+        renderer.removeTreeWillExpandListener(tel);
+     }
+ 
+    
     /**
      * Returns the selection model for the tree portion of the this treetable.
      *
