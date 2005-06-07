@@ -779,6 +779,7 @@ public class JXTreeTable extends JXTable {
      */
     public void setRootVisible(boolean visible) {
         renderer.setRootVisible(visible);
+        repaint();
     }
 
     /**
@@ -960,6 +961,7 @@ public class JXTreeTable extends JXTable {
      */
     public void setShowsRootHandles(boolean visible) {
         renderer.setShowsRootHandles(visible);
+        repaint();
     }
 
     /**

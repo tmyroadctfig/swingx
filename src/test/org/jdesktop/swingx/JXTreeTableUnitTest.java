@@ -243,31 +243,28 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      */    
     public void interactiveTestTreeProperties() {
         final JXTreeTable treeTable = new JXTreeTable(treeTableModel);
-        treeTable.setShowsRootHandles(false);
-        // storing negates of properties
-        Action toggle = new AbstractAction("Toggle Properties") {
+        Action toggleHandles = new AbstractAction("Toggle Handles") {
 
             public void actionPerformed(ActionEvent e) {
-                boolean expandsSelected = !treeTable.getExpandsSelectedPaths();
-                boolean scrollsOnExpand = !treeTable.getScrollsOnExpand();
-                boolean showRootHandles = !treeTable.getShowsRootHandles();
-                boolean rootVisible = !treeTable.isRootVisible();
-                // setting negates properties
-//                treeTable.setExpandsSelectedPaths(expandsSelected);
-//                treeTable.setScrollsOnExpand(scrollsOnExpand);
-//                treeTable.setShowsRootHandles(showRootHandles);
-                treeTable.setRootVisible(rootVisible);
+                treeTable.setShowsRootHandles(!treeTable.getShowsRootHandles());
                 
             }
             
         };
-//        treeTable.getActionMap().put("toggleProperties", toggle);
-//        treeTable.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("F5"), "toggleProperties");
+        Action toggleRoot = new AbstractAction("Toggle Root") {
+
+            public void actionPerformed(ActionEvent e) {
+                treeTable.setRootVisible(!treeTable.isRootVisible());
+                
+            }
+            
+        };
         treeTable.setRowHeight(22);
         treeTable.setRowMargin(1);
         JFrame frame = wrapWithScrollingInFrame(treeTable,
                 "Toggle Tree properties ");
-        addAction(frame, toggle);
+        addAction(frame, toggleRoot);
+        addAction(frame, toggleHandles);
         frame.setVisible(true);
     }
     
@@ -459,8 +456,8 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         try {
          //   test.runInteractiveTests();
          //   test.runInteractiveTests("interactive.*HighLighters");
-               test.runInteractiveTests("interactive.*SortingFilter.*");
-         //  test.runInteractiveTests("interactive.*Prop.*");
+         //      test.runInteractiveTests("interactive.*SortingFilter.*");
+           test.runInteractiveTests("interactive.*Prop.*");
          //     test.runInteractiveTests("interactive.*Bool.*");
         } catch (Exception ex) {
 
