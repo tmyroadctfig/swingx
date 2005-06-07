@@ -30,6 +30,7 @@ import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
+import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
@@ -310,6 +311,22 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         frame.setVisible(true);
     }
     
+    /**
+     * Issue #??: weird sorting.
+     *
+     */
+    public void interactiveTestSortingFilters() {
+        JXTreeTable treeTable = new JXTreeTable(treeTableModel);
+        treeTable.setRowHeight(22);
+        treeTable.setRowMargin(1);
+        treeTable.setFilters(new FilterPipeline(new Filter[] {
+                new ShuttleSorter(1, false), }));
+        JFrame frame = wrapWithScrollingInFrame(treeTable,
+                "SortingFilter");
+        frame.setVisible(true);
+    }
+    
+    
     public void interactiveTestFiltersAndRowHeight() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         treeTable.setRowHeight(22);
@@ -440,9 +457,9 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         // LFSwitcher.metalLF();
         JXTreeTableUnitTest test = new JXTreeTableUnitTest();
         try {
-            test.runInteractiveTests();
+         //   test.runInteractiveTests();
          //   test.runInteractiveTests("interactive.*HighLighters");
-         //      test.runInteractiveTests("interactive.*ilter.*");
+               test.runInteractiveTests("interactive.*SortingFilter.*");
          //  test.runInteractiveTests("interactive.*Prop.*");
          //     test.runInteractiveTests("interactive.*Bool.*");
         } catch (Exception ex) {
