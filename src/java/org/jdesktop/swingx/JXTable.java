@@ -74,7 +74,7 @@ import org.jdesktop.swingx.util.Link;
  * @author Mark Davidson
  * @author Jeanette Winzenburg
  */
-public class JXTable extends JTable implements PipelineListener, Searchable {
+public class JXTable extends JTable implements Searchable {
 
 public static boolean TRACE = false;
   
@@ -470,6 +470,8 @@ public static boolean TRACE = false;
     private JXFindDialog dialog = null;
     private boolean automaticSortDisabled;
 
+    private PipelineListener pipelineListener;
+
     private void find() {
         if (dialog == null) {
             dialog = new JXFindDialog(this);
@@ -495,7 +497,7 @@ public static boolean TRACE = false;
         firePropertyChange("sortable", !sortable, sortable);
         //JW @todo: this is a hack!
         if (sorter != null) {
-           contentsChanged(null);
+           updateOnFilterContentChanged();
         }
 
     }
@@ -530,17 +532,32 @@ public static boolean TRACE = false;
         restoreSelection(selection);
     }
 
-    public void contentsChanged(PipelineEvent e) {
+    protected void updateOnFilterContentChanged() {
         removeSorter();
         clearSelection();
-
         // Force private rowModel in JTable to null;
-        setRowHeight(getRowHeight());   // Ugly!
-
+        setRowHeight(getRowHeight()); // Ugly!
         revalidate();
         repaint();
     }
 
+
+    protected PipelineListener getFilterPipelineListener() {
+        if (pipelineListener == null) {
+            pipelineListener = createPipelineListener();
+        }
+        return pipelineListener;
+    }
+    
+    protected PipelineListener createPipelineListener() {
+        PipelineListener l = new PipelineListener() {
+            public void contentsChanged(PipelineEvent e) {
+                updateOnFilterContentChanged();
+            }
+        };
+        return l;
+    }
+    
 	@Override
     public int getRowCount() {
         // RG: If there are no filters, call superclass version rather than accessing model directly
@@ -710,7 +727,7 @@ public static boolean TRACE = false;
         if (pipeline != null) {
             // check JW: adding listener multiple times (after setModel)?
             if (initialUse(pipeline)) {
-                pipeline.addPipelineListener(this);
+                pipeline.addPipelineListener(getFilterPipelineListener());
                 pipeline.assign(getComponentAdapter());
             }
             pipeline.flush();
@@ -723,9 +740,10 @@ public static boolean TRACE = false;
      * @return true is not yet used in this JXTable, false otherwise
      */
     private boolean initialUse(FilterPipeline pipeline) {
+        if (pipelineListener == null) return true;
         PipelineListener[] l = pipeline.getPipelineListeners();
         for (int i = 0; i < l.length; i++) {
-            if (this.equals(l[i])) return false;
+            if (pipelineListener.equals(l[i])) return false;
         }
         return true;
     }
@@ -738,10 +756,10 @@ public static boolean TRACE = false;
     private void unsetFilters() {
         if (filters == null) return;
         // fix#125: cleanup old filters
-        filters.removePipelineListener(this);
+        filters.removePipelineListener(pipelineListener);
         // hacking around -
         //brute force update of sorter by removing
-        contentsChanged(null);
+        pipelineListener.contentsChanged(null);
     }
 
     private void doSetFilters(FilterPipeline pipeline) {

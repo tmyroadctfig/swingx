@@ -25,9 +25,7 @@ import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
-import javax.swing.DefaultCellEditor;
 import javax.swing.Icon;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -41,6 +39,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
@@ -55,6 +54,7 @@ import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.PipelineListener;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
+import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.util.AncientSwingTeam;
 import org.jdesktop.swingx.util.Link;
@@ -106,7 +106,9 @@ public class JXTableUnitTest extends InteractiveTestCase {
         PipelineListener l = table.getFilters().getPipelineListeners()[listenerCount - 1];
         // sanity assert
         assertEquals(1, listenerCount);
-        assertEquals(table, l);
+        // JW: no longer valid assumption - the pipelineListener now is an 
+        // implementation detail of JXTable
+ //       assertEquals(table, l);
         table.setModel(createModel(0, 20));
         assertEquals("pipeline listener count must not change after setModel", listenerCount, table.getFilters().getPipelineListeners().length);
         
@@ -521,6 +523,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
 
     }
 
+    
+    
     /** 
      * Issue #??: Problems with filters and ColumnControl
      * 
@@ -558,7 +562,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
  
     
-
     /** 
      * Issue #11: Column control not showing with few rows.
      *
@@ -661,9 +664,45 @@ public class JXTableUnitTest extends InteractiveTestCase {
 
 //---------------------------------
 
+    public void interactiveTestTableHeader() {
+        final JXTable table = new JXTable(10, 4);
+        // hmm bug regression with combos as editors - same in JTable
+//        JComboBox box = new JComboBox(new Object[] {"one", "two", "three" });
+//        box.setEditable(true);
+//        table.getColumnExt(0).setCellEditor(new DefaultCellEditor(box));
+        Action toggleFilter = new AbstractAction("Reset ColumnModel") {
+            
+            public void actionPerformed(ActionEvent e) {
+                
+                boolean autoCreate = table.getAutoCreateColumnsFromModel();
+                table.setAutoCreateColumnsFromModel(!autoCreate);
+                if (autoCreate) {
+                    int modelCount = table.getModel().getColumnCount();
+                    TableColumnModel newModel = new DefaultTableColumnModelExt();
+                    TableColumnModel oldModel = table.getColumnModel();
+                    for (int i = 1; i < modelCount; i++) {
+                       newModel.addColumn(oldModel.getColumn(i)); 
+                    }
+                    table.setColumnModel(newModel);
+                    
+                } else {
+
+                }
+                
+            }
+            
+        };
+        toggleFilter.putValue(Action.SHORT_DESCRIPTION, "Problem with header: does not follow columnModel change? ");
+        table.setColumnControlVisible(true);
+        JFrame frame = wrapWithScrollingInFrame(table, "JXTable: header and columnModel?");
+        addAction(frame, toggleFilter);
+        frame.setVisible(true);
+    }
+ 
     
     public void interactiveTestRolloverHighlight() {
         JXTable table = new JXTable(sortableTableModel);
+        table.setRolloverEnabled(true);
         Highlighter conditional = new ConditionalHighlighter(Color.BLUE, null, -1, -1) {
 
             protected boolean test(ComponentAdapter adapter) {
@@ -994,7 +1033,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         table.getTableHeader().setFont(new Font("Serif", Font.PLAIN, 10));
 
         ColumnHeaderRenderer headerRenderer = ColumnHeaderRenderer.createColumnHeaderRenderer();
-        headerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        headerRenderer.setHorizontalAlignment(JLabel.LEFT);
         headerRenderer.setBackground(Color.blue);
         headerRenderer.setForeground(Color.yellow);
         headerRenderer.setIcon(new Icon() {
@@ -1133,8 +1172,9 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public static void main(String args[]) {
         JXTableUnitTest test = new JXTableUnitTest();
         try {
-         // test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*Column.*");
+          test.runInteractiveTests();
+         //   test.runInteractiveTests("interactive.*Column.*");
+         //   test.runInteractiveTests("interactive.*TableHeader.*");
          //   test.runInteractiveTests("interactive.*Render.*");
          //   test.runInteractiveTests("interactive.*Toggle.*");
         } catch (Exception e) {
