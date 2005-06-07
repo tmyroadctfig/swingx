@@ -703,11 +703,12 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void interactiveTestRolloverHighlight() {
         JXTable table = new JXTable(sortableTableModel);
         table.setRolloverEnabled(true);
-        Highlighter conditional = new ConditionalHighlighter(Color.BLUE, null, -1, -1) {
+        Highlighter conditional = new ConditionalHighlighter(
+                new Color(0xF0, 0xF0, 0xE0), null, -1, -1) {
 
             protected boolean test(ComponentAdapter adapter) {
                 Point p = (Point) adapter.getComponent().getClientProperty(RolloverProducer.ROLLOVER_KEY);
-                
+     
                 return p != null &&  p.y == adapter.row;
             }
             
@@ -1172,11 +1173,11 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public static void main(String args[]) {
         JXTableUnitTest test = new JXTableUnitTest();
         try {
-          test.runInteractiveTests();
+         // test.runInteractiveTests();
          //   test.runInteractiveTests("interactive.*Column.*");
          //   test.runInteractiveTests("interactive.*TableHeader.*");
          //   test.runInteractiveTests("interactive.*Render.*");
-         //   test.runInteractiveTests("interactive.*Toggle.*");
+            test.runInteractiveTests("interactive.*High.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
