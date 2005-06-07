@@ -7,11 +7,13 @@
 package org.jdesktop.swingx;
 
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 import javax.swing.JComponent;
+import javax.swing.JList;
 import javax.swing.JTable;
 
 /**
@@ -50,17 +52,14 @@ public class RolloverProducer implements MouseListener, MouseMotionListener {
         }
 
         public void mouseEntered(MouseEvent e) {
-            if (!(e.getSource() instanceof JTable)) return;
-            JTable table = (JTable) e.getSource();
-            int col = table.columnAtPoint(e.getPoint());
-            int row = table.rowAtPoint(e.getPoint());
-            if ((col < 0) || (row < 0)) {
-                row = -1;
-                col = -1;
+            if (e.getSource() instanceof JTable) {
+                updateTableRolloverEntered((JTable) e.getSource(), e);
+            } else if (e.getSource() instanceof JList) {
+                updateListRolloverEntered((JList) e.getSource(), e);
             }
-            table.putClientProperty(ROLLOVER_KEY, new Point(col, row));
             
         }
+
 
         public void mouseExited(MouseEvent e) {
             if (e.getSource() instanceof JComponent) {
@@ -76,8 +75,44 @@ public class RolloverProducer implements MouseListener, MouseMotionListener {
         }
 
         public void mouseMoved(MouseEvent e) {
-            if (!(e.getSource() instanceof JTable)) return;
-            JTable table = (JTable) e.getSource();
+            if (e.getSource() instanceof JTable) {
+                updateTableRollover((JTable) e.getSource(), e);
+            } else if (e.getSource() instanceof JList) {
+                updateListRollover((JList) e.getSource(), e);
+            }
+        }
+
+        private void updateListRollover(JList list, MouseEvent e) {
+            Point p = (Point) list.getClientProperty(ROLLOVER_KEY);
+            int row = list.locationToIndex(e.getPoint());
+            if (row >= 0) {
+                Rectangle cellBounds = list.getCellBounds(row, row);
+                if (!cellBounds.contains(e.getPoint())) {
+                    row = -1;
+                }
+            }
+            int col = row < 0 ? -1 : 0;
+          //  System.out.println("moved - old/new: " + p + "/" + new Point(col, row));
+            if ((col != p.x) || (row != p.y)) {
+                list.putClientProperty(ROLLOVER_KEY, new Point(col, row));
+            }
+            
+        }
+
+        private void updateListRolloverEntered(JList list, MouseEvent e) {
+            int row = list.locationToIndex(e.getPoint());
+            if (row >= 0) {
+                Rectangle cellBounds = list.getCellBounds(row, row);
+                if (!cellBounds.contains(e.getPoint())) {
+                    row = -1;
+                }
+            }
+            int col = row < 0 ? -1 : 0;
+        //    System.out.println("entered - old/new: " + list.getClientProperty(ROLLOVER_KEY) + "/" + new Point(col, row));
+            list.putClientProperty(ROLLOVER_KEY, new Point(col, row));
+            
+        }
+        private void updateTableRollover(JTable table, MouseEvent e) {
             Point p = (Point) table.getClientProperty(ROLLOVER_KEY);
             int col = table.columnAtPoint(e.getPoint());
             int row = table.rowAtPoint(e.getPoint());
@@ -85,10 +120,19 @@ public class RolloverProducer implements MouseListener, MouseMotionListener {
                 row = -1;
                 col = -1;
             }
-       
             if ((col != p.x) || (row != p.y)) {
                 table.putClientProperty(ROLLOVER_KEY, new Point(col, row));
             }
+        }
+        
+        private void updateTableRolloverEntered(JTable table, MouseEvent e) {
+            int col = table.columnAtPoint(e.getPoint());
+            int row = table.rowAtPoint(e.getPoint());
+            if ((col < 0) || (row < 0)) {
+                row = -1;
+                col = -1;
+            }
+            table.putClientProperty(ROLLOVER_KEY, new Point(col, row));
         }
         
     }

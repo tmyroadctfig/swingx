@@ -8,6 +8,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -15,13 +16,18 @@ import java.net.URL;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.DefaultListModel;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ListCellRenderer;
+import javax.swing.ListModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
+import org.jdesktop.swingx.action.EditorPaneLinkVisitor;
 import org.jdesktop.swingx.action.LinkAction;
 import org.jdesktop.swingx.util.Link;
 
@@ -43,7 +49,7 @@ public class JXHyperlinkTest extends InteractiveTestCase {
             
         };
         JXHyperlinkLabel hyperlink = new JXHyperlinkLabel(action );
-        JFrame frame = wrapInFrame(hyperlink, "simple show label link");
+        JFrame frame = wrapInFrame(hyperlink, "hyperlink as label - no action");
         frame.setSize(200, 200);
         frame.setVisible(true);
         
@@ -59,7 +65,7 @@ public class JXHyperlinkTest extends InteractiveTestCase {
             
         };
         JXHyperlink hyperlink = new JXHyperlink(action );
-        JFrame frame = wrapInFrame(hyperlink, "simple show button link");
+        JFrame frame = wrapInFrame(hyperlink, "show underline - no link action");
         frame.setSize(200, 200);
         frame.setVisible(true);
         
@@ -67,68 +73,82 @@ public class JXHyperlinkTest extends InteractiveTestCase {
     
  
     public void interactiveTestLink() throws Exception {
-        final JEditorPane editorPane = new JEditorPane();
-        editorPane.setEditable(false);
-        editorPane.setContentType("text/html");
+        EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
         Link link = new Link("Click me!", null, JXEditorPaneTest.class.getResource("resources/test.html"));
-        Action action = new AbstractAction() {
-
-            public void actionPerformed(ActionEvent e) {
-                if (e.getSource() instanceof Link) {
-                    Link link = (Link) e.getSource();
-                    try {
-                        editorPane.setPage(link.getURL());
-                        link.setVisited(true);
-                    } catch (IOException e1) {
-                        editorPane.setText("<html>Error 404: couldn't show " + link.getURL() + " </html>");
-                    }
-                }
-                
-            }
-            
-        };
 
         LinkAction linkAction = new LinkAction(link);
-        linkAction.setVisitingDelegate(action);
+        linkAction.setVisitingDelegate(visitor);
         JXHyperlink hyperlink = new JXHyperlink(linkAction);
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(new JScrollPane(editorPane));
+        panel.add(new JScrollPane(visitor.getOutputComponent()));
         panel.add(hyperlink, BorderLayout.SOUTH);
-        JFrame frame = wrapInFrame(panel, "simple show button link");
+        JFrame frame = wrapInFrame(panel, "simple hyperlink");
         frame.setSize(200, 200);
         frame.setVisible(true);
         
     }
 
   
-    public void interactiveTestLinkRenderer() {
-        final JXEditorPane editorPane = new JXEditorPane();
-        editorPane.setEditable(false);
-        editorPane.setContentType("text/html");
+    public void interactiveTestTableLinkRenderer() {
+        EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
         JXTable table = new JXTable(createModelWithLinks());
         table.setRolloverEnabled(true);
-        Action action = new AbstractAction() {
 
-            public void actionPerformed(ActionEvent e) {
-                if (e.getSource() instanceof Link) {
-                    Link link = (Link) e.getSource();
-                    try {
-                        editorPane.setPage(link.getURL());
-                        link.setVisited(true);
-                    } catch (IOException e1) {
-                        editorPane.setText("<html>Error 404: couldn't show " + link.getURL() + " </html>");
-                    }
+        LinkRenderer editor = (LinkRenderer) table.getDefaultEditor(Link.class);
+        editor.setVisitingDelegate(visitor);
+        JFrame frame = wrapWithScrollingInFrame(table, visitor.getOutputComponent(), "show link renderer in table");
+        frame.setVisible(true);
+
+    }
+    
+    public void interactiveTestListLinkRenderer() {
+        EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
+        JXList list = new JXList(createListModelWithLinks());
+        list.setCellRenderer(createDelegatingRenderer(list.getCellRenderer(), visitor));
+        list.setRolloverEnabled(true);
+
+//        LinkRenderer editor = (LinkRenderer) table.getDefaultEditor(Link.class);
+//        editor.setVisitingDelegate(visitor);
+        JFrame frame = wrapWithScrollingInFrame(list, visitor.getOutputComponent(), "show link renderer in list");
+        frame.setVisible(true);
+
+    }
+    
+    
+    private ListCellRenderer createDelegatingRenderer(final ListCellRenderer cellRenderer, 
+            EditorPaneLinkVisitor visitor) {
+        final LinkRenderer linkRenderer = new LinkRenderer();
+        linkRenderer.setVisitingDelegate(visitor);
+        ListCellRenderer delegate = new ListCellRenderer() {
+
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                if (value instanceof Link) {
+                    return linkRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 }
-                
+                return cellRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             }
             
         };
+        return delegate;
+    }
+    private ListModel createListModelWithLinks() {
+        DefaultListModel model = new DefaultListModel();
+        for (int i = 0; i < 4; i++) {
+            try {
+                Link link = new Link("a link text " + i, null, new URL("http://some.dummy.url" + i));
+                if (i == 1) {
+                    URL url = JXEditorPaneTest.class.getResource("resources/test.html");
 
-        LinkRenderer editor = (LinkRenderer) table.getDefaultEditor(Link.class);
-        editor.setVisitingDelegate(action);
-        JFrame frame = wrapWithScrollingInFrame(table, editorPane, "show link renderer");
-        frame.setVisible(true);
-
+                    link = new Link("a link text " + i, null, url);
+                }
+                model.addElement(link);
+            } catch (MalformedURLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+ 
+        return model;
     }
     private TableModel createModelWithLinks() {
         DefaultTableModel model = new DefaultTableModel(0, 3) {

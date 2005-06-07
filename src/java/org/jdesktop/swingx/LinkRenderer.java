@@ -11,7 +11,9 @@ import java.awt.event.ActionListener;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.Action;
+import javax.swing.JList;
 import javax.swing.JTable;
+import javax.swing.ListCellRenderer;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
@@ -29,7 +31,7 @@ import org.jdesktop.swingx.util.Link;
  * @author Jeanette Winzenburg
  */
 public class LinkRenderer extends AbstractCellEditor implements
-        TableCellRenderer, TableCellEditor {
+        TableCellRenderer, TableCellEditor, ListCellRenderer {
     private JXHyperlink linkButton;
 
     private LinkAction linkAction;
@@ -50,6 +52,19 @@ public class LinkRenderer extends AbstractCellEditor implements
         
     }
 
+    public Component getListCellRendererComponent(JList list, Object value, 
+            int index, boolean isSelected, boolean cellHasFocus) {
+        linkAction.setLink(value instanceof Link ? (Link) value : null);
+        Point p = (Point) list
+            .getClientProperty(RolloverProducer.ROLLOVER_KEY);
+        if (cellHasFocus || (p != null && (p.y >= 0) && (p.y == index))) {
+             linkButton.getModel().setRollover(true);
+        } else {
+             linkButton.getModel().setRollover(false);
+        }
+        return linkButton;
+    }
+    
 //------------------------ TableCellRenderer
     
     public Component getTableCellRendererComponent(JTable table, Object value,
@@ -57,6 +72,7 @@ public class LinkRenderer extends AbstractCellEditor implements
         linkAction.setLink(value instanceof Link ? (Link) value : null);
         Point p = (Point) table
                 .getClientProperty(RolloverProducer.ROLLOVER_KEY);
+        // JW: check - px > 0 looks fishy! probably meant >= 0?
         if (hasFocus || (p != null && (p.x > 0) && (p.x == column) && (p.y == row))) {
              linkButton.getModel().setRollover(true);
         } else {
@@ -89,5 +105,6 @@ public class LinkRenderer extends AbstractCellEditor implements
         };
         return l;
     }
+
 
 }

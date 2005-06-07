@@ -32,6 +32,18 @@ public class JXList extends JList {
     // MUST ALWAYS ACCESS dataAdapter through accessor method!!!
     private final ComponentAdapter dataAdapter = new ListAdapter(this);
 
+    /**
+     * Mouse/Motion/Listener keeping track of mouse moved in
+     * cell coordinates.
+     */
+    private RolloverProducer rolloverProducer;
+
+    /**
+     * RolloverController: listens to cell over events and
+     * repaints entered/exited rows.
+     */
+    private LinkController linkController;
+
     public JXList() {
     }
 
@@ -46,6 +58,39 @@ public class JXList extends JList {
     public JXList(Vector listData) {
         super(listData);
     }
+    /**
+     * Property to enable/disable rollover support. This can be enabled
+     * to show "live" rollover behaviour, f.i. the cursor over Link cells. 
+     * Default is disabled.
+     * @param rolloverEnabled
+     */
+    public void setRolloverEnabled(boolean rolloverEnabled) {
+        boolean old = isRolloverEnabled();
+        if (rolloverEnabled == old) return;
+        if (rolloverEnabled) {
+            rolloverProducer = new RolloverProducer();
+            addMouseListener(rolloverProducer);
+            addMouseMotionListener(rolloverProducer);
+            linkController = new LinkController();
+            addPropertyChangeListener(linkController);
+        } else {
+            removeMouseListener(rolloverProducer);
+            removeMouseMotionListener(rolloverProducer);
+            rolloverProducer = null;
+            removePropertyChangeListener(linkController);
+            linkController = null;
+        }
+        firePropertyChange("rolloverEnabled", old, isRolloverEnabled());
+    }
+
+    /**
+     * returns the rolloverEnabled property.
+     * @return
+     */
+    public boolean isRolloverEnabled() {
+        return rolloverProducer != null;
+    }
+
 
     public FilterPipeline getFilters() {
         return filters;
