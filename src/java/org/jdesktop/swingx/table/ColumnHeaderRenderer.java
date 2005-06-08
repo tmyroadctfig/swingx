@@ -23,11 +23,13 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.LabelProperties;
+import org.jdesktop.swingx.border.IconBorder;
 import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.icon.SortArrowIcon;
 
@@ -41,29 +43,23 @@ import org.jdesktop.swingx.icon.SortArrowIcon;
  * @author Ramesh Gupta
  * @author Jeanette Winzenburg
  */
-public class ColumnHeaderRenderer extends JPanel implements TableCellRenderer {
+public class ColumnHeaderRenderer extends JComponent implements TableCellRenderer {
+    // the inheritance is only to make sure we are updated on LF change
+    
     private static TableCellRenderer sharedInstance = null;
 
     private static Icon defaultDownIcon = new SortArrowIcon(false);
 
     private static Icon defaultUpIcon = new SortArrowIcon(true);
 
-    // private static Border defaultMarginBorder =
-    // BorderFactory.createEmptyBorder(2,2,2,2);
-    private static Border defaultArrowBorder = BorderFactory.createEmptyBorder(
-            0, 2, 0, 4);
-
     private Icon downIcon = defaultDownIcon;
 
     private Icon upIcon = defaultUpIcon;
 
-    private JLabel arrow = new JLabel((Icon) null, JLabel.CENTER);
-
+    private IconBorder iconBorder = new IconBorder();
     private boolean antiAliasedText = false;
 
     private TableCellRenderer delegateRenderer;
-
-    private Component delegateRendererComponent;
 
     private LabelProperties label;
 
@@ -80,7 +76,13 @@ public class ColumnHeaderRenderer extends JPanel implements TableCellRenderer {
 
     /*
      * JW: a story ...
+     *
+     * latest: don't use a custom component and don't add the original
+     * and the arrow - use the original only and compound a border with 
+     * arrow icon. How does it look in XP/Mac?
      * 
+     * 
+     * ----------------- below is the comment as of ColumnHeaderRenderer
      * Original used a Label to show the typical text/icon part and another
      * Label to show the up/down arrows, added both to this and configured both
      * directly in getTableCellRendererComponent.
@@ -107,81 +109,49 @@ public class ColumnHeaderRenderer extends JPanel implements TableCellRenderer {
      */
 
     private ColumnHeaderRenderer() {
-        setLayout(new BorderLayout());
         label = new LabelProperties();
         initDelegate();
-        add(arrow, BorderLayout.EAST);
-        setOpaque(false);
+        
     }
 
-    private void initDelegateComponent(Component comp) {
-        delegateRendererComponent = comp;
-        add(comp);
-        if (comp instanceof JComponent) {
-            ((JComponent) comp).setOpaque(false);
-        }
-
-    }
 
     private void initDelegate() {
-        if (delegateRendererComponent != null) {
-            remove(delegateRendererComponent);
-            delegateRendererComponent = null;
-        }
         JTableHeader header = new JTableHeader();
         delegateRenderer = header.getDefaultRenderer();
-        // some renderers can't cope with null table
-        try {
-            Component comp = delegateRenderer.getTableCellRendererComponent(
-                    null, null, false, false, -1, -1);
-            initDelegateComponent(comp);
-        } catch (Exception e) {
-            // can't do anything for now, try later in a normal
-            // getTableCellRendererComponent
-        }
 
     }
 
     public Component getTableCellRendererComponent(JTable table, Object value,
             boolean isSelected, boolean hasFocus, int rowIndex, int columnIndex) {
-        configureDelegate(table, value, isSelected, hasFocus, rowIndex,
+        Component comp = configureDelegate(table, value, isSelected, hasFocus, rowIndex,
                 columnIndex);
-        if (table instanceof JXTable) {
+
+        if ((table instanceof JXTable) && (comp instanceof JComponent)) {
             // We no longer limit ourselves to a single "currently sorted
             // column"
             Sorter sorter = ((JXTable) table).getSorter(columnIndex);
 
-            if (sorter == null) {
-                arrow.setIcon(null);
-                arrow.setBorder(null);
-            } else {
-                arrow.setIcon(sorter.isAscending() ? upIcon : downIcon);
-                arrow.setBorder(defaultArrowBorder);
+            Border border = UIManager.getBorder("TableHeader.cellBorder");
+            if (sorter != null) {
+                iconBorder.setIcon(sorter.isAscending() ? upIcon : downIcon);
+                Border origBorder = ((JComponent) comp).getBorder();
+                border = new CompoundBorder(origBorder, iconBorder);
+                ((JComponent) comp).setBorder(border);
             }
         }
-        return this;
+        return comp;
     }
 
-    private void configureDelegate(JTable table, Object value,
+    private Component configureDelegate(JTable table, Object value,
             boolean isSelected, boolean hasFocus, int rowIndex, int columnIndex) {
         Component comp = delegateRenderer.getTableCellRendererComponent(table,
                 value, isSelected, hasFocus, rowIndex, columnIndex);
-        if (delegateRendererComponent == null) {
-            initDelegateComponent(comp);
-        }
 
-        Border border = UIManager.getBorder("TableHeader.cellBorder");
-        if (comp instanceof JComponent) {
-            JComponent jComp = (JComponent) comp;
-            border = jComp.getBorder();
-            jComp.setBorder(null);
-        }
-        applyLabelProperties();
-        setBorder(border);
-
+        applyLabelProperties(comp);
+        return comp;
     }
 
-    private void applyLabelProperties() {
+    private void applyLabelProperties(Component delegateRendererComponent) {
         if (delegateRendererComponent instanceof JLabel) {
             label.applyPropertiesTo((JLabel) delegateRendererComponent);
         } else {
@@ -202,20 +172,15 @@ public class ColumnHeaderRenderer extends JPanel implements TableCellRenderer {
         if (label != null) {
             label.setBackground(background);
         }
-        super.setBackground(background);
     }
 
     public void setForeground(Color foreground) {
-        super.setForeground(foreground);
-        // this is called somewhere along initialization of super?
-        if (label != null) {
+         if (label != null) {
             label.setForeground(foreground);
         }
     }
 
     public void setFont(Font font) {
-        super.setFont(font);
-        // this is called somewhere along initialization of super?
         if (label != null) {
             label.setFont(font);
         }
@@ -285,30 +250,24 @@ public class ColumnHeaderRenderer extends JPanel implements TableCellRenderer {
         return label.getVerticalTextPosition();
     }
 
-    public void paint(Graphics g) {
-        if (antiAliasedText) {
-            Graphics2D g2 = (Graphics2D) g;
-            Object save = g2
-                    .getRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING);
-            g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-
-            super.paint(g2);
-
-            g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, save);
-        } else {
-            super.paint(g);
-        }
-    }
-
+//    public void paint(Graphics g) {
+//        if (antiAliasedText) {
+//            Graphics2D g2 = (Graphics2D) g;
+//            Object save = g2
+//                    .getRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING);
+//            g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+//                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+//
+//            super.paint(g2);
+//
+//            g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, save);
+//        } else {
+//            super.paint(g);
+//        }
+//    }
+//
     public void updateUI() {
         super.updateUI();
-        if (arrow != null) {
-            arrow.updateUI();
-        }
         initDelegate();
-        if (delegateRendererComponent instanceof JComponent) {
-            ((JComponent) delegateRendererComponent).updateUI();
-        }
     }
 }

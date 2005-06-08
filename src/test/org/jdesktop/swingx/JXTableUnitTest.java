@@ -664,41 +664,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
 
 //---------------------------------
 
-    public void interactiveTestTableHeader() {
-        final JXTable table = new JXTable(10, 4);
-        // hmm bug regression with combos as editors - same in JTable
-//        JComboBox box = new JComboBox(new Object[] {"one", "two", "three" });
-//        box.setEditable(true);
-//        table.getColumnExt(0).setCellEditor(new DefaultCellEditor(box));
-        Action toggleFilter = new AbstractAction("Reset ColumnModel") {
-            
-            public void actionPerformed(ActionEvent e) {
-                
-                boolean autoCreate = table.getAutoCreateColumnsFromModel();
-                table.setAutoCreateColumnsFromModel(!autoCreate);
-                if (autoCreate) {
-                    int modelCount = table.getModel().getColumnCount();
-                    TableColumnModel newModel = new DefaultTableColumnModelExt();
-                    TableColumnModel oldModel = table.getColumnModel();
-                    for (int i = 1; i < modelCount; i++) {
-                       newModel.addColumn(oldModel.getColumn(i)); 
-                    }
-                    table.setColumnModel(newModel);
-                    
-                } else {
-
-                }
-                
-            }
-            
-        };
-        toggleFilter.putValue(Action.SHORT_DESCRIPTION, "Problem with header: does not follow columnModel change? ");
-        table.setColumnControlVisible(true);
-        JFrame frame = wrapWithScrollingInFrame(table, "JXTable: header and columnModel?");
-        addAction(frame, toggleFilter);
-        frame.setVisible(true);
-    }
- 
     
     public void interactiveTestRolloverHighlight() {
         JXTable table = new JXTable(sortableTableModel);
@@ -1174,10 +1139,10 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JXTableUnitTest test = new JXTableUnitTest();
         try {
          // test.runInteractiveTests();
-         //   test.runInteractiveTests("interactive.*Column.*");
-         //   test.runInteractiveTests("interactive.*TableHeader.*");
+            test.runInteractiveTests("interactive.*Column.*");
+//            test.runInteractiveTests("interactive.*TableHeader.*");
          //   test.runInteractiveTests("interactive.*Render.*");
-            test.runInteractiveTests("interactive.*High.*");
+         //   test.runInteractiveTests("interactive.*High.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();

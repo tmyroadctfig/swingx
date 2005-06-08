@@ -28,12 +28,12 @@ public class JXTableHeader extends JTableHeader {
     }
 
     public JXTableHeader(TableColumnModel columnModel) {
-        super();
+        super(columnModel);
     }
 
     public void setTable(JTable table) {
         super.setTable(table);
-        setColumnModel(table.getColumnModel());
+//        setColumnModel(table.getColumnModel());
         // the additional listening option makes sense only if the table
         // actually is a JXTable
         if (getXTable() != null) {
@@ -58,7 +58,7 @@ public class JXTableHeader extends JTableHeader {
      * @param aColumn
      * @return
      */
-    public int getViewIndexForColumn(TableColumn aColumn) {
+    private int getViewIndexForColumn(TableColumn aColumn) {
         if (aColumn == null)
             return -1;
         TableColumnModel cm = getColumnModel();
