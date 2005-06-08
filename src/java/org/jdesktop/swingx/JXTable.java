@@ -13,6 +13,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.print.PrinterException;
@@ -195,6 +196,21 @@ public static boolean TRACE = false;
         return rolloverProducer != null;
     }
 
+    /**
+     * If the default editor for Link.class is of type
+     * LinkRenderer  enables link visiting with the given linkVisitor.
+     * As a side-effect the rollover property is set to true.
+     * 
+     * @param linkVisitor
+     */
+    public void setDefaultLinkVisitor(ActionListener linkVisitor) {
+        TableCellEditor renderer = getDefaultEditor(Link.class);
+        if (renderer instanceof LinkRenderer) {
+            ((LinkRenderer) renderer).setVisitingDelegate(linkVisitor);
+        }
+        setRolloverEnabled(true);
+    }
+    
     /**
      * overridden to addionally configure the upper right corner 
      * of an enclosing scrollpane with the ColumnControl.

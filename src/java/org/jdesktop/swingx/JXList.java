@@ -130,6 +130,7 @@ public class JXList extends JList {
 
     public void setCellRenderer(ListCellRenderer renderer) {
         // JW: Pending - probably fires propertyChangeEvent with wrong newValue?
+        // yeah - and probs with fixedCellWidths? need to test!!
         super.setCellRenderer(renderer);
     }
     
