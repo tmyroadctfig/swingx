@@ -7,19 +7,28 @@
 
 package org.jdesktop.swingx;
 
+import java.awt.Component;
+import java.awt.event.ActionListener;
 import java.util.Vector;
 
 import javax.swing.JList;
+import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
+
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
+import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
+import org.jdesktop.swingx.util.Link;
 
 
 /**
  * JXList
  *
+ * added Rollover/Link handling.
+ * 
  * @author Ramesh Gupta
+ * @author Jeanette Winzenburg
  */
 public class JXList extends JList {
     /**
@@ -43,6 +52,8 @@ public class JXList extends JList {
      * repaints entered/exited rows.
      */
     private LinkController linkController;
+    
+    private LinkRendererDelegate linkRendererDelegate;
 
     public JXList() {
     }
@@ -91,7 +102,66 @@ public class JXList extends JList {
         return rolloverProducer != null;
     }
 
+    public void setLinkVisitor(ActionListener linkVisitor) {
+        if (linkVisitor != null) {
+            setRolloverEnabled(true);
+            getLinkRendererDelegate().setLinkVisitor(linkVisitor);
+        } else {
+            // JW: think - need to revert?
+        }
+            
+    }
+ 
+    
+    private LinkRendererDelegate getLinkRendererDelegate() {
+        if (linkRendererDelegate == null) {
+            linkRendererDelegate = new LinkRendererDelegate();
+        }
+        return linkRendererDelegate;
+    }
 
+    private ListCellRenderer getSuperCellRenderer() {
+        return super.getCellRenderer();
+    }
+
+    public ListCellRenderer getCellRenderer() {
+        return linkRendererDelegate == null ? getSuperCellRenderer() : linkRendererDelegate;
+    }
+
+    public void setCellRenderer(ListCellRenderer renderer) {
+        // JW: Pending - probably fires propertyChangeEvent with wrong newValue?
+        super.setCellRenderer(renderer);
+    }
+    
+    private class LinkRendererDelegate implements ListCellRenderer {
+
+        private LinkRenderer linkRenderer;
+
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            if (value instanceof Link) {
+                return getLinkRenderer().getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            }
+            return getSuperCellRenderer().getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+        }
+
+
+        private LinkRenderer getLinkRenderer() {
+            if (linkRenderer == null) {
+                linkRenderer = new LinkRenderer();
+            }
+            return linkRenderer;
+        }
+
+        public void setLinkVisitor(ActionListener linkVisitor) {
+            getLinkRenderer().setVisitingDelegate(linkVisitor);
+            
+        }
+        
+        
+        
+    }
+    
+    
     public FilterPipeline getFilters() {
         return filters;
     }

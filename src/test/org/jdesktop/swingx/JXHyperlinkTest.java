@@ -104,36 +104,17 @@ public class JXHyperlinkTest extends InteractiveTestCase {
     public void interactiveTestListLinkRenderer() {
         EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
         JXList list = new JXList(createListModelWithLinks());
-        list.setCellRenderer(createDelegatingRenderer(list.getCellRenderer(), visitor));
-        list.setRolloverEnabled(true);
-
-//        LinkRenderer editor = (LinkRenderer) table.getDefaultEditor(Link.class);
-//        editor.setVisitingDelegate(visitor);
+        list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+        list.setLinkVisitor(visitor);
         JFrame frame = wrapWithScrollingInFrame(list, visitor.getOutputComponent(), "show link renderer in list");
         frame.setVisible(true);
 
     }
     
     
-    private ListCellRenderer createDelegatingRenderer(final ListCellRenderer cellRenderer, 
-            EditorPaneLinkVisitor visitor) {
-        final LinkRenderer linkRenderer = new LinkRenderer();
-        linkRenderer.setVisitingDelegate(visitor);
-        ListCellRenderer delegate = new ListCellRenderer() {
-
-            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                if (value instanceof Link) {
-                    return linkRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                }
-                return cellRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            }
-            
-        };
-        return delegate;
-    }
     private ListModel createListModelWithLinks() {
         DefaultListModel model = new DefaultListModel();
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 20; i++) {
             try {
                 Link link = new Link("a link text " + i, null, new URL("http://some.dummy.url" + i));
                 if (i == 1) {

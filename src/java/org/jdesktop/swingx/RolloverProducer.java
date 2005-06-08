@@ -30,15 +30,7 @@ public class RolloverProducer implements MouseListener, MouseMotionListener {
         public static final String ROLLOVER_KEY = "swingx.rollover";
         
         public void mouseClicked(MouseEvent e) {
-            if (!(e.getSource() instanceof JTable)) return;
-            JTable table = (JTable) e.getSource();
-            int col = table.columnAtPoint(e.getPoint());
-            int row = table.rowAtPoint(e.getPoint());
-            if ((col < 0) || (row < 0)) {
-                return;
-            }
-            table.putClientProperty(CLICKED_KEY, new Point(col, row));
-            
+            updateRollover(e, CLICKED_KEY);
         }
 
         public void mousePressed(MouseEvent e) {
@@ -52,18 +44,14 @@ public class RolloverProducer implements MouseListener, MouseMotionListener {
         }
 
         public void mouseEntered(MouseEvent e) {
-            if (e.getSource() instanceof JTable) {
-                updateTableRolloverEntered((JTable) e.getSource(), e);
-            } else if (e.getSource() instanceof JList) {
-                updateListRolloverEntered((JList) e.getSource(), e);
-            }
-            
+            updateRollover(e, ROLLOVER_KEY);
         }
 
 
         public void mouseExited(MouseEvent e) {
             if (e.getSource() instanceof JComponent) {
                 ((JComponent) e.getSource()).putClientProperty(ROLLOVER_KEY, null);
+                ((JComponent) e.getSource()).putClientProperty(CLICKED_KEY, null);
             }
             
         }
@@ -75,64 +63,52 @@ public class RolloverProducer implements MouseListener, MouseMotionListener {
         }
 
         public void mouseMoved(MouseEvent e) {
+            updateRollover(e, ROLLOVER_KEY);
+        }
+
+        private void updateRollover(MouseEvent e, String property) {
             if (e.getSource() instanceof JTable) {
-                updateTableRollover((JTable) e.getSource(), e);
+                updateRolloverPoint((JTable) e.getSource(), e.getPoint());
             } else if (e.getSource() instanceof JList) {
-                updateListRollover((JList) e.getSource(), e);
+                updateRolloverPoint((JList) e.getSource(), e.getPoint());
+            } else {
+                return;
+            }
+            updateClientProperty((JComponent) e.getSource(), property);
+        }
+
+        Point rollover = new Point();
+        
+        private void updateClientProperty(JComponent component, String property) {
+            Point p = (Point) component.getClientProperty(property);
+            if (p == null || (rollover.x != p.x) || (rollover.y != p.y)) {
+                component.putClientProperty(property, new Point(rollover));
             }
         }
 
-        private void updateListRollover(JList list, MouseEvent e) {
-            Point p = (Point) list.getClientProperty(ROLLOVER_KEY);
-            int row = list.locationToIndex(e.getPoint());
+        private void updateRolloverPoint(JList list, Point mousePoint) {
+            int row = list.locationToIndex(mousePoint);
             if (row >= 0) {
                 Rectangle cellBounds = list.getCellBounds(row, row);
-                if (!cellBounds.contains(e.getPoint())) {
+                if (!cellBounds.contains(mousePoint)) {
                     row = -1;
                 }
             }
             int col = row < 0 ? -1 : 0;
-          //  System.out.println("moved - old/new: " + p + "/" + new Point(col, row));
-            if ((col != p.x) || (row != p.y)) {
-                list.putClientProperty(ROLLOVER_KEY, new Point(col, row));
-            }
-            
+            rollover.x = col;
+            rollover.y = row;
         }
 
-        private void updateListRolloverEntered(JList list, MouseEvent e) {
-            int row = list.locationToIndex(e.getPoint());
-            if (row >= 0) {
-                Rectangle cellBounds = list.getCellBounds(row, row);
-                if (!cellBounds.contains(e.getPoint())) {
-                    row = -1;
-                }
-            }
-            int col = row < 0 ? -1 : 0;
-        //    System.out.println("entered - old/new: " + list.getClientProperty(ROLLOVER_KEY) + "/" + new Point(col, row));
-            list.putClientProperty(ROLLOVER_KEY, new Point(col, row));
-            
-        }
-        private void updateTableRollover(JTable table, MouseEvent e) {
-            Point p = (Point) table.getClientProperty(ROLLOVER_KEY);
-            int col = table.columnAtPoint(e.getPoint());
-            int row = table.rowAtPoint(e.getPoint());
+        private void updateRolloverPoint(JTable table, Point mousePoint) {
+            int col = table.columnAtPoint(mousePoint);
+            int row = table.rowAtPoint(mousePoint);
             if ((col < 0) || (row < 0)) {
                 row = -1;
                 col = -1;
             }
-            if ((col != p.x) || (row != p.y)) {
-                table.putClientProperty(ROLLOVER_KEY, new Point(col, row));
-            }
+            rollover.x = col;
+            rollover.y = row;
         }
         
-        private void updateTableRolloverEntered(JTable table, MouseEvent e) {
-            int col = table.columnAtPoint(e.getPoint());
-            int row = table.rowAtPoint(e.getPoint());
-            if ((col < 0) || (row < 0)) {
-                row = -1;
-                col = -1;
-            }
-            table.putClientProperty(ROLLOVER_KEY, new Point(col, row));
-        }
         
     }
