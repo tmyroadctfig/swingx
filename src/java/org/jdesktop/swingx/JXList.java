@@ -11,6 +11,7 @@ import java.awt.Component;
 import java.awt.event.ActionListener;
 import java.util.Vector;
 
+import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
@@ -157,12 +158,51 @@ public class JXList extends JList {
             getLinkRenderer().setVisitingDelegate(linkVisitor);
             
         }
+
+
+        public void updateUI() {
+            updateRendererUI(linkRenderer);
+            updateRendererUI(getSuperCellRenderer());
+            
+        }
+
+
+        private void updateRendererUI(ListCellRenderer renderer) {
+            if (renderer instanceof JComponent) {
+                ((JComponent) renderer).updateUI();
+            } else {
+                Component comp = renderer.getListCellRendererComponent(JXList.this, null, 
+                        -1, false, false);
+                if (comp instanceof JComponent) {
+                    ((JComponent) comp).updateUI();
+                }
+            }
+            
+        }
         
         
         
     }
     
     
+    public void updateUI() {
+        super.updateUI();
+        updateRendererUI();
+    }
+    
+    private void updateRendererUI() {
+        if (linkRendererDelegate != null) {
+            linkRendererDelegate.updateUI();
+        } else {
+            ListCellRenderer renderer = getCellRenderer();
+            if (renderer instanceof JComponent) {
+                ((JComponent) renderer).updateUI();
+            }
+        }
+        
+        
+    }
+
     public FilterPipeline getFilters() {
         return filters;
     }
