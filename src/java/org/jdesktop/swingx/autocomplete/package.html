@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  </head>
+
+  <body>
+    Contains classes to enable automatic completion for JComboBox and
+    other components.
+    <p>
+    The easiest way to get automatic completion for a component is to use the
+    {@link org.jdesktop.swingx.autocomplete.Configurator Configurator}.
+    </p>
+    <p>
+    If you want to enable automatic completion for a component that is not 
+    supported by the {@link org.jdesktop.swingx.autocomplete.Configurator Configurator}, you
+    need to implement {@link org.jdesktop.swingx.autocomplete.CommonModel CommonModel}. For
+    an example see {@link org.jdesktop.swingx.autocomplete.JComboBoxAdaptor JComboBoxAdaptor}
+    and {@link org.jdesktop.swingx.autocomplete.JListAdaptor JListAdaptor}.
+    </p>
+    <p>
+    The automatic completion works only for subclasses of
+    {@link javax.swing.text.JTextComponent JTextComponent}. So you either use a component
+    that contains a JTextComponent (e.g. JComboBox) or you connect a
+    JTextComponent with another component (e.g. a JTextField and a JList).
+    Of course, it's also possible to enable automatic completion for a
+    JTextComponent  without another visual component.
+    </p>
+    <p>Once you have a custom implementation of
+    {@link org.jdesktop.swingx.autocomplete.CommonModel CommonModel}, you
+    normally would only have to make three more calls:
+    </p>
+    <p>
+    <code>
+    CommonModel model = new YourAdaptor(...);</br>
+    Document document = new Document(model, true); // or false if you need non-strict matching</br>
+    Configurator.configureTextComponent(yourTextComponent, document, model);
+    </code>
+    </p>
+  </body>
+</html>
