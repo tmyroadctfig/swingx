@@ -8,6 +8,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -15,9 +16,14 @@ import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JTable;
+import javax.swing.JTree;
+import javax.swing.ToolTipManager;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
@@ -177,6 +183,47 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     }
 
     // ---------------------------- interactive tests
+
+    /**
+     * Issue #226: no per-cell tooltips in TreeColumn.
+     */
+    public void interactiveTestToolTips() {
+        JXTreeTable tree = new JXTreeTable(treeTableModel);
+        tree.setTreeCellRenderer(createRenderer(tree.getTreeCellRenderer()));
+        tree.setDefaultRenderer(Object.class, createTableRenderer(tree.getDefaultRenderer(Object.class)));
+        JFrame frame = wrapWithScrollingInFrame(tree, "tooltips");
+        frame.setVisible(true);  // RG: Changed from deprecated method show();
+
+    }
+
+    private TableCellRenderer createTableRenderer(final TableCellRenderer delegate) {
+        TableCellRenderer l = new TableCellRenderer() {
+
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component result = delegate.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                ((JComponent) result).setToolTipText(String.valueOf(value));
+                return result;
+            }
+            
+        };
+        return l;
+    }
+
+
+    private TreeCellRenderer createRenderer(final TreeCellRenderer delegate) {
+        TreeCellRenderer renderer = new TreeCellRenderer() {
+
+            public Component getTreeCellRendererComponent(JTree tree, Object value, 
+                    boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+                Component result = delegate.getTreeCellRendererComponent(tree, value, 
+                        selected, expanded, leaf, row, hasFocus);
+                ((JComponent) result).setToolTipText(String.valueOf(tree.getPathForRow(row)));
+                 return result;
+            }
+            
+        };
+        return renderer;
+    }
 
     /**
      * reported: boolean not showing - not reproducible 
@@ -457,7 +504,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
          //   test.runInteractiveTests();
          //   test.runInteractiveTests("interactive.*HighLighters");
          //      test.runInteractiveTests("interactive.*SortingFilter.*");
-           test.runInteractiveTests("interactive.*Prop.*");
+           test.runInteractiveTests("interactive.*Tool.*");
          //     test.runInteractiveTests("interactive.*Bool.*");
         } catch (Exception ex) {
 

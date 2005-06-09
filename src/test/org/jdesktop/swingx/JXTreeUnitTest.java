@@ -6,15 +6,19 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JTree;
 import javax.swing.LookAndFeel;
+import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.tree.TreeCellRenderer;
 
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
@@ -42,7 +46,31 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         
     }
 
-    
+ 
+    public void interactiveTestToolTips() {
+        JXTree tree = new JXTree(treeTableModel);
+        tree.setCellRenderer(createRenderer(tree.getCellRenderer()));
+        ToolTipManager toolTipManager = ToolTipManager.sharedInstance();
+        toolTipManager.registerComponent(tree);
+        JFrame frame = wrapWithScrollingInFrame(tree, "tooltips");
+        frame.setVisible(true);  // RG: Changed from deprecated method show();
+
+    }
+    private TreeCellRenderer createRenderer(final TreeCellRenderer delegate) {
+        TreeCellRenderer renderer = new TreeCellRenderer() {
+
+            public Component getTreeCellRendererComponent(JTree tree, Object value, 
+                    boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+                Component result = delegate.getTreeCellRendererComponent(tree, value, 
+                        selected, expanded, leaf, row, hasFocus);
+                ((JComponent) result).setToolTipText(String.valueOf(tree.getPathForRow(row)));
+                 return result;
+            }
+            
+        };
+        return renderer;
+    }
+
     /**
      * test if lineStyle client property is respected by JXTree.
      * Note that some LFs don't respect anyway (WinLF f.i.)
