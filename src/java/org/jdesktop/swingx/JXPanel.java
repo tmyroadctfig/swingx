@@ -282,6 +282,7 @@ public class JXPanel extends JPanel implements Scrollable {
         if (drawGradient != b) {
             boolean old = drawGradient;
             drawGradient = b;
+            oldSize = getSize();
             firePropertyChange("drawGradient", old, b);
             repaint();
         }
