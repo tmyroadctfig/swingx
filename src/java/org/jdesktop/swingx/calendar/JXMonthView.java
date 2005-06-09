@@ -1264,11 +1264,10 @@ public class JXMonthView extends JComponent {
                     }
 
                     // Paint month name.
+                    Font oldFont = getFont();
                     FontMetrics oldFM = fm;
-                    Font oldFont = g.getFont();
-                    Font monthNameFont = oldFont.deriveFont(Font.BOLD);
-                    g.setFont(monthNameFont);
-                    fm = g.getFontMetrics();
+                    g.setFont(_derivedFont);
+                    fm = getFontMetrics(_derivedFont);
                     
                     g.setColor(_monthStringForeground);
                     tmpX = _ltr ? 
@@ -1285,7 +1284,6 @@ public class JXMonthView extends JComponent {
                         g.setColor(_monthStringForeground);
                     }
                     g.drawString(monthName, tmpX, tmpY);
-                    //restore -- rbair
                     g.setFont(oldFont);
                     fm = oldFM;
                 }
@@ -1304,7 +1302,10 @@ public class JXMonthView extends JComponent {
                     // Paint short representation of day of the week.
                     int dayIndex = _firstDayOfWeek - 1;
                     Font oldFont = g.getFont();
+                    FontMetrics oldFM = fm;
                     g.setFont(_derivedFont);
+                    fm = getFontMetrics(_derivedFont);
+
                     for (int i = 0; i < DAYS_IN_WEEK; i++) {
                         tmpX = _ltr ?
                                 x + (i * (_boxPaddingX + _boxWidth +
@@ -1331,6 +1332,7 @@ public class JXMonthView extends JComponent {
                         }
                     }
                     g.setFont(oldFont);
+                    fm = oldFM;
                 }
 
                 // Check if the month to paint falls in the clip.
@@ -1438,7 +1440,9 @@ public class JXMonthView extends JComponent {
                 if (nextFlaggedDate != -1 &&
                         _cal.getTimeInMillis() == nextFlaggedDate) {
                     Font oldFont = getFont();
+                    FontMetrics oldFM = fm;
                     g.setFont(_derivedFont);
+                    fm = getFontMetrics(_derivedFont);
                     g.drawString(numericDay,
                             _ltr ?
                                 _bounds.x + _boxPaddingX +
@@ -1447,6 +1451,7 @@ public class JXMonthView extends JComponent {
                                 _boxWidth - fm.stringWidth(numericDay) - 1,
                             _bounds.y + _boxPaddingY + fm.getAscent());
                     g.setFont(oldFont);
+                    fm = oldFM;
                 } else {
                     g.drawString(numericDay,
                             _ltr ?
