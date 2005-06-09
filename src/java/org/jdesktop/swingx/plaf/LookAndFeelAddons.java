@@ -17,6 +17,7 @@ import javax.swing.JComponent;
 import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 
+import org.jdesktop.swingx.plaf.aqua.AquaLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.windows.WindowsClassicLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.windows.WindowsLookAndFeelAddons;
@@ -40,7 +41,7 @@ import org.jdesktop.swingx.util.OS;
  * The addon can also be installed directly by calling the
  * {@link #setAddon(String)}method. For example, to install the
  * Windows addons, add the following statement
- * <code>LookAndFeelAddons.setAddon("org.jdesktop.jdnc.swing.plaf.windows.WindowsLookAndFeelAddons");</code>.
+ * <code>LookAndFeelAddons.setAddon("org.jdesktop.swingx.plaf.windows.WindowsLookAndFeelAddons");</code>.
  */
 public class LookAndFeelAddons {
 
@@ -168,7 +169,7 @@ public class LookAndFeelAddons {
       // on Mac OS X, use the class Windows style. This one does not
       // have the bug where "special" TaskPaneGroups are not
       // correctly painted.
-      addon = WindowsClassicLookAndFeelAddons.class.getName();
+      addon = AquaLookAndFeelAddons.class.getName();
     } else if (OS.isWindows()) {
       // see whether of not visual styles are used
       if (OS.isUsingWindowsVisualStyles()) {
@@ -297,5 +298,5 @@ public class LookAndFeelAddons {
   public static synchronized boolean isTrackingLookAndFeelChanges() {
     return trackingChanges;
   }
-  
+   
 }

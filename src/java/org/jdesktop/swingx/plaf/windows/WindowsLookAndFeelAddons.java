@@ -13,26 +13,8 @@ import org.jdesktop.swingx.plaf.basic.BasicLookAndFeelAddons;
  */
 public class WindowsLookAndFeelAddons extends BasicLookAndFeelAddons {
 
-  public void initialize() {
-    super.initialize();
-    loadDefaults(getDefaults());
-  }
-
-  public void uninitialize() {
-    super.uninitialize();
-    unloadDefaults(getDefaults());
-  }
+  public static final String HOMESTEAD_VISUAL_STYLE = "HomeStead";
   
-  private Object[] getDefaults() {
-    
-    Object[] defaults =
-      new Object[] {
-//        "FontChooserUI",
-//        "org.jdesktop.jdnc.plaf.windows.WindowsFontChooserUI",
-//        "DirectoryChooserUI",
-//        "org.jdesktop.jdnc.plaf.windows.WindowsDirectoryChooserUI",
-        };
-    return defaults;
-  }
+  public static final String SILVER_VISUAL_STYLE = "Metallic";
 
 }

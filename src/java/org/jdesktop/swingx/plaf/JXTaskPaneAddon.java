@@ -1,0 +1,253 @@
+/*
+ * $Id$
+ *
+ * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
+ * Santa Clara, California 95054, U.S.A. All rights reserved.
+ */
+package org.jdesktop.swingx.plaf;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.SystemColor;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.swing.UIDefaults;
+import javax.swing.UIManager;
+import javax.swing.plaf.ColorUIResource;
+import javax.swing.plaf.FontUIResource;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+
+import org.jdesktop.swingx.JXTaskPane;
+import org.jdesktop.swingx.plaf.ComponentAddon;
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.swingx.plaf.aqua.AquaLookAndFeelAddons;
+import org.jdesktop.swingx.plaf.basic.BasicLookAndFeelAddons;
+import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
+import org.jdesktop.swingx.plaf.windows.WindowsClassicLookAndFeelAddons;
+import org.jdesktop.swingx.plaf.windows.WindowsLookAndFeelAddons;
+import org.jdesktop.swingx.util.JVM;
+import org.jdesktop.swingx.util.OS;
+
+/**
+ * Addon for <code>JXTaskPane</code>.<br>
+ *
+ */
+public class JXTaskPaneAddon implements ComponentAddon {
+
+  public String getName() {
+    return "JXTaskPane";
+  }
+
+  public void initialize(LookAndFeelAddons addon) {
+    addon.loadDefaults(getDefaults(addon));
+  }
+  
+  public void uninitialize(LookAndFeelAddons addon) {
+    addon.unloadDefaults(getDefaults(addon));
+  }
+
+  private Object[] getDefaults(LookAndFeelAddons addon) {
+    List defaults = new ArrayList();
+    if (addon instanceof BasicLookAndFeelAddons) {
+      Color menuBackground = new ColorUIResource(SystemColor.menu);
+      defaults.addAll(Arrays.asList(new Object[]{
+        JXTaskPane.uiClassID,
+        "org.jdesktop.swingx.plaf.basic.BasicTaskPaneUI",
+        "TaskPane.font",
+        new FontUIResource(
+          UIManager.getFont("Label.font").deriveFont(Font.BOLD)),        
+        "TaskPane.background",
+        UIManager.getColor("List.background"),
+        "TaskPane.specialTitleBackground",
+        new ColorUIResource(menuBackground.darker()),
+        "TaskPane.titleBackgroundGradientStart",
+        menuBackground,
+        "TaskPane.titleBackgroundGradientEnd",
+        menuBackground,
+        "TaskPane.titleForeground",
+        new ColorUIResource(SystemColor.menuText),
+        "TaskPane.specialTitleForeground",
+        new ColorUIResource(SystemColor.menuText).brighter(),
+        "TaskPane.animate",
+        Boolean.TRUE,
+        "TaskPane.focusInputMap",
+        new UIDefaults.LazyInputMap(
+          new Object[] {
+            "ENTER",
+            "toggleExpanded",
+            "SPACE",
+            "toggleExpanded" }),
+      }));
+    }
+
+    if (addon instanceof MetalLookAndFeelAddons) {
+      // if using Ocean, use the Glossy l&f
+      String taskPaneGroupUI = "org.jdesktop.swingx.plaf.metal.MetalTaskPaneUI";
+      if (JVM.current().isOrLater(JVM.JDK1_5)) {
+        try {
+          Method method = MetalLookAndFeel.class.getMethod("getCurrentTheme",
+            null);
+          Object currentTheme = method.invoke(null, null);
+          if (Class.forName("javax.swing.plaf.metal.OceanTheme").isInstance(
+            currentTheme)) {
+            taskPaneGroupUI = "org.jdesktop.swingx.plaf.misc.GlossyTaskPaneUI";
+          }
+        } catch (Exception e) {
+        }
+      }
+      defaults.addAll(Arrays.asList(new Object[]{
+        JXTaskPane.uiClassID,
+        taskPaneGroupUI,
+        "TaskPane.foreground",
+        UIManager.getColor("activeCaptionText"),
+        "TaskPane.background",
+        MetalLookAndFeel.getControl(),
+        "TaskPane.specialTitleBackground",
+        MetalLookAndFeel.getPrimaryControl(),
+        "TaskPane.titleBackgroundGradientStart",
+        MetalLookAndFeel.getPrimaryControl(),
+        "TaskPane.titleBackgroundGradientEnd",
+        MetalLookAndFeel.getPrimaryControlHighlight(),
+        "TaskPane.titleForeground",
+        MetalLookAndFeel.getControlTextColor(),        
+        "TaskPane.specialTitleForeground",
+        MetalLookAndFeel.getControlTextColor(),     
+        "TaskPane.borderColor",
+        MetalLookAndFeel.getPrimaryControl(),
+        "TaskPane.titleOver",
+        MetalLookAndFeel.getControl().darker(),
+        "TaskPane.specialTitleOver",
+        MetalLookAndFeel.getPrimaryControlHighlight()        
+      }));      
+    }
+    
+    if (addon instanceof WindowsLookAndFeelAddons) {
+      defaults.addAll(Arrays.asList(new Object[]{
+        JXTaskPane.uiClassID,
+        "org.jdesktop.swingx.plaf.windows.WindowsTaskPaneUI"}));
+
+      String xpStyle = OS.getWindowsVisualStyle();
+      if (WindowsLookAndFeelAddons.HOMESTEAD_VISUAL_STYLE
+        .equalsIgnoreCase(xpStyle)) {        
+        defaults.addAll(Arrays.asList(new Object[]{
+          "TaskPane.foreground",
+          new ColorUIResource(86, 102, 45),
+          "TaskPane.background",
+          new ColorUIResource(246, 246, 236),
+          "TaskPane.specialTitleBackground",
+          new ColorUIResource(224, 231, 184),
+          "TaskPane.titleBackgroundGradientStart",
+          new ColorUIResource(255, 255, 255),
+          "TaskPane.titleBackgroundGradientEnd",
+          new ColorUIResource(224, 231, 184),
+          "TaskPane.titleForeground",
+          new ColorUIResource(86, 102, 45),
+          "TaskPane.titleOver",
+          new ColorUIResource(114, 146, 29),
+          "TaskPane.specialTitleForeground",
+          new ColorUIResource(86, 102, 45),
+          "TaskPane.specialTitleOver",
+          new ColorUIResource(114, 146, 29),
+          "TaskPane.borderColor",
+          new ColorUIResource(255, 255, 255),
+        }));
+      } else if (WindowsLookAndFeelAddons.SILVER_VISUAL_STYLE
+        .equalsIgnoreCase(xpStyle)) {
+        defaults.addAll(Arrays.asList(new Object[]{
+          "TaskPane.foreground",
+          new ColorUIResource(Color.black),
+          "TaskPane.background",
+          new ColorUIResource(240, 241, 245),
+          "TaskPane.specialTitleBackground",
+          new ColorUIResource(222, 222, 222),
+          "TaskPane.titleBackgroundGradientStart",
+          new ColorUIResource(Color.white),
+          "TaskPane.titleBackgroundGradientEnd",
+          new ColorUIResource(214, 215, 224),
+          "TaskPane.titleForeground",
+          new ColorUIResource(Color.black),
+          "TaskPane.titleOver",
+          new ColorUIResource(126, 124, 124),
+          "TaskPane.specialTitleForeground",
+          new ColorUIResource(Color.black),
+          "TaskPane.specialTitleOver",
+          new ColorUIResource(126, 124, 124),
+          "TaskPane.borderColor",
+          new ColorUIResource(Color.white),
+        }));
+      } else {        
+        defaults.addAll(Arrays.asList(new Object[]{
+          "TaskPane.foreground",
+          new ColorUIResource(Color.white),
+          "TaskPane.background",
+          new ColorUIResource(214, 223, 247),
+          "TaskPane.specialTitleBackground",
+          new ColorUIResource(33, 89, 201),
+          "TaskPane.titleBackgroundGradientStart",
+          new ColorUIResource(Color.white),
+          "TaskPane.titleBackgroundGradientEnd",
+          new ColorUIResource(199, 212, 247),
+          "TaskPane.titleForeground",
+          new ColorUIResource(33, 89, 201),
+          "TaskPane.specialTitleForeground",
+          new ColorUIResource(Color.white),
+          "TaskPane.borderColor",
+          new ColorUIResource(Color.white),
+        }));
+      }
+    }
+    
+    if (addon instanceof WindowsClassicLookAndFeelAddons) {
+      defaults.addAll(Arrays.asList(new Object[]{
+        JXTaskPane.uiClassID,
+        "org.jdesktop.swingx.plaf.windows.WindowsClassicTaskPaneUI",
+        "TaskPane.foreground",
+        new ColorUIResource(Color.black),
+        "TaskPane.background",
+        new ColorUIResource(Color.white),
+        "TaskPane.specialTitleBackground",
+        new ColorUIResource(10, 36, 106),
+        "TaskPane.titleBackgroundGradientStart",
+        new ColorUIResource(212, 208, 200),
+        "TaskPane.titleBackgroundGradientEnd",
+        new ColorUIResource(212, 208, 200),
+        "TaskPane.titleForeground",
+        new ColorUIResource(Color.black),
+        "TaskPane.specialTitleForeground",
+        new ColorUIResource(Color.white),
+        "TaskPane.borderColor",
+        new ColorUIResource(212, 208, 200),
+      }));
+    }
+    
+    if (addon instanceof AquaLookAndFeelAddons) {
+      defaults.addAll(Arrays.asList(new Object[]{
+        JXTaskPane.uiClassID,
+        "org.jdesktop.swingx.plaf.misc.GlossyTaskPaneUI",
+        "TaskPane.background",
+        new ColorUIResource(245, 245, 245),
+        "TaskPane.titleForeground",
+        new ColorUIResource(Color.black),
+        "TaskPane.specialTitleBackground",
+        new ColorUIResource(188,188,188),
+        "TaskPane.specialTitleForeground",
+        new ColorUIResource(Color.black),
+        "TaskPane.titleBackgroundGradientStart",
+        new ColorUIResource(250,250,250),
+        "TaskPane.titleBackgroundGradientEnd",
+        new ColorUIResource(188,188,188),
+        "TaskPane.borderColor",
+        new ColorUIResource(97, 97, 97),
+        "TaskPane.titleOver",
+        new ColorUIResource(125, 125, 97),
+        "TaskPane.specialTitleOver",
+        new ColorUIResource(125, 125, 97),
+      }));
+    }
+    
+    return defaults.toArray();
+  }
+}
