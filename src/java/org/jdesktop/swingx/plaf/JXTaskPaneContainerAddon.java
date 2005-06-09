@@ -6,13 +6,15 @@
  */
 package org.jdesktop.swingx.plaf;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import javax.swing.UIManager;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import org.jdesktop.swingx.JXTaskPaneContainer;
-import org.jdesktop.swingx.plaf.ComponentAddon;
-import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.aqua.AquaLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.basic.BasicLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
@@ -31,55 +33,82 @@ public class JXTaskPaneContainerAddon implements ComponentAddon {
   }
 
   public void initialize(LookAndFeelAddons addon) {
+    addon.loadDefaults(getDefaults(addon));
+  }
+  
+  public void uninitialize(LookAndFeelAddons addon) {
+    addon.unloadDefaults(getDefaults(addon));
+  }
+
+  private Object[] getDefaults(LookAndFeelAddons addon) {
+    List defaults = new ArrayList();
     
     if (addon instanceof BasicLookAndFeelAddons) {
-      addon.loadDefaults(new Object[] {
+      defaults.addAll(Arrays.asList(new Object[]{
         JXTaskPaneContainer.uiClassID,
         "org.jdesktop.swingx.plaf.basic.BasicTaskPaneContainerUI",
+        "TaskPaneContainer.useGradient",
+        Boolean.FALSE,
         "TaskPaneContainer.background",
         UIManager.getColor("Desktop.background")
-      });
+      }));
     }
     
     if (addon instanceof MetalLookAndFeelAddons) {
-      addon.loadDefaults(new Object[]{
+      defaults.addAll(Arrays.asList(new Object[]{
         "TaskPaneContainer.background",
         MetalLookAndFeel.getDesktopColor()
-      });
+      }));
     }
     
     if (addon instanceof WindowsLookAndFeelAddons) {     
       String xpStyle = OS.getWindowsVisualStyle();
-      Object background;
-      if ("homestead".equalsIgnoreCase(xpStyle)) {        
+      ColorUIResource background;
+      ColorUIResource backgroundGradientStart;
+      ColorUIResource backgroundGradientEnd;
+      
+      if (WindowsLookAndFeelAddons.HOMESTEAD_VISUAL_STYLE
+        .equalsIgnoreCase(xpStyle)) {        
         background = new ColorUIResource(201, 215, 170);
-      } else if ("metallic".equalsIgnoreCase(xpStyle)) {
+        backgroundGradientStart = new ColorUIResource(204, 217, 173);
+        backgroundGradientEnd = new ColorUIResource(165, 189, 132);
+      } else if (WindowsLookAndFeelAddons.SILVER_VISUAL_STYLE
+        .equalsIgnoreCase(xpStyle)) {
         background = new ColorUIResource(192, 195, 209);
+        backgroundGradientStart = new ColorUIResource(196, 200, 212);
+        backgroundGradientEnd = new ColorUIResource(177, 179, 200);
       } else {        
         background = new ColorUIResource(117, 150, 227);
+        backgroundGradientStart = new ColorUIResource(123, 162, 231);
+        backgroundGradientEnd = new ColorUIResource(99, 117, 214);
       }      
-      addon.loadDefaults(new Object[]{
+      defaults.addAll(Arrays.asList(new Object[]{
+        "TaskPaneContainer.useGradient",
+        Boolean.TRUE,
         "TaskPaneContainer.background",
         background,
-      });
+        "TaskPaneContainer.backgroundGradientStart",
+        backgroundGradientStart,
+        "TaskPaneContainer.backgroundGradientEnd",
+        backgroundGradientEnd,
+      }));
     }
     
     if (addon instanceof WindowsClassicLookAndFeelAddons) {
-      addon.loadDefaults(new Object[]{
+      defaults.addAll(Arrays.asList(new Object[]{
         "TaskPaneContainer.background",
         UIManager.getColor("List.background")
-      });      
+      }));      
     }
     
     if (addon instanceof AquaLookAndFeelAddons) {
-      addon.loadDefaults(new Object[]{
+      defaults.addAll(Arrays.asList(new Object[]{
         "TaskPaneContainer.background",
         new ColorUIResource(238, 238, 238),
-      });            
+      }));            
     }
-  }
-
-  public void uninitialize(LookAndFeelAddons addon) {
+    
+    return defaults.toArray();
   }
 
 }
