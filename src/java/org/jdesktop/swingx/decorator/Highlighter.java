@@ -283,7 +283,7 @@ public class Highlighter {
      * color. Otherwise, it returns a {@link java.awt.Color#darker} version of
      * the specified seed color.
      *
-     * @param seed initial background color; must not be null
+     * @param seed initial background color; must cope with null!
      * @return the background color for a selected cell
      */
     protected Color computeSelectedBackground(Color seed) {
@@ -295,9 +295,9 @@ public class Highlighter {
      * Computes the selected foreground color. If the selected foreground color
      * of this <code>Highlighter</code> is not null, this method returns that
      * color. Otherwise, it returns {@link java.awt.Color#white}, ignoring the
-     * specified seed color.
+     * specified seed color. 
      *
-     * @param seed initial foreground color
+     * @param seed initial foreground color; must cope with null!
      * @return the foreground color for a selected cell
      */
     protected Color computeSelectedForeground(Color seed) {

@@ -60,7 +60,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         JXTree tree = new JXTree(treeTableModel);
         tree.setCellRenderer(createHighlightingRenderer(tree.getCellRenderer()));
         tree.setHighlighters(new HighlighterPipeline(new Highlighter[] {
-                new PatternHighlighter(null, Color.red, "S.*", 0, 1),
+                new PatternHighlighter(null, Color.red, ".*o.*", 0, 1),
             }));
 //        tree.setHighlighters(new HighlighterPipeline(
 //                new Highlighter[] { AlternateRowHighlighter.classicLinePrinter, }));
@@ -82,7 +82,6 @@ public class JXTreeUnitTest extends InteractiveTestCase {
                     HighlighterPipeline highlighters = xTree.getHighlighters();
                     if (highlighters != null) {
                         xTree.getComponentAdapter().row = row;
-                        System.out.println(result);
                         result = highlighters.apply(result, xTree.getComponentAdapter());
                     }
                 }
