@@ -351,7 +351,7 @@ public class JXPanel extends JPanel implements Scrollable {
                 Color c1 = null;//UIManager.getColor("control");
                 Color c2 = null;//c.darker();
                 if (gradientPaint == null) {
-                    c1 = UIManager.getColor("control");
+                    c1 = getBackground();
                     c2 = new Color(c1.getRed() - 40, c1.getGreen() - 40, c1.getBlue() - 40);
                     float x1 = 0f;
                     float y1 = 0f;
