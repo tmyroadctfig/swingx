@@ -45,7 +45,7 @@ public class LinkAction extends AbstractAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        if (delegate != null) {
+        if ((delegate != null) && (link != null)) {
             delegate.actionPerformed(new ActionEvent(link, ActionEvent.ACTION_PERFORMED, VISIT_ACTION));
         }
         

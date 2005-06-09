@@ -1,6 +1,8 @@
 /*
- * Created on 23.05.2005
+ * $Id$
  *
+ * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
+ * Santa Clara, California 95054, U.S.A. All rights reserved.
  */
 package org.jdesktop.swingx;
 
@@ -73,7 +75,7 @@ public class LinkRenderer extends AbstractCellEditor implements
         Point p = (Point) table
                 .getClientProperty(RolloverProducer.ROLLOVER_KEY);
         // JW: check - px > 0 looks fishy! probably meant >= 0?
-        if (hasFocus || (p != null && (p.x > 0) && (p.x == column) && (p.y == row))) {
+        if (hasFocus || (p != null && (p.x >= 0) && (p.x == column) && (p.y == row))) {
              linkButton.getModel().setRollover(true);
         } else {
              linkButton.getModel().setRollover(false);
