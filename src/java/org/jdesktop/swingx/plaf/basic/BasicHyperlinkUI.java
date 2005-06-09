@@ -11,7 +11,6 @@ import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
@@ -172,9 +171,10 @@ public class BasicHyperlinkUI extends BasicButtonUI {
 
         // REMIND(aim): should we be basing the underline on
         // the font's baseline instead of the text bounds?
-
-        g.drawLine(rect.x, (rect.y + rect.height) - descent + 1, rect.x
-                + rect.width, (rect.y + rect.height) - descent + 1);
+        g.drawLine(rect.x + getTextShiftOffset(),
+          (rect.y + rect.height) - descent + 1 + getTextShiftOffset(),
+          rect.x + rect.width + getTextShiftOffset(),
+          (rect.y + rect.height) - descent + 1 + getTextShiftOffset());
     }
 
     protected void paintFocus(Graphics g, AbstractButton b, Rectangle viewRect,
