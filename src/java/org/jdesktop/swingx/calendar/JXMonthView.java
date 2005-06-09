@@ -188,6 +188,7 @@ public class JXMonthView extends JComponent {
     private Color _todayBackgroundColor;
     private Color _monthStringBackground;
     private Color _monthStringForeground;
+    private Color _daysOfTheWeekForeground;
     private Color _selectedBackground;
     private SimpleDateFormat _dayOfMonthFormatter = new SimpleDateFormat("d");
     private String _actionCommand = "selectionChanged";
@@ -272,13 +273,19 @@ public class JXMonthView extends JComponent {
 
         color = UIManager.getColor("JXMonthView.monthStringForeground");
         if (color == null) {
-            color = Color.WHITE;
+            color = new Color(68, 68, 68);
         }
         setMonthStringForeground(color);
+        
+        color = UIManager.getColor("JXMonthView.daysOfTheWeekForeground");
+        if (color == null) {
+            color = new Color(68, 68, 68);
+        }
+        setDaysOfTheWeekForeground(color);
 
         color = UIManager.getColor("JXMonthView.selectedBackground");
         if (color == null) {
-            color = new Color(138, 173, 209);
+            color = new Color(197, 220, 240);
         }
         setSelectedBackground(color);
 
@@ -807,6 +814,22 @@ public class JXMonthView extends JComponent {
     }
 
     /**
+     * Sets the color used to draw the foreground of each day of the week. These
+     * are the titles
+     */
+    public void setDaysOfTheWeekForeground(Color c) {
+        _daysOfTheWeekForeground = c;
+        repaint();
+    }
+    
+    /**
+     * @return Color Color
+     */
+    public Color getDaysOfTheWeekForeground() {
+        return _daysOfTheWeekForeground;
+    }
+    
+    /**
      * Returns a copy of the insets used to paint the month string background.
      *
      * @return Insets Month string insets.
@@ -1217,10 +1240,10 @@ public class JXMonthView extends JComponent {
                 String monthName = _monthsOfTheYear[_cal.get(Calendar.MONTH)];
                 monthName = monthName + " " + _cal.get(Calendar.YEAR);
 
-                _bounds.x = _ltr ? x : x - _calendarWidth;
-                _bounds.y = y + _boxPaddingY;
-                _bounds.width = _calendarWidth;
-                _bounds.height = _monthBoxHeight;
+                _bounds.x = (_ltr ? x : x - _calendarWidth);// + 4; //4px of padding on the left
+                _bounds.y = y + _boxPaddingY;// + 4; //4px of padding on the top
+                _bounds.width = _calendarWidth;// - 8; //4px of padding on both sides
+                _bounds.height = _monthBoxHeight; //4px of padding on top
 
                 if (_bounds.intersects(clip)) {
                     // Paint month name background.
@@ -1241,6 +1264,12 @@ public class JXMonthView extends JComponent {
                     }
 
                     // Paint month name.
+                    FontMetrics oldFM = fm;
+                    Font oldFont = g.getFont();
+                    Font monthNameFont = oldFont.deriveFont(Font.BOLD);
+                    g.setFont(monthNameFont);
+                    fm = g.getFontMetrics();
+                    
                     g.setColor(_monthStringForeground);
                     tmpX = _ltr ? 
                             x + (_calendarWidth / 2) -
@@ -1256,8 +1285,11 @@ public class JXMonthView extends JComponent {
                         g.setColor(_monthStringForeground);
                     }
                     g.drawString(monthName, tmpX, tmpY);
+                    //restore -- rbair
+                    g.setFont(oldFont);
+                    fm = oldFM;
                 }
-                g.setColor(getForeground());
+                g.setColor(getDaysOfTheWeekForeground());
 
                 _bounds.x = _ltr ? x : x - _calendarWidth;
                 _bounds.y = y + _boxPaddingY + _monthBoxHeight +
@@ -1290,7 +1322,7 @@ public class JXMonthView extends JComponent {
                             g.setColor(shadowColor);
                             g.drawString(_daysOfTheWeek[dayIndex],
                                     tmpX + 1, tmpY + 1);
-                            g.setColor(getForeground());
+                            g.setColor(getDaysOfTheWeekForeground());
                         }
                         g.drawString(_daysOfTheWeek[dayIndex], tmpX, tmpY);
                         dayIndex++;
@@ -1451,8 +1483,15 @@ public class JXMonthView extends JComponent {
         width = width - _monthStringInsets.left - _monthStringInsets.right;
         height = height - _monthStringInsets.top - _monthStringInsets.bottom;
 
-        g.setColor(_monthStringBackground);
-        g.fillRect(x, y, width, height);
+        Graphics2D g2 = (Graphics2D)g;
+        GradientPaint gp = new GradientPaint(x, y + height, new Color(238, 238, 238), x, y, new Color(204, 204, 204));
+        //paint the border
+//        g.setColor(_monthStringBackground);
+        g2.setPaint(gp);
+        g2.fillRect(x, y, width - 1, height - 1);
+        g2.setPaint(new Color(153, 153, 153));
+        g2.drawRect(x, y, width - 1, height - 1);
+        //TODO The right side of the rect is being clipped
     }
 
     /**
@@ -1468,8 +1507,13 @@ public class JXMonthView extends JComponent {
      */
     protected void paintTodayBackground(Graphics g, int x, int y, int width,
             int height) {
-        g.setColor(_todayBackgroundColor);
-        g.drawRect(x, y, width - 1, height - 1);
+//        g.setColor(_todayBackgroundColor);
+//        g.drawRect(x, y, width - 1, height - 1);
+        //paint the gradiented border
+        GradientPaint gp = new GradientPaint(x, y, new Color(91, 123, 145), x, y + height, new Color(68, 86, 98));
+        Graphics2D g2 = (Graphics2D)g;
+        g2.setPaint(gp);
+        g2.drawRect(x, y, width - 1, height - 1);
     }
 
     /**

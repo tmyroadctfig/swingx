@@ -17,6 +17,7 @@ import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.border.*;
 import javax.swing.text.DefaultFormatterFactory;
+import org.jdesktop.swingx.border.DropShadowBorder;
 import org.jdesktop.swingx.calendar.*;
 
 /**
@@ -485,29 +486,19 @@ public class JXDatePicker extends JComponent {
      */
     protected class JXDatePickerPopup extends JPopupMenu
             implements ActionListener {
-        private JLabel _todayLabel;
 
+        private DropShadowBorder dsb = new DropShadowBorder(new Color(145, 145, 145), 1, 6);
+        
         public JXDatePickerPopup() {
+//            setBorder(dsb);
             _monthView.setActionCommand("MONTH_VIEW");
             _monthView.addActionListener(this);
-
-            JPanel panel = new JPanel(new FlowLayout());
-            panel.setBackground(_monthView.getBackground());
 
             setLayout(new BorderLayout());
             add(_monthView, BorderLayout.CENTER);
 
-            _todayLabel = new JLabel("Today");
-            _todayLabel.addMouseListener(new MouseAdapter() {
-                public void mousePressed(MouseEvent ev) {
-                    DateSpan span = new DateSpan(System.currentTimeMillis(),
-                        System.currentTimeMillis());
-                    _monthView.ensureDateVisible(span.getStart());
-                }
-            });
-            _todayLabel.setForeground(Color.RED);
-            panel.add(_todayLabel);
-            add(panel, BorderLayout.NORTH);
+            JXPanel panel = new TodayPanel();            
+            add(panel, BorderLayout.SOUTH);
         }
 
         public void actionPerformed(ActionEvent ev) {
@@ -517,6 +508,39 @@ public class JXDatePicker extends JComponent {
                 _dateField.setValue(span.getStartAsDate());
                 _popup.setVisible(false);
                 fireActionPerformed();
+            }
+        }
+        
+        private final class TodayPanel extends JXPanel {
+            TodayPanel() {
+                super(new FlowLayout());
+                setDrawGradient(true);
+                setGradientPaint(new GradientPaint(0, 0, new Color(238, 238, 238), 0, 1, Color.WHITE));
+                JXHyperlink todayLink = new JXHyperlink(new TodayAction());
+//                todayLink.setHidden(false);
+                Color textColor = new Color(16, 66, 104);
+                todayLink.setUnclickedColor(textColor);
+                todayLink.setClickedColor(textColor);
+                add(todayLink);
+            }
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                //add the two lines at the top
+                g.setColor(new Color(187, 187, 187));
+                g.drawLine(0, 0, getWidth(), 0);
+                g.setColor(new Color(221, 221, 221));
+                g.drawLine(0, 1, getWidth(), 1);
+            }
+        }
+        
+        private final class TodayAction extends AbstractAction {
+            TodayAction() {
+                super("Today is " + new SimpleDateFormat("dd MMM yyyy").format(new Date()));
+            }
+            
+            public void actionPerformed(ActionEvent ae) {
+                DateSpan span = new DateSpan(System.currentTimeMillis(), System.currentTimeMillis());
+                _monthView.ensureDateVisible(span.getStart());
             }
         }
     }
