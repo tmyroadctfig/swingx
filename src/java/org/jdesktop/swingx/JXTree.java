@@ -271,12 +271,13 @@ public class JXTree extends JTree {
         }
 
         public Object getValueAt(int row, int column) {
+            TreePath path = tree.getPathForRow(row);
             return path.getLastPathComponent();
         }
 
         public Object getFilteredValueAt(int row, int column) {
             /** @todo Implement filtering */
-            return path.getLastPathComponent();
+            return getValueAt(row, column);
         }
 
         public boolean isSelected() {
