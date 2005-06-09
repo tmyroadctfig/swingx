@@ -7,6 +7,7 @@
 package org.jdesktop.swingx.plaf;
 
 import org.jdesktop.swingx.JXHyperlink;
+import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
 
 /**
  * Addon for <code>JXHyperlink</code>.<br>
@@ -22,10 +23,10 @@ public class JXHyperlinkAddon implements ComponentAddon {
     addon.loadDefaults(new Object[] {JXHyperlink.uiClassID,
       "org.jdesktop.swingx.plaf.basic.BasicHyperlinkUI",});
 
-//    if (addon instanceof WindowsLookAndFeelAddons) {
-//      addon.loadDefaults(new Object[] {JXHyperlink.uiClassID,
-//        "org.jdesktop.jdnc.plaf.windows.WindowsLinkButtonUI"});
-//    }
+    if (!(addon instanceof MetalLookAndFeelAddons)) {
+      addon.loadDefaults(new Object[] {JXHyperlink.uiClassID,
+        "org.jdesktop.swingx.plaf.windows.WindowsHyperlinkUI"});
+    }
   }
 
   public void uninitialize(LookAndFeelAddons addon) {
