@@ -187,7 +187,7 @@ public class JXTaskPane extends JPanel implements
    *          preferred="true"
    */
   public void setTitle(String title) {
-    String old = title;
+    String old = this.title;
     this.title = title;
     firePropertyChange(TITLE_CHANGED_KEY, old, title);
   }
@@ -212,7 +212,7 @@ public class JXTaskPane extends JPanel implements
    *          preferred="true"
    */
   public void setIcon(Icon icon) {
-    Icon old = icon;
+    Icon old = this.icon;
     this.icon = icon;
     firePropertyChange(ICON_CHANGED_KEY, old, icon);
   }
