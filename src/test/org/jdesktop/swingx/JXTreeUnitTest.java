@@ -6,6 +6,7 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 
@@ -20,6 +21,10 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.tree.TreeCellRenderer;
 
+import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
+import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.HighlighterPipeline;
+import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 
@@ -47,15 +52,60 @@ public class JXTreeUnitTest extends InteractiveTestCase {
     }
 
  
+    /**
+     * Issue ??: Background highlighters not working on JXTree.
+     *
+     */
+    public void interactiveTestHighlighters() {
+        JXTree tree = new JXTree(treeTableModel);
+        tree.setCellRenderer(createHighlightingRenderer(tree.getCellRenderer()));
+        tree.setHighlighters(new HighlighterPipeline(new Highlighter[] {
+                new PatternHighlighter(null, Color.red, "S.*", 0, 1),
+            }));
+//        tree.setHighlighters(new HighlighterPipeline(
+//                new Highlighter[] { AlternateRowHighlighter.classicLinePrinter, }));
+        JFrame frame = wrapWithScrollingInFrame(tree, "tooltips");
+        frame.setVisible(true);  // RG: Changed from deprecated method show();
+        
+    }
+    
+    
+    private TreeCellRenderer createHighlightingRenderer(final TreeCellRenderer delegate) {
+        TreeCellRenderer renderer = new TreeCellRenderer() {
+
+            public Component getTreeCellRendererComponent(JTree tree, Object value, 
+                    boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+                Component result = delegate.getTreeCellRendererComponent(tree, value, 
+                        selected, expanded, leaf, row, hasFocus);
+                if (tree instanceof JXTree) {
+                    JXTree xTree = (JXTree) tree;
+                    HighlighterPipeline highlighters = xTree.getHighlighters();
+                    if (highlighters != null) {
+                        xTree.getComponentAdapter().row = row;
+                        System.out.println(result);
+                        result = highlighters.apply(result, xTree.getComponentAdapter());
+                    }
+                }
+                 return result;
+            }
+            
+        };
+        return renderer;
+    }
+
     public void interactiveTestToolTips() {
         JXTree tree = new JXTree(treeTableModel);
         tree.setCellRenderer(createRenderer(tree.getCellRenderer()));
+        // JW: JTree does not automatically register itself
+        // should JXTree? 
         ToolTipManager toolTipManager = ToolTipManager.sharedInstance();
         toolTipManager.registerComponent(tree);
         JFrame frame = wrapWithScrollingInFrame(tree, "tooltips");
         frame.setVisible(true);  // RG: Changed from deprecated method show();
 
     }
+    
+    
     private TreeCellRenderer createRenderer(final TreeCellRenderer delegate) {
         TreeCellRenderer renderer = new TreeCellRenderer() {
 
@@ -176,7 +226,8 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         }
         JXTreeUnitTest test = new JXTreeUnitTest();
         try {
-            test.runInteractiveTests();
+          //  test.runInteractiveTests();
+            test.runInteractiveTests("interactive.*High.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();

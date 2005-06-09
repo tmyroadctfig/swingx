@@ -9,6 +9,8 @@ package org.jdesktop.swingx.decorator;
 
 import java.awt.Color;
 
+import javax.swing.JLabel;
+
 import junit.framework.TestCase;
 
 import org.jdesktop.swingx.JXTable;
@@ -87,5 +89,51 @@ public class HighlighterTest extends TestCase {
         for (int i = 0; i < hls.length; i++) {
             assertTrue(hls[i] != hl2);
         }
+    }
+    
+    public void testNullForeground() {
+        JLabel label = new JLabel("test");
+        HighlighterPipeline pipeline = new HighlighterPipeline(new Highlighter[] {
+                new PatternHighlighter(null, Color.red, "notfitting", 0, 1) });
+        ComponentAdapter adapter = createComponentAdapter(label);
+        label.setForeground(null);
+        pipeline.apply(label, adapter);
+    }
+
+    private ComponentAdapter createComponentAdapter(final JLabel label) {
+        ComponentAdapter adapter = new ComponentAdapter(label) {
+
+            public Object getValueAt(int row, int column) {
+                // TODO Auto-generated method stub
+                return label.getText();
+            }
+
+            public Object getFilteredValueAt(int row, int column) {
+                // TODO Auto-generated method stub
+                return getValueAt(row, column);
+            }
+
+            public void setValueAt(Object aValue, int row, int column) {
+                // TODO Auto-generated method stub
+                
+            }
+
+            public boolean isCellEditable(int row, int column) {
+                // TODO Auto-generated method stub
+                return false;
+            }
+
+            public boolean hasFocus() {
+                // TODO Auto-generated method stub
+                return false;
+            }
+
+            public boolean isSelected() {
+                // TODO Auto-generated method stub
+                return false;
+            }
+            
+        };
+        return adapter;
     }
 }
