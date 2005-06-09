@@ -619,13 +619,25 @@ public class JXTreeTable extends JXTable {
      *
      * @param cellRenderer to use for rendering tree cells.
      */
-    public void setCellRenderer(TreeCellRenderer cellRenderer) {
+    public void setTreeCellRenderer(TreeCellRenderer cellRenderer) {
         if (renderer != null) {
             renderer.setCellRenderer(cellRenderer);
         }
     }
 
+    public TreeCellRenderer getTreeCellRenderer() {
+        return renderer.getCellRenderer();
+    }
 
+    
+    public String getToolTipText(MouseEvent event) {
+        int column = columnAtPoint(event.getPoint());
+        if (isHierarchical(column)) {
+            return renderer.getToolTipText(event);
+        }
+        return super.getToolTipText(event);
+    }
+    
     /**
      * Sets the specified icon as the icon to use for rendering collapsed nodes.
      *
