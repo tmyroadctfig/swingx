@@ -8,7 +8,7 @@
 /**
  * This reporter initializes and uses default mail user agent to send information
  * to predefined mail address. Note, that to use this report facility you need to
- * install Java Desktop Integration Components (JDIC) Libdady.
+ * install Java Desktop Integration Components (JDIC) Library.
  *
  * One can obtain it on the
  * <a href="http://jdic.dev.java.net/">Official JDIC site</a>
