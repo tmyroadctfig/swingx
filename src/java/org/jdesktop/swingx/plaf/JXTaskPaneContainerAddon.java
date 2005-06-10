@@ -61,7 +61,12 @@ public class JXTaskPaneContainerAddon implements ComponentAddon {
       }));
     }
     
-    if (addon instanceof WindowsLookAndFeelAddons) {     
+    if (addon instanceof WindowsClassicLookAndFeelAddons) {
+      defaults.addAll(Arrays.asList(new Object[]{
+        "TaskPaneContainer.background",
+        UIManager.getColor("List.background")
+      }));      
+    } else if (addon instanceof WindowsLookAndFeelAddons) {     
       String xpStyle = OS.getWindowsVisualStyle();
       ColorUIResource background;
       ColorUIResource backgroundGradientStart;
@@ -93,14 +98,7 @@ public class JXTaskPaneContainerAddon implements ComponentAddon {
         backgroundGradientEnd,
       }));
     }
-    
-    if (addon instanceof WindowsClassicLookAndFeelAddons) {
-      defaults.addAll(Arrays.asList(new Object[]{
-        "TaskPaneContainer.background",
-        UIManager.getColor("List.background")
-      }));      
-    }
-    
+        
     if (addon instanceof AquaLookAndFeelAddons) {
       defaults.addAll(Arrays.asList(new Object[]{
         "TaskPaneContainer.background",
