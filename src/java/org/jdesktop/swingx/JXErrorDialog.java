@@ -56,14 +56,6 @@ public class JXErrorDialog extends JDialog {
     private JScrollPane detailsScrollPane;
 
     /**
-     *  String- and PrintWriter needed to format and print an exception.
-     *  They are to be initialized and used in appropriate method
-     */
-    private static StringWriter sw;
-    private static PrintWriter pw;
-
-
-    /**
      * Create a new ErrorDialog with the given Frame as the owner
      * @param owner
      */
@@ -125,6 +117,7 @@ public class JXErrorDialog extends JDialog {
 
         details = new JTextArea(7, 60);
         detailsScrollPane = new JScrollPane(details);
+        detailsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         details.setEditable(false);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridwidth = 3;
@@ -133,6 +126,23 @@ public class JXErrorDialog extends JDialog {
         gbc.weighty = 1.0;
         gbc.insets = new Insets(6, 11, 11, 11);
         this.getContentPane().add(detailsScrollPane, gbc);
+
+        /*
+         * Here i'm going to add invisible empty container to the bottom of the
+         * content pane to fix minimal width of the dialog. It's quite a hack,
+         * but i have not found anything better.
+         */
+        Dimension spPredictedSize = detailsScrollPane.getPreferredSize();
+        Dimension newPanelSize =
+                new Dimension(spPredictedSize.width+15, 0);
+        Container widthHolder = new Container();
+        widthHolder.setMinimumSize(newPanelSize);
+        widthHolder.setPreferredSize(newPanelSize);
+        widthHolder.setMaximumSize(newPanelSize);
+
+        gbc.gridy = 3;
+        gbc.insets = new Insets(0, 11, 11, 0);
+        this.getContentPane().add(widthHolder, gbc);
 
         //make the buttons the same size
         int buttonLength = detailButton.getPreferredSize().width;
@@ -237,10 +247,8 @@ public class JXErrorDialog extends JDialog {
      * @param e
      */
     public static void showDialog(Window owner, String title, Throwable e) {
-        if(sw == null) {
-            sw = new StringWriter();
-            pw = new PrintWriter(sw);
-        }
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
         showDialog(owner, title, e.getLocalizedMessage(), sw.toString());
     }
