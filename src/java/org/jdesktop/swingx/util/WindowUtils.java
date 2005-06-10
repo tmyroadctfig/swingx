@@ -121,6 +121,24 @@ public final class WindowUtils {
         }
 		return new Point(0,0);
 	}
+ 
+        /**
+         *<p>
+	 * Returns the <code>Point</code> at which a window should be placed in
+         * order to be staggered slightly from another &quot;origin&quot; window to 
+         * ensure that the title areas of both windows remain visible to the user.
+	 * </p> 
+         * @param originWindow Window from which the staggered location will be calculated
+         * @return location staggered from the upper left location of the origin
+         *         window
+         */ 
+        public static Point getPointForStaggering(Window originWindow) {
+            Point origin = originWindow.getLocation();
+            Insets insets = originWindow.getInsets();
+            origin.x += insets.top;
+            origin.y += insets.top;
+            return origin;
+        }
 
 	/**
 	 * Utility method used to load a GridBagConstraints object (param gbc) with the
