@@ -11,13 +11,18 @@ import java.lang.reflect.Method;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 
 import javax.swing.ActionMap;
 import javax.swing.JTree;
+import javax.swing.ListCellRenderer;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
@@ -36,6 +41,22 @@ public class JXTree extends JTree {
 
     protected FilterPipeline filters = null;
     protected HighlighterPipeline highlighters = null;
+    private DelegatingRenderer delegatingRenderer;
+
+    /**
+     * Mouse/Motion/Listener keeping track of mouse moved in
+     * cell coordinates.
+     */
+    private RolloverProducer rolloverProducer;
+
+    /**
+     * RolloverController: listens to cell over events and
+     * repaints entered/exited rows.
+     */
+    private LinkController linkController;
+    
+    
+    
     /**
      * Constructs a <code>JXTree</code> with a sample model. The default model
      * used by this tree defines a leaf node as any node without children.
@@ -240,6 +261,91 @@ public class JXTree extends JTree {
         highlighters = pipeline;
     }
 
+    /**
+     * Property to enable/disable rollover support. This can be enabled
+     * to show "live" rollover behaviour, f.i. the cursor over Link cells. 
+     * Default is disabled.
+     * @param rolloverEnabled
+     */
+    public void setRolloverEnabled(boolean rolloverEnabled) {
+        boolean old = isRolloverEnabled();
+        if (rolloverEnabled == old) return;
+        if (rolloverEnabled) {
+            rolloverProducer = new RolloverProducer();
+            addMouseListener(rolloverProducer);
+            addMouseMotionListener(rolloverProducer);
+            linkController = new LinkController();
+            addPropertyChangeListener(linkController);
+        } else {
+            removeMouseListener(rolloverProducer);
+            removeMouseMotionListener(rolloverProducer);
+            rolloverProducer = null;
+            removePropertyChangeListener(linkController);
+            linkController = null;
+        }
+        firePropertyChange("rolloverEnabled", old, isRolloverEnabled());
+    }
+
+    /**
+     * returns the rolloverEnabled property.
+     * @return
+     */
+    public boolean isRolloverEnabled() {
+        return rolloverProducer != null;
+    }
+
+    
+    
+    private DelegatingRenderer getDelegatingRenderer() {
+        if (delegatingRenderer == null) {
+            // only called once... to get hold of the default?
+            delegatingRenderer = new DelegatingRenderer();
+            delegatingRenderer.setDelegateRenderer(super.getCellRenderer());
+        }
+        return delegatingRenderer;
+    }
+
+    public TreeCellRenderer getCellRenderer() {
+        return getDelegatingRenderer();//.getDelegateRenderer();
+    }
+
+    public void setCellRenderer(TreeCellRenderer renderer) {
+        // PENDING: do something against recursive setting
+        // == multiple delegation...
+        getDelegatingRenderer().setDelegateRenderer(renderer);
+        super.setCellRenderer(delegatingRenderer);
+    }
+ 
+    
+    public class DelegatingRenderer implements TreeCellRenderer {
+        
+        private TreeCellRenderer delegate;
+
+        public void setDelegateRenderer(TreeCellRenderer delegate) {
+            if (delegate == null) {
+                delegate = new DefaultTreeCellRenderer();
+            }
+            this.delegate = delegate;
+        }
+        
+        public TreeCellRenderer getDelegateRenderer() {
+            return delegate;
+        }
+            public Component getTreeCellRendererComponent(JTree tree, Object value, 
+                    boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+                Component result = delegate.getTreeCellRendererComponent(tree, value, 
+                        selected, expanded, leaf, row, hasFocus);
+
+                    if (highlighters != null) {
+                        getComponentAdapter().row = row;
+                        result = highlighters.apply(result, getComponentAdapter());
+                    }
+
+                 return result;
+            }
+    }
+
+    
     protected ComponentAdapter getComponentAdapter() {
         return dataAdapter;
     }

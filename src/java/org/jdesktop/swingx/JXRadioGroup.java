@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractButton;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.ButtonModel;
@@ -32,17 +33,36 @@ public class JXRadioGroup extends JPanel {
     private List<Object> values = new ArrayList<Object>();
     private ActionListener actionHandler;
     private List<ActionListener> actionListeners;
+    private int gapWidth;
 
     public JXRadioGroup() {
-        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-        buttonGroup = new ButtonGroup();
+        this(0);
     }
 
+    public JXRadioGroup(int gapWidth) {
+        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+        buttonGroup = new ButtonGroup();
+        this.gapWidth = gapWidth;
+        
+    }
     public JXRadioGroup(Object radioValues[]) {
         this();
         for(int i = 0; i < radioValues.length; i++) {
             add(radioValues[i]);
         }
+    }
+
+    public void setValues(Object[] radioValues) {
+        clearAll();
+        for(int i = 0; i < radioValues.length; i++) {
+            add(radioValues[i]);
+        }
+    }
+    
+    private void clearAll() {
+        values.clear();
+        removeAll();
+        buttonGroup = new ButtonGroup();
     }
 
     public void add(Object radioValue) {
@@ -57,6 +77,7 @@ public class JXRadioGroup extends JPanel {
 
     private void addButton(AbstractButton button) {
         buttonGroup.add(button);
+        checkGap();
         super.add(button);
         if (actionHandler == null) {
             actionHandler = new ActionListener() {
@@ -66,6 +87,17 @@ public class JXRadioGroup extends JPanel {
             };
         }
         button.addActionListener(actionHandler);
+    }
+
+    private void checkGap() {
+        if ((getGapWidth() > 0) && (getComponentCount() > 0)) {
+            add(Box.createHorizontalStrut(getGapWidth()));
+        }
+        
+    }
+
+    private int getGapWidth() {
+        return gapWidth;
     }
 
     public AbstractButton getSelectedButton() {
