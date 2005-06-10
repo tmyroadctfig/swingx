@@ -18,7 +18,9 @@ import javax.swing.JComponent;
  * @author Ramesh Gupta
  */
 public abstract class ComponentAdapter {
+    /** current row in view coordinates (?) */
     public int row = 0;
+    /** current column in view coordinates */
     public int column = 0;
     protected final JComponent	target;
 

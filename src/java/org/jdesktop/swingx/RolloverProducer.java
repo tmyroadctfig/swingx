@@ -15,6 +15,7 @@ import java.awt.event.MouseMotionListener;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JTable;
+import javax.swing.JTree;
 
 /**
  * Mouse/Motion/Listener which stores mouse location as 
@@ -24,6 +25,9 @@ import javax.swing.JTable;
  */
 public class RolloverProducer implements MouseListener, MouseMotionListener {
 
+    /*
+     *  @TODO factor per component type
+     */
 //----------------- mouseListener
         
         public static final String CLICKED_KEY = "swingx.clicked";
@@ -71,6 +75,9 @@ public class RolloverProducer implements MouseListener, MouseMotionListener {
                 updateRolloverPoint((JTable) e.getSource(), e.getPoint());
             } else if (e.getSource() instanceof JList) {
                 updateRolloverPoint((JList) e.getSource(), e.getPoint());
+            } else if (e.getSource() instanceof JTree) {
+                updateRolloverPoint((JTree) e.getSource(), e.getPoint());
+                
             } else {
                 return;
             }
@@ -85,6 +92,20 @@ public class RolloverProducer implements MouseListener, MouseMotionListener {
                 component.putClientProperty(property, new Point(rollover));
             }
         }
+
+        private void updateRolloverPoint(JTree tree, Point mousePoint) {
+            int row = tree.getRowForLocation(mousePoint.x, mousePoint.y);
+//            if (row >= 0) {
+//                Rectangle cellBounds = list.getCellBounds(row, row);
+//                if (!cellBounds.contains(mousePoint)) {
+//                    row = -1;
+//                }
+//            }
+            int col = row < 0 ? -1 : 0;
+            rollover.x = col;
+            rollover.y = row;
+        }
+
 
         private void updateRolloverPoint(JList list, Point mousePoint) {
             int row = list.locationToIndex(mousePoint);
