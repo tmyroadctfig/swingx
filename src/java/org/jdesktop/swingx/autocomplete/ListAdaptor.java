@@ -5,8 +5,8 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.text.JTextComponent;
 
 /**
- * An implementation of the CommonModel that is suitable for a JList in
- * conjunction with a JTextComponent.
+ * An implementation of the AbstractComponentAdaptor that is suitable for a
+ * JList in conjunction with a JTextComponent.
  * @author Thomas Bierhance
  */
 public class ListAdaptor extends AbstractComponentAdaptor implements ListSelectionListener {

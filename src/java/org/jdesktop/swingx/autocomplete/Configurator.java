@@ -15,6 +15,15 @@ import javax.swing.text.TextAction;
 /**
  * This class contains only static utility methods that can be used to set up
  * automatic completion for some Swing components.
+ * <p>Usage examples:</p>
+ * <p><code>
+ * JComboBox comboBox = [...];<br/>
+ * Configurator.<b>enableAutoCompletion</b>(comboBox);<br/>
+ * &nbsp;<br/>
+ * JList list = [...];<br/>
+ * JTextField textField = [...];<br/>
+ * Configurator.<b>enableAutoCompletion</b>(list, textField);
+ * </p></code>
  *
  * @author Thomas Bierhance
  */
@@ -30,9 +39,9 @@ public class Configurator {
      * completion.
      */
     public static void enableAutoCompletion(JList list, JTextComponent textComponent) {
-        AbstractComponentAdaptor model = new ListAdaptor(list, textComponent);
-        Document document = new Document(model, true);
-        configureTextComponent(textComponent, document, model);
+        AbstractComponentAdaptor adaptor = new ListAdaptor(list, textComponent);
+        Document document = new Document(adaptor, true);
+        configureTextComponent(textComponent, document, adaptor);
     }
     
     /**
@@ -48,9 +57,9 @@ public class Configurator {
         
         // configure the text component=editor component
         JTextComponent editor = (JTextComponent) comboBox.getEditor().getEditorComponent();
-        final AbstractComponentAdaptor model = new ComboBoxAdaptor(comboBox);
-        final Document document = new Document(model, strictMatching);
-        configureTextComponent(editor, document, model);
+        final AbstractComponentAdaptor adaptor = new ComboBoxAdaptor(comboBox);
+        final Document document = new Document(adaptor, strictMatching);
+        configureTextComponent(editor, document, adaptor);
         
         // show the popup list when the user presses a key
         final KeyListener keyListener = new KeyAdapter() {
@@ -75,7 +84,7 @@ public class Configurator {
                 if (e.getPropertyName().equals("editor")) {
                     ComboBoxEditor editor = comboBox.getEditor();
                     if (editor!=null && editor.getEditorComponent()!=null) {
-                        configureTextComponent((JTextComponent) editor.getEditorComponent(), document, model);
+                        configureTextComponent((JTextComponent) editor.getEditorComponent(), document, adaptor);
                         editor.getEditorComponent().addKeyListener(keyListener);
                     }
                 }
@@ -85,12 +94,12 @@ public class Configurator {
     
     /**
      * Configures a given text component for automatic completion using the
-     * given Document and CommonModel.
+     * given Document and AbstractComponentAdaptor.
      * @param textComponent a text component that should be configured
      * @param document the Document to be installed on the text component
-     * @param model the CommonModel to be used
+     * @param adaptor the AbstractComponentAdaptor to be used
      */
-    public static void configureTextComponent(JTextComponent textComponent, Document document, final AbstractComponentAdaptor model) {
+    public static void configureTextComponent(JTextComponent textComponent, Document document, final AbstractComponentAdaptor adaptor) {
         // install the document on the text component
         textComponent.setDocument(document);
         
@@ -99,7 +108,7 @@ public class Configurator {
         textComponent.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent e) {
                 JTextComponent textComponent = (JTextComponent) e.getSource();
-                model.markEntireText();
+                adaptor.markEntireText();
             }
         });
         
@@ -120,24 +129,24 @@ public class Configurator {
             editorActionMap.put("nonstrict-backspace", new NonStrictBackspaceAction(
                     editorActionMap.get(DefaultEditorKit.deletePrevCharAction),
                     editorActionMap.get(DefaultEditorKit.selectionBackwardAction),
-                    model));
+                    adaptor));
         }
     }
     
     static class NonStrictBackspaceAction extends TextAction {
         Action backspace;
         Action selectionBackward;
-        AbstractComponentAdaptor model;
+        AbstractComponentAdaptor adaptor;
         
-        public NonStrictBackspaceAction(Action backspace, Action selectionBackward, AbstractComponentAdaptor model) {
+        public NonStrictBackspaceAction(Action backspace, Action selectionBackward, AbstractComponentAdaptor adaptor) {
             super("nonstrict-backspace");
             this.backspace = backspace;
             this.selectionBackward = selectionBackward;
-            this.model = model;
+            this.adaptor = adaptor;
         }
         
         public void actionPerformed(ActionEvent e) {
-            if (model.listContainsSelectedItem()) {
+            if (adaptor.listContainsSelectedItem()) {
                 selectionBackward.actionPerformed(e);
             } else {
                 backspace.actionPerformed(e);

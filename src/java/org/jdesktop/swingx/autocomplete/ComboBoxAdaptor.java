@@ -7,7 +7,7 @@ import javax.swing.JComboBox;
 import javax.swing.text.JTextComponent;
 
 /**
- * An implementation of the CommonModel that is suitable for JComboBox.
+ * An implementation of the AbstractComponentAdaptor that is suitable for JComboBox.
  * @author Thomas Bierhance
  */
 public class ComboBoxAdaptor extends AbstractComponentAdaptor implements ActionListener {

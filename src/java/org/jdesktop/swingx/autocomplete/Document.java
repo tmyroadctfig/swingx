@@ -9,46 +9,47 @@ import javax.swing.text.*;
 
 /**
  * A Document that can be plugged into any JTextComponent to enable automatic completion.
- * It finds and selects matching items using any implementation of the CommonModel.
+ * It finds and selects matching items using any implementation of the AbstractComponentAdaptor.
  */
 public class Document extends PlainDocument {
     
-    /** Flag to indicate if model.setSelectedItem has been called.
+    /** Flag to indicate if adaptor.setSelectedItem has been called.
      * Subsequent calls to remove/insertString should be ignored
      * as they are likely have been caused by the adapted Component that
      * is trying to set the text for the selected component.*/
     boolean selecting=false;
     
     /**
-     * true, if only items from the model's list can be entered
-     * false, otherwise (selected item might not be in the model's list)
+     * true, if only items from the adaptors's list can be entered
+     * false, otherwise (selected item might not be in the adaptors's list)
      */
     boolean strictMatching;
     
     /**
-     * The model that is used to find and select items.
+     * The adaptor that is used to find and select items.
      */
-    AbstractComponentAdaptor model;
+    AbstractComponentAdaptor adaptor;
     
     /**
-     * Creates a new Document for the given CommonModel.
-     * @param strictMatching true, if only items from the model should be allowed to be entered
-     * @param model The model that will be used to find and select matching
+     * Creates a new Document for the given AbstractComponentAdaptor.
+     * @param strictMatching true, if only items from the adaptor's list should
+     * be allowed to be entered
+     * @param adpator The adaptor that will be used to find and select matching
      * items.
      */
-    public Document(AbstractComponentAdaptor model, boolean strictMatching) {
-        this.model = model;
+    public Document(AbstractComponentAdaptor adaptor, boolean strictMatching) {
+        this.adaptor = adaptor;
         this.strictMatching = strictMatching;
         
         // Handle initially selected object
-        Object selected = model.getSelectedItem();
+        Object selected = adaptor.getSelectedItem();
         if (selected!=null) setText(selected.toString());
-        model.markEntireText();
+        adaptor.markEntireText();
     }
     
     /**
-     * Returns if only items from the model should be allowed to be entered.
-     * @return if only items from the model should be allowed to be entered
+     * Returns if only items from the adaptor's list should be allowed to be entered.
+     * @return if only items from the adaptor's list should be allowed to be entered
      */
     public boolean isStrictMatching() {
         return strictMatching;
@@ -60,7 +61,7 @@ public class Document extends PlainDocument {
         super.remove(offs, len);
         if (!strictMatching) {
             setSelectedItem(getText(0, getLength()));
-            model.getTextComponent().setCaretPosition(offs);
+            adaptor.getTextComponent().setCaretPosition(offs);
         }
     }
     
@@ -76,12 +77,12 @@ public class Document extends PlainDocument {
         } else {
             if (strictMatching) {
                 // keep old item selected if there is no match
-                item = model.getSelectedItem();
+                item = adaptor.getSelectedItem();
                 // imitate no insert (later on offs will be incremented by
                 // str.length(): selection won't move forward)
                 offs = offs-str.length();
                 // provide feedback to the user that his input has been received but can not be accepted
-                UIManager.getLookAndFeel().provideErrorFeedback(model.getTextComponent());
+                UIManager.getLookAndFeel().provideErrorFeedback(adaptor.getTextComponent());
             } else {
                 // no item matches => use the current input as selected item
                 item=getText(0, getLength());
@@ -90,7 +91,7 @@ public class Document extends PlainDocument {
         }
         setText(item==null?"":item.toString());
         // select the completed part
-        model.markText(offs+str.length());
+        adaptor.markText(offs+str.length());
     }
     
     /**
@@ -108,31 +109,31 @@ public class Document extends PlainDocument {
     }
     
     /**
-     * Selects the given item using the CommonModel.
+     * Selects the given item using the AbstractComponentAdaptor.
      * @param item the item that is to be selected
      */
     private void setSelectedItem(Object item) {
         selecting = true;
-        model.setSelectedItem(item);
+        adaptor.setSelectedItem(item);
         selecting = false;
     }
     
     /**
-     * Searches for an item that matches the given pattern. The CommonModel is used
-     * to access the candidate items. The match is not case-sensitive and will only
-     * match at the beginning of each item's string representation.
+     * Searches for an item that matches the given pattern. The AbstractComponentAdaptor
+     * is used to access the candidate items. The match is not case-sensitive
+     * and will only match at the beginning of each item's string representation.
      * @param pattern the pattern that should be matched
      * @return the first item that matches the pattern or <code>null</code> if no item matches
      */
     private Object lookupItem(String pattern) {
-        Object selectedItem = model.getSelectedItem();
+        Object selectedItem = adaptor.getSelectedItem();
         // only search for a different item if the currently selected does not match
         if (selectedItem != null && startsWithIgnoreCase(selectedItem.toString(), pattern)) {
             return selectedItem;
         } else {
             // iterate over all items
-            for (int i=0, n=model.getItemCount(); i < n; i++) {
-                Object currentItem = model.getItem(i);
+            for (int i=0, n=adaptor.getItemCount(); i < n; i++) {
+                Object currentItem = adaptor.getItem(i);
                 // current item starts with the pattern?
                 if (currentItem != null && startsWithIgnoreCase(currentItem.toString(), pattern)) {
                     return currentItem;
