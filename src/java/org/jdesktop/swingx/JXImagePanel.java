@@ -179,6 +179,8 @@ public class JXImagePanel extends JXPanel {
      */
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+//        Insets insets = getInsets();
+//        g.fillRect(insets.left, insets.top, getWidth() - insets.right - insets.left, getHeight() - insets.bottom - insets.top);
         Graphics2D g2 = (Graphics2D)g;
         if (img != null) {
             switch (style) {
@@ -189,6 +191,10 @@ public class JXImagePanel extends JXPanel {
                     break;
                 case TILED:
                 case SCALED:
+                    Image temp = img.getScaledInstance(getWidth(), getHeight(), BufferedImage.SCALE_SMOOTH);
+                    g2.drawImage(temp, (getWidth() - temp.getWidth(null)) / 2,
+                            (getHeight() - temp.getHeight(null)) / 2, null);
+                    break;
                 default:
                     System.err.println("unimplemented");
                     g2.drawImage(img, null, 0, 0);
