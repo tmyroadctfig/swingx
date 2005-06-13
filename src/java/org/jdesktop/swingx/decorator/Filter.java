@@ -214,7 +214,7 @@ public abstract class Filter {
 
     protected int mapTowardView(int row) {
         // WARNING: Not all model indices map to view when view is filtered!
-        return row < 0 ? - 1 : fromPrevious[row];
+        return row < 0 || row >= fromPrevious.length ? - 1 : fromPrevious[row];
     }
 
     /**
