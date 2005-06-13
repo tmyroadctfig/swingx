@@ -19,12 +19,14 @@ import javax.swing.LookAndFeel;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
+import org.jdesktop.swingx.decorator.RolloverHighlighter;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 
@@ -51,50 +53,49 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         
     }
 
- 
+    /**
+     * Issue ??: Background highlighters not working on JXTree.
+     *
+     */
+    public void interactiveTestRolloverHighlight() {
+        JXTree tree = new JXTree(treeTableModel);
+        tree.setRolloverEnabled(true);
+        tree.setHighlighters(createRolloverPipeline(true));
+        JFrame frame = wrapWithScrollingInFrame(tree, "Rollover  " );
+        frame.setVisible(true);  // RG: Changed from deprecated method show();
+        
+    }
+
+    private HighlighterPipeline createRolloverPipeline(boolean useForeground) {
+        Color color = new Color(0xF0, 0xF0, 0xE0); //Highlighter.ledgerBackground.getBackground();
+        Highlighter highlighter = new RolloverHighlighter(
+                useForeground ? null : color, useForeground ? color.darker() : null);
+        return new HighlighterPipeline( new Highlighter[] {highlighter});
+    }
+    
     /**
      * Issue ??: Background highlighters not working on JXTree.
      *
      */
     public void interactiveTestHighlighters() {
         JXTree tree = new JXTree(treeTableModel);
-        tree.setCellRenderer(createHighlightingRenderer(tree.getCellRenderer()));
+        String pattern = ".*o.*";
         tree.setHighlighters(new HighlighterPipeline(new Highlighter[] {
-                new PatternHighlighter(null, Color.red, ".*o.*", 0, 1),
+                new PatternHighlighter(null, Color.red, pattern, 0, 1),
             }));
 //        tree.setHighlighters(new HighlighterPipeline(
 //                new Highlighter[] { AlternateRowHighlighter.classicLinePrinter, }));
-        JFrame frame = wrapWithScrollingInFrame(tree, "tooltips");
+        JFrame frame = wrapWithScrollingInFrame(tree, "Highlighters: " + pattern);
         frame.setVisible(true);  // RG: Changed from deprecated method show();
         
     }
     
     
-    private TreeCellRenderer createHighlightingRenderer(final TreeCellRenderer delegate) {
-        TreeCellRenderer renderer = new TreeCellRenderer() {
-
-            public Component getTreeCellRendererComponent(JTree tree, Object value, 
-                    boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-                Component result = delegate.getTreeCellRendererComponent(tree, value, 
-                        selected, expanded, leaf, row, hasFocus);
-                if (tree instanceof JXTree) {
-                    JXTree xTree = (JXTree) tree;
-                    HighlighterPipeline highlighters = xTree.getHighlighters();
-                    if (highlighters != null) {
-                        xTree.getComponentAdapter().row = row;
-                        result = highlighters.apply(result, xTree.getComponentAdapter());
-                    }
-                }
-                 return result;
-            }
-            
-        };
-        return renderer;
-    }
-
     public void interactiveTestToolTips() {
         JXTree tree = new JXTree(treeTableModel);
-        tree.setCellRenderer(createRenderer(tree.getCellRenderer()));
+        // JW: don't use this idiom - Stackoverflow...
+        // multiple delegation - need to solve or discourage
+        tree.setCellRenderer(createRenderer());
         // JW: JTree does not automatically register itself
         // should JXTree? 
         ToolTipManager toolTipManager = ToolTipManager.sharedInstance();
@@ -105,7 +106,8 @@ public class JXTreeUnitTest extends InteractiveTestCase {
     }
     
     
-    private TreeCellRenderer createRenderer(final TreeCellRenderer delegate) {
+    private TreeCellRenderer createRenderer() {
+        final TreeCellRenderer delegate = new DefaultTreeCellRenderer();
         TreeCellRenderer renderer = new TreeCellRenderer() {
 
             public Component getTreeCellRendererComponent(JTree tree, Object value, 
