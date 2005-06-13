@@ -23,6 +23,7 @@ import javax.swing.JTree;
 import javax.swing.ToolTipManager;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 
@@ -189,7 +190,9 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      */
     public void interactiveTestToolTips() {
         JXTreeTable tree = new JXTreeTable(treeTableModel);
-        tree.setTreeCellRenderer(createRenderer(tree.getTreeCellRenderer()));
+        // JW: don't use this idiom - Stackoverflow...
+        // multiple delegation - need to solve or discourage
+        tree.setTreeCellRenderer(createRenderer());
         tree.setDefaultRenderer(Object.class, createTableRenderer(tree.getDefaultRenderer(Object.class)));
         JFrame frame = wrapWithScrollingInFrame(tree, "tooltips");
         frame.setVisible(true);  // RG: Changed from deprecated method show();
@@ -210,7 +213,8 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     }
 
 
-    private TreeCellRenderer createRenderer(final TreeCellRenderer delegate) {
+    private TreeCellRenderer createRenderer() {
+        final TreeCellRenderer delegate = new DefaultTreeCellRenderer();
         TreeCellRenderer renderer = new TreeCellRenderer() {
 
             public Component getTreeCellRendererComponent(JTree tree, Object value, 

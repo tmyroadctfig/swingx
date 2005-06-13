@@ -78,9 +78,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
     
 
-    public void testComponentAdapterCoordinates() {
-        
-    }
     /**
      * Issue #196: backward search broken.
      *
@@ -534,7 +531,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
      * - filtering invisible columns? Unclear state transitions.
      *
      */
-    public void interactiveTestJNTableColumnControlAndFilters() {
+    public void interactiveTestColumnControlAndFilters() {
         final JXTable table = new JXTable(sortableTableModel);
         // hmm bug regression with combos as editors - same in JTable
 //        JComboBox box = new JComboBox(new Object[] {"one", "two", "three" });
@@ -1139,10 +1136,10 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JXTableUnitTest test = new JXTableUnitTest();
         try {
          // test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*Column.*");
+        //    test.runInteractiveTests("interactive.*Column.*");
 //            test.runInteractiveTests("interactive.*TableHeader.*");
          //   test.runInteractiveTests("interactive.*Render.*");
-         //   test.runInteractiveTests("interactive.*High.*");
+            test.runInteractiveTests("interactive.*High.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
