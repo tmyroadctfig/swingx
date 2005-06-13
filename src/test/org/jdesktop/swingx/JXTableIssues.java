@@ -27,6 +27,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
+import org.jdesktop.swingx.decorator.ComponentAdapter;
+
 /**
  * @author Jeanette Winzenburg
  */
@@ -39,6 +41,35 @@ public class JXTableIssues extends InteractiveTestCase {
         // TODO Auto-generated constructor stub
     }
 
+    
+    public void testComponentAdapterCoordinates() {
+        JXTable table = new JXTable(createModel(0, 10));
+        Object originalFirstRowValue = table.getValueAt(0,0);
+        Object originalLastRowValue = table.getValueAt(table.getRowCount() - 1, 0);
+        assertEquals("view row coordinate equals model row coordinate", 
+                table.getModel().getValueAt(0, 0), originalFirstRowValue);
+        // sort first column - actually does not change anything order 
+        table.setSorter(0);
+        // sanity asssert
+        assertEquals("view order must be unchanged ", 
+                table.getValueAt(0, 0), originalFirstRowValue);
+        // invert sort
+        table.setSorter(0);
+        // sanity assert
+        assertEquals("view order must be reversed changed ", 
+                table.getValueAt(0, 0), originalLastRowValue);
+        ComponentAdapter adapter = table.getComponentAdapter();
+        assertEquals("adapter filteredValue expects view coordinates", 
+                table.getValueAt(0, 0), adapter.getFilteredValueAt(0, 0));
+        // adapter coordinates are view coordinates
+        adapter.row = 0;
+        adapter.column = 0;
+        assertEquals("adapter filteredValue expects view coordinates", 
+                table.getValueAt(0, 0), adapter.getValue());
+        
+        
+    }
+    
 //-------------------- adapted jesse wilson: #223
 
 
