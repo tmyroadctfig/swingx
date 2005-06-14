@@ -22,9 +22,9 @@ import java.util.ArrayList;
 import java.io.StringWriter;
 import java.io.PrintWriter;
 
-import org.jdesktop.jdic.desktop.Desktop;
+/*import org.jdesktop.jdic.desktop.Desktop;
 import org.jdesktop.jdic.desktop.DesktopException;
-import org.jdesktop.jdic.desktop.Message;
+import org.jdesktop.jdic.desktop.Message; */
 
 
 public class MailErrorReporter extends ErrorReporter {
@@ -63,13 +63,13 @@ public class MailErrorReporter extends ErrorReporter {
      * @param info <code>IncidentInfo</code> which incorporates all the information on error
      */
     public void reportIncident(IncidentInfo info) {
-        Message msg = new Message();
+/*        Message msg = new Message();
         msg.setToAddrs(toList);
         msg.setSubject(info.getHeader());
         msg.setBody(getMessageBody(info));
         try {
             Desktop.mail(msg);
-        } catch (DesktopException e) {}
+        } catch (DesktopException e) {} */
     }
 
     /**
