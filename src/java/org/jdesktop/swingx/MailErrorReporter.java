@@ -5,32 +5,80 @@
 * Santa Clara, California 95054, U.S.A. All rights reserved.
 */
 
+package org.jdesktop.swingx;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.io.StringWriter;
+import java.io.PrintWriter;
+
+import org.jdesktop.swingx.util.MailTransportProxy;
+
 /**
  * This reporter initializes and uses default mail user agent to send information
- * to predefined mail address. Note, that to use this report facility you need to
- * install Java Desktop Integration Components (JDIC) Library.
+ * to predefined mail address. To send error message one needs to configure an MailTransportProxy.
  *
- * One can obtain it on the
- * <a href="http://jdic.dev.java.net/">Official JDIC site</a>
+ * For example, here is how to use it with <a href="http://jdic.dev.java.net/">JDIC library</a>
+ * <pre>
+
+ import org.jdesktop.swingx.util.MailTransportProxy;
+ import org.jdesktop.swingx.*;
+ import org.jdesktop.jdic.desktop.Message;
+ import org.jdesktop.jdic.desktop.Desktop;
+ import org.jdesktop.jdic.desktop.DesktopException;
+
+ public class TestApp {
+     public static class MyMailTransport implements MailTransportProxy {
+         public void mailMessage(java.util.List<String> toAddr,
+                                 java.util.List<String> ccAddr,
+                                 String subject, String body,
+                                 java.util.List<String> attach) throws Error {
+             Error result = null;
+
+             Message msg = new Message();
+             msg.setToAddrs(toAddr);
+             msg.setCcAddrs(ccAddr);
+             msg.setSubject(subject);
+             msg.setBody(body);
+             try {
+                 msg.setAttachments(attach);
+             } catch (IOException e) {
+                 e.printStackTrace();
+             }
+             try {
+                 Desktop.mail(msg);
+             } catch (DesktopException e) {
+                 result = new Error(e);
+                 result.setStackTrace(Thread.currentThread().getStackTrace());
+                 throw result;
+             }
+         }
+     }
+     public static void main(String args[]) {
+         JFrame jf = new JFrame("Main frame");
+     ... In the program body ...
+         String errorDetails = "The filter factory can't accept this value";
+         MailErrorReporter reporter = new MailErrorReporter("someone@the.net");
+         reporter.setMailTransportProxy(new MyMailTransport());
+         JXErrorDialog.setReporter(reporter);
+         JXErrorDialog.showDialog(jf, "Filter Error", new RuntimeException(errorDetails));
+     }
+ } </pre>
  *
  * @author Alexander Zuev
  * @version 1.0
  */
-package org.jdesktop.swingx;
-
-import java.util.ArrayList;
-import java.io.StringWriter;
-import java.io.PrintWriter;
-
-/*import org.jdesktop.jdic.desktop.Desktop;
-import org.jdesktop.jdic.desktop.DesktopException;
-import org.jdesktop.jdic.desktop.Message; */
-
-
 public class MailErrorReporter extends ErrorReporter {
     private String mailAddr;
-    private ArrayList<String> toList = new ArrayList<String>();
+    private List<String> toList = new ArrayList<String>();
+    private MailTransportProxy mailTransportProxy;
 
+    /**
+     * Constructs new MailErrorReporter with the given address assigned as destination
+     * address for error report.
+     *
+     * @param address
+     */
     public MailErrorReporter(String address) {
         super();
         this.mailAddr = address;
@@ -57,19 +105,22 @@ public class MailErrorReporter extends ErrorReporter {
         toList.add(this.mailAddr);
     }
 
+    public void setMailTransportProxy(MailTransportProxy mailTransportProxy) {
+        this.mailTransportProxy = mailTransportProxy;
+    }
+
     /**
      * Report given incident by popping up system default mail user agent with prepared message
      *
      * @param info <code>IncidentInfo</code> which incorporates all the information on error
      */
     public void reportIncident(IncidentInfo info) {
-/*        Message msg = new Message();
-        msg.setToAddrs(toList);
-        msg.setSubject(info.getHeader());
-        msg.setBody(getMessageBody(info));
-        try {
-            Desktop.mail(msg);
-        } catch (DesktopException e) {} */
+        if(mailTransportProxy != null) {
+            try {
+                mailTransportProxy.mailMessage(toList, null, info.getHeader(),
+                                               getMessageBody(info), getAttachments(info));
+            } catch(Error e) {} // Do nothing
+        }
     }
 
     /**
@@ -91,5 +142,16 @@ public class MailErrorReporter extends ErrorReporter {
             body = body + "\n ----- " + sw.toString();
         }
         return body;
+    }
+
+    /**
+     * This method is used to extract list of paths to files that we want to send
+     * as attachment with the current incident report mwssage.
+     *
+     * @param incident - Incapsulates all the information about error
+     * @return List of Strings containing pathis to files
+     */
+    public List<String> getAttachments(IncidentInfo incident) {
+        return null;
     }
 }
