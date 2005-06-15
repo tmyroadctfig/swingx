@@ -7,9 +7,7 @@
 package org.jdesktop.swingx.decorator;
 
 import java.awt.Color;
-
-import org.jdesktop.swingx.decorator.ComponentAdapter;
-import org.jdesktop.swingx.decorator.PatternHighlighter;
+import java.util.regex.Pattern;
 
 /**
  * @author Jeanette Winzenburg
@@ -17,6 +15,7 @@ import org.jdesktop.swingx.decorator.PatternHighlighter;
 public class SearchHighlighter extends PatternHighlighter {
     int highlightRow;
     private boolean enableHighlight;
+    private static final String ALL = ".*";
     
     public SearchHighlighter() {
         this(Color.YELLOW.brighter(), null);
@@ -40,6 +39,10 @@ public class SearchHighlighter extends PatternHighlighter {
     }
 
     private boolean isEnabled() {
+        Pattern pattern = getPattern();
+        if (pattern == null || ALL.equals(pattern.pattern())) {
+            return false;
+        }
         return enableHighlight;
     }
 
