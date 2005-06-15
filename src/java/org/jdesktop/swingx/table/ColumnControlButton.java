@@ -81,7 +81,7 @@ public final class ColumnControlButton extends JButton {
      */
     private void init() {
         setFocusPainted(false);
-      //  setFocusable(false);
+        setFocusable(false);
 
         setEnabled(table.getColumnModel() instanceof TableColumnModelExt);
 
