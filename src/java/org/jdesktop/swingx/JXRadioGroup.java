@@ -10,6 +10,8 @@ package org.jdesktop.swingx;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +33,7 @@ public class JXRadioGroup extends JPanel {
 	private static final long serialVersionUID = 3257285842266567986L;
 	private ButtonGroup buttonGroup;
     private List<Object> values = new ArrayList<Object>();
-    private ActionListener actionHandler;
+    private ActionSelectionListener actionHandler;
     private List<ActionListener> actionListeners;
     private int gapWidth;
 
@@ -72,28 +74,44 @@ public class JXRadioGroup extends JPanel {
 
     public void add(AbstractButton button) {
         values.add(button.getText());
+        // PENDING: mapping needs cleanup...
         addButton(button);
     }
 
     private void addButton(AbstractButton button) {
         buttonGroup.add(button);
-        checkGap();
         super.add(button);
         if (actionHandler == null) {
-            actionHandler = new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    fireActionEvent(e);
-                }
-            };
+            actionHandler = new ActionSelectionListener();
+//            actionHandler = new ActionListener() {
+//                public void actionPerformed(ActionEvent e) {
+//                    fireActionEvent(e);
+//                }
+//            };
         }
         button.addActionListener(actionHandler);
+        button.addItemListener(actionHandler);
     }
 
+    private class ActionSelectionListener implements ActionListener,
+    ItemListener {
+
+        public void actionPerformed(ActionEvent e) {
+            fireActionEvent(e);
+        
+        }
+        
+        public void itemStateChanged(ItemEvent e) {
+            fireActionEvent(null);
+        
+        }
+
+}
+   
     private void checkGap() {
         if ((getGapWidth() > 0) && (getComponentCount() > 0)) {
             add(Box.createHorizontalStrut(getGapWidth()));
         }
-        
     }
 
     private int getGapWidth() {
@@ -102,7 +120,7 @@ public class JXRadioGroup extends JPanel {
 
     public AbstractButton getSelectedButton() {
         ButtonModel selectedModel = buttonGroup.getSelection();
-        Component children[] = getComponents();
+        AbstractButton children[] = getButtonComponents();
         for(int i = 0; i < children.length; i++) {
             AbstractButton button = (AbstractButton)children[i];
             if (button.getModel() == selectedModel) {
@@ -112,9 +130,20 @@ public class JXRadioGroup extends JPanel {
         return null;
     }
 
+    private AbstractButton[] getButtonComponents() {
+        Component[] children = getComponents();
+        List buttons = new ArrayList();
+        for (int i = 0; i < children.length; i++) {
+            if (children[i] instanceof AbstractButton) {
+                buttons.add(children[i]);
+            }
+        }
+        return (AbstractButton[]) buttons.toArray(new AbstractButton[buttons.size()]);
+    }
+
     private int getSelectedIndex() {
         ButtonModel selectedModel = buttonGroup.getSelection();
-        Component children[] = getComponents();
+        Component children[] = getButtonComponents();
         for (int i = 0; i < children.length; i++) {
             AbstractButton button = (AbstractButton) children[i];
             if (button.getModel() == selectedModel) {
@@ -131,7 +160,7 @@ public class JXRadioGroup extends JPanel {
 
     public void setSelectedValue(Object value) {
         int index = values.indexOf(value);
-        AbstractButton button = (AbstractButton)getComponent(index);
+        AbstractButton button = getButtonComponents()[index];
         button.setSelected(true);
     }
 
