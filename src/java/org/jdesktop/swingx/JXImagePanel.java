@@ -185,9 +185,25 @@ public class JXImagePanel extends JXPanel {
         if (img != null) {
             switch (style) {
                 case CENTERED:
-                    g2.drawImage(img, null,
-                            (getWidth() - img.getWidth()) / 2,
-                            (getHeight() - img.getHeight()) / 2);
+                    Rectangle clipRect = g2.getClipBounds();
+                    int imageX = (getWidth() - img.getWidth()) / 2;
+                    int imageY = (getHeight() - img.getHeight()) / 2;
+                    Rectangle r = SwingUtilities.computeIntersection(imageX, imageY, img.getWidth(), img.getHeight(), clipRect);
+                    if (r.x == 0 && r.y == 0 && (r.width == 0 || r.height == 0)) {
+                        return;
+                    }
+                    //I have my new clipping rectangle "r" in clipRect space.
+                    //It is therefore the new clipRect.
+                    clipRect = r;
+                    //since I have the intersection, all I need to do is adjust the
+                    //x & y values for the image
+                    int txClipX = clipRect.x - imageX;
+                    int txClipY = clipRect.y - imageY;
+                    int txClipW = clipRect.width;
+                    int txClipH = clipRect.height;
+                    
+                    g2.drawImage(img, clipRect.x, clipRect.y, clipRect.x + clipRect.width, clipRect.y + clipRect.height,
+                            txClipX, txClipY, txClipX + txClipW, txClipY + txClipH, null);
                     break;
                 case TILED:
                 case SCALED:
