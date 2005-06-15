@@ -39,22 +39,6 @@ public class JXHyperlinkTest extends InteractiveTestCase {
     public JXHyperlinkTest() {
         super("JXHyperlinkLabel Test");
     }
-    public void interactiveTestUnderline() {
-        Action action = new AbstractAction("Link@somewhere") {
-
-            public void actionPerformed(ActionEvent e) {
-                // TODO Auto-generated method stub
-                
-            }
-            
-        };
-        JXHyperlinkLabel hyperlink = new JXHyperlinkLabel(action );
-        JFrame frame = wrapInFrame(hyperlink, "hyperlink as label - no action");
-        frame.setSize(200, 200);
-        frame.setVisible(true);
-        
-    }
-    
     public void interactiveTestUnderlineButton() {
         Action action = new AbstractAction("Link@somewhere") {
 
