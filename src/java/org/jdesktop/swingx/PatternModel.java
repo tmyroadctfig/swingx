@@ -77,7 +77,7 @@ public class PatternModel {
      */
     private String createRegEx(String searchString) {
         if (isEmpty(searchString))
-            return null;
+            return ".*";
         return ".*" + searchString + ".*";
     }
 
