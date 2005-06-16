@@ -14,31 +14,31 @@ import java.beans.PropertyChangeListener;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 
-import org.jdesktop.swingx.util.Link;
+import org.jdesktop.swingx.LinkModel;
 
 /**
  * @author Jeanette Winzenburg
  */
 public class LinkAction extends AbstractAction {
     
-    private Link link;
+    private LinkModel link;
     private ActionListener delegate;
     public static final String VISIT_ACTION = "visit";
-    public static final String VISITED_PROPERTY = Link.VISITED_PROPERTY;
+    public static final String VISITED_PROPERTY = LinkModel.VISITED_PROPERTY;
     private PropertyChangeListener linkListener;
     
-    public LinkAction(Link link) {
+    public LinkAction(LinkModel link) {
         setLink(link);
     }
 
-    public void setLink(Link link) {
+    public void setLink(LinkModel link) {
         uninstallLinkListener();
         this.link = link;
         installLinkListener();
         updateFromLink();
     }
 
-    public Link getLink() {
+    public LinkModel getLink() {
         return link;
     }
 

@@ -20,7 +20,6 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
 import org.jdesktop.swingx.action.LinkAction;
-import org.jdesktop.swingx.util.Link;
 
 /**
  * A Renderer/Editor for Links.
@@ -56,7 +55,7 @@ public class LinkRenderer extends AbstractCellEditor implements
 
     public Component getListCellRendererComponent(JList list, Object value, 
             int index, boolean isSelected, boolean cellHasFocus) {
-        linkAction.setLink(value instanceof Link ? (Link) value : null);
+        linkAction.setLink(value instanceof LinkModel ? (LinkModel) value : null);
         Point p = (Point) list
             .getClientProperty(RolloverProducer.ROLLOVER_KEY);
         if (cellHasFocus || (p != null && (p.y >= 0) && (p.y == index))) {
@@ -71,7 +70,7 @@ public class LinkRenderer extends AbstractCellEditor implements
     
     public Component getTableCellRendererComponent(JTable table, Object value,
             boolean isSelected, boolean hasFocus, int row, int column) {
-        linkAction.setLink(value instanceof Link ? (Link) value : null);
+        linkAction.setLink(value instanceof LinkModel ? (LinkModel) value : null);
         Point p = (Point) table
                 .getClientProperty(RolloverProducer.ROLLOVER_KEY);
         // JW: check - px > 0 looks fishy! probably meant >= 0?
@@ -87,7 +86,7 @@ public class LinkRenderer extends AbstractCellEditor implements
     
     public Component getTableCellEditorComponent(JTable table, Object value,
             boolean isSelected, int row, int column) {
-        linkAction.setLink(value instanceof Link ? (Link) value : null);
+        linkAction.setLink(value instanceof LinkModel ? (LinkModel) value : null);
         linkButton.getModel().setRollover(true); 
         return linkButton;
     }

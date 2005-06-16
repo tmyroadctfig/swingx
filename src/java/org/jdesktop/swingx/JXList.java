@@ -21,13 +21,12 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
-import org.jdesktop.swingx.util.Link;
 
 
 /**
  * JXList
  *
- * added Rollover/Link handling.
+ * added Rollover/LinkModel handling.
  * 
  * @author Ramesh Gupta
  * @author Jeanette Winzenburg
@@ -74,7 +73,7 @@ public class JXList extends JList {
     }
     /**
      * Property to enable/disable rollover support. This can be enabled
-     * to show "live" rollover behaviour, f.i. the cursor over Link cells. 
+     * to show "live" rollover behaviour, f.i. the cursor over LinkModel cells. 
      * Default is disabled.
      * @param rolloverEnabled
      */
@@ -155,7 +154,7 @@ public class JXList extends JList {
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             Component comp = null;
           
-            if (value instanceof Link) {
+            if (value instanceof LinkModel) {
                 comp =  getLinkRenderer().getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             } else { 
                 comp = delegateRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);

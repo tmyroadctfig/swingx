@@ -5,7 +5,7 @@
  * Santa Clara, California 95054, U.S.A. All rights reserved.
  */
 
-package org.jdesktop.swingx.util;
+package org.jdesktop.swingx;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -18,7 +18,7 @@ import java.net.URL;
  * 
  * @author Mark Davidson
  */
-public class Link implements Comparable {
+public class LinkModel implements Comparable {
 
     private String text; // display text
 
@@ -33,7 +33,7 @@ public class Link implements Comparable {
     public static final String VISITED_PROPERTY = "visited";
 
     
-    public Link(String text, String target, URL url) {
+    public LinkModel(String text, String target, URL url) {
         setText(text);
         setTarget(target);
         setURL(url);
@@ -50,7 +50,7 @@ public class Link implements Comparable {
      * @param args
      *            an array of strings which will be used for substitition
      */
-    public Link(String text, String target, String template, String[] args) {
+    public LinkModel(String text, String target, String template, String[] args) {
         setText(text);
         setTarget(target);
         setURL(createURL(template, args));
@@ -190,15 +190,15 @@ public class Link implements Comparable {
         if (obj == this) {
             return 0;
         }
-        return text.compareTo(((Link) obj).text);
+        return text.compareTo(((LinkModel) obj).text);
     }
 
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
-        if (obj != null && obj instanceof Link) {
-            Link other = (Link) obj;
+        if (obj != null && obj instanceof LinkModel) {
+            LinkModel other = (LinkModel) obj;
             if (!getText().equals(other.getText())) {
                 return false;
             }

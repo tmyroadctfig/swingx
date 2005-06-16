@@ -25,7 +25,6 @@ import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
-import org.jdesktop.swingx.util.Link;
 
 /**
  * @author (C) 2004 Jeanette Winzenburg, Berlin
@@ -115,11 +114,11 @@ public class JXListTest extends InteractiveTestCase {
         DefaultListModel model = new DefaultListModel();
         for (int i = 0; i < 20; i++) {
             try {
-                Link link = new Link("a link text " + i, null, new URL("http://some.dummy.url" + i));
+                LinkModel link = new LinkModel("a link text " + i, null, new URL("http://some.dummy.url" + i));
                 if (i == 1) {
                     URL url = JXEditorPaneTest.class.getResource("resources/test.html");
 
-                    link = new Link("a resource", null, url);
+                    link = new LinkModel("a resource", null, url);
                 }
                 model.addElement(link);
             } catch (MalformedURLException e) {

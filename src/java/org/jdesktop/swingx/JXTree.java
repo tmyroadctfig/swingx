@@ -262,7 +262,7 @@ public class JXTree extends JTree {
 
     /**
      * Property to enable/disable rollover support. This can be enabled
-     * to show "live" rollover behaviour, f.i. the cursor over Link cells. 
+     * to show "live" rollover behaviour, f.i. the cursor over LinkModel cells. 
      * Default is disabled.
      * @param rolloverEnabled
      */

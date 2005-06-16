@@ -11,10 +11,10 @@ import java.io.IOException;
 import javax.swing.text.Document;
 
 import org.jdesktop.swingx.JXEditorPane;
-import org.jdesktop.swingx.util.Link;
+import org.jdesktop.swingx.LinkModel;
 
 /**
- * A ActionListener using a JXEditorPane to "visit" a Link.
+ * A ActionListener using a JXEditorPane to "visit" a LinkModel.
  * 
  * @author Jeanette Winzenburg
  */
@@ -44,14 +44,14 @@ public class EditorPaneLinkVisitor implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() instanceof Link) {
-            Link link = (Link) e.getSource();
+        if (e.getSource() instanceof LinkModel) {
+            LinkModel link = (LinkModel) e.getSource();
             visit(link);
         }
    
     }
 
-    public void visit(Link link) {
+    public void visit(LinkModel link) {
         try {
             // make sure to reload
             editorPane.getDocument().putProperty(Document.StreamDescriptionProperty, null);

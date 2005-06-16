@@ -10,7 +10,6 @@ import javax.swing.JButton;
 
 import org.jdesktop.swingx.plaf.JXHyperlinkAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
-import org.jdesktop.swingx.util.Link;
 
 /**
  * A hyperlink component that derives from JButton to provide compatibility
@@ -131,7 +130,7 @@ public class JXHyperlink extends JButton {
         PropertyChangeListener l = new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
-                if (Link.VISITED_PROPERTY.equals(evt.getPropertyName())) {
+                if (LinkModel.VISITED_PROPERTY.equals(evt.getPropertyName())) {
                     setVisitedFromActionProperty(a);
                 } else {
                     superListener.propertyChange(evt);
@@ -149,7 +148,7 @@ public class JXHyperlink extends JButton {
     }
 
     private void setVisitedFromActionProperty(Action a) {
-        Boolean visited = (Boolean) a.getValue(Link.VISITED_PROPERTY);
+        Boolean visited = (Boolean) a.getValue(LinkModel.VISITED_PROPERTY);
         setVisited(visited != null ? visited.booleanValue() : false);
     }
 

@@ -29,7 +29,6 @@ import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.action.EditorPaneLinkVisitor;
 import org.jdesktop.swingx.action.LinkAction;
-import org.jdesktop.swingx.util.Link;
 
 /**
  * @author Jeanette Winzenburg
@@ -39,8 +38,13 @@ public class JXHyperlinkTest extends InteractiveTestCase {
     public JXHyperlinkTest() {
         super("JXHyperlinkLabel Test");
     }
+
+    public void testDummy() {
+        
+    }
+    
     public void interactiveTestUnderlineButton() {
-        Action action = new AbstractAction("Link@somewhere") {
+        Action action = new AbstractAction("LinkModel@somewhere") {
 
             public void actionPerformed(ActionEvent e) {
                 // TODO Auto-generated method stub
@@ -58,7 +62,7 @@ public class JXHyperlinkTest extends InteractiveTestCase {
  
     public void interactiveTestLink() throws Exception {
         EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
-        Link link = new Link("Click me!", null, JXEditorPaneTest.class.getResource("resources/test.html"));
+        LinkModel link = new LinkModel("Click me!", null, JXEditorPaneTest.class.getResource("resources/test.html"));
 
         LinkAction linkAction = new LinkAction(link);
         linkAction.setVisitingDelegate(visitor);
@@ -78,7 +82,7 @@ public class JXHyperlinkTest extends InteractiveTestCase {
         JXTable table = new JXTable(createModelWithLinks());
         table.setRolloverEnabled(true);
 
-        LinkRenderer editor = (LinkRenderer) table.getDefaultEditor(Link.class);
+        LinkRenderer editor = (LinkRenderer) table.getDefaultEditor(LinkModel.class);
         editor.setVisitingDelegate(visitor);
         JFrame frame = wrapWithScrollingInFrame(table, visitor.getOutputComponent(), "show link renderer in table");
         frame.setVisible(true);
@@ -100,11 +104,11 @@ public class JXHyperlinkTest extends InteractiveTestCase {
         DefaultListModel model = new DefaultListModel();
         for (int i = 0; i < 20; i++) {
             try {
-                Link link = new Link("a link text " + i, null, new URL("http://some.dummy.url" + i));
+                LinkModel link = new LinkModel("a link text " + i, null, new URL("http://some.dummy.url" + i));
                 if (i == 1) {
                     URL url = JXEditorPaneTest.class.getResource("resources/test.html");
 
-                    link = new Link("a link text " + i, null, url);
+                    link = new LinkModel("a link text " + i, null, url);
                 }
                 model.addElement(link);
             } catch (MalformedURLException e) {
@@ -123,11 +127,11 @@ public class JXHyperlinkTest extends InteractiveTestCase {
         };
         for (int i = 0; i < 4; i++) {
             try {
-                Link link = new Link("a link text " + i, null, new URL("http://some.dummy.url" + i));
+                LinkModel link = new LinkModel("a link text " + i, null, new URL("http://some.dummy.url" + i));
                 if (i == 1) {
                     URL url = JXEditorPaneTest.class.getResource("resources/test.html");
 
-                    link = new Link("a link text " + i, null, url);
+                    link = new LinkModel("a link text " + i, null, url);
                 }
                 model.addRow(new Object[] {"text only " + i, link, new Integer(i) });
             } catch (MalformedURLException e) {

@@ -64,7 +64,6 @@ import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.table.TableColumnModelExt;
-import org.jdesktop.swingx.util.Link;
 
 
 /**
@@ -165,7 +164,7 @@ public static boolean TRACE = false;
 
     /**
      * Property to enable/disable rollover support. This can be enabled
-     * to show "live" rollover behaviour, f.i. the cursor over Link cells. 
+     * to show "live" rollover behaviour, f.i. the cursor over LinkModel cells. 
      * Default is disabled.
      * @param rolloverEnabled
      */
@@ -197,14 +196,14 @@ public static boolean TRACE = false;
     }
 
     /**
-     * If the default editor for Link.class is of type
+     * If the default editor for LinkModel.class is of type
      * LinkRenderer  enables link visiting with the given linkVisitor.
      * As a side-effect the rollover property is set to true.
      * 
      * @param linkVisitor
      */
     public void setDefaultLinkVisitor(ActionListener linkVisitor) {
-        TableCellEditor renderer = getDefaultEditor(Link.class);
+        TableCellEditor renderer = getDefaultEditor(LinkModel.class);
         if (renderer instanceof LinkRenderer) {
             ((LinkRenderer) renderer).setVisitingDelegate(linkVisitor);
         }
@@ -333,7 +332,7 @@ public static boolean TRACE = false;
 
     protected void createDefaultEditors() {
         super.createDefaultEditors();
-        setLazyEditor(Link.class, "org.jdesktop.swingx.LinkRenderer");
+        setLazyEditor(LinkModel.class, "org.jdesktop.swingx.LinkRenderer");
     }
     /**
      * Creates default cell renderers for objects, numbers, doubles, dates,
@@ -371,7 +370,7 @@ public static boolean TRACE = false;
         setLazyRenderer(Boolean.class, "org.jdesktop.swingx.JXTable$BooleanRenderer");
 
         // Other
-        setLazyRenderer(Link.class, "org.jdesktop.swingx.LinkRenderer");
+        setLazyRenderer(LinkModel.class, "org.jdesktop.swingx.LinkRenderer");
     }
 
     
@@ -1542,7 +1541,7 @@ public static boolean TRACE = false;
     }
 
     /**
-     * Renders a Link type the link in the table column
+     * Renders a LinkModel type the link in the table column
      */
 //    public static class LinkRenderer extends DefaultTableCellRenderer {
 //
@@ -1551,8 +1550,8 @@ public static boolean TRACE = false;
 //        private static Color colorVisited = new Color(82, 24, 139);
 //
 //        public void setValue(Object value) {
-//            if (value != null && value instanceof Link) {
-//                Link link = (Link) value;
+//            if (value != null && value instanceof LinkModel) {
+//                LinkModel link = (LinkModel) value;
 //
 //                setText(link.getText());
 //                setToolTipText(link.getURL().toString());

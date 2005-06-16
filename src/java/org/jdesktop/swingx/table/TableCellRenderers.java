@@ -49,7 +49,7 @@ public class TableCellRenderers {
                     "org.jdesktop.swing.table.TableCellRenderers$IconRenderer");
         typeMap.put(Boolean.class,
             "org.jdesktop.swing.table.TableCellRenderers$BooleanRenderer");
-//        typeMap.put(Link.class,
+//        typeMap.put(LinkModel.class,
 //                    "org.jdesktop.swing.table.TableCellRenderers$LinkRenderer");
 
     }
@@ -174,7 +174,7 @@ public class TableCellRenderers {
     }
 
     /**
-     * Renders a Link type the link in the table column
+     * Renders a LinkModel type the link in the table column
      */
     public static class LinkRenderer extends DefaultTableCellRenderer {
 
@@ -183,8 +183,8 @@ public class TableCellRenderers {
         private static Color colorVisited = new Color(82, 24, 139);
 
         public void setValue(Object value) {
-//            if (value != null && value instanceof Link) {
-//                Link link = (Link) value;
+//            if (value != null && value instanceof LinkModel) {
+//                LinkModel link = (LinkModel) value;
 //
 //                setText(link.getText());
 //                setToolTipText(link.getURL().toString());

@@ -34,6 +34,7 @@ import javax.swing.JTable;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -57,7 +58,6 @@ import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.util.AncientSwingTeam;
-import org.jdesktop.swingx.util.Link;
 
 public class JXTableUnitTest extends InteractiveTestCase {
 
@@ -356,7 +356,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
 //    public void testLinkCellType() {
 //        JXTable table = new JXTable(tableModel);
 //
-//        assertEquals(Link.class,
+//        assertEquals(LinkModel.class,
 //                     table.getColumnClass(DynamicTableModel.IDX_COL_LINK));
 //
 //        TableCellRenderer renderer = table.getCellRenderer(0,
@@ -474,7 +474,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertEquals("default Number renderer", JXTable.NumberRenderer.class, table.getDefaultRenderer(Number.class).getClass());
         assertEquals("default Double renderer", JXTable.DoubleRenderer.class, table.getDefaultRenderer(Double.class).getClass());
         assertEquals("default Date renderer", JXTable.DateRenderer.class, table.getDefaultRenderer(Date.class).getClass());
-        assertEquals("default Link renderer", LinkRenderer.class, table.getDefaultRenderer(Link.class).getClass());
+        assertEquals("default LinkModel renderer", LinkRenderer.class, table.getDefaultRenderer(LinkModel.class).getClass());
         assertEquals("default Icon renderer", JXTable.IconRenderer.class, table.getDefaultRenderer(Icon.class).getClass());
     }
 
@@ -640,7 +640,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     public void interactivetestColumnControlInvisibleColumns() {
         final JXTable table = new JXTable(sortableTableModel);
-//        table.getColumnExt("Last Name").setVisible(false);
+//      table.getColumnExt("Last Name").setVisible(false);
         table.setColumnControlVisible(true);
         JComponent columnControl = table.getColumnControl();
         int totalColumnCount = table.getColumnCount();
@@ -655,7 +655,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
 //        assertEquals(priorityColumn.getHeaderValue(), menuItem.getText());
 //        assertEquals("selection of menu must be equal to column visibility", 
 //                priorityColumn.isVisible(), menuItem.isSelected());
-        JFrame frame = wrapWithScrollingInFrame(table, "JXTable ColumnControl and Visibility");
+        JFrame frame = wrapWithScrollingInFrame(table, "JXTable (#192) ColumnControl and Visibility");
         frame.setVisible(true);
     }
 
@@ -762,7 +762,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         columns[3].setPrototypeValue(Boolean.TRUE);
         columns[4].setPrototypeValue(new Date(100));
         columns[5].setPrototypeValue(new Float(1.5));
-        columns[6].setPrototypeValue(new Link("Sun Micro", "_blank",
+        columns[6].setPrototypeValue(new LinkModel("Sun Micro", "_blank",
                                               tableModel.linkURL));
         columns[7].setPrototypeValue(new Integer(3023));
         columns[8].setPrototypeValue("John Doh");
@@ -1064,7 +1064,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
             columnSamples[3] = Boolean.TRUE;
             columnSamples[4] = new Date(100);
             columnSamples[5] = new Float(1.5);
-            columnSamples[IDX_COL_LINK] = new Link("Sun Micro", "_blank", linkURL);
+            columnSamples[IDX_COL_LINK] = new LinkModel("Sun Micro", "_blank", linkURL);
             columnSamples[7] = new Integer(3023);
             columnSamples[8] = "John Doh";
             columnSamples[9] = "23434 Testcase St";
@@ -1078,7 +1078,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
             columnSamples2[3] = Boolean.FALSE;
             columnSamples2[4] = new Date(333);
             columnSamples2[5] = new Float(22.22);
-            columnSamples2[IDX_COL_LINK] = new Link("Sun Web", "new_frame", linkURL);
+            columnSamples2[IDX_COL_LINK] = new LinkModel("Sun Web", "new_frame", linkURL);
             columnSamples[7] = new Integer(5503);
             columnSamples[8] = "Jane Smith";
             columnSamples[9] = "2343 Table Blvd.";
@@ -1133,13 +1133,17 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
     public static void main(String args[]) {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e1) { // ignore
+        }
         JXTableUnitTest test = new JXTableUnitTest();
         try {
          // test.runInteractiveTests();
         //    test.runInteractiveTests("interactive.*Column.*");
 //            test.runInteractiveTests("interactive.*TableHeader.*");
          //   test.runInteractiveTests("interactive.*Render.*");
-            test.runInteractiveTests("interactive.*High.*");
+            test.runInteractiveTests("interactive.*Control.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();

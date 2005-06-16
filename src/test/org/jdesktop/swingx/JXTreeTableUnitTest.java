@@ -505,10 +505,10 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         // LFSwitcher.metalLF();
         JXTreeTableUnitTest test = new JXTreeTableUnitTest();
         try {
-         //   test.runInteractiveTests();
+            test.runInteractiveTests();
          //   test.runInteractiveTests("interactive.*HighLighters");
          //      test.runInteractiveTests("interactive.*SortingFilter.*");
-           test.runInteractiveTests("interactive.*Tool.*");
+         //  test.runInteractiveTests("interactive.*Tool.*");
          //     test.runInteractiveTests("interactive.*Bool.*");
         } catch (Exception ex) {
 

@@ -14,7 +14,6 @@ import java.beans.PropertyChangeListener;
 import javax.swing.AbstractButton;
 import javax.swing.ListCellRenderer;
 
-import org.jdesktop.swingx.util.Link;
 
 /**
  * listens to rollover properties. 
@@ -89,7 +88,7 @@ public  class LinkController implements PropertyChangeListener {
     }
     private boolean isLinkColumn(JXTable table, Point location) {
         if (location == null || location.x < 0) return false;
-        return (table.getColumnClass(location.x) == Link.class);
+        return (table.getColumnClass(location.x) == LinkModel.class);
     }
 
     
@@ -137,7 +136,7 @@ public  class LinkController implements PropertyChangeListener {
     }
     private boolean isLinkElement(JXList list, Point location) {
         if (location == null || location.y < 0) return false;
-        return (list.getModel().getElementAt(location.y) instanceof Link);
+        return (list.getModel().getElementAt(location.y) instanceof LinkModel);
     }
     
 //-------------------------------------JTree rollover

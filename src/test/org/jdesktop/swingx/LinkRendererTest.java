@@ -13,14 +13,13 @@ import javax.swing.table.TableCellRenderer;
 
 import junit.framework.TestCase;
 
-import org.jdesktop.swingx.util.Link;
 
 /**
  * @author Jeanette Winzenburg
  */
 public class LinkRendererTest extends TestCase {
 
-    private Link link;
+    private LinkModel link;
 
 
     public void testRolloverRecognition() {
@@ -41,6 +40,6 @@ public class LinkRendererTest extends TestCase {
         super.setUp();
         URL url = getClass().getResource("resources/test.html");
 
-        link = new Link("a resource", null, url);
+        link = new LinkModel("a resource", null, url);
     }
 }
