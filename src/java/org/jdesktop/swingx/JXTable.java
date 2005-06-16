@@ -120,6 +120,8 @@ public static boolean TRACE = false;
      */
     private LinkController linkController;
 
+    private int oldAutoResizeMode;
+
     public JXTable() {
         init();
     }
@@ -162,7 +164,15 @@ public static boolean TRACE = false;
         map.put("find", new Actions("find"));
         map.put(ColumnControlButton.COLUMN_CONTROL_MARKER + "packAll", createPackAllAction());//new Actions("packAll"));
         map.put(ColumnControlButton.COLUMN_CONTROL_MARKER + "packSelected", createPackSelectedAction());//new Actions("packSelected"));
+        map.put(ColumnControlButton.COLUMN_CONTROL_MARKER + "horizontalScroll", createHorizontalScrollAction());
+    }
 
+    private Action createHorizontalScrollAction() {
+        BoundAction action = new BoundAction("Horizontal Scrolling", "horizontalScroll");
+        action.setStateAction();
+        action.registerCallback(this, "setHorizontalScrollEnabled");
+        action.setSelected(isHorizontalScrollEnabled());
+        return action;
     }
 
     private Action createPackSelectedAction() {
@@ -197,6 +207,20 @@ public static boolean TRACE = false;
         }
     }
 
+    public void setHorizontalScrollEnabled(boolean enabled) {
+        if (enabled == (isHorizontalScrollEnabled())) return;
+        if (enabled) {
+            oldAutoResizeMode = getAutoResizeMode();
+            setAutoResizeMode(AUTO_RESIZE_OFF);
+        } else {
+            setAutoResizeMode(oldAutoResizeMode);
+        }
+    }
+
+    private boolean isHorizontalScrollEnabled() {
+        return getAutoResizeMode() == AUTO_RESIZE_OFF;
+    }
+    
     private int getDefaultPackMargin() {
         return 4;
     }
@@ -210,7 +234,15 @@ public static boolean TRACE = false;
            packSelected.setEnabled(!((ListSelectionModel) e.getSource()).isSelectionEmpty()); 
         }
     }
+
     
+    public void setAutoResizeMode(int mode) {
+        super.setAutoResizeMode(mode);
+        Action packSelected = getActionMap().get(ColumnControlButton.COLUMN_CONTROL_MARKER + "horizontalScroll");
+        if (packSelected instanceof BoundAction) {
+           ((BoundAction) packSelected).setSelected(isHorizontalScrollEnabled());
+        }
+    }
     /**
      * Property to enable/disable rollover support. This can be enabled
      * to show "live" rollover behaviour, f.i. the cursor over LinkModel cells. 
@@ -266,6 +298,19 @@ public static boolean TRACE = false;
     protected void configureEnclosingScrollPane() {
         super.configureEnclosingScrollPane();
         configureColumnControl();
+        configureViewportBackground();
+    }
+
+    /** 
+     * set's the viewports background to this.background.
+     * PENDING: need to repeat on background changes to this!
+     *
+     */
+    protected void configureViewportBackground() {
+        Container p = getParent();
+        if (p instanceof JViewport) {
+            p.setBackground(getBackground());
+        }
     }
 
     /**

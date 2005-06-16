@@ -12,11 +12,10 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -33,6 +32,8 @@ import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+
+import org.jdesktop.swingx.action.ActionContainerFactory;
 
 
 /**
@@ -128,6 +129,7 @@ public final class ColumnControlButton extends JButton {
 
     private void addColumnActions() {
         Object[] actionKeys = table.getActionMap().allKeys();
+        Arrays.sort(actionKeys);
         List actions = new ArrayList();
         for (int i = 0; i < actionKeys.length; i++) {
            if (isColumnControlAction(actionKeys[i])) {
@@ -136,9 +138,10 @@ public final class ColumnControlButton extends JButton {
         }
         if (actions.size() == 0) return;
         popupMenu.addSeparator();
+        ActionContainerFactory factory = new ActionContainerFactory(null);
         for (Iterator iter = actions.iterator(); iter.hasNext();) {
             Action action = (Action) iter.next();
-            popupMenu.add(action);
+            popupMenu.add(factory.createMenuItem(action));
         }
     }
 
