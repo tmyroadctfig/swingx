@@ -599,7 +599,10 @@ public class JXTreeTable extends JXTable {
             // attributes of the table cell renderer are applied to the
             // tree cell renderer before the hierarchical column is rendered!
             TreeCellRenderer tcr = renderer.getCellRenderer();
-
+            if (tcr instanceof JXTree.DelegatingRenderer) {
+                tcr = ((JXTree.DelegatingRenderer) tcr).getDelegateRenderer();
+                
+            }
             if (tcr instanceof DefaultTreeCellRenderer) {
                 DefaultTreeCellRenderer dtcr = ((DefaultTreeCellRenderer) tcr);
                 if (adapter.isSelected()) {
@@ -609,7 +612,7 @@ public class JXTreeTable extends JXTable {
                     dtcr.setTextNonSelectionColor(component.getForeground());
                     dtcr.setBackgroundNonSelectionColor(component.getBackground());
                 }
-            }
+            } 
         }
         return component;
     }
