@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
+import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.DefaultCellEditor;
 import javax.swing.Icon;
@@ -42,6 +43,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
+import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.MouseInputListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -52,6 +54,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
+import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
@@ -157,11 +160,57 @@ public static boolean TRACE = false;
         ActionMap map = getActionMap();
         map.put("print", new Actions("print"));
         map.put("find", new Actions("find"));
-        map.put(ColumnControlButton.COLUMN_CONTROL_MARKER + "packAll", new Actions("packAll"));
-        map.put(ColumnControlButton.COLUMN_CONTROL_MARKER + "packSelected", new Actions("packSelected"));
+        map.put(ColumnControlButton.COLUMN_CONTROL_MARKER + "packAll", createPackAllAction());//new Actions("packAll"));
+        map.put(ColumnControlButton.COLUMN_CONTROL_MARKER + "packSelected", createPackSelectedAction());//new Actions("packSelected"));
 
     }
 
+    private Action createPackSelectedAction() {
+        BoundAction action = new BoundAction("Pack Selected Column", "packSelected");
+        action.registerCallback(this, "packSelected");
+        action.setEnabled(getSelectedColumnCount() > 0);
+        return action;
+    }
+
+    private Action createPackAllAction() {
+        BoundAction action = new BoundAction("Pack All Columns", "packAll");
+        action.registerCallback(this, "packAll");
+        return action;
+    }
+    
+    /**
+     * callback for BoundAction packAll.
+     *
+     */
+    public void packAll() {
+        packTable(getDefaultPackMargin());
+    }
+
+    /**
+     * callback for BoundAction packSelected.
+     *
+     */
+    public void packSelected() {
+        int selected = getSelectedColumn();
+        if (selected >= 0) {
+            packColumn(selected, getDefaultPackMargin());
+        }
+    }
+
+    private int getDefaultPackMargin() {
+        return 4;
+    }
+
+    
+    public void columnSelectionChanged(ListSelectionEvent e) {
+        super.columnSelectionChanged(e);
+        if (e.getValueIsAdjusting()) return;
+        Action packSelected = getActionMap().get(ColumnControlButton.COLUMN_CONTROL_MARKER + "packSelected");
+        if ((packSelected != null)) {// && (e.getSource() instanceof ListSelectionModel)){
+           packSelected.setEnabled(!((ListSelectionModel) e.getSource()).isSelectionEmpty()); 
+        }
+    }
+    
     /**
      * Property to enable/disable rollover support. This can be enabled
      * to show "live" rollover behaviour, f.i. the cursor over LinkModel cells. 
@@ -466,21 +515,6 @@ public static boolean TRACE = false;
 
     }
 
-    private void packAll() {
-        packTable(getDefaultPackMargin());
-    }
-
-    private void packSelected() {
-        int selected = getSelectedColumn();
-        if (selected >= 0) {
-            packColumn(selected, getDefaultPackMargin());
-        }
-    }
-
-    private int getDefaultPackMargin() {
-        
-        return 4;
-    }
 
     private JXFindDialog dialog = null;
     private boolean automaticSortDisabled;
