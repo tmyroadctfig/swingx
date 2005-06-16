@@ -6,22 +6,26 @@
  */
 
 package org.jdesktop.swingx;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Cursor;
 import java.awt.Graphics2D;
-
-import java.io.File;
-
+import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.net.URL;
-import javax.swing.Icon;
+
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
+
+import static org.jdesktop.swingx.JXImagePanel.Style.CENTERED;
+import static org.jdesktop.swingx.JXImagePanel.Style.SCALED;
+import static org.jdesktop.swingx.JXImagePanel.Style.TILED;
 
 
 /**
