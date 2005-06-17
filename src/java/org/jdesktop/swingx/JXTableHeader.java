@@ -19,6 +19,17 @@ import javax.swing.table.TableColumnModel;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 
 /**
+ * TableHeader with extended functionality if associated Table is of
+ * type JXTable.<p>
+ * 
+ * The enhancements:
+ * <ul>
+ * <li> toggles sort of column on mouseClicked if table isSortable
+ * <li> uses ColumnHeaderRenderer which can show the sort icon
+ * <li> triggers column pack (== auto-resize to exactly fit the contents)
+ *  on double-click in resize region.
+ * </ul>
+ * 
  * @author Jeanette Winzenburg
  */
 public class JXTableHeader extends JTableHeader {
@@ -31,6 +42,10 @@ public class JXTableHeader extends JTableHeader {
         super(columnModel);
     }
 
+    /**
+     * Sets the associated JTable. Enables enhanced header
+     * features if table is of type JXTable.
+     */
     public void setTable(JTable table) {
         super.setTable(table);
 //        setColumnModel(table.getColumnModel());
@@ -110,8 +125,8 @@ public class JXTableHeader extends JTableHeader {
         }
 
         private boolean shouldIgnore(MouseEvent e) {
-            return !SwingUtilities.isLeftMouseButton(e);
-            // && table.isEnabled());
+            return !SwingUtilities.isLeftMouseButton(e)
+              || !table.isEnabled();
         }
 
         private void doSort(MouseEvent e) {
@@ -136,7 +151,6 @@ public class JXTableHeader extends JTableHeader {
                 return;
             // int column = header.columnAtPoint(e.getPoint());
             int column = getViewIndexForColumn(cachedResizingColumn);
-            System.out.println(column);
             if (column >= 0) {
                 (getXTable()).packColumn(column, 5);
             }
