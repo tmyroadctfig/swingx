@@ -680,6 +680,28 @@ public class JXTableUnitTest extends InteractiveTestCase {
         frame.setVisible(true);
 
     }
+
+    /**
+     * Issue #31 (swingx): clicking header must not sort if table !enabled.
+     *
+     */
+    public void interactiveTestDisabledTableSorting() {
+        final JXTable table = new JXTable(sortableTableModel);
+        Action toggleAction = new AbstractAction("Toggle Enabled") {
+
+            public void actionPerformed(ActionEvent e) {
+                table.setEnabled(!table.isEnabled());
+                
+            }
+            
+        };
+        JFrame frame = wrapWithScrollingInFrame(table, "Disabled tabled: no sorting");
+        addAction(frame, toggleAction);
+        frame.setVisible(true);  
+    }
+
+
+    
     /**
      * Issue #191: sorting and custom renderer
      * not reproducible ...
@@ -687,6 +709,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     public void interactiveTestCustomRendererSorting() {
         JXTable table = new JXTable(sortableTableModel);
+        table.setEnabled(false);
         TableColumn column = table.getColumn("No.");
         TableCellRenderer renderer = new DefaultTableCellRenderer() {
             public Component getTableCellRendererComponent(JTable table, Object value,
@@ -1137,13 +1160,14 @@ public class JXTableUnitTest extends InteractiveTestCase {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e1) { // ignore
         }
+        
         JXTableUnitTest test = new JXTableUnitTest();
         try {
          // test.runInteractiveTests();
         //    test.runInteractiveTests("interactive.*Column.*");
 //            test.runInteractiveTests("interactive.*TableHeader.*");
-         //   test.runInteractiveTests("interactive.*Render.*");
-            test.runInteractiveTests("interactive.*Control.*");
+            test.runInteractiveTests("interactive.*Sort.*");
+         //   test.runInteractiveTests("interactive.*Control.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
