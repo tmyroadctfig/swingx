@@ -35,7 +35,6 @@ import javax.swing.table.TableColumnModel;
 
 import org.jdesktop.swingx.action.ActionContainerFactory;
 
-
 /**
  * This class is installed in the upper right corner of the table and is a
  * control which allows for toggling the visibilty of individual columns.
@@ -51,11 +50,11 @@ public final class ColumnControlButton extends JButton {
     /** exposed for testing. */
     protected JPopupMenu popupMenu = null;
 
-//    private MouseAdapter mouseListener = new MouseAdapter() {
-//        public void mousePressed(MouseEvent ev) {
-//            showP();
-//        }
-//    };
+    // private MouseAdapter mouseListener = new MouseAdapter() {
+    // public void mousePressed(MouseEvent ev) {
+    // showP();
+    // }
+    // };
 
     private JTable table;
 
@@ -67,7 +66,6 @@ public final class ColumnControlButton extends JButton {
         init();
     }
 
-    
     public void updateUI() {
         super.updateUI();
         setMargin(new Insets(1, 2, 2, 1)); // Make this LAF-independent
@@ -99,9 +97,17 @@ public final class ColumnControlButton extends JButton {
 
             public void actionPerformed(ActionEvent e) {
                 showPopup();
-                
+                // patch for Issue #27(swingx) - incomplete because not
+                // catching all possibilities to close the popup
+//                if (opened) {
+//                    opened = false;
+//                    popupMenu.setVisible(opened);
+//                } else {
+//                    showPopup();
+//                }
+
             }
-            
+
         });
 
     }
@@ -132,11 +138,12 @@ public final class ColumnControlButton extends JButton {
         Arrays.sort(actionKeys);
         List actions = new ArrayList();
         for (int i = 0; i < actionKeys.length; i++) {
-           if (isColumnControlAction(actionKeys[i])) {
-               actions.add(table.getActionMap().get(actionKeys[i]));
-           }
+            if (isColumnControlAction(actionKeys[i])) {
+                actions.add(table.getActionMap().get(actionKeys[i]));
+            }
         }
-        if (actions.size() == 0) return;
+        if (actions.size() == 0)
+            return;
         popupMenu.addSeparator();
         ActionContainerFactory factory = new ActionContainerFactory(null);
         for (Iterator iter = actions.iterator(); iter.hasNext();) {
@@ -145,11 +152,9 @@ public final class ColumnControlButton extends JButton {
         }
     }
 
-
     private boolean isColumnControlAction(Object object) {
         return String.valueOf(object).startsWith(COLUMN_CONTROL_MARKER);
     }
-
 
     protected void updateSelectionState() {
         Component[] menuItems = popupMenu.getComponents();
@@ -168,6 +173,7 @@ public final class ColumnControlButton extends JButton {
 
     private AbstractAction columnVisibilityAction = new AbstractAction() {
         public void actionPerformed(ActionEvent ev) {
+            opened = false;
             JCheckBoxMenuItem item = (JCheckBoxMenuItem) ev.getSource();
             TableColumnExt column = (TableColumnExt) item
                     .getClientProperty("column");
@@ -189,19 +195,20 @@ public final class ColumnControlButton extends JButton {
         }
     };
 
+    private boolean opened;
 
     public void showPopup() {
+
         if (popupMenu.getComponentCount() > 0) {
+            opened = true;
             Dimension buttonSize = getSize();
-            popupMenu
-                    .show(this, buttonSize.width
-                            - popupMenu.getPreferredSize().width,
-                            buttonSize.height);
+            popupMenu.show(this, buttonSize.width
+                    - popupMenu.getPreferredSize().width, buttonSize.height);
         }
     }
- 
-//-------------------------------- listeners
-    
+
+    // -------------------------------- listeners
+
     private PropertyChangeListener columnModelChangeListener = new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
             ((TableColumnModel) evt.getOldValue())
@@ -281,6 +288,4 @@ public final class ColumnControlButton extends JButton {
         }
     };
 
-    
-    
 } // end class ColumnControlButton
