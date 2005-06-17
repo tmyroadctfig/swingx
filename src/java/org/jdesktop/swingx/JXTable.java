@@ -125,6 +125,7 @@ public class JXTable extends JTable implements Searchable {
     private LinkController linkController;
 
     private int oldAutoResizeMode;
+    protected boolean isXTableRowHeightSet;
 
     public JXTable() {
         init();
@@ -169,6 +170,7 @@ public class JXTable extends JTable implements Searchable {
         map.put(PACKALL_ACTION_COMMAND, createPackAllAction());//new Actions("packAll"));
         map.put(PACKSELECTED_ACTION_COMMAND, createPackSelectedAction());//new Actions("packSelected"));
         map.put(HORIZONTALSCROLL_ACTION_COMMAND, createHorizontalScrollAction());
+        updateRowHeightUI(false);
     }
 
     private Action createHorizontalScrollAction() {
@@ -188,7 +190,7 @@ public class JXTable extends JTable implements Searchable {
     private Action createPackSelectedAction() {
         String text = getUIString(PACKSELECTED_ACTION_COMMAND);
         BoundAction action = new BoundAction(text, PACKSELECTED_ACTION_COMMAND);
-        action.registerCallback(this, PACKSELECTED_ACTION_COMMAND);
+        action.registerCallback(this, "packSelected");
         action.setEnabled(getSelectedColumnCount() > 0);
         return action;
     }
@@ -196,7 +198,7 @@ public class JXTable extends JTable implements Searchable {
     private Action createPackAllAction() {
         String text = getUIString(PACKALL_ACTION_COMMAND);
         BoundAction action = new BoundAction(text, PACKALL_ACTION_COMMAND);
-        action.registerCallback(this, PACKALL_ACTION_COMMAND);
+        action.registerCallback(this, "packAll");
         return action;
     }
     
@@ -241,7 +243,7 @@ public class JXTable extends JTable implements Searchable {
     public void columnSelectionChanged(ListSelectionEvent e) {
         super.columnSelectionChanged(e);
         if (e.getValueIsAdjusting()) return;
-        Action packSelected = getActionMap().get(ColumnControlButton.COLUMN_CONTROL_MARKER + PACKSELECTED_ACTION_COMMAND);
+        Action packSelected = getActionMap().get(PACKSELECTED_ACTION_COMMAND);
         if ((packSelected != null)) {// && (e.getSource() instanceof ListSelectionModel)){
            packSelected.setEnabled(!((ListSelectionModel) e.getSource()).isSelectionEmpty()); 
         }
@@ -250,7 +252,7 @@ public class JXTable extends JTable implements Searchable {
     
     public void setAutoResizeMode(int mode) {
         super.setAutoResizeMode(mode);
-        Action packSelected = getActionMap().get(ColumnControlButton.COLUMN_CONTROL_MARKER + HORIZONTALSCROLL_ACTION_COMMAND);
+        Action packSelected = getActionMap().get(HORIZONTALSCROLL_ACTION_COMMAND);
         if (packSelected instanceof BoundAction) {
            ((BoundAction) packSelected).setSelected(isHorizontalScrollEnabled());
         }
@@ -506,8 +508,35 @@ public class JXTable extends JTable implements Searchable {
             updateRendererUI(column.getCellRenderer());
             updateRendererUI(column.getHeaderRenderer());
         }
-   
+        updateRowHeightUI(true);
+        configureViewportBackground();
     }
+
+    private void updateRowHeightUI(boolean respectRowSetFlag) {
+        if (respectRowSetFlag && isXTableRowHeightSet) return;
+        int minimumSize = getFont().getSize() + 6;
+        int uiSize = UIManager.getInt(UIPREFIX + "rowHeight");
+        setRowHeight(Math.max(minimumSize, uiSize != 0 ? uiSize : 18));
+        isXTableRowHeightSet = false;
+    }
+
+    
+    public void setRowHeight(int rowHeight) {
+        super.setRowHeight(rowHeight);
+        if (rowHeight > 0) {
+            isXTableRowHeightSet = true;
+        }
+        
+    }
+    
+    /**
+     * this is a Hack: does not set the isXTableRowHeight flag.
+     * @param rowHeight
+     */
+//    protected void setRowHeightInternally(int rowHeight) {
+//        super.setRowHeight(rowHeight);
+//    }
+
     private void updateEditorUI(Object value) {
         // maybe null or proxyValue
         if (!(value instanceof TableCellEditor)) return;
@@ -642,7 +671,9 @@ public class JXTable extends JTable implements Searchable {
         removeSorter();
         clearSelection();
         // Force private rowModel in JTable to null;
+        boolean heightSet = isXTableRowHeightSet;
         setRowHeight(getRowHeight()); // Ugly!
+        isXTableRowHeightSet = heightSet;
         revalidate();
         repaint();
     }

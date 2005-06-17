@@ -173,7 +173,9 @@ public class JXTreeTable extends JXTable {
         // We must reconcile the differences in the semantics of rowHeight as
         // understood by JTable and JTree by overriding both setRowHeight() and
         // setRowMargin();
+        boolean heightSet = isXTableRowHeightSet;
         setRowHeight(getRowHeight()); // call overridden setRowHeight()
+        isXTableRowHeightSet = heightSet;
         setRowMargin(getRowMargin()); // call overridden setRowMargin()
 
     }
@@ -372,7 +374,9 @@ public class JXTreeTable extends JXTable {
         // We must reconcile the differences in the semantics of rowHeight as
         // understood by JTable and JTree by overriding both setRowHeight() and
         // setRowMargin();
+        boolean rememberRowHeightSet = isXTableRowHeightSet;
         setRowHeight(getRowHeight()); // call overridden setRowHeight()
+        isXTableRowHeightSet = rememberRowHeightSet;
         setRowMargin(getRowMargin()); // call overridden setRowMargin()
     }
 
@@ -1511,7 +1515,9 @@ public class JXTreeTable extends JXTable {
                     assert tableRowMargin >= 0;
                     final int tableRowHeight = rowHeight - (tableRowMargin << 1);
                     if (treeTable.getRowHeight() != tableRowHeight) {
+                        boolean heightSet = treeTable.isXTableRowHeightSet;
                         treeTable.setRowHeight(tableRowHeight);
+                        treeTable.isXTableRowHeightSet = heightSet;
                     }
                 }
             }
@@ -1651,7 +1657,8 @@ public class JXTreeTable extends JXTable {
 
     // Define defaultRowHeight to allow default document icon for leaf items to
     // draw properly
-    private final static int defaultRowHeight = 20;
+    // JW: unused? commented until needed
+    //private final static int defaultRowHeight = 20;
     private final static Dimension spacing = new Dimension(0, 2);
 
     static class TreeTableDataAdapter extends JXTable.TableAdapter {
