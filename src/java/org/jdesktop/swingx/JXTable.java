@@ -8,14 +8,11 @@
 package org.jdesktop.swingx;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.print.PrinterException;
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -23,7 +20,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import java.util.regex.Pattern;
@@ -41,10 +37,9 @@ import javax.swing.JTable;
 import javax.swing.JViewport;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
+import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.MouseInputListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
@@ -62,8 +57,9 @@ import org.jdesktop.swingx.decorator.PipelineEvent;
 import org.jdesktop.swingx.decorator.PipelineListener;
 import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.icon.ColumnControlIcon;
+import org.jdesktop.swingx.plaf.JXTableAddon;
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.table.ColumnControlButton;
-import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.table.TableColumnModelExt;
@@ -79,7 +75,15 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  */
 public class JXTable extends JTable implements Searchable {
 
-public static boolean TRACE = false;
+    public static final String HORIZONTALSCROLL_ACTION_COMMAND = ColumnControlButton.COLUMN_CONTROL_MARKER + "horizontalScroll";
+    public static final String PACKALL_ACTION_COMMAND = ColumnControlButton.COLUMN_CONTROL_MARKER + "packAll";
+    public static final String PACKSELECTED_ACTION_COMMAND = ColumnControlButton.COLUMN_CONTROL_MARKER + "packSelected";
+    public static final String UIPREFIX = "JXTable.";
+    static {
+        LookAndFeelAddons.contribute(new JXTableAddon());
+      }
+
+    public static boolean TRACE = false;
   
     protected Sorter            sorter = null;
     protected FilterPipeline        filters = null;
@@ -162,29 +166,37 @@ public static boolean TRACE = false;
         ActionMap map = getActionMap();
         map.put("print", new Actions("print"));
         map.put("find", new Actions("find"));
-        map.put(ColumnControlButton.COLUMN_CONTROL_MARKER + "packAll", createPackAllAction());//new Actions("packAll"));
-        map.put(ColumnControlButton.COLUMN_CONTROL_MARKER + "packSelected", createPackSelectedAction());//new Actions("packSelected"));
-        map.put(ColumnControlButton.COLUMN_CONTROL_MARKER + "horizontalScroll", createHorizontalScrollAction());
+        map.put(PACKALL_ACTION_COMMAND, createPackAllAction());//new Actions("packAll"));
+        map.put(PACKSELECTED_ACTION_COMMAND, createPackSelectedAction());//new Actions("packSelected"));
+        map.put(HORIZONTALSCROLL_ACTION_COMMAND, createHorizontalScrollAction());
     }
 
     private Action createHorizontalScrollAction() {
-        BoundAction action = new BoundAction("Horizontal Scrolling", "horizontalScroll");
+        String actionName = getUIString(HORIZONTALSCROLL_ACTION_COMMAND);
+        BoundAction action = new BoundAction(actionName, HORIZONTALSCROLL_ACTION_COMMAND);
         action.setStateAction();
         action.registerCallback(this, "setHorizontalScrollEnabled");
         action.setSelected(isHorizontalScrollEnabled());
         return action;
     }
 
+    private String getUIString(String key) {
+        String text = UIManager.getString(UIPREFIX + key, null);
+        return text != null ? text : key;
+    }
+
     private Action createPackSelectedAction() {
-        BoundAction action = new BoundAction("Pack Selected Column", "packSelected");
-        action.registerCallback(this, "packSelected");
+        String text = getUIString(PACKSELECTED_ACTION_COMMAND);
+        BoundAction action = new BoundAction(text, PACKSELECTED_ACTION_COMMAND);
+        action.registerCallback(this, PACKSELECTED_ACTION_COMMAND);
         action.setEnabled(getSelectedColumnCount() > 0);
         return action;
     }
 
     private Action createPackAllAction() {
-        BoundAction action = new BoundAction("Pack All Columns", "packAll");
-        action.registerCallback(this, "packAll");
+        String text = getUIString(PACKALL_ACTION_COMMAND);
+        BoundAction action = new BoundAction(text, PACKALL_ACTION_COMMAND);
+        action.registerCallback(this, PACKALL_ACTION_COMMAND);
         return action;
     }
     
@@ -229,7 +241,7 @@ public static boolean TRACE = false;
     public void columnSelectionChanged(ListSelectionEvent e) {
         super.columnSelectionChanged(e);
         if (e.getValueIsAdjusting()) return;
-        Action packSelected = getActionMap().get(ColumnControlButton.COLUMN_CONTROL_MARKER + "packSelected");
+        Action packSelected = getActionMap().get(ColumnControlButton.COLUMN_CONTROL_MARKER + PACKSELECTED_ACTION_COMMAND);
         if ((packSelected != null)) {// && (e.getSource() instanceof ListSelectionModel)){
            packSelected.setEnabled(!((ListSelectionModel) e.getSource()).isSelectionEmpty()); 
         }
@@ -238,7 +250,7 @@ public static boolean TRACE = false;
     
     public void setAutoResizeMode(int mode) {
         super.setAutoResizeMode(mode);
-        Action packSelected = getActionMap().get(ColumnControlButton.COLUMN_CONTROL_MARKER + "horizontalScroll");
+        Action packSelected = getActionMap().get(ColumnControlButton.COLUMN_CONTROL_MARKER + HORIZONTALSCROLL_ACTION_COMMAND);
         if (packSelected instanceof BoundAction) {
            ((BoundAction) packSelected).setSelected(isHorizontalScrollEnabled());
         }
@@ -550,9 +562,9 @@ public static boolean TRACE = false;
             }
             else if ("find".equals(getName())) {
                 find();
-            } else if ("packAll".equals(getName())) {
+            } else if (PACKALL_ACTION_COMMAND.equals(getName())) {
                 packAll();
-            } else if ("packSelected".equals(getName())) {
+            } else if (PACKSELECTED_ACTION_COMMAND.equals(getName())) {
                 packSelected();
             }
         }
