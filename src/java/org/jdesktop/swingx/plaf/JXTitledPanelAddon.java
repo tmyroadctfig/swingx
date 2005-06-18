@@ -21,7 +21,7 @@ import org.jdesktop.swingx.plaf.windows.WindowsLookAndFeelAddons;
 import org.jdesktop.swingx.util.OS;
 
 /**
- * Addon for <code>JXHyperlink</code>.<br>
+ * Addon for <code>JXTitledPanel</code>.<br>
  *
  */
 public class JXTitledPanelAddon implements ComponentAddon {
