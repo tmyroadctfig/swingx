@@ -88,9 +88,8 @@ public class JXTaskPaneAddon implements ComponentAddon {
       String taskPaneGroupUI = "org.jdesktop.swingx.plaf.metal.MetalTaskPaneUI";
       if (JVM.current().isOrLater(JVM.JDK1_5)) {
         try {
-          Method method = MetalLookAndFeel.class.getMethod("getCurrentTheme",
-            null);
-          Object currentTheme = method.invoke(null, null);
+          Method method = MetalLookAndFeel.class.getMethod("getCurrentTheme");
+          Object currentTheme = method.invoke(null);
           if (Class.forName("javax.swing.plaf.metal.OceanTheme").isInstance(
             currentTheme)) {
             taskPaneGroupUI = "org.jdesktop.swingx.plaf.misc.GlossyTaskPaneUI";
