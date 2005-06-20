@@ -21,20 +21,21 @@ public class JXTableAddon implements ComponentAddon {
   }
 
   public void initialize(LookAndFeelAddons addon) {
-    addon.loadDefaults(getDefaults());
+    // dummy call - ensure loading  
+    addon.loadDefaults(new Object[] {  });
   }
 
   public void uninitialize(LookAndFeelAddons addon) {
   }
 
-  protected Object[] getDefaults() {
-      List defaults = new ArrayList();
-      defaults.addAll(Arrays.asList(new Object[] { 
-           JXTable.UIPREFIX + JXTable.HORIZONTALSCROLL_ACTION_COMMAND, "Horizontal Scroll",
-           JXTable.UIPREFIX + JXTable.PACKALL_ACTION_COMMAND, "Pack All Columns",
-           JXTable.UIPREFIX + JXTable.PACKSELECTED_ACTION_COMMAND, "Pack Selected Column"
-      }));
-      return defaults.toArray();
-      
-  }
+//  protected Object[] getDefaults() {
+//      List defaults = new ArrayList();
+//      defaults.addAll(Arrays.asList(new Object[] { 
+//           JXTable.UIPREFIX + JXTable.HORIZONTALSCROLL_ACTION_COMMAND, "Horizontal Scroll",
+//           JXTable.UIPREFIX + JXTable.PACKALL_ACTION_COMMAND, "Pack All Columns",
+//           JXTable.UIPREFIX + JXTable.PACKSELECTED_ACTION_COMMAND, "Pack Selected Column"
+//      }));
+//      return defaults.toArray();
+//      
+//  }
 }

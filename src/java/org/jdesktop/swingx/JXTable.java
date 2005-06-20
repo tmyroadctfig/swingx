@@ -80,8 +80,9 @@ public class JXTable extends JTable implements Searchable {
     public static final String PACKSELECTED_ACTION_COMMAND = ColumnControlButton.COLUMN_CONTROL_MARKER + "packSelected";
     public static final String UIPREFIX = "JXTable.";
     static {
+        // Hack: make sure the resource bundle is loaded
         LookAndFeelAddons.contribute(new JXTableAddon());
-      }
+    }
 
     public static boolean TRACE = false;
   
@@ -183,7 +184,7 @@ public class JXTable extends JTable implements Searchable {
     }
 
     private String getUIString(String key) {
-        String text = UIManager.getString(UIPREFIX + key, null);
+        String text = UIManager.getString(UIPREFIX + key);
         return text != null ? text : key;
     }
 
@@ -591,11 +592,12 @@ public class JXTable extends JTable implements Searchable {
             }
             else if ("find".equals(getName())) {
                 find();
-            } else if (PACKALL_ACTION_COMMAND.equals(getName())) {
-                packAll();
-            } else if (PACKSELECTED_ACTION_COMMAND.equals(getName())) {
-                packSelected();
-            }
+            } 
+//            else if (PACKALL_ACTION_COMMAND.equals(getName())) {
+//                packAll();
+//            } else if (PACKSELECTED_ACTION_COMMAND.equals(getName())) {
+//                packSelected();
+//            }
         }
 
 

@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import javax.swing.JComponent;
 import javax.swing.UIManager;
@@ -59,6 +60,7 @@ public class LookAndFeelAddons {
     try {
       setAddon(addonClassname);
       setTrackingLookAndFeelChanges(true);
+      addDefaultResourceBundle();
     } catch (InstantiationException e) {
       e.printStackTrace();
     } catch (IllegalAccessException e) {
@@ -77,7 +79,14 @@ public class LookAndFeelAddons {
     }
   }
 
-  public void uninitialize() {
+  private static void addDefaultResourceBundle() {
+//    ResourceBundle bundle = ResourceBundle.getBundle(LookAndFeelAddons.class.getPackage().getName() + "/resources/swingx");
+//    System.out.println(bundle.getObject("JXTable.column.horizontalScroll"));
+    UIManager.getDefaults().addResourceBundle(LookAndFeelAddons.class.getPackage().getName() + "/resources/swingx");
+    
+  }
+
+public void uninitialize() {
     for (Iterator iter = contributedComponents.iterator(); iter.hasNext();) {
       ComponentAddon addon = (ComponentAddon)iter.next();
       addon.uninitialize(this);
