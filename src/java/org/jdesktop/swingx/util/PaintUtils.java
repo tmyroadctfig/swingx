@@ -5,7 +5,7 @@
  * Santa Clara, California 95054, U.S.A. All rights reserved.
  */
 
-package org.jdesktop.swingx;
+package org.jdesktop.swingx.util;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
