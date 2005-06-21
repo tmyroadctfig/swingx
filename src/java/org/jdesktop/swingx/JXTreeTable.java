@@ -158,7 +158,8 @@ public class JXTreeTable extends JXTable {
         // renderer-related initialization -- also called from setTreeTableModel()
         init(renderer); // private method
         initActions();
-
+        // disable sorting
+        super.setSortable(false);
         // Install the default editor.
         setDefaultEditor(AbstractTreeTableModel.hierarchicalColumnClass,
             new TreeTableCellEditor(renderer));
@@ -207,17 +208,14 @@ public class JXTreeTable extends JXTable {
         }
     }
 
-    /**
-     * Overrides superclass version to be a no-op.
+    /** 
+     * overridden to do nothing. 
+     * 
+     * TreeTable is not sortable by default, because 
+     * Sorters/Filters currently don't work properly.
+     * 
      */
-    protected void resetSorter() {
-        // no-op
-    }
-
-    /**
-     * Overrides superclass version to be a no-op.
-     */
-    protected void setSorter(int columnIndex) {
+    public void setSortable(boolean sortable) {
         // no-op
     }
 

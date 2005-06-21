@@ -957,6 +957,7 @@ public class JXTable extends JTable implements Searchable {
      * Used by headerListener
      */
     protected void setSorter(int columnIndex) {
+        if (!isSortable()) return;
         Selection   selection = new Selection(this);
         if (sorter == null) {
             sorter = refreshSorter(columnIndex);    // create and refresh
