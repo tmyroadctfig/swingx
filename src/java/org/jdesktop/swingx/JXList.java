@@ -26,7 +26,8 @@ import org.jdesktop.swingx.decorator.HighlighterPipeline;
 /**
  * JXList
  *
- * added Rollover/LinkModel handling.
+ * Enabled Rollover/LinkModel handling.
+ * Enabled Highlighter support.
  * 
  * @author Ramesh Gupta
  * @author Jeanette Winzenburg
