@@ -40,7 +40,7 @@ public class LinkModel implements Comparable {
     public LinkModel(String text, String target, URL url) {
         setText(text);
         setTarget(target);
-        setURL(url);
+        setURL(url != null ? url : getDefaultURL());
     }
 
     public LinkModel(String text) {
