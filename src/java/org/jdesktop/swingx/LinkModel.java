@@ -31,7 +31,11 @@ public class LinkModel implements Comparable {
     private PropertyChangeSupport propertyChangeSupport;
 
     public static final String VISITED_PROPERTY = "visited";
+    // hack - this class assumes that the url always != null
+    // need to cleanup
+    private static String defaultURLString = "https://jdnc.dev.java.net";
 
+    private static URL defaultURL;
     
     public LinkModel(String text, String target, URL url) {
         setText(text);
@@ -39,6 +43,9 @@ public class LinkModel implements Comparable {
         setURL(url);
     }
 
+    public LinkModel(String text) {
+        this(text, null, null);
+    }
     /**
      * @param text
      *            text to that a renderer would display
@@ -72,14 +79,43 @@ public class LinkModel implements Comparable {
         }
     }
 
+    public void setURLString(String howToURLString) {
+        URL url = null;
+        try {
+            url = new URL(howToURLString);
+        } catch (MalformedURLException e) {
+            url = getDefaultURL();
+            e.printStackTrace();
+        }
+        setURL(url);
+    }
+
+    private URL getDefaultURL() {
+        if (defaultURL == null) {
+            try {
+                defaultURL = new URL(defaultURLString);
+            } catch (MalformedURLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        return defaultURL;
+    }
+
     /**
-     * Set the url.
+     * Set the url and resets the visited flag.
+     * 
+     * Think: keep list of visited urls here?
      */
     public void setURL(URL url) {
-        if (url == null) {
+         if (url == null) {
             throw new IllegalArgumentException("URL for link cannot be null");
         }
-        this.url = url;
+         if (url.equals(getURL())) return;
+         URL old = getURL();
+         this.url = url;
+        firePropertyChange("URL", old, url);
+        setVisited(false);
     }
 
     public URL getURL() {
@@ -241,4 +277,5 @@ public class LinkModel implements Comparable {
 
         return buffer.toString();
     }
+
 }
