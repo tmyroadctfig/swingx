@@ -141,8 +141,8 @@ public class JXTableHeader extends JTableHeader {
                     table.setSorter(column);
                 }
                 uncacheResizingColumn();
-                // header.repaint();
             }
+            repaint();
 
         }
 
