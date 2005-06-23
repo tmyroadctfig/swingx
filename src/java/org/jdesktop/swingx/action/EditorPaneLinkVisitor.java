@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 
+import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
 
 import org.jdesktop.swingx.JXEditorPane;
@@ -45,8 +46,13 @@ public class EditorPaneLinkVisitor implements ActionListener {
 
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof LinkModel) {
-            LinkModel link = (LinkModel) e.getSource();
-            visit(link);
+            final LinkModel link = (LinkModel) e.getSource();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    visit(link);
+
+                }
+            });
         }
    
     }
