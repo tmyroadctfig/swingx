@@ -100,10 +100,6 @@ public class JXTitledPanelAddon implements ComponentAddon {
         
     }
 
-    private boolean isPlastic(LookAndFeelAddons addon) {
-        return UIManager.getLookAndFeel().getClass().getName().contains("Plastic");
-    }
-
     private void addWindowsDefaults(LookAndFeelAddons addon, List defaults) {
 //        if (OS.isWindowsXP() && OS.getWindowsVisualStyle() == OS.WinXPTheme.LUNA) {
             defaults.addAll(Arrays.asList(new Object[] { 
@@ -118,6 +114,10 @@ public class JXTitledPanelAddon implements ComponentAddon {
 //            "JXTitledPanel.title.lightBackground", new ColorUIResource(198, 211, 247),
 //            }));
 //        }
+    }
+
+    private boolean isPlastic(LookAndFeelAddons addon) {
+        return UIManager.getLookAndFeel().getClass().getName().contains("Plastic");
     }
 
     private boolean isMetal(LookAndFeelAddons addon) {
