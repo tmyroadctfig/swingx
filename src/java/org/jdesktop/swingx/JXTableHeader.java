@@ -8,6 +8,7 @@ package org.jdesktop.swingx;
 
 import java.awt.event.MouseEvent;
 
+import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputListener;
@@ -64,6 +65,14 @@ public class JXTableHeader extends JTableHeader {
         return (JXTable) getTable();
     }
 
+    
+    public void updateUI() {
+        super.updateUI();
+        if (getDefaultRenderer() instanceof JComponent) {
+            ((JComponent) getDefaultRenderer()).updateUI();
+         
+        }
+    }
     /**
      * returns the (visible) view index for the given column
      * or -1 if not visible or not contained in this header's
