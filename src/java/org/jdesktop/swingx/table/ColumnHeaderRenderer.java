@@ -7,23 +7,18 @@
 
 package org.jdesktop.swingx.table;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 
-import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
+import javax.swing.plaf.UIResource;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 
@@ -32,6 +27,8 @@ import org.jdesktop.swingx.LabelProperties;
 import org.jdesktop.swingx.border.IconBorder;
 import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.icon.SortArrowIcon;
+import org.jdesktop.swingx.plaf.ColumnHeaderRendererAddon;
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 
 /**
  * Header renderer class which renders column sort feedback (arrows).
@@ -45,7 +42,12 @@ import org.jdesktop.swingx.icon.SortArrowIcon;
  */
 public class ColumnHeaderRenderer extends JComponent implements TableCellRenderer {
     // the inheritance is only to make sure we are updated on LF change
-    
+    public static final String UP_ICON_KEY = "ColumnHeaderRenderer.upIcon";
+    public static final String DOWN_ICON_KEY = "ColumnHeaderRenderer.downIcon";
+
+    static {
+        LookAndFeelAddons.contribute(new ColumnHeaderRendererAddon());
+    }
     private static TableCellRenderer sharedInstance = null;
 
     private static Icon defaultDownIcon = new SortArrowIcon(false);
@@ -269,5 +271,19 @@ public class ColumnHeaderRenderer extends JComponent implements TableCellRendere
     public void updateUI() {
         super.updateUI();
         initDelegate();
+        updateIconUI();
+    }
+
+    private void updateIconUI() {
+        if (getUpIcon() instanceof UIResource) {
+            Icon icon = UIManager.getIcon(UP_ICON_KEY);
+            setUpIcon(icon != null ? icon : defaultUpIcon);
+            
+        }
+        if (getDownIcon() instanceof UIResource) {
+            Icon icon = UIManager.getIcon(DOWN_ICON_KEY);
+            setDownIcon(icon != null ? icon : defaultDownIcon);
+            
+        }
     }
 }
