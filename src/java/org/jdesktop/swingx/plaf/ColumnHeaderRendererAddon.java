@@ -16,6 +16,7 @@ import javax.swing.UIManager;
 import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.windows.WindowsLookAndFeelAddons;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
+import org.jdesktop.swingx.util.OS;
 /**
  * Addon for <code>JXTable</code>.<br>
  *
@@ -45,8 +46,10 @@ public class ColumnHeaderRendererAddon implements ComponentAddon {
               downIcon = "sort-w2k-dn.png";
               
           }
-//      } else if (isMetal(addon)) {
-//          addMetalDefaults(addon, defaults);
+      } else if (isSynth(addon)) {
+          upIcon = "sort-gtk-up.png";
+          downIcon = "sort-gtk-dn.png";
+          
       } else {
           upIcon = "sort-jlf-up.png";
           downIcon = "sort-jlf-dn.png";
@@ -71,16 +74,15 @@ public class ColumnHeaderRendererAddon implements ComponentAddon {
   }
 
   private boolean isXP(LookAndFeelAddons addon) {
-      // TODO Auto-generated method stub
-      return false;
+      return OS.isWindowsXP();
   }
   
   private boolean isPlastic(LookAndFeelAddons addon) {
       return UIManager.getLookAndFeel().getClass().getName().contains("Plastic");
   }
 
-  private boolean isMetal(LookAndFeelAddons addon) {
-      return addon instanceof MetalLookAndFeelAddons;
+  private boolean isSynth(LookAndFeelAddons addon) {
+      return UIManager.getLookAndFeel().getClass().getName().contains("ynth");
   }
 
   private boolean isWindows(LookAndFeelAddons addon) {
