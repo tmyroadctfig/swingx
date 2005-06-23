@@ -12,8 +12,9 @@ import java.awt.Component;
 import java.awt.Graphics;
 
 import javax.swing.Icon;
+import javax.swing.plaf.UIResource;
 
-public class SortArrowIcon implements Icon {
+public class SortArrowIcon implements Icon, UIResource {
     private boolean ascending = true;
     //REMIND(aim): support more configurable sizes
     private int width = 8;
