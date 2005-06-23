@@ -43,7 +43,9 @@ import org.jdesktop.swingx.plaf.TitledPanelUI;
  * title sections can have components embedded to the &quot;left&quot; or
  * &quot;right&quot; of the Title.
  *
- * @author rbair
+ * @author Richard Bair
+ * @author Jeanette Winzenburg
+ * 
  */
 public abstract class BasicTitledPanelUI extends TitledPanelUI {
     
@@ -106,20 +108,6 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
         installProperty(titledPanel, "titleFont", UIManager.getFont("JXTitledPanel.title.font"));
 
         
-
-//        titledPanel.setLayout(new BorderLayout());
-////        JXPanel contentPanel = new JXPanel();
-////		contentPanel.setBorder(BorderFactory.createEmptyBorder());
-////		titledPanel.add(contentPanel, BorderLayout.CENTER);
-//		caption = new JLabel(titledPanel.getTitle());
-//		caption.setFont(titledPanel.getTitleFont());
-//		topPanel = createTopPanel(titledPanel);
-//		topPanel.setBorder(BorderFactory.createEmptyBorder());
-//		topPanel.setLayout(new GridBagLayout());
-//		caption.setForeground(titledPanel.getTitleForeground());
-//		topPanel.add(caption, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(4, 12, 4, 12), 0, 0));
-//		titledPanel.add(topPanel, BorderLayout.NORTH);
-
       caption = createAndConfigureCaption(titledPanel);
       topPanel = createAndConfigureTopPanel(titledPanel);
         fillTopPanel();
@@ -214,18 +202,11 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
             }
             }
         };
-//        titledPanel.addPropertyChangeListener("title", titleChangeListener);
-//        titledPanel.addPropertyChangeListener("titleForeground", titleChangeListener);
-//        titledPanel.addPropertyChangeListener("titleFont", titleChangeListener);
         titledPanel.addPropertyChangeListener(titleChangeListener);
     }
 
     protected void uninstallListeners(JXTitledPanel panel) {
         titledPanel.removePropertyChangeListener(titleChangeListener);
-        //TODO
-//        panel.removePropertyChangeListener("title", titleChangeListener);
-//        panel.removePropertyChangeListener("titleForeground", titleChangeListener);
-//        panel.removePropertyChangeListener("titleFont", titleChangeListener);
     }
 
     protected void installProperty(JComponent c, String propName, Object value) {
@@ -275,7 +256,7 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
         if (right != null) topPanel.remove(right);
         right = decoration;
         if (right != null) {
-		topPanel.add(decoration, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHEAST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+		topPanel.add(decoration, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 	
         }
     }
@@ -287,7 +268,7 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
         if (left != null) topPanel.remove(left);
         left = decoration;
         if (left != null) {
-            topPanel.add(left, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+            topPanel.add(left, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
         }
 	}
 
@@ -349,16 +330,10 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
 			}
 			// draw the image
 			g.drawImage(helper.getImage(), 0, 0, getWidth(), getHeight(), helper.getImageObserver());
-		    // JW: saving the gradient doesn't update on LF change
-            // was: not removed from titledPanel on uninstall
-//            gp = createGradientPaint();
-//            ((Graphics2D) g).setPaint(gp);
-//            g.fillRect(0, 0, getWidth(), getHeight());
             
         }
         
         protected GradientPaint createGradientPaint() {
-          //  if (titledPanel == null) return null;
             return new GradientPaint(0, 
                                      0, 
                                      titledPanel.getTitleDarkBackground(), 
