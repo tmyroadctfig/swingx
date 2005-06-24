@@ -66,7 +66,46 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
 
 
 /**
- * JXTable
+ * <p>A JXTable is a JTable with built-in support for row sorting, filtering, and highlighting, column visibility
+ * and a special popup control on the column header for quick access to table configuration.
+ * You can instantiate a JXTable just as you would a JTable, using a TableModel. However, a JXTable automatically 
+ * wraps TableColumns inside a TableColumnExt instance. TableColumnExt supports visibility, sortability, and 
+ * prototype values for column sizing, none of which are available in TableColumn. You can retrieve the TableColumnExt
+ * instance for a column using {@link #getColumnExt(object identifier)} or {@link #getColumnExt(int colnumber)}.
+ *
+ * <p>A JXTable is, by default, sortable by clicking on column headers; each subsequent click on a header reverses
+ * the order of the sort, and a sort arrow icon is automatically drawn on the header. Sorting can be disabled using
+ * {@link #setSortable(boolean)}. Sorting on columns is handled by a Sorter instance which contains a Comparator
+ * used to compare values in two rows of a column. You can replace the Comparator for a given column by using
+ * <code>getColumnExt("column").getSorter().setComparator(customComparator)</code>
+ *
+ * <p>Columns can be hidden or shown by setting the visible property on the TableColumnExt using 
+ * {@link TableColumnExt#setVisible(boolean)}. Columns can also be shown or hidden from the column control popup.
+ *
+ * <p>The column control popup is triggered by an icon drawn to the far right of the column headers, above the
+ * table's scrollbar (when installed in a JScrollPane). The popup allows the user to select which columns should
+ * be shown or hidden, as well as to pack columns and turn on horizontal scrolling. To show or hide the column control,
+ * use the {@link #setColumnControlVisible(boolean show)} method.
+ *
+ * <p>Rows can be filtered from a JXTable using a Filter class and a FilterPipeline. One assigns a FilterPipeline to 
+ * the table using {@link #setFilters(FilterPipeline)}. Filtering hides, but does not delete or permanently remove rows 
+ * from a JXTable. Filters are used to provide sorting to the table--rows are not removed, but the table is made
+ * to believe rows in the model are in a sorted order.
+ *
+ * <p>One can automatically highlight certain rows in a JXTable by attaching Highlighters in the 
+ * {@link #setHighlighters(HighlighterPipeline}} method. An example would be a Highlighter that colors alternate
+ * rows in the table for readability; AlternateRowHighlighter does this. Again, like Filters, Highlighters can
+ * be chained together in a HighlighterPipeline to achieve more interesting effects. 
+ *
+ * <p>You can resize all columns, selected columns, or a single column using the methods like {@link #packAll()}.
+ * Packing combines several other aspects of a JXTable. If horizontal scrolling is enabled using 
+ * {@link #setHorizontalScrollEnabled(boolean)}, then the scrollpane will allow the table to scroll right-left, and
+ * columns will be sized to their preferred size. To control the preferred sizing of a column, you can provide
+ * a prototype value for the column in the TableColumnExt using {@link TableColumnExt#setPrototypeValue(Object)}.
+ * The prototype is used as an indicator of the preferred size of the column. This can be useful if some data in
+ * a given column is very long, but where the resize algorithm would normally not pick this up.
+ *
+ * <p>Last, you can also provide searches on a JXTable using the search methods.
  *
  * @author Ramesh Gupta
  * @author Amy Fowler
@@ -74,11 +113,18 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * @author Jeanette Winzenburg
  */
 public class JXTable extends JTable implements Searchable {
-
+    /** Constant string for horizontal scroll actions, used in JXTable's Action Map. */
     public static final String HORIZONTALSCROLL_ACTION_COMMAND = ColumnControlButton.COLUMN_CONTROL_MARKER + "horizontalScroll";
+
+    /** Constant string for packing all columns, used in JXTable's Action Map. */
     public static final String PACKALL_ACTION_COMMAND = ColumnControlButton.COLUMN_CONTROL_MARKER + "packAll";
+
+    /** Constant string for packing selected columns, used in JXTable's Action Map. */
     public static final String PACKSELECTED_ACTION_COMMAND = ColumnControlButton.COLUMN_CONTROL_MARKER + "packSelected";
+    
+    /** TODO */
     public static final String UIPREFIX = "JXTable.";
+    
     static {
         // Hack: make sure the resource bundle is loaded
         LookAndFeelAddons.contribute(new JXTableAddon());
@@ -86,8 +132,13 @@ public class JXTable extends JTable implements Searchable {
 
     public static boolean TRACE = false;
   
+    /** The sorter attached to this table for the column currently being sorted. */
     protected Sorter            sorter = null;
+    
+    /** The FilterPipeline for the table. */
     protected FilterPipeline        filters = null;
+
+    /** The HighlighterPipeline for the table. */
     protected HighlighterPipeline   highlighters = null;
 
     // MUST ALWAYS ACCESS dataAdapter through accessor method!!!
@@ -128,40 +179,71 @@ public class JXTable extends JTable implements Searchable {
     private int oldAutoResizeMode;
     protected boolean isXTableRowHeightSet;
 
+    /** Instantiates a JXTable with a default table model, no data. */
     public JXTable() {
         init();
     }
 
+    /** 
+     * Instantiates a JXTable with a specific table model.
+     * @param dm The model to use.
+     */
     public JXTable(TableModel dm) {
         super(dm);
         init();
     }
 
+    /** 
+     * Instantiates a JXTable with a specific table model.
+     * @param dm The model to use.
+     */
     public JXTable(TableModel dm, TableColumnModel cm) {
         super(dm, cm);
         init();
     }
 
+    /** 
+     * Instantiates a JXTable with a specific table model, column model, and selection model.
+     * @param dm The table model to use.
+     * @param cm The colomn model to use.
+     * @param lm The list selection model to use.
+     */
     public JXTable(TableModel dm, TableColumnModel cm, ListSelectionModel sm) {
         super(dm, cm, sm);
         init();
     }
 
+    /** 
+     * Instantiates a JXTable for a given number of columns and rows.
+     * @param numRows Count of rows to accomodate.
+     * @param numRows Count of columns to accomodate.
+     */
     public JXTable(int numRows, int numColumns) {
         super(numRows, numColumns);
         init();
     }
 
+    /** 
+     * Instantiates a JXTable with data in a vector or rows and column names.
+     * @param rowData Row data, as a Vector of Objects.
+     * @param columnNames Column names, as a Vector of Strings.
+     */
     public JXTable(Vector rowData, Vector columnNames) {
         super(rowData, columnNames);
         init();
     }
 
+    /** 
+     * Instantiates a JXTable with data in a array or rows and column names.
+     * @param rowData Row data, as a two-dimensional Array of Objects (by row, for column).
+     * @param columnNames Column names, as a Array of Strings.
+     */
     public JXTable(Object[][] rowData, Object[] columnNames) {
         super(rowData, columnNames);
         init();
     }
 
+    /** Initializes the table for use. */
     protected void init() {
         setSortable(true);
         // Register the actions that this class can handle.
@@ -174,6 +256,7 @@ public class JXTable extends JTable implements Searchable {
         updateRowHeightUI(false);
     }
 
+    /** Creates an Action for horizontal scrolling. */
     private Action createHorizontalScrollAction() {
         String actionName = getUIString(HORIZONTALSCROLL_ACTION_COMMAND);
         BoundAction action = new BoundAction(actionName, HORIZONTALSCROLL_ACTION_COMMAND);
@@ -188,6 +271,7 @@ public class JXTable extends JTable implements Searchable {
         return text != null ? text : key;
     }
 
+    /** Creates an Action for packing selected columns. */
     private Action createPackSelectedAction() {
         String text = getUIString(PACKSELECTED_ACTION_COMMAND);
         BoundAction action = new BoundAction(text, PACKSELECTED_ACTION_COMMAND);
@@ -196,6 +280,7 @@ public class JXTable extends JTable implements Searchable {
         return action;
     }
 
+    /** Creates an Action for packing all columns. */
     private Action createPackAllAction() {
         String text = getUIString(PACKALL_ACTION_COMMAND);
         BoundAction action = new BoundAction(text, PACKALL_ACTION_COMMAND);
@@ -204,16 +289,18 @@ public class JXTable extends JTable implements Searchable {
     }
     
     /**
-     * callback for BoundAction packAll.
-     *
+     * This resizes all columns to fit the viewport; if horizontal scrolling
+     * is enabled, all columns will get their preferred width. This can be
+     * triggered by the "packAll" BoundAction on the table as well.
      */
     public void packAll() {
         packTable(getDefaultPackMargin());
     }
 
     /**
-     * callback for BoundAction packSelected.
-     *
+     * This resizes selected columns to fit the viewport; if horizontal scrolling
+     * is enabled, selected columns will get their preferred width. This can be
+     * triggered by the "packSelected" BoundAction on the table as well.
      */
     public void packSelected() {
         int selected = getSelectedColumn();
@@ -222,6 +309,14 @@ public class JXTable extends JTable implements Searchable {
         }
     }
 
+    /**
+     * Controls horizontal scrolling in the viewport, and works in coordination
+     * with column sizing.
+     *
+     * @param enabled If true, the scrollpane will allow the table to scroll
+     * horizontally, and columns will resize to their preferred width. If false,
+     * columns will resize to fit the viewport.
+     */
     public void setHorizontalScrollEnabled(boolean enabled) {
         if (enabled == (isHorizontalScrollEnabled())) return;
         if (enabled) {
@@ -232,15 +327,17 @@ public class JXTable extends JTable implements Searchable {
         }
     }
 
+    /** Returns the current setting for horizontal scrolling. */
     private boolean isHorizontalScrollEnabled() {
         return getAutoResizeMode() == AUTO_RESIZE_OFF;
     }
     
+    /** Returns the default margin for packing columns. */
     private int getDefaultPackMargin() {
         return 4;
     }
 
-    
+    /** Notifies the table that a new column has been selected. */
     public void columnSelectionChanged(ListSelectionEvent e) {
         super.columnSelectionChanged(e);
         if (e.getValueIsAdjusting()) return;
@@ -250,7 +347,7 @@ public class JXTable extends JTable implements Searchable {
         }
     }
 
-    
+    /** ? */
     public void setAutoResizeMode(int mode) {
         super.setAutoResizeMode(mode);
         Action packSelected = getActionMap().get(HORIZONTALSCROLL_ACTION_COMMAND);
@@ -258,10 +355,13 @@ public class JXTable extends JTable implements Searchable {
            ((BoundAction) packSelected).setSelected(isHorizontalScrollEnabled());
         }
     }
+    
     /**
      * Property to enable/disable rollover support. This can be enabled
      * to show "live" rollover behaviour, f.i. the cursor over LinkModel cells. 
-     * Default is disabled.
+     * Default is disabled. If using a RolloverHighlighter on the table, 
+     * this should be set to true.
+     *
      * @param rolloverEnabled
      */
     public void setRolloverEnabled(boolean rolloverEnabled) {
@@ -284,7 +384,7 @@ public class JXTable extends JTable implements Searchable {
     }
 
     /**
-     * returns the rolloverEnabled property.
+     * Returns the rolloverEnabled property.
      * @return
      */
     public boolean isRolloverEnabled() {
@@ -427,18 +527,22 @@ public class JXTable extends JTable implements Searchable {
         return null;
     }
 
+    /** ? */
     private void setLazyValue(Hashtable h, Class c, String s) {
         h.put(c, new UIDefaults.ProxyLazyValue(s));
     }
 
+    /** ? */
     private void setLazyRenderer(Class c, String s) {
         setLazyValue(defaultRenderersByColumnClass, c, s);
     }
 
+    /** ? */
     private void setLazyEditor(Class c, String s) {
         setLazyValue(defaultEditorsByColumnClass, c, s);
     }
 
+    /** ? */
     protected void createDefaultEditors() {
         super.createDefaultEditors();
         setLazyEditor(LinkModel.class, "org.jdesktop.swingx.LinkRenderer");
@@ -513,6 +617,7 @@ public class JXTable extends JTable implements Searchable {
         configureViewportBackground();
     }
 
+    /** ? */
     private void updateRowHeightUI(boolean respectRowSetFlag) {
         if (respectRowSetFlag && isXTableRowHeightSet) return;
         int minimumSize = getFont().getSize() + 6;
@@ -521,7 +626,7 @@ public class JXTable extends JTable implements Searchable {
         isXTableRowHeightSet = false;
     }
 
-    
+    /** Changes the row height for all rows in the table. */
     public void setRowHeight(int rowHeight) {
         super.setRowHeight(rowHeight);
         if (rowHeight > 0) {
@@ -554,6 +659,7 @@ public class JXTable extends JTable implements Searchable {
         }
     }
     
+    /** ? */
     private void updateRendererUI(Object value) {
         // maybe null or proxyValue
         if (!(value instanceof TableCellRenderer)) return;
@@ -603,12 +709,16 @@ public class JXTable extends JTable implements Searchable {
 
     }
 
-
+    /** The JXFindDialog we open on find() */
     private JXFindDialog dialog = null;
+
+    /** ? */
     private boolean automaticSortDisabled;
 
+    /** ? */
     private PipelineListener pipelineListener;
 
+    /** Opens the JXFindDialog for the table. */
     private void find() {
         if (dialog == null) {
             dialog = new JXFindDialog(this);
@@ -639,6 +749,7 @@ public class JXTable extends JTable implements Searchable {
 
     }
 
+    /** Returns true if the table is sortable. */
     public boolean isSortable() {
         return sortable;
     }
@@ -653,6 +764,7 @@ public class JXTable extends JTable implements Searchable {
 //        return !automaticSortDisabled;
 //    }
 
+    /** ? */
     public void tableChanged(TableModelEvent e) {
         Selection   selection = new Selection(this);
         if (filters != null) {
@@ -669,6 +781,7 @@ public class JXTable extends JTable implements Searchable {
         restoreSelection(selection);
     }
 
+    /** ? */
     protected void updateOnFilterContentChanged() {
         removeSorter();
         clearSelection();
@@ -681,6 +794,7 @@ public class JXTable extends JTable implements Searchable {
     }
 
 
+    /** ? */
     protected PipelineListener getFilterPipelineListener() {
         if (pipelineListener == null) {
             pipelineListener = createPipelineListener();
@@ -688,6 +802,7 @@ public class JXTable extends JTable implements Searchable {
         return pipelineListener;
     }
     
+    /** ? */
     protected PipelineListener createPipelineListener() {
         PipelineListener l = new PipelineListener() {
             public void contentsChanged(PipelineEvent e) {
@@ -697,6 +812,7 @@ public class JXTable extends JTable implements Searchable {
         return l;
     }
     
+    /** Returns the row count in the table; if filters are applied, this is the filtered row count. */
 	@Override
     public int getRowCount() {
         // RG: If there are no filters, call superclass version rather than accessing model directly
@@ -782,6 +898,9 @@ public class JXTable extends JTable implements Searchable {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setValueAt(Object aValue, int row, int column) {
         if (sorter == null) {
             if (filters == null) {
@@ -796,6 +915,9 @@ public class JXTable extends JTable implements Searchable {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean isCellEditable(int row, int column) {
         if (sorter == null) {
             if (filters == null) {
@@ -810,6 +932,9 @@ public class JXTable extends JTable implements Searchable {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setModel(TableModel newModel) {
         //JW: need to clear here because super.setModel
         // calls tableChanged...
@@ -820,15 +945,17 @@ public class JXTable extends JTable implements Searchable {
     }
 
 
+    /** ? */
     protected JTableHeader createDefaultTableHeader() {
         return new JXTableHeader(columnModel);
     }
 
-
+    /** ? */
     protected TableColumnModel createDefaultColumnModel() {
         return new DefaultTableColumnModelExt();
     }
 
+    /** ? */
     private void restoreSelection(Selection selection) {
         clearSelection();   // call overridden version
 
@@ -853,6 +980,7 @@ public class JXTable extends JTable implements Searchable {
         }
     }
 
+    /** Returns the FilterPipeline for the table, null if none. */
     public FilterPipeline getFilters() {
         return filters;
     }
@@ -887,11 +1015,13 @@ public class JXTable extends JTable implements Searchable {
         return true;
     }
 
+    /** Sets the FilterPipeline for filtering table rows. */
     public void setFilters(FilterPipeline pipeline) {
         unsetFilters();
         doSetFilters(pipeline);
     }
 
+    /** ? */
     private void unsetFilters() {
         if (filters == null) return;
         // fix#125: cleanup old filters
@@ -901,19 +1031,23 @@ public class JXTable extends JTable implements Searchable {
         pipelineListener.contentsChanged(null);
     }
 
+    /** ? */
     private void doSetFilters(FilterPipeline pipeline) {
         filters = pipeline;
         use(filters);
     }
 
+    /** Returns the HighlighterPipeline assigned to the table, null if none. */
     public HighlighterPipeline getHighlighters() {
         return highlighters;
     }
 
+    /** Assigns a HighlighterPipeline to the table. */
     public void setHighlighters(HighlighterPipeline pipeline) {
         highlighters = pipeline;
     }
 
+    /** ? */
     private void removeSorter() {
 //        // fixing #167: remove from pipeline
 //        // moved to refreshSorter
@@ -936,6 +1070,7 @@ public class JXTable extends JTable implements Searchable {
         }
     }
 
+    /** ? */
     private Sorter refreshSorter(int columnIndex) {
         TableColumn col = getColumnModel().getColumn(columnIndex);
         if (col instanceof TableColumnExt) {
@@ -1000,22 +1135,30 @@ public class JXTable extends JTable implements Searchable {
     }
 
     /**
-     * Returns the <code>TableColumn</code> object for the column in the table
+     * Returns the <code>TableColumnExt</code> object for the column in the table
      * whose identifier is equal to <code>identifier</code>, when compared using
      * <code>equals</code>.
      *
-     * @return  the <code>TableColumn</code> object that matches the identifier
+     * @return  the <code>TableColumnExt</code> object that matches the identifier
      * @exception IllegalArgumentException
      *    if <code>identifier</code> is <code>null</code>
      *    or no <code>TableColumn</code> has this identifier
      *
      * @param   identifier                      the identifier object
      */
-
     public TableColumnExt getColumnExt(Object identifier) {
         return (TableColumnExt)super.getColumn(identifier);
     }
 
+    /**
+     * Returns the <code>TableColumnExt</code> object for the column in the table
+     * whose column index is equal to <code>viewColumnIndex</code>
+     *
+     * @return  the <code>TableColumnExt</code> object that matches the column index
+     * @exception IllegalArgumentException if no <code>TableColumn</code> has this identifier
+     *
+     * @param   identifier                      the identifier object
+     */
     public TableColumnExt getColumnExt(int viewColumnIndex) {
         return (TableColumnExt) getColumnModel().getColumn(viewColumnIndex);
     }
@@ -1169,10 +1312,20 @@ public class JXTable extends JTable implements Searchable {
         return dataAdapter;
     }
 
+    /** 
+     * Performs a search across the table using String that represents a regex pattern;
+     * {@see java.util.regex.Pattern}. All columns and all rows are searched; the row id
+     * of the first match is returned. 
+     */
     public int search(String searchString) {
         return search(searchString, -1);
     }
 
+    /** 
+     * Performs a search on a column using String that represents a regex pattern;
+     * {@see java.util.regex.Pattern}. The specified column searched; the row id
+     * of the first match is returned. 
+     */
     public int search(String searchString, int columnIndex) {
         Pattern pattern = null;
         if (searchString != null) {
@@ -1181,10 +1334,20 @@ public class JXTable extends JTable implements Searchable {
         return -1;
     }
 
+    /** 
+     * Performs a search across the table using a {@link java.util.regex.Pattern}. 
+     * All columns and all rows are searched; the row id
+     * of the first match is returned. 
+     */
     public int search(Pattern pattern) {
         return search(pattern, -1);
     }
 
+    /** 
+     * Performs a search across the table using a {@link java.util.regex.Pattern}. 
+     * starting at a given row. All columns and all rows are searched; the row id
+     * of the first match is returned. 
+     */
     public int search(Pattern pattern, int startIndex) {
         return search(pattern, startIndex, false);
     }
@@ -1193,7 +1356,12 @@ public class JXTable extends JTable implements Searchable {
     private int lastCol = 0;
 
     /**
+     * Performs a search across the table using a {@link java.util.regex.Pattern}. 
+     * starting at a given row. All columns and all rows are searched; the row id
+     * of the first match is returned. 
+     *
      * @param startIndex row to start search
+     * @param backwards whether to start at the last row and search up to the first.
      * @return row with a match.
      */
     public int search(Pattern pattern, int startIndex, boolean backwards) {
@@ -1318,10 +1486,12 @@ public class JXTable extends JTable implements Searchable {
 //        return matchRow;
 //    }
 
+    /** ? */
     public void setVisibleRowCount(int visibleRowCount) {
         this.visibleRowCount = visibleRowCount;
     }
 
+    /** ? */
     public int getVisibleRowCount() {
         return visibleRowCount;
     }
