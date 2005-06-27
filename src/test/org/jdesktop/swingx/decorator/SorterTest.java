@@ -17,7 +17,7 @@ import org.jdesktop.swingx.JXTable;
 public class SorterTest extends TestCase {
 
     /**
-     * Issue #189: make sure to use the correct default collator.
+     * Issue #179: make sure to use the correct default collator.
      * 
      */
     public void testCollator() {
