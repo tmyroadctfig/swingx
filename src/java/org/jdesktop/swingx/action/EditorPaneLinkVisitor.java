@@ -20,6 +20,9 @@ import org.jdesktop.swingx.LinkModel;
 /**
  * A ActionListener using a JXEditorPane to "visit" a LinkModel.
  * 
+ * adds an internal HyperlinkListener to visit links contained
+ * in the document. 
+ * 
  * @author Jeanette Winzenburg
  */
 public class EditorPaneLinkVisitor implements ActionListener {
