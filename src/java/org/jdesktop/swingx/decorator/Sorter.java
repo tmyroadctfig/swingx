@@ -9,7 +9,7 @@ package org.jdesktop.swingx.decorator;
 
 import java.text.Collator;
 import java.util.Comparator;
-import java.util.TreeSet;
+import java.util.Locale;
 
 /**
  * Pluggable sorting filter.
@@ -18,7 +18,9 @@ import java.util.TreeSet;
  */
 public abstract class Sorter extends Filter {
     private boolean	ascending = true;
-    private final   Collator    collator;   // RG: compute this once
+    // JW: need to be updated if default locale changed
+    private Collator    collator;   // RG: compute this once
+    private Locale currentLocale;
     private Comparator comparator;
 
     public Sorter() {
@@ -33,9 +35,26 @@ public abstract class Sorter extends Filter {
         super(col);
         this.comparator = comparator;
         setAscending(ascending);
-        collator = Collator.getInstance();
     }
 
+    /** 
+     * Subclasses must call this before filtering to guarantee the
+     * correct collator!
+     */
+    protected void refreshCollator() {
+        if (!Locale.getDefault().equals(currentLocale)) {
+            currentLocale = Locale.getDefault();
+            collator = Collator.getInstance();
+        }
+    }
+
+    /**
+     * exposed for testing only!
+     * @return
+     */
+    protected Collator getCollator() {
+        return collator;
+    }
     /**
      * set the Comparator to use when comparing values.
      * If not null every compare will be delegated to it.

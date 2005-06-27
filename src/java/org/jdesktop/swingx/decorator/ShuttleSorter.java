@@ -57,6 +57,7 @@ public class ShuttleSorter extends Sorter {
      * Performs the sort.
      */
     protected void filter() {
+        refreshCollator();
         sort((int[]) toPrevious.clone(), toPrevious, 0, toPrevious.length);
         // Generate inverse map for implementing convertRowIndexToView();
         for (int i = 0; i < toPrevious.length; i++) {
