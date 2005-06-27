@@ -83,9 +83,10 @@ public class LinkModel implements Comparable {
     public String getText() {
         if (text != null) {
             return text;
-        } else {
+        } else if (url != null) {
             return getURL().toString();
         }
+        return null;
     }
 
     public void setURLString(String howToURLString) {
