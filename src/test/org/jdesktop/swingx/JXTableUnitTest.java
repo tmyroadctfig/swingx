@@ -77,6 +77,37 @@ public class JXTableUnitTest extends InteractiveTestCase {
         sortableTableModel = new AncientSwingTeam();
     }
     
+    /**
+     * Issue #189, #214: Sorter fails if content is 
+     * comparable with mixed types
+     *
+     */
+    public void testMixedComparableTypes() {
+        
+        Object[][] rowData = new Object[][] {
+                new Object[] { Boolean.TRUE, new Integer(2) },
+                new Object[] { Boolean.TRUE, "BC" } };
+        String[] columnNames = new String[] { "Critical", "Task" };
+        DefaultTableModel model =  new DefaultTableModel(rowData, columnNames);
+        final JXTable table = new JXTable(model);
+        table.setSorter(1);
+    }   
+    
+    /**
+     * Issue #189, #214: Sorter fails if content is 
+     * mixed comparable/not comparable
+     *
+     */
+    public void testMixedComparableTypesWithNonComparable() {
+        
+        Object[][] rowData = new Object[][] {
+                new Object[] { Boolean.TRUE, new Integer(2) },
+                new Object[] { Boolean.TRUE, new Object() } };
+        String[] columnNames = new String[] { "Critical", "Task" };
+        DefaultTableModel model =  new DefaultTableModel(rowData, columnNames);
+        final JXTable table = new JXTable(model);
+        table.setSorter(1);
+    }   
 
     /**
      * Issue #196: backward search broken.
@@ -520,7 +551,32 @@ public class JXTableUnitTest extends InteractiveTestCase {
 
     }
 
-    
+    /**
+     * Issue #179: Sorter does not use collator if cell content is
+     *  a String.
+     *
+     */
+    public void interactiveTestLocaleSorter() {
+        
+        Object[][] rowData = new Object[][] {
+                new Object[] { Boolean.TRUE, "aa" },
+                new Object[] { Boolean.FALSE, "AB" },
+                new Object[] { Boolean.FALSE, "AC" },
+                new Object[] { Boolean.TRUE, "BA" },
+                new Object[] { Boolean.FALSE, "BB" },
+                new Object[] { Boolean.TRUE, "BC" } };
+        String[] columnNames = new String[] { "Critical", "Task" };
+        DefaultTableModel model =  new DefaultTableModel(rowData, columnNames);
+//        {
+//            public Class getColumnClass(int column) {
+//                return column == 1 ? String.class : super.getColumnClass(column);
+//            }
+//        };
+        final JXTable table = new JXTable(model);
+        table.setSorter(1);
+        JFrame frame = wrapWithScrollingInFrame(table, "locale sorting");
+        frame.setVisible(true);
+    }   
     
     /** 
      * Issue #??: Problems with filters and ColumnControl
@@ -1166,7 +1222,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
          // test.runInteractiveTests();
         //    test.runInteractiveTests("interactive.*Column.*");
 //            test.runInteractiveTests("interactive.*TableHeader.*");
-            test.runInteractiveTests("interactive.*Sort.*");
+            test.runInteractiveTests("interactive.*Locale.*");
          //   test.runInteractiveTests("interactive.*Control.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");

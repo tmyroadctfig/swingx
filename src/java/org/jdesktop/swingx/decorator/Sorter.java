@@ -132,39 +132,22 @@ public abstract class Sorter extends Filter {
             return comparator.compare(o1, o2);
         }
 
-        if (o1 instanceof Comparable) {
+        // make sure we use the collator for string compares
+        if ((o1.getClass() == String.class) && (o2.getClass() == String.class)) {
+            return collator.compare((String)o1, (String) o2);
+        }
+        
+        if ((o1 instanceof Comparable) && (o2 instanceof Comparable)) {
             Comparable c1 = (Comparable) o1;
             Comparable c2 = (Comparable) o2;
-            return c1.compareTo(c2);
-        }
-        else if (o1 instanceof Boolean) {   // RG: Dead branch? A Boolean is also a Comparable!
             try {
-                Boolean bool1 = (Boolean) o1;
-                boolean b1 = bool1.booleanValue();
-                Boolean bool2 = (Boolean) o2;
-                boolean b2 = bool2.booleanValue();
-
-                if (b1 == b2) {
-                    return 0;
-                }
-                else if (b1) { // Define false < true
-                    return 1;
-                }
-                else {
-                    return -1;
-                }
-            }
-            catch (ClassCastException ex) {
-                System.out.println("Column class mismatch: " + o1.getClass() +
-                                   " can't be compared to " + o2.getClass());
+                return c1.compareTo(o2);
+            } catch (ClassCastException ex) {
+                // comparables with different types
             }
         }
-        else {
-            return collator.compare(o1.toString(), o2.toString());
-            //return o1.toString().compareTo(o2.toString());
-        }
-
-        return 0;
+        
+        return collator.compare(o1.toString(), o2.toString());
     }
 
     public boolean isAscending() {
