@@ -34,13 +34,14 @@ public class ShuttleSorter extends Sorter {
      */
     protected void adopt(Sorter oldSorter) {
         if (oldSorter != null) {
-            toPrevious = (int[]) ((ShuttleSorter) oldSorter).toPrevious.clone();
+            toPrevious = ((ShuttleSorter) oldSorter).toPrevious.clone();
             /** @todo shouldn't cast */
-            fromPrevious = (int[]) ((ShuttleSorter) oldSorter).fromPrevious.clone();
+            fromPrevious = ((ShuttleSorter) oldSorter).fromPrevious.clone();
             /** @todo shouldn't cast */
         }
     }
 
+    
     /**
      * Resets the internal row mappings from this filter to the previous filter.
      */
@@ -57,8 +58,7 @@ public class ShuttleSorter extends Sorter {
      * Performs the sort.
      */
     protected void filter() {
-        refreshCollator();
-        sort((int[]) toPrevious.clone(), toPrevious, 0, toPrevious.length);
+        sort(toPrevious.clone(), toPrevious, 0, toPrevious.length);
         // Generate inverse map for implementing convertRowIndexToView();
         for (int i = 0; i < toPrevious.length; i++) {
             fromPrevious[toPrevious[i]] = i;

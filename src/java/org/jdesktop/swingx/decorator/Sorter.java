@@ -37,6 +37,11 @@ public abstract class Sorter extends Filter {
         setAscending(ascending);
     }
 
+    
+    protected void refresh(boolean reset) {
+        refreshCollator();
+        super.refresh(reset);
+    }
     /** 
      * Subclasses must call this before filtering to guarantee the
      * correct collator!

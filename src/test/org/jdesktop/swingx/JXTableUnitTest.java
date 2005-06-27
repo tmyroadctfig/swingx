@@ -1222,7 +1222,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
          // test.runInteractiveTests();
         //    test.runInteractiveTests("interactive.*Column.*");
 //            test.runInteractiveTests("interactive.*TableHeader.*");
-            test.runInteractiveTests("interactive.*Locale.*");
+            test.runInteractiveTests("interactive.*Sort.*");
          //   test.runInteractiveTests("interactive.*Control.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
