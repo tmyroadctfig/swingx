@@ -19,15 +19,15 @@ import javax.swing.tree.TreePath;
 
 /**
  * AbstractTreeTableModel provides an implementation of
- * {@link org.jdesktop.swing.treetable.TreeTableModel} as a convenient starting
- * point in defining custom data models for {@link org.jdesktop.swing.JXTreeTable}.
+ * {@link org.jdesktop.swingx.treetable.TreeTableModel} as a convenient starting
+ * point in defining custom data models for {@link org.jdesktop.swingx.JXTreeTable}.
  *
  * @author Ramesh Gupta
  */
 public abstract class AbstractTreeTableModel implements TreeTableModel {
     /**
-     * Value returned by {@link org.jdesktop.swing.treetable.TreeTableModel#getColumnClass(int) getColumnClass}
-     * for the {@link org.jdesktop.swing.JXTreeTable#isHierarchical(int) hierarchical} column.
+     * Value returned by {@link org.jdesktop.swingx.treetable.TreeTableModel#getColumnClass(int) getColumnClass}
+     * for the {@link org.jdesktop.swingx.JXTreeTable#isHierarchical(int) hierarchical} column.
      */
 	public final static Class hierarchicalColumnClass = TreeTableModel.class;
 

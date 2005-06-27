@@ -15,23 +15,23 @@ import javax.swing.event.EventListenerList;
 
 /**
  * <p>A <b><code>FilterPipeline</code></b> is used to define the set of
- * {@link org.jdesktop.swing.decorator.Filter filters}
- * for a data-aware component such as a {@link org.jdesktop.swing.JXList} or a
- * {@link org.jdesktop.swing.JXTable}. Filtering involves interposing one or
- * more filters in a {@link org.jdesktop.swing.decorator.FilterPipeline} between
+ * {@link org.jdesktop.swingx.decorator.Filter filters}
+ * for a data-aware component such as a {@link org.jdesktop.swingx.JXList} or a
+ * {@link org.jdesktop.swingx.JXTable}. Filtering involves interposing one or
+ * more filters in a {@link org.jdesktop.swingx.decorator.FilterPipeline} between
  * a data model and a view to change the apparent order and/or number of records
  * in the data model. The order of filters in the filter pipeline determines the
  * order in which each filter is applied. The output from one filter in the
  * pipeline is piped as the input to the next filter in the pipeline.</p>
  *
  * <pre>
- *  {@link org.jdesktop.swing.decorator.Filter}[]   filters = new {@link org.jdesktop.swing.decorator.Filter}[] {
- *      new {@link org.jdesktop.swing.decorator.PatternFilter}("S.*", 0, 1),    // regex, matchflags, column
- *      new {@link org.jdesktop.swing.decorator.ShuttleSorter}(1, false),   // column 1, descending
- *      new {@link org.jdesktop.swing.decorator.ShuttleSorter}(0, true),    // column 0, ascending
+ *  {@link org.jdesktop.swingx.decorator.Filter}[]   filters = new {@link org.jdesktop.swingx.decorator.Filter}[] {
+ *      new {@link org.jdesktop.swingx.decorator.PatternFilter}("S.*", 0, 1),    // regex, matchflags, column
+ *      new {@link org.jdesktop.swingx.decorator.ShuttleSorter}(1, false),   // column 1, descending
+ *      new {@link org.jdesktop.swingx.decorator.ShuttleSorter}(0, true),    // column 0, ascending
  *  };
- *  {@link org.jdesktop.swing.decorator.FilterPipeline} pipeline = new {@link org.jdesktop.swing.decorator.FilterPipeline}(filters);
- *  {@link org.jdesktop.swing.JXTable}  table = new {@link org.jdesktop.swing.JXTable}(model);
+ *  {@link org.jdesktop.swingx.decorator.FilterPipeline} pipeline = new {@link org.jdesktop.swingx.decorator.FilterPipeline}(filters);
+ *  {@link org.jdesktop.swingx.JXTable}  table = new {@link org.jdesktop.swingx.JXTable}(model);
  *  table.setFilters(pipeline);
  * </pre>
  *
@@ -40,7 +40,7 @@ import javax.swing.event.EventListenerList;
  * their own filter subclasses and want to override the way a filter pipeline works.
  *
  * @author Ramesh Gupta
- * @see org.jdesktop.swing.decorator.Filter
+ * @see org.jdesktop.swingx.decorator.Filter
  */
 public class FilterPipeline {
     protected EventListenerList     listenerList = new EventListenerList();
@@ -83,7 +83,7 @@ public class FilterPipeline {
     }
 
     /**
-     * Assigns a {@link org.jdesktop.swing.decorator.ComponentAdapter} to this
+     * Assigns a {@link org.jdesktop.swingx.decorator.ComponentAdapter} to this
      * pipeline if no adapter has previously been assigned to the pipeline. Once an
      * adapter has been assigned to this pipeline, any attempt to change that will
      * cause an exception to be thrown.
@@ -235,8 +235,8 @@ public class FilterPipeline {
     /**
      * Convert row index from view coordinates to model coordinates
      * accounting for the presence of sorters and filters. This is essentially
-     * a pass-through to the {@link org.jdesktop.swing.decorator.Filter#convertRowIndexToModel(int) convertRowIndexToModel}
-     * method of the <em>last</em> {@link org.jdesktop.swing.decorator.Filter},
+     * a pass-through to the {@link org.jdesktop.swingx.decorator.Filter#convertRowIndexToModel(int) convertRowIndexToModel}
+     * method of the <em>last</em> {@link org.jdesktop.swingx.decorator.Filter},
      * if any, in this pipeline.
      *
      * @param row row index in view coordinates
@@ -250,8 +250,8 @@ public class FilterPipeline {
     /**
      * Convert row index from model coordinates to view coordinates
      * accounting for the presence of sorters and filters. This is essentially
-     * a pass-through to the {@link org.jdesktop.swing.decorator.Filter#convertRowIndexToView(int) convertRowIndexToModel}
-     * method of the <em>last</em> {@link org.jdesktop.swing.decorator.Filter},
+     * a pass-through to the {@link org.jdesktop.swingx.decorator.Filter#convertRowIndexToView(int) convertRowIndexToModel}
+     * method of the <em>last</em> {@link org.jdesktop.swingx.decorator.Filter},
      * if any, in this pipeline.
      *
      * @param row row index in model coordinates
@@ -287,17 +287,17 @@ public class FilterPipeline {
     }
 
     /**
-     * Flushes the pipeline by initiating a {@link org.jdesktop.swing.decorator.Filter#refresh() refresh}
-     * on the <em>first</em> {@link org.jdesktop.swing.decorator.Filter filter},
+     * Flushes the pipeline by initiating a {@link org.jdesktop.swingx.decorator.Filter#refresh() refresh}
+     * on the <em>first</em> {@link org.jdesktop.swingx.decorator.Filter filter},
      * if any, in this pipeline. After that filter has refreshed itself, it sends a
-     * {@link #filterChanged(org.jdesktop.swing.decorator.Filter) filterChanged}
+     * {@link #filterChanged(org.jdesktop.swingx.decorator.Filter) filterChanged}
      * notification to this pipeline, and the pipeline responds by initiating a
-     * {@link org.jdesktop.swing.decorator.Filter#refresh() refresh}
-     * on the <em>next</em> {@link org.jdesktop.swing.decorator.Filter filter},
+     * {@link org.jdesktop.swingx.decorator.Filter#refresh() refresh}
+     * on the <em>next</em> {@link org.jdesktop.swingx.decorator.Filter filter},
      * if any, in this pipeline. Eventualy, when there are no more filters left
-     * in the pipeline, it broadcasts a {@link org.jdesktop.swing.decorator.PipelineEvent}
-     * signaling a {@link org.jdesktop.swing.decorator.PipelineEvent#CONTENTS_CHANGED}
-     * message to all {@link org.jdesktop.swing.decorator.PipelineListener} objects
+     * in the pipeline, it broadcasts a {@link org.jdesktop.swingx.decorator.PipelineEvent}
+     * signaling a {@link org.jdesktop.swingx.decorator.PipelineEvent#CONTENTS_CHANGED}
+     * message to all {@link org.jdesktop.swingx.decorator.PipelineListener} objects
      * registered with this pipeline.
      */
     public void flush() {
@@ -346,7 +346,7 @@ public class FilterPipeline {
     }
 
     /**
-     * Notifies all registered {@link org.jdesktop.swing.decorator.PipelineListener}
+     * Notifies all registered {@link org.jdesktop.swingx.decorator.PipelineListener}
      * objects that the contents of this pipeline has changed. The event instance
      * is lazily created.
      */

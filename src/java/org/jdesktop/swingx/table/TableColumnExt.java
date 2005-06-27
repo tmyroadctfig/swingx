@@ -134,7 +134,7 @@ public class TableColumnExt extends javax.swing.table.TableColumn
      * initial preferredWidth will be overridden if the user resizes columns
      * directly.
      * @see #getPrototypeValue
-     * @see org.jdesktop.swing.JXTable#getPreferredScrollableViewportSize
+     * @see org.jdesktop.swingx.JXTable#getPreferredScrollableViewportSize
      * @param value Object containing the value of the prototype to be used
      *         to calculate the initial preferred width of the column
      */

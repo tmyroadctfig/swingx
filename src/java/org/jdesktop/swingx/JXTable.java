@@ -71,7 +71,7 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * You can instantiate a JXTable just as you would a JTable, using a TableModel. However, a JXTable automatically 
  * wraps TableColumns inside a TableColumnExt instance. TableColumnExt supports visibility, sortability, and 
  * prototype values for column sizing, none of which are available in TableColumn. You can retrieve the TableColumnExt
- * instance for a column using {@link #getColumnExt(object identifier)} or {@link #getColumnExt(int colnumber)}.
+ * instance for a column using {@link #getColumnExt(Object)} or {@link #getColumnExt(int colnumber)}.
  *
  * <p>A JXTable is, by default, sortable by clicking on column headers; each subsequent click on a header reverses
  * the order of the sort, and a sort arrow icon is automatically drawn on the header. Sorting can be disabled using
@@ -93,7 +93,7 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * to believe rows in the model are in a sorted order.
  *
  * <p>One can automatically highlight certain rows in a JXTable by attaching Highlighters in the 
- * {@link #setHighlighters(HighlighterPipeline}} method. An example would be a Highlighter that colors alternate
+ * {@link #setHighlighters(HighlighterPipeline)} method. An example would be a Highlighter that colors alternate
  * rows in the table for readability; AlternateRowHighlighter does this. Again, like Filters, Highlighters can
  * be chained together in a HighlighterPipeline to achieve more interesting effects. 
  *
@@ -206,7 +206,7 @@ public class JXTable extends JTable implements Searchable {
      * Instantiates a JXTable with a specific table model, column model, and selection model.
      * @param dm The table model to use.
      * @param cm The colomn model to use.
-     * @param lm The list selection model to use.
+     * @param sm The list selection model to use.
      */
     public JXTable(TableModel dm, TableColumnModel cm, ListSelectionModel sm) {
         super(dm, cm, sm);
@@ -216,7 +216,7 @@ public class JXTable extends JTable implements Searchable {
     /** 
      * Instantiates a JXTable for a given number of columns and rows.
      * @param numRows Count of rows to accomodate.
-     * @param numRows Count of columns to accomodate.
+     * @param numColumns Count of columns to accomodate.
      */
     public JXTable(int numRows, int numColumns) {
         super(numRows, numColumns);
@@ -385,7 +385,7 @@ public class JXTable extends JTable implements Searchable {
 
     /**
      * Returns the rolloverEnabled property.
-     * @return
+     * @return <code>true</code> if rollover is enabled
      */
     public boolean isRolloverEnabled() {
         return rolloverProducer != null;
@@ -733,8 +733,8 @@ public class JXTable extends JTable implements Searchable {
          * property is <code>true</code>.  If <code>sortable</code> is <code>false</code>
          * then sorting will be disabled for all columns, regardless of each column's
          * individual <code>sorting</code> property.  The default is <code>true</code>.
-     * @see TableColumnExt#isSortable
-     * @see TableColumnExt#setSortable
+     * @see TableColumnExt#isSortable()
+//     * @see TableColumnExt#setSortable
      * @param sortable boolean indicating whether or not this table supports
      *        sortable columns
      */
@@ -1139,12 +1139,12 @@ public class JXTable extends JTable implements Searchable {
      * whose identifier is equal to <code>identifier</code>, when compared using
      * <code>equals</code>.
      *
+     * @param   identifier                      the identifier object
+     *
      * @return  the <code>TableColumnExt</code> object that matches the identifier
      * @exception IllegalArgumentException
      *    if <code>identifier</code> is <code>null</code>
      *    or no <code>TableColumn</code> has this identifier
-     *
-     * @param   identifier                      the identifier object
      */
     public TableColumnExt getColumnExt(Object identifier) {
         return (TableColumnExt)super.getColumn(identifier);
@@ -1154,10 +1154,10 @@ public class JXTable extends JTable implements Searchable {
      * Returns the <code>TableColumnExt</code> object for the column in the table
      * whose column index is equal to <code>viewColumnIndex</code>
      *
+     * @param  viewColumnIndex index of the column with the object in question
+     *
      * @return  the <code>TableColumnExt</code> object that matches the column index
      * @exception IllegalArgumentException if no <code>TableColumn</code> has this identifier
-     *
-     * @param   identifier                      the identifier object
      */
     public TableColumnExt getColumnExt(int viewColumnIndex) {
         return (TableColumnExt) getColumnModel().getColumn(viewColumnIndex);
@@ -1202,18 +1202,18 @@ public class JXTable extends JTable implements Searchable {
         return column;
     }
 
-    /**
-     * set column properties from MetaData. <p>
-     * Experimental, will be moved somewhere else when
-     * going for a data-unaware swingx layer.<p>
-     *
-     * Note: the column must not be assumed to be already
-     * added to the columnModel nor to have any relation
-     * to the current tableModel!.
-     *
-     * @param column
-     * @param metaData
-     */
+//    /**
+//     * set column properties from MetaData. <p>
+//     * Experimental, will be moved somewhere else when
+//     * going for a data-unaware swingx layer.<p>
+//     *
+//     * Note: the column must not be assumed to be already
+//     * added to the columnModel nor to have any relation
+//     * to the current tableModel!.
+//     *
+//     * @param column
+//     * @param metaData
+//     */
 //    public void configureColumn(TableColumn column, MetaData metaData) {
 //        column.setIdentifier(metaData.getName());
 //        column.setHeaderValue(metaData.getLabel());
@@ -1236,14 +1236,14 @@ public class JXTable extends JTable implements Searchable {
 //        }
 //    }
 
-    /**
-     * Returns the default table model object, which is
-     * a <code>DefaultTableModel</code>.  A subclass can override this
-     * method to return a different table model object.
-     *
-     * @return the default table model object
-     * @see org.jdesktop.swing.table.DefaultTableModelExt
-     */
+//    /**
+//     * Returns the default table model object, which is
+//     * a <code>DefaultTableModel</code>.  A subclass can override this
+//     * method to return a different table model object.
+//     *
+//     * @return the default table model object
+//     * @see DefaultTableColumnModelExt
+//     */
 //    protected TableModel createDefaultDataModel() {
 //        return new DefaultTableModelExt();
 //    }
@@ -1290,7 +1290,7 @@ public class JXTable extends JTable implements Searchable {
      * @param row the row of the cell to render, where 0 is the first row
          * @param column the column of the cell to render, where 0 is the first column
      * @return the decorated <code>Component</code> used as a stamp to render the specified cell
-     * @see org.jdesktop.swing.decorator.Highlighter
+     * @see org.jdesktop.swingx.decorator.Highlighter
      */
     public Component prepareRenderer(TableCellRenderer renderer, int row,
                                      int column) {
@@ -1314,7 +1314,7 @@ public class JXTable extends JTable implements Searchable {
 
     /** 
      * Performs a search across the table using String that represents a regex pattern;
-     * {@see java.util.regex.Pattern}. All columns and all rows are searched; the row id
+     * {@link java.util.regex.Pattern}. All columns and all rows are searched; the row id
      * of the first match is returned. 
      */
     public int search(String searchString) {
@@ -1323,7 +1323,7 @@ public class JXTable extends JTable implements Searchable {
 
     /** 
      * Performs a search on a column using String that represents a regex pattern;
-     * {@see java.util.regex.Pattern}. The specified column searched; the row id
+     * {@link java.util.regex.Pattern}. The specified column searched; the row id
      * of the first match is returned. 
      */
     public int search(String searchString, int columnIndex) {
@@ -1597,7 +1597,7 @@ public class JXTable extends JTable implements Searchable {
      * column's prototypeValue property.  If the column is not an
      * instance of <code>TableColumnExt</code> or prototypeValue is <code>null</code>
      * then the preferredWidth is left unmodified.
-     * @see org.jdesktop.swing.table.TableColumnExt#setPrototypeValue
+     * @see org.jdesktop.swingx.table.TableColumnExt#setPrototypeValue
      * @param column TableColumn object representing view column
      */
     protected void initializeColumnPreferredWidth(TableColumn column) {
@@ -1835,9 +1835,9 @@ public class JXTable extends JTable implements Searchable {
         }
     }
 
-    /**
-     * Renders a LinkModel type the link in the table column
-     */
+//    /**
+//     * Renders a LinkModel type the link in the table column
+//     */
 //    public static class LinkRenderer extends DefaultTableCellRenderer {
 //
 //        // Should have a way of setting these statically

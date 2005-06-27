@@ -21,7 +21,7 @@ import javax.swing.SwingUtilities;
  * for those who do not require this functionality.
  *
  * @author Bino George
- * @authro Shai Almog
+ * @author Shai Almog
  */
 public abstract class LoginService {
      private Vector<LoginListener> listenerList = new Vector<LoginListener>();
@@ -52,12 +52,17 @@ public abstract class LoginService {
      * @param name username
      * @param password password
      * @param server server (optional)
+     * 
+     * @return <code>true</code> on authentication success
+     * @throws IOException
      */
     public abstract boolean authenticate(String name, char[] password, String server) throws IOException;
     
     /**
      * Called immediately after a successful authentication. This method should return an array
      * of user roles or null if role based permissions are not used.
+     * 
+     * @return per default <code>null</code> 
      */
     public String[] getUserRoles() {
         return null;
@@ -85,6 +90,7 @@ public abstract class LoginService {
      * implementation just creates a new Thread with the given runnable.
      *
      * @param runnable runnable
+     * @return a new login thread
      */
     public Thread getLoginThread(Runnable runnable) {
       return new Thread(runnable);  
@@ -97,6 +103,7 @@ public abstract class LoginService {
      * @param user user
      * @param password password
      * @param server server
+     * @throws IOException
      */
     public void startAuthentication(final String user, final char[] password, final String server) throws IOException {
        canceled = false;
@@ -139,7 +146,8 @@ public abstract class LoginService {
     }
     
     /**
-     * Returns the synchronous property
+     * Get the synchronous property
+     * @return the synchronous property
      */
     public boolean getSynchronous() {
         return synchronous;

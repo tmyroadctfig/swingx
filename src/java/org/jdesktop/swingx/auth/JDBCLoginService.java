@@ -38,8 +38,6 @@ public class JDBCLoginService extends LoginService {
      * database using the given params.
      * @param driver
      * @param url
-     * @param user
-     * @param passwd
      */
     public JDBCLoginService(String driver, String url) {
         super(url);
@@ -79,8 +77,6 @@ public class JDBCLoginService extends LoginService {
      * Create a new JDBCLoginService and initializes it to connect to a
      * database using the given params.
      * @param jndiContext
-     * @param user
-     * @param passwd
      */
     public JDBCLoginService(String jndiContext) {
         super(jndiContext);
@@ -170,6 +166,8 @@ public class JDBCLoginService extends LoginService {
     }
 
     /**
+     * @param name	user name
+     * @param password	user password
      * @param server Must be either a valid JDBC URL for the type of JDBC driver you are using,
      * or must be a valid JNDIContext from which to get the database connection
      */

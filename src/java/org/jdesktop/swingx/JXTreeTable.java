@@ -59,7 +59,7 @@ import org.jdesktop.swingx.treetable.TreeTableModel;
  * consisting of a single column in which to display hierarchical data, and any
  * number of other columns in which to display regular data. The interface for
  * the data model used by a <code>JXTreeTable</code> is
- * {@link org.jdesktop.swing.treetable.TreeTableModel}. It extends the
+ * {@link org.jdesktop.swingx.treetable.TreeTableModel}. It extends the
  * {@link javax.swing.tree.TreeModel} interface to allow access to cell data by
  * column indices within each node of the tree hierarchy.</p>
  *
@@ -77,7 +77,7 @@ import org.jdesktop.swingx.treetable.TreeTableModel;
  * <p>A single treetable model instance may be shared among more than one
  * <code>JXTreeTable</code> instances. To access the treetable model, always call
  * {@link #getTreeTableModel() getTreeTableModel} and
- * {@link #setTreeTableModel(org.jdesktop.swing.treetable.TreeTableModel) setTreeTableModel}.
+ * {@link #setTreeTableModel(org.jdesktop.swingx.treetable.TreeTableModel) setTreeTableModel}.
  * <code>JXTreeTable</code> wraps the supplied treetable model inside a private
  * adapter class to adapt it to a {@link javax.swing.table.TableModel}. Although
  * the model adapter is accessible through the {@link #getModel() getModel} method, you
@@ -108,7 +108,7 @@ public class JXTreeTable extends JXTable {
 
     /**
      * Constructs a JXTreeTable using a
-     * {@link org.jdesktop.swing.treetable.DefaultTreeTableModel}.
+     * {@link org.jdesktop.swingx.treetable.DefaultTreeTableModel}.
      */
     public JXTreeTable() {
         this(new DefaultTreeTableModel());
@@ -116,7 +116,7 @@ public class JXTreeTable extends JXTable {
 
     /**
      * Constructs a JXTreeTable using the specified
-     * {@link org.jdesktop.swing.treetable.TreeTableModel}.
+     * {@link org.jdesktop.swingx.treetable.TreeTableModel}.
      *
      * @param treeModel model for the JXTreeTable
      */
@@ -342,7 +342,7 @@ public class JXTreeTable extends JXTable {
 
     /**
      * Sets the data model for this JXTreeTable to the specified
-     * {@link org.jdesktop.swing.treetable.TreeTableModel}. The same data model
+     * {@link org.jdesktop.swingx.treetable.TreeTableModel}. The same data model
      * may be shared by any number of JXTreeTable instances.
      *
      * @param treeModel data model for this JXTreeTable
@@ -393,9 +393,9 @@ public class JXTreeTable extends JXTable {
      * invoking the inherited version.</p>
      *
      * <p>Because JXTreeTable internally adapts an
-     * {@link org.jdesktop.swing.treetable.TreeTableModel} to make it a compatible
+     * {@link org.jdesktop.swingx.treetable.TreeTableModel} to make it a compatible
      * TableModel, <b>this method should never be called directly</b>. Use
-     * {@link #setTreeTableModel(org.jdesktop.swing.treetable.TreeTableModel) setTreeTableModel} instead.</p>
+     * {@link #setTreeTableModel(org.jdesktop.swingx.treetable.TreeTableModel) setTreeTableModel} instead.</p>
      *
      * <p>While it is possible to obtain a reference to this adapted
      * version of the TableModel by calling {@link javax.swing.JTable#getModel()},
@@ -1317,7 +1317,7 @@ public class JXTreeTable extends JXTable {
         /**
          * Returns the JXTreeTable instance to which this TreeTableModelAdapter is
          * permanently and exclusively bound. For use by
-         * {@link org.jdesktopx.swing.JXTreeTable#setModel(javax.swing.table.TableModel)}.
+         * {@link org.jdesktop.swingx.JXTreeTable#setModel(javax.swing.table.TableModel)}.
          *
          * @return JXTreeTable to which this TreeTableModelAdapter is permanently bound
          */
@@ -1352,10 +1352,6 @@ public class JXTreeTable extends JXTable {
             return model.getColumnClass(column);
         }
 
-        /**
-         *
-         * @return
-         */
         public int getColumnCount() {
             return model.getColumnCount();
         }

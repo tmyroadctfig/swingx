@@ -38,7 +38,7 @@ public class JXTitledPanel extends JXPanel {
     
     /**
      * @see #getUIClassID
-     * @see #readObject
+//     * @see #readObject
      */
     static public final String uiClassID = "TitledPanelUI";
 
@@ -125,7 +125,7 @@ public class JXTitledPanel extends JXPanel {
      * Sets the look and feel (L&F) object that renders this component.
      *
      * @param ui  the TitledPanelUI L&F object
-     * @see UIDefaults#getUI
+     * @see javax.swing.UIDefaults#getUI
      * @since 1.4
      * @beaninfo
      *        bound: true
@@ -143,7 +143,7 @@ public class JXTitledPanel extends JXPanel {
      *
      * @return "TitledPanelUI"
      * @see JComponent#getUIClassID
-     * @see UIDefaults#getUI
+     * @see javax.swing.UIDefaults#getUI
      * @beaninfo
      *        expert: true
      *   description: A string that specifies the name of the L&F class.
@@ -152,16 +152,10 @@ public class JXTitledPanel extends JXPanel {
         return uiClassID;
     }
 
-	/**
-	 * @return
-	 */
 	public String getTitle() {
 		return title;
 	}
 
-	/**
-	 * @param string
-	 */
 	public void setTitle(String title) {
 		String oldTitle = this.title;
 		this.title = (title == null ? "" : title);
@@ -174,9 +168,6 @@ public class JXTitledPanel extends JXPanel {
         firePropertyChange("title", oldTitle, getTitle());
 	}
 	
-	/**
-	 * @return
-	 */
 	public Container getContentContainer() {
         if (contentPanel == null) {
             contentPanel = new JXPanel();

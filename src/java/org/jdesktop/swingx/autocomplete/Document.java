@@ -1,11 +1,9 @@
 package org.jdesktop.swingx.autocomplete;
 
-import java.awt.Component;
-import java.awt.event.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import javax.swing.*;
-import javax.swing.text.*;
+import javax.swing.UIManager;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
 
 /**
  * A Document that can be plugged into any JTextComponent to enable automatic completion.
@@ -34,7 +32,7 @@ public class Document extends PlainDocument {
      * Creates a new Document for the given AbstractComponentAdaptor.
      * @param strictMatching true, if only items from the adaptor's list should
      * be allowed to be entered
-     * @param adpator The adaptor that will be used to find and select matching
+     * @param adaptor The adaptor that will be used to find and select matching
      * items.
      */
     public Document(AbstractComponentAdaptor adaptor, boolean strictMatching) {

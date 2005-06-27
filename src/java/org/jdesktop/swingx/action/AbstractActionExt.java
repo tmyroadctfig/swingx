@@ -15,8 +15,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.KeyStroke;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 
 /**
  * Extends the concept of the Action to include toggle or group states.

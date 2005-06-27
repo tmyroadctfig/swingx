@@ -12,7 +12,6 @@ import java.text.SimpleDateFormat;
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 import java.util.TimeZone;
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -603,7 +602,7 @@ public class JXMonthView extends JComponent {
     /**
      * Returns whether or not the month view supports traversing months.
      *
-     * @param true if month traversing is enabled, false otherwise.
+     * @return <code>true</code> if month traversing is enabled.
      */
     public boolean getTraversable() {
         return _traversable;
@@ -1590,13 +1589,11 @@ public class JXMonthView extends JComponent {
     }
 
     /**
-     * Returns the bounding box for drawing a date.  It is assumed that the
+     * Calculate the bounding box for drawing a date.  It is assumed that the
      * calendar, _cal, is already set to the date you want to find the offset
      * for.
      *
      * @param bounds Bounds of the date to draw in.
-     * @return Point X/Y coordinate to the upper left corner of the bounding
-     * box for date.
      */
     private void calculateBoundsForDay(Rectangle bounds) {
         int year = _cal.get(Calendar.YEAR);

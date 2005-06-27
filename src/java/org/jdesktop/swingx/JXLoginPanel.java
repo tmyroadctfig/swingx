@@ -389,8 +389,7 @@ public class JXLoginPanel extends JXImagePanel {
 
 	/**
 	 * Gets the <strong>User name</strong> for this panel.
-	 *
-	 * @param username User name
+	 * @return the user name
 	 */
 	public String getUserName() {
         if(saveMode != SaveMode.NONE) {

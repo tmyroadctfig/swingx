@@ -32,9 +32,9 @@ import org.jdesktop.swingx.event.ProgressSource;
  * <code>ProgressSource</code> components.
  *
  * @see JXStatusBar
- * @see org.jdesktop.swing.event.MessageEvent
- * @see org.jdesktop.swing.event.MessageSource
- * @see org.jdesktop.swing.event.ProgressSource
+ * @see org.jdesktop.swingx.event.MessageEvent
+ * @see org.jdesktop.swingx.event.MessageSource
+ * @see org.jdesktop.swingx.event.ProgressSource
  * @author Mark Davidson
  */
 public class JXRootPane extends JRootPane {

@@ -9,15 +9,15 @@ package org.jdesktop.swingx.decorator;
 
 /**
  * <p>A <b><code>Filter</code></b> is used to filter the data presented in a
- * data-aware component such as a {@link org.jdesktop.swing.JXList} or a
- * {@link org.jdesktop.swing.JXTable}. Filtering involves interposing one or
- * more filters in a {@link org.jdesktop.swing.decorator.FilterPipeline} between
+ * data-aware component such as a {@link org.jdesktop.swingx.JXList} or a
+ * {@link org.jdesktop.swingx.JXTable}. Filtering involves interposing one or
+ * more filters in a {@link org.jdesktop.swingx.decorator.FilterPipeline} between
  * a data model and a view to change the apparent order and/or number of records
  * in the data model.</p>
  *
  * @author Ramesh Gupta
- * @see org.jdesktop.swing.decorator.FilterPipeline
- * @see org.jdesktop.swing.JXTable
+ * @see org.jdesktop.swingx.decorator.FilterPipeline
+ * @see org.jdesktop.swingx.JXTable
  */
 public abstract class Filter {
     private final int column;		// in model coordinates
@@ -63,7 +63,7 @@ public abstract class Filter {
      * Refreshes the internal state of the filter, performs the {@link #filter() filter}
      * operation and regenerates row mappings from the previous filter. If this
      * filter is bound to a filter pipeline (as most filters are), it also triggers a
-     * {@link org.jdesktop.swing.decorator.FilterPipeline#filterChanged(org.jdesktop.swing.decorator.Filter) filterChanged}
+     * {@link org.jdesktop.swingx.decorator.FilterPipeline#filterChanged(org.jdesktop.swingx.decorator.Filter) filterChanged}
      * notification.
      */
     public void refresh() {
@@ -76,7 +76,7 @@ public abstract class Filter {
      * Always performs the {@link #filter() filter} operation and regenerates
      * row mappings from the previous filter. If this filter is bound to a filter
      * pipeline (as most filters are), it also triggers a
-     * {@link org.jdesktop.swing.decorator.FilterPipeline#filterChanged(org.jdesktop.swing.decorator.Filter) filterChanged}
+     * {@link org.jdesktop.swingx.decorator.FilterPipeline#filterChanged(org.jdesktop.swingx.decorator.Filter) filterChanged}
      * notification.
      *
      * @param reset true if existing row mappings from this filter to the previous
@@ -222,7 +222,7 @@ public abstract class Filter {
      * previous filter. If there is no previous filter in the pipeline, this returns
      * the row in this filter that maps to the specified row in the data model.
      * This method is called from
-     * {@link org.jdesktop.swing.decorator.Filter#convertRowIndexToView(int) convertRowIndexToView}
+     * {@link org.jdesktop.swingx.decorator.Filter#convertRowIndexToView(int) convertRowIndexToView}
      *
      * @param row a row index in the previous filter's "view" of the data model
      * @return the row in this filter that maps to the specified row in
@@ -238,7 +238,7 @@ public abstract class Filter {
      * this filter. If there is no previous filter in the pipeline, this returns
      * the row in the data model that maps to the specified row in this filter.
      * This method is called from
-     * {@link org.jdesktop.swing.decorator.Filter#convertRowIndexToModel(int) convertRowIndexToModel}
+     * {@link org.jdesktop.swingx.decorator.Filter#convertRowIndexToModel(int) convertRowIndexToModel}
      *
      * @param row a row index in this filter's "view" of the data model
      * @return the row in the previous filter that maps to the specified row in

@@ -86,7 +86,7 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel implemen
      * should check if the received columnAdded originated
      * from moving a column from invisible to visible.
      * 
-     * @param oldIndex the toIndex of the columnEvent
+     * @param newIndex the toIndex of the columnEvent
      * @return true if the column was moved to visible
      */
     public boolean isAddedFromInvisibleEvent(int newIndex) {

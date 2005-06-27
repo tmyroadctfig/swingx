@@ -22,7 +22,7 @@ import java.security.cert.CertificateException;
 
 import javax.crypto.spec.SecretKeySpec;
 
-/* <p>
+/**
  * <b>KeyChain</b> is a class that implements the "KeyChain" concept.
  * Fundamentally, it allows you to store multiple keys/credentials 
  * in a central password store. Access to this central store is
@@ -79,7 +79,8 @@ public class KeyChain {
 	 * Fetches the password for a given account/user and server.
 	 * @param user
 	 * @param server
-	 * @return
+	 * @return <code>null</code> if no password could be obtained, the password 
+	 * 		otherwise
 	 */
 	public String getPassword(String user, String server) {
 
@@ -106,10 +107,9 @@ public class KeyChain {
 	 * @param user
 	 * @param server
 	 * @param password
-	 * @throws IOException
 	 */
 	public void addPassword(String user, String server, char[] password)
-			throws IOException {
+			{
 		String pass = new String(password);
 		SecretKeySpec passwordKey = new SecretKeySpec(pass.getBytes(), "JCEKS");
 		KeyStore.SecretKeyEntry entry = new KeyStore.SecretKeyEntry(passwordKey);

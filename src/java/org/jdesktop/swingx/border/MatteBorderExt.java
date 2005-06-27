@@ -52,7 +52,7 @@ public class MatteBorderExt extends MatteBorder {
     }
 
     /**
-     * {@inheritDoc}
+     * @see MatteBorder#MatteBorder(int, int, int, int, java.awt.Color)
      */
     public MatteBorderExt(int top, int left, int bottom, int right,
                           Color matteColor) {
@@ -60,14 +60,14 @@ public class MatteBorderExt extends MatteBorder {
     }
 
     /**
-     * {@inheritDoc}
+     * @see MatteBorder#MatteBorder(java.awt.Insets, java.awt.Color)
      */
     public MatteBorderExt(Insets borderInsets, Color matteColor) {
         super(borderInsets, matteColor);
     }
 
     /**
-     * {@inheritDoc}
+     * @see MatteBorder#MatteBorder(int, int, int, int, javax.swing.Icon)
      */
     public MatteBorderExt(int top, int left, int bottom, int right,
                           Icon tileIcon) {
@@ -75,14 +75,14 @@ public class MatteBorderExt extends MatteBorder {
     }
 
     /**
-     * {@inheritDoc}
+     * @see MatteBorder#MatteBorder(java.awt.Insets, javax.swing.Icon)
      */
     public MatteBorderExt(Insets borderInsets, Icon tileIcon) {
         super(borderInsets, tileIcon);
     }
 
     /**
-     * {@inheritDoc}
+     * @see MatteBorder#MatteBorder(javax.swing.Icon)
      */
     public MatteBorderExt(Icon tileIcon) {
         super(tileIcon);

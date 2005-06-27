@@ -68,7 +68,7 @@ public final class Spatial {
 	
 	/**
 	 * Get the height of the spatial object
-	 * @return
+	 * @return the height
 	 */
 	public int getHeight() {
 		return height;
@@ -76,7 +76,7 @@ public final class Spatial {
 
 	/**
 	 * Get the distance from the left of the space for the spatial object
-	 * @return
+	 * @return the left distance
 	 */
 	public int getLeft() {
 		return left;
@@ -84,7 +84,7 @@ public final class Spatial {
 
 	/**
 	 * Get the distance from the top of the space for the spatial object
-	 * @return
+	 * @return the top distance
 	 */
 	public int getTop() {
 		return top;
@@ -92,14 +92,14 @@ public final class Spatial {
 
 	/**
 	 * Get the width of the spatial object
-	 * @return
+	 * @return the width
 	 */
 	public int getWidth() {
 		return width;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
+	/**
+	 * {@inheritDoc}
 	 */
 	public boolean equals(Object obj) {
 		if (obj instanceof Spatial) {
@@ -109,15 +109,15 @@ public final class Spatial {
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
+	/**
+	 * {@inheritDoc}
 	 */
 	public int hashCode() {
 		return cachedHash;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
+	/**
+	 * {@inheritDoc}
 	 */
 	public String toString() {
 		return cachedAsString;

@@ -95,7 +95,7 @@ public class DefaultUserNameStore extends UserNameStore {
     
 	/**
 	 * Add a username to the store.
-	 * @param username
+	 * @param name
 	 */
 	public void addUserName(String name) {
 		if (!containsUserName(name)) {
@@ -111,7 +111,7 @@ public class DefaultUserNameStore extends UserNameStore {
 	/**
 	 * Removes a username from the list.
 	 * 
-	 * @param username
+	 * @param name
 	 */
 	public void removeUserName(String name) {
 		if (containsUserName(name)) {
@@ -126,9 +126,6 @@ public class DefaultUserNameStore extends UserNameStore {
 		}
 	}
 	
-    /**
-     *
-     */
     public boolean containsUserName(String name) {
         for (String s : userNames) {
             if (s.equals(name)) {

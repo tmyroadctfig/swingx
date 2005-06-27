@@ -7,8 +7,11 @@ package org.jdesktop.swingx.action;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.net.URL;
 
 import javax.swing.SwingUtilities;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.text.Document;
 
 import org.jdesktop.swingx.JXEditorPane;
@@ -21,29 +24,29 @@ import org.jdesktop.swingx.LinkModel;
  */
 public class EditorPaneLinkVisitor implements ActionListener {
     private JXEditorPane editorPane;
+    private HyperlinkListener hyperlinkListener;
+    private LinkModel internalLink;
     
     public EditorPaneLinkVisitor() {
         this(null);
     }
     
     public EditorPaneLinkVisitor(JXEditorPane pane) {
+        if (editorPane != null) {
+            editorPane.removeHyperlinkListener(getHyperlinkListener());
+        }
         if (pane == null) {
             pane = createDefaultEditorPane();
         }
         this.editorPane = pane;
+        pane.addHyperlinkListener(getHyperlinkListener());
     }
     
+
     public JXEditorPane getOutputComponent() {
         return editorPane;
     }
     
-    protected JXEditorPane createDefaultEditorPane() {
-        final JXEditorPane editorPane = new JXEditorPane();
-        editorPane.setEditable(false);
-        editorPane.setContentType("text/html");
-        return editorPane;
-    }
-
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof LinkModel) {
             final LinkModel link = (LinkModel) e.getSource();
@@ -69,5 +72,50 @@ public class EditorPaneLinkVisitor implements ActionListener {
             editorPane.setText("<html>Error 404: couldn't show " + link.getURL() + " </html>");
         }
     }
-    
+
+    protected JXEditorPane createDefaultEditorPane() {
+        final JXEditorPane editorPane = new JXEditorPane();
+        editorPane.setEditable(false);
+        editorPane.setContentType("text/html");
+        return editorPane;
+    }
+
+    protected HyperlinkListener getHyperlinkListener() {
+        if (hyperlinkListener == null) {
+            hyperlinkListener = createHyperlinkListener();
+        }
+        return hyperlinkListener;
+    }
+
+    protected HyperlinkListener createHyperlinkListener() {
+        HyperlinkListener l = new HyperlinkListener() {
+
+            public void hyperlinkUpdate(HyperlinkEvent e) {
+                if (HyperlinkEvent.EventType.ACTIVATED == e.getEventType()) {
+                    visitInternal(e.getURL());
+                }
+                
+            }
+            
+        };
+        return l;
+    }
+
+    protected LinkModel getInternalLink() {
+        if (internalLink == null) {
+            internalLink = new LinkModel("internal");
+        }
+        return internalLink;
+    }
+
+    protected void visitInternal(URL url) {
+        try {
+            getInternalLink().setURL(url);
+            visit(getInternalLink());
+        } catch (Exception e) {
+            // todo: error feedback
+        }
+    }
+
+
 }
