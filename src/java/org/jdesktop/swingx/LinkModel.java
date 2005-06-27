@@ -13,10 +13,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * An object which represents an URL link in a table cell, tree cell or list
- * item.
+ * An bean which represents an URL link.
+ * 
+ * Text, URL and visited are bound properties. Compares by Text.
  * 
  * @author Mark Davidson
+ * @author Jeanette Winzenburg
  */
 public class LinkModel implements Comparable {
 
@@ -37,6 +39,12 @@ public class LinkModel implements Comparable {
 
     private static URL defaultURL;
     
+    /**
+     * 
+     * @param text
+     * @param target
+     * @param url
+     */
     public LinkModel(String text, String target, URL url) {
         setText(text);
         setTarget(target);
@@ -67,8 +75,9 @@ public class LinkModel implements Comparable {
      * Set the display text.
      */
     public void setText(String text) {
-        
+        String old = getText();
         this.text = text;
+        firePropertyChange("text", old, getText());
     }
 
     public String getText() {
