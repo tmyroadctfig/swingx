@@ -54,6 +54,9 @@ import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.PipelineListener;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
+import org.jdesktop.swingx.decorator.ComparatorProblem.Car;
+import org.jdesktop.swingx.decorator.ComparatorProblem.Porsche;
+import org.jdesktop.swingx.decorator.ComparatorProblem.Tractor;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
 import org.jdesktop.swingx.table.TableColumnExt;
@@ -551,6 +554,68 @@ public class JXTableUnitTest extends InteractiveTestCase {
 
     }
 
+    /**
+     * example mixed sorting (Jens Elkner).
+     *
+     */
+    public void interactiveTestSorterPatch() {
+        Object[][] fourWheels = new Object[][]{
+             new Object[] {"Car", new Car(180f)},
+             new Object[] {"Porsche", new Porsche(170)}, 
+             new Object[] {"Porsche", new Porsche(170)}, 
+             new Object[] {"Porsche", new Porsche(170, false)}, 
+             new Object[] {"Tractor", new Tractor(20)},
+             new Object[] {"Tractor", new Tractor(10)},
+
+        };
+        DefaultTableModel model = new DefaultTableModel(fourWheels, new String[] {"Text", "Car"}) ;
+        JXTable table = new JXTable(model);
+        JFrame frame = wrapWithScrollingInFrame(table, "Sorter patch");
+        frame.setVisible(true);
+        
+    
+    }
+    
+    public class Car implements Comparable<Car> {
+        float speed = 100;
+        public Car(float speed) { this.speed = speed; }
+        public int compareTo(Car o) {
+            return speed < o.speed ? -1 : speed > o.speed ? 1 : 0;
+        }
+        public String toString() {
+            return "Car - " + speed;
+        }
+    }
+    public class Porsche extends Car {
+        boolean hasBridgeStone = true;
+        public Porsche(float speed) { super(speed); }
+        public Porsche(float speed, boolean bridgeStone) { 
+            this(speed); 
+            hasBridgeStone = bridgeStone;
+        }
+        public int compareTo(Car o) {
+            if (o instanceof Porsche) {
+                return ((Porsche) o).hasBridgeStone ? 0 : 1; 
+            }
+            return super.compareTo(o);
+        }
+        public String toString() {
+            return "Porsche - " + speed + (hasBridgeStone ? "+" : "");
+        }
+    }
+    
+    public class Tractor implements Comparable<Tractor> {
+        float speed = 20;
+        public Tractor(float speed) { this.speed = speed; }
+        public int compareTo(Tractor o) {
+            return speed < o.speed ? -1 : speed > o.speed ? 1 : 0;
+        }
+        public String toString() {
+            return "Tractor - " + speed;
+        }
+    }
+
+    
     /**
      * Issue #179: Sorter does not use collator if cell content is
      *  a String.
@@ -1222,7 +1287,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
          // test.runInteractiveTests();
         //    test.runInteractiveTests("interactive.*Column.*");
 //            test.runInteractiveTests("interactive.*TableHeader.*");
-            test.runInteractiveTests("interactive.*Sort.*");
+            test.runInteractiveTests("interactive.*SorterP.*");
          //   test.runInteractiveTests("interactive.*Control.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
