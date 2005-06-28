@@ -7,17 +7,15 @@
 
 package org.jdesktop.swingx.decorator;
 
+import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EventListener;
 import java.util.Iterator;
 import java.util.List;
 
-import java.awt.Component;
-
+import javax.swing.JTable;
 import javax.swing.event.EventListenerList;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 
 /**
  * A class which manages the lists of highlighters.
@@ -154,9 +152,16 @@ public class HighlighterPipeline {
      * Applies all the highlighters to the components.
      */
     public Component apply(Component stamp, ComponentAdapter adapter) {
+        //JW
+        // table renderers have different state memory as renderers
+        // without the null they don't unstamp!
+        // but... null has adversory effect on JXList f.i. - selection
+        // color is changed
+        // 
+        if (adapter.getComponent() instanceof JTable) {
         /** @todo optimize the following bug fix */
-        stamp = nullHighlighter.highlight(stamp, adapter);      // fixed bug from M1
-
+            stamp = nullHighlighter.highlight(stamp, adapter);      // fixed bug from M1
+        }
         Iterator iter = highlighters.iterator();
         while (iter.hasNext()) {
             Highlighter hl = (Highlighter)iter.next();
