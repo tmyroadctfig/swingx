@@ -126,7 +126,8 @@ public abstract class ConditionalHighlighter extends Highlighter {
     }
 
     protected Color computeSelectedForeground(Color seed) {
-        return getSelectedForeground() == null ? seed.brighter() : getSelectedForeground();
+        return getSelectedForeground() == null ? 
+                seed == null ? null : seed.brighter() : getSelectedForeground();
     }
 
     public int getTestColumnIndex() {
