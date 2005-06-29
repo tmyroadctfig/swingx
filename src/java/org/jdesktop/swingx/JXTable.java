@@ -504,6 +504,10 @@ public class JXTable extends JTable implements Searchable {
     public void setColumnControlVisible(boolean showColumnControl) {
         boolean old = columnControlVisible;
         this.columnControlVisible = showColumnControl;
+        // JW: hacking issue #38(swingx) to initially add all columns
+        if (showColumnControl) {
+            getColumnControl();
+        }
         configureColumnControl();
         firePropertyChange("hasColumnControl", old, columnControlVisible);
     }
