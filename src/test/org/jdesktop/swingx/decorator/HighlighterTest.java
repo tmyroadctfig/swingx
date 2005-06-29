@@ -155,8 +155,7 @@ public class HighlighterTest extends TestCase {
 
     /** 
      * this puzzled me because it did not fail! 
-     * 
-     *
+     * Currently does...
      */
     public void testNullForegroundOnConditionalSelected() {
         assertApply(foregroundNull, FAIL_ALWAYS, SELECTED);

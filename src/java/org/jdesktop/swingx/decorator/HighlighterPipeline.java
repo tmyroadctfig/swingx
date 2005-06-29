@@ -37,21 +37,25 @@ public class HighlighterPipeline {
     public HighlighterPipeline(Highlighter[] inList) {
         // always returns a new copy of inList
         // XXX seems like there is too much happening here
+        // JW: and probably not what's intended - the array
+        // is cloned, not its content!
+        // don't need to anyway - highlighters are shareable
+        // between Pipelines - the order serves no purpose
         List copy = Arrays.asList((Highlighter[])inList.clone());
         highlighters = new ArrayList(copy.size());
         highlighters.addAll(copy);
 
-        reindexHighlighters();
+//        reindexHighlighters();
     }
 
-    private void reindexHighlighters() {
-        Iterator iter = highlighters.iterator();
-        int i = 0;
-        while (iter.hasNext()) {
-            Highlighter hl = (Highlighter)iter.next();
-            hl.order = i++;
-        }
-    }
+//    private void reindexHighlighters() {
+//        Iterator iter = highlighters.iterator();
+//        int i = 0;
+//        while (iter.hasNext()) {
+//            Highlighter hl = (Highlighter)iter.next();
+//            hl.order = i++;
+//        }
+//    }
 
     /**
      * Appends a highlighter to the pipeline.
@@ -77,7 +81,7 @@ public class HighlighterPipeline {
         } else {
             highlighters.add(highlighters.size(), hl);
         }
-        reindexHighlighters();
+//        reindexHighlighters();
     }
 
     /**
