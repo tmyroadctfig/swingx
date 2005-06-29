@@ -17,6 +17,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
+import javax.swing.UIManager;
 
 /**
  * Base class for supporting inclusion of interactive tests into a JUnit test case.
@@ -128,5 +129,12 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
         }
     }
 
-
+    public static void setSystemLF(boolean system) {
+        String lfName = system ? UIManager.getSystemLookAndFeelClassName() :
+            UIManager.getCrossPlatformLookAndFeelClassName();
+        try {
+          UIManager.setLookAndFeel(lfName);
+       } catch (Exception e1) { // ignore
+      }
+    }
 }

@@ -12,6 +12,7 @@ import java.net.URL;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.ListModel;
 
 import org.jdesktop.swingx.action.EditorPaneLinkVisitor;
@@ -39,6 +40,15 @@ public class JXListTest extends InteractiveTestCase {
     }
     public JXListTest() {
         super("JXList Tests");
+    }
+
+    public void interactiveTestCompareFocusedCellBackground() {
+        JXList xlist = new JXList(listModel);
+        xlist.setBackground(new Color(0xF5, 0xFF, 0xF5));
+        JList list = new JList(listModel);
+        list.setBackground(new Color(0xF5, 0xFF, 0xF5));
+        JFrame frame = wrapWithScrollingInFrame(xlist, list, "unselectedd focused background: JXList/JList");
+        frame.setVisible(true);
     }
 
     public void interactiveTestTablePatternFilter5() {
@@ -136,6 +146,7 @@ public class JXListTest extends InteractiveTestCase {
     }
     
     public static void main(String[] args) {
+        setSystemLF(true);
         JXListTest test = new JXListTest();
         try {
           test.runInteractiveTests();

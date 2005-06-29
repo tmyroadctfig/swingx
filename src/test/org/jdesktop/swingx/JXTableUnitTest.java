@@ -13,7 +13,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -40,12 +39,10 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
-import org.jdesktop.swingx.decorator.ConditionalHighlighter;
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
@@ -53,12 +50,9 @@ import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.PipelineListener;
+import org.jdesktop.swingx.decorator.RolloverHighlighter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
-import org.jdesktop.swingx.decorator.ComparatorProblem.Car;
-import org.jdesktop.swingx.decorator.ComparatorProblem.Porsche;
-import org.jdesktop.swingx.decorator.ComparatorProblem.Tractor;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
-import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.util.AncientSwingTeam;
 
@@ -786,17 +780,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void interactiveTestRolloverHighlight() {
         JXTable table = new JXTable(sortableTableModel);
         table.setRolloverEnabled(true);
-        Highlighter conditional = new ConditionalHighlighter(
-                new Color(0xF0, 0xF0, 0xE0), null, -1, -1) {
-
-            protected boolean test(ComponentAdapter adapter) {
-                Point p = (Point) adapter.getComponent().getClientProperty(RolloverProducer.ROLLOVER_KEY);
-     
-                return p != null &&  p.y == adapter.row;
-            }
-            
-        };
-        table.setHighlighters(new HighlighterPipeline(new Highlighter[] {conditional }));
+        table.setHighlighters(new HighlighterPipeline(new Highlighter[] 
+            {new RolloverHighlighter(Color.YELLOW, null)} ));
         JFrame frame = wrapWithScrollingInFrame(table, "rollover highlight");
         frame.setVisible(true);
 
@@ -830,7 +815,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     public void interactiveTestCustomRendererSorting() {
         JXTable table = new JXTable(sortableTableModel);
-        table.setEnabled(false);
         TableColumn column = table.getColumn("No.");
         TableCellRenderer renderer = new DefaultTableCellRenderer() {
             public Component getTableCellRendererComponent(JTable table, Object value,
@@ -847,32 +831,9 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
     /**
-     * JW: hmm.... what are we testing here?
-     *
-     */
-//    public void interactiveTestLinkCell() {
-//        JXTable table = new JXTable(tableModel);
-//        JFrame frame = wrapWithScrollingInFrame(table, "TableLinkCell Test");
-//        frame.setVisible(true);  // RG: Changed from deprecated method show();
-//    }
-
-    /**
      */
     public void interactiveTestToggleSortingEnabled() {
         final JXTable table = new JXTable(sortableTableModel);
-//        URL url = JXTableUnitTest.class.getResource("resources/stringdata.csv");
-//        System.out.println("url="+url);
-//        DefaultTableModelExt data = new DefaultTableModelExt(url);
-//        TableModelExtTextLoader loader = (TableModelExtTextLoader)data.getLoader();
-//        loader.setFirstRowHeader(true);
-//        loader.setColumnDelimiter(",");
-//        final JXTable table = new JXTable(data);
-//        try {
-//            data.startLoading();
-//        }
-//        catch (Exception ex) {
-//            fail("Exception in data load: " + ex.getMessage());
-//        }
         Action toggleSortableAction = new AbstractAction("Toggle Sortable") {
 
             public void actionPerformed(ActionEvent e) {
@@ -881,10 +842,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
             }
             
         };
-        table.getActionMap().put("toggleSortable", toggleSortableAction);
-        table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
-                KeyStroke.getKeyStroke("F6"), "toggleSortable");
-        JFrame frame = wrapWithScrollingInFrame(table, "ToggleSortingEnabled Test (press F6 to toggle)");
+        JFrame frame = wrapWithScrollingInFrame(table, "ToggleSortingEnabled Test");
+        addAction(frame, toggleSortableAction);
         frame.setVisible(true);  // RG: Changed from deprecated method show();
         
     }
@@ -1005,7 +964,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         frame.setVisible(true);
 
     }
-
+    
     public void interactiveTestTableSorter2() {
         JXTable table = new JXTable(sortableTableModel);
         table.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
@@ -1019,6 +978,20 @@ public class JXTableUnitTest extends InteractiveTestCase {
         }));
         JFrame frame = wrapWithScrollingInFrame(table, "TableSorter2 col 0 = asc, col 1 = desc");
         frame.setVisible(true);
+    }
+    public void interactiveTestFocusedCellBackground() {
+        JXTable xtable = new JXTable(sortableTableModel);
+        xtable.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
+        JTable table = new JTable(sortableTableModel);
+        table.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
+        JFrame frame = wrapWithScrollingInFrame(xtable, table, "Unselected focuse background: JXTable/JTable");
+        frame.setVisible(true);
+    }
+
+    private void configureTableForUnselectedCellBackground(JTable table) {
+        table.setGridColor(Color.cyan.darker());
+        table.setRowHeight(22);
+        table.setRowMargin(1);
     }
 
     public void interactiveTestTableSorter3() {
@@ -1277,18 +1250,18 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
     public static void main(String args[]) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e1) { // ignore
-        }
-        
+//        try {
+//            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//        } catch (Exception e1) { // ignore
+//        }
+//        
         JXTableUnitTest test = new JXTableUnitTest();
         try {
          // test.runInteractiveTests();
         //    test.runInteractiveTests("interactive.*Column.*");
 //            test.runInteractiveTests("interactive.*TableHeader.*");
-            test.runInteractiveTests("interactive.*SorterP.*");
-         //   test.runInteractiveTests("interactive.*Control.*");
+        //    test.runInteractiveTests("interactive.*SorterP.*");
+            test.runInteractiveTests("interactive.*Focus.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();

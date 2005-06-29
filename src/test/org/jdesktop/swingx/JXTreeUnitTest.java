@@ -57,6 +57,20 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * Issue ??: Background highlighters not working on JXTree.
      *
      */
+    public void interactiveUnselectedFocusedBackground() {
+        JXTree xtree = new JXTree(treeTableModel);
+        xtree.setBackground(new Color(0xF5, 0xFF, 0xF5));
+        JTree tree = new JTree(treeTableModel);
+        tree.setBackground(new Color(0xF5, 0xFF, 0xF5));
+        JFrame frame = wrapWithScrollingInFrame(xtree, tree, "Unselected focused background: JXTree/JTree" );
+        frame.setVisible(true);  // RG: Changed from deprecated method show();
+        
+    }
+
+    /**
+     * Issue ??: Background highlighters not working on JXTree.
+     *
+     */
     public void interactiveTestRolloverHighlight() {
         JXTree tree = new JXTree(treeTableModel);
         tree.setRolloverEnabled(true);
@@ -220,15 +234,11 @@ public class JXTreeUnitTest extends InteractiveTestCase {
     }
 
     public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-//        LFSwitcher.windowsLF();
-        } catch (Exception e1) { // ignore
-        }
+        setSystemLF(true);
         JXTreeUnitTest test = new JXTreeUnitTest();
         try {
-          //  test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*High.*");
+            test.runInteractiveTests();
+          //  test.runInteractiveTests("interactive.*High.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
