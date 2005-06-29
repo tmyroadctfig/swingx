@@ -39,6 +39,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -718,6 +720,8 @@ public class JXTable extends JTable implements Searchable {
     /** ? */
     private PipelineListener pipelineListener;
 
+    private ChangeListener highlighterChangeListener;
+
     /** Opens the JXFindDialog for the table. */
     private void find() {
         if (dialog == null) {
@@ -1042,9 +1046,38 @@ public class JXTable extends JTable implements Searchable {
         return highlighters;
     }
 
-    /** Assigns a HighlighterPipeline to the table. */
+    /** Assigns a HighlighterPipeline to the table. 
+     *  bound property.
+     */
     public void setHighlighters(HighlighterPipeline pipeline) {
+        HighlighterPipeline old = getHighlighters();
+        if (old != null) {
+            old.removeChangeListener(getHighlighterChangeListener());
+        }
         highlighters = pipeline;
+        if (highlighters != null) {
+            highlighters.addChangeListener(getHighlighterChangeListener());
+        }
+        firePropertyChange("highlighters", old, getHighlighters());
+    }
+
+    /**
+     * returns the ChangeListener to use with highlighters. 
+     * Creates one if necessary.
+     * @return != null
+     */
+    private ChangeListener getHighlighterChangeListener() {
+        if (highlighterChangeListener == null) {
+            highlighterChangeListener = new ChangeListener() {
+
+                public void stateChanged(ChangeEvent e) {
+                    repaint();
+                    
+                }
+                
+            };
+        }
+        return highlighterChangeListener;
     }
 
     /** ? */

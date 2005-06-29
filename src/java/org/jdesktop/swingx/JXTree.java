@@ -16,6 +16,8 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.ActionMap;
 import javax.swing.JTree;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
@@ -40,6 +42,8 @@ public class JXTree extends JTree {
 
     protected FilterPipeline filters = null;
     protected HighlighterPipeline highlighters = null;
+    private ChangeListener highlighterChangeListener;
+
     private DelegatingRenderer delegatingRenderer;
 
     /**
@@ -256,9 +260,33 @@ public class JXTree extends JTree {
         return highlighters;
     }
 
+    /** Assigns a HighlighterPipeline to the table. */
     public void setHighlighters(HighlighterPipeline pipeline) {
+        HighlighterPipeline old = getHighlighters();
+        if (old != null) {
+            old.removeChangeListener(getHighlighterChangeListener());
+        }
         highlighters = pipeline;
+        if (highlighters != null) {
+            highlighters.addChangeListener(getHighlighterChangeListener());
+        }
+        firePropertyChange("highlighters", old, getHighlighters());
     }
+
+    private ChangeListener getHighlighterChangeListener() {
+        if (highlighterChangeListener == null) {
+            highlighterChangeListener = new ChangeListener() {
+
+                public void stateChanged(ChangeEvent e) {
+                    repaint();
+                    
+                }
+                
+            };
+        }
+        return highlighterChangeListener;
+    }
+
 
     /**
      * Property to enable/disable rollover support. This can be enabled

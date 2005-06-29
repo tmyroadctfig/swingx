@@ -16,6 +16,8 @@ import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
@@ -39,6 +41,8 @@ public class JXList extends JList {
      */
     protected FilterPipeline filters = null;
     protected HighlighterPipeline highlighters = null;
+    /** listening to changeEvents from highlighterPipeline. */
+    private ChangeListener highlighterChangeListener;
 
     // MUST ALWAYS ACCESS dataAdapter through accessor method!!!
     private final ComponentAdapter dataAdapter = new ListAdapter(this);
@@ -241,9 +245,33 @@ public class JXList extends JList {
         return highlighters;
     }
 
+    /** Assigns a HighlighterPipeline to the table. */
     public void setHighlighters(HighlighterPipeline pipeline) {
+        HighlighterPipeline old = getHighlighters();
+        if (old != null) {
+            old.removeChangeListener(getHighlighterChangeListener());
+        }
         highlighters = pipeline;
+        if (highlighters != null) {
+            highlighters.addChangeListener(getHighlighterChangeListener());
+        }
+        firePropertyChange("highlighters", old, getHighlighters());
     }
+
+    private ChangeListener getHighlighterChangeListener() {
+        if (highlighterChangeListener == null) {
+            highlighterChangeListener = new ChangeListener() {
+
+                public void stateChanged(ChangeEvent e) {
+                    repaint();
+                    
+                }
+                
+            };
+        }
+        return highlighterChangeListener;
+    }
+
 
     protected ComponentAdapter getComponentAdapter() {
         // MUST ALWAYS ACCESS dataAdapter through accessor method!!!
