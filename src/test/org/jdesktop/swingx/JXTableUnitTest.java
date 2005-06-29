@@ -979,20 +979,24 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JFrame frame = wrapWithScrollingInFrame(table, "TableSorter2 col 0 = asc, col 1 = desc");
         frame.setVisible(true);
     }
+    
     public void interactiveTestFocusedCellBackground() {
-        JXTable xtable = new JXTable(sortableTableModel);
+        TableModel model = new AncientSwingTeam() {
+            public boolean isCellEditable(int row, int column) {
+                return column != 0;
+            }
+        };
+        KeyStroke clearStroke = KeyStroke.getKeyStroke("F5");
+        JXTable xtable = new JXTable(model);
+        xtable.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(clearStroke, "clearSelection");
+      //  BasicLookAndFeel lf;
         xtable.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
-        JTable table = new JTable(sortableTableModel);
+        JTable table = new JTable(model);
         table.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
-        JFrame frame = wrapWithScrollingInFrame(xtable, table, "Unselected focuse background: JXTable/JTable");
+        JFrame frame = wrapWithScrollingInFrame(xtable, table, "Unselected focused background: JXTable/JTable");
         frame.setVisible(true);
     }
 
-    private void configureTableForUnselectedCellBackground(JTable table) {
-        table.setGridColor(Color.cyan.darker());
-        table.setRowHeight(22);
-        table.setRowMargin(1);
-    }
 
     public void interactiveTestTableSorter3() {
         JXTable table = new JXTable(sortableTableModel);
