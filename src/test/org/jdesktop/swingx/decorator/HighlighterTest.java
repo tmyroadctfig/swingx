@@ -8,12 +8,14 @@
 package org.jdesktop.swingx.decorator;
 
 import java.awt.Color;
+import java.util.regex.Pattern;
 
 import javax.swing.JLabel;
 
 import junit.framework.TestCase;
 
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.util.ChangeReport;
 
 public class HighlighterTest extends TestCase {
 
@@ -48,6 +50,148 @@ public class HighlighterTest extends TestCase {
         highlighters = null;
     }
 
+
+//----------------- testing change notification of pipeline
+    
+    /**
+     * @todo - how to handle same highlighter inserted more than once?
+     */
+    public void testHighlighterPipelineWithDuplicates() {
+        
+    }
+    public void testHighlighterPipelineChange() {
+        Highlighter highlighter = new Highlighter();
+        HighlighterPipeline pipeline = new HighlighterPipeline();
+        ChangeReport changeReport = new ChangeReport();
+        pipeline.addChangeListener(changeReport);
+        int count = changeReport.getEventCount();
+        pipeline.addHighlighter(highlighter);
+        assertEquals("event count must be increased", ++count,  changeReport.getEventCount() );
+        assertPipelineChange(highlighter, pipeline, changeReport);
+    }
+    
+    public void testHighlighterPipelineChangeConstructor() {
+        Highlighter highlighter = new Highlighter();
+        HighlighterPipeline pipeline = new HighlighterPipeline(new Highlighter[] { highlighter} );
+        ChangeReport changeReport = new ChangeReport();
+        pipeline.addChangeListener(changeReport);
+        assertPipelineChange(highlighter, pipeline, changeReport);
+ 
+    }
+    private void assertPipelineChange(Highlighter highlighter, HighlighterPipeline pipeline, ChangeReport changeReport) {
+        int count = changeReport.getEventCount();
+        highlighter.setBackground(Color.red);
+        assertEquals("event count must be increased", ++count,  changeReport.getEventCount() );
+        assertEquals("event source must be pipeline", pipeline, changeReport.getLastEvent().getSource());
+        pipeline.removeHighlighter(highlighter);
+        assertEquals("event count must be increased", ++count,  changeReport.getEventCount() );
+        pipeline.removeHighlighter(highlighter);
+        assertEquals("event count must not be increased", count,  changeReport.getEventCount() );
+        highlighter.setBackground(Color.BLUE);
+        assertEquals("event count must not be increased", count,  changeReport.getEventCount() );
+    }
+    
+//----------------- testing change notification Highlighter
+
+    
+    public void testHighlighterChange() {
+        Highlighter highlighter = new Highlighter();
+        ChangeReport changeReport = new ChangeReport();
+        highlighter.addChangeListener(changeReport);
+        assertBaseHighlighterChange(highlighter, changeReport);
+    }
+
+    private void assertBaseHighlighterChange(Highlighter highlighter, ChangeReport changeReport) {
+        int count = changeReport.getEventCount();
+        highlighter.setBackground(Color.red);
+        assertEquals("event count must be increased", ++count,  changeReport.getEventCount() );
+        highlighter.setForeground(Color.red);
+        assertEquals("event count must be increased", ++count,  changeReport.getEventCount() );
+        highlighter.setSelectedBackground(Color.red);
+        assertEquals("event count must be increased", ++count,  changeReport.getEventCount() );
+        highlighter.setSelectedForeground(Color.red);
+        assertEquals("event count must be increased", ++count,  changeReport.getEventCount() );
+    }
+    
+    public void testAlternateRowHighlighterChange() {
+        AlternateRowHighlighter highlighter = new AlternateRowHighlighter();
+        ChangeReport changeReport = new ChangeReport();
+        highlighter.addChangeListener(changeReport);
+        assertBaseHighlighterChange(highlighter, changeReport);
+        int count = changeReport.getEventCount();
+        highlighter.setOddRowBackground(Color.red);
+        assertEquals("event count must be increased", ++count,  changeReport.getEventCount() );
+        highlighter.setEvenRowBackground(Color.red);
+        assertEquals("event count must be increased", ++count,  changeReport.getEventCount() );
+
+    }
+
+    /**
+     * @TODO
+     */
+    public void testColumnPropertyHighlighterChange() {
+    }
+
+    public void testConditionalHighlighterChange() {
+        ConditionalHighlighter highlighter = new ConditionalHighlighter() {
+
+            protected boolean test(ComponentAdapter adapter) {
+                // TODO Auto-generated method stub
+                return false;
+            }
+            
+        };
+        ChangeReport changeReport = new ChangeReport();
+        highlighter.addChangeListener(changeReport);
+        assertBaseHighlighterChange(highlighter, changeReport);
+        assertBaseConditionalChange(highlighter, changeReport);
+
+    }
+
+    public void testPatternHighlighterChange() {
+        PatternHighlighter highlighter = new PatternHighlighter();
+        ChangeReport changeReport = new ChangeReport();
+        highlighter.addChangeListener(changeReport);
+        assertBaseHighlighterChange(highlighter, changeReport);
+        assertBasePatternChange(highlighter, changeReport);
+    }
+
+    public void testSearchHighlighterChange() {
+        SearchHighlighter highlighter = new SearchHighlighter();
+        ChangeReport changeReport = new ChangeReport();
+        highlighter.addChangeListener(changeReport);
+        assertBaseHighlighterChange(highlighter, changeReport);
+        assertBasePatternChange(highlighter, changeReport);
+        assertBaseConditionalChange(highlighter, changeReport);
+        int count = changeReport.getEventCount();
+        highlighter.setEnabled(true);
+        assertEquals("event count must be increased", ++count,  changeReport.getEventCount() );
+        highlighter.setHighlightRow(3);
+        assertEquals("event count must be increased", ++count,  changeReport.getEventCount() );
+        highlighter.setHighlightAll();
+        assertEquals("event count must be increased", ++count,  changeReport.getEventCount() );
+        highlighter.setHighlightCell(5, 7);
+        assertEquals("event count must be increased", ++count,  changeReport.getEventCount() );
+    }
+    
+    private void assertBasePatternChange(PatternHighlighter highlighter, ChangeReport changeReport) {
+        assertBaseConditionalChange(highlighter, changeReport);
+        int count = changeReport.getEventCount();
+        highlighter.setPattern("x", 0);
+        assertEquals("event count must be increased", ++count,  changeReport.getEventCount() );
+        highlighter.setPattern(Pattern.compile(".*", 0));
+        assertEquals("event count must be increased", ++count,  changeReport.getEventCount() );
+    }
+    
+    private void assertBaseConditionalChange(ConditionalHighlighter highlighter, ChangeReport changeReport) {
+        int count = changeReport.getEventCount();
+        highlighter.setHighlightColumnIndex(5);
+        assertEquals("event count must be increased", ++count,  changeReport.getEventCount() );
+        highlighter.setMask(255);
+        assertEquals("event count must be increased", ++count,  changeReport.getEventCount() );
+        highlighter.setTestColumnIndex(255);
+        assertEquals("event count must be increased", ++count,  changeReport.getEventCount() );
+    }
     /**
      * This is a test to ensure that the example in the javadoc actually works.
      * if the javadoc example changes, then those changes should be pasted here.

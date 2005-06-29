@@ -144,6 +144,7 @@ public class PatternHighlighter extends ConditionalHighlighter
      */
     public void setPattern(Pattern pattern) {
         this.pattern = pattern;
+        fireStateChanged();
     }
 
 	protected Pattern	pattern = null;

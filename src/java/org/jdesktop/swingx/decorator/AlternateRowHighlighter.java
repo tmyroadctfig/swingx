@@ -87,6 +87,7 @@ public class AlternateRowHighlighter extends Highlighter {
      */
     public void setOddRowBackground(Color color) {
         oddRowBackground = color;
+        fireStateChanged();
     }
 
     /**
@@ -110,6 +111,7 @@ public class AlternateRowHighlighter extends Highlighter {
      */
     public void setEvenRowBackground(Color color) {
         evenRowBackground = color;
+        fireStateChanged();
     }
 
     /**

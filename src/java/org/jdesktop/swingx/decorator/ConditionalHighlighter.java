@@ -50,6 +50,7 @@ public abstract class ConditionalHighlighter extends Highlighter {
 
     public void setMask(int alpha) {
         mask = alpha;
+        fireStateChanged();
     }
 
     public int getMask() {
@@ -134,6 +135,7 @@ public abstract class ConditionalHighlighter extends Highlighter {
 
     public void setTestColumnIndex(int columnIndex) {
         this.testColumn = columnIndex;
+        fireStateChanged();
     }
 
     public int getHighlightColumnIndex() {
@@ -142,6 +144,7 @@ public abstract class ConditionalHighlighter extends Highlighter {
 
     public void setHighlightColumnIndex(int columnIndex) {
         this.highlightColumn = columnIndex;
+        fireStateChanged();
     }
 
     /**

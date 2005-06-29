@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
  * @author Jeanette Winzenburg
  */
 public class SearchHighlighter extends PatternHighlighter {
+    /** the row to highlight. -1 means all */
     int highlightRow;
     private boolean enableHighlight;
     private static final String ALL = ".*";
@@ -28,6 +29,7 @@ public class SearchHighlighter extends PatternHighlighter {
 
     public void setEnabled(boolean enableHighlight) {
         this.enableHighlight = enableHighlight;
+        fireStateChanged();
     }
     
     protected boolean needsHighlight(ComponentAdapter adapter) {
@@ -69,22 +71,29 @@ public class SearchHighlighter extends PatternHighlighter {
         }
     }
 
+    /** set the row to match in test. 
+     * - 1 means all.
+     * @param row
+     */
     public void setHighlightRow(int row) {
         highlightRow = row;
+        fireStateChanged();
     }
 
+    /** 
+     * convenience method to test and highlight all rows/columns and 
+     * enable.
+     *
+     */
     public void setHighlightAll() {
-        setHighlightColumnIndex(-1);
-        setHighlightRow(-1);
-        setTestColumnIndex(-1);
-        setEnabled(true);
+        setHighlightCell(-1, -1);
         
     }
 
     public void setHighlightCell(int row, int modelColumn) {
-        setHighlightColumnIndex(modelColumn);
-        setTestColumnIndex(modelColumn);
-        setHighlightRow(row);
+        this.testColumn = modelColumn;
+        this.highlightColumn = modelColumn;
+        this.highlightRow = row;
         setEnabled(true);
     }
 
