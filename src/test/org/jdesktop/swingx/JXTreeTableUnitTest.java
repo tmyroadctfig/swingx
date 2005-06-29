@@ -185,6 +185,13 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
 
     // ---------------------------- interactive tests
 
+    public void interactiveTestFocusedCellBackground() {
+        JXTreeTable xtable = new JXTreeTable(treeTableModel);
+        xtable.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
+        JFrame frame = wrapWithScrollingInFrame(xtable, "Unselected focuse background");
+        frame.setVisible(true);
+    }
+
     /**
      * Issue #226: no per-cell tooltips in TreeColumn.
      */
@@ -505,11 +512,11 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         // LFSwitcher.metalLF();
         JXTreeTableUnitTest test = new JXTreeTableUnitTest();
         try {
-            test.runInteractiveTests();
+          //  test.runInteractiveTests();
          //   test.runInteractiveTests("interactive.*HighLighters");
          //      test.runInteractiveTests("interactive.*SortingFilter.*");
          //  test.runInteractiveTests("interactive.*Tool.*");
-         //     test.runInteractiveTests("interactive.*Bool.*");
+              test.runInteractiveTests("interactive.*Focus.*");
         } catch (Exception ex) {
 
         }
