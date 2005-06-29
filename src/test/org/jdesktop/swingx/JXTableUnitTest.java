@@ -752,12 +752,14 @@ public class JXTableUnitTest extends InteractiveTestCase {
      * Issue #192: initially invisibility columns are hidden
      * but marked as visible in control.
      *
+     * Issue #38 (swingx): initially invisble columns don't show up
+     * in the column control list.
      */
-    public void interactivetestColumnControlInvisibleColumns() {
+    public void interactiveTestColumnControlInvisibleColumns() {
         final JXTable table = new JXTable(sortableTableModel);
 //      table.getColumnExt("Last Name").setVisible(false);
         table.setColumnControlVisible(true);
-        JComponent columnControl = table.getColumnControl();
+//        JComponent columnControl = table.getColumnControl();
         int totalColumnCount = table.getColumnCount();
         TableColumnExt priorityColumn = table.getColumnExt("First Name");
         priorityColumn.setVisible(false);
@@ -986,10 +988,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
                 return column != 0;
             }
         };
-        KeyStroke clearStroke = KeyStroke.getKeyStroke("F5");
         JXTable xtable = new JXTable(model);
-        xtable.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(clearStroke, "clearSelection");
-      //  BasicLookAndFeel lf;
+//        BasicLookAndFeel lf;
         xtable.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
         JTable table = new JTable(model);
         table.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
@@ -1265,7 +1265,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         //    test.runInteractiveTests("interactive.*Column.*");
 //            test.runInteractiveTests("interactive.*TableHeader.*");
         //    test.runInteractiveTests("interactive.*SorterP.*");
-            test.runInteractiveTests("interactive.*Focus.*");
+            test.runInteractiveTests("interactive.*Column.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
