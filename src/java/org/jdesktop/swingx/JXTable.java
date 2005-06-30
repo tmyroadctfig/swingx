@@ -62,6 +62,7 @@ import org.jdesktop.swingx.icon.ColumnControlIcon;
 import org.jdesktop.swingx.plaf.JXTableAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.table.ColumnControlButton;
+import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.table.TableColumnModelExt;
@@ -727,6 +728,9 @@ public class JXTable extends JTable implements Searchable {
     /** Listens for changes from the highlighters. */
     private ChangeListener highlighterChangeListener;
 
+    /** the factory to use for column creation and configuration. */
+    private ColumnFactory columnFactory;
+
     /** Opens the JXFindDialog for the table. */
     private void find() {
         if (dialog == null) {
@@ -1229,14 +1233,21 @@ public class JXTable extends JTable implements Searchable {
 //------------------------- start of (meta)Data-aware code
 
     protected TableColumn createAndConfigureColumn(TableModel model, int modelColumn) {
-        TableColumn column = createColumn(modelColumn);
+//        TableColumn column = createColumn(modelColumn);
 //        if (model instanceof MetaDataProvider) {
 //            MetaDataProvider provider = (MetaDataProvider) model;
 //            MetaData metaData = provider.getMetaData(provider.getFieldNames()[modelColumn]);
 //            configureColumn(column, metaData);
 //        }
-        column.setHeaderValue(model.getColumnName(modelColumn));
-        return column;
+//        column.setHeaderValue(model.getColumnName(modelColumn));
+        return getColumnFactory().createAndConfigureTableColumn(model, modelColumn);
+    }
+
+    private ColumnFactory getColumnFactory() {
+        if (columnFactory == null) {
+            columnFactory = ColumnFactory.getInstance();
+        }
+        return columnFactory;
     }
 
 //    /**
@@ -1286,9 +1297,6 @@ public class JXTable extends JTable implements Searchable {
 //    }
 //-------------------- end of (meta)Data-aware code
 
-    protected TableColumn createColumn(int modelIndex) {
-        return new TableColumnExt(modelIndex);
-    }
 
 
     /**
@@ -1599,34 +1607,7 @@ public class JXTable extends JTable implements Searchable {
      * @param max The maximum width the column can be resized to. -1 mean any size.
      */
     public void packColumn(int column, int margin, int max) {
-        TableColumnModel colModel = getColumnModel();
-        TableColumn col = colModel.getColumn(column);
-
-        /* Get width of column header */
-        TableCellRenderer renderer = col.getHeaderRenderer();
-        if (renderer == null) 
-            renderer = getTableHeader().getDefaultRenderer();
-        
-        int width = 0;
-        
-        Component comp = renderer.getTableCellRendererComponent(this, col
-                .getHeaderValue(), false, false, 0, 0);
-        width = comp.getPreferredSize().width;
-        
-        if(getRowCount() > 0)
-            renderer = getCellRenderer(0, column);
-        for (int r = 0; r < getRowCount(); r++) {
-            comp = renderer.getTableCellRendererComponent(this, getValueAt(r,
-                    column), false, false, r, column);
-            width = Math.max(width, comp.getPreferredSize().width);
-        }
-        width += 2 * margin;
-
-        /* Check if the width exceeds the max */
-        if( max != -1 && width > max )
-            width = max;
-        
-        col.setPreferredWidth(width);
+        getColumnFactory().packColumn(this, getColumnExt(column), margin, max);
     }
     
     /**
@@ -1639,39 +1620,7 @@ public class JXTable extends JTable implements Searchable {
      */
     protected void initializeColumnPreferredWidth(TableColumn column) {
         if (column instanceof TableColumnExt) {
-            Dimension cellSpacing = getIntercellSpacing();
-            TableColumnExt columnx = (TableColumnExt) column;
- //           if (columnx.isVisible()) {
-                Object prototypeValue = columnx.getPrototypeValue();
-                if (prototypeValue != null) {
-                    // calculate how much room the prototypeValue requires
-                    TableCellRenderer renderer = getCellRenderer(0,
-                        convertColumnIndexToView(columnx.getModelIndex()));
-                    Component comp = renderer.getTableCellRendererComponent(this,
-                        prototypeValue, false, false, 0, 0);
-                    int prefWidth = comp.getPreferredSize().width + cellSpacing.width;
-
-                    // now calculate how much room the column header wants
-                    renderer = columnx.getHeaderRenderer();
-                    if (renderer == null) {
-                        JTableHeader header = getTableHeader();
-                        if (header != null) {
-                            renderer = header.getDefaultRenderer();
-                        }
-                    }
-                    if (renderer != null) {
-                        comp = renderer.getTableCellRendererComponent(this,
-                                 columnx.getHeaderValue(), false, false, 0,
-                                 convertColumnIndexToView(columnx.getModelIndex()));
-
-                        prefWidth = Math.max(comp.getPreferredSize().width, prefWidth);
-                    }
-                    prefWidth += getColumnModel().getColumnMargin();
-                    columnx.setPreferredWidth(prefWidth);
-                }
-//            } else {
-//                columnx.setPreferredWidth(0);
-//            }
+            getColumnFactory().configureColumnWidths(this, (TableColumnExt) column);
         }
     }
 
