@@ -94,6 +94,13 @@ public class TableColumnExt extends javax.swing.table.TableColumn
         this.sorterConstructor = defaultSorterConstructor;
     }
 
+    /** cosmetic override: don't fool users if resize is
+     * not possible due to fixed column width.
+     */
+    public boolean getResizable() {
+        return super.getResizable() && (getMinWidth() < getMaxWidth());
+    }
+
     /**
      * Sets the editable property.  This property enables the table view to
      * control whether or not the user is permitted to edit cell values in this
@@ -315,6 +322,7 @@ public class TableColumnExt extends javax.swing.table.TableColumn
       * @return a clone of this TableColumn
       */
      public Object clone() {
+         // JW: where are the client properties?
          final TableColumnExt copy = new TableColumnExt(
              this.getModelIndex(), this.getWidth(),
              this.getCellRenderer(), this.getCellEditor());
@@ -326,7 +334,8 @@ public class TableColumnExt extends javax.swing.table.TableColumn
          copy.setMinWidth(this.getMinWidth());
          copy.setPreferredWidth(this.getPreferredWidth());
          copy.setPrototypeValue(this.getPrototypeValue());
-         copy.setResizable(this.getResizable());
+         // JW: isResizable is overridden to return a calculated property!
+         copy.setResizable(super.getResizable());
          copy.setVisible(this.isVisible());
          copy.setSorterClass(this.getSorterClass());
          copy.sorterConstructor = sorterConstructor;

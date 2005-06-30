@@ -754,14 +754,17 @@ public class JXTableUnitTest extends InteractiveTestCase {
      *
      * Issue #38 (swingx): initially invisble columns don't show up
      * in the column control list.
+     * 
+     * 
      */
     public void interactiveTestColumnControlInvisibleColumns() {
         final JXTable table = new JXTable(sortableTableModel);
+        // columns set to invisible before setting the columnControl
+        // will not be inserted into the column control's list
 //      table.getColumnExt("Last Name").setVisible(false);
         table.setColumnControlVisible(true);
-//        JComponent columnControl = table.getColumnControl();
         int totalColumnCount = table.getColumnCount();
-        TableColumnExt priorityColumn = table.getColumnExt("First Name");
+        final TableColumnExt priorityColumn = table.getColumnExt("First Name");
         priorityColumn.setVisible(false);
 //        assertNotNull("popup menu not null", columnControl.popupMenu);
 //        assertEquals("menu items must be equal to columns", totalColumnCount, 
@@ -772,10 +775,37 @@ public class JXTableUnitTest extends InteractiveTestCase {
 //        assertEquals(priorityColumn.getHeaderValue(), menuItem.getText());
 //        assertEquals("selection of menu must be equal to column visibility", 
 //                priorityColumn.isVisible(), menuItem.isSelected());
-        JFrame frame = wrapWithScrollingInFrame(table, "JXTable (#192) ColumnControl and Visibility");
+        JFrame frame = wrapWithScrollingInFrame(table, "JXTable (#192, #38-swingx) ColumnControl and Visibility of items");
         frame.setVisible(true);
     }
 
+    /** 
+     *  TableColumnExt: user friendly resizable  
+     * 
+     */
+    public void interactiveTestColumnResizable() {
+        final JXTable table = new JXTable(sortableTableModel);
+        table.setColumnControlVisible(true);
+        int totalColumnCount = table.getColumnCount();
+        final TableColumnExt priorityColumn = table.getColumnExt("First Name");
+        JFrame frame = wrapWithScrollingInFrame(table, "JXTable: Column with Min=Max not resizable");
+        Action action = new AbstractAction("Toggle MinMax of FirstName") {
+
+            public void actionPerformed(ActionEvent e) {
+                // user-friendly resizable flag
+                if (priorityColumn.getMinWidth() == priorityColumn.getMaxWidth()) {
+                    priorityColumn.setMinWidth(50);
+                    priorityColumn.setMaxWidth(150);
+                } else {
+                    priorityColumn.setMinWidth(100);
+                    priorityColumn.setMaxWidth(100);
+                }
+            }
+            
+        };
+        addAction(frame, action);
+        frame.setVisible(true);
+    }
 //---------------------------------
 
     
