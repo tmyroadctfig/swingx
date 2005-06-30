@@ -721,9 +721,10 @@ public class JXTable extends JTable implements Searchable {
     /** ? */
     private boolean automaticSortDisabled;
 
-    /** ? */
+    /** Listens for changes from the filters. */
     private PipelineListener pipelineListener;
 
+    /** Listens for changes from the highlighters. */
     private ChangeListener highlighterChangeListener;
 
     /** Opens the JXFindDialog for the table. */
@@ -742,7 +743,6 @@ public class JXTable extends JTable implements Searchable {
          * then sorting will be disabled for all columns, regardless of each column's
          * individual <code>sorting</code> property.  The default is <code>true</code>.
      * @see TableColumnExt#isSortable()
-//     * @see TableColumnExt#setSortable
      * @param sortable boolean indicating whether or not this table supports
      *        sortable columns
      */
@@ -802,7 +802,7 @@ public class JXTable extends JTable implements Searchable {
     }
 
 
-    /** ? */
+    /** returns the listener for changes in filters. */
     protected PipelineListener getFilterPipelineListener() {
         if (pipelineListener == null) {
             pipelineListener = createPipelineListener();
@@ -810,7 +810,7 @@ public class JXTable extends JTable implements Searchable {
         return pipelineListener;
     }
     
-    /** ? */
+    /** creates the listener for changes in filters. */
     protected PipelineListener createPipelineListener() {
         PipelineListener l = new PipelineListener() {
             public void contentsChanged(PipelineEvent e) {
@@ -828,8 +828,8 @@ public class JXTable extends JTable implements Searchable {
     }
 
     /**
-     * workaround bug in JTable 
-     * (review ID: 458601 - negative y is mapped to row 0).
+     * workaround bug in JTable. 
+     * (Bug Parade ID #6291631 - negative y is mapped to row 0).
      */
     public int rowAtPoint(Point point) {
         if (point.y < 0) return -1;
