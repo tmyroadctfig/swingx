@@ -24,14 +24,14 @@ public class ColumnFactory {
     
     private static ColumnFactory columnFactory;
     
-    public static ColumnFactory getInstance() {
+    public static synchronized ColumnFactory getInstance() {
         if (columnFactory == null) {
             columnFactory = new ColumnFactory();
         }
         return columnFactory;
     }
 
-    public static void setInstance(ColumnFactory factory) {
+    public static synchronized void  setInstance(ColumnFactory factory) {
         columnFactory = factory;
     }
     
@@ -64,34 +64,34 @@ public class ColumnFactory {
 
     public void configureColumnWidths(JXTable table, TableColumnExt columnx) {
         Dimension cellSpacing = table.getIntercellSpacing();
-            Object prototypeValue = columnx.getPrototypeValue();
-            if (prototypeValue != null) {
-                // calculate how much room the prototypeValue requires
-                TableCellRenderer renderer = table.getCellRenderer(0,
-                    table.convertColumnIndexToView(columnx.getModelIndex()));
-                Component comp = renderer.getTableCellRendererComponent(table,
+        Object prototypeValue = columnx.getPrototypeValue();
+        if (prototypeValue != null) {
+            // calculate how much room the prototypeValue requires
+            TableCellRenderer renderer = table.getCellRenderer(0, table
+                    .convertColumnIndexToView(columnx.getModelIndex()));
+            Component comp = renderer.getTableCellRendererComponent(table,
                     prototypeValue, false, false, 0, 0);
-                int prefWidth = comp.getPreferredSize().width + cellSpacing.width;
+            int prefWidth = comp.getPreferredSize().width + cellSpacing.width;
 
-                // now calculate how much room the column header wants
-                renderer = columnx.getHeaderRenderer();
-                if (renderer == null) {
-                    JTableHeader header = table.getTableHeader();
-                    if (header != null) {
-                        renderer = header.getDefaultRenderer();
-                    }
+            // now calculate how much room the column header wants
+            renderer = columnx.getHeaderRenderer();
+            if (renderer == null) {
+                JTableHeader header = table.getTableHeader();
+                if (header != null) {
+                    renderer = header.getDefaultRenderer();
                 }
-                if (renderer != null) {
-                    comp = renderer.getTableCellRendererComponent(table,
-                             columnx.getHeaderValue(), false, false, 0,
-                             table.convertColumnIndexToView(columnx.getModelIndex()));
-
-                    prefWidth = Math.max(comp.getPreferredSize().width, prefWidth);
-                }
-                prefWidth += table.getColumnModel().getColumnMargin();
-                columnx.setPreferredWidth(prefWidth);
             }
-        
+            if (renderer != null) {
+                comp = renderer.getTableCellRendererComponent(table, columnx
+                        .getHeaderValue(), false, false, 0, table
+                        .convertColumnIndexToView(columnx.getModelIndex()));
+
+                prefWidth = Math.max(comp.getPreferredSize().width, prefWidth);
+            }
+            prefWidth += table.getColumnModel().getColumnMargin();
+            columnx.setPreferredWidth(prefWidth);
+        }
+
     }
 
     public void packColumn(JXTable table, TableColumnExt col, int margin, int max) {
