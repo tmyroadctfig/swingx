@@ -749,37 +749,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
     /** 
-     * Issue #192: initially invisibility columns are hidden
-     * but marked as visible in control.
-     *
-     * Issue #38 (swingx): initially invisble columns don't show up
-     * in the column control list.
-     * 
-     * 
-     */
-    public void interactiveTestColumnControlInvisibleColumns() {
-        final JXTable table = new JXTable(sortableTableModel);
-        // columns set to invisible before setting the columnControl
-        // will not be inserted into the column control's list
-//      table.getColumnExt("Last Name").setVisible(false);
-        table.setColumnControlVisible(true);
-        int totalColumnCount = table.getColumnCount();
-        final TableColumnExt priorityColumn = table.getColumnExt("First Name");
-        priorityColumn.setVisible(false);
-//        assertNotNull("popup menu not null", columnControl.popupMenu);
-//        assertEquals("menu items must be equal to columns", totalColumnCount, 
-//                columnControl.popupMenu.getComponentCount());
-//        JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem) columnControl.popupMenu
-//            .getComponent(1);
-//        // sanit assert
-//        assertEquals(priorityColumn.getHeaderValue(), menuItem.getText());
-//        assertEquals("selection of menu must be equal to column visibility", 
-//                priorityColumn.isVisible(), menuItem.isSelected());
-        JFrame frame = wrapWithScrollingInFrame(table, "JXTable (#192, #38-swingx) ColumnControl and Visibility of items");
-        frame.setVisible(true);
-    }
-
-    /** 
      *  TableColumnExt: user friendly resizable  
      * 
      */
@@ -911,6 +880,13 @@ public class JXTableUnitTest extends InteractiveTestCase {
         frame.setVisible(true);
     }
 
+    public void interactiveTestEmptyTableSizing() {
+        JXTable table = new JXTable(0, 5);
+        table.setColumnControlVisible(true);
+        JFrame frame = wrapWithScrollingInFrame(table, "Empty Table (0 rows)");
+        frame.setVisible(true);
+        
+    }
     public void interactiveTestTableSizing2() {
         JXTable table = new JXTable();
         table.setAutoCreateColumnsFromModel(false);
@@ -1053,6 +1029,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JFrame frame = wrapWithScrollingInFrame(table, "TableSorter4 col 0 = des, col 1 = asc");
         frame.setVisible(true);
     }
+    
     public void interactiveTestTablePatternFilter1() {
         JXTable table = new JXTable(tableModel);
         table.setIntercellSpacing(new Dimension(1, 1));
@@ -1247,7 +1224,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         }
 
         public int getRowCount() {
-            return 1000;
+            return 50;
         }
 
         public int getColumnCount() {
@@ -1295,7 +1272,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         //    test.runInteractiveTests("interactive.*Column.*");
 //            test.runInteractiveTests("interactive.*TableHeader.*");
         //    test.runInteractiveTests("interactive.*SorterP.*");
-            test.runInteractiveTests("interactive.*Column.*");
+            test.runInteractiveTests("interactive.*Siz.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
