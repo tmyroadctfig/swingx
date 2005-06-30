@@ -510,7 +510,7 @@ public class JXTable extends JTable implements Searchable {
             getColumnControl();
         }
         configureColumnControl();
-        firePropertyChange("hasColumnControl", old, columnControlVisible);
+        firePropertyChange("columnControlVisible", old, columnControlVisible);
     }
     
     /**
