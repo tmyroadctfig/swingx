@@ -42,7 +42,7 @@ import javax.swing.UIManager;
  * @version 1.0
  */
 public abstract class InteractiveTestCase extends junit.framework.TestCase {
-    private Point frameLocation = new Point(0,0);
+    protected Point frameLocation = new Point(0,0);
 
     protected InteractiveTestCase(String testTitle) {
         super(testTitle);
