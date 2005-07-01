@@ -1655,7 +1655,7 @@ public class JXTreeTable extends JXTable {
     //private final static int defaultRowHeight = 20;
     private final static Dimension spacing = new Dimension(0, 2);
 
-    static class TreeTableDataAdapter extends JXTable.TableAdapter {
+    protected static class TreeTableDataAdapter extends JXTable.TableAdapter {
         private final JXTreeTable table;
 
         /**

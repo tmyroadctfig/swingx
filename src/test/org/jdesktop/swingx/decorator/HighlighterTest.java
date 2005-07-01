@@ -397,6 +397,14 @@ public class HighlighterTest extends TestCase {
             public boolean isSelected() {
                 return selected;
             }
+
+            public String getColumnName(int columnIndex) {
+                return null;
+            }
+
+            public String getColumnIdentifier(int columnIndex) {
+                return null;
+            }
             
         };
         return adapter;

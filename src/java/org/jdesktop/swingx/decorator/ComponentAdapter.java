@@ -39,14 +39,33 @@ public abstract class ComponentAdapter {
     }
 
     /**
-     *
+     * JW: doc unclear - label or identifier? TableCA implements 
+     * as column.headerValue (which is "label")... This wrecks
+     * ColumnHighlighter because JNTable stores the column props with
+     * column "logical name" as key. Boing :-(
+     * 
+     * Filter delegates to this in getColumnName. Filter.getColumnName is
+     * used in JXSearchPanel to fill the field with the column name - this
+     * looks as if it's meant to be the name...
+     * 
      * @param columnIndex in view coordinates
      * @return column name
      */
-    public String getColumnName(int columnIndex) {
-        throw new RuntimeException("getColumnName() must be overridden by subclass");
-    }
+    public abstract String getColumnName(int columnIndex);
 
+    /**
+     * returns the logical name (== identifier) of the column at 
+     * columnIndex in view
+     * coordinates.
+     * 
+     * JW: added to have a very clear contract without disturbing
+     * current implementations.
+     * 
+     * @param columnIndex in view coordinates
+     * @return the String value of the column identifier at columnIndex
+     *   or null if no identifier set
+     */
+    public abstract String getColumnIdentifier(int columnIndex);
     /**
      * Returns the number of columns in the target component's view.
      *

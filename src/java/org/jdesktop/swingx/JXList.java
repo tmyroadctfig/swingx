@@ -279,8 +279,8 @@ public class JXList extends JList {
     }
 
 
-    static class ListAdapter extends ComponentAdapter {
-        private final JList	list;
+    protected static class ListAdapter extends ComponentAdapter {
+        private final JXList	list;
 
         /**
          * Constructs a <code>ListDataAdapter</code> for the specified
@@ -288,7 +288,7 @@ public class JXList extends JList {
          *
          * @param component the target component
          */
-        public ListAdapter(JList component) {
+        public ListAdapter(JXList component) {
             super(component);
             list = component;
         }
@@ -298,7 +298,7 @@ public class JXList extends JList {
          *
          * @return the target component as a {@link javax.swing.JList}
          */
-        public JList getList() {
+        public JXList getList() {
             return list;
         }
 
@@ -345,6 +345,14 @@ public class JXList extends JList {
         public boolean isSelected() {
             /** @todo Think through printing implications */
             return list.isSelectedIndex(row);
+        }
+
+        public String getColumnName(int columnIndex) {
+            return "Column_" + columnIndex;
+        }
+
+        public String getColumnIdentifier(int columnIndex) {
+            return null;
         }
 
     }

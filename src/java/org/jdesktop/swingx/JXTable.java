@@ -1626,7 +1626,7 @@ public class JXTable extends JTable implements Searchable {
 
 
     protected static class TableAdapter extends ComponentAdapter {
-        private final JTable table;
+        private final JXTable table;
 
         /**
          * Constructs a <code>TableDataAdapter</code> for the specified
@@ -1634,7 +1634,7 @@ public class JXTable extends JTable implements Searchable {
          *
          * @param component the target component
          */
-        public TableAdapter(JTable component) {
+        public TableAdapter(JXTable component) {
             super(component);
             table = component;
         }
@@ -1644,7 +1644,7 @@ public class JXTable extends JTable implements Searchable {
          *
          * @return the target component as a {@link javax.swing.JTable}
          */
-        public JTable getTable() {
+        public JXTable getTable() {
             return table;
         }
 
@@ -1722,6 +1722,11 @@ public class JXTable extends JTable implements Searchable {
          */
         public int viewToModel(int columnIndex) {
             return table.convertColumnIndexToModel(columnIndex);
+        }
+
+        public String getColumnIdentifier(int columnIndex) {
+            Object identifier = table.getColumnExt(columnIndex).getIdentifier();
+            return identifier != null ? identifier.toString() : null;
         }
 
     }

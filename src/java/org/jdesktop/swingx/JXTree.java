@@ -379,8 +379,8 @@ public class JXTree extends JTree {
 
     private final ComponentAdapter dataAdapter = new TreeAdapter(this);
 
-    static class TreeAdapter extends ComponentAdapter {
-        private final JTree tree;
+    protected static class TreeAdapter extends ComponentAdapter {
+        private final JXTree tree;
         private TreePath path;
         // JTreeRenderContext requires cooperation from JTree, which must set path,
         // and call getRowForPath() to set the row in this context at appropriate times.
@@ -391,11 +391,11 @@ public class JXTree extends JTree {
          *
          * @param component the target component
          */
-        public TreeAdapter(JTree component) {
+        public TreeAdapter(JXTree component) {
             super(component);
             tree = component;
         }
-        public JTree getTree() {
+        public JXTree getTree() {
             return tree;
         }
 
@@ -431,6 +431,14 @@ public class JXTree extends JTree {
 
         public void setValueAt(Object aValue, int row, int column) {
             /** @todo  */
+        }
+        
+        public String getColumnName(int columnIndex) {
+            return "Column_" + columnIndex;
+        }
+        
+        public String getColumnIdentifier(int columnIndex) {
+            return null;
         }
     }
 
