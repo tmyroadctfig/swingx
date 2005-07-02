@@ -164,8 +164,6 @@ public class LookAndFeelAddons {
       addon = WindowsClassicLookAndFeelAddons.class.getName();
     } else if (UIManager.getLookAndFeel().getID().equals("Motif")) {
       addon = MotifLookAndFeelAddons.class.getName();
-    } else if ("com.jgoodies.looks.plastic.Plastic3DLookAndFeel".equals(lnf)) {
-      addon = MetalLookAndFeelAddons.class.getName();
     } else {
       addon = getSystemAddonClassName();
     }
