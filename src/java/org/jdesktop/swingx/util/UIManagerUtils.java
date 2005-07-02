@@ -6,9 +6,15 @@
  */
 package org.jdesktop.swingx.util;
 
+import java.awt.Font;
 import java.lang.reflect.Method;
+
+import javax.swing.JComponent;
+import javax.swing.JEditorPane;
 import javax.swing.UIManager;
 import javax.swing.plaf.metal.MetalLookAndFeel;
+import javax.swing.text.View;
+import javax.swing.text.html.HTMLDocument;
 
 /**
  * Utility for working with the UIManager
@@ -52,4 +58,45 @@ public final class UIManagerUtils {
 			}
 		}
 	}
+    
+  /**
+   * Forces the given component to use the given font for its html rendering.
+   * Text must have been set before calling this method.
+   * 
+   * @param component
+   * @param font
+   */
+  public static void htmlize(JComponent component, Font font) {    
+    String stylesheet = "body { margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; font-family: "
+      + font.getName()
+      + "; font-size: "
+      + font.getSize()
+      + "pt;  }"
+      + "a, p, li { margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; font-family: "
+      + font.getName()
+      + "; font-size: "
+      + font.getSize()
+      + "pt;  }";
+
+    try {
+      HTMLDocument doc = null;
+      if (component instanceof JEditorPane) {
+        if (((JEditorPane)component).getDocument() instanceof HTMLDocument) {
+          doc = (HTMLDocument)((JEditorPane)component).getDocument();
+        }
+      } else {
+        View v = (View)component
+          .getClientProperty(javax.swing.plaf.basic.BasicHTML.propertyKey);
+        if (v != null && v.getDocument() instanceof HTMLDocument) {
+          doc = (HTMLDocument)v.getDocument();
+        }
+      }
+      if (doc != null) {
+        doc.getStyleSheet().loadRules(new java.io.StringReader(stylesheet),
+          null);
+      } // end of if (doc != null)
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
 }
