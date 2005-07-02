@@ -11,22 +11,20 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.LookAndFeel;
-import javax.swing.UIManager;
 
-import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
-import org.jdesktop.swingx.plaf.windows.WindowsLookAndFeelAddons;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 import org.jdesktop.swingx.util.OS;
+
 /**
  * Addon for <code>JXTable</code>.<br>
  *
  */
-public class ColumnHeaderRendererAddon implements ComponentAddon {
+public class ColumnHeaderRendererAddon extends AbstractComponentAddon {
     
-  public String getName() {
-    return "ColumnHeaderRenderer";
+  public ColumnHeaderRendererAddon() {
+    super("ColumnHeaderRenderer");
   }
-
+  
   public void initialize(LookAndFeelAddons addon) {
       List defaults = new ArrayList();
       String upIcon = null;
@@ -46,7 +44,7 @@ public class ColumnHeaderRendererAddon implements ComponentAddon {
               downIcon = "sort-w2k-dn.png";
               
           }
-      } else if (isSynth(addon)) {
+      } else if (isSynth()) {
           upIcon = "sort-gtk-up.png";
           downIcon = "sort-gtk-dn.png";
           
@@ -76,27 +74,5 @@ public class ColumnHeaderRendererAddon implements ComponentAddon {
   private boolean isXP(LookAndFeelAddons addon) {
       return OS.isWindowsXP();
   }
-  
-  private boolean isPlastic(LookAndFeelAddons addon) {
-      return UIManager.getLookAndFeel().getClass().getName().contains("Plastic");
-  }
-
-  private boolean isSynth(LookAndFeelAddons addon) {
-      return UIManager.getLookAndFeel().getClass().getName().contains("ynth");
-  }
-
-  private boolean isWindows(LookAndFeelAddons addon) {
-      return addon instanceof WindowsLookAndFeelAddons;
-  }
-  
-  private boolean isMotif(LookAndFeelAddons addon) {
-      return UIManager.getLookAndFeel().getID().equals("Motif");
-  }
-
-  private boolean isMac(LookAndFeelAddons addon) {
-      // TODO Auto-generated method stub
-      return false;
-  }
-  
 
 }
