@@ -12,7 +12,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import javax.swing.JComponent;
 import javax.swing.UIManager;
@@ -20,6 +19,7 @@ import javax.swing.plaf.ComponentUI;
 
 import org.jdesktop.swingx.plaf.aqua.AquaLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
+import org.jdesktop.swingx.plaf.motif.MotifLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.windows.WindowsClassicLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.windows.WindowsLookAndFeelAddons;
 import org.jdesktop.swingx.util.OS;
@@ -46,7 +46,8 @@ import org.jdesktop.swingx.util.OS;
  */
 public class LookAndFeelAddons {
 
-  private static List contributedComponents = new ArrayList();
+  private static List<ComponentAddon> contributedComponents =
+    new ArrayList<ComponentAddon>();
 
   static {
     // load the default addon
@@ -73,8 +74,9 @@ public class LookAndFeelAddons {
   private static LookAndFeelAddons currentAddon;
 
   public void initialize() {
-    for (Iterator iter = contributedComponents.iterator(); iter.hasNext();) {
-      ComponentAddon addon = (ComponentAddon)iter.next();
+    for (Iterator<ComponentAddon> iter = contributedComponents.iterator(); iter
+      .hasNext();) {
+      ComponentAddon addon = iter.next();
       addon.initialize(this);
     }
   }
@@ -86,9 +88,10 @@ public class LookAndFeelAddons {
     
   }
 
-public void uninitialize() {
-    for (Iterator iter = contributedComponents.iterator(); iter.hasNext();) {
-      ComponentAddon addon = (ComponentAddon)iter.next();
+  public void uninitialize() {
+    for (Iterator<ComponentAddon> iter = contributedComponents.iterator(); iter
+      .hasNext();) {
+      ComponentAddon addon = iter.next();
       addon.uninitialize(this);
     }
   }
@@ -159,6 +162,10 @@ public void uninitialize() {
     } else if ("com.sun.java.swing.plaf.windows.WindowsClassicLookAndFeel"
       .equals(lnf)) {
       addon = WindowsClassicLookAndFeelAddons.class.getName();
+    } else if (UIManager.getLookAndFeel().getID().equals("Motif")) {
+      addon = MotifLookAndFeelAddons.class.getName();
+    } else if ("com.jgoodies.looks.plastic.Plastic3DLookAndFeel".equals(lnf)) {
+      addon = MetalLookAndFeelAddons.class.getName();
     } else {
       addon = getSystemAddonClassName();
     }
