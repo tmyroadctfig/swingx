@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.TimeZone;
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -194,6 +195,7 @@ public class JXMonthView extends JComponent {
     private Timer _todayTimer = null;
     private ImageIcon _monthDownImage;
     private ImageIcon _monthUpImage;
+    private Hashtable _dayToColorTable = new Hashtable<Integer, Color>();
 
     /**
      * Create a new instance of the <code>JXMonthView</code> class using the
@@ -827,7 +829,35 @@ public class JXMonthView extends JComponent {
     public Color getDaysOfTheWeekForeground() {
         return _daysOfTheWeekForeground;
     }
-    
+
+    /**
+     * Set the color to be used for painting the specified day of the week.
+     * Acceptable values are Calendar.SUNDAY - Calendar.SATURDAY.
+     *
+     * @dayOfWeek constant value defining the day of the week.
+     * @c The color to be used for painting the numeric day of the week.
+     */
+    public void setDayForeground(int dayOfWeek, Color c) {
+        _dayToColorTable.put(dayOfWeek, c);
+    }
+
+    /**
+     * Return the color that should be used for painting the numerical day of the week.
+     *
+     * @param dayOfWeek The day of week to get the color for.
+     * @return The color to be used for painting the numeric day of the week.
+     *    If this was no color has yet been defined the component foreground color
+     *    will be returned.
+     */
+    public Color getDayForeground(int dayOfWeek) {
+        Color c;
+        c = (Color)_dayToColorTable.get(dayOfWeek);
+        if (c == null) {
+            c = getForeground();
+        }
+        return c;
+    }
+
     /**
      * Returns a copy of the insets used to paint the month string background.
      *
@@ -1436,6 +1466,7 @@ public class JXMonthView extends JComponent {
                 }
 
                 // Paint numeric day of the month.
+                g.setColor(getDayForeground(_cal.get(Calendar.DAY_OF_WEEK)));
                 if (nextFlaggedDate != -1 &&
                         _cal.getTimeInMillis() == nextFlaggedDate) {
                     Font oldFont = getFont();
