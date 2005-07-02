@@ -5,7 +5,6 @@
 package org.jdesktop.swingx.table;
 
 import java.awt.Component;
-import java.awt.MenuItem;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;

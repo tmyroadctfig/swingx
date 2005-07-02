@@ -6,8 +6,6 @@
  */
 package org.jdesktop.swingx.auth;
 
-import java.util.EventObject;
-
 /*
  * <b>LoginListener</b> provides a listener for the actual login
  * process.

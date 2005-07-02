@@ -6,11 +6,8 @@
  */
 package org.jdesktop.swingx.calendar;
 
-import java.awt.*;
-import javax.swing.*;
-import javax.swing.plaf.*;
-import java.text.*;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * @author Scott Violet

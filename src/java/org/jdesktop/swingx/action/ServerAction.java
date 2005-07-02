@@ -49,7 +49,6 @@ import java.awt.event.ActionEvent;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -60,7 +59,6 @@ import java.net.HttpURLConnection;
 import java.net.UnknownHostException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLEncoder;
 
 import java.security.AccessControlException;
 

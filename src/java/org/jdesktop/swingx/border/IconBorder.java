@@ -7,15 +7,15 @@
 
 package org.jdesktop.swingx.border;
 
-import java.awt.*;
-import java.awt.event.*;
-
-import java.util.Timer;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Insets;
+import java.awt.Rectangle;
 
 import javax.swing.Icon;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
-import javax.swing.event.MouseInputAdapter;
 
 /**
  * @author Amy Fowler

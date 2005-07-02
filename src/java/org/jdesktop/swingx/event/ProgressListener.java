@@ -7,8 +7,6 @@
 
 package org.jdesktop.swingx.event;
 
-import java.util.EventListener;
-
 /**
  * The listener interface for recieving progress events.
  * The class interested in handling {@link ProgressEvent}s should implement

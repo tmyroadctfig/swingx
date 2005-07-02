@@ -9,9 +9,7 @@ package org.jdesktop.swingx.event;
 
 import java.util.logging.Level;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * implementation of the MessageSourceSupport class.

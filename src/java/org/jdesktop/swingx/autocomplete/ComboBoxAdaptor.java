@@ -2,7 +2,7 @@ package org.jdesktop.swingx.autocomplete;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
+
 import javax.swing.JComboBox;
 import javax.swing.text.JTextComponent;
 

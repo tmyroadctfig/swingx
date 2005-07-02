@@ -6,10 +6,6 @@
  */
 package org.jdesktop.swingx.plaf;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import org.jdesktop.swingx.JXTable;
 /**
  * Addon for <code>JXTable</code>.<br>
  *

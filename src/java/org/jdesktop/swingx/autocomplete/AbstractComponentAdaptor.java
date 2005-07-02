@@ -1,6 +1,5 @@
 package org.jdesktop.swingx.autocomplete;
 
-import java.util.List;
 import javax.swing.text.JTextComponent;
 
 /**

@@ -7,8 +7,6 @@
 
 package org.jdesktop.swingx.decorator;
 
-import java.awt.Color;
-
 import junit.framework.TestCase;
 
 import org.jdesktop.swingx.JXTable;

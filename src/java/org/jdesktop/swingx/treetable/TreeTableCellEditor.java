@@ -20,8 +20,6 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 
-import org.jdesktop.swingx.JXTreeTable;
-
 /**
  * An editor that can be used to edit the tree column. This extends
  * DefaultCellEditor and uses a JTextField (actually, TreeTableTextField)

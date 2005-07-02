@@ -1,7 +1,6 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
-import java.awt.Cursor;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 

@@ -7,8 +7,6 @@
 
 package org.jdesktop.swingx.event;
 
-import java.util.EventListener;
-
 /**
  * The listener interface for recieving message events.
  * The class interested in handling {@link MessageEvent}s should implement

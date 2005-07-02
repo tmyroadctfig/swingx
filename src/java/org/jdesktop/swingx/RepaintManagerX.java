@@ -6,7 +6,6 @@
 
 package org.jdesktop.swingx;
 
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Rectangle;
 import javax.swing.JComponent;

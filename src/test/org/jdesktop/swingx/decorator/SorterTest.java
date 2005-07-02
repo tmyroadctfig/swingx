@@ -12,8 +12,6 @@ import java.util.Locale;
 
 import junit.framework.TestCase;
 
-import org.jdesktop.swingx.JXTable;
-
 public class SorterTest extends TestCase {
 
     /**

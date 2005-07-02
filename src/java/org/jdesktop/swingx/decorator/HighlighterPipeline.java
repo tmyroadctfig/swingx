@@ -9,8 +9,6 @@ package org.jdesktop.swingx.decorator;
 
 import java.awt.Component;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EventListener;
 import java.util.Iterator;
 import java.util.List;
 

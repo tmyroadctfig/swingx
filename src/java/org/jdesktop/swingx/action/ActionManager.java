@@ -6,18 +6,13 @@
  */
 package org.jdesktop.swingx.action;
 
-import java.beans.PropertyChangeListener;
-
 import java.io.PrintStream;
-
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.*;
-import org.jdesktop.swingx.action.TargetableAction;
-import org.jdesktop.swingx.action.ServerAction;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 
 /**
  * The ActionManager manages sets of <code>javax.swing.Action</code>s for an

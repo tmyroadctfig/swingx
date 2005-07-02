@@ -7,7 +7,6 @@
 
 package org.jdesktop.swingx.border;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
@@ -23,13 +22,9 @@ import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.JFrame;
-import javax.swing.JSlider;
+
 import javax.swing.UIManager;
 import javax.swing.border.Border;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import org.jdesktop.swingx.JXPanel;
 
 /**
  * Implements a DropShadow for components. In general, the DropShadowBorder will

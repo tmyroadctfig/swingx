@@ -10,7 +10,6 @@ package org.jdesktop.swingx.action;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 
-import javax.swing.Action;
 import javax.swing.Icon;
 
 /**

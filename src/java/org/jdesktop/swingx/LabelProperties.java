@@ -16,7 +16,6 @@ import java.beans.PropertyChangeListener;
 import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.JLabel;
-import javax.swing.SwingConstants;
 import javax.swing.table.TableCellRenderer;
 
 /**

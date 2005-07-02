@@ -20,7 +20,6 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JTable;
 import javax.swing.JTree;
-import javax.swing.ToolTipManager;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;

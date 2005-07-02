@@ -1,18 +1,17 @@
 package org.jdesktop.swingx.autocomplete;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.Serializable;
-import javax.swing.*;
+
 import javax.swing.AbstractCellEditor;
+import javax.swing.ComboBoxEditor;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableColumn;
 
 /**
  * <p>This is a cell editor that can be used when a combo box (that has been set

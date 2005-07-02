@@ -10,11 +10,6 @@ package org.jdesktop.swingx.util;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.swing.*;
 

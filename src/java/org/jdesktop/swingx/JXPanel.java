@@ -22,9 +22,6 @@ import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 import javax.swing.RepaintManager;
 import javax.swing.Scrollable;
-import javax.swing.UIManager;
-
-
 
 /**
  * A simple JPanel extension that adds translucency support.

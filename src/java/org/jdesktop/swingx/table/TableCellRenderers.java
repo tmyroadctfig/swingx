@@ -7,16 +7,10 @@
 
 package org.jdesktop.swingx.table;
 
-import java.awt.Component;
-import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.util.Date;
 import java.util.HashMap;
 
 import javax.swing.Icon;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
