@@ -6,7 +6,6 @@
  */
 package org.jdesktop.swingx.plaf;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,9 +14,6 @@ import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import org.jdesktop.swingx.JXTaskPaneContainer;
-import org.jdesktop.swingx.plaf.aqua.AquaLookAndFeelAddons;
-import org.jdesktop.swingx.plaf.basic.BasicLookAndFeelAddons;
-import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.windows.WindowsClassicLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.windows.WindowsLookAndFeelAddons;
 import org.jdesktop.swingx.util.OS;
@@ -26,41 +22,37 @@ import org.jdesktop.swingx.util.OS;
  * Addon for <code>JXTaskPaneContainer</code>. <br>
  *  
  */
-public class JXTaskPaneContainerAddon implements ComponentAddon {
+public class JXTaskPaneContainerAddon extends AbstractComponentAddon {
 
-  public String getName() {
-    return "JXTaskPaneContainer";
+  public JXTaskPaneContainerAddon() {
+    super("JXTaskPaneContainer");
   }
 
-  public void initialize(LookAndFeelAddons addon) {
-    addon.loadDefaults(getDefaults(addon));
+  @Override
+  protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+    super.addBasicDefaults(addon, defaults);
+    defaults.addAll(Arrays.asList(new Object[]{
+      JXTaskPaneContainer.uiClassID,
+      "org.jdesktop.swingx.plaf.basic.BasicTaskPaneContainerUI",
+      "TaskPaneContainer.useGradient",
+      Boolean.FALSE,
+      "TaskPaneContainer.background",
+      UIManager.getColor("Desktop.background")
+    }));
+  }
+
+  @Override
+  protected void addMetalDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+    super.addMetalDefaults(addon, defaults);
+    defaults.addAll(Arrays.asList(new Object[]{
+      "TaskPaneContainer.background",
+      MetalLookAndFeel.getDesktopColor()
+    }));
   }
   
-  public void uninitialize(LookAndFeelAddons addon) {
-    addon.unloadDefaults(getDefaults(addon));
-  }
-
-  private Object[] getDefaults(LookAndFeelAddons addon) {
-    List defaults = new ArrayList();
-    
-    if (addon instanceof BasicLookAndFeelAddons) {
-      defaults.addAll(Arrays.asList(new Object[]{
-        JXTaskPaneContainer.uiClassID,
-        "org.jdesktop.swingx.plaf.basic.BasicTaskPaneContainerUI",
-        "TaskPaneContainer.useGradient",
-        Boolean.FALSE,
-        "TaskPaneContainer.background",
-        UIManager.getColor("Desktop.background")
-      }));
-    }
-    
-    if (addon instanceof MetalLookAndFeelAddons) {
-      defaults.addAll(Arrays.asList(new Object[]{
-        "TaskPaneContainer.background",
-        MetalLookAndFeel.getDesktopColor()
-      }));
-    }
-    
+  @Override
+  protected void addWindowsDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+    super.addWindowsDefaults(addon, defaults);
     if (addon instanceof WindowsClassicLookAndFeelAddons) {
       defaults.addAll(Arrays.asList(new Object[]{
         "TaskPaneContainer.background",
@@ -98,15 +90,15 @@ public class JXTaskPaneContainerAddon implements ComponentAddon {
         backgroundGradientEnd,
       }));
     }
-        
-    if (addon instanceof AquaLookAndFeelAddons) {
-      defaults.addAll(Arrays.asList(new Object[]{
-        "TaskPaneContainer.background",
-        new ColorUIResource(238, 238, 238),
-      }));            
-    }
-    
-    return defaults.toArray();
+  }
+
+  @Override
+  protected void addMacDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+    super.addMacDefaults(addon, defaults);
+    defaults.addAll(Arrays.asList(new Object[]{
+      "TaskPaneContainer.background",
+      new ColorUIResource(238, 238, 238),
+    }));            
   }
 
 }

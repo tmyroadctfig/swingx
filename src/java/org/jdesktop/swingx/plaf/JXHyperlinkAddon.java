@@ -6,30 +6,28 @@
  */
 package org.jdesktop.swingx.plaf;
 
+import java.util.List;
+
 import org.jdesktop.swingx.JXHyperlink;
-import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
 
 /**
  * Addon for <code>JXHyperlink</code>.<br>
  *
  */
-public class JXHyperlinkAddon implements ComponentAddon {
+public class JXHyperlinkAddon extends AbstractComponentAddon {
 
-  public String getName() {
-    return "JXHyperlink";
+  public JXHyperlinkAddon() {
+    super("JXHyperlink");
   }
 
-  public void initialize(LookAndFeelAddons addon) {
-    addon.loadDefaults(new Object[] {JXHyperlink.uiClassID,
-      "org.jdesktop.swingx.plaf.basic.BasicHyperlinkUI",});
-
-    if (!(addon instanceof MetalLookAndFeelAddons)) {
-      addon.loadDefaults(new Object[] {JXHyperlink.uiClassID,
-        "org.jdesktop.swingx.plaf.windows.WindowsHyperlinkUI"});
+  @Override
+  protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+    defaults.add(JXHyperlink.uiClassID);
+    if (isMetal(addon)) {
+      defaults.add("org.jdesktop.swingx.plaf.basic.BasicHyperlinkUI");
+    } else {
+      defaults.add("org.jdesktop.swingx.plaf.windows.WindowsHyperlinkUI");
     }
-  }
-
-  public void uninitialize(LookAndFeelAddons addon) {
   }
 
 }

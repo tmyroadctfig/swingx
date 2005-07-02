@@ -10,7 +10,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.SystemColor;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,11 +20,6 @@ import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import org.jdesktop.swingx.JXTaskPane;
-import org.jdesktop.swingx.plaf.ComponentAddon;
-import org.jdesktop.swingx.plaf.LookAndFeelAddons;
-import org.jdesktop.swingx.plaf.aqua.AquaLookAndFeelAddons;
-import org.jdesktop.swingx.plaf.basic.BasicLookAndFeelAddons;
-import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.windows.WindowsClassicLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.windows.WindowsLookAndFeelAddons;
 import org.jdesktop.swingx.util.JVM;
@@ -35,93 +29,91 @@ import org.jdesktop.swingx.util.OS;
  * Addon for <code>JXTaskPane</code>.<br>
  *
  */
-public class JXTaskPaneAddon implements ComponentAddon {
+public class JXTaskPaneAddon extends AbstractComponentAddon {
 
-  public String getName() {
-    return "JXTaskPane";
+  public JXTaskPaneAddon() {
+    super("JXTaskPane");
   }
 
-  public void initialize(LookAndFeelAddons addon) {
-    addon.loadDefaults(getDefaults(addon));
-  }
-  
-  public void uninitialize(LookAndFeelAddons addon) {
-    addon.unloadDefaults(getDefaults(addon));
+  @Override
+  protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+    Color menuBackground = new ColorUIResource(SystemColor.menu);
+    defaults.addAll(Arrays.asList(new Object[]{
+      JXTaskPane.uiClassID,
+      "org.jdesktop.swingx.plaf.basic.BasicTaskPaneUI",
+      "TaskPane.font",
+      new FontUIResource(
+        UIManager.getFont("Label.font").deriveFont(Font.BOLD)),        
+      "TaskPane.background",
+      UIManager.getColor("List.background"),
+      "TaskPane.specialTitleBackground",
+      new ColorUIResource(menuBackground.darker()),
+      "TaskPane.titleBackgroundGradientStart",
+      menuBackground,
+      "TaskPane.titleBackgroundGradientEnd",
+      menuBackground,
+      "TaskPane.titleForeground",
+      new ColorUIResource(SystemColor.menuText),
+      "TaskPane.specialTitleForeground",
+      new ColorUIResource(SystemColor.menuText).brighter(),
+      "TaskPane.animate",
+      Boolean.TRUE,
+      "TaskPane.focusInputMap",
+      new UIDefaults.LazyInputMap(
+        new Object[] {
+          "ENTER",
+          "toggleExpanded",
+          "SPACE",
+          "toggleExpanded" }),
+    }));
   }
 
-  private Object[] getDefaults(LookAndFeelAddons addon) {
-    List defaults = new ArrayList();
-    if (addon instanceof BasicLookAndFeelAddons) {
-      Color menuBackground = new ColorUIResource(SystemColor.menu);
-      defaults.addAll(Arrays.asList(new Object[]{
-        JXTaskPane.uiClassID,
-        "org.jdesktop.swingx.plaf.basic.BasicTaskPaneUI",
-        "TaskPane.font",
-        new FontUIResource(
-          UIManager.getFont("Label.font").deriveFont(Font.BOLD)),        
-        "TaskPane.background",
-        UIManager.getColor("List.background"),
-        "TaskPane.specialTitleBackground",
-        new ColorUIResource(menuBackground.darker()),
-        "TaskPane.titleBackgroundGradientStart",
-        menuBackground,
-        "TaskPane.titleBackgroundGradientEnd",
-        menuBackground,
-        "TaskPane.titleForeground",
-        new ColorUIResource(SystemColor.menuText),
-        "TaskPane.specialTitleForeground",
-        new ColorUIResource(SystemColor.menuText).brighter(),
-        "TaskPane.animate",
-        Boolean.TRUE,
-        "TaskPane.focusInputMap",
-        new UIDefaults.LazyInputMap(
-          new Object[] {
-            "ENTER",
-            "toggleExpanded",
-            "SPACE",
-            "toggleExpanded" }),
-      }));
-    }
-
-    if (addon instanceof MetalLookAndFeelAddons) {
-      // if using Ocean, use the Glossy l&f
-      String taskPaneGroupUI = "org.jdesktop.swingx.plaf.metal.MetalTaskPaneUI";
-      if (JVM.current().isOrLater(JVM.JDK1_5)) {
-        try {
-          Method method = MetalLookAndFeel.class.getMethod("getCurrentTheme");
-          Object currentTheme = method.invoke(null);
-          if (Class.forName("javax.swing.plaf.metal.OceanTheme").isInstance(
-            currentTheme)) {
-            taskPaneGroupUI = "org.jdesktop.swingx.plaf.misc.GlossyTaskPaneUI";
-          }
-        } catch (Exception e) {
+  @Override
+  protected void addMetalDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+    super.addMetalDefaults(addon, defaults);
+    // if using Ocean, use the Glossy l&f
+    String taskPaneGroupUI = "org.jdesktop.swingx.plaf.metal.MetalTaskPaneUI";
+    if (JVM.current().isOrLater(JVM.JDK1_5)) {
+      try {
+        Method method = MetalLookAndFeel.class.getMethod("getCurrentTheme");
+        Object currentTheme = method.invoke(null);
+        if (Class.forName("javax.swing.plaf.metal.OceanTheme").isInstance(
+          currentTheme)) {
+          taskPaneGroupUI = "org.jdesktop.swingx.plaf.misc.GlossyTaskPaneUI";
         }
+      } catch (Exception e) {
       }
-      defaults.addAll(Arrays.asList(new Object[]{
-        JXTaskPane.uiClassID,
-        taskPaneGroupUI,
-        "TaskPane.foreground",
-        UIManager.getColor("activeCaptionText"),
-        "TaskPane.background",
-        MetalLookAndFeel.getControl(),
-        "TaskPane.specialTitleBackground",
-        MetalLookAndFeel.getPrimaryControl(),
-        "TaskPane.titleBackgroundGradientStart",
-        MetalLookAndFeel.getPrimaryControl(),
-        "TaskPane.titleBackgroundGradientEnd",
-        MetalLookAndFeel.getPrimaryControlHighlight(),
-        "TaskPane.titleForeground",
-        MetalLookAndFeel.getControlTextColor(),        
-        "TaskPane.specialTitleForeground",
-        MetalLookAndFeel.getControlTextColor(),     
-        "TaskPane.borderColor",
-        MetalLookAndFeel.getPrimaryControl(),
-        "TaskPane.titleOver",
-        MetalLookAndFeel.getControl().darker(),
-        "TaskPane.specialTitleOver",
-        MetalLookAndFeel.getPrimaryControlHighlight()        
-      }));      
     }
+    defaults.addAll(Arrays.asList(new Object[]{
+      JXTaskPane.uiClassID,
+      taskPaneGroupUI,
+      "TaskPane.foreground",
+      UIManager.getColor("activeCaptionText"),
+      "TaskPane.background",
+      MetalLookAndFeel.getControl(),
+      "TaskPane.specialTitleBackground",
+      MetalLookAndFeel.getPrimaryControl(),
+      "TaskPane.titleBackgroundGradientStart",
+      MetalLookAndFeel.getPrimaryControl(),
+      "TaskPane.titleBackgroundGradientEnd",
+      MetalLookAndFeel.getPrimaryControlHighlight(),
+      "TaskPane.titleForeground",
+      MetalLookAndFeel.getControlTextColor(),        
+      "TaskPane.specialTitleForeground",
+      MetalLookAndFeel.getControlTextColor(),     
+      "TaskPane.borderColor",
+      MetalLookAndFeel.getPrimaryControl(),
+      "TaskPane.titleOver",
+      MetalLookAndFeel.getControl().darker(),
+      "TaskPane.specialTitleOver",
+      MetalLookAndFeel.getPrimaryControlHighlight()        
+    }));      
+  }
+
+  @Override
+  protected void addWindowsDefaults(LookAndFeelAddons addon,
+    List<Object> defaults) {
+    super.addWindowsDefaults(addon, defaults);
     
     if (addon instanceof WindowsLookAndFeelAddons) {
       defaults.addAll(Arrays.asList(new Object[]{
@@ -221,32 +213,33 @@ public class JXTaskPaneAddon implements ComponentAddon {
         new ColorUIResource(212, 208, 200),
       }));
     }
-    
-    if (addon instanceof AquaLookAndFeelAddons) {
-      defaults.addAll(Arrays.asList(new Object[]{
-        JXTaskPane.uiClassID,
-        "org.jdesktop.swingx.plaf.misc.GlossyTaskPaneUI",
-        "TaskPane.background",
-        new ColorUIResource(245, 245, 245),
-        "TaskPane.titleForeground",
-        new ColorUIResource(Color.black),
-        "TaskPane.specialTitleBackground",
-        new ColorUIResource(188,188,188),
-        "TaskPane.specialTitleForeground",
-        new ColorUIResource(Color.black),
-        "TaskPane.titleBackgroundGradientStart",
-        new ColorUIResource(250,250,250),
-        "TaskPane.titleBackgroundGradientEnd",
-        new ColorUIResource(188,188,188),
-        "TaskPane.borderColor",
-        new ColorUIResource(97, 97, 97),
-        "TaskPane.titleOver",
-        new ColorUIResource(125, 125, 97),
-        "TaskPane.specialTitleOver",
-        new ColorUIResource(125, 125, 97),
-      }));
-    }
-    
-    return defaults.toArray();
   }
+  
+  @Override
+  protected void addMacDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+    super.addMacDefaults(addon, defaults);
+    defaults.addAll(Arrays.asList(new Object[]{
+      JXTaskPane.uiClassID,
+      "org.jdesktop.swingx.plaf.misc.GlossyTaskPaneUI",
+      "TaskPane.background",
+      new ColorUIResource(245, 245, 245),
+      "TaskPane.titleForeground",
+      new ColorUIResource(Color.black),
+      "TaskPane.specialTitleBackground",
+      new ColorUIResource(188,188,188),
+      "TaskPane.specialTitleForeground",
+      new ColorUIResource(Color.black),
+      "TaskPane.titleBackgroundGradientStart",
+      new ColorUIResource(250,250,250),
+      "TaskPane.titleBackgroundGradientEnd",
+      new ColorUIResource(188,188,188),
+      "TaskPane.borderColor",
+      new ColorUIResource(97, 97, 97),
+      "TaskPane.titleOver",
+      new ColorUIResource(125, 125, 97),
+      "TaskPane.specialTitleOver",
+      new ColorUIResource(125, 125, 97),
+    }));
+  }
+  
 }
