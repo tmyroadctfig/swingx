@@ -39,6 +39,7 @@ public class JXDatePicker extends JComponent {
      * traversing/selecting dates.
      */
     private JXDatePickerPopup _popup;
+    private JPanel _linkPanel;
     private JButton _popupButton;
     private int _popupButtonWidth = 20;
     private JXMonthView _monthView;
@@ -69,6 +70,8 @@ public class JXDatePicker extends JComponent {
         _dateField.setName("dateField");
         _dateField.setBorder(null);
 
+        _linkPanel = new TodayPanel();
+        
         _handler = new Handler();
         _popupButton = new JButton();
         _popupButton.setName("popupButton");
@@ -232,6 +235,30 @@ public class JXDatePicker extends JComponent {
         _popup = null;
     }
 
+    /**
+     * Return the panel that is used at the bottom of the popup.  The default
+     * implementation shows a link that displays the current month.
+     *
+     * @return The currently installed link panel
+     */
+    public JPanel getLinkPanel() {
+        return _linkPanel;
+    }
+    
+    /**
+     * Set the panel that will be used at the bottom of the popup.
+     *
+     * @param linkPanel The new panel to install in the popup
+     */
+    public void setLinkPanel(JPanel linkPanel) {
+        // If the popup is null we haven't shown it yet.
+        if (_popup != null) {
+            _popup.remove(_linkPanel);
+            _popup.add(linkPanel, BorderLayout.SOUTH);
+        }
+        _linkPanel = linkPanel;
+    }
+    
     /**
      * Returns the formatted text field used to edit the date selection.
      *
@@ -496,9 +523,9 @@ public class JXDatePicker extends JComponent {
 
             setLayout(new BorderLayout());
             add(_monthView, BorderLayout.CENTER);
-
-            JXPanel panel = new TodayPanel();            
-            add(panel, BorderLayout.SOUTH);
+            if (_linkPanel != null) {
+                add(_linkPanel, BorderLayout.SOUTH);
+            }
         }
 
         public void actionPerformed(ActionEvent ev) {
@@ -510,27 +537,27 @@ public class JXDatePicker extends JComponent {
                 fireActionPerformed();
             }
         }
+    }
         
-        private final class TodayPanel extends JXPanel {
-            TodayPanel() {
-                super(new FlowLayout());
-                setDrawGradient(true);
-                setGradientPaint(new GradientPaint(0, 0, new Color(238, 238, 238), 0, 1, Color.WHITE));
-                JXHyperlink todayLink = new JXHyperlink(new TodayAction());
-//                todayLink.setHidden(false);
-                Color textColor = new Color(16, 66, 104);
-                todayLink.setUnclickedColor(textColor);
-                todayLink.setClickedColor(textColor);
-                add(todayLink);
-            }
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                //add the two lines at the top
-                g.setColor(new Color(187, 187, 187));
-                g.drawLine(0, 0, getWidth(), 0);
-                g.setColor(new Color(221, 221, 221));
-                g.drawLine(0, 1, getWidth(), 1);
-            }
+    private final class TodayPanel extends JXPanel {
+        TodayPanel() {
+            super(new FlowLayout());
+            setDrawGradient(true);
+            setGradientPaint(new GradientPaint(0, 0, new Color(238, 238, 238), 0, 1, Color.WHITE));
+            JXHyperlink todayLink = new JXHyperlink(new TodayAction());
+            //                todayLink.setHidden(false);
+            Color textColor = new Color(16, 66, 104);
+            todayLink.setUnclickedColor(textColor);
+            todayLink.setClickedColor(textColor);
+            add(todayLink);
+        }
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            //add the two lines at the top
+            g.setColor(new Color(187, 187, 187));
+            g.drawLine(0, 0, getWidth(), 0);
+            g.setColor(new Color(221, 221, 221));
+            g.drawLine(0, 1, getWidth(), 1);
         }
         
         private final class TodayAction extends AbstractAction {
@@ -543,8 +570,8 @@ public class JXDatePicker extends JComponent {
                 _monthView.ensureDateVisible(span.getStart());
             }
         }
-    }
-
+    }        
+    
     /**
      * Default formatter for the JXDatePicker component.  This factory
      * creates and returns a formatter that can handle a variety of date
