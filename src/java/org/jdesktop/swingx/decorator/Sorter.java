@@ -142,23 +142,23 @@ public abstract class Sorter extends Filter {
             return collator.compare((String)o1, (String) o2);
         }
         
-        if ((o1 instanceof Comparable) && (o2 instanceof Comparable)) {
-            try {
-                return ((Comparable) o1).compareTo(o2);
-            } catch (ClassCastException ex) {
-                // comparables with different types
-            }
+//        if ((o1 instanceof Comparable) && (o2 instanceof Comparable)) {
+//            try {
+//                return ((Comparable) o1).compareTo(o2);
+//            } catch (ClassCastException ex) {
+//                // comparables with different types
+//            }
+//        }
+        
+        // patch from Jens Elkner (#189)
+        if ((o1.getClass().isInstance(o2)) && (o1 instanceof Comparable)) {
+            Comparable c1 = (Comparable) o1;
+            return c1.compareTo(o2);
+        } else if (o2.getClass().isInstance(o1) && (o2 instanceof Comparable)) {
+            Comparable c2 = (Comparable) o2;
+            return -c2.compareTo(o1);
         }
         
-        // patch from Jens Elkner (from #189)
-//        if ((o1.getClass().isInstance(o2)) && (o1 instanceof Comparable)) {
-//            Comparable c1 = (Comparable) o1;
-//            return c1.compareTo(o2);
-//        } else if (o2.getClass().isInstance(o1) && (o2 instanceof Comparable)) {
-//            Comparable c2 = (Comparable) o2;
-//            return -c2.compareTo(o1);
-//        }
-//        
         return collator.compare(o1.toString(), o2.toString());
     }
 
