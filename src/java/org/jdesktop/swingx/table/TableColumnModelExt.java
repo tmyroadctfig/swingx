@@ -37,6 +37,16 @@ public interface TableColumnModelExt extends TableColumnModel {
     /**
      * Returns all of the columns in the TableColumnModel, including invisible
      * ones.
+     * @deprecated use getColumns(boolean instead)
      */
     public List getAllColumns();
+    
+    
+    /**
+     * Returns all of the columns in the TableColumnModel, including invisible
+     * ones if the parameter is true.
+     * @param includeHidden returned List contains the invisible if true, 
+     * only the visible columns if false.
+     */
+    public List getColumns(boolean includeHidden);
 }

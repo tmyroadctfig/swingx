@@ -33,7 +33,14 @@ import org.jdesktop.swingx.util.ColumnModelReport;
 public class TableColumnModelTest extends TestCase {
 
     private static final int COLUMN_COUNT = 3;
+ 
     
+    public void testGetColumns() {
+        TableColumnModelExt model = createColumnModel(COLUMN_COUNT);
+        ((TableColumnExt) model.getColumn(0)).setVisible(false);
+        assertEquals("visible column count must be reduced", COLUMN_COUNT - 1, model.getColumns(false).size());
+        assertEquals("all columns count must be unchanged", COLUMN_COUNT, model.getColumns(true).size());
+    }
     /**
      * column count must be changed on changing 
      * column visibility.
@@ -151,8 +158,8 @@ public class TableColumnModelTest extends TestCase {
 
 //------------------ private factory methods
     
-    private TableColumnModel createColumnModel(int columns) {
-        TableColumnModel model = new DefaultTableColumnModelExt();
+    private TableColumnModelExt createColumnModel(int columns) {
+        TableColumnModelExt model = new DefaultTableColumnModelExt();
         for (int i = 0; i < columns; i++) {
             model.addColumn(createTableColumnExt(i));
       

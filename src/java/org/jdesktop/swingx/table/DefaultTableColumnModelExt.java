@@ -9,6 +9,7 @@ package org.jdesktop.swingx.table;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -57,9 +58,22 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel implemen
         super();
     }
 
+    /**
+     * 
+     */
     public List getAllColumns() {
         //defensive copy
-        return new ArrayList(allColumns);
+        return getColumns(true);
+    }
+
+    /**
+     * 
+     */
+    public List getColumns(boolean includeHidden) {
+        if (includeHidden) {
+            return new ArrayList(allColumns);
+        } 
+        return Collections.list(getColumns());
     }
 
     public Set getInvisibleColumns() {
