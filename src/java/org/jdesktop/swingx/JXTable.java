@@ -1180,7 +1180,7 @@ public class JXTable extends JTable implements Searchable {
      * @return
      */
     public List getColumns() {
-        return getColumns(false); /** @todo Implement this */
+        return Collections.list(getColumnModel().getColumns()); 
     }
 
     /** 
@@ -1191,11 +1191,17 @@ public class JXTable extends JTable implements Searchable {
      * @return
      */
     public List getColumns(boolean includeHidden) {
-        TableColumnModel columnModel = getColumnModel();
-        if (columnModel instanceof TableColumnModelExt) {
-            return ((TableColumnModelExt) columnModel).getColumns(includeHidden);
+        if (includeHidden && (getColumnModel() instanceof TableColumnModelExt)) {
+            return ((TableColumnModelExt) getColumnModel()).getColumns(includeHidden);
         }
-        return Collections.list(getColumnModel().getColumns()); 
+        return getColumns();
+    }
+
+    public int getColumnCount(boolean includeHidden) {
+        if (getColumnModel() instanceof TableColumnModelExt) {
+            return ((TableColumnModelExt) getColumnModel()).getColumnCount(includeHidden);
+        }
+        return getColumnCount();
     }
     /**
      * reorders the columns in the sequence given array.
@@ -1208,7 +1214,7 @@ public class JXTable extends JTable implements Searchable {
         List columns = getColumns(true);
         Map map = new HashMap();
         for (Iterator iter = columns.iterator(); iter.hasNext();) {
-            // PENDING: handle duplicates...
+            // PENDING: handle duplicate identifiers ...
             TableColumn column = (TableColumn) iter.next();
             map.put(column.getIdentifier(), column);
             getColumnModel().removeColumn(column);
@@ -1221,7 +1227,6 @@ public class JXTable extends JTable implements Searchable {
             }
         }
         for (Iterator iter = columns.iterator(); iter.hasNext();) {
-            // PENDING: handle duplicates...
             TableColumn column = (TableColumn) iter.next();
             getColumnModel().addColumn(column);
         }

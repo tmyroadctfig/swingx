@@ -45,8 +45,9 @@ public interface TableColumnModelExt extends TableColumnModel {
     /**
      * Returns all of the columns in the TableColumnModel, including invisible
      * ones if the parameter is true.
-     * @param includeHidden returned List contains the invisible if true, 
-     * only the visible columns if false.
+     * @param includeHidden if true the returned list contains all columns 
+     *  otherwise only the subset of visible columns.
+     * 
      */
     public List getColumns(boolean includeHidden);
     
@@ -58,4 +59,13 @@ public interface TableColumnModelExt extends TableColumnModel {
      * @return
      */
     public TableColumnExt getColumnExt(Object identifier);
+    
+    /**
+     * returns the number of contained columns including invisible 
+     *  if the parameter is true.
+     * 
+     * @param includeHidden 
+     * @return
+     */
+    public int getColumnCount(boolean includeHidden);
 }

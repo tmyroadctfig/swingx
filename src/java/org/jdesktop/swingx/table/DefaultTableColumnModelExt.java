@@ -77,6 +77,12 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel implemen
         return Collections.list(getColumns());
     }
 
+    public int getColumnCount(boolean includeHidden) {
+        if (includeHidden) {
+            return allColumns.size();
+        }
+        return getColumnCount();
+    }
     /**
      * {@inheritDoc}
      */
