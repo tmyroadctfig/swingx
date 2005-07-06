@@ -656,7 +656,7 @@ public class JXTreeTable extends JXTable {
         }
         catch (ClassCastException ex) {
             /** @todo use logging apis instead */
-            System.err.println(ex);
+            System.err.println("hacking failed in JXTreeTable.collapsed icon " + ex);
         }
     }
 
@@ -673,7 +673,7 @@ public class JXTreeTable extends JXTable {
         }
         catch (ClassCastException ex) {
             /** @todo use logging apis instead */
-            System.err.println(ex);
+            System.err.println("hacking failed in JXTreeTable.expandedIcon" + ex);
         }
     }
 
@@ -690,7 +690,7 @@ public class JXTreeTable extends JXTable {
         }
         catch (ClassCastException ex) {
             /** @todo use logging apis instead */
-            System.err.println(ex);
+            System.err.println("hacking failed in JXTreeTable.open icon" + ex);
         }
     }
 
@@ -707,7 +707,7 @@ public class JXTreeTable extends JXTable {
         }
         catch (ClassCastException ex) {
             /** @todo use logging apis instead */
-            System.err.println(ex);
+            System.err.println("hacking failed in JXTreeTable.closedIcon " +ex);
         }
     }
 
@@ -724,7 +724,7 @@ public class JXTreeTable extends JXTable {
         }
         catch (ClassCastException ex) {
             /** @todo use logging apis instead */
-            System.err.println(ex);
+            System.err.println("hacking failed in JXTreeTable.leafIcon " +ex);
         }
     }
 
