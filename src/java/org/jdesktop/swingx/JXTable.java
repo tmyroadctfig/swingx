@@ -1230,17 +1230,36 @@ public class JXTable extends JTable implements Searchable {
     /**
      * Returns the <code>TableColumnExt</code> object for the column in the table
      * whose identifier is equal to <code>identifier</code>, when compared using
-     * <code>equals</code>.
+     * <code>equals</code>. The returned TableColumn is guaranteed to be part of 
+     * the current ColumnModel but may be hidden, that is 
+     * <pre> <code>
+     *     TableColumnExt column = table.getColumnExt(id);
+     *     if (column != null) {
+     *         int viewIndex = table.convertColumnIndexToView(column.getModelIndex());
+     *         assertEquals(column.isVisible(), viewIndex >= 0);
+     *     }
+     * </code> </pre>
      *
      * @param   identifier                      the identifier object
      *
-     * @return  the <code>TableColumnExt</code> object that matches the identifier
-     * @exception IllegalArgumentException
-     *    if <code>identifier</code> is <code>null</code>
-     *    or no <code>TableColumn</code> has this identifier
+     * @return  the <code>TableColumnExt</code> object that matches the identifier or 
+     *   null if none is found.
      */
     public TableColumnExt getColumnExt(Object identifier) {
-        return (TableColumnExt)super.getColumn(identifier);
+        if (getColumnModel() instanceof TableColumnModelExt) {
+            return ((TableColumnModelExt) getColumnModel()).getColumnExt(identifier);
+        } else {
+            // pending: not tested!
+            try {
+                TableColumn column = getColumn(identifier);
+                if (column instanceof TableColumnExt) {
+                    return (TableColumnExt) column;
+                }
+            } catch (Exception e) {
+                // TODO: handle exception
+            }
+        }
+        return null;
     }
 
     /**

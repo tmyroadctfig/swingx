@@ -49,4 +49,13 @@ public interface TableColumnModelExt extends TableColumnModel {
      * only the visible columns if false.
      */
     public List getColumns(boolean includeHidden);
+    
+    /**
+     * returns the first TableColumnExt with the given identifier or null
+     * if none is found. The returned column may be visible or hidden.
+     *  
+     * @param identifier
+     * @return
+     */
+    public TableColumnExt getColumnExt(Object identifier);
 }

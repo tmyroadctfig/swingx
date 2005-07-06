@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -76,6 +77,18 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel implemen
         return Collections.list(getColumns());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public TableColumnExt getColumnExt(Object identifier) {
+        for (Iterator iter = allColumns.iterator(); iter.hasNext();) {
+            TableColumn column = (TableColumn) iter.next();
+            if ((column instanceof TableColumnExt) && (identifier.equals(column.getIdentifier()))) {
+                return (TableColumnExt) column;
+            }
+        }
+        return null;
+    }
     public Set getInvisibleColumns() {
         return new HashSet(invisibleColumns);
     }
