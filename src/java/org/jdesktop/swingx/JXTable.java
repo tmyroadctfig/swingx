@@ -19,8 +19,11 @@ import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
@@ -1171,8 +1174,57 @@ public class JXTable extends JTable implements Searchable {
         }
     }
 
+    /** 
+     * returns a list of all visible TableColumns.
+     * 
+     * @return
+     */
     public List getColumns() {
-        return null; /** @todo Implement this */
+        return getColumns(false); /** @todo Implement this */
+    }
+
+    /** 
+     * returns a list of TableColumns including hidden if the parameter
+     * is set to true.
+     * 
+     * @param includeHidden
+     * @return
+     */
+    public List getColumns(boolean includeHidden) {
+        TableColumnModel columnModel = getColumnModel();
+        if (columnModel instanceof TableColumnModelExt) {
+            return ((TableColumnModelExt) columnModel).getColumns(includeHidden);
+        }
+        return Collections.list(getColumnModel().getColumns()); 
+    }
+    /**
+     * reorders the columns in the sequence given array.
+     * Logical names that do not correspond to any column in the
+     * model will be ignored.
+     * Columns with logical names not contained are added at the end.
+     * @param columnNames array of logical column names
+     */
+    public void setColumnSequence(Object[] identifiers) {
+        List columns = getColumns(true);
+        Map map = new HashMap();
+        for (Iterator iter = columns.iterator(); iter.hasNext();) {
+            // PENDING: handle duplicates...
+            TableColumn column = (TableColumn) iter.next();
+            map.put(column.getIdentifier(), column);
+            getColumnModel().removeColumn(column);
+        }
+        for (int i = 0; i < identifiers.length; i++) {
+            TableColumn column = (TableColumn) map.get(identifiers[i]);
+            if (column != null) {
+                getColumnModel().addColumn(column);
+                columns.remove(column);
+            }
+        }
+        for (Iterator iter = columns.iterator(); iter.hasNext();) {
+            // PENDING: handle duplicates...
+            TableColumn column = (TableColumn) iter.next();
+            getColumnModel().addColumn(column);
+        }
     }
 
     /**
@@ -1825,6 +1877,7 @@ public class JXTable extends JTable implements Searchable {
             return this;
         }
     }
+
 
 //    /**
 //     * Renders a LinkModel type the link in the table column
