@@ -11,7 +11,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -25,7 +24,6 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.JTable;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableColumnModelEvent;
@@ -33,6 +31,8 @@ import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
+import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.ActionContainerFactory;
 
 /**
@@ -56,21 +56,58 @@ public final class ColumnControlButton extends JButton {
     // }
     // };
 
-    private JTable table;
+    private JXTable table;
 
     public static final String COLUMN_CONTROL_MARKER = "column.";
 
-    public ColumnControlButton(JTable table, Icon icon) {
-        super(icon);
-        this.table = table;
+    public ColumnControlButton(JXTable table, Icon icon) {
+        super();
         init();
+        setAction(createControlAction(icon));
+        installTable(table);
+    }
+
+    private Action createControlAction(Icon icon) {
+        Action control = new AbstractAction() {
+
+            public void actionPerformed(ActionEvent e) {
+                showPopup();
+                
+            }
+            
+        };
+        control.putValue(Action.SMALL_ICON, icon);
+        return control;
+    }
+
+    private void installTable(JXTable table) {
+        this.table = table;
+        // attach a TableColumnModel listener so that if the column model
+        // is replaced or changed the popup menu will be regenerated
+        table.addPropertyChangeListener("columnModel",
+                columnModelChangeListener);
+        updateFromColumnModelChange(null);
+    }
+
+    private void updateFromColumnModelChange(TableColumnModel oldModel) {
+        if (oldModel != null) {
+            oldModel.removeColumnModelListener(columnModelListener);
+        }
+        populatePopupMenu();
+        if (canControl()) {
+            table.getColumnModel().addColumnModelListener(columnModelListener);
+        }
+    }
+
+    private boolean canControl() {
+        return table.getColumnModel() instanceof TableColumnModelExt;
     }
 
     public void updateUI() {
         super.updateUI();
         setMargin(new Insets(1, 2, 2, 1)); // Make this LAF-independent
         if (popupMenu != null) {
-            // Hmm, not really working....
+            // JW: Hmm, not really working....
             popupMenu.updateUI();
         }
     }
@@ -81,34 +118,8 @@ public final class ColumnControlButton extends JButton {
     private void init() {
         setFocusPainted(false);
         setFocusable(false);
-
-        setEnabled(table.getColumnModel() instanceof TableColumnModelExt);
-
         // create the popup menu
         popupMenu = new JPopupMenu();
-        // initially populate the menu
-        populatePopupMenu();
-        // attach a TableColumnModel listener so that if the column model
-        // is replaced or changed the popup menu will be regenerated
-        table.addPropertyChangeListener("columnModel",
-                columnModelChangeListener);
-        table.getColumnModel().addColumnModelListener(columnModelListener);
-        addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                showPopup();
-                // patch for Issue #27(swingx) - incomplete because not
-                // catching all possibilities to close the popup
-//                if (opened) {
-//                    opened = false;
-//                    popupMenu.setVisible(opened);
-//                } else {
-//                    showPopup();
-//                }
-
-            }
-
-        });
 
     }
 
@@ -118,19 +129,35 @@ public final class ColumnControlButton extends JButton {
      */
     protected void populatePopupMenu() {
         popupMenu.removeAll();
+        if (canControl()) {
+            addColumnMenuItems();
+        }
+        addColumnActions();
+    }
+
+    /**
+     * pre: canControl()
+     *
+     */
+    private void addColumnMenuItems() {
         // For each column in the view, add a JCheckBoxMenuItem to popup
-        TableColumnModel columnModel = table.getColumnModel();
-        for (int i = 0; i < columnModel.getColumnCount(); i++) {
-            TableColumn column = columnModel.getColumn(i);
+        List columns = table.getColumns(true);
+        for (Iterator iter = columns.iterator(); iter.hasNext();) {
+            TableColumn column = (TableColumn) iter.next();
             // Create a new JCheckBoxMenuItem
             JCheckBoxMenuItem item = new JCheckBoxMenuItem(column
-                    .getHeaderValue().toString(), true);
+                    .getHeaderValue().toString(), isVisible(column));
             item.putClientProperty("column", column);
             // Attach column visibility action to each menu item
             item.addActionListener(columnVisibilityAction);
             popupMenu.add(item); // Add item to popup menu
         }
-        addColumnActions();
+
+    }
+
+    private boolean isVisible(TableColumn column) {
+        return column instanceof TableColumnExt ? 
+                ((TableColumnExt) column).isVisible() : true;
     }
 
     private void addColumnActions() {
@@ -138,13 +165,15 @@ public final class ColumnControlButton extends JButton {
         Arrays.sort(actionKeys);
         List actions = new ArrayList();
         for (int i = 0; i < actionKeys.length; i++) {
-            if (isColumnControlAction(actionKeys[i])) {
+            if (isColumnControlActionKey(actionKeys[i])) {
                 actions.add(table.getActionMap().get(actionKeys[i]));
             }
         }
         if (actions.size() == 0)
             return;
-        popupMenu.addSeparator();
+        if (canControl()) {
+            popupMenu.addSeparator();
+        }
         ActionContainerFactory factory = new ActionContainerFactory(null);
         for (Iterator iter = actions.iterator(); iter.hasNext();) {
             Action action = (Action) iter.next();
@@ -152,7 +181,7 @@ public final class ColumnControlButton extends JButton {
         }
     }
 
-    private boolean isColumnControlAction(Object object) {
+    private boolean isColumnControlActionKey(Object object) {
         return String.valueOf(object).startsWith(COLUMN_CONTROL_MARKER);
     }
 
@@ -211,16 +240,7 @@ public final class ColumnControlButton extends JButton {
 
     private PropertyChangeListener columnModelChangeListener = new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
-            ((TableColumnModel) evt.getOldValue())
-                    .removeColumnModelListener(columnModelListener);
-            if (((TableColumnModel) evt.getNewValue()) instanceof TableColumnModelExt) {
-                setEnabled(true);
-                ((TableColumnModel) evt.getNewValue())
-                        .addColumnModelListener(columnModelListener);
-                populatePopupMenu();
-            } else {
-                setEnabled(false);
-            }
+            updateFromColumnModelChange((TableColumnModel) evt.getOldValue());
         }
     };
 

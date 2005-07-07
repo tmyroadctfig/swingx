@@ -14,12 +14,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
@@ -31,26 +26,24 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JViewport;
-import javax.swing.SwingUtilities;
-import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
-import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
-import org.jdesktop.swingx.decorator.PipelineListener;
 import org.jdesktop.swingx.decorator.RolloverHighlighter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
+import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.util.AncientSwingTeam;
 
@@ -196,7 +189,49 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         frame.setVisible(true);
     }
  
+    /** 
+     * Issue ??: Column control on changing column model.
+     *
+     */
+    public void interactiveTestColumnControlColumnModel() {
+        final JXTable table = new JXTable(10, 5);
+        table.setColumnControlVisible(true);
+        Action toggleAction = new AbstractAction("Set ColumnModel") {
+
+            public void actionPerformed(ActionEvent e) {
+                table.setColumnModel(new DefaultTableColumnModel());
+                table.setModel(sortableTableModel);
+                setEnabled(false);
+            }
+            
+        };
+        JFrame frame = wrapWithScrollingInFrame(table, "ColumnControl: set columnModel -> core default");
+        addAction(frame, toggleAction);
+        frame.setVisible(true);
+    }
     
+    /** 
+     * Issue ??: Column control on changing column model.
+     *
+     */
+    public void interactiveTestColumnControlColumnModelExt() {
+        final JXTable table = new JXTable();
+        table.setColumnModel( new DefaultTableColumnModel());
+        table.setModel(new DefaultTableModel(10, 5));
+        table.setColumnControlVisible(true);
+        Action toggleAction = new AbstractAction("Set ColumnModelExt") {
+
+            public void actionPerformed(ActionEvent e) {
+                table.setColumnModel(new DefaultTableColumnModelExt());
+                table.setModel(sortableTableModel);
+                setEnabled(false);
+            }
+            
+        };
+        JFrame frame = wrapWithScrollingInFrame(table, "ColumnControl: set ColumnModel -> modelExt");
+        addAction(frame, toggleAction);
+        frame.setVisible(true);
+    }
     /** 
      * Issue #11: Column control not showing with few rows.
      *
@@ -317,6 +352,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
      */
     public void interactiveTestDisabledTableSorting() {
         final JXTable table = new JXTable(sortableTableModel);
+        table.setColumnControlVisible(true);
         Action toggleAction = new AbstractAction("Toggle Enabled") {
 
             public void actionPerformed(ActionEvent e) {
@@ -358,6 +394,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
      */
     public void interactiveTestToggleSortingEnabled() {
         final JXTable table = new JXTable(sortableTableModel);
+        table.setColumnControlVisible(true);
         Action toggleSortableAction = new AbstractAction("Toggle Sortable") {
 
             public void actionPerformed(ActionEvent e) {
@@ -699,10 +736,10 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         JXTableVisualCheck test = new JXTableVisualCheck();
         try {
 //          test.runInteractiveTests();
-        //    test.runInteractiveTests("interactive.*Column.*");
+            test.runInteractiveTests("interactive.*ColumnControlColumnModel.*");
 //            test.runInteractiveTests("interactive.*TableHeader.*");
         //    test.runInteractiveTests("interactive.*SorterP.*");
-            test.runInteractiveTests("interactive.*Siz.*");
+//            test.runInteractiveTests("interactive.*abled.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
