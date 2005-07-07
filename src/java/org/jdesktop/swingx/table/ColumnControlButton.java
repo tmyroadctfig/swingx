@@ -7,7 +7,6 @@
 
 package org.jdesktop.swingx.table;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -23,7 +22,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
@@ -41,16 +39,20 @@ import org.jdesktop.swingx.action.ActionContainerFactory;
  * control which allows for toggling the visibilty of individual columns.
  * 
  * TODO: the table reference is a potential leak
+ * 
+ * TODO: no need to extend JButton - use non-visual controller returning
+ * a JComponent instead.
+ * 
  */
 public final class ColumnControlButton extends JButton {
 
     /** exposed for testing. */
     protected JPopupMenu popupMenu = null;
-
+    /** the table which is controlled by this. */
     private JXTable table;
-
+    /** a marker to auto-recognize actions which should be added to the popup */
     public static final String COLUMN_CONTROL_MARKER = "column.";
-
+    /** the list of actions for column menuitems.*/
     private List<ColumnVisibilityAction> columnVisibilityActions;
 
     public ColumnControlButton(JXTable table, Icon icon) {
@@ -60,32 +62,155 @@ public final class ColumnControlButton extends JButton {
         installTable(table);
     }
 
-    private Action createControlAction(Icon icon) {
-        Action control = new AbstractAction() {
 
-            public void actionPerformed(ActionEvent e) {
-                showPopup();
-            }
-            
-        };
-        control.putValue(Action.SMALL_ICON, icon);
-        return control;
+
+    public void updateUI() {
+        super.updateUI();
+        setMargin(new Insets(1, 2, 2, 1)); // Make this LAF-independent
+        if (popupMenu != null) {
+            // JW: Hmm, not really working....
+            popupMenu.updateUI();
+        }
     }
 
-    private void installTable(JXTable table) {
-        this.table = table;
-        // attach a TableColumnModel listener so that if the column model
-        // is replaced or changed the popup menu will be regenerated
-        table.addPropertyChangeListener("columnModel",
-                columnModelChangeListener);
-        updateFromColumnModelChange(null);
-    }
 
+//-------------------------- Action in synch with column properties
     /**
-     * adjust internal state to after table's column model property
-     * has changed. Handles cleanup of listeners to the old/new
-     * columnModel (listens to the new only if we can control column
-     * visibility) and content of popupMenu.
+     * A specialized action which takes care of keeping in synch with
+     * TableColumn state.
+     * 
+     * NOTE: client must call releaseColumn if this action is no longer needed!
+     * 
+     */
+    public class ColumnVisibilityAction extends AbstractActionExt {
+
+        private TableColumn column;
+
+        private PropertyChangeListener columnListener;
+
+        public ColumnVisibilityAction(TableColumn column) {
+            super((String) null);
+            setStateAction();
+            installColumn(column);
+        }
+
+        /**
+         * 
+         * release listening to column. Client must call this method if the
+         * action is no longer needed. After calling it the action must not be
+         * used any longer.
+         */
+        public void releaseColumn() {
+            column.removePropertyChangeListener(columnListener);
+            column = null;
+        }
+
+        public boolean isEnabled() {
+            return super.isEnabled() && canControl();
+        }
+
+        private boolean canControl() {
+            return (column instanceof TableColumnExt);
+        }
+
+        // public boolean isSelected() {
+        // return canControl() ? ((TableColumnExt) column).isVisible() : true;
+        // }
+        //
+        // public synchronized void setSelected(boolean newValue) {
+        // if (!canControl()) return;
+        // boolean oldValue = isSelected();
+        // if (oldValue == newValue) return;
+        // ((TableColumnExt) column).setVisible(newValue);
+        // firePropertyChange("selected", oldValue, isSelected());
+        // }
+
+        public void itemStateChanged(ItemEvent e) {
+            // setSelected(e.getStateChange() == ItemEvent.SELECTED);
+            if (canControl()) {
+                if ((e.getStateChange() == ItemEvent.DESELECTED)
+                        && (table.getColumnCount() <= 1)) {
+                    reselect();
+                } else {
+                    ((TableColumnExt) column)
+                            .setVisible(e.getStateChange() == ItemEvent.SELECTED);
+                }
+            }
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            // TODO Auto-generated method stub
+
+        }
+
+        private void updateSelected() {
+            boolean visible = true;
+            if (canControl()) {
+                visible = ((TableColumnExt) column).isVisible();
+            }
+            setSelected(visible);
+        }
+
+        private void reselect() {
+            firePropertyChange("selected", null, Boolean.TRUE);
+        }
+
+        // -------------- init
+        private void installColumn(TableColumn column) {
+            this.column = column;
+            column.addPropertyChangeListener(getColumnListener());
+            setName(String.valueOf(column.getHeaderValue()));
+            setActionCommand(column.getIdentifier());
+            updateSelected();
+        }
+
+        private PropertyChangeListener getColumnListener() {
+            if (columnListener == null) {
+                columnListener = createPropertyChangeListener();
+            }
+            return columnListener;
+        }
+
+        private PropertyChangeListener createPropertyChangeListener() {
+            PropertyChangeListener l = new PropertyChangeListener() {
+
+                public void propertyChange(PropertyChangeEvent evt) {
+                    if ("visible".equals(evt.getPropertyName())) {
+                        updateSelected();
+                    } else if ("headerValue".equals(evt.getPropertyName())) {
+                        setName(String.valueOf(evt.getNewValue()));
+                    }
+
+                }
+
+            };
+            return l;
+        }
+
+    }
+
+    /** 
+     * open the popup. 
+     * 
+     * hmmm... really public?
+     * 
+     *
+     */ 
+    public void showPopup() {
+
+        if (popupMenu.getComponentCount() > 0) {
+            Dimension buttonSize = getSize();
+            popupMenu.show(this, buttonSize.width
+                    - popupMenu.getPreferredSize().width, buttonSize.height);
+        }
+    }
+
+//-------------------------- updates from table propertyChangelistnere
+    
+    /**
+     * adjust internal state to after table's column model property has changed.
+     * Handles cleanup of listeners to the old/new columnModel (listens to the
+     * new only if we can control column visibility) and content of popupMenu.
      * 
      * @param oldModel
      */
@@ -98,43 +223,27 @@ public final class ColumnControlButton extends JButton {
             table.getColumnModel().addColumnModelListener(columnModelListener);
         }
     }
-
+    
+    protected void updateFromTableEnabledChanged() {
+        getAction().setEnabled(table.isEnabled());
+        
+    }
     /**
-     * Method to check if we can control column visibility
-     * POST: if true we can be sure to have an extended TableColumnModel
+     * Method to check if we can control column visibility POST: if true we can
+     * be sure to have an extended TableColumnModel
      * 
      * @return
      */
     private boolean canControl() {
         return table.getColumnModel() instanceof TableColumnModelExt;
     }
-
-    public void updateUI() {
-        super.updateUI();
-        setMargin(new Insets(1, 2, 2, 1)); // Make this LAF-independent
-        if (popupMenu != null) {
-            // JW: Hmm, not really working....
-            popupMenu.updateUI();
-        }
-    }
-
+ 
+//  ------------------------ updating the popupMenu
     /**
-     * Initialize the column control button's gui
+     * Populates the popup menu with actions related to controlling columns.
+     * Adds an action for each columns in the table (including both visible and
+     * hidden). Adds all column-related actions from the table's actionMap.
      */
-    private void init() {
-        setFocusPainted(false);
-        setFocusable(false);
-        // create the popup menu
-        popupMenu = new JPopupMenu();
-
-    }
-
-    /**
-     * Populates the popup menu with actions related to controlling
-     * columns. Adds an action for each columns in the table (including
-     * both visible and hidden). Adds all column-related actions from the
-     * table's actionMap.
-      */
     protected void populatePopupMenu() {
         clearPopupMenu();
         if (canControl()) {
@@ -145,31 +254,37 @@ public final class ColumnControlButton extends JButton {
 
     /**
      * 
-     * removes all components from the popup, making
-     * sure to release all columnVisibility actions.
-     *
+     * removes all components from the popup, making sure to release all
+     * columnVisibility actions.
+     * 
      */
     private void clearPopupMenu() {
-      releaseColumnVisibilityActions();
-      popupMenu.removeAll();
+        clearColumnVisibilityActions();
+        popupMenu.removeAll();
     }
 
-    private void releaseColumnVisibilityActions() {
-        if (columnVisibilityActions == null) return;
-        for (Iterator<ColumnVisibilityAction> iter = columnVisibilityActions.iterator(); iter.hasNext();) {
+    /**
+     * release actions and clear list of actions.
+     * 
+     */
+    private void clearColumnVisibilityActions() {
+        if (columnVisibilityActions == null)
+            return;
+        for (Iterator<ColumnVisibilityAction> iter = columnVisibilityActions
+                .iterator(); iter.hasNext();) {
             iter.next().releaseColumn();
-            
+
         }
         columnVisibilityActions.clear();
     }
 
+   
     /**
-     * adds a action to toggle column visibility for every column
-     * currently in the table. This includes both visible and invisible
-     * columns.
-     *  
+     * adds a action to toggle column visibility for every column currently in
+     * the table. This includes both visible and invisible columns.
+     * 
      * pre: canControl()
-     *
+     * 
      */
     private void addColumnMenuItems() {
         // For each column in the view, add a JCheckBoxMenuItem to popup
@@ -184,7 +299,6 @@ public final class ColumnControlButton extends JButton {
 
     }
 
-
     private List<ColumnVisibilityAction> getColumnVisibilityActions() {
         if (columnVisibilityActions == null) {
             columnVisibilityActions = new ArrayList<ColumnVisibilityAction>();
@@ -194,7 +308,7 @@ public final class ColumnControlButton extends JButton {
 
     /**
      * add additional actions from the xtable's actionMap.
-     *
+     * 
      */
     private void addColumnActions() {
         Object[] actionKeys = table.getActionMap().allKeys();
@@ -208,6 +322,9 @@ public final class ColumnControlButton extends JButton {
         if (actions.size() == 0)
             return;
         if (canControl()) {
+            // only the createPopup(..) and similar add a separator for
+            // a null element
+            // actions.add(0, null);
             popupMenu.addSeparator();
         }
         ActionContainerFactory factory = new ActionContainerFactory(null);
@@ -222,140 +339,54 @@ public final class ColumnControlButton extends JButton {
     }
 
 
+    //--------------------------- init
+    private void installTable(JXTable table) {
+        this.table = table;
+        table.addPropertyChangeListener(columnModelChangeListener);
+        updateFromColumnModelChange(null);
+        updateFromTableEnabledChanged();
+    }
+
+
     /**
-     *  A specialized action which takes care of keeping in synch with
-     *  TableColumn state.
-     *  
-     *  NOTE: client must call releaseColumn if this action is no longer needed!
-     *  
+     * Initialize the column control button's gui
      */
-    public class ColumnVisibilityAction extends AbstractActionExt {
+    private void init() {
+        setFocusPainted(false);
+        setFocusable(false);
+        // create the popup menu
+        popupMenu = new JPopupMenu();
 
-        private TableColumn column;
-        private PropertyChangeListener columnListener;
-
-        public ColumnVisibilityAction(TableColumn column) {
-            super((String) null);
-            setStateAction();
-            installColumn(column);
-        }
-
-        /** 
-         * 
-         * release listening to column. Client must call this 
-         * method if the action is no longer needed. After calling
-         * it the action must not be used any longer.
-         */
-        public void releaseColumn() {
-            column.removePropertyChangeListener(columnListener);
-            column = null;
-        }
-        
-        public boolean isEnabled() {
-            return super.isEnabled() && canControl();
-        }
+    }
 
 
-        private boolean canControl() {
-            return (column instanceof TableColumnExt);
-        }
+    /** 
+     * the action created for this.
+     * 
+     * @param icon
+     * @return
+     */
+    private Action createControlAction(Icon icon) {
+        Action control = new AbstractAction() {
+
+            public void actionPerformed(ActionEvent e) {
+                showPopup();
+            }
+
+        };
+        control.putValue(Action.SMALL_ICON, icon);
+        return control;
+    }
     
-      
-       
-//        public boolean isSelected() {
-//            return canControl() ? ((TableColumnExt) column).isVisible() : true;
-//        }
-//
-//        public synchronized void setSelected(boolean newValue) {
-//            if (!canControl()) return;
-//            boolean oldValue = isSelected();
-//            if (oldValue == newValue) return;
-//            ((TableColumnExt) column).setVisible(newValue);
-//            firePropertyChange("selected", oldValue, isSelected());
-//        }
-        
-        public void itemStateChanged(ItemEvent e) {
-//            setSelected(e.getStateChange() == ItemEvent.SELECTED);
-            if (canControl()) {
-                if ((e.getStateChange() == ItemEvent.DESELECTED) && (table.getColumnCount() <= 1)) {
-                    reselect();
-                } else {
-                    ((TableColumnExt) column).setVisible(e.getStateChange() == ItemEvent.SELECTED);
-                }
-            }
-        }
-
-
-        public void actionPerformed(ActionEvent e) {
-            // TODO Auto-generated method stub
-            
-        }
-        private void updateSelected() {
-            boolean visible = true;
-            if (canControl()) {
-                visible = ((TableColumnExt) column).isVisible();
-            }
-            setSelected(visible);
-        }
-
-        private void reselect() {
-            firePropertyChange("selected", null, Boolean.TRUE);
-        }
-
-
-        //-------------- init
-        private void installColumn(TableColumn column) {
-            this.column = column;
-            column.addPropertyChangeListener(getColumnListener());
-            setName(String.valueOf(column.getHeaderValue()));
-            setActionCommand(column.getIdentifier());
-            updateSelected();
-        }
-
-
-        private PropertyChangeListener getColumnListener() {
-            if (columnListener == null) {
-                columnListener = createPropertyChangeListener();
-            }
-            return columnListener;
-        }
-
-
-        private PropertyChangeListener createPropertyChangeListener() {
-            PropertyChangeListener l = new PropertyChangeListener() {
-
-                public void propertyChange(PropertyChangeEvent evt) {
-                    if ("visible".equals(evt.getPropertyName())) {
-                        updateSelected();
-                    } else if ("headerValue".equals(evt.getPropertyName())) {
-                        setName(String.valueOf(evt.getNewValue()));
-                    }
-                    
-                }
-                
-            };
-            return l;
-        }
-
-
-
-    }
-
- 
-    public void showPopup() {
-
-        if (popupMenu.getComponentCount() > 0) {
-            Dimension buttonSize = getSize();
-            popupMenu.show(this, buttonSize.width
-                    - popupMenu.getPreferredSize().width, buttonSize.height);
-        }
-    }
-
     // -------------------------------- listeners
 
     private PropertyChangeListener columnModelChangeListener = new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
-            updateFromColumnModelChange((TableColumnModel) evt.getOldValue());
+            if ("columnModel".equals(evt.getPropertyName())) {
+                updateFromColumnModelChange((TableColumnModel) evt.getOldValue());
+            } else if ("enabled".equals(evt.getPropertyName())) {
+                updateFromTableEnabledChanged();
+            }
         }
     };
 
@@ -417,5 +448,6 @@ public final class ColumnControlButton extends JButton {
         public void columnSelectionChanged(ListSelectionEvent e) {
         }
     };
+
 
 } // end class ColumnControlButton
