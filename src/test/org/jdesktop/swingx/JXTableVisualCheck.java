@@ -224,6 +224,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             public void actionPerformed(ActionEvent e) {
                 table.setColumnModel(new DefaultTableColumnModelExt());
                 table.setModel(sortableTableModel);
+                table.getColumnExt(0).setVisible(false);
                 setEnabled(false);
             }
             

@@ -22,6 +22,42 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
     protected TableModel sortableTableModel;
     
 
+    
+    public void testColumnControlReleaseAction() {
+        final JXTable table = new JXTable(sortableTableModel);
+        final TableColumnExt priorityColumn = table.getColumnExt("First Name");
+        int listenerCount = priorityColumn.getPropertyChangeListeners().length;
+        table.setColumnControlVisible(true);
+        ColumnControlButton columnControl = (ColumnControlButton) table.getColumnControl();
+        assertEquals("numbers of listeners must be increased", listenerCount + 1, 
+                priorityColumn.getPropertyChangeListeners().length);
+        int totalColumnCount = table.getColumnCount();
+        table.removeColumn(priorityColumn);
+        assertEquals("number of columns reduced", totalColumnCount - 1, table.getColumnCount());
+        assertEquals("all listeners must be removed", 0, 
+                priorityColumn.getPropertyChangeListeners().length);
+        
+        
+        //        assertNotNull("popup menu not null", columnControl.popupMenu);
+//        int columnMenuItems = 0;
+//        Component[] items = columnControl.popupMenu.getComponents();
+//        for (int i = 0; i < items.length; i++) {
+//            if (!(items[i] instanceof JMenuItem)) {
+//                break;
+//            }
+//            columnMenuItems++;
+//        }
+//        // wrong assumption - has separator and actions!
+//        assertEquals("menu items must be equal to columns", totalColumnCount, 
+//                columnMenuItems);
+//        JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem) columnControl.popupMenu
+//            .getComponent(0);
+//        // sanit assert
+//        assertEquals(priorityColumn.getHeaderValue(), menuItem.getText());
+//        assertEquals("selection of menu must be equal to column visibility", 
+//                priorityColumn.isVisible(), menuItem.isSelected());
+    }
+
    /** 
     * Issue #192: initially invisibility columns are hidden
     * but marked as visible in control.
@@ -59,8 +95,6 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
        assertEquals(priorityColumn.getHeaderValue(), menuItem.getText());
        assertEquals("selection of menu must be equal to column visibility", 
                priorityColumn.isVisible(), menuItem.isSelected());
-//       JFrame frame = wrapWithScrollingInFrame(table, "JXTable (#192, #38-swingx) ColumnControl and Visibility of items");
-//       frame.setVisible(true);
    }
 
 
@@ -82,15 +116,6 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
         int totalColumnCount = table.getColumnCount();
         final TableColumnExt priorityColumn = table.getColumnExt("First Name");
         priorityColumn.setVisible(false);
-//        assertNotNull("popup menu not null", columnControl.popupMenu);
-//        assertEquals("menu items must be equal to columns", totalColumnCount, 
-//                columnControl.popupMenu.getComponentCount());
-//        JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem) columnControl.popupMenu
-//            .getComponent(1);
-//        // sanit assert
-//        assertEquals(priorityColumn.getHeaderValue(), menuItem.getText());
-//        assertEquals("selection of menu must be equal to column visibility", 
-//                priorityColumn.isVisible(), menuItem.isSelected());
         JFrame frame = wrapWithScrollingInFrame(table, "JXTable (#192, #38-swingx) ColumnControl and Visibility of items");
         frame.setVisible(true);
     }
