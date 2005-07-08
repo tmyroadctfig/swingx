@@ -58,17 +58,25 @@ public class FilterPipeline {
      */
     public FilterPipeline(Filter[] inList) {
         filters = reorderSorters(inList, locateSorters(inList));
+        assignFilters();
+    }
 
+    private void assignFilters() {
         for (int i = 0; i < filters.length; i++) {
-            if (filters[i].order < 0) {
-                filters[i].order = i;
-            }
-            else {
-                throw new IllegalArgumentException("Element " + i +
-                    " is part of another pipeline.");
-            }
+            // JW: changed to bind early and move 
+            // binding responsibility to filter
+            // instead of fiddling around in other's bowels
+            filters[i].assign(this, i);
+//            if (filters[i].order < 0) {
+//                filters[i].order = i;
+//            }
+//            else {
+//                throw new IllegalArgumentException("Element " + i +
+//                    " is part of another pipeline.");
+//            }
         }
         // individual filters not bound until adapter is bound
+        // JW: why not? 
     }
 
     /**
@@ -102,7 +110,7 @@ public class FilterPipeline {
         if (this.adapter == null) {
             this.adapter = adapter;
             for (int i = 0; i < filters.length; i++) {
-                filters[i].assign(this);
+//                filters[i].assign(this);
                 filters[i].assign(adapter);
             }
         }

@@ -24,6 +24,7 @@ public abstract class Filter {
     private FilterPipeline		pipeline = null;
     protected ComponentAdapter	adapter = null;	/** @todo make private */
     protected int[]             fromPrevious = new int[0];
+    // JW... magic number!
     int order = -1;	// package private
 
     /**
@@ -139,6 +140,15 @@ public abstract class Filter {
         else if (this.pipeline != pipeline) {
             throw new IllegalStateException("Already bound to another pipeline");
         }
+    }
+
+    void assign(FilterPipeline pipeline, int i) {
+        if (order >= 0) {
+            throw new IllegalArgumentException("Element " + i +
+            " is part of another pipeline.");
+        }
+        this.order = i;
+        assign(pipeline);
     }
 
     protected FilterPipeline getPipeline() {
@@ -328,6 +338,7 @@ public abstract class Filter {
 
         return null;
     }
+
 
 }
 
