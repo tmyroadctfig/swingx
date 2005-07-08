@@ -61,6 +61,15 @@ public class FilterPipeline {
         assignFilters();
     }
 
+    /*
+     * JW let each contained filter assign both order and pipeline.
+     * Now we have a invariant 
+     * 
+     * (containedFilter.order >= 0) && (containedFilter.pipeline != null)
+     * 
+     * which simplifies access logic (IMO)
+     *
+     */
     private void assignFilters() {
         for (int i = 0; i < filters.length; i++) {
             // JW: changed to bind early and move 

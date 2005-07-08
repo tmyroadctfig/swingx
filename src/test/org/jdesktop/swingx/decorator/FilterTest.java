@@ -29,6 +29,13 @@ public class FilterTest extends InteractiveTestCase {
     private TableModel tableModel;
     private ComponentAdapter directModelAdapter;
 
+    public void testUnassignedFilter() {
+        Filter filter = new PatternFilter(".*s.*", 0, 0);
+        filter.getSize();
+        Filter[] filters = new Filter[] {filter};
+        FilterPipeline pipeline = new FilterPipeline(filters);
+        pipeline.getOutputSize();
+    }
     /**
      * early binding of pipeline to filters.
      *
@@ -50,7 +57,11 @@ public class FilterTest extends InteractiveTestCase {
         System.out.println(colors);
         System.out.println(numbers);
     }
-
+    
+//    [Kloba, Moore, Saab, Korn, Walker]
+//     [Yellow, Green, Red, Purple, Phthalo Blue]
+//     [14, 88, 4, 12, 4]
+//
     private FilterPipeline createPipeline() {
         Filter filterZero = new PatternFilter(".*e.*", 0, 0);
         Filter filterTwo = new PatternFilter(".*e.*", 0, 2); 

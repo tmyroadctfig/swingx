@@ -184,30 +184,60 @@ public abstract class Filter {
      */
     public int convertRowIndexToModel(int row) {
         int mappedRow = mapTowardModel(row);
-        if ((order != 0) && (pipeline != null)) {
-            Filter  filter = (order > 0) ? pipeline.previous(this) : pipeline.last();
-            if (filter != null) {
-                mappedRow = filter.convertRowIndexToModel(mappedRow);
-            }
+        Filter filter = getMappingFilter();
+        if (filter != null) {
+            mappedRow = filter.convertRowIndexToModel(mappedRow);
         }
+//        if ((order != 0) && (pipeline != null)) {
+//            Filter  filter = (order > 0) ? pipeline.previous(this) : pipeline.last();
+//            if (filter != null) {
+//                mappedRow = filter.convertRowIndexToModel(mappedRow);
+//            }
+//        }
         return mappedRow;
     }
 
     /**
-     * Convert row index from model coordinates to view coordinates
-     * accounting for the presence of sorters and filters.
-     *
-     * @param row row index in model coordinates
+     * returns to filter to use for accessing input.
+     * That's either the previous (model is first) filter if this is 
+     * part of a pipeline or pipeline's last if we are an
+     * interactive sorter.
+     * 
+     * @return
+     */
+    private Filter getMappingFilter() {
+        Filter filter = null;
+        // class invariant: order >= 0 guarantees pipeline != null
+        if (order >= 0) {
+            filter = pipeline.previous(this);
+        } else if (pipeline != null) {
+            filter = pipeline.last();
+        }
+        return filter;
+    }
+
+    /**
+     * Convert row index from model coordinates to view coordinates accounting
+     * for the presence of sorters and filters.
+     * 
+     * @param row
+     *            row index in model coordinates
      * @return row index in view coordinates
      */
     public int convertRowIndexToView(int row) {
         int mappedRow = row;
-        if ((order != 0) && (pipeline != null)) {
-            Filter  filter = (order > 0) ? pipeline.previous(this) : pipeline.last();
-            if (filter != null) {
-                mappedRow = filter.convertRowIndexToView(mappedRow);
-            }
+        Filter filter = getMappingFilter();
+        if (filter != null) {
+            mappedRow = filter.convertRowIndexToView(mappedRow);
         }
+
+//        if ((order != 0) && (pipeline != null)) {
+//            Filter filter = (order > 0) ? pipeline.previous(this) : pipeline
+//                    .last();
+//            if (filter != null) {
+//                mappedRow = filter.convertRowIndexToView(mappedRow);
+//            }
+//        }
         return mapTowardView(mappedRow);
     }
 
@@ -268,12 +298,16 @@ public abstract class Filter {
      */
 	public Object getValueAt(int row, int column) {
         int mappedRow = mapTowardModel(row);
-        if ((order != 0) && (pipeline != null)) {
-            Filter  filter = (order > 0) ? pipeline.previous(this) : pipeline.last();
-            if (filter != null) {
-                return filter.getValueAt(mappedRow, column);
-            }
+        Filter filter = getMappingFilter();
+        if (filter != null) {
+            return filter.getValueAt(mappedRow, column);
         }
+//        if ((order != 0) && (pipeline != null)) {
+//            Filter  filter = (order > 0) ? pipeline.previous(this) : pipeline.last();
+//            if (filter != null) {
+//                return filter.getValueAt(mappedRow, column);
+//            }
+//        }
         return adapter.getValueAt(mappedRow, column);
     }
 
@@ -287,24 +321,33 @@ public abstract class Filter {
      */
     public void setValueAt(Object aValue, int row, int column) {
         int mappedRow = mapTowardModel(row);
-        if ((order != 0) && (pipeline != null)) {
-            Filter  filter = (order > 0) ? pipeline.previous(this) : pipeline.last();
-            if (filter != null) {
-                filter.setValueAt(aValue, mappedRow, column);
-                return; // make sure you return from here!
-            }
+        Filter filter = getMappingFilter();
+        if (filter != null) {
+            filter.setValueAt(aValue, mappedRow, column);
+            return; // make sure you return from here!
         }
+//        if ((order != 0) && (pipeline != null)) {
+//            Filter  filter = (order > 0) ? pipeline.previous(this) : pipeline.last();
+//            if (filter != null) {
+//                filter.setValueAt(aValue, mappedRow, column);
+//                return; // make sure you return from here!
+//            }
+//        }
         adapter.setValueAt(aValue, mappedRow, column);
     }
 
     public boolean isCellEditable(int row, int column) {
         int mappedRow = mapTowardModel(row);
-        if ((order != 0) && (pipeline != null)) {
-            Filter  filter = (order > 0) ? pipeline.previous(this) : pipeline.last();
-            if (filter != null) {
-                return filter.isCellEditable(mappedRow, column);
-            }
+        Filter filter = getMappingFilter();
+        if (filter != null) {
+            return filter.isCellEditable(mappedRow, column);
         }
+//        if ((order != 0) && (pipeline != null)) {
+//            Filter  filter = (order > 0) ? pipeline.previous(this) : pipeline.last();
+//            if (filter != null) {
+//                return filter.isCellEditable(mappedRow, column);
+//            }
+//        }
         return adapter.isCellEditable(mappedRow, column);
     }
 
@@ -326,12 +369,16 @@ public abstract class Filter {
      * @return the value of the cell at the specified row and column (in model coordinates)
      */
     protected Object getInputValue(int row, int column) {
-        if ((order != 0) && (pipeline != null)) {
-            Filter  filter = (order > 0) ? pipeline.previous(this) : pipeline.last();
-            if (filter != null) {
-                return filter.getValueAt(row, column);
-            }
+        Filter filter = getMappingFilter();
+        if (filter != null) {
+            return filter.getValueAt(row, column);
         }
+//        if ((order != 0) && (pipeline != null)) {
+//            Filter  filter = (order > 0) ? pipeline.previous(this) : pipeline.last();
+//            if (filter != null) {
+//                return filter.getValueAt(row, column);
+//            }
+//        }
         if (adapter != null) {
             return adapter.getValueAt(row, column);
         }
