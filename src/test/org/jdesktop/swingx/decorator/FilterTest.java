@@ -14,6 +14,7 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFrame;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
@@ -27,10 +28,42 @@ public class FilterTest extends InteractiveTestCase {
     }
     
     private TableModel tableModel;
-    private ComponentAdapter directModelAdapter;
+    protected ComponentAdapter directModelAdapter;
 
+    /**
+     * cause for #167: sorter does not release pipeline if
+     * moved to a new one.
+     *
+     */
+    public void testInterpose() {
+        int sortColumn = 0;
+        Filter filter = new PatternFilter(".*s.*", 0, sortColumn);
+        Filter[] filters = new Filter[] {filter, new ShuttleSorter()};
+        FilterPipeline pipeline = new FilterPipeline(filters);
+        pipeline.assign(directModelAdapter);
+        pipeline.flush();
+        Object value = pipeline.getValueAt(0, sortColumn);
+        Object lastValue = pipeline.getValueAt(pipeline.getOutputSize() - 1, sortColumn);
+        Sorter sorter = new ShuttleSorter();
+        sorter.interpose(pipeline, directModelAdapter, null);
+        assertEquals("value must be unchanged by interactive sorter", value, sorter.getValueAt(0, sortColumn));
+        sorter.setAscending(false);
+        assertEquals("first value must be old last", lastValue, sorter.getValueAt(0, sortColumn));
+
+        Filter other = new PatternFilter();
+        Filter[] otherFilters = new Filter[] {other};
+        FilterPipeline otherPipeline = new FilterPipeline(otherFilters);
+        pipeline.assign(directModelAdapter);
+        pipeline.flush();
+        // the interactive sorter is flexible - can be moved from one 
+        // pipeline to the other
+        sorter.interpose(otherPipeline, directModelAdapter, null);
+        
+    }
+    
+    
     public void testUnassignedFilter() {
-        Filter filter = new PatternFilter(".*s.*", 0, 0);
+        Filter filter = createDefaultPatternFilter(0);
         filter.getSize();
         Filter[] filters = new Filter[] {filter};
         FilterPipeline pipeline = new FilterPipeline(filters);
@@ -63,20 +96,30 @@ public class FilterTest extends InteractiveTestCase {
 //     [14, 88, 4, 12, 4]
 //
     private FilterPipeline createPipeline() {
-        Filter filterZero = new PatternFilter(".*e.*", 0, 0);
-        Filter filterTwo = new PatternFilter(".*e.*", 0, 2); 
+        Filter filterZero = createDefaultPatternFilter(0);
+        Filter filterTwo = createDefaultPatternFilter(2); 
         Sorter sorter = new ShuttleSorter();
         Filter[] filters = new Filter[] {filterZero, filterTwo, sorter};
         FilterPipeline pipeline = new FilterPipeline(filters);
         return pipeline;
+    }
+
+    /** returns a PatternFilter for occurences of "e" in column.
+     * 
+     * @param column
+     * @return
+     */
+    protected Filter createDefaultPatternFilter(int column) {
+        Filter filterZero = new PatternFilter(".*e.*", 0, column);
+        return filterZero;
     }
     /**
      * early binding of pipeline to filters.
      *
      */
     public void testDirectComponentAdapter() {
-        Filter filterZero = new PatternFilter(".*e.*", 0, 0);
-        Filter filterTwo = new PatternFilter(".*e.*", 0, 2); 
+        Filter filterZero = createDefaultPatternFilter(0);
+        Filter filterTwo = createDefaultPatternFilter(2); 
         Sorter sorter = new ShuttleSorter();
         Filter[] filters = new Filter[] {filterZero, filterTwo, sorter};
         FilterPipeline pipeline = new FilterPipeline(filters);
@@ -117,7 +160,7 @@ public class FilterTest extends InteractiveTestCase {
     }
     
     public void testAssignFilterPipelineBoundFilterException() {
-        Filter filter = new PatternFilter(".*s.*", 0, 0);
+        Filter filter = createDefaultPatternFilter(0);
         assertEquals("order < 0", -1, filter.order);
         Filter[] filters = new Filter[] {filter};
         FilterPipeline pipeline = new FilterPipeline(filters);
@@ -241,6 +284,9 @@ public class FilterTest extends InteractiveTestCase {
             return false;
         }
 
+        public void refresh() {
+            // do nothing
+         }
     }
     /** 
      * just to see the filtering effects...

@@ -1093,11 +1093,6 @@ public class JXTable extends JTable implements Searchable {
 
     /** ? */
     private void removeSorter() {
-//        // fixing #167: remove from pipeline
-//        // moved to refreshSorter
-//        if (sorter != null) {
-//           sorter.interpose(null, getComponentAdapter(), null);
-//        }
         sorter = null;
         getTableHeader().repaint();
     }
@@ -1114,7 +1109,10 @@ public class JXTable extends JTable implements Searchable {
         }
     }
 
-    /** ? */
+    /** 
+     * returns the sorter for the column in view coordinates.
+     * 
+     */
     private Sorter refreshSorter(int columnIndex) {
         TableColumn col = getColumnModel().getColumn(columnIndex);
         if (col instanceof TableColumnExt) {
@@ -1123,7 +1121,8 @@ public class JXTable extends JTable implements Searchable {
             if (newSorter != null) {
                 // JW: hacking around #167: un-assign from filters
                 // this should be done somewhere else!
-                newSorter.interpose(null, getComponentAdapter(), null);
+                // fixed in Sorter
+//                newSorter.interpose(null, getComponentAdapter(), null);
                 // filter pipeline may be null!
                 newSorter.interpose(filters, getComponentAdapter(), sorter);  // refresh
                 return newSorter;
@@ -1133,7 +1132,13 @@ public class JXTable extends JTable implements Searchable {
     }
 
     /*
-     * Used by headerListener
+     * Used by headerListener.
+     * 
+     * request to sort the column at columnIndex in view coordinates.
+     * if there is already an interactive sorter for this column
+     * it's sort order is reversed. Otherwise the columns sorter is
+     * used as is.
+     * 
      */
     protected void setSorter(int columnIndex) {
         if (!isSortable()) return;

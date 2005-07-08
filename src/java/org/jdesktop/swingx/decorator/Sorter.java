@@ -93,12 +93,14 @@ public abstract class Sorter extends Filter {
      * @todo Pass in just the ComponentAdapter, and add methods to that for
      * fetching the filter pipeline and old sorter, if any.
      *
+     * 
      * @param filters
      * @param adapter
      * @param oldSorter
      */
     public void interpose(FilterPipeline filters, ComponentAdapter adapter,
                           Sorter oldSorter) {
+        releasePipeline();
         if (filters != null) {
             filters.setSorter(this);
         }
@@ -108,6 +110,17 @@ public abstract class Sorter extends Filter {
         refresh(oldSorter == null);
     }
 
+    /**
+     * release the old
+     *
+     */
+    private void releasePipeline() {
+        if (getPipeline() != null) {
+            getPipeline().setSorter(null);
+            assign((FilterPipeline) null);
+        }
+        
+    }
 
     public int compare(int row1, int row2) {
         int result = compare(row1, row2, getColumnIndex());
