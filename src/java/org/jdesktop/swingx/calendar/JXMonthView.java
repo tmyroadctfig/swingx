@@ -1632,6 +1632,16 @@ public class JXMonthView extends JComponent {
         int dayOfWeek = _cal.get(Calendar.DAY_OF_WEEK);
         int weekOfMonth = _cal.get(Calendar.WEEK_OF_MONTH);
 
+        // It is possible that the week of month is 0.  We only
+        // deal with values greater than 0.  Modify the value depending
+        // on the week of month the first day falls in.
+        // TODO: This is an annoying check to do every time.  We might
+        // want to find another way to accomplish this in the future.
+        long origDate = _cal.getTimeInMillis();
+        _cal.set(Calendar.DAY_OF_MONTH, 1);
+        weekOfMonth -= _cal.get(Calendar.WEEK_OF_MONTH);
+        _cal.setTimeInMillis(origDate);
+        
         // Determine what row/column we are in.
         int diffMonths = month - _firstDisplayedMonth +
                 ((year - _firstDisplayedYear) * 12);
@@ -1664,8 +1674,7 @@ public class JXMonthView extends JComponent {
                 (_calendarHeight + CALENDAR_SPACING);
 
         // Offset for Week of the Month.
-        bounds.y += (weekOfMonth - 1) *
-                (_boxPaddingY + _boxHeight + _boxPaddingY);
+        bounds.y += weekOfMonth * (_boxPaddingY + _boxHeight + _boxPaddingY);
 
         bounds.width = _boxPaddingX + _boxWidth + _boxPaddingX;
         bounds.height = _boxPaddingY + _boxHeight + _boxPaddingY;
