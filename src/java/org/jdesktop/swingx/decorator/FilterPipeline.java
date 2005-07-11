@@ -91,14 +91,30 @@ public class FilterPipeline {
     /**
      * Sets the sorter that the output of the filter pipeline is piped through.
      * This is the sorter that is installed interactively on a view by a user
-     * action. This is an implementation detail.
+     * action. 
      *
      * @param sorter the interactive sorter, if any; null otherwise.
      */
-    void setSorter(Sorter sorter) {
+    public void setSorter(Sorter sorter) {
+        Sorter oldSorter = getSorter();
+        if (oldSorter != null) {
+           // oldSorter.releasePipeline();
+            oldSorter.assign((FilterPipeline) null);
+        }
         this.sorter = sorter;
+        if (sorter != null) {
+            sorter.assign((FilterPipeline) null);
+            sorter.assign(this);
+            if (adapter != null) {
+                sorter.assign(adapter);
+                sorter.refresh();
+            }
+        }
     }
 
+    public Sorter getSorter() {
+        return sorter;
+    }
     /**
      * Assigns a {@link org.jdesktop.swingx.decorator.ComponentAdapter} to this
      * pipeline if no adapter has previously been assigned to the pipeline. Once an
@@ -122,11 +138,22 @@ public class FilterPipeline {
 //                filters[i].assign(this);
                 filters[i].assign(adapter);
             }
+            if (sorter != null) {
+                sorter.assign(adapter);
+            }
         }
         else if (this.adapter != adapter){
             throw new IllegalStateException("Can't bind to a different adapter");
         }
     }
+
+     /**
+      * 
+      * @return
+      */
+     public boolean isAssigned() {
+         return adapter != null;
+     }
 
     /**
      * Returns true if this pipeline contains the specified filter;
@@ -407,6 +434,11 @@ public class FilterPipeline {
     }
 
     private Filter[] reorderSorters(Filter[] inList, List sorterLocations) {
+        // quick hack for issue #46-swingx: make sure we are open
+        // without filter.
+        if (inList.length == 0) {
+            return new Filter[] {new IdentityFilter()};
+        }
         // always returns a new copy of inList
         Filter[]    outList = (Filter[]) inList.clone();
 
@@ -420,4 +452,33 @@ public class FilterPipeline {
 
         return outList;
     }
+
+    public class IdentityFilter extends Filter {
+
+        protected void init() {
+
+        }
+
+        protected void reset() {
+
+        }
+
+        protected void filter() {
+
+        }
+
+        public int getSize() {
+            return getInputSize();
+        }
+
+        protected int mapTowardModel(int row) {
+            return row;
+        }
+
+        protected int mapTowardView(int row) {
+            return row;
+        }
+    }
+
+
 }

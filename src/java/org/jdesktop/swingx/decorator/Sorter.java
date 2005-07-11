@@ -100,21 +100,23 @@ public abstract class Sorter extends Filter {
      */
     public void interpose(FilterPipeline filters, ComponentAdapter adapter,
                           Sorter oldSorter) {
-        releasePipeline();
         if (filters != null) {
+            // let the pipeline do all the work
             filters.setSorter(this);
+        } else {
+            releasePipeline();
+            adopt(oldSorter);
+            assign(filters);
+            assign(adapter);
+            refresh(oldSorter == null);
         }
-        adopt(oldSorter);
-        assign(filters);
-        assign(adapter);
-        refresh(oldSorter == null);
     }
 
     /**
      * release the old
      *
      */
-    private void releasePipeline() {
+    protected void releasePipeline() {
         if (getPipeline() != null) {
             getPipeline().setSorter(null);
             assign((FilterPipeline) null);
