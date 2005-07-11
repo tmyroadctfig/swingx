@@ -93,6 +93,9 @@ public abstract class Sorter extends Filter {
      * @todo Pass in just the ComponentAdapter, and add methods to that for
      * fetching the filter pipeline and old sorter, if any.
      *
+     * PENDING: check when adopting from oldSorter makes sense!
+     * 
+     * @deprecated - use filterPipeline.setSorter instead
      * 
      * @param filters
      * @param adapter

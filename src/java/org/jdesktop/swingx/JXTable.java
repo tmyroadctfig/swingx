@@ -1147,20 +1147,21 @@ public class JXTable extends JTable implements Searchable {
      * returns the sorter for the column in view coordinates.
      * 
      */
-    private Sorter refreshSorter(int columnIndex) {
+    private Sorter getColumnSorter(int columnIndex) {
         TableColumn col = getColumnModel().getColumn(columnIndex);
         if (col instanceof TableColumnExt) {
             TableColumnExt column = (TableColumnExt) col;
-            Sorter  newSorter = column.getSorter();
-            if (newSorter != null) {
-                // JW: hacking around #167: un-assign from filters
-                // this should be done somewhere else!
-                // fixed in Sorter
-//                newSorter.interpose(null, getComponentAdapter(), null);
-                // filter pipeline may be null!
-                newSorter.interpose(filters, getComponentAdapter(), getInteractiveSorter());  // refresh
-                return newSorter;
-            }
+            return column.getSorter();
+//            Sorter  newSorter = column.getSorter();
+//            if (newSorter != null) {
+//                // JW: hacking around #167: un-assign from filters
+//                // this should be done somewhere else!
+//                // fixed in Sorter
+////                newSorter.interpose(null, getComponentAdapter(), null);
+//                // filter pipeline may be null!
+//               // newSorter.interpose(filters, getComponentAdapter(), getInteractiveSorter());  // refresh
+//                return newSorter;
+//            }
         }
         return getInteractiveSorter();
     }
@@ -1179,18 +1180,25 @@ public class JXTable extends JTable implements Searchable {
         Selection   selection = new Selection(this);
         Sorter sorter = getInteractiveSorter();
 
-        if (sorter == null) {
-            sorter = refreshSorter(columnIndex);    // create and refresh
+        if ((sorter != null) && (sorter.getColumnIndex() == convertColumnIndexToModel(columnIndex))) {
+            sorter.toggle();
+        } else {
+            getFilters().setSorter(getColumnSorter(columnIndex));
         }
-        else {
-            int modelColumnIndex = convertColumnIndexToModel(columnIndex);
-            if (sorter.getColumnIndex() == modelColumnIndex) {
-                sorter.toggle();
-            }
-            else {
-                sorter = refreshSorter(columnIndex);    // create and refresh
-            }
-        }
+//        if (sorter == null) {
+//            sorter = refreshSorter(columnIndex);    // create and refresh
+//            
+//        }
+        
+//        else {
+//            int modelColumnIndex = convertColumnIndexToModel(columnIndex);
+//            if (sorter.getColumnIndex() == modelColumnIndex) {
+//                sorter.toggle();
+//            }
+//            else {
+//                sorter = refreshSorter(columnIndex);    // create and refresh
+//            }
+//        }
         restoreSelection(selection);
     }
 
