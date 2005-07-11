@@ -36,27 +36,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
         assertEquals("number of columns reduced", totalColumnCount - 1, table.getColumnCount());
         assertEquals("all listeners must be removed", 0, 
                 priorityColumn.getPropertyChangeListeners().length);
-        
-        
-        //        assertNotNull("popup menu not null", columnControl.popupMenu);
-//        int columnMenuItems = 0;
-//        Component[] items = columnControl.popupMenu.getComponents();
-//        for (int i = 0; i < items.length; i++) {
-//            if (!(items[i] instanceof JMenuItem)) {
-//                break;
-//            }
-//            columnMenuItems++;
-//        }
-//        // wrong assumption - has separator and actions!
-//        assertEquals("menu items must be equal to columns", totalColumnCount, 
-//                columnMenuItems);
-//        JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem) columnControl.popupMenu
-//            .getComponent(0);
-//        // sanit assert
-//        assertEquals(priorityColumn.getHeaderValue(), menuItem.getText());
-//        assertEquals("selection of menu must be equal to column visibility", 
-//                priorityColumn.isVisible(), menuItem.isSelected());
-    }
+     }
 
    /** 
     * Issue #192: initially invisibility columns are hidden
@@ -116,6 +96,24 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
         int totalColumnCount = table.getColumnCount();
         final TableColumnExt priorityColumn = table.getColumnExt("First Name");
         priorityColumn.setVisible(false);
+        JFrame frame = wrapWithScrollingInFrame(table, "JXTable (#192, #38-swingx) ColumnControl and Visibility of items");
+        frame.setVisible(true);
+    }
+
+
+    /** 
+     * 
+     * 
+     */
+    public void interactiveTestColumnControlEarlyInvisibleColumns() {
+        final JXTable table = new JXTable(sortableTableModel);
+        // columns set to invisible before setting the columnControl
+        // will not be inserted into the column control's list
+      table.getColumnExt("Last Name").setVisible(false);
+        table.setColumnControlVisible(true);
+//        int totalColumnCount = table.getColumnCount();
+//        final TableColumnExt priorityColumn = table.getColumnExt("First Name");
+//        priorityColumn.setVisible(false);
         JFrame frame = wrapWithScrollingInFrame(table, "JXTable (#192, #38-swingx) ColumnControl and Visibility of items");
         frame.setVisible(true);
     }
