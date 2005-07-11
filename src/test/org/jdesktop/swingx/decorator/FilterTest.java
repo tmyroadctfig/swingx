@@ -30,6 +30,8 @@ public class FilterTest extends InteractiveTestCase {
     private TableModel tableModel;
     protected ComponentAdapter directModelAdapter;
 
+    
+    
     /**
      * cause for #167: sorter does not release pipeline if
      * moved to a new one.

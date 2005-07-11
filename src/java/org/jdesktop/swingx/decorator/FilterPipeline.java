@@ -187,6 +187,7 @@ public class FilterPipeline {
      * no filters in this pipeline
      */
     Filter last() {
+        if (sorter != null) return sorter;
         return (filters.length > 0) ? filters[filters.length - 1] : null;
     }
 
@@ -199,7 +200,9 @@ public class FilterPipeline {
      * or null, if there aren't any filters after the supplied filter
      */
     Filter next(Filter filter) {
-        return last().equals(filter) ? null : filters[filter.order + 1];
+        if (last().equals(filter)) return null;
+        return filter.order + 1 < filters.length ? filters[filter.order + 1] : getSorter();
+ //       return last().equals(filter) ? null : filters[filter.order + 1];
     }
 
     /**
@@ -211,6 +214,7 @@ public class FilterPipeline {
      * or null, if there aren't any filters before the supplied filter
      */
     Filter previous(Filter filter) {
+        if (filter.equals(sorter)) return filters.length > 0 ? filters[filters.length - 1] : null;
         return first().equals(filter) ? null : filters[filter.order - 1];
     }
 
@@ -225,14 +229,15 @@ public class FilterPipeline {
      * @param filter a filter in this pipeline that has changed in any way
      */
     protected void filterChanged(Filter filter) {
-        Filter  next = contains(filter) ? next(filter) : null;
+        Filter  next = next(filter); //contains(filter) ? next(filter) : null;
         if (next == null) {
-            if (sorter == null) {
-                fireContentsChanged();
-            }
-            else {
-                sorter.refresh();   // cascade to interposed sorter
-            }
+            fireContentsChanged();
+//            if (sorter == null) {
+//                fireContentsChanged();
+//            }
+//            else {
+//                sorter.refresh();   // cascade to interposed sorter
+//            }
         }
         else {
             next.refresh(); // Cascade to next filter
@@ -245,20 +250,28 @@ public class FilterPipeline {
     }
 */
     int getInputSize(Filter filter) {
-        if (contains(filter)) {
-            Filter  previous = previous(filter);
-            if (previous == null) {
-                return adapter.getRowCount();
-            }
-            else {
-                return previous.getSize();
-            }
+        
+        Filter  previous = previous(filter);
+        if (previous == null) {
+            return adapter.getRowCount();
         }
-        else if (filter.getPipeline() == this) {
-            return getOutputSize();
+        else {
+            return previous.getSize();
         }
-
-        return 0;
+//        if (contains(filter)) {
+//            Filter  previous = previous(filter);
+//            if (previous == null) {
+//                return adapter.getRowCount();
+//            }
+//            else {
+//                return previous.getSize();
+//            }
+//        }
+//        else if (filter.getPipeline() == this) {
+//            return getOutputSize();
+//        }
+//
+//        return 0;
     }
 
     /**

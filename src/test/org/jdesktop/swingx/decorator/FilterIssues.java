@@ -19,6 +19,34 @@ public class FilterIssues extends FilterTest {
      * with a differnt ComponentAdapter.
      *
      */
+    public void testSetSorterDiffComponentAdapter() {
+        int sortColumn = 0;
+        Filter[] filters = new Filter[] {};
+        FilterPipeline pipeline = new FilterPipeline(filters);
+        pipeline.assign(directModelAdapter);
+        pipeline.flush();
+        Object value = pipeline.getValueAt(0, sortColumn);
+        Object lastValue = pipeline.getValueAt(pipeline.getOutputSize() - 1, sortColumn);
+        Sorter sorter = new ShuttleSorter();
+        sorter.assign(new DirectModelAdapter(new DefaultTableModel(10, 5)));
+        try {
+            pipeline.setSorter(sorter);
+            fail("interposing with a different adapter must throw an IllegalStateException");
+        } catch (IllegalStateException ex) {
+            
+        } catch (Exception e) {
+            fail("interposing with a different adapter must throw an " +
+                    "IllegalStatetException instead of " + e);
+        }
+        
+    }
+
+    /**
+     * Issue #45-swingx:
+     * interpose should throw if trying to interpose to a pipeline
+     * with a differnt ComponentAdapter.
+     *
+     */
     public void testInterposeDiffComponentAdapter() {
         int sortColumn = 0;
         Filter[] filters = new Filter[] {};
@@ -28,18 +56,17 @@ public class FilterIssues extends FilterTest {
         Object value = pipeline.getValueAt(0, sortColumn);
         Object lastValue = pipeline.getValueAt(pipeline.getOutputSize() - 1, sortColumn);
         Sorter sorter = new ShuttleSorter();
+        sorter.assign(new DirectModelAdapter(new DefaultTableModel(10, 5)));
         try {
+            // PENDING: deprecate interpose ... delegates to pipeline anyway
             sorter.interpose(pipeline, new DirectModelAdapter(new DefaultTableModel(10, 5)), null);
-            fail("interposing with a different adapter must throw an IllegalargumentException");
-        } catch (IllegalArgumentException ex) {
+            fail("interposing with a different adapter must throw an IllegalStateException");
+        } catch (IllegalStateException ex) {
             
         } catch (Exception e) {
             fail("interposing with a different adapter must throw an " +
-                    "IllegalargumentException instead of " + e);
+                    "IllegalStateException instead of " + e);
         }
-//        assertEquals("value must be unchanged by interactive sorter", value, sorter.getValueAt(0, sortColumn));
-//        sorter.setAscending(false);
-//        assertEquals("first value must be old last", lastValue, sorter.getValueAt(0, sortColumn));
         
     }
 
@@ -86,6 +113,31 @@ public class FilterIssues extends FilterTest {
         assertEquals(sortedValue, sorter.getValueAt(0, sortColumn));
         
     }
+    public void testSorterInterposeNullPipeline() {
+        int sortColumn = 0;
+        Filter[] sorters = new Filter[] {new ShuttleSorter()};
+        FilterPipeline sortedPipeline = new FilterPipeline(sorters);
+        sortedPipeline.assign(directModelAdapter);
+        sortedPipeline.flush();
+        Object sortedValue = sortedPipeline.getValueAt(0, sortColumn);
+        Sorter sorter = new ShuttleSorter();
+        sorter.interpose(null, directModelAdapter, null);
+        assertEquals(sortedValue, sorter.getValueAt(0, sortColumn));
+    }
+   
+    public void testSorterInPipeline() {
+        Filter filter = createDefaultPatternFilter(0);
+        FilterPipeline pipeline = new FilterPipeline(new Filter[] { filter });
+        pipeline.assign(directModelAdapter);
+        // JW PENDING: remove necessity to explicitly flush...
+        pipeline.flush();
+        Object value = pipeline.getValueAt(0, 0);
+        Sorter sorter = new ShuttleSorter();
+        pipeline.setSorter(sorter);
+        assertEquals(pipeline.getValueAt(0, 0), sorter.getValueAt(0,0));
+        
+    }
+
     /** does nothing currently. 
      * 
      *

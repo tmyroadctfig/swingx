@@ -105,9 +105,9 @@ public abstract class Sorter extends Filter {
             filters.setSorter(this);
         } else {
             releasePipeline();
+            assign(adapter);
             adopt(oldSorter);
             assign(filters);
-            assign(adapter);
             refresh(oldSorter == null);
         }
     }

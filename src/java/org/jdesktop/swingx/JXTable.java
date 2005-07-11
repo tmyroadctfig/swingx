@@ -784,16 +784,17 @@ public class JXTable extends JTable implements Searchable {
 
     /** ? */
     public void tableChanged(TableModelEvent e) {
+        // PENDING - needs cleanup!
         Selection   selection = new Selection(this);
         if (filters != null) {
             filters.flush();    // will call contentsChanged()
         }
-        else if (getInteractiveSorter() != null) {
-            getInteractiveSorter().refresh();
-//            if (isAutomaticSort()) {
-//                sorter.refresh();
-//            }
-        }
+//        else if (getInteractiveSorter() != null) {
+//            getInteractiveSorter().refresh();
+////            if (isAutomaticSort()) {
+////                sorter.refresh();
+////            }
+//        }
 
         super.tableChanged(e);
         restoreSelection(selection);
@@ -859,21 +860,22 @@ public class JXTable extends JTable implements Searchable {
      * @return row index in model coordinates
      */
     public int convertRowIndexToModel(int row) {
-        Sorter sorter = getInteractiveSorter();
-        if (sorter == null) {
-            if (filters == null) {
-                return row;
-            }
-            else {
-                // delegate conversion to the filters pipeline
-                return filters.convertRowIndexToModel(row);
-            }
-        }
-        else {
-            // after performing its own conversion, the sorter
-            // delegates the conversion to the filters pipeline, if any
-            return sorter.convertRowIndexToModel(row);
-        }
+        return getFilters().convertRowIndexToModel(row);
+//        Sorter sorter = getInteractiveSorter();
+//        if (sorter == null) {
+//            if (filters == null) {
+//                return row;
+//            }
+//            else {
+//                // delegate conversion to the filters pipeline
+//                return filters.convertRowIndexToModel(row);
+//            }
+//        }
+//        else {
+//            // after performing its own conversion, the sorter
+//            // delegates the conversion to the filters pipeline, if any
+//            return sorter.convertRowIndexToModel(row);
+//        }
     }
 
     /**
@@ -884,76 +886,80 @@ public class JXTable extends JTable implements Searchable {
      * @return row index in view coordinates
      */
     public int convertRowIndexToView(int row) {
-        Sorter sorter = getInteractiveSorter();
-        if (sorter == null) {
-            if (filters == null) {
-                return row;
-            }
-            else {
-                // delegate conversion to the filters pipeline
-                return filters.convertRowIndexToView(row);
-            }
-        }
-        else {
-            // before performing its own conversion, the sorter
-            // delegates the conversion to the filters pipeline, if any
-            return sorter.convertRowIndexToView(row);
-        }
+        return getFilters().convertRowIndexToView(row);
+//        Sorter sorter = getInteractiveSorter();
+//        if (sorter == null) {
+//            if (filters == null) {
+//                return row;
+//            }
+//            else {
+//                // delegate conversion to the filters pipeline
+//                return filters.convertRowIndexToView(row);
+//            }
+//        }
+//        else {
+//            // before performing its own conversion, the sorter
+//            // delegates the conversion to the filters pipeline, if any
+//            return sorter.convertRowIndexToView(row);
+//        }
     }
 
     /**
      * {@inheritDoc}
      */
     public Object getValueAt(int row, int column) {
-        Sorter sorter = getInteractiveSorter();
-        if (sorter == null) {       // have interactive sorter?
-            if (filters == null) {  // have filter pipeline?
-                // superclass will call convertColumnIndexToModel
-                return super.getValueAt(row, column);   // unsorted, unfiltered
-            }
-            else {  // filtered
-                return filters.getValueAt(row, convertColumnIndexToModel(column));
-            }
-        }
-        else {  // interactively sorted, and potentially filtered
-            return sorter.getValueAt(row, convertColumnIndexToModel(column));
-        }
+        return getFilters().getValueAt(row, convertColumnIndexToModel(column));
+//        Sorter sorter = getInteractiveSorter();
+//        if (sorter == null) {       // have interactive sorter?
+//            if (filters == null) {  // have filter pipeline?
+//                // superclass will call convertColumnIndexToModel
+//                return super.getValueAt(row, column);   // unsorted, unfiltered
+//            }
+//            else {  // filtered
+//                return filters.getValueAt(row, convertColumnIndexToModel(column));
+//            }
+//        }
+//        else {  // interactively sorted, and potentially filtered
+//            return sorter.getValueAt(row, convertColumnIndexToModel(column));
+//        }
     }
 
     /**
      * {@inheritDoc}
      */
     public void setValueAt(Object aValue, int row, int column) {
-        Sorter sorter = getInteractiveSorter();
-        if (sorter == null) {
-            if (filters == null) {
-                super.setValueAt(aValue, row, column);
-            }
-            else {
-                filters.setValueAt(aValue, row, convertColumnIndexToModel(column));
-            }
-        }
-        else {
-            sorter.setValueAt(aValue, row, convertColumnIndexToModel(column));
-        }
+        getFilters().setValueAt(aValue, row, convertColumnIndexToModel(column));
+//        Sorter sorter = getInteractiveSorter();
+//        if (sorter == null) {
+//            if (filters == null) {
+//                super.setValueAt(aValue, row, column);
+//            }
+//            else {
+//                filters.setValueAt(aValue, row, convertColumnIndexToModel(column));
+//            }
+//        }
+//        else {
+//            sorter.setValueAt(aValue, row, convertColumnIndexToModel(column));
+//        }
     }
 
     /**
      * {@inheritDoc}
      */
     public boolean isCellEditable(int row, int column) {
-        Sorter sorter = getInteractiveSorter();
-        if (sorter == null) {
-            if (filters == null) {
-                return super.isCellEditable(row, column);
-            }
-            else {
-                return filters.isCellEditable(row, convertColumnIndexToModel(column));
-            }
-        }
-        else {
-            return sorter.isCellEditable(row, convertColumnIndexToModel(column));
-        }
+        return getFilters().isCellEditable(row, convertColumnIndexToModel(column));
+//        Sorter sorter = getInteractiveSorter();
+//        if (sorter == null) {
+//            if (filters == null) {
+//                return super.isCellEditable(row, column);
+//            }
+//            else {
+//                return filters.isCellEditable(row, convertColumnIndexToModel(column));
+//            }
+//        }
+//        else {
+//            return sorter.isCellEditable(row, convertColumnIndexToModel(column));
+//        }
     }
 
     /**
@@ -1004,7 +1010,7 @@ public class JXTable extends JTable implements Searchable {
         }
     }
 
-    /** Returns the FilterPipeline for the table, null if none. */
+    /** Returns the FilterPipeline for the table. */
     public FilterPipeline getFilters() {
         if (filters == null) {
             filters = new FilterPipeline(new Filter[] { });
@@ -1446,12 +1452,17 @@ public class JXTable extends JTable implements Searchable {
      *
      * @param renderer the <code>TableCellRenderer</code> to prepare
      * @param row the row of the cell to render, where 0 is the first row
-         * @param column the column of the cell to render, where 0 is the first column
+     * @param column the column of the cell to render, where 0 is the first column
      * @return the decorated <code>Component</code> used as a stamp to render the specified cell
      * @see org.jdesktop.swingx.decorator.Highlighter
      */
     public Component prepareRenderer(TableCellRenderer renderer, int row,
                                      int column) {
+        Object value = getValueAt(row, column);
+        Class columnClass = getColumnClass(column);
+        boolean typeclash = !columnClass.isInstance(value);
+        TableColumn tableColumn = getColumnModel().getColumn(column);
+        getColumnClass(column);
         Component stamp = super.prepareRenderer(renderer, row, column);
         if (highlighters == null) {
             return stamp;   // no need to decorate renderer with highlighters

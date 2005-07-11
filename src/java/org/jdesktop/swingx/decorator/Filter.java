@@ -207,12 +207,15 @@ public abstract class Filter {
      */
     private Filter getMappingFilter() {
         Filter filter = null;
-        // class invariant: order >= 0 guarantees pipeline != null
-        if (order >= 0) {
+        if (pipeline != null) {
             filter = pipeline.previous(this);
-        } else if (pipeline != null) {
-            filter = pipeline.last();
         }
+        // class invariant: order >= 0 guarantees pipeline != null
+//        if (order >= 0) {
+//            filter = pipeline.previous(this);
+//        } else if (pipeline != null) {
+//            filter = pipeline.last();
+//        }
         return filter;
     }
 
