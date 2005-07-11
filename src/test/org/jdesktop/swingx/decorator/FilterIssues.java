@@ -62,13 +62,30 @@ public class FilterIssues extends FilterTest {
         Filter[] filters = new Filter[] {};
         FilterPipeline pipeline = new FilterPipeline(filters);
         pipeline.assign(directModelAdapter);
-        pipeline.flush();
+//        pipeline.flush();
         assertEquals("size must be number of rows in adapter", 
                 directModelAdapter.getRowCount(), pipeline.getOutputSize());
         Object value = pipeline.getValueAt(0, sortColumn);
         assertEquals(directModelAdapter.getValueAt(0, sortColumn), value);
     }
+ 
     
+    public void testSorterInEmptyPipeline() {
+        int sortColumn = 0;
+        Filter[] sorters = new Filter[] {new ShuttleSorter()};
+        FilterPipeline sortedPipeline = new FilterPipeline(sorters);
+        sortedPipeline.assign(directModelAdapter);
+        sortedPipeline.flush();
+        Object sortedValue = sortedPipeline.getValueAt(0, sortColumn);
+        Filter[] filters = new Filter[] {};
+        FilterPipeline pipeline = new FilterPipeline(filters);
+        pipeline.assign(directModelAdapter);
+     //   assert
+        Sorter sorter = new ShuttleSorter();
+        pipeline.setSorter(sorter);
+        assertEquals(sortedValue, sorter.getValueAt(0, sortColumn));
+        
+    }
     /** does nothing currently. 
      * 
      *
