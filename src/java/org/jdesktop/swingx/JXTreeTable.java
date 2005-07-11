@@ -1643,11 +1643,14 @@ public class JXTreeTable extends JXTable {
      * @return the adapter that knows how to access the component data model
      */
     protected ComponentAdapter getComponentAdapter() {
+        if (dataAdapter == null) {
+            dataAdapter = new TreeTableDataAdapter(this); 
+        }
         // MUST ALWAYS ACCESS dataAdapter through accessor method!!!
         return dataAdapter;
     }
 
-    private final ComponentAdapter  dataAdapter = new TreeTableDataAdapter(this);
+//    private final ComponentAdapter  dataAdapter = new TreeTableDataAdapter(this);
 
     // Define defaultRowHeight to allow default document icon for leaf items to
     // draw properly

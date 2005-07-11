@@ -169,16 +169,16 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //        box.setEditable(true);
 //        table.getColumnExt(0).setCellEditor(new DefaultCellEditor(box));
         Action toggleFilter = new AbstractAction("Toggle Filter") {
-            
+            boolean hasFilters;
             public void actionPerformed(ActionEvent e) {
-                if (table.getFilters() != null) {
+                if (hasFilters) {
                     table.setFilters(null);
                 } else {
                     Filter filter = new PatternFilter(".*e.*", 0, 0);
                     table.setFilters(new FilterPipeline(new Filter[] {filter}));
 
                 }
-                
+                hasFilters = !hasFilters;
             }
             
         };
@@ -557,7 +557,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         };
         JXTable xtable = new JXTable(model);
 //        BasicLookAndFeel lf;
-        xtable.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
+        xtable.setBackground(Highlighter.notePadBackground.getBackground()); // ledger
         JTable table = new JTable(model);
         table.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
         JFrame frame = wrapWithScrollingInFrame(xtable, table, "Unselected focused background: JXTable/JTable");
@@ -733,14 +733,14 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 
 
     public static void main(String args[]) {
-        setSystemLF(false);
+        setSystemLF(true);
         JXTableVisualCheck test = new JXTableVisualCheck();
         try {
 //          test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*ColumnControlColumnModel.*");
+//            test.runInteractiveTests("interactive.*ColumnControlColumnModel.*");
 //            test.runInteractiveTests("interactive.*TableHeader.*");
         //    test.runInteractiveTests("interactive.*SorterP.*");
-//            test.runInteractiveTests("interactive.*abled.*");
+            test.runInteractiveTests("interactive.*Focu.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();

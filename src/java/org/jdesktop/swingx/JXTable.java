@@ -56,11 +56,13 @@ import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PipelineEvent;
 import org.jdesktop.swingx.decorator.PipelineListener;
 import org.jdesktop.swingx.decorator.Sorter;
+import org.jdesktop.swingx.decorator.FilterPipeline.IdentityFilter;
 import org.jdesktop.swingx.icon.ColumnControlIcon;
 import org.jdesktop.swingx.plaf.JXTableAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
@@ -139,7 +141,7 @@ public class JXTable extends JTable implements Searchable {
     public static boolean TRACE = false;
   
     /** The sorter attached to this table for the column currently being sorted. */
-    protected Sorter            sorter = null;
+//    protected Sorter            sorter = null;
     
     /** The FilterPipeline for the table. */
     protected FilterPipeline        filters = null;
@@ -148,7 +150,7 @@ public class JXTable extends JTable implements Searchable {
     protected HighlighterPipeline   highlighters = null;
 
     // MUST ALWAYS ACCESS dataAdapter through accessor method!!!
-    private final ComponentAdapter dataAdapter = new TableAdapter(this);
+    protected ComponentAdapter dataAdapter;// = new TableAdapter(this);
 
     private boolean sortable = false;
     private int visibleRowCount = 18;
@@ -251,6 +253,7 @@ public class JXTable extends JTable implements Searchable {
 
     /** Initializes the table for use. */
     protected void init() {
+        setFilters(null);
         setSortable(true);
         // Register the actions that this class can handle.
         ActionMap map = getActionMap();
@@ -758,7 +761,7 @@ public class JXTable extends JTable implements Searchable {
         this.sortable = sortable;
         firePropertyChange("sortable", !sortable, sortable);
         //JW @todo: this is a hack!
-        if (sorter != null) {
+        if (getInteractiveSorter() != null) {
            updateOnFilterContentChanged();
         }
 
@@ -785,8 +788,8 @@ public class JXTable extends JTable implements Searchable {
         if (filters != null) {
             filters.flush();    // will call contentsChanged()
         }
-        else if (sorter != null) {
-            sorter.refresh();
+        else if (getInteractiveSorter() != null) {
+            getInteractiveSorter().refresh();
 //            if (isAutomaticSort()) {
 //                sorter.refresh();
 //            }
@@ -831,7 +834,8 @@ public class JXTable extends JTable implements Searchable {
 	@Override
     public int getRowCount() {
         // RG: If there are no filters, call superclass version rather than accessing model directly
-        return filters == null ? super.getRowCount() : filters.getOutputSize();
+        return ((filters == null) || !filters.isAssigned()) ? 
+                super.getRowCount() : filters.getOutputSize();
     }
 
     /**
@@ -855,6 +859,7 @@ public class JXTable extends JTable implements Searchable {
      * @return row index in model coordinates
      */
     public int convertRowIndexToModel(int row) {
+        Sorter sorter = getInteractiveSorter();
         if (sorter == null) {
             if (filters == null) {
                 return row;
@@ -879,6 +884,7 @@ public class JXTable extends JTable implements Searchable {
      * @return row index in view coordinates
      */
     public int convertRowIndexToView(int row) {
+        Sorter sorter = getInteractiveSorter();
         if (sorter == null) {
             if (filters == null) {
                 return row;
@@ -899,6 +905,7 @@ public class JXTable extends JTable implements Searchable {
      * {@inheritDoc}
      */
     public Object getValueAt(int row, int column) {
+        Sorter sorter = getInteractiveSorter();
         if (sorter == null) {       // have interactive sorter?
             if (filters == null) {  // have filter pipeline?
                 // superclass will call convertColumnIndexToModel
@@ -917,6 +924,7 @@ public class JXTable extends JTable implements Searchable {
      * {@inheritDoc}
      */
     public void setValueAt(Object aValue, int row, int column) {
+        Sorter sorter = getInteractiveSorter();
         if (sorter == null) {
             if (filters == null) {
                 super.setValueAt(aValue, row, column);
@@ -934,6 +942,7 @@ public class JXTable extends JTable implements Searchable {
      * {@inheritDoc}
      */
     public boolean isCellEditable(int row, int column) {
+        Sorter sorter = getInteractiveSorter();
         if (sorter == null) {
             if (filters == null) {
                 return super.isCellEditable(row, column);
@@ -997,6 +1006,9 @@ public class JXTable extends JTable implements Searchable {
 
     /** Returns the FilterPipeline for the table, null if none. */
     public FilterPipeline getFilters() {
+        if (filters == null) {
+            filters = new FilterPipeline(new Filter[] { });
+        }
         return filters;
     }
 
@@ -1032,24 +1044,29 @@ public class JXTable extends JTable implements Searchable {
 
     /** Sets the FilterPipeline for filtering table rows. */
     public void setFilters(FilterPipeline pipeline) {
-        unsetFilters();
-        doSetFilters(pipeline);
+        Sorter sorter = unsetFilters();
+        doSetFilters(pipeline, sorter);
     }
 
     /** ? */
-    private void unsetFilters() {
-        if (filters == null) return;
+    private Sorter unsetFilters() {
+        if (filters == null) return null;
         // fix#125: cleanup old filters
         filters.removePipelineListener(pipelineListener);
         // hacking around -
         //brute force update of sorter by removing
         pipelineListener.contentsChanged(null);
+        return filters.getSorter();
     }
 
     /** ? */
-    private void doSetFilters(FilterPipeline pipeline) {
+    private void doSetFilters(FilterPipeline pipeline, Sorter sorter) {
+        if (pipeline == null) {
+            pipeline = new FilterPipeline(new Filter[] { });
+        }
         filters = pipeline;
         use(filters);
+        pipeline.setSorter(sorter);
     }
 
     /** Returns the HighlighterPipeline assigned to the table, null if none. */
@@ -1093,8 +1110,19 @@ public class JXTable extends JTable implements Searchable {
 
     /** ? */
     private void removeSorter() {
-        sorter = null;
+        setInteractiveSorter(null);
         getTableHeader().repaint();
+    }
+
+
+    private void setInteractiveSorter(Sorter sorter) {
+        if (filters == null) return;
+        getFilters().setSorter(sorter);
+        
+    }
+    private Sorter getInteractiveSorter() {
+        if (filters == null) return null;
+        return getFilters().getSorter();
     }
 
 
@@ -1102,7 +1130,7 @@ public class JXTable extends JTable implements Searchable {
      * Used by headerListener
      */
     protected void resetSorter() {
-        if (sorter != null) {
+        if (getInteractiveSorter() != null) {
             Selection selection = new Selection(this);
             removeSorter();
             restoreSelection(selection);
@@ -1124,11 +1152,11 @@ public class JXTable extends JTable implements Searchable {
                 // fixed in Sorter
 //                newSorter.interpose(null, getComponentAdapter(), null);
                 // filter pipeline may be null!
-                newSorter.interpose(filters, getComponentAdapter(), sorter);  // refresh
+                newSorter.interpose(filters, getComponentAdapter(), getInteractiveSorter());  // refresh
                 return newSorter;
             }
         }
-        return sorter;
+        return getInteractiveSorter();
     }
 
     /*
@@ -1143,6 +1171,8 @@ public class JXTable extends JTable implements Searchable {
     protected void setSorter(int columnIndex) {
         if (!isSortable()) return;
         Selection   selection = new Selection(this);
+        Sorter sorter = getInteractiveSorter();
+
         if (sorter == null) {
             sorter = refreshSorter(columnIndex);    // create and refresh
         }
@@ -1162,6 +1192,8 @@ public class JXTable extends JTable implements Searchable {
      * Used by ColumnHeaderRenderer.getTableCellRendererComponent()
      */
     public Sorter getSorter(int columnIndex) {
+        Sorter sorter = getInteractiveSorter();
+
         return sorter == null ? null :
             sorter.getColumnIndex() == convertColumnIndexToModel(columnIndex) ?
             sorter : null;
@@ -1434,7 +1466,9 @@ public class JXTable extends JTable implements Searchable {
     }
 
     protected ComponentAdapter getComponentAdapter() {
-        // MUST ALWAYS ACCESS dataAdapter through accessor method!!!
+        if (dataAdapter == null) {
+            dataAdapter = new TableAdapter(this);
+        }
         return dataAdapter;
     }
 
