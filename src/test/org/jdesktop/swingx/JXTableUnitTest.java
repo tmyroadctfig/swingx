@@ -158,6 +158,29 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
     /**
+     * Issue #187: filter update removes interactive sorter.
+     *
+     */
+    public void testFilterUpdateKeepsSorter() {
+        int rowCount = 20;
+        int firstValue = 0;
+        JXTable table = new JXTable(createModel(firstValue, rowCount));
+        table.setSorter(0);
+        // sort descending
+        table.setSorter(0);
+        Object value = table.getValueAt(0, 0);
+        assertEquals("highest value", value, firstValue + rowCount - 1);
+        PatternFilter filter = new PatternFilter(".*", 0, 0);
+        // set a filter
+        table.setFilters(new FilterPipeline(new Filter[] {filter}));
+        assertEquals("highest value unchanged", value, table.getValueAt(0, 0 ));
+        // update the filter
+        filter.setPattern("1.*", 0);
+        assertTrue("sorter must be active", 
+                ((Integer) table.getValueAt(0, 0)).intValue() > ((Integer) table.getValueAt(1, 0)));
+    }
+    
+    /**
      * Issue #175: multiple registration as PipelineListener.
      * 
      *
@@ -276,6 +299,14 @@ public class JXTableUnitTest extends InteractiveTestCase {
         model.removeRow(0);
     }
     
+    /**
+     * returns a tableModel with count rows filled with
+     * ascending integers in first column
+     * starting from startRow.
+     * @param startRow the value of the first row
+     * @param count the number of rows
+     * @return
+     */
     private DefaultTableModel createModel(int startRow, int count) {
         DefaultTableModel model = new DefaultTableModel(count, 5);
         for (int i = 0; i < model.getRowCount(); i++) {

@@ -740,7 +740,8 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //            test.runInteractiveTests("interactive.*ColumnControlColumnModel.*");
 //            test.runInteractiveTests("interactive.*TableHeader.*");
         //    test.runInteractiveTests("interactive.*SorterP.*");
-            test.runInteractiveTests("interactive.*Focu.*");
+            test.runInteractiveTests("interactive.*ColumnControlAndF.*");
+        //    test.runInteractiveTests("interactive.*Filt.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();

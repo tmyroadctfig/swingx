@@ -802,7 +802,7 @@ public class JXTable extends JTable implements Searchable {
 
     /** ? */
     protected void updateOnFilterContentChanged() {
-        removeSorter();
+        //removeSorter();
         clearSelection();
         // Force private rowModel in JTable to null;
         boolean heightSet = isXTableRowHeightSet;
@@ -1013,7 +1013,7 @@ public class JXTable extends JTable implements Searchable {
     /** Returns the FilterPipeline for the table. */
     public FilterPipeline getFilters() {
         if (filters == null) {
-            filters = new FilterPipeline(new Filter[] { });
+            filters = new FilterPipeline();
         }
         return filters;
     }
@@ -1068,7 +1068,7 @@ public class JXTable extends JTable implements Searchable {
     /** ? */
     private void doSetFilters(FilterPipeline pipeline, Sorter sorter) {
         if (pipeline == null) {
-            pipeline = new FilterPipeline(new Filter[] { });
+            pipeline = new FilterPipeline();
         }
         filters = pipeline;
         use(filters);

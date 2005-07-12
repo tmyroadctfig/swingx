@@ -49,6 +49,13 @@ public class FilterPipeline {
     private final Filter[]          filters;
 
     /**
+     * Creates an empty open pipeline.
+     *
+     */
+    public FilterPipeline() {
+        this(new Filter[] {});
+    }
+    /**
      * Constructs a new <code>FilterPipeline</code> populated with the specified
      * filters that are applied in the order they appear in the list. Since filters
      * maintain state about the view to which they are attached, an instance of
@@ -162,10 +169,14 @@ public class FilterPipeline {
      * @param filter filter whose membership in this pipeline is tested
      * @return true if this pipeline contains the specified filter;
      * otherwise it returns false
+     * @throws NullPointerException if filter == null
+     * 
      */
     boolean contains(Filter filter) {
-        return (filter.order >= 0) &&
-                (filters.length > 0) && (filters[filter.order] == filter);
+        return (filter.equals(sorter)) || 
+            (filter.order >= 0) &&
+                (filters.length > 0) && 
+                (filters[filter.order] == filter);
     }
 
     /**

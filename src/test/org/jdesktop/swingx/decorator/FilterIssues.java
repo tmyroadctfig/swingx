@@ -14,151 +14,21 @@ import javax.swing.table.DefaultTableModel;
 public class FilterIssues extends FilterTest {
 
     /**
-     * Issue #45-swingx:
-     * interpose should throw if trying to interpose to a pipeline
-     * with a differnt ComponentAdapter.
+     * Issue ??-swingx
+     * pipeline should auto-flush on assigning adapter.
      *
      */
-    public void testSetSorterDiffComponentAdapter() {
-        int sortColumn = 0;
-        Filter[] filters = new Filter[] {};
-        FilterPipeline pipeline = new FilterPipeline(filters);
-        pipeline.assign(directModelAdapter);
-        pipeline.flush();
-        Object value = pipeline.getValueAt(0, sortColumn);
-        Object lastValue = pipeline.getValueAt(pipeline.getOutputSize() - 1, sortColumn);
-        Sorter sorter = new ShuttleSorter();
-        sorter.assign(new DirectModelAdapter(new DefaultTableModel(10, 5)));
-        try {
-            pipeline.setSorter(sorter);
-            fail("interposing with a different adapter must throw an IllegalStateException");
-        } catch (IllegalStateException ex) {
-            
-        } catch (Exception e) {
-            fail("interposing with a different adapter must throw an " +
-                    "IllegalStatetException instead of " + e);
-        }
-        
-    }
-
-    /**
-     * Issue #45-swingx:
-     * interpose should throw if trying to interpose to a pipeline
-     * with a differnt ComponentAdapter.
-     *
-     */
-    public void testInterposeDiffComponentAdapter() {
-        int sortColumn = 0;
-        Filter[] filters = new Filter[] {};
-        FilterPipeline pipeline = new FilterPipeline(filters);
-        pipeline.assign(directModelAdapter);
-        pipeline.flush();
-        Object value = pipeline.getValueAt(0, sortColumn);
-        Object lastValue = pipeline.getValueAt(pipeline.getOutputSize() - 1, sortColumn);
-        Sorter sorter = new ShuttleSorter();
-        sorter.assign(new DirectModelAdapter(new DefaultTableModel(10, 5)));
-        try {
-            // PENDING: deprecate interpose ... delegates to pipeline anyway
-            sorter.interpose(pipeline, new DirectModelAdapter(new DefaultTableModel(10, 5)), null);
-            fail("interposing with a different adapter must throw an IllegalStateException");
-        } catch (IllegalStateException ex) {
-            
-        } catch (Exception e) {
-            fail("interposing with a different adapter must throw an " +
-                    "IllegalStateException instead of " + e);
-        }
-        
-    }
-
-    /**
-     * 
-     * Issue #46-swingx:
-     * 
-     * need to clarify the behaviour of an empty pipeline.
-     * I would expect 0 filters to result in an open pipeline 
-     * (nothing filtered). The implementation treats this case as a
-     * closed pipeline (everything filtered). 
-     * 
-     * Arguably it could be decided either way, but returning a
-     * outputsize > 0 and null instead of the adapter value for 
-     * all rows is a bug.
-     *
-     */
-    public void testEmptyPipeline() {
-        int sortColumn = 0;
-        Filter[] filters = new Filter[] {};
-        FilterPipeline pipeline = new FilterPipeline(filters);
-        pipeline.assign(directModelAdapter);
-//        pipeline.flush();
-        assertEquals("size must be number of rows in adapter", 
-                directModelAdapter.getRowCount(), pipeline.getOutputSize());
-        Object value = pipeline.getValueAt(0, sortColumn);
-        assertEquals(directModelAdapter.getValueAt(0, sortColumn), value);
-    }
- 
-    
-    public void testSorterInEmptyPipeline() {
-        int sortColumn = 0;
-        Filter[] sorters = new Filter[] {new ShuttleSorter()};
-        FilterPipeline sortedPipeline = new FilterPipeline(sorters);
-        sortedPipeline.assign(directModelAdapter);
-        sortedPipeline.flush();
-        Object sortedValue = sortedPipeline.getValueAt(0, sortColumn);
-        Filter[] filters = new Filter[] {};
-        FilterPipeline pipeline = new FilterPipeline(filters);
-        pipeline.assign(directModelAdapter);
-     //   assert
-        Sorter sorter = new ShuttleSorter();
-        pipeline.setSorter(sorter);
-        assertEquals(sortedValue, sorter.getValueAt(0, sortColumn));
-        
-    }
-    public void testSorterInterposeNullPipeline() {
-        int sortColumn = 0;
-        Filter[] sorters = new Filter[] {new ShuttleSorter()};
-        FilterPipeline sortedPipeline = new FilterPipeline(sorters);
-        sortedPipeline.assign(directModelAdapter);
-        sortedPipeline.flush();
-        Object sortedValue = sortedPipeline.getValueAt(0, sortColumn);
-        Sorter sorter = new ShuttleSorter();
-        sorter.interpose(null, directModelAdapter, null);
-        assertEquals(sortedValue, sorter.getValueAt(0, sortColumn));
-    }
-   
-    public void testSorterInPipeline() {
-        Filter filter = createDefaultPatternFilter(0);
+    public void testFlushOnAssign() {
+        Filter filter = new PatternFilter(".*", 0, 0);
         FilterPipeline pipeline = new FilterPipeline(new Filter[] { filter });
         pipeline.assign(directModelAdapter);
         // JW PENDING: remove necessity to explicitly flush...
-        pipeline.flush();
         Object value = pipeline.getValueAt(0, 0);
-        Sorter sorter = new ShuttleSorter();
-        pipeline.setSorter(sorter);
-        assertEquals(pipeline.getValueAt(0, 0), sorter.getValueAt(0,0));
+        assertEquals("value access via sorter must return the same as via pipeline", 
+               value, pipeline.getValueAt(0, 0));
         
     }
 
-    /** does nothing currently. 
-     * 
-     *
-     */
-    public void testInterposeEmptyPipeline() {
-        int sortColumn = 0;
-        Filter[] filters = new Filter[] {};
-        FilterPipeline pipeline = new FilterPipeline(filters);
-        pipeline.assign(directModelAdapter);
-        pipeline.flush();
-        Object value = pipeline.getValueAt(0, sortColumn);
-        Object lastValue = pipeline.getValueAt(pipeline.getOutputSize() - 1, sortColumn);
-        // JW: Hmmm... need to test differently - the orig is unsorted
-//        Sorter sorter = new ShuttleSorter();
-//        sorter.interpose(pipeline, directModelAdapter, null);
-//        assertEquals("value must be unchanged by interactive sorter", value, sorter.getValueAt(0, sortColumn));
-//        sorter.setAscending(false);
-//        assertEquals("first value must be old last", lastValue, sorter.getValueAt(0, sortColumn));
-        
-    }
-      
     /**
      * what is the benefit of passing the old sorter?
      *
