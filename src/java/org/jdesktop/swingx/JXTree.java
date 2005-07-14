@@ -170,7 +170,8 @@ public class JXTree extends JTree {
 
     private Method getValueConversionMethod(TreeModel model) {
         try {
-            return model.getClass().getMethod("convertValueToText", methodSignature);
+            return model == null ? null :
+				model.getClass().getMethod("convertValueToText", methodSignature);
         }
         catch (NoSuchMethodException ex) {
             // not an error
