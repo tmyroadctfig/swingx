@@ -77,7 +77,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         sortableTableModel = new AncientSwingTeam();
     }
 
-    
+ 
     /**
      * sanity testing while refactoring support
      * for interactive sorter.
@@ -224,7 +224,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
      *
      */
     public void testBackwardSearch() {
-        JXTable table = new JXTable(createModel(0, 10));
+        JXTable table = new JXTable(createAscendingModel(0, 10));
         int row = 1;
         String lastName = table.getValueAt(row, 0).toString();
         int found = table.search(Pattern.compile(lastName), -1, true);
@@ -238,7 +238,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testFilterUpdateKeepsSorter() {
         int rowCount = 20;
         int firstValue = 0;
-        JXTable table = new JXTable(createModel(firstValue, rowCount));
+        JXTable table = new JXTable(createAscendingModel(firstValue, rowCount));
         table.setSorter(0);
         // sort descending
         table.setSorter(0);
@@ -270,7 +270,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         // JW: no longer valid assumption - the pipelineListener now is an 
         // implementation detail of JXTable
  //       assertEquals(table, l);
-        table.setModel(createModel(0, 20));
+        table.setModel(createAscendingModel(0, 20));
         assertEquals("pipeline listener count must not change after setModel", listenerCount, table.getFilters().getPipelineListeners().length);
         
     }
@@ -280,7 +280,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     public void testLeadFocusCell() {
         final JXTable table = new JXTable();
-        table.setModel(createModel(0, 10));
+        table.setModel(createAscendingModel(0, 10));
         // sort first column
 //        table.setSorter(0);
         // select last rows
@@ -322,7 +322,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     public void testSelectionAndToggleModel() {
         JXTable table = new JXTable();
-        table.setModel(createModel(0, 10));
+        table.setModel(createAscendingModel(0, 10));
         // sort first column
         table.setSorter(0);
         // select last rows
@@ -330,7 +330,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         // invert sort
         table.setSorter(0);
         // set model with less rows
-        table.setModel(createModel(0, 8));
+        table.setModel(createAscendingModel(0, 8));
         
     }
     
@@ -341,7 +341,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     public void testSelectionAndAddRows() {
         JXTable table = new JXTable();
-        DefaultTableModel model = createModel(0, 10);
+        DefaultTableModel model = createAscendingModel(0, 10);
         table.setModel(model);
         // sort first column
         table.setSorter(0);
@@ -362,7 +362,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     public void testSelectionAndRemoveRows() {
         JXTable table = new JXTable();
-        DefaultTableModel model = createModel(0, 10);
+        DefaultTableModel model = createAscendingModel(0, 10);
         table.setModel(model);
         // sort first column
         table.setSorter(0);
@@ -372,7 +372,95 @@ public class JXTableUnitTest extends InteractiveTestCase {
         table.setSorter(0);
         model.removeRow(0);
     }
-    
+
+    /**
+     * Issue #223
+     * 
+     * test if selection is updated on remove row above selection.
+     */
+    public void testDeleteRowAboveSelection() {
+        DefaultTableModel ascendingModel = createAscendingModel(0, 20);
+        JXTable table = new JXTable(ascendingModel);
+        int selectedRow = table.getRowCount() - 1;
+        table.setRowSelectionInterval(selectedRow, selectedRow);
+        // set a pipeline
+        table.setSorter(0);
+        // revert order - fails... track down
+//        table.setSorter(0);
+        assertEquals("last row must be selected", selectedRow, table.getSelectedRow());
+        ascendingModel.removeRow(0);
+        assertEquals("last row must still be selected after remove be selected", table.getRowCount() - 1, table.getSelectedRow());
+        
+    }
+
+    /**
+     * test if selection is updated on remove row above selection.
+     *
+     */
+    public void testDeleteRowAboveSelectionInvertedOrder() {
+        DefaultTableModel ascendingModel = createAscendingModel(0, 20);
+        JXTable table = new JXTable(ascendingModel);
+        // select the last row in view coordinates
+        int selectedRow = table.getRowCount() - 1;
+        table.setRowSelectionInterval(selectedRow, selectedRow);
+        // set a pipeline - ascending, no change
+        table.setSorter(0);
+        // revert order 
+        table.setSorter(0);
+        assertEquals("first row must be selected", 0, table.getSelectedRow());
+        // remove row in model coordinates
+        ascendingModel.removeRow(0);
+        assertEquals("first row must still be selected after remove ", 0, table.getSelectedRow());
+        
+    }
+    /**
+     * test if selection is kept if row below selection is removed.
+     *
+     */
+    public void testDeleteRowBelowSelection() {
+        DefaultTableModel ascendingModel = createAscendingModel(0, 20);
+        JXTable table = new JXTable(ascendingModel);
+        int selectedRow = 0;
+        table.setRowSelectionInterval(selectedRow, selectedRow);
+        // set a pipeline
+        table.setSorter(0);
+        // revert order - fails... track down
+//        table.setSorter(0);
+        assertEquals("first row must be selected", selectedRow, table.getSelectedRow());
+        ascendingModel.removeRow(selectedRow + 1);
+        assertEquals("first row must still be selected after remove", selectedRow, table.getSelectedRow());
+        
+    }
+
+    /**
+     * test if selection is kept if row in selection is removed.
+     *
+     */
+    public void testDeleteLastRowInSelection() {
+        DefaultTableModel ascendingModel = createAscendingModel(0, 20);
+        JXTable table = new JXTable(ascendingModel);
+        int selectedRow = 0;
+        int lastSelectedRow = 1;
+        table.setRowSelectionInterval(selectedRow, lastSelectedRow);
+        // set a pipeline
+        table.setSorter(0);
+        // revert order - fails... track down
+//        table.setSorter(0);
+        int[] selectedRows = table.getSelectedRows();
+        for (int i = selectedRow; i <= lastSelectedRow; i++) {
+            assertEquals("row must be selected " + i, i, selectedRows[i]);
+            
+        }
+        ascendingModel.removeRow(lastSelectedRow);
+        int[] selectedRowsAfter = table.getSelectedRows();
+        for (int i = selectedRow; i < lastSelectedRow; i++) {
+            assertEquals("row must be selected " + i, i, selectedRowsAfter[i]);
+            
+        }
+        assertFalse("removed row must not be selected " + lastSelectedRow, table.isRowSelected(lastSelectedRow));
+        
+    }
+
     /**
      * returns a tableModel with count rows filled with
      * ascending integers in first column
@@ -381,8 +469,12 @@ public class JXTableUnitTest extends InteractiveTestCase {
      * @param count the number of rows
      * @return
      */
-    private DefaultTableModel createModel(int startRow, int count) {
-        DefaultTableModel model = new DefaultTableModel(count, 5);
+    private DefaultTableModel createAscendingModel(int startRow, int count) {
+        DefaultTableModel model = new DefaultTableModel(count, 5) {
+            public Class getColumnClass(int column) {
+                return column == 0 ? Integer.class : super.getColumnClass(column);
+            }
+        };
         for (int i = 0; i < model.getRowCount(); i++) {
             model.setValueAt(new Integer(startRow++), i, 0);
         }

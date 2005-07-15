@@ -55,7 +55,12 @@ public class SelectionIssues extends InteractiveTestCase {
                 selectionModel.getMinSelectionIndex());
         
     }
-    
+
+
+    /**
+     * Issue #187: keep selection on filter change
+     *
+     */
     public void testKeepSelectionOnFilterChange() {
         JXTable table = new JXTable(ascendingModel);
         int selectedRow = 0;
@@ -65,6 +70,8 @@ public class SelectionIssues extends InteractiveTestCase {
         PatternFilter filter = new PatternFilter(".*", 0, 0);
         table.setFilters(new FilterPipeline(new Filter[] {filter}));
         assertEquals("table must keep selection after setting filter", selectedRow, table.getSelectedRow());
+        // add an invers sorter
+        Sorter sorter = new ShuttleSorter(0, false);
     }
 
     
@@ -85,7 +92,11 @@ public class SelectionIssues extends InteractiveTestCase {
      * @return
      */
     private DefaultTableModel createAscendingModel(int startRow, int count) {
-        DefaultTableModel model = new DefaultTableModel(count, 5);
+        DefaultTableModel model = new DefaultTableModel(count, 5) {
+            public Class getColumnClass(int column) {
+                return column == 0 ? Integer.class : super.getColumnClass(column);
+            }
+        };
         for (int i = 0; i < model.getRowCount(); i++) {
             model.setValueAt(new Integer(startRow++), i, 0);
         }
