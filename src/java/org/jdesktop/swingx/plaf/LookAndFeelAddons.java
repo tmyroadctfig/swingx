@@ -180,9 +180,6 @@ public class LookAndFeelAddons {
     String addon = WindowsClassicLookAndFeelAddons.class.getName();
 
     if (OS.isMacOSX()) {
-      // on Mac OS X, use the class Windows style. This one does not
-      // have the bug where "special" TaskPaneGroups are not
-      // correctly painted.
       addon = AquaLookAndFeelAddons.class.getName();
     } else if (OS.isWindows()) {
       // see whether of not visual styles are used
