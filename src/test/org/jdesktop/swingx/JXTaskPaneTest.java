@@ -7,17 +7,15 @@
 package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.UIManager;
 
 import org.jdesktop.swingx.icon.EmptyIcon;
-import org.jdesktop.swingx.plaf.LookAndFeelAddons;
-import org.jdesktop.swingx.plaf.aqua.AquaLookAndFeelAddons;
-import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
-import org.jdesktop.swingx.plaf.windows.WindowsClassicLookAndFeelAddons;
-import org.jdesktop.swingx.plaf.windows.WindowsLookAndFeelAddons;
 import org.jdesktop.swingx.util.PropertyChangeReport;
 
 public class JXTaskPaneTest extends InteractiveTestCase {
@@ -26,7 +24,7 @@ public class JXTaskPaneTest extends InteractiveTestCase {
     super(testTitle);
   }
 
-  public void testBean() {
+  public void testBean() throws Exception {
     PropertyChangeReport report = new PropertyChangeReport();
     JXTaskPane group = new JXTaskPane();
     group.setAnimated(false);
@@ -97,11 +95,7 @@ public class JXTaskPaneTest extends InteractiveTestCase {
     assertFalse(report.getLastNewBooleanValue());
     assertTrue(report.getLastOldBooleanValue());
     
-    try {
-      JXTaskPaneBeanInfo beanInfo = new JXTaskPaneBeanInfo(); 
-    } catch (Exception e) {
-      throw new Error(e);
-    }    
+    new JXTaskPaneBeanInfo(); 
   }
 
   public void testContentPane() {
@@ -128,13 +122,21 @@ public class JXTaskPaneTest extends InteractiveTestCase {
     assertFalse(layout == group.getLayout());
   }
   
+  public void testActions() throws Exception {
+    JXTaskPane taskPane = new JXTaskPane();    
+    Action action = new AbstractAction() {
+      public void actionPerformed(java.awt.event.ActionEvent e) {};
+    };
+    assertEquals(0, taskPane.getContentPane().getComponentCount());
+    Component component = taskPane.add(action);
+    assertEquals(taskPane.getContentPane(), component.getParent());
+    assertEquals(1, taskPane.getContentPane().getComponentCount());    
+  }
+  
   public void testAddon() throws Exception {
     // move around all addons
-    JXTaskPane group = new JXTaskPane();
-    LookAndFeelAddons.setAddon(AquaLookAndFeelAddons.class.getName());
-    LookAndFeelAddons.setAddon(MetalLookAndFeelAddons.class.getName());
-    LookAndFeelAddons.setAddon(WindowsLookAndFeelAddons.class.getName());
-    LookAndFeelAddons.setAddon(WindowsClassicLookAndFeelAddons.class.getName());
+    new JXTaskPane();
+    TestUtilities.cycleAddons();
   }
   
 }
