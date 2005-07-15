@@ -76,6 +76,7 @@ public class JXTableIssues extends InteractiveTestCase {
     /**
      * Enhancement: modifying (= filtering by resetting the content) should keep 
      * selection
+     * 
      */
     public void testModifyTableContentAndSelection() {
         CompareTableBehaviour compare = new CompareTableBehaviour(new Object[] { "A", "B", "C", "D", "E", "F", "G", "H", "I" });
@@ -104,6 +105,9 @@ public class JXTableIssues extends InteractiveTestCase {
     /**
      * Issue #223: deleting row above selection does not
      * update the view selection correctly.
+     * 
+     * fixed - PENDING: move to normal test (need to move special models as well)
+     * 
      */
     public void testDeleteRowAboveSelection() {
         CompareTableBehaviour compare = new CompareTableBehaviour(new Object[] { "A", "B", "C", "D", "E", "F", "G", "H", "I" });

@@ -45,6 +45,7 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
@@ -61,6 +62,7 @@ import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PipelineEvent;
 import org.jdesktop.swingx.decorator.PipelineListener;
+import org.jdesktop.swingx.decorator.Selection;
 import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.decorator.FilterPipeline.IdentityFilter;
 import org.jdesktop.swingx.icon.ColumnControlIcon;
@@ -737,6 +739,8 @@ public class JXTable extends JTable implements Searchable {
     /** the factory to use for column creation and configuration. */
     private ColumnFactory columnFactory;
 
+    private Selection selection;
+
     /** Opens the JXFindDialog for the table. */
     private void find() {
         if (dialog == null) {
@@ -785,25 +789,65 @@ public class JXTable extends JTable implements Searchable {
     /** ? */
     public void tableChanged(TableModelEvent e) {
         // PENDING - needs cleanup!
-        Selection   selection = new Selection(this);
-        if (filters != null) {
-            filters.flush();    // will call contentsChanged()
-        }
 //        else if (getInteractiveSorter() != null) {
 //            getInteractiveSorter().refresh();
 ////            if (isAutomaticSort()) {
 ////                sorter.refresh();
 ////            }
 //        }
-
+        getSelection().lock();
         super.tableChanged(e);
-        restoreSelection(selection);
+        updateSelection(e);
+        if (filters != null) {
+            filters.flush();    // will call updateOnFilterContentChanged()
+        }
+    }
+
+    private void updateSelection(TableModelEvent e) {
+        if (getSelectionModel().isSelectionEmpty()) {
+            getSelection().clearModelSelection();
+            return;
+        }
+        // c&p from JTable
+        // still missing: checkLeadAnchor
+        if (e.getType() == TableModelEvent.INSERT) {
+            int start = e.getFirstRow();
+            int end = e.getLastRow();
+            if (start < 0) {
+                start = 0;
+            }
+            if (end < 0) {
+                end = getModel().getRowCount() - 1;
+            }
+
+            // Adjust the selection to account for the new rows.
+            int length = end - start + 1;
+            getSelection().insertIndexInterval(start, length, true);
+
+        } else if (e.getType() == TableModelEvent.DELETE) {
+            int start = e.getFirstRow();
+            int end = e.getLastRow();
+            if (start < 0) {
+                start = 0;
+            }
+            if (end < 0) {
+                end = getModel().getRowCount() - 1;
+            }
+
+            int deletedCount = end - start + 1;
+            int previousRowCount = getModel().getRowCount() + deletedCount;
+            // Adjust the selection to account for the new rows
+            getSelection().removeIndexInterval(start, end);
+
+        }
+
     }
 
     /** ? */
     protected void updateOnFilterContentChanged() {
         //removeSorter();
-        clearSelection();
+      //  clearSelection();
+//        getSelection().restoreSelection();
         // Force private rowModel in JTable to null;
         boolean heightSet = isXTableRowHeightSet;
         setRowHeight(getRowHeight()); // Ugly!
@@ -812,6 +856,13 @@ public class JXTable extends JTable implements Searchable {
         repaint();
     }
 
+
+    private Selection getSelection() {
+        if (selection == null) {
+            selection = new Selection(filters, getSelectionModel());
+        }
+        return selection;
+    }
 
     /** returns the listener for changes in filters. */
     protected PipelineListener getFilterPipelineListener() {
@@ -970,6 +1021,7 @@ public class JXTable extends JTable implements Searchable {
         // calls tableChanged...
         // fixing #173
         clearSelection();
+        getSelection().lock();
         super.setModel(newModel);
         use(filters);
     }
@@ -986,29 +1038,29 @@ public class JXTable extends JTable implements Searchable {
     }
 
     /** ? */
-    private void restoreSelection(Selection selection) {
-        clearSelection();   // call overridden version
-
-        // RG: calculate rowCount once, not inside a loop
-        final   int rowCount = getModel().getRowCount();
-
-        for (int i = 0; i < selection.selected.length; i++) {
-            // JW: make sure we convert valid row indices (in model coordinates) only
-            // fix #16
-            int selected = selection.selected[i];
-            if ((selected != selection.lead) && (selected < rowCount)) {
-                int index = convertRowIndexToView(selection.selected[i]);
-                selectionModel.addSelectionInterval(index, index);
-            }
-        }
-
-        // JW: make sure we convert valid row indices (in model coordinates) only
-        // fix #16
-        if ((selection.lead >= 0) && (selection.lead < rowCount)) {
-            selection.lead = convertRowIndexToView(selection.lead);
-            selectionModel.addSelectionInterval(selection.lead, selection.lead);
-        }
-    }
+//    private void restoreSelection(Selection selection) {
+//        clearSelection();   // call overridden version
+//
+//        // RG: calculate rowCount once, not inside a loop
+//        final   int rowCount = getModel().getRowCount();
+//
+//        for (int i = 0; i < selection.selected.length; i++) {
+//            // JW: make sure we convert valid row indices (in model coordinates) only
+//            // fix #16
+//            int selected = selection.selected[i];
+//            if ((selected != selection.lead) && (selected < rowCount)) {
+//                int index = convertRowIndexToView(selection.selected[i]);
+//                selectionModel.addSelectionInterval(index, index);
+//            }
+//        }
+//
+//        // JW: make sure we convert valid row indices (in model coordinates) only
+//        // fix #16
+//        if ((selection.lead >= 0) && (selection.lead < rowCount)) {
+//            selection.lead = convertRowIndexToView(selection.lead);
+//            selectionModel.addSelectionInterval(selection.lead, selection.lead);
+//        }
+//    }
 
     /** Returns the FilterPipeline for the table. */
     public FilterPipeline getFilters() {
@@ -1061,7 +1113,7 @@ public class JXTable extends JTable implements Searchable {
         filters.removePipelineListener(pipelineListener);
         // hacking around -
         //brute force update of sorter by removing
-        pipelineListener.contentsChanged(null);
+//        pipelineListener.contentsChanged(null);
         return filters.getSorter();
     }
 
@@ -1073,6 +1125,7 @@ public class JXTable extends JTable implements Searchable {
         filters = pipeline;
         use(filters);
         pipeline.setSorter(sorter);
+        getSelection().setFilters(pipeline);
     }
 
     /** Returns the HighlighterPipeline assigned to the table, null if none. */
@@ -1137,9 +1190,9 @@ public class JXTable extends JTable implements Searchable {
      */
     protected void resetSorter() {
         if (getInteractiveSorter() != null) {
-            Selection selection = new Selection(this);
+//            Selection selection = new Selection(getFilters(), getSelectionModel());
             removeSorter();
-            restoreSelection(selection);
+//            selection.restoreSelection();
         }
     }
 
@@ -1148,24 +1201,42 @@ public class JXTable extends JTable implements Searchable {
      * 
      */
     private Sorter getColumnSorter(int columnIndex) {
-        TableColumn col = getColumnModel().getColumn(columnIndex);
-        if (col instanceof TableColumnExt) {
-            TableColumnExt column = (TableColumnExt) col;
+        TableColumnExt column = getColumnExt(columnIndex);
+        if (column != null) {
             return column.getSorter();
-//            Sorter  newSorter = column.getSorter();
-//            if (newSorter != null) {
-//                // JW: hacking around #167: un-assign from filters
-//                // this should be done somewhere else!
-//                // fixed in Sorter
-////                newSorter.interpose(null, getComponentAdapter(), null);
-//                // filter pipeline may be null!
-//               // newSorter.interpose(filters, getComponentAdapter(), getInteractiveSorter());  // refresh
-//                return newSorter;
-//            }
         }
-        return getInteractiveSorter();
+        return null;
     }
 
+    public void columnRemoved(TableColumnModelEvent e) {
+        // old problem: need access to removed column 
+        // to get hold of removed modelIndex 
+        // to remove interactive sorter if any 
+        // no way 
+//        int modelIndex = convertColumnIndexToModel(e.getFromIndex());
+        updateSorterAfterColumnRemoved();
+        super.columnRemoved(e);
+    }
+
+    /**
+     * 
+     *
+     */
+    private void updateSorterAfterColumnRemoved() {
+        // bloody hack: get sorter and check if there's a column with it
+        // available
+        Sorter sorter = getInteractiveSorter();
+        if (sorter != null) {
+            int sorterColumn = sorter.getColumnIndex();
+            List columns = getColumns(true);
+            for (Iterator iter = columns.iterator(); iter.hasNext();) {
+                TableColumn column = (TableColumn) iter.next();
+                if (column.getModelIndex() == sorterColumn) return;
+            }
+            // didn't find a column with the sorter's index - remove
+            resetSorter();
+        }
+    }
     /*
      * Used by headerListener.
      * 
@@ -1177,7 +1248,7 @@ public class JXTable extends JTable implements Searchable {
      */
     protected void setSorter(int columnIndex) {
         if (!isSortable()) return;
-        Selection   selection = new Selection(this);
+//        Selection   selection = new Selection(getFilters(), getSelectionModel());
         Sorter sorter = getInteractiveSorter();
 
         if ((sorter != null) && (sorter.getColumnIndex() == convertColumnIndexToModel(columnIndex))) {
@@ -1199,7 +1270,7 @@ public class JXTable extends JTable implements Searchable {
 //                sorter = refreshSorter(columnIndex);    // create and refresh
 //            }
 //        }
-        restoreSelection(selection);
+//        selection.restoreSelection();
     }
 
     /*
@@ -1219,9 +1290,15 @@ public class JXTable extends JTable implements Searchable {
     protected void removeColumns() {
         /** @todo promote this method to superclass, and
          * change createDefaultColumnsFromModel() to call this method */
-        TableColumnModel cm = getColumnModel();
-        while (cm.getColumnCount() > 0) {
-            cm.removeColumn(cm.getColumn(0));
+//        TableColumnModel cm = getColumnModel();
+//        while (cm.getColumnCount() > 0) {
+//            cm.removeColumn(cm.getColumn(0));
+//        }
+        
+        List columns = getColumns(true);
+        for (Iterator iter = columns.iterator(); iter.hasNext();) {
+            getColumnModel().removeColumn((TableColumn) iter.next());
+            
         }
     }
 
@@ -1345,11 +1422,11 @@ public class JXTable extends JTable implements Searchable {
             }
 
             // Remove any current columns
-            TableColumnModel columnModel = getColumnModel();
-            while (columnModel.getColumnCount() > 0) {
-                columnModel.removeColumn(columnModel.getColumn(0));
-            }
-
+//            TableColumnModel columnModel = getColumnModel();
+//            while (columnModel.getColumnCount() > 0) {
+//                columnModel.removeColumn(columnModel.getColumn(0));
+//            }
+            removeColumns();
             // Now add the new columns to the column model
             for (int i = 0; i < newColumns.length; i++) {
                 addColumn(newColumns[i]);
@@ -1865,22 +1942,22 @@ public class JXTable extends JTable implements Searchable {
 
     }
 
-    private static class Selection {
-        protected   final int[] selected;   // used ONLY within save/restoreSelection();
-        protected   int     lead = -1;
-        protected Selection(JXTable table) {
-            selected = table.getSelectedRows(); // in view coordinates
-            for (int i = 0; i < selected.length; i++) {
-                selected[i] = table.convertRowIndexToModel(selected[i]);    // model coordinates
-            }
-
-            if (selected.length > 0) {
-                // convert lead selection index to model coordinates
-                lead = table.convertRowIndexToModel(
-                    table.getSelectionModel().getLeadSelectionIndex());
-            }
-        }
-    }
+//    private static class Selection {
+//        protected   final int[] selected;   // used ONLY within save/restoreSelection();
+//        protected   int     lead = -1;
+//        protected Selection(JXTable table) {
+//            selected = table.getSelectedRows(); // in view coordinates
+//            for (int i = 0; i < selected.length; i++) {
+//                selected[i] = table.convertRowIndexToModel(selected[i]);    // model coordinates
+//            }
+//
+//            if (selected.length > 0) {
+//                // convert lead selection index to model coordinates
+//                lead = table.convertRowIndexToModel(
+//                    table.getSelectionModel().getLeadSelectionIndex());
+//            }
+//        }
+//    }
 
     /*
      * Default Type-based Renderers:

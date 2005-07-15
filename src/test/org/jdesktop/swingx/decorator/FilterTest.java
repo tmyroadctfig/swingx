@@ -385,7 +385,7 @@ public class FilterTest extends InteractiveTestCase {
     /**
      * ComponentAdapter directly on top of a TableModel.
      */
-    public class DirectModelAdapter extends ComponentAdapter {
+    public static class DirectModelAdapter extends ComponentAdapter {
 
         private TableModel tableModel;
 

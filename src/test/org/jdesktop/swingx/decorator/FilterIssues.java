@@ -22,6 +22,8 @@ public class FilterIssues extends FilterTest {
         Filter filter = new PatternFilter(".*", 0, 0);
         FilterPipeline pipeline = new FilterPipeline(new Filter[] { filter });
         pipeline.assign(directModelAdapter);
+        assertEquals("pipeline output size must be model count", 
+                directModelAdapter.getRowCount(), pipeline.getOutputSize());
         // JW PENDING: remove necessity to explicitly flush...
         Object value = pipeline.getValueAt(0, 0);
         assertEquals("value access via sorter must return the same as via pipeline", 

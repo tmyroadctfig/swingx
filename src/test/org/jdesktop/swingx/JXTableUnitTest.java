@@ -77,6 +77,80 @@ public class JXTableUnitTest extends InteractiveTestCase {
         sortableTableModel = new AncientSwingTeam();
     }
 
+    
+    /**
+     * sanity testing while refactoring support
+     * for interactive sorter.
+     *
+     */
+    public void testSorterToPipeline() {
+        JXTable table = new JXTable(sortableTableModel);
+        table.setSorter(0);
+        TableColumnExt columnX = table.getColumnExt(0);
+        assertEquals("interactive sorter must be same as sorter in column", 
+                columnX.getSorter(), table.getFilters().getSorter());
+        table.resetSorter();
+        assertEquals("interactive sorter must be null", null, table.getFilters().getSorter());
+    }
+    
+    /**
+     * Issue #53: interactive sorter not removed if column removed.
+     *
+     */
+    public void testSorterAfterColumnRemoved() {
+        JXTable table = new JXTable(sortableTableModel);
+        TableColumnExt columnX = table.getColumnExt(0);
+        table.setSorter(0);
+        table.removeColumn(columnX);
+        assertEquals("sorter must be removed when column removed", null, table.getFilters().getSorter());
+        
+    }
+    
+    /**
+     * interactive sorter must be active if column is hidden.
+     *
+     */
+    public void testSorterAfterColumnHidden() {
+        JXTable table = new JXTable(sortableTableModel);
+        TableColumnExt columnX = table.getColumnExt(0);
+        table.setSorter(0);
+        columnX.setVisible(false);
+        assertEquals("interactive sorter must be same as sorter in column", 
+                columnX.getSorter(), table.getFilters().getSorter());
+        
+    }
+    
+    /**
+     * Issue #54: hidden columns not removed.
+     * 
+     * NOTE: this is testing internal behaviour - don't!
+     * it bubbles up to public behaviour in setModel(), 
+     * check if anywhere else?
+     *
+     */
+    public void testRemoveAllColumns() {
+        JXTable table = new JXTable(sortableTableModel);
+        TableColumnExt columnX = table.getColumnExt(0);
+        columnX.setVisible(false);
+        table.removeColumns();
+        assertEquals("all columns must have been removed", 
+                table.getColumnCount(), table.getColumnCount(true));
+    }
+    
+    /**
+     * Issue #54: hidden columns not removed on setModel.
+     *
+     */
+    public void testRemoveAllColumsAfterModelChanged() {
+        JXTable table = new JXTable(sortableTableModel);
+        TableColumnExt columnX = table.getColumnExt(0);
+        columnX.setVisible(false);
+        table.setModel(new DefaultTableModel());
+        assertEquals("all columns must have been removed", 
+                table.getColumnCount(), table.getColumnCount(true));
+        assertEquals("sorter must be removed when column removed", null, table.getFilters().getSorter());
+    }
+    
     /**
      * testing contract of getColumnExt.
      *
@@ -84,7 +158,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testColumnExt() {
         JXTable table = new JXTable(sortableTableModel);
         /// arrgghhh... autoboxing ?
-        //Object zeroName = table.getColumn(0).getIdentifier();
+//        Object zeroName = table.getColumn(0).getIdentifier();
         Object zeroName = table.getColumnModel().getColumn(0).getIdentifier();
         Object oneName = table.getColumnModel().getColumn(1).getIdentifier();
         TableColumn column = table.getColumn(zeroName);
@@ -191,8 +265,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
         table.setFilters(new FilterPipeline(new Filter[] {noFilter}));
         int listenerCount = table.getFilters().getPipelineListeners().length;
         PipelineListener l = table.getFilters().getPipelineListeners()[listenerCount - 1];
-        // sanity assert
-        assertEquals(1, listenerCount);
+        // sanity assert - no longer 1: Selection adds listener as well
+         assertEquals(2, listenerCount);
         // JW: no longer valid assumption - the pipelineListener now is an 
         // implementation detail of JXTable
  //       assertEquals(table, l);
