@@ -1,16 +1,16 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-  <meta content="text/html; charset=ISO-8859-1"
- http-equiv="content-type">
+  <meta http-equiv="content-type"
+ content="text/html; charset=ISO-8859-1">
   <title>SwingX Todo - Summer 2005</title>
-  <meta name="author"
- content="Jeanette Winzenburg, Richard Bair, Alexander Zuev">
+  <meta content="Jeanette Winzenburg, Richard Bair, Alexander Zuev"
+ name="author">
 </head>
 <body>
 <h1>SwingX Task List</h1>
 <br>
-<table border="1" style="width: 100%;" cellpadding="2" cellspacing="2">
+<table cellspacing="2" cellpadding="2" style="width: 100%;" border="1">
   <tbody>
     <tr>
       <td style="vertical-align: top; width: 60%;">Task<br>
@@ -21,7 +21,7 @@
       </td>
     </tr>
     <tr>
-      <td colspan="3" rowspan="1">
+      <td rowspan="1" colspan="3">
       <h2>Documentation</h2>
       </td>
     </tr>
@@ -60,7 +60,7 @@ HowTo</a><br>
       </td>
     </tr>
     <tr>
-      <td colspan="3" rowspan="1">
+      <td rowspan="1" colspan="3">
       <h2>Other Meta-Issues</h2>
       </td>
     </tr>
@@ -159,7 +159,7 @@ add reusable FindModel</td>
       </td>
     </tr>
     <tr>
-      <td colspan="2" rowspan="1">* <span style="font-weight: bold;">JXTable</span></td>
+      <td rowspan="1" colspan="2">* <span style="font-weight: bold;">JXTable</span></td>
       <td style="vertical-align: top;"><br>
       </td>
     </tr>
@@ -193,7 +193,7 @@ DecoratorDemo<br>
       </td>
     </tr>
     <tr>
-      <td colspan="2" rowspan="1">- bug fixing (todo - list and
+      <td rowspan="1" colspan="2">- bug fixing (todo - list and
 prioritize most annoying misbehaviour)</td>
       <td style="vertical-align: top;"><br>
       </td>
@@ -292,11 +292,11 @@ filtering<br>
       </td>
       <td style="vertical-align: top;"><br>
       </td>
-      <td style="vertical-align: top;"><br>
+      <td style="vertical-align: top;">done<br>
       </td>
     </tr>
     <tr>
-      <td colspan="2" rowspan="1">*<span style="font-weight: bold;">
+      <td rowspan="1" colspan="2">*<span style="font-weight: bold;">
 JXTreeTable</span>
 tree method exposure (todo - list most wanted methods)</td>
       <td style="vertical-align: top;">in discussion<br>
@@ -329,7 +329,7 @@ listeners<br>
       </td>
     </tr>
     <tr>
-      <td colspan="2" rowspan="1" style="vertical-align: top;">*
+      <td style="vertical-align: top;" rowspan="1" colspan="2">*
 JXTreeTable bugs<br>
       </td>
       <td style="vertical-align: top;"><br>
@@ -499,7 +499,7 @@ VerticalLayout)</td>
       </td>
     </tr>
     <tr>
-      <td colspan="3" rowspan="1">
+      <td rowspan="1" colspan="3">
       <h2>Code - swingx.util</h2>
       </td>
     </tr>
@@ -554,7 +554,7 @@ swingx<br>
       </td>
     </tr>
     <tr>
-      <td colspan="3" rowspan="1">
+      <td rowspan="1" colspan="3">
       <h2>Code - swingx.plaf</h2>
       </td>
     </tr>
@@ -589,7 +589,7 @@ except on Mac use Glossy laf</td>
       </td>
     </tr>
     <tr>
-      <td colspan="3" rowspan="1">
+      <td rowspan="1" colspan="3">
       <h2>Code - swingx.decorator</h2>
       </td>
     </tr>
@@ -604,9 +604,10 @@ except on Mac use Glossy laf</td>
       <td style="vertical-align: top;">* try to further abstract the
 filter/sort/highlight pipelining
 functionality for re-use across "collection views" (table, list, tree)</td>
-      <td style="vertical-align: top;"><br>
+      <td style="vertical-align: top;">moved responsibility for
+interactive sorter into pipeline<br>
       </td>
-      <td style="vertical-align: top;"><br>
+      <td style="vertical-align: top;">started<br>
       </td>
     </tr>
     <tr>
@@ -621,7 +622,7 @@ to fire a state change on modification/mutation<br>
       </td>
     </tr>
     <tr>
-      <td colspan="2" rowspan="1">* bug fixing (todo - list of most
+      <td rowspan="1" colspan="2">* bug fixing (todo - list of most
 prominent misbehaviour)</td>
       <td style="vertical-align: top;"><br>
       </td>
@@ -640,12 +641,12 @@ classcastexception (fix suggested)<br>
       </td>
       <td style="vertical-align: top;"><br>
       </td>
-      <td style="vertical-align: top;">started<br>
+      <td style="vertical-align: top;">done<br>
       </td>
     </tr>
     <tr>
-      <td style="vertical-align: top;">&nbsp;check: have bug for
-mutable pipelines?<br>
+      <td style="vertical-align: top;">#218 - allow mutable pipelines
+(add/remove filters)<br>
       </td>
       <td style="vertical-align: top;"><br>
       </td>
@@ -653,7 +654,7 @@ mutable pipelines?<br>
       </td>
     </tr>
     <tr>
-      <td colspan="3" rowspan="1">
+      <td rowspan="1" colspan="3">
       <h2>Code - swingx.calendar</h2>
       </td>
     </tr>
@@ -679,7 +680,7 @@ mutable pipelines?<br>
       </td>
     </tr>
     <tr>
-      <td colspan="3" rowspan="1">
+      <td rowspan="1" colspan="3">
       <h2>Code - swingx.border</h2>
       </td>
     </tr>
@@ -699,7 +700,7 @@ width shadows</td>
       </td>
     </tr>
     <tr>
-      <td colspan="3" rowspan="1">
+      <td rowspan="1" colspan="3">
       <h2>Code - swingx.auth</h2>
       </td>
     </tr>
@@ -740,7 +741,7 @@ a file?</td>
       </td>
     </tr>
     <tr>
-      <td colspan="3" rowspan="1">
+      <td rowspan="1" colspan="3">
       <h2>Code - swingx.action</h2>
       </td>
     </tr>
@@ -782,7 +783,7 @@ of it's current 3 methods</td>
       </td>
     </tr>
     <tr>
-      <td colspan="3" rowspan="1">
+      <td rowspan="1" colspan="3">
       <h2>Code - swingx.icon</h2>
       </td>
     </tr>
@@ -817,7 +818,7 @@ of it's current 3 methods</td>
       </td>
     </tr>
     <tr>
-      <td colspan="3" rowspan="1">
+      <td rowspan="1" colspan="3">
       <h2>Thoughts</h2>
       </td>
     </tr>
