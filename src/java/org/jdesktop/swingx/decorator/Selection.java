@@ -121,7 +121,12 @@ public class Selection {
         // modelSelection should be cleared on update
         if ((lead >= 0) && (lead < rowCount)) {
             lead = convertToView(lead);
-            viewSelection.addSelectionInterval(lead, lead);
+            if (viewSelection instanceof DefaultListSelectionModel) {
+                // #223 - part d)
+                ((DefaultListSelectionModel) viewSelection).moveLeadSelectionIndex(lead);
+            } else {
+                viewSelection.addSelectionInterval(lead, lead);
+            }
         }
         viewSelection.setValueIsAdjusting(false);
         unlock();
