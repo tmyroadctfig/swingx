@@ -100,6 +100,9 @@ public class FilterPipeline {
      * This is the sorter that is installed interactively on a view by a user
      * action. 
      *
+     * This method is responsible for doing all the bookkeeping to assign/cleanup
+     * pipeline/adapter assignments. 
+     * 
      * @param sorter the interactive sorter, if any; null otherwise.
      */
     public void setSorter(Sorter sorter) {
@@ -119,9 +122,15 @@ public class FilterPipeline {
         }
     }
 
+    /**
+     * returns the interactive sorter or null if none is set.
+     * 
+     * @return
+     */
     public Sorter getSorter() {
         return sorter;
     }
+    
     /**
      * Assigns a {@link org.jdesktop.swingx.decorator.ComponentAdapter} to this
      * pipeline if no adapter has previously been assigned to the pipeline. Once an
@@ -255,11 +264,16 @@ public class FilterPipeline {
         }
     }
 
-/*
+
+    /**
+     * returns the unfiltered data adapter size or 0 if unassigned.
+     * 
+     * @return
+     */
     public int getInputSize() {
-        return adapter.getRowCount();
+        return isAssigned() ? adapter.getRowCount() : 0;
     }
-*/
+
     int getInputSize(Filter filter) {
         
         Filter  previous = previous(filter);
@@ -369,6 +383,7 @@ public class FilterPipeline {
      * registered with this pipeline.
      */
     public void flush() {
+        // JW PENDING: use first!
         if ((filters != null) && (filters.length > 0)) {
             filters[0].refresh();
         }

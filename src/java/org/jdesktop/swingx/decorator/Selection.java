@@ -101,13 +101,14 @@ public class Selection {
         viewSelection.clearSelection();
 
         // RG: calculate rowCount once, not inside a loop
-        final int rowCount = pipeline != null ? pipeline.getInputSize(pipeline.first()) : Integer.MAX_VALUE;
+        final int rowCount = pipeline != null ? pipeline.getInputSize() : Integer.MAX_VALUE;
         int[] selected = getSelectedRows(modelSelection);
         int lead = modelSelection.getLeadSelectionIndex();
         for (int i = 0; i < selected.length; i++) {
             // JW: make sure we convert valid row indices (in model coordinates)
-            // only
-            // fix #16
+            // only fix #16
+            // PENDING: check if selected >= rowCount can really happen! 
+            // modelSelection should be cleared on update
             if ((selected[i] != lead) && (selected[i] < rowCount)) {
                 int index = convertToView(selected[i]);
                 viewSelection.addSelectionInterval(index, index);
@@ -115,8 +116,9 @@ public class Selection {
         }
 
         // JW: make sure we convert valid row indices (in model coordinates)
-        // only
-        // fix #16
+        // only fix #16
+        // PENDING: check if selected >= rowCount can really happen! 
+        // modelSelection should be cleared on update
         if ((lead >= 0) && (lead < rowCount)) {
             lead = convertToView(lead);
             viewSelection.addSelectionInterval(lead, lead);
