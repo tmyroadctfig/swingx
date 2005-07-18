@@ -45,8 +45,12 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      * learning something new every day :-)
      *
      */
-    public void testDummy() {
-        
+    public void testNullModel() {
+        JXTree tree = new JXTree();
+        assertNotNull(tree.getModel());
+        tree.setModel(null);
+        assertEquals(0, tree.getRowCount());
+        // tree.getComponentAdapter().isLeaf();
     }
 
     /**
