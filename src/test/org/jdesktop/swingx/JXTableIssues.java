@@ -47,6 +47,45 @@ public class JXTableIssues extends InteractiveTestCase {
     }
 
     /**
+     * Issue #223 - part d)
+     * 
+     * test if selection is cleared after receiving a dataChanged.
+     * Need to specify behaviour: lead/anchor of selectionModel are 
+     * not changed in clearSelection(). So modelSelection has old 
+     * lead which is mapped as a selection in the view (may be out-of 
+     * range). Hmmm...
+     * 
+     */
+    public void testSelectionAfterDataChanged() {
+        DefaultTableModel ascendingModel = createAscendingModel(0, 20, 5, false);
+        JXTable table = new JXTable(ascendingModel);
+        int selectedRow = table.getRowCount() - 1;
+        table.setRowSelectionInterval(selectedRow, selectedRow);
+        // sanity
+        assertEquals("last row must be selected", selectedRow, table.getSelectedRow());
+        ascendingModel.fireTableDataChanged();
+        assertEquals("selection must be cleared", -1, table.getSelectedRow());
+        
+    }
+
+    /**
+     * Issue #223 - part d)
+     * 
+     * test if selection is cleared after receiving a dataChanged.
+     * 
+     */
+    public void testCoreTableSelectionAfterDataChanged() {
+        DefaultTableModel ascendingModel = createAscendingModel(0, 20, 5, false);
+        JTable table = new JTable(ascendingModel);
+        int selectedRow = table.getRowCount() - 1;
+        table.setRowSelectionInterval(selectedRow, selectedRow);
+        // sanity
+        assertEquals("last row must be selected", selectedRow, table.getSelectedRow());
+        ascendingModel.fireTableDataChanged();
+        assertEquals("selection must be cleared", -1, table.getSelectedRow());
+        
+    }
+    /**
      * Issue #119: Exception if sorter on last column and setting
      * model with fewer columns.
      * 
@@ -228,6 +267,26 @@ public class JXTableIssues extends InteractiveTestCase {
         JFrame frame = wrapInFrame(box, "delete below selection");
         frame.setVisible(true);
         
+        
+    }
+    
+    public void interactiveDataChanged() {
+        final DefaultTableModel model = createAscendingModel(0, 10, 5, false);
+        JXTable xtable = new JXTable(model);
+        xtable.setRowSelectionInterval(0, 0);
+        JTable table = new JTable(model);
+        table.setRowSelectionInterval(0, 0);
+        AbstractAction action = new AbstractAction("fire dataChanged") {
+
+            public void actionPerformed(ActionEvent e) {
+                model.fireTableDataChanged();
+                
+            }
+            
+        };
+        JFrame frame = wrapWithScrollingInFrame(xtable, table, "selection after data changed");
+        addAction(frame, action);
+        frame.setVisible(true);
         
     }
     private JComponent createContent(CompareTableBehaviour compare, Action action) {

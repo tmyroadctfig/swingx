@@ -359,6 +359,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         model.addRow(new Object[] { highestValue });
         assertEquals(highestValue, table.getValueAt(0, 0));
     }
+
     
     /**
      * Issue #16: removing row throws ArrayIndexOOB if
@@ -390,8 +391,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
         table.setRowSelectionInterval(selectedRow, selectedRow);
         // set a pipeline
         table.setSorter(0);
-        // revert order - fails... track down
-//        table.setSorter(0);
         assertEquals("last row must be selected", selectedRow, table.getSelectedRow());
         ascendingModel.removeRow(0);
         assertEquals("last row must still be selected after remove be selected", table.getRowCount() - 1, table.getSelectedRow());
@@ -399,6 +398,50 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
     /**
+     * Issue #223
+     * 
+     * test if selection is updated on add row above selection.
+     */
+    public void testAddRowAboveSelection() {
+        DefaultTableModel ascendingModel = createAscendingModel(0, 20);
+        JXTable table = new JXTable(ascendingModel);
+        int selectedRow = table.getRowCount() - 1;
+        table.setRowSelectionInterval(selectedRow, selectedRow);
+        assertEquals("last row must be selected", selectedRow, table.getSelectedRow());
+        ascendingModel.insertRow(0, new Object[table.getColumnCount()]);
+        assertEquals("last row must still be selected after add above", table.getRowCount() - 1, table.getSelectedRow());
+        
+    }
+
+    /**
+     * Issue #223
+     * test if selection is updated on add row above selection.
+     *
+     */
+    public void testAddRowAboveSelectionInvertedOrder() {
+        DefaultTableModel ascendingModel = createAscendingModel(0, 20);
+        JXTable table = new JXTable(ascendingModel);
+        // select the last row in view coordinates
+        int selectedRow = table.getRowCount() - 1;
+        table.setRowSelectionInterval(selectedRow, selectedRow);
+        // set a pipeline - ascending, no change
+        table.setSorter(0);
+        // revert order 
+        table.setSorter(0);
+        assertEquals("first row must be selected", 0, table.getSelectedRow());
+        // remove row in model coordinates
+        Object[] row = new Integer[table.getColumnCount()];
+        // insert high value
+        row[0] = new Integer(100);
+        ascendingModel.addRow(row);
+        // selection must be moved one below
+        assertEquals("selection must be incremented by one ", 1, table.getSelectedRow());
+        
+    }
+
+    
+    /**
+     * Issue #223
      * test if selection is updated on remove row above selection.
      *
      */
@@ -419,6 +462,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         
     }
     /**
+     * Issue #223
      * test if selection is kept if row below selection is removed.
      *
      */
@@ -438,6 +482,26 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
     /**
+     * Issue #223
+     * test if selection is kept if row below selection is removed.
+     *
+     */
+    public void testDeleteRowBelowSelectionInvertedOrder() {
+        DefaultTableModel ascendingModel = createAscendingModel(0, 20);
+        JXTable table = new JXTable(ascendingModel);
+        int selectedRow = 0;
+        table.setRowSelectionInterval(selectedRow, selectedRow);
+        // set a pipeline
+        table.setSorter(0);
+        // revert order - fails... track down
+        table.setSorter(0);
+        assertEquals("last row must be selected", table.getRowCount() - 1, table.getSelectedRow());
+        ascendingModel.removeRow(selectedRow + 1);
+        assertEquals("last row must still be selected after remove", table.getRowCount() - 1, table.getSelectedRow());
+        
+    }
+    /**
+     * Issue #223
      * test if selection is kept if row in selection is removed.
      *
      */
@@ -449,8 +513,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
         table.setRowSelectionInterval(selectedRow, lastSelectedRow);
         // set a pipeline
         table.setSorter(0);
-        // revert order - fails... track down
-//        table.setSorter(0);
         int[] selectedRows = table.getSelectedRows();
         for (int i = selectedRow; i <= lastSelectedRow; i++) {
             assertEquals("row must be selected " + i, i, selectedRows[i]);
