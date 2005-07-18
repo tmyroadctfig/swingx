@@ -7,13 +7,6 @@
 
 package org.jdesktop.swingx;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.event.ActionEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -21,36 +14,21 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import javax.swing.AbstractAction;
-import javax.swing.AbstractButton;
-import javax.swing.Action;
 import javax.swing.Icon;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
-import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
-import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PatternFilter;
-import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.PipelineListener;
-import org.jdesktop.swingx.decorator.RolloverHighlighter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
-import org.jdesktop.swingx.table.ColumnHeaderRenderer;
+import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.util.AncientSwingTeam;
 
@@ -77,7 +55,20 @@ public class JXTableUnitTest extends InteractiveTestCase {
         sortableTableModel = new AncientSwingTeam();
     }
 
- 
+    /**
+     * Issue #119: Exception if sorter on last column and setting
+     * model with fewer columns.
+     * 
+     * JW: related to #53-swingx - sorter not removed on column removed. 
+     *
+     */
+    public void testInteractiveSorterOnModelChange() {
+        JXTable table = new JXTable(sortableTableModel);
+        int columnCount = table.getColumnCount();
+        table.setSorter(columnCount - 1);
+        table.setModel(new DefaultTableModel(10, columnCount - 1));
+        assertEquals(null, table.getFilters().getSorter());
+    }
     /**
      * sanity testing while refactoring support
      * for interactive sorter.
@@ -94,7 +85,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
     
     /**
-     * Issue #53: interactive sorter not removed if column removed.
+     * Issue #53-swingx: interactive sorter not removed if column removed.
      *
      */
     public void testSorterAfterColumnRemoved() {
@@ -121,7 +112,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
     
     /**
-     * Issue #54: hidden columns not removed.
+     * Issue #54-swingx: hidden columns not removed.
      * 
      * NOTE: this is testing internal behaviour - don't!
      * it bubbles up to public behaviour in setModel(), 
@@ -313,7 +304,21 @@ public class JXTableUnitTest extends InteractiveTestCase {
         });
     }
     
-
+    /**
+     * Issue #33-swingx: selection not restored after refresh of interactive sorter.
+     *
+     */
+    public void testSelectionOnSorterRefresh() {
+        JXTable table = new JXTable(createAscendingModel(0, 10));
+        table.setSorter(0);
+        Sorter sorter = table.getSorter(0);
+        // sanity assert
+        assertTrue(sorter.isAscending());
+        // select the first row
+        table.setRowSelectionInterval(0, 0);
+        sorter.setAscending(false);
+        assertEquals("last row must be selected", table.getRowCount() - 1, table.getSelectedRow());
+    }
     /**
      * Issue #173: 
      * ArrayIndexOOB if replacing model with one containing
@@ -470,7 +475,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
      * @return
      */
     private DefaultTableModel createAscendingModel(int startRow, int count) {
-        DefaultTableModel model = new DefaultTableModel(count, 5) {
+        DefaultTableModel model = new DefaultTableModel(count, 4) {
             public Class getColumnClass(int column) {
                 return column == 0 ? Integer.class : super.getColumnClass(column);
             }
@@ -617,19 +622,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
     
-//    public void testLinkCellType() {
-//        JXTable table = new JXTable(tableModel);
-//
-//        assertEquals(LinkModel.class,
-//                     table.getColumnClass(DynamicTableModel.IDX_COL_LINK));
-//
-//        TableCellRenderer renderer = table.getCellRenderer(0,
-//            DynamicTableModel.IDX_COL_LINK);
-//
-//        // XXX note: this should be a LinkCellRenderer LinkRenderer is not public.
-//        //      assertEquals(renderer.getClass(),
-//        //             org.jdesktop.swing.table.TableCellRenderers$LinkRenderer.class);
-//    }
 
     /**
      * Issue #167: IllegalStateException if re-setting filter while
