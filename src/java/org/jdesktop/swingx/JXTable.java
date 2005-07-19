@@ -331,6 +331,7 @@ public class JXTable extends JTable implements Searchable {
     /** Initializes the table for use. */
     protected void init() {
         setSortable(true);
+        // guarantee getFilters() to return != null
         setFilters(null);
         initActions();
         // instantiate row height depending on font size
@@ -636,7 +637,10 @@ public class JXTable extends JTable implements Searchable {
         return 4;
     }
 
-    /** Notifies the table that a new column has been selected. */
+    /** Notifies the table that a new column has been selected. 
+     *  overridden to update the enabled state of the packSelected
+     *  action.
+     */
     public void columnSelectionChanged(ListSelectionEvent e) {
         super.columnSelectionChanged(e);
         if (e.getValueIsAdjusting())
@@ -649,13 +653,16 @@ public class JXTable extends JTable implements Searchable {
         }
     }
 
-    /** ? */
+    /** 
+     * overridden to update the show horizontal scrollbar action's
+     * selected state. 
+     */
     public void setAutoResizeMode(int mode) {
         super.setAutoResizeMode(mode);
-        Action packSelected = getActionMap().get(
+        Action showHorizontal = getActionMap().get(
                 HORIZONTALSCROLL_ACTION_COMMAND);
-        if (packSelected instanceof BoundAction) {
-            ((BoundAction) packSelected)
+        if (showHorizontal instanceof BoundAction) {
+            ((BoundAction) showHorizontal)
                     .setSelected(isHorizontalScrollEnabled());
         }
     }
@@ -670,9 +677,9 @@ public class JXTable extends JTable implements Searchable {
     @Override public int getRowCount() {
         // RG: If there are no filters, call superclass version rather than
         // accessing model directly
-        // JW: change pipeline to calculate outputsize on flush only.
-        return ((filters == null) || !filters.isAssigned()) ? super
-                .getRowCount() : filters.getOutputSize();
+        return filters == null ?
+//        return ((filters == null) || !filters.isAssigned()) ? 
+                super.getRowCount() : filters.getOutputSize();
     }
 
     public boolean isHierarchical(int column) {
@@ -732,7 +739,7 @@ public class JXTable extends JTable implements Searchable {
         // JW: need to clear here because super.setModel
         // calls tableChanged...
         // fixing #173
-        clearSelection();
+//        clearSelection();
         getSelection().lock();
         super.setModel(newModel);
         // JW: PENDING - needs cleanup, probably much simpler now...
@@ -747,17 +754,18 @@ public class JXTable extends JTable implements Searchable {
         getSelection().lock();
         super.tableChanged(e);
         updateSelection(e);
+        use(filters);
         // JW: this is for the sake of the very first call to setModel, done in
         // super on instantiation - at that time filters cannot be set
         // because they will be re-initialized to null 
         // ... arrrgggg
-        if (filters != null) {
-            filters.flush(); // will call updateOnFilterContentChanged()
-        } else {
-            // not really needed... we reach this branch only on the
-            // very first super.setModel()
-            getSelection().restoreSelection();
-        }
+//        if (filters != null) {
+//            filters.flush(); // will call updateOnFilterContentChanged()
+//        } else {
+//            // not really needed... we reach this branch only on the
+//            // very first super.setModel()
+//            getSelection().restoreSelection();
+//        }
     }
 
     /**
@@ -818,9 +826,9 @@ public class JXTable extends JTable implements Searchable {
     
     /** Returns the FilterPipeline for the table. */
     public FilterPipeline getFilters() {
-        if (filters == null) {
-            filters = new FilterPipeline();
-        }
+        // PENDING: this is guaranteed to be != null because
+        // init calls setFilters(null) which enforces an empty
+        // pipeline
         return filters;
     }
 
@@ -835,15 +843,14 @@ public class JXTable extends JTable implements Searchable {
             if (initialUse(pipeline)) {
                 pipeline.addPipelineListener(getFilterPipelineListener());
                 pipeline.assign(getComponentAdapter());
+            } else {
+                pipeline.flush();
             }
-            pipeline.flush();
         }
     }
 
     /**
      * 
-     * @param pipeline
-     *            must be != null
      * @return true is not yet used in this JXTable, false otherwise
      */
     private boolean initialUse(FilterPipeline pipeline) {
@@ -859,31 +866,19 @@ public class JXTable extends JTable implements Searchable {
 
     /** Sets the FilterPipeline for filtering table rows. */
     public void setFilters(FilterPipeline pipeline) {
-        Sorter sorter = unsetFilters();
-        doSetFilters(pipeline, sorter);
-    }
-
-    /** ? */
-    private Sorter unsetFilters() {
-        if (filters == null)
-            return null;
-        // fix#125: cleanup old filters
-        filters.removePipelineListener(pipelineListener);
-        // hacking around -
-        // brute force update of sorter by removing
-        // pipelineListener.contentsChanged(null);
-        return filters.getSorter();
-    }
-
-    /** ? */
-    private void doSetFilters(FilterPipeline pipeline, Sorter sorter) {
+        FilterPipeline old = getFilters();
+        Sorter sorter = null;
+        if (old != null) {
+            old.removePipelineListener(pipelineListener);
+            sorter = old.getSorter();
+        }
         if (pipeline == null) {
             pipeline = new FilterPipeline();
         }
         filters = pipeline;
+        filters.setSorter(sorter);
+        getSelection().setFilters(filters);
         use(filters);
-        pipeline.setSorter(sorter);
-        getSelection().setFilters(pipeline);
     }
 
 
@@ -937,14 +932,15 @@ public class JXTable extends JTable implements Searchable {
         if (sortable == isSortable())
             return;
         this.sortable = sortable;
+        if (!isSortable()) resetSorter();
         firePropertyChange("sortable", !sortable, sortable);
         // JW @todo: this is a hack!
         // check if the sortable/not sortable toggling still works with the
         // sorter in pipeline
-        if (getInteractiveSorter() != null) {
-            updateOnFilterContentChanged();
-        }
-
+//        if (getInteractiveSorter() != null) {
+//            updateOnFilterContentChanged();
+//        }
+//
     }
 
     /** Returns true if the table is sortable. */
@@ -982,7 +978,7 @@ public class JXTable extends JTable implements Searchable {
      * 
      */
     protected void resetSorter() {
-        // JW PENDING: think about notification instead of manually repaint.
+        // JW PENDING: think about notification instead of manual repaint.
         setInteractiveSorter(null);
         getTableHeader().repaint();
     }
@@ -1033,7 +1029,7 @@ public class JXTable extends JTable implements Searchable {
         Sorter sorter = getInteractiveSorter();
 
         if ((sorter != null)
-                && (sorter.getColumnIndex() == convertColumnIndexToModel(columnIndex))) {
+            && (sorter.getColumnIndex() == convertColumnIndexToModel(columnIndex))) {
             sorter.toggle();
         } else {
             TableColumnExt column = getColumnExt(columnIndex);
