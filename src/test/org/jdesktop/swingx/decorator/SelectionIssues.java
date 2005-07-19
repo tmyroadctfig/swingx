@@ -30,6 +30,7 @@ public class SelectionIssues extends InteractiveTestCase {
     private TableModel ascendingModel;
     protected ComponentAdapter ascendingModelAdapter;
 
+    
     public void testSelectionNullPipeline() {
         ListSelectionModel selectionModel = new DefaultListSelectionModel();
         selectionModel.setSelectionInterval(0, 0);
@@ -37,14 +38,35 @@ public class SelectionIssues extends InteractiveTestCase {
         selection.restoreSelection();
         assertTrue("selection must be retained", selectionModel.isSelectedIndex(0));
     }
-    
+ 
+    public void testLeadSelectionSetPipeline() {
+        ListSelectionModel selectionModel = new DefaultListSelectionModel();
+        // select first in "model" coordinates
+        int index0 = 0;
+        int lead = 2;
+        int index1 = 4;
+        selectionModel.addSelectionInterval(index0, index0);
+        selectionModel.addSelectionInterval(index1, index1);
+        selectionModel.addSelectionInterval(lead, lead);
+        assertEquals("lead is last selected", lead, selectionModel.getLeadSelectionIndex());
+        FilterPipeline pipeline = new FilterPipeline();
+        // descending sorter
+        pipeline.setSorter(new ShuttleSorter(0, false));
+        pipeline.assign(ascendingModelAdapter);
+//        pipeline.flush();
+        Selection selection = new Selection(pipeline, selectionModel);
+        assertEquals("lead selection must be last added", 
+                pipeline.convertRowIndexToView(lead), 
+                selectionModel.getLeadSelectionIndex());
+    }
+
     public void testSelectionSetPipeline() {
         ListSelectionModel selectionModel = new DefaultListSelectionModel();
         FilterPipeline pipeline = new FilterPipeline();
         // descending sorter
         pipeline.setSorter(new ShuttleSorter(0, false));
         pipeline.assign(ascendingModelAdapter);
-        pipeline.flush();
+//        pipeline.flush();
         // select first in model coordinates
         int index = 0;
         selectionModel.setSelectionInterval(index, index);

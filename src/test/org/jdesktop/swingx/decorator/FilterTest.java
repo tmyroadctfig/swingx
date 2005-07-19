@@ -20,6 +20,7 @@ import javax.swing.table.TableModel;
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.util.AncientSwingTeam;
+import org.jdesktop.swingx.util.PipelineReport;
 
 public class FilterTest extends InteractiveTestCase {
 
@@ -29,7 +30,45 @@ public class FilterTest extends InteractiveTestCase {
     
     private TableModel tableModel;
     protected ComponentAdapter directModelAdapter;
+    private PipelineReport pipelineReport;
 
+    public void testPipelineEventOnSameSorter() {
+        FilterPipeline pipeline = new FilterPipeline();
+        pipeline.assign(directModelAdapter);
+//        pipeline.flush();
+        pipeline.addPipelineListener(pipelineReport);
+        Sorter sorter = new ShuttleSorter();
+        pipeline.setSorter(sorter);
+        assertEquals("pipeline must have fired on setSorter", 1, pipelineReport.getEventCount());
+        pipelineReport.clear();
+        pipeline.setSorter(sorter);
+        assertEquals("pipeline must not have fired on same setSorter", 0, pipelineReport.getEventCount());
+        
+    }
+
+    public void testPipelineEventOnSetSorter() {
+        FilterPipeline pipeline = new FilterPipeline();
+        pipeline.assign(directModelAdapter);
+//        pipeline.flush();
+        pipeline.addPipelineListener(pipelineReport);
+        pipeline.setSorter(new ShuttleSorter());
+        assertEquals("pipeline must have fired on setSorter", 1, pipelineReport.getEventCount());
+        pipelineReport.clear();
+        pipeline.setSorter(null);
+        assertEquals("pipeline must have fired on setSorter null", 1, pipelineReport.getEventCount());
+        
+    }
+    public void testPipelineEventOnSetSorterUnassigned() {
+        FilterPipeline pipeline = new FilterPipeline();
+        pipeline.addPipelineListener(pipelineReport);
+        pipeline.setSorter(new ShuttleSorter());
+        assertEquals("pipeline must not fire if unassigned", 0, pipelineReport.getEventCount());
+        pipelineReport.clear();
+        pipeline.setSorter(null);
+        assertEquals("pipeline must not fire if unassigned", 0, pipelineReport.getEventCount());
+        
+    }
+    
     /**
      * Issue #45-swingx:
      * interpose should throw if trying to interpose to a pipeline
@@ -40,7 +79,7 @@ public class FilterTest extends InteractiveTestCase {
         int sortColumn = 0;
         FilterPipeline pipeline = new FilterPipeline();
         pipeline.assign(directModelAdapter);
-        pipeline.flush();
+//        pipeline.flush();
         Object value = pipeline.getValueAt(0, sortColumn);
         Object lastValue = pipeline.getValueAt(pipeline.getOutputSize() - 1, sortColumn);
         Sorter sorter = new ShuttleSorter();
@@ -67,7 +106,7 @@ public class FilterTest extends InteractiveTestCase {
         int sortColumn = 0;
         FilterPipeline pipeline = new FilterPipeline();
         pipeline.assign(directModelAdapter);
-        pipeline.flush();
+//        pipeline.flush();
         Object value = pipeline.getValueAt(0, sortColumn);
         Object lastValue = pipeline.getValueAt(pipeline.getOutputSize() - 1, sortColumn);
         Sorter sorter = new ShuttleSorter();
@@ -123,7 +162,7 @@ public class FilterTest extends InteractiveTestCase {
         Filter[] sorters = new Filter[] {new ShuttleSorter()};
         FilterPipeline sortedPipeline = new FilterPipeline(sorters);
         sortedPipeline.assign(directModelAdapter);
-        sortedPipeline.flush();
+//        sortedPipeline.flush();
         Object sortedValue = sortedPipeline.getValueAt(0, sortColumn);
         // prepare the empty pipeline with associated sorter
         FilterPipeline pipeline = new FilterPipeline();
@@ -145,7 +184,7 @@ public class FilterTest extends InteractiveTestCase {
         Filter[] sorters = new Filter[] {new ShuttleSorter()};
         FilterPipeline sortedPipeline = new FilterPipeline(sorters);
         sortedPipeline.assign(directModelAdapter);
-        sortedPipeline.flush();
+//        sortedPipeline.flush();
         Object sortedValue = sortedPipeline.getValueAt(0, sortColumn);
         // prepare the stand-alone sorter
         Sorter sorter = new ShuttleSorter();
@@ -162,7 +201,7 @@ public class FilterTest extends InteractiveTestCase {
         FilterPipeline pipeline = new FilterPipeline(new Filter[] { filter });
         pipeline.assign(directModelAdapter);
         // JW PENDING: remove necessity to explicitly flush...
-        pipeline.flush();
+//        pipeline.flush();
         Object value = pipeline.getValueAt(0, 0);
         Sorter sorter = new ShuttleSorter();
         pipeline.setSorter(sorter);
@@ -183,7 +222,7 @@ public class FilterTest extends InteractiveTestCase {
         Filter[] filters = new Filter[] {filter, new ShuttleSorter()};
         FilterPipeline pipeline = new FilterPipeline(filters);
         pipeline.assign(directModelAdapter);
-        pipeline.flush();
+//        pipeline.flush();
         Object value = pipeline.getValueAt(0, sortColumn);
         Object lastValue = pipeline.getValueAt(pipeline.getOutputSize() - 1, sortColumn);
         Sorter sorter = new ShuttleSorter();
@@ -196,7 +235,7 @@ public class FilterTest extends InteractiveTestCase {
         Filter[] otherFilters = new Filter[] {other};
         FilterPipeline otherPipeline = new FilterPipeline(otherFilters);
         otherPipeline.assign(directModelAdapter);
-        otherPipeline.flush();
+//        otherPipeline.flush();
         // the interactive sorter is flexible - can be moved from one 
         // pipeline to the other
         sorter.interpose(otherPipeline, directModelAdapter, null);
@@ -221,7 +260,7 @@ public class FilterTest extends InteractiveTestCase {
     public void testDirectComponentAdapterAccess() {
         FilterPipeline pipeline = createPipeline();
         pipeline.assign(directModelAdapter);
-        pipeline.flush();
+//        pipeline.flush();
         assertTrue("pipeline must have filtered values", pipeline.getOutputSize() < directModelAdapter.getRowCount());
 //        List lastNames = new ArrayList();
 //        List colors = new ArrayList();
@@ -380,6 +419,7 @@ public class FilterTest extends InteractiveTestCase {
         super.setUp();
         tableModel = new AncientSwingTeam();
         directModelAdapter = new DirectModelAdapter(tableModel);
+        pipelineReport = new PipelineReport();
      }
 
     /**

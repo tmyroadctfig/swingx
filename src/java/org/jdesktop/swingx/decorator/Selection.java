@@ -98,35 +98,26 @@ public class Selection {
     public void restoreSelection() {
         lock();
         viewSelection.setValueIsAdjusting(true);
+        // JW - hmm... clearSelection doesn't reset the lead/anchor. Why not?
         viewSelection.clearSelection();
 
-        // RG: calculate rowCount once, not inside a loop
-        final int rowCount = pipeline != null ? pipeline.getInputSize() : Integer.MAX_VALUE;
+//        checking for model boundary coordinates was a quick hack for #16
+        // should be solved in the overhaul
+//        final int rowCount = pipeline != null ? pipeline.getInputSize() : Integer.MAX_VALUE;
         int[] selected = getSelectedRows(modelSelection);
-        int lead = modelSelection.getLeadSelectionIndex();
         for (int i = 0; i < selected.length; i++) {
-            // JW: make sure we convert valid row indices (in model coordinates)
-            // only fix #16
-            // PENDING: check if selected >= rowCount can really happen! 
-            // modelSelection should be cleared on update
-            if ((selected[i] != lead) && (selected[i] < rowCount)) {
-                int index = convertToView(selected[i]);
-                viewSelection.addSelectionInterval(index, index);
-            }
+          int index = convertToView(selected[i]);
+          // index might be -1, but then addSelectionInterval ignores it. 
+          viewSelection.addSelectionInterval(index, index);
         }
-
-        // JW: make sure we convert valid row indices (in model coordinates)
-        // only fix #16
-        // PENDING: check if selected >= rowCount can really happen! 
-        // modelSelection should be cleared on update
-        if ((lead >= 0) && (lead < rowCount)) {
-            lead = convertToView(lead);
-//            if (viewSelection instanceof DefaultListSelectionModel) {
-//                // #223 - part d)
-//                ((DefaultListSelectionModel) viewSelection).moveLeadSelectionIndex(lead);
-//            } else {
-                viewSelection.addSelectionInterval(lead, lead);
-//            }
+        int lead = modelSelection.getLeadSelectionIndex();
+        lead = convertToView(lead);
+        if (viewSelection instanceof DefaultListSelectionModel) {
+            ((DefaultListSelectionModel) viewSelection).moveLeadSelectionIndex(lead);
+        } else {
+            // PENDING: not tested, don't have a non-DefaultXX handy
+            viewSelection.removeSelectionInterval(lead, lead);
+            viewSelection.addSelectionInterval(lead, lead);
         }
         viewSelection.setValueIsAdjusting(false);
         unlock();
@@ -150,18 +141,26 @@ public class Selection {
         modelSelection.clearSelection();
         
     }
+
+    public void insertIndexInterval(int start, int length, boolean before) {
+        modelSelection.insertIndexInterval(start, length, before);
+        
+    }
+
+    public void removeIndexInterval(int start, int end) {
+        modelSelection.removeIndexInterval(start, end);
+        
+    }
+
     
     private void mapTowardsModel() {
         // if (!pipeline.isAssigned()) return;
         modelSelection.clearSelection();
-        int[] selected = getSelectedRows(viewSelection); // in view
-                                                            // coordinates
+        int[] selected = getSelectedRows(viewSelection); 
         for (int i = 0; i < selected.length; i++) {
             int modelIndex = convertToModel(selected[i]);
-            modelSelection.addSelectionInterval(modelIndex, modelIndex); // model
-                                                                            // coordinates
+            modelSelection.addSelectionInterval(modelIndex, modelIndex); 
         }
-//        lead = selected.length > 0 ? convertToModel(viewSelection.getLeadSelectionIndex()) : -1;
         if (selected.length > 0) {
             // convert lead selection index to model coordinates
             modelSelection.moveLeadSelectionIndex(convertToModel(viewSelection.getLeadSelectionIndex()));
@@ -220,16 +219,5 @@ public class Selection {
         }
         return viewSelectionListener;
     }
-
-    public void insertIndexInterval(int start, int length, boolean before) {
-        modelSelection.insertIndexInterval(start, length, before);
-        
-    }
-
-    public void removeIndexInterval(int start, int end) {
-        modelSelection.removeIndexInterval(start, end);
-        
-    }
-
 
 }

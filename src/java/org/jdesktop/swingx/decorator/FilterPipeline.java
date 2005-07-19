@@ -107,8 +107,8 @@ public class FilterPipeline {
      */
     public void setSorter(Sorter sorter) {
         Sorter oldSorter = getSorter();
+        if (oldSorter == sorter) return;
         if (oldSorter != null) {
-           // oldSorter.releasePipeline();
             oldSorter.assign((FilterPipeline) null);
         }
         this.sorter = sorter;
@@ -119,6 +119,9 @@ public class FilterPipeline {
                 sorter.assign(adapter);
                 sorter.refresh();
             }
+        } 
+        if ((sorter == null) && isAssigned()) { 
+            fireContentsChanged();
         }
     }
 
@@ -157,6 +160,7 @@ public class FilterPipeline {
             if (sorter != null) {
                 sorter.assign(adapter);
             }
+            flush();
         }
         else if (this.adapter != adapter){
             throw new IllegalStateException("Can't bind to a different adapter");
@@ -274,29 +278,25 @@ public class FilterPipeline {
         return isAssigned() ? adapter.getRowCount() : 0;
     }
 
+    /**
+     * PRE: isAssigned()
+     * @param filter
+     * @return
+     */
     int getInputSize(Filter filter) {
         
         Filter  previous = previous(filter);
-        if (previous == null) {
-            return adapter.getRowCount();
-        }
-        else {
+        if (previous != null) {
             return previous.getSize();
         }
-//        if (contains(filter)) {
-//            Filter  previous = previous(filter);
-//            if (previous == null) {
-//                return adapter.getRowCount();
-//            }
-//            else {
-//                return previous.getSize();
-//            }
+        return adapter.getRowCount();
+//        Filter  previous = previous(filter);
+//        if (previous == null) {
+//            return adapter.getRowCount();
 //        }
-//        else if (filter.getPipeline() == this) {
-//            return getOutputSize();
+//        else {
+//            return previous.getSize();
 //        }
-//
-//        return 0;
     }
 
     /**
@@ -305,15 +305,11 @@ public class FilterPipeline {
      * @return the number of records in the filtered view
      */
     public int getOutputSize() {
+//        if (!isAssigned()) return 0;
         Filter last = last();
         return (last == null) ? adapter.getRowCount() : last.getSize();
     }
 
-/*
-    public int getOutputSize(Filter filter) {
-        return (isMember(filter)) ? filter.getSize() : 0;
-    }
-*/
     /**
      * Convert row index from view coordinates to model coordinates
      * accounting for the presence of sorters and filters. This is essentially
