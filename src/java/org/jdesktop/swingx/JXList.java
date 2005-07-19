@@ -45,7 +45,7 @@ public class JXList extends JList {
     private ChangeListener highlighterChangeListener;
 
     // MUST ALWAYS ACCESS dataAdapter through accessor method!!!
-    private final ComponentAdapter dataAdapter = new ListAdapter(this);
+    protected ComponentAdapter dataAdapter;
 
     /**
      * Mouse/Motion/Listener keeping track of mouse moved in
@@ -274,7 +274,9 @@ public class JXList extends JList {
 
 
     protected ComponentAdapter getComponentAdapter() {
-        // MUST ALWAYS ACCESS dataAdapter through accessor method!!!
+        if (dataAdapter == null) {
+            dataAdapter = new ListAdapter(this);
+        }
         return dataAdapter;
     }
 

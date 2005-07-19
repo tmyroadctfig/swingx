@@ -850,12 +850,10 @@ public class JXTable extends JTable implements Searchable {
     }
 
     /**
-     * 
      * @return true is not yet used in this JXTable, false otherwise
      */
     private boolean initialUse(FilterPipeline pipeline) {
-        if (pipelineListener == null)
-            return true;
+        if (pipelineListener == null) return true;
         PipelineListener[] l = pipeline.getPipelineListeners();
         for (int i = 0; i < l.length; i++) {
             if (pipelineListener.equals(l[i]))
@@ -901,12 +899,12 @@ public class JXTable extends JTable implements Searchable {
     }
 
 
-    /** ? */
+    /** 
+     * method called on change notification from filterpipeline.
+     */
     protected void updateOnFilterContentChanged() {
         // Force private rowModel in JTable to null;
-        boolean heightSet = isXTableRowHeightSet;
-        setRowHeight(getRowHeight()); // Ugly!
-        isXTableRowHeightSet = heightSet;
+        adminSetRowHeight(getRowHeight());
         revalidate();
         repaint();
     }
@@ -1903,6 +1901,17 @@ public class JXTable extends JTable implements Searchable {
         }
 
     }
+
+    /**
+     * calling setRowHeight for internal reasons.
+     * Keeps the isXTableRowHeight unchanged.
+     */
+    protected void adminSetRowHeight(int rowHeight) {
+        boolean heightSet = isXTableRowHeightSet;
+        setRowHeight(rowHeight); // Ugly!
+        isXTableRowHeightSet = heightSet;
+    }
+
 
     private void updateEditorUI(Object value) {
         // maybe null or proxyValue

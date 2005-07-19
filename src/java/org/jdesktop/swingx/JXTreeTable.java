@@ -174,9 +174,10 @@ public class JXTreeTable extends JXTable {
         // We must reconcile the differences in the semantics of rowHeight as
         // understood by JTable and JTree by overriding both setRowHeight() and
         // setRowMargin();
-        boolean heightSet = isXTableRowHeightSet;
-        setRowHeight(getRowHeight()); // call overridden setRowHeight()
-        isXTableRowHeightSet = heightSet;
+        adminSetRowHeight(getRowHeight());
+//        boolean heightSet = isXTableRowHeightSet;
+//        setRowHeight(getRowHeight()); // call overridden setRowHeight()
+//        isXTableRowHeightSet = heightSet;
         setRowMargin(getRowMargin()); // call overridden setRowMargin()
 
     }
@@ -372,9 +373,10 @@ public class JXTreeTable extends JXTable {
         // We must reconcile the differences in the semantics of rowHeight as
         // understood by JTable and JTree by overriding both setRowHeight() and
         // setRowMargin();
-        boolean rememberRowHeightSet = isXTableRowHeightSet;
-        setRowHeight(getRowHeight()); // call overridden setRowHeight()
-        isXTableRowHeightSet = rememberRowHeightSet;
+        adminSetRowHeight(getRowHeight());
+        //        boolean rememberRowHeightSet = isXTableRowHeightSet;
+//        setRowHeight(getRowHeight()); // call overridden setRowHeight()
+//        isXTableRowHeightSet = rememberRowHeightSet;
         setRowMargin(getRowMargin()); // call overridden setRowMargin()
     }
 
@@ -1509,9 +1511,10 @@ public class JXTreeTable extends JXTable {
                     assert tableRowMargin >= 0;
                     final int tableRowHeight = rowHeight - (tableRowMargin << 1);
                     if (treeTable.getRowHeight() != tableRowHeight) {
-                        boolean heightSet = treeTable.isXTableRowHeightSet;
-                        treeTable.setRowHeight(tableRowHeight);
-                        treeTable.isXTableRowHeightSet = heightSet;
+                        treeTable.adminSetRowHeight(tableRowHeight);
+//                        boolean heightSet = treeTable.isXTableRowHeightSet;
+//                        treeTable.setRowHeight(tableRowHeight);
+//                        treeTable.isXTableRowHeightSet = heightSet;
                     }
                 }
             }
