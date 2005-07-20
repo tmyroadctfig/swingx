@@ -24,43 +24,43 @@ import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
 
-
 /**
  * JXList
- *
- * Enabled Rollover/LinkModel handling.
- * Enabled Highlighter support.
+ * 
+ * Enabled Rollover/LinkModel handling. Enabled Highlighter support.
  * 
  * @author Ramesh Gupta
  * @author Jeanette Winzenburg
  */
 public class JXList extends JList {
+    
+    /** The pipeline holding the filters. */
+    protected FilterPipeline filters;
+
     /**
-     * Array of {@link Highlighter} objects that will be used to highlight
-     * the cell renderer for this component.
+     * The pipeline holding the highlighters.
      */
-    protected FilterPipeline filters = null;
-    protected HighlighterPipeline highlighters = null;
+    protected HighlighterPipeline highlighters;
+
     /** listening to changeEvents from highlighterPipeline. */
     private ChangeListener highlighterChangeListener;
 
-    // MUST ALWAYS ACCESS dataAdapter through accessor method!!!
+    /** The ComponentAdapter for model data access. */
     protected ComponentAdapter dataAdapter;
 
     /**
-     * Mouse/Motion/Listener keeping track of mouse moved in
-     * cell coordinates.
+     * Mouse/Motion/Listener keeping track of mouse moved in cell coordinates.
      */
     private RolloverProducer rolloverProducer;
 
     /**
-     * RolloverController: listens to cell over events and
-     * repaints entered/exited rows.
+     * RolloverController: listens to cell over events and repaints
+     * entered/exited rows.
      */
     private LinkController linkController;
-    
+
+    /** A wrapper around the default renderer enabling decoration. */
     private DelegatingRenderer delegatingRenderer;
-    
 
     public JXList() {
     }
@@ -76,15 +76,18 @@ public class JXList extends JList {
     public JXList(Vector listData) {
         super(listData);
     }
+
     /**
-     * Property to enable/disable rollover support. This can be enabled
-     * to show "live" rollover behaviour, f.i. the cursor over LinkModel cells. 
-     * Default is disabled.
+     * Property to enable/disable rollover support. This can be enabled to show
+     * "live" rollover behaviour, f.i. the cursor over LinkModel cells. Default
+     * is disabled.
+     * 
      * @param rolloverEnabled
      */
     public void setRolloverEnabled(boolean rolloverEnabled) {
         boolean old = isRolloverEnabled();
-        if (rolloverEnabled == old) return;
+        if (rolloverEnabled == old)
+            return;
         if (rolloverEnabled) {
             rolloverProducer = new RolloverProducer();
             addMouseListener(rolloverProducer);
@@ -103,6 +106,7 @@ public class JXList extends JList {
 
     /**
      * returns the rolloverEnabled property.
+     * 
      * @return
      */
     public boolean isRolloverEnabled() {
@@ -116,163 +120,29 @@ public class JXList extends JList {
         } else {
             // JW: think - need to revert?
         }
-            
-    }
-    
-    private DelegatingRenderer getDelegatingRenderer() {
-        if (delegatingRenderer == null) {
-            // only called once... to get hold of the default?
-            delegatingRenderer = new DelegatingRenderer(super.getCellRenderer());
-        }
-        return delegatingRenderer;
+
     }
 
-    public ListCellRenderer getCellRenderer() {
-        return getDelegatingRenderer();
-    }
+    // ---------------------------- filters
 
-    public void setCellRenderer(ListCellRenderer renderer) {
-        // JW: Pending - probably fires propertyChangeEvent with wrong newValue?
-        // how about fixedCellWidths? 
-        // need to test!!
-        getDelegatingRenderer().setDelegateRenderer(renderer);
-        super.setCellRenderer(delegatingRenderer);
-    }
- 
-    
-    private class DelegatingRenderer implements ListCellRenderer {
-
-        private LinkRenderer linkRenderer;
-        private ListCellRenderer delegateRenderer;
-        
-        public DelegatingRenderer(ListCellRenderer delegate) {
-            setDelegateRenderer(delegate);
-        }
-
-        public void setDelegateRenderer(ListCellRenderer delegate) {
-            if (delegate == null) {
-                delegate = new DefaultListCellRenderer();
-            }
-            delegateRenderer = delegate;
-        }
-        
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            Component comp = null;
-          
-            if (value instanceof LinkModel) {
-                comp =  getLinkRenderer().getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            } else { 
-                comp = delegateRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            } 
-            if (highlighters != null) {
-                ComponentAdapter adapter = getComponentAdapter();
-                adapter.column = 0;
-                adapter.row = index;
-                comp = highlighters.apply(comp, adapter);
-            }
-            return comp;
-        }
-
-
-        private LinkRenderer getLinkRenderer() {
-            if (linkRenderer == null) {
-                linkRenderer = new LinkRenderer();
-            }
-            return linkRenderer;
-        }
-
-        public void setLinkVisitor(ActionListener linkVisitor) {
-            getLinkRenderer().setVisitingDelegate(linkVisitor);
-            
-        }
-
-
-        public void updateUI() {
-            updateRendererUI(linkRenderer);
-            updateRendererUI(delegateRenderer);
-        }
-
-
-        private void updateRendererUI(ListCellRenderer renderer) {
-            if (renderer instanceof JComponent) {
-                ((JComponent) renderer).updateUI();
-            } else if (renderer != null){
-                Component comp = renderer.getListCellRendererComponent(JXList.this, null, 
-                        -1, false, false);
-                if (comp instanceof JComponent) {
-                    ((JComponent) comp).updateUI();
-                }
-            }
-            
-        }
-        
-        
-        
-    }
-    
-    
-    public void updateUI() {
-        super.updateUI();
-        updateRendererUI();
-    }
-    
-    private void updateRendererUI() {
-        if (delegatingRenderer != null) {
-            delegatingRenderer.updateUI();
-        } else {
-            ListCellRenderer renderer = getCellRenderer();
-            if (renderer instanceof JComponent) {
-                ((JComponent) renderer).updateUI();
-            }
-        }
-        
-        
-    }
-
+//    public ListModel getWrappedModel() {
+//        return wrappedModel != null ? wrappedModel.getModel() : getModel();
+//    }
     public FilterPipeline getFilters() {
         return filters;
     }
 
     public void setFilters(FilterPipeline pipeline) {
-        /**@todo setFilters
-        TableModel	model = getModel();
-        adjustListeners(pipeline, model, model);
-		*/
+        /**
+         * @todo setFilters TableModel model = getModel();
+         *       adjustListeners(pipeline, model, model);
+         */
         filters = pipeline;
     }
 
-    public HighlighterPipeline getHighlighters() {
-        return highlighters;
-    }
+    // ---------------------------- uniform data model
 
-    /** Assigns a HighlighterPipeline to the table. */
-    public void setHighlighters(HighlighterPipeline pipeline) {
-        HighlighterPipeline old = getHighlighters();
-        if (old != null) {
-            old.removeChangeListener(getHighlighterChangeListener());
-        }
-        highlighters = pipeline;
-        if (highlighters != null) {
-            highlighters.addChangeListener(getHighlighterChangeListener());
-        }
-        firePropertyChange("highlighters", old, getHighlighters());
-    }
-
-    private ChangeListener getHighlighterChangeListener() {
-        if (highlighterChangeListener == null) {
-            highlighterChangeListener = new ChangeListener() {
-
-                public void stateChanged(ChangeEvent e) {
-                    repaint();
-                    
-                }
-                
-            };
-        }
-        return highlighterChangeListener;
-    }
-
-
+    // MUST ALWAYS ACCESS dataAdapter through accessor method!!!
     protected ComponentAdapter getComponentAdapter() {
         if (dataAdapter == null) {
             dataAdapter = new ListAdapter(this);
@@ -280,15 +150,15 @@ public class JXList extends JList {
         return dataAdapter;
     }
 
-
     protected static class ListAdapter extends ComponentAdapter {
-        private final JXList	list;
+        private final JXList list;
 
         /**
-         * Constructs a <code>ListDataAdapter</code> for the specified
-         * target component.
-         *
-         * @param component the target component
+         * Constructs a <code>ListDataAdapter</code> for the specified target
+         * component.
+         * 
+         * @param component
+         *            the target component
          */
         public ListAdapter(JXList component) {
             super(component);
@@ -297,7 +167,7 @@ public class JXList extends JList {
 
         /**
          * Typesafe accessor for the target component.
-         *
+         * 
          * @return the target component as a {@link javax.swing.JList}
          */
         public JXList getList() {
@@ -326,14 +196,14 @@ public class JXList extends JList {
         public Object getFilteredValueAt(int row, int column) {
             /** @todo Implement getFilteredValueAt */
             return getValueAt(row, column);
-//            throw new UnsupportedOperationException(
-//                "Method getFilteredValueAt() not yet implemented.");
+            // throw new UnsupportedOperationException(
+            // "Method getFilteredValueAt() not yet implemented.");
         }
 
         public void setValueAt(Object aValue, int row, int column) {
             /** @todo Implement getFilteredValueAt */
             throw new UnsupportedOperationException(
-                "Method getFilteredValueAt() not yet implemented.");
+                    "Method getFilteredValueAt() not yet implemented.");
         }
 
         public boolean isCellEditable(int row, int column) {
@@ -358,4 +228,143 @@ public class JXList extends JList {
         }
 
     }
+    // ------------------------------ renderers
+
+    public HighlighterPipeline getHighlighters() {
+        return highlighters;
+    }
+
+    /** Assigns a HighlighterPipeline to the table. */
+    public void setHighlighters(HighlighterPipeline pipeline) {
+        HighlighterPipeline old = getHighlighters();
+        if (old != null) {
+            old.removeChangeListener(getHighlighterChangeListener());
+        }
+        highlighters = pipeline;
+        if (highlighters != null) {
+            highlighters.addChangeListener(getHighlighterChangeListener());
+        }
+        firePropertyChange("highlighters", old, getHighlighters());
+    }
+
+    private ChangeListener getHighlighterChangeListener() {
+        if (highlighterChangeListener == null) {
+            highlighterChangeListener = new ChangeListener() {
+
+                public void stateChanged(ChangeEvent e) {
+                    repaint();
+                }
+
+            };
+        }
+        return highlighterChangeListener;
+    }
+
+    private DelegatingRenderer getDelegatingRenderer() {
+        if (delegatingRenderer == null) {
+            // only called once... to get hold of the default?
+            delegatingRenderer = new DelegatingRenderer(super.getCellRenderer());
+        }
+        return delegatingRenderer;
+    }
+
+    public ListCellRenderer getCellRenderer() {
+        return getDelegatingRenderer();
+    }
+
+    public void setCellRenderer(ListCellRenderer renderer) {
+        // JW: Pending - probably fires propertyChangeEvent with wrong newValue?
+        // how about fixedCellWidths?
+        // need to test!!
+        getDelegatingRenderer().setDelegateRenderer(renderer);
+        super.setCellRenderer(delegatingRenderer);
+    }
+
+    private class DelegatingRenderer implements ListCellRenderer {
+
+        private LinkRenderer linkRenderer;
+
+        private ListCellRenderer delegateRenderer;
+
+        public DelegatingRenderer(ListCellRenderer delegate) {
+            setDelegateRenderer(delegate);
+        }
+
+        public void setDelegateRenderer(ListCellRenderer delegate) {
+            if (delegate == null) {
+                delegate = new DefaultListCellRenderer();
+            }
+            delegateRenderer = delegate;
+        }
+
+        public Component getListCellRendererComponent(JList list, Object value,
+                int index, boolean isSelected, boolean cellHasFocus) {
+            Component comp = null;
+
+            if (value instanceof LinkModel) {
+                comp = getLinkRenderer().getListCellRendererComponent(list,
+                        value, index, isSelected, cellHasFocus);
+            } else {
+                comp = delegateRenderer.getListCellRendererComponent(list,
+                        value, index, isSelected, cellHasFocus);
+            }
+            if (highlighters != null) {
+                ComponentAdapter adapter = getComponentAdapter();
+                adapter.column = 0;
+                adapter.row = index;
+                comp = highlighters.apply(comp, adapter);
+            }
+            return comp;
+        }
+
+        private LinkRenderer getLinkRenderer() {
+            if (linkRenderer == null) {
+                linkRenderer = new LinkRenderer();
+            }
+            return linkRenderer;
+        }
+
+        public void setLinkVisitor(ActionListener linkVisitor) {
+            getLinkRenderer().setVisitingDelegate(linkVisitor);
+
+        }
+
+        public void updateUI() {
+            updateRendererUI(linkRenderer);
+            updateRendererUI(delegateRenderer);
+        }
+
+        private void updateRendererUI(ListCellRenderer renderer) {
+            if (renderer instanceof JComponent) {
+                ((JComponent) renderer).updateUI();
+            } else if (renderer != null) {
+                Component comp = renderer.getListCellRendererComponent(
+                        JXList.this, null, -1, false, false);
+                if (comp instanceof JComponent) {
+                    ((JComponent) comp).updateUI();
+                }
+            }
+
+        }
+
+    }
+
+    // --------------------------- updateUI
+
+    public void updateUI() {
+        super.updateUI();
+        updateRendererUI();
+    }
+
+    private void updateRendererUI() {
+        if (delegatingRenderer != null) {
+            delegatingRenderer.updateUI();
+        } else {
+            ListCellRenderer renderer = getCellRenderer();
+            if (renderer instanceof JComponent) {
+                ((JComponent) renderer).updateUI();
+            }
+        }
+    }
+
 }
