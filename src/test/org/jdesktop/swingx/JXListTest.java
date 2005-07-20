@@ -6,9 +6,12 @@ package org.jdesktop.swingx;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
@@ -19,25 +22,120 @@ import org.jdesktop.swingx.action.EditorPaneLinkVisitor;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.ConditionalHighlighter;
+import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
+import org.jdesktop.swingx.decorator.ShuttleSorter;
+import org.jdesktop.swingx.decorator.Sorter;
 
 /**
- * @author (C) 2004 Jeanette Winzenburg, Berlin
- * @version $Revision$ - $Date$
+ * @author Jeanette Winzenburg
  */
 public class JXListTest extends InteractiveTestCase {
 
     private ListModel listModel;
+    private DefaultListModel ascendingListModel;
 
-    public void testDummy() {
+    public void testEmptyFilter() {
+        JXList list = new JXList();
+        list.setModel(ascendingListModel);
+        assertEquals(ascendingListModel.getSize(), list.getModelSize());
+        assertEquals(ascendingListModel.getElementAt(0), list.getElementAt(0));
+    }
+    
+    public void testFilterEnabled() {
+        JXList list = new JXList();
+        list.setFilterEnabled(true);
+        list.setModel(ascendingListModel);
+        assertNotSame(ascendingListModel, list.getModel());
+        assertEquals(ascendingListModel.getSize(), list.getModelSize());
+        assertEquals(ascendingListModel.getElementAt(0), list.getElementAt(0));
         
     }
-    public JXListTest() {
-        super("JXList Tests");
+
+    public void testFilterEnabledAndDisabled() {
+        JXList list = new JXList();
+        list.setFilterEnabled(true);
+        list.setModel(ascendingListModel);
+        Sorter sorter = new ShuttleSorter(0, false);
+        FilterPipeline pipeline = list.getFilters();
+        pipeline.setSorter(sorter);
+        list.setFilterEnabled(false);
+        assertSame(ascendingListModel, list.getModel());
+        assertEquals(ascendingListModel.getSize(), list.getModelSize());
+        assertEquals(ascendingListModel.getElementAt(0), list.getElementAt(0));
+        
+    }
+    public void testSortingFilterEnabled() {
+        JXList list = new JXList();
+        list.setFilterEnabled(true);
+        list.setModel(ascendingListModel);
+        Sorter sorter = new ShuttleSorter(0, false);
+        FilterPipeline pipeline = list.getFilters();
+        assertNotNull(pipeline);
+        pipeline.setSorter(sorter);
+        assertEquals(ascendingListModel.getSize(), list.getModelSize());
+        assertEquals(ascendingListModel.getElementAt(0), list.getElementAt(list.getModelSize() - 1));
+        
+    }
+    
+    public void testSortingKeepsModelSelection() {
+        JXList list = new JXList();
+        list.setFilterEnabled(true);
+        list.setModel(ascendingListModel);
+        list.setSelectedIndex(0);
+        Sorter sorter = new ShuttleSorter(0, false);
+        FilterPipeline pipeline = list.getFilters();
+        pipeline.setSorter(sorter);
+        assertEquals("last row must be selected after sorting", 
+                ascendingListModel.getSize() - 1, list.getSelectedIndex());
     }
 
+    public void testSelectionAfterDeleteAbove() {
+        JXList list = new JXList();
+        list.setFilterEnabled(true);
+        list.setModel(ascendingListModel);
+        list.setSelectedIndex(1);
+        ascendingListModel.remove(0);
+        assertEquals("first row must be selected removing old first", 
+                0, list.getSelectedIndex());
+        
+    }
+    public void testSortingFilterDisabled() {
+        JXList list = new JXList();
+        list.setModel(ascendingListModel);
+        Sorter sorter = new ShuttleSorter(0, false);
+        FilterPipeline pipeline = list.getFilters();
+        assertNotNull(pipeline);
+        pipeline.setSorter(sorter);
+        assertSame(ascendingListModel, list.getModel());
+        assertEquals(ascendingListModel.getSize(), list.getModelSize());
+        assertEquals(ascendingListModel.getElementAt(0), list.getElementAt(0));
+        
+    }
+
+    public void interactiveTestSorter() {
+        JXList list = new JXList();
+        list.setFilterEnabled(true);
+        list.setModel(ascendingListModel);
+        final Sorter sorter = new ShuttleSorter(0, false);
+        FilterPipeline pipeline = list.getFilters();
+        pipeline.setSorter(sorter);
+        Action action = new AbstractAction("Toggle Sort Order") {
+
+            public void actionPerformed(ActionEvent e) {
+                sorter.setAscending(!sorter.isAscending());
+                
+            }
+            
+        };
+        JFrame frame = wrapWithScrollingInFrame(list, "Toggle sorter");
+        addAction(frame, action);
+        frame.setVisible(true);
+        
+    }
+    
     public void interactiveTestCompareFocusedCellBackground() {
         JXList xlist = new JXList(listModel);
         xlist.setBackground(new Color(0xF5, 0xFF, 0xF5));
@@ -116,7 +214,14 @@ public class JXListTest extends InteractiveTestCase {
         return new DefaultComboBoxModel(list.getActionMap().allKeys());
     }
 
-    private ListModel createListModelWithLinks() {
+    private DefaultListModel createAscendingListModel(int startRow, int count) {
+        DefaultListModel l = new DefaultListModel();
+        for (int row = startRow; row < startRow  + count; row++) {
+            l.addElement(new Integer(row));
+        }
+        return l;
+    }
+    private DefaultListModel createListModelWithLinks() {
         DefaultListModel model = new DefaultListModel();
         for (int i = 0; i < 20; i++) {
             try {
@@ -139,7 +244,12 @@ public class JXListTest extends InteractiveTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         listModel = createListModel();
+        ascendingListModel = createAscendingListModel(0, 20);
     }
+    public JXListTest() {
+        super("JXList Tests");
+    }
+
     
     public static void main(String[] args) {
         setSystemLF(true);
