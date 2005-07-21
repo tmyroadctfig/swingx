@@ -279,17 +279,18 @@ public class FilterPipeline {
     }
 
     /**
-     * PRE: isAssigned()
      * @param filter
      * @return
      */
     int getInputSize(Filter filter) {
-        
         Filter  previous = previous(filter);
         if (previous != null) {
             return previous.getSize();
         }
-        return adapter.getRowCount();
+        // fixed issue #64-swingx - removed precondition... (was: isAssigned())
+        return getInputSize();
+//        return adapter.getRowCount();
+//        return getInputSize();
 //        Filter  previous = previous(filter);
 //        if (previous == null) {
 //            return adapter.getRowCount();
@@ -305,7 +306,10 @@ public class FilterPipeline {
      * @return the number of records in the filtered view
      */
     public int getOutputSize() {
-//        if (!isAssigned()) return 0;
+        // don't need to check - but that's heavily dependent on the
+        // implementation detail that there's always the identityFilter
+        // (which might change any time)
+        if (!isAssigned()) return 0;
         Filter last = last();
         return (last == null) ? adapter.getRowCount() : last.getSize();
     }

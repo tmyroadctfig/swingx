@@ -253,6 +253,11 @@ public class FilterTest extends InteractiveTestCase {
         FilterPipeline pipeline = new FilterPipeline(filters);
         assertEquals(0, pipeline.getOutputSize());
     }
+
+    public void testUnassignedEmptyFilter() {
+        FilterPipeline filters = new FilterPipeline();
+        assertEquals(0, filters.getOutputSize());
+    }
     /**
      * test paranoia
      *

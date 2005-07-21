@@ -56,6 +56,17 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
     /**
+     * Issue #64-swingx: setFilters(null) throws NPE if has selection.
+     *
+     */
+    public void testSetNullFilters() {
+        JXTable table = new JXTable(sortableTableModel);
+        table.setRowSelectionInterval(0, 0);
+        table.setFilters(null);
+        assertEquals("selected row must be unchanged", 0, table.getSelectedRow());
+    }
+    
+    /**
      * Issue #119: Exception if sorter on last column and setting
      * model with fewer columns.
      * 
