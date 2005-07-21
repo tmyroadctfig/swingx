@@ -171,6 +171,10 @@ public class DateSpan {
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean equals(Object o) {
         if (o == this) {
             return true;
@@ -182,6 +186,10 @@ public class DateSpan {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int hashCode() {
         int result = 17;
         result = 37 * result + (int)(_start ^ (_start >>> 32));
@@ -189,6 +197,10 @@ public class DateSpan {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toString() {
         return "DateSpan [" + getStartAsDate() + "-" + getEndAsDate() + "]";
     }

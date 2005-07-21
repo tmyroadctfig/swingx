@@ -26,6 +26,7 @@ public class JXDatePickerFormatterFactory extends AbstractFormatterFactory {
     /**
      * {@inheritDoc}
      */
+    @Override
     public AbstractFormatter getFormatter(JFormattedTextField ftf) {
         if (formatter == null) {
             formatter = new JXDatePickerFormatter();
@@ -82,6 +83,7 @@ public class JXDatePickerFormatterFactory extends AbstractFormatterFactory {
         /**
          * {@inheritDoc}
          */
+        @Override
         public Object stringToValue(String text) throws ParseException {
             Object result = null;
             ParseException pex = null;
@@ -96,7 +98,7 @@ public class JXDatePickerFormatterFactory extends AbstractFormatterFactory {
             if (result == null) {
                 for (int i = 0; i < _formats.length; i++) {
                     try {
-                        result = ((SimpleDateFormat)_formats[i]).parse(text);
+                        result = _formats[i].parse(text);
 
                         // We got a successful formatter.  Update the current
                         // formatter index.
@@ -119,7 +121,8 @@ public class JXDatePickerFormatterFactory extends AbstractFormatterFactory {
         /**
          * {@inheritDoc}
          */
-        public String valueToString(Object value) throws ParseException {
+        @Override
+        public String valueToString(Object value) {
             if (value != null) {
                 return _formats[_formatIndex].format(value);
             }

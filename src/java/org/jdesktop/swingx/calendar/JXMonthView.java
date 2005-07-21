@@ -151,9 +151,6 @@ public class JXMonthView extends JComponent {
     /** For multiple selection we need to record the date we pivot around. */
     private long _pivotDate = -1;
 
-    /** Bounds of the selected date including its visual border. */
-    private Rectangle _selectedDateRect = new Rectangle();
-
     /** The number of calendars able to be displayed horizontally. */
     private int _numCalCols = 1;
 
@@ -220,6 +217,7 @@ public class JXMonthView extends JComponent {
         // Set up calendar instance.
         _cal = Calendar.getInstance(getLocale());
         _cal.setFirstDayOfWeek(_firstDayOfWeek);
+        _cal.setMinimalDaysInFirstWeek(1);
 
         // Keep track of today.
         _cal.set(Calendar.HOUR_OF_DAY, 0);
@@ -772,6 +770,8 @@ public class JXMonthView extends JComponent {
     /**
      * Sets the color used to draw the bounding box around today.  The default
      * is the background of the <code>JXMonthView</code> component.
+     * 
+     * @param c color to set
      */
     public void setTodayBackground(Color c) {
         _todayBackgroundColor = c;
@@ -790,6 +790,8 @@ public class JXMonthView extends JComponent {
     /**
      * Sets the color used to draw the background of the month string.  The
      * default is <code>138, 173, 209 (Blue-ish)</code>.
+     *
+     * @param c color to set
      */
     public void setMonthStringBackground(Color c) {
         _monthStringBackground = c;
@@ -808,6 +810,8 @@ public class JXMonthView extends JComponent {
     /**
      * Sets the color used to draw the foreground of the month string.  The
      * default is <code>Color.WHITE</code>.
+     *
+     * @param c color to set
      */
     public void setMonthStringForeground(Color c) {
         _monthStringForeground = c;
@@ -817,6 +821,8 @@ public class JXMonthView extends JComponent {
     /**
      * Sets the color used to draw the foreground of each day of the week. These
      * are the titles
+     *
+     * @param c color to set
      */
     public void setDaysOfTheWeekForeground(Color c) {
         _daysOfTheWeekForeground = c;
@@ -1075,6 +1081,7 @@ public class JXMonthView extends JComponent {
      *
      * @return Dimension Minimum size.
      */
+    @Override
     public Dimension getMinimumSize() {
         return getPreferredSize();
     }
@@ -1084,6 +1091,7 @@ public class JXMonthView extends JComponent {
      *
      * @return Dimension Preferred size.
      */
+    @Override
     public Dimension getPreferredSize() {
         updateIfNecessary();
         return new Dimension(_dim);
@@ -1094,6 +1102,7 @@ public class JXMonthView extends JComponent {
      *
      * @return Dimension Maximum size.
      */
+    @Override
     public Dimension getMaximumSize() {
         return new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
@@ -1112,6 +1121,7 @@ public class JXMonthView extends JComponent {
      *
      * @param border Border.
      */
+    @Override
     public void setBorder(Border border) {
         super.setBorder(border);
         _dirty = true;
@@ -1127,6 +1137,7 @@ public class JXMonthView extends JComponent {
      * @param width The new width of this component
      * @param height The new height of this component
      */
+    @Override
     public void setBounds(int x, int y, int width, int height) {
         super.setBounds(x, y, width, height);
 
@@ -1140,6 +1151,7 @@ public class JXMonthView extends JComponent {
      *
      * @param r The new bounding rectangle for this component
      */
+    @Override
     public void setBounds(Rectangle r) {
         setBounds(r.x, r.y, r.width, r.height);
     }
@@ -1157,6 +1169,7 @@ public class JXMonthView extends JComponent {
      *
      * @param o The component orientation.
      */
+    @Override
     public void setComponentOrientation(ComponentOrientation o) {
         super.setComponentOrientation(o);
         _ltr = o.isLeftToRight();
@@ -1170,6 +1183,7 @@ public class JXMonthView extends JComponent {
      * @param font The font to become this component's font; if this parameter
      * is null then this component will inherit the font of its parent.
      */
+    @Override
     public void setFont(Font font) {
         super.setFont(font);
         _dirty = true;
@@ -1178,6 +1192,7 @@ public class JXMonthView extends JComponent {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void removeNotify() {
         _todayTimer.stop();
         super.removeNotify();
@@ -1186,6 +1201,7 @@ public class JXMonthView extends JComponent {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addNotify() {
         super.addNotify();
 
@@ -1217,6 +1233,7 @@ public class JXMonthView extends JComponent {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void paintComponent(Graphics g) {
         Object oldAAValue = null;
         Graphics2D g2 = (g instanceof Graphics2D) ? (Graphics2D)g : null;
@@ -1631,16 +1648,6 @@ public class JXMonthView extends JComponent {
         int month = _cal.get(Calendar.MONTH);
         int dayOfWeek = _cal.get(Calendar.DAY_OF_WEEK);
         int weekOfMonth = _cal.get(Calendar.WEEK_OF_MONTH);
-
-        // It is possible that the week of month is 0.  We only
-        // deal with values greater than 0.  Modify the value depending
-        // on the week of month the first day falls in.
-        // TODO: This is an annoying check to do every time.  We might
-        // want to find another way to accomplish this in the future.
-        long origDate = _cal.getTimeInMillis();
-        _cal.set(Calendar.DAY_OF_MONTH, 1);
-        weekOfMonth -= _cal.get(Calendar.WEEK_OF_MONTH);
-        _cal.setTimeInMillis(origDate);
         
         // Determine what row/column we are in.
         int diffMonths = month - _firstDisplayedMonth +
@@ -1674,7 +1681,8 @@ public class JXMonthView extends JComponent {
                 (_calendarHeight + CALENDAR_SPACING);
 
         // Offset for Week of the Month.
-        bounds.y += weekOfMonth * (_boxPaddingY + _boxHeight + _boxPaddingY);
+        bounds.y += (weekOfMonth - 1) *
+                (_boxPaddingY + _boxHeight + _boxPaddingY);
 
         bounds.width = _boxPaddingX + _boxWidth + _boxPaddingX;
         bounds.height = _boxPaddingY + _boxHeight + _boxPaddingY;
@@ -1762,6 +1770,8 @@ public class JXMonthView extends JComponent {
      * traversing the month was pressed.  This method should only be
      * called when <code>setTraversable</code> is set to true.
      *
+     * @param x x position of the pointer
+     * @param y y position of the pointer
      * @return MONTH_UP, MONTH_DOWN or -1 when no button is selected.
      */
     protected int getTraversableButtonAt(int x, int y) {
@@ -1890,6 +1900,7 @@ public class JXMonthView extends JComponent {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void processMouseEvent(MouseEvent e) {
         if (!isEnabled()) {
             return;
@@ -1964,6 +1975,7 @@ public class JXMonthView extends JComponent {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void processMouseMotionEvent(MouseEvent e) {
         if (!isEnabled() || _selectionMode == NO_SELECTION) {
             return;

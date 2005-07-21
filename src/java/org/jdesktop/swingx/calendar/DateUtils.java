@@ -108,6 +108,8 @@ public class DateUtils {
      *
      * @param time Base time
      * @param amount Amount of increment.
+     * 
+     * @return the <var>time</var> + <var>amount</var> days
      */
     public static long addDays(long time, int amount) {
         Calendar calendar = CALENDAR;
@@ -181,9 +183,13 @@ public class DateUtils {
        return  getDaysDiff(t1, t2, true);
     }
 
-    /*
-     * This methods returns true if the date passed in is the
-     * first day of the year.
+    /**
+     * Check, whether the date passed in is the first day of the year.
+     *
+     * @param date date to check in millis
+     * @return <code>true</code> if <var>date</var> corresponds to the first
+     *         day of a year
+     * @see Date#getTime() 
      */
     public static boolean isFirstOfYear(long date) {
         boolean ret = false;
@@ -199,9 +205,13 @@ public class DateUtils {
         return ret;
     }
 
-    /*
-     * This methods returns true if the date passed in is the
-     * first day of the month.
+    /**
+     * Check, whether the date passed in is the first day of the month.
+     *
+     * @param date date to check in millis
+     * @return <code>true</code> if <var>date</var> corresponds to the first
+     *         day of a month
+     * @see Date#getTime() 
      */
     public static boolean isFirstOfMonth(long date) {
         boolean ret = false;
@@ -335,14 +345,14 @@ public class DateUtils {
     }
 
     private static long getMonth(long date, int increment) {
+		long result;
         Calendar calendar = CALENDAR;
         synchronized(calendar) {
             calendar.setTimeInMillis(date);
             if (increment == -1) {
                 calendar.set(Calendar.DAY_OF_MONTH, 1);
-                return startOfDayInMillis(calendar.getTimeInMillis());
-            }
-            else {
+                result = startOfDayInMillis(calendar.getTimeInMillis());
+            } else {
                 calendar.add(Calendar.MONTH, 1);
                 calendar.set(Calendar.DAY_OF_MONTH, 1);
                 calendar.set(Calendar.HOUR_OF_DAY, 0);
@@ -350,9 +360,10 @@ public class DateUtils {
                 calendar.set(Calendar.SECOND, 0);
                 calendar.set(Calendar.MINUTE, 0);
                 calendar.add(Calendar.MILLISECOND, -1);
-                return calendar.getTimeInMillis();
+                result = calendar.getTimeInMillis();
             }
         }
+		return result;
     }
 
     /**

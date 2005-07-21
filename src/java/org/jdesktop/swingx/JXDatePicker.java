@@ -11,6 +11,7 @@ import java.awt.event.*;
 import java.text.ParseException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.text.MessageFormat;
 import java.util.Date;
 import javax.swing.*;
 import javax.swing.JFormattedTextField.AbstractFormatter;
@@ -40,6 +41,8 @@ public class JXDatePicker extends JComponent {
      */
     private JXDatePickerPopup _popup;
     private JPanel _linkPanel;
+    private long _linkDate;
+    private MessageFormat _linkFormat;
     private JButton _popupButton;
     private int _popupButtonWidth = 20;
     private JXMonthView _monthView;
@@ -69,8 +72,6 @@ public class JXDatePicker extends JComponent {
         _dateField = new JFormattedTextField(new JXDatePickerFormatter());
         _dateField.setName("dateField");
         _dateField.setBorder(null);
-
-        _linkPanel = new TodayPanel();
         
         _handler = new Handler();
         _popupButton = new JButton();
@@ -101,7 +102,10 @@ public class JXDatePicker extends JComponent {
         add(_popupButton);
 
         updateUI();
-
+        
+        _linkDate = System.currentTimeMillis();
+        _linkPanel = new TodayPanel();
+        
         _dateField.setValue(new Date(millis));
     }
 
@@ -134,6 +138,12 @@ public class JXDatePicker extends JComponent {
                     BorderFactory.createEmptyBorder(3, 3, 3, 3));
         }
         _dateField.setBorder(border);
+
+        String formatString = UIManager.getString("JXDatePicker.linkFormat");
+        if (formatString == null) {
+            formatString = "Today is {0,date, dd MMMM yyyy}";
+        }
+        _linkFormat = new MessageFormat(formatString);
     }
 
     /**
@@ -234,7 +244,21 @@ public class JXDatePicker extends JComponent {
         _monthView = monthView;
         _popup = null;
     }
-
+    
+    /**
+     * Set the date the link will use and the string defining a MessageFormat
+     * to format the link.  If no valid date is in the editor when the popup
+     * is displayed the popup will focus on the month the linkDate is in.
+     *
+     * @param linkDate Date in milliseconds
+     * @param linkFormatString String used to format the link
+     * @see java.text.MessageFormat
+     */
+    public void setLinkDate(long linkDate, String linkFormatString) {
+        _linkDate = linkDate;
+        _linkFormat = new MessageFormat(linkFormatString);
+    }
+    
     /**
      * Return the panel that is used at the bottom of the popup.  The default
      * implementation shows a link that displays the current month.
@@ -488,7 +512,7 @@ public class JXDatePicker extends JComponent {
             }
             if (!_popup.isVisible()) {
                 if (_dateField.getValue() == null) {
-                    _dateField.setValue(new Date(System.currentTimeMillis()));
+                    _dateField.setValue(new Date(_linkDate));
                 }
                 DateSpan span =
                         new DateSpan((java.util.Date)_dateField.getValue(),
@@ -551,6 +575,7 @@ public class JXDatePicker extends JComponent {
             todayLink.setClickedColor(textColor);
             add(todayLink);
         }
+        
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             //add the two lines at the top
@@ -562,11 +587,11 @@ public class JXDatePicker extends JComponent {
         
         private final class TodayAction extends AbstractAction {
             TodayAction() {
-                super("Today is " + new SimpleDateFormat("dd MMM yyyy").format(new Date()));
+                super(_linkFormat.format(new Object[] { new Date(_linkDate) }));
             }
             
             public void actionPerformed(ActionEvent ae) {
-                DateSpan span = new DateSpan(System.currentTimeMillis(), System.currentTimeMillis());
+                DateSpan span = new DateSpan(_linkDate, _linkDate);
                 _monthView.ensureDateVisible(span.getStart());
             }
         }
