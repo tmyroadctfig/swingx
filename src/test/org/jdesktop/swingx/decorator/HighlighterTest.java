@@ -51,6 +51,18 @@ public class HighlighterTest extends TestCase {
     }
 
 
+    public void testAddToEmptyHighlighterPipeline() {
+        HighlighterPipeline pipeline = new HighlighterPipeline(new Highlighter[] { });
+        pipeline.addHighlighter(new Highlighter());
+    }
+    public void testRemoveFromEmptyHighlighterPipeline() {
+        HighlighterPipeline pipeline = new HighlighterPipeline(new Highlighter[] { });
+        pipeline.removeHighlighter(new Highlighter());
+    }
+    public void testApplyEmptyHighlighterPipeline() {
+        HighlighterPipeline pipeline = new HighlighterPipeline(new Highlighter[] { });
+        pipeline.apply(new JLabel(), createComponentAdapter(new JLabel(), false));
+    }
 //----------------- testing change notification of pipeline
     
     /**
@@ -59,6 +71,7 @@ public class HighlighterTest extends TestCase {
     public void testHighlighterPipelineWithDuplicates() {
         
     }
+    
     public void testHighlighterPipelineChange() {
         Highlighter highlighter = new Highlighter();
         HighlighterPipeline pipeline = new HighlighterPipeline();

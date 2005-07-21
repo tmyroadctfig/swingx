@@ -24,20 +24,28 @@ import javax.swing.event.EventListenerList;
  * @see Highlighter
  *
  * @author Ramesh Gupta
+ * @author Jeanette Winzenburg
+ * 
  */
 public class HighlighterPipeline {
     protected transient ChangeEvent changeEvent = null;
     protected EventListenerList listenerList = new EventListenerList();
 
-    private List highlighters;
+    protected List<Highlighter> highlighters;
     private final static Highlighter nullHighlighter = new Highlighter(null, null);
     private ChangeListener highlighterChangeListener;
 
     public HighlighterPipeline() {
-        highlighters = new ArrayList();
+        highlighters = new ArrayList<Highlighter>();
     }
     
+    /**
+     * 
+     * @param inList the array of highlighters to initially add to this.
+     * @throws NullPointerException if array is null of array contains null values.
+     */
     public HighlighterPipeline(Highlighter[] inList) {
+        this();
         // always returns a new copy of inList
         // XXX seems like there is too much happening here
         // JW: and probably not what's intended - the array
@@ -52,20 +60,12 @@ public class HighlighterPipeline {
         }
     }
 
-//    private void reindexHighlighters() {
-//        Iterator iter = highlighters.iterator();
-//        int i = 0;
-//        while (iter.hasNext()) {
-//            Highlighter hl = (Highlighter)iter.next();
-//            hl.order = i++;
-//        }
-//    }
-
     /**
      * Appends a highlighter to the pipeline.
      *
      * @param hl highlighter to add
-     */
+      * @throws NullPointerException if highlighter is null.
+    */
     public void addHighlighter(Highlighter hl) {
         addHighlighter(hl, false);
     }
@@ -77,11 +77,9 @@ public class HighlighterPipeline {
      * 
      * @param hl highlighter to add
      * @param prepend prepend the highlighter if true; false will append
+     * @throws NullPointerException if highlighter is null.
      */
     public void addHighlighter(Highlighter hl, boolean prepend) {
-        if (highlighters == null) {
-            highlighters = new ArrayList();
-        }
         if (prepend) {
             highlighters.add(0, hl);
         } else {
@@ -125,62 +123,11 @@ public class HighlighterPipeline {
         return (Highlighter[])highlighters.toArray(new Highlighter[highlighters.size()]);
     }
 
-//    public EventListener[] getListeners(Class listenerType) {
-//        return listenerList.getListeners(listenerType);
-//    }
-//
-//    /**
-//     * Adds a listener to the list that's notified each time there is a change
-//     * to the pipeline.
-//     *
-//     * @param l the <code>PipelineListener</code> to be added
-//     */
-//    public void addPipelineListener(PipelineListener l) {
-//        listenerList.add(PipelineListener.class, l);
-//    }
-//
-//    /**
-//     * Removes a listener from the list that's notified each time there is a change
-//     * to the pipeline.
-//     *
-//     * @param l the <code>PipelineListener</code> to be removed
-//     */
-//    public void removePipelineListener(PipelineListener l) {
-//        listenerList.remove(PipelineListener.class, l);
-//    }
-//
-//    /**
-//     * Returns an array of all the pipeline listeners
-//     * registered on this <code>HighlighterPipeline</code>.
-//     *
-//     * @return all of this pipeline's <code>PipelineListener</code>s,
-//     *         or an empty array if no pipeline listeners
-//     *         are currently registered
-//     *
-//     * @see #addPipelineListener
-//     * @see #removePipelineListener
-//     */
-//    public PipelineListener[] getPipelineListeners() {
-//        return (PipelineListener[]) listenerList.getListeners(
-//            PipelineListener.class);
-//    }
-//
-//    protected void fireContentsChanged(Object source) {
-//        Object[] listeners = listenerList.getListenerList();
-//        PipelineEvent e = null;
-//
-//        for (int i = listeners.length - 2; i >= 0; i -= 2) {
-//            if (listeners[i] == PipelineListener.class) {
-//                if (e == null) {
-//                    e = new PipelineEvent(source, PipelineEvent.CONTENTS_CHANGED);
-//                }
-//                ( (PipelineListener) listeners[i + 1]).contentsChanged(e);
-//            }
-//        }
-//    }
 
     /**
      * Applies all the highlighters to the components.
+     * 
+     * @throws NullPointerException if either stamp or adapter is null.
      */
     public Component apply(Component stamp, ComponentAdapter adapter) {
         //JW
@@ -193,11 +140,15 @@ public class HighlighterPipeline {
         /** @todo optimize the following bug fix */
             stamp = nullHighlighter.highlight(stamp, adapter);      // fixed bug from M1
         }
-        Iterator iter = highlighters.iterator();
-        while (iter.hasNext()) {
-            Highlighter hl = (Highlighter)iter.next();
-            stamp = hl.highlight(stamp, adapter);
+        for (Iterator<Highlighter> iter = highlighters.iterator(); iter.hasNext();) {
+            stamp = iter.next().highlight(stamp, adapter);
+            
         }
+//        Iterator iter = highlighters.iterator();
+//        while (iter.hasNext()) {
+//            Highlighter hl = (Highlighter)iter.next();
+//            stamp = hl.highlight(stamp, adapter);
+//        }
         return stamp;
     }
 
