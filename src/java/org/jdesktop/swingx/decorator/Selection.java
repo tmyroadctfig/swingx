@@ -18,8 +18,7 @@ import javax.swing.event.ListSelectionListener;
  * @author Jeanette Winzenburg
  */
 public class Selection {
-    // protected int[] selected; // used ONLY within save/restoreSelection();
-    // protected int lead = -1;
+
     private ListSelectionModel viewSelection;
 
     private DefaultListSelectionModel modelSelection;
