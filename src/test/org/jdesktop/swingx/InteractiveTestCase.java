@@ -44,26 +44,34 @@ import javax.swing.UIManager;
 public abstract class InteractiveTestCase extends junit.framework.TestCase {
     protected Point frameLocation = new Point(0,0);
 
-    protected InteractiveTestCase(String testTitle) {
+    public InteractiveTestCase() {
+        super();
+        String className = getClass().getName();
+        int lastDot = className.lastIndexOf(".");
+        String lastElement = className.substring(lastDot + 1);
+        setName(lastElement);
+    }
+    
+    public InteractiveTestCase(String testTitle) {
         super(testTitle);
     }
 
-    public JFrame wrapWithScrollingInFrame(JComponent component, String title) {
+    public JXFrame wrapWithScrollingInFrame(JComponent component, String title) {
         JScrollPane scroller = new JScrollPane(component);
         return wrapInFrame(scroller, title);
     }
 
-    public JFrame wrapWithScrollingInFrame(JComponent leftComp, JComponent rightComp, String title) {
+    public JXFrame wrapWithScrollingInFrame(JComponent leftComp, JComponent rightComp, String title) {
         JComponent comp = Box.createHorizontalBox();
         comp.add(new JScrollPane(leftComp));
         comp.add(new JScrollPane(rightComp));
-        JFrame frame = wrapInFrame(comp, title);
+        JXFrame frame = wrapInFrame(comp, title);
         return frame;
     }
 
 
-    public JFrame wrapInFrame(JComponent component, String title) {
-        JFrame frame = new JFrame(title);
+    public JXFrame wrapInFrame(JComponent component, String title) {
+        JXFrame frame = new JXFrame(title, false);
         JToolBar toolbar = new JToolBar();
         frame.getContentPane().add(BorderLayout.CENTER, component);
         frame.getContentPane().add(BorderLayout.NORTH, toolbar);

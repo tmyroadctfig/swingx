@@ -20,12 +20,18 @@ import javax.swing.JRootPane;
 public class JXFrame extends JFrame {
 
     public JXFrame() {
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this(null, true);
+    }
+    
+    public JXFrame(String title, boolean exitOnClose) {
+        super(title);
+        if (exitOnClose) {
+            setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        }
     }
 
     public JXFrame(String title) {
-        super(title);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this(title, true);
     }
 
     /**
