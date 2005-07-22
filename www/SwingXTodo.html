@@ -1,19 +1,19 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-  <meta http-equiv="content-type"
- content="text/html; charset=ISO-8859-1">
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
   <title>SwingX Todo - Summer 2005</title>
-  <meta content="Jeanette Winzenburg, Richard Bair, Alexander Zuev"
- name="author">
+  <meta name="author"
+ content="Jeanette Winzenburg, Richard Bair, Alexander Zuev">
 </head>
 <body>
 <h1>SwingX Task List</h1>
 <br>
-<table cellspacing="2" cellpadding="2" style="width: 100%;" border="1">
+<table border="1" style="width: 100%;" cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
-      <th style="vertical-align: top; width: 60%; text-align: center;">Task<br>
+      <th style="vertical-align: top; text-align: center; width: 50%;">Task<br>
       </th>
       <th style="vertical-align: top;">Comments<br>
       </th>
@@ -21,7 +21,7 @@
       </th>
     </tr>
     <tr>
-      <td rowspan="1" colspan="3">
+      <td colspan="3" rowspan="1">
       <h2>Documentation</h2>
       </td>
     </tr>
@@ -60,7 +60,7 @@ HowTo</a><br>
       </td>
     </tr>
     <tr>
-      <td rowspan="1" colspan="3">
+      <td colspan="3" rowspan="1">
       <h2>Other Meta-Issues</h2>
       </td>
     </tr>
@@ -153,13 +153,14 @@ add reusable FindModel</td>
     <tr>
       <td>* JXRootPane: there are links in JavaDoc that leads to
 &#8220;org.jdesktop.swing.*&#8221;</td>
-      <td style="vertical-align: top;"><br>
+      <td style="vertical-align: top;">sometime during community
+cleanup <br>
       </td>
-      <td style="vertical-align: top;"><br>
+      <td style="vertical-align: top;">done<br>
       </td>
     </tr>
     <tr>
-      <td rowspan="1" colspan="2">* <span style="font-weight: bold;">JXTable</span></td>
+      <td colspan="2" rowspan="1">* <span style="font-weight: bold;">JXTable</span></td>
       <td style="vertical-align: top;"><br>
       </td>
     </tr>
@@ -193,7 +194,7 @@ DecoratorDemo<br>
       </td>
     </tr>
     <tr>
-      <td rowspan="1" colspan="2">- bug fixing (todo - list and
+      <td colspan="2" rowspan="1">- bug fixing (todo - list and
 prioritize most annoying misbehaviour)</td>
       <td style="vertical-align: top;"><br>
       </td>
@@ -213,7 +214,8 @@ related issues: #25 - JN'Table and Mac<br>
       <td style="vertical-align: top;">#227 (fun) - expose auto-resize
 in columnControl <br>
       </td>
-      <td style="vertical-align: top;"><br>
+      <td style="vertical-align: top;">added localizable bound actions
+to JXTable's actionMap, used in ColumnControl<br>
       </td>
       <td style="vertical-align: top;">done<br>
       </td>
@@ -222,7 +224,8 @@ in columnControl <br>
       <td style="vertical-align: top;">&nbsp;#85 cleanup in
 setTableHeader<br>
       </td>
-      <td style="vertical-align: top;"><br>
+      <td style="vertical-align: top;">removed - use super:
+JXTableHeader takes care of swingx specifics<br>
       </td>
       <td style="vertical-align: top;">done<br>
       </td>
@@ -294,13 +297,14 @@ dirty: rowModel private to super - reflection with access mod needed<br>
       <td style="vertical-align: top;">&nbsp;#187 keep sorter when
 filtering<br>
       </td>
-      <td style="vertical-align: top;"><br>
+      <td style="vertical-align: top;">solved during filter/sorter
+overhaul<br>
       </td>
       <td style="vertical-align: top;">done<br>
       </td>
     </tr>
     <tr>
-      <td rowspan="1" colspan="2">*<span style="font-weight: bold;">
+      <td colspan="2" rowspan="1">*<span style="font-weight: bold;">
 JXTreeTable</span>
 tree method exposure (todo - list most wanted methods)</td>
       <td style="vertical-align: top;">in discussion<br>
@@ -333,7 +337,7 @@ listeners<br>
       </td>
     </tr>
     <tr>
-      <td style="vertical-align: top;" rowspan="1" colspan="2">*
+      <td colspan="2" rowspan="1" style="vertical-align: top;">*
 JXTreeTable bugs<br>
       </td>
       <td style="vertical-align: top;"><br>
@@ -503,7 +507,7 @@ VerticalLayout)</td>
       </td>
     </tr>
     <tr>
-      <td rowspan="1" colspan="3">
+      <td colspan="3" rowspan="1">
       <h2>Code - swingx.util</h2>
       </td>
     </tr>
@@ -558,7 +562,7 @@ swingx<br>
       </td>
     </tr>
     <tr>
-      <td rowspan="1" colspan="3">
+      <td colspan="3" rowspan="1">
       <h2>Code - swingx.plaf</h2>
       </td>
     </tr>
@@ -593,7 +597,7 @@ except on Mac use Glossy laf</td>
       </td>
     </tr>
     <tr>
-      <td rowspan="1" colspan="3">
+      <td colspan="3" rowspan="1">
       <h2>Code - swingx.decorator</h2>
       </td>
     </tr>
@@ -628,7 +632,7 @@ to fire a state change on modification/mutation<br>
       </td>
     </tr>
     <tr>
-      <td rowspan="1" colspan="2">* bug fixing (todo - list of most
+      <td colspan="2" rowspan="1">* bug fixing (todo - list of most
 prominent misbehaviour)</td>
       <td style="vertical-align: top;"><br>
       </td>
@@ -660,7 +664,7 @@ classcastexception (fix suggested)<br>
       </td>
     </tr>
     <tr>
-      <td rowspan="1" colspan="3">
+      <td colspan="3" rowspan="1">
       <h2>Code - swingx.calendar</h2>
       </td>
     </tr>
@@ -686,7 +690,7 @@ classcastexception (fix suggested)<br>
       </td>
     </tr>
     <tr>
-      <td rowspan="1" colspan="3">
+      <td colspan="3" rowspan="1">
       <h2>Code - swingx.border</h2>
       </td>
     </tr>
@@ -706,7 +710,7 @@ width shadows</td>
       </td>
     </tr>
     <tr>
-      <td rowspan="1" colspan="3">
+      <td colspan="3" rowspan="1">
       <h2>Code - swingx.auth</h2>
       </td>
     </tr>
@@ -747,7 +751,7 @@ a file?</td>
       </td>
     </tr>
     <tr>
-      <td rowspan="1" colspan="3">
+      <td colspan="3" rowspan="1">
       <h2>Code - swingx.action</h2>
       </td>
     </tr>
@@ -789,7 +793,7 @@ of it's current 3 methods</td>
       </td>
     </tr>
     <tr>
-      <td rowspan="1" colspan="3">
+      <td colspan="3" rowspan="1">
       <h2>Code - swingx.icon</h2>
       </td>
     </tr>
@@ -824,7 +828,7 @@ of it's current 3 methods</td>
       </td>
     </tr>
     <tr>
-      <td rowspan="1" colspan="3">
+      <td colspan="3" rowspan="1">
       <h2>Thoughts</h2>
       </td>
     </tr>
