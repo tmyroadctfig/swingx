@@ -24,7 +24,6 @@ import javax.swing.event.ListDataListener;
 
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
-import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PipelineEvent;
 import org.jdesktop.swingx.decorator.PipelineListener;
@@ -36,13 +35,11 @@ import org.jdesktop.swingx.decorator.Sorter;
  * 
  * Enabled Rollover/LinkModel handling. Enabled Highlighter support.
  * 
- * Added experimental support for filtering/sorting. 
- * This feature is disabled by default
- * because it has side-effects which might break "normal" expectations when 
- * using a JList: if 
- * enabled all row coordinates (including those returned by the selection)
- * are in view coordinates. Furthermore, the model returned from getModel() is
- * a wrapper around the actual data.
+ * Added experimental support for filtering/sorting. This feature is disabled by
+ * default because it has side-effects which might break "normal" expectations
+ * when using a JList: if enabled all row coordinates (including those returned
+ * by the selection) are in view coordinates. Furthermore, the model returned
+ * from getModel() is a wrapper around the actual data.
  * 
  * 
  * 
@@ -50,7 +47,7 @@ import org.jdesktop.swingx.decorator.Sorter;
  * @author Jeanette Winzenburg
  */
 public class JXList extends JList {
-    
+
     /** The pipeline holding the filters. */
     protected FilterPipeline filters;
 
@@ -150,27 +147,27 @@ public class JXList extends JList {
 
     // ---------------------------- filters
 
-    
     public Object getElementAt(int viewIndex) {
-        return getModel().getElementAt(viewIndex); 
+        return getModel().getElementAt(viewIndex);
     }
-    
+
     public int getModelSize() {
         return getModel().getSize();
     }
 
     public int convertRowIndexToModel(int viewIndex) {
-        return isFilterEnabled() ? 
-                getFilters().convertRowIndexToModel(viewIndex) : viewIndex;
+        return isFilterEnabled() ? getFilters().convertRowIndexToModel(
+                viewIndex) : viewIndex;
     }
-    
+
     public int convertRowIndexToView(int modelIndex) {
-        return isFilterEnabled() ? 
-                getFilters().convertRowIndexToView(modelIndex) : modelIndex;
+        return isFilterEnabled() ? getFilters().convertRowIndexToView(
+                modelIndex) : modelIndex;
     }
+
     /**
-     * returns the underlying model. If !isFilterEnabled
-     * this will be the same as getModel().
+     * returns the underlying model. If !isFilterEnabled this will be the same
+     * as getModel().
      * 
      * @return
      */
@@ -179,16 +176,16 @@ public class JXList extends JList {
     }
 
     /**
-     * Enables/disables filtering support.
-     * If enabled all row indices - including the selection - 
-     * are in view coordinates and getModel returns a wrapper around the
-     * underlying model. 
+     * Enables/disables filtering support. If enabled all row indices -
+     * including the selection - are in view coordinates and getModel returns a
+     * wrapper around the underlying model.
      * 
      * @param enabled
      */
     public void setFilterEnabled(boolean enabled) {
         boolean old = isFilterEnabled();
-        if (old == enabled) return;
+        if (old == enabled)
+            return;
         if (!old) {
             wrappingModel = new WrappingListModel(getModel());
             super.setModel(wrappingModel);
@@ -205,10 +202,9 @@ public class JXList extends JList {
     }
 
     /**
-     * set's the underlying data model. 
-     * Note that if isFilterEnabled you must call 
-     * getWrappedModel to access the model given here. In this
-     * case getModel returns a wrapper around the data!
+     * set's the underlying data model. Note that if isFilterEnabled you must
+     * call getWrappedModel to access the model given here. In this case
+     * getModel returns a wrapper around the data!
      * 
      * 
      * 
@@ -220,7 +216,7 @@ public class JXList extends JList {
             super.setModel(model);
         }
     }
- 
+
     private Selection getSelection() {
         if (selection == null) {
             selection = new Selection(filters, getSelectionModel());
@@ -252,7 +248,6 @@ public class JXList extends JList {
         use(filters);
     }
 
-    
     /**
      * setModel() and setFilters() may be called in either order.
      * 
@@ -274,7 +269,8 @@ public class JXList extends JList {
      * @return true is not yet used in this JXTable, false otherwise
      */
     private boolean initialUse(FilterPipeline pipeline) {
-        if (pipelineListener == null) return true;
+        if (pipelineListener == null)
+            return true;
         PipelineListener[] l = pipeline.getPipelineListeners();
         for (int i = 0; i < l.length; i++) {
             if (pipelineListener.equals(l[i]))
@@ -282,7 +278,6 @@ public class JXList extends JList {
         }
         return true;
     }
-
 
     /** returns the listener for changes in filters. */
     protected PipelineListener getFilterPipelineListener() {
@@ -302,8 +297,7 @@ public class JXList extends JList {
         return l;
     }
 
-
-    /** 
+    /**
      * method called on change notification from filterpipeline.
      */
     protected void updateOnFilterContentChanged() {
@@ -318,15 +312,16 @@ public class JXList extends JList {
     private class WrappingListModel extends AbstractListModel {
 
         private ListModel delegate;
+
         private ListDataListener listDataListener;
 
         public WrappingListModel(ListModel model) {
             setModel(model);
         }
-        
+
         public void updateOnFilterContentChanged() {
             fireContentsChanged(this, -1, -1);
-            
+
         }
 
         public void setModel(ListModel model) {
@@ -338,7 +333,7 @@ public class JXList extends JList {
             delegate.addListDataListener(getListDataListener());
             fireContentsChanged(this, -1, -1);
         }
-        
+
         private ListDataListener getListDataListener() {
             if (listDataListener == null) {
                 listDataListener = createListDataListener();
@@ -351,12 +346,12 @@ public class JXList extends JList {
 
                 public void intervalAdded(ListDataEvent e) {
                     contentsChanged(e);
-                    
+
                 }
 
                 public void intervalRemoved(ListDataEvent e) {
                     contentsChanged(e);
-                    
+
                 }
 
                 public void contentsChanged(ListDataEvent e) {
@@ -364,16 +359,17 @@ public class JXList extends JList {
                     fireContentsChanged(this, -1, -1);
                     updateSelection(e);
                     getFilters().flush();
-                    
+
                 }
-                
+
             };
             return l;
         }
 
         protected void updateSelection(ListDataEvent e) {
             if (e.getType() == ListDataEvent.INTERVAL_REMOVED) {
-                getSelection().removeIndexInterval(e.getIndex0(), e.getIndex1());
+                getSelection()
+                        .removeIndexInterval(e.getIndex0(), e.getIndex1());
             } else if (e.getType() == ListDataEvent.INTERVAL_ADDED) {
 
                 int minIndex = Math.min(e.getIndex0(), e.getIndex1());
@@ -383,7 +379,7 @@ public class JXList extends JList {
             } else {
                 getSelection().clearModelSelection();
             }
-            
+
         }
 
         public ListModel getModel() {
@@ -397,8 +393,9 @@ public class JXList extends JList {
         public Object getElementAt(int index) {
             return getFilters().getValueAt(index, 0);
         }
-        
+
     }
+
     // ---------------------------- uniform data model
 
     // MUST ALWAYS ACCESS dataAdapter through accessor method!!!
@@ -443,7 +440,7 @@ public class JXList extends JList {
 
         public int getRowCount() {
             return list.getWrappedModel().getSize();
-          //  return list.getModel().getSize();
+            // return list.getModel().getSize();
         }
 
         /**
@@ -451,13 +448,13 @@ public class JXList extends JList {
          */
         public Object getValueAt(int row, int column) {
             return list.getWrappedModel().getElementAt(row);
-           // return list.getModel().getElementAt(row);
+            // return list.getModel().getElementAt(row);
         }
 
         public Object getFilteredValueAt(int row, int column) {
             return list.getElementAt(row);
             /** @todo Implement getFilteredValueAt */
-        //    return getValueAt(row, column);
+            // return getValueAt(row, column);
             // throw new UnsupportedOperationException(
             // "Method getFilteredValueAt() not yet implemented.");
         }
@@ -490,6 +487,7 @@ public class JXList extends JList {
         }
 
     }
+
     // ------------------------------ renderers
 
     public HighlighterPipeline getHighlighters() {
@@ -628,6 +626,5 @@ public class JXList extends JList {
             }
         }
     }
-
 
 }
