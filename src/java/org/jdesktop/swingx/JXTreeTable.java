@@ -17,6 +17,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.Field;
 import java.util.Enumeration;
 import java.util.EventObject;
 
@@ -25,6 +26,7 @@ import javax.swing.Icon;
 import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
+import javax.swing.SizeSequence;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
@@ -458,6 +460,21 @@ public class JXTreeTable extends JXTable {
         adjustTreeRowHeight(); // JTree doesn't have setRowMargin. So adjust.
     }
 
+    /**
+     * Hacking around super hack for super's individual row heights.
+     * Not supported here.
+     */
+    protected Field getRowModelField() {
+        return null;
+    }
+    
+    /**
+     * Hacking around super hack for super's individual row heights.
+     * Not supported here.
+     */
+    protected SizeSequence getSuperRowModel() {
+        return null;
+    }
     /**
      * <p>Sets the margin between columns.</p>
      *

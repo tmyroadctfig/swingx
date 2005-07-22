@@ -51,17 +51,22 @@ import org.jdesktop.swingx.util.AncientSwingTeam;
  * Split from old JXTableUnitTest - contains "interactive"
  * methods only.
  * 
- * @author Jeanette Winzenburg, Berlin
+ * @author Jeanette Winzenburg
  */
 public class JXTableVisualCheck extends JXTableUnitTest {
     
     /**
-     * Issue #189, #214: Sorter fails if content is 
-     * comparable with mixed types
-     *
+     * dummy
      */
     public void testDummy() {
     }   
+
+    public void interactiveTestRowHeight() {
+        JXTable table = new JXTable(sortableTableModel);
+        table.setRowHeight(0, table.getRowHeight() * 2);
+        JFrame frame = wrapWithScrollingInFrame(table, "Individual rowheight");
+        frame.setVisible(true);
+    }
     
     /**
      * example mixed sorting (Jens Elkner).
@@ -739,9 +744,9 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*ColumnControlColumnModel.*");
 //            test.runInteractiveTests("interactive.*TableHeader.*");
-        //    test.runInteractiveTests("interactive.*SorterP.*");
-            test.runInteractiveTests("interactive.*ColumnControlAndF.*");
-        //    test.runInteractiveTests("interactive.*Filt.*");
+       //     test.runInteractiveTests("interactive.*Sort.*");
+//            test.runInteractiveTests("interactive.*ColumnControlAndF.*");
+            test.runInteractiveTests("interactive.*RowHeight.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();

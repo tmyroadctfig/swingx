@@ -1,0 +1,153 @@
+/*
+ * Created on 21.07.2005
+ *
+ */
+package org.jdesktop.swingx.decorator;
+
+import javax.swing.DefaultListSelectionModel;
+import javax.swing.ListSelectionModel;
+import javax.swing.SizeSequence;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+/**
+ * @author Jeanette Winzenburg
+ */
+public class RowSizing {
+
+    private SizeSequence viewSizes;
+
+    private SizeSequence modelSizes;
+
+    private FilterPipeline pipeline;
+
+    private PipelineListener pipelineListener;
+
+    private int defaultHeight;
+
+    public RowSizing() {
+    }
+
+    public RowSizing(FilterPipeline pipeline) {
+        this();
+        setFilters(pipeline);
+    }
+    /**
+     * 
+     * @param pipeline
+     * @param selection
+     */
+    public RowSizing(FilterPipeline pipeline, SizeSequence selection, int defaultHeight) {
+        this();
+        setViewSizeSequence(selection, defaultHeight);
+        setFilters(pipeline);
+    }
+
+    public void setViewSizeSequence(SizeSequence selection, int height) {
+        SizeSequence old = this.viewSizes;
+        if (old != null) {
+            clearModelSizes();
+        }
+        this.viewSizes = selection;
+        this.defaultHeight = height;
+        mapTowardsModel();
+    }
+
+    public SizeSequence getViewSizeSequence() {
+        return viewSizes;
+    }
+
+    public void setFilters(FilterPipeline pipeline) {
+        FilterPipeline old = this.pipeline;
+        if (old != null) {
+            old.removePipelineListener(pipelineListener);
+        }
+        this.pipeline = pipeline;
+        if (pipeline != null) {
+            pipeline.addPipelineListener(getPipelineListener());
+        }
+        restoreSelection();
+    }
+
+
+
+    public void clearModelSizes() {
+        modelSizes = null;
+//        modelSizes.setSizes(new int[0]);
+        
+    }
+
+    public void insertIndexInterval(int start, int length, int value) {
+        if (modelSizes == null) return;
+        modelSizes.insertEntries(start, length, value);
+        
+    }
+
+    public void removeIndexInterval(int start, int length) {
+        if (modelSizes == null) return;
+        modelSizes.removeEntries(start, length);
+        
+    }
+
+    public void restoreSelection() {
+        if (viewSizes == null) return;
+        viewSizes.setSizes(new int[0]);
+        viewSizes.insertEntries(0, getOutputSize(), defaultHeight);
+
+        int[] selected = modelSizes.getSizes();
+        for (int i = 0; i < selected.length; i++) {
+          int index = convertToView(i);
+          // index might be -1, but then addSelectionInterval ignores it. 
+          viewSizes.setSize(index, selected[i]);
+        }
+    }
+
+    private void mapTowardsModel() {
+        if (viewSizes == null) return;
+        modelSizes = new SizeSequence(getInputSize(), defaultHeight);
+//        clearModelSizes();
+//        modelSizes.insertEntries(0, getInputSize(), defaultHeight);
+        int[] selected = viewSizes.getSizes(); 
+        for (int i = 0; i < selected.length; i++) {
+            int modelIndex = convertToModel(i);
+            modelSizes.setSize(modelIndex, selected[i]); 
+        }
+    }
+
+    private int getInputSize() {
+        return pipeline != null ? pipeline.getInputSize() : 0;
+    }
+
+    private int getOutputSize() {
+        return pipeline != null ? pipeline.getOutputSize() : 0;
+    }
+
+    private int convertToModel(int index) {
+        return pipeline != null ? pipeline.convertRowIndexToModel(index) : index;
+    }
+    
+    private int convertToView(int index) {
+        return pipeline != null ? pipeline.convertRowIndexToView(index) : index;
+    }
+    
+
+    protected void updateFromPipelineChanged() {
+        restoreSelection();
+    }
+
+    private PipelineListener getPipelineListener() {
+        if (pipelineListener == null) {
+            pipelineListener = new PipelineListener() {
+
+                public void contentsChanged(PipelineEvent e) {
+                    updateFromPipelineChanged();
+                    
+                }
+                
+            };
+        }
+        return pipelineListener;
+    }
+
+
+}

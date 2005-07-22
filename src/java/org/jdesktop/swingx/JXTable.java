@@ -15,6 +15,9 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.print.PrinterException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.Collections;
@@ -41,6 +44,7 @@ import javax.swing.JTable;
 import javax.swing.JViewport;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SizeSequence;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
@@ -62,6 +66,7 @@ import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PipelineEvent;
 import org.jdesktop.swingx.decorator.PipelineListener;
+import org.jdesktop.swingx.decorator.RowSizing;
 import org.jdesktop.swingx.decorator.Selection;
 import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.icon.ColumnControlIcon;
@@ -753,7 +758,7 @@ public class JXTable extends JTable implements Searchable {
         // causing complete confusion.
         getSelection().lock();
         super.tableChanged(e);
-        updateSelection(e);
+        updateSelectionAndRowModel(e);
         use(filters);
         // JW: this is for the sake of the very first call to setModel, done in
         // super on instantiation - at that time filters cannot be set
@@ -774,7 +779,7 @@ public class JXTable extends JTable implements Searchable {
      * 
      * @param e
      */
-    private void updateSelection(TableModelEvent e) {
+    private void updateSelectionAndRowModel(TableModelEvent e) {
         // c&p from JTable
         // still missing: checkLeadAnchor
         if (e.getType() == TableModelEvent.INSERT) {
@@ -790,6 +795,7 @@ public class JXTable extends JTable implements Searchable {
             // Adjust the selection to account for the new rows.
             int length = end - start + 1;
             getSelection().insertIndexInterval(start, length, true);
+            getRowSizing().insertIndexInterval(start, length, getRowHeight());
 
         } else if (e.getType() == TableModelEvent.DELETE) {
             int start = e.getFirstRow();
@@ -805,11 +811,14 @@ public class JXTable extends JTable implements Searchable {
             int previousRowCount = getModel().getRowCount() + deletedCount;
             // Adjust the selection to account for the new rows
             getSelection().removeIndexInterval(start, end);
+            getRowSizing().removeIndexInterval(start, deletedCount);
 
         } else if (getSelectionModel().isSelectionEmpty()) {
             // possibly got a dataChanged or structureChanged
             // super will have cleared selection
             getSelection().clearModelSelection();
+            getRowSizing().clearModelSizes();
+            getRowSizing().setViewSizeSequence(getSuperRowModel(), getRowHeight());
         }
 
     }
@@ -876,6 +885,7 @@ public class JXTable extends JTable implements Searchable {
         filters = pipeline;
         filters.setSorter(sorter);
         getSelection().setFilters(filters);
+        getRowSizing().setFilters(filters);
         use(filters);
     }
 
@@ -904,7 +914,7 @@ public class JXTable extends JTable implements Searchable {
      */
     protected void updateOnFilterContentChanged() {
         // Force private rowModel in JTable to null;
-        adminSetRowHeight(getRowHeight());
+//        adminSetRowHeight(getRowHeight());
         revalidate();
         repaint();
     }
@@ -1303,6 +1313,10 @@ public class JXTable extends JTable implements Searchable {
 
     // Save the last column with the match.
     private int lastCol = 0;
+
+    private RowSizing rowSizing;
+
+    private Field rowModelField;
 
     /**
      * Performs a search across the table using a
@@ -1899,7 +1913,70 @@ public class JXTable extends JTable implements Searchable {
         if (rowHeight > 0) {
             isXTableRowHeightSet = true;
         }
+        getRowSizing().setViewSizeSequence(getSuperRowModel(), getRowHeight());
 
+    }
+
+    
+    public void setRowHeight(int row, int rowHeight) {
+        super.setRowHeight(row, rowHeight);
+        getRowSizing().setViewSizeSequence(getSuperRowModel(), getRowHeight());
+        resizeAndRepaint();
+//        if (getRowSizing().getViewSizeSequence() == null) {
+//            getRowSizing().setViewSizeSequence(getRowModel(), getRowHeight());
+//        } else {
+//            getRowSizing().mapRowHeightTowardsModel(row);
+//        }
+    }
+
+    protected SizeSequence getSuperRowModel() {
+        try {
+            Field field = getRowModelField();
+            if (field != null) {
+                return (SizeSequence) field.get(this);
+            }
+        } catch (SecurityException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * @return
+     * @throws NoSuchFieldException
+     */
+    protected Field getRowModelField() {
+        if (rowModelField == null) {
+            try {
+                rowModelField = getClass().getSuperclass().getDeclaredField("rowModel");
+                rowModelField.setAccessible(true);
+            } catch (SecurityException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (NoSuchFieldException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        return rowModelField;
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    protected RowSizing getRowSizing() {
+        if (rowSizing == null) {
+            rowSizing = new RowSizing(filters);
+        }
+        return rowSizing;
     }
 
     /**
@@ -1908,7 +1985,7 @@ public class JXTable extends JTable implements Searchable {
      */
     protected void adminSetRowHeight(int rowHeight) {
         boolean heightSet = isXTableRowHeightSet;
-        setRowHeight(rowHeight); // Ugly!
+        setRowHeight(rowHeight); 
         isXTableRowHeightSet = heightSet;
     }
 
