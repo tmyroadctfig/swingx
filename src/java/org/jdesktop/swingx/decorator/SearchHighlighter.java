@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  * @author Jeanette Winzenburg
  */
 public class SearchHighlighter extends PatternHighlighter {
-    /** the row to highlight. -1 means all */
+    /** the row to highlight in view coordinates (?). -1 means all */
     int highlightRow;
     private boolean enableHighlight;
     private static final String ALL = ".*";
