@@ -748,7 +748,7 @@ public class JXTable extends JTable implements Searchable {
         getSelection().lock();
         super.setModel(newModel);
         // JW: PENDING - needs cleanup, probably much simpler now...
-        use(filters);
+//        use(filters);
     }
 
     /** ? */
@@ -1317,6 +1317,8 @@ public class JXTable extends JTable implements Searchable {
     private RowSizing rowSizing;
 
     private Field rowModelField;
+
+    private boolean rowHeightEnabled;
 
     /**
      * Performs a search across the table using a
@@ -1919,17 +1921,46 @@ public class JXTable extends JTable implements Searchable {
 
     
     public void setRowHeight(int row, int rowHeight) {
+        if (!isRowHeightEnabled()) return;
         super.setRowHeight(row, rowHeight);
         getRowSizing().setViewSizeSequence(getSuperRowModel(), getRowHeight());
         resizeAndRepaint();
-//        if (getRowSizing().getViewSizeSequence() == null) {
-//            getRowSizing().setViewSizeSequence(getRowModel(), getRowHeight());
-//        } else {
-//            getRowSizing().mapRowHeightTowardsModel(row);
-//        }
     }
 
-    protected SizeSequence getSuperRowModel() {
+    /**
+     * sets enabled state of individual rowHeight support. The default 
+     * is false.
+     * Enabling the support envolves reflective access
+     * to super's private field rowModel which may fail due to security
+     * issues. If failing the support is not enabled.
+     * 
+     * PENDING: should we throw an Exception if the enabled fails? 
+     * Or silently fail - depends on runtime context, 
+     * can't do anything about it.
+     * 
+     * @param enabled
+     */
+    public void setRowHeightEnabled(boolean enabled) {
+        boolean old = isRowHeightEnabled();
+        if (old == enabled) return;
+        if (enabled && !canEnableRowHeight()) return;
+        rowHeightEnabled = enabled;
+        if (!enabled) {
+            adminSetRowHeight(getRowHeight());
+        }
+//        getRowSizing().setViewSizeSequence(getSuperRowModel(), getRowHeight());
+        firePropertyChange("rowHeightEnabled", old, rowHeightEnabled);
+    }
+    
+    private boolean canEnableRowHeight() {
+        return getRowModelField() != null;
+    }
+
+    public boolean isRowHeightEnabled() {
+        return rowHeightEnabled;
+    }
+
+    private SizeSequence getSuperRowModel() {
         try {
             Field field = getRowModelField();
             if (field != null) {
@@ -1952,13 +1983,13 @@ public class JXTable extends JTable implements Searchable {
      * @return
      * @throws NoSuchFieldException
      */
-    protected Field getRowModelField() {
+    private Field getRowModelField() {
         if (rowModelField == null) {
             try {
-                rowModelField = getClass().getSuperclass().getDeclaredField("rowModel");
+                rowModelField = JTable.class.getDeclaredField("rowModel");
                 rowModelField.setAccessible(true);
             } catch (SecurityException e) {
-                // TODO Auto-generated catch block
+                rowModelField = null;
                 e.printStackTrace();
             } catch (NoSuchFieldException e) {
                 // TODO Auto-generated catch block

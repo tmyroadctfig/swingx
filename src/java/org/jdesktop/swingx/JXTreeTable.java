@@ -460,21 +460,21 @@ public class JXTreeTable extends JXTable {
         adjustTreeRowHeight(); // JTree doesn't have setRowMargin. So adjust.
     }
 
-    /**
-     * Hacking around super hack for super's individual row heights.
-     * Not supported here.
-     */
-    protected Field getRowModelField() {
-        return null;
-    }
-    
-    /**
-     * Hacking around super hack for super's individual row heights.
-     * Not supported here.
-     */
-    protected SizeSequence getSuperRowModel() {
-        return null;
-    }
+//    /**
+//     * Hacking around super hack for super's individual row heights.
+//     * Not supported here.
+//     */
+//    protected Field getRowModelField() {
+//        return null;
+//    }
+//    
+//    /**
+//     * Hacking around super hack for super's individual row heights.
+//     * Not supported here.
+//     */
+//    protected SizeSequence getSuperRowModel() {
+//        return null;
+//    }
     /**
      * <p>Sets the margin between columns.</p>
      *

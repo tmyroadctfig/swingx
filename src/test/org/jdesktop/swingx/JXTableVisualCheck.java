@@ -198,6 +198,26 @@ public class JXTableVisualCheck extends JXTableUnitTest {
      * Issue ??: Column control on changing column model.
      *
      */
+    public void interactiveTestToggleTableModel() {
+        final DefaultTableModel tableModel = createAscendingModel(0, 20);
+        final JXTable table = new JXTable(tableModel);
+        table.setColumnControlVisible(true);
+        Action toggleAction = new AbstractAction("Toggle TableModel") {
+
+            public void actionPerformed(ActionEvent e) {
+                TableModel model = table.getModel();
+                table.setModel(model.equals(tableModel) ? sortableTableModel : tableModel);
+            }
+            
+        };
+        JFrame frame = wrapWithScrollingInFrame(table, "ColumnControl: set columnModel -> core default");
+        addAction(frame, toggleAction);
+        frame.setVisible(true);
+    }
+    /** 
+     * Issue ??: Column control on changing column model.
+     *
+     */
     public void interactiveTestColumnControlColumnModel() {
         final JXTable table = new JXTable(10, 5);
         table.setColumnControlVisible(true);
@@ -738,7 +758,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 
 
     public static void main(String args[]) {
-        setSystemLF(true);
+//        setSystemLF(true);
         JXTableVisualCheck test = new JXTableVisualCheck();
         try {
 //          test.runInteractiveTests();
@@ -747,6 +767,9 @@ public class JXTableVisualCheck extends JXTableUnitTest {
        //     test.runInteractiveTests("interactive.*Sort.*");
 //            test.runInteractiveTests("interactive.*ColumnControlAndF.*");
             test.runInteractiveTests("interactive.*RowHeight.*");
+            test.runInteractiveTests("interactive.*TableMod.*");
+            
+//            test.runInteractiveTests("interactive.*PatternHigh.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();

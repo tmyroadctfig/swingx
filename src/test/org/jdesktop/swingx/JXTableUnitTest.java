@@ -56,9 +56,25 @@ public class JXTableUnitTest extends InteractiveTestCase {
         sortableTableModel = new AncientSwingTeam();
     }
 
-    public void testIndividualRowHeightAfterSetModel() {
+    public void testEnableRowHeight() {
         JXTable table = new JXTable(createAscendingModel(0, 10));
         table.setRowHeight(0, 25);
+        assertEquals("indy row height must not be set if disabled", table.getRowHeight(), table.getRowHeight(0));
+        table.setRowHeightEnabled(true);
+        assertEquals("indy row height must not be set on setting enabled", table.getRowHeight(), table.getRowHeight(0));
+        table.setRowHeight(0, 25);
+        assertEquals(25, table.getRowHeight(0));
+        table.setRowHeightEnabled(false);
+        assertEquals("indy row height must not be set if disabled", table.getRowHeight(), table.getRowHeight(0));
+        
+     
+    }
+    public void testIndividualRowHeightAfterSetModel() {
+        JXTable table = new JXTable(createAscendingModel(0, 10));
+        table.setRowHeightEnabled(true);
+        table.setRowHeight(0, 25);
+        // sanity assert
+        assertEquals(25, table.getRowHeight(0));
         table.setModel(sortableTableModel);
         assertEquals("individual rowheight must be reset", 
                 table.getRowHeight(), table.getRowHeight(0));
@@ -66,6 +82,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
     public void testIndividualRowHeight() {
         JXTable table = new JXTable(createAscendingModel(0, 10));
+        table.setRowHeightEnabled(true);
         table.setRowHeight(0, 25);
         assertEquals(25, table.getRowHeight(0));
         assertEquals(table.getRowHeight(), table.getRowHeight(1));
@@ -78,6 +95,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     
     public void testResetIndividualRowHeight() {
         JXTable table = new JXTable(createAscendingModel(0, 10));
+        table.setRowHeightEnabled(true);
         table.setRowHeight(0, 25);
         table.getFilters().setSorter(new ShuttleSorter(0, false));
         assertEquals("individual row height must be moved to last row", 
@@ -91,8 +109,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testRowModelAccess() {
         JXTable table = new JXTable(sortableTableModel);
         table.setRowHeight(0, 25);
-        SizeSequence sizing = table.getSuperRowModel();
-        assertNotNull(sizing);
+//        SizeSequence sizing = table.getSuperRowModel();
+//        assertNotNull(sizing);
     }
 
     /**
@@ -310,7 +328,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         // sanity assert - no longer 1: Selection adds listener as well
         // no longer 2: Rowsizing adds listener
         // no longer sane - remove!!
-         assertEquals(3, listenerCount);
+//         assertEquals(3, listenerCount);
         // JW: no longer valid assumption - the pipelineListener now is an 
         // implementation detail of JXTable
  //       assertEquals(table, l);
@@ -435,6 +453,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testDeleteRowAboveIndividualRowHeight() {
         DefaultTableModel model = createAscendingModel(0, 10);
         JXTable table = new JXTable(model);
+        table.setRowHeightEnabled(true);
         int selectedRow = table.getRowCount() - 1;
         table.setRowHeight(selectedRow, 25);
         table.setSorter(0);
@@ -479,6 +498,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testAddRowAboveIndividualRowHeigh() {
         DefaultTableModel ascendingModel = createAscendingModel(0, 20);
         JXTable table = new JXTable(ascendingModel);
+        table.setRowHeightEnabled(true);
         int selectedRow = table.getRowCount() - 1;
         table.setRowHeight(selectedRow, 25);
         assertEquals("last row must have indy rowheight", 25, table.getRowHeight(selectedRow));
@@ -515,6 +535,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testAddRowAboveIndividualRowHeightInvertedOrder() {
         DefaultTableModel ascendingModel = createAscendingModel(0, 20);
         JXTable table = new JXTable(ascendingModel);
+        table.setRowHeightEnabled(true);
         // select the last row in view coordinates
         int selectedRow = table.getRowCount() - 1;
         table.setRowHeight(selectedRow, 25);
@@ -630,7 +651,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
      * @param count the number of rows
      * @return
      */
-    private DefaultTableModel createAscendingModel(int startRow, int count) {
+    protected DefaultTableModel createAscendingModel(int startRow, int count) {
         DefaultTableModel model = new DefaultTableModel(count, 4) {
             public Class getColumnClass(int column) {
                 return column == 0 ? Integer.class : super.getColumnClass(column);
@@ -988,7 +1009,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         }
 
         public int getRowCount() {
-            return 50;
+            return 1000;
         }
 
         public int getColumnCount() {
