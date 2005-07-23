@@ -748,6 +748,7 @@ public class JXTable extends JTable implements Searchable {
         getSelection().lock();
         super.setModel(newModel);
         // JW: PENDING - needs cleanup, probably much simpler now...
+        // not needed because called in tableChanged
 //        use(filters);
     }
 

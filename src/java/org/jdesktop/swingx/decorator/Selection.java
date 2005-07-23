@@ -19,19 +19,23 @@ import javax.swing.event.ListSelectionListener;
  */
 public class Selection {
 
+    /** selection in view coordinates. */
     private ListSelectionModel viewSelection;
-
+    
+    /** selection in model coordinates. */
     private DefaultListSelectionModel modelSelection;
 
+    /** mapping pipeline. */
     private FilterPipeline pipeline;
 
+    /** listener to view selection. */
     private ListSelectionListener viewSelectionListener;
-
-    private PipelineListener pipelineListener;
-
+    /** state flag for locking non-listening phases. */
     private boolean isListening;
 
-//    private int lead;
+    /** listener to mapping pipeline. */
+    private PipelineListener pipelineListener;
+
 
     /**
      * PRE: selection != null;
@@ -43,9 +47,13 @@ public class Selection {
         modelSelection = new DefaultListSelectionModel();
         setViewSelectionModel(selection);
         setFilters(pipeline);
-//        mapTowardsModel();
     }
 
+    /**
+     * sets the view selection model. Must not be null.
+     * 
+     * @param selection holding selected indices in view coordinates
+     */
     public void setViewSelectionModel(ListSelectionModel selection) {
         ListSelectionModel old = this.viewSelection;
         if (old != null) {
@@ -53,11 +61,9 @@ public class Selection {
             modelSelection.clearSelection();
         }
         this.viewSelection = selection;
-        unlock();
         mapTowardsModel();
+        unlock();
     }
-
-
 
     public void setFilters(FilterPipeline pipeline) {
         FilterPipeline old = this.pipeline;
@@ -72,9 +78,97 @@ public class Selection {
     }
 
 
+    public void restoreSelection() {
+        lock();
+        // JW - hmm... clearSelection doesn't reset the lead/anchor. Why not?
+        viewSelection.clearSelection();
 
+        int[] selected = getSelectedRows(modelSelection);
+        for (int i = 0; i < selected.length; i++) {
+          int index = convertToView(selected[i]);
+          // index might be -1, but then addSelectionInterval ignores it. 
+          viewSelection.addSelectionInterval(index, index);
+        }
+        int lead = modelSelection.getLeadSelectionIndex();
+        lead = convertToView(lead);
+        if (viewSelection instanceof DefaultListSelectionModel) {
+            ((DefaultListSelectionModel) viewSelection).moveLeadSelectionIndex(lead);
+        } else {
+            // PENDING: not tested, don't have a non-DefaultXX handy
+            viewSelection.removeSelectionInterval(lead, lead);
+            viewSelection.addSelectionInterval(lead, lead);
+        }
+        unlock();
+    }
 
-    public int[] getSelectedRows(ListSelectionModel selection) {
+    public void unlock() {
+        if (!isListening) {
+            viewSelection.setValueIsAdjusting(false);
+            viewSelection.addListSelectionListener(getViewSelectionListener());
+            isListening = true;
+        }
+    }
+
+    public void lock() {
+        if (viewSelectionListener != null) {
+            viewSelection.removeListSelectionListener(viewSelectionListener);
+            viewSelection.setValueIsAdjusting(true);
+            isListening = false;
+        }
+    }
+
+    public void clearModelSelection() {
+        // JW: need to reset anchor/lead?
+        modelSelection.clearSelection();
+    }
+
+    public void insertIndexInterval(int start, int length, boolean before) {
+        modelSelection.insertIndexInterval(start, length, before);
+    }
+
+    public void removeIndexInterval(int start, int end) {
+        modelSelection.removeIndexInterval(start, end);
+    }
+
+    private void mapTowardsModel() {
+        modelSelection.clearSelection();
+        int[] selected = getSelectedRows(viewSelection); 
+        for (int i = 0; i < selected.length; i++) {
+            int modelIndex = convertToModel(selected[i]);
+            modelSelection.addSelectionInterval(modelIndex, modelIndex); 
+        }
+        if (selected.length > 0) {
+            // convert lead selection index to model coordinates
+            modelSelection.moveLeadSelectionIndex(convertToModel(viewSelection.getLeadSelectionIndex()));
+        }
+    }
+
+    private int convertToModel(int index) {
+        // JW: check for valid index? must be < pipeline.getOutputSize()
+        return pipeline != null ? pipeline.convertRowIndexToModel(index) : index;
+    }
+    
+    private int convertToView(int index) {
+        // JW: check for valid index? must be < pipeline.getInputSize()
+        return pipeline != null ? pipeline.convertRowIndexToView(index) : index;
+    }
+    
+    protected void updateFromViewSelectionChanged(int firstIndex, int lastIndex) {
+        for (int i = firstIndex; i <= lastIndex; i++) {
+            int modelIndex = convertToModel(i);
+            if (viewSelection.isSelectedIndex(i)) {
+                modelSelection.addSelectionInterval(modelIndex, modelIndex);
+            } else {
+                modelSelection.removeSelectionInterval(modelIndex, modelIndex);
+            }
+        }
+    }
+
+    protected void updateFromPipelineChanged() {
+        restoreSelection();
+    }
+
+    private int[] getSelectedRows(ListSelectionModel selection) {
         int iMin = selection.getMinSelectionIndex();
         int iMax = selection.getMaxSelectionIndex();
 
@@ -93,110 +187,13 @@ public class Selection {
         System.arraycopy(rvTmp, 0, rv, 0, n);
         return rv;
     }
-
-    public void restoreSelection() {
-        lock();
-        viewSelection.setValueIsAdjusting(true);
-        // JW - hmm... clearSelection doesn't reset the lead/anchor. Why not?
-        viewSelection.clearSelection();
-
-//        checking for model boundary coordinates was a quick hack for #16
-        // should be solved in the overhaul
-//        final int rowCount = pipeline != null ? pipeline.getInputSize() : Integer.MAX_VALUE;
-        int[] selected = getSelectedRows(modelSelection);
-        for (int i = 0; i < selected.length; i++) {
-          int index = convertToView(selected[i]);
-          // index might be -1, but then addSelectionInterval ignores it. 
-          viewSelection.addSelectionInterval(index, index);
-        }
-        int lead = modelSelection.getLeadSelectionIndex();
-        lead = convertToView(lead);
-        if (viewSelection instanceof DefaultListSelectionModel) {
-            ((DefaultListSelectionModel) viewSelection).moveLeadSelectionIndex(lead);
-        } else {
-            // PENDING: not tested, don't have a non-DefaultXX handy
-            viewSelection.removeSelectionInterval(lead, lead);
-            viewSelection.addSelectionInterval(lead, lead);
-        }
-        viewSelection.setValueIsAdjusting(false);
-        unlock();
-    }
-
-    public void unlock() {
-        if (!isListening) {
-            viewSelection.addListSelectionListener(getViewSelectionListener());
-            isListening = true;
-        }
-    }
-
-    public void lock() {
-        if (viewSelectionListener != null) {
-            viewSelection.removeListSelectionListener(viewSelectionListener);
-            isListening = false;
-        }
-    }
-
-    public void clearModelSelection() {
-        modelSelection.clearSelection();
-        
-    }
-
-    public void insertIndexInterval(int start, int length, boolean before) {
-        modelSelection.insertIndexInterval(start, length, before);
-        
-    }
-
-    public void removeIndexInterval(int start, int end) {
-        modelSelection.removeIndexInterval(start, end);
-        
-    }
-
     
-    private void mapTowardsModel() {
-        // if (!pipeline.isAssigned()) return;
-        modelSelection.clearSelection();
-        int[] selected = getSelectedRows(viewSelection); 
-        for (int i = 0; i < selected.length; i++) {
-            int modelIndex = convertToModel(selected[i]);
-            modelSelection.addSelectionInterval(modelIndex, modelIndex); 
-        }
-        if (selected.length > 0) {
-            // convert lead selection index to model coordinates
-            modelSelection.moveLeadSelectionIndex(convertToModel(viewSelection.getLeadSelectionIndex()));
-        }
-    }
-
-    private int convertToModel(int index) {
-        return pipeline != null ? pipeline.convertRowIndexToModel(index) : index;
-    }
-    
-    private int convertToView(int index) {
-        return pipeline != null ? pipeline.convertRowIndexToView(index) : index;
-    }
-    
-    protected void updateFromViewSelectionChanged(int firstIndex, int lastIndex) {
-        for (int i = firstIndex; i <= lastIndex; i++) {
-            int modelIndex = convertToModel(i);
-            if (viewSelection.isSelectedIndex(i)) {
-                modelSelection.addSelectionInterval(modelIndex, modelIndex);
-            } else {
-                modelSelection.removeSelectionInterval(modelIndex, modelIndex);
-            }
-        }
-        
-    }
-
-    protected void updateFromPipelineChanged() {
-        restoreSelection();
-    }
-
     private PipelineListener getPipelineListener() {
         if (pipelineListener == null) {
             pipelineListener = new PipelineListener() {
 
                 public void contentsChanged(PipelineEvent e) {
                     updateFromPipelineChanged();
-                    
                 }
                 
             };
@@ -211,7 +208,6 @@ public class Selection {
                 public void valueChanged(ListSelectionEvent e) {
                     if (e.getValueIsAdjusting()) return;
                     updateFromViewSelectionChanged(e.getFirstIndex(), e.getLastIndex());
-                    
                 }
                 
             };
