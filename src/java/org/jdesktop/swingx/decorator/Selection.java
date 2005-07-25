@@ -62,7 +62,8 @@ public class Selection {
         }
         this.viewSelection = selection;
         mapTowardsModel();
-        unlock();
+        viewSelection.addListSelectionListener(getViewSelectionListener());
+        isListening = true;
     }
 
     public void setFilters(FilterPipeline pipeline) {
@@ -79,6 +80,7 @@ public class Selection {
 
 
     public void restoreSelection() {
+//        if (pipeline == null) return;
         lock();
         // JW - hmm... clearSelection doesn't reset the lead/anchor. Why not?
         viewSelection.clearSelection();
@@ -110,7 +112,7 @@ public class Selection {
     }
 
     public void lock() {
-        if (viewSelectionListener != null) {
+        if (isListening) {
             viewSelection.removeListSelectionListener(viewSelectionListener);
             viewSelection.setValueIsAdjusting(true);
             isListening = false;
@@ -145,12 +147,12 @@ public class Selection {
 
     private int convertToModel(int index) {
         // JW: check for valid index? must be < pipeline.getOutputSize()
-        return pipeline != null ? pipeline.convertRowIndexToModel(index) : index;
+        return (pipeline != null) && pipeline.isAssigned() ? pipeline.convertRowIndexToModel(index) : index;
     }
     
     private int convertToView(int index) {
         // JW: check for valid index? must be < pipeline.getInputSize()
-        return pipeline != null ? pipeline.convertRowIndexToView(index) : index;
+        return (pipeline != null) && pipeline.isAssigned() ? pipeline.convertRowIndexToView(index) : index;
     }
     
     protected void updateFromViewSelectionChanged(int firstIndex, int lastIndex) {

@@ -179,7 +179,9 @@ public abstract class Filter {
      * Convert row index from view coordinates to model coordinates
      * accounting for the presence of sorters and filters.
      *
-     * @param row row index in view coordinates
+     *  
+     * @param row row index in view coordinates - 
+     *      JW: shouldn't it be "this filter's coordinates"?
      * @return row index in model coordinates
      */
     public int convertRowIndexToModel(int row) {
@@ -257,6 +259,9 @@ public abstract class Filter {
 
     protected int mapTowardView(int row) {
         // WARNING: Not all model indices map to view when view is filtered!
+        // JW - TODO: cleanup and clarify preconditions in all mapping methods
+        // in all towardView the row must be < getInputSize
+        // in add towardModel the row must be < getSize
         return row < 0 || row >= fromPrevious.length ? - 1 : fromPrevious[row];
     }
 

@@ -86,11 +86,12 @@ public class SelectionIssues extends InteractiveTestCase {
     public void testKeepSelectionOnFilterChange() {
         JXTable table = new JXTable(ascendingModel);
         int selectedRow = 0;
-        table.setRowSelectionInterval(selectedRow, 0);
+        table.setRowSelectionInterval(selectedRow, selectedRow);
         // sanity assert
         assertEquals(selectedRow, table.getSelectedRow());
         PatternFilter filter = new PatternFilter(".*", 0, 0);
         table.setFilters(new FilterPipeline(new Filter[] {filter}));
+        assertEquals(ascendingModel.getRowCount(), table.getRowCount());
         assertEquals("table must keep selection after setting filter", selectedRow, table.getSelectedRow());
         // add an invers sorter
         Sorter sorter = new ShuttleSorter(0, false);
