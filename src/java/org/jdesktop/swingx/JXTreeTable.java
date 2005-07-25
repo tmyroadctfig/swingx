@@ -356,8 +356,17 @@ public class JXTreeTable extends JXTable {
 //      CHANGED LINE TO CORRECT ISSUE 151 - rlopes
       	//renderer = new TreeTableCellRenderer(treeModel);
         renderer.setModel(treeModel);
-        // Adapt tree model to table model before invoking setModel()
-        setModel(new TreeTableModelAdapter(treeModel, renderer));
+        // #241: make sure old listeners are removed
+        // JW: this should be done more cleanly, actually there is no need
+        // to create a new adapter when setting a new treeModel.
+        // what's needed is to fire a structureChanged
+        
+        ((TreeTableModelAdapter)getModel()).setTreeTableModel(treeModel);
+//        if (getModel() instanceof TreeTableModelAdapter) {
+//            ((TreeTableModelAdapter) getModel()).setTreeTableModel(null);
+//        }
+//        // Adapt tree model to table model before invoking setModel()
+//        setModel(new TreeTableModelAdapter(treeModel, renderer));
         // Enforce referential integrity; bail on fail
         if (treeModel != renderer.getModel()) { // do not use assert here!
             throw new IllegalArgumentException("Mismatched TreeTableModel");
@@ -1270,6 +1279,7 @@ public class JXTreeTable extends JXTable {
     }
 
     private static class TreeTableModelAdapter extends AbstractTableModel {
+        private TreeModelListener treeModelListener;
         /**
          * Maintains a TreeTableModel and a JTree as purely implementation details.
          * Developers can plug in any type of custom TreeTableModel through a
@@ -1287,29 +1297,7 @@ public class JXTreeTable extends JXTable {
             assert tree != null;
 
             this.tree = tree; // need tree to implement getRowCount()
-            this.model = model;
-
-            // Install a TreeModelListener that can update the table when
-            // tree changes. We use delayedFireTableDataChanged as we can
-            // not be guaranteed the tree will have finished processing
-            // the event before us.
-            model.addTreeModelListener(new TreeModelListener() {
-                public void treeNodesChanged(TreeModelEvent e) {
-                    delayedFireTableDataChanged(e, 0);
-                }
-
-                public void treeNodesInserted(TreeModelEvent e) {
-                    delayedFireTableDataChanged(e, 1);
-                }
-
-                public void treeNodesRemoved(TreeModelEvent e) {
-                    delayedFireTableDataChanged(e, 2);
-                }
-
-                public void treeStructureChanged(TreeModelEvent e) {
-                    delayedFireTableDataChanged();
-                }
-            });
+            setTreeTableModel(model);
 
             tree.addTreeExpansionListener(new TreeExpansionListener() {
                 // Don't use fireTableRowsInserted() here; the selection model
@@ -1322,6 +1310,51 @@ public class JXTreeTable extends JXTable {
                     fireTableDataChanged();
                 }
             });
+        }
+
+        /**
+         * 
+         * @param model must not be null!
+         */
+        public void setTreeTableModel(TreeTableModel model) {
+            TreeTableModel old = getTreeTableModel();
+            if (old != null) {
+                old.removeTreeModelListener(getTreeModelListener());
+            }
+            this.model = model;
+            // Install a TreeModelListener that can update the table when
+            // tree changes. 
+            model.addTreeModelListener(getTreeModelListener());
+            fireTableStructureChanged();
+        }
+
+        /**
+         * @return
+         */
+        private TreeModelListener getTreeModelListener() {
+            if (treeModelListener == null) {
+                treeModelListener = new TreeModelListener() {
+                    // We use delayedFireTableDataChanged as we can
+                    // not be guaranteed the tree will have finished processing
+                    // the event before us.
+                    public void treeNodesChanged(TreeModelEvent e) {
+                        delayedFireTableDataChanged(e, 0);
+                    }
+
+                    public void treeNodesInserted(TreeModelEvent e) {
+                        delayedFireTableDataChanged(e, 1);
+                    }
+
+                    public void treeNodesRemoved(TreeModelEvent e) {
+                        delayedFireTableDataChanged(e, 2);
+                    }
+
+                    public void treeStructureChanged(TreeModelEvent e) {
+                        delayedFireTableDataChanged();
+                    }
+                };
+            }
+            return treeModelListener;
         }
 
         /**
