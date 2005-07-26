@@ -347,23 +347,33 @@ public class FilterPipeline {
     /**
      * Returns the value of the cell at the specified coordinates.
      *
+     * 
      * @param row in view coordinates
      * @param column in model coordinates
      * @return the value of the cell at the specified coordinates
      */
     public Object getValueAt(int row, int column) {
+        // JW: this impl relies on the fact that there's always the
+        // identity filter installed
+        // should use adapter if assigned and no filter
         Filter last = last();
         return (last == null) ? null : last.getValueAt(row, column);
     }
 
     public void setValueAt(Object aValue, int row, int column) {
-        Filter last = last();
+        // JW: this impl relies on the fact that there's always the
+        // identity filter installed
+        // should use adapter if assigned and no filter
+                Filter last = last();
         if (last != null) {
             last.setValueAt(aValue, row, column);
         }
     }
 
     public boolean isCellEditable(int row, int column) {
+        // JW: this impl relies on the fact that there's always the
+        // identity filter installed
+        // should use adapter if assigned and no filter
         Filter last = last();
         return (last == null) ? false : last.isCellEditable(row, column);
     }

@@ -32,6 +32,28 @@ public class FilterTest extends InteractiveTestCase {
     protected ComponentAdapter directModelAdapter;
     private PipelineReport pipelineReport;
 
+
+    /**
+     * Issue ??-swingx
+     * pipeline should auto-flush on assigning adapter.
+     *
+     */
+    public void testFlushOnAssign() {
+        Filter filter = new PatternFilter(".*", 0, 0);
+        FilterPipeline pipeline = new FilterPipeline(new Filter[] { filter });
+        pipeline.assign(directModelAdapter);
+        assertEquals("pipeline output size must be model count", 
+                directModelAdapter.getRowCount(), pipeline.getOutputSize());
+        // JW PENDING: remove necessity to explicitly flush...
+        Object value = pipeline.getValueAt(0, 0);
+        assertEquals("value access via sorter must return the same as via pipeline", 
+               value, pipeline.getValueAt(0, 0));
+        
+    }
+    /**
+     * test notification on setSorter: must fire on change only.
+     *
+     */
     public void testPipelineEventOnSameSorter() {
         FilterPipeline pipeline = new FilterPipeline();
         pipeline.assign(directModelAdapter);
@@ -46,6 +68,10 @@ public class FilterTest extends InteractiveTestCase {
         
     }
 
+    /**
+     * test notification on setSorter.
+     *
+     */
     public void testPipelineEventOnSetSorter() {
         FilterPipeline pipeline = new FilterPipeline();
         pipeline.assign(directModelAdapter);
@@ -58,6 +84,11 @@ public class FilterTest extends InteractiveTestCase {
         assertEquals("pipeline must have fired on setSorter null", 1, pipelineReport.getEventCount());
         
     }
+
+    /**
+     * test notification on setSorter: must fire if assigned only.
+     *
+     */
     public void testPipelineEventOnSetSorterUnassigned() {
         FilterPipeline pipeline = new FilterPipeline();
         pipeline.addPipelineListener(pipelineReport);
@@ -383,9 +414,9 @@ public class FilterTest extends InteractiveTestCase {
     }
     /**
      * returns a pipeline with two default patternfilters on
-     * column 0, 2 and a sorter on column 0.
+     * column 0, 2 and an ascending sorter on column 0.
      */
-    private FilterPipeline createPipeline() {
+    protected FilterPipeline createPipeline() {
         Filter filterZero = createDefaultPatternFilter(0);
         Filter filterTwo = createDefaultPatternFilter(2); 
         Sorter sorter = new ShuttleSorter();
