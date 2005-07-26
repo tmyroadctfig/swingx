@@ -101,12 +101,13 @@ public class PatternHighlighter extends ConditionalHighlighter
             return false;
         }
 
-        // getValueAt() requires column in view coordinates. So convert.
-        int		testColumnV = adapter.modelToView(testColumn);
-        if (testColumnV < 0) {
-            return false; // column is not being displayed
-        }
-        Object	value = adapter.getFilteredValueAt(adapter.row, testColumnV);
+//        // getValueAt() requires column in view coordinates. So convert.
+//        int		testColumnV = adapter.modelToView(testColumn);
+//        if (testColumnV < 0) {
+//            return false; // column is not being displayed
+//        }
+        if (!adapter.isTestable(testColumn)) return false;
+        Object	value = adapter.getFilteredValueAt(adapter.row, testColumn);
 
         if (value == null) {
             return false;

@@ -169,9 +169,10 @@ public abstract class Filter {
             return "Column " + column;	// in model coordinates :-(
         }
         else {
-            int	viewColumnIndex = adapter.modelToView(getColumnIndex());
-            return viewColumnIndex < 0 ?
-                "" : adapter.getColumnName(viewColumnIndex);
+//            int	viewColumnIndex = adapter.modelToView(getColumnIndex());
+//            return viewColumnIndex < 0 ?
+//                "" : adapter.getColumnName(viewColumnIndex);
+            return adapter.getColumnName(getColumnIndex());
         }
     }
 

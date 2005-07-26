@@ -14,13 +14,39 @@ import javax.swing.JComponent;
  * A <code>ComponentAdapter</code> allows a {@link Filter}, {@link Sorter},
  * or {@link Highlighter} to interact with a {@link #target} component through a
  * common API.
- *
+ * 
+ * It has two aspects:
+ * <ul>
+ * <li> interact with the data of the component. The methods for this are those 
+ * taking row/column indices as parameters. The coordinates
+ * are in model coordinate system. Typical clients of are Filters.
+ * <li> interact with the view state for a given data element. The row/cloumn fields and the
+ * parameterless methods service this aspect. The coordinates are in view coordinate system.
+ * Typical clients are the highlighting part of Highlighters.
+ * </ul>
+ * 
+ * The adapter is responsible for mapping column coordinates. 
+ * 
+ * All input column 
+ * indices are in model coordinates with exactly two exceptions:
+ * <ul>
+ * <li> {@link #column} in column view coordinates
+ * <li> the mapping method viewToModel(columnIndex) in view coordinates
+ * </ul>
+ * 
+ * All input row indices are in model coordinates with exactly two exceptions:
+ * <ul>
+ * <li> {@link #row} in row view coordinates
+ * <li> the access method for the filtered value takes the row in view coordinates.
+ * </ul>
+ *  
+ * 
  * @author Ramesh Gupta
  */
 public abstract class ComponentAdapter {
-    /** current row in view coordinates (?) */
+    /** current row in view coordinates. */
     public int row = 0;
-    /** current column in view coordinates */
+    /** current column in view coordinates. */
     public int column = 0;
     protected final JComponent	target;
 
@@ -38,58 +64,94 @@ public abstract class ComponentAdapter {
         return target;
     }
 
+//---------------------------- accessing the target's model
+    
     /**
-     * JW: doc unclear - label or identifier? TableCA implements 
-     * as column.headerValue (which is "label")... This wrecks
-     * ColumnHighlighter because JNTable stores the column props with
-     * column "logical name" as key. Boing :-(
+     * returns the column's label (= headerValue).
      * 
-     * Filter delegates to this in getColumnName. Filter.getColumnName is
-     * used in JXSearchPanel to fill the field with the column name - this
-     * looks as if it's meant to be the name...
+     * Used f.i. in SearchPanel to fill the field with the 
+     * column name.
      * 
-     * @param columnIndex in view coordinates
-     * @return column name
+     * Note: it's up to the implementation to decide for which
+     * columns it returns a name - most will do so for the
+     * subset with isTestable = true.
+     * 
+     * @param columnIndex in model coordinates
+     * @return column name or null if not found/not testable.
      */
     public abstract String getColumnName(int columnIndex);
 
     /**
      * returns the logical name (== identifier) of the column at 
-     * columnIndex in view
-     * coordinates.
+     * columnIndex in model coordinates.
      * 
-     * JW: added to have a very clear contract without disturbing
-     * current implementations.
+     * Used f.i. JNTable to store and apply column properties by identifier.
      * 
-     * @param columnIndex in view coordinates
+     * Note: it's up to the implementation to decide for which
+     * columns it returns a name - most will do so for the
+     * subset with isTestable = true.
+     * 
+     * @param columnIndex in model coordinates
      * @return the String value of the column identifier at columnIndex
      *   or null if no identifier set
      */
     public abstract String getColumnIdentifier(int columnIndex);
+
     /**
-     * Returns the number of columns in the target component's view.
+     * Returns the number of columns in the target's data model.
      *
-     * @return the number of columns in the target component's view
+     * @return the number of columns in the target's data model.
      */
     public int getColumnCount() {
         return 1;	// default for combo-boxes, lists, and trees
     }
 
     /**
-     * Returns the number of rows in the target component's view.
+     * Returns the number of rows in the target's data model.
      *
-     * @return the number of rows in the target component's view
+     * @return the number of rows in the target's data model.
      */
     public int getRowCount() {
         return 0;
     }
 
     /**
+     * Returns the value of the target component's cell identified by the
+     * specified row and column in model coordinates.
+     *
+     * @param row in model coordinates
+     * @param column in model coordinates
+     * @return the value of the target component's cell identified by the
+     * specified row and column
+     */
+    public abstract Object getValueAt(int row, int column);
+    public abstract void setValueAt(Object aValue, int row, int column);
+
+    public abstract boolean isCellEditable(int row, int column);
+
+    /**
+     * returns true if the column should be included in testing.
+     * Here: returns true if visible (that is modelToView gives a valid
+     * view column coordinate).
+     * 
+     * @param column in model coordinates
+     * @return
+     */
+    public  boolean isTestable(int column) {
+        return modelToView(column) >= 0;
+    }
+    
+//----------------------- accessing the target's view state
+    
+    /**
      * Returns the value of the cell identified by this adapter by invoking
      * {@link #getValueAt(int, int)}, passing in the {@link #row} and
      * {@link #column} values of this adapter. For target components that don't
      * support multiple columns, the value of <code>column</code> is always zero.
      *
+     * PENDING: needs clarification/cleanup - getValueAt(row, column) expects 
+     * model coordinates!.
+     * 
      * @return the value of the cell identified by this adapter
      */
     public Object getValue() {
@@ -97,19 +159,18 @@ public abstract class ComponentAdapter {
     }
 
     /**
-     * Returns the value of the target component's cell identified by the
-     * specified row and column.
-     *
+     * returns the filtered value of the cell identified by the row
+     * in view coordinate and the column in model coordinates.
+     * 
+     * Note: the asymetry of the coordinates is intentional - clients like
+     * Highlighters are interested in view values but might need to access
+     * non-visible columns for testing.
+     * 
      * @param row
      * @param column
-     * @return the value of the target component's cell identified by the
-     * specified row and column
+     * @return
      */
-    public abstract Object getValueAt(int row, int column);
     public abstract Object getFilteredValueAt(int row, int column);
-    public abstract void setValueAt(Object aValue, int row, int column);
-
-    public abstract boolean isCellEditable(int row, int column);
 
     /**
      * Returns true if the cell identified by this adapter currently has focus;
@@ -182,7 +243,7 @@ public abstract class ComponentAdapter {
         return columnIndex; // sensible default for JList and JTree
     }
 
-    /**
+   /**
      * For target components that support multiple columns in their model,
      * along with column reordering in the view, this method transforms the
      * specified columnIndex from view coordinates to model coordinates. For all

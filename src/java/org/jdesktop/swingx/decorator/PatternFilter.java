@@ -91,9 +91,9 @@ public class PatternFilter extends Filter implements PatternMatcher {
             return false;
         }
 
-        // If column index in view coordinates is negative, the column is hidden.
-        if (adapter.modelToView(getColumnIndex()) < 0) {
-            return false; // column is not being displayed; obviously no match!
+        // ask the adapter is the column should be includes
+        if (!adapter.isTestable(getColumnIndex())) {
+            return false; 
         }
 
         Object	value = getInputValue(row, getColumnIndex());

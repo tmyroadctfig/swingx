@@ -53,11 +53,16 @@ public class SearchHighlighter extends PatternHighlighter {
             return false;
         }
         // use one highlighter for all columns
-        int testColumnV = adapter.column;
-        if (testColumn >= 0) {
-            testColumnV = adapter.modelToView(testColumn);
+//        int testColumnV = adapter.column;
+//        if (testColumn >= 0) {
+//            testColumnV = adapter.modelToView(testColumn);
+//        }
+        int columnToTest = testColumn;
+        // use one highlighter for all columns
+        if (columnToTest < 0) {
+            columnToTest = adapter.viewToModel(adapter.column);
         }
-        Object  value = adapter.getFilteredValueAt(adapter.row, testColumnV);
+        Object  value = adapter.getFilteredValueAt(adapter.row, columnToTest);
         if (value == null) {
             return false;
         }

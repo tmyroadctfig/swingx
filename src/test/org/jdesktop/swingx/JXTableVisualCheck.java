@@ -14,6 +14,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Date;
 
 import javax.swing.AbstractAction;
@@ -26,6 +28,9 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JViewport;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
@@ -55,14 +60,63 @@ import org.jdesktop.swingx.util.AncientSwingTeam;
  */
 public class JXTableVisualCheck extends JXTableUnitTest {
     
+    public static void main(String args[]) {
+//      setSystemLF(true);
+      JXTableVisualCheck test = new JXTableVisualCheck();
+      try {
+//        test.runInteractiveTests();
+//          test.runInteractiveTests("interactive.*ColumnControlColumnModel.*");
+//          test.runInteractiveTests("interactive.*TableHeader.*");
+     //     test.runInteractiveTests("interactive.*Sort.*");
+//          test.runInteractiveTests("interactive.*ColumnControlAndF.*");
+          test.runInteractiveTests("interactive.*RowHeight.*");
+//          test.runInteractiveTests("interactive.*TableMod.*");
+          
+//          test.runInteractiveTests("interactive.*PatternHigh.*");
+      } catch (Exception e) {
+          System.err.println("exception when executing interactive tests:");
+          e.printStackTrace();
+      }
+  }
+
     /**
      * dummy
      */
     public void testDummy() {
     }   
 
+
+    public void interactiveTestRowHeightAndSelection() {
+        final JXTable table = new JXTable(sortableTableModel);
+        table.setRowHeightEnabled(true);
+        table.setRowHeight(0, table.getRowHeight() * 2);
+        final int column = 0;
+        table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+            public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting()) return;
+                ListSelectionModel model = (ListSelectionModel) e.getSource();
+                int selected = model.getMinSelectionIndex();
+                if (selected < 0) return;
+                System.out.println("from selection: " + table.getValueAt(selected, column));
+            }
+            
+        });
+        
+        table.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+               int row = table.rowAtPoint(e.getPoint());
+               int col = table.columnAtPoint(e.getPoint());
+               System.out.println(table.getValueAt(row, column));
+            }
+        });
+        JFrame frame = wrapWithScrollingInFrame(table, "Accessing values (indy rowheights)");
+        frame.setVisible(true);
+    }
+
     public void interactiveTestRowHeight() {
         JXTable table = new JXTable(sortableTableModel);
+        table.setRowHeightEnabled(true);
         table.setRowHeight(0, table.getRowHeight() * 2);
         JFrame frame = wrapWithScrollingInFrame(table, "Individual rowheight");
         frame.setVisible(true);
@@ -173,7 +227,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //        JComboBox box = new JComboBox(new Object[] {"one", "two", "three" });
 //        box.setEditable(true);
 //        table.getColumnExt(0).setCellEditor(new DefaultCellEditor(box));
-        Action toggleFilter = new AbstractAction("Toggle Filter") {
+        Action toggleFilter = new AbstractAction("Toggle Filter col. 0") {
             boolean hasFilters;
             public void actionPerformed(ActionEvent e) {
                 if (hasFilters) {
@@ -757,22 +811,4 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     }
 
 
-    public static void main(String args[]) {
-//        setSystemLF(true);
-        JXTableVisualCheck test = new JXTableVisualCheck();
-        try {
-//          test.runInteractiveTests();
-//            test.runInteractiveTests("interactive.*ColumnControlColumnModel.*");
-//            test.runInteractiveTests("interactive.*TableHeader.*");
-       //     test.runInteractiveTests("interactive.*Sort.*");
-//            test.runInteractiveTests("interactive.*ColumnControlAndF.*");
-            test.runInteractiveTests("interactive.*RowHeight.*");
-            test.runInteractiveTests("interactive.*TableMod.*");
-            
-//            test.runInteractiveTests("interactive.*PatternHigh.*");
-        } catch (Exception e) {
-            System.err.println("exception when executing interactive tests:");
-            e.printStackTrace();
-        }
-    }
 }

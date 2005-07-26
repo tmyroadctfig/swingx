@@ -1174,7 +1174,7 @@ public class JXTable extends JTable implements Searchable {
             return ((TableColumnModelExt) getColumnModel())
                     .getColumnExt(identifier);
         } else {
-            // pending: not tested!
+            // PENDING: not tested!
             try {
                 TableColumn column = getColumn(identifier);
                 if (column instanceof TableColumnExt) {
@@ -1533,29 +1533,44 @@ public class JXTable extends JTable implements Searchable {
             return table;
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        public boolean hasFocus() {
-
-            boolean rowIsLead = (table.getSelectionModel()
-                    .getLeadSelectionIndex() == row);
-            boolean colIsLead = (table.getColumnModel().getSelectionModel()
-                    .getLeadSelectionIndex() == column);
-            return table.isFocusOwner() && (rowIsLead && colIsLead);
-
-        }
 
         public String getColumnName(int columnIndex) {
-            TableColumnModel columnModel = table.getColumnModel();
-            if (columnModel == null) {
-                return "Column " + columnIndex;
-            }
-            TableColumn column = columnModel.getColumn(columnIndex);
-
+//            TableColumnModel columnModel = table.getColumnModel();
+//            if (columnModel == null) {
+//                return "Column " + columnIndex;
+//            }
+//            int viewColumn = modelToView(columnIndex);
+//            TableColumn column = null;
+//            if (viewColumn >= 0) {
+//                column = columnModel.getColumn(viewColumn);
+//            }
+            TableColumn column = getColumnByModelIndex(columnIndex);
             return column == null ? "" : column.getHeaderValue().toString();
         }
 
+        protected TableColumn getColumnByModelIndex(int modelColumn) {
+            List columns = table.getColumns(true);
+            for (Iterator iter = columns.iterator(); iter.hasNext();) {
+                TableColumn column = (TableColumn) iter.next();
+                if (column.getModelIndex() == modelColumn) {
+                    return column;
+                }
+            }
+            return null;
+        }
+
+        
+        public String getColumnIdentifier(int columnIndex) {
+            
+            TableColumn column = getColumnByModelIndex(columnIndex);
+//            int viewColumn = modelToView(columnIndex);
+//            if (viewColumn >= 0) {
+//                table.getColumnExt(viewColumn).getIdentifier();
+//            }
+            Object identifier = column != null ? column.getIdentifier() : null;
+            return identifier != null ? identifier.toString() : null;
+        }
+        
         public int getColumnCount() {
             return table.getModel().getColumnCount();
         }
@@ -1572,10 +1587,6 @@ public class JXTable extends JTable implements Searchable {
             return table.getModel().getValueAt(row, column);
         }
 
-        public Object getFilteredValueAt(int row, int column) {
-            return table.getValueAt(row, column); // in view coordinates
-        }
-
         public void setValueAt(Object aValue, int row, int column) {
             // RG: eliminate superfluous back-and-forth conversions
             table.getModel().setValueAt(aValue, row, column);
@@ -1586,11 +1597,32 @@ public class JXTable extends JTable implements Searchable {
             return table.getModel().isCellEditable(row, column);
         }
 
+        
+        
+        public boolean isTestable(int column) {
+            return getColumnByModelIndex(column) != null;
+        }
+//-------------------------- accessing view state/values
+        
+        public Object getFilteredValueAt(int row, int column) {
+            return table.getValueAt(row, modelToView(column)); // in view coordinates
+        }
+
         /**
          * {@inheritDoc}
          */
         public boolean isSelected() {
             return table.isCellSelected(row, column);
+        }
+        /**
+         * {@inheritDoc}
+         */
+        public boolean hasFocus() {
+            boolean rowIsLead = (table.getSelectionModel()
+                    .getLeadSelectionIndex() == row);
+            boolean colIsLead = (table.getColumnModel().getSelectionModel()
+                    .getLeadSelectionIndex() == column);
+            return table.isFocusOwner() && (rowIsLead && colIsLead);
         }
 
         /**
@@ -1607,10 +1639,6 @@ public class JXTable extends JTable implements Searchable {
             return table.convertColumnIndexToModel(columnIndex);
         }
 
-        public String getColumnIdentifier(int columnIndex) {
-            Object identifier = table.getColumnExt(columnIndex).getIdentifier();
-            return identifier != null ? identifier.toString() : null;
-        }
 
     }
 
