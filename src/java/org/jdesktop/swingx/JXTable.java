@@ -719,22 +719,28 @@ public class JXTable extends JTable implements Searchable {
      * {@inheritDoc}
      */
     public Object getValueAt(int row, int column) {
-        return getFilters().getValueAt(row, convertColumnIndexToModel(column));
+        return getModel().getValueAt(convertRowIndexToModel(row), 
+                convertColumnIndexToModel(column));
+//        return getFilters().getValueAt(row, convertColumnIndexToModel(column));
     }
 
     /**
      * {@inheritDoc}
      */
     public void setValueAt(Object aValue, int row, int column) {
-        getFilters().setValueAt(aValue, row, convertColumnIndexToModel(column));
+        getModel().setValueAt(aValue, convertRowIndexToModel(row),
+                convertColumnIndexToModel(column));
+//        getFilters().setValueAt(aValue, row, convertColumnIndexToModel(column));
     }
 
     /**
      * {@inheritDoc}
      */
     public boolean isCellEditable(int row, int column) {
-        return getFilters().isCellEditable(row,
+        return getModel().isCellEditable(convertRowIndexToModel(row),
                 convertColumnIndexToModel(column));
+//        return getFilters().isCellEditable(row,
+//                convertColumnIndexToModel(column));
     }
 
     /**
