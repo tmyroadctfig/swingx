@@ -12,6 +12,8 @@ import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JTable;
@@ -47,7 +49,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
           //  test.runInteractiveTests();
          //   test.runInteractiveTests("interactive.*HighLighters");
          //      test.runInteractiveTests("interactive.*SortingFilter.*");
-           test.runInteractiveTests("interactive.*Model.*");
+           test.runInteractiveTests("interactive.*Icon.*");
          //     test.runInteractiveTests("interactive.*Focus.*");
         } catch (Exception ex) {
 
@@ -219,7 +221,42 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         addAction(frame, toggleHandles);
         frame.setVisible(true);
     }
-    
+
+    /**    
+     * Issue #242: CCE when setting icons.
+     */    
+    public void interactiveTestTreeIcons() {
+        final JXTreeTable treeTable = new JXTreeTable(treeTableModel);
+        Icon downIcon = new ImageIcon(getClass().getResource("resources/images/" + "wellbottom.gif"));
+//        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
+//        renderer.setClosedIcon(downIcon);
+//        treeTable.setTreeCellRenderer(renderer);
+        treeTable.setClosedIcon(downIcon);
+//        Action toggleHandles = new AbstractAction("Toggle Handles") {
+//
+//            public void actionPerformed(ActionEvent e) {
+//                treeTable.setShowsRootHandles(!treeTable.getShowsRootHandles());
+//                
+//            }
+//            
+//        };
+//        Action toggleRoot = new AbstractAction("Toggle Root") {
+//
+//            public void actionPerformed(ActionEvent e) {
+//                treeTable.setRootVisible(!treeTable.isRootVisible());
+//                
+//            }
+//            
+//        };
+        treeTable.setRowHeight(22);
+        treeTable.setRowMargin(1);
+        JFrame frame = wrapWithScrollingInFrame(treeTable,
+                "Toggle Tree icons ");
+//        addAction(frame, toggleRoot);
+//        addAction(frame, toggleHandles);
+        frame.setVisible(true);
+    }
+
     /**    issue #148
      *   did not work on LFs which normally respect lineStyle
      *   winLF does not respect it anyway...

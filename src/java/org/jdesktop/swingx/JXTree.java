@@ -7,17 +7,18 @@
 
 package org.jdesktop.swingx;
 
+import java.awt.Component;
+import java.awt.event.ActionEvent;
 import java.lang.reflect.Method;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-
 import javax.swing.ActionMap;
+import javax.swing.Icon;
 import javax.swing.JTree;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
@@ -33,12 +34,15 @@ import org.jdesktop.swingx.decorator.HighlighterPipeline;
  * JXTree.
  *
  * @author Ramesh Gupta
+ * @author Jeanette Winzenburg
  */
 public class JXTree extends JTree {
-    /** @todo Highlighters */
     private Method					conversionMethod = null;
     private final static Class[]	methodSignature = new Class[] {Object.class};
     private final static Object[]	methodArgs = new Object[] {null};
+
+//  private Icon    collapsedIcon = null;
+//  private Icon    expandedIcon = null;
 
     protected FilterPipeline filters = null;
     protected HighlighterPipeline highlighters = null;
@@ -57,6 +61,7 @@ public class JXTree extends JTree {
      * repaints entered/exited rows.
      */
     private LinkController linkController;
+    private boolean overwriteIcons;
     
     
     
@@ -334,7 +339,7 @@ public class JXTree extends JTree {
     }
 
     public TreeCellRenderer getCellRenderer() {
-        return getDelegatingRenderer();//.getDelegateRenderer();
+        return getDelegatingRenderer();
     }
 
     public void setCellRenderer(TreeCellRenderer renderer) {
@@ -343,17 +348,169 @@ public class JXTree extends JTree {
         getDelegatingRenderer().setDelegateRenderer(renderer);
         super.setCellRenderer(delegatingRenderer);
     }
- 
+
+    /**
+     * sets the icon for the handle of an expanded node.
+     * 
+     * Note: this will only succeed if the current ui delegate is
+     * a BasicTreeUI otherwise it will do nothing.
+     * 
+     * @param expanded
+     */
+    public void setExpandedIcon(Icon expanded) {
+        if (getUI() instanceof BasicTreeUI) {
+            ((BasicTreeUI) getUI()).setExpandedIcon(expanded);
+        }
+    }
+    
+    /**
+     * sets the icon for the handel of a collapsed node.
+     * 
+     * Note: this will only succeed if the current ui delegate is
+     * a BasicTreeUI otherwise it will do nothing.
+     *  
+     * @param collapsed
+     */
+    public void setCollapsedIcon(Icon collapsed) {
+        if (getUI() instanceof BasicTreeUI) {
+            ((BasicTreeUI) getUI()).setCollapsedIcon(collapsed);
+        }
+    }
+    
+    /**
+     * set the icon for a leaf node.
+     * 
+     * Note: this will only succeed if current renderer is a 
+     * DefaultTreeCellRenderer.
+     * 
+     * @param leafIcon
+     */
+    public void setLeafIcon(Icon leafIcon) {
+        getDelegatingRenderer().setLeafIcon(leafIcon);
+        
+    }
+    
+    /**
+     * set the icon for a open non-leaf node.
+     * 
+     * Note: this will only succeed if current renderer is a 
+     * DefaultTreeCellRenderer.
+     * 
+     * @param openIcon
+     */
+    public void setOpenIcon(Icon openIcon) {
+        getDelegatingRenderer().setOpenIcon(openIcon);
+    }
+    
+    /**
+     * set the icon for a closed non-leaf node.
+     * 
+     * Note: this will only succeed if current renderer is a 
+     * DefaultTreeCellRenderer.
+     * 
+     * @param closedIcon
+     */
+    public void setClosedIcon(Icon closedIcon) {
+        getDelegatingRenderer().setClosedIcon(closedIcon);
+    }
+    
+    /**
+     * Property to control whether per-tree icons should be 
+     * copied to the renderer on setCellRenderer.
+     * 
+     * the default is false for backward compatibility.
+     * 
+     * PENDING: should update the current renderer's icons when 
+     * setting to true?
+     * 
+     * @param overwrite
+     */
+    public void setOverwriteRendererIcons(boolean overwrite) {
+        if (overwriteIcons == overwrite) return;
+        boolean old = overwriteIcons;
+        this.overwriteIcons = overwrite;
+        firePropertyChange("overwriteRendererIcons", old, overwrite);
+    }
+
+    public boolean isOverwriteRendererIcons() {
+        return overwriteIcons;
+    }
     
     public class DelegatingRenderer implements TreeCellRenderer {
-        
+        private Icon    closedIcon = null;
+        private Icon    openIcon = null;
+        private Icon    leafIcon = null;
+       
         private TreeCellRenderer delegate;
+        
+        public DelegatingRenderer() {
+            initIcons(new DefaultTreeCellRenderer());
+        }
 
+        /**
+         * initially sets the icons to the defaults as given
+         * by a DefaultTreeCellRenderer.
+         * 
+         * @param renderer
+         */
+        private void initIcons(DefaultTreeCellRenderer renderer) {
+            closedIcon = renderer.getDefaultClosedIcon();
+            openIcon = renderer.getDefaultOpenIcon();
+            leafIcon = renderer.getDefaultLeafIcon();
+        }
+
+        /**
+         * Set the delegate renderer. 
+         * Updates the folder/leaf icons. 
+         * 
+         * THINK: how to update? always override with this.icons, only
+         * if renderer's icons are null, update this icons if they are not,
+         * update all if only one is != null.... ??
+         * 
+         * @param delegate
+         */
         public void setDelegateRenderer(TreeCellRenderer delegate) {
             if (delegate == null) {
                 delegate = new DefaultTreeCellRenderer();
             }
             this.delegate = delegate;
+            updateIcons();
+        }
+        
+        /**
+         * tries to set the renderers icons. Can succeed only if the
+         * delegate is a DefaultTreeCellRenderer.
+         * THINK: how to update? always override with this.icons, only
+         * if renderer's icons are null, update this icons if they are not,
+         * update all if only one is != null.... ??
+         * 
+         */
+        private void updateIcons() {
+            if (!isOverwriteRendererIcons()) return;
+            setClosedIcon(closedIcon);
+            setOpenIcon(openIcon);
+            setLeafIcon(leafIcon);
+        }
+
+        public void setClosedIcon(Icon closedIcon) {
+            if (delegate instanceof DefaultTreeCellRenderer) {
+                ((DefaultTreeCellRenderer) delegate).setClosedIcon(closedIcon);
+            }
+            this.closedIcon = closedIcon;
+        }
+        
+        public void setOpenIcon(Icon openIcon) {
+            if (delegate instanceof DefaultTreeCellRenderer) {
+                ((DefaultTreeCellRenderer) delegate).setOpenIcon(openIcon);
+            }
+            this.openIcon = openIcon;
+        }
+        
+        public void setLeafIcon(Icon leafIcon) {
+            if (delegate instanceof DefaultTreeCellRenderer) {
+                ((DefaultTreeCellRenderer) delegate).setLeafIcon(leafIcon);
+            }
+            this.leafIcon = leafIcon;
         }
         
         public TreeCellRenderer getDelegateRenderer() {

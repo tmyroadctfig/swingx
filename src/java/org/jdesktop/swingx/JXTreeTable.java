@@ -17,7 +17,6 @@ import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.reflect.Field;
 import java.util.Enumeration;
 import java.util.EventObject;
 
@@ -26,7 +25,6 @@ import javax.swing.Icon;
 import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
-import javax.swing.SizeSequence;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
@@ -49,6 +47,7 @@ import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import org.jdesktop.swingx.JXTree.DelegatingRenderer;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
@@ -95,11 +94,11 @@ import org.jdesktop.swingx.treetable.TreeTableModel;
  */
 public class JXTreeTable extends JXTable {
     // TOTAL HACK to fix icons that disappeared in a regression after M3!
-    private Icon    collapsedIcon = null;
-    private Icon    expandedIcon = null;
-    private Icon    closedIcon = null;
-    private Icon    openIcon = null;
-    private Icon    leafIcon = null;
+//    private Icon    collapsedIcon = null;
+//    private Icon    expandedIcon = null;
+//    private Icon    closedIcon = null;
+//    private Icon    openIcon = null;
+//    private Icon    leafIcon = null;
 
     /**
      * Renderer used to render cells within the
@@ -581,21 +580,21 @@ public class JXTreeTable extends JXTable {
         int column) {
         // TOTAL HACK to fix icons that disappeared in a regression after M3!
         if (isHierarchical(column)) {
-            if (collapsedIcon != null) {
-                setCollapsedIcon(collapsedIcon);
-            }
-            if (expandedIcon != null) {
-                setExpandedIcon(expandedIcon);
-            }
-            if (openIcon != null) {
-                setOpenIcon(openIcon);
-            }
-            if (closedIcon != null) {
-                setClosedIcon(closedIcon);
-            }
-            if (leafIcon != null) {
-                setLeafIcon(leafIcon);
-            }
+//            if (collapsedIcon != null) {
+//                setCollapsedIcon(collapsedIcon);
+//            }
+//            if (expandedIcon != null) {
+//                setExpandedIcon(expandedIcon);
+//            }
+//            if (openIcon != null) {
+//                setOpenIcon(openIcon);
+//            }
+//            if (closedIcon != null) {
+//                setClosedIcon(closedIcon);
+//            }
+//            if (leafIcon != null) {
+//                setLeafIcon(leafIcon);
+//            }
         }
         
         Component component = super.prepareRenderer(renderer, row, column);
@@ -677,15 +676,16 @@ public class JXTreeTable extends JXTable {
      * @param icon to use for rendering collapsed nodes
      */
     public void setCollapsedIcon(Icon icon) {
-        try {
-            ( (BasicTreeUI) (renderer.getUI())).setCollapsedIcon(icon);
-            // TOTAL HACK to fix icons that disappeared in a regression after M3!
-            collapsedIcon = icon;
-        }
-        catch (ClassCastException ex) {
-            /** @todo use logging apis instead */
-            System.err.println("hacking failed in JXTreeTable.collapsed icon " + ex);
-        }
+        renderer.setCollapsedIcon(icon);
+//        try {
+//            ( (BasicTreeUI) (renderer.getUI())).setCollapsedIcon(icon);
+//            // TOTAL HACK to fix icons that disappeared in a regression after M3!
+////            collapsedIcon = icon;
+//        }
+//        catch (ClassCastException ex) {
+//            /** @todo use logging apis instead */
+//            System.err.println("hacking failed in JXTreeTable.collapsed icon " + ex);
+//        }
     }
 
     /**
@@ -694,15 +694,16 @@ public class JXTreeTable extends JXTable {
      * @param icon to use for rendering expanded nodes
      */
     public void setExpandedIcon(Icon icon) {
-        try {
-            ( (BasicTreeUI) (renderer.getUI())).setExpandedIcon(icon);
-            // TOTAL HACK to fix icons that disappeared in a regression after M3!
-            expandedIcon = icon;
-        }
-        catch (ClassCastException ex) {
-            /** @todo use logging apis instead */
-            System.err.println("hacking failed in JXTreeTable.expandedIcon" + ex);
-        }
+        renderer.setExpandedIcon(icon);
+//        try {
+//            ( (BasicTreeUI) (renderer.getUI())).setExpandedIcon(icon);
+//            // TOTAL HACK to fix icons that disappeared in a regression after M3!
+////            expandedIcon = icon;
+//        }
+//        catch (ClassCastException ex) {
+//            /** @todo use logging apis instead */
+//            System.err.println("hacking failed in JXTreeTable.expandedIcon" + ex);
+//        }
     }
 
     /**
@@ -711,15 +712,16 @@ public class JXTreeTable extends JXTable {
      * @param icon to use for rendering open nodes
      */
     public void setOpenIcon(Icon icon) {
-        try {
-            ((DefaultTreeCellRenderer) renderer.getCellRenderer()).setOpenIcon(icon);
-            // TOTAL HACK to fix icons that disappeared in a regression after M3!
-            openIcon = icon;
-        }
-        catch (ClassCastException ex) {
-            /** @todo use logging apis instead */
-            System.err.println("hacking failed in JXTreeTable.open icon" + ex);
-        }
+        renderer.setOpenIcon(icon);
+//        try {
+//            ((DefaultTreeCellRenderer) renderer.getCellRenderer()).setOpenIcon(icon);
+//            // TOTAL HACK to fix icons that disappeared in a regression after M3!
+//            openIcon = icon;
+//        }
+//        catch (ClassCastException ex) {
+//            /** @todo use logging apis instead */
+//            System.err.println("hacking failed in JXTreeTable.open icon" + ex);
+//        }
     }
 
     /**
@@ -728,15 +730,18 @@ public class JXTreeTable extends JXTable {
      * @param icon to use for rendering closed nodes
      */
     public void setClosedIcon(Icon icon) {
-        try {
-            ((DefaultTreeCellRenderer) renderer.getCellRenderer()).setClosedIcon(icon);
-            // TOTAL HACK to fix icons that disappeared in a regression after M3!
-            closedIcon = icon;
-        }
-        catch (ClassCastException ex) {
-            /** @todo use logging apis instead */
-            System.err.println("hacking failed in JXTreeTable.closedIcon " +ex);
-        }
+        renderer.setClosedIcon(icon);
+//        try {
+//            DelegatingRenderer delegate = (DelegatingRenderer) renderer.getCellRenderer();
+//            
+//            ((DefaultTreeCellRenderer) delegate.getDelegateRenderer()).setClosedIcon(icon);
+//            // TOTAL HACK to fix icons that disappeared in a regression after M3!
+//            closedIcon = icon;
+//        }
+//        catch (ClassCastException ex) {
+//            /** @todo use logging apis instead */
+//            System.err.println("hacking failed in JXTreeTable.closedIcon " +ex);
+//        }
     }
 
     /**
@@ -745,15 +750,16 @@ public class JXTreeTable extends JXTable {
      * @param icon to use for rendering leaf nodes
      */
     public void setLeafIcon(Icon icon) {
-        try {
-            ((DefaultTreeCellRenderer) renderer.getCellRenderer()).setLeafIcon(icon);
-            // TOTAL HACK to fix icons that disappeared in a regression after M3!
-            leafIcon = icon;
-        }
-        catch (ClassCastException ex) {
-            /** @todo use logging apis instead */
-            System.err.println("hacking failed in JXTreeTable.leafIcon " +ex);
-        }
+        renderer.setLeafIcon(icon);
+//        try {
+//            ((DefaultTreeCellRenderer) renderer.getCellRenderer()).setLeafIcon(icon);
+//            // TOTAL HACK to fix icons that disappeared in a regression after M3!
+//            leafIcon = icon;
+//        }
+//        catch (ClassCastException ex) {
+//            /** @todo use logging apis instead */
+//            System.err.println("hacking failed in JXTreeTable.leafIcon " +ex);
+//        }
     }
 
     /**
@@ -1503,6 +1509,7 @@ public class JXTreeTable extends JXTable {
             setRootVisible(false); // superclass default is "true"
             setShowsRootHandles(true); // superclass default is "false"
                 /** @todo Support truncated text directly in DefaultTreeCellRenderer. */
+            setOverwriteRendererIcons(true);
             setCellRenderer(new ClippedTreeCellRenderer());
         }
 
