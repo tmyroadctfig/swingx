@@ -22,6 +22,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JPopupMenu;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
@@ -196,9 +197,10 @@ public final class ColumnControlButton extends JButton {
      * 
      *
      */ 
-    public void showPopup() {
-
-        if (popupMenu.getComponentCount() > 0) {
+    public void togglePopup() {
+        if (popupMenu.isVisible()) {
+            popupMenu.setVisible(false);
+        } else if (popupMenu.getComponentCount() > 0) {
             Dimension buttonSize = getSize();
             popupMenu.show(this, buttonSize.width
                     - popupMenu.getPreferredSize().width, buttonSize.height);
@@ -356,7 +358,11 @@ public final class ColumnControlButton extends JButton {
         setFocusable(false);
         // create the popup menu
         popupMenu = new JPopupMenu();
-
+        // this is a trick to get hold of the client prop which
+        // prevents closing of the popup
+        JComboBox box = new JComboBox();
+        Object preventHide = box.getClientProperty("doNotCancelPopup");
+        putClientProperty("doNotCancelPopup", preventHide);
     }
 
 
@@ -370,7 +376,7 @@ public final class ColumnControlButton extends JButton {
         Action control = new AbstractAction() {
 
             public void actionPerformed(ActionEvent e) {
-                showPopup();
+                togglePopup();
             }
 
         };
