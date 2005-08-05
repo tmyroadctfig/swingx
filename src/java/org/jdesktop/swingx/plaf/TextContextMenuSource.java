@@ -1,6 +1,8 @@
 /*
- * Created on 02.08.2005
+ * $Id$
  *
+ * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
+ * Santa Clara, California 95054, U.S.A. All rights reserved.
  */
 package org.jdesktop.swingx.plaf;
 
@@ -20,13 +22,10 @@ public class TextContextMenuSource extends ContextMenuSource{
     String UNDO = "Undo";
     String CUT = "Cut";
     String COPY = "Copy";
-
     String PASTE = "Paste";
-
     String DELETE = "Delete";
-
     String SELECT_ALL = "Select All";
-    
+  
     String[] keys = { DefaultEditorKit.cutAction, DefaultEditorKit.copyAction,
             DefaultEditorKit.pasteAction, DefaultEditorKit.deleteNextCharAction, 
             null, // separator
