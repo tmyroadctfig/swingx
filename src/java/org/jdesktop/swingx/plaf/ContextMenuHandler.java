@@ -28,6 +28,8 @@ public class ContextMenuHandler extends MouseAdapter {
 
     private ContextMenuSource contextMenuSource;
 
+    private JPopupMenu popup;
+
     /**
      * creates a context handler for TextContextMenuSource.
      *
@@ -79,27 +81,39 @@ public class ContextMenuHandler extends MouseAdapter {
     }
 
     private void showContextPopup(JComponent component, int x, int y) {
-        JPopupMenu popup = new JPopupMenu();
-        ActionMap map = getActionMap(component, true);
-        String[] keys = getContextMenuSource().getKeys();
-        for (int i = 0; i < keys.length; i++) {
-            if (keys[i] != null) {
-                popup.add(map.get(keys[i]));
-            } else {
-                popup.addSeparator();
-            }
-        }
+        JPopupMenu popup = getPopupMenu(component, true);
         popup.show(component, x, y);
     }
 
-    private ActionMap getActionMap(JComponent component, boolean synchEnabled) {
+    /**
+     * @param component
+     * @return
+     */
+    private JPopupMenu getPopupMenu(JComponent component, boolean synchEnabled) {
+        if (popup == null) {
+            popup = new JPopupMenu();
+            ActionMap map = getActionMap(component);
+            String[] keys = getContextMenuSource().getKeys();
+            for (int i = 0; i < keys.length; i++) {
+                if (keys[i] != null) {
+                    popup.add(map.get(keys[i]));
+                } else {
+                    popup.addSeparator();
+                }
+            }
+        }  
+        if (synchEnabled) {
+            getContextMenuSource().updateActionEnabled(component, actionMap);
+        }
+
+        return popup;
+    }
+
+    private ActionMap getActionMap(JComponent component) {
         if (actionMap == null) {
             actionMap = getContextMenuSource().createActionMap(component);
         } else {
             // todo: replace actions with components?
-        }
-        if (synchEnabled) {
-            getContextMenuSource().updateActionEnabled(component, actionMap);
         }
         return actionMap;
     }

@@ -18,9 +18,7 @@ import javax.swing.text.JTextComponent;
 public class TextContextMenuSource extends ContextMenuSource{
 
     String UNDO = "Undo";
-
     String CUT = "Cut";
-
     String COPY = "Copy";
 
     String PASTE = "Paste";
