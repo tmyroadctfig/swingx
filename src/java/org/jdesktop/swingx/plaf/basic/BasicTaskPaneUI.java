@@ -16,6 +16,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -36,8 +38,9 @@ import javax.swing.plaf.ActionMapUIResource;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicGraphicsUtils;
 
-import org.jdesktop.swingx.JXTaskPane;
+import org.jdesktop.swingx.JXCollapsiblePane;
 import org.jdesktop.swingx.JXHyperlink;
+import org.jdesktop.swingx.JXTaskPane;
 import org.jdesktop.swingx.icon.EmptyIcon;
 import org.jdesktop.swingx.plaf.TaskPaneUI;
 
@@ -57,8 +60,7 @@ public class BasicTaskPaneUI extends TaskPaneUI {
   protected boolean mouseOver;
   protected MouseInputListener mouseListener;
 
-  protected boolean animationRunning = false;
-  protected float animationStage = 0.0f;
+  protected PropertyChangeListener propertyListener;
   
   public void installUI(JComponent c) {
     super.installUI(c);
@@ -93,6 +95,8 @@ public class BasicTaskPaneUI extends TaskPaneUI {
     group.addMouseListener(mouseListener);
 
     group.addFocusListener(focusListener);
+    propertyListener = createPropertyListener();
+    group.addPropertyChangeListener(propertyListener);
   }
 
   protected void installKeyboardActions() {
@@ -125,12 +129,17 @@ public class BasicTaskPaneUI extends TaskPaneUI {
     group.removeMouseListener(mouseListener);
     group.removeMouseMotionListener(mouseListener);
     group.removeFocusListener(focusListener);
+    group.removePropertyChangeListener(propertyListener);
   }
 
   protected MouseInputListener createMouseInputListener() {
     return new ToggleListener();
   }
 
+  protected PropertyChangeListener createPropertyListener() {
+    return new ChangeListener();
+  }
+  
   protected boolean isInBorder(MouseEvent event) {
     return event.getY() < getTitleHeight();
   }
@@ -162,8 +171,8 @@ public class BasicTaskPaneUI extends TaskPaneUI {
   protected void ensureVisible() {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-      group.scrollRectToVisible(
-        new Rectangle(group.getWidth(), group.getHeight()));
+        group.scrollRectToVisible(
+          new Rectangle(group.getWidth(), group.getHeight()));
       }
     });
   }
@@ -174,6 +183,22 @@ public class BasicTaskPaneUI extends TaskPaneUI {
     }
     public void focusLost(FocusEvent e) {
       e.getComponent().repaint();
+    }
+  }
+  
+  class ChangeListener implements PropertyChangeListener {
+    public void propertyChange(PropertyChangeEvent evt) {
+      // if group is expanded but not animated
+      // or if animated has reached expanded state
+      // scroll to visible if scrollOnExpand is enabled
+      if ((JXTaskPane.EXPANDED_CHANGED_KEY.equals(evt.getPropertyName())
+        && Boolean.TRUE.equals(evt.getNewValue()) && !group.isAnimated())
+        || (JXCollapsiblePane.ANIMATION_STATE_KEY.equals(evt.getPropertyName()) && "expanded"
+          .equals(evt.getNewValue()))) {
+        if (group.isScrollOnExpand()) {
+          ensureVisible();
+        }
+      }
     }
   }
   

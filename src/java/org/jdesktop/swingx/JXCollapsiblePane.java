@@ -49,6 +49,11 @@ import javax.swing.Timer;
 public class JXCollapsiblePane extends JPanel {
 
   /**
+   * Used when generating PropertyChangeEvents for the "animationState" property
+   */
+  public final static String ANIMATION_STATE_KEY = "animationState";
+  
+  /**
    * Indicates whether the component is collapsed or expanded
    */
   private boolean collapsed = false;
@@ -352,6 +357,8 @@ public class JXCollapsiblePane extends JPanel {
           if (finalHeight > 0) {
             wrapper.showContent();   
             validate();
+            JXCollapsiblePane.this.firePropertyChange(ANIMATION_STATE_KEY, null,
+              "expanded");
             return;
           }
         }
@@ -376,7 +383,6 @@ public class JXCollapsiblePane extends JPanel {
         bounds.height = (bounds.height - oldHeight) + newHeight;
         currentHeight = bounds.height;
         setBounds(bounds);
-        bounds = getBounds();
         startHeight = newHeight;
         
         // it happens the animateAlpha goes over the alphaStart/alphaEnd range
@@ -435,6 +441,8 @@ public class JXCollapsiblePane extends JPanel {
      */
     public void reinit(int startHeight, int stopHeight) {
       synchronized (ANIMATION_MUTEX) {
+        JXCollapsiblePane.this.firePropertyChange(ANIMATION_STATE_KEY, null,
+          "reinit");
         this.startHeight = startHeight;
         this.finalHeight = stopHeight;
         animateAlpha = animationParams.alphaStart;

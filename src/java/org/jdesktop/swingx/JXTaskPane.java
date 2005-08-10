@@ -10,6 +10,8 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.LayoutManager;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -123,6 +125,15 @@ public class JXTaskPane extends JPanel implements
 
     // disable animation if specified in UIManager
     setAnimated(!Boolean.FALSE.equals(UIManager.get("TaskPane.animate")));
+    
+    // listen for animation events and forward them to registered listeners
+    collapsePane.addPropertyChangeListener(
+      JXCollapsiblePane.ANIMATION_STATE_KEY, new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent evt) {
+          JXTaskPane.this.firePropertyChange(evt.getPropertyName(), evt
+            .getOldValue(), evt.getNewValue());
+        }
+      });
   }
 
   public Container getContentPane() {
