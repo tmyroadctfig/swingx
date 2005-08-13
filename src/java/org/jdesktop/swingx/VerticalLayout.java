@@ -63,12 +63,14 @@ public class VerticalLayout implements LayoutManager {
     for (int i = 0, c = parent.getComponentCount(); i < c; i++) {
       Component m = parent.getComponent(i);
       if (m.isVisible()) {
-        pref.height += parent.getComponent(i).getPreferredSize().height + gap;
-        pref.width = Math.max(pref.width, parent.getComponent(i)
-          .getPreferredSize().width);
+        Dimension componentPreferredSize =
+          parent.getComponent(i).getPreferredSize(); 
+        pref.height += componentPreferredSize.height + gap;
+        pref.width = Math.max(pref.width, componentPreferredSize.width);
       }
     }
 
+    pref.width += insets.left + insets.right;
     pref.height += insets.top + insets.bottom;
 
     return pref;
