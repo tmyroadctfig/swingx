@@ -22,6 +22,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreeNode;
 
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
@@ -49,10 +50,59 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
           //  test.runInteractiveTests();
          //   test.runInteractiveTests("interactive.*HighLighters");
          //      test.runInteractiveTests("interactive.*SortingFilter.*");
-           test.runInteractiveTests("interactive.*Icon.*");
+           test.runInteractiveTests("interactive.*Node.*");
          //     test.runInteractiveTests("interactive.*Focus.*");
         } catch (Exception ex) {
 
+        }
+    }
+
+    /**
+     * Issue #82-swingx: update probs with insert node.
+     * 
+     * Adapted from example code in report.
+     *
+     */
+    public void interactiveTestInsertNode() {
+        final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+        final InsertTreeTableModel model = new InsertTreeTableModel(root);
+        final  DefaultMutableTreeNode leaf = model.addChild(root);
+        JXTree tree = new JXTree(model);
+        JXTreeTable treeTable = new JXTreeTable(model);
+        JFrame frame = wrapWithScrollingInFrame(tree, treeTable, "update on insert");
+        Action insertAction = new AbstractAction("insert node") {
+
+            public void actionPerformed(ActionEvent e) {
+                model.addChild(leaf);
+                setEnabled(false);
+                
+            }
+            
+        };
+        addAction(frame, insertAction);
+        frame.setVisible(true);
+    }
+ 
+    /**
+     * Model used to show insert update issue.
+     */
+    public static class InsertTreeTableModel extends DefaultTreeTableModel {
+        public InsertTreeTableModel(TreeNode root) {
+            super(root);
+        }
+
+        public int getColumnCount() {
+            return 2;
+        }
+
+        private DefaultMutableTreeNode addChild(DefaultMutableTreeNode parent) {
+            DefaultMutableTreeNode newNode = new DefaultMutableTreeNode("Child");
+            parent.add(newNode);
+            fireTreeNodesInserted(this, getPathToRoot(parent),
+                    new int[] { parent.getIndex(newNode) },
+                    new Object[] { newNode });
+
+            return newNode;
         }
     }
 
