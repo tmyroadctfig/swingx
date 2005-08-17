@@ -1484,6 +1484,11 @@ public class JXTreeTable extends JXTable {
                                     fireTableRowsDeleted(startingRow + min, startingRow+max);
                                 break;
                             }
+                        } else { 
+                        // not expanded - but change might effect appearance of parent
+                        // Issue #82-swingx
+                            int row = tree.getRowForPath(path);
+                            fireTableRowsUpdated(row, row);
                         }
                     }
                     else {  // case where the event is fired to identify root.
