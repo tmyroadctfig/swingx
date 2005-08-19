@@ -20,7 +20,7 @@ import javax.swing.JRootPane;
 public class JXFrame extends JFrame {
 
     public JXFrame() {
-        this(null, true);
+        this(null, false);
     }
     
     public JXFrame(String title, boolean exitOnClose) {
@@ -31,7 +31,7 @@ public class JXFrame extends JFrame {
     }
 
     public JXFrame(String title) {
-        this(title, true);
+        this(title, false);
     }
 
     /**
