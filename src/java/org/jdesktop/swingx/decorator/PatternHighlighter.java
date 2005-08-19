@@ -113,7 +113,7 @@ public class PatternHighlighter extends ConditionalHighlighter
             return false;
         }
         else {
-            boolean	matches = pattern.matcher(value.toString()).matches();
+            boolean	matches = pattern.matcher(value.toString()).find();
             return matches;
         }
     }

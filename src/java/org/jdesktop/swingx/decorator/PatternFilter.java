@@ -102,7 +102,7 @@ public class PatternFilter extends Filter implements PatternMatcher {
             return false;
         }
         else {
-            boolean	matches = pattern.matcher(value.toString()).matches();
+            boolean	matches = pattern.matcher(value.toString()).find();
             return matches;
         }
     }

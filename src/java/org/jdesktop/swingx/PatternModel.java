@@ -9,7 +9,7 @@ import java.beans.PropertyChangeSupport;
 import java.util.regex.Pattern;
 
 /**
- * Holds a compiled regular expression
+ * Holds a compiled regular expression.
  * <p>
  * <b>Anchors</b> By default, the scope of the pattern relative to strings
  * being tested are unanchored, ie, the pattern will match any part of the
@@ -144,6 +144,7 @@ public class PatternModel {
     private String createRegEx(String searchString) {
         if (isEmpty(searchString))
             return ".*";
+        if (!isStartAnchored() && !isEndAnchored()) return escapeRegexTokens(searchString);
         StringBuffer buf = new StringBuffer(searchString.length() + 4);
         if (!hasStartAnchor(searchString)) {
             if (isStartAnchored()) {
@@ -164,6 +165,31 @@ public class PatternModel {
         }
 
         return buf.toString();
+    }
+
+    /**
+     * 
+     * @param s
+     * @return
+     */
+    private String escapeRegexTokens(String s) {
+         return Pattern.quote(s);
+//        // escape everything except [0-9a-zA-Z]
+//        String retval = null;
+//        if (null != s) {
+//            int length = s.length();
+//
+//            StringBuilder sb = new StringBuilder(s.length());
+//            for (int i = 0; i < length; i++) {
+//                char c = s.charAt(i);
+//                if (!((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))) {
+//                    sb.append('\\');
+//                }
+//                sb.append(c);
+//            }
+//            retval = sb.toString();
+//        }
+//        return retval;
     }
 
     private boolean hasStartAnchor(String str) {
