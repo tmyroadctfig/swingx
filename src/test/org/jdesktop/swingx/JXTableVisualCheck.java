@@ -9,6 +9,7 @@ package org.jdesktop.swingx;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.ComponentOrientation;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -68,8 +69,8 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*ColumnControlColumnModel.*");
 //          test.runInteractiveTests("interactive.*TableHeader.*");
      //     test.runInteractiveTests("interactive.*Sort.*");
-//          test.runInteractiveTests("interactive.*ColumnControlAndF.*");
-          test.runInteractiveTests("interactive.*RowHeight.*");
+          test.runInteractiveTests("interactive.*RToL.*");
+//          test.runInteractiveTests("interactive.*RowHeight.*");
 //          test.runInteractiveTests("interactive.*TableMod.*");
           
 //          test.runInteractiveTests("interactive.*PatternHigh.*");
@@ -79,13 +80,37 @@ public class JXTableVisualCheck extends JXTableUnitTest {
       }
   }
 
+
     /**
-     * dummy
+     * Issue #89-swingx: ColumnControl not updated with ComponentOrientation.
+     *
      */
-    public void testDummy() {
-    }   
+    public void interactiveRToLTableWithColumnControl() {
+        JXTable table = new JXTable(50, 5);
+        final JScrollPane pane = new JScrollPane(table);
+        pane.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        table.setColumnControlVisible(true);
+        JFrame frame = wrapInFrame(pane, "RToLScrollPane");
+        Action action = new AbstractAction("toggle orientation") {
 
+            public void actionPerformed(ActionEvent e) {
+                ComponentOrientation current = pane.getComponentOrientation();
+                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
+                    pane
+                            .applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+                } else {
+                    pane
+                            .applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 
+                }
+
+            }
+
+        };
+        addAction(frame, action);
+        frame.setVisible(true);
+    }
+    
     public void interactiveTestRowHeightAndSelection() {
         final JXTable table = new JXTable(sortableTableModel);
         table.setRowHeightEnabled(true);
@@ -248,6 +273,38 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         frame.setVisible(true);
     }
  
+
+    /** 
+     */
+//    public void interactiveTestColumnControlAndFiltersRowSorter() {
+//        final JXTable table = new JXTable(sortableTableModel);
+//        // hmm bug regression with combos as editors - same in JTable
+////        JComboBox box = new JComboBox(new Object[] {"one", "two", "three" });
+////        box.setEditable(true);
+////        table.getColumnExt(0).setCellEditor(new DefaultCellEditor(box));
+//        Action toggleFilter = new AbstractAction("Toggle RowFilter -contains e- ") {
+//            boolean hasFilters;
+//            public void actionPerformed(ActionEvent e) {
+//                if (hasFilters) {
+//                    table.setFilters(null);
+//                } else {
+//                    RowSorterFilter filter = new RowSorterFilter();
+//                    filter.setRowFilter(RowFilter.regexFilter(".*e.*", 0));
+//                    table.setFilters(new FilterPipeline(new Filter[] {filter}));
+//
+//                }
+//                hasFilters = !hasFilters;
+//            }
+//            
+//        };
+//        toggleFilter.putValue(Action.SHORT_DESCRIPTION, "filtering first column - problem if invisible ");
+//        table.setColumnControlVisible(true);
+//        JFrame frame = wrapWithScrollingInFrame(table, "JXTable ColumnControl and Filters");
+//        addAction(frame, toggleFilter);
+//        frame.setVisible(true);
+//    }
+ 
+
     /** 
      * Issue ??: Column control on changing column model.
      *
@@ -810,5 +867,10 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         frame.setVisible(true);
     }
 
+    /**
+     * dummy
+     */
+    public void testDummy() {
+    }   
 
 }
