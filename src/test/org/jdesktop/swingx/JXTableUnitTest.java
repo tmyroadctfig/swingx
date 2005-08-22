@@ -324,7 +324,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         table.setFilters(new FilterPipeline(new Filter[] {filter}));
         assertEquals("highest value unchanged", value, table.getValueAt(0, 0 ));
         // update the filter
-        filter.setPattern("1.*", 0);
+        filter.setPattern("^1", 0);
         assertTrue("sorter must be active", 
                 ((Integer) table.getValueAt(0, 0)).intValue() > ((Integer) table.getValueAt(1, 0)));
     }
