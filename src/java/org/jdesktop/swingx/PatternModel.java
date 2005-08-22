@@ -11,6 +11,8 @@ import java.util.regex.Pattern;
 /**
  * Holds a compiled regular expression.
  * <p>
+ * 
+ * JW: Work-in-progress - Anchors will be factored into AnchoredSearchMode 
  * <b>Anchors</b> By default, the scope of the pattern relative to strings
  * being tested are unanchored, ie, the pattern will match any part of the
  * tested string. Traditionally, special characters ('^' and '$') are used to
@@ -34,6 +36,22 @@ import java.util.regex.Pattern;
  */
 public class PatternModel {
 
+    public static final String SEARCH_STRING_REGEX = "regex";
+
+    public static final String SEARCH_STRING_ANCHORED = "anchored";
+
+    public static final String SEARCH_STRING_WILDCARD = "wildcard";
+
+    public static final String SEARCH_STRING_EXPLICIT = "explicit";
+
+    public static final String SEARCH_CATEGORY_CONTAINS = "contains";
+
+    public static final String SEARCH_CATEGORY_EQUALS = "equals";
+
+    public static final String SEARCH_CATEGORY_ENDSWITH = "endsWith";
+
+    public static final String SEARCH_CATEGORY_STARTSWITH = "startsWith";
+
     private String rawText;
 
     private boolean backwards;
@@ -44,9 +62,9 @@ public class PatternModel {
 
     private boolean caseSensitive;
 
-    private boolean startAnchored;
-
-    private boolean endAnchored;
+//    private boolean startAnchored;
+//
+//    private boolean endAnchored;
 
     // private boolean enabled;
     //
@@ -54,6 +72,11 @@ public class PatternModel {
     // private boolean highlight;
 
     private PropertyChangeSupport propertySupport;
+
+    private String searchStringMode;
+
+    private SearchMode searchMode;
+
 
     public boolean isCaseSensitive() {
         return caseSensitive;
@@ -64,48 +87,6 @@ public class PatternModel {
         this.caseSensitive = caseSensitive;
         updatePattern(caseSensitive);
         firePropertyChange("caseSensitive", old, isCaseSensitive());
-    }
-
-    /**
-     * returns true if the pattern must match from the beginning of the string,
-     * or false if the pattern can match anywhere in a string.
-     */
-    public boolean isStartAnchored() {
-        return startAnchored;
-    }
-
-    /**
-     * sets the default interpretation of the pattern for strings it will later
-     * be given. Setting this value to true will force the pattern to match from
-     * the beginning of tested strings. Setting this value to false will allow
-     * the pattern to match any part of a tested string.
-     */
-    public void setStartAnchored(boolean startAnchored) {
-        boolean old = isStartAnchored();
-        this.startAnchored = startAnchored;
-        updatePattern(createRegEx(getRawText()));
-        firePropertyChange("startAnchored", old, isStartAnchored());
-    }
-
-    /**
-     * returns true if the pattern must match from the beginning of the string,
-     * or false if the pattern can match anywhere in a string.
-     */
-    public boolean isEndAnchored() {
-        return endAnchored;
-    }
-
-    /**
-     * sets the default interpretation of the pattern for strings it will later
-     * be given. Setting this value to true will force the pattern to match the
-     * end of tested strings. Setting this value to false will allow the pattern
-     * to match any part of a tested string.
-     */
-    public void setEndAnchored(boolean endAnchored) {
-        boolean old = isEndAnchored();
-        this.endAnchored = endAnchored;
-        updatePattern(createRegEx(getRawText()));
-        firePropertyChange("endAnchored", old, isEndAnchored());
     }
 
     public Pattern getPattern() {
@@ -144,27 +125,7 @@ public class PatternModel {
     private String createRegEx(String searchString) {
         if (isEmpty(searchString))
             return ".*";
-        if (!isStartAnchored() && !isEndAnchored()) return escapeRegexTokens(searchString);
-        StringBuffer buf = new StringBuffer(searchString.length() + 4);
-        if (!hasStartAnchor(searchString)) {
-            if (isStartAnchored()) {
-                buf.append("^");
-            } else {
-                buf.append(".*");
-            }
-        }
-
-        buf.append(searchString);
-
-        if (!hasEndAnchor(searchString)) {
-            if (isEndAnchored()) {
-                buf.append("$");
-            } else {
-                buf.append(".*");
-            }
-        }
-
-        return buf.toString();
+        return getSearchMode().createRegEx(searchString);
     }
 
     /**
@@ -172,52 +133,6 @@ public class PatternModel {
      * @param s
      * @return
      */
-    private String escapeRegexTokens(String s) {
-         return Pattern.quote(s);
-//        // escape everything except [0-9a-zA-Z]
-//        String retval = null;
-//        if (null != s) {
-//            int length = s.length();
-//
-//            StringBuilder sb = new StringBuilder(s.length());
-//            for (int i = 0; i < length; i++) {
-//                char c = s.charAt(i);
-//                if (!((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))) {
-//                    sb.append('\\');
-//                }
-//                sb.append(c);
-//            }
-//            retval = sb.toString();
-//        }
-//        return retval;
-    }
-
-    private boolean hasStartAnchor(String str) {
-        return str.startsWith("^");
-    }
-
-    private boolean hasEndAnchor(String str) {
-        int len = str.length();
-        if ((str.charAt(len - 1)) != '$')
-            return false;
-
-        // the string "$" is anchored
-        if (len == 1)
-            return true;
-
-        // scan backwards along the string: if there's an odd number
-        // of backslashes, then the last escapes the dollar and the
-        // pattern is not anchored. if there's an even number, then
-        // the dollar is unescaped and the pattern is anchored.
-        for (int n = len - 2; n >= 0; --n)
-            if (str.charAt(n) != '\\')
-                return (len - n) % 2 == 0;
-
-        // The string is of the form "\+$". If the length is an odd
-        // number (ie, an even number of '\' and a '$') the pattern is
-        // anchored
-        return len % 2 != 0;
-    }
 
     private boolean isEmpty(String text) {
         return (text == null) || (text.length() == 0);
@@ -316,4 +231,223 @@ public class PatternModel {
         propertySupport.firePropertyChange(name, oldValue, newValue);
     }
 
+    public class SearchMode {
+        private String searchCategory;
+
+        public String getSearchCategory() {
+            if (searchCategory == null) {
+                searchCategory = getDefaultSearchCategory();
+            }
+            return searchCategory;
+        }
+
+        public boolean isAutoDetect() {
+            return false;
+        }
+        
+        public String createRegEx(String searchString) {
+            if (SEARCH_CATEGORY_CONTAINS.equals(getSearchCategory())) {
+                return createContainedRegEx(searchString);
+            }
+            if (SEARCH_CATEGORY_EQUALS.equals(getSearchCategory())) {
+                return createEqualsRegEx(searchString);
+            }
+            if (SEARCH_CATEGORY_STARTSWITH.equals(getSearchCategory())){
+                return createStartsAnchoredRegEx(searchString);
+            }
+            if (SEARCH_CATEGORY_ENDSWITH.equals(getSearchCategory())) {
+                return createEndAnchoredRegEx(searchString);
+            }
+            return searchString;
+        }
+
+        protected String createEndAnchoredRegEx(String searchString) {
+            return Pattern.quote(searchString) + "$";
+        }
+
+        protected String createStartsAnchoredRegEx(String searchString) {
+            return "^" + Pattern.quote(searchString);
+        }
+
+        protected String createEqualsRegEx(String searchString) {
+            return "^" + Pattern.quote(searchString) + "$";
+        }
+
+        protected String createContainedRegEx(String searchString) {
+            return Pattern.quote(searchString);
+        }
+
+        public void setSearchCategory(String category) {
+            this.searchCategory = category;
+        }
+        
+        protected String getDefaultSearchCategory() {
+            return SEARCH_CATEGORY_CONTAINS;
+        }
+    }
+
+ 
+    public class AnchoredSearchMode extends SearchMode {
+        
+        public boolean isAutoDetect() {
+            return true;
+        }
+        
+        public String createRegEx(String searchExp) {
+          if (isAutoDetect()) {
+              StringBuffer buf = new StringBuffer(searchExp.length() + 4);
+              if (!hasStartAnchor(searchExp)) {
+                  if (isStartAnchored()) {
+                      buf.append("^");
+                  } 
+              }
+      
+              buf.append(createContainedRegEx(searchExp));
+      
+              if (!hasEndAnchor(searchExp)) {
+                  if (isEndAnchored()) {
+                      buf.append("$");
+                  } 
+              }
+      
+              return buf.toString();
+          }
+          return super.createRegEx(searchExp);
+        }
+
+        private boolean hasStartAnchor(String str) {
+            return str.startsWith("^");
+        }
+
+        private boolean hasEndAnchor(String str) {
+            int len = str.length();
+            if ((str.charAt(len - 1)) != '$')
+                return false;
+
+            // the string "$" is anchored
+            if (len == 1)
+                return true;
+
+            // scan backwards along the string: if there's an odd number
+            // of backslashes, then the last escapes the dollar and the
+            // pattern is not anchored. if there's an even number, then
+            // the dollar is unescaped and the pattern is anchored.
+            for (int n = len - 2; n >= 0; --n)
+                if (str.charAt(n) != '\\')
+                    return (len - n) % 2 == 0;
+
+            // The string is of the form "\+$". If the length is an odd
+            // number (ie, an even number of '\' and a '$') the pattern is
+            // anchored
+            return len % 2 != 0;
+        }
+
+
+//      /**
+//      * returns true if the pattern must match from the beginning of the string,
+//      * or false if the pattern can match anywhere in a string.
+//      */
+     public boolean isStartAnchored() {
+         return SEARCH_CATEGORY_STARTSWITH.equals(getSearchCategory());
+     }
+ //
+//     /**
+//      * sets the default interpretation of the pattern for strings it will later
+//      * be given. Setting this value to true will force the pattern to match from
+//      * the beginning of tested strings. Setting this value to false will allow
+//      * the pattern to match any part of a tested string.
+//      */
+//     public void setStartAnchored(boolean startAnchored) {
+//         boolean old = isStartAnchored();
+//         this.startAnchored = startAnchored;
+//         updatePattern(createRegEx(getRawText()));
+//         firePropertyChange("startAnchored", old, isStartAnchored());
+//     }
+ //
+     /**
+      * returns true if the pattern must match from the beginning of the string,
+      * or false if the pattern can match anywhere in a string.
+      */
+     public boolean isEndAnchored() {
+         return SEARCH_CATEGORY_ENDSWITH.equals(getSearchCategory());
+     }
+ //
+//     /**
+//      * sets the default interpretation of the pattern for strings it will later
+//      * be given. Setting this value to true will force the pattern to match the
+//      * end of tested strings. Setting this value to false will allow the pattern
+//      * to match any part of a tested string.
+//      */
+//     public void setEndAnchored(boolean endAnchored) {
+//         boolean old = isEndAnchored();
+//         this.endAnchored = endAnchored;
+//         updatePattern(createRegEx(getRawText()));
+//         firePropertyChange("endAnchored", old, isEndAnchored());
+//     }
+ //
+//     public boolean isStartEndAnchored() {
+//         return isEndAnchored() && isStartAnchored();
+//     }
+//     
+//     /**
+//      * sets the default interpretation of the pattern for strings it will later
+//      * be given. Setting this value to true will force the pattern to match the
+//      * end of tested strings. Setting this value to false will allow the pattern
+//      * to match any part of a tested string.
+//      */
+//     public void setStartEndAnchored(boolean endAnchored) {
+//         boolean old = isStartEndAnchored();
+//         this.endAnchored = endAnchored;
+//         this.startAnchored = endAnchored;
+//         updatePattern(createRegEx(getRawText()));
+//         firePropertyChange("StartEndAnchored", old, isStartEndAnchored());
+//     }
+    }
+    /**
+     * 
+     * @param mode
+     */
+    public void setSearchStringMode(String mode) {
+        if (getSearchStringMode().equals(mode)) return;
+        String old = getSearchStringMode();
+        searchStringMode = mode;
+        firePropertyChange("searchStringMode", old, getSearchStringMode());
+        
+    }
+
+    public String getSearchStringMode() {
+        if (searchStringMode == null) {
+            searchStringMode = getDefaultSearchStringMode();
+        }
+        return searchStringMode;
+    }
+
+    private String getDefaultSearchStringMode() {
+        return SEARCH_STRING_EXPLICIT;
+    }
+
+    public void setSearchCategory(String category) {
+        if (getSearchCategory().equals(category)) {
+            return;
+        }
+        String old = getSearchCategory();
+        getSearchMode().setSearchCategory(category);
+        updatePattern(createRegEx(getRawText()));
+        firePropertyChange("searchCategory", old, getSearchCategory());
+        
+    }
+
+    public String getSearchCategory() {
+        return getSearchMode().getSearchCategory();
+    }
+
+    private SearchMode getSearchMode() {
+        if (searchMode == null) {
+            searchMode = new SearchMode();
+        }
+        return searchMode;
+    }
+
+
+    
 }

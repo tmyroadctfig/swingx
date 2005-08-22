@@ -32,113 +32,60 @@ import org.jdesktop.swingx.decorator.PatternMatcher;
  * Search panel.
  *
  * @author Ramesh Gupta
+ * @author Jeanette Winzenburg
+ * 
  */
 public class JXSearchPanel extends JPanel implements DocumentListener, ActionListener {
-    //public final static String	MEDIATOR_KEY = "jfc:searchPanel";
-
-    // colleagues mediated by this JXSearchPanel
     private final JLabel				fieldName = new JLabel();
     private final JCheckBox				matchCase = new JCheckBox();
     private final JComboBox				searchCriteria = new JComboBox();
-    private	final JButton				searchButton = new JButton();
     private	final JTextField			searchField = new JTextField();
-    // JXSearchPanel is the mediator for all colleagues
-    private final JComponent[]			colleagues = {
-	matchCase,
-	searchCriteria,
-	searchButton,
-	searchField
-    };
 
     private PatternFilter				patternFilter = null;
     private PatternHighlighter			patternHighlighter = null;
     private JComponent					targetComponent = null;
 
+    private PatternModel patternModel;
+    
     public JXSearchPanel() {
         //super(new FlowLayout());
         /** @todo Remove hard-coded strings */
-        searchButton.setText("Search");
+        patternModel = new PatternModel();
         matchCase.setText("Match Case");
         ComboBoxModel	model = new DefaultComboBoxModel(new String[] {
-            "begins with",
-            "contains",
-            "ends with",
-            "equals"
+//            "begins with",
+//            "contains",
+//            "ends with",
+//            "equals"
+              PatternModel.SEARCH_CATEGORY_CONTAINS,
+              PatternModel.SEARCH_CATEGORY_STARTSWITH,
+              PatternModel.SEARCH_CATEGORY_ENDSWITH,
+              PatternModel.SEARCH_CATEGORY_EQUALS
         });
+        model.setSelectedItem(patternModel.getSearchCategory());
         searchCriteria.setModel(model);
 	searchField.setPreferredSize(new Dimension(80, 20));
-	/*
-	  for (int i = 0; i < colleagues.length; i++) {
-	  colleagues[i].putClientProperty(MEDIATOR_KEY, this);
-	  }
-	*/
         add(fieldName);
         add(searchCriteria);
         add(searchField);
         add(matchCase);
-        //add(searchButton);	/** @todo remove searchButton entirely! */
         addActionListener();
         addEditListener();
     }
 
-    public int getMatchFlags() {
-        return matchCase.isSelected() ? 0 : Pattern.CASE_INSENSITIVE;
-    }
 
     public Pattern getPattern() {
-        String	searchString = searchField.getText();
-        if (searchString.length() == 0) {
-            return Pattern.compile(".*", getMatchFlags());
-        }
-
-        String	patternString;
-        int criteria = searchCriteria.getSelectedIndex();
-        /** @todo Remove hard-coded integers */
-        switch (criteria) {
-	case	0: {
-	    patternString = new String(searchString + ".*");
-	    break;
-	}
-	case	1: {
-	    patternString = new String(".*" + searchString + ".*");
-	    break;
-	}
-	case	2: {
-	    patternString = new String(".*" + searchString);
-	    break;
-	}
-	default: {
-	    patternString = searchString;
-	    break;
-	}
-        }
-        return Pattern.compile(patternString, getMatchFlags());
+        return patternModel.getPattern();
     }
 
     private void addActionListener() {
-        /** @todo Define ActionSource interface for all components that
-         * support addActionListener and removeActionListener
-         * for (int i = 0; i < colleagues.length; i++) {
-         * 		colleagues[i].addActionListener(this);
-         * }
-         */
-        // In the absence of ActionSource, add listener to each colleage...
         matchCase.addActionListener(this);
-        searchButton.addActionListener(this);
         searchField.addActionListener(this);
         searchCriteria.addActionListener(this);
     }
 
     private void removeActionListener() {
-        /** @todo Define ActionSource interface for all components that
-         * support addActionListener and removeActionListener
-         * for (int i = 0; i < colleagues.length; i++) {
-         * 		colleagues[i].removeActionListener(listener);
-         * }
-         */
-        // In the absence of ActionSource, remove listener from each colleage...
         matchCase.removeActionListener(this);
-        searchButton.removeActionListener(this);
         searchField.removeActionListener(this);
         searchCriteria.removeActionListener(this);
     }
@@ -194,36 +141,33 @@ public class JXSearchPanel extends JPanel implements DocumentListener, ActionLis
         return fieldName.getText();
     }
 
-    /*
-      JTextField getSearchTextField() {
-      return searchField;
-      }
-
-      JComboBox getSearchCriteriaComboBox() {
-      return searchCriteria;
-      }
-
-      JCheckBox getCaseCheckBox() {
-      return matchCase;
-      }
-    */
 
     public void changedUpdate(DocumentEvent ev) {
-        refresh();
+        refreshFromDocument();
     }
 
     public void insertUpdate(DocumentEvent ev) {
-        refresh();
+        refreshFromDocument();
     }
 
     public void removeUpdate(DocumentEvent ev) {
-        refresh();
+        refreshFromDocument();
     }
 
     public void actionPerformed(ActionEvent ev) {
+        if (matchCase.equals(ev.getSource())) {
+            patternModel.setCaseSensitive(matchCase.isSelected());
+        } else if (searchCriteria.equals(ev.getSource())) {
+            patternModel.setSearchCategory((String)searchCriteria.getSelectedItem());
+        }
         refresh();
     }
 
+    protected void refreshFromDocument() {
+        patternModel.setRawText(searchField.getText());
+        refresh();
+    }
+    
     protected void refresh() {
         Pattern			pattern = getPattern();
 
@@ -234,31 +178,18 @@ public class JXSearchPanel extends JPanel implements DocumentListener, ActionLis
 
         PatternMatcher	highlighter = getPatternHighlighter();
         if (highlighter != null) {
-            highlighter.setPattern(pattern);
-
-	    if (filter == null) {
-                // Repaint explicitly only if there is no filter
-                JComponent target = getTargetComponent();
-                if (target != null) {
-                    target.repaint();
-                }
-            }
+            highlighter.setPattern(pattern); // will repaint target automatically
         }
+
+//	    if (filter == null) {
+//                // Repaint explicitly only if there is no filter
+//                JComponent target = getTargetComponent();
+//                if (target != null) {
+//                    target.repaint();
+//                }
+//            }
+//        }
     }
 
-    /*
-      public static JXSearchPanel getMediator(Object colleague) {
-      JXSearchPanel	searchPanel = null;
-      try {
-      // colleague could be a JTextField, JButton, JCheckBox, or JComboBox
-      JComponent	component = (JComponent) colleague;
-      //searchPanel = (JXSearchPanel) component.getClientProperty(MEDIATOR_KEY);
-      }
-      catch (ClassCastException ex) {
-      // Perhaps colleague is not a JComponent?
-      }
-      return searchPanel;	// OK to return null
-      }
-    */
 }
 
