@@ -16,7 +16,6 @@ import java.util.regex.Pattern;
 
 import javax.swing.Icon;
 import javax.swing.JFrame;
-import javax.swing.SizeSequence;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
@@ -111,6 +110,22 @@ public class JXTableUnitTest extends InteractiveTestCase {
         table.setRowHeight(0, 25);
 //        SizeSequence sizing = table.getSuperRowModel();
 //        assertNotNull(sizing);
+    }
+
+    /**
+     * Issue #197: JXTable pattern search differs from 
+     * PatternHighlighter/Filter.
+     * 
+     */
+    public void testRespectPatternInSearch() {
+        JXTable table = new JXTable(createAscendingModel(0, 11));
+        int row = 1;
+        String lastName = table.getValueAt(row, 0).toString();
+        Pattern strict = Pattern.compile("^" + lastName + "$");
+        int found = table.search(strict, -1, false);
+        assertEquals("found must be equal to row", row, found);
+        found = table.search(strict, found, false);
+        assertEquals("search must fail", -1, found);
     }
 
     /**
@@ -815,14 +830,14 @@ public class JXTableUnitTest extends InteractiveTestCase {
                 new Object[] { Boolean.TRUE, "BC" } };
         String[] columnNames = new String[] { "Critical", "Task" };
         final JXTable table = new JXTable(rowData, columnNames);
-        Filter filterA = new PatternFilter("A.*", Pattern.CASE_INSENSITIVE, 1);
+//        Filter filterA = new PatternFilter("A.*", Pattern.CASE_INSENSITIVE, 1);
         // simulates the sequence of user interaction as described in 
         // the original bug report in 
         // http://www.javadesktop.org/forums/thread.jspa?messageID=56285
-        table.setFilters(new FilterPipeline(new Filter[] {filterA}));
+        table.setFilters(createFilterPipeline(false, 1));//new FilterPipeline(new Filter[] {filterA}));
         table.setSorter(1);
-        Filter filterB = new PatternFilter(".*", Pattern.CASE_INSENSITIVE, 1);
-        table.setFilters(new FilterPipeline(new Filter[] {filterB}));
+//        Filter filterB = new PatternFilter(".*", Pattern.CASE_INSENSITIVE, 1);
+        table.setFilters(createFilterPipeline(true, 1)); //new FilterPipeline(new Filter[] {filterB}));
         table.setSorter(1);
     }
 
@@ -854,6 +869,13 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
     
     private FilterPipeline createFilterPipeline(boolean matchAll, int col) {
+//        RowSorterFilter filter = new RowSorterFilter();
+//        if (matchAll) {
+//            filter.setRowFilter(RowFilter.regexFilter(".*", col));
+//            
+//        } else {
+//            filter.setRowFilter(RowFilter.regexFilter("A.*", col));
+//        }
         Filter filter;
         if (matchAll) {
             filter = new PatternFilter(".*", Pattern.CASE_INSENSITIVE, col);
@@ -883,8 +905,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
         String[] columnNames = new String[] { "Critical", "Task" };
         final JXTable table = new JXTable(rowData, columnNames);
         int rows = table.getRowCount();
-        Filter filterA = new PatternFilter("A.*", Pattern.CASE_INSENSITIVE, 1);
-        table.setFilters(new FilterPipeline(new Filter[] {filterA}));
+//        Filter filterA = new PatternFilter("A.*", Pattern.CASE_INSENSITIVE, 1);
+        table.setFilters(createFilterPipeline(false, 1)); //new FilterPipeline(new Filter[] {filterA}));
         table.setSorter(1);
         table.setFilters(null);
         assertEquals("rowCount must be original", rows, table.getRowCount());

@@ -779,13 +779,13 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         // **** PatternFilter and PatternHighlighter!!! ****
         JXTable table = new JXTable(tableModel);
         table.setFilters(new FilterPipeline(new Filter[] {
-                                            new PatternFilter("S.*", 0, 1),
+                                            new PatternFilter("^S", 0, 1),
                                             new ShuttleSorter(0, false), // column 0, descending
                                             new ShuttleSorter(1, true), // column 1, ascending
                                             new ShuttleSorter(3, false), // column 3, descending
         }));
         table.setHighlighters(new HighlighterPipeline(new Highlighter[] {
-            new PatternHighlighter(null, Color.red, "S.*", 0, 1),
+            new PatternHighlighter(null, Color.red, "^S", 0, 1),
         }));
         JFrame frame = wrapWithScrollingInFrame(table, "TablePatternFilter5 Test");
         frame.setVisible(true);
@@ -806,7 +806,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         table.setRowHeight(0, 96);
         table.setShowGrid(true);
         table.setHighlighters(new HighlighterPipeline(new Highlighter[] {
-            new PatternHighlighter(null, Color.red, "A.*", 0, 1),
+            new PatternHighlighter(null, Color.red, "^A", 0, 1),
         }));
         JFrame frame = wrapWithScrollingInFrame(table, "TablePatternHighlighter Test");
         frame.setVisible(true);

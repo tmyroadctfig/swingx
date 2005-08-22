@@ -322,7 +322,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         treeTable.setHighlighters(new HighlighterPipeline(new Highlighter[] {
                 AlternateRowHighlighter.quickSilver,
                 new HierarchicalColumnHighlighter(),
-                new PatternHighlighter(null, Color.red, "s.*",
+                new PatternHighlighter(null, Color.red, "^s",
                         Pattern.CASE_INSENSITIVE, 0, -1), }));
         JFrame frame = wrapWithScrollingInFrame(treeTable,
                 "QuickSilver-, Column-, PatternHighligher and LineStyle");
@@ -477,7 +477,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
                         new Highlighter(Color.orange, null),
                         new HierarchicalColumnHighlighter(),
                         new PatternHighlighter(null, Color.red,
-                                ".*D.*", 0, 0, 0), }));
+                                "D", 0, 0, 0), }));
         JFrame frame = wrapWithScrollingInFrame(treeTable, "Highlighters");
         frame.setVisible(true);
     }

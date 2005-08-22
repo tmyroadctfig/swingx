@@ -412,20 +412,6 @@ public class JXTableIssues extends InteractiveTestCase {
                 table.getDefaultRenderer(Object.class), newRenderer);
     }
 
-    /**
-     * Issue #??: JXTable pattern search differs from 
-     * PatternHighlighter/Filter.
-     * 
-     */
-    public void testRespectPatternInSearch() {
-        JXTable table = new JXTable(createModel(0, 11));
-        int row = 1;
-        String lastName = table.getValueAt(row, 0).toString();
-        int found = table.search(Pattern.compile(lastName), -1, false);
-        assertEquals("found must be equal to row", row, found);
-        found = table.search(Pattern.compile(lastName), found, false);
-        assertEquals("search must fail", -1, found);
-    }
 
     /**
      * Issue #??: JXTable pattern search differs from 

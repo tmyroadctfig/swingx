@@ -32,7 +32,7 @@ public class HighlighterTest extends TestCase {
     protected void setUp() {
         highlighters = new Highlighter[] {
             new AlternateRowHighlighter(Color.white, new Color(0xF0, 0xF0, 0xE0), null),
-            new PatternHighlighter(null, Color.red, "s.*", 0, 0)
+            new PatternHighlighter(null, Color.red, "^s", 0, 0)
         };
         backgroundNull = new JLabel("test");
         backgroundNull.setForeground(Color.red);
@@ -212,7 +212,7 @@ public class HighlighterTest extends TestCase {
     public void testJavaDocExample() {
         Highlighter[]   highlighters = new Highlighter[] {
             new AlternateRowHighlighter(Color.white, new Color(0xF0, 0xF0, 0xE0), null),
-            new PatternHighlighter(null, Color.red, "s.*", 0, 0)
+            new PatternHighlighter(null, Color.red, "^s", 0, 0)
         };
 
         HighlighterPipeline highlighterPipeline = new HighlighterPipeline(highlighters);

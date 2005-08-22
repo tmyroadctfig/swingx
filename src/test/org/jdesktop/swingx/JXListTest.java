@@ -147,7 +147,7 @@ public class JXListTest extends InteractiveTestCase {
 
     public void interactiveTestTablePatternFilter5() {
         JXList list = new JXList(listModel);
-        String pattern = ".*Row.*";
+        String pattern = "Row";
         list.setHighlighters(new HighlighterPipeline(new Highlighter[] {
             new PatternHighlighter(null, Color.red, pattern, 0, 1),
         }));
@@ -255,11 +255,11 @@ public class JXListTest extends InteractiveTestCase {
         setSystemLF(true);
         JXListTest test = new JXListTest();
         try {
-          test.runInteractiveTests();
+         // test.runInteractiveTests();
          //   test.runInteractiveTests("interactive.*Column.*");
          //   test.runInteractiveTests("interactive.*TableHeader.*");
          //   test.runInteractiveTests("interactive.*Render.*");
-          //  test.runInteractiveTests("interactive.*High.*");
+            test.runInteractiveTests("interactive.*Sort.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();

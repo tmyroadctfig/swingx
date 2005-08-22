@@ -93,7 +93,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      */
     public void interactiveTestHighlighters() {
         JXTree tree = new JXTree(treeTableModel);
-        String pattern = ".*o.*";
+        String pattern = "o";
         tree.setHighlighters(new HighlighterPipeline(new Highlighter[] {
                 new PatternHighlighter(null, Color.red, pattern, 0, 1),
             }));
