@@ -340,7 +340,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         treeTable.setRowHeight(22);
         treeTable.setRowMargin(1);
         treeTable.setFilters(new FilterPipeline(new Filter[] {
-                new PatternFilter( "d.*",
+                new PatternFilter( "^d",
                         Pattern.CASE_INSENSITIVE, 0), }));
         JFrame frame = wrapWithScrollingInFrame(treeTable,
                 "PatternFilter");

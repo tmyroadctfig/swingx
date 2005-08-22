@@ -145,7 +145,7 @@ public class SelectionIssues extends InteractiveTestCase {
      * @return
      */
     protected Filter createDefaultPatternFilter(int column) {
-        Filter filterZero = new PatternFilter(".*e.*", 0, column);
+        Filter filterZero = new PatternFilter("e", 0, column);
         return filterZero;
     }
     

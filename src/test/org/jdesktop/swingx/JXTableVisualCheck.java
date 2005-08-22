@@ -258,7 +258,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
                 if (hasFilters) {
                     table.setFilters(null);
                 } else {
-                    Filter filter = new PatternFilter(".*e.*", 0, 0);
+                    Filter filter = new PatternFilter("e", 0, 0);
                     table.setFilters(new FilterPipeline(new Filter[] {filter}));
 
                 }
@@ -732,7 +732,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         table.setIntercellSpacing(new Dimension(1, 1));
         table.setShowGrid(true);
         table.setFilters(new FilterPipeline(new Filter[] {
-                                            new PatternFilter("A.*", 0, 1)
+                                            new PatternFilter("^A", 0, 1)
         }));
         JFrame frame = wrapWithScrollingInFrame(table, "TablePatternFilter1 Test");
         frame.setVisible(true);
@@ -743,7 +743,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         table.setIntercellSpacing(new Dimension(2, 2));
         table.setShowGrid(true);
         table.setFilters(new FilterPipeline(new Filter[] {
-                                            new PatternFilter("S.*", 0, 1),
+                                            new PatternFilter("^S", 0, 1),
                                             new ShuttleSorter(0, false), // column 0, descending
         }));
         JFrame frame = wrapWithScrollingInFrame(table, "TablePatternFilter2 Test");
@@ -754,7 +754,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         JXTable table = new JXTable(tableModel);
         table.setShowGrid(true);
         table.setFilters(new FilterPipeline(new Filter[] {
-                                            new PatternFilter("S.*", 0, 1),
+                                            new PatternFilter("^S", 0, 1),
                                             new ShuttleSorter(1, false), // column 1, descending
                                             new ShuttleSorter(0, false), // column 0, descending
         }));
@@ -767,7 +767,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         table.setIntercellSpacing(new Dimension(3, 3));
         table.setShowGrid(true);
         table.setFilters(new FilterPipeline(new Filter[] {
-                                            new PatternFilter("A.*", 0, 1),
+                                            new PatternFilter("^A", 0, 1),
                                             new ShuttleSorter(0, false), // column 0, descending
         }));
         JFrame frame = wrapWithScrollingInFrame(table, "TablePatternFilter4 Test");

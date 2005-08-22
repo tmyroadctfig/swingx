@@ -724,7 +724,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         }
         // need to chain two filters (to reach the "else" block in
         // filter.isCellEditable()
-        PatternFilter filter = new PatternFilter("NOT.*", 0, 1);
+        PatternFilter filter = new PatternFilter("^NOT", 0, 1);
         PatternFilter noFilter = new PatternFilter(".*", 0, 1);
 
         table.setFilters(new FilterPipeline(new Filter[] {noFilter, filter}));
@@ -880,7 +880,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         if (matchAll) {
             filter = new PatternFilter(".*", Pattern.CASE_INSENSITIVE, col);
         } else {
-           filter = new PatternFilter("A.*", Pattern.CASE_INSENSITIVE, col);
+           filter = new PatternFilter("^A", Pattern.CASE_INSENSITIVE, col);
         }
         return new FilterPipeline(new Filter[] {filter});
         
@@ -966,7 +966,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testColumnControlAndFilters() {
         final JXTable table = new JXTable(sortableTableModel);
         table.setColumnControlVisible(true);
-        Filter filter = new PatternFilter(".*e.*", 0, 0);
+        Filter filter = new PatternFilter("e", 0, 0);
         table.setFilters(new FilterPipeline(new Filter[] {filter}));
         // needed to make public in JXTable for testing
         //   table.getTable().setSorter(0);

@@ -8,8 +8,6 @@
 package org.jdesktop.swingx.decorator;
 
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -249,7 +247,7 @@ public class FilterTest extends InteractiveTestCase {
      */
     public void testInterpose() {
         int sortColumn = 0;
-        Filter filter = new PatternFilter(".*s.*", 0, sortColumn);
+        Filter filter = new PatternFilter("s", 0, sortColumn);
         Filter[] filters = new Filter[] {filter, new ShuttleSorter()};
         FilterPipeline pipeline = new FilterPipeline(filters);
         pipeline.assign(directModelAdapter);
@@ -431,7 +429,9 @@ public class FilterTest extends InteractiveTestCase {
      * @return
      */
     protected Filter createDefaultPatternFilter(int column) {
-        Filter filterZero = new PatternFilter(".*e.*", 0, column);
+        Filter filterZero = new PatternFilter("e", 0, column);
+//        RowSorterFilter filterZero = new RowSorterFilter();
+//        filterZero.setRowFilter(RowFilter.regexFilter(".*e.*", 0));
         return filterZero;
     }
     
@@ -442,7 +442,7 @@ public class FilterTest extends InteractiveTestCase {
     public void testJavaDocExample() {
 
         Filter[] filters = new Filter[] {
-            new PatternFilter("S.*", 0, 1), // regex, matchflags, column
+            new PatternFilter("^S", 0, 1), // regex, matchflags, column
             new ShuttleSorter(1, false),   // column 1, descending
             new ShuttleSorter(0, true),    // column 0, ascending
         };
