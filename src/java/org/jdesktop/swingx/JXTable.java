@@ -442,7 +442,7 @@ public class JXTable extends JTable implements Searchable {
                 if (isColumnControlVisible()) {
                     verticalScrollPolicy = scrollPane
                             .getVerticalScrollBarPolicy();
-                    scrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER,
+                    scrollPane.setCorner(JScrollPane.UPPER_TRAILING_CORNER,
                             getColumnControl());
 
                     scrollPane
