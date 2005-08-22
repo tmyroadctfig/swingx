@@ -16,7 +16,7 @@ import java.awt.Component;
  * @author Ramesh Gupta
  */
 public abstract class ConditionalHighlighter extends Highlighter {
-    protected int               testColumn = 0;                 // always in model coordinates
+    protected int               testColumn = 0;         // always in model coordinates
     protected int               highlightColumn = -1;   // always in model coordinates
     protected int               mask = 255;
 

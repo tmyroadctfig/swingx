@@ -10,23 +10,45 @@ import java.awt.Color;
 import java.util.regex.Pattern;
 
 /**
+ * Convenience Highlighter to test and highlight cells in searching.
+ *  
  * @author Jeanette Winzenburg
  */
 public class SearchHighlighter extends PatternHighlighter {
-    /** the row to highlight in view coordinates (?). -1 means all */
+    /** the row to highlight in view coordinates. -1 means all */
     int highlightRow;
     private boolean enableHighlight;
     private static final String ALL = ".*";
     
+    /**
+     * Instantiates a default SearchHighlighter. 
+     * The default colors are Yellow background and null foreground.
+     * The default matching state is 
+     *  Pattern == null, flags = 0, tests all columns and all rows.
+     * 
+     */
     public SearchHighlighter() {
         this(Color.YELLOW.brighter(), null);
     }
     
+    /**
+     * Instantiates a default SearchHighlighter with background/foreground colors.
+     * The default matching state is 
+     *  Pattern == null, flags = 0, tests all columns and all rows.
+     * 
+     * @param background color of hightlight background
+     * @param foreground color of highlight foreground
+     */
     public SearchHighlighter(Color background, Color foreground) {
         super(background, foreground, null, 0, -1);
         setHighlightRow(-1);
     }
 
+    /**
+     * Toggle to enable/disable - if disabled never hightlights.
+     * 
+     * @param enableHighlight
+     */
     public void setEnabled(boolean enableHighlight) {
         this.enableHighlight = enableHighlight;
         fireStateChanged();
@@ -52,11 +74,6 @@ public class SearchHighlighter extends PatternHighlighter {
         if (pattern == null) {
             return false;
         }
-        // use one highlighter for all columns
-//        int testColumnV = adapter.column;
-//        if (testColumn >= 0) {
-//            testColumnV = adapter.modelToView(testColumn);
-//        }
         int columnToTest = testColumn;
         // use one highlighter for all columns
         if (columnToTest < 0) {
@@ -67,10 +84,6 @@ public class SearchHighlighter extends PatternHighlighter {
             return false;
         }
         else {
-            // this is a hack to make the Highlighter matching behave
-            // consistently with Table matching: brute force find.
-            // The correct thing to do would be to 
-            // make JXTable respect the pattern.
             boolean matches = pattern.matcher(value.toString()).find();
             return matches;
         }
@@ -95,6 +108,11 @@ public class SearchHighlighter extends PatternHighlighter {
         
     }
 
+    /**
+     * Set's highlightRow to row, test- and highlight column = column
+     * @param row
+     * @param modelColumn
+     */
     public void setHighlightCell(int row, int modelColumn) {
         this.testColumn = modelColumn;
         this.highlightColumn = modelColumn;
