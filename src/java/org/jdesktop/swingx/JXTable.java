@@ -168,15 +168,13 @@ public class JXTable extends JTable implements Searchable {
     public static final String PACKSELECTED_ACTION_COMMAND = 
         ColumnControlButton.COLUMN_CONTROL_MARKER + "packSelected";
 
-    /** TODO */
+    /** The prefix marker to find component related properties in the resourcebundle. */
     public static final String UIPREFIX = "JXTable.";
 
     static {
         // Hack: make sure the resource bundle is loaded
         LookAndFeelAddons.contribute(new JXTableAddon());
     }
-
-//    public static boolean TRACE = false;
 
     /** The FilterPipeline for the table. */
     protected FilterPipeline filters = null;
