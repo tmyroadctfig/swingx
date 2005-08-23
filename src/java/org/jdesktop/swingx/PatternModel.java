@@ -6,6 +6,9 @@ package org.jdesktop.swingx;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -36,21 +39,21 @@ import java.util.regex.Pattern;
  */
 public class PatternModel {
 
-    public static final String SEARCH_STRING_REGEX = "regex";
+    public static final String REGEX_UNCHANGED = "regex";
 
-    public static final String SEARCH_STRING_ANCHORED = "anchored";
+    public static final String REGEX_ANCHORED = "anchored";
 
-    public static final String SEARCH_STRING_WILDCARD = "wildcard";
+    public static final String REGEX_WILDCARD = "wildcard";
 
-    public static final String SEARCH_STRING_EXPLICIT = "explicit";
+    public static final String REGEX_MATCH_RULES = "explicit";
 
-    public static final String SEARCH_CATEGORY_CONTAINS = "contains";
+    public static final String MATCH_RULE_CONTAINS = "contains";
 
-    public static final String SEARCH_CATEGORY_EQUALS = "equals";
+    public static final String MATCH_RULE_EQUALS = "equals";
 
-    public static final String SEARCH_CATEGORY_ENDSWITH = "endsWith";
+    public static final String MATCH_RULE_ENDSWITH = "endsWith";
 
-    public static final String SEARCH_CATEGORY_STARTSWITH = "startsWith";
+    public static final String MATCH_RULE_STARTSWITH = "startsWith";
 
     private String rawText;
 
@@ -73,9 +76,9 @@ public class PatternModel {
 
     private PropertyChangeSupport propertySupport;
 
-    private String searchStringMode;
+    private String regexCreatorKey;
 
-    private SearchMode searchMode;
+    private RegexCreator regexCreator;
 
 
     public boolean isCaseSensitive() {
@@ -125,7 +128,7 @@ public class PatternModel {
     private String createRegEx(String searchString) {
         if (isEmpty(searchString))
             return ".*";
-        return getSearchMode().createRegEx(searchString);
+        return getRegexCreator().createRegEx(searchString);
     }
 
     /**
@@ -231,14 +234,20 @@ public class PatternModel {
         propertySupport.firePropertyChange(name, oldValue, newValue);
     }
 
-    public class SearchMode {
-        private String searchCategory;
+    /**
+     * Responsible for converting a "raw text" into a valid 
+     * regular expression in the context of a set of rules.
+     * 
+     */
+    public static class RegexCreator {
+        protected String matchRule;
+        private List rules;
 
-        public String getSearchCategory() {
-            if (searchCategory == null) {
-                searchCategory = getDefaultSearchCategory();
+        public String getMatchRule() {
+            if (matchRule == null) {
+                matchRule = getDefaultMatchRule();
             }
-            return searchCategory;
+            return matchRule;
         }
 
         public boolean isAutoDetect() {
@@ -246,16 +255,16 @@ public class PatternModel {
         }
         
         public String createRegEx(String searchString) {
-            if (SEARCH_CATEGORY_CONTAINS.equals(getSearchCategory())) {
+            if (MATCH_RULE_CONTAINS.equals(getMatchRule())) {
                 return createContainedRegEx(searchString);
             }
-            if (SEARCH_CATEGORY_EQUALS.equals(getSearchCategory())) {
+            if (MATCH_RULE_EQUALS.equals(getMatchRule())) {
                 return createEqualsRegEx(searchString);
             }
-            if (SEARCH_CATEGORY_STARTSWITH.equals(getSearchCategory())){
+            if (MATCH_RULE_STARTSWITH.equals(getMatchRule())){
                 return createStartsAnchoredRegEx(searchString);
             }
-            if (SEARCH_CATEGORY_ENDSWITH.equals(getSearchCategory())) {
+            if (MATCH_RULE_ENDSWITH.equals(getMatchRule())) {
                 return createEndAnchoredRegEx(searchString);
             }
             return searchString;
@@ -277,17 +286,45 @@ public class PatternModel {
             return Pattern.quote(searchString);
         }
 
-        public void setSearchCategory(String category) {
-            this.searchCategory = category;
+        public void setMatchRule(String category) {
+            this.matchRule = category;
         }
         
-        protected String getDefaultSearchCategory() {
-            return SEARCH_CATEGORY_CONTAINS;
+        protected String getDefaultMatchRule() {
+            return MATCH_RULE_CONTAINS;
+        }
+
+        public List getMatchRules() {
+            if (rules == null) {
+                rules = createAndInitRules();
+            }
+            return rules;
+        }
+
+        private List createAndInitRules() {
+            if (!supportsRules()) return Collections.EMPTY_LIST;
+            List<String> list = new ArrayList<String>();
+            list.add(MATCH_RULE_CONTAINS);
+            list.add(MATCH_RULE_EQUALS);
+            list.add(MATCH_RULE_STARTSWITH);
+            list.add(MATCH_RULE_ENDSWITH);
+            return list;
+        }
+
+        private boolean supportsRules() {
+            return true;
         }
     }
 
  
-    public class AnchoredSearchMode extends SearchMode {
+    /**
+     * Support for anchored input.
+     * 
+     * PENDING: NOT TESTED - simply moved!
+     * Need to define requirements...
+     * 
+     */
+    public static class AnchoredSearchMode extends RegexCreator {
         
         public boolean isAutoDetect() {
             return true;
@@ -302,7 +339,8 @@ public class PatternModel {
                   } 
               }
       
-              buf.append(createContainedRegEx(searchExp));
+              //PENDING: doesn't escape contained regex metacharacters...
+              buf.append(searchExp);
       
               if (!hasEndAnchor(searchExp)) {
                   if (isEndAnchored()) {
@@ -348,7 +386,8 @@ public class PatternModel {
 //      * or false if the pattern can match anywhere in a string.
 //      */
      public boolean isStartAnchored() {
-         return SEARCH_CATEGORY_STARTSWITH.equals(getSearchCategory());
+         return MATCH_RULE_EQUALS.equals(getMatchRule()) ||
+             MATCH_RULE_STARTSWITH.equals(getMatchRule());
      }
  //
 //     /**
@@ -369,7 +408,8 @@ public class PatternModel {
       * or false if the pattern can match anywhere in a string.
       */
      public boolean isEndAnchored() {
-         return SEARCH_CATEGORY_ENDSWITH.equals(getSearchCategory());
+         return MATCH_RULE_EQUALS.equals(getMatchRule()) ||
+             MATCH_RULE_ENDSWITH.equals(getMatchRule());
      }
  //
 //     /**
@@ -407,45 +447,49 @@ public class PatternModel {
      * 
      * @param mode
      */
-    public void setSearchStringMode(String mode) {
-        if (getSearchStringMode().equals(mode)) return;
-        String old = getSearchStringMode();
-        searchStringMode = mode;
-        firePropertyChange("searchStringMode", old, getSearchStringMode());
+    public void setRegexCreatorKey(String mode) {
+        if (getRegexCreatorKey().equals(mode)) return;
+        String old = getRegexCreatorKey();
+        regexCreatorKey = mode;
+        firePropertyChange("regexCreatorKey", old, getRegexCreatorKey());
         
     }
 
-    public String getSearchStringMode() {
-        if (searchStringMode == null) {
-            searchStringMode = getDefaultSearchStringMode();
+    public String getRegexCreatorKey() {
+        if (regexCreatorKey == null) {
+            regexCreatorKey = getDefaultRegexCreatorKey();
         }
-        return searchStringMode;
+        return regexCreatorKey;
     }
 
-    private String getDefaultSearchStringMode() {
-        return SEARCH_STRING_EXPLICIT;
+    private String getDefaultRegexCreatorKey() {
+        return REGEX_MATCH_RULES;
     }
 
-    public void setSearchCategory(String category) {
-        if (getSearchCategory().equals(category)) {
+    public void setMatchRule(String category) {
+        if (getMatchRule().equals(category)) {
             return;
         }
-        String old = getSearchCategory();
-        getSearchMode().setSearchCategory(category);
+        String old = getMatchRule();
+        getRegexCreator().setMatchRule(category);
         updatePattern(createRegEx(getRawText()));
-        firePropertyChange("searchCategory", old, getSearchCategory());
+        firePropertyChange("matchRule", old, getMatchRule());
         
     }
 
-    public String getSearchCategory() {
-        return getSearchMode().getSearchCategory();
+    public String getMatchRule() {
+        return getRegexCreator().getMatchRule();
     }
 
-    private SearchMode getSearchMode() {
-        if (searchMode == null) {
-            searchMode = new SearchMode();
+    private RegexCreator getRegexCreator() {
+        if (regexCreator == null) {
+            regexCreator = new RegexCreator();
         }
-        return searchMode;
+        return regexCreator;
+    }
+
+    public List getMatchRules() {
+        return getRegexCreator().getMatchRules();
     }
 
 

@@ -4,9 +4,11 @@
  */
 package org.jdesktop.swingx;
 
-import org.jdesktop.swingx.util.PropertyChangeReport;
+import java.util.List;
 
 import junit.framework.TestCase;
+
+import org.jdesktop.swingx.util.PropertyChangeReport;
 
 public class PatternModelTest extends TestCase {
 
@@ -16,46 +18,64 @@ public class PatternModelTest extends TestCase {
     final static String middleEndAnchor = "some" + endAnchor + "one";
     private PropertyChangeReport propertyReport;
  
-    public void testSetSearchStringMode() {
+    public void testCaseSensitive() {
+        PatternModel model = new PatternModel();
+        model.setRawText("tab");
+        assertTrue("must find not case sensitive by default", 
+                model.getPattern().matcher("JTABLE").find());
+        model.addPropertyChangeListener(propertyReport);
+        model.setCaseSensitive(true);
+        assertTrue("changing case sensitive must fire casesensitive property", 
+                propertyReport.hasEvents("caseSensitive"));
+        assertTrue("changing case sensitive must fire pattern property", 
+                propertyReport.hasEvents("pattern"));
+        
+    }
+    public void testAvailableMatchRules() {
+        PatternModel model = new PatternModel();
+        List rules = model.getMatchRules();
+        assertNotNull("rules must not be null", rules);
+    }
+    public void testRegexCreator() {
         PatternModel model = new PatternModel();
         model.addPropertyChangeListener(propertyReport);
-        model.setSearchStringMode(PatternModel.SEARCH_STRING_REGEX);
-        assertEquals("search string mode must be", PatternModel.SEARCH_STRING_REGEX, model.getSearchStringMode());
-        assertTrue(propertyReport.hasEvents("searchStringMode"));
+        model.setRegexCreatorKey(PatternModel.REGEX_UNCHANGED);
+        assertEquals("search string mode must be", PatternModel.REGEX_UNCHANGED, model.getRegexCreatorKey());
+        assertTrue(propertyReport.hasEvents("regexCreatorKey"));
         
 //        model.setSearchStringMode(PatternModel.SEARCH_STRING_ANCHORED);
 //        model.setSearchStringMode(PatternModel.SEARCH_STRING_WILDCARD);
 //        model.setSearchStringMode(PatternModel.SEARCH_STRING_EXPLICIT);
     }
     
-    public void testSearchCategory() {
+    public void testMatchRule() {
         PatternModel model = new PatternModel();
         model.addPropertyChangeListener(propertyReport);
         // default searchStringMode
         assertEquals("search string mode must be", 
-                PatternModel.SEARCH_STRING_EXPLICIT, model.getSearchStringMode());
+                PatternModel.REGEX_MATCH_RULES, model.getRegexCreatorKey());
         // default searchCategory
         assertEquals("search category must be ", 
-                PatternModel.SEARCH_CATEGORY_CONTAINS, model.getSearchCategory());
+                PatternModel.MATCH_RULE_CONTAINS, model.getMatchRule());
         // change category and test if property change is fired
-        model.setSearchCategory(PatternModel.SEARCH_CATEGORY_EQUALS);
-        assertTrue("model must have fired " + "searchCategory ", propertyReport.hasEvents("searchCategory"));
+        model.setMatchRule(PatternModel.MATCH_RULE_EQUALS);
+        assertTrue("model must have fired " + "matchRule ", propertyReport.hasEvents("matchRule"));
     }
     
-    public void testChangeSearchCategory() {
+    public void testChangeMatchRule() {
         PatternModel model = new PatternModel();
         String contained = "t";
         model.setRawText(contained);
         String match = "x" + contained + "x";
         assertTrue("pattern must find " + match, model.getPattern().matcher(match).find());
         model.addPropertyChangeListener(propertyReport);
-        model.setSearchCategory(PatternModel.SEARCH_CATEGORY_EQUALS);
+        model.setMatchRule(PatternModel.MATCH_RULE_EQUALS);
         assertTrue("model must have fire pattern change", propertyReport.hasEvents("pattern"));
         assertFalse("pattern must reject " + match, model.getPattern().matcher(match).find());
-        model.setSearchCategory(PatternModel.SEARCH_CATEGORY_STARTSWITH);
+        model.setMatchRule(PatternModel.MATCH_RULE_STARTSWITH);
         match = "txx";
         assertTrue("pattern must find " + match, model.getPattern().matcher(match).find());
-        model.setSearchCategory(PatternModel.SEARCH_CATEGORY_ENDSWITH);
+        model.setMatchRule(PatternModel.MATCH_RULE_ENDSWITH);
         match = "xxt";
         assertTrue("pattern must find " + match, model.getPattern().matcher(match).find());
     }
