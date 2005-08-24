@@ -16,8 +16,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.print.PrinterException;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.Collections;
@@ -42,6 +40,7 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JViewport;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SizeSequence;
@@ -223,7 +222,7 @@ public class JXTable extends JTable implements Searchable {
     private JComponent columnControlButton;
 
     /** The JXFindDialog we open on find() */
-    private JXFindDialog dialog = null;
+    private static JXFindDialog dialog;
 
 
     /**
@@ -336,7 +335,7 @@ public class JXTable extends JTable implements Searchable {
         setSortable(true);
         // guarantee getFilters() to return != null
         setFilters(null);
-        initActions();
+        initActionsAndBindings();
         // instantiate row height depending on font size
         updateRowHeightUI(false);
     }
@@ -537,12 +536,13 @@ public class JXTable extends JTable implements Searchable {
     /** Opens the JXFindDialog for the table. */
     private void find() {
         if (dialog == null) {
-            dialog = new JXFindDialog(this);
+            dialog = new JXFindDialog();
         }
+        dialog.setSearchable(this);
         dialog.setVisible(true);
     }
 
-    private void initActions() {
+    private void initActionsAndBindings() {
         // Register the actions that this class can handle.
         ActionMap map = getActionMap();
         map.put("print", new Actions("print"));
@@ -550,6 +550,9 @@ public class JXTable extends JTable implements Searchable {
         map.put(PACKALL_ACTION_COMMAND, createPackAllAction());
         map.put(PACKSELECTED_ACTION_COMMAND, createPackSelectedAction());
         map.put(HORIZONTALSCROLL_ACTION_COMMAND, createHorizontalScrollAction());
+        // this should be handled by the LF!
+        KeyStroke findStroke = KeyStroke.getKeyStroke("F3");
+        getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(findStroke, "find");
     }
 
     /** Creates an Action for horizontal scrolling. */
