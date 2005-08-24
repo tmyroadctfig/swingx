@@ -80,6 +80,71 @@ public class PatternModel {
 
     private RegexCreator regexCreator;
 
+    private boolean wrapping;
+
+
+//---------------------- misc. properties not directly related to Pattern.
+    
+    public int getFoundIndex() {
+        return foundIndex;
+    }
+
+    public void setFoundIndex(int foundIndex) {
+        int old = getFoundIndex();
+        this.foundIndex = foundIndex;
+        firePropertyChange("foundIndex", old, getFoundIndex());
+    }
+    
+    public boolean isBackwards() {
+        return backwards;
+    }
+
+    public void setBackwards(boolean backwards) {
+        boolean old = isBackwards();
+        this.backwards = backwards;
+        firePropertyChange("backwards", old, isBackwards());
+    }
+
+    public boolean isWrapping() {
+        return wrapping;
+    }
+    
+    public void setWrapping(boolean wrapping) {
+        boolean old = isWrapping();
+        this.wrapping = wrapping;
+        firePropertyChange("wrapping", old, isWrapping());
+    }
+    
+    // public boolean isActive() {
+    // return active;
+    // }
+    //
+    // public void setActive(boolean active) {
+    // if (!isEnabled())
+    // return;
+    // boolean old = isActive();
+    // this.active = active;
+    // firePropertyChange("active", old, isActive());
+    // }
+    //
+    // public boolean isEnabled() {
+    // return enabled;
+    // }
+    //
+    // public void setEnabled(boolean enabled) {
+    // boolean old = isEnabled();
+    // this.enabled = enabled;
+    // firePropertyChange("enabled", old, isEnabled());
+    // }
+    // public boolean isHighlight() {
+    // return highlight;
+    // }
+    //
+    // public void setHighlight(boolean highlight) {
+    // boolean old = isHighlight();
+    // this.highlight = highlight;
+    // firePropertyChange("highlight", old, isHighlight());
+    // }
 
     public boolean isCaseSensitive() {
         return caseSensitive;
@@ -94,16 +159,6 @@ public class PatternModel {
 
     public Pattern getPattern() {
         return pattern;
-    }
-
-    public int getFoundIndex() {
-        return foundIndex;
-    }
-
-    public void setFoundIndex(int foundIndex) {
-        int old = getFoundIndex();
-        this.foundIndex = foundIndex;
-        firePropertyChange("foundIndex", old, getFoundIndex());
     }
 
     public String getRawText() {
@@ -172,47 +227,6 @@ public class PatternModel {
         }
         firePropertyChange("pattern", old, getPattern());
     }
-
-    public boolean isBackwards() {
-        return backwards;
-    }
-
-    public void setBackwards(boolean backwards) {
-        boolean old = isBackwards();
-        this.backwards = backwards;
-        firePropertyChange("backwards", old, isBackwards());
-    }
-
-    // public boolean isActive() {
-    // return active;
-    // }
-    //
-    // public void setActive(boolean active) {
-    // if (!isEnabled())
-    // return;
-    // boolean old = isActive();
-    // this.active = active;
-    // firePropertyChange("active", old, isActive());
-    // }
-    //
-    // public boolean isEnabled() {
-    // return enabled;
-    // }
-    //
-    // public void setEnabled(boolean enabled) {
-    // boolean old = isEnabled();
-    // this.enabled = enabled;
-    // firePropertyChange("enabled", old, isEnabled());
-    // }
-    // public boolean isHighlight() {
-    // return highlight;
-    // }
-    //
-    // public void setHighlight(boolean highlight) {
-    // boolean old = isHighlight();
-    // this.highlight = highlight;
-    // firePropertyChange("highlight", old, isHighlight());
-    // }
 
     public void addPropertyChangeListener(PropertyChangeListener l) {
         if (propertySupport == null) {

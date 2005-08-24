@@ -7,9 +7,12 @@
 
 package org.jdesktop.swingx;
 
+import java.awt.Container;
 import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -50,6 +53,7 @@ import org.jdesktop.swingx.plaf.SearchPanelAddon;
  * TODO: allow custom PatternModel and/or access 
  * to configuration of bound PatternModel. 
  * 
+ * TODO: fully support control of multiple PatternMatchers.
  * 
  * @author Ramesh Gupta
  * @author Jeanette Winzenburg
@@ -79,10 +83,8 @@ public class JXSearchPanel extends JPanel {
 
     private JTextField searchField;
 
-    private PatternFilter patternFilter = null;
-
-    private PatternHighlighter patternHighlighter = null;
-
+    private List<PatternMatcher> patternMatchers;
+    
     private PatternModel patternModel;
 
     public JXSearchPanel() {
@@ -101,20 +103,8 @@ public class JXSearchPanel extends JPanel {
      * 
      */
     public void setPatternFilter(PatternFilter filter) {
-        patternFilter = filter;
-        if (filter == null) {
-            fieldName.setText("Field");
-        } else {
-            fieldName.setText(filter.getColumnName());
-        }
-    }
-
-    /** 
-     * returns the patternfilter - really needed?
-     * @return
-     */
-    public PatternFilter getPatternFilter() {
-        return patternFilter;
+        getPatternMatchers().add(filter);
+        updateFieldName(filter);
     }
 
     /**
@@ -124,20 +114,31 @@ public class JXSearchPanel extends JPanel {
      * 
      */
     public void setPatternHighlighter(PatternHighlighter highlighter) {
-        patternHighlighter = highlighter;
-        if (fieldName.getText().length() == 0) { // ugly hack
-            fieldName.setText("Field");
-            /** @todo Remove this hack!!! */
-        }
+        getPatternMatchers().add(highlighter);
+        updateFieldName(highlighter);
+//        if (fieldName.getText().length() == 0) { // ugly hack
+//            fieldName.setText("Field");
+//            /** @todo Remove this hack!!! */
+//        }
     }
+
+
+
+    /** 
+     * returns the patternfilter - really needed?
+     * @return
+     */
+//    public PatternFilter getPatternFilter() {
+//        return patternFilter;
+//    }
 
     /** 
      * returns the patternHighlighter - really needed?
      * @return
      */
-    public PatternHighlighter getPatternHighlighter() {
-        return patternHighlighter;
-    }
+//    public PatternHighlighter getPatternHighlighter() {
+//        return patternHighlighter;
+//    }
 
 
     /**
@@ -203,7 +204,11 @@ public class JXSearchPanel extends JPanel {
         return text != null ? text : key;
     }
 
-    private Action createMatchCaseAction() {
+    /**
+     * 
+     * @return
+     */
+    private AbstractActionExt createMatchCaseAction() {
         String actionName = getUIString(MATCH_CASE_ACTION_COMMAND);
         BoundAction action = new BoundAction(actionName,
                 MATCH_CASE_ACTION_COMMAND);
@@ -213,7 +218,12 @@ public class JXSearchPanel extends JPanel {
         return action;
     }
 
-    private Action createSelectMatchRuleAction() {
+    /**
+     * return the Action to select the Match Rule.
+     * 
+     * @return
+     */
+    private AbstractActionExt createSelectMatchRuleAction() {
         String actionName = getUIString(MATCH_RULE_ACTION_COMMAND);
         BoundAction action = new BoundAction(actionName,
                 MATCH_RULE_ACTION_COMMAND);
@@ -264,15 +274,9 @@ public class JXSearchPanel extends JPanel {
     protected void refreshPatternMatchersFromModel() {
         Pattern pattern = getPattern();
 
-        PatternMatcher filter = getPatternFilter();
-        if (filter != null) {
-            filter.setPattern(pattern); // will repaint target automatically!
-        }
-
-        PatternMatcher highlighter = getPatternHighlighter();
-        if (highlighter != null) {
-            highlighter.setPattern(pattern); // will repaint target
-                                                // automatically
+        for (Iterator<PatternMatcher> iter = getPatternMatchers().iterator(); iter.hasNext();) {
+            iter.next().setPattern(pattern);
+            
         }
     }
 
@@ -300,9 +304,35 @@ public class JXSearchPanel extends JPanel {
      *
      */
     protected void refreshModelFromDocument() {
-        patternModel.setRawText(searchField.getText());
+        getPatternModel().setRawText(searchField.getText());
     }
 
+    /**
+     * @param filter
+     */
+    private void updateFieldName(PatternMatcher matcher) {
+        if (matcher instanceof PatternFilter) {
+            PatternFilter filter = (PatternFilter) matcher;
+            if (filter == null) {
+                fieldName.setText("Field");
+            } else {
+                fieldName.setText(filter.getColumnName());
+            }
+        } else {
+            if (fieldName.getText().length() == 0) { // ugly hack
+                fieldName.setText("Field");
+                /** @todo Remove this hack!!! */
+            }
+
+        }
+    }
+
+    private List<PatternMatcher> getPatternMatchers() {
+        if (patternMatchers == null) {
+            patternMatchers = new ArrayList<PatternMatcher>();
+        }
+        return patternMatchers;
+    }
 
     //--------------------- binding support
     

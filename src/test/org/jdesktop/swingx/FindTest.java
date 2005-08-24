@@ -100,14 +100,14 @@ public class FindTest extends TestCase {
 
         boolean[] states = { true, false, false, true, true };
         for (int i = 0; i < states.length; i++) {
-            dialog.setMatchFlag(states[i]);
-            assertEquals(states[i], dialog.getMatchFlag());
-
-            dialog.setWrapFlag(states[i]);
-            assertEquals(states[i], dialog.getWrapFlag());
-
-            dialog.setBackwardsFlag(states[i]);
-            assertEquals(states[i], dialog.getBackwardsFlag());
+//            dialog.setMatchFlag(states[i]);
+//            assertEquals(states[i], dialog.getMatchFlag());
+//
+//            dialog.setWrapFlag(states[i]);
+//            assertEquals(states[i], dialog.getWrapFlag());
+//
+//            dialog.setBackwardsFlag(states[i]);
+//            assertEquals(states[i], dialog.getBackwardsFlag());
         }
     }
 
@@ -124,7 +124,6 @@ public class FindTest extends TestCase {
 
     private static void showDialog() {
         JXFindDialog dialog = new JXFindDialog(new TestSearchable());
-        dialog.setDebug(true);
         dialog.setVisible(true);
     }
 
