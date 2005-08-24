@@ -434,14 +434,26 @@ public class ActionContainerFactory {
      * @param group the group to add the toggle button or null
      */
     private JToggleButton createToggleButton(AbstractActionExt a, ButtonGroup group)  {
-        JToggleButton button = new JToggleButton(a);
+        JToggleButton button = new JToggleButton();
+        configureButton(button, a, group);
+        return button;
+    }
+
+    /**
+     * 
+     * @param button
+     * @param a
+     * @param group
+     * @return
+     */
+    public void configureButton(JToggleButton button, AbstractActionExt a, ButtonGroup group) {
+        button.setAction(a);
         button.addItemListener(a);
         button.setSelected(a.isSelected());
         if (group != null) {
             group.add(button);
         }
         configureToggleButton(button, a);
-        return button;
     }
 
     /**

@@ -18,7 +18,10 @@ public class SearchPanelAddon implements ComponentAddon {
 
   public void initialize(LookAndFeelAddons addon) {
     // dummy call - ensure loading  
-    addon.loadDefaults(new Object[] {  });
+    addon.loadDefaults(new Object[] {
+//            testing order of loads/finding values in UIManager
+//            "JXSearchPanel.matchCase", "rude overwrite"
+    });
   }
 
   public void uninitialize(LookAndFeelAddons addon) {

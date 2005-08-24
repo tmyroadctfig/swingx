@@ -13,10 +13,10 @@ import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -25,6 +25,7 @@ import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.ActionContainerFactory;
 import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.decorator.PatternFilter;
@@ -72,7 +73,7 @@ public class JXSearchPanel extends JPanel {
 
     private JLabel fieldName;
 
-    private AbstractButton matchCase;
+    private JCheckBox matchCase;
 
     private JComboBox searchCriteria;
 
@@ -86,7 +87,6 @@ public class JXSearchPanel extends JPanel {
 
     public JXSearchPanel() {
         initActions();
-        initActionComponents();
         initComponents();
         build();
         bind();
@@ -274,15 +274,6 @@ public class JXSearchPanel extends JPanel {
             highlighter.setPattern(pattern); // will repaint target
                                                 // automatically
         }
-
-        // if (filter == null) {
-        // // Repaint explicitly only if there is no filter
-        // JComponent target = getTargetComponent();
-        // if (target != null) {
-        // target.repaint();
-        // }
-        // }
-        // }
     }
 
     private DocumentListener getSearchFieldListener() {
@@ -326,27 +317,14 @@ public class JXSearchPanel extends JPanel {
         searchCriteria.setModel(model);
         searchCriteria.setAction(getActionMap().get(MATCH_RULE_ACTION_COMMAND));
         searchField.getDocument().addDocumentListener(getSearchFieldListener());
-    }
-    
-    /**
-     * PRE: actions initialized.
-     * 
-     * PENDING: we should create all components we want to 
-     * access in initComponents. Currently that's not quite possible because
-     * of ActionContainerFactory limitation (doesn't support config of
-     * action components after creation)
-     * 
-     * TODO: add radiobutton/checkbox creating methods to
-     * ActionContainerFactory.
-     * 
-     */
-    private void initActionComponents() {
         // bind the action should be decoupled from creating the button!
         ActionContainerFactory factory = new ActionContainerFactory(null);
-        matchCase = factory.createButton(getActionMap().get(
-                MATCH_CASE_ACTION_COMMAND));
+        factory.configureButton(matchCase, 
+                (AbstractActionExt) getActionMap().get(MATCH_CASE_ACTION_COMMAND),
+                null);
+        
     }
-
+    
 
 
     //------------------------ init ui
@@ -376,6 +354,7 @@ public class JXSearchPanel extends JPanel {
         fieldName = new JLabel();
         searchField = new JTextField();
         searchCriteria = new JComboBox();
+        matchCase = new JCheckBox();
     }
 
 
