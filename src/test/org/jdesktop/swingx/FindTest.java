@@ -87,7 +87,22 @@ public class FindTest extends TestCase {
         }
     }
 
+    public void testNullSearchable() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            return;
+        }
+
+        JXFindDialog dialog = new JXFindDialog();
+        dialog.doFind();
+    }
     /**
+     * Not longer valid: 
+     * there are no public methods in the FindDialog 
+     * to access patternModel flags.
+     * 
+     * PENDING: do we need it?
+     * 
      * Simple test to ensure that flags are set correctly.
      */
     public void testFlags() {

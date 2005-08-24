@@ -71,6 +71,10 @@ public class JXFindDialog extends JDialog {
 
     private PatternModel patternModel;
 
+    public JXFindDialog() {
+        this(null, null);
+    }
+    
     public JXFindDialog(Searchable searchable) {
         this(searchable, 
             (searchable instanceof Component) ? (Component) searchable : null);
@@ -79,12 +83,21 @@ public class JXFindDialog extends JDialog {
         super(component != null ? 
               (Frame)SwingUtilities.getWindowAncestor(component) : JOptionPane.getRootFrame(),
               "Find in this component");
-        this.searchable = searchable;
+        setSearchable(searchable);
 
         locate();
 
         init();
         pack();
+    }
+    
+    /**
+     * Sets the Searchable targeted with this dialog.
+     * 
+     * @param searchable 
+     */
+    public void setSearchable(Searchable searchable) {
+        this.searchable = searchable;
     }
     
     /**
@@ -201,6 +214,7 @@ public class JXFindDialog extends JDialog {
     }
 
     public void doFind(boolean backwards) {
+        if (searchable == null) return;
         setLastIndex(searchable.search(getPattern(), getLastIndex(), backwards));
         if (getLastIndex() == -1) {
             boolean notFound = true;
