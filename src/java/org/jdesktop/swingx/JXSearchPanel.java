@@ -65,11 +65,6 @@ public class JXSearchPanel extends JPanel {
         LookAndFeelAddons.contribute(new SearchPanelAddon());
     }
 
-    /**
-     * The prefix marker to find component related properties in the
-     * resourcebundle.
-     */
-    public static final String UIPREFIX = "JXSearchPanel.";
 
     public static final String MATCH_RULE_ACTION_COMMAND = "selectMatchRule";
 
@@ -200,7 +195,7 @@ public class JXSearchPanel extends JPanel {
      *   value was null.
      */
     private String getUIString(String key) {
-        String text = UIManager.getString(UIPREFIX + key);
+        String text = UIManager.getString(PatternModel.SEARCH_PREFIX + key);
         return text != null ? text : key;
     }
 

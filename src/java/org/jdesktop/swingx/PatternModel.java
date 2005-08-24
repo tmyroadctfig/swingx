@@ -39,6 +39,12 @@ import java.util.regex.Pattern;
  */
 public class PatternModel {
 
+    /**
+     * The prefix marker to find component related properties in the
+     * resourcebundle.
+     */
+    public static final String SEARCH_PREFIX = "Search.";
+
     public static final String REGEX_UNCHANGED = "regex";
 
     public static final String REGEX_ANCHORED = "anchored";

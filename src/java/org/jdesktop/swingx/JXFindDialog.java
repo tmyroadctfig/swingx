@@ -357,7 +357,7 @@ public class JXFindDialog extends JDialog {
      *   value was null.
      */
     private String getUIString(String key) {
-        String text = UIManager.getString(JXSearchPanel.UIPREFIX + key);
+        String text = UIManager.getString(PatternModel.SEARCH_PREFIX + key);
         return text != null ? text : key;
     }
 
