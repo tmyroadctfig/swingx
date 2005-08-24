@@ -48,6 +48,7 @@ import org.jdesktop.swingx.action.BoundAction;
  * 
  * 
  * PENDING: need to extract a common dialog.
+ * PENDING: the base search widget need not be a dialog!
  * 
  * @author ??
  * @author Jeanette Winzenburg
@@ -97,7 +98,11 @@ public class JXFindDialog extends JDialog {
      * @param searchable 
      */
     public void setSearchable(Searchable searchable) {
+        if ((this.searchable != null) && this.searchable.equals(searchable)) return;
+        Object old = this.searchable;
         this.searchable = searchable;
+        setLastIndex(-1);
+        firePropertyChange("searchable", old, this.searchable);
     }
     
     /**
