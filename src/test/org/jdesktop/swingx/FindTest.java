@@ -15,26 +15,34 @@ import java.util.regex.Pattern;
 
 import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.table.AbstractTableModel;
 
-import junit.framework.TestCase;
-
-import org.jdesktop.swingx.JXEditorPane;
-import org.jdesktop.swingx.JXFindDialog;
-import org.jdesktop.swingx.JXTable;
-import org.jdesktop.swingx.Searchable;
 import org.jdesktop.swingx.action.TargetableAction;
 
-public class FindTest extends TestCase {
+public class FindTest extends InteractiveTestCase {
+
+    public static void main(String args[]) {
+//      setSystemLF(true);
+      FindTest test = new FindTest();
+      try {
+//        test.runInteractiveTests();
+          test.runInteractiveTests("interactive.*Editor.*");
+      } catch (Exception e) {
+          System.err.println("exception when executing interactive tests:");
+          e.printStackTrace();
+      }
+  }
 
     public FindTest() {
         super("Find Action Test");
@@ -130,33 +138,45 @@ public class FindTest extends TestCase {
     public void testMatchCase() {
     }
 
-    public static void main(String[] args) {
-        showDialog();
-        showTable();
-        showEditor();
-        showSplitPane();
+//    public static void main(String[] args) {
+//        showDialog();
+//        showTable();
+//        showEditor();
+//        showSplitPane();
+//    }
+
+    public void interactiveShowDialog() {
+        SearchFactory.getInstance().showFindInput(new TestSearchable());
+//        JXFindPanel findPanel = new JXFindPanel(new TestSearchable());
+//        JXDialog dialog = new JXDialog(null, findPanel, true);
+//        JXFindDialog dialog = new JXFindDialog(new TestSearchable());
+//        dialog.setVisible(true);
+//        JOptionPane optionPane = new JOptionPane("als das hier so ganz lang " +
+//                "werden sollte wie denn auch umbrechend") {
+//            public int getMaxCharactersPerLineCount() {
+//                return 20;
+//            }
+//        };
+//        JDialog dialog = optionPane.createDialog(new JPanel(), "mytitle");
+//        dialog.setVisible(true);
     }
 
-    private static void showDialog() {
-        JXFindDialog dialog = new JXFindDialog(new TestSearchable());
-        dialog.setVisible(true);
-    }
-
-    private static void showEditor() {
+    
+    public void interactiveShowEditor() {
         try {
-            showComponent(new JXEditorPane(FindTest.class.getResource("resources/test.txt")));
+            interactiveShowComponent(new JXEditorPane(FindTest.class.getResource("resources/test.txt")));
         } catch (Exception ex) {
             throw new RuntimeException("Error finding resource for JXEditorPane", ex);
         }
     }
 
-    private static void showTable() {
-        showComponent(new JXTable(new TestTableModel()));
+    public void interactiveShowTable() {
+        interactiveShowComponent(new JXTable(new TestTableModel()));
     }
 
-    private static void showSplitPane() {
+    public void interactiveShowSplitPane() {
         try {
-            showComponent(new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+            interactiveShowComponent(new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                                          new JXEditorPane(FindTest.class.getResource("resources/test.txt")),
                                          new JXTable(new TestTableModel())));
         } catch (Exception ex) {
@@ -164,7 +184,7 @@ public class FindTest extends TestCase {
         }
     }
 
-    private static void showComponent(Component component) {
+    public void interactiveShowComponent(Component component) {
         Action action = new TargetableAction("Find", "find");
         JToolBar toolbar = new JToolBar();
         JButton button = new JButton(action);

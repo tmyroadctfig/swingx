@@ -414,10 +414,11 @@ public class JXEditorPane extends JEditorPane implements Searchable, Targetable 
     }
 
     private void find() {
-        if (dialog == null) {
-            dialog = new JXFindDialog(this);
-        }
-        dialog.setVisible(true);
+        SearchFactory.getInstance().showFindInput(this);
+//        if (dialog == null) {
+//            dialog = new JXFindDialog(this);
+//        }
+//        dialog.setVisible(true);
     }
 
     public int search(String searchString) {

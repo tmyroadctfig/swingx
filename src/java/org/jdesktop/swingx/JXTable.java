@@ -535,11 +535,12 @@ public class JXTable extends JTable implements Searchable {
 
     /** Opens the JXFindDialog for the table. */
     private void find() {
-        if (dialog == null) {
-            dialog = new JXFindDialog();
-        }
-        dialog.setSearchable(this);
-        dialog.setVisible(true);
+        SearchFactory.getInstance().showFindInput(this);
+//        if (dialog == null) {
+//            dialog = new JXFindDialog();
+//        }
+//        dialog.setSearchable(this);
+//        dialog.setVisible(true);
     }
 
     private void initActionsAndBindings() {

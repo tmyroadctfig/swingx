@@ -47,17 +47,13 @@ import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 
 /**
- * Simple FindDialog.
+ * Simple FindPanel for usage in a JXDialog.
  * 
  * 
- * PENDING: need to extract a common dialog.
- * PENDING: the base search widget need not be a dialog!
- * 
- * @deprecated use SearchFactory.getInstance().showFindDialog() instead
  * @author ??
  * @author Jeanette Winzenburg
  */
-public class JXFindDialog extends JDialog {
+public class JXFindPanel extends JXPanel {
 
     static {
         // Hack to enforce loading of SwingX framework ResourceBundle
@@ -67,41 +63,28 @@ public class JXFindDialog extends JDialog {
     public static final String MATCH_WRAP_ACTION_COMMAND = "wrapSearch";
     public static final String MATCH_BACKWARDS_ACTION_COMMAND = "backwardsSearch";
     public static final String EXECUTE_FIND_ACTION_COMMAND = "executeSearch";
-    public static final String EXECUTE_ACTION_COMMAND = "execute";
-    public static final String CLOSE_ACTION_COMMAND = "close";
-    private static final String SEARCH_FIELD_LABEL = "searchFieldLabel";
-    private static final String SEARCH_FIELD_MNEMONIC = SEARCH_FIELD_LABEL + ".mnemonic";
-//    private static final Object ENTER_ACTION_COMMAND = null;
-//    private static final Object CANCEL_ACTION_COMMAND = null;
+    public static final String SEARCH_FIELD_LABEL = "searchFieldLabel";
+    public static final String SEARCH_FIELD_MNEMONIC = SEARCH_FIELD_LABEL + ".mnemonic";
+    public static final String SEARCH_TITLE = "searchTitle";
     
-    private Searchable searchable;
+    protected Searchable searchable;
 
-    private JTextField searchField;
+    protected JTextField searchField;
     private JCheckBox matchCheck;
     private JCheckBox wrapCheck;
     private JCheckBox backCheck;
 
 
-    private PatternModel patternModel;
+    protected PatternModel patternModel;
+    protected boolean incrementalSearch;
 
-    public JXFindDialog() {
-        this(null, null);
+    public JXFindPanel() {
+        this(null);
     }
     
-    public JXFindDialog(Searchable searchable) {
-        this(searchable, 
-            (searchable instanceof Component) ? (Component) searchable : null);
-     }
-    public JXFindDialog(Searchable searchable, Component component) {
-        super(component != null ? 
-              (Frame)SwingUtilities.getWindowAncestor(component) : JOptionPane.getRootFrame(),
-              "Find in this component");
+    public JXFindPanel(Searchable searchable) {
         setSearchable(searchable);
-
-        locate();
-
         init();
-        pack();
     }
     
     /**
@@ -117,27 +100,15 @@ public class JXFindDialog extends JDialog {
         firePropertyChange("searchable", old, this.searchable);
     }
     
-    /**
-     * 
-     */
-    private void locate() {
-        GraphicsConfiguration gc =
-            GraphicsEnvironment.getLocalGraphicsEnvironment().
-            getDefaultScreenDevice().getDefaultConfiguration();
-        Rectangle bounds = gc.getBounds();
-        int x = bounds.x+bounds.width/3;
-        int y = bounds.y+bounds.height/3;
-
-        setLocation(x, y);
-    }
 
     private void init() {
         initActions();
         initComponents();
         build();
         bind();
-
+        setName(getUIString(SEARCH_TITLE));
     }
+    
     //------------------ support synch the model <--> components
     
     /**
@@ -164,7 +135,7 @@ public class JXFindDialog extends JDialog {
 
             public void propertyChange(PropertyChangeEvent evt) {
                 if ("pattern".equals(evt.getPropertyName())) {
-                    refreshPatternMatchersFromModel();
+                    refreshSearchableFromModel();
                 }
 
             }
@@ -177,14 +148,27 @@ public class JXFindDialog extends JDialog {
      * callback method from listening to PatternModel.
      *
      */
-    protected void refreshPatternMatchersFromModel() {
+    protected void refreshSearchableFromModel() {
+        if (isIncrementalSearch()) {
+            doFind();
+        }
+    }
+
+    public void setIncrementalSearch(boolean incremental) {
+        boolean old = isIncrementalSearch();
+        this.incrementalSearch = incremental;
+        firePropertyChange("incrementalSearch", old, isIncrementalSearch());
+    }
+    
+    public boolean isIncrementalSearch() {
+        return incrementalSearch;
     }
 
     private DocumentListener getSearchFieldListener() {
         DocumentListener l = new DocumentListener() {
             public void changedUpdate(DocumentEvent ev) {
-                // JW - really?? we've a PlainDoc without Attributes
-                refreshModelFromDocument();
+//                // JW - really?? we've a PlainDoc without Attributes
+//                refreshModelFromDocument();
             }
 
             public void insertUpdate(DocumentEvent ev) {
@@ -249,13 +233,6 @@ public class JXFindDialog extends JDialog {
     private boolean isWrapping() {
         return getPatternModel().isWrapping();
     }
-    /**
-     * Action callback for Close action.
-     */
-    public void doClose() {
-        JXFindDialog.this.dispose();
-    }
-
 
     private void setLastIndex(int i) {
         getPatternModel().setFoundIndex(i);
@@ -277,8 +254,7 @@ public class JXFindDialog extends JDialog {
         putAction(MATCH_WRAP_ACTION_COMMAND, createWrapAction());
         putAction(MATCH_BACKWARDS_ACTION_COMMAND, createBackwardsAction());
         // PENDING: factor a common dialog containing the following
-        putAction(EXECUTE_FIND_ACTION_COMMAND, createFindAction());
-        putAction(CLOSE_ACTION_COMMAND, createCloseAction());
+        putAction(JXDialog.EXECUTE_ACTION_COMMAND, createFindAction());
     }
 
     /**
@@ -333,25 +309,13 @@ public class JXFindDialog extends JDialog {
         action.registerCallback(this, "doFind");
         return action;
     }
-    
-    /**
-     * 
-     * @return
-     */
-    private AbstractActionExt createCloseAction() {
-        String actionName = getUIString(CLOSE_ACTION_COMMAND);
-        BoundAction action = new BoundAction(actionName,
-                CLOSE_ACTION_COMMAND);
-        action.registerCallback(this, "doClose");
-        return action;
-    }
     /**
      * convenience wrapper to access rootPane's actionMap.
      * @param key
      * @param action
      */
     private void putAction(Object key, Action action) {
-        getRootPane().getActionMap().put(key, action);
+        getActionMap().put(key, action);
     }
     
     /**
@@ -361,7 +325,7 @@ public class JXFindDialog extends JDialog {
      * @return
      */
     private Action getAction(Object key) {
-        return getRootPane().getActionMap().get(key);
+        return getActionMap().get(key);
     }
     /**
      * tries to find a String value from the UIManager, prefixing the
@@ -384,7 +348,7 @@ public class JXFindDialog extends JDialog {
     /** create components.
      * 
      */
-    private void initComponents() {
+    protected void initComponents() {
         searchField = new JTextField(30) {
             public Dimension getMaximumSize() {
                 Dimension superMax = super.getMaximumSize();
@@ -401,25 +365,6 @@ public class JXFindDialog extends JDialog {
 
 
     private void build() {
-        JComponent content = new Box(BoxLayout.PAGE_AXIS); //Box.createVerticalBox();
-        JComponent fieldPanel = createFieldPanel();
-        content.add(fieldPanel);
-        JComponent buttonPanel = createButtonPanel();
-        content.add(buttonPanel);
-        content.setBorder(BorderFactory.createEmptyBorder(14, 14, 14, 14));
-//        content.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-        
-//        fieldPanel.setAlignmentX();
-//      buttonPanel.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        add(content);
-    }
-
-    /**
-     * TODO: Strings should be removed from the UI
-     */
-    private JComponent createFieldPanel() {
-
-        // Create components
         JLabel label = new JLabel(getUIString(SEARCH_FIELD_LABEL));
         String mnemonic = getUIString(SEARCH_FIELD_MNEMONIC);
         if (mnemonic != SEARCH_FIELD_MNEMONIC) {
@@ -431,7 +376,6 @@ public class JXFindDialog extends JDialog {
         lBox.add(label);
         lBox.add(new JLabel(":"));
         lBox.add(new JLabel("  "));
-//        lBox.add(Box.createGlue());
         lBox.setAlignmentY(Component.TOP_ALIGNMENT);
         Box rBox = new Box(BoxLayout.PAGE_AXIS); 
         rBox.add(searchField);
@@ -439,48 +383,12 @@ public class JXFindDialog extends JDialog {
         rBox.add(wrapCheck);
         rBox.add(backCheck);
         rBox.setAlignmentY(Component.TOP_ALIGNMENT);
-        Box box = new Box(BoxLayout.LINE_AXIS);
-        box.add(lBox);
-        box.add(rBox);
 
-        return box;
+        setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+        
+        add(lBox);
+        add(rBox);
     }
-
-    /**
-     * create the dialog button controls.
-     * 
-     * PENDING: this should be factored to a common dialog support.
-     * 
-     * @return
-     */
-    private JComponent createButtonPanel() {
-        JPanel panel = new JPanel(new BasicOptionPaneUI.ButtonAreaLayout(true, 6))
-        {
-            public Dimension getMaximumSize() {
-                return getPreferredSize();
-            }
-        };
-
-        panel.setBorder(BorderFactory.createEmptyBorder(9, 0, 0, 0));
-        Action findAction = getAction(EXECUTE_FIND_ACTION_COMMAND);
-        Action closeAction = getAction(CLOSE_ACTION_COMMAND);
-
-        JButton findButton;
-        panel.add(findButton = new JButton(findAction));
-        panel.add(new JButton(closeAction));
-
-
-        KeyStroke enterKey = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false);
-        KeyStroke escapeKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false);
-
-        InputMap inputMap = getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-        inputMap.put(enterKey, EXECUTE_FIND_ACTION_COMMAND);
-        inputMap.put(escapeKey, CLOSE_ACTION_COMMAND);
-
-        getRootPane().setDefaultButton(findButton);
-        return panel;
-    }
-
 
     //----------------------- obsolete actions - no longer use
     //----------------------- kept here to remember adding names etc to resources
