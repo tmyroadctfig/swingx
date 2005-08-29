@@ -11,9 +11,39 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import javax.swing.ActionMap;
+import javax.swing.UIManager;
+
+import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.action.BoundAction;
+
 /**
- * Holds a compiled regular expression.
+ * Presentation Model for Find/Filter Widgets. 
  * <p>
+ * 
+ * Compiles and holds a Pattern from rawText. There are different 
+ * predefined strategies to control the compilation:
+ * 
+ * <ul>
+ * <li> TODO: list and explain
+ * </ul> 
+ * 
+ * Holds controlling state for both find and filter (TODO - explain). Nearly
+ * all properties are accessible via bound actions accessible by key.
+ * 
+ * Relevant in all
+ * 
+ * <ul>
+ * <li> contextSensitive - 
+ * </ul>
+ * 
+ * Relevant in find contexts:
+ * <ul>
+ * <li> backwards - search direction if used in a find context
+ * <li> wrapping - wrap over the end if not found
+ * <li> incremental - TBD
+ * </ul>
+ * 
  * 
  * JW: Work-in-progress - Anchors will be factored into AnchoredSearchMode 
  * <b>Anchors</b> By default, the scope of the pattern relative to strings
@@ -61,6 +91,13 @@ public class PatternModel {
 
     public static final String MATCH_RULE_STARTSWITH = "startsWith";
 
+    public static final String MATCH_BACKWARDS_ACTION_COMMAND = "backwardsSearch";
+
+    public static final String MATCH_WRAP_ACTION_COMMAND = "wrapSearch";
+
+    public static final String MATCH_CASE_ACTION_COMMAND = "matchCase";
+
+
     private String rawText;
 
     private boolean backwards;
@@ -87,6 +124,10 @@ public class PatternModel {
     private RegexCreator regexCreator;
 
     private boolean wrapping;
+
+    private ActionMap actionMap;
+
+    private boolean incremental;
 
 
 //---------------------- misc. properties not directly related to Pattern.
@@ -120,7 +161,17 @@ public class PatternModel {
         this.wrapping = wrapping;
         firePropertyChange("wrapping", old, isWrapping());
     }
+
+    public void setIncremental(boolean incremental) {
+        boolean old = isIncremental();
+        this.incremental = incremental;
+        firePropertyChange("incremental", old, isIncremental());
+    }
     
+    public boolean isIncremental() {
+        return incremental;
+    }
+
     // public boolean isActive() {
     // return active;
     // }

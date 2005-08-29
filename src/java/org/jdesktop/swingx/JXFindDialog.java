@@ -212,7 +212,7 @@ public class JXFindDialog extends JDialog {
         searchField.getDocument().addDocumentListener(getSearchFieldListener());
         ActionContainerFactory factory = new ActionContainerFactory(null);
         factory.configureButton(matchCheck, 
-                (AbstractActionExt) getAction(JXSearchPanel.MATCH_CASE_ACTION_COMMAND),
+                (AbstractActionExt) getAction(PatternModel.MATCH_CASE_ACTION_COMMAND),
                 null);
         factory.configureButton(wrapCheck, 
                 (AbstractActionExt) getAction(MATCH_WRAP_ACTION_COMMAND),
@@ -273,7 +273,7 @@ public class JXFindDialog extends JDialog {
     //-------------------------- initial
     
     private void initActions() {
-        putAction(JXSearchPanel.MATCH_CASE_ACTION_COMMAND, createMatchCaseAction());
+        putAction(PatternModel.MATCH_CASE_ACTION_COMMAND, createMatchCaseAction());
         putAction(MATCH_WRAP_ACTION_COMMAND, createWrapAction());
         putAction(MATCH_BACKWARDS_ACTION_COMMAND, createBackwardsAction());
         // PENDING: factor a common dialog containing the following
@@ -286,9 +286,9 @@ public class JXFindDialog extends JDialog {
      * @return
      */
     private AbstractActionExt createMatchCaseAction() {
-        String actionName = getUIString(JXSearchPanel.MATCH_CASE_ACTION_COMMAND);
+        String actionName = getUIString(PatternModel.MATCH_CASE_ACTION_COMMAND);
         BoundAction action = new BoundAction(actionName,
-                JXSearchPanel.MATCH_CASE_ACTION_COMMAND);
+                PatternModel.MATCH_CASE_ACTION_COMMAND);
         action.setStateAction();
         action.registerCallback(getPatternModel(), "setCaseSensitive");
         action.setSelected(getPatternModel().isCaseSensitive());
