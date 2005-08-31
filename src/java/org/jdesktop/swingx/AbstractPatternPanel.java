@@ -7,9 +7,8 @@ package org.jdesktop.swingx;
 import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Iterator;
-import java.util.List;
 
+import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -28,6 +27,7 @@ public abstract class AbstractPatternPanel extends JXPanel {
     public static final String SEARCH_FIELD_LABEL = "searchFieldLabel";
     public static final String SEARCH_FIELD_MNEMONIC = SEARCH_FIELD_LABEL + ".mnemonic";
     public static final String SEARCH_TITLE = "searchTitle";
+    public static final String MATCH_ACTION_COMMAND = "match";
 
     static {
         // Hack to enforce loading of SwingX framework ResourceBundle
@@ -44,8 +44,25 @@ public abstract class AbstractPatternPanel extends JXPanel {
 
 //------------------------ actions
 
+    
+    public abstract void match();
+    
     protected AbstractActionExt getAction(String key) {
         return (AbstractActionExt) getActionMap().get(key);
+    }
+
+    protected void initActions() {
+        initPatternActions();
+        initExecutables();
+    }
+    
+    protected void initExecutables() {
+        Action execute = createBoundAction(MATCH_ACTION_COMMAND, "match");
+        getActionMap().put(JXDialog.EXECUTE_ACTION_COMMAND, 
+                execute);
+        getActionMap().put(MATCH_ACTION_COMMAND, execute);
+        
+        
     }
 
     protected void initPatternActions() {
@@ -59,6 +76,9 @@ public abstract class AbstractPatternPanel extends JXPanel {
         map.put(PatternModel.MATCH_BACKWARDS_ACTION_COMMAND, 
                 createModelStateAction(PatternModel.MATCH_BACKWARDS_ACTION_COMMAND, 
                         "setBackwards", getPatternModel().isBackwards()));
+        map.put(PatternModel.MATCH_INCREMENTAL_ACTION_COMMAND, 
+                createModelStateAction(PatternModel.MATCH_INCREMENTAL_ACTION_COMMAND, 
+                        "setIncremental", getPatternModel().isIncremental()));
     }
 
     /**
@@ -115,10 +135,15 @@ public abstract class AbstractPatternPanel extends JXPanel {
 
     //---------------------- synch patternModel <--> components
 
-    /** 
-     * called after receiving a "pattern" propertyChange from PatternModel.
+    /**
+     * callback method from listening to PatternModel.
+     *
      */
-    protected abstract void refreshPatternFromModel();
+    protected void refreshPatternFromModel() {
+        if (getPatternModel().isIncremental()) {
+            match();
+        }
+    }
 
 
     /**
@@ -126,10 +151,16 @@ public abstract class AbstractPatternPanel extends JXPanel {
      */
     protected PatternModel getPatternModel() {
         if (patternModel == null) {
-            patternModel = new PatternModel();
+            patternModel = createPatternModel();
             patternModel.addPropertyChangeListener(getPatternModelListener());
         }
         return patternModel;
+    }
+
+
+    protected PatternModel createPatternModel() {
+        PatternModel l = new PatternModel();
+        return l;
     }
 
     /**
@@ -156,6 +187,10 @@ public abstract class AbstractPatternPanel extends JXPanel {
                 } else if ("backwards".equals(property)) {
                     getAction(PatternModel.MATCH_BACKWARDS_ACTION_COMMAND).
                     setSelected(((Boolean) evt.getNewValue()).booleanValue());
+                } else if ("incremental".equals(property)) {
+                    getAction(PatternModel.MATCH_INCREMENTAL_ACTION_COMMAND).
+                    setSelected(((Boolean) evt.getNewValue()).booleanValue());
+
                 }
     
             }
@@ -236,6 +271,6 @@ public abstract class AbstractPatternPanel extends JXPanel {
      * @return
      */
     protected int getSearchFieldWidth() {
-        return 20;
+        return 15;
     }
 }

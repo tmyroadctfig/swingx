@@ -29,7 +29,6 @@ import javax.swing.JOptionPane;
 public class JXFindPanel extends AbstractPatternPanel {
 
     
-    public static final String FIND_ACTION_COMMAND = "find";
     public static final String FIND_NEXT_ACTION_COMMAND = "findNext";
     public static final String FIND_PREVIOUS_ACTION_COMMAND = "findPrevious";
     
@@ -38,6 +37,7 @@ public class JXFindPanel extends AbstractPatternPanel {
 
     protected JCheckBox wrapCheck;
     protected JCheckBox backCheck;
+    private boolean initialized;
 
 
 //    protected JButton findNext;
@@ -49,7 +49,7 @@ public class JXFindPanel extends AbstractPatternPanel {
     
     public JXFindPanel(Searchable searchable) {
         setSearchable(searchable);
-        init();
+        initActions();
     }
     
     /**
@@ -66,26 +66,23 @@ public class JXFindPanel extends AbstractPatternPanel {
     }
     
 
-
-    private void init() {
-        initActions();
+    public void addNotify() {
+        init();
+        super.addNotify();
+    }
+    
+    protected void init() {
+        if (initialized) return;
+        initialized = true;
         initComponents();
         build();
         bind();
         setName(getUIString(SEARCH_TITLE));
+        
     }
     
     //------------------ support synch the model <--> components
     
-    /**
-     * callback method from listening to PatternModel.
-     *
-     */
-    protected void refreshPatternFromModel() {
-        if (getPatternModel().isIncremental()) {
-            find();
-        }
-    }
 
 
     protected void bind() {
@@ -107,7 +104,7 @@ public class JXFindPanel extends AbstractPatternPanel {
      * Find next/previous match using current setting of direction flag.
      * 
      */
-    public void find() {
+    public void match() {
         doFind();
     }
 
@@ -117,7 +114,7 @@ public class JXFindPanel extends AbstractPatternPanel {
      */
     public void findNext() {
         getPatternModel().setBackwards(false);
-        find();
+        match();
     }
     
     /**
@@ -126,7 +123,7 @@ public class JXFindPanel extends AbstractPatternPanel {
      */
     public void findPrevious() {
         getPatternModel().setBackwards(true);
-        find();
+        match();
     }
     
     protected void doFind() {
@@ -163,10 +160,11 @@ public class JXFindPanel extends AbstractPatternPanel {
 
     //-------------------------- initial
     
-    protected void initActions() {
-        initPatternActions();
-        getActionMap().put(JXDialog.EXECUTE_ACTION_COMMAND, 
-                createBoundAction(FIND_ACTION_COMMAND, "find"));
+    /**
+     * 
+     */
+    protected void initExecutables() {
+        super.initExecutables();
         getActionMap().put(FIND_NEXT_ACTION_COMMAND, 
                 createBoundAction(FIND_NEXT_ACTION_COMMAND, "findNext"));
         getActionMap().put(FIND_PREVIOUS_ACTION_COMMAND, 

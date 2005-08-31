@@ -414,7 +414,7 @@ public class JXEditorPane extends JEditorPane implements Searchable, Targetable 
     }
 
     private void find() {
-        SearchFactory.getInstance().showFindInput(this);
+        SearchFactory.getInstance().showFindInput(this, this);
 //        if (dialog == null) {
 //            dialog = new JXFindDialog(this);
 //        }
@@ -465,6 +465,8 @@ public class JXEditorPane extends JEditorPane implements Searchable, Targetable 
             start = matcher.start() + startIndex;
             end = matcher.end() + startIndex;
             select(start + 1, end + 1);
+            
+            getCaret().setSelectionVisible(true);
         } else {
             return -1;
         }

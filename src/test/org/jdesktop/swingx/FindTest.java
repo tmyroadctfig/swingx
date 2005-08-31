@@ -27,6 +27,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.text.BadLocationException;
 
 import org.jdesktop.swingx.action.TargetableAction;
 
@@ -146,7 +147,7 @@ public class FindTest extends InteractiveTestCase {
 //    }
 
     public void interactiveShowDialog() {
-        SearchFactory.getInstance().showFindInput(new TestSearchable());
+        SearchFactory.getInstance().showFindInput(null, new TestSearchable());
 //        JXFindPanel findPanel = new JXFindPanel(new TestSearchable());
 //        JXDialog dialog = new JXDialog(null, findPanel, true);
 //        JXFindDialog dialog = new JXFindDialog(new TestSearchable());
@@ -197,12 +198,12 @@ public class FindTest extends InteractiveTestCase {
         menu.add(new JMenuItem(action));
 
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(toolbar, BorderLayout.NORTH);
         panel.add(new JScrollPane(component), BorderLayout.CENTER);
 
-        JFrame frame = new JFrame();
+        JXFrame frame = new JXFrame("Find in JXEditorPane");
         frame.setJMenuBar(menubar);
-        frame.getContentPane().add(panel);
+        frame.getRootPaneExt().setToolBar(toolbar);
+        frame.add(panel);
 
         frame.pack();
         frame.setVisible(true);

@@ -66,10 +66,11 @@ public class JXSearchPanel extends AbstractPatternPanel {
     
 
     public JXSearchPanel() {
-        initActions();
         initComponents();
         build();
+        initActions();
         bind();
+        getPatternModel().setIncremental(true);
     }
 
 //----------------- accessing public properties
@@ -148,6 +149,16 @@ public class JXSearchPanel extends AbstractPatternPanel {
     // ---------------- action callbacks
 
     /**
+     * 
+     */
+    public void match() {
+        for (Iterator<PatternMatcher> iter = getPatternMatchers().iterator(); iter.hasNext();) {
+            iter.next().setPattern(getPattern());
+            
+        }
+    }
+
+    /**
      * set's the PatternModel's MatchRule to the selected in combo. 
      * 
      * NOTE: this
@@ -159,27 +170,6 @@ public class JXSearchPanel extends AbstractPatternPanel {
                 (String) searchCriteria.getSelectedItem());
     }
 
-    //---------------- init actions
-    
-    protected void initActions() {
-        initPatternActions();
-        getActionMap().put(MATCH_RULE_ACTION_COMMAND,
-                createBoundAction(MATCH_RULE_ACTION_COMMAND, "updateMatchRule"));
-    }
-
-    
-    /**
-     * callback method from listening to PatternModel.
-     *
-     */
-    protected void refreshPatternFromModel() {
-        for (Iterator<PatternMatcher> iter = getPatternMatchers().iterator(); iter.hasNext();) {
-            iter.next().setPattern(getPattern());
-            
-        }
-    }
-
-
     private List<PatternMatcher> getPatternMatchers() {
         if (patternMatchers == null) {
             patternMatchers = new ArrayList<PatternMatcher>();
@@ -187,8 +177,19 @@ public class JXSearchPanel extends AbstractPatternPanel {
         return patternMatchers;
     }
 
+    //---------------- init actions and model
+    
+    protected void initExecutables() {
+        super.initExecutables();
+        getActionMap().put(MATCH_RULE_ACTION_COMMAND,
+                createBoundAction(MATCH_RULE_ACTION_COMMAND, "updateMatchRule"));
+    }
+
+
     //--------------------- binding support
     
+
+
     /**
      * bind the components to the patternModel/actions.
      */

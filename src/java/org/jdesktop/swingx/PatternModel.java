@@ -97,6 +97,8 @@ public class PatternModel {
 
     public static final String MATCH_CASE_ACTION_COMMAND = "matchCase";
 
+    public static final String MATCH_INCREMENTAL_ACTION_COMMAND = "matchIncremental";
+
 
     private String rawText;
 

@@ -4,19 +4,32 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.Component;
 import java.awt.Frame;
+import java.awt.KeyboardFocusManager;
 import java.awt.Window;
 
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+
 public class SearchFactory {
+
+    static {
+        // Hack to enforce loading of SwingX framework ResourceBundle
+        LookAndFeelAddons.getAddon();
+    }
 
     private static SearchFactory searchFactory;
 
     protected JXDialog findDialog;
     protected JXFindPanel findPanel;
+   
+    protected JXFindBar findBar;
+
+    private boolean inDialog;
     
     public static SearchFactory getInstance() {
           if (searchFactory == null) {
@@ -29,40 +42,63 @@ public class SearchFactory {
         searchFactory = factory;
     }
     
-    public void showFindInput(Searchable searchable) {
+    public void showFindInput(JComponent target, Searchable searchable) {
+        if (showInDialog(target, searchable)) {
+            showFindDialog(target, searchable);
+            
+        } else {
+            showFindBar(target, searchable);
+        }
+    }
+
+    public void showFindBar(JComponent target, Searchable searchable) {
+        if (target == null) return;
+        if (findBar == null) {
+            findBar = new JXFindBar();
+        }
+        Window topLevel = SwingUtilities.getWindowAncestor(target);
+        if (topLevel instanceof JXFrame) {
+            JXRootPane rootPane = ((JXFrame) topLevel).getRootPaneExt();
+            JToolBar toolBar = rootPane.getToolBar();
+            if (toolBar == null) {
+                toolBar = new JToolBar();
+                rootPane.setToolBar(toolBar);
+            }
+            toolBar.add(findBar, 0);
+            rootPane.revalidate();
+            KeyboardFocusManager.getCurrentKeyboardFocusManager().focusNextComponent(findBar);
+            
+        }
+        findBar.setSearchable(searchable);
+    }
+
+    /**
+     * @param target
+     * @param searchable
+     */
+    public void showFindDialog(JComponent target, Searchable searchable) {
         if (findPanel == null) {
             findPanel = new JXFindPanel();
             Frame frame = JOptionPane.getRootFrame();
-//            if (component != null) {
-//               Window window = SwingUtilities.getWindowAncestor(component); 
-//               if (window instanceof Frame) {
-//                   frame = (Frame) window;
-//               }
-//            }
+            if (target != null) {
+               Window window = SwingUtilities.getWindowAncestor(target); 
+               if (window instanceof Frame) {
+                   frame = (Frame) window;
+               }
+            }
             findDialog = new JXDialog(frame, findPanel, false);
             findDialog.pack();
             findDialog.setLocationRelativeTo(null);
         }
         findPanel.setSearchable(searchable);
-//        findPanel.setIncrementalSearch(true);
         findDialog.setVisible(true);
-//        showFindInput(searchable, 
-//                (searchable instanceof Component) ? (Component) searchable : null);
     }
-    
-//    public void showFindInput(Searchable searchable, Component component) {
-//        if (findPanel == null) {
-//            JXFindPanel findPanel = new JXFindPanel();
-//            Frame frame = JOptionPane.getRootFrame();
-////            if (component != null) {
-////               Window window = SwingUtilities.getWindowAncestor(component); 
-////               if (window instanceof Frame) {
-////                   frame = (Frame) window;
-////               }
-////            }
-//            findDialog = new JXDialog(frame, findPanel, false);
-//        }
-//        findPanel.setSearchable(searchable);
-//        
-//    }
+
+    public boolean showInDialog(JComponent target, Searchable searchable) {
+        return false;
+    }
+ 
+    public void setShowInDialog(boolean inDialog) {
+        this.inDialog = inDialog;
+    }
 }
