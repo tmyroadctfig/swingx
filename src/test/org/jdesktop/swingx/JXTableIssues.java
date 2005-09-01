@@ -284,7 +284,7 @@ public class JXTableIssues extends InteractiveTestCase {
             }
             
         };
-        JFrame frame = wrapWithScrollingInFrame(xtable, table, "selection after data changed");
+        JXFrame frame = wrapWithScrollingInFrame(xtable, table, "selection after data changed");
         addAction(frame, action);
         frame.setVisible(true);
         

@@ -90,7 +90,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         final JScrollPane pane = new JScrollPane(table);
         pane.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         table.setColumnControlVisible(true);
-        JFrame frame = wrapInFrame(pane, "RToLScrollPane");
+        JXFrame frame = wrapInFrame(pane, "RToLScrollPane");
         Action action = new AbstractAction("toggle orientation") {
 
             public void actionPerformed(ActionEvent e) {
@@ -268,7 +268,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         };
         toggleFilter.putValue(Action.SHORT_DESCRIPTION, "filtering first column - problem if invisible ");
         table.setColumnControlVisible(true);
-        JFrame frame = wrapWithScrollingInFrame(table, "JXTable ColumnControl and Filters");
+        JXFrame frame = wrapWithScrollingInFrame(table, "JXTable ColumnControl and Filters");
         addAction(frame, toggleFilter);
         frame.setVisible(true);
     }
@@ -321,7 +321,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             }
             
         };
-        JFrame frame = wrapWithScrollingInFrame(table, "ColumnControl: set columnModel -> core default");
+        JXFrame frame = wrapWithScrollingInFrame(table, "ColumnControl: set columnModel -> core default");
         addAction(frame, toggleAction);
         frame.setVisible(true);
     }
@@ -341,7 +341,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             }
             
         };
-        JFrame frame = wrapWithScrollingInFrame(table, "ColumnControl: set columnModel -> core default");
+        JXFrame frame = wrapWithScrollingInFrame(table, "ColumnControl: set columnModel -> core default");
         addAction(frame, toggleAction);
         frame.setVisible(true);
     }
@@ -365,7 +365,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             }
             
         };
-        JFrame frame = wrapWithScrollingInFrame(table, "ColumnControl: set ColumnModel -> modelExt");
+        JXFrame frame = wrapWithScrollingInFrame(table, "ColumnControl: set ColumnModel -> modelExt");
         addAction(frame, toggleAction);
         frame.setVisible(true);
     }
@@ -385,7 +385,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         };
         table.setModel(new DefaultTableModel(10, 5));
         table.setColumnControlVisible(true);
-        JFrame frame = wrapWithScrollingInFrame(table, "JXTable ColumnControl with few rows");
+        JXFrame frame = wrapWithScrollingInFrame(table, "JXTable ColumnControl with few rows");
         addAction(frame, toggleAction);
         frame.setVisible(true);
     }
@@ -407,7 +407,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         toggleAction.putValue(Action.SHORT_DESCRIPTION, "does nothing visible - no scrollpane");
         table.setModel(new DefaultTableModel(10, 5));
         table.setColumnControlVisible(true);
-        JFrame frame = wrapInFrame(table, "JXTable: Toggle ColumnControl outside ScrollPane");
+        JXFrame frame = wrapInFrame(table, "JXTable: Toggle ColumnControl outside ScrollPane");
         addAction(frame, toggleAction);
         frame.setVisible(true);
     }
@@ -420,7 +420,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         final JXTable table = new JXTable();
         table.setModel(new DefaultTableModel(10, 5));
         table.setColumnControlVisible(true);
-        final JFrame frame = wrapInFrame(table, "JXTable: Toggle ScrollPane with Columncontrol on");
+        final JXFrame frame = wrapInFrame(table, "JXTable: Toggle ScrollPane with Columncontrol on");
         Action toggleAction = new AbstractAction("Toggle ScrollPane") {
 
             public void actionPerformed(ActionEvent e) {
@@ -452,7 +452,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         table.setColumnControlVisible(true);
         int totalColumnCount = table.getColumnCount();
         final TableColumnExt priorityColumn = table.getColumnExt("First Name");
-        JFrame frame = wrapWithScrollingInFrame(table, "JXTable: Column with Min=Max not resizable");
+        JXFrame frame = wrapWithScrollingInFrame(table, "JXTable: Column with Min=Max not resizable");
         Action action = new AbstractAction("Toggle MinMax of FirstName") {
 
             public void actionPerformed(ActionEvent e) {
@@ -498,7 +498,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             }
             
         };
-        JFrame frame = wrapWithScrollingInFrame(table, "Disabled tabled: no sorting");
+        JXFrame frame = wrapWithScrollingInFrame(table, "Disabled tabled: no sorting");
         addAction(frame, toggleAction);
         frame.setVisible(true);  
     }
@@ -540,7 +540,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             }
             
         };
-        JFrame frame = wrapWithScrollingInFrame(table, "ToggleSortingEnabled Test");
+        JXFrame frame = wrapWithScrollingInFrame(table, "ToggleSortingEnabled Test");
         addAction(frame, toggleSortableAction);
         frame.setVisible(true);  // RG: Changed from deprecated method show();
         

@@ -130,7 +130,7 @@ public class JXListTest extends InteractiveTestCase {
             }
             
         };
-        JFrame frame = wrapWithScrollingInFrame(list, "Toggle sorter");
+        JXFrame frame = wrapWithScrollingInFrame(list, "Toggle sorter");
         addAction(frame, action);
         frame.setVisible(true);
         

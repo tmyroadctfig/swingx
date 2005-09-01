@@ -69,7 +69,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         final  DefaultMutableTreeNode leaf = model.addChild(root);
         JXTree tree = new JXTree(model);
         JXTreeTable treeTable = new JXTreeTable(model);
-        JFrame frame = wrapWithScrollingInFrame(tree, treeTable, "update on insert");
+        JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "update on insert");
         Action insertAction = new AbstractAction("insert node") {
 
             public void actionPerformed(ActionEvent e) {
@@ -265,7 +265,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         };
         treeTable.setRowHeight(22);
         treeTable.setRowMargin(1);
-        JFrame frame = wrapWithScrollingInFrame(treeTable,
+        JXFrame frame = wrapWithScrollingInFrame(treeTable,
                 "Toggle Tree properties ");
         addAction(frame, toggleRoot);
         addAction(frame, toggleHandles);

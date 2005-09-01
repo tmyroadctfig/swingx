@@ -16,6 +16,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.util.AncientSwingTeam;
 import org.jdesktop.swingx.util.PipelineReport;
@@ -539,7 +540,7 @@ public class FilterTest extends InteractiveTestCase {
             
         };
         toggleFilter.putValue(Action.SHORT_DESCRIPTION, "filtering first column - problem if invisible ");
-        JFrame frame = wrapWithScrollingInFrame(table, "JXTable ColumnControl and Filters");
+        JXFrame frame = wrapWithScrollingInFrame(table, "JXTable ColumnControl and Filters");
         addAction(frame, toggleFilter);
         frame.setVisible(true);
     }

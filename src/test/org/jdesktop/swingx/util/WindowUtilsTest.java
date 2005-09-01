@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXFrame;
 
 public class WindowUtilsTest extends InteractiveTestCase {
 
@@ -42,7 +43,7 @@ public class WindowUtilsTest extends InteractiveTestCase {
         config.add(new JLabel("Min. Height"));
         config.add(minH);
 
-        final JFrame minSizeFrame = wrapInFrame(config, "Minimum Size");
+        final JXFrame minSizeFrame = wrapInFrame(config, "Minimum Size");
         Action apply = new AbstractAction("Apply") {
             public void actionPerformed(ActionEvent e) {
                int newW = new Integer(minW.getText()).intValue();

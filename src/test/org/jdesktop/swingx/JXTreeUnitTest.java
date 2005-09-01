@@ -170,7 +170,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
             
         };
         treeTable.setRowHeight(22);
-        JFrame frame = wrapWithScrollingInFrame(treeTable,
+        JXFrame frame = wrapWithScrollingInFrame(treeTable,
                 "Toggle Tree properties ");
         addAction(frame, toggleRoot);
         addAction(frame, toggleHandles);
@@ -205,7 +205,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         };
  
         treeTable.setRowHeight(22);
-        JFrame frame = wrapWithScrollingInFrame(treeTable,
+        JXFrame frame = wrapWithScrollingInFrame(treeTable,
                 "Toggle Tree expand properties ");
         addAction(frame, toggleScrolls);
         addAction(frame, expand);

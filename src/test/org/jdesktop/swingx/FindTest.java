@@ -8,26 +8,23 @@
 package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.GraphicsEnvironment;
+import java.io.IOException;
 import java.net.URL;
 import java.util.regex.Pattern;
 
 import javax.swing.Action;
 import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.text.BadLocationException;
 
 import org.jdesktop.swingx.action.TargetableAction;
 
@@ -37,13 +34,15 @@ public class FindTest extends InteractiveTestCase {
 //      setSystemLF(true);
       FindTest test = new FindTest();
       try {
-//        test.runInteractiveTests();
-          test.runInteractiveTests("interactive.*Editor.*");
+        test.runInteractiveTests();
+//          test.runInteractiveTests("interactive.*Editor.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
+
+    private URL editorURL;
 
     public FindTest() {
         super("Find Action Test");
@@ -139,76 +138,72 @@ public class FindTest extends InteractiveTestCase {
     public void testMatchCase() {
     }
 
-//    public static void main(String[] args) {
-//        showDialog();
-//        showTable();
-//        showEditor();
-//        showSplitPane();
-//    }
-
     public void interactiveShowDialog() {
         SearchFactory.getInstance().showFindInput(null, new TestSearchable());
-//        JXFindPanel findPanel = new JXFindPanel(new TestSearchable());
-//        JXDialog dialog = new JXDialog(null, findPanel, true);
-//        JXFindDialog dialog = new JXFindDialog(new TestSearchable());
-//        dialog.setVisible(true);
-//        JOptionPane optionPane = new JOptionPane("als das hier so ganz lang " +
-//                "werden sollte wie denn auch umbrechend") {
-//            public int getMaxCharactersPerLineCount() {
-//                return 20;
-//            }
-//        };
-//        JDialog dialog = optionPane.createDialog(new JPanel(), "mytitle");
-//        dialog.setVisible(true);
-    }
-
-    
-    public void interactiveShowEditor() {
-        try {
-            interactiveShowComponent(new JXEditorPane(FindTest.class.getResource("resources/test.txt")));
-        } catch (Exception ex) {
-            throw new RuntimeException("Error finding resource for JXEditorPane", ex);
-        }
     }
 
     public void interactiveShowTable() {
-        interactiveShowComponent(new JXTable(new TestTableModel()));
+        showComponent(new JXTable(new TestTableModel()));
     }
 
     public void interactiveShowSplitPane() {
+       showComponent(createEditor(), new JXTable(new TestTableModel()));
+    }
+    
+    public void interactiveShowEditor() {
+        showComponent(createEditor());
+    }
+
+    /**
+     * @return
+     * @throws IOException
+     */
+    private JXEditorPane createEditor()  {
         try {
-            interactiveShowComponent(new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                                         new JXEditorPane(FindTest.class.getResource("resources/test.txt")),
-                                         new JXTable(new TestTableModel())));
-        } catch (Exception ex) {
-            throw new RuntimeException("Error finding resource for JXEditorPane", ex);
+            return new JXEditorPane(editorURL);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
+        return null;
     }
 
-    public void interactiveShowComponent(Component component) {
+
+    public void showComponent(JComponent component, JComponent second) {
+        JXFrame frame = wrapWithScrollingInFrame(component, second, "Find");
+        
         Action action = new TargetableAction("Find", "find");
-        JToolBar toolbar = new JToolBar();
-        JButton button = new JButton(action);
-        button.setFocusable(false);
-        toolbar.add(button);
-
-        // Must add a menu bar so that the Ctrl-F will work.
-        JMenuBar menubar = new JMenuBar();
-        JMenu menu = menubar.add(new JMenu("File"));
-        menu.add(new JMenuItem(action));
-
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.add(new JScrollPane(component), BorderLayout.CENTER);
-
-        JXFrame frame = new JXFrame("Find in JXEditorPane");
-        frame.setJMenuBar(menubar);
-        frame.getRootPaneExt().setToolBar(toolbar);
-        frame.add(panel);
-
-        frame.pack();
+        addAction(frame, action);
         frame.setVisible(true);
+        
+    }
+    public void showComponent(JComponent component) {
+        showComponent(component, null);
+        // Must add a menu bar so that the Ctrl-F will work.
+//        JMenuBar menubar = new JMenuBar();
+//        JMenu menu = menubar.add(new JMenu("File"));
+//        menu.add(new JMenuItem(action));
+//
+//        JPanel panel = new JPanel(new BorderLayout());
+//        panel.add(new JScrollPane(component), BorderLayout.CENTER);
+//
+//        JXFrame frame = new JXFrame("Find in JXEditorPane");
+//        frame.setJMenuBar(menubar);
+//        frame.getRootPaneExt().setToolBar(toolbar);
+//        frame.add(panel);
+//
+//        frame.pack();
+//        frame.setVisible(true);
     }
 
+    @Override
+    protected void setUp() {
+        editorURL = FindTest.class.getResource("resources/test.txt");
+        SearchFactory.getInstance().setShowFindInToolBar(true);
+    }
+    
+    
+    
     public static class TestTableModel extends AbstractTableModel {
 
         private static String[] data = { "One", "Two", "Three",
@@ -262,4 +257,6 @@ public class FindTest extends InteractiveTestCase {
         }
 
     }
+
+    
 }
