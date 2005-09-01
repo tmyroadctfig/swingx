@@ -226,9 +226,15 @@ public class PatternModel {
 
     public void setRawText(String findText) {
         String old = getRawText();
+        boolean oldEmpty = isEmpty();
         this.rawText = findText;
         updatePattern(createRegEx(findText));
         firePropertyChange("rawText", old, getRawText());
+        firePropertyChange("empty", oldEmpty, isEmpty());
+    }
+
+    public boolean isEmpty() {
+        return isEmpty(getRawText());
     }
 
     /**
@@ -241,7 +247,7 @@ public class PatternModel {
      */
     private String createRegEx(String searchString) {
         if (isEmpty(searchString))
-            return ".*";
+            return null; //".*";
         return getRegexCreator().createRegEx(searchString);
     }
 
@@ -564,6 +570,7 @@ public class PatternModel {
     public List getMatchRules() {
         return getRegexCreator().getMatchRules();
     }
+
 
 
     
