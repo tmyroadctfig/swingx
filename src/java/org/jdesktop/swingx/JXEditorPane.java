@@ -369,7 +369,7 @@ public class JXEditorPane extends JEditorPane implements Searchable, Targetable 
         hdoc.setParagraphAttributes(start, end - start, newAttrs, true);
     }
 
-    private JXFindDialog dialog = null;
+//    private JXFindDialog dialog = null;
 
     /**
      * The paste method has been overloaded to strip off the <html><body> tags
@@ -442,10 +442,11 @@ public class JXEditorPane extends JEditorPane implements Searchable, Targetable 
     }
 
     /**
-     * @return end position of matching string or -1
+     * @return start position of matching string or -1
      */
     public int search(Pattern pattern, int startIndex, boolean backwards) {
         if (pattern == null) {
+            setCaretPosition(startIndex > -1 ? startIndex : 0);
             return -1;
         }
 
@@ -462,15 +463,16 @@ public class JXEditorPane extends JEditorPane implements Searchable, Targetable 
 
         matcher = pattern.matcher(segment.toString());
         if (matcher.find()) {
-            start = matcher.start() + startIndex;
+            start = matcher.start() + start; //Index;
             end = matcher.end() + startIndex;
-            select(start + 1, end + 1);
+            select(start, end + 1);
             
             getCaret().setSelectionVisible(true);
         } else {
+            setCaretPosition(startIndex > -1 ? startIndex : 0);
             return -1;
         }
-        return end;
+        return start;
     }
 
     public boolean hasCommand(Object command) {
