@@ -4,6 +4,7 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Container;
 import java.awt.Frame;
 import java.awt.KeyboardFocusManager;
 import java.awt.Window;
@@ -97,6 +98,13 @@ public class SearchFactory {
         if (target == null) return;
         if (findBar == null) {
             findBar = new JXFindBar();
+        }
+        Container oldParent = findBar.getParent();
+        if (oldParent != null) {
+            oldParent.remove(findBar);
+            if (oldParent instanceof JComponent) {
+                ((JComponent) oldParent).revalidate();
+            }
         }
         Window topLevel = SwingUtilities.getWindowAncestor(target);
         if (topLevel instanceof JXFrame) {
