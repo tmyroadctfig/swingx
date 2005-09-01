@@ -15,7 +15,15 @@ import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 
+/**
+ * Factory to create, configure and show application consistent
+ * search and find widgets.
+ * 
+ * PENDING: add methods to return JXSearchPanels?
+ * 
+ */
 public class SearchFactory {
+    // PENDING: rename methods to batch/incremental instead of dialog/toolbar
 
     static {
         // Hack to enforce loading of SwingX framework ResourceBundle
@@ -24,13 +32,22 @@ public class SearchFactory {
 
     private static SearchFactory searchFactory;
 
+    /** the shared dialog to show input. */
     protected JXDialog findDialog;
+    
+    /** the shared find widget for batch-find. */
     protected JXFindPanel findPanel;
    
+    /** the shared find widget for incremental-find. */
     protected JXFindBar findBar;
 
     private boolean findInToolBar;
     
+    /** 
+     * returns the shared SearchFactory.
+     * 
+     * @return
+     */
     public static SearchFactory getInstance() {
           if (searchFactory == null) {
               searchFactory = new SearchFactory();
@@ -38,10 +55,25 @@ public class SearchFactory {
           return searchFactory;
       }
     
+    /**
+     * sets the shared SearchFactory.
+     * 
+     * @param factory
+     */
     public static void setInstance(SearchFactory factory) {
         searchFactory = factory;
     }
     
+    /**
+     * Shows an appropriate find widget targeted at the searchable.
+     * This implementation opens a batch-find or incremental-find 
+     * widget based on the showFindInToolBar property (which defaults
+     * to false).
+     *  
+     *  
+     * @param target - the component associated with the searchable
+     * @param searchable - the object to search.
+     */
     public void showFindInput(JComponent target, Searchable searchable) {
         if (showFindInToolBar(target, searchable)) {
             showFindBar(target, searchable);
@@ -50,6 +82,17 @@ public class SearchFactory {
         }
     }
 
+    /**
+     * Show a incremental-find widget targeted at the searchable.
+     * 
+     * This implementation uses a JXFindBar and inserts it into the
+     * target's toplevel container toolbar. 
+     * 
+     * PENDING: Nothing shown if there is no toolbar found. 
+     * 
+     * @param target - the component associated with the searchable
+     * @param searchable - the object to search.
+     */
     public void showFindBar(JComponent target, Searchable searchable) {
         if (target == null) return;
         if (findBar == null) {
@@ -72,8 +115,13 @@ public class SearchFactory {
     }
 
     /**
-     * @param target
-     * @param searchable
+     * Show a batch-find widget targeted at the given Searchable.
+     * 
+     * This implementation uses a shared JXFindPanel contained in a shared
+     * JXDialog.
+     * 
+     * @param target - the component associated with the searchable
+     * @param searchable - the object to search.
      */
     public void showFindDialog(JComponent target, Searchable searchable) {
         if (findPanel == null) {
@@ -93,6 +141,16 @@ public class SearchFactory {
         findDialog.setVisible(true);
     }
 
+    
+    /**
+     * Returns decision about using a batch- vs. incremental-find 
+     * for the searchable. This implementation returns the 
+     * showFindInToolBar property directly. 
+     * 
+     * @param target - the component associated with the searchable
+     * @param searchable - the object to search.
+     * @return true if a incremental-find should be used, false otherwise.
+     */
     public boolean showFindInToolBar(JComponent target, Searchable searchable) {
         return findInToolBar;
     }
