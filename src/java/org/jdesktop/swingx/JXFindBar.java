@@ -43,15 +43,15 @@ public class JXFindBar extends JXFindPanel {
     
     @Override
     protected void initExecutables() {
-        super.initExecutables();
         getActionMap().put(JXDialog.CLOSE_ACTION_COMMAND, 
                 createBoundAction(JXDialog.CLOSE_ACTION_COMMAND, "cancel"));
+        super.initExecutables();
     }
 
     @Override
     protected void bind() {
-        super.bind();
-        searchField.setAction(getAction(JXDialog.EXECUTE_ACTION_COMMAND));
+      super.bind();
+      searchField.addActionListener(getAction(JXDialog.EXECUTE_ACTION_COMMAND));
       findNext.setAction(getAction(FIND_NEXT_ACTION_COMMAND));
       findPrevious.setAction(getAction(FIND_PREVIOUS_ACTION_COMMAND));
       KeyStroke stroke = KeyStroke.getKeyStroke("ESCAPE");

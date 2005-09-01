@@ -22,6 +22,20 @@ import org.jdesktop.swingx.action.ActionContainerFactory;
 import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 
+/**
+ * Common base class of ui clients.
+ * 
+ * Implements basic synchronization between PatternModel state and
+ * actions bound to it.
+ * 
+ * 
+ * 
+ * PENDING: extending JXPanel is a convenience measure, should be extracted
+ *   into a dedicated controller.
+ * PENDING: should be re-visited when swingx goes binding-aware
+ * 
+ * @author Jeanette Winzenburg
+ */
 public abstract class AbstractPatternPanel extends JXPanel {
 
     public static final String SEARCH_FIELD_LABEL = "searchFieldLabel";
@@ -44,10 +58,20 @@ public abstract class AbstractPatternPanel extends JXPanel {
 
 //------------------------ actions
 
-    
+    /**
+     * Callback action bound to MATCH_ACTION_COMMAND.  
+     */
     public abstract void match();
     
+    /** 
+     * convenience method for type-cast to AbstractActionExt.
+     * 
+     *  
+     * @param key
+     * @return
+     */
     protected AbstractActionExt getAction(String key) {
+        // PENDING: outside clients might add different types?
         return (AbstractActionExt) getActionMap().get(key);
     }
 
@@ -61,10 +85,15 @@ public abstract class AbstractPatternPanel extends JXPanel {
         getActionMap().put(JXDialog.EXECUTE_ACTION_COMMAND, 
                 execute);
         getActionMap().put(MATCH_ACTION_COMMAND, execute);
+        updateExecutableEnabled(!getPatternModel().isEmpty());
         
         
     }
-
+    
+    /**
+     * creates actions bound to PatternModel's state.
+     *
+     */
     protected void initPatternActions() {
         ActionMap map = getActionMap();
         map.put(PatternModel.MATCH_CASE_ACTION_COMMAND, 
@@ -137,6 +166,9 @@ public abstract class AbstractPatternPanel extends JXPanel {
 
     /**
      * callback method from listening to PatternModel.
+     * 
+     * This implementation calls match() if the model is in
+     * incremental state.
      *
      */
     protected void refreshPatternFromModel() {
@@ -147,6 +179,8 @@ public abstract class AbstractPatternPanel extends JXPanel {
 
 
     /**
+     * returns the patternModel. Lazyly creates and registers a
+     * propertyChangeListener if null.
      * 
      */
     protected PatternModel getPatternModel() {
@@ -158,6 +192,11 @@ public abstract class AbstractPatternPanel extends JXPanel {
     }
 
 
+    /**
+     * factory method to create the PatternModel.
+     * Hook for subclasses to install custom models.
+     * @return
+     */
     protected PatternModel createPatternModel() {
         PatternModel l = new PatternModel();
         return l;
@@ -191,7 +230,9 @@ public abstract class AbstractPatternPanel extends JXPanel {
                     getAction(PatternModel.MATCH_INCREMENTAL_ACTION_COMMAND).
                     setSelected(((Boolean) evt.getNewValue()).booleanValue());
 
-                }
+                } else if ("empty".equals(property)) {
+                    updateExecutableEnabled(!((Boolean) evt.getNewValue()).booleanValue());
+                }   
     
             }
     
@@ -200,6 +241,11 @@ public abstract class AbstractPatternPanel extends JXPanel {
     }
 
     
+    protected void updateExecutableEnabled(boolean b) {
+        getAction(MATCH_ACTION_COMMAND).setEnabled(b);
+        
+    }
+
     /**
      * callback method from listening to searchField.
      *
