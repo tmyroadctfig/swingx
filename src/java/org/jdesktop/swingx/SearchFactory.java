@@ -29,7 +29,7 @@ public class SearchFactory {
    
     protected JXFindBar findBar;
 
-    private boolean inDialog;
+    private boolean findInToolBar;
     
     public static SearchFactory getInstance() {
           if (searchFactory == null) {
@@ -43,11 +43,10 @@ public class SearchFactory {
     }
     
     public void showFindInput(JComponent target, Searchable searchable) {
-        if (showInDialog(target, searchable)) {
-            showFindDialog(target, searchable);
-            
-        } else {
+        if (showFindInToolBar(target, searchable)) {
             showFindBar(target, searchable);
+        } else {
+            showFindDialog(target, searchable);
         }
     }
 
@@ -94,11 +93,15 @@ public class SearchFactory {
         findDialog.setVisible(true);
     }
 
-    public boolean showInDialog(JComponent target, Searchable searchable) {
-        return false;
+    public boolean showFindInToolBar(JComponent target, Searchable searchable) {
+        return findInToolBar;
     }
  
-    public void setShowInDialog(boolean inDialog) {
-        this.inDialog = inDialog;
+    /**
+     * 
+     * @param inToolBar
+     */
+    public void setShowFindInToolBar(boolean inToolBar) {
+        this.findInToolBar = inToolBar;
     }
 }
