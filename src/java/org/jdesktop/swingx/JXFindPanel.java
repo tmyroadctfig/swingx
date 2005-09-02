@@ -99,9 +99,17 @@ public class JXFindPanel extends AbstractPatternPanel {
     }
 
     
+    /**
+     * called from listening to empty property of PatternModel.
+     * 
+     * this implementation calls super and additionally synchs the 
+     * enabled state of FIND_NEXT_ACTION_COMMAND, FIND_PREVIOUS_ACTION_COMMAND
+     * to !empty.
+     */
     @Override
-    protected void updateExecutableEnabled(boolean enabled) {
-        super.updateExecutableEnabled(enabled);
+    protected void refreshEmptyFromModel() {
+        super.refreshEmptyFromModel();
+        boolean enabled = !getPatternModel().isEmpty();
         getAction(FIND_NEXT_ACTION_COMMAND).setEnabled(enabled);
         getAction(FIND_PREVIOUS_ACTION_COMMAND).setEnabled(enabled);
     }

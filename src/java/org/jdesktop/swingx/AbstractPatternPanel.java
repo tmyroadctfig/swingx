@@ -75,17 +75,28 @@ public abstract class AbstractPatternPanel extends JXPanel {
         return (AbstractActionExt) getActionMap().get(key);
     }
 
+    /**
+     * creates and registers all actions with the actionMap.
+     *
+     */
     protected void initActions() {
         initPatternActions();
         initExecutables();
     }
     
+    /**
+     * creates and registers all "executable" actions.
+     * Meaning: the actions bound to a callback method on this.
+     * 
+     * PENDING: not quite correctly factored? Name?
+     *
+     */
     protected void initExecutables() {
         Action execute = createBoundAction(MATCH_ACTION_COMMAND, "match");
         getActionMap().put(JXDialog.EXECUTE_ACTION_COMMAND, 
                 execute);
         getActionMap().put(MATCH_ACTION_COMMAND, execute);
-        updateExecutableEnabled(!getPatternModel().isEmpty());
+        refreshEmptyFromModel();
         
         
     }
@@ -165,7 +176,7 @@ public abstract class AbstractPatternPanel extends JXPanel {
     //---------------------- synch patternModel <--> components
 
     /**
-     * callback method from listening to PatternModel.
+     * called from listening to pattern property of PatternModel.
      * 
      * This implementation calls match() if the model is in
      * incremental state.
@@ -231,7 +242,7 @@ public abstract class AbstractPatternPanel extends JXPanel {
                     setSelected(((Boolean) evt.getNewValue()).booleanValue());
 
                 } else if ("empty".equals(property)) {
-                    updateExecutableEnabled(!((Boolean) evt.getNewValue()).booleanValue());
+                    refreshEmptyFromModel();
                 }   
     
             }
@@ -240,9 +251,16 @@ public abstract class AbstractPatternPanel extends JXPanel {
         return l;
     }
 
-    
-    protected void updateExecutableEnabled(boolean b) {
-        getAction(MATCH_ACTION_COMMAND).setEnabled(b);
+    /**
+     * called from listening to empty property of PatternModel.
+     * 
+     * this implementation synch's the enabled state of the action with
+     * MATCH_ACTION_COMMAND to !empty.
+     * 
+     */
+    protected void refreshEmptyFromModel() {
+        boolean enabled = !getPatternModel().isEmpty();
+        getAction(MATCH_ACTION_COMMAND).setEnabled(enabled);
         
     }
 
