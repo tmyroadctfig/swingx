@@ -7,9 +7,48 @@ package org.jdesktop.swingx;
 import javax.swing.text.BadLocationException;
 
 public class FindIssues extends FindTest {
-
+    
     /**
-     * Issue #??-swingx: expect to return the start of the match.
+     * Issue #??-swingx: backwards search not implemented in JXEditorPane.
+     *
+     */
+    public void testEditorBackwards() {
+        JXEditorPane editor = new JXEditorPane();
+        String text = "fou four";
+        editor.setText(text);
+        PatternModel model = new PatternModel();
+        model.setRawText("fo");
+        int foIndex = editor.search(model.getPattern(), text.length() - 1, true);
+        assertEquals("found index must be last occurence", text.lastIndexOf("fo"), foIndex);
+        
+    }
+    public void testEditorTolerateExceedingStartIndex() {
+        JXEditorPane editor = new JXEditorPane();
+        editor.setText("fou four");
+        int foIndex = editor.search("fo", 20);
+        assertEquals(-1, foIndex);
+    }
+
+    public void testEditorEmptyDocument() {
+        JXEditorPane editor = new JXEditorPane();
+        int foIndex = editor.search("fo", -1);
+        assertEquals(-1, foIndex);
+        foIndex = editor.search("fo", 0);
+        assertEquals(-1, foIndex);
+    }
+    
+    public void testEditorBoundarySearchIndex() {
+        JXEditorPane editor = new JXEditorPane();
+        editor.setText("f");
+        int foIndex = editor.search("fo", -1);
+        assertEquals(-1, foIndex);
+        foIndex = editor.search("f", -1);
+        assertEquals(0, foIndex);
+        foIndex = editor.search("f", 0);
+        assertEquals(0, foIndex);
+    }
+    /**
+     * Issue #100-swingx: expect to return the start of the match.
      * Only then it's possible to implement a reasonably behaved
      * incremental search.
      *
@@ -32,7 +71,7 @@ public class FindIssues extends FindTest {
         JXEditorPane editor = new JXEditorPane();
         editor.setText("fou four");
         int foIndex = editor.search("fo", -1);
-        assertTrue("fo".equals(editor.getSelectedText()));
+        assertEquals("selected text must be equals to input", "fo", editor.getSelectedText());
         try {
             String textAt = editor.getText(foIndex, 2);
             assertEquals("fo", textAt);

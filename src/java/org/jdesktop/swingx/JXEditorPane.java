@@ -8,57 +8,55 @@
 package org.jdesktop.swingx;
 
 import java.awt.Component;
-
-import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-
 import java.net.URL;
-
-import java.util.Vector;
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.Vector;
+import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.*;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.html.HTMLEditorKit;
-
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-import javax.swing.undo.UndoManager;
-
+import javax.swing.ActionMap;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JComboBox;
+import javax.swing.JEditorPane;
+import javax.swing.JList;
+import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
-
 import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.EditorKit;
 import javax.swing.text.Element;
 import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.Position;
 import javax.swing.text.Segment;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import javax.swing.text.StyledEditorKit;
-
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
+
 import org.jdesktop.swingx.action.ActionManager;
 import org.jdesktop.swingx.action.Targetable;
 
@@ -75,7 +73,7 @@ import org.jdesktop.swingx.action.Targetable;
  */
 public class JXEditorPane extends JEditorPane implements Searchable, Targetable {
 
-    private Matcher matcher;
+//    private Matcher matcher;
 
     private UndoableEditListener undoHandler;
     private UndoManager undoManager;
@@ -441,38 +439,92 @@ public class JXEditorPane extends JEditorPane implements Searchable, Targetable 
         return search(pattern, startIndex, false);
     }
 
+    Position lastFound;
+    int lastStartIndex;
+    MatchResult lastMatchResult;
+    
     /**
      * @return start position of matching string or -1
      */
-    public int search(Pattern pattern, int startIndex, boolean backwards) {
-        if (pattern == null) {
-            setCaretPosition(startIndex > -1 ? startIndex : 0);
+    public int search(Pattern pattern, final int startIndex, boolean backwards) {
+        if ((pattern == null) || 
+                (getDocument().getLength() == 0) ||
+                ((startIndex > -1 ) && (getDocument().getLength() < startIndex))){
+//            System.out.println("shortcut out *" + getText() + "* "+ startIndex);
+            updateStateAfterNotFound(startIndex);
             return -1;
         }
 
-        int start = startIndex + 1;
-        int end = -1;
+//        if (startIndex < 0) {
+//            startIndex = 0;
+//        }
+//        
+//        if (getDocument().getLength() < startIndex) {
+//            return -1;
+//        }
+        
+        int start;
+        int length;
+        if (backwards) {
+            start = 0;
+            if (startIndex < 0) {
+                length = getDocument().getLength() - 1;
+            } else {
+                length =  - 1 + startIndex;
+            }
+        } else {
+            start = startIndex + 1;
+            length = getDocument().getLength() - 1 - startIndex;
+        }
+//        int end = -1;
 
+//        Position position = getDocument().createPosition(startIndex);
         Segment segment = new Segment();
+        
         try {
-            Document doc = getDocument();
-            doc.getText(start, doc.getLength() - start, segment);
+            getDocument().getText(start, length, segment);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
 
-        matcher = pattern.matcher(segment.toString());
-        if (matcher.find()) {
-            start = matcher.start() + start; //Index;
-            end = matcher.end() + startIndex;
-            select(start, end + 1);
+        Matcher matcher = pattern.matcher(segment.toString());
+        if (backwards) {
+            MatchResult currentResult = null;
+            while (matcher.find()) {
+                currentResult = matcher.toMatchResult();
+            }
+            if (currentResult != null) {
+                start = currentResult.start();
+                int end = currentResult.end();
+                select(start, end + 1);
+                getCaret().setSelectionVisible(true);
+            } else {
+                updateStateAfterNotFound(startIndex);
+                return -1;
+            }
             
-            getCaret().setSelectionVisible(true);
         } else {
-            setCaretPosition(startIndex > -1 ? startIndex : 0);
-            return -1;
+            if (matcher.find()) {
+                start = matcher.start() + start; //Index;
+                int end = matcher.end() + startIndex;
+                select(start, end + 1);
+                getCaret().setSelectionVisible(true);
+            } else {
+                updateStateAfterNotFound(startIndex);
+                return -1;
+            }
         }
         return start;
+    }
+
+    /**
+     * @param startIndex
+     */
+    private void updateStateAfterNotFound(int startIndex) {
+        lastStartIndex = -1;
+        lastMatchResult = null;
+        setCaretPosition(getSelectionEnd());
+//        setCaretPosition(startIndex > -1 ? startIndex : 0);
     }
 
     public boolean hasCommand(Object command) {
