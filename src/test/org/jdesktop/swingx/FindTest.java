@@ -34,13 +34,19 @@ public class FindTest extends InteractiveTestCase {
 //      setSystemLF(true);
       FindTest test = new FindTest();
       try {
-        test.runInteractiveTests();
-//          test.runInteractiveTests("interactive.*Editor.*");
+//        test.runInteractiveTests();
+          test.runInteractiveTests("interactive.*Editor.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
+    @Override
+    protected void setUp() {
+        editorURL = FindTest.class.getResource("resources/test.txt");
+        SearchFactory.getInstance().setShowFindInToolBar(true);
+    }
+    
 
     private URL editorURL;
 
@@ -174,6 +180,7 @@ public class FindTest extends InteractiveTestCase {
         
         Action action = new TargetableAction("Find", "find");
         addAction(frame, action);
+        frame.setSize(600, 400);
         frame.setVisible(true);
         
     }
@@ -196,12 +203,6 @@ public class FindTest extends InteractiveTestCase {
 //        frame.setVisible(true);
     }
 
-    @Override
-    protected void setUp() {
-        editorURL = FindTest.class.getResource("resources/test.txt");
-        SearchFactory.getInstance().setShowFindInToolBar(true);
-    }
-    
     
     
     public static class TestTableModel extends AbstractTableModel {

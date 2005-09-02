@@ -28,20 +28,22 @@ import org.jdesktop.swingx.action.BoundAction;
  * <li> TODO: list and explain
  * </ul> 
  * 
- * Holds controlling state for both find and filter (TODO - explain). Nearly
- * all properties are accessible via bound actions accessible by key.
- * 
+ * Holds state for controlling the match process
+ * for both find and filter (TODO - explain). 
  * Relevant in all
  * 
  * <ul>
- * <li> contextSensitive - 
+ * <li> caseSensitive - 
+ * <li> empty - true if there's no searchString
+ * <li> incremental - a hint to clients to react immediately
+ *      to pattern changes.
+ *      
  * </ul>
  * 
  * Relevant in find contexts:
  * <ul>
  * <li> backwards - search direction if used in a find context
- * <li> wrapping - wrap over the end if not found
- * <li> incremental - TBD
+ * <li> wrapping - wrap over the end/start if not found
  * </ul>
  * 
  * 
@@ -110,15 +112,6 @@ public class PatternModel {
 
     private boolean caseSensitive;
 
-//    private boolean startAnchored;
-//
-//    private boolean endAnchored;
-
-    // private boolean enabled;
-    //
-    // private boolean active;
-    // private boolean highlight;
-
     private PropertyChangeSupport propertySupport;
 
     private String regexCreatorKey;
@@ -174,36 +167,6 @@ public class PatternModel {
         return incremental;
     }
 
-    // public boolean isActive() {
-    // return active;
-    // }
-    //
-    // public void setActive(boolean active) {
-    // if (!isEnabled())
-    // return;
-    // boolean old = isActive();
-    // this.active = active;
-    // firePropertyChange("active", old, isActive());
-    // }
-    //
-    // public boolean isEnabled() {
-    // return enabled;
-    // }
-    //
-    // public void setEnabled(boolean enabled) {
-    // boolean old = isEnabled();
-    // this.enabled = enabled;
-    // firePropertyChange("enabled", old, isEnabled());
-    // }
-    // public boolean isHighlight() {
-    // return highlight;
-    // }
-    //
-    // public void setHighlight(boolean highlight) {
-    // boolean old = isHighlight();
-    // this.highlight = highlight;
-    // firePropertyChange("highlight", old, isHighlight());
-    // }
 
     public boolean isCaseSensitive() {
         return caseSensitive;

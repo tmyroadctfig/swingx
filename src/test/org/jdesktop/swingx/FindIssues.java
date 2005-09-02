@@ -16,6 +16,13 @@ public class FindIssues extends FindTest {
         JXEditorPane editor = new JXEditorPane();
         String text = "fou four";
         editor.setText(text);
+        int first = 2;
+        try {
+            editor.getDocument().getText(first, editor.getDocument().getLength() - first);
+        } catch (BadLocationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         PatternModel model = new PatternModel();
         model.setRawText("fo");
         int foIndex = editor.search(model.getPattern(), text.length() - 1, true);

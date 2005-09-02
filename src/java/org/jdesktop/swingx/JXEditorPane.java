@@ -455,13 +455,6 @@ public class JXEditorPane extends JEditorPane implements Searchable, Targetable 
             return -1;
         }
 
-//        if (startIndex < 0) {
-//            startIndex = 0;
-//        }
-//        
-//        if (getDocument().getLength() < startIndex) {
-//            return -1;
-//        }
         
         int start;
         int length;
@@ -476,8 +469,6 @@ public class JXEditorPane extends JEditorPane implements Searchable, Targetable 
             start = startIndex + 1;
             length = getDocument().getLength() - 1 - startIndex;
         }
-//        int end = -1;
-
 //        Position position = getDocument().createPosition(startIndex);
         Segment segment = new Segment();
         
@@ -496,7 +487,7 @@ public class JXEditorPane extends JEditorPane implements Searchable, Targetable 
             if (currentResult != null) {
                 start = currentResult.start();
                 int end = currentResult.end();
-                select(start, end + 1);
+                select(start, end);
                 getCaret().setSelectionVisible(true);
             } else {
                 updateStateAfterNotFound(startIndex);
@@ -505,9 +496,9 @@ public class JXEditorPane extends JEditorPane implements Searchable, Targetable 
             
         } else {
             if (matcher.find()) {
+                int end = matcher.end() + start;
                 start = matcher.start() + start; //Index;
-                int end = matcher.end() + startIndex;
-                select(start, end + 1);
+                select(start, end);
                 getCaret().setSelectionVisible(true);
             } else {
                 updateStateAfterNotFound(startIndex);
