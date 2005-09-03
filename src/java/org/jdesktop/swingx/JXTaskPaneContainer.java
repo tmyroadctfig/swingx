@@ -20,9 +20,55 @@ import org.jdesktop.swingx.plaf.TaskPaneContainerUI;
 
 /**
  * <code>JXTaskPaneContainer</code> provides an elegant view
- * to display a list of tasks ordered by groups.
- * It can be added to a JScrollPane.
+ * to display a list of tasks ordered by groups ({@link org.jdesktop.swingx.JXTaskPane}.
+ * 
+ * <p>
+ * Although {@link org.jdesktop.swingx.JXTaskPane} can be added to any other
+ * container, the <code>JXTaskPaneContainer</code> will provide better
+ * fidelity when it comes to matching the look and feel of the host operating
+ * system than any other panel. As example, when using on a Windows platform,
+ * the <code>JXTaskPaneContainer</code> will be painted with light gradient
+ * background. Also <code>JXTaskPaneContainer</code> takes care of using the
+ * right {@link java.awt.LayoutManager} (as required by
+ * {@link org.jdesktop.swingx.JXCollapsiblePane}) so that
+ * {@link org.jdesktop.swingx.JXTaskPane} behaves correctly when collapsing and
+ * expanding its content.
+ *  
+ * <p>
+ * <code>JXTaskPaneContainer<code> can be added to a JScrollPane.
+ * 
+ * <p>
+ * Example:
+ * <pre>
+ * <code>
+ * JXFrame frame = new JXFrame();
+ * 
+ * // a container to put all JXTaskPane together
+ * JXTaskPaneContainer taskPaneContainer = new JXTaskPaneContainer();
+ * 
+ * // add JXTaskPanes to the container
+ * JXTaskPane actionPane = createActionPane();
+ * JXTaskPane miscActionPane = createMiscActionPane();
+ * JXTaskPane detailsPane = createDetailsPane();
+ * taskPaneContainer.add(actionPane);
+ * taskPaneContainer.add(miscActionPane);
+ * taskPaneContainer.add(detailsPane);
  *
+ * // put the action list on the left in a JScrollPane
+ * // as we have several taskPane and we want to make sure they
+ * // all get visible.   
+ * frame.add(new JScrollPane(taskPaneContainer), BorderLayout.EAST);
+ * 
+ * // and a file browser in the middle
+ * frame.add(fileBrowser, BorderLayout.CENTER);
+ * 
+ * frame.pack().
+ * frame.setVisible(true);
+ * </code>
+ * </pre>
+ *
+ * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
+ * 
  * @javabean.attribute
  *          name="isContainer"
  *          value="Boolean.TRUE"

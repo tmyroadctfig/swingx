@@ -25,16 +25,26 @@ import org.jdesktop.swingx.plaf.TaskPaneUI;
 
 /**
  * <code>JXTaskPane</code> is a container for tasks and other
- * arbitrary components. <code>JXTaskPane</code> s are added to
- * a {@link org.jdesktop.swingx.JXTaskPaneContainer}.
- * <code>JXTaskPane</code> provides control to be expanded and
- * collapsed in order to show or hide the task list. It can have an
+ * arbitrary components.
+ * 
+ * <p>
+ * Several <code>JXTaskPane</code>s are usually grouped together within a
+ * {@link org.jdesktop.swingx.JXTaskPaneContainer}. However it is not mandatory
+ * to use a JXTaskPaneContainer as the parent for JXTaskPane. The JXTaskPane can
+ * be added to any other container. See
+ * {@link org.jdesktop.swingx.JXTaskPaneContainer} to understand the benefits of
+ * using it as the parent container.
+ * 
+ * <p>
+ * <code>JXTaskPane</code> provides control to expand and
+ * collapse the content area in order to show or hide the task list. It can have an
  * <code>icon</code>, a <code>title</code> and can be marked as
  * <code>special</code>. Marking a <code>JXTaskPane</code> as
- * <code>special</code> is only an hint for the pluggable UI which
+ * <code>special</code> is only a hint for the pluggable UI which
  * will usually paint it differently (by example by using another
  * color for the border of the pane).
  * 
+ * <p> 
  * When the JXTaskPane is expanded or collapsed, it will be
  * animated with a fade effect. The animated can be disabled on a per
  * component basis through {@link #setAnimated(boolean)}.
@@ -42,6 +52,55 @@ import org.jdesktop.swingx.plaf.TaskPaneUI;
  * To disable the animation for all newly created <code>JXTaskPane</code>,
  * use the UIManager property:
  * <code>UIManager.put("TaskPane.animate", Boolean.FALSE);</code>.
+ * 
+ * <p>
+ * Example:
+ * <pre>
+ * <code>
+ * JXFrame frame = new JXFrame();
+ * 
+ * // a container to put all JXTaskPane together
+ * JXTaskPaneContainer taskPaneContainer = new JXTaskPaneContainer();
+ * 
+ * // create a first taskPane with common actions
+ * JXTaskPane actionPane = new JXTaskPane();
+ * actionPane.setTitle("Files and Folders");
+ * actionPane.setSpecial(true);
+ * 
+ * // actions can be added, an hyperlink will be created
+ * Action renameSelectedFile = createRenameFileAction();
+ * actionPane.add(renameSelectedFile);
+ * actionPane.add(createDeleteFileAction());
+ * 
+ * // add this taskPane to the taskPaneContainer
+ * taskPaneContainer.add(actionPane);
+ * 
+ * // create another taskPane, it will show details of the selected file
+ * JXTaskPane details = new JXTaskPane();
+ * details.setTitle("Details");
+ *  
+ * // add standard components to the details taskPane
+ * JLabel searchLabel = new JLabel("Search:");
+ * JTextField searchField = new JTextField("");
+ * details.add(searchLabel);
+ * details.add(searchField);
+ * 
+ * taskPaneContainer.add(details);
+ * 
+ * // put the action list on the left 
+ * frame.add(taskPaneContainer, BorderLayout.EAST);
+ * 
+ * // and a file browser in the middle
+ * frame.add(fileBrowser, BorderLayout.CENTER);
+ * 
+ * frame.pack().
+ * frame.setVisible(true);
+ * </code>
+ * </pre>
+ * 
+ * @see org.jdesktop.swingx.JXTaskPaneContainer
+ * @see org.jdesktop.swingx.JXCollapsiblePane
+ * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
  * 
  * @javabean.attribute
  *          name="isContainer"
@@ -66,6 +125,9 @@ import org.jdesktop.swingx.plaf.TaskPaneUI;
 public class JXTaskPane extends JPanel implements
   JXCollapsiblePane.JCollapsiblePaneContainer {
 
+  /**
+   * JXTaskPane pluggable UI key <i>swingx/TaskPaneUI</i> 
+   */
   public final static String uiClassID = "swingx/TaskPaneUI";
   
   // ensure at least the default ui is registered
@@ -136,6 +198,10 @@ public class JXTaskPane extends JPanel implements
       });
   }
 
+  /**
+   * Returns the contentPane object for this JXTaskPane.
+   * @return the contentPane property
+   */
   public Container getContentPane() {
     return collapsePane.getContentPane();
   }
@@ -255,7 +321,6 @@ public class JXTaskPane extends JPanel implements
   /**
    * Should this group be scrolled to be visible on expand.
    * 
-   * 
    * @param scrollOnExpand true to scroll this group to be
    * visible if this group is expanded.
    * 
@@ -325,6 +390,9 @@ public class JXTaskPane extends JPanel implements
   }
   
   /**
+   * Returns true if this taskpane is animated during expand/collapse
+   * transition.
+   * 
    * @return true if this taskpane is animated during expand/collapse
    *         transition.
    */
@@ -346,14 +414,23 @@ public class JXTaskPane extends JPanel implements
     return c;
   }
 
+  /**
+   * @see JXCollapsiblePane.JCollapsiblePaneContainer
+   */
   public Container getValidatingContainer() {
     return getParent();
   }
   
+  /**
+   * Overriden to redirect call to the content pane.
+   */
   protected void addImpl(Component comp, Object constraints, int index) {
     getContentPane().add(comp, constraints, index);
   }
 
+  /**
+   * Overriden to redirect call to the content pane.
+   */
   public void setLayout(LayoutManager mgr) {
     if (collapsePane != null) {
       getContentPane().setLayout(mgr);
@@ -394,6 +471,8 @@ public class JXTaskPane extends JPanel implements
       + String.valueOf(isExpanded())
       + ",special="
       + String.valueOf(isSpecial())
+      + ",scrollOnExpand=" 
+      + String.valueOf(isScrollOnExpand())
       + ",ui=" + getUI();
   }
 
