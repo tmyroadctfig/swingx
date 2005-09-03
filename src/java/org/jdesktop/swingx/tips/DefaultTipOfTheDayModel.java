@@ -12,8 +12,8 @@ import java.util.Collection;
 import java.util.List;
 
 /**
+ * Default {@link org.jdesktop.swingx.tips.TipOfTheDayModel} implementation.<br>
  * 
- * DefaultTipOfTheDayModel.<br>
  * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
  */
 public class DefaultTipOfTheDayModel implements TipOfTheDayModel {

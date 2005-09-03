@@ -9,8 +9,7 @@ package org.jdesktop.swingx.tips;
 import org.jdesktop.swingx.tips.TipOfTheDayModel.Tip;
 
 /**
- * 
- * DefaultTip.<br>
+ * Default {@link org.jdesktop.swingx.tips.TipOfTheDayModel.Tip} implementation.<br>
  * 
  * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
  */

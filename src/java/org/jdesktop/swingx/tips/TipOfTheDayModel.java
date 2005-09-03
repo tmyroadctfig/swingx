@@ -35,7 +35,7 @@ public interface TipOfTheDayModel {
   interface Tip {
 
     /**
-     * @return very short (optional) description for the tip
+     * @return very short (optional) text describing the tip
      */
     String getTipName();
 
