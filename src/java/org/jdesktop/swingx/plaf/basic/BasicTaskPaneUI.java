@@ -46,6 +46,8 @@ import org.jdesktop.swingx.plaf.TaskPaneUI;
 
 /**
  * Base implementation of the <code>JXTaskPane</code> UI.
+ * 
+ * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
  */
 public class BasicTaskPaneUI extends TaskPaneUI {
 

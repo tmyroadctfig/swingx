@@ -8,6 +8,12 @@ package org.jdesktop.swingx.tips;
 
 import org.jdesktop.swingx.tips.TipOfTheDayModel.Tip;
 
+/**
+ * 
+ * DefaultTip.<br>
+ * 
+ * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
+ */
 public class DefaultTip implements Tip {
 
   private String name;

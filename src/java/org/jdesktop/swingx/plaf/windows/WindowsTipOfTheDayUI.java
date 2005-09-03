@@ -28,6 +28,11 @@ import org.jdesktop.swingx.JXTipOfTheDay;
 import org.jdesktop.swingx.JXTipOfTheDay.ShowOnStartupChoice;
 import org.jdesktop.swingx.plaf.basic.BasicTipOfTheDayUI;
 
+/**
+ * Windows implementation of the TipOfTheDayUI.
+ * 
+ * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
+ */
 public class WindowsTipOfTheDayUI extends BasicTipOfTheDayUI {
 
   public static ComponentUI createUI(JComponent c) {

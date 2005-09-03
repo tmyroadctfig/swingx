@@ -10,6 +10,8 @@ import javax.swing.plaf.ComponentUI;
 
 /**
  * Pluggable UI for <code>JXTaskPaneContainer</code>.
+ * 
+ * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
  */
 public class TaskPaneContainerUI extends ComponentUI {
 

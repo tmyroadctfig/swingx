@@ -10,6 +10,8 @@ import org.jdesktop.swingx.JXTipOfTheDay;
 
 /**
  * A model for {@link org.jdesktop.swingx.JXTipOfTheDay}.<br>
+ * 
+ * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
  */
 public interface TipOfTheDayModel {
 

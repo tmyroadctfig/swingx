@@ -43,6 +43,8 @@ import org.jdesktop.swingx.util.OS;
  * {@link #setAddon(String)}method. For example, to install the
  * Windows addons, add the following statement
  * <code>LookAndFeelAddons.setAddon("org.jdesktop.swingx.plaf.windows.WindowsLookAndFeelAddons");</code>.
+ * 
+ * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a> 
  */
 public class LookAndFeelAddons {
 

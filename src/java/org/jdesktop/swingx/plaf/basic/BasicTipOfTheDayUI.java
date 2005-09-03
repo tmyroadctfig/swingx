@@ -49,6 +49,11 @@ import org.jdesktop.swingx.plaf.TipOfTheDayUI;
 import org.jdesktop.swingx.tips.TipOfTheDayModel.Tip;
 import org.jdesktop.swingx.util.UIManagerUtils;
 
+/**
+ * Base implementation of the <code>JXTipOfTheDay</code> UI.
+ * 
+ * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
+ */
 public class BasicTipOfTheDayUI extends TipOfTheDayUI {
 
   public static ComponentUI createUI(JComponent c) {

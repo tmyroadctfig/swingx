@@ -22,6 +22,8 @@ import org.jdesktop.swingx.plaf.windows.WindowsTipOfTheDayUI;
 
 /**
  * Addon for <code>JXTipOfTheDay</code>.<br>
+ * 
+ * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
  */
 public class JXTipOfTheDayAddon extends AbstractComponentAddon {
 

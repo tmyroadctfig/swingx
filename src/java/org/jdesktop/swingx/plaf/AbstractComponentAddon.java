@@ -21,7 +21,7 @@ import org.jdesktop.swingx.plaf.windows.WindowsLookAndFeelAddons;
 /**
  * Ease the work of creating an addon for a component.<br>
  * 
- * @author Frederic Lavigne
+ * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
  */
 public abstract class AbstractComponentAddon implements ComponentAddon {
 

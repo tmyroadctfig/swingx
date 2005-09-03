@@ -24,6 +24,8 @@ import org.jdesktop.swingx.plaf.basic.BasicTaskPaneUI;
 
 /**
  * Windows implementation of the TaskPaneUI.
+ * 
+ * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
  */
 public class WindowsTaskPaneUI extends BasicTaskPaneUI {
 

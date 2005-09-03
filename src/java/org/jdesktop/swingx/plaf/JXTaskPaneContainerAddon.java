@@ -21,6 +21,7 @@ import org.jdesktop.swingx.util.OS;
 /**
  * Addon for <code>JXTaskPaneContainer</code>. <br>
  *  
+ * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
  */
 public class JXTaskPaneContainerAddon extends AbstractComponentAddon {
 

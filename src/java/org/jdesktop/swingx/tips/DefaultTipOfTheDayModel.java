@@ -11,7 +11,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-
+/**
+ * 
+ * DefaultTipOfTheDayModel.<br>
+ * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
+ */
 public class DefaultTipOfTheDayModel implements TipOfTheDayModel {
 
   private List<Tip> tips = new ArrayList<Tip>();

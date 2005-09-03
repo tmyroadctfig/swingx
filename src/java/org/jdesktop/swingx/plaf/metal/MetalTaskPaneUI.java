@@ -20,6 +20,8 @@ import org.jdesktop.swingx.plaf.basic.BasicTaskPaneUI;
 
 /**
  * Metal implementation of the <code>JXTaskPane</code> UI. <br>
+ * 
+ * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
  */
 public class MetalTaskPaneUI extends BasicTaskPaneUI {
 

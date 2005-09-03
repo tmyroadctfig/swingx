@@ -11,6 +11,8 @@ package org.jdesktop.swingx.plaf;
  * the LookAndFeelAddons. A <code>ComponentAddon</code> is the
  * equivalent of a {@link javax.swing.LookAndFeel}but focused on one
  * component. <br>
+ * 
+ * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
  */
 public interface ComponentAddon {
 

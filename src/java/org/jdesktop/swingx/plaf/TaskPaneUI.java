@@ -15,6 +15,7 @@ import javax.swing.plaf.PanelUI;
 /**
  * Pluggable UI for <code>JXTaskPane</code>.
  *  
+ * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
  */
 public class TaskPaneUI extends PanelUI {
 

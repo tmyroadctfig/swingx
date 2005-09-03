@@ -25,6 +25,8 @@ import org.jdesktop.swingx.plaf.basic.BasicTaskPaneUI;
 
 /**
  * Paints the JXTaskPane with a gradient in the title bar.
+ * 
+ * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
  */
 public class GlossyTaskPaneUI extends BasicTaskPaneUI {
 

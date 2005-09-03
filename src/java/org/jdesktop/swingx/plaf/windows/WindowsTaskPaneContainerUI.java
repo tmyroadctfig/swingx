@@ -13,6 +13,8 @@ import org.jdesktop.swingx.plaf.basic.BasicTaskPaneContainerUI;
 
 /**
  * Windows implementation of the TaskPaneContainerUI.
+ * 
+ * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
  */
 public class WindowsTaskPaneContainerUI extends BasicTaskPaneContainerUI {
 

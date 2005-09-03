@@ -12,6 +12,8 @@ import java.util.Properties;
 
 /**
  * Loads tips from various sources.<br>
+ * 
+ * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
  */
 public class TipLoader {
 

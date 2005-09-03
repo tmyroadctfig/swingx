@@ -16,6 +16,7 @@ import org.jdesktop.swingx.JXTipOfTheDay;
 /**
  * Pluggable UI for <code>JXTipOfTheDay</code>.
  *  
+ * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
  */
 public abstract class TipOfTheDayUI extends PanelUI {
   
