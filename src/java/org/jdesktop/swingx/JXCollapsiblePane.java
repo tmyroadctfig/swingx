@@ -20,14 +20,60 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 
+import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 /**
- * Collapses or expands its content area with animation and fade in/fade out
- * effects.
+ * <code>JXCollapsiblePane</code> provides a component which can collapse or
+ * expand its content area with animation and fade in/fade out effects.
+ * It also acts as a standard container for other Swing components.
+ * 
+ * <p>
+ * In this example, the <code>JXCollapsiblePane</code> is used to build
+ * a Search pane which can be shown and hidden on demand.
+ * 
+ * <pre>
+ * <code>
+ * JXCollapsiblePane cp = new JXCollapsiblePane();
+ *
+ * // JXCollapsiblePane can be used like any other container
+ * cp.setLayout(new BorderLayout());
+ * 
+ * // the Controls panel with a textfield to filter the tree
+ * JPanel controls = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
+ * controls.add(new JLabel("Search:"));
+ * controls.add(new JTextField(10));    
+ * controls.add(new JButton("Refresh"));
+ * controls.setBorder(new TitledBorder("Filters"));
+ * cp.add("Center", controls);
+ *   
+ * JXFrame frame = new JXFrame();
+ * frame.setLayout(new BorderLayout());
+ *  
+ * // Put the "Controls" first
+ * frame.add("North", cp);
+ *    
+ * // Then the tree - we assume the Controls would somehow filter the tree
+ * JScrollPane scroll = new JScrollPane(new JTree());
+ * frame.add("Center", scroll);
+ *
+ * // Show/hide the "Controls"
+ * JButton toggle = new JButton(cp.getActionMap().get("toggle"));
+ * frame.add("South", toggle);
+ *
+ * frame.pack();
+ * frame.setVisible(true);
+ * </code>
+ * </pre>
+ * 
+ * <p>
+ * Note: <code>JXCollapsiblePane</code> requires its parent container to have a
+ * {@link java.awt.LayoutManager} using {@link #getPreferredSize()} when
+ * calculating its layout (example {@link org.jdesktop.swingx.VerticalLayout},
+ * {@link java.awt.BorderLayout}). 
  * 
  * @javabean.attribute
  *          name="isContainer"
@@ -44,7 +90,7 @@ import javax.swing.Timer;
  *          stopClass="java.awt.Component"
  *          
  * @author rbair (from the JDNC project)
- * @author <a href="mailto:fred@L2FProd.com">fred</a>
+ * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
  */
 public class JXCollapsiblePane extends JPanel {
 
@@ -69,8 +115,9 @@ public class JXCollapsiblePane extends JPanel {
   private AnimationParams animationParams;
 
   /**
-   * Constructs a new JXCollapsiblePane with a {@link JPanel} as content pane and
-   * a vertical {@link VerticalLayout} with a gap of 2 pixels as layout manager.
+   * Constructs a new JXCollapsiblePane with a {@link JPanel} as content pane
+   * and a vertical {@link VerticalLayout} with a gap of 2 pixels as layout
+   * manager.
    */
   public JXCollapsiblePane() {
     super.setLayout(new BorderLayout(0, 0));
@@ -81,37 +128,22 @@ public class JXCollapsiblePane extends JPanel {
 
     animator = new AnimationListener();
     setAnimationParams(new AnimationParams(30, 8, 0.01f, 1.0f));
+    
+    // add an action to automatically toggle the state of the pane
+    getActionMap().put("toggle", new AbstractAction("Toggle") {
+      public void actionPerformed(ActionEvent e) {
+        setCollapsed(!isCollapsed());
+      }
+    });
   }
 
   /**
-   * If true, enables the animation when pane is collapsed/expanded. If false,
-   * animation is turned off.
-   * 
-   * @param animated
-   * @javabean.property
-   *          bound="true"
-   *          preferred="true"
-   */
-  public void setAnimated(boolean animated) {
-    if (animated != useAnimation) {
-      useAnimation = animated;
-      firePropertyChange("animated", !useAnimation, useAnimation);
-    }
-  }
-
-  /**
-   * @return true if the pane is animated, false otherwise
-   */
-  public boolean isAnimated() {
-    return useAnimation;
-  }
-
-  /**
-   * Sets the content pane of this JXCollapsiblePane. Components must be added to
-   * this content pane, not to the JXCollapsiblePane.
+   * Sets the content pane of this JXCollapsiblePane. Components must be added
+   * to this content pane, not to the JXCollapsiblePane.
    * 
    * @param contentPanel
-   * @throws IllegalArgumentException if contentPanel is null
+   * @throws IllegalArgumentException
+   *           if contentPanel is null
    */
   public void setContentPane(Container contentPanel) {
     if (contentPanel == null) {
@@ -171,6 +203,39 @@ public class JXCollapsiblePane extends JPanel {
   }
   
   /**
+   * If true, enables the animation when pane is collapsed/expanded. If false,
+   * animation is turned off.
+   * 
+   * <p>
+   * When animated, the <code>JXCollapsiblePane</code> will progressively
+   * reduce (when collapsing) or enlarge (when expanding) the height of its
+   * content area until it becomes 0 or until it reaches the preferred height of
+   * the components it contains. The transparency of the content area will also
+   * change during the animation.
+   * 
+   * <p>
+   * If not animated, the <code>JXCollapsiblePane</code> will simply hide
+   * (collapsing) or show (expanding) its content area.
+   * 
+   * @param animated
+   * @javabean.property bound="true" preferred="true"
+   */
+  public void setAnimated(boolean animated) {
+    if (animated != useAnimation) {
+      useAnimation = animated;
+      firePropertyChange("animated", !useAnimation, useAnimation);
+    }
+  }
+
+  /**
+   * @return true if the pane is animated, false otherwise
+   * @see #setAnimated(boolean)
+   */
+  public boolean isAnimated() {
+    return useAnimation;
+  }
+
+  /**
    * @return true if the pane is collapsed, false if expanded
    */
   public boolean isCollapsed() {
@@ -178,17 +243,25 @@ public class JXCollapsiblePane extends JPanel {
   }
 
   /**
-   * If the component is collapsed and <code>val</code> is false, then this
-   * call scrolls down the JXCollapsiblePane, such that the entire
-   * JXCollapsiblePane will be visible. This also causes the content container to
-   * be faded in. However, if the component is expanded and <code>val</code>
-   * is true, then this call scrolls up the JXCollapsiblePane. Also, this will
-   * cause the content container to be faded out. <b>Note: the animation occurs
-   * only if {@link JXCollapsiblePane#isAnimated()} returns true</b>
+   * Expands or collapses this <code>JXCollapsiblePane</code>.
    * 
+   * <p>
+   * If the component is collapsed and <code>val</code> is false, then this
+   * call expands the JXCollapsiblePane, such that the entire JXCollapsiblePane
+   * will be visible. If {@link #isAnimated()} returns true, the expansion will
+   * be accompanied by an animation.
+   * 
+   * <p>
+   * However, if the component is expanded and <code>val</code> is true, then
+   * this call collapses the JXCollapsiblePane, such that the entire
+   * JXCollapsiblePane will be invisible. If {@link #isAnimated()} returns true,
+   * the collapse will be accompanied by an animation.
+   * 
+   * @see #isAnimated()
+   * @see #setAnimated(boolean)
    * @javabean.property
-   *          bound="true"
-   *          preferred="true"
+   *    bound="true"
+   *    preferred="true"
    */
   public void setCollapsed(boolean val) {
     if (collapsed != val) {
@@ -220,10 +293,13 @@ public class JXCollapsiblePane extends JPanel {
     return getPreferredSize();
   }
 
-  /*
-   * (non-Javadoc)
+  /**
+   * The critical part of the animation of this <code>JXCollapsiblePane</code>
+   * relies on the calculation of its preferred size. During the animation, its
+   * preferred size (specially its height) will change, when expanding, from 0
+   * to the preferred size of the content pane, and the reverse when collapsing.
    * 
-   * @see java.awt.Component#getPreferredSize()
+   * @return this component preferred size
    */
   public Dimension getPreferredSize() {
     /*
@@ -368,9 +444,13 @@ public class JXCollapsiblePane extends JPanel {
           :animationParams.deltaY;
         int newHeight = wrapper.getHeight() + delta_y;
         if (contracting) {
-          newHeight = newHeight < finalHeight?finalHeight:newHeight;
+          if (newHeight < finalHeight) {
+            newHeight = finalHeight;
+          }
         } else {
-          newHeight = newHeight > finalHeight?finalHeight:newHeight;
+          if (newHeight > finalHeight) {
+            newHeight = finalHeight;
+          }
         }
         animateAlpha = (float)newHeight
           / (float)wrapper.c.getPreferredSize().height;
