@@ -152,6 +152,16 @@ public class JXTitledPanel extends JXPanel {
         return uiClassID;
     }
 
+    /**
+     * Notification from the <code>UIManager</code> that the L&F has changed.
+     * Replaces the current UI object with the latest version from the <code>UIManager</code>.
+     * 
+     * @see javax.swing.JComponent#updateUI
+     */
+    public void updateUI() {
+      setUI((TitledPanelUI)LookAndFeelAddons.getUI(this, TitledPanelUI.class));
+    }
+    
 	public String getTitle() {
 		return title;
 	}
