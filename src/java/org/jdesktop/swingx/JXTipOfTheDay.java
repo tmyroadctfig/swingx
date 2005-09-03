@@ -22,8 +22,10 @@ import org.jdesktop.swingx.tips.TipOfTheDayModel.Tip;
 
 /**
  * Provides the "Tip of The Day" pane and dialog.<br>
- * Tips are retrieved from the {@link org.jdesktop.swingx.tips.TipOfTheDayModel}. In the
- * most common usage, a tip (as returned by
+ * 
+ * <p>
+ * Tips are retrieved from the {@link org.jdesktop.swingx.tips.TipOfTheDayModel}.
+ * In the most common usage, a tip (as returned by
  * {@link org.jdesktop.swingx.tips.TipOfTheDayModel.Tip#getTip()}) is just a
  * <code>String</code>. However, the return type of this method is actually
  * <code>Object</code>. Its interpretation depends on its type:
@@ -39,10 +41,70 @@ import org.jdesktop.swingx.tips.TipOfTheDayModel.Tip;
  * <code>JEditorPane</code> or <code>JTextArea</code> and displayed.
  * </dl>
  * 
- * @author Frederic Lavigne
+ * <p>
+ * <code>JXTipOfTheDay<code> finds its tips in its {@link org.jdesktop.swingx.tips.TipOfTheDayModel}.
+ * Such model can be programmatically built using {@link org.jdesktop.swingx.tips.DefaultTipOfTheDayModel}
+ * and {@link org.jdesktop.swingx.tips.DefaultTip} but
+ * the {@link org.jdesktop.swingx.tips.TipLoader} provides a convenient method to
+ * build a model and its tips from a {@link java.util.Properties} object.
+ *
+ * <p>
+ * Example:
+ * <p>
+ * Let's consider a file <i>tips.properties</i> with the following content:
+ * <pre>
+ * <code>
+ * tip.1.description=This is the first time! Plain text.
+ * tip.2.description=&lt;html&gt;This is &lt;b&gt;another tip&lt;/b&gt;, it uses HTML!
+ * tip.3.description=A third one
+ * </code>
+ * </pre>
+ *
+ * To load and display the tips:
+ * 
+ * <pre>
+ * <code>
+ * Properties tips = new Properties();
+ * tips.load(new FileInputStream("tips.properties"));
+ * 
+ * TipOfTheDayModel model = TipLoader.load(tips);
+ * JXTipOfTheDay totd = new JXTipOfTheDay(model);
+ * 
+ * totd.showDialog(someParentComponent);
+ * </code>
+ * </pre>
+ * 
+ * <p>
+ * Additionally, <code>JXTipOfTheDay</code> features an option enabling the end-user
+ * to choose to not display the "Tip Of The Day" dialog. This user choice can be stored
+ * in the user {@link java.util.prefs.Preferences} but <code>JXTipOfTheDay</code> also
+ * supports custom storage through the {@link org.jdesktop.swingx.JXTipOfTheDay.ShowOnStartupChoice} interface.
+ * 
+ * <pre>
+ * <code>
+ * Preferences userPreferences = Preferences.userRoot().node("myApp");
+ * totd.showDialog(someParentComponent, userPreferences);
+ * </code>
+ * </pre>
+ * In this code, the first time showDialog is called, the dialog will be made 
+ * visible and the user will have the choice to not display it again in the future
+ * (usually this is controlled by a checkbox "Show tips on startup"). If the user
+ * unchecks the option, subsequent calls to showDialog will not display the dialog.
+ * As the choice is saved in the user Preferences, it will persist when the application is relaunched.
+ * 
+ * @see org.jdesktop.swingx.tips.TipLoader
+ * @see org.jdesktop.swingx.tips.TipOfTheDayModel
+ * @see org.jdesktop.swingx.tips.TipOfTheDayModel.Tip
+ * @see #showDialog(Component, Preferences)
+ * @see #showDialog(Component, ShowOnStartupChoice)
+ * 
+ * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
  */
 public class JXTipOfTheDay extends JXPanel {
 
+  /**
+   * JXTipOfTheDay pluggable UI key <i>swingx/TipOfTheDayUI</i> 
+   */
   public final static String uiClassID = "swingx/TipOfTheDayUI";
 
   // ensure at least the default ui is registered
@@ -341,7 +403,10 @@ public class JXTipOfTheDay extends JXPanel {
 
   /**
    * Calls
-   * {@link TipOfTheDayUI#createDialog(Component, JXTipOfTheDay.ShowOnStartupChoice)}
+   * {@link TipOfTheDayUI#createDialog(Component, JXTipOfTheDay.ShowOnStartupChoice)}.
+   * 
+   * This method can be overriden in order to control things such as the
+   * placement of the dialog or its title.
    * 
    * @param parentComponent
    * @param choice
@@ -358,7 +423,16 @@ public class JXTipOfTheDay extends JXPanel {
    * "Show tips on startup" choice.
    */
   public static interface ShowOnStartupChoice {
+    
+    /**
+     * Persists the user choice
+     * @param showOnStartup the user choice
+     */
     void setShowingOnStartup(boolean showOnStartup);
+    
+    /**
+     * @return the previously stored user choice
+     */
     boolean isShowingOnStartup();
   }
 
