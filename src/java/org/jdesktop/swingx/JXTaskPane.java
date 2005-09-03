@@ -218,8 +218,7 @@ public class JXTaskPane extends JPanel implements
     if (collapsePane == null) {
       return;
     }
-    setUI((TaskPaneUI)LookAndFeelAddons.getUI(this, TaskPaneUI.class,
-      UIManager.getUI(this)));
+    setUI((TaskPaneUI)LookAndFeelAddons.getUI(this, TaskPaneUI.class));
   }
   
   /**

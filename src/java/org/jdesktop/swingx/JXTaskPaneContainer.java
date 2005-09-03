@@ -12,7 +12,6 @@ import java.awt.Rectangle;
 import javax.swing.JComponent;
 import javax.swing.JViewport;
 import javax.swing.Scrollable;
-import javax.swing.UIManager;
 
 import org.jdesktop.swingx.plaf.JXTaskPaneContainerAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
@@ -108,8 +107,7 @@ public class JXTaskPaneContainer extends JComponent implements Scrollable {
    * @see javax.swing.JComponent#updateUI
    */
   public void updateUI() {
-    setUI((TaskPaneContainerUI)LookAndFeelAddons.getUI(this, TaskPaneContainerUI.class, UIManager
-      .getUI(this)));
+    setUI((TaskPaneContainerUI)LookAndFeelAddons.getUI(this, TaskPaneContainerUI.class));
   }
 
   /**

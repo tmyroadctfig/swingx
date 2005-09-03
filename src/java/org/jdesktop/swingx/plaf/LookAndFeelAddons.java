@@ -51,6 +51,12 @@ public class LookAndFeelAddons {
   private static List<ComponentAddon> contributedComponents =
     new ArrayList<ComponentAddon>();
 
+  /**
+   * Key used to ensure the current UIManager has been populated by the
+   * LookAndFeelAddons.
+   */
+  private static final Object APPCONTEXT_INITIALIZED = new Object();
+  
   static {
     // load the default addon
     String addonClassname = getBestMatchAddonClassName();
@@ -133,7 +139,8 @@ public class LookAndFeelAddons {
     }
 
     addon.initialize();
-    currentAddon = addon;
+    currentAddon = addon;    
+    UIManager.put(APPCONTEXT_INITIALIZED, Boolean.TRUE);
   }
 
   public static LookAndFeelAddons getAddon() {
@@ -226,22 +233,34 @@ public class LookAndFeelAddons {
   }
 
   /**
-   * Workaround for IDE mixing up with classloaders (like netbeans).
-   * Consider this method as API private. It must not be called
-   * directly.
+   * Workaround for IDE mixing up with classloaders and Applets environments.
+   * Consider this method as API private. It must not be called directly.
    * 
-   * @param p_Component
-   * @return an instance of p_ExpectedUIClass 
+   * @param component
+   * @param expectedUIClass
+   * @return an instance of expectedUIClass 
    */
-  public static ComponentUI getUI(JComponent p_Component,
-    Class p_ExpectedUIClass, ComponentUI p_CandidateUI) {
-    if (p_ExpectedUIClass.isInstance(p_CandidateUI)) {
-      return p_CandidateUI;
+  public static ComponentUI getUI(JComponent component, Class expectedUIClass) {
+    maybeInitialize();
+
+    // solve issue with ClassLoader not able to find classes
+    String uiClassname = (String)UIManager.get(component.getUIClassID());
+    try {
+      Class uiClass = Class.forName(uiClassname);
+      UIManager.put(uiClassname, uiClass);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    
+    ComponentUI ui = UIManager.getUI(component);
+    
+    if (expectedUIClass.isInstance(ui)) {
+      return ui;
     } else {
-      String realUI = p_CandidateUI.getClass().getName();
+      String realUI = ui.getClass().getName();
       Class realUIClass;
       try {
-        realUIClass = p_ExpectedUIClass.getClassLoader()
+        realUIClass = expectedUIClass.getClassLoader()
         .loadClass(realUI);
       } catch (ClassNotFoundException e) {
         throw new RuntimeException("Failed to load class " + realUI, e);
@@ -253,9 +272,32 @@ public class LookAndFeelAddons {
         throw new RuntimeException("Class " + realUI + " has no method createUI(JComponent)");
       }
       try {
-        return (ComponentUI)createUIMethod.invoke(null, new Object[]{p_Component});
+        return (ComponentUI)createUIMethod.invoke(null, new Object[]{component});
       } catch (Exception e2) {
         throw new RuntimeException("Failed to invoke " + realUI + "#createUI(JComponent)");
+      }
+    }
+  }
+  
+  /**
+   * With applets, if you reload the current applet, the UIManager will be
+   * reinitialized (entries previously added by LookAndFeelAddons will be
+   * removed) but the addon will not reinitialize because addon initialize
+   * itself through the static block in components and the classes do not get
+   * reloaded. This means component.updateUI will fail because it will not find
+   * its UI.
+   * 
+   * This method ensures LookAndFeelAddons get re-initialized if needed. It must
+   * be called in every component updateUI methods.
+   */
+  private static synchronized void maybeInitialize() {
+    if (currentAddon != null) {
+      // this is to ensure "UIManager#maybeInitialize" gets called and the
+      // LAFState initialized
+      UIManager.getLookAndFeelDefaults();
+      
+      if (!UIManager.getBoolean(APPCONTEXT_INITIALIZED)) {
+        setAddon(currentAddon);
       }
     }
   }

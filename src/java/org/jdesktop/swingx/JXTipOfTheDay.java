@@ -11,7 +11,6 @@ import java.awt.HeadlessException;
 import java.util.prefs.Preferences;
 
 import javax.swing.JDialog;
-import javax.swing.UIManager;
 
 import org.jdesktop.swingx.plaf.JXTipOfTheDayAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
@@ -152,8 +151,7 @@ public class JXTipOfTheDay extends JXPanel {
    * @see javax.swing.JComponent#updateUI
    */
   public void updateUI() {
-    setUI((TipOfTheDayUI)LookAndFeelAddons.getUI(this, TipOfTheDayUI.class,
-      UIManager.getUI(this)));
+    setUI((TipOfTheDayUI)LookAndFeelAddons.getUI(this, TipOfTheDayUI.class));
   }
 
   /**
