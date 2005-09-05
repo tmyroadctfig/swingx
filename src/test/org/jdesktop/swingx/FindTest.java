@@ -106,9 +106,10 @@ public class FindTest extends InteractiveTestCase {
         if (GraphicsEnvironment.isHeadless()) {
             return;
         }
-
-        JXFindDialog dialog = new JXFindDialog();
-        dialog.doFind();
+        JXFindPanel find = new JXFindPanel();
+        find.match();
+//        JXFindDialog dialog = new JXFindDialog();
+//        dialog.doFind();
     }
     /**
      * Not longer valid: 

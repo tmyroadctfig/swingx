@@ -71,7 +71,7 @@ import org.jdesktop.swingx.action.Targetable;
  *
  * @author Mark Davidson
  */
-public class JXEditorPane extends JEditorPane implements Searchable, Targetable {
+public class JXEditorPane extends JEditorPane implements /*Searchable, */Targetable {
 
 //    private Matcher matcher;
 
@@ -104,6 +104,7 @@ public class JXEditorPane extends JEditorPane implements Searchable, Targetable 
     private final static String ACTION_PASTE = "paste";
 
     private TargetableSupport targetSupport = new TargetableSupport(this);
+    private Searchable searchable;
     
     public JXEditorPane() {
         init();
@@ -412,112 +413,181 @@ public class JXEditorPane extends JEditorPane implements Searchable, Targetable 
     }
 
     private void find() {
-        SearchFactory.getInstance().showFindInput(this, this);
+        SearchFactory.getInstance().showFindInput(this, getSearchable());
 //        if (dialog == null) {
 //            dialog = new JXFindDialog(this);
 //        }
 //        dialog.setVisible(true);
     }
 
-    public int search(String searchString) {
-        return search(searchString, -1);
-    }
-
-    public int search(String searchString, int columnIndex) {
-        Pattern pattern = null;
-        if (searchString !=  null) {
-            return search(Pattern.compile(searchString, 0), columnIndex);
-        }
-        return -1;
-    }
-
-    public int search(Pattern pattern) {
-        return search(pattern, -1);
-    }
-
-    public int search(Pattern pattern, int startIndex) {
-        return search(pattern, startIndex, false);
-    }
-
-    Position lastFound;
-    int lastStartIndex;
-    MatchResult lastMatchResult;
-    
     /**
-     * @return start position of matching string or -1
+     * 
+     * @returns a not-null Searchable for this editor.  
      */
-    public int search(Pattern pattern, final int startIndex, boolean backwards) {
-        if ((pattern == null) || 
-                (getDocument().getLength() == 0) ||
-                ((startIndex > -1 ) && (getDocument().getLength() < startIndex))){
-//            System.out.println("shortcut out *" + getText() + "* "+ startIndex);
-            updateStateAfterNotFound(startIndex);
+    public Searchable getSearchable() {
+        if (searchable == null) {
+            searchable = new DocumentSearchable();
+        }
+        return searchable;
+    }
+
+    /**
+     * sets the Searchable for this editor. If null, a default 
+     * searchable will be used.
+     * 
+     * @param searchable
+     */
+    public void setSearchable(Searchable searchable) {
+        this.searchable = searchable;
+    }
+    
+    public class DocumentSearchable implements Searchable {
+        public int search(String searchString) {
+            return search(searchString, -1);
+        }
+
+        public int search(String searchString, int columnIndex) {
+            Pattern pattern = null;
+            if (searchString != null) {
+                return search(Pattern.compile(searchString, 0), columnIndex);
+            }
             return -1;
         }
 
-        
-        int start;
-        int length;
-        if (backwards) {
-            start = 0;
-            if (startIndex < 0) {
-                length = getDocument().getLength() - 1;
-            } else {
-                length =  - 1 + startIndex;
-            }
-        } else {
-            start = startIndex + 1;
-            length = getDocument().getLength() - 1 - startIndex;
-        }
-//        Position position = getDocument().createPosition(startIndex);
-        Segment segment = new Segment();
-        
-        try {
-            getDocument().getText(start, length, segment);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        public int search(Pattern pattern) {
+            return search(pattern, -1);
         }
 
-        Matcher matcher = pattern.matcher(segment.toString());
-        if (backwards) {
+        public int search(Pattern pattern, int startIndex) {
+            return search(pattern, startIndex, false);
+        }
+
+//        Position lastFound;
+
+        int lastFoundIndex = -1;
+
+        MatchResult lastMatchResult;
+
+        /**
+         * @return start position of matching string or -1
+         */
+        public int search(Pattern pattern, final int startIndex,
+                boolean backwards) {
+            if ((pattern == null)
+                    || (getDocument().getLength() == 0)
+                    || ((startIndex > -1) && (getDocument().getLength() < startIndex))) {
+                // System.out.println("shortcut out *" + getText() + "* "+
+                // startIndex);
+                updateStateAfterNotFound(startIndex);
+                return -1;
+            }
+
+            int start = startIndex;
+            if ((startIndex >= 0) && (startIndex == lastFoundIndex)) {
+                int length = getDocument().getLength() - startIndex;
+                // Position position = getDocument().createPosition(startIndex);
+                Segment segment = new Segment();
+
+                try {
+                    getDocument().getText(start, length, segment);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                Matcher matcher = pattern.matcher(segment.toString());
+                MatchResult currentResult = getMatchResult(matcher, true);
+                if (currentResult != null) {
+                    if ((currentResult.start() == 0) && 
+                       (!lastMatchResult.group().equals(currentResult.group()))) {
+                        updateStateAfterFound(currentResult, start);
+                        return lastFoundIndex;
+                    } 
+                }
+                start++;
+            }
+
+            int length;
+            if (backwards) {
+                start = 0;
+                if (startIndex < 0) {
+                    length = getDocument().getLength() - 1;
+                } else {
+                    length = -1 + startIndex;
+                }
+            } else {
+                //start = startIndex + 1;
+                if (start < 0) start = 0;
+                length = getDocument().getLength() - start;
+            }
+            // Position position = getDocument().createPosition(startIndex);
+            Segment segment = new Segment();
+
+            try {
+                getDocument().getText(start, length, segment);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
+            Matcher matcher = pattern.matcher(segment.toString());
+            if (backwards) {
+                MatchResult currentResult = getMatchResult(matcher, false);
+                if (currentResult != null) {
+                    start = updateStateAfterFound(currentResult, start);
+                } else {
+                    updateStateAfterNotFound(startIndex);
+                    return -1;
+                }
+
+            } else {
+                MatchResult currentResult = getMatchResult(matcher, true);
+                if (currentResult != null) {//(matcher.find()) {
+                    start = updateStateAfterFound(currentResult, start);
+                } else {
+                    updateStateAfterNotFound(startIndex);
+                    return -1;
+                }
+            }
+            return start;
+        }
+
+        /**
+         * @param currentResult
+         * @param offset
+         * @return
+         */
+        private int updateStateAfterFound(MatchResult currentResult, final int offset) {
+            int end = currentResult.end() + offset;
+            int found = currentResult.start() + offset; 
+            select(found, end);
+            getCaret().setSelectionVisible(true);
+            lastFoundIndex = found;
+            lastMatchResult = currentResult;
+            return found;
+        }
+
+        /**
+         * @param matcher
+         * @return
+         */
+        private MatchResult getMatchResult(Matcher matcher, boolean  useFirst) {
             MatchResult currentResult = null;
             while (matcher.find()) {
                 currentResult = matcher.toMatchResult();
+                if (useFirst) break;
             }
-            if (currentResult != null) {
-                start = currentResult.start();
-                int end = currentResult.end();
-                select(start, end);
-                getCaret().setSelectionVisible(true);
-            } else {
-                updateStateAfterNotFound(startIndex);
-                return -1;
-            }
-            
-        } else {
-            if (matcher.find()) {
-                int end = matcher.end() + start;
-                start = matcher.start() + start; //Index;
-                select(start, end);
-                getCaret().setSelectionVisible(true);
-            } else {
-                updateStateAfterNotFound(startIndex);
-                return -1;
-            }
+            return currentResult;
         }
-        return start;
-    }
 
-    /**
-     * @param startIndex
-     */
-    private void updateStateAfterNotFound(int startIndex) {
-        lastStartIndex = -1;
-        lastMatchResult = null;
-        setCaretPosition(getSelectionEnd());
-//        setCaretPosition(startIndex > -1 ? startIndex : 0);
-    }
+        /**
+         * @param startIndex
+         */
+        private void updateStateAfterNotFound(int startIndex) {
+            lastFoundIndex = -1;
+            lastMatchResult = null;
+            setCaretPosition(getSelectionEnd());
+        }
 
+    }
+    
     public boolean hasCommand(Object command) {
         return targetSupport.hasCommand(command);
     }
