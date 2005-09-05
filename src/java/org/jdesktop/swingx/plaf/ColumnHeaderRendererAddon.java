@@ -16,7 +16,10 @@ import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 import org.jdesktop.swingx.util.OS;
 
 /**
- * Addon for <code>JXTable</code>.<br>
+ * Addon for ColumnHeaderRenderer.<p>
+ * Loads LF specific sort icons.
+ * 
+ * @author Jeanette Winzenburg
  *
  */
 public class ColumnHeaderRendererAddon extends AbstractComponentAddon {

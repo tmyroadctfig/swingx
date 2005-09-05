@@ -67,7 +67,7 @@ public class FindTest extends InteractiveTestCase {
             int useIndex = -1;
             int lastIndex = -1;
             for (int i = 0; i < 9; i++) {
-                lastIndex = editor.search("four", useIndex);
+                lastIndex = editor.getSearchable().search("four", useIndex);
                 assertTrue(lastIndex != -1);
                 assertTrue(lastIndex != useIndex);
 

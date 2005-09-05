@@ -13,8 +13,7 @@ import javax.swing.JComponent;
 import javax.swing.JScrollBar;
 
 /**
- * @author (C) 2004 Jeanette Winzenburg, Berlin
- * @version $Revision$ - $Date$
+ * @author Jeanette Winzenburg
  */
 public class ScrollBarContextMenuSource extends ContextMenuSource {
 

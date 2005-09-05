@@ -1,6 +1,8 @@
 /*
- * Created on 18.08.2005
+ * $Id$
  *
+ * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
+ * Santa Clara, California 95054, U.S.A. All rights reserved.
  */
 package org.jdesktop.swingx;
 
@@ -10,6 +12,11 @@ import junit.framework.TestCase;
 
 import org.jdesktop.swingx.util.PropertyChangeReport;
 
+/**
+ * Testing PatternModel.
+ * 
+ * @author Jeanette Winzenburg
+ */
 public class PatternModelTest extends TestCase {
 
     final static String startAnchor = "^";
@@ -36,6 +43,7 @@ public class PatternModelTest extends TestCase {
         List rules = model.getMatchRules();
         assertNotNull("rules must not be null", rules);
     }
+    
     public void testRegexCreator() {
         PatternModel model = new PatternModel();
         model.addPropertyChangeListener(propertyReport);

@@ -1,6 +1,8 @@
 /*
- * Created on 26.08.2005
+ * $Id$
  *
+ * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
+ * Santa Clara, California 95054, U.S.A. All rights reserved.
  */
 package org.jdesktop.swingx;
 
@@ -22,6 +24,7 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  * 
  * PENDING: add methods to return JXSearchPanels?
  * 
+ * @author Jeanette Winzenburg
  */
 public class SearchFactory {
     // PENDING: rename methods to batch/incremental instead of dialog/toolbar
