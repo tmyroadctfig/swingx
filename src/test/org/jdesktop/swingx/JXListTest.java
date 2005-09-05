@@ -1,6 +1,8 @@
 /*
- * Created on 07.06.2005
+ * $Id$
  *
+ * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
+ * Santa Clara, California 95054, U.S.A. All rights reserved.
  */
 package org.jdesktop.swingx;
 
@@ -22,14 +24,18 @@ import org.jdesktop.swingx.action.EditorPaneLinkVisitor;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.ConditionalHighlighter;
+import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
+import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.decorator.Sorter;
 
 /**
+ * Testing JXList.
+ * 
  * @author Jeanette Winzenburg
  */
 public class JXListTest extends InteractiveTestCase {
@@ -102,19 +108,42 @@ public class JXListTest extends InteractiveTestCase {
                 0, list.getSelectedIndex());
         
     }
+    
+    /**
+     * related to #2-swinglabs: clarify behaviour to expect if 
+     * filtering disabled?
+     *
+     */
     public void testSortingFilterDisabled() {
         JXList list = new JXList();
         list.setModel(ascendingListModel);
         Sorter sorter = new ShuttleSorter(0, false);
         FilterPipeline pipeline = list.getFilters();
-        assertNotNull(pipeline);
-        pipeline.setSorter(sorter);
-        assertSame(ascendingListModel, list.getModel());
-        assertEquals(ascendingListModel.getSize(), list.getModelSize());
-        assertEquals(ascendingListModel.getElementAt(0), list.getElementAt(0));
+        // Probably wrong assumption for disabled filtering
+//        assertNotNull(pipeline);
+//        pipeline.setSorter(sorter);
+//        assertSame(ascendingListModel, list.getModel());
+//        assertEquals(ascendingListModel.getSize(), list.getModelSize());
+//        assertEquals(ascendingListModel.getElementAt(0), list.getElementAt(0));
         
     }
 
+    /**
+     * Issue #2-swinglabs: setting filter if not enabled throws exception on selection.
+     * Reported by Kim.
+     * 
+     * Fix: should not accept filter if not enabled.
+     *
+     */
+    public void interactiveTestFilterDisabled() {
+        JXList list = new JXList();
+        list.setModel(ascendingListModel);
+        Filter[] filter = new Filter[] { new PatternFilter("1", 0, 0) };
+        list.setFilters(new FilterPipeline(filter));
+        JXFrame frame = wrapWithScrollingInFrame(list, "filter disabled");
+        frame.setVisible(true);
+    }
+    
     public void interactiveTestSorter() {
         JXList list = new JXList();
         list.setFilterEnabled(true);
@@ -259,7 +288,7 @@ public class JXListTest extends InteractiveTestCase {
          //   test.runInteractiveTests("interactive.*Column.*");
          //   test.runInteractiveTests("interactive.*TableHeader.*");
          //   test.runInteractiveTests("interactive.*Render.*");
-            test.runInteractiveTests("interactive.*Sort.*");
+            test.runInteractiveTests("interactive.*Disab.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
