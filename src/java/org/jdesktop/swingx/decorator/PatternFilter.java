@@ -46,8 +46,12 @@ public class PatternFilter extends Filter implements PatternMatcher {
      * @see java.util.regex.Pattern
      */
     public void setPattern(Pattern pattern) {
-        this.pattern = pattern;
-        refresh();
+        if (pattern == null) {
+            setPattern(null, 0);
+        } else {
+            this.pattern = pattern;
+            refresh();
+        }
     }
 
     /**
@@ -86,7 +90,15 @@ public class PatternFilter extends Filter implements PatternMatcher {
         }
     }
 
+    /**
+     * @param row
+     * @return
+     */
     public boolean test(int row) {
+        // PENDING: wrong false?
+        // null pattern should be treated the same as null searchString
+        // which is open
+        // !testable should be clarified to mean "ignore" when filtering
         if (pattern == null) {
             return false;
         }
