@@ -7,31 +7,18 @@
 
 package org.jdesktop.swingx;
 
-import java.awt.Container;
-import java.awt.Dimension;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import javax.swing.Action;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
 
-import org.jdesktop.swingx.action.AbstractActionExt;
-import org.jdesktop.swingx.action.ActionContainerFactory;
-import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.PatternMatcher;
-import org.jdesktop.swingx.plaf.LookAndFeelAddons;
-import org.jdesktop.swingx.plaf.SearchPanelAddon;
 
 /**
  * Rudimentary search panel.

@@ -69,7 +69,6 @@ import org.jdesktop.swingx.decorator.RowSizing;
 import org.jdesktop.swingx.decorator.Selection;
 import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.icon.ColumnControlIcon;
-import org.jdesktop.swingx.plaf.JXTableAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.table.ColumnFactory;
@@ -172,7 +171,7 @@ public class JXTable extends JTable implements Searchable {
 
     static {
         // Hack: make sure the resource bundle is loaded
-        LookAndFeelAddons.contribute(new JXTableAddon());
+        LookAndFeelAddons.getAddon();
     }
 
     /** The FilterPipeline for the table. */
