@@ -478,29 +478,14 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
                     || ((startIndex > -1) && (getDocument().getLength() < startIndex))) {
                 // System.out.println("shortcut out *" + getText() + "* "+
                 // startIndex);
-                updateStateAfterNotFound(startIndex);
+                updateStateAfterNotFound();
                 return -1;
             }
 
             int start = startIndex;
-            if ((startIndex >= 0) && (startIndex == lastFoundIndex)) {
-                int length = getDocument().getLength() - startIndex;
-                // Position position = getDocument().createPosition(startIndex);
-                Segment segment = new Segment();
-
-                try {
-                    getDocument().getText(start, length, segment);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                Matcher matcher = pattern.matcher(segment.toString());
-                MatchResult currentResult = getMatchResult(matcher, true);
-                if (currentResult != null) {
-                    if ((currentResult.start() == 0) && 
-                       (!lastMatchResult.group().equals(currentResult.group()))) {
-                        updateStateAfterFound(currentResult, start);
-                        return lastFoundIndex;
-                    } 
+            if (maybeExtendedMatch(startIndex)) {
+                if (foundExtendedMatch(pattern, start)) {
+                    return lastFoundIndex;
                 }
                 start++;
             }
@@ -514,8 +499,9 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
                     length = -1 + startIndex;
                 }
             } else {
-                //start = startIndex + 1;
-                if (start < 0) start = 0;
+                // start = startIndex + 1;
+                if (start < 0)
+                    start = 0;
                 length = getDocument().getLength() - start;
             }
             // Position position = getDocument().createPosition(startIndex);
@@ -528,25 +514,80 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
             }
 
             Matcher matcher = pattern.matcher(segment.toString());
-            if (backwards) {
-                MatchResult currentResult = getMatchResult(matcher, false);
-                if (currentResult != null) {
-                    start = updateStateAfterFound(currentResult, start);
-                } else {
-                    updateStateAfterNotFound(startIndex);
-                    return -1;
-                }
-
+            MatchResult currentResult = getMatchResult(matcher, !backwards);
+            if (currentResult != null) {
+                updateStateAfterFound(currentResult, start);
             } else {
-                MatchResult currentResult = getMatchResult(matcher, true);
-                if (currentResult != null) {//(matcher.find()) {
-                    start = updateStateAfterFound(currentResult, start);
-                } else {
-                    updateStateAfterNotFound(startIndex);
-                    return -1;
-                }
+                updateStateAfterNotFound();
             }
-            return start;
+            return lastFoundIndex;
+
+            // if (backwards) {
+            // MatchResult currentResult = getMatchResult(matcher, false);
+            // if (currentResult != null) {
+            // start = updateStateAfterFound(currentResult, start);
+            // } else {
+            // updateStateAfterNotFound(startIndex);
+            // return -1;
+            // }
+            //
+            // } else {
+            // MatchResult currentResult = getMatchResult(matcher, true);
+            // if (currentResult != null) {//(matcher.find()) {
+            // start = updateStateAfterFound(currentResult, start);
+            // } else {
+            //                    updateStateAfterNotFound(startIndex);
+            //                    return -1;
+            //                }
+            //            }
+            //            return start;
+        }
+
+        /**
+         * Search from same startIndex as the previous search. 
+         * Checks if the match is different from the last (either 
+         * extended/reduced) at the same position. Returns true
+         * if the current match result represents a different match 
+         * than the last, false if no match or the same.
+         * 
+         * @param pattern
+         * @param start
+         * @return
+         */
+        private boolean foundExtendedMatch(Pattern pattern, int start) {
+            boolean foundExtended = false;
+            int length = getDocument().getLength() - start;
+            // Position position = getDocument().createPosition(startIndex);
+            Segment segment = new Segment();
+
+            try {
+                getDocument().getText(start, length, segment);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            Matcher matcher = pattern.matcher(segment.toString());
+            MatchResult currentResult = getMatchResult(matcher, true);
+            if (currentResult != null) {
+                // JW: how to compare match results reliably?
+                // the group().equals probably isn't the best idea...
+                if ((currentResult.start() == 0) && 
+                   (!lastMatchResult.group().equals(currentResult.group()))) {
+                    updateStateAfterFound(currentResult, start);
+                    foundExtended = true;
+                } 
+            }
+            return foundExtended;
+        }
+
+        /**
+         * Checks if the startIndex is a candidate for trying a re-match.
+         * 
+         * 
+         * @param startIndex
+         * @return true if the startIndex should be re-matched, false if not.
+         */
+        private boolean maybeExtendedMatch(final int startIndex) {
+            return (startIndex >= 0) && (startIndex == lastFoundIndex);
         }
 
         /**
@@ -578,9 +619,8 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
         }
 
         /**
-         * @param startIndex
          */
-        private void updateStateAfterNotFound(int startIndex) {
+        private void updateStateAfterNotFound() {
             lastFoundIndex = -1;
             lastMatchResult = null;
             setCaretPosition(getSelectionEnd());
