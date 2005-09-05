@@ -111,39 +111,6 @@ public class FindTest extends InteractiveTestCase {
 //        JXFindDialog dialog = new JXFindDialog();
 //        dialog.doFind();
     }
-    /**
-     * Not longer valid: 
-     * there are no public methods in the FindDialog 
-     * to access patternModel flags.
-     * 
-     * PENDING: do we need it?
-     * 
-     * Simple test to ensure that flags are set correctly.
-     */
-    public void testFlags() {
-        // This test will not work in a headless configuration.
-        if (GraphicsEnvironment.isHeadless()) {
-            return;
-        }
-
-        JXFindDialog dialog = new JXFindDialog(new TestSearchable());
-
-        boolean[] states = { true, false, false, true, true };
-        for (int i = 0; i < states.length; i++) {
-//            dialog.setMatchFlag(states[i]);
-//            assertEquals(states[i], dialog.getMatchFlag());
-//
-//            dialog.setWrapFlag(states[i]);
-//            assertEquals(states[i], dialog.getWrapFlag());
-//
-//            dialog.setBackwardsFlag(states[i]);
-//            assertEquals(states[i], dialog.getBackwardsFlag());
-        }
-    }
-
-
-    public void testMatchCase() {
-    }
 
     public void interactiveShowDialog() {
         SearchFactory.getInstance().showFindInput(null, new TestSearchable());
@@ -177,7 +144,13 @@ public class FindTest extends InteractiveTestCase {
 
 
     public void showComponent(JComponent component, JComponent second) {
-        JXFrame frame = wrapWithScrollingInFrame(component, second, "Find");
+        
+        JXFrame frame;
+        if (second != null) {
+          frame = wrapWithScrollingInFrame(component, second, "Find");
+        } else {
+            frame= wrapWithScrollingInFrame(component, "Find");
+        }
         
         Action action = new TargetableAction("Find", "find");
         addAction(frame, action);
