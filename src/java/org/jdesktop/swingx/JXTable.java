@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.DefaultCellEditor;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -59,14 +60,16 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
-import org.jdesktop.swingx.JXEditorPane.DocumentSearchable;
 import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
+import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
+import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.PipelineEvent;
 import org.jdesktop.swingx.decorator.PipelineListener;
 import org.jdesktop.swingx.decorator.RowSizing;
+import org.jdesktop.swingx.decorator.SearchHighlighter;
 import org.jdesktop.swingx.decorator.Selection;
 import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.icon.ColumnControlIcon;
@@ -537,15 +540,6 @@ public class JXTable extends JTable { //implements Searchable {
 
     }
 
-    /** Opens the JXFindDialog for the table. */
-    private void find() {
-        SearchFactory.getInstance().showFindInput(this, getSearchable());
-//        if (dialog == null) {
-//            dialog = new JXFindDialog();
-//        }
-//        dialog.setSearchable(this);
-//        dialog.setVisible(true);
-    }
 
     private void initActionsAndBindings() {
         // Register the actions that this class can handle.
@@ -1284,6 +1278,17 @@ public class JXTable extends JTable { //implements Searchable {
 
 //----------------------- Search support 
 
+
+    /** Opens the find widget for the table. */
+    private void find() {
+        SearchFactory.getInstance().showFindInput(this, getSearchable());
+//        if (dialog == null) {
+//            dialog = new JXFindDialog();
+//        }
+//        dialog.setSearchable(this);
+//        dialog.setVisible(true);
+    }
+
     /**
      * 
      * @returns a not-null Searchable for this editor.  
@@ -1348,6 +1353,7 @@ public class JXTable extends JTable { //implements Searchable {
 
         // Save the last column with the match.
         private int lastCol = 0;
+        private SearchHighlighter searchHighlighter;
 
         /**
          * Performs a search across the table using a
@@ -1363,16 +1369,31 @@ public class JXTable extends JTable { //implements Searchable {
          * @return row with a match.
          */
         public int search(Pattern pattern, int startIndex, boolean backwards) {
+
+            int matchingRow = searchMatchingRow(pattern, startIndex, backwards);
+            moveMatchMarker(pattern, matchingRow, lastCol);
+            return matchingRow;
+
+        }
+
+
+        /**
+         * returns/updates the matching row/column indices.
+         * 
+         * @param pattern
+         * @param startIndex
+         * @param backwards
+         * @return
+         */
+        protected int searchMatchingRow(Pattern pattern, int startIndex, boolean backwards) {
             if (pattern == null) {
                 lastCol = 0;
                 return -1;
             }
             int rows = getRowCount();
             int endCol = getColumnCount();
-
             int matchRow = -1;
-
-            if (backwards) {
+            if (backwards == true) {
                 if (startIndex < 0)
                     startIndex = rows;
                 int startRow = startIndex - 1;
@@ -1380,8 +1401,7 @@ public class JXTable extends JTable { //implements Searchable {
                     for (int c = endCol - 1; c >= 0; c--) {
                         Object value = getValueAt(r, c);
                         if ((value != null) &&
-                                pattern.matcher(value.toString()).find()) {
-                            changeSelection(r, c, false, false);
+                            pattern.matcher(value.toString()).find()) {
                             matchRow = r;
                             lastCol = c;
                             break; // No need to search other columns
@@ -1397,8 +1417,7 @@ public class JXTable extends JTable { //implements Searchable {
                     for (int c = lastCol; c < endCol; c++) {
                         Object value = getValueAt(r, c);
                         if ((value != null) &&
-                                pattern.matcher(value.toString()).find()) {
-                            changeSelection(r, c, false, false);
+                            pattern.matcher(value.toString()).find()) {
                             matchRow = r;
                             lastCol = c;
                             break; // No need to search other columns
@@ -1409,18 +1428,52 @@ public class JXTable extends JTable { //implements Searchable {
                     }
                 }
             }
-
-            if (matchRow != -1) {
-                Object viewport = getParent();
-                if (viewport instanceof JViewport) {
-                    Rectangle rect = getCellRect(getSelectedRow(), 0, true);
-                    Point pt = ((JViewport) viewport).getViewPosition();
-                    rect.setLocation(rect.x - pt.x, rect.y - pt.y);
-                    ((JViewport) viewport).scrollRectToVisible(rect);
-                }
-            }
             return matchRow;
         }
+        
+        protected void moveMatchMarker(Pattern pattern, int row, int column) {
+            // ensureInsertedSearchHighlighters();
+            // getSearchHighlighter().setPattern(pattern);
+            // int modelColumn = convertColumnIndexToModel(column);
+            // getSearchHighlighter().setHighlightCell(row, modelColumn);
+            changeSelection(row, column, false, false);
+            if (!getAutoscrolls()) {
+                // scrolling not handled by moving selection
+                Rectangle cellRect = getCellRect(row, column, true);
+                if (cellRect != null) {
+                    scrollRectToVisible(cellRect);
+                }
+            }
+        }
+
+        private SearchHighlighter getSearchHighlighter() {
+            if (searchHighlighter == null) {
+               searchHighlighter = createSearchHighlighter();
+            }
+            return searchHighlighter;
+        }
+
+        private void ensureInsertedSearchHighlighters() {
+            if (getHighlighters() == null) {
+                setHighlighters(new HighlighterPipeline(new Highlighter[] {getSearchHighlighter()}));
+            } else if (!isInPipeline(getSearchHighlighter())){
+                getHighlighters().addHighlighter(getSearchHighlighter());
+            }
+        }
+
+        private boolean isInPipeline(PatternHighlighter searchHighlighter) {
+            Highlighter[] inPipeline = getHighlighters().getHighlighters();
+            for (int i = 0; i < inPipeline.length; i++) {
+                if (searchHighlighter.equals(inPipeline[i])) return true;
+            }
+            return false;
+        }
+
+        protected SearchHighlighter createSearchHighlighter() {
+            return new SearchHighlighter();
+        }
+        
+
 
     }
 //-------------------------------- sizing support
