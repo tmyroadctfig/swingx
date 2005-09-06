@@ -173,6 +173,9 @@ public class JXTable extends JTable { //implements Searchable {
     /** The prefix marker to find component related properties in the resourcebundle. */
     public static final String UIPREFIX = "JXTable.";
 
+    /** key for client property to use SearchHighlighter as match marker. */
+    public static final String MATCH_HIGHLIGHTER = "match.highlighter";
+
     static {
         // Hack: make sure the resource bundle is loaded
         LookAndFeelAddons.getAddon();
@@ -1311,6 +1314,7 @@ public class JXTable extends JTable { //implements Searchable {
     }
 
     public class TableSearchable implements Searchable {
+
         /**
          * Performs a search across the table using String that represents a
          * regex pattern; {@link java.util.regex.Pattern}. All columns and all
@@ -1352,6 +1356,7 @@ public class JXTable extends JTable { //implements Searchable {
         }
 
         // Save the last column with the match.
+        // TODO (JW) - lastCol should either be a valid column index or < 0
         private int lastCol = 0;
         private SearchHighlighter searchHighlighter;
 
@@ -1432,18 +1437,34 @@ public class JXTable extends JTable { //implements Searchable {
         }
         
         protected void moveMatchMarker(Pattern pattern, int row, int column) {
-            // ensureInsertedSearchHighlighters();
-            // getSearchHighlighter().setPattern(pattern);
-            // int modelColumn = convertColumnIndexToModel(column);
-            // getSearchHighlighter().setHighlightCell(row, modelColumn);
-            changeSelection(row, column, false, false);
-            if (!getAutoscrolls()) {
-                // scrolling not handled by moving selection
+            if (markByHighlighter()) {
                 Rectangle cellRect = getCellRect(row, column, true);
                 if (cellRect != null) {
                     scrollRectToVisible(cellRect);
                 }
+                 ensureInsertedSearchHighlighters();
+                 // TODO (JW) - cleanup SearchHighlighter state management
+                 if ((row >= 0) && (column >= 0)) { 
+                     getSearchHighlighter().setPattern(pattern);
+                     int modelColumn = convertColumnIndexToModel(column);
+                     getSearchHighlighter().setHighlightCell(row, modelColumn);
+                 } else {
+                     getSearchHighlighter().setPattern(null);
+                 }
+            } else { // use selection
+                changeSelection(row, column, false, false);
+                if (!getAutoscrolls()) {
+                    // scrolling not handled by moving selection
+                    Rectangle cellRect = getCellRect(row, column, true);
+                    if (cellRect != null) {
+                        scrollRectToVisible(cellRect);
+                    }
+                }
             }
+        }
+
+        private boolean markByHighlighter() {
+            return Boolean.TRUE.equals(getClientProperty(MATCH_HIGHLIGHTER));
         }
 
         private SearchHighlighter getSearchHighlighter() {

@@ -118,19 +118,26 @@ public class FindTest extends InteractiveTestCase {
     }
 
     public void interactiveShowList() {
-        showComponent(new JXList(new TestListModel()));
+        showComponent(new JXList(new TestListModel()), "Search in XList");
     }
     
     public void interactiveShowTable() {
-        showComponent(new JXTable(new TestTableModel()));
+        showComponent(new JXTable(new TestTableModel()), "Search in XTable");
+    }
+
+    public void interactiveCompareMatchMarker() {
+        JXTable first = new JXTable(new TestTableModel());
+        JXTable second = new JXTable(new TestTableModel());
+        second.putClientProperty(JXTable.MATCH_HIGHLIGHTER, Boolean.TRUE);
+        showComponent(first, second, "Mark Match by Selection <--> SearchHighlighter");
     }
 
     public void interactiveShowSplitPane() {
-       showComponent(createEditor(), new JXTable(new TestTableModel()));
+       showComponent(createEditor(), new JXTable(new TestTableModel()), "Targetable Search");
     }
     
     public void interactiveShowEditor() {
-        showComponent(createEditor());
+        showComponent(createEditor(), "Search in XEditorPane");
     }
 
     /**
@@ -148,13 +155,13 @@ public class FindTest extends InteractiveTestCase {
     }
 
 
-    public void showComponent(JComponent component, JComponent second) {
+    public void showComponent(JComponent component, JComponent second, String title) {
         
         JXFrame frame;
         if (second != null) {
-          frame = wrapWithScrollingInFrame(component, second, "Find");
+          frame = wrapWithScrollingInFrame(component, second, title);
         } else {
-            frame= wrapWithScrollingInFrame(component, "Find");
+            frame= wrapWithScrollingInFrame(component, title);
         }
         
         Action action = new TargetableAction("Find", "find");
@@ -163,8 +170,8 @@ public class FindTest extends InteractiveTestCase {
         frame.setVisible(true);
         
     }
-    public void showComponent(JComponent component) {
-        showComponent(component, null);
+    public void showComponent(JComponent component, String title) {
+        showComponent(component, null, title);
         // Must add a menu bar so that the Ctrl-F will work.
 //        JMenuBar menubar = new JMenuBar();
 //        JMenu menu = menubar.add(new JMenu("File"));
