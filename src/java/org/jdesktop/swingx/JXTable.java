@@ -59,6 +59,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
+import org.jdesktop.swingx.JXEditorPane.DocumentSearchable;
 import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
@@ -147,7 +148,7 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * @author Mark Davidson
  * @author Jeanette Winzenburg
  */
-public class JXTable extends JTable implements Searchable {
+public class JXTable extends JTable { //implements Searchable {
     /**
      * Constant string for horizontal scroll actions, used in JXTable's Action
      * Map.
@@ -204,6 +205,12 @@ public class JXTable extends JTable implements Searchable {
     /** The default number of visible rows (in a ScrollPane). */
     private int visibleRowCount = 18;
 
+    private RowSizing rowSizing;
+
+    private Field rowModelField;
+
+    private boolean rowHeightEnabled;
+
     /**
      * flag to indicate if the column control is visible.
      */
@@ -219,10 +226,6 @@ public class JXTable extends JTable implements Searchable {
      * which to hide
      */
     private JComponent columnControlButton;
-
-    /** The JXFindDialog we open on find() */
-    private static JXFindDialog dialog;
-
 
     /**
      * Mouse/Motion/Listener keeping track of mouse moved in cell coordinates.
@@ -245,6 +248,8 @@ public class JXTable extends JTable implements Searchable {
      *  the height has not been set explicitly by the application.
      */
     protected boolean isXTableRowHeightSet;
+
+    protected Searchable searchable;
 
     /** Instantiates a JXTable with a default table model, no data. */
     public JXTable() {
@@ -534,7 +539,7 @@ public class JXTable extends JTable implements Searchable {
 
     /** Opens the JXFindDialog for the table. */
     private void find() {
-        SearchFactory.getInstance().showFindInput(this, this);
+        SearchFactory.getInstance().showFindInput(this, getSearchable());
 //        if (dialog == null) {
 //            dialog = new JXFindDialog();
 //        }
@@ -551,7 +556,7 @@ public class JXTable extends JTable implements Searchable {
         map.put(PACKSELECTED_ACTION_COMMAND, createPackSelectedAction());
         map.put(HORIZONTALSCROLL_ACTION_COMMAND, createHorizontalScrollAction());
         // this should be handled by the LF!
-        KeyStroke findStroke = KeyStroke.getKeyStroke("F3");
+        KeyStroke findStroke = KeyStroke.getKeyStroke("control F");
         getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(findStroke, "find");
     }
 
@@ -1278,132 +1283,146 @@ public class JXTable extends JTable implements Searchable {
     }
 
 //----------------------- Search support 
-    
-    /**
-     * Performs a search across the table using String that represents a regex
-     * pattern; {@link java.util.regex.Pattern}. All columns and all rows are
-     * searched; the row id of the first match is returned.
-     */
-    public int search(String searchString) {
-        return search(searchString, -1);
-    }
 
     /**
-     * Performs a search on a column using String that represents a regex
-     * pattern; {@link java.util.regex.Pattern}. The specified column searched;
-     * the row id of the first match is returned.
-     */
-    public int search(String searchString, int columnIndex) {
-        Pattern pattern = null;
-        if (searchString != null) {
-            return search(Pattern.compile(searchString, 0), columnIndex);
-        }
-        return -1;
-    }
-
-    /**
-     * Performs a search across the table using a
-     * {@link java.util.regex.Pattern}. All columns and all rows are searched;
-     * the row id of the first match is returned.
-     */
-    public int search(Pattern pattern) {
-        return search(pattern, -1);
-    }
-
-    /**
-     * Performs a search across the table using a
-     * {@link java.util.regex.Pattern}. starting at a given row. All columns
-     * and all rows are searched; the row id of the first match is returned.
-     */
-    public int search(Pattern pattern, int startIndex) {
-        return search(pattern, startIndex, false);
-    }
-
-    // Save the last column with the match.
-    private int lastCol = 0;
-
-    private RowSizing rowSizing;
-
-    private Field rowModelField;
-
-    private boolean rowHeightEnabled;
-
-    /**
-     * Performs a search across the table using a
-     * {@link java.util.regex.Pattern}. starting at a given row. All columns
-     * and all rows are searched; the row id of the first match is returned.
      * 
-     * @param startIndex
-     *            row to start search
-     * @param backwards
-     *            whether to start at the last row and search up to the first.
-     * @return row with a match.
+     * @returns a not-null Searchable for this editor.  
      */
-    public int search(Pattern pattern, int startIndex, boolean backwards) {
-        if (pattern == null) {
-            lastCol = 0;
+    public Searchable getSearchable() {
+        if (searchable == null) {
+            searchable = new TableSearchable();
+        }
+        return searchable;
+    }
+
+    /**
+     * sets the Searchable for this editor. If null, a default 
+     * searchable will be used.
+     * 
+     * @param searchable
+     */
+    public void setSearchable(Searchable searchable) {
+        this.searchable = searchable;
+    }
+
+    public class TableSearchable implements Searchable {
+        /**
+         * Performs a search across the table using String that represents a
+         * regex pattern; {@link java.util.regex.Pattern}. All columns and all
+         * rows are searched; the row id of the first match is returned.
+         */
+        public int search(String searchString) {
+            return search(searchString, -1);
+        }
+
+        /**
+         * Performs a search on a column using String that represents a regex
+         * pattern; {@link java.util.regex.Pattern}. The specified column
+         * searched; the row id of the first match is returned.
+         */
+        public int search(String searchString, int columnIndex) {
+            if (searchString != null) {
+                return search(Pattern.compile(searchString, 0), columnIndex);
+            }
             return -1;
         }
-        int rows = getRowCount();
-        int endCol = getColumnCount();
 
-        int matchRow = -1;
-
-        if (backwards == true) {
-            if (startIndex < 0)
-                startIndex = rows;
-            int startRow = startIndex - 1;
-            for (int r = startRow; r >= 0 && matchRow == -1; r--) {
-                for (int c = endCol - 1; c >= 0; c--) {
-                    Object value = getValueAt(r, c);
-                    if ((value != null) &&
-                    // JW: differs from PatternHighlighter/Filter
-                            pattern.matcher(value.toString()).find()) {
-                        // pattern.matcher(value.toString()).matches()) {
-                        changeSelection(r, c, false, false);
-                        matchRow = r;
-                        lastCol = c;
-                        break; // No need to search other columns
-                    }
-                }
-                if (matchRow == -1) {
-                    lastCol = endCol;
-                }
-            }
-        } else {
-            int startRow = startIndex + 1;
-            for (int r = startRow; r < rows && matchRow == -1; r++) {
-                for (int c = lastCol; c < endCol; c++) {
-                    Object value = getValueAt(r, c);
-                    if ((value != null) &&
-                    // JW: differs from PatternHighlighter/Filter
-                            pattern.matcher(value.toString()).find()) {
-                        // pattern.matcher(value.toString()).matches()) {
-                        changeSelection(r, c, false, false);
-                        matchRow = r;
-                        lastCol = c;
-                        break; // No need to search other columns
-                    }
-                }
-                if (matchRow == -1) {
-                    lastCol = 0;
-                }
-            }
+        /**
+         * Performs a search across the table using a
+         * {@link java.util.regex.Pattern}. All columns and all rows are
+         * searched; the row id of the first match is returned.
+         */
+        public int search(Pattern pattern) {
+            return search(pattern, -1);
         }
 
-        if (matchRow != -1) {
-            Object viewport = getParent();
-            if (viewport instanceof JViewport) {
-                Rectangle rect = getCellRect(getSelectedRow(), 0, true);
-                Point pt = ((JViewport) viewport).getViewPosition();
-                rect.setLocation(rect.x - pt.x, rect.y - pt.y);
-                ((JViewport) viewport).scrollRectToVisible(rect);
-            }
+        /**
+         * Performs a search across the table using a
+         * {@link java.util.regex.Pattern}. starting at a given row. All
+         * columns and all rows are searched; the row id of the first match is
+         * returned.
+         */
+        public int search(Pattern pattern, int startIndex) {
+            return search(pattern, startIndex, false);
         }
-        return matchRow;
+
+        // Save the last column with the match.
+        private int lastCol = 0;
+
+        /**
+         * Performs a search across the table using a
+         * {@link java.util.regex.Pattern}. starting at a given row. All
+         * columns and all rows are searched; the row id of the first match is
+         * returned.
+         * 
+         * @param startIndex
+         *            row to start search
+         * @param backwards
+         *            whether to start at the last row and search up to the
+         *            first.
+         * @return row with a match.
+         */
+        public int search(Pattern pattern, int startIndex, boolean backwards) {
+            if (pattern == null) {
+                lastCol = 0;
+                return -1;
+            }
+            int rows = getRowCount();
+            int endCol = getColumnCount();
+
+            int matchRow = -1;
+
+            if (backwards) {
+                if (startIndex < 0)
+                    startIndex = rows;
+                int startRow = startIndex - 1;
+                for (int r = startRow; r >= 0 && matchRow == -1; r--) {
+                    for (int c = endCol - 1; c >= 0; c--) {
+                        Object value = getValueAt(r, c);
+                        if ((value != null) &&
+                                pattern.matcher(value.toString()).find()) {
+                            changeSelection(r, c, false, false);
+                            matchRow = r;
+                            lastCol = c;
+                            break; // No need to search other columns
+                        }
+                    }
+                    if (matchRow == -1) {
+                        lastCol = endCol;
+                    }
+                }
+            } else {
+                int startRow = startIndex + 1;
+                for (int r = startRow; r < rows && matchRow == -1; r++) {
+                    for (int c = lastCol; c < endCol; c++) {
+                        Object value = getValueAt(r, c);
+                        if ((value != null) &&
+                                pattern.matcher(value.toString()).find()) {
+                            changeSelection(r, c, false, false);
+                            matchRow = r;
+                            lastCol = c;
+                            break; // No need to search other columns
+                        }
+                    }
+                    if (matchRow == -1) {
+                        lastCol = 0;
+                    }
+                }
+            }
+
+            if (matchRow != -1) {
+                Object viewport = getParent();
+                if (viewport instanceof JViewport) {
+                    Rectangle rect = getCellRect(getSelectedRow(), 0, true);
+                    Point pt = ((JViewport) viewport).getViewPosition();
+                    rect.setLocation(rect.x - pt.x, rect.y - pt.y);
+                    ((JViewport) viewport).scrollRectToVisible(rect);
+                }
+            }
+            return matchRow;
+        }
+
     }
-
-
 //-------------------------------- sizing support
     
     /** ? */

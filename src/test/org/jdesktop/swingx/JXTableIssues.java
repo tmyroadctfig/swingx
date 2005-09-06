@@ -429,9 +429,9 @@ public class JXTableIssues extends InteractiveTestCase {
         JXTable table = new JXTable(createModel(0, 11));
         int row = 1;
         String lastName = table.getValueAt(row, 0).toString();
-        int found = table.search(lastName, -1);
+        int found = table.getSearchable().search(lastName, -1);
         assertEquals("found must be equal to row", row, found);
-        found = table.search(lastName, found);
+        found = table.getSearchable().search(lastName, found);
         assertEquals("search must succeed", 10, found);
     }
 

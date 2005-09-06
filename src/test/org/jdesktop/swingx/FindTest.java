@@ -34,8 +34,8 @@ public class FindTest extends InteractiveTestCase {
 //      setSystemLF(true);
       FindTest test = new FindTest();
       try {
-//        test.runInteractiveTests();
-          test.runInteractiveTests("interactive.*Editor.*");
+        test.runInteractiveTests();
+//          test.runInteractiveTests("interactive.*Editor.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -86,7 +86,7 @@ public class FindTest extends InteractiveTestCase {
         int useIndex = -1;
         int lastIndex = -1;
         for (int i = 0; i < 100; i++) {
-            lastIndex = table.search("One", useIndex);
+            lastIndex = table.getSearchable().search("One", useIndex);
             assertTrue(lastIndex != -1);
             assertTrue(lastIndex != useIndex);
 

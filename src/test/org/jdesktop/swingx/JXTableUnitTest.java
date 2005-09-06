@@ -122,9 +122,9 @@ public class JXTableUnitTest extends InteractiveTestCase {
         int row = 1;
         String lastName = table.getValueAt(row, 0).toString();
         Pattern strict = Pattern.compile("^" + lastName + "$");
-        int found = table.search(strict, -1, false);
+        int found = table.getSearchable().search(strict, -1, false);
         assertEquals("found must be equal to row", row, found);
-        found = table.search(strict, found, false);
+        found = table.getSearchable().search(strict, found, false);
         assertEquals("search must fail", -1, found);
     }
 
@@ -302,7 +302,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JXTable table = new JXTable(createAscendingModel(0, 10));
         int row = 1;
         String lastName = table.getValueAt(row, 0).toString();
-        int found = table.search(Pattern.compile(lastName), -1, true);
+        int found = table.getSearchable().search(Pattern.compile(lastName), -1, true);
         assertEquals(row, found);
     }
 
