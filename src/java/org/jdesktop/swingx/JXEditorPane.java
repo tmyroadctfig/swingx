@@ -476,8 +476,6 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
             if ((pattern == null)
                     || (getDocument().getLength() == 0)
                     || ((startIndex > -1) && (getDocument().getLength() < startIndex))) {
-                // System.out.println("shortcut out *" + getText() + "* "+
-                // startIndex);
                 updateStateAfterNotFound();
                 return -1;
             }
@@ -522,25 +520,6 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
             }
             return lastFoundIndex;
 
-            // if (backwards) {
-            // MatchResult currentResult = getMatchResult(matcher, false);
-            // if (currentResult != null) {
-            // start = updateStateAfterFound(currentResult, start);
-            // } else {
-            // updateStateAfterNotFound(startIndex);
-            // return -1;
-            // }
-            //
-            // } else {
-            // MatchResult currentResult = getMatchResult(matcher, true);
-            // if (currentResult != null) {//(matcher.find()) {
-            // start = updateStateAfterFound(currentResult, start);
-            // } else {
-            //                    updateStateAfterNotFound(startIndex);
-            //                    return -1;
-            //                }
-            //            }
-            //            return start;
         }
 
         /**
@@ -570,6 +549,7 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
             if (currentResult != null) {
                 // JW: how to compare match results reliably?
                 // the group().equals probably isn't the best idea...
+                // better check pattern?
                 if ((currentResult.start() == 0) && 
                    (!lastMatchResult.group().equals(currentResult.group()))) {
                     updateStateAfterFound(currentResult, start);
