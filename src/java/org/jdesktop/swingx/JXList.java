@@ -8,13 +8,17 @@
 package org.jdesktop.swingx;
 
 import java.awt.Component;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Vector;
+import java.util.regex.Pattern;
 
 import javax.swing.AbstractListModel;
+import javax.swing.Action;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComponent;
 import javax.swing.JList;
+import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.event.ChangeEvent;
@@ -22,6 +26,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
+import org.jdesktop.swingx.JXEditorPane.DocumentSearchable;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
@@ -84,21 +89,142 @@ public class JXList extends JList {
 
     private Selection selection;
 
+    private Searchable searchable;
+
     public JXList() {
+        init();
     }
 
     public JXList(ListModel dataModel) {
         super(dataModel);
+        init();
     }
 
     public JXList(Object[] listData) {
         super(listData);
+        init();
     }
 
     public JXList(Vector listData) {
         super(listData);
+        init();
     }
 
+    private void init() {
+        Action findAction = createFindAction();
+        getActionMap().put("find", findAction);
+        // this should be handled by the LF!
+        KeyStroke findStroke = KeyStroke.getKeyStroke("control F");
+        getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(findStroke, "find");
+        
+    }
+
+    private Action createFindAction() {
+        Action findAction = new UIAction("find") {
+
+            public void actionPerformed(ActionEvent e) {
+                doFind();
+                
+            }
+            
+        };
+        return findAction;
+    }
+
+    protected void doFind() {
+        SearchFactory.getInstance().showFindInput(this, getSearchable());
+        
+    }
+
+    /**
+     * 
+     * @returns a not-null Searchable for this editor.  
+     */
+    public Searchable getSearchable() {
+        if (searchable == null) {
+            searchable = new ListSearchable();
+        }
+        return searchable;
+    }
+
+    /**
+     * sets the Searchable for this editor. If null, a default 
+     * searchable will be used.
+     * 
+     * @param searchable
+     */
+    public void setSearchable(Searchable searchable) {
+        this.searchable = searchable;
+    }
+    
+
+    public class ListSearchable implements Searchable {
+
+        public int search(String searchString) {
+            return search(searchString, -1);
+        }
+
+        public int search(String searchString, int columnIndex) {
+            if (searchString != null) {
+                return search(Pattern.compile(searchString, 0), columnIndex);
+            }
+            return -1;
+        }
+
+        public int search(Pattern pattern) {
+            return search(pattern, -1);
+        }
+
+        public int search(Pattern pattern, int startIndex) {
+            return search(pattern, startIndex, false);
+        }
+
+
+        public int search(Pattern pattern, int startIndex, boolean backward) {
+            int matchingRow = searchMatchingRow(pattern, startIndex, backward);
+            moveMatchMarker(pattern, matchingRow);
+            return matchingRow;
+        }
+
+        private void moveMatchMarker(Pattern pattern, int matchingRow) {
+            setSelectedIndex(matchingRow);
+            ensureIndexIsVisible(matchingRow);
+            
+        }
+
+        private int searchMatchingRow(Pattern pattern, int startIndex, boolean backward) {
+            if (pattern == null) {
+                return -1;
+            }
+            int rows = getModelSize();
+            int matchRow = -1;
+            if (backward) {
+                if (startIndex < 0)
+                    startIndex = rows;
+                int startRow = startIndex - 1;
+                for (int r = startRow; r >= 0 && matchRow == -1; r--) {
+                        Object value = getElementAt(r);
+                        if ((value != null) &&
+                            pattern.matcher(value.toString()).find()) {
+                            matchRow = r;
+                            break; // No need to search other columns
+                        }
+                }
+            } else {
+                int startRow = startIndex + 1;
+                for (int r = startRow; r < rows && matchRow == -1; r++) {
+                        Object value = getElementAt(r);
+                        if ((value != null) &&
+                            pattern.matcher(value.toString()).find()) {
+                            matchRow = r;
+                            break; // No need to search other columns
+                        }
+                }
+            }
+            return matchRow;
+        }
+        
+    }
     /**
      * Property to enable/disable rollover support. This can be enabled to show
      * "live" rollover behaviour, f.i. the cursor over LinkModel cells. Default
@@ -145,12 +271,19 @@ public class JXList extends JList {
 
     }
 
+//--------------------------- searching
+    
+    
     // ---------------------------- filters
 
     public Object getElementAt(int viewIndex) {
         return getModel().getElementAt(viewIndex);
     }
 
+    /**
+     * PENDING: misnomer - this is the view size!
+     * @return
+     */
     public int getModelSize() {
         return getModel().getSize();
     }
@@ -225,14 +358,21 @@ public class JXList extends JList {
     }
 
     public FilterPipeline getFilters() {
-        if (filters == null) {
+        if ((filters == null) && isFilterEnabled()) {
             setFilters(null);
         }
         return filters;
     }
 
-    /** Sets the FilterPipeline for filtering table rows. */
+    /** Sets the FilterPipeline for filtering table rows. 
+     *  PRE: isFilterEnabled()
+     * 
+     * @param pipeline the filterPipeline to use.
+     * @throws IllegalStateException if !isFilterEnabled()
+     */
     public void setFilters(FilterPipeline pipeline) {
+        if (!isFilterEnabled()) throw
+            new IllegalStateException("filters not enabled - not allowed to set filters");
         FilterPipeline old = filters;
         Sorter sorter = null;
         if (old != null) {

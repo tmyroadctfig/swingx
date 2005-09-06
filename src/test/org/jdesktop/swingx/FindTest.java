@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.regex.Pattern;
 
+import javax.swing.AbstractListModel;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -116,6 +117,10 @@ public class FindTest extends InteractiveTestCase {
         SearchFactory.getInstance().showFindInput(null, new TestSearchable());
     }
 
+    public void interactiveShowList() {
+        showComponent(new JXList(new TestListModel()));
+    }
+    
     public void interactiveShowTable() {
         showComponent(new JXTable(new TestTableModel()));
     }
@@ -181,7 +186,7 @@ public class FindTest extends InteractiveTestCase {
     
     public static class TestTableModel extends AbstractTableModel {
 
-        private static String[] data = { "One", "Two", "Three",
+        public static String[] data = { "One", "Two", "Three",
                                          "Four", "Five" };
 
         public int getRowCount() { return 100; }
@@ -194,6 +199,18 @@ public class FindTest extends InteractiveTestCase {
         }
     }
 
+    public static class TestListModel extends AbstractListModel {
+
+        public int getSize() {
+            return 100;
+        }
+
+        public Object getElementAt(int index) {
+            int dataPos = index % TestTableModel.data.length;
+            return TestTableModel.data[dataPos] + index;
+        }
+        
+    }
     /**
      * A small class that implements the Searchable interface.
      */
