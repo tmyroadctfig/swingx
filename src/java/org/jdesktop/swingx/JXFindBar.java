@@ -8,8 +8,10 @@ package org.jdesktop.swingx;
 
 import java.awt.Container;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 
 public class JXFindBar extends JXFindPanel {
@@ -62,7 +64,10 @@ public class JXFindBar extends JXFindPanel {
 
     @Override
     protected void build() {
+//        setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
         add(searchLabel);
+        add(new JLabel(":"));
+        add(new JLabel("  "));
         add(searchField);
         add(findNext);
         add(findPrevious);
