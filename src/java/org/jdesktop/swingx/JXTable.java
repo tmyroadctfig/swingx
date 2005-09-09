@@ -1811,6 +1811,7 @@ public class JXTable extends JTable { //implements Searchable {
 //        TableColumn tableColumn = getColumnModel().getColumn(column);
 //        getColumnClass(column);
         Component stamp = super.prepareRenderer(renderer, row, column);
+        adjustComponentOrientation(stamp);
         if (highlighters == null) {
             return stamp; // no need to decorate renderer with highlighters
         } else {
@@ -1823,6 +1824,12 @@ public class JXTable extends JTable { //implements Searchable {
     }
 
     
+
+    private void adjustComponentOrientation(Component stamp) {
+        if (stamp.getComponentOrientation().equals(getComponentOrientation())) return;
+        stamp.applyComponentOrientation(getComponentOrientation());
+        
+    }
 
     /**
      * Returns a new instance of the default renderer for the specified class.
@@ -1925,7 +1932,7 @@ public class JXTable extends JTable { //implements Searchable {
     public static class NumberRenderer extends DefaultTableCellRenderer {
         public NumberRenderer() {
             super();
-            setHorizontalAlignment(JLabel.RIGHT);
+            setHorizontalAlignment(JLabel.TRAILING);
         }
     }
 
