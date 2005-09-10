@@ -90,10 +90,7 @@ public class LookAndFeelAddons {
   }
 
   private static void addDefaultResourceBundle() {
-//    ResourceBundle bundle = ResourceBundle.getBundle(LookAndFeelAddons.class.getPackage().getName() + "/resources/swingx");
-//    System.out.println(bundle.getObject("JXTable.column.horizontalScroll"));
-    UIManager.getDefaults().addResourceBundle(LookAndFeelAddons.class.getPackage().getName() + "/resources/swingx");
-    
+    UIManager.getLookAndFeelDefaults().addResourceBundle(LookAndFeelAddons.class.getPackage().getName() + "/resources/swingx");    
   }
 
   public void uninitialize() {
@@ -111,13 +108,13 @@ public class LookAndFeelAddons {
    */
   public void loadDefaults(Object[] keysAndValues) {
     for (int i = 0, c = keysAndValues.length; i < c; i = i + 2) {
-      UIManager.put(keysAndValues[i], keysAndValues[i + 1]);
+      UIManager.getLookAndFeelDefaults().put(keysAndValues[i], keysAndValues[i + 1]);
     }
   }
 
   public void unloadDefaults(Object[] keysAndValues) {
     for (int i = 0, c = keysAndValues.length; i < c; i = i + 2) {
-      UIManager.put(keysAndValues[i], null);
+      UIManager.getLookAndFeelDefaults().put(keysAndValues[i], null);
     }
   }
 
