@@ -141,6 +141,9 @@ public class ColumnHeaderRenderer extends JComponent implements TableCellRendere
                 ((JComponent) comp).setBorder(border);
             }
         }
+        if(comp.getComponentOrientation() != table.getComponentOrientation()) {
+            comp.setComponentOrientation(table.getComponentOrientation());
+        }
         return comp;
     }
 

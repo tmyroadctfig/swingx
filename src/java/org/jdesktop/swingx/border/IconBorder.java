@@ -8,6 +8,7 @@
 package org.jdesktop.swingx.border;
 
 import java.awt.Component;
+import java.awt.ComponentOrientation;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
@@ -32,7 +33,7 @@ public class IconBorder implements Border {
     }
 
     public IconBorder(Icon validIcon) {
-        this(validIcon, SwingConstants.EAST);
+        this(validIcon, SwingConstants.TRAILING);
     }
 
     public IconBorder(Icon validIcon, int iconPosition) {
@@ -42,6 +43,7 @@ public class IconBorder implements Border {
 
     public Insets getBorderInsets(Component c) {
         int horizontalInset = icon.getIconWidth() + (2 * PAD);
+        int iconPosition = bidiDecodeLeadingTrailing(c.getComponentOrientation(), this.iconPosition);
         if (iconPosition == SwingConstants.EAST) {
             return new Insets(0, 0, 0, horizontalInset);
         }
@@ -59,6 +61,7 @@ public class IconBorder implements Border {
     public void paintBorder(Component c, Graphics g, int x, int y, int width,
         int height) {
         Graphics2D g2d = (Graphics2D) g;
+        int iconPosition = bidiDecodeLeadingTrailing(c.getComponentOrientation(), this.iconPosition);
         if (iconPosition == SwingConstants.NORTH_EAST) {
             iconBounds.y = y + PAD;
             iconBounds.x = x + width - PAD - icon.getIconWidth();
@@ -74,6 +77,27 @@ public class IconBorder implements Border {
         iconBounds.width = icon.getIconWidth();
         iconBounds.height = icon.getIconHeight();
         icon.paintIcon(c, g, iconBounds.x, iconBounds.y);
+    }
+
+    /**
+     * Returns EAST or WEST depending on the ComponentOrientation and 
+     * the given postion LEADING/TRAILING this method has no effect for other
+     * position values
+     */
+    private int bidiDecodeLeadingTrailing(ComponentOrientation c, int position) {
+        if(position == SwingConstants.TRAILING) {
+            if(!c.isLeftToRight()) {
+                return SwingConstants.WEST;
+            }
+            return SwingConstants.EAST;
+        }
+        if(position == SwingConstants.LEADING) {
+            if(!c.isLeftToRight()) {
+                return SwingConstants.WEST;
+            }
+            return SwingConstants.EAST;
+        }
+        return position;
     }
 
 }
