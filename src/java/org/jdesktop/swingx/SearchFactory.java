@@ -99,16 +99,7 @@ public class SearchFactory {
      */
     public void showFindBar(JComponent target, Searchable searchable) {
         if (target == null) return;
-        if (findBar == null) {
-            findBar = new JXFindBar();
-        }
-        Container oldParent = findBar.getParent();
-        if (oldParent != null) {
-            oldParent.remove(findBar);
-            if (oldParent instanceof JComponent) {
-                ((JComponent) oldParent).revalidate();
-            }
-        }
+        removeFromParent(getSharedFindBar());
         Window topLevel = SwingUtilities.getWindowAncestor(target);
         if (topLevel instanceof JXFrame) {
             JXRootPane rootPane = ((JXFrame) topLevel).getRootPaneExt();
@@ -117,12 +108,61 @@ public class SearchFactory {
                 toolBar = new JToolBar();
                 rootPane.setToolBar(toolBar);
             }
-            toolBar.add(findBar, 0);
+            toolBar.add(getSharedFindBar(), 0);
             rootPane.revalidate();
-            KeyboardFocusManager.getCurrentKeyboardFocusManager().focusNextComponent(findBar);
+            KeyboardFocusManager.getCurrentKeyboardFocusManager().focusNextComponent(getSharedFindBar());
             
         }
-        findBar.setSearchable(searchable);
+        getSharedFindBar().setSearchable(searchable);
+    }
+
+    /**
+     * convenience method to remove a component from its parent
+     * and revalidate the parent
+     */
+    protected void removeFromParent(JComponent component) {
+        Container oldParent = component.getParent();
+        if (oldParent != null) {
+            oldParent.remove(component);
+            if (oldParent instanceof JComponent) {
+                ((JComponent) oldParent).revalidate();
+            } else {
+                // not sure... never have non-j comps
+                oldParent.invalidate();
+                oldParent.validate();
+            }
+        }
+    }
+
+    /**
+     * returns the shared JXFindBar. Creates and configures on 
+     * first call.
+     * @return
+     */
+    public JXFindBar getSharedFindBar() {
+        if (findBar == null) {
+            findBar = createFindBar();
+            configureSharedFindBar();
+        }
+        return findBar;
+    }
+    
+    /**
+     * called after creation of shared FindBar.
+     * Subclasses can add configuration code, here: no-op.
+     * PRE: findBar != null.
+     *
+     */
+    protected void configureSharedFindBar() {
+    }
+
+    /**
+     * Factory method to create a JXFindBar.
+     * 
+     * @return
+     */
+    public JXFindBar createFindBar() {
+        return new JXFindBar();
     }
 
     /**
