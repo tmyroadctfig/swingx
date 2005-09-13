@@ -14,9 +14,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.border.BevelBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
@@ -294,6 +297,18 @@ public class JXTableUnitTest extends InteractiveTestCase {
         table.setSorter(1);
     }   
 
+    public void testIncrementalSearch() {
+        JXTable table = new JXTable(createAscendingModel(10, 10));
+        int row = 0;
+        String ten = table.getValueAt(row, 0).toString();
+        // sanity assert
+        assertEquals("10", ten);
+        int found = table.getSearchable().search("1", -1);
+        assertEquals("must have found first row", row, found);
+        int second = table.getSearchable().search("10", found);
+        assertEquals("must have found incrementally at same position", found, second);
+    }
+    
     /**
      * Issue #196: backward search broken.
      *
