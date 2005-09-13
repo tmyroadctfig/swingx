@@ -313,7 +313,7 @@ public final class ColumnControlButton extends JButton {
      * 
      */
     private void addColumnActions() {
-        Object[] actionKeys = table.getActionMap().allKeys();
+        Object[] actionKeys = getColumnControlActionKeys();
         Arrays.sort(actionKeys);
         List actions = new ArrayList();
         for (int i = 0; i < actionKeys.length; i++) {
@@ -334,6 +334,22 @@ public final class ColumnControlButton extends JButton {
             Action action = (Action) iter.next();
             popupMenu.add(factory.createMenuItem(action));
         }
+    }
+
+
+
+    /**
+     * @return
+     */
+    private Object[] getColumnControlActionKeys() {
+        Object[] allKeys = table.getActionMap().allKeys();
+        List columnKeys = new ArrayList();
+        for (int i = 0; i < allKeys.length; i++) {
+            if (isColumnControlActionKey(allKeys[i])) {
+                columnKeys.add(allKeys[i]);
+            }
+        }
+        return columnKeys.toArray();
     }
 
     private boolean isColumnControlActionKey(Object object) {

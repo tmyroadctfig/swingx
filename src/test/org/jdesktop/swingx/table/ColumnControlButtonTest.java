@@ -5,10 +5,15 @@
 package org.jdesktop.swingx.table;
 
 import java.awt.Component;
+import java.awt.event.ActionEvent;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
@@ -21,7 +26,24 @@ import org.jdesktop.swingx.util.AncientSwingTeam;
 public class ColumnControlButtonTest extends InteractiveTestCase {
     protected TableModel sortableTableModel;
     
+    /**
+     * Issue #153-swingx: ClassCastException if actionMap key is not a string.
+     *
+     */
+    public void testNonStringActionKeys() {
+        JXTable table = new JXTable();
+        Action l = new AbstractAction("dummy") {
 
+            public void actionPerformed(ActionEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+        };
+        table.registerKeyboardAction(l , KeyStroke.getKeyStroke("ESCAPE"), JComponent.WHEN_FOCUSED);
+        table.setColumnControlVisible(true);
+        table.getColumnControl();
+    }
     
     public void testColumnControlReleaseAction() {
         final JXTable table = new JXTable(sortableTableModel);
