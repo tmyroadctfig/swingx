@@ -27,12 +27,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.DefaultCellEditor;
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -1387,7 +1388,9 @@ public class JXTable extends JTable { //implements Searchable {
 
         // Save the last column with the match.
         // TODO (JW) - lastCol should either be a valid column index or < 0
-        private int lastCol = 0;
+        private int lastFoundColumn = -1;
+        private int lastFoundRow = -1;
+        private MatchResult lastMatchResult;
         private SearchHighlighter searchHighlighter;
 
         /**
@@ -1406,7 +1409,7 @@ public class JXTable extends JTable { //implements Searchable {
         public int search(Pattern pattern, int startIndex, boolean backwards) {
 
             int matchingRow = searchMatchingRow(pattern, startIndex, backwards);
-            moveMatchMarker(pattern, matchingRow, lastCol);
+            moveMatchMarker(pattern, matchingRow, lastFoundColumn);
             return matchingRow;
 
         }
@@ -1422,48 +1425,125 @@ public class JXTable extends JTable { //implements Searchable {
          */
         protected int searchMatchingRow(Pattern pattern, int startIndex, boolean backwards) {
             if (pattern == null) {
-                lastCol = 0;
-                return -1;
+                updateStateAfterNotFound();
+                return lastFoundRow;
             }
-            int rows = getRowCount();
-            int endCol = getColumnCount();
-            int matchRow = -1;
-            if (backwards == true) {
+            
+//            int start = startIndex;
+            if (maybeExtendedMatch(startIndex)) {
+                if (foundExtendedMatch(pattern, startIndex)) {
+                    return lastFoundRow;
+                }
+//                start++;
+            }
+            if (backwards) {
+                int matchRow = -1;
                 if (startIndex < 0)
-                    startIndex = rows;
+                    startIndex = getRowCount();
                 int startRow = startIndex - 1;
                 for (int r = startRow; r >= 0 && matchRow == -1; r--) {
-                    for (int c = endCol - 1; c >= 0; c--) {
-                        Object value = getValueAt(r, c);
-                        if ((value != null) &&
-                            pattern.matcher(value.toString()).find()) {
-                            matchRow = r;
-                            lastCol = c;
-                            break; // No need to search other columns
-                        }
-                    }
-                    if (matchRow == -1) {
-                        lastCol = endCol;
-                    }
+                    matchRow = findMatchBackwardsInRow(pattern, r);
                 }
             } else {
+                int matchRow = -1;
                 int startRow = startIndex + 1;
-                for (int r = startRow; r < rows && matchRow == -1; r++) {
-                    for (int c = lastCol; c < endCol; c++) {
-                        Object value = getValueAt(r, c);
-                        if ((value != null) &&
-                            pattern.matcher(value.toString()).find()) {
-                            matchRow = r;
-                            lastCol = c;
-                            break; // No need to search other columns
-                        }
+                for (int r = startRow; r < getRowCount() && matchRow == -1; r++) {
+                    matchRow = findMatchForwardInRow(pattern, r);
+                }
+            }
+            return lastFoundRow;
+        }
+        
+        private boolean foundExtendedMatch(Pattern pattern, int start) {
+            boolean foundExtended = false;
+            Object value = getValueAt(start, lastFoundColumn);
+            if (value != null) {
+                Matcher matcher = pattern.matcher(value.toString());
+                if (matcher.find()) {
+                    MatchResult result = matcher.toMatchResult();
+                    if ((result.start() == lastMatchResult.start()) &&
+                            !result.group().equals(lastMatchResult.group())) {
+                        updateStateAfterFound(matcher, start, lastFoundColumn);
+                        foundExtended = true;
                     }
-                    if (matchRow == -1) {
-                        lastCol = 0;
+                 }
+            }
+            return foundExtended;
+        }
+
+        /**
+         * Checks if the startIndex is a candidate for trying a re-match.
+         * 
+         * 
+         * @param startIndex
+         * @return true if the startIndex should be re-matched, false if not.
+         */
+        private boolean maybeExtendedMatch(final int startIndex) {
+            return (startIndex >= 0) && (startIndex == lastFoundRow) && 
+               (lastFoundColumn >= 0);
+        }
+
+        /**
+         * @param pattern
+         * @param matchRow
+         * @param row
+         * @return
+         */
+        private int findMatchForwardInRow(Pattern pattern, int row) {
+            if (lastFoundColumn < 0) lastFoundColumn = 0;
+            for (int column = lastFoundColumn; column < getColumnCount(); column++) {
+                Object value = getValueAt(row, column);
+                if (value != null) {
+                    Matcher matcher = pattern.matcher(value.toString());
+                    if (matcher.find()) {
+                        updateStateAfterFound(matcher, row, column);
+                        return row;
                     }
                 }
             }
-            return matchRow;
+            updateStateAfterNotFound();
+            return -1;
+        }
+
+       /**
+         * @param pattern
+         * @param row
+         * @return
+         */
+        private int findMatchBackwardsInRow(Pattern pattern, int row) {
+            if (lastFoundColumn < 0) lastFoundColumn = getColumnCount() - 1;
+            for (int column = lastFoundColumn; column >= 0; column--) {
+                Object value = getValueAt(row, column);
+                if (value != null) {
+                    Matcher matcher = pattern.matcher(value.toString());
+                    if (matcher.find()) {
+                        updateStateAfterFound(matcher, row, column);
+                        return row;
+                    }
+                }
+            }
+            updateStateAfterNotFound();
+            return -1;
+        }
+
+        /**
+         * @param matcher
+         * @param r
+         * @param c
+         */
+        private void updateStateAfterFound(Matcher matcher, int r, int c) {
+            lastMatchResult = matcher.toMatchResult();
+            lastFoundRow = r;
+            lastFoundColumn = c;
+        }
+
+         /**
+         * 
+         */
+        protected void updateStateAfterNotFound() {
+            lastFoundColumn = -1;
+            lastFoundRow = -1;
+            lastMatchResult = null;
         }
         
         protected void moveMatchMarker(Pattern pattern, int row, int column) {
