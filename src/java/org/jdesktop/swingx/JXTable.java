@@ -144,7 +144,37 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * normally not pick this up.
  * 
  * <p>
- * Last, you can also provide searches on a JXTable using the search methods.
+ * Last, you can also provide searches on a JXTable using the Searchable property.
+ * 
+ * <p>
+ * Keys/Actions registered with this component:
+ * 
+ * <ul>
+ * <li> "find" - open an appropriate search widget for searching cell content. The
+ *   default action registeres itself with the SearchFactory as search target.
+ * <li> "print" - print the table
+ * <li> {@link JXTable#HORIZONTAL_ACTION_COMMAND} - toggle the horizontal scrollbar
+ * <li> {@link JXTable#PACKSELECTED_ACTION_COMMAND} - resize the selected column to fit the widest
+ *  cell content 
+ * <li> {@link JXTable#PACKALL_ACTION_COMMAND} - resize all columns to fit the widest
+ *  cell content in each column
+ * 
+ * </ul>
+ * 
+ * <p>
+ * Key bindings.
+ * 
+ * <ul>
+ * <li> "control F" - bound to actionKey "find".
+ * </ul>
+ * 
+ * <p>
+ * Client Properties.
+ * 
+ * <ul>
+ * <li> {@link JXTable#MATCH_HIGHLIGHTER} - set to Boolean.TRUE to 
+ *  use a SearchHighlighter to mark a cell as matching.
+ * </ul>
  * 
  * @author Ramesh Gupta
  * @author Amy Fowler
