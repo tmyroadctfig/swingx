@@ -47,6 +47,24 @@ public class JXTableIssues extends InteractiveTestCase {
     }
 
     /**
+     * Issue #155-swingx: lost setting of initial scrollBarPolicy.
+     *
+     */
+    public void testConserveVerticalScrollBarPolicy() {
+        JXTable table = new JXTable(0, 3);
+        JScrollPane scrollPane1 = new JScrollPane(table);
+        scrollPane1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        JXFrame frame = new JXFrame();
+        frame.add(scrollPane1);
+        frame.setSize(500, 400);
+        frame.setVisible(true);
+        assertEquals("vertical scrollbar policy must be always", 
+                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                scrollPane1.getVerticalScrollBarPolicy());
+        
+    }
+
+    /**
      * Issue #223 - part d)
      * 
      * test if selection is cleared after receiving a dataChanged.
