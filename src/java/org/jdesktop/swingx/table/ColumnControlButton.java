@@ -352,8 +352,8 @@ public final class ColumnControlButton extends JButton {
         return columnKeys.toArray();
     }
 
-    private boolean isColumnControlActionKey(Object object) {
-        return String.valueOf(object).startsWith(COLUMN_CONTROL_MARKER);
+    private boolean isColumnControlActionKey(Object actionKey) {
+        return (actionKey instanceof String) && ((String) actionKey).startsWith(COLUMN_CONTROL_MARKER);
     }
 
 
