@@ -68,12 +68,12 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //        test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*ColumnControlColumnModel.*");
 //          test.runInteractiveTests("interactive.*TableHeader.*");
-          test.runInteractiveTests("interactive.*Sort.*");
-     //     test.runInteractiveTests("interactive.*RToL.*");
+//          test.runInteractiveTests("interactive.*Sort.*");
+//          test.runInteractiveTests("interactive.*RToL.*");
 //          test.runInteractiveTests("interactive.*RowHeight.*");
 //          test.runInteractiveTests("interactive.*TableMod.*");
           
-//          test.runInteractiveTests("interactive.*PatternHigh.*");
+          test.runInteractiveTests("interactive.*Column.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -86,28 +86,35 @@ public class JXTableVisualCheck extends JXTableUnitTest {
      *
      */
     public void interactiveRToLTableWithColumnControl() {
-        JXTable table = new JXTable(50, 5);
+        final JXTable table = new JXTable(createAscendingModel(0, 20));
         final JScrollPane pane = new JScrollPane(table);
-        pane.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-        table.setColumnControlVisible(true);
+//        table.setColumnControlVisible(true);
+//        pane.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         JXFrame frame = wrapInFrame(pane, "RToLScrollPane");
-        Action action = new AbstractAction("toggle orientation") {
+        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
 
             public void actionPerformed(ActionEvent e) {
                 ComponentOrientation current = pane.getComponentOrientation();
                 if (current == ComponentOrientation.LEFT_TO_RIGHT) {
-                    pane
-                            .applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+                    pane.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
                 } else {
-                    pane
-                            .applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+                    pane.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 
                 }
 
             }
 
         };
-        addAction(frame, action);
+        addAction(frame, toggleComponentOrientation);
+        Action toggleColumnControl = new AbstractAction("toggle column control") {
+
+            public void actionPerformed(ActionEvent e) {
+                table.setColumnControlVisible(!table.isColumnControlVisible());
+                
+            }
+            
+        };
+        addAction(frame, toggleColumnControl);
         frame.setVisible(true);
     }
     
@@ -369,6 +376,32 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         addAction(frame, toggleAction);
         frame.setVisible(true);
     }
+
+    /** 
+     * Issue #155-swingx: vertical scrollbar policy lost.
+     *
+     */
+    public void interactiveTestColumnControlConserveVerticalScrollBarPolicy() {
+        final JXTable table = new JXTable();
+        Action toggleAction = new AbstractAction("Toggle Control") {
+
+            public void actionPerformed(ActionEvent e) {
+                table.setColumnControlVisible(!table.isColumnControlVisible());
+                
+            }
+            
+        };
+        table.setModel(new DefaultTableModel(10, 5));
+//        table.setColumnControlVisible(true);
+        JScrollPane scrollPane1 = new JScrollPane(table);
+        scrollPane1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        
+        JXFrame frame = wrapInFrame(scrollPane1, "JXTable Vertical ScrollBar Policy");
+        addAction(frame, toggleAction);
+        frame.setVisible(true);
+    }
+
+
     /** 
      * Issue #11: Column control not showing with few rows.
      *
