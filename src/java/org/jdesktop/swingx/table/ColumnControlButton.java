@@ -7,6 +7,7 @@
 
 package org.jdesktop.swingx.table;
 
+import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -74,7 +75,7 @@ public final class ColumnControlButton extends JButton {
         }
     }
 
-
+   
 //-------------------------- Action in synch with column properties
     /**
      * A specialized action which takes care of keeping in synch with
@@ -205,6 +206,12 @@ public final class ColumnControlButton extends JButton {
             popupMenu.show(this, buttonSize.width
                     - popupMenu.getPreferredSize().width, buttonSize.height);
         }
+    }
+
+    @Override
+    public void applyComponentOrientation(ComponentOrientation o) {
+        super.applyComponentOrientation(o);
+        popupMenu.applyComponentOrientation(o);
     }
 
 //-------------------------- updates from table propertyChangelistnere
@@ -470,6 +477,7 @@ public final class ColumnControlButton extends JButton {
         public void columnSelectionChanged(ListSelectionEvent e) {
         }
     };
+
 
 
 } // end class ColumnControlButton
