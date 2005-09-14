@@ -8,6 +8,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.Component;
+import java.awt.ComponentOrientation;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
@@ -493,8 +494,7 @@ public class JXTable extends JTable { //implements Searchable {
                         scrollPane.setVerticalScrollBarPolicy(verticalScrollPolicy);
                     }
                     try {
-                        // PENDING: JW - change corner to trailing!
-                        scrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER,
+                        scrollPane.setCorner(JScrollPane.UPPER_TRAILING_CORNER,
                                 null);
                     } catch (Exception ex) {
                         // Ignore spurious exception thrown by JScrollPane. This
@@ -504,6 +504,13 @@ public class JXTable extends JTable { //implements Searchable {
                 }
             }
         }
+    }
+
+    
+    @Override
+    public void setComponentOrientation(ComponentOrientation o) {
+        super.setComponentOrientation(o);
+        configureColumnControl();
     }
 
     /**
