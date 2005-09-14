@@ -6,7 +6,9 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.ComponentOrientation;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 
@@ -18,6 +20,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import org.jdesktop.swingx.util.PropertyChangeReport;
 
@@ -97,7 +100,49 @@ public class JXTitledPanelTest extends InteractiveTestCase {
     }
 
 //--------------------- interactive tests
+
+    public  void interactiveRToL() {
+        String title = "starting title";
+        JXTitledPanel titledPane = new JXTitledPanel(title);
+        titledPane.addLeftDecoration(new JLabel("Leading"));
+        titledPane.addRightDecoration(new JLabel("Trailing"));
+//        panel.getContentContainer().setLayout(new BoxLayout(panel.getContentContainer(), BoxLayout.PAGE_AXIS));
+        Icon icon = new ImageIcon(getClass().getResource("resources/images/wellBottom.gif"));
+        final JLabel label = new JLabel(title);
+        label.setIcon(icon);
+        final JPanel panel = new JPanel(new BorderLayout());
+        panel.add(titledPane, BorderLayout.NORTH);
+        panel.add(label);
+        JXFrame frame = wrapInFrame(panel, "toggle Title");
+        Action toggleCO = new AbstractAction("toggle orientation") {
+
+
+                public void actionPerformed(ActionEvent e) {
+                    ComponentOrientation current = panel.getComponentOrientation();
+                    if (current == ComponentOrientation.LEFT_TO_RIGHT) {
+                        panel.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+//                        panel.revalidate();
+//                        panel.repaint();
+                        label.setText("RightToLeft");
+                    } else {
+                        panel.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+//                      panel.revalidate();
+//                      panel.repaint();
+                        label.setText("LeftToRight");
+
+                    }
+
+                }
+                
+            
+        };
+        addAction(frame, toggleCO);
+        frame.pack();
+        frame.setVisible(true);
+
+    }
     
+
     public  void interactiveIconAndHtmlTest() {
         String title = "<html><u>starting title </u></html>";
         final JXTitledPanel panel = new JXTitledPanel(title);
@@ -105,7 +150,7 @@ public class JXTitledPanelTest extends InteractiveTestCase {
         panel.addLeftDecoration(new JLabel(icon));
         panel.getContentContainer().setLayout(new BoxLayout(panel.getContentContainer(), BoxLayout.Y_AXIS));
         panel.getContentContainer().add(new JLabel(title));
-        JFrame frame = wrapInFrame(panel, "toggle Title");
+        JXFrame frame = wrapInFrame(panel, "toggle Title");
         frame.setVisible(true);
 
     }
