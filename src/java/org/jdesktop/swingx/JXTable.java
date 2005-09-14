@@ -486,11 +486,14 @@ public class JXTable extends JTable { //implements Searchable {
                     scrollPane
                             .setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
                 } else {
-                    scrollPane
-                            .setVerticalScrollBarPolicy(verticalScrollPolicy == 0 ? ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED
-                                    : verticalScrollPolicy);
-
+                    if (verticalScrollPolicy != 0) {
+                        // Fix #155-swingx: reset only if we had force always before
+                        // PENDING: JW - doesn't cope with dynamically changing the policy
+                        // shouldn't be much of a problem because doesn't happen too often?? 
+                        scrollPane.setVerticalScrollBarPolicy(verticalScrollPolicy);
+                    }
                     try {
+                        // PENDING: JW - change corner to trailing!
                         scrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER,
                                 null);
                     } catch (Exception ex) {
@@ -538,10 +541,6 @@ public class JXTable extends JTable { //implements Searchable {
     public void setColumnControlVisible(boolean showColumnControl) {
         boolean old = columnControlVisible;
         this.columnControlVisible = showColumnControl;
-        // JW: hacking issue #38(swingx) to initially add all columns
-        // if (showColumnControl) {
-        // getColumnControl();
-        // }
         configureColumnControl();
         firePropertyChange("columnControlVisible", old, columnControlVisible);
     }
