@@ -58,6 +58,24 @@ public class JXTableUnitTest extends InteractiveTestCase {
         sortableTableModel = new AncientSwingTeam();
     }
 
+
+    /**
+     * Issue #155-swingx: lost setting of initial scrollBarPolicy.
+     *
+     */
+    public void testConserveVerticalScrollBarPolicy() {
+        JXTable table = new JXTable(0, 3);
+        JScrollPane scrollPane1 = new JScrollPane(table);
+        scrollPane1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        JXFrame frame = new JXFrame();
+        frame.add(scrollPane1);
+        frame.setSize(500, 400);
+        frame.setVisible(true);
+        assertEquals("vertical scrollbar policy must be always", 
+                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                scrollPane1.getVerticalScrollBarPolicy());
+    }
+
     public void testEnableRowHeight() {
         JXTable table = new JXTable(createAscendingModel(0, 10));
         table.setRowHeight(0, 25);
