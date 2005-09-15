@@ -9,6 +9,7 @@ package org.jdesktop.swingx;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -52,13 +53,18 @@ public class JXFindPanel extends AbstractPatternPanel {
     }
     
     /**
-     * Sets the Searchable targeted with this dialog.
+     * Sets the Searchable targeted of this find widget.
+     * Triggers a search with null pattern to release the old
+     * searchable, if any.
      * 
      * @param searchable 
      */
     public void setSearchable(Searchable searchable) {
         if ((this.searchable != null) && this.searchable.equals(searchable)) return;
-        Object old = this.searchable;
+        Searchable old = this.searchable;
+        if (old != null) {
+            old.search((Pattern) null);
+        }
         this.searchable = searchable;
         getPatternModel().setFoundIndex(-1);
         firePropertyChange("searchable", old, this.searchable);
@@ -129,7 +135,7 @@ public class JXFindPanel extends AbstractPatternPanel {
      */
     public void findNext() {
         getPatternModel().setBackwards(false);
-        match();
+        doFind();
     }
     
     /**
@@ -138,21 +144,26 @@ public class JXFindPanel extends AbstractPatternPanel {
      */
     public void findPrevious() {
         getPatternModel().setBackwards(true);
-        match();
+        doFind();
     }
     
     protected void doFind() {
-        if (searchable == null) return;
+        if (searchable == null)
+            return;
         int foundIndex = doSearch();
-        if ((foundIndex == -1) && !getPatternModel().isEmpty()){
-            boolean notFound = true;
+        boolean notFound = (foundIndex == -1) && !getPatternModel().isEmpty();
+        if (notFound) {
             if (getPatternModel().isWrapping()) {
                 notFound = doSearch() == -1;
-            } 
-            if (notFound) {
-                showNotFoundMessage();
             }
+
         }
+        if (notFound) {
+            showNotFoundMessage();
+        } else {
+            showFoundMessage();
+        }
+
     }
 
     /**
@@ -163,6 +174,10 @@ public class JXFindPanel extends AbstractPatternPanel {
                 getPatternModel().getFoundIndex(), getPatternModel().isBackwards());
         getPatternModel().setFoundIndex(foundIndex);
         return foundIndex;
+    }
+
+    protected void showFoundMessage() {
+        
     }
 
     /**
