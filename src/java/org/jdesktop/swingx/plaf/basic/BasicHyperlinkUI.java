@@ -72,7 +72,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
         dashedRectGapHeight = UIManager.getInt("ButtonUI.dashedRectGapHeight");
         focusColor = UIManager.getColor("ButtonUI.focus");
 
-        b.setHorizontalAlignment(AbstractButton.LEFT);
+        b.setHorizontalAlignment(AbstractButton.LEADING);
     }
 
     protected void installListeners(AbstractButton b) {
