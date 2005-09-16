@@ -311,19 +311,20 @@ public class JXCollapsiblePane extends JPanel {
      * preferred size will be the current height of the component (as contained
      * in the currentHeight variable)
      */
+    Dimension dim;
     if (!isAnimated()) {
       if (getContentPane().isVisible()) {
-        return getContentPane().getPreferredSize();
+        dim = getContentPane().getPreferredSize();
       } else {
-        return super.getPreferredSize();
+        dim = super.getPreferredSize();
       }
     } else {
-      Dimension dim = new Dimension(getContentPane().getPreferredSize());
+      dim = new Dimension(getContentPane().getPreferredSize());
       if (!getContentPane().isVisible() && currentHeight != -1) {
         dim.height = currentHeight;
       }
-      return dim;
     }
+    return dim;
   }
 
   /**

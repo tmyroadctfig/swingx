@@ -8,8 +8,8 @@ package org.jdesktop.swingx.plaf.basic;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.ComponentOrientation;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Rectangle;
@@ -158,6 +158,29 @@ public class BasicTaskPaneUI extends TaskPaneUI {
     return new PaneBorder();
   }
 
+  @Override
+  public Dimension getPreferredSize(JComponent c) {
+    Component component = group.getComponent(0);
+    if (!(component instanceof JXCollapsiblePane)) {
+      // something wrong in this JXTaskPane
+      return super.getPreferredSize(c);
+    }
+    
+    JXCollapsiblePane collapsible = (JXCollapsiblePane)component;
+    Dimension dim = collapsible.getPreferredSize();
+    
+    Border groupBorder = group.getBorder();
+    if (groupBorder instanceof PaneBorder) {
+      Dimension border = ((PaneBorder)groupBorder).getPreferredSize(group);
+      dim.width = Math.max(dim.width, border.width);
+      dim.height += border.height;
+    } else {
+      dim.height += getTitleHeight();
+    }      
+    
+    return dim;
+  }
+  
   protected Border createContentPaneBorder() {
     Color borderColor = UIManager.getColor("TaskPane.borderColor");
     return new CompoundBorder(new ContentPaneBorder(borderColor), BorderFactory
@@ -276,11 +299,6 @@ public class BasicTaskPaneUI extends TaskPaneUI {
     }
   }
 
-  protected static int getTitleHeight(Component c) {
-    return ((BasicTaskPaneUI) ((JXTaskPane)c).getUI())
-      .getTitleHeight();
-  }
-
   /**
    * The border around the content pane
    */
@@ -320,6 +338,8 @@ public class BasicTaskPaneUI extends TaskPaneUI {
     protected Color titleOver;
     protected Color specialTitleOver;
     
+    protected JLabel label;
+    
     public PaneBorder() {
       borderColor = UIManager.getColor("TaskPane.borderColor");      
 
@@ -343,23 +363,46 @@ public class BasicTaskPaneUI extends TaskPaneUI {
       if (specialTitleOver == null) {
         specialTitleOver = specialTitleBackground.brighter();
       }
+      
+      label = new JLabel();
+      label.setOpaque(false);
+      label.setIconTextGap(8);
     }
     
     public Insets getBorderInsets(Component c) {
-      return new Insets(getTitleHeight(c), 0, 0, 0);
+      return new Insets(getTitleHeight(), 0, 0, 0);
     }
 
     public boolean isBorderOpaque() {
       return true;
     }
 
+    /**
+     * Calculates the preferred border size, its size so all its content fits.
+     */
+    public Dimension getPreferredSize(JXTaskPane group) {
+      // calculate the title width so it is fully visible
+      // it starts with the title width
+      configureLabel(group);
+      Dimension dim = label.getPreferredSize();
+      // add the title left offset
+      dim.width += 3;
+      // add the controls width
+      dim.width += TITLE_HEIGHT;
+      // and some space between label and controls
+      dim.width += 3;
+      
+      dim.height = getTitleHeight();
+      return dim;
+    }
+    
     protected void paintTitleBackground(JXTaskPane group, Graphics g) {
       if (group.isSpecial()) {
         g.setColor(specialTitleBackground);
       } else {
         g.setColor(titleBackgroundGradientStart);
       }
-      g.fillRect(0, 0, group.getWidth(), getTitleHeight(group) - 1);
+      g.fillRect(0, 0, group.getWidth(), getTitleHeight() - 1);
     }
 
     protected void paintTitle(
@@ -370,21 +413,22 @@ public class BasicTaskPaneUI extends TaskPaneUI {
       int y,
       int width,
       int height) {
-      JLabel label = new JLabel();
-      label.applyComponentOrientation(group.getComponentOrientation());
-      label.setOpaque(false);
+      configureLabel(group);
       label.setForeground(textColor);
-      label.setFont(g.getFont());
-      label.setIconTextGap(8);
-      label.setText(group.getTitle());
-      label.setIcon(
-        group.getIcon() == null ? new EmptyIcon() : group.getIcon());
       g.translate(x, y);
       label.setBounds(0, 0, width, height);
       label.paint(g);
       g.translate(-x, -y);
     }
 
+    protected void configureLabel(JXTaskPane group) {
+      label.applyComponentOrientation(group.getComponentOrientation());
+      label.setFont(group.getFont());
+      label.setText(group.getTitle());
+      label.setIcon(
+        group.getIcon() == null ? new EmptyIcon() : group.getIcon());      
+    }
+    
     protected void paintExpandedControls(JXTaskPane group, Graphics g, int x,
       int y, int width, int height) {}
 
@@ -430,8 +474,8 @@ public class BasicTaskPaneUI extends TaskPaneUI {
       int controlY = ROUND_HEIGHT - 1;
       int titleX = 3;
       int titleY = 0;
-      int titleWidth = group.getWidth() - getTitleHeight(c) - 3;
-      int titleHeight = getTitleHeight(c);
+      int titleWidth = group.getWidth() - getTitleHeight() - 3;
+      int titleHeight = getTitleHeight();
       
       if (!group.getComponentOrientation().isLeftToRight()) {
         controlX = group.getWidth() - controlX - controlWidth;        
@@ -456,7 +500,7 @@ public class BasicTaskPaneUI extends TaskPaneUI {
           3,
           3,
           width - 6,
-          getTitleHeight(c) - 6);
+          getTitleHeight() - 6);
       }
 
       paintTitle(
