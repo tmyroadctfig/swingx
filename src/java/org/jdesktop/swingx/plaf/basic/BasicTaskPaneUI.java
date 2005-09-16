@@ -8,6 +8,7 @@ package org.jdesktop.swingx.plaf.basic;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.ComponentOrientation;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Insets;
@@ -57,6 +58,9 @@ public class BasicTaskPaneUI extends TaskPaneUI {
     return new BasicTaskPaneUI();
   }
 
+  protected static int TITLE_HEIGHT = 25;
+  protected static int ROUND_HEIGHT = 5;
+  
   protected JXTaskPane group;
 
   protected boolean mouseOver;
@@ -146,8 +150,8 @@ public class BasicTaskPaneUI extends TaskPaneUI {
     return event.getY() < getTitleHeight();
   }
 
-  protected int getTitleHeight() {
-    return 25;
+  protected final int getTitleHeight() {
+    return TITLE_HEIGHT;
   }
 
   protected Border createPaneBorder() {
@@ -304,7 +308,7 @@ public class BasicTaskPaneUI extends TaskPaneUI {
    * "expanded" status and the "special" type.
    *  
    */
-  protected static class PaneBorder implements Border {
+  protected class PaneBorder implements Border {
 
     protected Color borderColor;
     protected Color titleForeground;
@@ -367,6 +371,7 @@ public class BasicTaskPaneUI extends TaskPaneUI {
       int width,
       int height) {
       JLabel label = new JLabel();
+      label.applyComponentOrientation(group.getComponentOrientation());
       label.setOpaque(false);
       label.setForeground(textColor);
       label.setFont(g.getFont());
@@ -380,9 +385,35 @@ public class BasicTaskPaneUI extends TaskPaneUI {
       g.translate(-x, -y);
     }
 
-    protected void paintExpandedControls(JXTaskPane group, Graphics g) {
-    }
+    protected void paintExpandedControls(JXTaskPane group, Graphics g, int x,
+      int y, int width, int height) {}
 
+    protected Color getPaintColor(JXTaskPane group) {
+      Color paintColor;
+      if (isMouseOverBorder()) {
+        if (mouseOver) {
+          if (group.isSpecial()) {
+            paintColor = specialTitleOver;
+          } else {
+            paintColor = titleOver;
+          }
+        } else {
+          if (group.isSpecial()) {
+            paintColor = specialTitleForeground;
+          } else {
+            paintColor = titleForeground;
+          }
+        }
+      } else {
+        if (group.isSpecial()) {
+          paintColor = specialTitleForeground;
+        } else {
+          paintColor = titleForeground;
+        }
+      }
+      return paintColor;
+    }
+    
     public void paintBorder(
       Component c,
       Graphics g,
@@ -393,19 +424,29 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 
       JXTaskPane group = (JXTaskPane)c;
 
+      // calculate position of title and toggle controls
+      int controlWidth = TITLE_HEIGHT - 2 * ROUND_HEIGHT;
+      int controlX = group.getWidth() - TITLE_HEIGHT;
+      int controlY = ROUND_HEIGHT - 1;
+      int titleX = 3;
+      int titleY = 0;
+      int titleWidth = group.getWidth() - getTitleHeight(c) - 3;
+      int titleHeight = getTitleHeight(c);
+      
+      if (!group.getComponentOrientation().isLeftToRight()) {
+        controlX = group.getWidth() - controlX - controlWidth;        
+        titleX = group.getWidth() - titleX - titleWidth;
+      }
+      
       // paint the title background
       paintTitleBackground(group, g);
 
       // paint the the toggles
-      paintExpandedControls(group, g);
+      paintExpandedControls(group, g, controlX, controlY, controlWidth,
+        controlWidth);
 
       // paint the title text and icon
-      Color paintColor;
-      if (group.isSpecial()) {
-        paintColor = specialTitleForeground;
-      } else {
-        paintColor = titleForeground;
-      }
+      Color paintColor = getPaintColor(group);
 
       // focus painted same color as text
       if (group.hasFocus()) {
@@ -422,10 +463,78 @@ public class BasicTaskPaneUI extends TaskPaneUI {
         group,
         g,
         paintColor,
-        3,
-        0,
-        c.getWidth() - getTitleHeight(c) - 3,
-        getTitleHeight(c));
+        titleX,
+        titleY,
+        titleWidth,
+        titleHeight);
+    }
+    
+    protected void paintRectAroundControls(JXTaskPane group, Graphics g, int x,
+      int y, int width, int height, Color highColor, Color lowColor) {      
+      if (mouseOver) {
+        int x2 = x + width;
+        int y2 = y + height;
+        g.setColor(highColor);
+        g.drawLine(x, y, x2, y);
+        g.drawLine(x, y, x, y2);
+        g.setColor(lowColor);
+        g.drawLine(x2, y, x2, y2);
+        g.drawLine(x, y2, x2, y2);
+      }
+    }
+    
+    protected void paintOvalAroundControls(JXTaskPane group, Graphics g, int x,
+      int y, int width, int height) {      
+      if (group.isSpecial()) {
+        g.setColor(specialTitleBackground.brighter());
+        g.drawOval(
+          x,
+          y,
+          width,
+          height);
+      } else {
+        g.setColor(titleBackgroundGradientStart);
+        g.fillOval(
+          x,
+          y,
+          width,
+          height);
+
+        g.setColor(titleBackgroundGradientEnd.darker());
+        g.drawOval(
+          x,
+          y,
+          width,
+          width);
+      }
+    }
+    
+    protected void paintChevronControls(JXTaskPane group, Graphics g, int x,
+      int y, int width, int height) {      
+      ChevronIcon chevron;
+      if (group.isExpanded()) {
+        chevron = new ChevronIcon(true);
+      } else {
+        chevron = new ChevronIcon(false);
+      }
+      int chevronX = x + width / 2 - chevron.getIconWidth() / 2;
+      int chevronY = y + (height / 2 - chevron.getIconHeight());
+      chevron.paintIcon(group, g, chevronX, chevronY);
+      chevron.paintIcon(
+        group,
+        g,
+        chevronX,
+        chevronY + chevron.getIconHeight() + 1);
+    }
+    
+    /**
+     * Default implementation returns false.
+     *  
+     * @return true if this border wants to display things differently when the
+     *         mouse is over it
+     */
+    protected boolean isMouseOverBorder() {
+      return false;
     }
   }
 
