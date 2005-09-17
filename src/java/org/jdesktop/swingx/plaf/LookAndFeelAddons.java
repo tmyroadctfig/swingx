@@ -69,7 +69,16 @@ public class LookAndFeelAddons {
     try {
       setAddon(addonClassname);
       setTrackingLookAndFeelChanges(true);
-      addDefaultResourceBundle();
+      
+      // this addon ensure resource bundle gets added to lookandfeel defaults
+      // and re-added by #maybeInitialize if needed      
+      contribute(new AbstractComponentAddon("MinimumAddon") {
+        @Override
+        protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+          addResource(defaults, LookAndFeelAddons.class.getPackage().getName()
+            + ".resources.swingx");
+        }
+      });
     } catch (InstantiationException e) {
       e.printStackTrace();
     } catch (IllegalAccessException e) {
@@ -87,10 +96,6 @@ public class LookAndFeelAddons {
       ComponentAddon addon = iter.next();
       addon.initialize(this);
     }
-  }
-
-  private static void addDefaultResourceBundle() {
-    UIManager.getLookAndFeelDefaults().addResourceBundle(LookAndFeelAddons.class.getPackage().getName() + "/resources/swingx");    
   }
 
   public void uninitialize() {
