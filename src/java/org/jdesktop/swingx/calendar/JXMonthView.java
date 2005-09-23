@@ -234,6 +234,7 @@ public class JXMonthView extends JComponent {
 
         setOpaque(true);
         setBackground(Color.WHITE);
+        setFocusable(true);
         _todayBackgroundColor = getForeground();
 
         // Restore original time value.
@@ -242,6 +243,29 @@ public class JXMonthView extends JComponent {
         enableEvents(AWTEvent.MOUSE_EVENT_MASK);
         enableEvents(AWTEvent.MOUSE_MOTION_EVENT_MASK);
 
+        // Setup the keyboard handler.
+        InputMap inputMap = getInputMap(JComponent.WHEN_FOCUSED);
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "selectPreviousDay");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "selectNextDay");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, false), "selectDayInPreviousWeek");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, false), "selectDayInNextWeek");
+        
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.SHIFT_MASK, false), "addPreviousDay");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.SHIFT_MASK, false), "addNextDay");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.SHIFT_MASK, false), "addToPreviousWeek");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.SHIFT_MASK, false), "addToNextWeek");
+        
+        ActionMap actionMap = getActionMap();
+        actionMap.put("selectPreviousDay", new KeyboardAction(KeyboardAction.SELECT_PREVIOUS_DAY));
+        actionMap.put("selectNextDay", new KeyboardAction(KeyboardAction.SELECT_NEXT_DAY));
+        actionMap.put("selectDayInPreviousWeek", new KeyboardAction(KeyboardAction.SELECT_DAY_PREVIOUS_WEEK));
+        actionMap.put("selectDayInNextWeek", new KeyboardAction(KeyboardAction.SELECT_DAY_NEXT_WEEK));
+
+        actionMap.put("addPreviousDay", new KeyboardAction(KeyboardAction.ADD_PREVIOUS_DAY));
+        actionMap.put("addNextDay", new KeyboardAction(KeyboardAction.ADD_NEXT_DAY));
+        actionMap.put("addToPreviousWeek", new KeyboardAction(KeyboardAction.ADD_TO_PREVIOUS_WEEK));
+        actionMap.put("addToNextWeek", new KeyboardAction(KeyboardAction.ADD_TO_NEXT_WEEK));
+        
         updateUI();
     }
 
@@ -1905,6 +1929,10 @@ public class JXMonthView extends JComponent {
         if (!isEnabled()) {
             return;
         }
+        
+        if (!hasFocus() && isFocusable()) {
+            requestFocusInWindow();
+        }
 
         int id = e.getID();
 
@@ -2066,5 +2094,112 @@ public class JXMonthView extends JComponent {
             _asKirkWouldSay_FIRE = true;
         }
         super.processMouseMotionEvent(e);
+    }
+
+    /**
+     * Class that supports keyboard traversal of the JXMonthView component.
+     */
+    private class KeyboardAction extends AbstractAction {
+        public static final int SELECT_PREVIOUS_DAY = 0;
+        public static final int SELECT_NEXT_DAY = 1;
+        public static final int SELECT_DAY_PREVIOUS_WEEK = 2;
+        public static final int SELECT_DAY_NEXT_WEEK = 3;
+        public static final int ADD_PREVIOUS_DAY = 4;
+        public static final int ADD_NEXT_DAY = 5;
+        public static final int ADD_TO_PREVIOUS_WEEK = 6;
+        public static final int ADD_TO_NEXT_WEEK = 7;
+        
+        private int mode;
+        
+        public KeyboardAction(int mode) {
+            this.mode = mode;
+        }
+        
+        public void actionPerformed(ActionEvent ev) {            
+            if (_startSelectedDate != -1) {
+                
+                if (mode >=0 && mode <= 3) {
+                    if (getSelectionMode() >= SINGLE_SELECTION) {
+                        traverse(mode);
+                    }
+                } else if (mode >= 4 && mode <= 7) {
+                    if (getSelectionMode() > SINGLE_SELECTION) {
+                        addToSelection(mode);
+                    }
+                }
+
+            }
+        }
+        
+        private void traverse(int mode) {
+            _cal.setTimeInMillis(_startSelectedDate);
+            switch (mode) {
+                case SELECT_PREVIOUS_DAY:
+                    _cal.add(Calendar.DAY_OF_MONTH, -1);
+                    break;                        
+                case SELECT_NEXT_DAY:
+                    _cal.add(Calendar.DAY_OF_MONTH, 1);
+                    break;
+                case SELECT_DAY_PREVIOUS_WEEK:
+                    _cal.add(Calendar.DAY_OF_MONTH, -7);
+                    break;
+                case SELECT_DAY_NEXT_WEEK:
+                    _cal.add(Calendar.DAY_OF_MONTH, 7);
+                    break;
+            }
+            
+            long newStartDate = _cal.getTimeInMillis();
+            if (newStartDate != _startSelectedDate) {
+                setSelectedDateSpan(new DateSpan(newStartDate, newStartDate));
+                ensureDateVisible(newStartDate);
+            }
+            // Restore the original time value.
+            _cal.setTimeInMillis(_firstDisplayedDate);
+        }
+        
+        /**
+         * If we are in a mode that allows for range selection this method
+         * will extend the currently selected range.
+         *
+         * NOTE: This may not be the expected behavior for the keyboard controls
+         * and we ay need to update this code to act in a way that people expect.
+         */
+        private void addToSelection(int mode) {
+            long newStartDate = _startSelectedDate;
+            long newEndDate = _endSelectedDate;
+            boolean isForward = true;
+            
+            switch (mode) {
+                case ADD_PREVIOUS_DAY:
+                    _cal.setTimeInMillis(_startSelectedDate);
+                    _cal.add(Calendar.DAY_OF_MONTH, -1);
+                    newStartDate = _cal.getTimeInMillis();
+                    isForward = false;
+                    break;
+                case ADD_NEXT_DAY:
+                    _cal.setTimeInMillis(_endSelectedDate);
+                    _cal.add(Calendar.DAY_OF_MONTH, 1);
+                    newEndDate = _cal.getTimeInMillis();
+                    break;
+                case ADD_TO_PREVIOUS_WEEK:
+                    _cal.setTimeInMillis(_startSelectedDate);
+                    _cal.add(Calendar.DAY_OF_MONTH, -7);
+                    newStartDate = _cal.getTimeInMillis();
+                    isForward = false;
+                    break;
+                case ADD_TO_NEXT_WEEK:
+                    _cal.setTimeInMillis(_endSelectedDate);
+                    _cal.add(Calendar.DAY_OF_MONTH, 7);
+                    newEndDate = _cal.getTimeInMillis();
+                    break;                    
+            }
+            if (newStartDate != _startSelectedDate || newEndDate != _endSelectedDate) {
+                setSelectedDateSpan(new DateSpan(newStartDate, newEndDate));
+                ensureDateVisible(isForward ? newEndDate : newStartDate);
+            }
+            
+            // Restore the original time value.
+            _cal.setTimeInMillis(_firstDisplayedDate);
+        }
     }
 }
