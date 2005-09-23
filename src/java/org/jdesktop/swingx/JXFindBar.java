@@ -6,16 +6,39 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.Container;
+import java.awt.Color;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 
+/**
+ * A simple low-intrusion default widget for incremental search.
+ * 
+ * 
+ * Actions registered (in addition to super):
+ * <ul>
+ *  <li> {@link JXDialog#CLOSE_ACTION_COMMAND} - an action bound to this component's
+ *      cancel method. The method itself is an empty implementation: Subclassing
+ *      clients can override the method, all clients can register a custom action.
+ * </ul>
+ * 
+ * Key bindings:
+ * <ul>
+ *   <li> ESCAPE - calls action registered for {@link JXDialog#CLOSE_ACTION_COMMAND}
+ * </ul>
+ * 
+ * @author Jeanette Winzenburg
+ * 
+ */
 public class JXFindBar extends JXFindPanel {
 
+    
+    Color previousBackgroundColor;
+    Color previousForegroundColor;
+    // PENDING: need to read from UIManager
+    Color notFoundBackgroundColor = Color.decode("#FF6666");
+    Color notFoundForegroundColor = Color.white;
   protected JButton findNext;
   protected JButton findPrevious;
 
@@ -28,19 +51,34 @@ public class JXFindBar extends JXFindPanel {
         getPatternModel().setIncremental(true);
     }
 
-//--------------------------- action call back
+    
+    @Override
+    protected void showFoundMessage() {
+        if (previousBackgroundColor != null) {
+            searchField.setBackground(previousBackgroundColor);
+            searchField.setForeground(previousForegroundColor);
+        }        
+    }
+
+    @Override
+    protected void showNotFoundMessage() {
+        previousBackgroundColor = searchField.getBackground();
+        previousForegroundColor = searchField.getForeground();
+        searchField.setForeground(notFoundForegroundColor);
+        searchField.setBackground(notFoundBackgroundColor);    }
+
+    //--------------------------- action call back
     /**
-     * removes itself from parent if any.
+     * Action callback method for bound action 
+     * JXDialog.CLOSE_ACTION_COMMAND.
+     * 
+     * Here: does nothing. Subclasses can override to define custom
+     * "closing" behaviour. Alternatively, any client can register
+     * a custom action with the actionMap.
+     * 
      *
      */
     public void cancel() {
-       Container parent = getParent();
-       if (parent != null) {
-           parent.remove(this);
-           if (parent instanceof JComponent) {
-               ((JComponent)parent).revalidate();
-           } 
-       }
     }
 
     //-------------------- init
