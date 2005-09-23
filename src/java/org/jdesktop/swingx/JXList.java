@@ -11,6 +11,7 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Vector;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractListModel;
@@ -26,6 +27,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
+import org.jdesktop.swingx.AbstractSearchable.SearchResult;
 import org.jdesktop.swingx.JXEditorPane.DocumentSearchable;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
@@ -158,72 +160,63 @@ public class JXList extends JList {
     }
     
 
-    public class ListSearchable implements Searchable {
+    public class ListSearchable extends AbstractSearchable {
 
-        public int search(String searchString) {
-            return search(searchString, -1);
-        }
-
-        public int search(String searchString, int columnIndex) {
-            if (searchString != null) {
-                return search(Pattern.compile(searchString, 0), columnIndex);
+        @Override
+        protected void findMatchAndUpdateState(Pattern pattern, int startRow, boolean backwards) {
+            SearchResult searchResult = null;
+            if (backwards) {
+                for (int index = startRow; index >= 0 && searchResult == null; index--) {
+                    searchResult = findMatchAt(pattern, index);
+                }
+            } else {
+                for (int index = startRow; index < getSize() && searchResult == null; index++) {
+                    searchResult = findMatchAt(pattern, index);
+                }
             }
-            return -1;
+            updateState(searchResult);
         }
 
-        public int search(Pattern pattern) {
-            return search(pattern, -1);
+        @Override
+        protected SearchResult findExtendedMatch(Pattern pattern, int row) {
+            
+            return findMatchAt(pattern, row);
+        }
+        /**
+         * Matches the cell content at row/col against the given Pattern.
+         * Returns an appropriate SearchResult if matching or null if no
+         * matching
+         * 
+         * @param pattern 
+         * @param row a valid row index in view coordinates
+         * @param column a valid column index in view coordinates
+         * @return
+         */
+        protected SearchResult findMatchAt(Pattern pattern, int row) {
+            Object value = getElementAt(row);
+            if (value != null) {
+                Matcher matcher = pattern.matcher(value.toString());
+                if (matcher.find()) {
+                    return createSearchResult(matcher, row, -1);
+                }
+            }
+            return null;
+        }
+        
+        @Override
+        protected int getSize() {
+            return getModelSize();
         }
 
-        public int search(Pattern pattern, int startIndex) {
-            return search(pattern, startIndex, false);
-        }
-
-
-        public int search(Pattern pattern, int startIndex, boolean backward) {
-            int matchingRow = searchMatchingRow(pattern, startIndex, backward);
-            moveMatchMarker(pattern, matchingRow);
-            return matchingRow;
-        }
-
-        private void moveMatchMarker(Pattern pattern, int matchingRow) {
-            setSelectedIndex(matchingRow);
-            ensureIndexIsVisible(matchingRow);
+        @Override
+        protected void moveMatchMarker() {
+          setSelectedIndex(lastSearchResult.foundRow);
+          if (lastSearchResult.foundRow >= 0) {
+              ensureIndexIsVisible(lastSearchResult.foundRow);
+          }
             
         }
 
-        private int searchMatchingRow(Pattern pattern, int startIndex, boolean backward) {
-            if (pattern == null) {
-                return -1;
-            }
-            int rows = getModelSize();
-            int matchRow = -1;
-            if (backward) {
-                if (startIndex < 0)
-                    startIndex = rows;
-                int startRow = startIndex - 1;
-                for (int r = startRow; r >= 0 && matchRow == -1; r--) {
-                        Object value = getElementAt(r);
-                        if ((value != null) &&
-                            pattern.matcher(value.toString()).find()) {
-                            matchRow = r;
-                            break; // No need to search other columns
-                        }
-                }
-            } else {
-                int startRow = startIndex + 1;
-                for (int r = startRow; r < rows && matchRow == -1; r++) {
-                        Object value = getElementAt(r);
-                        if ((value != null) &&
-                            pattern.matcher(value.toString()).find()) {
-                            matchRow = r;
-                            break; // No need to search other columns
-                        }
-                }
-            }
-            return matchRow;
-        }
-        
     }
     /**
      * Property to enable/disable rollover support. This can be enabled to show

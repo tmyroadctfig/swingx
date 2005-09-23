@@ -8,13 +8,246 @@ package org.jdesktop.swingx;
 
 import javax.swing.text.BadLocationException;
 
+import org.jdesktop.swingx.JXTable.TableSearchable;
+
 /**
  * Exposing open issues in Searchable implementations.
  * 
  * @author Jeanette Winzenburg
  */
 public class FindIssues extends FindTest {
+
+    /** 
+     * test if internal state is reset to not found by
+     * passing a null searchstring.
+     *
+     */
+    public void testTableResetStateWithNullSearchString() {
+        JXTable table = new JXTable(new TestTableModel());
+        int row = 39;
+        int firstColumn = 0;
+        String firstSearchText = table.getValueAt(row, firstColumn).toString();
+        PatternModel model = new PatternModel();
+        model.setRawText(firstSearchText);
+        // initialize searchable to "found state"
+        int foundIndex = table.getSearchable().search(model.getPattern(), -1);
+        // sanity asserts
+        int foundColumn = ((TableSearchable) table.getSearchable()).lastSearchResult.foundColumn;
+        assertEquals("last line found", row, foundIndex);
+        assertEquals("column must be updated", firstColumn, foundColumn);
+        // search with null searchstring 
+        int notFoundIndex =  table.getSearchable().search((String) null);
+        assertEquals("nothing found", -1, notFoundIndex);
+        assertEquals("column must be reset", -1, ((TableSearchable) table.getSearchable()).lastSearchResult.foundColumn);
+
+    }
     
+    /** 
+     * test if internal state is reset to not found by
+     * passing a empty (="") searchstring.
+     *
+     */
+    public void testTableResetStateWithEmptySearchString() {
+        JXTable table = new JXTable(new TestTableModel());
+        int row = 39;
+        int firstColumn = 0;
+        String firstSearchText = table.getValueAt(row, firstColumn).toString();
+        PatternModel model = new PatternModel();
+        model.setRawText(firstSearchText);
+        // initialize searchable to "found state"
+        int foundIndex = table.getSearchable().search(model.getPattern(), -1);
+        // sanity asserts
+        int foundColumn = ((TableSearchable) table.getSearchable()).lastSearchResult.foundColumn;
+        assertEquals("last line found", row, foundIndex);
+        assertEquals("column must be updated", firstColumn, foundColumn);
+        // search with null searchstring 
+        int notFoundIndex =  table.getSearchable().search("");
+        assertEquals("nothing found", -1, notFoundIndex);
+        assertEquals("column must be reset", -1, ((TableSearchable) table.getSearchable()).lastSearchResult.foundColumn);
+
+    }
+    
+    /** 
+     * test incremental search in JXTable.
+     *
+     */
+    public void testTableIncremental() {
+        JXTable table = new JXTable(new TestTableModel());
+        String firstSearchText = "on";
+        PatternModel model = new PatternModel();
+        model.setRawText(firstSearchText);
+        // make sure we had a match
+        int foundIndex = table.getSearchable().search(model.getPattern(), -1);
+        assertEquals("must return be found", 0, foundIndex);
+        // extended searchstring
+        String secondSearchText ="one";
+        model.setRawText(secondSearchText);
+        // start search with row >> getRowCount()
+        int secondFoundIndex = table.getSearchable().search(model.getPattern(), foundIndex);
+        assertEquals("must not be found", foundIndex, secondFoundIndex);
+        
+    }
+
+    /** 
+     * test if starting a search in a non-contained index results
+     * in not-found state.
+     *
+     */
+    public void testTableInvalidStartIndex() {
+        JXTable table = new JXTable(new TestTableModel());
+        String firstSearchText = "one";
+        PatternModel model = new PatternModel();
+        model.setRawText(firstSearchText);
+        // make sure we had a match
+        int foundIndex = table.getSearchable().search(model.getPattern(), -1);
+        assertEquals("must return be found", 0, foundIndex);
+        // start search with row >> getRowCount()
+        int notFoundIndex = table.getSearchable().search(model.getPattern(), table.getRowCount() * 5, false);
+        assertEquals("must not be found", -1, notFoundIndex);
+        
+    }
+    /**
+     * test if search loops all columns of previous row (backwards search).
+     * 
+     * Hmm... not testable? 
+     * Needed to widen access for lastFoundColumn.
+     */
+    public void testTableFoundNextColumnInPreviousRow() {
+        JXTable table = new JXTable(new TestTableModel());
+        int lastColumn = table.getColumnCount() -1;
+        int row = 39;
+        int firstColumn = lastColumn - 1;
+        String firstSearchText = table.getValueAt(row, firstColumn).toString();
+        // need a pattern for backwards search
+        PatternModel model = new PatternModel();
+        model.setRawText(firstSearchText);
+        int foundIndex = table.getSearchable().search(model.getPattern(), -1, true);
+        assertEquals("last line found", row, foundIndex);
+        int foundColumn = ((TableSearchable) table.getSearchable()).lastSearchResult.foundColumn;
+        assertEquals("column must be updated", firstColumn, foundColumn);
+        // the last char(s) of all values is the row index
+        // here we are searching for an entry in the next row relative to
+        // the previous search and expect the match in the first column (index = 0);
+        int previousRow = row -1;
+        String secondSearchText = String.valueOf(previousRow);
+        model.setRawText(secondSearchText);
+        int secondFoundIndex = table.getSearchable().search(model.getPattern(), previousRow, true);
+        // sanity assert
+        assertEquals("must find match in same row", previousRow, secondFoundIndex);
+        assertEquals("column must be updated", lastColumn, ((TableSearchable) table.getSearchable()).lastSearchResult.foundColumn);
+        
+    }
+    /**
+     * test if match in same row but different column is found in backwards
+     * search.
+     *
+     */
+    public void testTableFoundPreviousColumnInSameRow() {
+        JXTable table = new JXTable(new TestTableModel());
+        int lastColumn = table.getColumnCount() -1;
+        int row = 90;
+        String firstSearchText = table.getValueAt(row, lastColumn).toString();
+        // need a pattern for backwards search
+        PatternModel model = new PatternModel();
+        model.setRawText(firstSearchText);
+        int foundIndex = table.getSearchable().search(model.getPattern(), -1, true);
+        assertEquals("last line found", row, foundIndex);
+        String secondSearchText = table.getValueAt(row, lastColumn - 1).toString();
+        model.setRawText(secondSearchText);
+        int secondFoundIndex = table.getSearchable().search(model.getPattern(), foundIndex, true);
+        assertEquals("must find match in same row", foundIndex, secondFoundIndex);
+    }
+
+    
+    /**
+     * test if search loops all columns of next row.
+     *
+     * Hmm... not testable? 
+     * Needed to widen access for lastFoundColumn.
+     */
+    public void testTableFoundPreviousColumnInNextRow() {
+        JXTable table = new JXTable(new TestTableModel());
+        int row = 0;
+        int firstColumn = 1;
+        String firstSearchText = table.getValueAt(row, firstColumn).toString();
+        int foundIndex = table.getSearchable().search(firstSearchText);
+        assertEquals("last line found", row, foundIndex);
+        int foundColumn = ((TableSearchable) table.getSearchable()).lastSearchResult.foundColumn;
+        assertEquals("column must be updated", firstColumn, foundColumn);
+        // the last char(s) of all values is the row index
+        // here we are searching for an entry in the next row relative to
+        // the previous search and expect the match in the first column (index = 0);
+        int nextRow = row + 1;
+        String secondSearchText = String.valueOf(nextRow);
+        int secondFoundIndex = table.getSearchable().search(secondSearchText, nextRow);
+        // sanity assert
+        assertEquals("must find match in same row", nextRow, secondFoundIndex);
+        assertEquals("column must be updated", 0, ((TableSearchable) table.getSearchable()).lastSearchResult.foundColumn);
+        
+    }
+    /**
+     * test if match in same row but different column is found in forward
+     * search.
+     *
+     */
+    public void testTableFoundNextColumnInSameRow() {
+        JXTable table = new JXTable(new TestTableModel());
+        int row = 90;
+        int firstColumn = 0;
+        String firstSearchText = table.getValueAt(row, firstColumn).toString();
+        int foundIndex = table.getSearchable().search(firstSearchText);
+        assertEquals("last line found", row, foundIndex);
+        String secondSearchText = table.getValueAt(row, firstColumn +1).toString();
+        int secondFoundIndex = table.getSearchable().search(secondSearchText, foundIndex);
+        assertEquals("must find match in same row", foundIndex, secondFoundIndex);
+        
+    }
+    /**
+     * check if not-wrapping returns not found marker (-1).
+     *
+     */
+    public void testTableNotFoundWithoutWrapping() {
+        JXTable table = new JXTable(new TestTableModel());
+        int row = 90;
+        String searchText = table.getValueAt(row, 0).toString();
+        int foundIndex = table.getSearchable().search(searchText);
+        assertEquals("last line found", row, foundIndex);
+        int notFoundIndex = table.getSearchable().search(searchText, foundIndex);
+        assertEquals("nothing found after last line", -1, notFoundIndex);
+    }
+    
+    /**
+     * test if not-wrapping returns not found marker (-1) if the
+     * last found position is the last row.
+     *
+     */
+    public void testTableNotFoundLastRowWithoutWrapping() {
+        JXTable table = new JXTable(new TestTableModel());
+        int row = table.getRowCount() - 1;
+        String searchText = table.getValueAt(row, 0).toString();
+        int foundIndex = table.getSearchable().search(searchText);
+        assertEquals("last line found", row, foundIndex);
+        int notFoundIndex = table.getSearchable().search(searchText, foundIndex);
+        assertEquals("nothing found after last line", -1, notFoundIndex);
+    }
+
+    /**
+     * test if not-wrapping returns not found marker (-1) if the
+     * last found position is the first row.
+     *
+     */
+    public void testTableNotFoundFirstRowWithoutWrapping() {
+        JXTable table = new JXTable(new TestTableModel());
+        int row = 0;
+        PatternModel model = new PatternModel();
+        String searchText = table.getValueAt(row, 0).toString();
+        model.setRawText(searchText);
+        int foundIndex = table.getSearchable().search(model.getPattern(), row + 1, true);
+        assertEquals("last line found", row, foundIndex);
+        int notFoundIndex = table.getSearchable().search(model.getPattern(), foundIndex, true);
+        assertEquals("nothing found after last line", -1, notFoundIndex);
+    }
+
     /**
      * Issue #??-swingx: backwards search not implemented in JXEditorPane.
      *

@@ -206,7 +206,7 @@ public class JXTable extends JTable { //implements Searchable {
     public static final String UIPREFIX = "JXTable.";
 
     /** key for client property to use SearchHighlighter as match marker. */
-    public static final String MATCH_HIGHLIGHTER = "match.highlighter";
+    public static final String MATCH_HIGHLIGHTER = AbstractSearchable.MATCH_HIGHLIGHTER;
 
     static {
         // Hack: make sure the resource bundle is loaded
@@ -1350,131 +1350,159 @@ public class JXTable extends JTable { //implements Searchable {
         this.searchable = searchable;
     }
 
-    public class TableSearchable implements Searchable {
+    public class TableSearchable extends AbstractSearchable {
 
-        /**
-         * Performs a search across the table using String that represents a
-         * regex pattern; {@link java.util.regex.Pattern}. All columns and all
-         * rows are searched; the row id of the first match is returned.
-         */
-        public int search(String searchString) {
-            return search(searchString, -1);
-        }
-
-        /**
-         * Performs a search on a column using String that represents a regex
-         * pattern; {@link java.util.regex.Pattern}. The specified column
-         * searched; the row id of the first match is returned.
-         */
-        public int search(String searchString, int columnIndex) {
-            if (searchString != null) {
-                return search(Pattern.compile(searchString, 0), columnIndex);
-            }
-            return -1;
-        }
-
-        /**
-         * Performs a search across the table using a
-         * {@link java.util.regex.Pattern}. All columns and all rows are
-         * searched; the row id of the first match is returned.
-         */
-        public int search(Pattern pattern) {
-            return search(pattern, -1);
-        }
-
-        /**
-         * Performs a search across the table using a
-         * {@link java.util.regex.Pattern}. starting at a given row. All
-         * columns and all rows are searched; the row id of the first match is
-         * returned.
-         */
-        public int search(Pattern pattern, int startIndex) {
-            return search(pattern, startIndex, false);
-        }
-
-        // Save the last column with the match.
-        // TODO (JW) - lastCol should either be a valid column index or < 0
-        private int lastFoundColumn = -1;
-        private int lastFoundRow = -1;
-        private MatchResult lastMatchResult;
         private SearchHighlighter searchHighlighter;
 
-        /**
-         * Performs a search across the table using a
-         * {@link java.util.regex.Pattern}. starting at a given row. All
-         * columns and all rows are searched; the row id of the first match is
-         * returned.
-         * 
-         * @param startIndex
-         *            row to start search
-         * @param backwards
-         *            whether to start at the last row and search up to the
-         *            first.
-         * @return row with a match.
-         */
-        public int search(Pattern pattern, int startIndex, boolean backwards) {
-
-            int matchingRow = searchMatchingRow(pattern, startIndex, backwards);
-            moveMatchMarker(pattern, matchingRow, lastFoundColumn);
-            return matchingRow;
+        @Override
+        protected void findMatchAndUpdateState(Pattern pattern, int startRow,
+                boolean backwards) {
+            SearchResult matchRow = null;
+            if (backwards) {
+                // CHECK: off-one end still needed?
+                // Probably not - the findXX don't have side-effects any longer
+                // hmmm... still needed: even without side-effects we need to
+                // guarantee calling the notfound update at the very end of the
+                // loop.
+                for (int r = startRow; r >= -1 && matchRow == null; r--) {
+                    matchRow = findMatchBackwardsInRow(pattern, r);
+                    updateState(matchRow);
+                }
+            } else {
+                for (int r = startRow; r <= getSize() && matchRow == null; r++) {
+                    matchRow = findMatchForwardInRow(pattern, r);
+                    updateState(matchRow);
+                }
+            }
+            // JW: Needed to update if loop wasn't entered!
+            // the alternative is to go one off in the loop. Hmm - which is
+            // preferable?
+            // updateState(matchRow);
 
         }
 
-
         /**
-         * returns/updates the matching row/column indices.
+         * called if sameRowIndex && !hasEqualRegEx. Matches the cell at
+         * row/lastFoundColumn against the pattern. PRE: lastFoundColumn valid.
          * 
          * @param pattern
+         * @param row
+         * @return
+         */
+        protected SearchResult findExtendedMatch(Pattern pattern, int row) {
+            return findMatchAt(pattern, row, lastSearchResult.foundColumn);
+        }
+
+        /**
+         * Searches forward through columns of the given row. Starts at
+         * lastFoundColumn or first column if lastFoundColumn < 0. returns an
+         * appropriate SearchResult if a matching cell is found in this row or
+         * null if no match is found. A row index out off range results in a
+         * no-match.
+         * 
+         * @param pattern
+         * @param row
+         *            the row to search
+         * @return
+         */
+        private SearchResult findMatchForwardInRow(Pattern pattern, int row) {
+            int startColumn = (lastSearchResult.foundColumn < 0) ? 0 : lastSearchResult.foundColumn;
+            if (isValidIndex(row)) {
+                for (int column = startColumn; column < getColumnCount(); column++) {
+                    SearchResult result = findMatchAt(pattern, row, column);
+                    if (result != null)
+                        return result;
+                }
+            }
+            return null;
+        }
+
+        /**
+         * Searches forward through columns of the given row. Starts at
+         * lastFoundColumn or first column if lastFoundColumn < 0. returns an
+         * appropriate SearchResult if a matching cell is found in this row or
+         * null if no match is found. A row index out off range results in a
+         * no-match.
+         * 
+         * @param pattern
+         * @param row
+         *            the row to search
+         * @return
+         */
+        private SearchResult findMatchBackwardsInRow(Pattern pattern, int row) {
+            int startColumn = (lastSearchResult.foundColumn < 0) ? getColumnCount() - 1
+                    : lastSearchResult.foundColumn;
+            if (isValidIndex(row)) {
+                for (int column = startColumn; column >= 0; column--) {
+                    SearchResult result = findMatchAt(pattern, row, column);
+                    if (result != null)
+                        return result;
+                }
+            }
+            return null;
+        }
+
+        /**
+         * Matches the cell content at row/col against the given Pattern.
+         * Returns an appropriate SearchResult if matching or null if no
+         * matching
+         * 
+         * @param pattern
+         * @param row
+         *            a valid row index in view coordinates
+         * @param column
+         *            a valid column index in view coordinates
+         * @return
+         */
+        protected SearchResult findMatchAt(Pattern pattern, int row, int column) {
+            Object value = getValueAt(row, column);
+            if (value != null) {
+                Matcher matcher = pattern.matcher(value.toString());
+                if (matcher.find()) {
+                    return createSearchResult(matcher, row, column);
+                }
+            }
+            return null;
+        }
+
+        /**
+         * Called if startIndex is different from last search, reset the column
+         * to -1 and make sure a backwards/forwards search starts at last/first
+         * row, respectively.
+         * 
          * @param startIndex
          * @param backwards
          * @return
          */
-        protected int searchMatchingRow(Pattern pattern, int startIndex, boolean backwards) {
-            if (pattern == null) {
-                updateStateAfterNotFound();
-                return lastFoundRow;
-            }
-            
-//            int start = startIndex;
-            if (maybeExtendedMatch(startIndex)) {
-                if (foundExtendedMatch(pattern, startIndex)) {
-                    return lastFoundRow;
-                }
-//                start++;
-            }
+        protected int adjustStartPosition(int startIndex, boolean backwards) {
+            lastSearchResult.foundColumn = -1;
+            return super.adjustStartPosition(startIndex, backwards);
+        }
+
+        /**
+         * Moves the internal start for matching as appropriate and returns the
+         * new startIndex to use. Called if search was messaged with the same
+         * startIndex as previously.
+         * 
+         * @param startRow
+         * @param backwards
+         * @return
+         */
+        @Override
+        protected int moveStartPosition(int startRow, boolean backwards) {
             if (backwards) {
-                int matchRow = -1;
-                if (startIndex < 0)
-                    startIndex = getRowCount();
-                int startRow = startIndex - 1;
-                for (int r = startRow; r >= 0 && matchRow == -1; r--) {
-                    matchRow = findMatchBackwardsInRow(pattern, r);
+                lastSearchResult.foundColumn--;
+                if (lastSearchResult.foundColumn < 0) {
+                    startRow--;
                 }
             } else {
-                int matchRow = -1;
-                int startRow = startIndex + 1;
-                for (int r = startRow; r < getRowCount() && matchRow == -1; r++) {
-                    matchRow = findMatchForwardInRow(pattern, r);
+                lastSearchResult.foundColumn++;
+                if (lastSearchResult.foundColumn >= getColumnCount()) {
+                    lastSearchResult.foundColumn = -1;
+                    startRow++;
                 }
             }
-            return lastFoundRow;
-        }
-        
-        private boolean foundExtendedMatch(Pattern pattern, int start) {
-            boolean foundExtended = false;
-            Object value = getValueAt(start, lastFoundColumn);
-            if (value != null) {
-                Matcher matcher = pattern.matcher(value.toString());
-                if (matcher.find()) {
-                    MatchResult result = matcher.toMatchResult();
-                    if ((result.start() == lastMatchResult.start()) &&
-                            !result.group().equals(lastMatchResult.group())) {
-                        updateStateAfterFound(matcher, start, lastFoundColumn);
-                        foundExtended = true;
-                    }
-                 }
-            }
-            return foundExtended;
+            return startRow;
         }
 
         /**
@@ -1484,89 +1512,46 @@ public class JXTable extends JTable { //implements Searchable {
          * @param startIndex
          * @return true if the startIndex should be re-matched, false if not.
          */
-        private boolean maybeExtendedMatch(final int startIndex) {
-            return (startIndex >= 0) && (startIndex == lastFoundRow) && 
-               (lastFoundColumn >= 0);
+        protected boolean isEqualStartIndex(final int startIndex) {
+            return super.isEqualStartIndex(startIndex)
+                    && isValidColumn(lastSearchResult.foundColumn);
         }
 
         /**
-         * @param pattern
-         * @param matchRow
-         * @param row
-         * @return
-         */
-        private int findMatchForwardInRow(Pattern pattern, int row) {
-            if (lastFoundColumn < 0) lastFoundColumn = 0;
-            for (int column = lastFoundColumn; column < getColumnCount(); column++) {
-                Object value = getValueAt(row, column);
-                if (value != null) {
-                    Matcher matcher = pattern.matcher(value.toString());
-                    if (matcher.find()) {
-                        updateStateAfterFound(matcher, row, column);
-                        return row;
-                    }
-                }
-            }
-            updateStateAfterNotFound();
-            return -1;
-        }
-
-       /**
-         * @param pattern
-         * @param row
-         * @return
-         */
-        private int findMatchBackwardsInRow(Pattern pattern, int row) {
-            if (lastFoundColumn < 0) lastFoundColumn = getColumnCount() - 1;
-            for (int column = lastFoundColumn; column >= 0; column--) {
-                Object value = getValueAt(row, column);
-                if (value != null) {
-                    Matcher matcher = pattern.matcher(value.toString());
-                    if (matcher.find()) {
-                        updateStateAfterFound(matcher, row, column);
-                        return row;
-                    }
-                }
-            }
-            updateStateAfterNotFound();
-            return -1;
-        }
-
-        /**
-         * @param matcher
-         * @param r
-         * @param c
-         */
-        private void updateStateAfterFound(Matcher matcher, int r, int c) {
-            lastMatchResult = matcher.toMatchResult();
-            lastFoundRow = r;
-            lastFoundColumn = c;
-        }
-
-         /**
+         * checks if row is in range: 0 <= row < getRowCount().
          * 
+         * @param column
+         * @return
          */
-        protected void updateStateAfterNotFound() {
-            lastFoundColumn = -1;
-            lastFoundRow = -1;
-            lastMatchResult = null;
+        private boolean isValidColumn(int column) {
+            return column >= 0 && column < getColumnCount();
         }
-        
-        protected void moveMatchMarker(Pattern pattern, int row, int column) {
+
+
+        @Override
+        protected int getSize() {
+            return getRowCount();
+        }
+
+        @Override
+        protected void moveMatchMarker() {
+            int row = lastSearchResult.foundRow;
+            int column = lastSearchResult.foundColumn;
+            Pattern pattern = lastSearchResult.pattern;
             if (markByHighlighter()) {
                 Rectangle cellRect = getCellRect(row, column, true);
                 if (cellRect != null) {
                     scrollRectToVisible(cellRect);
                 }
-                 ensureInsertedSearchHighlighters();
-                 // TODO (JW) - cleanup SearchHighlighter state management
-                 if ((row >= 0) && (column >= 0)) { 
-                     getSearchHighlighter().setPattern(pattern);
-                     int modelColumn = convertColumnIndexToModel(column);
-                     getSearchHighlighter().setHighlightCell(row, modelColumn);
-                 } else {
-                     getSearchHighlighter().setPattern(null);
-                 }
+                ensureInsertedSearchHighlighters();
+                // TODO (JW) - cleanup SearchHighlighter state management
+                if ((row >= 0) && (column >= 0)) {
+                    getSearchHighlighter().setPattern(pattern);
+                    int modelColumn = convertColumnIndexToModel(column);
+                    getSearchHighlighter().setHighlightCell(row, modelColumn);
+                } else {
+                    getSearchHighlighter().setPattern(null);
+                }
             } else { // use selection
                 changeSelection(row, column, false, false);
                 if (!getAutoscrolls()) {
@@ -1585,15 +1570,16 @@ public class JXTable extends JTable { //implements Searchable {
 
         private SearchHighlighter getSearchHighlighter() {
             if (searchHighlighter == null) {
-               searchHighlighter = createSearchHighlighter();
+                searchHighlighter = createSearchHighlighter();
             }
             return searchHighlighter;
         }
 
         private void ensureInsertedSearchHighlighters() {
             if (getHighlighters() == null) {
-                setHighlighters(new HighlighterPipeline(new Highlighter[] {getSearchHighlighter()}));
-            } else if (!isInPipeline(getSearchHighlighter())){
+                setHighlighters(new HighlighterPipeline(
+                        new Highlighter[] { getSearchHighlighter() }));
+            } else if (!isInPipeline(getSearchHighlighter())) {
                 getHighlighters().addHighlighter(getSearchHighlighter());
             }
         }
@@ -1601,7 +1587,8 @@ public class JXTable extends JTable { //implements Searchable {
         private boolean isInPipeline(PatternHighlighter searchHighlighter) {
             Highlighter[] inPipeline = getHighlighters().getHighlighters();
             for (int i = 0; i < inPipeline.length; i++) {
-                if (searchHighlighter.equals(inPipeline[i])) return true;
+                if (searchHighlighter.equals(inPipeline[i]))
+                    return true;
             }
             return false;
         }
@@ -1609,8 +1596,6 @@ public class JXTable extends JTable { //implements Searchable {
         protected SearchHighlighter createSearchHighlighter() {
             return new SearchHighlighter();
         }
-        
-
 
     }
 //-------------------------------- sizing support

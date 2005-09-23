@@ -1,0 +1,356 @@
+/*
+ * Created on 23.09.2005
+ *
+ */
+package org.jdesktop.swingx;
+
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * An abstract implementation of Searchable supporting
+ * incremental search.
+ * 
+ * Keeps internal state to represent the previous search result.
+ * For all methods taking a string as parameter: compiles the String 
+ * to a Pattern as-is and routes to the central method taking a Pattern.
+ * 
+ * 
+ * @author Jeanette Winzenburg
+ */
+public abstract class AbstractSearchable implements Searchable {
+    /**
+     * a constant representing not-found state.
+     */
+    public static final SearchResult NO_MATCH = new SearchResult();
+
+    /**
+     * stores the result of the previous search.
+     */
+    protected SearchResult lastSearchResult = new SearchResult();
+    
+
+    /** key for client property to use SearchHighlighter as match marker. */
+    public static final String MATCH_HIGHLIGHTER = "match.highlighter";
+
+    /**
+     * Performs a forward search starting at the beginning 
+     * across the Searchable using String that represents a
+     * regex pattern; {@link java.util.regex.Pattern}. 
+     * @return the position of the match in appropriate coordinates or -1 if
+     *   no match found.
+     */
+    public int search(String searchString) {
+        return search(searchString, -1);
+    }
+
+    /**
+     * Performs a forward search starting at the given startIndex
+     * using String that represents a regex
+     * pattern; {@link java.util.regex.Pattern}. 
+     * @return the position of the match in appropriate coordinates or -1 if
+     *   no match found.
+     */
+    public int search(String searchString, int startIndex) {
+        return search(searchString, startIndex, false);
+    }
+
+    /**
+     * Performs a  search starting at the given startIndex
+     * using String that represents a regex
+     * pattern; {@link java.util.regex.Pattern}. The search direction 
+     * depends on the boolean parameter: forward/backward if false/true, respectively.
+     * @return the position of the match in appropriate coordinates or -1 if
+     *   no match found.
+     */
+    public int search(String searchString, int startIndex, boolean backward) {
+        Pattern pattern = null;
+        if (!isEmpty(searchString)) {
+            pattern = Pattern.compile(searchString, 0);
+        }
+        return search(pattern, startIndex, backward);
+    }
+
+    /**
+     * Performs a forward search starting at the beginning 
+     * across the Searchable using the pattern; {@link java.util.regex.Pattern}. 
+     * @return the position of the match in appropriate coordinates or -1 if
+     *   no match found.
+     */
+    public int search(Pattern pattern) {
+        return search(pattern, -1);
+    }
+
+    /**
+     * Performs a forward search starting at the given startIndex
+     * using the Pattern; {@link java.util.regex.Pattern}. 
+     * @return the position of the match in appropriate coordinates or -1 if
+     *   no match found.
+     */
+    public int search(Pattern pattern, int startIndex) {
+        return search(pattern, startIndex, false);
+    }
+
+
+
+    /**
+     * Performs a  search starting at the given startIndex
+     * using the pattern; {@link java.util.regex.Pattern}. 
+     * The search direction depends on the boolean parameter: 
+     * forward/backward if false/true, respectively.
+     * 
+     * Updates visible and internal search state.
+     * 
+     * @param startIndex the index to start search
+     * @param backwards flag for search direction
+     * @param pattern 
+     * @return the position of the match in appropriate coordinates or -1 if
+     *   no match found.
+     */
+    public int search(Pattern pattern, int startIndex, boolean backwards) {
+        int matchingRow = doSearch(pattern, startIndex, backwards);
+        moveMatchMarker();
+        return matchingRow;
+    }
+
+
+    /**
+     * Performs a  search starting at the given startIndex
+     * using the pattern; {@link java.util.regex.Pattern}. 
+     * The search direction depends on the boolean parameter: 
+     * forward/backward if false/true, respectively.
+     * 
+     * Updates internal search state.
+     * 
+     * @param pattern
+     * @param startIndex
+     * @param backwards
+     * @return the position of the match in appropriate coordinates or -1 if
+     *   no match found.
+     */
+    protected int doSearch(Pattern pattern, final int startIndex, boolean backwards) {
+        if (isTrivialNoMatch(pattern, startIndex)) {
+            updateState(null);
+            return lastSearchResult.foundRow;
+        }
+        
+        int startRow;
+        if (isEqualStartIndex(startIndex)) { // implies: the last found coordinates are valid
+            if (!isEqualPattern(pattern)) {
+               SearchResult searchResult = findExtendedMatch(pattern, startIndex);
+               if (searchResult != null) {
+                   updateState(searchResult);
+                   return lastSearchResult.foundRow;
+               }
+
+            }
+            // didn't find a match, make sure to move the startPosition
+            // for looking for the next/previous match
+            startRow = moveStartPosition(startIndex, backwards);
+            
+        } else { 
+            // startIndex is different from last search, reset the column to -1
+            // and make sure a -1 startIndex is mapped to first/last row, respectively.
+            startRow = adjustStartPosition(startIndex, backwards); 
+        }
+        findMatchAndUpdateState(pattern, startRow, backwards);
+        return lastSearchResult.foundRow;
+    }
+
+    /**
+     * loops through the searchable until a match is found or the 
+     * end is reached. Updates internal search state.
+     * @param pattern
+     * @param startRow
+     * @param backwards
+     */
+    protected abstract void findMatchAndUpdateState(Pattern pattern, int startRow, boolean backwards);
+
+    /**
+     * Checks and returns if it can be trivially decided to not match.
+     * Here: pattern is null or startIndex exceeds the upper size limit.
+     * 
+     * @param pattern
+     * @param startIndex
+     * @return
+     */
+    protected boolean isTrivialNoMatch(Pattern pattern, final int startIndex) {
+        return (pattern == null) || (startIndex >= getSize());
+    }
+
+    /**
+     * Called if 
+     * startIndex is different from last search
+     * and make sure a backwards/forwards search starts at last/first row,
+     * respectively.
+     * @param startIndex
+     * @param backwards
+     * @return
+     */
+    protected int adjustStartPosition(int startIndex, boolean backwards) {
+        if (startIndex < 0) {
+            if (backwards) {
+                return getSize() - 1;
+            } else {
+                return 0;
+            }
+        }
+        return startIndex;
+    }
+
+    /**
+     * Moves the internal start position for matching as appropriate and returns
+     * the new startIndex to use.
+     * Called if search was messaged with the same startIndex as previously.
+     * 
+     * @param startIndex
+     * @param backwards
+     * @return
+     */
+    protected int moveStartPosition(int startIndex, boolean backwards) {
+        if (backwards) {
+                   startIndex--;
+           } else {
+                   startIndex++;
+           }
+        return startIndex;
+    }
+    
+
+    /**
+     * Checks if the given Pattern should be considered as the same as 
+     * in a previous search.
+     * 
+     * Here: compares the patterns' regex.
+     * 
+     * @param pattern
+     * @return
+     */
+    protected boolean isEqualPattern(Pattern pattern) {
+        return pattern.pattern().equals(lastSearchResult.getRegEx());
+    }
+
+    /**
+     * Checks if the startIndex should be considered as the same as in
+     * the previous search.
+     * 
+     * @param startIndex
+     * @return true if the startIndex should be re-matched, false if not.
+     */
+    protected boolean isEqualStartIndex(final int startIndex) {
+        return isValidIndex(startIndex) && (startIndex == lastSearchResult.foundRow);
+    }
+    /**
+     * checks if the searchString should be interpreted as empty.
+     * here: returns true if string is null or has zero length.
+     * 
+     * @param searchString
+     * @return
+     */
+    protected boolean isEmpty(String searchString) {
+        return (searchString == null) || searchString.length() == 0;
+    }
+
+
+    /**
+     * called if sameRowIndex && !hasEqualRegEx.
+     * Matches the cell at row/lastFoundColumn against the pattern.
+     * PRE: lastFoundColumn valid.
+     * 
+     * @param pattern
+     * @param row 
+     * @return
+     */
+    protected abstract SearchResult findExtendedMatch(Pattern pattern, int row);
+ 
+
+    /**
+     * Factory method to create a SearchResult from the given parameters.
+     * 
+     * @param matcher the matcher after a successful find. Must not be null.
+     * @param row the found index
+     * @param column the found column
+     * @return
+     */
+   protected SearchResult createSearchResult(Matcher matcher, int row, int column) {
+        return new SearchResult(matcher.pattern(), 
+                matcher.toMatchResult(), row, column);
+    }
+
+/** 
+    * checks if index is in range: 0 <= index < getSize().
+    * @param index
+    * @return
+    */ 
+   protected boolean isValidIndex(int index) {
+        return index >= 0 && index < getSize();
+    }
+
+   /**
+    * returns the size of this searchable.
+    * 
+    * @return
+    */
+   protected abstract int getSize();
+   
+    protected void updateState(SearchResult searchResult) {
+        lastSearchResult.updateFrom(searchResult);
+    }
+
+    /**
+     * Moves the match marker according to current found state.
+     */
+    protected abstract void moveMatchMarker();
+
+    /**
+     * A convenience class to hold search state.
+     * NOTE: this is still in-flow, probably will take more responsibility/
+     * or even change altogether on further factoring
+     */
+    public static class SearchResult {
+        int foundRow;
+        int foundColumn;
+        MatchResult matchResult;
+        Pattern pattern;
+
+        public SearchResult() {
+            reset();
+        }
+        
+        public void updateFrom(SearchResult searchResult) {
+            if (searchResult == null) {
+                reset();
+                return;
+            }
+            foundRow = searchResult.foundRow;
+            foundColumn = searchResult.foundColumn;
+            matchResult = searchResult.matchResult;
+            pattern = searchResult.pattern;
+            
+        }
+
+        public String getRegEx() {
+            return pattern != null ? pattern.pattern() : null;
+        }
+
+        public SearchResult(Pattern ex, MatchResult result, int row, int column) {
+            pattern = ex;
+            matchResult = result;
+            foundRow = row;
+            foundColumn = column;
+        }
+        
+        public void reset() {
+            foundRow= -1;
+            foundColumn = -1;
+            matchResult = null;
+            pattern = null;
+        }
+        
+        
+    }
+    
+
+
+}

@@ -12,10 +12,15 @@ import java.awt.event.ActionEvent;
 import java.lang.reflect.Method;
 import java.util.Hashtable;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.Icon;
+import javax.swing.JComponent;
 import javax.swing.JTree;
+import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicTreeUI;
@@ -25,6 +30,8 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import org.jdesktop.swingx.AbstractSearchable.SearchResult;
+import org.jdesktop.swingx.JXList.ListSearchable;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
@@ -62,6 +69,7 @@ public class JXTree extends JTree {
      */
     private LinkController linkController;
     private boolean overwriteIcons;
+    private Searchable searchable;
     
     
     
@@ -211,6 +219,11 @@ public class JXTree extends JTree {
         ActionMap map = getActionMap();
         map.put("expand-all", new Actions("expand-all"));
         map.put("collapse-all", new Actions("collapse-all"));
+        map.put("find", createFindAction());
+        // this should be handled by the LF!
+        KeyStroke findStroke = KeyStroke.getKeyStroke("control F");
+        getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(findStroke, "find");
+
     }
 
     /**
@@ -233,6 +246,120 @@ public class JXTree extends JTree {
     }
 
 
+//-------------------- search support
+    
+    private Action createFindAction() {
+        Action findAction = new UIAction("find") {
+
+            public void actionPerformed(ActionEvent e) {
+                doFind();
+                
+            }
+            
+        };
+        return findAction;
+    }
+
+    protected void doFind() {
+        SearchFactory.getInstance().showFindInput(this, getSearchable());
+        
+    }
+
+    /**
+     * 
+     * @returns a not-null Searchable for this editor.  
+     */
+    public Searchable getSearchable() {
+        if (searchable == null) {
+            searchable = new TreeSearchable();
+        }
+        return searchable;
+    }
+
+    /**
+     * sets the Searchable for this editor. If null, a default 
+     * searchable will be used.
+     * 
+     * @param searchable
+     */
+    public void setSearchable(Searchable searchable) {
+        this.searchable = searchable;
+    }
+    
+ 
+    /**
+     * A searchable targetting the visible rows of a JXTree.
+     * 
+     * PENDING: value to string conversion should behave as nextMatch (?)
+     * which uses the convertValueToString().
+     * 
+     */
+    public class TreeSearchable extends AbstractSearchable {
+
+        @Override
+        protected void findMatchAndUpdateState(Pattern pattern, int startRow, boolean backwards) {
+            SearchResult searchResult = null;
+            if (backwards) {
+                for (int index = startRow; index >= 0 && searchResult == null; index--) {
+                    searchResult = findMatchAt(pattern, index);
+                }
+            } else {
+                for (int index = startRow; index < getSize() && searchResult == null; index++) {
+                    searchResult = findMatchAt(pattern, index);
+                }
+            }
+            updateState(searchResult);
+            
+        }
+
+        @Override
+        protected SearchResult findExtendedMatch(Pattern pattern, int row) {
+            return findMatchAt(pattern, row);
+        }
+
+        /**
+         * Matches the cell content at row/col against the given Pattern.
+         * Returns an appropriate SearchResult if matching or null if no
+         * matching
+         * 
+         * @param pattern 
+         * @param row a valid row index in view coordinates
+         * @param column a valid column index in view coordinates
+         * @return
+         */
+        protected SearchResult findMatchAt(Pattern pattern, int row) {
+            TreePath path = getPathForRow(row);
+            Object value = null;
+            if (path != null) {
+                value = path.getLastPathComponent();
+            }
+            if (value != null) {
+                Matcher matcher = pattern.matcher(value.toString());
+                if (matcher.find()) {
+                    return createSearchResult(matcher, row, -1);
+                }
+            }
+            return null;
+        }
+        
+
+        @Override
+        protected int getSize() {
+            return getRowCount();
+        }
+
+        @Override
+        protected void moveMatchMarker() {
+            int row = lastSearchResult.foundRow;
+            setSelectionRow(row);
+            if (row >= 0) {
+                scrollRowToVisible(row);
+            }
+            
+        }
+        
+    }
+    
     /**
      * Collapses all nodes in the tree table.
      */
