@@ -335,7 +335,7 @@ public class JXTipOfTheDay extends JXPanel {
    * @exception HeadlessException
    *              if GraphicsEnvironment.isHeadless() returns true.
    * @see java.awt.GraphicsEnvironment#isHeadless
-   * @return true if the user chooses to not the tips again, false otherwise.
+   * @return true if the user chooses to see the tips again, false otherwise.
    */
   public boolean showDialog(Component parentComponent,
     ShowOnStartupChoice choice) {
