@@ -472,7 +472,7 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
         int lastFoundIndex = -1;
 
         MatchResult lastMatchResult;
-
+        String lastRegEx;
         /**
          * @return start position of matching string or -1
          */
@@ -539,7 +539,10 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
          * @return
          */
         private boolean foundExtendedMatch(Pattern pattern, int start) {
-            boolean foundExtended = false;
+            // JW: logic still needs cleanup...
+            if (pattern.pattern().equals(lastRegEx)) {
+                return false;
+            }
             int length = getDocument().getLength() - start;
             // Position position = getDocument().createPosition(startIndex);
             Segment segment = new Segment();
@@ -558,10 +561,10 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
                 if ((currentResult.start() == 0) && 
                    (!lastMatchResult.group().equals(currentResult.group()))) {
                     updateStateAfterFound(currentResult, start);
-                    foundExtended = true;
+                    return true;
                 } 
             }
-            return foundExtended;
+            return false;
         }
 
         /**
@@ -587,6 +590,7 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
             getCaret().setSelectionVisible(true);
             lastFoundIndex = found;
             lastMatchResult = currentResult;
+            lastRegEx = ((Matcher) lastMatchResult).pattern().pattern();
             return found;
         }
 
@@ -608,6 +612,7 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
         private void updateStateAfterNotFound() {
             lastFoundIndex = -1;
             lastMatchResult = null;
+            lastRegEx = null;
             setCaretPosition(getSelectionEnd());
         }
 
