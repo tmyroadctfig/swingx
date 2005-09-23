@@ -19,8 +19,7 @@ public class JXTaskPaneContainerTest extends InteractiveTestCase {
   
   public void testAddon() throws Exception {
     // move around all addons
-    new JXTaskPaneContainer();
-    TestUtilities.cycleAddons();
+    TestUtilities.cycleAddons(new JXTaskPaneContainer());
   }
 
 }
