@@ -92,7 +92,11 @@ public class Selection {
           viewSelection.addSelectionInterval(index, index);
         }
         int lead = modelSelection.getLeadSelectionIndex();
-        lead = convertToView(lead);
+        // PENDING: JW - this is a quick hack for spurious AIOB - need to enquire why 
+        // they happen in the first place
+        if (lead >= 0) {
+            lead = convertToView(lead);
+        }
         if (viewSelection instanceof DefaultListSelectionModel) {
             ((DefaultListSelectionModel) viewSelection).moveLeadSelectionIndex(lead);
         } else {
