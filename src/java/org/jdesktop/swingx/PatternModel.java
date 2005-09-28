@@ -39,13 +39,17 @@ import org.jdesktop.swingx.action.BoundAction;
  * <li> empty - true if there's no searchString
  * <li> incremental - a hint to clients to react immediately
  *      to pattern changes.
- *      
+ * 
  * </ul>
  * 
  * Relevant in find contexts:
  * <ul>
  * <li> backwards - search direction if used in a find context
  * <li> wrapping - wrap over the end/start if not found
+ * <li> foundIndex - storage for last found index
+ * <li> autoAdjustFoundIndex - flag to indicate auto-incr/decr of foundIndex on setting.
+ *      Here the property correlates to !isIncremental() - to simplify batch vs.
+ *      incremental search ui.
  * </ul>
  * 
  * 
@@ -110,7 +114,7 @@ public class PatternModel {
 
     private Pattern pattern;
 
-    private int foundIndex;
+    private int foundIndex = -1;
 
     private boolean caseSensitive;
 
@@ -135,10 +139,31 @@ public class PatternModel {
 
     public void setFoundIndex(int foundIndex) {
         int old = getFoundIndex();
-        this.foundIndex = foundIndex;
+        updateFoundIndex(foundIndex);
         firePropertyChange("foundIndex", old, getFoundIndex());
     }
     
+    /**
+     * 
+     * @param newFoundIndex
+     */
+    protected void updateFoundIndex(int newFoundIndex) {
+        if (newFoundIndex < 0) {
+            this.foundIndex = newFoundIndex;
+            return;
+        }
+        if (isAutoAdjustFoundIndex()) {
+            foundIndex = backwards ? newFoundIndex -1 : newFoundIndex + 1;
+        } else {
+            foundIndex = newFoundIndex;
+        }
+        
+    }
+
+    public boolean isAutoAdjustFoundIndex() {
+        return !isIncremental();
+    }
+
     public boolean isBackwards() {
         return backwards;
     }
@@ -147,6 +172,7 @@ public class PatternModel {
         boolean old = isBackwards();
         this.backwards = backwards;
         firePropertyChange("backwards", old, isBackwards());
+        setFoundIndex(getFoundIndex());
     }
 
     public boolean isWrapping() {
