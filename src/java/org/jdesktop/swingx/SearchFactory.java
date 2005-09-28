@@ -262,8 +262,8 @@ public class SearchFactory {
             } else {
                 findDialog.setLocation(location);
             }
-            findDialog.setVisible(true);
         }    
+        findDialog.setVisible(true);
         getSharedFindPanel().setSearchable(searchable);
     }
 
@@ -277,14 +277,16 @@ public class SearchFactory {
     protected Point hideSharedFilePanel() {
         if (findPanel == null) return null;
         Window window = SwingUtilities.getWindowAncestor(findPanel);
+        Point location = null;
         if (window != null) {
-            Point location = window.getLocationOnScreen();
             findPanel.getParent().remove(findPanel);
+            if (window.isVisible()) {
+                location = window.getLocationOnScreen();
+            }
             window.dispose();
-            return location;
-            
+             
         }
-        return null;
+        return location;
     }
 
     /**
