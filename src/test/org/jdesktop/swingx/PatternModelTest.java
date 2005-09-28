@@ -24,7 +24,73 @@ public class PatternModelTest extends TestCase {
     final static String middleStartAnchor = "some" + startAnchor + "one";
     final static String middleEndAnchor = "some" + endAnchor + "one";
     private PropertyChangeReport propertyReport;
- 
+
+
+    /**
+     * test initial autoAdjust of foundIndex in backward search.
+     *
+     */
+    public void testFoundIndexAutoAdjustBackward() {
+        PatternModel model = new PatternModel();
+        model.setBackwards(true);
+        assertTrue("is autoAdjust by default", model.isAutoAdjustFoundIndex());
+        model.addPropertyChangeListener(propertyReport);
+        int foundIndex = 10;
+        model.setFoundIndex(foundIndex);
+        // assert changed value
+        assertEquals("foundIndex must be set", foundIndex -1, model.getFoundIndex());
+        assertTrue("changing foundIndex must have fired foundIndex property", 
+                propertyReport.hasEvents("foundIndex"));
+    }
+
+    /**
+     * test initial autoAdjust of foundIndex in forward search.
+     *
+     */
+    public void testFoundIndexAutoAdjustNotFound() {
+        PatternModel model = new PatternModel();
+        assertTrue("is autoAdjust by default", model.isAutoAdjustFoundIndex());
+        model.addPropertyChangeListener(propertyReport);
+        int foundIndex = -1;
+        model.setFoundIndex(foundIndex);
+        // assert changed value
+        assertEquals("foundIndex must be set", foundIndex, model.getFoundIndex());
+    }
+
+
+    /**
+     * test initial autoAdjust of foundIndex in forward search.
+     *
+     */
+    public void testFoundIndexAutoAdjustForward() {
+        PatternModel model = new PatternModel();
+        assertTrue("is autoAdjust by default", model.isAutoAdjustFoundIndex());
+        model.addPropertyChangeListener(propertyReport);
+        int foundIndex = 10;
+        model.setFoundIndex(foundIndex);
+        // assert changed value
+        assertEquals("foundIndex must be set", foundIndex + 1, model.getFoundIndex());
+        assertTrue("changing foundIndex must have fired foundIndex property", 
+                propertyReport.hasEvents("foundIndex"));
+    }
+
+    /**
+     * test initial value and notification of "foundIndex" property.
+     *
+     */
+    public void testFoundIndex() {
+        PatternModel model = new PatternModel();
+        model.setIncremental(true);
+        // assert initial value
+        assertEquals("not found on start", -1, model.getFoundIndex());
+        model.addPropertyChangeListener(propertyReport);
+        model.setFoundIndex(10);
+        // assert changed value
+        assertEquals("foundIndex must be set", 10, model.getFoundIndex());
+        assertTrue("changing foundIndex must have fired foundIndex property", 
+                propertyReport.hasEvents("foundIndex"));
+    }
+    
     public void testCaseSensitive() {
         PatternModel model = new PatternModel();
         model.setRawText("tab");

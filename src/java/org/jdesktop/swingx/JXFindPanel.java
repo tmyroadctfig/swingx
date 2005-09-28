@@ -173,7 +173,7 @@ public class JXFindPanel extends AbstractPatternPanel {
         int foundIndex = searchable.search(getPatternModel().getPattern(), 
                 getPatternModel().getFoundIndex(), getPatternModel().isBackwards());
         getPatternModel().setFoundIndex(foundIndex);
-        return foundIndex;
+        return getPatternModel().getFoundIndex();
     }
 
     protected void showFoundMessage() {
