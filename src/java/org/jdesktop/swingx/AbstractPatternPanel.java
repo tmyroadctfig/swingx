@@ -15,6 +15,7 @@ import javax.swing.ActionMap;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -61,7 +62,8 @@ public abstract class AbstractPatternPanel extends JXPanel {
 //------------------------ actions
 
     /**
-     * Callback action bound to MATCH_ACTION_COMMAND.  
+     * Callback action bound to MATCH_ACTION_COMMAND. 
+     *  
      */
     public abstract void match();
     
@@ -230,6 +232,8 @@ public abstract class AbstractPatternPanel extends JXPanel {
                 String property = evt.getPropertyName();
                 if ("pattern".equals(property)) {
                     refreshPatternFromModel();
+                } else if ("rawText".equals(property)) {
+                    refreshDocumentFromModel();
                 } else if ("caseSensitive".equals(property)){
                     getAction(PatternModel.MATCH_CASE_ACTION_COMMAND).
                         setSelected(((Boolean) evt.getNewValue()).booleanValue());
@@ -274,6 +278,15 @@ public abstract class AbstractPatternPanel extends JXPanel {
         getPatternModel().setRawText(searchField.getText());
     }
 
+    protected void refreshDocumentFromModel() {
+        if (searchField.getText().equals(getPatternModel().getRawText())) return;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                searchField.setText(getPatternModel().getRawText());
+            }
+        });
+    }
+
     protected DocumentListener getSearchFieldListener() {
         DocumentListener l = new DocumentListener() {
             public void changedUpdate(DocumentEvent ev) {
@@ -299,18 +312,27 @@ public abstract class AbstractPatternPanel extends JXPanel {
      * configure and bind components to/from PatternModel
      */
     protected void bind() {
-      searchLabel.setText(getUIString(SEARCH_FIELD_LABEL));
-      String mnemonic = getUIString(SEARCH_FIELD_MNEMONIC);
-      if (mnemonic != SEARCH_FIELD_MNEMONIC) {
-          searchLabel.setDisplayedMnemonic(mnemonic.charAt(0));
-      }
-      searchLabel.setLabelFor(searchField);
+      bindSearchLabel();
         searchField.getDocument().addDocumentListener(getSearchFieldListener());
         ActionContainerFactory factory = new ActionContainerFactory(null);
         getActionContainerFactory().configureButton(matchCheck, 
                 (AbstractActionExt) getActionMap().get(PatternModel.MATCH_CASE_ACTION_COMMAND),
                 null);
         
+    }
+
+    /**
+     * Configures the searchLabel.
+     * Here: sets text and mnenomic properties form ui values, 
+     * configures as label for searchField.
+     */
+    protected void bindSearchLabel() {
+        searchLabel.setText(getUIString(SEARCH_FIELD_LABEL));
+          String mnemonic = getUIString(SEARCH_FIELD_MNEMONIC);
+          if (mnemonic != SEARCH_FIELD_MNEMONIC) {
+              searchLabel.setDisplayedMnemonic(mnemonic.charAt(0));
+          }
+          searchLabel.setLabelFor(searchField);
     }
     
     protected ActionContainerFactory getActionContainerFactory() {
