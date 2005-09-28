@@ -28,7 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-import java.util.regex.MatchResult;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -865,9 +865,23 @@ public class JXTable extends JTable { //implements Searchable {
             // super will have cleared selection
             getSelection().clearModelSelection();
             getRowSizing().clearModelSizes();
-            getRowSizing().setViewSizeSequence(getSuperRowModel(), getRowHeight());
+            updateViewSizeSequence();
+             
         }
 
+    }
+
+    /**
+     * Called if individual row height mapping need to be updated.
+     * This implementation guards against unnessary access of 
+     * super's private rowModel field.
+     */
+    protected void updateViewSizeSequence() {
+        SizeSequence sizeSequence = null;
+        if (isRowHeightEnabled()) {
+            sizeSequence = getSuperRowModel();
+        }
+        getRowSizing().setViewSizeSequence(sizeSequence, getRowHeight());
     }
     
     private Selection getSelection() {
@@ -2152,7 +2166,7 @@ public class JXTable extends JTable { //implements Searchable {
         if (rowHeight > 0) {
             isXTableRowHeightSet = true;
         }
-        getRowSizing().setViewSizeSequence(getSuperRowModel(), getRowHeight());
+        updateViewSizeSequence();
 
     }
 
@@ -2160,7 +2174,7 @@ public class JXTable extends JTable { //implements Searchable {
     public void setRowHeight(int row, int rowHeight) {
         if (!isRowHeightEnabled()) return;
         super.setRowHeight(row, rowHeight);
-        getRowSizing().setViewSizeSequence(getSuperRowModel(), getRowHeight());
+        updateViewSizeSequence();
         resizeAndRepaint();
     }
 
@@ -2231,6 +2245,7 @@ public class JXTable extends JTable { //implements Searchable {
             } catch (NoSuchFieldException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
+//                Logger.s();
             }
         }
         return rowModelField;
