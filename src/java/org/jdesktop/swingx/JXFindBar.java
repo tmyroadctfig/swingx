@@ -15,7 +15,6 @@ import javax.swing.KeyStroke;
 /**
  * A simple low-intrusion default widget for incremental search.
  * 
- * 
  * Actions registered (in addition to super):
  * <ul>
  *  <li> {@link JXDialog#CLOSE_ACTION_COMMAND} - an action bound to this component's
@@ -27,6 +26,17 @@ import javax.swing.KeyStroke;
  * <ul>
  *   <li> ESCAPE - calls action registered for {@link JXDialog#CLOSE_ACTION_COMMAND}
  * </ul>
+ * 
+ * This implementation uses textfield coloring as not-found visualization.
+ * 
+ * <p>
+ * PENDING: the coloring needs to be read from the UIManager instead of 
+ *  hardcoding.
+ *  
+ * <p>
+ * PENDING: the state transition of found/non-found coloring needs clean-up -
+ *  there are spurious problems when re-using the same instance 
+ *  (as SearchFactory does).
  * 
  * @author Jeanette Winzenburg
  * 
@@ -53,19 +63,48 @@ public class JXFindBar extends JXFindPanel {
 
     
     @Override
-    protected void showFoundMessage() {
-        if (previousBackgroundColor != null) {
-            searchField.setBackground(previousBackgroundColor);
-            searchField.setForeground(previousForegroundColor);
-        }        
+    public void setSearchable(Searchable searchable) {
+        super.setSearchable(searchable);
+        match();
     }
 
+
+    /**
+     * here: set textfield colors to not-found colors.
+     */
     @Override
     protected void showNotFoundMessage() {
-        previousBackgroundColor = searchField.getBackground();
-        previousForegroundColor = searchField.getForeground();
+//        previousBackgroundColor = searchField.getBackground();
+//        previousForegroundColor = searchField.getForeground();
         searchField.setForeground(notFoundForegroundColor);
         searchField.setBackground(notFoundBackgroundColor);    }
+
+
+    /**
+     * here: set textfield colors to normal.
+     */
+    @Override
+    protected void showFoundMessage() {
+//        if (previousBackgroundColor != null) {
+            searchField.setBackground(previousBackgroundColor);
+            searchField.setForeground(previousForegroundColor);
+//        }        
+    }
+
+    
+    
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        if (previousBackgroundColor == null) {
+            previousBackgroundColor = searchField.getBackground();
+            previousForegroundColor = searchField.getForeground();
+        } else {
+            searchField.setBackground(previousBackgroundColor);
+            searchField.setForeground(previousForegroundColor);
+        }
+    }
+
 
     //--------------------------- action call back
     /**
