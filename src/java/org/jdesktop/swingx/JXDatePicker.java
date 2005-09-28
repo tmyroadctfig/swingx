@@ -18,7 +18,6 @@ import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.border.*;
 import javax.swing.text.DefaultFormatterFactory;
-import org.jdesktop.swingx.border.DropShadowBorder;
 import org.jdesktop.swingx.calendar.*;
 
 /**
@@ -520,7 +519,6 @@ public class JXDatePicker extends JComponent {
                 _monthView.setSelectedDateSpan(span);
                 _monthView.ensureDateVisible(
                         ((Date)_dateField.getValue()).getTime());
-                Point loc = _dateField.getLocationOnScreen();
                 _popup.show(JXDatePicker.this,
                         0, JXDatePicker.this.getHeight());
             } else {
@@ -538,10 +536,7 @@ public class JXDatePicker extends JComponent {
     protected class JXDatePickerPopup extends JPopupMenu
             implements ActionListener {
 
-        private DropShadowBorder dsb = new DropShadowBorder(new Color(145, 145, 145), 1, 6);
-        
         public JXDatePickerPopup() {
-//            setBorder(dsb);
             _monthView.setActionCommand("MONTH_VIEW");
             _monthView.addActionListener(this);
 
@@ -569,7 +564,6 @@ public class JXDatePicker extends JComponent {
             setDrawGradient(true);
             setGradientPaint(new GradientPaint(0, 0, new Color(238, 238, 238), 0, 1, Color.WHITE));
             JXHyperlink todayLink = new JXHyperlink(new TodayAction());
-            //                todayLink.setHidden(false);
             Color textColor = new Color(16, 66, 104);
             todayLink.setUnclickedColor(textColor);
             todayLink.setClickedColor(textColor);
@@ -578,7 +572,7 @@ public class JXDatePicker extends JComponent {
         
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            //add the two lines at the top
+
             g.setColor(new Color(187, 187, 187));
             g.drawLine(0, 0, getWidth(), 0);
             g.setColor(new Color(221, 221, 221));
@@ -650,19 +644,17 @@ public class JXDatePicker extends JComponent {
             // If the current formatter did not work loop through the other
             // formatters and see if any of them can parse the string passed
             // in.
-            if (result == null) {
-                for (int i = 0; i < _formats.length; i++) {
-                    try {
-                        result = ((DateFormat)_formats[i]).parse(text);
+            for (int i = 0; i < _formats.length; i++) {
+                try {
+                    result = (_formats[i]).parse(text);
 
-                        // We got a successful formatter.  Update the
-                        // current formatter index.
-                        _formatIndex = i;
-                        pex = null;
-                        break;
-                    } catch (ParseException ex) {
-                        pex = ex;
-                    }
+                    // We got a successful formatter.  Update the
+                    // current formatter index.
+                    _formatIndex = i;
+                    pex = null;
+                    break;
+                } catch (ParseException ex) {
+                    pex = ex;
                 }
             }
 

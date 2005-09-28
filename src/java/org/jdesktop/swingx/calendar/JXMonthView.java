@@ -175,6 +175,7 @@ public class JXMonthView extends JComponent {
     private boolean _antiAlias = false;
     private boolean _ltr;
     private boolean _traversable = false;
+    private boolean _usingKeyboard = false;
     private boolean _asKirkWouldSay_FIRE = false;
     private Calendar _cal;
     private String[] _daysOfTheWeek;
@@ -192,7 +193,12 @@ public class JXMonthView extends JComponent {
     private Timer _todayTimer = null;
     private ImageIcon _monthDownImage;
     private ImageIcon _monthUpImage;
-    private Hashtable _dayToColorTable = new Hashtable<Integer, Color>();
+    private Hashtable<Integer, Color> _dayToColorTable = new Hashtable<Integer, Color>();
+
+    /**
+     * Date span used by the keyboard actions to track the original selection.
+     */
+    private DateSpan _originalDateSpan = null;
 
     /**
      * Create a new instance of the <code>JXMonthView</code> class using the
@@ -244,7 +250,10 @@ public class JXMonthView extends JComponent {
         enableEvents(AWTEvent.MOUSE_MOTION_EVENT_MASK);
 
         // Setup the keyboard handler.
-        InputMap inputMap = getInputMap(JComponent.WHEN_FOCUSED);
+        InputMap inputMap = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false), "acceptSelection");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false), "cancelSelection");
+
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "selectPreviousDay");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "selectNextDay");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, false), "selectDayInPreviousWeek");
@@ -256,6 +265,9 @@ public class JXMonthView extends JComponent {
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.SHIFT_MASK, false), "addToNextWeek");
         
         ActionMap actionMap = getActionMap();
+        actionMap.put("acceptSelection", new KeyboardAction(KeyboardAction.ACCEPT_SELECTION));
+        actionMap.put("cancelSelection", new KeyboardAction(KeyboardAction.CANCEL_SELECTION));
+
         actionMap.put("selectPreviousDay", new KeyboardAction(KeyboardAction.SELECT_PREVIOUS_DAY));
         actionMap.put("selectNextDay", new KeyboardAction(KeyboardAction.SELECT_NEXT_DAY));
         actionMap.put("selectDayInPreviousWeek", new KeyboardAction(KeyboardAction.SELECT_DAY_PREVIOUS_WEEK));
@@ -421,7 +433,7 @@ public class JXMonthView extends JComponent {
             int lastYear = _cal.get(Calendar.YEAR);
 
             int diffMonths = month - lastMonth +
-                    ((year - lastYear) * 12);
+                    ((year - lastYear) * MONTHS_IN_YEAR);
 
             _cal.setTimeInMillis(_firstDisplayedDate);
             _cal.add(Calendar.MONTH, diffMonths);
@@ -491,7 +503,7 @@ public class JXMonthView extends JComponent {
                         _cal.add(Calendar.DAY_OF_MONTH, 1);
                         count++;
                     }
-                    if (count > 7) {
+                    if (count > DAYS_IN_WEEK) {
                         // Make sure start date is on the beginning of the
                         // week.
                         _cal.setTimeInMillis(_startSelectedDate);
@@ -510,10 +522,10 @@ public class JXMonthView extends JComponent {
 
                         // Make sure we have full weeks.  Otherwise modify the
                         // end date.
-                        int remainder = count % 7;
+                        int remainder = count % DAYS_IN_WEEK;
                         if (remainder != 0) {
                             _cal.setTimeInMillis(_endSelectedDate);
-                            _cal.add(Calendar.DAY_OF_MONTH, (7 - remainder));
+                            _cal.add(Calendar.DAY_OF_MONTH, (DAYS_IN_WEEK - remainder));
                             _endSelectedDate = _cal.getTimeInMillis();
                         }
                     }
@@ -650,16 +662,16 @@ public class JXMonthView extends JComponent {
      * week.  For this method the first days of the week days[0] is assumed to
      * be <code>Calendar.SUNDAY</code>.
      *
-     * @throws IllegalArgumentException if <code>days.length</code> != 7
+     * @throws IllegalArgumentException if <code>days.length</code> != DAYS_IN_WEEK
      * @throws NullPointerException if <code>days</code> == null
      */
     public void setDaysOfTheWeek(String[] days)
             throws IllegalArgumentException, NullPointerException {
         if (days == null) {
             throw new NullPointerException("Array of days is null.");
-        } else if (days.length != 7) {
+        } else if (days.length != DAYS_IN_WEEK) {
             throw new IllegalArgumentException(
-                    "Array of days is not of length 7 as expected.");
+                    "Array of days is not of length " + DAYS_IN_WEEK + " as expected.");
         }
 
         // TODO: This could throw off internal size information we should
@@ -677,8 +689,8 @@ public class JXMonthView extends JComponent {
      * @return Single character representation for the days of the week
      */
     public String[] getDaysOfTheWeek() {
-        String[] days = new String[7];
-        System.arraycopy(_daysOfTheWeek, 0, days, 0, 7);
+        String[] days = new String[DAYS_IN_WEEK];
+        System.arraycopy(_daysOfTheWeek, 0, days, 0, DAYS_IN_WEEK);
         return days;
     }
 
@@ -864,8 +876,8 @@ public class JXMonthView extends JComponent {
      * Set the color to be used for painting the specified day of the week.
      * Acceptable values are Calendar.SUNDAY - Calendar.SATURDAY.
      *
-     * @dayOfWeek constant value defining the day of the week.
-     * @c The color to be used for painting the numeric day of the week.
+     * @param dayOfWeek constant value defining the day of the week.
+     * @param c The color to be used for painting the numeric day of the week.
      */
     public void setDayForeground(int dayOfWeek, Color c) {
         _dayToColorTable.put(dayOfWeek, c);
@@ -1011,8 +1023,8 @@ public class JXMonthView extends JComponent {
         // Loop through the days of the week and adjust the box width
         // accordingly.
         _boxHeight = fm.getHeight();
-        for (int i = 0; i < _daysOfTheWeek.length; i++) {
-            currWidth = fm.stringWidth(_daysOfTheWeek[i]);
+        for (String dayOfTheWeek : _daysOfTheWeek) {
+            currWidth = fm.stringWidth(dayOfTheWeek);
             if (currWidth > _boxWidth) {
                 _boxWidth = currWidth;
             }
@@ -1397,7 +1409,7 @@ public class JXMonthView extends JComponent {
                         }
                         g.drawString(_daysOfTheWeek[dayIndex], tmpX, tmpY);
                         dayIndex++;
-                        if (dayIndex == 7) {
+                        if (dayIndex == DAYS_IN_WEEK) {
                             dayIndex = 0;
                         }
                     }
@@ -1613,10 +1625,7 @@ public class JXMonthView extends JComponent {
      * and _endSelectedDate range.
      */
     private boolean isSelectedDate(long time) {
-        if (time >= _startSelectedDate && time <= _endSelectedDate) {
-            return true;
-        }
-        return false;
+        return time >= _startSelectedDate && time <= _endSelectedDate;
     }
 
     /**
@@ -1675,7 +1684,7 @@ public class JXMonthView extends JComponent {
         
         // Determine what row/column we are in.
         int diffMonths = month - _firstDisplayedMonth +
-                ((year - _firstDisplayedYear) * 12);
+                ((year - _firstDisplayedYear) * MONTHS_IN_YEAR);
         int calRowIndex = diffMonths / _numCalCols;
         int calColIndex = diffMonths - (calRowIndex * _numCalCols);
 
@@ -1926,10 +1935,13 @@ public class JXMonthView extends JComponent {
      */
     @Override
     protected void processMouseEvent(MouseEvent e) {
+         // If we were using the keyboard we aren't anymore.
+        _usingKeyboard = false;
+
         if (!isEnabled()) {
             return;
         }
-        
+
         if (!hasFocus() && isFocusable()) {
             requestFocusInWindow();
         }
@@ -2005,6 +2017,9 @@ public class JXMonthView extends JComponent {
      */
     @Override
     protected void processMouseMotionEvent(MouseEvent e) {
+        // If we were using the keyboard we aren't anymore.
+        _usingKeyboard = false;
+
         if (!isEnabled() || _selectionMode == NO_SELECTION) {
             return;
         }
@@ -2100,40 +2115,57 @@ public class JXMonthView extends JComponent {
      * Class that supports keyboard traversal of the JXMonthView component.
      */
     private class KeyboardAction extends AbstractAction {
-        public static final int SELECT_PREVIOUS_DAY = 0;
-        public static final int SELECT_NEXT_DAY = 1;
-        public static final int SELECT_DAY_PREVIOUS_WEEK = 2;
-        public static final int SELECT_DAY_NEXT_WEEK = 3;
-        public static final int ADD_PREVIOUS_DAY = 4;
-        public static final int ADD_NEXT_DAY = 5;
-        public static final int ADD_TO_PREVIOUS_WEEK = 6;
-        public static final int ADD_TO_NEXT_WEEK = 7;
+        public static final int ACCEPT_SELECTION = 0;
+        public static final int CANCEL_SELECTION = 1;
+        public static final int SELECT_PREVIOUS_DAY = 2;
+        public static final int SELECT_NEXT_DAY = 3;
+        public static final int SELECT_DAY_PREVIOUS_WEEK = 4;
+        public static final int SELECT_DAY_NEXT_WEEK = 5;
+        public static final int ADD_PREVIOUS_DAY = 6;
+        public static final int ADD_NEXT_DAY = 7;
+        public static final int ADD_TO_PREVIOUS_WEEK = 8;
+        public static final int ADD_TO_NEXT_WEEK = 9;
         
-        private int mode;
+        private int action;
         
-        public KeyboardAction(int mode) {
-            this.mode = mode;
+        public KeyboardAction(int action) {
+            this.action = action;
         }
         
-        public void actionPerformed(ActionEvent ev) {            
-            if (_startSelectedDate != -1) {
-                
-                if (mode >=0 && mode <= 3) {
-                    if (getSelectionMode() >= SINGLE_SELECTION) {
-                        traverse(mode);
-                    }
-                } else if (mode >= 4 && mode <= 7) {
-                    if (getSelectionMode() > SINGLE_SELECTION) {
-                        addToSelection(mode);
-                    }
+        public void actionPerformed(ActionEvent ev) {
+            int selectionMode = getSelectionMode();
+
+            // TODO: Modify this to allow keyboard selection even if we don't have a previous selection.
+            if (_startSelectedDate != -1 && selectionMode != NO_SELECTION) {
+                if (!_usingKeyboard) {
+                    _originalDateSpan = getSelectedDateSpan();
                 }
 
+                if (action >= ACCEPT_SELECTION && action <= CANCEL_SELECTION && _usingKeyboard) {
+                    if (action == CANCEL_SELECTION) {
+                        // Restore the original selection.
+                        setSelectedDateSpan(_originalDateSpan);
+                        fireActionPerformed();
+                    } else {
+                        // Accept the keyboard selection.
+                        setSelectedDateSpan(getSelectedDateSpan());
+                        fireActionPerformed();
+                    }
+                    _usingKeyboard = false;
+                } else if (action >= SELECT_PREVIOUS_DAY && action <= SELECT_DAY_NEXT_WEEK) {
+                    _usingKeyboard = true;
+                    traverse(action);
+                } else if (selectionMode >= MULTIPLE_SELECTION &&
+                        action >= ADD_PREVIOUS_DAY && action <= ADD_TO_NEXT_WEEK) {
+                    _usingKeyboard = true;
+                    addToSelection(action);
+                }
             }
         }
         
-        private void traverse(int mode) {
+        private void traverse(int action) {
             _cal.setTimeInMillis(_startSelectedDate);
-            switch (mode) {
+            switch (action) {
                 case SELECT_PREVIOUS_DAY:
                     _cal.add(Calendar.DAY_OF_MONTH, -1);
                     break;                        
@@ -2141,10 +2173,10 @@ public class JXMonthView extends JComponent {
                     _cal.add(Calendar.DAY_OF_MONTH, 1);
                     break;
                 case SELECT_DAY_PREVIOUS_WEEK:
-                    _cal.add(Calendar.DAY_OF_MONTH, -7);
+                    _cal.add(Calendar.DAY_OF_MONTH, -DAYS_IN_WEEK);
                     break;
                 case SELECT_DAY_NEXT_WEEK:
-                    _cal.add(Calendar.DAY_OF_MONTH, 7);
+                    _cal.add(Calendar.DAY_OF_MONTH, DAYS_IN_WEEK);
                     break;
             }
             
@@ -2164,12 +2196,12 @@ public class JXMonthView extends JComponent {
          * NOTE: This may not be the expected behavior for the keyboard controls
          * and we ay need to update this code to act in a way that people expect.
          */
-        private void addToSelection(int mode) {
+        private void addToSelection(int action) {
             long newStartDate = _startSelectedDate;
             long newEndDate = _endSelectedDate;
             boolean isForward = true;
             
-            switch (mode) {
+            switch (action) {
                 case ADD_PREVIOUS_DAY:
                     _cal.setTimeInMillis(_startSelectedDate);
                     _cal.add(Calendar.DAY_OF_MONTH, -1);
@@ -2183,13 +2215,13 @@ public class JXMonthView extends JComponent {
                     break;
                 case ADD_TO_PREVIOUS_WEEK:
                     _cal.setTimeInMillis(_startSelectedDate);
-                    _cal.add(Calendar.DAY_OF_MONTH, -7);
+                    _cal.add(Calendar.DAY_OF_MONTH, -DAYS_IN_WEEK);
                     newStartDate = _cal.getTimeInMillis();
                     isForward = false;
                     break;
                 case ADD_TO_NEXT_WEEK:
                     _cal.setTimeInMillis(_endSelectedDate);
-                    _cal.add(Calendar.DAY_OF_MONTH, 7);
+                    _cal.add(Calendar.DAY_OF_MONTH, DAYS_IN_WEEK);
                     newEndDate = _cal.getTimeInMillis();
                     break;                    
             }
