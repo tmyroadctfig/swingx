@@ -7,10 +7,12 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
+import java.awt.FlowLayout;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
 
 /**
  * A simple low-intrusion default widget for incremental search.
@@ -142,6 +144,7 @@ public class JXFindBar extends JXFindPanel {
     @Override
     protected void build() {
 //        setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+        setLayout(new FlowLayout(SwingConstants.LEADING));
         add(searchLabel);
         add(new JLabel(":"));
         add(new JLabel("  "));
