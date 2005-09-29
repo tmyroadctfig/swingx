@@ -1600,10 +1600,11 @@ public class JXTable extends JTable { //implements Searchable {
 
         private boolean isInPipeline(PatternHighlighter searchHighlighter) {
             Highlighter[] inPipeline = getHighlighters().getHighlighters();
-            for (int i = 0; i < inPipeline.length; i++) {
-                if (searchHighlighter.equals(inPipeline[i]))
-                    return true;
+            if ((inPipeline.length > 0) && 
+               (searchHighlighter.equals(inPipeline[inPipeline.length -1]))) {
+                return true;
             }
+            getHighlighters().removeHighlighter(searchHighlighter);
             return false;
         }
 
