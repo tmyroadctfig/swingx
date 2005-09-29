@@ -6,12 +6,18 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Frame;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -63,6 +69,10 @@ public class SearchFactory {
     protected JXFindBar findBar;
 
     private boolean useFindBar;
+
+    private Point lastFindDialogLocation;
+
+    private FindRemover findRemover;
     
     /** 
      * returns the shared SearchFactory.
@@ -130,7 +140,22 @@ public class SearchFactory {
             KeyboardFocusManager.getCurrentKeyboardFocusManager().focusNextComponent(getSharedFindBar());
             
         }
+        target.putClientProperty(AbstractSearchable.MATCH_HIGHLIGHTER, Boolean.TRUE);
+        installFindRemover(target, getSharedFindBar());
         getSharedFindBar().setSearchable(searchable);
+    }
+
+    protected void installFindRemover(Container target, Container findWidget) {
+        if (target != null) {
+            getFindRemover().addTarget(target);
+        }
+        getFindRemover().addTarget(findWidget);
+    }
+    private FindRemover getFindRemover() {
+        if (findRemover == null) {
+            findRemover = new FindRemover();
+        }
+        return findRemover;
     }
 
     /**
@@ -178,6 +203,7 @@ public class SearchFactory {
 
             public void actionPerformed(ActionEvent e) {
                 removeFromParent(findBar);
+//                stopSearching();
                 
             }
             
@@ -242,6 +268,7 @@ public class SearchFactory {
     public void showFindDialog(JComponent target, Searchable searchable) {
         Frame frame = JOptionPane.getRootFrame();
         if (target != null) {
+            target.putClientProperty(AbstractSearchable.MATCH_HIGHLIGHTER, Boolean.FALSE);
             Window window = SwingUtilities.getWindowAncestor(target);
             if (window instanceof Frame) {
                 frame = (Frame) window;
@@ -254,7 +281,7 @@ public class SearchFactory {
             KeyboardFocusManager.getCurrentKeyboardFocusManager().focusNextComponent(findDialog);
         } else {
             Point location = hideSharedFilePanel();
-            findDialog = new JXDialog(frame, getSharedFindPanel(), false);
+            findDialog = new JXDialog(frame, getSharedFindPanel());
             findDialog.setAlwaysOnTop(true);
             findDialog.pack();
             if (location == null) {
@@ -262,8 +289,10 @@ public class SearchFactory {
             } else {
                 findDialog.setLocation(location);
             }
-        }    
+        } 
+        
         findDialog.setVisible(true);
+        installFindRemover(target, findDialog);
         getSharedFindPanel().setSearchable(searchable);
     }
 
@@ -277,16 +306,27 @@ public class SearchFactory {
     protected Point hideSharedFilePanel() {
         if (findPanel == null) return null;
         Window window = SwingUtilities.getWindowAncestor(findPanel);
-        Point location = null;
+        Point location = lastFindDialogLocation;
         if (window != null) {
             findPanel.getParent().remove(findPanel);
             if (window.isVisible()) {
                 location = window.getLocationOnScreen();
             }
             window.dispose();
-             
         }
         return location;
+    }
+
+    protected void stopSearching() {
+        if (findPanel != null) {
+            lastFindDialogLocation = hideSharedFilePanel();
+            findPanel.setSearchable(null);
+        }
+        if (findBar != null) {
+            removeFromParent(findBar);
+            findBar.setSearchable(null);
+        }
+        
     }
 
     /**
@@ -309,6 +349,65 @@ public class SearchFactory {
      * @param inToolBar
      */
     public void setUseFindBar(boolean inToolBar) {
+        if (inToolBar == useFindBar) return;
         this.useFindBar = inToolBar;
+        getFindRemover().endSearching();
     }
+
+    public class FindRemover implements PropertyChangeListener {
+        KeyboardFocusManager focusManager;
+        Set<Container> targets;
+        
+        public FindRemover() {
+            updateManager();
+        }
+
+        public void addTarget(Container target) {
+            getTargets().add(target);
+        }
+        
+        public void removeTarget(Container target) {
+            getTargets().remove(target);
+        }
+        
+        private Set<Container> getTargets() {
+            if (targets == null) {
+                targets = new HashSet<Container>();
+            }
+            return targets;
+        }
+
+        /**
+         * 
+         */
+        private void updateManager() {
+            if (focusManager != null) {
+                focusManager.removePropertyChangeListener("permanentFocusOwner", this);
+            }
+            this.focusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+            focusManager.addPropertyChangeListener("permanentFocusOwner", this);
+        }
+
+        public void propertyChange(PropertyChangeEvent ev) {
+
+            Component c = focusManager.getPermanentFocusOwner();
+            if (c == null) return;
+            for (Iterator<Container> iter = getTargets().iterator(); iter.hasNext();) {
+                Container element = iter.next();
+                if ((element == c) || (SwingUtilities.isDescendingFrom(c, element))) {
+                    return;
+                }
+            }
+            endSearching();
+       }
+
+        /**
+         * 
+         */
+        public void endSearching() {
+            getTargets().clear();
+            stopSearching();
+        }
+    }
+
 }

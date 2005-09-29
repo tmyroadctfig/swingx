@@ -9,10 +9,12 @@ package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
 import java.awt.GraphicsEnvironment;
+import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.util.regex.Pattern;
 
+import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
 import javax.swing.Action;
 import javax.swing.JButton;
@@ -39,7 +41,7 @@ public class FindTest extends InteractiveTestCase {
       FindTest test = new FindTest();
       try {
 //        test.runInteractiveTests();
-//          test.runInteractiveTests("interactive.*Compare.*");
+          test.runInteractiveTests("interactive.*Compare.*");
           test.runInteractiveTests("interactive.*Tree.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
@@ -49,7 +51,7 @@ public class FindTest extends InteractiveTestCase {
     @Override
     protected void setUp() {
         editorURL = FindTest.class.getResource("resources/test.txt");
-//        SearchFactory.getInstance().setShowFindInToolBar(true);
+//        SearchFactory.getInstance().setUseFindBar(true);
     }
     
 
@@ -521,12 +523,25 @@ public class FindTest extends InteractiveTestCase {
         showComponent(new JXTable(new TestTableModel()), "Search in XTable");
     }
 
-    public void interactiveCompareMatchMarker() {
-        JXTable first = new JXTable(new TestTableModel());
+    public void interactiveCompareFindStrategy() {
+        final JXTable first = new JXTable(new TestTableModel());
         first.setColumnControlVisible(true);
-        JXTable second = new JXTable(new TestTableModel());
-        second.putClientProperty(JXTable.MATCH_HIGHLIGHTER, Boolean.TRUE);
-        showComponent(first, second, "Mark Match by Selection <--> SearchHighlighter");
+        Action action = new AbstractAction("toggle batch/incremental"){
+            boolean useFindBar;
+            public void actionPerformed(ActionEvent e) {
+                useFindBar = !useFindBar;
+                SearchFactory.getInstance().setUseFindBar(useFindBar);
+//                first.getActionMap().get("find").actionPerformed(null);
+                
+            }
+            
+        };
+        
+        final JXTreeTable second = new JXTreeTable(new FileSystemModel());
+        JXFrame frame = wrapWithScrollingInFrame(first, second, "Batch/Incremental Search");
+        addAction(frame, action);
+        frame.getRootPaneExt().getStatusBar().add(new JLabel("Press ctrl-F to open search widget"));
+        frame.setVisible(true);
     }
 
     public void interactiveShowSplitPane() {
@@ -561,8 +576,9 @@ public class FindTest extends InteractiveTestCase {
             frame= wrapWithScrollingInFrame(component, title);
         }
         
-        Action action = new TargetableAction("Find", "find");
-        addAction(frame, action);
+//        Action action = new TargetableAction("Find", "find");
+//        addAction(frame, action);
+        frame.getRootPaneExt().getStatusBar().add(new JLabel("Press ctrl-F to open search widget"));
         frame.setSize(600, 400);
         frame.setVisible(true);
         

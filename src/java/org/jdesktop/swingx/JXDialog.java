@@ -43,6 +43,8 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  * 
  * 
  * PENDING: add support for vetoing the close.
+ * PENDING: add complete set of constructors
+ * PENDING: add windowListener to delegate to close action
  * 
  * @author Jeanette Winzenburg
  */
@@ -59,14 +61,9 @@ public class JXDialog extends JDialog {
 
     JComponent content;
     
-    public JXDialog(Frame frame, JComponent content, boolean packAndShow) {
+    public JXDialog(Frame frame, JComponent content) {
         super(frame);
         setContent(content);
-        if (packAndShow) {
-            pack();
-            locate();
-            setVisible(true);
-        }
     }
     
     private void setContent(JComponent content) {
@@ -105,19 +102,19 @@ public class JXDialog extends JDialog {
         
     }
 
-    /**
-     * 
-     */
-    private void locate() {
-        GraphicsConfiguration gc =
-            GraphicsEnvironment.getLocalGraphicsEnvironment().
-            getDefaultScreenDevice().getDefaultConfiguration();
-        Rectangle bounds = gc.getBounds();
-        int x = bounds.x+bounds.width/3;
-        int y = bounds.y+bounds.height/3;
-
-        setLocation(x, y);
-    }
+//    /**
+//     * 
+//     */
+//    private void locate() {
+//        GraphicsConfiguration gc =
+//            GraphicsEnvironment.getLocalGraphicsEnvironment().
+//            getDefaultScreenDevice().getDefaultConfiguration();
+//        Rectangle bounds = gc.getBounds();
+//        int x = bounds.x+bounds.width/3;
+//        int y = bounds.y+bounds.height/3;
+//
+//        setLocation(x, y);
+//    }
 
     public void setVisible(boolean visible) {
         if (content == null) throw 
