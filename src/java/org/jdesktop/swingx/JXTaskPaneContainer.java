@@ -9,7 +9,7 @@ package org.jdesktop.swingx;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 
-import javax.swing.JPanel;
+import javax.swing.JComponent;
 import javax.swing.JViewport;
 import javax.swing.Scrollable;
 
@@ -84,7 +84,7 @@ import org.jdesktop.swingx.plaf.TaskPaneContainerUI;
  *          mono32="JXTaskPaneContainer32-mono.gif"
  *          color32="JXTaskPaneContainer32.gif"
  */
-public class JXTaskPaneContainer extends JPanel implements Scrollable {
+public class JXTaskPaneContainer extends JComponent implements Scrollable {
 
   public final static String uiClassID = "swingx/TaskPaneContainerUI";
   
