@@ -99,7 +99,7 @@ public class BasicTipOfTheDayUI extends TipOfTheDayUI {
     }
 
     dialog.getContentPane().setLayout(new BorderLayout(10, 10));
-    dialog.getContentPane().add("Center", tipPane);
+    dialog.getContentPane().add(tipPane, BorderLayout.CENTER);
     ((JComponent)dialog.getContentPane()).setBorder(BorderFactory
       .createEmptyBorder(10, 10, 10, 10));
 
@@ -113,14 +113,14 @@ public class BasicTipOfTheDayUI extends TipOfTheDayUI {
       showOnStartupBox = new JCheckBox(UIManager
         .getString("TipOfTheDay.showOnStartupText"), choice
         .isShowingOnStartup());
-      controls.add("Center", showOnStartupBox);
+      controls.add(showOnStartupBox, BorderLayout.CENTER);
     } else {
       showOnStartupBox = null;
     }
 
     JPanel buttons =
       new JPanel(new GridLayout(1, showPreviousButton?3:2, 9, 0));
-    controls.add("East", buttons);
+    controls.add(buttons, BorderLayout.LINE_END);
     
     if (showPreviousButton) {
       JButton previousTipButton = new JButton(UIManager
