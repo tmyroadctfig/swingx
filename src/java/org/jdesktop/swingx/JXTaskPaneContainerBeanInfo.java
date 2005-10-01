@@ -152,10 +152,7 @@ public class JXTaskPaneContainerBeanInfo extends SimpleBeanInfo
       }
       catch (Exception e)
       {
-         // do not ignore, bomb politely so use has chance to discover what went wrong...
-	 // I know that this is suboptimal solution, but swallowing silently is
-	 // even worse... Propose better solution! 
-	 e.printStackTrace();
+        // Ignore it
       }
       return null;
    }
