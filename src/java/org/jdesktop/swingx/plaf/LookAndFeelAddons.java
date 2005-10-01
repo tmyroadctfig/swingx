@@ -68,24 +68,23 @@ public class LookAndFeelAddons {
 
     try {
       setAddon(addonClassname);
-      setTrackingLookAndFeelChanges(true);
-      
-      // this addon ensure resource bundle gets added to lookandfeel defaults
-      // and re-added by #maybeInitialize if needed      
-      contribute(new AbstractComponentAddon("MinimumAddon") {
-        @Override
-        protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
-          addResource(defaults, LookAndFeelAddons.class.getPackage().getName()
-            + ".resources.swingx");
-        }
-      });
-    } catch (InstantiationException e) {
-      e.printStackTrace();
-    } catch (IllegalAccessException e) {
-      e.printStackTrace();
-    } catch (ClassNotFoundException e) {
-      e.printStackTrace();
+    } catch (Exception e) {
+      // PENDING(fred) do we want to log an error and continue with a default
+      // addon class or do we just fail?
+      throw new ExceptionInInitializerError(e);
     }
+    
+    setTrackingLookAndFeelChanges(true);
+      
+    // this addon ensure resource bundle gets added to lookandfeel defaults
+    // and re-added by #maybeInitialize if needed      
+    contribute(new AbstractComponentAddon("MinimumAddon") {
+      @Override
+      protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+        addResource(defaults, LookAndFeelAddons.class.getPackage().getName()
+          + ".resources.swingx");
+      }
+    });
   }
 
   private static LookAndFeelAddons currentAddon;
@@ -250,8 +249,8 @@ public class LookAndFeelAddons {
     try {
       Class uiClass = Class.forName(uiClassname);
       UIManager.put(uiClassname, uiClass);
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (ClassNotFoundException e) {
+      // we ignore the ClassNotFoundException
     }
     
     ComponentUI ui = UIManager.getUI(component);
