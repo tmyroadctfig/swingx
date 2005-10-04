@@ -60,6 +60,20 @@ public class JXTableUnitTest extends InteractiveTestCase {
 
 
     /**
+     * Issue #165-swingx: IllegalArgumentException when
+     * hiding/reshowing columns "at end" of column model.
+     *
+     */
+    public void testHideShowLastColumns() {
+        JXTable table = new JXTable(10, 3);
+        TableColumnExt ext = table.getColumnExt(2);
+        for (int i = table.getModel().getColumnCount() - 1; i > 0; i--) {
+           table.getColumnExt(i).setVisible(false); 
+        }
+        ext.setVisible(true);
+    }
+
+    /**
      * Issue #155-swingx: lost setting of initial scrollBarPolicy.
      *
      */

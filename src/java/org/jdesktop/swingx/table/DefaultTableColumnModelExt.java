@@ -199,7 +199,7 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel implemen
         oldIndexes.remove(col);
         col.putClientProperty(IGNORE_EVENT, Boolean.TRUE);
         super.addColumn(col);
-        moveColumn(getColumnCount() - 1, oldIndex);
+        moveColumn(getColumnCount() - 1, Math.min(getColumnCount() - 1, oldIndex));
         col.putClientProperty(IGNORE_EVENT, null);
 //        tableColumns.add(oldIndex, col);
 //        //need to fire some listener that will cause the table
