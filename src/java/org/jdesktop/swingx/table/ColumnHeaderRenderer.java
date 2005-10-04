@@ -141,10 +141,19 @@ public class ColumnHeaderRenderer extends JComponent implements TableCellRendere
                 ((JComponent) comp).setBorder(border);
             }
         }
-        if(comp.getComponentOrientation() != table.getComponentOrientation()) {
-            comp.setComponentOrientation(table.getComponentOrientation());
-        }
+        adjustComponentOrientation(comp);
         return comp;
+    }
+
+    /**
+     * adjusts the Component's orientation to JXTable's CO if appropriate.
+     * Here: always.
+     * 
+     * @param stamp
+     */
+    protected void adjustComponentOrientation(Component stamp) {
+        if (stamp.getComponentOrientation().equals(getComponentOrientation())) return;
+        stamp.applyComponentOrientation(getComponentOrientation());
     }
 
     private Component configureDelegate(JTable table, Object value,

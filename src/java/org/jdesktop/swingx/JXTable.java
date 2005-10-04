@@ -1906,7 +1906,11 @@ public class JXTable extends JTable { //implements Searchable {
     /**
      * Returns the decorated <code>Component</code> used as a stamp to render
      * the specified cell. Overrides superclass version to provide support for
-     * cell decorators.
+     * cell decorators. 
+     * 
+     * Adjusts component orientation (guaranteed to happen before applying 
+     * Highlighters).
+     * see - https://swingx.dev.java.net/issues/show_bug.cgi?id=145
      * 
      * @param renderer
      *            the <code>TableCellRenderer</code> to prepare
@@ -1940,11 +1944,27 @@ public class JXTable extends JTable { //implements Searchable {
     }
 
     
+    /**
+     * Overridden to adjust the editor's component orientation if 
+     * appropriate.
+     */
+    @Override
+    public Component prepareEditor(TableCellEditor editor, int row, int column) {
+        // TODO Auto-generated method stub
+        Component comp =  super.prepareEditor(editor, row, column);
+        adjustComponentOrientation(comp);
+        return comp;
+    }
 
-    private void adjustComponentOrientation(Component stamp) {
+    /**
+     * adjusts the Component's orientation to JXTable's CO if appropriate.
+     * Here: always.
+     * 
+     * @param stamp
+     */
+    protected void adjustComponentOrientation(Component stamp) {
         if (stamp.getComponentOrientation().equals(getComponentOrientation())) return;
         stamp.applyComponentOrientation(getComponentOrientation());
-        
     }
 
     /**
