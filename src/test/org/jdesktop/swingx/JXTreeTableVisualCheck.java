@@ -44,13 +44,13 @@ import org.jdesktop.swingx.util.ComponentTreeTableModel;
  */
 public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     public static void main(String[] args) {
-        // LFSwitcher.metalLF();
+        setSystemLF(true);
         JXTreeTableVisualCheck test = new JXTreeTableVisualCheck();
         try {
-          //  test.runInteractiveTests();
+            test.runInteractiveTests();
          //   test.runInteractiveTests("interactive.*HighLighters");
          //      test.runInteractiveTests("interactive.*SortingFilter.*");
-           test.runInteractiveTests("interactive.*Node.*");
+//           test.runInteractiveTests("interactive.*Node.*");
          //     test.runInteractiveTests("interactive.*Focus.*");
         } catch (Exception ex) {
 

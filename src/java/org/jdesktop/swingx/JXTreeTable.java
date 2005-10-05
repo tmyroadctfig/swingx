@@ -1567,6 +1567,9 @@ public class JXTreeTable extends JXTable {
         public void setRowHeight(int rowHeight) {
             super.setRowHeight(rowHeight);
             if (rowHeight > 0) {
+                // JW: setting the largeModel property is suggested in
+                // #24-swingx. 
+                setLargeModel(true);
                 if (treeTable != null) {
                     // Reconcile semantic differences between JTable and JTree
                     final int tableRowMargin = treeTable.getRowMargin();
@@ -1579,6 +1582,8 @@ public class JXTreeTable extends JXTable {
 //                        treeTable.isXTableRowHeightSet = heightSet;
                     }
                 }
+            } else {
+                setLargeModel(false);
             }
         }
 
