@@ -14,6 +14,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
@@ -25,7 +26,13 @@ import org.jdesktop.swingx.util.AncientSwingTeam;
  */
 public class ColumnControlButtonTest extends InteractiveTestCase {
     protected TableModel sortableTableModel;
-    
+
+    public void testMinimumColumnCountOne() {
+        JXTable table = new JXTable(10, 2);
+        table.setColumnControlVisible(true);
+        table.getColumnExt(0).setVisible(false);
+        assertEquals(1, table.getColumnCount());
+    }
     /**
      * Issue #153-swingx: ClassCastException if actionMap key is not a string.
      *
@@ -140,6 +147,19 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
         frame.setVisible(true);
     }
 
+    /** 
+     * 
+     * 
+     */
+    public void interactiveTestLastVisibleColumn() {
+        final JXTable table = new JXTable();
+        table.setModel(new DefaultTableModel(10, 2));
+        table.setColumnControlVisible(true);
+
+        JFrame frame = wrapWithScrollingInFrame(table, "JXTable (#192, #38-swingx) ColumnControl and Visibility of items");
+        table.getColumnExt(0).setVisible(false);
+        frame.setVisible(true);
+    }
 
     
     public ColumnControlButtonTest() {
@@ -155,11 +175,11 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
        setSystemLF(false);
       ColumnControlButtonTest test = new ColumnControlButtonTest();
       try {
-       // test.runInteractiveTests();
+        test.runInteractiveTests();
       //    test.runInteractiveTests("interactive.*Column.*");
 //          test.runInteractiveTests("interactive.*TableHeader.*");
       //    test.runInteractiveTests("interactive.*SorterP.*");
-          test.runInteractiveTests("interactive.*Column.*");
+      //    test.runInteractiveTests("interactive.*Column.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
