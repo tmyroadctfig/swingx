@@ -12,6 +12,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
@@ -38,6 +39,7 @@ public class FindTest extends InteractiveTestCase {
 
     public static void main(String args[]) {
       setSystemLF(true);
+//      Locale.setDefault(new Locale("es"));
       FindTest test = new FindTest();
       try {
 //        test.runInteractiveTests();
@@ -540,7 +542,7 @@ public class FindTest extends InteractiveTestCase {
         final JXTreeTable second = new JXTreeTable(new FileSystemModel());
         JXFrame frame = wrapWithScrollingInFrame(first, second, "Batch/Incremental Search");
         addAction(frame, action);
-        frame.getRootPaneExt().getStatusBar().add(new JLabel("Press ctrl-F to open search widget"));
+        addMessage(frame, "Press ctrl-F to open search widget");
         frame.setVisible(true);
     }
 
@@ -578,7 +580,7 @@ public class FindTest extends InteractiveTestCase {
         
 //        Action action = new TargetableAction("Find", "find");
 //        addAction(frame, action);
-        frame.getRootPaneExt().getStatusBar().add(new JLabel("Press ctrl-F to open search widget"));
+        addMessage(frame, "Press ctrl-F to open search widget");
         frame.setSize(600, 400);
         frame.setVisible(true);
         

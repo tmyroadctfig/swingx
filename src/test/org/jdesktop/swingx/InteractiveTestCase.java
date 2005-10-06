@@ -15,6 +15,7 @@ import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.UIManager;
@@ -127,20 +128,21 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
 
     public void addAction(JXFrame frame, Action action) {
         JToolBar toolbar = frame.getRootPaneExt().getToolBar();
-//        JToolBar toolbar = null;
-//        Component[] components = frame.getContentPane().getComponents();
-//        for (int i = 0; i < components.length; i++) {
-//            if (components[i] instanceof JToolBar) {
-//                toolbar = (JToolBar) components[i];
-//                break;
-//            }
-//        }
         if (toolbar != null) {
             AbstractButton button = toolbar.add(action);
             button.setFocusable(false);
         }
     }
 
+    public void addMessage(JXFrame frame, String message) {
+        JXStatusBar statusBar = frame.getRootPaneExt().getStatusBar();
+        if (statusBar == null) {
+            statusBar = new JXStatusBar();
+            frame.getRootPaneExt().setStatusBar(statusBar);
+        }
+        statusBar.add(new JLabel(message));
+    }
+    
     public static void setSystemLF(boolean system) {
         String lfName = system ? UIManager.getSystemLookAndFeelClassName() :
             UIManager.getCrossPlatformLookAndFeelClassName();
