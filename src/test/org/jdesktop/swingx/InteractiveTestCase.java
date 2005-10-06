@@ -75,7 +75,6 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
         JXFrame frame = new JXFrame(title, false);
         JToolBar toolbar = new JToolBar();
         frame.getRootPaneExt().setToolBar(toolbar);
-        frame.getRootPaneExt().setStatusBar(new JXStatusBar());
         frame.getContentPane().add(BorderLayout.CENTER, component);
 //        frame.getContentPane().add(BorderLayout.NORTH, toolbar);
         frame.pack();
