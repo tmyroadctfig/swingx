@@ -21,14 +21,14 @@ import javax.swing.JTree;
  * Mouse/Motion/Listener which stores mouse location as 
  * client property in the target JComponent.
  * 
+ * Note: assumes that the component it is listening to is 
+ * of type JComponent!
+ * 
  * @author Jeanette Winzenburg
  */
 public class RolloverProducer implements MouseListener, MouseMotionListener {
 
-    /*
-     *  @TODO factor per component type
-     */
-//----------------- mouseListener
+    //----------------- mouseListener
         
         public static final String CLICKED_KEY = "swingx.clicked";
         public static final String ROLLOVER_KEY = "swingx.rollover";
@@ -70,65 +70,32 @@ public class RolloverProducer implements MouseListener, MouseMotionListener {
             updateRollover(e, ROLLOVER_KEY);
         }
 
-        private void updateRollover(MouseEvent e, String property) {
-            if (e.getSource() instanceof JTable) {
-                updateRolloverPoint((JTable) e.getSource(), e.getPoint());
-            } else if (e.getSource() instanceof JList) {
-                updateRolloverPoint((JList) e.getSource(), e.getPoint());
-            } else if (e.getSource() instanceof JTree) {
-                updateRolloverPoint((JTree) e.getSource(), e.getPoint());
-                
-            } else {
-                return;
-            }
+        protected void updateRollover(MouseEvent e, String property) {
+            updateRolloverPoint((JComponent) e.getComponent(), e.getPoint());
             updateClientProperty((JComponent) e.getSource(), property);
         }
 
-        Point rollover = new Point();
+        protected Point rollover = new Point(-1, -1);
         
-        private void updateClientProperty(JComponent component, String property) {
+        protected void updateClientProperty(JComponent component, String property) {
             Point p = (Point) component.getClientProperty(property);
             if (p == null || (rollover.x != p.x) || (rollover.y != p.y)) {
                 component.putClientProperty(property, new Point(rollover));
             }
         }
 
-        private void updateRolloverPoint(JTree tree, Point mousePoint) {
-            int row = tree.getRowForLocation(mousePoint.x, mousePoint.y);
-//            if (row >= 0) {
-//                Rectangle cellBounds = list.getCellBounds(row, row);
-//                if (!cellBounds.contains(mousePoint)) {
-//                    row = -1;
-//                }
-//            }
-            int col = row < 0 ? -1 : 0;
-            rollover.x = col;
-            rollover.y = row;
-        }
-
-
-        private void updateRolloverPoint(JList list, Point mousePoint) {
-            int row = list.locationToIndex(mousePoint);
-            if (row >= 0) {
-                Rectangle cellBounds = list.getCellBounds(row, row);
-                if (!cellBounds.contains(mousePoint)) {
-                    row = -1;
-                }
-            }
-            int col = row < 0 ? -1 : 0;
-            rollover.x = col;
-            rollover.y = row;
-        }
-
-        private void updateRolloverPoint(JTable table, Point mousePoint) {
-            int col = table.columnAtPoint(mousePoint);
-            int row = table.rowAtPoint(mousePoint);
-            if ((col < 0) || (row < 0)) {
-                row = -1;
-                col = -1;
-            }
-            rollover.x = col;
-            rollover.y = row;
+        /**
+         * Subclasses must override to map the given mouse coordinates into
+         * appropriate client coordinates. The result must be stored in the 
+         * rollover field. 
+         * 
+         * Here: does nothing.
+         * 
+         * @param component
+         * @param mousePoint
+         */
+        protected void updateRolloverPoint(JComponent component, Point mousePoint) {
+            
         }
         
         

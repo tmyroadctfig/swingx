@@ -8,6 +8,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.Component;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.lang.reflect.Method;
 import java.util.Hashtable;
@@ -431,7 +432,7 @@ public class JXTree extends JTree {
         boolean old = isRolloverEnabled();
         if (rolloverEnabled == old) return;
         if (rolloverEnabled) {
-            rolloverProducer = new RolloverProducer();
+            rolloverProducer = createRolloverProducer();
             addMouseListener(rolloverProducer);
             addMouseMotionListener(rolloverProducer);
             linkController = new LinkController();
@@ -444,6 +445,27 @@ public class JXTree extends JTree {
             linkController = null;
         }
         firePropertyChange("rolloverEnabled", old, isRolloverEnabled());
+    }
+
+    /**
+     * creates and returns the RolloverProducer to use with this tree.
+     * 
+     * @return
+     */
+    protected RolloverProducer createRolloverProducer() {
+        RolloverProducer r = new RolloverProducer() {
+            protected void updateRolloverPoint(JComponent component,
+                    Point mousePoint) {
+                JXTree tree = (JXTree) component;
+                int row = tree.getRowForLocation(mousePoint.x, mousePoint.y);
+                int col = row < 0 ? -1 : 0;
+                rollover.x = col;
+                rollover.y = row;
+            }
+
+        };
+        return r;
+//        return new RolloverProducer();
     }
 
     /**

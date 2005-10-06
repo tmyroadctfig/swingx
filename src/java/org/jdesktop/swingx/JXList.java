@@ -8,6 +8,8 @@
 package org.jdesktop.swingx;
 
 import java.awt.Component;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Vector;
@@ -27,8 +29,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-import org.jdesktop.swingx.AbstractSearchable.SearchResult;
-import org.jdesktop.swingx.JXEditorPane.DocumentSearchable;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
@@ -230,7 +230,7 @@ public class JXList extends JList {
         if (rolloverEnabled == old)
             return;
         if (rolloverEnabled) {
-            rolloverProducer = new RolloverProducer();
+            rolloverProducer = createRolloverProducer();
             addMouseListener(rolloverProducer);
             addMouseMotionListener(rolloverProducer);
             linkController = new LinkController();
@@ -245,6 +245,31 @@ public class JXList extends JList {
         firePropertyChange("rolloverEnabled", old, isRolloverEnabled());
     }
 
+    /**
+     * creates and returns the RolloverProducer to use with this tree.
+     * 
+     * @return
+     */
+    protected RolloverProducer createRolloverProducer() {
+        RolloverProducer r = new RolloverProducer() {
+            protected void updateRolloverPoint(JComponent component,
+                    Point mousePoint) {
+                JXList list = (JXList) component;
+                int row = list.locationToIndex(mousePoint);
+                if (row >= 0) {
+                    Rectangle cellBounds = list.getCellBounds(row, row);
+                    if (!cellBounds.contains(mousePoint)) {
+                        row = -1;
+                    }
+                }
+                int col = row < 0 ? -1 : 0;
+                rollover.x = col;
+                rollover.y = row;
+            }
+
+        };
+        return r;
+    }
     /**
      * returns the rolloverEnabled property.
      * 
