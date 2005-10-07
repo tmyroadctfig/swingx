@@ -46,6 +46,28 @@ public class JXTableIssues extends InteractiveTestCase {
         // TODO Auto-generated constructor stub
     }
 
+    /**
+     * 
+     * Issue #172-swingx.
+     * 
+     * The sequence: clearSelection() - setFilter - setRowSelectionInterval
+     * throws Exception.
+     * 
+     * example:
+     * http://www.javadesktop.org/forums/thread.jspa?messageID=117814
+     *
+     */
+    public void testClearSelectionAndFilter() {
+        JXTable table = new JXTable(createModel(0, 20));
+        int modelRow = table.getRowCount() - 1;
+        // set a selection near the end - will be invalid after filtering
+        table.setRowSelectionInterval(modelRow, modelRow);
+        table.clearSelection();
+        table.setFilters(new FilterPipeline(new Filter[] {new PatternFilter("9", 0, 0) }));
+        int viewRow = table.convertRowIndexToView(modelRow);
+        assertTrue("view index visible", viewRow >= 0);
+        table.setRowSelectionInterval(viewRow, viewRow);
+    }
 
     /**
      * Issue #167-swingx: table looses individual row height 
