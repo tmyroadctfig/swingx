@@ -11,7 +11,6 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -22,6 +21,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -46,6 +47,39 @@ public class JXTableIssues extends InteractiveTestCase {
         // TODO Auto-generated constructor stub
     }
 
+    
+    /**
+     * 
+     * Issue #173-swingx.
+     * 
+     * table.setFilters() leads to selectionListener
+     * notification while internal table state not yet stable.
+     * 
+     * example (second one, from Nicola):
+     * http://www.javadesktop.org/forums/thread.jspa?messageID=117814
+     *
+     */
+    public void testSelectionListenerNotification() {
+        final JXTable table = new JXTable(createModel(0, 20));
+        final int modelRow = 0;
+        // set a selection 
+        table.setRowSelectionInterval(modelRow, modelRow);
+        ListSelectionListener l = new ListSelectionListener() {
+
+            public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting()) return;
+                int viewRow = table.getSelectedRow(); //table.convertRowIndexToView(modelRow);
+                assertTrue("view index visible", viewRow >= 0);
+                int convertedRow = table.convertRowIndexToModel(viewRow);
+                
+            }
+            
+        };
+        table.getSelectionModel().addListSelectionListener(l);
+        table.setFilters(new FilterPipeline(new Filter[] {new PatternFilter("0", 0, 0) }));
+    }
+
+
     /**
      * 
      * Issue #172-swingx.
@@ -53,7 +87,7 @@ public class JXTableIssues extends InteractiveTestCase {
      * The sequence: clearSelection() - setFilter - setRowSelectionInterval
      * throws Exception.
      * 
-     * example:
+     * example (first, from Diego):
      * http://www.javadesktop.org/forums/thread.jspa?messageID=117814
      *
      */
