@@ -10,12 +10,15 @@ package org.jdesktop.swingx;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.print.PrinterException;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -32,6 +35,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.DefaultCellEditor;
@@ -44,6 +48,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
+import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SizeSequence;
@@ -457,6 +462,67 @@ public class JXTable extends JTable { //implements Searchable {
             ((LinkRenderer) renderer).setVisitingDelegate(linkVisitor);
         }
         setRolloverEnabled(true);
+    }
+
+    /**
+     * listens to rollover properties. 
+     * Repaints effected component regions.
+     * Updates link cursor.
+     * 
+     * @author Jeanette Winzenburg
+     */
+    public  class LinkController implements PropertyChangeListener {
+
+        private Cursor oldCursor;
+        public void propertyChange(PropertyChangeEvent evt) {
+            if (RolloverProducer.ROLLOVER_KEY.equals(evt.getPropertyName())) {
+               rollover((JXTable) evt.getSource(), (Point) evt
+                            .getOldValue(), (Point) evt.getNewValue());
+            }
+        }
+
+//    --------------------------- JTable rollover
+        
+        private void rollover(JXTable table, Point oldLocation, Point newLocation) {
+            if (oldLocation != null) {
+                Rectangle r = table.getCellRect(oldLocation.y, oldLocation.x, false);
+                r.x = 0;
+                r.width = table.getWidth();
+                table.repaint(r);
+            }
+            if (newLocation != null) {
+                Rectangle r = table.getCellRect(newLocation.y, newLocation.x, false);
+                r.x = 0;
+                r.width = table.getWidth();
+                table.repaint(r);
+            }
+            setLinkCursor(table, newLocation);
+//            table.repaint();
+        }
+
+        private void setLinkCursor(JXTable table, Point location) {
+            if (isLinkColumn(table, location)) {
+                if (oldCursor == null) {
+                    oldCursor = table.getCursor();
+                    table.setCursor(Cursor
+                            .getPredefinedCursor(Cursor.HAND_CURSOR));
+                }
+            } else {
+                if (oldCursor != null) {
+                    table.setCursor(oldCursor);
+                    oldCursor = null;
+                }
+            }
+
+        }
+        private boolean isLinkColumn(JXTable table, Point location) {
+            if (location == null || location.x < 0) return false;
+            return (table.getColumnClass(location.x) == LinkModel.class);
+        }
+
+        
+        
+
     }
 
     

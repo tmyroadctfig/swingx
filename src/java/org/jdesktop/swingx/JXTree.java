@@ -8,20 +8,27 @@
 package org.jdesktop.swingx;
 
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.lang.reflect.Method;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
+import javax.swing.ListCellRenderer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicTreeUI;
@@ -449,15 +456,53 @@ public class JXTree extends JTree {
 
     /**
      * creates and returns the RolloverProducer to use with this tree.
+     * A "hit" for rollover is covering the total width of the tree.
+     * Additionally, a pressed to the right (but outside of the label bounds)
+     * is re-dispatched as a pressed just inside the label bounds. This 
+     * is a first go for #166-swingx.
      * 
      * @return
      */
     protected RolloverProducer createRolloverProducer() {
         RolloverProducer r = new RolloverProducer() {
+            
+            @Override
+            public void mousePressed(MouseEvent e) {
+                JXTree tree = (JXTree) e.getComponent();
+                Point mousePoint = e.getPoint();
+              int labelRow = tree.getRowForLocation(mousePoint.x, mousePoint.y);
+              // default selection
+              if (labelRow >= 0) return;
+              int row = tree.getClosestRowForLocation(mousePoint.x, mousePoint.y);
+              Rectangle bounds = tree.getRowBounds(row);
+              if (bounds == null) {
+                  row = -1;
+              } else {
+                  if ((bounds.y + bounds.height < mousePoint.y) || 
+                       bounds.x > mousePoint.x)   {
+                      row = -1;
+                  }
+              }
+              // no hit
+              if (row < 0) return;
+              tree.dispatchEvent(new MouseEvent(tree, e.getID(), e.getWhen(), 
+                      e.getModifiers(), bounds.x + bounds.width - 2, mousePoint.y,
+                      e.getClickCount(), e.isPopupTrigger(), e.getButton()));
+            }
+
             protected void updateRolloverPoint(JComponent component,
                     Point mousePoint) {
                 JXTree tree = (JXTree) component;
-                int row = tree.getRowForLocation(mousePoint.x, mousePoint.y);
+//                int row = tree.getRowForLocation(mousePoint.x, mousePoint.y);
+                int row = tree.getClosestRowForLocation(mousePoint.x, mousePoint.y);
+                Rectangle bounds = tree.getRowBounds(row);
+                if (bounds == null) {
+                    row = -1;
+                } else {
+                    if (bounds.y + bounds.height < mousePoint.y) {
+                        row = -1;
+                    }
+                }
                 int col = row < 0 ? -1 : 0;
                 rollover.x = col;
                 rollover.y = row;
@@ -468,6 +513,8 @@ public class JXTree extends JTree {
 //        return new RolloverProducer();
     }
 
+  
+   
     /**
      * returns the rolloverEnabled property.
      * @return
@@ -476,7 +523,51 @@ public class JXTree extends JTree {
         return rolloverProducer != null;
     }
 
-    
+
+    /**
+     * listens to rollover properties. 
+     * Repaints effected component regions.
+     * Updates link cursor.
+     * 
+     * @author Jeanette Winzenburg
+     */
+    public  class LinkController implements PropertyChangeListener {
+
+
+        private Cursor oldCursor;
+        public void propertyChange(PropertyChangeEvent evt) {
+            if (RolloverProducer.ROLLOVER_KEY.equals(evt.getPropertyName())) {
+                    rollover((JXTree) evt.getSource(), (Point) evt.getOldValue(),
+                            (Point) evt.getOldValue());
+            } 
+        }
+        
+        
+//    -------------------------------------JTree rollover
+        
+        private void rollover(JXTree tree, Point oldLocation, Point newLocation) {
+            //setLinkCursor(list, newLocation);
+            // JW: conditional repaint not working?
+            tree.repaint();
+//            if (oldLocation != null) {
+//                Rectangle r = tree.getRowBounds(oldLocation.y);
+////                r.x = 0;
+////                r.width = table.getWidth();
+//                if (r != null)
+//                tree.repaint(r);
+//            }
+//            if (newLocation != null) {
+//                Rectangle r = tree.getRowBounds(newLocation.y);
+////                r.x = 0;
+////                r.width = table.getWidth();
+//                if (r != null)
+//                tree.repaint(r);
+//            }
+        }
+
+    }
+
+
     
     private DelegatingRenderer getDelegatingRenderer() {
         if (delegatingRenderer == null) {

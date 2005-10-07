@@ -32,6 +32,8 @@ public class RolloverProducer implements MouseListener, MouseMotionListener {
         
         public static final String CLICKED_KEY = "swingx.clicked";
         public static final String ROLLOVER_KEY = "swingx.rollover";
+//        public static final String PRESSED_KEY = "swingx.pressed";
+        
         
         public void mouseClicked(MouseEvent e) {
             updateRollover(e, CLICKED_KEY);
@@ -56,6 +58,7 @@ public class RolloverProducer implements MouseListener, MouseMotionListener {
             if (e.getSource() instanceof JComponent) {
                 ((JComponent) e.getSource()).putClientProperty(ROLLOVER_KEY, null);
                 ((JComponent) e.getSource()).putClientProperty(CLICKED_KEY, null);
+//                ((JComponent) e.getSource()).putClientProperty(PRESSED_KEY, null);
             }
             
         }

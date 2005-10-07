@@ -10,6 +10,8 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
 import javax.swing.Action;
+import javax.swing.JPopupMenu;
+import javax.swing.JTree;
 import javax.swing.ListModel;
 import javax.swing.table.TableModel;
 
@@ -80,7 +82,7 @@ public class RolloverTest extends InteractiveTestCase {
         table.setRolloverEnabled(true);
         table.setHighlighters(new HighlighterPipeline());
         table.getHighlighters().addHighlighter(foregroundHighlighter);
-        JXFrame frame = wrapWithScrollingInFrame(table, "Table with rollover");
+        JXFrame frame = wrapWithScrollingInFrame(table, "JXList with rollover");
         Action toggleAction = new AbstractAction("toggle foreground/background") {
             boolean isBackground;
             public void actionPerformed(ActionEvent e) {
@@ -104,9 +106,12 @@ public class RolloverTest extends InteractiveTestCase {
     public void interactiveTreeRollover() {
         final JXTree table = new JXTree(treeTableModel);
         table.setRolloverEnabled(true);
+        table.setComponentPopupMenu(createPopup());
         table.setHighlighters(new HighlighterPipeline());
         table.getHighlighters().addHighlighter(foregroundHighlighter);
-        JXFrame frame = wrapWithScrollingInFrame(table, "Table with rollover");
+        JTree tree = new JTree(treeTableModel);
+        tree.setComponentPopupMenu(createPopup());
+        JXFrame frame = wrapWithScrollingInFrame(table, tree, "JXTree (at left) with rollover");
         Action toggleAction = new AbstractAction("toggle foreground/background") {
             boolean isBackground;
             public void actionPerformed(ActionEvent e) {
@@ -128,6 +133,12 @@ public class RolloverTest extends InteractiveTestCase {
         frame.setVisible(true);
     }
 
+    public JPopupMenu createPopup() {
+        JPopupMenu popup = new JPopupMenu();
+        popup.add("dummy");
+        return popup;
+    }
+    
     public void interactiveTreeTableRollover() {
         final JXTreeTable table = new JXTreeTable(treeTableModel);
         table.setRolloverEnabled(true);

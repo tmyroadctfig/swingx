@@ -8,14 +8,18 @@
 package org.jdesktop.swingx;
 
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.AbstractButton;
 import javax.swing.AbstractListModel;
 import javax.swing.Action;
 import javax.swing.DefaultListCellRenderer;
@@ -288,6 +292,77 @@ public class JXList extends JList {
         }
 
     }
+
+    /**
+     * listens to rollover properties. 
+     * Repaints effected component regions.
+     * Updates link cursor.
+     * 
+     * @author Jeanette Winzenburg
+     */
+    public class LinkController implements PropertyChangeListener {
+
+        private Cursor oldCursor;
+        public void propertyChange(PropertyChangeEvent evt) {
+            if (RolloverProducer.ROLLOVER_KEY.equals(evt.getPropertyName())) {
+                   rollover((JXList) evt.getSource(), (Point) evt.getOldValue(),
+                            (Point) evt.getOldValue());
+            } else if (RolloverProducer.CLICKED_KEY.equals(evt.getPropertyName())) {
+                    click((JXList) evt.getSource(), (Point) evt.getOldValue(),
+                            (Point) evt.getNewValue());
+            }
+        }
+
+        
+//    --------------------------------- JList rollover
+        
+        private void rollover(JXList list, Point oldLocation, Point newLocation) {
+            setLinkCursor(list, newLocation);
+            // JW: partial repaints incomplete
+            list.repaint();
+        }
+
+        private void click(JXList list, Point oldLocation, Point newLocation) {
+            if (!isLinkElement(list, newLocation)) return;
+            ListCellRenderer renderer = list.getCellRenderer();
+            // PENDING: JW - don't ask the model, ask the list!
+            Component comp = renderer.getListCellRendererComponent(list, list.getModel().getElementAt(newLocation.y), newLocation.y, false, true);
+            if (comp instanceof AbstractButton) {
+                // this is fishy - needs to be removed as soon as JList is editable
+                ((AbstractButton) comp).doClick();
+                list.repaint();
+            }
+        }
+        
+        /**
+         * something weird: cursor in JList behaves different from JTable?
+         * @param list
+         * @param location
+         */
+        private void setLinkCursor(JXList list, Point location) {
+            if (isLinkElement(list, location)) {
+              //  if (oldCursor == null) {
+                    oldCursor = list.getCursor();
+                    list.setCursor(Cursor
+                            .getPredefinedCursor(Cursor.HAND_CURSOR));
+               // }
+            } else {
+              //  if (oldCursor != null) {
+                    list.setCursor(oldCursor);
+                    oldCursor = null;
+               // }
+            }
+
+        }
+        private boolean isLinkElement(JXList list, Point location) {
+            if (location == null || location.y < 0) return false;
+            // PENDING: JW - don't ask the model, ask the list!
+            return (list.getModel().getElementAt(location.y) instanceof LinkModel);
+        }
+        
+
+    }
+
 
 //--------------------------- searching
     
