@@ -51,4 +51,23 @@ public class JXListIssues extends JXListTest {
     }
 
 
+    /**
+     * setFilterEnabled throws NPE if formerly had selection.
+     * 
+     * Reason is internal state mismanagement... filterEnabled must be
+     * set before calling super.setModel!
+     *
+     */
+    public void testSetFilterEnabledWithSelection() {
+        final JXList list = new JXList(ascendingListModel);
+        // a side-effect of setFilterEnabled is to clear the selection!
+        // this is done in JList.setModel(..) which is called when 
+        // changing filterEnabled!
+        assertEquals(20, list.getModelSize());
+        final int modelRow = 0;
+        // set a selection 
+        list.setSelectedIndex(modelRow);
+        list.setFilterEnabled(true);
+        
+    }
 }
