@@ -41,7 +41,7 @@ import org.jdesktop.swingx.decorator.Sorter;
 public class JXListTest extends InteractiveTestCase {
 
     private ListModel listModel;
-    private DefaultListModel ascendingListModel;
+    protected DefaultListModel ascendingListModel;
 
     public void testEmptyFilter() {
         JXList list = new JXList();
