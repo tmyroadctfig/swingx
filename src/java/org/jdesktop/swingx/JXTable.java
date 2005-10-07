@@ -1036,9 +1036,12 @@ public class JXTable extends JTable { //implements Searchable {
         }
         filters = pipeline;
         filters.setSorter(sorter);
-        getSelection().setFilters(filters);
-        getRowSizing().setFilters(filters);
         use(filters);
+        getRowSizing().setFilters(filters);
+        getSelection().setFilters(filters);
+//        getSelection().setFilters(filters);
+//        getRowSizing().setFilters(filters);
+//        use(filters);
     }
 
 

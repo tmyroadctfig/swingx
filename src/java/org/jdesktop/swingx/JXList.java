@@ -406,13 +406,23 @@ public class JXList extends JList {
      * including the selection - are in view coordinates and getModel returns a
      * wrapper around the underlying model.
      * 
+     * Note: as an implementation side-effect calling this method clears the
+     * selection (done in super.setModel).
+     * 
+     * PENDING: cleanup state transitions!! - currently this can be safely applied
+     * once only to enable. Internal state is inconsistent if trying to disable
+     * again.   
+     * 
+     * see Issue #2-swinglabs.
+     * 
      * @param enabled
      */
     public void setFilterEnabled(boolean enabled) {
         boolean old = isFilterEnabled();
         if (old == enabled)
             return;
-        if (!old) {
+        filterEnabled = enabled;
+       if (!old) {
             wrappingModel = new WrappingListModel(getModel());
             super.setModel(wrappingModel);
         } else {
@@ -420,7 +430,7 @@ public class JXList extends JList {
             wrappingModel = null;
             super.setModel(model);
         }
-        filterEnabled = enabled;
+                
     }
 
     public boolean isFilterEnabled() {
@@ -477,8 +487,8 @@ public class JXList extends JList {
         }
         filters = pipeline;
         filters.setSorter(sorter);
-        getSelection().setFilters(filters);
         use(filters);
+        getSelection().setFilters(filters);
     }
 
     /**
