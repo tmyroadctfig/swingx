@@ -48,37 +48,6 @@ public class JXTableIssues extends InteractiveTestCase {
     }
 
     
-    /**
-     * 
-     * Issue #173-swingx.
-     * 
-     * table.setFilters() leads to selectionListener
-     * notification while internal table state not yet stable.
-     * 
-     * example (second one, from Nicola):
-     * http://www.javadesktop.org/forums/thread.jspa?messageID=117814
-     *
-     */
-    public void testSelectionListenerNotification() {
-        final JXTable table = new JXTable(createModel(0, 20));
-        final int modelRow = 0;
-        // set a selection 
-        table.setRowSelectionInterval(modelRow, modelRow);
-        ListSelectionListener l = new ListSelectionListener() {
-
-            public void valueChanged(ListSelectionEvent e) {
-                if (e.getValueIsAdjusting()) return;
-                int viewRow = table.getSelectedRow(); //table.convertRowIndexToView(modelRow);
-                assertTrue("view index visible", viewRow >= 0);
-                int convertedRow = table.convertRowIndexToModel(viewRow);
-                
-            }
-            
-        };
-        table.getSelectionModel().addListSelectionListener(l);
-        table.setFilters(new FilterPipeline(new Filter[] {new PatternFilter("0", 0, 0) }));
-    }
-
 
     /**
      * 
@@ -92,7 +61,7 @@ public class JXTableIssues extends InteractiveTestCase {
      *
      */
     public void testClearSelectionAndFilter() {
-        JXTable table = new JXTable(createModel(0, 20));
+        JXTable table = new JXTable(createAscendingModel(0, 20));
         int modelRow = table.getRowCount() - 1;
         // set a selection near the end - will be invalid after filtering
         table.setRowSelectionInterval(modelRow, modelRow);
@@ -219,7 +188,7 @@ public class JXTableIssues extends InteractiveTestCase {
     
     
     public void testComponentAdapterCoordinates() {
-        JXTable table = new JXTable(createModel(0, 10));
+        JXTable table = new JXTable(createAscendingModel(0, 10));
         Object originalFirstRowValue = table.getValueAt(0,0);
         Object originalLastRowValue = table.getValueAt(table.getRowCount() - 1, 0);
         assertEquals("view row coordinate equals model row coordinate", 
@@ -479,7 +448,7 @@ public class JXTableIssues extends InteractiveTestCase {
     }
     
     
-    private DefaultTableModel createModel(int startRow, int count) {
+    private DefaultTableModel createAscendingModel(int startRow, int count) {
         DefaultTableModel model = new DefaultTableModel(count, 5);
         for (int i = 0; i < model.getRowCount(); i++) {
             model.setValueAt(new Integer(startRow++), i, 0);
@@ -515,7 +484,7 @@ public class JXTableIssues extends InteractiveTestCase {
      *  fixed!
      */
     public void testWildCardInSearchByString() {
-        JXTable table = new JXTable(createModel(0, 11));
+        JXTable table = new JXTable(createAscendingModel(0, 11));
         int row = 1;
         String lastName = table.getValueAt(row, 0).toString();
         int found = table.getSearchable().search(lastName, -1);

@@ -20,6 +20,8 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
@@ -57,6 +59,40 @@ public class JXTableUnitTest extends InteractiveTestCase {
         }
         sortableTableModel = new AncientSwingTeam();
     }
+
+
+    
+    /**
+     * 
+     * Issue #173-swingx.
+     * 
+     * table.setFilters() leads to selectionListener
+     * notification while internal table state not yet stable.
+     * 
+     * example (second one, from Nicola):
+     * http://www.javadesktop.org/forums/thread.jspa?messageID=117814
+     *
+     */
+    public void testSelectionListenerNotification() {
+        final JXTable table = new JXTable(createAscendingModel(0, 20));
+        final int modelRow = 0;
+        // set a selection 
+        table.setRowSelectionInterval(modelRow, modelRow);
+        ListSelectionListener l = new ListSelectionListener() {
+
+            public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting()) return;
+                int viewRow = table.getSelectedRow(); //table.convertRowIndexToView(modelRow);
+                assertTrue("view index visible", viewRow >= 0);
+                int convertedRow = table.convertRowIndexToModel(viewRow);
+                
+            }
+            
+        };
+        table.getSelectionModel().addListSelectionListener(l);
+        table.setFilters(new FilterPipeline(new Filter[] {new PatternFilter("0", 0, 0) }));
+    }
+
 
 
     /**
