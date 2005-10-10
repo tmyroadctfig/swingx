@@ -23,7 +23,7 @@ public class DefaultUserNameStore extends UserNameStore {
     /**
      * The key for one of the preferences
      */
-	private static final String USER_KEY = "usernames";
+        private static final String USER_KEY = "usernames";
     /**
      */
     private static final String NUM_KEY = "usernames.length";
@@ -36,7 +36,7 @@ public class DefaultUserNameStore extends UserNameStore {
      * app name is &quot;default&quot. This should be set by the application
      * if the application wants it&apos;s own list of user names.
      */
-	private String appNameForPreferences = "default";
+        private String appNameForPreferences = "default";
     /**
      * Contains the user names. Since the list of user names is not
      * frequently updated, there is no penalty in storing the values
@@ -47,15 +47,15 @@ public class DefaultUserNameStore extends UserNameStore {
      * Used for propogating bean changes
      */
     private PropertyChangeSupport pcs;
-    
+
     /**
-     * Creates a new instance of DefaultUserNameStore 
+     * Creates a new instance of DefaultUserNameStore
      */
     public DefaultUserNameStore() {
         pcs = new PropertyChangeSupport(this);
         userNames = new String[0];
     }
-    
+
     public void loadUserNames() {
         initPrefs();
         if (prefs != null) {
@@ -66,9 +66,10 @@ public class DefaultUserNameStore extends UserNameStore {
             for (int i = 0; i < n; i++) {
                 names[i] = prefs.get(valuePrefix + "." + i, null);
             }
+            setUserNames(names);
         }
     }
-    
+
     public void saveUserNames() {
         initPrefs();
         if (prefs != null) {
@@ -92,29 +93,29 @@ public class DefaultUserNameStore extends UserNameStore {
             pcs.firePropertyChange("userNames", old, this.userNames);
         }
     }
-    
-	/**
-	 * Add a username to the store.
-	 * @param name
-	 */
-	public void addUserName(String name) {
-		if (!containsUserName(name)) {
+
+        /**
+         * Add a username to the store.
+         * @param name
+         */
+        public void addUserName(String name) {
+                if (!containsUserName(name)) {
             String[] newNames = new String[userNames.length + 1];
             for (int i=0; i<userNames.length; i++) {
                 newNames[i] = userNames[i];
             }
             newNames[newNames.length - 1] = name;
             setUserNames(newNames);
-		}
-	}
-	
-	/**
-	 * Removes a username from the list.
-	 * 
-	 * @param name
-	 */
-	public void removeUserName(String name) {
-		if (containsUserName(name)) {
+                }
+        }
+
+        /**
+         * Removes a username from the list.
+         *
+         * @param name
+         */
+        public void removeUserName(String name) {
+                if (containsUserName(name)) {
             String[] newNames = new String[userNames.length - 1];
             int index = 0;
             for (String s : userNames) {
@@ -123,9 +124,9 @@ public class DefaultUserNameStore extends UserNameStore {
                 }
             }
             setUserNames(newNames);
-		}
-	}
-	
+                }
+        }
+
     public boolean containsUserName(String name) {
         for (String s : userNames) {
             if (s.equals(name)) {
@@ -134,35 +135,36 @@ public class DefaultUserNameStore extends UserNameStore {
         }
         return false;
     }
-    
-	/**
-	 * @return Returns the appNameForPreferences.
-	 */
-	public String getAppNameForPreferences() {
-		return appNameForPreferences;
-	}
-    
-	/**
-	 * @param appNameForPreferences The appNameForPreferences to set.
-	 */
-	public void setAppNameForPreferences(String appNameForPreferences) {
+
+        /**
+         * @return Returns the appNameForPreferences.
+         */
+        public String getAppNameForPreferences() {
+                return appNameForPreferences;
+        }
+
+        /**
+         * @param appNameForPreferences The appNameForPreferences to set.
+         */
+        public void setAppNameForPreferences(String appNameForPreferences) {
         if (this.appNameForPreferences != appNameForPreferences) {
             String old = this.appNameForPreferences;
             this.appNameForPreferences = appNameForPreferences;
             pcs.firePropertyChange("appNameForPreferences", old, appNameForPreferences);
+            prefs = null;
             loadUserNames();
         }
-	}
-    
-	private String getNumPrefix() {
-		return this.getClass().getName() + "." + getAppNameForPreferences()
-				+ "." + NUM_KEY;
-	}
+        }
 
-	private String getValuePrefix() {
-		return this.getClass().getName() + "." + getAppNameForPreferences()
-				+ "." + USER_KEY;
-	}
+        private String getNumPrefix() {
+                return this.getClass().getName() + "." + getAppNameForPreferences()
+                                + "." + NUM_KEY;
+        }
+
+        private String getValuePrefix() {
+                return this.getClass().getName() + "." + getAppNameForPreferences()
+                                + "." + USER_KEY;
+        }
 
     private void initPrefs() {
         if (prefs == null) {
