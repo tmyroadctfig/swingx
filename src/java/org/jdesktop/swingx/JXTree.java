@@ -513,9 +513,10 @@ public class JXTree extends JTree {
                 if (bounds == null) {
                     row = -1;
                 } else {
-                    if (bounds.y + bounds.height < mousePoint.y) {
-                        row = -1;
-                    }
+                    if ((bounds.y + bounds.height < mousePoint.y) || 
+                            bounds.x > mousePoint.x)   {
+                           row = -1;
+                       }
                 }
                 int col = row < 0 ? -1 : 0;
                 rollover.x = col;
