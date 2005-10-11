@@ -30,7 +30,26 @@ import java.io.StringWriter;
 import javax.swing.*;
 
 /**
- * Common Error Dialog.  Composed of a title, message, and details.
+ * Common Error Dialog, suitable for representing information about 
+ * errors and exceptions happened in application. The common usage of the 
+ * <code>JXErrorDialog</code> is to show collected data about the incident and 
+ * probably ask customer for a feedback. The data about the incident consists 
+ * from the title which will be displayed in the dialog header, short 
+ * description of the problem that will be immediately seen after dialog is 
+ * became visible, full description of the problem which will be visible after
+ * user clicks "Details" button and Throwable that contains stack trace and
+ * another usable information that may be displayed in the dialog.<p>
+ *
+ * To ask user for feedback extend abstract class <code>ErrorReporter</code> and
+ * set your reporter using <code>setReporter</code> method. Report button will 
+ * be added to the dialog automatically.<br>
+ * See {@link MailErrorReporter MailErrorReporter} documentation for the
+ * example of error reporting usage.<p>
+
+ * For example, to show simple <code>JXErrorDialog</code> call <br>
+ * <code>JXErrorDialog.showDialog(null, "Application Error", 
+ *   "The application encountered the unexpected error,
+ *    please contact developers")</code>
 
  * @author Richard Bair
  * @author Alexander Zuev
@@ -89,7 +108,7 @@ public class JXErrorDialog extends JDialog {
 
     /**
      * Create a new ErrorDialog with the given Frame as the owner
-     * @param owner
+     * @param owner Owner of this error dialog.
      */
     public JXErrorDialog(Frame owner) {
         super(owner, true);
@@ -98,7 +117,7 @@ public class JXErrorDialog extends JDialog {
 
     /**
      * Create a new ErrorDialog with the given Dialog as the owner
-     * @param owner
+     * @param owner Owner of this error dialog.
      */
     private JXErrorDialog(Dialog owner) {
         super(owner, true);
@@ -200,7 +219,8 @@ public class JXErrorDialog extends JDialog {
      * Set the details section of the error dialog.  If the details are either
      * null or an empty string, then hide the details button and hide the detail
      * scroll pane.  Otherwise, just set the details section.
-     * @param details
+     * @param details  Details to be shown in the detail section of the dialog.  This can be null
+     * if you do not want to display the details section of the dialog.
      */
     private void setDetails(String details) {
         if (details == null || details.equals("")) {
@@ -216,7 +236,7 @@ public class JXErrorDialog extends JDialog {
     /**
      * Set the details section to be either visible or invisible.  Set the
      * text of the Details button accordingly.
-     * @param b
+     * @param b if true details section will be visible
      */
     private void setDetailsVisible(boolean b) {
         if (b) {
@@ -233,7 +253,7 @@ public class JXErrorDialog extends JDialog {
 
     /**
      * Set the error message for the dialog box
-     * @param errorMessage
+     * @param errorMessage Message for the error dialog
      */
     private void setErrorMessage(String errorMessage) {
         this.errorMessage.setText(errorMessage);
@@ -241,6 +261,8 @@ public class JXErrorDialog extends JDialog {
 
     /**
      * Sets the IncidentInfo for this dialog
+     *
+     * @param info IncidentInfo that incorporates all the details about the error
      */
     private void setIncidentInfo(IncidentInfo info) {
         this.incidentInfo = info;
@@ -289,9 +311,9 @@ public class JXErrorDialog extends JDialog {
     /**
      * Constructs and shows the error dialog for the given exception.  The exceptions message will be the
      * errorMessage, and the stacktrace will be the details.
-     * @param owner
-     * @param title
-     * @param e
+     * @param owner Owner of this error dialog.
+     * @param title Title of the error dialog
+     * @param e Exception that contains information about the error cause and stack trace
      */
     public static void showDialog(Window owner, String title, Throwable e) {
         IncidentInfo ii = new IncidentInfo(title, null, null, e);
@@ -300,7 +322,7 @@ public class JXErrorDialog extends JDialog {
 
     /**
      * Show the error dialog.
-     * @param owner Owner of this error dialog.  This cannot be null.
+     * @param owner Owner of this error dialog
      * @param title Title of the error dialog
      * @param errorMessage Message for the error dialog
      * @param details Details to be shown in the detail section of the dialog.  This can be null
@@ -313,7 +335,7 @@ public class JXErrorDialog extends JDialog {
 
     /**
      * Show the error dialog.
-     * @param owner Owner of this error dialog.  This cannot be null.
+     * @param owner Owner of this error dialog.
      * @param info <code>IncidentInfo</code> that incorporates all the information about the error
      */
     public static void showDialog(Window owner, IncidentInfo info) {
@@ -347,7 +369,7 @@ public class JXErrorDialog extends JDialog {
 
     /**
      * Returns the current reporting engine that will be used to report a problem if
-     * user clicks on 'Report' button or null if no reporting engine set.
+     * user clicks on 'Report' button or <code>null</code> if no reporting engine set.
      *
      * @return reporting engine
      */
@@ -358,7 +380,7 @@ public class JXErrorDialog extends JDialog {
     /**
      * Set reporting engine which will handle error reporting if user clicks 'report' button.
      *
-     * @param rep <code>ErrorReporter</code> to be used or @null to turn reporting facility off
+     * @param rep <code>ErrorReporter</code> to be used or <code>null</code> to turn reporting facility off.
      */
     public static void setReporter(ErrorReporter rep) {
         reporter = rep;
