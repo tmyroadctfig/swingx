@@ -98,14 +98,5 @@ public class JXFrame extends JFrame {
         return null;
     }
 
-    /**
-     * Overloaded to pack when visible is true.
-     */
-//    public void setVisible(boolean visible) {
-//        if (visible) {
-//            pack();
-//        }
-//        super.setVisible(visible);
-//    }
 }
 

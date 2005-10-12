@@ -51,20 +51,6 @@ public class JXHyperlink extends JButton {
       LookAndFeelAddons.contribute(new JXHyperlinkAddon());
     }
 
-    /**
-     * Initialization that would ideally be moved into various look and feel
-     * classes.
-     */
-//    static {
-//        loadDefaults();
-//    }
-//
-//    static void loadDefaults() {
-//        UIDefaults defaults = UIManager.getDefaults();
-//        defaults.put(uiClassID,
-//                "org.jdesktop.swingx.plaf.basic.BasicHyperlinkUI");
-//    }
-
     private boolean hasBeenVisited = false;
 
     /**

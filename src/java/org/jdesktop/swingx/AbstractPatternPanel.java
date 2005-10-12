@@ -328,7 +328,6 @@ public abstract class AbstractPatternPanel extends JXPanel {
     protected void bind() {
       bindSearchLabel();
         searchField.getDocument().addDocumentListener(getSearchFieldListener());
-        ActionContainerFactory factory = new ActionContainerFactory(null);
         getActionContainerFactory().configureButton(matchCheck, 
                 (AbstractActionExt) getActionMap().get(PatternModel.MATCH_CASE_ACTION_COMMAND),
                 null);

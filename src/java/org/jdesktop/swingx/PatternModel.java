@@ -465,10 +465,10 @@ public class PatternModel {
         }
 
 
-//      /**
-//      * returns true if the pattern must match from the beginning of the string,
-//      * or false if the pattern can match anywhere in a string.
-//      */
+      /**
+      * returns true if the pattern must match from the beginning of the string,
+      * or false if the pattern can match anywhere in a string.
+      */
      public boolean isStartAnchored() {
          return MATCH_RULE_EQUALS.equals(getMatchRule()) ||
              MATCH_RULE_STARTSWITH.equals(getMatchRule());

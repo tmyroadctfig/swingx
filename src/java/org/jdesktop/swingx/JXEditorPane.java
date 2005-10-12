@@ -60,7 +60,6 @@ import javax.swing.text.Document;
 import javax.swing.text.EditorKit;
 import javax.swing.text.Element;
 import javax.swing.text.MutableAttributeSet;
-import javax.swing.text.Position;
 import javax.swing.text.Segment;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -433,10 +432,6 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
 
     private void find() {
         SearchFactory.getInstance().showFindInput(this, getSearchable());
-//        if (dialog == null) {
-//            dialog = new JXFindDialog(this);
-//        }
-//        dialog.setVisible(true);
     }
 
     /**
@@ -481,8 +476,6 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
             return search(pattern, startIndex, false);
         }
 
-//        Position lastFound;
-
         int lastFoundIndex = -1;
 
         MatchResult lastMatchResult;
@@ -521,7 +514,6 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
                     start = 0;
                 length = getDocument().getLength() - start;
             }
-            // Position position = getDocument().createPosition(startIndex);
             Segment segment = new Segment();
 
             try {
@@ -558,7 +550,6 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
                 return false;
             }
             int length = getDocument().getLength() - start;
-            // Position position = getDocument().createPosition(startIndex);
             Segment segment = new Segment();
 
             try {

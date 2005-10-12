@@ -107,19 +107,13 @@ import org.jdesktop.swingx.treetable.TreeTableModel;
  * @author Ramesh Gupta
  */
 public class JXTreeTable extends JXTable {
-    // TOTAL HACK to fix icons that disappeared in a regression after M3!
-//    private Icon    collapsedIcon = null;
-//    private Icon    expandedIcon = null;
-//    private Icon    closedIcon = null;
-//    private Icon    openIcon = null;
-//    private Icon    leafIcon = null;
 
     /**
      * Renderer used to render cells within the
-     * {@link #isHierarchical(int) hierarchical} column.
+     *  {@link #isHierarchical(int) hierarchical} column.
+     *  renderer extends JXTree and implements TableCellRenderer
      */
-    private TreeTableCellRenderer renderer = null;
-    // renderer extends JXTree and implements TableCellRenderer
+    private TreeTableCellRenderer renderer;
 
     /**
      * Constructs a JXTreeTable using a
@@ -190,9 +184,6 @@ public class JXTreeTable extends JXTable {
         // understood by JTable and JTree by overriding both setRowHeight() and
         // setRowMargin();
         adminSetRowHeight(getRowHeight());
-//        boolean heightSet = isXTableRowHeightSet;
-//        setRowHeight(getRowHeight()); // call overridden setRowHeight()
-//        isXTableRowHeightSet = heightSet;
         setRowMargin(getRowMargin()); // call overridden setRowMargin()
 
     }
@@ -364,10 +355,6 @@ public class JXTreeTable extends JXTable {
      * @param treeModel data model for this JXTreeTable
      */
     public void setTreeTableModel(TreeTableModel treeModel) {
-        // The original TreeTable implementation didn't support this signature.
-
-//      CHANGED LINE TO CORRECT ISSUE 151 - rlopes
-      	//renderer = new TreeTableCellRenderer(treeModel);
         renderer.setModel(treeModel);
         // #241: make sure old listeners are removed
         // JW: this should be done more cleanly, actually there is no need
@@ -375,20 +362,10 @@ public class JXTreeTable extends JXTable {
         // what's needed is to fire a structureChanged
         
         ((TreeTableModelAdapter)getModel()).setTreeTableModel(treeModel);
-//        if (getModel() instanceof TreeTableModelAdapter) {
-//            ((TreeTableModelAdapter) getModel()).setTreeTableModel(null);
-//        }
-//        // Adapt tree model to table model before invoking setModel()
-//        setModel(new TreeTableModelAdapter(treeModel, renderer));
         // Enforce referential integrity; bail on fail
         if (treeModel != renderer.getModel()) { // do not use assert here!
             throw new IllegalArgumentException("Mismatched TreeTableModel");
         }
-//      COMMENTED LINE TO CORRECT ISSUE 151 - rlopes        
-//    		 Not needed because the renderer doesn't change, and is already initialized
-//         in the constructor   
-//         init(renderer); // renderer is a JTree
-
         // Install the default editor.
         setDefaultEditor(AbstractTreeTableModel.hierarchicalColumnClass,
             new TreeTableCellEditor(renderer));
@@ -398,9 +375,6 @@ public class JXTreeTable extends JXTable {
         // understood by JTable and JTree by overriding both setRowHeight() and
         // setRowMargin();
         adminSetRowHeight(getRowHeight());
-        //        boolean rememberRowHeightSet = isXTableRowHeightSet;
-//        setRowHeight(getRowHeight()); // call overridden setRowHeight()
-//        isXTableRowHeightSet = rememberRowHeightSet;
         setRowMargin(getRowMargin()); // call overridden setRowMargin()
     }
 
@@ -482,21 +456,6 @@ public class JXTreeTable extends JXTable {
         adjustTreeRowHeight(); // JTree doesn't have setRowMargin. So adjust.
     }
 
-//    /**
-//     * Hacking around super hack for super's individual row heights.
-//     * Not supported here.
-//     */
-//    protected Field getRowModelField() {
-//        return null;
-//    }
-//    
-//    /**
-//     * Hacking around super hack for super's individual row heights.
-//     * Not supported here.
-//     */
-//    protected SizeSequence getSuperRowModel() {
-//        return null;
-//    }
     /**
      * <p>Sets the margin between columns.</p>
      *
@@ -592,24 +551,6 @@ public class JXTreeTable extends JXTable {
      */
     public Component prepareRenderer(TableCellRenderer renderer, int row,
         int column) {
-        // TOTAL HACK to fix icons that disappeared in a regression after M3!
-        if (isHierarchical(column)) {
-//            if (collapsedIcon != null) {
-//                setCollapsedIcon(collapsedIcon);
-//            }
-//            if (expandedIcon != null) {
-//                setExpandedIcon(expandedIcon);
-//            }
-//            if (openIcon != null) {
-//                setOpenIcon(openIcon);
-//            }
-//            if (closedIcon != null) {
-//                setClosedIcon(closedIcon);
-//            }
-//            if (leafIcon != null) {
-//                setLeafIcon(leafIcon);
-//            }
-        }
         
         Component component = super.prepareRenderer(renderer, row, column);
         // MUST ALWAYS ACCESS dataAdapter through accessor method!!!
@@ -617,8 +558,7 @@ public class JXTreeTable extends JXTable {
         adapter.row = row;
         adapter.column = column;
         
-        return applyRenderer(component, //super.prepareRenderer(renderer, row, column),
-            adapter); 
+        return applyRenderer(component, adapter); 
     }
 
     /**
@@ -691,15 +631,6 @@ public class JXTreeTable extends JXTable {
      */
     public void setCollapsedIcon(Icon icon) {
         renderer.setCollapsedIcon(icon);
-//        try {
-//            ( (BasicTreeUI) (renderer.getUI())).setCollapsedIcon(icon);
-//            // TOTAL HACK to fix icons that disappeared in a regression after M3!
-////            collapsedIcon = icon;
-//        }
-//        catch (ClassCastException ex) {
-//            /** @todo use logging apis instead */
-//            System.err.println("hacking failed in JXTreeTable.collapsed icon " + ex);
-//        }
     }
 
     /**
@@ -709,15 +640,6 @@ public class JXTreeTable extends JXTable {
      */
     public void setExpandedIcon(Icon icon) {
         renderer.setExpandedIcon(icon);
-//        try {
-//            ( (BasicTreeUI) (renderer.getUI())).setExpandedIcon(icon);
-//            // TOTAL HACK to fix icons that disappeared in a regression after M3!
-////            expandedIcon = icon;
-//        }
-//        catch (ClassCastException ex) {
-//            /** @todo use logging apis instead */
-//            System.err.println("hacking failed in JXTreeTable.expandedIcon" + ex);
-//        }
     }
 
     /**
@@ -727,15 +649,6 @@ public class JXTreeTable extends JXTable {
      */
     public void setOpenIcon(Icon icon) {
         renderer.setOpenIcon(icon);
-//        try {
-//            ((DefaultTreeCellRenderer) renderer.getCellRenderer()).setOpenIcon(icon);
-//            // TOTAL HACK to fix icons that disappeared in a regression after M3!
-//            openIcon = icon;
-//        }
-//        catch (ClassCastException ex) {
-//            /** @todo use logging apis instead */
-//            System.err.println("hacking failed in JXTreeTable.open icon" + ex);
-//        }
     }
 
     /**
@@ -745,17 +658,6 @@ public class JXTreeTable extends JXTable {
      */
     public void setClosedIcon(Icon icon) {
         renderer.setClosedIcon(icon);
-//        try {
-//            DelegatingRenderer delegate = (DelegatingRenderer) renderer.getCellRenderer();
-//            
-//            ((DefaultTreeCellRenderer) delegate.getDelegateRenderer()).setClosedIcon(icon);
-//            // TOTAL HACK to fix icons that disappeared in a regression after M3!
-//            closedIcon = icon;
-//        }
-//        catch (ClassCastException ex) {
-//            /** @todo use logging apis instead */
-//            System.err.println("hacking failed in JXTreeTable.closedIcon " +ex);
-//        }
     }
 
     /**
@@ -765,15 +667,6 @@ public class JXTreeTable extends JXTable {
      */
     public void setLeafIcon(Icon icon) {
         renderer.setLeafIcon(icon);
-//        try {
-//            ((DefaultTreeCellRenderer) renderer.getCellRenderer()).setLeafIcon(icon);
-//            // TOTAL HACK to fix icons that disappeared in a regression after M3!
-//            leafIcon = icon;
-//        }
-//        catch (ClassCastException ex) {
-//            /** @todo use logging apis instead */
-//            System.err.println("hacking failed in JXTreeTable.leafIcon " +ex);
-//        }
     }
 
     /**
@@ -1592,9 +1485,6 @@ public class JXTreeTable extends JXTable {
                     final int tableRowHeight = rowHeight - (tableRowMargin << 1);
                     if (treeTable.getRowHeight() != tableRowHeight) {
                         treeTable.adminSetRowHeight(tableRowHeight);
-//                        boolean heightSet = treeTable.isXTableRowHeightSet;
-//                        treeTable.setRowHeight(tableRowHeight);
-//                        treeTable.isXTableRowHeightSet = heightSet;
                     }
                 }
             } 
@@ -1616,8 +1506,8 @@ public class JXTreeTable extends JXTable {
         }
 
         /**
-         * Sublcassed to translate the graphics such that the last visible
-         * row will be drawn at 0,0.
+         * Sublcassed to translate the graphics such that the last visible row
+         * will be drawn at 0,0.
          */
         public void paint(Graphics g) {
             int rowMargin = treeTable.getRowMargin();
@@ -1626,7 +1516,7 @@ public class JXTreeTable extends JXTable {
             // additional pixel if rowMargin is odd!
             int margins = rowMargin + (rowMargin >> 1) + (rowMargin % 2);
             int translationOffset = margins + visibleRow * getRowHeight();
-            g.translate(0, - translationOffset);
+            g.translate(0, -translationOffset);
 
             hierarchicalColumnWidth = getWidth();
             super.paint(g);
@@ -1636,13 +1526,15 @@ public class JXTreeTable extends JXTable {
                 // #170: border not drawn correctly
                 // JW: position the border to be drawn in translated area
                 // still not satifying in all cases...
-				// RG: Now it satisfies (at least for the row margins)
-				// Still need to make similar adjustments for column margins...
-                highlightBorder.paintBorder(this, g, 0, 
-                        translationOffset,
-                        getWidth(), 
-                        // uhhh getRowHeight() + 1 - 2 * (margins) 
-						getRowHeight() - (rowMargin << 1) - rowMargin);	// RG: subtract (rowMargin * 3)
+                // RG: Now it satisfies (at least for the row margins)
+                // Still need to make similar adjustments for column margins...
+                highlightBorder.paintBorder(this, g, 0, translationOffset,
+                        getWidth(),
+                        // uhhh getRowHeight() + 1 - 2 * (margins)
+                        getRowHeight() - (rowMargin << 1) - rowMargin); // RG:
+                                                                        // subtract
+                                                                        // (rowMargin
+                                                                        // * 3)
             }
         }
 
@@ -1736,12 +1628,7 @@ public class JXTreeTable extends JXTable {
         return dataAdapter;
     }
 
-//    private final ComponentAdapter  dataAdapter = new TreeTableDataAdapter(this);
 
-    // Define defaultRowHeight to allow default document icon for leaf items to
-    // draw properly
-    // JW: unused? commented until needed
-    //private final static int defaultRowHeight = 20;
     private final static Dimension spacing = new Dimension(0, 2);
 
     protected static class TreeTableDataAdapter extends JXTable.TableAdapter {

@@ -59,7 +59,9 @@ public class JXTableHeader extends JTableHeader {
 
     /**
      * Sets the associated JTable. Enables enhanced header
-     * features if table is of type JXTable.
+     * features if table is of type JXTable.<p>
+     * 
+     * PENDING: who is responsible for synching the columnModel?
      */
     public void setTable(JTable table) {
         super.setTable(table);
@@ -109,7 +111,6 @@ public class JXTableHeader extends JTableHeader {
     }
 
     protected TableCellRenderer createDefaultRenderer() {
-        // return super.createDefaultRenderer();
         return ColumnHeaderRenderer.createColumnHeaderRenderer();
     }
 
@@ -144,7 +145,6 @@ public class JXTableHeader extends JTableHeader {
             } else {
                 doSort(e);
             }
-            // uncacheResizingColumn();
         }
 
         private boolean shouldIgnore(MouseEvent e) {
@@ -172,7 +172,6 @@ public class JXTableHeader extends JTableHeader {
         private void doResize(MouseEvent e) {
             if (e.getClickCount() != 2)
                 return;
-            // int column = header.columnAtPoint(e.getPoint());
             int column = getViewIndexForColumn(cachedResizingColumn);
             if (column >= 0) {
                 (getXTable()).packColumn(column, 5);
@@ -204,22 +203,7 @@ public class JXTableHeader extends JTableHeader {
         }
 
         private boolean isInResizeRegion(MouseEvent e) {
-            // JTableHeader header = (JTableHeader) e.getSource();
-            // // JW: kind of a hack - there's no indication in the
-            // // JTableHeader api to find if we are in the resizing
-            // // region before actually receiving a click
-            // // checked the header.resizingColumn should be set on
-            // // first click?
-            // // doesn't work probably because this listener is messaged before
-            // // ui-delegate listener
-            // // return header.getResizingColumn() != null;
-            // Cursor cursor = header.getCursor();
-            // boolean inResize = cursor != null ?
-            // (cursor.getType() == Cursor.E_RESIZE_CURSOR || cursor.getType()
-            // == Cursor.W_RESIZE_CURSOR ) :
-            // false;
             return cachedResizingColumn != null; // inResize;
-            // return inResize;
         }
 
         public void mouseEntered(MouseEvent e) {
@@ -234,8 +218,6 @@ public class JXTableHeader extends JTableHeader {
         }
 
         public void mouseMoved(MouseEvent e) {
-            // uncacheResizingColumn();
-
         }
     }
 

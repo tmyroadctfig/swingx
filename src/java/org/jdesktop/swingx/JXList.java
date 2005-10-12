@@ -133,7 +133,7 @@ public class JXList extends JList {
     private void init() {
         Action findAction = createFindAction();
         getActionMap().put("find", findAction);
-        // this should be handled by the LF!
+        // JW: this should be handled by the LF!
         KeyStroke findStroke = KeyStroke.getKeyStroke("control F");
         getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(findStroke, "find");
         
@@ -355,16 +355,12 @@ public class JXList extends JList {
          */
         private void setLinkCursor(JXList list, Point location) {
             if (isLinkElement(list, location)) {
-              //  if (oldCursor == null) {
                     oldCursor = list.getCursor();
                     list.setCursor(Cursor
                             .getPredefinedCursor(Cursor.HAND_CURSOR));
-               // }
             } else {
-              //  if (oldCursor != null) {
                     list.setCursor(oldCursor);
                     oldCursor = null;
-               // }
             }
 
         }
@@ -655,7 +651,6 @@ public class JXList extends JList {
 
     // ---------------------------- uniform data model
 
-    // MUST ALWAYS ACCESS dataAdapter through accessor method!!!
     protected ComponentAdapter getComponentAdapter() {
         if (dataAdapter == null) {
             dataAdapter = new ListAdapter(this);
@@ -681,7 +676,7 @@ public class JXList extends JList {
         /**
          * Typesafe accessor for the target component.
          * 
-         * @return the target component as a {@link javax.swing.JList}
+         * @return the target component as a {@link org.jdesktop.swingx.JXList}
          */
         public JXList getList() {
             return list;
@@ -697,7 +692,6 @@ public class JXList extends JList {
 
         public int getRowCount() {
             return list.getWrappedModel().getSize();
-            // return list.getModel().getSize();
         }
 
         /**
@@ -705,25 +699,18 @@ public class JXList extends JList {
          */
         public Object getValueAt(int row, int column) {
             return list.getWrappedModel().getElementAt(row);
-            // return list.getModel().getElementAt(row);
         }
 
         public Object getFilteredValueAt(int row, int column) {
             return list.getElementAt(row);
-            /** @todo Implement getFilteredValueAt */
-            // return getValueAt(row, column);
-            // throw new UnsupportedOperationException(
-            // "Method getFilteredValueAt() not yet implemented.");
         }
 
         public void setValueAt(Object aValue, int row, int column) {
-            /** @todo Implement getFilteredValueAt */
             throw new UnsupportedOperationException(
                     "Method getFilteredValueAt() not yet implemented.");
         }
 
         public boolean isCellEditable(int row, int column) {
-            /** @todo Implement getFilteredValueAt */
             return false;
         }
 

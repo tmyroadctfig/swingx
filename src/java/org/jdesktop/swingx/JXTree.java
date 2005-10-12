@@ -62,19 +62,18 @@ import org.jdesktop.swingx.decorator.HighlighterPipeline;
 /**
  * JXTree.
  *
+ * PENDING: support filtering/sorting.
+ * 
  * @author Ramesh Gupta
  * @author Jeanette Winzenburg
  */
 public class JXTree extends JTree {
-    private Method					conversionMethod = null;
-    private final static Class[]	methodSignature = new Class[] {Object.class};
-    private final static Object[]	methodArgs = new Object[] {null};
+    private Method conversionMethod = null;
+    private final static Class[] methodSignature = new Class[] {Object.class};
+    private final static Object[] methodArgs = new Object[] {null};
 
-//  private Icon    collapsedIcon = null;
-//  private Icon    expandedIcon = null;
-
-    protected FilterPipeline filters = null;
-    protected HighlighterPipeline highlighters = null;
+    protected FilterPipeline filters;
+    protected HighlighterPipeline highlighters;
     private ChangeListener highlighterChangeListener;
 
     private DelegatingRenderer delegatingRenderer;
@@ -184,18 +183,19 @@ public class JXTree extends JTree {
     /**
      * Constructs an instance of <code>JXTree</code> which displays the root
      * node -- the tree is created using the specified data model.
-     *
+     * 
      * This version of the constructor simply invokes the super class version
      * with the same arguments.
-     *
-     * @param newModel the <code>TreeModel</code> to use as the data model
+     * 
+     * @param newModel
+     *            the <code>TreeModel</code> to use as the data model
      */
     public JXTree(TreeModel newModel) {
         super(newModel);
-		initActions();
+        initActions();
         // To support delegation of convertValueToText() to the model...
         conversionMethod = getValueConversionMethod(newModel);
-	}
+    }
 
     public void setModel(TreeModel newModel) {
         super.setModel(newModel);
@@ -205,30 +205,26 @@ public class JXTree extends JTree {
 
     private Method getValueConversionMethod(TreeModel model) {
         try {
-            return model == null ? null :
-				model.getClass().getMethod("convertValueToText", methodSignature);
-        }
-        catch (NoSuchMethodException ex) {
+            return model == null ? null : model.getClass().getMethod(
+                    "convertValueToText", methodSignature);
+        } catch (NoSuchMethodException ex) {
             // not an error
         }
         return null;
     }
 
     public String convertValueToText(Object value, boolean selected,
-                                     boolean expanded, boolean leaf,
-                                     int row, boolean hasFocus) {
+            boolean expanded, boolean leaf, int row, boolean hasFocus) {
         // Delegate to model, if possible. Otherwise fall back to superclass...
-
-        if(value != null) {
+        if (value != null) {
             if (conversionMethod == null) {
                 return value.toString();
-            }
-            else {
+            } else {
                 try {
                     methodArgs[0] = value;
-                    return (String) conversionMethod.invoke(getModel(), methodArgs);
-                }
-                catch (Exception ex) {
+                    return (String) conversionMethod.invoke(getModel(),
+                            methodArgs);
+                } catch (Exception ex) {
                     // fall through
                 }
             }
@@ -242,7 +238,7 @@ public class JXTree extends JTree {
         map.put("expand-all", new Actions("expand-all"));
         map.put("collapse-all", new Actions("collapse-all"));
         map.put("find", createFindAction());
-        // this should be handled by the LF!
+        // JW: this should be handled by the LF!
         KeyStroke findStroke = KeyStroke.getKeyStroke("control F");
         getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(findStroke, "find");
 
@@ -284,7 +280,6 @@ public class JXTree extends JTree {
 
     protected void doFind() {
         SearchFactory.getInstance().showFindInput(this, getSearchable());
-        
     }
 
     /**
@@ -312,26 +307,28 @@ public class JXTree extends JTree {
     /**
      * A searchable targetting the visible rows of a JXTree.
      * 
-     * PENDING: value to string conversion should behave as nextMatch (?)
-     * which uses the convertValueToString().
+     * PENDING: value to string conversion should behave as nextMatch (?) which
+     * uses the convertValueToString().
      * 
      */
     public class TreeSearchable extends AbstractSearchable {
 
         @Override
-        protected void findMatchAndUpdateState(Pattern pattern, int startRow, boolean backwards) {
+        protected void findMatchAndUpdateState(Pattern pattern, int startRow,
+                boolean backwards) {
             SearchResult searchResult = null;
             if (backwards) {
                 for (int index = startRow; index >= 0 && searchResult == null; index--) {
                     searchResult = findMatchAt(pattern, index);
                 }
             } else {
-                for (int index = startRow; index < getSize() && searchResult == null; index++) {
+                for (int index = startRow; index < getSize()
+                        && searchResult == null; index++) {
                     searchResult = findMatchAt(pattern, index);
                 }
             }
             updateState(searchResult);
-            
+
         }
 
         @Override
@@ -344,9 +341,11 @@ public class JXTree extends JTree {
          * Returns an appropriate SearchResult if matching or null if no
          * matching
          * 
-         * @param pattern 
-         * @param row a valid row index in view coordinates
-         * @param column a valid column index in view coordinates
+         * @param pattern
+         * @param row
+         *            a valid row index in view coordinates
+         * @param column
+         *            a valid column index in view coordinates
          * @return
          */
         protected SearchResult findMatchAt(Pattern pattern, int row) {
@@ -363,7 +362,6 @@ public class JXTree extends JTree {
             }
             return null;
         }
-        
 
         @Override
         protected int getSize() {
@@ -377,9 +375,9 @@ public class JXTree extends JTree {
             if (row >= 0) {
                 scrollRowToVisible(row);
             }
-            
+
         }
-        
+
     }
     
     /**
@@ -400,16 +398,6 @@ public class JXTree extends JTree {
         }
     }
 
-    public FilterPipeline getFilters() {
-        return filters;
-    }
-
-    public void setFilters(FilterPipeline pipeline) {
-        /** @todo  */
-        //TreeModel	model = getModel();
-        //adjustListeners(pipeline, model, model);
-        filters = pipeline;
-    }
 
     public HighlighterPipeline getHighlighters() {
         return highlighters;
@@ -507,7 +495,6 @@ public class JXTree extends JTree {
             protected void updateRolloverPoint(JComponent component,
                     Point mousePoint) {
                 JXTree tree = (JXTree) component;
-//                int row = tree.getRowForLocation(mousePoint.x, mousePoint.y);
                 int row = tree.getClosestRowForLocation(mousePoint.x, mousePoint.y);
                 Rectangle bounds = tree.getRowBounds(row);
                 if (bounds == null) {
@@ -525,7 +512,6 @@ public class JXTree extends JTree {
 
         };
         return r;
-//        return new RolloverProducer();
     }
 
   
@@ -794,9 +780,6 @@ public class JXTree extends JTree {
 
     protected static class TreeAdapter extends ComponentAdapter {
         private final JXTree tree;
-        private TreePath path;
-        // JTreeRenderContext requires cooperation from JTree, which must set path,
-        // and call getRowForPath() to set the row in this context at appropriate times.
 
         /**
          * Constructs a <code>TableCellRenderContext</code> for the specified

@@ -57,7 +57,13 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  * </ul>
  * 
  * 
- * PENDING: update (?) views/wiring on focus change.
+ * PENDING: JW - update (?) views/wiring on focus change. Started brute force - 
+ * stop searching. This looks extreme confusing for findBars added to ToolBars 
+ * which are empty except for the findbar. Weird problem if triggered from 
+ * menu - find widget disappears after having been shown for an instance. 
+ * Where's the focus?
+ * 
+ * 
  * PENDING: add methods to return JXSearchPanels (for use by PatternMatchers).
  * 
  * @author Jeanette Winzenburg
@@ -72,10 +78,7 @@ public class SearchFactory {
 
     private static SearchFactory searchFactory;
 
-//    /** the shared dialog to show input. */
-    // JW: can't share the Dialog - not possible to reset the owner!
-//    protected JXDialog findDialog;
-    
+   
     /** the shared find widget for batch-find. */
     protected JXFindPanel findPanel;
    

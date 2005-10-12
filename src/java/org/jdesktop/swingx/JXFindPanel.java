@@ -54,9 +54,6 @@ public class JXFindPanel extends AbstractPatternPanel {
     private boolean initialized;
 
 
-//    protected JButton findNext;
-//    protected JButton findPrevious;
-
     public JXFindPanel() {
         this(null);
     }
@@ -112,9 +109,6 @@ public class JXFindPanel extends AbstractPatternPanel {
         getActionContainerFactory().configureButton(backCheck, 
                 getAction(PatternModel.MATCH_BACKWARDS_ACTION_COMMAND),
                 null);
-
-//        findNext.setAction(getAction(EXECUTE_FIND_NEXT_ACTION_COMMAND));
-//        findPrevious.setAction(getAction(EXECUTE_FIND_PREVIOUS_ACTION_COMMAND));
     }
 
     
@@ -226,15 +220,11 @@ public class JXFindPanel extends AbstractPatternPanel {
         super.initComponents();
         wrapCheck = new JCheckBox();
         backCheck = new JCheckBox();
-//        findNext = new JButton();
-//        findPrevious = new JButton();
-
     }
 
 
 
     protected void build() {
-
         Box lBox = new Box(BoxLayout.LINE_AXIS); 
         lBox.add(searchLabel);
         lBox.add(new JLabel(":"));
@@ -245,10 +235,6 @@ public class JXFindPanel extends AbstractPatternPanel {
         rBox.add(matchCheck);
         rBox.add(wrapCheck);
         rBox.add(backCheck);
-        // just want to see...
-//        rBox.add(findNext);
-//        rBox.add(findPrevious);
-        
         rBox.setAlignmentY(Component.TOP_ALIGNMENT);
 
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
@@ -257,37 +243,5 @@ public class JXFindPanel extends AbstractPatternPanel {
         add(rBox);
     }
 
-    //----------------------- obsolete actions - no longer use
-    //----------------------- kept here to remember adding names etc to resources
-    private abstract class CheckAction extends AbstractAction {
-
-        public CheckAction(String name) {
-            super(name);
-        }
-
-        public void actionPerformed(ActionEvent evt) {
-        }
-    }
-
-    private class MatchAction extends CheckAction {
-        public MatchAction() {
-            super("Match upper/lower case");
-            putValue(Action.MNEMONIC_KEY, new Integer('M'));
-        }
-    }
-
-    private class WrapAction extends CheckAction {
-        public WrapAction() {
-            super("Wrap around");
-            putValue(Action.MNEMONIC_KEY, new Integer('W'));
-        }
-    }
-
-    private class BackwardAction extends CheckAction {
-        public BackwardAction() {
-            super("Search Backwards");
-            putValue(Action.MNEMONIC_KEY, new Integer('B'));
-        }
-    }
 
 }
