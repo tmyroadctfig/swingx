@@ -23,7 +23,6 @@ import javax.swing.ListModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
-import org.jdesktop.swingx.action.EditorPaneLinkVisitor;
 import org.jdesktop.swingx.action.LinkAction;
 
 /**
@@ -87,8 +86,8 @@ public class JXHyperlinkTest extends InteractiveTestCase {
     
     public void interactiveTestListLinkRenderer() {
         EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
-        JXList list = new JXList(createListModelWithLinks());
-        list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+        JXList list = new JXList(createListModelWithLinks(20));
+//        list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
         list.setLinkVisitor(visitor);
         JFrame frame = wrapWithScrollingInFrame(list, visitor.getOutputComponent(), "show link renderer in list");
         frame.setVisible(true);
@@ -96,9 +95,9 @@ public class JXHyperlinkTest extends InteractiveTestCase {
     }
     
     
-    private ListModel createListModelWithLinks() {
+    private ListModel createListModelWithLinks(int count) {
         DefaultListModel model = new DefaultListModel();
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < count; i++) {
             try {
                 LinkModel link = new LinkModel("a link text " + i, null, new URL("http://some.dummy.url" + i));
                 if (i == 1) {
@@ -142,8 +141,8 @@ public class JXHyperlinkTest extends InteractiveTestCase {
      //   UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         JXHyperlinkTest test = new JXHyperlinkTest();
         try {
-            test.runInteractiveTests();
-         //   test.runInteractiveTests("interactive.*Rend.*");
+//            test.runInteractiveTests();
+            test.runInteractiveTests("interactive.*List.*");
           } catch (Exception e) {
               System.err.println("exception when executing interactive tests:");
               e.printStackTrace();

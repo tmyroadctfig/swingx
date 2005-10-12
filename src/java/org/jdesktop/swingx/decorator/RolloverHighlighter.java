@@ -35,7 +35,11 @@ public class RolloverHighlighter extends ConditionalHighlighter {
     }
 
     protected boolean test(ComponentAdapter adapter) {
-        Point p = (Point) adapter.getComponent().getClientProperty(RolloverProducer.ROLLOVER_KEY);
+        // JW: where to put constants? 
+        // this is a back-reference into swingx simply to access
+        // a string constant. Hmmm...
+        Point p = (Point) adapter.getComponent().getClientProperty(
+                RolloverProducer.ROLLOVER_KEY);
         return p != null &&  p.y == adapter.row;
     }
 

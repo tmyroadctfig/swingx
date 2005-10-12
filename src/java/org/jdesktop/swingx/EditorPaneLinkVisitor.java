@@ -18,7 +18,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package org.jdesktop.swingx.action;
+package org.jdesktop.swingx;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,8 +30,6 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.Document;
 
-import org.jdesktop.swingx.JXEditorPane;
-import org.jdesktop.swingx.LinkModel;
 
 /**
  * A ActionListener using a JXEditorPane to "visit" a LinkModel.
