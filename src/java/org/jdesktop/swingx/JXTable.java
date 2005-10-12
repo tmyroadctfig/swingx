@@ -48,6 +48,7 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.DefaultCellEditor;
@@ -60,6 +61,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
+import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SizeSequence;
@@ -467,7 +469,11 @@ public class JXTable extends JTable {
      * @param linkVisitor
      */
     public void setDefaultLinkVisitor(ActionListener linkVisitor) {
-        TableCellEditor renderer = getDefaultEditor(LinkModel.class);
+//        TableCellEditor editor = getDefaultEditor(LinkModel.class);
+//        if (editor instanceof LinkRenderer) {
+//            ((LinkRenderer) editor).setVisitingDelegate(linkVisitor);
+//        }
+        TableCellRenderer renderer = getDefaultRenderer(LinkModel.class);
         if (renderer instanceof LinkRenderer) {
             ((LinkRenderer) renderer).setVisitingDelegate(linkVisitor);
         }
@@ -488,6 +494,9 @@ public class JXTable extends JTable {
             if (RolloverProducer.ROLLOVER_KEY.equals(evt.getPropertyName())) {
                rollover((JXTable) evt.getSource(), (Point) evt
                             .getOldValue(), (Point) evt.getNewValue());
+            } else if (RolloverProducer.CLICKED_KEY.equals(evt.getPropertyName())) {
+                click((JXTable) evt.getSource(), (Point) evt.getOldValue(),
+                        (Point) evt.getNewValue());
             }
         }
 
@@ -507,6 +516,18 @@ public class JXTable extends JTable {
                 table.repaint(r);
             }
             setLinkCursor(table, newLocation);
+        }
+
+        private void click(JXTable list, Point oldLocation, Point newLocation) {
+            if (!isLinkColumn(list, newLocation)) return;
+            TableCellRenderer renderer = list.getCellRenderer(newLocation.y, newLocation.x);
+            // PENDING: JW - don't ask the model, ask the list!
+            Component comp = list.prepareRenderer(renderer, newLocation.y,  newLocation.x);
+            if (comp instanceof AbstractButton) {
+                // this is fishy - needs to be removed as soon as JList is editable
+                ((AbstractButton) comp).doClick();
+                list.repaint();
+            }
         }
 
         private void setLinkCursor(JXTable table, Point location) {
@@ -2040,7 +2061,7 @@ public class JXTable extends JTable {
     /** ? */
     protected void createDefaultEditors() {
         super.createDefaultEditors();
-        setLazyEditor(LinkModel.class, "org.jdesktop.swingx.LinkRenderer");
+//        setLazyEditor(LinkModel.class, "org.jdesktop.swingx.LinkRenderer");
     }
 
     /**

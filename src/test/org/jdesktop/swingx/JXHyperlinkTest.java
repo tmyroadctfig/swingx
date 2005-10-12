@@ -75,10 +75,11 @@ public class JXHyperlinkTest extends InteractiveTestCase {
     public void interactiveTestTableLinkRenderer() {
         EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
         JXTable table = new JXTable(createModelWithLinks());
-        table.setRolloverEnabled(true);
-
-        LinkRenderer editor = (LinkRenderer) table.getDefaultEditor(LinkModel.class);
-        editor.setVisitingDelegate(visitor);
+        table.setDefaultLinkVisitor(visitor);
+//        table.setRolloverEnabled(true);
+//
+//        LinkRenderer editor = (LinkRenderer) table.getDefaultEditor(LinkModel.class);
+//        editor.setVisitingDelegate(visitor);
         JFrame frame = wrapWithScrollingInFrame(table, visitor.getOutputComponent(), "show link renderer in table");
         frame.setVisible(true);
 
@@ -142,7 +143,7 @@ public class JXHyperlinkTest extends InteractiveTestCase {
         JXHyperlinkTest test = new JXHyperlinkTest();
         try {
 //            test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*List.*");
+            test.runInteractiveTests("interactive.*Table.*");
           } catch (Exception e) {
               System.err.println("exception when executing interactive tests:");
               e.printStackTrace();
