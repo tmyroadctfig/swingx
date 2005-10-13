@@ -107,13 +107,9 @@ public class DropShadowBorder implements Border {
         int rightEdge = x + width - borderInsets.right;
         int topEdge = y + borderInsets.top - lineWidth;
         int bottomEdge = y + height - borderInsets.bottom;
-//        
 //        //draw a rectangular border.
         Graphics2D g2 = (Graphics2D)graphics;
         g2.setColor(lineColor);
-//        if (lineWidth > 0) {
-//            g2.drawRect(leftEdge, topEdge, rightEdge - leftEdge, bottomEdge - topEdge);
-//        }
         
         //The location and size of the shadows depends on which shadows are being
         //drawn. For instance, if the left & bottom shadows are being drawn, then
@@ -246,7 +242,6 @@ public class DropShadowBorder implements Border {
             BufferedImage targetImage = new BufferedImage(imageWidth, imageWidth, BufferedImage.TYPE_INT_ARGB);
             ((Graphics2D)targetImage.getGraphics()).drawImage(image, blur, -(shadowSize/2), -(shadowSize/2));
 
-//            g2.drawImage(targetImage, null, 0, 0);
             int x = 1;
             int y = 1;
             int w = shadowSize;
@@ -287,27 +282,7 @@ public class DropShadowBorder implements Border {
             w = 1;
             h = shadowSize;
             images.put(Position.TOP, targetImage.getSubimage(x, y, w, h));
-            
-//            try {
-//                ImageIO.write(images.get(Position.BOTTOM), "PNG", new FileOutputStream("/home/rb156199/Desktop/bottom.png"));
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-            
-            //paint some trial images
-//            int xoffset = 100;
-//            int yoffset = 100;
-//            int width = 200;
-//            int height = 200;
-//            g2.drawImage(images.get(Position.TOP_LEFT), null, xoffset, yoffset);
-//            g2.drawImage(images.get(Position.LEFT).getScaledInstance(shadowSize, height - (shadowSize * 2), Image.SCALE_FAST), xoffset, yoffset + shadowSize, null);
-//            g2.drawImage(images.get(Position.BOTTOM_LEFT), null, xoffset, yoffset + height - shadowSize);
-//            g2.drawImage(images.get(Position.BOTTOM).getScaledInstance(width - (shadowSize * 2), shadowSize, Image.SCALE_FAST), xoffset + shadowSize, yoffset + height - shadowSize, null);
-//            g2.drawImage(images.get(Position.BOTTOM_RIGHT), null, xoffset + width - shadowSize, yoffset + height - shadowSize);
-//            g2.drawImage(images.get(Position.RIGHT).getScaledInstance(shadowSize, height - (shadowSize * 2), Image.SCALE_FAST), xoffset + width - shadowSize, yoffset + shadowSize, null);
-//            g2.drawImage(images.get(Position.TOP_RIGHT), null, xoffset + width - shadowSize, yoffset);
-//            g2.drawImage(images.get(Position.TOP).getScaledInstance(width - (shadowSize * 2), shadowSize, Image.SCALE_FAST), xoffset + shadowSize, yoffset, null);
-            
+                        
             buffer.dispose();
             image.flush();
         }
@@ -367,58 +342,4 @@ public class DropShadowBorder implements Border {
     public int getCornerSize() {
         return cornerSize;
     }
-    
-//    public static void main(String... args) {
-//        JFrame frame = new JFrame();
-//        frame.setSize(500, 500);
-//        
-//        JXPanel contentPane = new JXPanel(new BorderLayout());        
-//
-//        //add sliders
-//        JXPanel sliderPanel = new JXPanel();
-//        contentPane.add(sliderPanel, BorderLayout.SOUTH);
-//        
-//        //add the slider for adjusting the shadow thickness
-//        final JSlider slider = new JSlider(1, 10, 4);
-//        slider.setSnapToTicks(true);
-//        slider.setPaintTicks(true);
-//        slider.setPaintLabels(true);
-//        sliderPanel.add(slider);
-//        
-//        //add the slider for adjusting the corner radius
-//        final JSlider cornerSlider = new JSlider(1, 24, 12);
-//        cornerSlider.setSnapToTicks(true);
-//        cornerSlider.setPaintTicks(true);
-//        cornerSlider.setPaintLabels(true);
-//        sliderPanel.add(cornerSlider);
-//        
-//        //add the checkboxes for what sides to generate images for
-//        
-//        //add the display panel
-//        final DropShadowBorder border = new DropShadowBorder();
-//        final JXPanel display = new JXPanel() {
-//            public void paintComponent(Graphics g) {
-//                super.paintComponent(g);
-//                border.getImages((Graphics2D)g);
-//            }
-//        };
-//        display.setDoubleBuffered(false);
-//        slider.addChangeListener(new ChangeListener() {
-//            public void stateChanged(ChangeEvent e) {
-////                border.setShadowSize(slider.getValue());
-//                display.repaint();
-//            }
-//        });
-//        cornerSlider.addChangeListener(new ChangeListener() {
-//            public void stateChanged(ChangeEvent e) {
-////                border.setCornerSize(cornerSlider.getValue());
-//                display.repaint();
-//            }
-//        });
-//        contentPane.add(display, BorderLayout.CENTER);
-//        
-//        frame.setContentPane(contentPane);
-//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        frame.setVisible(true);
-//    }
 }
