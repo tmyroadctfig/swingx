@@ -107,7 +107,6 @@ public class DropShadowBorder implements Border {
         int rightEdge = x + width - borderInsets.right;
         int topEdge = y + borderInsets.top - lineWidth;
         int bottomEdge = y + height - borderInsets.bottom;
-//        //draw a rectangular border.
         Graphics2D g2 = (Graphics2D)graphics;
         g2.setColor(lineColor);
         
