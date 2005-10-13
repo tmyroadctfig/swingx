@@ -100,7 +100,6 @@ public class ShuttleSorter extends Sorter {
 // using it here is that, unlike qsort, it is stable.
     protected void sort(int from[], int to[], int low, int high) {
         if (high - low < 2) {
-        //    System.out.println("low:"+low+"; high:"+high);
             return;
         }
         int middle = (low + high) >> 1;

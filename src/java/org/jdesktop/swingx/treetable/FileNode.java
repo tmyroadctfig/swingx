@@ -38,15 +38,6 @@ public class FileNode extends DefaultMutableTreeNode {
 	this.isDir = file.isDirectory();
     }
 
-    /* @todo Add userObject support
-       public FileNode(Object userObject) {
-       ...
-       }
-
-       public FileNode(Object userObject, boolean allowsChildren) {
-       ...
-       }
-    */
 
     public boolean getAllowsChildren() {
 	return isDir;

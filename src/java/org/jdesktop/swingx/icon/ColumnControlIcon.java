@@ -79,7 +79,7 @@ public class ColumnControlIcon implements Icon {
         JLabel label = new JLabel(new ColumnControlIcon());
         frame.getContentPane().add(BorderLayout.CENTER, label);
         frame.pack();
-        frame.setVisible(true);  // RG: Changed from deprecated method show();
+        frame.setVisible(true);  
     }
 
 }

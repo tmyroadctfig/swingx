@@ -180,16 +180,6 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel implemen
             ((TableColumnExt) aColumn).setVisible(oldVisible);
         }
         
-//        if (aColumn instanceof TableColumnExt && !((TableColumnExt)aColumn).isVisible()) {
-//            invisibleColumns.add(aColumn);
-//            //The indexes are -1 because no visible difference has occurred. The
-//            //javadoc doesn't indicate that -1 is unacceptable, but errors may
-//            //occur. There must be a better way...
-//            TableColumnModelEvent evt = new TableColumnModelEvent(this, -1, -1);
-//            fireColumnAdded(evt);
-//        } else {
-//            super.addColumn(aColumn);
-//        }
     }
 
         
@@ -199,11 +189,6 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel implemen
         invisibleColumns.add(col);
         oldIndexes.put(col, new Integer(oldIndex));
         super.removeColumn(col);
-        //need to fire some listener that will cause the table
-        //associated with this model to be refreshed...
-//                    tableColumns.remove(col);
-//                    TableColumnModelEvent e = new TableColumnModelEvent(DefaultTableColumnModelExt.this, -1, -1);
-//                    fireColumnMoved(e);
     }
 
     protected void moveToVisible(TableColumnExt col) {
@@ -216,11 +201,6 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel implemen
         super.addColumn(col);
         moveColumn(getColumnCount() - 1, Math.min(getColumnCount() - 1, oldIndex));
         col.putClientProperty(IGNORE_EVENT, null);
-//        tableColumns.add(oldIndex, col);
-//        //need to fire some listener that will cause the table
-//        //associated with this model to be refreshed...
-//        TableColumnModelEvent e = new TableColumnModelEvent(DefaultTableColumnModelExt.this, -1, oldIndex);
-//        fireColumnMoved(e);
     }
 
     private final class VisibilityListener implements PropertyChangeListener {        

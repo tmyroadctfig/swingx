@@ -78,8 +78,6 @@ public final class ColumnControlButton extends JButton {
         installTable(table);
     }
 
-
-
     public void updateUI() {
         super.updateUI();
         setMargin(new Insets(1, 2, 2, 1)); // Make this LAF-independent
@@ -129,20 +127,7 @@ public final class ColumnControlButton extends JButton {
             return (column instanceof TableColumnExt);
         }
 
-        // public boolean isSelected() {
-        // return canControl() ? ((TableColumnExt) column).isVisible() : true;
-        // }
-        //
-        // public synchronized void setSelected(boolean newValue) {
-        // if (!canControl()) return;
-        // boolean oldValue = isSelected();
-        // if (oldValue == newValue) return;
-        // ((TableColumnExt) column).setVisible(newValue);
-        // firePropertyChange("selected", oldValue, isSelected());
-        // }
-
         public void itemStateChanged(ItemEvent e) {
-            // setSelected(e.getStateChange() == ItemEvent.SELECTED);
             if (canControl()) {
                 if ((e.getStateChange() == ItemEvent.DESELECTED)
                         && (table.getColumnCount() <= 1)) {
@@ -196,7 +181,6 @@ public final class ColumnControlButton extends JButton {
                     } else if ("headerValue".equals(evt.getPropertyName())) {
                         setName(String.valueOf(evt.getNewValue()));
                     }
-
                 }
 
             };
@@ -345,9 +329,6 @@ public final class ColumnControlButton extends JButton {
         if (actions.size() == 0)
             return;
         if (canControl()) {
-            // only the createPopup(..) and similar add a separator for
-            // a null element
-            // actions.add(0, null);
             popupMenu.addSeparator();
         }
         ActionContainerFactory factory = new ActionContainerFactory(null);
@@ -356,8 +337,6 @@ public final class ColumnControlButton extends JButton {
             popupMenu.add(factory.createMenuItem(action));
         }
     }
-
-
 
     /**
      * @return

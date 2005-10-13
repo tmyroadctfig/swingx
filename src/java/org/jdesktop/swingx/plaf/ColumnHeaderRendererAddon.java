@@ -49,8 +49,6 @@ public class ColumnHeaderRendererAddon extends AbstractComponentAddon {
       if (isMac(addon)) {
           upIcon = "sort-osx-up.png";
           downIcon = "sort-osx-dn.png";
-//      } else if (isMotif(addon)) {
-//          
       } else if (isWindows(addon)) {
           if (isXP(addon)) {
               upIcon = "sort-xp-up.png";

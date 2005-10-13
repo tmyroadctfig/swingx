@@ -373,25 +373,6 @@ public class ActionManager {
         }
     }
 
-    /**
-     * A really ugly little hack which registers the text component on all the
-     * ServerActions.
-     * TODO: Should find a way of supporting generic components. Perhaps by
-     *       defining a new interface like DataProvider which can
-     *       be implemented by all ServerActions.
-     *
-     public void registerDataProvider(ServerActionListener listener) {
-     if (actionMap != null) {
-     Iterator iter = actionMap.values().iterator();
-     while (iter.hasNext()) {
-     AbstractAction action = (AbstractAction)iter.next();
-     if (action instanceof ServerAction) {
-     ((ServerAction)action).addServerActionListener(listener);
-     }
-     }
-     }
-     }*/
-
     //
     // Convenience methods for determining the type of action.
     //

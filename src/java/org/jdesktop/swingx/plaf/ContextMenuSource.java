@@ -82,13 +82,7 @@ public abstract class ContextMenuSource {
     
     protected abstract String getResourcePrefix();
 
-    
-//    private void addAction(ActionMap map, JComponent component,
-//            String actionKey) {
-//        Action action = createDelegateAction(component, actionKey);
-//        map.put(actionKey, action);
-//    }
-
+ 
     protected Action createDelegateAction(JComponent component,
             String actionKey) {
         Action action = component.getActionMap().get(actionKey);

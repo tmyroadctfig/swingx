@@ -193,8 +193,6 @@ public class ServerAction extends AbstractAction {
 		if (url.startsWith("http")) {
 		    execURL = new URL(url);
 		} else {
-		    // Create the URL based on the enclosing applet.
-//		    execURL = Application.getURL(url, this);
 		}
 		if (execURL == null) {
 		    // XXX TODO: send a message
@@ -204,11 +202,6 @@ public class ServerAction extends AbstractAction {
 		    putValue(URL_CACHE, execURL);
 		}
 
-		/*
-		if (Debug.debug) {
-		    System.out.println("ServerAction: URL created: " + execURL.toString());
-		}
-		*/
 	    } catch (MalformedURLException ex) {
 		ex.printStackTrace();
 	    }
@@ -320,20 +313,6 @@ public class ServerAction extends AbstractAction {
 	return postData.toString();
     }
 
-    /**
-     * Retrieves the text from the text component.
-     * TODO: should use selection criteria to select text.
-     */
-    private StringBuffer getDataBuffer() throws UnsupportedEncodingException {
-	StringBuffer buffer = new StringBuffer("content=");
-	/*
-	if (listener != null) {
-	    buffer.append(URLEncoder.encode(listener.getText(), "UTF-8"));
-	} else {
-	    buffer.append("ServerAction ERROR: text component has not been set");
-	    }*/
-	return buffer;
-    }
 
     /**
      * Creates a human readable message from the server code and message result.

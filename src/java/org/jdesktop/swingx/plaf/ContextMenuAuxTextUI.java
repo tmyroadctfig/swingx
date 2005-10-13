@@ -55,10 +55,7 @@ public class ContextMenuAuxTextUI extends TextUI {
     private MouseListener mouseHandler;
 
     public static ComponentUI createUI(JComponent c) {
-//        if (auxTextFieldUI == null) {
-//            auxTextFieldUI = new ContextMenuAuxTextUI();
-//        }
-        return new ContextMenuAuxTextUI(); //auxTextFieldUI;
+        return new ContextMenuAuxTextUI(); 
     }
 
     public void installUI(JComponent comp) {

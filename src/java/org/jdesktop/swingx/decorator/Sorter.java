@@ -31,9 +31,9 @@ import java.util.Locale;
  * @author Ramesh Gupta
  */
 public abstract class Sorter extends Filter {
-    private boolean	ascending = true;
+    private boolean ascending = true;
     // JW: need to be updated if default locale changed
-    private Collator    collator;   // RG: compute this once
+    private Collator  collator;   // RG: compute this once
     private Locale currentLocale;
     private Comparator comparator;
 
@@ -95,10 +95,11 @@ public abstract class Sorter extends Filter {
 
     /**
      * Adopts the row mappings of the specified sorter by cloning the mappings.
-     *
-     * @param oldSorter <code>Sorter</code> whose mappings are to be cloned
+     * 
+     * @param oldSorter
+     *            <code>Sorter</code> whose mappings are to be cloned
      */
-	protected abstract void adopt(Sorter oldSorter);
+    protected abstract void adopt(Sorter oldSorter);
 
     /**
      * Interposes this sorter between a filter pipeline and the component that
@@ -138,7 +139,6 @@ public abstract class Sorter extends Filter {
             getPipeline().setSorter(null);
             assign((FilterPipeline) null);
         }
-        
     }
 
     public int compare(int row1, int row2) {
@@ -146,7 +146,7 @@ public abstract class Sorter extends Filter {
         return ascending ? result : -result;
     }
 
-	/* Adapted from Phil Milne's TableSorter implementation.
+    /* Adapted from Phil Milne's TableSorter implementation.
         This implementation, however, is not coupled to TableModel in any way,
         and may be used with list models and other types of models easily. */
 
@@ -168,20 +168,10 @@ public abstract class Sorter extends Filter {
         if (comparator != null) {
             return comparator.compare(o1, o2);
         }
-
         // make sure we use the collator for string compares
         if ((o1.getClass() == String.class) && (o2.getClass() == String.class)) {
             return collator.compare((String)o1, (String) o2);
         }
-        
-//        if ((o1 instanceof Comparable) && (o2 instanceof Comparable)) {
-//            try {
-//                return ((Comparable) o1).compareTo(o2);
-//            } catch (ClassCastException ex) {
-//                // comparables with different types
-//            }
-//        }
-        
         // patch from Jens Elkner (#189)
         if ((o1.getClass().isInstance(o2)) && (o1 instanceof Comparable)) {
             Comparable c1 = (Comparable) o1;
@@ -190,7 +180,6 @@ public abstract class Sorter extends Filter {
             Comparable c2 = (Comparable) o2;
             return -c2.compareTo(o1);
         }
-        
         return collator.compare(o1.toString(), o2.toString());
     }
 

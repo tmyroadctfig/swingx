@@ -60,15 +60,6 @@ public class HighlighterPipeline {
      */
     public HighlighterPipeline(Highlighter[] inList) {
         this();
-        // always returns a new copy of inList
-        // XXX seems like there is too much happening here
-        // JW: and probably not what's intended - the array
-        // is cloned, not its content!
-        // don't need to anyway - highlighters are shareable
-        // between Pipelines - the order serves no purpose
-//        List copy = Arrays.asList((Highlighter[])inList.clone());
-//        highlighters = new ArrayList(copy.size());
-//        highlighters.addAll(copy);
         for (int i = 0; i < inList.length; i++) {
             addHighlighter(inList[i]);
         }
@@ -158,11 +149,6 @@ public class HighlighterPipeline {
             stamp = iter.next().highlight(stamp, adapter);
             
         }
-//        Iterator iter = highlighters.iterator();
-//        while (iter.hasNext()) {
-//            Highlighter hl = (Highlighter)iter.next();
-//            stamp = hl.highlight(stamp, adapter);
-//        }
         return stamp;
     }
 

@@ -96,7 +96,6 @@ public class Selection {
 
 
     public void restoreSelection() {
-//        if (pipeline == null) return;
         lock();
         // JW - hmm... clearSelection doesn't reset the lead/anchor. Why not?
         viewSelection.clearSelection();

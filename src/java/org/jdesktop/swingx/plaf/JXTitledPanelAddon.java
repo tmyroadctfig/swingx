@@ -76,19 +76,11 @@ public class JXTitledPanelAddon extends AbstractComponentAddon {
   @Override
   protected void addWindowsDefaults(LookAndFeelAddons addon, List<Object> defaults) {
     super.addWindowsDefaults(addon, defaults);
-//        if (OS.isWindowsXP() && OS.getWindowsVisualStyle() == OS.WinXPTheme.LUNA) {
     defaults.addAll(Arrays.asList(new Object[] { 
       "JXTitledPanel.title.foreground", new ColorUIResource(255, 255, 255),
       "JXTitledPanel.title.darkBackground", new ColorUIResource(49, 121, 242),
       "JXTitledPanel.title.lightBackground", new ColorUIResource(198, 211, 247),
     }));
-//        } else {
-//            defaults.addAll(Arrays.asList(new Object[] { 
-//            "JXTitledPanel.title.foreground", new ColorUIResource(255, 255, 255),
-//            "JXTitledPanel.title.darkBackground", new ColorUIResource(49, 121, 242),
-//            "JXTitledPanel.title.lightBackground", new ColorUIResource(198, 211, 247),
-//            }));
-//        }
   }
 
 }

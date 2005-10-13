@@ -37,10 +37,7 @@ public class ContextMenuAuxScrollBarUI extends ScrollBarUI {
     private JScrollBar scrollBar;
     
     public static ComponentUI createUI(JComponent c) {
-//        if (auxTextFieldUI == null) {
-//            auxTextFieldUI = new ContextMenuAuxTextUI();
-//        }
-        return new ContextMenuAuxScrollBarUI(); //auxTextFieldUI;
+        return new ContextMenuAuxScrollBarUI(); 
     }
 
     // PENDING: need to listen to orientation changes

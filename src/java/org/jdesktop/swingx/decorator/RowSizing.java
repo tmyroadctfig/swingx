@@ -20,11 +20,7 @@
  */
 package org.jdesktop.swingx.decorator;
 
-import javax.swing.DefaultListSelectionModel;
-import javax.swing.ListSelectionModel;
 import javax.swing.SizeSequence;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 /**
  * @author Jeanette Winzenburg
@@ -89,20 +85,16 @@ public class RowSizing {
 
     public void clearModelSizes() {
         modelSizes = null;
-//        modelSizes.setSizes(new int[0]);
-        
     }
 
     public void insertIndexInterval(int start, int length, int value) {
         if (modelSizes == null) return;
         modelSizes.insertEntries(start, length, value);
-        
     }
 
     public void removeIndexInterval(int start, int length) {
         if (modelSizes == null) return;
         modelSizes.removeEntries(start, length);
-        
     }
 
     public void restoreSelection() {
@@ -121,8 +113,6 @@ public class RowSizing {
     private void mapTowardsModel() {
         if (viewSizes == null) return;
         modelSizes = new SizeSequence(getInputSize(), defaultHeight);
-//        clearModelSizes();
-//        modelSizes.insertEntries(0, getInputSize(), defaultHeight);
         int[] selected = viewSizes.getSizes(); 
         for (int i = 0; i < selected.length; i++) {
             int modelIndex = convertToModel(i);

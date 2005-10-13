@@ -96,8 +96,6 @@ public class TreeTableCellEditor extends DefaultCellEditor {
                                                  int column) {
         Component component = super.getTableCellEditorComponent(table, value,
             isSelected, row, column);
-
-        //boolean isRootVisible = tree.isRootVisible();
         Rectangle bounds = tree.getRowBounds(row);
         int offset = bounds.x;
         TreeCellRenderer tcr = tree.getCellRenderer();
@@ -117,7 +115,6 @@ public class TreeTableCellEditor extends DefaultCellEditor {
             }
         }
         ((TreeTableTextField) getComponent()).offset = offset;
-        //((TreeTableTextField) getComponent()).selectAll();
         return component;
     }
 
@@ -130,12 +127,10 @@ public class TreeTableCellEditor extends DefaultCellEditor {
             return true;
         }
         else if (e instanceof MouseEvent) {
-			// RG: Fix Issue 49 -- Move cell expansion/collapse logic to
-			// JXTreeTable.editCellAt();
             return (((MouseEvent) e).getClickCount() >= clickCountToStart);
         }
 
-		// e is some other type of event...
+	// e is some other type of event...
         return false;
     }
 

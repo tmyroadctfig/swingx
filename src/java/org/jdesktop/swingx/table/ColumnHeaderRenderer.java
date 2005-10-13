@@ -278,22 +278,6 @@ public class ColumnHeaderRenderer extends JComponent implements TableCellRendere
         return label.getVerticalTextPosition();
     }
 
-//    public void paint(Graphics g) {
-//        if (antiAliasedText) {
-//            Graphics2D g2 = (Graphics2D) g;
-//            Object save = g2
-//                    .getRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING);
-//            g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-//                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-//
-//            super.paint(g2);
-//
-//            g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, save);
-//        } else {
-//            super.paint(g);
-//        }
-//    }
-//
     public void updateUI() {
         super.updateUI();
         initDelegate();

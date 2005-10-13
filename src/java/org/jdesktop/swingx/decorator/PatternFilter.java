@@ -117,7 +117,7 @@ public class PatternFilter extends Filter implements PatternMatcher {
             return false;
         }
 
-        // ask the adapter is the column should be includes
+        // ask the adapter if the column should be includes
         if (!adapter.isTestable(getColumnIndex())) {
             return false; 
         }
@@ -128,7 +128,7 @@ public class PatternFilter extends Filter implements PatternMatcher {
             return false;
         }
         else {
-            boolean	matches = pattern.matcher(value.toString()).find();
+            boolean matches = pattern.matcher(value.toString()).find();
             return matches;
         }
     }

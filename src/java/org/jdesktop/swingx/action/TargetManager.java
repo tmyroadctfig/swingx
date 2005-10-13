@@ -207,33 +207,6 @@ public class TargetManager {
     }
 
     /**
-     * Listens to changes in the target property, disables managed actions
-     *
-     class TargetListener implements PropertyChangeListener {
-     public void propertyChange(PropertyChangeEvent evt) {
-     ActionManager manager = ActionManager.getInstance();
-
-     // Disable old commands.
-     Targetable target = (Targetable)evt.getOldValue();
-     if (target != null) {
-     String[] commands = target.getCommands();
-     for (int i = 0; i < commands.length; i++) {
-     manager.setEnabled(commands[i], false);
-     }
-     }
-
-     // Enable new commands
-     target = (Targetable)evt.getNewValue();
-     if (target != null) {
-     String[] commands = target.getCommands();
-     for (int i = 0; i < commands.length; i++) {
-     manager.setEnabled(commands[i], true);
-     }
-     }
-     }
-     }*/
-
-    /**
      * Executes the command on the current targetable component.
      * If there isn't current targetable component then the list
      * of targetable components are searched and the first component
@@ -289,18 +262,6 @@ public class TargetManager {
             comp = comp.getParent();
         }
 
-//        Application app = Application.getInstance();
-//        if (app != null) {
-//            ActionMap map = app.getActionMap();
-//            Action action = map.get(command);
-//            if (action != null) {
-//                if (evt == null) {
-//                    evt = new ActionEvent(comp, 0, command.toString());
-//                }
-//                action.actionPerformed(evt);
-//                return true;
-//            }
-//        }
         return false;
     }
 

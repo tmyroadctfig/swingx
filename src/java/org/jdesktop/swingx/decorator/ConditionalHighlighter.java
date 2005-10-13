@@ -176,7 +176,6 @@ public abstract class ConditionalHighlighter extends Highlighter {
         // highlightColumn is always in "model" coordinates, but adapter.column
         // is in "view" coordinates. So, convert before comparing.
         if ((highlightColumn < 0) ||
-//            (adapter.modelToView(highlightColumn) == adapter.column)) {
             (highlightColumn == adapter.viewToModel(adapter.column))) {
             return test(adapter);
         }

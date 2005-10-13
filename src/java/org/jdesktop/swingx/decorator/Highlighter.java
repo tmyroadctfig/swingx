@@ -112,9 +112,6 @@ public class Highlighter {
     /** The listeners waiting for model changes. */
     protected EventListenerList listenerList = new EventListenerList();
     
-    // Package private field which indicates if the ordinance of the highlighter
-    // will be -1 if uninitialized.
-//    int order = -1;
 
     /**
      * Predefined <code>Highlighter</code> that highlights the background of

@@ -36,7 +36,7 @@ package org.jdesktop.swingx.decorator;
 public abstract class Filter {
     /** the column the filter is bound to. JW: no need to make it final. */
     private /** final */ int column;		// in model coordinates
-    private FilterPipeline		pipeline = null;
+    protected FilterPipeline		pipeline = null;
     protected ComponentAdapter	adapter = null;	/** @todo make private */
     protected int[]             fromPrevious = new int[0];
     // JW... magic number!
@@ -125,8 +125,7 @@ public abstract class Filter {
      * Convert row index from model coordinates to view coordinates accounting
      * for the presence of sorters and filters.
      * 
-     * @param row
-     *            row index in model coordinates
+     * @param row row index in model coordinates
      * @return row index in this filter's "view" coordinates
      */
     public int convertRowIndexToView(int row) {
@@ -361,7 +360,7 @@ public abstract class Filter {
      *
      * @param adapter adapter that this filter is bound to
      */
-    final void assign(ComponentAdapter adapter) {
+    protected void assign(ComponentAdapter adapter) {
         if (adapter == null) {
             throw new IllegalArgumentException("null adapter");
         }
