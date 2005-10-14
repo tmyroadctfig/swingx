@@ -19,28 +19,45 @@ import org.jdesktop.swingx.util.ChangeReport;
 
 public class HighlighterTest extends TestCase {
 
-    private Highlighter[] highlighters;
-    private static final boolean UNSELECTED = false;
-    private static final boolean SELECTED = true;
-    private static final boolean FAIL_ALWAYS = false;
-    private static final boolean PASS_ALWAYS = true;
+    protected Highlighter[] highlighters;
+    protected static final boolean UNSELECTED = false;
+    protected static final boolean SELECTED = true;
+    protected static final boolean FAIL_ALWAYS = false;
+    protected static final boolean PASS_ALWAYS = true;
     
     
-    private JLabel backgroundNull ;
-    private JLabel foregroundNull;
+    protected JLabel backgroundNull ;
+    protected JLabel foregroundNull;
+    protected JLabel allNull;
+    protected JLabel allColored;
+    
+    protected Color background = Color.RED;
+    protected Color foreground = Color.BLUE;
+    
+    protected Highlighter emptyHighlighter;
 
     protected void setUp() {
         highlighters = new Highlighter[] {
             new AlternateRowHighlighter(Color.white, new Color(0xF0, 0xF0, 0xE0), null),
-            new PatternHighlighter(null, Color.red, "^s", 0, 0)
+            new PatternHighlighter(null, foreground, "^s", 0, 0)
         };
         backgroundNull = new JLabel("test");
-        backgroundNull.setForeground(Color.red);
+        backgroundNull.setForeground(foreground);
         backgroundNull.setBackground(null);
         
         foregroundNull = new JLabel("test");
         foregroundNull.setForeground(null);
-        foregroundNull.setBackground(Color.red);
+        foregroundNull.setBackground(background);
+        
+        allNull = new JLabel("test");
+        allNull.setForeground(null);
+        allNull.setBackground(null);
+        
+        allColored = new JLabel("test");
+        allColored.setForeground(foreground);
+        allColored.setBackground(background);
+        
+        emptyHighlighter = new Highlighter();
     }
 
     protected void tearDown() {
@@ -50,7 +67,13 @@ public class HighlighterTest extends TestCase {
         highlighters = null;
     }
 
-
+    
+//----------------------- mutable pipeline
+    
+    /**
+     * there had been exceptions when adding/removing highlighters to/from
+     * an initially empty pipeline. 
+     */
     public void testAddToEmptyHighlighterPipeline() {
         HighlighterPipeline pipeline = new HighlighterPipeline(new Highlighter[] { });
         pipeline.addHighlighter(new Highlighter());
@@ -270,6 +293,10 @@ public class HighlighterTest extends TestCase {
         assertNotNull("background must not be null", foregroundNull.getBackground());
         assertNull("background must be null", backgroundNull.getBackground());
         assertNotNull("foreground must not be null", backgroundNull.getForeground());
+        assertNull("foreground must be null", allNull.getForeground());
+        assertNull("background must be null", allNull.getBackground());
+        assertEquals(background, allColored.getBackground());
+        assertEquals(foreground, allColored.getForeground());
     }
     
     /**
@@ -342,17 +369,13 @@ public class HighlighterTest extends TestCase {
         assertApplyHighlightColors(null, null, label, testStatus, selected);
     }
     private void assertApplyHighlightColors(Color background, Color foreground, JLabel label, boolean testStatue, boolean selected) {
-        testLabelSanity();
-        HighlighterPipeline pipeline = createPipeline(background, foreground, testStatue);
+        Highlighter highlighter = createConditionalHighlighter(background, foreground, testStatue);
         ComponentAdapter adapter = createComponentAdapter(label, selected);
-        pipeline.apply(label, adapter);
+        highlighter.highlight(label, adapter);
     }
 
     //---------------------------------------------------
     
-    private HighlighterPipeline createPipeline(Color background, Color foreground, boolean pass) {
-        return new HighlighterPipeline(new Highlighter[] { createConditionalHighlighter(background, foreground, pass)});
-    }
 
     private Highlighter createConditionalHighlighter(Color background, Color foreground, final boolean pass) {
         ConditionalHighlighter highlighter = new ConditionalHighlighter(background, foreground, 0, -1) {
@@ -367,21 +390,31 @@ public class HighlighterTest extends TestCase {
 
     public void testNullBackgroundOnHighlighter() {
         HighlighterPipeline pipeline =  new HighlighterPipeline(
-                new Highlighter[] { new Highlighter(Color.orange, null), });
+                new Highlighter[] { new Highlighter(null, null), });
         ComponentAdapter adapter = createComponentAdapter(backgroundNull, false);
         pipeline.apply(backgroundNull, adapter);
     }
     
     public void testNullForegroundOnHighlighter() {
-        JLabel label = new JLabel("test");
         HighlighterPipeline pipeline =  new HighlighterPipeline(
                 new Highlighter[] { new Highlighter(null, null), });
-        ComponentAdapter adapter = createComponentAdapter(label, false);
-        label.setForeground(null);
-        pipeline.apply(label, adapter);
+        ComponentAdapter adapter = createComponentAdapter(foregroundNull, false);
+        pipeline.apply(foregroundNull, adapter);
     }
 
-    private ComponentAdapter createComponentAdapter(final JLabel label, final boolean selected) {
+ 
+    /**
+     * Issue #??-swingx: Highlighters always change the selection color.
+     * sanity test to see if non-selected colors are unchanged.
+     */
+    public void testSelectedDoNothingHighlighter() {
+        ComponentAdapter adapter = createComponentAdapter(allColored, false);
+        emptyHighlighter.highlight(allColored, adapter);
+        assertEquals("default highlighter must not change foreground", foreground, allColored.getForeground());
+        assertEquals("default highlighter must not change background", background, allColored.getBackground());
+    }
+
+    protected ComponentAdapter createComponentAdapter(final JLabel label, final boolean selected) {
         ComponentAdapter adapter = new ComponentAdapter(label) {
 
             public Object getValueAt(int row, int column) {
