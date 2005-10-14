@@ -44,6 +44,46 @@ public class JXListTest extends InteractiveTestCase {
     private ListModel listModel;
     protected DefaultListModel ascendingListModel;
 
+    public void testConvertToModelPreconditions() {
+        final JXList list = new JXList(ascendingListModel);
+        // a side-effect of setFilterEnabled is to clear the selection!
+        // this is done in JList.setModel(..) which is called when 
+        // changing filterEnabled!
+        list.setFilterEnabled(true);
+        assertEquals(20, list.getElementCount());
+        list.setFilters(new FilterPipeline(new Filter[] {new PatternFilter("0", 0, 0) }));
+        assertEquals(2, list.getElementCount());
+        try {
+            list.convertIndexToModel(list.getElementCount());
+            fail("accessing list out of range index must throw execption");
+        } catch (IndexOutOfBoundsException ex) {
+            // this is correct behaviour
+        } catch (Exception ex) {
+            fail("got " + ex);
+        }
+        
+    }
+ 
+
+    public void testElementAtPreconditions() {
+        final JXList list = new JXList(ascendingListModel);
+        // a side-effect of setFilterEnabled is to clear the selection!
+        // this is done in JList.setModel(..) which is called when 
+        // changing filterEnabled!
+        list.setFilterEnabled(true);
+        assertEquals(20, list.getElementCount());
+        list.setFilters(new FilterPipeline(new Filter[] {new PatternFilter("0", 0, 0) }));
+        assertEquals(2, list.getElementCount());
+        try {
+            list.getElementAt(list.getElementCount());
+            fail("accessing list out of range index must throw execption");
+        } catch (IndexOutOfBoundsException ex) {
+            // this is correct behaviour
+        } catch (Exception ex) {
+            fail("got " + ex);
+        }
+        
+    }
     
     /**
      * 
@@ -62,7 +102,7 @@ public class JXListTest extends InteractiveTestCase {
         // this is done in JList.setModel(..) which is called when 
         // changing filterEnabled!
         list.setFilterEnabled(true);
-        assertEquals(20, list.getModelSize());
+        assertEquals(20, list.getElementCount());
         final int modelRow = 0;
         // set a selection 
         list.setSelectedIndex(modelRow);
@@ -72,14 +112,14 @@ public class JXListTest extends InteractiveTestCase {
                 if (e.getValueIsAdjusting()) return;
                 int viewRow = list.getSelectedIndex(); //table.convertRowIndexToView(modelRow);
                 assertEquals("view index visible", 0, viewRow);
-                int convertedRow = list.convertRowIndexToModel(viewRow);
+                int convertedRow = list.convertIndexToModel(viewRow);
                 
             }
             
         };
         list.getSelectionModel().addListSelectionListener(l);
         list.setFilters(new FilterPipeline(new Filter[] {new PatternFilter("0", 0, 0) }));
-        assertEquals(2, list.getModelSize());
+        assertEquals(2, list.getElementCount());
     }
 
 
@@ -95,7 +135,7 @@ public class JXListTest extends InteractiveTestCase {
         // a side-effect of setFilterEnabled is to clear the selection!
         // this is done in JList.setModel(..) which is called when 
         // changing filterEnabled!
-        assertEquals(20, list.getModelSize());
+        assertEquals(20, list.getElementCount());
         final int modelRow = 0;
         // set a selection 
         list.setSelectedIndex(modelRow);
@@ -106,7 +146,7 @@ public class JXListTest extends InteractiveTestCase {
     public void testEmptyFilter() {
         JXList list = new JXList();
         list.setModel(ascendingListModel);
-        assertEquals(ascendingListModel.getSize(), list.getModelSize());
+        assertEquals(ascendingListModel.getSize(), list.getElementCount());
         assertEquals(ascendingListModel.getElementAt(0), list.getElementAt(0));
     }
     
@@ -115,7 +155,7 @@ public class JXListTest extends InteractiveTestCase {
         list.setFilterEnabled(true);
         list.setModel(ascendingListModel);
         assertNotSame(ascendingListModel, list.getModel());
-        assertEquals(ascendingListModel.getSize(), list.getModelSize());
+        assertEquals(ascendingListModel.getSize(), list.getElementCount());
         assertEquals(ascendingListModel.getElementAt(0), list.getElementAt(0));
         
     }
@@ -129,7 +169,7 @@ public class JXListTest extends InteractiveTestCase {
         pipeline.setSorter(sorter);
         list.setFilterEnabled(false);
         assertSame(ascendingListModel, list.getModel());
-        assertEquals(ascendingListModel.getSize(), list.getModelSize());
+        assertEquals(ascendingListModel.getSize(), list.getElementCount());
         assertEquals(ascendingListModel.getElementAt(0), list.getElementAt(0));
         
     }
@@ -141,8 +181,8 @@ public class JXListTest extends InteractiveTestCase {
         FilterPipeline pipeline = list.getFilters();
         assertNotNull(pipeline);
         pipeline.setSorter(sorter);
-        assertEquals(ascendingListModel.getSize(), list.getModelSize());
-        assertEquals(ascendingListModel.getElementAt(0), list.getElementAt(list.getModelSize() - 1));
+        assertEquals(ascendingListModel.getSize(), list.getElementCount());
+        assertEquals(ascendingListModel.getElementAt(0), list.getElementAt(list.getElementCount() - 1));
         
     }
     

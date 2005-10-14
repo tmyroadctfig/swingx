@@ -223,7 +223,7 @@ public class JXList extends JList {
         
         @Override
         protected int getSize() {
-            return getModelSize();
+            return getElementCount();
         }
 
         @Override
@@ -373,30 +373,60 @@ public class JXList extends JList {
 
     }
 
-
-//--------------------------- searching
-    
-    
+   
     // ---------------------------- filters
 
+    /**
+     * returns the element at the given index. The index is
+     * in view coordinates which might differ from model 
+     * coordinates if filtering is enabled and filters/sorters
+     * are active.
+     * 
+     * @param viewIndex the index in view coordinates
+     * @return the element at the index
+     * @throws IndexOutOfBoundsException 
+     *          if viewIndex < 0 or viewIndex >= getElementCount()
+     */
     public Object getElementAt(int viewIndex) {
         return getModel().getElementAt(viewIndex);
     }
 
     /**
-     * PENDING: misnomer - this is the view size!
+     * Returns the number of elements in this list in view 
+     * coordinates. If filters are active this number might be
+     * less than the number of elements in the underlying model.
+     * 
      * @return
      */
-    public int getModelSize() {
+    public int getElementCount() {
         return getModel().getSize();
     }
 
-    public int convertRowIndexToModel(int viewIndex) {
+    /**
+     * Convert row index from view coordinates to model coordinates accounting
+     * for the presence of sorters and filters.
+     * 
+     * @param viewIndex index in view coordinates
+     * @return index in model coordinates
+     * @throws IndexOutOfBoundsException if viewIndex < 0 or viewIndex >= getElementCount() 
+     */
+    public int convertIndexToModel(int viewIndex) {
         return isFilterEnabled() ? getFilters().convertRowIndexToModel(
                 viewIndex) : viewIndex;
     }
 
-    public int convertRowIndexToView(int modelIndex) {
+    /**
+     * Convert index from model coordinates to view coordinates accounting
+     * for the presence of sorters and filters.
+     * 
+     * PENDING Filter guards against out of range - should not? 
+     * 
+     * @param modelIndex index in model coordinates
+     * @return index in view coordinates if the model index maps to a view coordinate
+     *          or -1 if not contained in the view.
+     * 
+     */
+    public int convertIndexToView(int modelIndex) {
         return isFilterEnabled() ? getFilters().convertRowIndexToView(
                 modelIndex) : modelIndex;
     }
@@ -419,9 +449,9 @@ public class JXList extends JList {
      * Note: as an implementation side-effect calling this method clears the
      * selection (done in super.setModel).
      * 
-     * PENDING: cleanup state transitions!! - currently this can be safely applied
-     * once only to enable. Internal state is inconsistent if trying to disable
-     * again.   
+     * PENDING: cleanup state transitions!! - currently this can be safely
+     * applied once only to enable. Internal state is inconsistent if trying to
+     * disable again.
      * 
      * see Issue #2-swinglabs.
      * 
@@ -432,7 +462,7 @@ public class JXList extends JList {
         if (old == enabled)
             return;
         filterEnabled = enabled;
-       if (!old) {
+        if (!old) {
             wrappingModel = new WrappingListModel(getModel());
             super.setModel(wrappingModel);
         } else {
@@ -440,7 +470,7 @@ public class JXList extends JList {
             wrappingModel = null;
             super.setModel(model);
         }
-                
+
     }
 
     public boolean isFilterEnabled() {
