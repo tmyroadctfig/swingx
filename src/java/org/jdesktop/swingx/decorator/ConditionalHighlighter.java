@@ -101,6 +101,7 @@ public abstract class ConditionalHighlighter extends Highlighter {
     protected void maskBackground(Component renderer, ComponentAdapter adapter) {
         Color seed = renderer.getBackground();
         Color color = adapter.isSelected() ? computeSelectedBackground(seed) : seed;
+        // fix issue#21-swingx: foreground of renderers can be null
         if (color != null) {
             renderer.setBackground(
                                new Color((getMask() << 24) | (color.getRGB() & 0x00FFFFFF), true));
@@ -110,6 +111,7 @@ public abstract class ConditionalHighlighter extends Highlighter {
     protected void maskForeground(Component renderer, ComponentAdapter adapter) {
         Color seed = renderer.getForeground();
         Color color = adapter.isSelected() ? computeSelectedForeground(seed) : seed;
+        // fix issue#21-swingx: foreground of renderers can be null
         if (color != null) {
             renderer.setForeground(
                                new Color((getMask() << 24) | (color.getRGB() & 0x00FFFFFF), true));
