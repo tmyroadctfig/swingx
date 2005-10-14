@@ -386,8 +386,6 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
         hdoc.setParagraphAttributes(start, end - start, newAttrs, true);
     }
 
-//    private JXFindDialog dialog = null;
-
     /**
      * The paste method has been overloaded to strip off the <html><body> tags
      * This doesn't really work.
@@ -406,22 +404,7 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
                             // This works but we lose all the formatting.
                             replaceSelection(data.toString());
                             break;
-                        } /*
-                            else if (flavors[i].isMimeTypeEqual("text/html")) {
-                            // This doesn't really work since we would
-                            // have to strip off the <html><body> tags
-                            Reader reader = flavors[i].getReaderForText(content);
-                            int start = getSelectionStart();
-                            int end = getSelectionEnd();
-                            int length = end - start;
-                            EditorKit kit = getUI().getEditorKit(this);
-                            Document doc = getDocument();
-                            if (length > 0) {
-                            doc.remove(start, length);
-                            }
-                            kit.read(reader, doc, start);
-                            break;
-                            } */
+                        } 
                     }
                 }
             } catch (Exception ex) {
