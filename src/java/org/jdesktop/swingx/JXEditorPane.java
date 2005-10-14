@@ -444,11 +444,26 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
         }
 
         public int search(String searchString, int columnIndex) {
+            return search(searchString, columnIndex, false);
+        }
+        
+        public int search(String searchString, int columnIndex, boolean backward) {
             Pattern pattern = null;
-            if (searchString != null) {
-                return search(Pattern.compile(searchString, 0), columnIndex);
+            if (!isEmpty(searchString)) {
+                pattern = Pattern.compile(searchString, 0);
             }
-            return -1;
+            return search(pattern, columnIndex, backward);
+        }
+
+        /**
+         * checks if the searchString should be interpreted as empty.
+         * here: returns true if string is null or has zero length.
+         * 
+         * @param searchString
+         * @return
+         */
+        protected boolean isEmpty(String searchString) {
+            return (searchString == null) || searchString.length() == 0;
         }
 
         public int search(Pattern pattern) {

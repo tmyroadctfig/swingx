@@ -35,6 +35,8 @@ public interface Searchable {
      */
     public int search(String searchString);
     public int search(String searchString, int startIndex);
+    public int search(String searchString, int startIndex, boolean backward);
+    
     public int search(Pattern pattern);
 
     /**

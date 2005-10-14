@@ -7,32 +7,22 @@
 
 package org.jdesktop.swingx;
 
-import java.awt.BorderLayout;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Locale;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
 import javax.swing.Action;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JToolBar;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.text.BadLocationException;
 
+import org.jdesktop.swingx.JXEditorPane.DocumentSearchable;
 import org.jdesktop.swingx.JXTable.TableSearchable;
-import org.jdesktop.swingx.action.TargetableAction;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 
 public class FindTest extends InteractiveTestCase {
@@ -295,6 +285,68 @@ public class FindTest extends InteractiveTestCase {
         assertEquals("nothing found after last line", -1, notFoundIndex);
     }
 
+
+    /**
+     * test if internal state is reset when search triggered through 
+     * methods taking a string. 
+     * 
+     *
+     */
+    public void testEditorResetStateOnEmptySearchString() {
+        JXEditorPane editor = new JXEditorPane();
+        String text = "fou four";
+        editor.setText(text);
+        // initialize to found state
+        int foundIndex = editor.getSearchable().search("ou");
+        // sanity
+        assertEquals(1, foundIndex);
+        // search with null searchString
+        int notFoundIndex = editor.getSearchable().search("", foundIndex);
+        // sanity: nothing found
+        assertEquals(-1, notFoundIndex);
+        assertEquals(notFoundIndex, ((DocumentSearchable) editor.getSearchable()).lastFoundIndex);
+    }
+
+    /**
+     * test if internal state is reset when search triggered through 
+     * methods taking a string. 
+     * 
+     *
+     */
+    public void testEditorResetStateOnNullSearchString() {
+        JXEditorPane editor = new JXEditorPane();
+        String text = "fou four";
+        editor.setText(text);
+        // initialize to found state
+        int foundIndex = editor.getSearchable().search("ou");
+        // sanity
+        assertEquals(1, foundIndex);
+        // search with null searchString
+        int notFoundIndex = editor.getSearchable().search((String) null, foundIndex);
+        // sanity: nothing found
+        assertEquals(-1, notFoundIndex);
+        assertEquals(notFoundIndex, ((DocumentSearchable) editor.getSearchable()).lastFoundIndex);
+    }
+    /**
+     * test if internal state is reset when search triggered through 
+     * methods taking a string. 
+     * 
+     *
+     */
+    public void testEditorResetStateOnNullPattern() {
+        JXEditorPane editor = new JXEditorPane();
+        String text = "fou four";
+        editor.setText(text);
+        // initialize to found state
+        int foundIndex = editor.getSearchable().search("ou");
+        // sanity
+        assertEquals(1, foundIndex);
+        // search with null searchString
+        int notFoundIndex = editor.getSearchable().search((Pattern) null, foundIndex);
+        // sanity: nothing found
+        assertEquals(-1, notFoundIndex);
+        assertEquals(notFoundIndex, ((DocumentSearchable) editor.getSearchable()).lastFoundIndex);
+    }
     /**
      * Issue #??-swingx: backwards search not implemented in JXEditorPane.
      *
@@ -450,11 +502,6 @@ public class FindTest extends InteractiveTestCase {
     }
     
 
-    
-    public void testCreate() {
-        // JXFindDialog dialog = new JXFindDialog(null);
-    }
-
     public void testEditor() {
         URL url = FindTest.class.getResource("resources/test.txt");
         try {
@@ -505,8 +552,6 @@ public class FindTest extends InteractiveTestCase {
         }
         JXFindPanel find = new JXFindPanel();
         find.match();
-//        JXFindDialog dialog = new JXFindDialog();
-//        dialog.doFind();
     }
 
 //    public void interactiveShowDialog() {
@@ -578,8 +623,6 @@ public class FindTest extends InteractiveTestCase {
             frame= wrapWithScrollingInFrame(component, title);
         }
         
-//        Action action = new TargetableAction("Find", "find");
-//        addAction(frame, action);
         addMessage(frame, "Press ctrl-F to open search widget");
         frame.setSize(600, 400);
         frame.setVisible(true);
@@ -648,10 +691,14 @@ public class FindTest extends InteractiveTestCase {
         public int search(String searchString) {
             return search(searchString, -1);
         }
+        
         public int search(String searchString, int startIndex) {
             return succeed ? 100 : -1;
         }
 
+        public int search(String searchString, int startIndex, boolean backward) {
+            return succeed ? 100 : -1;
+        }
         public int search(Pattern pattern) {
             return search(pattern, -1);
         }
