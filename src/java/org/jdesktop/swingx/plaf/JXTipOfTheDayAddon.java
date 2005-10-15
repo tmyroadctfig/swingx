@@ -29,6 +29,7 @@ import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.ColorUIResource;
+import javax.swing.plaf.FontUIResource;
 
 import org.jdesktop.swingx.JXTipOfTheDay;
 import org.jdesktop.swingx.plaf.basic.BasicTipOfTheDayUI;
@@ -51,10 +52,19 @@ public class JXTipOfTheDayAddon extends AbstractComponentAddon {
     defaults.add(BasicTipOfTheDayUI.class.getName());
 
     defaults.add("TipOfTheDay.font");
-    defaults.add(UIManager.getFont("TextPane.font"));
+    Font font = UIManager.getFont("TextPane.font");
+    if (font == null) {
+      font = new Font("Serif", Font.PLAIN, 12);
+    }
+    defaults.add(new FontUIResource(font));
 
     defaults.add("TipOfTheDay.tipFont");
-    defaults.add(UIManager.getFont("Label.font").deriveFont(Font.BOLD, 13f));
+    font = UIManager.getFont("Label.font");
+    if (font == null) {
+      font = new Font("Dialog", Font.PLAIN, 12);
+    }
+    font = font.deriveFont(Font.BOLD, 13f);
+    defaults.add(new FontUIResource(font));
 
     defaults.add("TipOfTheDay.background");
     defaults.add(new ColorUIResource(Color.white));
@@ -83,7 +93,12 @@ public class JXTipOfTheDayAddon extends AbstractComponentAddon {
     defaults.add(new ColorUIResource(128, 128, 128));
 
     defaults.add("TipOfTheDay.font");
-    defaults.add(UIManager.getFont("Label.font").deriveFont(13f));
+    Font font = UIManager.getFont("Label.font");
+    if (font == null) {
+      font = new Font("Dialog", Font.PLAIN, 12);
+    }
+    font = font.deriveFont(13f);
+    defaults.add(new FontUIResource(font));
 
     defaults.add("TipOfTheDay.icon");
     defaults.add(LookAndFeel.makeIcon(WindowsTipOfTheDayUI.class,
