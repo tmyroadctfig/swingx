@@ -54,9 +54,9 @@ import org.jdesktop.swingx.plaf.TaskPaneUI;
  * collapse the content area in order to show or hide the task list. It can have an
  * <code>icon</code>, a <code>title</code> and can be marked as
  * <code>special</code>. Marking a <code>JXTaskPane</code> as
- * <code>special</code> is only a hint for the pluggable UI which
- * will usually paint it differently (by example by using another
- * color for the border of the pane).
+ * <code>special</code> ({@link #setSpecial(boolean)} is only a hint for
+ * the pluggable UI which will usually paint it differently (by example by
+ * using another color for the border of the pane).
  * 
  * <p> 
  * When the JXTaskPane is expanded or collapsed, it will be
@@ -311,18 +311,26 @@ public class JXTaskPane extends JPanel implements
    * Returns true if this pane is "special".
    * 
    * @return true if this pane is "special"
+   * @see #setSpecial(boolean)
    */
   public boolean isSpecial() {
     return special;
   }
 
   /**
-   * Sets this pane to be "special" or not.
+   * Sets this pane to be "special" or not. Marking a <code>JXTaskPane</code>
+   * as <code>special</code> is only a hint for the pluggable UI which will
+   * usually paint it differently (by example by using another color for the
+   * border of the pane).
    * 
-   * @param special true if this pane is "special", false otherwise
-   * @javabean.property
-   *          bound="true"
-   *          preferred="true"
+   * <p>
+   * Usually the first JXTaskPane in a JXTaskPaneContainer is marked as special
+   * because it contains the default set of actions which can be executed given
+   * the current context.
+   * 
+   * @param special
+   *          true if this pane is "special", false otherwise
+   * @javabean.property bound="true" preferred="true"
    */
   public void setSpecial(boolean special) {
     if (this.special != special) {
