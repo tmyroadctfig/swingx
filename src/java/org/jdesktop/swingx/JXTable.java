@@ -67,11 +67,14 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SizeSequence;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableModelEvent;
+import javax.swing.plaf.UIResource;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellEditor;
@@ -2182,11 +2185,17 @@ public class JXTable extends JTable {
         }
     }
 
-    public static class BooleanRenderer extends JCheckBox implements
-            TableCellRenderer {
+    /*
+     * re- c&p'd from 1.5 JTable. 
+     */
+    public static class BooleanRenderer extends JCheckBox implements // , UIResource
+            TableCellRenderer     {
+        private static final Border noFocusBorder = new EmptyBorder(1, 1, 1, 1);
+
         public BooleanRenderer() {
             super();
             setHorizontalAlignment(JLabel.CENTER);
+            setBorderPainted(true);
         }
 
         public Component getTableCellRendererComponent(JTable table,
@@ -2200,11 +2209,18 @@ public class JXTable extends JTable {
                 setBackground(table.getBackground());
             }
             setSelected((value != null && ((Boolean) value).booleanValue()));
+
+            if (hasFocus) {
+                setBorder(UIManager.getBorder("Table.focusCellHighlightBorder"));
+            } else {
+                setBorder(noFocusBorder);
+            }
+
             return this;
         }
     }
 
-//---------------------------- updateUI support
+// ---------------------------- updateUI support
     
     /**
      * bug fix: super doesn't update all renderers/editors.
