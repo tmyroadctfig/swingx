@@ -29,6 +29,9 @@ import javax.swing.AbstractCellEditor;
 import javax.swing.JList;
 import javax.swing.JTable;
 import javax.swing.ListCellRenderer;
+import javax.swing.UIManager;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
@@ -46,6 +49,9 @@ import org.jdesktop.swingx.action.LinkAction;
  */
 public class LinkRenderer extends AbstractCellEditor implements
         TableCellRenderer, TableCellEditor, ListCellRenderer {
+
+    private static final Border noFocusBorder = new EmptyBorder(1, 1, 1, 1);
+
     private JXHyperlink linkButton;
 
     private LinkAction linkAction;
@@ -57,6 +63,8 @@ public class LinkRenderer extends AbstractCellEditor implements
     public LinkRenderer(ActionListener visitingDelegate) {
         linkAction = new LinkAction(null);
         linkButton = new JXHyperlink(linkAction);
+        linkButton.setBorderPainted(true);
+        linkButton.setOpaque(true);
         linkButton.addActionListener(createEditorActionListener());
         setVisitingDelegate(visitingDelegate);
     }
@@ -71,14 +79,28 @@ public class LinkRenderer extends AbstractCellEditor implements
         linkAction.setLink(value instanceof LinkModel ? (LinkModel) value : null);
         Point p = (Point) list
             .getClientProperty(RolloverProducer.ROLLOVER_KEY);
-        if (cellHasFocus || (p != null && (p.y >= 0) && (p.y == index))) {
+        if (/*cellHasFocus ||*/ (p != null && (p.y >= 0) && (p.y == index))) {
              linkButton.getModel().setRollover(true);
         } else {
              linkButton.getModel().setRollover(false);
         }
+        updateSelectionColors(list, isSelected);
+        updateFocusBorder(cellHasFocus);
         return linkButton;
     }
     
+
+    private void updateSelectionColors(JList table, boolean isSelected) {
+        if (isSelected) {
+            // linkButton.setForeground(table.getSelectionForeground());
+            linkButton.setBackground(table.getSelectionBackground());
+        } else {
+            // linkButton.setForeground(table.getForeground());
+            linkButton.setBackground(table.getBackground());
+        }
+
+    }
+
 //------------------------ TableCellRenderer
     
     public Component getTableCellRendererComponent(JTable table, Object value,
@@ -86,12 +108,36 @@ public class LinkRenderer extends AbstractCellEditor implements
         linkAction.setLink(value instanceof LinkModel ? (LinkModel) value : null);
         Point p = (Point) table
                 .getClientProperty(RolloverProducer.ROLLOVER_KEY);
-        if (hasFocus || (p != null && (p.x >= 0) && (p.x == column) && (p.y == row))) {
+        if (/*hasFocus || */(p != null && (p.x >= 0) && (p.x == column) && (p.y == row))) {
              linkButton.getModel().setRollover(true);
         } else {
              linkButton.getModel().setRollover(false);
         }
+        updateSelectionColors(table, isSelected);
+        updateFocusBorder(hasFocus);
         return linkButton;
+    }
+
+    private void updateSelectionColors(JTable table, boolean isSelected) {
+            if (isSelected) {
+//                linkButton.setForeground(table.getSelectionForeground());
+                linkButton.setBackground(table.getSelectionBackground());
+            }
+            else {
+//                linkButton.setForeground(table.getForeground());
+                linkButton.setBackground(table.getBackground());
+            }
+    
+    }
+
+    private void updateFocusBorder(boolean hasFocus) {
+        if (hasFocus) {
+            linkButton.setBorder(UIManager.getBorder("Table.focusCellHighlightBorder"));
+        } else {
+            linkButton.setBorder(noFocusBorder);
+        }
+
+        
     }
 
 //-------------------------- TableCellEditor
