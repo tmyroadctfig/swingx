@@ -17,7 +17,9 @@ import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
@@ -39,6 +41,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
+import org.jdesktop.swingx.JXTipOfTheDay.ShowOnStartupChoice;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
@@ -48,6 +51,7 @@ import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.RolloverHighlighter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
+import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
 import org.jdesktop.swingx.table.TableColumnExt;
@@ -68,12 +72,13 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //        test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*ColumnControlColumnModel.*");
 //          test.runInteractiveTests("interactive.*TableHeader.*");
-//          test.runInteractiveTests("interactive.*Sort.*");
+//          test.runInteractiveTests("interactive.*Multiple.*");
 //          test.runInteractiveTests("interactive.*RToL.*");
 //          test.runInteractiveTests("interactive.*RowHeight.*");
-//          test.runInteractiveTests("interactive.*TableMod.*");
+          test.runInteractiveTests("interactive.*Pattern.*");
           
-          test.runInteractiveTests("interactive.*Column.*");
+//          test.runInteractiveTests("interactive.*Column.*");
+//        test.runInteractiveTests("interactive.*isable.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -142,7 +147,19 @@ public class JXTableVisualCheck extends JXTableUnitTest {
                System.out.println(table.getValueAt(row, column));
             }
         });
-        JFrame frame = wrapWithScrollingInFrame(table, "Accessing values (indy rowheights)");
+        JXFrame frame = wrapWithScrollingInFrame(table, "Accessing values (indy rowheights)");
+        Action updateCellAction = new AbstractAction("update cell value") {
+
+            public void actionPerformed(ActionEvent e) {
+                int anchorRow = table.getSelectionModel().getLeadSelectionIndex();
+                int anchorCol = table.getColumnModel().getSelectionModel().getLeadSelectionIndex();
+                if ((anchorRow < 0) || (anchorCol < 0)) return;
+                table.setValueAt("x" + table.getValueAt(anchorRow, anchorCol), anchorRow, anchorCol);
+                
+            }
+            
+        };
+        addAction(frame, updateCellAction);
         frame.setVisible(true);
     }
 
@@ -505,6 +522,59 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     }
 //---------------------------------
 
+    /**
+     * quick check if multiple comparators per column work.
+     * Basically yes, with a slight tweak: need to comment guarding
+     * code in filterpipeline throwing exceptions.
+     * 
+     * So commented the body for now, need to enquire why the guard
+     * was added in the first place.
+     */
+    public void interactiveMultipleComparatorsPerColumn() {
+//        JXTable table = new JXTable(createSplittableValues());
+//        Sorter sorter1 = new ShuttleSorter(0, false);
+//        sorter1.setComparator(new ClassComparator(0));
+//        Sorter sorter2 = new ShuttleSorter(0, true );
+//        sorter2.setComparator(new ClassComparator(1));
+//        
+//        FilterPipeline pipeline = new FilterPipeline(new Filter[] { sorter1, sorter2 });
+//        table.setFilters(pipeline);
+//        JXFrame frame = wrapWithScrollingInFrame(table, "MultipleSorter per Column");
+//        frame.setVisible(true);
+        
+    }
+    
+    private TableModel createSplittableValues() {
+        String[] values = {"avalue:zvalue", "avalue:yvalue", "avalue:xvalue", 
+                "bvalue:zvalue", "bvalue:yvalue", "bvalue:xvalue", 
+                "cvalue:zvalue", "cvalue:yvalue", "cvalue:xvalue", 
+                };
+        DefaultTableModel model = new DefaultTableModel(values.length, 1);
+        for (int i = 0; i < values.length; i++) {
+            model.setValueAt(values[i], i, 0);
+        }
+    return model;
+}
+
+    public class ClassComparator implements Comparator {
+        
+        List packageOrder;
+        int sortIndex;
+        
+        public ClassComparator(int index) {
+            this.sortIndex = index;
+        }
+
+        public int compare(Object o1, Object o2) {
+            String[] value1 = String.valueOf(o1).split(":");
+            String[] value2 = String.valueOf(o2).split(":");
+            
+            String part1 = value1.length > sortIndex ? value1[sortIndex] : "";
+            String part2 = value2.length > sortIndex ? value2[sortIndex] : "";
+            return part1.compareTo(part2);
+        }
+        
+    }
     
     public void interactiveTestRolloverHighlight() {
         JXTable table = new JXTable(sortableTableModel);
@@ -833,7 +903,8 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     }
 
     public void interactiveTestTablePatternHighlighter() {
-        JXTable table = new JXTable(tableModel);
+        JXTable table = new JXTable(sortableTableModel);
+        table.setColumnControlVisible(true);
         table.setIntercellSpacing(new Dimension(15, 15));
         table.setRowHeight(48);
         table.setRowHeight(0, 96);

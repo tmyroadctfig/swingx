@@ -7,6 +7,7 @@
 
 package org.jdesktop.swingx;
 
+import java.awt.Color;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -14,12 +15,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
-import javax.swing.border.BevelBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
@@ -30,7 +30,9 @@ import javax.swing.table.TableModel;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
+import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.PatternFilter;
+import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.PipelineListener;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.decorator.Sorter;
@@ -60,7 +62,19 @@ public class JXTableUnitTest extends InteractiveTestCase {
         sortableTableModel = new AncientSwingTeam();
     }
 
-
+    /**
+     * Issue #180-swingx: outOfBoundsEx if testColumn is hidden.
+     *
+     */
+    public void testHighlighterHiddenTestColumn() {
+        JXTable table = new JXTable(sortableTableModel);
+        table.getColumnExt(0).setVisible(false);
+        Highlighter highlighter = new PatternHighlighter(null, Color.RED, "a", 0, 0);
+        ComponentAdapter adapter = table.getComponentAdapter();
+        adapter.row = 0;
+        adapter.column = 0;
+        highlighter.highlight(new JLabel(), adapter);
+    }
     
     /**
      * 

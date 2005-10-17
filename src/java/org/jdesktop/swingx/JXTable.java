@@ -1892,7 +1892,8 @@ public class JXTable extends JTable {
 //-------------------------- accessing view state/values
         
         public Object getFilteredValueAt(int row, int column) {
-            return table.getValueAt(row, modelToView(column)); // in view coordinates
+            return getValueAt(table.convertRowIndexToModel(row), column);
+//            return table.getValueAt(row, modelToView(column)); // in view coordinates
         }
 
         /**
