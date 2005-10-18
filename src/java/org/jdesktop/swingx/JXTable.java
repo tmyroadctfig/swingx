@@ -61,7 +61,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
-import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SizeSequence;
@@ -74,7 +73,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableModelEvent;
-import javax.swing.plaf.UIResource;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellEditor;
@@ -1457,6 +1455,7 @@ public class JXTable extends JTable {
     public class TableSearchable extends AbstractSearchable {
 
         private SearchHighlighter searchHighlighter;
+        
 
         @Override
         protected void findMatchAndUpdateState(Pattern pattern, int startRow,
@@ -1954,6 +1953,7 @@ public class JXTable extends JTable {
             highlighters.addChangeListener(getHighlighterChangeListener());
         }
         firePropertyChange("highlighters", old, getHighlighters());
+        repaint();
     }
 
     /**

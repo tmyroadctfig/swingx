@@ -84,7 +84,9 @@ public class SearchFactory {
    
     /** the shared find widget for incremental-find. */
     protected JXFindBar findBar;
-
+    /** this is a temporary hack: need to remove the useSearchHighlighter property. */ 
+    protected JComponent lastFindBarTarget;
+    
     private boolean useFindBar;
 
     private Point lastFindDialogLocation;
@@ -143,7 +145,11 @@ public class SearchFactory {
      */
     public void showFindBar(JComponent target, Searchable searchable) {
         if (target == null) return;
-        removeFromParent(getSharedFindBar());
+        if (findBar == null) {
+            findBar = getSharedFindBar();
+        } else {
+            releaseFindBar();
+        }
         Window topLevel = SwingUtilities.getWindowAncestor(target);
         if (topLevel instanceof JXFrame) {
             JXRootPane rootPane = ((JXFrame) topLevel).getRootPaneExt();
@@ -152,13 +158,14 @@ public class SearchFactory {
                 toolBar = new JToolBar();
                 rootPane.setToolBar(toolBar);
             }
-            toolBar.add(getSharedFindBar(), 0);
+            toolBar.add(findBar, 0);
             rootPane.revalidate();
-            KeyboardFocusManager.getCurrentKeyboardFocusManager().focusNextComponent(getSharedFindBar());
+            KeyboardFocusManager.getCurrentKeyboardFocusManager().focusNextComponent(findBar);
             
         }
+        lastFindBarTarget = target;
         target.putClientProperty(AbstractSearchable.MATCH_HIGHLIGHTER, Boolean.TRUE);
-        installFindRemover(target, getSharedFindBar());
+        installFindRemover(target, findBar);
         getSharedFindBar().setSearchable(searchable);
     }
 
@@ -221,6 +228,7 @@ public class SearchFactory {
             public void actionPerformed(ActionEvent e) {
                 removeFromParent(findBar);
 //                stopSearching();
+//                releaseFindBar();
                 
             }
             
@@ -299,7 +307,8 @@ public class SearchFactory {
         } else {
             Point location = hideSharedFilePanel();
             findDialog = new JXDialog(frame, getSharedFindPanel());
-            findDialog.setAlwaysOnTop(true);
+            // JW: don't - this will stay on top of all applications!
+//            findDialog.setAlwaysOnTop(true);
             findDialog.pack();
             if (location == null) {
                 findDialog.setLocationRelativeTo(frame);
@@ -340,10 +349,21 @@ public class SearchFactory {
             findPanel.setSearchable(null);
         }
         if (findBar != null) {
-            removeFromParent(findBar);
-            findBar.setSearchable(null);
-        }
+            releaseFindBar();
+         }
         
+    }
+
+    /**
+     * Pre: findbar != null.
+     */
+    private void releaseFindBar() {
+        findBar.setSearchable(null);
+        if (lastFindBarTarget != null) {
+            lastFindBarTarget.putClientProperty(AbstractSearchable.MATCH_HIGHLIGHTER, Boolean.FALSE);
+            lastFindBarTarget = null;
+        }
+        removeFromParent(findBar);
     }
 
     /**
