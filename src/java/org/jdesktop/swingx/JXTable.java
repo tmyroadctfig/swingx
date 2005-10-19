@@ -496,10 +496,10 @@ public class JXTable extends JTable {
                rollover((JXTable) evt.getSource(), (Point) evt
                             .getOldValue(), (Point) evt.getNewValue());
             } 
-//            else if (RolloverProducer.CLICKED_KEY.equals(evt.getPropertyName())) {
-//                click((JXTable) evt.getSource(), (Point) evt.getOldValue(),
-//                        (Point) evt.getNewValue());
-//            }
+            else if (RolloverProducer.CLICKED_KEY.equals(evt.getPropertyName())) {
+                click((JXTable) evt.getSource(), (Point) evt.getOldValue(),
+                        (Point) evt.getNewValue());
+            }
         }
 
 //    --------------------------- JTable rollover
