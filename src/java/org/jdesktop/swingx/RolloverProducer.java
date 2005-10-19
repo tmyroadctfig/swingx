@@ -50,7 +50,6 @@ public class RolloverProducer implements MouseListener, MouseMotionListener {
         
         
         public void mouseClicked(MouseEvent e) {
-            updateRollover(e, CLICKED_KEY);
         }
 
         public void mousePressed(MouseEvent e) {
@@ -58,6 +57,7 @@ public class RolloverProducer implements MouseListener, MouseMotionListener {
         }
 
         public void mouseReleased(MouseEvent e) {
+            updateRollover(e, CLICKED_KEY);
             
         }
 

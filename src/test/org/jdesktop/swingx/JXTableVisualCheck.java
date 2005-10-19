@@ -17,6 +17,8 @@ import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -32,6 +34,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JViewport;
 import javax.swing.ListSelectionModel;
+import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -41,7 +44,6 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
-import org.jdesktop.swingx.JXTipOfTheDay.ShowOnStartupChoice;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
@@ -51,7 +53,6 @@ import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.RolloverHighlighter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
-import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
 import org.jdesktop.swingx.table.TableColumnExt;
@@ -74,8 +75,8 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*TableHeader.*");
 //          test.runInteractiveTests("interactive.*Multiple.*");
 //          test.runInteractiveTests("interactive.*RToL.*");
-//          test.runInteractiveTests("interactive.*RowHeight.*");
-          test.runInteractiveTests("interactive.*Pattern.*");
+          test.runInteractiveTests("interactive.*Compare.*");
+//          test.runInteractiveTests("interactive.*Focus.*");
           
 //          test.runInteractiveTests("interactive.*Column.*");
 //        test.runInteractiveTests("interactive.*isable.*");
@@ -84,6 +85,46 @@ public class JXTableVisualCheck extends JXTableUnitTest {
           e.printStackTrace();
       }
   }
+
+
+    /**
+     * Issue #186-swingxProblem with lead/selection and buttons as editors:
+     * - move focus (using arrow keys) to first editable boolean  
+     * - press space to toggle boolean
+     * - move focus to next row (same column)
+     * - press space to toggle boolean
+     * - move back to first row (same column)
+     * - press space: boolean is toggled and (that's the problem) 
+     *  lead selection is moved to next row.
+     *  No problem in JTable.
+     *
+     */
+    public void interactiveTestCompareTableBoolean() {
+        JXTable xtable = new JXTable(createModelWithBooleans());
+        JTable table = new JTable(createModelWithBooleans()); 
+        JXFrame frame = wrapWithScrollingInFrame(xtable, table, "Compare boolean renderer JXTable <--> JTable");
+        frame.setVisible(true);
+    }
+
+    private TableModel createModelWithBooleans() {
+        String[] columnNames = { "text only", "Bool editable", "Bool not-editable" };
+        
+        DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
+            public Class getColumnClass(int column) {
+                return getValueAt(0, column).getClass();
+            }
+
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                    return !getColumnName(column).contains("not");
+            }
+            
+        };
+        for (int i = 0; i < 4; i++) {
+                model.addRow(new Object[] {"text only " + i, Boolean.TRUE, Boolean.TRUE });
+        }
+        return model;
+    }
 
 
     /**

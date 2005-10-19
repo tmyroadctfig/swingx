@@ -470,10 +470,10 @@ public class JXTable extends JTable {
      * @param linkVisitor
      */
     public void setDefaultLinkVisitor(ActionListener linkVisitor) {
-//        TableCellEditor editor = getDefaultEditor(LinkModel.class);
-//        if (editor instanceof LinkRenderer) {
-//            ((LinkRenderer) editor).setVisitingDelegate(linkVisitor);
-//        }
+        TableCellEditor editor = getDefaultEditor(LinkModel.class);
+        if (editor instanceof LinkRenderer) {
+            ((LinkRenderer) editor).setVisitingDelegate(linkVisitor);
+        }
         TableCellRenderer renderer = getDefaultRenderer(LinkModel.class);
         if (renderer instanceof LinkRenderer) {
             ((LinkRenderer) renderer).setVisitingDelegate(linkVisitor);
@@ -495,10 +495,11 @@ public class JXTable extends JTable {
             if (RolloverProducer.ROLLOVER_KEY.equals(evt.getPropertyName())) {
                rollover((JXTable) evt.getSource(), (Point) evt
                             .getOldValue(), (Point) evt.getNewValue());
-            } else if (RolloverProducer.CLICKED_KEY.equals(evt.getPropertyName())) {
-                click((JXTable) evt.getSource(), (Point) evt.getOldValue(),
-                        (Point) evt.getNewValue());
-            }
+            } 
+//            else if (RolloverProducer.CLICKED_KEY.equals(evt.getPropertyName())) {
+//                click((JXTable) evt.getSource(), (Point) evt.getOldValue(),
+//                        (Point) evt.getNewValue());
+//            }
         }
 
 //    --------------------------- JTable rollover
@@ -521,6 +522,7 @@ public class JXTable extends JTable {
 
         private void click(JXTable list, Point oldLocation, Point newLocation) {
             if (!isLinkColumn(list, newLocation)) return;
+            if (list.isCellEditable(newLocation.y, newLocation.x)) return;
             TableCellRenderer renderer = list.getCellRenderer(newLocation.y, newLocation.x);
             // PENDING: JW - don't ask the model, ask the list!
             Component comp = list.prepareRenderer(renderer, newLocation.y,  newLocation.x);
@@ -2065,7 +2067,7 @@ public class JXTable extends JTable {
     /** ? */
     protected void createDefaultEditors() {
         super.createDefaultEditors();
-//        setLazyEditor(LinkModel.class, "org.jdesktop.swingx.LinkRenderer");
+        setLazyEditor(LinkModel.class, "org.jdesktop.swingx.LinkRenderer");
     }
 
     /**

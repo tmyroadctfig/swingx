@@ -146,6 +146,7 @@ public class LinkRenderer extends AbstractCellEditor implements
             boolean isSelected, int row, int column) {
         linkAction.setLink(value instanceof LinkModel ? (LinkModel) value : null);
         linkButton.getModel().setRollover(true); 
+        updateSelectionColors(table, isSelected);
         return linkButton;
     }
 
