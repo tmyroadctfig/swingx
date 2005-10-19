@@ -39,7 +39,7 @@ public class Selection {
     private ListSelectionModel viewSelection;
     
     /** selection in model coordinates. */
-    private DefaultListSelectionModel modelSelection;
+    protected DefaultListSelectionModel modelSelection;
 
     /** mapping pipeline. */
     private FilterPipeline pipeline;
@@ -74,7 +74,8 @@ public class Selection {
         ListSelectionModel old = this.viewSelection;
         if (old != null) {
             old.removeListSelectionListener(viewSelectionListener);
-            modelSelection.clearSelection();
+//            modelSelection.clearSelection();
+            clearModelSelection();
         }
         this.viewSelection = selection;
         mapTowardsModel();
@@ -97,8 +98,7 @@ public class Selection {
 
     public void restoreSelection() {
         lock();
-        // JW - hmm... clearSelection doesn't reset the lead/anchor. Why not?
-        viewSelection.clearSelection();
+        clearViewSelection();
 
         int[] selected = getSelectedRows(modelSelection);
         for (int i = 0; i < selected.length; i++) {
@@ -122,6 +122,7 @@ public class Selection {
         unlock();
     }
 
+
     public void unlock() {
         if (!isListening) {
             viewSelection.setValueIsAdjusting(false);
@@ -141,6 +142,18 @@ public class Selection {
     public void clearModelSelection() {
         // JW: need to reset anchor/lead?
         modelSelection.clearSelection();
+        modelSelection.setAnchorSelectionIndex(-1);
+        modelSelection.setLeadSelectionIndex(-1);
+    }
+
+    /**
+     * 
+     */
+    private void clearViewSelection() {
+        // JW - hmm... clearSelection doesn't reset the lead/anchor. Why not?
+        viewSelection.clearSelection();
+//        viewSelection.setAnchorSelectionIndex(-1);
+//        viewSelection.setLeadSelectionIndex(-1);
     }
 
     public void insertIndexInterval(int start, int length, boolean before) {
@@ -152,7 +165,8 @@ public class Selection {
     }
 
     private void mapTowardsModel() {
-        modelSelection.clearSelection();
+//        modelSelection.clearSelection();
+        clearModelSelection();
         int[] selected = getSelectedRows(viewSelection); 
         for (int i = 0; i < selected.length; i++) {
             int modelIndex = convertToModel(selected[i]);
@@ -183,6 +197,11 @@ public class Selection {
                 modelSelection.removeSelectionInterval(modelIndex, modelIndex);
             }
         }
+        int lead = viewSelection.getLeadSelectionIndex();
+        if (lead >= 0) {
+            modelSelection.moveLeadSelectionIndex(convertToModel(lead));
+        }
+
     }
 
     protected void updateFromPipelineChanged() {

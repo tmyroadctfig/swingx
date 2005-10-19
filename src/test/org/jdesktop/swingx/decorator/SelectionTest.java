@@ -23,15 +23,61 @@ import org.jdesktop.swingx.util.AncientSwingTeam;
 /**
  * @author Jeanette Winzenburg
  */
-public class SelectionIssues extends InteractiveTestCase {
-    public SelectionIssues() {
+public class SelectionTest extends InteractiveTestCase {
+    public SelectionTest() {
         super("SelectionTest");
     }
     
     private TableModel ascendingModel;
     protected ComponentAdapter ascendingModelAdapter;
 
+    /**
+     * Related to #186-swingx: Lead/anchor not correctly synched.
+     *
+     */
+    public void testSynchLeadSelection() {
+        ListSelectionModel viewSelectionModel = new DefaultListSelectionModel();
+        int selected = 0;
+        viewSelectionModel.setSelectionInterval(selected, selected);
+        FilterPipeline pipeline =  null; //new FilterPipeline();
+//        pipeline.assign(ascendingModelAdapter);
+        Selection selection = new Selection(pipeline, viewSelectionModel);
+        int anchor = selected;
+        int lead = selected;
+        assertAnchorLeadSynched(anchor, lead, viewSelectionModel, selection);
+        anchor = 2;
+        viewSelectionModel.setValueIsAdjusting(true);
+        viewSelectionModel.setAnchorSelectionIndex(anchor);
+        viewSelectionModel.setValueIsAdjusting(false);
+//        pipeline.flush();
+        assertAnchorLeadSynched(anchor, lead, viewSelectionModel, selection);
+        
+    }
     
+    public void testAnchorLeadSelection() {
+        ListSelectionModel viewSelectionModel = new DefaultListSelectionModel();
+        int selected = 0;
+        viewSelectionModel.setSelectionInterval(selected, selected);
+        int anchor = selected;
+        int lead = selected;
+        assertAnchorLead(anchor, lead, viewSelectionModel);
+        anchor = 2;
+        viewSelectionModel.setValueIsAdjusting(true);
+        viewSelectionModel.setAnchorSelectionIndex(anchor);
+        viewSelectionModel.setValueIsAdjusting(false);
+        assertAnchorLead(anchor, lead, viewSelectionModel);
+        
+    }
+    private void assertAnchorLeadSynched(int anchor, int lead, ListSelectionModel viewSelection, Selection mapper) {
+       assertAnchorLead(anchor, lead, viewSelection);
+       assertAnchorLead(anchor, lead, mapper.modelSelection);
+    }
+    
+    private void assertAnchorLead(int anchor, int lead, ListSelectionModel viewSelection) {
+        assertEquals("anchor", anchor, viewSelection.getAnchorSelectionIndex());
+        assertEquals("lead", lead, viewSelection.getLeadSelectionIndex());
+        
+    }
     public void testSelectionNullPipeline() {
         ListSelectionModel selectionModel = new DefaultListSelectionModel();
         selectionModel.setSelectionInterval(0, 0);
@@ -181,7 +227,7 @@ public class SelectionIssues extends InteractiveTestCase {
 
     public static void main(String args[]) {
         setSystemLF(true);
-        SelectionIssues test = new SelectionIssues();
+        SelectionTest test = new SelectionTest();
         try {
            test.runInteractiveTests();
         } catch (Exception e) {

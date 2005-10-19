@@ -918,6 +918,13 @@ public class JXTable extends JTable {
      * {@inheritDoc}
      */
     public void tableChanged(TableModelEvent e) {
+        if (getSelectionModel().getValueIsAdjusting()) {
+            // this may happen if the uidelegate/editor changed selection
+            // and adjusting state
+            // before firing a editingStopped
+            // need to enforce update of model selection
+            getSelectionModel().setValueIsAdjusting(false);
+        }
         // JW: make Selection deaf ... super doesn't know about row
         // mapping and sets rowSelection in model coordinates
         // causing complete confusion.
