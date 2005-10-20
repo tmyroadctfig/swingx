@@ -8,6 +8,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
+import java.beans.PropertyChangeListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -60,6 +61,31 @@ public class JXTableUnitTest extends InteractiveTestCase {
             tableModel = new DynamicTableModel();
         }
         sortableTableModel = new AncientSwingTeam();
+    }
+
+    /**
+     * test if LinkController/executeButtonAction is properly registered/unregistered on
+     * setRolloverEnabled.
+     *
+     */
+    public void testLinkControllerListening() {
+        JXTable table = new JXTable();
+        table.setRolloverEnabled(true);
+        assertNotNull("LinkController must be listening", getLinkControllerAsPropertyChangeListener(table));
+        assertNotNull("execute button action must be registered", table.getActionMap().get(JXTable.EXECUTE_BUTTON_ACTIONCOMMAND));
+        table.setRolloverEnabled(false);
+        assertNull("LinkController must not be listening", getLinkControllerAsPropertyChangeListener(table));
+        assertNull("execute button action must be de-registered", table.getActionMap().get(JXTable.EXECUTE_BUTTON_ACTIONCOMMAND));
+    }
+    
+    private PropertyChangeListener getLinkControllerAsPropertyChangeListener(JXTable table) {
+        PropertyChangeListener[] listeners = table.getPropertyChangeListeners();
+        for (int i = 0; i < listeners.length; i++) {
+            if (listeners[i] instanceof JXTable.LinkController) {
+                return (JXTable.LinkController) listeners[i];
+            }
+        }
+        return null;
     }
 
     /**

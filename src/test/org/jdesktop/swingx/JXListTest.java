@@ -9,6 +9,7 @@ package org.jdesktop.swingx;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -43,6 +44,32 @@ public class JXListTest extends InteractiveTestCase {
 
     private ListModel listModel;
     protected DefaultListModel ascendingListModel;
+
+    
+    /**
+     * test if LinkController/executeButtonAction is properly registered/unregistered on
+     * setRolloverEnabled.
+     *
+     */
+    public void testLinkControllerListening() {
+        JXList table = new JXList();
+        table.setRolloverEnabled(true);
+        assertNotNull("LinkController must be listening", getLinkControllerAsPropertyChangeListener(table));
+        assertNotNull("execute button action must be registered", table.getActionMap().get(JXList.EXECUTE_BUTTON_ACTIONCOMMAND));
+        table.setRolloverEnabled(false);
+        assertNull("LinkController must not be listening", getLinkControllerAsPropertyChangeListener(table));
+        assertNull("execute button action must be de-registered", table.getActionMap().get(JXList.EXECUTE_BUTTON_ACTIONCOMMAND));
+    }
+
+    private PropertyChangeListener getLinkControllerAsPropertyChangeListener(JXList table) {
+        PropertyChangeListener[] listeners = table.getPropertyChangeListeners();
+        for (int i = 0; i < listeners.length; i++) {
+            if (listeners[i] instanceof JXList.LinkController) {
+                return (JXList.LinkController) listeners[i];
+            }
+        }
+        return null;
+    }
 
     public void testConvertToModelPreconditions() {
         final JXList list = new JXList(ascendingListModel);

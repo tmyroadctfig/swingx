@@ -33,6 +33,7 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.AbstractListModel;
 import javax.swing.Action;
@@ -46,7 +47,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
+import javax.swing.table.TableCellRenderer;
 
+import org.jdesktop.swingx.JXTable.LinkController;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
@@ -72,6 +75,7 @@ import org.jdesktop.swingx.decorator.Sorter;
  * @author Jeanette Winzenburg
  */
 public class JXList extends JList {
+    public static final String EXECUTE_BUTTON_ACTIONCOMMAND = "executeButtonAction";
 
     /** The pipeline holding the filters. */
     protected FilterPipeline filters;
@@ -251,17 +255,28 @@ public class JXList extends JList {
             rolloverProducer = createRolloverProducer();
             addMouseListener(rolloverProducer);
             addMouseMotionListener(rolloverProducer);
-            linkController = new LinkController();
-            addPropertyChangeListener(linkController);
+            getLinkController().install(this);
         } else {
             removeMouseListener(rolloverProducer);
             removeMouseMotionListener(rolloverProducer);
             rolloverProducer = null;
-            removePropertyChangeListener(linkController);
-            linkController = null;
+            getLinkController().release();
         }
         firePropertyChange("rolloverEnabled", old, isRolloverEnabled());
     }
+
+    
+    protected LinkController getLinkController() {
+        if (linkController == null) {
+            linkController = createLinkController();
+        }
+        return linkController;
+    }
+
+    protected LinkController createLinkController() {
+        return new LinkController();
+    }
+
 
     /**
      * creates and returns the RolloverProducer to use with this tree.
@@ -314,9 +329,11 @@ public class JXList extends JList {
      * 
      * @author Jeanette Winzenburg
      */
-    public class LinkController implements PropertyChangeListener {
+    public static class LinkController implements PropertyChangeListener {
 
         private Cursor oldCursor;
+        private JXList list;
+        
         public void propertyChange(PropertyChangeEvent evt) {
             if (RolloverProducer.ROLLOVER_KEY.equals(evt.getPropertyName())) {
                    rollover((JXList) evt.getSource(), (Point) evt.getOldValue(),
@@ -327,7 +344,20 @@ public class JXList extends JList {
             }
         }
 
-        
+
+        public void install(JXList list) {
+            release();  
+            this.list = list;
+            list.addPropertyChangeListener(this);
+            registerExecuteButtonAction();
+          }
+          
+          public void release() {
+              if (list == null) return;
+              list.removePropertyChangeListener(this);
+              unregisterExecuteButtonAction();
+          }
+
 //    --------------------------------- JList rollover
         
         private void rollover(JXList list, Point oldLocation, Point newLocation) {
@@ -369,7 +399,53 @@ public class JXList extends JList {
             // PENDING: JW - don't ask the model, ask the list!
             return (list.getModel().getElementAt(location.y) instanceof LinkModel);
         }
-        
+
+        private void unregisterExecuteButtonAction() {
+            list.getActionMap().put(EXECUTE_BUTTON_ACTIONCOMMAND, null);
+            KeyStroke space = KeyStroke.getKeyStroke("released SPACE");
+            list.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(space , null);
+        }
+
+        private void registerExecuteButtonAction() {
+            list.getActionMap().put(EXECUTE_BUTTON_ACTIONCOMMAND, createExecuteButtonAction());
+            KeyStroke space = KeyStroke.getKeyStroke("released SPACE");
+            list.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(space , EXECUTE_BUTTON_ACTIONCOMMAND);
+            
+        }
+
+        private Action createExecuteButtonAction() {
+            Action action = new AbstractAction() {
+
+                public void actionPerformed(ActionEvent e) {
+                    AbstractButton button = getClickableRendererComponent();
+                    if (button != null) {
+                        button.doClick();
+                        list.repaint();
+                    }
+                }
+
+                @Override
+                public boolean isEnabled() {
+                    return isClickable();
+                }
+
+                private boolean isClickable() {
+                    return getClickableRendererComponent() != null;
+                }
+                
+                private AbstractButton getClickableRendererComponent() {
+                    if (list == null || !list.isEnabled() || !list.hasFocus()) return null;
+                    int leadRow = list.getLeadSelectionIndex();
+                    if (leadRow < 0 ) return null;
+                    ListCellRenderer renderer = list.getCellRenderer();
+                    Component rendererComp = renderer.getListCellRendererComponent(list, list.getElementAt(leadRow), leadRow, false, true);
+                    return rendererComp instanceof AbstractButton ? (AbstractButton) rendererComp : null;
+                }
+                
+            };
+            return action;
+        }
+
 
     }
 

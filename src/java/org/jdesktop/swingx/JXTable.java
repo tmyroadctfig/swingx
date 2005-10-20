@@ -48,6 +48,7 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -203,6 +204,8 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * @author Jeanette Winzenburg
  */
 public class JXTable extends JTable { 
+    public static final String EXECUTE_BUTTON_ACTIONCOMMAND = "executeButtonAction";
+
     /**
      * Constant string for horizontal scroll actions, used in JXTable's Action
      * Map.
@@ -417,17 +420,28 @@ public class JXTable extends JTable {
             rolloverProducer = createRolloverProducer();
             addMouseListener(rolloverProducer);
             addMouseMotionListener(rolloverProducer);
-            linkController = new LinkController();
-            addPropertyChangeListener(linkController);
+            getLinkController().install(this);
+
         } else {
             removeMouseListener(rolloverProducer);
             removeMouseMotionListener(rolloverProducer);
             rolloverProducer = null;
-            removePropertyChangeListener(linkController);
-            linkController = null;
+            getLinkController().release();
         }
         firePropertyChange("rolloverEnabled", old, isRolloverEnabled());
     }
+
+    protected LinkController getLinkController() {
+        if (linkController == null) {
+            linkController = createLinkController();
+        }
+        return linkController;
+    }
+
+    protected LinkController createLinkController() {
+        return new LinkController();
+    }
+
 
     /**
      * creates and returns the RolloverProducer to use.
@@ -488,9 +502,11 @@ public class JXTable extends JTable {
      * 
      * @author Jeanette Winzenburg
      */
-    public  class LinkController implements PropertyChangeListener {
+    public static class LinkController implements PropertyChangeListener {
 
         private Cursor oldCursor;
+        private JXTable table;
+
         public void propertyChange(PropertyChangeEvent evt) {
             if (RolloverProducer.ROLLOVER_KEY.equals(evt.getPropertyName())) {
                rollover((JXTable) evt.getSource(), (Point) evt
@@ -500,6 +516,19 @@ public class JXTable extends JTable {
                 click((JXTable) evt.getSource(), (Point) evt.getOldValue(),
                         (Point) evt.getNewValue());
             }
+        }
+
+        public void install(JXTable table) {
+          release();  
+          this.table = table;
+          table.addPropertyChangeListener(this);
+          registerExecuteButtonAction();
+        }
+        
+        public void release() {
+            if (table == null) return;
+            table.removePropertyChangeListener(this);
+            unregisterExecuteButtonAction();
         }
 
 //    --------------------------- JTable rollover
@@ -524,10 +553,8 @@ public class JXTable extends JTable {
             if (!isLinkColumn(list, newLocation)) return;
             if (list.isCellEditable(newLocation.y, newLocation.x)) return;
             TableCellRenderer renderer = list.getCellRenderer(newLocation.y, newLocation.x);
-            // PENDING: JW - don't ask the model, ask the list!
             Component comp = list.prepareRenderer(renderer, newLocation.y,  newLocation.x);
             if (comp instanceof AbstractButton) {
-                // this is fishy - needs to be removed as soon as JList is editable
                 ((AbstractButton) comp).doClick();
                 list.repaint();
             }
@@ -551,6 +578,54 @@ public class JXTable extends JTable {
         private boolean isLinkColumn(JXTable table, Point location) {
             if (location == null || location.x < 0) return false;
             return (table.getColumnClass(location.x) == LinkModel.class);
+        }
+
+
+        private void unregisterExecuteButtonAction() {
+            table.getActionMap().put(EXECUTE_BUTTON_ACTIONCOMMAND, null);
+            KeyStroke space = KeyStroke.getKeyStroke("released SPACE");
+            table.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(space , null);
+        }
+
+        private void registerExecuteButtonAction() {
+            table.getActionMap().put(EXECUTE_BUTTON_ACTIONCOMMAND, createExecuteButtonAction());
+            KeyStroke space = KeyStroke.getKeyStroke("released SPACE");
+            table.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(space , EXECUTE_BUTTON_ACTIONCOMMAND);
+            
+        }
+
+        private Action createExecuteButtonAction() {
+            Action action = new AbstractAction() {
+
+                public void actionPerformed(ActionEvent e) {
+                    AbstractButton button = getClickableRendererComponent();
+                    if (button != null) {
+                        button.doClick();
+                        table.repaint();
+                    }
+                }
+
+                @Override
+                public boolean isEnabled() {
+                    return isClickable();
+                }
+
+                private boolean isClickable() {
+                    return getClickableRendererComponent() != null;
+                }
+                
+                private AbstractButton getClickableRendererComponent() {
+                    if (table == null || !table.isEnabled() || !table.hasFocus()) return null;
+                    int leadRow = table.getSelectionModel().getLeadSelectionIndex();
+                    int leadColumn = table.getColumnModel().getSelectionModel().getLeadSelectionIndex();
+                    if (leadRow < 0 || leadColumn < 0 || table.isCellEditable(leadRow, leadColumn)) return null;
+                    TableCellRenderer renderer = table.getCellRenderer(leadRow, leadColumn);
+                    Component rendererComp = table.prepareRenderer(renderer, leadRow, leadColumn);
+                    return rendererComp instanceof AbstractButton ? (AbstractButton) rendererComp : null;
+                }
+                
+            };
+            return action;
         }
 
     }
