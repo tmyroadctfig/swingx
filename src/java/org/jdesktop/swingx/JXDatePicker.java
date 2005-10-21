@@ -492,6 +492,10 @@ public class JXDatePicker extends JComponent {
         }
 
         public void mouseReleased(MouseEvent ev) {
+            if (!isEnabled()) {
+                return;
+            }
+
             // Retarget mouse event to the month view.
             if (_forwardReleaseEvent) {
                 ev = SwingUtilities.convertMouseEvent(_popupButton, ev,
@@ -508,6 +512,10 @@ public class JXDatePicker extends JComponent {
         }
 
         public void mouseDragged(MouseEvent ev) {
+            if (!isEnabled()) {
+                return;
+            }
+
             _forwardReleaseEvent = true;
 
             if (!_popup.isShowing()) {
