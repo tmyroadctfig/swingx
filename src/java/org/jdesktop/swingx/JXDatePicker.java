@@ -261,7 +261,9 @@ public class JXDatePicker extends JComponent {
     /**
      * Set the date the link will use and the string defining a MessageFormat
      * to format the link.  If no valid date is in the editor when the popup
-     * is displayed the popup will focus on the month the linkDate is in.
+     * is displayed the popup will focus on the month the linkDate is in.  Calling
+     * this method will replace the currently installed linkPanel and install
+     * a new one with the requested date and format.
      *
      * @param linkDate Date in milliseconds
      * @param linkFormatString String used to format the link
@@ -270,6 +272,7 @@ public class JXDatePicker extends JComponent {
     public void setLinkDate(long linkDate, String linkFormatString) {
         _linkDate = linkDate;
         _linkFormat = new MessageFormat(linkFormatString);
+        setLinkPanel(new TodayPanel());
     }
     
     /**
@@ -563,7 +566,7 @@ public class JXDatePicker extends JComponent {
 
         public void actionPerformed(ActionEvent ev) {
             String command = ev.getActionCommand();
-            if ("MONTH_VIEW" == command) {
+            if ("MONTH_VIEW".equals(command)) {
                 DateSpan span = _monthView.getSelectedDateSpan();
                 _dateField.setValue(span.getStartAsDate());
                 _popup.setVisible(false);
