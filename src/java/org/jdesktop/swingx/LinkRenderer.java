@@ -26,6 +26,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.AbstractCellEditor;
+import javax.swing.Action;
 import javax.swing.JList;
 import javax.swing.JTable;
 import javax.swing.ListCellRenderer;
@@ -62,11 +63,27 @@ public class LinkRenderer extends AbstractCellEditor implements
 
     public LinkRenderer(ActionListener visitingDelegate) {
         linkAction = new LinkAction(null);
-        linkButton = new JXHyperlink(linkAction);
-        linkButton.setBorderPainted(true);
-        linkButton.setOpaque(true);
+        linkButton = createHyperlink(linkAction);
+//        linkButton.setBorderPainted(true);
+//        linkButton.setOpaque(true);
         linkButton.addActionListener(createEditorActionListener());
         setVisitingDelegate(visitingDelegate);
+    }
+
+    /**
+     * @return
+     */
+    private JXHyperlink createHyperlink(Action linkAction) {
+        return new JXHyperlink(linkAction) {
+
+            @Override
+            public void updateUI() {
+                super.updateUI();
+                setBorderPainted(true);
+                setOpaque(true);
+            }
+            
+        };
     }
 
     public void setVisitingDelegate(ActionListener openAction) {
