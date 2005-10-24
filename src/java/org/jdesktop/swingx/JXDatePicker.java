@@ -82,7 +82,7 @@ public class JXDatePicker extends JComponent {
         _monthView = new JXMonthView();
         _monthView.setTraversable(true);
 
-        _dateField = new JFormattedTextField(new JXDatePickerFormatter());
+        _dateField = createEditor();
         _dateField.setName("dateField");
         _dateField.setBorder(null);
         
@@ -312,6 +312,16 @@ public class JXDatePicker extends JComponent {
      */
     public JFormattedTextField getEditor() {
         return _dateField;
+    }
+
+    /**
+     * Creates the editor used to edit the date selection.  Subclasses should
+     * override this method if they want to substitute in their own editor.
+     *
+     * @return an instance of a JFormattedTextField
+     */
+    protected JFormattedTextField createEditor() {
+        return new JFormattedTextField(new JXDatePickerFormatter());
     }
 
     /**
