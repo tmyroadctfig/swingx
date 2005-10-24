@@ -27,8 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import javax.swing.ActionMap;
-
 /**
  * Presentation Model for Find/Filter Widgets. 
  * <p>
@@ -135,8 +133,6 @@ public class PatternModel {
     private RegexCreator regexCreator;
 
     private boolean wrapping;
-
-    private ActionMap actionMap;
 
     private boolean incremental;
 

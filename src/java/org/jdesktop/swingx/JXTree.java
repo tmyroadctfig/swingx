@@ -22,7 +22,6 @@
 package org.jdesktop.swingx;
 
 import java.awt.Component;
-import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -530,8 +529,6 @@ public class JXTree extends JTree {
      */
     public  class LinkController implements PropertyChangeListener {
 
-
-        private Cursor oldCursor;
         public void propertyChange(PropertyChangeEvent evt) {
             if (RolloverProducer.ROLLOVER_KEY.equals(evt.getPropertyName())) {
                     rollover((JXTree) evt.getSource(), (Point) evt.getOldValue(),

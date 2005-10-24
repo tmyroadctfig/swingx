@@ -99,8 +99,7 @@ public class SelectionMapperTest extends InteractiveTestCase {
         // descending sorter
         pipeline.setSorter(new ShuttleSorter(0, false));
         pipeline.assign(ascendingModelAdapter);
-//        pipeline.flush();
-        SelectionMapper selectionMapper = new SelectionMapper(pipeline, selectionModel);
+        new SelectionMapper(pipeline, selectionModel);
         assertEquals("lead selection must be last added", 
                 pipeline.convertRowIndexToView(lead), 
                 selectionModel.getLeadSelectionIndex());
@@ -139,8 +138,6 @@ public class SelectionMapperTest extends InteractiveTestCase {
         table.setFilters(new FilterPipeline(new Filter[] {filter}));
         assertEquals(ascendingModel.getRowCount(), table.getRowCount());
         assertEquals("table must keep selection after setting filter", selectedRow, table.getSelectedRow());
-        // add an invers sorter
-        Sorter sorter = new ShuttleSorter(0, false);
     }
 
     

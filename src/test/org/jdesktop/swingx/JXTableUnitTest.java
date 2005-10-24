@@ -34,7 +34,6 @@ import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
-import org.jdesktop.swingx.decorator.PipelineListener;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.table.TableColumnExt;
@@ -122,9 +121,10 @@ public class JXTableUnitTest extends InteractiveTestCase {
 
             public void valueChanged(ListSelectionEvent e) {
                 if (e.getValueIsAdjusting()) return;
-                int viewRow = table.getSelectedRow(); //table.convertRowIndexToView(modelRow);
+                int viewRow = table.getSelectedRow(); 
                 assertTrue("view index visible", viewRow >= 0);
-                int convertedRow = table.convertRowIndexToModel(viewRow);
+                // JW: the following checks if the reverse conversion succeeds
+                table.convertRowIndexToModel(viewRow);
                 
             }
             
@@ -462,14 +462,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
         PatternFilter noFilter = new PatternFilter(".*", 0, 1);
         table.setFilters(new FilterPipeline(new Filter[] {noFilter}));
         int listenerCount = table.getFilters().getPipelineListeners().length;
-        PipelineListener l = table.getFilters().getPipelineListeners()[listenerCount - 1];
-        // sanity assert - no longer 1: SelectionMapper adds listener as well
-        // no longer 2: Rowsizing adds listener
-        // no longer sane - remove!!
-//         assertEquals(3, listenerCount);
-        // JW: no longer valid assumption - the pipelineListener now is an 
-        // implementation detail of JXTable
- //       assertEquals(table, l);
         table.setModel(createAscendingModel(0, 20));
         assertEquals("pipeline listener count must not change after setModel", listenerCount, table.getFilters().getPipelineListeners().length);
         

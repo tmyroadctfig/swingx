@@ -12,6 +12,18 @@ package org.jdesktop.swingx.decorator;
  */
 public class FilterIssues extends FilterTest {
 
+    /**
+     * order of filters must be retained.
+     *
+     */
+    public void testSorterOrder() {
+        Sorter sorter = new ShuttleSorter(); 
+        assertEquals("order < 0", -1, sorter.order);
+        Filter[] filters = new Filter[] {sorter, new ShuttleSorter(2, true)};
+        new FilterPipeline(filters);
+        // JW: pipeline inverts order of sorter - why?
+        assertOrders(filters);
+    }
 
     public void testConvertRowIndicesInLastAndPipeline() {
         Filter filterZero = createDefaultPatternFilter(0);

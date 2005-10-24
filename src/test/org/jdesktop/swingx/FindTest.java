@@ -54,7 +54,6 @@ public class FindTest extends InteractiveTestCase {
 
     
     public void testWrapFindBar() {
-        JXTable table = new JXTable(new TestTableModel());
         JXFindBar findBar = new JXFindBar();
         assertTrue("findbar must auto-wrap", findBar.getPatternModel().isWrapping());
     }

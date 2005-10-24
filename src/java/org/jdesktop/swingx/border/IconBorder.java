@@ -24,7 +24,6 @@ package org.jdesktop.swingx.border;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Rectangle;
 
@@ -74,7 +73,6 @@ public class IconBorder implements Border {
 
     public void paintBorder(Component c, Graphics g, int x, int y, int width,
         int height) {
-        Graphics2D g2d = (Graphics2D) g;
         int iconPosition = bidiDecodeLeadingTrailing(c.getComponentOrientation(), this.iconPosition);
         if (iconPosition == SwingConstants.NORTH_EAST) {
             iconBounds.y = y + PAD;

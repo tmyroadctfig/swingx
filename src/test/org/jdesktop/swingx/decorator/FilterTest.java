@@ -125,11 +125,8 @@ public class FilterTest extends InteractiveTestCase {
      *
      */
     public void testSetSorterDiffComponentAdapter() {
-        int sortColumn = 0;
         FilterPipeline pipeline = new FilterPipeline();
         pipeline.assign(directModelAdapter);
-        Object value = pipeline.getValueAt(0, sortColumn);
-        Object lastValue = pipeline.getValueAt(pipeline.getOutputSize() - 1, sortColumn);
         Sorter sorter = new ShuttleSorter();
         sorter.assign(new DirectModelAdapter(new DefaultTableModel(10, 5)));
         try {
@@ -151,11 +148,8 @@ public class FilterTest extends InteractiveTestCase {
      *
      */
     public void testInterposeDiffComponentAdapter() {
-        int sortColumn = 0;
         FilterPipeline pipeline = new FilterPipeline();
         pipeline.assign(directModelAdapter);
-        Object value = pipeline.getValueAt(0, sortColumn);
-        Object lastValue = pipeline.getValueAt(pipeline.getOutputSize() - 1, sortColumn);
         Sorter sorter = new ShuttleSorter();
         sorter.assign(new DirectModelAdapter(new DefaultTableModel(10, 5)));
         try {
@@ -244,7 +238,6 @@ public class FilterTest extends InteractiveTestCase {
         Filter filter = createDefaultPatternFilter(0);
         FilterPipeline pipeline = new FilterPipeline(new Filter[] { filter });
         pipeline.assign(directModelAdapter);
-        Object value = pipeline.getValueAt(0, 0);
         Sorter sorter = new ShuttleSorter();
         pipeline.setSorter(sorter);
         assertEquals("value access via sorter must return the same as via pipeline", 
@@ -319,22 +312,10 @@ public class FilterTest extends InteractiveTestCase {
         Sorter sorter = new ShuttleSorter();
         assertEquals("order < 0", -1, sorter.order);
         Filter[] filters = new Filter[] {filterZero, filterTwo, sorter};
-        FilterPipeline pipeline = new FilterPipeline(filters);
+        new FilterPipeline(filters);
         assertOrder(filterZero, filters);
     }
     
-    /**
-     * order of filters must be retained.
-     *
-     */
-    public void testSorterOrder() {
-        Sorter sorter = new ShuttleSorter(); 
-        assertEquals("order < 0", -1, sorter.order);
-        Filter[] filters = new Filter[] {sorter, new ShuttleSorter(2, true)};
-        FilterPipeline pipeline = new FilterPipeline(filters);
-        // JW: pipeline inverts order of sorter - why?
-       // assertOrders(filters);
-    }
 
     /**
      * FilterPipeline allows maximal one sorter per column. 
@@ -343,7 +324,7 @@ public class FilterTest extends InteractiveTestCase {
     public void testDuplicatedSortColumnException() {
         Filter[] filters = new Filter[] {new ShuttleSorter(), new ShuttleSorter()};
         try {
-            FilterPipeline pipeline = new FilterPipeline(filters);
+            new FilterPipeline(filters);
             fail("trying to sort one column more than once must throw IllegalArgumentException");
         
         } catch (IllegalArgumentException e) {    
@@ -361,7 +342,7 @@ public class FilterTest extends InteractiveTestCase {
         Filter filter = createDefaultPatternFilter(0);
         assertEquals("order < 0", -1, filter.order);
         Filter[] filters = new Filter[] {filter};
-        FilterPipeline pipeline = new FilterPipeline(filters);
+        new FilterPipeline(filters);
         try {
             new FilterPipeline(filters);
             fail("sharing filters are not allowed - must throw IllegalArgumentException");
@@ -391,16 +372,14 @@ public class FilterTest extends InteractiveTestCase {
         assertEquals("order equals position in array", position, filter.order);
     }
 
-    private void assertOrders(Filter[] filters) {
+    protected void assertOrders(Filter[] filters) {
         for (int i = 0; i < filters.length; i++) {
             assertEquals("order must be equal to filter position", i, filters[i].order);
         }
     }
     private int getFilterPosition(Filter filter, Filter[] filters) {
-        int position = -1;
         for (int i = 0; i < filters.length; i++) {
             if (filters[i].equals(filter)) {
-                position = i;
                 return i;
             }
         }

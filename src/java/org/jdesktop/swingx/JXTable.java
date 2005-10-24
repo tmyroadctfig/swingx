@@ -1046,7 +1046,6 @@ public class JXTable extends JTable {
             }
 
             int deletedCount = end - start + 1;
-            int previousRowCount = getModel().getRowCount() + deletedCount;
             // Adjust the selectionMapper to account for the new rows
             getSelectionMapper().removeIndexInterval(start, end);
             getRowModelMapper().removeIndexInterval(start, deletedCount);

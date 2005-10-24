@@ -15,8 +15,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -176,14 +174,6 @@ public class JXTableVisualCheck extends JXTableUnitTest {
                 System.out.println("from selection: " + table.getValueAt(selected, column));
             }
             
-        });
-        
-        table.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-               int row = table.rowAtPoint(e.getPoint());
-               int col = table.columnAtPoint(e.getPoint());
-               System.out.println(table.getValueAt(row, column));
-            }
         });
         JXFrame frame = wrapWithScrollingInFrame(table, "Accessing values (indy rowheights)");
         Action updateCellAction = new AbstractAction("update cell value") {
@@ -538,7 +528,6 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     public void interactiveTestColumnResizable() {
         final JXTable table = new JXTable(sortableTableModel);
         table.setColumnControlVisible(true);
-        int totalColumnCount = table.getColumnCount();
         final TableColumnExt priorityColumn = table.getColumnExt("First Name");
         JXFrame frame = wrapWithScrollingInFrame(table, "JXTable: Column with Min=Max not resizable");
         Action action = new AbstractAction("Toggle MinMax of FirstName") {

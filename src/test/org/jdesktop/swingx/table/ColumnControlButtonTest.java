@@ -57,7 +57,9 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
         final TableColumnExt priorityColumn = table.getColumnExt("First Name");
         int listenerCount = priorityColumn.getPropertyChangeListeners().length;
         table.setColumnControlVisible(true);
-        ColumnControlButton columnControl = (ColumnControlButton) table.getColumnControl();
+        // JW: the columnControlButton is created lazily, so we
+        // have to access to test if listeners are registered.
+        table.getColumnControl();
         assertEquals("numbers of listeners must be increased", listenerCount + 1, 
                 priorityColumn.getPropertyChangeListeners().length);
         int totalColumnCount = table.getColumnCount();
@@ -122,7 +124,6 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
         // will not be inserted into the column control's list
 //      table.getColumnExt("Last Name").setVisible(false);
         table.setColumnControlVisible(true);
-        int totalColumnCount = table.getColumnCount();
         final TableColumnExt priorityColumn = table.getColumnExt("First Name");
         priorityColumn.setVisible(false);
         JFrame frame = wrapWithScrollingInFrame(table, "JXTable (#192, #38-swingx) ColumnControl and Visibility of items");

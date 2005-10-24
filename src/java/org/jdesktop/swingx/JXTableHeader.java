@@ -156,7 +156,7 @@ public class JXTableHeader extends JTableHeader {
             JXTable table = getXTable();
             if (!table.isSortable() || (e.getClickCount() != 1))
                 return;
-            if ((e.getModifiersEx() & e.SHIFT_DOWN_MASK) == e.SHIFT_DOWN_MASK) {
+            if ((e.getModifiersEx() & MouseEvent.SHIFT_DOWN_MASK) == MouseEvent.SHIFT_DOWN_MASK) {
                 table.resetSorter();
             } else {
                 int column = columnAtPoint(e.getPoint());

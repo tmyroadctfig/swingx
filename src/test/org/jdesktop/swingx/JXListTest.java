@@ -137,9 +137,10 @@ public class JXListTest extends InteractiveTestCase {
 
             public void valueChanged(ListSelectionEvent e) {
                 if (e.getValueIsAdjusting()) return;
-                int viewRow = list.getSelectedIndex(); //table.convertRowIndexToView(modelRow);
+                int viewRow = list.getSelectedIndex(); 
                 assertEquals("view index visible", 0, viewRow);
-                int convertedRow = list.convertIndexToModel(viewRow);
+                // JW: the following checks if the reverse conversion succeeds
+                list.convertIndexToModel(viewRow);
                 
             }
             
