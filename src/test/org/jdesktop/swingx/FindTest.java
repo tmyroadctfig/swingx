@@ -32,9 +32,9 @@ public class FindTest extends InteractiveTestCase {
 //      Locale.setDefault(new Locale("es"));
       FindTest test = new FindTest();
       try {
-//        test.runInteractiveTests();
-          test.runInteractiveTests("interactive.*Compare.*");
-          test.runInteractiveTests("interactive.*Tree.*");
+        test.runInteractiveTests();
+//          test.runInteractiveTests("interactive.*Compare.*");
+//          test.runInteractiveTests("interactive.*Tree.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -43,7 +43,6 @@ public class FindTest extends InteractiveTestCase {
     @Override
     protected void setUp() {
         editorURL = FindTest.class.getResource("resources/test.txt");
-//        SearchFactory.getInstance().setUseFindBar(true);
     }
     
 
@@ -54,6 +53,11 @@ public class FindTest extends InteractiveTestCase {
     }
 
     
+    public void testWrapFindBar() {
+        JXTable table = new JXTable(new TestTableModel());
+        JXFindBar findBar = new JXFindBar();
+        assertTrue("findbar must auto-wrap", findBar.getPatternModel().isWrapping());
+    }
     /** 
      * test if internal state is reset to not found by
      * passing a null searchstring.
@@ -578,8 +582,6 @@ public class FindTest extends InteractiveTestCase {
             public void actionPerformed(ActionEvent e) {
                 useFindBar = !useFindBar;
                 SearchFactory.getInstance().setUseFindBar(useFindBar);
-//                first.getActionMap().get("find").actionPerformed(null);
-                
             }
             
         };

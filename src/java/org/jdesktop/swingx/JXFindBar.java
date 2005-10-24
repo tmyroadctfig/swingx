@@ -81,6 +81,7 @@ public class JXFindBar extends JXFindPanel {
     public JXFindBar(Searchable searchable) {
         super(searchable);
         getPatternModel().setIncremental(true);
+        getPatternModel().setWrapping(true);
     }
 
     @Override
