@@ -93,6 +93,12 @@ public class JXDatePicker extends JComponent {
         _popupButton.addMouseListener(_handler);
         _popupButton.addMouseMotionListener(_handler);
 
+        // this is a trick to get hold of the client prop which
+        // prevents closing of the popup
+        JComboBox box = new JComboBox();
+        Object preventHide = box.getClientProperty("doNotCancelPopup");
+        _popupButton.putClientProperty("doNotCancelPopup", preventHide);
+
         KeyStroke enterKey =
             KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false);
 
