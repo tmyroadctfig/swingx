@@ -25,7 +25,7 @@ import javax.swing.SizeSequence;
 /**
  * @author Jeanette Winzenburg
  */
-public class RowSizing {
+public class SizeSequenceMapper {
 
     private SizeSequence viewSizes;
 
@@ -37,10 +37,10 @@ public class RowSizing {
 
     private int defaultHeight;
 
-    public RowSizing() {
+    public SizeSequenceMapper() {
     }
 
-    public RowSizing(FilterPipeline pipeline) {
+    public SizeSequenceMapper(FilterPipeline pipeline) {
         this();
         setFilters(pipeline);
     }
@@ -49,7 +49,7 @@ public class RowSizing {
      * @param pipeline
      * @param selection
      */
-    public RowSizing(FilterPipeline pipeline, SizeSequence selection, int defaultHeight) {
+    public SizeSequenceMapper(FilterPipeline pipeline, SizeSequence selection, int defaultHeight) {
         this();
         setViewSizeSequence(selection, defaultHeight);
         setFilters(pipeline);

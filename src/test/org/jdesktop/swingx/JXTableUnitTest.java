@@ -463,7 +463,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         table.setFilters(new FilterPipeline(new Filter[] {noFilter}));
         int listenerCount = table.getFilters().getPipelineListeners().length;
         PipelineListener l = table.getFilters().getPipelineListeners()[listenerCount - 1];
-        // sanity assert - no longer 1: Selection adds listener as well
+        // sanity assert - no longer 1: SelectionMapper adds listener as well
         // no longer 2: Rowsizing adds listener
         // no longer sane - remove!!
 //         assertEquals(3, listenerCount);

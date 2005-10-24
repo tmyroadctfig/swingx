@@ -55,7 +55,7 @@ import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PipelineEvent;
 import org.jdesktop.swingx.decorator.PipelineListener;
-import org.jdesktop.swingx.decorator.Selection;
+import org.jdesktop.swingx.decorator.SelectionMapper;
 import org.jdesktop.swingx.decorator.Sorter;
 
 /**
@@ -111,7 +111,7 @@ public class JXList extends JList {
 
     private boolean filterEnabled;
 
-    private Selection selection;
+    private SelectionMapper selectionMapper;
 
     private Searchable searchable;
 
@@ -569,11 +569,11 @@ public class JXList extends JList {
         }
     }
 
-    private Selection getSelection() {
-        if (selection == null) {
-            selection = new Selection(filters, getSelectionModel());
+    private SelectionMapper getSelectionMapper() {
+        if (selectionMapper == null) {
+            selectionMapper = new SelectionMapper(filters, getSelectionModel());
         }
-        return selection;
+        return selectionMapper;
     }
 
     public FilterPipeline getFilters() {
@@ -604,7 +604,7 @@ public class JXList extends JList {
         filters = pipeline;
         filters.setSorter(sorter);
         use(filters);
-        getSelection().setFilters(filters);
+        getSelectionMapper().setFilters(filters);
     }
 
     /**
@@ -714,7 +714,7 @@ public class JXList extends JList {
                 }
 
                 public void contentsChanged(ListDataEvent e) {
-                    getSelection().lock();
+                    getSelectionMapper().lock();
                     fireContentsChanged(this, -1, -1);
                     updateSelection(e);
                     getFilters().flush();
@@ -727,16 +727,16 @@ public class JXList extends JList {
 
         protected void updateSelection(ListDataEvent e) {
             if (e.getType() == ListDataEvent.INTERVAL_REMOVED) {
-                getSelection()
+                getSelectionMapper()
                         .removeIndexInterval(e.getIndex0(), e.getIndex1());
             } else if (e.getType() == ListDataEvent.INTERVAL_ADDED) {
 
                 int minIndex = Math.min(e.getIndex0(), e.getIndex1());
                 int maxIndex = Math.max(e.getIndex0(), e.getIndex1());
                 int length = maxIndex - minIndex + 1;
-                getSelection().insertIndexInterval(minIndex, length, true);
+                getSelectionMapper().insertIndexInterval(minIndex, length, true);
             } else {
-                getSelection().clearModelSelection();
+                getSelectionMapper().clearModelSelection();
             }
 
         }

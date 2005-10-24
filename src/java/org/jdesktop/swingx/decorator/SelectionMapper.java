@@ -33,7 +33,7 @@ import javax.swing.event.ListSelectionListener;
  * 
  * @author Jeanette Winzenburg
  */
-public class Selection {
+public class SelectionMapper {
 
     /** selection in view coordinates. */
     private ListSelectionModel viewSelection;
@@ -59,7 +59,7 @@ public class Selection {
      * @param pipeline
      * @param selection
      */
-    public Selection(FilterPipeline pipeline, ListSelectionModel selection) {
+    public SelectionMapper(FilterPipeline pipeline, ListSelectionModel selection) {
         modelSelection = new DefaultListSelectionModel();
         setViewSelectionModel(selection);
         setFilters(pipeline);

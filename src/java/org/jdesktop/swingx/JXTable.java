@@ -90,9 +90,9 @@ import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.PipelineEvent;
 import org.jdesktop.swingx.decorator.PipelineListener;
-import org.jdesktop.swingx.decorator.RowSizing;
+import org.jdesktop.swingx.decorator.SizeSequenceMapper;
 import org.jdesktop.swingx.decorator.SearchHighlighter;
-import org.jdesktop.swingx.decorator.Selection;
+import org.jdesktop.swingx.decorator.SelectionMapper;
 import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.icon.ColumnControlIcon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
@@ -245,7 +245,7 @@ public class JXTable extends JTable {
     protected ComponentAdapter dataAdapter;
 
     /** The handler for mapping view/model coordinates of row selection. */
-    private Selection selection;
+    private SelectionMapper selectionMapper;
 
     /** flag to indicate if table is interactively sortable. */
     private boolean sortable;
@@ -265,7 +265,7 @@ public class JXTable extends JTable {
     /** The default number of visible rows (in a ScrollPane). */
     private int visibleRowCount = 18;
 
-    private RowSizing rowSizing;
+    private SizeSequenceMapper rowModelMapper;
 
     private Field rowModelField;
 
@@ -984,7 +984,7 @@ public class JXTable extends JTable {
      */
     public void setModel(TableModel newModel) {
         // JW: need to look here? is done in tableChanged as well. 
-        getSelection().lock();
+        getSelectionMapper().lock();
         super.setModel(newModel);
     }
 
@@ -1000,17 +1000,17 @@ public class JXTable extends JTable {
             // need to enforce update of model selection
             getSelectionModel().setValueIsAdjusting(false);
         }
-        // JW: make Selection deaf ... super doesn't know about row
+        // JW: make SelectionMapper deaf ... super doesn't know about row
         // mapping and sets rowSelection in model coordinates
         // causing complete confusion.
-        getSelection().lock();
+        getSelectionMapper().lock();
         super.tableChanged(e);
         updateSelectionAndRowModel(e);
         use(filters);
     }
 
     /**
-     * reset model selection coordinates in Selection after
+     * reset model selection coordinates in SelectionMapper after
      * model events.
      * 
      * @param e
@@ -1030,10 +1030,10 @@ public class JXTable extends JTable {
                 end = getModel().getRowCount() - 1;
             }
 
-            // Adjust the selection to account for the new rows.
+            // Adjust the selectionMapper to account for the new rows.
             int length = end - start + 1;
-            getSelection().insertIndexInterval(start, length, true);
-            getRowSizing().insertIndexInterval(start, length, getRowHeight());
+            getSelectionMapper().insertIndexInterval(start, length, true);
+            getRowModelMapper().insertIndexInterval(start, length, getRowHeight());
 
         } else if (e.getType() == TableModelEvent.DELETE) {
             int start = e.getFirstRow();
@@ -1047,16 +1047,16 @@ public class JXTable extends JTable {
 
             int deletedCount = end - start + 1;
             int previousRowCount = getModel().getRowCount() + deletedCount;
-            // Adjust the selection to account for the new rows
-            getSelection().removeIndexInterval(start, end);
-            getRowSizing().removeIndexInterval(start, deletedCount);
+            // Adjust the selectionMapper to account for the new rows
+            getSelectionMapper().removeIndexInterval(start, end);
+            getRowModelMapper().removeIndexInterval(start, deletedCount);
 
         } else if (getSelectionModel().isSelectionEmpty()) {
             // JW: this is incomplete! see #167-swingx
             // possibly got a dataChanged or structureChanged
             // super will have cleared selection
-            getSelection().clearModelSelection();
-            getRowSizing().clearModelSizes();
+            getSelectionMapper().clearModelSelection();
+            getRowModelMapper().clearModelSizes();
             updateViewSizeSequence();
              
         }
@@ -1073,14 +1073,14 @@ public class JXTable extends JTable {
         if (isRowHeightEnabled()) {
             sizeSequence = getSuperRowModel();
         }
-        getRowSizing().setViewSizeSequence(sizeSequence, getRowHeight());
+        getRowModelMapper().setViewSizeSequence(sizeSequence, getRowHeight());
     }
     
-    private Selection getSelection() {
-        if (selection == null) {
-            selection = new Selection(filters, getSelectionModel());
+    private SelectionMapper getSelectionMapper() {
+        if (selectionMapper == null) {
+            selectionMapper = new SelectionMapper(filters, getSelectionModel());
         }
-        return selection;
+        return selectionMapper;
     }
 
 
@@ -1140,8 +1140,8 @@ public class JXTable extends JTable {
         // JW: first assign to prevent (short?) illegal internal state
         // #173-swingx
         use(filters);
-        getRowSizing().setFilters(filters);
-        getSelection().setFilters(filters);
+        getRowModelMapper().setFilters(filters);
+        getSelectionMapper().setFilters(filters);
     }
 
 
@@ -2445,11 +2445,11 @@ public class JXTable extends JTable {
      * 
      * @return
      */
-    protected RowSizing getRowSizing() {
-        if (rowSizing == null) {
-            rowSizing = new RowSizing(filters);
+    protected SizeSequenceMapper getRowModelMapper() {
+        if (rowModelMapper == null) {
+            rowModelMapper = new SizeSequenceMapper(filters);
         }
-        return rowSizing;
+        return rowModelMapper;
     }
 
     /**

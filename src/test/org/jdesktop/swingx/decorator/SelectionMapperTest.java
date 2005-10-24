@@ -23,9 +23,9 @@ import org.jdesktop.swingx.util.AncientSwingTeam;
 /**
  * @author Jeanette Winzenburg
  */
-public class SelectionTest extends InteractiveTestCase {
-    public SelectionTest() {
-        super("SelectionTest");
+public class SelectionMapperTest extends InteractiveTestCase {
+    public SelectionMapperTest() {
+        super("SelectionMapperTest");
     }
     
     private TableModel ascendingModel;
@@ -41,16 +41,16 @@ public class SelectionTest extends InteractiveTestCase {
         viewSelectionModel.setSelectionInterval(selected, selected);
         FilterPipeline pipeline =  null; //new FilterPipeline();
 //        pipeline.assign(ascendingModelAdapter);
-        Selection selection = new Selection(pipeline, viewSelectionModel);
+        SelectionMapper selectionMapper = new SelectionMapper(pipeline, viewSelectionModel);
         int anchor = selected;
         int lead = selected;
-        assertAnchorLeadSynched(anchor, lead, viewSelectionModel, selection);
+        assertAnchorLeadSynched(anchor, lead, viewSelectionModel, selectionMapper);
         anchor = 2;
         viewSelectionModel.setValueIsAdjusting(true);
         viewSelectionModel.setAnchorSelectionIndex(anchor);
         viewSelectionModel.setValueIsAdjusting(false);
 //        pipeline.flush();
-        assertAnchorLeadSynched(anchor, lead, viewSelectionModel, selection);
+        assertAnchorLeadSynched(anchor, lead, viewSelectionModel, selectionMapper);
         
     }
     
@@ -68,7 +68,7 @@ public class SelectionTest extends InteractiveTestCase {
         assertAnchorLead(anchor, lead, viewSelectionModel);
         
     }
-    private void assertAnchorLeadSynched(int anchor, int lead, ListSelectionModel viewSelection, Selection mapper) {
+    private void assertAnchorLeadSynched(int anchor, int lead, ListSelectionModel viewSelection, SelectionMapper mapper) {
        assertAnchorLead(anchor, lead, viewSelection);
        assertAnchorLead(anchor, lead, mapper.modelSelection);
     }
@@ -81,8 +81,8 @@ public class SelectionTest extends InteractiveTestCase {
     public void testSelectionNullPipeline() {
         ListSelectionModel selectionModel = new DefaultListSelectionModel();
         selectionModel.setSelectionInterval(0, 0);
-        Selection selection = new Selection(null, selectionModel);
-        selection.restoreSelection();
+        SelectionMapper selectionMapper = new SelectionMapper(null, selectionModel);
+        selectionMapper.restoreSelection();
         assertTrue("selection must be retained", selectionModel.isSelectedIndex(0));
     }
  
@@ -101,7 +101,7 @@ public class SelectionTest extends InteractiveTestCase {
         pipeline.setSorter(new ShuttleSorter(0, false));
         pipeline.assign(ascendingModelAdapter);
 //        pipeline.flush();
-        Selection selection = new Selection(pipeline, selectionModel);
+        SelectionMapper selectionMapper = new SelectionMapper(pipeline, selectionModel);
         assertEquals("lead selection must be last added", 
                 pipeline.convertRowIndexToView(lead), 
                 selectionModel.getLeadSelectionIndex());
@@ -117,8 +117,8 @@ public class SelectionTest extends InteractiveTestCase {
         // select first in model coordinates
         int index = 0;
         selectionModel.setSelectionInterval(index, index);
-        Selection selection = new Selection(null, selectionModel);
-        selection.setFilters(pipeline);
+        SelectionMapper selectionMapper = new SelectionMapper(null, selectionModel);
+        selectionMapper.setFilters(pipeline);
 //        selection.restoreSelection();
         assertEquals("view selection must be last", ascendingModelAdapter.getRowCount() - 1, 
                 selectionModel.getMinSelectionIndex());
@@ -227,7 +227,7 @@ public class SelectionTest extends InteractiveTestCase {
 
     public static void main(String args[]) {
         setSystemLF(true);
-        SelectionTest test = new SelectionTest();
+        SelectionMapperTest test = new SelectionMapperTest();
         try {
            test.runInteractiveTests();
         } catch (Exception e) {
