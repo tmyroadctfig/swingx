@@ -2325,14 +2325,9 @@ public class JXTable extends JTable {
                 .elements(); defaultRenderers.hasMoreElements();) {
             updateRendererUI(defaultRenderers.nextElement());
         }
-        Enumeration columns = getColumnModel().getColumns();
-        if (getColumnModel() instanceof TableColumnModelExt) {
-            columns = Collections
-                    .enumeration(((TableColumnModelExt) getColumnModel())
-                            .getAllColumns());
-        }
-        while (columns.hasMoreElements()) {
-            TableColumn column = (TableColumn) columns.nextElement();
+        List columns = getColumns(true);
+        for (Iterator iter = columns.iterator(); iter.hasNext();) {
+            TableColumn column = (TableColumn) iter.next();
             updateEditorUI(column.getCellEditor());
             updateRendererUI(column.getCellRenderer());
             updateRendererUI(column.getHeaderRenderer());

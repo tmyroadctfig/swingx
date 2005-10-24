@@ -74,13 +74,6 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel implemen
         super();
     }
 
-    /**
-     * 
-     */
-    public List getAllColumns() {
-        //defensive copy
-        return getColumns(true);
-    }
 
     /**
      * 

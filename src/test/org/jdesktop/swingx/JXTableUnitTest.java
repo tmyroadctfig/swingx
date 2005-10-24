@@ -8,12 +8,15 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
 import java.beans.PropertyChangeListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.swing.Icon;
@@ -45,10 +48,15 @@ import org.jdesktop.swingx.util.AncientSwingTeam;
 * 
 */
 public class JXTableUnitTest extends InteractiveTestCase {
+    private static final Logger LOG = Logger.getLogger(JXTableUnitTest.class
+            .getName());
 
     protected DynamicTableModel tableModel = null;
     protected TableModel sortableTableModel;
-    
+
+    // flag used in setup to explicitly choose LF
+    private boolean defaultToSystemLF;
+
     public JXTableUnitTest() {
         super("JXTable unit test");
     }
@@ -60,8 +68,37 @@ public class JXTableUnitTest extends InteractiveTestCase {
             tableModel = new DynamicTableModel();
         }
         sortableTableModel = new AncientSwingTeam();
+        // make sure we have the same default for each test
+        defaultToSystemLF = false;
+        setSystemLF(defaultToSystemLF);
     }
 
+    /**
+     * test if renderer properties are updated on LF change.
+     * Note: this can be done examplary only. Here: we use the 
+     * font of a rendererComponent returned by a LinkRenderer for
+     * comparison. There's nothing to test if the font are equal
+     * in System and crossplattform LF.
+     */
+    public void testUpdateRendererOnLFChange() {
+        LinkRenderer comparison = new LinkRenderer();
+        LinkRenderer linkRenderer = new LinkRenderer();
+        JXTable table = new JXTable(2, 3);
+        Component comparisonComponent = comparison.getTableCellEditorComponent(table, null, false, 0, 0);
+        Font comparisonFont = comparisonComponent.getFont();
+        table.getColumnModel().getColumn(0).setCellRenderer(linkRenderer);
+        setSystemLF(!defaultToSystemLF);
+        SwingUtilities.updateComponentTreeUI(comparisonComponent);
+        if (comparisonFont.equals(comparisonComponent.getFont())) {
+            LOG.info("cannot run test - equal font" + comparisonFont);
+            return;
+        }
+        SwingUtilities.updateComponentTreeUI(table);
+        Component rendererComp = table.prepareRenderer(table.getCellRenderer(0, 0), 0, 0);
+        assertEquals("renderer font must be updated", 
+                comparisonComponent.getFont(), rendererComp.getFont());
+        
+    }
     /**
      * test if LinkController/executeButtonAction is properly registered/unregistered on
      * setRolloverEnabled.
