@@ -63,7 +63,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         JTree tree = new JTree(treeTableModel);
         tree.setBackground(new Color(0xF5, 0xFF, 0xF5));
         JFrame frame = wrapWithScrollingInFrame(xtree, tree, "Unselected focused background: JXTree/JTree" );
-        frame.setVisible(true);  // RG: Changed from deprecated method show();
+        frame.setVisible(true);  
         
     }
 
@@ -76,7 +76,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         tree.setRolloverEnabled(true);
         tree.setHighlighters(createRolloverPipeline(true));
         JFrame frame = wrapWithScrollingInFrame(tree, "Rollover  " );
-        frame.setVisible(true);  // RG: Changed from deprecated method show();
+        frame.setVisible(true);  
         
     }
 
@@ -100,7 +100,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
 //        tree.setHighlighters(new HighlighterPipeline(
 //                new Highlighter[] { AlternateRowHighlighter.classicLinePrinter, }));
         JFrame frame = wrapWithScrollingInFrame(tree, "Highlighters: " + pattern);
-        frame.setVisible(true);  // RG: Changed from deprecated method show();
+        frame.setVisible(true);  
         
     }
     
@@ -115,7 +115,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         ToolTipManager toolTipManager = ToolTipManager.sharedInstance();
         toolTipManager.registerComponent(tree);
         JFrame frame = wrapWithScrollingInFrame(tree, "tooltips");
-        frame.setVisible(true);  // RG: Changed from deprecated method show();
+        frame.setVisible(true);  
 
     }
     
@@ -145,7 +145,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         tree.setDragEnabled(true);
         tree.putClientProperty("JTree.lineStyle", "None");
         JFrame frame = wrapWithScrollingInFrame(tree, "LineStyle Test");
-        frame.setVisible(true);  // RG: Changed from deprecated method show();
+        frame.setVisible(true);  
     }
 
     /**    
@@ -225,7 +225,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         otherTree.setRootVisible(true);
         otherTree.setShowsRootHandles(false);
         JFrame frame = wrapWithScrollingInFrame(tree, otherTree, "ShowsRootHandles");
-        frame.setVisible(true);  // RG: Changed from deprecated method show();
+        frame.setVisible(true);  
     }
 
     protected void setUp() throws Exception {

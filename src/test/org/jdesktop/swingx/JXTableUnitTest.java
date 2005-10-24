@@ -10,6 +10,7 @@ package org.jdesktop.swingx;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.beans.PropertyChangeListener;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -508,11 +509,18 @@ public class JXTableUnitTest extends InteractiveTestCase {
      *
      */
     public void testLeadFocusCell() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run leadFocusCell - headless environment");
+            return;
+        }
         final JXTable table = new JXTable();
         table.setModel(createAscendingModel(0, 10));
-        // sort first column
-//        table.setSorter(0);
-        // select last rows
+        final JFrame frame = new JFrame();
+        frame.add(table);
+        frame.pack();
+        frame.setVisible(true);
+        table.requestFocus();
         table.addRowSelectionInterval(table.getRowCount() - 2, table.getRowCount() - 1);
         final int leadRow = table.getSelectionModel().getLeadSelectionIndex();
         int anchorRow = table.getSelectionModel().getAnchorSelectionIndex();
@@ -523,11 +531,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertEquals("anchor must be second last row", table.getRowCount() - 2, anchorRow);
         assertEquals("lead must be first column", 0, leadColumn);
         assertEquals("anchor must be first column", 0, anchorColumn);
-        final JFrame frame = new JFrame();
-        frame.add(table);
-        frame.pack();
-        frame.setVisible(true);
-        table.requestFocus();
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 ComponentAdapter adapter = table.getComponentAdapter();

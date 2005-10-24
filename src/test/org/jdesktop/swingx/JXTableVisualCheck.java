@@ -654,7 +654,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         };
         column.setCellRenderer(renderer);
         JFrame frame = wrapWithScrollingInFrame(table, "RendererSortingTest");
-        frame.setVisible(true);  // RG: Changed from deprecated method show();
+        frame.setVisible(true);  
     }
 
     /**
@@ -672,7 +672,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         };
         JXFrame frame = wrapWithScrollingInFrame(table, "ToggleSortingEnabled Test");
         addAction(frame, toggleSortableAction);
-        frame.setVisible(true);  // RG: Changed from deprecated method show();
+        frame.setVisible(true);  
         
     }
     public void interactiveTestTableSizing1() {

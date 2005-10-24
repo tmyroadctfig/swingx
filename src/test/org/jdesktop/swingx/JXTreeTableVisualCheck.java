@@ -147,8 +147,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         tree.setTreeCellRenderer(createRenderer());
         tree.setDefaultRenderer(Object.class, createTableRenderer(tree.getDefaultRenderer(Object.class)));
         JFrame frame = wrapWithScrollingInFrame(tree, "tooltips");
-        frame.setVisible(true);  // RG: Changed from deprecated method show();
-
+        frame.setVisible(true);  
     }
 
     private TableCellRenderer createTableRenderer(final TableCellRenderer delegate) {
