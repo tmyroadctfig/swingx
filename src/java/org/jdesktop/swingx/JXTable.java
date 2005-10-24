@@ -1561,7 +1561,7 @@ public class JXTable extends JTable {
                     updateState(matchRow);
                 }
             }
-            // JW: Needed to update if loop wasn't entered!
+            // KEEP - JW: Needed to update if loop wasn't entered!
             // the alternative is to go one off in the loop. Hmm - which is
             // preferable?
             // updateState(matchRow);
@@ -1725,6 +1725,12 @@ public class JXTable extends JTable {
             int row = lastSearchResult.foundRow;
             int column = lastSearchResult.foundColumn;
             Pattern pattern = lastSearchResult.pattern;
+            if ((row < 0) || (column < 0)) {
+                if (markByHighlighter()) {
+                    getSearchHighlighter().setPattern(null);
+                }
+                return;
+            }
             if (markByHighlighter()) {
                 Rectangle cellRect = getCellRect(row, column, true);
                 if (cellRect != null) {
@@ -1732,13 +1738,9 @@ public class JXTable extends JTable {
                 }
                 ensureInsertedSearchHighlighters();
                 // TODO (JW) - cleanup SearchHighlighter state management
-                if ((row >= 0) && (column >= 0)) {
-                    getSearchHighlighter().setPattern(pattern);
-                    int modelColumn = convertColumnIndexToModel(column);
-                    getSearchHighlighter().setHighlightCell(row, modelColumn);
-                } else {
-                    getSearchHighlighter().setPattern(null);
-                }
+                getSearchHighlighter().setPattern(pattern);
+                int modelColumn = convertColumnIndexToModel(column);
+                getSearchHighlighter().setHighlightCell(row, modelColumn);
             } else { // use selection
                 changeSelection(row, column, false, false);
                 if (!getAutoscrolls()) {
