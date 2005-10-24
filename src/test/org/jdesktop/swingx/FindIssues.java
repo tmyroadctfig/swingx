@@ -6,9 +6,6 @@
  */
 package org.jdesktop.swingx;
 
-import javax.swing.text.BadLocationException;
-
-import org.jdesktop.swingx.JXTable.TableSearchable;
 
 /**
  * Exposing open issues in Searchable implementations.

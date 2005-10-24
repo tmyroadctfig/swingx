@@ -22,11 +22,8 @@
 package org.jdesktop.swingx;
 
 import java.awt.Component;
-import java.awt.event.ActionEvent;
 import java.util.regex.Pattern;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;

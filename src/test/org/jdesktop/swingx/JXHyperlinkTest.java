@@ -18,7 +18,6 @@ import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.ListModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -76,10 +75,6 @@ public class JXHyperlinkTest extends InteractiveTestCase {
         EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
         JXTable table = new JXTable(createModelWithLinks());
         table.setDefaultLinkVisitor(visitor);
-//        table.setRolloverEnabled(true);
-//
-//        LinkRenderer editor = (LinkRenderer) table.getDefaultEditor(LinkModel.class);
-//        editor.setVisitingDelegate(visitor);
         JFrame frame = wrapWithScrollingInFrame(table, visitor.getOutputComponent(), "show link renderer in table");
         frame.setVisible(true);
 
@@ -148,7 +143,7 @@ public class JXHyperlinkTest extends InteractiveTestCase {
     }
 
     public static void main(String[] args) throws Exception {
-        setSystemLF(true);
+//        setSystemLF(true);
         JXHyperlinkTest test = new JXHyperlinkTest();
         try {
             test.runInteractiveTests();

@@ -21,25 +21,20 @@
 package org.jdesktop.swingx.action;
 
 import java.awt.event.ActionEvent;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-
-import java.net.MalformedURLException;
 import java.net.HttpURLConnection;
-import java.net.UnknownHostException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-
+import java.net.UnknownHostException;
 import java.security.AccessControlException;
-
-import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.AbstractAction;

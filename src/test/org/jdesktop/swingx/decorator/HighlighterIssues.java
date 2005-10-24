@@ -4,9 +4,6 @@
  */
 package org.jdesktop.swingx.decorator;
 
-import java.awt.Color;
-
-import javax.swing.JLabel;
 
 public class HighlighterIssues extends HighlighterTest {
 

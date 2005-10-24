@@ -21,15 +21,11 @@
 package org.jdesktop.swingx;
 
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 import javax.swing.JComponent;
-import javax.swing.JList;
-import javax.swing.JTable;
-import javax.swing.JTree;
 
 /**
  * Mouse/Motion/Listener which stores mouse location as 

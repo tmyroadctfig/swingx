@@ -22,9 +22,6 @@ package org.jdesktop.swingx;
 
 import java.awt.Dimension;
 import java.awt.Frame;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsEnvironment;
-import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 
 import javax.swing.Action;

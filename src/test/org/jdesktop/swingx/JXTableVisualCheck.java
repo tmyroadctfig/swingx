@@ -17,8 +17,6 @@ import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -34,7 +32,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JViewport;
 import javax.swing.ListSelectionModel;
-import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -75,8 +72,8 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*TableHeader.*");
 //          test.runInteractiveTests("interactive.*Multiple.*");
 //          test.runInteractiveTests("interactive.*RToL.*");
+//          test.runInteractiveTests("interactive.*Boolean.*");
           test.runInteractiveTests("interactive.*Compare.*");
-//          test.runInteractiveTests("interactive.*Focus.*");
           
 //          test.runInteractiveTests("interactive.*Column.*");
 //        test.runInteractiveTests("interactive.*isable.*");

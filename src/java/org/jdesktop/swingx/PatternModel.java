@@ -28,10 +28,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.swing.ActionMap;
-import javax.swing.UIManager;
-
-import org.jdesktop.swingx.action.AbstractActionExt;
-import org.jdesktop.swingx.action.BoundAction;
 
 /**
  * Presentation Model for Find/Filter Widgets. 

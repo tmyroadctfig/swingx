@@ -6,7 +6,6 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.net.URL;
@@ -15,7 +14,6 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
 
 /**

@@ -6,7 +6,6 @@
  */
 package org.jdesktop.swingx.decorator;
 
-import javax.swing.table.DefaultTableModel;
 
 /**
  * @author Jeanette Winzenburg

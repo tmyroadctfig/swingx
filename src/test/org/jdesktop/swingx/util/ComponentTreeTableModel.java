@@ -8,16 +8,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.TableModel;
-import javax.swing.tree.TreeModel;
 
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
