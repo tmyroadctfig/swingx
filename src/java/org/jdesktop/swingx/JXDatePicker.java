@@ -640,7 +640,6 @@ public class JXDatePicker extends JComponent {
     static class JXDatePickerFormatter extends
             JFormattedTextField.AbstractFormatter {
         private DateFormat _formats[] = null;
-        private int _formatIndex = 0;
 
         public JXDatePickerFormatter() {
             _formats = new DateFormat[3];
@@ -688,10 +687,6 @@ public class JXDatePicker extends JComponent {
             for (int i = 0; i < _formats.length; i++) {
                 try {
                     result = (_formats[i]).parse(text);
-
-                    // We got a successful formatter.  Update the
-                    // current formatter index.
-                    _formatIndex = i;
                     pex = null;
                     break;
                 } catch (ParseException ex) {
@@ -711,7 +706,7 @@ public class JXDatePicker extends JComponent {
          */
         public String valueToString(Object value) throws ParseException {
             if (value != null) {
-                return _formats[_formatIndex].format(value);
+                return _formats[0].format(value);
             }
             return null;
         }
