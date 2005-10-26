@@ -22,7 +22,6 @@
 package org.jdesktop.swingx.action;
 
 import java.awt.event.ItemListener;
-
 import java.beans.PropertyChangeListener;
 
 import javax.swing.AbstractAction;

@@ -22,10 +22,11 @@ package org.jdesktop.swingx.calendar;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+
 import javax.swing.JFormattedTextField;
+import javax.swing.UIManager;
 import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
-import javax.swing.UIManager;
 
 /**
  * Default formatter factory for the JXDatePicker component.  This factory

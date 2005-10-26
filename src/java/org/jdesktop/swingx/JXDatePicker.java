@@ -20,19 +20,47 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.text.ParseException;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.text.MessageFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
-import javax.swing.*;
+
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.Icon;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
-import javax.swing.border.*;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
 import javax.swing.text.DefaultFormatterFactory;
-import org.jdesktop.swingx.calendar.*;
+
+import org.jdesktop.swingx.calendar.DateSpan;
+import org.jdesktop.swingx.calendar.JXMonthView;
 
 /**
  * A component that combines a button, an editable field and a JXMonthView

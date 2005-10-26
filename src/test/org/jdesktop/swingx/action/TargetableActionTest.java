@@ -36,12 +36,6 @@ import org.jdesktop.swingx.JXEditorPane;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.JXTreeTable;
-import org.jdesktop.swingx.action.ActionContainerFactory;
-import org.jdesktop.swingx.action.ActionFactory;
-import org.jdesktop.swingx.action.ActionManager;
-import org.jdesktop.swingx.action.TargetManager;
-import org.jdesktop.swingx.action.Targetable;
-import org.jdesktop.swingx.action.TargetableAction;
 
 /**
  * A unit test for targetable actions.

@@ -21,6 +21,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 import org.jdesktop.swingx.util.PropertyChangeReport;
 
@@ -28,11 +30,32 @@ import org.jdesktop.swingx.util.PropertyChangeReport;
  * @author Jeanette Winzenburg
  */
 public class JXTitledPanelTest extends InteractiveTestCase {
+    // flag used in setup to explicitly choose LF
+    private boolean defaultToSystemLF;
+
+    protected void setUp() throws Exception {
+        super.setUp();
+        // make sure we have the same default for each test
+        defaultToSystemLF = false;
+        setSystemLF(defaultToSystemLF);
+    }
 
     public JXTitledPanelTest() {
         super("JXTitledPane interactive test");
     }
 
+    
+    public void testLayoutOnLFChange() {
+        JXTitledPanel titledPanel = new JXTitledPanel();
+        assertNotNull(titledPanel.getContentContainer());
+        titledPanel.getContentContainer().setLayout(new BorderLayout());
+        String lf = UIManager.getLookAndFeel().getName();
+        setSystemLF(!defaultToSystemLF);
+        assertFalse(lf.equals(UIManager.getLookAndFeel().getName()));
+        SwingUtilities.updateComponentTreeUI(titledPanel);
+        assertTrue(titledPanel.getContentContainer().getLayout() instanceof BorderLayout);
+    }
+    
     /**
      * Issue ??: notifications missing on all "title"XX properties.
      *

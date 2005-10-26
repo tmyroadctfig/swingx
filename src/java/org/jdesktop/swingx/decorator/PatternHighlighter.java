@@ -21,10 +21,9 @@
 
 package org.jdesktop.swingx.decorator;
 
+import java.awt.Color;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
-import java.awt.Color;
 
 /**
  * PatternHighlighter

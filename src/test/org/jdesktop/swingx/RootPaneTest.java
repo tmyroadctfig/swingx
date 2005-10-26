@@ -7,15 +7,15 @@
 
 package org.jdesktop.swingx;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -26,16 +26,13 @@ import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
-import org.jdesktop.swingx.JXFrame;
-import org.jdesktop.swingx.JXRootPane;
-import org.jdesktop.swingx.JXStatusBar;
+import junit.framework.TestCase;
+
 import org.jdesktop.swingx.event.MessageListener;
 import org.jdesktop.swingx.event.MessageSource;
 import org.jdesktop.swingx.event.MessageSourceSupport;
 import org.jdesktop.swingx.event.ProgressListener;
 import org.jdesktop.swingx.event.ProgressSource;
-
-import junit.framework.TestCase;
 
 public class RootPaneTest extends TestCase {
 

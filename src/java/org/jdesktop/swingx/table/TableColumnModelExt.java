@@ -23,6 +23,7 @@ package org.jdesktop.swingx.table;
 
 import java.util.List;
 import java.util.Set;
+
 import javax.swing.table.TableColumnModel;
 
 /**

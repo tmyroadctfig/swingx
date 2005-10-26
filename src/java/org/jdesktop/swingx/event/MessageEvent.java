@@ -22,7 +22,6 @@
 package org.jdesktop.swingx.event;
 
 import java.util.EventObject;
-
 import java.util.logging.Level;
 
 /**

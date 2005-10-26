@@ -20,8 +20,8 @@
 */
 package org.jdesktop.swingx.action;
 
-import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.AbstractButton;
 

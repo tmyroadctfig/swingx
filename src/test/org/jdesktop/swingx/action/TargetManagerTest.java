@@ -9,9 +9,6 @@ package org.jdesktop.swingx.action;
 
 import junit.framework.TestCase;
 
-import org.jdesktop.swingx.action.TargetManager;
-import org.jdesktop.swingx.action.Targetable;
-
 /**
  * Tests registration and command execution of the target manager.
  *

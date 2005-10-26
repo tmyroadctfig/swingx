@@ -28,8 +28,17 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javax.swing.*;
-import javax.swing.text.*;
+
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.ComboBoxEditor;
+import javax.swing.InputMap;
+import javax.swing.JComboBox;
+import javax.swing.JList;
+import javax.swing.KeyStroke;
+import javax.swing.UIManager;
+import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.JTextComponent;
 import javax.swing.text.TextAction;
 
 /**

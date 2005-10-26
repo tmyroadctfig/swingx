@@ -14,6 +14,7 @@ import java.awt.Insets;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.ResourceBundle;
+
 import javax.swing.ComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -21,7 +22,13 @@ import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
-import org.jdesktop.swingx.auth.*;
+
+import org.jdesktop.swingx.auth.DefaultUserNameStore;
+import org.jdesktop.swingx.auth.LoginEvent;
+import org.jdesktop.swingx.auth.LoginListener;
+import org.jdesktop.swingx.auth.LoginService;
+import org.jdesktop.swingx.auth.PasswordStore;
+import org.jdesktop.swingx.auth.UserNameStore;
 
 /**
  *  <p>JXLoginPanel is a JPanel that implements a Login dialog with

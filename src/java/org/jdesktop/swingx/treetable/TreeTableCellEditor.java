@@ -21,11 +21,11 @@
 
 package org.jdesktop.swingx.treetable;
 
-import java.util.EventObject;
-
 import java.awt.Component;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
+import java.util.EventObject;
+
 import javax.swing.DefaultCellEditor;
 import javax.swing.Icon;
 import javax.swing.JTable;

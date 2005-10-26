@@ -17,12 +17,6 @@ import javax.swing.JButton;
 
 import junit.framework.TestCase;
 
-import org.jdesktop.swingx.action.ActionFactory;
-import org.jdesktop.swingx.action.ActionManager;
-import org.jdesktop.swingx.action.BoundAction;
-import org.jdesktop.swingx.action.CompositeAction;
-import org.jdesktop.swingx.action.ServerAction;
-
 /**
  * Unit test driver for the ActionManager
  *

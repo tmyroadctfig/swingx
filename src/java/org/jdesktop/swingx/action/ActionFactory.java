@@ -25,8 +25,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.KeyStroke;
-import org.jdesktop.swingx.action.TargetableAction;
-import org.jdesktop.swingx.action.ServerAction;
 
 /**
  * A collection of static methods to make it easier to construct

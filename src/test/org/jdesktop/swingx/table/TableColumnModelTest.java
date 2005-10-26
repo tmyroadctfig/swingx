@@ -15,8 +15,6 @@ import javax.swing.table.TableColumnModel;
 
 import junit.framework.TestCase;
 
-import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
-import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.util.ColumnModelReport;
 
 /**

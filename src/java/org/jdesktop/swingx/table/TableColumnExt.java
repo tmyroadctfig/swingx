@@ -22,13 +22,13 @@
 package org.jdesktop.swingx.table;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
 import java.lang.reflect.Constructor;
-
 import java.util.Comparator;
 import java.util.Hashtable;
+
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+
 import org.jdesktop.swingx.decorator.Sorter;
 
 /**

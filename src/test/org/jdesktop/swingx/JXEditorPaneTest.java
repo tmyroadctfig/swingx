@@ -24,7 +24,6 @@ import javax.swing.text.html.HTMLDocument;
 
 import junit.framework.TestCase;
 
-import org.jdesktop.swingx.JXEditorPane;
 import org.jdesktop.swingx.action.ActionContainerFactory;
 import org.jdesktop.swingx.action.ActionFactory;
 import org.jdesktop.swingx.action.ActionManager;

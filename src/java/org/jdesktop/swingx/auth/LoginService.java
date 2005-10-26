@@ -20,9 +20,11 @@
  */
 package org.jdesktop.swingx.auth;
 
-import java.io.IOException;
-import java.util.*;
 import java.awt.EventQueue;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Vector;
+
 import javax.swing.SwingUtilities;
 /**
  * <b>LoginService</b> is the abstract base class for all classes implementing

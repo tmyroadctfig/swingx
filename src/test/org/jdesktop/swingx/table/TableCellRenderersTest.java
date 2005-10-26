@@ -8,11 +8,11 @@ import java.util.Date;
 
 import javax.swing.Icon;
 
+import junit.framework.TestCase;
+
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.LinkModel;
 import org.jdesktop.swingx.LinkRenderer;
-
-import junit.framework.TestCase;
 
 /**
  * @author Jeanette Winzenburg

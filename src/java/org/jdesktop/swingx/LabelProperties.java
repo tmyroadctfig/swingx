@@ -23,7 +23,6 @@ package org.jdesktop.swingx;
 
 import java.awt.Color;
 import java.awt.Font;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 

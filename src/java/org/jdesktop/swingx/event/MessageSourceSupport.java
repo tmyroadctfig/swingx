@@ -21,9 +21,9 @@
 
 package org.jdesktop.swingx.event;
 
-import javax.swing.event.EventListenerList;
-
 import java.util.logging.Level;
+
+import javax.swing.event.EventListenerList;
 
 /**
  * A helper class which is an implementation of a message source and a progress

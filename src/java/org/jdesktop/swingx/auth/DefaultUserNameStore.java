@@ -9,6 +9,7 @@ package org.jdesktop.swingx.auth;
 
 import java.beans.PropertyChangeSupport;
 import java.util.prefs.Preferences;
+
 import org.jdesktop.swingx.JXLoginPanel;
 
 /**

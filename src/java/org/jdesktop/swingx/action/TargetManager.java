@@ -22,19 +22,17 @@
 package org.jdesktop.swingx.action;
 
 import java.awt.Component;
-
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.Action;
 import javax.swing.ActionMap;
-import javax.swing.JComponent;
 import javax.swing.FocusManager;
+import javax.swing.JComponent;
 
 
 

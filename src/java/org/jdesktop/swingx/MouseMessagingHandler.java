@@ -22,15 +22,14 @@
 package org.jdesktop.swingx;
 
 import java.awt.Component;
-
-import java.awt.event.MouseEvent;
 import java.awt.event.MouseAdapter;
-
+import java.awt.event.MouseEvent;
 import java.util.logging.Level;
 
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.MenuElement;
+
 import org.jdesktop.swingx.event.MessageEvent;
 import org.jdesktop.swingx.event.MessageListener;
 import org.jdesktop.swingx.event.MessageSource;
