@@ -88,6 +88,10 @@ public class JXLoginDialog extends JDialog {
         initComponents();
     }
     
+    public JXLoginPanel getLoginPanel() {
+        return loginPanel;
+    }
+    
     private void initComponents() {
         //initialize dialog itself
         setModal(true);
