@@ -38,6 +38,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -62,7 +64,8 @@ import org.jdesktop.swingx.plaf.TitledPanelUI;
  * 
  */
 public abstract class BasicTitledPanelUI extends TitledPanelUI {
-    
+    private static final Logger LOG = Logger.getLogger(BasicTitledPanelUI.class
+            .getName());
     
 	/**
 	 * JLabel used for the title in the Title section of the JTitledPanel.
@@ -237,8 +240,7 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
                 }
             }
         } catch (Exception e) {
-            //should log this...TODO
-            e.printStackTrace();
+            LOG.log(Level.FINE, "Failed to install property " + propName, e);
         }
     }
 

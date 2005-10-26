@@ -45,6 +45,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -90,9 +92,9 @@ import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.PipelineEvent;
 import org.jdesktop.swingx.decorator.PipelineListener;
-import org.jdesktop.swingx.decorator.SizeSequenceMapper;
 import org.jdesktop.swingx.decorator.SearchHighlighter;
 import org.jdesktop.swingx.decorator.SelectionMapper;
+import org.jdesktop.swingx.decorator.SizeSequenceMapper;
 import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.icon.ColumnControlIcon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
@@ -204,6 +206,8 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * @author Jeanette Winzenburg
  */
 public class JXTable extends JTable { 
+    private static final Logger LOG = Logger.getLogger(JXTable.class.getName());
+    
     public static final String EXECUTE_BUTTON_ACTIONCOMMAND = "executeButtonAction";
 
     /**
@@ -773,7 +777,7 @@ public class JXTable extends JTable {
                 } catch (PrinterException ex) {
                     // REMIND(aim): should invoke pluggable application error
                     // handler
-                    ex.printStackTrace();
+                    LOG.log(Level.WARNING, "", ex);
                 }
             } else if ("find".equals(getName())) {
                 find();
@@ -2141,7 +2145,7 @@ public class JXTable extends JTable {
             try {
                 return (TableCellRenderer) renderer.getClass().newInstance();
             } catch (Exception e) {
-                e.printStackTrace();
+                LOG.fine("could not create renderer for " + columnClass);
             }
         }
         return null;
@@ -2403,14 +2407,14 @@ public class JXTable extends JTable {
                 return (SizeSequence) field.get(this);
             }
         } catch (SecurityException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.fine("cannot use reflection " +
+            " - expected behaviour in sandbox");
         } catch (IllegalArgumentException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.fine("problem while accessing super's private field - private api changed?");
         } catch (IllegalAccessException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.fine("cannot access private field " +
+                " - expected behaviour in sandbox. " +
+                "Could be program logic running wild in unrestricted contexts");
         }
         return null;
     }
@@ -2426,10 +2430,11 @@ public class JXTable extends JTable {
                 rowModelField.setAccessible(true);
             } catch (SecurityException e) {
                 rowModelField = null;
-                e.printStackTrace();
+                LOG.fine("cannot access JTable private field rowModel " +
+                                "- expected behaviour in sandbox");
             } catch (NoSuchFieldException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                LOG.fine("problem while accessing super's private field" +
+                                " - private api changed?");
             }
         }
         return rowModelField;

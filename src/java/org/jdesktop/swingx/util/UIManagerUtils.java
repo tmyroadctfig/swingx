@@ -22,6 +22,8 @@ package org.jdesktop.swingx.util;
 
 import java.awt.Font;
 import java.lang.reflect.Method;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
@@ -34,8 +36,12 @@ import javax.swing.text.html.HTMLDocument;
  * Utility for working with the UIManager
  * @author Richard Bair
  */
+// PENDING: JW - is this still used? Yes, by BasicTipOfTheDayUI
 public final class UIManagerUtils {
-	/**
+    
+    private static final Logger LOG = Logger.getLogger(UIManagerUtils.class
+            .getName());
+        /**
 	 * Hidden constructor
 	 */
 	private UIManagerUtils() {
@@ -110,7 +116,9 @@ public final class UIManagerUtils {
           null);
       } // end of if (doc != null)
     } catch (Exception e) {
-      e.printStackTrace();
+        // TODO change to something meaningful JW - when do we expect this to happen?
+        LOG.log(Level.WARNING, "", e);
+
     }
   }
 }

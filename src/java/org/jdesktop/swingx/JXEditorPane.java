@@ -37,6 +37,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -88,7 +90,8 @@ import org.jdesktop.swingx.action.Targetable;
  */
 public class JXEditorPane extends JEditorPane implements /*Searchable, */Targetable {
 
-//    private Matcher matcher;
+    private static final Logger LOG = Logger.getLogger(JXEditorPane.class
+            .getName());
 
     private UndoableEditListener undoHandler;
     private UndoManager undoManager;
@@ -251,7 +254,7 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
                 try {
                     undoManager.undo();
                 } catch (CannotUndoException ex) {
-                    ex.printStackTrace();
+                    LOG.info("Could not undo");
                 }
                 updateActionState();
             }
@@ -259,7 +262,7 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
                 try {
                     undoManager.redo();
                 } catch (CannotRedoException ex) {
-                    ex.printStackTrace();
+                    LOG.info("Could not redo");
                 }
                 updateActionState();
             } else if (ACTION_CUT.equals(name)) {
@@ -279,7 +282,7 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
                 map.put(ACTION_PASTE, this);
             }
             else {
-                System.out.println("ActionHandled: " + name);
+                LOG.fine("ActionHandled: " + name);
             }
 
         }
@@ -408,7 +411,8 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
                     }
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                // TODO change to something meaningful - when can this acutally happen?
+                LOG.log(Level.FINE, "What can produce a problem with data flavor?", ex);
             }
         }
     }
@@ -516,8 +520,9 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
 
             try {
                 getDocument().getText(start, length, segment);
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            } catch (BadLocationException ex) {
+                LOG.log(Level.FINE,
+                        "this should not happen (calculated the valid start/length) " , ex);
             }
 
             Matcher matcher = pattern.matcher(segment.toString());
@@ -552,8 +557,9 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
 
             try {
                 getDocument().getText(start, length, segment);
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            } catch (BadLocationException ex) {
+                LOG.log(Level.FINE,
+                        "this should not happen (calculated the valid start/length) " , ex);
             }
             Matcher matcher = pattern.matcher(segment.toString());
             MatchResult currentResult = getMatchResult(matcher, true);

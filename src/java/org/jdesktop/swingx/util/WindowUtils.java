@@ -31,6 +31,8 @@ import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
@@ -46,7 +48,8 @@ import javax.swing.SwingUtilities;
  * @author Richard Bair
  */
 public final class WindowUtils {
-	
+	private static final Logger LOG = Logger.getLogger(WindowUtils.class
+                .getName());
 	/**
 	 * Hide the constructor - don't wan't anybody creating an instance of this
 	 */
@@ -89,8 +92,8 @@ public final class WindowUtils {
                 }
             }
         } catch (Exception e) {
-            //this can occur do to a Security exception in sandboxed apps
-            e.printStackTrace();
+            LOG.log(Level.FINE, e.getLocalizedMessage() +
+                    " - this can occur do to a Security exception in sandboxed apps");
         }
 		return new Point(0,0);
 	}
@@ -132,8 +135,8 @@ public final class WindowUtils {
                 }
             }
         } catch (Exception e) {
-            //this can occur do to a Security exception in sandboxed apps
-            e.printStackTrace();
+            LOG.log(Level.FINE, e.getLocalizedMessage() +
+            " - this can occur do to a Security exception in sandboxed apps");
         }
 		return new Point(0,0);
 	}

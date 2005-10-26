@@ -36,6 +36,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -51,7 +53,8 @@ import javax.swing.Icon;
  */
 public class ServerAction extends AbstractAction {
     // Server action support
-
+    private static final Logger LOG = Logger.getLogger(ServerAction.class
+            .getName());
     private static final String PARAMS = "action-params";
     private static final String HEADERS = "action-headers";
     private static final String URL = "action-url";
@@ -198,7 +201,7 @@ public class ServerAction extends AbstractAction {
 		}
 
 	    } catch (MalformedURLException ex) {
-		ex.printStackTrace();
+		LOG.log(Level.WARNING, "something went wrong...", ex);
 	    }
 	}
 
@@ -255,23 +258,18 @@ public class ServerAction extends AbstractAction {
             // RG: Fix for J2SE 5.0; Can't cascade append() calls because
             // return type in StringBuffer and AbstractStringBuilder are different
 		    buffer.append(line);
-            buffer.append('\n');
+                    buffer.append('\n');
 		}
-		if (Debug.debug) {
-		    // XXX So now that we have results in the StringBuffer, we should do something
-		    // with it.
-		    System.out.println(buffer.toString());
-		}
+            // JW: this used the Debug - maybe use finest level?    
+            LOG.finer("returned from connection\n" + buffer.toString());    
 	    }
-	} catch (UnknownHostException uhe) {
-	    Debug.printException("UnknownHostException detected. Could it be a proxy issue?\n" +
-				 uhe.getMessage(), uhe);
-	} catch (AccessControlException aex) {
-	    Debug.printException("AccessControlException detected\n" +
-			    aex.getMessage(), aex);
+	} catch (UnknownHostException ex) {
+            LOG.log(Level.WARNING, "UnknownHostException detected. Could it be a proxy issue?", ex);
+            
+	} catch (AccessControlException ex) {
+            LOG.log(Level.WARNING, "AccessControlException detected", ex);
 	} catch (IOException ex) {
-	    Debug.printException("IOException detected\n" +
-				 ex.getMessage(), ex);
+            LOG.log(Level.WARNING, "IOException detected", ex);
 	}
     }
 
@@ -302,9 +300,8 @@ public class ServerAction extends AbstractAction {
 	    // Replace the first & with a ?
 	    postData.setCharAt(0, '?');
 	}
-	if (Debug.debug) {
-	    System.out.println("ServerAction: POST data: " + postData.toString());
-	}
+	
+	LOG.finer("ServerAction: POST data: " + postData.toString());
 	return postData.toString();
     }
 

@@ -20,6 +20,9 @@
  */
 package org.jdesktop.swingx.auth;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
@@ -38,6 +41,8 @@ import javax.security.auth.login.LoginException;
  * @author Bino George
  */
 public class JAASLoginService extends LoginService {
+    private static final Logger LOG = Logger.getLogger(JAASLoginService.class
+            .getName());
 
 	/**
 	 * Constructor for <b>JAASLoginService</b>
@@ -61,24 +66,24 @@ public class JAASLoginService extends LoginService {
 			loginContext.login();
 			return true;
 		} catch (AccountExpiredException e) {
-			// TODO log
-			e.printStackTrace();
+			// TODO add explanation?
+			LOG.log(Level.WARNING, "", e);
 			return false;
 		} catch (CredentialExpiredException e) {
-			// TODO log
-			e.printStackTrace();
+                        // TODO add explanation?
+                        LOG.log(Level.WARNING, "", e);
 			return false;
 		} catch (FailedLoginException e) {
-			// TODO log
-			e.printStackTrace();
+                        // TODO add explanation?
+                        LOG.log(Level.WARNING, "", e);
 			return false;
 		} catch (LoginException e) {
-			// TODO log
-			e.printStackTrace();
+                        // TODO add explanation?
+                        LOG.log(Level.WARNING, "", e);
 			return false;
 		} catch (Throwable e) {
-			// TODO log
-			e.printStackTrace();
+                        // TODO add explanation?
+                        LOG.log(Level.WARNING, "", e);
 			return false;
 		}
 	}

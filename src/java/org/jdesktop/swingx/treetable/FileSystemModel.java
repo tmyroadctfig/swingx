@@ -22,10 +22,10 @@
 package org.jdesktop.swingx.treetable;
 
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.tree.TreeNode;
-
-import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 
 /**
  * FileSystemModel
@@ -33,6 +33,8 @@ import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
  * @author Ramesh Gupta
  */
 public class FileSystemModel extends DefaultTreeTableModel {
+    private static final Logger LOG = Logger.getLogger(FileSystemModel.class
+            .getName());
     protected boolean asksAllowsChildren;
 
     public FileSystemModel() {
@@ -101,7 +103,8 @@ public class FileSystemModel extends DefaultTreeTableModel {
 	    }
 	}
 	catch  (Exception ex) {
-	    ex.printStackTrace();
+                LOG.log(Level.WARNING, "Problem accessing file", ex);
+
 	}
 
 	return null;

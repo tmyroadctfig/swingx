@@ -32,6 +32,8 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.crypto.spec.SecretKeySpec;
 
@@ -56,7 +58,10 @@ import javax.crypto.spec.SecretKeySpec;
  * @author Bino George
  */
 public class KeyChain {
-	private KeyStore store;
+    private static final Logger LOG = Logger
+            .getLogger(KeyChain.class.getName());
+    
+    private KeyStore store;
 
 	private char[] masterPassword;
 
@@ -76,14 +81,14 @@ public class KeyChain {
 			store = KeyStore.getInstance("JCEKS");
 			store.load(inputStream, masterPassword);
 
-		} catch (KeyStoreException e) {
-			e.printStackTrace();
-		} catch (CertificateException e) {
-			e.printStackTrace();
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		} catch (EOFException e) {
-			e.printStackTrace();
+		} catch (KeyStoreException ex) {
+			LOG.log(Level.WARNING, "", ex);
+		} catch (CertificateException ex) {
+                        LOG.log(Level.WARNING, "", ex);
+		} catch (NoSuchAlgorithmException ex) {
+                        LOG.log(Level.WARNING, "", ex);
+		} catch (EOFException ex) {
+                        LOG.log(Level.WARNING, "", ex);
 		}
 
 	}
@@ -103,12 +108,12 @@ public class KeyChain {
 					.getEntry(user + "@" + server,
 							new KeyStore.PasswordProtection(masterPassword));
 			return new String(entry2.getSecretKey().getEncoded());
-		} catch (KeyStoreException e) {
-			e.printStackTrace();
-		} catch (UnrecoverableEntryException ce) {
-			ce.printStackTrace();
-		} catch (NoSuchAlgorithmException ne) {
-			ne.printStackTrace();
+		} catch (KeyStoreException ex) {
+			LOG.log(Level.WARNING, "", ex);
+		} catch (UnrecoverableEntryException ex) {
+			LOG.log(Level.WARNING, "", ex);
+		} catch (NoSuchAlgorithmException ex) {
+			LOG.log(Level.WARNING, "", ex);
 		}
 
 		return null;
@@ -130,7 +135,7 @@ public class KeyChain {
 			store.setEntry(user + "@" + server, entry,
 					new KeyStore.PasswordProtection(masterPassword));
 		} catch (KeyStoreException e) {
-			e.printStackTrace();
+			LOG.log(Level.WARNING, "", e);
 		}
 	}
 
@@ -144,7 +149,7 @@ public class KeyChain {
 		try {
 			store.deleteEntry(user + "@" + server);
 		} catch (KeyStoreException e) {
-			e.printStackTrace();
+			LOG.log(Level.WARNING, "", e);
 		}
 	}
 
@@ -158,12 +163,12 @@ public class KeyChain {
 	public void store(OutputStream ostream) throws IOException {
 		try {
 			store.store(ostream, masterPassword);
-		} catch (KeyStoreException e) {
-			e.printStackTrace();
-		} catch (CertificateException ce) {
-			ce.printStackTrace();
-		} catch (NoSuchAlgorithmException ne) {
-			ne.printStackTrace();
+		} catch (KeyStoreException ex) {
+                        LOG.log(Level.WARNING, "", ex);
+		} catch (CertificateException ex) {
+                        LOG.log(Level.WARNING, "", ex);
+		} catch (NoSuchAlgorithmException ex) {
+                        LOG.log(Level.WARNING, "", ex);
 		}
 	}
 
@@ -180,20 +185,20 @@ public class KeyChain {
 			}
 			KeyChain kc = new KeyChain("test".toCharArray(), fis);
 			kc.addPassword("bino", "sun-ds.sfbay", "test123".toCharArray());
-			System.out.println("pass = "
+			LOG.fine("pass = "
 					+ kc.getPassword("bino", "sun-ds.sfbay"));
 
-			System.out.println("More testing :");
+			LOG.fine("More testing :");
 			for (int i = 0; i < 100; i++) {
 				kc.addPassword("" + i, "sun-ds.sfbay", ("" + i).toCharArray());
 			}
 			for (int i = 0; i < 100; i++) {
-				System.out.println("key =" + i + " pass ="
+				LOG.fine("key =" + i + " pass ="
 						+ kc.getPassword("" + i, "sun-ds.sfbay"));
 			}
 			kc.store(new FileOutputStream(file));
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.log(Level.WARNING, "", e);
 		}
 	}
 	

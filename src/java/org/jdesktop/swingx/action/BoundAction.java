@@ -28,6 +28,8 @@ import java.awt.event.ItemListener;
 import java.beans.EventHandler;
 import java.beans.Statement;
 import java.util.EventListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.Icon;
 import javax.swing.event.EventListenerList;
@@ -42,7 +44,8 @@ import javax.swing.event.EventListenerList;
  * @author Mark Davidson
  */
 public class BoundAction extends AbstractActionExt {
-
+    private static final Logger LOG = Logger.getLogger(BoundAction.class
+            .getName());
     // Holds the listeners
     private EventListenerList listeners;
 
@@ -100,7 +103,7 @@ public class BoundAction extends AbstractActionExt {
 
 		registerCallback(obj, elems[1]);
 	    } catch (Exception ex) {
-		System.out.println("ERROR: setCallback(" + callback
+		LOG.fine("ERROR: setCallback(" + callback
 				   + ") - " + ex.getMessage());
 	    }
 	}
@@ -151,15 +154,17 @@ public class BoundAction extends AbstractActionExt {
 	}
 
 	public void itemStateChanged(ItemEvent evt) {
-	    Statement statement = (evt.getStateChange() == ItemEvent.DESELECTED) ? 
-		falseStatement : trueStatement;
-	    
-	    try {
-		statement.execute();
-	    } catch (Exception ex) {
-		ex.printStackTrace();
-	    }
-	}
+            Statement statement = (evt.getStateChange() == ItemEvent.DESELECTED) ? falseStatement
+                    : trueStatement;
+
+            try {
+                statement.execute();
+            } catch (Exception ex) {
+                LOG.log(Level.FINE,
+                        "Couldn't execute boolean method via Statement "
+                                + statement, ex);
+            }
+        }
     }
 
     // Listener registration...

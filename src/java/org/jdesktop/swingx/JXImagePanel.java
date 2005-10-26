@@ -31,15 +31,13 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
-
-import static org.jdesktop.swingx.JXImagePanel.Style.CENTERED;
-import static org.jdesktop.swingx.JXImagePanel.Style.SCALED;
-import static org.jdesktop.swingx.JXImagePanel.Style.TILED;
 
 
 /**
@@ -62,7 +60,8 @@ import static org.jdesktop.swingx.JXImagePanel.Style.TILED;
  */
 public class JXImagePanel extends JXPanel {
     public static enum Style {CENTERED, TILED, SCALED};
-    
+    private static final Logger LOG = Logger.getLogger(JXImagePanel.class
+            .getName());
     /**
      * Text informing the user that clicking on this component will allow them to set the image
      */
@@ -99,8 +98,8 @@ public class JXImagePanel extends JXPanel {
         try {
             setImage((BufferedImage)new ImageIcon(imageUrl).getImage());
         } catch (Exception e) {
-            //TODO need to log
-            e.printStackTrace();
+            //TODO need convert to something meaningful
+           LOG.log(Level.WARNING, "", e);
         }
     }
     
@@ -230,7 +229,7 @@ public class JXImagePanel extends JXPanel {
                             (getHeight() - temp.getHeight(null)) / 2, null);
                     break;
                 default:
-                    System.err.println("unimplemented");
+                    LOG.fine("unimplemented");
                     g2.drawImage(img, null, 0, 0);
                     break;
             }

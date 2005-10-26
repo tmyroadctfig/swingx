@@ -71,7 +71,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*Multiple.*");
 //          test.runInteractiveTests("interactive.*RToL.*");
 //          test.runInteractiveTests("interactive.*Boolean.*");
-          test.runInteractiveTests("interactive.*Compare.*");
+          test.runInteractiveTests("interactive.*RowHeight.*");
           
 //          test.runInteractiveTests("interactive.*Column.*");
 //        test.runInteractiveTests("interactive.*isable.*");
@@ -192,10 +192,19 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     }
 
     public void interactiveTestRowHeight() {
-        JXTable table = new JXTable(sortableTableModel);
+        final JXTable table = new JXTable(sortableTableModel);
         table.setRowHeightEnabled(true);
         table.setRowHeight(0, table.getRowHeight() * 2);
-        JFrame frame = wrapWithScrollingInFrame(table, "Individual rowheight");
+        JXFrame frame = wrapWithScrollingInFrame(table, "Individual rowheight");
+        Action temp = new AbstractAction("empty selection") {
+
+            public void actionPerformed(ActionEvent e) {
+                table.changeSelection(-1, -1, false, false);
+                
+            }
+            
+        };
+        addAction(frame, temp);
         frame.setVisible(true);
     }
     

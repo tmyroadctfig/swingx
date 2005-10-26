@@ -25,6 +25,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.logging.Logger;
 
 /**
  * An bean which represents an URL link.
@@ -35,6 +36,9 @@ import java.net.URL;
  * @author Jeanette Winzenburg
  */
 public class LinkModel implements Comparable {
+
+    private static final Logger LOG = Logger.getLogger(LinkModel.class
+            .getName());
 
     private String text; // display text
 
@@ -47,12 +51,13 @@ public class LinkModel implements Comparable {
     private PropertyChangeSupport propertyChangeSupport;
 
     public static final String VISITED_PROPERTY = "visited";
+
     // hack - this class assumes that the url always != null
     // need to cleanup
     private static String defaultURLString = "https://jdnc.dev.java.net";
 
     private static URL defaultURL;
-    
+
     /**
      * 
      * @param text
@@ -68,16 +73,13 @@ public class LinkModel implements Comparable {
     public LinkModel(String text) {
         this(text, null, null);
     }
+
     /**
-     * @param text
-     *            text to that a renderer would display
-     * @param target
-     *            the target that a URL should load into.
-     * @param template
-     *            a string that represents a URL with
+     * @param text text to that a renderer would display
+     * @param target the target that a URL should load into.
+     * @param template a string that represents a URL with
      * @{N} place holders for string substitution
-     * @param args
-     *            an array of strings which will be used for substitition
+     * @param args an array of strings which will be used for substitition
      */
     public LinkModel(String text, String target, String template, String[] args) {
         setText(text);
@@ -109,7 +111,8 @@ public class LinkModel implements Comparable {
             url = new URL(howToURLString);
         } catch (MalformedURLException e) {
             url = getDefaultURL();
-            e.printStackTrace();
+            LOG.warning("the given urlString is malformed: " + howToURLString + 
+                    "\n falling back to default url: " + url);
         }
         setURL(url);
     }
@@ -119,8 +122,8 @@ public class LinkModel implements Comparable {
             try {
                 defaultURL = new URL(defaultURLString);
             } catch (MalformedURLException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                LOG.fine("should not happen - defaultURL is wellFormed: "
+                        + defaultURLString);
             }
         }
         return defaultURL;
@@ -132,12 +135,13 @@ public class LinkModel implements Comparable {
      * Think: keep list of visited urls here?
      */
     public void setURL(URL url) {
-         if (url == null) {
+        if (url == null) {
             throw new IllegalArgumentException("URL for link cannot be null");
         }
-         if (url.equals(getURL())) return;
-         URL old = getURL();
-         this.url = url;
+        if (url.equals(getURL()))
+            return;
+        URL old = getURL();
+        this.url = url;
         firePropertyChange("URL", old, url);
         setVisited(false);
     }
@@ -158,10 +162,8 @@ public class LinkModel implements Comparable {
      *      arg array contains: java, classes_swing The resulting URL will be:
      *      http://bugz.sfbay/cgi-bin/showbug?cat=java&sub_cat=classes_swing
      *      <p>
-     * @param template
-     *            a url string that contains the placeholders
-     * @param args
-     *            an array of strings that will be substituted
+     * @param template a url string that contains the placeholders
+     * @param args an array of strings that will be substituted
      */
     private URL createURL(String template, String[] args) {
         URL url = null;
@@ -206,41 +208,47 @@ public class LinkModel implements Comparable {
     public void setVisited(boolean visited) {
         boolean old = getVisited();
         this.visited = visited;
-        firePropertyChange(VISITED_PROPERTY , old, getVisited());
+        firePropertyChange(VISITED_PROPERTY, old, getVisited());
     }
 
     public boolean getVisited() {
         return visited;
     }
 
-//---------------------- property change notification
-    
+    // ---------------------- property change notification
+
     public void addPropertyChangeListener(PropertyChangeListener l) {
         getPropertyChangeSupport().addPropertyChangeListener(l);
-        
+
     }
-    
+
     public void removePropertyChangeListener(PropertyChangeListener l) {
-        if (propertyChangeSupport == null) return;
+        if (propertyChangeSupport == null)
+            return;
         propertyChangeSupport.removePropertyChangeListener(l);
     }
-    
-    protected void firePropertyChange(String property, Object oldValue, Object newValue) {
-        if (propertyChangeSupport == null) return;
+
+    protected void firePropertyChange(String property, Object oldValue,
+            Object newValue) {
+        if (propertyChangeSupport == null)
+            return;
         propertyChangeSupport.firePropertyChange(property, oldValue, newValue);
     }
-    
-    protected void firePropertyChange(String property, boolean oldValue, boolean newValue) {
-        if (propertyChangeSupport == null) return;
+
+    protected void firePropertyChange(String property, boolean oldValue,
+            boolean newValue) {
+        if (propertyChangeSupport == null)
+            return;
         propertyChangeSupport.firePropertyChange(property, oldValue, newValue);
-        
+
     }
+
     private PropertyChangeSupport getPropertyChangeSupport() {
-     if (propertyChangeSupport == null) {
-         propertyChangeSupport = new PropertyChangeSupport(this);
-     }
-    return propertyChangeSupport;
-}
+        if (propertyChangeSupport == null) {
+            propertyChangeSupport = new PropertyChangeSupport(this);
+        }
+        return propertyChangeSupport;
+    }
 
     // Comparable interface for sorting.
     public int compareTo(Object obj) {
