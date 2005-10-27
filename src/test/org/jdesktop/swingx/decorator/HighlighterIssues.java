@@ -8,9 +8,9 @@ package org.jdesktop.swingx.decorator;
 public class HighlighterIssues extends HighlighterTest {
 
     /**
-     * Issue #??-swingx: Highlighters always change the selection color.
+     * Issue #178-swingx: Highlighters always change the selection color.
      */
-    public void testUnselectedDoNothingHighlighter() {
+    public void testSelectedDoNothingHighlighter() {
         ComponentAdapter adapter = createComponentAdapter(allColored, true);
         emptyHighlighter.highlight(allColored, adapter);
         assertEquals("default highlighter must not change foreground", foreground, allColored.getForeground());

@@ -404,10 +404,10 @@ public class HighlighterTest extends TestCase {
 
  
     /**
-     * Issue #??-swingx: Highlighters always change the selection color.
+     * Issue #178-swingx: Highlighters always change the selection color.
      * sanity test to see if non-selected colors are unchanged.
      */
-    public void testSelectedDoNothingHighlighter() {
+    public void testUnSelectedDoNothingHighlighter() {
         ComponentAdapter adapter = createComponentAdapter(allColored, false);
         emptyHighlighter.highlight(allColored, adapter);
         assertEquals("default highlighter must not change foreground", foreground, allColored.getForeground());
