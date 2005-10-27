@@ -1,6 +1,6 @@
 /*
  * $Id$
- * 
+ *
  * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
  * Santa Clara, California 95054, U.S.A. All rights reserved.
  *
@@ -8,50 +8,25 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 package org.jdesktop.swingx.calendar;
 
-import java.awt.AWTEvent;
-import java.awt.Color;
-import java.awt.ComponentOrientation;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.GradientPaint;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Insets;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.text.DateFormatSymbols;
+import java.awt.*;
+import java.awt.event.*;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.TimeZone;
-
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.ImageIcon;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
+import java.text.DateFormatSymbols;
+import java.util.*;
+import javax.swing.*;
 import javax.swing.Timer;
-import javax.swing.UIManager;
 import javax.swing.border.Border;
 
 
@@ -60,7 +35,7 @@ import javax.swing.border.Border;
  * or range of days.  By default the <code>JXMonthView</code> will display a
  * single calendar using the current month and year, using
  * <code>Calendar.SUNDAY</code> as the first day of the week.
- * <p> 
+ * <p>
  * The <code>JXMonthView</code> can be configured to display more than one
  * calendar at a time by calling
  * <code>setPreferredCalCols</code>/<code>setPreferredCalRows</code>.  These
@@ -90,9 +65,9 @@ import javax.swing.border.Border;
  *            new String[]{"S", "M", "T", "W", "Th", "F", "S"});
  * </pre>
  * <p>
- * This component supports flagging days.  These flagged days, which must be
- * provided in sorted order, are displayed in a bold font.  This can be used to
- * inform the user of such things as scheduled appointment.
+ * This component supports flagging days.  These flagged days are displayed
+ * in a bold font.  This can be used to inform the user of such things as
+ * scheduled appointment.
  * <pre>
  *    // Create some dates that we want to flag as being important.
  *    Calendar cal1 = Calendar.getInstance();
@@ -106,8 +81,6 @@ import javax.swing.border.Border;
  *        System.currentTimeMillis()
  *    };
  *
- *    // Sort them in ascending order.
- *    java.util.Arrays.sort(flaggedDates);
  *    monthView.setFlaggedDates(flaggedDates);
  * </pre>
  * Applications may have the need to allow users to select different ranges of
@@ -149,6 +122,9 @@ public class JXMonthView extends JComponent {
     public static final int MONTH_DOWN = 1;
     /** Return value used to identify when the month up button is pressed. */
     public static final int MONTH_UP = 2;
+
+    /** Formatter used to format the day of the week to a numerical value. */
+    protected static final SimpleDateFormat _dayOfMonthFormatter = new SimpleDateFormat("d");
 
     /**
      * Insets used in determining the rectangle for the month string
@@ -197,7 +173,7 @@ public class JXMonthView extends JComponent {
     private int _minCalCols = 1;
     private int _minCalRows = 1;
     private long _today;
-    private long[] _flaggedDates;
+    private HashSet<Long> _flaggedDates;
     private int _selectionMode = SINGLE_SELECTION;
     private int _boxHeight;
     private int _boxWidth;
@@ -225,7 +201,6 @@ public class JXMonthView extends JComponent {
     private Color _monthStringForeground;
     private Color _daysOfTheWeekForeground;
     private Color _selectedBackground;
-    private SimpleDateFormat _dayOfMonthFormatter = new SimpleDateFormat("d");
     private String _actionCommand = "selectionChanged";
     private Timer _todayTimer = null;
     private ImageIcon _monthDownImage;
@@ -295,7 +270,7 @@ public class JXMonthView extends JComponent {
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "selectNextDay");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, false), "selectDayInPreviousWeek");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, false), "selectDayInNextWeek");
-        
+
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.SHIFT_MASK, false), "addPreviousDay");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.SHIFT_MASK, false), "addNextDay");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.SHIFT_MASK, false), "addToPreviousWeek");
@@ -329,7 +304,7 @@ public class JXMonthView extends JComponent {
         actionMap.put("addNextDay", new KeyboardAction(KeyboardAction.ADD_NEXT_DAY));
         actionMap.put("addToPreviousWeek", new KeyboardAction(KeyboardAction.ADD_TO_PREVIOUS_WEEK));
         actionMap.put("addToNextWeek", new KeyboardAction(KeyboardAction.ADD_TO_NEXT_WEEK));
-        
+
         updateUI();
     }
 
@@ -363,7 +338,7 @@ public class JXMonthView extends JComponent {
             color = new Color(68, 68, 68);
         }
         setMonthStringForeground(color);
-        
+
         color = UIManager.getColor("JXMonthView.daysOfTheWeekForeground");
         if (color == null) {
             color = new Color(68, 68, 68);
@@ -517,7 +492,7 @@ public class JXMonthView extends JComponent {
      * will be used.  If we are in WEEK_SELECTION mode the span will be
      * modified to be valid if necessary.
      *
-     * @param dateSpan DateSpan defining the selected dates.  Passing 
+     * @param dateSpan DateSpan defining the selected dates.  Passing
      * <code>null</code> will clear the selection.
      */
     public void setSelectedDateSpan(DateSpan dateSpan) {
@@ -619,41 +594,55 @@ public class JXMonthView extends JComponent {
     }
 
     /**
-     * An array of longs defining days that should be flagged.  This array is
-     * assumed to be in sorted order from least to greatest.
+     * Identifies whether or not the date passed is a flagged date.
+     *
+     * @param date date which to test for flagged status
+     * @return true if the date is flagged, false otherwise
+     */
+    protected boolean isFlaggedDate(long date) {
+        boolean result = false;
+        if (_flaggedDates != null) {
+            result = _flaggedDates.contains(date);
+        }
+        return result;
+    }
+
+    /**
+     * An array of longs defining days that should be flagged.
+     *
+     * @param flaggedDates the dates to be flagged
      */
     public void setFlaggedDates(long[] flaggedDates) {
-        _flaggedDates = flaggedDates;
-
         if (_flaggedDates == null) {
-            repaint();
-            return;
+            _flaggedDates = null;
+        } else {
+            _flaggedDates = new HashSet<Long>();
+
+            // Loop through the flaggedDates and set the hour, minute, seconds and
+            // milliseconds to 0 so we can compare times later.
+            for (long flaggedDate : flaggedDates) {
+                _cal.setTimeInMillis(flaggedDate);
+
+                // We only want to compare the day, month and year
+                // so reset all other values to 0.
+                _cal.set(Calendar.HOUR_OF_DAY, 0);
+                _cal.set(Calendar.MINUTE, 0);
+                _cal.set(Calendar.SECOND, 0);
+                _cal.set(Calendar.MILLISECOND, 0);
+
+                _flaggedDates.add(_cal.getTimeInMillis());
+            }
+
+            // Restore the time.
+            _cal.setTimeInMillis(_firstDisplayedDate);
         }
-
-        // Loop through the flaggedDates and set the hour, minute, seconds and
-        // milliseconds to 0 so we can compare times later.
-        for (int i = 0; i < _flaggedDates.length; i++) {
-            _cal.setTimeInMillis(_flaggedDates[i]);
-
-            // We only want to compare the day, month and year
-            // so reset all other values to 0.
-            _cal.set(Calendar.HOUR_OF_DAY, 0);
-            _cal.set(Calendar.MINUTE, 0);
-            _cal.set(Calendar.SECOND, 0);
-            _cal.set(Calendar.MILLISECOND, 0);
-
-            _flaggedDates[i] = _cal.getTimeInMillis();
-        }
-
-        // Restore the time.
-        _cal.setTimeInMillis(_firstDisplayedDate);
 
         repaint();
     }
 
     /**
      * Returns the padding used between days in the calendar.
-     */ 
+     */
     public int getBoxPaddingX() {
         return _boxPaddingX;
     }
@@ -671,7 +660,7 @@ public class JXMonthView extends JComponent {
 
     /**
      * Returns the padding used above and below days in the calendar.
-     */ 
+     */
     public int getBoxPaddingY() {
         return _boxPaddingY;
     }
@@ -726,9 +715,6 @@ public class JXMonthView extends JComponent {
                     "Array of days is not of length " + DAYS_IN_WEEK + " as expected.");
         }
 
-        // TODO: This could throw off internal size information we should
-        // call update and then recalculate displayed calendars and start
-        // positions.
         _daysOfTheWeek = days;
         _dirty = true;
         repaint();
@@ -858,7 +844,7 @@ public class JXMonthView extends JComponent {
     /**
      * Sets the color used to draw the bounding box around today.  The default
      * is the background of the <code>JXMonthView</code> component.
-     * 
+     *
      * @param c color to set
      */
     public void setTodayBackground(Color c) {
@@ -916,7 +902,7 @@ public class JXMonthView extends JComponent {
         _daysOfTheWeekForeground = c;
         repaint();
     }
-    
+
     /**
      * @return Color Color
      */
@@ -945,11 +931,22 @@ public class JXMonthView extends JComponent {
      */
     public Color getDayForeground(int dayOfWeek) {
         Color c;
-        c = (Color)_dayToColorTable.get(dayOfWeek);
+        c = _dayToColorTable.get(dayOfWeek);
         if (c == null) {
             c = getForeground();
         }
         return c;
+    }
+
+    /**
+     * Convenience method so subclasses can get the currently painted day's day of the
+     * week. It is assumed the calendar, _cal, is already set to the correct day.
+     *
+     * @see java.util.Calendar
+     * @return day of the week (Calendar.SATURDAY, Calendar.SUNDAY, ...)
+     */
+    protected int getDayOfTheWeek() {
+        return _cal.get(Calendar.DAY_OF_WEEK);
     }
 
     /**
@@ -1158,7 +1155,7 @@ public class JXMonthView extends JComponent {
         _cal.setTimeInMillis(_today);
         _cal.add(Calendar.DAY_OF_MONTH, 1);
         _today = _cal.getTimeInMillis();
-        
+
         // Restore calendar.
         _cal.setTimeInMillis(_firstDisplayedDate);
         repaint();
@@ -1402,9 +1399,9 @@ public class JXMonthView extends JComponent {
                     FontMetrics oldFM = fm;
                     g.setFont(_derivedFont);
                     fm = getFontMetrics(_derivedFont);
-                    
+
                     g.setColor(_monthStringForeground);
-                    tmpX = _ltr ? 
+                    tmpX = _ltr ?
                             x + (_calendarWidth / 2) -
                                 (fm.stringWidth(monthName) / 2) :
                             x - (_calendarWidth / 2) -
@@ -1484,7 +1481,7 @@ public class JXMonthView extends JComponent {
                 // the calendar forward a month as it would have if paintMonth
                 // was called.
                 if (_bounds.intersects(clip)) {
-                    paintMonth(g, column, row);
+                    paintMonth(g);
                 } else {
                     _cal.add(Calendar.MONTH, 1);
                 }
@@ -1508,31 +1505,22 @@ public class JXMonthView extends JComponent {
      * Paints a month.  It is assumed the calendar, _cal, is already set to the
      * first day of the month to be painted.
      *
-     * @param col X (column) the calendar is displayed in.
-     * @param row Y (row) the calendar is displayed in.
      * @param g Graphics object.
      */
-    private void paintMonth(Graphics g, int col, int row) {
-        String numericDay;
+    private void paintMonth(Graphics g) {
         int days = _cal.getActualMaximum(Calendar.DAY_OF_MONTH);
-        FontMetrics fm = g.getFontMetrics();
         Rectangle clip = g.getClipBounds();
-
-        long nextFlaggedDate = -1;
-        int flaggedDateIndex = 0;
-        if (_flaggedDates != null && _flaggedDates.length > 0) {
-            nextFlaggedDate = _flaggedDates[flaggedDateIndex];
-        }
+        long day;
 
         for (int i = 0; i < days; i++) {
             calculateBoundsForDay(_bounds);
 
             if (_bounds.intersects(clip)) {
-                numericDay = _dayOfMonthFormatter.format(_cal.getTime());
+                day = _cal.getTimeInMillis();
 
                 // Paint bounding box around any date that falls within the
                 // selection.
-                if (isSelectedDate(_cal.getTimeInMillis())) {
+                if (isSelectedDate(day)) {
                     // Keep track of the rectangle for the currently
                     // selected date so we don't have to recalculate it
                     // later when it becomes unselected.  This is only
@@ -1543,59 +1531,11 @@ public class JXMonthView extends JComponent {
                         _dirtyRect.width = _bounds.width;
                         _dirtyRect.height = _bounds.height;
                     }
-
-                    paintSelectedDayBackground(g, _bounds.x, _bounds.y,
-                            _bounds.width, _bounds.height);
-
-                    g.setColor(getForeground());
                 }
-
-                // Paint bounding box around today.
-                if (_cal.getTimeInMillis() == _today) {
-                    paintTodayBackground(g, _bounds.x, _bounds.y,
-                            _bounds.width, _bounds.height);
-
-                    g.setColor(getForeground());
-                }
-
-                // If the appointment date is less than the current
-                // calendar date increment to the next appointment.
-                while (nextFlaggedDate != -1 &&
-                        nextFlaggedDate < _cal.getTimeInMillis()) {
-                    flaggedDateIndex++;
-                    if (flaggedDateIndex < _flaggedDates.length) {
-                        nextFlaggedDate = _flaggedDates[flaggedDateIndex];
-                    } else {
-                        nextFlaggedDate = -1;
-                    }
-                }
-
-                // Paint numeric day of the month.
-                g.setColor(getDayForeground(_cal.get(Calendar.DAY_OF_WEEK)));
-                if (nextFlaggedDate != -1 &&
-                        _cal.getTimeInMillis() == nextFlaggedDate) {
-                    Font oldFont = getFont();
-                    FontMetrics oldFM = fm;
-                    g.setFont(_derivedFont);
-                    fm = getFontMetrics(_derivedFont);
-                    g.drawString(numericDay,
-                            _ltr ?
-                                _bounds.x + _boxPaddingX +
-                                _boxWidth - fm.stringWidth(numericDay):
-                                _bounds.x + _boxPaddingX +
-                                _boxWidth - fm.stringWidth(numericDay) - 1,
-                            _bounds.y + _boxPaddingY + fm.getAscent());
-                    g.setFont(oldFont);
-                    fm = oldFM;
-                } else {
-                    g.drawString(numericDay,
-                            _ltr ?
-                                _bounds.x + _boxPaddingX +
-                                _boxWidth - fm.stringWidth(numericDay):
-                                _bounds.x + _boxPaddingX +
-                                _boxWidth - fm.stringWidth(numericDay) - 1,
-                            _bounds.y + _boxPaddingY + fm.getAscent());
-                }
+                paintDayBackground(g, _bounds.x, _bounds.y,
+                        _bounds.width, _bounds.height, day);
+                paintDayForeground(g, _bounds.x, _bounds.y,
+                        _bounds.width, _bounds.height, day);
             }
             _cal.add(Calendar.DAY_OF_MONTH, 1);
         }
@@ -1635,49 +1575,92 @@ public class JXMonthView extends JComponent {
     }
 
     /**
-     * Paints the background for today.  The default is a rectangle drawn in
-     * using the color set by <code>setTodayBackground</code>
+     * Paint the background for the specified day.
      *
-     * @see #setTodayBackground
-     * @param g Graphics object to paint to.
-     * @param x x-coordinate of upper left corner.
-     * @param y y-coordinate of upper left corner.
-     * @param width width of bounding box for the day.
-     * @param height height of bounding box for the day.
+     * @param g Graphics object to paint to
+     * @param x x-coordinate of upper left corner
+     * @param y y-coordinate of upper left corner
+     * @param width width of bounding box for the day
+     * @param height height of bounding box for the day
+     * @param date long value representing the day being painted
+     * @see  #isSelectedDate
+     * @see  #isToday
      */
-    protected void paintTodayBackground(Graphics g, int x, int y, int width,
-            int height) {
-//        g.setColor(_todayBackgroundColor);
-//        g.drawRect(x, y, width - 1, height - 1);
-        //paint the gradiented border
-        GradientPaint gp = new GradientPaint(x, y, new Color(91, 123, 145), x, y + height, new Color(68, 86, 98));
-        Graphics2D g2 = (Graphics2D)g;
-        g2.setPaint(gp);
-        g2.drawRect(x, y, width - 1, height - 1);
+    protected void paintDayBackground(Graphics g, int x, int y, int width, int height,
+            long date) {
+        if (isSelectedDate(date)) {
+            g.setColor(getSelectedBackground());
+            g.fillRect(x, y, width, height);
+        }
+
+        // If the date is today make sure we draw it's background over the selected
+        // background.
+        if (isToday(date)) {
+            // Paint the gradiented border
+            GradientPaint gp = new GradientPaint(x, y, new Color(91, 123, 145), x, y + height, new Color(68, 86, 98));
+            Graphics2D g2 = (Graphics2D)g;
+            g2.setPaint(gp);
+            g2.drawRect(x, y, width - 1, height - 1);
+        }
     }
 
     /**
-     * Paint the background for a selected day.  The default is a filled
-     * rectangle in the in the component's background color.
+     * Paint the foreground for the specified day.
      *
-     * @param g Graphics object to paint to.
-     * @param x x-coordinate of upper left corner.
-     * @param y y-coordinate of upper left corner.
-     * @param width width of bounding box for the day.
-     * @param height height of bounding box for the day.
+     * @param g Graphics object to paint to
+     * @param x x-coordinate of upper left corner
+     * @param y y-coordinate of upper left corner
+     * @param width width of bounding box for the day
+     * @param height height of bounding box for the day
+     * @param date long value representing the day being painted
      */
-    protected void paintSelectedDayBackground(Graphics g, int x, int y,
-            int width, int height) {
-        g.setColor(getSelectedBackground());
-        g.fillRect(x, y, width, height);
+    protected void paintDayForeground(Graphics g, int x, int y, int width, int height,
+            long date) {
+        String numericDay = _dayOfMonthFormatter.format(date);
+        FontMetrics fm;
+
+        g.setColor(getDayForeground(getDayOfTheWeek()));
+
+        if (isFlaggedDate(date)) {
+            Font oldFont = getFont();
+            g.setFont(_derivedFont);
+            fm = getFontMetrics(_derivedFont);
+            g.drawString(numericDay,
+                    _ltr ?
+                            x + _boxPaddingX +
+                                    _boxWidth - fm.stringWidth(numericDay):
+                            x + _boxPaddingX +
+                                    _boxWidth - fm.stringWidth(numericDay) - 1,
+                    y + _boxPaddingY + fm.getAscent());
+            g.setFont(oldFont);
+        } else {
+            fm = g.getFontMetrics();
+            g.drawString(numericDay,
+                    _ltr ?
+                            x + _boxPaddingX +
+                                    _boxWidth - fm.stringWidth(numericDay):
+                            x + _boxPaddingX +
+                                    _boxWidth - fm.stringWidth(numericDay) - 1,
+                    y + _boxPaddingY + fm.getAscent());
+        }
     }
 
     /**
-     * Returns true if the specified time falls within the _startSelectedDate
+     * Returns true if the specified date falls within the _startSelectedDate
      * and _endSelectedDate range.
      */
-    private boolean isSelectedDate(long time) {
-        return time >= _startSelectedDate && time <= _endSelectedDate;
+    protected boolean isSelectedDate(long date) {
+        return date >= _startSelectedDate && date <= _endSelectedDate;
+    }
+
+    /**
+     * Returns true if the date passed in is the same as today.
+     *
+     * @param date long representing the date you want to compare to today.
+     * @return true if the date passed is the same as today.
+     */
+    protected boolean isToday(long date) {
+        return date == _today;
     }
 
     /**
@@ -1733,7 +1716,7 @@ public class JXMonthView extends JComponent {
         int month = _cal.get(Calendar.MONTH);
         int dayOfWeek = _cal.get(Calendar.DAY_OF_WEEK);
         int weekOfMonth = _cal.get(Calendar.WEEK_OF_MONTH);
-        
+
         // Determine what row/column we are in.
         int diffMonths = month - _firstDisplayedMonth +
                 ((year - _firstDisplayedYear) * MONTHS_IN_YEAR);
@@ -1947,7 +1930,7 @@ public class JXMonthView extends JComponent {
      * Adds an ActionListener.
      * <p>
      * The ActionListener will receive an ActionEvent when a selection has
-     * been made. 
+     * been made.
      *
      * @param l The ActionListener that is to be notified
      */
@@ -2082,14 +2065,14 @@ public class JXMonthView extends JComponent {
             int x = e.getX();
             int y = e.getY();
             long selected = getDayAt(x, y);
-    
+
             if (selected == -1) {
                 return;
             }
-    
+
             long oldStart = _startSelectedDate;
             long oldEnd = _endSelectedDate;
-    
+
             if (_selectionMode == SINGLE_SELECTION) {
                 if (selected == oldStart) {
                     return;
@@ -2105,19 +2088,19 @@ public class JXMonthView extends JComponent {
                     _endSelectedDate = selected;
                 }
             }
-    
+
             if (_selectionMode == WEEK_SELECTION) {
                 // Do we span a week.
                 long start = (selected > _pivotDate) ? _pivotDate : selected;
                 long end = (selected > _pivotDate) ? selected : _pivotDate;
-                        
+
                 _cal.setTimeInMillis(start);
                 int count = 1;
                 while (_cal.getTimeInMillis() < end) {
                     _cal.add(Calendar.DAY_OF_MONTH, 1);
                     count++;
                 }
-    
+
                 if (count > DAYS_IN_WEEK) {
                     // Move the start date to the first day of the week.
                     _cal.setTimeInMillis(start);
@@ -2127,9 +2110,9 @@ public class JXMonthView extends JComponent {
                         daysFromStart += DAYS_IN_WEEK;
                     }
                     _cal.add(Calendar.DAY_OF_MONTH, -daysFromStart);
-                    
+
                     _startSelectedDate = _cal.getTimeInMillis();
-    
+
                     // Move the end date to the last day of the week.
                     _cal.setTimeInMillis(end);
                     dayOfWeek = _cal.get(Calendar.DAY_OF_WEEK);
@@ -2145,14 +2128,14 @@ public class JXMonthView extends JComponent {
                     _endSelectedDate = _cal.getTimeInMillis();
                 }
             }
-    
+
             if (oldStart == _startSelectedDate && oldEnd == _endSelectedDate) {
                 return;
             }
-    
+
             // Repaint the old dirty area.
             repaint(_dirtyRect);
-    
+
             // Repaint the new dirty area.
             calculateDirtyRectForSelection();
             repaint(_dirtyRect);
@@ -2177,13 +2160,13 @@ public class JXMonthView extends JComponent {
         public static final int ADD_NEXT_DAY = 7;
         public static final int ADD_TO_PREVIOUS_WEEK = 8;
         public static final int ADD_TO_NEXT_WEEK = 9;
-        
+
         private int action;
-        
+
         public KeyboardAction(int action) {
             this.action = action;
         }
-        
+
         public void actionPerformed(ActionEvent ev) {
             int selectionMode = getSelectionMode();
 
@@ -2214,13 +2197,13 @@ public class JXMonthView extends JComponent {
                 }
             }
         }
-        
+
         private void traverse(int action) {
             _cal.setTimeInMillis(_startSelectedDate);
             switch (action) {
                 case SELECT_PREVIOUS_DAY:
                     _cal.add(Calendar.DAY_OF_MONTH, -1);
-                    break;                        
+                    break;
                 case SELECT_NEXT_DAY:
                     _cal.add(Calendar.DAY_OF_MONTH, 1);
                     break;
@@ -2231,7 +2214,7 @@ public class JXMonthView extends JComponent {
                     _cal.add(Calendar.DAY_OF_MONTH, DAYS_IN_WEEK);
                     break;
             }
-            
+
             long newStartDate = _cal.getTimeInMillis();
             if (newStartDate != _startSelectedDate) {
                 setSelectedDateSpan(new DateSpan(newStartDate, newStartDate));
@@ -2240,7 +2223,7 @@ public class JXMonthView extends JComponent {
             // Restore the original time value.
             _cal.setTimeInMillis(_firstDisplayedDate);
         }
-        
+
         /**
          * If we are in a mode that allows for range selection this method
          * will extend the currently selected range.
@@ -2252,7 +2235,7 @@ public class JXMonthView extends JComponent {
             long newStartDate = _startSelectedDate;
             long newEndDate = _endSelectedDate;
             boolean isForward = true;
-            
+
             switch (action) {
                 case ADD_PREVIOUS_DAY:
                     _cal.setTimeInMillis(_startSelectedDate);
@@ -2275,13 +2258,13 @@ public class JXMonthView extends JComponent {
                     _cal.setTimeInMillis(_endSelectedDate);
                     _cal.add(Calendar.DAY_OF_MONTH, DAYS_IN_WEEK);
                     newEndDate = _cal.getTimeInMillis();
-                    break;                    
+                    break;
             }
             if (newStartDate != _startSelectedDate || newEndDate != _endSelectedDate) {
                 setSelectedDateSpan(new DateSpan(newStartDate, newEndDate));
                 ensureDateVisible(isForward ? newEndDate : newStartDate);
             }
-            
+
             // Restore the original time value.
             _cal.setTimeInMillis(_firstDisplayedDate);
         }
