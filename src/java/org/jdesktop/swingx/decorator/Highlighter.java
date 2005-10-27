@@ -75,7 +75,7 @@ import javax.swing.event.EventListenerList;
   Highlighter[]   highlighters = new Highlighter[] {
       new <b>AlternateRowHighlighter</b>(Color.white,
                                          new Color(0xF0, 0xF0, 0xE0), null),
-      new <b>PatternHighlighter</b>(null, Color.red, "s.*", 0, 0)
+      new <b>PatternHighlighter</b>(null, Color.red, "^s", 0, 0)
   };
 
   HighlighterPipeline highlighterPipeline = new HighlighterPipeline(highlighters);
