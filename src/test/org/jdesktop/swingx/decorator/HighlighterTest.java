@@ -12,12 +12,12 @@ import java.util.regex.Pattern;
 
 import javax.swing.JLabel;
 
-import junit.framework.TestCase;
-
+import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
 import org.jdesktop.swingx.util.ChangeReport;
 
-public class HighlighterTest extends TestCase {
+public class HighlighterTest extends InteractiveTestCase {
 
     protected Highlighter[] highlighters;
     protected static final boolean UNSELECTED = false;
@@ -68,6 +68,87 @@ public class HighlighterTest extends TestCase {
     }
 
     
+// UIHighlighter
+    
+    public void testUIHighlighter() {
+        AlternateRowHighlighter highlighter = new UIAlternateRowHighlighter();
+    }
+//----------------------- highlighter constructors, immutable highlighters
+ 
+    
+    public void testConstructors() {
+        Highlighter empty = new Highlighter();
+        assertColors(empty, null, null, null, null, false);
+        Highlighter normal = new Highlighter(background, foreground);
+        assertColors(normal, background, foreground, null, null, false);
+        Highlighter normalImmutable = new Highlighter(background, foreground, true);
+        assertColors(normalImmutable, background, foreground, null, null, true);
+        Color selectedBackground = Color.YELLOW;
+        Color selectedForeground = Color.BLACK;
+        Highlighter full = new Highlighter(background, foreground, 
+                selectedBackground , selectedForeground);
+        assertColors(full, background, foreground, selectedBackground, selectedForeground, false);
+        Highlighter fullImmutable = new Highlighter(background, foreground, 
+                selectedBackground , selectedForeground, true);
+        assertColors(fullImmutable, background, foreground, selectedBackground, selectedForeground, true);
+        
+    }
+    
+    public void testImmutable() {
+        Highlighter immutable = new Highlighter(background, foreground, true);
+        ChangeReport report = new ChangeReport();
+        immutable.addChangeListener(report);
+        assertEquals("no listeners", 0, immutable.getChangeListeners().length);
+        immutable.setForeground(Color.BLACK);
+        immutable.setBackground(Color.YELLOW);
+        immutable.setSelectedForeground(Color.BLACK);
+        immutable.setSelectedBackground(Color.YELLOW);
+        // nothing changed
+        assertColors(immutable, background, foreground, null, null, true);
+    }
+    
+    public void testAlternateRowImmutable() {
+        Color evenColor = Color.YELLOW;
+        AlternateRowHighlighter immutable = new AlternateRowHighlighter(background, evenColor, foreground, true);
+        assertColors(immutable, background, foreground, null, null, true);
+        assertAlternateColors(immutable, background, evenColor);
+        immutable.setOddRowBackground(Color.GRAY);
+        immutable.setEvenRowBackground(Color.CYAN);
+        assertColors(immutable, background, foreground, null, null, true);
+        assertAlternateColors(immutable, background, evenColor);
+        
+    }
+
+    /**
+     * @param immutable
+     * @param oddColor TODO
+     * @param evenColor
+     */
+    private void assertAlternateColors(AlternateRowHighlighter immutable, Color oddColor, Color evenColor) {
+        assertEquals("oddbackground", oddColor, immutable.getOddRowBackground());
+        assertEquals("evenbackground", evenColor, immutable.getEvenRowBackground());
+    }
+    
+    
+    public void testImmutablePredefinedHighlighters() {
+        assertTrue("ledger must be immutable", Highlighter.ledgerBackground.isImmutable());
+        assertTrue("notepad must be immutable", Highlighter.notePadBackground.isImmutable());
+        assertTrue("beige must be immutable", AlternateRowHighlighter.beige.isImmutable());
+        assertTrue("floral must be immutable", AlternateRowHighlighter.floralWhite.isImmutable());
+        assertTrue("lineprinter must be immutable", AlternateRowHighlighter.linePrinter.isImmutable());
+        assertTrue("classiclineprinter must be immutable", AlternateRowHighlighter.classicLinePrinter.isImmutable());
+        assertTrue("quickSilver must be immutable", AlternateRowHighlighter.quickSilver.isImmutable());
+    }
+    
+    private void assertColors(Highlighter highlighter, Color background, Color foreground,
+            Color  selectedBackground, Color selectedForeground, boolean immutable) {
+        assertEquals("background", background, highlighter.getBackground());
+        assertEquals("foreground", foreground, highlighter.getForeground());
+        assertEquals("selectedbackground", selectedBackground, highlighter.getSelectedBackground());
+        assertEquals("selectedForeground", selectedForeground, highlighter.getSelectedForeground());
+        assertEquals("immutable", immutable, highlighter.isImmutable());
+    }
+
 //----------------------- mutable pipeline
     
     /**

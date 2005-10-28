@@ -112,7 +112,9 @@ public class Highlighter {
     /** The listeners waiting for model changes. */
     protected EventListenerList listenerList = new EventListenerList();
     
-
+    /** flag to indicate whether the Highlighter is mutable in every respect. */
+    protected final boolean immutable;
+    
     /**
      * Predefined <code>Highlighter</code> that highlights the background of
      * each cell with a pastel green "ledger" background color, and is most
@@ -120,7 +122,7 @@ public class Highlighter {
      * horizontal gridlines in <code>Color.cyan.darker()</code> color.
      */
     public final static Highlighter ledgerBackground =
-                new Highlighter(new Color(0xF5, 0xFF, 0xF5), null);
+                new Highlighter(new Color(0xF5, 0xFF, 0xF5), null, true);
 
     /**
      * Predefined <code>Highlighter</code> that decorates the background of
@@ -129,7 +131,7 @@ public class Highlighter {
      * horizontal gridlines in <code>Color.cyan.darker()</code> color.
      */
     public final static Highlighter notePadBackground =
-                new Highlighter(new Color(0xFF, 0xFF, 0xCC), null);
+                new Highlighter(new Color(0xFF, 0xFF, 0xCC), null, true);
 
     private Color background = null;
     private Color foreground = null;
@@ -137,17 +139,18 @@ public class Highlighter {
     private Color selectedForeground = null;
 
     /**
-     * Default constructor.
+     * Default constructor for mutable Highlighter.
      * Initializes background, foreground, selectedBackground, and
      * selectedForeground to null.
      */
     public Highlighter() {
-        // default constructor
+        this(null, null);
     }
 
     /**
-     * Constructs a <code>Highlighter</code> with the specified
-     * background and foreground colors.
+     * Constructs a mutable <code>Highlighter</code> with the specified
+     * background and foreground colors, selectedBackground and 
+     * selectedForeground to null.
      *
      * @param cellBackground background color for the renderer, or null,
      *          to compute a suitable background
@@ -155,8 +158,44 @@ public class Highlighter {
      *          to compute a suitable foreground
      */
     public Highlighter(Color cellBackground, Color cellForeground) {
+        this(cellBackground, cellForeground, false);
+    }
+
+    public Highlighter(Color cellBackground, Color cellForeground, boolean immutable) {
+        this(cellBackground, cellForeground, null, null, immutable);
+    }
+    
+    /**
+     * Constructs a mutable <code>Highlighter</code> with the specified
+     * background and foreground colors.
+     *
+     * @param cellBackground background color for the renderer, or null,
+     *          to compute a suitable background
+     * @param cellForeground foreground color for the renderer, or null,
+     *          to compute a suitable foreground
+     */
+    public Highlighter(Color cellBackground, Color cellForeground, 
+            Color selectedBackground, Color selectedForeground) {
+        this(cellBackground, cellForeground, selectedBackground, selectedForeground, false);
+    }
+
+    /**
+     * Constructs a <code>Highlighter</code> with the specified
+     * background and foreground colors with mutability depending on
+     * given flag.
+     *
+     * @param cellBackground background color for the renderer, or null,
+     *          to compute a suitable background
+     * @param cellForeground foreground color for the renderer, or null,
+     *          to compute a suitable foreground
+     */
+    public Highlighter(Color cellBackground, Color cellForeground, 
+            Color selectedBackground, Color selectedForeground, boolean immutable) {
+        this.immutable = immutable;
         this.background = cellBackground; // could be null
         this.foreground = cellForeground; // could be null
+        this.selectedBackground = selectedBackground;
+        this.selectedForeground = selectedForeground;
     }
 
     /**
@@ -312,8 +351,11 @@ public class Highlighter {
      * @return the background color for a selected cell
      */
     protected Color computeSelectedBackground(Color seed) {
-        return selectedBackground == null ?
-            seed == null ? Color.gray : seed.darker() : selectedBackground;
+        // JW: first go on fixing #178-swingx - return absolute color
+        // this moves the responsibility of computation to subclasses.
+        return selectedBackground;
+//        return selectedBackground == null ? 
+//            seed == null ? Color.gray : seed.darker() : selectedBackground;
     }
 
     /**
@@ -326,9 +368,21 @@ public class Highlighter {
      * @return the foreground color for a selected cell
      */
     protected Color computeSelectedForeground(Color seed) {
-        return selectedForeground == null ? Color.white : selectedForeground;
+        // JW: first go on fixing #178-swingx - return absolute color
+        // this moves the responsibility of computation to subclasses.
+        return selectedForeground; 
+//        return selectedForeground == null ?  
+//                Color.white : selectedForeground;
     }
 
+    /**
+     * Returns immutable flag: if true, none of the setXX methods have
+     * any effects, there are no listeners added and no change events fired.
+     * @return
+     */
+    public boolean isImmutable() {
+        return immutable;
+    }
     /**
      * Returns the background color of this <code>Highlighter</code>.
      *
@@ -340,12 +394,16 @@ public class Highlighter {
     }
 
     /**
-     * Sets the background color of this <code>Highlighter</code>.
+     * Sets the background color of this <code>Highlighter</code> if this
+     * is not immutable.
      *
+     * Does nothing if immutable.
+     *  
      * @param color the background color of this <code>Highlighter</code>,
      *          or null, to clear any existing background color
      */
     public void setBackground(Color color) {
+        if (isImmutable()) return;
         background = color;
         fireStateChanged();
     }
@@ -367,6 +425,7 @@ public class Highlighter {
      *          or null, to clear any existing foreground color
      */
     public void setForeground(Color color) {
+        if (isImmutable()) return;
         foreground = color;
         fireStateChanged();
     }
@@ -388,6 +447,7 @@ public class Highlighter {
      *          or null, to clear any existing selected background color
      */
     public void setSelectedBackground(Color color) {
+        if (isImmutable()) return;
         selectedBackground = color;
         fireStateChanged();
     }
@@ -409,6 +469,7 @@ public class Highlighter {
      *          or null, to clear any existing selected foreground color
      */
     public void setSelectedForeground(Color color) {
+        if (isImmutable()) return;
         selectedForeground = color;
         fireStateChanged();
     }
@@ -422,6 +483,7 @@ public class Highlighter {
      * @see BoundedRangeModel#addChangeListener
      */
     public void addChangeListener(ChangeListener l) {
+        if (isImmutable()) return;
         listenerList.add(ChangeListener.class, l);
     }
     
@@ -434,6 +496,7 @@ public class Highlighter {
      * @see BoundedRangeModel#removeChangeListener
      */
     public void removeChangeListener(ChangeListener l) {
+        if (isImmutable()) return;
         listenerList.remove(ChangeListener.class, l);
     }
 
@@ -463,8 +526,8 @@ public class Highlighter {
      * @see #setRangeProperties
      * @see EventListenerList
      */
-    protected void fireStateChanged() 
-    {
+    protected void fireStateChanged() {
+        if (isImmutable()) return;
         Object[] listeners = listenerList.getListenerList();
         for (int i = listeners.length - 2; i >= 0; i -=2 ) {
             if (listeners[i] == ChangeListener.class) {
@@ -477,5 +540,8 @@ public class Highlighter {
     }   
 
     
-
+    public interface UIHighlighter {
+        
+        void updateUI();
+    }
 }

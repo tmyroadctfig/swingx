@@ -96,6 +96,7 @@ import org.jdesktop.swingx.decorator.SearchHighlighter;
 import org.jdesktop.swingx.decorator.SelectionMapper;
 import org.jdesktop.swingx.decorator.SizeSequenceMapper;
 import org.jdesktop.swingx.decorator.Sorter;
+import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
 import org.jdesktop.swingx.icon.ColumnControlIcon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.table.ColumnControlButton;
@@ -2316,7 +2317,6 @@ public class JXTable extends JTable {
      */
     public void updateUI() {
         super.updateUI();
-        // JW PENDING: update columnControl
         if (columnControlButton != null) {
             columnControlButton.updateUI();
         }
@@ -2337,7 +2337,13 @@ public class JXTable extends JTable {
             updateRendererUI(column.getHeaderRenderer());
         }
         updateRowHeightUI(true);
+        updateHighlighters();
         configureViewportBackground();
+    }
+
+    protected void updateHighlighters() {
+        if (getHighlighters() == null) return;
+        getHighlighters().updateUI();
     }
 
     /** ? */

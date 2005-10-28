@@ -23,6 +23,9 @@ package org.jdesktop.swingx.decorator;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.util.HashMap;
+
+import javax.swing.UIManager;
 
 /**
  * AlternateRowHighlighter prepares a cell renderer to use different background
@@ -35,19 +38,22 @@ public class AlternateRowHighlighter extends Highlighter {
     private final static Color  defaultEvenRowColor = new Color(0xF0, 0xF0, 0xE0);
 
     public final static Highlighter beige =
-        new AlternateRowHighlighter(Color.white, new Color(245, 245, 220), null);
+        new AlternateRowHighlighter(Color.white, new Color(245, 245, 220), null, true);
 
     public final static Highlighter linePrinter =
-        new AlternateRowHighlighter(Color.white, new Color(0xCC, 0xCC, 0xFF), null);
+        new AlternateRowHighlighter(Color.white, new Color(0xCC, 0xCC, 0xFF), null, true);
 
     public final static Highlighter classicLinePrinter =
-        new AlternateRowHighlighter(Color.white, new Color(0xCC, 0xFF, 0xCC), null);
+        new AlternateRowHighlighter(Color.white, new Color(0xCC, 0xFF, 0xCC), null, true);
 
     public final static Highlighter floralWhite =
-        new AlternateRowHighlighter(Color.white, new Color(255, 250, 240), null);
+        new AlternateRowHighlighter(Color.white, new Color(255, 250, 240), null, true);
 
     public final static Highlighter quickSilver =
-        new AlternateRowHighlighter(Color.white, defaultEvenRowColor, null);
+        new AlternateRowHighlighter(Color.white, defaultEvenRowColor, null, true);
+    
+    public final static AlternateRowHighlighter genericGrey = 
+        new AlternateRowHighlighter(Color.white, new Color(229, 229, 229), null, true);
 
     private Color oddRowBackground = defaultOddRowColor;
     private Color evenRowBackground = defaultEvenRowColor;
@@ -74,7 +80,12 @@ public class AlternateRowHighlighter extends Highlighter {
      */
     public AlternateRowHighlighter(Color oddRowBackground,
                                    Color evenRowBackground, Color foreground) {
-        super(oddRowBackground, foreground); // same background for odd and even
+        this(oddRowBackground, evenRowBackground, foreground, false);
+    }
+
+    public AlternateRowHighlighter(Color oddRowBackground,
+            Color evenRowBackground, Color foreground, boolean immutable) {
+        super(oddRowBackground, foreground, immutable); // same background for odd and even
         this.oddRowBackground = oddRowBackground;
         this.evenRowBackground = evenRowBackground;
     }
@@ -100,6 +111,7 @@ public class AlternateRowHighlighter extends Highlighter {
      * color of the cell renderer should be left unchanged for odd rows
      */
     public void setOddRowBackground(Color color) {
+        if (isImmutable()) return;
         oddRowBackground = color;
         fireStateChanged();
     }
@@ -124,6 +136,7 @@ public class AlternateRowHighlighter extends Highlighter {
      * color of the cell renderer should be left unchanged for even rows
      */
     public void setEvenRowBackground(Color color) {
+        if (isImmutable()) return;
         evenRowBackground = color;
         fireStateChanged();
     }
@@ -153,4 +166,70 @@ public class AlternateRowHighlighter extends Highlighter {
 
         return color;
     }
+
+
+    @Override
+    protected Color computeSelectedBackground(Color seed) {
+        return getSelectedBackground();
+    }
+
+    @Override
+    protected Color computeSelectedForeground(Color seed) {
+        return getSelectedForeground();
+    }
+    
+    public static class UIAlternateRowHighlighter extends AlternateRowHighlighter 
+       implements UIHighlighter {
+
+        private HashMap<Color, Color> colorMap;
+        public UIAlternateRowHighlighter() {
+            super(Color.WHITE, null, null);
+            initColorMap();
+            updateUI();
+        }
+        
+ 
+        public void updateUI() {
+            
+            Color selection = UIManager.getColor("Table.selectionBackground");
+            Color highlight = getMappedColor(selection);
+            
+            setEvenRowBackground(highlight);
+        }
+
+        private Color getMappedColor(Color selection) {
+            Color color = colorMap.get(selection);
+            if (color == null) {
+                color = AlternateRowHighlighter.genericGrey.getEvenRowBackground();
+            }
+            return color;
+        }
+        /** 
+         * this is a hack until we can think about something better!
+         * we map all known selection colors to highlighter colors.
+         *
+         */
+        private void initColorMap() {
+            colorMap = new HashMap<Color, Color>();
+            // Ocean
+            colorMap.put(new Color(184, 207, 229), new Color(230, 238, 246));
+            // xp blue
+            colorMap.put(new Color(49, 106, 197), new Color(224, 233, 246));
+            // xp silver
+            colorMap.put(new Color(178, 180, 191), new Color(235, 235, 236));
+            // xp olive
+            colorMap.put(new Color(147, 160, 112), new Color(228, 231, 219));
+            // win classic
+            colorMap.put(new Color(10, 36, 106), new Color(218, 222, 233));
+            // win 2k?
+            colorMap.put(new Color(0, 0, 128), new Color(218, 222, 233));
+            // default metal
+            colorMap.put(new Color(205, 205, 255), new Color(235, 235, 255));
+            // mac OS X
+            colorMap.put(new Color(56, 117, 215), new Color(237, 243, 254));
+            
+        }
+        
+    }
+
 }

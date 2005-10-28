@@ -32,6 +32,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 
+import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
+import org.jdesktop.swingx.decorator.Highlighter.UIHighlighter;
+
 /**
  * A class which manages the lists of highlighters.
  *
@@ -41,12 +44,13 @@ import javax.swing.event.EventListenerList;
  * @author Jeanette Winzenburg
  * 
  */
-public class HighlighterPipeline {
+public class HighlighterPipeline implements UIHighlighter {
     protected transient ChangeEvent changeEvent = null;
     protected EventListenerList listenerList = new EventListenerList();
 
     protected List<Highlighter> highlighters;
-    private final static Highlighter nullHighlighter = new Highlighter(null, null);
+    // JW: this is a hack to make JXTable renderers behave...
+    private final static Highlighter nullHighlighter = new Highlighter(null, null, true);
     private ChangeListener highlighterChangeListener;
 
     public HighlighterPipeline() {
@@ -90,9 +94,11 @@ public class HighlighterPipeline {
         } else {
             highlighters.add(highlighters.size(), hl);
         }
+        updateUI(hl);
         hl.addChangeListener(getHighlighterChangeListener());
         fireStateChanged();
     }
+
 
     private ChangeListener getHighlighterChangeListener() {
         if (highlighterChangeListener == null) {
@@ -136,20 +142,36 @@ public class HighlighterPipeline {
      */
     public Component apply(Component stamp, ComponentAdapter adapter) {
         //JW
-        // table renderers have different state memory as renderers
+        // table renderers have different state memory as list/tree renderers
         // without the null they don't unstamp!
         // but... null has adversory effect on JXList f.i. - selection
-        // color is changed
+        // color is changed. This is related to #178-swingx: 
+        // highlighter background computation is weird.
         // 
         if (adapter.getComponent() instanceof JTable) {
         /** @todo optimize the following bug fix */
-            stamp = nullHighlighter.highlight(stamp, adapter);      // fixed bug from M1
+            stamp = nullHighlighter.highlight(stamp, adapter); 
         }
         for (Iterator<Highlighter> iter = highlighters.iterator(); iter.hasNext();) {
             stamp = iter.next().highlight(stamp, adapter);
             
         }
         return stamp;
+    }
+
+    public void updateUI() {
+        for (Highlighter highlighter : highlighters) {
+            updateUI(highlighter);
+        }
+    }   
+
+    /**
+     * @param hl
+     */
+    private void updateUI(Highlighter hl) {
+        if (hl instanceof UIHighlighter) {
+            ((UIHighlighter) hl).updateUI();
+        }
     }
 
     /**
@@ -213,7 +235,7 @@ public class HighlighterPipeline {
                 ((ChangeListener)listeners[i+1]).stateChanged(changeEvent);
             }          
         }
-    }   
+    }
 
 
 }

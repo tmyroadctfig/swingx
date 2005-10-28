@@ -71,7 +71,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*Multiple.*");
 //          test.runInteractiveTests("interactive.*RToL.*");
 //          test.runInteractiveTests("interactive.*Boolean.*");
-          test.runInteractiveTests("interactive.*RowHeight.*");
+          test.runInteractiveTests("interactive.*Highligh.*");
           
 //          test.runInteractiveTests("interactive.*Column.*");
 //        test.runInteractiveTests("interactive.*isable.*");
@@ -757,6 +757,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 
     public void interactiveTestTableAlternateHighlighter1() {
         JXTable table = new JXTable(tableModel);
+        table.setRolloverEnabled(true);
         table.setRowHeight(22);
         table.setRowMargin(1);
 
@@ -765,11 +766,11 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         }));
 
         table.setHighlighters(new HighlighterPipeline(new Highlighter[] {
-            AlternateRowHighlighter.
-            linePrinter,
+            AlternateRowHighlighter.linePrinter,
+            new RolloverHighlighter(Color.YELLOW, null),
         }));
 
-        JFrame frame = wrapWithScrollingInFrame(table, "TableAlternateRowHighlighter1 Test");
+        JFrame frame = wrapWithScrollingInFrame(table, "LinePrinter plus yellow rollover");
         frame.setVisible(true);
     }
 
@@ -785,7 +786,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             AlternateRowHighlighter.classicLinePrinter,
         }));
 
-        JFrame frame = wrapWithScrollingInFrame(table, "TableAlternateRowHighlighter2 Test");
+        JFrame frame = wrapWithScrollingInFrame(table, "classic lineprinter Test");
         frame.setVisible(true);
     }
 
@@ -913,7 +914,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         frame.setVisible(true);
     }
 
-    public void interactiveTestTablePatternFilter5() {
+    public void interactiveTestTableSortedPatternFilterPatternHighlighter() {
         // **** IMPORTANT TEST CASE for interaction between ****
         // **** PatternFilter and PatternHighlighter!!! ****
         JXTable table = new JXTable(tableModel);
@@ -926,7 +927,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         table.setHighlighters(new HighlighterPipeline(new Highlighter[] {
             new PatternHighlighter(null, Color.red, "^S", 0, 1),
         }));
-        JFrame frame = wrapWithScrollingInFrame(table, "TablePatternFilter5 Test");
+        JFrame frame = wrapWithScrollingInFrame(table, "PatternFilter/Highlighter ^S col1");
         frame.setVisible(true);
     }
 
@@ -948,7 +949,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         table.setHighlighters(new HighlighterPipeline(new Highlighter[] {
             new PatternHighlighter(null, Color.red, "^A", 0, 1),
         }));
-        JFrame frame = wrapWithScrollingInFrame(table, "TablePatternHighlighter Test");
+        JFrame frame = wrapWithScrollingInFrame(table, "PatternHighlighter ^A col 1");
         frame.setVisible(true);
     }
 

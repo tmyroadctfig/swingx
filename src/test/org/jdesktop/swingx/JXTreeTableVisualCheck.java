@@ -47,8 +47,8 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         setSystemLF(true);
         JXTreeTableVisualCheck test = new JXTreeTableVisualCheck();
         try {
-            test.runInteractiveTests();
-         //   test.runInteractiveTests("interactive.*HighLighters");
+//            test.runInteractiveTests();
+            test.runInteractiveTests("interactive.*Highligh.*");
          //      test.runInteractiveTests("interactive.*SortingFilter.*");
 //           test.runInteractiveTests("interactive.*Node.*");
          //     test.runInteractiveTests("interactive.*Focus.*");
@@ -310,7 +310,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      *   did not work on LFs which normally respect lineStyle
      *   winLF does not respect it anyway...
      */    
-    public void interactiveTestFilterAndLineStyle() {
+    public void interactiveTestFilterHighlightAndLineStyle() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         // issue #148
         // did not work on LFs which normally respect lineStyle
@@ -362,7 +362,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     }
     
     
-    public void interactiveTestFiltersAndRowHeight() {
+    public void interactiveTestHighlightAndRowHeight() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         treeTable.setRowHeight(22);
         treeTable.setRowMargin(1);
@@ -412,7 +412,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         frame.setVisible(true);
     }
 
-    public void interactiveTestHierarchicalColumn() {
+    public void interactiveTestHierarchicalColumnHighlight() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         treeTable.setHighlighters(new HighlighterPipeline(
                 new Highlighter[] { new HierarchicalColumnHighlighter(), }));
@@ -452,11 +452,11 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         treeTable.setIntercellSpacing(new Dimension(15, 15));
         treeTable.setRowHeight(48);
         JFrame frame = wrapWithScrollingInFrame(treeTable,
-                "Orange, IntercellSpacing15, big rowheight");
+                "Orange, big rowheight");
         frame.setVisible(true);
     }
 
-    public void interactiveTestHighLighters() {
+    public void interactiveTestHighlighters() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         treeTable.setIntercellSpacing(new Dimension(15, 15));
         treeTable.setRowHeight(48);
@@ -472,12 +472,14 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         };
         treeTable.setHighlighters(new HighlighterPipeline(
                 new Highlighter[] {
-                        conditional,
                         new Highlighter(Color.orange, null),
                         new HierarchicalColumnHighlighter(),
                         new PatternHighlighter(null, Color.red,
-                                "D", 0, 0, 0), }));
-        JFrame frame = wrapWithScrollingInFrame(treeTable, "Highlighters");
+                                "D", 0, 0, 0), 
+                        conditional,
+        
+                }));
+        JFrame frame = wrapWithScrollingInFrame(treeTable, "Highlighters: conditional, orange, hierarchy, pattern D");
         frame.setVisible(true);
     }
 
