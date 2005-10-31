@@ -853,7 +853,7 @@ public class JXTable extends JTable {
      * well.
      */
     public void packSelected() {
-        int selected = getSelectedColumn();
+        int selected = getColumnModel().getSelectionModel().getLeadSelectionIndex();
         if (selected >= 0) {
             packColumn(selected, getDefaultPackMargin());
         }
