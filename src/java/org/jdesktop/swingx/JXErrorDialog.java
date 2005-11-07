@@ -134,7 +134,7 @@ public class JXErrorDialog extends JDialog {
      * Create a new ErrorDialog with the given Dialog as the owner
      * @param owner Owner of this error dialog.
      */
-    private JXErrorDialog(Dialog owner) {
+    public JXErrorDialog(Dialog owner) {
         super(owner, true);
         initGui();
     }
@@ -332,6 +332,19 @@ public class JXErrorDialog extends JDialog {
      */
     public static void showDialog(Window owner, String title, Throwable e) {
         IncidentInfo ii = new IncidentInfo(title, null, null, e);
+        showDialog(owner, ii);
+    }
+
+    /**
+     * Constructs and shows the error dialog for the given exception.  The exceptions message is specified,
+     * and the stacktrace will be the details.
+     * @param owner Owner of this error dialog.
+     * @param title Title of the error dialog
+     * @param errorMessage Message for the error dialog
+     * @param e Exception that contains information about the error cause and stack trace
+     */
+    public static void showDialog(Window owner, String title, String errorMessage, Throwable e) {
+        IncidentInfo ii = new IncidentInfo(title, errorMessage, null, e);
         showDialog(owner, ii);
     }
 
