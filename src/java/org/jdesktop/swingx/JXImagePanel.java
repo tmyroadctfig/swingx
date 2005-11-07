@@ -28,11 +28,11 @@ import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -69,7 +69,7 @@ public class JXImagePanel extends JXPanel {
     /**
      * The image to draw
      */
-    private BufferedImage img;
+    private Image img;
     /**
      * If true, then the image can be changed. Perhaps a better name is
      * &quot;readOnly&quot;, but editable was chosen to be more consistent
@@ -96,7 +96,7 @@ public class JXImagePanel extends JXPanel {
     
     public JXImagePanel(URL imageUrl) {
         try {
-            setImage((BufferedImage)new ImageIcon(imageUrl).getImage());
+            setImage(ImageIO.read(imageUrl));
         } catch (Exception e) {
             //TODO need convert to something meaningful
            LOG.log(Level.WARNING, "", e);
@@ -110,11 +110,11 @@ public class JXImagePanel extends JXPanel {
      * image to be painted. If the preferred size has not been explicitly set,
      * then the image dimensions will alter the preferred size of the panel.
      */
-    public void setImage(BufferedImage image) {
+    public void setImage(Image image) {
         if (image != img) {
-            BufferedImage oldImage = img;
+            Image oldImage = img;
             img = image;
-            firePropertyChange("icon", oldImage, img);
+            firePropertyChange("image", oldImage, img);
             invalidate();
             repaint();
         }
@@ -123,7 +123,7 @@ public class JXImagePanel extends JXPanel {
     /**
      * @return the image used for painting the background of this panel
      */
-    public BufferedImage getImage() {
+    public Image getImage() {
         return img;
     }
     
@@ -185,7 +185,12 @@ public class JXImagePanel extends JXPanel {
     public Dimension getPreferredSize() {
         if (preferredSize == null && img != null) {
             //it has not been explicitly set, so return the width/height of the image
-            return new Dimension(img.getWidth(), img.getHeight());
+            int width = img.getWidth(null);
+            int height = img.getHeight(null);
+            if (width == -1 || height == -1) {
+                return super.getPreferredSize();
+            }
+            return new Dimension(width, height);
         } else {
             return super.getPreferredSize();
         }
@@ -200,12 +205,19 @@ public class JXImagePanel extends JXPanel {
 //        g.fillRect(insets.left, insets.top, getWidth() - insets.right - insets.left, getHeight() - insets.bottom - insets.top);
         Graphics2D g2 = (Graphics2D)g;
         if (img != null) {
+            int imgWidth = img.getWidth(null);
+            int imgHeight = img.getHeight(null);
+            if (imgWidth == -1 || imgHeight == -1) {
+                //image hasn't completed loading, return
+                return;
+            }
+            
             switch (style) {
                 case CENTERED:
                     Rectangle clipRect = g2.getClipBounds();
-                    int imageX = (getWidth() - img.getWidth()) / 2;
-                    int imageY = (getHeight() - img.getHeight()) / 2;
-                    Rectangle r = SwingUtilities.computeIntersection(imageX, imageY, img.getWidth(), img.getHeight(), clipRect);
+                    int imageX = (getWidth() - imgWidth) / 2;
+                    int imageY = (getHeight() - imgHeight) / 2;
+                    Rectangle r = SwingUtilities.computeIntersection(imageX, imageY, imgWidth, imgHeight, clipRect);
                     if (r.x == 0 && r.y == 0 && (r.width == 0 || r.height == 0)) {
                         return;
                     }
@@ -224,13 +236,13 @@ public class JXImagePanel extends JXPanel {
                     break;
                 case TILED:
                 case SCALED:
-                    Image temp = img.getScaledInstance(getWidth(), getHeight(), BufferedImage.SCALE_SMOOTH);
+                    Image temp = img.getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH);
                     g2.drawImage(temp, (getWidth() - temp.getWidth(null)) / 2,
                             (getHeight() - temp.getHeight(null)) / 2, null);
                     break;
                 default:
                     LOG.fine("unimplemented");
-                    g2.drawImage(img, null, 0, 0);
+                    g2.drawImage(img, 0, 0, this);
                     break;
             }
         }
@@ -251,7 +263,7 @@ public class JXImagePanel extends JXPanel {
             if (retVal == JFileChooser.APPROVE_OPTION) {
                 File file = chooser.getSelectedFile();
                 try {
-                    setImage((BufferedImage)new ImageIcon(file.toURL()).getImage());
+                    setImage(new ImageIcon(file.toURL()).getImage());
                 } catch (Exception ex) {
                 }
             }
