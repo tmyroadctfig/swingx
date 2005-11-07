@@ -43,6 +43,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
+import javax.swing.JOptionPane;
 import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
 
@@ -248,6 +249,16 @@ public final class WindowUtils {
 	} else {
 	    return findJDialog(c.getParent());
 	}
+    }
+    
+    public static Window findWindow(Component c) {
+        if (c == null) {
+            return JOptionPane.getRootFrame();
+        } else if (c instanceof Window) {
+            return (Window)c;
+        } else {
+            return findWindow(c.getParent());
+        }
     }
     
     public static List<Component> getAllComponents(final Container c) {
