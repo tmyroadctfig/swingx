@@ -21,6 +21,7 @@
 
 package org.jdesktop.swingx;
 
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -43,6 +44,7 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
+import org.jdesktop.swingx.util.WindowUtils;
 
 /**
  * Common Error Dialog, suitable for representing information about 
@@ -326,11 +328,13 @@ public class JXErrorDialog extends JDialog {
     /**
      * Constructs and shows the error dialog for the given exception.  The exceptions message will be the
      * errorMessage, and the stacktrace will be the details.
-     * @param owner Owner of this error dialog.
+     * @param owner Owner of this error dialog. Determines the Window in which the dialog
+     *		is displayed; if the <code>owner</code> has
+     *		no <code>Window</code>, a default <code>Frame</code> is used
      * @param title Title of the error dialog
      * @param e Exception that contains information about the error cause and stack trace
      */
-    public static void showDialog(Window owner, String title, Throwable e) {
+    public static void showDialog(Component owner, String title, Throwable e) {
         IncidentInfo ii = new IncidentInfo(title, null, null, e);
         showDialog(owner, ii);
     }
@@ -338,36 +342,44 @@ public class JXErrorDialog extends JDialog {
     /**
      * Constructs and shows the error dialog for the given exception.  The exceptions message is specified,
      * and the stacktrace will be the details.
-     * @param owner Owner of this error dialog.
+     * @param owner Owner of this error dialog. Determines the Window in which the dialog
+     *		is displayed; if the <code>owner</code> has
+     *		no <code>Window</code>, a default <code>Frame</code> is used
      * @param title Title of the error dialog
      * @param errorMessage Message for the error dialog
      * @param e Exception that contains information about the error cause and stack trace
      */
-    public static void showDialog(Window owner, String title, String errorMessage, Throwable e) {
+    public static void showDialog(Component owner, String title, String errorMessage, Throwable e) {
         IncidentInfo ii = new IncidentInfo(title, errorMessage, null, e);
         showDialog(owner, ii);
     }
 
     /**
      * Show the error dialog.
-     * @param owner Owner of this error dialog
+     * @param owner Owner of this error dialog. Determines the Window in which the dialog
+     *		is displayed; if the <code>owner</code> has
+     *		no <code>Window</code>, a default <code>Frame</code> is used
      * @param title Title of the error dialog
      * @param errorMessage Message for the error dialog
      * @param details Details to be shown in the detail section of the dialog.  This can be null
      * if you do not want to display the details section of the dialog.
      */
-    public static void showDialog(Window owner, String title, String errorMessage, String details) {
+    public static void showDialog(Component owner, String title, String errorMessage, String details) {
         IncidentInfo ii = new IncidentInfo(title, errorMessage, details);
         showDialog(owner, ii);
     }
 
     /**
      * Show the error dialog.
-     * @param owner Owner of this error dialog.
+     * @param owner Owner of this error dialog. Determines the Window in which the dialog
+     *		is displayed; if the <code>owner</code> has
+     *		no <code>Window</code>, a default <code>Frame</code> is used
      * @param info <code>IncidentInfo</code> that incorporates all the information about the error
      */
-    public static void showDialog(Window owner, IncidentInfo info) {
+    public static void showDialog(Component owner, IncidentInfo info) {
         JXErrorDialog dlg;
+
+        Window window = WindowUtils.findWindow(owner);
 
         if (owner instanceof Dialog) {
             dlg = new JXErrorDialog((Dialog)owner);
