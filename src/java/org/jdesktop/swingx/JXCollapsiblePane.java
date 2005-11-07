@@ -165,7 +165,12 @@ public class JXCollapsiblePane extends JPanel {
     }
     
     if (wrapper != null) {
-      super.remove(wrapper);
+      //these next two lines are as they are because if I try to remove
+      //the "wrapper" component directly, then super.remove(comp) ends up
+      //calling remove(int), which is overridden in this class, leading to
+      //improper behavior.
+      assert super.getComponent(0) == wrapper;
+      super.remove(0);
     }
     wrapper = new WrapperContainer(contentPanel);
     super.addImpl(wrapper, BorderLayout.CENTER, -1);
@@ -206,7 +211,7 @@ public class JXCollapsiblePane extends JPanel {
    * Overriden to redirect call to the content pane.
    */
   public void remove(int index) {
-    getContentPane().remove(index);
+      getContentPane().remove(index);
   }
   
   /**
