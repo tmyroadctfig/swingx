@@ -70,6 +70,10 @@ public class LinkModel implements Comparable {
         setURL(url != null ? url : getDefaultURL());
     }
 
+    public LinkModel() {
+        this(" ", null, null);
+    }
+    
     public LinkModel(String text) {
         this(text, null, null);
     }
