@@ -21,6 +21,7 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -43,6 +44,7 @@ import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import org.jdesktop.swingx.action.AbstractActionExt;
@@ -906,6 +908,7 @@ public class JXLoginPanel extends JXImagePanel {
                     //TODO
                 }
             });
+            setEditable(true);
         }
         public String getUserName() {
             Object item = getModel().getSelectedItem();
@@ -1029,7 +1032,6 @@ public class JXLoginPanel extends JXImagePanel {
         w.setLayout(new BorderLayout());
         w.add(panel, BorderLayout.CENTER);
         JButton okButton = new JButton(panel.getActionMap().get(LOGIN_ACTION_COMMAND));
-        okButton.setMnemonic('O');//UIManager.getInt(CLASS_NAME + ".okString.mnemonic"));
         final JButton cancelButton = new JButton("Close");//TODO i18n
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -1063,7 +1065,6 @@ public class JXLoginPanel extends JXImagePanel {
             }
         });
         cancelButton.setText("Close");
-        cancelButton.setMnemonic('C');//UIManager.getInt(CLASS_NAME + ".cancelString.mnemonic"));
         int prefWidth = Math.max(cancelButton.getPreferredSize().width, okButton.getPreferredSize().width);
         cancelButton.setPreferredSize(new Dimension(prefWidth, okButton.getPreferredSize().height));
         okButton.setPreferredSize(new Dimension(prefWidth, okButton.getPreferredSize().height));
@@ -1080,12 +1081,29 @@ public class JXLoginPanel extends JXImagePanel {
         });
 
         if (w instanceof JFrame) {
-            ((JFrame)w).getRootPane().setDefaultButton(okButton);
-            ((JFrame)w).setResizable(false);
-            ((JFrame)w).setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            final JFrame f = (JFrame)w;
+            f.getRootPane().setDefaultButton(okButton);
+            f.setResizable(false);
+            f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            KeyStroke ks = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+            ActionListener closeAction = new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    f.setVisible(false);
+                    f.dispose();
+                }
+            };
+            f.getRootPane().registerKeyboardAction(closeAction, ks, JComponent.WHEN_IN_FOCUSED_WINDOW);
         } else if (w instanceof JDialog) {
-            ((JDialog)w).getRootPane().setDefaultButton(okButton);
-            ((JDialog)w).setResizable(false);
+            final JDialog d = (JDialog)w;
+            d.getRootPane().setDefaultButton(okButton);
+            d.setResizable(false);
+            KeyStroke ks = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+            ActionListener closeAction = new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    d.setVisible(false);
+                }
+            };
+            d.getRootPane().registerKeyboardAction(closeAction, ks, JComponent.WHEN_IN_FOCUSED_WINDOW);
         }
     }
 }
