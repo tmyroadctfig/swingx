@@ -678,15 +678,6 @@ public class JXLoginPanel extends JXImagePanel {
             String name = getUserName();
             char[] password = getPassword();
             loginService.startAuthentication(name, password, null);
-            if (saveMode != SaveMode.NONE
-                    && !userNameStore.containsUserName(name)
-                    && name != null && !name.trim().equals("")) {
-                userNameStore.addUserName(name);
-                userNameStore.saveUserNames();
-            }
-            if (saveCB.isSelected() && (saveMode == SaveMode.BOTH || saveMode == SaveMode.PASSWORD)) {
-                passwordStore.set(name, loginService.getServer(), password);
-            }
         } catch(Exception ex) {
 	    //The status is set via the loginService listener, so no need to set
 	    //the status here. Just log the error.
@@ -711,7 +702,9 @@ public class JXLoginPanel extends JXImagePanel {
      * TODO
      */
     protected void savePassword() {
-        if (passwordStore != null) {
+        if (saveCB.isSelected() 
+            && (saveMode == SaveMode.BOTH || saveMode == SaveMode.PASSWORD)
+            && passwordStore != null) {
             passwordStore.set(getUserName(),getLoginService().getServer(),getPassword());
         }
     }
@@ -758,9 +751,8 @@ public class JXLoginPanel extends JXImagePanel {
         public void loginSucceeded(LoginEvent source) {
             //save the user names and passwords
             String userName = namePanel.getUserName();
-            if (getSaveMode() == SaveMode.PASSWORD || getSaveMode() == SaveMode.BOTH) {
-                savePassword();
-            } else if (getSaveMode() == SaveMode.USER_NAME
+            savePassword();
+            if (getSaveMode() == SaveMode.USER_NAME
                     && userName != null && !userName.trim().equals("")) {
                 userNameStore.addUserName(userName);
                 userNameStore.saveUserNames();
