@@ -3,7 +3,22 @@
  *
  * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
  * Santa Clara, California 95054, U.S.A. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+
 
 package org.jdesktop.swingx.auth;
 
@@ -24,20 +39,20 @@ public class DefaultUserNameStore extends UserNameStore {
     /**
      * The key for one of the preferences
      */
-        private static final String USER_KEY = "usernames";
+    private static final String USER_KEY = "usernames";
     /**
      */
     private static final String NUM_KEY = "usernames.length";
-    /**
-     * The preferences node
-     */
-    private Preferences prefs;
     /**
      * A name that is used when retrieving preferences. By default, the
      * app name is &quot;default&quot. This should be set by the application
      * if the application wants it&apos;s own list of user names.
      */
-        private String appNameForPreferences = "default";
+    private static final String DEFAULT_APP_NAME = "default";
+    /**
+     * The preferences node
+     */
+    private Preferences prefs;
     /**
      * Contains the user names. Since the list of user names is not
      * frequently updated, there is no penalty in storing the values
@@ -48,7 +63,7 @@ public class DefaultUserNameStore extends UserNameStore {
      * Used for propogating bean changes
      */
     private PropertyChangeSupport pcs;
-
+    
     /**
      * Creates a new instance of DefaultUserNameStore
      */
@@ -56,37 +71,45 @@ public class DefaultUserNameStore extends UserNameStore {
         pcs = new PropertyChangeSupport(this);
         userNames = new String[0];
     }
-
+    
+    /**
+     * Loads the user names from Preferences
+     */
     public void loadUserNames() {
         initPrefs();
         if (prefs != null) {
-            String numPrefix = getNumPrefix();
-            int n = prefs.getInt(numPrefix, 0);
-            String valuePrefix = getValuePrefix();
+            int n = prefs.getInt(NUM_KEY, 0);
             String[] names = new String[n];
             for (int i = 0; i < n; i++) {
-                names[i] = prefs.get(valuePrefix + "." + i, null);
+                names[i] = prefs.get(USER_KEY + "." + i, null);
             }
             setUserNames(names);
         }
     }
-
+    
+    /**
+     * Saves the user names to Preferences
+     */
     public void saveUserNames() {
         initPrefs();
         if (prefs != null) {
-            String numPrefix = getNumPrefix();
-            String valuePrefix = getValuePrefix();
-            prefs.putInt(numPrefix, userNames.length);
+            prefs.putInt(NUM_KEY, userNames.length);
             for (int i = 0; i < userNames.length; i++) {
-                prefs.put(valuePrefix + "." + i, userNames[i]);
+                prefs.put(USER_KEY + "." + i, userNames[i]);
             }
         }
     }
-
+    
+    /**
+     * @inheritDoc
+     */
     public String[] getUserNames() {
         return userNames;
     }
-
+    
+    /**
+     * @inheritDoc
+     */
     public void setUserNames(String[] userNames) {
         if (this.userNames != userNames) {
             String[] old = this.userNames;
@@ -94,29 +117,29 @@ public class DefaultUserNameStore extends UserNameStore {
             pcs.firePropertyChange("userNames", old, this.userNames);
         }
     }
-
-        /**
-         * Add a username to the store.
-         * @param name
-         */
-        public void addUserName(String name) {
-                if (!containsUserName(name)) {
+    
+    /**
+     * Add a username to the store.
+     * @param name
+     */
+    public void addUserName(String name) {
+        if (!containsUserName(name)) {
             String[] newNames = new String[userNames.length + 1];
             for (int i=0; i<userNames.length; i++) {
                 newNames[i] = userNames[i];
             }
             newNames[newNames.length - 1] = name;
             setUserNames(newNames);
-                }
         }
-
-        /**
-         * Removes a username from the list.
-         *
-         * @param name
-         */
-        public void removeUserName(String name) {
-                if (containsUserName(name)) {
+    }
+    
+    /**
+     * Removes a username from the list.
+     *
+     * @param name
+     */
+    public void removeUserName(String name) {
+        if (containsUserName(name)) {
             String[] newNames = new String[userNames.length - 1];
             int index = 0;
             for (String s : userNames) {
@@ -125,9 +148,12 @@ public class DefaultUserNameStore extends UserNameStore {
                 }
             }
             setUserNames(newNames);
-                }
         }
-
+    }
+    
+    /**
+     * @inheritDoc
+     */
     public boolean containsUserName(String name) {
         for (String s : userNames) {
             if (s.equals(name)) {
@@ -136,40 +162,36 @@ public class DefaultUserNameStore extends UserNameStore {
         }
         return false;
     }
-
-        /**
-         * @return Returns the appNameForPreferences.
-         */
-        public String getAppNameForPreferences() {
-                return appNameForPreferences;
-        }
-
-        /**
-         * @param appNameForPreferences The appNameForPreferences to set.
-         */
-        public void setAppNameForPreferences(String appNameForPreferences) {
-        if (this.appNameForPreferences != appNameForPreferences) {
-            String old = this.appNameForPreferences;
-            this.appNameForPreferences = appNameForPreferences;
-            pcs.firePropertyChange("appNameForPreferences", old, appNameForPreferences);
-            prefs = null;
+    
+    /**
+     * @return Returns Preferences node in which the user names will be stored
+     */
+    public Preferences getPreferences() {
+        return prefs;
+    }
+    
+    /**
+     * @param prefs the Preferences node to store the user names in. If null,
+     * or undefined, then they are stored in /org/jdesktop/swingx/auth/DefaultUserNameStore.
+     */
+    public void setPreferences(Preferences prefs) {
+        initPrefs();
+        if (this.prefs != prefs) {
+            Preferences old = this.prefs;
+            this.prefs = prefs;
+            pcs.firePropertyChange("preferences", old, prefs);
+            //if prefs is null, this next method will create the default prefs node
             loadUserNames();
         }
-        }
+    }
 
-        private String getNumPrefix() {
-                return this.getClass().getName() + "." + getAppNameForPreferences()
-                                + "." + NUM_KEY;
-        }
-
-        private String getValuePrefix() {
-                return this.getClass().getName() + "." + getAppNameForPreferences()
-                                + "." + USER_KEY;
-        }
-
+    /**
+     * Creates the default prefs node
+     */
     private void initPrefs() {
         if (prefs == null) {
-            prefs = Preferences.userNodeForPackage(JXLoginPanel.class);
+            prefs = Preferences.userNodeForPackage(DefaultUserNameStore.class);
+            prefs = prefs.node("DefaultUserNameStore");
         }
     }
 }
