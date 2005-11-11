@@ -18,27 +18,31 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+
 package org.jdesktop.swingx.auth;
-import java.util.EventObject;
+
 /**
- * This is an event object that is passed to login listener methods
  *
- * @author Shai Almog
+ * @author rbair
  */
-public class LoginEvent extends EventObject {
-    private Exception cause;
-    
-    public LoginEvent(Object source) {
-        this(source, null);
-    }
-    
-    /** Creates a new instance of LoginEvent */
-    public LoginEvent(Object source, Exception cause) {
-        super(source);
-        this.cause = cause;
-    }
-    
-    public Exception getCause() {
-        return cause;
-    }
+public abstract class LoginAdapter implements LoginListener {
+    /**
+     * @inheritDoc
+     */
+    public void loginSucceeded(LoginEvent source) {}
+
+    /**
+     * @inheritDoc
+     */
+    public void loginStarted(LoginEvent source) {}
+
+    /**
+     * @inheritDoc
+     */
+    public void loginFailed(LoginEvent source) {}
+
+    /**
+     * @inheritDoc
+     */
+    public void loginCanceled(LoginEvent source) {}
 }

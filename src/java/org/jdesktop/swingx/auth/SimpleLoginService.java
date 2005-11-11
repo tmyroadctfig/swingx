@@ -20,12 +20,9 @@
  */
 
 package org.jdesktop.swingx.auth;
-
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
 /**
  * An implementation of LoginService that simply matches
  * the username/password against a list of known users and their passwords.
@@ -54,7 +51,7 @@ public final class SimpleLoginService extends LoginService {
     /**
      * Attempts to authenticate the given username and password against the password map
      */
-    public boolean authenticate(String name, char[] password, String server) throws IOException {
+    public boolean authenticate(String name, char[] password, String server) throws Exception {
         char[] p = passwordMap.get(name);
         return Arrays.equals(password, p);
     }

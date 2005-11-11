@@ -18,27 +18,19 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package org.jdesktop.swingx.auth;
-import java.util.EventObject;
+
+package org.jdesktop.swingx.plaf;
+import java.awt.Image;
+import javax.swing.plaf.PanelUI;
+
 /**
- * This is an event object that is passed to login listener methods
  *
- * @author Shai Almog
+ * @author rbair
  */
-public class LoginEvent extends EventObject {
-    private Exception cause;
-    
-    public LoginEvent(Object source) {
-        this(source, null);
-    }
-    
-    /** Creates a new instance of LoginEvent */
-    public LoginEvent(Object source, Exception cause) {
-        super(source);
-        this.cause = cause;
-    }
-    
-    public Exception getCause() {
-        return cause;
-    }
+public abstract class LoginPanelUI extends PanelUI {
+    /**
+     * @return The Image to use as the banner for the JXLoginPanel. If
+     * this method returns null, then no banner will be shown.
+     */
+    public abstract Image getBanner();
 }

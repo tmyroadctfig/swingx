@@ -57,7 +57,7 @@ public class JAASLoginService extends LoginService {
 	 * @inheritDoc
 	 * 	 
 	 */
-	public boolean authenticate(String name, char[] password, String server) {
+	public boolean authenticate(String name, char[] password, String server) throws Exception {
 		try {
 			LoginContext loginContext = null;
 

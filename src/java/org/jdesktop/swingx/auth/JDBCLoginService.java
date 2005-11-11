@@ -19,8 +19,6 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 package org.jdesktop.swingx.auth;
-
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Properties;
@@ -28,7 +26,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.naming.InitialContext;
-
 /**
  * A login service for connecting to SQL based databases via JDBC
  *
@@ -190,7 +187,7 @@ public class JDBCLoginService extends LoginService {
      * @param server Must be either a valid JDBC URL for the type of JDBC driver you are using,
      * or must be a valid JNDIContext from which to get the database connection
      */
-    public boolean authenticate(String name, char[] password, String server) throws IOException {
+    public boolean authenticate(String name, char[] password, String server) throws Exception {
         //try to form a connection. If it works, conn will not be null
         //if the jndiContext is not null, then try to get the DataSource to use
         //from jndi
