@@ -29,6 +29,7 @@ import java.util.Enumeration;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.AbstractListModel;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 
@@ -36,7 +37,6 @@ import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -877,29 +877,12 @@ public class JXLoginPanel extends JXImagePanel {
      * If a UserNameStore is used, then this combo box is presented allowing the user
      * to select a previous login name, or type in a new login name
      */
-    public static final class ComboNamePanel extends JComboBox implements NameComponent {
+    public static final class ComboNamePanel extends JXComboBox implements NameComponent {
+        private UserNameStore userNameStore;
         public ComboNamePanel(final UserNameStore userNameStore) {
-            super(new ComboBoxModel() {
-                private Object selectedItem;
-                public void setSelectedItem(Object anItem) {
-                    selectedItem = anItem;
-                }
-                public Object getSelectedItem() {
-                    return selectedItem;
-                }
-                public Object getElementAt(int index) {
-                    return userNameStore.getUserNames()[index];
-                }
-                public int getSize() {
-                    return userNameStore.getUserNames().length;
-                }
-                public void removeListDataListener(javax.swing.event.ListDataListener l) {
-                    //TODO
-                }
-                public void addListDataListener(javax.swing.event.ListDataListener l) {
-                    //TODO
-                }
-            });
+            super();
+            this.userNameStore = userNameStore;
+            setModel(new NameComboBoxModel());
             setEditable(true);
         }
         public String getUserName() {
@@ -914,6 +897,22 @@ public class JXLoginPanel extends JXImagePanel {
         }
         public JComponent getComponent() {
             return this;
+        }
+        private final class NameComboBoxModel extends AbstractListModel implements ComboBoxModel {
+            private Object selectedItem;
+            public void setSelectedItem(Object anItem) {
+                selectedItem = anItem;
+                fireContentsChanged(this, -1, -1);
+            }
+            public Object getSelectedItem() {
+                return selectedItem;
+            }
+            public Object getElementAt(int index) {
+                return userNameStore.getUserNames()[index];
+            }
+            public int getSize() {
+                return userNameStore.getUserNames().length;
+            }
         }
     }
 
@@ -1009,6 +1008,10 @@ public class JXLoginPanel extends JXImagePanel {
 	public JXLoginPanel.Status getStatus() {
 	    return panel.getStatus();
 	}
+        
+        public JXLoginPanel getPanel() {
+            return panel;
+        }
     }
     
     /**
@@ -1064,8 +1067,6 @@ public class JXLoginPanel extends JXImagePanel {
         buttonPanel.add(okButton, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(17, 12, 11, 5), 0, 0));
         buttonPanel.add(cancelButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(17, 0, 11, 11), 0, 0));
         w.add(buttonPanel, BorderLayout.SOUTH);            
-        w.pack();
-        w.setLocation(WindowUtils.getPointForCentering(w));
         w.addWindowListener(new WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent e) {
                 panel.cancelLogin();
@@ -1097,5 +1098,7 @@ public class JXLoginPanel extends JXImagePanel {
             };
             d.getRootPane().registerKeyboardAction(closeAction, ks, JComponent.WHEN_IN_FOCUSED_WINDOW);
         }
+        w.pack();
+        w.setLocation(WindowUtils.getPointForCentering(w));
     }
 }
