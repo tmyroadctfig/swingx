@@ -1050,7 +1050,7 @@ public class JXLoginPanel extends JXImagePanel {
     /**
      * Shows a login frame. A JFrame is not modal, and thus does not block
      */
-    public static JFrame showLoginFrame(LoginService svc) {
+    public static JXLoginFrame showLoginFrame(LoginService svc) {
         return showLoginFrame(svc, null, null);
     }
 
