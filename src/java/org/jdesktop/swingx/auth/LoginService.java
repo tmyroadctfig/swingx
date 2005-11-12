@@ -26,7 +26,8 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
-import org.jdesktop.swingworker.SwingWorker;
+import org.jdesktop.swingx.util.SwingWorker;
+
 /**
  * <b>LoginService</b> is the abstract base class for all classes implementing
  * a login mechanism. It allows you to customize the threading behaviour
