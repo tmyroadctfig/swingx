@@ -25,7 +25,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -183,6 +186,13 @@ public class JXLoginPanel extends JXImagePanel {
      */
     private JPasswordField passwordField;
     /**
+     * A combo box presenting the user with a list of servers to which they
+     * may log in. This is an optional feature, which is only enabled if
+     * the List of servers supplied to the JXLoginPanel has a length greater
+     * than 1.
+     */
+    private JXComboBox serverCombo;
+    /**
      * Check box presented if a PasswordStore is used, allowing the user to decide whether to
      * save their password
      */
@@ -214,6 +224,13 @@ public class JXLoginPanel extends JXImagePanel {
      * Optional: a UserNameStore to use for storing user names and retrieving them
      */
     private UserNameStore userNameStore;
+    /**
+     * A list of servers where each server is represented by a String. If the
+     * list of Servers is greater than 1, then a combo box will be presented to
+     * the user to choose from. If any servers are specified, the selected one
+     * (or the only one if servers.size() == 1) will be passed to the LoginService
+     */
+    private List<String> servers;
     /**
      *  Whether to save password or username or both
      */
@@ -272,9 +289,21 @@ public class JXLoginPanel extends JXImagePanel {
      * @param userStore
      */
     public JXLoginPanel(LoginService service, PasswordStore passwordStore, UserNameStore userStore) {
+        this(service, passwordStore, userStore, null);
+    }
+    
+    /**
+     * Create a new JXLoginPanel
+     * @param service
+     * @param passwordStore
+     * @param userStore
+     * @param servers
+     */
+    public JXLoginPanel(LoginService service, PasswordStore passwordStore, UserNameStore userStore, List<String> servers) {
         this.loginService = service == null ? new NullLoginService() : service;
         this.passwordStore = passwordStore == null ? new NullPasswordStore() : passwordStore;
         this.userNameStore = userStore == null ? new DefaultUserNameStore() : userStore;
+        this.servers = servers == null ? new ArrayList<String>() : servers;
         
         //create the login and cancel actions, and add them to the action map
         getActionMap().put(LOGIN_ACTION_COMMAND, createLoginAction());
@@ -352,6 +381,16 @@ public class JXLoginPanel extends JXImagePanel {
         JLabel passwordLabel = new JLabel(UIManager.getString(CLASS_NAME + ".passwordString"));
         passwordLabel.setLabelFor(passwordField);
         
+        //create the server combo box if necessary
+//            JLabel serverLabel = new JLabel(UIManager.getString(CLASS_NAME + ".serverString"));
+        JLabel serverLabel = new JLabel("Server");
+        if (servers.size() > 1) {
+            serverCombo = new JXComboBox(servers.toArray());
+            serverLabel.setLabelFor(serverCombo);
+        } else {
+            serverCombo = null;
+        }
+        
         //create the save check box. By default, it is not selected
         saveCB = new JCheckBox(UIManager.getString(CLASS_NAME + ".rememberPasswordString"));
         saveCB.setSelected(false); //TODO should get this from prefs!!! And, it should be based on the user
@@ -380,7 +419,7 @@ public class JXLoginPanel extends JXImagePanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(0, 0, 11, 11);
+        gridBagConstraints.insets = new Insets(0, 0, 5, 11);
         loginPanel.add(passwordLabel, gridBagConstraints);
         
         gridBagConstraints = new GridBagConstraints();
@@ -390,19 +429,47 @@ public class JXLoginPanel extends JXImagePanel {
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new Insets(0, 0, 11, 0);
+        gridBagConstraints.insets = new Insets(0, 0, 5, 0);
         loginPanel.add(passwordField, gridBagConstraints);
         
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
-        loginPanel.add(saveCB, gridBagConstraints);
-        
+        if (serverCombo != null) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 0, 5, 11);
+            loginPanel.add(serverLabel, gridBagConstraints);
+
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = 2;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 0, 5, 0);
+            loginPanel.add(serverCombo, gridBagConstraints);
+
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 3;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(6, 0, 0, 0);
+            loginPanel.add(saveCB, gridBagConstraints);
+        } else {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 2;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(6, 0, 0, 0);
+            loginPanel.add(saveCB, gridBagConstraints);
+        }
         return loginPanel;
     }
     
@@ -504,6 +571,25 @@ public class JXLoginPanel extends JXImagePanel {
     public void setSaveMode(SaveMode saveMode) {
         this.saveMode = saveMode;
         recreateLoginPanel();
+    }
+    
+    /**
+     * @return the List of servers
+     */
+    public List<String> getServers() {
+        return Collections.unmodifiableList(servers);
+    }
+    
+    /**
+     * Sets the list of servers. See the servers field javadoc for more info
+     */
+    public void setServers(List<String> servers) {
+        if (this.servers != servers) {
+            List<String> old = this.servers;
+            this.servers = servers == null ? new ArrayList<String>() : servers;
+            recreateLoginPanel();
+            firePropertyChange("servers", old, servers);
+        }
     }
     
     /**
@@ -677,7 +763,8 @@ public class JXLoginPanel extends JXImagePanel {
             progressMessageLabel.setText("Please wait, logging in....");//TODO i18n
             String name = getUserName();
             char[] password = getPassword();
-            loginService.startAuthentication(name, password, null);
+            String server = servers.size() == 1 ? servers.get(0) : serverCombo == null ? null : (String)serverCombo.getSelectedItem();
+            loginService.startAuthentication(name, password, server);
         } catch(Exception ex) {
 	    //The status is set via the loginService listener, so no need to set
 	    //the status here. Just log the error.
@@ -930,7 +1017,15 @@ public class JXLoginPanel extends JXImagePanel {
      * @return The status of the login operation
      */
     public static Status showLoginDialog(JComponent parent, LoginService svc, PasswordStore ps, UserNameStore us) {
-        JXLoginPanel panel = new JXLoginPanel(svc, ps, us);
+        return showLoginDialog(parent, svc, ps, us, null);
+    }
+    
+    /**
+     * Shows a login dialog. This method blocks.
+     * @return The status of the login operation
+     */
+    public static Status showLoginDialog(JComponent parent, LoginService svc, PasswordStore ps, UserNameStore us, List<String> servers) {
+        JXLoginPanel panel = new JXLoginPanel(svc, ps, us, servers);
         return showLoginDialog(parent, panel);
     }
     
@@ -962,10 +1057,16 @@ public class JXLoginPanel extends JXImagePanel {
     /**
      */
     public static JXLoginFrame showLoginFrame(LoginService svc, PasswordStore ps, UserNameStore us) {
-        JXLoginPanel panel = new JXLoginPanel(svc, ps, us);
-        return showLoginFrame(panel);
+        return showLoginFrame(svc, ps, us, null);
     }
     
+    /**
+     */
+    public static JXLoginFrame showLoginFrame(LoginService svc, PasswordStore ps, UserNameStore us, List<String> servers) {
+        JXLoginPanel panel = new JXLoginPanel(svc, ps, us, servers);
+        return showLoginFrame(panel);
+    }
+
     /**
      */
     public static JXLoginFrame showLoginFrame(JXLoginPanel panel) {
