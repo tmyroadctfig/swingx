@@ -31,7 +31,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 /**
- * Simple FindPanel for usage in a JXDialog.
+ * Find panel to incorporate search capability into the users application.
+ * The most intended usage is to adding this panel to the dialogs.
  * 
  * 
  * @author ??
@@ -39,22 +40,29 @@ import javax.swing.JOptionPane;
  */
 public class JXFindPanel extends AbstractPatternPanel {
 
-    
     public static final String FIND_NEXT_ACTION_COMMAND = "findNext";
     public static final String FIND_PREVIOUS_ACTION_COMMAND = "findPrevious";
     
-
     protected Searchable searchable;
 
     protected JCheckBox wrapCheck;
     protected JCheckBox backCheck;
     private boolean initialized;
 
-
+    /*
+     * Default constructor for the find panel. Constructs panel not targeted to
+     * any component.
+     */
     public JXFindPanel() {
         this(null);
     }
     
+    /*
+     * Construct search panel targeted to specific <code>Searchable</code> component.
+     *
+     * @param searchible Component where search widget will try to locate and select
+     *                   information using methods of the <code>Searchible</code> interface.
+     */
     public JXFindPanel(Searchable searchable) {
         setSearchable(searchable);
         initActions();
@@ -65,7 +73,8 @@ public class JXFindPanel extends AbstractPatternPanel {
      * Triggers a search with null pattern to release the old
      * searchable, if any.
      * 
-     * @param searchable 
+     * @param searchable Component where search widget will try to locate and select
+     *                   information using methods of the {@link Searchable Searchable} interface.
      */
     public void setSearchable(Searchable searchable) {
         if ((this.searchable != null) && this.searchable.equals(searchable)) return;
@@ -78,12 +87,19 @@ public class JXFindPanel extends AbstractPatternPanel {
         firePropertyChange("searchable", old, this.searchable);
     }
     
-
+    /**
+     * Notifies this component that it now has a parent component.
+     * When this method is invoked, the chain of parent components is
+     * set up with <code>KeyboardAction</code> event listeners.
+     */
     public void addNotify() {
         init();
         super.addNotify();
     }
     
+   /**
+    * Initializes component and its listeners and models.
+    */ 
     protected void init() {
         if (initialized) return;
         initialized = true;
@@ -91,13 +107,15 @@ public class JXFindPanel extends AbstractPatternPanel {
         build();
         bind();
         setName(getUIString(SEARCH_TITLE));
-        
     }
     
     //------------------ support synch the model <--> components
     
 
-
+    /**
+     * Configure and bind components to/from PatternModel.
+     */
+    @Override
     protected void bind() {
         super.bind();
         getActionContainerFactory().configureButton(wrapCheck, 
@@ -152,6 +170,16 @@ public class JXFindPanel extends AbstractPatternPanel {
         doFind();
     }
     
+    /**
+     * Common standalone method to perform search. Used by the action callback methods 
+     * for Find/FindNext/FindPrevious actions. Finds next/previous match using current 
+     * setting of direction flag. Result is being reporred using showFoundMessage and 
+     * showNotFoundMessage methods respectively.
+     *
+     * @see #match
+     * @see #findNext
+     * @see #findPrevious
+     */
     protected void doFind() {
         if (searchable == null)
             return;
@@ -161,18 +189,18 @@ public class JXFindPanel extends AbstractPatternPanel {
             if (getPatternModel().isWrapping()) {
                 notFound = doSearch() == -1;
             }
-
         }
         if (notFound) {
             showNotFoundMessage();
         } else {
             showFoundMessage();
         }
-
     }
 
     /**
-     * @return
+     * Proforms search and returns index of the next match.
+     *
+     * @return Index of the next match in document.
      */
     protected int doSearch() {
         int foundIndex = searchable.search(getPatternModel().getPattern(), 
@@ -181,12 +209,15 @@ public class JXFindPanel extends AbstractPatternPanel {
         return getPatternModel().getFoundIndex();
     }
 
+    /**
+     * Report that suitable match is found.
+     */
     protected void showFoundMessage() {
         
     }
 
     /**
-     * 
+     * Report that no match is found.
      */
     protected void showNotFoundMessage() {
         JOptionPane.showMessageDialog(this, "Value not found");
@@ -196,8 +227,10 @@ public class JXFindPanel extends AbstractPatternPanel {
     //-------------------------- initial
     
     /**
-     * 
+     * creates and registers all "executable" actions.
+     * Meaning: the actions bound to a callback method on this.
      */
+    @Override
     protected void initExecutables() {
         getActionMap().put(FIND_NEXT_ACTION_COMMAND, 
                 createBoundAction(FIND_NEXT_ACTION_COMMAND, "findNext"));
@@ -210,8 +243,8 @@ public class JXFindPanel extends AbstractPatternPanel {
   
 //----------------------------- init ui
     
-    /** create components.
-     * 
+    /** 
+     * Create and initialize components.
      */
     protected void initComponents() {
         super.initComponents();
@@ -221,6 +254,9 @@ public class JXFindPanel extends AbstractPatternPanel {
 
 
 
+    /**
+     * Compose and layout all the subcomponents.
+     */
     protected void build() {
         Box lBox = new Box(BoxLayout.LINE_AXIS); 
         lBox.add(searchLabel);
@@ -239,6 +275,4 @@ public class JXFindPanel extends AbstractPatternPanel {
         add(lBox);
         add(rBox);
     }
-
-
 }
