@@ -91,7 +91,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         setSystemLF(!defaultToSystemLF);
         SwingUtilities.updateComponentTreeUI(comparisonComponent);
         if (comparisonFont.equals(comparisonComponent.getFont())) {
-            LOG.info("cannot run test - equal font" + comparisonFont);
+            LOG.info("cannot run test - equal font " + comparisonFont);
             return;
         }
         SwingUtilities.updateComponentTreeUI(table);

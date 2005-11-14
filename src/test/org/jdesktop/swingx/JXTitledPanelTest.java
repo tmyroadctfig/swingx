@@ -11,6 +11,7 @@ import java.awt.Color;
 import java.awt.ComponentOrientation;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -30,6 +31,9 @@ import org.jdesktop.swingx.util.PropertyChangeReport;
  * @author Jeanette Winzenburg
  */
 public class JXTitledPanelTest extends InteractiveTestCase {
+    private static final Logger LOG = Logger.getLogger(JXTitledPanelTest.class
+            .getName());
+    
     // flag used in setup to explicitly choose LF
     private boolean defaultToSystemLF;
 
@@ -51,7 +55,10 @@ public class JXTitledPanelTest extends InteractiveTestCase {
         titledPanel.getContentContainer().setLayout(new BorderLayout());
         String lf = UIManager.getLookAndFeel().getName();
         setSystemLF(!defaultToSystemLF);
-        assertFalse(lf.equals(UIManager.getLookAndFeel().getName()));
+        if (lf.equals(UIManager.getLookAndFeel().getName())) {
+            LOG.info("cannot run layoutOnLFChange - equal LF" + lf);
+            return;
+        }
         SwingUtilities.updateComponentTreeUI(titledPanel);
         assertTrue(titledPanel.getContentContainer().getLayout() instanceof BorderLayout);
     }

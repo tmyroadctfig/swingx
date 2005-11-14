@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
 
 /**
@@ -73,8 +74,13 @@ public class LinkRendererTest extends InteractiveTestCase {
         // LinkRenderer
         assertTrue("renderer comp must be opaque", hyperlink.isOpaque());
         assertTrue("renderer must paint border", hyperlink.isBorderPainted());
+        String lf = UIManager.getLookAndFeel().getName();
         // switch LF
         setSystemLF(!defaultToSystemLF);
+        if (lf.equals(UIManager.getLookAndFeel().getName())) {
+            LOG.info("cannot run rendererComponentPropertiesAfterLFChange - equal LF" + lf);
+            return;
+        }
         SwingUtilities.updateComponentTreeUI(table);
         // sanity: same as set
         assertSame(linkRenderer, table.getCellRenderer(1, 0));
