@@ -194,7 +194,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testConserveVerticalScrollBarPolicy() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run leadFocusCell - headless environment");
+            LOG.info("cannot run conserveVerticalScrollBarPolicy - headless environment");
             return;
         }
         JXTable table = new JXTable(0, 3);
