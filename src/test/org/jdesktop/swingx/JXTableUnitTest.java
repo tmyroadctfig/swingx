@@ -375,6 +375,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         TableColumnExt columnX = table.getColumnExt(0);
         columnX.setVisible(false);
         table.setModel(new DefaultTableModel());
+        assertEquals("all columns must have been removed", 0, table.getColumnCount(true));
         assertEquals("all columns must have been removed", 
                 table.getColumnCount(), table.getColumnCount(true));
         assertEquals("sorter must be removed when column removed", null, table.getFilters().getSorter());

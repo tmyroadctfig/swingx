@@ -10,10 +10,12 @@ package org.jdesktop.swingx;
 import java.awt.Point;
 
 import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
@@ -28,6 +30,23 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     public JXTreeTableUnitTest() {
         super("JXTreeTable Unit Test");
     }
+
+    /**
+     * Issue #54: hidden columns not removed on setModel.
+     * sanity test (make sure nothing evil introduced in treeTable as 
+     * compared to table)
+     */
+    public void testRemoveAllColumsAfterModelChanged() {
+        JXTreeTable table = new JXTreeTable(new FileSystemModel());
+        TableColumnExt columnX = table.getColumnExt(1);
+        columnX.setVisible(false);
+        int columnCount = table.getColumnCount(true);
+        assertEquals("total column count must be same as model", table.getModel().getColumnCount(), columnCount);
+        assertEquals("visible column count must one less as total", columnCount - 1, table.getColumnCount());
+        table.setTreeTableModel(new FileSystemModel());
+        assertEquals("visible columns must be same as total", 
+                table.getColumnCount(), table.getColumnCount(true));
+      }
 
     /**
      * Issue #241: treeModelListeners not removed.
