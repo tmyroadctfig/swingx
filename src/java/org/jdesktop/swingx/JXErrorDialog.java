@@ -307,6 +307,7 @@ public class JXErrorDialog extends JDialog {
         public void actionPerformed(ActionEvent e) {
             //close the window
             setVisible(false);
+            dispose();
         }
     }
 
