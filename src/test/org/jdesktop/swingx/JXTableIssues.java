@@ -71,6 +71,40 @@ public class JXTableIssues extends InteractiveTestCase {
     }
 
     /**
+     * 
+     * Issue #172-swingx. really related?
+     * 
+     * 
+     * reported exception if row removed (Ray, at the end of)
+     * http://www.javadesktop.org/forums/thread.jspa?messageID=117814
+     *
+     */
+    public void testSelectionAndRemoveRowOfMisbehavingModel() {
+        DefaultTableModel model = new DefaultTableModel(10, 2) {
+
+            @Override
+            public void fireTableRowsDeleted(int firstRow, int lastRow) {
+                fireTableStructureChanged();
+            }
+            
+            
+        };
+        for (int i = 0; i < model.getRowCount(); i++) {
+            model.setValueAt(i, i, 0);
+        }
+        JXTable table = new JXTable(model);
+        int modelRow = table.getRowCount() - 1;
+        table.setSorter(0);
+        table.setSorter(0);
+        // set a selection near the end - will be invalid after filtering
+        table.setRowSelectionInterval(modelRow, modelRow);
+        model.removeRow(modelRow);
+        int viewRow = table.convertRowIndexToView(table.getModel().getRowCount() - 1);
+        assertTrue("view index visible", viewRow >= 0);
+        table.setRowSelectionInterval(viewRow, viewRow);
+    }
+
+    /**
      * Issue #167-swingx: table looses individual row height 
      * on update.
      * 

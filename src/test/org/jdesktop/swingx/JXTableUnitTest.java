@@ -522,7 +522,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         }
         final JXTable table = new JXTable();
         table.setModel(createAscendingModel(0, 10));
-        final JFrame frame = new JFrame();
+        final JXFrame frame = new JXFrame();
         frame.add(table);
         frame.pack();
         frame.setVisible(true);
@@ -537,15 +537,18 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertEquals("anchor must be second last row", table.getRowCount() - 2, anchorRow);
         assertEquals("lead must be first column", 0, leadColumn);
         assertEquals("anchor must be first column", 0, anchorColumn);
-        SwingUtilities.invokeLater(new Runnable() {
+         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 ComponentAdapter adapter = table.getComponentAdapter();
                 adapter.row = leadRow;
                 adapter.column = leadColumn;
                 // difficult to test - hasFocus() implies that the table isFocusOwner()
-                assertTrue("adapter must have focus for leadRow/Column: " + adapter.row + "/" + adapter.column, 
-                        adapter.hasFocus());
-                frame.dispose();
+                try {
+                    assertTrue("adapter must have focus for leadRow/Column: " + adapter.row + "/" + adapter.column, 
+                            adapter.hasFocus());
+                } finally {
+                    frame.dispose();
+                }
 
             }
         });
@@ -605,6 +608,25 @@ public class JXTableUnitTest extends InteractiveTestCase {
         Integer highestValue = new Integer(100);
         model.addRow(new Object[] { highestValue });
         assertEquals(highestValue, table.getValueAt(0, 0));
+    }
+
+    /**
+     * Issue #??: removing row throws ArrayIndexOOB on selection
+     *
+     */
+    public void testSelectionRemoveRowsReselect() {
+        JXTable table = new JXTable();
+        DefaultTableModel model = createAscendingModel(0, 10);
+        table.setModel(model);
+        // sort first column
+        table.setSorter(0);
+        // invert sort
+        table.setSorter(0);
+        // select last row
+        int modelLast = table.getRowCount() - 1;
+        table.setRowSelectionInterval(modelLast, modelLast);
+        model.removeRow(table.convertRowIndexToModel(modelLast));
+        table.setRowSelectionInterval(table.getRowCount() - 1, table.getRowCount() - 1);
     }
 
     
