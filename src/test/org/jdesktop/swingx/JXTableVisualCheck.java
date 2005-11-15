@@ -71,7 +71,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*Multiple.*");
 //          test.runInteractiveTests("interactive.*RToL.*");
 //          test.runInteractiveTests("interactive.*Boolean.*");
-          test.runInteractiveTests("interactive.*Highligh.*");
+          test.runInteractiveTests("interactive.*Sorting.*");
           
 //          test.runInteractiveTests("interactive.*Column.*");
 //        test.runInteractiveTests("interactive.*isable.*");
@@ -668,7 +668,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 
     /**
      */
-    public void interactiveTestToggleSortingEnabled() {
+    public void interactiveTestToggleSortable() {
         final JXTable table = new JXTable(sortableTableModel);
         table.setColumnControlVisible(true);
         Action toggleSortableAction = new AbstractAction("Toggle Sortable") {

@@ -838,6 +838,23 @@ public class JXTableUnitTest extends InteractiveTestCase {
         return model;
     }
     
+    /**
+     * check if setting to false really disables sortability.
+     *
+     */
+    public void testSortable() {
+        JXTable table = new JXTable(createAscendingModel(0, 10));
+        boolean sortable = table.isSortable();
+        // sanity assert: sortable defaults to true
+        assertTrue("JXTable sortable defaults to true", sortable);
+        table.setSorter(0);
+        Object first = table.getValueAt(0, 0);
+        table.setSortable(false);
+        assertFalse(table.isSortable());
+        // reverse the sorting order on first column
+        table.setSorter(0);
+        assertEquals("sorting on a non-sortable table must do nothing", first, table.getValueAt(0, 0));
+    }
     
     /**
      * Issue #171: row-coordinate not transformed in isCellEditable (sorting)
