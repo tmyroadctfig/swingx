@@ -36,6 +36,7 @@ import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * A component that combines a button, an editable field and a JXMonthView
@@ -69,6 +70,11 @@ public class JXDatePicker extends JComponent {
      * Create a new date picker using the current date as the initial
      * selection and the default abstract formatter
      * <code>JXDatePickerFormatter</code>.
+     *
+     * The date picker is configured with the default time zone and locale
+     *
+     * @see #setTimeZone
+     * @see #getTimeZone
      */
     public JXDatePicker() {
         this(System.currentTimeMillis());
@@ -79,7 +85,11 @@ public class JXDatePicker extends JComponent {
      * selection and the default abstract formatter
      * <code>JXDatePickerFormatter</code>.
      *
+     * The date picker is configured with the default time zone and locale
+     *
      * @param millis initial time in milliseconds
+     * @see #setTimeZone
+     * @see #getTimeZone
      */
     public JXDatePicker(long millis) {
         _monthView = new JXMonthView();
@@ -262,11 +272,41 @@ public class JXDatePicker extends JComponent {
         return _monthView;
     }
 
+    /**
+     * Set the component to use the specified JXMonthView.  If the new JXMonthView
+     * is configured to a different time zone it will affect the time zone of this
+     * component.
+     *
+     * @param monthView month view comopnent
+     * @see #setTimeZone
+     * @see #getTimeZone
+     */
     public void setMonthView(JXMonthView monthView) {
         _monthView = monthView;
         _popup = null;
     }
-    
+
+    /**
+     * Gets the time zone.  This is a convenience method which returns the time zone
+     * of the JXMonthView being used.
+     *
+     * @return The <code>TimeZone</code> used by the <code>JXMonthView</code>.
+     */
+    public TimeZone getTimeZone() {
+        return _monthView.getTimeZone();
+    }
+
+    /**
+     * Sets the time zone with the given time zone value.    This is a convenience
+     * method which returns the time zone of the JXMonthView being used.
+     *
+     * @param tz The <code>TimeZone</code>.
+     */
+    public void setTimeZone(TimeZone tz) {
+        _monthView.setTimeZone(tz);
+
+    }
+
     /**
      * Set the date the link will use and the string defining a MessageFormat
      * to format the link.  If no valid date is in the editor when the popup
