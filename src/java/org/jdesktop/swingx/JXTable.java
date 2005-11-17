@@ -2235,31 +2235,39 @@ public class JXTable extends JTable {
     }
 
     public static class DoubleRenderer extends NumberRenderer {
-        NumberFormat formatter;
+        private final NumberFormat formatter;
 
         public DoubleRenderer() {
-            super();
+            this(null);
         }
 
-        public void setValue(Object value) {
+        public DoubleRenderer(NumberFormat formatter) {
             if (formatter == null) {
                 formatter = NumberFormat.getInstance();
             }
+            this.formatter = formatter;
+        }
+
+        public void setValue(Object value) {
             setText((value == null) ? "" : formatter.format(value));
         }
     }
 
     public static class DateRenderer extends DefaultTableCellRenderer {
-        DateFormat formatter;
+        private final DateFormat formatter;
 
         public DateRenderer() {
-            super();
+            this(null);
         }
 
-        public void setValue(Object value) {
+        public DateRenderer(DateFormat formatter) {
             if (formatter == null) {
                 formatter = DateFormat.getDateInstance();
             }
+            this.formatter = formatter;
+        }
+
+        public void setValue(Object value) {
             setText((value == null) ? "" : formatter.format(value));
         }
     }
