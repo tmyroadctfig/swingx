@@ -508,9 +508,8 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 
       // focus painted same color as text
       if (group.hasFocus()) {
-        g.setColor(paintColor);
-        BasicGraphicsUtils.drawDashedRect(
-          g,
+        paintFocus(g, 
+          paintColor, 
           3,
           3,
           width - 6,
@@ -585,6 +584,16 @@ public class BasicTaskPaneUI extends TaskPaneUI {
         chevronY + chevron.getIconHeight() + 1);
     }
     
+    protected void paintFocus(Graphics g, Color paintColor, int x, int y, int width, int height) {
+        g.setColor(paintColor);
+        BasicGraphicsUtils.drawDashedRect(
+          g,
+          x,
+          y,
+          width,
+          height);
+    }
+    
     /**
      * Default implementation returns false.
      *  
@@ -593,7 +602,7 @@ public class BasicTaskPaneUI extends TaskPaneUI {
      */
     protected boolean isMouseOverBorder() {
       return false;
-    }
+    }    
   }
 
 }
