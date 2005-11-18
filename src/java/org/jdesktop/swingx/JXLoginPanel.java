@@ -8,6 +8,7 @@ package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -966,7 +967,7 @@ public class JXLoginPanel extends JXImagePanel {
      */
     public static final class ComboNamePanel extends JXComboBox implements NameComponent {
         private UserNameStore userNameStore;
-        public ComboNamePanel(final UserNameStore userNameStore) {
+        public ComboNamePanel(UserNameStore userNameStore) {
             super();
             this.userNameStore = userNameStore;
             setModel(new NameComboBoxModel());
@@ -1008,7 +1009,7 @@ public class JXLoginPanel extends JXImagePanel {
      * Shows a login dialog. This method blocks.
      * @return The status of the login operation
      */
-    public static Status showLoginDialog(JComponent parent, LoginService svc) {
+    public static Status showLoginDialog(Component parent, LoginService svc) {
         return showLoginDialog(parent, svc, null, null);
     }
 
@@ -1016,7 +1017,7 @@ public class JXLoginPanel extends JXImagePanel {
      * Shows a login dialog. This method blocks.
      * @return The status of the login operation
      */
-    public static Status showLoginDialog(JComponent parent, LoginService svc, PasswordStore ps, UserNameStore us) {
+    public static Status showLoginDialog(Component parent, LoginService svc, PasswordStore ps, UserNameStore us) {
         return showLoginDialog(parent, svc, ps, us, null);
     }
     
@@ -1024,7 +1025,7 @@ public class JXLoginPanel extends JXImagePanel {
      * Shows a login dialog. This method blocks.
      * @return The status of the login operation
      */
-    public static Status showLoginDialog(JComponent parent, LoginService svc, PasswordStore ps, UserNameStore us, List<String> servers) {
+    public static Status showLoginDialog(Component parent, LoginService svc, PasswordStore ps, UserNameStore us, List<String> servers) {
         JXLoginPanel panel = new JXLoginPanel(svc, ps, us, servers);
         return showLoginDialog(parent, panel);
     }
@@ -1033,7 +1034,7 @@ public class JXLoginPanel extends JXImagePanel {
      * Shows a login dialog. This method blocks.
      * @return The status of the login operation
      */
-    public static Status showLoginDialog(JComponent parent, JXLoginPanel panel) {
+    public static Status showLoginDialog(Component parent, JXLoginPanel panel) {
         Window w = WindowUtils.findWindow(parent);
         JXLoginDialog dlg =  null;
         if (w == null) {
