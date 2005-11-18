@@ -95,7 +95,20 @@ import javax.swing.event.EventListenerList;
  * a red foreground. Also, as mentioned earlier, the highlighters are applied in
  * the order they appear in the list.</p>
  *
+ * <p> Highlighters are mutable by default, that is all there properties can be
+ * changed dynamically. If so they fire changeEvents to registered ChangeListeners.
+ * They can be marked as immutable at instantiation time - if so, trying to mutate
+ * all properties will not have any effect, ChangeListeners are not registered and
+ * no events are fired. </p>
+ * 
+ * <p> This base class has properties background/foreground and corresponding
+ * selectionBackground/selectionForeground. It will apply those colors "absolutely", 
+ * that is without actually computing any derived color. It's up to subclasses to 
+ * implement color computation, if desired. </p>
+ *
  * @author Ramesh Gupta
+ * @author Jeanette Winzenburg
+ * 
  * @see ComponentAdapter
  * @see javax.swing.ListCellRenderer
  * @see javax.swing.table.TableCellRenderer
@@ -120,6 +133,8 @@ public class Highlighter {
      * each cell with a pastel green "ledger" background color, and is most
      * effective when the {@link ComponentAdapter#target} component has
      * horizontal gridlines in <code>Color.cyan.darker()</code> color.
+     * 
+     * @deprecated set the component's background color instead!
      */
     public final static Highlighter ledgerBackground =
                 new Highlighter(new Color(0xF5, 0xFF, 0xF5), null, true);
@@ -129,6 +144,8 @@ public class Highlighter {
      * each cell with a pastel yellow "notepad" background color, and is most
      * effective when the {@link ComponentAdapter#target} component has
      * horizontal gridlines in <code>Color.cyan.darker()</code> color.
+     * 
+     * @deprecated set the component's background color instead!
      */
     public final static Highlighter notePadBackground =
                 new Highlighter(new Color(0xFF, 0xFF, 0xCC), null, true);
@@ -216,9 +233,12 @@ public class Highlighter {
      * This is the bottleneck decorate method that all highlighters must invoke
      * to decorate the cell renderer. This method invokes {@link #applyBackground
      * applyBackground}, {@link #applyForeground applyForeground},
-     * {@link #applyFont applyFont} and so on, to decorate the corresponding
-     * attributes of the specified component within the given adapter.
+     * to decorate the corresponding
+     * attributes of the specified component within the given adapter. <p>
      *
+     * Subclasses which want to decorate additional properties must override
+     * this and additionally call custom applyXX methods.
+     * 
      * @param renderer the cell renderer component that is to be decorated
      * @param adapter the {@link ComponentAdapter} for this decorate operation
      * @return the decorated cell renderer component
@@ -226,17 +246,16 @@ public class Highlighter {
     protected Component doHighlight(Component renderer, ComponentAdapter adapter) {
         applyBackground(renderer, adapter);
         applyForeground(renderer, adapter);
-        applyFont(renderer, adapter); // e.g., make it bold
-        // and so on...
         return renderer;
     }
 
     /**
-     * Computes a suitable background for the renderer component within the
-     * specified adapter by calling {@link #computeBackground computeBackground}
-     * and applies the computed color to the component. If the computed
-     * color is null, it leaves the background unchanged; Otherwise it sets the
-     * component's background to the computed color.
+     * Applies a suitable background for the renderer component within the
+     * specified adapter. <p>
+     * 
+     * This implementation calls {@link #computeBackground computeBackground}
+     * and applies the computed color to the component if the returned value is
+     * != null. Otherwise it does nothing.
      *
      * @param renderer the cell renderer component that is to be decorated
      * @param adapter the {@link ComponentAdapter} for this decorate operation
@@ -249,11 +268,12 @@ public class Highlighter {
     }
 
     /**
-     * Computes a suitable foreground for the renderer component within the
-     * specified adapter by calling {@link #computeForeground computeForeground}
-     * and applies the computed color to the component. If the computed
-     * color is null, it leaves the foreground unchanged; Otherwise it sets the
-     * component's foreground to the computed color.
+     * Applies a suitable foreground for the renderer component within the
+     * specified adapter. <p>
+     * 
+     * This implementation calls {@link #computeForeground computeForeground}
+     * and applies the computed color to the component if the returned value
+     * is != null. Otherwise it does nothing.
      *
      * @param renderer the cell renderer component that is to be decorated
      * @param adapter the {@link ComponentAdapter} for this decorate operation
@@ -263,16 +283,6 @@ public class Highlighter {
         if (color != null) {
             renderer.setForeground(color);
         }
-    }
-
-    /**
-     * Empty method. Override it to change the font of the renderer component.
-     *
-     * @param renderer the cell renderer component that is to be decorated
-     * @param adapter the {@link ComponentAdapter} for this decorate operation
-     */
-    protected void applyFont(Component renderer, ComponentAdapter adapter) {
-        // must be overridden to cause any effect
     }
 
     /**
@@ -342,10 +352,9 @@ public class Highlighter {
     }
 
     /**
-     * Computes the selected background color. If the selected background color
-     * of this <code>Highlighter</code> is not null, this method returns that
-     * color. Otherwise, it returns a {@link java.awt.Color#darker} version of
-     * the specified seed color.
+     * Computes the selected background color. 
+     * 
+     * This implementation simply returns the selectedBackground property.
      *
      * @param seed initial background color; must cope with null!
      * @return the background color for a selected cell
@@ -359,10 +368,9 @@ public class Highlighter {
     }
 
     /**
-     * Computes the selected foreground color. If the selected foreground color
-     * of this <code>Highlighter</code> is not null, this method returns that
-     * color. Otherwise, it returns {@link java.awt.Color#white}, ignoring the
-     * specified seed color. 
+     * Computes the selected foreground color. 
+     * 
+     * This implementation simply returns the selectedBackground property.
      *
      * @param seed initial foreground color; must cope with null!
      * @return the foreground color for a selected cell
@@ -394,10 +402,9 @@ public class Highlighter {
     }
 
     /**
-     * Sets the background color of this <code>Highlighter</code> if this
-     * is not immutable.
-     *
-     * Does nothing if immutable.
+     * Sets the background color of this <code>Highlighter</code> and 
+     * notifies registered ChangeListeners if this
+     * is mutable. Does nothing if immutable.
      *  
      * @param color the background color of this <code>Highlighter</code>,
      *          or null, to clear any existing background color
@@ -419,7 +426,9 @@ public class Highlighter {
     }
 
     /**
-     * Sets the foreground color of this <code>Highlighter</code>.
+     * Sets the foreground color of this <code>Highlighter</code> and notifies
+     * registered ChangeListeners if this is mutable. Does nothing if 
+     * immutable.
      *
      * @param color the foreground color of this <code>Highlighter</code>,
      *          or null, to clear any existing foreground color
@@ -441,7 +450,9 @@ public class Highlighter {
     }
 
     /**
-     * Sets the selected background color of this <code>Highlighter</code>.
+     * Sets the selected background color of this <code>Highlighter</code>
+     * and notifies registered ChangeListeners if this is mutable. Does nothing
+     * if immutable.
      *
      * @param color the selected background color of this <code>Highlighter</code>,
      *          or null, to clear any existing selected background color
@@ -463,7 +474,9 @@ public class Highlighter {
     }
 
     /**
-     * Sets the selected foreground color of this <code>Highlighter</code>.
+     * Sets the selected foreground color of this <code>Highlighter</code> and
+     * notifies registered ChangeListeners if this is mutable. Does nothing if
+     * immutable.
      *
      * @param color the selected foreground color of this <code>Highlighter</code>,
      *          or null, to clear any existing selected foreground color
@@ -475,12 +488,11 @@ public class Highlighter {
     }
 
     /**
-     * Adds a <code>ChangeListener</code>.  The change listeners are run each
-     * time any one of the Bounded Range model properties changes.
+     * Adds a <code>ChangeListener</code> if this is mutable. ChangeListeners are
+     * notified after changes of any attribute. Does nothing if immutable. 
      *
      * @param l the ChangeListener to add
      * @see #removeChangeListener
-     * @see BoundedRangeModel#addChangeListener
      */
     public void addChangeListener(ChangeListener l) {
         if (isImmutable()) return;
@@ -489,11 +501,11 @@ public class Highlighter {
     
 
     /**
-     * Removes a <code>ChangeListener</code>.
+     * Removes a <code>ChangeListener</code> if this is mutable. 
+     * Does nothis if immutable.
      *
      * @param l the <code>ChangeListener</code> to remove
      * @see #addChangeListener
-     * @see BoundedRangeModel#removeChangeListener
      */
     public void removeChangeListener(ChangeListener l) {
         if (isImmutable()) return;
@@ -503,7 +515,7 @@ public class Highlighter {
 
     /**
      * Returns an array of all the change listeners
-     * registered on this <code>DefaultBoundedRangeModel</code>.
+     * registered on this <code>Highlighter</code>.
      *
      * @return all of this model's <code>ChangeListener</code>s 
      *         or an empty
@@ -523,8 +535,6 @@ public class Highlighter {
     /** 
      * Runs each <code>ChangeListener</code>'s <code>stateChanged</code> method.
      * 
-     * @see #setRangeProperties
-     * @see EventListenerList
      */
     protected void fireStateChanged() {
         if (isImmutable()) return;

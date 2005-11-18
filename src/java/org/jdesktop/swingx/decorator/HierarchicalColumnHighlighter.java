@@ -47,15 +47,6 @@ public class HierarchicalColumnHighlighter extends Highlighter {
         return null;    // don't change the background
     }
 
-    public Color getForeground(Component component, ComponentAdapter adapter) {
-        if (adapter.isHierarchical()) {
-            if (getForeground() != null) {
-                return super.computeForeground(component, adapter);
-            }
-        }
-        return null;    // don't change the foreground
-    }
-
     protected Color computeBackgroundSeed(Color seed) {
         return new Color(Math.max((int)(seed.getRed()  * 0.95), 0),
                          Math.max((int)(seed.getGreen()* 0.95), 0),
