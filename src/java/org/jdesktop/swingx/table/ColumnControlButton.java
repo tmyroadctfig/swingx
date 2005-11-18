@@ -201,8 +201,9 @@ public final class ColumnControlButton extends JButton {
             popupMenu.setVisible(false);
         } else if (popupMenu.getComponentCount() > 0) {
             Dimension buttonSize = getSize();
-            popupMenu.show(this, buttonSize.width
-                    - popupMenu.getPreferredSize().width, buttonSize.height);
+            int xPos = getComponentOrientation().isLeftToRight() ?
+                    buttonSize.width - popupMenu.getPreferredSize().width : 0;
+             popupMenu.show(this, xPos, buttonSize.height);
         }
     }
 
