@@ -386,10 +386,9 @@ public class JXDatePicker extends JComponent {
     }
 
     /**
-     * Enables or disables the date picker and all its subcomponents.
-     *
-     * @param value true to enable, false to disable
+     * {@inheritDoc}
      */
+    @Override
     public void setEnabled(boolean value) {
         if (isEnabled() == value) {
             return;
@@ -398,6 +397,15 @@ public class JXDatePicker extends JComponent {
         super.setEnabled(value);
         _dateField.setEnabled(value);
         _popupButton.setEnabled(value);
+    }
+
+    public void setEditable(boolean value) {
+        _monthView.setEnabled(value);
+        _dateField.setEditable(value);
+    }
+
+    public boolean isEditable() {
+        return _dateField.isEditable();
     }
 
     /**
@@ -541,17 +549,19 @@ public class JXDatePicker extends JComponent {
                 return;
             }
 
-            if (_dateField.isEditValid()) {
-                try {
-                    _dateField.commitEdit();
-                } catch (java.text.ParseException ex) {
+            if (!isEditable()) {
+                if (_dateField.isEditValid()) {
+                    try {
+                        _dateField.commitEdit();
+                    } catch (java.text.ParseException ex) {
+                    }
                 }
             }
             toggleShowPopup();
         }
 
         public void mouseReleased(MouseEvent ev) {
-            if (!isEnabled()) {
+            if (!isEnabled() || !isEditable()) {
                 return;
             }
 
@@ -571,7 +581,7 @@ public class JXDatePicker extends JComponent {
         }
 
         public void mouseDragged(MouseEvent ev) {
-            if (!isEnabled()) {
+            if (!isEnabled() || !isEditable()) {
                 return;
             }
 
