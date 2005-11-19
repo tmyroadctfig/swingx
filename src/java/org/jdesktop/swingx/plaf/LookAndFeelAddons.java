@@ -70,6 +70,9 @@ public class LookAndFeelAddons {
    * LookAndFeelAddons.
    */
   private static final Object APPCONTEXT_INITIALIZED = new Object();
+
+  private static boolean trackingChanges = false;
+  private static PropertyChangeListener changeListener;    
   
   static {
     // load the default addon
@@ -320,9 +323,6 @@ public class LookAndFeelAddons {
   //
   // TRACKING OF THE CURRENT LOOK AND FEEL
   //
-  private static boolean trackingChanges = false;
-  private static PropertyChangeListener changeListener;    
-
   private static class UpdateAddon implements PropertyChangeListener {
     public void propertyChange(PropertyChangeEvent evt) {
       try {
