@@ -33,6 +33,8 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
@@ -75,11 +77,33 @@ import javax.swing.Timer;
  * frame.add("Center", scroll);
  *
  * // Show/hide the "Controls"
- * JButton toggle = new JButton(cp.getActionMap().get("toggle"));
+ * JButton toggle = new JButton(cp.getActionMap().get(JXCollapsiblePane.TOGGLE_ACTION));
+ * toggle.setText("Show/Hide Search Panel");
  * frame.add("South", toggle);
  *
  * frame.pack();
  * frame.setVisible(true);
+ * </code>
+ * </pre>
+ * 
+ * <p>
+ * The <code>JXCollapsiblePane</code> has a default toggle action registered
+ * under the name {@link #TOGGLE_ACTION}. Bind this action to a button and
+ * pressing the button will automatically toggle the pane between expanded
+ * and collapsed states. Additionally, you can define the icons to use through
+ * the {@link #EXPAND_ICON} and {@link #COLLAPSE_ICON} properties on the action.
+ * Example
+ * <pre>
+ * <code>
+ * // get the built-in toggle action 
+ * Action toggleAction = collapsible.getActionMap().
+ *   get(JXCollapsiblePane.TOGGLE_ACTION);
+ *   
+ * // use the collapse/expand icons from the JTree UI 
+ * toggleAction.putValue(JXCollapsiblePane.COLLAPSE_ICON,
+ *                       UIManager.getIcon("Tree.expandedIcon"));
+ * toggleAction.putValue(JXCollapsiblePane.EXPAND_ICON,
+ *                       UIManager.getIcon("Tree.collapsedIcon"));
  * </code>
  * </pre>
  * 
@@ -112,6 +136,25 @@ public class JXCollapsiblePane extends JPanel {
    * Used when generating PropertyChangeEvents for the "animationState" property
    */
   public final static String ANIMATION_STATE_KEY = "animationState";
+
+  /**
+   * JXCollapsible has a built-in toggle action which can be bound to buttons.
+   * Accesses the action through
+   * <code>collapsiblePane.getActionMap().get(JXCollapsiblePane.TOGGLE_ACTION)</code>.
+   */
+  public final static String TOGGLE_ACTION = "toggle";
+  
+  /**
+   * The icon used by the "toggle" action when the JXCollapsiblePane is
+   * expanded, i.e the icon which indicates the pane can be collapsed.
+   */
+  public final static String COLLAPSE_ICON = "collapseIcon";
+  
+  /**
+   * The icon used by the "toggle" action when the JXCollapsiblePane is
+   * collapsed, i.e the icon which indicates the pane can be expanded.
+   */
+  public final static String EXPAND_ICON = "expandIcon";
   
   /**
    * Indicates whether the component is collapsed or expanded
@@ -144,13 +187,43 @@ public class JXCollapsiblePane extends JPanel {
     setAnimationParams(new AnimationParams(30, 8, 0.01f, 1.0f));
     
     // add an action to automatically toggle the state of the pane
-    getActionMap().put("toggle", new AbstractAction("Toggle") {
-      public void actionPerformed(ActionEvent e) {
-        setCollapsed(!isCollapsed());
-      }
-    });
+    getActionMap().put(TOGGLE_ACTION, new ToggleAction());
   }
 
+  /**
+   * Toggles the JXCollapsiblePane state and updates its icon based on the
+   * JXCollapsiblePane "collapsed" status.
+   */
+  private class ToggleAction extends AbstractAction implements
+    PropertyChangeListener {
+    public ToggleAction() {
+      super(TOGGLE_ACTION);
+      // the action must track the collapsed status of the pane to update its
+      // icon
+      JXCollapsiblePane.this.addPropertyChangeListener("collapsed", this);
+    }
+    @Override
+    public void putValue(String key, Object newValue) {
+      super.putValue(key, newValue);
+      if (EXPAND_ICON.equals(key) || COLLAPSE_ICON.equals(key)) {
+        updateIcon();
+      }
+    }
+    public void actionPerformed(ActionEvent e) {      
+      setCollapsed(!isCollapsed());
+    }
+    public void propertyChange(PropertyChangeEvent evt) {
+      updateIcon();
+    }
+    void updateIcon() {      
+      if (isCollapsed()) {
+        putValue(SMALL_ICON, getValue(EXPAND_ICON));
+      } else {
+        putValue(SMALL_ICON, getValue(COLLAPSE_ICON));
+      }
+    }
+  }
+  
   /**
    * Sets the content pane of this JXCollapsiblePane. Components must be added
    * to this content pane, not to the JXCollapsiblePane.
