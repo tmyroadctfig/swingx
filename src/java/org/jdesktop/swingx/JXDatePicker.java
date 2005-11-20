@@ -151,12 +151,6 @@ public class JXDatePicker extends JComponent {
         }
         _dateField.setColumns(cols);
 
-        String str = UIManager.getString("JXDatePicker.arrowDown.tooltip");
-        if (str == null) {
-            str = "Show Calendar";
-        }
-        _popupButton.setToolTipText(str);
-
         Icon icon = UIManager.getIcon("JXDatePicker.arrowDown.image");
         if (icon == null) {
             icon = (Icon)UIManager.get("Tree.expandedIcon");
@@ -406,6 +400,16 @@ public class JXDatePicker extends JComponent {
 
     public boolean isEditable() {
         return _dateField.isEditable();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setToolTipText(String text) {
+        super.setToolTipText(text);
+        _dateField.setToolTipText(text);
+        _popupButton.setToolTipText(text);
     }
 
     /**
