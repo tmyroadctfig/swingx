@@ -22,12 +22,14 @@ package org.jdesktop.swingx;
 
 import org.jdesktop.swingx.calendar.DateSpan;
 import org.jdesktop.swingx.calendar.JXMonthView;
+import org.jdesktop.swingx.plaf.DatePickerUI;
+import org.jdesktop.swingx.plaf.JXDatePickerAddon;
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.swingx.plaf.basic.BasicDatePickerUI;
 
 import javax.swing.*;
 import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
-import javax.swing.border.Border;
-import javax.swing.border.LineBorder;
 import javax.swing.text.DefaultFormatterFactory;
 import java.awt.*;
 import java.awt.event.*;
@@ -49,6 +51,21 @@ import java.util.TimeZone;
  * @author Joshua Outwater
  */
 public class JXDatePicker extends JComponent {
+
+    static {
+      LookAndFeelAddons.contribute(new JXDatePickerAddon());
+    }
+
+    /**
+     * UI Class ID
+     */
+    public static final String uiClassID = "DatePickerUI";
+
+    public static final String EDITOR = "editor";
+    public static final String MONTH_VIEW = "monthView";
+    public static final String DATE_IN_MILLIS ="dateInMillis";
+    public static final String LINK_PANEL = "linkPanel";
+
     /** The editable date field that displays the date */
     private JFormattedTextField _dateField;
 
@@ -56,15 +73,12 @@ public class JXDatePicker extends JComponent {
      * Popup that displays the month view with controls for
      * traversing/selecting dates.
      */
-    private JXDatePickerPopup _popup;
     private JPanel _linkPanel;
     private long _linkDate;
     private MessageFormat _linkFormat;
-    private JButton _popupButton;
-    private int _popupButtonWidth = 20;
     private JXMonthView _monthView;
-    private Handler _handler;
     private String _actionCommand = "selectionChanged";
+    private boolean editable = true;
 
     /**
      * Create a new date picker using the current date as the initial
@@ -95,81 +109,48 @@ public class JXDatePicker extends JComponent {
         _monthView = new JXMonthView();
         _monthView.setTraversable(true);
 
-        _dateField = createEditor();
-        _dateField.setName("dateField");
-        _dateField.setBorder(null);
-        
-        _handler = new Handler();
-        _popupButton = new JButton();
-        _popupButton.setName("popupButton");
-        _popupButton.setRolloverEnabled(false);
-        _popupButton.addMouseListener(_handler);
-        _popupButton.addMouseMotionListener(_handler);
+        _linkFormat = new MessageFormat(UIManager.getString("JXDatePicker.linkFormat"));
 
-        // this is a trick to get hold of the client prop which
-        // prevents closing of the popup
-        JComboBox box = new JComboBox();
-        Object preventHide = box.getClientProperty("doNotCancelPopup");
-        _popupButton.putClientProperty("doNotCancelPopup", preventHide);
-
-        KeyStroke enterKey =
-            KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false);
-
-        InputMap inputMap = _dateField.getInputMap(JComponent.WHEN_FOCUSED);
-        inputMap.put(enterKey, "COMMIT_EDIT");
-
-        ActionMap actionMap = _dateField.getActionMap();
-        actionMap.put("COMMIT_EDIT", new CommitEditAction());
-
-        KeyStroke spaceKey =
-            KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false);
-
-        inputMap = _popupButton.getInputMap(JComponent.WHEN_FOCUSED);
-        inputMap.put(spaceKey, "TOGGLE_POPUP");
-
-        actionMap = _popupButton.getActionMap();
-        actionMap.put("TOGGLE_POPUP", new TogglePopupAction());
-
-        add(_dateField);
-        add(_popupButton);
-
-        updateUI();
-        
         _linkDate = System.currentTimeMillis();
         _linkPanel = new TodayPanel();
         
+        updateUI();
+
         _dateField.setValue(new Date(millis));
     }
 
     /**
-     * Resets the UI property to a value from the current look and feel.
+     * @inheritDoc
+     */
+    public DatePickerUI getUI() {
+        return (DatePickerUI)ui;
+    }
+
+    /**
+     * Sets the L&F object that renders this component.
+     *
+     * @param ui
+     */
+    public void setUI(DatePickerUI ui) {
+        super.setUI(ui);
+    }
+
+    /**
+     * Resets the UI property with the value from the current look and feel.
+     *
+     * @see UIManager#getUI
      */
     public void updateUI() {
-        int cols = UIManager.getInt("JXDatePicker.numColumns");
-        if (cols == -1) {
-            cols = 10;
-        }
-        _dateField.setColumns(cols);
+        setUI((DatePickerUI)UIManager.getUI(this));
+        invalidate();
+    }
 
-        Icon icon = UIManager.getIcon("JXDatePicker.arrowDown.image");
-        if (icon == null) {
-            icon = (Icon)UIManager.get("Tree.expandedIcon");
-        }
-        _popupButton.setIcon(icon);
-
-        Border border = UIManager.getBorder("JXDatePicker.border");
-        if (border == null) {
-            border = BorderFactory.createCompoundBorder(
-                    LineBorder.createGrayLineBorder(),
-                    BorderFactory.createEmptyBorder(3, 3, 3, 3));
-        }
-        _dateField.setBorder(border);
-
-        String formatString = UIManager.getString("JXDatePicker.linkFormat");
-        if (formatString == null) {
-            formatString = "Today is {0,date, dd MMMM yyyy}";
-        }
-        _linkFormat = new MessageFormat(formatString);
+    /**
+     * @inheritDoc
+     */
+    @Override
+    public String getUIClassID() {
+        return uiClassID;
     }
 
     /**
@@ -276,8 +257,9 @@ public class JXDatePicker extends JComponent {
      * @see #getTimeZone
      */
     public void setMonthView(JXMonthView monthView) {
+        JXMonthView oldMonthView = _monthView;
         _monthView = monthView;
-        _popup = null;
+        firePropertyChange(MONTH_VIEW, oldMonthView, _monthView);
     }
 
     /**
@@ -299,6 +281,10 @@ public class JXDatePicker extends JComponent {
     public void setTimeZone(TimeZone tz) {
         _monthView.setTimeZone(tz);
 
+    }
+
+    public long getLinkDate() {
+        return _linkDate;
     }
 
     /**
@@ -334,12 +320,9 @@ public class JXDatePicker extends JComponent {
      * @param linkPanel The new panel to install in the popup
      */
     public void setLinkPanel(JPanel linkPanel) {
-        // If the popup is null we haven't shown it yet.
-        if (_popup != null) {
-            _popup.remove(_linkPanel);
-            _popup.add(linkPanel, BorderLayout.SOUTH);
-        }
+        JPanel oldLinkPanel = _linkPanel;
         _linkPanel = linkPanel;
+        firePropertyChange(LINK_PANEL, oldLinkPanel, _linkPanel);
     }
     
     /**
@@ -351,14 +334,10 @@ public class JXDatePicker extends JComponent {
         return _dateField;
     }
 
-    /**
-     * Creates the editor used to edit the date selection.  Subclasses should
-     * override this method if they want to substitute in their own editor.
-     *
-     * @return an instance of a JFormattedTextField
-     */
-    protected JFormattedTextField createEditor() {
-        return new JFormattedTextField(new JXDatePickerFormatter());
+    public void setEditor(JFormattedTextField editor) {
+        JFormattedTextField oldEditor = _dateField;
+        _dateField = editor;
+        firePropertyChange(EDITOR, oldEditor, _dateField);
     }
 
     /**
@@ -379,37 +358,17 @@ public class JXDatePicker extends JComponent {
         _dateField.commitEdit();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setEnabled(boolean value) {
-        if (isEnabled() == value) {
-            return;
-        }
-
-        super.setEnabled(value);
-        _dateField.setEnabled(value);
-        _popupButton.setEnabled(value);
-    }
-
     public void setEditable(boolean value) {
-        _monthView.setEnabled(value);
-        _dateField.setEditable(value);
+        boolean oldEditable = isEditable();
+        editable = value;
+        firePropertyChange("editable", oldEditable, editable);
+        if (editable != oldEditable) {
+            repaint();
+        }
     }
 
     public boolean isEditable() {
-        return _dateField.isEditable();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setToolTipText(String text) {
-        super.setToolTipText(text);
-        _dateField.setToolTipText(text);
-        _popupButton.setToolTipText(text);
+        return editable;
     }
 
     /**
@@ -469,193 +428,17 @@ public class JXDatePicker extends JComponent {
         }
     }
 
+    public void postActionEvent() {
+        fireActionPerformed();
+    }
+
     /**
      * {@inheritDoc}
      */
     public void doLayout() {
-        int width = getWidth();
-        int height = getHeight();
-
-        Insets insets = getInsets();
-        _dateField.setBounds(insets.left,
-                insets.bottom,
-                width - _popupButtonWidth,
-                height);
-        _popupButton.setBounds(width - _popupButtonWidth + insets.left,
-                insets.bottom,
-                _popupButtonWidth,
-                height);
+        ((BasicDatePickerUI)getUI()).doLayout();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public Dimension getMinimumSize() {
-        return getPreferredSize();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Dimension getPreferredSize() {
-        Dimension dim = _dateField.getPreferredSize();
-        dim.width += _popupButton.getPreferredSize().width;
-        Insets insets = getInsets();
-        dim.width += insets.left + insets.right;
-        dim.height += insets.top + insets.bottom;
-        return dim;
-    }
-
-    /**
-     * Action used to commit the current value in the JFormattedTextField.
-     * This action is used by the keyboard bindings.
-     */
-    private class TogglePopupAction extends AbstractAction {
-        public TogglePopupAction() {
-            super("TogglePopup");
-        }
-
-        public void actionPerformed(ActionEvent ev) {
-            _handler.toggleShowPopup();
-        }
-    }
-
-    /**
-     * Action used to commit the current value in the JFormattedTextField.
-     * This action is used by the keyboard bindings.
-     */
-    private class CommitEditAction extends AbstractAction {
-        public CommitEditAction() {
-            super("CommitEditPopup");
-        }
-
-        public void actionPerformed(ActionEvent ev) {
-            try {
-                // Commit the current value.
-                _dateField.commitEdit();
-
-                // Reformat the value according to the formatter.
-                _dateField.setValue(_dateField.getValue());
-                fireActionPerformed();
-            } catch (java.text.ParseException ex) {
-            }
-        }
-    }
-
-    private class Handler implements MouseListener, MouseMotionListener {
-        private boolean _forwardReleaseEvent = false;
-
-        public void mouseClicked(MouseEvent ev) {
-        }
-
-        public void mousePressed(MouseEvent ev) {
-            if (!isEnabled()) {
-                return;
-            }
-
-            if (!isEditable()) {
-                if (_dateField.isEditValid()) {
-                    try {
-                        _dateField.commitEdit();
-                    } catch (java.text.ParseException ex) {
-                    }
-                }
-            }
-            toggleShowPopup();
-        }
-
-        public void mouseReleased(MouseEvent ev) {
-            if (!isEnabled() || !isEditable()) {
-                return;
-            }
-
-            // Retarget mouse event to the month view.
-            if (_forwardReleaseEvent) {
-                ev = SwingUtilities.convertMouseEvent(_popupButton, ev,
-                        _monthView);
-                _monthView.dispatchEvent(ev);
-                _forwardReleaseEvent = false;
-            }
-        }
-
-        public void mouseEntered(MouseEvent ev) {
-        }
-
-        public void mouseExited(MouseEvent ev) {
-        }
-
-        public void mouseDragged(MouseEvent ev) {
-            if (!isEnabled() || !isEditable()) {
-                return;
-            }
-
-            _forwardReleaseEvent = true;
-
-            if (!_popup.isShowing()) {
-                return;
-            }
-
-            // Retarget mouse event to the month view.
-            ev = SwingUtilities.convertMouseEvent(_popupButton, ev, _monthView);
-            _monthView.dispatchEvent(ev);
-        }
-
-        public void mouseMoved(MouseEvent ev) {
-        }
-
-        public void toggleShowPopup() {
-            if (_popup == null) {
-                _popup = new JXDatePickerPopup();
-            }
-            if (!_popup.isVisible()) {
-                if (_dateField.getValue() == null) {
-                    _dateField.setValue(new Date(_linkDate));
-                }
-                DateSpan span =
-                        new DateSpan((java.util.Date)_dateField.getValue(),
-                                (java.util.Date)_dateField.getValue());
-                _monthView.setSelectedDateSpan(span);
-                _monthView.ensureDateVisible(
-                        ((Date)_dateField.getValue()).getTime());
-                _popup.show(JXDatePicker.this,
-                        0, JXDatePicker.this.getHeight());
-            } else {
-                _popup.setVisible(false);
-            }
-        }
-    }
-
-    /**
-     * Popup component that shows a JXMonthView component along with controlling
-     * buttons to allow traversal of the months.  Upon selection of a date the
-     * popup will automatically hide itself and enter the selection into the
-     * editable field of the JXDatePicker.
-     */
-    protected class JXDatePickerPopup extends JPopupMenu
-            implements ActionListener {
-
-        public JXDatePickerPopup() {
-            _monthView.setActionCommand("MONTH_VIEW");
-            _monthView.addActionListener(this);
-
-            setLayout(new BorderLayout());
-            add(_monthView, BorderLayout.CENTER);
-            if (_linkPanel != null) {
-                add(_linkPanel, BorderLayout.SOUTH);
-            }
-        }
-
-        public void actionPerformed(ActionEvent ev) {
-            String command = ev.getActionCommand();
-            if ("MONTH_VIEW".equals(command)) {
-                DateSpan span = _monthView.getSelectedDateSpan();
-                _dateField.setValue(span.getStartAsDate());
-                _popup.setVisible(false);
-                fireActionPerformed();
-            }
-        }
-    }
-        
     private final class TodayPanel extends JXPanel {
         TodayPanel() {
             super(new FlowLayout());
@@ -686,86 +469,6 @@ public class JXDatePicker extends JComponent {
                 DateSpan span = new DateSpan(_linkDate, _linkDate);
                 _monthView.ensureDateVisible(span.getStart());
             }
-        }
-    }        
-    
-    /**
-     * Default formatter for the JXDatePicker component.  This factory
-     * creates and returns a formatter that can handle a variety of date
-     * formats.
-     */
-    static class JXDatePickerFormatter extends
-            JFormattedTextField.AbstractFormatter {
-        private DateFormat _formats[] = null;
-
-        public JXDatePickerFormatter() {
-            _formats = new DateFormat[3];
-            String format = UIManager.getString("JXDatePicker.longFormat");
-            if (format == null) {
-                format = "EEE MM/dd/yyyy";
-            }
-            _formats[0] = new SimpleDateFormat(format);
-
-            format = UIManager.getString("JXDatePicker.mediumFormat");
-            if (format == null) {
-                format = "MM/dd/yyyy";
-            }
-            _formats[1] = new SimpleDateFormat(format);
-
-            format = UIManager.getString("JXDatePicker.shortFormat");
-            if (format == null) {
-                format = "MM/dd";
-            }
-            _formats[2] = new SimpleDateFormat(format);
-        }
-
-        public JXDatePickerFormatter(DateFormat formats[]) {
-            _formats = formats;
-        }
-
-        public DateFormat[] getFormats() {
-            return _formats;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public Object stringToValue(String text) throws ParseException {
-            Object result = null;
-            ParseException pex = null;
-
-            if (text == null || text.trim().length() == 0) {
-                return null;
-            }
-
-            // If the current formatter did not work loop through the other
-            // formatters and see if any of them can parse the string passed
-            // in.
-            for (DateFormat _format : _formats) {
-                try {
-                    result = (_format).parse(text);
-                    pex = null;
-                    break;
-                } catch (ParseException ex) {
-                    pex = ex;
-                }
-            }
-
-            if (pex != null) {
-                throw pex;
-            }
-            
-            return result;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public String valueToString(Object value) throws ParseException {
-            if (value != null) {
-                return _formats[0].format(value);
-            }
-            return null;
         }
     }
 }
