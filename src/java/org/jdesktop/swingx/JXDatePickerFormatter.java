@@ -19,23 +19,9 @@ public class JXDatePickerFormatter extends
 
     public JXDatePickerFormatter() {
         _formats = new DateFormat[3];
-        String format = UIManager.getString("JXDatePicker.longFormat");
-        if (format == null) {
-            format = "EEE MM/dd/yyyy";
-        }
-        _formats[0] = new SimpleDateFormat(format);
-
-        format = UIManager.getString("JXDatePicker.mediumFormat");
-        if (format == null) {
-            format = "MM/dd/yyyy";
-        }
-        _formats[1] = new SimpleDateFormat(format);
-
-        format = UIManager.getString("JXDatePicker.shortFormat");
-        if (format == null) {
-            format = "MM/dd";
-        }
-        _formats[2] = new SimpleDateFormat(format);
+        _formats[0] = new SimpleDateFormat(UIManager.getString("JXDatePicker.longFormat"));
+        _formats[1] = new SimpleDateFormat(UIManager.getString("JXDatePicker.mediumFormat"));
+        _formats[2] = new SimpleDateFormat(UIManager.getString("JXDatePicker.shortFormat"));
     }
 
     public JXDatePickerFormatter(DateFormat formats[]) {
