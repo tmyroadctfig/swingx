@@ -447,12 +447,12 @@ public class BasicDatePickerUI extends DatePickerUI {
         }
 
         public void layoutContainer(Container parent) {
-            int width = datePicker.getWidth();
-            int height = datePicker.getHeight();
+            Insets insets = datePicker.getInsets();
+            int width = datePicker.getWidth() - insets.left - insets.right;
+            int height = datePicker.getHeight() - insets.top - insets.bottom;
 
             int popupButtonWidth = popupButton != null ? popupButton.getPreferredSize().width : 0;
 
-            Insets insets = datePicker.getInsets();
             datePicker.getEditor().setBounds(insets.left,
                     insets.bottom,
                     width - popupButtonWidth,
