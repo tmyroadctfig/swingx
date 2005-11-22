@@ -157,7 +157,7 @@ public class ServerAction extends AbstractAction {
      */
     public void addHeader(String name, String value) {
 	Map map = getHeaders();
-	if (map != null) {
+	if (map == null) {
 	    map = new HashMap();
 	    setHeaders(map);
 	}
