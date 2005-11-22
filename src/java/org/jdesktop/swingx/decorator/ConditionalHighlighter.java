@@ -25,14 +25,17 @@ import java.awt.Color;
 import java.awt.Component;
 
 /**
- * ConditionalHighlighter
- *
+ * ConditionalHighlighter.
+ * 
+ * 
  * @author Ramesh Gupta
  */
 public abstract class ConditionalHighlighter extends Highlighter {
     protected int               testColumn = 0;         // always in model coordinates
     protected int               highlightColumn = -1;   // always in model coordinates
-    protected int               mask = 255;
+
+    // JW ?? - changed from 255 to 256 to not be "on" by default...
+    protected int               mask = 256;
 
     public ConditionalHighlighter() {
         // default constructor
@@ -62,11 +65,18 @@ public abstract class ConditionalHighlighter extends Highlighter {
         this.highlightColumn = highlightColumn;
     }
 
+    /**
+     * JW ??
+     */
     public void setMask(int alpha) {
         mask = alpha;
         fireStateChanged();
     }
 
+    /**
+     * JW ??
+     * @return
+     */
     public int getMask() {
         return mask;
     }
@@ -89,6 +99,13 @@ public abstract class ConditionalHighlighter extends Highlighter {
         return renderer;
     }
 
+    /**
+     * ??
+     * 
+     * @param renderer
+     * @param adapter
+     * @return
+     */
     protected Component doMask(Component renderer, ComponentAdapter adapter) {
 
         maskBackground(renderer, adapter);
@@ -98,6 +115,9 @@ public abstract class ConditionalHighlighter extends Highlighter {
         return renderer;
     }
 
+    /**
+     * ??
+     */
     protected void maskBackground(Component renderer, ComponentAdapter adapter) {
         Color seed = renderer.getBackground();
         Color color = adapter.isSelected() ? computeSelectedBackground(seed) : seed;
@@ -108,6 +128,11 @@ public abstract class ConditionalHighlighter extends Highlighter {
         }
     }
 
+    /**
+     * ??
+     * @param renderer
+     * @param adapter
+     */
     protected void maskForeground(Component renderer, ComponentAdapter adapter) {
         Color seed = renderer.getForeground();
         Color color = adapter.isSelected() ? computeSelectedForeground(seed) : seed;
@@ -118,29 +143,8 @@ public abstract class ConditionalHighlighter extends Highlighter {
     
         }
     }
-
-    /**
-     *
-     * @param renderer
-     * @param adapter
-     * @return null if the background is null; otherwise delegate to superclass
-     */
-    protected Color computeBackground(Component renderer, ComponentAdapter adapter) {
-        return getBackground() == null ? null :
-            super.computeBackground(renderer, adapter);
-    }
-
-    /**
-     *
-     * @param renderer
-     * @param adapter
-     * @return null if the foreground is null; otherwise delegate to superclass
-     */
-    protected Color computeForeground(Component renderer, ComponentAdapter adapter) {
-        return getForeground() == null ? null :
-            super.computeForeground(renderer, adapter);
-    }
-
+   
+    @Override
     protected Color computeSelectedForeground(Color seed) {
         return getSelectedForeground() == null ? 
                 seed == null ? null : seed.brighter() : getSelectedForeground();

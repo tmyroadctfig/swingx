@@ -48,6 +48,7 @@ import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.RolloverHighlighter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
+import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
 import org.jdesktop.swingx.table.TableColumnExt;
@@ -71,9 +72,9 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*Multiple.*");
 //          test.runInteractiveTests("interactive.*RToL.*");
 //          test.runInteractiveTests("interactive.*Boolean.*");
-          test.runInteractiveTests("interactive.*Sorting.*");
+//          test.runInteractiveTests("interactive.*Sorting.*");
           
-//          test.runInteractiveTests("interactive.*Column.*");
+          test.runInteractiveTests("interactive.*Highl.*");
 //        test.runInteractiveTests("interactive.*isable.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
@@ -612,16 +613,6 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         
     }
     
-    public void interactiveTestRolloverHighlight() {
-        JXTable table = new JXTable(sortableTableModel);
-        table.setRolloverEnabled(true);
-        table.setHighlighters(new HighlighterPipeline(new Highlighter[] 
-            {new RolloverHighlighter(Color.YELLOW, null)} ));
-        JFrame frame = wrapWithScrollingInFrame(table, "rollover highlight");
-        frame.setVisible(true);
-
-    }
-
     /**
      * Issue #31 (swingx): clicking header must not sort if table !enabled.
      *
@@ -754,6 +745,30 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         JFrame frame = wrapWithScrollingInFrame(table, "TableSizing2 Test");
         frame.setVisible(true);
     }
+
+    public void interactiveTestRolloverHighlight() {
+        JXTable table = new JXTable(sortableTableModel);
+        table.setRolloverEnabled(true);
+        table.setHighlighters(new HighlighterPipeline(new Highlighter[] 
+            {new RolloverHighlighter(Color.YELLOW, null)} ));
+        JFrame frame = wrapWithScrollingInFrame(table, "rollover highlight");
+        frame.setVisible(true);
+
+    }
+
+    public void interactiveTestTableAlternateHighlighterGroup() {
+        JXTable table = new JXTable(tableModel);
+        table.setRowHeight(22);
+        AlternateRowHighlighter highlighter = new UIAlternateRowHighlighter();
+        highlighter.setLinesPerGroup(5);
+        table.setHighlighters(new HighlighterPipeline(new Highlighter[] {
+            highlighter
+        }));
+
+        JFrame frame = wrapWithScrollingInFrame(table, "AlternateRow with Grouping of 5 lines");
+        frame.setVisible(true);
+    }
+
 
     public void interactiveTestTableAlternateHighlighter1() {
         JXTable table = new JXTable(tableModel);

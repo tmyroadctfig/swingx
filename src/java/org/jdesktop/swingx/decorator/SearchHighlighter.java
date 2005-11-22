@@ -21,6 +21,7 @@
 package org.jdesktop.swingx.decorator;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.util.regex.Pattern;
 
 /**
@@ -101,6 +102,28 @@ public class SearchHighlighter extends PatternHighlighter {
             boolean matches = pattern.matcher(value.toString()).find();
             return matches;
         }
+    }
+
+    
+    /**
+     * <p>Computes a suitable selected background for the renderer component within the
+     * specified adapter and returns the computed color. 
+     * 
+     * This implementation returns super if != null, 
+     * otherwise returns computeUnselectedBackground. The reason is to always 
+     * show a match marker even if no selection specific colors are set. 
+     * 
+     *  PENDING: move up to ConditionalHighlighter?
+     * 
+     * @param renderer
+     * @param adapter
+     * @return
+     * 
+     */
+    @Override
+    protected Color computeSelectedBackground(Component renderer, ComponentAdapter adapter) {
+        Color color = super.computeSelectedBackground(renderer, adapter);
+        return color != null ? color : computeUnselectedBackground(renderer, adapter);
     }
 
     /** set the row to match in test. 

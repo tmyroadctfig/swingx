@@ -6,18 +6,25 @@ package org.jdesktop.swingx.decorator;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import javax.swing.Box;
 import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.ListModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
 
+import org.jdesktop.swingx.JXEditorPaneTest;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
+import org.jdesktop.swingx.LinkModel;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
 
 
@@ -125,20 +132,77 @@ public class HighlighterIssues extends HighlighterTest {
         
     }
     
+    /**
+     * DefaultTableCellRenderer: has memory. How to formulate as test?
+     * this is testing the hack (reset the memory in HighlighterPipeline), not
+     * any highlighter!
+     */
+    public void testTableUnSelectedDoNothingHighlighter() {
+        JXTable table = new JXTable(10, 2);
+        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
+        renderer.setForeground(foreground);
+        table.setHighlighters(new HighlighterPipeline(new Highlighter[]{ }));
+        Component comp = table.prepareRenderer(renderer, 0, 0);
+        assertEquals("do nothing highlighter must not change foreground", foreground, comp.getForeground());
+    }
 
-
-    
-    
     /**
      * Issue #178-swingx: Highlighters always change the selection color.
      */
-    public void testSelectedDoNothingHighlighter() {
-        ComponentAdapter adapter = createComponentAdapter(allColored, true);
-        emptyHighlighter.highlight(allColored, adapter);
-        assertEquals("default highlighter must not change foreground", foreground, allColored.getForeground());
-        assertEquals("default highlighter must not change background", background, allColored.getBackground());
+    public void interactiveTableUnSelectedDoNothingHighlighter() {
+        TableModel model = createTableModelWithLinks();
+        JXTable table = new JXTable(model) {
+
+            @Override
+            public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+                Component comp = super.prepareRenderer(renderer, row, column);
+                ComponentAdapter componentAdapter = getComponentAdapter();
+                componentAdapter.row = row;
+                componentAdapter.column = column;
+                return emptyHighlighter.highlight(comp, componentAdapter);
+            }
+            
+        };
+        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
+        renderer.setForeground(foreground);
+        JXFrame frame = wrapWithScrollingInFrame(table,  
+                "table colored renderer with empty highlighter");
+        frame.setVisible(true);
+        
     }
 
+    private TableModel createTableModelWithLinks() {
+        String[] columnNames = { "text only", "Link editable", "Link not-editable", "Bool editable", "Bool not-editable" };
+        
+        DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
+            public Class getColumnClass(int column) {
+                return getValueAt(0, column).getClass();
+            }
+
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                    return !getColumnName(column).contains("not");
+            }
+            
+        };
+        for (int i = 0; i < 4; i++) {
+            try {
+                LinkModel link = new LinkModel("a link text " + i, null, new URL("http://some.dummy.url" + i));
+                if (i == 1) {
+                    URL url = JXEditorPaneTest.class.getResource("resources/test.html");
+
+                    link = new LinkModel("a link text " + i, null, url);
+                }
+                model.addRow(new Object[] {"text only " + i, link, link, Boolean.TRUE, Boolean.TRUE });
+            } catch (MalformedURLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        return model;
+    }
+
+    
     /**
      * Issue #178-swingx: Highlighters always change the selection color.
      */

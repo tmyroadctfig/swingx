@@ -209,8 +209,8 @@ public class Highlighter {
     public Highlighter(Color cellBackground, Color cellForeground, 
             Color selectedBackground, Color selectedForeground, boolean immutable) {
         this.immutable = immutable;
-        this.background = cellBackground; // could be null
-        this.foreground = cellForeground; // could be null
+        this.background = cellBackground; 
+        this.foreground = cellForeground; 
         this.selectedBackground = selectedBackground;
         this.selectedForeground = selectedForeground;
     }
@@ -287,75 +287,102 @@ public class Highlighter {
 
     /**
      * <p>Computes a suitable background for the renderer component within the
-     * specified adapter and returns the computed color. The computed color
-     * depends on two factors: (i) whether the background color for this
-     * <code>Highlighter</code> is null or not, and (ii) whether the cell
-     * identified by the specified adapter
-     * {@link ComponentAdapter#isSelected isSelected} or not.</p>
-     *
-     * <p>If the background color for this <code>Highlighter</code> is not
-     * null, this method starts with an initial value that is equal to that
-     * background color, and proceeds to check the selected state of the cell.
-     * Otherwise, it starts with the background color of the component whose
-     * cell is being rendererd (not the background color of the renderer component
-     * that was passed in), and proceeds to check the selected state of the cell.</p>
-     *
-     * <p>If the cell identified by the specified adapter is selected, this
-     * method returns the value computed by
-     * {@link #computeSelectedBackground computeSelectedBackground} when passed
-     * the initial background color computed earlier. Otherwise, it simply
-     * returns the initial background color computed earlier.</p>
+     * specified adapter and returns the computed color. 
+     * 
+     * <p> In this implementation the returned color depends
+     * on {@link ComponentAdapter#isSelected isSelected}: it will
+     * return computSelected/-UnselectedBackground, respectively.</p> 
      *
      * @param renderer the cell renderer component that is to be decorated
      * @param adapter the {@link ComponentAdapter} for this decorate operation
      * @return a suitable background color for the specified component and adapter
      */
     protected Color computeBackground(Component renderer, ComponentAdapter adapter) {
-        // If this.background is null, use adapter.target.getBackground();
-        // Never use renderer.getBackground() as the seed in this decorator
-        // class because renderer is too promiscuous!
-        Color seed = background == null ? adapter.target.getBackground() : background;
-        return adapter.isSelected() ? computeSelectedBackground(seed) : seed;
+        return adapter.isSelected() ? computeSelectedBackground(renderer, adapter) :
+            computeUnselectedBackground(renderer, adapter);
+    }
+
+
+
+    /**
+     * <p>Computes a suitable unselected background for the renderer component within the
+     * specified adapter and returns the computed color. 
+     * 
+     * This implementation returns getBackground().
+     * 
+     * @param renderer
+     * @param adapter
+     * @return
+     */
+    protected Color computeUnselectedBackground(Component renderer, ComponentAdapter adapter) {
+        return getBackground();
+    }
+
+    /**
+     * <p>Computes a suitable selected background for the renderer component within the
+     * specified adapter and returns the computed color. 
+     * 
+     * This implementation returns getSelectedBackground().
+     * 
+     * @param renderer
+     * @param adapter
+     * @return
+     */
+    protected Color computeSelectedBackground(Component renderer, ComponentAdapter adapter) {
+        return getSelectedBackground();
     }
 
     /**
      * <p>Computes a suitable foreground for the renderer component within the
-     * specified adapter and returns the computed color. The computed color
-     * depends on two factors: (i) whether the foreground color for this
-     * <code>Highlighter</code> is null or not, and (ii) whether the cell
-     * identified by the specified adapter
-     * {@link ComponentAdapter#isSelected isSelected} or not.</p>
-     *
-     * <p>If the foreground color for this <code>Highlighter</code> is not
-     * null, this method starts with an initial value that is equal to that
-     * foreground color, and proceeds to check the selected state of the cell.
-     * Otherwise, it starts with the foreground color of the component whose
-     * cell is being rendererd (not the foreground color of the renderer component
-     * that was passed in), and proceeds to check the selected state of the cell.</p>
-     *
-     * <p>If the cell identified by the specified adapter is selected, this
-     * method returns the value computed by
-     * {@link #computeSelectedForeground computeSelectedBackground} when passed
-     * the initial foreground color computed earlier. Otherwise, it simply
-     * returns the initial foreground color computed earlier.</p>
+     * specified adapter and returns the computed color. 
+     *  In this implementation the returned color depends
+     * on {@link ComponentAdapter#isSelected isSelected}: it will
+     * return computSelected/-UnselectedForeground, respectively.</p> 
+     *</p>
      *
      * @param renderer the cell renderer component that is to be decorated
      * @param adapter the {@link ComponentAdapter} for this decorate operation
      * @return a suitable foreground color for the specified component and adapter
      */
     protected Color computeForeground(Component renderer, ComponentAdapter adapter) {
-        // If this.foreground is null, use adapter.target.getForeground();
-        // Never use renderer.getForeground() as the seed in this decorator
-        // class because renderer is too promiscuous!
-        Color seed = foreground == null ? adapter.target.getForeground() : foreground;
-        return adapter.isSelected() ? computeSelectedForeground(seed) : seed;
+        return adapter.isSelected() ? computeSelectedForeground(renderer, adapter) :
+            computeUnselectedForeground(renderer, adapter);
+    }
+
+    /**
+     * <p>Computes a suitable unselected foreground for the renderer component within the
+     * specified adapter and returns the computed color. 
+     * 
+     * This implementation returns getForeground().
+     * 
+     * @param renderer
+     * @param adapter
+     * @return
+     */
+    protected Color computeUnselectedForeground(Component renderer, ComponentAdapter adapter) {
+        return getForeground();
+    }
+
+    /**
+     * <p>Computes a suitable selected foreground for the renderer component within the
+     * specified adapter and returns the computed color. 
+     * 
+     * This implementation returns getSelectedForeground().
+     * 
+     * @param renderer
+     * @param adapter
+     * @return
+     */
+    protected Color computeSelectedForeground(Component renderer, ComponentAdapter adapter) {
+        return getSelectedForeground();
     }
 
     /**
      * Computes the selected background color. 
      * 
      * This implementation simply returns the selectedBackground property.
-     *
+     * 
+     * @deprecated this is no longer used by this implementation 
      * @param seed initial background color; must cope with null!
      * @return the background color for a selected cell
      */
@@ -363,8 +390,6 @@ public class Highlighter {
         // JW: first go on fixing #178-swingx - return absolute color
         // this moves the responsibility of computation to subclasses.
         return selectedBackground;
-//        return selectedBackground == null ? 
-//            seed == null ? Color.gray : seed.darker() : selectedBackground;
     }
 
     /**
@@ -372,6 +397,8 @@ public class Highlighter {
      * 
      * This implementation simply returns the selectedBackground property.
      *
+     * @deprecated this method is longer called by this implementation
+     *          
      * @param seed initial foreground color; must cope with null!
      * @return the foreground color for a selected cell
      */
@@ -379,8 +406,6 @@ public class Highlighter {
         // JW: first go on fixing #178-swingx - return absolute color
         // this moves the responsibility of computation to subclasses.
         return selectedForeground; 
-//        return selectedForeground == null ?  
-//                Color.white : selectedForeground;
     }
 
     /**

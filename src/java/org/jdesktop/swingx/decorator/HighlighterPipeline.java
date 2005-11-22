@@ -27,12 +27,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.BoundedRangeModel;
-import javax.swing.JTable;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
+import javax.swing.table.DefaultTableCellRenderer;
 
-import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.Highlighter.UIHighlighter;
 
 /**
@@ -50,7 +49,23 @@ public class HighlighterPipeline implements UIHighlighter {
 
     protected List<Highlighter> highlighters;
     // JW: this is a hack to make JXTable renderers behave...
-    private final static Highlighter nullHighlighter = new Highlighter(null, null, true);
+    private final static Highlighter resetDefaultTableCellRendererHighlighter = new Highlighter(null, null, true){
+
+        @Override
+        protected void applyBackground(Component renderer, ComponentAdapter adapter) {
+            if (!adapter.isSelected()) {
+                renderer.setBackground(null);
+            }
+        }
+
+        @Override
+        protected void applyForeground(Component renderer, ComponentAdapter adapter) {
+            if (!adapter.isSelected()) {
+                renderer.setForeground(null);
+            }
+        }
+        
+    };
     private ChangeListener highlighterChangeListener;
 
     public HighlighterPipeline() {
@@ -141,6 +156,37 @@ public class HighlighterPipeline implements UIHighlighter {
      * @throws NullPointerException if either stamp or adapter is null.
      */
     public Component apply(Component stamp, ComponentAdapter adapter) {
+        stamp = resetDefaultTableCellRenderer(stamp, adapter);
+        for (Iterator<Highlighter> iter = highlighters.iterator(); iter.hasNext();) {
+            stamp = iter.next().highlight(stamp, adapter);
+            
+        }
+        return stamp;
+    }
+
+    /**
+     * This is a hack around DefaultTableCellRenderer color "memory".
+     * 
+     * The issue is that the default has internal color management 
+     * which is different from other types of renderers. The
+     * consequence of the internal color handling is that there's
+     * a color memory which must be reset somehow. The "old" hack around
+     * reset the xxColors of all types of renderers to the adapter's
+     * target XXColors, introducing #178-swingx (Highlighgters must not
+     * change any colors except those for which their color properties are
+     * explicitly set).
+     * 
+     * This hack limits the interference to renderers of type 
+     * DefaultTableCellRenderer, applying a hacking highlighter which
+     *  resets the renderers XXColors to null if unselected. Note that
+     *  both hacks loose any colors previously set by clients (in 
+     *  prepareRenderer before applying the pipeline). 
+     * 
+     * @param stamp
+     * @param adapter
+     * @return
+     */
+    private Component resetDefaultTableCellRenderer(Component stamp, ComponentAdapter adapter) {
         //JW
         // table renderers have different state memory as list/tree renderers
         // without the null they don't unstamp!
@@ -148,13 +194,9 @@ public class HighlighterPipeline implements UIHighlighter {
         // color is changed. This is related to #178-swingx: 
         // highlighter background computation is weird.
         // 
-        if (adapter.getComponent() instanceof JTable) {
+        if (stamp instanceof DefaultTableCellRenderer) {    
         /** @todo optimize the following bug fix */
-            stamp = nullHighlighter.highlight(stamp, adapter); 
-        }
-        for (Iterator<Highlighter> iter = highlighters.iterator(); iter.hasNext();) {
-            stamp = iter.next().highlight(stamp, adapter);
-            
+            stamp = resetDefaultTableCellRendererHighlighter.highlight(stamp, adapter); 
         }
         return stamp;
     }

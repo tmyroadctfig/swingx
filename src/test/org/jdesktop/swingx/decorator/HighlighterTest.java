@@ -8,11 +8,14 @@
 package org.jdesktop.swingx.decorator;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.util.regex.Pattern;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
 import org.jdesktop.swingx.util.ChangeReport;
@@ -240,7 +243,9 @@ public class HighlighterTest extends InteractiveTestCase {
         assertEquals("event count must be increased", ++count,  changeReport.getEventCount() );
         highlighter.setEvenRowBackground(Color.red);
         assertEquals("event count must be increased", ++count,  changeReport.getEventCount() );
-
+        highlighter.setLinesPerGroup(5);
+        assertEquals("event count must be increased", ++count,  changeReport.getEventCount() );
+        
     }
 
     /**
@@ -446,13 +451,25 @@ public class HighlighterTest extends InteractiveTestCase {
         assertApplyHighlightColors(Color.green, Color.magenta, label, testStatus, selected);
     }
 
-    private void assertApplyNoColors(JLabel label, boolean testStatus, boolean selected) {
-        assertApplyHighlightColors(null, null, label, testStatus, selected);
-    }
-    private void assertApplyHighlightColors(Color background, Color foreground, JLabel label, boolean testStatue, boolean selected) {
-        Highlighter highlighter = createConditionalHighlighter(background, foreground, testStatue);
+    private void assertApplyHighlightColors(Color background, Color foreground, JLabel label, boolean testStatus, boolean selected) {
+        Highlighter highlighter = createConditionalHighlighter(background, foreground, testStatus);
         ComponentAdapter adapter = createComponentAdapter(label, selected);
+        Color labelForeground = label.getForeground();
+        Color labelBackground = label.getBackground();
         highlighter.highlight(label, adapter);
+        if (testStatus && !selected) {
+            if (background == null) {
+                assertEquals(labelBackground, label.getBackground());
+            } else {
+                assertEquals(background, label.getBackground());
+            }
+            if (foreground == null) {
+                assertEquals(labelForeground, label.getForeground());
+                
+            } else {
+                assertEquals(foreground, label.getForeground());
+            }
+        }
     }
 
     //---------------------------------------------------
@@ -483,6 +500,7 @@ public class HighlighterTest extends InteractiveTestCase {
         pipeline.apply(foregroundNull, adapter);
     }
 
+    
  
     /**
      * Issue #178-swingx: Highlighters always change the selection color.
@@ -490,11 +508,62 @@ public class HighlighterTest extends InteractiveTestCase {
      */
     public void testUnSelectedDoNothingHighlighter() {
         ComponentAdapter adapter = createComponentAdapter(allColored, false);
-        emptyHighlighter.highlight(allColored, adapter);
-        assertEquals("default highlighter must not change foreground", foreground, allColored.getForeground());
-        assertEquals("default highlighter must not change background", background, allColored.getBackground());
+        assertApplied(emptyHighlighter, allColored, adapter);
+    }
+    /**
+     * Issue #178-swingx: Highlighters always change the selection color.
+     */
+    public void testSelectedDoNothingHighlighter() {
+        ComponentAdapter adapter = createComponentAdapter(allColored, true);
+        assertApplied(emptyHighlighter, allColored, adapter);
     }
 
+
+    public void testXListUnselectedDoNothingHighlighter() {
+        JXXList list = new JXXList();
+        list.setModel(createAscendingListModel(0, 10));
+        
+    }
+    
+    /**
+     * running assertion for all highlighter colors, depending on selection of adapter and
+     * colors set/not set in highlighter.
+     * 
+     * @param highlighter
+     * @param label
+     * @param adapter
+     */
+    protected void assertApplied(Highlighter highlighter, Component label, ComponentAdapter adapter) {
+        Color labelForeground = label.getForeground();
+        Color labelBackground = label.getBackground();
+        highlighter.highlight(label, adapter);
+        if (!adapter.isSelected()) {
+            if (highlighter.getBackground() == null) {
+                assertEquals("unselected: background must not be changed", labelBackground, label.getBackground());
+            } else {
+                assertEquals("unselected: background must be changed", highlighter.getBackground(), label.getBackground());
+            }
+            if (highlighter.getForeground() == null) {
+                assertEquals("unselected: forground must not be changed", labelForeground, label.getForeground());
+            } else {
+                assertEquals("unselected: forground must be changed", highlighter.getForeground(), label.getForeground());
+            }
+        } else {
+            if (highlighter.getSelectedBackground() == null) {
+                assertEquals("selected: background must not be changed", labelBackground, label.getBackground());
+            } else {
+                assertEquals("selected: background must be changed", highlighter.getSelectedBackground(), label.getBackground());
+            }
+            if (highlighter.getSelectedForeground() == null) {
+                assertEquals("selected: forground must not be changed", labelForeground, label.getForeground());
+            } else {
+                assertEquals("selected: forground must be changed", highlighter.getSelectedForeground(), label.getForeground());
+            }
+            
+        }
+    } 
+    
+    
     protected ComponentAdapter createComponentAdapter(final JLabel label, final boolean selected) {
         ComponentAdapter adapter = new ComponentAdapter(label) {
 
@@ -535,5 +604,25 @@ public class HighlighterTest extends InteractiveTestCase {
             
         };
         return adapter;
+    }
+    
+    private DefaultListModel createAscendingListModel(int startRow, int count) {
+        DefaultListModel l = new DefaultListModel();
+        for (int row = startRow; row < startRow  + count; row++) {
+            l.addElement(new Integer(row));
+        }
+        return l;
+    }
+    public class JXXList extends JXList {
+
+        /** 
+         * @Override to access the adapter
+         * 
+         */
+        public ComponentAdapter getComponentAdapter() {
+            return super.getComponentAdapter();
+        }
+        
+        
     }
 }

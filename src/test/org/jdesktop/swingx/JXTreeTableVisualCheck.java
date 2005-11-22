@@ -463,7 +463,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         // not supported in JXTreeTable
  //       treeTable.setRowHeight(0, 96);
         treeTable.setShowGrid(true);
-        Highlighter conditional = new ConditionalHighlighter(Color.BLUE, null, 0, 0) {
+        Highlighter conditional = new ConditionalHighlighter(Color.BLUE, Color.WHITE, 0, 0) {
 
             protected boolean test(ComponentAdapter adapter) {
                 return adapter.hasFocus();

@@ -29,7 +29,8 @@ import javax.swing.UIManager;
 
 /**
  * AlternateRowHighlighter prepares a cell renderer to use different background
- * colors for alternating rows in a data view.
+ * colors for alternating rows in a data view. The size (in terms of row count) of
+ * an alternating group is configurable (defaults to 1);
  *
  * @author Ramesh Gupta
  */
@@ -57,6 +58,7 @@ public class AlternateRowHighlighter extends Highlighter {
 
     private Color oddRowBackground = defaultOddRowColor;
     private Color evenRowBackground = defaultEvenRowColor;
+    private int linesPerGroup = 1; 
 
     /**
      * Constructs a default <code>AlternateRowHighlighter</code> that prepares a
@@ -141,41 +143,31 @@ public class AlternateRowHighlighter extends Highlighter {
         fireStateChanged();
     }
 
+
+    @Override
+    protected Color computeUnselectedBackground(Component renderer, ComponentAdapter adapter) {
+        return isOddRow(adapter) ?
+                oddRowBackground : evenRowBackground;
+    }
+
     /**
-     * Computes the background color for the current rendering context for the
-     * specified adapter. It first chooses the raw background color for the
-     * renderer depending on whether the row being rendered is odd or even. If
-     * the chosen background color is not null
-     * calls {@link Highlighter#computeSelectedBackground(java.awt.Color) computeSelectedBackground}
-     * passing in the chosen raw background color as the seed color, but only if
-     * the row being rendered is selected.
-     *
-     * @param renderer the cell renderer component
      * @param adapter
-     * @return the computed background color
+     * @return true if the adapter's row should be colored with the oddRowBackground,
+     *          false is not
      */
-    protected Color computeBackground(Component renderer,
-                                      ComponentAdapter adapter) {
-        // row is zero-based; so even is actually odd!
-        Color color = (adapter.row % 2) == 0 ?
-            oddRowBackground : evenRowBackground;
-
-        if ((color != null) && adapter.isSelected()) {
-            color = computeSelectedBackground(color);
-        }
-
-        return color;
+    protected boolean isOddRow(ComponentAdapter adapter) {
+        return ((adapter.row / getLinesPerGroup()) % 2) == 0;
     }
 
 
-    @Override
-    protected Color computeSelectedBackground(Color seed) {
-        return getSelectedBackground();
+    public int getLinesPerGroup() {
+        return linesPerGroup;
     }
-
-    @Override
-    protected Color computeSelectedForeground(Color seed) {
-        return getSelectedForeground();
+    
+    public void setLinesPerGroup(int linesPerGroup) {
+        if (isImmutable()) return;
+        this.linesPerGroup = Math.max(1, linesPerGroup);
+        fireStateChanged();
     }
     
     public static class UIAlternateRowHighlighter extends AlternateRowHighlighter 
