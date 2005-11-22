@@ -41,6 +41,9 @@ public class BasicDatePickerUI extends DatePickerUI {
     private JButton popupButton;
     private BasicDatePickerPopup popup;
     private Handler handler;
+    protected PropertyChangeListener propertyChangeListener;
+    protected MouseListener mouseListener;
+    protected MouseMotionListener mouseMotionListener;
 
     public static ComponentUI createUI(JComponent c) {
         return new BasicDatePickerUI();
@@ -48,6 +51,7 @@ public class BasicDatePickerUI extends DatePickerUI {
 
     public void installUI(JComponent c) {
         datePicker = (JXDatePicker)c;
+        datePicker.setLayout(createLayoutManager());
         installComponents();
         installDefaults();
         installKeyboardActions();
@@ -59,6 +63,7 @@ public class BasicDatePickerUI extends DatePickerUI {
         uninstallKeyboardActions();
         uninstallDefaults();
         uninstallComponents();
+        datePicker.setLayout(null);
         datePicker = null;
     }
 
@@ -125,28 +130,56 @@ public class BasicDatePickerUI extends DatePickerUI {
     }
 
     protected void installListeners() {
-        handler = new Handler();
+        propertyChangeListener = createPropertyChangeListener();
+        mouseListener = createMouseListener();
+        mouseMotionListener = createMouseMotionListener();
 
-        datePicker.addPropertyChangeListener(handler);
+        datePicker.addPropertyChangeListener(propertyChangeListener);
 
         if (popupButton != null) {
-            popupButton.addPropertyChangeListener(handler);
-            popupButton.addMouseListener(handler);
-            popupButton.addMouseMotionListener(handler);
+            popupButton.addPropertyChangeListener(propertyChangeListener);
+            popupButton.addMouseListener(mouseListener);
+            popupButton.addMouseMotionListener(mouseMotionListener);
         }
 
     }
 
     protected void uninstallListeners() {
-        datePicker.removePropertyChangeListener(handler);
+        datePicker.removePropertyChangeListener(propertyChangeListener);
 
         if (popupButton != null) {
-            popupButton.removePropertyChangeListener(handler);
-            popupButton.removeMouseListener(handler);
-            popupButton.removeMouseMotionListener(handler);
+            popupButton.removePropertyChangeListener(propertyChangeListener);
+            popupButton.removeMouseListener(mouseListener);
+            popupButton.removeMouseMotionListener(mouseMotionListener);
         }
 
+        propertyChangeListener = null;
+        mouseListener = null;
+        mouseMotionListener = null;
         handler = null;
+    }
+
+    private Handler getHandler() {
+        if (handler == null) {
+            handler = new Handler();
+        }
+        return handler;
+    }
+
+    protected PropertyChangeListener createPropertyChangeListener() {
+        return getHandler();
+    }
+
+    protected LayoutManager createLayoutManager() {
+        return getHandler();
+    }
+
+    protected MouseListener createMouseListener() {
+        return getHandler();
+    }
+
+    protected MouseMotionListener createMouseMotionListener() {
+        return getHandler();
     }
 
     /**
@@ -199,25 +232,6 @@ public class BasicDatePickerUI extends DatePickerUI {
         dim.width += insets.left + insets.right;
         dim.height += insets.top + insets.bottom;
         return (Dimension)dim.clone();
-    }
-
-    public void doLayout() {
-        int width = datePicker.getWidth();
-        int height = datePicker.getHeight();
-
-        int popupButtonWidth = popupButton != null ? popupButton.getPreferredSize().width : 0;
-
-        Insets insets = datePicker.getInsets();
-        datePicker.getEditor().setBounds(insets.left,
-                insets.bottom,
-                width - popupButtonWidth,
-                height);
-        if (popupButton != null) {
-            popupButton.setBounds(width - popupButtonWidth + insets.left,
-                    insets.bottom,
-                    popupButtonWidth,
-                    height);
-        }
     }
 
     /**
@@ -297,7 +311,8 @@ public class BasicDatePickerUI extends DatePickerUI {
     }
 
 
-    private class Handler implements MouseListener, MouseMotionListener, PropertyChangeListener {
+    private class Handler implements LayoutManager, MouseListener, MouseMotionListener,
+            PropertyChangeListener {
         private boolean _forwardReleaseEvent = false;
 
         public void mouseClicked(MouseEvent ev) {
@@ -416,6 +431,37 @@ public class BasicDatePickerUI extends DatePickerUI {
                 JFormattedTextField editor = (JFormattedTextField)e.getNewValue();
                 datePicker.add(editor);
                 datePicker.revalidate();
+            }
+        }
+
+        public void addLayoutComponent(String name, Component comp) { }
+
+        public void removeLayoutComponent(Component comp) { }
+
+        public Dimension preferredLayoutSize(Container parent) {
+            return parent.getPreferredSize();
+        }
+
+        public Dimension minimumLayoutSize(Container parent) {
+            return parent.getMinimumSize();
+        }
+
+        public void layoutContainer(Container parent) {
+            int width = datePicker.getWidth();
+            int height = datePicker.getHeight();
+
+            int popupButtonWidth = popupButton != null ? popupButton.getPreferredSize().width : 0;
+
+            Insets insets = datePicker.getInsets();
+            datePicker.getEditor().setBounds(insets.left,
+                    insets.bottom,
+                    width - popupButtonWidth,
+                    height);
+            if (popupButton != null) {
+                popupButton.setBounds(width - popupButtonWidth + insets.left,
+                        insets.bottom,
+                        popupButtonWidth,
+                        height);
             }
         }
     }

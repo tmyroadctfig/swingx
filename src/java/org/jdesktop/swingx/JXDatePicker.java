@@ -25,7 +25,6 @@ import org.jdesktop.swingx.calendar.JXMonthView;
 import org.jdesktop.swingx.plaf.DatePickerUI;
 import org.jdesktop.swingx.plaf.JXDatePickerAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
-import org.jdesktop.swingx.plaf.basic.BasicDatePickerUI;
 
 import javax.swing.*;
 import javax.swing.JFormattedTextField.AbstractFormatter;
@@ -430,13 +429,6 @@ public class JXDatePicker extends JComponent {
 
     public void postActionEvent() {
         fireActionPerformed();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void doLayout() {
-        ((BasicDatePickerUI)getUI()).doLayout();
     }
 
     private final class TodayPanel extends JXPanel {
