@@ -19,6 +19,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 package org.jdesktop.swingx.plaf.basic;
+import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -51,9 +52,21 @@ public class BasicLoginPanelUI extends LoginPanelUI {
     public Image getBanner() {
         int w = 400;
         int h = 60;
+        float loginStringX = w * .05f;
+        float loginStringY = h * .75f;
 
         BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2 = img.createGraphics();
+        Font font = UIManager.getFont("JXLoginPanel.banner.font");
+        g2.setFont(font);
+        Graphics2D originalGraphics = g2;
+        if(!dlg.getComponentOrientation().isLeftToRight()) {
+            originalGraphics = (Graphics2D)g2.create();
+            g2.scale(-1, 1);
+            g2.translate(-w, 0);
+            loginStringX = w - (((float)font.getStringBounds(dlg.getBannerText(), 
+                    originalGraphics.getFontRenderContext()).getWidth()) + w * .05f);
+        } 
 
         g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -79,9 +92,8 @@ public class BasicLoginPanelUI extends LoginPanelUI {
         g2.setPaint(gp);
         g2.fill(curveShape);
 
-        g2.setFont(UIManager.getFont("JXLoginPanel.banner.font"));
-        g2.setColor(UIManager.getColor("JXLoginPanel.banner.foreground"));
-        g2.drawString(dlg.getBannerText(), w * .05f, h * .75f);
+        originalGraphics.setColor(UIManager.getColor("JXLoginPanel.banner.foreground"));
+        originalGraphics.drawString(dlg.getBannerText(), loginStringX, loginStringY);
         return img;
     }
 }

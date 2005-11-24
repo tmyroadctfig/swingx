@@ -9,6 +9,7 @@ package org.jdesktop.swingx;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.ComponentOrientation;
 import java.awt.Cursor;
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -79,23 +80,6 @@ import org.jdesktop.swingx.util.WindowUtils;
  *  is not saved. Similarly, if a <strong>PasswordStore</strong> is
  *  supplied and the password is null, then the <strong>PasswordStore</strong>
  *  will be queried for the password using the <code>get</code> method.
- *
- * Changes by Shai:
- * Clarified the save mode a little bit including hiding the save checkbox when there
- * is no password store.
- * Changed the class to derive from JXImagePanel to make customization easier (need to
- * check my ImagePanel which has some technical advantages).
- * Removed the static keyword from the ok/cancel buttons since this can cause an issue
- * with more than one login dialogs (yes its an unlikely situation but documenting this
- * sort of behavior or dealing with one bug resulting from this can be a real pain!).
- * Allowed the name field to be represented as a text field when there is no password store.
- * Rewrote the layout code to mostly work with a single container.
- * Removed additional dialogs for progress and error messages and incorporated their
- * functionality into the main dialog.
- * Allowed for an IOException with a message to be thrown by the login code. This message
- * is displayed to the user when the login is stopped.
- * Removed repetetive code and moved it to a static block.
- * i18n converted some of the strings that were not localized.
  *
  * @author Bino George
  * @author Shai Almog
@@ -402,7 +386,7 @@ public class JXLoginPanel extends JXImagePanel {
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new Insets(0, 0, 5, 11);
         loginPanel.add(nameLabel, gridBagConstraints);
         
@@ -410,7 +394,7 @@ public class JXLoginPanel extends JXImagePanel {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new Insets(0, 0, 5, 0);
@@ -419,7 +403,7 @@ public class JXLoginPanel extends JXImagePanel {
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new Insets(0, 0, 5, 11);
         loginPanel.add(passwordLabel, gridBagConstraints);
         
@@ -427,7 +411,7 @@ public class JXLoginPanel extends JXImagePanel {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new Insets(0, 0, 5, 0);
@@ -437,7 +421,7 @@ public class JXLoginPanel extends JXImagePanel {
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 2;
-            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.anchor = GridBagConstraints.LINE_START;
             gridBagConstraints.insets = new Insets(0, 0, 5, 11);
             loginPanel.add(serverLabel, gridBagConstraints);
 
@@ -445,7 +429,7 @@ public class JXLoginPanel extends JXImagePanel {
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 2;
             gridBagConstraints.gridwidth = 1;
-            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.anchor = GridBagConstraints.LINE_START;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 0, 5, 0);
@@ -456,7 +440,7 @@ public class JXLoginPanel extends JXImagePanel {
             gridBagConstraints.gridy = 3;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.anchor = GridBagConstraints.LINE_START;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(6, 0, 0, 0);
             loginPanel.add(saveCB, gridBagConstraints);
@@ -466,12 +450,25 @@ public class JXLoginPanel extends JXImagePanel {
             gridBagConstraints.gridy = 2;
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.anchor = GridBagConstraints.LINE_START;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(6, 0, 0, 0);
             loginPanel.add(saveCB, gridBagConstraints);
         }
         return loginPanel;
+    }
+    
+    /**
+     * This method adds functionality to support bidi languages within this 
+     * component
+     */
+    public void setComponentOrientation(ComponentOrientation orient) {
+        // this if is used to avoid needless creations of the image
+        if(orient != super.getComponentOrientation()) {
+            super.setComponentOrientation(orient);
+            banner.setImage(createLoginBanner());
+            progressPanel.applyComponentOrientation(orient);
+        }
     }
     
     /**
@@ -491,9 +488,7 @@ public class JXLoginPanel extends JXImagePanel {
         loginPanel = createLoginPanel();
         
         //create the message and hyperlink and hide them
-        errorMessageLabel = new JLabel("<html><b>Couldn't log in</b><br><br>" +
-                "Check your user name and password. Check to see if Caps Lock is<br>" +
-                "turned on.</html>"); //TODO i18n
+        errorMessageLabel = new JLabel(UIManager.getString(CLASS_NAME + ".errorMessage")); 
         errorMessageLabel.setIcon(UIManager.getIcon("JXLoginDialog.error.icon"));
         errorMessageLabel.setVerticalTextPosition(SwingConstants.TOP);
         errorMessageLabel.setOpaque(true);
@@ -517,12 +512,12 @@ public class JXLoginPanel extends JXImagePanel {
         
         //create the progress panel
         progressPanel = new JXPanel(new GridBagLayout());
-        progressMessageLabel = new JLabel("Please wait, logging in....");//TODO i18n
+        progressMessageLabel = new JLabel(UIManager.getString(CLASS_NAME + ".pleaseWait"));
         progressMessageLabel.setFont(progressMessageLabel.getFont().deriveFont(Font.BOLD)); //TODO get from UIManager
         JProgressBar pb = new JProgressBar();
         pb.setIndeterminate(true);
         JButton cancelButton = new JButton(getActionMap().get(CANCEL_LOGIN_ACTION_COMMAND));
-        progressPanel.add(progressMessageLabel, new GridBagConstraints(0, 0, 2, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(12, 12, 11, 11), 0, 0));
+        progressPanel.add(progressMessageLabel, new GridBagConstraints(0, 0, 2, 1, 1.0, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.HORIZONTAL, new Insets(12, 12, 11, 11), 0, 0));
         progressPanel.add(pb, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 24, 11, 7), 0, 0));
         progressPanel.add(cancelButton, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 11, 11), 0, 0));
         
@@ -761,7 +756,7 @@ public class JXLoginPanel extends JXImagePanel {
         oldCursor = getCursor();
         try {
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            progressMessageLabel.setText("Please wait, logging in....");//TODO i18n
+            progressMessageLabel.setText(UIManager.getString(CLASS_NAME + ".pleaseWait"));
             String name = getUserName();
             char[] password = getPassword();
             String server = servers.size() == 1 ? servers.get(0) : serverCombo == null ? null : (String)serverCombo.getSelectedItem();
@@ -780,7 +775,7 @@ public class JXLoginPanel extends JXImagePanel {
      * with the LoginService's cancelAuthentication method
      */
     protected void cancelLogin() {
-        progressMessageLabel.setText("Cancelling login, please wait....");//TODO i18n
+        progressMessageLabel.setText(UIManager.getString(CLASS_NAME + ".cancelWait"));
         getActionMap().get(CANCEL_LOGIN_ACTION_COMMAND).setEnabled(false);
         loginService.cancelAuthentication();
         setCursor(oldCursor);
@@ -886,7 +881,7 @@ public class JXLoginPanel extends JXImagePanel {
     private static final class LoginAction extends AbstractActionExt {
 	private JXLoginPanel panel;
 	public LoginAction(JXLoginPanel p) {
-	    super("Login", LOGIN_ACTION_COMMAND); //TODO i18n
+	    super(UIManager.getString(CLASS_NAME + ".loginString"), LOGIN_ACTION_COMMAND); 
 	    this.panel = p;
 	}
 	public void actionPerformed(ActionEvent e) {
@@ -901,7 +896,7 @@ public class JXLoginPanel extends JXImagePanel {
     private static final class CancelAction extends AbstractActionExt {
 	private JXLoginPanel panel;
 	public CancelAction(JXLoginPanel p) {
-	    super("Cancel Login", CANCEL_LOGIN_ACTION_COMMAND); //TODO i18n
+	    super(UIManager.getString(CLASS_NAME + ".cancelLogin"), CANCEL_LOGIN_ACTION_COMMAND); 
 	    this.panel = p;
 	    this.setEnabled(false);
 	}
@@ -1088,7 +1083,7 @@ public class JXLoginPanel extends JXImagePanel {
         }
         
 	protected void init(JXLoginPanel p) {
-	    setTitle("Login"); //TODO i18n
+	    setTitle(UIManager.getString(CLASS_NAME + ".loginString")); 
             this.panel = p;
             initWindow(this, panel);
 	}
@@ -1102,7 +1097,7 @@ public class JXLoginPanel extends JXImagePanel {
 	private JXLoginPanel panel;
 	
 	public JXLoginFrame(JXLoginPanel p) {
-	    super("Login"); //TODO i18n
+	    super(UIManager.getString(CLASS_NAME + ".loginString")); 
 	    this.panel = p;
             initWindow(this, panel);
 	}
@@ -1129,7 +1124,7 @@ public class JXLoginPanel extends JXImagePanel {
         w.setLayout(new BorderLayout());
         w.add(panel, BorderLayout.CENTER);
         JButton okButton = new JButton(panel.getActionMap().get(LOGIN_ACTION_COMMAND));
-        final JButton cancelButton = new JButton("Close");//TODO i18n
+        final JButton cancelButton = new JButton(UIManager.getString(CLASS_NAME + ".cancelString"));
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //change panel status to cancelled!
@@ -1166,8 +1161,8 @@ public class JXLoginPanel extends JXImagePanel {
         cancelButton.setPreferredSize(new Dimension(prefWidth, okButton.getPreferredSize().height));
         okButton.setPreferredSize(new Dimension(prefWidth, okButton.getPreferredSize().height));
         JXPanel buttonPanel = new JXPanel(new GridBagLayout());
-        buttonPanel.add(okButton, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(17, 12, 11, 5), 0, 0));
-        buttonPanel.add(cancelButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(17, 0, 11, 11), 0, 0));
+        buttonPanel.add(okButton, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(17, 12, 11, 5), 0, 0));
+        buttonPanel.add(cancelButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(17, 0, 11, 11), 0, 0));
         w.add(buttonPanel, BorderLayout.SOUTH);            
         w.addWindowListener(new WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent e) {
