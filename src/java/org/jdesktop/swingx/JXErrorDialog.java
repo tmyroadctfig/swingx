@@ -537,14 +537,4 @@ public class JXErrorDialog extends JDialog {
         }
         
     }
-    
-    public static void main(String[] args) {
-        javax.swing.JFrame frm = new javax.swing.JFrame();
-        showDialog(frm, "Application Error", 
-            "The application encountered the unexpected error", "please contact developers");
-        frm.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-        showDialog(frm, "Application Error Hebrew", 
-            "The application encountered the unexpected error", "please contact developers");
-        System.exit(0);
-    }
 }
