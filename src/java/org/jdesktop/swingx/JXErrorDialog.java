@@ -22,6 +22,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.Component;
+import java.awt.ComponentOrientation;
 import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -34,6 +35,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Enumeration;
+import java.util.ResourceBundle;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -67,32 +70,26 @@ import org.jdesktop.swingx.util.WindowUtils;
  * <code>JXErrorDialog.showDialog(null, "Application Error", 
  *   "The application encountered the unexpected error,
  *    please contact developers")</code>
+ *
+ * <p>Internationalization is handled via a resource bundle or via the UIManager
+ * bidi orientation (usefull for right to left languages) is determined in the 
+ * same way as the JOptionPane where the orientation of the parent component is
+ * picked. So when showDialog(Component cmp, ...) is invoked the component 
+ * orientation of the error dialog will match the component orientation of cmp.
 
  * @author Richard Bair
  * @author Alexander Zuev
+ * @author Shai Almog
  */
 public class JXErrorDialog extends JDialog {
     /**
-     * Text representing expanding the details section of the dialog
+     * Used as a prefix when pulling data out of UIManager for i18n
      */
-    private static final String DETAILS_EXPAND_TEXT = "Details >>";
-    /**
-     * Text representing contracting the details section of the dialog
-     */
-    private static final String DETAILS_CONTRACT_TEXT = "Details <<";
-    /**
-     * Text for the Ok button.
-     */
-    private static final String OK_BUTTON_TEXT = "Ok";
+    private static String CLASS_NAME;
     /**
      * Icon for the error dialog (stop sign, etc)
      */
     private static final Icon icon = UIManager.getIcon("OptionPane.warningIcon");
-    /**
-     * Text for the reportError button
-     */
-    private static final String REPORT_BUTTON_TEXT = "Report...";
-
     /**
      * Error message label
      */
@@ -104,7 +101,7 @@ public class JXErrorDialog extends JDialog {
     /**
      * detail button
      */
-    private JButton detailButton;
+    private EqualSizeJButton detailButton;
     /**
      * details scroll pane
      */
@@ -112,7 +109,7 @@ public class JXErrorDialog extends JDialog {
     /**
      * report an error button
      */
-    private JButton reportButton;
+    private EqualSizeJButton reportButton;
     /**
      * Error reporting engine assigned for error reporting for all error dialogs
      */
@@ -123,6 +120,26 @@ public class JXErrorDialog extends JDialog {
      */
     private IncidentInfo incidentInfo;
 
+    /**
+     * Creates initialize the UIManager with localized strings
+     */
+    static {
+        // Popuplate UIDefaults with the localizable Strings we will use
+        // in the Login panel.
+        CLASS_NAME = JXErrorDialog.class.getCanonicalName();
+        String lookup;
+        ResourceBundle res = ResourceBundle.getBundle("org.jdesktop.swingx.plaf.resources.ErrorDialog");
+        Enumeration<String> keys = res.getKeys();
+        while (keys.hasMoreElements()) {
+            String key = keys.nextElement();
+            lookup = CLASS_NAME + "." + key;
+            if (UIManager.getString(lookup) == null) {
+                UIManager.put(lookup, res.getString(key));
+            }
+        }
+    }
+    
+    
     /**
      * Create a new ErrorDialog with the given Frame as the owner
      * @param owner Owner of this error dialog.
@@ -157,7 +174,7 @@ public class JXErrorDialog extends JDialog {
         this.getContentPane().add(new JLabel(icon), gbc);
 
         errorMessage = new JLabel();
-        gbc.anchor = GridBagConstraints.WEST;
+        gbc.anchor = GridBagConstraints.LINE_START;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridheight = 1;
         gbc.gridwidth = 2;
@@ -172,19 +189,19 @@ public class JXErrorDialog extends JDialog {
         gbc.gridwidth = 1;
         gbc.weightx = 1.0;
         gbc.weighty = 0.0;
-        gbc.anchor = GridBagConstraints.EAST;
+        gbc.anchor = GridBagConstraints.LINE_END;
         gbc.insets = new Insets(12, 0, 11, 5);
-        JButton okButton = new JButton(OK_BUTTON_TEXT);
+        EqualSizeJButton okButton = new EqualSizeJButton(UIManager.getString(CLASS_NAME + ".ok_button_text"));
         this.getContentPane().add(okButton, gbc);
 
-        reportButton = new JButton(new ReportAction());
+        reportButton = new EqualSizeJButton(new ReportAction());
         gbc.gridx = 2;
         gbc.weightx = 0.0;
         gbc.insets = new Insets(12, 0, 11, 5);
         this.getContentPane().add(reportButton, gbc);
         reportButton.setVisible(false); // not visible by default
 
-        detailButton = new JButton(DETAILS_EXPAND_TEXT);
+        detailButton = new EqualSizeJButton(UIManager.getString(CLASS_NAME + ".details_expand_text"));
         gbc.gridx = 3;
         gbc.weightx = 0.0;
         gbc.insets = new Insets(12, 0, 11, 11);
@@ -220,12 +237,11 @@ public class JXErrorDialog extends JDialog {
         this.getContentPane().add(widthHolder, gbc);
 
         //make the buttons the same size
-        int buttonLength = detailButton.getPreferredSize().width;
-        int buttonHeight = detailButton.getPreferredSize().height;
-        Dimension buttonSize = new Dimension(buttonLength, buttonHeight);
-        okButton.setPreferredSize(buttonSize);
-        reportButton.setPreferredSize(buttonSize);
-        detailButton.setPreferredSize(buttonSize);
+        EqualSizeJButton[] buttons = new EqualSizeJButton[] {
+                detailButton, okButton, reportButton };
+        okButton.setGroup(buttons);
+        reportButton.setGroup(buttons);
+        detailButton.setGroup(buttons);
 
         //set the event handling
         okButton.addActionListener(new OkClickEvent());
@@ -259,13 +275,23 @@ public class JXErrorDialog extends JDialog {
         if (b) {
             details.setCaretPosition(0);
             detailsScrollPane.setVisible(true);
-            detailButton.setText(DETAILS_CONTRACT_TEXT);
+            detailButton.setText(UIManager.getString(CLASS_NAME + ".details_contract_text"));
+            detailsScrollPane.applyComponentOrientation(detailButton.getComponentOrientation());
+            
+            // workaround for bidi bug, if the text is not set "again" and the component orientation has changed
+            // then the text won't be aligned correctly. To reproduce this (in JDK 1.5) show two dialogs in one
+            // use LTOR orientation and in the second use RTOL orientation and press "details" in both.
+            // Text in the text box should be aligned to right/left respectively, without this line this doesn't
+            // occure I assume because bidi properties are tested when the text is set and are not updated later
+            // on when setComponentOrientation is invoked.
+            details.setText(details.getText());
         } else {
             detailsScrollPane.setVisible(false);
-            detailButton.setText(DETAILS_EXPAND_TEXT);
+            detailButton.setText(UIManager.getString(CLASS_NAME + ".details_expand_text"));
         }
 
         pack();
+        repaint();
     }
 
     /**
@@ -402,6 +428,7 @@ public class JXErrorDialog extends JDialog {
         }
         dlg.setDetails(details);
         dlg.setIncidentInfo(info);
+        dlg.applyComponentOrientation(owner.getComponentOrientation());
         dlg.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dlg.pack();
         dlg.setLocationRelativeTo(owner);
@@ -445,10 +472,79 @@ public class JXErrorDialog extends JDialog {
                 if(getReporter() != null && getReporter().getActionName() != null) {
                     return getReporter().getActionName();
                 } else {
-                    return REPORT_BUTTON_TEXT;
+                    return UIManager.getString(CLASS_NAME + ".report_button_text");
                 }
             }
             return super.getValue(key);
         }
+    }
+    
+    /**
+     * This is a button that maintains the size of the largest button in the button
+     * group by returning the largest size from the getPreferredSize method.
+     * This is better than using setPreferredSize since this will work regardless
+     * of changes to the text of the button and its language.
+     */
+    private static class EqualSizeJButton extends JButton {
+        public EqualSizeJButton() {
+        }
+
+        public EqualSizeJButton(String text) {
+            super(text);
+        }
+        
+        public EqualSizeJButton(Action a) {
+            super(a);
+        }
+        
+        /**
+         * Buttons whose size should be taken into consideration
+         */
+        private EqualSizeJButton[] group;
+        
+        public void setGroup(EqualSizeJButton[] group) {
+            this.group = group;
+        }
+
+        /**
+         * Returns the actual preferred size on a different instance of this button
+         */
+        private Dimension getRealPreferredSize() {
+            return super.getPreferredSize();
+        }
+        
+        /**
+         * If the <code>preferredSize</code> has been set to a
+         * non-<code>null</code> value just returns it.
+         * If the UI delegate's <code>getPreferredSize</code>
+         * method returns a non <code>null</code> value then return that;
+         * otherwise defer to the component's layout manager.
+         * 
+         * @return the value of the <code>preferredSize</code> property
+         * @see #setPreferredSize
+         * @see ComponentUI
+         */
+        public Dimension getPreferredSize() {
+            int width = 0;
+            int height = 0;
+            for(int iter = 0 ; iter < group.length ; iter++) {
+                Dimension size = group[iter].getRealPreferredSize();
+                width = Math.max(size.width, width);
+                height = Math.max(size.height, height);
+            }
+            
+            return new Dimension(width, height);
+        }
+        
+    }
+    
+    public static void main(String[] args) {
+        javax.swing.JFrame frm = new javax.swing.JFrame();
+        showDialog(frm, "Application Error", 
+            "The application encountered the unexpected error", "please contact developers");
+        frm.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        showDialog(frm, "Application Error Hebrew", 
+            "The application encountered the unexpected error", "please contact developers");
+        System.exit(0);
     }
 }
