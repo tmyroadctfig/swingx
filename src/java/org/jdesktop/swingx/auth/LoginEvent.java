@@ -20,25 +20,26 @@
  */
 package org.jdesktop.swingx.auth;
 import java.util.EventObject;
+
 /**
  * This is an event object that is passed to login listener methods
  *
  * @author Shai Almog
  */
 public class LoginEvent extends EventObject {
-    private Exception cause;
+    private Throwable cause;
     
     public LoginEvent(Object source) {
         this(source, null);
     }
     
     /** Creates a new instance of LoginEvent */
-    public LoginEvent(Object source, Exception cause) {
+    public LoginEvent(Object source, Throwable cause) {
         super(source);
         this.cause = cause;
     }
     
-    public Exception getCause() {
+    public Throwable getCause() {
         return cause;
     }
 }

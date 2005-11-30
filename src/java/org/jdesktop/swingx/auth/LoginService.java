@@ -72,7 +72,7 @@ public abstract class LoginService {
      * @param server server (optional)
      *
      * @return <code>true</code> on authentication success
-     * @throws IOException
+     * @throws Exception
      */
     public abstract boolean authenticate(String name, char[] password, String server) throws Exception;
     
@@ -106,7 +106,7 @@ public abstract class LoginService {
      * @param user user
      * @param password password
      * @param server server
-     * @throws IOException
+     * @throws Exception
      */
     public void startAuthentication(final String user, final char[] password, final String server) throws Exception {
         if (getSynchronous()) {
@@ -116,7 +116,7 @@ public abstract class LoginService {
                 } else {
                     fireLoginFailed(new LoginEvent(this));
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 fireLoginFailed(new LoginEvent(this, e));
             }
         } else {
@@ -142,7 +142,7 @@ public abstract class LoginService {
                             }
                         });
                         return result;
-                    } catch (final Exception failed) {
+                    } catch (final Throwable failed) {
                         if (!isCancelled()) {
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
