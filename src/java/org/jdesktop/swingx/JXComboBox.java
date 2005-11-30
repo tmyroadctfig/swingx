@@ -32,8 +32,6 @@ import javax.swing.plaf.basic.BasicBorders;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
 
 /**
- * Adds some visual enhancements to JComboBox. In particular, adds some margin
- * 
  * @author rbair
  */
 public class JXComboBox extends JComboBox {
@@ -50,7 +48,6 @@ public class JXComboBox extends JComboBox {
      */
     public JXComboBox(ComboBoxModel aModel) {
         super(aModel);
-        setEditor(new BorderedComboBoxEditor());
     }
 
     /** 
@@ -63,7 +60,6 @@ public class JXComboBox extends JComboBox {
      */
     public JXComboBox(final Object items[]) {
         super(items);
-        setEditor(new BorderedComboBoxEditor());
     }
 
     /**
@@ -76,7 +72,6 @@ public class JXComboBox extends JComboBox {
      */
     public JXComboBox(Vector<?> items) {
         super(items);
-        setEditor(new BorderedComboBoxEditor());
     }
 
     /**
@@ -89,17 +84,5 @@ public class JXComboBox extends JComboBox {
      */
     public JXComboBox() {
         super();
-        setEditor(new BorderedComboBoxEditor());
-    }
-
-    /**
-     * A new combo box editor that has space between the left edge and the first
-     * character, leading to a more pleasing look
-     */
-    private final class BorderedComboBoxEditor extends BasicComboBoxEditor {
-        public BorderedComboBoxEditor() {
-            editor = new JTextField("",9);
-            editor.setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 0));
-        }
     }
 }
