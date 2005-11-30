@@ -401,6 +401,19 @@ public class JXErrorDialog extends JDialog {
      * @param owner Owner of this error dialog. Determines the Window in which the dialog
      *		is displayed; if the <code>owner</code> has
      *		no <code>Window</code>, a default <code>Frame</code> is used
+     * @param title Title of the error dialog
+     * @param errorMessage Message for the error dialog
+     */
+    public static void showDialog(Component owner, String title, String errorMessage) {
+        IncidentInfo ii = new IncidentInfo(title, errorMessage, (String)null);
+        showDialog(owner, ii);
+    }
+
+    /**
+     * Show the error dialog.
+     * @param owner Owner of this error dialog. Determines the Window in which the dialog
+     *		is displayed; if the <code>owner</code> has
+     *		no <code>Window</code>, a default <code>Frame</code> is used
      * @param info <code>IncidentInfo</code> that incorporates all the information about the error
      */
     public static void showDialog(Component owner, IncidentInfo info) {
