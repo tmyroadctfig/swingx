@@ -18,6 +18,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.util.AncientSwingTeam;
 
@@ -116,38 +117,61 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
      * Issue #38 (swingx): initially invisble columns don't show up
      * in the column control list.
      * 
+     * Visual check: first enable column control then  set column invisible. 
      * 
      */
     public void interactiveTestColumnControlInvisibleColumns() {
         final JXTable table = new JXTable(sortableTableModel);
-        // columns set to invisible before setting the columnControl
-        // will not be inserted into the column control's list
-//      table.getColumnExt("Last Name").setVisible(false);
         table.setColumnControlVisible(true);
-        final TableColumnExt priorityColumn = table.getColumnExt("First Name");
-        priorityColumn.setVisible(false);
-        JFrame frame = wrapWithScrollingInFrame(table, "JXTable (#192, #38-swingx) ColumnControl and Visibility of items");
+        final TableColumnExt firstNameColumn = table.getColumnExt("First Name");
+        firstNameColumn.setVisible(false);
+        JFrame frame = wrapWithScrollingInFrame(table, "ColumnControl (#192, #38-swingx) first enable ColumnControl then column invisible");
         frame.setVisible(true);
     }
 
 
     /** 
+     * Issue #192: initially invisibility columns are hidden
+     * but marked as visible in control.
+     *
+     * Issue #38 (swingx): initially invisble columns don't show up
+     * in the column control list.
      * 
+     * Visual check: first set column invisible then enable column control.
      * 
      */
     public void interactiveTestColumnControlEarlyInvisibleColumns() {
         final JXTable table = new JXTable(sortableTableModel);
-        // columns set to invisible before setting the columnControl
-        // will not be inserted into the column control's list
-      table.getColumnExt("Last Name").setVisible(false);
+        table.getColumnExt("First Name").setVisible(false);
         table.setColumnControlVisible(true);
-//        int totalColumnCount = table.getColumnCount();
-//        final TableColumnExt priorityColumn = table.getColumnExt("First Name");
-//        priorityColumn.setVisible(false);
-        JFrame frame = wrapWithScrollingInFrame(table, "JXTable (#192, #38-swingx) ColumnControl and Visibility of items");
+        JFrame frame = wrapWithScrollingInFrame(table, "ColumnControl (#192, #38-swingx) first column invisible, the enable columnControl");
         frame.setVisible(true);
     }
 
+    /** 
+     * Issue #212: programmatically toggle column vis does not work.
+     * 
+     * Visual check: programmatically toggle column visibility.
+     * 
+     * Can't reproduce.
+     * 
+     */
+    public void interactiveTestColumnControlToggleInvisibleColumns() {
+        final JXTable table = new JXTable(sortableTableModel);
+        final TableColumnExt firstNameColumn = table.getColumnExt("First Name");
+        table.setColumnControlVisible(true);
+        JXFrame frame = wrapWithScrollingInFrame(table, "ColumnControl (#212-swingx) toggle first column invisible");
+        Action action = new AbstractAction("Toggle first name visibility") {
+
+            public void actionPerformed(ActionEvent e) {
+                firstNameColumn.setVisible(!firstNameColumn.isVisible());
+                
+            }
+            
+        };
+        addAction(frame, action);
+        frame.setVisible(true);
+    }
     /** 
      * 
      * 
