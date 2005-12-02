@@ -337,8 +337,9 @@ public class JXTableVisualCheck extends JXTableUnitTest {
  
 
     /** 
+     * @KEEP this is about testing Mustang sorting.
      */
-//    public void interactiveTestColumnControlAndFiltersRowSorter() {
+    public void interactiveTestColumnControlAndFiltersRowSorter() {
 //        final JXTable table = new JXTable(sortableTableModel);
 //        // hmm bug regression with combos as editors - same in JTable
 ////        JComboBox box = new JComboBox(new Object[] {"one", "two", "three" });
@@ -364,7 +365,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //        JFrame frame = wrapWithScrollingInFrame(table, "JXTable ColumnControl and Filters");
 //        addAction(frame, toggleFilter);
 //        frame.setVisible(true);
-//    }
+    }
  
 
     /** 
@@ -566,6 +567,8 @@ public class JXTableVisualCheck extends JXTableUnitTest {
      * 
      * So commented the body for now, need to enquire why the guard
      * was added in the first place.
+     * 
+     * @KEEP
      */
     public void interactiveMultipleComparatorsPerColumn() {
 //        JXTable table = new JXTable(createSplittableValues());
@@ -749,8 +752,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     public void interactiveTestRolloverHighlight() {
         JXTable table = new JXTable(sortableTableModel);
         table.setRolloverEnabled(true);
-        table.setHighlighters(new HighlighterPipeline(new Highlighter[] 
-            {new RolloverHighlighter(Color.YELLOW, null)} ));
+        table.addHighlighter(new RolloverHighlighter(Color.YELLOW, null));
         JFrame frame = wrapWithScrollingInFrame(table, "rollover highlight");
         frame.setVisible(true);
 
@@ -761,10 +763,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         table.setRowHeight(22);
         AlternateRowHighlighter highlighter = new UIAlternateRowHighlighter();
         highlighter.setLinesPerGroup(5);
-        table.setHighlighters(new HighlighterPipeline(new Highlighter[] {
-            highlighter
-        }));
-
+        table.addHighlighter(highlighter);
         JFrame frame = wrapWithScrollingInFrame(table, "AlternateRow with Grouping of 5 lines");
         frame.setVisible(true);
     }
@@ -797,19 +796,13 @@ public class JXTableVisualCheck extends JXTableUnitTest {
                                             new ShuttleSorter(1, false), // column 1, descending
         }));
 
-        table.setHighlighters(new HighlighterPipeline(new Highlighter[] {
-            AlternateRowHighlighter.classicLinePrinter,
-        }));
-
+        table.addHighlighter(AlternateRowHighlighter.classicLinePrinter);
         JFrame frame = wrapWithScrollingInFrame(table, "classic lineprinter Test");
         frame.setVisible(true);
     }
 
     public void interactiveTestTableSorter1() {
         JXTable table = new JXTable(sortableTableModel);
-        table.setHighlighters(new HighlighterPipeline(new Highlighter[] {
-            AlternateRowHighlighter.notePadBackground,
-        }));
         table.setBackground(new Color(0xFF, 0xFF, 0xCC)); // notepad
         table.setGridColor(Color.cyan.darker());
         table.setRowHeight(22);
@@ -847,7 +840,6 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             }
         };
         JXTable xtable = new JXTable(model);
-//        BasicLookAndFeel lf;
         xtable.setBackground(Highlighter.notePadBackground.getBackground()); // ledger
         JTable table = new JTable(model);
         table.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
@@ -858,9 +850,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 
     public void interactiveTestTableSorter3() {
         JXTable table = new JXTable(sortableTableModel);
-        table.setHighlighters(new HighlighterPipeline(new Highlighter[] {
-            new Highlighter(Color.orange, null),
-        }));
+        table.addHighlighter(new Highlighter(Color.orange, null));
         table.setFilters(new FilterPipeline(new Filter[] {
                                             new ShuttleSorter(1, true), // column 1, ascending
                                             new ShuttleSorter(0, false), // column 0, descending
@@ -871,9 +861,6 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 
     public void interactiveTestTableSorter4() {
         JXTable table = new JXTable(sortableTableModel);
-        table.setHighlighters(new HighlighterPipeline(new Highlighter[] {
-            new Highlighter(Color.orange, null),
-        }));
         table.setFilters(new FilterPipeline(new Filter[] {
                 new ShuttleSorter(0, false), // column 0, descending
                                             new ShuttleSorter(1, true), // column 1, ascending
@@ -939,9 +926,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
                                             new ShuttleSorter(1, true), // column 1, ascending
                                             new ShuttleSorter(3, false), // column 3, descending
         }));
-        table.setHighlighters(new HighlighterPipeline(new Highlighter[] {
-            new PatternHighlighter(null, Color.red, "^S", 0, 1),
-        }));
+        table.addHighlighter(new PatternHighlighter(null, Color.red, "^S", 0, 1));
         JFrame frame = wrapWithScrollingInFrame(table, "PatternFilter/Highlighter ^S col1");
         frame.setVisible(true);
     }
@@ -961,9 +946,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         table.setRowHeight(48);
         table.setRowHeight(0, 96);
         table.setShowGrid(true);
-        table.setHighlighters(new HighlighterPipeline(new Highlighter[] {
-            new PatternHighlighter(null, Color.red, "^A", 0, 1),
-        }));
+        table.addHighlighter(new PatternHighlighter(null, Color.red, "^A", 0, 1));
         JFrame frame = wrapWithScrollingInFrame(table, "PatternHighlighter ^A col 1");
         frame.setVisible(true);
     }
