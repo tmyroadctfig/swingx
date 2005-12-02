@@ -5,6 +5,7 @@
 package org.jdesktop.swingx.table;
 
 import java.awt.Component;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
@@ -28,6 +29,10 @@ import org.jdesktop.swingx.util.AncientSwingTeam;
 public class ColumnControlButtonTest extends InteractiveTestCase {
     protected TableModel sortableTableModel;
 
+    /**
+     * guarantee that at least one column is always visible.
+     *
+     */
     public void testMinimumColumnCountOne() {
         JXTable table = new JXTable(10, 2);
         table.setColumnControlVisible(true);
@@ -148,19 +153,23 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
         frame.setVisible(true);
     }
 
+
     /** 
      * Issue #212: programmatically toggle column vis does not work.
      * 
      * Visual check: programmatically toggle column visibility.
      * 
-     * Can't reproduce.
+     * Happens if a) column visibility is set after adding the table to a frame
+     * and b) model.count = 2.
      * 
      */
-    public void interactiveTestColumnControlToggleInvisibleColumns() {
-        final JXTable table = new JXTable(sortableTableModel);
-        final TableColumnExt firstNameColumn = table.getColumnExt("First Name");
+    public void interactiveTestColumnControlSetModelToggleInvisibleColumns() {
+        final JXTable table = new JXTable();
         table.setColumnControlVisible(true);
-        JXFrame frame = wrapWithScrollingInFrame(table, "ColumnControl (#212-swingx) toggle first column invisible");
+        JXFrame frame = wrapWithScrollingInFrame(table, "ColumnControl (#212-swingx) setModel and toggle first column invisible");
+        frame.setVisible(true);
+        table.setModel(new DefaultTableModel(10, 2));
+        final TableColumnExt firstNameColumn = table.getColumnExt(1);
         Action action = new AbstractAction("Toggle first name visibility") {
 
             public void actionPerformed(ActionEvent e) {
@@ -170,8 +179,8 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
             
         };
         addAction(frame, action);
-        frame.setVisible(true);
     }
+
     /** 
      * 
      * 

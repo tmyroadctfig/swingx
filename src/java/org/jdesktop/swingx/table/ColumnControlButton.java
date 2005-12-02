@@ -130,6 +130,13 @@ public final class ColumnControlButton extends JButton {
         public void itemStateChanged(ItemEvent e) {
             if (canControl()) {
                 if ((e.getStateChange() == ItemEvent.DESELECTED)
+                        //JW: this is fishy - leads to #212-swingx: setting
+                        // column visibility programatically fails if
+                        // the current column is the second last
+                        // guarding against 0 leads to hiding all columns
+                        // by deselecting the menu item. 
+                        // TODO further check Rob's basic idea to distinguish
+                        // event sources instead of unconditionally reselect!
                         && (table.getColumnCount() <= 1)) {
                     reselect();
                 } else {
