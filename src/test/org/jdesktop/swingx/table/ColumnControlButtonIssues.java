@@ -4,11 +4,11 @@
  */
 package org.jdesktop.swingx.table;
 
+import java.awt.Component;
 import java.awt.GraphicsEnvironment;
 
-import javax.swing.table.DefaultTableModel;
+import javax.swing.JMenuItem;
 
-import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
 
 public class ColumnControlButtonIssues extends ColumnControlButtonTest {
@@ -16,13 +16,14 @@ public class ColumnControlButtonIssues extends ColumnControlButtonTest {
     /**
      * Issue #212-swingx: 
      * 
-     * guarantee that at exactly one column is always.
+     * guarantee that exactly one column is always visible.
      * 
-     * Happens if a) column visibility is set after adding the table to a frame
+     * Here we directly set the second last visible column to invisible. This 
+     * fails if a) column visibility is set after adding the table to a frame
      * and b) model.count = 2.
      *
      */
-    public void testMinimumColumnCountOneAfterSetModel() {
+    public void testSetSecondLastColumnToInvisible() {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
             return;
@@ -34,5 +35,26 @@ public class ColumnControlButtonIssues extends ColumnControlButtonTest {
         assertEquals(1, table.getColumnCount());
     }
 
+    /**
+     * Issue #212-swingx: 
+     * 
+     * guarantee that exactly one column is always visible.
+     * 
+     * Here we deselect the menuitem.
+     * 
+     */
+    public void testSetLastColumnToInvisible() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            return;
+        }
+        final JXTable table = new JXTable(10, 1);
+        table.setColumnControlVisible(true);
+        wrapWithScrollingInFrame(table, "");
+        ColumnControlButton columnControl = (ColumnControlButton) table.getColumnControl();
+        Component[] items = columnControl.popupMenu.getComponents();
+        ((JMenuItem) items[0]).setSelected(false);
+        assertEquals(1, table.getColumnCount());
+    }
 
 }

@@ -127,12 +127,12 @@ public final class ColumnControlButton extends JButton {
             return (column instanceof TableColumnExt);
         }
 
-        public void itemStateChanged(ItemEvent e) {
+        public void itemStateChanged(final ItemEvent e) {
             if (canControl()) {
                 if ((e.getStateChange() == ItemEvent.DESELECTED)
-                        //JW: this is fishy - leads to #212-swingx: setting
+                        //JW: guarding against 1 leads to #212-swingx: setting
                         // column visibility programatically fails if
-                        // the current column is the second last
+                        // the current column is the second last visible
                         // guarding against 0 leads to hiding all columns
                         // by deselecting the menu item. 
                         // TODO further check Rob's basic idea to distinguish
