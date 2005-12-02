@@ -21,7 +21,6 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.swing.Icon;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
@@ -32,16 +31,20 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
+import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.util.AncientSwingTeam;
+import org.jdesktop.swingx.util.ChangeReport;
+import org.jdesktop.swingx.util.PropertyChangeReport;
 
 /**
 * Split from old JXTableUnitTest - contains unit test
@@ -72,6 +75,94 @@ public class JXTableUnitTest extends InteractiveTestCase {
         // make sure we have the same default for each test
         defaultToSystemLF = false;
         setSystemLF(defaultToSystemLF);
+    }
+
+    public void testRemoveHighlighter() {
+        JXTable table = new JXTable();
+        // test cope with null
+        table.removeHighlighter(null);
+        Highlighter presetHighlighter = AlternateRowHighlighter.classicLinePrinter;
+        HighlighterPipeline pipeline = new HighlighterPipeline(new Highlighter[] {presetHighlighter});
+        table.setHighlighters(pipeline);
+        ChangeReport report = new ChangeReport();
+        pipeline.addChangeListener(report);
+        table.removeHighlighter(new Highlighter());
+        // sanity: highlighter was not contained
+        assertFalse("pipeline must not have fired", report.hasEvents());
+        // remove the presetHighlighter
+        table.removeHighlighter(presetHighlighter);
+        assertEquals("pipeline must have fired on remove", 1, report.getEventCount());
+        assertEquals("pipeline must be empty", 0, pipeline.getHighlighters().length);
+    }
+    
+    /**
+     * test choking on precondition failure (highlighter must not be null).
+     *
+     */
+    public void testAddNullHighlighter() {
+        JXTable table = new JXTable();
+        try {
+            table.addHighlighter(null);
+            fail("adding a null highlighter must throw NPE");
+        } catch (NullPointerException e) {
+            // pass - this is what we expect
+        } catch (Exception e) {
+            fail("adding a null highlighter throws exception different " +
+                        "from the expected NPE \n" + e);
+        }
+    }
+    
+    public void testAddHighlighterWithNotEmptyPipeline() {
+        JXTable table = new JXTable();
+        Highlighter presetHighlighter = AlternateRowHighlighter.classicLinePrinter;
+        HighlighterPipeline pipeline = new HighlighterPipeline(new Highlighter[] {presetHighlighter});
+        table.setHighlighters(pipeline);
+        Highlighter highlighter = new Highlighter();
+        ChangeReport report = new ChangeReport();
+        pipeline.addChangeListener(report);
+        table.addHighlighter(highlighter);
+        assertSame("pipeline must be same as preset", pipeline, table.getHighlighters());
+        assertEquals("pipeline must have fired changeEvent", 1, report.getEventCount());
+        assertPipelineHasAsLast(pipeline, highlighter);
+    }
+    
+    private void assertPipelineHasAsLast(HighlighterPipeline pipeline, Highlighter highlighter) {
+        Highlighter[] highlighters = pipeline.getHighlighters();
+        assertTrue("pipeline must not be empty", highlighters.length > 0);
+        assertSame("highlighter must be added as last", highlighter, highlighters[highlighters.length - 1]);
+    }
+
+    /**
+     * test adding a highlighter.
+     *
+     *  asserts that a pipeline is created and set (firing a property change) and
+     *  that the pipeline contains the highlighter.
+     */
+    public void testAddHighlighterWithNullPipeline() {
+        JXTable table = new JXTable();
+        PropertyChangeReport report = new PropertyChangeReport();
+        table.addPropertyChangeListener(report);
+        Highlighter highlighter = new Highlighter();
+        table.addHighlighter(highlighter);
+        assertNotNull("table must have created pipeline", table.getHighlighters());
+        assertTrue("table must have fired propertyChange for highlighters", report.hasEvents("highlighters"));
+        assertPipelineContainsHighlighter(table.getHighlighters(), highlighter);
+    }
+    
+    /**
+     * fails if the given highlighter is not contained in the pipeline.
+     * PRE: pipeline != null, highlighter != null.
+     * 
+     * @param pipeline
+     * @param highlighter
+     */
+    private void assertPipelineContainsHighlighter(HighlighterPipeline pipeline, Highlighter highlighter) {
+        Highlighter[] highlighters = pipeline.getHighlighters();
+        for (int i = 0; i < highlighters.length; i++) {
+            if (highlighter.equals(highlighters[i])) return;
+        }
+        fail("pipeline does not contain highlighter");
+        
     }
 
     /**

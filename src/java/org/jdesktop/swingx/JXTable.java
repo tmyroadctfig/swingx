@@ -2045,7 +2045,39 @@ public class JXTable extends JTable {
         firePropertyChange("highlighters", old, getHighlighters());
         repaint();
     }
+    
+    /**
+     * Adds a Highlighter.
+     * 
+     * If the HighlighterPipeline returned from getHighlighters() is null, creates
+     * and sets a new pipeline containing the given Highlighter. Else, appends
+     * the Highlighter to the end of the pipeline.
+     * 
+     * @param highlighter the Highlighter to add - must not be null.
+     * @throws NullPointerException if highlighter is null.
+     */
+    public void addHighlighter(Highlighter highlighter) {
+        HighlighterPipeline pipeline = getHighlighters();
+        if (pipeline == null) {
+           setHighlighters(new HighlighterPipeline(new Highlighter[] {highlighter})); 
+        } else {
+            pipeline.addHighlighter(highlighter);
+        }
+    }
 
+    /**
+     * Removes the Highlighter.
+     * 
+     * Does nothing if the HighlighterPipeline is null or does not contain
+     * the given Highlighter.
+     * 
+     * @param highlighter the highlighter to remove.
+     */
+    public void removeHighlighter(Highlighter highlighter) {
+        if ((getHighlighters() == null)) return;
+        getHighlighters().removeHighlighter(highlighter);
+    }
+    
     /**
      * returns the ChangeListener to use with highlighters. Creates one if
      * necessary.
