@@ -12,6 +12,7 @@ import java.awt.Frame;
 import java.awt.GraphicsConfiguration;
 import java.awt.HeadlessException;
 import javax.swing.JDialog;
+import javax.swing.UIManager;
 import org.jdesktop.swingx.auth.LoginService;
 import org.jdesktop.swingx.auth.PasswordStore;
 import org.jdesktop.swingx.auth.UserNameStore;
@@ -292,7 +293,7 @@ public class JXLoginDialog extends JDialog {
      */
     public JXLoginDialog(LoginService service, PasswordStore ps, UserNameStore us) {
         super();
-        setTitle("Login"); //TODO i18n
+        setTitle(UIManager.getString(JXLoginPanel.class.getCanonicalName() + ".loginString")); 
         setPanel(new JXLoginPanel(service, ps, us));
         JXLoginPanel.initWindow(this, getPanel());
     }

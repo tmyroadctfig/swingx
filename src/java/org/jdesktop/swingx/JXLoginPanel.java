@@ -308,6 +308,9 @@ public class JXLoginPanel extends JXImagePanel {
         loginListener = new LoginListenerImpl();
         this.loginService.addLoginListener(loginListener);
         
+        // initialize banner text
+        bannerText = UIManager.getString(CLASS_NAME + ".loginString");
+        
         updateUI();
         initComponents();
     }
@@ -1156,7 +1159,7 @@ public class JXLoginPanel extends JXImagePanel {
                 }
             }
         });
-        cancelButton.setText("Close");
+        cancelButton.setText(UIManager.getString(CLASS_NAME + ".cancelString"));
         int prefWidth = Math.max(cancelButton.getPreferredSize().width, okButton.getPreferredSize().width);
         cancelButton.setPreferredSize(new Dimension(prefWidth, okButton.getPreferredSize().height));
         okButton.setPreferredSize(new Dimension(prefWidth, okButton.getPreferredSize().height));
