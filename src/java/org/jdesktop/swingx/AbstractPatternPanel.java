@@ -77,16 +77,15 @@ public abstract class AbstractPatternPanel extends JXPanel {
 
     /**
      * Callback action bound to MATCH_ACTION_COMMAND. 
-     *  
      */
     public abstract void match();
     
     /** 
      * convenience method for type-cast to AbstractActionExt.
      * 
-     *  
-     * @param key
-     * @return
+     * @param key Key to retrieve action
+     * @return Action bound to this key
+     * @see AbstractActionExt
      */
     protected AbstractActionExt getAction(String key) {
         // PENDING: outside clients might add different types?
@@ -94,8 +93,7 @@ public abstract class AbstractPatternPanel extends JXPanel {
     }
 
     /**
-     * creates and registers all actions with the actionMap.
-     *
+     * creates and registers all actions for the default the actionMap.
      */
     protected void initActions() {
         initPatternActions();
@@ -115,13 +113,10 @@ public abstract class AbstractPatternPanel extends JXPanel {
                 execute);
         getActionMap().put(MATCH_ACTION_COMMAND, execute);
         refreshEmptyFromModel();
-        
-        
     }
     
     /**
      * creates actions bound to PatternModel's state.
-     *
      */
     protected void initPatternActions() {
         ActionMap map = getActionMap();
@@ -145,9 +140,9 @@ public abstract class AbstractPatternPanel extends JXPanel {
      * 
      * TODO: move to utilities?
      * 
-     * @param key 
-     * @return the String as returned by the UIManager or key if the returned
-     *   value was null.
+     * @param key <code>String</code> that specifyes the value in UIManager
+     * @return the <code>String</code> as returned by the UIManager or key itself 
+     *  if no value bound to this key in UIManager
      */
     protected String getUIString(String key) {
         String text = UIManager.getString(PatternModel.SEARCH_PREFIX + key);
@@ -162,7 +157,7 @@ public abstract class AbstractPatternPanel extends JXPanel {
      * @param command the actionCommand - same as key to find localizable resources
      * @param methodName the method on the PatternModel to call on item state changed
      * @param initial the initial value of the property
-     * @return
+     * @return newly created action
      */
     protected AbstractActionExt createModelStateAction(String command, String methodName, boolean initial) {
         String actionName = getUIString(command);
@@ -180,7 +175,7 @@ public abstract class AbstractPatternPanel extends JXPanel {
      * 
      * @param actionCommand the actionCommand, same as key to find localizable resources
      * @param methodName the method to call an actionPerformed.
-     * @return
+     * @return newly created action
      */
     protected AbstractActionExt createBoundAction(String actionCommand, String methodName) {
         String actionName = getUIString(actionCommand);
@@ -211,6 +206,8 @@ public abstract class AbstractPatternPanel extends JXPanel {
      * returns the patternModel. Lazyly creates and registers a
      * propertyChangeListener if null.
      * 
+     * @return current <code>PatternModel</code> if it exists or newly created 
+     * one if it was not initialized before this call
      */
     protected PatternModel getPatternModel() {
         if (patternModel == null) {
@@ -224,7 +221,8 @@ public abstract class AbstractPatternPanel extends JXPanel {
     /**
      * factory method to create the PatternModel.
      * Hook for subclasses to install custom models.
-     * @return
+     *
+     * @return newly created <code>PatternModel</code>
      */
     protected PatternModel createPatternModel() {
         PatternModel l = new PatternModel();
@@ -237,7 +235,8 @@ public abstract class AbstractPatternPanel extends JXPanel {
      * NOTE: the patternModel is totally under control of this class - currently
      * there's no need to keep a reference to the listener.
      * 
-     * @return
+     * @return created and bound to appropriate callback methods 
+     *  <code>PropertyChangeListener</code>
      */
     protected PropertyChangeListener getPatternModelListener() {
         PropertyChangeListener l = new PropertyChangeListener() {
@@ -292,6 +291,10 @@ public abstract class AbstractPatternPanel extends JXPanel {
         getPatternModel().setRawText(searchField.getText());
     }
 
+    /**
+     * callback method that updates document from the search field
+     *
+     */
     protected void refreshDocumentFromModel() {
         if (searchField.getText().equals(getPatternModel().getRawText())) return;
         SwingUtilities.invokeLater(new Runnable() {
@@ -301,6 +304,12 @@ public abstract class AbstractPatternPanel extends JXPanel {
         });
     }
 
+    /**
+     * Create <code>DocumentListener</code> for the search field that calls
+     * corresponding callback method whenever the search field contents is being changed
+     *
+     * @return newly created <code>DocumentListener</code>
+     */
     protected DocumentListener getSearchFieldListener() {
         DocumentListener l = new DocumentListener() {
             public void changedUpdate(DocumentEvent ev) {
@@ -348,6 +357,10 @@ public abstract class AbstractPatternPanel extends JXPanel {
           searchLabel.setLabelFor(searchField);
     }
     
+    /**
+     * @return current <code>ActionContainerFactory</code>. 
+     * Will lazily create new factory if it does not exist
+     */
     protected ActionContainerFactory getActionContainerFactory() {
         if (actionFactory == null) {
             actionFactory = new ActionContainerFactory(null);
@@ -355,6 +368,9 @@ public abstract class AbstractPatternPanel extends JXPanel {
         return actionFactory;
     }
     
+    /**
+     * Initialize all the incorporated components and models
+     */
     protected void initComponents() {
         searchLabel = new JLabel();
         searchField = new JTextField(getSearchFieldWidth()) {
@@ -365,11 +381,10 @@ public abstract class AbstractPatternPanel extends JXPanel {
             }
         };
         matchCheck = new JCheckBox();
-        
     }
 
     /**
-     * @return
+     * @return width in characters of the search field
      */
     protected int getSearchFieldWidth() {
         return 15;
