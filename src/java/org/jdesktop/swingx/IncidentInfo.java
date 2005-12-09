@@ -24,7 +24,7 @@
  * to report a problem to the automated report/processing system.
  *
  * @author Alexander Zuev
- * @version 1.2
+ * @version 1.4
  */
 package org.jdesktop.swingx;
 
@@ -53,12 +53,12 @@ public class IncidentInfo {
      * @param header Header that will be used as the quick reference for the 
      *        incident (e.g. title for a dialog or subject for the incident message)
      * @param basicErrorMessage Short description of the given problem
-     * @param detailedErrorMesage Full description of the problem
+     * @param detailedErrorMessage Full description of the problem
      * @param errorException <code>Throwable</code> that can be used as a source for 
      *        additional information such as call stack, thread name, etc.
      */
     public IncidentInfo(String header, String basicErrorMessage,
-                        String detailedErrorMesage, Throwable errorException) {
+                        String detailedErrorMessage, Throwable errorException) {
         this.header = header;
         if(basicErrorMessage != null) {
             this.basicErrorMessage = basicErrorMessage;
@@ -69,7 +69,7 @@ public class IncidentInfo {
                 this.basicErrorMessage = "";
             }
         }
-        this.detailedErrorMessage = detailedErrorMesage;
+        this.detailedErrorMessage = detailedErrorMessage;
         this.errorException = errorException;
     }
 
@@ -78,7 +78,7 @@ public class IncidentInfo {
      * @param header Header that will be used as the quick reference for the 
      *        incident (e.g. title for a dialog or subject for the incident message)
      * @param basicErrorMessage Short description of the given problem
-     * @param detailedErrorMesage Full description og the problem
+     * @param detailedErrorMessage Full description og the problem
      */
     public IncidentInfo(String header, String basicErrorMessage, String detailedErrorMessage) {
         this(header, basicErrorMessage, detailedErrorMessage, null);
