@@ -98,8 +98,7 @@ public class LookAndFeelAddons {
     contribute(new AbstractComponentAddon("MinimumAddon") {
       @Override
       protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
-        addResource(defaults, LookAndFeelAddons.class.getPackage().getName()
-          + ".resources.swingx");
+        addResource(defaults, "org.jdesktop.swingx.plaf.resources.swingx");
       }
     });
   }
