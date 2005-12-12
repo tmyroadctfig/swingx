@@ -32,7 +32,10 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 
 /**
  * A hyperlink component that derives from JButton to provide compatibility
- * mostly for binding actions enabled/disabled behavior accesility i18n etc...
+ * mostly for binding actions enabled/disabled behavior accesilibity i18n etc...
+ *
+ * This component tracks its state and changes way it is being painted after
+ * being clicked for the first time.
  * 
  * @author Richard Bair
  * @author Shai Almog
@@ -67,25 +70,36 @@ public class JXHyperlink extends JButton {
      */
     private Color clickedColor = new Color(0x99, 0, 0x99);
 
-    /** Creates a new instance of JXHyperlink */
+    /**
+     * Creates a new instance of JXHyperlink with default parameters
+     */
     public JXHyperlink() {
         super();
     }
 
+    /**
+     * Creates a new instance of JHyperLink and configures it from provided Action.
+     *
+     * @param action Action whose parameters will be borrowed to configure newly 
+     *        created JXHyperLink
+     */
     public JXHyperlink(Action action) {
         super(action);
         init();
     }
 
     /**
-     * @return
+     * @return Color for the hyper link if it has not yet been clicked.
      */
     public Color getUnclickedColor() {
         return unclickedColor;
     }
 
     /**
-     * @param color
+     * Sets the color for the previously not visited link. This value will override the one
+     * set by the "JXHyperlink.unclickedColor" UIManager property and defaults.
+     *
+     * @param color Color for the hyper link if it has not yet been clicked.
      */
     public void setClickedColor(Color color) {
         Color old = getClickedColor();
@@ -97,14 +111,17 @@ public class JXHyperlink extends JButton {
     }
 
     /**
-     * @return
+     * @return Color for the hyper link if it has already been clicked.
      */
     public Color getClickedColor() {
         return clickedColor;
     }
 
     /**
-     * @param color
+     * Sets the color for the previously visited link. This value will override the one
+     * set by the "JXHyperlink.clickedColor" UIManager property and defaults.
+     *
+     * @param color Color for the hyper link if it has already been clicked.
      */
     public void setUnclickedColor(Color color) {
         Color old = getUnclickedColor();
@@ -115,6 +132,12 @@ public class JXHyperlink extends JButton {
         firePropertyChange("unclickedColor", old, getUnclickedColor());
     }
 
+    /**
+     * Sets if this link has been clicked before. This will luckily affect the way
+     * this component is being painted.
+     *
+     * @param visited If <code>true</code> marks link as visited.
+     */
     protected void setVisited(boolean visited) {
         boolean old = isVisited();
         hasBeenVisited = visited;
@@ -122,10 +145,17 @@ public class JXHyperlink extends JButton {
         firePropertyChange("visited", old, isVisited());
     }
 
+    /**
+     * @return <code>true</code> if hyper link has already been clicked.
+     */
     protected boolean isVisited() {
         return hasBeenVisited;
     }
 
+    /**
+     * Create listener that will watch the changes of the provided <code>Action</code>
+     * and will update JXHyperlink's properties accordingly.
+     */
     protected PropertyChangeListener createActionPropertyChangeListener(
             final Action a) {
         final PropertyChangeListener superListener = super
@@ -147,6 +177,10 @@ public class JXHyperlink extends JButton {
         return l;
     }
 
+    /**
+     * Read all the essentional properties from the provided <code>Action</code>
+     * and apply it to the <code>JXHyperlink</code>
+     */
     protected void configurePropertiesFromAction(Action a) {
         super.configurePropertiesFromAction(a);
         setVisitedFromActionProperty(a);
@@ -161,8 +195,11 @@ public class JXHyperlink extends JButton {
         setForeground(isVisited() ? getClickedColor() : getUnclickedColor());
     }
 
+    /**
+     * Returns a string that specifies the name of the L&F class
+     * that renders this component.
+     */
     public String getUIClassID() {
         return uiClassID;
     }
-
 }
