@@ -431,6 +431,8 @@ public class BasicDatePickerUI extends DatePickerUI {
                 JFormattedTextField editor = (JFormattedTextField)e.getNewValue();
                 datePicker.add(editor);
                 datePicker.revalidate();
+            } else if ("componentOrientation".equals(property)) {
+                datePicker.revalidate();
             }
         }
 
