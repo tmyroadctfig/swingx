@@ -31,6 +31,7 @@ import java.beans.PropertyChangeListener;
 import java.lang.reflect.Method;
 import java.util.Hashtable;
 import java.util.Vector;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,6 +64,7 @@ import org.jdesktop.swingx.decorator.HighlighterPipeline;
  * @author Jeanette Winzenburg
  */
 public class JXTree extends JTree {
+    private static final Logger LOG = Logger.getLogger(JXTree.class.getName());
     private Method conversionMethod = null;
     private final static Class[] methodSignature = new Class[] {Object.class};
     private final static Object[] methodArgs = new Object[] {null};
@@ -203,7 +205,8 @@ public class JXTree extends JTree {
             return model == null ? null : model.getClass().getMethod(
                     "convertValueToText", methodSignature);
         } catch (NoSuchMethodException ex) {
-            // not an error
+            LOG.finer("ex " + ex);
+            LOG.finer("no conversionMethod in " + model.getClass());
         }
         return null;
     }
@@ -220,7 +223,8 @@ public class JXTree extends JTree {
                     return (String) conversionMethod.invoke(getModel(),
                             methodArgs);
                 } catch (Exception ex) {
-                    // fall through
+                    LOG.finer("ex " + ex);
+                    LOG.finer("can't invoke " + conversionMethod);
                 }
             }
         }
