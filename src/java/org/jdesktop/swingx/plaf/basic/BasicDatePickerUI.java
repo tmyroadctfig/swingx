@@ -453,12 +453,15 @@ public class BasicDatePickerUI extends DatePickerUI {
 
             int popupButtonWidth = popupButton != null ? popupButton.getPreferredSize().width : 0;
 
-            datePicker.getEditor().setBounds(insets.left,
+            boolean ltr = datePicker.getComponentOrientation().isLeftToRight();
+
+            datePicker.getEditor().setBounds(ltr ? insets.left : insets.left + popupButtonWidth,
                     insets.bottom,
                     width - popupButtonWidth,
                     height);
+
             if (popupButton != null) {
-                popupButton.setBounds(width - popupButtonWidth + insets.left,
+                popupButton.setBounds(ltr ? width - popupButtonWidth + insets.right : insets.left,
                         insets.bottom,
                         popupButtonWidth,
                         height);
