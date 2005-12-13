@@ -1,6 +1,8 @@
 /*
- * Created on 13.12.2005
+ * $Id$
  *
+ * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
+ * Santa Clara, California 95054, U.S.A. All rights reserved.
  */
 package org.jdesktop.swingx.treetable;
 
@@ -13,7 +15,7 @@ public class TreeTableModelIssues extends TestCase {
         .getLogger(TreeTableModelIssues.class.getName());
 
     /**
-     * Issue #??-swingx: TreeTableModel impl break type contract for
+     * Issue #218-swingx: TreeTableModel impl break type contract for
      * hierarchical column.
      * 
      * Expected contract (non-doc'ed but common sense...)
