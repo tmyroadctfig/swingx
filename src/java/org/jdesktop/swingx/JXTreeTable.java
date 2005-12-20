@@ -1452,6 +1452,12 @@ public class JXTreeTable extends JXTable {
             super.updateUI();
             // Make the tree's cell renderer use the table's cell selection
             // colors.
+            // TODO JW: need to revisit...
+            // a) the "real" of a JXTree is always wrapped into a DelegatingRenderer
+            //  consequently the if-block never executes
+            // b) even if it does it probably (?) should not 
+            // unconditionally overwrite custom selection colors. 
+            // Check for UIResources instead. 
             TreeCellRenderer tcr = getCellRenderer();
             if (tcr instanceof DefaultTreeCellRenderer) {
                 DefaultTreeCellRenderer dtcr = ((DefaultTreeCellRenderer) tcr);
