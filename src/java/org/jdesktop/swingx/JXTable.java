@@ -1056,6 +1056,11 @@ public class JXTable extends JTable {
             getRowModelMapper().removeIndexInterval(start, deletedCount);
 
         } else if (getSelectionModel().isSelectionEmpty()) {
+            // JW first go on #172 - trying to adjust lead/anchor to valid
+            // indices (model only...) after super's default clearSelection
+            // in dataChanged/structureChanged! 
+            hackLeadAnchor(e);
+
             // JW: this is incomplete! see #167-swingx
             // possibly got a dataChanged or structureChanged
             // super will have cleared selection
@@ -1066,6 +1071,25 @@ public class JXTable extends JTable {
         }
 
     }
+
+    /**
+     * Trying to hack around #172-swingx: lead/anchor of row selection model
+     * is not adjusted to valid (not even model indices!) in the 
+     * usual clearSelection after dataChanged/structureChanged.
+     * 
+     * @param e
+     */
+    private void hackLeadAnchor(TableModelEvent e) {
+        int lead = getSelectionModel().getLeadSelectionIndex();
+        int anchor = getSelectionModel().getAnchorSelectionIndex();
+        int lastRow = getModel().getRowCount() - 1;
+        if ((lead > lastRow) || (anchor > lastRow)) {
+            lead = anchor = lastRow;
+            getSelectionModel().setAnchorSelectionIndex(lead);
+            getSelectionModel().setLeadSelectionIndex(lead);
+        }
+    }
+
 
     /**
      * Called if individual row height mapping need to be updated.
