@@ -49,6 +49,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     private static final Logger LOG = Logger
             .getLogger(JXTreeTableVisualCheck.class.getName());
     public static void main(String[] args) {
+        System.setProperty("sun.swing.enableImprovedDragGesture", "true" );
         setSystemLF(true);
         JXTreeTableVisualCheck test = new JXTreeTableVisualCheck();
         try {
@@ -154,29 +155,28 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
              * @param e
              * @return
              */
-            @Override
-            public boolean editCellAt(int row, int column, EventObject e) {
-                if (getDragEnabled() && e instanceof MouseEvent) {
-                    MouseEvent me = (MouseEvent) e;
-                    LOG.info("original mouseEvent " + e);
-                    e = new MouseEvent((Component)me.getSource(),
-                    MouseEvent.MOUSE_PRESSED,
-                    me.getWhen(),
-                    me.getModifiers(),
-                    me.getX(),
-                    me.getY(),
-                    me.getClickCount(),
-                    me.isPopupTrigger());
-                    }
-                return super.editCellAt(row, column, e);
-            }
+//            @Override
+//            public boolean editCellAt(int row, int column, EventObject e) {
+//                if (getDragEnabled() && e instanceof MouseEvent) {
+//                    MouseEvent me = (MouseEvent) e;
+//                    LOG.info("original mouseEvent " + e);
+//                    e = new MouseEvent((Component)me.getSource(),
+//                    MouseEvent.MOUSE_PRESSED,
+//                    me.getWhen(),
+//                    me.getModifiers(),
+//                    me.getX(),
+//                    me.getY(),
+//                    me.getClickCount(),
+//                    me.isPopupTrigger());
+//                    }
+//                return super.editCellAt(row, column, e);
+//            }
             
         };
         treeTable.setColumnControlVisible(true);
         final JXTree tree = new JXTree(treeTableModel);
         JXFrame frame = wrapWithScrollingInFrame(treeTable, tree, "toggle dragEnabled (starting with false)");
         frame.setVisible(true);
-        final TreeTableModel model = new ComponentTreeTableModel(frame);
         Action action = new AbstractAction("Toggle dnd") {
 
             public void actionPerformed(ActionEvent e) {
