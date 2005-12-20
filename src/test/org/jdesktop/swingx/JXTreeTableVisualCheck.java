@@ -49,6 +49,8 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     private static final Logger LOG = Logger
             .getLogger(JXTreeTableVisualCheck.class.getName());
     public static void main(String[] args) {
+        // NOTE JW: this property has be set "very early" in the application life-cycle
+        // it's immutable once read from the UIManager (into a final static field!!)
         System.setProperty("sun.swing.enableImprovedDragGesture", "true" );
         setSystemLF(true);
         JXTreeTableVisualCheck test = new JXTreeTableVisualCheck();
