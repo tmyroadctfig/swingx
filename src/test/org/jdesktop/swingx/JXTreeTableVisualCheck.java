@@ -8,6 +8,9 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.util.EventObject;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
@@ -43,15 +46,17 @@ import org.jdesktop.swingx.util.ComponentTreeTableModel;
  * @author Jeanette Winzenburg
  */
 public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
+    private static final Logger LOG = Logger
+            .getLogger(JXTreeTableVisualCheck.class.getName());
     public static void main(String[] args) {
         setSystemLF(true);
         JXTreeTableVisualCheck test = new JXTreeTableVisualCheck();
         try {
 //            test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*Highligh.*");
+//            test.runInteractiveTests("interactive.*Highligh.*");
          //      test.runInteractiveTests("interactive.*SortingFilter.*");
 //           test.runInteractiveTests("interactive.*Node.*");
-         //     test.runInteractiveTests("interactive.*Focus.*");
+             test.runInteractiveTests("interactive.*DnD.*");
         } catch (Exception ex) {
 
         }
@@ -130,12 +135,69 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         addAction(frame, action);
     }
     
+
+    /**
+     * Issue #168-jdnc: dnd enabled breaks node collapse/expand.
+     */
+    public void interactiveToggleDnDEnabled() {
+        final JXTreeTable treeTable = new JXTreeTable(treeTableModel) {
+
+            /**
+             * testing dirty little hack mentioned in the forum
+             * discussion about the issue: fake a mousePressed if drag enabled.
+             * The usability is slightly impaired because the expand/collapse
+             * is effectively triggered on released only (drag system intercepts
+             * and consumes all other).
+             *  
+             * @param row
+             * @param column
+             * @param e
+             * @return
+             */
+            @Override
+            public boolean editCellAt(int row, int column, EventObject e) {
+                if (getDragEnabled() && e instanceof MouseEvent) {
+                    MouseEvent me = (MouseEvent) e;
+                    LOG.info("original mouseEvent " + e);
+                    e = new MouseEvent((Component)me.getSource(),
+                    MouseEvent.MOUSE_PRESSED,
+                    me.getWhen(),
+                    me.getModifiers(),
+                    me.getX(),
+                    me.getY(),
+                    me.getClickCount(),
+                    me.isPopupTrigger());
+                    }
+                return super.editCellAt(row, column, e);
+            }
+            
+        };
+        treeTable.setColumnControlVisible(true);
+        final JXTree tree = new JXTree(treeTableModel);
+        JXFrame frame = wrapWithScrollingInFrame(treeTable, tree, "toggle dragEnabled (starting with false)");
+        frame.setVisible(true);
+        final TreeTableModel model = new ComponentTreeTableModel(frame);
+        Action action = new AbstractAction("Toggle dnd") {
+
+            public void actionPerformed(ActionEvent e) {
+                
+                boolean dragEnabled = !treeTable.getDragEnabled();
+                treeTable.setDragEnabled(dragEnabled);
+                tree.setDragEnabled(dragEnabled);
+               
+            }
+            
+        };
+        addAction(frame, action);
+    }
+
     public void interactiveTestFocusedCellBackground() {
         JXTreeTable xtable = new JXTreeTable(treeTableModel);
         xtable.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
         JFrame frame = wrapWithScrollingInFrame(xtable, "Unselected focused background");
         frame.setVisible(true);
     }
+
 
     /**
      * Issue #226: no per-cell tooltips in TreeColumn.
