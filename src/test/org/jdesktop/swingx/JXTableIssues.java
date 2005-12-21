@@ -169,6 +169,7 @@ public class JXTableIssues extends InteractiveTestCase {
         int viewRow = table.convertRowIndexToView(lastRow);
         // JW: here's the problem - the anchor of the selectionModel is not updated correctly
         // after removing the last model row
+        // not longer valid (as of 50u6)
 //        assertEquals("anchor must be last", lastRow, table.getSelectionModel().getAnchorSelectionIndex());
         assertTrue("view index visible", viewRow >= 0);
         assertEquals("view index is last", viewRow, lastRow);

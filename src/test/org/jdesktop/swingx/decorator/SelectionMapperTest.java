@@ -31,6 +31,48 @@ public class SelectionMapperTest extends InteractiveTestCase {
     protected ComponentAdapter ascendingModelAdapter;
 
     /**
+     * sanity: understand DefaultListSelectionModel behaviour.
+     * 
+     * behaviour: if any selected (==lead/anchor) and selection cleared then the
+     * selection is empty and lead/anchor still on old value.
+     * 
+     *
+     */
+    public void testLeadAnchorAfterClearSelection() {
+        ListSelectionModel viewSelectionModel = new DefaultListSelectionModel();
+        int selected = 5;
+        viewSelectionModel.setSelectionInterval(selected, selected);
+        assertEquals(selected, viewSelectionModel.getAnchorSelectionIndex());
+        assertEquals(selected, viewSelectionModel.getLeadSelectionIndex());
+        viewSelectionModel.clearSelection();
+        int anchor = selected;
+        assertTrue(viewSelectionModel.isSelectionEmpty());
+        assertEquals(anchor, viewSelectionModel.getAnchorSelectionIndex());
+        assertEquals(anchor, viewSelectionModel.getLeadSelectionIndex());
+        
+    }
+
+    /**
+     * sanity: understand DefaultListSelectionModel behaviour.
+     * 
+     * behaviour: if "last" selected (==lead/anchor) and removed then the
+     * selection is empty but lead/anchor are on the new "last" row.
+     *
+     */
+    public void testLeadAnchorAfterRemove() {
+        ListSelectionModel viewSelectionModel = new DefaultListSelectionModel();
+        int selected = 5;
+        viewSelectionModel.setSelectionInterval(selected, selected);
+        assertEquals(selected, viewSelectionModel.getAnchorSelectionIndex());
+        assertEquals(selected, viewSelectionModel.getLeadSelectionIndex());
+        viewSelectionModel.removeIndexInterval(5, 5);
+        int anchor = selected -1;
+        assertTrue(viewSelectionModel.isSelectionEmpty());
+        assertEquals(anchor, viewSelectionModel.getAnchorSelectionIndex());
+        assertEquals(anchor, viewSelectionModel.getLeadSelectionIndex());
+        
+    }
+    /**
      * Related to #186-swingx: Lead/anchor not correctly synched.
      *
      */
