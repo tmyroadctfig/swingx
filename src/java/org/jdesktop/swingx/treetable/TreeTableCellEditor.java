@@ -96,6 +96,7 @@ public class TreeTableCellEditor extends DefaultCellEditor {
             boolean isSelected, int row, int column) {
         Component component = super.getTableCellEditorComponent(table, value,
                 isSelected, row, column);
+        // JW: this implementation is not bidi-compliant, need to do better
         int offset = getEditorOffset(row, isSelected);
         ((TreeTableTextField) getComponent()).offset = offset;
         return component;
