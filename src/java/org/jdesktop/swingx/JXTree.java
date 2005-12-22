@@ -191,13 +191,17 @@ public class JXTree extends JTree {
         super(newModel);
         initActions();
         // To support delegation of convertValueToText() to the model...
+        // JW: need to set again (is done in setModel, but at call
+        // in super constructor the field is not yet valid)
         conversionMethod = getValueConversionMethod(newModel);
     }
 
     public void setModel(TreeModel newModel) {
-        super.setModel(newModel);
         // To support delegation of convertValueToText() to the model...
+        // JW: method needs to be set before calling super
+        // otherwise there are size caching problems
         conversionMethod = getValueConversionMethod(newModel);
+        super.setModel(newModel);
     }
 
     private Method getValueConversionMethod(TreeModel model) {
