@@ -67,7 +67,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 
     
     /**
-     * Issue #??-swingx: TreeTableEditor not bidi compliant.
+     * Issue #224-swingx: TreeTableEditor not bidi compliant.
      *
      * the textfield for editing is at the wrong position in RToL.
      */
@@ -75,8 +75,6 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         final TreeTableModel model = new ComponentTreeTableModel(new JXFrame());
         final JXTreeTable table = new JXTreeTable(model);
         final JScrollPane pane = new JScrollPane(table);
-//        table.setColumnControlVisible(true);
-//        pane.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         JXFrame frame = wrapInFrame(pane, "Editor: position follows Component orientation");
         Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
 
@@ -164,7 +162,9 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      * see effect of switching treeTableModel.
      * Problem when toggling back to FileSystemModel: hierarchical 
      * column does not show filenames, need to click into table first.
-     * JW: fixed. What exactly was the reason? 
+     * JW: fixed. The issue was updating of the conversionMethod 
+     * field - needed to be done before calling super.setModel().
+     * 
      */
     public void interactiveTestSetModel() {
         final JXTreeTable treeTable = new JXTreeTable(treeTableModel);
