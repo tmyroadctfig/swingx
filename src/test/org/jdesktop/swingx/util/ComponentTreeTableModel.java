@@ -9,6 +9,8 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
 
+import javax.swing.tree.TreePath;
+
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
 
@@ -63,11 +65,9 @@ public class ComponentTreeTableModel extends AbstractTreeTableModel {
     }
  
     public String convertValueToText(Object node) {
-        String className = node.getClass().getName();
-        int lastDot = className.lastIndexOf(".");
-        String lastElement = className.substring(lastDot + 1);
-        return lastElement;
+        return String.valueOf(getValueAt(node, 0));
     }
+    
 //------------------ TreeTableModel    
 
     public Class getColumnClass(int column) {
@@ -75,7 +75,7 @@ public class ComponentTreeTableModel extends AbstractTreeTableModel {
         case 0:
             return hierarchicalColumnClass;
         case 1:
-            return Point.class;
+            return Class.class;
         case 2:
             return Dimension.class;
         default:
@@ -89,9 +89,9 @@ public class ComponentTreeTableModel extends AbstractTreeTableModel {
     public String getColumnName(int column) {
         switch (column) {
         case 0:
-            return "Type";
+            return "Name";
         case 1:
-            return "Location";
+            return "Type";
         case 2:
             return "Size";
         default:
@@ -103,9 +103,9 @@ public class ComponentTreeTableModel extends AbstractTreeTableModel {
         Component comp = (Component) node;
         switch (column) {
         case 0:
-            return comp;
+            return comp.getName();
         case 1:
-            return comp.getLocation();
+            return comp.getClass();
         case 2:
             return comp.getSize();
         default:
@@ -113,8 +113,64 @@ public class ComponentTreeTableModel extends AbstractTreeTableModel {
         }
     }
 
-    public void setValueAt(Object value, Object node, int column) {
+    
+    @Override
+    public boolean isCellEditable(Object node, int column) {
+        return column == 0;
+    }
 
+    public void setValueAt(Object value, Object node, int column) {
+        if (!isCellEditable(node, column)) return;
+        Component comp = (Component) node;
+        comp.setName(String.valueOf(value));
+        nodeChanged(comp);
+    }
+
+    private void nodeChanged(Component comp) {
+        TreePath path = getPathToRoot(comp);
+        Object node = path.getLastPathComponent();
+        TreePath parentPath = path.getParentPath();
+
+        if (parentPath == null) {
+            //todo....
+           // fireChildrenChanged(path, null, null);
+        } else {
+            Object parent = parentPath.getLastPathComponent();
+
+            fireTreeNodesChanged(this, new Object[] {parentPath} , 
+                    new int[] { getIndexOfChild(parent, node) },
+                    new Object[]  { node} );
+        }
+        
+    }
+
+    private TreePath getPathToRoot(Component node) {
+        return new TreePath(getPathToRoot(node, 0));
+    }
+
+    private Component[] getPathToRoot(Component node, int depth) {
+        Component[]              retNodes;
+        // This method recurses, traversing towards the root in order
+        // size the array. On the way back, it fills in the nodes,
+        // starting from the root and working back to the original node.
+
+        /* Check for null, in case someone passed in a null node, or
+           they passed in an element that isn't rooted at root. */
+        if(node == null) {
+            if(depth == 0)
+                return null;
+            else
+                retNodes = new Component[depth];
+        }
+        else {
+            depth++;
+            if(node == root)
+                retNodes = new Component[depth];
+            else
+                retNodes = getPathToRoot(node.getParent(), depth);
+            retNodes[retNodes.length - depth] = node;
+        }
+        return retNodes;
     }
 
     

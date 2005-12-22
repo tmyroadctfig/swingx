@@ -28,6 +28,7 @@ import java.util.EventObject;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.Icon;
+import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTree;
@@ -79,43 +80,68 @@ public class TreeTableCellEditor extends DefaultCellEditor {
         if (tree == null) {
             throw new IllegalArgumentException("null tree");
         }
-
+        // JW: no need to...
         this.tree = tree; // immutable
     }
 
     /**
-     * Overriden to determine an offset that tree would place the
-     * editor at. The offset is determined from the
-     * <code>getRowBounds</code> JTree method, and additionaly
-     * from the icon DefaultTreeCellRenderer will use.
-     * <p>The offset is then set on the TreeTableTextField component
-     * created in the constructor, and returned.
+     * Overriden to determine an offset that tree would place the editor at. The
+     * offset is determined from the <code>getRowBounds</code> JTree method,
+     * and additionaly from the icon DefaultTreeCellRenderer will use.
+     * <p>
+     * The offset is then set on the TreeTableTextField component created in the
+     * constructor, and returned.
      */
     public Component getTableCellEditorComponent(JTable table, Object value,
-                                                 boolean isSelected, int row,
-                                                 int column) {
+            boolean isSelected, int row, int column) {
         Component component = super.getTableCellEditorComponent(table, value,
-            isSelected, row, column);
-        Rectangle bounds = tree.getRowBounds(row);
-        int offset = bounds.x;
-        TreeCellRenderer tcr = tree.getCellRenderer();
-        if (tcr instanceof DefaultTreeCellRenderer) {
-            Object node = tree.getPathForRow(row).getLastPathComponent();
-            Icon icon;
-            if (tree.getModel().isLeaf(node))
-                icon = ((DefaultTreeCellRenderer) tcr).getLeafIcon();
-            else if (tree.isExpanded(row))
-                icon = ((DefaultTreeCellRenderer) tcr).getOpenIcon();
-            else
-                icon = ((DefaultTreeCellRenderer) tcr).getClosedIcon();
-
-            if (icon != null) {
-                offset += ((DefaultTreeCellRenderer) tcr).getIconTextGap() +
-                    icon.getIconWidth();
-            }
-        }
+                isSelected, row, column);
+        int offset = getEditorOffset(row, isSelected);
         ((TreeTableTextField) getComponent()).offset = offset;
         return component;
+    }
+
+    /**
+     * @param row
+     * @param isSelected
+     * @return
+     */
+    protected int getEditorOffset(int row, boolean isSelected) {
+        if (tree == null) return 0;
+        Rectangle bounds = tree.getRowBounds(row);
+        int offset = bounds.x;
+        Object node = tree.getPathForRow(row).getLastPathComponent();
+        boolean leaf = tree.getModel().isLeaf(node);
+        boolean expanded = tree.isExpanded(row);
+        TreeCellRenderer tcr = tree.getCellRenderer();
+        Component treeComponent = tcr.getTreeCellRendererComponent(tree, node,
+                isSelected, expanded, leaf, row, false);
+        if (treeComponent instanceof JLabel) {
+            JLabel label = (JLabel) treeComponent;
+
+            Icon icon = label.getIcon();
+            offset += icon.getIconWidth() + label.getIconTextGap();
+        }
+//         JW: the following fails if the renderer is not of type DTCR and
+//         with custom  renderers which might decide to base
+//         decisions about icons based on node type and/or selected state.
+//         TreeCellRenderer tcr = tree.getCellRenderer();
+//         if (tcr instanceof DefaultTreeCellRenderer) {
+//         Object node = tree.getPathForRow(row).getLastPathComponent();
+//         Icon icon;
+//         if (tree.getModel().isLeaf(node))
+//         icon = ((DefaultTreeCellRenderer) tcr).getLeafIcon();
+//         else if (tree.isExpanded(row))
+//         icon = ((DefaultTreeCellRenderer) tcr).getOpenIcon();
+//         else
+//         icon = ((DefaultTreeCellRenderer) tcr).getClosedIcon();
+//        
+//         if (icon != null) {
+//         offset += ((DefaultTreeCellRenderer) tcr).getIconTextGap() +
+//         icon.getIconWidth();
+//         }
+//         }
+        return offset;
     }
 
     /**

@@ -6,10 +6,9 @@ package org.jdesktop.swingx;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
-import java.util.EventObject;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -19,6 +18,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.table.TableCellRenderer;
@@ -59,10 +59,54 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //            test.runInteractiveTests("interactive.*Highligh.*");
          //      test.runInteractiveTests("interactive.*SortingFilter.*");
 //           test.runInteractiveTests("interactive.*Node.*");
-             test.runInteractiveTests("interactive.*DnD.*");
+             test.runInteractiveTests("interactive.*Editor.*");
         } catch (Exception ex) {
 
         }
+    }
+
+    
+    /**
+     * Issue #??-swingx: TreeTableEditor not bidi compliant.
+     *
+     * the textfield for editing is at the wrong position in RToL.
+     */
+    public void interactiveRToLTreeTableEditor() {
+        final TreeTableModel model = new ComponentTreeTableModel(new JXFrame());
+        final JXTreeTable table = new JXTreeTable(model);
+        final JScrollPane pane = new JScrollPane(table);
+//        table.setColumnControlVisible(true);
+//        pane.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        JXFrame frame = wrapInFrame(pane, "Editor: position follows Component orientation");
+        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
+
+            public void actionPerformed(ActionEvent e) {
+                ComponentOrientation current = pane.getComponentOrientation();
+                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
+                    pane.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+                } else {
+                    pane.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+
+                }
+
+            }
+
+        };
+        addAction(frame, toggleComponentOrientation);
+        frame.setVisible(true);
+    }
+
+    /**
+     * Issue #223-swingx: TreeTableEditor not bidi compliant.
+     *
+     * the textfield for editing is at the wrong position in RToL.
+     */
+    public void interactiveTreeTableEditorIcons() {
+        final TreeTableModel model = new ComponentTreeTableModel(new JXFrame());
+        final JXTreeTable table = new JXTreeTable(model);
+        final JScrollPane pane = new JScrollPane(table);
+        JXFrame frame = wrapWithScrollingInFrame(pane, "Editor: icons showing");
+        frame.setVisible(true);
     }
 
     /**
@@ -114,11 +158,13 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         }
     }
 
+    
+    
     /**
      * see effect of switching treeTableModel.
      * Problem when toggling back to FileSystemModel: hierarchical 
      * column does not show filenames, need to click into table first.
-     *
+     * JW: fixed. What exactly was the reason? 
      */
     public void interactiveTestSetModel() {
         final JXTreeTable treeTable = new JXTreeTable(treeTableModel);
