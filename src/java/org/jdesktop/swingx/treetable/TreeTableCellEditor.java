@@ -97,8 +97,7 @@ public class TreeTableCellEditor extends DefaultCellEditor {
         Component component = super.getTableCellEditorComponent(table, value,
                 isSelected, row, column);
         // JW: this implementation is not bidi-compliant, need to do better
-        int offset = getEditorOffset(row, isSelected);
-        ((TreeTableTextField) getComponent()).offset = offset;
+        initEditorOffset(table, row, column, isSelected);
         return component;
     }
 
@@ -107,8 +106,8 @@ public class TreeTableCellEditor extends DefaultCellEditor {
      * @param isSelected
      * @return
      */
-    protected int getEditorOffset(int row, boolean isSelected) {
-        if (tree == null) return 0;
+    protected void initEditorOffset(JTable table, int row, int column, boolean isSelected) {
+        if (tree == null) return;
         Rectangle bounds = tree.getRowBounds(row);
         int offset = bounds.x;
         Object node = tree.getPathForRow(row).getLastPathComponent();
@@ -121,8 +120,9 @@ public class TreeTableCellEditor extends DefaultCellEditor {
             JLabel label = (JLabel) treeComponent;
 
             Icon icon = label.getIcon();
-            offset += icon.getIconWidth() + label.getIconTextGap();
+            //offset += icon.getIconWidth() + label.getIconTextGap();
         }
+        ((TreeTableTextField) getComponent()).init(offset, column, bounds.width, table);
 //         JW: the following fails if the renderer is not of type DTCR and
 //         with custom  renderers which might decide to base
 //         decisions about icons based on node type and/or selected state.
@@ -142,7 +142,6 @@ public class TreeTableCellEditor extends DefaultCellEditor {
 //         icon.getIconWidth();
 //         }
 //         }
-        return offset;
     }
 
     /**
@@ -167,15 +166,53 @@ public class TreeTableCellEditor extends DefaultCellEditor {
      * make the x location be <code>offset</code>.
      */
     static class TreeTableTextField extends JTextField {
-        int offset; // changed to package private instead of public
-
+        void init(int offset, int column, int width, JTable table) {
+            this.offset = offset;
+            this.column = column;
+            this.width = width;
+            this.table = table;
+        }
+        
+        private int offset; // changed to package private instead of public
+        private int column;
+        private int width;
+        private JTable table;
         public void reshape(int x, int y, int width, int height) {
             // Allows precise positioning of text field in the tree cell.
             //Border border = this.getBorder(); // get this text field's border
             //Insets insets = border == null ? null : border.getBorderInsets(this);
             //int newOffset = offset - (insets == null ? 0 : insets.left);
-            int newOffset = offset - getInsets().left;
-            super.reshape(x + newOffset, y, width - newOffset, height);
+            if(table.getComponentOrientation().isLeftToRight()) {
+                int newOffset = offset - getInsets().left;
+                // this is LtR version
+                super.reshape(x + newOffset, y, width - newOffset, height);
+            } else {
+                // right to left version
+                int newOffset = offset + getInsets().left;
+                int pos = getColumnPositionBidi();
+                width = table.getColumnModel().getColumn(getBidiTreeColumn()).getWidth();
+                width = width - (width - newOffset - this.width);
+                super.reshape(pos, y, width, height);
+            }
+        }
+        
+        /**
+         * Returns the column for the tree in a bidi situation
+         */
+        private int getBidiTreeColumn() {
+            // invert the column offet since this method will always be invoked
+            // in a bidi situation
+            return table.getColumnCount() - this.column - 1;
+        }
+        
+        private int getColumnPositionBidi() {
+            int width = 0;
+            
+            int column = getBidiTreeColumn();
+            for(int iter = 0 ; iter < column ; iter++) {
+                width += table.getColumnModel().getColumn(iter).getWidth();
+            }
+            return width;
         }
     }
 
