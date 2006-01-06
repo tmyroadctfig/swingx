@@ -1,3 +1,80 @@
 Manifest-Version: 1.0
 X-COMMENT: Main-Class will be added automatically by build
 
+Name: org/jdesktop/swingx/JXCollapsiblePane.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXComboBox.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXDatePicker.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXDialog.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXEditorPane.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXErrorDialog.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXFindBar.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXFrame.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXGlassBox.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXHyperlink.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXImagePanel.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXList.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXLoginDialog.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXLoginPanel.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXPanel.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXRadioGroup.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXRootPane.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXSearchPanel.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXStatusBar.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXTable.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXTaskPane.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXTipOfTheDay.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXTitledPanel.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXTree.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXTreeTable.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/calendar/JXMonthView.class
+Java-Bean: True
