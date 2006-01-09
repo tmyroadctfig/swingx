@@ -353,18 +353,16 @@ public class JXTreeTable extends JXTable {
      * @param treeModel data model for this JXTreeTable
      */
     public void setTreeTableModel(TreeTableModel treeModel) {
+        TreeTableModel old = getTreeTableModel();
         renderer.setModel(treeModel);
-        // #241: make sure old listeners are removed
-        // JW: this should be done more cleanly, actually there is no need
-        // to create a new adapter when setting a new treeModel.
-        // what's needed is to fire a structureChanged
-        
         ((TreeTableModelAdapter)getModel()).setTreeTableModel(treeModel);
         // Enforce referential integrity; bail on fail
+        // JW: when would that happen? we just set it... 
         if (treeModel != renderer.getModel()) { // do not use assert here!
             throw new IllegalArgumentException("Mismatched TreeTableModel");
         }
         // Install the default editor.
+        // JW: change to re-use the editor!
         setDefaultEditor(AbstractTreeTableModel.hierarchicalColumnClass,
             new TreeTableCellEditor(renderer));
 
@@ -374,6 +372,7 @@ public class JXTreeTable extends JXTable {
         // setRowMargin();
         adminSetRowHeight(getRowHeight());
         setRowMargin(getRowMargin()); // call overridden setRowMargin()
+        firePropertyChange("treeTableModel", old, getTreeTableModel());
     }
 
     /**

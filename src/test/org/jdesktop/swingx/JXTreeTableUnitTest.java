@@ -10,7 +10,6 @@ package org.jdesktop.swingx;
 import java.awt.Point;
 
 import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -20,6 +19,7 @@ import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
+import org.jdesktop.swingx.util.PropertyChangeReport;
 
 
 public class JXTreeTableUnitTest extends InteractiveTestCase {
@@ -31,6 +31,29 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         super("JXTreeTable Unit Test");
     }
 
+    /**
+     * Issue #230-swingx: 
+     * JXTreeTable should fire property change on setTreeTableModel.
+     * 
+     * 
+     *
+     */
+    public void testTreeTableModelIsBoundProperty() {
+        JXTreeTable treeTable = new JXTreeTable();
+        PropertyChangeReport report = new PropertyChangeReport();
+        treeTable.addPropertyChangeListener(report);
+        treeTable.setTreeTableModel(simpleTreeTableModel);
+        int allPropertyCount = report.getEventCount();
+        int treeTMPropertyCount = report.getEventCount("treeTableModel");
+        assertEquals("treeTable must have fired exactly one event for property treeTableModel", 
+                1, treeTMPropertyCount);
+        assertEquals("treeTable must have fired event for property treeTableModel only",
+                allPropertyCount, treeTMPropertyCount);
+        // sanity: must not fire when setting to same
+        report.clear();
+        treeTable.setTreeTableModel(simpleTreeTableModel);
+        assertEquals("treeTable must not have fired", 0, report.getEventCount()); 
+    }
     /**
      * Issue #54: hidden columns not removed on setModel.
      * sanity test (make sure nothing evil introduced in treeTable as 
