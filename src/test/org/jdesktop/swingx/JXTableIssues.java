@@ -47,16 +47,6 @@ public class JXTableIssues extends InteractiveTestCase {
     }
 
     /**
-     * Issue #??-swingx: selection not kept if selectionModel had been changed.
-     *
-     */
-    public void testSelectionMapperUpdatedOnSelectionModelChange() {
-        JXTable table = new JXTable();
-        ListSelectionModel model = new DefaultListSelectionModel();
-        table.setSelectionModel(model);
-        assertEquals(model, table.getSelectionMapper().getViewSelectionModel());
-    }
-    /**
      * 
      * Issue #172-swingx.
      * 

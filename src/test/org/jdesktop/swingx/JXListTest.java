@@ -17,9 +17,11 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -32,6 +34,7 @@ import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
+import org.jdesktop.swingx.decorator.SelectionMapper;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.decorator.Sorter;
 
@@ -45,7 +48,36 @@ public class JXListTest extends InteractiveTestCase {
     private ListModel listModel;
     protected DefaultListModel ascendingListModel;
 
-    
+
+    /**
+     * Issue #232-swingx: selection not kept if selectionModel had been changed.
+     *
+     */
+    public void testSelectionMapperUpdatedOnSelectionModelChange() {
+        JXList table = new JXList();
+        table.setFilterEnabled(true);
+        // created lazily, to see the failure,
+        // need to get hold before replacing list's selection
+        SelectionMapper mapper = table.getSelectionMapper();
+        ListSelectionModel model = new DefaultListSelectionModel();
+        table.setSelectionModel(model);
+        assertEquals(model, mapper.getViewSelectionModel());
+    }
+
+    /**
+     * Issue #232-swingx: selection not kept if selectionModel had been changed.
+     *
+     *  PENDING: selectionMapper shouldn't be available if list not filterable? 
+     */
+    public void testSelectionMapperFilterDisabled() {
+        JXList table = new JXList();
+        // created lazily, need to get hold before replacing list's selection
+        SelectionMapper mapper = table.getSelectionMapper();
+        ListSelectionModel model = new DefaultListSelectionModel();
+        table.setSelectionModel(model);
+        assertEquals(model, mapper.getViewSelectionModel());
+    }
+
     /**
      * test if LinkController/executeButtonAction is properly registered/unregistered on
      * setRolloverEnabled.

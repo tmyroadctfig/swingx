@@ -984,6 +984,16 @@ public class JXTable extends JTable {
                 convertColumnIndexToModel(column));
     }
 
+    
+    /**
+     * Overridden to update selectionMapper
+     */
+    @Override 
+    public void setSelectionModel(ListSelectionModel newModel) {
+        super.setSelectionModel(newModel);
+        getSelectionMapper().setViewSelectionModel(getSelectionModel());
+    }
+
     /**
      * {@inheritDoc}
      */

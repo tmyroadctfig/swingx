@@ -43,6 +43,7 @@ import javax.swing.JList;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListDataEvent;
@@ -552,6 +553,15 @@ public class JXList extends JList {
     }
 
     /**
+     * Overridden to update selectionMapper
+     */
+    @Override 
+    public void setSelectionModel(ListSelectionModel newModel) {
+        super.setSelectionModel(newModel);
+        getSelectionMapper().setViewSelectionModel(getSelectionModel());
+    }
+
+    /**
      * set's the underlying data model. Note that if isFilterEnabled you must
      * call getWrappedModel to access the model given here. In this case
      * getModel returns a wrapper around the data!
@@ -567,7 +577,11 @@ public class JXList extends JList {
         }
     }
 
-    private SelectionMapper getSelectionMapper() {
+    /**
+     * widened access for testing...
+     * @return
+     */
+    protected SelectionMapper getSelectionMapper() {
         if (selectionMapper == null) {
             selectionMapper = new SelectionMapper(filters, getSelectionModel());
         }

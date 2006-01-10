@@ -20,9 +20,11 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -75,6 +77,18 @@ public class JXTableUnitTest extends InteractiveTestCase {
         // make sure we have the same default for each test
         defaultToSystemLF = false;
         setSystemLF(defaultToSystemLF);
+    }
+
+    
+    /**
+     * Issue #232-swingx: selection not kept if selectionModel had been changed.
+     *
+     */
+    public void testSelectionMapperUpdatedOnSelectionModelChange() {
+        JXTable table = new JXTable();
+        ListSelectionModel model = new DefaultListSelectionModel();
+        table.setSelectionModel(model);
+        assertEquals(model, table.getSelectionMapper().getViewSelectionModel());
     }
 
     public void testRemoveHighlighter() {

@@ -231,7 +231,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     
 
     /**
-     * Issue #??-swingx: SelectionMapper not updated on changing selectionModel.
+     * Issue #232-swingx: SelectionMapper not updated on changing selectionModel.
      * visually verify that the mapper keeps the selection after re-setting
      * table's selectionModel.
      * 
