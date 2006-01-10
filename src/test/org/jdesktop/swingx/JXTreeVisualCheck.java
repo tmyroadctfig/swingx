@@ -32,20 +32,9 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
      *
      */
     public void interactiveTreeEditingRToL() {
-        final TreeTableModel model = new ComponentTreeTableModel(new JXFrame());
-        JTree tree =  new JTree(model) {
-
-            @Override
-            public String convertValueToText(Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-                if (value instanceof Component) {
-                    return ((Component) value).getName();
-                }
-                return super.convertValueToText(value, selected, expanded, leaf, row, hasFocus);
-            }
-            
-        };
+        JTree tree =  new JTree(); 
         tree.setEditable(true);
-        JXTree xTree = new JXTree(model);
+        JXTree xTree = new JXTree();
         xTree.setEditable(true);
         final JXFrame frame = wrapWithScrollingInFrame(tree, xTree, "Editing: compare tree and xtree");
         Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
@@ -246,8 +235,8 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
         setSystemLF(true);
         JXTreeVisualCheck test = new JXTreeVisualCheck();
         try {
-            test.runInteractiveTests();
-          //  test.runInteractiveTests("interactive.*High.*");
+//            test.runInteractiveTests();
+            test.runInteractiveTests("interactive.*RToL.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
