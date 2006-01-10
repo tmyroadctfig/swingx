@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -45,8 +46,16 @@ public class JXTableIssues extends InteractiveTestCase {
         // TODO Auto-generated constructor stub
     }
 
-    
-
+    /**
+     * Issue #??-swingx: selection not kept if selectionModel had been changed.
+     *
+     */
+    public void testSelectionMapperUpdatedOnSelectionModelChange() {
+        JXTable table = new JXTable();
+        ListSelectionModel model = new DefaultListSelectionModel();
+        table.setSelectionModel(model);
+        assertEquals(model, table.getSelectionMapper().getViewSelectionModel());
+    }
     /**
      * 
      * Issue #172-swingx.

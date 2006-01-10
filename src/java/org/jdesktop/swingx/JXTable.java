@@ -1014,6 +1014,7 @@ public class JXTable extends JTable {
         use(filters);
     }
 
+    
     /**
      * reset model selection coordinates in SelectionMapper after
      * model events.
@@ -1089,6 +1090,71 @@ public class JXTable extends JTable {
             getSelectionModel().setLeadSelectionIndex(lead);
         }
     }
+//  ------------------ preparing fix for (Issue #172-swingx)
+    
+    /**
+     * for a complete fix of #172 we need to guarantee that the
+     * view ListSelectionModel never has illegal indices. As 
+     * super.tableChanged doesn't know about coordinate transformation
+     * it will happily access/set illegal view coordinates during the
+     * tableChanged. The only way out might be to completely overwrite.
+     * Need to test thoroughly!
+     * 
+     * PENDING: find out how important the paint optimizations in super
+     * still are (are they at all important? They are very old and never 
+     * _really_ worked anyway...)!
+     * 
+     */
+    private void myTableChanged(TableModelEvent e) {
+        if (isStructureChanged(e)) {
+            updateAfterStructureChanged();
+        } else if (isDataChanged(e)) {
+            updateAfterDataChanged();
+        } else if (e.getType() == TableModelEvent.INSERT) {
+            updateAfterInsert(e); 
+        } else if (e.getType() == TableModelEvent.DELETE) {
+            updateAfterDelete(e);
+        } else {
+           updateAfterCellsUpdate(e); 
+        }
+    }
+    private void updateAfterCellsUpdate(TableModelEvent e) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    private void updateAfterDelete(TableModelEvent e) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    private void updateAfterInsert(TableModelEvent e) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    private void updateAfterDataChanged() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    private void updateAfterStructureChanged() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    private boolean isDataChanged(TableModelEvent e) {
+        return e.getType() == TableModelEvent.UPDATE && 
+            e.getFirstRow() == 0 &&
+            e.getLastRow() == Integer.MAX_VALUE;
+    }
+
+    private boolean isStructureChanged(TableModelEvent e) {
+        return e == null || e.getFirstRow() == TableModelEvent.HEADER_ROW;
+    }
+
+    // -------------- end prepare complete #172-fix
+    
 
 
     /**
@@ -1104,7 +1170,11 @@ public class JXTable extends JTable {
         getRowModelMapper().setViewSizeSequence(sizeSequence, getRowHeight());
     }
     
-    private SelectionMapper getSelectionMapper() {
+    /**
+     * temporaryly exposed for testing...
+     * @return
+     */
+    protected SelectionMapper getSelectionMapper() {
         if (selectionMapper == null) {
             selectionMapper = new SelectionMapper(filters, getSelectionModel());
         }

@@ -22,6 +22,7 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -67,14 +68,14 @@ public class JXTableVisualCheck extends JXTableUnitTest {
       JXTableVisualCheck test = new JXTableVisualCheck();
       try {
 //        test.runInteractiveTests();
-//          test.runInteractiveTests("interactive.*ColumnControlColumnModel.*");
+//          test.runInteractiveTests("interactive.*ColumnControl.*");
 //          test.runInteractiveTests("interactive.*TableHeader.*");
 //          test.runInteractiveTests("interactive.*Multiple.*");
 //          test.runInteractiveTests("interactive.*RToL.*");
 //          test.runInteractiveTests("interactive.*Boolean.*");
 //          test.runInteractiveTests("interactive.*Sorting.*");
           
-          test.runInteractiveTests("interactive.*Highl.*");
+          test.runInteractiveTests("interactive.*Select.*");
 //        test.runInteractiveTests("interactive.*isable.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
@@ -82,6 +83,25 @@ public class JXTableVisualCheck extends JXTableUnitTest {
       }
   }
 
+    /** 
+     * Issue ??: Anchor lost after receiving a structure changed.
+     *
+     */
+    public void interactiveTestToggleTableModelU6() {
+        final DefaultTableModel tableModel = createAscendingModel(0, 20);
+        final JXTable table = new JXTable(tableModel);
+        Action toggleAction = new AbstractAction("Toggle TableModel") {
+
+            public void actionPerformed(ActionEvent e) {
+                TableModel model = table.getModel();
+                table.setModel(model.equals(tableModel) ? sortableTableModel : tableModel);
+            }
+            
+        };
+        JXFrame frame = wrapWithScrollingInFrame(table, "anchor lost after structure changed");
+        addAction(frame, toggleAction);
+        frame.setVisible(true);
+    }
 
     /**
      * Issue #186-swingxProblem with lead/selection and buttons as editors:
@@ -209,7 +229,31 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         frame.setVisible(true);
     }
     
+
     /**
+     * Issue #??-swingx: SelectionMapper not updated on changing selectionModel.
+     * visually verify that the mapper keeps the selection after re-setting
+     * table's selectionModel.
+     * 
+     * 
+     *
+     */
+    public void interactiveSelectionMapperOnSelectionModelChange() {
+        final JXTable table = new JXTable(sortableTableModel);
+        table.setSelectionModel(new DefaultListSelectionModel());
+        JXFrame frame = wrapWithScrollingInFrame(table, "SelectionMapper: keep selection on change view model");
+//        Action temp = new AbstractAction("toggle selectionModel") {
+//
+//            public void actionPerformed(ActionEvent e) {
+//                table.setSelectionModel(new DefaultListSelectionModel());
+//                
+//            }
+//            
+//        };
+//        addAction(frame, temp);
+        frame.setVisible(true);
+    }
+/**
      * example mixed sorting (Jens Elkner).
      *
      */

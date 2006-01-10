@@ -83,6 +83,14 @@ public class SelectionMapper {
         isListening = true;
     }
 
+    /**
+     * temporarily added for testing...
+     * @return
+     */
+    public ListSelectionModel getViewSelectionModel() {
+        return viewSelection;
+    }
+    
     public void setFilters(FilterPipeline pipeline) {
         FilterPipeline old = this.pipeline;
         if (old != null) {
