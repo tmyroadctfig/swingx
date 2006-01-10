@@ -63,7 +63,26 @@ public class ComponentTreeTableModel extends AbstractTreeTableModel {
     public boolean isLeaf(Object node) {
         return getChildCount(node) == 0;
     }
- 
+
+    /**
+     * This method is called by a standard JTree after
+     * editing the cell.
+     * 
+     */
+    public void valueForPathChanged(TreePath path, Object newValue) {
+        Object node = path.getLastPathComponent();
+        setValueAt(newValue, node, 0);
+        
+    }
+
+
+    /**
+     * This method is called by the "tree" part to render the 
+     * hierarchical column.
+     * 
+     * @param node
+     * @return
+     */
     public String convertValueToText(Object node) {
         return String.valueOf(getValueAt(node, 0));
     }
@@ -125,6 +144,7 @@ public class ComponentTreeTableModel extends AbstractTreeTableModel {
         comp.setName(String.valueOf(value));
         nodeChanged(comp);
     }
+
 
     private void nodeChanged(Component comp) {
         TreePath path = getPathToRoot(comp);

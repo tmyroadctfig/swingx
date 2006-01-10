@@ -59,12 +59,51 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //            test.runInteractiveTests("interactive.*Highligh.*");
          //      test.runInteractiveTests("interactive.*SortingFilter.*");
 //           test.runInteractiveTests("interactive.*Node.*");
-             test.runInteractiveTests("interactive.*Editor.*");
+             test.runInteractiveTests("interactive.*Edit.*");
         } catch (Exception ex) {
 
         }
     }
 
+    /**
+     * visualize editing of the hierarchical column, both
+     * in a tree and a treeTable
+     *
+     */
+    public void interactiveTreeTableModelEditing() {
+        final TreeTableModel model = new ComponentTreeTableModel(new JXFrame());
+        final JXTreeTable table = new JXTreeTable(model);
+        JTree tree =  new JTree(model) {
+
+            @Override
+            public String convertValueToText(Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+                if (value instanceof Component) {
+                    return ((Component) value).getName();
+                }
+                return super.convertValueToText(value, selected, expanded, leaf, row, hasFocus);
+            }
+            
+        };
+        tree.setEditable(true);
+        final JXFrame frame = wrapWithScrollingInFrame(table, tree, "Editing: compare treetable and tree");
+        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
+
+            public void actionPerformed(ActionEvent e) {
+                ComponentOrientation current = frame.getComponentOrientation();
+                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
+                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+                } else {
+                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+
+                }
+
+            }
+
+        };
+        addAction(frame, toggleComponentOrientation);
+        frame.setVisible(true);
+        
+    }
     
     /**
      * Issue #224-swingx: TreeTableEditor not bidi compliant.
@@ -74,16 +113,15 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     public void interactiveRToLTreeTableEditor() {
         final TreeTableModel model = new ComponentTreeTableModel(new JXFrame());
         final JXTreeTable table = new JXTreeTable(model);
-        final JScrollPane pane = new JScrollPane(table);
-        JXFrame frame = wrapInFrame(pane, "Editor: position follows Component orientation");
+        final JXFrame frame = wrapWithScrollingInFrame(table, "Editor: position follows Component orientation");
         Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
 
             public void actionPerformed(ActionEvent e) {
-                ComponentOrientation current = pane.getComponentOrientation();
+                ComponentOrientation current = frame.getComponentOrientation();
                 if (current == ComponentOrientation.LEFT_TO_RIGHT) {
-                    pane.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
                 } else {
-                    pane.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 
                 }
 
