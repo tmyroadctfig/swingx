@@ -56,6 +56,9 @@ public class DefaultXTreeCellEditor extends DefaultTreeCellEditor {
         super(tree, renderer, editor);
     }
 
+    public void setRenderer(DefaultTreeCellRenderer renderer) {
+        this.renderer = renderer;
+    }
     
     public class XEditorContainer extends EditorContainer {
 

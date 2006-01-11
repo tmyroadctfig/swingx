@@ -54,6 +54,13 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
         tree.setCellEditor(new DefaultXTreeCellEditor(tree, renderer));
         JXTree xTree = new JXTree();
         xTree.setEditable(true);
+        TreeCellRenderer xRenderer = xTree.getCellRenderer();
+        if (xRenderer instanceof JXTree.DelegatingRenderer) {
+            TreeCellRenderer delegate = ((JXTree.DelegatingRenderer) xRenderer).getDelegateRenderer();
+            if (delegate instanceof DefaultTreeCellRenderer) { 
+                xTree.setCellEditor(new DefaultXTreeCellEditor(xTree, (DefaultTreeCellRenderer) delegate));
+            }   
+        }
         final JXFrame frame = wrapWithScrollingInFrame(tree, xTree, "Editing: compare tree and xtree");
         Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
 
