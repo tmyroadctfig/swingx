@@ -38,8 +38,8 @@ import javax.swing.tree.TreeCellEditor;
  * editing field (is only one char wide if the node value is null).
  * 
  * PENDING: any possibility to position the editorContainer? 
- * BasicTreeUI adds it to the tree (why not use a CellRendererPane?)
- * and positions at the node location. That's not a problem in LToR, only
+ * BasicTreeUI adds it to the tree and positions at the node location. 
+ * That's not a problem in LToR, only
  * in RToL 
  *
  * 
