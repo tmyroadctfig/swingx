@@ -309,7 +309,7 @@ public class JXLoginPanel extends JXImagePanel {
         this.loginService.addLoginListener(loginListener);
         
         // initialize banner text
-        bannerText = UIManager.getString(CLASS_NAME + ".loginString");
+        bannerText = UIManager.getString(CLASS_NAME + ".bannerString");
         
         updateUI();
         initComponents();
@@ -1086,7 +1086,7 @@ public class JXLoginPanel extends JXImagePanel {
         }
         
 	protected void init(JXLoginPanel p) {
-	    setTitle(UIManager.getString(CLASS_NAME + ".loginString")); 
+	    setTitle(UIManager.getString(CLASS_NAME + ".titleString")); 
             this.panel = p;
             initWindow(this, panel);
 	}
@@ -1100,7 +1100,7 @@ public class JXLoginPanel extends JXImagePanel {
 	private JXLoginPanel panel;
 	
 	public JXLoginFrame(JXLoginPanel p) {
-	    super(UIManager.getString(CLASS_NAME + ".loginString")); 
+	    super(UIManager.getString(CLASS_NAME + ".titleString")); 
 	    this.panel = p;
             initWindow(this, panel);
 	}
