@@ -207,6 +207,9 @@ public class JXFindPanel extends AbstractPatternPanel {
                 getPatternModel().getFoundIndex(), getPatternModel().isBackwards());
         getPatternModel().setFoundIndex(foundIndex);
         return getPatternModel().getFoundIndex();
+//         first try on #236-swingx - foundIndex wrong in backwards search.
+//         re-think: autoIncrement in PatternModel? 
+//        return foundIndex; 
     }
 
     /**
