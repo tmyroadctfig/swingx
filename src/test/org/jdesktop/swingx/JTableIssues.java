@@ -54,6 +54,7 @@ public class JTableIssues extends TestCase {
         JTable table = new JTable(model);
         int rowIndex = table.getRowCount() - 1;
         table.addRowSelectionInterval(rowIndex, rowIndex);
+        model.removeRow(rowIndex);
         // JW: this was pre-1.5u5 (?), changed (1.5u6?) to return - 1
 //        assertEquals("", rowIndex, table.getSelectionModel().getAnchorSelectionIndex());
         assertEquals("", -1, table.getSelectionModel().getAnchorSelectionIndex());
