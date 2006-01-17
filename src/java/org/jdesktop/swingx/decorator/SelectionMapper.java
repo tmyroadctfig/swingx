@@ -160,8 +160,8 @@ public class SelectionMapper {
     private void clearViewSelection() {
         // JW - hmm... clearSelection doesn't reset the lead/anchor. Why not?
         viewSelection.clearSelection();
-//        viewSelection.setAnchorSelectionIndex(-1);
-//        viewSelection.setLeadSelectionIndex(-1);
+        viewSelection.setAnchorSelectionIndex(-1);
+        viewSelection.setLeadSelectionIndex(-1);
     }
 
     public void insertIndexInterval(int start, int length, boolean before) {
