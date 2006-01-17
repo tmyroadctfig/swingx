@@ -276,6 +276,37 @@ public class JXTableUnitTest extends InteractiveTestCase {
         table.setFilters(new FilterPipeline(new Filter[] {new PatternFilter("0", 0, 0) }));
     }
 
+    /**
+     * Issue #167-swingx: table looses individual row height 
+     * on update.
+     * 
+     * This happened if the indy row is filtered and the selection is empty - 
+     * updateSelectionAndRowHeight case analysis was incomplete. Fixed.
+     *
+     */
+    public void testKeepRowHeightOnUpdateAndEmptySelection() {
+        JXTable table = new JXTable(10, 3);
+        table.setRowHeightEnabled(true);
+        // sanity assert
+        assertTrue("row height enabled", table.isRowHeightEnabled());
+        table.setRowHeight(0, 25);
+        // sanity assert
+        assertEquals(25, table.getRowHeight(0));
+        // setting an arbitrary value
+        table.setValueAt("dummy", 1, 0);
+        assertEquals(25, table.getRowHeight(0));
+        // filter to leave only the row with the value set
+        table.setFilters(new FilterPipeline(new Filter[] {new PatternFilter("d", 0, 0)}));
+        assertEquals(1, table.getRowCount());
+        // setting an arbitrary value in the visible rows
+        table.setValueAt("otherdummy", 0, 1);
+        // reset filter to show all
+        table.setFilters(null);
+        assertEquals(25, table.getRowHeight(0));
+        
+        
+    }
+    
 
 
     /**

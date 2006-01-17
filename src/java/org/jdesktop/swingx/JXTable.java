@@ -1021,6 +1021,7 @@ public class JXTable extends JTable {
         getSelectionMapper().lock();
         super.tableChanged(e);
         updateSelectionAndRowModel(e);
+//        myTableChanged(e);
         use(filters);
     }
 
@@ -1066,7 +1067,10 @@ public class JXTable extends JTable {
             getSelectionMapper().removeIndexInterval(start, end);
             getRowModelMapper().removeIndexInterval(start, deletedCount);
 
-        } else if (getSelectionModel().isSelectionEmpty()) {
+        } else if //(getSelectionModel().isSelectionEmpty()) { 
+          // fix for #167-swingx - indy rowheight lost on update 
+          (isDataChanged(e) || isStructureChanged(e)) {
+        
             // JW first go on #172 - trying to adjust lead/anchor to valid
             // indices (model only...) after super's default clearSelection
             // in dataChanged/structureChanged! 
@@ -1079,14 +1083,29 @@ public class JXTable extends JTable {
             getRowModelMapper().clearModelSizes();
             updateViewSizeSequence();
              
-        }
+        } 
+        // nothing to do on TableEvent.updated
 
     }
+
+    private boolean isDataChanged(TableModelEvent e) {
+        return e.getType() == TableModelEvent.UPDATE && 
+            e.getFirstRow() == 0 &&
+            e.getLastRow() == Integer.MAX_VALUE;
+    }
+
+    private boolean isStructureChanged(TableModelEvent e) {
+        return e == null || e.getFirstRow() == TableModelEvent.HEADER_ROW;
+    }
+
 
     /**
      * Trying to hack around #172-swingx: lead/anchor of row selection model
      * is not adjusted to valid (not even model indices!) in the 
      * usual clearSelection after dataChanged/structureChanged.
+     * 
+     * Note: as of jdk1.5U6 the anchor/lead of the view selectionModel is 
+     * unconditionally set to -1 after data/structureChanged.
      * 
      * @param e
      */
@@ -1134,33 +1153,61 @@ public class JXTable extends JTable {
     }
 
     private void updateAfterDelete(TableModelEvent e) {
-        // TODO Auto-generated method stub
-        
+        int start = e.getFirstRow();
+        int end = e.getLastRow();
+        if (start < 0) {
+            start = 0;
+        }
+        if (end < 0) {
+            end = getModel().getRowCount() - 1;
+        }
+
+        int deletedCount = end - start + 1;
+        // Adjust the selectionMapper to account for the new rows
+        getSelectionMapper().removeIndexInterval(start, end);
+        getRowModelMapper().removeIndexInterval(start, deletedCount);
     }
 
     private void updateAfterInsert(TableModelEvent e) {
-        // TODO Auto-generated method stub
-        
+        int start = e.getFirstRow();
+        int end = e.getLastRow();
+        if (start < 0) {
+            start = 0;
+        }
+        if (end < 0) {
+            end = getModel().getRowCount() - 1;
+        }
+
+        // Adjust the selectionMapper to account for the new rows.
+        int length = end - start + 1;
+        getSelectionMapper().insertIndexInterval(start, length, true);
+        getRowModelMapper().insertIndexInterval(start, length, getRowHeight());
     }
 
     private void updateAfterDataChanged() {
-        // TODO Auto-generated method stub
-        
+        // JW: this is incomplete! see #167-swingx
+        // possibly got a dataChanged or structureChanged
+        // super will have cleared selection
+        getSelectionMapper().clearModelSelection();
+        getRowModelMapper().clearModelSizes();
+        updateViewSizeSequence();
     }
 
     private void updateAfterStructureChanged() {
-        // TODO Auto-generated method stub
-        
-    }
-
-    private boolean isDataChanged(TableModelEvent e) {
-        return e.getType() == TableModelEvent.UPDATE && 
-            e.getFirstRow() == 0 &&
-            e.getLastRow() == Integer.MAX_VALUE;
-    }
-
-    private boolean isStructureChanged(TableModelEvent e) {
-        return e == null || e.getFirstRow() == TableModelEvent.HEADER_ROW;
+        // equivalent to rowModel = null (can't access directly)
+        if (getRowHeight() > 0) {
+            adminSetRowHeight(getRowHeight());
+        }
+        // JW: this is incomplete! see #167-swingx
+        // possibly got a dataChanged or structureChanged
+        // super will have cleared selection
+        getSelectionMapper().clearModelSelection();
+        getRowModelMapper().clearModelSizes();
+        updateViewSizeSequence();
+        if (getAutoCreateColumnsFromModel()) {
+            // This will effect invalidation of the JTable and JTableHeader.
+            createDefaultColumnsFromModel();
+        }
     }
 
     // -------------- end prepare complete #172-fix
