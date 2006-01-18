@@ -1021,7 +1021,6 @@ public class JXTable extends JTable {
         getSelectionMapper().lock();
         super.tableChanged(e);
         updateSelectionAndRowModel(e);
-//        myTableChanged(e);
         use(filters);
     }
 
@@ -1034,9 +1033,6 @@ public class JXTable extends JTable {
      */
     private void updateSelectionAndRowModel(TableModelEvent e) {
         // JW: c&p from JTable
-        // JW: still missing: checkLeadAnchor (#172-swingx)
-        // super checkLeadAnchor is subtly buggy in lead/anchor update
-        // because it calls model.getRowCount() instead of getRowCount!!
         if (e.getType() == TableModelEvent.INSERT) {
             int start = e.getFirstRow();
             int end = e.getLastRow();
@@ -1067,18 +1063,13 @@ public class JXTable extends JTable {
             getSelectionMapper().removeIndexInterval(start, end);
             getRowModelMapper().removeIndexInterval(start, deletedCount);
 
-        } else if //(getSelectionModel().isSelectionEmpty()) { 
-          // fix for #167-swingx - indy rowheight lost on update 
-          (isDataChanged(e) || isStructureChanged(e)) {
+        } else if (isDataChanged(e) || isStructureChanged(e)) {
         
-            // JW first go on #172 - trying to adjust lead/anchor to valid
-            // indices (model only...) after super's default clearSelection
-            // in dataChanged/structureChanged! 
+            // JW fixing part of #172 - trying to adjust lead/anchor to valid
+            // indices (at least in model coordinates) after super's default clearSelection
+            // in dataChanged/structureChanged. 
             hackLeadAnchor(e);
 
-            // JW: this is incomplete! see #167-swingx
-            // possibly got a dataChanged or structureChanged
-            // super will have cleared selection
             getSelectionMapper().clearModelSelection();
             getRowModelMapper().clearModelSizes();
             updateViewSizeSequence();
@@ -1119,100 +1110,6 @@ public class JXTable extends JTable {
             getSelectionModel().setLeadSelectionIndex(lead);
         }
     }
-//  ------------------ preparing fix for (Issue #172-swingx)
-    
-    /**
-     * for a complete fix of #172 we need to guarantee that the
-     * view ListSelectionModel never has illegal indices. As 
-     * super.tableChanged doesn't know about coordinate transformation
-     * it will happily access/set illegal view coordinates during the
-     * tableChanged. The only way out might be to completely overwrite.
-     * Need to test thoroughly!
-     * 
-     * PENDING: find out how important the paint optimizations in super
-     * still are (are they at all important? They are very old and never 
-     * _really_ worked anyway...)!
-     * 
-     */
-    private void myTableChanged(TableModelEvent e) {
-        if (isStructureChanged(e)) {
-            updateAfterStructureChanged();
-        } else if (isDataChanged(e)) {
-            updateAfterDataChanged();
-        } else if (e.getType() == TableModelEvent.INSERT) {
-            updateAfterInsert(e); 
-        } else if (e.getType() == TableModelEvent.DELETE) {
-            updateAfterDelete(e);
-        } else {
-           updateAfterCellsUpdate(e); 
-        }
-    }
-    private void updateAfterCellsUpdate(TableModelEvent e) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    private void updateAfterDelete(TableModelEvent e) {
-        int start = e.getFirstRow();
-        int end = e.getLastRow();
-        if (start < 0) {
-            start = 0;
-        }
-        if (end < 0) {
-            end = getModel().getRowCount() - 1;
-        }
-
-        int deletedCount = end - start + 1;
-        // Adjust the selectionMapper to account for the new rows
-        getSelectionMapper().removeIndexInterval(start, end);
-        getRowModelMapper().removeIndexInterval(start, deletedCount);
-    }
-
-    private void updateAfterInsert(TableModelEvent e) {
-        int start = e.getFirstRow();
-        int end = e.getLastRow();
-        if (start < 0) {
-            start = 0;
-        }
-        if (end < 0) {
-            end = getModel().getRowCount() - 1;
-        }
-
-        // Adjust the selectionMapper to account for the new rows.
-        int length = end - start + 1;
-        getSelectionMapper().insertIndexInterval(start, length, true);
-        getRowModelMapper().insertIndexInterval(start, length, getRowHeight());
-    }
-
-    private void updateAfterDataChanged() {
-        // JW: this is incomplete! see #167-swingx
-        // possibly got a dataChanged or structureChanged
-        // super will have cleared selection
-        getSelectionMapper().clearModelSelection();
-        getRowModelMapper().clearModelSizes();
-        updateViewSizeSequence();
-    }
-
-    private void updateAfterStructureChanged() {
-        // equivalent to rowModel = null (can't access directly)
-        if (getRowHeight() > 0) {
-            adminSetRowHeight(getRowHeight());
-        }
-        // JW: this is incomplete! see #167-swingx
-        // possibly got a dataChanged or structureChanged
-        // super will have cleared selection
-        getSelectionMapper().clearModelSelection();
-        getRowModelMapper().clearModelSizes();
-        updateViewSizeSequence();
-        if (getAutoCreateColumnsFromModel()) {
-            // This will effect invalidation of the JTable and JTableHeader.
-            createDefaultColumnsFromModel();
-        }
-    }
-
-    // -------------- end prepare complete #172-fix
-    
-
 
     /**
      * Called if individual row height mapping need to be updated.
