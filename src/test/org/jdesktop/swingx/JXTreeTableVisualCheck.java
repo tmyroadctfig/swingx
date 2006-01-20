@@ -26,6 +26,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
@@ -58,8 +60,8 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Highligh.*");
          //      test.runInteractiveTests("interactive.*SortingFilter.*");
-//           test.runInteractiveTests("interactive.*Node.*");
-             test.runInteractiveTests("interactive.*Edit.*");
+           test.runInteractiveTests("interactive.*Node.*");
+//             test.runInteractiveTests("interactive.*Edit.*");
         } catch (Exception ex) {
 
         }
@@ -156,13 +158,17 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         final InsertTreeTableModel model = new InsertTreeTableModel(root);
         final  DefaultMutableTreeNode leaf = model.addChild(root);
         JXTree tree = new JXTree(model);
-        JXTreeTable treeTable = new JXTreeTable(model);
+        final JXTreeTable treeTable = new JXTreeTable(model);
         JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "update on insert");
         Action insertAction = new AbstractAction("insert node") {
 
             public void actionPerformed(ActionEvent e) {
-                model.addChild(leaf);
-                setEnabled(false);
+                int selected = treeTable.getSelectedRow();
+                if (selected < 0 ) return;
+                TreePath path = treeTable.getPathForRow(selected);
+                DefaultMutableTreeNode parent = (DefaultMutableTreeNode) path.getLastPathComponent();
+                model.addChild(parent);
+//                setEnabled(false);
                 
             }
             
@@ -186,9 +192,10 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         private DefaultMutableTreeNode addChild(DefaultMutableTreeNode parent) {
             DefaultMutableTreeNode newNode = new DefaultMutableTreeNode("Child");
             parent.add(newNode);
-            fireTreeNodesInserted(this, getPathToRoot(parent),
-                    new int[] { parent.getIndex(newNode) },
-                    new Object[] { newNode });
+            nodesWereInserted(parent, new int[] {parent.getIndex(newNode) });
+//            fireTreeNodesInserted(this, getPathToRoot(parent),
+//                    new int[] { parent.getIndex(newNode) },
+//                    new Object[] { newNode });
 
             return newNode;
         }
