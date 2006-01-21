@@ -91,13 +91,25 @@ public class JXErrorDialog extends JDialog {
      */
     private static final Icon icon = UIManager.getIcon("OptionPane.warningIcon");
     /**
-     * Error message label
+     * Error message text area
      */
-    private JLabel errorMessage;
+    private JTextArea errorMessage;
+    /**
+     * Number of columns of error message text area
+     */
+    private static final int ERROR_MESSAGE_COLUMNS = 30;
     /**
      * details text area
      */
     private JTextArea details;
+    /**
+     * Number of rows of details text area
+     */
+    private static final int DETAILS_ROWS = 7;
+    /**
+     * Number of columns of details text area
+     */
+    private static final int DETAILS_COLUMNS = 50;
     /**
      * detail button
      */
@@ -167,20 +179,27 @@ public class JXErrorDialog extends JDialog {
         this.getContentPane().setLayout(layout);
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.anchor = GridBagConstraints.NORTH;
         gbc.fill = GridBagConstraints.NONE;
         gbc.gridheight = 1;
         gbc.insets = new Insets(22, 12, 11, 17);
         this.getContentPane().add(new JLabel(icon), gbc);
 
-        errorMessage = new JLabel();
+        errorMessage = new JTextArea();
+        errorMessage.setEditable( false );
+        errorMessage.setColumns( ERROR_MESSAGE_COLUMNS );
+        errorMessage.setBorder( null );
+        errorMessage.setOpaque( false );
+        errorMessage.setLineWrap( true );
+        errorMessage.setWrapStyleWord( true );
         gbc.anchor = GridBagConstraints.LINE_START;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridheight = 1;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 3;
         gbc.gridx = 1;
-        gbc.weightx = 1.0;
-        gbc.insets = new Insets(12, 0, 0, 11);
+        gbc.weightx = 0.0;
+        gbc.weighty = 0.0;
+        gbc.insets = new Insets(32, 0, 0, 11);
         this.getContentPane().add(errorMessage, gbc);
 
         gbc.fill = GridBagConstraints.NONE;
@@ -207,7 +226,7 @@ public class JXErrorDialog extends JDialog {
         gbc.insets = new Insets(12, 0, 11, 11);
         this.getContentPane().add(detailButton, gbc);
 
-        details = new JTextArea(7, 60);
+        details = new JTextArea(DETAILS_ROWS, DETAILS_COLUMNS);
         detailsScrollPane = new JScrollPane(details);
         detailsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         details.setEditable(false);
@@ -218,23 +237,6 @@ public class JXErrorDialog extends JDialog {
         gbc.weighty = 1.0;
         gbc.insets = new Insets(6, 11, 11, 11);
         this.getContentPane().add(detailsScrollPane, gbc);
-
-        /*
-         * Here i'm going to add invisible empty container to the bottom of the
-         * content pane to fix minimal width of the dialog. It's quite a hack,
-         * but i have not found anything better.
-         */
-        Dimension spPredictedSize = detailsScrollPane.getPreferredSize();
-        Dimension newPanelSize =
-                new Dimension(spPredictedSize.width+15, 0);
-        Container widthHolder = new Container();
-        widthHolder.setMinimumSize(newPanelSize);
-        widthHolder.setPreferredSize(newPanelSize);
-        widthHolder.setMaximumSize(newPanelSize);
-
-        gbc.gridy = 3;
-        gbc.insets = new Insets(0, 11, 11, 0);
-        this.getContentPane().add(widthHolder, gbc);
 
         //make the buttons the same size
         EqualSizeJButton[] buttons = new EqualSizeJButton[] {
@@ -273,7 +275,6 @@ public class JXErrorDialog extends JDialog {
      */
     private void setDetailsVisible(boolean b) {
         if (b) {
-            details.setCaretPosition(0);
             detailsScrollPane.setVisible(true);
             detailButton.setText(UIManager.getString(CLASS_NAME + ".details_contract_text"));
             detailsScrollPane.applyComponentOrientation(detailButton.getComponentOrientation());
@@ -285,9 +286,14 @@ public class JXErrorDialog extends JDialog {
             // occure I assume because bidi properties are tested when the text is set and are not updated later
             // on when setComponentOrientation is invoked.
             details.setText(details.getText());
+            details.setCaretPosition(0);
         } else {
             detailsScrollPane.setVisible(false);
             detailButton.setText(UIManager.getString(CLASS_NAME + ".details_expand_text"));
+            // Trick to force errorMessage JTextArea to resize according
+            // to its columns property.
+            errorMessage.setSize( 0, 0 );
+            errorMessage.setSize( errorMessage.getPreferredSize() );
         }
 
         pack();
@@ -441,7 +447,12 @@ public class JXErrorDialog extends JDialog {
         }
         dlg.setDetails(details);
         dlg.setIncidentInfo(info);
+        // If the owner is null applies orientation of the shared 
+        // hidden window used as owner.
+        if(owner != null)
         dlg.applyComponentOrientation(owner.getComponentOrientation());
+        else
+            dlg.applyComponentOrientation(window.getComponentOrientation());
         dlg.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dlg.pack();
         dlg.setLocationRelativeTo(owner);
