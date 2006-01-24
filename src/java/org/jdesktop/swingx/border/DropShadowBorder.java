@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package com.sun.javachannel.client.ui;
+package org.jdesktop.swingx.border;
 
 import java.awt.Color;
 import java.awt.Component;
