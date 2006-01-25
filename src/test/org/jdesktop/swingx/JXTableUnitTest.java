@@ -79,7 +79,54 @@ public class JXTableUnitTest extends InteractiveTestCase {
         setSystemLF(defaultToSystemLF);
     }
 
-    
+
+    /**
+     * Issue #251-swingx: JXTable doesn't respect TableColumn editability.
+     * report, test and fix by nicfagn (Nicola Fagnani),
+     *
+     */
+    public void testTableColumnEditable() {
+        DefaultTableModel model = new DefaultTableModel( 2, 2 );
+        JXTable table = new JXTable( model );
+
+        // DefaultTableModel allows to edit its cells.
+        for( int i = 0; i < model.getRowCount(); i++ ) {
+            for( int j = 0; j < model.getRowCount(); j++ ) {
+                assertEquals(
+                    "cell (" + i + "," + j + ") must be editable", 
+                    true, table.isCellEditable( i, j ) );
+            }
+        }        
+
+        // First column not editable.
+        int column = 0;
+        table.getColumnExt( column ).setEditable( false );
+        for( int i = 0; i < model.getRowCount(); i++ ) {
+            for( int j = 0; j < model.getRowCount(); j++ ) {
+                assertEquals(
+                    "cell (" + i + "," + j + ") must " +
+                    (j == column ? "not" : "") + " be editable", 
+                    !(j == column), table.isCellEditable( i, j ) );
+            }
+        }        
+        table.getColumnExt( column ).setEditable( true );
+                
+        // Second column not editable.
+        column = 1;
+        table.getColumnExt( column ).setEditable( false );
+        for( int i = 0; i < model.getRowCount(); i++ ) {
+            for( int j = 0; j < model.getRowCount(); j++ ) {
+                assertEquals(
+                    "cell (" + i + "," + j + ") must " +
+                    (j == column ? "not" : "") + " be editable", 
+                    !(j == column), table.isCellEditable( i, j ) );
+            }
+        }        
+        table.getColumnExt( column ).setEditable( true );
+        
+    }
+
+
     /**
      * Issue #232-swingx: selection not kept if selectionModel had been changed.
      *

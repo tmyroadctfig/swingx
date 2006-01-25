@@ -977,11 +977,21 @@ public class JXTable extends JTable {
     }
 
     /**
+     * Overridden to account for row index mapping and to respect
+     * {@link TableColumnExt#isEditable()} property.
      * {@inheritDoc}
      */
+    @Override
     public boolean isCellEditable(int row, int column) {
-        return getModel().isCellEditable(convertRowIndexToModel(row),
+        boolean editable = getModel().isCellEditable(convertRowIndexToModel(row),
                 convertColumnIndexToModel(column));
+        if (editable) {
+            TableColumnExt tableColumn = getColumnExt(column);
+            if (tableColumn != null) {
+                editable = editable && tableColumn.isEditable();
+            }
+        }
+        return editable;
     }
 
     
