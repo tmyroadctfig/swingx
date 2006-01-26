@@ -142,6 +142,63 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         frame.setVisible(true);
     }
 
+    /**
+     * Issue #246-swingx: update probs with insert node.
+     * 
+     * The reported issue is an asymmetry in updating the parent: it's done
+     * only if not expanded. With the arguments of #82-swingx, parent's
+     * appearance might be effected by child changes if expanded as well.
+     * 
+     * Here's a test for insert: the crazy renderer removes the icon if 
+     * childCount exceeds a limit. Select a node, insert a child, expand the node
+     * and keep inserting children. Interestingly the parent is
+     * always updated in the treeTable, but not in the tree
+     * 
+     *
+     */
+    public void interactiveTestInsertNodeAndChangedParentRendering() {
+        final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+        final InsertTreeTableModel model = new InsertTreeTableModel(root);
+        final  DefaultMutableTreeNode leaf = model.addChild(root);
+        JXTree tree = new JXTree(model);
+        final JXTreeTable treeTable = new JXTreeTable(model);
+        TreeCellRenderer renderer = new DefaultTreeCellRenderer() {
+
+            @Override
+            public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+                Component comp = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf,
+                        row, hasFocus);
+                TreePath path = tree.getPathForRow(row);
+                if (path != null) {
+                    Object node = path.getLastPathComponent();
+                    if ((node != null) && (tree.getModel().getChildCount(node) > 3)) {
+                        setIcon(null);
+                    }
+                }
+                return comp;
+            }
+            
+        };
+        tree.setCellRenderer(renderer);
+        treeTable.setTreeCellRenderer(renderer);
+        treeTable.setRootVisible(true);
+        JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "update expanded parent on insert");
+        Action insertAction = new AbstractAction("insert node") {
+
+            public void actionPerformed(ActionEvent e) {
+                int selected = treeTable.getSelectedRow();
+                if (selected < 0 ) return;
+                TreePath path = treeTable.getPathForRow(selected);
+                DefaultMutableTreeNode parent = (DefaultMutableTreeNode) path.getLastPathComponent();
+                model.addChild(parent);
+                
+            }
+            
+        };
+        addAction(frame, insertAction);
+        frame.setVisible(true);
+    }
+ 
 
     /**
      * Issue #224-swingx: TreeTableEditor not bidi compliant.
@@ -204,7 +261,6 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
                 TreePath path = treeTable.getPathForRow(selected);
                 DefaultMutableTreeNode parent = (DefaultMutableTreeNode) path.getLastPathComponent();
                 model.addChild(parent);
-//                setEnabled(false);
                 
             }
             
