@@ -33,6 +33,27 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         super("JXTreeTable Unit Test");
     }
 
+    /**
+     * loosely related to Issue #248-swingx: setRootVisible (true) after
+     * initial rootInvisible didn't show the root.
+     * 
+     * this here is a sanity test that there is exactly one row, the problem
+     * is a missing visual update of the table.
+     *
+     */
+    public void testEmptyModelInitiallyInvisibleRoot() {
+        final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+        final InsertTreeTableModel model = new InsertTreeTableModel(root);
+        final JXTreeTable treeTable = new JXTreeTable(model);
+        // sanity...
+        assertFalse(treeTable.isRootVisible());
+        assertEquals("no rows with invisible root", 0, treeTable.getRowCount());
+        treeTable.setRootVisible(true);
+        // sanity...
+        assertTrue(treeTable.isRootVisible());
+        assertEquals("one row with visible root", 1, treeTable.getRowCount());
+
+    }
     
     /**
      * Issue #247-swingx: update probs with insert node.

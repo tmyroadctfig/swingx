@@ -111,13 +111,18 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      * Issue #248-swingx: update probs with insert into empty model when root
      * not visible.
      * 
-     * Adapted from example code in report.
-     *
+     * Looks like a core JTree problem: a collapsed root is not automatically expanded
+     * on hiding. Should it? Yes, IMO (JW).
+     * 
+     * this exposed a slight glitch in JXTreeTable: toggling the initially invisible
+     * root to visible did not result in showing the root in the the table. Needed
+     * to modify setRootVisible to force a revalidate.
+     *   
      */
     public void interactiveTestInsertNodeEmptyModel() {
         final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
         final InsertTreeTableModel model = new InsertTreeTableModel(root);
-        final JXTree tree = new JXTree(model);
+        final JTree tree = new JTree(model);
         tree.setRootVisible(false);
         final JXTreeTable treeTable = new JXTreeTable(model);
         // treetable root invisible by default

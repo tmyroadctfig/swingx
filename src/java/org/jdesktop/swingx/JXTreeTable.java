@@ -734,6 +734,14 @@ public class JXTreeTable extends JXTable {
      */
     public void setRootVisible(boolean visible) {
         renderer.setRootVisible(visible);
+        // JW: the revalidate forces the root to appear after a 
+        // toggling a visible from an initially invisible root.
+        // JTree fires a propertyChange on the ROOT_VISIBLE_PROPERTY
+        // BasicTreeUI reacts by (ultimately) calling JTree.treeDidChange
+        // which revalidate the tree part. 
+        // Might consider to listen for the propertyChange (fired only if there
+        // actually was a change) instead of revalidating unconditionally.
+        revalidate();
         repaint();
     }
 
