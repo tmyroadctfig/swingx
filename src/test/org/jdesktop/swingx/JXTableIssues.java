@@ -14,7 +14,6 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -23,8 +22,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.decorator.ComponentAdapter;
@@ -46,6 +48,20 @@ public class JXTableIssues extends InteractiveTestCase {
         // TODO Auto-generated constructor stub
     }
 
+    /**
+     * Issue 252-swingx: getColumnExt throws ClassCastException if tableColumn
+     * is not of type TableColumnExt.
+     *
+     */
+    public void testTableColumnType() {
+        JXTable table = new JXTable();
+        table.setAutoCreateColumnsFromModel(false);
+        table.setModel(new DefaultTableModel(2, 1));
+        TableColumnModel columnModel = new DefaultTableColumnModel();
+        columnModel.addColumn(new TableColumn(0));
+        table.setColumnModel(columnModel);
+        table.getColumnExt(0);
+    }
 
     /**
      * Issue #223 - part d)
