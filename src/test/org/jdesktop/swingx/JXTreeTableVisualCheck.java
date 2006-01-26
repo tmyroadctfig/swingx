@@ -21,13 +21,13 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
 
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
@@ -106,7 +106,43 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         frame.setVisible(true);
         
     }
-    
+
+    /**
+     * Issue #247-swingx: update probs with insert node.
+     * The insert under a collapsed node fires a dataChanged on the table 
+     * which results in the usual total "memory" loss (f.i. selection)
+     * to reproduce: run example, select root's child in both the tree and the 
+     * treetable (left and right view), press the insert button, treetable looses 
+     * selection, tree doesn't (the latter is the correct behaviour)
+     * 
+     * couldn't reproduce the reported loss of expansion state. Hmmm..
+     *
+     */
+    public void interactiveTestInsertUnderCollapsedNode() {
+        final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+        final InsertTreeTableModel model = new InsertTreeTableModel(root);
+        DefaultMutableTreeNode childA = model.addChild(root);
+        final DefaultMutableTreeNode childB = model.addChild(childA);
+        model.addChild(childB);
+        DefaultMutableTreeNode secondRootChild = model.addChild(root);
+        model.addChild(secondRootChild);
+        JXTree tree = new JXTree(model);
+        final JXTreeTable treeTable = new JXTreeTable(model);
+        treeTable.setRootVisible(true);
+        JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "insert problem - root collapsed");
+        Action insertAction = new AbstractAction("insert node") {
+
+            public void actionPerformed(ActionEvent e) {
+                model.addChild(childB);
+           
+            }
+            
+        };
+        addAction(frame, insertAction);
+        frame.setVisible(true);
+    }
+
+
     /**
      * Issue #224-swingx: TreeTableEditor not bidi compliant.
      *
@@ -177,30 +213,6 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         frame.setVisible(true);
     }
  
-    /**
-     * Model used to show insert update issue.
-     */
-    public static class InsertTreeTableModel extends DefaultTreeTableModel {
-        public InsertTreeTableModel(TreeNode root) {
-            super(root);
-        }
-
-        public int getColumnCount() {
-            return 2;
-        }
-
-        private DefaultMutableTreeNode addChild(DefaultMutableTreeNode parent) {
-            DefaultMutableTreeNode newNode = new DefaultMutableTreeNode("Child");
-            parent.add(newNode);
-            nodesWereInserted(parent, new int[] {parent.getIndex(newNode) });
-//            fireTreeNodesInserted(this, getPathToRoot(parent),
-//                    new int[] { parent.getIndex(newNode) },
-//                    new Object[] { newNode });
-
-            return newNode;
-        }
-    }
-
     
     
     /**

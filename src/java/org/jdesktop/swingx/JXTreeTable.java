@@ -1392,7 +1392,10 @@ public class JXTreeTable extends JXTable {
                         // not expanded - but change might effect appearance of parent
                         // Issue #82-swingx
                             int row = tree.getRowForPath(path);
-                            fireTableRowsUpdated(row, row);
+                            // fix Issue #247-swingx: prevent accidental structureChanged
+                            // for collapsed path 
+                            // in this case row == -1, which == TableEvent.HEADER_ROW
+                            if (row >= 0) fireTableRowsUpdated(row, row);
                         }
                     }
                     else {  // case where the event is fired to identify root.

@@ -10,6 +10,8 @@ package org.jdesktop.swingx;
 import java.awt.Point;
 
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -30,6 +32,73 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     public JXTreeTableUnitTest() {
         super("JXTreeTable Unit Test");
     }
+
+    
+    /**
+     * Issue #247-swingx: update probs with insert node.
+     * The insert under a collapsed node fires a dataChanged on the table 
+     * which results in the usual total "memory" loss (f.i. selection)
+     *
+     * The tree model is after setup is (see the bug report as well):
+     * root
+     *   childA
+     *     childB
+     *     
+     * In the view childA is collapsed:
+     * root
+     *   childA  
+     * 
+     */
+    public void testInsertUnderCollapsedNode() {
+        final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+        final InsertTreeTableModel model = new InsertTreeTableModel(root);
+        DefaultMutableTreeNode childA = model.addChild(root);
+        final DefaultMutableTreeNode childB = model.addChild(childA);
+        final JXTreeTable treeTable = new JXTreeTable(model);
+        treeTable.setRootVisible(true);
+        // sanity...
+        assertEquals(2, treeTable.getRowCount());
+        final int selected = 1;
+        // select childA
+        treeTable.setRowSelectionInterval(selected, selected);
+        model.addChild(childB);
+        // need to invoke - the tableEvent is fired delayed as well
+        // Note: doing so will make the test _appear_ to pass, the
+        // assertion failure can be seen as an output only!
+        // any idea how to make the test fail?
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                int selectedAfterInsert = treeTable.getSelectedRow();
+                assertEquals(selected, selectedAfterInsert);
+
+            }
+        });
+    }
+    
+    /**
+     * Model used to show insert update issue.
+     */
+    public static class InsertTreeTableModel extends DefaultTreeTableModel {
+        public InsertTreeTableModel(TreeNode root) {
+            super(root);
+        }
+
+        public int getColumnCount() {
+            return 2;
+        }
+
+        public DefaultMutableTreeNode addChild(DefaultMutableTreeNode parent) {
+            DefaultMutableTreeNode newNode = new DefaultMutableTreeNode("Child");
+            parent.add(newNode);
+            nodesWereInserted(parent, new int[] {parent.getIndex(newNode) });
+//            fireTreeNodesInserted(this, getPathToRoot(parent),
+//                    new int[] { parent.getIndex(newNode) },
+//                    new Object[] { newNode });
+
+            return newNode;
+        }
+    }
+
 
     /**
      * Issue #230-swingx: 
