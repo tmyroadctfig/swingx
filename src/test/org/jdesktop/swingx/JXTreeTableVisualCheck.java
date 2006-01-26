@@ -108,6 +108,43 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     }
 
     /**
+     * Issue #248-swingx: update probs with insert into empty model when root
+     * not visible.
+     * 
+     * Adapted from example code in report.
+     *
+     */
+    public void interactiveTestInsertNodeEmptyModel() {
+        final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+        final InsertTreeTableModel model = new InsertTreeTableModel(root);
+        final JXTree tree = new JXTree(model);
+        tree.setRootVisible(false);
+        final JXTreeTable treeTable = new JXTreeTable(model);
+        // treetable root invisible by default
+        JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "insert into empty model");
+        Action insertAction = new AbstractAction("insert node") {
+
+            public void actionPerformed(ActionEvent e) {
+                model.addChild(root);
+                
+            }
+            
+        };
+        addAction(frame, insertAction);
+        Action toggleRoot = new AbstractAction("toggle root") {
+            public void actionPerformed(ActionEvent e) {
+                boolean rootVisible = !tree.isRootVisible();
+                treeTable.setRootVisible(rootVisible);
+                tree.setRootVisible(rootVisible);
+            }
+            
+        };
+        addAction(frame, toggleRoot);
+        frame.setVisible(true);
+    }
+ 
+
+    /**
      * Issue #247-swingx: update probs with insert node.
      * The insert under a collapsed node fires a dataChanged on the table 
      * which results in the usual total "memory" loss (f.i. selection)
