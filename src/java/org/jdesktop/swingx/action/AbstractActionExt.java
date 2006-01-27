@@ -152,7 +152,7 @@ public abstract class AbstractActionExt extends AbstractAction
     public void setLongDescription(String desc) {
         putValue(Action.LONG_DESCRIPTION, desc);
         if (desc != null && getShortDescription() == null) {
-            setLongDescription(desc);
+            setShortDescription(desc);
         }
     }
 
