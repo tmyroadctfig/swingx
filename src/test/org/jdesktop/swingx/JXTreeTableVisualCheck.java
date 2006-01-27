@@ -121,7 +121,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      */
     public void interactiveTestInsertNodeEmptyModel() {
         final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
-        final InsertTreeTableModel model = new InsertTreeTableModel(root);
+        final InsertTreeTableModel model = new InsertTreeTableModel(root, true);
         final JTree tree = new JTree(model);
         tree.setRootVisible(false);
         final JXTreeTable treeTable = new JXTreeTable(model);
@@ -292,7 +292,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
         final InsertTreeTableModel model = new InsertTreeTableModel(root);
         final  DefaultMutableTreeNode leaf = model.addChild(root);
-        JXTree tree = new JXTree(model);
+        JTree tree = new JTree(model);
         final JXTreeTable treeTable = new JXTreeTable(model);
         JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "update on insert");
         Action insertAction = new AbstractAction("insert node") {

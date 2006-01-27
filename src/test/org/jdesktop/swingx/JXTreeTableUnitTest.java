@@ -100,9 +100,25 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * Model used to show insert update issue.
      */
     public static class InsertTreeTableModel extends DefaultTreeTableModel {
+        private boolean rootIsFolder;
+        
         public InsertTreeTableModel(TreeNode root) {
             super(root);
         }
+
+        public InsertTreeTableModel(TreeNode root, boolean rootIsFolder) {
+            super(root);
+            this.rootIsFolder = rootIsFolder;
+        }
+        
+        @Override
+        public boolean isLeaf(Object node) {
+            if (rootIsFolder && (node == getRoot())) {
+                return false;
+            }
+            return super.isLeaf(node);
+        }
+
 
         public int getColumnCount() {
             return 2;
