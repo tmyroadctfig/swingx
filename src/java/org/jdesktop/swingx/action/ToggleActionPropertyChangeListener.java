@@ -22,27 +22,77 @@ package org.jdesktop.swingx.action;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.ref.WeakReference;
 
+import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
+import javax.swing.Action;
 
 /**
  * Added to the Toggle type buttons and menu items so that various components
- * which have been created from a single StateChangeAction can be in synch
+ * which have been created from a single StateChangeAction can be in synch. 
+ * 
+ * This listener is responsible for updating the selected property from the 
+ * Action to the AbstractButton. <p>
+ * 
+ * It guarantees a maximum of 1 instance of 
+ * ToggleActionPCL to be installed per button (PENDING JW: add test to verify). 
+ * It removes all ToggleActionPCLs which are targeted to unreachable buttons
+ * from the action's listener list.
+ * 
+ * 
  */
 class ToggleActionPropertyChangeListener implements PropertyChangeListener {
 
-    // XXX - Should be a WeakRef since it's unreachable! 
-    // this is a potential memory leak but we don't really have to
-    // worry about it since the most of the time the buttons will be
-    // loaded for the lifetime of the application. Should make it
-    // weak referenced for a general purpose toolkit.
-    private AbstractButton button; 
 
-    public ToggleActionPropertyChangeListener(AbstractButton button) {
-	this.button = button;
+    private WeakReference<AbstractButton> buttonRef;
+    
+    public ToggleActionPropertyChangeListener(Action action, AbstractButton button) {
+        if (shouldAddListener(action, button)) {
+            this.buttonRef = new WeakReference<AbstractButton>(button);
+            action.addPropertyChangeListener(this);
+        }
     }
 
+    
+    protected synchronized boolean shouldAddListener(Action action, AbstractButton button) {
+        releasePCLs(action);
+        return !isToggling(action, button);
+//        return true;
+    }
+
+
+    protected boolean isToggling(Action action, AbstractButton button) {
+        if (!(action instanceof AbstractAction)) return false;
+        PropertyChangeListener[] listeners = ((AbstractAction)action).getPropertyChangeListeners();
+        for (int i = listeners.length - 1; i >= 0; i--) {
+            if (listeners[i] instanceof ToggleActionPropertyChangeListener) {
+                if (((ToggleActionPropertyChangeListener) listeners[i]).isToggling(button)) return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Removes all ToggleActionPCLs with unreachable target buttons from the 
+     * Action's PCL-listeners.
+     * 
+     * @param action to cleanup.
+     */
+    protected void releasePCLs(Action action) {
+        if (!(action instanceof AbstractAction)) return;
+        PropertyChangeListener[] listeners = ((AbstractAction)action).getPropertyChangeListeners();
+        for (int i = listeners.length - 1; i >= 0; i--) {
+            if (listeners[i] instanceof ToggleActionPropertyChangeListener) {
+                ((ToggleActionPropertyChangeListener) listeners[i]).checkReferent(action);
+            }
+        }
+    }
+
+    
     public void propertyChange(PropertyChangeEvent evt) {
+        AbstractButton button = checkReferent((Action) evt.getSource());
+        if (button == null) return;
 	String propertyName = evt.getPropertyName();
 
 	if (propertyName.equals("selected")) {
@@ -50,4 +100,68 @@ class ToggleActionPropertyChangeListener implements PropertyChangeListener {
 	    button.setSelected(selected.booleanValue());
 	}
     }
+
+    /**
+     * Returns the target button to synchronize from the listener.
+     * 
+     * Side-effects if the target is no longer reachable:
+     *  - the internal reference to target is nulled.
+     *  - if the given action is != null, this listener removes 
+     *       itself from the action's listener list.
+     * 
+     * @param action The action this is listening to.
+     * @return the target button if it is strongly reachable or null 
+     *    if it is no longer strongly reachable.
+     */
+    protected AbstractButton checkReferent(Action action) {
+        AbstractButton button = null;
+        if (buttonRef != null) {
+            button = buttonRef.get();
+        }
+        if (button == null) {
+            if (action != null) {
+                action.removePropertyChangeListener(this);
+            }
+           buttonRef = null;
+        }
+        return button;
+    }
+
+
+    /**
+     * Check if this is already synchronizing the given AbstractButton.
+     * 
+     * This may have the side-effect of releasing the weak reference to
+     * the target button.
+     * 
+     * @param button must not be null
+     * @return true if this target button and the given comp are equal 
+     *         false otherwise. 
+     * @throws NullPointerException if the button is null.
+     */
+    public boolean isToggling(AbstractButton button) {
+        // JW: should check identity instead of equality?
+        return button.equals(checkReferent(null));
+    }
+
+    /**
+     * Checks if this is synchronizing to the same target button as the
+     * given listener.
+     * 
+     * This may have the side-effect of releasing the weak reference to
+     * the target button.
+     * 
+     * @param pcl The listener to test, must not be null.
+     * @return true if the target buttons of the given is equal to this target
+     *    button and the button is strongly reachable, false otherwise.
+     */
+//    public boolean isToggling(ToggleActionPropertyChangeListener pcl) {
+//        AbstractButton other = pcl.checkReferent(null);
+//        if (other != null) {
+//            return isToggling(other);
+//        }
+//        return false;
+//    }
+    
+    
 }

@@ -21,12 +21,14 @@
 package org.jdesktop.swingx.action;
 
 import java.awt.Insets;
+import java.beans.PropertyChangeListener;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
@@ -462,6 +464,7 @@ public class ActionContainerFactory {
      */
     public void configureButton(JToggleButton button, AbstractActionExt a, ButtonGroup group) {
         button.setAction(a);
+        button.removeItemListener(a);
         button.addItemListener(a);
         button.setSelected(a.isSelected());
         if (group != null) {
@@ -471,28 +474,25 @@ public class ActionContainerFactory {
     }
 
     /**
-     * This method will be called after toggle buttons are created.
-     * Override for custom configuration but the overriden method should be called
-     * first.
-     *
+     * This method will be called after toggle buttons are created. Override for
+     * custom configuration but the overriden method should be called first.
+     * 
      * @param button the button to be configured
      * @param action the action used to construct the menu item.
      */
     protected void configureToggleButton(JToggleButton button, Action action) {
         configureButton(button, action);
 
-        // The PropertyChangeListener that gets added
-        // to the Action doesn't know how to handle the "selected" property change
-        // in the meantime, the corect thing to do is to add another PropertyChangeListener
-        // to the AbstractActionExt until this is fixed.
-        action.addPropertyChangeListener(new ToggleActionPropertyChangeListener(button));
+        // action.addPropertyChangeListener(new
+        // ToggleActionPropertyChangeListener(button));
+        new ToggleActionPropertyChangeListener(action, button);
     }
 
 
     /**
-     * This method will be called after buttons created from an action.
-     * Override for custom configuration.
-     *
+     * This method will be called after buttons created from an action. Override
+     * for custom configuration.
+     * 
      * @param button the button to be configured
      * @param action the action used to construct the menu item.
      */
@@ -526,7 +526,8 @@ public class ActionContainerFactory {
         // to the Action doesn't know how to handle the "selected" property change
         // in the meantime, the corect thing to do is to add another PropertyChangeListener
         // to the AbstractActionExt until this is fixed.
-        action.addPropertyChangeListener(new ToggleActionPropertyChangeListener(menuItem));
+        //action.addPropertyChangeListener(new ToggleActionPropertyChangeListener(button));
+        new ToggleActionPropertyChangeListener(action, menuItem);
     }
 
 

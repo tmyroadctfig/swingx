@@ -20,12 +20,14 @@ import org.jdesktop.swingx.action.AbstractActionExt;
 public class ColumnControlButtonIssues extends ColumnControlButtonTest {
     private static final Logger LOG = Logger
             .getLogger(ColumnControlButtonIssues.class.getName());
+
+
     /**
      * Issue #229-swingx: increasing listener list in column actions.
-     *
+     * 
      */
     public void testColumnActionListenerCount() {
-        JXTable table = new JXTable(10, 3);
+        JXTable table = new JXTable(10, 1);
         Action action = table.getActionMap().get(JXTable.HORIZONTALSCROLL_ACTION_COMMAND);
         if (!(action instanceof AbstractActionExt)) {
             LOG.info("cannot run testColumnActionListenerCount - action not of type AbstractAction");
@@ -43,10 +45,11 @@ public class ColumnControlButtonIssues extends ColumnControlButtonTest {
         // sanity: expect it to be 2 - one is the menuitem itself, another 
         // the TogglePCL registered by the ActionContainerFacory
         assertEquals(2, initialPCLCount);
-        table.setModel(new DefaultTableModel(10, 10));
+        table.setModel(new DefaultTableModel(10, 1));
         // this is testing the actual (combined) misbehaviour of ColumnControl
         // and ActionContainerFactory: on every column removed/columnAdded there's
         // a new menuItem created registering a listener without deregistering the old.
+//        System.gc();
        assertEquals(initialPCLCount, extAction.getPropertyChangeListeners().length);
         
     }
