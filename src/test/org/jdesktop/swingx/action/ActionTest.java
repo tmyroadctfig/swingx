@@ -52,20 +52,24 @@ public class ActionTest extends TestCase {
 
     }
     
-    private void assertToggleButtonConfigureWithSame(AbstractButton checkBoxItem) {
-        assertToggleButtonConfigure(checkBoxItem, checkBoxItem);
+    private void assertToggleButtonConfigureWithSame(AbstractButton button) {
+        assertToggleButtonConfigure(button, button);
     }
     
-    private void assertToggleButtonConfigure(AbstractButton first, AbstractButton second) {
+    private void assertToggleButtonConfigure(AbstractButton button, AbstractButton second) {
         AbstractActionExt extAction = createStateAction();
         assertEquals(0, extAction.getPropertyChangeListeners().length);
         ActionContainerFactory factory = new ActionContainerFactory(null);
-        factory.configureSelectableButton(first, extAction, null);
+        factory.configureSelectableButton(button, extAction, null);
         // sanity: expect it to be 2 - one is the menuitem itself, another 
         // the TogglePCL registered by the ActionContainerFacory
         
         assertEquals(2, extAction.getPropertyChangeListeners().length);
         factory.configureSelectableButton(second, extAction, null);
+        // JW: wrong assumption!! Valid only if first == second, for
+        // different buttons we actually expect the listener count to be increased!
+        // Note to myself: remove this comment after correcting the method call
+        // sequence here in the test ...
         assertEquals(2, extAction.getPropertyChangeListeners().length);
         
     }
@@ -88,9 +92,9 @@ public class ActionTest extends TestCase {
         AbstractActionExt extAction = createStateAction();
         ActionContainerFactory factory = new ActionContainerFactory(null);
         factory.configureSelectableButton(checkBoxItem, extAction, null);
-        assertCountAsItemListener(1, extAction, checkBoxItem );
+        assertCountAsItemListener(checkBoxItem, extAction, 1 );
         factory.configureSelectableButton(checkBoxItem, extAction, null);
-        assertCountAsItemListener(1, extAction, checkBoxItem );
+        assertCountAsItemListener(checkBoxItem, extAction, 1 );
       
     }
 
@@ -108,7 +112,14 @@ public class ActionTest extends TestCase {
         return extAction;
     }
 
-    private void assertCountAsItemListener(int expectedCount, ItemListener extAction, AbstractButton checkBoxItem) {
+    /**
+     * assert that the given itemListener is registered exactly
+     * expectedCount times to the given button.
+     * @param checkBoxItem
+     * @param extAction
+     * @param expectedCount
+     */
+    protected void assertCountAsItemListener(AbstractButton checkBoxItem, ItemListener extAction, int expectedCount) {
         int count = 0;
         ItemListener[] itemListeners = checkBoxItem.getItemListeners();
         for (int j = 0; j < itemListeners.length; j++) {

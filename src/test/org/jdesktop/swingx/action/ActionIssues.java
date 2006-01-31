@@ -8,12 +8,29 @@ import javax.swing.JToggleButton;
 
 public class ActionIssues extends ActionTest {
 
-
+    
+    /**
+     * test that the button always has mostly one
+     * Action registered as itemListener and that
+     * this registered listener is the same as the buttons
+     * action.
+     *
+     */
+    public void testButtonOneActionAsItemListener() {
+        AbstractActionExt extAction = createStateAction();
+        JToggleButton button = new JToggleButton();
+        ActionContainerFactory factory = new ActionContainerFactory(null);
+        factory.configureSelectableButton(button, extAction, null);
+        assertCountAsItemListener(button, extAction, 1);
+        factory.configureSelectableButton(button, null, null);
+        // assert that the previous action is removed as itemListener
+        assertCountAsItemListener(button, extAction, 0);
+    }
     /**
      * test that configured button is kept in synch with
      *  maximal one action's selected state
      */
-    public void testButtonSelectedOneSynchAction() {
+    public void testButtonSelectedNullAction() {
         AbstractActionExt extAction = createStateAction();
         JToggleButton button = new JToggleButton();
         ActionContainerFactory factory = new ActionContainerFactory(null);
@@ -27,6 +44,25 @@ public class ActionIssues extends ActionTest {
         extAction.setSelected(!extAction.isSelected());
         assertEquals("button selected must be uneffected by old action",
                 extActionB.isSelected(), button.isSelected());
+    }
+
+    /**
+     * test that PCLs related to a previous button are 
+     * unregistered from the Action after release.
+     *
+     */
+    public void testButtonReleaseActionReleasePCL() {
+        AbstractActionExt extAction = createStateAction();
+        JToggleButton button = new JToggleButton();
+        ActionContainerFactory factory = new ActionContainerFactory(null);
+        factory.configureSelectableButton(button, extAction, null);
+        // sanity: expect it to be 2 - one is the menuitem itself, another 
+        // the TogglePCL registered by the ActionContainerFacory
+        assertEquals(2, extAction.getPropertyChangeListeners().length);
+        // set the button's action to null
+        factory.configureSelectableButton(button, null, null);
+        // assert that button related PCLs are removed from the action's listener list
+        assertEquals(0, extAction.getPropertyChangeListeners().length);
     }
 
     /**
