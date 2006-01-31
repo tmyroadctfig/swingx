@@ -21,8 +21,157 @@ import junit.framework.TestCase;
 public class ActionTest extends TestCase {
     private static final Logger LOG = Logger.getLogger(ActionTest.class
             .getName());
-
+    protected ActionContainerFactory factory;
     
+    
+    
+    @Override
+    protected void setUp() throws Exception {
+        factory = new ActionContainerFactory(null);
+    }
+    /**
+     * Issue #255-swingx: probs in synch selectable button <--> action. 
+     *  
+     * test that the button always has mostly one
+     * Action registered as itemListener and that
+     * this registered listener is the same as the buttons
+     * action.
+     *
+     */
+    public void testButtonOneActionAsItemListener() {
+        AbstractActionExt extAction = createStateAction();
+        JToggleButton button = new JToggleButton();
+        factory.configureSelectableButton(button, extAction, null);
+        assertCountAsItemListener(button, extAction, 1);
+        factory.configureSelectableButton(button, null, null);
+        // assert that the previous action is removed as itemListener
+        assertCountAsItemListener(button, extAction, 0);
+    }
+    /**
+     * Issue #255-swingx: probs in synch selectable button <--> action. 
+     * test that configured button is kept in synch with
+     *  maximal one action's selected state
+     */
+    public void testButtonSelectedNullAction() {
+        AbstractActionExt extAction = createStateAction();
+        JToggleButton button = new JToggleButton();
+        factory.configureSelectableButton(button, extAction, null);
+        // we are sure that the button selected is true (has dedicated test)
+        // now configure it with a different action, unselected
+        AbstractActionExt extActionB = createStateAction();
+        factory.configureSelectableButton(button, extActionB, null);
+        // invert the old action selected and assert that the change 
+        // does not effect the taken up by the button
+        extAction.setSelected(!extAction.isSelected());
+        assertEquals("button selected must be uneffected by old action",
+                extActionB.isSelected(), button.isSelected());
+    }
+
+    /**
+     * Issue #255-swingx: probs in synch selectable button <--> action. 
+     * test that PCLs related to a previous button are 
+     * unregistered from the Action after release.
+     *
+     */
+    public void testButtonReleaseActionReleasePCL() {
+        AbstractActionExt extAction = createStateAction();
+        JToggleButton button = new JToggleButton();
+        factory.configureSelectableButton(button, extAction, null);
+        // sanity: expect it to be 2 - one is the menuitem itself, another 
+        // the TogglePCL registered by the ActionContainerFacory
+        assertEquals(2, extAction.getPropertyChangeListeners().length);
+        // set the button's action to null
+        factory.configureSelectableButton(button, null, null);
+        // assert that button related PCLs are removed from the action's listener list
+        assertEquals(0, extAction.getPropertyChangeListeners().length);
+    }
+
+    /**
+     * Issue #255-swingx: probs in synch selectable button <--> action. 
+     * test that configured button is no longer kept in
+     * synch after setting the action to null.
+     */
+    public void testButtonSelectedReleasedSynchAction() {
+        AbstractActionExt extAction = createStateAction();
+        JToggleButton button = new JToggleButton();
+        factory.configureSelectableButton(button, extAction, null);
+        // now we unconfigure it with a null action
+        factory.configureSelectableButton(button, null, null);
+        // invert the old action selected and assert that the change 
+        // does not effect the taken up by the button
+        boolean oldSelected = button.isSelected();
+        extAction.setSelected(!extAction.isSelected());
+        assertEquals("button selected must be uneffected by old action",
+                oldSelected, button.isSelected());
+    }
+
+    /**
+     * Issue #255-swingx: probs in synch selectable button <--> action. 
+     * test that configured button is kept in synch with
+     *  maximal one action's selected state
+     */
+    public void testButtonSelectedMaxOneSynchAction() {
+        AbstractActionExt extAction = createStateAction();
+        boolean actionSelected = true;
+        extAction.setSelected(actionSelected);
+        JToggleButton button = new JToggleButton();
+        factory.configureSelectableButton(button, extAction, null);
+        // we are sure that the button selected is true (has dedicated test)
+        // now configure it with a different action, unselected
+        AbstractActionExt extActionB = createStateAction();
+        factory.configureSelectableButton(button, extActionB, null);
+        // sanity: the new action is not effected by the old
+        // currently this may accidentally pass because the back direction isn't
+        // synched!! 
+        assertFalse(extActionB.isSelected());
+        assertEquals("button selected must be initialized to new action",
+                extActionB.isSelected(), button.isSelected());
+        // invert the old action selected and assert that the change 
+        // does not effect the taken up by the button
+        extAction.setSelected(!actionSelected);
+        // need to be done twice, the first toggle produces 
+        extAction.setSelected(actionSelected);
+        assertEquals("button selected must be uneffected by old action",
+                extActionB.isSelected(), button.isSelected());
+    }
+
+    /**
+     * Issue #255-swingx: probs in synch selectable button <--> action. 
+     * test that button is configured with initial action selected state.
+     *
+     */
+    public void testButtonSelectedInitialSynchAction() {
+        AbstractActionExt extAction = createStateAction();
+        boolean actionSelected = true;
+        extAction.setSelected(actionSelected);
+        JToggleButton button = new JToggleButton();
+        boolean buttonSelected = button.isSelected();
+        // sanity: different selected state
+        assertTrue(actionSelected != buttonSelected);
+        factory.configureSelectableButton(button, extAction, null);
+        assertEquals("action selection must be unchanged", actionSelected, extAction.isSelected());
+        assertEquals("button selected must be initialized", actionSelected, button.isSelected());
+    }
+
+    /**
+     * test method contract: configureSelectable must throw runtime exception
+     * for non-state action.
+     *
+     */
+    public void testExceptionOnNonStateAction() {
+        AbstractActionExt actionExt = createStateAction();
+        actionExt.setStateAction(false);
+        JToggleButton button = new JToggleButton();
+        try {
+           factory.configureSelectableButton(button, actionExt, null);
+           fail("configureSelectable didn't throw IllegalArgument for non-state action ");
+        } catch (IllegalArgumentException e) {
+            // nothing todo - this is what we expect
+        } catch (Exception e) {
+            fail("caught unexpected exception " + e);
+        }
+        
+    }
 
     /**
      * Issue #229-swingx: increasing listener list in column actions.
@@ -53,19 +202,14 @@ public class ActionTest extends TestCase {
     }
     
     private void assertToggleButtonConfigureWithSame(AbstractButton button) {
-        assertToggleButtonConfigure(button, button);
-    }
-    
-    private void assertToggleButtonConfigure(AbstractButton button, AbstractButton second) {
         AbstractActionExt extAction = createStateAction();
         assertEquals(0, extAction.getPropertyChangeListeners().length);
-        ActionContainerFactory factory = new ActionContainerFactory(null);
         factory.configureSelectableButton(button, extAction, null);
         // sanity: expect it to be 2 - one is the menuitem itself, another 
         // the TogglePCL registered by the ActionContainerFacory
         
         assertEquals(2, extAction.getPropertyChangeListeners().length);
-        factory.configureSelectableButton(second, extAction, null);
+        factory.configureSelectableButton(button, extAction, null);
         // JW: wrong assumption!! Valid only if first == second, for
         // different buttons we actually expect the listener count to be increased!
         // Note to myself: remove this comment after correcting the method call
@@ -90,7 +234,6 @@ public class ActionTest extends TestCase {
     
     private void assertAddItemListenerToSame(AbstractButton checkBoxItem) {
         AbstractActionExt extAction = createStateAction();
-        ActionContainerFactory factory = new ActionContainerFactory(null);
         factory.configureSelectableButton(checkBoxItem, extAction, null);
         assertCountAsItemListener(checkBoxItem, extAction, 1 );
         factory.configureSelectableButton(checkBoxItem, extAction, null);

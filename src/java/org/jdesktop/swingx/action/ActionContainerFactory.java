@@ -467,21 +467,61 @@ public class ActionContainerFactory {
        configureButtonFromExtActionProperties(button, a);
     }
 
+    /**
+     * method to configure a "selectable" button from the given AbstractActionExt.
+     * As there is some un-/wiring involved to support synch of the selected property between
+     * the action and the button, all config and unconfig (== setting a null action!) 
+     * should be passed through this method. <p>
+     * 
+     * It's up to the client to only pass in button's where selected and/or the 
+     * group property makes sense. 
+     * 
+     * PENDING: the group properties are yet untested.
+     * PENDING: think about automated unconfig.
+     * 
+     * @param button where selected makes sense
+     * @param a
+     * @param group the button should be added to.
+     * @throws IllegalArgumentException if the given action doesn't have the state flag set. 
+     * 
+     */
     public void configureSelectableButton(AbstractButton button, AbstractActionExt a, ButtonGroup group){
+        if ((a != null) && !a.isStateAction()) throw
+            new IllegalArgumentException("the Action must be a stateAction");
+        // we assume that all button configuration is done exclusively through this method!!
+        if (button.getAction() == a) return;
+
+        // unconfigure if the old Action is a state AbstractActionExt
+        // PENDING JW: automate unconfigure via a PCL that is listening to  
+        // the button's action property? Think about memory leak implications!
+        Action oldAction = button.getAction();
+        if (oldAction instanceof AbstractActionExt) {
+            AbstractActionExt actionExt = (AbstractActionExt) oldAction;
+            // remove as itemListener
+            button.removeItemListener(actionExt);
+            // remove the button related PCL from the old actionExt
+            PropertyChangeListener[] l = actionExt.getPropertyChangeListeners();
+            for (int i = l.length - 1; i >= 0; i--) {
+                if (l[i] instanceof ToggleActionPropertyChangeListener) {
+                    ToggleActionPropertyChangeListener togglePCL = (ToggleActionPropertyChangeListener) l[i];
+                    if (togglePCL.isToggling(button)) {
+                        actionExt.removePropertyChangeListener(togglePCL);
+                    }
+                }
+            }
+        }
+        
         button.setAction(a);
         if (group != null) {
             group.add(button);
         }
         if (a != null) {
-            button.removeItemListener(a);
             button.addItemListener(a);
-            // JW: move the initial config into the PCL
+            // JW: move the initial config into the PCL??
             button.setSelected(a.isSelected());
             new ToggleActionPropertyChangeListener(a, button);
 //          new ToggleActionPCL(button, a);
-        } else {
-            // unconfigure?? Do so before setting the new action??
-        }
+        } 
         
     }
 

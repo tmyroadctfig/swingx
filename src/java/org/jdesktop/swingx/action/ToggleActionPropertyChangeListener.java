@@ -57,6 +57,9 @@ class ToggleActionPropertyChangeListener implements PropertyChangeListener {
     
     protected synchronized boolean shouldAddListener(Action action, AbstractButton button) {
         releasePCLs(action);
+        // PENDING JW: revisit - we need a configurator to maintain at most a 1:1 from button to
+        // action anyway: so a true in isToggling must not happen.
+        // 
         return !isToggling(action, button);
 //        return true;
     }
