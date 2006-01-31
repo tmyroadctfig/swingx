@@ -359,7 +359,7 @@ public class ActionContainerFactory {
 
         if (menuItem == null) {
             menuItem= new JMenuItem(action);
-            configureMenuItem(menuItem, action);
+            configureMenuItemFromExtActionProperties(menuItem, action);
         }
         return menuItem;
     }
@@ -421,7 +421,7 @@ public class ActionContainerFactory {
         if (button == null) {
             // Create a regular button
             button = new JButton(action);
-            configureButton(button, action);
+            configureButtonFromExtActionProperties(button, action);
         }
         return button;
     }
@@ -463,31 +463,27 @@ public class ActionContainerFactory {
      * @return
      */
     public void configureButton(JToggleButton button, AbstractActionExt a, ButtonGroup group) {
+       configureSelectableButton(button, a, group);
+       configureButtonFromExtActionProperties(button, a);
+    }
+
+    public void configureSelectableButton(AbstractButton button, AbstractActionExt a, ButtonGroup group){
         button.setAction(a);
-        button.removeItemListener(a);
-        button.addItemListener(a);
-        button.setSelected(a.isSelected());
         if (group != null) {
             group.add(button);
         }
-        configureToggleButton(button, a);
+        if (a != null) {
+            button.removeItemListener(a);
+            button.addItemListener(a);
+            // JW: move the initial config into the PCL
+            button.setSelected(a.isSelected());
+            new ToggleActionPropertyChangeListener(a, button);
+//          new ToggleActionPCL(button, a);
+        } else {
+            // unconfigure?? Do so before setting the new action??
+        }
+        
     }
-
-    /**
-     * This method will be called after toggle buttons are created. Override for
-     * custom configuration but the overriden method should be called first.
-     * 
-     * @param button the button to be configured
-     * @param action the action used to construct the menu item.
-     */
-    protected void configureToggleButton(JToggleButton button, Action action) {
-        configureButton(button, action);
-
-        // action.addPropertyChangeListener(new
-        // ToggleActionPropertyChangeListener(button));
-        new ToggleActionPropertyChangeListener(action, button);
-    }
-
 
     /**
      * This method will be called after buttons created from an action. Override
@@ -496,7 +492,7 @@ public class ActionContainerFactory {
      * @param button the button to be configured
      * @param action the action used to construct the menu item.
      */
-    protected void configureButton(AbstractButton button, Action action)  {
+    protected void configureButtonFromExtActionProperties(AbstractButton button, Action action)  {
         if (action.getValue(Action.SHORT_DESCRIPTION) == null) {
             button.setToolTipText((String)action.getValue(Action.NAME));
         }
@@ -510,26 +506,6 @@ public class ActionContainerFactory {
         }
     }
 
-    /**
-     * This method will be called after toggle type menu items (like
-     * JRadioButtonMenuItem and JCheckBoxMenuItem) are created.
-     * Override for custom configuration but the overriden method should be called
-     * first.
-     *
-     * @param menuItem the menu item to be configured
-     * @param action the action used to construct the menu item.
-     */
-    protected void configureToggleMenuItem(JMenuItem menuItem, Action action) {
-        configureMenuItem(menuItem, action);
-
-        // The PropertyChangeListener that gets added
-        // to the Action doesn't know how to handle the "selected" property change
-        // in the meantime, the corect thing to do is to add another PropertyChangeListener
-        // to the AbstractActionExt until this is fixed.
-        //action.addPropertyChangeListener(new ToggleActionPropertyChangeListener(button));
-        new ToggleActionPropertyChangeListener(action, menuItem);
-    }
-
 
     /**
      * This method will be called after menu items are created.
@@ -538,18 +514,16 @@ public class ActionContainerFactory {
      * @param menuItem the menu item to be configured
      * @param action the action used to construct the menu item.
      */
-    protected void configureMenuItem(JMenuItem menuItem, Action action) {
+    protected void configureMenuItemFromExtActionProperties(JMenuItem menuItem, Action action) {
     }
 
     /**
      * Helper method to add a checkbox menu item.
      */
     private JCheckBoxMenuItem createCheckBoxMenuItem(AbstractActionExt a) {
-        JCheckBoxMenuItem mi = new JCheckBoxMenuItem(a);
-        mi.addItemListener(a);
-        mi.setSelected(a.isSelected());
-
-        configureToggleMenuItem(mi, a);
+        JCheckBoxMenuItem mi = new JCheckBoxMenuItem();
+        configureSelectableButton(mi, a, null);
+        configureMenuItemFromExtActionProperties(mi, a);
         return mi;
     }
 
@@ -558,13 +532,11 @@ public class ActionContainerFactory {
      */
     private JRadioButtonMenuItem createRadioButtonMenuItem(ButtonGroup group,
                                                                   AbstractActionExt a)  {
-        JRadioButtonMenuItem mi = new JRadioButtonMenuItem(a);
-        mi.addItemListener(a);
-        mi.setSelected(a.isSelected());
-        if (group != null) {
-            group.add(mi);
-        }
-        configureToggleMenuItem(mi, a);
+        JRadioButtonMenuItem mi = new JRadioButtonMenuItem();
+        configureSelectableButton(mi, a, group);
+        configureMenuItemFromExtActionProperties(mi, a);
         return mi;
     }
+    
+    
 }
