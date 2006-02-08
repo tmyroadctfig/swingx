@@ -133,8 +133,9 @@ public class HighlighterIssues extends HighlighterTest {
     }
     
     /**
-     * DefaultTableCellRenderer: has memory. How to formulate as test?
-     * this is testing the hack (reset the memory in HighlighterPipeline), not
+     * Issue #258-swingx: DefaultTableCellRenderer has memory. 
+     * How to formulate as test?
+     * this is testing the hack (reset the memory in HighlighterPipeline to null), not
      * any highlighter!
      */
     public void testTableUnSelectedDoNothingHighlighter() {

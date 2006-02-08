@@ -21,12 +21,14 @@
 
 package org.jdesktop.swingx.decorator;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.BoundedRangeModel;
+import javax.swing.JComponent;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
@@ -54,18 +56,39 @@ public class HighlighterPipeline implements UIHighlighter {
         @Override
         protected void applyBackground(Component renderer, ComponentAdapter adapter) {
             if (!adapter.isSelected()) {
-                renderer.setBackground(null);
+                // renderer.setBackground(null);
+                Object colorMemory = ((JComponent) renderer).getClientProperty("rendererColorMemory.background");
+                if (colorMemory instanceof ColorMemory) {
+                    renderer.setBackground(((ColorMemory) colorMemory).color);
+                } else {
+                    ((JComponent) renderer).putClientProperty("rendererColorMemory.background", new ColorMemory(renderer.getBackground()));
+                }
             }
         }
 
         @Override
         protected void applyForeground(Component renderer, ComponentAdapter adapter) {
             if (!adapter.isSelected()) {
-                renderer.setForeground(null);
+//                renderer.setForeground(null);
+                Object colorMemory = ((JComponent) renderer).getClientProperty("rendererColorMemory.foreground");
+                if (colorMemory instanceof ColorMemory) {
+                    renderer.setForeground(((ColorMemory) colorMemory).color);
+                } else {
+                    ((JComponent) renderer).putClientProperty("rendererColorMemory.foreground", new ColorMemory(renderer.getForeground()));
+                }
             }
         }
         
     };
+    
+    private static class ColorMemory {
+        public ColorMemory(Color foreground) {
+            color = foreground;
+        }
+
+        Color color;
+    }
+    
     private ChangeListener highlighterChangeListener;
 
     public HighlighterPipeline() {
