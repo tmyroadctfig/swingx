@@ -133,7 +133,14 @@ import javax.swing.Timer;
 public class JXCollapsiblePane extends JPanel {
 
   /**
-   * Used when generating PropertyChangeEvents for the "animationState" property
+   * Used when generating PropertyChangeEvents for the "animationState"
+   * property. The PropertyChangeEvent will takes the following different values
+   * for {@link PropertyChangeEvent#getNewValue()}:
+   * <ul>
+   * <li><code>reinit</code> every time the animation starts
+   * <li><code>expanded</code> when the animation ends and the pane is expanded
+   * <li><code>collapsed</code> when the animation ends and the pane is collapsed
+   * </ul>
    */
   public final static String ANIMATION_STATE_KEY = "animationState";
 
@@ -529,6 +536,9 @@ public class JXCollapsiblePane extends JPanel {
             JXCollapsiblePane.this.firePropertyChange(ANIMATION_STATE_KEY, null,
               "expanded");
             return;
+          } else {
+            JXCollapsiblePane.this.firePropertyChange(ANIMATION_STATE_KEY, null,
+            "collapsed");            
           }
         }
 

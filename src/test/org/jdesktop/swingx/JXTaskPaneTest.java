@@ -8,6 +8,7 @@ package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -94,14 +95,14 @@ public class JXTaskPaneTest extends InteractiveTestCase {
       .getPropertyName());
     assertFalse(report.getLastNewBooleanValue());
     assertTrue(report.getLastOldBooleanValue());
-    
-    new JXTaskPaneBeanInfo(); 
+
+    new JXTaskPaneBeanInfo();
   }
 
   public void testContentPane() {
     JXTaskPane group = new JXTaskPane();
     assertEquals(0, group.getContentPane().getComponentCount());
-    
+
     // Objects are not added to the taskPane but to its contentPane
     JButton button = new JButton();
     group.add(button);
@@ -115,27 +116,70 @@ public class JXTaskPaneTest extends InteractiveTestCase {
     group.add(button);
     group.remove(0);
     assertEquals(0, group.getContentPane().getComponentCount());
-    
+
     BorderLayout layout = new BorderLayout();
     group.setLayout(layout);
     assertEquals(layout, group.getContentPane().getLayout());
     assertFalse(layout == group.getLayout());
   }
-  
+
   public void testActions() throws Exception {
-    JXTaskPane taskPane = new JXTaskPane();    
+    JXTaskPane taskPane = new JXTaskPane();
     Action action = new AbstractAction() {
       public void actionPerformed(java.awt.event.ActionEvent e) {};
     };
     assertEquals(0, taskPane.getContentPane().getComponentCount());
     Component component = taskPane.add(action);
     assertEquals(taskPane.getContentPane(), component.getParent());
-    assertEquals(1, taskPane.getContentPane().getComponentCount());    
+    assertEquals(1, taskPane.getContentPane().getComponentCount());
   }
-  
+
+  public void testAnimationListeners() throws Exception {
+    JXTaskPane taskPane = new JXTaskPane();
+    // start with a not expanded or animated taskPane
+    taskPane.setAnimated(false);
+    taskPane.setExpanded(false);
+    assertFalse(taskPane.isExpanded());
+
+    class ListenForEvents implements PropertyChangeListener {
+      private boolean expandedEventReceived;
+      private boolean collapsedEventReceived;
+      private int animationStart;
+      
+      public void propertyChange(java.beans.PropertyChangeEvent evt) {
+        if ("expanded".equals(evt.getNewValue())) {
+          expandedEventReceived = true;
+        } else if ("collapsed".equals(evt.getNewValue())) {
+          collapsedEventReceived = true;
+        } else if ("reinit".equals(evt.getNewValue())) {
+          animationStart++;
+        }
+      }
+    }
+    ;
+    ListenForEvents listener = new ListenForEvents();
+
+    // register a listener on the animation
+    taskPane.addPropertyChangeListener(JXCollapsiblePane.ANIMATION_STATE_KEY,
+      listener);
+    taskPane.setAnimated(true);
+    
+    // expand the taskPane and...
+    taskPane.setExpanded(true);
+    // ...wait until listener has been notified
+    while (!listener.expandedEventReceived) { Thread.sleep(100); }
+    
+    // collapse the taskPane and...
+    // ...wait until listener has been notified
+    taskPane.setExpanded(false);
+    while (!listener.collapsedEventReceived) { Thread.sleep(100); }
+    
+    assertEquals(2, listener.animationStart);
+  }
+
   public void testAddon() throws Exception {
     // move around all addons
     TestUtilities.cycleAddons(new JXTaskPane());
   }
-  
+
 }
