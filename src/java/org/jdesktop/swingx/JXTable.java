@@ -1488,18 +1488,44 @@ public class JXTable extends JTable {
 
     /**
      * Returns the <code>TableColumnExt</code> object for the column in the
-     * table whose column index is equal to <code>viewColumnIndex</code>
+     * table whose column index is equal to <code>viewColumnIndex</code> or 
+     * null if the column is not of type <code>TableColumnExt</code>
      * 
      * @param viewColumnIndex
      *            index of the column with the object in question
      * 
      * @return the <code>TableColumnExt</code> object that matches the column
      *         index
-     * @exception IllegalArgumentException
-     *                if no <code>TableColumn</code> has this identifier
+     * @throws ArrayIndexOutOfBoundsException if viewColumnIndex out of allowed range.
      */
     public TableColumnExt getColumnExt(int viewColumnIndex) {
-        return (TableColumnExt) getColumnModel().getColumn(viewColumnIndex);
+        TableColumn column = getColumn(viewColumnIndex);
+        if (column instanceof TableColumnExt) {
+            return (TableColumnExt) column;
+        }
+        return null;
+    }
+
+    /**
+     * Returns the <code>TableColumn</code> object for the column in the
+     * table whose column index is equal to <code>viewColumnIndex</code>.
+     * 
+     * Note: 
+     * Super does not expose the TableColumn access by index which may lead to
+     * unexpected IllegalArgumentException if client code assumes the delegate
+     * method is available - autoboxing will convert the given int to an object
+     * which will call the getColumn(Object) method ... We do here.
+     * 
+     * 
+     * @param viewColumnIndex
+     *            index of the column with the object in question
+     * 
+     * @return the <code>TableColumn</code> object that matches the column
+     *         index
+     * @throws ArrayIndexOutOfBoundsException if viewColumnIndex out of allowed range.
+     */
+    public TableColumn getColumn(int viewColumnIndex) {
+        return getColumnModel().getColumn(viewColumnIndex);
     }
 
     public void createDefaultColumnsFromModel() {

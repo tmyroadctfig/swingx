@@ -49,21 +49,6 @@ public class JXTableIssues extends InteractiveTestCase {
     }
 
     /**
-     * Issue 252-swingx: getColumnExt throws ClassCastException if tableColumn
-     * is not of type TableColumnExt.
-     *
-     */
-    public void testTableColumnType() {
-        JXTable table = new JXTable();
-        table.setAutoCreateColumnsFromModel(false);
-        table.setModel(new DefaultTableModel(2, 1));
-        TableColumnModel columnModel = new DefaultTableColumnModel();
-        columnModel.addColumn(new TableColumn(0));
-        table.setColumnModel(columnModel);
-        table.getColumnExt(0);
-    }
-
-    /**
      * Issue #223 - part d)
      * 
      * test if selection is cleared after receiving a dataChanged.

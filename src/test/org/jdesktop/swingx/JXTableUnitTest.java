@@ -17,6 +17,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -29,8 +30,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
@@ -77,6 +80,70 @@ public class JXTableUnitTest extends InteractiveTestCase {
         // make sure we have the same default for each test
         defaultToSystemLF = false;
         setSystemLF(defaultToSystemLF);
+    }
+
+
+    /**
+     * Issue 252-swingx: getColumnExt throws ClassCastException if tableColumn
+     * is not of type TableColumnExt.
+     *
+     */
+    public void testTableColumnType() {
+        JXTable table = new JXTable();
+        table.setAutoCreateColumnsFromModel(false);
+        table.setModel(new DefaultTableModel(2, 1));
+        TableColumnModel columnModel = new DefaultTableColumnModel();
+        columnModel.addColumn(new TableColumn(0));
+        table.setColumnModel(columnModel);
+        // valid column index must not throw exception
+        TableColumnExt tableColumnExt = table.getColumnExt(0);
+        assertNull("getColumnExt must return null on type mismatch", tableColumnExt);
+    }
+
+    /**
+     * test contract: getColumnExt(int) throws ArrayIndexOutofBounds with 
+     * invalid column index.
+     *
+     */
+    public void testTableColumnExtOffRange() {
+        JXTable table = new JXTable(2, 1);
+        try {
+            table.getColumnExt(1);
+            fail("accessing invalid column index must throw ArrayIndexOutofBoundExc");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // do nothing: contracted runtime exception
+        } catch (Exception e) {
+           fail("unexpected exception: " + e + "\n" +
+              "accessing invalid column index must throw ArrayIndexOutofBoundExc");
+        }
+    }
+
+    /**
+     * test contract: getColumn(int) throws ArrayIndexOutofBounds with 
+     * invalid column index.<p>
+     *
+     * Subtle autoboxing issue:  
+     * JTable has convenience method getColumn(Object) to access by 
+     * identifier, but doesn't have delegate method to columnModel.getColumn(int)
+     * Clients assuming the existence of a direct delegate no longer get a
+     * compile-time error message in 1.5 due to autoboxing. 
+     * Furthermore, the runtime exception is unexpected (IllegalArgument
+     * instead of AIOOB). <p>
+     * 
+     * Added getColumn(int) to JXTable api to solve.
+     * 
+     */
+    public void testTableColumnOffRange() {
+        JXTable table = new JXTable(2, 1);
+        try {
+            table.getColumn(1);
+            fail("accessing invalid column index must throw ArrayIndexOutofBoundExc");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // do nothing: contracted runtime exception
+        } catch (Exception e) {
+           fail("unexpected exception: " + e + "\n" +
+              "accessing invalid column index must throw ArrayIndexOutofBoundExc");
+        }
     }
 
 
@@ -574,7 +641,10 @@ public class JXTableUnitTest extends InteractiveTestCase {
     
     public void testRowModelAccess() {
         JXTable table = new JXTable(sortableTableModel);
+        LOG.info("" + Logger.global.getLevel());
+        Logger.global.setLevel(Level.FINEST);
         table.setRowHeight(0, 25);
+        LOG.fine("dummy");
 //        SizeSequence sizing = table.getSuperRowModel();
 //        assertNotNull(sizing);
     }
