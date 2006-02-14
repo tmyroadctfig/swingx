@@ -9,6 +9,7 @@ package org.jdesktop.swingx;
 import java.awt.BorderLayout;
 import java.awt.Point;
 import java.lang.reflect.Method;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractButton;
 import javax.swing.Action;
@@ -43,6 +44,8 @@ import javax.swing.UIManager;
  * @version 1.0
  */
 public abstract class InteractiveTestCase extends junit.framework.TestCase {
+    private static final Logger LOG = Logger
+            .getLogger(InteractiveTestCase.class.getName());
     protected Point frameLocation = new Point(0,0);
 
     public InteractiveTestCase() {
@@ -147,7 +150,8 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
             UIManager.getCrossPlatformLookAndFeelClassName();
         try {
           UIManager.setLookAndFeel(lfName);
-       } catch (Exception e1) { // ignore
+       } catch (Exception e1) { 
+           LOG.info("exception when setting LF to " + lfName);
       }
     }
 }
