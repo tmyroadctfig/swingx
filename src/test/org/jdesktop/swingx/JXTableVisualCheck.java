@@ -14,10 +14,13 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
@@ -31,6 +34,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JViewport;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -40,7 +44,10 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
+import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
+import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.ConditionalHighlighter;
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
@@ -62,9 +69,9 @@ import org.jdesktop.swingx.util.AncientSwingTeam;
  * @author Jeanette Winzenburg
  */
 public class JXTableVisualCheck extends JXTableUnitTest {
-    
+    private static final Logger LOG = Logger.getLogger(JXTableVisualCheck.class
+            .getName());
     public static void main(String args[]) {
-//      setSystemLF(true);
       JXTableVisualCheck test = new JXTableVisualCheck();
       try {
 //        test.runInteractiveTests();
@@ -75,21 +82,60 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*Boolean.*");
 //          test.runInteractiveTests("interactive.*Sorting.*");
           
-          test.runInteractiveTests("interactive.*Select.*");
-//        test.runInteractiveTests("interactive.*isable.*");
+//          test.runInteractiveTests("interactive.*Column.*");
+        test.runInteractiveTests("interactive.*Viewport.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
 
+    
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        // super has LF specific tests...
+        setSystemLF(true);
+    }
+
+
+    /**
+     * Issue #256-swingx: viewport config.
+     *
+     */
+    public void interactiveTestFillsViewportHeight() {
+        final JXTable table = new JXTable(10, 2);
+        table.setFillsViewportHeight(true);
+        JXFrame frame = wrapWithScrollingInFrame(table, "toggle viewport height");
+        frame.setSize(500, table.getPreferredSize().height * 2);
+        Action action = new AbstractAction("toggle fill") {
+
+            public void actionPerformed(ActionEvent e) {
+                table.setFillsViewportHeight(!table.getFillsViewportHeight());
+                
+            }
+            
+        };
+        addAction(frame, action);
+        frame.setVisible(true);
+
+    }
+
     /** 
      * Issue ??: Anchor lost after receiving a structure changed.
+     * Lead/anchor no longer automatically initialized - no visual clue
+     * if table is focused. 
      *
      */
     public void interactiveTestToggleTableModelU6() {
         final DefaultTableModel tableModel = createAscendingModel(0, 20);
-        final JXTable table = new JXTable(tableModel);
+        final JTable table = new JTable(tableModel);
+        // JW: need to explicitly set _both_ anchor and lead to >= 0
+        // need to set anchor first
+        table.getSelectionModel().setAnchorSelectionIndex(0);
+        table.getSelectionModel().setLeadSelectionIndex(0);
+        table.getColumnModel().getSelectionModel().setAnchorSelectionIndex(0);
+        table.getColumnModel().getSelectionModel().setLeadSelectionIndex(0);
         Action toggleAction = new AbstractAction("Toggle TableModel") {
 
             public void actionPerformed(ActionEvent e) {
@@ -101,6 +147,13 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         JXFrame frame = wrapWithScrollingInFrame(table, "anchor lost after structure changed");
         addAction(frame, toggleAction);
         frame.setVisible(true);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                // sanity - focus is on table
+                LOG.info("isFocused? " + table.hasFocus());
+                LOG.info("who has focus? " + KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner());
+            }
+        });
     }
 
     /**
@@ -793,10 +846,12 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         frame.setVisible(true);
     }
 
+    
     public void interactiveTestRolloverHighlight() {
         JXTable table = new JXTable(sortableTableModel);
         table.setRolloverEnabled(true);
         table.addHighlighter(new RolloverHighlighter(Color.YELLOW, null));
+//        table.addHighlighter(new RolloverHighlighter(null, Color.RED));
         JFrame frame = wrapWithScrollingInFrame(table, "rollover highlight");
         frame.setVisible(true);
 
@@ -809,6 +864,29 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         highlighter.setLinesPerGroup(5);
         table.addHighlighter(highlighter);
         JFrame frame = wrapWithScrollingInFrame(table, "AlternateRow with Grouping of 5 lines");
+        frame.setVisible(true);
+    }
+
+    public void interactiveTestAlternateRowWithForegroundHighlighter() {
+        JXTable table = new JXTable(tableModel);
+        ConditionalHighlighter highlighter = new ConditionalHighlighter(null, Color.BLUE, 1, 1) {
+            
+            @Override
+            protected boolean needsHighlight(ComponentAdapter adapter) {
+                return highlightColumn == adapter.viewToModel(adapter.column);
+            }
+
+            @Override
+            protected boolean test(ComponentAdapter adapter) {
+                // not called - the column is highlighted unconditionally
+                return false;
+            }
+            
+        };
+        
+        table.addHighlighter(highlighter);
+        table.addHighlighter(new UIAlternateRowHighlighter());
+        JFrame frame = wrapWithScrollingInFrame(table, "AlternateRow with and column");
         frame.setVisible(true);
     }
 

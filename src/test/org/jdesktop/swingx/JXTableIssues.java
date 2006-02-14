@@ -7,10 +7,13 @@
 package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -21,12 +24,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.decorator.ComponentAdapter;
@@ -40,12 +41,43 @@ import org.jdesktop.swingx.decorator.Sorter;
  * @author Jeanette Winzenburg
  */
 public class JXTableIssues extends InteractiveTestCase {
-
+    private static final Logger LOG = Logger.getLogger(JXTableIssues.class
+            .getName());
 
 
     public JXTableIssues() {
         super("JXTableIssues");
         // TODO Auto-generated constructor stub
+    }
+
+    /**
+     * Issue #256-swingX: viewport - toggle track height must
+     * revalidate.
+     * 
+     * PENDING JW: the visual test looks okay - probably something wrong with the
+     * test setup ... invoke doesn't help
+     * 
+     */
+    public void testToggleTrackViewportHeight() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run trackViewportHeight - headless environment");
+            return;
+        }
+        final JXTable table = new JXTable(10, 2);
+        table.setFillsViewportHeight(true);
+        final Dimension tablePrefSize = table.getPreferredSize();
+        JScrollPane scrollPane = new JScrollPane(table);
+        JXFrame frame = wrapInFrame(scrollPane, "");
+        frame.setSize(500, tablePrefSize.height * 2);
+        frame.setVisible(true);
+        assertEquals("table height be equal to viewport", 
+                table.getHeight(), scrollPane.getViewport().getHeight());
+        table.setFillsViewportHeight(false);
+        assertEquals("table height be equal to table pref height", 
+                tablePrefSize.height, table.getHeight());
+ 
+        
     }
 
     /**

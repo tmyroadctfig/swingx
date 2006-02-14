@@ -9,6 +9,7 @@ package org.jdesktop.swingx;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.beans.PropertyChangeListener;
@@ -17,7 +18,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -83,6 +83,93 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
 
+    /**
+     * Issue #256-swingX: viewport - do track height.
+     * 
+     * 
+     */
+    public void testTrackViewportHeight() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run trackViewportHeight - headless environment");
+            return;
+        }
+        JXTable table = new JXTable(10, 2);
+        table.setFillsViewportHeight(true);
+        Dimension tablePrefSize = table.getPreferredSize();
+        JScrollPane scrollPane = new JScrollPane(table);
+        JXFrame frame = wrapInFrame(scrollPane, "");
+        frame.setSize(500, tablePrefSize.height * 2);
+        frame.setVisible(true);
+        assertEquals("table height be equal to viewport", 
+                table.getHeight(), scrollPane.getViewport().getHeight());
+        
+    }
+    /**
+     * Issue #256-swingX: viewport - don't track height.
+     * 
+     * 
+     */
+    public void testNotTrackViewportHeight() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run notTrackViewportHeight - headless environment");
+            return;
+        }
+        JXTable table = new JXTable(10, 2);
+        table.setFillsViewportHeight(false);
+        Dimension tablePrefSize = table.getPreferredSize();
+        JScrollPane scrollPane = new JScrollPane(table);
+        JXFrame frame = wrapInFrame(scrollPane, "");
+        // make sure the height is > table pref height
+        frame.setSize(500, tablePrefSize.height * 2);
+        frame.setVisible(true);
+        assertEquals("table height must be unchanged", 
+                tablePrefSize.height, table.getHeight());
+    }
+
+    /**
+     * Issue #256-swingx: added fillsViewportHeight property.
+     * 
+     * check "fillsViewportHeight" property change fires event.
+     *
+     */
+    public void testFillsViewportProperty() {
+        JXTable table = new JXTable(10, 1);
+        boolean fill = table.getFillsViewportHeight();
+        PropertyChangeReport report = new PropertyChangeReport();
+        table.addPropertyChangeListener(report);
+        table.setFillsViewportHeight(!fill);
+        assertEquals("must have fired propertyChange for fillsViewportHeight", 1, report.getEventCount("fillsViewportHeight"));
+        assertEquals("property must equal newValue", table.getFillsViewportHeight(), report.getLastNewValue("fillsViewportHeight"));
+    }
+    
+    /**
+     * Issue #256-swingX: viewport - don't change background
+     * in configureEnclosingScrollPane.
+     * 
+     * 
+     */
+    public void testUnchangedViewportBackground() {
+        JXTable table = new JXTable(10, 2);
+        JScrollPane scrollPane = new JScrollPane();
+        scrollPane.setSize(500, 500);
+        Color viewportColor = scrollPane.getViewport().getBackground();
+        Color tableColor = table.getBackground();
+        if ((viewportColor != null) && viewportColor.equals(tableColor)) {
+            LOG.info("cannot run test unchanged viewport background because \n" +
+                        "viewport has same color as table. \n" +
+                        "viewport: " + viewportColor + 
+                        "\n table: " + tableColor);
+            return;
+        }
+        scrollPane.setViewportView(table);
+        table.configureEnclosingScrollPane();
+        assertEquals("viewport background must be unchanged", 
+                viewportColor, scrollPane.getViewport().getBackground());
+        
+        
+    }
     /**
      * Issue 252-swingx: getColumnExt throws ClassCastException if tableColumn
      * is not of type TableColumnExt.
@@ -639,14 +726,13 @@ public class JXTableUnitTest extends InteractiveTestCase {
                 table.getRowHeight(), table.getRowHeight(table.getRowCount() - 1));
     }
     
+    /*
+     * PENDING JW: looks useless, at least incomplete!
+     *
+     */
     public void testRowModelAccess() {
         JXTable table = new JXTable(sortableTableModel);
-        LOG.info("" + Logger.global.getLevel());
-        Logger.global.setLevel(Level.FINEST);
         table.setRowHeight(0, 25);
-        LOG.fine("dummy");
-//        SizeSequence sizing = table.getSuperRowModel();
-//        assertNotNull(sizing);
     }
 
     /**

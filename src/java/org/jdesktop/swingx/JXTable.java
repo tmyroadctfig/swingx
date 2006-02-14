@@ -316,6 +316,8 @@ public class JXTable extends JTable {
 
     protected Searchable searchable;
 
+    private boolean fillsViewportHeight;
+
     /** Instantiates a JXTable with a default table model, no data. */
     public JXTable() {
         init();
@@ -636,7 +638,52 @@ public class JXTable extends JTable {
     }
 
     
-//--------------------------------- ColumnControl
+//--------------------------------- ColumnControl && Viewport
+ 
+    /**
+     * Set flag to control JXTable's scrollableTracksViewportHeight 
+     * property.
+     * If true the table's height will be always at least as large as the 
+     * containing (viewport?) parent, if false the table's height will be
+     * independent of parent's height.
+     *   
+     */
+    public void setFillsViewportHeight(boolean fillsViewportHeight) {
+        if (fillsViewportHeight == getFillsViewportHeight()) return;
+        boolean old = getFillsViewportHeight();
+        this.fillsViewportHeight = fillsViewportHeight;
+        firePropertyChange("fillsViewportHeight", old, getFillsViewportHeight());
+        revalidate();
+    }
+    
+    /**
+     * Returns the flag to control JXTable scrollableTracksViewportHeight
+     * property. 
+     * If true the table's height will be always at least as large as the 
+     * containing (viewport?) parent, if false the table's height will be
+     * independent of parent's height.
+     * 
+     * @return
+     */
+    public boolean getFillsViewportHeight() {
+        return fillsViewportHeight;
+}
+
+    /**
+     * Overridden to control the tracksHeight property depending on 
+     * fillsViewportHeight and relative size to containing parent (viewport?).
+     * 
+     * @return true if the control flag is true and the containing viewport
+     *          height > prefHeight, else returns false.
+     * 
+     */
+    @Override
+    public boolean getScrollableTracksViewportHeight() {
+        return getFillsViewportHeight()
+        && getParent() instanceof JViewport
+        && (((JViewport)getParent()).getHeight() > getPreferredSize().height);
+    }
+
     
     /**
      * overridden to addionally configure the upper right corner of an enclosing
@@ -645,7 +692,7 @@ public class JXTable extends JTable {
     protected void configureEnclosingScrollPane() {
         super.configureEnclosingScrollPane();
         configureColumnControl();
-        configureViewportBackground();
+//        configureViewportBackground();
     }
 
     /**
