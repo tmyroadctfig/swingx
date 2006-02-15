@@ -134,6 +134,19 @@ public class JXTableUnitTest extends InteractiveTestCase {
      * check "fillsViewportHeight" property change fires event.
      *
      */
+    public void testDefaultFillsViewport() {
+        JXTable table = new JXTable(10, 1);
+        boolean fill = table.getFillsViewportHeight();
+        assertTrue("fillsViewport is on by default", fill);
+    }
+    
+    
+    /**
+     * Issue #256-swingx: added fillsViewportHeight property.
+     * 
+     * check "fillsViewportHeight" property change fires event.
+     *
+     */
     public void testFillsViewportProperty() {
         JXTable table = new JXTable(10, 1);
         boolean fill = table.getFillsViewportHeight();

@@ -401,7 +401,14 @@ public class JXTable extends JTable {
         init();
     }
 
-    /** Initializes the table for use. */
+    /** 
+     * Initializes the table for use.
+     *  
+     */
+    /*
+     * PENDING JW: this method should be private!
+     * 
+     */
     protected void init() {
         setSortable(true);
         // guarantee getFilters() to return != null
@@ -409,6 +416,7 @@ public class JXTable extends JTable {
         initActionsAndBindings();
         // instantiate row height depending on font size
         updateRowHeightUI(false);
+        setFillsViewportHeight(true);
     }
 
     /**
