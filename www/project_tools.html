@@ -1,16 +1,63 @@
-    <div><a href="http://swinglabs.org/index.jsp">Swinglabs.org</a></div>
+<!-- this group is hidden by javascript, might be visible if
+ scripting is disabled -->
+ 		<strong> <a href="https://swinglabs.dev.java.net/ignore.html">Ignore THESE</a> </strong>
   </div>
 </div>
 
+<script>
+// Hide default projecttools bars
+var section = document.getElementById("projecttools");
+section.style.display= "none";
+</script>
+
+<!-- take over to projecttools to be able to redirect some pages -->
+<div id="swinglabstools" class="toolgroup">
+  <div class="label"><strong>Project tools</strong></div>
+  <div class="body">
+       <div>
+           <a href="https://swingx.dev.java.net/servlets/ProjectHome" class="selfref">Project home</a>
+    	 </div>
+       <div>   
+    	    <a href="https://swingx.dev.java.net/servlets/ProjectMemberList">Membership</a> 
+    	 </div>
+	 </div>  <!-- end body -->
+   <div class="body">  
+	 			<div>   
+						<a href="https://jdnc.dev.java.net/servlets/ProjectNewsList">Announcements</a> 
+				</div>  
+    		<div>   
+						<a href="https://jdnc.dev.java.net/servlets/ProjectForumView">Discussion forums</a> 
+				</div>  
+ 				<div>   
+				    <a href="mailinglists.html">Mailing lists</a> 
+				</div>
+		</div>  <!-- end body -->
+		<div class="body">
+				<div>   
+						<a href="https://swingx.dev.java.net/servlets/ProjectDocumentList">Documents &amp; files</a> 
+				</div>
+		 		<div>
+						 <a href="https://swingx.dev.java.net/source/browse/swinglabs/">Version control - CVS</a>
+				</div>
+		</div> <!-- end body -->
+		<div class="body">
+				<div>
+   					 <a href="https://swingx.dev.java.net/servlets/ProjectIssues">Issue tracker</a> 
+				</div>
+    </div> <!-- end body -->
+</div> <!-- end swinglabstools -->
+
+<!-- the additional group, everything pointing to swinglabs.org -->
 <div id="swinglabs-org-tools" class="toolgroup">
   <div class="label"><strong>In Action</strong></div>
   <div class="body">
+    <div><a href="http://swinglabs.org/index.jsp">Swinglabs.org</a></div>
     <div><a href="http://swinglabs.org/screenshots.jsp">Screenshots</a></div>
     <div><a href="http://swinglabs.org/demos.jsp">Demos</a></div>
     <div><a href="http://swinglabs.org/docs.jsp">Documentation</a></div>
 		
 <!--- this file is added as a fragment: 
-			we terminate the project-tools block above 
+			we terminated the original project-tools block above 
 			consequently we must keep the last additional block un-terminated 		
 		
   </div>
