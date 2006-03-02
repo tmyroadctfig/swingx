@@ -107,6 +107,10 @@ import org.jdesktop.swingx.treetable.TreeTableModel;
 public class JXTreeTable extends JXTable {
 
     /**
+     * Key for clientProperty to decide whether to apply hack around #168-jdnc.
+     */
+    public static final String DRAG_HACK_FLAG_KEY = "treeTable.dragHackFlag";
+    /**
      * Renderer used to render cells within the
      *  {@link #isHierarchical(int) hierarchical} column.
      *  renderer extends JXTree and implements TableCellRenderer
@@ -270,7 +274,7 @@ public class JXTreeTable extends JXTable {
      * {@inheritDoc}
      */
     public boolean editCellAt(int row, int column, EventObject e) {
-        expandOrCollapseNode(e);    // RG: Fix Issue 49!
+        expandOrCollapseNode(column, e);    // RG: Fix Issue 49!
         boolean canEdit = super.editCellAt(row, column, e);
         if (canEdit && isHierarchical(column)) {
             repaint(getCellRect(row, column, false));
@@ -278,50 +282,90 @@ public class JXTreeTable extends JXTable {
         return canEdit;
     }
 
-    private void expandOrCollapseNode(EventObject e) {
-        if (e instanceof MouseEvent) {
-            MouseEvent me = (MouseEvent) e;
-            // If the modifiers are not 0 (or the left mouse button),
-            // tree may try and toggle the selection, and table
-            // will then try and toggle, resulting in the
-            // selection remaining the same. To avoid this, we
-            // only dispatch when the modifiers are 0 (or the left mouse
-            // button).
-            if (me.getModifiers() == 0 ||
-                me.getModifiers() == InputEvent.BUTTON1_MASK) {
-                final int count = getColumnCount();
-                for (int i = count - 1; i >= 0; i--) {
-                    if (isHierarchical(i)) {
-                        
-                        int savedHeight = renderer.getRowHeight();
-                        renderer.setRowHeight(getRowHeight());
-                        MouseEvent pressed = new MouseEvent
-                            (renderer,
-                             me.getID(),
-                             me.getWhen(),
-                             me.getModifiers(),
-                             me.getX() - getCellRect(0, i, false).x,
-                             me.getY(),
-                             me.getClickCount(),
-                             me.isPopupTrigger());
-                        renderer.dispatchEvent(pressed);
-                        // For Mac OS X, we need to dispatch a MOUSE_RELEASED as well
-                        MouseEvent released = new MouseEvent
-                            (renderer,
-                             java.awt.event.MouseEvent.MOUSE_RELEASED,
-                             pressed.getWhen(),
-                             pressed.getModifiers(),
-                             pressed.getX(),
-                             pressed.getY(),
-                             pressed.getClickCount(),
-                             pressed.isPopupTrigger());
-                        renderer.dispatchEvent(released);
-                        renderer.setRowHeight(savedHeight);
-                        break;
-                    }
-                }
-            }
+    private void expandOrCollapseNode(int column, EventObject e) {
+        if (!(e instanceof MouseEvent)) return;
+        if (!isHierarchical(column)) return;
+        MouseEvent me = (MouseEvent) e;
+        if (hackAroundDragEnabled(me)) {
+            /*
+             * Hack around #168-jdnc:
+             * dirty little hack mentioned in the forum
+             * discussion about the issue: fake a mousePressed if drag enabled.
+             * The usability is slightly impaired because the expand/collapse
+             * is effectively triggered on released only (drag system intercepts
+             * and consumes all other).
+             */
+            me = new MouseEvent((Component)me.getSource(),
+                    MouseEvent.MOUSE_PRESSED,
+                    me.getWhen(),
+                    me.getModifiers(),
+                    me.getX(),
+                    me.getY(),
+                    me.getClickCount(),
+                    me.isPopupTrigger());
+            
         }
+        // If the modifiers are not 0 (or the left mouse button),
+        // tree may try and toggle the selection, and table
+        // will then try and toggle, resulting in the
+        // selection remaining the same. To avoid this, we
+        // only dispatch when the modifiers are 0 (or the left mouse
+        // button).
+        if (me.getModifiers() == 0 ||
+            me.getModifiers() == InputEvent.BUTTON1_MASK) {
+                    int savedHeight = renderer.getRowHeight();
+                    renderer.setRowHeight(getRowHeight());
+                    MouseEvent pressed = new MouseEvent
+                        (renderer,
+                         me.getID(),
+                         me.getWhen(),
+                         me.getModifiers(),
+                         me.getX() - getCellRect(0, column, false).x,
+                         me.getY(),
+                         me.getClickCount(),
+                         me.isPopupTrigger());
+                    renderer.dispatchEvent(pressed);
+                    // For Mac OS X, we need to dispatch a MOUSE_RELEASED as well
+                    MouseEvent released = new MouseEvent
+                        (renderer,
+                         java.awt.event.MouseEvent.MOUSE_RELEASED,
+                         pressed.getWhen(),
+                         pressed.getModifiers(),
+                         pressed.getX(),
+                         pressed.getY(),
+                         pressed.getClickCount(),
+                         pressed.isPopupTrigger());
+                    renderer.dispatchEvent(released);
+                    renderer.setRowHeight(savedHeight);
+        }
+    }
+
+    /**
+     * decides whether we want to apply the hack for #168-jdnc.
+     * here: returns true if dragEnabled() and the improved drag
+     * handling is not activated (or the system property is not accessible).
+     * The given mouseEvent is not analysed.
+     * 
+     * PENDING: Mustang?
+     * 
+     * @param me the mouseEvent that triggered a editCellAt
+     * @return true if the hack should be applied.
+     */
+    protected boolean hackAroundDragEnabled(MouseEvent me) {
+        Boolean dragHackFlag = (Boolean) getClientProperty(DRAG_HACK_FLAG_KEY);
+        if (dragHackFlag == null) {
+            // access and store the system property as a client property once
+            String priority = null;
+            try {
+                priority = System.getProperty("sun.swing.enableImprovedDragGesture");
+
+            } catch (Exception ex) {
+                // found some foul expression or failed to read the property
+            }
+            dragHackFlag = (priority == null);
+            putClientProperty(DRAG_HACK_FLAG_KEY, dragHackFlag);
+        }
+        return getDragEnabled() && dragHackFlag;
     }
 
     /**

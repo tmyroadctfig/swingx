@@ -4,11 +4,14 @@
  */
 package org.jdesktop.swingx;
 
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.util.EventObject;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -21,12 +24,10 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
-import javax.swing.SwingUtilities;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
@@ -53,14 +54,14 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     public static void main(String[] args) {
         // NOTE JW: this property has be set "very early" in the application life-cycle
         // it's immutable once read from the UIManager (into a final static field!!)
-        System.setProperty("sun.swing.enableImprovedDragGesture", "true" );
+//        System.setProperty("sun.swing.enableImprovedDragGesture", "true" );
         setSystemLF(true);
         JXTreeTableVisualCheck test = new JXTreeTableVisualCheck();
         try {
 //            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Highligh.*");
          //      test.runInteractiveTests("interactive.*SortingFilter.*");
-           test.runInteractiveTests("interactive.*Node.*");
+           test.runInteractiveTests("interactive.*DnD.*");
 //             test.runInteractiveTests("interactive.*Edit.*");
         } catch (Exception ex) {
 
@@ -342,40 +343,11 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 
     /**
      * Issue #168-jdnc: dnd enabled breaks node collapse/expand.
+     * 
+     * 
      */
     public void interactiveToggleDnDEnabled() {
-        final JXTreeTable treeTable = new JXTreeTable(treeTableModel) {
-
-            /**
-             * testing dirty little hack mentioned in the forum
-             * discussion about the issue: fake a mousePressed if drag enabled.
-             * The usability is slightly impaired because the expand/collapse
-             * is effectively triggered on released only (drag system intercepts
-             * and consumes all other).
-             *  
-             * @param row
-             * @param column
-             * @param e
-             * @return
-             */
-//            @Override
-//            public boolean editCellAt(int row, int column, EventObject e) {
-//                if (getDragEnabled() && e instanceof MouseEvent) {
-//                    MouseEvent me = (MouseEvent) e;
-//                    LOG.info("original mouseEvent " + e);
-//                    e = new MouseEvent((Component)me.getSource(),
-//                    MouseEvent.MOUSE_PRESSED,
-//                    me.getWhen(),
-//                    me.getModifiers(),
-//                    me.getX(),
-//                    me.getY(),
-//                    me.getClickCount(),
-//                    me.isPopupTrigger());
-//                    }
-//                return super.editCellAt(row, column, e);
-//            }
-            
-        };
+        final JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         treeTable.setColumnControlVisible(true);
         final JXTree tree = new JXTree(treeTableModel);
         JXFrame frame = wrapWithScrollingInFrame(treeTable, tree, "toggle dragEnabled (starting with false)");
