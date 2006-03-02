@@ -37,11 +37,13 @@ import org.jdesktop.swingx.decorator.Sorter;
  *
  * @author Ramesh Gupta
  * @author Amy Fowler
+ * @author Jeanette Winzenburg
  */
 public class TableColumnExt extends javax.swing.table.TableColumn
     implements Cloneable {
 
-    public static final String SORTER_COMPARATOR = "Sorter.COMPARATOR";
+    // removed - comparator now is a full-fledged bound property.
+//    public static final String SORTER_COMPARATOR = "Sorter.COMPARATOR";
     protected boolean editable = true;
     protected boolean visible = true;
     protected Object prototypeValue = null;
@@ -49,6 +51,9 @@ public class TableColumnExt extends javax.swing.table.TableColumn
     private Hashtable clientProperties = null;
 
     protected Sorter sorter = null;
+    /** the comparator to use for this column */
+    protected Comparator comparator;
+    
     private Constructor	sorterConstructor = null;
     private final static Constructor	defaultSorterConstructor;
     private final static Class[]	sorterConstructorSignature =
@@ -220,10 +225,7 @@ public class TableColumnExt extends javax.swing.table.TableColumn
                         new Object[] {
                             new Integer(getModelIndex()),
                             new Boolean(true)});
-                    Object object = getClientProperty(SORTER_COMPARATOR);
-                    if (object instanceof Comparator) {
-                        sorter.setComparator((Comparator) object);
-                    }
+                   sorter.setComparator(getComparator());
                 }
                 catch (Exception ex) {
                 }
@@ -232,6 +234,32 @@ public class TableColumnExt extends javax.swing.table.TableColumn
         return sorter;
     }
 
+    /**
+     * returns the Comparator to use for this column.
+     * @return
+     */
+    public Comparator getComparator() {
+        return comparator;
+    }
+
+    /**
+     * sets the comparator to use for this column.
+     * Updates the column's sorter with the given comparator.
+     * NOTE: it's up to clients to not re-set the sorter's comparator
+     * somewhere else - the column cannot guarantee to keep both in synch!
+     *  
+     * 
+     * @param comparator
+     */
+    public void setComparator(Comparator comparator) {
+        Comparator old = getComparator();
+        this.comparator = comparator;
+        if (sorter != null) {
+            sorter.setComparator(comparator);
+        }
+        firePropertyChange("comparator", old, getComparator());
+    }
+    
     /**
      *
      * @return boolean indicating whether this view column is sortable
@@ -251,11 +279,13 @@ public class TableColumnExt extends javax.swing.table.TableColumn
 
     /**
      * Convenience method which returns the headerValue property after
-     * converting it to a string.
-     * @return String containing the title of this view column
+     * converting it to a string. 
+     * @return String containing the title of this view column or null if
+     *   no headerValue is set.
      */
     public String getTitle() {
-        return getHeaderValue().toString();	// simple wrapper
+        Object header = getHeaderValue();
+        return header != null ? header.toString() : null;	// simple wrapper
     }
 
     /**
@@ -288,6 +318,7 @@ public class TableColumnExt extends javax.swing.table.TableColumn
      * @see #getClientProperty
      * @param key Object which is used as key to retrieve value
      * @param value Object containing value of client property
+     * @throws IllegalArgumentExcetpion if key == null
      */
     public void putClientProperty(Object key, Object value) {
         if (key == null)
@@ -297,6 +328,7 @@ public class TableColumnExt extends javax.swing.table.TableColumn
             return;
         }
 
+        Object old = getClientProperty(key);
         if (value == null) {
             getClientProperties().remove(key);
         }
@@ -304,8 +336,8 @@ public class TableColumnExt extends javax.swing.table.TableColumn
             getClientProperties().put(key, value);
         }
 
-        /** @todo Support firePropertyChange(key.toString(), oldValue, newValue);
-         * Make all fireXXX methods in TableColumn protected instead of private */
+        firePropertyChange(key.toString(), old, value);
+        /* Make all fireXXX methods in TableColumn protected instead of private */
     }
 
     /**
@@ -353,6 +385,7 @@ public class TableColumnExt extends javax.swing.table.TableColumn
          copy.setVisible(this.isVisible());
          copy.setSorterClass(this.getSorterClass());
          copy.sorterConstructor = sorterConstructor;
+         copy.setComparator(getComparator());
          return copy;
      }
 
