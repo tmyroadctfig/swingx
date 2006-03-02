@@ -14,15 +14,13 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-
-import junit.framework.TestCase;
 
 import org.jdesktop.swingx.util.ListSelectionReport;
 
@@ -45,7 +43,31 @@ public class JTableIssues extends InteractiveTestCase {
       }
   }
 
+    /**
+     * Issue #272-swingx: inserted row is selected.
+     * Not a bug: documented behaviour of DefaultListSelectionModel.
+     *
+     */
+    public void interactiveInsertAboveSelection() {
+        final DefaultTableModel model = new DefaultTableModel(10, 2);
+        final JTable table = new JTable(model);
+        Action action = new AbstractAction("insertRow") {
 
+            public void actionPerformed(ActionEvent e) {
+                
+                int selected = table.getSelectedRow();
+                if (selected < 0) return;
+                model.insertRow(selected, new Object[2]);
+            }
+            
+        };
+        JXFrame frame = wrapWithScrollingInFrame(table, "insert at selection");
+        addAction(frame, action);
+        frame.setVisible(true);
+    }
+
+    
+    
     public void interactiveLeadAnchor() {
         final JTable table = new JTable(10, 3) {
 
@@ -98,6 +120,33 @@ public class JTableIssues extends InteractiveTestCase {
 
 //---------------------- unit tests 
     
+    /**
+     * Issue #272-swingx: inserted row is selected.
+     * Not a bug: documented behaviour of DefaultListSelectionModel.
+     *
+     */
+    public void testInsertBeforeSelected() {
+        DefaultTableModel model = new DefaultTableModel(10, 2);
+        JTable table = new JTable(model);
+        table.setRowSelectionInterval(3, 3);
+        model.insertRow(3, new Object[2]);
+        int[] selected = table.getSelectedRows();
+        assertEquals(1, selected.length);
+    }
+
+    /**
+     * Issue #272-swingx: inserted row is selected.
+     * Not a bug: documented behaviour of DefaultListSelectionModel.
+     */
+    public void testInsertBeforeSelectedSM() {
+        DefaultListSelectionModel model = new DefaultListSelectionModel();
+        model.setSelectionInterval(3, 3);
+        model.insertIndexInterval(3, 1, true);
+        int max = model.getMaxSelectionIndex();
+        int min = model.getMinSelectionIndex();
+        assertEquals(max, min);
+    }
+
     /**
      * test contract: getColumn(int) throws ArrayIndexOutofBounds with 
      * invalid column index.
