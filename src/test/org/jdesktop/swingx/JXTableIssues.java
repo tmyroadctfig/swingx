@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -24,7 +25,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -36,6 +36,8 @@ import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.decorator.Sorter;
+import org.jdesktop.swingx.treetable.FileSystemModel;
+import org.jdesktop.swingx.util.AncientSwingTeam;
 
 /**
  * @author Jeanette Winzenburg
@@ -284,6 +286,7 @@ public class JXTableIssues extends InteractiveTestCase {
     
     }
 
+    
     public void interactiveDeleteRowAboveSelection() {
         CompareTableBehaviour compare = new CompareTableBehaviour(new Object[] { "A", "B", "C", "D", "E", "F", "G", "H", "I" });
         compare.table.getSelectionModel().setSelectionInterval(2, 5);
@@ -304,6 +307,31 @@ public class JXTableIssues extends InteractiveTestCase {
         
     }
     
+    public void interactiveDisabledCollectionViews() {
+        final JXTable table = new JXTable(new AncientSwingTeam());
+        table.setEnabled(false);
+        final JXList list = new JXList(new String[] {"one", "two", "and something longer"});
+        list.setEnabled(false);
+        final JXTree tree = new JXTree(new FileSystemModel());
+        tree.setEnabled(false);
+        JComponent box = Box.createHorizontalBox();
+        box.add(new JScrollPane(table));
+        box.add(new JScrollPane(list));
+        box.add(new JScrollPane(tree));
+        JXFrame frame = wrapInFrame(box, "disabled collection views");
+        AbstractAction action = new AbstractAction("toggle disabled") {
+
+            public void actionPerformed(ActionEvent e) {
+                table.setEnabled(!table.isEnabled());
+                list.setEnabled(!list.isEnabled());
+                tree.setEnabled(!tree.isEnabled());
+            }
+            
+        };
+        addAction(frame, action);
+        frame.setVisible(true);
+        
+    }
     public void interactiveDataChanged() {
         final DefaultTableModel model = createAscendingModel(0, 10, 5, false);
         JXTable xtable = new JXTable(model);
