@@ -21,6 +21,7 @@
 
 package org.jdesktop.swingx;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Container;
@@ -62,6 +63,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
@@ -71,6 +73,7 @@ import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -2323,27 +2326,43 @@ public class JXTable extends JTable {
         return null;
     }
 
-    /** ? */
-    protected void createDefaultEditors() {
-        super.createDefaultEditors();
-        setLazyEditor(LinkModel.class, "org.jdesktop.swingx.LinkRenderer");
-    }
-
     /**
      * Creates default cell renderers for objects, numbers, doubles, dates,
      * booleans, icons, and links.
      * THINK: delegate to TableCellRenderers?
+     * Overridden to provide default renderer for LinkModel plus hacking around
+     * huge memory consumption of UIDefaults (see #6345050 in core Bug parade)
      * 
      */
+    @Override
     protected void createDefaultRenderers() {
         // super.createDefaultRenderers();
         // This duplicates JTable's functionality in order to make the renderers
         // available in getNewDefaultRenderer(); If JTable's renderers either
         // were public, or it provided a factory for *new* renderers, this would
         // not be needed
+        
+        // hack around #6345050 - new UIDefaults() 
+        // is created with a huge initialCapacity
+        // giving a dummy key/value array as parameter reduces that capacity 
+        // to length/2.
+        Object[] dummies = new Object[] {
+              1, 0,
+              2, 0,
+              3, 0,
+              4, 0,
+              5, 0,
+              6, 0,
+              7, 0,
+              8, 0,
+              9, 0,
+              10, 0,
+              
+        };
+        defaultRenderersByColumnClass = new UIDefaults(dummies);
+        defaultRenderersByColumnClass.clear();
 
-        defaultRenderersByColumnClass = new UIDefaults();
-
+//        defaultRenderersByColumnClass = new UIDefaults();
         // Objects
         setLazyRenderer(Object.class,
                 "javax.swing.table.DefaultTableCellRenderer");
@@ -2488,6 +2507,136 @@ public class JXTable extends JTable {
             return this;
         }
     }
+
+    /**
+     * Creates default cell editors for objects, numbers, and boolean values.
+     * Overridden to provide default editor for LinkModel
+     * @see DefaultCellEditor
+     */
+//    @Override
+//    protected void createDefaultEditors() {
+//        super.createDefaultEditors();
+//        setLazyEditor(LinkModel.class, "org.jdesktop.swingx.LinkRenderer");
+//    }
+
+    /**
+     * Creates default cell editors for objects, numbers, and boolean values.
+     * Overridden to provide default editor for LinkModel plus hacking around
+     * huge memory consumption of UIDefaults (see #6345050 in core Bug parade)
+     * @see DefaultCellEditor
+     */
+    @Override
+    protected void createDefaultEditors() {
+        Object[] dummies = new Object[] {
+                1, 0,
+                2, 0,
+                3, 0,
+                4, 0,
+                5, 0,
+                6, 0,
+                7, 0,
+                8, 0,
+                9, 0,
+                10, 0,
+                
+          };
+          defaultEditorsByColumnClass = new UIDefaults(dummies);
+          defaultEditorsByColumnClass.clear();
+//        defaultEditorsByColumnClass = new UIDefaults();
+
+        // Objects
+        setLazyEditor(Object.class, "org.jdesktop.swingx.JXTable$GenericEditor");
+
+        // Numbers
+        setLazyEditor(Number.class, "org.jdesktop.swingx.JXTable$NumberEditor");
+
+        // Booleans
+        setLazyEditor(Boolean.class, "org.jdesktop.swingx.JXTable$BooleanEditor");
+        setLazyEditor(LinkModel.class, "org.jdesktop.swingx.LinkRenderer");
+
+    }
+
+    /**
+     * Default Editors
+     */
+    public static class GenericEditor extends DefaultCellEditor {
+
+        Class[] argTypes = new Class[]{String.class};
+        java.lang.reflect.Constructor constructor;
+        Object value;
+
+        public GenericEditor() {
+            super(new JTextField());
+            getComponent().setName("Table.editor");
+        }
+
+        public boolean stopCellEditing() {
+            String s = (String)super.getCellEditorValue();
+            // Here we are dealing with the case where a user
+            // has deleted the string value in a cell, possibly
+            // after a failed validation. Return null, so that
+            // they have the option to replace the value with
+            // null or use escape to restore the original.
+            // For Strings, return "" for backward compatibility.
+            if ("".equals(s)) {
+                if (constructor.getDeclaringClass() == String.class) {
+                    value = s;
+                }
+                super.stopCellEditing();
+            }
+
+            try {
+                value = constructor.newInstance(new Object[]{s});
+            }
+            catch (Exception e) {
+                ((JComponent)getComponent()).setBorder(new LineBorder(Color.red));
+                return false;
+            }
+            return super.stopCellEditing();
+        }
+
+        public Component getTableCellEditorComponent(JTable table, Object value,
+                                                 boolean isSelected,
+                                                 int row, int column) {
+            this.value = null;
+            ((JComponent)getComponent()).setBorder(new LineBorder(Color.black));
+            try {
+                Class type = table.getColumnClass(column);
+                // Since our obligation is to produce a value which is
+                // assignable for the required type it is OK to use the
+                // String constructor for columns which are declared
+                // to contain Objects. A String is an Object.
+                if (type == Object.class) {
+                    type = String.class;
+                }
+                constructor = type.getConstructor(argTypes);
+            }
+            catch (Exception e) {
+                return null;
+            }
+            return super.getTableCellEditorComponent(table, value, isSelected, row, column);
+        }
+
+        public Object getCellEditorValue() {
+            return value;
+        }
+    }
+
+    public static class NumberEditor extends GenericEditor {
+
+        public NumberEditor() {
+            ((JTextField)getComponent()).setHorizontalAlignment(JTextField.RIGHT);
+        }
+    }
+
+    public static class BooleanEditor extends DefaultCellEditor {
+        public BooleanEditor() {
+            super(new JCheckBox());
+            JCheckBox checkBox = (JCheckBox)getComponent();
+            checkBox.setHorizontalAlignment(JCheckBox.CENTER);
+        }
+    }
+
 
 // ---------------------------- updateUI support
     
