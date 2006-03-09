@@ -39,6 +39,7 @@ import java.util.logging.Level;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -95,18 +96,6 @@ public class JXErrorDialog extends JDialog {
      */
     private static Icon DEFAULT_WARNING_ICON = UIManager.getIcon("OptionPane.warningIcon");
     /**
-     * Number of columns of error message text area
-     */
-    private static final int ERROR_MESSAGE_COLUMNS = 30;
-    /**
-     * Number of rows of details text area
-     */
-    private static final int DETAILS_ROWS = 7;
-    /**
-     * Number of columns of details text area
-     */
-    private static final int DETAILS_COLUMNS = 50;
-    /**
      * Error reporting engine assigned for error reporting for all error dialogs
      */
     private static ErrorReporter DEFAULT_REPORTER;
@@ -116,11 +105,11 @@ public class JXErrorDialog extends JDialog {
     /**
      * Error message text area
      */
-    private JTextArea errorMessage;
+    private JXEditorPane errorMessage;
     /**
      * details text area
      */
-    private JTextArea details;
+    private JXEditorPane details;
     /**
      * detail button
      */
@@ -330,13 +319,11 @@ public class JXErrorDialog extends JDialog {
         iconLabel = new JLabel(DEFAULT_ERROR_ICON);
         this.getContentPane().add(iconLabel, gbc);
 
-        errorMessage = new JTextArea();
+        errorMessage = new JXEditorPane();
         errorMessage.setEditable( false );
-        errorMessage.setColumns( ERROR_MESSAGE_COLUMNS );
-        errorMessage.setBorder( null );
+        errorMessage.setContentType("text/html");
         errorMessage.setOpaque( false );
-        errorMessage.setLineWrap( true );
-        errorMessage.setWrapStyleWord( true );
+        gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.LINE_START;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridheight = 1;
@@ -344,9 +331,10 @@ public class JXErrorDialog extends JDialog {
         gbc.gridx = 1;
         gbc.weightx = 0.0;
         gbc.weighty = 0.0;
-        gbc.insets = new Insets(32, 0, 0, 11);
+        gbc.insets = new Insets(24, 0, 0, 11);
         this.getContentPane().add(errorMessage, gbc);
 
+        gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.NONE;
         gbc.gridx = 1;
         gbc.gridy = 1;
@@ -360,6 +348,7 @@ public class JXErrorDialog extends JDialog {
 
         reportAction = new ReportAction();
         reportButton = new EqualSizeJButton(reportAction);
+        gbc = new GridBagConstraints();
         gbc.gridx = 2;
         gbc.weightx = 0.0;
         gbc.insets = new Insets(12, 0, 11, 5);
@@ -367,15 +356,19 @@ public class JXErrorDialog extends JDialog {
         reportButton.setVisible(false); // not visible by default
 
         detailButton = new EqualSizeJButton(UIManager.getString(CLASS_NAME + ".details_expand_text"));
+        gbc = new GridBagConstraints();
         gbc.gridx = 3;
         gbc.weightx = 0.0;
         gbc.insets = new Insets(12, 0, 11, 11);
         this.getContentPane().add(detailButton, gbc);
 
-        details = new JTextArea(DETAILS_ROWS, DETAILS_COLUMNS);
+        details = new JXEditorPane();
+        details.setContentType("text/html");
         detailsScrollPane = new JScrollPane(details);
+        detailsScrollPane.setPreferredSize(new Dimension(300, 200));
         detailsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         details.setEditable(false);
+        gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridwidth = 4;
         gbc.gridx = 0;
@@ -391,6 +384,10 @@ public class JXErrorDialog extends JDialog {
         reportButton.setGroup(buttons);
         detailButton.setGroup(buttons);
 
+        okButton.setMinimumSize(okButton.getPreferredSize());
+        reportButton.setMinimumSize(reportButton.getPreferredSize());
+        detailButton.setMinimumSize(detailButton.getPreferredSize());
+        
         //set the event handling
         okButton.addActionListener(new OkClickEvent());
         detailButton.addActionListener(new DetailsClickEvent());
@@ -474,10 +471,25 @@ public class JXErrorDialog extends JDialog {
             String details = incidentInfo.getDetailedErrorMessage();
             if(details == null) {
                 if(incidentInfo.getErrorException() != null) {
-                    StringWriter sw = new StringWriter();
-                    PrintWriter pw = new PrintWriter(sw);
-                    incidentInfo.getErrorException().printStackTrace(pw);
-                    details = sw.toString();
+                    //convert the stacktrace into a more pleasent bit of HTML
+                    StringBuffer html = new StringBuffer("<html><head><title>");
+                    html.append(incidentInfo.getHeader());
+                    html.append("</title><style><!--H1 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:22px;} H2 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:16px;} H3 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:14px;} BODY {font-family:Tahoma,Arial,sans-serif;color:black;background-color:white;} B {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;} P {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:12px;}A {color : black;}HR {color : #525D76;}--></style> </head><body><h1>");
+                    html.append(incidentInfo.getHeader());
+                    html.append("</h1><HR size=\"1\" noshade><p><b>Level</b> ");
+                    html.append(incidentInfo.getErrorLevel());
+                    html.append("</p><p><b>Message</b> <u>");
+                    html.append(incidentInfo.getErrorException().getLocalizedMessage());
+                    html.append("</u></p><p><b>Stack Trace</b><br>");
+                    for (StackTraceElement el : incidentInfo.getErrorException().getStackTrace()) {
+                        html.append("&nbsp;&nbsp;&nbsp;&nbsp;");
+                        html.append(el.toString());
+                        html.append("<br>");
+                    }
+                    html.append("<HR size=\"1\" noshade><h3>");
+                    html.append(incidentInfo.getHeader());
+                    html.append("</h3></body></html>");
+                    details = html.toString();
                 } else {
                     details = "";
                 }
