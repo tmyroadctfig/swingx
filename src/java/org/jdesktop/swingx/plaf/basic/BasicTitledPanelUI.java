@@ -67,14 +67,14 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
     private static final Logger LOG = Logger.getLogger(BasicTitledPanelUI.class
             .getName());
     
-	/**
-	 * JLabel used for the title in the Title section of the JTitledPanel.
-	 */
-	private JLabel caption;
-	/**
-	 * The Title section panel.
-	 */
-	private JGradientPanel topPanel;
+    /**
+     * JLabel used for the title in the Title section of the JTitledPanel.
+     */
+    private JLabel caption;
+    /**
+     * The Title section panel.
+     */
+    private JGradientPanel topPanel;
     /**
      * Listens to changes in the title of the JXTitledPanel component
      */
@@ -300,12 +300,12 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
     }
     
     /**
-	 * A special inner class who's background is painted as a gradient.  This is used
-	 * as the Title section of the JTitledPanel
-	 * @author Richard Bair
-	 * date: Jan 13, 2004
-	 */
-	protected static 
+     * A special inner class who's background is painted as a gradient.  This is used
+     * as the Title section of the JTitledPanel
+     * @author Richard Bair
+     * date: Jan 13, 2004
+     */
+    protected static 
     class JGradientPanel extends JXPanel {
 		private GradientPaint gp;
 		private double oldWidth = -1;
@@ -323,30 +323,29 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
             invalidateGradient();
             repaint();
         }
-		//override the background color to provide for a gradient
-		
-		/* (non-Javadoc)
-		 * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
-		 * 
-		 * There is some special optimization code in here that is kind of...er..shall we say, tricky.
-		 * First off, the gradient panels are taking forever to draw. Therefore, I have resorted to caching the
-		 * gradient'ed paint job so that I don't have to repaint it all the time.
-		 */
-		protected void paintComponent(Graphics g) {
-			//draw the gradient background
-			if (gp == null || oldWidth != getWidth() || oldHeight != getHeight()) {
-				gp = createGradientPaint();
-				Image savedImg = createImage(getWidth(), getHeight());
-				Graphics2D imgg = (Graphics2D)savedImg.getGraphics();
-				imgg.setPaint(gp);
-				imgg.fillRect(0, 0, getWidth(), getHeight());
-				oldWidth = getWidth();
-				oldHeight = getHeight();
-				helper.setImage(savedImg);
-			}
-			// draw the image
-			g.drawImage(helper.getImage(), 0, 0, getWidth(), getHeight(), helper.getImageObserver());
-            
+        //override the background color to provide for a gradient
+
+        /* (non-Javadoc)
+         * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
+         * 
+         * There is some special optimization code in here that is kind of...er..shall we say, tricky.
+         * First off, the gradient panels are taking forever to draw. Therefore, I have resorted to caching the
+         * gradient'ed paint job so that I don't have to repaint it all the time.
+         */
+        protected void paintComponent(Graphics g) {
+                //draw the gradient background
+                if (gp == null || oldWidth != getWidth() || oldHeight != getHeight()) {
+                        gp = createGradientPaint();
+                        Image savedImg = createImage(getWidth(), getHeight());
+                        Graphics2D imgg = (Graphics2D)savedImg.getGraphics();
+                        imgg.setPaint(gp);
+                        imgg.fillRect(0, 0, getWidth(), getHeight());
+                        oldWidth = getWidth();
+                        oldHeight = getHeight();
+                        helper.setImage(savedImg);
+                }
+                // draw the image
+                g.drawImage(helper.getImage(), 0, 0, getWidth(), getHeight(), helper.getImageObserver());
         }
         
         protected GradientPaint createGradientPaint() {
