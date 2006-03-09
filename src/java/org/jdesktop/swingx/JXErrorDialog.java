@@ -22,8 +22,6 @@
 package org.jdesktop.swingx;
 
 import java.awt.Component;
-import java.awt.ComponentOrientation;
-import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -37,6 +35,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Enumeration;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -82,6 +81,7 @@ import org.jdesktop.swingx.util.WindowUtils;
  * @author Shai Almog
  */
 public class JXErrorDialog extends JDialog {
+    //---------------------------------------------------- static properties    
     /**
      * Used as a prefix when pulling data out of UIManager for i18n
      */
@@ -89,19 +89,15 @@ public class JXErrorDialog extends JDialog {
     /**
      * Icon for the error dialog (stop sign, etc)
      */
-    private static final Icon icon = UIManager.getIcon("OptionPane.warningIcon");
+    private static Icon DEFAULT_ERROR_ICON = UIManager.getIcon("OptionPane.errorIcon");
     /**
-     * Error message text area
+     * Icon for the error dialog (stop sign, etc)
      */
-    private JTextArea errorMessage;
+    private static Icon DEFAULT_WARNING_ICON = UIManager.getIcon("OptionPane.warningIcon");
     /**
      * Number of columns of error message text area
      */
     private static final int ERROR_MESSAGE_COLUMNS = 30;
-    /**
-     * details text area
-     */
-    private JTextArea details;
     /**
      * Number of rows of details text area
      */
@@ -111,6 +107,21 @@ public class JXErrorDialog extends JDialog {
      */
     private static final int DETAILS_COLUMNS = 50;
     /**
+     * Error reporting engine assigned for error reporting for all error dialogs
+     */
+    private static ErrorReporter DEFAULT_REPORTER;
+
+    //-------------------------------------------------- instance properties    
+    
+    /**
+     * Error message text area
+     */
+    private JTextArea errorMessage;
+    /**
+     * details text area
+     */
+    private JTextArea details;
+    /**
      * detail button
      */
     private EqualSizeJButton detailButton;
@@ -119,19 +130,41 @@ public class JXErrorDialog extends JDialog {
      */
     private JScrollPane detailsScrollPane;
     /**
+     * label used to display the warning/error icon
+     */
+    private JLabel iconLabel;
+    /**
      * report an error button
      */
     private EqualSizeJButton reportButton;
-    /**
-     * Error reporting engine assigned for error reporting for all error dialogs
-     */
-    private static ErrorReporter reporter;
     /**
      * IncidentInfo that contains all the information prepared for
      * reporting.
      */
     private IncidentInfo incidentInfo;
+    /**
+     * The Action that will be executed to report an error/warning. If null,
+     * then a default ReportAction will be used.
+     */
+    private Action reportAction;
+    /**
+     * The ErrorReporter to use. It defaults to the global default reporter
+     * specified via the static methods, but may be overridden
+     */
+    private ErrorReporter reporter = DEFAULT_REPORTER;
+    /**
+     * The Icon to use if the error message is indeed an Error, as specified
+     * by IncidentInfo.getErrorLevel == Level.SEVERE
+     */
+    private Icon errorIcon = DEFAULT_ERROR_ICON;
+    /**
+     * The Icon to use if the error message is not an Error
+     * (IncidentInfo.getErrorLevel != Level.SEVERE)
+     */
+    private Icon warningIcon = DEFAULT_WARNING_ICON;
 
+    //------------------------------------------------- static configuration    
+    
     /**
      * Creates initialize the UIManager with localized strings
      */
@@ -151,6 +184,7 @@ public class JXErrorDialog extends JDialog {
         }
     }
     
+    //--------------------------------------------------------- constructors
     
     /**
      * Create a new ErrorDialog with the given Frame as the owner
@@ -170,6 +204,116 @@ public class JXErrorDialog extends JDialog {
         initGui();
     }
 
+    //-------------------------------------------- public methods/properties    
+    
+    /**
+     * Sets the IncidentInfo for this dialog
+     *
+     * @param info IncidentInfo that incorporates all the details about the error
+     */
+    public void setIncidentInfo(IncidentInfo info) {
+        IncidentInfo old = this.incidentInfo;
+        this.incidentInfo = info;
+        firePropertyChange("incidentInfo", old, this.incidentInfo);
+        reinit();
+    }
+
+    /**
+     * Get curent dialog's IncidentInfo
+     *
+     * @return <code>IncidentInfo</code> assigned to this dialog
+     */
+    public IncidentInfo getIncidentInfo() {
+        return incidentInfo;
+    }
+
+    /**
+     * Sets the ErrorReporter to use with this instance of JXErrorDialog.
+     * If not specified, the default error reporter is used (as specified
+     * by the setDefaultErrorReporter() static method).
+     *
+     * @param rep if null, the default error reporter is used
+     */
+    public void setErrorReporter(ErrorReporter rep) {
+        ErrorReporter old = this.reporter;
+        this.reporter = rep == null ? DEFAULT_REPORTER : rep;
+        firePropertyChange("errorReporter", old, this.reporter);
+        reinit();
+    }
+
+    /**
+     * Returns the error reporter in use with this instance of JXErrorDialog.
+     * If not specified, the default error reporter is returned
+     *
+     * @return the ErrorReporter in use. May be null
+     */
+    public ErrorReporter getErrorReporter() {
+        return reporter;
+    }
+    
+    /**
+     * Specifies the icon to use if the IncidentInfo is Level.SEVERE
+     *
+     * @param icon the Icon to use. If null, the default error icon will be used
+     */
+    public void setErrorIcon(Icon icon) {
+        Icon old = this.errorIcon;
+        this.errorIcon = icon == null ? DEFAULT_ERROR_ICON : icon;
+        firePropertyChange("errorIcon", old, this.errorIcon);
+        reinit();
+    }
+
+    /**
+     * Returns the Icon in use if the IncidentInfo is Level.SEVERE
+     *
+     * @return the Icon
+     */
+    public Icon getErrorIcon() {
+        return errorIcon;
+    }
+    
+    /**
+     * Specifies the icon to use if the IncidentInfo is not Level.SEVERE
+     *
+     * @param icon the Icon to use. If null, the default warning icon will be used
+     */
+    public void setWarningIcon(Icon icon) {
+        Icon old = this.warningIcon;
+        this.warningIcon = icon == null ? DEFAULT_WARNING_ICON : icon;
+        firePropertyChange("warningIcon", old, this.warningIcon);
+        reinit();
+    }
+    
+    /**
+     * Returns the Icon in use if the IncidentInfo is not Level.SEVERE
+     *
+     * @return the Icon
+     */
+    public Icon getWarningIcon() {
+        return warningIcon;
+    }
+    
+    /**
+     * Specify the Action that will be executed to report an error/warning. If null,
+     * then a default ReportAction will be used.
+     *
+     * @param action The Action to execute if the user attempts to report a problem
+     */
+    public void setReportAction(Action action) {
+        Action old = this.reportAction;
+        this.reportAction = action == null ? new ReportAction() : action;
+        firePropertyChange("reportAction", old, this.reportAction);
+        reportButton.setAction(this.reportAction);
+    }
+    
+    /**
+     * @return the Action that is executed if the user attempts to report a problem
+     */
+    public Action getReportAction() {
+        return reportAction;
+    }
+
+    //----------------------------------------------- private helper methods    
     /**
      * initialize the gui.
      */
@@ -183,7 +327,8 @@ public class JXErrorDialog extends JDialog {
         gbc.fill = GridBagConstraints.NONE;
         gbc.gridheight = 1;
         gbc.insets = new Insets(22, 12, 11, 17);
-        this.getContentPane().add(new JLabel(icon), gbc);
+        iconLabel = new JLabel(DEFAULT_ERROR_ICON);
+        this.getContentPane().add(iconLabel, gbc);
 
         errorMessage = new JTextArea();
         errorMessage.setEditable( false );
@@ -213,7 +358,8 @@ public class JXErrorDialog extends JDialog {
         EqualSizeJButton okButton = new EqualSizeJButton(UIManager.getString(CLASS_NAME + ".ok_button_text"));
         this.getContentPane().add(okButton, gbc);
 
-        reportButton = new EqualSizeJButton(new ReportAction());
+        reportAction = new ReportAction();
+        reportButton = new EqualSizeJButton(reportAction);
         gbc.gridx = 2;
         gbc.weightx = 0.0;
         gbc.insets = new Insets(12, 0, 11, 5);
@@ -254,8 +400,9 @@ public class JXErrorDialog extends JDialog {
      * Set the details section of the error dialog.  If the details are either
      * null or an empty string, then hide the details button and hide the detail
      * scroll pane.  Otherwise, just set the details section.
-     * @param details  Details to be shown in the detail section of the dialog.  This can be null
-     * if you do not want to display the details section of the dialog.
+     * @param details  Details to be shown in the detail section of the dialog. 
+     * This can be null if you do not want to display the details section of the
+     * dialog.
      */
     private void setDetails(String details) {
         if (details == null || details.equals("")) {
@@ -307,57 +454,40 @@ public class JXErrorDialog extends JDialog {
     private void setErrorMessage(String errorMessage) {
         this.errorMessage.setText(errorMessage);
     }
-
+    
     /**
-     * Sets the IncidentInfo for this dialog
-     *
-     * @param info IncidentInfo that incorporates all the details about the error
+     * Reconfigures the dialog if settings have changed, such as the 
+     * IncidentInfo, errorIcon, warningIcon, etc
      */
-    private void setIncidentInfo(IncidentInfo info) {
-        this.incidentInfo = info;
-        this.reportButton.setVisible(getReporter() != null);
-    }
-
-    /**
-     * Get curent dialog's IncidentInfo
-     *
-     * @return <code>IncidentInfo</code> assigned to this dialog
-     */
-    private IncidentInfo getIncidentInfo() {
-        return incidentInfo;
-    }
-
-    /**
-     * Listener for Ok button click events
-     * @author Richard Bair
-     */
-    private final class OkClickEvent implements ActionListener {
-
-        /* (non-Javadoc)
-        * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-        */
-        public void actionPerformed(ActionEvent e) {
-            //close the window
-            setVisible(false);
-            dispose();
+    private void reinit() {
+        reportButton.setVisible(getErrorReporter() != null);
+        if (incidentInfo == null) {
+            iconLabel.setIcon(DEFAULT_ERROR_ICON);
+            setTitle("");
+            setErrorMessage("");
+            setDetails("");
+        } else {
+            iconLabel.setIcon(incidentInfo.getErrorLevel() == Level.SEVERE ? 
+                errorIcon : warningIcon);
+            setTitle(incidentInfo.getHeader());
+            setErrorMessage(incidentInfo.getBasicErrorMessage());
+            String details = incidentInfo.getDetailedErrorMessage();
+            if(details == null) {
+                if(incidentInfo.getErrorException() != null) {
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw);
+                    incidentInfo.getErrorException().printStackTrace(pw);
+                    details = sw.toString();
+                } else {
+                    details = "";
+                }
+            }
+            setDetails(details);
         }
     }
-
-    /**
-     * Listener for Details click events.  Alternates whether the details section
-     * is visible or not.
-     * @author Richard Bair
-     */
-    private final class DetailsClickEvent implements ActionListener {
-
-        /* (non-Javadoc)
-        * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-        */
-        public void actionPerformed(ActionEvent e) {
-            setDetailsVisible(!detailsScrollPane.isVisible());
-        }
-    }
-
+    
+    //------------------------------------------------------- static methods    
+    
     /**
      * Constructs and shows the error dialog for the given exception.  The exceptions message will be the
      * errorMessage, and the stacktrace will be the details.
@@ -432,20 +562,6 @@ public class JXErrorDialog extends JDialog {
         } else {
             dlg = new JXErrorDialog((Frame)window);
         }
-        dlg.setTitle(info.getHeader());
-        dlg.setErrorMessage(info.getBasicErrorMessage());
-        String details = info.getDetailedErrorMessage();
-        if(details == null) {
-            if(info.getErrorException() != null) {
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                info.getErrorException().printStackTrace(pw);
-                details = sw.toString();
-            } else {
-                details = "";
-            }
-        }
-        dlg.setDetails(details);
         dlg.setIncidentInfo(info);
         // If the owner is null applies orientation of the shared 
         // hidden window used as owner.
@@ -464,18 +580,108 @@ public class JXErrorDialog extends JDialog {
      * user clicks on 'Report' button or <code>null</code> if no reporting engine set.
      *
      * @return reporting engine
+     * @deprecated Use <code>getDefaultErrorReporter</code> instead
      */
     public static ErrorReporter getReporter() {
-        return reporter;
+        return DEFAULT_REPORTER;
     }
 
     /**
      * Set reporting engine which will handle error reporting if user clicks 'report' button.
      *
      * @param rep <code>ErrorReporter</code> to be used or <code>null</code> to turn reporting facility off.
+     * @deprecated Use <code>setDefaultErrorReporter</code> instead
      */
     public static void setReporter(ErrorReporter rep) {
-        reporter = rep;
+        DEFAULT_REPORTER = rep;
+    }
+    
+    /**
+     * Returns the current reporting engine that will be used to report a problem if
+     * user clicks on 'Report' button or <code>null</code> if no reporting engine set.
+     *
+     * @return reporting engine
+     */
+    public static ErrorReporter getDefaultErrorReporter() {
+        return DEFAULT_REPORTER;
+    }
+    
+    /**
+     * Set reporting engine which will handle error reporting if user clicks 'report' button.
+     *
+     * @param rep <code>ErrorReporter</code> to be used or <code>null</code> to turn reporting facility off.
+     */
+    public static void setDefaultErrorReporter(ErrorReporter rep) {
+        DEFAULT_REPORTER = rep;
+    }
+    
+    /**
+     * Set the Icon to use as the default error icon for JXErrorDialog
+     * instances. This icon is used whenever the IncidentInfo for a JXErrorDialog
+     * has an errorLevel of Level.SEVERE
+     *
+     * @param icon the Icon to use as the default error icon
+     */
+    public static void setDefaultErrorIcon(Icon icon) {
+        DEFAULT_ERROR_ICON = icon;
+    }
+    
+    /**
+     * @return the default error icon
+     */
+    public static Icon getDefaultErrorIcon() {
+        return DEFAULT_ERROR_ICON;
+    }
+    
+    /**
+     * Set the Icon to use as the default warning icon for JXErrorDialog
+     * instances. This icon is used whenever the IncidentInfo for a JXErrorDialog
+     * has an errorLevel that is not Level.SEVERE
+     *
+     * @param icon the Icon to use as the default warning icon
+     */
+    public static void setDefaultWarningIcon(Icon icon) {
+        DEFAULT_WARNING_ICON = icon;
+    }
+    
+    /**
+     * @return the default warning icon
+     */
+    public static Icon getDefaultWarningIcon() {
+        return DEFAULT_WARNING_ICON;
+    }
+    
+    //------------------------------------------------ actions/inner classes    
+    
+    /**
+     * Listener for Ok button click events
+     * @author Richard Bair
+     */
+    private final class OkClickEvent implements ActionListener {
+
+        /* (non-Javadoc)
+        * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+        */
+        public void actionPerformed(ActionEvent e) {
+            //close the window
+            setVisible(false);
+            dispose();
+        }
+    }
+
+    /**
+     * Listener for Details click events.  Alternates whether the details section
+     * is visible or not.
+     * @author Richard Bair
+     */
+    private final class DetailsClickEvent implements ActionListener {
+
+        /* (non-Javadoc)
+        * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+        */
+        public void actionPerformed(ActionEvent e) {
+            setDetailsVisible(!detailsScrollPane.isVisible());
+        }
     }
 
     /**
@@ -484,17 +690,17 @@ public class JXErrorDialog extends JDialog {
     public class ReportAction extends AbstractAction {
 
         public boolean isEnabled() {
-            return (getReporter() != null);
+            return (getErrorReporter() != null);
         }
 
         public void actionPerformed(ActionEvent e) {
-            getReporter().reportIncident(getIncidentInfo());
+            getErrorReporter().reportIncident(getIncidentInfo());
         }
 
         public Object getValue(String key) {
             if(key == Action.NAME) {
-                if(getReporter() != null && getReporter().getActionName() != null) {
-                    return getReporter().getActionName();
+                if(getErrorReporter() != null && getErrorReporter().getActionName() != null) {
+                    return getErrorReporter().getActionName();
                 } else {
                     return UIManager.getString(CLASS_NAME + ".report_button_text");
                 }

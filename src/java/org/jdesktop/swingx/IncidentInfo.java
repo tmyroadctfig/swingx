@@ -28,6 +28,8 @@
  */
 package org.jdesktop.swingx;
 
+import java.util.logging.Level;
+
 public class IncidentInfo {
     /**
      * Short string that will be used as a error header
@@ -47,6 +49,10 @@ public class IncidentInfo {
      * additional information
      */
     private Throwable errorException;
+    /**
+     * Used to specify how bad this error was.
+     */
+    private Level errorLevel;
 
     /**
      * Main constructor that adds all the information to <code>IncidentInfo</code>
@@ -71,6 +77,7 @@ public class IncidentInfo {
         }
         this.detailedErrorMessage = detailedErrorMessage;
         this.errorException = errorException;
+        this.errorLevel = Level.SEVERE;
     }
 
     /**
@@ -164,10 +171,30 @@ public class IncidentInfo {
      * Set the exception that may contain additional information about the
      * error.
      *
-     * @param errorException new <code>Throwable</code> ot <code>null</code>
+     * @param errorException new <code>Throwable</code> or <code>null</code>
      *        if there is no <code>Throwable</code> related to this error
      */
     public void setErrorException(Throwable errorException) {
         this.errorException = errorException;
+    }
+    
+    /**
+     * Returns the severity of the Error. This defaults to Level.SEVERE, but
+     * may be specified via setErrorLevel
+     *
+     * @return the Level. This will never be null
+     */
+    public Level getErrorLevel() {
+        return errorLevel;
+    }
+    
+    /**
+     * Sets the error level for this IncidentInfo
+     *
+     * @param errorLevel any Level (Level.SEVERE, Level.WARNING, etc). If null,
+     *        then the level will be set to SEVERE.
+     */
+    public void setErrorLevel(Level errorLevel) {
+        this.errorLevel = errorLevel == null ? Level.SEVERE : errorLevel;
     }
 }
