@@ -29,6 +29,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Window;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.PrintWriter;
@@ -42,10 +44,12 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import org.jdesktop.swingx.util.WindowUtils;
 
@@ -115,9 +119,9 @@ public class JXErrorDialog extends JDialog {
      */
     private EqualSizeJButton detailButton;
     /**
-     * details scroll pane
+     * details panel
      */
-    private JScrollPane detailsScrollPane;
+    private JXPanel detailsPanel;
     /**
      * label used to display the warning/error icon
      */
@@ -364,19 +368,39 @@ public class JXErrorDialog extends JDialog {
 
         details = new JXEditorPane();
         details.setContentType("text/html");
-        detailsScrollPane = new JScrollPane(details);
+        details.setTransferHandler(new DetailsTransferHandler());
+        JScrollPane detailsScrollPane = new JScrollPane(details);
         detailsScrollPane.setPreferredSize(new Dimension(300, 200));
         detailsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         details.setEditable(false);
+        detailsPanel = new JXPanel(new GridBagLayout());
+        detailsPanel.add(detailsScrollPane, new GridBagConstraints(0,0,1,1,1.0,1.0,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(6,11,11,11),0,0));
         gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridwidth = 4;
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.weighty = 1.0;
-        gbc.insets = new Insets(6, 11, 11, 11);
-        this.getContentPane().add(detailsScrollPane, gbc);
+        this.getContentPane().add(detailsPanel, gbc);
 
+        JButton button = new JButton(UIManager.getString(CLASS_NAME + ".copy_to_clipboard_button_text"));
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                details.copy();
+            }
+        });
+        gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.LINE_END;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.gridwidth = 1;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weighty = 0.0;
+        gbc.weightx = 1.0;
+        gbc.insets = new Insets(6, 11, 11, 11);
+        detailsPanel.add(button, gbc);
+        
+        
         //make the buttons the same size
         EqualSizeJButton[] buttons = new EqualSizeJButton[] {
                 detailButton, okButton, reportButton };
@@ -419,9 +443,9 @@ public class JXErrorDialog extends JDialog {
      */
     private void setDetailsVisible(boolean b) {
         if (b) {
-            detailsScrollPane.setVisible(true);
+            detailsPanel.setVisible(true);
             detailButton.setText(UIManager.getString(CLASS_NAME + ".details_contract_text"));
-            detailsScrollPane.applyComponentOrientation(detailButton.getComponentOrientation());
+            detailsPanel.applyComponentOrientation(detailButton.getComponentOrientation());
             
             // workaround for bidi bug, if the text is not set "again" and the component orientation has changed
             // then the text won't be aligned correctly. To reproduce this (in JDK 1.5) show two dialogs in one
@@ -432,7 +456,7 @@ public class JXErrorDialog extends JDialog {
             details.setText(details.getText());
             details.setCaretPosition(0);
         } else {
-            detailsScrollPane.setVisible(false);
+            detailsPanel.setVisible(false);
             detailButton.setText(UIManager.getString(CLASS_NAME + ".details_expand_text"));
             // Trick to force errorMessage JTextArea to resize according
             // to its columns property.
@@ -480,7 +504,7 @@ public class JXErrorDialog extends JDialog {
                     html.append(incidentInfo.getErrorLevel());
                     html.append("</p><p><b>Message</b> <u>");
                     html.append(incidentInfo.getErrorException().getLocalizedMessage());
-                    html.append("</u></p><p><b>Stack Trace</b><br>");
+                    html.append("</u></p><p><b>Stack Trace</b><p>");
                     for (StackTraceElement el : incidentInfo.getErrorException().getStackTrace()) {
                         html.append("&nbsp;&nbsp;&nbsp;&nbsp;");
                         html.append(el.toString());
@@ -692,7 +716,7 @@ public class JXErrorDialog extends JDialog {
         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
         */
         public void actionPerformed(ActionEvent e) {
-            setDetailsVisible(!detailsScrollPane.isVisible());
+            setDetailsVisible(!detailsPanel.isVisible());
         }
     }
 
@@ -776,6 +800,27 @@ public class JXErrorDialog extends JDialog {
             }
             
             return new Dimension(width, height);
+        }
+        
+    }
+    
+    /**
+     * Returns the text as non-HTML in a COPY operation, and disabled CUT/PASTE
+     * operations for the Details pane.
+     */
+    private final class DetailsTransferHandler extends TransferHandler {
+        protected Transferable createTransferable(JComponent c) {
+            String text = details.getSelectedText();
+            if (text == null || text.equals("")) {
+                details.selectAll();
+                text = details.getSelectedText();
+                details.select(-1, -1);
+            }
+            return new StringSelection(text);
+        }
+
+        public int getSourceActions(JComponent c) {
+            return TransferHandler.COPY;
         }
         
     }
