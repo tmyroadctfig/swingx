@@ -172,12 +172,12 @@ public class JXTableIssues extends InteractiveTestCase {
         assertEquals("view row coordinate equals model row coordinate", 
                 table.getModel().getValueAt(0, 0), originalFirstRowValue);
         // sort first column - actually does not change anything order 
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         // sanity asssert
         assertEquals("view order must be unchanged ", 
                 table.getValueAt(0, 0), originalFirstRowValue);
         // invert sort
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         // sanity assert
         assertEquals("view order must be reversed changed ", 
                 table.getValueAt(0, 0), originalLastRowValue);

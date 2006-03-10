@@ -41,27 +41,19 @@ import org.jdesktop.swingx.decorator.RolloverHighlighter;
 import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
 
 public class JXTreeVisualCheck extends JXTreeUnitTest {
+
     /**
      * visualize editing of the hierarchical column, both
      * in a tree and a xTree switching CO.
      *
+     * standard editor
      */
     public void interactiveTreeEditingRToL() {
         JTree tree =  new JTree(); 
         tree.setEditable(true);
-        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
-        tree.setCellRenderer(renderer);
-        tree.setCellEditor(new DefaultXTreeCellEditor(tree, renderer));
         JXTree xTree = new JXTree();
         xTree.setEditable(true);
-        TreeCellRenderer xRenderer = xTree.getCellRenderer();
-        if (xRenderer instanceof JXTree.DelegatingRenderer) {
-            TreeCellRenderer delegate = ((JXTree.DelegatingRenderer) xRenderer).getDelegateRenderer();
-            if (delegate instanceof DefaultTreeCellRenderer) { 
-                xTree.setCellEditor(new DefaultXTreeCellEditor(xTree, (DefaultTreeCellRenderer) delegate));
-            }   
-        }
-        final JXFrame frame = wrapWithScrollingInFrame(tree, xTree, "Editing: compare tree and xtree");
+        final JXFrame frame = wrapWithScrollingInFrame(tree, xTree, "standard Editing: compare tree and xtree");
         Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
 
             public void actionPerformed(ActionEvent e) {
@@ -80,6 +72,50 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
         frame.setVisible(true);
         
     }
+
+
+
+    /**
+     * visualize editing of the hierarchical column, both
+     * in a tree and a xTree switching CO.
+     * using DefaultXTreeCellEditor.
+     */
+    public void interactiveXTreeEditingRToL() {
+        JTree tree =  new JTree(); 
+        tree.setEditable(true);
+        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
+        tree.setCellRenderer(renderer);
+        tree.setCellEditor(new DefaultXTreeCellEditor(tree, renderer));
+        JXTree xTree = new JXTree();
+        xTree.setEditable(true);
+        TreeCellRenderer xRenderer = xTree.getCellRenderer();
+        if (xRenderer instanceof JXTree.DelegatingRenderer) {
+            TreeCellRenderer delegate = ((JXTree.DelegatingRenderer) xRenderer).getDelegateRenderer();
+            if (delegate instanceof DefaultTreeCellRenderer) { 
+                xTree.setCellEditor(new DefaultXTreeCellEditor(xTree, (DefaultTreeCellRenderer) delegate));
+            }   
+        }
+        final JXFrame frame = wrapWithScrollingInFrame(tree, xTree, "XEditing: compare tree and xtree");
+        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
+
+            public void actionPerformed(ActionEvent e) {
+                ComponentOrientation current = frame.getComponentOrientation();
+                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
+                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+                } else {
+                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+
+                }
+
+            }
+
+        };
+        addAction(frame, toggleComponentOrientation);
+        frame.setVisible(true);
+        
+    }
+
+
 
     /**
      * Issue ??: Background highlighters not working on JXTree.
@@ -257,7 +293,7 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
     }
 
     public static void main(String[] args) {
-        setSystemLF(true);
+//        setSystemLF(true);
         JXTreeVisualCheck test = new JXTreeVisualCheck();
         try {
 //            test.runInteractiveTests();

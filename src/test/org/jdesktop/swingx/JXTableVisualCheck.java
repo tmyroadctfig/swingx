@@ -80,10 +80,10 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*Multiple.*");
 //          test.runInteractiveTests("interactive.*RToL.*");
 //          test.runInteractiveTests("interactive.*Boolean.*");
-//          test.runInteractiveTests("interactive.*Sorting.*");
+          test.runInteractiveTests("interactive.*Sorting.*");
           
 //          test.runInteractiveTests("interactive.*Column.*");
-        test.runInteractiveTests("interactive.*Viewport.*");
+        test.runInteractiveTests("interactive.*Header.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -99,6 +99,30 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     }
 
 
+    public void interactiveUpdateHeader() {
+        final JXTable table = new JXTable(10, 2);
+        JXFrame frame = wrapWithScrollingInFrame(table, "update header");
+        Action action = new AbstractAction("update headervalue") {
+            int count;
+            public void actionPerformed(ActionEvent e) {
+                table.getColumn(0).setHeaderValue("A" + count++);
+                
+            }
+            
+        };
+        addAction(frame, action);
+        action = new AbstractAction("update column title") {
+            int count;
+            public void actionPerformed(ActionEvent e) {
+                table.getColumnExt(0).setTitle("A" + count++);
+                
+            }
+            
+        };
+        addAction(frame, action);
+        frame.setVisible(true);
+        
+    }
     /**
      * Issue #256-swingx: viewport config.
      *
@@ -391,7 +415,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //            }
 //        };
         final JXTable table = new JXTable(model);
-        table.setSorter(1);
+        table.toggleSortOrder(1);
         JFrame frame = wrapWithScrollingInFrame(table, "locale sorting");
         frame.setVisible(true);
     }   
