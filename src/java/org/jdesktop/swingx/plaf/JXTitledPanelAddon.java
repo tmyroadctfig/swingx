@@ -29,6 +29,8 @@ import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import org.jdesktop.swingx.JXTitledPanel;
+import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
+import org.jdesktop.swingx.plaf.windows.WindowsLookAndFeelAddons;
 
 /**
  * Addon for <code>JXTitledPanel</code>.<br>
@@ -60,9 +62,9 @@ public class JXTitledPanelAddon extends AbstractComponentAddon {
 
     if (isPlastic()) {
       defaults.addAll(Arrays.asList(new Object[] { 
-        "JXTitledPanel.title.foreground", new ColorUIResource(Color.WHITE),
-        "JXTitledPanel.title.darkBackground", new ColorUIResource(Color.GRAY),
-        "JXTitledPanel.title.lightBackground", new ColorUIResource(Color.LIGHT_GRAY),
+        "JXTitledPanel.title.foreground", new ColorUIResource(255, 255, 255),
+        "JXTitledPanel.title.darkBackground", new ColorUIResource(49, 121, 242),
+        "JXTitledPanel.title.lightBackground", new ColorUIResource(198, 211, 247),
       }));
     } else {
       defaults.addAll(Arrays.asList(new Object[] { 
@@ -77,11 +79,6 @@ public class JXTitledPanelAddon extends AbstractComponentAddon {
   protected void addWindowsDefaults(LookAndFeelAddons addon, List<Object> defaults) {
     super.addWindowsDefaults(addon, defaults);
     defaults.addAll(Arrays.asList(new Object[] { 
-        //I'd actually like to use these colors with JGoodies PlaticLookAndFeel, if we had a
-        //mechanism for supporting it (do we?)
-//        "JXTitledPanel.title.foreground", new ColorUIResource(255, 255, 255),
-//        "JXTitledPanel.title.darkBackground", new ColorUIResource(49, 121, 242),
-//        "JXTitledPanel.title.lightBackground", new ColorUIResource(198, 211, 247),
         "JXTitledPanel.title.foreground", UIManager.getColor("InternalFrame.activeTitleForeground"),
         "JXTitledPanel.title.darkBackground", UIManager.getColor("InternalFrame.activeTitleBackground"),
         "JXTitledPanel.title.lightBackground", UIManager.getColor("InternalFrame.inactiveTitleGradient")
