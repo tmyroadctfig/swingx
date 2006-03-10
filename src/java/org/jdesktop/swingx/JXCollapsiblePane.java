@@ -184,18 +184,26 @@ public class JXCollapsiblePane extends JPanel {
    * manager.
    */
   public JXCollapsiblePane() {
-    super.setLayout(new BorderLayout(0, 0));
-
-    JPanel panel = new JPanel();
-    panel.setLayout(new VerticalLayout(2));
-    setContentPane(panel);
-
-    animator = new AnimationListener();
-    setAnimationParams(new AnimationParams(30, 8, 0.01f, 1.0f));
-    
-    // add an action to automatically toggle the state of the pane
-    getActionMap().put(TOGGLE_ACTION, new ToggleAction());
+    this(new BorderLayout(0, 0));
   }
+  
+    /**
+     * Constructs a new JXCollapsiblePane with a {@link JPanel} as content pane
+     * and the given LayoutManager
+     */
+    public JXCollapsiblePane(LayoutManager layout) {
+        super(layout);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new VerticalLayout(2));
+        setContentPane(panel);
+
+        animator = new AnimationListener();
+        setAnimationParams(new AnimationParams(30, 8, 0.01f, 1.0f));
+
+        // add an action to automatically toggle the state of the pane
+        getActionMap().put(TOGGLE_ACTION, new ToggleAction());
+    }
 
   /**
    * Toggles the JXCollapsiblePane state and updates its icon based on the
