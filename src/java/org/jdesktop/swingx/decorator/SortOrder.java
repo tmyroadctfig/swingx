@@ -4,6 +4,10 @@
  */
 package org.jdesktop.swingx.decorator;
 
+/**
+ * Encasulates sort state.
+ * @author <a href="mailto:jesse@swank.ca">Jesse Wilson</a>
+ */
 public final class SortOrder {
     public static final SortOrder ASCENDING = new SortOrder("ascending");
     public static final SortOrder DESCENDING = new SortOrder("descending");
