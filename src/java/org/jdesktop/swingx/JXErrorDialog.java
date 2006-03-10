@@ -50,7 +50,7 @@ import javax.swing.UIManager;
 import org.jdesktop.swingx.util.WindowUtils;
 
 /**
- * Common Error Dialog, suitable for representing information about 
+ * <p>Common Error Dialog, suitable for representing information about 
  * errors and exceptions happened in application. The common usage of the 
  * <code>JXErrorDialog</code> is to show collected data about the incident and 
  * probably ask customer for a feedback. The data about the incident consists 
@@ -58,25 +58,44 @@ import org.jdesktop.swingx.util.WindowUtils;
  * description of the problem that will be immediately seen after dialog is 
  * became visible, full description of the problem which will be visible after
  * user clicks "Details" button and Throwable that contains stack trace and
- * another usable information that may be displayed in the dialog.<p>
+ * another usable information that may be displayed in the dialog.</p>
  *
- * To ask user for feedback extend abstract class <code>ErrorReporter</code> and
+ * <p>There are two basic ways to use the JXErrorDialog. The first is to call one
+ * of the standard static methods for displaying the error dialog. Here is a
+ * basic example:<br/>
+ * <pre><code>
+ *      try {
+ *          //do some work
+ *          //some exception is thrown
+ *      } catch (Exception e) {
+ *          JXErrorDialog.showDialog(this, "Critical Error", 
+ *                  "&lt;html&gt;&lt;body&gt;Some &lt;b&gt;critical error&lt;/b&gt; has occured." +
+ *                  " You may need to restart this application. Message #SC21." +
+ *                  "&lt;/body&gt;&lt;/html&gt;", e);
+ *      }
+ * </code></pre></p>
+ *
+ * <p>For the vast majority of use cases, the static methods should be sufficient and
+ * are recommended. However, for those few use cases requireing customizations, you
+ * can create and display a JXErrorDialog manually.</p>
+ *
+ * <p>To ask user for feedback extend abstract class <code>ErrorReporter</code> and
  * set your reporter using <code>setReporter</code> method. Report button will 
  * be added to the dialog automatically.<br>
  * See {@link MailErrorReporter MailErrorReporter} documentation for the
- * example of error reporting usage.<p>
-
- * For example, to show simple <code>JXErrorDialog</code> call <br>
+ * example of error reporting usage.</p>
+ *
+ * <p>For example, to show simple <code>JXErrorDialog</code> call <br>
  * <code>JXErrorDialog.showDialog(null, "Application Error", 
  *   "The application encountered the unexpected error,
- *    please contact developers")</code>
+ *    please contact developers")</code></p>
  *
  * <p>Internationalization is handled via a resource bundle or via the UIManager
  * bidi orientation (usefull for right to left languages) is determined in the 
  * same way as the JOptionPane where the orientation of the parent component is
  * picked. So when showDialog(Component cmp, ...) is invoked the component 
- * orientation of the error dialog will match the component orientation of cmp.
-
+ * orientation of the error dialog will match the component orientation of cmp.</p>
+ *
  * @author Richard Bair
  * @author Alexander Zuev
  * @author Shai Almog
