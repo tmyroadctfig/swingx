@@ -171,6 +171,18 @@ public class JXErrorDialog extends JDialog {
      */
     private Icon warningIcon = DEFAULT_WARNING_ICON;
 
+    //------------------------------------------------------ private helpers
+    /**
+     * The height of the window when collapsed. This value is stashed when the
+     * dialog is expanded
+     */
+    private int collapsedHeight = 0;
+    /**
+     * The height of the window when last expanded. This value is stashed when
+     * the dialog is collapsed
+     */
+    private int expandedHeight = 0;
+    
     //------------------------------------------------- static configuration    
     
     /**
@@ -349,7 +361,9 @@ public class JXErrorDialog extends JDialog {
         gbc.gridwidth = 3;
         gbc.gridx = 1;
         gbc.weightx = 0.0;
-        gbc.weighty = 0.0;
+        gbc.weighty = 0.00001; //ensures that when details is hidden, it get all
+                               //the extra space, but none when details is shown
+                               //(unless you have a REALLY BIG MONITOR
         gbc.insets = new Insets(24, 0, 0, 11);
         this.getContentPane().add(errorMessage, gbc);
 
@@ -385,8 +399,7 @@ public class JXErrorDialog extends JDialog {
         details.setContentType("text/html");
         details.setTransferHandler(new DetailsTransferHandler());
         JScrollPane detailsScrollPane = new JScrollPane(details);
-        detailsScrollPane.setPreferredSize(new Dimension(300, 200));
-        detailsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        detailsScrollPane.setPreferredSize(new Dimension(10, 250));
         details.setEditable(false);
         detailsPanel = new JXPanel(new GridBagLayout());
         detailsPanel.add(detailsScrollPane, new GridBagConstraints(0,0,1,1,1.0,1.0,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(6,11,11,11),0,0));
@@ -458,6 +471,8 @@ public class JXErrorDialog extends JDialog {
      */
     private void setDetailsVisible(boolean b) {
         if (b) {
+            collapsedHeight = getHeight();
+            setSize(getWidth(), expandedHeight == 0 ? collapsedHeight + 300 : expandedHeight);
             detailsPanel.setVisible(true);
             detailButton.setText(UIManager.getString(CLASS_NAME + ".details_contract_text"));
             detailsPanel.applyComponentOrientation(detailButton.getComponentOrientation());
@@ -471,15 +486,16 @@ public class JXErrorDialog extends JDialog {
             details.setText(details.getText());
             details.setCaretPosition(0);
         } else {
+            expandedHeight = getHeight();
             detailsPanel.setVisible(false);
             detailButton.setText(UIManager.getString(CLASS_NAME + ".details_expand_text"));
             // Trick to force errorMessage JTextArea to resize according
             // to its columns property.
             errorMessage.setSize( 0, 0 );
             errorMessage.setSize( errorMessage.getPreferredSize() );
+            setSize(getWidth(), collapsedHeight);
         }
 
-        pack();
         repaint();
     }
 
@@ -535,6 +551,15 @@ public class JXErrorDialog extends JDialog {
             }
             setDetails(details);
         }
+        
+        //set the preferred width of the message area
+        //the preferred width should not exceed 500 pixels, or be less than 300 pixels
+        Dimension prefSize = errorMessage.getPreferredSize();
+        prefSize.width = Math.min(500, prefSize.width);
+        prefSize.width = Math.max(300, prefSize.width);
+        errorMessage.setSize(prefSize);
+        prefSize.height = errorMessage.getPreferredSize().height;
+        errorMessage.setPreferredSize(prefSize);
     }
     
     //------------------------------------------------------- static methods    
