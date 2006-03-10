@@ -56,7 +56,7 @@ import javax.swing.SwingUtilities;
  *
  * <p>Images to be displayed can be set based on URL, Image, etc.
  *
- * @author unattributed, rbair
+ * @author rbair
  */
 public class JXImagePanel extends JXPanel {
     public static enum Style {CENTERED, TILED, SCALED};
@@ -236,9 +236,7 @@ public class JXImagePanel extends JXPanel {
                     break;
                 case TILED:
                 case SCALED:
-                    Image temp = img.getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH);
-                    g2.drawImage(temp, (getWidth() - temp.getWidth(null)) / 2,
-                            (getHeight() - temp.getHeight(null)) / 2, null);
+                      g2.drawImage(img, 0, 0, getWidth(), getHeight(), null);
                     break;
                 default:
                     LOG.fine("unimplemented");
