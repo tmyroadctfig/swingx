@@ -16,7 +16,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
+import java.awt.event.MouseEvent;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -44,7 +44,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
-import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.JXTableHeader.SortGestureRecognizer;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.ConditionalHighlighter;
@@ -80,7 +80,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*Multiple.*");
 //          test.runInteractiveTests("interactive.*RToL.*");
 //          test.runInteractiveTests("interactive.*Boolean.*");
-          test.runInteractiveTests("interactive.*Sorting.*");
+          test.runInteractiveTests("interactive.*Sort.*");
           
 //          test.runInteractiveTests("interactive.*Column.*");
         test.runInteractiveTests("interactive.*Header.*");
@@ -98,7 +98,48 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         setSystemLF(true);
     }
 
+    /**
+     * Issue #271-swingx: make sort triggering mouseEvents
+     * customizable.
+     * 
+     * added SortGestureRecognizer.
+     *
+     */
+    public void interactiveSortGestureRecognizer() {
+        final JXTable table = new JXTable(10, 2);
+        JXFrame frame = wrapWithScrollingInFrame(table, "Sort Gesture customization");
+        Action action = new AbstractAction("toggle default/custom recognizer") {
+            boolean hasCustom;
+            public void actionPerformed(ActionEvent e) {
+                SortGestureRecognizer recognizer = null;
+                if (!hasCustom) {
+                    hasCustom = !hasCustom;
+                    recognizer = new SortGestureRecognizer() {
 
+                        @Override
+                        public boolean isSortOrderGesture(MouseEvent e) {
+                            return e.getClickCount() <= 2;
+                        }
+                        
+                    };
+                }
+                ((JXTableHeader) table.getTableHeader()).setSortGestureRecognizer(recognizer);
+                
+            }
+            
+        };
+        addAction(frame, action);
+        frame.setVisible(true);
+        
+    }
+   
+
+    /**
+     * Issue #281-swingx: header should be auto-repainted on changes to
+     * header title, value.
+     * 
+     *
+     */
     public void interactiveUpdateHeader() {
         final JXTable table = new JXTable(10, 2);
         JXFrame frame = wrapWithScrollingInFrame(table, "update header");

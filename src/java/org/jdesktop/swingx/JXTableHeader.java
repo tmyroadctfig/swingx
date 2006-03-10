@@ -49,6 +49,8 @@ import org.jdesktop.swingx.table.ColumnHeaderRenderer;
  */
 public class JXTableHeader extends JTableHeader {
 
+    private SortGestureRecognizer sortGestureRecognizer;
+
     public JXTableHeader() {
         super();
     }
@@ -114,6 +116,37 @@ public class JXTableHeader extends JTableHeader {
         return ColumnHeaderRenderer.createColumnHeaderRenderer();
     }
 
+    /**
+     * Lazily creates and returns the SortGestureRecognizer.
+     * 
+     * @return the SortGestureRecognizer used in Headerlistener.
+     */
+    public SortGestureRecognizer getSortGestureRecognizer() {
+        if (sortGestureRecognizer == null) {
+            sortGestureRecognizer = createSortGestureRecognizer();
+        }
+        return sortGestureRecognizer;
+        
+    }
+    
+    /**
+     * Set the SortGestureRecognizer for use in the HeaderListener.
+     * 
+     * @param recognizer the recognizer to use in HeaderListener.
+     */
+    public void setSortGestureRecognizer(SortGestureRecognizer recognizer) {
+        this.sortGestureRecognizer = recognizer;
+    }
+    
+    /**
+     * creates and returns the default SortGestureRecognizer.
+     * @return the SortGestureRecognizer used in Headerlistener.
+     * 
+     */
+    protected SortGestureRecognizer createSortGestureRecognizer() {
+        return new SortGestureRecognizer();
+    }
+
     protected void installHeaderListener() {
         if (headerListener == null) {
             headerListener = new HeaderListener();
@@ -154,18 +187,19 @@ public class JXTableHeader extends JTableHeader {
 
         private void doSort(MouseEvent e) {
             JXTable table = getXTable();
-            if (!table.isSortable() || (e.getClickCount() != 1))
+            if (!table.isSortable())
                 return;
-            if ((e.getModifiersEx() & MouseEvent.SHIFT_DOWN_MASK) == MouseEvent.SHIFT_DOWN_MASK) {
+            if (getSortGestureRecognizer().isResetSortOrderGesture(e)) {
                 table.resetSortOrder();
-            } else {
+                repaint();
+            } else if (getSortGestureRecognizer().isToggleSortOrderGesture(e)){
                 int column = columnAtPoint(e.getPoint());
                 if (column >= 0) {
                     table.toggleSortOrder(column);
                 }
                 uncacheResizingColumn();
+                repaint();
             }
-            repaint();
 
         }
 
@@ -190,7 +224,7 @@ public class JXTableHeader extends JTableHeader {
         }
 
         private void cacheResizingColumn(MouseEvent e) {
-            if (e.getClickCount() != 1)
+            if (!getSortGestureRecognizer().isSortOrderGesture(e))
                 return;
             TableColumn column = getResizingColumn();
             if (column != null) {
@@ -220,5 +254,29 @@ public class JXTableHeader extends JTableHeader {
         public void mouseMoved(MouseEvent e) {
         }
     }
+
+    /**
+     * Encapsulates decision about which MouseEvents should
+     * trigger which sort events.
+     * 
+     */
+    public static class SortGestureRecognizer {
+        public boolean isResetSortOrderGesture(MouseEvent e) {
+            return isSortOrderGesture(e) && isResetModifier(e);
+        }
+
+        protected boolean isResetModifier(MouseEvent e) {
+            return ((e.getModifiersEx() & MouseEvent.SHIFT_DOWN_MASK) == MouseEvent.SHIFT_DOWN_MASK);
+        }
+        
+        public boolean isToggleSortOrderGesture(MouseEvent e) {
+            return isSortOrderGesture(e) && !isResetModifier(e);
+        }
+        
+        public boolean isSortOrderGesture(MouseEvent e) {
+            return e.getClickCount() == 1;
+        }
+    }
+
 
 }
