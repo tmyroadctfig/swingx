@@ -115,11 +115,31 @@ public class JXTableVisualCheck extends JXTableUnitTest {
                 if (!hasCustom) {
                     hasCustom = !hasCustom;
                     recognizer = new SortGestureRecognizer() {
-
+                        /**
+                         * allow double clicks to trigger a sort.
+                         */
                         @Override
                         public boolean isSortOrderGesture(MouseEvent e) {
                             return e.getClickCount() <= 2;
                         }
+
+                        /**
+                         * Disable reset gesture.
+                         */
+                        @Override
+                        public boolean isResetSortOrderGesture(MouseEvent e) {
+                            return false;
+                        }
+
+                        /**
+                         * ignore modifiers.
+                         */
+                        @Override
+                        public boolean isToggleSortOrderGesture(MouseEvent e) {
+                            return isSortOrderGesture(e);
+                        }
+                        
+                        
                         
                     };
                 }
