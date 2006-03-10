@@ -30,6 +30,7 @@ import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 import java.lang.reflect.Method;
 import java.util.Vector;
+import org.jdesktop.swingx.*;
 
 /**
  * BeanInfo class for JXTaskPane.

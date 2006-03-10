@@ -26,6 +26,7 @@ import java.beans.EventSetDescriptor;
 import java.beans.MethodDescriptor;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
+import org.jdesktop.swingx.*;
 
 /**
  * @author rbair

@@ -23,38 +23,41 @@ package org.jdesktop.swingx;
 import java.awt.Image;
 import java.beans.BeanDescriptor;
 import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.MethodDescriptor;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 import java.lang.reflect.Method;
 import java.util.Vector;
+import org.jdesktop.swingx.*;
 
 /**
- * BeanInfo class for JXTaskPaneContainer.
+ * BeanInfo class for JXCollapsiblePane.
  */
-public class JXTaskPaneContainerBeanInfo extends SimpleBeanInfo
+public class JXCollapsiblePaneBeanInfo extends SimpleBeanInfo
 {
    /** Description of the Field */
-   protected BeanDescriptor bd = new BeanDescriptor(org.jdesktop.swingx.JXTaskPaneContainer.class);
+   protected BeanDescriptor bd = new BeanDescriptor(JXCollapsiblePane.class);
    /** Description of the Field */
-   protected Image iconMono16 = loadImage("resources/JXTaskPaneContainer16-mono.gif");
+   protected Image iconMono16;
    /** Description of the Field */
-   protected Image iconColor16 = loadImage("resources/JXTaskPaneContainer16.gif");
+   protected Image iconColor16;
    /** Description of the Field */
-   protected Image iconMono32 = loadImage("resources/JXTaskPaneContainer32-mono.gif");
+   protected Image iconMono32;
    /** Description of the Field */
-   protected Image iconColor32 = loadImage("resources/JXTaskPaneContainer32.gif");
+   protected Image iconColor32;
 
-   /** Constructor for the JXTaskPaneContainerBeanInfo object */
-   public JXTaskPaneContainerBeanInfo() throws java.beans.IntrospectionException
+   /** Constructor for the JXCollapsiblePaneBeanInfo object */
+   public JXCollapsiblePaneBeanInfo() throws java.beans.IntrospectionException
    {
    	// setup bean descriptor in constructor. 
-       bd.setName("JXTaskPaneContainer");
+       bd.setName("JXCollapsiblePane");
 
-       bd.setShortDescription("A component that contains JXTaskPanes.");
+       bd.setShortDescription("A pane which hides its content with an animation.");
 
        bd.setValue("isContainer",Boolean.TRUE);
+       bd.setValue("containerDelegate","getContentPane");
 
        BeanInfo info = Introspector.getBeanInfo(getBeanDescriptor().getBeanClass().getSuperclass());
        String order = info.getBeanDescriptor().getValue("propertyorder") == null ? "" : (String) info.getBeanDescriptor().getValue("propertyorder");
@@ -80,7 +83,7 @@ public class JXTaskPaneContainerBeanInfo extends SimpleBeanInfo
       BeanInfo[] biarr = null;
       try
       {
-         for (Class cl = org.jdesktop.swingx.JXTaskPaneContainer.class.getSuperclass(); !cl.equals(java.awt.Component.class.getSuperclass()); cl = cl.getSuperclass()) {
+         for (Class cl = JXCollapsiblePane.class.getSuperclass(); !cl.equals(java.awt.Component.class.getSuperclass()); cl = cl.getSuperclass()) {
             bi.addElement(Introspector.getBeanInfo(cl));
          }
          biarr = new BeanInfo[bi.size()];
@@ -165,11 +168,40 @@ public class JXTaskPaneContainerBeanInfo extends SimpleBeanInfo
          Vector descriptors = new Vector();
          PropertyDescriptor descriptor = null;
 
+         try
+         {
+            descriptor = new PropertyDescriptor("animated", JXCollapsiblePane.class);
+         }
+         catch (IntrospectionException e)
+         {
+            descriptor = new PropertyDescriptor("animated", JXCollapsiblePane.class, "getAnimated", null);
+         }
+
+         descriptor.setPreferred(true);
+
+         descriptor.setBound(true);
+
+         descriptors.add(descriptor);
+         try
+         {
+            descriptor = new PropertyDescriptor("collapsed", JXCollapsiblePane.class);
+         }
+         catch (IntrospectionException e)
+         {
+            descriptor = new PropertyDescriptor("collapsed", JXCollapsiblePane.class, "getCollapsed", null);
+         }
+
+         descriptor.setPreferred(true);
+
+         descriptor.setBound(true);
+
+         descriptors.add(descriptor);
+
          return (PropertyDescriptor[]) descriptors.toArray(new PropertyDescriptor[descriptors.size()]);
       }
       catch (Exception e)
       {
-        // Ignore it
+        // Ignored
       }
       return null;
    }
@@ -186,7 +218,7 @@ public class JXTaskPaneContainerBeanInfo extends SimpleBeanInfo
       Method method;
 
       try {
-         m = Class.forName("org.jdesktop.swingx.JXTaskPaneContainer").getMethods();
+         m = Class.forName("org.jdesktop.swingx.JXCollapsiblePane").getMethods();
       } catch (ClassNotFoundException e) {
          return new MethodDescriptor[0];
       }
