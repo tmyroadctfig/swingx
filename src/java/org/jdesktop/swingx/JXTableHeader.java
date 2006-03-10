@@ -157,11 +157,11 @@ public class JXTableHeader extends JTableHeader {
             if (!table.isSortable() || (e.getClickCount() != 1))
                 return;
             if ((e.getModifiersEx() & MouseEvent.SHIFT_DOWN_MASK) == MouseEvent.SHIFT_DOWN_MASK) {
-                table.resetSorter();
+                table.resetSortOrder();
             } else {
                 int column = columnAtPoint(e.getPoint());
                 if (column >= 0) {
-                    table.setSorter(column);
+                    table.toggleSortOrder(column);
                 }
                 uncacheResizingColumn();
             }

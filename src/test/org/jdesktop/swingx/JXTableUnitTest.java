@@ -45,6 +45,7 @@ import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
+import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.util.AncientSwingTeam;
@@ -82,7 +83,34 @@ public class JXTableUnitTest extends InteractiveTestCase {
         setSystemLF(defaultToSystemLF);
     }
 
-
+    /**
+     * resetSortOrders didn't check for tableHeader != null.
+     * Didn't show up before new sorter api because method was protected and 
+     * only called from JXTableHeader.
+     *
+     */
+    public void testResetSortOrderNPE() {
+        JXTable table = new JXTable(sortableTableModel);
+        table.setTableHeader(null);
+        table.resetSortOrder();
+    }
+    /**
+     * testing new sorter api: 
+     * getSortOrder(), toggleSortOrder, resetSortOrders.
+     *
+     */
+    public void testSortOrder() {
+        JXTable table = new JXTable(sortableTableModel);
+        assertSame(SortOrder.UNSORTED, table.getSortOrder(0));
+        table.toggleSortOrder(0);
+        assertSame(SortOrder.ASCENDING, table.getSortOrder(0));
+        // sanity: other columns uneffected
+        assertSame(SortOrder.UNSORTED, table.getSortOrder(1));
+        table.toggleSortOrder(0);
+        assertSame(SortOrder.DESCENDING, table.getSortOrder(0));
+        table.resetSortOrder();
+        assertSame(SortOrder.UNSORTED, table.getSortOrder(0));
+    }
     /**
      * Issue #256-swingX: viewport - do track height.
      * 
@@ -565,7 +593,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         }
         JXTable table = new JXTable(model);
         int modelRow = table.getRowCount() - 1;
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         // set a selection near the end - will be invalid after filtering
         table.setRowSelectionInterval(modelRow, modelRow);
         model.removeRow(modelRow);
@@ -785,7 +813,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testInteractiveSorterOnModelChange() {
         JXTable table = new JXTable(sortableTableModel);
         int columnCount = table.getColumnCount();
-        table.setSorter(columnCount - 1);
+        table.toggleSortOrder(columnCount - 1);
         table.setModel(new DefaultTableModel(10, columnCount - 1));
         assertEquals(null, table.getFilters().getSorter());
     }
@@ -796,11 +824,11 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     public void testSorterToPipeline() {
         JXTable table = new JXTable(sortableTableModel);
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         TableColumnExt columnX = table.getColumnExt(0);
         assertEquals("interactive sorter must be same as sorter in column", 
                 columnX.getSorter(), table.getFilters().getSorter());
-        table.resetSorter();
+        table.resetSortOrder();
         assertEquals("interactive sorter must be null", null, table.getFilters().getSorter());
     }
     
@@ -811,7 +839,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testSorterAfterColumnRemoved() {
         JXTable table = new JXTable(sortableTableModel);
         TableColumnExt columnX = table.getColumnExt(0);
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         table.removeColumn(columnX);
         assertEquals("sorter must be removed when column removed", null, table.getFilters().getSorter());
         
@@ -824,7 +852,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testSorterAfterColumnHidden() {
         JXTable table = new JXTable(sortableTableModel);
         TableColumnExt columnX = table.getColumnExt(0);
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         columnX.setVisible(false);
         assertEquals("interactive sorter must be same as sorter in column", 
                 columnX.getSorter(), table.getFilters().getSorter());
@@ -912,7 +940,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         String[] columnNames = new String[] { "Critical", "Task" };
         DefaultTableModel model =  new DefaultTableModel(rowData, columnNames);
         final JXTable table = new JXTable(model);
-        table.setSorter(1);
+        table.toggleSortOrder(1);
     }   
     
     /**
@@ -928,7 +956,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         String[] columnNames = new String[] { "Critical", "Task" };
         DefaultTableModel model =  new DefaultTableModel(rowData, columnNames);
         final JXTable table = new JXTable(model);
-        table.setSorter(1);
+        table.toggleSortOrder(1);
     }   
 
     public void testIncrementalSearch() {
@@ -963,9 +991,9 @@ public class JXTableUnitTest extends InteractiveTestCase {
         int rowCount = 20;
         int firstValue = 0;
         JXTable table = new JXTable(createAscendingModel(firstValue, rowCount));
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         // sort descending
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         Object value = table.getValueAt(0, 0);
         assertEquals("highest value", value, firstValue + rowCount - 1);
         PatternFilter filter = new PatternFilter(".*", 0, 0);
@@ -1039,16 +1067,19 @@ public class JXTableUnitTest extends InteractiveTestCase {
     /**
      * Issue #33-swingx: selection not restored after refresh of interactive sorter.
      *
+     *  adjusted to new JXTable sorter api (after the source tag jw_before_rowsorter)
+     *  
      */
     public void testSelectionOnSorterRefresh() {
         JXTable table = new JXTable(createAscendingModel(0, 10));
-        table.setSorter(0);
-        Sorter sorter = table.getSorter(0);
+        table.toggleSortOrder(0);
+        SortOrder sortOrder = table.getSortOrder(0);
         // sanity assert
-        assertTrue(sorter.isAscending());
+        assertTrue(sortOrder.isAscending());
         // select the first row
         table.setRowSelectionInterval(0, 0);
-        sorter.setAscending(false);
+        // reverse sortorder
+        table.toggleSortOrder(0);
         assertEquals("last row must be selected", table.getRowCount() - 1, table.getSelectedRow());
     }
     /**
@@ -1061,11 +1092,11 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JXTable table = new JXTable();
         table.setModel(createAscendingModel(0, 10));
         // sort first column
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         // select last rows
         table.addRowSelectionInterval(table.getRowCount() - 2, table.getRowCount() - 1);
         // invert sort
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         // set model with less rows
         table.setModel(createAscendingModel(0, 8));
         
@@ -1081,11 +1112,11 @@ public class JXTableUnitTest extends InteractiveTestCase {
         DefaultTableModel model = createAscendingModel(0, 10);
         table.setModel(model);
         // sort first column
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         // select last rows
         table.addRowSelectionInterval(table.getRowCount() - 2, table.getRowCount() - 1);
         // invert sort
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         
         Integer highestValue = new Integer(100);
         model.addRow(new Object[] { highestValue });
@@ -1101,9 +1132,9 @@ public class JXTableUnitTest extends InteractiveTestCase {
         DefaultTableModel model = createAscendingModel(0, 10);
         table.setModel(model);
         // sort first column
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         // invert sort
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         // select last row
         int modelLast = table.getRowCount() - 1;
         table.setRowSelectionInterval(modelLast, modelLast);
@@ -1122,11 +1153,11 @@ public class JXTableUnitTest extends InteractiveTestCase {
         DefaultTableModel model = createAscendingModel(0, 10);
         table.setModel(model);
         // sort first column
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         // select last rows
         table.addRowSelectionInterval(table.getRowCount() - 2, table.getRowCount() - 1);
         // invert sort
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         model.removeRow(0);
     }
 
@@ -1136,7 +1167,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         table.setRowHeightEnabled(true);
         int selectedRow = table.getRowCount() - 1;
         table.setRowHeight(selectedRow, 25);
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         assertEquals("last row is individual", 25, table.getRowHeight(selectedRow));
         model.removeRow(0);
         assertEquals("last row is individual", 25, table.getRowHeight(selectedRow - 1));
@@ -1153,7 +1184,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         int selectedRow = table.getRowCount() - 1;
         table.setRowSelectionInterval(selectedRow, selectedRow);
         // set a pipeline
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         assertEquals("last row must be selected", selectedRow, table.getSelectedRow());
         ascendingModel.removeRow(0);
         assertEquals("last row must still be selected after remove be selected", table.getRowCount() - 1, table.getSelectedRow());
@@ -1198,9 +1229,9 @@ public class JXTableUnitTest extends InteractiveTestCase {
         int selectedRow = table.getRowCount() - 1;
         table.setRowSelectionInterval(selectedRow, selectedRow);
         // set a pipeline - ascending, no change
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         // revert order 
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         assertEquals("first row must be selected", 0, table.getSelectedRow());
         // remove row in model coordinates
         Object[] row = new Integer[table.getColumnCount()];
@@ -1220,9 +1251,9 @@ public class JXTableUnitTest extends InteractiveTestCase {
         int selectedRow = table.getRowCount() - 1;
         table.setRowHeight(selectedRow, 25);
         // set a pipeline - ascending, no change
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         // revert order 
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         assertEquals("first row must have indy rowheight", 25, table.getRowHeight(0));
         // remove row in model coordinates
         Object[] row = new Integer[table.getColumnCount()];
@@ -1247,9 +1278,9 @@ public class JXTableUnitTest extends InteractiveTestCase {
         int selectedRow = table.getRowCount() - 1;
         table.setRowSelectionInterval(selectedRow, selectedRow);
         // set a pipeline - ascending, no change
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         // revert order 
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         assertEquals("first row must be selected", 0, table.getSelectedRow());
         // remove row in model coordinates
         ascendingModel.removeRow(0);
@@ -1267,7 +1298,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         int selectedRow = 0;
         table.setRowSelectionInterval(selectedRow, selectedRow);
         // set a pipeline
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         // revert order - fails... track down
 //        table.setSorter(0);
         assertEquals("first row must be selected", selectedRow, table.getSelectedRow());
@@ -1287,9 +1318,9 @@ public class JXTableUnitTest extends InteractiveTestCase {
         int selectedRow = 0;
         table.setRowSelectionInterval(selectedRow, selectedRow);
         // set a pipeline
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         // revert order - fails... track down
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         assertEquals("last row must be selected", table.getRowCount() - 1, table.getSelectedRow());
         ascendingModel.removeRow(selectedRow + 1);
         assertEquals("last row must still be selected after remove", table.getRowCount() - 1, table.getSelectedRow());
@@ -1307,7 +1338,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         int lastSelectedRow = 1;
         table.setRowSelectionInterval(selectedRow, lastSelectedRow);
         // set a pipeline
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         int[] selectedRows = table.getSelectedRows();
         for (int i = selectedRow; i <= lastSelectedRow; i++) {
             assertEquals("row must be selected " + i, i, selectedRows[i]);
@@ -1352,12 +1383,12 @@ public class JXTableUnitTest extends InteractiveTestCase {
         boolean sortable = table.isSortable();
         // sanity assert: sortable defaults to true
         assertTrue("JXTable sortable defaults to true", sortable);
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         Object first = table.getValueAt(0, 0);
         table.setSortable(false);
         assertFalse(table.isSortable());
         // reverse the sorting order on first column
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         assertEquals("sorting on a non-sortable table must do nothing", first, table.getValueAt(0, 0));
     }
     
@@ -1373,7 +1404,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertEquals("rowObject data must be equal", firstInModel.getData1(), table.getValueAt(0, 0));
         assertEquals("rowObject editability must be equal", firstInModel.isEditable(), table.isCellEditable(0, 0));
         // nothing changed
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         Object firstDataValueInTable = table.getValueAt(0,0);
         boolean firstEditableValueInTable = table.isCellEditable(0, 0);
         assertEquals("rowObject data must be equal", firstInModel.getData1(), table.getValueAt(0, 0));
@@ -1384,7 +1415,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertTrue("lastEditability different from first", firstEditableValueInTable !=
             table.isCellEditable(rows - 1, 0));
         // reverse order
-        table.setSorter(0);
+        table.toggleSortOrder(0);
         assertEquals("last row data must be equal to former first", firstDataValueInTable, 
                 table.getValueAt(rows - 1, 0));
         assertEquals("last row editability must be equal to former first", firstEditableValueInTable, 
@@ -1517,10 +1548,10 @@ public class JXTableUnitTest extends InteractiveTestCase {
         // the original bug report in 
         // http://www.javadesktop.org/forums/thread.jspa?messageID=56285
         table.setFilters(createFilterPipeline(false, 1));//new FilterPipeline(new Filter[] {filterA}));
-        table.setSorter(1);
+        table.toggleSortOrder(1);
 //        Filter filterB = new PatternFilter(".*", Pattern.CASE_INSENSITIVE, 1);
         table.setFilters(createFilterPipeline(true, 1)); //new FilterPipeline(new Filter[] {filterB}));
-        table.setSorter(1);
+        table.toggleSortOrder(1);
     }
 
     /**
@@ -1543,11 +1574,11 @@ public class JXTableUnitTest extends InteractiveTestCase {
         // the follow-up bug report in 
         // http://www.javadesktop.org/forums/thread.jspa?messageID=56285
         table.setFilters(createFilterPipeline(false, 1));
-        table.setSorter(0);
-        table.setSorter(1);
+        table.toggleSortOrder(0);
+        table.toggleSortOrder(1);
         table.setFilters(createFilterPipeline(true, 1));
         table.setFilters(createFilterPipeline(false, 1));
-        table.setSorter(0);
+        table.toggleSortOrder(0);
     }
     
     private FilterPipeline createFilterPipeline(boolean matchAll, int col) {
@@ -1589,7 +1620,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         int rows = table.getRowCount();
 //        Filter filterA = new PatternFilter("A.*", Pattern.CASE_INSENSITIVE, 1);
         table.setFilters(createFilterPipeline(false, 1)); //new FilterPipeline(new Filter[] {filterA}));
-        table.setSorter(1);
+        table.toggleSortOrder(1);
         table.setFilters(null);
         assertEquals("rowCount must be original", rows, table.getRowCount());
         table.getValueAt(rows - 1, 0);

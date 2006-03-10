@@ -15,6 +15,32 @@ import junit.framework.TestCase;
 public class SorterTest extends TestCase {
 
     /**
+     * sanity - SortOrders convenience method state.
+     *
+     */
+    public void testSortOrderConvenience() {
+        assertTrue(SortOrder.ASCENDING.isSorted());
+        assertTrue(SortOrder.ASCENDING.isAscending());
+        assertTrue(SortOrder.DESCENDING.isSorted());
+        assertFalse(SortOrder.DESCENDING.isAscending());
+        assertFalse(SortOrder.UNSORTED.isSorted());
+        assertFalse(SortOrder.UNSORTED.isAscending());
+    }
+    /**
+     * test new method sorter.getSortOrder(), must be in synch with 
+     * sorter.isAscending()
+     *
+     */
+    public void testSortOrder() {
+        Sorter sorter = new ShuttleSorter();
+        assertSame(SortOrder.ASCENDING, sorter.getSortOrder());
+        Sorter other = new ShuttleSorter(0, false);
+        assertSame(SortOrder.DESCENDING, other.getSortOrder());
+        other.setAscending(true);
+        assertSame(SortOrder.ASCENDING, other.getSortOrder());
+    }
+    
+    /**
      * Issue #179: make sure to use the correct default collator.
      * 
      */

@@ -39,7 +39,7 @@ import javax.swing.table.TableCellRenderer;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.LabelProperties;
 import org.jdesktop.swingx.border.IconBorder;
-import org.jdesktop.swingx.decorator.Sorter;
+import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.icon.SortArrowIcon;
 import org.jdesktop.swingx.plaf.ColumnHeaderRendererAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
@@ -143,13 +143,12 @@ public class ColumnHeaderRenderer extends JComponent implements TableCellRendere
                 columnIndex);
 
         if ((table instanceof JXTable) && (comp instanceof JComponent)) {
-            // We no longer limit ourselves to a single "currently sorted
-            // column"
-            Sorter sorter = ((JXTable) table).getSorter(columnIndex);
+            
+            SortOrder sortOrder = ((JXTable) table).getSortOrder(columnIndex);
 
             Border border = UIManager.getBorder("TableHeader.cellBorder");
-            if (sorter != null) {
-                iconBorder.setIcon(sorter.isAscending() ? upIcon : downIcon);
+            if (sortOrder.isSorted()) {
+                iconBorder.setIcon(sortOrder.isAscending() ? upIcon : downIcon);
                 Border origBorder = ((JComponent) comp).getBorder();
                 border = new CompoundBorder(origBorder, iconBorder);
                 ((JComponent) comp).setBorder(border);

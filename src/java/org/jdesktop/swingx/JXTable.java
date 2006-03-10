@@ -98,8 +98,8 @@ import org.jdesktop.swingx.decorator.PipelineListener;
 import org.jdesktop.swingx.decorator.SearchHighlighter;
 import org.jdesktop.swingx.decorator.SelectionMapper;
 import org.jdesktop.swingx.decorator.SizeSequenceMapper;
+import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.decorator.Sorter;
-import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
 import org.jdesktop.swingx.icon.ColumnControlIcon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.table.ColumnControlButton;
@@ -1313,7 +1313,7 @@ public class JXTable extends JTable {
         if (sortable == isSortable())
             return;
         this.sortable = sortable;
-        if (!isSortable()) resetSorter();
+        if (!isSortable()) resetSortOrder();
         firePropertyChange("sortable", !sortable, sortable);
     }
 
@@ -1343,10 +1343,12 @@ public class JXTable extends JTable {
      * Used by headerListener.
      * 
      */
-    protected void resetSorter() {
+    public void resetSortOrder() {
         // JW PENDING: think about notification instead of manual repaint.
         setInteractiveSorter(null);
-        getTableHeader().repaint();
+        if (getTableHeader() != null) {
+            getTableHeader().repaint();
+        }
     }
 
     public void columnRemoved(TableColumnModelEvent e) {
@@ -1377,19 +1379,21 @@ public class JXTable extends JTable {
                     return;
             }
             // didn't find a column with the sorter's index - remove
-            resetSorter();
+            resetSortOrder();
         }
     }
 
     /**
      * 
-     * request to sort the column at columnIndex in view coordinates. if there
+     * request to sort the column at columnIndex. If there
      * is already an interactive sorter for this column it's sort order is
      * reversed. Otherwise the columns sorter is used as is.
      * Used by headerListener.
      * 
+     * @param columnIndex the columnIndex in view coordinates.
+     * 
      */
-    protected void setSorter(int columnIndex) {
+    public void toggleSortOrder(int columnIndex) {
         if (!isSortable())
             return;
         Sorter sorter = getInteractiveSorter();
@@ -1409,16 +1413,35 @@ public class JXTable extends JTable {
      * 
      * @param columnIndex the column index in view coordinates.
      * @return the interactive sorter if matches the column or null.
+     * @deprecated use getSortOrder().
      */
-    public Sorter getSorter(int columnIndex) {
+//    public Sorter getSorter(int columnIndex) {
+//        Sorter sorter = getInteractiveSorter();
+//
+//        return sorter == null ? null
+//                : sorter.getColumnIndex() == convertColumnIndexToModel(columnIndex) ? sorter
+//                        : null;
+//    }
+
+
+    /**
+     * Returns the SortOrder of the interactive sorter 
+     * if it is set from the given column.
+     * Used by ColumnHeaderRenderer.getTableCellRendererComponent().
+     * 
+     * @param columnIndex the column index in view coordinates.
+     * @return the interactive sorter's SortOrder if matches the column 
+     *  or SortOrder.UNCHANGED 
+     */
+    public SortOrder getSortOrder(int columnIndex) {
         Sorter sorter = getInteractiveSorter();
 
-        return sorter == null ? null
-                : sorter.getColumnIndex() == convertColumnIndexToModel(columnIndex) ? sorter
-                        : null;
+        return sorter == null ? SortOrder.UNSORTED 
+                : sorter.getColumnIndex() == convertColumnIndexToModel(columnIndex) ? 
+                        sorter.getSortOrder() : SortOrder.UNSORTED;
     }
 
-    
+
 //---------------------- enhanced TableColumn/Model support    
     /**
      * Remove all columns, make sure to include hidden.

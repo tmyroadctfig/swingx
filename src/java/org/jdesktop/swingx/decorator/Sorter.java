@@ -192,6 +192,10 @@ public abstract class Sorter extends Filter {
         refresh();
     }
 
+    public SortOrder getSortOrder() {
+        return isAscending() ? SortOrder.ASCENDING : SortOrder.DESCENDING; 
+    }
+    
     public void toggle() {
         ascending = !ascending;
         refresh();

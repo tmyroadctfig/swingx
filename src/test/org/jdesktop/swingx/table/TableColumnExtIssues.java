@@ -8,11 +8,20 @@ package org.jdesktop.swingx.table;
 
 import junit.framework.TestCase;
 
+import org.jdesktop.swingx.util.PropertyChangeReport;
+
 /**
  * @author Jeanette Winzenburg
  */
 public class TableColumnExtIssues extends TestCase {
 
+    public void testHeaderValueBoundProperty() {
+        TableColumnExt tableColumn = new TableColumnExt();
+        PropertyChangeReport report = new PropertyChangeReport();
+        tableColumn.addPropertyChangeListener(report);
+        tableColumn.setHeaderValue("someheader");
+        assertEquals(1, report.getEventCount("headerValue"));
+    }
     /**
      * Client properties not preserved when cloning.
      *
