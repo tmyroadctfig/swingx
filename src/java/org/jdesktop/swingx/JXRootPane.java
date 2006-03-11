@@ -97,11 +97,11 @@ public class JXRootPane extends JRootPane {
         }
         if (comp instanceof MessageSource) {
             MessageSource source = (MessageSource) comp;
-            source.addMessageListener(statusBar);
+//            source.addMessageListener(statusBar);
         }
         if (comp instanceof ProgressSource) {
             ProgressSource source = (ProgressSource) comp;
-            source.addProgressListener(statusBar);
+//            source.addProgressListener(statusBar);
         }
         if (comp instanceof Container) {
             Component[] comps = ((Container) comp).getComponents();
@@ -117,11 +117,11 @@ public class JXRootPane extends JRootPane {
         }
         if (comp instanceof MessageSource) {
             MessageSource source = (MessageSource) comp;
-            source.removeMessageListener(statusBar);
+//            source.removeMessageListener(statusBar);
         }
         if (comp instanceof ProgressSource) {
             ProgressSource source = (ProgressSource) comp;
-            source.removeProgressListener(statusBar);
+//            source.removeProgressListener(statusBar);
         }
         if (comp instanceof Container) {
             Component[] comps = ((Container) comp).getComponents();
@@ -147,15 +147,15 @@ public class JXRootPane extends JRootPane {
             if (handler == null) {
                 // Create the new mouse handler and register the toolbar
                 // and menu components.
-                handler = new MouseMessagingHandler(this, statusBar);
+//                handler = new MouseMessagingHandler(this, statusBar);
                 if (toolBar != null) {
-                    handler.registerListeners(toolBar.getComponents());
+//                    handler.registerListeners(toolBar.getComponents());
                 }
                 if (menuBar != null) {
-                    handler.registerListeners(menuBar.getSubElements());
+//                    handler.registerListeners(menuBar.getSubElements());
                 }
             } else {
-                handler.setMessageListener(statusBar);
+//                handler.setMessageListener(statusBar);
             }
         }
 
