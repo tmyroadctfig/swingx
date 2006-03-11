@@ -22,8 +22,7 @@ package org.jdesktop.swingx;
 
 import java.beans.PropertyDescriptor;
 import javax.swing.JList;
-import org.jdesktop.swingx.JXList;
-import org.netbeans.modules.jdnc.beaninfo.editors.HighlighterPropertyEditor;
+import org.jdesktop.swingx.editors.HighlighterPropertyEditor;
 
 /**
  *
