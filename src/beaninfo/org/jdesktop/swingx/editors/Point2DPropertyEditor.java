@@ -26,21 +26,21 @@ import java.beans.PropertyEditorSupport;
 
 /**
  *
- * @author rb156199
+ * @author rbair
  */
 public class Point2DPropertyEditor extends PropertyEditorSupport {
-    
+
     /** Creates a new instance of Point2DPropertyEditor */
     public Point2DPropertyEditor() {
     }
-    
-    public Point2D.Double getValue() {
+
+    public Point2D getValue() {
         return (Point2D.Double)super.getValue();
     }
-    
+
     public String getJavaInitializationString() {
-        Point2D.Double point = getValue();
-        return point == null ? "null" : "new java.awt.geom.Point2D.Double(" + point.x + ", " + point.y + ")";
+        Point2D point = getValue();
+        return point == null ? "null" : "new java.awt.geom.Point2D.Double(" + point.getX() + ", " + point.getY() + ")";
     }
 
     public void setAsText(String text) throws IllegalArgumentException {
@@ -61,9 +61,9 @@ public class Point2DPropertyEditor extends PropertyEditorSupport {
         //[]
         //[ ]
         //any other value throws an IllegalArgumentException
-        
+
         String originalParam = text;
-        
+
         if (text != null) {
             //remove any opening or closing brackets
             text = text.replace('[', ' ');
@@ -72,7 +72,7 @@ public class Point2DPropertyEditor extends PropertyEditorSupport {
             //trim whitespace
             text = text.trim();
         }
-        
+
         //test for the simple case
         if (text == null || text.equals("") || text.equals("null")) {
             setValue(null);
@@ -95,10 +95,10 @@ public class Point2DPropertyEditor extends PropertyEditorSupport {
     }
 
     public String getAsText() {
-        Point2D.Double point = getValue();
-        return point == null ? "[]" : "[" + point.x + ", " + point.y + "]";
+        Point2D point = getValue();
+        return point == null ? "[]" : "[" + point.getX() + ", " + point.getY() + "]";
     }
-    
+
     public static void main(String... args) {
         test("[1.5,1.2]");
         test("1.5,1.2]");
@@ -115,16 +115,16 @@ public class Point2DPropertyEditor extends PropertyEditorSupport {
         test("[ ]");
         test("[1.5 1.2]");
     }
-    
+
     private static void test(String input) {
         System.out.print("Input '" + input + "'");
         try {
             Point2DPropertyEditor ed = new Point2DPropertyEditor();
             ed.setAsText(input);
-            Point2D.Double point = ed.getValue();
+            Point2D point = ed.getValue();
             System.out.println(" succeeded: " + point);
         } catch (Exception e) {
             System.out.println(" failed: " + e.getMessage());
         }
     }
-}
+} 
