@@ -240,8 +240,7 @@ public class JXCollapsiblePane extends JPanel {
   }
   
   /**
-   * Sets the content pane of this JXCollapsiblePane. Components must be added
-   * to this content pane, not to the JXCollapsiblePane.
+   * Sets the content pane of this JXCollapsiblePane.
    * 
    * @param contentPanel
    * @throws IllegalArgumentException
