@@ -66,4 +66,8 @@
     nbproject/build-impl.xml file. 
 
     -->
+    <target name="-post-jar">
+        <taskdef name="pack200" classname="com.sun.tools.apache.ant.pack200.Pack200Task" classpath="c:/Program Files/Apache/Ant/lib/Pack200Task.jar" /> 
+        <pack200 src="dist/swingx.jar" destfile="dist/swingx.pack.gz" GZIPOutput="yes" verbose="0" />
+    </target>
 </project>
