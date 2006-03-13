@@ -34,6 +34,11 @@ import org.jdesktop.swingx.event.MessageSourceSupport;
 import org.jdesktop.swingx.event.ProgressListener;
 import org.jdesktop.swingx.event.ProgressSource;
 
+/**
+ * There are several commented out portions of this file. They should be moved
+ * or changed once a "status bean" is implemented that provides the functionality
+ * originally envisioned for the JXRootPane/JXStatusBar coupling
+ */
 public class RootPaneTest extends TestCase {
 
     private Action[] actions;
@@ -83,15 +88,15 @@ public class RootPaneTest extends TestCase {
 	Component[] cs = rootPane.getContentComponents();
 	assertTrue(cs.length == comps.length);
 
-	// Ensure that messages are passed to the
-	// status bar. The PERSISTENT message is sent to the
-	// trailing message location.
-	for (int i = 0; i < comps.length; i++) {
-	    TestComponent comp = comps[i];
-	    comp.sendMessage();
-	    assertEquals(comp.getMessage(), statusBar.getTrailingMessage());
-	}
-
+//	// Ensure that messages are passed to the
+//	// status bar. The PERSISTENT message is sent to the
+//	// trailing message location.
+//	for (int i = 0; i < comps.length; i++) {
+//	    TestComponent comp = comps[i];
+//	    comp.sendMessage();
+//	    assertEquals(comp.getMessage(), statusBar.getTrailingMessage());
+//	}
+//
 	// Remove all components.
 	for (int i = 0; i < comps.length; i++) {
 	    rootPane.removeComponent(comps[i]);
@@ -99,13 +104,13 @@ public class RootPaneTest extends TestCase {
 	cs = rootPane.getContentComponents();
 	assertTrue(cs.length == 0);
 
-	// Ensure that the status bar has been unregistered.
-	statusBar.setTrailingMessage("");
-	for (int i = 0; i < comps.length; i++) {
-	    TestComponent comp = comps[i];
-	    comp.sendMessage();
-	    assertEquals("", statusBar.getTrailingMessage());
-	}
+//	// Ensure that the status bar has been unregistered.
+//	statusBar.setTrailingMessage("");
+//	for (int i = 0; i < comps.length; i++) {
+//	    TestComponent comp = comps[i];
+//	    comp.sendMessage();
+//	    assertEquals("", statusBar.getTrailingMessage());
+//	}
     }
 
     /**
@@ -127,26 +132,26 @@ public class RootPaneTest extends TestCase {
 	Component[] cs = rootPane.getContentComponents();
 	assertTrue(cs.length == 1);
 
-	// The status bar should get all messages send to all
-	// components.
-	for (int i = 0; i < comps.length; i++) {
-	    TestComponent comp = comps[i];
-	    comp.sendMessage();
-	    assertEquals(comp.getMessage(), statusBar.getTrailingMessage());
-	}
+//	// The status bar should get all messages send to all
+//	// components.
+//	for (int i = 0; i < comps.length; i++) {
+//	    TestComponent comp = comps[i];
+//	    comp.sendMessage();
+//	    assertEquals(comp.getMessage(), statusBar.getTrailingMessage());
+//	}
 
 	// Remove the head. There shouldn't be any components.
 	rootPane.removeComponent(comps[HEAD]);
 	cs = rootPane.getContentComponents();
 	assertTrue(cs.length == 0);
 
-	// Ensure that the status bar has been unregistered.
-	statusBar.setTrailingMessage("");
-	for (int i = 0; i < comps.length; i++) {
-	    TestComponent comp = comps[i];
-	    comp.sendMessage();
-	    assertEquals("", statusBar.getTrailingMessage());
-	}
+//	// Ensure that the status bar has been unregistered.
+//	statusBar.setTrailingMessage("");
+//	for (int i = 0; i < comps.length; i++) {
+//	    TestComponent comp = comps[i];
+//	    comp.sendMessage();
+//	    assertEquals("", statusBar.getTrailingMessage());
+//	}
     }
 
     /**
@@ -162,26 +167,26 @@ public class RootPaneTest extends TestCase {
 	JXStatusBar statusBar = new JXStatusBar();
 	rootPane.setStatusBar(statusBar);
 
-	// The status bar should get all messages send to all
-	// components.
-	for (int i = 0; i < comps.length; i++) {
-	    TestComponent comp = comps[i];
-	    comp.sendMessage();
-	    assertEquals(comp.getMessage(), statusBar.getTrailingMessage());
-	}
+//	// The status bar should get all messages send to all
+//	// components.
+//	for (int i = 0; i < comps.length; i++) {
+//	    TestComponent comp = comps[i];
+//	    comp.sendMessage();
+//	    assertEquals(comp.getMessage(), statusBar.getTrailingMessage());
+//	}
 
 	// Change the status bar. Reset the old status bar. It shouldn't get
 	// any messages.
 	rootPane.setStatusBar(new JXStatusBar());
 	assertNotSame(statusBar, rootPane.getStatusBar());
 
-	// Ensure that the status bar has been unregistered.
-	statusBar.setTrailingMessage("");
-	for (int i = 0; i < comps.length; i++) {
-	    TestComponent comp = comps[i];
-	    comp.sendMessage();
-	    assertEquals("", statusBar.getTrailingMessage());
-	}
+//	// Ensure that the status bar has been unregistered.
+//	statusBar.setTrailingMessage("");
+//	for (int i = 0; i < comps.length; i++) {
+//	    TestComponent comp = comps[i];
+//	    comp.sendMessage();
+//	    assertEquals("", statusBar.getTrailingMessage());
+//	}
     }
 
     /**
@@ -209,10 +214,10 @@ public class RootPaneTest extends TestCase {
 	rootPane.setToolBar(toolBar);
 
 	comps = toolBar.getComponents();
-	for (int i = 0; i < comps.length; i++) {
-	    MouseListener[] listeners = comps[i].getMouseListeners();
-	    assertEquals(original[i] + 1, listeners.length);
-	}
+//	for (int i = 0; i < comps.length; i++) {
+//	    MouseListener[] listeners = comps[i].getMouseListeners();
+//	    assertEquals(original[i] + 1, listeners.length);
+//	}
 
 	// the toolbar is replaces. MouseListeners should be unregistered
 	rootPane.setToolBar(new JToolBar());
