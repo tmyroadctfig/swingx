@@ -833,6 +833,18 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
     
     /**
+     * add api to access the sorted column.
+     *
+     */
+    public void testSortedColumn() {
+        JXTable table = new JXTable(sortableTableModel);
+        TableColumnExt columnX = table.getColumnExt(0);
+        table.toggleSortOrder(0);
+        TableColumn sortedColumn = table.getSortedColumn();
+        assertEquals(columnX, sortedColumn);
+        
+    }
+    /**
      * Issue #53-swingx: interactive sorter not removed if column removed.
      *
      */

@@ -27,6 +27,7 @@ import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.Icon;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -37,6 +38,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableColumnModelEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
@@ -80,10 +82,10 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*Multiple.*");
 //          test.runInteractiveTests("interactive.*RToL.*");
 //          test.runInteractiveTests("interactive.*Boolean.*");
-          test.runInteractiveTests("interactive.*Sort.*");
+//          test.runInteractiveTests("interactive.*isable.*");
           
 //          test.runInteractiveTests("interactive.*Column.*");
-        test.runInteractiveTests("interactive.*Header.*");
+        test.runInteractiveTests("interactive.*Sort.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -97,6 +99,37 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         // super has LF specific tests...
         setSystemLF(true);
     }
+
+
+    /**
+     * Expose sorted column. 
+     * Example how to guarantee one column sorted at all times.
+     */
+    public void interactiveAlwaysSorted() {
+        final JXTable table = new JXTable(sortableTableModel) {
+
+            @Override
+            public void columnRemoved(TableColumnModelEvent e) {
+                super.columnRemoved(e);
+                if (!hasVisibleSortedColumn()) {
+                    toggleSortOrder(0);
+                }
+            }
+
+            private boolean hasVisibleSortedColumn() {
+                TableColumn column = getSortedColumn();
+                return ((column instanceof TableColumnExt) 
+                        && ((TableColumnExt) column).isVisible());
+            }
+
+            
+        };
+        table.setColumnControlVisible(true);
+        JXFrame frame = wrapWithScrollingInFrame(table, "Sort Gesture customization");
+        frame.setVisible(true);
+        
+    }
+   
 
     /**
      * Issue #271-swingx: make sort triggering mouseEvents
@@ -591,6 +624,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         frame.setVisible(true);
     }
     
+    
     /** 
      * Issue ??: Column control on changing column model.
      *
@@ -804,6 +838,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
      */
     public void interactiveTestDisabledTableSorting() {
         final JXTable table = new JXTable(sortableTableModel);
+        table.setEnabled(false);
         table.setColumnControlVisible(true);
         Action toggleAction = new AbstractAction("Toggle Enabled") {
 

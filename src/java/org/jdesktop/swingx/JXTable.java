@@ -1323,21 +1323,6 @@ public class JXTable extends JTable {
     }
 
 
-    private void setInteractiveSorter(Sorter sorter) {
-        // this check is for the sake of the very first call after instantiation
-        if (filters == null)
-            return;
-        getFilters().setSorter(sorter);
-
-    }
-
-    private Sorter getInteractiveSorter() {
-        // this check is for the sake of the very first call after instantiation
-        if (filters == null)
-            return null;
-        return getFilters().getSorter();
-    }
-
     /**
      * Removes the interactive sorter.
      * Used by headerListener.
@@ -1348,38 +1333,6 @@ public class JXTable extends JTable {
         setInteractiveSorter(null);
         if (getTableHeader() != null) {
             getTableHeader().repaint();
-        }
-    }
-
-    public void columnRemoved(TableColumnModelEvent e) {
-        // JW - old problem: need access to removed column
-        // to get hold of removed modelIndex
-        // to remove interactive sorter if any
-        // no way
-        // int modelIndex = convertColumnIndexToModel(e.getFromIndex());
-        updateSorterAfterColumnRemoved();
-        super.columnRemoved(e);
-    }
-
-    /**
-     * guarantee that the interactive sorter is removed if its column
-     * is removed.
-     * 
-     */
-    private void updateSorterAfterColumnRemoved() {
-        // bloody hack: get sorter and check if there's a column with it
-        // available
-        Sorter sorter = getInteractiveSorter();
-        if (sorter != null) {
-            int sorterColumn = sorter.getColumnIndex();
-            List columns = getColumns(true);
-            for (Iterator iter = columns.iterator(); iter.hasNext();) {
-                TableColumn column = (TableColumn) iter.next();
-                if (column.getModelIndex() == sorterColumn)
-                    return;
-            }
-            // didn't find a column with the sorter's index - remove
-            resetSortOrder();
         }
     }
 
@@ -1441,6 +1394,70 @@ public class JXTable extends JTable {
                         sorter.getSortOrder() : SortOrder.UNSORTED;
     }
 
+    /**
+     * 
+     * @return the currently interactively sorted TableColumn or null
+     *   if there is not sorter active or if the sorted column index 
+     *   does not correspond to any column in the TableColumnModel.
+     */
+    public TableColumn getSortedColumn() {
+        // bloody hack: get sorter and check if there's a column with it
+        // available
+        Sorter sorter = getInteractiveSorter();
+        if (sorter != null) {
+            int sorterColumn = sorter.getColumnIndex();
+            List columns = getColumns(true);
+            for (Iterator iter = columns.iterator(); iter.hasNext();) {
+                TableColumn column = (TableColumn) iter.next();
+                if (column.getModelIndex() == sorterColumn) {
+                    return column;
+                }
+            }
+        }
+        return null;
+    }
+
+    private void setInteractiveSorter(Sorter sorter) {
+        // this check is for the sake of the very first call after instantiation
+        if (filters == null)
+            return;
+        getFilters().setSorter(sorter);
+
+    }
+
+    private Sorter getInteractiveSorter() {
+        // this check is for the sake of the very first call after instantiation
+        if (filters == null)
+            return null;
+        return getFilters().getSorter();
+    }
+
+    /**
+     * overridden to remove the interactive sorter if the
+     * sorted column is no longer contained in the ColumnModel.
+     */
+    @Override
+    public void columnRemoved(TableColumnModelEvent e) {
+        // JW - old problem: need access to removed column
+        // to get hold of removed modelIndex
+        // to remove interactive sorter if any
+        // no way
+        // int modelIndex = convertColumnIndexToModel(e.getFromIndex());
+        updateSorterAfterColumnRemoved();
+        super.columnRemoved(e);
+    }
+
+    /**
+     * guarantee that the interactive sorter is removed if its column
+     * is removed.
+     * 
+     */
+    private void updateSorterAfterColumnRemoved() {
+        TableColumn sortedColumn = getSortedColumn();
+        if (sortedColumn == null) {
+            resetSortOrder();
+        }
+    }
 
 //---------------------- enhanced TableColumn/Model support    
     /**
