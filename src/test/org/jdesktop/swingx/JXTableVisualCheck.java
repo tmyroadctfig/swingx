@@ -118,8 +118,13 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 
             private boolean hasVisibleSortedColumn() {
                 TableColumn column = getSortedColumn();
-                return ((column instanceof TableColumnExt) 
-                        && ((TableColumnExt) column).isVisible());
+                if (column instanceof TableColumnExt) {
+                    return ((TableColumnExt) column).isVisible();
+                }
+                // JW: this path is not tested, don't really expect
+                // non-ext column types, though JXTable must 
+                // cope with them
+                return column != null;
             }
 
             
