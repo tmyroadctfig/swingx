@@ -185,25 +185,25 @@ public final class WindowUtils {
     }
     
     /**
-     * Get a <code>Spatial</code> object representing the given window's position and
+     * Get a <code>Rectangle</code> object representing the given window's position and
      * magnitude in space.
-     * @param win The window to get a Spatial object for
-     * @return a Spatial object.  @see com.jgui.Spatial
+     * @param win The window to get a Rectangle object for
+     * @return a Rectangle object.  @see com.jgui.Rectangle
      */
-    public static Spatial getSpatial(Window win) {
-	Spatial spatial = new Spatial(win.getY(), win.getX(), win.getWidth(), win.getHeight());
-	return spatial;
+    public static Rectangle getRectangle(Window win) {
+	Rectangle Rectangle = new Rectangle(win.getY(), win.getX(), win.getWidth(), win.getHeight());
+	return Rectangle;
     }
     
     /**
-     * Get a <code>Spatial</code> object representing the given JComponent's position and
+     * Get a <code>Rectangle</code> object representing the given JComponent's position and
      * magnitude in space.
-     * @param comp The JComponent to get a Spatial object for
-     * @return a Spatial object.  @see com.jgui.Spatial
+     * @param comp The JComponent to get a Rectangle object for
+     * @return a Rectangle object.  @see com.jgui.Rectangle
      */
-    public static Spatial getSpatial(JComponent comp) {
-	Spatial spatial = new Spatial(comp.getY(), comp.getX(), comp.getWidth(), comp.getHeight());
-	return spatial;
+    public static Rectangle getRectangle(JComponent comp) {
+	Rectangle Rectangle = new Rectangle(comp.getY(), comp.getX(), comp.getWidth(), comp.getHeight());
+	return Rectangle;
     }
     
     /**
