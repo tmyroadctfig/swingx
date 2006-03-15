@@ -32,6 +32,19 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
     protected TableModel sortableTableModel;
 
     /**
+     * suspected: enabled not synched on init. 
+     * But is (done in ccb.installTable()). 
+     *
+     */
+    public void testInitialDisabled() {
+        JXTable table = new JXTable(10, 3);
+        table.setEnabled(false);
+        table.setColumnControlVisible(true);
+        assertEquals(table.isEnabled(), table.getColumnControl().isEnabled());
+    }
+
+
+    /**
      * guarantee that at least one column is always visible.
      *
      */

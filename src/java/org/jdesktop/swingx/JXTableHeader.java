@@ -39,11 +39,12 @@ import org.jdesktop.swingx.table.ColumnHeaderRenderer;
  * 
  * The enhancements:
  * <ul>
- * <li> toggles sort of column on mouseClicked if table isSortable
+ * <li> supports pluggable handler to control user interaction for sorting
  * <li> uses ColumnHeaderRenderer which can show the sort icon
  * <li> triggers column pack (== auto-resize to exactly fit the contents)
  *  on double-click in resize region.
  * </ul>
+ * 
  * 
  * @author Jeanette Winzenburg
  */
@@ -257,7 +258,10 @@ public class JXTableHeader extends JTableHeader {
 
     /**
      * Encapsulates decision about which MouseEvents should
-     * trigger which sort events.
+     * trigger sort/unsort events.
+     * 
+     * Here: a single left click for toggling sort order, a
+     * single SHIFT-left click for unsorting.
      * 
      */
     public static class SortGestureRecognizer {

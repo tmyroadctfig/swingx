@@ -26,7 +26,6 @@ public class ColumnControlButtonIssues extends ColumnControlButtonTest {
     private static final Logger LOG = Logger
             .getLogger(ColumnControlButtonIssues.class.getName());
 
-
     /**
      * Issue #229-swingx: increasing listener list in column actions.
      * 
