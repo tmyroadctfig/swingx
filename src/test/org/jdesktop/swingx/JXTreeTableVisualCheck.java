@@ -61,7 +61,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Highligh.*");
          //      test.runInteractiveTests("interactive.*SortingFilter.*");
-           test.runInteractiveTests("interactive.*DnD.*");
+           test.runInteractiveTests("interactive.*Insert.*");
 //             test.runInteractiveTests("interactive.*Edit.*");
         } catch (Exception ex) {
 
@@ -126,6 +126,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         final JTree tree = new JTree(model);
         tree.setRootVisible(false);
         final JXTreeTable treeTable = new JXTreeTable(model);
+        treeTable.setColumnControlVisible(true);
         // treetable root invisible by default
         JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "insert into empty model");
         Action insertAction = new AbstractAction("insert node") {
@@ -171,6 +172,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         model.addChild(secondRootChild);
         JXTree tree = new JXTree(model);
         final JXTreeTable treeTable = new JXTreeTable(model);
+        treeTable.setColumnControlVisible(true);
         treeTable.setRootVisible(true);
         JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "insert problem - root collapsed");
         Action insertAction = new AbstractAction("insert node") {
@@ -205,6 +207,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         final  DefaultMutableTreeNode leaf = model.addChild(root);
         JXTree tree = new JXTree(model);
         final JXTreeTable treeTable = new JXTreeTable(model);
+        treeTable.setColumnControlVisible(true);
         TreeCellRenderer renderer = new DefaultTreeCellRenderer() {
 
             @Override
