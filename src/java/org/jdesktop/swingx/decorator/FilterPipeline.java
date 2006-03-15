@@ -22,6 +22,7 @@
 package org.jdesktop.swingx.decorator;
 
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
@@ -61,6 +62,7 @@ public class FilterPipeline {
     private ComponentAdapter    adapter = null;
     private Sorter                  sorter = null;
     private final Filter[]          filters;
+    private SortController sortController;
 
     /**
      * Creates an empty open pipeline.
@@ -131,14 +133,97 @@ public class FilterPipeline {
     }
 
     /**
-     * returns the interactive sorter or null if none is set.
+     * Returns the sorter that the output of the filter pipeline is piped through.
+     * This is the sorter that is installed interactively on a view by a user
+     * action. 
      * 
-     * @return
+     * @return the interactive sorter, if any; null otherwise.
      */
     public Sorter getSorter() {
         return sorter;
     }
     
+    public SortController getSortController() {
+        if (sortController == null) {
+            sortController = createDefaultSortController();
+        }
+        return sortController;
+    }
+    
+    protected SortController createDefaultSortController() {
+        return new SorterBasedSortController();
+    }
+    
+    protected class SorterBasedSortController implements SortController {
+        public void toggleSortOrder(int column) {
+            Sorter currentSorter = getSorter();
+            if ((currentSorter != null) && (currentSorter.getColumnIndex() == column)) {
+               currentSorter.toggle(); 
+            } else {
+               setSorter(createDefaultSorter(new SortKey(SortOrder.ASCENDING, column))); 
+            }
+            
+        }
+
+        public void setSortKeys(List<? extends SortKey> keys) {
+            if ((keys == null) || keys.isEmpty()) {
+                setSorter(null);
+                return;
+            }
+            SortKey sortKey = getFirstSortingKey(keys);
+            // only crappy unsorted...
+            if (sortKey == null) return;
+            // technically, we could re-use the sorter
+            // and only reset column, comparator and direction
+            // need to detangle from TableColumn before going there...
+            // so for now we only change the order if we have a sorter
+            // for the given column, create a new default sorter if not
+            Sorter currentSorter = getSorter();
+            if ((currentSorter == null) || 
+                    (currentSorter.getColumnIndex() != sortKey.getColumn())) {
+                currentSorter = createDefaultSorter(sortKey);
+            }
+            if (currentSorter.isAscending() != sortKey.getSortOrder().isAscending()) {
+                currentSorter.setAscending(sortKey.getSortOrder().isAscending());
+            }
+            setSorter(currentSorter);
+            
+        }
+
+        private Sorter createDefaultSorter(SortKey sortKey) {
+            return new ShuttleSorter(sortKey.getColumn(), sortKey.getSortOrder().isAscending());
+        }
+
+        private SortKey getFirstSortingKey(List<? extends SortKey> keys) {
+            for (SortKey key : keys) {
+                if (key.getSortOrder().isSorted()) {
+                    return key;
+                }
+            }
+            return null;
+        }
+
+        public List<? extends SortKey> getSortKeys() {
+            Sorter sorter = getSorter();
+            if (sorter == null) {
+                return Collections.EMPTY_LIST;
+            }
+            return Collections.singletonList(createSortKey(sorter));
+        }
+
+        private SortKey createSortKey(Sorter sorter) {
+            return new SortKey(sorter.getSortOrder(), sorter.getColumnIndex());
+        }
+
+        public SortOrder getSortOrder(int column) {
+            Sorter sorter = getSorter();
+            if ((sorter == null) || (sorter.getColumnIndex() != column)) {
+                return SortOrder.UNSORTED;
+            }
+            return sorter.getSortOrder();
+        }
+        
+    }
     /**
      * Assigns a {@link org.jdesktop.swingx.decorator.ComponentAdapter} to this
      * pipeline if no adapter has previously been assigned to the pipeline. Once an
@@ -260,6 +345,10 @@ public class FilterPipeline {
     protected void filterChanged(Filter filter) {
         Filter  next = next(filter); 
         if (next == null) {
+            // prepared for additional event type
+//            if (filter == getSorter()) {
+//                fireSortOrderChanged();
+//            }
             fireContentsChanged();
         }
         else {
@@ -447,6 +536,23 @@ public class FilterPipeline {
         }
     }
 
+    /**
+     * Notifies all registered {@link org.jdesktop.swingx.decorator.PipelineListener}
+     * objects that the contents of this pipeline has changed. 
+     */
+    protected void fireSortOrderChanged() {
+        Object[] listeners = listenerList.getListenerList();
+        PipelineEvent e = null;
+
+        for (int i = listeners.length - 2; i >= 0; i -= 2) {
+            if (listeners[i] == PipelineListener.class) {
+                if (e == null) {
+                    e = new PipelineEvent(this, PipelineEvent.SORT_ORDER_CHANGED);
+                }
+                ( (PipelineListener) listeners[i + 1]).contentsChanged(e);
+            }
+        }
+    }
     private List locateSorters(Filter[] inList) {
         BitSet  sortableColumns = new BitSet(); // temporary structure for checking
         List    sorterLocations = new Vector();

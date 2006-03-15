@@ -15,6 +15,18 @@ import junit.framework.TestCase;
 public class SorterTest extends TestCase {
 
     /**
+     * initial addition.
+     *
+     */
+    public void testSortKey() {
+        int column = 3;
+        SortOrder sortOrder = SortOrder.ASCENDING;
+        SortKey sortKey = new SortKey(sortOrder, column);
+        assertEquals(column, sortKey.getColumn());
+        assertEquals(sortOrder, sortKey.getSortOrder());
+    }
+    
+    /**
      * sanity - SortOrders convenience method state.
      *
      */

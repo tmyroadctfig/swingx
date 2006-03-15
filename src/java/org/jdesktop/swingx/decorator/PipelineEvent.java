@@ -34,12 +34,15 @@ public class PipelineEvent extends EventObject
     /** Identifies one or more changes in the pipeline. */
     public static final int CONTENTS_CHANGED = 0;
 
+    /** Identifies a order change of the interactive sorter. */
+    public static final int SORT_ORDER_CHANGED = 1;
     private int type;
 
     /**
      * Returns the event type. The possible values are:
      * <ul>
      * <li> {@link #CONTENTS_CHANGED}
+     * <li> {@link #SORT_ORDER_CHANGED  }
      * </ul>
      *
      * @return an int representing the type value

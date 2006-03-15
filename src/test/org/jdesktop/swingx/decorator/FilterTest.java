@@ -8,6 +8,8 @@
 package org.jdesktop.swingx.decorator;
 
 import java.awt.event.ActionEvent;
+import java.util.Collections;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -30,6 +32,182 @@ public class FilterTest extends InteractiveTestCase {
     protected ComponentAdapter directModelAdapter;
     private PipelineReport pipelineReport;
 
+    /**
+     * Guarantee that Pipeline's Sorter and SortController are in synch
+     * after setting properties of SortController.
+     *
+     */
+    public void testSortControllerToggleUpdatesSameSorter() {
+        FilterPipeline pipeline = new FilterPipeline();
+        pipeline.assign(directModelAdapter);
+        int column = 2;
+        pipeline.setSorter(new ShuttleSorter(column, false));
+        Sorter sorter = pipeline.getSorter();
+        pipeline.addPipelineListener(pipelineReport);
+        SortController controller = pipeline.getSortController();
+        controller.toggleSortOrder(column);
+        assertFalse("toggleSortOrder must have initialized sortKey", controller.getSortKeys().isEmpty());
+        // we assume that there's exactly one sortkey created!
+        SortKey sortKey = controller.getSortKeys().get(0);
+        assertEquals(column, sortKey.getColumn());
+        assertSame(sorter, pipeline.getSorter());
+        assertTrue(pipeline.getSorter().isAscending());
+        assertEquals(sortKey.getSortOrder().isAscending(), pipeline.getSorter().isAscending());
+        assertEquals(sortKey.getColumn(), pipeline.getSorter().getColumnIndex());
+        assertEquals(1, pipelineReport.getEventCount(PipelineEvent.CONTENTS_CHANGED));
+    }
+
+    /**
+     * Guarantee that Pipeline's Sorter and SortController are in synch
+     * after setting properties of SortController.
+     *
+     */
+    public void testSortControllerToggleUpdatesSorter() {
+        FilterPipeline pipeline = new FilterPipeline();
+        pipeline.assign(directModelAdapter);
+        int column = 2;
+        pipeline.setSorter(new ShuttleSorter(column, false));
+        pipeline.addPipelineListener(pipelineReport);
+        SortController controller = pipeline.getSortController();
+        int newColumn = column - 1;
+        controller.toggleSortOrder(newColumn);
+        assertFalse("toggleSortOrder must have initialized sortKey", controller.getSortKeys().isEmpty());
+        // we assume that there's exactly one sortkey created!
+        SortKey sortKey = controller.getSortKeys().get(0);
+        assertEquals(newColumn, sortKey.getColumn());
+        assertTrue(pipeline.getSorter().isAscending());
+        assertEquals(sortKey.getSortOrder().isAscending(), pipeline.getSorter().isAscending());
+        assertEquals(sortKey.getColumn(), pipeline.getSorter().getColumnIndex());
+        assertEquals(1, pipelineReport.getEventCount(PipelineEvent.CONTENTS_CHANGED));
+    }
+
+    /**
+     * Guarantee that Pipeline's Sorter is correctly initialized 
+     * after setting properties of SortController.
+     *
+     */
+    public void testSortControllerToggleInitSorter() {
+        FilterPipeline pipeline = new FilterPipeline();
+        pipeline.assign(directModelAdapter);
+        pipeline.addPipelineListener(pipelineReport);
+        int column = 2;
+        SortController controller = pipeline.getSortController();
+        controller.toggleSortOrder(column);
+        assertFalse("toggleSortOrder must have initialized sortKey", controller.getSortKeys().isEmpty());
+        // we assume that there's exactly one sortkey created!
+        SortKey sortKey = controller.getSortKeys().get(0);
+        assertNotNull(pipeline.getSorter());
+        assertEquals(sortKey.getSortOrder().isAscending(), pipeline.getSorter().isAscending());
+        assertEquals(sortKey.getColumn(), pipeline.getSorter().getColumnIndex());
+        assertEquals(1, pipelineReport.getEventCount(PipelineEvent.CONTENTS_CHANGED));
+    }
+
+    /**
+     * Guarantee that Pipeline's Sorter and SortController are in synch
+     * after setting properties of SortController.
+     *
+     */
+    public void testSortControllerResetRemovesSorter() {
+        FilterPipeline pipeline = new FilterPipeline();
+        pipeline.assign(directModelAdapter);
+        int column = 2;
+        pipeline.setSorter(new ShuttleSorter(column, true));
+        SortController controller = pipeline.getSortController();
+        controller.setSortKeys(Collections.EMPTY_LIST);
+        assertNull(pipeline.getSorter());
+    }
+    
+    /**
+     * Guarantee that Pipeline's Sorter and SortController are in synch
+     * after setting properties of SortController.
+     *
+     */
+    public void testSortControllerSortKeysUpdatesSorter() {
+        FilterPipeline pipeline = new FilterPipeline();
+        pipeline.assign(directModelAdapter);
+        int column = 2;
+        pipeline.setSorter(new ShuttleSorter(column, true));
+        pipeline.addPipelineListener(pipelineReport);
+        SortController controller = pipeline.getSortController();
+        int newColumn = column - 1;
+        SortKey sortKey = new SortKey(SortOrder.DESCENDING, newColumn);
+        controller.setSortKeys(Collections.singletonList(sortKey));
+        assertNotNull(pipeline.getSorter());
+        assertEquals(sortKey.getSortOrder().isAscending(), pipeline.getSorter().isAscending());
+        assertEquals(sortKey.getColumn(), pipeline.getSorter().getColumnIndex());
+        assertEquals(1, pipelineReport.getEventCount(PipelineEvent.CONTENTS_CHANGED));
+    }
+    
+    /**
+     * Guarantee that Pipeline's Sorter is correctly initialized 
+     * after setting properties of SortController.
+     *
+     */
+    public void testSortControllerSortKeysInitSorter() {
+        FilterPipeline pipeline = new FilterPipeline();
+        pipeline.assign(directModelAdapter);
+        pipeline.addPipelineListener(pipelineReport);
+        int column = 2;
+        SortController controller = pipeline.getSortController();
+        SortKey sortKey = new SortKey(SortOrder.DESCENDING, column);
+        controller.setSortKeys(Collections.singletonList(sortKey));
+        assertNotNull(pipeline.getSorter());
+        assertEquals(sortKey.getSortOrder().isAscending(), pipeline.getSorter().isAscending());
+        assertEquals(sortKey.getColumn(), pipeline.getSorter().getColumnIndex());
+        assertEquals(1, pipelineReport.getEventCount(PipelineEvent.CONTENTS_CHANGED));
+    }
+    /**
+     * initial addition of SortController 
+     * (== basically renamed Jesse's RowSorter).
+     * no active sorter.
+     */
+    public void testSortControllerWithoutSorter() {
+        FilterPipeline pipeline = new FilterPipeline();
+        pipeline.assign(directModelAdapter);
+        SortController controller = pipeline.getSortController();
+        assertNotNull(controller);
+        // test all method if nothing is sorted
+        assertEquals(SortOrder.UNSORTED, controller.getSortOrder(0));
+        assertNotNull(controller.getSortKeys());
+    }
+    
+    /**
+     * initial addition of SortController 
+     * Guarantee that SortController getters are in synch with Sorter.
+     */
+    public void testSortControllerWithSorter() {
+        FilterPipeline pipeline = new FilterPipeline();
+        pipeline.assign(directModelAdapter);
+        int column = 2;
+        pipeline.setSorter(new ShuttleSorter(column, true));
+        SortController controller = pipeline.getSortController();
+        assertNotNull(controller);
+        // test all method if sorter ascending sorter on column 
+        assertEquals(SortOrder.ASCENDING, controller.getSortOrder(column));
+        List<? extends SortKey> sortKeys = controller.getSortKeys();
+        assertNotNull(sortKeys);
+        assertEquals(1, sortKeys.size());
+        SortKey sortKey = sortKeys.get(0);
+        assertEquals(SortOrder.ASCENDING, sortKey.getSortOrder());
+        assertEquals(column, sortKey.getColumn());
+        // sanity: doesn't effect unsorted column
+        assertEquals(SortOrder.UNSORTED, controller.getSortOrder(column - 1));
+    }
+    
+    public void testSortOrderChangedEvent() {
+        FilterPipeline pipeline = new FilterPipeline();
+        pipeline.assign(directModelAdapter);
+        pipeline.addPipelineListener(pipelineReport);
+        
+        pipeline.setSorter(new ShuttleSorter());
+        assertEquals(1, pipelineReport.getEventCount(PipelineEvent.CONTENTS_CHANGED));
+        // expect 2 events: one for sortOrderChanged, one for contentsChanged
+        // not yet implemented - has implications on other tests, so go for
+        // one type of events only ... 
+//        assertEquals(1, pipelineReport.getEventCount(PipelineEvent.SORT_ORDER_CHANGED));
+//        PipelineEvent event = pipelineReport.getLastEvent(PipelineEvent.SORT_ORDER_CHANGED);
+//        assertEquals(PipelineEvent.SORT_ORDER_CHANGED, event.getType());
+    }
 
     /**
      * reported on swingx-dev mailing list:
