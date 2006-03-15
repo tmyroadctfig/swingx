@@ -27,8 +27,14 @@ import java.beans.Introspector;
 import java.beans.MethodDescriptor;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import org.jdesktop.swingx.editors.HighlighterPropertyEditor;
 
 /**
  *
@@ -93,6 +99,85 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    protected void setSmallColorIconName(String name) {
+        iconNameC16 = name;
+    }
+    
+    protected void setColorIconName(String name) {
+        iconNameC32 = name;
+    }
+
+    protected void setSmallMonoIconName(String name) {
+        iconNameM16 = name;
+    }
+
+    protected void setMonoIconName(String name) {
+        iconNameM32 = name;
+    }
+    
+    protected void setHidden(String... propertyNames) {
+        setHidden(getPropertyDescriptors(propertyNames));
+    }
+    
+    protected void setHidden(PropertyDescriptor... properties) {
+        for (PropertyDescriptor pd : properties) {
+            pd.setHidden(true);
+        }
+    }
+    
+    protected void setExpert(String... propertyNames) {
+        setExpert(getPropertyDescriptors(propertyNames));
+    }
+    
+    protected void setExpert(PropertyDescriptor... properties) {
+        for (PropertyDescriptor pd : properties) {
+            pd.setExpert(true);
+        }
+    }
+    
+    protected void setPreferred(String... propertyNames) {
+        setPreferred(getPropertyDescriptors(propertyNames));
+    }
+    
+    protected void setPreferred(PropertyDescriptor... properties) {
+        for (PropertyDescriptor pd : properties) {
+            pd.setPreferred(true);
+        }
+    }
+    
+    protected void setCategory(String categoryName, String... propertyNames) {
+        setCategory(categoryName, getPropertyDescriptors(propertyNames));
+    }
+    
+    protected void setCategory(String categoryName, PropertyDescriptor... properties) {
+        for (PropertyDescriptor pd : properties) {
+            pd.setValue("category", categoryName);
+        }
+    }
+    
+    protected void setPropertyEditor(Class editorClass, String... propertyNames) {
+        setPropertyEditor(editorClass, getPropertyDescriptors(propertyNames));
+    }
+    
+    protected void setPropertyEditor(Class editorClass, PropertyDescriptor... properties) {
+        for (PropertyDescriptor pd : properties) {
+            pd.setPropertyEditorClass(editorClass);
+        }
+    }
+    
+    protected PropertyDescriptor[] getPropertyDescriptors(String... propertyNames) {
+        PropertyDescriptor[] array = getPropertyDescriptors();
+        Set<String> names = new HashSet<String>(Arrays.asList(propertyNames));
+        List<PropertyDescriptor> results = new ArrayList<PropertyDescriptor>();
+        for (int i=0; i<array.length; i++) {
+            PropertyDescriptor pd = array[i];
+            if (names.contains(pd.getName())) {
+                results.add(pd);
+            }
+        }
+        return results.toArray(new PropertyDescriptor[0]);
     }
     
     /**
