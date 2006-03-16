@@ -196,6 +196,39 @@ public abstract class Sorter extends Filter {
         return isAscending() ? SortOrder.ASCENDING : SortOrder.DESCENDING; 
     }
     
+    /**
+     * Updates itself according to the SortKey's properties.
+     * 
+     * @param sortKey 
+     * @throws IllegalArgumentException if sortKey = null
+     * @throws IllegalArgumentException if !sortKey.sortOrder().isSorted
+     */
+    public void setSortKey(SortKey sortKey) {
+        if ((sortKey == null) || (!sortKey.getSortOrder().isSorted())) {
+            throw new IllegalArgumentException("SortKey must not be null with sorted SortOrder");
+        }
+        boolean forceRefresh = false;
+        if (ascending != sortKey.getSortOrder().isAscending()) {
+            forceRefresh = true;
+            ascending = sortKey.getSortOrder().isAscending();
+        }
+        if (((comparator != null) && !comparator.equals(sortKey.getComparator()))
+              || ((comparator == null) && (sortKey.getComparator() != null))) {
+            forceRefresh = true;
+            comparator = sortKey.getComparator();
+        }
+        // JW: take care of notification - refresh only if needed but then guarantee!
+        // problem - if columns are the same, super does nothing
+        if (getColumnIndex() != sortKey.getColumn()) {
+            // super handles event notification
+            forceRefresh = false;
+            setColumnIndex(sortKey.getColumn());
+        }
+        if (forceRefresh) {
+            refresh();
+        }
+    }
+    
     public void toggle() {
         ascending = !ascending;
         refresh();

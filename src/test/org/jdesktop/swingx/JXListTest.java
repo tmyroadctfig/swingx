@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -36,6 +37,8 @@ import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.SelectionMapper;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
+import org.jdesktop.swingx.decorator.SortKey;
+import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.decorator.Sorter;
 
 /**
@@ -224,9 +227,9 @@ public class JXListTest extends InteractiveTestCase {
         JXList list = new JXList();
         list.setFilterEnabled(true);
         list.setModel(ascendingListModel);
-        Sorter sorter = new ShuttleSorter(0, false);
         FilterPipeline pipeline = list.getFilters();
-        pipeline.setSorter(sorter);
+        SortKey sortKey = new SortKey(SortOrder.DESCENDING, 0);
+        pipeline.getSortController().setSortKeys(Collections.singletonList(sortKey ));
         list.setFilterEnabled(false);
         assertSame(ascendingListModel, list.getModel());
         assertEquals(ascendingListModel.getSize(), list.getElementCount());
@@ -240,7 +243,8 @@ public class JXListTest extends InteractiveTestCase {
         Sorter sorter = new ShuttleSorter(0, false);
         FilterPipeline pipeline = list.getFilters();
         assertNotNull(pipeline);
-        pipeline.setSorter(sorter);
+        SortKey sortKey = new SortKey(SortOrder.DESCENDING, 0);
+        pipeline.getSortController().setSortKeys(Collections.singletonList(sortKey ));
         assertEquals(ascendingListModel.getSize(), list.getElementCount());
         assertEquals(ascendingListModel.getElementAt(0), list.getElementAt(list.getElementCount() - 1));
         
@@ -251,9 +255,9 @@ public class JXListTest extends InteractiveTestCase {
         list.setFilterEnabled(true);
         list.setModel(ascendingListModel);
         list.setSelectedIndex(0);
-        Sorter sorter = new ShuttleSorter(0, false);
         FilterPipeline pipeline = list.getFilters();
-        pipeline.setSorter(sorter);
+        SortKey sortKey = new SortKey(SortOrder.DESCENDING, 0);
+        pipeline.getSortController().setSortKeys(Collections.singletonList(sortKey ));
         assertEquals("last row must be selected after sorting", 
                 ascendingListModel.getSize() - 1, list.getSelectedIndex());
     }
@@ -308,13 +312,14 @@ public class JXListTest extends InteractiveTestCase {
         JXList list = new JXList();
         list.setFilterEnabled(true);
         list.setModel(ascendingListModel);
-        final Sorter sorter = new ShuttleSorter(0, false);
-        FilterPipeline pipeline = list.getFilters();
-        pipeline.setSorter(sorter);
+//        final Sorter sorter = new ShuttleSorter(0, false);
+        final FilterPipeline pipeline = list.getFilters();
+        SortKey sortKey = new SortKey(SortOrder.DESCENDING, 0);
+        pipeline.getSortController().setSortKeys(Collections.singletonList(sortKey ));
         Action action = new AbstractAction("Toggle Sort Order") {
 
             public void actionPerformed(ActionEvent e) {
-                sorter.setAscending(!sorter.isAscending());
+                pipeline.getSortController().toggleSortOrder(0);
                 
             }
             
@@ -444,11 +449,11 @@ public class JXListTest extends InteractiveTestCase {
         setSystemLF(true);
         JXListTest test = new JXListTest();
         try {
-         // test.runInteractiveTests();
+          test.runInteractiveTests();
          //   test.runInteractiveTests("interactive.*Column.*");
          //   test.runInteractiveTests("interactive.*TableHeader.*");
          //   test.runInteractiveTests("interactive.*Render.*");
-            test.runInteractiveTests("interactive.*Disab.*");
+//            test.runInteractiveTests("interactive.*Disab.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();

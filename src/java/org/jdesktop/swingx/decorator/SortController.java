@@ -4,6 +4,7 @@
  */
 package org.jdesktop.swingx.decorator;
 
+import java.util.Comparator;
 import java.util.List;
 
 import org.jdesktop.swingx.JXTable;
@@ -33,6 +34,15 @@ public interface SortController {
      */
     void toggleSortOrder(int column);
 
+    /**
+     * Toggle the specified column, if its already sorted reverse its
+     * order. If it's not already sorted, sort this column.
+     *
+     * @param column the model index of the column to toggle
+     * @param comparator the comparator to use
+     */
+//    void toggleSortOrder(int column, Comparator comparator);
+    
     /**
      * Set the sort order by column.
      */

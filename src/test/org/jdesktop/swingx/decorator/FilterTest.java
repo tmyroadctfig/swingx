@@ -8,7 +8,9 @@
 package org.jdesktop.swingx.decorator;
 
 import java.awt.event.ActionEvent;
+import java.text.Collator;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -32,14 +34,122 @@ public class FilterTest extends InteractiveTestCase {
     protected ComponentAdapter directModelAdapter;
     private PipelineReport pipelineReport;
 
+//----------------------- testing sorter notification
+//----------------------- will happen only if in pipeline so we do it here 
+    /**
+     * test notification from sorter after setSortkey.
+     * Guarantee refresh notification with same direction, columnIndex
+     * but different Comparator.
+     */
+    public void testSorterSortKeyComparatorRefresh() {
+        FilterPipeline pipeline = new FilterPipeline();
+        pipeline.assign(directModelAdapter);
+        // create a sorter for column 0, ascending, 
+        // without explicit comparator
+        Sorter sorter = new ShuttleSorter();
+        pipeline.setSorter(sorter);
+        pipeline.addPipelineListener(pipelineReport);
+        // create sortKey with other sort direction on column
+        SortKey sortKey = new SortKey(SortOrder.ASCENDING, 
+                sorter.getColumnIndex(), Collator.getInstance());
+        sorter.setSortKey(sortKey);
+        // sanity: sorter and sortKey synched
+        SorterTest.assertSorterSortKeySynched(sortKey, sorter);
+        assertEquals(1, pipelineReport.getEventCount(PipelineEvent.CONTENTS_CHANGED));
+    }
+
+    /**
+     * test notification from sorter after setSortkey.
+     * Guarantee refresh notification with same columnIndex.
+     */
+    public void testSorterSortKeyRefresh() {
+        FilterPipeline pipeline = new FilterPipeline();
+        pipeline.assign(directModelAdapter);
+        // create a sorter for column 0, ascending, 
+        // without explicit comparator
+        Sorter sorter = new ShuttleSorter();
+        pipeline.setSorter(sorter);
+        pipeline.addPipelineListener(pipelineReport);
+        // create sortKey with other sort direction on column
+        SortKey sortKey = new SortKey(SortOrder.DESCENDING, sorter.getColumnIndex());
+        sorter.setSortKey(sortKey);
+        // sanity: sorter and sortKey synched
+        SorterTest.assertSorterSortKeySynched(sortKey, sorter);
+        assertEquals(1, pipelineReport.getEventCount(PipelineEvent.CONTENTS_CHANGED));
+    }
+
+    /**
+     * test notification from sorter after setSortkey.
+     * Guarantee exactly one refresh notification.
+     */
+    public void testSorterSortKeyOneRefresh() {
+        FilterPipeline pipeline = new FilterPipeline();
+        pipeline.assign(directModelAdapter);
+        // create a sorter for column 0, ascending, 
+        // without explicit comparator
+        Sorter sorter = new ShuttleSorter();
+        pipeline.setSorter(sorter);
+        pipeline.addPipelineListener(pipelineReport);
+        // create sortKey with other sort direction on column
+        SortKey sortKey = new SortKey(SortOrder.DESCENDING, sorter.getColumnIndex() +1);
+        sorter.setSortKey(sortKey);
+        // sanity: sorter and sortKey synched
+        SorterTest.assertSorterSortKeySynched(sortKey, sorter);
+        assertEquals(1, pipelineReport.getEventCount(PipelineEvent.CONTENTS_CHANGED));
+    }
+    /**
+     * test notification from sorter after setSortkey.
+     * Guarantee no refresh notification on same.
+     */
+    public void testSorterSortKeyNoRefresh() {
+        FilterPipeline pipeline = new FilterPipeline();
+        pipeline.assign(directModelAdapter);
+        // create a sorter for column 0, ascending, 
+        // without explicit comparator
+        Comparator comparator = Collator.getInstance();
+        Sorter sorter = new ShuttleSorter(0, true, comparator);
+        pipeline.setSorter(sorter);
+        pipeline.addPipelineListener(pipelineReport);
+        // create sortKey with other sort direction on column
+        SortKey sortKey = new SortKey(SortOrder.ASCENDING, 
+                sorter.getColumnIndex(), sorter.getComparator());
+        sorter.setSortKey(sortKey);
+        // sanity: sorter and sortKey synched
+        SorterTest.assertSorterSortKeySynched(sortKey, sorter);
+        assertFalse("sorter must not refresh without state change", pipelineReport.hasEvents());
+    }
+
+//---------------------------------SortController/Sorter in FilterPipeline
+ 
+    public void testSortControllerToggleWithComparator() {
+        FilterPipeline pipeline = createAssignedPipeline(true);
+        SortController controller = pipeline.getSortController();
+//        controller.toggleSortOrder(0, Collator.getInstance());
+    }
+    
+    /**
+     * creates and returns a FilterPipeline assigned to directModelAdapter.
+     * Registers pipelineReport if withReport.
+     * 
+     * @param withReport flag to indicate if pipelineReport should be registered.
+     * @return
+     */
+    private FilterPipeline createAssignedPipeline(boolean withReport) {
+        FilterPipeline pipeline = new FilterPipeline();
+        pipeline.assign(directModelAdapter);
+        if (withReport) {
+            pipeline.addPipelineListener(pipelineReport);
+        }
+        return pipeline;
+    }
+
     /**
      * Guarantee that Pipeline's Sorter and SortController are in synch
      * after setting properties of SortController.
      *
      */
     public void testSortControllerToggleUpdatesSameSorter() {
-        FilterPipeline pipeline = new FilterPipeline();
-        pipeline.assign(directModelAdapter);
+        FilterPipeline pipeline = createAssignedPipeline(false);
         int column = 2;
         pipeline.setSorter(new ShuttleSorter(column, false));
         Sorter sorter = pipeline.getSorter();
@@ -49,11 +159,10 @@ public class FilterTest extends InteractiveTestCase {
         assertFalse("toggleSortOrder must have initialized sortKey", controller.getSortKeys().isEmpty());
         // we assume that there's exactly one sortkey created!
         SortKey sortKey = controller.getSortKeys().get(0);
+        assertTrue(pipeline.getSorter().isAscending());
         assertEquals(column, sortKey.getColumn());
         assertSame(sorter, pipeline.getSorter());
-        assertTrue(pipeline.getSorter().isAscending());
-        assertEquals(sortKey.getSortOrder().isAscending(), pipeline.getSorter().isAscending());
-        assertEquals(sortKey.getColumn(), pipeline.getSorter().getColumnIndex());
+        SorterTest.assertSorterSortKeySynched(sortKey, pipeline.getSorter());
         assertEquals(1, pipelineReport.getEventCount(PipelineEvent.CONTENTS_CHANGED));
     }
 
@@ -63,8 +172,7 @@ public class FilterTest extends InteractiveTestCase {
      *
      */
     public void testSortControllerToggleUpdatesSorter() {
-        FilterPipeline pipeline = new FilterPipeline();
-        pipeline.assign(directModelAdapter);
+        FilterPipeline pipeline = createAssignedPipeline(false);
         int column = 2;
         pipeline.setSorter(new ShuttleSorter(column, false));
         pipeline.addPipelineListener(pipelineReport);
@@ -74,10 +182,8 @@ public class FilterTest extends InteractiveTestCase {
         assertFalse("toggleSortOrder must have initialized sortKey", controller.getSortKeys().isEmpty());
         // we assume that there's exactly one sortkey created!
         SortKey sortKey = controller.getSortKeys().get(0);
-        assertEquals(newColumn, sortKey.getColumn());
         assertTrue(pipeline.getSorter().isAscending());
-        assertEquals(sortKey.getSortOrder().isAscending(), pipeline.getSorter().isAscending());
-        assertEquals(sortKey.getColumn(), pipeline.getSorter().getColumnIndex());
+        SorterTest.assertSorterSortKeySynched(sortKey, pipeline.getSorter());
         assertEquals(1, pipelineReport.getEventCount(PipelineEvent.CONTENTS_CHANGED));
     }
 
@@ -87,18 +193,14 @@ public class FilterTest extends InteractiveTestCase {
      *
      */
     public void testSortControllerToggleInitSorter() {
-        FilterPipeline pipeline = new FilterPipeline();
-        pipeline.assign(directModelAdapter);
-        pipeline.addPipelineListener(pipelineReport);
+        FilterPipeline pipeline = createAssignedPipeline(true);
         int column = 2;
         SortController controller = pipeline.getSortController();
         controller.toggleSortOrder(column);
         assertFalse("toggleSortOrder must have initialized sortKey", controller.getSortKeys().isEmpty());
         // we assume that there's exactly one sortkey created!
         SortKey sortKey = controller.getSortKeys().get(0);
-        assertNotNull(pipeline.getSorter());
-        assertEquals(sortKey.getSortOrder().isAscending(), pipeline.getSorter().isAscending());
-        assertEquals(sortKey.getColumn(), pipeline.getSorter().getColumnIndex());
+        SorterTest.assertSorterSortKeySynched(sortKey, pipeline.getSorter());
         assertEquals(1, pipelineReport.getEventCount(PipelineEvent.CONTENTS_CHANGED));
     }
 
@@ -108,8 +210,7 @@ public class FilterTest extends InteractiveTestCase {
      *
      */
     public void testSortControllerResetRemovesSorter() {
-        FilterPipeline pipeline = new FilterPipeline();
-        pipeline.assign(directModelAdapter);
+        FilterPipeline pipeline = createAssignedPipeline(false);
         int column = 2;
         pipeline.setSorter(new ShuttleSorter(column, true));
         SortController controller = pipeline.getSortController();
@@ -122,9 +223,25 @@ public class FilterTest extends InteractiveTestCase {
      * after setting properties of SortController.
      *
      */
+    public void testSortControllerSortKeysUpdatesSameSorter() {
+        FilterPipeline pipeline = createAssignedPipeline(false);
+        pipeline.setSorter(new ShuttleSorter());
+        Sorter sorter = pipeline.getSorter();
+        pipeline.addPipelineListener(pipelineReport);
+        SortController controller = pipeline.getSortController();
+        SortKey sortKey = new SortKey(SortOrder.DESCENDING, sorter.getColumnIndex());
+        controller.setSortKeys(Collections.singletonList(sortKey));
+        assertSame(sorter, pipeline.getSorter());
+        SorterTest.assertSorterSortKeySynched(sortKey, pipeline.getSorter());
+        assertEquals(1, pipelineReport.getEventCount(PipelineEvent.CONTENTS_CHANGED));
+    }
+    /**
+     * Guarantee that Pipeline's Sorter and SortController are in synch
+     * after setting properties of SortController.
+     *
+     */
     public void testSortControllerSortKeysUpdatesSorter() {
-        FilterPipeline pipeline = new FilterPipeline();
-        pipeline.assign(directModelAdapter);
+        FilterPipeline pipeline = createAssignedPipeline(false);
         int column = 2;
         pipeline.setSorter(new ShuttleSorter(column, true));
         pipeline.addPipelineListener(pipelineReport);
@@ -132,9 +249,7 @@ public class FilterTest extends InteractiveTestCase {
         int newColumn = column - 1;
         SortKey sortKey = new SortKey(SortOrder.DESCENDING, newColumn);
         controller.setSortKeys(Collections.singletonList(sortKey));
-        assertNotNull(pipeline.getSorter());
-        assertEquals(sortKey.getSortOrder().isAscending(), pipeline.getSorter().isAscending());
-        assertEquals(sortKey.getColumn(), pipeline.getSorter().getColumnIndex());
+        SorterTest.assertSorterSortKeySynched(sortKey, pipeline.getSorter());
         assertEquals(1, pipelineReport.getEventCount(PipelineEvent.CONTENTS_CHANGED));
     }
     
@@ -144,16 +259,12 @@ public class FilterTest extends InteractiveTestCase {
      *
      */
     public void testSortControllerSortKeysInitSorter() {
-        FilterPipeline pipeline = new FilterPipeline();
-        pipeline.assign(directModelAdapter);
-        pipeline.addPipelineListener(pipelineReport);
+        FilterPipeline pipeline = createAssignedPipeline(true);
         int column = 2;
         SortController controller = pipeline.getSortController();
         SortKey sortKey = new SortKey(SortOrder.DESCENDING, column);
         controller.setSortKeys(Collections.singletonList(sortKey));
-        assertNotNull(pipeline.getSorter());
-        assertEquals(sortKey.getSortOrder().isAscending(), pipeline.getSorter().isAscending());
-        assertEquals(sortKey.getColumn(), pipeline.getSorter().getColumnIndex());
+        SorterTest.assertSorterSortKeySynched(sortKey, pipeline.getSorter());
         assertEquals(1, pipelineReport.getEventCount(PipelineEvent.CONTENTS_CHANGED));
     }
     /**
@@ -162,8 +273,7 @@ public class FilterTest extends InteractiveTestCase {
      * no active sorter.
      */
     public void testSortControllerWithoutSorter() {
-        FilterPipeline pipeline = new FilterPipeline();
-        pipeline.assign(directModelAdapter);
+        FilterPipeline pipeline = createAssignedPipeline(false);
         SortController controller = pipeline.getSortController();
         assertNotNull(controller);
         // test all method if nothing is sorted
@@ -176,8 +286,7 @@ public class FilterTest extends InteractiveTestCase {
      * Guarantee that SortController getters are in synch with Sorter.
      */
     public void testSortControllerWithSorter() {
-        FilterPipeline pipeline = new FilterPipeline();
-        pipeline.assign(directModelAdapter);
+        FilterPipeline pipeline = createAssignedPipeline(false);
         int column = 2;
         pipeline.setSorter(new ShuttleSorter(column, true));
         SortController controller = pipeline.getSortController();
@@ -195,9 +304,7 @@ public class FilterTest extends InteractiveTestCase {
     }
     
     public void testSortOrderChangedEvent() {
-        FilterPipeline pipeline = new FilterPipeline();
-        pipeline.assign(directModelAdapter);
-        pipeline.addPipelineListener(pipelineReport);
+        FilterPipeline pipeline = createAssignedPipeline(true);
         
         pipeline.setSorter(new ShuttleSorter());
         assertEquals(1, pipelineReport.getEventCount(PipelineEvent.CONTENTS_CHANGED));
@@ -209,6 +316,8 @@ public class FilterTest extends InteractiveTestCase {
 //        assertEquals(PipelineEvent.SORT_ORDER_CHANGED, event.getType());
     }
 
+//----------------------------------
+    
     /**
      * reported on swingx-dev mailing list:
      * chained filters must AND - as they did. 

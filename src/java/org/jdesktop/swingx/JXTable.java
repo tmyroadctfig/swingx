@@ -98,8 +98,9 @@ import org.jdesktop.swingx.decorator.PipelineListener;
 import org.jdesktop.swingx.decorator.SearchHighlighter;
 import org.jdesktop.swingx.decorator.SelectionMapper;
 import org.jdesktop.swingx.decorator.SizeSequenceMapper;
+import org.jdesktop.swingx.decorator.SortController;
+import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
-import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.icon.ColumnControlIcon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.table.ColumnControlButton;
@@ -711,6 +712,7 @@ public class JXTable extends JTable {
      * 
      * PENDING: need to
      * repeat on background changes to this!
+     * @deprecated no longer used - replaced by fillsViewportHeight
      * 
      */
     protected void configureViewportBackground() {
@@ -1247,16 +1249,16 @@ public class JXTable extends JTable {
     /** Sets the FilterPipeline for filtering table rows. */
     public void setFilters(FilterPipeline pipeline) {
         FilterPipeline old = getFilters();
-        Sorter sorter = null;
+        List<? extends SortKey> sortKeys = null;
         if (old != null) {
             old.removePipelineListener(pipelineListener);
-            sorter = old.getSorter();
+            sortKeys = old.getSortController().getSortKeys();
         }
         if (pipeline == null) {
             pipeline = new FilterPipeline();
         }
         filters = pipeline;
-        filters.setSorter(sorter);
+        filters.getSortController().setSortKeys(sortKeys);
         // JW: first assign to prevent (short?) illegal internal state
         // #173-swingx
         use(filters);
@@ -1330,7 +1332,11 @@ public class JXTable extends JTable {
      */
     public void resetSortOrder() {
         // JW PENDING: think about notification instead of manual repaint.
-        setInteractiveSorter(null);
+        SortController controller = getSortController();
+        if (controller != null) {
+            controller.setSortKeys(null);
+        }
+//        setInteractiveSorter(null);
         if (getTableHeader() != null) {
             getTableHeader().repaint();
         }
@@ -1349,15 +1355,19 @@ public class JXTable extends JTable {
     public void toggleSortOrder(int columnIndex) {
         if (!isSortable())
             return;
-        Sorter sorter = getInteractiveSorter();
-
-        if ((sorter != null)
-            && (sorter.getColumnIndex() == convertColumnIndexToModel(columnIndex))) {
-            sorter.toggle();
-        } else {
-            TableColumnExt column = getColumnExt(columnIndex);
-            getFilters().setSorter(column != null ? column.getSorter() : null);
+        SortController controller = getSortController();
+        if (controller != null) {
+            controller.toggleSortOrder(convertColumnIndexToModel(columnIndex));
         }
+//        Sorter sorter = getInteractiveSorter();
+//
+//        if ((sorter != null)
+//            && (sorter.getColumnIndex() == convertColumnIndexToModel(columnIndex))) {
+//            sorter.toggle();
+//        } else {
+//            TableColumnExt column = getColumnExt(columnIndex);
+//            getFilters().setSorter(column != null ? column.getSorter() : null);
+//        }
     }
 
     /**
@@ -1387,11 +1397,28 @@ public class JXTable extends JTable {
      *  or SortOrder.UNCHANGED 
      */
     public SortOrder getSortOrder(int columnIndex) {
-        Sorter sorter = getInteractiveSorter();
+        SortController sortController = getSortController();
+        if (sortController == null) return SortOrder.UNSORTED;
+        SortKey sortKey = SortKey.getFirstSortKeyForColumn(sortController.getSortKeys(), 
+                convertColumnIndexToModel(columnIndex));
+        return sortKey != null ? sortKey.getSortOrder() : SortOrder.UNSORTED;
+//        Sorter sorter = getInteractiveSorter();
+//
+//        return sorter == null ? SortOrder.UNSORTED 
+//                : sorter.getColumnIndex() == convertColumnIndexToModel(columnIndex) ? 
+//                        sorter.getSortOrder() : SortOrder.UNSORTED;
+    }
 
-        return sorter == null ? SortOrder.UNSORTED 
-                : sorter.getColumnIndex() == convertColumnIndexToModel(columnIndex) ? 
-                        sorter.getSortOrder() : SortOrder.UNSORTED;
+
+    /**
+     * returns the currently active SortController. Can be null
+     * on the very first call after instantiation.
+     * @return
+     */
+    protected SortController getSortController() {
+//      // this check is for the sake of the very first call after instantiation
+        if (filters == null) return null;
+        return getFilters().getSortController();
     }
 
     /**
@@ -1403,34 +1430,50 @@ public class JXTable extends JTable {
     public TableColumn getSortedColumn() {
         // bloody hack: get sorter and check if there's a column with it
         // available
-        Sorter sorter = getInteractiveSorter();
-        if (sorter != null) {
-            int sorterColumn = sorter.getColumnIndex();
-            List columns = getColumns(true);
-            for (Iterator iter = columns.iterator(); iter.hasNext();) {
-                TableColumn column = (TableColumn) iter.next();
-                if (column.getModelIndex() == sorterColumn) {
-                    return column;
-                }
+        SortController controller = getSortController();
+        if (controller != null) {
+            SortKey sortKey = SortKey.getFirstSortingKey(controller.getSortKeys());
+            if (sortKey != null) {
+              int sorterColumn = sortKey.getColumn();
+              List columns = getColumns(true);
+              for (Iterator iter = columns.iterator(); iter.hasNext();) {
+                  TableColumn column = (TableColumn) iter.next();
+                  if (column.getModelIndex() == sorterColumn) {
+                      return column;
+                  }
+              }
+                
             }
         }
+//        Sorter sorter = getInteractiveSorter();
+//        if (sorter != null) {
+//            int sorterColumn = sorter.getColumnIndex();
+//            List columns = getColumns(true);
+//            for (Iterator iter = columns.iterator(); iter.hasNext();) {
+//                TableColumn column = (TableColumn) iter.next();
+//                if (column.getModelIndex() == sorterColumn) {
+//                    return column;
+//                }
+//            }
+//        }
         return null;
     }
 
-    private void setInteractiveSorter(Sorter sorter) {
-        // this check is for the sake of the very first call after instantiation
-        if (filters == null)
-            return;
-        getFilters().setSorter(sorter);
 
-    }
-
-    private Sorter getInteractiveSorter() {
-        // this check is for the sake of the very first call after instantiation
-        if (filters == null)
-            return null;
-        return getFilters().getSorter();
-    }
+//    private void setInteractiveSorter(Sorter sorter) {
+//        // this check is for the sake of the very first call after instantiation
+//        if (filters == null)
+//            return;
+//        getFilters().setSorter(sorter);
+//
+//    }
+//
+//    private Sorter getInteractiveSorter() {
+//        // this check is for the sake of the very first call after instantiation
+//        if (filters == null)
+//            return null;
+//        return getFilters().getSorter();
+//    }
 
     /**
      * overridden to remove the interactive sorter if the

@@ -130,7 +130,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             
         };
         table.setColumnControlVisible(true);
-        JXFrame frame = wrapWithScrollingInFrame(table, "Sort Gesture customization");
+        JXFrame frame = wrapWithScrollingInFrame(table, "Always sorted");
         frame.setVisible(true);
         
     }
@@ -325,18 +325,18 @@ public class JXTableVisualCheck extends JXTableUnitTest {
      */
     public void interactiveRToLTableWithColumnControl() {
         final JXTable table = new JXTable(createAscendingModel(0, 20));
-        final JScrollPane pane = new JScrollPane(table);
+         JScrollPane pane = new JScrollPane(table);
 //        table.setColumnControlVisible(true);
 //        pane.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-        JXFrame frame = wrapInFrame(pane, "RToLScrollPane");
+        final JXFrame frame = wrapInFrame(pane, "RToLScrollPane");
         Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
 
             public void actionPerformed(ActionEvent e) {
-                ComponentOrientation current = pane.getComponentOrientation();
+                ComponentOrientation current = frame.getComponentOrientation();
                 if (current == ComponentOrientation.LEFT_TO_RIGHT) {
-                    pane.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
                 } else {
-                    pane.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 
                 }
 
@@ -1110,7 +1110,8 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         JXTable table = new JXTable(sortableTableModel);
         table.setFilters(new FilterPipeline(new Filter[] {
                 new ShuttleSorter(0, false), // column 0, descending
-                                            new ShuttleSorter(1, true), // column 1, ascending
+                                            
+                new ShuttleSorter(1, true), // column 1, ascending
         }));
         JFrame frame = wrapWithScrollingInFrame(table, "TableSorter4 col 0 = des, col 1 = asc");
         frame.setVisible(true);

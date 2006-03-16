@@ -112,7 +112,7 @@ public class FilterPipeline {
      * 
      * @param sorter the interactive sorter, if any; null otherwise.
      */
-    public void setSorter(Sorter sorter) {
+    protected void setSorter(Sorter sorter) {
         Sorter oldSorter = getSorter();
         if (oldSorter == sorter) return;
         if (oldSorter != null) {
@@ -139,7 +139,7 @@ public class FilterPipeline {
      * 
      * @return the interactive sorter, if any; null otherwise.
      */
-    public Sorter getSorter() {
+    protected Sorter getSorter() {
         return sorter;
     }
     
@@ -170,7 +170,7 @@ public class FilterPipeline {
                 setSorter(null);
                 return;
             }
-            SortKey sortKey = getFirstSortingKey(keys);
+            SortKey sortKey = SortKey.getFirstSortingKey(keys);
             // only crappy unsorted...
             if (sortKey == null) return;
             // technically, we could re-use the sorter
@@ -194,14 +194,6 @@ public class FilterPipeline {
             return new ShuttleSorter(sortKey.getColumn(), sortKey.getSortOrder().isAscending());
         }
 
-        private SortKey getFirstSortingKey(List<? extends SortKey> keys) {
-            for (SortKey key : keys) {
-                if (key.getSortOrder().isSorted()) {
-                    return key;
-                }
-            }
-            return null;
-        }
 
         public List<? extends SortKey> getSortKeys() {
             Sorter sorter = getSorter();

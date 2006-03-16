@@ -16,6 +16,7 @@ import java.beans.PropertyChangeListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -45,8 +46,8 @@ import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
+import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
-import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.util.AncientSwingTeam;
 import org.jdesktop.swingx.util.ChangeReport;
@@ -747,7 +748,10 @@ public class JXTableUnitTest extends InteractiveTestCase {
         table.setRowHeight(0, 25);
         assertEquals(25, table.getRowHeight(0));
         assertEquals(table.getRowHeight(), table.getRowHeight(1));
-        table.getFilters().setSorter(new ShuttleSorter(0, false));
+        table.getFilters().getSortController().setSortKeys
+            (Collections.singletonList(
+                new SortKey(SortOrder.DESCENDING, 0)));
+//                new ShuttleSorter(0, false));
         assertEquals(table.getRowHeight(), table.getRowHeight(1));
         assertEquals(25, table.getRowHeight(table.getRowCount() - 1));
         table.setRowHeight(table.getRowHeight());
@@ -758,7 +762,11 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JXTable table = new JXTable(createAscendingModel(0, 10));
         table.setRowHeightEnabled(true);
         table.setRowHeight(0, 25);
-        table.getFilters().setSorter(new ShuttleSorter(0, false));
+        table.getFilters().getSortController().setSortKeys
+            (Collections.singletonList(
+                new SortKey(SortOrder.DESCENDING, 0)));
+//                new ShuttleSorter(0, false))
+//                new ShuttleSorter(0, false));
         assertEquals("individual row height must be moved to last row", 
                 25, table.getRowHeight(table.getRowCount() - 1));
         // reset
@@ -815,7 +823,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         int columnCount = table.getColumnCount();
         table.toggleSortOrder(columnCount - 1);
         table.setModel(new DefaultTableModel(10, columnCount - 1));
-        assertEquals(null, table.getFilters().getSorter());
+        assertTrue(table.getFilters().getSortController().getSortKeys().isEmpty());
     }
     /**
      * sanity testing while refactoring support
@@ -826,10 +834,12 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JXTable table = new JXTable(sortableTableModel);
         table.toggleSortOrder(0);
         TableColumnExt columnX = table.getColumnExt(0);
-        assertEquals("interactive sorter must be same as sorter in column", 
-                columnX.getSorter(), table.getFilters().getSorter());
+        // invalid assumption .. only the comparator must be used.
+        // but: not yet implemented
+//        assertEquals("interactive sorter must be same as sorter in column", 
+//                columnX.getSorter(), table.getFilters().getSorter());
         table.resetSortOrder();
-        assertEquals("interactive sorter must be null", null, table.getFilters().getSorter());
+        assertTrue(table.getFilters().getSortController().getSortKeys().isEmpty());
     }
     
     /**
@@ -853,21 +863,25 @@ public class JXTableUnitTest extends InteractiveTestCase {
         TableColumnExt columnX = table.getColumnExt(0);
         table.toggleSortOrder(0);
         table.removeColumn(columnX);
-        assertEquals("sorter must be removed when column removed", null, table.getFilters().getSorter());
+        assertTrue("sorter must be removed when column removed", 
+                table.getFilters().getSortController().getSortKeys().isEmpty());
         
     }
     
     /**
      * interactive sorter must be active if column is hidden.
-     *
+     * THINK: no longer valid... check sortkeys instead?
      */
     public void testSorterAfterColumnHidden() {
         JXTable table = new JXTable(sortableTableModel);
         TableColumnExt columnX = table.getColumnExt(0);
         table.toggleSortOrder(0);
+        List<? extends SortKey> sortKeys = table.getFilters().getSortController().getSortKeys();
         columnX.setVisible(false);
         assertEquals("interactive sorter must be same as sorter in column", 
-                columnX.getSorter(), table.getFilters().getSorter());
+                sortKeys, table.getFilters().getSortController().getSortKeys());
+//        assertEquals("interactive sorter must be same as sorter in column", 
+//                columnX.getSorter(), table.getFilters().getSorter());
         
     }
     
@@ -900,7 +914,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertEquals("all columns must have been removed", 0, table.getColumnCount(true));
         assertEquals("all columns must have been removed", 
                 table.getColumnCount(), table.getColumnCount(true));
-        assertEquals("sorter must be removed when column removed", null, table.getFilters().getSorter());
+        assertTrue("sorter must be removed when column removed",
+                table.getFilters().getSortController().getSortKeys().isEmpty());
     }
     
     /**

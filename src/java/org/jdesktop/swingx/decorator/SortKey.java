@@ -4,24 +4,38 @@
  */
 package org.jdesktop.swingx.decorator;
 
+import java.util.Comparator;
+import java.util.List;
+
 /**
  * A column and how its sorted.
  */
-public final class SortKey {
+public class SortKey {
     private final SortOrder sortOrder;
     private final int column;
-
+    private final Comparator comparator;
+    
     /**
      * @param sortOrder one of {@link SortOrder#ASCENDING},
      *     {@link SortOrder#DESCENDING} or {@link SortOrder#UNSORTED}.
      * @param column a column in terms of <strong>model</strong> index.
      */
     public SortKey(SortOrder sortOrder, int column) {
+        this(sortOrder, column, null);
+    }
+
+    /**
+     * @param sortOrder one of {@link SortOrder#ASCENDING},
+     *     {@link SortOrder#DESCENDING} or {@link SortOrder#UNSORTED}.
+     * @param column a column in terms of <strong>model</strong> index.
+     * @param comparator the comparator to use with this sort.
+     */
+    public SortKey(SortOrder sortOrder, int column, Comparator comparator) {
         if(sortOrder == null) throw new IllegalArgumentException();
         if(column < 0) throw new IllegalArgumentException();
-
-        this.sortOrder = sortOrder;
         this.column = column;
+        this.comparator = comparator;
+        this.sortOrder = sortOrder;
     }
 
     /**
@@ -38,6 +52,12 @@ public final class SortKey {
         return column;
     }
 
+    /**
+     * The comparator to use, might be null.
+     */
+    public Comparator getComparator() {
+        return comparator;
+    }
     /** {@inheritDoc} */
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -58,4 +78,25 @@ public final class SortKey {
         result = 29 * result + column;
         return result;
     }
+    
+//---------------------- static utility methods
+    
+    public static SortKey getFirstSortingKey(List<? extends SortKey> keys) {
+        for (SortKey key : keys) {
+            if (key.getSortOrder().isSorted()) {
+                return key;
+            }
+        }
+        return null;
+    }
+
+    public static SortKey getFirstSortKeyForColumn(List<? extends SortKey> keys, int modelColumn) {
+        for (SortKey key : keys) {
+            if (key.getColumn() == modelColumn) {
+                return key;
+            }
+        }
+        return null;
+    }
+
 }

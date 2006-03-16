@@ -21,6 +21,8 @@
 
 package org.jdesktop.swingx.decorator;
 
+import java.util.Comparator;
+
 /**
  * Pluggable sorting filter.
  *
@@ -34,10 +36,17 @@ public class ShuttleSorter extends Sorter {
     }
 
     public ShuttleSorter(int col, boolean ascending) {
+        // pending .. chain to this
         super(col, ascending);
     }
 
+    public ShuttleSorter(int col, boolean ascending, Comparator comparator) {
+        super(col, ascending, comparator);
+    }
+    
     protected void init() {
+        // JW: ?? called from super, so toPrevious is still null after running
+        // this method??
         toPrevious = new int[0];
     }
 

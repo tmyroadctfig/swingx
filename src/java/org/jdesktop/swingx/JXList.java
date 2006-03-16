@@ -29,6 +29,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -55,7 +56,7 @@ import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PipelineEvent;
 import org.jdesktop.swingx.decorator.PipelineListener;
 import org.jdesktop.swingx.decorator.SelectionMapper;
-import org.jdesktop.swingx.decorator.Sorter;
+import org.jdesktop.swingx.decorator.SortKey;
 
 /**
  * JXList
@@ -604,19 +605,36 @@ public class JXList extends JList {
     public void setFilters(FilterPipeline pipeline) {
         if (!isFilterEnabled()) throw
             new IllegalStateException("filters not enabled - not allowed to set filters");
+
         FilterPipeline old = filters;
-        Sorter sorter = null;
+        List<? extends SortKey> sortKeys = null;
         if (old != null) {
             old.removePipelineListener(pipelineListener);
-            sorter = old.getSorter();
+            sortKeys = old.getSortController().getSortKeys();
         }
         if (pipeline == null) {
             pipeline = new FilterPipeline();
         }
         filters = pipeline;
-        filters.setSorter(sorter);
+        filters.getSortController().setSortKeys(sortKeys);
+        // JW: first assign to prevent (short?) illegal internal state
+        // #173-swingx
         use(filters);
         getSelectionMapper().setFilters(filters);
+
+//        FilterPipeline old = filters;
+//        Sorter sorter = null;
+//        if (old != null) {
+//            old.removePipelineListener(pipelineListener);
+//            sorter = old.getSorter();
+//        }
+//        if (pipeline == null) {
+//            pipeline = new FilterPipeline();
+//        }
+//        filters = pipeline;
+//        filters.setSorter(sorter);
+//        use(filters);
+//        getSelectionMapper().setFilters(filters);
     }
 
     /**

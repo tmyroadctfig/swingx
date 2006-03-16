@@ -8,22 +8,108 @@
 package org.jdesktop.swingx.decorator;
 
 import java.text.Collator;
+import java.util.Comparator;
 import java.util.Locale;
 
 import junit.framework.TestCase;
 
+/**
+ * Unit test for divers sort-related classes/issues.
+ * 
+ * <ul>
+ * <li> SortKey
+ * <li> SortOrder
+ * <li> Sorter
+ * </ul>
+ * @author Jeanette Winzenburg
+ */
 public class SorterTest extends TestCase {
 
     /**
-     * initial addition.
+     * test that sorter updates internal state.
      *
      */
-    public void testSortKey() {
+    public void testSorterSortKeySynched() {
+        // create a sorter for column 0, ascending, 
+        // without explicit comparator
+        Sorter sorter = new ShuttleSorter();
+        SortKey sortKey = new SortKey(SortOrder.DESCENDING, 1, Collator.getInstance());
+        sorter.setSortKey(sortKey);
+        assertSorterSortKeySynched(sortKey, sorter);
+    }
+    
+    public static void assertSorterSortKeySynched(SortKey sortKey, Sorter sorter) {
+        assertNotNull(sorter);
+        assertEquals(sortKey.getColumn(), sorter.getColumnIndex());
+        assertEquals(sortKey.getSortOrder().isAscending(), sorter.isAscending());
+        assertSame(sortKey.getComparator(), sorter.getComparator());
+        
+    }
+    /**
+     * test that sorter.setSortKey(..) throws the documented exceptions.
+     *
+     */
+    public void testSorterSortKeyExceptions() {
+        Sorter sorter = new ShuttleSorter();
+        try {
+            sorter.setSortKey(null);
+            fail("sorter must throw IllegalArgument for null SortKey");
+        } catch (IllegalArgumentException e) {
+            // this is documented behaviour
+        } catch (Exception e) {
+            fail("unexpected exception for null Sortkey" + e);
+        }
+        try {
+            SortKey sortKey = new SortKey(SortOrder.UNSORTED, 0, Collator.getInstance());
+            sorter.setSortKey(sortKey);
+            fail("sorter must throw IllegalArgument for unsorted SortKey");
+        } catch (IllegalArgumentException e) {
+            // this is documented behaviour
+        } catch (Exception e) {
+            fail("unexpected exception for unsorted Sortkey" + e);
+        }
+        
+    }
+    /**
+     * initial addition.
+     * Testing exceptions thrown in constructors
+     */
+    public void testSortKeyConstructorExceptions() {
+        try {
+            new SortKey(null, 2);
+            fail("SortKey must throw IllegalArgument for null SortOrder");
+        } catch (IllegalArgumentException e) {
+            // this is documented behaviour
+        } catch (Exception e) {
+            fail("unexpected exception in SortKey with null SortOrder" + e);
+        }
+        try {
+            new SortKey(SortOrder.ASCENDING, -1);
+            fail("SortKey must throw IllegalArgument for negative column");
+        } catch (IllegalArgumentException e) {
+            // this is documented behaviour
+        } catch (Exception e) {
+            fail("unexpected exception in SortKey with negative column" + e);
+        }
+    }
+
+    /**
+     * initial addition, test constructors parameters.
+     */
+    public void testSortKeyConstructor() {
         int column = 3;
         SortOrder sortOrder = SortOrder.ASCENDING;
+        // two parameter constructor
         SortKey sortKey = new SortKey(sortOrder, column);
         assertEquals(column, sortKey.getColumn());
         assertEquals(sortOrder, sortKey.getSortOrder());
+        assertNull(sortKey.getComparator());
+        Comparator comparator = Collator.getInstance();
+        // three parameter constructor
+        sortKey = new SortKey(sortOrder, column, comparator);
+        assertEquals(column, sortKey.getColumn());
+        assertEquals(sortOrder, sortKey.getSortOrder());
+        assertSame(comparator, sortKey.getComparator());
     }
     
     /**
