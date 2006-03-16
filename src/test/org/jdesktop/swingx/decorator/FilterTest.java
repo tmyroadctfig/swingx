@@ -262,9 +262,12 @@ public class FilterTest extends InteractiveTestCase {
         FilterPipeline pipeline = createAssignedPipeline(true);
         int column = 2;
         SortController controller = pipeline.getSortController();
-        SortKey sortKey = new SortKey(SortOrder.DESCENDING, column);
+        SortKey sortKey = new SortKey(SortOrder.DESCENDING, column, Collator.getInstance());
         controller.setSortKeys(Collections.singletonList(sortKey));
         SorterTest.assertSorterSortKeySynched(sortKey, pipeline.getSorter());
+        SortKey createdKey = SortKey.getFirstSortKeyForColumn(controller.getSortKeys(), column);
+        SorterTest.assertSorterSortKeySynched(createdKey, pipeline.getSorter());
+        
         assertEquals(1, pipelineReport.getEventCount(PipelineEvent.CONTENTS_CHANGED));
     }
     /**

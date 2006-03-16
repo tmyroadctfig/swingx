@@ -1348,7 +1348,7 @@ public class JXTable extends JTable {
      * is already an interactive sorter for this column it's sort order is
      * reversed. Otherwise the columns sorter is used as is.
      * Used by headerListener.
-     * 
+     * PRE: 0 <= columnIndex < getColumnCount() 
      * @param columnIndex the columnIndex in view coordinates.
      * 
      */
@@ -1357,7 +1357,9 @@ public class JXTable extends JTable {
             return;
         SortController controller = getSortController();
         if (controller != null) {
-            controller.toggleSortOrder(convertColumnIndexToModel(columnIndex));
+            TableColumnExt columnExt = getColumnExt(columnIndex);
+            controller.toggleSortOrder(convertColumnIndexToModel(columnIndex),
+                    columnExt != null ? columnExt.getComparator() : null);
         }
 //        Sorter sorter = getInteractiveSorter();
 //

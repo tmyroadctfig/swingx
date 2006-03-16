@@ -26,10 +26,22 @@ import junit.framework.TestCase;
 public class SorterTest extends TestCase {
 
     /**
-     * test that sorter updates internal state.
+     * test that sorter returns SortKey 
+     * synched to internal state.
      *
      */
-    public void testSorterSortKeySynched() {
+    public void testSorterSynchedToSortKey() {
+        int column = 1;
+        Sorter sorter = new ShuttleSorter(column, false, Collator.getInstance());
+        SortKey sortKey = sorter.getSortKey();
+        assertSorterSortKeySynched(sortKey, sorter);
+    }
+
+    /**
+     * test that sorter updates internal state from SortKey.
+     *
+     */
+    public void testSorterSynchedFromSortKey() {
         // create a sorter for column 0, ascending, 
         // without explicit comparator
         Sorter sorter = new ShuttleSorter();

@@ -41,7 +41,7 @@ public interface SortController {
      * @param column the model index of the column to toggle
      * @param comparator the comparator to use
      */
-//    void toggleSortOrder(int column, Comparator comparator);
+    void toggleSortOrder(int column, Comparator comparator);
     
     /**
      * Set the sort order by column.

@@ -23,6 +23,7 @@ package org.jdesktop.swingx.decorator;
 
 import java.util.BitSet;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
 
@@ -156,14 +157,20 @@ public class FilterPipeline {
     
     protected class SorterBasedSortController implements SortController {
         public void toggleSortOrder(int column) {
+            toggleSortOrder(column, null);
+        }
+
+        
+        public void toggleSortOrder(int column, Comparator comparator) {
             Sorter currentSorter = getSorter();
             if ((currentSorter != null) && (currentSorter.getColumnIndex() == column)) {
-               currentSorter.toggle(); 
+               // JW: think about logic - need to update comparator?
+                currentSorter.toggle(); 
             } else {
-               setSorter(createDefaultSorter(new SortKey(SortOrder.ASCENDING, column))); 
+               setSorter(createDefaultSorter(new SortKey(SortOrder.ASCENDING, column, comparator))); 
             }
-            
-        }
+       }
+
 
         public void setSortKeys(List<? extends SortKey> keys) {
             if ((keys == null) || keys.isEmpty()) {
@@ -173,39 +180,51 @@ public class FilterPipeline {
             SortKey sortKey = SortKey.getFirstSortingKey(keys);
             // only crappy unsorted...
             if (sortKey == null) return;
+            Sorter sorter = getSorter();
+            if (sorter == null) {
+                sorter = createDefaultSorter();
+            }
+            sorter.setSortKey(sortKey);
             // technically, we could re-use the sorter
             // and only reset column, comparator and direction
             // need to detangle from TableColumn before going there...
             // so for now we only change the order if we have a sorter
             // for the given column, create a new default sorter if not
-            Sorter currentSorter = getSorter();
-            if ((currentSorter == null) || 
-                    (currentSorter.getColumnIndex() != sortKey.getColumn())) {
-                currentSorter = createDefaultSorter(sortKey);
-            }
-            if (currentSorter.isAscending() != sortKey.getSortOrder().isAscending()) {
-                currentSorter.setAscending(sortKey.getSortOrder().isAscending());
-            }
-            setSorter(currentSorter);
+//            if ((currentSorter == null) || 
+//                    (currentSorter.getColumnIndex() != sortKey.getColumn())) {
+//                currentSorter = createDefaultSorter(sortKey);
+//            }
+//            if (currentSorter.isAscending() != sortKey.getSortOrder().isAscending()) {
+//                currentSorter.setAscending(sortKey.getSortOrder().isAscending());
+//            }
+            setSorter(sorter);
             
         }
-
-        private Sorter createDefaultSorter(SortKey sortKey) {
-            return new ShuttleSorter(sortKey.getColumn(), sortKey.getSortOrder().isAscending());
+        
+        /**
+         * creates a Sorter initialized with sortKey
+         * @param sortKey the properties to use
+         * @return 
+         */
+        protected Sorter createDefaultSorter(SortKey sortKey) {
+            Sorter sorter = createDefaultSorter();
+            sorter.setSortKey(sortKey);
+            return sorter;
         }
 
 
+        protected Sorter createDefaultSorter() {
+            return new ShuttleSorter();
+        }
+        
         public List<? extends SortKey> getSortKeys() {
             Sorter sorter = getSorter();
             if (sorter == null) {
                 return Collections.EMPTY_LIST;
             }
-            return Collections.singletonList(createSortKey(sorter));
+            return Collections.singletonList(sorter.getSortKey());
         }
 
-        private SortKey createSortKey(Sorter sorter) {
-            return new SortKey(sorter.getSortOrder(), sorter.getColumnIndex());
-        }
 
         public SortOrder getSortOrder(int column) {
             Sorter sorter = getSorter();

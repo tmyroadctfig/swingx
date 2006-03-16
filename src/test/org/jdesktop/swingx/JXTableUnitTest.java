@@ -15,6 +15,7 @@ import java.awt.GraphicsEnvironment;
 import java.beans.PropertyChangeListener;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -82,6 +83,25 @@ public class JXTableUnitTest extends InteractiveTestCase {
         // make sure we have the same default for each test
         defaultToSystemLF = false;
         setSystemLF(defaultToSystemLF);
+    }
+
+    /**
+     * JXTable has responsibility to guarantee usage of 
+     * TableColumnExt comparator.
+     * 
+     */
+    public void testComparatorToPipeline() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        TableColumnExt columnX = table.getColumnExt(0);
+        columnX.setComparator(Collator.getInstance());
+        table.toggleSortOrder(0);
+        // invalid assumption .. only the comparator must be used.
+//        assertEquals("interactive sorter must be same as sorter in column", 
+//                columnX.getSorter(), table.getFilters().getSorter());
+        SortKey sortKey = SortKey.getFirstSortKeyForColumn(table.getFilters().getSortController().getSortKeys(), 0);
+        assertNotNull(sortKey);
+        assertEquals(columnX.getComparator(), sortKey.getComparator());
+       
     }
 
     /**

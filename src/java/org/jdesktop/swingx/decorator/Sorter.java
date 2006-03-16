@@ -229,6 +229,9 @@ public abstract class Sorter extends Filter {
         }
     }
     
+    public SortKey getSortKey() {
+        return new SortKey(getSortOrder(), getColumnIndex(), getComparator());
+    }
     public void toggle() {
         ascending = !ascending;
         refresh();

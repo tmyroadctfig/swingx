@@ -36,6 +36,7 @@ import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
+import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.treetable.FileSystemModel;
@@ -54,23 +55,6 @@ public class JXTableIssues extends InteractiveTestCase {
         // TODO Auto-generated constructor stub
     }
 
-    /**
-     * JXTable has responsibility to guarantee usage of 
-     * TableColumnExt comparator.
-     *
-     */
-    public void testComparatorToPipeline() {
-        JXTable table = new JXTable(new AncientSwingTeam());
-        TableColumnExt columnX = table.getColumnExt(0);
-        columnX.setComparator(Collator.getInstance());
-        table.toggleSortOrder(0);
-        // invalid assumption .. only the comparator must be used.
-        // but: not yet implemented
-//        assertEquals("interactive sorter must be same as sorter in column", 
-//                columnX.getSorter(), table.getFilters().getSorter());
-        fail("use of table columns's comparator is not yet implemented");
-        
-    }
 
     /**
      * Issue #256-swingX: viewport - toggle track height must
