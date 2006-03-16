@@ -42,6 +42,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -1549,13 +1550,13 @@ public class JXGraph extends JXPanel implements PropertyChangeListener {
          * <code>JXGraph</code>, the <code>JXGraph</code> automatically becomes
          * a new property change listener of this plot.</p>
          */
-        protected List<PropertyChangeListener> listeners;
+        protected PropertyChangeSupport support;
 
         /**
          * <p>Creates a new, parameter-less plot.</p>
          */
         protected Plot() {
-            this.listeners = new LinkedList<PropertyChangeListener>();
+            this.support = new PropertyChangeSupport(this);
         }
         
         /**
@@ -1575,9 +1576,7 @@ public class JXGraph extends JXPanel implements PropertyChangeListener {
          *                 property changes
          */
         public void addPropertyChangeListener(PropertyChangeListener listener) {
-            if (listener != null && !listeners.contains(listener)) {
-                listeners.add(listener);
-            }
+            support.addPropertyChangeListener(listener);
         }
 
         /**
@@ -1586,9 +1585,7 @@ public class JXGraph extends JXPanel implements PropertyChangeListener {
          * @param listener the  property change listener to be removed
          */
         public void removePropertyChangeListener(PropertyChangeListener listener) {
-            if (listener != null) {
-                listeners.remove(listener);
-            }
+            support.removePropertyChangeListener(listener);
         }
 
         /**
@@ -1605,7 +1602,7 @@ public class JXGraph extends JXPanel implements PropertyChangeListener {
                                           double oldValue, double newValue) {
             PropertyChangeEvent changeEvent =
                 new PropertyChangeEvent(this, propertyName, oldValue, newValue);
-            for (PropertyChangeListener listener: listeners) {
+            for (PropertyChangeListener listener : support.getPropertyChangeListeners()) {
                 listener.propertyChange(changeEvent);
             }
         }
