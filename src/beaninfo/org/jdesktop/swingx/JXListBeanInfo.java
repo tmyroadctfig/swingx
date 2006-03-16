@@ -20,8 +20,6 @@
  */
 package org.jdesktop.swingx;
 
-import java.beans.PropertyDescriptor;
-import javax.swing.JList;
 import org.jdesktop.swingx.editors.HighlighterPropertyEditor;
 
 /**
@@ -36,14 +34,7 @@ public class JXListBeanInfo extends BeanInfoSupport {
     }
 
     protected void initialize() {
-        PropertyDescriptor[] array = getPropertyDescriptors();
-        for (int i=0; i<array.length; i++) {
-            PropertyDescriptor pd = array[i];
-            if (pd.getName().equals("highlighters")) {
-                pd.setPreferred(true);
-                pd.setPropertyEditorClass(HighlighterPropertyEditor.class);
-            }
-        }
-        setIconsBasedOn(JList.class);
+        setPreferred(true, "highlighters");
+        setPropertyEditor(HighlighterPropertyEditor.class, "highlighters");
     }
 }

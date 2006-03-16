@@ -20,8 +20,6 @@
  */
 package org.jdesktop.swingx;
 
-import java.beans.PropertyDescriptor;
-
 /**
  *
  * @author rbair
@@ -33,10 +31,6 @@ public class JXHeaderBeanInfo extends BeanInfoSupport {
     }
 
     protected void initialize() {
-        setPreferred("title", "description", "icon");
-        
-        //for now I'll use the same icons as jxpanel
-        iconNameC16 = "jxpanel16.png";
-        iconNameC32 = "jxpanel32.png";
+        setPreferred(true, "title", "description", "icon");
     }
 }

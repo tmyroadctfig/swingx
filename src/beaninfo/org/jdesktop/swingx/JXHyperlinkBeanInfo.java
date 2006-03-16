@@ -20,7 +20,6 @@
  */
 package org.jdesktop.swingx;
 
-import org.jdesktop.swingx.JXHyperlink;
 /**
  *
  * @author rbair
@@ -32,7 +31,5 @@ public class JXHyperlinkBeanInfo extends BeanInfoSupport {
     }
 
     protected void initialize() {
-        iconNameC16 = "jxhyperlink16.png";
-        iconNameC32 = "jxhyperlink32.png";
     }
 }

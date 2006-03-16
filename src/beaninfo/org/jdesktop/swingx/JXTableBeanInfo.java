@@ -20,10 +20,6 @@
  */
 package org.jdesktop.swingx;
 
-import java.beans.PropertyDescriptor;
-import javax.swing.JTable;
-import org.jdesktop.swingx.JXTable;
-
 /**
  *
  * @author rbair
@@ -35,10 +31,5 @@ public class JXTableBeanInfo extends BeanInfoSupport {
     }
 
     protected void initialize() {
-        PropertyDescriptor[] array = getPropertyDescriptors();
-        for (int i=0; i<array.length; i++) {
-            PropertyDescriptor pd = array[i];
-        }
-        setIconsBasedOn(JTable.class);
     }
 }

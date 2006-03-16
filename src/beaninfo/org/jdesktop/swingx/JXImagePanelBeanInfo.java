@@ -20,9 +20,6 @@
  */
 package org.jdesktop.swingx;
 
-import java.beans.PropertyDescriptor;
-import org.jdesktop.swingx.JXImagePanel;
-
 /**
  *
  * @author rbair
@@ -34,23 +31,6 @@ public class JXImagePanelBeanInfo extends BeanInfoSupport {
     }
 
     protected void initialize() {
-        PropertyDescriptor[] array = getPropertyDescriptors();
-        for (int i=0; i<array.length; i++) {
-            PropertyDescriptor pd = array[i];
-//            if (pd.getName().equals("dataPath")) {
-//                pd.setPreferred(true);
-//                pd.setValue("category", "Data Binding");
-//                pd.setPropertyEditorClass(DataPathSelectedEditor.class);
-            if (pd.getName().equals("icon") 
-                || pd.getName().equals("opaque")
-                || pd.getName().equals("alpha")
-                || pd.getName().equals("inheritAlpha")
-                || pd.getName().equals("drawGradient")
-                || pd.getName().equals("gradientPaint")) {
-                pd.setPreferred(true);
-            }
-        }
-        iconNameC16 = "jximagepanel16.png";
-        iconNameC32 = "jximagepanel32.png";
+        setPreferred(true, "icon");
     }
 }

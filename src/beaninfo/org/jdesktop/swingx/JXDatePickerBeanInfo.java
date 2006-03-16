@@ -20,9 +20,6 @@
  */
 package org.jdesktop.swingx;
 
-import java.beans.PropertyDescriptor;
-import org.jdesktop.swingx.JXDatePicker;
-
 /**
  *
  * @author rbair
@@ -35,11 +32,5 @@ public class JXDatePickerBeanInfo extends BeanInfoSupport {
     }
 
     protected void initialize() {
-        PropertyDescriptor[] array = getPropertyDescriptors();
-        for (int i=0; i<array.length; i++) {
-            PropertyDescriptor pd = array[i];
-        }
-        iconNameC16 = "jxdatepicker16.png";
-        iconNameC32 = "jxdatepicker32.png";
     }
 }

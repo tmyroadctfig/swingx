@@ -20,10 +20,6 @@
  */
 package org.jdesktop.swingx;
 
-import java.beans.PropertyDescriptor;
-import javax.swing.JTree;
-import org.jdesktop.swingx.JXTree;
-
 /**
  *
  * @author rbair
@@ -35,10 +31,5 @@ public class JXTreeBeanInfo extends BeanInfoSupport {
     }
 
     protected void initialize() {
-        PropertyDescriptor[] array = getPropertyDescriptors();
-        for (int i=0; i<array.length; i++) {
-            PropertyDescriptor pd = array[i];
-        }
-        setIconsBasedOn(JTree.class);
     }
 }

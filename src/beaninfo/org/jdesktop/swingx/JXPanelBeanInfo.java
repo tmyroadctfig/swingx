@@ -20,9 +20,6 @@
  */
 package org.jdesktop.swingx;
 
-import java.beans.PropertyDescriptor;
-import org.jdesktop.swingx.JXPanel;
-
 /**
  *
  * @author rbair
@@ -34,18 +31,7 @@ public class JXPanelBeanInfo extends BeanInfoSupport {
     }
 
     protected void initialize() {
-        PropertyDescriptor[] array = getPropertyDescriptors();
-        for (int i=0; i<array.length; i++) {
-            PropertyDescriptor pd = array[i];
-            if (pd.getName().equals("opaque")
-                || pd.getName().equals("alpha")
-                || pd.getName().equals("inheritAlpha")
-                || pd.getName().equals("drawGradient")
-                || pd.getName().equals("gradientPaint")) {
-                pd.setPreferred(true);
-            }
-        }
-        iconNameC16 = "jxpanel16.png";
-        iconNameC32 = "jxpanel32.png";
+        setPreferred(true, "opaque", "alpha", "inheritAlpha", 
+                "drawGradient", "gradientPaint");
     }
 }

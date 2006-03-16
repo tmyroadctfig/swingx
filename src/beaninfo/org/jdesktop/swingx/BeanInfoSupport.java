@@ -20,6 +20,7 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Image;
 import java.beans.BeanDescriptor;
 import java.beans.BeanInfo;
 import java.beans.EventSetDescriptor;
@@ -27,159 +28,298 @@ import java.beans.Introspector;
 import java.beans.MethodDescriptor;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import org.jdesktop.swingx.editors.HighlighterPropertyEditor;
+import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
+ * Useful baseclass for BeanInfos. With this class, normal introspection occurs
+ * and then you are given the opportunity to reconfigure portions of the
+ * bean info in the <code>initialize</code> method.
  *
  * @author rbair
  */
 public abstract class BeanInfoSupport extends SimpleBeanInfo {
-    private static Map/*<Class,Boolean>*/ introspectingState = new HashMap/*<Class,Boolean>*/();
-    private Class beanClass;
-    private int defaultPropertyIndex = -1;
-    private int defaultEventIndex = -1;
-    protected java.awt.Image iconColor16 = null;                    
-    protected java.awt.Image iconColor32 = null;
-    protected java.awt.Image iconMono16 = null;
-    protected java.awt.Image iconMono32 = null;                  
-    protected String iconNameC16 = null;                 
-    protected String iconNameC32 = null;
-    protected String iconNameM16 = null;
-    protected String iconNameM32 = null;               
-    private static Map/*<Class,BeanDescriptor>*/ beanDescriptors = new HashMap/*<Class,BeanDescriptor>*/();
-    private static Map/*<Class,PropertyDescriptor[]>*/ propertyDescriptors = new HashMap/*<Class,PropertyDescriptor[]>*/();
-    private static Map/*<Class,EventSetDescriptor[]>*/ eventDescriptors = new HashMap/*<Class,EventSetDescriptor[]>*/();
-    private static Map/*<Class,MethodDescriptor[]>*/ methodDescriptors = new HashMap/*<Class,MethodDescriptor[]>*/();
+    private static Logger LOG = Logger.getLogger(BeanInfoSupport.class.getName());
     
+    /**
+     * Indicates whether I am introspecting state for the give class. This
+     * helps prevent infinite loops
+     */
+    private static Map<Class, Boolean> introspectingState = new HashMap<Class, Boolean>();
+    /**
+     * The class of the bean that this BeanInfoSupport is for
+     */
+    private Class beanClass;
+    
+    /**
+     * @see BeanInfo
+     */
+    private int defaultPropertyIndex = -1;
+    /**
+     * @see BeanInfo
+     */
+    private int defaultEventIndex = -1;
+    /**
+     * The 16x16 color icon
+     */
+    private Image iconColor16 = null;
+    /**
+     * The 32x32 color icon
+     */
+    private Image iconColor32 = null;
+    /**
+     * The 16x16 monochrome icon
+     */
+    private Image iconMono16 = null;
+    /**
+     * The 32x32 monochrome icon
+     */
+    private Image iconMono32 = null;
+    /**
+     * A reference to the icon. This String must be of a form that
+     * ImageIO can use to locate and load the icon image
+     */
+    private String iconNameC16 = null;
+    /**
+     * A reference to the icon. This String must be of a form that
+     * ImageIO can use to locate and load the icon image
+     */
+    private String iconNameC32 = null;
+    /**
+     * A reference to the icon. This String must be of a form that
+     * ImageIO can use to locate and load the icon image
+     */
+    private String iconNameM16 = null;
+    /**
+     * A reference to the icon. This String must be of a form that
+     * ImageIO can use to locate and load the icon image
+     */
+    private String iconNameM32 = null;
+    
+    private BeanDescriptor beanDescriptor;
+    
+    private Map<String, PropertyDescriptor> properties = new TreeMap<String, PropertyDescriptor>();
+    private Map<String, EventSetDescriptor> events = new TreeMap<String, EventSetDescriptor>();
+    private Map<String, MethodDescriptor> methods = new TreeMap<String, MethodDescriptor>();
+
     /** Creates a new instance of BeanInfoSupport */
     public BeanInfoSupport(Class beanClass) {
         this.beanClass = beanClass;
         Boolean b = (Boolean)introspectingState.get(beanClass);
-        boolean introspecting = b == null ? false : b.booleanValue();
-        if (!introspecting) {
-            introspecting = true;
-            introspectingState.put(beanClass, Boolean.valueOf(introspecting));
+        if (!isIntrospecting()) {
+            introspectingState.put(beanClass, Boolean.TRUE);
             try {
                 BeanInfo info = Introspector.getBeanInfo(beanClass);
-                beanDescriptors.put(beanClass, info.getBeanDescriptor());
-                propertyDescriptors.put(beanClass, info.getPropertyDescriptors());
-                eventDescriptors.put(beanClass, info.getEventSetDescriptors());
-                methodDescriptors.put(beanClass, info.getMethodDescriptors());
+                beanDescriptor = info.getBeanDescriptor();
+                for (PropertyDescriptor pd : info.getPropertyDescriptors()) {
+                    properties.put(pd.getName(), pd);
+                }
+                for (EventSetDescriptor esd : info.getEventSetDescriptors()) {
+                    events.put(esd.getName(), esd);
+                }
+                for (MethodDescriptor md : info.getMethodDescriptors()) {
+                    methods.put(md.getName(), md);
+                }
+                
                 defaultPropertyIndex = info.getDefaultPropertyIndex();
                 defaultEventIndex = info.getDefaultEventIndex();
-                iconColor16 = info.getIcon(BeanInfo.ICON_COLOR_16x16);
-                iconColor32 = info.getIcon(BeanInfo.ICON_COLOR_32x32);
-                iconMono16 = info.getIcon(BeanInfo.ICON_MONO_16x16);
-                iconMono32 = info.getIcon(BeanInfo.ICON_MONO_32x32);
+                                
+                iconColor16 = loadStandardImage(info, BeanInfo.ICON_COLOR_16x16);
+                iconColor32 = loadStandardImage(info, BeanInfo.ICON_COLOR_32x32);
+                iconMono16 = loadStandardImage(info, BeanInfo.ICON_MONO_16x16);
+                iconMono32 = loadStandardImage(info, BeanInfo.ICON_MONO_32x32);
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            introspectingState.put(beanClass, Boolean.FALSE);
             initialize();
-            introspecting = false;
-            introspectingState.put(beanClass, Boolean.valueOf(introspecting));
         }
     }
     
-    protected abstract void initialize();
-    
-    protected void setIconsBasedOn(Class clazz) {
+    private boolean isIntrospecting() {
+        Boolean b = (Boolean)introspectingState.get(beanClass);
+        return b == null ? false : b.booleanValue();
+    }
+
+    /**
+     * attempts to load a png icon from the
+     * resource directory beneath beaninfo, named like:
+     *   JXTaskPaneContainer16.png
+     *   JXTaskPaneContainer16-mono.png
+     *   JXTaskPaneContainer32.png
+     *   JXTaskPaneContainer32-mono.png
+     * 
+     * if any of the icons is missing, an attempt is made to
+     * get an icon via introspection. If that fails, the icon
+     * will be set to placeholder16.png or one of the derivitives
+     */
+    private Image loadStandardImage(BeanInfo info, int size) {
+        String s = "";
+        switch (size) {
+            case BeanInfo.ICON_COLOR_16x16: s = "16"; break;
+            case BeanInfo.ICON_COLOR_32x32: s = "32"; break;
+            case BeanInfo.ICON_MONO_16x16: s = "16-mono"; break;
+            case BeanInfo.ICON_MONO_32x32: s = "32-mono"; break;
+        }
+        String iconName = beanClass.getSimpleName() + s + ".png";
+        
+        Image image = null;
         try {
-            BeanInfo info = Introspector.getBeanInfo(clazz);
-            iconColor16 = info.getIcon(BeanInfo.ICON_COLOR_16x16);
-            iconColor32 = info.getIcon(BeanInfo.ICON_COLOR_32x32);
-            iconMono16 = info.getIcon(BeanInfo.ICON_MONO_16x16);
-            iconMono32 = info.getIcon(BeanInfo.ICON_MONO_32x32);
+            image = loadImage("resources/" + iconName);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.info("No icon named " + iconName + " was found");
         }
+        
+//        if (image == null) {
+//            image = info.getIcon(size);
+//        }
+        
+        return image;
     }
     
+    /**
+     * Called by the constructor during the proper time so that subclasses
+     * can override the settings/values for the various beaninfo properties.
+     * For example, you could call setDisplayName("Foo Name", "foo") to change
+     * the foo properties display name
+     */
+    protected abstract void initialize();
+
+    //------------------------------------ Methods for mutating the BeanInfo    
+    /**
+     * Specify the name/url/path to the small 16x16 color icon
+     */
     protected void setSmallColorIconName(String name) {
         iconNameC16 = name;
     }
     
+    /**
+     * Specify the name/url/path to the 32x32 color icon
+     */
     protected void setColorIconName(String name) {
         iconNameC32 = name;
     }
 
+    /**
+     * Specify the name/url/path to the small 16x16 monochrome icon
+     */
     protected void setSmallMonoIconName(String name) {
         iconNameM16 = name;
     }
 
+    /**
+     * Specify the name/url/path to the 32x32 monochrome icon
+     */
     protected void setMonoIconName(String name) {
         iconNameM32 = name;
     }
     
-    protected void setHidden(String... propertyNames) {
-        setHidden(getPropertyDescriptors(propertyNames));
-    }
-    
-    protected void setHidden(PropertyDescriptor... properties) {
-        for (PropertyDescriptor pd : properties) {
-            pd.setHidden(true);
+    /**
+     * Changes the display name of the given named property. Property names
+     * are always listed last to allow for varargs
+     */
+    protected void setDisplayName(String displayName, String propertyName) {
+        PropertyDescriptor pd = properties.get(propertyName);
+        if (pd != null) {
+            pd.setDisplayName(displayName);
+        } else {
+            LOG.log(Level.WARNING, "Failed to set display name for property '" +
+                    propertyName + "'. No such property was found");
         }
     }
     
-    protected void setExpert(String... propertyNames) {
-        setExpert(getPropertyDescriptors(propertyNames));
-    }
-    
-    protected void setExpert(PropertyDescriptor... properties) {
-        for (PropertyDescriptor pd : properties) {
-            pd.setExpert(true);
+    /**
+     * Sets the given named properties to be "hidden".
+     * @see PropertyDescriptor
+     */
+    protected void setHidden(boolean hidden, String... propertyNames) {
+        for (String propertyName : propertyNames) {
+            PropertyDescriptor pd = properties.get(propertyName);
+            if (pd != null) {
+                pd.setHidden(hidden);
+            } else {
+                LOG.log(Level.WARNING, "Failed to set hidden attribute for property '" +
+                        propertyName + "'. No such property was found");
+            }
         }
     }
     
-    protected void setPreferred(String... propertyNames) {
-        setPreferred(getPropertyDescriptors(propertyNames));
+    protected void setExpert(boolean expert, String... propertyNames) {
+        for (String propertyName : propertyNames) {
+            PropertyDescriptor pd = properties.get(propertyName);
+            if (pd != null) {
+                pd.setExpert(expert);
+            } else {
+                LOG.log(Level.WARNING, "Failed to set expert attribute for property '" +
+                        propertyName + "'. No such property was found");
+            }
+        }
     }
     
-    protected void setPreferred(PropertyDescriptor... properties) {
-        for (PropertyDescriptor pd : properties) {
-            pd.setPreferred(true);
+    protected void setPreferred(boolean preferred, String... propertyNames) {
+        for (String propertyName : propertyNames) {
+            PropertyDescriptor pd = properties.get(propertyName);
+            if (pd != null) {
+                pd.setPreferred(preferred);
+            } else {
+                LOG.log(Level.WARNING, "Failed to set preferred attribute for property '" +
+                        propertyName + "'. No such property was found");
+            }
+        }
+    }
+    
+    protected void setBound(boolean bound, String... propertyNames) {
+        for (String propertyName : propertyNames) {
+            PropertyDescriptor pd = properties.get(propertyName);
+            if (pd != null) {
+                pd.setBound(bound);
+            } else {
+                LOG.log(Level.WARNING, "Failed to set bound attribute for property '" +
+                        propertyName + "'. No such property was found");
+            }
+        }
+    }
+    
+    protected void setConstrained(boolean constrained, String... propertyNames) {
+        for (String propertyName : propertyNames) {
+            PropertyDescriptor pd = properties.get(propertyName);
+            if (pd != null) {
+                pd.setConstrained(constrained);
+            } else {
+                LOG.log(Level.WARNING, "Failed to set constrained attribute for property '" +
+                        propertyName + "'. No such property was found");
+            }
         }
     }
     
     protected void setCategory(String categoryName, String... propertyNames) {
-        setCategory(categoryName, getPropertyDescriptors(propertyNames));
-    }
-    
-    protected void setCategory(String categoryName, PropertyDescriptor... properties) {
-        for (PropertyDescriptor pd : properties) {
-            pd.setValue("category", categoryName);
+        for (String propertyName : propertyNames) {
+            PropertyDescriptor pd = properties.get(propertyName);
+            if (pd != null) {
+                pd.setValue("category", categoryName);
+            } else {
+                LOG.log(Level.WARNING, "Failed to set category for property '" +
+                        propertyName + "'. No such property was found");
+            }
         }
     }
     
     protected void setPropertyEditor(Class editorClass, String... propertyNames) {
-        setPropertyEditor(editorClass, getPropertyDescriptors(propertyNames));
-    }
-    
-    protected void setPropertyEditor(Class editorClass, PropertyDescriptor... properties) {
-        for (PropertyDescriptor pd : properties) {
-            pd.setPropertyEditorClass(editorClass);
-        }
-    }
-    
-    protected PropertyDescriptor[] getPropertyDescriptors(String... propertyNames) {
-        PropertyDescriptor[] array = getPropertyDescriptors();
-        Set<String> names = new HashSet<String>(Arrays.asList(propertyNames));
-        List<PropertyDescriptor> results = new ArrayList<PropertyDescriptor>();
-        for (int i=0; i<array.length; i++) {
-            PropertyDescriptor pd = array[i];
-            if (names.contains(pd.getName())) {
-                results.add(pd);
+        for (String propertyName : propertyNames) {
+            PropertyDescriptor pd = properties.get(propertyName);
+            if (pd != null) {
+                pd.setPropertyEditorClass(editorClass);
+            } else {
+                LOG.log(Level.WARNING, "Failed to set property editor for property '" +
+                        propertyName + "'. No such property was found");
             }
         }
-        return results.toArray(new PropertyDescriptor[0]);
     }
     
+    //----------------------------------------------------- BeanInfo methods
     /**
      * Gets the bean's <code>BeanDescriptor</code>s.
      *
@@ -188,7 +328,7 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
      * information should be obtained by automatic analysis.
      */
     public BeanDescriptor getBeanDescriptor() {
-        return (BeanDescriptor)beanDescriptors.get(beanClass);
+        return isIntrospecting() ? null : beanDescriptor;
     }
     
     /**
@@ -204,7 +344,9 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
      * if a given PropertyDescriptor is an IndexedPropertyDescriptor.
      */
     public PropertyDescriptor[] getPropertyDescriptors() {
-        return (PropertyDescriptor[])propertyDescriptors.get(beanClass);
+        return isIntrospecting() 
+            ? null
+            : properties.values().toArray(new PropertyDescriptor[0]);
     }
     
     /**
@@ -215,7 +357,9 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
      * should be obtained by automatic analysis.
      */
     public EventSetDescriptor[] getEventSetDescriptors() {
-        return (EventSetDescriptor[])eventDescriptors.get(beanClass);
+        return isIntrospecting()
+            ? null
+            : events.values().toArray(new EventSetDescriptor[0]);
     }
     
     /**
@@ -226,7 +370,9 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
      * should be obtained by automatic analysis.
      */
     public MethodDescriptor[] getMethodDescriptors() {
-        return (MethodDescriptor[])methodDescriptors.get(beanClass);
+        return isIntrospecting()
+            ? null
+            : methods.values().toArray(new MethodDescriptor[0]);
     }
     
     /**
@@ -238,7 +384,7 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
      * <P>	Returns -1 if there is no default property.
      */
     public int getDefaultPropertyIndex() {
-        return defaultPropertyIndex;
+        return isIntrospecting() ? -1 : defaultPropertyIndex;
     }
     
     /**
@@ -249,7 +395,7 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
      * <P>	Returns -1 if there is no default event.
      */
     public int getDefaultEventIndex() {
-        return defaultEventIndex;
+        return isIntrospecting() ? -1 : defaultEventIndex;
     }
     
     /**
@@ -295,5 +441,14 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
             }
         }
         return img;
+    }
+    
+    public static void main(String... args) {
+        try {
+            BeanInfo info = Introspector.getBeanInfo(JXTaskPane.class);
+            System.out.println(java.util.Arrays.asList(info.getPropertyDescriptors()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

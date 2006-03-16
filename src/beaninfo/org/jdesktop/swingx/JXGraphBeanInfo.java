@@ -20,10 +20,6 @@
  */
 package org.jdesktop.swingx;
 
-import java.beans.PropertyDescriptor;
-import java.beans.PropertyEditor;
-import java.util.HashMap;
-import java.util.Map;
 import org.jdesktop.swingx.editors.Point2DPropertyEditor;
 import org.jdesktop.swingx.editors.Rectangle2DPropertyEditor;
 
@@ -33,69 +29,25 @@ import org.jdesktop.swingx.editors.Rectangle2DPropertyEditor;
  * @author Romain Guy <romain.guy@mac.com>
  */
 public class JXGraphBeanInfo extends BeanInfoSupport {
-    // maps property names to their category
-    private static final Map<String, String> categories =
-        new HashMap<String, String>();
-    static {
-        categories.put("majorX", "Graph View");
-        categories.put("majorY", "Graph View");
-        categories.put("minorCountX", "Graph View");
-        categories.put("minorCountY", "Graph View");
-        categories.put("origin", "Graph View");
-        categories.put("view", "Graph View");
-        categories.put("axisColor", "Graph Appearance");
-        categories.put("axisPainted", "Graph Appearance");
-        categories.put("backgroundPainted", "Graph Appearance");
-        categories.put("gridPainted", "Graph Appearance");
-        categories.put("majorGridColor", "Graph Appearance");
-        categories.put("minorGridColor", "Graph Appearance");
-        categories.put("textPainted", "Graph Appearance");
-        categories.put("inputEnabled", "Graph Input");
-    }
-    
-    // maps property names to their property editor
-    private static final Map<String, Class<? extends PropertyEditor>> editors =
-        new HashMap<String, Class<? extends PropertyEditor>>();
-    static {
-        editors.put("origin", Point2DPropertyEditor.class);
-        editors.put("view", Rectangle2DPropertyEditor.class);
-    }
-    
-    // defines display names for some properties
-    private static final Map<String, String> names = new HashMap<String, String>();
-    static {
-        names.put("majorX", "vertical lines spacing");
-        names.put("majorY", "horizontal lines spacing");
-        names.put("minorCountX", "sub-vertical lines count");
-        names.put("minorCountY", "sub-horizontal lines count");
-        names.put("majorGridColor", "major grid lines color");
-        names.put("minorGridColor", "minor grid lines color");
-    }
-    
     public JXGraphBeanInfo() {
         super(JXGraph.class);
     }
 
     protected void initialize() {
-        PropertyDescriptor[] array = getPropertyDescriptors();
-        for (int i = 0; i < array.length; i++) {
-            PropertyDescriptor pd = array[i];
-            if (categories.containsKey(pd.getName())) {
-                pd.setValue("category", categories.get(pd.getName()));
-            }
-            if (editors.containsKey(pd.getName())) {
-                pd.setPropertyEditorClass(editors.get(pd.getName()));
-            }
-            if (names.containsKey(pd.getName())) {
-                pd.setDisplayName(names.get(pd.getName()));
-            }
-            
-            if (pd.getName().equals("viewAndOrigin")) {
-                pd.setHidden(true);
-            }
-        }
+        setCategory("Graph View", "majorX", "majorY", "minorCountX", "minorCountY",
+                    "origin", "view");
+        setCategory("Graph Appearance", "axisColor", "axisPainted", "backgroundPainted", 
+                    "gridPainted", "majorGridColor", "minorGridColor", "textPainted");
+        setCategory("Graph Input", "inputEnabled");
         
-        iconNameC16 = "jxgraph16.png";
-        iconNameC32 = "jxgraph32.png";
+        setPropertyEditor(Point2DPropertyEditor.class, "origin");
+        setPropertyEditor(Rectangle2DPropertyEditor.class, "view");
+        
+        setDisplayName("vertical lines spacing", "majorX");
+        setDisplayName("horizontal lines spacing", "majorY");
+        setDisplayName("sub-vertical lines count", "minorCountX");
+        setDisplayName("sub-horizontal lines count", "minorCountY");
+        setDisplayName("major grid lines color", "majorGridColor");
+        setDisplayName("minor grid lines color", "minorGridColor");
     }
 }

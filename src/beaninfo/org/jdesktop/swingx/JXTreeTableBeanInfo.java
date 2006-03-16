@@ -20,9 +20,6 @@
  */
 package org.jdesktop.swingx;
 
-import java.beans.PropertyDescriptor;
-import org.jdesktop.swingx.JXTreeTable;
-
 /**
  *
  * @author rbair
@@ -34,11 +31,5 @@ public class JXTreeTableBeanInfo extends BeanInfoSupport {
     }
 
     protected void initialize() {
-        PropertyDescriptor[] array = getPropertyDescriptors();
-        for (int i=0; i<array.length; i++) {
-            PropertyDescriptor pd = array[i];
-        }
-        iconNameC16 = "jxtreetable16.png";
-        iconNameC32 = "jxtreetable32.png";
     }
 }

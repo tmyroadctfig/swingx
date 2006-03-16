@@ -20,10 +20,6 @@
  */
 package org.jdesktop.swingx;
 
-import java.beans.PropertyDescriptor;
-import javax.swing.JFrame;
-import org.jdesktop.swingx.JXFrame;
-
 /**
  *
  * @author rbair
@@ -35,10 +31,5 @@ public class JXFrameBeanInfo extends BeanInfoSupport {
     }
 
     protected void initialize() {
-        PropertyDescriptor[] array = getPropertyDescriptors();
-        for (int i=0; i<array.length; i++) {
-            PropertyDescriptor pd = array[i];
-        }
-        setIconsBasedOn(JFrame.class);
     }
 }

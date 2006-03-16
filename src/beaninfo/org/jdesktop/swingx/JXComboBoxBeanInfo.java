@@ -20,10 +20,6 @@
  */
 package org.jdesktop.swingx;
 
-import java.beans.PropertyDescriptor;
-import javax.swing.JComboBox;
-import org.jdesktop.swingx.JXComboBox;
-
 /**
  *
  * @author rbair
@@ -36,10 +32,5 @@ public class JXComboBoxBeanInfo extends BeanInfoSupport {
     }
 
     protected void initialize() {
-        PropertyDescriptor[] array = getPropertyDescriptors();
-        for (int i=0; i<array.length; i++) {
-            PropertyDescriptor pd = array[i];
-        }
-         setIconsBasedOn(JComboBox.class);
    }
 }

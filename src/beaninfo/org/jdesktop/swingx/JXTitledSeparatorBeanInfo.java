@@ -33,7 +33,8 @@ public class JXTitledSeparatorBeanInfo extends BeanInfoSupport {
     }
 
     protected void initialize() {
-        setPreferred("icon", "title", "horizontalAlignment", "horizontalTextPosition");
+        setPreferred(true, "icon", "title", "horizontalAlignment", 
+                "horizontalTextPosition");
         setPropertyEditor(HorizontalAlignmentPropertyEditor.class, 
                 "horizontalAlignment", "horizontalTextPosition");
     }
