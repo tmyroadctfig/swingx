@@ -531,6 +531,17 @@ public class JXGraph extends JXPanel implements PropertyChangeListener {
 
     /**
      * {@inheritDoc}
+     */
+    @Override
+   public boolean isOpaque() {
+        if (!isBackgroundPainted()) {
+            return false;
+        }
+        return super.isOpaque();
+    }
+    
+    /**
+     * {@inheritDoc}
      * @see #setInputEnabled(boolean)
      */
     @Override
