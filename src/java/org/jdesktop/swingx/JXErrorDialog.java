@@ -8,12 +8,12 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -43,19 +43,21 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
+import javax.swing.plaf.basic.BasicHTML;
 import org.jdesktop.swingx.util.WindowUtils;
 
 /**
- * <p>Common Error Dialog, suitable for representing information about 
- * errors and exceptions happened in application. The common usage of the 
- * <code>JXErrorDialog</code> is to show collected data about the incident and 
- * probably ask customer for a feedback. The data about the incident consists 
- * from the title which will be displayed in the dialog header, short 
- * description of the problem that will be immediately seen after dialog is 
+ * <p>Common Error Dialog, suitable for representing information about
+ * errors and exceptions happened in application. The common usage of the
+ * <code>JXErrorDialog</code> is to show collected data about the incident and
+ * probably ask customer for a feedback. The data about the incident consists
+ * from the title which will be displayed in the dialog header, short
+ * description of the problem that will be immediately seen after dialog is
  * became visible, full description of the problem which will be visible after
  * user clicks "Details" button and Throwable that contains stack trace and
  * another usable information that may be displayed in the dialog.</p>
@@ -68,7 +70,7 @@ import org.jdesktop.swingx.util.WindowUtils;
  *          //do some work
  *          //some exception is thrown
  *      } catch (Exception e) {
- *          JXErrorDialog.showDialog(this, "Critical Error", 
+ *          JXErrorDialog.showDialog(this, "Critical Error",
  *                  "&lt;html&gt;&lt;body&gt;Some &lt;b&gt;critical error&lt;/b&gt; has occured." +
  *                  " You may need to restart this application. Message #SC21." +
  *                  "&lt;/body&gt;&lt;/html&gt;", e);
@@ -80,20 +82,20 @@ import org.jdesktop.swingx.util.WindowUtils;
  * can create and display a JXErrorDialog manually.</p>
  *
  * <p>To ask user for feedback extend abstract class <code>ErrorReporter</code> and
- * set your reporter using <code>setReporter</code> method. Report button will 
+ * set your reporter using <code>setReporter</code> method. Report button will
  * be added to the dialog automatically.<br>
  * See {@link MailErrorReporter MailErrorReporter} documentation for the
  * example of error reporting usage.</p>
  *
  * <p>For example, to show simple <code>JXErrorDialog</code> call <br>
- * <code>JXErrorDialog.showDialog(null, "Application Error", 
+ * <code>JXErrorDialog.showDialog(null, "Application Error",
  *   "The application encountered the unexpected error,
  *    please contact developers")</code></p>
  *
  * <p>Internationalization is handled via a resource bundle or via the UIManager
- * bidi orientation (usefull for right to left languages) is determined in the 
+ * bidi orientation (usefull for right to left languages) is determined in the
  * same way as the JOptionPane where the orientation of the parent component is
- * picked. So when showDialog(Component cmp, ...) is invoked the component 
+ * picked. So when showDialog(Component cmp, ...) is invoked the component
  * orientation of the error dialog will match the component orientation of cmp.</p>
  *
  * @author Richard Bair
@@ -101,7 +103,7 @@ import org.jdesktop.swingx.util.WindowUtils;
  * @author Shai Almog
  */
 public class JXErrorDialog extends JDialog {
-    //---------------------------------------------------- static properties    
+    //---------------------------------------------------- static properties
     /**
      * Used as a prefix when pulling data out of UIManager for i18n
      */
@@ -118,13 +120,13 @@ public class JXErrorDialog extends JDialog {
      * Error reporting engine assigned for error reporting for all error dialogs
      */
     private static ErrorReporter DEFAULT_REPORTER;
-
-    //-------------------------------------------------- instance properties    
+    
+    //-------------------------------------------------- instance properties
     
     /**
      * Error message text area
      */
-    private JXEditorPane errorMessage;
+    private JEditorPane errorMessage;
     /**
      * details text area
      */
@@ -170,7 +172,7 @@ public class JXErrorDialog extends JDialog {
      * (IncidentInfo.getErrorLevel != Level.SEVERE)
      */
     private Icon warningIcon = DEFAULT_WARNING_ICON;
-
+    
     //------------------------------------------------------ private helpers
     /**
      * The height of the window when collapsed. This value is stashed when the
@@ -183,7 +185,7 @@ public class JXErrorDialog extends JDialog {
      */
     private int expandedHeight = 0;
     
-    //------------------------------------------------- static configuration    
+    //------------------------------------------------- static configuration
     
     /**
      * Creates initialize the UIManager with localized strings
@@ -214,7 +216,7 @@ public class JXErrorDialog extends JDialog {
         super(owner, true);
         initGui();
     }
-
+    
     /**
      * Create a new ErrorDialog with the given Dialog as the owner
      * @param owner Owner of this error dialog.
@@ -223,8 +225,8 @@ public class JXErrorDialog extends JDialog {
         super(owner, true);
         initGui();
     }
-
-    //-------------------------------------------- public methods/properties    
+    
+    //-------------------------------------------- public methods/properties
     
     /**
      * Sets the IncidentInfo for this dialog
@@ -237,7 +239,7 @@ public class JXErrorDialog extends JDialog {
         firePropertyChange("incidentInfo", old, this.incidentInfo);
         reinit();
     }
-
+    
     /**
      * Get curent dialog's IncidentInfo
      *
@@ -246,7 +248,7 @@ public class JXErrorDialog extends JDialog {
     public IncidentInfo getIncidentInfo() {
         return incidentInfo;
     }
-
+    
     /**
      * Sets the ErrorReporter to use with this instance of JXErrorDialog.
      * If not specified, the default error reporter is used (as specified
@@ -260,7 +262,7 @@ public class JXErrorDialog extends JDialog {
         firePropertyChange("errorReporter", old, this.reporter);
         reinit();
     }
-
+    
     /**
      * Returns the error reporter in use with this instance of JXErrorDialog.
      * If not specified, the default error reporter is returned
@@ -282,7 +284,7 @@ public class JXErrorDialog extends JDialog {
         firePropertyChange("errorIcon", old, this.errorIcon);
         reinit();
     }
-
+    
     /**
      * Returns the Icon in use if the IncidentInfo is Level.SEVERE
      *
@@ -332,8 +334,8 @@ public class JXErrorDialog extends JDialog {
     public Action getReportAction() {
         return reportAction;
     }
-
-    //----------------------------------------------- private helper methods    
+    
+    //----------------------------------------------- private helper methods
     /**
      * initialize the gui.
      */
@@ -341,7 +343,7 @@ public class JXErrorDialog extends JDialog {
         //initialize the gui
         GridBagLayout layout = new GridBagLayout();
         this.getContentPane().setLayout(layout);
-
+        
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.NORTH;
         gbc.fill = GridBagConstraints.NONE;
@@ -349,11 +351,12 @@ public class JXErrorDialog extends JDialog {
         gbc.insets = new Insets(22, 12, 11, 17);
         iconLabel = new JLabel(DEFAULT_ERROR_ICON);
         this.getContentPane().add(iconLabel, gbc);
-
-        errorMessage = new JXEditorPane();
+        
+        errorMessage = new JEditorPane();
         errorMessage.setEditable( false );
         errorMessage.setContentType("text/html");
         errorMessage.setOpaque( false );
+        errorMessage.putClientProperty(JXEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
         gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.LINE_START;
         gbc.fill = GridBagConstraints.BOTH;
@@ -362,11 +365,11 @@ public class JXErrorDialog extends JDialog {
         gbc.gridx = 1;
         gbc.weightx = 0.0;
         gbc.weighty = 0.00001; //ensures that when details is hidden, it get all
-                               //the extra space, but none when details is shown
-                               //(unless you have a REALLY BIG MONITOR
+        //the extra space, but none when details is shown
+        //(unless you have a REALLY BIG MONITOR
         gbc.insets = new Insets(24, 0, 0, 11);
         this.getContentPane().add(errorMessage, gbc);
-
+        
         gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.NONE;
         gbc.gridx = 1;
@@ -378,7 +381,7 @@ public class JXErrorDialog extends JDialog {
         gbc.insets = new Insets(12, 0, 11, 5);
         EqualSizeJButton okButton = new EqualSizeJButton(UIManager.getString(CLASS_NAME + ".ok_button_text"));
         this.getContentPane().add(okButton, gbc);
-
+        
         reportAction = new ReportAction();
         reportButton = new EqualSizeJButton(reportAction);
         gbc = new GridBagConstraints();
@@ -387,16 +390,17 @@ public class JXErrorDialog extends JDialog {
         gbc.insets = new Insets(12, 0, 11, 5);
         this.getContentPane().add(reportButton, gbc);
         reportButton.setVisible(false); // not visible by default
-
+        
         detailButton = new EqualSizeJButton(UIManager.getString(CLASS_NAME + ".details_expand_text"));
         gbc = new GridBagConstraints();
         gbc.gridx = 3;
         gbc.weightx = 0.0;
         gbc.insets = new Insets(12, 0, 11, 11);
         this.getContentPane().add(detailButton, gbc);
-
+        
         details = new JXEditorPane();
         details.setContentType("text/html");
+        details.putClientProperty(JXEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
         details.setTransferHandler(new DetailsTransferHandler());
         JScrollPane detailsScrollPane = new JScrollPane(details);
         detailsScrollPane.setPreferredSize(new Dimension(10, 250));
@@ -410,7 +414,7 @@ public class JXErrorDialog extends JDialog {
         gbc.gridy = 2;
         gbc.weighty = 1.0;
         this.getContentPane().add(detailsPanel, gbc);
-
+        
         JButton button = new JButton(UIManager.getString(CLASS_NAME + ".copy_to_clipboard_button_text"));
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
@@ -431,11 +435,11 @@ public class JXErrorDialog extends JDialog {
         
         //make the buttons the same size
         EqualSizeJButton[] buttons = new EqualSizeJButton[] {
-                detailButton, okButton, reportButton };
+            detailButton, okButton, reportButton };
         okButton.setGroup(buttons);
         reportButton.setGroup(buttons);
         detailButton.setGroup(buttons);
-
+        
         okButton.setMinimumSize(okButton.getPreferredSize());
         reportButton.setMinimumSize(reportButton.getPreferredSize());
         detailButton.setMinimumSize(detailButton.getPreferredSize());
@@ -444,12 +448,12 @@ public class JXErrorDialog extends JDialog {
         okButton.addActionListener(new OkClickEvent());
         detailButton.addActionListener(new DetailsClickEvent());
     }
-
+    
     /**
      * Set the details section of the error dialog.  If the details are either
      * null or an empty string, then hide the details button and hide the detail
      * scroll pane.  Otherwise, just set the details section.
-     * @param details  Details to be shown in the detail section of the dialog. 
+     * @param details  Details to be shown in the detail section of the dialog.
      * This can be null if you do not want to display the details section of the
      * dialog.
      */
@@ -463,7 +467,7 @@ public class JXErrorDialog extends JDialog {
             detailButton.setVisible(true);
         }
     }
-
+    
     /**
      * Set the details section to be either visible or invisible.  Set the
      * text of the Details button accordingly.
@@ -495,20 +499,25 @@ public class JXErrorDialog extends JDialog {
             errorMessage.setSize( errorMessage.getPreferredSize() );
             setSize(getWidth(), collapsedHeight);
         }
-
+        
         repaint();
     }
-
+    
     /**
      * Set the error message for the dialog box
      * @param errorMessage Message for the error dialog
      */
     private void setErrorMessage(String errorMessage) {
+        if(BasicHTML.isHTMLString(errorMessage)) {
+            this.errorMessage.setContentType("text/html");
+        } else {
+            this.errorMessage.setContentType("text/plain");
+        }
         this.errorMessage.setText(errorMessage);
     }
     
     /**
-     * Reconfigures the dialog if settings have changed, such as the 
+     * Reconfigures the dialog if settings have changed, such as the
      * IncidentInfo, errorIcon, warningIcon, etc
      */
     private void reinit() {
@@ -519,7 +528,7 @@ public class JXErrorDialog extends JDialog {
             setErrorMessage("");
             setDetails("");
         } else {
-            iconLabel.setIcon(incidentInfo.getErrorLevel() == Level.SEVERE ? 
+            iconLabel.setIcon(incidentInfo.getErrorLevel() == Level.SEVERE ?
                 errorIcon : warningIcon);
             setTitle(incidentInfo.getHeader());
             setErrorMessage(incidentInfo.getBasicErrorMessage());
@@ -527,23 +536,24 @@ public class JXErrorDialog extends JDialog {
             if(details == null) {
                 if(incidentInfo.getErrorException() != null) {
                     //convert the stacktrace into a more pleasent bit of HTML
-                    StringBuffer html = new StringBuffer("<html><head><title>");
-                    html.append(incidentInfo.getHeader());
-                    html.append("</title><style><!--H1 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:22px;} H2 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:16px;} H3 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:14px;} BODY {font-family:Tahoma,Arial,sans-serif;color:black;background-color:white;} B {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;} P {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:12px;}A {color : black;}HR {color : #525D76;}--></style> </head><body><h1>");
-                    html.append(incidentInfo.getHeader());
-                    html.append("</h1><HR size=\"1\" noshade><p><b>Level</b> ");
-                    html.append(incidentInfo.getErrorLevel());
-                    html.append("</p><p><b>Message</b> <u>");
-                    html.append(incidentInfo.getErrorException().getLocalizedMessage());
-                    html.append("</u></p><p><b>Stack Trace</b><p>");
+                    StringBuffer html = new StringBuffer("<html>");
+                    html.append("<h2>" + incidentInfo.getHeader() + "</h2>");
+                    html.append("<HR size='1' noshade>");
+                    html.append("<div></div>");
+                    html.append("<b>Message:</b>");
+                    html.append("<pre>");
+                    html.append("    " + incidentInfo.getErrorException().toString());
+                    html.append("</pre>");
+                    html.append("<b>Level:</b>");
+                    html.append("<pre>");
+                    html.append("    " + incidentInfo.getErrorLevel());
+                    html.append("</pre>");
+                    html.append("<b>Stack Trace:</b>");
+                    html.append("<pre>");
                     for (StackTraceElement el : incidentInfo.getErrorException().getStackTrace()) {
-                        html.append("&nbsp;&nbsp;&nbsp;&nbsp;");
-                        html.append(el.toString());
-                        html.append("<br>");
+                        html.append("    " + el.toString() + "\n");
                     }
-                    html.append("<HR size=\"1\" noshade><h3>");
-                    html.append(incidentInfo.getHeader());
-                    html.append("</h3></body></html>");
+                    html.append("</pre></html>");
                     details = html.toString();
                 } else {
                     details = "";
@@ -562,7 +572,7 @@ public class JXErrorDialog extends JDialog {
         errorMessage.setPreferredSize(prefSize);
     }
     
-    //------------------------------------------------------- static methods    
+    //------------------------------------------------------- static methods
     
     /**
      * Constructs and shows the error dialog for the given exception.  The exceptions message will be the
@@ -577,7 +587,7 @@ public class JXErrorDialog extends JDialog {
         IncidentInfo ii = new IncidentInfo(title, null, null, e);
         showDialog(owner, ii);
     }
-
+    
     /**
      * Constructs and shows the error dialog for the given exception.  The exceptions message is specified,
      * and the stacktrace will be the details.
@@ -592,7 +602,7 @@ public class JXErrorDialog extends JDialog {
         IncidentInfo ii = new IncidentInfo(title, errorMessage, null, e);
         showDialog(owner, ii);
     }
-
+    
     /**
      * Show the error dialog.
      * @param owner Owner of this error dialog. Determines the Window in which the dialog
@@ -607,7 +617,7 @@ public class JXErrorDialog extends JDialog {
         IncidentInfo ii = new IncidentInfo(title, errorMessage, details);
         showDialog(owner, ii);
     }
-
+    
     /**
      * Show the error dialog.
      * @param owner Owner of this error dialog. Determines the Window in which the dialog
@@ -620,7 +630,7 @@ public class JXErrorDialog extends JDialog {
         IncidentInfo ii = new IncidentInfo(title, errorMessage, (String)null);
         showDialog(owner, ii);
     }
-
+    
     /**
      * Show the error dialog.
      * @param owner Owner of this error dialog. Determines the Window in which the dialog
@@ -630,19 +640,19 @@ public class JXErrorDialog extends JDialog {
      */
     public static void showDialog(Component owner, IncidentInfo info) {
         JXErrorDialog dlg;
-
+        
         Window window = WindowUtils.findWindow(owner);
-
+        
         if (window instanceof Dialog) {
             dlg = new JXErrorDialog((Dialog)window);
         } else {
             dlg = new JXErrorDialog((Frame)window);
         }
         dlg.setIncidentInfo(info);
-        // If the owner is null applies orientation of the shared 
+        // If the owner is null applies orientation of the shared
         // hidden window used as owner.
         if(owner != null)
-        dlg.applyComponentOrientation(owner.getComponentOrientation());
+            dlg.applyComponentOrientation(owner.getComponentOrientation());
         else
             dlg.applyComponentOrientation(window.getComponentOrientation());
         dlg.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -650,7 +660,7 @@ public class JXErrorDialog extends JDialog {
         dlg.setLocationRelativeTo(owner);
         dlg.setVisible(true);
     }
-
+    
     /**
      * Returns the current reporting engine that will be used to report a problem if
      * user clicks on 'Report' button or <code>null</code> if no reporting engine set.
@@ -661,7 +671,7 @@ public class JXErrorDialog extends JDialog {
     public static ErrorReporter getReporter() {
         return DEFAULT_REPORTER;
     }
-
+    
     /**
      * Set reporting engine which will handle error reporting if user clicks 'report' button.
      *
@@ -727,52 +737,52 @@ public class JXErrorDialog extends JDialog {
         return DEFAULT_WARNING_ICON;
     }
     
-    //------------------------------------------------ actions/inner classes    
+    //------------------------------------------------ actions/inner classes
     
     /**
      * Listener for Ok button click events
      * @author Richard Bair
      */
     private final class OkClickEvent implements ActionListener {
-
+        
         /* (non-Javadoc)
-        * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-        */
+         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
         public void actionPerformed(ActionEvent e) {
             //close the window
             setVisible(false);
             dispose();
         }
     }
-
+    
     /**
      * Listener for Details click events.  Alternates whether the details section
      * is visible or not.
      * @author Richard Bair
      */
     private final class DetailsClickEvent implements ActionListener {
-
+        
         /* (non-Javadoc)
-        * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-        */
+         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
         public void actionPerformed(ActionEvent e) {
             setDetailsVisible(!detailsPanel.isVisible());
         }
     }
-
+    
     /**
      * Action for report button
      */
     public class ReportAction extends AbstractAction {
-
+        
         public boolean isEnabled() {
             return (getErrorReporter() != null);
         }
-
+        
         public void actionPerformed(ActionEvent e) {
             getErrorReporter().reportIncident(getIncidentInfo());
         }
-
+        
         public Object getValue(String key) {
             if(key == Action.NAME) {
                 if(getErrorReporter() != null && getErrorReporter().getActionName() != null) {
@@ -794,7 +804,7 @@ public class JXErrorDialog extends JDialog {
     private static class EqualSizeJButton extends JButton {
         public EqualSizeJButton() {
         }
-
+        
         public EqualSizeJButton(String text) {
             super(text);
         }
@@ -811,7 +821,7 @@ public class JXErrorDialog extends JDialog {
         public void setGroup(EqualSizeJButton[] group) {
             this.group = group;
         }
-
+        
         /**
          * Returns the actual preferred size on a different instance of this button
          */
@@ -825,7 +835,7 @@ public class JXErrorDialog extends JDialog {
          * If the UI delegate's <code>getPreferredSize</code>
          * method returns a non <code>null</code> value then return that;
          * otherwise defer to the component's layout manager.
-         * 
+         *
          * @return the value of the <code>preferredSize</code> property
          * @see #setPreferredSize
          * @see ComponentUI
@@ -858,7 +868,7 @@ public class JXErrorDialog extends JDialog {
             }
             return new StringSelection(text);
         }
-
+        
         public int getSourceActions(JComponent c) {
             return TransferHandler.COPY;
         }

@@ -71,6 +71,9 @@ public class IncidentInfo {
         } else {
             if(errorException != null) {
                 this.basicErrorMessage = errorException.getLocalizedMessage();
+                if (this.basicErrorMessage == null) {
+                    this.basicErrorMessage = errorException.toString();
+                }
             } else {
                 this.basicErrorMessage = "";
             }
