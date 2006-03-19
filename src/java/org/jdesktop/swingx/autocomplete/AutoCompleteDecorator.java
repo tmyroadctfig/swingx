@@ -47,16 +47,16 @@ import javax.swing.text.TextAction;
  * <p>Usage examples:</p>
  * <p><code>
  * JComboBox comboBox = [...];<br/>
- * Configurator.<b>enableAutoCompletion</b>(comboBox);<br/>
+ * AutoCompleteDecorator.<b>decorate</b>(comboBox);<br/>
  * &nbsp;<br/>
  * JList list = [...];<br/>
  * JTextField textField = [...];<br/>
- * Configurator.<b>enableAutoCompletion</b>(list, textField);
+ * AutoCompleteDecorator.<b>decorate</b>(list, textField);
  * </p></code>
  *
  * @author Thomas Bierhance
  */
-public class Configurator {
+public class AutoCompleteDecorator {
     
     /**
      * Enables automatic completion for the given JTextComponent based on the
@@ -67,9 +67,9 @@ public class Configurator {
      * @param textComponent the text component that will be used for automatic
      * completion.
      */
-    public static void enableAutoCompletion(JList list, JTextComponent textComponent) {
-        AbstractComponentAdaptor adaptor = new ListAdaptor(list, textComponent);
-        Document document = new Document(adaptor, true);
+    public static void decorate(JList list, JTextComponent textComponent) {
+        AbstractAutoCompleteAdaptor adaptor = new ListAdaptor(list, textComponent);
+        AutoCompleteDocument document = new AutoCompleteDocument(adaptor, true);
         configureTextComponent(textComponent, document, adaptor);
     }
     
@@ -79,15 +79,15 @@ public class Configurator {
      * if the combo box is not editable.
      * @param comboBox a combobox
      */
-    public static void enableAutoCompletion(final JComboBox comboBox) {
+    public static void decorate(final JComboBox comboBox) {
         boolean strictMatching = !comboBox.isEditable();
         // has to be editable
         comboBox.setEditable(true);
         
         // configure the text component=editor component
         JTextComponent editor = (JTextComponent) comboBox.getEditor().getEditorComponent();
-        final AbstractComponentAdaptor adaptor = new ComboBoxAdaptor(comboBox);
-        final Document document = new Document(adaptor, strictMatching);
+        final AbstractAutoCompleteAdaptor adaptor = new ComboBoxAdaptor(comboBox);
+        final AutoCompleteDocument document = new AutoCompleteDocument(adaptor, strictMatching);
         configureTextComponent(editor, document, adaptor);
         
         // show the popup list when the user presses a key
@@ -123,12 +123,14 @@ public class Configurator {
     
     /**
      * Configures a given text component for automatic completion using the
-     * given Document and AbstractComponentAdaptor.
+     * given AutoCompleteDocument and AbstractAutoCompleteAdaptor.
+     * 
+     * 
      * @param textComponent a text component that should be configured
-     * @param document the Document to be installed on the text component
-     * @param adaptor the AbstractComponentAdaptor to be used
+     * @param document the AutoCompleteDocument to be installed on the text component
+     * @param adaptor the AbstractAutoCompleteAdaptor to be used
      */
-    public static void configureTextComponent(JTextComponent textComponent, Document document, final AbstractComponentAdaptor adaptor) {
+    public static void configureTextComponent(JTextComponent textComponent, AutoCompleteDocument document, final AbstractAutoCompleteAdaptor adaptor) {
         // install the document on the text component
         textComponent.setDocument(document);
         
@@ -165,9 +167,9 @@ public class Configurator {
     static class NonStrictBackspaceAction extends TextAction {
         Action backspace;
         Action selectionBackward;
-        AbstractComponentAdaptor adaptor;
+        AbstractAutoCompleteAdaptor adaptor;
         
-        public NonStrictBackspaceAction(Action backspace, Action selectionBackward, AbstractComponentAdaptor adaptor) {
+        public NonStrictBackspaceAction(Action backspace, Action selectionBackward, AbstractAutoCompleteAdaptor adaptor) {
             super("nonstrict-backspace");
             this.backspace = backspace;
             this.selectionBackward = selectionBackward;

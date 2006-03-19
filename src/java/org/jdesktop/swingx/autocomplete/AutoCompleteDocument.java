@@ -26,10 +26,10 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 
 /**
- * A Document that can be plugged into any JTextComponent to enable automatic completion.
- * It finds and selects matching items using any implementation of the AbstractComponentAdaptor.
+ * A document that can be plugged into any JTextComponent to enable automatic completion.
+ * It finds and selects matching items using any implementation of the AbstractAutoCompleteAdaptor.
  */
-public class Document extends PlainDocument {
+public class AutoCompleteDocument extends PlainDocument {
     
     /** Flag to indicate if adaptor.setSelectedItem has been called.
      * Subsequent calls to remove/insertString should be ignored
@@ -46,16 +46,18 @@ public class Document extends PlainDocument {
     /**
      * The adaptor that is used to find and select items.
      */
-    AbstractComponentAdaptor adaptor;
+    AbstractAutoCompleteAdaptor adaptor;
     
     /**
-     * Creates a new Document for the given AbstractComponentAdaptor.
+     * Creates a new AutoCompleteDocument for the given AbstractAutoCompleteAdaptor.
+     * 
+     * 
      * @param strictMatching true, if only items from the adaptor's list should
      * be allowed to be entered
      * @param adaptor The adaptor that will be used to find and select matching
      * items.
      */
-    public Document(AbstractComponentAdaptor adaptor, boolean strictMatching) {
+    public AutoCompleteDocument(AbstractAutoCompleteAdaptor adaptor, boolean strictMatching) {
         this.adaptor = adaptor;
         this.strictMatching = strictMatching;
         
@@ -113,7 +115,8 @@ public class Document extends PlainDocument {
     }
     
     /**
-     * Sets the text of this Document to the given text.
+     * Sets the text of this AutoCompleteDocument to the given text.
+     * 
      * @param text the text that will be set for this document
      */
     private void setText(String text) {
@@ -127,7 +130,8 @@ public class Document extends PlainDocument {
     }
     
     /**
-     * Selects the given item using the AbstractComponentAdaptor.
+     * Selects the given item using the AbstractAutoCompleteAdaptor.
+     * 
      * @param item the item that is to be selected
      */
     private void setSelectedItem(Object item) {
@@ -137,9 +141,10 @@ public class Document extends PlainDocument {
     }
     
     /**
-     * Searches for an item that matches the given pattern. The AbstractComponentAdaptor
+     * Searches for an item that matches the given pattern. The AbstractAutoCompleteAdaptor
      * is used to access the candidate items. The match is not case-sensitive
      * and will only match at the beginning of each item's string representation.
+     * 
      * @param pattern the pattern that should be matched
      * @return the first item that matches the pattern or <code>null</code> if no item matches
      */

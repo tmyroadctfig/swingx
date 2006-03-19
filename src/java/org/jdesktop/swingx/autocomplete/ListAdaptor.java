@@ -25,11 +25,12 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.text.JTextComponent;
 
 /**
- * An implementation of the AbstractComponentAdaptor that is suitable for a
+ * An implementation of the AbstractAutoCompleteAdaptor that is suitable for a
  * JList in conjunction with a JTextComponent.
+ * 
  * @author Thomas Bierhance
  */
-public class ListAdaptor extends AbstractComponentAdaptor implements ListSelectionListener {
+public class ListAdaptor extends AbstractAutoCompleteAdaptor implements ListSelectionListener {
     
     /** the list containing the items */
     JList list;
