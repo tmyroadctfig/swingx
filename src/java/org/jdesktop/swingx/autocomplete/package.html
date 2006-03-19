@@ -74,7 +74,7 @@
     <code>
     AbstractAutoCompleteAdaptor adaptor = <span class="keyword">new</span> <b>YourAdaptor</b>([...]);<br/>
     AutoCompleteDocument document = <span class="keyword">new</span> <b>AutoCompleteDocument</b>(adaptor, true); <span class="comment">// or false if you need non-strict matching</span><br/>
-    AutoCompleteDecorator.<b>configureTextComponent</b>(yourTextComponent, document, adaptor);
+    AutoCompleteDecorator.<b>decorate</b>(yourTextComponent, document, adaptor);
     </code>
     </p>
   </body>

@@ -70,7 +70,7 @@ public class AutoCompleteDecorator {
     public static void decorate(JList list, JTextComponent textComponent) {
         AbstractAutoCompleteAdaptor adaptor = new ListAdaptor(list, textComponent);
         AutoCompleteDocument document = new AutoCompleteDocument(adaptor, true);
-        configureTextComponent(textComponent, document, adaptor);
+        decorate(textComponent, document, adaptor);
     }
     
     /**
@@ -88,7 +88,7 @@ public class AutoCompleteDecorator {
         JTextComponent editor = (JTextComponent) comboBox.getEditor().getEditorComponent();
         final AbstractAutoCompleteAdaptor adaptor = new ComboBoxAdaptor(comboBox);
         final AutoCompleteDocument document = new AutoCompleteDocument(adaptor, strictMatching);
-        configureTextComponent(editor, document, adaptor);
+        decorate(editor, document, adaptor);
         
         // show the popup list when the user presses a key
         final KeyListener keyListener = new KeyAdapter() {
@@ -113,7 +113,7 @@ public class AutoCompleteDecorator {
                 if (e.getPropertyName().equals("editor")) {
                     ComboBoxEditor editor = comboBox.getEditor();
                     if (editor!=null && editor.getEditorComponent()!=null) {
-                        configureTextComponent((JTextComponent) editor.getEditorComponent(), document, adaptor);
+                        decorate((JTextComponent) editor.getEditorComponent(), document, adaptor);
                         editor.getEditorComponent().addKeyListener(keyListener);
                     }
                 }
@@ -122,15 +122,15 @@ public class AutoCompleteDecorator {
     }
     
     /**
-     * Configures a given text component for automatic completion using the
+     * Decorates a given text component for automatic completion using the
      * given AutoCompleteDocument and AbstractAutoCompleteAdaptor.
      * 
      * 
-     * @param textComponent a text component that should be configured
+     * @param textComponent a text component that should be decorated
      * @param document the AutoCompleteDocument to be installed on the text component
      * @param adaptor the AbstractAutoCompleteAdaptor to be used
      */
-    public static void configureTextComponent(JTextComponent textComponent, AutoCompleteDocument document, final AbstractAutoCompleteAdaptor adaptor) {
+    public static void decorate(JTextComponent textComponent, AutoCompleteDocument document, final AbstractAutoCompleteAdaptor adaptor) {
         // install the document on the text component
         textComponent.setDocument(document);
         
