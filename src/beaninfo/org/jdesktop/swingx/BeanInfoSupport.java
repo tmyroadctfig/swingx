@@ -442,13 +442,4 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
         }
         return img;
     }
-    
-    public static void main(String... args) {
-        try {
-            BeanInfo info = Introspector.getBeanInfo(JXTaskPane.class);
-            System.out.println(java.util.Arrays.asList(info.getPropertyDescriptors()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }
