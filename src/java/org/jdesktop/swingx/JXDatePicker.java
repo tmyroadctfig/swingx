@@ -38,6 +38,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
+import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
 
 /**
  * A component that combines a button, an editable field and a JXMonthView
@@ -434,8 +435,7 @@ public class JXDatePicker extends JComponent {
     private final class TodayPanel extends JXPanel {
         TodayPanel() {
             super(new FlowLayout());
-            setDrawGradient(true);
-            setGradientPaint(new GradientPaint(0, 0, new Color(238, 238, 238), 0, 1, Color.WHITE));
+            setBackgroundPainter(new BasicGradientPainter(0, 0, new Color(238, 238, 238), 0, 1, Color.WHITE));
             JXHyperlink todayLink = new JXHyperlink(new TodayAction());
             Color textColor = new Color(16, 66, 104);
             todayLink.setUnclickedColor(textColor);

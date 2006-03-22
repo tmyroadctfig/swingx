@@ -21,14 +21,16 @@
 
 package org.jdesktop.swingx;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JSeparator;
+import javax.swing.UIManager;
+import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
 
 /**
  * <p>A simple component that consists of a title, a description, and an icon.
@@ -86,7 +88,7 @@ public class JXHeader extends JXPanel {
 
         add(new JSeparator(), new GridBagConstraints(0, 2, 2, 1, 1.0, 0.0, GridBagConstraints.SOUTH, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
         
-        setDrawGradient(true);
+        setBackgroundPainter(new BasicGradientPainter(0, 0, Color.WHITE, 1, 0, UIManager.getColor("control")));
     }
     
     /**
