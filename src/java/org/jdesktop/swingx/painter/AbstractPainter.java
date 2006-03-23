@@ -29,11 +29,15 @@ import java.awt.Paint;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JComponent;
 import org.jdesktop.swingx.JavaBean;
+import org.jdesktop.swingx.util.PaintUtils;
 
 /**
  * <p>A convenient base class from which concrete Painter implementations may
@@ -93,13 +97,67 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
     
     private Shape clip;
     private Composite composite;
+    private boolean useCache;
     private Map<RenderingHints.Key, Object> renderingHints;
+    private SoftReference<BufferedImage> cachedImage;
+    private Effect[] effects = new Effect[0];
     
     /**
      * Creates a new instance of AbstractPainter
      */
     public AbstractPainter() {
         renderingHints = new HashMap<RenderingHints.Key,Object>();
+    }
+    
+    /**
+     * <p>Sets whether to cache the painted image with a SoftReference in a BufferedImage
+     * between calls. If true, and if the size of the component hasn't changed,
+     * then the cached image will be used rather than causing a painting operation.</p>
+     *
+     * <p>This should be considered a hint, rather than absolute. Several factors may
+     * force repainting, including low memory, different component sizes, or possibly
+     * new rendering hint settings, etc.</p>
+     *
+     * @param b whether or not to use the cache
+     */
+    public void setUseCache(boolean b) {
+        boolean old = isUseCache();
+        useCache = b;
+        firePropertyChange("useCache", old, isUseCache());
+        //if there was a cached image and I'm no longer using the cache, blow it away
+        if (cachedImage != null && !isUseCache()) {
+            cachedImage = null;
+        }
+    }
+    
+    /**
+     * @returns whether or not the cache should be used
+     */
+    public boolean isUseCache() {
+        return useCache;
+    }
+    
+    /**
+     * <p>Sets an array of effects to execute, in order from first to last, on the
+     * results of the AbstractPainter's painting operation. Some common effects
+     * including blurs, shadows, embossing, and so forth. If the given array is
+     * null, an empty array will be created and used instead.</p>
+     *
+     * @param effects the array of Effects that will be executed in order from
+     *        first to last on the results of the painting operation
+     */
+    public void setEffects(Effect... effects) {
+        Effect[] old = getEffects();
+        this.effects = effects == null ? new Effect[0] : effects;
+        firePropertyChange("effects", old, getEffects());
+    }
+    
+    /**
+     * @return the array of effects to be applied to the results of the painting
+     *         operation. This will never return null;
+     */
+    public Effect[] getEffects() {
+        return this.effects;
     }
     
     /**
@@ -585,7 +643,37 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
             g.setClip(getClip());
         }
         
-        paintBackground(g, component);
+        //if I am cacheing, and the cache is not null, and the image has the
+        //same dimensions as the component, then simply paint the image
+        BufferedImage image = cachedImage == null ? null : cachedImage.get();
+        if (isUseCache() && image != null 
+                && image.getWidth() == component.getWidth()
+                && image.getHeight() == component.getHeight()) {
+            g.drawImage(image, 0, 0, null);
+        } else {
+            Effect[] effects = getEffects();
+            if (effects.length > 0 || isUseCache()) {
+                image = PaintUtils.createCompatibleImage(
+                        component.getWidth(),
+                        component.getHeight(),
+                        Transparency.TRANSLUCENT);
+                
+                Graphics2D gfx = image.createGraphics();
+                paintBackground(gfx, component);
+                gfx.dispose();
+                
+                for (Effect effect : effects) {
+                    effect.apply(image);
+                }
+                
+                if (isUseCache()) {
+                    cachedImage = new SoftReference<BufferedImage>(image);
+                }
+            } else {
+                paintBackground(g, component);
+            }
+        }
+        
         restoreState(g);
     }
 

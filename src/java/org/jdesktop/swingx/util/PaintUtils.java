@@ -29,9 +29,13 @@ import java.awt.FontMetrics;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -156,4 +160,33 @@ public class PaintUtils {
 	    }
 	}
     }
+    
+    /**
+     * @return Creates and returns a BufferedImage that is "compatible" with this machines
+     * video card and subsystem
+     *
+     * @param width the width of the new BufferedImage
+     * @param height the height of the new BufferedImage
+     */
+    public static BufferedImage createCompatibleImage(int width, int height) { 
+         GraphicsEnvironment environment = GraphicsEnvironment.getLocalGraphicsEnvironment(); 
+         GraphicsDevice screenDevice = environment.getDefaultScreenDevice(); 
+         GraphicsConfiguration configuration = screenDevice.getDefaultConfiguration(); 
+         return configuration.createCompatibleImage(width, height); 
+     }
+    
+    /**
+     * @return Creates and returns a BufferedImage that is "compatible" with this machines
+     * video card and subsystem with the given Transparency.
+     *
+     * @param width the width of the new BufferedImage
+     * @param height the height of the new BufferedImage
+     * @param transparency, one of the values in the Transparency interface
+     */
+    public static BufferedImage createCompatibleImage(int width, int height, int transparency) { 
+         GraphicsEnvironment environment = GraphicsEnvironment.getLocalGraphicsEnvironment(); 
+         GraphicsDevice screenDevice = environment.getDefaultScreenDevice(); 
+         GraphicsConfiguration configuration = screenDevice.getDefaultConfiguration(); 
+         return configuration.createCompatibleImage(width, height, transparency); 
+     }
 }
