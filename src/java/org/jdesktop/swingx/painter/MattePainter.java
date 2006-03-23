@@ -80,7 +80,7 @@ public class MattePainter extends AbstractPainter {
      * @param the Paint to fill with
      */
     public MattePainter(Paint paint) {
-        super();
+        setPaint(paint);
     }
 
     /**
