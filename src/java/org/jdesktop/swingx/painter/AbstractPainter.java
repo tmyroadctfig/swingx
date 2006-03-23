@@ -26,9 +26,12 @@ import java.awt.Composite;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JComponent;
 import org.jdesktop.swingx.JavaBean;
 
@@ -37,20 +40,42 @@ import org.jdesktop.swingx.JavaBean;
  * extend. It extends JavaBean and thus provides property change notification
  * (which is crucial for the Painter implementations to be available in a
  * GUI builder). It also saves off the Graphics2D state in its "saveState" method,
- * and restores that state in the "restoreState" method. Simply include these method
- * calls in the paint method of subclasses.</p>
+ * and restores that state in the "restoreState" method. Sublasses simply need
+ * to extend AbstractPainter and implement the paintBackground method.
  * 
- * <p>For example, here is the paint method of BackgroundPainter:
+ * <p>For example, here is the paintBackground method of BackgroundPainter:
  * <pre><code>
- *  public void paint(Graphics2D g, JComponent component) {
- *      saveState(g);
+ *  public void paintBackground(Graphics2D g, JComponent component) {
  *      g.setColor(component.getBackground());
  *      g.fillRect(0, 0, component.getWidth(), component.getHeight());
- *      restoreState(g);
  *  }
+ * </code></pre>
+ * 
+ * <p>AbstractPainter provides a very useful default implementation of
+ * the paint method. It:
+ * <ol>
+ *  <li>Saves off the old state</li>
+ *  <li>Sets any specified rendering hints</li>
+ *  <li>Sets the Clip if there is one</li>
+ *  <li>Sets the Composite if there is one</li>
+ *  <li>Delegates to paintBackground</li>
+ *  <li>Restores the original Graphics2D state</li>
+ * <ol></p>
+ *
+ * <p>Specifying rendering hints can greatly improve the visual impact of your
+ * applications. For example, by default Swing doesn't do much in the way of
+ * antialiasing (except for Fonts, but that's another story). Pinstripes don't
+ * look so good without antialiasing. So if I were going to paint pinstripes, I
+ * might do it like this:
+ * <pre><code>
+ *   PinstripePainter p = new PinstripePainter();
+ *   p.setAntialiasing(RenderingHints.VALUE_ANTIALIAS_ON);
  * </code></pre></p>
- * 
- * 
+ *
+ * <p>You can read more about antialiasing and other rendering hints in the
+ * java.awt.RenderingHints documentation. <strong>By nature, changing the rendering
+ * hints may have an impact on performance. Certain hints require more
+ * computation, others require less</strong></p>
  * 
  * @author rbair
  */
@@ -64,14 +89,17 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
     private Shape oldClip;
     private Color oldBackground;
     private Color oldColor;
+    private RenderingHints oldRenderingHints;
     
     private Shape clip;
     private Composite composite;
+    private Map<RenderingHints.Key, Object> renderingHints;
     
     /**
      * Creates a new instance of AbstractPainter
      */
     public AbstractPainter() {
+        renderingHints = new HashMap<RenderingHints.Key,Object>();
     }
     
     /**
@@ -117,6 +145,378 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
     }
 
     /**
+     * @returns the technique used for interpolating alpha values. May be one
+     * of:
+     * <ul>
+     *  <li>RenderingHints.VALUE_ALPHA_INTERPOLATION_SPEED</li>
+     *  <li>RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY</li>
+     *  <li>RenderingHints.VALUE_ALPHA_INTERPOLATION_DEFAULT</li>
+     * </ul>
+     */
+    public Object getAlphaInterpolation() {
+        return renderingHints.get(RenderingHints.KEY_ALPHA_INTERPOLATION);
+    }
+
+    /**
+     * Sets the technique used for interpolating alpha values.
+     *
+     * @param alphaInterpolation
+     * May be one of:
+     * <ul>
+     *  <li>RenderingHints.VALUE_ALPHA_INTERPOLATION_SPEED</li>
+     *  <li>RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY</li>
+     *  <li>RenderingHints.VALUE_ALPHA_INTERPOLATION_DEFAULT</li>
+     * </ul>
+     */
+    public void setAlphaInterpolation(Object alphaInterpolation) {
+        if (!RenderingHints.KEY_ALPHA_INTERPOLATION.isCompatibleValue(alphaInterpolation)) {
+            throw new IllegalArgumentException(alphaInterpolation + " is not an acceptable value");
+        }
+        Object old = getAlphaInterpolation();
+        renderingHints.put(RenderingHints.KEY_ALPHA_INTERPOLATION, alphaInterpolation);
+        firePropertyChange("alphaInterpolation", old, getAlphaInterpolation());
+    }
+
+    /**
+     * @returns whether or not to antialias
+     *          May be one of:
+     * <ul>
+     *  <li>RenderingHints.VALUE_ANTIALIAS_DEFAULT</li>
+     *  <li>RenderingHints.VALUE_ANTIALIAS_OFF</li>
+     *  <li>RenderingHints.VALUE_ANTIALIAS_ON</li>
+     * </ul>
+     */
+    public Object getAntialiasing() {
+        return renderingHints.get(RenderingHints.KEY_ANTIALIASING);
+    }
+
+    /**
+     * Sets whether or not to antialias
+     * @param antialiasing
+     *          May be one of:
+     * <ul>
+     *  <li>RenderingHints.VALUE_ANTIALIAS_DEFAULT</li>
+     *  <li>RenderingHints.VALUE_ANTIALIAS_OFF</li>
+     *  <li>RenderingHints.VALUE_ANTIALIAS_ON</li>
+     * </ul>
+     */
+    public void setAntialiasing(Object antialiasing) {
+        if (!RenderingHints.KEY_ANTIALIASING.isCompatibleValue(antialiasing)) {
+            throw new IllegalArgumentException(antialiasing + " is not an acceptable value");
+        }
+        Object old = getAntialiasing();
+        renderingHints.put(RenderingHints.KEY_ANTIALIASING, antialiasing);
+        firePropertyChange("antialiasing", old, getAntialiasing());
+    }
+
+    /**
+     * @returns the technique to use for rendering colors
+     *          May be one of:
+     * <ul>
+     *  <li>RenderingHints.VALUE_COLOR_RENDER_DEFAULT</li>
+     *  <li>RenderingHints.VALUE_RENDER_QUALITY</li>
+     *  <li>RenderingHints.VALUE_RENDER_SPEED</li>
+     * </ul>
+     */
+    public Object getColorRendering() {
+        return renderingHints.get(RenderingHints.KEY_COLOR_RENDERING);
+    }
+
+    /**
+     * Sets the technique to use for rendering colors
+     * @param colorRendering
+     *          May be one of:
+     * <ul>
+     *  <li>RenderingHints.VALUE_COLOR_RENDER_DEFAULT</li>
+     *  <li>RenderingHints.VALUE_RENDER_QUALITY</li>
+     *  <li>RenderingHints.VALUE_RENDER_SPEED</li>
+     * </ul>
+     */
+    public void setColorRendering(Object colorRendering) {
+        if (!RenderingHints.KEY_COLOR_RENDERING.isCompatibleValue(colorRendering)) {
+            throw new IllegalArgumentException(colorRendering + " is not an acceptable value");
+        }
+        Object old = getColorRendering();
+        renderingHints.put(RenderingHints.KEY_COLOR_RENDERING, colorRendering);
+        firePropertyChange("colorRendering", old, getColorRendering());
+    }
+
+    /**
+     * @returns whether or not to dither
+     *          May be one of:
+     * <ul>
+     *  <li>RenderingHints.VALUE_DITHER_DEFAULT</li>
+     *  <li>RenderingHints.VALUE_DITHER_ENABLE</li>
+     *  <li>RenderingHints.VALUE_DITHER_DISABLE</li>
+     * </ul>
+     */
+    public Object getDithering() {
+        return renderingHints.get(RenderingHints.KEY_DITHERING);
+    }
+
+    /**
+     * Sets whether or not to dither
+     * @param dithering
+     *          May be one of:
+     * <ul>
+     *  <li>RenderingHints.VALUE_DITHER_DEFAULT</li>
+     *  <li>RenderingHints.VALUE_DITHER_ENABLE</li>
+     *  <li>RenderingHints.VALUE_DITHER_DISABLE</li>
+     * </ul>
+     */
+    public void setDithering(Object dithering) {
+        if (!RenderingHints.KEY_DITHERING.isCompatibleValue(dithering)) {
+            throw new IllegalArgumentException(dithering + " is not an acceptable value");
+        }
+        Object old = getDithering();
+        renderingHints.put(RenderingHints.KEY_DITHERING, dithering);
+        firePropertyChange("dithering", old, getDithering());
+    }
+
+    /**
+     * @returns whether or not to use fractional metrics
+     *          May be one of:
+     * <ul>
+     *  <li>RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT</li>
+     *  <li>RenderingHints.VALUE_FRACTIONALMETRICS_OFF</li>
+     *  <li>RenderingHints.VALUE_FRACTIONALMETRICS_ON</li>
+     * </ul>
+     */
+    public Object getFractionalMetrics() {
+        return renderingHints.get(RenderingHints.KEY_FRACTIONALMETRICS);
+    }
+
+    /**
+     * Sets whether or not to use fractional metrics
+     *
+     * @param fractionalMetrics
+     *          May be one of:
+     * <ul>
+     *  <li>RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT</li>
+     *  <li>RenderingHints.VALUE_FRACTIONALMETRICS_OFF</li>
+     *  <li>RenderingHints.VALUE_FRACTIONALMETRICS_ON</li>
+     * </ul>
+     */
+    public void setFractionalMetrics(Object fractionalMetrics) {
+        if (!RenderingHints.KEY_FRACTIONALMETRICS.isCompatibleValue(fractionalMetrics)) {
+            throw new IllegalArgumentException(fractionalMetrics + " is not an acceptable value");
+        }
+        Object old = getFractionalMetrics();
+        renderingHints.put(RenderingHints.KEY_FRACTIONALMETRICS, fractionalMetrics);
+        firePropertyChange("fractionalMetrics", old, getFractionalMetrics());
+    }
+
+    /**
+     * @returns the technique to use for interpolation (used esp. when scaling)
+     *          May be one of:
+     * <ul>
+     *  <li>RenderingHints.VALUE_INTERPOLATION_BICUBIC</li>
+     *  <li>RenderingHints.VALUE_INTERPOLATION_BILINEAR</li>
+     *  <li>RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR</li>
+     * </ul>
+     */
+    public Object getInterpolation() {
+        return renderingHints.get(RenderingHints.KEY_INTERPOLATION);
+    }
+
+    /**
+     * Sets the technique to use for interpolation (used esp. when scaling)
+     * @param interpolation
+     *          May be one of:
+     * <ul>
+     *  <li>RenderingHints.VALUE_INTERPOLATION_BICUBIC</li>
+     *  <li>RenderingHints.VALUE_INTERPOLATION_BILINEAR</li>
+     *  <li>RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR</li>
+     * </ul>
+     */
+    public void setInterpolation(Object interpolation) {
+        if (!RenderingHints.KEY_INTERPOLATION.isCompatibleValue(interpolation)) {
+            throw new IllegalArgumentException(interpolation + " is not an acceptable value");
+        }
+        Object old = getInterpolation();
+        renderingHints.put(RenderingHints.KEY_INTERPOLATION, interpolation);
+        firePropertyChange("interpolation", old, getInterpolation());
+    }
+
+    /**
+     * @returns a hint as to techniques to use with regards to rendering quality vs. speed
+     *          May be one of:
+     * <ul>
+     *  <li>RenderingHints.VALUE_RENDER_QUALITY</li>
+     *  <li>RenderingHints.VALUE_RENDER_SPEED</li>
+     *  <li>RenderingHints.VALUE_RENDER_DEFAULT</li>
+     * </ul>
+     */
+    public Object getRendering() {
+        return renderingHints.get(RenderingHints.KEY_RENDERING);
+    }
+
+    /**
+     * Specifies a hint as to techniques to use with regards to rendering quality vs. speed
+     *
+     * @param rendering
+     *          May be one of:
+     * <ul>
+     *  <li>RenderingHints.VALUE_RENDER_QUALITY</li>
+     *  <li>RenderingHints.VALUE_RENDER_SPEED</li>
+     *  <li>RenderingHints.VALUE_RENDER_DEFAULT</li>
+     * </ul>
+     */
+    public void setRendering(Object rendering) {
+        if (!RenderingHints.KEY_RENDERING.isCompatibleValue(rendering)) {
+            throw new IllegalArgumentException(rendering + " is not an acceptable value");
+        }
+        Object old = getRendering();
+        renderingHints.put(RenderingHints.KEY_RENDERING, rendering);
+        firePropertyChange("rendering", old, getRendering());
+    }
+
+    /**
+     * @returns technique for rendering strokes
+     *          May be one of:
+     * <ul>
+     *  <li>RenderingHints.VALUE_STROKE_DEFAULT</li>
+     *  <li>RenderingHints.VALUE_STROKE_NORMALIZE</li>
+     *  <li>RenderingHints.VALUE_STROKE_PURE</li>
+     * </ul>
+     */
+    public Object getStrokeControl() {
+        return renderingHints.get(RenderingHints.KEY_STROKE_CONTROL);
+    }
+
+    /**
+     * Specifies a technique for rendering strokes
+     *
+     * @param strokeControl
+     *          May be one of:
+     * <ul>
+     *  <li>RenderingHints.VALUE_STROKE_DEFAULT</li>
+     *  <li>RenderingHints.VALUE_STROKE_NORMALIZE</li>
+     *  <li>RenderingHints.VALUE_STROKE_PURE</li>
+     * </ul>
+     */
+    public void setStrokeControl(Object strokeControl) {
+        if (!RenderingHints.KEY_STROKE_CONTROL.isCompatibleValue(strokeControl)) {
+            throw new IllegalArgumentException(strokeControl + " is not an acceptable value");
+        }
+        Object old = getStrokeControl();
+        renderingHints.put(RenderingHints.KEY_STROKE_CONTROL, strokeControl);
+        firePropertyChange("strokeControl", old, getStrokeControl());
+    }
+
+    /**
+     * @returns technique for anti-aliasing text.
+     *          (TODO this needs to be updated for Mustang. You may use the
+     *           new Mustang values, and everything will work, but support in
+     *           the GUI builder and documentation need to be added once we
+     *           branch for Mustang)<br/>
+     *          May be one of:
+     * <ul>
+     *  <li>RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT</li>
+     *  <li>RenderingHints.VALUE_TEXT_ANTIALIAS_OFF</li>
+     *  <li>RenderingHints.VALUE_TEXT_ANTIALIAS_ON</li>
+     * </ul>
+     */
+    public Object getTextAntialiasing() {
+        return renderingHints.get(RenderingHints.KEY_TEXT_ANTIALIASING);
+    }
+
+    /**
+     * Sets the technique for anti-aliasing text.
+     *          (TODO this needs to be updated for Mustang. You may use the
+     *           new Mustang values, and everything will work, but support in
+     *           the GUI builder and documentation need to be added once we
+     *           branch for Mustang)<br/>
+     *
+     * @param textAntialiasing
+     *          May be one of:
+     * <ul>
+     *  <li>RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT</li>
+     *  <li>RenderingHints.VALUE_TEXT_ANTIALIAS_OFF</li>
+     *  <li>RenderingHints.VALUE_TEXT_ANTIALIAS_ON</li>
+     * </ul>
+     */
+    public void setTextAntialiasing(Object textAntialiasing) {
+        if (!RenderingHints.KEY_TEXT_ANTIALIASING.isCompatibleValue(textAntialiasing)) {
+            throw new IllegalArgumentException(textAntialiasing + " is not an acceptable value");
+        }
+        Object old = getTextAntialiasing();
+        renderingHints.put(RenderingHints.KEY_TEXT_ANTIALIASING, textAntialiasing);
+        firePropertyChange("textAntialiasing", old, getTextAntialiasing());
+    }
+
+    /**
+     * @return the rendering hint associated with the given key. May return null
+     */
+    public Object getRenderingHint(RenderingHints.Key key) {
+        return renderingHints.get(key);
+    }
+
+    /**
+     * Set the given hint for the given key. This will end up firing the appropriate
+     * property change event if the key is recognized. For example, if the key is
+     * RenderingHints.KEY_ANTIALIASING, then the setAntialiasing method will be
+     * called firing an "antialiasing" property change event if necessary. If
+     * the key is not recognized, no event will be fired but the key will be saved.
+     * The key must not be null
+     *
+     * @param key cannot be null
+     * @param hint must be a hint compatible with the given key
+     */
+    public void setRenderingHint(RenderingHints.Key key, Object hint) {
+        if (key == null) {
+            throw new NullPointerException("RenderingHints key cannot be null");
+        }
+        
+        if (key == RenderingHints.KEY_ALPHA_INTERPOLATION) {
+            setAlphaInterpolation(hint);
+        } else if (key == RenderingHints.KEY_ANTIALIASING) {
+            setAntialiasing(hint);
+        } else if (key == RenderingHints.KEY_COLOR_RENDERING) {
+            setColorRendering(hint);
+        } else if (key == RenderingHints.KEY_DITHERING) {
+            setDithering(hint);
+        } else if (key == RenderingHints.KEY_FRACTIONALMETRICS) {
+            setFractionalMetrics(hint);
+        } else if (key == RenderingHints.KEY_INTERPOLATION) {
+            setInterpolation(hint);
+        } else if (key == RenderingHints.KEY_RENDERING) {
+            setRendering(hint);
+        } else if (key == RenderingHints.KEY_STROKE_CONTROL) {
+            setStrokeControl(hint);
+        } else if (key == RenderingHints.KEY_TEXT_ANTIALIASING) {
+            setTextAntialiasing(hint);
+        } else {
+            renderingHints.put(key, hint);
+        }
+    }
+
+    /**
+     * @return a copy of the map of rendering hints held by this class. This
+     *         returned value will never be null
+     */
+    public Map<RenderingHints.Key, Object> getRenderingHints() {
+        return new HashMap<RenderingHints.Key, Object>(renderingHints);
+    }
+
+    /**
+     * Sets the rendering hints to use. This will <strong>replace</strong> the
+     * rendering hints entirely, clearing any hints that were previously set.
+     *
+     * @param renderingHints map of hints. May be null. I null, a new Map of
+     * rendering hints will be created
+     */
+    public void setRenderingHints(Map<RenderingHints.Key, Object> renderingHints) {
+        Map<RenderingHints.Key,Object> old = this.renderingHints;
+        if (renderingHints != null) {
+            this.renderingHints = new HashMap<RenderingHints.Key, Object>(renderingHints);
+        } else {
+            this.renderingHints = new HashMap<RenderingHints.Key, Object>();
+        }
+        firePropertyChange("renderingHints", old, getRenderingHints());
+    }
+    
+    /**
      * Saves the state in the given Graphics2D object so that it may be
      * restored later.
      *
@@ -131,6 +531,10 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
         oldClip = g.getClip();
         oldBackground = g.getBackground();
         oldColor = g.getColor();
+        
+        //save off the old rendering hints
+        oldRenderingHints = g.getRenderingHints();
+        
         stateSaved = true;
     }
     
@@ -154,7 +558,35 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
         g.setClip(oldClip);
         g.setBackground(oldBackground);
         g.setColor(oldColor);
+        
+        //restore the rendering hints
+        g.setRenderingHints(oldRenderingHints);
+        
         stateSaved = false;
+    }
+        
+    /**
+     * @inheritDoc
+     */
+    public void paint(Graphics2D g, JComponent component) {
+        saveState(g);
+        
+        //set any non-null rendering hints
+        for (Map.Entry<RenderingHints.Key,Object> entry : renderingHints.entrySet()) {
+            if (entry.getValue() != null) {
+                g.setRenderingHint(entry.getKey(), entry.getValue());
+            }
+        }
+        
+        if (getComposite() != null) {
+            g.setComposite(getComposite());
+        }
+        if (getClip() != null) {
+            g.setClip(getClip());
+        }
+        
+        paintBackground(g, component);
+        restoreState(g);
     }
 
     /**
@@ -166,19 +598,4 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
      * @param component The JComponent that the Painter is delegate for.
      */
     protected abstract void paintBackground(Graphics2D g, JComponent component);
-        
-    /**
-     * @inheritDoc
-     */
-    public void paint(Graphics2D g, JComponent component) {
-        saveState(g);
-        if (getComposite() != null) {
-            g.setComposite(getComposite());
-        }
-        if (getClip() != null) {
-            g.setClip(getClip());
-        }
-        paintBackground(g, component);
-        restoreState(g);
-    }
 }
