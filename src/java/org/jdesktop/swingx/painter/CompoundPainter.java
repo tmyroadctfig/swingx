@@ -52,7 +52,7 @@ import org.jdesktop.swingx.JavaBean;
  *
  * @author rbair
  */
-public class CompoundPainter extends JavaBean implements Painter {
+public class CompoundPainter extends AbstractPainter implements Painter {
     private Painter[] painters = new Painter[0];
     
     /** Creates a new instance of CompoundPainter */
@@ -101,7 +101,7 @@ public class CompoundPainter extends JavaBean implements Painter {
     /**
      * @inheritDoc
      */
-    public void paint(Graphics2D g, JComponent component) {
+    public void paintBackground(Graphics2D g, JComponent component) {
         for (Painter p : getPainters()) {
             p.paint(g, component);
         }
