@@ -114,6 +114,14 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
             try {
                 BeanInfo info = Introspector.getBeanInfo(beanClass);
                 beanDescriptor = info.getBeanDescriptor();
+                if (beanDescriptor != null) {
+                    Class customizerClass = getCustomizerClass();
+                    beanDescriptor = new BeanDescriptor(beanDescriptor.getBeanClass(),
+                            customizerClass == null ? beanDescriptor.getCustomizerClass()
+                            : customizerClass);
+                } else {
+                    beanDescriptor = new BeanDescriptor(beanClass, getCustomizerClass());
+                }
                 for (PropertyDescriptor pd : info.getPropertyDescriptors()) {
                     properties.put(pd.getName(), pd);
                 }
@@ -188,6 +196,14 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
      */
     protected abstract void initialize();
 
+    /**
+     * Override this method if you want to return a custom customizer class
+     * for the bean
+     */
+    protected Class getCustomizerClass() {
+        return null;
+    }
+    
     //------------------------------------ Methods for mutating the BeanInfo    
     /**
      * Specify the name/url/path to the small 16x16 color icon
