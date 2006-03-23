@@ -20,6 +20,8 @@
  */
 package org.jdesktop.swingx;
 
+import org.jdesktop.swingx.editors.PainterPropertyEditor;
+
 /**
  *
  * @author rbair
@@ -31,7 +33,8 @@ public class JXPanelBeanInfo extends BeanInfoSupport {
     }
 
     protected void initialize() {
-        setPreferred(true, "opaque", "alpha", "inheritAlpha", 
-                "drawGradient", "gradientPaint");
+        setPreferred(true, "opaque", "alpha", "inheritAlpha", "backgroundPainter");
+        setHidden(true, "drawGradient", "gradientPaint");
+        setPropertyEditor(PainterPropertyEditor.class, "backgroundPainter");
     }
 }
