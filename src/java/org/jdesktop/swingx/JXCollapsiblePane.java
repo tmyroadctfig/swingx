@@ -130,7 +130,7 @@ import javax.swing.Timer;
  * @author rbair (from the JDNC project)
  * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
  */
-public class JXCollapsiblePane extends JPanel {
+public class JXCollapsiblePane extends JXPanel {
 
   /**
    * Used when generating PropertyChangeEvents for the "animationState"
@@ -192,7 +192,7 @@ public class JXCollapsiblePane extends JPanel {
      * and the given LayoutManager
      */
     public JXCollapsiblePane(LayoutManager layout) {
-        super(layout);
+        super.setLayout(layout);
 
         JPanel panel = new JPanel();
         panel.setLayout(new VerticalLayout(2));
@@ -642,7 +642,7 @@ public class JXCollapsiblePane extends JPanel {
     }
   }
 
-  private final class WrapperContainer extends JPanel {
+  private final class WrapperContainer extends JXPanel {
     private BufferedImage img;
     private Container c;
     float alpha = 1.0f;
