@@ -666,6 +666,8 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
                     effect.apply(image);
                 }
                 
+                g.drawImage(image, 0, 0, null);
+                
                 if (isUseCache()) {
                     cachedImage = new SoftReference<BufferedImage>(image);
                 }
