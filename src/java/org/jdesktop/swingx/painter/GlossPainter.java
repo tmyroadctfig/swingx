@@ -1,16 +1,29 @@
 /*
- * GlossPainter.java
+ * $Id$
  *
- * Created on 23 mars 2006, 13:52
+ * Copyright 2006 Sun Microsystems, Inc., 4150 Network Circle,
+ * Santa Clara, California 95054, U.S.A. All rights reserved.
  *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 package org.jdesktop.swingx.painter;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.Area;
@@ -18,40 +31,83 @@ import java.awt.geom.Ellipse2D;
 import javax.swing.JComponent;
 
 /**
+ * <p>A Painter implementation that simulates a gloss effect. The gloss can
+ * be positionned at the top or bottom of the drawing area. To fill the gloss,
+ * this painter uses a Paint instance which can be used to fill with a color
+ * (opaque or translucent), a texture, a gradient...</p>
+ * <p>The following example creates a white gloss at the top of the drawing
+ * area:</p>
+ * <pre>
+ *  GlossPainter p = new GlossPainter();
+ *  p.setPaint(new Color(1.0f, 1.0f, 1.0f, 0.2f);
+ *  p.setPosition(GlossPainter.GlossPosition.TOP);
+ *  panel.setBackgroundPainter(p);
+ * </pre>
+ * <p>The values shown in this examples are the values used by default if
+ * they are not specified.</p>
  *
  * @author Romain Guy <romain.guy@mac.com>
  */
 public class GlossPainter extends AbstractPainter {
+    /**
+     * <p>Used to define the position of the gloss on the painted area.</p>
+     */
     public enum GlossPosition {
         TOP, BOTTOM
     }
     
-    private Color color;
+    private Paint paint;
     private GlossPosition position;
     
+    /**
+     * <p>Creates a new gloss painter positionned at the top of the painted
+     * area with a 20% translucent white color.</p>
+     */
     public GlossPainter() {
-        this(Color.WHITE, GlossPosition.TOP);
+        this(new Color(1.0f, 1.0f, 1.0f, 0.2f), GlossPosition.TOP);
     }
     
-    public GlossPainter(Color color) {
-        this(color, GlossPosition.TOP);
+    /**
+     * <p>Creates a new gloss painter positionned at the top of the painted
+     * area with the specified paint.</p>
+     *
+     * @param paint The paint to be used when filling the gloss
+     */
+    public GlossPainter(Paint paint) {
+        this(paint, GlossPosition.TOP);
     }
     
+    /**
+     * <p>Creates a new gloss painter positionned at the specified position
+     * and using a white, 20% translucent paint.</p>
+     *
+     * @param position The position of the gloss on the painted area
+     */
     public GlossPainter(GlossPosition position) {
-        this(Color.WHITE, position);
+        this(new Color(1.0f, 1.0f, 1.0f, 0.2f), position);
     }
     
-    public GlossPainter(Color color, GlossPosition position) {
-        this.setColor(color);
+    /**
+     * <p>Creates a new gloss painter positionned at the specified position
+     * and painted with the specified paint.</p>
+     *
+     * @param paint The paint to be used when filling the gloss
+     * @param position The position of the gloss on the painted area
+     */
+    public GlossPainter(Paint paint, GlossPosition position) {
+        this.setPaint(paint);
         this.setPosition(position);
         
         setRenderingHint(RenderingHints.KEY_ANTIALIASING,
             RenderingHints.VALUE_ANTIALIAS_ON);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected void paintBackground(Graphics2D g, JComponent component) {
-        Ellipse2D ellipse = new Ellipse2D.Double(-component.getWidth(),
-            component.getHeight() / 2.7, component.getWidth() * 3.0,
+        Ellipse2D ellipse = new Ellipse2D.Double(-component.getWidth() / 2.0,
+            component.getHeight() / 2.7, component.getWidth() * 2.0,
             component.getHeight() * 2.0);
         
         Shape gloss = ellipse;
@@ -61,24 +117,49 @@ public class GlossPainter extends AbstractPainter {
             gloss = area;
         }
         
-        g.setColor(getColor());
-        g.fill(gloss);
+        if (getPaint() != null) {
+            g.setPaint(getPaint());
+            g.fill(gloss);
+        }
     }
 
-    public Color getColor() {
-        return color;
+    /**
+     * <p>Returns the paint currently used by the painter to fill the gloss.</p>
+     *
+     * @return the current Paint instance used by the painter
+     */
+    public Paint getPaint() {
+        return paint;
     }
 
-    public void setColor(Color color) {
-        Color old = this.color;
-        this.color = color;
-        firePropertyChange("color", old, getColor());
+    /**
+     * <p>Changes the paint to be used to fill the gloss. When the specified
+     * paint is null, nothing is painted. A paint can be an instance of
+     * Color.</p>
+     *
+     * @param paint The Paint instance to be used to fill the gloss
+     */
+    public void setPaint(Paint paint) {
+        Paint old = this.paint;
+        this.paint = paint;
+        firePropertyChange("paint", old, getPaint());
     }
 
+    /**
+     * <p>Returns the position at which the gloss is painted.</p>
+     *
+     * @return the position of the gloss in the painted area
+     */
     public GlossPosition getPosition() {
         return position;
     }
 
+    /**
+     * <p>Changes the position of the gloss in the painted area. Only the
+     * values defined in the GlossPosition enum are valid.</p>
+     *
+     * @param position The position at which the gloss is painted
+     */
     public void setPosition(GlossPosition position) {
         GlossPosition old = this.position;
         this.position = position;
