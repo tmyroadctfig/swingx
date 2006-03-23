@@ -65,10 +65,55 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
     private Color oldBackground;
     private Color oldColor;
     
+    private Shape clip;
+    private Composite composite;
+    
     /**
      * Creates a new instance of AbstractPainter
      */
     public AbstractPainter() {
+    }
+    
+    /**
+     * Specifies the Shape to use for clipping the painting area. This
+     * may be null
+     *
+     * @param clip the Shape to use to clip the area. Whatever is inside this
+     *        shape will be kept, everything else "clipped". May be null. If
+     *        null, the clipping is not set on the graphics object
+     */
+    public void setClip(Shape clip) {
+        Shape old = getClip();
+        this.clip = clip;
+        firePropertyChange("clip", old, getClip());
+    }
+    
+    /**
+     * @returns the clipping shape
+     */
+    public Shape getClip() {
+        return clip;
+    }
+    
+    /**
+     * Sets the Composite to use. For example, you may specify a specific
+     * AlphaComposite so that when this Painter paints, any content in the
+     * drawing area is handled properly
+     *
+     * @param c The composite to use. If null, then no composite will be
+     *        specified on the graphics object
+     */
+    public void setComposite(Composite c) {
+        Composite old = getComposite();
+        this.composite = c;
+        firePropertyChange("composite", old, getComposite());
+    }
+    
+    /**
+     * @returns the composite
+     */
+    public Composite getComposite() {
+        return composite;
     }
 
     /**
@@ -110,5 +155,30 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
         g.setBackground(oldBackground);
         g.setColor(oldColor);
         stateSaved = false;
+    }
+
+    /**
+     * Subclasses should implement this method and perform custom painting operations
+     * here. Common behavior, such as setting the clip and composite, saving and restoring
+     * state, is performed in the "paint" method automatically, and then delegated here.
+     *
+     * @param g The Graphics2D object in which to paint
+     * @param component The JComponent that the Painter is delegate for.
+     */
+    protected abstract void paintBackground(Graphics2D g, JComponent component);
+        
+    /**
+     * @inheritDoc
+     */
+    public void paint(Graphics2D g, JComponent component) {
+        saveState(g);
+        if (getComposite() != null) {
+            g.setComposite(getComposite());
+        }
+        if (getClip() != null) {
+            g.setClip(getClip());
+        }
+        paintBackground(g, component);
+        restoreState(g);
     }
 }

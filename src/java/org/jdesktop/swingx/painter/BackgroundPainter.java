@@ -32,14 +32,18 @@ import javax.swing.JComponent;
  */
 public class BackgroundPainter extends AbstractPainter {
     
+    /**
+     * Creates a new BackgroundPainter
+     */
     public BackgroundPainter() {
         super();
     }
     
-    public void paint(Graphics2D g, JComponent component) {
-        saveState(g);
+    /**
+     * @inheritDoc
+     */
+    public void paintBackground(Graphics2D g, JComponent component) {
         g.setColor(component.getBackground());
         g.fillRect(0, 0, component.getWidth(), component.getHeight());
-        restoreState(g);
     }
 }

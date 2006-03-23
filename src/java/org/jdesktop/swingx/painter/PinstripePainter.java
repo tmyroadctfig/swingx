@@ -147,8 +147,7 @@ public class PinstripePainter extends AbstractPainter {
     /**
      * @inheritDoc
      */
-    public void paint(Graphics2D g, JComponent component) {
-        saveState(g);
+    public void paintBackground(Graphics2D g, JComponent component) {
         //draws pinstripes at the angle specified in this class
         //and at the given distance apart
         Paint p = getPaint();
@@ -171,7 +170,5 @@ public class PinstripePainter extends AbstractPainter {
             int x = (int)(i * getSpacing());
             g.drawLine(x, -lineLength, x, lineLength);
         }
-            
-        restoreState(g);
     }
 }

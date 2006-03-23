@@ -123,9 +123,7 @@ public class ImagePainter extends AbstractPainter {
     /**
      * @inheritDoc
      */
-    public void paint(Graphics2D g, JComponent component) {
-        saveState(g);
-        
+    public void paintBackground(Graphics2D g, JComponent component) {
         if (img != null) {
             int imgWidth = img.getWidth(null);
             int imgHeight = img.getHeight(null);
@@ -175,7 +173,5 @@ public class ImagePainter extends AbstractPainter {
                 }
             }
         }
-        
-        restoreState(g);
     }
 }

@@ -30,17 +30,17 @@ import javax.swing.JComponent;
  * to be able to customize the background painting of a JXPanel without having
  * to override it. Since many components within SwingX extend JXPanel, the
  * developer can implement custom painting on many parts of SwingX.</p>
- *
+ * 
  * <p>Painters are generally expected to work with JComponent or one of its
  * subclasses. Most painters don't use the component beyond requesting its width
  * and height, but it is conceivable that certain painters will only work with
  * specific subclasses (JXTitledPanel, for instance, so that the text can
  * be extracted and used to paint a glow effect).</p>
- *
+ * 
  * <p>Painters can be combined together by using the CompoundPainter. CompoundPainter
  * uses an array to store several painters, and the order in which they should be
  * painted.</p>
- *
+ * 
  * <p>For example, if I want to create a CompoundPainter that started with a blue
  * background, had pinstripes on it running at a 45 degree angle, and those
  * pinstripes appeared to "fade in" from left to right, I would write the following:
@@ -60,10 +60,11 @@ import javax.swing.JComponent;
  *  Painter p = new CompoundPainter(backgroundPainter, pinstripes, veil);
  *  panel.setBackgroundPainter(p);
  * </code></pre></p>
- *
+ * 
  * <p>For convenience, AbstractPainter handles some basic painting chores and
  * should be extended for most concrete Painter implementations</p>
- *
+ * 
+ * 
  * @author rbair
  */
 public interface Painter<T extends JComponent> {
@@ -73,12 +74,13 @@ public interface Painter<T extends JComponent> {
      * use the background property of the component and the width/height of the
      * component to perform a fill rect. Most other Painters will disregard the
      * component entirely, except to get the component width/height.</p>
-     *
+     * 
      * <p>The Graphics2D object must be returned to the same state it started
      * at by the end of the method. For example, if "setColor(c)" was called
      * on the graphics object, it should be reset to the original color before
      * the method returns.</p>
-     *
+     * 
+     * 
      * @param g The Graphics2D object in which to paint
      * @param component The JComponent that the Painter is delegate for.
      */

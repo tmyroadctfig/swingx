@@ -79,16 +79,12 @@ public abstract class AbstractGradientPainter extends AbstractPainter {
     /**
      * @inheritDoc
      */
-    public void paint(Graphics2D g, JComponent component) {
-        saveState(g);
-        
+    public void paintBackground(Graphics2D g, JComponent component) {
         Paint p = calculateSizedPaint(component.getWidth(), component.getHeight());
         if (p != null) {
             g.setPaint(p);
             g.fillRect(0, 0, component.getWidth(), component.getHeight());
         }
-        
-        restoreState(g);
     }
 
     /**

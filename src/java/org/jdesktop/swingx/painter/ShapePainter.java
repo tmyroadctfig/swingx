@@ -154,9 +154,7 @@ public class ShapePainter extends AbstractPainter {
     /**
      * @inheritDoc
      */
-    public void paint(Graphics2D g, JComponent component) {
-        saveState(g);
-        
+    public void paintBackground(Graphics2D g, JComponent component) {
         Paint p = getPaint();
         if (p == null) {
             p = component.getBackground();
@@ -171,7 +169,5 @@ public class ShapePainter extends AbstractPainter {
         Point2D location = getLocation();
         g.translate(-location.getX(), -location.getY());
         g.draw(getShape());
-        
-        restoreState(g);
     }
 }

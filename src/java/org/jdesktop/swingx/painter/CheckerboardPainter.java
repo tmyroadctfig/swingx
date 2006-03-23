@@ -170,12 +170,11 @@ public class CheckerboardPainter extends AbstractPainter {
         return checkerPaint;
     }
     
-    public void paint(Graphics2D g, JComponent component) {
-        saveState(g);
-        
+    /**
+     * @inheritDoc
+     */
+    public void paintBackground(Graphics2D g, JComponent component) {
         g.setPaint(getCheckerPaint(component));
         g.fillRect(0, 0, component.getWidth(), component.getHeight());
-        
-        restoreState(g);
     }
 }

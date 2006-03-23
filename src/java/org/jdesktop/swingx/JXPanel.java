@@ -83,7 +83,8 @@ public class JXPanel extends JPanel implements Scrollable {
     /**
      * If the JXPanel is to draw a gradient, this paint indicates how it should
      * be painted
-     * @deprecated
+     * 
+     * @deprecated 
      */
     private GradientPaint gradientPaint;
     /**
@@ -371,7 +372,7 @@ public class JXPanel extends JPanel implements Scrollable {
 
     /**
      * overridden to provide gradient painting
-     *
+     * 
      * TODO: Chris says that in OGL we actually suffer here by caching the
      * gradient paint since the OGL pipeline will render gradients on
      * hardware for us. The decision to use cacheing is based on my experience
