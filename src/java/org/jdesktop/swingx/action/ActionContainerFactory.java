@@ -128,7 +128,7 @@ public class ActionContainerFactory {
      * @param list a list of action ids used to construct the toolbar.
      * @return the toolbar or null
      */
-    private JToolBar createToolBar(Object[] list) {
+    public JToolBar createToolBar(Object[] list) {
         return createToolBar(Arrays.asList(list));
     }
 
@@ -173,7 +173,7 @@ public class ActionContainerFactory {
      * @param list an array of action ids used to construct the popup.
      * @return the popup or null
      */
-    private JPopupMenu createPopup(Object[] list) {
+    public JPopupMenu createPopup(Object[] list) {
         return createPopup(Arrays.asList(list));
     }
 
@@ -201,6 +201,27 @@ public class ActionContainerFactory {
             }
         }
         return popup;
+    }
+
+    /**
+     * Constructs a menu tree from a list of actions or lists of lists or actions.
+     * 
+     * TODO This method is broken. It <em>should</em> expect either that every
+     * entry is a List (thus, the sub menus off the main MenuBar), or it should
+     * handle normal actions properly. By submitting a List of all Actions, nothing
+     * is created....
+     * <p>
+     * For example, If my list is [action, action, action], then nothing is added
+     * to the menu bar. However, if my list is [list[action], action, action, action] then
+     * I get a menu and under it the tree actions. This should not be, because if I
+     * wanted those actions to be on the sub menu, then they should have been
+     * listed within the sub list!
+     *
+     * @param actionIds an array which represents the root item.
+     * @return a menu bar which represents the menu bar tree
+     */
+    public JMenuBar createMenuBar(Object[] actionIds) {
+        return createMenuBar(Arrays.asList(actionIds));
     }
 
     /**
@@ -245,6 +266,20 @@ public class ActionContainerFactory {
         return menubar;
     }
 
+
+    /**
+     * Creates and returns a menu from a List which represents actions, separators
+     * and sub-menus. The menu
+     * constructed will have the attributes from the first action in the List.
+     * Subsequent actions in the list represent menu items.
+     *
+     * @param actionIds an array of action ids used to construct the menu and menu items.
+     *             the first element represents the action used for the menu,
+     * @return the constructed JMenu or null
+     */
+     public JMenu createMenu(Object[] actionIds) {
+        return createMenu(Arrays.asList(actionIds));
+    }
 
     /**
      * Creates and returns a menu from a List which represents actions, separators
