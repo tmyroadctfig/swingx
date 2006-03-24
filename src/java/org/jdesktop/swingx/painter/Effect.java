@@ -29,5 +29,5 @@ import java.awt.image.BufferedImage;
  * @author gfx
  */
 public interface Effect {
-    public void apply(BufferedImage image);
+    public BufferedImage apply(BufferedImage image);
 }

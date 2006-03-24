@@ -100,7 +100,7 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
     private boolean useCache;
     private RenderingHints renderingHints;
     private SoftReference<BufferedImage> cachedImage;
-    private Effect[] effects = new Effect[0];
+    private Effect effect;
     
     /**
      * Creates a new instance of AbstractPainter
@@ -138,26 +138,26 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
     }
     
     /**
-     * <p>Sets an array of effects to execute, in order from first to last, on the
-     * results of the AbstractPainter's painting operation. Some common effects
-     * including blurs, shadows, embossing, and so forth. If the given array is
-     * null, an empty array will be created and used instead.</p>
+     * <p>Sets an effect (or multiple effects if you use a CompoundEffect) 
+     * to apply to the results of the AbstractPainter's painting operation. 
+     * Some common effects include blurs, shadows, embossing, and so forth. If 
+     * the given effect is null, no effects will be used</p>
      *
-     * @param effects the array of Effects that will be executed in order from
-     *        first to last on the results of the painting operation
+     * @param effects the Effect to apply to the results of the AbstractPainter's
+     *                painting operation
      */
-    public void setEffects(Effect... effects) {
-        Effect[] old = getEffects();
-        this.effects = effects == null ? new Effect[0] : effects;
-        firePropertyChange("effects", old, getEffects());
+    public void setEffect(Effect effect) {
+        Effect old = getEffect();
+        this.effect = effect;
+        firePropertyChange("effect", old, getEffect());
     }
     
     /**
-     * @return the array of effects to be applied to the results of the painting
-     *         operation. This will never return null;
+     * @param effects the Effect to apply to the results of the AbstractPainter's
+     *                painting operation. May be null
      */
-    public Effect[] getEffects() {
-        return this.effects;
+    public Effect getEffect() {
+        return this.effect;
     }
     
     /**
@@ -639,8 +639,8 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
                 && image.getHeight() == component.getHeight()) {
             g.drawImage(image, 0, 0, null);
         } else {
-            Effect[] effects = getEffects();
-            if (effects.length > 0 || isUseCache()) {
+            Effect effect = getEffect();
+            if (effect != null || isUseCache()) {
                 image = PaintUtils.createCompatibleImage(
                         component.getWidth(),
                         component.getHeight(),
@@ -650,9 +650,9 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
                 configureGraphics(gfx);
                 paintBackground(gfx, component);
                 gfx.dispose();
-                
-                for (Effect effect : effects) {
-                    effect.apply(image);
+
+                if (effect != null) {
+                    image = effect.apply(image);
                 }
                 
                 g.drawImage(image, 0, 0, null);
