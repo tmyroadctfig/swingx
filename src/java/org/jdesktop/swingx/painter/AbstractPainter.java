@@ -98,7 +98,7 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
     private Shape clip;
     private Composite composite;
     private boolean useCache;
-    private Map<RenderingHints.Key, Object> renderingHints;
+    private RenderingHints renderingHints;
     private SoftReference<BufferedImage> cachedImage;
     private Effect[] effects = new Effect[0];
     
@@ -106,7 +106,7 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
      * Creates a new instance of AbstractPainter
      */
     public AbstractPainter() {
-        renderingHints = new HashMap<RenderingHints.Key,Object>();
+        renderingHints = new RenderingHints(new HashMap<RenderingHints.Key,Object>());
     }
     
     /**
@@ -553,8 +553,8 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
      * @return a copy of the map of rendering hints held by this class. This
      *         returned value will never be null
      */
-    public Map<RenderingHints.Key, Object> getRenderingHints() {
-        return new HashMap<RenderingHints.Key, Object>(renderingHints);
+    public RenderingHints getRenderingHints() {
+        return (RenderingHints)renderingHints.clone();
     }
 
     /**
@@ -564,12 +564,12 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
      * @param renderingHints map of hints. May be null. I null, a new Map of
      * rendering hints will be created
      */
-    public void setRenderingHints(Map<RenderingHints.Key, Object> renderingHints) {
-        Map<RenderingHints.Key,Object> old = this.renderingHints;
+    public void setRenderingHints(RenderingHints renderingHints) {
+        RenderingHints old = this.renderingHints;
         if (renderingHints != null) {
-            this.renderingHints = new HashMap<RenderingHints.Key, Object>(renderingHints);
+            this.renderingHints = (RenderingHints)renderingHints.clone();
         } else {
-            this.renderingHints = new HashMap<RenderingHints.Key, Object>();
+            this.renderingHints = new RenderingHints(new HashMap<RenderingHints.Key, Object>());
         }
         firePropertyChange("renderingHints", old, getRenderingHints());
     }
@@ -629,19 +629,7 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
     public void paint(Graphics2D g, JComponent component) {
         saveState(g);
         
-        //set any non-null rendering hints
-        for (Map.Entry<RenderingHints.Key,Object> entry : renderingHints.entrySet()) {
-            if (entry.getValue() != null) {
-                g.setRenderingHint(entry.getKey(), entry.getValue());
-            }
-        }
-        
-        if (getComposite() != null) {
-            g.setComposite(getComposite());
-        }
-        if (getClip() != null) {
-            g.setClip(getClip());
-        }
+        configureGraphics(g);
         
         //if I am cacheing, and the cache is not null, and the image has the
         //same dimensions as the component, then simply paint the image
@@ -659,6 +647,7 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
                         Transparency.TRANSLUCENT);
                 
                 Graphics2D gfx = image.createGraphics();
+                configureGraphics(gfx);
                 paintBackground(gfx, component);
                 gfx.dispose();
                 
@@ -677,6 +666,21 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
         }
         
         restoreState(g);
+    }
+    
+    /**
+     * Utility method for configuring the given Graphics2D with the rendering hints,
+     * composite, and clip
+     */
+    private void configureGraphics(Graphics2D g) {
+        g.setRenderingHints(getRenderingHints());
+
+        if (getComposite() != null) {
+            g.setComposite(getComposite());
+        }
+        if (getClip() != null) {
+            g.setClip(getClip());
+        }
     }
 
     /**
