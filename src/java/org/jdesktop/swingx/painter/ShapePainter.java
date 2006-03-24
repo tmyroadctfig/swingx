@@ -64,6 +64,10 @@ public class ShapePainter extends AbstractPainter {
      * The location at which to draw the shape. If null, 0,0 is used
      */
     private Point2D location = new Point2D.Double(0, 0);
+    /**
+     * Indicates whether the shape should be filled or drawn.
+     */
+    private boolean isFilled;
     
     /**
      * Create a new ShapePainter
@@ -149,6 +153,25 @@ public class ShapePainter extends AbstractPainter {
      */
     public Point2D getLocation() {
         return location;
+    }
+    
+    /**
+     * The shape can be filled or simply stroked. By default, the shape is
+     * stroked. Setting this property to true fills the shape upon drawing.
+     *
+     * @param isFilled true if the shape must be filled, false otherwise.
+     */
+    public void setFilled(boolean isFilled) {
+        boolean old = isFilled();
+        this.isFilled = isFilled;
+        firePropertyChange("paint", old, isFilled());
+    }
+    
+    /**
+     * @return true is the shape is filled, false if stroked
+     */
+    public boolean isFilled() {
+        return isFilled;
     }
     
     /**
