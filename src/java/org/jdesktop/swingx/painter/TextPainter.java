@@ -22,6 +22,7 @@
 package org.jdesktop.swingx.painter;
 
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.geom.Point2D;
@@ -39,7 +40,7 @@ public class TextPainter extends AbstractPainter {
     private String text = "";
     private Font font;
     private Paint paint;
-    private Point2D location = new Point2D.Double(.5, .5);
+    private Point2D location = new Point2D.Double(.0, .0);
     
     /** Creates a new instance of TextPainter */
     public TextPainter() {
@@ -77,7 +78,7 @@ public class TextPainter extends AbstractPainter {
     
     public void setLocation(Point2D location) {
         Point2D old = getLocation();
-        this.location = location == null ? new Point2D.Double(.5, .5) : location;
+        this.location = location == null ? new Point2D.Double(.0, .0) : location;
         firePropertyChange("location", old, getLocation());
     }
     
@@ -96,13 +97,16 @@ public class TextPainter extends AbstractPainter {
             g.setPaint(paint);
         }
         
+        FontMetrics metrics = g.getFontMetrics(font);
+        
         Point2D location = getLocation();
         double x = location.getX() * component.getWidth();
         double y = location.getY() * component.getHeight();
+        y += metrics.getAscent();
         
         String text = getText();
-        double stringWidth = SwingUtilities.computeStringWidth(g.getFontMetrics(font), text);
-        x -= stringWidth/2;
+        //double stringWidth = SwingUtilities.computeStringWidth(metrics, text);
+        //x -= stringWidth/2;
         g.drawString(text, (float)x, (float)y);
     }
 }
