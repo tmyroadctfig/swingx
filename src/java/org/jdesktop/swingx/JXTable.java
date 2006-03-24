@@ -1336,7 +1336,6 @@ public class JXTable extends JTable {
         if (controller != null) {
             controller.setSortKeys(null);
         }
-//        setInteractiveSorter(null);
         if (getTableHeader() != null) {
             getTableHeader().repaint();
         }
@@ -1361,32 +1360,7 @@ public class JXTable extends JTable {
             controller.toggleSortOrder(convertColumnIndexToModel(columnIndex),
                     columnExt != null ? columnExt.getComparator() : null);
         }
-//        Sorter sorter = getInteractiveSorter();
-//
-//        if ((sorter != null)
-//            && (sorter.getColumnIndex() == convertColumnIndexToModel(columnIndex))) {
-//            sorter.toggle();
-//        } else {
-//            TableColumnExt column = getColumnExt(columnIndex);
-//            getFilters().setSorter(column != null ? column.getSorter() : null);
-//        }
     }
-
-    /**
-     * Returns the interactive sorter if it is set from the given column.
-     * Used by ColumnHeaderRenderer.getTableCellRendererComponent().
-     * 
-     * @param columnIndex the column index in view coordinates.
-     * @return the interactive sorter if matches the column or null.
-     * @deprecated use getSortOrder().
-     */
-//    public Sorter getSorter(int columnIndex) {
-//        Sorter sorter = getInteractiveSorter();
-//
-//        return sorter == null ? null
-//                : sorter.getColumnIndex() == convertColumnIndexToModel(columnIndex) ? sorter
-//                        : null;
-//    }
 
 
     /**
@@ -1404,11 +1378,6 @@ public class JXTable extends JTable {
         SortKey sortKey = SortKey.getFirstSortKeyForColumn(sortController.getSortKeys(), 
                 convertColumnIndexToModel(columnIndex));
         return sortKey != null ? sortKey.getSortOrder() : SortOrder.UNSORTED;
-//        Sorter sorter = getInteractiveSorter();
-//
-//        return sorter == null ? SortOrder.UNSORTED 
-//                : sorter.getColumnIndex() == convertColumnIndexToModel(columnIndex) ? 
-//                        sorter.getSortOrder() : SortOrder.UNSORTED;
     }
 
 
@@ -1447,35 +1416,10 @@ public class JXTable extends JTable {
                 
             }
         }
-//        Sorter sorter = getInteractiveSorter();
-//        if (sorter != null) {
-//            int sorterColumn = sorter.getColumnIndex();
-//            List columns = getColumns(true);
-//            for (Iterator iter = columns.iterator(); iter.hasNext();) {
-//                TableColumn column = (TableColumn) iter.next();
-//                if (column.getModelIndex() == sorterColumn) {
-//                    return column;
-//                }
-//            }
-//        }
         return null;
     }
 
 
-//    private void setInteractiveSorter(Sorter sorter) {
-//        // this check is for the sake of the very first call after instantiation
-//        if (filters == null)
-//            return;
-//        getFilters().setSorter(sorter);
-//
-//    }
-//
-//    private Sorter getInteractiveSorter() {
-//        // this check is for the sake of the very first call after instantiation
-//        if (filters == null)
-//            return null;
-//        return getFilters().getSorter();
-//    }
 
     /**
      * overridden to remove the interactive sorter if the

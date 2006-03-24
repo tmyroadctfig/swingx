@@ -622,19 +622,6 @@ public class JXList extends JList {
         use(filters);
         getSelectionMapper().setFilters(filters);
 
-//        FilterPipeline old = filters;
-//        Sorter sorter = null;
-//        if (old != null) {
-//            old.removePipelineListener(pipelineListener);
-//            sorter = old.getSorter();
-//        }
-//        if (pipeline == null) {
-//            pipeline = new FilterPipeline();
-//        }
-//        filters = pipeline;
-//        filters.setSorter(sorter);
-//        use(filters);
-//        getSelectionMapper().setFilters(filters);
     }
 
     /**
