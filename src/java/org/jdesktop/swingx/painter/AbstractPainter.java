@@ -34,7 +34,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
-import java.util.Map;
 import javax.swing.JComponent;
 import org.jdesktop.swingx.JavaBean;
 import org.jdesktop.swingx.util.PaintUtils;
@@ -591,7 +590,7 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
         oldColor = g.getColor();
         
         //save off the old rendering hints
-        oldRenderingHints = g.getRenderingHints();
+        oldRenderingHints = (RenderingHints)g.getRenderingHints().clone();
         
         stateSaved = true;
     }
@@ -673,7 +672,12 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
      * composite, and clip
      */
     private void configureGraphics(Graphics2D g) {
-        g.setRenderingHints(getRenderingHints());
+        RenderingHints hints = getRenderingHints();
+        //merge these hints with the existing ones, otherwise I won't inherit
+        //any of the hints from the Graphics2D
+        for (Object key : hints.keySet()) {
+            g.setRenderingHint((RenderingHints.Key)key, hints.get(key));
+        }
 
         if (getComposite() != null) {
             g.setComposite(getComposite());
