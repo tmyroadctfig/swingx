@@ -53,6 +53,17 @@ public class IconPainter extends ImagePainter {
     }
     
     /**
+     * Create a new IconPainter with the specified icon.
+     *
+     * @param icon the icon to be painted
+     */
+    public IconPainter(Icon icon) {
+        super();
+        this.icon = icon;
+    }
+    
+    
+    /**
      * Set the icon to use. This will fire property change notification not
      * only for the "icon" property, but also for the "image" property.
      *

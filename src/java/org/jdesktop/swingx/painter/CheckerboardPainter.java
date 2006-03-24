@@ -70,8 +70,33 @@ public class CheckerboardPainter extends AbstractPainter {
      * the dark color is a light gray, and the square length is 8.
      */
     public CheckerboardPainter() {
-        super();
     }
+    
+    /**
+     * Create a new CheckerboardPainter with the specified light and dark paints.
+     * By default the square length is 8.
+     *
+     * @param darkPaint the paint used to draw the dark squares
+     * @param lightPaint the paint used to draw the light squares
+     */
+    public CheckerboardPainter(Paint darkPaint, Paint lightPaint) {
+        this(darkPaint, lightPaint, 8);
+    }
+    
+    /**
+     * Create a new CheckerboardPainter with the specified light and dark paints
+     * and the specified square size.
+     *
+     * @param darkPaint the paint used to draw the dark squares
+     * @param lightPaint the paint used to draw the light squares
+     * @param length the length of the checker board squares
+     */
+    public CheckerboardPainter(Paint darkPaint, Paint lightPaint, int length) {
+        this.darkColor = darkPaint;
+        this.lightColor = lightPaint;
+        this.squareLength = length;
+    }
+    
     
     /**
      * Specifies the length of the squares. By default, it is 8. A length of <=

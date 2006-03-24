@@ -78,6 +78,29 @@ public class ImagePainter extends AbstractPainter {
     }
     
     /**
+     * Create a new ImagePainter with the specified image and the Style
+     * Style.CENTERED
+     *
+     * @param image the image to be painted
+     */
+    public ImagePainter(Image image) {
+        super();
+        this.img = image;
+    }
+    
+    /**
+     * Create a new ImagePainter with the specified image and style.
+     *
+     * @param image the image to be painted
+     * @param style the style of the image
+     */
+    public ImagePainter(Image image, Style style) {
+        super();
+        this.img = image;
+        this.style = style;
+    }
+    
+    /**
      * Sets the image to use for the background of this panel. This image is
      * painted whether the panel is opaque or translucent.
      *

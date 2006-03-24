@@ -88,12 +88,40 @@ public class ShapePainter extends AbstractPainter {
     }
     
     /**
-     * Create a new ShapePainter for the given shape
+     * Create a new ShapePainter with the specified shape.
      *
-     * @param s the Shape to use
+     * @param shape the shape to paint
      */
-    public ShapePainter(Shape s) {
-        this.shape = s;
+    public ShapePainter(Shape shape) {
+        super();
+        this.shape = shape;
+    }
+    
+    /**
+     * Create a new ShapePainter with the specified shape and paint.
+     *
+     * @param shape the shape to paint
+     * @param paint the paint to be used to paint the shape
+     */
+    public ShapePainter(Shape shape, Paint paint) {
+        super();
+        this.shape = shape;
+        this.paint = paint;
+    }
+    
+    /**
+     * Create a new ShapePainter with the specified shape and paint. The shape
+     * can be filled or stroked (only the ouline is painted).
+     *
+     * @param shape the shape to paint
+     * @param paint the paint to be used to paint the shape
+     * @param isFilled true to fill the shape, false to stroke the outline
+     */
+    public ShapePainter(Shape shape, Paint paint, boolean isFilled) {
+        super();
+        this.shape = shape;
+        this.paint = paint;
+        this.isFilled = isFilled;
     }
     
     /**

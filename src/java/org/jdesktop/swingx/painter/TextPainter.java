@@ -21,13 +21,13 @@
 
 package org.jdesktop.swingx.painter;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.geom.Point2D;
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 import org.jdesktop.swingx.util.Resize;
 
 /**
@@ -44,6 +44,20 @@ public class TextPainter extends AbstractPainter {
     
     /** Creates a new instance of TextPainter */
     public TextPainter() {
+    }
+    
+    public TextPainter(String text) {
+        this(text, new Font("Dialog", Font.PLAIN, 12));
+    }
+    
+    public TextPainter(String text, Font font) {
+        this(text, font, Color.BLACK);
+    }
+    
+    public TextPainter(String text, Font font, Paint paint) {
+        this.text = text;
+        this.font = font;
+        this.paint = paint;
     }
     
     public void setFont(Font f) {

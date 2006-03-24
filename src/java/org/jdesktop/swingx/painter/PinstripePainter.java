@@ -69,6 +69,29 @@ public class PinstripePainter extends AbstractPainter {
     }
 
     /**
+     * Create a new PinstripePainter using an angle of 45, 8 pixel spacing,
+     * and the given Paint.
+     *
+     * @param paint the paint used when drawing the stripes
+     * @param angle the angle, in degrees, in which to paint the pinstripes
+     */
+    public PinstripePainter(Paint paint) {
+        this(paint, 45);
+    }
+    
+    /**
+     * Create a new PinstripePainter using the given angle, 8 pixel spacing,
+     * and the given Paint
+     *
+     * @param paint the paint used when drawing the stripes
+     * @param angle the angle, in degrees, in which to paint the pinstripes
+     */
+    public PinstripePainter(Paint paint, double angle) {
+        this.paint = paint;
+        this.angle = angle;
+    }
+    
+    /**
      * Create a new PinstripePainter using the given angle, 8 pixel spacing,
      * and the foreground color of the Component
      *
