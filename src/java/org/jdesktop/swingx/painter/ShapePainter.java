@@ -191,6 +191,10 @@ public class ShapePainter extends AbstractPainter {
         
         Point2D location = getLocation();
         g.translate(-location.getX(), -location.getY());
-        g.draw(getShape());
+        if (!isFilled()) {
+            g.draw(getShape());
+        } else {
+            g.fill(getShape());
+        }
     }
 }
