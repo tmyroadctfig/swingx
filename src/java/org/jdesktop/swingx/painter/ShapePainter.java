@@ -70,11 +70,11 @@ public class ShapePainter extends AbstractPainter {
     /**
      * Specifies if/how resizing (relocating) the location should occur.
      */
-    private Resize resizeLocation = Resize.BOTH;
+    private Resize resizeLocation = Resize.NONE;
     /**
      * Specifies if/how resizing of the shape should occur
      */
-    private Resize resize = Resize.BOTH;
+    private Resize resize = Resize.NONE;
     /**
      * Indicates whether the shape should be filled or drawn.
      */
@@ -207,7 +207,7 @@ public class ShapePainter extends AbstractPainter {
      */
     public void setResizeLocation(Resize r) {
         Resize old = getResizeLocation();
-        this.resizeLocation = r == null ? r.BOTH : r;
+        this.resizeLocation = r == null ? r.NONE : r;
         firePropertyChange("resizeLocation", old, getResizeLocation());
     }
 
@@ -226,11 +226,11 @@ public class ShapePainter extends AbstractPainter {
      * between 0 and 1
      *
      * @param r value indication whether/how to resize the shape. If null,
-     *        Resize.BOTH will be used
+     *        Resize.NONE will be used
      */
     public void setResize(Resize r) {
         Resize old = getResize();
-        this.resize = r == null ? r.BOTH : r;
+        this.resize = r == null ? r.NONE : r;
         firePropertyChange("resize", old, getResize());
     }
     
