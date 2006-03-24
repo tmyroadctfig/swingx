@@ -64,6 +64,14 @@ public class LinearGradientPainter extends AbstractGradientPainter {
                 new Color(32, 39, 55),
                 new Color(74, 82, 96),
                 new Color(123, 132, 145)});
+    public static final LinearGradientPaint BLACK_PERSPECTIVE = new LinearGradientPaint (
+            new Point2D.Double(0, 0),
+            new Point2D.Double(0, 1),
+            new float[] {0f, .5f, 1f},
+            new Color[] {
+                Color.BLACK,
+                new Color(110, 110, 110),
+                Color.BLACK});
     
     private LinearGradientPaint paint;
     
