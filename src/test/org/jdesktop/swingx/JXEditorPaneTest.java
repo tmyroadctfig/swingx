@@ -13,17 +13,17 @@ import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.JEditorPane;
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.text.html.HTMLDocument;
 
-import junit.framework.TestCase;
-
+import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.ActionContainerFactory;
 import org.jdesktop.swingx.action.ActionFactory;
 import org.jdesktop.swingx.action.ActionManager;
@@ -33,12 +33,56 @@ import org.jdesktop.swingx.action.ActionManager;
  *
  * @author Mark Davidson
  */
-public class JXEditorPaneTest extends TestCase {
-
+public class JXEditorPaneTest extends InteractiveTestCase {
+    private static final Logger LOG = Logger.getLogger(JXEditorPaneTest.class
+            .getName());
     private static String testText = "This is an example of some text";
+
+    public static void main(String[] args) throws Exception {
+//      setSystemLF(true);
+      JXEditorPaneTest test = new JXEditorPaneTest();
+      try {
+          test.runInteractiveTests();
+//          test.runInteractiveTests("interactive.*Table.*");
+//          test.runInteractiveTests("interactive.*List.*");
+        } catch (Exception e) {
+            System.err.println("exception when executing interactive tests:");
+            e.printStackTrace();
+        } 
+  }
 
     private static  boolean DEBUG = false;
 
+    /**
+     * Issue #289-swingx: JXEditorPane actions should be disabled if not
+     * applicable.
+     * Can of worms? super does nothing to enable/disable default actions?
+     * TransferHandler's actions are mixed in?
+     * 
+     */
+    public void testXDisabledActionsOnNotEditable() {
+        JXEditorPane editor = new JXEditorPane();
+        editor.setEditable(false);
+        Action action = editor.getActionMap().get("paste");
+        LOG.info("enabled " + action.isEnabled());
+        
+    }
+    
+    /**
+     * Issue #289-swingx: JXEditorPane actions should be disabled if not
+     * applicable.
+     * Can of worms? super does nothing to enable/disable default actions?
+     * TransferHandler's actions are mixed in?
+     * 
+     */
+    public void testDisabledActionsOnNotEditable() {
+        JEditorPane editor = new JEditorPane();
+        editor.setEditable(false);
+        Action action = editor.getActionMap().get("paste");
+        LOG.info("enabled " + action.isEnabled());
+        
+    }
+    
     public void testInitialization() throws IOException {
         URL url = JXEditorPaneTest.class.getResource("resources/test.html");
         JXEditorPane editor = new JXEditorPane();
@@ -130,8 +174,86 @@ public class JXEditorPaneTest extends TestCase {
         assertEquals(before, editor.getText());
     }
 
-    public static void main(String[] args) throws Exception {
-        Action[] actions = new Action[14];
+    /**
+     * Issue #289-swingx: JXEditorPane actions should be disabled if not
+     * applicable.
+     * checking action enabled behaviour of core editorpane.
+     * Doing nothing to enable/disable depending on editable state?
+     *
+     */
+    public void interactiveXEditorDefaultActions() {
+        JXEditorPane editor = new JXEditorPane();
+        Action[] actions = editor.getActions();
+        ActionManager manager = ActionManager.getInstance();
+        List actionNames = new ArrayList();
+        StringBuffer buffer = new StringBuffer("No. of default actions: " + actions.length);
+        ActionMap map = editor.getActionMap();
+        Object[] keys = map.keys();
+        int count = keys != null ? keys.length : 0;
+        buffer.append("\n No. of actions in ActionMap: " + count);
+        for (int i = 0; i < actions.length; i++) {
+            Object id = actions[i].getValue(Action.NAME);
+            manager.addAction(id, actions[i]);
+            actionNames.add(id);
+            buffer.append("\n" + actions[i].toString());
+        }
+        
+        
+        editor.setText(buffer.toString());
+        ActionContainerFactory factory = manager.getFactory();
+
+      JToolBar toolbar = factory.createToolBar(actionNames);
+      toolbar.setOrientation(JToolBar.VERTICAL);
+      editor.setEditable(false);
+      editor.setPreferredSize(new Dimension(600, 400));
+
+      JXFrame frame = wrapWithScrollingInFrame(editor, "Looking at swingx editor default actions");
+      frame.getContentPane().add(toolbar, BorderLayout.WEST);
+      frame.setVisible(true);
+    }
+
+    /**
+     * Issue #289-swingx: JXEditorPane actions should be disabled if not
+     * applicable.
+     * checking action enabled behaviour of core editorpane.
+     * Doing nothing to enable/disable depending on editable state?
+     *
+     */
+    public void interactiveEditorDefaultActions() {
+        JEditorPane editor = new JEditorPane();
+        editor.setText(testText);
+        Action[] actions = editor.getActions();
+        ActionManager manager = ActionManager.getInstance();
+        List actionNames = new ArrayList();
+        StringBuffer buffer = new StringBuffer("No. of default actions: " + actions.length);
+        ActionMap map = editor.getActionMap();
+        Object[] keys = map.keys();
+        int count = keys != null ? keys.length : 0;
+        buffer.append("\n No. of actions in ActionMap: " + count);
+        for (int i = 0; i < actions.length; i++) {
+            Object id = actions[i].getValue(Action.NAME);
+            manager.addAction(id, actions[i]);
+            actionNames.add(id);
+            buffer.append("\n" + actions[i].toString());
+        }
+        editor.setText(buffer.toString());
+        ActionContainerFactory factory = manager.getFactory();
+
+      JToolBar toolbar = factory.createToolBar(actionNames);
+      toolbar.setOrientation(JToolBar.VERTICAL);
+      editor.setEditable(false);
+      editor.setPreferredSize(new Dimension(600, 400));
+
+      JXFrame frame = wrapWithScrollingInFrame(editor, "Looking at core default actions");
+      frame.getContentPane().add(toolbar, BorderLayout.WEST);
+      frame.setVisible(true);
+    }
+    /**
+     * JW: this is oold - no idea if that's the way to handle actions!.
+     *
+     */
+    public void interactiveEditorActions() {
+        AbstractActionExt[] actions = new AbstractActionExt[14];
 
         actions[0] = ActionFactory.createTargetableAction("cut-to-clipboard", "Cut", "C");
         actions[1] = ActionFactory.createTargetableAction("copy-to-clipboard", "Copy", "P");
@@ -158,27 +280,39 @@ public class JXEditorPaneTest extends TestCase {
         // JW: changed on reorg to remove reference to Application 
      //   Application app = Application.getInstance();
         ActionManager manager = ActionManager.getInstance();
-
+        List actionNames = new ArrayList();
+        for (int i = 0; i < actions.length; i++) {
+            manager.addAction(actions[i]);
+            actionNames.add(actions[i].getActionCommand());
+        }
+        
         // Populate the toolbar. Must use the ActionContainerFactory to ensure
         // that toggle actions are supported.
         ActionContainerFactory factory = manager.getFactory();
 
-        JToolBar toolbar = new JToolBar();
-        for (int i = 0; i < actions.length; i++) {
-            manager.addAction(actions[i]);
-            toolbar.add(factory.createButton(actions[i]));
-        }
+//        JToolBar toolbar = new JToolBar();
+//        for (int i = 0; i < actions.length; i++) {
+//            manager.addAction(actions[i]);
+//            toolbar.add(factory.createButton(actions[i]));
+//        }
 
+        JToolBar toolbar = factory.createToolBar(actionNames);
+        
         URL url = JXEditorPaneTest.class.getResource("resources/test.html");
-        JXEditorPane editor = new JXEditorPane(url);
+        JXEditorPane editor = null;
+        try {
+            editor = new JXEditorPane(url);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        editor.setEditable(false);
         editor.setPreferredSize(new Dimension(600, 400));
 
-        toolbar.add(editor.getParagraphSelector());
+//        toolbar.add(editor.getParagraphSelector());
 
-        JFrame frame = new JFrame("Editor tester");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JXFrame frame = wrapWithScrollingInFrame(editor, "Editor tester");
         frame.getContentPane().add(toolbar, BorderLayout.NORTH);
-        frame.getContentPane().add(new JScrollPane(editor), BorderLayout.CENTER);
 
         frame.pack();
         frame.setVisible(true);
