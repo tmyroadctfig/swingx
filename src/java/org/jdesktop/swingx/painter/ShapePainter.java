@@ -25,8 +25,11 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import javax.swing.JComponent;
+import org.jdesktop.swingx.util.Resize;
 
 /**
  * <p>A Painter that paints Shapes. It uses a stroke and a paint to do so. The
@@ -65,6 +68,14 @@ public class ShapePainter extends AbstractPainter {
      */
     private Point2D location = new Point2D.Double(0, 0);
     /**
+     * Specifies if/how resizing (relocating) the location should occur.
+     */
+    private Resize resizeLocation = Resize.BOTH;
+    /**
+     * Specifies if/how resizing of the shape should occur
+     */
+    private Resize resize = Resize.BOTH;
+    /**
      * Indicates whether the shape should be filled or drawn.
      */
     private boolean isFilled;
@@ -74,6 +85,15 @@ public class ShapePainter extends AbstractPainter {
      */
     public ShapePainter() {
         super();
+    }
+    
+    /**
+     * Create a new ShapePainter for the given shape
+     *
+     * @param s the Shape to use
+     */
+    public ShapePainter(Shape s) {
+        this.shape = s;
     }
     
     /**
@@ -175,26 +195,102 @@ public class ShapePainter extends AbstractPainter {
     }
     
     /**
+     * Specifies the resize behavior for the location property. If r is
+     * Resize.HORIZONTAL or Resize.BOTH, then the x value of the location
+     * will be treated as if it were a percentage of the width of the component.
+     * Likewise, Resize.VERTICAL or Resize.BOTH will affect the y value. For
+     * example, if I had a location (.3, .8) then the X will be situated at
+     * 30% of the width and the Y will be situated at 80% of the height.
+     *
+     * @param r value indicating whether/how to resize the Location property when
+     *        painting. If null, Resize.BOTH will be used
+     */
+    public void setResizeLocation(Resize r) {
+        Resize old = getResizeLocation();
+        this.resizeLocation = r == null ? r.BOTH : r;
+        firePropertyChange("resizeLocation", old, getResizeLocation());
+    }
+
+    /**
+     * @return value indication whether/how to resize the location property.
+     *         This will never be null
+     */
+    public Resize getResizeLocation() {
+        return resizeLocation;
+    }
+    
+    /**
+     * Specifies the resize behavior of the shape. As with all other properties
+     * that rely on Resize, the value of the width/height of the shape will
+     * represent a percentage of the width/height of the component, as a value
+     * between 0 and 1
+     *
+     * @param r value indication whether/how to resize the shape. If null,
+     *        Resize.BOTH will be used
+     */
+    public void setResize(Resize r) {
+        Resize old = getResize();
+        this.resize = r == null ? r.BOTH : r;
+        firePropertyChange("resize", old, getResize());
+    }
+    
+    /**
+     * @return value indication whether/how to resize the shape. Will never be null
+     */
+    public Resize getResize() {
+        return resizeLocation;
+    }
+    
+    /**
      * @inheritDoc
      */
     public void paintBackground(Graphics2D g, JComponent component) {
+        //set the paint
         Paint p = getPaint();
         if (p == null) {
             p = component.getBackground();
         }
         g.setPaint(p);
         
+        //set the stroke if it is not null
         Stroke s = getStroke();
         if (s != null) {
             g.setStroke(s);
         }
         
+        //handle the location
         Point2D location = getLocation();
+        Resize resizeLocation = getResizeLocation();
+        double x = location.getX();
+        double y = location.getY();
+        if (resizeLocation == Resize.HORIZONTAL || resizeLocation == Resize.BOTH) {
+            x = x * component.getWidth();
+        }
+        if (resizeLocation == Resize.VERTICAL || resizeLocation == Resize.BOTH) {
+            y = y * component.getHeight();
+        }
         g.translate(-location.getX(), -location.getY());
+        
+        //resize the shape if necessary
+        Shape shape = getShape();
+        Rectangle2D bounds = shape.getBounds2D();
+        double width = 1;
+        double height = 1;
+        Resize resize = getResize();
+        if (resize == Resize.HORIZONTAL || resize == Resize.BOTH) {
+            width = component.getWidth();
+        }
+        if (resize == Resize.VERTICAL || resize == Resize.BOTH) {
+            height = component.getHeight();
+        }
+        shape = AffineTransform.getScaleInstance(
+                width, height).createTransformedShape(shape);
+        
+        //draw/fill the shape
         if (!isFilled()) {
-            g.draw(getShape());
+            g.draw(shape);
         } else {
-            g.fill(getShape());
+            g.fill(shape);
         }
     }
 }
