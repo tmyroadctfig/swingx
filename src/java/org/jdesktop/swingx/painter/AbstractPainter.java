@@ -37,6 +37,7 @@ import java.util.HashMap;
 import javax.swing.JComponent;
 import org.jdesktop.swingx.JavaBean;
 import org.jdesktop.swingx.util.PaintUtils;
+import org.jdesktop.swingx.util.Resize;
 
 /**
  * <p>A convenient base class from which concrete Painter implementations may
@@ -95,6 +96,7 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
     private RenderingHints oldRenderingHints;
     
     private Shape clip;
+    private Resize resizeClip;
     private Composite composite;
     private boolean useCache;
     private RenderingHints renderingHints;
@@ -178,6 +180,28 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
      */
     public Shape getClip() {
         return clip;
+    }
+    
+    /**
+     * Specifies the resize behavior of the clip. As with all other properties
+     * that rely on Resize, the value of the width/height of the shape will
+     * represent a percentage of the width/height of the component, as a value
+     * between 0 and 1
+     *
+     * @param r value indication whether/how to resize the clip. If null,
+     *        Resize.NONE will be used
+     */
+    public void setResizeClip(Resize r) {
+        Resize old = getResizeClip();
+        this.resizeClip = r == null ? r.NONE : r;
+        firePropertyChange("resizeClip", old, getResizeClip());
+    }
+    
+    /**
+     * @return value indication whether/how to resize the clip. Will never be null
+     */
+    public Resize getResizeClip() {
+        return resizeClip;
     }
     
     /**
@@ -628,7 +652,7 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
     public void paint(Graphics2D g, JComponent component) {
         saveState(g);
         
-        configureGraphics(g);
+        configureGraphics(g, component);
         
         //if I am cacheing, and the cache is not null, and the image has the
         //same dimensions as the component, then simply paint the image
@@ -646,7 +670,7 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
                         Transparency.TRANSLUCENT);
                 
                 Graphics2D gfx = image.createGraphics();
-                configureGraphics(gfx);
+                configureGraphics(gfx, component);
                 paintBackground(gfx, component);
                 gfx.dispose();
 
@@ -671,7 +695,7 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
      * Utility method for configuring the given Graphics2D with the rendering hints,
      * composite, and clip
      */
-    private void configureGraphics(Graphics2D g) {
+    private void configureGraphics(Graphics2D g, JComponent c) {
         RenderingHints hints = getRenderingHints();
         //merge these hints with the existing ones, otherwise I won't inherit
         //any of the hints from the Graphics2D
@@ -682,8 +706,21 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
         if (getComposite() != null) {
             g.setComposite(getComposite());
         }
-        if (getClip() != null) {
-            g.setClip(getClip());
+        Shape clip = getClip();
+        if (clip != null) {
+            //resize the clip if necessary
+            double width = 1;
+            double height = 1;
+            Resize resizeClip = getResizeClip();
+            if (resizeClip == Resize.HORIZONTAL || resizeClip == Resize.BOTH) {
+                width = c.getWidth();
+            }
+            if (resizeClip == Resize.VERTICAL || resizeClip == Resize.BOTH) {
+                height = c.getHeight();
+            }
+            clip = AffineTransform.getScaleInstance(
+                    width, height).createTransformedShape(clip);
+            g.setClip(clip);
         }
     }
 
