@@ -24,6 +24,7 @@ package org.jdesktop.swingx.painter.gradient;
 import java.awt.Paint;
 import java.awt.geom.Point2D;
 import org.apache.batik.ext.awt.RadialGradientPaint;
+import org.jdesktop.swingx.util.Resize;
 
 /**
  * <p>A Gradient based painter used for painting "multi-stop" radial gradients. These are

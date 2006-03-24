@@ -25,6 +25,7 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import javax.swing.JComponent;
 import org.jdesktop.swingx.painter.AbstractPainter;
+import org.jdesktop.swingx.util.Resize;
 
 /**
  * <p>An abstract base class from which the various gradient oriented painter
