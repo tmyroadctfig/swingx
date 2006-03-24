@@ -238,7 +238,7 @@ public class ShapePainter extends AbstractPainter {
      * @return value indication whether/how to resize the shape. Will never be null
      */
     public Resize getResize() {
-        return resizeLocation;
+        return resize;
     }
     
     /**
