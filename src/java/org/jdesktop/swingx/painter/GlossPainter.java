@@ -106,18 +106,18 @@ public class GlossPainter extends AbstractPainter {
      * {@inheritDoc}
      */
     protected void paintBackground(Graphics2D g, JComponent component) {
-        Ellipse2D ellipse = new Ellipse2D.Double(-component.getWidth() / 2.0,
-            component.getHeight() / 2.7, component.getWidth() * 2.0,
-            component.getHeight() * 2.0);
-        
-        Shape gloss = ellipse;
-        if (getPosition() == GlossPosition.TOP) {
-            Area area = new Area(component.getBounds());
-            area.subtract(new Area(ellipse));
-            gloss = area;
-        }
-        
         if (getPaint() != null) {
+            Ellipse2D ellipse = new Ellipse2D.Double(-component.getWidth() / 2.0,
+                component.getHeight() / 2.7, component.getWidth() * 2.0,
+                component.getHeight() * 2.0);
+
+            Shape gloss = ellipse;
+            if (getPosition() == GlossPosition.TOP) {
+                Area area = new Area(component.getBounds());
+                area.subtract(new Area(ellipse));
+                gloss = area;
+            }
+        
             g.setPaint(getPaint());
             g.fill(gloss);
         }
