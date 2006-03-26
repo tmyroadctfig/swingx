@@ -59,7 +59,7 @@ import javax.swing.JComponent;
  * @author rbair
  */
 public class CheckerboardPainter extends AbstractPainter {
-    private Paint checkerPaint;
+    private transient Paint checkerPaint;
     
     private Paint darkColor = new Color(204, 204, 204);
     private Paint lightColor = Color.WHITE;
