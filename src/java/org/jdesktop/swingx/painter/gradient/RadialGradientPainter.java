@@ -59,6 +59,16 @@ public class RadialGradientPainter extends AbstractGradientPainter {
     public RadialGradientPainter() {
     }
     
+    /** 
+     * Creates a new instance of RadialGradientPainter 
+     * with the given RadialGradientPaint
+     *
+     * @param paint the RadialGradientPaint to use
+     */
+    public RadialGradientPainter(RadialGradientPaint paint) {
+        this.paint = paint;
+    }
+    
     /**
      * Set the gradient paint to use. This may be null. If null, nothing is painted
      *
