@@ -83,7 +83,8 @@ import org.jdesktop.swingx.util.Resize;
  * 
  * @author rbair
  */
-public abstract class AbstractPainter extends JavaBean implements Painter {
+public abstract class AbstractPainter extends JavaBean implements Painter<JComponent> {
+    //------------------------------------------------- Saved Graphics State
     private boolean stateSaved = false;
     private Paint oldPaint;
     private Font oldFont;
@@ -95,12 +96,37 @@ public abstract class AbstractPainter extends JavaBean implements Painter {
     private Color oldColor;
     private RenderingHints oldRenderingHints;
     
+    //--------------------------------------------------- Instance Variables
+    /**
+     * A Shape that is used to clip the graphics area. Anything within this
+     * clip shape is included in the final output.
+     */
     private Shape clip;
+    /**
+     * A Resize value indicating if and how the clip should be resized
+     * according to the size of the Component
+     */
     private Resize resizeClip;
+    /**
+     * The composite to use. By default this is a reasonable AlphaComposite,
+     * but you may want to specify a different composite
+     */
     private Composite composite;
-    private boolean useCache;
+    /**
+     * RenderingHints to apply when painting
+     */
     private RenderingHints renderingHints;
+    /**
+     * A hint as to whether or not to attempt caching the image
+     */
+    private boolean useCache;
+    /**
+     * The cached image, if useCache is true
+     */
     private SoftReference<BufferedImage> cachedImage;
+    /**
+     * The Effect to apply to the results of the paint() operation
+     */
     private Effect effect;
     
     /**
