@@ -52,7 +52,7 @@ import org.jdesktop.swingx.JavaBean;
  *
  * @author rbair
  */
-public class CompoundPainter extends AbstractPainter implements Painter {
+public class CompoundPainter extends AbstractPainter {
     private Painter[] painters = new Painter[0];
     
     /** Creates a new instance of CompoundPainter */
