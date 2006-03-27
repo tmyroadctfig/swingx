@@ -53,6 +53,7 @@ public class SorterTest extends TestCase {
     public static void assertSorterSortKeySynched(SortKey sortKey, Sorter sorter) {
         assertNotNull(sorter);
         assertEquals(sortKey.getColumn(), sorter.getColumnIndex());
+        assertTrue(sortKey.getSortOrder().isSorted(sorter.isAscending()));
         assertEquals(sortKey.getSortOrder().isAscending(), sorter.isAscending());
         assertSame(sortKey.getComparator(), sorter.getComparator());
         
@@ -135,6 +136,15 @@ public class SorterTest extends TestCase {
         assertFalse(SortOrder.DESCENDING.isAscending());
         assertFalse(SortOrder.UNSORTED.isSorted());
         assertFalse(SortOrder.UNSORTED.isAscending());
+        // wanted: ascending sort
+        assertEquals(false, SortOrder.UNSORTED.isSorted(true));
+        assertEquals(false, SortOrder.DESCENDING.isSorted(true));
+        assertEquals(true, SortOrder.ASCENDING.isSorted(true));
+        // wanted: descending sort
+        assertEquals(false, SortOrder.UNSORTED.isSorted(false));
+        assertEquals(true, SortOrder.DESCENDING.isSorted(false));
+        assertEquals(false, SortOrder.ASCENDING.isSorted(false));
+        
     }
     /**
      * test new method sorter.getSortOrder(), must be in synch with 
