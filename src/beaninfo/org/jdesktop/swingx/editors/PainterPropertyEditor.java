@@ -9,15 +9,47 @@
 
 package org.jdesktop.swingx.editors;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
+import java.awt.Color;
+import java.awt.GradientPaint;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Arc2D;
+import java.awt.geom.Area;
+import java.awt.geom.CubicCurve2D;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Line2D;
+import java.awt.geom.PathIterator;
+import java.awt.geom.Point2D;
+import java.awt.geom.QuadCurve2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
+import java.beans.DefaultPersistenceDelegate;
+import java.beans.Encoder;
+import java.beans.Expression;
+import java.beans.PersistenceDelegate;
 import java.beans.PropertyEditorSupport;
-import java.util.HashMap;
-import java.util.Map;
+import java.beans.Statement;
+import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import javax.swing.JFrame;
+import org.apache.batik.ext.awt.LinearGradientPaint;
+import org.apache.batik.ext.awt.MultipleGradientPaint.ColorSpaceEnum;
+import org.apache.batik.ext.awt.RadialGradientPaint;
 import org.jdesktop.swingx.JXPanel;
+import org.jdesktop.swingx.painter.BackgroundPainter;
+import org.jdesktop.swingx.painter.CheckerboardPainter;
+import org.jdesktop.swingx.painter.CompoundPainter;
+import org.jdesktop.swingx.painter.GlossPainter;
+import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
+import org.jdesktop.swingx.painter.PinstripePainter;
+import org.jdesktop.swingx.painter.ShapePainter;
+import org.jdesktop.swingx.painter.TextPainter;
 import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
+import org.jdesktop.swingx.painter.gradient.LinearGradientPainter;
+import org.jdesktop.swingx.painter.gradient.RadialGradientPainter;
 
 /**
  * Two parts to this property editor. The first part is a simple dropdown.
@@ -27,27 +59,8 @@ import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
  * @author Richard
  */
 public class PainterPropertyEditor extends PropertyEditorSupport {
-    private static Map<Painter, String> defaultPainters = new HashMap<Painter, String>();
-    static {
-        //add the default painters
-//        defaultPainters.put(
-//                new BasicGradientPainter(
-//                    BasicGradientPainter.WHITE_TO_CONTROL_HORZONTAL), "White->Control (horizontal)");
-//        defaultPainters.put(
-//                new BasicGradientPainter(
-//                    BasicGradientPainter.WHITE_TO_CONTROL_VERTICAL), "White->Control (vertical)");
-    }
-    
     /** Creates a new instance of PainterPropertyEditor */
     public PainterPropertyEditor() {
-    }
-    
-    public String[] getTags() {
-        String[] names = defaultPainters.values().toArray(new String[0]);
-        String[] results = new String[names.length+1];
-        results[0] = "<none>";
-        System.arraycopy(names, 0, results, 1, names.length);
-        return results;
     }
     
     public Painter getValue() {
@@ -61,52 +74,227 @@ public class PainterPropertyEditor extends PropertyEditorSupport {
             "new org.jdesktop.swingx.painter.CheckerboardPainter()";
     }
 
-    public void setAsText(String text) throws IllegalArgumentException {
-        if (text == null || text.trim().equals("") || text.trim().equalsIgnoreCase("none")
-                || text.trim().equalsIgnoreCase("<none>")
-                || text.trim().equalsIgnoreCase("[none]")) {
-            setValue(null);
-            return;
-        }
+    public static void main(String... args) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(300);
+        XMLEncoder e = new XMLEncoder(baos);
         
-        if (text.trim().equalsIgnoreCase("<custom>")) {
-            //do nothing
-        }
+        e.setPersistenceDelegate(GradientPaint.class, new GradientPaintDelegate());
+        e.setPersistenceDelegate(Arc2D.Float.class, new Arc2DDelegate());
+        e.setPersistenceDelegate(Arc2D.Double.class, new Arc2DDelegate());
+        e.setPersistenceDelegate(CubicCurve2D.Float.class, new CubicCurve2DDelegate());
+        e.setPersistenceDelegate(CubicCurve2D.Double.class, new CubicCurve2DDelegate());
+        e.setPersistenceDelegate(Ellipse2D.Float.class, new Ellipse2DDelegate());
+        e.setPersistenceDelegate(Ellipse2D.Double.class, new Ellipse2DDelegate());
+        e.setPersistenceDelegate(Line2D.Float.class, new Line2DDelegate());
+        e.setPersistenceDelegate(Line2D.Double.class, new Line2DDelegate());
+        e.setPersistenceDelegate(Point2D.Float.class, new Point2DDelegate());
+        e.setPersistenceDelegate(Point2D.Double.class, new Point2DDelegate());
+        e.setPersistenceDelegate(QuadCurve2D.Float.class, new QuadCurve2DDelegate());
+        e.setPersistenceDelegate(QuadCurve2D.Double.class, new QuadCurve2DDelegate());
+        e.setPersistenceDelegate(Rectangle2D.Float.class, new Rectangle2DDelegate());
+        e.setPersistenceDelegate(Rectangle2D.Double.class, new Rectangle2DDelegate());
+        e.setPersistenceDelegate(RoundRectangle2D.Float.class, new RoundRectangle2DDelegate());
+        e.setPersistenceDelegate(RoundRectangle2D.Double.class, new RoundRectangle2DDelegate());
+        e.setPersistenceDelegate(Area.class, new AreaDelegate());
+        e.setPersistenceDelegate(GeneralPath.class, new GeneralPathDelegate());
+        e.setPersistenceDelegate(AffineTransform.class, new AffineTransformDelegate());
+        e.setPersistenceDelegate(RadialGradientPaint.class, new RadialGradientPaintDelegate());
+        e.setPersistenceDelegate(LinearGradientPaint.class, new LinearGradientPaintDelegate());
         
-        for (Map.Entry<Painter, String> entry : defaultPainters.entrySet()) {
-            if (entry.getValue().equalsIgnoreCase(text)) {
-                setValue(entry.getKey());
-                return;
+        Area a = new Area(new RoundRectangle2D.Double(20, 20, 50, 50, 4, 4));
+        a.add(new Area(new Ellipse2D.Double(10, 10, 100, 20)));
+        
+        TextPainter textPainter = new TextPainter("Yo dude");
+        textPainter.setPaint(Color.WHITE);
+        
+        e.writeObject(new CompoundPainter(
+                new BackgroundPainter(),
+                new CheckerboardPainter(),
+                new MattePainter(Color.BLACK),
+                new BasicGradientPainter(BasicGradientPainter.RED_XP),
+                new LinearGradientPainter(LinearGradientPainter.BLACK_PERSPECTIVE),
+                new RadialGradientPainter(new RadialGradientPaint(
+                    new Point2D.Double(.5, .5),
+                    .2f, new float[] {0f, .5f, 1f},
+                    new Color[] {Color.BLACK,Color.WHITE,Color.RED})),
+                new ShapePainter(a),
+                new PinstripePainter(),
+                textPainter,
+                new GlossPainter()
+//                new IconPainter(), 
+//                new ImagePainter(),
+                ));
+        e.close();
+        System.out.println(baos.toString());
+        
+        XMLDecoder d = new XMLDecoder(new ByteArrayInputStream(baos.toByteArray()));
+        
+        Painter p = (Painter)d.readObject();
+        
+        JFrame frame = new JFrame("Yo momma");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JXPanel panel = new JXPanel();
+        panel.setBackgroundPainter(p);
+        frame.add(panel);
+        frame.setSize(800,600);
+        frame.setVisible(true);
+    }
+    
+    public static final class GradientPaintDelegate extends DefaultPersistenceDelegate {
+        public GradientPaintDelegate() {
+            super(new String[] {"point1", "color1", "point2", "color2"});
+        }
+    }
+    public static final class LinearGradientPaintDelegate extends DefaultPersistenceDelegate {
+        public LinearGradientPaintDelegate() {
+            super(new String[] {"startPoint", "endPoint", "fractions", "colors"});
+            //these 3 not yet supported. The problem is the
+            //colorspace. I haven't figured out how to transfer that one yet
+            //, "cycleMethod", "colorSpace", "transform"});
+        }
+
+        protected Expression instantiate(Object oldInstance, Encoder out) {
+            
+            ColorSpaceEnum e = ((LinearGradientPaint)oldInstance).getColorSpace();
+            Expression retValue;
+            
+            retValue = super.instantiate(oldInstance, out);
+            return retValue;
+        }
+    }
+    public static final class RadialGradientPaintDelegate extends DefaultPersistenceDelegate {
+        public RadialGradientPaintDelegate() {
+            super(new String[] {"centerPoint", "radius", "focusPoint", "fractions", "colors"});
+            //these 3 not yet supported. The problem is the
+            //colorspace. I haven't figured out how to transfer that one yet
+            //, "cycleMethod", "colorSpace", "transform"});
+        }
+    }
+    public static final class Arc2DDelegate extends DefaultPersistenceDelegate {
+        public Arc2DDelegate() {
+            super(new String[] {"x", "y", "width", "height", "angleStart", "angleExtent", "arcType"});
+        }
+    }
+    public static final class CubicCurve2DDelegate extends DefaultPersistenceDelegate {
+        public CubicCurve2DDelegate() {
+            super(new String[] {"x1", "y1", "ctrlX1", "ctrlY1", "ctrlX2", "ctrlY2", "x2", "y2"});
+        }
+    }
+    public static final class Ellipse2DDelegate extends DefaultPersistenceDelegate {
+        public Ellipse2DDelegate() {
+            super(new String[] {"x", "y", "width", "height"});
+        }
+    }
+    public static final class Line2DDelegate extends DefaultPersistenceDelegate {
+        public Line2DDelegate() {
+            super(new String[] {"x1", "y1", "x2", "y2"});
+        }
+    }
+    public static final class Point2DDelegate extends DefaultPersistenceDelegate {
+        public Point2DDelegate() {
+            super(new String[] {"x", "y"});
+        }
+    }
+    public static final class QuadCurve2DDelegate extends DefaultPersistenceDelegate {
+        public QuadCurve2DDelegate() {
+            super(new String[] {"x1", "y1", "ctrlX", "ctrlY", "x2", "y2"});
+        }
+    }
+    public static final class Rectangle2DDelegate extends DefaultPersistenceDelegate {
+        public Rectangle2DDelegate() {
+            super(new String[] {"x", "y", "width", "height"});
+        }
+    }
+    public static final class RoundRectangle2DDelegate extends DefaultPersistenceDelegate {
+        public RoundRectangle2DDelegate() {
+            super(new String[] {"x", "y", "width", "height", "arcWidth", "arcHeight"});
+        }
+    }
+    public static final class AreaDelegate extends PersistenceDelegate {
+        protected Expression instantiate(Object oldInstance, Encoder out) {
+            Area a = (Area)oldInstance;
+
+            //use the default constructor
+            AffineTransform tx = new AffineTransform();
+            PathIterator itr = a.getPathIterator(tx);
+            
+            GeneralPath path = new GeneralPath();
+            out.writeExpression(new Expression(path, GeneralPath.class, "new", new Object[0]));
+            
+            while (!itr.isDone()) {
+                float[] segment = new float[6]; //must use floats because lineTo etc use floats
+                int pathType = itr.currentSegment(segment);
+
+                switch (pathType) {
+                    case PathIterator.SEG_CLOSE:
+                        out.writeStatement(new Statement(path, "closePath", new Object[0]));
+                        break;
+                    case PathIterator.SEG_CUBICTO:
+                        out.writeStatement(new Statement(path, "curveTo", new Object[] {segment[0], segment[1], segment[2], segment[3], segment[4], segment[5]}));
+                        break;
+                    case PathIterator.SEG_LINETO:
+                        out.writeStatement(new Statement(path, "lineTo", new Object[] {segment[0], segment[1]}));
+                        break;
+                    case PathIterator.SEG_MOVETO:
+                        out.writeStatement(new Statement(path, "moveTo", new Object[] {segment[0], segment[1]}));
+                        break;
+                    case PathIterator.SEG_QUADTO:
+                        out.writeStatement(new Statement(path, "quadTo", new Object[] {segment[0], segment[1], segment[2], segment[3]}));
+                        break;
+                }
+                itr.next();
+            }
+            
+            return new Expression(a, Area.class, "new", new Object[] {path});
+        }
+    }
+    public static final class AffineTransformDelegate extends DefaultPersistenceDelegate {
+        public AffineTransformDelegate() {
+            super(new String[] {"scaleX", "shearY", "shearX", "scaleY", "translateX", "translateY"});
+        }
+    }
+    public static final class GeneralPathDelegate extends PersistenceDelegate {
+        protected Expression instantiate(Object oldInstance, Encoder out) {
+            return new Expression(oldInstance, GeneralPath.class, "new", new Object[0]);
+        }
+        protected void initialize(Class<?> type, Object oldInstance, Object newInstance, Encoder out) {
+            GeneralPath a = (GeneralPath)oldInstance;
+
+            AffineTransform tx = new AffineTransform();
+            PathIterator itr = a.getPathIterator(tx);
+
+            out.writeStatement(new Statement(a, "setWindingRule", new Object[] {a.getWindingRule()}));
+
+            while (!itr.isDone()) {
+                float[] segment = new float[6]; //must use floats because lineTo etc use floats
+                int pathType = itr.currentSegment(segment);
+
+                switch (pathType) {
+                    case PathIterator.SEG_CLOSE:
+                        out.writeStatement(new Statement(a, "closePath", new Object[0]));
+                        break;
+                    case PathIterator.SEG_CUBICTO:
+                        out.writeStatement(new Statement(a, "curveTo", new Object[] {segment[0], segment[1], segment[2], segment[3], segment[4], segment[5]}));
+                        break;
+                    case PathIterator.SEG_LINETO:
+                        out.writeStatement(new Statement(a, "lineTo", new Object[] {segment[0], segment[1]}));
+                        break;
+                    case PathIterator.SEG_MOVETO:
+                        out.writeStatement(new Statement(a, "moveTo", new Object[] {segment[0], segment[1]}));
+                        break;
+                    case PathIterator.SEG_QUADTO:
+                        out.writeStatement(new Statement(a, "quadTo", new Object[] {segment[0], segment[1], segment[2], segment[3]}));
+                        break;
+                }
+                itr.next();
             }
         }
-        
-        throw new IllegalArgumentException("The input value " + text + " does" +
-                " not match one of the names of the standard painters");
     }
-
-    public String getAsText() {
-        Painter p = getValue();
-        if (p == null) {
-            return null;
-        } else if (defaultPainters.containsKey(p)) {
-            return defaultPainters.get(p);
-        } else {
-            return "<custom>";
-        }
-    }
-
-    public void paintValue(Graphics gfx, Rectangle box) {
-        Painter p = getValue();
-        if (p == null) {
-            //do nothing -- in the future draw the checkerboard or something
-        } else {
-            JXPanel panel = new JXPanel();
-            panel.setBounds(box);
-            p.paint((Graphics2D) gfx, panel);
-        }
-    }
-
-    public boolean isPaintable() {
-        return true;
-    }
+//    public static final class PaintDelegate extends PersistenceDelegate {
+//        protected Expression instantiate(Object oldInstance, Encoder out) {
+//            if (oldInstance instanceof GradientPaint) {
+//                
+//            }
+//        }
+//    }
 }
