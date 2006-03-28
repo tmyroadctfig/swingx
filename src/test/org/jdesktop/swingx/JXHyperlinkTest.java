@@ -22,7 +22,7 @@ import javax.swing.ListModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
-import org.jdesktop.swingx.action.LinkAction;
+import org.jdesktop.swingx.action.LinkModelAction;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
@@ -61,7 +61,7 @@ public class JXHyperlinkTest extends InteractiveTestCase {
         EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
         LinkModel link = new LinkModel("Click me!", null, JXEditorPaneTest.class.getResource("resources/test.html"));
 
-        LinkAction linkAction = new LinkAction(link);
+        LinkModelAction linkAction = new LinkModelAction(link);
         linkAction.setVisitingDelegate(visitor);
         JXHyperlink hyperlink = new JXHyperlink(linkAction);
         JPanel panel = new JPanel(new BorderLayout());

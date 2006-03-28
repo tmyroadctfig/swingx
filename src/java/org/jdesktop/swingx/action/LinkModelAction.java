@@ -33,7 +33,7 @@ import org.jdesktop.swingx.LinkModel;
 /**
  * @author Jeanette Winzenburg
  */
-public class LinkAction extends AbstractAction {
+public class LinkModelAction extends AbstractAction {
     
     private LinkModel link;
     private ActionListener delegate;
@@ -41,7 +41,7 @@ public class LinkAction extends AbstractAction {
     public static final String VISITED_PROPERTY = LinkModel.VISITED_PROPERTY;
     private PropertyChangeListener linkListener;
     
-    public LinkAction(LinkModel link) {
+    public LinkModelAction(LinkModel link) {
         setLink(link);
     }
 

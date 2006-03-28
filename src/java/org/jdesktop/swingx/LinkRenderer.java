@@ -36,7 +36,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
-import org.jdesktop.swingx.action.LinkAction;
+import org.jdesktop.swingx.action.LinkModelAction;
 
 /**
  * A Renderer/Editor for Links.
@@ -55,14 +55,14 @@ public class LinkRenderer extends AbstractCellEditor implements
 
     private JXHyperlink linkButton;
 
-    private LinkAction linkAction;
+    private LinkModelAction linkAction;
 
     public LinkRenderer() {
         this(null);
     }
 
     public LinkRenderer(ActionListener visitingDelegate) {
-        linkAction = new LinkAction(null);
+        linkAction = new LinkModelAction(null);
         linkButton = createHyperlink(linkAction);
 //        linkButton.setBorderPainted(true);
 //        linkButton.setOpaque(true);
