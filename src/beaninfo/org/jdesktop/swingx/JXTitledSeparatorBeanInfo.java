@@ -20,7 +20,8 @@
  */
 package org.jdesktop.swingx;
 
-import org.jdesktop.swingx.editors.HorizontalAlignmentPropertyEditor;
+import javax.swing.SwingConstants;
+import org.jdesktop.swingx.BeanInfoSupport.EnumerationValue;
 
 /**
  *
@@ -35,7 +36,13 @@ public class JXTitledSeparatorBeanInfo extends BeanInfoSupport {
     protected void initialize() {
         setPreferred(true, "icon", "title", "horizontalAlignment", 
                 "horizontalTextPosition");
-        setPropertyEditor(HorizontalAlignmentPropertyEditor.class, 
-                "horizontalAlignment", "horizontalTextPosition");
+        
+        setEnumerationValues(new EnumerationValue[] {
+            new EnumerationValue("Center", SwingConstants.CENTER, "SwingConstants.CENTER"),
+            new EnumerationValue("Leading", SwingConstants.LEADING, "SwingConstants.LEADING"),
+            new EnumerationValue("Left", SwingConstants.LEFT, "SwingConstants.LEFT"),
+            new EnumerationValue("Right", SwingConstants.RIGHT, "SwingConstants.RIGHT"),
+            new EnumerationValue("Trailing", SwingConstants.TRAILING, "SwingConstants.TRAILING")
+        }, "horizontalAlignment", "horizontalTextPosition");
     }
 }
