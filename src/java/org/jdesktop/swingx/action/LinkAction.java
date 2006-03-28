@@ -6,13 +6,24 @@ package org.jdesktop.swingx.action;
 
 import java.awt.event.ItemEvent;
 
+/**
+ * Convenience implementation to simplify {@link JXHyperlink} configuration and 
+ * provide minimal api as needed by a {@link LinkRenderer}. <p>
+ * 
+ * PENDING: generalize LinkRenderer to use LinkAction instead of LinkModelAction
+ * PENDING: generify target.
+ * 
+ * @author Jeanette Winzenburg
+ */
 public abstract class LinkAction extends AbstractActionExt {
 
     /**
-     * temporaryly changed value to guarantee hyperlink is listening to
-     * this instead of to linkmodel.
+     * Key for the visited property value.
      */
-    public static final String VISITED_KEY = "link_visited";
+    public static final String VISITED_KEY = "visited";
+    /**
+     * the object the actionPerformed can act on.
+     */
     private Object target;
 
 
@@ -22,11 +33,15 @@ public abstract class LinkAction extends AbstractActionExt {
     
     public LinkAction(Object target) {
        this(target, false);
+       // JW: this looks suspicious ... 
        setTarget(target);
     }
 
     public LinkAction(Object target, boolean visited) {
         setTarget(target);
+        // JW: hmmm ... reverse method calls to guarantee target 
+        // properties take precedence if wanted?
+        // test!!
         setVisited(visited);
     }
 

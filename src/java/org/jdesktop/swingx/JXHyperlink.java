@@ -40,8 +40,35 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  * This button has visual state related to a notion of "clicked": 
  * foreground color is unclickedColor or clickedColor depending on 
  * its boolean bound property clicked being false or true, respectively.
+ * If the hyperlink has an action, it guarantees to synchronize its 
+ * "clicked" state to an action value with key LinkAction.VISITED_KEY. 
+ * Synchronization happens on setAction() and on propertyChange notification
+ * from the action. JXHyperlink accepts any type of action - 
+ * {@link LinkAction} is a convenience implementation to
+ * simplify clicked control.
  * <p>
  * 
+ * <pre> <code>
+ *      LinkAction linkAction = new LinkAction("http://swinglabs.org", false) {
+ *            public void actionPerformed(ActionEvent e) {
+ *                doSomething(getTarget());
+ *                setVisited(true);
+ *            }
+ *      };
+ *      JXHyperlink hyperlink = new JXHyperlink(linkAction);
+ * <code> </pre>
+ * 
+ * The hyperlink can be configured to always update its clicked 
+ * property after firing the actionPerformed:
+ * 
+ * <pre> <code>
+ *      JXHyperlink hyperlink = new JXHyperlink(action);
+ *      hyperlink.setOverrulesActionOnClick(true);
+ * <code> </pre>
+ * 
+ * By default, this property is false. The hyperlink will 
+ * auto-click only if it has no action. Developers can change the
+ * behaviour by overriding {@link JXHyperlink#isAutoSetClicked()};
  * 
  * 
  * 

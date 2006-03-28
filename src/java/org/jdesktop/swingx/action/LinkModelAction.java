@@ -31,6 +31,12 @@ import javax.swing.Action;
 import org.jdesktop.swingx.LinkModel;
 
 /**
+ * Specialized LinkAction for a target of type {@link LinkModel}. 
+ * <p>
+ * 
+ * PENDING: cleanup internals to use super's infrastructure. <p>
+ * PENDING: move to swingx package?
+ * 
  * @author Jeanette Winzenburg
  */
 public class LinkModelAction extends LinkAction {
