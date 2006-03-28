@@ -55,6 +55,26 @@ public class JXTableIssues extends InteractiveTestCase {
         // TODO Auto-generated constructor stub
     }
 
+    /**
+     * JXTable has responsibility to guarantee usage of 
+     * TableColumnExt comparator and update the sort if
+     * the columns comparator changes.
+     * 
+     */
+    public void testComparatorToPipelineDynamic() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        TableColumnExt columnX = table.getColumnExt(0);
+        table.toggleSortOrder(0);
+        columnX.setComparator(Collator.getInstance());
+        // invalid assumption .. only the comparator must be used.
+//        assertEquals("interactive sorter must be same as sorter in column", 
+//                columnX.getSorter(), table.getFilters().getSorter());
+        SortKey sortKey = SortKey.getFirstSortKeyForColumn(table.getFilters().getSortController().getSortKeys(), 0);
+        assertNotNull(sortKey);
+        assertEquals(columnX.getComparator(), sortKey.getComparator());
+       
+    }
+
 
     /**
      * Issue #256-swingX: viewport - toggle track height must
