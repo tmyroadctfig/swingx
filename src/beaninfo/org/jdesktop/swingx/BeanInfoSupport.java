@@ -335,6 +335,46 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
         }
     }
     
+    protected void setEnumerationValues(EnumerationValue[] values, String... propertyNames) {
+        if (values == null) {
+            return;
+        }
+        
+        Object[] enumValues = new Object[values.length * 3];
+        int index = 0;
+        for (EnumerationValue ev : values) {
+            enumValues[index++] = ev.name;
+            enumValues[index++] = ev.value;
+            enumValues[index++] = ev.javaInitializationString;
+        }
+        
+        for (String propertyName : propertyNames) {
+            PropertyDescriptor pd = properties.get(propertyName);
+            if (pd != null) {
+                pd.setValue("enumerationValues", enumValues);
+            } else {
+                LOG.log(Level.WARNING, "Failed to set enumeration values for property '" +
+                        propertyName + "'. No such property was found");
+            }
+        }
+    }
+    
+    /**
+     * Used with the setEnumerationValues method to specify enumerated values for
+     * properties
+     */
+    protected static final class EnumerationValue {
+        private String name;
+        private Object value;
+        private String javaInitializationString;
+        
+        public EnumerationValue(String name, Object value, String javaInitString) {
+            this.name = name;
+            this.value = value;
+            this.javaInitializationString = javaInitString;
+        }
+    }
+    
     //----------------------------------------------------- BeanInfo methods
     /**
      * Gets the bean's <code>BeanDescriptor</code>s.
