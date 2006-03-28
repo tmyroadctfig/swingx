@@ -363,7 +363,7 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
      * Used with the setEnumerationValues method to specify enumerated values for
      * properties
      */
-    protected static final class EnumerationValue {
+    public static final class EnumerationValue {
         private String name;
         private Object value;
         private String javaInitializationString;
@@ -372,6 +372,22 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
             this.name = name;
             this.value = value;
             this.javaInitializationString = javaInitString;
+        }
+        
+        public String getName() {
+            return name;
+        }
+        
+        public String toString() {
+            return name;
+        }
+        
+        public Object getValue() {
+            return value;
+        }
+        
+        public String getJavaInitializationString() {
+            return javaInitializationString;
         }
     }
     
