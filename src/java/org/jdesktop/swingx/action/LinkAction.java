@@ -24,26 +24,47 @@ public abstract class LinkAction extends AbstractActionExt {
     /**
      * the object the actionPerformed can act on.
      */
-    private Object target;
+    protected Object target;
 
-
+    /**
+     * Instantiates a LinkAction with null target. 
+     * 
+     */
     public LinkAction() {
         this(null);
     }
     
+    /**
+     * Instantiates a LinkAction with target. 
+     * The visited property is initialized as defined by 
+     * {@link LinkAction#installTarget()}
+     * 
+     * @param target the target this action should act on.
+     */
     public LinkAction(Object target) {
-       this(target, false);
-       // JW: this looks suspicious ... 
        setTarget(target);
     }
 
-    public LinkAction(Object target, boolean visited) {
-        setTarget(target);
-        // JW: hmmm ... reverse method calls to guarantee target 
-        // properties take precedence if wanted?
-        // test!!
-        setVisited(visited);
-    }
+    /**
+     * Instantiates a LinkAction with target and visited. T
+     * The initial value of visited is guaranteed to be 
+     * the given parameter value, overruling the 
+     * {@link LinkAction#installTarget()}
+     * 
+     * PENDING: hmm... better remove this constructor? 
+     * Done for now - there are issue with the 
+     * class invarant. 
+     * 
+     * @param target
+     * @param visited
+     */
+//    public LinkAction(Object target, boolean visited) {
+//        setTarget(target);
+//        // JW: hmmm ... reverse method calls to guarantee target 
+//        // properties take precedence if wanted?
+//        // test!!
+//        setVisited(visited);
+//    }
 
     /**
      * Set the visited property.

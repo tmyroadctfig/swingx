@@ -49,7 +49,7 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  * <p>
  * 
  * <pre> <code>
- *      LinkAction linkAction = new LinkAction("http://swinglabs.org", false) {
+ *      LinkAction linkAction = new LinkAction("http://swinglabs.org") {
  *            public void actionPerformed(ActionEvent e) {
  *                doSomething(getTarget());
  *                setVisited(true);

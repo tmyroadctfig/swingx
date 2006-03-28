@@ -21,6 +21,33 @@ public class LinkActionTest extends TestCase {
     
     private PropertyChangeReport report;
 
+
+    /**
+     * test if auto-installed visited property is respected.
+     *
+     */
+    public void testConstructorsAndCustomTargetInstall() {
+        Object target = new Object();
+        final boolean visitedIsTrue = true;
+        LinkAction linkAction = new LinkAction(target) {
+
+            public void actionPerformed(ActionEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+
+            @Override
+            protected void installTarget() {
+                super.installTarget();
+                setVisited(visitedIsTrue);
+            }
+            
+            
+            
+        };
+        assertEquals(visitedIsTrue, linkAction.isVisited());
+        
+    }
     /**
      * test constructors with parameters
      *
@@ -38,16 +65,17 @@ public class LinkActionTest extends TestCase {
         };
         assertEquals(target, linkAction.getTarget());
         assertFalse(linkAction.isVisited());
-        LinkAction linkAction2 = new LinkAction(target, visitedIsTrue) {
-
-            public void actionPerformed(ActionEvent e) {
-                // TODO Auto-generated method stub
-                
-            }
-            
-        };
-        assertEquals(target, linkAction2.getTarget());
-        assertEquals(visitedIsTrue, linkAction2.isVisited());
+        // removed convenience constructor - issues with class invariant
+//        LinkAction linkAction2 = new LinkAction(target, visitedIsTrue) {
+//
+//            public void actionPerformed(ActionEvent e) {
+//                // TODO Auto-generated method stub
+//                
+//            }
+//            
+//        };
+//        assertEquals(target, linkAction2.getTarget());
+//        assertEquals(visitedIsTrue, linkAction2.isVisited());
     }
     /**
      * test visited/target properties of LinkAction.
