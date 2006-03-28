@@ -32,6 +32,7 @@ import java.awt.Stroke;
 import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import javax.swing.JComponent;
@@ -125,9 +126,9 @@ public abstract class AbstractPainter extends JavaBean implements Painter<JCompo
      */
     private SoftReference<BufferedImage> cachedImage;
     /**
-     * The Effect to apply to the results of the paint() operation
+     * The Effects to apply to the results of the paint() operation
      */
-    private Effect effect;
+    private Effect[] effects = new Effect[0];
     
     /**
      * Creates a new instance of AbstractPainter
@@ -165,26 +166,50 @@ public abstract class AbstractPainter extends JavaBean implements Painter<JCompo
     }
     
     /**
-     * <p>Sets an effect (or multiple effects if you use a CompoundEffect) 
-     * to apply to the results of the AbstractPainter's painting operation. 
-     * Some common effects include blurs, shadows, embossing, and so forth. If 
-     * the given effect is null, no effects will be used</p>
+     * <p>Sets the effects to apply to the results of the AbstractPainter's
+     * painting operation. Some common effects include blurs, shadows, embossing,
+     * and so forth. If the given effects is a null array, no effects will be used</p>
      *
-     * @param effects the Effect to apply to the results of the AbstractPainter's
+     * @param effects the Effects to apply to the results of the AbstractPainter's
      *                painting operation
      */
-    public void setEffect(Effect effect) {
-        Effect old = getEffect();
-        this.effect = effect;
-        firePropertyChange("effect", old, getEffect());
+    public void setEffects(Effect... effects) {
+        Effect[] old = getEffects();
+        this.effects = new Effect[effects == null ? 0 : effects.length];
+        if (effects != null) {
+            System.arraycopy(effects, 0, this.effects, 0, effects.length);
+        }
+        firePropertyChange("effects", old, getEffects());
+        firePropertyChange("effects", old, getEffects());
     }
     
     /**
-     * @param effects the Effect to apply to the results of the AbstractPainter's
-     *                painting operation. May be null
+     * <p>A convenience method for specifying the effects to use based on
+     * BufferedImageOps. These will each be individually wrapped by an ImageEffect
+     * and then setEffects(Effect... effects) will be called with the resulting
+     * array</p>
+     *
+     * @param filters the BufferedImageOps to wrap as effects
      */
-    public Effect getEffect() {
-        return this.effect;
+    public void setEffects(BufferedImageOp... filters) {
+        Effect[] effects = new Effect[filters == null ? 0 : filters.length];
+        if (filters != null) {
+            int index = 0;
+            for (BufferedImageOp op : filters) {
+                effects[index++] = new ImageEffect(op);
+            }
+        }
+        setEffects(effects);
+    }
+    
+    /**
+     * @param effects a defensive copy of the Effects to apply to the results
+     *          of the AbstractPainter's painting operation. Will never null
+     */
+    public Effect[] getEffects() {
+        Effect[] results = new Effect[effects.length];
+        System.arraycopy(effects, 0, results, 0, results.length);
+        return results;
     }
     
     /**
@@ -688,8 +713,8 @@ public abstract class AbstractPainter extends JavaBean implements Painter<JCompo
                 && image.getHeight() == component.getHeight()) {
             g.drawImage(image, 0, 0, null);
         } else {
-            Effect effect = getEffect();
-            if (effect != null || isUseCache()) {
+            Effect[] effects = getEffects();
+            if (effects.length > 0 || isUseCache()) {
                 image = PaintUtils.createCompatibleImage(
                         component.getWidth(),
                         component.getHeight(),
@@ -700,7 +725,7 @@ public abstract class AbstractPainter extends JavaBean implements Painter<JCompo
                 paintBackground(gfx, component);
                 gfx.dispose();
 
-                if (effect != null) {
+                for (Effect effect : effects) {
                     image = effect.apply(image);
                 }
                 
