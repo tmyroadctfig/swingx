@@ -613,7 +613,7 @@ public class JXMonthView extends JComponent {
      * @param flaggedDates the dates to be flagged
      */
     public void setFlaggedDates(long[] flaggedDates) {
-        if (_flaggedDates == null) {
+        if (flaggedDates == null) {
             _flaggedDates = null;
         } else {
             _flaggedDates = new HashSet<Long>();
