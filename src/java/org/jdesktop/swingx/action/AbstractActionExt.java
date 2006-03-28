@@ -57,6 +57,13 @@ public abstract class AbstractActionExt extends AbstractAction
     private boolean selected = false;
 
     /**
+     * Default constructor, does nothing.
+     *
+     */
+    public AbstractActionExt() {
+        // default constructor
+    }
+    /**
      * Copy constuctor copies the state.
      */
     public AbstractActionExt(AbstractActionExt action) {

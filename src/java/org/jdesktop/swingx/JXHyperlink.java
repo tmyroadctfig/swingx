@@ -21,21 +21,29 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.Action;
 import javax.swing.JButton;
 
+import org.jdesktop.swingx.action.LinkAction;
 import org.jdesktop.swingx.plaf.JXHyperlinkAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 
 /**
  * A hyperlink component that derives from JButton to provide compatibility
  * mostly for binding actions enabled/disabled behavior accesilibity i18n etc...
+ * <p>
  *
- * This component tracks its state and changes way it is being painted after
- * being clicked for the first time.
+ * This button has visual state related to a notion of "clicked": 
+ * foreground color is unclickedColor or clickedColor depending on 
+ * its boolean bound property clicked being false or true, respectively.
+ * <p>
+ * 
+ * 
+ * 
  * 
  * @author Richard Bair
  * @author Shai Almog
@@ -70,11 +78,13 @@ public class JXHyperlink extends JButton {
      */
     private Color clickedColor = new Color(0x99, 0, 0x99);
 
+    private boolean overrulesActionOnClick;
+
     /**
      * Creates a new instance of JXHyperlink with default parameters
      */
     public JXHyperlink() {
-        super();
+        this(null);
     }
 
     /**
@@ -84,7 +94,8 @@ public class JXHyperlink extends JButton {
      *        created JXHyperLink
      */
     public JXHyperlink(Action action) {
-        super(action);
+        super();
+        setAction(action);
         init();
     }
 
@@ -104,7 +115,7 @@ public class JXHyperlink extends JButton {
     public void setClickedColor(Color color) {
         Color old = getClickedColor();
         clickedColor = color;
-        if (isVisited()) {
+        if (isClicked()) {
             setForeground(getClickedColor());
         }
         firePropertyChange("clickedColor", old, getClickedColor());
@@ -126,30 +137,78 @@ public class JXHyperlink extends JButton {
     public void setUnclickedColor(Color color) {
         Color old = getUnclickedColor();
         unclickedColor = color;
-        if (!isVisited()) {
+        if (!isClicked()) {
             setForeground(getUnclickedColor());
         }
         firePropertyChange("unclickedColor", old, getUnclickedColor());
     }
 
     /**
-     * Sets if this link has been clicked before. This will luckily affect the way
-     * this component is being painted.
-     *
-     * @param visited If <code>true</code> marks link as visited.
+     * Sets the clicked property and updates visual state depending
+     * on clicked.
+     * Here: the dependent visual state is the foreground color.
+     * NOTE: as with all  button's visual properties, this will not update 
+     * the backing action's "visited" state.
+     * 
+     * @param clicked flag to indicate if the button should be regarded
+     *    as having been clicked or not.
      */
-    protected void setVisited(boolean visited) {
-        boolean old = isVisited();
-        hasBeenVisited = visited;
-        setForeground(isVisited() ? getClickedColor() : getUnclickedColor());
-        firePropertyChange("visited", old, isVisited());
-    }
+    public void setClicked(boolean clicked) {
+        boolean old = isClicked();
+        hasBeenVisited = clicked;
+        setForeground(isClicked() ? getClickedColor() : getUnclickedColor());
+        firePropertyChange("clicked", old, isClicked());
+   }
 
     /**
      * @return <code>true</code> if hyper link has already been clicked.
      */
-    protected boolean isVisited() {
+    public boolean isClicked() {
         return hasBeenVisited;
+    }
+
+    /**
+     * Control auto-click property. 
+     * 
+     * @param overrule if true, fireActionPerformed will set clicked to true
+     *   independent of action.
+     * 
+     */
+    public void setOverrulesActionOnClick(boolean overrule) {
+        boolean old = getOverrulesActionOnClick();
+        this.overrulesActionOnClick = overrule;
+        firePropertyChange("overrulesActionOnClick", old, getOverrulesActionOnClick());
+    }
+    
+    /**
+     * Returns whether the clicked property should be set always on clicked.
+     * 
+     * Defaults to false.
+     * 
+     * @return overrulesActionOnClick 
+     */
+    public boolean getOverrulesActionOnClick() {
+        return overrulesActionOnClick;
+    }
+
+    /**
+     * override to control auto-clicked. 
+     */
+    @Override
+    protected void fireActionPerformed(ActionEvent event) {
+        super.fireActionPerformed(event);
+        if (isAutoSetClicked()) {
+            setClicked(true);
+        }
+    }
+
+    /**
+     * Decides auto-setting of clicked property after firing action events.
+     * Here: true if no action or overrulesAction property is true.
+     * @return true if fireActionEvent should force a clicked, false if not.
+     */
+    protected boolean isAutoSetClicked() {
+        return getAction() == null || getOverrulesActionOnClick();
     }
 
     /**
@@ -165,8 +224,8 @@ public class JXHyperlink extends JButton {
         PropertyChangeListener l = new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
-                if (LinkModel.VISITED_PROPERTY.equals(evt.getPropertyName())) {
-                    setVisitedFromActionProperty(a);
+                if (LinkAction.VISITED_KEY.equals(evt.getPropertyName())) {
+                    configureClickedPropertyFromAction(a);
                 } else {
                     superListener.propertyChange(evt);
                 }
@@ -181,18 +240,23 @@ public class JXHyperlink extends JButton {
      * Read all the essentional properties from the provided <code>Action</code>
      * and apply it to the <code>JXHyperlink</code>
      */
+    @Override
     protected void configurePropertiesFromAction(Action a) {
         super.configurePropertiesFromAction(a);
-        setVisitedFromActionProperty(a);
+        configureClickedPropertyFromAction(a);
     }
 
-    private void setVisitedFromActionProperty(Action a) {
-        Boolean visited = (Boolean) a.getValue(LinkModel.VISITED_PROPERTY);
-        setVisited(visited != null ? visited.booleanValue() : false);
+    private void configureClickedPropertyFromAction(Action a) {
+        boolean clicked = false;
+        if (a != null) {
+            clicked = Boolean.TRUE.equals(a.getValue(LinkAction.VISITED_KEY));
+            
+        }
+        setClicked(clicked);
     }
 
     private void init() {
-        setForeground(isVisited() ? getClickedColor() : getUnclickedColor());
+        setForeground(isClicked() ? getClickedColor() : getUnclickedColor());
     }
 
     /**

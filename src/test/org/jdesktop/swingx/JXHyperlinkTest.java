@@ -14,7 +14,9 @@ import java.net.URL;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Box;
 import javax.swing.DefaultListModel;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -22,24 +24,198 @@ import javax.swing.ListModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
+import org.jdesktop.swingx.action.LinkAction;
 import org.jdesktop.swingx.action.LinkModelAction;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
+import org.jdesktop.swingx.util.PropertyChangeReport;
 
 /**
  * @author Jeanette Winzenburg
  */
 public class JXHyperlinkTest extends InteractiveTestCase {
 
+    private PropertyChangeReport report;
+
     public JXHyperlinkTest() {
         super("JXHyperlinkLabel Test");
     }
 
-    public void testDummy() {
-        
+    
+    /**
+     * test control of the clicked property.
+     * 
+     * Default behaviour
+     * 
+     *
+     */
+    public void testAutoClicked() {
+       // no action 
+       JXHyperlink hyperlink = new JXHyperlink();
+       hyperlink.doClick();
+       assertTrue("hyperlink autoClicks if it has no action", hyperlink.isClicked());
+       
+       LinkAction emptyAction = createEmptyLinkAction();
+       JXHyperlink hyperlink2 = new JXHyperlink(emptyAction);
+       hyperlink2.doClick();
+       assertFalse(emptyAction.isVisited());
+       assertFalse("hyperlink does nothing if has action", hyperlink2.isClicked());
+       
+       LinkAction emptyAction3 = createEmptyLinkAction();
+       JXHyperlink hyperlink3 = new JXHyperlink(emptyAction3);
+       hyperlink3.setOverrulesActionOnClick(true);
+       hyperlink3.doClick();
+       assertFalse(emptyAction.isVisited());
+       assertTrue("hyperlink overrules action", hyperlink3.isClicked());
+       
     }
     
+    public void testOverrulesActionOnClick() {
+        JXHyperlink hyperlink = new JXHyperlink();
+        assertFalse(hyperlink.getOverrulesActionOnClick());
+        hyperlink.addPropertyChangeListener(report);
+        hyperlink.setOverrulesActionOnClick(true);
+        assertTrue(hyperlink.getOverrulesActionOnClick()); 
+        assertEquals(1, report.getEventCount("overrulesActionOnClick"));
+    }
+    /**
+     * sanity (duplicate of LinkActionTest method) to
+     * guarantee that hyperlink is updated as expected.
+     *
+     */
+    public void testLinkActionSetTarget() {
+        LinkAction linkAction = createEmptyLinkAction();
+        linkAction.setVisited(true);
+        JXHyperlink hyperlink = new JXHyperlink(linkAction);
+        Object target = new Object();
+        linkAction.setTarget(target);
+        assertEquals(linkAction.getName(), hyperlink.getText());
+        assertFalse(hyperlink.isClicked());
+    }
+    /**
+     * test that hyperlink.setClicked doesn't change action.isVisited();
+     *
+     */
+    public void testSetClickedActionUnchanged() {
+        LinkAction linkAction = createEmptyLinkAction();
+        linkAction.setVisited(true);
+        JXHyperlink hyperlink = new JXHyperlink(linkAction);
+        // sanity assert..
+        assertTrue(hyperlink.isClicked());
+        hyperlink.setClicked(false);
+        // action state must be unchanged;
+        assertTrue(linkAction.isVisited());
+        
+    }
+    /**
+     * test hyperlink's clicked property.
+     *
+     */
+    public void testClicked() {
+        JXHyperlink hyperlink = new JXHyperlink();
+        boolean isClicked = hyperlink.isClicked();
+        assertFalse(isClicked);
+        hyperlink.addPropertyChangeListener(report);
+        hyperlink.setClicked(!isClicked);
+        assertEquals(1, report.getEventCount("clicked"));
+    }
+    
+    /**
+     * JXHyperlink must handle null action gracefully.
+     * 
+     * Was NPE in configureFromAction
+     *
+     */
+    public void testInitNullAction() {
+        JXHyperlink hyperlink = new JXHyperlink();
+        assertNull(hyperlink.getAction());
+        
+    }
+
+    /**
+     * JXHyperlink must handle null action gracefully.
+     * 
+     * Was NPE in configureFromAction
+     *
+     */
+    public void testSetNullAction() {
+        LinkAction action = createEmptyLinkAction();
+        JXHyperlink hyperlink = new JXHyperlink(action);
+        assertEquals("hyperlink action must be equal to linkAction", action, hyperlink.getAction());
+        hyperlink.setAction(null);
+        assertNull(hyperlink.getAction());
+    }
+    /**
+     * JXHyperlink must handle null action gracefully.
+     * 
+     * Was NPE in configureFromAction
+     *
+     */
+    public void testSetAction() {
+        JXHyperlink hyperlink = new JXHyperlink();
+        LinkAction action = createEmptyLinkAction();
+        hyperlink.setAction(action);
+        assertEquals("hyperlink action must be equal to linkAction", 
+                action, hyperlink.getAction());
+    }
+
+    /**
+     * test that JXHyperlink visited state keeps synched 
+     * to LinkAction.
+     *
+     */
+    public void testListeningVisited() {
+       LinkAction linkAction = createEmptyLinkAction();
+       JXHyperlink hyperlink = new JXHyperlink(linkAction);
+       // sanity: both are expected to be false
+       assertEquals(linkAction.isVisited(), hyperlink.isClicked());
+       assertFalse(linkAction.isVisited());
+       linkAction.setVisited(!linkAction.isVisited());
+       assertEquals(linkAction.isVisited(), hyperlink.isClicked());
+    }
+    
+    /**
+     * test initial visited state in JXHyperlink is synched to
+     * linkAction given in constructor.
+     * 
+     * There was the usual "init" problem with the constructor.
+     * Solved by chaining.
+     * 
+     */
+    public void testInitialVisitedSynched() {
+        LinkAction linkAction = createEmptyLinkAction();
+       linkAction.setVisited(true);
+       // sanity: linkAction is changed to true
+       assertTrue(linkAction.isVisited());
+       JXHyperlink hyperlink = new JXHyperlink(linkAction);
+       assertEquals(linkAction.isVisited(), hyperlink.isClicked());
+    }
+
+    
+    
+    /**
+     * visually check how differently configured buttons behave on
+     * clicked.
+     *
+     */
+    public void interactiveCompareClicked() {
+        JComponent box = Box.createVerticalBox();
+        JXHyperlink noActionHyperlink = new JXHyperlink();
+        noActionHyperlink.setText("have no action - auto-click");
+        box.add(noActionHyperlink);
+        LinkAction doNothingAction = createEmptyLinkAction("have do nothing action - follow action");
+        JXHyperlink doNothingActionHyperlink = new JXHyperlink(doNothingAction);
+        box.add(doNothingActionHyperlink);
+        
+        LinkAction doNothingAction2 = createEmptyLinkAction("have do nothing action - overrule");
+        JXHyperlink overruleActionHyperlink = new JXHyperlink(doNothingAction2);
+        overruleActionHyperlink.setOverrulesActionOnClick(true);
+        box.add(overruleActionHyperlink);
+        JXFrame frame = wrapInFrame(box, "compare clicked control");
+        frame.setVisible(true);
+        
+    }
     public void interactiveTestUnderlineButton() {
         Action action = new AbstractAction("LinkModel@somewhere") {
 
@@ -214,13 +390,38 @@ public class JXHyperlinkTest extends InteractiveTestCase {
         return model;
     }
 
+    
+    protected LinkAction createEmptyLinkAction() {
+        LinkAction linkAction = new LinkAction() {
+
+            public void actionPerformed(ActionEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+               
+       };
+        return linkAction;
+    }
+
+    protected LinkAction createEmptyLinkAction(String name) {
+        LinkAction linkAction = createEmptyLinkAction();
+        linkAction.setName(name);
+        return linkAction;
+    }
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        report = new PropertyChangeReport();
+    }
+
     public static void main(String[] args) throws Exception {
 //        setSystemLF(true);
         JXHyperlinkTest test = new JXHyperlinkTest();
         try {
 //            test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*Table.*");
-            test.runInteractiveTests("interactive.*List.*");
+//            test.runInteractiveTests("interactive.*Table.*");
+//            test.runInteractiveTests("interactive.*List.*");
+            test.runInteractiveTests("interactive.*Clicked.*");
           } catch (Exception e) {
               System.err.println("exception when executing interactive tests:");
               e.printStackTrace();

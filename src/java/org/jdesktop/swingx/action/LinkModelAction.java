@@ -33,12 +33,11 @@ import org.jdesktop.swingx.LinkModel;
 /**
  * @author Jeanette Winzenburg
  */
-public class LinkModelAction extends AbstractAction {
+public class LinkModelAction extends LinkAction {
     
     private LinkModel link;
     private ActionListener delegate;
     public static final String VISIT_ACTION = "visit";
-    public static final String VISITED_PROPERTY = LinkModel.VISITED_PROPERTY;
     private PropertyChangeListener linkListener;
     
     public LinkModelAction(LinkModel link) {
@@ -77,7 +76,7 @@ public class LinkModelAction extends AbstractAction {
         if (link != null) {
             putValue(Action.NAME, link.getText());
             putValue(Action.SHORT_DESCRIPTION, link.getURL().toString());
-            putValue(VISITED_PROPERTY, new Boolean(link.getVisited()));
+            putValue(VISITED_KEY, new Boolean(link.getVisited()));
         } else {
             Object[] keys = getKeys();
             if (keys == null) return;
