@@ -10,8 +10,6 @@ import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
-import java.util.EventObject;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -24,6 +22,9 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeExpansionListener;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -41,6 +42,7 @@ import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
+import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.swingx.util.ComponentTreeTableModel;
@@ -61,13 +63,49 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Highligh.*");
          //      test.runInteractiveTests("interactive.*SortingFilter.*");
-           test.runInteractiveTests("interactive.*Insert.*");
+           test.runInteractiveTests("interactive.*Expand.*");
 //             test.runInteractiveTests("interactive.*Edit.*");
         } catch (Exception ex) {
 
         }
     }
 
+    /**
+     * http://forums.java.net/jive/thread.jspa?threadID=13966&tstart=0
+     * adjust hierarchical column width on expansion. The expansion
+     * listener looks like doing the job. Important: auto-resize off, 
+     * otherwise the table will run out of width to distribute!
+     * 
+     */
+    public void interactiveUpdateWidthOnExpand() {
+        
+        final JXTreeTable tree = new JXTreeTable(treeTableModel);
+        tree.setColumnControlVisible(true);
+        JTree renderer = ((JTree) tree.getDefaultRenderer(AbstractTreeTableModel.hierarchicalColumnClass));            
+        
+        renderer.addTreeExpansionListener(new TreeExpansionListener(){
+
+           public void treeCollapsed(TreeExpansionEvent event) {
+           }
+
+           public void treeExpanded(TreeExpansionEvent event) {
+              
+              final JTree renderer = (JTree)event.getSource();
+              
+              SwingUtilities.invokeLater(new Runnable(){
+                 
+                 public void run() {
+                    tree.getColumnModel().getColumn(0).setPreferredWidth(renderer.getPreferredSize().width);
+
+                 }
+              });            
+           }
+           
+        });
+        JXFrame frame = wrapWithScrollingInFrame(tree, "adjust column on expand");
+        frame.setVisible(true);
+
+    }
     /**
      * visualize editing of the hierarchical column, both
      * in a tree and a treeTable
