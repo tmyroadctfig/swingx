@@ -103,23 +103,23 @@ public class GradientPreviewPanel extends JXPanel {
 	// set up the end points
 	Point2D start = this.start;
 	Point2D end = this.end;
-	if(picker.reversed.isSelected()) {
+	if(picker.reversedCheck.isSelected()) {
 	    start = this.end;
 	    end = this.start;
 	}
 
 	// set up the cycle type
 	MultipleGradientPaint.CycleMethodEnum cycle = MultipleGradientPaint.NO_CYCLE;
-	if(picker.repeated.isSelected()) {
+	if(picker.repeatedRadio.isSelected()) {
 	    cycle = MultipleGradientPaint.REPEAT;
 	}
-	if(picker.reflected.isSelected()) {
+	if(picker.reflectedRadio.isSelected()) {
 	    cycle = MultipleGradientPaint.REFLECT;
 	}
 	
 	// create the underlying gradient paint
 	MultipleGradientPaint paint = null;
-	if(picker.style_list.getSelectedItem().toString().equals("Linear")) {
+	if(picker.styleCombo.getSelectedItem().toString().equals("Linear")) {
 	    paint = new org.apache.batik.ext.awt.LinearGradientPaint(
 	    (float)start.getX(),
 	    (float)start.getY(),
@@ -127,7 +127,7 @@ public class GradientPreviewPanel extends JXPanel {
 	    (float)end.getY(),
 	    fractions,colors,cycle);
 	}
-	if(picker.style_list.getSelectedItem().toString().equals("Radial")) {
+	if(picker.styleCombo.getSelectedItem().toString().equals("Radial")) {
 	    paint = new org.apache.batik.ext.awt.RadialGradientPaint(
 	    start, (float)start.distance(end),start,
 	    fractions, colors, cycle, MultipleGradientPaint.SRGB
