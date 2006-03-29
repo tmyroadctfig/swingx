@@ -346,9 +346,21 @@ public class JXPanel extends JPanel implements Scrollable {
         return gradientTrackHeight;
     }
     
+    /**
+     * Specifies a Painter to use to paint the background of this JXPanel.
+     * If <code>p</code> is not null, then setOpaque(false) will be called
+     * as a side effect. A component should not be opaque if painters are
+     * being used, because Painters may paint transparent pixels or not
+     * paint certain pixels, such as around the border insets.
+     */
     public void setBackgroundPainter(Painter p) {
         Painter old = getBackgroundPainter();
         this.backgroundPainter = p;
+        
+        if (p != null) {
+            setOpaque(false);
+        }
+        
         firePropertyChange("backgroundPainter", old, getBackgroundPainter());
         repaint();
     }
