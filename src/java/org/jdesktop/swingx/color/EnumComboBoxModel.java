@@ -20,6 +20,9 @@
  */
 package org.jdesktop.swingx.color;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
 import javax.swing.AbstractListModel;
 import javax.swing.ComboBoxModel;
 import org.jdesktop.swingx.JXGradientChooser;
@@ -30,26 +33,30 @@ import org.jdesktop.swingx.JXGradientChooser;
  *
  * @author joshy
  */
-public class EnumComboBoxModel extends AbstractListModel implements ComboBoxModel {
+public class EnumComboBoxModel<E extends Enum<E>> extends AbstractListModel implements ComboBoxModel {
     Object selected = null;
+    List<E> list;
 
-    public EnumComboBoxModel() {
-	selected = JXGradientChooser.GradientStyle.values()[0];
+    public EnumComboBoxModel(Class<E> en) {
+        EnumSet<E> ens = EnumSet.allOf(en);
+        list = new ArrayList<E>(ens);
+        selected = list.get(0);
     }
 
     public int getSize() {
-	return JXGradientChooser.GradientStyle.values().length;
+        return list.size();
     }
 
-    public Object getElementAt(int index) {
-	return JXGradientChooser.GradientStyle.values()[index];
+    public E getElementAt(int index) {
+        return list.get(index);
     }
 
     public void setSelectedItem(Object anItem) {
 	selected = anItem;
+        this.fireContentsChanged(this,0,getSize());
     }
     
-    public Object getSelectedItem() {
-	return selected;
+    public E getSelectedItem() {
+	return (E)selected;
     }
 }
