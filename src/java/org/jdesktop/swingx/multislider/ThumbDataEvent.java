@@ -1,12 +1,23 @@
 /*
- * ThumbDataEvent.java
+ * $Id$
  *
- * Created on February 22, 2006, 1:30 PM
+ * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
+ * Santa Clara, California 95054, U.S.A. All rights reserved.
  *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
 package org.jdesktop.swingx.multislider;
 
 import java.util.EventObject;
@@ -18,7 +29,7 @@ import java.util.EventObject;
 public class ThumbDataEvent extends EventObject {
     private int type, index;
     private Thumb thumb;
-    
+
     /** Creates a new instance of ThumbDataEvent */
     public ThumbDataEvent(Object source, int type, int index, Thumb thumb) {
 	super(source);
@@ -26,7 +37,7 @@ public class ThumbDataEvent extends EventObject {
 	this.thumb = thumb;
 	this.index = index;
     }
-    
+
     public int getType() {
 	return type;
     }
@@ -34,9 +45,8 @@ public class ThumbDataEvent extends EventObject {
     public int getIndex() {
 	return index;
     }
-    
+
     public Thumb getThumb() {
 	return thumb;
     }
-    
 }
