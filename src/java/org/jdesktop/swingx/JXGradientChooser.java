@@ -19,12 +19,23 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.List;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSlider;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -40,6 +51,38 @@ import org.jdesktop.swingx.multislider.Thumb;
  * @author  jm158417
  */
 public class JXGradientChooser extends JXPanel {
+    
+    
+    public JButton add_thumb_button;
+    public JSlider alpha_slider;
+    public JSpinner alpha_value;
+    public ButtonGroup buttonGroup1;
+    public JButton change_color;
+    public JSpinner color_location_field;
+    public JTextField color_value;
+    public JButton delete_thumb_button;
+    public JPanel gradientPreview;
+    public JPanel gradient_selector;
+    public JLabel jLabel1;
+    public JLabel jLabel2;
+    public JLabel jLabel3;
+    public JLabel jLabel4;
+    public JLabel jLabel5;
+    public JLabel jLabel6;
+    public JLabel jLabel7;
+    public JLabel jLabel8;
+    public JPanel jPanel1;
+    public JPanel jPanel2;
+    public JPanel jPanel3;
+    public JPanel jPanel4;
+    public JSpinner jSpinner1;
+    public JButton minus_button;
+    public JRadioButton no_cycle;
+    public JButton plus_button;
+    public JRadioButton reflected;
+    public JRadioButton repeated;
+    public JCheckBox reversed;
+    public JComboBox style_list;
     
     public static void main(String[] args) throws Exception {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -62,14 +105,12 @@ public class JXGradientChooser extends JXPanel {
         frame.setVisible(true);
     }
     
-    
-    //MultipleGradientPaint mgrad;
     Paint checker_texture = null;
     private JXMultiThumbSlider<Color> slider = null;
     
     /** Creates new form GradientPicker */
     public JXGradientChooser() {
-	//initComponents();
+	initComponents();
 	
 	SpinnerNumberModel alpha_model = new SpinnerNumberModel(100,0,100,1);
 	alpha_value.setModel(alpha_model);
@@ -135,7 +176,7 @@ public class JXGradientChooser extends JXPanel {
 	    }
 	});
 	
-	style_list.setModel(new EnumComboBoxModel());
+	style_list.setModel(new DefaultComboBoxModel(GradientStyle.values()));
 	
     }
     
@@ -224,39 +265,39 @@ public class JXGradientChooser extends JXPanel {
     /** This method is called from within the constructor to
      * initialize the form.
      */
-    /*private void initComponents() {
-        buttonGroup1 = new javax.swing.ButtonGroup();
-        jSpinner1 = new javax.swing.JSpinner();
-        jPanel2 = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
-        jPanel1 = new javax.swing.JPanel();
+    private void initComponents() {/*
+        buttonGroup1 = new ButtonGroup();
+        jSpinner1 = new JSpinner();
+        jPanel2 = new JPanel();
+        jPanel3 = new JPanel();
+        jPanel1 = new JPanel();
         gradientPreview = new GradientPreviewPanel();
-        jLabel7 = new javax.swing.JLabel();
-        style_list = new javax.swing.JComboBox();
-        reversed = new javax.swing.JCheckBox();
-        reflected = new javax.swing.JRadioButton();
-        repeated = new javax.swing.JRadioButton();
-        no_cycle = new javax.swing.JRadioButton();
-        jLabel8 = new javax.swing.JLabel();
-        jPanel4 = new javax.swing.JPanel();
-        plus_button = new javax.swing.JButton();
-        minus_button = new javax.swing.JButton();
-        gradient_selector = new javax.swing.JPanel();
-        add_thumb_button = new javax.swing.JButton();
-        delete_thumb_button = new javax.swing.JButton();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        color_value = new javax.swing.JTextField();
-        color_location_field = new javax.swing.JSpinner();
-        alpha_value = new javax.swing.JSpinner();
-        alpha_slider = new javax.swing.JSlider();
+        jLabel7 = new JLabel();
+        style_list = new JComboBox();
+        reversed = new JCheckBox();
+        reflected = new JRadioButton();
+        repeated = new JRadioButton();
+        no_cycle = new JRadioButton();
+        jLabel8 = new JLabel();
+        jPanel4 = new JPanel();
+        plus_button = new JButton();
+        minus_button = new JButton();
+        gradient_selector = new JPanel();
+        add_thumb_button = new JButton();
+        delete_thumb_button = new JButton();
+        jLabel4 = new JLabel();
+        jLabel3 = new JLabel();
+        jLabel1 = new JLabel();
+        jLabel2 = new JLabel();
+        jLabel6 = new JLabel();
+        jLabel5 = new JLabel();
+        color_value = new JTextField();
+        color_location_field = new JSpinner();
+        alpha_value = new JSpinner();
+        alpha_slider = new JSlider();
         change_color = new ColorSelectionButton();
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Stops"));
+        jPanel2.setBorder(BorderFactory.createTitledBorder("Stops"));
         org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -278,8 +319,8 @@ public class JXGradientChooser extends JXPanel {
             .add(0, 80, Short.MAX_VALUE)
         );
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Preview"));
-        gradientPreview.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jPanel1.setBorder(BorderFactory.createTitledBorder("Preview"));
+        gradientPreview.setBorder(BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         org.jdesktop.layout.GroupLayout gradientPreviewLayout = new org.jdesktop.layout.GroupLayout(gradientPreview);
         gradientPreview.setLayout(gradientPreviewLayout);
         gradientPreviewLayout.setHorizontalGroup(
@@ -293,26 +334,26 @@ public class JXGradientChooser extends JXPanel {
 
         jLabel7.setText("Style:");
 
-        style_list.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Linear", "Radial" }));
+        style_list.setModel(new DefaultComboBoxModel(new String[] { "Linear", "Radial" }));
 
         reversed.setText("Reverse");
-        reversed.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        reversed.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         reversed.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
         buttonGroup1.add(reflected);
         reflected.setText("Reflect");
-        reflected.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        reflected.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         reflected.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
         buttonGroup1.add(repeated);
         repeated.setText("Repeat");
-        repeated.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        repeated.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         repeated.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
         buttonGroup1.add(no_cycle);
         no_cycle.setSelected(true);
         no_cycle.setText("None");
-        no_cycle.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        no_cycle.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         no_cycle.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
         jLabel8.setText("Type:");
@@ -361,7 +402,7 @@ public class JXGradientChooser extends JXPanel {
                 .addContainerGap())
         );
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Gradient"));
+        jPanel4.setBorder(BorderFactory.createTitledBorder("Gradient"));
         plus_button.setText("+");
 
         minus_button.setText("-");
@@ -399,15 +440,15 @@ public class JXGradientChooser extends JXPanel {
         color_value.setEnabled(false);
 
         color_location_field.setEnabled(false);
-        color_location_field.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+        color_location_field.addChangeListener(new event.ChangeListener() {
+            public void stateChanged(event.ChangeEvent evt) {
                 mystatechanged(evt);
             }
         });
 
         alpha_value.setEnabled(false);
-        alpha_value.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+        alpha_value.addChangeListener(new event.ChangeListener() {
+            public void stateChanged(event.ChangeEvent evt) {
                 alpha_valueStateChanged(evt);
             }
         });
@@ -513,10 +554,10 @@ public class JXGradientChooser extends JXPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
-        );
-    }*/
+        );*/
+    }
 
-    private void alpha_valueStateChanged(javax.swing.event.ChangeEvent evt) {
+    private void alpha_valueStateChanged(ChangeEvent evt) {
 	if(getSlider().getSelectedIndex() >= 0) {
 	    Thumb<Color> thumb = getSlider().getModel().getThumbAt(getSlider().getSelectedIndex());
 	    int alpha = (Integer)alpha_value.getValue();
@@ -528,7 +569,7 @@ public class JXGradientChooser extends JXPanel {
 	}
     }
 
-    private void mystatechanged(javax.swing.event.ChangeEvent evt) {
+    private void mystatechanged(ChangeEvent evt) {
 	if(getSlider().getSelectedIndex() >= 0) {
 	    Thumb thumb = getSlider().getModel().getThumbAt(getSlider().getSelectedIndex());
 	    thumb.setPosition((float)((Integer)color_location_field.getValue())/100);
@@ -539,36 +580,6 @@ public class JXGradientChooser extends JXPanel {
     }
     
     
-    public javax.swing.JButton add_thumb_button;
-    public javax.swing.JSlider alpha_slider;
-    public javax.swing.JSpinner alpha_value;
-    public javax.swing.ButtonGroup buttonGroup1;
-    public javax.swing.JButton change_color;
-    public javax.swing.JSpinner color_location_field;
-    public javax.swing.JTextField color_value;
-    public javax.swing.JButton delete_thumb_button;
-    public javax.swing.JPanel gradientPreview;
-    public javax.swing.JPanel gradient_selector;
-    public javax.swing.JLabel jLabel1;
-    public javax.swing.JLabel jLabel2;
-    public javax.swing.JLabel jLabel3;
-    public javax.swing.JLabel jLabel4;
-    public javax.swing.JLabel jLabel5;
-    public javax.swing.JLabel jLabel6;
-    public javax.swing.JLabel jLabel7;
-    public javax.swing.JLabel jLabel8;
-    public javax.swing.JPanel jPanel1;
-    public javax.swing.JPanel jPanel2;
-    public javax.swing.JPanel jPanel3;
-    public javax.swing.JPanel jPanel4;
-    public javax.swing.JSpinner jSpinner1;
-    public javax.swing.JButton minus_button;
-    public javax.swing.JRadioButton no_cycle;
-    public javax.swing.JButton plus_button;
-    public javax.swing.JRadioButton reflected;
-    public javax.swing.JRadioButton repeated;
-    public javax.swing.JCheckBox reversed;
-    public javax.swing.JComboBox style_list;
     
     private class ChangeColorListener implements ActionListener {
 	
