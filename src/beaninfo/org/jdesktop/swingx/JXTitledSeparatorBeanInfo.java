@@ -21,7 +21,6 @@
 package org.jdesktop.swingx;
 
 import javax.swing.SwingConstants;
-import org.jdesktop.swingx.BeanInfoSupport.EnumerationValue;
 
 /**
  *

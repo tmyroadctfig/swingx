@@ -343,9 +343,9 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
         Object[] enumValues = new Object[values.length * 3];
         int index = 0;
         for (EnumerationValue ev : values) {
-            enumValues[index++] = ev.name;
-            enumValues[index++] = ev.value;
-            enumValues[index++] = ev.javaInitializationString;
+            enumValues[index++] = ev.getName();
+            enumValues[index++] = ev.getValue();
+            enumValues[index++] = ev.getJavaInitializationString();
         }
         
         for (String propertyName : propertyNames) {
@@ -356,38 +356,6 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
                 LOG.log(Level.WARNING, "Failed to set enumeration values for property '" +
                         propertyName + "'. No such property was found");
             }
-        }
-    }
-    
-    /**
-     * Used with the setEnumerationValues method to specify enumerated values for
-     * properties
-     */
-    public static final class EnumerationValue {
-        private String name;
-        private Object value;
-        private String javaInitializationString;
-        
-        public EnumerationValue(String name, Object value, String javaInitString) {
-            this.name = name;
-            this.value = value;
-            this.javaInitializationString = javaInitString;
-        }
-        
-        public String getName() {
-            return name;
-        }
-        
-        public String toString() {
-            return name;
-        }
-        
-        public Object getValue() {
-            return value;
-        }
-        
-        public String getJavaInitializationString() {
-            return javaInitializationString;
         }
     }
     
