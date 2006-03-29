@@ -427,8 +427,8 @@ public class JXTable extends JTable {
     /**
      * Property to enable/disable rollover support. This can be enabled to show
      * "live" rollover behaviour, f.i. the cursor over LinkModel cells. Default
-     * is disabled. If using a RolloverHighlighter on the table, this should be
-     * set to true.
+     * is enabled. If rollover effects are not used, this property should be 
+     * disabled.
      * 
      * @param rolloverEnabled
      */
@@ -496,24 +496,6 @@ public class JXTable extends JTable {
         return rolloverProducer != null;
     }
 
-    /**
-     * If the default editor for LinkModel.class is of type LinkRenderer enables
-     * link visiting with the given linkVisitor. As a side-effect the rollover
-     * property is set to true.
-     * 
-     * @param linkVisitor
-     */
-//    public void setDefaultLinkVisitor(ActionListener linkVisitor) {
-//        TableCellEditor editor = getDefaultEditor(LinkModel.class);
-//        if (editor instanceof LinkRenderer) {
-//            ((LinkRenderer) editor).setVisitingDelegate(linkVisitor);
-//        }
-//        TableCellRenderer renderer = getDefaultRenderer(LinkModel.class);
-//        if (renderer instanceof LinkRenderer) {
-//            ((LinkRenderer) renderer).setVisitingDelegate(linkVisitor);
-//        }
-//        setRolloverEnabled(true);
-//    }
 
     /**
      * listens to rollover properties. 
@@ -541,14 +523,17 @@ public class JXTable extends JTable {
         public void install(JXTable table) {
           release();  
           this.table = table;
-          table.addPropertyChangeListener(this);
+          table.addPropertyChangeListener(RolloverProducer.CLICKED_KEY, this);
+          table.addPropertyChangeListener(RolloverProducer.ROLLOVER_KEY, this);
           registerExecuteButtonAction();
         }
         
         public void release() {
             if (table == null) return;
-            table.removePropertyChangeListener(this);
+            table.removePropertyChangeListener(RolloverProducer.CLICKED_KEY, this);
+            table.removePropertyChangeListener(RolloverProducer.ROLLOVER_KEY, this);
             unregisterExecuteButtonAction();
+            table = null;
         }
 
 //    --------------------------- JTable rollover
@@ -2363,7 +2348,7 @@ public class JXTable extends JTable {
      * Creates default cell renderers for objects, numbers, doubles, dates,
      * booleans, icons, and links.
      * THINK: delegate to TableCellRenderers?
-     * Overridden to provide default renderer for LinkModel plus hacking around
+     * Overridden so we can act as factory for renderers plus hacking around
      * huge memory consumption of UIDefaults (see #6345050 in core Bug parade)
      * 
      */
@@ -2423,7 +2408,7 @@ public class JXTable extends JTable {
                 "org.jdesktop.swingx.JXTable$BooleanRenderer");
 
         // Other
-        setLazyRenderer(LinkModel.class, "org.jdesktop.swingx.LinkRenderer");
+//        setLazyRenderer(LinkModel.class, "org.jdesktop.swingx.LinkRenderer");
     }
 
 
@@ -2541,20 +2526,10 @@ public class JXTable extends JTable {
         }
     }
 
-    /**
-     * Creates default cell editors for objects, numbers, and boolean values.
-     * Overridden to provide default editor for LinkModel
-     * @see DefaultCellEditor
-     */
-//    @Override
-//    protected void createDefaultEditors() {
-//        super.createDefaultEditors();
-//        setLazyEditor(LinkModel.class, "org.jdesktop.swingx.LinkRenderer");
-//    }
 
     /**
      * Creates default cell editors for objects, numbers, and boolean values.
-     * Overridden to provide default editor for LinkModel plus hacking around
+     * Overridden to hacking around
      * huge memory consumption of UIDefaults (see #6345050 in core Bug parade)
      * @see DefaultCellEditor
      */
@@ -2585,7 +2560,7 @@ public class JXTable extends JTable {
 
         // Booleans
         setLazyEditor(Boolean.class, "org.jdesktop.swingx.JXTable$BooleanEditor");
-        setLazyEditor(LinkModel.class, "org.jdesktop.swingx.LinkRenderer");
+//        setLazyEditor(LinkModel.class, "org.jdesktop.swingx.LinkRenderer");
 
     }
 

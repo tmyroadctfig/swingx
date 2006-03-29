@@ -27,7 +27,6 @@ import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.Icon;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -47,6 +46,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.JXTableHeader.SortGestureRecognizer;
+import org.jdesktop.swingx.action.LinkModelAction;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.ConditionalHighlighter;
@@ -85,7 +85,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*isable.*");
           
 //          test.runInteractiveTests("interactive.*Column.*");
-        test.runInteractiveTests("interactive.*Sort.*");
+        test.runInteractiveTests("interactive.*High.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -904,7 +904,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         JXTable table = new JXTable();
         table.setAutoCreateColumnsFromModel(false);
         table.setModel(tableModel);
-
+        installLinkRenderer(table);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
         TableColumnExt columns[] = new TableColumnExt[tableModel.getColumnCount()];
@@ -932,6 +932,19 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         frame.setVisible(true);
     }
 
+
+    private void installLinkRenderer(JXTable table) {
+        LinkModelAction action = new LinkModelAction() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("activated link: " + getTarget());
+            }
+             
+        };
+        table.setDefaultRenderer(LinkModel.class, new LinkRenderer(action));
+    }
+
     public void interactiveTestEmptyTableSizing() {
         JXTable table = new JXTable(0, 5);
         table.setColumnControlVisible(true);
@@ -943,6 +956,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         JXTable table = new JXTable();
         table.setAutoCreateColumnsFromModel(false);
         table.setModel(tableModel);
+        installLinkRenderer(table);
 
         TableColumnExt columns[] = new TableColumnExt[6];
         int viewIndex = 0;
@@ -984,6 +998,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 
     public void interactiveTestTableAlternateHighlighterGroup() {
         JXTable table = new JXTable(tableModel);
+        installLinkRenderer(table);
         table.setRowHeight(22);
         AlternateRowHighlighter highlighter = new UIAlternateRowHighlighter();
         highlighter.setLinesPerGroup(5);
@@ -994,6 +1009,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 
     public void interactiveTestAlternateRowWithForegroundHighlighter() {
         JXTable table = new JXTable(tableModel);
+        installLinkRenderer(table);
         ConditionalHighlighter highlighter = new ConditionalHighlighter(null, Color.BLUE, 1, 1) {
             
             @Override
@@ -1018,7 +1034,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 
     public void interactiveTestTableAlternateHighlighter1() {
         JXTable table = new JXTable(tableModel);
-        table.setRolloverEnabled(true);
+        installLinkRenderer(table);
         table.setRowHeight(22);
         table.setRowMargin(1);
 
@@ -1037,6 +1053,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 
     public void interactiveTestTableAlternateRowHighlighter2() {
         JXTable table = new JXTable(tableModel);
+        installLinkRenderer(table);
         table.setRowHeight(22);
         table.setRowMargin(1);
         table.setFilters(new FilterPipeline(new Filter[] {
@@ -1119,6 +1136,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     
     public void interactiveTestTablePatternFilter1() {
         JXTable table = new JXTable(tableModel);
+        installLinkRenderer(table);
         table.setIntercellSpacing(new Dimension(1, 1));
         table.setShowGrid(true);
         table.setFilters(new FilterPipeline(new Filter[] {
@@ -1130,6 +1148,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 
     public void interactiveTestTablePatternFilter2() {
         JXTable table = new JXTable(tableModel);
+        installLinkRenderer(table);
         table.setIntercellSpacing(new Dimension(2, 2));
         table.setShowGrid(true);
         table.setFilters(new FilterPipeline(new Filter[] {
@@ -1142,6 +1161,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 
     public void interactiveTestTablePatternFilter3() {
         JXTable table = new JXTable(tableModel);
+        installLinkRenderer(table);
         table.setShowGrid(true);
         table.setFilters(new FilterPipeline(new Filter[] {
                                             new PatternFilter("^S", 0, 1),
@@ -1154,6 +1174,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 
     public void interactiveTestTablePatternFilter4() {
         JXTable table = new JXTable(tableModel);
+        installLinkRenderer(table);
         table.setIntercellSpacing(new Dimension(3, 3));
         table.setShowGrid(true);
         table.setFilters(new FilterPipeline(new Filter[] {
@@ -1168,6 +1189,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         // **** IMPORTANT TEST CASE for interaction between ****
         // **** PatternFilter and PatternHighlighter!!! ****
         JXTable table = new JXTable(tableModel);
+        installLinkRenderer(table);
         table.setFilters(new FilterPipeline(new Filter[] {
                                             new PatternFilter("^S", 0, 1),
                                             new ShuttleSorter(0, false), // column 0, descending
@@ -1181,6 +1203,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 
     public void interactiveTestTableViewProperties() {
         JXTable table = new JXTable(tableModel);
+        installLinkRenderer(table);
         table.setIntercellSpacing(new Dimension(15, 15));
         table.setRowHeight(48);
         JFrame frame = wrapWithScrollingInFrame(table, "TableViewProperties Test");
@@ -1202,6 +1225,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     public void interactiveTestTableColumnProperties() {
         JXTable table = new JXTable();
         table.setModel(tableModel);
+        installLinkRenderer(table);
 
         table.getTableHeader().setBackground(Color.green);
         table.getTableHeader().setForeground(Color.magenta);

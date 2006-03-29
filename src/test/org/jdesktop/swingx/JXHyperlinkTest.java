@@ -45,6 +45,19 @@ public class JXHyperlinkTest extends InteractiveTestCase {
         super("JXHyperlinkLabel Test");
     }
 
+    public static void main(String[] args) throws Exception {
+//      setSystemLF(true);
+      JXHyperlinkTest test = new JXHyperlinkTest();
+      try {
+          test.runInteractiveTests();
+//          test.runInteractiveTests("interactive.*Table.*");
+//          test.runInteractiveTests("interactive.*List.*");
+//          test.runInteractiveTests("interactive.*Simple.*");
+        } catch (Exception e) {
+            System.err.println("exception when executing interactive tests:");
+            e.printStackTrace();
+        } 
+  }
     
     /**
      * test control of the clicked property.
@@ -491,17 +504,4 @@ public class JXHyperlinkTest extends InteractiveTestCase {
         report = new PropertyChangeReport();
     }
 
-    public static void main(String[] args) throws Exception {
-//        setSystemLF(true);
-        JXHyperlinkTest test = new JXHyperlinkTest();
-        try {
-//            test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*Table.*");
-//            test.runInteractiveTests("interactive.*List.*");
-//            test.runInteractiveTests("interactive.*Simple.*");
-          } catch (Exception e) {
-              System.err.println("exception when executing interactive tests:");
-              e.printStackTrace();
-          } 
-    }
 }
