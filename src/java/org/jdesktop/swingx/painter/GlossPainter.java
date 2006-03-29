@@ -24,6 +24,7 @@ package org.jdesktop.swingx.painter;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.Area;
@@ -113,7 +114,8 @@ public class GlossPainter extends AbstractPainter {
 
             Shape gloss = ellipse;
             if (getPosition() == GlossPosition.TOP) {
-                Area area = new Area(component.getBounds());
+                Area area = new Area(new Rectangle(0, 0,
+                    component.getWidth(), component.getHeight()));
                 area.subtract(new Area(ellipse));
                 gloss = area;
             }
