@@ -21,6 +21,7 @@
 
 package org.jdesktop.swingx.action;
 
+import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeListener;
 
@@ -419,5 +420,12 @@ public abstract class AbstractActionExt extends AbstractAction
             /** @todo Log it */
         }
         return buffer.toString();
+    }
+
+    /**
+     * @inheritDoc
+     * Default to no-op
+     */
+    public void itemStateChanged(ItemEvent e) {
     }
 }
