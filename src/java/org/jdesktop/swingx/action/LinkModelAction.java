@@ -39,50 +39,78 @@ import org.jdesktop.swingx.LinkModel;
  * 
  * @author Jeanette Winzenburg
  */
-public class LinkModelAction extends LinkAction {
+public class LinkModelAction<T extends LinkModel> extends LinkAction<T> {
     
-    private LinkModel link;
     private ActionListener delegate;
     public static final String VISIT_ACTION = "visit";
     private PropertyChangeListener linkListener;
     
-    public LinkModelAction(LinkModel link) {
-        setLink(link);
+
+    public LinkModelAction() {
+        this((T) null);
     }
 
-    public void setLink(LinkModel link) {
-        uninstallLinkListener();
-        this.link = link;
-        installLinkListener();
-        updateFromLink();
+    public LinkModelAction(ActionListener visitingDelegate) {
+        this(null, visitingDelegate);
     }
-
-    public LinkModel getLink() {
-        return link;
+    
+    public LinkModelAction(T target) {
+        this(target, null);
     }
+    
+    public LinkModelAction(T target, ActionListener visitingDelegate) {
+        super(target);
+        setVisitingDelegate(visitingDelegate);
+    };
+    
+    
+//    public void setLink(LinkModel link) {
+//        uninstallLinkListener();
+//        this.link = link;
+//        installLinkListener();
+//        updateFromLink();
+//    }
+//
+//    public LinkModel getLink() {
+//        return link;
+//    }
 
     public void setVisitingDelegate(ActionListener delegate) {
         this.delegate = delegate;
     }
     
     public void actionPerformed(ActionEvent e) {
-        if ((delegate != null) && (link != null)) {
-            delegate.actionPerformed(new ActionEvent(link, ActionEvent.ACTION_PERFORMED, VISIT_ACTION));
+        if ((delegate != null) && (getTarget() != null)) {
+            delegate.actionPerformed(new ActionEvent(getTarget(), ActionEvent.ACTION_PERFORMED, VISIT_ACTION));
         }
         
     }
 
-    private void uninstallLinkListener() {
-        if (link == null) return;
-        link.removePropertyChangeListener(getLinkListener());
-     
+//    private void uninstallLinkListener() {
+//        if (link == null) return;
+//        link.removePropertyChangeListener(getLinkListener());
+//     
+//    }
+
+    @Override
+    protected void installTarget() {
+        if (getTarget() != null) {
+            getTarget().addPropertyChangeListener(getLinkListener());
+        }
+        updateFromLink();
+    }
+
+    @Override
+    protected void uninstallTarget() {
+        if (getTarget() == null) return;
+       getTarget().removePropertyChangeListener(getLinkListener());
     }
 
     private void updateFromLink() {
-        if (link != null) {
-            putValue(Action.NAME, link.getText());
-            putValue(Action.SHORT_DESCRIPTION, link.getURL().toString());
-            putValue(VISITED_KEY, new Boolean(link.getVisited()));
+        if (getTarget() != null) {
+            putValue(Action.NAME, getTarget().getText());
+            putValue(Action.SHORT_DESCRIPTION, getTarget().getURL().toString());
+            putValue(VISITED_KEY, new Boolean(getTarget().getVisited()));
         } else {
             Object[] keys = getKeys();
             if (keys == null) return;
@@ -92,10 +120,10 @@ public class LinkModelAction extends LinkAction {
         }
     }
 
-    private void installLinkListener() {
-        if (link == null) return;
-        link.addPropertyChangeListener(getLinkListener());
-    }
+//    private void installLinkListener() {
+//        if (link == null) return;
+//        link.addPropertyChangeListener(getLinkListener());
+//    }
 
     private PropertyChangeListener getLinkListener() {
         if (linkListener == null) {

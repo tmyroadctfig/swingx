@@ -29,7 +29,7 @@ public class LinkActionTest extends TestCase {
     public void testConstructorsAndCustomTargetInstall() {
         Object target = new Object();
         final boolean visitedIsTrue = true;
-        LinkAction linkAction = new LinkAction(target) {
+        LinkAction linkAction = new LinkAction<Object>(target) {
 
             public void actionPerformed(ActionEvent e) {
                 // TODO Auto-generated method stub

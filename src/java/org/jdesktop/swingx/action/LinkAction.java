@@ -15,7 +15,7 @@ import java.awt.event.ItemEvent;
  * 
  * @author Jeanette Winzenburg
  */
-public abstract class LinkAction extends AbstractActionExt {
+public abstract class LinkAction <T> extends AbstractActionExt {
 
     /**
      * Key for the visited property value.
@@ -24,7 +24,7 @@ public abstract class LinkAction extends AbstractActionExt {
     /**
      * the object the actionPerformed can act on.
      */
-    protected Object target;
+    protected T target;
 
     /**
      * Instantiates a LinkAction with null target. 
@@ -41,7 +41,7 @@ public abstract class LinkAction extends AbstractActionExt {
      * 
      * @param target the target this action should act on.
      */
-    public LinkAction(Object target) {
+    public LinkAction(T target) {
        setTarget(target);
     }
 
@@ -85,11 +85,11 @@ public abstract class LinkAction extends AbstractActionExt {
     }
 
     
-    public Object getTarget() {
+    public T getTarget() {
         return target;
     }
 
-    public void setTarget(Object target) {
+    public void setTarget(T target) {
         Object oldTarget = getTarget();
         uninstallTarget();
         this.target = target;

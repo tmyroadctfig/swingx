@@ -415,6 +415,7 @@ public class JXTable extends JTable {
      */
     protected void init() {
         setSortable(true);
+        setRolloverEnabled(true);
         // guarantee getFilters() to return != null
         setFilters(null);
         initActionsAndBindings();
@@ -502,17 +503,17 @@ public class JXTable extends JTable {
      * 
      * @param linkVisitor
      */
-    public void setDefaultLinkVisitor(ActionListener linkVisitor) {
-        TableCellEditor editor = getDefaultEditor(LinkModel.class);
-        if (editor instanceof LinkRenderer) {
-            ((LinkRenderer) editor).setVisitingDelegate(linkVisitor);
-        }
-        TableCellRenderer renderer = getDefaultRenderer(LinkModel.class);
-        if (renderer instanceof LinkRenderer) {
-            ((LinkRenderer) renderer).setVisitingDelegate(linkVisitor);
-        }
-        setRolloverEnabled(true);
-    }
+//    public void setDefaultLinkVisitor(ActionListener linkVisitor) {
+//        TableCellEditor editor = getDefaultEditor(LinkModel.class);
+//        if (editor instanceof LinkRenderer) {
+//            ((LinkRenderer) editor).setVisitingDelegate(linkVisitor);
+//        }
+//        TableCellRenderer renderer = getDefaultRenderer(LinkModel.class);
+//        if (renderer instanceof LinkRenderer) {
+//            ((LinkRenderer) renderer).setVisitingDelegate(linkVisitor);
+//        }
+//        setRolloverEnabled(true);
+//    }
 
     /**
      * listens to rollover properties. 
@@ -595,8 +596,11 @@ public class JXTable extends JTable {
 
         }
         private boolean isLinkColumn(JXTable table, Point location) {
-            if (location == null || location.x < 0) return false;
-            return (table.getColumnClass(location.x) == LinkModel.class);
+            if (location == null || location.x < 0 || location.y < 0) return false;
+            TableCellRenderer renderer = table.getCellRenderer(location.y, location.x);
+            return (renderer instanceof RolloverRenderer) 
+                && ((RolloverRenderer) renderer).isRolloverEnabled();
+
         }
 
 

@@ -26,6 +26,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.jdesktop.swingx.action.LinkModelAction;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.ConditionalHighlighter;
@@ -386,8 +387,9 @@ public class JXListTest extends InteractiveTestCase {
      */
     public void interactiveTestRolloverHighlightAndLink() {
         JXList list = new JXList(createListModelWithLinks());
-        list.setLinkVisitor(new EditorPaneLinkVisitor());
-    //    table.setRolloverEnabled(true);
+        LinkModelAction action = new LinkModelAction<LinkModel>(new EditorPaneLinkVisitor());
+        list.setCellRenderer(new LinkRenderer(action));
+        list.setRolloverEnabled(true);
         Highlighter conditional = new ConditionalHighlighter(
                 new Color(0xF0, 0xF0, 0xE0), null, -1, -1) {
 

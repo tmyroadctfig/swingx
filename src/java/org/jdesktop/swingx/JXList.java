@@ -26,7 +26,6 @@ import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
@@ -50,6 +49,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
+import org.jdesktop.swingx.action.LinkAction;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
@@ -312,15 +312,15 @@ public class JXList extends JList {
         return rolloverProducer != null;
     }
 
-    public void setLinkVisitor(ActionListener linkVisitor) {
-        if (linkVisitor != null) {
-            setRolloverEnabled(true);
-            getDelegatingRenderer().setLinkVisitor(linkVisitor);
-        } else {
-            // JW: think - need to revert?
-        }
-
-    }
+//    public void setLinkVisitor(ActionListener linkVisitor) {
+//        if (linkVisitor != null) {
+//            setRolloverEnabled(true);
+//            getDelegatingRenderer().setLinkVisitor(linkVisitor);
+//        } else {
+//            // JW: think - need to revert?
+//        }
+//
+//    }
 
     /**
      * listens to rollover properties. 
@@ -396,8 +396,11 @@ public class JXList extends JList {
         }
         private boolean isLinkElement(JXList list, Point location) {
             if (location == null || location.y < 0) return false;
+            ListCellRenderer renderer = list.getCellRenderer();
+            return (renderer instanceof RolloverRenderer)
+               && ((RolloverRenderer) renderer).isRolloverEnabled();
             // PENDING: JW - don't ask the model, ask the list!
-            return (list.getModel().getElementAt(location.y) instanceof LinkModel);
+//            return (list.getModel().getElementAt(location.y) instanceof LinkModel);
         }
 
         private void unregisterExecuteButtonAction() {
@@ -907,9 +910,9 @@ public class JXList extends JList {
         super.setCellRenderer(delegatingRenderer);
     }
 
-    private class DelegatingRenderer implements ListCellRenderer {
+    private class DelegatingRenderer implements ListCellRenderer, RolloverRenderer {
 
-        private LinkRenderer linkRenderer;
+//        private LinkRenderer linkRenderer;
 
         private ListCellRenderer delegateRenderer;
 
@@ -924,17 +927,22 @@ public class JXList extends JList {
             delegateRenderer = delegate;
         }
 
+        public boolean isRolloverEnabled() {
+            return (delegateRenderer instanceof RolloverRenderer) && 
+               ((RolloverRenderer) delegateRenderer).isRolloverEnabled();
+        }
+        
         public Component getListCellRendererComponent(JList list, Object value,
                 int index, boolean isSelected, boolean cellHasFocus) {
             Component comp = null;
 
-            if (value instanceof LinkModel) {
-                comp = getLinkRenderer().getListCellRendererComponent(list,
-                        value, index, isSelected, cellHasFocus);
-            } else {
+//            if (value instanceof LinkModel) {
+//                comp = getLinkRenderer().getListCellRendererComponent(list,
+//                        value, index, isSelected, cellHasFocus);
+//            } else {
                 comp = delegateRenderer.getListCellRendererComponent(list,
                         value, index, isSelected, cellHasFocus);
-            }
+//            }
             if (highlighters != null) {
                 ComponentAdapter adapter = getComponentAdapter();
                 adapter.column = 0;
@@ -944,20 +952,23 @@ public class JXList extends JList {
             return comp;
         }
 
-        private LinkRenderer getLinkRenderer() {
-            if (linkRenderer == null) {
-                linkRenderer = new LinkRenderer();
-            }
-            return linkRenderer;
-        }
-
-        public void setLinkVisitor(ActionListener linkVisitor) {
-            getLinkRenderer().setVisitingDelegate(linkVisitor);
-
-        }
+//        private LinkRenderer getLinkRenderer() {
+//            if (linkRenderer == null) {
+//                linkRenderer = new LinkRenderer();
+//            }
+//            return linkRenderer;
+//        }
+//
+//        public void setLinkAction(LinkAction action) {
+//            getLinkRenderer().setLinkAction(action);
+//        }
+//        public void setLinkVisitor(ActionListener linkVisitor) {
+//            getLinkRenderer().setVisitingDelegate(linkVisitor);
+//
+//        }
 
         public void updateUI() {
-            updateRendererUI(linkRenderer);
+//            updateRendererUI(linkRenderer);
             updateRendererUI(delegateRenderer);
         }
 

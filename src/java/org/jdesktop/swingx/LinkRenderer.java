@@ -36,45 +36,73 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
+import org.jdesktop.swingx.action.LinkAction;
 import org.jdesktop.swingx.action.LinkModelAction;
 
 /**
- * A Renderer/Editor for Links.
+ * A Renderer/Editor for "Links". <p>
+ * 
+ * The renderer is configured with a LinkAction<T>. 
+ * Currently it's up to the developer to guarantee that the all
+ * values which are passed into the getXXRendererComponent(...) are
+ * compatible with T. <p>
+ * 
+ * It's recommended to not use the given Action anywhere else in code,
+ * as it is updated on each getXXRendererComponent() call which might
+ * lead to undesirable side-effects. <p>
  * 
  * internally uses JXHyperlink for both (Note: don't reuse the same
- * instance for both functions).
+ * instance for both functions). <p>
  * 
  * PENDING: make renderer respect selected cell state.
  * 
  * @author Jeanette Winzenburg
  */
 public class LinkRenderer extends AbstractCellEditor implements
-        TableCellRenderer, TableCellEditor, ListCellRenderer {
+        TableCellRenderer, TableCellEditor, ListCellRenderer, RolloverRenderer {
 
     private static final Border noFocusBorder = new EmptyBorder(1, 1, 1, 1);
 
     private JXHyperlink linkButton;
 
-    private LinkModelAction linkAction;
+    private LinkAction<Object> linkAction;
 
     public LinkRenderer() {
         this(null);
     }
 
-    public LinkRenderer(ActionListener visitingDelegate) {
-        linkAction = new LinkModelAction(null);
-        linkButton = createHyperlink(linkAction);
-//        linkButton.setBorderPainted(true);
-//        linkButton.setOpaque(true);
+    public LinkRenderer(LinkAction linkAction) {
+        linkButton = createHyperlink();
         linkButton.addActionListener(createEditorActionListener());
-        setVisitingDelegate(visitingDelegate);
+        setLinkAction(linkAction);
     }
+    
+    public void setLinkAction(LinkAction linkAction) {
+        if (linkAction == null) {
+            linkAction = createDefaultLinkAction();
+        }
+        this.linkAction = linkAction;
+        linkButton.setAction(linkAction);
+    }
+    
+    // does nothing...
+    private LinkAction createDefaultLinkAction() {
+        return new LinkAction() {
+
+            public void actionPerformed(ActionEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+        };
+    }
+
 
     /**
      * @return
      */
-    private JXHyperlink createHyperlink(Action linkAction) {
-        return new JXHyperlink(linkAction) {
+    private JXHyperlink createHyperlink() {
+        return new JXHyperlink() {
 
             @Override
             public void updateUI() {
@@ -86,23 +114,24 @@ public class LinkRenderer extends AbstractCellEditor implements
         };
     }
 
-    public void setVisitingDelegate(ActionListener openAction) {
-        linkAction.setVisitingDelegate(openAction);
-        
+    public boolean isRolloverEnabled() {
+        return true;
     }
 
     public Component getListCellRendererComponent(JList list, Object value, 
             int index, boolean isSelected, boolean cellHasFocus) {
-        linkAction.setLink(value instanceof LinkModel ? (LinkModel) value : null);
-        Point p = (Point) list
-            .getClientProperty(RolloverProducer.ROLLOVER_KEY);
-        if (/*cellHasFocus ||*/ (p != null && (p.y >= 0) && (p.y == index))) {
-             linkButton.getModel().setRollover(true);
-        } else {
-             linkButton.getModel().setRollover(false);
-        }
-        updateSelectionColors(list, isSelected);
-        updateFocusBorder(cellHasFocus);
+        linkAction.setTarget(value);
+        if (list != null) {
+            Point p = (Point) list
+                .getClientProperty(RolloverProducer.ROLLOVER_KEY);
+            if (/*cellHasFocus ||*/ (p != null && (p.y >= 0) && (p.y == index))) {
+                 linkButton.getModel().setRollover(true);
+            } else {
+                 linkButton.getModel().setRollover(false);
+            }
+            updateSelectionColors(list, isSelected);
+            updateFocusBorder(cellHasFocus);
+        };
         return linkButton;
     }
     
@@ -122,16 +151,18 @@ public class LinkRenderer extends AbstractCellEditor implements
     
     public Component getTableCellRendererComponent(JTable table, Object value,
             boolean isSelected, boolean hasFocus, int row, int column) {
-        linkAction.setLink(value instanceof LinkModel ? (LinkModel) value : null);
-        Point p = (Point) table
-                .getClientProperty(RolloverProducer.ROLLOVER_KEY);
-        if (/*hasFocus || */(p != null && (p.x >= 0) && (p.x == column) && (p.y == row))) {
-             linkButton.getModel().setRollover(true);
-        } else {
-             linkButton.getModel().setRollover(false);
+        linkAction.setTarget(value);
+        if (table !=  null) {
+            Point p = (Point) table
+                    .getClientProperty(RolloverProducer.ROLLOVER_KEY);
+            if (/*hasFocus || */(p != null && (p.x >= 0) && (p.x == column) && (p.y == row))) {
+                 linkButton.getModel().setRollover(true);
+            } else {
+                 linkButton.getModel().setRollover(false);
+            }
+            updateSelectionColors(table, isSelected);
+            updateFocusBorder(hasFocus);
         }
-        updateSelectionColors(table, isSelected);
-        updateFocusBorder(hasFocus);
         return linkButton;
     }
 
@@ -161,21 +192,28 @@ public class LinkRenderer extends AbstractCellEditor implements
     
     public Component getTableCellEditorComponent(JTable table, Object value,
             boolean isSelected, int row, int column) {
-        linkAction.setLink(value instanceof LinkModel ? (LinkModel) value : null);
+        linkAction.setTarget(value);
         linkButton.getModel().setRollover(true); 
         updateSelectionColors(table, isSelected);
         return linkButton;
     }
 
     public Object getCellEditorValue() {
-        return linkAction.getLink();
+        return linkAction.getTarget();
+    }
+
+    
+ 
+    @Override
+    protected void fireEditingStopped() {
+        fireEditingCanceled();
     }
 
     private ActionListener createEditorActionListener() {
         ActionListener l = new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                fireEditingStopped();
+                cancelCellEditing();
 
             }
 

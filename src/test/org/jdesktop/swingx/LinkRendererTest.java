@@ -17,6 +17,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
 
+import org.jdesktop.swingx.action.LinkModelAction;
+
 /**
  * @author Jeanette Winzenburg
  */
