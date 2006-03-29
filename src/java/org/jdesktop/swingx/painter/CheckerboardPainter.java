@@ -61,8 +61,8 @@ import javax.swing.JComponent;
 public class CheckerboardPainter extends AbstractPainter {
     private transient Paint checkerPaint;
     
-    private Paint darkColor = new Color(204, 204, 204);
-    private Paint lightColor = Color.WHITE;
+    private Paint darkPaint = new Color(204, 204, 204);
+    private Paint lightPaint = Color.WHITE;
     private int squareLength = 8;
     
     /**
@@ -92,8 +92,8 @@ public class CheckerboardPainter extends AbstractPainter {
      * @param length the length of the checker board squares
      */
     public CheckerboardPainter(Paint darkPaint, Paint lightPaint, int length) {
-        this.darkColor = darkPaint;
-        this.lightColor = lightPaint;
+        this.darkPaint = darkPaint;
+        this.lightPaint = lightPaint;
         this.squareLength = length;
     }
     
@@ -131,16 +131,16 @@ public class CheckerboardPainter extends AbstractPainter {
      */
     public void setDarkPaint(Paint color) {
         Paint old = getDarkPaint();
-        this.darkColor = color;
+        this.darkPaint = color;
         checkerPaint = null;
-        firePropertyChange("darkColor", old, getDarkPaint());
+        firePropertyChange("darkPaint", old, getDarkPaint());
     }
     
     /**
      * @returns the Paint used for painting the "dark" tiles. May be null
      */
     public Paint getDarkPaint() {
-        return darkColor;
+        return darkPaint;
     }
     
     /**
@@ -152,16 +152,16 @@ public class CheckerboardPainter extends AbstractPainter {
      */
     public void setLightPaint(Paint color) {
         Paint old = getLightPaint();
-        this.lightColor = color;
+        this.lightPaint = color;
         checkerPaint = null;
-        firePropertyChange("lightColor", old, getLightPaint());
+        firePropertyChange("lightPaint", old, getLightPaint());
     }
     
     /**
      * @returns the Paint used for painting the "light" tiles. May be null
      */
     public Paint getLightPaint() {
-        return lightColor;
+        return lightPaint;
     }
     
     /**

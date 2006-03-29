@@ -24,8 +24,8 @@ public class CheckerboardPainterBeanInfo extends BeanInfoSupport {
     }
 
     protected void initialize() {
-        setPreferred(true, "darkColor", "lightColor", "squareLength");
-        setHidden(true, "class", "propertyChangeListeners");
-        setPropertyEditor(PaintPropertyEditor.class, "darkColor", "lightColor");
+        setPreferred(true, "darkPaint", "lightPaint", "squareLength");
+        setCategory("Appearance", "darkPaint", "lightPaint", "squareLength");
+        setPropertyEditor(PaintPropertyEditor.class, "darkPaint", "lightPaint");
     }
 }
