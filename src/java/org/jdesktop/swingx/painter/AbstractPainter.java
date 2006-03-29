@@ -35,6 +35,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JComponent;
 import org.jdesktop.swingx.JavaBean;
 import org.jdesktop.swingx.util.PaintUtils;
@@ -107,7 +108,7 @@ public abstract class AbstractPainter extends JavaBean implements Painter<JCompo
      * A Resize value indicating if and how the clip should be resized
      * according to the size of the Component
      */
-    private Resize resizeClip;
+    private Resize resizeClip = Resize.BOTH;
     /**
      * The composite to use. By default this is a reasonable AlphaComposite,
      * but you may want to specify a different composite
@@ -116,11 +117,11 @@ public abstract class AbstractPainter extends JavaBean implements Painter<JCompo
     /**
      * RenderingHints to apply when painting
      */
-    private RenderingHints renderingHints;
+    private Map<RenderingHints.Key,Object> renderingHints;
     /**
      * A hint as to whether or not to attempt caching the image
      */
-    private boolean useCache;
+    private boolean useCache = true;
     /**
      * The cached image, if useCache is true
      */
@@ -134,7 +135,7 @@ public abstract class AbstractPainter extends JavaBean implements Painter<JCompo
      * Creates a new instance of AbstractPainter
      */
     public AbstractPainter() {
-        renderingHints = new RenderingHints(new HashMap<RenderingHints.Key,Object>());
+        renderingHints = new HashMap<RenderingHints.Key,Object>();
     }
     
     /**
@@ -301,7 +302,8 @@ public abstract class AbstractPainter extends JavaBean implements Painter<JCompo
      * </ul>
      */
     public void setAlphaInterpolation(Object alphaInterpolation) {
-        if (!RenderingHints.KEY_ALPHA_INTERPOLATION.isCompatibleValue(alphaInterpolation)) {
+        if (alphaInterpolation != null && 
+                !RenderingHints.KEY_ALPHA_INTERPOLATION.isCompatibleValue(alphaInterpolation)) {
             throw new IllegalArgumentException(alphaInterpolation + " is not an acceptable value");
         }
         Object old = getAlphaInterpolation();
@@ -333,7 +335,8 @@ public abstract class AbstractPainter extends JavaBean implements Painter<JCompo
      * </ul>
      */
     public void setAntialiasing(Object antialiasing) {
-        if (!RenderingHints.KEY_ANTIALIASING.isCompatibleValue(antialiasing)) {
+        if (antialiasing != null && 
+                !RenderingHints.KEY_ANTIALIASING.isCompatibleValue(antialiasing)) {
             throw new IllegalArgumentException(antialiasing + " is not an acceptable value");
         }
         Object old = getAntialiasing();
@@ -365,7 +368,8 @@ public abstract class AbstractPainter extends JavaBean implements Painter<JCompo
      * </ul>
      */
     public void setColorRendering(Object colorRendering) {
-        if (!RenderingHints.KEY_COLOR_RENDERING.isCompatibleValue(colorRendering)) {
+        if (colorRendering != null && 
+                !RenderingHints.KEY_COLOR_RENDERING.isCompatibleValue(colorRendering)) {
             throw new IllegalArgumentException(colorRendering + " is not an acceptable value");
         }
         Object old = getColorRendering();
@@ -397,7 +401,8 @@ public abstract class AbstractPainter extends JavaBean implements Painter<JCompo
      * </ul>
      */
     public void setDithering(Object dithering) {
-        if (!RenderingHints.KEY_DITHERING.isCompatibleValue(dithering)) {
+        if (dithering != null && 
+                !RenderingHints.KEY_DITHERING.isCompatibleValue(dithering)) {
             throw new IllegalArgumentException(dithering + " is not an acceptable value");
         }
         Object old = getDithering();
@@ -430,7 +435,8 @@ public abstract class AbstractPainter extends JavaBean implements Painter<JCompo
      * </ul>
      */
     public void setFractionalMetrics(Object fractionalMetrics) {
-        if (!RenderingHints.KEY_FRACTIONALMETRICS.isCompatibleValue(fractionalMetrics)) {
+        if (fractionalMetrics != null && 
+                !RenderingHints.KEY_FRACTIONALMETRICS.isCompatibleValue(fractionalMetrics)) {
             throw new IllegalArgumentException(fractionalMetrics + " is not an acceptable value");
         }
         Object old = getFractionalMetrics();
@@ -462,7 +468,8 @@ public abstract class AbstractPainter extends JavaBean implements Painter<JCompo
      * </ul>
      */
     public void setInterpolation(Object interpolation) {
-        if (!RenderingHints.KEY_INTERPOLATION.isCompatibleValue(interpolation)) {
+        if (interpolation != null &&
+                !RenderingHints.KEY_INTERPOLATION.isCompatibleValue(interpolation)) {
             throw new IllegalArgumentException(interpolation + " is not an acceptable value");
         }
         Object old = getInterpolation();
@@ -495,7 +502,8 @@ public abstract class AbstractPainter extends JavaBean implements Painter<JCompo
      * </ul>
      */
     public void setRendering(Object rendering) {
-        if (!RenderingHints.KEY_RENDERING.isCompatibleValue(rendering)) {
+        if (rendering != null && 
+                !RenderingHints.KEY_RENDERING.isCompatibleValue(rendering)) {
             throw new IllegalArgumentException(rendering + " is not an acceptable value");
         }
         Object old = getRendering();
@@ -528,7 +536,8 @@ public abstract class AbstractPainter extends JavaBean implements Painter<JCompo
      * </ul>
      */
     public void setStrokeControl(Object strokeControl) {
-        if (!RenderingHints.KEY_STROKE_CONTROL.isCompatibleValue(strokeControl)) {
+        if (strokeControl != null && 
+                !RenderingHints.KEY_STROKE_CONTROL.isCompatibleValue(strokeControl)) {
             throw new IllegalArgumentException(strokeControl + " is not an acceptable value");
         }
         Object old = getStrokeControl();
@@ -569,7 +578,8 @@ public abstract class AbstractPainter extends JavaBean implements Painter<JCompo
      * </ul>
      */
     public void setTextAntialiasing(Object textAntialiasing) {
-        if (!RenderingHints.KEY_TEXT_ANTIALIASING.isCompatibleValue(textAntialiasing)) {
+        if (textAntialiasing != null && 
+                !RenderingHints.KEY_TEXT_ANTIALIASING.isCompatibleValue(textAntialiasing)) {
             throw new IllegalArgumentException(textAntialiasing + " is not an acceptable value");
         }
         Object old = getTextAntialiasing();
@@ -596,10 +606,6 @@ public abstract class AbstractPainter extends JavaBean implements Painter<JCompo
      * @param hint must be a hint compatible with the given key
      */
     public void setRenderingHint(RenderingHints.Key key, Object hint) {
-        if (key == null) {
-            throw new NullPointerException("RenderingHints key cannot be null");
-        }
-        
         if (key == RenderingHints.KEY_ALPHA_INTERPOLATION) {
             setAlphaInterpolation(hint);
         } else if (key == RenderingHints.KEY_ANTIALIASING) {
@@ -627,8 +633,8 @@ public abstract class AbstractPainter extends JavaBean implements Painter<JCompo
      * @return a copy of the map of rendering hints held by this class. This
      *         returned value will never be null
      */
-    public RenderingHints getRenderingHints() {
-        return (RenderingHints)renderingHints.clone();
+    public Map<RenderingHints.Key,Object> getRenderingHints() {
+        return new HashMap<RenderingHints.Key,Object>(renderingHints);
     }
 
     /**
@@ -638,14 +644,13 @@ public abstract class AbstractPainter extends JavaBean implements Painter<JCompo
      * @param renderingHints map of hints. May be null. I null, a new Map of
      * rendering hints will be created
      */
-    public void setRenderingHints(RenderingHints renderingHints) {
-        RenderingHints old = this.renderingHints;
+    public void setRenderingHints(Map<RenderingHints.Key,Object> renderingHints) {
         if (renderingHints != null) {
-            this.renderingHints = (RenderingHints)renderingHints.clone();
+            this.renderingHints = new HashMap<RenderingHints.Key,Object>(renderingHints);
         } else {
-            this.renderingHints = new RenderingHints(new HashMap<RenderingHints.Key, Object>());
+            this.renderingHints = new HashMap<RenderingHints.Key, Object>();
         }
-        firePropertyChange("renderingHints", old, getRenderingHints());
+        firePropertyChange("renderingHints", null, getRenderingHints());
     }
     
     /**
@@ -747,11 +752,14 @@ public abstract class AbstractPainter extends JavaBean implements Painter<JCompo
      * composite, and clip
      */
     private void configureGraphics(Graphics2D g, JComponent c) {
-        RenderingHints hints = getRenderingHints();
+        Map<RenderingHints.Key,Object> hints = getRenderingHints();
         //merge these hints with the existing ones, otherwise I won't inherit
         //any of the hints from the Graphics2D
         for (Object key : hints.keySet()) {
-            g.setRenderingHint((RenderingHints.Key)key, hints.get(key));
+            Object value = hints.get(key);
+            if (value != null) {
+                g.setRenderingHint((RenderingHints.Key)key, hints.get(key));
+            }
         }
 
         if (getComposite() != null) {
