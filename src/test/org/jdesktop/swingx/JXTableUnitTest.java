@@ -476,15 +476,17 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testLinkControllerListening() {
         JXTable table = new JXTable();
         table.setRolloverEnabled(true);
-        assertNotNull("LinkController must be listening", getLinkControllerAsPropertyChangeListener(table));
+        assertNotNull("LinkController must be listening", getLinkControllerAsPropertyChangeListener(table, RolloverProducer.CLICKED_KEY));
+        assertNotNull("LinkController must be listening", getLinkControllerAsPropertyChangeListener(table, RolloverProducer.ROLLOVER_KEY));
         assertNotNull("execute button action must be registered", table.getActionMap().get(JXTable.EXECUTE_BUTTON_ACTIONCOMMAND));
         table.setRolloverEnabled(false);
-        assertNull("LinkController must not be listening", getLinkControllerAsPropertyChangeListener(table));
+        assertNull("LinkController must not be listening", getLinkControllerAsPropertyChangeListener(table, RolloverProducer.CLICKED_KEY ));
+        assertNull("LinkController must be listening", getLinkControllerAsPropertyChangeListener(table, RolloverProducer.ROLLOVER_KEY));
         assertNull("execute button action must be de-registered", table.getActionMap().get(JXTable.EXECUTE_BUTTON_ACTIONCOMMAND));
     }
     
-    private PropertyChangeListener getLinkControllerAsPropertyChangeListener(JXTable table) {
-        PropertyChangeListener[] listeners = table.getPropertyChangeListeners();
+    private PropertyChangeListener getLinkControllerAsPropertyChangeListener(JXTable table, String propertyName) {
+        PropertyChangeListener[] listeners = table.getPropertyChangeListeners(propertyName);
         for (int i = 0; i < listeners.length; i++) {
             if (listeners[i] instanceof JXTable.LinkController) {
                 return (JXTable.LinkController) listeners[i];
@@ -492,6 +494,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
         }
         return null;
     }
+    
+    
 
     /**
      * Issue #180-swingx: outOfBoundsEx if testColumn is hidden.
@@ -1689,7 +1693,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertEquals("default Number renderer", JXTable.NumberRenderer.class, table.getDefaultRenderer(Number.class).getClass());
         assertEquals("default Double renderer", JXTable.DoubleRenderer.class, table.getDefaultRenderer(Double.class).getClass());
         assertEquals("default Date renderer", JXTable.DateRenderer.class, table.getDefaultRenderer(Date.class).getClass());
-        assertEquals("default LinkModel renderer", LinkRenderer.class, table.getDefaultRenderer(LinkModel.class).getClass());
+        // JW: removed default registration
+        // assertEquals("default LinkModel renderer", LinkRenderer.class, table.getDefaultRenderer(LinkModel.class).getClass());
         assertEquals("default Icon renderer", JXTable.IconRenderer.class, table.getDefaultRenderer(Icon.class).getClass());
     }
 

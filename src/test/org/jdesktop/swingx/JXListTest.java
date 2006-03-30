@@ -90,15 +90,17 @@ public class JXListTest extends InteractiveTestCase {
     public void testLinkControllerListening() {
         JXList table = new JXList();
         table.setRolloverEnabled(true);
-        assertNotNull("LinkController must be listening", getLinkControllerAsPropertyChangeListener(table));
+        assertNotNull("LinkController must be listening", getLinkControllerAsPropertyChangeListener(table, RolloverProducer.CLICKED_KEY));
+        assertNotNull("LinkController must be listening", getLinkControllerAsPropertyChangeListener(table, RolloverProducer.ROLLOVER_KEY));
         assertNotNull("execute button action must be registered", table.getActionMap().get(JXList.EXECUTE_BUTTON_ACTIONCOMMAND));
         table.setRolloverEnabled(false);
-        assertNull("LinkController must not be listening", getLinkControllerAsPropertyChangeListener(table));
+        assertNull("LinkController must not be listening", getLinkControllerAsPropertyChangeListener(table, RolloverProducer.CLICKED_KEY ));
+        assertNull("LinkController must be listening", getLinkControllerAsPropertyChangeListener(table, RolloverProducer.ROLLOVER_KEY));
         assertNull("execute button action must be de-registered", table.getActionMap().get(JXList.EXECUTE_BUTTON_ACTIONCOMMAND));
     }
 
-    private PropertyChangeListener getLinkControllerAsPropertyChangeListener(JXList table) {
-        PropertyChangeListener[] listeners = table.getPropertyChangeListeners();
+    private PropertyChangeListener getLinkControllerAsPropertyChangeListener(JXList table, String propertyName) {
+        PropertyChangeListener[] listeners = table.getPropertyChangeListeners(propertyName);
         for (int i = 0; i < listeners.length; i++) {
             if (listeners[i] instanceof JXList.LinkController) {
                 return (JXList.LinkController) listeners[i];
