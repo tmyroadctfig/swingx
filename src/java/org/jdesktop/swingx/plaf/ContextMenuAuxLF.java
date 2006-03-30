@@ -24,6 +24,24 @@ import javax.swing.LookAndFeel;
 import javax.swing.UIDefaults;
 
 /**
+ * Support for context dependent popup menus.
+ * 
+ * It's meant to be used as a auxiliary LF on top of main LF: 
+ * 
+ *  <pre> 
+ *  <code>
+ *  UIManager.addAuxiliaryLookAndFeel(new ContextMenuAuxLF());
+ *  </code>
+ *  </pre>
+ * 
+ * There are core-issues involved, which might or might not
+ * impair its usefulness, for details please see a thread in
+ * the SwingLabs forum: <p>
+ * 
+ * <a href="http://forums.java.net/jive/thread.jspa?threadID=7713">
+ *  Experimental: default context menus for textcomponents/scrollbars 
+ * </a>
+ * 
  * 
  * @author Jeanette Winzenburg
  */
@@ -41,11 +59,10 @@ public class ContextMenuAuxLF extends LookAndFeel {
 
     public String getDescription() {
 
-        return "nothing special - just adding some fun";
+        return "Auxiliary LF to Support Context Dependent Popups";
     }
 
     public boolean isNativeLookAndFeel() {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -80,8 +97,14 @@ public class ContextMenuAuxLF extends LookAndFeel {
      */
     private static class MyUIDefaults extends UIDefaults {
 
+        /**
+         *  Overridden to do nothing. 
+         *  There will be many errors because this is incomplete as 
+         *  of component types by design
+         * 
+         */
+        @Override
         protected void getUIError(String msg) {
-            // TODO Auto-generated method stub
 
         }
     }
