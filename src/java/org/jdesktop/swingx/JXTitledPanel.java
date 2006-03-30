@@ -28,6 +28,7 @@ import java.awt.Font;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import org.jdesktop.swingx.painter.Painter;
 
 import org.jdesktop.swingx.plaf.JXTitledPanelAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
@@ -78,18 +79,6 @@ public class JXTitledPanel extends JXPanel {
     private Font titleFont;
 
     /**
-     * For the gradient, this is the background color to use for the dark part
-     * of the gradient
-     */
-    private Color titleDarkBackground;
-
-    /**
-     * For the gradient, this is the light color to use for the light part of
-     * the gradient
-     */
-    private Color titleLightBackground;
-
-    /**
      * The forground color to use for the Title (particularly for the text)
      */
     private Color titleForeground;
@@ -99,6 +88,11 @@ public class JXTitledPanel extends JXPanel {
      * Content section
      */
     private Container contentPanel;
+    
+    /**
+     * The Painter to use for painting the title section of the JXTitledPanel
+     */
+    private Painter titlePainter;
 
     /**
      * Create a new JTitledPanel with an empty string for the title.
@@ -242,25 +236,24 @@ public class JXTitledPanel extends JXPanel {
         firePropertyChange("titleFont", old, getTitleFont());
     }
 
-    public Color getTitleDarkBackground() {
-        return titleDarkBackground;
+    /**
+     * Set the Painter to use for painting the title section of the JXTitledPanel.
+     * This value may be null, which will cause the current look and feel to paint
+     * an appropriate look
+     *
+     * @param p The Painter to use. May be null
+     */
+    public void setTitlePainter(Painter p) {
+        Painter old = getTitlePainter();
+        this.titlePainter = p;
+        firePropertyChange("titlePainter", old, getTitlePainter());
     }
-
-    public void setTitleDarkBackground(Color titleDarkBackground) {
-        Color old = getTitleDarkBackground();
-        this.titleDarkBackground = titleDarkBackground;
-        firePropertyChange("titleDarkBackground", old, getTitleDarkBackground());
-    }
-
-    public Color getTitleLightBackground() {
-        return titleLightBackground;
-    }
-
-    public void setTitleLightBackground(Color titleLightBackground) {
-        Color old = getTitleLightBackground();
-        this.titleLightBackground = titleLightBackground;
-        firePropertyChange("titleLightBackground", old,
-                getTitleLightBackground());
+    
+    /**
+     * @returns the Painter to use for painting the background of the title section
+     */
+    public Painter getTitlePainter() {
+        return titlePainter;
     }
 
     public Color getTitleForeground() {

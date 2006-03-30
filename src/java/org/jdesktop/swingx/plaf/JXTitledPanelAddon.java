@@ -29,8 +29,7 @@ import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import org.jdesktop.swingx.JXTitledPanel;
-import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
-import org.jdesktop.swingx.plaf.windows.WindowsLookAndFeelAddons;
+import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
 
 /**
  * Addon for <code>JXTitledPanel</code>.<br>
@@ -51,8 +50,8 @@ public class JXTitledPanelAddon extends AbstractComponentAddon {
       "JXTitledPanel.title.font",
       UIManager.getFont("Button.font"),
       "JXTitledPanel.title.foreground", new ColorUIResource(Color.WHITE),
-      "JXTitledPanel.title.darkBackground", new ColorUIResource(Color.GRAY),
-      "JXTitledPanel.title.lightBackground", new ColorUIResource(Color.LIGHT_GRAY),
+      "JXTitledPanel.title.painter", new PainterUIResource(
+              new BasicGradientPainter(0, 0, Color.LIGHT_GRAY, 0, 1, Color.GRAY))
     }));
   }
   
@@ -63,14 +62,20 @@ public class JXTitledPanelAddon extends AbstractComponentAddon {
     if (isPlastic()) {
       defaults.addAll(Arrays.asList(new Object[] { 
         "JXTitledPanel.title.foreground", new ColorUIResource(255, 255, 255),
-        "JXTitledPanel.title.darkBackground", new ColorUIResource(49, 121, 242),
-        "JXTitledPanel.title.lightBackground", new ColorUIResource(198, 211, 247),
+        "JXTitledPanel.title.painter", new PainterUIResource(
+                new BasicGradientPainter(0, 0, 
+                    new Color(49, 121, 242),
+                    0, 1, 
+                    new Color(198, 211, 247)
+                    ))
       }));
     } else {
       defaults.addAll(Arrays.asList(new Object[] { 
         "JXTitledPanel.title.foreground", new ColorUIResource(255, 255, 255),
-        "JXTitledPanel.title.darkBackground", MetalLookAndFeel.getCurrentTheme().getPrimaryControlDarkShadow(),
-        "JXTitledPanel.title.lightBackground", MetalLookAndFeel.getCurrentTheme().getPrimaryControl()
+        "JXTitledPanel.title.painter", new PainterUIResource(
+                new BasicGradientPainter(0, 0, 
+                    MetalLookAndFeel.getCurrentTheme().getPrimaryControl(), 0, 1,
+                    MetalLookAndFeel.getCurrentTheme().getPrimaryControlDarkShadow()))
       }));
     }
   }
@@ -80,8 +85,10 @@ public class JXTitledPanelAddon extends AbstractComponentAddon {
     super.addWindowsDefaults(addon, defaults);
     defaults.addAll(Arrays.asList(new Object[] { 
         "JXTitledPanel.title.foreground", UIManager.getColor("InternalFrame.activeTitleForeground"),
-        "JXTitledPanel.title.darkBackground", UIManager.getColor("InternalFrame.activeTitleBackground"),
-        "JXTitledPanel.title.lightBackground", UIManager.getColor("InternalFrame.inactiveTitleGradient")
+        "JXTitledPanel.title.painter", new PainterUIResource(
+                new BasicGradientPainter(0, 0, 
+                    UIManager.getColor("InternalFrame.inactiveTitleGradient"), 0, 1,
+                    UIManager.getColor("InternalFrame.activeTitleBackground")))
     }));
   }
 
