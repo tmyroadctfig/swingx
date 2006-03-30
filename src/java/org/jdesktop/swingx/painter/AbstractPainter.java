@@ -31,6 +31,7 @@ import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.lang.ref.SoftReference;
@@ -777,8 +778,15 @@ public abstract class AbstractPainter extends JavaBean implements Painter<JCompo
             if (resizeClip == Resize.VERTICAL || resizeClip == Resize.BOTH) {
                 height = c.getHeight();
             }
-            clip = AffineTransform.getScaleInstance(
-                    width, height).createTransformedShape(clip);
+            if (clip instanceof RoundRectangle2D) {
+                RoundRectangle2D rect = (RoundRectangle2D)clip;
+                clip = new RoundRectangle2D.Double(
+                        rect.getX(), rect.getY(), width, height,
+                        rect.getArcWidth(), rect.getArcHeight());
+            } else {
+                clip = AffineTransform.getScaleInstance(
+                        width, height).createTransformedShape(clip);
+            }
             g.setClip(clip);
         }
     }
