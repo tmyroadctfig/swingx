@@ -71,9 +71,9 @@ public class ColorSelectionButton extends JButton {
                     setBackground(color);
                 }
                 
-                
             }
         });
+        this.setContentAreaFilled(false);
     }
 
     public void paintComponent(Graphics g) {
@@ -83,6 +83,6 @@ public class ColorSelectionButton extends JButton {
         g.drawRect(0, 0, getWidth()-1, getHeight()-1);
         g.setColor(Color.white);
         g.drawRect(1, 1, getWidth()-3, getHeight()-3);
-        g.drawString(getText(),10,20);
+        super.paintComponent(g);
     }
 }
