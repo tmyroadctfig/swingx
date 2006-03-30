@@ -357,7 +357,7 @@ public class SearchFactory {
     /**
      * Pre: findbar != null.
      */
-    private void releaseFindBar() {
+    protected void releaseFindBar() {
         findBar.setSearchable(null);
         if (lastFindBarTarget != null) {
             lastFindBarTarget.putClientProperty(AbstractSearchable.MATCH_HIGHLIGHTER, Boolean.FALSE);
