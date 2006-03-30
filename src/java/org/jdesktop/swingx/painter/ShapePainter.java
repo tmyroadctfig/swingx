@@ -33,25 +33,34 @@ import javax.swing.JComponent;
 import org.jdesktop.swingx.util.Resize;
 
 /**
- * <p>A Painter that paints Shapes. It uses a stroke and a paint to do so. The
+ * <p>A Painter that paints Shapes. It uses a stroke and a fillPaint to do so. The
  * shape is painted as is, at a specific location. If no Shape is specified, nothing
  * will be painted. If no stroke is specified, the default for the Graphics2D
- * will be used. If no paint is specified, the component background color
+ * will be used. If no fillPaint is specified, the component background color
  * will be used. And if no location is specified, then the shape will be draw
  * at the origin (0,0)</p>
- *
+ * 
  * <p>Here is an example that draws a lowly rectangle:
  * <pre><code>
  *  Rectangle2D.Double rect = new Rectangle2D.Double(0, 0, 50, 50);
  *  ShapePainter p = new ShapePainter(rect);
  *  p.setLocation(new Point2D.Double(20, 10));
  * </code></pre>
- *
+ * 
+ * 
  * @author rbair
  */
 public class ShapePainter extends AbstractPainter {
     /**
-     * The Shape to paint. If null, nothing is painted.
+     * Different available fill styles. BOTH indicates that both the outline,
+     * and the fill should be painted. This is the default. FILLED indicates that
+     * the shape should be filled, but no outline painted. OUTLINE specifies that
+     * the shape should be outlined, but not filled
+     */
+    public enum Style {BOTH, FILLED, OUTLINE}
+    
+    /**
+     * The Shape to fillPaint. If null, nothing is painted.
      */
     private Shape shape;
     /**
@@ -63,7 +72,12 @@ public class ShapePainter extends AbstractPainter {
      * The Paint to use when painting the shape. If null, then the component
      * background color is used
      */
-    private Paint paint;
+    private Paint fillPaint;
+    /**
+     * The Paint to use when stroking the shape (drawing the outline). If null,
+     * then the component foreground color is used
+     */
+    private Paint strokePaint;
     /**
      * The location at which to draw the shape. If null, 0,0 is used
      */
@@ -77,9 +91,9 @@ public class ShapePainter extends AbstractPainter {
      */
     private Resize resize = Resize.BOTH;
     /**
-     * Indicates whether the shape should be filled or drawn.
+     * Indicates whether the shape should be filled or outlined, or both
      */
-    private boolean isFilled;
+    private Style style = Style.BOTH;
     
     /**
      * Create a new ShapePainter
@@ -90,8 +104,9 @@ public class ShapePainter extends AbstractPainter {
     
     /**
      * Create a new ShapePainter with the specified shape.
-     *
-     * @param shape the shape to paint
+     * 
+     * 
+     * @param shape the shape to fillPaint
      */
     public ShapePainter(Shape shape) {
         super();
@@ -99,38 +114,42 @@ public class ShapePainter extends AbstractPainter {
     }
     
     /**
-     * Create a new ShapePainter with the specified shape and paint.
-     *
-     * @param shape the shape to paint
-     * @param paint the paint to be used to paint the shape
+     * Create a new ShapePainter with the specified shape and fillPaint.
+     * 
+     * 
+     * @param shape the shape to fillPaint
+     * @param fillPaint the fillPaint to be used to fillPaint the shape
      */
     public ShapePainter(Shape shape, Paint paint) {
         super();
         this.shape = shape;
-        this.paint = paint;
+        this.fillPaint = paint;
     }
     
     /**
-     * Create a new ShapePainter with the specified shape and paint. The shape
+     * Create a new ShapePainter with the specified shape and fillPaint. The shape
      * can be filled or stroked (only the ouline is painted).
-     *
-     * @param shape the shape to paint
-     * @param paint the paint to be used to paint the shape
-     * @param isFilled true to fill the shape, false to stroke the outline
+     * 
+     * 
+     * @param shape the shape to fillPaint
+     * @param fillPaint the fillPaint to be used to fillPaint the shape
+     * @param style specifies the ShapePainter.Style to use for painting this shape.
+     *        If null, then Style.BOTH is used
      */
-    public ShapePainter(Shape shape, Paint paint, boolean isFilled) {
+    public ShapePainter(Shape shape, Paint paint, Style style) {
         super();
         this.shape = shape;
-        this.paint = paint;
-        this.isFilled = isFilled;
+        this.fillPaint = paint;
+        this.style = style == null ? Style.BOTH : style;
     }
     
     /**
-     * Sets the shape to paint. This shape is not resized when the component
+     * Sets the shape to fillPaint. This shape is not resized when the component
      * bounds are. To do that, create a custom shape that is bound to the
      * component width/height
-     *
-     * @param s the Shape to paint. May be null
+     * 
+     * 
+     * @param s the Shape to fillPaint. May be null
      */
     public void setShape(Shape s) {
         Shape old = getShape();
@@ -139,7 +158,9 @@ public class ShapePainter extends AbstractPainter {
     }
     
     /**
-     * @return the Shape to paint. May be null
+     * 
+     * 
+     * @return the Shape to fillPaint. May be null
      */
     public Shape getShape() {
         return shape;
@@ -148,8 +169,9 @@ public class ShapePainter extends AbstractPainter {
     /**
      * Sets the stroke to use for painting. If null, then the default Graphics2D
      * stroke use used
-     *
-     * @param s the Stroke to paint with
+     * 
+     * 
+     * @param s the Stroke to fillPaint with
      */
     public void setStroke(Stroke s) {
         Stroke old = getStroke();
@@ -165,30 +187,51 @@ public class ShapePainter extends AbstractPainter {
     }
     
     /**
-     * The Paint to use for painting the shape. Can be a Color, GradientPaint,
+     * The Paint to use for filling the shape. Can be a Color, GradientPaint,
      * TexturePaint, or any other kind of Paint. If null, the component
      * background is used.
      *
      * @param p the Paint to use for painting the shape. May be null.
      */
-    public void setPaint(Paint p) {
-        Paint old = getPaint();
-        this.paint = p;
-        firePropertyChange("paint", old, getPaint());
+    public void setFillPaint(Paint p) {
+        Paint old = getFillPaint();
+        this.fillPaint = p;
+        firePropertyChange("fillPaint", old, getFillPaint());
     }
     
     /**
      * @return the Paint used when painting the shape. May be null
      */
-    public Paint getPaint() {
-        return paint;
+    public Paint getFillPaint() {
+        return fillPaint;
+    }
+    
+    /**
+     * The Paint to use for stroking the shape (painting the outline). 
+     * Can be a Color, GradientPaint, TexturePaint, or any other kind of Paint. 
+     * If null, the component foreground is used.
+     *
+     * @param p the Paint to use for stroking the shape. May be null.
+     */
+    public void setStrokePaint(Paint p) {
+        Paint old = getStrokePaint();
+        this.strokePaint = p;
+        firePropertyChange("strokePaint", old, getStrokePaint());
+    }
+    
+    /**
+     * @return the Paint used when stroking the shape. May be null
+     */
+    public Paint getStrokePaint() {
+        return strokePaint;
     }
     
     /**
      * Specifies the location at which to place the shape prior to painting.
      * If null, the origin (0,0) is used
-     *
-     * @param location the Point2D at which to paint the shape. may be null
+     * 
+     * 
+     * @param location the Point2D at which to fillPaint the shape. may be null
      */
     public void setLocation(Point2D location) {
         Point2D old = getLocation();
@@ -197,7 +240,9 @@ public class ShapePainter extends AbstractPainter {
     }
     
     /**
-     * @return the Point2D location at which to paint the shape. Will never be null
+     * 
+     * 
+     * @return the Point2D location at which to fillPaint the shape. Will never be null
      *         (if it was null, new Point2D.Double(0,0) will be returned)
      */
     public Point2D getLocation() {
@@ -205,22 +250,23 @@ public class ShapePainter extends AbstractPainter {
     }
     
     /**
-     * The shape can be filled or simply stroked. By default, the shape is
-     * stroked. Setting this property to true fills the shape upon drawing.
+     * The shape can be filled or simply stroked (outlined), or both. By default,
+     * the shape is both filled and stroked. This property specifies the strategy to
+     * use.
      *
-     * @param isFilled true if the shape must be filled, false otherwise.
+     * @param s the Style to use. If null, Style.BOTH is used
      */
-    public void setFilled(boolean isFilled) {
-        boolean old = isFilled();
-        this.isFilled = isFilled;
-        firePropertyChange("paint", old, isFilled());
+    public void setStyle(Style s) {
+        Style old = getStyle();
+        this.style = s == null ? Style.BOTH : s;
+        firePropertyChange("style", old, getStyle());
     }
     
     /**
-     * @return true is the shape is filled, false if stroked
+     * @return the Style used
      */
-    public boolean isFilled() {
-        return isFilled;
+    public Style getStyle() {
+        return style;
     }
     
     /**
@@ -274,13 +320,6 @@ public class ShapePainter extends AbstractPainter {
      * @inheritDoc
      */
     public void paintBackground(Graphics2D g, JComponent component) {
-        //set the paint
-        Paint p = getPaint();
-        if (p == null) {
-            p = component.getBackground();
-        }
-        g.setPaint(p);
-        
         //set the stroke if it is not null
         Stroke s = getStroke();
         if (s != null) {
@@ -307,10 +346,10 @@ public class ShapePainter extends AbstractPainter {
         double height = 1;
         Resize resize = getResize();
         if (resize == Resize.HORIZONTAL || resize == Resize.BOTH) {
-            width = component.getWidth();
+            width = component.getWidth() - 1;
         }
         if (resize == Resize.VERTICAL || resize == Resize.BOTH) {
-            height = component.getHeight();
+            height = component.getHeight() - 1;
         }
         
         if (shape instanceof RoundRectangle2D) {
@@ -324,10 +363,38 @@ public class ShapePainter extends AbstractPainter {
         }
         
         //draw/fill the shape
-        if (!isFilled()) {
-            g.draw(shape);
-        } else {
-            g.fill(shape);
+        switch (getStyle()) {
+            case BOTH:
+                g.setPaint(calculateStrokePaint(component));
+                g.draw(shape);
+                g.setPaint(calculateFillPaint(component));
+                g.fill(shape);
+                break;
+            case FILLED:
+                g.setPaint(calculateFillPaint(component));
+                g.fill(shape);
+                break;
+            case OUTLINE:
+                g.setPaint(calculateStrokePaint(component));
+                g.draw(shape);
+                break;
         }
+    }
+    
+    private Paint calculateStrokePaint(JComponent component) {
+        Paint p = getStrokePaint();
+        if (p == null) {
+            p = component.getForeground();
+        }
+        return p;
+    }
+    
+    private Paint calculateFillPaint(JComponent component) {
+        //set the fillPaint
+        Paint p = getFillPaint();
+        if (p == null) {
+            p = component.getBackground();
+        }
+        return p;
     }
 }
