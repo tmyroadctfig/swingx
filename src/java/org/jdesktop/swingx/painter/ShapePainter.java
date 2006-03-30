@@ -28,6 +28,7 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 import javax.swing.JComponent;
 import org.jdesktop.swingx.util.Resize;
 
@@ -70,11 +71,11 @@ public class ShapePainter extends AbstractPainter {
     /**
      * Specifies if/how resizing (relocating) the location should occur.
      */
-    private Resize resizeLocation = Resize.NONE;
+    private Resize resizeLocation = Resize.BOTH;
     /**
      * Specifies if/how resizing of the shape should occur
      */
-    private Resize resize = Resize.NONE;
+    private Resize resize = Resize.BOTH;
     /**
      * Indicates whether the shape should be filled or drawn.
      */
@@ -311,8 +312,16 @@ public class ShapePainter extends AbstractPainter {
         if (resize == Resize.VERTICAL || resize == Resize.BOTH) {
             height = component.getHeight();
         }
-        shape = AffineTransform.getScaleInstance(
-                width, height).createTransformedShape(shape);
+        
+        if (shape instanceof RoundRectangle2D) {
+            RoundRectangle2D rect = (RoundRectangle2D)shape;
+            shape = new RoundRectangle2D.Double(
+                    rect.getX(), rect.getY(), width, height,
+                    rect.getArcWidth(), rect.getArcHeight());
+        } else {
+            shape = AffineTransform.getScaleInstance(
+                    width, height).createTransformedShape(shape);
+        }
         
         //draw/fill the shape
         if (!isFilled()) {
