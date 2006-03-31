@@ -34,7 +34,8 @@ import org.jdesktop.swingx.LinkModel;
  * Specialized LinkAction for a target of type {@link LinkModel}. 
  * <p>
  * 
- * PENDING: cleanup internals to use super's infrastructure. <p>
+ * This action delegates actionPerformed to vistingDelegate.
+ * 
  * PENDING: move to swingx package?
  * 
  * @author Jeanette Winzenburg
@@ -59,26 +60,37 @@ public class LinkModelAction<T extends LinkModel> extends LinkAction<T> {
     }
     
     public LinkModelAction(T target, ActionListener visitingDelegate) {
-        super(target);
+        // JW: hardcoded LinkModel.class? Is this flexible enough for subclasses ??
+        super(target, LinkModel.class);
         setVisitingDelegate(visitingDelegate);
-    };
+    }
     
-    
-//    public void setLink(LinkModel link) {
-//        uninstallLinkListener();
-//        this.link = link;
-//        installLinkListener();
-//        updateFromLink();
-//    }
-//
-//    public LinkModel getLink() {
-//        return link;
-//    }
-
+    /**
+     * The delegate to invoke on actionPerformed.
+     * <p>
+     * The delegates actionPerformed is invoked with an ActionEvent
+     * having the target as source. Delegates are expected to
+     * cope gracefully with the T. 
+     * <p>
+     * 
+     * PENDING: JW - How to formalize? 
+     * 
+     * @param delegate the action invoked on the target.
+     */
     public void setVisitingDelegate(ActionListener delegate) {
         this.delegate = delegate;
     }
     
+    /**
+     * This action delegates to the visitingDelegate if both
+     * delegate and target are != null, does nothing otherwise.
+     * The actionEvent carries the target as source.
+     * 
+     * PENDING: pass through a null target? - most probably!
+     * 
+     * 
+     * 
+     */
     public void actionPerformed(ActionEvent e) {
         if ((delegate != null) && (getTarget() != null)) {
             delegate.actionPerformed(new ActionEvent(getTarget(), ActionEvent.ACTION_PERFORMED, VISIT_ACTION));
@@ -86,27 +98,33 @@ public class LinkModelAction<T extends LinkModel> extends LinkAction<T> {
         
     }
 
-//    private void uninstallLinkListener() {
-//        if (link == null) return;
-//        link.removePropertyChangeListener(getLinkListener());
-//     
-//    }
-
+    /**
+     * installs a propertyChangeListener on the target and
+     * updates the visual properties from the target.
+     */
     @Override
     protected void installTarget() {
         if (getTarget() != null) {
-            getTarget().addPropertyChangeListener(getLinkListener());
+            getTarget().addPropertyChangeListener(getTargetListener());
         }
-        updateFromLink();
+        updateFromTarget();
     }
 
+    /**
+     * removes the propertyChangeListener. <p>
+     * 
+     * Implementation NOTE: this does not clean-up internal state! There is
+     * no need to because updateFromTarget handles both null and not-null
+     * targets. Hmm...
+     * 
+     */
     @Override
     protected void uninstallTarget() {
         if (getTarget() == null) return;
-       getTarget().removePropertyChangeListener(getLinkListener());
+       getTarget().removePropertyChangeListener(getTargetListener());
     }
 
-    private void updateFromLink() {
+    protected void updateFromTarget() {
         if (getTarget() != null) {
             putValue(Action.NAME, getTarget().getText());
             putValue(Action.SHORT_DESCRIPTION, getTarget().getURL().toString());
@@ -120,17 +138,12 @@ public class LinkModelAction<T extends LinkModel> extends LinkAction<T> {
         }
     }
 
-//    private void installLinkListener() {
-//        if (link == null) return;
-//        link.addPropertyChangeListener(getLinkListener());
-//    }
-
-    private PropertyChangeListener getLinkListener() {
+    private PropertyChangeListener getTargetListener() {
         if (linkListener == null) {
          linkListener = new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
-                updateFromLink();
+                updateFromTarget();
             }
             
         };

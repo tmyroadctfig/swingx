@@ -87,7 +87,7 @@ public class LinkRenderer extends AbstractCellEditor implements
     
     // does nothing...
     private LinkAction createDefaultLinkAction() {
-        return new LinkAction() {
+        return new LinkAction((Class) null) {
 
             public void actionPerformed(ActionEvent e) {
                 // TODO Auto-generated method stub
@@ -151,6 +151,9 @@ public class LinkRenderer extends AbstractCellEditor implements
     
     public Component getTableCellRendererComponent(JTable table, Object value,
             boolean isSelected, boolean hasFocus, int row, int column) {
+        if ((value != null) && !linkAction.isTargetable(value)) {
+            value = null;
+        }
         linkAction.setTarget(value);
         if (table !=  null) {
             Point p = (Point) table

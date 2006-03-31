@@ -268,7 +268,7 @@ public class JXHyperlinkTest extends InteractiveTestCase {
 //---------------------- interactive test: JXTable
     
     public void interactiveTableLinkRendererSimpleText() {
-        LinkAction linkAction = new LinkAction() {
+        LinkAction linkAction = new LinkAction(null) {
 
             public void actionPerformed(ActionEvent e) {
                 LOG.info("hit: " + getTarget());
@@ -347,9 +347,53 @@ public class JXHyperlinkTest extends InteractiveTestCase {
 
     
 //----------------- interactive tests: JXList
+ 
+    public void interactiveTestListLinkRendererPlayer() {
+        LinkAction linkAction = new LinkAction<Player>(Player.class) {
+
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("hit: " + getTarget());
+                
+            }
+            
+            protected void installTarget() {
+                setName(getTarget() != null ? getTarget().name : "");
+            }
+            
+        };
+        
+        JXList list = new JXList(createPlayerModel());
+        list.setRolloverEnabled(true);
+        list.setCellRenderer(new LinkRenderer(linkAction));
+        JFrame frame = wrapWithScrollingInFrame(list, "show simple bean link renderer in list");
+        frame.setVisible(true);
+
+    }
     
+    private ListModel createPlayerModel() {
+        DefaultListModel model = new DefaultListModel();
+        model.addElement(new Player("Henry", 10));
+        model.addElement(new Player("Berta", 112));
+        model.addElement(new Player("Dave", 20));
+        return model;
+    }
+
+    public static class Player {
+        String name;
+        int score;
+        public Player(String name, int score) {
+            this.name = name;
+            this.score = score;
+        }
+        @Override
+        public String toString() {
+            return name + " has score: " + score;
+        }
+        
+        
+    }
     public void interactiveTestListLinkRendererSimpleText() {
-        LinkAction linkAction = new LinkAction() {
+        LinkAction linkAction = new LinkAction(null) {
 
             public void actionPerformed(ActionEvent e) {
                 LOG.info("hit: " + getTarget());
@@ -482,7 +526,7 @@ public class JXHyperlinkTest extends InteractiveTestCase {
 
     
     protected LinkAction createEmptyLinkAction() {
-        LinkAction linkAction = new LinkAction() {
+        LinkAction linkAction = new LinkAction(null) {
 
             public void actionPerformed(ActionEvent e) {
                 // TODO Auto-generated method stub

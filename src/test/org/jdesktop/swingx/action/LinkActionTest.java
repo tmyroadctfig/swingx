@@ -23,13 +23,36 @@ public class LinkActionTest extends TestCase {
 
 
     /**
+     * test exception as documented.
+     *
+     */
+    public void testConstructorException() {
+        try {
+            LinkAction linkAction = new LinkAction(new Integer(10), String.class) {
+    
+                public void actionPerformed(ActionEvent e) {
+                    // TODO Auto-generated method stub
+                    
+                }
+                
+            };
+            fail("instantiate LinkAction with non-matching target and targetClass must throw" +
+                        "IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            // this is what to expect
+        } catch (Exception e) {
+            fail("unexpected exception type - " + e);
+        }
+        
+    }
+    /**
      * test if auto-installed visited property is respected.
      *
      */
     public void testConstructorsAndCustomTargetInstall() {
         Object target = new Object();
         final boolean visitedIsTrue = true;
-        LinkAction linkAction = new LinkAction<Object>(target) {
+        LinkAction linkAction = new LinkAction<Object>(target, null) {
 
             public void actionPerformed(ActionEvent e) {
                 // TODO Auto-generated method stub
@@ -55,7 +78,7 @@ public class LinkActionTest extends TestCase {
     public void testConstructors() {
         Object target = new Object();
         boolean visitedIsTrue = true;
-        LinkAction linkAction = new LinkAction(target) {
+        LinkAction linkAction = new LinkAction(target, null) {
 
             public void actionPerformed(ActionEvent e) {
                 // TODO Auto-generated method stub
@@ -65,24 +88,13 @@ public class LinkActionTest extends TestCase {
         };
         assertEquals(target, linkAction.getTarget());
         assertFalse(linkAction.isVisited());
-        // removed convenience constructor - issues with class invariant
-//        LinkAction linkAction2 = new LinkAction(target, visitedIsTrue) {
-//
-//            public void actionPerformed(ActionEvent e) {
-//                // TODO Auto-generated method stub
-//                
-//            }
-//            
-//        };
-//        assertEquals(target, linkAction2.getTarget());
-//        assertEquals(visitedIsTrue, linkAction2.isVisited());
     }
     /**
      * test visited/target properties of LinkAction.
      *
      */
     public void testLinkAction() {
-       LinkAction linkAction = new LinkAction() {
+       LinkAction linkAction = new LinkAction(null) {
 
         public void actionPerformed(ActionEvent e) {
             // TODO Auto-generated method stub

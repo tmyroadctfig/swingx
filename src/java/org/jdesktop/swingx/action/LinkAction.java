@@ -10,8 +10,7 @@ import java.awt.event.ItemEvent;
  * Convenience implementation to simplify {@link JXHyperlink} configuration and 
  * provide minimal api as needed by a {@link LinkRenderer}. <p>
  * 
- * PENDING: generalize LinkRenderer to use LinkAction instead of LinkModelAction
- * PENDING: generify target.
+ * PENDING: rename to AbstractLinkAction
  * 
  * @author Jeanette Winzenburg
  */
@@ -26,45 +25,32 @@ public abstract class LinkAction <T> extends AbstractActionExt {
      */
     protected T target;
 
+    protected Class<?> targetClass;
+
+    
     /**
      * Instantiates a LinkAction with null target. 
      * 
      */
-    public LinkAction() {
-        this(null);
+    public LinkAction(Class<?> targetClass) {
+        this(null, targetClass);
     }
     
     /**
-     * Instantiates a LinkAction with target. 
+     * Instantiates a LinkAction with a target of type targetClass. 
      * The visited property is initialized as defined by 
      * {@link LinkAction#installTarget()}
      * 
      * @param target the target this action should act on.
+     * @param targetClass the type of target
+     * @throws IllegalArgumentException if !isTargetable(target)
      */
-    public LinkAction(T target) {
+    public LinkAction(T target, Class<?> targetClass) {
+       this.targetClass = targetClass; 
+       if (!isTargetable(target)) 
+           throw new IllegalArgumentException("the target class is expected to be " + targetClass);
        setTarget(target);
     }
-
-    /**
-     * Instantiates a LinkAction with target and visited. T
-     * The initial value of visited is guaranteed to be 
-     * the given parameter value, overruling the 
-     * {@link LinkAction#installTarget()}
-     * 
-     * PENDING: hmm... better remove this constructor? 
-     * Done for now - there are issue with the 
-     * class invarant. 
-     * 
-     * @param target
-     * @param visited
-     */
-//    public LinkAction(Object target, boolean visited) {
-//        setTarget(target);
-//        // JW: hmmm ... reverse method calls to guarantee target 
-//        // properties take precedence if wanted?
-//        // test!!
-//        setVisited(visited);
-//    }
 
     /**
      * Set the visited property.
@@ -89,12 +75,36 @@ public abstract class LinkAction <T> extends AbstractActionExt {
         return target;
     }
 
+    /**
+     * PRE: isTargetable(target)
+     * @param target
+     */
     public void setTarget(T target) {
-        Object oldTarget = getTarget();
+        T oldTarget = getTarget();
         uninstallTarget();
         this.target = target;
         installTarget();
         firePropertyChange("target", oldTarget, getTarget());
+        
+    }
+
+    /**
+     * decides if the given target is acceptable for setTarget.
+     * <p>
+     *  
+     *  target == null is acceptable for all types.
+     *  targetClass == null is the same as Object.class
+     *  
+     * @param target the target to set.
+     * @return true if setTarget can cope with the object, 
+     *  false otherwise.
+     * 
+     */
+    public  boolean isTargetable(Object target) {
+        // we accept everything
+        if (targetClass == null) return true;
+        if (target == null) return true;
+        return targetClass.isAssignableFrom(target.getClass());
     }
 
     /**
