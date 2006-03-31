@@ -11,6 +11,8 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -72,7 +74,7 @@ public class JXHyperlinkTest extends InteractiveTestCase {
        hyperlink.doClick();
        assertTrue("hyperlink autoClicks if it has no action", hyperlink.isClicked());
        
-       LinkAction emptyAction = createEmptyLinkAction();
+       LinkAction<Object> emptyAction = createEmptyLinkAction();
        JXHyperlink hyperlink2 = new JXHyperlink(emptyAction);
        hyperlink2.doClick();
        assertFalse(emptyAction.isVisited());
@@ -101,7 +103,7 @@ public class JXHyperlinkTest extends InteractiveTestCase {
      *
      */
     public void testLinkActionSetTarget() {
-        LinkAction linkAction = createEmptyLinkAction();
+        LinkAction<Object> linkAction = createEmptyLinkAction();
         linkAction.setVisited(true);
         JXHyperlink hyperlink = new JXHyperlink(linkAction);
         Object target = new Object();
@@ -114,7 +116,7 @@ public class JXHyperlinkTest extends InteractiveTestCase {
      *
      */
     public void testSetClickedActionUnchanged() {
-        LinkAction linkAction = createEmptyLinkAction();
+        LinkAction<Object> linkAction = createEmptyLinkAction();
         linkAction.setVisited(true);
         JXHyperlink hyperlink = new JXHyperlink(linkAction);
         // sanity assert..
@@ -182,7 +184,7 @@ public class JXHyperlinkTest extends InteractiveTestCase {
      *
      */
     public void testListeningVisited() {
-       LinkAction linkAction = createEmptyLinkAction();
+       LinkAction<Object> linkAction = createEmptyLinkAction();
        JXHyperlink hyperlink = new JXHyperlink(linkAction);
        // sanity: both are expected to be false
        assertEquals(linkAction.isVisited(), hyperlink.isClicked());
@@ -200,7 +202,7 @@ public class JXHyperlinkTest extends InteractiveTestCase {
      * 
      */
     public void testInitialVisitedSynched() {
-        LinkAction linkAction = createEmptyLinkAction();
+        LinkAction<Object> linkAction = createEmptyLinkAction();
        linkAction.setVisited(true);
        // sanity: linkAction is changed to true
        assertTrue(linkAction.isVisited());
@@ -253,7 +255,7 @@ public class JXHyperlinkTest extends InteractiveTestCase {
         EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
         LinkModel link = new LinkModel("Click me!", null, JXEditorPaneTest.class.getResource("resources/test.html"));
 
-        LinkModelAction linkAction = new LinkModelAction(link);
+        LinkModelAction linkAction = new LinkModelAction<LinkModel>(link);
         linkAction.setVisitingDelegate(visitor);
         JXHyperlink hyperlink = new JXHyperlink(linkAction);
         JPanel panel = new JPanel(new BorderLayout());
@@ -268,7 +270,7 @@ public class JXHyperlinkTest extends InteractiveTestCase {
 //---------------------- interactive test: JXTable
     
     public void interactiveTableLinkRendererSimpleText() {
-        LinkAction linkAction = new LinkAction(null) {
+        LinkAction linkAction = new LinkAction<Object>(null) {
 
             public void actionPerformed(ActionEvent e) {
                 LOG.info("hit: " + getTarget());
@@ -349,7 +351,7 @@ public class JXHyperlinkTest extends InteractiveTestCase {
 //----------------- interactive tests: JXList
  
     public void interactiveTestListLinkRendererPlayer() {
-        LinkAction linkAction = new LinkAction<Player>(Player.class) {
+        LinkAction<Player> linkAction = new LinkAction<Player>(Player.class) {
 
             public void actionPerformed(ActionEvent e) {
                 LOG.info("hit: " + getTarget());
@@ -393,7 +395,7 @@ public class JXHyperlinkTest extends InteractiveTestCase {
         
     }
     public void interactiveTestListLinkRendererSimpleText() {
-        LinkAction linkAction = new LinkAction(null) {
+        LinkAction linkAction = new LinkAction<Object>(null) {
 
             public void actionPerformed(ActionEvent e) {
                 LOG.info("hit: " + getTarget());
@@ -525,8 +527,8 @@ public class JXHyperlinkTest extends InteractiveTestCase {
     }
 
     
-    protected LinkAction createEmptyLinkAction() {
-        LinkAction linkAction = new LinkAction(null) {
+    protected LinkAction<Object> createEmptyLinkAction() {
+        LinkAction<Object> linkAction = new LinkAction<Object>(null) {
 
             public void actionPerformed(ActionEvent e) {
                 // TODO Auto-generated method stub

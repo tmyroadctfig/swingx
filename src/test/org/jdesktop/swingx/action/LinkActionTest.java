@@ -21,6 +21,26 @@ public class LinkActionTest extends TestCase {
     
     private PropertyChangeReport report;
 
+    /**
+     * test exception as documented.
+     *
+     */
+    public void testConstructorSubclass() {
+        try {
+            LinkAction linkAction = new LinkAction(new Integer(10), Number.class) {
+    
+                public void actionPerformed(ActionEvent e) {
+                    // TODO Auto-generated method stub
+                    
+                }
+                
+            };
+        } catch (IllegalArgumentException e) {
+            fail("instantiate LinkAction with subtypes of targetclass must not throw any exception " +
+                e);
+        } 
+        
+    }
 
     /**
      * test exception as documented.
@@ -28,7 +48,7 @@ public class LinkActionTest extends TestCase {
      */
     public void testConstructorException() {
         try {
-            LinkAction linkAction = new LinkAction(new Integer(10), String.class) {
+            LinkAction linkAction = new LinkAction<Number> (new Integer(10), Number.class) {
     
                 public void actionPerformed(ActionEvent e) {
                     // TODO Auto-generated method stub
@@ -52,7 +72,7 @@ public class LinkActionTest extends TestCase {
     public void testConstructorsAndCustomTargetInstall() {
         Object target = new Object();
         final boolean visitedIsTrue = true;
-        LinkAction linkAction = new LinkAction<Object>(target, null) {
+        LinkAction linkAction = new LinkAction<Object>(target, Object.class) {
 
             public void actionPerformed(ActionEvent e) {
                 // TODO Auto-generated method stub

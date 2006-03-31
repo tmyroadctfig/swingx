@@ -14,7 +14,7 @@ import java.awt.event.ItemEvent;
  * 
  * @author Jeanette Winzenburg
  */
-public abstract class LinkAction <T> extends AbstractActionExt {
+public abstract class LinkAction<T> extends AbstractActionExt {
 
     /**
      * Key for the visited property value.
@@ -32,7 +32,7 @@ public abstract class LinkAction <T> extends AbstractActionExt {
      * Instantiates a LinkAction with null target. 
      * 
      */
-    public LinkAction(Class<?> targetClass) {
+    public LinkAction (Class<?> targetClass) {
         this(null, targetClass);
     }
     
