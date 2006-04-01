@@ -112,7 +112,7 @@ public class GlossPainter extends AbstractPainter {
                 component.getHeight() / 2.7, component.getWidth() * 2.0,
                 component.getHeight() * 2.0);
 
-            Shape gloss = ellipse;
+            Area gloss = new Area(ellipse);
             if (getPosition() == GlossPosition.TOP) {
                 Area area = new Area(new Rectangle(0, 0,
                     component.getWidth(), component.getHeight()));
@@ -120,6 +120,7 @@ public class GlossPainter extends AbstractPainter {
                 gloss = area;
             }
         
+            gloss.intersect(new Area(getClip()));
             g.setPaint(getPaint());
             g.fill(gloss);
         }
