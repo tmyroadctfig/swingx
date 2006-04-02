@@ -86,7 +86,7 @@ import org.jdesktop.swingx.util.Resize;
  * 
  * @author rbair
  */
-public abstract class AbstractPainter extends JavaBean implements Painter<JComponent> {
+public abstract class AbstractPainter<T extends JComponent> extends JavaBean implements Painter<T> {
     //------------------------------------------------- Saved Graphics State
     private boolean stateSaved = false;
     private Paint oldPaint;
@@ -706,7 +706,7 @@ public abstract class AbstractPainter extends JavaBean implements Painter<JCompo
     /**
      * @inheritDoc
      */
-    public void paint(Graphics2D g, JComponent component) {
+    public void paint(Graphics2D g, T component) {
         saveState(g);
         
         configureGraphics(g, component);
@@ -752,7 +752,7 @@ public abstract class AbstractPainter extends JavaBean implements Painter<JCompo
      * Utility method for configuring the given Graphics2D with the rendering hints,
      * composite, and clip
      */
-    private void configureGraphics(Graphics2D g, JComponent c) {
+    private void configureGraphics(Graphics2D g, T c) {
         Map<RenderingHints.Key,Object> hints = getRenderingHints();
         //merge these hints with the existing ones, otherwise I won't inherit
         //any of the hints from the Graphics2D
@@ -799,5 +799,5 @@ public abstract class AbstractPainter extends JavaBean implements Painter<JCompo
      * @param g The Graphics2D object in which to paint
      * @param component The JComponent that the Painter is delegate for.
      */
-    protected abstract void paintBackground(Graphics2D g, JComponent component);
+    protected abstract void paintBackground(Graphics2D g, T component);
 }
