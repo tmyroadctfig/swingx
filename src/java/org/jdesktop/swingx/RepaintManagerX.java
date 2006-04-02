@@ -49,7 +49,8 @@ public class RepaintManagerX extends RepaintManager implements TranslucentRepain
                 if (!parent.isVisible() || (parent.getPeer() == null)) {
                     return;
                 }
-                if (parent instanceof JXPanel && ((JXPanel)parent).getAlpha() < 1f) {
+                if (parent instanceof JXPanel && (((JXPanel)parent).getAlpha() < 1f ||
+                    !parent.isOpaque())) {
                     x += lastDeltaX;
                     y += lastDeltaY;
                     lastDeltaX = lastDeltaY = 0;
