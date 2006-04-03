@@ -43,16 +43,17 @@ import org.jdesktop.swingx.action.LinkModelAction;
  * A Renderer/Editor for "Links". <p>
  * 
  * The renderer is configured with a LinkAction<T>. 
- * Currently it's up to the developer to guarantee that the all
+ * It's mostly up to the developer to guarantee that the all
  * values which are passed into the getXXRendererComponent(...) are
- * compatible with T. <p>
+ * compatible with T. If it isn't the renderer will configure the
+ * action with a null target. <p>
  * 
  * It's recommended to not use the given Action anywhere else in code,
  * as it is updated on each getXXRendererComponent() call which might
  * lead to undesirable side-effects. <p>
  * 
- * internally uses JXHyperlink for both (Note: don't reuse the same
- * instance for both functions). <p>
+ * Internally uses JXHyperlink for both CellRenderer and CellEditor
+ * It's recommended to not reuse the same instance for both functions. <p>
  * 
  * PENDING: make renderer respect selected cell state.
  * 
@@ -85,9 +86,13 @@ public class LinkRenderer extends AbstractCellEditor implements
         linkButton.setAction(linkAction);
     }
     
-    // does nothing...
+    /** 
+     * does nothing... except showing the target.
+     * 
+     * @return a default LinkAction for showing the target.
+     */
     private LinkAction createDefaultLinkAction() {
-        return new LinkAction((Class) null) {
+        return new LinkAction<Object>(null) {
 
             public void actionPerformed(ActionEvent e) {
                 // TODO Auto-generated method stub
