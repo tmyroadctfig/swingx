@@ -63,8 +63,8 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Highligh.*");
          //      test.runInteractiveTests("interactive.*SortingFilter.*");
-           test.runInteractiveTests("interactive.*Expand.*");
-//             test.runInteractiveTests("interactive.*Edit.*");
+//           test.runInteractiveTests("interactive.*Expand.*");
+             test.runInteractiveTests("interactive.*Edit.*");
         } catch (Exception ex) {
 
         }
@@ -145,6 +145,40 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         frame.setVisible(true);
         
     }
+
+    /**
+     * visualize editing of the hierarchical column, both
+     * in a treeTable with a local version of TreeTableCellEditor
+     *  and a treeTable with the head version. <p>
+     *  
+     *  Both are loosing the icon... ehem.
+     *
+     */
+//    public void interactiveTreeTableEditingLocalVsHeadEditor() {
+//        final TreeTableModel model = new ComponentTreeTableModel(new JXFrame());
+//        final JXTreeTable table = new JXTreeTable(model);
+//        final JXTreeTable tableHead = new JXTreeTable(model);
+//        tableHead.setDefaultEditor(AbstractTreeTableModel.hierarchicalColumnClass,
+//                new TreeTableCellEditorHead(((JXTree) tableHead.getDefaultRenderer(AbstractTreeTableModel.hierarchicalColumnClass))));
+//        final JXFrame frame = wrapWithScrollingInFrame(table, tableHead, "Editing: compare treetable local and treetable head");
+//        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
+//
+//            public void actionPerformed(ActionEvent e) {
+//                ComponentOrientation current = frame.getComponentOrientation();
+//                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
+//                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+//                } else {
+//                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+//
+//                }
+//
+//            }
+//
+//        };
+//        addAction(frame, toggleComponentOrientation);
+//        frame.setVisible(true);
+//        
+//    }
 
     /**
      * Issue #248-swingx: update probs with insert into empty model when root
@@ -312,15 +346,15 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     }
 
     /**
-     * Issue #223-swingx: TreeTableEditor not bidi compliant.
-     *
-     * the textfield for editing is at the wrong position in RToL.
+     * Issue #223-swingx: Icons lost when editing.
+     *  Regression after starting to fix #224-swingx? 
+     *  
+     *  
      */
     public void interactiveTreeTableEditorIcons() {
         final TreeTableModel model = new ComponentTreeTableModel(new JXFrame());
         final JXTreeTable table = new JXTreeTable(model);
-        final JScrollPane pane = new JScrollPane(table);
-        JXFrame frame = wrapWithScrollingInFrame(pane, "Editor: icons showing");
+        JXFrame frame = wrapWithScrollingInFrame(table, "Editor: icons showing");
         frame.setVisible(true);
     }
 
