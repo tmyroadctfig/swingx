@@ -116,32 +116,16 @@ public class TreeTableCellEditor extends DefaultCellEditor {
         TreeCellRenderer tcr = tree.getCellRenderer();
         Component treeComponent = tcr.getTreeCellRendererComponent(tree, node,
                 isSelected, expanded, leaf, row, false);
-        if (treeComponent instanceof JLabel) {
+        if ((treeComponent instanceof JLabel) 
+                // adjust the offset to account for the icon - at least
+                // in LToR orientation. RToL is hard to tackle anyway...
+                && table.getComponentOrientation().isLeftToRight()) {
             JLabel label = (JLabel) treeComponent;
 
             Icon icon = label.getIcon();
-            //offset += icon.getIconWidth() + label.getIconTextGap();
+            offset += icon.getIconWidth() + label.getIconTextGap();
         }
         ((TreeTableTextField) getComponent()).init(offset, column, bounds.width, table);
-//         JW: the following fails if the renderer is not of type DTCR and
-//         with custom  renderers which might decide to base
-//         decisions about icons based on node type and/or selected state.
-//         TreeCellRenderer tcr = tree.getCellRenderer();
-//         if (tcr instanceof DefaultTreeCellRenderer) {
-//         Object node = tree.getPathForRow(row).getLastPathComponent();
-//         Icon icon;
-//         if (tree.getModel().isLeaf(node))
-//         icon = ((DefaultTreeCellRenderer) tcr).getLeafIcon();
-//         else if (tree.isExpanded(row))
-//         icon = ((DefaultTreeCellRenderer) tcr).getOpenIcon();
-//         else
-//         icon = ((DefaultTreeCellRenderer) tcr).getClosedIcon();
-//        
-//         if (icon != null) {
-//         offset += ((DefaultTreeCellRenderer) tcr).getIconTextGap() +
-//         icon.getIconWidth();
-//         }
-//         }
     }
 
     /**
@@ -171,6 +155,7 @@ public class TreeTableCellEditor extends DefaultCellEditor {
             this.column = column;
             this.width = width;
             this.table = table;
+            setComponentOrientation(table.getComponentOrientation());
         }
         
         private int offset; // changed to package private instead of public
