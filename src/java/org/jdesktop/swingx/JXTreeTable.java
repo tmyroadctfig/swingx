@@ -756,6 +756,28 @@ public class JXTreeTable extends JXTable {
     }
 
     /**
+     * Makes sure all the path components in path are expanded (except
+     * for the last path component) and scrolls so that the 
+     * node identified by the path is displayed. Only works when this
+     * <code>JTree</code> is contained in a <code>JScrollPane</code>.
+     * 
+     * (doc copied from JTree)
+     * 
+     * PENDING: JW - where exactly do we want to scroll? Here: the scroll
+     * is in vertical direction only. Might need to show the tree column?
+     * 
+     * @param path  the <code>TreePath</code> identifying the node to
+     *          bring into view
+     */
+    public void scrollPathToVisible(TreePath path) {
+        if (path == null) return;
+        renderer.makeVisible(path);
+        int row = getRowForPath(path);
+        scrollRowToVisible(row);
+    }
+
+    
+    /**
      * Collapses the row in the treetable. If the specified row index is
      * not valid, this method will have no effect.
      */
@@ -771,6 +793,7 @@ public class JXTreeTable extends JXTable {
         renderer.expandRow(row);
     }
 
+    
     /**
      * Determines whether or not the root node from the TreeModel is visible.
      *

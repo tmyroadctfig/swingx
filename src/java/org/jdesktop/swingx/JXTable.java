@@ -1952,8 +1952,61 @@ public class JXTable extends JTable {
         }
 
     }
-//-------------------------------- sizing support
+//-------------------------------- sizing/scrolling support
+
+    /**
+     * Scrolls vertically to make the given row visible.
+     * This might not have any effect if the table isn't contained
+     * in a JViewport. <p>
+     * 
+     * Note: this method has no precondition as it internally uses
+     * getCellRect which is lenient to off-range coordinates.
+     * 
+     * @param row the view row index of the cell
+     */
+    public void scrollRowToVisible(int row) {
+        Rectangle cellRect = getCellRect(row, 0, false);
+        Rectangle visibleRect = getVisibleRect();
+        cellRect.x = visibleRect.x;
+        cellRect.width = visibleRect.width;
+        scrollRectToVisible(cellRect);
+    }
+
+    /**
+     * Scrolls horizontally to make the given column visible.
+     * This might not have any effect if the table isn't contained
+     * in a JViewport. <p>
+     * 
+     * Note: this method has no precondition as it internally uses
+     * getCellRect which is lenient to off-range coordinates.
+     * 
+     * @param column the view column index of the cell
+     */
+    public void scrollColumnToVisible(int column) {
+        Rectangle cellRect = getCellRect(0, column, false);
+        Rectangle visibleRect = getVisibleRect();
+        cellRect.y = visibleRect.y;
+        cellRect.height = visibleRect.height;
+        scrollRectToVisible(cellRect);
+    }
     
+
+    /**
+     * Scrolls to make the cell at row and column visible.
+     * This might not have any effect if the table isn't contained
+     * in a JViewport.<p>
+     * 
+     * Note: this method has no precondition as it internally uses
+     * getCellRect which is lenient to off-range coordinates.
+     * 
+     * @param row the view row index of the cell
+     * @param column the view column index of the cell
+     */
+    public void scrollCellToVisible(int row, int column) {
+        Rectangle cellRect = getCellRect(row, column, false);
+        scrollRectToVisible(cellRect);
+    }
+
     /** ? */
     public void setVisibleRowCount(int visibleRowCount) {
         this.visibleRowCount = visibleRowCount;

@@ -71,7 +71,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     }
 
     /**
-     * issue #??-swingx: expose scrollPathToVisible in JXTreeTable.
+     * issue #296-swingx: expose scrollPathToVisible in JXTreeTable.
      * 
      * Treetable should behave exactly like Tree - so
      * simply passing through to the hierarchical renderer is not quite
@@ -83,14 +83,16 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         final JXFrame container = new JXFrame();
         final ComponentTreeTableModel model = new ComponentTreeTableModel(container);
         final JXTreeTable table = new JXTreeTable(model);
+        table.setColumnControlVisible(true);
         final JXTree tree = new JXTree(model);
         Action action = new AbstractAction("path visible") {
 
             public void actionPerformed(ActionEvent e) {
                 TreePath path = model.getPathToRoot(container.getContentPane());
-                ((JTree) table.getDefaultRenderer(
-                        AbstractTreeTableModel.hierarchicalColumnClass))
-                        .scrollPathToVisible(path);
+                table.scrollPathToVisible(path);
+//                ((JTree) table.getDefaultRenderer(
+//                        AbstractTreeTableModel.hierarchicalColumnClass))
+//                        .scrollPathToVisible(path);
                 
                 tree.scrollPathToVisible(path);
                 
