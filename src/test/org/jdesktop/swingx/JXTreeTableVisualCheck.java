@@ -64,10 +64,43 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //            test.runInteractiveTests("interactive.*Highligh.*");
          //      test.runInteractiveTests("interactive.*SortingFilter.*");
 //           test.runInteractiveTests("interactive.*Expand.*");
-             test.runInteractiveTests("interactive.*Edit.*");
+             test.runInteractiveTests("interactive.*Scroll.*");
         } catch (Exception ex) {
 
         }
+    }
+
+    /**
+     * issue #??-swingx: expose scrollPathToVisible in JXTreeTable.
+     * 
+     * Treetable should behave exactly like Tree - so
+     * simply passing through to the hierarchical renderer is not quite
+     * enough - need to force a scrollTo after expanding.
+     *
+     */
+    public void interactiveScrollPathToVisible() {
+        
+        final JXFrame container = new JXFrame();
+        final ComponentTreeTableModel model = new ComponentTreeTableModel(container);
+        final JXTreeTable table = new JXTreeTable(model);
+        final JXTree tree = new JXTree(model);
+        Action action = new AbstractAction("path visible") {
+
+            public void actionPerformed(ActionEvent e) {
+                TreePath path = model.getPathToRoot(container.getContentPane());
+                ((JTree) table.getDefaultRenderer(
+                        AbstractTreeTableModel.hierarchicalColumnClass))
+                        .scrollPathToVisible(path);
+                
+                tree.scrollPathToVisible(path);
+                
+            }
+            
+        };
+        JXFrame frame = wrapWithScrollingInFrame(table, tree, "compare scrollPathtovisible");
+        addAction(frame, action);
+        frame.setVisible(true);
+
     }
 
     /**

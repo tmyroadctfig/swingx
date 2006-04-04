@@ -164,7 +164,13 @@ public class ComponentTreeTableModel extends AbstractTreeTableModel {
         
     }
 
-    private TreePath getPathToRoot(Component node) {
+    /**
+     * exposed for test convenience.
+     * 
+     * @param node
+     * @return
+     */
+    public TreePath getPathToRoot(Component node) {
         return new TreePath(getPathToRoot(node, 0));
     }
 
