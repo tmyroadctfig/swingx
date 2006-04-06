@@ -168,13 +168,13 @@ public class AutoCompleteDocument extends PlainDocument {
     }
     
     /**
-     * Returns true if <code>string1</code> starts with <code>string2</code> (ignoring case).
-     * @param string1 the first string
-     * @param string2 the second string
-     * @return true if <code>string1</code> starts with <code>string2</code>; false otherwise
+     * Returns true if <code>base</code> starts with <code>prefix</code> (ignoring case).
+     * @param base the string to be checked
+     * @param prefix the prefix to check for
+     * @return true if <code>base</code> starts with <code>prefix</code>; false otherwise
      */
-    private boolean startsWithIgnoreCase(String string1, String string2) {
-        // this could be optimized, but anyway it doesn't seem to be a performance killer
-        return string1.toUpperCase().startsWith(string2.toUpperCase());
+    private boolean startsWithIgnoreCase(String base, String prefix) {
+        if (base.length() < prefix.length()) return false;
+        return base.regionMatches(true, 0, prefix, 0, prefix.length());
     }
 }
