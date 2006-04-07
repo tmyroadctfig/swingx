@@ -23,6 +23,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.table.TableCellRenderer;
@@ -64,7 +65,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //            test.runInteractiveTests("interactive.*Highligh.*");
          //      test.runInteractiveTests("interactive.*SortingFilter.*");
 //           test.runInteractiveTests("interactive.*Expand.*");
-             test.runInteractiveTests("interactive.*Scroll.*");
+             test.runInteractiveTests("interactive.*ToolTip.*");
         } catch (Exception ex) {
 
         }
@@ -488,12 +489,18 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      * Issue #226: no per-cell tooltips in TreeColumn.
      */
     public void interactiveTestToolTips() {
-        JXTreeTable tree = new JXTreeTable(treeTableModel);
+        JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         // JW: don't use this idiom - Stackoverflow...
         // multiple delegation - need to solve or discourage
-        tree.setTreeCellRenderer(createRenderer());
-        tree.setDefaultRenderer(Object.class, createTableRenderer(tree.getDefaultRenderer(Object.class)));
-        JFrame frame = wrapWithScrollingInFrame(tree, "tooltips");
+        treeTable.setTreeCellRenderer(createRenderer());
+        treeTable.setDefaultRenderer(Object.class, createTableRenderer(treeTable.getDefaultRenderer(Object.class)));
+        
+        JXTree tree = new JXTree(treeTableModel);
+        tree.setCellRenderer(createRenderer());
+        // I'm registered to do tool tips so we can draw tips for the renderers
+        ToolTipManager toolTipManager = ToolTipManager.sharedInstance();
+        toolTipManager.registerComponent(tree);
+        JXFrame frame = wrapWithScrollingInFrame(treeTable, tree, "tooltips");
         frame.setVisible(true);  
     }
 

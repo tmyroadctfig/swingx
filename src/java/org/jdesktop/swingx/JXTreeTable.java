@@ -36,6 +36,7 @@ import java.util.EventObject;
 
 import javax.swing.ActionMap;
 import javax.swing.Icon;
+import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
@@ -660,7 +661,8 @@ public class JXTreeTable extends JXTable {
     public String getToolTipText(MouseEvent event) {
         int column = columnAtPoint(event.getPoint());
         if (isHierarchical(column)) {
-            return renderer.getToolTipText(event);
+            int row = rowAtPoint(event.getPoint());
+            return renderer.getToolTipText(event, row, column);
         }
         return super.getToolTipText(event);
     }
@@ -1498,6 +1500,60 @@ public class JXTreeTable extends JXTable {
                 /** @todo Support truncated text directly in DefaultTreeCellRenderer. */
             setOverwriteRendererIcons(true);
             setCellRenderer(new ClippedTreeCellRenderer());
+        }
+
+        /**
+         * Hack around #297-swingx: tooltips shown at wrong row.
+         * 
+         * The problem is that - due to much tricksery when rendering
+         * the tree - the given coordinates are rather useless. As a 
+         * consequence, super maps to wrong coordinates. This takes
+         * over completely.
+         * 
+         * PENDING: bidi?
+         * 
+         * @param event the mouseEvent in treetable coordinates
+         * @param row the view row index
+         * @param column the view column index
+         * @return the tooltip as appropriate for the given row
+         */
+        private String getToolTipText(MouseEvent event, int row, int column) {
+            if (row < 0) return null;
+            TreeCellRenderer renderer = getCellRenderer();
+            TreePath     path = getPathForRow(row);
+            Object       lastPath = path.getLastPathComponent();
+            Component    rComponent = renderer.getTreeCellRendererComponent
+                (this, lastPath, isRowSelected(row),
+                 isExpanded(row), getModel().isLeaf(lastPath), row,
+                 true);
+
+            if(rComponent instanceof JComponent) {
+                Rectangle       pathBounds = getPathBounds(path);
+                Rectangle cellRect = treeTable.getCellRect(row, column, false);
+                // JW: what we are after
+                // is the offset into the hierarchical column 
+                // then intersect this with the pathbounds   
+                Point mousePoint = event.getPoint();
+                // translate to coordinates relative to cell
+                mousePoint.translate(-cellRect.x, -cellRect.y);
+                // translate horizontally to 
+                mousePoint.translate(-pathBounds.x, 0);
+                // show tooltip only if over renderer?
+//                if (mousePoint.x < 0) return null;
+//                p.translate(-pathBounds.x, -pathBounds.y);
+                MouseEvent newEvent = new MouseEvent(rComponent, event.getID(),
+                      event.getWhen(),
+                      event.getModifiers(),
+                      mousePoint.x, 
+                      mousePoint.y,
+//                    p.x, p.y, 
+                      event.getClickCount(),
+                      event.isPopupTrigger());
+                
+                return ((JComponent)rComponent).getToolTipText(newEvent);
+            }
+
+            return null;
         }
 
         /**
