@@ -443,11 +443,17 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
     /**
-     * test if renderer properties are updated on LF change.
+     * test if renderer properties are updated on LF change. <p>
      * Note: this can be done examplary only. Here: we use the 
      * font of a rendererComponent returned by a LinkRenderer for
      * comparison. There's nothing to test if the font are equal
-     * in System and crossplattform LF.
+     * in System and crossplattform LF. <p>
+     * 
+     * There are spurious problems when toggling UI (since when?) 
+     * with LinkRenderer
+     * "no ComponentUI class for: org.jdesktop.swingx.LinkRenderer$1"
+     * that's the inner class JXHyperlink which overrides updateUI.
+     * 
      */
     public void testUpdateRendererOnLFChange() {
         LinkRenderer comparison = new LinkRenderer();

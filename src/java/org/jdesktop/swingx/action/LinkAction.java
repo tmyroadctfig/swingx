@@ -25,16 +25,13 @@ public abstract class LinkAction<T> extends AbstractActionExt {
      */
     protected T target;
 
-    protected Class<?> targetClass;
-
     
     /**
      * Instantiates a LinkAction with null target. 
      * 
      */
-    public LinkAction (Class<?> targetClass) {
-        this(null, targetClass);
-    }
+    public LinkAction () {
+        this(null);    }
     
     /**
      * Instantiates a LinkAction with a target of type targetClass. 
@@ -42,13 +39,8 @@ public abstract class LinkAction<T> extends AbstractActionExt {
      * {@link LinkAction#installTarget()}
      * 
      * @param target the target this action should act on.
-     * @param targetClass the type of target
-     * @throws IllegalArgumentException if !isTargetable(target)
      */
-    public LinkAction(T target, Class<?> targetClass) {
-       this.targetClass = targetClass; 
-       if (!isTargetable(target)) 
-           throw new IllegalArgumentException("the target class is expected to be " + targetClass);
+    public LinkAction(T target) {
        setTarget(target);
     }
 
@@ -86,25 +78,6 @@ public abstract class LinkAction<T> extends AbstractActionExt {
         installTarget();
         firePropertyChange("target", oldTarget, getTarget());
         
-    }
-
-    /**
-     * decides if the given target is acceptable for setTarget.
-     * <p>
-     *  
-     *  target == null is acceptable for all types.
-     *  targetClass == null is the same as Object.class
-     *  
-     * @param target the target to set.
-     * @return true if setTarget can cope with the object, 
-     *  false otherwise.
-     * 
-     */
-    public  boolean isTargetable(Object target) {
-        // we accept everything
-        if (targetClass == null) return true;
-        if (target == null) return true;
-        return targetClass.isAssignableFrom(target.getClass());
     }
 
     /**

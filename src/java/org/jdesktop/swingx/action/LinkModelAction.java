@@ -59,8 +59,7 @@ public class LinkModelAction<T extends LinkModel> extends LinkAction<T> {
     }
     
     public LinkModelAction(T target, ActionListener visitingDelegate) {
-        // JW: hardcoded LinkModel.class? Is this flexible enough for subclasses ??
-        super(target, LinkModel.class);
+        super(target);
         setVisitingDelegate(visitingDelegate);
     }
     

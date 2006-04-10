@@ -942,7 +942,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             }
              
         };
-        table.setDefaultRenderer(LinkModel.class, new LinkRenderer(action));
+        table.setDefaultRenderer(LinkModel.class, new LinkRenderer(action, LinkModel.class));
     }
 
     public void interactiveTestEmptyTableSizing() {

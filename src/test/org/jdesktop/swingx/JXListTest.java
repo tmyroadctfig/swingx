@@ -389,8 +389,8 @@ public class JXListTest extends InteractiveTestCase {
      */
     public void interactiveTestRolloverHighlightAndLink() {
         JXList list = new JXList(createListModelWithLinks());
-        LinkModelAction action = new LinkModelAction<LinkModel>(new EditorPaneLinkVisitor());
-        list.setCellRenderer(new LinkRenderer(action));
+        LinkModelAction action = new LinkModelAction(new EditorPaneLinkVisitor());
+        list.setCellRenderer(new LinkRenderer(action, LinkModel.class));
         list.setRolloverEnabled(true);
         Highlighter conditional = new ConditionalHighlighter(
                 new Color(0xF0, 0xF0, 0xE0), null, -1, -1) {

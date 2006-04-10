@@ -21,50 +21,7 @@ public class LinkActionTest extends TestCase {
     
     private PropertyChangeReport report;
 
-    /**
-     * test exception as documented.
-     *
-     */
-    public void testConstructorSubclass() {
-        try {
-            LinkAction linkAction = new LinkAction(new Integer(10), Number.class) {
-    
-                public void actionPerformed(ActionEvent e) {
-                    // TODO Auto-generated method stub
-                    
-                }
-                
-            };
-        } catch (IllegalArgumentException e) {
-            fail("instantiate LinkAction with subtypes of targetclass must not throw any exception " +
-                e);
-        } 
-        
-    }
 
-    /**
-     * test exception as documented.
-     *
-     */
-    public void testConstructorException() {
-        try {
-            LinkAction linkAction = new LinkAction<Number> (new Integer(10), Number.class) {
-    
-                public void actionPerformed(ActionEvent e) {
-                    // TODO Auto-generated method stub
-                    
-                }
-                
-            };
-            fail("instantiate LinkAction with non-matching target and targetClass must throw" +
-                        "IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            // this is what to expect
-        } catch (Exception e) {
-            fail("unexpected exception type - " + e);
-        }
-        
-    }
     /**
      * test if auto-installed visited property is respected.
      *
@@ -72,7 +29,7 @@ public class LinkActionTest extends TestCase {
     public void testConstructorsAndCustomTargetInstall() {
         Object target = new Object();
         final boolean visitedIsTrue = true;
-        LinkAction linkAction = new LinkAction<Object>(target, Object.class) {
+        LinkAction linkAction = new LinkAction<Object>(target) {
 
             public void actionPerformed(ActionEvent e) {
                 // TODO Auto-generated method stub
@@ -98,7 +55,7 @@ public class LinkActionTest extends TestCase {
     public void testConstructors() {
         Object target = new Object();
         boolean visitedIsTrue = true;
-        LinkAction linkAction = new LinkAction(target, null) {
+        LinkAction linkAction = new LinkAction(target) {
 
             public void actionPerformed(ActionEvent e) {
                 // TODO Auto-generated method stub

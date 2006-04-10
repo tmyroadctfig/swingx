@@ -67,39 +67,88 @@ public class LinkRenderer extends AbstractCellEditor implements
     private JXHyperlink linkButton;
 
     private LinkAction<Object> linkAction;
+    protected Class<?> targetClass;
 
+    /**
+     * Instantiate a LinkRenderer with null LinkAction and null
+     * targetClass.
+     *
+     */
     public LinkRenderer() {
-        this(null);
+        this(null, null);
     }
 
-    public LinkRenderer(LinkAction linkAction) {
+    /**
+     * Instantiate a LinkRenderer with the LinkAction to use with
+     * target values. 
+     * 
+     * @param linkAction the action that acts on values.
+     */
+//    public LinkRenderer(LinkAction linkAction) {
+//        this(linkAction, null);
+//    }
+    
+    /**
+     * Instantiate a LinkRenderer with a LinkAction to use with
+     * target values and the type of values the action can cope with. <p>
+     * 
+     * It's up to developers to take care of matching types.
+     * 
+     * @param linkAction the action that acts on values.
+     * @param targetClass the type of values the action can handle.
+     */
+    public LinkRenderer(LinkAction linkAction, Class targetClass) {
         linkButton = createHyperlink();
         linkButton.addActionListener(createEditorActionListener());
+        setTargetClass(targetClass);
         setLinkAction(linkAction);
     }
     
+    /**
+     * Sets the class the action is supposed to handle. <p>
+     * 
+     * PENDING: make sense to set independently of LinkAction?
+     * 
+     * @param targetClass the type of values the action can handle.
+     */
+    public void setTargetClass(Class targetClass) {
+        this.targetClass = targetClass;
+    }
+
+    /**
+     * Sets the LinkAction for handling the values. <p>
+     * 
+     * PENDING: in the general case this is not independent of the
+     * targetClass. Need api to set them combined?
+     * 
+     * @param linkAction
+     */
     public void setLinkAction(LinkAction linkAction) {
         if (linkAction == null) {
             linkAction = createDefaultLinkAction();
         }
         this.linkAction = linkAction;
         linkButton.setAction(linkAction);
+        
     }
     
-    /** 
-     * does nothing... except showing the target.
+    /**
+     * decides if the given target is acceptable for setTarget.
+     * <p>
+     *  
+     *  target == null is acceptable for all types.
+     *  targetClass == null is the same as Object.class
+     *  
+     * @param target the target to set.
+     * @return true if setTarget can cope with the object, 
+     *  false otherwise.
      * 
-     * @return a default LinkAction for showing the target.
      */
-    private LinkAction createDefaultLinkAction() {
-        return new LinkAction<Object>(null) {
-
-            public void actionPerformed(ActionEvent e) {
-                // TODO Auto-generated method stub
-                
-            }
-            
-        };
+    public  boolean isTargetable(Object target) {
+        // we accept everything
+        if (targetClass == null) return true;
+        if (target == null) return true;
+        return targetClass.isAssignableFrom(target.getClass());
     }
 
 
@@ -119,10 +168,30 @@ public class LinkRenderer extends AbstractCellEditor implements
         };
     }
 
+    /** 
+     * does nothing... except showing the target.
+     * 
+     * @return a default LinkAction for showing the target.
+     */
+    private LinkAction createDefaultLinkAction() {
+        return new LinkAction<Object>(null) {
+
+            public void actionPerformed(ActionEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+        };
+    }
+
+//----------------------- Implement RolloverRenderer
+    
     public boolean isRolloverEnabled() {
         return true;
     }
 
+//---------------------- Implement ListCellRenderer
+    
     public Component getListCellRendererComponent(JList list, Object value, 
             int index, boolean isSelected, boolean cellHasFocus) {
         linkAction.setTarget(value);
@@ -156,7 +225,7 @@ public class LinkRenderer extends AbstractCellEditor implements
     
     public Component getTableCellRendererComponent(JTable table, Object value,
             boolean isSelected, boolean hasFocus, int row, int column) {
-        if ((value != null) && !linkAction.isTargetable(value)) {
+        if ((value != null) && !isTargetable(value)) {
             value = null;
         }
         linkAction.setTarget(value);
