@@ -507,20 +507,20 @@ public class JXTable extends JTable {
     public static class LinkController implements PropertyChangeListener {
 
         private Cursor oldCursor;
-        private JXTable table;
+        private JTable table;
 
         public void propertyChange(PropertyChangeEvent evt) {
             if (RolloverProducer.ROLLOVER_KEY.equals(evt.getPropertyName())) {
-               rollover((JXTable) evt.getSource(), (Point) evt
+               rollover((JTable) evt.getSource(), (Point) evt
                             .getOldValue(), (Point) evt.getNewValue());
             } 
             else if (RolloverProducer.CLICKED_KEY.equals(evt.getPropertyName())) {
-                click((JXTable) evt.getSource(), (Point) evt.getOldValue(),
+                click((JTable) evt.getSource(), (Point) evt.getOldValue(),
                         (Point) evt.getNewValue());
             }
         }
 
-        public void install(JXTable table) {
+        public void install(JTable table) {
           release();  
           this.table = table;
           table.addPropertyChangeListener(RolloverProducer.CLICKED_KEY, this);
@@ -538,7 +538,7 @@ public class JXTable extends JTable {
 
 //    --------------------------- JTable rollover
         
-        private void rollover(JXTable table, Point oldLocation, Point newLocation) {
+        private void rollover(JTable table, Point oldLocation, Point newLocation) {
             if (oldLocation != null) {
                 Rectangle r = table.getCellRect(oldLocation.y, oldLocation.x, false);
                 r.x = 0;
@@ -551,11 +551,11 @@ public class JXTable extends JTable {
                 r.width = table.getWidth();
                 table.repaint(r);
             }
-            setLinkCursor(table, newLocation);
+            setRolloverCursor(table, newLocation);
         }
 
-        private void click(JXTable list, Point oldLocation, Point newLocation) {
-            if (!isLinkColumn(list, newLocation)) return;
+        private void click(JTable list, Point oldLocation, Point newLocation) {
+            if (!isRolloverCell(list, newLocation)) return;
             if (list.isCellEditable(newLocation.y, newLocation.x)) return;
             TableCellRenderer renderer = list.getCellRenderer(newLocation.y, newLocation.x);
             Component comp = list.prepareRenderer(renderer, newLocation.y,  newLocation.x);
@@ -565,8 +565,8 @@ public class JXTable extends JTable {
             }
         }
 
-        private void setLinkCursor(JXTable table, Point location) {
-            if (isLinkColumn(table, location)) {
+        private void setRolloverCursor(JTable table, Point location) {
+            if (isRolloverCell(table, location)) {
                 if (oldCursor == null) {
                     oldCursor = table.getCursor();
                     table.setCursor(Cursor
@@ -580,7 +580,7 @@ public class JXTable extends JTable {
             }
 
         }
-        private boolean isLinkColumn(JXTable table, Point location) {
+        private boolean isRolloverCell(JTable table, Point location) {
             if (location == null || location.x < 0 || location.y < 0) return false;
             TableCellRenderer renderer = table.getCellRenderer(location.y, location.x);
             return (renderer instanceof RolloverRenderer) 

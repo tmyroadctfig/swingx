@@ -45,7 +45,8 @@ import org.jdesktop.swingx.action.LinkModelAction;
  * The renderer is configured with a LinkAction<T>. 
  * It's mostly up to the developer to guarantee that the all
  * values which are passed into the getXXRendererComponent(...) are
- * compatible with T. If it isn't the renderer will configure the
+ * compatible with T: she can provide a runtime class to check against.
+ * If it isn't the renderer will configure the
  * action with a null target. <p>
  * 
  * It's recommended to not use the given Action anywhere else in code,
@@ -84,9 +85,9 @@ public class LinkRenderer extends AbstractCellEditor implements
      * 
      * @param linkAction the action that acts on values.
      */
-//    public LinkRenderer(LinkAction linkAction) {
-//        this(linkAction, null);
-//    }
+    public LinkRenderer(LinkAction linkAction) {
+        this(linkAction, null);
+    }
     
     /**
      * Instantiate a LinkRenderer with a LinkAction to use with
@@ -100,8 +101,7 @@ public class LinkRenderer extends AbstractCellEditor implements
     public LinkRenderer(LinkAction linkAction, Class targetClass) {
         linkButton = createHyperlink();
         linkButton.addActionListener(createEditorActionListener());
-        setTargetClass(targetClass);
-        setLinkAction(linkAction);
+        setLinkAction(linkAction, targetClass);
     }
     
     /**
@@ -118,20 +118,33 @@ public class LinkRenderer extends AbstractCellEditor implements
     /**
      * Sets the LinkAction for handling the values. <p>
      * 
+     * The action is assumed to be able to cope with any type, that is
+     * this method is equivalent to setLinkAction(linkAction, null).
+     * 
+     * @param linkAction
+     */
+    public void setLinkAction(LinkAction linkAction) {
+        setLinkAction(linkAction, null);
+    }
+    
+    /**
+     * Sets the LinkAction for handling the values and the 
+     * class the action can handle. <p>
+     * 
      * PENDING: in the general case this is not independent of the
      * targetClass. Need api to set them combined?
      * 
      * @param linkAction
      */
-    public void setLinkAction(LinkAction linkAction) {
+    public void setLinkAction(LinkAction linkAction, Class targetClass) {
         if (linkAction == null) {
             linkAction = createDefaultLinkAction();
         }
+        setTargetClass(targetClass); 
         this.linkAction = linkAction;
         linkButton.setAction(linkAction);
         
     }
-    
     /**
      * decides if the given target is acceptable for setTarget.
      * <p>
@@ -153,9 +166,12 @@ public class LinkRenderer extends AbstractCellEditor implements
 
 
     /**
-     * @return
+     * creates and returns the hyperlink component used for rendering
+     * the value and activating the action on the target value.
+     * 
+     * @return the hyperlink renderer component.
      */
-    private JXHyperlink createHyperlink() {
+    protected JXHyperlink createHyperlink() {
         return new JXHyperlink() {
 
             @Override
@@ -169,11 +185,11 @@ public class LinkRenderer extends AbstractCellEditor implements
     }
 
     /** 
-     * does nothing... except showing the target.
+     * default action - does nothing... except showing the target.
      * 
      * @return a default LinkAction for showing the target.
      */
-    private LinkAction createDefaultLinkAction() {
+    protected LinkAction createDefaultLinkAction() {
         return new LinkAction<Object>(null) {
 
             public void actionPerformed(ActionEvent e) {

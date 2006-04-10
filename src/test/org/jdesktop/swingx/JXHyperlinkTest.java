@@ -11,8 +11,6 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -29,8 +27,11 @@ import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.action.LinkAction;
 import org.jdesktop.swingx.action.LinkModelAction;
+import org.jdesktop.swingx.decorator.Filter;
+import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
+import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
 import org.jdesktop.swingx.util.PropertyChangeReport;
 
@@ -51,9 +52,9 @@ public class JXHyperlinkTest extends InteractiveTestCase {
 //      setSystemLF(true);
       JXHyperlinkTest test = new JXHyperlinkTest();
       try {
-          test.runInteractiveTests();
+//          test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*Table.*");
-//          test.runInteractiveTests("interactive.*List.*");
+          test.runInteractiveTests("interactive.*List.*");
 //          test.runInteractiveTests("interactive.*Simple.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
@@ -366,6 +367,11 @@ public class JXHyperlinkTest extends InteractiveTestCase {
         
         JXList list = new JXList(createPlayerModel());
         list.setRolloverEnabled(true);
+        // descending order - check if the action is performed for the 
+        // correct value
+        list.setFilterEnabled(true);
+        FilterPipeline pipeline = new FilterPipeline(new Filter[] { new ShuttleSorter(0, false)});
+        list.setFilters(pipeline);
         list.setCellRenderer(new LinkRenderer(linkAction, Player.class));
         JFrame frame = wrapWithScrollingInFrame(list, "show simple bean link renderer in list");
         frame.setVisible(true);

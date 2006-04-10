@@ -322,20 +322,20 @@ public class JXList extends JList {
     public static class LinkController implements PropertyChangeListener {
 
         private Cursor oldCursor;
-        private JXList list;
+        private JList list;
         
         public void propertyChange(PropertyChangeEvent evt) {
             if (RolloverProducer.ROLLOVER_KEY.equals(evt.getPropertyName())) {
-                   rollover((JXList) evt.getSource(), (Point) evt.getOldValue(),
+                   rollover((JList) evt.getSource(), (Point) evt.getOldValue(),
                             (Point) evt.getOldValue());
             } else if (RolloverProducer.CLICKED_KEY.equals(evt.getPropertyName())) {
-                    click((JXList) evt.getSource(), (Point) evt.getOldValue(),
+                    click((JList) evt.getSource(), (Point) evt.getOldValue(),
                             (Point) evt.getNewValue());
             }
         }
 
 
-        public void install(JXList list) {
+        public void install(JList list) {
             release();  
             this.list = list;
             list.addPropertyChangeListener(RolloverProducer.CLICKED_KEY, this);
@@ -354,17 +354,18 @@ public class JXList extends JList {
 
 //    --------------------------------- JList rollover
         
-        private void rollover(JXList list, Point oldLocation, Point newLocation) {
-            setLinkCursor(list, newLocation);
+        private void rollover(JList list, Point oldLocation, Point newLocation) {
+            setRolloverCursor(list, newLocation);
             // JW: partial repaints incomplete
             list.repaint();
         }
 
-        private void click(JXList list, Point oldLocation, Point newLocation) {
-            if (!isLinkElement(list, newLocation)) return;
+        private void click(JList list, Point oldLocation, Point newLocation) {
+            if (!isRolloverCell(list, newLocation)) return;
             ListCellRenderer renderer = list.getCellRenderer();
             // PENDING: JW - don't ask the model, ask the list!
-            Component comp = renderer.getListCellRendererComponent(list, list.getElementAt(newLocation.y), newLocation.y, false, true);
+            Object element = list.getModel().getElementAt(newLocation.y);
+            Component comp = renderer.getListCellRendererComponent(list, element, newLocation.y, false, true);
             if (comp instanceof AbstractButton) {
                 // this is fishy - needs to be removed as soon as JList is editable
                 ((AbstractButton) comp).doClick();
@@ -377,8 +378,8 @@ public class JXList extends JList {
          * @param list
          * @param location
          */
-        private void setLinkCursor(JXList list, Point location) {
-            if (isLinkElement(list, location)) {
+        private void setRolloverCursor(JList list, Point location) {
+            if (isRolloverCell(list, location)) {
                     oldCursor = list.getCursor();
                     list.setCursor(Cursor
                             .getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -388,7 +389,7 @@ public class JXList extends JList {
             }
 
         }
-        private boolean isLinkElement(JXList list, Point location) {
+        private boolean isRolloverCell(JList list, Point location) {
             if (location == null || location.y < 0) return false;
             ListCellRenderer renderer = list.getCellRenderer();
             return (renderer instanceof RolloverRenderer)
@@ -433,7 +434,8 @@ public class JXList extends JList {
                     int leadRow = list.getLeadSelectionIndex();
                     if (leadRow < 0 ) return null;
                     ListCellRenderer renderer = list.getCellRenderer();
-                    Component rendererComp = renderer.getListCellRendererComponent(list, list.getElementAt(leadRow), leadRow, false, true);
+                    Object element = list.getModel().getElementAt(leadRow);
+                    Component rendererComp = renderer.getListCellRendererComponent(list, element, leadRow, false, true);
                     return rendererComp instanceof AbstractButton ? (AbstractButton) rendererComp : null;
                 }
                 
