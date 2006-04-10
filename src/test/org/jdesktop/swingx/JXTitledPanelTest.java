@@ -75,12 +75,13 @@ public class JXTitledPanelTest extends InteractiveTestCase {
         Font deriveFont = panel.getTitleFont().deriveFont(27f);
         panel.setTitleFont(deriveFont);
         assertTrue("panel must notify on titleFont change", report.hasEvents("titleFont"));
-        panel.setTitleForeground(Color.black);
-        assertTrue("panel must notify on titleForeground change", report.hasEvents("titleForeground"));
-        panel.setTitleDarkBackground(Color.black);
-        assertTrue("panel must notify on titleDarkBackground change", report.hasEvents("titleDarkBackground"));
-        panel.setTitleLightBackground(Color.black);
-        assertTrue("panel must notify on titleLightBackground change", report.hasEvents("titleLightBackground"));
+        fail("JXTitledPanelText must be updated to new api");
+//        panel.setTitleForeground(Color.black);
+//        assertTrue("panel must notify on titleForeground change", report.hasEvents("titleForeground"));
+//        panel.setTitleDarkBackground(Color.black);
+//        assertTrue("panel must notify on titleDarkBackground change", report.hasEvents("titleDarkBackground"));
+//        panel.setTitleLightBackground(Color.black);
+//        assertTrue("panel must notify on titleLightBackground change", report.hasEvents("titleLightBackground"));
         
     }
     
@@ -195,8 +196,10 @@ public class JXTitledPanelTest extends InteractiveTestCase {
         panel.getContentContainer().setLayout(new BoxLayout(panel.getContentContainer(), BoxLayout.Y_AXIS));
         Action toggleLight = new AbstractAction("toggle lightBackground") {
             public void actionPerformed(ActionEvent e) {
-                Color oldFont = panel.getTitleLightBackground();
-                panel.setTitleLightBackground(oldFont.darker());
+                LOG.info("JXTitledPanelText must be updated to new api");
+
+//                Color oldFont = panel.getTitleLightBackground();
+//                panel.setTitleLightBackground(oldFont.darker());
                 
             }
             
@@ -206,8 +209,9 @@ public class JXTitledPanelTest extends InteractiveTestCase {
         panel.getContentContainer().setLayout(new BoxLayout(panel.getContentContainer(), BoxLayout.Y_AXIS));
         Action toggleDark = new AbstractAction("toggle darkbackground") {
             public void actionPerformed(ActionEvent e) {
-                Color oldFont = panel.getTitleDarkBackground();
-                panel.setTitleDarkBackground(oldFont.darker());
+                LOG.info("JXTitledPanelText must be updated to new api");
+//                Color oldFont = panel.getTitleDarkBackground();
+//                panel.setTitleDarkBackground(oldFont.darker());
                 
             }
             
