@@ -145,6 +145,14 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
         statusBar.add(new JLabel(message));
     }
     
+    /**
+     * PENDING: JW - this is about toggling the LF, does nothing to
+     * update the UI. Check all tests using this method to see if they 
+     * make sense! 
+     *
+     * 
+     * @param system
+     */
     public static void setSystemLF(boolean system) {
         String lfName = system ? UIManager.getSystemLookAndFeelClassName() :
             UIManager.getCrossPlatformLookAndFeelClassName();
