@@ -393,7 +393,7 @@ public class JXList extends JList {
             if (location == null || location.y < 0) return false;
             ListCellRenderer renderer = list.getCellRenderer();
             return (renderer instanceof RolloverRenderer)
-               && ((RolloverRenderer) renderer).isRolloverEnabled();
+               && ((RolloverRenderer) renderer).isEnabled();
         }
 
         private void unregisterExecuteButtonAction() {
@@ -919,11 +919,16 @@ public class JXList extends JList {
             delegateRenderer = delegate;
         }
 
-        public boolean isRolloverEnabled() {
+        public boolean isEnabled() {
             return (delegateRenderer instanceof RolloverRenderer) && 
-               ((RolloverRenderer) delegateRenderer).isRolloverEnabled();
+               ((RolloverRenderer) delegateRenderer).isEnabled();
         }
         
+        public void doClick() {
+            if (isEnabled()) {
+                ((RolloverRenderer) delegateRenderer).doClick();
+            }
+        }
         public Component getListCellRendererComponent(JList list, Object value,
                 int index, boolean isSelected, boolean cellHasFocus) {
             Component comp = null;

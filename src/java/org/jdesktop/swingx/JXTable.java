@@ -504,21 +504,23 @@ public class JXTable extends JTable {
      * 
      * @author Jeanette Winzenburg
      */
-    public static class LinkController implements PropertyChangeListener {
+    public static class LinkController // extends RolloverController
+        implements PropertyChangeListener {
 
         private Cursor oldCursor;
         private JTable table;
 
         public void propertyChange(PropertyChangeEvent evt) {
+            if ((table == null) || (table != evt.getSource())) return;
             if (RolloverProducer.ROLLOVER_KEY.equals(evt.getPropertyName())) {
-               rollover((JTable) evt.getSource(), (Point) evt
+               rollover((Point) evt
                             .getOldValue(), (Point) evt.getNewValue());
             } 
             else if (RolloverProducer.CLICKED_KEY.equals(evt.getPropertyName())) {
-                click((JTable) evt.getSource(), (Point) evt.getOldValue(),
-                        (Point) evt.getNewValue());
+                click((Point) evt.getOldValue(), (Point) evt.getNewValue());
             }
         }
+
 
         public void install(JTable table) {
           release();  
@@ -538,7 +540,7 @@ public class JXTable extends JTable {
 
 //    --------------------------- JTable rollover
         
-        private void rollover(JTable table, Point oldLocation, Point newLocation) {
+        private void rollover(Point oldLocation, Point newLocation) {
             if (oldLocation != null) {
                 Rectangle r = table.getCellRect(oldLocation.y, oldLocation.x, false);
                 r.x = 0;
@@ -551,22 +553,38 @@ public class JXTable extends JTable {
                 r.width = table.getWidth();
                 table.repaint(r);
             }
-            setRolloverCursor(table, newLocation);
+            setRolloverCursor(newLocation);
         }
 
-        private void click(JTable list, Point oldLocation, Point newLocation) {
-            if (!isRolloverCell(list, newLocation)) return;
-            if (list.isCellEditable(newLocation.y, newLocation.x)) return;
-            TableCellRenderer renderer = list.getCellRenderer(newLocation.y, newLocation.x);
-            Component comp = list.prepareRenderer(renderer, newLocation.y,  newLocation.x);
-            if (comp instanceof AbstractButton) {
-                ((AbstractButton) comp).doClick();
-                list.repaint();
+        private void click(Point oldLocation, Point newLocation) {
+            if (!isClickable(newLocation)) return;
+            RolloverRenderer rollover = getRolloverRenderer(newLocation, true);
+            if (rollover != null) {
+                rollover.doClick();
+                table.repaint();
             }
         }
+        
+        private boolean isClickable(Point cell) {
+            return isRolloverCell(cell) && !table.isCellEditable(cell.y, cell.x);
+        }
 
-        private void setRolloverCursor(JTable table, Point location) {
-            if (isRolloverCell(table, location)) {
+        private RolloverRenderer getRolloverRenderer(Point cell, boolean prepare) {
+            TableCellRenderer renderer = table.getCellRenderer(cell.y, cell.x);
+            RolloverRenderer rollover = renderer instanceof RolloverRenderer ?
+                    (RolloverRenderer) renderer : null;
+            if ((rollover != null) && !rollover.isEnabled()) {
+                rollover = null;
+            }
+            if ((rollover != null) && prepare) {
+                table.prepareRenderer(renderer, cell.y, cell.x);
+            }
+            return rollover;
+        }
+
+
+        private void setRolloverCursor(Point location) {
+            if (isRolloverCell(location)) {
                 if (oldCursor == null) {
                     oldCursor = table.getCursor();
                     table.setCursor(Cursor
@@ -580,14 +598,19 @@ public class JXTable extends JTable {
             }
 
         }
-        private boolean isRolloverCell(JTable table, Point location) {
+        
+        private boolean isRolloverCell(Point location) {
             if (location == null || location.x < 0 || location.y < 0) return false;
-            TableCellRenderer renderer = table.getCellRenderer(location.y, location.x);
-            return (renderer instanceof RolloverRenderer) 
-                && ((RolloverRenderer) renderer).isRolloverEnabled();
-
+            return getRolloverRenderer(location, false) != null;
         }
 
+        private Point getLeadCell() {
+            int leadRow = table.getSelectionModel()
+                    .getLeadSelectionIndex();
+            int leadColumn = table.getColumnModel().getSelectionModel()
+                    .getLeadSelectionIndex();
+            return new Point(leadColumn, leadRow);
+        }
 
         private void unregisterExecuteButtonAction() {
             table.getActionMap().put(EXECUTE_BUTTON_ACTIONCOMMAND, null);
@@ -606,32 +629,18 @@ public class JXTable extends JTable {
             Action action = new AbstractAction() {
 
                 public void actionPerformed(ActionEvent e) {
-                    AbstractButton button = getClickableRendererComponent();
-                    if (button != null) {
-                        button.doClick();
-                        table.repaint();
-                    }
+                    click(null, getLeadCell());
                 }
 
                 @Override
                 public boolean isEnabled() {
-                    return isClickable();
+                    if (table == null || !table.isEnabled()
+                            || !table.hasFocus())
+                        return false;
+                    return isClickable(getLeadCell());
                 }
 
-                private boolean isClickable() {
-                    return getClickableRendererComponent() != null;
-                }
-                
-                private AbstractButton getClickableRendererComponent() {
-                    if (table == null || !table.isEnabled() || !table.hasFocus()) return null;
-                    int leadRow = table.getSelectionModel().getLeadSelectionIndex();
-                    int leadColumn = table.getColumnModel().getSelectionModel().getLeadSelectionIndex();
-                    if (leadRow < 0 || leadColumn < 0 || table.isCellEditable(leadRow, leadColumn)) return null;
-                    TableCellRenderer renderer = table.getCellRenderer(leadRow, leadColumn);
-                    Component rendererComp = table.prepareRenderer(renderer, leadRow, leadColumn);
-                    return rendererComp instanceof AbstractButton ? (AbstractButton) rendererComp : null;
-                }
-                
+
             };
             return action;
         }

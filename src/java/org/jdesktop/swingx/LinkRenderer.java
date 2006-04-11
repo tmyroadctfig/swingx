@@ -202,10 +202,14 @@ public class LinkRenderer extends AbstractCellEditor implements
 
 //----------------------- Implement RolloverRenderer
     
-    public boolean isRolloverEnabled() {
+    public boolean isEnabled() {
         return true;
     }
 
+    public void doClick() {
+        linkButton.doClick();
+    }
+    
 //---------------------- Implement ListCellRenderer
     
     public Component getListCellRendererComponent(JList list, Object value, 
