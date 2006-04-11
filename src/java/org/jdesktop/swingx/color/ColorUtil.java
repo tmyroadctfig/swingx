@@ -38,30 +38,72 @@ import javax.swing.JComponent;
  */
 public class ColorUtil {
     
+    /**
+     * Returns a new color equal to the old one, except that there is no
+     * alpha channel (transparency).
+     * @param color the color to remove the alpha (transparency) from
+     * @return Color
+     */
     public static Color removeAlpha(Color color) {
         return new Color(color.getRed(),color.getGreen(),color.getBlue());
     }
     
+    /**
+     * Modifies the passed in color by setting a new alpha channel (transparency)
+     * and returns the new color. 
+     *
+     * @param col the color to modify
+     * @param alpha the new alpha (transparency) level. Must be an int between 0 and 255
+     *
+     * @return the new Color
+     */
     public static Color setAlpha(Color col, int alpha) {
         return new Color(col.getRed(),col.getGreen(),col.getBlue(),alpha);
     }
     
-    public static Color setBrightness(Color col, float brightness) {
-        int alpha = col.getAlpha();
+    /**
+     * 
+     * Modifies the passed in color by changing it's brightness using HSB
+     * calculations. The brightness must be a float between 0 and 1. If 0 the
+     * resulting color will be black. If 1 the resulting color will be the brightest
+     * possible form of the passed in color.
+     * 
+     * @param color the color to modify
+     * @param brightness the brightness to use in the new color
+     * @return the new Color
+     */
+    public static Color setBrightness(Color color, float brightness) {
+        int alpha = color.getAlpha();
         
-        float[] cols = Color.RGBtoHSB(col.getRed(),col.getGreen(),col.getBlue(),null);
+        float[] cols = Color.RGBtoHSB(color.getRed(),color.getGreen(),color.getBlue(),null);
         cols[2] = brightness;
-        Color c2 = col.getHSBColor(cols[0],cols[1],cols[2]);
+        Color c2 = color.getHSBColor(cols[0],cols[1],cols[2]);
         
         return setAlpha(c2,alpha);
     }
     
+    /**
+     * Produces a String represeting the passed in color as a hex value
+     * (including the #) suitable for use in html. It does not include 
+     * the alpha (transparency) channel in the string.
+     * @param color the color to convert
+     * @return the hex String
+     */
     public static String toHexString(Color color) {
         return "#"+(""+Integer.toHexString(color.getRGB())).substring(2);        
     }
         
     private static Paint checker_texture = null;
 
+    
+    /**
+     * Obtain a <code>java.awt.Paint</code> instance which draws a checker
+     * background of black and white. 
+     * Note: The returned instance may be shared.
+     * Note: This method should be reimplemented to not use a png resource.
+     *
+     * @return a Paint implementation
+     */
     public static Paint getCheckerPaint() {
 	if(checker_texture == null) {
             checker_texture = Color.white;
@@ -78,6 +120,10 @@ public class ColorUtil {
         return checker_texture;           
     }
     
+    /**
+     * Draws an image on top of a component by doing a 3x3 grid stretch of the image
+     * using the specified insets.
+     */
     public static void tileStretchPaint(Graphics g, 
                 JComponent comp,
                 BufferedImage img,
