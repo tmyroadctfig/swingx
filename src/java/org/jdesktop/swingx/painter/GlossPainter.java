@@ -119,8 +119,9 @@ public class GlossPainter extends AbstractPainter {
                 area.subtract(new Area(ellipse));
                 gloss = area;
             }
-        
-            gloss.intersect(new Area(getClip()));
+            if(getClip() != null) {
+                gloss.intersect(new Area(getClip()));
+            }
             g.setPaint(getPaint());
             g.fill(gloss);
         }
