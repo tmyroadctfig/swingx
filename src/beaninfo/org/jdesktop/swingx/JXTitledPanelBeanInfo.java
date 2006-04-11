@@ -25,5 +25,6 @@ public class JXTitledPanelBeanInfo extends BeanInfoSupport {
     protected void initialize() {
         BeanDescriptor bd = getBeanDescriptor();
         bd.setValue("containerDelegate", "getContentContainer");
+        setPreferred(true, "title", "titleFont", "titleForeground", "titlePainter");
     }
 }
