@@ -140,10 +140,10 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
     private void fillTopPanel() {
         topPanel.add(caption, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(4, 12, 4, 12), 0, 0));
         if (titledPanel.getClientProperty(JXTitledPanel.RIGHT_DECORATION) instanceof JComponent) {
-            addRightDecoration((JComponent) titledPanel.getClientProperty(JXTitledPanel.RIGHT_DECORATION));
+            setRightDecoration((JComponent) titledPanel.getClientProperty(JXTitledPanel.RIGHT_DECORATION));
         }
         if (titledPanel.getClientProperty(JXTitledPanel.LEFT_DECORATION) instanceof JComponent) {
-            addLeftDecoration((JComponent) titledPanel.getClientProperty(JXTitledPanel.LEFT_DECORATION));
+            setLeftDecoration((JComponent) titledPanel.getClientProperty(JXTitledPanel.LEFT_DECORATION));
         }
     }
     
@@ -267,7 +267,7 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
      * Adds the given JComponent as a decoration on the right of the title
      * @param decoration
      */
-    public void addRightDecoration(JComponent decoration) {
+    public void setRightDecoration(JComponent decoration) {
         if (right != null) topPanel.remove(right);
         right = decoration;
         if (right != null) {
@@ -275,16 +275,25 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
             
         }
     }
+    
+    public JComponent getRightDecoration() {
+        return right;
+    }
+    
     /**
      * Adds the given JComponent as a decoration on the left of the title
      * @param decoration
      */
-    public void addLeftDecoration(JComponent decoration) {
+    public void setLeftDecoration(JComponent decoration) {
         if (left != null) topPanel.remove(left);
         left = decoration;
         if (left != null) {
             topPanel.add(left, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
         }
+    }
+    
+    public JComponent getLeftDecoration() {
+        return left;
     }
     
     /**

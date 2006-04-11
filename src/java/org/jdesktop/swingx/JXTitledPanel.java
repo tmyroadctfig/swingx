@@ -213,8 +213,9 @@ public class JXTitledPanel extends JXPanel {
      * 
      * @param decoration
      */
+    @Deprecated
     public void addRightDecoration(JComponent decoration) {
-        getUI().addRightDecoration(decoration);
+        getUI().setRightDecoration(decoration);
     }
 
     /**
@@ -222,10 +223,41 @@ public class JXTitledPanel extends JXPanel {
      * 
      * @param decoration
      */
+    @Deprecated
     public void addLeftDecoration(JComponent decoration) {
-        getUI().addLeftDecoration(decoration);
+        getUI().setLeftDecoration(decoration);
     }
 
+    /**
+     * Adds the given JComponent as a decoration on the right of the title
+     * 
+     * @param decoration
+     */
+    public void setRightDecoration(JComponent decoration) {
+        JComponent old = getRightDecoration();
+        getUI().setRightDecoration(decoration);
+        firePropertyChange("rightDecoration", old, getRightDecoration());
+    }
+    
+    public JComponent getRightDecoration() {
+        return getUI().getRightDecoration();
+    }
+
+    /**
+     * Adds the given JComponent as a decoration on the left of the title
+     * 
+     * @param decoration
+     */
+    public void setLeftDecoration(JComponent decoration) {
+        JComponent old = getLeftDecoration();
+        getUI().setLeftDecoration(decoration);
+        firePropertyChange("leftDecoration", old, getLeftDecoration());
+    }
+    
+    public JComponent getLeftDecoration() {
+        return getUI().getLeftDecoration();
+    }
+    
     public Font getTitleFont() {
         return titleFont;
     }
