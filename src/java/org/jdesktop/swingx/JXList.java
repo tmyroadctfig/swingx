@@ -40,6 +40,7 @@ import javax.swing.Action;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComponent;
 import javax.swing.JList;
+import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
@@ -100,7 +101,7 @@ public class JXList extends JList {
      * RolloverController: listens to cell over events and repaints
      * entered/exited rows.
      */
-    private LinkController linkController;
+    private ListRolloverController linkController;
 
     /** A wrapper around the default renderer enabling decoration. */
     private DelegatingRenderer delegatingRenderer;
@@ -266,15 +267,15 @@ public class JXList extends JList {
     }
 
     
-    protected LinkController getLinkController() {
+    protected ListRolloverController getLinkController() {
         if (linkController == null) {
             linkController = createLinkController();
         }
         return linkController;
     }
 
-    protected LinkController createLinkController() {
-        return new LinkController();
+    protected ListRolloverController createLinkController() {
+        return new ListRolloverController();
     }
 
 
@@ -287,7 +288,7 @@ public class JXList extends JList {
         RolloverProducer r = new RolloverProducer() {
             protected void updateRolloverPoint(JComponent component,
                     Point mousePoint) {
-                JXList list = (JXList) component;
+                JList list = (JList) component;
                 int row = list.locationToIndex(mousePoint);
                 if (row >= 0) {
                     Rectangle cellBounds = list.getCellBounds(row, row);
@@ -313,136 +314,65 @@ public class JXList extends JList {
     }
 
     /**
-     * listens to rollover properties. 
-     * Repaints effected component regions.
+     * listens to rollover properties. Repaints effected component regions.
      * Updates link cursor.
      * 
      * @author Jeanette Winzenburg
      */
-    public static class LinkController implements PropertyChangeListener {
+    public static class ListRolloverController<T extends JList> extends
+            RolloverController<T> {
 
         private Cursor oldCursor;
-        private JList list;
-        
-        public void propertyChange(PropertyChangeEvent evt) {
-            if (RolloverProducer.ROLLOVER_KEY.equals(evt.getPropertyName())) {
-                   rollover((JList) evt.getSource(), (Point) evt.getOldValue(),
-                            (Point) evt.getOldValue());
-            } else if (RolloverProducer.CLICKED_KEY.equals(evt.getPropertyName())) {
-                    click((JList) evt.getSource(), (Point) evt.getOldValue(),
-                            (Point) evt.getNewValue());
-            }
-        }
 
+        // --------------------------------- JList rollover
 
-        public void install(JList list) {
-            release();  
-            this.list = list;
-            list.addPropertyChangeListener(RolloverProducer.CLICKED_KEY, this);
-            list.addPropertyChangeListener(RolloverProducer.ROLLOVER_KEY, this);
-            registerExecuteButtonAction();
-          }
-          
-          public void release() {
-              if (list == null) return;
-              list.removePropertyChangeListener(this);
-              list.removePropertyChangeListener(RolloverProducer.CLICKED_KEY, this);
-              list.removePropertyChangeListener(RolloverProducer.ROLLOVER_KEY, this);
-              unregisterExecuteButtonAction();
-              list = null;
-          }
-
-//    --------------------------------- JList rollover
-        
-        private void rollover(JList list, Point oldLocation, Point newLocation) {
-            setRolloverCursor(list, newLocation);
+        protected void rollover(Point oldLocation, Point newLocation) {
+            setRolloverCursor(newLocation);
             // JW: partial repaints incomplete
-            list.repaint();
+            component.repaint();
         }
 
-        private void click(JList list, Point oldLocation, Point newLocation) {
-            if (!isRolloverCell(list, newLocation)) return;
-            ListCellRenderer renderer = list.getCellRenderer();
-            // PENDING: JW - don't ask the model, ask the list!
-            Object element = list.getModel().getElementAt(newLocation.y);
-            Component comp = renderer.getListCellRendererComponent(list, element, newLocation.y, false, true);
-            if (comp instanceof AbstractButton) {
-                // this is fishy - needs to be removed as soon as JList is editable
-                ((AbstractButton) comp).doClick();
-                list.repaint();
-            }
-        }
-        
         /**
          * something weird: cursor in JList behaves different from JTable?
+         * 
          * @param list
          * @param location
          */
-        private void setRolloverCursor(JList list, Point location) {
-            if (isRolloverCell(list, location)) {
-                    oldCursor = list.getCursor();
-                    list.setCursor(Cursor
-                            .getPredefinedCursor(Cursor.HAND_CURSOR));
+        private void setRolloverCursor(Point location) {
+            if (hasRollover(location)) {
+                oldCursor = component.getCursor();
+                component.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             } else {
-                    list.setCursor(oldCursor);
-                    oldCursor = null;
+                component.setCursor(oldCursor);
+                oldCursor = null;
             }
 
         }
-        private boolean isRolloverCell(JList list, Point location) {
-            if (location == null || location.y < 0) return false;
-            ListCellRenderer renderer = list.getCellRenderer();
-            return (renderer instanceof RolloverRenderer)
-               && ((RolloverRenderer) renderer).isEnabled();
+
+        @Override
+        protected RolloverRenderer getRolloverRenderer(Point location,
+                boolean prepare) {
+            ListCellRenderer renderer = component.getCellRenderer();
+            RolloverRenderer rollover = renderer instanceof RolloverRenderer 
+                ? (RolloverRenderer) renderer : null;
+            if ((rollover != null) && !rollover.isEnabled()) {
+                rollover = null;
+            }
+            if ((rollover != null) && prepare) {
+                Object element = component.getModel().getElementAt(location.y);
+                renderer.getListCellRendererComponent(component, element,
+                        location.y, false, true);
+            }
+            return rollover;
         }
 
-        private void unregisterExecuteButtonAction() {
-            list.getActionMap().put(EXECUTE_BUTTON_ACTIONCOMMAND, null);
-            KeyStroke space = KeyStroke.getKeyStroke("released SPACE");
-            list.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(space , null);
+        @Override
+        protected Point getFocusedCell() {
+            int leadRow = component.getLeadSelectionIndex();
+            if (leadRow < 0)
+                return null;
+            return new Point(0, leadRow);
         }
-
-        private void registerExecuteButtonAction() {
-            list.getActionMap().put(EXECUTE_BUTTON_ACTIONCOMMAND, createExecuteButtonAction());
-            KeyStroke space = KeyStroke.getKeyStroke("released SPACE");
-            list.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(space , EXECUTE_BUTTON_ACTIONCOMMAND);
-            
-        }
-
-        private Action createExecuteButtonAction() {
-            Action action = new AbstractAction() {
-
-                public void actionPerformed(ActionEvent e) {
-                    AbstractButton button = getClickableRendererComponent();
-                    if (button != null) {
-                        button.doClick();
-                        list.repaint();
-                    }
-                }
-
-                @Override
-                public boolean isEnabled() {
-                    return isClickable();
-                }
-
-                private boolean isClickable() {
-                    return getClickableRendererComponent() != null;
-                }
-                
-                private AbstractButton getClickableRendererComponent() {
-                    if (list == null || !list.isEnabled() || !list.hasFocus()) return null;
-                    int leadRow = list.getLeadSelectionIndex();
-                    if (leadRow < 0 ) return null;
-                    ListCellRenderer renderer = list.getCellRenderer();
-                    Object element = list.getModel().getElementAt(leadRow);
-                    Component rendererComp = renderer.getListCellRendererComponent(list, element, leadRow, false, true);
-                    return rendererComp instanceof AbstractButton ? (AbstractButton) rendererComp : null;
-                }
-                
-            };
-            return action;
-        }
-
 
     }
 
@@ -450,15 +380,14 @@ public class JXList extends JList {
     // ---------------------------- filters
 
     /**
-     * returns the element at the given index. The index is
-     * in view coordinates which might differ from model 
-     * coordinates if filtering is enabled and filters/sorters
-     * are active.
+     * returns the element at the given index. The index is in view coordinates
+     * which might differ from model coordinates if filtering is enabled and
+     * filters/sorters are active.
      * 
      * @param viewIndex the index in view coordinates
      * @return the element at the index
-     * @throws IndexOutOfBoundsException 
-     *          if viewIndex < 0 or viewIndex >= getElementCount()
+     * @throws IndexOutOfBoundsException if viewIndex < 0 or viewIndex >=
+     *         getElementCount()
      */
     public Object getElementAt(int viewIndex) {
         return getModel().getElementAt(viewIndex);

@@ -271,7 +271,7 @@ public class JXHyperlinkTest extends InteractiveTestCase {
 //---------------------- interactive test: JXTable
     
     public void interactiveTableLinkRendererSimpleText() {
-        LinkAction linkAction = new LinkAction<Object>(null) {
+        LinkAction simpleAction = new LinkAction<Object>(null) {
 
             public void actionPerformed(ActionEvent e) {
                 LOG.info("hit: " + getTarget());
@@ -286,8 +286,7 @@ public class JXHyperlinkTest extends InteractiveTestCase {
         table.setDefaultRenderer(LinkModel.class, new LinkRenderer(action, LinkModel.class));
         LinkModelAction action2 = new LinkModelAction<LinkModel>(visitor);
         table.setDefaultEditor(LinkModel.class, new LinkRenderer(action2, LinkModel.class));
-        table.getColumn(0).setCellRenderer(new LinkRenderer(linkAction, LinkModel.class));
-//        table.getColumn(0).setCellEditor(new LinkRenderer(linkAction));
+        table.getColumn(0).setCellRenderer(new LinkRenderer(simpleAction));
         table.getColumnExt(0).setEditable(false);
         JFrame frame = wrapWithScrollingInFrame(table, visitor.getOutputComponent(), "table and simple links");
         frame.setVisible(true);

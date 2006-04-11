@@ -484,18 +484,18 @@ public class JXTableUnitTest extends InteractiveTestCase {
         table.setRolloverEnabled(true);
         assertNotNull("LinkController must be listening", getLinkControllerAsPropertyChangeListener(table, RolloverProducer.CLICKED_KEY));
         assertNotNull("LinkController must be listening", getLinkControllerAsPropertyChangeListener(table, RolloverProducer.ROLLOVER_KEY));
-        assertNotNull("execute button action must be registered", table.getActionMap().get(JXTable.EXECUTE_BUTTON_ACTIONCOMMAND));
+        assertNotNull("execute button action must be registered", table.getActionMap().get(RolloverController.EXECUTE_BUTTON_ACTIONCOMMAND));
         table.setRolloverEnabled(false);
         assertNull("LinkController must not be listening", getLinkControllerAsPropertyChangeListener(table, RolloverProducer.CLICKED_KEY ));
         assertNull("LinkController must be listening", getLinkControllerAsPropertyChangeListener(table, RolloverProducer.ROLLOVER_KEY));
-        assertNull("execute button action must be de-registered", table.getActionMap().get(JXTable.EXECUTE_BUTTON_ACTIONCOMMAND));
+        assertNull("execute button action must be de-registered", table.getActionMap().get(RolloverController.EXECUTE_BUTTON_ACTIONCOMMAND));
     }
     
     private PropertyChangeListener getLinkControllerAsPropertyChangeListener(JXTable table, String propertyName) {
         PropertyChangeListener[] listeners = table.getPropertyChangeListeners(propertyName);
         for (int i = 0; i < listeners.length; i++) {
-            if (listeners[i] instanceof JXTable.LinkController) {
-                return (JXTable.LinkController) listeners[i];
+            if (listeners[i] instanceof JXTable.TableRolloverController) {
+                return (JXTable.TableRolloverController) listeners[i];
             }
         }
         return null;

@@ -213,7 +213,6 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
 public class JXTable extends JTable { 
     private static final Logger LOG = Logger.getLogger(JXTable.class.getName());
     
-    public static final String EXECUTE_BUTTON_ACTIONCOMMAND = "executeButtonAction";
 
     /**
      * Constant string for horizontal scroll actions, used in JXTable's Action
@@ -305,7 +304,7 @@ public class JXTable extends JTable {
      * RolloverController: listens to cell over events and repaints
      * entered/exited rows.
      */
-    private LinkController linkController;
+    private TableRolloverController linkController;
 
     /** field to store the autoResizeMode while interactively setting 
      *  horizontal scrollbar to visible.
@@ -451,15 +450,15 @@ public class JXTable extends JTable {
         firePropertyChange("rolloverEnabled", old, isRolloverEnabled());
     }
 
-    protected LinkController getLinkController() {
+    protected TableRolloverController getLinkController() {
         if (linkController == null) {
             linkController = createLinkController();
         }
         return linkController;
     }
 
-    protected LinkController createLinkController() {
-        return new LinkController();
+    protected TableRolloverController createLinkController() {
+        return new TableRolloverController();
     }
 
 
@@ -472,7 +471,7 @@ public class JXTable extends JTable {
         RolloverProducer r = new RolloverProducer() {
             protected void updateRolloverPoint(JComponent component,
                     Point mousePoint) {
-                JXTable table = (JXTable) component;
+                JTable table = (JTable) component;
                 int col = table.columnAtPoint(mousePoint);
                 int row = table.rowAtPoint(mousePoint);
                 if ((col < 0) || (row < 0)) {
@@ -504,145 +503,73 @@ public class JXTable extends JTable {
      * 
      * @author Jeanette Winzenburg
      */
-    public static class LinkController // extends RolloverController
-        implements PropertyChangeListener {
+    public static class TableRolloverController<T extends JTable>  extends RolloverController<T> {
 
         private Cursor oldCursor;
-        private JTable table;
-
-        public void propertyChange(PropertyChangeEvent evt) {
-            if ((table == null) || (table != evt.getSource())) return;
-            if (RolloverProducer.ROLLOVER_KEY.equals(evt.getPropertyName())) {
-               rollover((Point) evt
-                            .getOldValue(), (Point) evt.getNewValue());
-            } 
-            else if (RolloverProducer.CLICKED_KEY.equals(evt.getPropertyName())) {
-                click((Point) evt.getOldValue(), (Point) evt.getNewValue());
-            }
-        }
-
-
-        public void install(JTable table) {
-          release();  
-          this.table = table;
-          table.addPropertyChangeListener(RolloverProducer.CLICKED_KEY, this);
-          table.addPropertyChangeListener(RolloverProducer.ROLLOVER_KEY, this);
-          registerExecuteButtonAction();
-        }
-        
-        public void release() {
-            if (table == null) return;
-            table.removePropertyChangeListener(RolloverProducer.CLICKED_KEY, this);
-            table.removePropertyChangeListener(RolloverProducer.ROLLOVER_KEY, this);
-            unregisterExecuteButtonAction();
-            table = null;
-        }
 
 //    --------------------------- JTable rollover
         
-        private void rollover(Point oldLocation, Point newLocation) {
+        protected void rollover(Point oldLocation, Point newLocation) {
             if (oldLocation != null) {
-                Rectangle r = table.getCellRect(oldLocation.y, oldLocation.x, false);
+                Rectangle r = component.getCellRect(oldLocation.y, oldLocation.x, false);
                 r.x = 0;
-                r.width = table.getWidth();
-                table.repaint(r);
+                r.width = component.getWidth();
+                component.repaint(r);
             }
             if (newLocation != null) {
-                Rectangle r = table.getCellRect(newLocation.y, newLocation.x, false);
+                Rectangle r = component.getCellRect(newLocation.y, newLocation.x, false);
                 r.x = 0;
-                r.width = table.getWidth();
-                table.repaint(r);
+                r.width = component.getWidth();
+                component.repaint(r);
             }
             setRolloverCursor(newLocation);
         }
 
-        private void click(Point oldLocation, Point newLocation) {
-            if (!isClickable(newLocation)) return;
-            RolloverRenderer rollover = getRolloverRenderer(newLocation, true);
-            if (rollover != null) {
-                rollover.doClick();
-                table.repaint();
-            }
-        }
-        
-        private boolean isClickable(Point cell) {
-            return isRolloverCell(cell) && !table.isCellEditable(cell.y, cell.x);
+        /**
+         * overridden to return false if cell editable.
+         */
+        @Override
+        protected boolean isClickable(Point location) {
+            return super.isClickable(location) && !component.isCellEditable(location.y, location.x);
         }
 
-        private RolloverRenderer getRolloverRenderer(Point cell, boolean prepare) {
-            TableCellRenderer renderer = table.getCellRenderer(cell.y, cell.x);
+        protected RolloverRenderer getRolloverRenderer(Point location, boolean prepare) {
+            TableCellRenderer renderer = component.getCellRenderer(location.y, location.x);
             RolloverRenderer rollover = renderer instanceof RolloverRenderer ?
                     (RolloverRenderer) renderer : null;
             if ((rollover != null) && !rollover.isEnabled()) {
                 rollover = null;
             }
             if ((rollover != null) && prepare) {
-                table.prepareRenderer(renderer, cell.y, cell.x);
+                component.prepareRenderer(renderer, location.y, location.x);
             }
             return rollover;
         }
 
 
         private void setRolloverCursor(Point location) {
-            if (isRolloverCell(location)) {
+            if (hasRollover(location)) {
                 if (oldCursor == null) {
-                    oldCursor = table.getCursor();
-                    table.setCursor(Cursor
+                    oldCursor = component.getCursor();
+                    component.setCursor(Cursor
                             .getPredefinedCursor(Cursor.HAND_CURSOR));
                 }
             } else {
                 if (oldCursor != null) {
-                    table.setCursor(oldCursor);
+                    component.setCursor(oldCursor);
                     oldCursor = null;
                 }
             }
 
         }
         
-        private boolean isRolloverCell(Point location) {
-            if (location == null || location.x < 0 || location.y < 0) return false;
-            return getRolloverRenderer(location, false) != null;
-        }
 
-        private Point getLeadCell() {
-            int leadRow = table.getSelectionModel()
+        protected Point getFocusedCell() {
+            int leadRow = component.getSelectionModel()
                     .getLeadSelectionIndex();
-            int leadColumn = table.getColumnModel().getSelectionModel()
+            int leadColumn = component.getColumnModel().getSelectionModel()
                     .getLeadSelectionIndex();
             return new Point(leadColumn, leadRow);
-        }
-
-        private void unregisterExecuteButtonAction() {
-            table.getActionMap().put(EXECUTE_BUTTON_ACTIONCOMMAND, null);
-            KeyStroke space = KeyStroke.getKeyStroke("released SPACE");
-            table.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(space , null);
-        }
-
-        private void registerExecuteButtonAction() {
-            table.getActionMap().put(EXECUTE_BUTTON_ACTIONCOMMAND, createExecuteButtonAction());
-            KeyStroke space = KeyStroke.getKeyStroke("released SPACE");
-            table.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(space , EXECUTE_BUTTON_ACTIONCOMMAND);
-            
-        }
-
-        private Action createExecuteButtonAction() {
-            Action action = new AbstractAction() {
-
-                public void actionPerformed(ActionEvent e) {
-                    click(null, getLeadCell());
-                }
-
-                @Override
-                public boolean isEnabled() {
-                    if (table == null || !table.isEnabled()
-                            || !table.hasFocus())
-                        return false;
-                    return isClickable(getLeadCell());
-                }
-
-
-            };
-            return action;
         }
 
     }

@@ -102,8 +102,8 @@ public class JXListTest extends InteractiveTestCase {
     private PropertyChangeListener getLinkControllerAsPropertyChangeListener(JXList table, String propertyName) {
         PropertyChangeListener[] listeners = table.getPropertyChangeListeners(propertyName);
         for (int i = 0; i < listeners.length; i++) {
-            if (listeners[i] instanceof JXList.LinkController) {
-                return (JXList.LinkController) listeners[i];
+            if (listeners[i] instanceof JXList.ListRolloverController) {
+                return (JXList.ListRolloverController) listeners[i];
             }
         }
         return null;
