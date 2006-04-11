@@ -48,7 +48,7 @@ import org.apache.batik.ext.awt.LinearGradientPaint;
 public class LinearGradientPainter extends AbstractGradientPainter {
     public static final LinearGradientPaint ORANGE_DELIGHT = new LinearGradientPaint(
             new Point2D.Double(0, 0),
-            new Point2D.Double(1, 0),
+            new Point2D.Double(0, 1),
             new float[] {0f, .5f, .51f, 1f},
             new Color[] {
                 new Color(248, 192, 75),
@@ -57,7 +57,7 @@ public class LinearGradientPainter extends AbstractGradientPainter {
                 new Color(254, 124, 0)});
     public static final LinearGradientPaint BLACK_STAR = new LinearGradientPaint(
             new Point2D.Double(0, 0),
-            new Point2D.Double(1, 0),
+            new Point2D.Double(0, 1),
             new float[] {0f, .5f, .51f, 1f},
             new Color[] {
                 new Color(54, 62, 78),
