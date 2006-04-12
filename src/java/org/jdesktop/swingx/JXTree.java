@@ -22,6 +22,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -39,6 +40,7 @@ import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.Icon;
 import javax.swing.JComponent;
+import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
@@ -50,6 +52,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import org.jdesktop.swingx.JXList.ListRolloverController;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
@@ -85,7 +88,7 @@ public class JXTree extends JTree {
      * RolloverController: listens to cell over events and
      * repaints entered/exited rows.
      */
-    private LinkController linkController;
+    private TreeRolloverController linkController;
     private boolean overwriteIcons;
     private Searchable searchable;
     
@@ -447,16 +450,25 @@ public class JXTree extends JTree {
             rolloverProducer = createRolloverProducer();
             addMouseListener(rolloverProducer);
             addMouseMotionListener(rolloverProducer);
-            linkController = new LinkController();
-            addPropertyChangeListener(linkController);
+            getLinkController().install(this);
         } else {
             removeMouseListener(rolloverProducer);
             removeMouseMotionListener(rolloverProducer);
             rolloverProducer = null;
-            removePropertyChangeListener(linkController);
-            linkController = null;
+            getLinkController().release();
         }
         firePropertyChange("rolloverEnabled", old, isRolloverEnabled());
+    }
+
+    protected TreeRolloverController getLinkController() {
+        if (linkController == null) {
+            linkController = createLinkController();
+        }
+        return linkController;
+    }
+
+    protected TreeRolloverController createLinkController() {
+        return new TreeRolloverController();
     }
 
     /**
@@ -535,22 +547,17 @@ public class JXTree extends JTree {
      * 
      * @author Jeanette Winzenburg
      */
-    public  class LinkController implements PropertyChangeListener {
-
-        public void propertyChange(PropertyChangeEvent evt) {
-            if (RolloverProducer.ROLLOVER_KEY.equals(evt.getPropertyName())) {
-                    rollover((JXTree) evt.getSource(), (Point) evt.getOldValue(),
-                            (Point) evt.getOldValue());
-            } 
-        }
-        
+    public  class TreeRolloverController<T extends JTree>  extends RolloverController<T> {
+    
+        private Cursor oldCursor;
         
 //    -------------------------------------JTree rollover
         
-        private void rollover(JXTree tree, Point oldLocation, Point newLocation) {
+        protected void rollover(Point oldLocation, Point newLocation) {
+            setRolloverCursor(newLocation);
             //setLinkCursor(list, newLocation);
             // JW: conditional repaint not working?
-            tree.repaint();
+            component.repaint();
 //            if (oldLocation != null) {
 //                Rectangle r = tree.getRowBounds(oldLocation.y);
 ////                r.x = 0;
@@ -567,6 +574,49 @@ public class JXTree extends JTree {
 //            }
         }
 
+
+        private void setRolloverCursor(Point location) {
+            if (hasRollover(location)) {
+                if (oldCursor == null) {
+                    oldCursor = component.getCursor();
+                    component.setCursor(Cursor
+                            .getPredefinedCursor(Cursor.HAND_CURSOR));
+                }
+            } else {
+                if (oldCursor != null) {
+                    component.setCursor(oldCursor);
+                    oldCursor = null;
+                }
+            }
+
+        }
+
+
+        @Override
+        protected RolloverRenderer getRolloverRenderer(Point location, boolean prepare) {
+            TreeCellRenderer renderer = component.getCellRenderer();
+            RolloverRenderer rollover = renderer instanceof RolloverRenderer 
+                ? (RolloverRenderer) renderer : null;
+            if ((rollover != null) && !rollover.isEnabled()) {
+                rollover = null;
+            }
+            if ((rollover != null) && prepare) {
+                TreePath path = component.getPathForRow(location.y);
+                Object element = path != null ? path.getLastPathComponent() : null;
+                renderer.getTreeCellRendererComponent(component, element, false, 
+                        false, false, 
+                        location.y, false);
+            }
+            return rollover;
+        }
+
+
+        @Override
+        protected Point getFocusedCell() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
     }
 
 
@@ -578,6 +628,11 @@ public class JXTree extends JTree {
             delegatingRenderer.setDelegateRenderer(super.getCellRenderer());
         }
         return delegatingRenderer;
+    }
+
+    public void setRolloverCursor(Point newLocation) {
+        // TODO Auto-generated method stub
+        
     }
 
     public TreeCellRenderer getCellRenderer() {
@@ -678,7 +733,7 @@ public class JXTree extends JTree {
         return overwriteIcons;
     }
     
-    public class DelegatingRenderer implements TreeCellRenderer {
+    public class DelegatingRenderer implements TreeCellRenderer, RolloverRenderer {
         private Icon    closedIcon = null;
         private Icon    openIcon = null;
         private Icon    leafIcon = null;
@@ -755,6 +810,8 @@ public class JXTree extends JTree {
             this.leafIcon = leafIcon;
         }
         
+        //--------------- TreeCellRenderer
+        
         public TreeCellRenderer getDelegateRenderer() {
             return delegate;
         }
@@ -770,6 +827,20 @@ public class JXTree extends JTree {
 
                  return result;
             }
+            
+            //------------------ RolloverRenderer
+            
+            public boolean isEnabled() {
+                return (delegate instanceof RolloverRenderer) && 
+                   ((RolloverRenderer) delegate).isEnabled();
+            }
+            
+            public void doClick() {
+                if (isEnabled()) {
+                    ((RolloverRenderer) delegate).doClick();
+                }
+            }
+
     }
 
     

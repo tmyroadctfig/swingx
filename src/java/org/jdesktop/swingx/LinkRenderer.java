@@ -26,18 +26,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.AbstractCellEditor;
-import javax.swing.Action;
 import javax.swing.JList;
 import javax.swing.JTable;
+import javax.swing.JTree;
 import javax.swing.ListCellRenderer;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.tree.TreeCellRenderer;
 
 import org.jdesktop.swingx.action.LinkAction;
-import org.jdesktop.swingx.action.LinkModelAction;
 
 /**
  * A Renderer/Editor for "Links". <p>
@@ -58,10 +58,15 @@ import org.jdesktop.swingx.action.LinkModelAction;
  * 
  * PENDING: make renderer respect selected cell state.
  * 
+ * PENDING: TreeCellRenderer has several issues
+ *   - no icons
+ *   - usual background highlighter issues
+ * 
  * @author Jeanette Winzenburg
  */
 public class LinkRenderer extends AbstractCellEditor implements
-        TableCellRenderer, TableCellEditor, ListCellRenderer, RolloverRenderer {
+        TableCellRenderer, TableCellEditor, ListCellRenderer, 
+        TreeCellRenderer, RolloverRenderer {
 
     private static final Border noFocusBorder = new EmptyBorder(1, 1, 1, 1);
 
@@ -214,6 +219,9 @@ public class LinkRenderer extends AbstractCellEditor implements
     
     public Component getListCellRendererComponent(JList list, Object value, 
             int index, boolean isSelected, boolean cellHasFocus) {
+        if ((value != null) && !isTargetable(value)) {
+            value = null;
+        }
         linkAction.setTarget(value);
         if (list != null) {
             Point p = (Point) list
@@ -318,5 +326,39 @@ public class LinkRenderer extends AbstractCellEditor implements
         return l;
     }
 
+//----------------------- treeCellRenderer
+    
+    public Component getTreeCellRendererComponent(JTree tree, Object value, boolean isSelected,
+            boolean expanded, boolean leaf, int row, boolean hasFocus) {
+        if ((value != null) && !isTargetable(value)) {
+            value = null;
+        }
+        linkAction.setTarget(value);
+        if (tree != null) {
+            Point p = (Point) tree
+                .getClientProperty(RolloverProducer.ROLLOVER_KEY);
+            if (/*cellHasFocus ||*/ (p != null && (p.y >= 0) && (p.y == row))) {
+                 linkButton.getModel().setRollover(true);
+            } else {
+                 linkButton.getModel().setRollover(false);
+            }
+            updateSelectionColors(tree, isSelected);
+            updateFocusBorder(hasFocus);
+        }
+        return linkButton;
+        
+    }
+
+    private void updateSelectionColors(JTree tree, boolean isSelected) {
+        if (isSelected) {
+//          linkButton.setForeground(table.getSelectionForeground());
+          linkButton.setBackground(UIManager.getColor("Tree.selectionBackground"));
+      }
+      else {
+//          linkButton.setForeground(table.getForeground());
+          linkButton.setBackground(tree.getBackground());
+      }
+        
+    }
 
 }

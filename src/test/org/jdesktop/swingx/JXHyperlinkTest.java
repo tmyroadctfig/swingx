@@ -54,7 +54,8 @@ public class JXHyperlinkTest extends InteractiveTestCase {
       try {
 //          test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*Table.*");
-          test.runInteractiveTests("interactive.*List.*");
+//          test.runInteractiveTests("interactive.*List.*");
+          test.runInteractiveTests("interactive.*Tree.*");
 //          test.runInteractiveTests("interactive.*Simple.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
@@ -268,6 +269,26 @@ public class JXHyperlinkTest extends InteractiveTestCase {
         
     }
 
+//---------------------- interactive test: JXTree
+    public void interactiveTreeLinkRendererSimpleText() {
+        LinkAction simpleAction = new LinkAction<Object>(null) {
+
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("hit: " + getTarget());
+                
+            }
+            
+        };
+        JXTree tree = new JXTree();
+        tree.setRolloverEnabled(true);
+        tree.setCellRenderer(new LinkRenderer(simpleAction));
+        tree.setHighlighters(new HighlighterPipeline(new Highlighter[] { 
+                new UIAlternateRowHighlighter()}));
+        JFrame frame = wrapWithScrollingInFrame(tree, "table and simple links");
+        frame.setVisible(true);
+        
+    }
+    
 //---------------------- interactive test: JXTable
     
     public void interactiveTableLinkRendererSimpleText() {
