@@ -83,13 +83,41 @@ public class JXTitledPanelAddon extends AbstractComponentAddon {
   @Override
   protected void addWindowsDefaults(LookAndFeelAddons addon, List<Object> defaults) {
     super.addWindowsDefaults(addon, defaults);
+    // JW: copied to get hold of the old colors
+//  "JXTitledPanel.title.foreground", new ColorUIResource(255, 255, 255),
+//  "JXTitledPanel.title.darkBackground", new ColorUIResource(49, 121, 242),
+//  "JXTitledPanel.title.lightBackground", new ColorUIResource(198, 211, 247),
+  
+    // JW: hot fix for #291-swingx
+    // was tracked down by Neil Weber - the requested colors are not available in 
+    // all LFs, so changed to fall-back to something real
+    // don't understand why this has blown when trying to toggle to Metal...
+    // definitely needs deeper digging 
     defaults.addAll(Arrays.asList(new Object[] { 
-        "JXTitledPanel.title.foreground", UIManager.getColor("InternalFrame.activeTitleForeground"),
-        "JXTitledPanel.title.painter", new PainterUIResource(
-                new BasicGradientPainter(0, 0, 
-                    UIManager.getColor("InternalFrame.inactiveTitleGradient"), 0, 1,
-                    UIManager.getColor("InternalFrame.activeTitleBackground")))
-    }));
+            "JXTitledPanel.title.foreground", 
+                getSafeColor("InternalFrame.activeTitleForeground", new ColorUIResource(255, 255, 255)),
+            "JXTitledPanel.title.painter", new PainterUIResource(
+                    new BasicGradientPainter(0, 0, 
+                        getSafeColor("InternalFrame.inactiveTitleGradient", new ColorUIResource(49, 121, 242)), 0, 1,
+                        getSafeColor("InternalFrame.activeTitleBackground", new ColorUIResource(198, 211, 247))))
+        }));
+
+//    defaults.addAll(Arrays.asList(new Object[] { 
+//        "JXTitledPanel.title.foreground", UIManager.getColor("InternalFrame.activeTitleForeground"),
+//        "JXTitledPanel.title.painter", new PainterUIResource(
+//                new BasicGradientPainter(0, 0, 
+//                    UIManager.getColor("InternalFrame.inactiveTitleGradient"), 0, 1,
+//                    UIManager.getColor("InternalFrame.activeTitleBackground")))
+//    }));
+
+  
   }
 
+  protected Color getSafeColor(String uiKey, Color fallBack) {
+      Color color = UIManager.getColor(uiKey);
+      if (color == null) {
+          color = fallBack;
+      }
+      return color;
+  }
 }

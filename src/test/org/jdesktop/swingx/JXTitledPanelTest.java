@@ -75,7 +75,7 @@ public class JXTitledPanelTest extends InteractiveTestCase {
         Font deriveFont = panel.getTitleFont().deriveFont(27f);
         panel.setTitleFont(deriveFont);
         assertTrue("panel must notify on titleFont change", report.hasEvents("titleFont"));
-        fail("JXTitledPanelText must be updated to new api");
+        fail("JXTitledPanelTest must be updated to new api");
 //        panel.setTitleForeground(Color.black);
 //        assertTrue("panel must notify on titleForeground change", report.hasEvents("titleForeground"));
 //        panel.setTitleDarkBackground(Color.black);
