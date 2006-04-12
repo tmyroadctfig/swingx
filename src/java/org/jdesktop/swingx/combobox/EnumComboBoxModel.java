@@ -110,6 +110,7 @@ public class EnumComboBoxModel<E extends Enum<E>>
 	return (E)selected;
     }
     
+    /*
     public static void main(String[] args) {
         JFrame frame = new JFrame();
         frame.setLayout(new BoxLayout(frame.getContentPane(),BoxLayout.Y_AXIS));
@@ -144,5 +145,6 @@ public class EnumComboBoxModel<E extends Enum<E>>
         return "ERROR";
     }
     };
+     */
 
 }
