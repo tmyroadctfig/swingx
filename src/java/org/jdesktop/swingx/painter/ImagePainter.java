@@ -25,6 +25,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.TexturePaint;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
@@ -56,7 +57,7 @@ public class ImagePainter extends AbstractPainter {
      * The smallest dimension (Math.min(width, height)) will be used to constrain
      * the image.
      */
-    public static enum Style {CENTERED, TILED, SCALED};
+    public static enum Style {CENTERED, TILED, SCALED, POSITIONED};
     
     /**
      * The image to draw
@@ -189,6 +190,12 @@ public class ImagePainter extends AbstractPainter {
                     case SCALED:
                           g.drawImage(img, 0, 0, component.getWidth(), component.getHeight(), null);
                         break;
+                    case POSITIONED:
+                          g.drawImage(img, (int)imagePosition.getX(), (int)imagePosition.getY(), 
+                                  (int)(((double)img.getWidth(null))*imageScale),
+                                  (int)(((double)img.getHeight(null))*imageScale),
+                                  null);
+                        break;
                     default:
                         LOG.fine("unimplemented");
                         g.drawImage(img, 0, 0, null);
@@ -197,4 +204,18 @@ public class ImagePainter extends AbstractPainter {
             }
         }
     }
+    
+    private Point2D imagePosition = new Point2D.Double(0,0);
+    public void setImagePosition(Point2D imagePosition) {
+        this.imagePosition = imagePosition;
+    }
+    public Point2D getImagePosition() {
+        return imagePosition;
+    }
+
+    private double imageScale;
+    public void setImageScale(double imageScale) {
+        this.imageScale = imageScale;
+    }
+
 }
