@@ -84,7 +84,7 @@ import javax.swing.JFrame;
  */
 public class EnumComboBoxModel<E extends Enum<E>> 
         extends AbstractListModel implements ComboBoxModel {
-    private Object selected = null;
+    private E selected = null;
     private List<E> list;
 
     public EnumComboBoxModel(Class<E> en) {
@@ -102,12 +102,12 @@ public class EnumComboBoxModel<E extends Enum<E>>
     }
 
     public void setSelectedItem(Object anItem) {
-	selected = anItem;
+	selected = (E)anItem;
         this.fireContentsChanged(this,0,getSize());
     }
     
     public E getSelectedItem() {
-	return (E)selected;
+	return selected;
     }
     
     /*
