@@ -113,6 +113,7 @@ public class EnumComboBoxModel<E extends Enum<E>>
     /*
     public static void main(String[] args) {
         JFrame frame = new JFrame();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BoxLayout(frame.getContentPane(),BoxLayout.Y_AXIS));
         
         
@@ -131,6 +132,9 @@ public class EnumComboBoxModel<E extends Enum<E>>
         
         MyEnum1 selected = enumModel.getSelectedItem();
         
+        //uncomment to see the ClassCastException
+//        enumModel.setSelectedItem("Die clown");
+        
         frame.pack();
         frame.setVisible(true);
     }
@@ -145,6 +149,6 @@ public class EnumComboBoxModel<E extends Enum<E>>
         return "ERROR";
     }
     };
-     */
+    */
 
 }
