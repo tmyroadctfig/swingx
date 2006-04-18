@@ -102,7 +102,11 @@ public class EnumComboBoxModel<E extends Enum<E>>
     }
 
     public void setSelectedItem(Object anItem) {
-	selected = (E)anItem;
+        try {
+            selected = (E)anItem;
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException(anItem + " not of the expected type", e);
+        }
         this.fireContentsChanged(this,0,getSize());
     }
     
