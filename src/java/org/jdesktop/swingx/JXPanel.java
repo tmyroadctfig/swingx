@@ -152,7 +152,8 @@ public class JXPanel extends JPanel implements Scrollable {
                     oldOpaque = isOpaque();
                     setOpaque(false);
                 }
-                if (!(RepaintManager.currentManager(this) instanceof TranslucentRepaintManager)) {
+                RepaintManager manager = RepaintManager.currentManager(this);
+                if (!manager.getClass().isAnnotationPresent(TranslucentRepaintManager.class)) {
                     RepaintManager.setCurrentManager(new RepaintManagerX());
                 }
             } else if (alpha == 1) {

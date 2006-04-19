@@ -21,10 +21,17 @@
 
 package org.jdesktop.swingx;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
  * Marker interface suggesting that the given RepaintManager supports
  * translucency
  * @author rbair
  */
-public interface TranslucentRepaintManager {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface TranslucentRepaintManager {
 }

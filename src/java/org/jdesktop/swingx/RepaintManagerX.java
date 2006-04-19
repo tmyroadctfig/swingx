@@ -38,7 +38,8 @@ import javax.swing.RepaintManager;
  * @author zixle
  * @author rbair
  */
-public class RepaintManagerX extends RepaintManager implements TranslucentRepaintManager {
+@TranslucentRepaintManager
+public class RepaintManagerX extends RepaintManager {
     public void addDirtyRegion(JComponent c, int x, int y, int w, int h) {
         Rectangle dirtyRegion = getDirtyRegion(c);
         if (dirtyRegion.width == 0 && dirtyRegion.height == 0) {
