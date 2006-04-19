@@ -19,15 +19,15 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+package org.jdesktop.swingx;
+
 /**
  * Abstract class contains all the declarations that needs to be
- * implemented to add error reporting to sdandart JXErrorDislog.
+ * implemented to add error reporting to standard JXErrorDislog.
  *
  * @author Alexander Zuev
  * @version 1.0
  */
-package org.jdesktop.swingx;
-
 public abstract class ErrorReporter {
     /**
      * This method will be called if user clicks 'report' button
