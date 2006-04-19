@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
+ * Copyright 2006 Sun Microsystems, Inc., 4150 Network Circle,
  * Santa Clara, California 95054, U.S.A. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -27,8 +27,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marker interface suggesting that the given RepaintManager supports
- * translucency
+ * Annotation that can be applied to a RepaintPanager to suggest that the
+ * RepaintManager supports translucency.
+ *
  * @author rbair
  */
 @Retention(RetentionPolicy.RUNTIME)
