@@ -56,6 +56,7 @@ import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -190,7 +191,7 @@ public class JXLoginPanel extends JXImagePanel {
      * the List of servers supplied to the JXLoginPanel has a length greater
      * than 1.
      */
-    private JXComboBox serverCombo;
+    private JComboBox serverCombo;
     /**
      * Check box presented if a PasswordStore is used, allowing the user to decide whether to
      * save their password
@@ -387,7 +388,7 @@ public class JXLoginPanel extends JXImagePanel {
 //            JLabel serverLabel = new JLabel(UIManager.getString(CLASS_NAME + ".serverString"));
         JLabel serverLabel = new JLabel("Server");
         if (servers.size() > 1) {
-            serverCombo = new JXComboBox(servers.toArray());
+            serverCombo = new JComboBox(servers.toArray());
             serverLabel.setLabelFor(serverCombo);
         } else {
             serverCombo = null;
@@ -977,7 +978,7 @@ public class JXLoginPanel extends JXImagePanel {
      * If a UserNameStore is used, then this combo box is presented allowing the user
      * to select a previous login name, or type in a new login name
      */
-    public static final class ComboNamePanel extends JXComboBox implements NameComponent {
+    public static final class ComboNamePanel extends JComboBox implements NameComponent {
         private UserNameStore userNameStore;
         public ComboNamePanel(UserNameStore userNameStore) {
             super();
