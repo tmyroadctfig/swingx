@@ -52,6 +52,9 @@ public class StackLayout implements LayoutManager2 {
     // hence we choose a linked list to make insertion at the bottom faster
     private List<Component> components = new LinkedList<Component>();
 
+    /**
+     * {@inheritDoc}
+     */
     public void addLayoutComponent(final Component comp,
                                    final Object constraints) {
         synchronized (comp.getTreeLock()) {
@@ -64,28 +67,46 @@ public class StackLayout implements LayoutManager2 {
             }
         }
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     public void addLayoutComponent(final String name, final Component comp) {
         addLayoutComponent(comp, TOP);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void removeLayoutComponent(final Component comp) {
         synchronized (comp.getTreeLock()) {
             components.remove(comp);
         }
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public float getLayoutAlignmentX(final Container target) {
         return 0.5f;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public float getLayoutAlignmentY(final Container target) {
         return 0.5f;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void invalidateLayout(final Container target) {
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Dimension preferredLayoutSize(final Container parent) {
         synchronized (parent.getTreeLock()) {
             int width = 0;
@@ -105,6 +126,9 @@ public class StackLayout implements LayoutManager2 {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Dimension minimumLayoutSize(final Container parent) {
         synchronized (parent.getTreeLock()) {
             int width = 0;
@@ -123,12 +147,18 @@ public class StackLayout implements LayoutManager2 {
             return new Dimension(width, height);
         }
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     public Dimension maximumLayoutSize(final Container target) {
         return new Dimension(Integer.MAX_VALUE,
                              Integer.MAX_VALUE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void layoutContainer(final Container parent) {
         synchronized (parent.getTreeLock()) {
             int width = parent.getWidth();
