@@ -19,12 +19,6 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-/*
- * @(#)UIAction.java    1.2 03/04/24
- *
- * Copyright 2002 Sun Microsystems, Inc. All rights reserved.
- * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
 package org.jdesktop.swingx;
 
 import java.beans.PropertyChangeListener;
@@ -62,7 +56,7 @@ import javax.swing.Action;
  * @see javax.swing.Action
  * @author Scott Violet
  */
-public abstract class UIAction implements Action {
+abstract class UIAction implements Action {
     private String name;
 
     public UIAction(String name) {
