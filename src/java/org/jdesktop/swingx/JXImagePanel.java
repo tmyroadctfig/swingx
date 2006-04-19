@@ -261,7 +261,7 @@ public class JXImagePanel extends JXPanel {
             if (retVal == JFileChooser.APPROVE_OPTION) {
                 File file = chooser.getSelectedFile();
                 try {
-                    setImage(new ImageIcon(file.toURL()).getImage());
+                    setImage(new ImageIcon(file.toURI().toURL()).getImage());
                 } catch (Exception ex) {
                 }
             }
