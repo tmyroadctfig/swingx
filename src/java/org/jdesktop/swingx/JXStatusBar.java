@@ -197,7 +197,7 @@ public class JXStatusBar extends JXPanel {
         }
     }
     
-    public static class Layout implements LayoutManager2 {
+    private static class Layout implements LayoutManager2 {
         private Map<Component,Constraint> constraints = new HashMap<Component,Constraint>();
         
         public void addLayoutComponent(String name, Component comp) {
