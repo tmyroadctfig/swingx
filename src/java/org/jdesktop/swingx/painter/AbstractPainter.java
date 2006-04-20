@@ -122,7 +122,7 @@ public abstract class AbstractPainter<T extends JComponent> extends JavaBean imp
     /**
      * A hint as to whether or not to attempt caching the image
      */
-    private boolean useCache = true;
+    private boolean useCache = false;
     /**
      * The cached image, if useCache is true
      */
