@@ -22,13 +22,6 @@ package org.jdesktop.swingx.util;
 
 import java.util.List;
 
-/*
-* $Id$
-*
-* Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
-* Santa Clara, California 95054, U.S.A. All rights reserved.
-*/
-
 /**
  * This is a proxy interface to allow usage of the JDIC mail transport for error logging
  * without adding dependensies on the JDIC itaelf.
