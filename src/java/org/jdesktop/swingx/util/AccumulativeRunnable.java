@@ -120,7 +120,7 @@ abstract class AccumulativeRunnable<T> implements Runnable {
      */
     public final synchronized void add(T... args) {
         if (componentType == null) {
-            componentType = (Class<T>) args.getClass().getComponentType();
+            componentType = args.getClass().getComponentType();
         }
         boolean isSubmitted = true;
         if (arguments == null) {
@@ -151,7 +151,7 @@ abstract class AccumulativeRunnable<T> implements Runnable {
      *
      * @return accumulated artuments
      */
-    private final synchronized T[] flush() {
+    private synchronized T[] flush() {
         List<T> list = arguments;
         arguments = null;
         if (componentType == null) {

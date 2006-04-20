@@ -269,7 +269,7 @@ public abstract class SwingWorker<T, V> implements Future<T>, Runnable {
          * is finished.
          */
         DONE
-    };
+    }
 
     /**
      * Constructs this {@code SwingWorker}.
@@ -691,7 +691,7 @@ public abstract class SwingWorker<T, V> implements Future<T>, Runnable {
     
     /**
      * Sets this {@code SwingWorker} state bound property.
-     * @param the state state to set
+     * @param state the state to set
      */
     private void setState(StateValue state) {
         StateValue old = this.state;
@@ -725,7 +725,6 @@ public abstract class SwingWorker<T, V> implements Future<T>, Runnable {
      * get started.
      * 
      * @return ExecutorService for the {@code SwingWorkers}
-     * @see #startAutoShutdownThread
      */
     private static synchronized ExecutorService getWorkersExecutorService() {
         if (executorService == null) {
