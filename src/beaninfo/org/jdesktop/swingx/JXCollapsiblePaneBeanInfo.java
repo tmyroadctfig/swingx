@@ -38,8 +38,8 @@ public class JXCollapsiblePaneBeanInfo extends BeanInfoSupport {
         bd.setValue("isContainer", Boolean.TRUE);
         bd.setValue("containerDelegate", "getContentPane");
         
-        setPreferred(true, "animated", "collapsed");
-        setBound(true, "animated", "collapsed");
+        setPreferred(true, "animated", "collapsed", "orientation");
+        setBound(true, "animated", "collapsed", "orientation");
         
 //        BeanInfo info = Introspector.getBeanInfo(getBeanDescriptor().getBeanClass().getSuperclass());
 //        String order = info.getBeanDescriptor().getValue("propertyorder") == null ? "" : (String) info.getBeanDescriptor().getValue("propertyorder");

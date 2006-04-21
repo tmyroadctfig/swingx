@@ -396,6 +396,38 @@ public class JXCollapsiblePane extends JXPanel {
     }
 
     /**
+     * Changes the orientation of this collapsible pane. Doing so changes the
+     * layout of the underlying content pane. If the chosen orientation is
+     * vertical, a vertical layout with a gap of 2 pixels is chosen. Otherwise,
+     * a horizontal layout with a gap of 2 pixels is chosen.
+     *
+     * @see #getOrientation()
+     * @param orientation the new {@link Orientation} for this collapsible pane
+     * @throws IllegalStateException when this method is called while a
+     *                               collapsing/restore operation is running
+     * @javabean.property
+     *    bound="true"
+     *    preferred="true"
+     */
+    public void setOrientation(Orientation orientation) {
+        if (orientation != this.orientation) {
+            if (animateTimer.isRunning()) {
+                throw new IllegalStateException("Orientation cannot be changed " +
+                    "during collapsing.");
+            }
+
+            this.orientation = orientation;
+
+            if (orientation == Orientation.VERTICAL) {
+                getContentPane().setLayout(new VerticalLayout(2));
+            } else {
+                getContentPane().setLayout(new HorizontalLayout(2));
+            }
+        }
+    }
+    
+    /**
+     * @see #setOrientation(Orientation)
      * @return the current {@link Orientation}
      */
     public Orientation getOrientation() {
