@@ -102,11 +102,11 @@ public class DropShadowBorder implements Border {
        	Map<Position,BufferedImage> images = getImages(null);
         
         //compute the edges of the component -- not including the border
-        Insets borderInsets = getBorderInsets(c);
-        int leftEdge = x + borderInsets.left - lineWidth;
-        int rightEdge = x + width - borderInsets.right;
-        int topEdge = y + borderInsets.top - lineWidth;
-        int bottomEdge = y + height - borderInsets.bottom;
+//        Insets borderInsets = getBorderInsets(c);
+//        int leftEdge = x + borderInsets.left;
+//        int rightEdge = x + width - borderInsets.right;
+//        int topEdge = y + borderInsets.top;
+//        int bottomEdge = y + height - borderInsets.bottom;
         Graphics2D g2 = (Graphics2D)graphics.create();
         g2.setColor(lineColor);
         
@@ -351,7 +351,7 @@ public class DropShadowBorder implements Border {
      * @inheritDoc
      */
     public boolean isBorderOpaque() {
-        return true;
+        return false;
     }
     
     public boolean isShowTopShadow() {
