@@ -18,8 +18,12 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -52,6 +56,8 @@ import javax.swing.event.MouseInputAdapter;
  * JXImageView allows a user to drag photos into the well. If the user drags 
  * more than one photo at a time the first photo will be loaded and shown in the well. 
  * 
+ * JXImageView provides actions to do common image operations like rotation, opening
+ * and saving, and zooming.
  *
  * @author joshy
  */
@@ -85,7 +91,6 @@ public class JXImageView extends JXPanel {
             }
             
             public boolean importData(JComponent comp, Transferable t) {
-                System.out.println("got an importData call from: " + comp + " " + t);
                 if (canImport(comp,t.getTransferDataFlavors())) {
                     try {
                         List files = (List)t.getTransferData(DataFlavor.javaFileListFlavor);
@@ -188,6 +193,62 @@ public class JXImageView extends JXPanel {
 
         action.putValue(Action.NAME,"Save");
         return action;
+    }
+    
+    public Action getRotateClockwiseAction() {
+        Action action = new AbstractAction() {
+            public void actionPerformed(ActionEvent evt) {
+                Image img = getImage();
+                BufferedImage src = new BufferedImage(
+                            img.getWidth(null),
+                            img.getHeight(null), 
+                            BufferedImage.TYPE_INT_ARGB);
+                BufferedImage dst = new BufferedImage(
+                            img.getHeight(null), 
+                            img.getWidth(null),
+                            BufferedImage.TYPE_INT_ARGB);
+                Graphics2D g = (Graphics2D)src.getGraphics();
+                // smooth scaling
+                g.drawImage(img,0,0,null);
+                g.dispose();
+                AffineTransform trans = AffineTransform.getRotateInstance(Math.PI/2,0,0);
+                trans.translate(0,-src.getHeight());
+                BufferedImageOp op = new AffineTransformOp(trans, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+                Rectangle2D rect = op.getBounds2D(src);
+                op.filter(src,dst);
+                setImage(dst);
+            }
+        };
+        action.putValue(Action.NAME,"Rotate Clockwise");
+        return action;        
+    }
+    
+    public Action getRotateCounterClockwiseAction() {
+        Action action = new AbstractAction() {
+            public void actionPerformed(ActionEvent evt) {
+                Image img = getImage();
+                BufferedImage src = new BufferedImage(
+                            img.getWidth(null),
+                            img.getHeight(null), 
+                            BufferedImage.TYPE_INT_ARGB);
+                BufferedImage dst = new BufferedImage(
+                            img.getHeight(null), 
+                            img.getWidth(null),
+                            BufferedImage.TYPE_INT_ARGB);
+                Graphics2D g = (Graphics2D)src.getGraphics();
+                // smooth scaling
+                g.drawImage(img,0,0,null);
+                g.dispose();
+                AffineTransform trans = AffineTransform.getRotateInstance(-Math.PI/2,0,0);
+                trans.translate(-src.getWidth(),0);
+                BufferedImageOp op = new AffineTransformOp(trans, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+                Rectangle2D rect = op.getBounds2D(src);
+                op.filter(src,dst);
+                setImage(dst);
+            }
+        };
+        action.putValue(Action.NAME, "Rotate CounterClockwise");
+        return action;        
     }
     
     /* === overriden methods === */
