@@ -10,12 +10,15 @@
 package org.jdesktop.swingx;
 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -68,6 +71,38 @@ public class JXImageView extends JXPanel {
             }
         };
         action.putValue(Action.NAME,"Open");
+        return action;
+    }
+    
+    public Action getSaveAction() {
+        Action action = new AbstractAction() {
+            public void actionPerformed(ActionEvent evt) {
+                Image img = getImage();
+                BufferedImage dst = new BufferedImage(
+                            img.getWidth(null),
+                            img.getHeight(null), 
+                            BufferedImage.TYPE_INT_ARGB);
+                Graphics2D g = (Graphics2D)dst.getGraphics();
+                // smooth scaling
+                g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                                   RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                g.drawImage(img,0,0,null);
+                g.dispose();
+                JFileChooser chooser = new JFileChooser();
+                chooser.showSaveDialog(JXImageView.this);
+                File file = chooser.getSelectedFile();
+                if(file != null) {
+                    try {
+                        ImageIO.write(dst,"png",file);
+                    } catch (IOException ex) {
+                        System.out.println(ex.getMessage());
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        };
+
+        action.putValue(Action.NAME,"Save");
         return action;
     }
 

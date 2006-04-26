@@ -8,12 +8,12 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -99,7 +99,7 @@ public class JXImagePanel extends JXPanel {
             setImage(ImageIO.read(imageUrl));
         } catch (Exception e) {
             //TODO need convert to something meaningful
-           LOG.log(Level.WARNING, "", e);
+            LOG.log(Level.WARNING, "", e);
         }
     }
     
@@ -169,7 +169,7 @@ public class JXImagePanel extends JXPanel {
             repaint();
         }
     }
-
+    
     /**
      * @return the Style used for drawing the image (CENTERED, TILED, etc).
      */
@@ -236,7 +236,7 @@ public class JXImagePanel extends JXPanel {
                     break;
                 case TILED:
                 case SCALED:
-                      g2.drawImage(img, 0, 0, getWidth(), getHeight(), null);
+                    g2.drawImage(img, 0, 0, getWidth(), getHeight(), null);
                     break;
                 default:
                     LOG.fine("unimplemented");
@@ -268,10 +268,12 @@ public class JXImagePanel extends JXPanel {
         }
         
         public void mouseEntered(MouseEvent evt) {
-            JLabel label = (JLabel)evt.getSource();
-            if (oldCursor == null) {
-                oldCursor = label.getCursor();
-                label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            if(evt.getSource() instanceof JLabel) {
+                JLabel label = (JLabel)evt.getSource();
+                if (oldCursor == null) {
+                    oldCursor = label.getCursor();
+                    label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                }
             }
         }
         
