@@ -68,7 +68,7 @@ public class JXGradientChooser extends JXPanel {
     public JButton addThumbButton;
 
     public JTextField colorField;
-    public ColorSelectionButton changeColorButton;
+    public JXColorSelectionButton changeColorButton;
     public JSpinner colorLocationSpinner;
     public JSpinner alphaSpinner;
     public JSlider alphaSlider;
@@ -213,7 +213,7 @@ public class JXGradientChooser extends JXPanel {
         colorField.setText("000");
         colorField.setEnabled(false);
         label.setLabelFor(colorField);
-        changeColorButton = new ColorSelectionButton();
+        changeColorButton = new JXColorSelectionButton();
         changeColorButton.setAction(changeColorAction);
         changeColorButton.setText("");
         topPanel.add(label, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
