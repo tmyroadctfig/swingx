@@ -35,7 +35,27 @@ import javax.swing.SwingUtilities;
 /**
  * <p>A Painter instance that paints an image. Any Image is acceptable. This
  * Painter also allows the developer to specify a "Style" -- CENTERED, TILED,
- * or SCALED.</p>
+ * SCALED, POSITIONED, and CSS_POSITIONED; with the following meanings:</p>
+ *
+ * <ul>
+ *  <li><b>CENTERED</b>: draws the image unscaled and positioned in the center of
+ * the component</li>
+ *  <li><b>TILED</b>: draws the image repeatedly across the component, filling the
+ * entire background.</li>
+ *  <li><b>SCALED</b>: draws the image stretched large enough (or small enough) to 
+ * cover the entire component. The stretch may not preserve the aspect ratio of the
+ * original image.</li>
+ *  <li><b>POSITIONED</b>: draws the image at the location specified by the imageLocation
+ * property. This style of drawing will respect the imageScale property.</li>
+ *  <li><b>CSS_POSITIONED</b>: draws the image using CSS style background positioning.
+ *It will use the location specified by the imageLocation property. This property should
+ *contain a point with the x and y values between 0 and 1. 0,0 will put the image in the
+ *upper left hand corner, 1,1 in the lower right, and 0.5,0.5 in the center. All other values
+ *will be interpolated accordingly. For a more
+ * complete defintion of the positioning algorithm see the 
+ * <a href="http://www.w3.org/TR/CSS21/colors.html#propdef-background-position">CSS 2.1 spec</a>.
+ * </li>
+ * </ul>
  *
  * @author Richard
  */
@@ -57,7 +77,7 @@ public class ImagePainter extends AbstractPainter {
      * The smallest dimension (Math.min(width, height)) will be used to constrain
      * the image.
      */
-    public static enum Style {CENTERED, TILED, SCALED, POSITIONED};
+    public static enum Style {CENTERED, TILED, SCALED, POSITIONED, CSS_POSITIONED};
     
     /**
      * The image to draw
@@ -196,6 +216,11 @@ public class ImagePainter extends AbstractPainter {
                                   (int)(((double)img.getHeight(null))*imageScale),
                                   null);
                         break;
+                    case CSS_POSITIONED:
+                        double x = imagePosition.getX() * (component.getWidth()-img.getWidth(null));
+                        double y = imagePosition.getY() * (component.getHeight()-img.getHeight(null));
+                        g.drawImage(img,(int)x,(int)y,null);
+                        break;
                     default:
                         LOG.fine("unimplemented");
                         g.drawImage(img, 0, 0, null);
@@ -213,7 +238,7 @@ public class ImagePainter extends AbstractPainter {
         return imagePosition;
     }
 
-    private double imageScale;
+    private double imageScale = 1.0;
     public void setImageScale(double imageScale) {
         this.imageScale = imageScale;
     }
