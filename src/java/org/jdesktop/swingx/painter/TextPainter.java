@@ -31,7 +31,14 @@ import javax.swing.JComponent;
 import org.jdesktop.swingx.util.Resize;
 
 /**
- * "Paints" text at the given location.
+ * "Paints" text at the given location. The location should be a point where
+ * the x and y values are in the range of 0 to 1. Similar to the CSS background
+ * positioning algorithm, each value will be scaled along each axis of the component
+ * this TextPainter is painting, and then used to position the text. A value of
+ * 0,0 would put the text in the upper lefthand corner. 0.5,0.5 would position the
+ * text in the center and 1.0,1.0 would be at the lower righthand corner. For a more
+ * complete defintion of the positioning algorithm see the 
+ * <a href="http://www.w3.org/TR/CSS21/colors.html#propdef-background-position">CSS 2.1 spec</a>.
  *
  * @author rbair
  */
@@ -112,13 +119,15 @@ public class TextPainter extends AbstractPainter {
         }
         
         FontMetrics metrics = g.getFontMetrics(g.getFont());
+        String text = getText();
         
         Point2D location = getLocation();
-        double x = location.getX() * component.getWidth();
-        double y = location.getY() * component.getHeight();
+        int tw = metrics.stringWidth(text);
+        int th = metrics.getHeight();
+        double x = location.getX() * (component.getWidth()-tw);
+        double y = location.getY() * (component.getHeight()-th);
         y += metrics.getAscent();
         
-        String text = getText();
         //double stringWidth = SwingUtilities.computeStringWidth(metrics, text);
         //x -= stringWidth/2;
         g.drawString(text, (float)x, (float)y);
