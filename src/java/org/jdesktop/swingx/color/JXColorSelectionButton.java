@@ -43,20 +43,22 @@ import javax.swing.event.ChangeListener;
  *
  * @author joshy
  */
-public class ColorSelectionButton extends JButton {
+public class JXColorSelectionButton extends JButton {
     
     JDialog dialog = null;
     private JColorChooser chooser = null;
     
-    /** Creates a new instance of ColorSelectionButton */
-    public ColorSelectionButton() {
+    /**
+     * Creates a new instance of JXColorSelectionButton
+     */
+    public JXColorSelectionButton() {
         setBackground(Color.red);
         this.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
                 System.out.println("new color selection button");
                 if(dialog == null) {
                     dialog = JColorChooser.createDialog(
-                            ColorSelectionButton.this,
+                            JXColorSelectionButton.this,
                             "Choose a color",
                             true, 
                             getChooser(),
@@ -72,7 +74,7 @@ public class ColorSelectionButton extends JButton {
                             }
                             );
                     dialog.getContentPane().add(getChooser());
-                    getChooser().getSelectionModel().addChangeListener(new ColorChangeListener(ColorSelectionButton.this));
+                    getChooser().getSelectionModel().addChangeListener(new ColorChangeListener(JXColorSelectionButton.this));
                 }
                 dialog.setVisible(true);
                 Color color = getChooser().getColor();
@@ -96,8 +98,8 @@ public class ColorSelectionButton extends JButton {
     BufferedImage colorwell;
     
     private class ColorChangeListener implements ChangeListener {
-        public ColorSelectionButton button;
-        public ColorChangeListener(ColorSelectionButton button) {
+        public JXColorSelectionButton button;
+        public ColorChangeListener(JXColorSelectionButton button) {
             this.button = button;
         }
         public void stateChanged(ChangeEvent changeEvent) {
@@ -132,7 +134,7 @@ public class ColorSelectionButton extends JButton {
         JFrame frame = new JFrame("Color Button Test");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         JPanel panel = new JPanel();
-        panel.add(new ColorSelectionButton());
+        panel.add(new JXColorSelectionButton());
         panel.add(new JLabel("ColorSelectionButton test"));
         
         frame.add(panel);

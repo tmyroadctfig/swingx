@@ -32,7 +32,6 @@ import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 
 /**
- * TODO May want to move to org.jdesktop.swingx.util
  *
  * @author joshua.marinacci@sun.com
  */
@@ -83,7 +82,7 @@ public class ColorUtil {
     }
     
     /**
-     * Produces a String represeting the passed in color as a hex value
+     * Produces a String representing the passed in color as a hex value
      * (including the #) suitable for use in html. It does not include 
      * the alpha (transparency) channel in the string.
      * @param color the color to convert
