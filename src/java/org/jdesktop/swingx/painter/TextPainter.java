@@ -111,7 +111,7 @@ public class TextPainter extends AbstractPainter {
             g.setPaint(paint);
         }
         
-        FontMetrics metrics = g.getFontMetrics(font);
+        FontMetrics metrics = g.getFontMetrics(g.getFont());
         
         Point2D location = getLocation();
         double x = location.getX() * component.getWidth();
