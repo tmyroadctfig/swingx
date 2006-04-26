@@ -9,9 +9,12 @@
 
 package org.jdesktop.swingx;
 
+import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Paint;
 import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.datatransfer.DataFlavor;
@@ -36,6 +39,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JList;
 import javax.swing.TransferHandler;
 import javax.swing.event.MouseInputAdapter;
+import org.jdesktop.swingx.color.ColorUtil;
 
 /**
  * a panel which shows an image centered. the user can drag an image into the panel
@@ -69,47 +73,16 @@ public class JXImageView extends JXPanel {
     
     // location to draw image. if null then draw in the center
     private Point2D imageLocation;
-    
+    private Paint checkerPaint;
 
     /** Creates a new instance of JXImageView */
     public JXImageView() {
         MouseInputAdapter mia = new MoveHandler();
         addMouseMotionListener(mia);
         addMouseListener(mia);
-        
-        this.setTransferHandler(new TransferHandler() {
-            public boolean canImport(JComponent c, DataFlavor[] flavors) {
-                for(int i=0; i<flavors.length; i++) {
-                    if(DataFlavor.javaFileListFlavor.equals(flavors[i])) {
-                        return true;
-                    }/*
-                    if(DataFlavor.javaJVMLocalObjectMimeType.equals(flavors[i])) {
-                        return true;
-                    }*/
-                }
-                return false;
-            }
-            
-            public boolean importData(JComponent comp, Transferable t) {
-                if (canImport(comp,t.getTransferDataFlavors())) {
-                    try {
-                        List files = (List)t.getTransferData(DataFlavor.javaFileListFlavor);
-                        if(files.size() > 0) {
-                            File file = (File)files.get(0);
-                            BufferedImage img = ImageIO.read(file);
-                            setImage(img);
-                            return true;
-                        }
-                    } catch (Exception ex) {
-                        System.out.println(ex.getMessage());
-                        ex.printStackTrace();
-                    }
-                }
-                return false;
-            }
-
-        });
-        
+        this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        this.setTransferHandler(new DnDHandler());
+        checkerPaint = ColorUtil.getCheckerPaint(Color.white,new Color(250,250,250),50);
     }
 
     /* ========= properties ========= */
@@ -254,7 +227,8 @@ public class JXImageView extends JXPanel {
     /* === overriden methods === */
     
     protected void paintComponent(Graphics g) {
-        g.setColor(getBackground());
+        ((Graphics2D)g).setPaint(checkerPaint);
+        //g.setColor(getBackground());
         g.fillRect(0,0,getWidth(),getHeight());
         if(getImage() != null) {
             if(getImageLocation() == null) {
@@ -304,6 +278,37 @@ public class JXImageView extends JXPanel {
             prev = null;
         }
     }
+
+    private class DnDHandler extends TransferHandler {
+
+        public boolean canImport(JComponent c, DataFlavor[] flavors) {
+            for (int i = 0; i < flavors.length; i++) {
+                if (DataFlavor.javaFileListFlavor.equals(flavors[i])) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public boolean importData(JComponent comp, Transferable t) {
+            if (canImport(comp, t.getTransferDataFlavors())) {
+                try {
+                    List files = (List) t.getTransferData(DataFlavor.javaFileListFlavor);
+                    if (files.size() > 0) {
+                        File file = (File) files.get(0);
+                        BufferedImage img = ImageIO.read(file);
+                        setImage(img);
+                        return true;
+                    }
+                } catch (Exception ex) {
+                    System.out.println(ex.getMessage());
+                    ex.printStackTrace();
+                }
+            }
+            return false;
+        }
+    }
+
 
     
 }
