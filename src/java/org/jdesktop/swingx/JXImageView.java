@@ -14,18 +14,23 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
+import javax.swing.JList;
+import javax.swing.TransferHandler;
 import javax.swing.event.MouseInputAdapter;
 
 /**
@@ -42,15 +47,92 @@ import javax.swing.event.MouseInputAdapter;
  * or hand cursor.
  *
  * allows to set a crop/ restriction rect, if allowed
+ *
+ *
+ * JXImageView allows a user to drag photos into the well. If the user drags 
+ * more than one photo at a time the first photo will be loaded and shown in the well. 
+ * 
+ *
  * @author joshy
  */
 public class JXImageView extends JXPanel {
     
+    /* ======= instance variables ========= */
     // the image this view will show
     private Image image;
     
     // location to draw image. if null then draw in the center
     private Point2D imageLocation;
+    
+
+    /** Creates a new instance of JXImageView */
+    public JXImageView() {
+        MouseInputAdapter mia = new MoveHandler();
+        addMouseMotionListener(mia);
+        addMouseListener(mia);
+        
+        this.setTransferHandler(new TransferHandler() {
+            public boolean canImport(JComponent c, DataFlavor[] flavors) {
+                for(int i=0; i<flavors.length; i++) {
+                    if(DataFlavor.javaFileListFlavor.equals(flavors[i])) {
+                        return true;
+                    }/*
+                    if(DataFlavor.javaJVMLocalObjectMimeType.equals(flavors[i])) {
+                        return true;
+                    }*/
+                }
+                return false;
+            }
+            
+            public boolean importData(JComponent comp, Transferable t) {
+                System.out.println("got an importData call from: " + comp + " " + t);
+                if (canImport(comp,t.getTransferDataFlavors())) {
+                    try {
+                        List files = (List)t.getTransferData(DataFlavor.javaFileListFlavor);
+                        if(files.size() > 0) {
+                            File file = (File)files.get(0);
+                            BufferedImage img = ImageIO.read(file);
+                            setImage(img);
+                            return true;
+                        }
+                    } catch (Exception ex) {
+                        System.out.println(ex.getMessage());
+                        ex.printStackTrace();
+                    }
+                }
+                return false;
+            }
+
+        });
+        
+    }
+
+    /* ========= properties ========= */
+    public Point2D getImageLocation() {
+        return imageLocation;
+    }
+
+    public void setImageLocation(Point2D imageLocation) {
+        this.imageLocation = imageLocation;
+    }
+    
+    public Image getImage() {
+        return image;
+    }
+
+    public void setImage(Image image) {
+        this.image = image;
+        setImageLocation(null);
+        repaint();
+    }
+    
+    public void setImage(URL url) throws IOException {
+        setImage(ImageIO.read(url));
+    }
+    
+    public void setImage(File file) throws IOException {
+        setImage(ImageIO.read(file));
+    }
     
     // an action which will open a file chooser and load the selected image
     // if any.
@@ -74,6 +156,8 @@ public class JXImageView extends JXPanel {
         return action;
     }
     
+    // an action that will open a file chooser then save the current image to
+    // the selected file, if any.
     public Action getSaveAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent evt) {
@@ -105,41 +189,6 @@ public class JXImageView extends JXPanel {
         action.putValue(Action.NAME,"Save");
         return action;
     }
-
-        /** Creates a new instance of JXImageView */
-    public JXImageView() {
-        MouseInputAdapter mia = new MoveHandler();
-        addMouseMotionListener(mia);
-        addMouseListener(mia);
-    }
-
-    /* === properties === */
-    public Point2D getImageLocation() {
-        return imageLocation;
-    }
-
-    public void setImageLocation(Point2D imageLocation) {
-        this.imageLocation = imageLocation;
-    }
-    
-    public Image getImage() {
-        return image;
-    }
-
-    public void setImage(Image image) {
-        this.image = image;
-        setImageLocation(null);
-        repaint();
-    }
-    
-    public void setImage(URL url) throws IOException {
-        setImage(ImageIO.read(url));
-    }
-    
-    public void setImage(File file) throws IOException {
-        setImage(ImageIO.read(file));
-    }
-    
     
     /* === overriden methods === */
     
