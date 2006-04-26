@@ -104,19 +104,18 @@ public class ColorUtil {
      * @return a Paint implementation
      */
     public static Paint getCheckerPaint() {
-	if(checker_texture == null) {
-            checker_texture = Color.white;
-	    try {
-		BufferedImage checker_image = ImageIO.read(
-			ColorUtil.class.getResourceAsStream("/icons/checker8.png"));
-		Rectangle rect = new Rectangle(0,0,
-			checker_image.getWidth(),checker_image.getHeight());
-		checker_texture = new TexturePaint(checker_image,rect);
-	    } catch (Exception ex) {
-		ex.printStackTrace();
-	    }
-	}
-        return checker_texture;           
+        return getCheckerPaint(Color.white,Color.gray,20);
+    }
+    public static Paint getCheckerPaint(Color c1, Color c2, int size) {
+        BufferedImage img = new BufferedImage(size,size,BufferedImage.TYPE_INT_ARGB);
+        Graphics g = img.getGraphics();
+        g.setColor(c1);
+        g.fillRect(0,0,size,size);
+        g.setColor(c2);
+        g.fillRect(0,0,size/2,size/2);
+        g.fillRect(size/2,size/2,size/2,size/2);
+        g.dispose();
+        return new TexturePaint(img,new Rectangle(0,0,size,size));
     }
     
     /**
