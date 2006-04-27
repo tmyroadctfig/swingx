@@ -23,6 +23,9 @@ package org.jdesktop.swingx.painter;
 
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import javax.swing.JComponent;
 
 /**
@@ -187,11 +190,11 @@ public class PinstripePainter extends AbstractPainter {
         g.rotate(radians);
 
         int numLines = (int)(hypLength / getSpacing());
-        int lineLength = (int)hypLength;
 
         for (int i=0; i<numLines; i++) {
-            int x = (int)(i * getSpacing());
-            g.drawLine(x, -lineLength, x, lineLength);
+            double x = i * getSpacing();
+            Line2D line = new Line2D.Double(x, -hypLength, x, hypLength);
+            g.draw(line);
         }
     }
 }
