@@ -1,10 +1,22 @@
 /*
- * JXImageView.java
+ * $Id$
  *
- * Created on April 25, 2006, 9:31 PM
+ * Copyright 2006 Sun Microsystems, Inc., 4150 Network Circle,
+ * Santa Clara, California 95054, U.S.A. All rights reserved.
  *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 package org.jdesktop.swingx;
@@ -28,10 +40,13 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.List;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
@@ -40,30 +55,27 @@ import javax.swing.JList;
 import javax.swing.TransferHandler;
 import javax.swing.event.MouseInputAdapter;
 import org.jdesktop.swingx.color.ColorUtil;
+import org.jdesktop.swingx.error.ErrorListener;
+import org.jdesktop.swingx.error.ErrorSupport;
 
 /**
- * a panel which shows an image centered. the user can drag an image into the panel
- * to display it. The view has built in actions for 
- *  scaling, 
- * rotating,  
- * opening a new image, and 
- * cropping.
- *
- * has dashed rect and text indicating you should drag there.
- *
- * allows user to drag image within the panel, if allowed. shows move cursor
- * or hand cursor.
- *
- * allows to set a crop/ restriction rect, if allowed
- *
- *
- * JXImageView allows a user to drag photos into the well. If the user drags 
- * more than one photo at a time the first photo will be loaded and shown in the well. 
+ * <p>A panel which shows an image centered. The user can drag an image into the 
+ * panel from other applications and move the image around within the view.
+ * The JXImageView has built in actions for scaling, rotating, opening a new 
+ * image, and saving. These actions can be obtained using the relevant get*Action()
+ * methods.
+ *</p> 
  * 
- * JXImageView provides actions to do common image operations like rotation, opening
- * and saving, and zooming.
+ * <p>TODO: has dashed rect and text indicating you should drag there.</p>
+ * 
+ * 
+ * <p>If the user drags more than one photo at a time into the JXImageView only
+ * the first photo will be loaded and shown. Any errors generated internally, 
+ * such as dragging in a list of files which are not images, will be reported 
+ * to any attached {@link ErrorListeners} added by the 
+ * <CODE>{@link addErrorListener}()</CODE> method.</p>
  *
- * @author joshy
+ * @author Joshua Marinacci joshua.marinacci@sun.com
  */
 public class JXImageView extends JXPanel {
     
@@ -71,49 +83,201 @@ public class JXImageView extends JXPanel {
     // the image this view will show
     private Image image;
     
+    // support for error listeners
+    private ErrorSupport errorSupport = new ErrorSupport(this);
+    
     // location to draw image. if null then draw in the center
     private Point2D imageLocation;
+    // the background paint 
     private Paint checkerPaint;
+    // the scale for drawing the image
+    private double scale = 1.0;
+    // controls whether the user can move images around
+    private boolean editable = true;
+    // the handler for moving the image around within the panel
+    private MoveHandler moveHandler = new MoveHandler();
+    // controls the drag part of drag and drop
+    private boolean dragEnabled = false;
 
     /** Creates a new instance of JXImageView */
     public JXImageView() {
-        MouseInputAdapter mia = new MoveHandler();
-        addMouseMotionListener(mia);
-        addMouseListener(mia);
-        this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        this.setTransferHandler(new DnDHandler());
         checkerPaint = ColorUtil.getCheckerPaint(Color.white,new Color(250,250,250),50);
+        setEditable(true);
     }
+    
+   
 
     /* ========= properties ========= */
+    /**
+     * Gets the current image location. This location can be changed programmatically 
+     * or by the user dragging the image within the JXImageView.
+     * @return the current image location
+     */
     public Point2D getImageLocation() {
         return imageLocation;
     }
 
+    /**
+     * Set the current image location.
+     * @param imageLocation The new image location.
+     */
     public void setImageLocation(Point2D imageLocation) {
         this.imageLocation = imageLocation;
+        repaint();
     }
     
+    /**
+     * Gets the currently set image, or null if no image is set.
+     * @return the currently set image, or null if no image is set.
+     */
     public Image getImage() {
         return image;
     }
 
+    /**
+     * Sets the current image. Can set null if there should be no image show.
+     * @param image the new image to set, or null.
+     */
     public void setImage(Image image) {
         this.image = image;
         setImageLocation(null);
+        setScale(1.0);
         repaint();
     }
     
+    /**
+     * Set the current image to an image pointed to by this URL.
+     * @param url a URL pointing to an image, or null
+     * @throws java.io.IOException thrown if the image cannot be loaded
+     */
     public void setImage(URL url) throws IOException {
         setImage(ImageIO.read(url));
     }
     
+    /**
+     * Set the current image to an image pointed to by this File.
+     * @param file a File pointing to an image
+     * @throws java.io.IOException thrown if the image cannot be loaded
+     */
     public void setImage(File file) throws IOException {
+        System.out.println("reading: " + file.getAbsolutePath());
         setImage(ImageIO.read(file));
+    }
+    
+    /**
+     * Gets the current image scale . When the scale is set to 1.0 
+     * then one image pixel = one screen pixel. When scale < 1.0 the draw image
+     * will be smaller than it's real size. When scale > 1.0 the drawn image will
+     * be larger than it's real size. 1.0 is the default value.
+     * @return the current image scale
+     */
+    public double getScale() {
+        return scale;
+    }
+
+    /**
+     * Sets the current image scale . When the scale is set to 1.0 
+     * then one image pixel = one screen pixel. When scale < 1.0 the draw image
+     * will be smaller than it's real size. When scale > 1.0 the drawn image will
+     * be larger than it's real size. 1.0 is the default value.
+     * @param scale the new image scale
+     */
+    public void setScale(double scale) {
+        double oldScale = this.scale;
+        this.scale = scale;
+        this.firePropertyChange("scale",oldScale,scale);
+        repaint();
+    }
+
+    /**
+     * Returns whether or not the user can drag images.
+     * @return whether or not the user can drag images
+     */
+    public boolean isEditable() {
+        return editable;
+    }
+
+    /**
+     * Sets whether or not the user can drag images. When set to true the user can
+     * drag the photo around with their mouse. Also the cursor will be set to the
+     * 'hand' cursor. When set to false the user cannot drag photos around
+     * and the cursor will be set to the default.
+     * @param editable whether or not the user can drag images
+     */
+    public void setEditable(boolean editable) {
+        this.editable = editable;
+        if(editable) {
+            addMouseMotionListener(moveHandler);
+            addMouseListener(moveHandler);
+            this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            try {
+                this.setTransferHandler(new DnDHandler());
+            } catch (ClassNotFoundException ex) {
+                ex.printStackTrace();
+                fireError(ex);
+            }
+        } else {
+            removeMouseMotionListener(moveHandler);
+            removeMouseListener(moveHandler);
+            this.setCursor(Cursor.getDefaultCursor());
+            setTransferHandler(null);
+        }
+    }
+    
+    /**
+     * Sets the <CODE>dragEnabled</CODE> property, which determines whether or not 
+     * the user can drag images out of the image view and into other components or 
+     * application. Note: <B>setting
+     * this to true will disable the ability to move the image around within the
+     * well.</B>, though it will not change the <b>editable</b> property directly.
+     * @param dragEnabled the value to set the dragEnabled property to.
+     */
+    public void setDragEnabled(boolean dragEnabled) {
+        this.dragEnabled = dragEnabled;
+    }
+
+    /**
+     * Gets the current value of the <CODE>dragEnabled</CODE> property.
+     * @return the current value of the <CODE>dragEnabled</CODE> property
+     */
+    public boolean isDragEnabled() {
+        return dragEnabled;
+    }
+    
+    /**
+     * Adds an ErrorListener to the list of listeners to be notified
+     * of ErrorEvents
+     * @param el an ErrorListener to add
+     */
+    public void addErrorListener(ErrorListener el) {
+        errorSupport.addErrorListener(el);
+    }
+    
+    /**
+     * Remove an ErrorListener from the list of listeners to be notified of ErrorEvents.
+     * @param el an ErrorListener to remove
+     */
+    public void removeErrorListener(ErrorListener el) {
+        errorSupport.removeErrorListener(el);
+    }
+    
+    /**
+     * Send a new ErrorEvent to all registered ErrorListeners
+     * @param throwable the Error or Exception which was thrown
+     */
+    protected void fireError(Throwable throwable) {
+        errorSupport.fireErrorEvent(throwable);
     }
     
     // an action which will open a file chooser and load the selected image
     // if any.
+    /**
+     * Returns an Action which will open a file chooser, ask the user for an image file
+     * then load the image into the view. If the load fails an error will be fired
+     * to all registered ErrorListeners
+     * @return the action
+     * @see ErrorListener
+     */
     public Action getOpenAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent actionEvent) {
@@ -126,6 +290,7 @@ public class JXImageView extends JXPanel {
                     } catch (IOException ex) {
                         System.out.println(ex.getMessage());
                         ex.printStackTrace();
+                        fireError(ex);
                     }
                 }
             }
@@ -136,6 +301,12 @@ public class JXImageView extends JXPanel {
     
     // an action that will open a file chooser then save the current image to
     // the selected file, if any.
+    /**
+     * Returns an Action which will open a file chooser, ask the user for an image file
+     * then save the image from the view. If the save fails an error will be fired
+     * to all registered ErrorListeners
+     * @return an Action
+     */
     public Action getSaveAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent evt) {
@@ -159,6 +330,7 @@ public class JXImageView extends JXPanel {
                     } catch (IOException ex) {
                         System.out.println(ex.getMessage());
                         ex.printStackTrace();
+                        fireError(ex);
                     }
                 }
             }
@@ -168,6 +340,10 @@ public class JXImageView extends JXPanel {
         return action;
     }
     
+    /**
+     * Get an action which will rotate the currently selected image clockwise.
+     * @return an action
+     */
     public Action getRotateClockwiseAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent evt) {
@@ -196,6 +372,10 @@ public class JXImageView extends JXPanel {
         return action;        
     }
     
+    /**
+     * Gets an action which will rotate the current image counter clockwise.
+     * @return an Action
+     */
     public Action getRotateCounterClockwiseAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent evt) {
@@ -223,25 +403,56 @@ public class JXImageView extends JXPanel {
         action.putValue(Action.NAME, "Rotate CounterClockwise");
         return action;        
     }
+       
+    /**
+     * Gets an action which will zoom the current image out by a factor of 2.
+     * @return an action
+     */
+    public Action getZoomOutAction() {
+        Action action = new AbstractAction() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                setScale(getScale()*0.5);
+            }
+        };
+        action.putValue(Action.NAME,"Zoom Out");
+        return action;
+    }
     
+    /**
+     * Gets an action which will zoom the current image in by a factor of 2
+     * @return an action
+     */
+    public Action getZoomInAction() {
+        Action action = new AbstractAction() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                setScale(getScale()*2);
+            }
+        };
+        action.putValue(Action.NAME,"Zoom In");
+        return action;
+    }
     /* === overriden methods === */
     
+    /**
+     * Implementation detail.
+     * @param g 
+     */
     protected void paintComponent(Graphics g) {
         ((Graphics2D)g).setPaint(checkerPaint);
         //g.setColor(getBackground());
         g.fillRect(0,0,getWidth(),getHeight());
         if(getImage() != null) {
-            if(getImageLocation() == null) {
-                g.drawImage(getImage(),
-                        (getWidth()-getImage().getWidth(null))/2,
-                        (getHeight()-getImage().getHeight(null))/2,
-                        null);
-            } else {
-                g.drawImage(getImage(),
-                        (int)getImageLocation().getX(),
-                        (int)getImageLocation().getY(),
-                        null);
+            Point2D center = new Point2D.Double(getWidth()/2,getHeight()/2);
+            if(getImageLocation() != null) {
+                center = getImageLocation();
             }
+            Point2D loc = new Point2D.Double();
+            double width = getImage().getWidth(null)*getScale();
+            double height = getImage().getHeight(null)*getScale();
+            loc.setLocation(center.getX()-width/2, center.getY()-height/2);
+            g.drawImage(getImage(), (int)loc.getX(), (int)loc.getY(),
+                    (int)width,(int)height,
+                    null);
         }
     }
 
@@ -263,7 +474,7 @@ public class JXImageView extends JXPanel {
             Point2D offset = getImageLocation();
             if (offset == null) {
                 if (image != null) {
-                    offset = new Point2D.Double((getWidth() - getImage().getWidth(null)) / 2, (getHeight() - getImage().getHeight(null)) / 2);
+                    offset = new Point2D.Double(getWidth() / 2, getHeight() / 2);
                 } else {
                     offset = new Point2D.Double(0, 0);
                 }
@@ -280,12 +491,26 @@ public class JXImageView extends JXPanel {
     }
 
     private class DnDHandler extends TransferHandler {
+        DataFlavor urlFlavor;
+        
+        public DnDHandler() throws ClassNotFoundException {
+             urlFlavor = new DataFlavor("application/x-java-url;class=java.net.URL");
+        }
 
         public boolean canImport(JComponent c, DataFlavor[] flavors) {
+            System.out.println("flavor = " + urlFlavor);
             for (int i = 0; i < flavors.length; i++) {
+                System.out.println("testing: "+flavors[i]);
                 if (DataFlavor.javaFileListFlavor.equals(flavors[i])) {
                     return true;
                 }
+                if (DataFlavor.imageFlavor.equals(flavors[i])) {
+                    return true;
+                }
+                if (urlFlavor.match(flavors[i])) {
+                    return true;
+                }
+                
             }
             return false;
         }
@@ -293,22 +518,38 @@ public class JXImageView extends JXPanel {
         public boolean importData(JComponent comp, Transferable t) {
             if (canImport(comp, t.getTransferDataFlavors())) {
                 try {
-                    List files = (List) t.getTransferData(DataFlavor.javaFileListFlavor);
-                    if (files.size() > 0) {
-                        File file = (File) files.get(0);
-                        BufferedImage img = ImageIO.read(file);
-                        setImage(img);
-                        return true;
+                    if(t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                        List files = (List) t.getTransferData(DataFlavor.javaFileListFlavor);
+                        System.out.println("doing file list flavor");
+                        if (files.size() > 0) {
+                            File file = (File) files.get(0);
+                            System.out.println("readingt hte image: " + file.getCanonicalPath());
+                            /*Iterator it = ImageIO.getImageReaders(new FileInputStream(file));
+                            while(it.hasNext()) {
+                                System.out.println("can read: " + it.next());
+                            }*/
+                            BufferedImage img = ImageIO.read(file);
+                            setImage(img);
+                            return true;
+                        }
                     }
+                    //System.out.println("doing a uri list");
+                    Object obj = t.getTransferData(urlFlavor);
+                    //System.out.println("obj = " + obj + " " + obj.getClass().getPackage() + " "
+                    //        + obj.getClass().getName());
+                    if(obj instanceof URL) {
+                        setImage((URL)obj);
+                    }
+                    return true;
                 } catch (Exception ex) {
                     System.out.println(ex.getMessage());
                     ex.printStackTrace();
+                    fireError(ex);
                 }
             }
             return false;
         }
     }
-
 
     
 }
