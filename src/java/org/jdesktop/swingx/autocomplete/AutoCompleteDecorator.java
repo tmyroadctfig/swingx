@@ -23,6 +23,8 @@ package org.jdesktop.swingx.autocomplete;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -100,6 +102,8 @@ public class AutoCompleteDecorator {
                     int keyCode = keyEvent.getKeyCode();
                     // don't popup when the user hits shift,ctrl or alt
                     if (keyCode==keyEvent.VK_SHIFT || keyCode==keyEvent.VK_CONTROL || keyCode==keyEvent.VK_ALT) return;
+                    // don't popup when the user hits escape (see issue #311)
+                    if (keyCode==keyEvent.VK_ESCAPE) return;
                     comboBox.setPopupVisible(true);
                 }
             }
