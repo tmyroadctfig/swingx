@@ -37,7 +37,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     private int arrowPaddingY = 3;
     private int startX;
     private int startY;
-    private Dimension dim;
+    private Dimension dim = new Dimension();
     private PropertyChangeListener propertyChangeListener;
     private MouseListener mouseListener;
     private MouseMotionListener mouseMotionListener;
@@ -1038,10 +1038,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
 
         public Dimension preferredLayoutSize(Container parent) {
-            if (dim == null) {
-                dim = new Dimension();
-                layoutContainer(parent);
-            }
+            layoutContainer(parent);
             return new Dimension(dim);
         }
 
