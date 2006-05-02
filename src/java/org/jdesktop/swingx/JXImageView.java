@@ -31,6 +31,11 @@ import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DragGestureRecognizer;
+import java.awt.dnd.DragSource;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
@@ -95,7 +100,7 @@ public class JXImageView extends JXPanel {
     // controls whether the user can move images around
     private boolean editable = true;
     // the handler for moving the image around within the panel
-    private MoveHandler moveHandler = new MoveHandler();
+    private MoveHandler moveHandler = new MoveHandler(this);
     // controls the drag part of drag and drop
     private boolean dragEnabled = false;
 
@@ -460,15 +465,27 @@ public class JXImageView extends JXPanel {
     /* === Internal helper classes === */
 
     private class MoveHandler extends MouseInputAdapter {
-
+        private JXImageView panel;
         private Point prev = null;
+        private Point start = null;
+        public MoveHandler(JXImageView panel) {
+            this.panel = panel;
+        }
 
         public void mousePressed(MouseEvent evt) {
             prev = evt.getPoint();
+            start = prev;
         }
 
         public void mouseDragged(MouseEvent evt) {
             Point curr = evt.getPoint();
+            
+            if(isDragEnabled()) {
+                if(curr.distance(start) > 5) {
+                    panel.getTransferHandler().exportAsDrag(panel,evt,TransferHandler.COPY);
+                }
+            }
+            
             int offx = curr.x - prev.x;
             int offy = curr.y - prev.y;
             Point2D offset = getImageLocation();
