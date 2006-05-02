@@ -36,7 +36,14 @@ import javax.swing.event.MouseInputAdapter;
 import org.jdesktop.swingx.multislider.*;
 
 /**
- *
+ * <p>A slider which can have multiple control points or <i>Thumbs</i></p>
+ * <p>The thumbs each represent a value between the minimum and maximum values
+ * of the slider.  Thumbs can pass each other when being dragged.  Thumbs have
+ * no default visual representation. To customize the look of the thumbs and the
+ * track behind the thumbs you must provide a ThumbRenderer and a TrackRenderer 
+ * implementation. To listen for changes to the thumbs you must provide an 
+ * implemention of ThumbDataListener.
+ * 
  * @author joshy
  */
 public class JXMultiThumbSlider<E> extends JComponent {
@@ -45,29 +52,9 @@ public class JXMultiThumbSlider<E> extends JComponent {
     public JXMultiThumbSlider() {
         thumbs = new ArrayList();
         setLayout(null);
-	tdl = new ThumbDataListener() {
-	    public void positionChanged(ThumbDataEvent e) {
-		System.out.println("position changed");
-	    }
-	    public void thumbAdded(ThumbDataEvent evt) {
-		ThumbComp thumb = new ThumbComp(JXMultiThumbSlider.this);
-		thumb.setLocation(0,0);
-		add(thumb); // add as swing child
-		thumbs.add(evt.getIndex(),thumb); // add to thumb list
-		clipThumbPosition(thumb); // make sure it's valid
-		setThumbXByPosition(thumb,evt.getThumb().getPosition()); // move the thumb to the right pos.
-		repaint();
-	    }
-	    public void thumbRemoved(ThumbDataEvent evt) {
-		ThumbComp thumb = thumbs.get(evt.getIndex());
-		remove(thumb);
-		thumbs.remove(thumb);
-		repaint();
-	    }
-	    public void valueChanged(ThumbDataEvent e) {
-		System.out.println("value changed");
-	    }
-	};
+        
+	tdl = new ThumbHandler();
+        
         setModel(new DefaultMultiThumbModel<E>());
         MultiThumbMouseListener mia = new MultiThumbMouseListener(this);
         addMouseListener(mia);
@@ -80,7 +67,25 @@ public class JXMultiThumbSlider<E> extends JComponent {
         dim = new Dimension(10,10);
         setMinimumSize(dim);
 	
-	
+	this.setThumbRenderer(new ThumbRenderer() {
+            public void paintThumb(Graphics2D g, JXMultiThumbSlider.ThumbComp thumb, int index, boolean selected) {
+                g.setColor(Color.white);
+                g.drawLine(0,0,thumb.getWidth(),thumb.getHeight());
+                g.drawLine(0,thumb.getHeight(),thumb.getWidth(),0);
+                g.drawRect(0,0,thumb.getWidth()-1,thumb.getHeight()-1);
+            }
+        });
+        
+        this.setTrackRenderer(new TrackRenderer() {
+            public void paintTrack(Graphics2D g, JXMultiThumbSlider slider) {
+                g.setColor(Color.black);
+                g.fillRect(0,0,slider.getWidth(),slider.getHeight());
+                g.setColor(Color.white);
+                g.drawLine(0,0,slider.getWidth(),slider.getHeight());
+                g.drawLine(0,slider.getHeight(),slider.getWidth(),0);
+                g.drawRect(0,0,slider.getWidth()-1,slider.getHeight()-1);
+            }
+        });
     }
     
     
@@ -317,6 +322,7 @@ public class JXMultiThumbSlider<E> extends JComponent {
             setMinimumSize(dim);
             setPreferredSize(dim);
             setMaximumSize(dim);
+            setBackground(Color.white);
         }
         
         public void paintComponent(Graphics g) {
@@ -343,5 +349,34 @@ public class JXMultiThumbSlider<E> extends JComponent {
             this.selected = selected;
         }
     }
+
+    private class ThumbHandler implements ThumbDataListener {
+
+        public void positionChanged(ThumbDataEvent e) {
+            System.out.println("position changed");
+        }
+
+        public void thumbAdded(ThumbDataEvent evt) {
+            ThumbComp thumb = new ThumbComp(JXMultiThumbSlider.this);
+            thumb.setLocation(0, 0);
+            add(thumb);
+            thumbs.add(evt.getIndex(), thumb);
+            clipThumbPosition(thumb);
+            setThumbXByPosition(thumb, evt.getThumb().getPosition());
+            repaint();
+        }
+
+        public void thumbRemoved(ThumbDataEvent evt) {
+            ThumbComp thumb = thumbs.get(evt.getIndex());
+            remove(thumb);
+            thumbs.remove(thumb);
+            repaint();
+        }
+
+        public void valueChanged(ThumbDataEvent e) {
+            System.out.println("value changed");
+        }
+    }
+
 
 }
