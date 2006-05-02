@@ -12,6 +12,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Paint;
 import java.awt.Toolkit;
@@ -21,6 +22,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.List;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
@@ -85,7 +88,7 @@ public class JXGradientChooser extends JXPanel {
     
     /** Creates new form GradientPicker */
     public JXGradientChooser() {
-	initComponents();
+	initComponents2();
     }
     
     
@@ -174,21 +177,333 @@ public class JXGradientChooser extends JXPanel {
     /** This method is called from within the constructor to
      * initialize the form.
      */
+
+    private JPanel topPanel, previewPanel;
     private void initComponents() {
-        setLayout(new BorderLayout());
+        // declarations for anonymous components
+        JPanel jPanel1, jPanel2, jPanel3, jPanel4;
+        JLabel jLabel1, jLabel5, jLabel2, jLabel6, jLabel4, jLabel7, jLabel8, jLabel9;
+        ButtonGroup typeGroup;
+        // pre-init stuff
+        slider = new JXMultiThumbSlider<Color>();
+        gradientPreview = new GradientPreviewPanel();
         
+        java.awt.GridBagConstraints gridBagConstraints;
+
+        typeGroup = new javax.swing.ButtonGroup();
+        jPanel1 = new javax.swing.JPanel();
+        topPanel = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        colorField = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        colorLocationSpinner = new javax.swing.JSpinner();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        alphaSpinner = new javax.swing.JSpinner();
+        changeColorButton = new JXColorSelectionButton();
+        alphaSlider = new javax.swing.JSlider();
+        //slider = new javax.swing.JSlider();
+        jPanel4 = new javax.swing.JPanel();
+        addThumbButton = new javax.swing.JButton();
+        deleteThumbButton = new javax.swing.JButton();
+        previewPanel = new javax.swing.JPanel();
+        jPanel3 = new javax.swing.JPanel();
+        jLabel8 = new javax.swing.JLabel();
+        styleCombo = new javax.swing.JComboBox();
+        jLabel9 = new javax.swing.JLabel();
+        noCycleRadio = new javax.swing.JRadioButton();
+        reflectedRadio = new javax.swing.JRadioButton();
+        repeatedRadio = new javax.swing.JRadioButton();
+        reversedCheck = new javax.swing.JCheckBox();
+        //gradientPreview = new javax.swing.JPanel();
+
+        //setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        jPanel1.setLayout(new java.awt.GridBagLayout());
+
+        topPanel.setLayout(new java.awt.GridBagLayout());
+
+        topPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Gradient"));
+        jPanel2.setLayout(new java.awt.GridBagLayout());
+
+        jLabel1.setText("Color:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.ipadx = 2;
+        gridBagConstraints.ipady = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        jPanel2.add(jLabel1, gridBagConstraints);
+
+        jLabel5.setText("#");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(4, 0, 4, 4);
+        jPanel2.add(jLabel5, gridBagConstraints);
+
+        colorField.setColumns(6);
+        colorField.setEnabled(false);
+        colorField.setPreferredSize(null);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        jPanel2.add(colorField, gridBagConstraints);
+
+        jLabel2.setText("Location:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        jPanel2.add(jLabel2, gridBagConstraints);
+
+        jLabel6.setText("%");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridy = 1;
+        jPanel2.add(jLabel6, gridBagConstraints);
+
+        colorLocationSpinner.setEnabled(false);
+        colorLocationSpinner.setPreferredSize(null);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        jPanel2.add(colorLocationSpinner, gridBagConstraints);
+
+        jLabel4.setText("Opacity:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        jPanel2.add(jLabel4, gridBagConstraints);
+
+        jLabel7.setText("%");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridy = 2;
+        jPanel2.add(jLabel7, gridBagConstraints);
+
+        alphaSpinner.setEnabled(false);
+        alphaSpinner.setPreferredSize(null);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        jPanel2.add(alphaSpinner, gridBagConstraints);
+
+        changeColorButton.setText("00");
+        changeColorButton.setEnabled(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 0);
+        jPanel2.add(changeColorButton, gridBagConstraints);
+
+        alphaSlider.setEnabled(false);
+        alphaSlider.setPreferredSize(new java.awt.Dimension(20, 25));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        jPanel2.add(alphaSlider, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        topPanel.add(jPanel2, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        topPanel.add(slider, gridBagConstraints);
+
+        jPanel4.setLayout(new java.awt.GridLayout(1, 0, 2, 0));
+
+        addThumbButton.setText("Add");
+        jPanel4.add(addThumbButton);
+
+        deleteThumbButton.setText("Delete");
+        jPanel4.add(deleteThumbButton);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        topPanel.add(jPanel4, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        jPanel1.add(topPanel, gridBagConstraints);
+
+        previewPanel.setLayout(new java.awt.GridBagLayout());
+
+        previewPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Preview"));
+        jPanel3.setLayout(new java.awt.GridBagLayout());
+
+        jLabel8.setText("Style:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        jPanel3.add(jLabel8, gridBagConstraints);
+
+        styleCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Linear", "Radial" }));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        jPanel3.add(styleCombo, gridBagConstraints);
+
+        jLabel9.setText("Type:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        jPanel3.add(jLabel9, gridBagConstraints);
+
+        typeGroup.add(noCycleRadio);
+        noCycleRadio.setSelected(true);
+        noCycleRadio.setText("None");
+        noCycleRadio.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        noCycleRadio.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        jPanel3.add(noCycleRadio, gridBagConstraints);
+
+        typeGroup.add(reflectedRadio);
+        reflectedRadio.setText("Reflect");
+        reflectedRadio.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        reflectedRadio.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        jPanel3.add(reflectedRadio, gridBagConstraints);
+
+        typeGroup.add(repeatedRadio);
+        repeatedRadio.setText("Repeat");
+        repeatedRadio.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        repeatedRadio.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        jPanel3.add(repeatedRadio, gridBagConstraints);
+
+        reversedCheck.setText("Reverse");
+        reversedCheck.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        reversedCheck.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        jPanel3.add(reversedCheck, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        previewPanel.add(jPanel3, gridBagConstraints);
+
+        gradientPreview.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        gradientPreview.setPreferredSize(new java.awt.Dimension(130, 130));
+        /*
+        org.jdesktop.layout.GroupLayout gradientPreviewLayout = new org.jdesktop.layout.GroupLayout(gradientPreview);
+        gradientPreview.setLayout(gradientPreviewLayout);
+        gradientPreviewLayout.setHorizontalGroup(
+            gradientPreviewLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 132, Short.MAX_VALUE)
+        );
+        gradientPreviewLayout.setVerticalGroup(
+            gradientPreviewLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 118, Short.MAX_VALUE)
+        );
+         */
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 10.0;
+        gridBagConstraints.weighty = 10.0;
+        previewPanel.add(gradientPreview, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        jPanel1.add(previewPanel, gridBagConstraints);
+
+        /*
+        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 253, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        pack();
+         */
+    }// </editor-fold>    
+    private void initComponents2() {
+        this.initComponents();
+        setLayout(new BorderLayout());
+        add(topPanel, BorderLayout.NORTH);
+        add(previewPanel, BorderLayout.CENTER);
+        
+        
+        // do event handling stuff
         //create the actions and load them in the action map
         AddThumbAction addThumbAction = new AddThumbAction();
         DeleteThumbAction deleteThumbAction = new DeleteThumbAction();
         deleteThumbAction.setEnabled(false); //disabled to begin with
-        ChangeColorAction changeColorAction = new ChangeColorAction();
-        changeColorAction.setEnabled(false);
         //TODO Add to the action map with proper keys, etc
         ActionMap actions = getActionMap();
         actions.put("add-thumb", addThumbAction);
         actions.put("delete-thumb", deleteThumbAction);
-        actions.put("change-color", changeColorAction);
-        
+        //actions.put("change-color", changeColorAction);
+        addThumbButton.setAction(addThumbAction);
+        deleteThumbButton.setAction(deleteThumbAction);
+        changeColorButton.addPropertyChangeListener("background", new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                System.out.println("color bg changed");
+                selectColorForThumb();
+            }
+        });
+        colorLocationSpinner.addChangeListener(new ChangeLocationListener());
+        ChangeAlphaListener changeAlphaListener = new ChangeAlphaListener();
+        alphaSpinner.addChangeListener(changeAlphaListener);
+        alphaSlider.addChangeListener(changeAlphaListener);
+        RepaintOnEventListener repaintListener = new RepaintOnEventListener();
+	styleCombo.addItemListener(repaintListener);
+	styleCombo.setModel(new DefaultComboBoxModel(GradientStyle.values()));
+        noCycleRadio.addActionListener(repaintListener);
+        reflectedRadio.addActionListener(repaintListener);
+        repeatedRadio.addActionListener(repaintListener);
+        reversedCheck.addActionListener(repaintListener);
+        gradientPreview.picker = this; //wow, nasty
+
+        /*
         //configure the panel
         JXPanel topPanel = new JXPanel(new GridBagLayout());
         topPanel.setBorder(BorderFactory.createTitledBorder("Gradient"));
@@ -199,6 +514,7 @@ public class JXGradientChooser extends JXPanel {
         addThumbButton = new JButton(addThumbAction);
         deleteThumbButton = new JButton(deleteThumbAction);
         
+        Insets stdInsets = new Insets(3,3,3,3);
         sliderPanel.add(slider, new GridBagConstraints(0, 0, 2, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 5, 0), 0, 0));
         sliderPanel.add(addThumbButton, new GridBagConstraints(0, 1, 1, 1, .5, 0.0, GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(0, 0, 0, 3), 0, 0));
         sliderPanel.add(deleteThumbButton, new GridBagConstraints(1, 1, 1, 1, .5, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.NONE, new Insets(0, 3, 0, 0), 0, 0));
@@ -214,9 +530,14 @@ public class JXGradientChooser extends JXPanel {
         colorField.setEnabled(false);
         label.setLabelFor(colorField);
         changeColorButton = new JXColorSelectionButton();
-        changeColorButton.setAction(changeColorAction);
         changeColorButton.setText("");
-        topPanel.add(label, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+        changeColorButton.addPropertyChangeListener("background", new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                System.out.println("color bg changed");
+                selectColorForThumb();
+            }
+        });
+        topPanel.add(label, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
         topPanel.add(colorField, new GridBagConstraints(1, 1, 1, 1, .5, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
         topPanel.add(changeColorButton, new GridBagConstraints(2, 1, 1, 1, .5, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
         
@@ -234,6 +555,7 @@ public class JXGradientChooser extends JXPanel {
         label.setHorizontalAlignment(SwingConstants.TRAILING);
         alphaSpinner = new JSpinner();
         alphaSpinner.setEnabled(false);
+        ChangeAlphaListener changeAlphaListener = new ChangeAlphaListener();
         alphaSpinner.addChangeListener(changeAlphaListener);
         label.setLabelFor(alphaSpinner);
         alphaSlider = new JSlider();
@@ -250,9 +572,9 @@ public class JXGradientChooser extends JXPanel {
         JXPanel previewPanel = new JXPanel(new GridBagLayout());
         previewPanel.setBorder(BorderFactory.createTitledBorder("Preview"));
         
-        RepaintOnEventListener repaintListener = new RepaintOnEventListener();
         label = new JLabel("Style:");
         styleCombo = new JComboBox();
+        RepaintOnEventListener repaintListener = new RepaintOnEventListener();
 	styleCombo.addItemListener(repaintListener);
 	styleCombo.setModel(new DefaultComboBoxModel(GradientStyle.values()));
         label.setLabelFor(styleCombo);
@@ -288,7 +610,7 @@ public class JXGradientChooser extends JXPanel {
         previewPanel.add(gradientPreview, new GridBagConstraints(2, 0, 1, 5, 1.0, 1.0, GridBagConstraints.FIRST_LINE_START, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
         add(previewPanel);
-
+        */
         
         ///To still refactor below::
 	SpinnerNumberModel alpha_model = new SpinnerNumberModel(100,0,100,1);
@@ -346,15 +668,6 @@ public class JXGradientChooser extends JXPanel {
 		slider.repaint();
 		gradientPreview.repaint();
 	    }
-	}
-    }
-    private final class ChangeColorAction extends AbstractActionExt {
-	public ChangeColorAction() {
-	    super("Change Color");
-	}
-	
-	public void actionPerformed(ActionEvent actionEvent) {
-	    selectColorForThumb();
 	}
     }
     private final class AddThumbAction extends AbstractActionExt {
@@ -437,13 +750,11 @@ public class JXGradientChooser extends JXPanel {
 	int index = slider.getSelectedIndex();
 	if (index >= 0) {
 	    Color color = (Color)slider.getModel().getThumbAt(index).getObject();
-	    color = JColorChooser.showDialog(slider, "Select A Color", color);
-	    if (color != null) {
-		slider.getModel().getThumbAt(index).setObject(color);
-		updateFromStop(index, slider.getModel().getThumbAt(index).getPosition(), color);
-		slider.repaint();
-		((GradientPreviewPanel)gradientPreview).repaint();
-	    }
+            color = changeColorButton.getBackground();
+            slider.getModel().getThumbAt(index).setObject(color);
+            updateFromStop(index, slider.getModel().getThumbAt(index).getPosition(), color);
+            slider.repaint();
+            ((GradientPreviewPanel)gradientPreview).repaint();
 	}
     }
     
@@ -469,19 +780,32 @@ public class JXGradientChooser extends JXPanel {
 		dialog.setVisible(false);
 	    }
 	});
-	JButton okay = new JButton("Okay");
+	JButton okay = new JButton("Ok");
 	okay.addActionListener(new ActionListener() {
 	    public void actionPerformed(ActionEvent actionEvent) {
 		dialog.setVisible(false);
 	    }
 	});
+        okay.setDefaultCapable(true);
 	
 	
+        GridLayout gl = new GridLayout();
+        gl.setHgap(2);
+        panel.setLayout(gl);
 	panel.add(cancel);
-	panel.add(okay,"East");;
-	dialog.add(panel,"South");
+	panel.add(okay);
+        
+        JPanel p2 = new JPanel();
+        p2.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = gbc.EAST;
+        gbc.weightx = 1.0;
+        p2.add(panel,gbc);
+	dialog.add(p2,"South");
 	
+        dialog.getRootPane().setDefaultButton(okay);
 	dialog.pack();
+        dialog.setResizable(false);
 	dialog.setVisible(true);
 	
 	return picker.getGradient();
