@@ -22,6 +22,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -31,12 +32,14 @@ import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
 import java.awt.dnd.DragGestureRecognizer;
 import java.awt.dnd.DragSource;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -48,6 +51,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.imageio.ImageIO;
@@ -62,6 +66,7 @@ import javax.swing.event.MouseInputAdapter;
 import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.error.ErrorListener;
 import org.jdesktop.swingx.error.ErrorSupport;
+import org.jdesktop.swingx.util.PaintUtils;
 
 /**
  * <p>A panel which shows an image centered. The user can drag an image into the 
@@ -103,7 +108,11 @@ public class JXImageView extends JXPanel {
     private MoveHandler moveHandler = new MoveHandler(this);
     // controls the drag part of drag and drop
     private boolean dragEnabled = false;
-
+    // controls the filename of the dropped file
+    private String exportName = "UntitledImage";
+    // controls the format and filename extension of the dropped file
+    private String exportFormat = "png";
+    
     /** Creates a new instance of JXImageView */
     public JXImageView() {
         checkerPaint = ColorUtil.getCheckerPaint(Color.white,new Color(250,250,250),50);
@@ -481,8 +490,12 @@ public class JXImageView extends JXPanel {
             Point curr = evt.getPoint();
             
             if(isDragEnabled()) {
+                //System.out.println("testing drag enabled: " + curr + " " + start);
+                //System.out.println("distance = " + curr.distance(start));
                 if(curr.distance(start) > 5) {
-                    panel.getTransferHandler().exportAsDrag(panel,evt,TransferHandler.COPY);
+                    System.out.println("starting the drag: ");
+                    panel.getTransferHandler().exportAsDrag((JComponent)evt.getSource(),evt,TransferHandler.COPY);
+                    return;
                 }
             }
             
@@ -513,11 +526,23 @@ public class JXImageView extends JXPanel {
         public DnDHandler() throws ClassNotFoundException {
              urlFlavor = new DataFlavor("application/x-java-url;class=java.net.URL");
         }
+        
+        public void exportAsDrag(JComponent c, InputEvent evt, int action) {
+            //System.out.println("exportting as drag");
+            super.exportAsDrag(c,evt,action);
+        }
+        public int getSourceActions(JComponent c) {
+            //System.out.println("get source actions: " + c);
+            return COPY;
+        }
+        protected void exportDone(JComponent source, Transferable data, int action) {
+            System.out.println("exportDone: " + source + " " + data + " " +action);
+        }
 
         public boolean canImport(JComponent c, DataFlavor[] flavors) {
-            System.out.println("flavor = " + urlFlavor);
+            //System.out.println("canImport:" + c);
             for (int i = 0; i < flavors.length; i++) {
-                System.out.println("testing: "+flavors[i]);
+                //System.out.println("testing: "+flavors[i]);
                 if (DataFlavor.javaFileListFlavor.equals(flavors[i])) {
                     return true;
                 }
@@ -532,7 +557,14 @@ public class JXImageView extends JXPanel {
             return false;
         }
 
+        protected Transferable createTransferable(JComponent c) {
+            System.out.println("creating a transferable");
+            JXImageView view = (JXImageView)c;
+            return new ImageTransferable(view.getImage(),
+                    view.getExportName(), view.getExportFormat());
+        }
         public boolean importData(JComponent comp, Transferable t) {
+            System.out.println("importData called");
             if (canImport(comp, t.getTransferDataFlavors())) {
                 try {
                     if(t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
@@ -566,7 +598,69 @@ public class JXImageView extends JXPanel {
             }
             return false;
         }
+
     }
 
     
+    private class ImageTransferable implements Transferable {
+        private Image img;
+        private List files;
+        private String exportName, exportFormat;
+        public ImageTransferable(Image img, String exportName, String exportFormat) {
+            this.img = img;
+            this.exportName = exportName;
+            this.exportFormat = exportFormat;
+        }
+
+        public DataFlavor[] getTransferDataFlavors() {
+            DataFlavor[] flavors = { DataFlavor.imageFlavor,
+                DataFlavor.javaFileListFlavor };
+            return flavors;
+        }
+
+        public boolean isDataFlavorSupported(DataFlavor flavor) {
+            if(flavor == DataFlavor.imageFlavor) {
+                return true;
+            }
+            if(flavor == DataFlavor.javaFileListFlavor) {
+                return true;
+            }
+            return false;
+        }
+
+        public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+            //System.out.println("doing get trans data: " + flavor);
+            if(flavor == DataFlavor.imageFlavor) {
+                return img;
+            }
+            if(flavor == DataFlavor.javaFileListFlavor) {
+                if(files == null) {
+                    files = new ArrayList();
+                    File file = File.createTempFile(exportName,"."+exportFormat);
+                    //System.out.println("writing to: " + file);
+                    ImageIO.write(PaintUtils.convertToBufferedImage(img),exportFormat,file);
+                    files.add(file);
+                }
+                //System.out.println("returning: " + files);
+                return files;
+            }
+            return null;
+        }
+    }
+
+    public String getExportName() {
+        return exportName;
+    }
+
+    public void setExportName(String exportName) {
+        this.exportName = exportName;
+    }
+
+    public String getExportFormat() {
+        return exportFormat;
+    }
+
+    public void setExportFormat(String exportFormat) {
+        this.exportFormat = exportFormat;
+    }
 }
