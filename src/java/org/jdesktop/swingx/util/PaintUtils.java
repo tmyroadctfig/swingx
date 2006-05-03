@@ -32,6 +32,7 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.Image;
 import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
@@ -189,5 +190,13 @@ public class PaintUtils {
         GraphicsConfiguration configuration =
                 screenDevice.getDefaultConfiguration();
         return configuration.createCompatibleImage(width, height, transparency);
+    }
+    
+    public static BufferedImage convertToBufferedImage(Image img) {
+        BufferedImage buff = createCompatibleImage(img.getWidth(null),img.getHeight(null));
+        Graphics2D g2 = buff.createGraphics();
+        g2.drawImage(img,0,0,null);
+        g2.dispose();
+        return buff;
     }
 }
