@@ -20,6 +20,7 @@ public class JXMonthViewAddon extends AbstractComponentAddon {
                 "JXMonthView.monthStringForeground", new Color(68, 68, 68),
                 "JXMonthView.daysOfTheWeekForeground", new Color(68, 68, 68),
                 "JXMonthView.selectedBackground", new Color(197, 220, 240),
+                "JXMonthView.flaggedDayForeground", Color.RED,
                 "JXMonthView.font", UIManager.getFont("Button.font"),
                 "JXMonthView.monthDownFileName", "resources/month-down.png",
                 "JXMonthView.monthUpFileName", "resources/month-up.png"

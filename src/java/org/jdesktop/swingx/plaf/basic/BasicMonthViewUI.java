@@ -1,19 +1,19 @@
 package org.jdesktop.swingx.plaf.basic;
 
-import org.jdesktop.swingx.plaf.MonthViewUI;
-import org.jdesktop.swingx.calendar.JXMonthView;
 import org.jdesktop.swingx.calendar.DateSpan;
 import org.jdesktop.swingx.calendar.DateUtils;
+import org.jdesktop.swingx.calendar.JXMonthView;
+import org.jdesktop.swingx.plaf.MonthViewUI;
 
 import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
-import java.awt.event.*;
 import java.awt.*;
-import java.util.Calendar;
+import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
+import java.util.Calendar;
 
 public class BasicMonthViewUI extends MonthViewUI {
     private static final int CALENDAR_SPACING = 10;
@@ -112,6 +112,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         monthView.setMonthStringForeground(UIManager.getColor("JXMonthView.monthStringForeground"));
         monthView.setDaysOfTheWeekForeground(UIManager.getColor("JXMonthView.daysOfTheWeekForeground"));
         monthView.setSelectedBackground(UIManager.getColor("JXMonthView.selectedBackground"));
+        monthView.setFlaggedDayForeground(UIManager.getColor("JXMonthView.flaggedDayForeground"));
         monthView.setFont(UIManager.getFont("JXMonthView.font"));
         monthDownImage = new ImageIcon(
                 JXMonthView.class.getResource(UIManager.getString("JXMonthView.monthDownFileName")));
@@ -711,10 +712,18 @@ public class BasicMonthViewUI extends MonthViewUI {
                         dirtyRect.height = bounds.height;
                     }
                 }
-                paintDayBackground(g, bounds.x, bounds.y,
-                        bounds.width, bounds.height, day);
-                paintDayForeground(g, bounds.x, bounds.y,
-                        bounds.width, bounds.height, day);
+
+                if (monthView.isFlaggedDate(day)) {
+                    paintFlaggedDayBackground(g, bounds.x, bounds.y,
+                            bounds.width, bounds.height, day);
+                    paintFlaggedDayForeground(g, bounds.x, bounds.y,
+                            bounds.width, bounds.height, day);
+                } else {
+                    paintDayBackground(g, bounds.x, bounds.y,
+                            bounds.width, bounds.height, day);
+                    paintDayForeground(g, bounds.x, bounds.y,
+                            bounds.width, bounds.height, day);
+                }
             }
             cal.add(Calendar.DAY_OF_MONTH, 1);
         }
@@ -803,28 +812,61 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         int boxPaddingX = monthView.getBoxPaddingX();
         int boxPaddingY = monthView.getBoxPaddingY();
-        if (monthView.isFlaggedDate(date)) {
-            Font oldFont = monthView.getFont();
-            g.setFont(derivedFont);
-            fm = monthView.getFontMetrics(derivedFont);
-            g.drawString(numericDay,
-                    ltr ?
-                            x + boxPaddingX +
-                                    boxWidth - fm.stringWidth(numericDay):
-                            x + boxPaddingX +
-                                    boxWidth - fm.stringWidth(numericDay) - 1,
-                    y + boxPaddingY + fm.getAscent());
-            g.setFont(oldFont);
-        } else {
-            fm = g.getFontMetrics();
-            g.drawString(numericDay,
-                    ltr ?
-                            x + boxPaddingX +
-                                    boxWidth - fm.stringWidth(numericDay):
-                            x + boxPaddingX +
-                                    boxWidth - fm.stringWidth(numericDay) - 1,
-                    y + boxPaddingY + fm.getAscent());
-        }
+
+        fm = g.getFontMetrics();
+        g.drawString(numericDay,
+                ltr ?
+                        x + boxPaddingX +
+                                boxWidth - fm.stringWidth(numericDay) :
+                        x + boxPaddingX +
+                                boxWidth - fm.stringWidth(numericDay) - 1,
+                y + boxPaddingY + fm.getAscent());
+    }
+
+    /**
+     * Paint the background for the specified flagged day.  The default implementation just
+     * calls <code>paintDayBackground</code>.
+     *
+     * @param g Graphics object to paint to
+     * @param x x-coordinate of upper left corner
+     * @param y y-coordinate of upper left corner
+     * @param width width of bounding box for the day
+     * @param height height of bounding box for the day
+     * @param date long value representing the flagged day being painted
+     */
+    protected void paintFlaggedDayBackground(Graphics g, int x, int y, int width, int height, long date) {
+        paintDayBackground(g, x, y, width, height, date);
+    }
+
+    /**
+     * Paint the foreground for the specified flagged day.
+     *
+     * @param g Graphics object to paint to
+     * @param x x-coordinate of upper left corner
+     * @param y y-coordinate of upper left corner
+     * @param width width of bounding box for the day
+     * @param height height of bounding box for the day
+     * @param date long value representing the flagged day being painted
+     */
+    protected void paintFlaggedDayForeground(Graphics g, int x, int y, int width, int height, long date) {
+        String numericDay = dayOfMonthFormatter.format(date);
+        FontMetrics fm;
+
+        int boxPaddingX = monthView.getBoxPaddingX();
+        int boxPaddingY = monthView.getBoxPaddingY();
+
+        Font oldFont = monthView.getFont();
+        g.setColor(monthView.getFlaggedDayForeground());
+        g.setFont(derivedFont);
+        fm = monthView.getFontMetrics(derivedFont);
+        g.drawString(numericDay,
+                ltr ?
+                        x + boxPaddingX +
+                                boxWidth - fm.stringWidth(numericDay):
+                        x + boxPaddingX +
+                                boxWidth - fm.stringWidth(numericDay) - 1,
+                y + boxPaddingY + fm.getAscent());
+        g.setFont(oldFont);
     }
 
     private class Handler implements ComponentListener, MouseListener, MouseMotionListener, LayoutManager, PropertyChangeListener {
@@ -835,9 +877,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         /** For multiple selection we need to record the date we pivot around. */
         private long pivotDate = -1;
 
-        public void mouseClicked(MouseEvent e) {
-
-        }
+        public void mouseClicked(MouseEvent e) {}
 
         public void mousePressed(MouseEvent e) {
             // If we were using the keyboard we aren't anymore.

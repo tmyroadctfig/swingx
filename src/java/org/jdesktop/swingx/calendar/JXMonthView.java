@@ -20,15 +20,16 @@
  */
 package org.jdesktop.swingx.calendar;
 
-import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.JXMonthViewAddon;
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.MonthViewUI;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
 import javax.swing.*;
 import javax.swing.Timer;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.*;
 
 
 /**
@@ -183,6 +184,7 @@ public class JXMonthView extends JComponent {
     private String _actionCommand = "selectionChanged";
     private Timer _todayTimer = null;
     private Hashtable<Integer, Color> _dayToColorTable = new Hashtable<Integer, Color>();
+    private Color _flaggedDayForeground;
 
     /**
      * Create a new instance of the <code>JXMonthView</code> class using the
@@ -831,6 +833,24 @@ public class JXMonthView extends JComponent {
     }
 
     /**
+     * Set the color to be used for painting the foregroudn of a flagged day.
+     *
+     * @param c The color to be used for painting.
+     */
+    public void setFlaggedDayForeground(Color c) {
+        _flaggedDayForeground = c;
+    }
+
+    /**
+     * Return the color that should be used for painting the foreground of the flagged day.
+     *
+     * @return The color to be used for painting
+     */
+    public Color getFlaggedDayForeground() {
+        return _flaggedDayForeground;
+    }
+
+    /**
      * Returns a copy of the insets used to paint the month string background.
      *
      * @return Insets Month string insets.
@@ -1103,24 +1123,27 @@ public class JXMonthView extends JComponent {
     }
 
 
-//    public static void main(String args[]) {
-//        SwingUtilities.invokeLater(new Runnable() {
-//            public void run() {
-//                JFrame frame = new JFrame();
-//                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//                JXMonthView mv = new JXMonthView();
-//                mv.setPreferredRows(2);
-//                mv.setSelectionMode(JXMonthView.SINGLE_SELECTION);
-//                mv.addActionListener(new ActionListener() {
-//                    public void actionPerformed(ActionEvent e) {
-//                        System.out.println(
-//                                ((JXMonthView)e.getSource()).getSelectedDateSpan());
-//                    }
-//                });
-//                frame.getContentPane().add(mv);
-//                frame.pack();
-//                frame.setVisible(true);
-//            }
-//        });
-//    }
+    public static void main(String args[]) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                JFrame frame = new JFrame();
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                JXMonthView mv = new JXMonthView();
+                Calendar cal = Calendar.getInstance();
+                cal.set(2006, 5, 20);
+                mv.setFlaggedDates(new long[] { cal.getTimeInMillis() });
+                mv.setPreferredRows(2);
+                mv.setSelectionMode(JXMonthView.SINGLE_SELECTION);
+                mv.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        System.out.println(
+                                ((JXMonthView)e.getSource()).getSelectedDateSpan());
+                    }
+                });
+                frame.getContentPane().add(mv);
+                frame.pack();
+                frame.setVisible(true);
+            }
+        });
+    }
 }
