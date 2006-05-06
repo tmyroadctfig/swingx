@@ -33,6 +33,7 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     private boolean usingKeyboard = false;
     private boolean ltr;
+    private boolean showingWeekNumber;
     private int arrowPaddingX = 3;
     private int arrowPaddingY = 3;
     private int startX;
@@ -270,7 +271,14 @@ public class BasicMonthViewUI extends MonthViewUI {
                 (calCol * (calendarWidth + CALENDAR_SPACING))) /
                 (boxPaddingX + boxWidth + boxPaddingX);
 
-        if (col > JXMonthView.DAYS_IN_WEEK - 1) {
+        // If we're showing week numbers we need to reduce the selected
+        // col index by one.
+        if (showingWeekNumber) {
+            col--;
+        }
+
+        // Make sure the selected column matches up with a day of the week.
+        if (col < 0 || col > JXMonthView.DAYS_IN_WEEK - 1) {
             return -1;
         }
 
@@ -481,6 +489,14 @@ public class BasicMonthViewUI extends MonthViewUI {
         // Offset for location of the day in the week.
         int boxPaddingX = monthView.getBoxPaddingX();
         int boxPaddingY = monthView.getBoxPaddingY();
+
+        // If we're showing week numbers then increase the bounds.x
+        // by one more boxPaddingX boxWidth boxPaddingX.
+        if (showingWeekNumber) {
+            bounds.x++;
+        }
+
+        // Calculate the x location.
         bounds.x = ltr ?
                 bounds.x * (boxPaddingX + boxWidth + boxPaddingX) :
                 (bounds.x + 1) * (boxPaddingX + boxWidth + boxPaddingX);
@@ -760,7 +776,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         g2.fillRect(x, y, width - 1, height - 1);
         g2.setPaint(new Color(153, 153, 153));
         g2.drawRect(x, y, width - 1, height - 1);
-        //TODO The right side of the rect is being clipped
     }
 
     /**
@@ -1144,6 +1159,15 @@ public class BasicMonthViewUI extends MonthViewUI {
                 cal.add(Calendar.DAY_OF_MONTH, 1);
             }
 
+            // If we are displaying week numbers find the largest displayed week number.
+            if (showingWeekNumber) {
+                int val = cal.getActualMaximum(Calendar.WEEK_OF_YEAR);
+                currWidth = fm.stringWidth(Integer.toString(val));
+                if (currWidth > boxWidth) {
+                    boxWidth = currWidth;
+                }
+            }
+
             // If the calendar is traversable, check the icon heights and
             // adjust the month box height accordingly.
             monthBoxHeight = boxHeight;
@@ -1166,11 +1190,14 @@ public class BasicMonthViewUI extends MonthViewUI {
                             monthUpImage.getIconWidth() + (arrowPaddingX * 4);
                 }
                 boxWidth += Math.ceil(diff / (double)JXMonthView.DAYS_IN_WEEK);
-                dim.width = (boxWidth + (2 * boxPaddingX)) * JXMonthView.DAYS_IN_WEEK;
             }
 
             // Keep track of calendar width and height for use later.
             calendarWidth = (boxWidth + (2 * boxPaddingX)) * JXMonthView.DAYS_IN_WEEK;
+            if (showingWeekNumber) {
+                calendarWidth += (boxWidth + (2 * boxPaddingX));
+            }
+
             calendarHeight = ((boxPaddingY + boxHeight + boxPaddingY) * 7) +
                     (boxPaddingY + monthBoxHeight + boxPaddingY);
 
@@ -1237,6 +1264,8 @@ public class BasicMonthViewUI extends MonthViewUI {
                     "traversable".equals(property) || "daysOfTheWeek".equals(property) ||
                     "border".equals(property) || "font".equals(property)) {
                 monthView.revalidate();
+            } else if ("weekNumber".equals(property)) {
+                showingWeekNumber = monthView.isShowingWeekNumber();
             }
         }
 

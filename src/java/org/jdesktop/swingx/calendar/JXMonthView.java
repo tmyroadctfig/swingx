@@ -185,6 +185,7 @@ public class JXMonthView extends JComponent {
     private Timer _todayTimer = null;
     private Hashtable<Integer, Color> _dayToColorTable = new Hashtable<Integer, Color>();
     private Color _flaggedDayForeground;
+    private boolean _showWeekNumber;
 
     /**
      * Create a new instance of the <code>JXMonthView</code> class using the
@@ -586,6 +587,29 @@ public class JXMonthView extends JComponent {
         }
     }
 
+    /**
+     * Returns whether or not this <code>JXMonthView</code> should display
+     * week number.
+     *
+     * @return <code>true</code> if week numbers should be displayed
+     */
+    public boolean isShowingWeekNumber() {
+        return _showWeekNumber;
+    }
+
+    /**
+     * Set whether or not this <code>JXMonthView</code> will display week
+     * numbers or not.
+     *
+     * @param showWeekNumber true if week numbers should be displayed,
+     *        false otherwise
+     */
+    public void setShowingWeekNumber(boolean showWeekNumber) {
+        if (_showWeekNumber != showWeekNumber) {
+            _showWeekNumber = showWeekNumber;
+            firePropertyChange("weekNumber", !_showWeekNumber, showWeekNumber);
+        }
+    }
     /**
      * Sets the single character representation for each day of the
      * week.  For this method the first days of the week days[0] is assumed to
@@ -1129,6 +1153,8 @@ public class JXMonthView extends JComponent {
                 JFrame frame = new JFrame();
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 JXMonthView mv = new JXMonthView();
+                mv.setShowingWeekNumber(true);
+                mv.setTraversable(true);
                 Calendar cal = Calendar.getInstance();
                 cal.set(2006, 5, 20);
                 mv.setFlaggedDates(new long[] { cal.getTimeInMillis() });
