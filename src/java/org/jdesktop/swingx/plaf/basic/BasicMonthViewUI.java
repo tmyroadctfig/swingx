@@ -650,6 +650,9 @@ public class BasicMonthViewUI extends MonthViewUI {
                                     (boxWidth / 2) -
                                     (fm.stringWidth(daysOfTheWeek[dayIndex]) /
                                     2);
+                        if (showingWeekNumber) {
+                            tmpX += boxPaddingX + boxWidth + boxPaddingX;
+                        }
                         tmpY = bounds.y + fm.getAscent();
                         g.drawString(daysOfTheWeek[dayIndex], tmpX, tmpY);
                         dayIndex++;
@@ -707,9 +710,21 @@ public class BasicMonthViewUI extends MonthViewUI {
         int days = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
         Rectangle clip = g.getClipBounds();
         long day;
+        int oldWeek = -1;
 
         for (int i = 0; i < days; i++) {
             calculateBoundsForDay(bounds);
+
+            // Paint the week numbers if we're displaying them.
+            // TODO: add a paint background for the whole area of the week numbers
+            if (showingWeekNumber) {
+                int weekOfYear = cal.get(Calendar.WEEK_OF_YEAR);
+                if (weekOfYear != oldWeek) {
+                    paintWeekOfYear(g, bounds.x - (monthView.getBoxPaddingX() + boxWidth + monthView.getBoxPaddingY()),
+                            bounds.y, bounds.width, bounds.height, weekOfYear);
+                    oldWeek = weekOfYear;
+                }
+            }
 
             if (bounds.intersects(clip)) {
                 day = cal.getTimeInMillis();
@@ -743,6 +758,35 @@ public class BasicMonthViewUI extends MonthViewUI {
             }
             cal.add(Calendar.DAY_OF_MONTH, 1);
         }
+    }
+
+    /**
+     * Paints the week of the year
+     *
+     * @param g Graphics object
+     * @param x x-coordinate of upper left corner.
+     * @param y y-coordinate of upper left corner.
+     * @param width width of bounding box
+     * @param height height of bounding box
+     * @param weekOfYear week of the year
+     */
+    private void paintWeekOfYear(Graphics g, int x, int y, int width, int height, int weekOfYear) {
+        String str = Integer.toString(weekOfYear);
+        FontMetrics fm;
+
+        g.setColor(monthView.getDayForeground(getDayOfTheWeek()));
+
+        int boxPaddingX = monthView.getBoxPaddingX();
+        int boxPaddingY = monthView.getBoxPaddingY();
+
+        fm = g.getFontMetrics();
+        g.drawString(str,
+                ltr ?
+                        x + boxPaddingX +
+                                boxWidth - fm.stringWidth(str) :
+                        x + boxPaddingX +
+                                boxWidth - fm.stringWidth(str) - 1,
+                y + boxPaddingY + fm.getAscent());
     }
 
     /**
