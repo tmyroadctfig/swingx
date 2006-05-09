@@ -32,8 +32,15 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import javax.swing.JComponent;
+import javax.swing.UIManager;
 import javax.swing.event.MouseInputAdapter;
 import org.jdesktop.swingx.multislider.*;
+import org.jdesktop.swingx.multislider.ThumbListener;
+import org.jdesktop.swingx.multislider.ThumbRenderer;
+import org.jdesktop.swingx.multislider.TrackRenderer;
+import org.jdesktop.swingx.plaf.JXMultiThumbSliderAddon;
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.swingx.plaf.MultiThumbSliderUI;
 
 /**
  * <p>A slider which can have multiple control points or <i>Thumbs</i></p>
@@ -44,9 +51,21 @@ import org.jdesktop.swingx.multislider.*;
  * implementation. To listen for changes to the thumbs you must provide an 
  * implemention of ThumbDataListener.
  * 
+ * TODOs:
+ * move public inner classes (interfaces, etc) to subpackage
+ * add min/maxvalue convenience methods to jxmultithumbslider
+ * add plafs for windows, mac, and basic (if necessary)
+ * make way to properly control the height.
+ * hide the inner thumb component
+ *
  * @author joshy
  */
 public class JXMultiThumbSlider<E> extends JComponent {
+    static {
+        LookAndFeelAddons.contribute(new JXMultiThumbSliderAddon());
+    }
+
+    public static final String uiClassID = "MultiThumbSliderUI";
     
     /** Creates a new instance of JMultiThumbSlider */
     public JXMultiThumbSlider() {
@@ -67,28 +86,31 @@ public class JXMultiThumbSlider<E> extends JComponent {
         dim = new Dimension(10,10);
         setMinimumSize(dim);
 	
-	this.setThumbRenderer(new ThumbRenderer() {
-            public void paintThumb(Graphics2D g, JXMultiThumbSlider.ThumbComp thumb, int index, boolean selected) {
-                g.setColor(Color.white);
-                g.drawLine(0,0,thumb.getWidth(),thumb.getHeight());
-                g.drawLine(0,thumb.getHeight(),thumb.getWidth(),0);
-                g.drawRect(0,0,thumb.getWidth()-1,thumb.getHeight()-1);
-            }
-        });
-        
-        this.setTrackRenderer(new TrackRenderer() {
-            public void paintTrack(Graphics2D g, JXMultiThumbSlider slider) {
-                g.setColor(Color.black);
-                g.fillRect(0,0,slider.getWidth(),slider.getHeight());
-                g.setColor(Color.white);
-                g.drawLine(0,0,slider.getWidth(),slider.getHeight());
-                g.drawLine(0,slider.getHeight(),slider.getWidth(),0);
-                g.drawRect(0,0,slider.getWidth()-1,slider.getHeight()-1);
-            }
-        });
+        updateUI();
     }
     
+
+    public MultiThumbSliderUI getUI() {
+        return (MultiThumbSliderUI)ui;
+    }
     
+    public void setUI(MultiThumbSliderUI ui) {
+        super.setUI(ui);
+    }
+    
+    public void updateUI() {
+        setUI((MultiThumbSliderUI)UIManager.getUI(this));
+        invalidate();
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    @Override
+    public String getUIClassID() {
+        return uiClassID;
+    }
+
     private ThumbDataListener tdl;
     public List<ThumbComp> thumbs;
     
@@ -221,7 +243,7 @@ public class JXMultiThumbSlider<E> extends JComponent {
     }
 
    
-    class MultiThumbMouseListener extends MouseInputAdapter {
+    private class MultiThumbMouseListener extends MouseInputAdapter {
         private JXMultiThumbSlider slider;
         
         public MultiThumbMouseListener(JXMultiThumbSlider slider) {
@@ -290,23 +312,7 @@ public class JXMultiThumbSlider<E> extends JComponent {
             return null;
         }
     }
-
     
-    
-    
-    public interface ThumbListener {
-        public void thumbMoved(int thumb, float pos);
-        public void thumbSelected(int thumb);
-	public void mousePressed(MouseEvent evt);
-    }
-    
-    public interface ThumbRenderer {
-        public void paintThumb(Graphics2D g, JXMultiThumbSlider.ThumbComp thumb, int index, boolean selected);
-    }
-    
-    public interface TrackRenderer {
-        public void paintTrack(Graphics2D g, JXMultiThumbSlider slider);
-    }
     
     
     

@@ -30,9 +30,10 @@ import java.util.List;
 import org.apache.batik.ext.awt.MultipleGradientPaint;
 import org.jdesktop.swingx.JXMultiThumbSlider;
 import org.jdesktop.swingx.JXGradientChooser;
+import org.jdesktop.swingx.multislider.TrackRenderer;
 import org.jdesktop.swingx.multislider.Thumb;
 
-public class GradientTrackRenderer implements JXMultiThumbSlider.TrackRenderer {
+public class GradientTrackRenderer implements TrackRenderer {
     private Paint checker_paint;
     private final JXGradientChooser gradientPicker;
 

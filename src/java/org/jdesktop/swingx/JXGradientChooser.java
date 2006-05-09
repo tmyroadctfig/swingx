@@ -53,6 +53,7 @@ import org.apache.batik.ext.awt.MultipleGradientPaint;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.color.*;
 import org.jdesktop.swingx.multislider.Thumb;
+import org.jdesktop.swingx.multislider.ThumbListener;
 
 /**
  * A specialized JXPanel that allows the user to construct and choose a Gradient.
@@ -704,7 +705,7 @@ public class JXGradientChooser extends JXPanel {
 	}
     }
     
-    private class StopListener implements JXMultiThumbSlider.ThumbListener {
+    private class StopListener implements ThumbListener {
 	
 	private JXMultiThumbSlider slider;
 	

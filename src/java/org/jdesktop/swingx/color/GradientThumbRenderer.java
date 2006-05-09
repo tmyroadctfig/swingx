@@ -26,8 +26,9 @@ import java.awt.Image;
 import javax.imageio.ImageIO;
 import org.jdesktop.swingx.JXMultiThumbSlider;
 import org.jdesktop.swingx.JXGradientChooser;
+import org.jdesktop.swingx.multislider.ThumbRenderer;
 
-public class GradientThumbRenderer implements JXMultiThumbSlider.ThumbRenderer {
+public class GradientThumbRenderer implements ThumbRenderer {
     private final JXGradientChooser gradientPicker;
     private JXMultiThumbSlider slider;
     private Image thumb_black;
