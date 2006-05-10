@@ -21,14 +21,16 @@
 package org.jdesktop.swingx.color;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import javax.imageio.ImageIO;
+import javax.swing.JComponent;
 import org.jdesktop.swingx.JXMultiThumbSlider;
 import org.jdesktop.swingx.JXGradientChooser;
 import org.jdesktop.swingx.multislider.ThumbRenderer;
 
-public class GradientThumbRenderer implements ThumbRenderer {
+public class GradientThumbRenderer extends JComponent implements ThumbRenderer {
     private final JXGradientChooser gradientPicker;
     private JXMultiThumbSlider slider;
     private Image thumb_black;
@@ -47,16 +49,24 @@ public class GradientThumbRenderer implements ThumbRenderer {
 	}
     }
 
-    public void paintThumb(Graphics2D g, JXMultiThumbSlider.ThumbComp thumb, int index, boolean selected) {
+    private boolean selected;
+    protected void paintComponent(Graphics g) {
+        JComponent thumb = this;
 	int w = thumb.getWidth();
-	Color c = (Color)gradientPicker.getSlider().getModel().getThumbAt(index).getObject();
-	c = ColorUtil.removeAlpha(c);
-	g.setColor(c);
+	g.setColor(getForeground());
 	g.fillRect(0, 0, w - 1, w - 1);
 	if (selected) {
 	    g.drawImage(thumb_black, 0, 0, null);
 	} else {
 	    g.drawImage(thumb_gray, 0, 0, null);
 	}
+    }
+
+    public JComponent getThumbRendererComponent(JXMultiThumbSlider slider, int index, boolean selected) {
+	Color c = (Color)gradientPicker.getSlider().getModel().getThumbAt(index).getObject();
+	c = ColorUtil.removeAlpha(c);
+        this.setForeground(c);
+        this.selected = selected;
+        return this;
     }
 }

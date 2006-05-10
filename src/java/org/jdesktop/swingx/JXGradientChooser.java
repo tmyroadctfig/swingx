@@ -642,7 +642,7 @@ public class JXGradientChooser extends JXPanel {
             if(slider.getSelectedIndex() >= 0) {
                 Thumb thumb = slider.getModel().getThumbAt(slider.getSelectedIndex());
                 thumb.setPosition((float)((Integer)colorLocationSpinner.getValue())/100);
-                slider.recalc();
+                //slider.recalc();
                 slider.repaint();
                 updateFromStop(thumb);
             }
