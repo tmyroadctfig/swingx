@@ -82,14 +82,19 @@ public class BasicMultiThumbSliderUI extends MultiThumbSliderUI {
         }
     }
 
-    private class BasicTrackRenderer implements TrackRenderer {
-
-        public void paintTrack(Graphics2D g, JXMultiThumbSlider slider) {
+    private class BasicTrackRenderer extends JComponent implements TrackRenderer {
+        private JXMultiThumbSlider slider;
+        public void paintComponent(Graphics g) {
             g.setColor(slider.getBackground());
             g.fillRect(0, 0, slider.getWidth(), slider.getHeight());
             g.setColor(Color.black);
             g.drawLine(0,slider.getHeight()/2,slider.getWidth(),slider.getHeight()/2);
             g.drawLine(0,slider.getHeight()/2+1,slider.getWidth(),slider.getHeight()/2+1);
+        }
+
+        public JComponent getRendererComponent(JXMultiThumbSlider slider) {
+            this.slider = slider;
+            return this;
         }
     }
 

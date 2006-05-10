@@ -124,7 +124,8 @@ public class JXMultiThumbSlider<E> extends JComponent {
     protected void paintComponent(Graphics g) {
         if(isVisible()) {
             if(trackRenderer != null) {
-                trackRenderer.paintTrack((Graphics2D)g,this);
+                JComponent comp = trackRenderer.getRendererComponent(this);
+                comp.paint(g);
             } else {
                 paintRange((Graphics2D)g);
             }

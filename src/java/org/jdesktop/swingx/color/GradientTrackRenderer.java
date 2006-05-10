@@ -21,19 +21,21 @@
 package org.jdesktop.swingx.color;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
+import javax.swing.JComponent;
 import org.apache.batik.ext.awt.MultipleGradientPaint;
 import org.jdesktop.swingx.JXMultiThumbSlider;
 import org.jdesktop.swingx.JXGradientChooser;
 import org.jdesktop.swingx.multislider.TrackRenderer;
 import org.jdesktop.swingx.multislider.Thumb;
 
-public class GradientTrackRenderer implements TrackRenderer {
+public class GradientTrackRenderer extends JComponent implements TrackRenderer {
     private Paint checker_paint;
     private final JXGradientChooser gradientPicker;
 
@@ -41,8 +43,12 @@ public class GradientTrackRenderer implements TrackRenderer {
 	this.gradientPicker = gradientPicker;
         checker_paint = ColorUtil.getCheckerPaint();
     }
+    
+    private JXMultiThumbSlider slider;
 
-    public void paintTrack(Graphics2D g, JXMultiThumbSlider slider) {
+    protected void paintComponent(Graphics gfx) {
+        Graphics2D g = (Graphics2D)gfx;
+        
 	// get the list of colors
 	List<Thumb<Color>> stops = slider.getModel().getSortedThumbs();
 	int len = stops.size();
@@ -83,5 +89,10 @@ public class GradientTrackRenderer implements TrackRenderer {
 	g.setColor(Color.black);
 	g.draw(rect);
 	g.translate(-thumb_width / 2, -12);
+    }
+
+    public JComponent getRendererComponent(JXMultiThumbSlider slider) {
+        this.slider = slider;
+        return this;
     }
 }
