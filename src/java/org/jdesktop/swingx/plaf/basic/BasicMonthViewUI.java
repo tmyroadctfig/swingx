@@ -36,6 +36,11 @@ public class BasicMonthViewUI extends MonthViewUI {
     private boolean showingWeekNumber;
     private int arrowPaddingX = 3;
     private int arrowPaddingY = 3;
+    private int boxPaddingX;
+    private int boxPaddingY;
+    private int fullMonthBoxHeight;
+    private int fullBoxWidth;
+    private int fullBoxHeight;
     private int startX;
     private int startY;
     private Dimension dim = new Dimension();
@@ -109,6 +114,8 @@ public class BasicMonthViewUI extends MonthViewUI {
             }
         }
         monthView.setDaysOfTheWeek(daysOfTheWeek);
+        monthView.setBoxPaddingX((Integer)UIManager.get("JXMonthView.boxPaddingX"));
+        monthView.setBoxPaddingY((Integer)UIManager.get("JXMonthView.boxPaddingY"));
         monthView.setMonthStringBackground(UIManager.getColor("JXMonthView.monthStringBackground"));
         monthView.setMonthStringForeground(UIManager.getColor("JXMonthView.monthStringForeground"));
         monthView.setDaysOfTheWeekForeground(UIManager.getColor("JXMonthView.daysOfTheWeekForeground"));
@@ -555,7 +562,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         for (int row = 0; row < numCalRows; row++) {
             // Center the calendars horizontally in the available space.
             int x = startX;
-            int tmpX, tmpY;
 
             // Check if this row falls in the clip region.
             bounds.x = 0;
@@ -571,99 +577,6 @@ public class BasicMonthViewUI extends MonthViewUI {
             }
 
             for (int column = 0; column < numCalCols; column++) {
-                String monthName = monthsOfTheYear[cal.get(Calendar.MONTH)];
-                monthName = monthName + " " + cal.get(Calendar.YEAR);
-
-                int boxPaddingX = monthView.getBoxPaddingX();
-                int boxPaddingY = monthView.getBoxPaddingY();
-                bounds.x = (ltr ? x : x - calendarWidth);// + 4; //4px of padding on the left
-                bounds.y = y + boxPaddingY;// + 4; //4px of padding on the top
-                bounds.width = calendarWidth;// - 8; //4px of padding on both sides
-                bounds.height = monthBoxHeight; //4px of padding on top
-
-                if (bounds.intersects(clip)) {
-                    // Paint month name background.
-                    paintMonthStringBackground(g, bounds.x, bounds.y,
-                            bounds.width, bounds.height);
-
-                    // Paint arrow buttons for traversing months if enabled.
-                    if (monthView.isTraversable()) {
-                        tmpX = bounds.x + arrowPaddingX;
-                        tmpY = bounds.y + (bounds.height -
-                            monthDownImage.getIconHeight()) / 2;
-                        g.drawImage(monthDownImage.getImage(),
-                            tmpX, tmpY, null);
-
-                        tmpX = bounds.x + bounds.width - arrowPaddingX -
-                                monthUpImage.getIconWidth();
-                        g.drawImage(monthUpImage.getImage(), tmpX, tmpY, null);
-                    }
-
-                    // Paint month name.
-                    Font oldFont = monthView.getFont();
-                    FontMetrics oldFM = fm;
-                    g.setFont(derivedFont);
-                    fm = monthView.getFontMetrics(derivedFont);
-
-                    g.setColor(monthView.getMonthStringForeground());
-                    tmpX = ltr ?
-                            x + (calendarWidth / 2) -
-                                (fm.stringWidth(monthName) / 2) :
-                            x - (calendarWidth / 2) -
-                                (fm.stringWidth(monthName) / 2) - 1;
-                    tmpY = bounds.y + ((monthBoxHeight - boxHeight) / 2) +
-                            fm.getAscent();
-
-                    g.drawString(monthName, tmpX, tmpY);
-                    g.setFont(oldFont);
-                    fm = oldFM;
-                }
-                g.setColor(monthView.getDaysOfTheWeekForeground());
-
-                bounds.x = ltr ? x : x - calendarWidth;
-                bounds.y = y + boxPaddingY + monthBoxHeight +
-                    boxPaddingY + boxPaddingY;
-                bounds.width = calendarWidth;
-                bounds.height = boxHeight;
-
-                if (bounds.intersects(clip)) {
-                    cal.set(Calendar.DAY_OF_MONTH,
-                            cal.getActualMinimum(Calendar.DAY_OF_MONTH));
-
-                    // Paint short representation of day of the week.
-                    int dayIndex = monthView.getFirstDayOfWeek() - 1;
-                    Font oldFont = g.getFont();
-                    FontMetrics oldFM = fm;
-                    g.setFont(derivedFont);
-                    fm = monthView.getFontMetrics(derivedFont);
-
-                    String[] daysOfTheWeek = monthView.getDaysOfTheWeek();
-                    for (int i = 0; i < JXMonthView.DAYS_IN_WEEK; i++) {
-                        tmpX = ltr ?
-                                x + (i * (boxPaddingX + boxWidth +
-                                    boxPaddingX)) + boxPaddingX +
-                                    (boxWidth / 2) -
-                                    (fm.stringWidth(daysOfTheWeek[dayIndex]) /
-                                    2) :
-                                x - (i * (boxPaddingX + boxWidth +
-                                    boxPaddingX)) - boxPaddingX -
-                                    (boxWidth / 2) -
-                                    (fm.stringWidth(daysOfTheWeek[dayIndex]) /
-                                    2);
-                        if (showingWeekNumber) {
-                            tmpX += boxPaddingX + boxWidth + boxPaddingX;
-                        }
-                        tmpY = bounds.y + fm.getAscent();
-                        g.drawString(daysOfTheWeek[dayIndex], tmpX, tmpY);
-                        dayIndex++;
-                        if (dayIndex == JXMonthView.DAYS_IN_WEEK) {
-                            dayIndex = 0;
-                        }
-                    }
-                    g.setFont(oldFont);
-                    fm = oldFM;
-                }
-
                 // Check if the month to paint falls in the clip.
                 bounds.x = startX +
                         (ltr ?
@@ -679,7 +592,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 // the calendar forward a month as it would have if paintMonth
                 // was called.
                 if (bounds.intersects(clip)) {
-                    paintMonth(g);
+                    paintMonth(g, bounds.x, bounds.y, bounds.width, bounds.height);
                 } else {
                     cal.add(Calendar.MONTH, 1);
                 }
@@ -700,28 +613,101 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     /**
-     * Paints a month.  It is assumed the calendar, _cal, is already set to the
+     * Paints a month.  It is assumed the calendar, <code>monthView.getCalendar()</code>, is already set to the
      * first day of the month to be painted.
      *
      * @param g Graphics object.
+     * @param x
+     * @param y
+     * @param width
+     * @param height
      */
-    private void paintMonth(Graphics g) {
+    private void paintMonth(Graphics g, int x, int y, int width, int height) {
         Calendar cal = monthView.getCalendar();
         int days = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
         Rectangle clip = g.getClipBounds();
         long day;
         int oldWeek = -1;
 
+        // Paint month name background.
+        paintMonthStringBackground(g, x, y,
+                width, boxPaddingY + monthBoxHeight + boxPaddingY);
+
+        // Paint arrow buttons for traversing months if enabled.
+        if (monthView.isTraversable()) {
+            g.drawImage(monthDownImage.getImage(),
+                    x + arrowPaddingX, y + ((fullMonthBoxHeight - monthDownImage.getIconHeight()) / 2), null);
+            g.drawImage(monthUpImage.getImage(), x + width - arrowPaddingX - monthUpImage.getIconWidth(),
+                    y + ((fullMonthBoxHeight - monthDownImage.getIconHeight()) / 2), null);
+        }
+
+        // Paint month name.
+        Font oldFont = monthView.getFont();
+        g.setFont(derivedFont);
+        FontMetrics fm = monthView.getFontMetrics(derivedFont);
+        String monthName = monthsOfTheYear[cal.get(Calendar.MONTH)];
+        monthName = monthName + " " + cal.get(Calendar.YEAR);
+
+        g.setColor(monthView.getMonthStringForeground());
+        int tmpX =
+                x + (calendarWidth / 2) -
+                        (fm.stringWidth(monthName) / 2);
+        int tmpY = y + boxPaddingY + ((monthBoxHeight - boxHeight) / 2) +
+                fm.getAscent();
+        g.drawString(monthName, tmpX, tmpY);
+        g.setFont(oldFont);
+
+        // Paint background of the short names for the days of the week.
+        tmpX = ltr ? x + (showingWeekNumber ? fullBoxWidth : 0) : x;
+        tmpY = y + fullMonthBoxHeight;
+        int tmpWidth = width - (showingWeekNumber ? fullBoxWidth : 0);
+        paintDayOfTheWeekBackground(g, tmpX, tmpY, tmpWidth, fullBoxHeight);
+
+        // Paint short representation of day of the week.
+        int dayIndex = monthView.getFirstDayOfWeek() - 1;
+        g.setFont(derivedFont);
+        g.setColor(monthView.getDaysOfTheWeekForeground());
+        fm = monthView.getFontMetrics(derivedFont);
+        String[] daysOfTheWeek = monthView.getDaysOfTheWeek();
+        for (int i = 0; i < JXMonthView.DAYS_IN_WEEK; i++) {
+            tmpX = ltr ?
+                    x + (i * fullBoxWidth) + boxPaddingX +
+                            (boxWidth / 2) -
+                            (fm.stringWidth(daysOfTheWeek[dayIndex]) /
+                                    2) :
+                    x + width - (i * fullBoxWidth) - boxPaddingX -
+                            (boxWidth / 2) -
+                            (fm.stringWidth(daysOfTheWeek[dayIndex]) /
+                                    2);
+            if (showingWeekNumber) {
+                tmpX += ltr ? fullBoxWidth : -fullBoxWidth;
+            }
+            tmpY = y + fullMonthBoxHeight + boxPaddingY + fm.getAscent();
+            g.drawString(daysOfTheWeek[dayIndex], tmpX, tmpY);
+            dayIndex++;
+            if (dayIndex == JXMonthView.DAYS_IN_WEEK) {
+                dayIndex = 0;
+            }
+        }
+        g.setFont(oldFont);
+
+
+        if (showingWeekNumber) {
+            tmpX = ltr ? x : x + width - fullBoxWidth;
+            paintWeekOfYearBackground(g, tmpX, y + fullMonthBoxHeight + fullBoxHeight, fullBoxWidth,
+                    calendarHeight - (fullMonthBoxHeight + fullBoxHeight));
+        }
+
+        int oldY = -1;
         for (int i = 0; i < days; i++) {
             calculateBoundsForDay(bounds);
-
             // Paint the week numbers if we're displaying them.
-            // TODO: add a paint background for the whole area of the week numbers
-            if (showingWeekNumber) {
+            if (showingWeekNumber && oldY != bounds.y) {
+                oldY = bounds.y;
                 int weekOfYear = cal.get(Calendar.WEEK_OF_YEAR);
                 if (weekOfYear != oldWeek) {
-                    paintWeekOfYear(g, bounds.x - (monthView.getBoxPaddingX() + boxWidth + monthView.getBoxPaddingY()),
-                            bounds.y, bounds.width, bounds.height, weekOfYear);
+                    tmpX = ltr ? x : x + width - fullBoxWidth;
+                    paintWeekOfYear(g, tmpX, bounds.y, fullBoxWidth, fullBoxHeight, weekOfYear);
                     oldWeek = weekOfYear;
                 }
             }
@@ -758,6 +744,15 @@ public class BasicMonthViewUI extends MonthViewUI {
             }
             cal.add(Calendar.DAY_OF_MONTH, 1);
         }
+    }
+
+    private void paintDayOfTheWeekBackground(Graphics g, int x, int y, int width, int height) {
+        g.drawLine(x + boxPaddingX, y + height - 1, x + width - boxPaddingX, y + height - 1);
+    }
+
+    private void paintWeekOfYearBackground(Graphics g, int x, int y, int width, int height) {
+        x = ltr ? x + width - 1 : x;
+        g.drawLine(x, y + boxPaddingY, x, y + height - boxPaddingY);
     }
 
     /**
@@ -814,8 +809,6 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         Graphics2D g2 = (Graphics2D)g;
         GradientPaint gp = new GradientPaint(x, y + height, new Color(238, 238, 238), x, y, new Color(204, 204, 204));
-        //paint the border
-//        g.setColor(_monthStringBackground);
         g2.setPaint(gp);
         g2.fillRect(x, y, width - 1, height - 1);
         g2.setPaint(new Color(153, 153, 153));
@@ -1236,14 +1229,19 @@ public class BasicMonthViewUI extends MonthViewUI {
                 boxWidth += Math.ceil(diff / (double)JXMonthView.DAYS_IN_WEEK);
             }
 
+
+            // Keep track of a full box height/width and full month box height
+            fullBoxWidth = boxWidth + boxPaddingX + boxPaddingX;
+            fullBoxHeight = boxHeight + boxPaddingY + boxPaddingY;
+            fullMonthBoxHeight = monthBoxHeight + boxPaddingY + boxPaddingY;
+
             // Keep track of calendar width and height for use later.
-            calendarWidth = (boxWidth + (2 * boxPaddingX)) * JXMonthView.DAYS_IN_WEEK;
+            calendarWidth = fullBoxWidth * JXMonthView.DAYS_IN_WEEK;
             if (showingWeekNumber) {
-                calendarWidth += (boxWidth + (2 * boxPaddingX));
+                calendarWidth += fullBoxWidth;
             }
 
-            calendarHeight = ((boxPaddingY + boxHeight + boxPaddingY) * 7) +
-                    (boxPaddingY + monthBoxHeight + boxPaddingY);
+            calendarHeight = (fullBoxHeight * 7) + fullMonthBoxHeight;
 
             // Calculate minimum width/height for the component.
             int prefRows = monthView.getPreferredRows();
@@ -1307,6 +1305,8 @@ public class BasicMonthViewUI extends MonthViewUI {
             } else if ("boxPaddingX".equals(property) || "boxPaddingY".equals(property) ||
                     "traversable".equals(property) || "daysOfTheWeek".equals(property) ||
                     "border".equals(property) || "font".equals(property)) {
+                boxPaddingX = monthView.getBoxPaddingX();
+                boxPaddingY = monthView.getBoxPaddingY();
                 monthView.revalidate();
             } else if ("weekNumber".equals(property)) {
                 showingWeekNumber = monthView.isShowingWeekNumber();

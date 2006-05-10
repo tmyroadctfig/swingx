@@ -145,8 +145,8 @@ public class JXMonthView extends JComponent {
      */
     public static final String uiClassID = "MonthViewUI";
 
-    private int _boxPaddingX = 3;
-    private int _boxPaddingY = 3;
+    private int _boxPaddingX;
+    private int _boxPaddingY;
     public static final int DAYS_IN_WEEK = 7;
     public static final int MONTHS_IN_YEAR = 12;
 

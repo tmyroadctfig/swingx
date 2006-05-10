@@ -23,7 +23,9 @@ public class JXMonthViewAddon extends AbstractComponentAddon {
                 "JXMonthView.flaggedDayForeground", Color.RED,
                 "JXMonthView.font", UIManager.getFont("Button.font"),
                 "JXMonthView.monthDownFileName", "resources/month-down.png",
-                "JXMonthView.monthUpFileName", "resources/month-up.png"
+                "JXMonthView.monthUpFileName", "resources/month-up.png",
+                "JXMonthView.boxPaddingX", 3,
+                "JXMonthView.boxPaddingY", 3
         }));
     }
 }
