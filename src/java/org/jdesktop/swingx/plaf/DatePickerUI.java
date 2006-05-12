@@ -24,4 +24,16 @@ import javax.swing.plaf.ComponentUI;
  * @author Joshua Outwater
  */
 public abstract class DatePickerUI extends ComponentUI {
+    /**
+     * Get the baseline for the specified component, or a value less
+     * than 0 if the baseline can not be determined.  The baseline is measured
+     * from the top of the component.
+     *
+     * @param width  Width of the component to determine baseline for.
+     * @param height Height of the component to determine baseline for.
+     * @return baseline for the specified component
+     */
+    public int getBaseline(int width, int height) {
+        return -1;
+    }
 }

@@ -18,20 +18,21 @@
  */
 package org.jdesktop.swingx.plaf.basic;
 
-import org.jdesktop.swingx.plaf.DatePickerUI;
 import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.JXDatePickerFormatter;
 import org.jdesktop.swingx.calendar.DateSpan;
 import org.jdesktop.swingx.calendar.JXMonthView;
+import org.jdesktop.swingx.plaf.DatePickerUI;
 
 import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.UIResource;
-import java.awt.event.*;
+import javax.swing.text.View;
 import java.awt.*;
-import java.util.Date;
-import java.beans.PropertyChangeListener;
+import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.Date;
 
 /**
  * @author Joshua Outwater
@@ -49,6 +50,7 @@ public class BasicDatePickerUI extends DatePickerUI {
         return new BasicDatePickerUI();
     }
 
+    @Override
     public void installUI(JComponent c) {
         datePicker = (JXDatePicker)c;
         datePicker.setLayout(createLayoutManager());
@@ -58,6 +60,7 @@ public class BasicDatePickerUI extends DatePickerUI {
         installListeners();
     }
 
+    @Override
     public void uninstallUI(JComponent c) {
         uninstallListeners();
         uninstallKeyboardActions();
@@ -232,6 +235,29 @@ public class BasicDatePickerUI extends DatePickerUI {
         dim.width += insets.left + insets.right;
         dim.height += insets.top + insets.bottom;
         return (Dimension)dim.clone();
+    }
+
+    @Override
+    public int getBaseline(int width, int height) {
+        JFormattedTextField editor = datePicker.getEditor();
+        View rootView = editor.getUI().getRootView(editor);
+        if (rootView.getViewCount() > 0) {
+            Insets insets = editor.getInsets();
+            Insets insetsOut = datePicker.getInsets();
+            int nh = height - insets.top - insets.bottom
+                    - insetsOut.top - insetsOut.bottom;
+            int y = insets.top + insetsOut.top;
+            View fieldView = rootView.getView(0);
+            int vspan = (int) fieldView.getPreferredSpan(View.Y_AXIS);
+            if (nh != vspan) {
+                int slop = nh - vspan;
+                y += slop / 2;
+            }
+            FontMetrics fm = editor.getFontMetrics(editor.getFont());
+            y += fm.getAscent();
+            return y;
+        }
+        return -1;
     }
 
     /**

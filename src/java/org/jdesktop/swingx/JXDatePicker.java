@@ -22,6 +22,7 @@ package org.jdesktop.swingx;
 
 import org.jdesktop.swingx.calendar.DateSpan;
 import org.jdesktop.swingx.calendar.JXMonthView;
+import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
 import org.jdesktop.swingx.plaf.DatePickerUI;
 import org.jdesktop.swingx.plaf.JXDatePickerAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
@@ -31,14 +32,14 @@ import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.text.DefaultFormatterFactory;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
-import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
 
 /**
  * A component that combines a button, an editable field and a JXMonthView
@@ -140,6 +141,7 @@ public class JXDatePicker extends JComponent {
      *
      * @see UIManager#getUI
      */
+    @Override
     public void updateUI() {
         setUI((DatePickerUI)UIManager.getUI(this));
         invalidate();
@@ -372,6 +374,18 @@ public class JXDatePicker extends JComponent {
     }
 
     /**
+	 * Get the baseline for the specified component, or a value less
+	 * than 0 if the baseline can not be determined.  The baseline is measured
+	 * from the top of the component.
+	 *
+     * @param width Width of the component to determine baseline for.
+	 * @param height Height of the component to determine baseline for.
+	 * @return baseline for the specified component
+	 */
+    public int getBaseline(int width, int height) {
+        return ((DatePickerUI)ui).getBaseline(width, height);
+    }
+    /**
      * Returns the string currently used to identiy fired ActionEvents.
      *
      * @return String The string used for identifying ActionEvents.
@@ -443,6 +457,7 @@ public class JXDatePicker extends JComponent {
             add(todayLink);
         }
         
+        @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
 
