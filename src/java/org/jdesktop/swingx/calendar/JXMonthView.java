@@ -608,6 +608,7 @@ public class JXMonthView extends JComponent {
         if (_showWeekNumber != showWeekNumber) {
             _showWeekNumber = showWeekNumber;
             firePropertyChange("weekNumber", !_showWeekNumber, showWeekNumber);
+            repaint();            
         }
     }
     /**

@@ -1304,12 +1304,11 @@ public class BasicMonthViewUI extends MonthViewUI {
                 today = (Long)evt.getNewValue();
             } else if ("boxPaddingX".equals(property) || "boxPaddingY".equals(property) ||
                     "traversable".equals(property) || "daysOfTheWeek".equals(property) ||
-                    "border".equals(property) || "font".equals(property)) {
+                    "border".equals(property) || "font".equals(property) || "weekNumber".equals(property)) {
                 boxPaddingX = monthView.getBoxPaddingX();
                 boxPaddingY = monthView.getBoxPaddingY();
-                monthView.revalidate();
-            } else if ("weekNumber".equals(property)) {
                 showingWeekNumber = monthView.isShowingWeekNumber();
+                monthView.revalidate();
             }
         }
 
