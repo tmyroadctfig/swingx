@@ -204,6 +204,7 @@ public class BasicDatePickerUI extends DatePickerUI {
         JButton b = new JButton();
         b.setName("popupButton");
         b.setRolloverEnabled(false);
+        b.setMargin(new Insets(0, 3, 0, 3));
 
         Icon icon = UIManager.getIcon("JXDatePicker.arrowDown.image");
         if (icon == null) {
