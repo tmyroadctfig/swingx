@@ -342,6 +342,12 @@ public class JXDatePicker extends JComponent {
         firePropertyChange(EDITOR, oldEditor, _dateField);
     }
 
+    @Override
+    public void setComponentOrientation(ComponentOrientation orientation) {
+        super.setComponentOrientation(orientation);
+        _monthView.setComponentOrientation(orientation);
+    }
+
     /**
      * Returns true if the current value being edited is valid.
      *
