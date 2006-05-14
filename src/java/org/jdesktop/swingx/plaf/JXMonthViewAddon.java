@@ -12,7 +12,9 @@ public class JXMonthViewAddon extends AbstractComponentAddon {
         super("JXMonthView");
     }
 
+    @Override
     protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+        super.addBasicDefaults(addon, defaults);
         defaults.addAll(Arrays.asList(new Object[] {
                 defaults.add(JXMonthView.uiClassID),
                 defaults.add("org.jdesktop.swingx.plaf.basic.BasicMonthViewUI"),

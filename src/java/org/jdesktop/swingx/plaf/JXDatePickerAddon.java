@@ -37,6 +37,7 @@ public class JXDatePickerAddon extends AbstractComponentAddon {
 
     @Override
     protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+        super.addBasicDefaults(addon, defaults);
         defaults.addAll(Arrays.asList(new Object[]{
                 defaults.add(JXDatePicker.uiClassID),
                 defaults.add("org.jdesktop.swingx.plaf.basic.BasicDatePickerUI"),
@@ -53,9 +54,25 @@ public class JXDatePickerAddon extends AbstractComponentAddon {
                         LineBorder.createGrayLineBorder(),
                         BorderFactory.createEmptyBorder(3, 3, 3, 3))),
                 "JXDatePicker.numColumns",
-                10,
+                10
+        }));
+    }
+
+    @Override
+    protected void addWindowsDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+        super.addWindowsDefaults(addon, defaults);
+        defaults.addAll(Arrays.asList(new Object[] {
                 "JXDatePicker.arrowDown.image",
-                new IconUIResource(new ImageIcon(getClass().getResource("resources/combo-xp.png"))),
+                new IconUIResource(new ImageIcon(getClass().getResource("resources/combo-xp.png")))
+        }));
+    }
+
+    @Override
+    protected void addMacDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+        super.addMacDefaults(addon, defaults);
+        defaults.addAll(Arrays.asList(new Object[] {
+                "JXDatePicker.arrowDown.image",
+                new IconUIResource(new ImageIcon(getClass().getResource("resources/combo-osx.png")))
         }));
     }
 }
