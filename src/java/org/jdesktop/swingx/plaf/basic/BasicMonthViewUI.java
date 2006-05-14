@@ -551,18 +551,12 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
         g.setColor(monthView.getForeground());
 
-        FontMetrics fm = g.getFontMetrics();
-
         // Reset the calendar.
         Calendar cal = monthView.getCalendar();
         cal.setTimeInMillis(firstDisplayedDate);
 
-        // Center the calendars vertically in the available space.
-        int y = startY;
+        // Center the calendars horizontally/vertically in the available space.
         for (int row = 0; row < numCalRows; row++) {
-            // Center the calendars horizontally in the available space.
-            int x = startX;
-
             // Check if this row falls in the clip region.
             bounds.x = 0;
             bounds.y = startY +
@@ -572,7 +566,6 @@ public class BasicMonthViewUI extends MonthViewUI {
 
             if (!bounds.intersects(clip)) {
                 cal.add(Calendar.MONTH, numCalCols);
-                y += calendarHeight + CALENDAR_SPACING;
                 continue;
             }
 
@@ -596,12 +589,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 } else {
                     cal.add(Calendar.MONTH, 1);
                 }
-
-                x += ltr ?
-                        calendarWidth + CALENDAR_SPACING :
-                        -(calendarWidth + CALENDAR_SPACING);
             }
-            y += calendarHeight + CALENDAR_SPACING;
         }
 
         // Restore the calendar.
@@ -622,6 +610,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param width
      * @param height
      */
+    @SuppressWarnings({"UNUSED_SYMBOL"})
     private void paintMonth(Graphics g, int x, int y, int width, int height) {
         Calendar cal = monthView.getCalendar();
         int days = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
@@ -765,6 +754,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param height height of bounding box
      * @param weekOfYear week of the year
      */
+    @SuppressWarnings({"UNUSED_SYMBOL"})
     private void paintWeekOfYear(Graphics g, int x, int y, int width, int height, int weekOfYear) {
         String str = Integer.toString(weekOfYear);
         FontMetrics fm;
@@ -971,33 +961,12 @@ public class BasicMonthViewUI extends MonthViewUI {
             startDate = selected;
             endDate = selected;
 
-            if (selectionMode == JXMonthView.MULTIPLE_SELECTION ||
-                    selectionMode == JXMonthView.WEEK_SELECTION) {
+            if (selectionMode == JXMonthView.SINGLE_INTERVAL_SELECTION ||
+                    selectionMode == JXMonthView.WEEK_INTERVAL_SELECTION) {
                 pivotDate = selected;
             }
 
             monthView.setSelectedDateSpan(new DateSpan(startDate, endDate));
-
-//            // Determine the dirty rectangle of the new selected date so we
-//            // draw the bounding box around it.  This dirty rect includes the
-//            // visual border of the selected date.
-//            Calendar cal = monthView.getCalendar();
-//            cal.setTimeInMillis(selected);
-//
-//            calculateBoundsForDay(bounds);
-//            cal.setTimeInMillis(firstDisplayedDate);
-//
-//            // Repaint the old dirty area.
-//            monthView.repaint(dirtyRect);
-//
-//            // Repaint the new dirty area.
-//            monthView.repaint(bounds);
-//
-//            // Update the dirty area.
-//            dirtyRect.x = bounds.x;
-//            dirtyRect.y = bounds.y;
-//            dirtyRect.width = bounds.width;
-//            dirtyRect.height = bounds.height;
 
             // Arm so we fire action performed on mouse release.
             asKirkWouldSay_FIRE = true;
@@ -1021,13 +990,9 @@ public class BasicMonthViewUI extends MonthViewUI {
             asKirkWouldSay_FIRE = false;
         }
 
-        public void mouseEntered(MouseEvent e) {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
+        public void mouseEntered(MouseEvent e) {}
 
-        public void mouseExited(MouseEvent e) {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
+        public void mouseExited(MouseEvent e) {}
 
         public void mouseDragged(MouseEvent e) {
             // If we were using the keyboard we aren't anymore.
@@ -1065,7 +1030,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 }
             }
 
-            if (selectionMode == JXMonthView.WEEK_SELECTION) {
+            if (selectionMode == JXMonthView.WEEK_INTERVAL_SELECTION) {
                 // Do we span a week.
                 long start = (selected > pivotDate) ? pivotDate : selected;
                 long end = (selected > pivotDate) ? selected : pivotDate;
@@ -1117,17 +1082,11 @@ public class BasicMonthViewUI extends MonthViewUI {
             asKirkWouldSay_FIRE = true;
         }
 
-        public void mouseMoved(MouseEvent e) {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
+        public void mouseMoved(MouseEvent e) {}
 
-        public void addLayoutComponent(String name, Component comp) {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
+        public void addLayoutComponent(String name, Component comp) {}
 
-        public void removeLayoutComponent(Component comp) {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
+        public void removeLayoutComponent(Component comp) {}
 
         public Dimension preferredLayoutSize(Container parent) {
             layoutContainer(parent);
@@ -1368,7 +1327,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 } else if (action >= SELECT_PREVIOUS_DAY && action <= SELECT_DAY_NEXT_WEEK) {
                     setUsingKeyboard(true);
                     traverse(action);
-                } else if (selectionMode >= JXMonthView.MULTIPLE_SELECTION &&
+                } else if (selectionMode >= JXMonthView.SINGLE_INTERVAL_SELECTION &&
                         action >= ADD_PREVIOUS_DAY && action <= ADD_TO_NEXT_WEEK) {
                     setUsingKeyboard(true);
                     addToSelection(action);

@@ -92,7 +92,7 @@ import java.util.*;
  * selection has changed.
  * <pre>
  *    // Change the selection mode to select full weeks.
- *    monthView.setSelectionMode(JXMonthView.WEEK_SELECTION);
+ *    monthView.setSelectionMode(JXMonthView.WEEK_INTERVAL_SELECTION);
  *
  *    // Add an action listener that will be notified when the user
  *    // changes selection via the mouse.
@@ -113,12 +113,15 @@ public class JXMonthView extends JComponent {
     /** Mode that allows for selection of a single day. */
     public static final int SINGLE_SELECTION = 1;
     /** Mode that allows for selecting of multiple consecutive days. */
-    public static final int MULTIPLE_SELECTION = 2;
+    public static final int SINGLE_INTERVAL_SELECTION = 2;
+// TODO: Add multiple interval selection.
+//    /** Mode that allows for selecting disjoint days. */
+//    public static final int MULTIPLE_INTERVAL_SELECTION = 3;
     /**
      * Mode where selections consisting of more than 7 days will
      * snap to a full week.
      */
-    public static final int WEEK_SELECTION = 3;
+    public static final int WEEK_INTERVAL_SELECTION = 4;
 
     /** Return value used to identify when the month down button is pressed. */
     public static final int MONTH_DOWN = 1;
@@ -366,7 +369,7 @@ public class JXMonthView extends JComponent {
      * Selects the dates in the DateSpan.  This method will not change the
      * initial date displayed so the caller must update this if necessary.
      * If we are in SINGLE_SELECTION mode only the start time from the DateSpan
-     * will be used.  If we are in WEEK_SELECTION mode the span will be
+     * will be used.  If we are in WEEK_INTERVAL_SELECTION mode the span will be
      * modified to be valid if necessary.
      *
      * @param dateSpan DateSpan defining the selected dates.  Passing
@@ -401,7 +404,7 @@ public class JXMonthView extends JComponent {
                 _cal.set(Calendar.MILLISECOND, 0);
                 _endSelectedDate = _cal.getTimeInMillis();
 
-                if (_selectionMode == WEEK_SELECTION) {
+                if (_selectionMode == WEEK_INTERVAL_SELECTION) {
                     // Make sure if we are over 7 days we span full weeks.
                     _cal.setTimeInMillis(_startSelectedDate);
                     int count = 1;
@@ -461,8 +464,8 @@ public class JXMonthView extends JComponent {
      * @throws IllegalArgumentException
      */
     public void setSelectionMode(int mode) throws IllegalArgumentException {
-        if (mode != SINGLE_SELECTION && mode != MULTIPLE_SELECTION &&
-                mode != WEEK_SELECTION && mode != NO_SELECTION) {
+        if (mode != SINGLE_SELECTION && mode != SINGLE_INTERVAL_SELECTION &&
+                mode != WEEK_INTERVAL_SELECTION && mode != NO_SELECTION) {
             throw new IllegalArgumentException(mode +
                     " is not a valid selection mode");
         }
