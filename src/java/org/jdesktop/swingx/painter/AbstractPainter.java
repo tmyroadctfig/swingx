@@ -229,7 +229,7 @@ public abstract class AbstractPainter<T extends JComponent> extends JavaBean imp
     }
     
     /**
-     * @returns the clipping shape
+     * @return the clipping shape
      */
     public Shape getClip() {
         return clip;
@@ -246,7 +246,7 @@ public abstract class AbstractPainter<T extends JComponent> extends JavaBean imp
      */
     public void setResizeClip(Resize r) {
         Resize old = getResizeClip();
-        this.resizeClip = r == null ? r.NONE : r;
+        this.resizeClip = r == null ? Resize.NONE : r;
         firePropertyChange("resizeClip", old, getResizeClip());
     }
     

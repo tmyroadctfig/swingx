@@ -52,6 +52,7 @@ public abstract class Sorter extends Filter {
     }
 
     
+    @Override
     protected void refresh(boolean reset) {
         refreshCollator();
         super.refresh(reset);
@@ -69,7 +70,7 @@ public abstract class Sorter extends Filter {
 
     /**
      * exposed for testing only!
-     * @return
+     * @return <code>Collator</code>
      */
     protected Collator getCollator() {
         return collator;
@@ -105,7 +106,7 @@ public abstract class Sorter extends Filter {
      * Interposes this sorter between a filter pipeline and the component that
      * the pipeline is bound to, replacing oldSorter as the previously
      * interposed sorter. You should not have to call this method directly.
-     * @todo Pass in just the ComponentAdapter, and add methods to that for
+     * TODO: Pass in just the ComponentAdapter, and add methods to that for
      * fetching the filter pipeline and old sorter, if any.
      *
      * PENDING: check when adopting from oldSorter makes sense!

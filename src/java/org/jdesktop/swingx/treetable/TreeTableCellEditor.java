@@ -32,7 +32,6 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTree;
-import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 
 /**
@@ -92,6 +91,7 @@ public class TreeTableCellEditor extends DefaultCellEditor {
      * The offset is then set on the TreeTableTextField component created in the
      * constructor, and returned.
      */
+    @Override
     public Component getTableCellEditorComponent(JTable table, Object value,
             boolean isSelected, int row, int column) {
         Component component = super.getTableCellEditorComponent(table, value,
@@ -104,7 +104,6 @@ public class TreeTableCellEditor extends DefaultCellEditor {
     /**
      * @param row
      * @param isSelected
-     * @return
      */
     protected void initEditorOffset(JTable table, int row, int column, boolean isSelected) {
         if (tree == null) return;
@@ -132,6 +131,7 @@ public class TreeTableCellEditor extends DefaultCellEditor {
      * This is overriden to forward the event to the tree. This will
      * return true if the click count >= clickCountToStart, or the event is null.
      */
+    @Override
     public boolean isCellEditable(EventObject e) {
         if (e == null) {
             return true;
@@ -162,6 +162,7 @@ public class TreeTableCellEditor extends DefaultCellEditor {
         private int column;
         private int width;
         private JTable table;
+        @Override
         public void reshape(int x, int y, int width, int height) {
             // Allows precise positioning of text field in the tree cell.
             //Border border = this.getBorder(); // get this text field's border

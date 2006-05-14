@@ -47,9 +47,9 @@ public abstract class ContextMenuSource {
     public abstract void updateActionEnabled(JComponent component, ActionMap map);
 
     /**
-     * returns an ActionMap for usage in default context menues.
+     * returns an ActionMap for usage in default context menus.
      * @param component
-     * @return
+     * @return an <code>ActionMap</code> for usage in default context menus
      */
     public ActionMap createActionMap(JComponent component) {
         ActionMap map = new ActionMap();

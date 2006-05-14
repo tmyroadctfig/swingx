@@ -7,8 +7,8 @@ package org.jdesktop.swingx.action;
 import java.awt.event.ItemEvent;
 
 /**
- * Convenience implementation to simplify {@link JXHyperlink} configuration and 
- * provide minimal api as needed by a {@link LinkRenderer}. <p>
+ * Convenience implementation to simplify {@link org.jdesktop.swingx.JXHyperlink} configuration and
+ * provide minimal api as needed by a {@link org.jdesktop.swingx.LinkRenderer}. <p>
  * 
  * PENDING: rename to AbstractLinkAction
  * 

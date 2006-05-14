@@ -40,7 +40,7 @@ public class ColumnControlIcon implements Icon {
     private int width = 10;
     private int height = 10;
 
-    /**@todo: need to support small, medium, large */
+    /** TODO: need to support small, medium, large */
     public ColumnControlIcon() {
     }
 
