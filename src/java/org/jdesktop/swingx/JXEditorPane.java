@@ -423,7 +423,7 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
 
     /**
      * 
-     * @returns a not-null Searchable for this editor.  
+     * @return a not-null Searchable for this editor.
      */
     public Searchable getSearchable() {
         if (searchable == null) {
@@ -462,9 +462,11 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
         /**
          * checks if the searchString should be interpreted as empty.
          * here: returns true if string is null or has zero length.
+         *
+         * TODO: This should be in a utility class.
          * 
          * @param searchString
-         * @return
+         * @return true if string is null or has zero length
          */
         protected boolean isEmpty(String searchString) {
             return (searchString == null) || searchString.length() == 0;
@@ -545,7 +547,8 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
          * 
          * @param pattern
          * @param start
-         * @return
+         * @return true if the current match result represents a different
+         * match than the last, false if no match or the same.
          */
         private boolean foundExtendedMatch(Pattern pattern, int start) {
             // JW: logic still needs cleanup...
@@ -590,7 +593,7 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
         /**
          * @param currentResult
          * @param offset
-         * @return
+         * @return the start position of the selected text
          */
         private int updateStateAfterFound(MatchResult currentResult, final int offset) {
             int end = currentResult.end() + offset;
@@ -605,7 +608,8 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
 
         /**
          * @param matcher
-         * @return
+         * @param useFirst whether or not to return after the first match is found.
+         * @return <code>MatchResult</code> or null
          */
         private MatchResult getMatchResult(Matcher matcher, boolean  useFirst) {
             MatchResult currentResult = null;

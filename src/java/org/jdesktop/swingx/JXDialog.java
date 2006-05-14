@@ -156,7 +156,7 @@ public class JXDialog extends JDialog {
      * create the dialog button controls.
      * 
      * 
-     * @return
+     * @return panel containing button controls
      */
     protected JComponent createButtonPanel() {
         // PENDING: this is a hack until we have a dedicated ButtonPanel!
@@ -200,7 +200,7 @@ public class JXDialog extends JDialog {
      * convenience wrapper to access rootPane's actionMap.
      * 
      * @param key
-     * @return
+     * @return root pane's <code>ActionMap</code>
      */
     private Action getAction(Object key) {
         return getRootPane().getActionMap().get(key);

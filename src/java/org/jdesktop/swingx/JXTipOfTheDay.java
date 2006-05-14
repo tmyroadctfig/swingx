@@ -187,6 +187,7 @@ public class JXTipOfTheDay extends JXPanel {
    * 
    * @return the TipOfTheDayUI object that implements the TipOfTheDayUI L&F
    */
+  @Override
   public TipOfTheDayUI getUI() {
     return (TipOfTheDayUI)ui;
   }
@@ -198,6 +199,7 @@ public class JXTipOfTheDay extends JXPanel {
    * @see javax.swing.JComponent#getUIClassID
    * @see javax.swing.UIDefaults#getUI
    */
+  @Override
   public String getUIClassID() {
     return uiClassID;
   }
@@ -223,7 +225,7 @@ public class JXTipOfTheDay extends JXPanel {
    * Sets the index of the tip to show
    * 
    * @param currentTip
-   * @throw IllegalArgumentException if currentTip is not within the bounds [0,
+   * @throws IllegalArgumentException if currentTip is not within the bounds [0,
    *        getModel().getTipCount()[.
    */
   public void setCurrentTip(int currentTip) {

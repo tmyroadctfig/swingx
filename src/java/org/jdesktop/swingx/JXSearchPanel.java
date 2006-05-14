@@ -120,14 +120,14 @@ public class JXSearchPanel extends AbstractPatternPanel {
     /**
      * returns the current compiled Pattern.
      * 
-     * @return
+     * @return the current compiled <code>Pattern</code>
      */
     public Pattern getPattern() {
         return patternModel.getPattern();
     }
 
     /**
-     * @param filter
+     * @param matcher
      */
     protected void updateFieldName(PatternMatcher matcher) {
         
@@ -141,7 +141,7 @@ public class JXSearchPanel extends AbstractPatternPanel {
         } else {
             if (searchLabel.getText().length() == 0) { // ugly hack
                 searchLabel.setText("Field");
-                /** @todo Remove this hack!!! */
+                /** TODO: Remove this hack!!! */
             }
 
         }
@@ -180,6 +180,7 @@ public class JXSearchPanel extends AbstractPatternPanel {
 
     //---------------- init actions and model
     
+    @Override
     protected void initExecutables() {
         super.initExecutables();
         getActionMap().put(MATCH_RULE_ACTION_COMMAND,
@@ -194,6 +195,7 @@ public class JXSearchPanel extends AbstractPatternPanel {
     /**
      * bind the components to the patternModel/actions.
      */
+    @Override
     protected void bind() {
         super.bind();
         List matchRules = getPatternModel().getMatchRules();
@@ -225,6 +227,7 @@ public class JXSearchPanel extends AbstractPatternPanel {
      * 
      *
      */
+    @Override
     protected void initComponents() {
         super.initComponents();
         searchCriteria = new JComboBox();

@@ -142,10 +142,10 @@ public class JXTreeTable extends JXTable {
 
     /**
      * Constructs a <code>JXTreeTable</code> using the specified
-     * {@link org.jdesktop.swing.treetable.TreeTableModel} and
-     * {@link org.jdesktop.swing.treetable.TreeTableCellRenderer}. The renderer
+     * {@link org.jdesktop.swingx.treetable.TreeTableModel} and
+     * {@link org.jdesktop.swingx.JXTreeTable.TreeTableCellRenderer}. The renderer
      * must have been constructed using the same instance of
-     * {@link org.jdesktop.swing.treetable.TreeTableModel} as passed to this
+     * {@link org.jdesktop.swingx.treetable.TreeTableModel} as passed to this
      * constructor.
      *
      * @param treeModel model for the JXTreeTable
@@ -225,6 +225,7 @@ public class JXTreeTable extends JXTable {
      * Sorters/Filters currently don't work properly.
      * 
      */
+    @Override
     public void setSortable(boolean sortable) {
         // no-op
     }
@@ -243,6 +244,7 @@ public class JXTreeTable extends JXTable {
      * @see #setRowMargin(int) setRowMargin
      * @see javax.swing.JTable#setIntercellSpacing(java.awt.Dimension) setIntercellSpacing
      */
+    @Override
     public void setShowHorizontalLines(boolean show) {
         super.setShowHorizontalLines(show);
     }
@@ -261,6 +263,7 @@ public class JXTreeTable extends JXTable {
      * @see #setColumnMargin(int) setColumnMargin
      * @see javax.swing.JTable#setIntercellSpacing(java.awt.Dimension) setIntercellSpacing
      */
+    @Override
     public void setShowVerticalLines(boolean show) {
         super.setShowVerticalLines(show);
     }
@@ -274,6 +277,7 @@ public class JXTreeTable extends JXTable {
      *
      * {@inheritDoc}
      */
+    @Override
     public boolean editCellAt(int row, int column, EventObject e) {
         expandOrCollapseNode(column, e);    // RG: Fix Issue 49!
         boolean canEdit = super.editCellAt(row, column, e);
@@ -378,6 +382,7 @@ public class JXTreeTable extends JXTable {
      *
      * {@inheritDoc}
      */
+    @Override
     public int getEditingRow() {
         return isHierarchical(editingColumn) ? -1 : editingRow;
     }
@@ -451,6 +456,7 @@ public class JXTreeTable extends JXTable {
      * @throws IllegalArgumentException if the specified tableModel is not an
      * instance of TreeTableModelAdapter
      */
+    @Override
     public final void setModel(TableModel tableModel) { // note final keyword
         if (tableModel instanceof TreeTableModelAdapter) {
             if (((TreeTableModelAdapter) tableModel).getTreeTable() == null) {
@@ -483,6 +489,7 @@ public class JXTreeTable extends JXTable {
      * @throws UnsupportedOperationException because variable height rows are
      * not supported
      */
+    @Override
     public final void setRowHeight(int row, int rowHeight) {
         throw new UnsupportedOperationException("variable height rows not supported");
     }
@@ -493,6 +500,7 @@ public class JXTreeTable extends JXTable {
      *
      * @param rowHeight height of a row
      */
+    @Override
     public void setRowHeight(int rowHeight) {
         super.setRowHeight(rowHeight);
         adjustTreeRowHeight(); // JTree doesn't have setRowMargin. So adjust.
@@ -507,6 +515,7 @@ public class JXTreeTable extends JXTable {
      * @param columnMargin margin between columns; must be greater than or equal to zero.
      * @see #setShowVerticalLines(boolean) setShowVerticalLines
      */
+    @Override
     public void setColumnMargin(int columnMargin) {
         super.setColumnMargin(columnMargin);
     }
@@ -523,6 +532,7 @@ public class JXTreeTable extends JXTable {
      * @param rowMargin margin or intercell spacing between rows
      * @see #setShowHorizontalLines(boolean) setShowHorizontalLines
      */
+    @Override
     public void setRowMargin(int rowMargin) {
         // No need to override setIntercellSpacing, because the change in
         // rowMargin will be funneled through this method anyway.
@@ -560,6 +570,7 @@ public class JXTreeTable extends JXTable {
      *
      * @param mode any of the table selection modes
      */
+    @Override
     public void setSelectionMode(int mode) {
         if (renderer != null) {
             switch (mode) {
@@ -591,6 +602,7 @@ public class JXTreeTable extends JXTable {
      * @param column the column of the cell to render, where 0 is the first column
      * @return the <code>Component</code> used as a stamp to render the specified cell
      */
+    @Override
     public Component prepareRenderer(TableCellRenderer renderer, int row,
         int column) {
         
@@ -658,6 +670,7 @@ public class JXTreeTable extends JXTable {
     }
 
     
+    @Override
     public String getToolTipText(MouseEvent event) {
         int column = columnAtPoint(event.getPoint());
         if (isHierarchical(column)) {
@@ -718,6 +731,7 @@ public class JXTreeTable extends JXTable {
      * necessary synchronization. If you override this method, make sure you call
      * this version from your version of this method.
      */
+    @Override
     public void clearSelection() {
         if (renderer != null) {
             renderer.clearSelection();
@@ -1080,8 +1094,9 @@ public class JXTreeTable extends JXTable {
      * think the table is being edited, as <code>getEditingRow</code> returns
      * -1, and therefore doesn't automaticly resize the editor for us.
      */
+    @Override
     public void sizeColumnsToFit(int resizingColumn) {
-        /** @todo Review wrt doLayout() */
+        /** TODO: Review wrt doLayout() */
         super.sizeColumnsToFit(resizingColumn);
         // rg:changed
         if (getEditingColumn() != -1 && isHierarchical(editingColumn)) {
@@ -1098,6 +1113,7 @@ public class JXTreeTable extends JXTable {
      * Since the tree is not actually in the component hieachy it will
      * never receive this unless we forward it in this manner.
      */
+    @Override
     public void updateUI() {
         super.updateUI();
         if (renderer != null) {
@@ -1124,6 +1140,7 @@ public class JXTreeTable extends JXTable {
      * @return true if the class of objects in the specified column implement
      * the {@link javax.swing.tree.TreeNode} interface; false otherwise.
      */
+    @Override
     public boolean isHierarchical(int column) {
         return AbstractTreeTableModel.hierarchicalColumnClass.isAssignableFrom(
             getColumnClass(column));
@@ -1136,7 +1153,7 @@ public class JXTreeTable extends JXTable {
      * @param renderer private tree/renderer permanently and exclusively bound
      * to this JXTreeTable.
      */
-    private final void init(TreeTableCellRenderer renderer) {
+    private void init(TreeTableCellRenderer renderer) {
         this.renderer = renderer;
         // Force the JTable and JTree to share their row selection models.
         ListToTreeSelectionModelWrapper selectionWrapper =
@@ -1196,6 +1213,7 @@ public class JXTreeTable extends JXTable {
          * and message super. This is the only place DefaultTreeSelectionModel
          * alters the ListSelectionModel.
          */
+        @Override
         public void resetRowSelection() {
             if (!updatingListSelectionModel) {
                 updatingListSelectionModel = true;
@@ -1316,7 +1334,7 @@ public class JXTreeTable extends JXTable {
         }
 
         /**
-         * @return
+         * @return <code>TreeModelListener</code>
          */
         private TreeModelListener getTreeModelListener() {
             if (treeModelListener == null) {
@@ -1387,6 +1405,7 @@ public class JXTreeTable extends JXTable {
         // Wrappers, implementing TableModel interface.
         // TableModelListener management provided by AbstractTableModel superclass.
 
+        @Override
         public Class getColumnClass(int column) {
             return model.getColumnClass(column);
         }
@@ -1395,6 +1414,7 @@ public class JXTreeTable extends JXTable {
             return model.getColumnCount();
         }
 
+        @Override
         public String getColumnName(int column) {
             return model.getColumnName(column);
         }
@@ -1407,10 +1427,12 @@ public class JXTreeTable extends JXTable {
             return model.getValueAt(nodeForRow(row), column);
         }
 
+        @Override
         public boolean isCellEditable(int row, int column) {
             return model.isCellEditable(nodeForRow(row), column);
         }
 
+        @Override
         public void setValueAt(Object value, int row, int column) {
             model.setValueAt(value, nodeForRow(row), column);
         }
@@ -1497,7 +1519,7 @@ public class JXTreeTable extends JXTable {
             putClientProperty("JTree.lineStyle", "None");
             setRootVisible(false); // superclass default is "true"
             setShowsRootHandles(true); // superclass default is "false"
-                /** @todo Support truncated text directly in DefaultTreeCellRenderer. */
+                /** TODO: Support truncated text directly in DefaultTreeCellRenderer. */
             setOverwriteRendererIcons(true);
             setCellRenderer(new ClippedTreeCellRenderer());
         }
@@ -1581,6 +1603,7 @@ public class JXTreeTable extends JXTable {
          * updateUI is overridden to set the colors of the Tree's renderer
          * to match that of the table.
          */
+        @Override
         public void updateUI() {
             super.updateUI();
             // Make the tree's cell renderer use the table's cell selection
@@ -1608,6 +1631,7 @@ public class JXTreeTable extends JXTable {
          * Sets the row height of the tree, and forwards the row height to
          * the table.
          */
+        @Override
         public void setRowHeight(int rowHeight) {
             super.setRowHeight(rowHeight);
             if (rowHeight > 0) {
@@ -1633,6 +1657,7 @@ public class JXTreeTable extends JXTable {
         /**
          * This is overridden to set the height to match that of the JTable.
          */
+        @Override
         public void setBounds(int x, int y, int w, int h) {
             if (treeTable != null) {
                 y = 0;
@@ -1646,6 +1671,7 @@ public class JXTreeTable extends JXTable {
          * Sublcassed to translate the graphics such that the last visible row
          * will be drawn at 0,0.
          */
+        @Override
         public void paint(Graphics g) {
             int rowMargin = treeTable.getRowMargin();
             // MUST account for rowMargin for precise positioning.
@@ -1719,7 +1745,7 @@ public class JXTreeTable extends JXTable {
                     getItemRect(itemRect), iconRect, textRect,
                     getIconTextGap());
 
-                /** @todo setText is more heavyweight than we want in this
+                /** TODO: setText is more heavyweight than we want in this
                  * situation. Make JLabel.text protected instead of private.
                  */
 
@@ -1757,6 +1783,7 @@ public class JXTreeTable extends JXTable {
      *
      * @return the adapter that knows how to access the component data model
      */
+    @Override
     protected ComponentAdapter getComponentAdapter() {
         if (dataAdapter == null) {
             dataAdapter = new TreeTableDataAdapter(this); 
@@ -1785,23 +1812,27 @@ public class JXTreeTable extends JXTable {
             return table;
         }
 
+        @Override
         public boolean isExpanded() {
-            return super.isExpanded(); /** @todo implement this method */
+            return super.isExpanded(); /** TODO: implement this method */
         }
 
+        @Override
         public boolean hasFocus() {
-            boolean focus = super.hasFocus(); /** @todo implement this method */
+            boolean focus = super.hasFocus(); /** TODO: implement this method */
             return focus;
         }
 
+        @Override
         public boolean isLeaf() {
-            return super.isLeaf(); /** @todo implement this method */
+            return super.isLeaf(); /** TODO: implement this method */
         }
         /**
          *
          * @return true if the cell identified by this adapter displays hierarchical
          *      nodes; false otherwise
          */
+        @Override
         public boolean isHierarchical() {
             return table.isHierarchical(column);
         }

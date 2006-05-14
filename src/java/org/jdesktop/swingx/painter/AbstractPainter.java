@@ -161,7 +161,7 @@ public abstract class AbstractPainter<T extends JComponent> extends JavaBean imp
     }
     
     /**
-     * @returns whether or not the cache should be used
+     * @return whether or not the cache should be used
      */
     public boolean isUseCache() {
         return useCache;
@@ -205,7 +205,7 @@ public abstract class AbstractPainter<T extends JComponent> extends JavaBean imp
     }
     
     /**
-     * @param effects a defensive copy of the Effects to apply to the results
+     * @return effects a defensive copy of the Effects to apply to the results
      *          of the AbstractPainter's painting operation. Will never null
      */
     public Effect[] getEffects() {
@@ -272,14 +272,14 @@ public abstract class AbstractPainter<T extends JComponent> extends JavaBean imp
     }
     
     /**
-     * @returns the composite
+     * @return the composite
      */
     public Composite getComposite() {
         return composite;
     }
 
     /**
-     * @returns the technique used for interpolating alpha values. May be one
+     * @return the technique used for interpolating alpha values. May be one
      * of:
      * <ul>
      *  <li>RenderingHints.VALUE_ALPHA_INTERPOLATION_SPEED</li>
@@ -313,7 +313,7 @@ public abstract class AbstractPainter<T extends JComponent> extends JavaBean imp
     }
 
     /**
-     * @returns whether or not to antialias
+     * @return whether or not to antialias
      *          May be one of:
      * <ul>
      *  <li>RenderingHints.VALUE_ANTIALIAS_DEFAULT</li>
@@ -346,7 +346,7 @@ public abstract class AbstractPainter<T extends JComponent> extends JavaBean imp
     }
 
     /**
-     * @returns the technique to use for rendering colors
+     * @return the technique to use for rendering colors
      *          May be one of:
      * <ul>
      *  <li>RenderingHints.VALUE_COLOR_RENDER_DEFAULT</li>
@@ -379,7 +379,7 @@ public abstract class AbstractPainter<T extends JComponent> extends JavaBean imp
     }
 
     /**
-     * @returns whether or not to dither
+     * @return whether or not to dither
      *          May be one of:
      * <ul>
      *  <li>RenderingHints.VALUE_DITHER_DEFAULT</li>
@@ -412,7 +412,7 @@ public abstract class AbstractPainter<T extends JComponent> extends JavaBean imp
     }
 
     /**
-     * @returns whether or not to use fractional metrics
+     * @return whether or not to use fractional metrics
      *          May be one of:
      * <ul>
      *  <li>RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT</li>
@@ -446,7 +446,7 @@ public abstract class AbstractPainter<T extends JComponent> extends JavaBean imp
     }
 
     /**
-     * @returns the technique to use for interpolation (used esp. when scaling)
+     * @return the technique to use for interpolation (used esp. when scaling)
      *          May be one of:
      * <ul>
      *  <li>RenderingHints.VALUE_INTERPOLATION_BICUBIC</li>
@@ -479,7 +479,7 @@ public abstract class AbstractPainter<T extends JComponent> extends JavaBean imp
     }
 
     /**
-     * @returns a hint as to techniques to use with regards to rendering quality vs. speed
+     * @return a hint as to techniques to use with regards to rendering quality vs. speed
      *          May be one of:
      * <ul>
      *  <li>RenderingHints.VALUE_RENDER_QUALITY</li>
@@ -513,7 +513,7 @@ public abstract class AbstractPainter<T extends JComponent> extends JavaBean imp
     }
 
     /**
-     * @returns technique for rendering strokes
+     * @return technique for rendering strokes
      *          May be one of:
      * <ul>
      *  <li>RenderingHints.VALUE_STROKE_DEFAULT</li>
@@ -547,7 +547,7 @@ public abstract class AbstractPainter<T extends JComponent> extends JavaBean imp
     }
 
     /**
-     * @returns technique for anti-aliasing text.
+     * @return technique for anti-aliasing text.
      *          (TODO this needs to be updated for Mustang. You may use the
      *           new Mustang values, and everything will work, but support in
      *           the GUI builder and documentation need to be added once we

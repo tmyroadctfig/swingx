@@ -182,7 +182,7 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * <li> "find" - open an appropriate search widget for searching cell content. The
  *   default action registeres itself with the SearchFactory as search target.
  * <li> "print" - print the table
- * <li> {@link JXTable#HORIZONTAL_ACTION_COMMAND} - toggle the horizontal scrollbar
+ * <li> {@link JXTable#HORIZONTALSCROLL_ACTION_COMMAND} - toggle the horizontal scrollbar
  * <li> {@link JXTable#PACKSELECTED_ACTION_COMMAND} - resize the selected column to fit the widest
  *  cell content 
  * <li> {@link JXTable#PACKALL_ACTION_COMMAND} - resize all columns to fit the widest
@@ -465,7 +465,7 @@ public class JXTable extends JTable {
     /**
      * creates and returns the RolloverProducer to use.
      * 
-     * @return
+     * @return <code>RolloverProducer</code>
      */
     protected RolloverProducer createRolloverProducer() {
         RolloverProducer r = new RolloverProducer() {
@@ -600,7 +600,8 @@ public class JXTable extends JTable {
      * containing (viewport?) parent, if false the table's height will be
      * independent of parent's height.
      * 
-     * @return
+     * @return true if the table's height will always be at least as large
+     * as the containing parent, false if it is independent
      */
     public boolean getFillsViewportHeight() {
         return fillsViewportHeight;
@@ -626,6 +627,7 @@ public class JXTable extends JTable {
      * overridden to addionally configure the upper right corner of an enclosing
      * scrollpane with the ColumnControl.
      */
+    @Override
     protected void configureEnclosingScrollPane() {
         super.configureEnclosingScrollPane();
         configureColumnControl();
@@ -713,7 +715,7 @@ public class JXTable extends JTable {
      * shown even if this returns true. In this case it's the responsibility of
      * the client code to actually show it.
      * 
-     * @return
+     * @return true if the column is visible, false otherwise
      */
     public boolean isColumnControlVisible() {
         return columnControlVisible;
@@ -722,7 +724,7 @@ public class JXTable extends JTable {
     /**
      * returns the component for column control.
      * 
-     * @return
+     * @return component for column control
      */
     public JComponent getColumnControl() {
         if (columnControlButton == null) {
@@ -878,6 +880,7 @@ public class JXTable extends JTable {
      *  overridden to update the enabled state of the packSelected
      *  action.
      */
+    @Override
     public void columnSelectionChanged(ListSelectionEvent e) {
         super.columnSelectionChanged(e);
         if (e.getValueIsAdjusting())
@@ -893,6 +896,7 @@ public class JXTable extends JTable {
      * overridden to update the show horizontal scrollbar action's
      * selected state. 
      */
+    @Override
     public void setAutoResizeMode(int mode) {
         super.setAutoResizeMode(mode);
         Action showHorizontal = getActionMap().get(
@@ -910,7 +914,8 @@ public class JXTable extends JTable {
      * Returns the row count in the table; if filters are applied, this is the
      * filtered row count.
      */
-    @Override public int getRowCount() {
+    @Override
+    public int getRowCount() {
         // RG: If there are no filters, call superclass version rather than
         // accessing model directly
         return filters == null ?
@@ -948,6 +953,7 @@ public class JXTable extends JTable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object getValueAt(int row, int column) {
         return getModel().getValueAt(convertRowIndexToModel(row), 
                 convertColumnIndexToModel(column));
@@ -956,6 +962,7 @@ public class JXTable extends JTable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setValueAt(Object aValue, int row, int column) {
         getModel().setValueAt(aValue, convertRowIndexToModel(row),
                 convertColumnIndexToModel(column));
@@ -992,6 +999,7 @@ public class JXTable extends JTable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setModel(TableModel newModel) {
         // JW: need to look here? is done in tableChanged as well. 
         getSelectionMapper().lock();
@@ -1002,6 +1010,7 @@ public class JXTable extends JTable {
      * additionally updates filtered state.
      * {@inheritDoc}
      */
+    @Override
     public void tableChanged(TableModelEvent e) {
         if (getSelectionModel().getValueIsAdjusting()) {
             // this may happen if the uidelegate/editor changed selection
@@ -1121,7 +1130,7 @@ public class JXTable extends JTable {
     
     /**
      * temporaryly exposed for testing...
-     * @return
+     * @return <code>SelectionMapper</code>
      */
     protected SelectionMapper getSelectionMapper() {
         if (selectionMapper == null) {
@@ -1309,7 +1318,7 @@ public class JXTable extends JTable {
     /**
      * returns the currently active SortController. Can be null
      * on the very first call after instantiation.
-     * @return
+     * @return the currently active <code>SortController</code> may be null
      */
     protected SortController getSortController() {
 //      // this check is for the sake of the very first call after instantiation
@@ -1380,7 +1389,7 @@ public class JXTable extends JTable {
      */
     protected void removeColumns() {
         /**
-         * @todo promote this method to superclass, and change
+         * TODO: promote this method to superclass, and change
          *       createDefaultColumnsFromModel() to call this method
          */
         List columns = getColumns(true);
@@ -1393,7 +1402,7 @@ public class JXTable extends JTable {
     /**
      * returns a list of all visible TableColumns.
      * 
-     * @return
+     * @return list of all the visible <code>TableColumns</code>
      */
     public List getColumns() {
         return Collections.list(getColumnModel().getColumns());
@@ -1404,7 +1413,8 @@ public class JXTable extends JTable {
      * to true.
      * 
      * @param includeHidden
-     * @return
+     * @return list of <code>TableColumns</code> including hidden columns if
+     * specified
      */
     public List getColumns(boolean includeHidden) {
         if (includeHidden && (getColumnModel() instanceof TableColumnModelExt)) {
@@ -1419,7 +1429,8 @@ public class JXTable extends JTable {
      * to true.
      * 
      * @param includeHidden
-     * @return
+     * @return number of <code>TableColumns</code> including hidden columns
+     * if specified
      */
     public int getColumnCount(boolean includeHidden) {
         if (getColumnModel() instanceof TableColumnModelExt) {
@@ -1434,7 +1445,7 @@ public class JXTable extends JTable {
      * not correspond to any column in the model will be ignored. Columns with
      * logical names not contained are added at the end.
      * 
-     * @param columnNames
+     * @param identifiers
      *            array of logical column names
      */
     public void setColumnSequence(Object[] identifiers) {
@@ -1540,6 +1551,7 @@ public class JXTable extends JTable {
         return getColumnModel().getColumn(viewColumnIndex);
     }
 
+    @Override
     public void createDefaultColumnsFromModel() {
         TableModel model = getModel();
         if (model != null) {
@@ -1617,7 +1629,7 @@ public class JXTable extends JTable {
 
     /**
      * 
-     * @returns a not-null Searchable for this editor.  
+     * @return a not-null Searchable for this editor.
      */
     public Searchable getSearchable() {
         if (searchable == null) {
@@ -1641,7 +1653,6 @@ public class JXTable extends JTable {
         private SearchHighlighter searchHighlighter;
         
 
-        @Override
         protected void findMatchAndUpdateState(Pattern pattern, int startRow,
                 boolean backwards) {
             SearchResult matchRow = null;
@@ -1674,7 +1685,7 @@ public class JXTable extends JTable {
          * 
          * @param pattern
          * @param row
-         * @return
+         * @return an appropriate <code>SearchResult</code> if matching or null
          */
         protected SearchResult findExtendedMatch(Pattern pattern, int row) {
             return findMatchAt(pattern, row, lastSearchResult.foundColumn);
@@ -1690,7 +1701,8 @@ public class JXTable extends JTable {
          * @param pattern
          * @param row
          *            the row to search
-         * @return
+         * @return an appropriate <code>SearchResult</code> if a matching cell
+         * is found in this row or null if no match is found
          */
         private SearchResult findMatchForwardInRow(Pattern pattern, int row) {
             int startColumn = (lastSearchResult.foundColumn < 0) ? 0 : lastSearchResult.foundColumn;
@@ -1714,7 +1726,8 @@ public class JXTable extends JTable {
          * @param pattern
          * @param row
          *            the row to search
-         * @return
+         * @return an appropriate <code>SearchResult</code> if a matching cell is found
+         * in this row or null if no match is found
          */
         private SearchResult findMatchBackwardsInRow(Pattern pattern, int row) {
             int startColumn = (lastSearchResult.foundColumn < 0) ? getColumnCount() - 1
@@ -1739,7 +1752,7 @@ public class JXTable extends JTable {
          *            a valid row index in view coordinates
          * @param column
          *            a valid column index in view coordinates
-         * @return
+         * @return an appropriate <code>SearchResult</code> if matching or null
          */
         protected SearchResult findMatchAt(Pattern pattern, int row, int column) {
             Object value = getValueAt(row, column);
@@ -1759,8 +1772,9 @@ public class JXTable extends JTable {
          * 
          * @param startIndex
          * @param backwards
-         * @return
+         * @return adjusted <code>startIndex</code>
          */
+        @Override
         protected int adjustStartPosition(int startIndex, boolean backwards) {
             lastSearchResult.foundColumn = -1;
             return super.adjustStartPosition(startIndex, backwards);
@@ -1773,7 +1787,7 @@ public class JXTable extends JTable {
          * 
          * @param startRow
          * @param backwards
-         * @return
+         * @return new start index to use
          */
         @Override
         protected int moveStartPosition(int startRow, boolean backwards) {
@@ -1799,6 +1813,7 @@ public class JXTable extends JTable {
          * @param startIndex
          * @return true if the startIndex should be re-matched, false if not.
          */
+        @Override
         protected boolean isEqualStartIndex(final int startIndex) {
             return super.isEqualStartIndex(startIndex)
                     && isValidColumn(lastSearchResult.foundColumn);
@@ -1808,19 +1823,17 @@ public class JXTable extends JTable {
          * checks if row is in range: 0 <= row < getRowCount().
          * 
          * @param column
-         * @return
+         * @return true if the column is in range, false otherwise
          */
         private boolean isValidColumn(int column) {
             return column >= 0 && column < getColumnCount();
         }
 
 
-        @Override
         protected int getSize() {
             return getRowCount();
         }
 
-        @Override
         protected void moveMatchMarker() {
             int row = lastSearchResult.foundRow;
             int column = lastSearchResult.foundColumn;
@@ -1953,6 +1966,7 @@ public class JXTable extends JTable {
         return visibleRowCount;
     }
 
+    @Override
     public Dimension getPreferredScrollableViewportSize() {
         Dimension prefSize = super.getPreferredScrollableViewportSize();
 
@@ -2102,10 +2116,12 @@ public class JXTable extends JTable {
             return identifier != null ? identifier.toString() : null;
         }
         
+        @Override
         public int getColumnCount() {
             return table.getModel().getColumnCount();
         }
 
+        @Override
         public int getRowCount() {
             return table.getModel().getRowCount();
         }
@@ -2127,6 +2143,7 @@ public class JXTable extends JTable {
 
         
         
+        @Override
         public boolean isTestable(int column) {
             return getColumnByModelIndex(column) != null;
         }
@@ -2157,6 +2174,7 @@ public class JXTable extends JTable {
         /**
          * {@inheritDoc}
          */
+        @Override
         public int modelToView(int columnIndex) {
             return table.convertColumnIndexToView(columnIndex);
         }
@@ -2164,6 +2182,7 @@ public class JXTable extends JTable {
         /**
          * {@inheritDoc}
          */
+        @Override
         public int viewToModel(int columnIndex) {
             return table.convertColumnIndexToModel(columnIndex);
         }
@@ -2751,8 +2770,7 @@ public class JXTable extends JTable {
     }
 
     /**
-     * @return
-     * @throws NoSuchFieldException
+     * @return <code>Field</code>
      */
     private Field getRowModelField() {
         if (rowModelField == null) {
@@ -2773,7 +2791,7 @@ public class JXTable extends JTable {
     
     /**
      * 
-     * @return
+     * @return <code>SizeSequenceMapper</code>
      */
     protected SizeSequenceMapper getRowModelMapper() {
         if (rowModelMapper == null) {

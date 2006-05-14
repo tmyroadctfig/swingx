@@ -226,6 +226,7 @@ public class JXTaskPane extends JPanel implements
    * 
    * @see javax.swing.JComponent#updateUI
    */
+  @Override
   public void updateUI() {
     // collapsePane is null when updateUI() is called by the "super()"
     // constructor
@@ -255,6 +256,7 @@ public class JXTaskPane extends JPanel implements
    * @see javax.swing.JComponent#getUIClassID
    * @see javax.swing.UIDefaults#getUI
    */
+  @Override
   public String getUIClassID() {
     return uiClassID;
   }
@@ -445,6 +447,7 @@ public class JXTaskPane extends JPanel implements
   /**
    * Overriden to redirect call to the content pane.
    */
+  @Override
   protected void addImpl(Component comp, Object constraints, int index) {
     getContentPane().add(comp, constraints, index);
   }
@@ -452,6 +455,7 @@ public class JXTaskPane extends JPanel implements
   /**
    * Overriden to redirect call to the content pane.
    */
+  @Override
   public void setLayout(LayoutManager mgr) {
     if (collapsePane != null) {
       getContentPane().setLayout(mgr);
@@ -461,6 +465,7 @@ public class JXTaskPane extends JPanel implements
   /**
    * Overriden to redirect call to the content pane
    */
+  @Override
   public void remove(Component comp) {
     getContentPane().remove(comp);
   }
@@ -468,6 +473,7 @@ public class JXTaskPane extends JPanel implements
   /**
    * Overriden to redirect call to the content pane.
    */
+  @Override
   public void remove(int index) {
     getContentPane().remove(index);
   }
@@ -475,6 +481,7 @@ public class JXTaskPane extends JPanel implements
   /**
    * Overriden to redirect call to the content pane.
    */
+  @Override
   public void removeAll() {
     getContentPane().removeAll();
   }
@@ -482,6 +489,7 @@ public class JXTaskPane extends JPanel implements
   /**
    * @see JComponent#paramString()
    */
+  @Override
   protected String paramString() {
     return super.paramString()
       + ",title="

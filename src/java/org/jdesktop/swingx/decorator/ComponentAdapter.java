@@ -149,7 +149,7 @@ public abstract class ComponentAdapter {
      * view column coordinate).
      * 
      * @param column in model coordinates
-     * @return
+     * @return true if the column should be included in testing
      */
     public  boolean isTestable(int column) {
         return modelToView(column) >= 0;
@@ -182,7 +182,8 @@ public abstract class ComponentAdapter {
      * 
      * @param row
      * @param column
-     * @return
+     * @return the filtered value of the cell identified by the row
+     * in view coordinate and the column in model coordiantes
      */
     public abstract Object getFilteredValueAt(int row, int column);
 

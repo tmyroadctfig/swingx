@@ -41,7 +41,7 @@ public class JXLoginDialog extends JDialog {
      * @exception HeadlessException if GraphicsEnvironment.isHeadless()
      * returns true.
      * @see java.awt.GraphicsEnvironment#isHeadless
-     * @see JComponent#getDefaultLocale
+     * @see javax.swing.JComponent#getDefaultLocale
      */
     public JXLoginDialog() throws HeadlessException {
         super();
@@ -61,7 +61,7 @@ public class JXLoginDialog extends JDialog {
      * @exception HeadlessException if GraphicsEnvironment.isHeadless()
      * returns true.
      * @see java.awt.GraphicsEnvironment#isHeadless
-     * @see JComponent#getDefaultLocale
+     * @see javax.swing.JComponent#getDefaultLocale
      */
     public JXLoginDialog(Frame owner) throws HeadlessException {
         super(owner);
@@ -83,7 +83,7 @@ public class JXLoginDialog extends JDialog {
      * @exception HeadlessException if GraphicsEnvironment.isHeadless()
      * returns true.
      * @see java.awt.GraphicsEnvironment#isHeadless
-     * @see JComponent#getDefaultLocale
+     * @see javax.swing.JComponent#getDefaultLocale
      */
     public JXLoginDialog(Frame owner, boolean modal) throws HeadlessException {
         super(owner, modal);
@@ -105,7 +105,7 @@ public class JXLoginDialog extends JDialog {
      * @exception HeadlessException if GraphicsEnvironment.isHeadless()
      * returns true.
      * @see java.awt.GraphicsEnvironment#isHeadless
-     * @see JComponent#getDefaultLocale
+     * @see javax.swing.JComponent#getDefaultLocale
      */
     public JXLoginDialog(Frame owner, String title) throws HeadlessException {
         super(owner, title);     
@@ -133,7 +133,7 @@ public class JXLoginDialog extends JDialog {
      * @exception HeadlessException if GraphicsEnvironment.isHeadless()
      * returns true.
      * @see java.awt.GraphicsEnvironment#isHeadless
-     * @see JComponent#getDefaultLocale
+     * @see javax.swing.JComponent#getDefaultLocale
      */
     public JXLoginDialog(Frame owner, String title, boolean modal)
         throws HeadlessException {
@@ -165,7 +165,7 @@ public class JXLoginDialog extends JDialog {
      * @exception HeadlessException if GraphicsEnvironment.isHeadless()
      * returns true.
      * @see java.awt.GraphicsEnvironment#isHeadless
-     * @see JComponent#getDefaultLocale
+     * @see javax.swing.JComponent#getDefaultLocale
      * @since 1.4
      */
     public JXLoginDialog(Frame owner, String title, boolean modal,
@@ -185,7 +185,7 @@ public class JXLoginDialog extends JDialog {
      * @exception HeadlessException if GraphicsEnvironment.isHeadless()
      * returns true.
      * @see java.awt.GraphicsEnvironment#isHeadless
-     * @see JComponent#getDefaultLocale
+     * @see javax.swing.JComponent#getDefaultLocale
      */
     public JXLoginDialog(Dialog owner) throws HeadlessException {
         super(owner);
@@ -205,7 +205,7 @@ public class JXLoginDialog extends JDialog {
      * @exception HeadlessException if GraphicsEnvironment.isHeadless()
      * returns true.
      * @see java.awt.GraphicsEnvironment#isHeadless
-     * @see JComponent#getDefaultLocale
+     * @see javax.swing.JComponent#getDefaultLocale
      */
     public JXLoginDialog(Dialog owner, boolean modal) throws HeadlessException {
         super(owner, modal);
@@ -225,7 +225,7 @@ public class JXLoginDialog extends JDialog {
      * @exception HeadlessException if GraphicsEnvironment.isHeadless()
      * returns true.
      * @see java.awt.GraphicsEnvironment#isHeadless
-     * @see JComponent#getDefaultLocale
+     * @see javax.swing.JComponent#getDefaultLocale
      */
     public JXLoginDialog(Dialog owner, String title) throws HeadlessException {
         super(owner, title);     
@@ -247,7 +247,7 @@ public class JXLoginDialog extends JDialog {
      * @exception HeadlessException if GraphicsEnvironment.isHeadless()
      * returns true.
      * @see java.awt.GraphicsEnvironment#isHeadless
-     * @see JComponent#getDefaultLocale
+     * @see javax.swing.JComponent#getDefaultLocale
      */
     public JXLoginDialog(Dialog owner, String title, boolean modal)
         throws HeadlessException {
@@ -278,7 +278,7 @@ public class JXLoginDialog extends JDialog {
      * <code>GraphicsConfiguration</code> as the owning Dialog is used.    
      * @exception HeadlessException if GraphicsEnvironment.isHeadless()
      * @see java.awt.GraphicsEnvironment#isHeadless
-     * @see JComponent#getDefaultLocale
+     * @see javax.swing.JComponent#getDefaultLocale
      * returns true.
      * @since 1.4
      */

@@ -163,7 +163,7 @@ public class JXList extends JList {
 
     /**
      * 
-     * @returns a not-null Searchable for this editor.  
+     * @return a not-null Searchable for this editor.
      */
     public Searchable getSearchable() {
         if (searchable == null) {
@@ -212,8 +212,7 @@ public class JXList extends JList {
          * 
          * @param pattern 
          * @param row a valid row index in view coordinates
-         * @param column a valid column index in view coordinates
-         * @return
+         * @return <code>SearchResult</code> if matched otherwise null
          */
         protected SearchResult findMatchAt(Pattern pattern, int row) {
             Object value = getElementAt(row);
@@ -282,7 +281,7 @@ public class JXList extends JList {
     /**
      * creates and returns the RolloverProducer to use with this tree.
      * 
-     * @return
+     * @return <code>RolloverProducer</code> to use with this tree
      */
     protected RolloverProducer createRolloverProducer() {
         RolloverProducer r = new RolloverProducer() {
@@ -306,8 +305,10 @@ public class JXList extends JList {
     }
     /**
      * returns the rolloverEnabled property.
-     * 
-     * @return
+     *
+     * TODO: why doesn't this just return rolloverEnabled???
+     *
+     * @return true if rollover is enabled
      */
     public boolean isRolloverEnabled() {
         return rolloverProducer != null;
@@ -335,7 +336,6 @@ public class JXList extends JList {
         /**
          * something weird: cursor in JList behaves different from JTable?
          * 
-         * @param list
          * @param location
          */
         private void setRolloverCursor(Point location) {
@@ -349,7 +349,6 @@ public class JXList extends JList {
 
         }
 
-        @Override
         protected RolloverRenderer getRolloverRenderer(Point location,
                 boolean prepare) {
             ListCellRenderer renderer = component.getCellRenderer();
@@ -398,7 +397,7 @@ public class JXList extends JList {
      * coordinates. If filters are active this number might be
      * less than the number of elements in the underlying model.
      * 
-     * @return
+     * @return number of elements in this list in view coordinates
      */
     public int getElementCount() {
         return getModel().getSize();
@@ -437,7 +436,7 @@ public class JXList extends JList {
      * returns the underlying model. If !isFilterEnabled this will be the same
      * as getModel().
      * 
-     * @return
+     * @return the underlying model
      */
     public ListModel getWrappedModel() {
         return isFilterEnabled() ? wrappingModel.getModel() : getModel();
@@ -496,6 +495,7 @@ public class JXList extends JList {
      * 
      * 
      */
+    @Override
     public void setModel(ListModel model) {
         if (isFilterEnabled()) {
             wrappingModel.setModel(model);
@@ -506,7 +506,7 @@ public class JXList extends JList {
 
     /**
      * widened access for testing...
-     * @return
+     * @return the selection mapper
      */
     protected SelectionMapper getSelectionMapper() {
         if (selectionMapper == null) {
@@ -735,10 +735,11 @@ public class JXList extends JList {
          * {@inheritDoc}
          */
         public boolean hasFocus() {
-            /** @todo Think through printing implications */
+            /** TODO: Think through printing implications */
             return list.isFocusOwner() && (row == list.getLeadSelectionIndex());
         }
 
+        @Override
         public int getRowCount() {
             return list.getWrappedModel().getSize();
         }
@@ -767,7 +768,7 @@ public class JXList extends JList {
          * {@inheritDoc}
          */
         public boolean isSelected() {
-            /** @todo Think through printing implications */
+            /** TODO: Think through printing implications */
             return list.isSelectedIndex(row);
         }
 
@@ -821,10 +822,12 @@ public class JXList extends JList {
         return delegatingRenderer;
     }
 
+    @Override
     public ListCellRenderer getCellRenderer() {
         return getDelegatingRenderer();
     }
 
+    @Override
     public void setCellRenderer(ListCellRenderer renderer) {
         // JW: Pending - probably fires propertyChangeEvent with wrong newValue?
         // how about fixedCellWidths?
@@ -895,6 +898,7 @@ public class JXList extends JList {
 
     // --------------------------- updateUI
 
+    @Override
     public void updateUI() {
         super.updateUI();
         updateRendererUI();

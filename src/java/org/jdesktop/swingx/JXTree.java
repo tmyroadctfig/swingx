@@ -27,8 +27,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.lang.reflect.Method;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -40,7 +38,6 @@ import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.Icon;
 import javax.swing.JComponent;
-import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
@@ -52,7 +49,6 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
-import org.jdesktop.swingx.JXList.ListRolloverController;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
@@ -199,6 +195,7 @@ public class JXTree extends JTree {
         conversionMethod = getValueConversionMethod(newModel);
     }
 
+    @Override
     public void setModel(TreeModel newModel) {
         // To support delegation of convertValueToText() to the model...
         // JW: method needs to be set before calling super
@@ -218,6 +215,7 @@ public class JXTree extends JTree {
         return null;
     }
 
+    @Override
     public String convertValueToText(Object value, boolean selected,
             boolean expanded, boolean leaf, int row, boolean hasFocus) {
         // Delegate to model, if possible. Otherwise fall back to superclass...
@@ -290,7 +288,7 @@ public class JXTree extends JTree {
 
     /**
      * 
-     * @returns a not-null Searchable for this editor.  
+     * @return a not-null Searchable for this editor.
      */
     public Searchable getSearchable() {
         if (searchable == null) {
@@ -319,7 +317,6 @@ public class JXTree extends JTree {
      */
     public class TreeSearchable extends AbstractSearchable {
 
-        @Override
         protected void findMatchAndUpdateState(Pattern pattern, int startRow,
                 boolean backwards) {
             SearchResult searchResult = null;
@@ -337,7 +334,6 @@ public class JXTree extends JTree {
 
         }
 
-        @Override
         protected SearchResult findExtendedMatch(Pattern pattern, int row) {
             return findMatchAt(pattern, row);
         }
@@ -350,9 +346,9 @@ public class JXTree extends JTree {
          * @param pattern
          * @param row
          *            a valid row index in view coordinates
-         * @param column
          *            a valid column index in view coordinates
-         * @return
+         * @return an appropriate <code>SearchResult</code> if matching or
+         * null if no matching
          */
         protected SearchResult findMatchAt(Pattern pattern, int row) {
             TreePath path = getPathForRow(row);
@@ -369,12 +365,10 @@ public class JXTree extends JTree {
             return null;
         }
 
-        @Override
         protected int getSize() {
             return getRowCount();
         }
 
-        @Override
         protected void moveMatchMarker() {
             int row = lastSearchResult.foundRow;
             setSelectionRow(row);
@@ -478,7 +472,7 @@ public class JXTree extends JTree {
      * is re-dispatched as a pressed just inside the label bounds. This 
      * is a first go for #166-swingx.
      * 
-     * @return
+     * @return <code>RolloverProducer</code> to use with this tree
      */
     protected RolloverProducer createRolloverProducer() {
         RolloverProducer r = new RolloverProducer() {
@@ -533,7 +527,10 @@ public class JXTree extends JTree {
    
     /**
      * returns the rolloverEnabled property.
-     * @return
+     *
+     * TODO: Why doesn't this just return rolloverEnabled???
+     *
+     * @return if rollober is enabled.
      */
     public boolean isRolloverEnabled() {
         return rolloverProducer != null;
@@ -592,7 +589,6 @@ public class JXTree extends JTree {
         }
 
 
-        @Override
         protected RolloverRenderer getRolloverRenderer(Point location, boolean prepare) {
             TreeCellRenderer renderer = component.getCellRenderer();
             RolloverRenderer rollover = renderer instanceof RolloverRenderer 
@@ -611,7 +607,6 @@ public class JXTree extends JTree {
         }
 
 
-        @Override
         protected Point getFocusedCell() {
             // TODO Auto-generated method stub
             return null;
@@ -877,7 +872,7 @@ public class JXTree extends JTree {
         }
 
         public Object getFilteredValueAt(int row, int column) {
-            /** @todo Implement filtering */
+            /** TODO: Implement filtering */
             return getValueAt(row, column);
         }
 
@@ -885,20 +880,22 @@ public class JXTree extends JTree {
             return tree.isRowSelected(row);
         }
 
+        @Override
         public boolean isExpanded() {
             return tree.isExpanded(row);
         }
 
+        @Override
         public boolean isLeaf() {
             return tree.getModel().isLeaf(getValue());
         }
 
         public boolean isCellEditable(int row, int column) {
-            return false;	/** @todo  */
+            return false;	/** TODO:  */
         }
 
         public void setValueAt(Object aValue, int row, int column) {
-            /** @todo  */
+            /** TODO:  */
         }
         
         public String getColumnName(int columnIndex) {
