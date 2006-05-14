@@ -147,7 +147,7 @@ public class JXTitledSeparator extends JXPanel {
      * Sets the title for the separator. This may be simple html, or plain
      * text.
      *
-     * @title the new title. Any string input is acceptable
+     * @param title the new title. Any string input is acceptable
      */
     public void setTitle(String title) {
         String old = getTitle();
@@ -214,7 +214,7 @@ public class JXTitledSeparator extends JXPanel {
      * Sets the horizontal position of the title's text,
      * relative to the icon.
      *
-     * @param textPosition  One of the following constants
+     * @param position  One of the following constants
      *           defined in <code>SwingConstants</code>:
      *           <code>LEFT</code>,
      *           <code>CENTER</code>,
@@ -253,7 +253,6 @@ public class JXTitledSeparator extends JXPanel {
      * <p>
      * The default value of this property is null.
      * 
-     * @see #setVerticalTextPosition
      * @see #setHorizontalTextPosition
      * @see #getIcon
      */

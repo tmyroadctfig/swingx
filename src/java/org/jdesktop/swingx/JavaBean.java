@@ -129,7 +129,7 @@ public class JavaBean {
      * }
      *</pre>
      *
-     * @see PropertyChangeListenerProxy
+     * @see java.beans.PropertyChangeListenerProxy
      * @return all of the <code>PropertyChangeListeners</code> added or an 
      *         empty array if no listeners have been added
      */

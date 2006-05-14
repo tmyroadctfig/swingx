@@ -82,7 +82,7 @@ public class LinkModel implements Comparable {
      * @param text text to that a renderer would display
      * @param target the target that a URL should load into.
      * @param template a string that represents a URL with
-     * @{N} place holders for string substitution
+     * &amp;{N} place holders for string substitution
      * @param args an array of strings which will be used for substitition
      */
     public LinkModel(String text, String target, String template, String[] args) {
@@ -287,6 +287,7 @@ public class LinkModel implements Comparable {
         return false;
     }
 
+    @Override
     public int hashCode() {
         int result = 7;
 
@@ -298,6 +299,7 @@ public class LinkModel implements Comparable {
         return result;
     }
 
+    @Override
     public String toString() {
 
         StringBuffer buffer = new StringBuffer("[");

@@ -96,7 +96,7 @@ public class SearchFactory {
     /** 
      * returns the shared SearchFactory.
      * 
-     * @return
+     * @return the shared <code>SearchFactory</code>
      */
     public static SearchFactory getInstance() {
           if (searchFactory == null) {
@@ -203,7 +203,7 @@ public class SearchFactory {
     /**
      * returns the shared JXFindBar. Creates and configures on 
      * first call.
-     * @return
+     * @return the shared <code>JXFindBar</code>
      */
     public JXFindBar getSharedFindBar() {
         if (findBar == null) {
@@ -239,7 +239,7 @@ public class SearchFactory {
     /**
      * Factory method to create a JXFindBar.
      * 
-     * @return
+     * @return the <code>JXFindBar</code>
      */
     public JXFindBar createFindBar() {
         return new JXFindBar();
@@ -249,7 +249,7 @@ public class SearchFactory {
     /**
      * returns the shared JXFindPanel. Creates and configures on 
      * first call.
-     * @return
+     * @return the shared <code>JXFindPanel</code>
      */
     public JXFindPanel getSharedFindPanel() {
         if (findPanel == null) {
@@ -272,7 +272,7 @@ public class SearchFactory {
     /**
      * Factory method to create a JXFindPanel.
      * 
-     * @return
+     * @return <code>JXFindPanel</code>
      */
     public JXFindPanel createFindPanel() {
         return new JXFindPanel();

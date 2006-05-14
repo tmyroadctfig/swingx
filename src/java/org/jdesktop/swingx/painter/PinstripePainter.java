@@ -76,7 +76,6 @@ public class PinstripePainter extends AbstractPainter {
      * and the given Paint.
      *
      * @param paint the paint used when drawing the stripes
-     * @param angle the angle, in degrees, in which to paint the pinstripes
      */
     public PinstripePainter(Paint paint) {
         this(paint, 45);
@@ -155,7 +154,7 @@ public class PinstripePainter extends AbstractPainter {
     /**
      * Sets the spacing between pinstripes
      *
-     * @param the spacing between pinstripes
+     * @param spacing spacing between pinstripes
      */
     public void setSpacing(double spacing) {
         double old = getSpacing();

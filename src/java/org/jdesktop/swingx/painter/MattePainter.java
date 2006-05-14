@@ -66,7 +66,7 @@ public class MattePainter extends AbstractPainter {
      * a convenience constructor since Color is a Paint, and thus the
      * other constructor is perfectly suited for specify a color as well
      *
-     * @param the Color to fill with
+     * @param color Color to fill with
      */
     public MattePainter(Color color) {
         this((Paint)color);
@@ -77,7 +77,7 @@ public class MattePainter extends AbstractPainter {
      * (though not recommended because the gradient will not grow when the
      * component becomes larger), TexturePaint, Color, or other Paint instance.
      *
-     * @param the Paint to fill with
+     * @param paint Paint to fill with
      */
     public MattePainter(Paint paint) {
         super();

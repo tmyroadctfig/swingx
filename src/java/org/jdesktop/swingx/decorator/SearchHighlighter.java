@@ -99,8 +99,7 @@ public class SearchHighlighter extends PatternHighlighter {
             return false;
         }
         else {
-            boolean matches = pattern.matcher(value.toString()).find();
-            return matches;
+            return pattern.matcher(value.toString()).find();
         }
     }
 

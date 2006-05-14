@@ -109,7 +109,7 @@ public class PatternFilter extends Filter implements PatternMatcher {
      * @return
      */
     public boolean test(int row) {
-        // PENDING: wrong false?
+        // TODO: PENDING: wrong false?
         // null pattern should be treated the same as null searchString
         // which is open
         // !testable should be clarified to mean "ignore" when filtering

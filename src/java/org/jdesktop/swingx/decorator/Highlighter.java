@@ -312,7 +312,7 @@ public class Highlighter {
      * 
      * @param renderer
      * @param adapter
-     * @return
+     * @return unselected background color
      */
     protected Color computeUnselectedBackground(Component renderer, ComponentAdapter adapter) {
         return getBackground();
@@ -326,7 +326,7 @@ public class Highlighter {
      * 
      * @param renderer
      * @param adapter
-     * @return
+     * @return selected background color
      */
     protected Color computeSelectedBackground(Component renderer, ComponentAdapter adapter) {
         return getSelectedBackground();
@@ -357,7 +357,7 @@ public class Highlighter {
      * 
      * @param renderer
      * @param adapter
-     * @return
+     * @return unselected foreground color
      */
     protected Color computeUnselectedForeground(Component renderer, ComponentAdapter adapter) {
         return getForeground();
@@ -371,7 +371,7 @@ public class Highlighter {
      * 
      * @param renderer
      * @param adapter
-     * @return
+     * @return selected foreground color
      */
     protected Color computeSelectedForeground(Component renderer, ComponentAdapter adapter) {
         return getSelectedForeground();
@@ -411,7 +411,7 @@ public class Highlighter {
     /**
      * Returns immutable flag: if true, none of the setXX methods have
      * any effects, there are no listeners added and no change events fired.
-     * @return
+     * @return true if none of the setXX methods have any effect
      */
     public boolean isImmutable() {
         return immutable;

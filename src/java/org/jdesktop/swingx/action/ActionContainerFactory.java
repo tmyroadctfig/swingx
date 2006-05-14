@@ -28,7 +28,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
@@ -495,7 +494,6 @@ public class ActionContainerFactory {
      * @param button
      * @param a
      * @param group
-     * @return
      */
     public void configureButton(JToggleButton button, AbstractActionExt a, ButtonGroup group) {
        configureSelectableButton(button, a, group);

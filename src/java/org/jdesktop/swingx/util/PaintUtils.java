@@ -177,7 +177,7 @@ public class PaintUtils {
     /**
      * @param width         the width of the new BufferedImage
      * @param height        the height of the new BufferedImage
-     * @param transparency, one of the values in the Transparency interface
+     * @param transparency  one of the values in the Transparency interface
      *
      * @return Creates and returns a BufferedImage that is "compatible" with this machines
      *         video card and subsystem with the given Transparency.

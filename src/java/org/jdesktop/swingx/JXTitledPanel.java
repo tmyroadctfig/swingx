@@ -129,6 +129,7 @@ public class JXTitledPanel extends JXPanel {
      * @return the TitledPanelUI object that renders this component
      * @since 1.4
      */
+    @Override
     public TitledPanelUI getUI() {
         return (TitledPanelUI) ui;
     }
@@ -158,6 +159,7 @@ public class JXTitledPanel extends JXPanel {
      * @beaninfo expert: true description: A string that specifies the name of
      *           the L&F class.
      */
+    @Override
     public String getUIClassID() {
         return uiClassID;
     }
@@ -169,6 +171,7 @@ public class JXTitledPanel extends JXPanel {
      * 
      * @see javax.swing.JComponent#updateUI
      */
+    @Override
     public void updateUI() {
         setUI((TitledPanelUI) LookAndFeelAddons
                 .getUI(this, TitledPanelUI.class));
@@ -282,7 +285,7 @@ public class JXTitledPanel extends JXPanel {
     }
     
     /**
-     * @returns the Painter to use for painting the background of the title section
+     * @return the Painter to use for painting the background of the title section
      */
     public Painter getTitlePainter() {
         return titlePainter;

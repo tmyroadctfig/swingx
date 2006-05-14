@@ -118,7 +118,7 @@ public class ShapePainter extends AbstractPainter {
      * 
      * 
      * @param shape the shape to fillPaint
-     * @param fillPaint the fillPaint to be used to fillPaint the shape
+     * @param paint the fillPaint to be used to fillPaint the shape
      */
     public ShapePainter(Shape shape, Paint paint) {
         super();
@@ -132,7 +132,7 @@ public class ShapePainter extends AbstractPainter {
      * 
      * 
      * @param shape the shape to fillPaint
-     * @param fillPaint the fillPaint to be used to fillPaint the shape
+     * @param paint the fillPaint to be used to fillPaint the shape
      * @param style specifies the ShapePainter.Style to use for painting this shape.
      *        If null, then Style.BOTH is used
      */
@@ -282,7 +282,7 @@ public class ShapePainter extends AbstractPainter {
      */
     public void setResizeLocation(Resize r) {
         Resize old = getResizeLocation();
-        this.resizeLocation = r == null ? r.NONE : r;
+        this.resizeLocation = r == null ? Resize.NONE : r;
         firePropertyChange("resizeLocation", old, getResizeLocation());
     }
 
@@ -305,7 +305,7 @@ public class ShapePainter extends AbstractPainter {
      */
     public void setResize(Resize r) {
         Resize old = getResize();
-        this.resize = r == null ? r.NONE : r;
+        this.resize = r == null ? Resize.NONE : r;
         firePropertyChange("resize", old, getResize());
     }
     

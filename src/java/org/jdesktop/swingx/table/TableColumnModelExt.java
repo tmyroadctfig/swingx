@@ -66,7 +66,8 @@ public interface TableColumnModelExt extends TableColumnModel {
      * if none is found. The returned column may be visible or hidden.
      *  
      * @param identifier
-     * @return
+     * @return first <code>TableColumnExt</code> with the given identifier
+     * or null if none is found
      */
     public TableColumnExt getColumnExt(Object identifier);
     
@@ -75,7 +76,8 @@ public interface TableColumnModelExt extends TableColumnModel {
      *  if the parameter is true.
      * 
      * @param includeHidden 
-     * @return
+     * @return the number of contained columns including the invisible
+     * ones if specified
      */
     public int getColumnCount(boolean includeHidden);
 }

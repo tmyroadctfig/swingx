@@ -116,6 +116,7 @@ public class TableColumnExt extends javax.swing.table.TableColumn
     /** cosmetic override: don't fool users if resize is
      * not possible due to fixed column width.
      */
+    @Override
     public boolean getResizable() {
         return super.getResizable() && (getMinWidth() < getMaxWidth());
     }
@@ -236,7 +237,7 @@ public class TableColumnExt extends javax.swing.table.TableColumn
 
     /**
      * returns the Comparator to use for this column.
-     * @return
+     * @return <code>Comparator</code> to use for this column
      */
     public Comparator getComparator() {
         return comparator;
@@ -318,7 +319,7 @@ public class TableColumnExt extends javax.swing.table.TableColumn
      * @see #getClientProperty
      * @param key Object which is used as key to retrieve value
      * @param value Object containing value of client property
-     * @throws IllegalArgumentExcetpion if key == null
+     * @throws IllegalArgumentException if key == null
      */
     public void putClientProperty(Object key, Object value) {
         if (key == null)
@@ -367,8 +368,9 @@ public class TableColumnExt extends javax.swing.table.TableColumn
       *
       * @return a clone of this TableColumn
       */
+     @Override
      public Object clone() {
-         // JW: where are the client properties?
+         // TODO: JW: where are the client properties?
          final TableColumnExt copy = new TableColumnExt(
              this.getModelIndex(), this.getWidth(),
              this.getCellRenderer(), this.getCellEditor());
