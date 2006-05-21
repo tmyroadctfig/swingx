@@ -50,12 +50,13 @@ public interface DateSelectionModel {
     public SelectionMode getSelectionMode();
     public void setSelectionMode(final SelectionMode mode);
 
-    public void addSelectionInterval(final Date startDate, final Date endDate);
-    public void setSelectionInterval(final Date startDate, final Date endDate);
-    public void removeSelectionInterval(final Date startDate, final Date endDate);
+    public void addSelectionInterval(Date startDate, Date endDate);
+    public void setSelectionInterval(Date startDate, Date endDate);
+    public void removeSelectionInterval(Date startDate, Date endDate);
     public void clearSelection();
     public SortedSet<Date> getSelection();
     public boolean isSelected(final Date date);
+    public boolean isSelectionEmpty();
     public void addDateSelectionListener(DateSelectionListener listener);
     public void removeDateSelectionListener(DateSelectionListener listener);
 }

@@ -20,7 +20,6 @@ package org.jdesktop.swingx.plaf.basic;
 
 import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.JXDatePickerFormatter;
-import org.jdesktop.swingx.calendar.DateSpan;
 import org.jdesktop.swingx.calendar.JXMonthView;
 import org.jdesktop.swingx.plaf.DatePickerUI;
 
@@ -33,6 +32,7 @@ import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Date;
+import java.util.SortedSet;
 
 /**
  * @author Joshua Outwater
@@ -329,8 +329,8 @@ public class BasicDatePickerUI extends DatePickerUI {
         public void actionPerformed(ActionEvent ev) {
             String command = ev.getActionCommand();
             if ("MONTH_VIEW".equals(command)) {
-                DateSpan span = datePicker.getMonthView().getSelectedDateSpan();
-                datePicker.getEditor().setValue(span.getStartAsDate());
+                SortedSet<Date> selection = datePicker.getMonthView().getSelectionModel().getSelection();
+                datePicker.getEditor().setValue(selection.first());
                 setVisible(false);
                 datePicker.postActionEvent();
             }
@@ -412,11 +412,9 @@ public class BasicDatePickerUI extends DatePickerUI {
                 if (editor.getValue() == null) {
                     editor.setValue(new Date(datePicker.getLinkDate()));
                 }
-                DateSpan span =
-                        new DateSpan((java.util.Date)editor.getValue(),
-                                (java.util.Date)editor.getValue());
                 JXMonthView monthView = datePicker.getMonthView();
-                monthView.setSelectedDateSpan(span);
+                Date selection = (Date) editor.getValue();
+                monthView.getSelectionModel().setSelectionInterval(selection, selection);
                 monthView.ensureDateVisible(
                         ((Date)editor.getValue()).getTime());
                 popup.show(datePicker,

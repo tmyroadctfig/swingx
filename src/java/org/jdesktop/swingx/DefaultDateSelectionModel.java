@@ -18,25 +18,28 @@
  */
 package org.jdesktop.swingx;
 
-import static org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.calendar.JXMonthView;
-import org.jdesktop.swingx.event.EventListenerMap;
 import org.jdesktop.swingx.event.DateSelectionEvent;
+import static org.jdesktop.swingx.event.DateSelectionEvent.EventType;
+import org.jdesktop.swingx.event.EventListenerMap;
 
 import java.util.*;
 
 /**
+ * This implementation of the <code>DateSelectionModel</code> stores all dates without hours,
+ * minutes, seconds and milliseconds.
+ *
  * @author Joshua Outwater
  */
 public class DefaultDateSelectionModel implements DateSelectionModel {
     private JXMonthView monthView;
-    private EventListenerMap listenerList;
+    private EventListenerMap listenerMap;
     private SelectionMode selectionMode;
     private Set<Date> selectedDates;
     private Calendar cal;
 
     public DefaultDateSelectionModel(JXMonthView monthView) {
-        this.listenerList = new EventListenerMap();
+        this.listenerMap = new EventListenerMap();
         this.monthView = monthView;
         selectionMode = SelectionMode.SINGLE_SELECTION;
         selectedDates = new TreeSet<Date>();
@@ -52,7 +55,9 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
         clearSelection();
     }
 
-    public void addSelectionInterval(final Date startDate, final Date endDate) {
+    public void addSelectionInterval(Date startDate, Date endDate) {
+        cleanupDate(startDate);
+        cleanupDate(endDate);
         if (startDate.after(endDate)) {
             return;
         }
@@ -82,6 +87,8 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
     }
 
     public void setSelectionInterval(final Date startDate, final Date endDate) {
+        cleanupDate(startDate);
+        cleanupDate(endDate);
         switch (selectionMode) {
             case NO_SELECTION:
                 return;
@@ -107,15 +114,19 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
         fireValueChanged(EventType.DATES_SET);
     }
 
-    /** TODO: This is really only useful for multiple selection.  Maybe restrict to that mode??? */
+    /**
+     * TODO: This is really only useful for multiple selection.  Maybe restrict to that mode???
+     */
     public void removeSelectionInterval(final Date startDate, final Date endDate) {
+        cleanupDate(startDate);
+        cleanupDate(endDate);
         if (startDate.after(endDate)) {
             return;
         }
 
         cal.setTime(startDate);
         Date date = cal.getTime();
-        while(date.before(endDate) || date.equals(endDate)) {
+        while (date.before(endDate) || date.equals(endDate)) {
             selectedDates.remove(date);
             cal.add(Calendar.DATE, 1);
             date = cal.getTime();
@@ -140,16 +151,20 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
         return selectedDates.contains(date);
     }
 
+    public boolean isSelectionEmpty() {
+        return selectedDates.size() == 0;
+    }
+
     public void addDateSelectionListener(DateSelectionListener l) {
-        listenerList.add(DateSelectionListener.class, l);
+        listenerMap.add(DateSelectionListener.class, l);
     }
 
     public void removeDateSelectionListener(DateSelectionListener l) {
-        listenerList.remove(DateSelectionListener.class, l);
+        listenerMap.remove(DateSelectionListener.class, l);
     }
 
     public List<DateSelectionListener> getDateSelectionListeners() {
-        return listenerList.getListeners(DateSelectionListener.class);
+        return listenerMap.getListeners(DateSelectionListener.class);
     }
 
     protected void fireValueChanged(DateSelectionEvent.EventType eventType) {
@@ -207,10 +222,12 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
     }
 
     private void setSingleIntervalSelection(Date startDate, Date endDate) {
+        cleanupDate(startDate);
+        cleanupDate(endDate);
         clearSelectionImpl();
         cal.setTime(startDate);
         Date date = cal.getTime();
-        while(date.before(endDate) || date.equals(endDate)) {
+        while (date.before(endDate) || date.equals(endDate)) {
             selectedDates.add(date);
             cal.add(Calendar.DATE, 1);
             date = cal.getTime();
@@ -218,14 +235,25 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
     }
 
     private void addSelectionImpl(final Date startDate, final Date endDate) {
+        cleanupDate(startDate);
+        cleanupDate(endDate);
         cal.setTime(startDate);
         Date date = cal.getTime();
-        while(date.before(endDate) || date.equals(endDate)) {
+        while (date.before(endDate) || date.equals(endDate)) {
             selectedDates.add(date);
             cal.add(Calendar.DATE, 1);
             date = cal.getTime();
         }
     }
 
-
+    // For ease of comparison dates stored in this model must be stored without
+    // hours, minutes, seconds and milliseconds
+    private void cleanupDate(Date date) {
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        date.setTime(cal.getTimeInMillis());
+    }
 }

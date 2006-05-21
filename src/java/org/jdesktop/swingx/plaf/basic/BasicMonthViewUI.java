@@ -1,8 +1,11 @@
 package org.jdesktop.swingx.plaf.basic;
 
-import org.jdesktop.swingx.calendar.DateSpan;
+import org.jdesktop.swingx.DateSelectionListener;
+import org.jdesktop.swingx.DateSelectionModel;
+import org.jdesktop.swingx.DateSelectionModel.SelectionMode;
 import org.jdesktop.swingx.calendar.DateUtils;
 import org.jdesktop.swingx.calendar.JXMonthView;
+import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.plaf.MonthViewUI;
 
 import javax.swing.*;
@@ -14,6 +17,8 @@ import java.beans.PropertyChangeListener;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.SortedSet;
 
 public class BasicMonthViewUI extends MonthViewUI {
     private static final int CALENDAR_SPACING = 10;
@@ -29,7 +34,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     protected int firstDisplayedYear;
     protected long lastDisplayedDate;
     protected long today;
-    protected DateSpan selection;
+    protected SortedSet<Date> selection;
 
     private boolean usingKeyboard = false;
     private boolean ltr;
@@ -57,7 +62,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     /**
      * Date span used by the keyboard actions to track the original selection.
      */
-    private DateSpan originalDateSpan = null;
+    private SortedSet<Date> originalDateSpan;
     private int calendarWidth;
     private int monthBoxHeight;
     private int boxWidth;
@@ -186,9 +191,11 @@ public class BasicMonthViewUI extends MonthViewUI {
         monthView.addPropertyChangeListener(propertyChangeListener);
         monthView.addMouseListener(mouseListener);
         monthView.addMouseMotionListener(mouseMotionListener);
+        monthView.getSelectionModel().addDateSelectionListener(getHandler());
     }
 
     protected void uninstallListeners() {
+        monthView.getSelectionModel().removeDateSelectionListener(getHandler());
         monthView.removeMouseMotionListener(mouseMotionListener);
         monthView.removeMouseListener(mouseListener);
         monthView.removePropertyChangeListener(propertyChangeListener);
@@ -440,19 +447,19 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     private void calculateDirtyRectForSelection() {
-        if (selection == null) {
+        if (selection == null || selection.isEmpty()) {
             dirtyRect.x = 0;
             dirtyRect.y = 0;
             dirtyRect.width = 0;
             dirtyRect.height = 0;
         } else {
             Calendar cal = monthView.getCalendar();
-            cal.setTimeInMillis(selection.getStart());
+            cal.setTime(selection.first());
             calculateBoundsForDay(dirtyRect);
             cal.add(Calendar.DAY_OF_MONTH, 1);
 
             Rectangle tmpRect;
-            while (cal.getTimeInMillis() <= selection.getEnd()) {
+            while (cal.getTimeInMillis() <= selection.last().getTime()) {
                 calculateBoundsForDay(bounds);
                 tmpRect = dirtyRect.union(bounds);
                 dirtyRect.x = tmpRect.x;
@@ -711,7 +718,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                     // selected date so we don't have to recalculate it
                     // later when it becomes unselected.  This is only
                     // useful for SINGLE_SELECTION mode.
-                    if (monthView.getSelectionMode() == JXMonthView.SINGLE_SELECTION) {
+                    if (monthView.getSelectionMode() == SelectionMode.SINGLE_SELECTION) {
                         dirtyRect.x = bounds.x;
                         dirtyRect.y = bounds.y;
                         dirtyRect.width = bounds.width;
@@ -911,7 +918,8 @@ public class BasicMonthViewUI extends MonthViewUI {
         g.setFont(oldFont);
     }
 
-    private class Handler implements ComponentListener, MouseListener, MouseMotionListener, LayoutManager, PropertyChangeListener {
+    private class Handler implements ComponentListener, MouseListener, MouseMotionListener, LayoutManager,
+            PropertyChangeListener, DateSelectionListener {
         private boolean asKirkWouldSay_FIRE;
         private long startDate;
         private long endDate;
@@ -947,8 +955,8 @@ public class BasicMonthViewUI extends MonthViewUI {
                 }
             }
 
-            int selectionMode = monthView.getSelectionMode();
-            if (selectionMode == JXMonthView.NO_SELECTION) {
+            SelectionMode selectionMode = monthView.getSelectionMode();
+            if (selectionMode == SelectionMode.NO_SELECTION) {
                 return;
             }
 
@@ -961,12 +969,12 @@ public class BasicMonthViewUI extends MonthViewUI {
             startDate = selected;
             endDate = selected;
 
-            if (selectionMode == JXMonthView.SINGLE_INTERVAL_SELECTION ||
-                    selectionMode == JXMonthView.WEEK_INTERVAL_SELECTION) {
+            if (selectionMode == SelectionMode.SINGLE_INTERVAL_SELECTION ||
+                    selectionMode == SelectionMode.WEEK_INTERVAL_SELECTION) {
                 pivotDate = selected;
             }
 
-            monthView.setSelectedDateSpan(new DateSpan(startDate, endDate));
+            monthView.getSelectionModel().addSelectionInterval(new Date(startDate), new Date(endDate));
 
             // Arm so we fire action performed on mouse release.
             asKirkWouldSay_FIRE = true;
@@ -997,9 +1005,9 @@ public class BasicMonthViewUI extends MonthViewUI {
         public void mouseDragged(MouseEvent e) {
             // If we were using the keyboard we aren't anymore.
             setUsingKeyboard(false);
-            int selectionMode = monthView.getSelectionMode();
+            SelectionMode selectionMode = monthView.getSelectionMode();
 
-            if (!monthView.isEnabled() || selectionMode == JXMonthView.NO_SELECTION) {
+            if (!monthView.isEnabled() || selectionMode == SelectionMode.NO_SELECTION) {
                 return;
             }
 
@@ -1014,7 +1022,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             long oldStart = startDate;
             long oldEnd = endDate;
 
-            if (selectionMode == JXMonthView.SINGLE_SELECTION) {
+            if (selectionMode == SelectionMode.SINGLE_SELECTION) {
                 if (selected == oldStart) {
                     return;
                 }
@@ -1030,7 +1038,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 }
             }
 
-            if (selectionMode == JXMonthView.WEEK_INTERVAL_SELECTION) {
+            if (selectionMode == SelectionMode.WEEK_INTERVAL_SELECTION) {
                 // Do we span a week.
                 long start = (selected > pivotDate) ? pivotDate : selected;
                 long end = (selected > pivotDate) ? selected : pivotDate;
@@ -1076,7 +1084,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 return;
             }
 
-            monthView.setSelectedDateSpan(new DateSpan(startDate, endDate));
+            monthView.getSelectionModel().setSelectionInterval(new Date(startDate), new Date(endDate));
 
             // Set trigger.
             asKirkWouldSay_FIRE = true;
@@ -1222,8 +1230,8 @@ public class BasicMonthViewUI extends MonthViewUI {
             calculateNumDisplayedCals();
             calculateStartPosition();
 
-            if (selection != null) {
-                long startDate = selection.getStart();
+            if (!monthView.getSelectionModel().isSelectionEmpty()) {
+                long startDate = selection.first().getTime();
                 if (startDate > lastDisplayedDate ||
                         startDate < firstDisplayedDate) {
                     // Already does the recalculation for the dirty rect.
@@ -1243,16 +1251,13 @@ public class BasicMonthViewUI extends MonthViewUI {
                 monthView.revalidate();
                 calculateStartPosition();
                 calculateDirtyRectForSelection();
-            } else if ("selectedDates".equals(property)) {
-                selection = (DateSpan)evt.getNewValue();
-                // repaint old dirty region
-                monthView.repaint(dirtyRect);
-                // calculate new dirty region based on selection
-                calculateDirtyRectForSelection();
-                // repaint new selection
-                monthView.repaint(dirtyRect);
             } else if ("ensureDateVisibility".equals(property)) {
                 calculateDirtyRectForSelection();
+            } else if ("selectionModel".equals(property)) {
+                DateSelectionModel selectionModel = (DateSelectionModel) evt.getOldValue();
+                selectionModel.removeDateSelectionListener(getHandler());
+                selectionModel = (DateSelectionModel) evt.getNewValue();
+                selectionModel.addDateSelectionListener(getHandler());
             } else if ("firstDisplayedDate".equals(property)) {
                 firstDisplayedDate = (Long)evt.getNewValue();
             } else if ("firstDisplayedMonth".equals(property)) {
@@ -1281,6 +1286,16 @@ public class BasicMonthViewUI extends MonthViewUI {
         public void componentShown(ComponentEvent e) {}
 
         public void componentHidden(ComponentEvent e) {}
+
+        public void valueChanged(DateSelectionEvent ev) {
+            selection = ev.getSelection();
+            // repaint old dirty region
+            monthView.repaint(dirtyRect);
+            // calculate new dirty region based on selection
+            calculateDirtyRectForSelection();
+            // repaint new selection
+            monthView.repaint(dirtyRect);
+        }
     }
 
     /**
@@ -1305,29 +1320,28 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
 
         public void actionPerformed(ActionEvent ev) {
-            int selectionMode = monthView.getSelectionMode();
+            SelectionMode selectionMode = monthView.getSelectionMode();
 
             // TODO: Modify this to allow keyboard selection even if we don't have a previous selection.
-            if (selection != null && selectionMode != JXMonthView.NO_SELECTION) {
+            if (selectionMode != SelectionMode.NO_SELECTION) {
                 if (!isUsingKeyboard()) {
-                    originalDateSpan = monthView.getSelectedDateSpan();
+                    originalDateSpan = monthView.getSelectionModel().getSelection();
                 }
 
                 if (action >= ACCEPT_SELECTION && action <= CANCEL_SELECTION && isUsingKeyboard()) {
                     if (action == CANCEL_SELECTION) {
                         // Restore the original selection.
-                        monthView.setSelectedDateSpan(originalDateSpan);
+                        monthView.getSelectionModel().setSelectionInterval(originalDateSpan.first(), originalDateSpan.last());
                         monthView.postActionEvent();
                     } else {
                         // Accept the keyboard selection.
-                        monthView.setSelectedDateSpan(monthView.getSelectedDateSpan());
                         monthView.postActionEvent();
                     }
                     setUsingKeyboard(false);
                 } else if (action >= SELECT_PREVIOUS_DAY && action <= SELECT_DAY_NEXT_WEEK) {
                     setUsingKeyboard(true);
                     traverse(action);
-                } else if (selectionMode >= JXMonthView.SINGLE_INTERVAL_SELECTION &&
+                } else if (selectionMode == SelectionMode.SINGLE_INTERVAL_SELECTION &&
                         action >= ADD_PREVIOUS_DAY && action <= ADD_TO_NEXT_WEEK) {
                     setUsingKeyboard(true);
                     addToSelection(action);
@@ -1336,7 +1350,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
 
         private void traverse(int action) {
-            long oldStart = selection.getStart();
+            long oldStart = selection.first().getTime();
             Calendar cal = monthView.getCalendar();
             cal.setTimeInMillis(oldStart);
             switch (action) {
@@ -1356,7 +1370,8 @@ public class BasicMonthViewUI extends MonthViewUI {
 
             long newStartDate = cal.getTimeInMillis();
             if (newStartDate != oldStart) {
-                monthView.setSelectedDateSpan(new DateSpan(newStartDate, newStartDate));
+                final Date startDate = new Date(newStartDate);
+                monthView.getSelectionModel().setSelectionInterval(startDate, startDate);
                 monthView.ensureDateVisible(newStartDate);
             }
             // Restore the original time value.
@@ -1376,9 +1391,9 @@ public class BasicMonthViewUI extends MonthViewUI {
             long selectionStart = -1;
             long selectionEnd = -1;
 
-            if (selection != null) {
-                newStartDate = selectionStart = selection.getStart();
-                newEndDate = selectionEnd = selection.getEnd();
+            if (!selection.isEmpty()) {
+                newStartDate = selectionStart = selection.first().getTime();
+                newEndDate = selectionEnd = selection.last().getTime();
             }
 
             boolean isForward = true;
@@ -1409,7 +1424,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                     break;
             }
             if (newStartDate != selectionStart || newEndDate != selectionEnd) {
-                monthView.setSelectedDateSpan(new DateSpan(newStartDate, newEndDate));
+                monthView.getSelectionModel().setSelectionInterval(new Date(newStartDate), new Date(newEndDate));
                 monthView.ensureDateVisible(isForward ? newEndDate : newStartDate);
             }
 
