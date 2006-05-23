@@ -46,15 +46,24 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
         cal = Calendar.getInstance();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public SelectionMode getSelectionMode() {
         return selectionMode;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setSelectionMode(final SelectionMode selectionMode) {
         this.selectionMode = selectionMode;
         clearSelection();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void addSelectionInterval(Date startDate, Date endDate) {
         cleanupDate(startDate);
         cleanupDate(endDate);
@@ -86,6 +95,9 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
         fireValueChanged(EventType.DATES_ADDED);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setSelectionInterval(final Date startDate, final Date endDate) {
         cleanupDate(startDate);
         cleanupDate(endDate);
@@ -117,6 +129,9 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
     /**
      * TODO: This is really only useful for multiple selection.  Maybe restrict to that mode???
      */
+     /**
+     * {@inheritDoc}
+     */
     public void removeSelectionInterval(final Date startDate, final Date endDate) {
         cleanupDate(startDate);
         cleanupDate(endDate);
@@ -134,6 +149,9 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
         fireValueChanged(EventType.DATES_REMOVED);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void clearSelection() {
         clearSelectionImpl();
         fireValueChanged(EventType.SELECTION_CLEARED);
@@ -143,22 +161,37 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
         selectedDates.clear();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public SortedSet<Date> getSelection() {
         return new TreeSet<Date>(selectedDates);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean isSelected(final Date date) {
         return selectedDates.contains(date);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean isSelectionEmpty() {
         return selectedDates.size() == 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void addDateSelectionListener(DateSelectionListener l) {
         listenerMap.add(DateSelectionListener.class, l);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void removeDateSelectionListener(DateSelectionListener l) {
         listenerMap.remove(DateSelectionListener.class, l);
     }

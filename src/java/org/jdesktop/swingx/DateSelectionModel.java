@@ -47,16 +47,72 @@ public interface DateSelectionModel {
         WEEK_INTERVAL_SELECTION
     }
 
+    /**
+     * Get the selection mode
+     * @return return the current selection mode
+     */
     public SelectionMode getSelectionMode();
+
+    /**
+     * Set the selection mode
+     * @param mode new selection mode
+     */
     public void setSelectionMode(final SelectionMode mode);
 
+    /**
+     * Add the specified selection interval to the selection model
+     * @param startDate interval start date
+     * @param endDate interval end date
+     */
     public void addSelectionInterval(Date startDate, Date endDate);
+
+    /**
+     * Set the specified selection interval to the selection model
+     * @param startDate interval start date
+     * @param endDate interval end date
+     */
     public void setSelectionInterval(Date startDate, Date endDate);
+
+    /**
+     * Remove the specifed selection interval from the selection model
+     * @param startDate interval start date
+     * @param endDate interval end date
+     */
     public void removeSelectionInterval(Date startDate, Date endDate);
+
+    /**
+     * Clear any selection from the selection model
+     */
     public void clearSelection();
+
+    /**
+     * Get the current selection
+     * @return sorted set of selected dates
+     */
     public SortedSet<Date> getSelection();
+
+    /**
+     * Return true if the date specified is selected, false otherwise
+     * @param date date to check for selection
+     * @return true if the date is selected, false otherwise
+     */
     public boolean isSelected(final Date date);
+
+    /**
+     * Return true if the selection is empty, false otherwise
+     * @return true if the selection is empty, false otherwise
+     */
     public boolean isSelectionEmpty();
+
+    /**
+     * Add the specified listener to this model
+     * @param listener listener to add to this model
+     */
     public void addDateSelectionListener(DateSelectionListener listener);
+
+    /**
+     * Remove the specified listener to this model
+     * @param listener listener to remove from this model
+     */
     public void removeDateSelectionListener(DateSelectionListener listener);
 }

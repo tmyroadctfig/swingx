@@ -217,7 +217,7 @@ public class JXDatePicker extends JComponent {
      * @param date date
      */
     public void setDate(Date date) {
-        _dateField.setValue(date);
+        _monthView.getSelectionModel().setSelectionInterval(date, date);
     }
 
     /**
@@ -226,7 +226,7 @@ public class JXDatePicker extends JComponent {
      * @param millis milliseconds
      */
     public void setDateInMillis(long millis) {
-        _dateField.setValue(new Date(millis));
+        setDate(new Date(millis));
     }
 
     /**
@@ -235,7 +235,7 @@ public class JXDatePicker extends JComponent {
      * @return Date
      */
     public Date getDate() {
-        return (Date) _dateField.getValue();
+        return _monthView.getSelectionModel().getSelection().first();
     }
 
     /**
@@ -244,7 +244,7 @@ public class JXDatePicker extends JComponent {
      * @return the date in milliseconds
      */
     public long getDateInMillis() {
-        return ((Date) _dateField.getValue()).getTime();
+        return getDate().getTime();
     }
 
     /**
@@ -372,6 +372,12 @@ public class JXDatePicker extends JComponent {
      */
     public void commitEdit() throws ParseException {
         _dateField.commitEdit();
+
+        // Reformat the value according to the formatter.
+        _dateField.setValue(_dateField.getValue());
+
+        Date date = (Date) _dateField.getValue();
+        setDate(date);
     }
 
     public void setEditable(boolean value) {
@@ -511,14 +517,14 @@ public class JXDatePicker extends JComponent {
             public void run() {
                 JFrame frame = new JFrame();
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                JXDatePicker mv = new JXDatePicker();
-                mv.addActionListener(new ActionListener() {
+                JXDatePicker datePicker = new JXDatePicker();
+                datePicker.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         System.out.println(
-                                ((JXMonthView) e.getSource()).getSelection());
+                                ((JXDatePicker) e.getSource()).getMonthView().getSelection());
                     }
                 });
-                frame.getContentPane().add(mv);
+                frame.getContentPane().add(datePicker);
                 frame.pack();
                 frame.setVisible(true);
             }

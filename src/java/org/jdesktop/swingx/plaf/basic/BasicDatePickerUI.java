@@ -46,6 +46,7 @@ public class BasicDatePickerUI extends DatePickerUI {
     protected MouseListener mouseListener;
     protected MouseMotionListener mouseMotionListener;
 
+    @SuppressWarnings({"UNUSED_SYMBOL"})
     public static ComponentUI createUI(JComponent c) {
         return new BasicDatePickerUI();
     }
@@ -272,12 +273,9 @@ public class BasicDatePickerUI extends DatePickerUI {
 
         public void actionPerformed(ActionEvent ev) {
             try {
-                JFormattedTextField editor = datePicker.getEditor();
                 // Commit the current value.
-                editor.commitEdit();
+                datePicker.commitEdit();
 
-                // Reformat the value according to the formatter.
-                editor.setValue(editor.getValue());
                 datePicker.postActionEvent();
             } catch (java.text.ParseException ex) {
             }
@@ -413,6 +411,7 @@ public class BasicDatePickerUI extends DatePickerUI {
                     editor.setValue(new Date(datePicker.getLinkDate()));
                 }
                 JXMonthView monthView = datePicker.getMonthView();
+                // TODO: don't set the date unless it's different
                 Date selection = (Date) editor.getValue();
                 monthView.getSelectionModel().setSelectionInterval(selection, selection);
                 monthView.ensureDateVisible(

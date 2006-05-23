@@ -26,7 +26,7 @@ import java.util.*;
  * @author Joshua Outwater
  */
 public class EventListenerMap {
-    private final static Map<Class<? extends EventListener>, List<? extends EventListener>> listenerList =
+    private final Map<Class<? extends EventListener>, List<? extends EventListener>> listenerList =
             new HashMap<Class<? extends EventListener>, List<? extends EventListener>>();
 
     public List<EventListener> getListeners() {
