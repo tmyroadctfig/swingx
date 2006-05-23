@@ -23,6 +23,7 @@ package org.jdesktop.swingx.auth;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
 /**
  * An implementation of LoginService that simply matches
  * the username/password against a list of known users and their passwords.

@@ -59,16 +59,11 @@ public class DefaultUserNameStore extends UserNameStore {
      * in an array.
      */
     private String[] userNames;
-    /**
-     * Used for propogating bean changes
-     */
-    private PropertyChangeSupport pcs;
     
     /**
      * Creates a new instance of DefaultUserNameStore
      */
     public DefaultUserNameStore() {
-        pcs = new PropertyChangeSupport(this);
         userNames = new String[0];
     }
     
@@ -111,11 +106,10 @@ public class DefaultUserNameStore extends UserNameStore {
      * @inheritDoc
      */
     public void setUserNames(String[] userNames) {
-        if (this.userNames != userNames) {
-            String[] old = this.userNames;
-            this.userNames = userNames == null ? new String[0] : userNames;
-            pcs.firePropertyChange("userNames", old, this.userNames);
-        }
+        userNames = userNames == null ? new String[0] : userNames;
+        String[] old = getUserNames();
+        this.userNames = userNames;
+        firePropertyChange("userNames", old, getUserNames());
     }
     
     /**
@@ -176,10 +170,10 @@ public class DefaultUserNameStore extends UserNameStore {
      */
     public void setPreferences(Preferences prefs) {
         initPrefs();
-        if (this.prefs != prefs) {
-            Preferences old = this.prefs;
-            this.prefs = prefs;
-            pcs.firePropertyChange("preferences", old, prefs);
+        Preferences old = getPreferences();
+        this.prefs = prefs;
+        firePropertyChange("preferences", old, getPreferences());
+        if (this.prefs != old) {
             //if prefs is null, this next method will create the default prefs node
             loadUserNames();
         }

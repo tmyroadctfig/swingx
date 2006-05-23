@@ -8,29 +8,31 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 package org.jdesktop.swingx.auth;
 
+import org.jdesktop.swingx.JavaBean;
+
 /**
  * <b>UsernameStore</b> is a class that implements persistence of usernames
- * 
+ *
  * @author Bino George
  * @author rbair
  */
-public abstract class UserNameStore {
-	/**
-	 * Gets the current list of users.
-	 */
-	public abstract String[] getUserNames();
+public abstract class UserNameStore extends JavaBean {
+    /**
+     * Gets the current list of users.
+     */
+    public abstract String[] getUserNames();
     /**
      */
     public abstract void setUserNames(String[] names);
@@ -45,16 +47,16 @@ public abstract class UserNameStore {
     /**
      */
     public abstract boolean containsUserName(String name);
-
+    
     /**
-	 * Add a username to the store.
-	 * @param userName
-	 */
-	public abstract void addUserName(String userName);
-	
-	/**
-	 * Removes a username from the list.
-	 * @param userName
-	 */
-	public abstract void removeUserName(String userName);
+     * Add a username to the store.
+     * @param userName
+     */
+    public abstract void addUserName(String userName);
+    
+    /**
+     * Removes a username from the list.
+     * @param userName
+     */
+    public abstract void removeUserName(String userName);
 }

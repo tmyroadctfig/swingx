@@ -99,6 +99,13 @@ public class JDBCLoginService extends LoginService {
     }
     
     /**
+     * Default JavaBean constructor
+     */
+    public JDBCLoginService() {
+        super();
+    }
+    
+    /**
      * @return the JDBC connection url
      */
     public String getUrl() {
@@ -109,7 +116,9 @@ public class JDBCLoginService extends LoginService {
      * @param url set the JDBC connection url
      */
     public void setUrl(String url) {
+        String old = getUrl();
         setServer(url);
+        firePropertyChange("url", old, getUrl());
     }
 
     /**
@@ -124,11 +133,19 @@ public class JDBCLoginService extends LoginService {
      *        to the database via the JDBC driver
      */
     public void setProperties(Properties properties) {
+        Properties old = getProperties();
         this.properties = properties;
+        firePropertyChange("properties", old, getProperties());
     }
     
     public Connection getConnection() {
         return conn;
+    }
+    
+    public void setConnection(Connection conn) {
+        Connection old = getConnection();
+        this.conn = conn;
+        firePropertyChange("connection", old, getConnection());
     }
     
     /**
