@@ -4,9 +4,6 @@ X-COMMENT: Main-Class will be added automatically by build
 Name: org/jdesktop/swingx/JXCollapsiblePane.class
 Java-Bean: True
 
-Name: org/jdesktop/swingx/JXComboBox.class
-Java-Bean: True
-
 Name: org/jdesktop/swingx/JXDatePicker.class
 Java-Bean: True
 
@@ -22,10 +19,22 @@ Java-Bean: True
 Name: org/jdesktop/swingx/JXFindBar.class
 Java-Bean: True
 
+Name: org/jdesktop/swingx/JXFindPanel.class
+Java-Bean: True
+
 Name: org/jdesktop/swingx/JXFrame.class
 Java-Bean: True
 
 Name: org/jdesktop/swingx/JXGlassBox.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXGradientChooser.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXGraph.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXHeader.class
 Java-Bean: True
 
 Name: org/jdesktop/swingx/JXHyperlink.class
@@ -41,6 +50,12 @@ Name: org/jdesktop/swingx/JXLoginDialog.class
 Java-Bean: True
 
 Name: org/jdesktop/swingx/JXLoginPanel.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXMultiSplitPane.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXMultiThumbSlider.class
 Java-Bean: True
 
 Name: org/jdesktop/swingx/JXPanel.class
@@ -64,10 +79,16 @@ Java-Bean: True
 Name: org/jdesktop/swingx/JXTaskPane.class
 Java-Bean: True
 
+Name: org/jdesktop/swingx/JXTaskPaneContainer.class
+Java-Bean: True
+
 Name: org/jdesktop/swingx/JXTipOfTheDay.class
 Java-Bean: True
 
 Name: org/jdesktop/swingx/JXTitledPanel.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXTitledSeparator.class
 Java-Bean: True
 
 Name: org/jdesktop/swingx/JXTree.class
@@ -77,4 +98,58 @@ Name: org/jdesktop/swingx/JXTreeTable.class
 Java-Bean: True
 
 Name: org/jdesktop/swingx/calendar/JXMonthView.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/auth/DefaultUserNameStore.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/auth/JAASLoginService.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/auth/JDBCLoginService.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/border/DropShadowBorder.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/border/MatteBorderExt.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/painter/BackgroundPainter.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/painter/CheckerboardPainter.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/painter/CompoundPainter.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/painter/GlossPainter.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/painter/IconPainter.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/painter/ImagePainter.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/painter/MattePainter.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/painter/PinstripePainter.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/painter/ShapePainter.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/painter/TextPainter.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/painter/gradient/BasicGradientPainter.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/painter/gradient/LinearGradientPainter.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/painter/gradient/RadialGradientPainter.class
 Java-Bean: True
