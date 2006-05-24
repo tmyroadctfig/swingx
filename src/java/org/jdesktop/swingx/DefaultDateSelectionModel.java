@@ -32,15 +32,14 @@ import java.util.*;
  * @author Joshua Outwater
  */
 public class DefaultDateSelectionModel implements DateSelectionModel {
-    private JXMonthView monthView;
     private EventListenerMap listenerMap;
     private SelectionMode selectionMode;
     private Set<Date> selectedDates;
     private Calendar cal;
+    private int firstDayOfWeek = Calendar.SUNDAY;
 
-    public DefaultDateSelectionModel(JXMonthView monthView) {
+    public DefaultDateSelectionModel() {
         this.listenerMap = new EventListenerMap();
-        this.monthView = monthView;
         selectionMode = SelectionMode.SINGLE_SELECTION;
         selectedDates = new TreeSet<Date>();
         cal = Calendar.getInstance();
@@ -59,6 +58,14 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
     public void setSelectionMode(final SelectionMode selectionMode) {
         this.selectionMode = selectionMode;
         clearSelection();
+    }
+
+    public int getFirstDayOfWeek() {
+        return firstDayOfWeek;
+    }
+
+    public void setFirstDayOfWeek(final int firstDayOfWeek) {
+        this.firstDayOfWeek = firstDayOfWeek;
     }
 
     /**
@@ -218,7 +225,7 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
 
         // Make sure if we are over 7 days we span full weeks.
         cal.setTime(startDate);
-        int firstDayOfWeek = monthView.getFirstDayOfWeek();
+        int firstDayOfWeek = getFirstDayOfWeek();
         cal.setFirstDayOfWeek(firstDayOfWeek);
         int count = 1;
         while (cal.getTime().before(endDate)) {

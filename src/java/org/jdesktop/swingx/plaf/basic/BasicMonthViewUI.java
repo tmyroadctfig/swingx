@@ -1084,7 +1084,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 return;
             }
 
-            monthView.getSelectionModel().setSelectionInterval(new Date(startDate), new Date(endDate));
+            monthView.setSelectionInterval(new Date(startDate), new Date(endDate));
 
             // Set trigger.
             asKirkWouldSay_FIRE = true;
@@ -1331,7 +1331,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 if (action >= ACCEPT_SELECTION && action <= CANCEL_SELECTION && isUsingKeyboard()) {
                     if (action == CANCEL_SELECTION) {
                         // Restore the original selection.
-                        monthView.getSelectionModel().setSelectionInterval(originalDateSpan.first(), originalDateSpan.last());
+                        monthView.setSelectionInterval(originalDateSpan.first(), originalDateSpan.last());
                         monthView.postActionEvent();
                     } else {
                         // Accept the keyboard selection.
@@ -1371,7 +1371,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             long newStartDate = cal.getTimeInMillis();
             if (newStartDate != oldStart) {
                 final Date startDate = new Date(newStartDate);
-                monthView.getSelectionModel().setSelectionInterval(startDate, startDate);
+                monthView.setSelectionInterval(startDate, startDate);
                 monthView.ensureDateVisible(newStartDate);
             }
             // Restore the original time value.
@@ -1424,7 +1424,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                     break;
             }
             if (newStartDate != selectionStart || newEndDate != selectionEnd) {
-                monthView.getSelectionModel().setSelectionInterval(new Date(newStartDate), new Date(newEndDate));
+                monthView.setSelectionInterval(new Date(newStartDate), new Date(newEndDate));
                 monthView.ensureDateVisible(isForward ? newEndDate : newStartDate);
             }
 

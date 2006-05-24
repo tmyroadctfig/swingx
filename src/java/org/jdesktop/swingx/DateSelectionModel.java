@@ -59,6 +59,10 @@ public interface DateSelectionModel {
      */
     public void setSelectionMode(final SelectionMode mode);
 
+    public int getFirstDayOfWeek();
+
+    public void setFirstDayOfWeek(final int firstDayOfWeek);
+
     /**
      * Add the specified selection interval to the selection model
      * @param startDate interval start date

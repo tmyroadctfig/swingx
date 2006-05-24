@@ -196,7 +196,7 @@ public class JXMonthView extends JComponent {
         this.listenerMap = new EventListenerMap();
         this.model = model;
         if (this.model == null) {
-            this.model = new DefaultDateSelectionModel(this);
+            this.model = new DefaultDateSelectionModel();
         }
 
         updateUI();
@@ -632,6 +632,7 @@ public class JXMonthView extends JComponent {
 
         _firstDayOfWeek = firstDayOfWeek;
         _cal.setFirstDayOfWeek(_firstDayOfWeek);
+        model.setFirstDayOfWeek(_firstDayOfWeek);
 
         firePropertyChange("firstDayOfWeek", oldFirstDayOfWeek, _firstDayOfWeek);
 
