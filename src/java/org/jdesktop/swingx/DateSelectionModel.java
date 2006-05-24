@@ -38,7 +38,9 @@ public interface DateSelectionModel {
          * Mode that allows for selecting of multiple consecutive days.
          */
         SINGLE_INTERVAL_SELECTION,
-        /** Mode that allows for selecting disjoint days. */
+        /**
+         * Mode that allows for selecting disjoint days.
+         */
         MULTIPLE_INTERVAL_SELECTION,
         /**
          * Mode where selections consisting of more than 7 days will
@@ -49,38 +51,61 @@ public interface DateSelectionModel {
 
     /**
      * Get the selection mode
+     *
      * @return return the current selection mode
      */
     public SelectionMode getSelectionMode();
 
     /**
      * Set the selection mode
+     *
      * @param mode new selection mode
      */
     public void setSelectionMode(final SelectionMode mode);
 
+    /**
+     * Gets what the first day of the week is; e.g.,
+     * <code>Calendar.SUNDAY</code> in the U.S., <code>Calendar.MONDAY</code>
+     * in France.
+     *
+     * This is needed when the model selection mode is <code>WEEK_INTERVAL_SELECTION</code>.
+     * The default value is <code>Calendar.SUNDAY</code>
+     *
+     * @return int The first day of the week.
+     */
     public int getFirstDayOfWeek();
 
+    /**
+     * Sets what the first day of the week is; e.g.,
+     * <code>Calendar.SUNDAY</code> in US, <code>Calendar.MONDAY</code>
+     * in France.
+     *
+     * @param firstDayOfWeek The first day of the week.
+     * @see java.util.Calendar
+     */
     public void setFirstDayOfWeek(final int firstDayOfWeek);
 
     /**
      * Add the specified selection interval to the selection model
+     *
      * @param startDate interval start date
-     * @param endDate interval end date
+     * @param endDate   interval end date
      */
     public void addSelectionInterval(Date startDate, Date endDate);
 
     /**
      * Set the specified selection interval to the selection model
+     *
      * @param startDate interval start date
-     * @param endDate interval end date
+     * @param endDate   interval end date
      */
     public void setSelectionInterval(Date startDate, Date endDate);
 
     /**
      * Remove the specifed selection interval from the selection model
+     *
      * @param startDate interval start date
-     * @param endDate interval end date
+     * @param endDate   interval end date
      */
     public void removeSelectionInterval(Date startDate, Date endDate);
 
@@ -91,12 +116,14 @@ public interface DateSelectionModel {
 
     /**
      * Get the current selection
+     *
      * @return sorted set of selected dates
      */
     public SortedSet<Date> getSelection();
 
     /**
      * Return true if the date specified is selected, false otherwise
+     *
      * @param date date to check for selection
      * @return true if the date is selected, false otherwise
      */
@@ -104,18 +131,21 @@ public interface DateSelectionModel {
 
     /**
      * Return true if the selection is empty, false otherwise
+     *
      * @return true if the selection is empty, false otherwise
      */
     public boolean isSelectionEmpty();
 
     /**
      * Add the specified listener to this model
+     *
      * @param listener listener to add to this model
      */
     public void addDateSelectionListener(DateSelectionListener listener);
 
     /**
      * Remove the specified listener to this model
+     *
      * @param listener listener to remove from this model
      */
     public void removeDateSelectionListener(DateSelectionListener listener);
