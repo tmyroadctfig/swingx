@@ -726,7 +726,13 @@ public class BasicMonthViewUI extends MonthViewUI {
                     }
                 }
 
-                if (monthView.isFlaggedDate(day)) {
+                if (monthView.isUnselectableDate(day)) {
+                    paintUnselectableDayBackground(g, bounds.x, bounds.y,
+                            bounds.width, bounds.height, day);
+                    paintUnselectableDayForeground(g, bounds.x, bounds.y,
+                            bounds.width, bounds.height, day);
+                }
+                else if (monthView.isFlaggedDate(day)) {
                     paintFlaggedDayBackground(g, bounds.x, bounds.y,
                             bounds.width, bounds.height, day);
                     paintFlaggedDayForeground(g, bounds.x, bounds.y,
@@ -916,6 +922,49 @@ public class BasicMonthViewUI extends MonthViewUI {
                                 boxWidth - fm.stringWidth(numericDay) - 1,
                 y + boxPaddingY + fm.getAscent());
         g.setFont(oldFont);
+    }
+
+    /**
+     * Paint the foreground for the specified unselectable day.
+     *
+     * @param g Graphics object to paint to
+     * @param x x-coordinate of upper left corner
+     * @param y y-coordinate of upper left corner
+     * @param width width of bounding box for the day
+     * @param height height of bounding box for the day
+     * @param date long value representing the flagged day being painted
+     */
+    protected void paintUnselectableDayBackground(Graphics g, int x, int y, int width, int height, long date) {
+        paintDayBackground(g, x, y, width, height, date);
+    }
+
+    /**
+     * Paint the foreground for the specified unselectable day.
+     *
+     * @param g Graphics object to paint to
+     * @param x x-coordinate of upper left corner
+     * @param y y-coordinate of upper left corner
+     * @param width width of bounding box for the day
+     * @param height height of bounding box for the day
+     * @param date long value representing the flagged day being painted
+     */
+    protected void paintUnselectableDayForeground(Graphics g, int x, int y, int width, int height, long date) {
+        paintDayForeground(g, x, y, width, height, date);
+        g.setColor(Color.RED);
+
+        String numericDay = dayOfMonthFormatter.format(date);
+        FontMetrics fm = monthView.getFontMetrics(derivedFont);
+        width = fm.stringWidth(numericDay);
+        height = fm.getAscent();
+        x = ltr ? x + boxPaddingX + boxWidth - fm.stringWidth(numericDay) :
+                x + boxPaddingX +
+                        boxWidth - fm.stringWidth(numericDay) - 1;
+        y = y + boxPaddingY;
+
+        g.drawLine(x, y, x + width, y + height);
+        g.drawLine(x + 1, y, x + width + 1, y + height);
+        g.drawLine(x + width, y, x, y + height);
+        g.drawLine(x + width - 1, y, x - 1, y + height);
     }
 
     private class Handler implements ComponentListener, MouseListener, MouseMotionListener, LayoutManager,

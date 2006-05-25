@@ -508,9 +508,9 @@ public class JXMonthView extends JComponent {
             this.flaggedDates = null;
         } else {
             this.flaggedDates = new TreeSet<Long>();
-
-            // Loop through the flaggedDates and set the hour, minute, seconds and
-            // milliseconds to 0 so we can compare times later.
+            // Loop through the flaggedDates and clean them up so
+            // the hour, minute, seconds and milliseconds to 0 so
+            // we can compare times later.
             for (long flaggedDate : flaggedDates) {
                 this.flaggedDates.add(cleanupDate(flaggedDate));
             }
@@ -519,6 +519,12 @@ public class JXMonthView extends JComponent {
         repaint();
     }
 
+    /**
+     * Identifies whether or not the date passed is an unselectable date.
+     *
+     * @param date date which to test for unselectable status
+     * @return true if the date is unselectable, false otherwise
+     */
     public boolean isUnselectableDate(long date) {
         boolean result = false;
         if (unselectableDates != null) {
@@ -527,11 +533,19 @@ public class JXMonthView extends JComponent {
         return result;
     }
 
+    /**
+     * An array of longs defining days that should be unselectable.
+     *
+     * @param unselectableDates the dates that should be unselectable
+     */
     public void setUnselectableDates(long[] unselectableDates) {
         if (unselectableDates == null) {
             this.unselectableDates = null;
         } else {
             this.unselectableDates = new TreeSet<Long>();
+            // Loop through the unselectableDates and clean them up so
+            // the hour, minute, seconds and milliseconds to 0 so
+            // we can compare times later.
             for (long date : unselectableDates) {
                 this.unselectableDates.add(cleanupDate(date));
             }
@@ -1160,6 +1174,7 @@ public class JXMonthView extends JComponent {
                 mv.setTraversable(true);
                 Calendar cal = Calendar.getInstance();
                 cal.set(2006, 5, 20);
+                mv.setUnselectableDates(new long[] { cal.getTimeInMillis() });
                 mv.setPreferredRows(2);
                 mv.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
                 cal.setTimeInMillis(System.currentTimeMillis());
