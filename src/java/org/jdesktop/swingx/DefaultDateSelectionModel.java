@@ -18,7 +18,6 @@
  */
 package org.jdesktop.swingx;
 
-import org.jdesktop.swingx.calendar.JXMonthView;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import static org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.event.EventListenerMap;
@@ -26,9 +25,6 @@ import org.jdesktop.swingx.event.EventListenerMap;
 import java.util.*;
 
 /**
- * This implementation of the <code>DateSelectionModel</code> stores all dates without hours,
- * minutes, seconds and milliseconds.
- *
  * @author Joshua Outwater
  */
 public class DefaultDateSelectionModel implements DateSelectionModel {
@@ -36,12 +32,13 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
     private SelectionMode selectionMode;
     private Set<Date> selectedDates;
     private Calendar cal;
-    private int firstDayOfWeek = Calendar.SUNDAY;
+    private int firstDayOfWeek;
 
     public DefaultDateSelectionModel() {
         this.listenerMap = new EventListenerMap();
-        selectionMode = SelectionMode.SINGLE_SELECTION;
-        selectedDates = new TreeSet<Date>();
+        this.selectionMode = SelectionMode.SINGLE_SELECTION;
+        this.selectedDates = new TreeSet<Date>();
+        this.firstDayOfWeek = Calendar.SUNDAY;
         cal = Calendar.getInstance();
     }
 
@@ -72,15 +69,11 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
      * {@inheritDoc}
      */
     public void addSelectionInterval(Date startDate, Date endDate) {
-        cleanupDate(startDate);
-        cleanupDate(endDate);
         if (startDate.after(endDate)) {
             return;
         }
 
         switch (selectionMode) {
-            case NO_SELECTION:
-                return;
             case SINGLE_SELECTION:
                 clearSelectionImpl();
                 selectedDates.add(startDate);
@@ -88,10 +81,6 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
             case SINGLE_INTERVAL_SELECTION:
                 clearSelectionImpl();
                 setSingleIntervalSelection(startDate, endDate);
-                break;
-            case WEEK_INTERVAL_SELECTION:
-                clearSelection();
-                setWeekIntervalSelection(startDate, endDate);
                 break;
             case MULTIPLE_INTERVAL_SELECTION:
                 addSelectionImpl(startDate, endDate);
@@ -106,11 +95,7 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
      * {@inheritDoc}
      */
     public void setSelectionInterval(final Date startDate, final Date endDate) {
-        cleanupDate(startDate);
-        cleanupDate(endDate);
         switch (selectionMode) {
-            case NO_SELECTION:
-                return;
             case SINGLE_SELECTION:
                 clearSelectionImpl();
                 selectedDates.add(startDate);
@@ -118,10 +103,6 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
             case SINGLE_INTERVAL_SELECTION:
                 clearSelectionImpl();
                 setSingleIntervalSelection(startDate, endDate);
-                break;
-            case WEEK_INTERVAL_SELECTION:
-                clearSelectionImpl();
-                setWeekIntervalSelection(startDate, endDate);
                 break;
             case MULTIPLE_INTERVAL_SELECTION:
                 clearSelectionImpl();
@@ -140,8 +121,6 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
      * {@inheritDoc}
      */
     public void removeSelectionInterval(final Date startDate, final Date endDate) {
-        cleanupDate(startDate);
-        cleanupDate(endDate);
         if (startDate.after(endDate)) {
             return;
         }
@@ -219,51 +198,7 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
         }
     }
 
-    private void setWeekIntervalSelection(Date startDate, Date endDate) {
-        Date newStart = startDate;
-        Date newEnd = endDate;
-
-        // Make sure if we are over 7 days we span full weeks.
-        cal.setTime(startDate);
-        int firstDayOfWeek = getFirstDayOfWeek();
-        cal.setFirstDayOfWeek(firstDayOfWeek);
-        int count = 1;
-        while (cal.getTime().before(endDate)) {
-            cal.add(Calendar.DAY_OF_MONTH, 1);
-            count++;
-        }
-        if (count > JXMonthView.DAYS_IN_WEEK) {
-            // Make sure start date is on the beginning of the
-            // week.
-            cal.setTime(startDate);
-            int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-            if (dayOfWeek != firstDayOfWeek) {
-                // Move the start date back to the first day of the
-                // week.
-                int daysFromStart = dayOfWeek - firstDayOfWeek;
-                if (daysFromStart < 0) {
-                    daysFromStart += JXMonthView.DAYS_IN_WEEK;
-                }
-                cal.add(Calendar.DAY_OF_MONTH, -daysFromStart);
-                count += daysFromStart;
-                newStart = cal.getTime();
-            }
-
-            // Make sure we have full weeks.  Otherwise modify the
-            // end date.
-            int remainder = count % JXMonthView.DAYS_IN_WEEK;
-            if (remainder != 0) {
-                cal.setTime(endDate);
-                cal.add(Calendar.DAY_OF_MONTH, (JXMonthView.DAYS_IN_WEEK - remainder));
-                newEnd = cal.getTime();
-            }
-        }
-        addSelectionImpl(newStart, newEnd);
-    }
-
     private void setSingleIntervalSelection(Date startDate, Date endDate) {
-        cleanupDate(startDate);
-        cleanupDate(endDate);
         clearSelectionImpl();
         cal.setTime(startDate);
         Date date = cal.getTime();
@@ -275,8 +210,6 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
     }
 
     private void addSelectionImpl(final Date startDate, final Date endDate) {
-        cleanupDate(startDate);
-        cleanupDate(endDate);
         cal.setTime(startDate);
         Date date = cal.getTime();
         while (date.before(endDate) || date.equals(endDate)) {
@@ -284,16 +217,5 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
             cal.add(Calendar.DATE, 1);
             date = cal.getTime();
         }
-    }
-
-    // For ease of comparison dates stored in this model must be stored without
-    // hours, minutes, seconds and milliseconds
-    private void cleanupDate(Date date) {
-        cal.setTime(date);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        date.setTime(cal.getTimeInMillis());
     }
 }

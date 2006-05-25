@@ -2,9 +2,9 @@ package org.jdesktop.swingx.plaf.basic;
 
 import org.jdesktop.swingx.DateSelectionListener;
 import org.jdesktop.swingx.DateSelectionModel;
-import org.jdesktop.swingx.DateSelectionModel.SelectionMode;
 import org.jdesktop.swingx.calendar.DateUtils;
 import org.jdesktop.swingx.calendar.JXMonthView;
+import org.jdesktop.swingx.calendar.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.plaf.MonthViewUI;
 
@@ -974,7 +974,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 pivotDate = selected;
             }
 
-            monthView.getSelectionModel().addSelectionInterval(new Date(startDate), new Date(endDate));
+            monthView.addSelectionInterval(new Date(startDate), new Date(endDate));
 
             // Arm so we fire action performed on mouse release.
             asKirkWouldSay_FIRE = true;
@@ -1011,9 +1011,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 return;
             }
 
-            int x = e.getX();
-            int y = e.getY();
-            long selected = monthView.getDayAt(x, y);
+            long selected = monthView.getDayAt(e.getX(), e.getY());
 
             if (selected == -1) {
                 return;
@@ -1325,7 +1323,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             // TODO: Modify this to allow keyboard selection even if we don't have a previous selection.
             if (selectionMode != SelectionMode.NO_SELECTION) {
                 if (!isUsingKeyboard()) {
-                    originalDateSpan = monthView.getSelectionModel().getSelection();
+                    originalDateSpan = monthView.getSelection();
                 }
 
                 if (action >= ACCEPT_SELECTION && action <= CANCEL_SELECTION && isUsingKeyboard()) {

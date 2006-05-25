@@ -27,10 +27,6 @@ import java.util.SortedSet;
 public interface DateSelectionModel {
     public static enum SelectionMode {
         /**
-         * Mode that disallows selection of days from the calendar.
-         */
-        NO_SELECTION,
-        /**
          * Mode that allows for selection of a single day.
          */
         SINGLE_SELECTION,
@@ -41,12 +37,7 @@ public interface DateSelectionModel {
         /**
          * Mode that allows for selecting disjoint days.
          */
-        MULTIPLE_INTERVAL_SELECTION,
-        /**
-         * Mode where selections consisting of more than 7 days will
-         * snap to a full week.
-         */
-        WEEK_INTERVAL_SELECTION
+        MULTIPLE_INTERVAL_SELECTION
     }
 
     /**

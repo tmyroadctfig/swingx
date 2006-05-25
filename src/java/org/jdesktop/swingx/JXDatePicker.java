@@ -125,7 +125,7 @@ public class JXDatePicker extends JComponent {
 
         updateUI();
 
-        _dateField.setValue(_monthView.getSelectionModel().getSelection().first());
+        _dateField.setValue(_monthView.getSelection().first());
     }
 
     /**
@@ -217,7 +217,7 @@ public class JXDatePicker extends JComponent {
      * @param date date
      */
     public void setDate(Date date) {
-        _monthView.getSelectionModel().setSelectionInterval(date, date);
+        _monthView.setSelectionInterval(date, date);
     }
 
     /**
@@ -235,7 +235,7 @@ public class JXDatePicker extends JComponent {
      * @return Date
      */
     public Date getDate() {
-        return _monthView.getSelectionModel().getSelection().first();
+        return _monthView.getSelection().first();
     }
 
     /**

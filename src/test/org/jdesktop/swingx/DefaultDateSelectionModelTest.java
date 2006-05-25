@@ -1,3 +1,21 @@
+/**
+ * Copyright 2006 Sun Microsystems, Inc., 4150 Network Circle,
+ * Santa Clara, California 95054, U.S.A. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
 package org.jdesktop.swingx;
 
 import junit.framework.TestCase;
@@ -20,17 +38,6 @@ public class DefaultDateSelectionModelTest extends TestCase {
     @Override
     public void tearDown() {
 
-    }
-
-    public void testNoSelection() {
-        assertTrue(model.getSelection().isEmpty());
-        model.setSelectionMode(DateSelectionModel.SelectionMode.NO_SELECTION);
-        Date today = new Date();
-        model.setSelectionInterval(today, today);
-        assertTrue(model.getSelection().isEmpty());
-
-        model.addSelectionInterval(today, today);
-        assertTrue(model.getSelection().isEmpty());
     }
 
     public void testSingleSelection() {
@@ -78,37 +85,5 @@ public class DefaultDateSelectionModelTest extends TestCase {
         selection = model.getSelection();
         assertTrue(startDateNextMonth.equals(selection.first()));
         assertTrue(startDateNextMonth.equals(selection.last()));
-    }
-
-    public void testWeekIntervalSelection() {
-        model.setSelectionMode(DateSelectionModel.SelectionMode.WEEK_INTERVAL_SELECTION);
-        // Use known date that lands on a Sunday.  Which just happens to be my birthday.
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.YEAR, 2006);
-        cal.set(Calendar.MONTH, Calendar.APRIL);
-        cal.set(Calendar.DAY_OF_MONTH, 9);
-
-        // The DefaultDateSelectionModel requires that hour/minute/second/millisecond are set to 0.
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-
-        Date startDate = cal.getTime();
-        cal.set(Calendar.DAY_OF_MONTH, 12);
-        Date endDate = cal.getTime();
-        model.setSelectionInterval(startDate, endDate);
-        SortedSet<Date> selection = model.getSelection();
-        assertTrue(startDate.equals(selection.first()));
-        assertTrue(endDate.equals(selection.last()));
-
-        cal.set(Calendar.DAY_OF_MONTH, 16);
-        endDate = cal.getTime();
-        model.setSelectionInterval(startDate, endDate);
-        selection = model.getSelection();
-        cal.set(Calendar.DAY_OF_MONTH, 22);
-        Date expectedEndDate = cal.getTime();
-        assertTrue(expectedEndDate.equals(selection.last()));
-
     }
 }

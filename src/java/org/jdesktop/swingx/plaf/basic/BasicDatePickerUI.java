@@ -413,7 +413,7 @@ public class BasicDatePickerUI extends DatePickerUI {
                 JXMonthView monthView = datePicker.getMonthView();
                 // TODO: don't set the date unless it's different
                 Date selection = (Date) editor.getValue();
-                monthView.getSelectionModel().setSelectionInterval(selection, selection);
+                monthView.setSelectionInterval(selection, selection);
                 monthView.ensureDateVisible(
                         ((Date)editor.getValue()).getTime());
                 popup.show(datePicker,
