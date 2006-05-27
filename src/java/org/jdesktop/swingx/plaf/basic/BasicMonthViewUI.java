@@ -1369,7 +1369,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         public void actionPerformed(ActionEvent ev) {
             SelectionMode selectionMode = monthView.getSelectionMode();
 
-            // TODO: Modify this to allow keyboard selection even if we don't have a previous selection.
             if (selectionMode != SelectionMode.NO_SELECTION) {
                 if (!isUsingKeyboard()) {
                     originalDateSpan = monthView.getSelection();
@@ -1378,7 +1377,11 @@ public class BasicMonthViewUI extends MonthViewUI {
                 if (action >= ACCEPT_SELECTION && action <= CANCEL_SELECTION && isUsingKeyboard()) {
                     if (action == CANCEL_SELECTION) {
                         // Restore the original selection.
-                        monthView.setSelectionInterval(originalDateSpan.first(), originalDateSpan.last());
+                        if (!originalDateSpan.isEmpty()) {
+                            monthView.setSelectionInterval(originalDateSpan.first(), originalDateSpan.last());
+                        } else {
+                            monthView.clearSelection();
+                        }
                         monthView.postActionEvent();
                     } else {
                         // Accept the keyboard selection.
@@ -1397,7 +1400,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
 
         private void traverse(int action) {
-            long oldStart = selection.first().getTime();
+            long oldStart = selection.isEmpty() ? System.currentTimeMillis() : selection.first().getTime();
             Calendar cal = monthView.getCalendar();
             cal.setTimeInMillis(oldStart);
             switch (action) {

@@ -212,12 +212,16 @@ public class JXDatePicker extends JComponent {
     }
 
     /**
-     * Set the currently selected date.
+     * Set the currently selected date.  If the date is <code>null</code> the selection is cleared.
      *
      * @param date date
      */
     public void setDate(Date date) {
-        _monthView.setSelectionInterval(date, date);
+        if (date == null) {
+            _monthView.clearSelection();
+        } else {
+            _monthView.setSelectionInterval(date, date);
+        }
     }
 
     /**

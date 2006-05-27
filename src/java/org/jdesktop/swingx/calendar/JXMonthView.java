@@ -374,7 +374,7 @@ public class JXMonthView extends JComponent {
     @Deprecated
     public DateSpan getSelectedDateSpan() {
         DateSpan result = null;
-        Iterator<Date> itr = getSelectionModel().getSelection().iterator();
+        Iterator<Date> itr = getSelection().iterator();
         if (itr.hasNext()) {
             Date date = itr.next();
             result = new DateSpan(date, date);
@@ -415,7 +415,9 @@ public class JXMonthView extends JComponent {
      * @param endDate
      */
     public void addSelectionInterval(final Date startDate, final Date endDate) {
-        getSelectionModel().addSelectionInterval(cleanupDate(startDate), cleanupDate(endDate));
+        if (selectionMode != SelectionMode.NO_SELECTION) {
+            getSelectionModel().addSelectionInterval(cleanupDate(startDate), cleanupDate(endDate));
+        }
     }
 
     /**
@@ -426,7 +428,9 @@ public class JXMonthView extends JComponent {
      * @param endDate
      */
     public void setSelectionInterval(final Date startDate, final Date endDate) {
-        getSelectionModel().setSelectionInterval(cleanupDate(startDate), cleanupDate(endDate));
+        if (selectionMode != SelectionMode.NO_SELECTION) {
+            getSelectionModel().setSelectionInterval(cleanupDate(startDate), cleanupDate(endDate));
+        }
     }
 
     /**

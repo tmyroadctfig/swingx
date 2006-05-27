@@ -328,7 +328,11 @@ public class BasicDatePickerUI extends DatePickerUI {
             String command = ev.getActionCommand();
             if ("MONTH_VIEW".equals(command)) {
                 SortedSet<Date> selection = datePicker.getMonthView().getSelectionModel().getSelection();
-                datePicker.getEditor().setValue(selection.first());
+                if (!selection.isEmpty()) {
+                    datePicker.getEditor().setValue(selection.first());
+                } else {
+                    datePicker.getEditor().setValue(null);
+                }
                 setVisible(false);
                 datePicker.postActionEvent();
             }
@@ -407,15 +411,15 @@ public class BasicDatePickerUI extends DatePickerUI {
             }
             if (!popup.isVisible()) {
                 JFormattedTextField editor = datePicker.getEditor();
-                if (editor.getValue() == null) {
-                    editor.setValue(new Date(datePicker.getLinkDate()));
-                }
                 JXMonthView monthView = datePicker.getMonthView();
-                // TODO: don't set the date unless it's different
-                Date selection = (Date) editor.getValue();
-                monthView.setSelectionInterval(selection, selection);
-                monthView.ensureDateVisible(
-                        ((Date)editor.getValue()).getTime());
+                SortedSet<Date> selection = monthView.getSelection();
+                if (!selection.isEmpty()) {
+                    Date date = selection.first();
+                    monthView.setSelectionInterval(date, date);
+                    monthView.ensureDateVisible(date.getTime());
+                } else {
+                    monthView.ensureDateVisible(System.currentTimeMillis());
+                }
                 popup.show(datePicker,
                         0, datePicker.getHeight());
             } else {
