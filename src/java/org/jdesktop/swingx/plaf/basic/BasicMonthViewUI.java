@@ -998,10 +998,12 @@ public class BasicMonthViewUI extends MonthViewUI {
                 if (arrowType == JXMonthView.MONTH_DOWN) {
                     monthView.setFirstDisplayedDate(
                             DateUtils.getPreviousMonth(monthView.getFirstDisplayedDate()));
+                    calculateDirtyRectForSelection();
                     return;
                 } else if (arrowType == JXMonthView.MONTH_UP) {
                     monthView.setFirstDisplayedDate(
                             DateUtils.getNextMonth(monthView.getFirstDisplayedDate()));
+                    calculateDirtyRectForSelection();
                     return;
                 }
             }
@@ -1089,48 +1091,6 @@ public class BasicMonthViewUI extends MonthViewUI {
                 } else if (selected > pivotDate) {
                     startDate = pivotDate;
                     endDate = selected;
-                }
-            }
-
-            if (selectionMode == SelectionMode.WEEK_INTERVAL_SELECTION) {
-                // Do we span a week.
-                long start = (selected > pivotDate) ? pivotDate : selected;
-                long end = (selected > pivotDate) ? selected : pivotDate;
-
-                Calendar cal = monthView.getCalendar();
-                cal.setTimeInMillis(start);
-                int count = 1;
-                while (cal.getTimeInMillis() < end) {
-                    cal.add(Calendar.DAY_OF_MONTH, 1);
-                    count++;
-                }
-
-                if (count > JXMonthView.DAYS_IN_WEEK) {
-                    // Move the start date to the first day of the week.
-                    cal.setTimeInMillis(start);
-                    int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-                    int firstDayOfWeek = monthView.getFirstDayOfWeek();
-                    int daysFromStart = dayOfWeek - firstDayOfWeek;
-                    if (daysFromStart < 0) {
-                        daysFromStart += JXMonthView.DAYS_IN_WEEK;
-                    }
-                    cal.add(Calendar.DAY_OF_MONTH, -daysFromStart);
-
-                    startDate = cal.getTimeInMillis();
-
-                    // Move the end date to the last day of the week.
-                    cal.setTimeInMillis(end);
-                    dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-                    int lastDayOfWeek = firstDayOfWeek - 1;
-                    if (lastDayOfWeek == 0) {
-                        lastDayOfWeek = Calendar.SATURDAY;
-                    }
-                    int daysTillEnd = lastDayOfWeek - dayOfWeek;
-                    if (daysTillEnd < 0) {
-                        daysTillEnd += JXMonthView.DAYS_IN_WEEK;
-                    }
-                    cal.add(Calendar.DAY_OF_MONTH, daysTillEnd);
-                    endDate = cal.getTimeInMillis();
                 }
             }
 

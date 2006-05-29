@@ -111,6 +111,42 @@ public class JXMonthViewTest extends TestCase {
         assertTrue(tomorrow.equals(selection.last()));
     }
 
+    public void testWeekIntervalSelection() {
+        JXMonthView monthView = new JXMonthView();
+        monthView.setSelectionMode(JXMonthView.SelectionMode.WEEK_INTERVAL_SELECTION);
+
+        // Use a known date that falls on a Sunday, which just happens to be my birthday.
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, 2006);
+        cal.set(Calendar.MONTH, Calendar.APRIL);
+        cal.set(Calendar.DAY_OF_MONTH, 9);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        Date startDate = cal.getTime();
+
+        Date endDate;
+        cal.set(Calendar.DAY_OF_MONTH, 13);
+        endDate = cal.getTime();
+
+        monthView.setSelectionInterval(startDate, endDate);
+        SortedSet<Date> selection = monthView.getSelection();
+        assertTrue(startDate.equals(selection.first()));
+        assertTrue(endDate.equals(selection.last()));
+
+        cal.set(Calendar.DAY_OF_MONTH, 20);
+        endDate = cal.getTime();
+        monthView.setSelectionInterval(startDate, endDate);
+
+        cal.set(Calendar.DAY_OF_MONTH, 22);
+        endDate = cal.getTime();
+        selection = monthView.getSelection();
+
+        assertTrue(startDate.equals(selection.first()));
+        assertTrue(endDate.equals((selection.last())));
+    }
+
     public void testModelSelectionUpdate() {
         JXMonthView monthView = new JXMonthView();
 

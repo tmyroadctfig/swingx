@@ -196,6 +196,10 @@ public class JXMonthView extends JComponent {
     private DateSelectionModel model;
     private EventListenerMap listenerMap;
     private SelectionMode selectionMode;
+    @SuppressWarnings({"FieldCanBeLocal"})
+    private Date modifyedStartDate;
+    @SuppressWarnings({"FieldCanBeLocal"})
+    private Date modifyedEndDate;
 
     /**
      * Create a new instance of the <code>JXMonthView</code> class using the
@@ -414,9 +418,14 @@ public class JXMonthView extends JComponent {
      * @param startDate
      * @param endDate
      */
-    public void addSelectionInterval(final Date startDate, final Date endDate) {
+    public void addSelectionInterval(Date startDate, Date endDate) {
         if (selectionMode != SelectionMode.NO_SELECTION) {
-            getSelectionModel().addSelectionInterval(cleanupDate(startDate), cleanupDate(endDate));
+            modifyedStartDate = startDate;
+            modifyedEndDate = endDate;
+            if (selectionMode == SelectionMode.WEEK_INTERVAL_SELECTION) {
+                cleanupWeekSelectionDates(startDate, endDate);
+            }
+            getSelectionModel().addSelectionInterval(cleanupDate(modifyedStartDate), cleanupDate(modifyedEndDate));
         }
     }
 
@@ -429,7 +438,49 @@ public class JXMonthView extends JComponent {
      */
     public void setSelectionInterval(final Date startDate, final Date endDate) {
         if (selectionMode != SelectionMode.NO_SELECTION) {
-            getSelectionModel().setSelectionInterval(cleanupDate(startDate), cleanupDate(endDate));
+            modifyedStartDate = startDate;
+            modifyedEndDate = endDate;
+            if (selectionMode == SelectionMode.WEEK_INTERVAL_SELECTION) {
+                cleanupWeekSelectionDates(startDate, endDate);
+            }
+            getSelectionModel().setSelectionInterval(cleanupDate(modifyedStartDate), cleanupDate(modifyedEndDate));
+        }
+    }
+
+    private void cleanupWeekSelectionDates(Date startDate, Date endDate) {
+        int count = 1;
+        cal.setTime(startDate);
+        while (cal.getTimeInMillis() < endDate.getTime()) {
+            cal.add(Calendar.DAY_OF_MONTH, 1);
+            count++;
+        }
+
+        if (count > JXMonthView.DAYS_IN_WEEK) {
+            // Move the start date to the first day of the week.
+            cal.setTime(startDate);
+            int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+            int firstDayOfWeek = getFirstDayOfWeek();
+            int daysFromStart = dayOfWeek - firstDayOfWeek;
+            if (daysFromStart < 0) {
+                daysFromStart += JXMonthView.DAYS_IN_WEEK;
+            }
+            cal.add(Calendar.DAY_OF_MONTH, -daysFromStart);
+
+            modifyedStartDate = cal.getTime();
+
+            // Move the end date to the last day of the week.
+            cal.setTime(endDate);
+            dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+            int lastDayOfWeek = firstDayOfWeek - 1;
+            if (lastDayOfWeek == 0) {
+                lastDayOfWeek = Calendar.SATURDAY;
+            }
+            int daysTillEnd = lastDayOfWeek - dayOfWeek;
+            if (daysTillEnd < 0) {
+                daysTillEnd += JXMonthView.DAYS_IN_WEEK;
+            }
+            cal.add(Calendar.DAY_OF_MONTH, daysTillEnd);
+            modifyedEndDate = cal.getTime();
         }
     }
 
