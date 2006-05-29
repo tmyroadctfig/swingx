@@ -18,8 +18,10 @@
  */
 package org.jdesktop.swingx.calendar;
 
-import junit.framework.TestCase;
+import org.jdesktop.swingx.DateSelectionListener;
 import org.jdesktop.swingx.DateSelectionModel;
+import org.jmock.Mock;
+import org.jmock.MockObjectTestCase;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -30,7 +32,7 @@ import java.util.SortedSet;
  *
  * @author Joshua Outwater
  */
-public class JXMonthViewTest extends TestCase {
+public class JXMonthViewTest extends MockObjectTestCase {
 
     public void setUp() {
     }
@@ -147,6 +149,29 @@ public class JXMonthViewTest extends TestCase {
         assertTrue(endDate.equals((selection.last())));
     }
 
+    public void testMultipleIntervalSelection() {
+        JXMonthView monthView = new JXMonthView();
+        monthView.setSelectionMode(JXMonthView.SelectionMode.MULTIPLE_INTERVAL_SELECTION);
+
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        Date date1 = cal.getTime();
+
+        cal.add(Calendar.DAY_OF_MONTH, 5);
+        Date date2 = cal.getTime();
+
+        monthView.setSelectionInterval(date1, date1);
+        monthView.addSelectionInterval(date2, date2);
+
+        SortedSet<Date> selection = monthView.getSelection();
+        assertTrue(2 == selection.size());
+        assertTrue(date1.equals(selection.first()));
+        assertTrue(date2.equals(selection.last()));
+    }
+
     public void testModelSelectionUpdate() {
         JXMonthView monthView = new JXMonthView();
 
@@ -175,5 +200,16 @@ public class JXMonthViewTest extends TestCase {
                 DateSelectionModel.SelectionMode.MULTIPLE_INTERVAL_SELECTION ==
                         monthView.getSelectionModel().getSelectionMode());
 
+    }
+
+    public void testDateSelectionListener() {
+        JXMonthView monthView = new JXMonthView();
+        Mock listenerMock = mock(DateSelectionListener.class);
+        listenerMock.expects(once()).method("valueChanged");
+        DateSelectionListener listener = (DateSelectionListener) listenerMock.proxy();
+        monthView.getSelectionModel().addDateSelectionListener(listener);
+
+        Date date = new Date();
+        monthView.setSelectionInterval(date, date);
     }
 }
