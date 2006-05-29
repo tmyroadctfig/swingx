@@ -71,7 +71,7 @@ public class DefaultDateSelectionModelTest extends TestCase {
         Date startDate = new Date();
         Calendar cal = Calendar.getInstance();
         cal.setTime(startDate);
-        cal.roll(Calendar.DAY_OF_MONTH, 5);
+        cal.add(Calendar.DAY_OF_MONTH, 5);
         Date endDate = cal.getTime();
         model.setSelectionInterval(startDate, endDate);
         SortedSet<Date> selection = model.getSelection();
