@@ -471,7 +471,8 @@ public class JXMonthView extends JComponent {
         this.selectionMode = selectionMode;
         if (selectionMode == SelectionMode.NO_SELECTION || selectionMode == SelectionMode.SINGLE_SELECTION) {
             getSelectionModel().setSelectionMode(DateSelectionModel.SelectionMode.SINGLE_SELECTION);
-        } else if (selectionMode == SelectionMode.SINGLE_INTERVAL_SELECTION) {
+        } else if (selectionMode == SelectionMode.SINGLE_INTERVAL_SELECTION ||
+                selectionMode == SelectionMode.WEEK_INTERVAL_SELECTION) {
             getSelectionModel().setSelectionMode(DateSelectionModel.SelectionMode.SINGLE_INTERVAL_SELECTION);
         } else {
             getSelectionModel().setSelectionMode(DateSelectionModel.SelectionMode.MULTIPLE_INTERVAL_SELECTION);
@@ -1180,7 +1181,7 @@ public class JXMonthView extends JComponent {
                 cal.set(2006, 5, 20);
                 mv.setUnselectableDates(new long[] { cal.getTimeInMillis() });
                 mv.setPreferredRows(2);
-                mv.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
+                mv.setSelectionMode(SelectionMode.MULTIPLE_INTERVAL_SELECTION);
                 cal.setTimeInMillis(System.currentTimeMillis());
                 mv.setSelectionInterval(cal.getTime(), cal.getTime());
                 mv.addActionListener(new ActionListener() {

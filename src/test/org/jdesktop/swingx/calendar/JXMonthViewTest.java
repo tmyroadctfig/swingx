@@ -19,6 +19,7 @@
 package org.jdesktop.swingx.calendar;
 
 import junit.framework.TestCase;
+import org.jdesktop.swingx.DateSelectionModel;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -62,6 +63,7 @@ public class JXMonthViewTest extends TestCase {
 
     public void testNoSelectionMode() {
         JXMonthView monthView = new JXMonthView();
+        monthView.setSelectionMode(JXMonthView.SelectionMode.NO_SELECTION);
 
         Date date = new Date();
         monthView.setSelectionInterval(date, date);
@@ -107,5 +109,35 @@ public class JXMonthViewTest extends TestCase {
         assertTrue(2 == selection.size());
         assertTrue(today.equals(selection.first()));
         assertTrue(tomorrow.equals(selection.last()));
+    }
+
+    public void testModelSelectionUpdate() {
+        JXMonthView monthView = new JXMonthView();
+
+        // The JXMonthView uses an underlying model mode of single selection when it is in no selection mode.
+        monthView.setSelectionMode(JXMonthView.SelectionMode.NO_SELECTION);
+        assertTrue(
+                DateSelectionModel.SelectionMode.SINGLE_SELECTION == monthView.getSelectionModel().getSelectionMode());
+
+        monthView.setSelectionMode(JXMonthView.SelectionMode.SINGLE_SELECTION);
+        assertTrue(
+                DateSelectionModel.SelectionMode.SINGLE_SELECTION == monthView.getSelectionModel().getSelectionMode());
+
+        monthView.setSelectionMode(JXMonthView.SelectionMode.SINGLE_INTERVAL_SELECTION);
+        assertTrue(
+                DateSelectionModel.SelectionMode.SINGLE_INTERVAL_SELECTION ==
+                        monthView.getSelectionModel().getSelectionMode());
+
+        // The JXMonthView uses an underlying model mode of single interval selection when it is in week selection mode.
+        monthView.setSelectionMode(JXMonthView.SelectionMode.WEEK_INTERVAL_SELECTION);
+        assertTrue(
+                DateSelectionModel.SelectionMode.SINGLE_INTERVAL_SELECTION ==
+                        monthView.getSelectionModel().getSelectionMode());
+
+        monthView.setSelectionMode(JXMonthView.SelectionMode.MULTIPLE_INTERVAL_SELECTION);
+        assertTrue(
+                DateSelectionModel.SelectionMode.MULTIPLE_INTERVAL_SELECTION ==
+                        monthView.getSelectionModel().getSelectionMode());
+
     }
 }

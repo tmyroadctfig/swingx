@@ -80,7 +80,7 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
                 break;
             case SINGLE_INTERVAL_SELECTION:
                 clearSelectionImpl();
-                setSingleIntervalSelection(startDate, endDate);
+                addSelectionImpl(startDate, endDate);
                 break;
             case MULTIPLE_INTERVAL_SELECTION:
                 addSelectionImpl(startDate, endDate);
@@ -102,7 +102,7 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
                 break;
             case SINGLE_INTERVAL_SELECTION:
                 clearSelectionImpl();
-                setSingleIntervalSelection(startDate, endDate);
+                addSelectionImpl(startDate, endDate);
                 break;
             case MULTIPLE_INTERVAL_SELECTION:
                 clearSelectionImpl();
@@ -114,9 +114,6 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
         fireValueChanged(EventType.DATES_SET);
     }
 
-    /**
-     * TODO: This is really only useful for multiple selection.  Maybe restrict to that mode???
-     */
      /**
      * {@inheritDoc}
      */
@@ -195,17 +192,6 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
                 e = new DateSelectionEvent(this, eventType);
             }
             listener.valueChanged(e);
-        }
-    }
-
-    private void setSingleIntervalSelection(Date startDate, Date endDate) {
-        clearSelectionImpl();
-        cal.setTime(startDate);
-        Date date = cal.getTime();
-        while (date.before(endDate) || date.equals(endDate)) {
-            selectedDates.add(date);
-            cal.add(Calendar.DATE, 1);
-            date = cal.getTime();
         }
     }
 

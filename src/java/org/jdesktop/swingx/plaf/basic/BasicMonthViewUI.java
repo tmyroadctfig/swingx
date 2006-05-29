@@ -694,6 +694,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                     calendarHeight - (fullMonthBoxHeight + fullBoxHeight));
         }
 
+        // TODO: paint leading days in the month
         int oldY = -1;
         for (int i = 0; i < days; i++) {
             calculateBoundsForDay(bounds);
@@ -746,6 +747,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             }
             cal.add(Calendar.DAY_OF_MONTH, 1);
         }
+        // TODO: paint trailing days in the month
     }
 
     private void paintDayOfTheWeekBackground(Graphics g, int x, int y, int width, int height) {
@@ -1019,12 +1021,17 @@ public class BasicMonthViewUI extends MonthViewUI {
             endDate = selected;
 
             if (selectionMode == SelectionMode.SINGLE_INTERVAL_SELECTION ||
-                    selectionMode == SelectionMode.WEEK_INTERVAL_SELECTION) {
+                    selectionMode == SelectionMode.WEEK_INTERVAL_SELECTION ||
+                    selectionMode == SelectionMode.MULTIPLE_INTERVAL_SELECTION) {
                 pivotDate = selected;
             }
 
-            monthView.addSelectionInterval(new Date(startDate), new Date(endDate));
-
+            if (selectionMode == SelectionMode.MULTIPLE_INTERVAL_SELECTION && e.isControlDown()) {
+                monthView.addSelectionInterval(new Date(startDate), new Date(endDate));
+            } else {
+                monthView.setSelectionInterval(new Date(startDate), new Date(endDate));
+            }
+            
             // Arm so we fire action performed on mouse release.
             asKirkWouldSay_FIRE = true;
         }
@@ -1131,7 +1138,11 @@ public class BasicMonthViewUI extends MonthViewUI {
                 return;
             }
 
-            monthView.setSelectionInterval(new Date(startDate), new Date(endDate));
+            if (selectionMode == SelectionMode.MULTIPLE_INTERVAL_SELECTION && e.isControlDown()) {
+                monthView.addSelectionInterval(new Date(startDate), new Date(endDate));
+            } else {
+                monthView.setSelectionInterval(new Date(startDate), new Date(endDate));
+            }
 
             // Set trigger.
             asKirkWouldSay_FIRE = true;
