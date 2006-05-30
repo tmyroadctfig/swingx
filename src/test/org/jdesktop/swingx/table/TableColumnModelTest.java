@@ -32,6 +32,21 @@ public class TableColumnModelTest extends TestCase {
 
     private static final int COLUMN_COUNT = 3;
  
+    /**
+     * Issue #??-swingx: incorrect isRemovedToInvisible after
+     * removing an invisible column. 
+     *
+     */
+    public void testRemoveInvisibleColumn() {
+        DefaultTableColumnModelExt model = (DefaultTableColumnModelExt) createColumnModel(COLUMN_COUNT);
+        TableColumnExt tableColumnExt = ((TableColumnExt) model.getColumn(0));
+        tableColumnExt.setVisible(false);
+        model.removeColumn(tableColumnExt);
+        assertEquals("visible column count must be reduced", COLUMN_COUNT - 1, model.getColumns(false).size());
+        assertEquals("all columns count must be unchanged", COLUMN_COUNT - 1, model.getColumns(true).size());
+        assertFalse("removing invisible must update event cache", model.isRemovedToInvisibleEvent(0));
+    }
+
     
     public void testGetColumns() {
         TableColumnModelExt model = createColumnModel(COLUMN_COUNT);

@@ -45,9 +45,10 @@ import javax.swing.table.TableColumnModel;
  */
 public interface TableColumnModelExt extends TableColumnModel {
     /**
-     * Returns a list containing all of the columns that are invisible. If
+     * Returns a Set containing all of the columns that are invisible. If
      * no columns in this model are invisible, then this will be an empty
-     * list.
+     * set.
+     * @return the set of invisible columns.
      */
     public Set getInvisibleColumns();
     
@@ -57,7 +58,7 @@ public interface TableColumnModelExt extends TableColumnModel {
      * ones if the parameter is true.
      * @param includeHidden if true the returned list contains all columns 
      *  otherwise only the subset of visible columns.
-     * 
+     * @return the list of columns in the TableColumnModel.
      */
     public List getColumns(boolean includeHidden);
     

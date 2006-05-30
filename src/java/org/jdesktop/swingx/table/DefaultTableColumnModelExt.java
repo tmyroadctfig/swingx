@@ -52,13 +52,16 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel implemen
      * contains a list of all of the columns, in the order in which they would
      * appear if all of the columns were visible.
      */
-    private List allColumns = new ArrayList();
+    private List<TableColumn> allColumns = new ArrayList<TableColumn>();
     
     /**
-     * Set of invisible columns. These must be of type TableColumnExt.
+     * Set of invisible columns. 
      */
-    private Set invisibleColumns = new HashSet();
-    
+    private Set<TableColumn> invisibleColumns = new HashSet<TableColumn>();
+
+    /** 
+     * used to distinguish a real remove from hiding.
+     */
     private Map oldIndexes = new HashMap();
     
     /**
@@ -74,9 +77,10 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel implemen
         super();
     }
 
-
+//----------------------- implement TableColumnModelExt
+    
     /**
-     * 
+     * {@inheritDoc}
      */
     public List getColumns(boolean includeHidden) {
         if (includeHidden) {
@@ -85,12 +89,16 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel implemen
         return Collections.list(getColumns());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int getColumnCount(boolean includeHidden) {
         if (includeHidden) {
             return allColumns.size();
         }
         return getColumnCount();
     }
+    
     /**
      * {@inheritDoc}
      */
@@ -103,6 +111,10 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel implemen
         }
         return null;
     }
+    
+    /**
+     * {@inheritDoc}
+     */
     public Set getInvisibleColumns() {
         return new HashSet(invisibleColumns);
     }
@@ -135,7 +147,9 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel implemen
         return Boolean.TRUE.equals(((TableColumnExt) getColumn(newIndex)).getClientProperty(IGNORE_EVENT));
     }
 
+//------------------------ TableColumnModel
     
+    @Override
     public void removeColumn(TableColumn column) {
         //remove the visibility listener if appropriate
         if (column instanceof TableColumnExt) {
@@ -144,10 +158,12 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel implemen
         //remove from the invisible columns set and the allColumns list first
         invisibleColumns.remove(column);
         allColumns.remove(column);
+        oldIndexes.remove(column);
         //let the superclass handle notification etc
         super.removeColumn(column);
     }
 
+    @Override
     public void addColumn(TableColumn aColumn) {
         // hacking to guarantee correct events
         // two step: add as visible, setVisible
@@ -175,7 +191,13 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel implemen
         
     }
 
-        
+    /**
+     * Update internal state after the visibility of the column
+     * was changed to invisible. The given column is assumed to
+     * be contained in allColumns.
+     * 
+     * @param col the column which was hidden.
+     */    
     protected void moveToInvisible(TableColumnExt col) {
         //make invisible
         int oldIndex = tableColumns.indexOf(col);
@@ -184,17 +206,47 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel implemen
         super.removeColumn(col);
     }
 
+
+    /**
+     * Update internal state after the visibility of the column
+     * was changed to visible. The given column is assumed to
+     * be contained in allColumns.
+     *  
+     * @param col the column which was made visible.
+     */    
     protected void moveToVisible(TableColumnExt col) {
-        //make visible
         invisibleColumns.remove(col);
-        Integer oldIndexInteger = (Integer)oldIndexes.get(col);
-        int oldIndex = oldIndexInteger == null ? getColumnCount() : oldIndexInteger.intValue();
+        Integer oldIndex = (Integer) oldIndexes.get(col);
+        if (oldIndex == null) {
+            oldIndex = getColumnCount();
+        }
         oldIndexes.remove(col);
         col.putClientProperty(IGNORE_EVENT, Boolean.TRUE);
+        // two step process: first add at end of columns
+        // then move to "best" position relative to where it
+        // was before hiding.
         super.addColumn(col);
+        // JW: the question is what is the "best" position?
+        // this moves back as near to the position at the time 
+        // of hiding, which leads to #253-swingx
         moveColumn(getColumnCount() - 1, Math.min(getColumnCount() - 1, oldIndex));
+        
+        // fix for #253-swingx: order of columns changed after hiding/unhiding
+        // moves back to the original position at the time of addColumn. 
+        // @KEEP
+//        Integer addIndex = allColumns.indexOf(col);
+//        for (int i = 0; i < (getColumnCount() - 1); i++) {
+//            TableColumn tableCol = getColumn(i);
+//            int actualPosition = allColumns.indexOf(tableCol);
+//            if (actualPosition > addIndex) {
+//                moveColumn(getColumnCount() - 1, i);
+//                break;
+//            }
+//        }
+
         col.putClientProperty(IGNORE_EVENT, null);
-    }
+    } 
+
 
     private final class VisibilityListener implements PropertyChangeListener {        
         public void propertyChange(PropertyChangeEvent evt) {
