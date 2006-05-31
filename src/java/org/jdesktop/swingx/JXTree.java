@@ -625,10 +625,6 @@ public class JXTree extends JTree {
         return delegatingRenderer;
     }
 
-    public void setRolloverCursor(Point newLocation) {
-        // TODO Auto-generated method stub
-        
-    }
 
     public TreeCellRenderer getCellRenderer() {
         return getDelegatingRenderer();
