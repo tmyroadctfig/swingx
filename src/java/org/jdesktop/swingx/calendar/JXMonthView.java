@@ -299,7 +299,7 @@ public class JXMonthView extends JComponent {
     /**
      * Set the first displayed date.  We only use the month and year of
      * this date.  The <code>Calendar.DAY_OF_MONTH</code> field is reset to
-     * 1 and all other fields, with exception of the year and month ,
+     * 1 and all other fields, with exception of the year and month,
      * are reset to 0.
      *
      * @param date The first displayed date.
@@ -412,8 +412,8 @@ public class JXMonthView extends JComponent {
     }
 
     /**
-     * Adds the selection interval to the selection model.  All dates are modified to remove their hour of
-     * day, minute, second, and millisecond before being added to the selection model.
+     * Adds the selection interval to the selection model.  <b>All dates are modified to remove their hour of
+     * day, minute, second, and millisecond before being added to the selection model</b>.
      *
      * @param startDate
      * @param endDate
@@ -430,8 +430,8 @@ public class JXMonthView extends JComponent {
     }
 
     /**
-     * Sets the selection interval to the selection model.  All dates are modified to remove their hour of
-     * day, minute, second, and millisecond before being added to the selection model.
+     * Sets the selection interval to the selection model.  <b>All dates are modified to remove their hour of
+     * day, minute, second, and millisecond before being added to the selection model</b>.
      *
      * @param startDate
      * @param endDate
@@ -485,8 +485,8 @@ public class JXMonthView extends JComponent {
     }
 
     /**
-     * Removes the selection interval from the selection model.  All dates are modified to remove their hour of
-     * day, minute, second, and millisecond before being added to the selection model.
+     * Removes the selection interval from the selection model.  <b>All dates are modified to remove their hour of
+     * day, minute, second, and millisecond before being added to the selection model</b>.
      *
      * @param startDate
      * @param endDate
@@ -534,14 +534,18 @@ public class JXMonthView extends JComponent {
 
     /**
      * Returns true if the specified date falls within the _startSelectedDate
-     * and _endSelectedDate range.
+     * and _endSelectedDate range.  <b>All dates are modified to remove their hour of
+     * day, minute, second, and millisecond before being added to the selection model</b>.
+     *
+     * @return true if the date is selected, false otherwise
      */
     public boolean isSelectedDate(long date) {
-        return getSelectionModel().isSelected(new Date(date));
+        return getSelectionModel().isSelected(new Date(cleanupDate(date)));
     }
 
     /**
-     * Identifies whether or not the date passed is a flagged date.
+     * Identifies whether or not the date passed is a flagged date.  <b>All dates are modified to remove their hour of
+     * day, minute, second, and millisecond before being added to the selection model</b>
      *
      * @param date date which to test for flagged status
      * @return true if the date is flagged, false otherwise
@@ -549,7 +553,7 @@ public class JXMonthView extends JComponent {
     public boolean isFlaggedDate(long date) {
         boolean result = false;
         if (flaggedDates != null) {
-            result = flaggedDates.contains(date);
+            result = flaggedDates.contains(cleanupDate(date));
         }
         return result;
     }
@@ -576,7 +580,8 @@ public class JXMonthView extends JComponent {
     }
 
     /**
-     * Identifies whether or not the date passed is an unselectable date.
+     * Identifies whether or not the date passed is an unselectable date.  <b>All dates are modified to remove their
+     * hour of day, minute, second, and millisecond before being added to the selection model</b>.
      *
      * @param date date which to test for unselectable status
      * @return true if the date is unselectable, false otherwise
@@ -584,13 +589,14 @@ public class JXMonthView extends JComponent {
     public boolean isUnselectableDate(long date) {
         boolean result = false;
         if (unselectableDates != null) {
-            result = unselectableDates.contains(date);
+            result = unselectableDates.contains(cleanupDate(date));
         }
         return result;
     }
 
     /**
-     * An array of longs defining days that should be unselectable.
+     * An array of longs defining days that should be unselectable.  <b>All dates are modified to remove their hour of
+     * day, minute, second, and millisecond before being added to the selection model</b>.
      *
      * @param unselectableDates the dates that should be unselectable
      */

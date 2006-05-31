@@ -33,8 +33,10 @@ import java.util.SortedSet;
  * @author Joshua Outwater
  */
 public class JXMonthViewTest extends MockObjectTestCase {
+    private Calendar cal;
 
     public void setUp() {
+        cal = Calendar.getInstance();
     }
 
     public void teardown() {
@@ -82,10 +84,9 @@ public class JXMonthViewTest extends MockObjectTestCase {
         assertTrue(1 == selection.size());
         assertTrue(today.equals(selection.first()));
 
-        Calendar cal = Calendar.getInstance();
         cal.setTime(today);
-        cal.roll(Calendar.DAY_OF_MONTH, 1);
-        Date tomorrow = cal.getTime();
+        cal.add(Calendar.DAY_OF_MONTH, 1);
+        Date tomorrow = cleanupDate(cal);
         monthView.setSelectionInterval(today, tomorrow);
         selection = monthView.getSelection();
         assertTrue(1 == selection.size());
@@ -102,10 +103,9 @@ public class JXMonthViewTest extends MockObjectTestCase {
         assertTrue(1 == selection.size());
         assertTrue(today.equals(selection.first()));
 
-        Calendar cal = Calendar.getInstance();
         cal.setTime(today);
-        cal.roll(Calendar.DAY_OF_MONTH, 1);
-        Date tomorrow = cal.getTime();
+        cal.add(Calendar.DAY_OF_MONTH, 1);
+        Date tomorrow = cleanupDate(cal);
         monthView.setSelectionInterval(today, tomorrow);
         selection = monthView.getSelection();
         assertTrue(2 == selection.size());
@@ -118,15 +118,10 @@ public class JXMonthViewTest extends MockObjectTestCase {
         monthView.setSelectionMode(JXMonthView.SelectionMode.WEEK_INTERVAL_SELECTION);
 
         // Use a known date that falls on a Sunday, which just happens to be my birthday.
-        Calendar cal = Calendar.getInstance();
         cal.set(Calendar.YEAR, 2006);
         cal.set(Calendar.MONTH, Calendar.APRIL);
         cal.set(Calendar.DAY_OF_MONTH, 9);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        Date startDate = cal.getTime();
+        Date startDate = cleanupDate(cal);
 
         Date endDate;
         cal.set(Calendar.DAY_OF_MONTH, 13);
@@ -153,12 +148,8 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JXMonthView monthView = new JXMonthView();
         monthView.setSelectionMode(JXMonthView.SelectionMode.MULTIPLE_INTERVAL_SELECTION);
 
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        Date date1 = cal.getTime();
+        cal.setTimeInMillis(System.currentTimeMillis());
+        Date date1 = cleanupDate(cal);
 
         cal.add(Calendar.DAY_OF_MONTH, 5);
         Date date2 = cal.getTime();
@@ -170,6 +161,14 @@ public class JXMonthViewTest extends MockObjectTestCase {
         assertTrue(2 == selection.size());
         assertTrue(date1.equals(selection.first()));
         assertTrue(date2.equals(selection.last()));
+    }
+
+    private Date cleanupDate(Calendar cal) {
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
     }
 
     public void testModelSelectionUpdate() {
@@ -211,5 +210,23 @@ public class JXMonthViewTest extends MockObjectTestCase {
 
         Date date = new Date();
         monthView.setSelectionInterval(date, date);
+    }
+
+    public void testFlaggedDate() {
+        JXMonthView monthView = new JXMonthView();
+        Date date = new Date();
+
+        assertFalse(monthView.isFlaggedDate(date.getTime()));
+        monthView.setFlaggedDates(new long[] { date.getTime() });
+        assertTrue(monthView.isFlaggedDate(date.getTime()));
+    }
+
+    public void testUnselectableDate() {
+        JXMonthView monthView = new JXMonthView();
+        Date date = new Date();
+
+        assertFalse(monthView.isUnselectableDate(date.getTime()));
+        monthView.setUnselectableDates(new long[] { date.getTime() });
+        assertTrue(monthView.isUnselectableDate(date.getTime()));
     }
 }
