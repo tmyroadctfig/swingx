@@ -44,6 +44,31 @@ public class JTableIssues extends InteractiveTestCase {
   }
 
     /**
+     * forum: table does not scroll after setRowSelectionInterval?
+     * 
+     * 
+     */
+    public void interactiveAutoScroll() {
+        final DefaultTableModel model = new DefaultTableModel(50, 2);
+        final JTable table = new JTable(model);
+        table.setAutoscrolls(true);
+        Action action = new AbstractAction("select last row: scrolling?") {
+
+            public void actionPerformed(ActionEvent e) {
+                
+                int selected = table.getRowCount() - 1;
+                if (selected >= 0) {
+                    table.setRowSelectionInterval(selected, selected);
+                }
+            }
+            
+        };
+        JXFrame frame = wrapWithScrollingInFrame(table, "insert at selection");
+        addAction(frame, action);
+        frame.setVisible(true);
+    }
+    
+    /**
      * Issue #272-swingx: inserted row is selected.
      * Not a bug: documented behaviour of DefaultListSelectionModel.
      *

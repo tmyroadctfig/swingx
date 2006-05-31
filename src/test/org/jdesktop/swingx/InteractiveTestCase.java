@@ -9,6 +9,7 @@ package org.jdesktop.swingx;
 import java.awt.BorderLayout;
 import java.awt.Point;
 import java.lang.reflect.Method;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractButton;
@@ -160,6 +161,7 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
           UIManager.setLookAndFeel(lfName);
        } catch (Exception e1) { 
            LOG.info("exception when setting LF to " + lfName);
+           LOG.log(Level.FINE, "caused by ", e1);
       }
     }
 }
