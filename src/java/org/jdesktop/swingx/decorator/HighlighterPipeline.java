@@ -286,7 +286,6 @@ public class HighlighterPipeline implements UIHighlighter {
     /** 
      * Runs each <code>ChangeListener</code>'s <code>stateChanged</code> method.
      * 
-     * @see #setRangeProperties
      * @see EventListenerList
      */
     protected void fireStateChanged() 

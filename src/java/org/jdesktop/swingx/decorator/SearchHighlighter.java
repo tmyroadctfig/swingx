@@ -62,19 +62,11 @@ public class SearchHighlighter extends PatternHighlighter {
     /**
      * Toggle to enable/disable - if disabled never hightlights.
      * 
-     * @param enableHighlight
+     * @param enableHighlight flag to indicate highlight enablement
      */
     public void setEnabled(boolean enableHighlight) {
         this.enableHighlight = enableHighlight;
         fireStateChanged();
-    }
-    
-    protected boolean needsHighlight(ComponentAdapter adapter) {
-        if (!isEnabled()) return false;
-        if (highlightRow >= 0 && (adapter.row != highlightRow)) {
-            return false;
-        }
-        return super.needsHighlight(adapter);
     }
 
     private boolean isEnabled() {
@@ -84,7 +76,24 @@ public class SearchHighlighter extends PatternHighlighter {
         }
         return enableHighlight;
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean needsHighlight(ComponentAdapter adapter) {
+        if (!isEnabled()) return false;
+        if (highlightRow >= 0 && (adapter.row != highlightRow)) {
+            return false;
+        }
+        return super.needsHighlight(adapter);
+    }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected boolean test(ComponentAdapter adapter) {
         if (pattern == null) {
             return false;
@@ -114,9 +123,9 @@ public class SearchHighlighter extends PatternHighlighter {
      * 
      *  PENDING: move up to ConditionalHighlighter?
      * 
-     * @param renderer
-     * @param adapter
-     * @return
+     * @param renderer the component to highlight
+     * @param adapter the componentAdapter using the component as renderer
+     * @return the background color to use for selected adapter state
      * 
      */
     @Override
@@ -125,9 +134,10 @@ public class SearchHighlighter extends PatternHighlighter {
         return color != null ? color : computeUnselectedBackground(renderer, adapter);
     }
 
-    /** set the row to match in test. 
-     * - 1 means all.
-     * @param row
+    /** 
+     * set the row to match in test. 
+     * 
+     * @param row the row to highlight if match is true, - 1 means all.
      */
     public void setHighlightRow(int row) {
         highlightRow = row;
@@ -145,9 +155,12 @@ public class SearchHighlighter extends PatternHighlighter {
     }
 
     /**
-     * Set's highlightRow to row, test- and highlight column = column
-     * @param row
-     * @param modelColumn
+     * Set's highlightRow to row, test- and highlight column = column. 
+     * As a side-effect the highlight is enabled.
+     * 
+     * @param row the row to highlight if match is true, - 1 means all rows.
+     * @param modelColumn the column to use for both test and highlight,
+     *   -1 means all columns
      */
     public void setHighlightCell(int row, int modelColumn) {
         this.testColumn = modelColumn;

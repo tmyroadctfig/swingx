@@ -33,19 +33,38 @@ public class PatternFilter extends Filter implements PatternMatcher {
     private ArrayList<Integer>	toPrevious;
     protected Pattern	pattern = null;
 
+    /**
+     * Instantiates a includeAll PatternFilter with matchFlag 0 on
+     * column 0.
+     *
+     */
     public PatternFilter() {
         this(null, 0, 0);
     }
 
+    /**
+     * Instantiates a PatternFilter with a Pattern compiled from the
+     * given regex and matchFlags on the column in model coordinates.
+     * 
+     * @param regularExpr the regex to compile, a null or empty String
+     *   is interpreted as ".*"
+     * @param matchFlags the matchflags to use in the compile
+     * @param col the column to filter in model coordinates.
+     */
     public PatternFilter(String regularExpr, int matchFlags, int col) {
         super(col);
         setPattern(regularExpr, matchFlags);
     }
 
-    protected void init() {
-		toPrevious = new ArrayList<Integer>();
-    }
-
+    /**
+     * Convenience to set the pattern in terms of a regex and
+     * matchFlags, which are used to compile the pattern to apply.
+     * 
+     * @param regularExpr the regex to compile, a null or empty String
+     *   is interpreted as ".*"
+     * @param matchFlags the matchflags to use in the compile
+     * @see java.util.regex.Pattern#compile for details
+     */
     public void setPattern(String regularExpr, int matchFlags) {
         if ((regularExpr == null) || (regularExpr.length() == 0)) {
             regularExpr = ".*";
@@ -81,6 +100,7 @@ public class PatternFilter extends Filter implements PatternMatcher {
     /**
      * Resets the internal row mappings from this filter to the previous filter.
      */
+    @Override
     protected void reset() {
         toPrevious.clear();
         int inputSize = getInputSize();
@@ -90,6 +110,10 @@ public class PatternFilter extends Filter implements PatternMatcher {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void filter() {
         if (pattern != null) {
             int inputSize = getInputSize();
@@ -105,8 +129,12 @@ public class PatternFilter extends Filter implements PatternMatcher {
     }
 
     /**
-     * @param row
-     * @return
+     * Tests whether the given row (in this filter's coordinates) should
+     * be added. <p>
+     * 
+     * PENDING JW: why is this public? called from a protected method? 
+     * @param row the row to test
+     * @return true if the row should be added, false if not.
      */
     public boolean test(int row) {
         // TODO: PENDING: wrong false?
@@ -133,11 +161,28 @@ public class PatternFilter extends Filter implements PatternMatcher {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int getSize() {
         return toPrevious.size();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected int mapTowardModel(int row) {
         return toPrevious.get(row);
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void init() {
+        toPrevious = new ArrayList<Integer>();
+    }
+
 }
