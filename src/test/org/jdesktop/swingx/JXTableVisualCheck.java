@@ -85,7 +85,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*isable.*");
           
 //          test.runInteractiveTests("interactive.*Column.*");
-        test.runInteractiveTests("interactive.*High.*");
+        test.runInteractiveTests("interactive.*Sort.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -100,6 +100,18 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         setSystemLF(true);
     }
 
+    /**
+     * Respect not-sortable column.
+     */
+    public void interactiveColumnNotSortable() {
+        final JXTable table = new JXTable(sortableTableModel) ;
+        table.setColumnControlVisible(true);
+        table.getColumnExt(0).setSorterClass(null);
+        JXFrame frame = wrapWithScrollingInFrame(table, "Always sorted");
+        frame.setVisible(true);
+        
+    }
+   
 
     /**
      * Expose sorted column. 

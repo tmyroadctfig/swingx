@@ -1253,7 +1253,11 @@ public class JXTable extends JTable {
         firePropertyChange("sortable", !sortable, sortable);
     }
 
-    /** Returns true if the table is sortable. */
+    /** 
+     * Returns the table's sortable property.
+     * 
+     * @return true if the table is sortable. 
+     */
     public boolean isSortable() {
         return sortable;
     }
@@ -1277,16 +1281,25 @@ public class JXTable extends JTable {
 
     /**
      * 
-     * request to sort the column at columnIndex. If there
-     * is already an interactive sorter for this column it's sort order is
-     * reversed. Otherwise the columns sorter is used as is.
-     * Used by headerListener.
+     * Toggles the sort order of the column at columnIndex.
+     * <p>
+     * The exact behaviour is defined by the SortController's
+     * toggleSortOrder implementation. Typically a unsorted 
+     * column is sorted in ascending order, a sorted column's
+     * order is reversed. 
+     * <p>
+     * Respects the tableColumnExt's sortable and comparator 
+     * properties: routes the column's comparator to the SortController
+     * and does nothing if !isSortable(column). 
+     * <p>
+     * 
      * PRE: 0 <= columnIndex < getColumnCount() 
+     * 
      * @param columnIndex the columnIndex in view coordinates.
      * 
      */
     public void toggleSortOrder(int columnIndex) {
-        if (!isSortable())
+        if (!isSortable(columnIndex))
             return;
         SortController controller = getSortController();
         if (controller != null) {
@@ -1296,15 +1309,65 @@ public class JXTable extends JTable {
         }
     }
 
+    /**
+     * Decides if the column at columnIndex can be interactively sorted. 
+     * <p>
+     * Here: true if both this table and the column sortable property is
+     * enabled, false otherwise.
+     * 
+     * @param columnIndex column in view coordinates
+     * @return boolean indicating whether or not the column is sortable
+     *            in this table.
+     */
+    protected boolean isSortable(int columnIndex) {
+        boolean sortable = isSortable();
+        TableColumnExt tableColumnExt = getColumnExt(columnIndex);
+        if (tableColumnExt != null) {
+            sortable = sortable && tableColumnExt.isSortable();
+        }
+        return sortable;
+    }
 
     /**
-     * Returns the SortOrder of the interactive sorter 
-     * if it is set from the given column.
-     * Used by ColumnHeaderRenderer.getTableCellRendererComponent().
+     * Sorts the table by the given column using SortOrder. 
+     * 
+     * 
+     * Respects the tableColumnExt's sortable and comparator 
+     * properties: routes the column's comparator to the SortController
+     * and does nothing if !isSortable(column). 
+     * <p>
+     * 
+     * PRE: 0 <= columnIndex < getColumnCount() 
+     * <p>
+     * 
+     * 
+     * @param columnIndex the column index in view coordinates.
+     * @param sortOrder the sort order to use. If null or SortOrder.UNSORTED, 
+     *   this method has the same effect as resetSortOrder();
+     *    
+     */
+    public void setSortOrder(int columnIndex, SortOrder sortOrder) {
+        if ((sortOrder == null) || !sortOrder.isSorted()) {
+            resetSortOrder();
+            return;
+        }
+        if (!isSortable(columnIndex)) return;
+        SortController sortController = getSortController();
+        if (sortController != null) {
+            TableColumnExt columnExt = getColumnExt(columnIndex);
+            SortKey sortKey = new SortKey(sortOrder, 
+                    convertColumnIndexToModel(columnIndex),
+                    columnExt != null ? columnExt.getComparator() : null);
+            sortController.setSortKeys(Collections.singletonList(sortKey));
+        }
+    }
+
+    /**
+     * Returns the SortOrder of the given column. 
      * 
      * @param columnIndex the column index in view coordinates.
      * @return the interactive sorter's SortOrder if matches the column 
-     *  or SortOrder.UNCHANGED 
+     *  or SortOrder.UNSORTED 
      */
     public SortOrder getSortOrder(int columnIndex) {
         SortController sortController = getSortController();
@@ -1314,6 +1377,117 @@ public class JXTable extends JTable {
         return sortKey != null ? sortKey.getSortOrder() : SortOrder.UNSORTED;
     }
 
+    /**
+     * 
+     * Toggles the sort order of the column with identifier.
+     * <p>
+     * The exact behaviour is defined by the SortController's
+     * toggleSortOrder implementation. Typically a unsorted 
+     * column is sorted in ascending order, a sorted column's
+     * order is reversed. 
+     * <p>
+     * Respects the tableColumnExt's sortable and comparator 
+     * properties: routes the column's comparator to the SortController
+     * and does nothing if !isSortable(column). 
+     * <p>
+     * 
+     * PENDING: JW - define the behaviour if the identifier is not found.
+     *   This can happen if either there's no column at all with the identifier
+     *   or if there's no column of type TableColumnExt.
+     *   Currently does nothing, that is does not change sort state.
+     * 
+     * @param identifier the column identifier.
+     * 
+     */
+    public void toggleSortOrder(Object identifier) {
+        if (!isSortable(identifier))
+            return;
+        SortController controller = getSortController();
+        if (controller != null) {
+            TableColumnExt columnExt = getColumnExt(identifier);
+            if (columnExt == null) return;
+            controller.toggleSortOrder(columnExt.getModelIndex(),
+                    columnExt.getComparator());
+        }
+    }
+
+    /**
+     * Sorts the table by the given column using the SortOrder. 
+     * 
+     * 
+     * Respects the tableColumnExt's sortable and comparator 
+     * properties: routes the column's comparator to the SortController
+     * and does nothing if !isSortable(column). 
+     * <p>
+     * 
+     * PENDING: JW - define the behaviour if the identifier is not found.
+     *   This can happen if either there's no column at all with the identifier
+     *   or if there's no column of type TableColumnExt.
+     *   Currently does nothing, that is does not change sort state.
+     * 
+     * @param identifier the column's identifier.
+     * @param sortOrder the sort order to use. If null or SortOrder.UNSORTED, 
+     *   this method has the same effect as resetSortOrder();
+     *    
+     */
+    public void setSortOrder(Object identifier, SortOrder sortOrder) {
+        if ((sortOrder == null) || !sortOrder.isSorted()) {
+            resetSortOrder();
+            return;
+        }
+        if (!isSortable(identifier)) return;
+        SortController sortController = getSortController();
+        if (sortController != null) {
+            TableColumnExt columnExt = getColumnExt(identifier);
+            if (columnExt == null) return;
+            SortKey sortKey = new SortKey(sortOrder, 
+                    columnExt.getModelIndex(),
+                    columnExt.getComparator());
+            sortController.setSortKeys(Collections.singletonList(sortKey));
+        }
+    }
+
+    /**
+     * Returns the SortOrder of the given column. 
+     * 
+     * PENDING: JW - define the behaviour if the identifier is not found.
+     *   This can happen if either there's no column at all with the identifier
+     *   or if there's no column of type TableColumnExt.
+     *   Currently returns SortOrder.UNSORTED.
+     *   
+     * @param identifier the column's identifier.
+     * @return the interactive sorter's SortOrder if matches the column 
+     *  or SortOrder.UNSORTED 
+     */
+    public SortOrder getSortOrder(Object identifier) {
+        SortController sortController = getSortController();
+        if (sortController == null) return SortOrder.UNSORTED;
+        TableColumnExt columnExt = getColumnExt(identifier);
+        if (columnExt == null) return SortOrder.UNSORTED;
+        int  modelIndex = columnExt.getModelIndex();
+        SortKey sortKey = SortKey.getFirstSortKeyForColumn(sortController.getSortKeys(), 
+                modelIndex);
+        return sortKey != null ? sortKey.getSortOrder() : SortOrder.UNSORTED;
+    }
+
+    /**
+     * Decides if the column with identifier can be interactively sorted. 
+     * <p>
+     * Here: true if both this table and the column sortable property is
+     * enabled, false otherwise.
+     * 
+     * @param identifier the column's identifier
+     * @return boolean indicating whether or not the column is sortable
+     *            in this table.
+     */
+    protected boolean isSortable(Object identifier) {
+        boolean sortable = isSortable();
+        TableColumnExt tableColumnExt = getColumnExt(identifier);
+        if (tableColumnExt != null) {
+            sortable = sortable && tableColumnExt.isSortable();
+        }
+        return sortable;
+    }
 
     /**
      * returns the currently active SortController. Can be null
@@ -1333,8 +1507,8 @@ public class JXTable extends JTable {
      *   does not correspond to any column in the TableColumnModel.
      */
     public TableColumn getSortedColumn() {
-        // bloody hack: get sorter and check if there's a column with it
-        // available
+        // bloody hack: get primary SortKey and 
+        // check if there's a column with it available
         SortController controller = getSortController();
         if (controller != null) {
             SortKey sortKey = SortKey.getFirstSortingKey(controller.getSortKeys());

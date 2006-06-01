@@ -86,6 +86,140 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
     /**
+     * programmatic sorting of hidden column (through table api).
+     * 
+     */
+    public void testSetSortOrderHiddenColumn() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        Object identifier = "Last Name";
+        TableColumnExt columnExt = table.getColumnExt(identifier);
+        columnExt.setVisible(false);
+        table.setSortOrder(identifier, SortOrder.ASCENDING);
+        assertEquals("sorted column must be at " + identifier, columnExt, table.getSortedColumn());
+        assertEquals("column must be sorted after setting sortOrder on " + identifier, SortOrder.ASCENDING, table.getSortOrder(identifier));
+        Object otherIdentifier = "First Name";
+        table.setSortOrder(otherIdentifier, SortOrder.UNSORTED);
+        assertNull("table must be unsorted after resetting sortOrder on " + otherIdentifier,
+                table.getSortedColumn());
+    }
+
+    /**
+     * added xtable.setSortOrder(Object, SortOrder)
+     * 
+     */
+    public void testSetSortOrderByIdentifier() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        Object identifier = "Last Name";
+        TableColumnExt columnExt = table.getColumnExt(identifier);
+        table.setSortOrder(identifier, SortOrder.ASCENDING);
+        assertEquals("sorted column must be at " + identifier, columnExt, table.getSortedColumn());
+        assertEquals("column must be sorted after setting sortOrder on " + identifier, SortOrder.ASCENDING, table.getSortOrder(identifier));
+        Object otherIdentifier = "First Name";
+        table.setSortOrder(otherIdentifier, SortOrder.UNSORTED);
+        assertNull("table must be unsorted after resetting sortOrder on " + otherIdentifier,
+                table.getSortedColumn());
+    }
+    
+    /**
+     * JXTable has responsibility to respect TableColumnExt
+     * sortable property.
+     * 
+     */
+    public void testSetSortOrderByIdentifierColumnNotSortable() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        Object identifier = "Last Name";
+        TableColumnExt columnX = table.getColumnExt(identifier);
+        // old way: make column not sortable.
+        columnX.setSorterClass(null);
+        table.setSortOrder(identifier, SortOrder.ASCENDING);
+        assertEquals("unsortable column must be unsorted", SortOrder.UNSORTED, table.getSortOrder(0));
+    }
+
+    /**
+     * testing new sorter api: 
+     * toggleSortOrder(Object), resetSortOrder.
+     *
+     */
+    public void testToggleSortOrderByIdentifier() {
+        JXTable table = new JXTable(sortableTableModel);
+        Object firstColumn = "First Name";
+        Object secondColumn = "Last Name";
+        assertSame(SortOrder.UNSORTED, table.getSortOrder(secondColumn));
+        table.toggleSortOrder(firstColumn);
+        assertSame(SortOrder.ASCENDING, table.getSortOrder(firstColumn));
+        // sanity: other columns uneffected
+        assertSame(SortOrder.UNSORTED, table.getSortOrder(secondColumn));
+        table.toggleSortOrder(firstColumn);
+        assertSame(SortOrder.DESCENDING, table.getSortOrder(firstColumn));
+        table.resetSortOrder();
+        assertSame(SortOrder.UNSORTED, table.getSortOrder(firstColumn));
+    }
+
+    /**
+     * JXTable has responsibility to respect TableColumnExt
+     * sortable property.
+     * 
+     */
+    public void testToggleSortOrderByIdentifierColumnNotSortable() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        Object identifier = "Last Name";
+        TableColumnExt columnX = table.getColumnExt(identifier);
+        // old way: make column not sortable.
+        columnX.setSorterClass(null);
+        table.toggleSortOrder(identifier);
+        assertEquals("unsortable column must be unsorted", SortOrder.UNSORTED, table.getSortOrder(identifier));
+       
+    }
+
+    /**
+     * added xtable.setSortOrder(int, SortOrder)
+     * 
+     */
+    public void testSetSortOrder() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        int col = 0;
+        TableColumnExt columnExt = table.getColumnExt(col);
+        table.setSortOrder(col, SortOrder.ASCENDING);
+        assertEquals("sorted column must be at " + col, columnExt, table.getSortedColumn());
+        assertEquals("column must be sorted after setting sortOrder on " + col, SortOrder.ASCENDING, table.getSortOrder(col));
+        int otherColumn = col + 1;
+        table.setSortOrder(otherColumn, SortOrder.UNSORTED);
+        assertNull("table must be unsorted after resetting sortOrder on " + otherColumn,
+                table.getSortedColumn());
+    }
+    
+    /**
+     * JXTable has responsibility to respect TableColumnExt
+     * sortable property.
+     * 
+     */
+    public void testSetSortOrderColumnNotSortable() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        TableColumnExt columnX = table.getColumnExt(0);
+        // old way: make column not sortable.
+        columnX.setSorterClass(null);
+        table.setSortOrder(0, SortOrder.ASCENDING);
+        assertEquals("unsortable column must be unsorted", SortOrder.UNSORTED, table.getSortOrder(0));
+       
+    }
+
+    /**
+     * JXTable has responsibility to respect TableColumnExt
+     * sortable property.
+     * 
+     */
+    public void testToggleSortOrderColumnNotSortable() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        TableColumnExt columnX = table.getColumnExt(0);
+        // old way: make column not sortable.
+        columnX.setSorterClass(null);
+        table.toggleSortOrder(0);
+        assertEquals("unsortable column must be unsorted", SortOrder.UNSORTED, table.getSortOrder(0));
+       
+    }
+   
+    
+    /**
      * JXTable has responsibility to guarantee usage of 
      * TableColumnExt comparator.
      * 
@@ -95,13 +229,9 @@ public class JXTableUnitTest extends InteractiveTestCase {
         TableColumnExt columnX = table.getColumnExt(0);
         columnX.setComparator(Collator.getInstance());
         table.toggleSortOrder(0);
-        // invalid assumption .. only the comparator must be used.
-//        assertEquals("interactive sorter must be same as sorter in column", 
-//                columnX.getSorter(), table.getFilters().getSorter());
         SortKey sortKey = SortKey.getFirstSortKeyForColumn(table.getFilters().getSortController().getSortKeys(), 0);
         assertNotNull(sortKey);
         assertEquals(columnX.getComparator(), sortKey.getComparator());
-       
     }
 
     /**
@@ -117,10 +247,10 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
     /**
      * testing new sorter api: 
-     * getSortOrder(), toggleSortOrder, resetSortOrders.
+     * getSortOrder(int), toggleSortOrder(int), resetSortOrder().
      *
      */
-    public void testSortOrder() {
+    public void testToggleSortOrder() {
         JXTable table = new JXTable(sortableTableModel);
         assertSame(SortOrder.UNSORTED, table.getSortOrder(0));
         table.toggleSortOrder(0);
@@ -132,6 +262,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         table.resetSortOrder();
         assertSame(SortOrder.UNSORTED, table.getSortOrder(0));
     }
+    
     /**
      * Issue #256-swingX: viewport - do track height.
      * 
@@ -152,8 +283,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
         frame.setVisible(true);
         assertEquals("table height be equal to viewport", 
                 table.getHeight(), scrollPane.getViewport().getHeight());
-        
-    }
+     }
+ 
     /**
      * Issue #256-swingX: viewport - don't track height.
      * 
