@@ -106,7 +106,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     public void interactiveColumnNotSortable() {
         final JXTable table = new JXTable(sortableTableModel) ;
         table.setColumnControlVisible(true);
-        table.getColumnExt(0).setSorterClass(null);
+        table.getColumnExt(0).setSortable(false);
         JXFrame frame = wrapWithScrollingInFrame(table, "Always sorted");
         frame.setVisible(true);
         

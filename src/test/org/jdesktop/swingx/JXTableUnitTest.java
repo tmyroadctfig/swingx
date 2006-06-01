@@ -129,8 +129,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JXTable table = new JXTable(new AncientSwingTeam());
         Object identifier = "Last Name";
         TableColumnExt columnX = table.getColumnExt(identifier);
-        // old way: make column not sortable.
-        columnX.setSorterClass(null);
+        //  make column not sortable.
+        columnX.setSortable(false);
         table.setSortOrder(identifier, SortOrder.ASCENDING);
         assertEquals("unsortable column must be unsorted", SortOrder.UNSORTED, table.getSortOrder(0));
     }
@@ -165,7 +165,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         Object identifier = "Last Name";
         TableColumnExt columnX = table.getColumnExt(identifier);
         // old way: make column not sortable.
-        columnX.setSorterClass(null);
+        columnX.setSortable(false);
         table.toggleSortOrder(identifier);
         assertEquals("unsortable column must be unsorted", SortOrder.UNSORTED, table.getSortOrder(identifier));
        
@@ -197,7 +197,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JXTable table = new JXTable(new AncientSwingTeam());
         TableColumnExt columnX = table.getColumnExt(0);
         // old way: make column not sortable.
-        columnX.setSorterClass(null);
+        columnX.setSortable(false);
         table.setSortOrder(0, SortOrder.ASCENDING);
         assertEquals("unsortable column must be unsorted", SortOrder.UNSORTED, table.getSortOrder(0));
        
@@ -212,7 +212,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JXTable table = new JXTable(new AncientSwingTeam());
         TableColumnExt columnX = table.getColumnExt(0);
         // old way: make column not sortable.
-        columnX.setSorterClass(null);
+        columnX.setSortable(false);
         table.toggleSortOrder(0);
         assertEquals("unsortable column must be unsorted", SortOrder.UNSORTED, table.getSortOrder(0));
        

@@ -11,7 +11,6 @@ import java.util.Comparator;
 
 import junit.framework.TestCase;
 
-import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.util.PropertyChangeReport;
 
 /**
@@ -19,35 +18,39 @@ import org.jdesktop.swingx.util.PropertyChangeReport;
  */
 public class TableColumnExtTest extends TestCase {
 
-    /**
-     * Issue #273-swingx: make Comparator a bound property of TableColumnExt.
-     * (instead of client property)
-     *
-     * test if comparator is taken initially. 
-     */
-    public void testInitialComparator() {
-        TableColumnExt tableColumn = new TableColumnExt();
-        Comparator comparator = Collator.getInstance();
-        tableColumn.setComparator(comparator);
-        Sorter sorter = tableColumn.getSorter();
-        assertEquals(comparator, sorter.getComparator());
-        assertEquals(sorter.getComparator(), tableColumn.getComparator());
+    public void testSortable() {
+        TableColumnExt columnExt = new TableColumnExt();
+        boolean sortable = columnExt.isSortable();
+        assertTrue("columnExt isSortable by default", sortable);
+        PropertyChangeReport report = new PropertyChangeReport();
+        columnExt.addPropertyChangeListener(report);
+        columnExt.setSortable(!sortable);
+        // sanity assert: the change was taken
+        assertEquals(sortable, !columnExt.isSortable());
+        assertEquals("must have fired one propertyChangeEvent for sortable ", 
+                1, report.getEventCount("sortable"));
+        TableColumnExt cloned = (TableColumnExt) columnExt.clone();
+        assertEquals("sortable property must be cloned", columnExt.isSortable(),
+                cloned.isSortable());
     }
     
     /**
      * Issue #273-swingx: make Comparator a bound property of TableColumnExt.
      * (instead of client property)
      *
-     * test if comparator is updated. 
+     * test if comparator is taken initially. This test doesn't make much sense
+     * after removing the sorter property because there's nothing to synch any 
+     * more 
+     * 
+     * TODO remove!
      */
-    public void testSetComparator() {
+    public void testInitialComparator() {
         TableColumnExt tableColumn = new TableColumnExt();
-        Sorter sorter = tableColumn.getSorter();
         Comparator comparator = Collator.getInstance();
         tableColumn.setComparator(comparator);
-        assertEquals(comparator, sorter.getComparator());
-        assertEquals(sorter.getComparator(), tableColumn.getComparator());
+        assertEquals(comparator, tableColumn.getComparator());
     }
+    
     
     /**
      * Issue #273-swingx: make Comparator a bound property of TableColumnExt.

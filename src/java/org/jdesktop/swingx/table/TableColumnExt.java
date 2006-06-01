@@ -22,14 +22,11 @@
 package org.jdesktop.swingx.table;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.reflect.Constructor;
 import java.util.Comparator;
 import java.util.Hashtable;
 
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
-
-import org.jdesktop.swingx.decorator.Sorter;
 
 /**
  * TableColumn extension which adds support for view column configuration features
@@ -42,34 +39,16 @@ import org.jdesktop.swingx.decorator.Sorter;
 public class TableColumnExt extends javax.swing.table.TableColumn
     implements Cloneable {
 
-    // removed - comparator now is a full-fledged bound property.
-//    public static final String SORTER_COMPARATOR = "Sorter.COMPARATOR";
     protected boolean editable = true;
     protected boolean visible = true;
     protected Object prototypeValue = null;
 
     private Hashtable clientProperties = null;
 
-    protected Sorter sorter = null;
     /** the comparator to use for this column */
     protected Comparator comparator;
+    private boolean sortable = true;
     
-    private Constructor	sorterConstructor = null;
-    private final static Constructor	defaultSorterConstructor;
-    private final static Class[]	sorterConstructorSignature =
-        new Class[]{int.class, boolean.class};
-
-    static {
-        Constructor	constructor = null;
-        try {
-            Class	sorterClass = Class.forName("org.jdesktop.swingx.decorator.ShuttleSorter", true,
-                                              TableColumnExt.class.getClassLoader());
-            constructor = sorterClass.getConstructor(sorterConstructorSignature);
-        }
-        catch (Exception ex) {
-        }
-        defaultSorterConstructor = constructor;
-    }
 
     /**
      * Creates new table view column with a model index = 0.
@@ -110,7 +89,6 @@ public class TableColumnExt extends javax.swing.table.TableColumn
     public TableColumnExt(int modelIndex, int width,
                           TableCellRenderer cellRenderer, TableCellEditor cellEditor) {
         super(modelIndex, width, cellRenderer, cellEditor);
-        this.sorterConstructor = defaultSorterConstructor;
     }
 
     /** cosmetic override: don't fool users if resize is
@@ -184,59 +162,7 @@ public class TableColumnExt extends javax.swing.table.TableColumn
     }
 
     /**
-     * Sets a user-defined sorter for this column
-     * @param sorterClassName String containing the name of the class which
-     *        performs sorting on this view column
-     */
-    public void setSorterClass(String sorterClassName) {
-        if ((sorterClassName == null) || (sorterClassName.length() == 0)){
-            sorterConstructor = null;
-        }
-        else {
-            try {
-                Class	sorterClass = Class.forName(sorterClassName, true,
-                                                  getClass().getClassLoader());
-                sorterConstructor = sorterClass.getConstructor(sorterConstructorSignature);
-            }
-            catch (Exception ex) {
-                sorterConstructor = null;
-            }
-        }
-    }
-
-    /**
-     *
-     * @return String containing the name of the class which
-     *         performs sorting on this view column
-     */
-    public String getSorterClass() {
-        return sorterConstructor == null ? null :
-            sorterConstructor.getDeclaringClass().getName();
-    }
-
-    /**
-     *
-     * @return Sorter instance which performs sorting on this view column
-     */
-    public Sorter getSorter() {
-        if (sorter == null) {
-            if (sorterConstructor != null) {
-                try {
-                    sorter = (Sorter) sorterConstructor.newInstance(
-                        new Object[] {
-                            new Integer(getModelIndex()),
-                            new Boolean(true)});
-                   sorter.setComparator(getComparator());
-                }
-                catch (Exception ex) {
-                }
-            }
-        }
-        return sorter;
-    }
-
-    /**
-     * returns the Comparator to use for this column.
+     * @see #setComparator
      * @return <code>Comparator</code> to use for this column
      */
     public Comparator getComparator() {
@@ -244,31 +170,42 @@ public class TableColumnExt extends javax.swing.table.TableColumn
     }
 
     /**
-     * sets the comparator to use for this column.
-     * Updates the column's sorter with the given comparator.
-     * NOTE: it's up to clients to not re-set the sorter's comparator
-     * somewhere else - the column cannot guarantee to keep both in synch!
-     *  
+     * Sets the comparator to use for this column.
+     * JXTable sorting api respects this property by routing
+     * to the SortController.
      * 
-     * @param comparator
+     * @see #getComparator
+     * @param comparator a custom comparator to use in interactive
+     *    sorting.
      */
     public void setComparator(Comparator comparator) {
         Comparator old = getComparator();
         this.comparator = comparator;
-        if (sorter != null) {
-            sorter.setComparator(comparator);
-        }
         firePropertyChange("comparator", old, getComparator());
     }
     
     /**
-     *
+     * @see #setSortable
      * @return boolean indicating whether this view column is sortable
      */
     public boolean isSortable() {
-        return sorterConstructor != null;
+        return sortable;
     }
 
+    /**
+     * Sets the sortable property. JXTable sorting api respects this
+     * property by not sorting this column if false. The default value
+     * is true.
+     * @see #isSortable 
+     * @param sortable boolean indicating whether or not this column can
+     *        be sorted in the table
+     */
+    public void setSortable(boolean sortable) {
+        boolean old = isSortable();
+        this.sortable = sortable;
+        firePropertyChange("sortable", old, isSortable());
+    }
+    
     /**
      * Sets the title of this view column.  This is a convenience
      * wrapper for <code>setHeaderValue</code>.
@@ -385,8 +322,7 @@ public class TableColumnExt extends javax.swing.table.TableColumn
          // JW: isResizable is overridden to return a calculated property!
          copy.setResizable(super.getResizable());
          copy.setVisible(this.isVisible());
-         copy.setSorterClass(this.getSorterClass());
-         copy.sorterConstructor = sorterConstructor;
+         copy.setSortable(this.isSortable());
          copy.setComparator(getComparator());
          return copy;
      }
