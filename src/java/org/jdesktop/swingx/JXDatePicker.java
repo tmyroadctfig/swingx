@@ -41,6 +41,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.EventListener;
+import java.util.SortedSet;
 import java.util.TimeZone;
 
 /**
@@ -239,16 +240,22 @@ public class JXDatePicker extends JComponent {
      * @return Date
      */
     public Date getDate() {
-        return _monthView.getSelection().first();
+        SortedSet<Date> selection = _monthView.getSelection();
+        return selection.isEmpty() ? null : selection.first();
     }
 
     /**
      * Returns the currently selected date in milliseconds.
      *
-     * @return the date in milliseconds
+     * @return the date in milliseconds, -1 if there is no selection.
      */
     public long getDateInMillis() {
-        return getDate().getTime();
+        long result = -1;
+        Date selection = getDate();
+        if (selection != null) {
+            result = selection.getTime();
+        }
+        return result;
     }
 
     /**
