@@ -30,7 +30,36 @@ import javax.swing.table.TableModel;
 import org.jdesktop.swingx.JXTable;
 
 /**
- * Creates and configures TableColumns.
+ * Creates and configures TableColumns. JXTable  
+ * delegates all TableColumn creation and configuration to this class. 
+ * <p>
+ * It's meant to be shared across all tables of an 
+ * application. To apply a custom ColumnFactory, subclass and
+ * set the shared instance to the new class "early" in the application.
+ * <pre>
+ * <code>
+ *   MyColumnFactory extends ColumnFactory {
+ *       @Override
+ *       public void configureTableColumn(TableModel model, 
+ *           TableColumnExt columnExt) {
+ *           super.configureTableColumn(model, columnExt);
+ *           String title = columnExt.getTitle();
+ *           title = title.substring(0,1).toUpperCase() + title.substring(1).toLowerCase();
+ *           columnExt.setTitle(title);
+ *       }
+ *   };
+ *   ColumnFactory.setInstance(new MyColumnFactory());
+ * </code>
+ * </pre>
+ * 
+ * To install a per-table ColumnFactory, subclass JXTable and 
+ * override getColumnFactory to create and return a custom factory.
+ * <p>
+ * 
+ * PENDING: make columnFactory a configurable property of JXTable. 
+ * Currently it's not settable on JXTable - hmm ...  
+ * 
+ * 
  * 
  * @author Jeanette Winzenburg
  */
@@ -49,6 +78,11 @@ public class ColumnFactory {
         columnFactory = factory;
     }
     
+    /**
+     * Creates a table column with modelIndex.
+     * @param modelIndex column index in model coordinates
+     * @return TableColumnExt to use
+     */
     public TableColumnExt createTableColumn(int modelIndex) {
         return new TableColumnExt(modelIndex);
     }
@@ -56,39 +90,59 @@ public class ColumnFactory {
     /**
      * Configure column properties from TableModel.
      * 
-     * @param model
-     * @param column
+     * @param model the TableModel to read configuration properties from
+     * @param columnExt the TableColumnExt to configure.
      * @throws NPE if model or column == null
      * @throws IllegalStateException if column does not have valid modelIndex
      *   (in coordinate space of the tablemodel)
      */
-    public void configureTableColumn(TableModel model, TableColumnExt column) {
-        if ((column.getModelIndex() < 0) 
-                || (column.getModelIndex() >= model.getColumnCount())) 
+    public void configureTableColumn(TableModel model, TableColumnExt columnExt) {
+        if ((columnExt.getModelIndex() < 0) 
+                || (columnExt.getModelIndex() >= model.getColumnCount())) 
             throw new IllegalStateException("column must have valid modelIndex");
-        column.setHeaderValue(model.getColumnName(column.getModelIndex()));
+        columnExt.setHeaderValue(model.getColumnName(columnExt.getModelIndex()));
 
     }
     
+    /**
+     * Creates and configures a TableColumnExt.
+     * 
+     * @param model the TableModel to read configuration properties from
+     * @param modelIndex column index in model coordinates
+     * @return a TableColumnExt to use for the modelIndex
+     * @throws NPE if model == null
+     * @throws IllegalStateException if the modelIndex is invalid
+     *   (in coordinate space of the tablemodel)
+     */
     public TableColumnExt createAndConfigureTableColumn(TableModel model, int modelIndex) {
         TableColumnExt column = createTableColumn(modelIndex);
         configureTableColumn(model, column);
         return column;
     }
 
-    public void configureColumnWidths(JXTable table, TableColumnExt columnx) {
+    /**
+     * configure column widths properties from JXTable. This
+     * method is typically called in JXTable initialization 
+     * (TODO JW: really? need to check).
+     * 
+     * Here: set column's preferredWidth from prototype. 
+     *  
+     * @param table the context the column will live in.
+     * @param columnExt the Tablecolumn to configure.
+     */
+    public void configureColumnWidths(JXTable table, TableColumnExt columnExt) {
         Dimension cellSpacing = table.getIntercellSpacing();
-        Object prototypeValue = columnx.getPrototypeValue();
+        Object prototypeValue = columnExt.getPrototypeValue();
         if (prototypeValue != null) {
             // calculate how much room the prototypeValue requires
             TableCellRenderer renderer = table.getCellRenderer(0, table
-                    .convertColumnIndexToView(columnx.getModelIndex()));
+                    .convertColumnIndexToView(columnExt.getModelIndex()));
             Component comp = renderer.getTableCellRendererComponent(table,
                     prototypeValue, false, false, 0, 0);
             int prefWidth = comp.getPreferredSize().width + cellSpacing.width;
 
             // now calculate how much room the column header wants
-            renderer = columnx.getHeaderRenderer();
+            renderer = columnExt.getHeaderRenderer();
             if (renderer == null) {
                 JTableHeader header = table.getTableHeader();
                 if (header != null) {
@@ -96,37 +150,48 @@ public class ColumnFactory {
                 }
             }
             if (renderer != null) {
-                comp = renderer.getTableCellRendererComponent(table, columnx
-                        .getHeaderValue(), false, false, 0, table
-                        .convertColumnIndexToView(columnx.getModelIndex()));
+                comp = renderer.getTableCellRendererComponent(table, 
+                        columnExt.getHeaderValue(), false, false, 0, 
+                        table.convertColumnIndexToView(columnExt.getModelIndex()));
 
                 prefWidth = Math.max(comp.getPreferredSize().width, prefWidth);
             }
             prefWidth += table.getColumnModel().getColumnMargin();
-            columnx.setPreferredWidth(prefWidth);
+            columnExt.setPreferredWidth(prefWidth);
         }
 
     }
 
-    public void packColumn(JXTable table, TableColumnExt col, int margin, int max) {
+    /**
+     * configure the table column's preferredWidth, respecting the table context, 
+     * a symmetric left/right margin to add and maximum width.
+     * 
+     * Here: basically loops through all rows of the given column and measures
+     * the renderers pref width. This is a potential performance sink.
+     * 
+     * @param table the context the column will live in.
+     * @param columnExt the Tablecolumn to configure.
+     * @param margin the spacing to add left/right 
+     * @param max an upper limit to prefWidth, -1 is interpreted as no limit
+     */
+    public void packColumn(JXTable table, TableColumnExt columnExt, int margin, int max) {
 
         /* Get width of column header */
-        TableCellRenderer renderer = col.getHeaderRenderer();
+        TableCellRenderer renderer = columnExt.getHeaderRenderer();
         if (renderer == null) 
             renderer = table.getTableHeader().getDefaultRenderer();
         
-        int width = 0;
+        int column = table.convertColumnIndexToView(columnExt.getModelIndex());
         
-        Component comp = renderer.getTableCellRendererComponent(table, col
-                .getHeaderValue(), false, false, 0, 0);
-        width = comp.getPreferredSize().width;
+        Component comp = renderer.getTableCellRendererComponent(table, 
+                columnExt.getHeaderValue(), false, false, 0, column);
+        int width = comp.getPreferredSize().width;
         
-        int column = table.convertColumnIndexToView(col.getModelIndex());
         if(table.getRowCount() > 0)
             renderer = table.getCellRenderer(0, column);
         for (int r = 0; r < table.getRowCount(); r++) {
-            comp = renderer.getTableCellRendererComponent(table, table.getValueAt(r,
-                    column), false, false, r, column);
+            comp = renderer.getTableCellRendererComponent(table, 
+                    table.getValueAt(r, column), false, false, r, column);
             width = Math.max(width, comp.getPreferredSize().width);
         }
         width += 2 * margin;
@@ -135,7 +200,7 @@ public class ColumnFactory {
         if( max != -1 && width > max )
             width = max;
         
-        col.setPreferredWidth(width);
+        columnExt.setPreferredWidth(width);
         
     }
 }

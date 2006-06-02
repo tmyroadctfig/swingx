@@ -1754,6 +1754,11 @@ public class JXTable extends JTable {
                 modelColumn);
     }
 
+    /**
+     * 
+     * @return the columnFactory to use for column creation and
+     *   configuration.
+     */
     protected ColumnFactory getColumnFactory() {
         if (columnFactory == null) {
             columnFactory = ColumnFactory.getInstance();
@@ -1761,8 +1766,26 @@ public class JXTable extends JTable {
         return columnFactory;
     }
 
-
-
+    /**
+     * Set's the ColumnFactory to use for column creation and 
+     * configuration. The default value is the shared application
+     * ColumnFactory.
+     * 
+     * TODO test!
+     * 
+     * TODO auto-configure columns on set? or add public table api to
+     * do so? Mostly, this is meant to be done once in the lifetime
+     * of the table, preferably before a model is set ... overshoot?
+     * 
+     * @param columnFactory the factory to use, null indicates
+     *    to use the shared application ColumnFactory.
+     */
+    public void setColumnFactory(ColumnFactory columnFactory) {
+        if (this.columnFactory == columnFactory) return;
+        ColumnFactory old = this.columnFactory;
+        this.columnFactory = columnFactory;
+        firePropertyChange("columnFactory", old, getColumnFactory());
+    }
     
 //----------------------- delegating methods?? from super    
     /**
