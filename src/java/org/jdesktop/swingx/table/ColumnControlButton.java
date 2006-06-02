@@ -303,11 +303,10 @@ public final class ColumnControlButton extends JButton {
      */
     private void addColumnMenuItems() {
         // For each column in the view, add a JCheckBoxMenuItem to popup
-        List columns = table.getColumns(true);
+        List<TableColumn> columns = table.getColumns(true);
         ActionContainerFactory factory = new ActionContainerFactory(null);
-        for (Iterator iter = columns.iterator(); iter.hasNext();) {
-            TableColumn column = (TableColumn) iter.next();
-            ColumnVisibilityAction action = new ColumnVisibilityAction(column);
+        for (Iterator<TableColumn> iter = columns.iterator(); iter.hasNext();) {
+            ColumnVisibilityAction action = new ColumnVisibilityAction(iter.next());
             getColumnVisibilityActions().add(action);
             popupMenu.add(factory.createMenuItem(action));
         }
@@ -328,7 +327,7 @@ public final class ColumnControlButton extends JButton {
     private void addColumnActions() {
         Object[] actionKeys = getColumnControlActionKeys();
         Arrays.sort(actionKeys);
-        List actions = new ArrayList();
+        List<Action> actions = new ArrayList<Action>();
         for (int i = 0; i < actionKeys.length; i++) {
             if (isColumnControlActionKey(actionKeys[i])) {
                 actions.add(table.getActionMap().get(actionKeys[i]));
@@ -340,9 +339,8 @@ public final class ColumnControlButton extends JButton {
             popupMenu.addSeparator();
         }
         ActionContainerFactory factory = new ActionContainerFactory(null);
-        for (Iterator iter = actions.iterator(); iter.hasNext();) {
-            Action action = (Action) iter.next();
-            popupMenu.add(factory.createMenuItem(action));
+        for (Iterator<Action> iter = actions.iterator(); iter.hasNext();) {
+            popupMenu.add(factory.createMenuItem(iter.next()));
         }
     }
 
