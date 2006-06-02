@@ -86,6 +86,18 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
     /**
+     * sanity test while cleaning up: 
+     * getColumns() should return the exact same
+     * ordering as getColumns(false);
+     *
+     */
+    public void testColumnSequence() {
+        JXTable table = new JXTable(10, 20);
+        table.getColumnExt(5).setVisible(false);
+        table.getColumnModel().moveColumn(table.getColumnCount() - 1, 0);
+        assertEquals(table.getColumns(), table.getColumns(false));
+    }
+    /**
      * programmatic sorting of hidden column (through table api).
      * 
      */

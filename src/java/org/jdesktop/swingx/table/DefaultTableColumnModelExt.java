@@ -46,7 +46,8 @@ import javax.swing.table.TableColumn;
  *  
  * @author Richard Bair
  */
-public class DefaultTableColumnModelExt extends DefaultTableColumnModel implements TableColumnModelExt {
+public class DefaultTableColumnModelExt extends DefaultTableColumnModel 
+    implements TableColumnModelExt {
     private static final String IGNORE_EVENT = "TableColumnModelExt.ignoreEvent";
     /**
      * contains a list of all of the columns, in the order in which they would
@@ -57,12 +58,12 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel implemen
     /**
      * Set of invisible columns. 
      */
-    private Set<TableColumn> invisibleColumns = new HashSet<TableColumn>();
+    private Set<TableColumnExt> invisibleColumns = new HashSet<TableColumnExt>();
 
     /** 
      * used to distinguish a real remove from hiding.
      */
-    private Map oldIndexes = new HashMap();
+    private Map<TableColumnExt, Integer> oldIndexes = new HashMap<TableColumnExt, Integer>();
     
     /**
      * Listener attached to TableColumnExt instances to listen for changes
@@ -82,9 +83,9 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel implemen
     /**
      * {@inheritDoc}
      */
-    public List getColumns(boolean includeHidden) {
+    public List<TableColumn> getColumns(boolean includeHidden) {
         if (includeHidden) {
-            return new ArrayList(allColumns);
+            return new ArrayList<TableColumn>(allColumns);
         } 
         return Collections.list(getColumns());
     }
@@ -103,8 +104,8 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel implemen
      * {@inheritDoc}
      */
     public TableColumnExt getColumnExt(Object identifier) {
-        for (Iterator iter = allColumns.iterator(); iter.hasNext();) {
-            TableColumn column = (TableColumn) iter.next();
+        for (Iterator<TableColumn> iter = allColumns.iterator(); iter.hasNext();) {
+            TableColumn column = iter.next();
             if ((column instanceof TableColumnExt) && (identifier.equals(column.getIdentifier()))) {
                 return (TableColumnExt) column;
             }
@@ -115,8 +116,8 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel implemen
     /**
      * {@inheritDoc}
      */
-    public Set getInvisibleColumns() {
-        return new HashSet(invisibleColumns);
+    public Set<TableColumnExt> getInvisibleColumns() {
+        return new HashSet<TableColumnExt>(invisibleColumns);
     }
 
     /**
@@ -129,8 +130,8 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel implemen
      * @return true if the column was moved to invisible
      */
     public boolean isRemovedToInvisibleEvent(int oldIndex) {
-        Integer index = new Integer(oldIndex);
-        return oldIndexes.containsValue(index);
+//        Integer index = new Integer(oldIndex);
+        return oldIndexes.containsValue(oldIndex);
     }
 
     /**
@@ -200,9 +201,8 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel implemen
      */    
     protected void moveToInvisible(TableColumnExt col) {
         //make invisible
-        int oldIndex = tableColumns.indexOf(col);
         invisibleColumns.add(col);
-        oldIndexes.put(col, new Integer(oldIndex));
+        oldIndexes.put(col, tableColumns.indexOf(col));
         super.removeColumn(col);
     }
 
@@ -216,7 +216,7 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel implemen
      */    
     protected void moveToVisible(TableColumnExt col) {
         invisibleColumns.remove(col);
-        Integer oldIndex = (Integer) oldIndexes.get(col);
+        Integer oldIndex = oldIndexes.get(col);
         if (oldIndex == null) {
             oldIndex = getColumnCount();
         }

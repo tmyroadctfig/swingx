@@ -1514,9 +1514,9 @@ public class JXTable extends JTable {
             SortKey sortKey = SortKey.getFirstSortingKey(controller.getSortKeys());
             if (sortKey != null) {
               int sorterColumn = sortKey.getColumn();
-              List columns = getColumns(true);
-              for (Iterator iter = columns.iterator(); iter.hasNext();) {
-                  TableColumn column = (TableColumn) iter.next();
+              List<TableColumn> columns = getColumns(true);
+              for (Iterator<TableColumn> iter = columns.iterator(); iter.hasNext();) {
+                  TableColumn column = iter.next();
                   if (column.getModelIndex() == sorterColumn) {
                       return column;
                   }
@@ -1566,9 +1566,9 @@ public class JXTable extends JTable {
          * TODO: promote this method to superclass, and change
          *       createDefaultColumnsFromModel() to call this method
          */
-        List columns = getColumns(true);
-        for (Iterator iter = columns.iterator(); iter.hasNext();) {
-            getColumnModel().removeColumn((TableColumn) iter.next());
+        List<TableColumn> columns = getColumns(true);
+        for (Iterator<TableColumn> iter = columns.iterator(); iter.hasNext();) {
+            getColumnModel().removeColumn(iter.next());
 
         }
     }
@@ -1578,7 +1578,7 @@ public class JXTable extends JTable {
      * 
      * @return list of all the visible <code>TableColumns</code>
      */
-    public List getColumns() {
+    public List<TableColumn> getColumns() {
         return Collections.list(getColumnModel().getColumns());
     }
 
@@ -1590,8 +1590,8 @@ public class JXTable extends JTable {
      * @return list of <code>TableColumns</code> including hidden columns if
      * specified
      */
-    public List getColumns(boolean includeHidden) {
-        if (includeHidden && (getColumnModel() instanceof TableColumnModelExt)) {
+    public List<TableColumn> getColumns(boolean includeHidden) {
+        if (getColumnModel() instanceof TableColumnModelExt) {
             return ((TableColumnModelExt) getColumnModel())
                     .getColumns(includeHidden);
         }
