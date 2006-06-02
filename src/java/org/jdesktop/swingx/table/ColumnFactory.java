@@ -52,12 +52,19 @@ import org.jdesktop.swingx.JXTable;
  * </code>
  * </pre>
  * 
- * To install a per-table ColumnFactory, subclass JXTable and 
- * override getColumnFactory to create and return a custom factory.
+ * Alternatively, any instance of JXTable can be configured 
+ * individually with a custom ColumnFactory:
+ * 
+ *  <pre>
+ *  <code>
+ *    JXTable table = new JXTable();
+ *    table.setColumnFactory(new MyColumnFactory());
+ *    table.setModel(myTableModel);
+ *  </code>
+ *  </pre>
+ * 
  * <p>
  * 
- * PENDING: make columnFactory a configurable property of JXTable. 
- * Currently it's not settable on JXTable - hmm ...  
  * 
  * 
  * 

@@ -128,7 +128,7 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * {@link #setSortable(boolean)}. Sorting on columns is handled by a Sorter
  * instance which contains a Comparator used to compare values in two rows of a
  * column. You can replace the Comparator for a given column by using
- * <code>getColumnExt("column").getSorter().setComparator(customComparator)</code>
+ * <code>getColumnExt("column").setComparator(customComparator)</code>
  * 
  * <p>
  * Columns can be hidden or shown by setting the visible property on the
@@ -171,6 +171,13 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * an indicator of the preferred size of the column. This can be useful if some
  * data in a given column is very long, but where the resize algorithm would
  * normally not pick this up.
+ * 
+ * <p>
+ * JXTable guarantees to delegate creation and configuration of TableColumnExt 
+ * to a ColumnFactory. By default, the application-wide shared ColumnFactory is used.
+ * You can install a custom ColumnFactory, either application-wide by 
+ * {@link CustomFactory.setInstance(ColumnFactory)} or per table instance by 
+ * {@link #setColumnFactory(ColumnFactory)}. 
  * 
  * <p>
  * Last, you can also provide searches on a JXTable using the Searchable property.
@@ -1756,12 +1763,23 @@ public class JXTable extends JTable {
 
     /**
      * 
+     * @see #setColumnFactory(ColumnFactory)
      * @return the columnFactory to use for column creation and
      *   configuration.
      */
     protected ColumnFactory getColumnFactory() {
+        /*
+        * TODO JW: think about implications of not/ copying the reference 
+        *  to the shared instance into the table's field? Better 
+        *  access the getInstance() on each call? We are on single thread 
+        *  anyway...
+        *  Furthermore, we don't expect the instance to change often, typically
+        *  it is configured on startup. So we don't really have to worry about
+        *  changes which would destabilize column state?
+        */
         if (columnFactory == null) {
-            columnFactory = ColumnFactory.getInstance();
+            return ColumnFactory.getInstance();
+//            columnFactory = ColumnFactory.getInstance();
         }
         return columnFactory;
     }
@@ -1771,8 +1789,6 @@ public class JXTable extends JTable {
      * configuration. The default value is the shared application
      * ColumnFactory.
      * 
-     * TODO test!
-     * 
      * TODO auto-configure columns on set? or add public table api to
      * do so? Mostly, this is meant to be done once in the lifetime
      * of the table, preferably before a model is set ... overshoot?
@@ -1781,8 +1797,7 @@ public class JXTable extends JTable {
      *    to use the shared application ColumnFactory.
      */
     public void setColumnFactory(ColumnFactory columnFactory) {
-        if (this.columnFactory == columnFactory) return;
-        ColumnFactory old = this.columnFactory;
+        ColumnFactory old = getColumnFactory();
         this.columnFactory = columnFactory;
         firePropertyChange("columnFactory", old, getColumnFactory());
     }
