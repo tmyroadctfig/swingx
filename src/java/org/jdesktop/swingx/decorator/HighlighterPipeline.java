@@ -21,18 +21,15 @@
 
 package org.jdesktop.swingx.decorator;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.BoundedRangeModel;
-import javax.swing.JComponent;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
-import javax.swing.table.DefaultTableCellRenderer;
 
 import org.jdesktop.swingx.decorator.Highlighter.UIHighlighter;
 
@@ -50,44 +47,6 @@ public class HighlighterPipeline implements UIHighlighter {
     protected EventListenerList listenerList = new EventListenerList();
 
     protected List<Highlighter> highlighters;
-    // JW: this is a hack to make JXTable renderers behave...
-    private final static Highlighter resetDefaultTableCellRendererHighlighter = new Highlighter(null, null, true){
-
-        @Override
-        protected void applyBackground(Component renderer, ComponentAdapter adapter) {
-            if (!adapter.isSelected()) {
-                // renderer.setBackground(null);
-                Object colorMemory = ((JComponent) renderer).getClientProperty("rendererColorMemory.background");
-                if (colorMemory instanceof ColorMemory) {
-                    renderer.setBackground(((ColorMemory) colorMemory).color);
-                } else {
-                    ((JComponent) renderer).putClientProperty("rendererColorMemory.background", new ColorMemory(renderer.getBackground()));
-                }
-            }
-        }
-
-        @Override
-        protected void applyForeground(Component renderer, ComponentAdapter adapter) {
-            if (!adapter.isSelected()) {
-//                renderer.setForeground(null);
-                Object colorMemory = ((JComponent) renderer).getClientProperty("rendererColorMemory.foreground");
-                if (colorMemory instanceof ColorMemory) {
-                    renderer.setForeground(((ColorMemory) colorMemory).color);
-                } else {
-                    ((JComponent) renderer).putClientProperty("rendererColorMemory.foreground", new ColorMemory(renderer.getForeground()));
-                }
-            }
-        }
-        
-    };
-    
-    private static class ColorMemory {
-        public ColorMemory(Color foreground) {
-            color = foreground;
-        }
-
-        Color color;
-    }
     
     private ChangeListener highlighterChangeListener;
 
@@ -179,7 +138,7 @@ public class HighlighterPipeline implements UIHighlighter {
      * @throws NullPointerException if either stamp or adapter is null.
      */
     public Component apply(Component stamp, ComponentAdapter adapter) {
-        stamp = resetDefaultTableCellRenderer(stamp, adapter);
+//        stamp = resetDefaultTableCellRendererHighlighter.highlight(stamp, adapter);
         for (Iterator<Highlighter> iter = highlighters.iterator(); iter.hasNext();) {
             stamp = iter.next().highlight(stamp, adapter);
             
@@ -187,42 +146,6 @@ public class HighlighterPipeline implements UIHighlighter {
         return stamp;
     }
 
-    /**
-     * This is a hack around DefaultTableCellRenderer color "memory".
-     * 
-     * The issue is that the default has internal color management 
-     * which is different from other types of renderers. The
-     * consequence of the internal color handling is that there's
-     * a color memory which must be reset somehow. The "old" hack around
-     * reset the xxColors of all types of renderers to the adapter's
-     * target XXColors, introducing #178-swingx (Highlighgters must not
-     * change any colors except those for which their color properties are
-     * explicitly set).
-     * 
-     * This hack limits the interference to renderers of type 
-     * DefaultTableCellRenderer, applying a hacking highlighter which
-     *  resets the renderers XXColors to null if unselected. Note that
-     *  both hacks loose any colors previously set by clients (in 
-     *  prepareRenderer before applying the pipeline). 
-     * 
-     * @param stamp
-     * @param adapter
-     * @return
-     */
-    private Component resetDefaultTableCellRenderer(Component stamp, ComponentAdapter adapter) {
-        //JW
-        // table renderers have different state memory as list/tree renderers
-        // without the null they don't unstamp!
-        // but... null has adversory effect on JXList f.i. - selection
-        // color is changed. This is related to #178-swingx: 
-        // highlighter background computation is weird.
-        // 
-        if (stamp instanceof DefaultTableCellRenderer) {    
-        /** @todo optimize the following bug fix */
-            stamp = resetDefaultTableCellRendererHighlighter.highlight(stamp, adapter); 
-        }
-        return stamp;
-    }
 
     public void updateUI() {
         for (Highlighter highlighter : highlighters) {

@@ -30,10 +30,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.print.PrinterException;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -51,8 +48,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.AbstractAction;
-import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.DefaultCellEditor;
@@ -255,6 +250,84 @@ public class JXTable extends JTable {
 
     /** The HighlighterPipeline for the table. */
     protected HighlighterPipeline highlighters;
+
+    
+    /**
+     * This is a hack around DefaultTableCellRenderer color "memory", 
+     * see Issue #258-swingx.
+     * 
+     * The issue is that the default has internal color management 
+     * which is different from other types of renderers. The
+     * consequence of the internal color handling is that there's
+     * a color memory which must be reset somehow. The "old" hack around
+     * reset the xxColors of all types of renderers to the adapter's
+     * target XXColors, introducing #178-swingx (Highlighgters must not
+     * change any colors except those for which their color properties are
+     * explicitly set).
+     * 
+     * This hack limits the interference to renderers of type 
+     * DefaultTableCellRenderer, applying a hacking highlighter which
+     *  resets the renderers XXColors to a previously "memorized" 
+     *  color. Note that setting the color to null didn't have the desired
+     *  effect.
+     * 
+     */
+    private final static Highlighter resetDefaultTableCellRendererHighlighter = new Highlighter(null, null, true){
+
+        /**
+         * applies the memory hack for renderers of type DefaultTableCellRenderer,
+         * does nothing for other types.
+         * @param renderer the component to highlight
+         * @param adapter the renderee's component state.
+         */
+        @Override
+        public Component highlight(Component renderer, ComponentAdapter adapter) {
+            //JW
+            // table renderers have different state memory as list/tree renderers
+            // without the null they don't unstamp!
+            // but... null has adversory effect on JXList f.i. - selection
+            // color is changed. This is related to #178-swingx: 
+            // highlighter background computation is weird.
+            // 
+           if (renderer instanceof DefaultTableCellRenderer) {
+                return super.highlight(renderer, adapter);
+            } 
+            return renderer;
+        }
+
+        @Override
+        protected void applyBackground(Component renderer, ComponentAdapter adapter) {
+            if (!adapter.isSelected()) {
+                Object colorMemory = ((JComponent) renderer).getClientProperty("rendererColorMemory.background");
+                if (colorMemory instanceof ColorMemory) {
+                    renderer.setBackground(((ColorMemory) colorMemory).color);
+                } else {
+                    ((JComponent) renderer).putClientProperty("rendererColorMemory.background", new ColorMemory(renderer.getBackground()));
+                }
+            }
+        }
+
+        @Override
+        protected void applyForeground(Component renderer, ComponentAdapter adapter) {
+            if (!adapter.isSelected()) {
+                Object colorMemory = ((JComponent) renderer).getClientProperty("rendererColorMemory.foreground");
+                if (colorMemory instanceof ColorMemory) {
+                    renderer.setForeground(((ColorMemory) colorMemory).color);
+                } else {
+                    ((JComponent) renderer).putClientProperty("rendererColorMemory.foreground", new ColorMemory(renderer.getForeground()));
+                }
+            }
+        }
+        
+    };
+    
+    private static class ColorMemory {
+        public ColorMemory(Color color) {
+            this.color = color;
+        }
+
+        Color color;
+    }
 
     /** The ComponentAdapter for model data access. */
     protected ComponentAdapter dataAdapter;
@@ -2278,6 +2351,20 @@ public class JXTable extends JTable {
         return dataAdapter;
     }
 
+    /**
+     * Convenience to access a configured ComponentAdapter.
+     * 
+     * @param row the row index in view coordinates.
+     * @param column the column index in view coordinates.
+     * @return
+     */
+    protected ComponentAdapter getComponentAdapter(int row, int column) {
+        ComponentAdapter adapter = getComponentAdapter();
+        adapter.row = row;
+        adapter.column = column;
+        return adapter;
+    }
+
     
     protected static class TableAdapter extends ComponentAdapter {
         private final JXTable table;
@@ -2503,15 +2590,12 @@ public class JXTable extends JTable {
             int column) {
         Component stamp = super.prepareRenderer(renderer, row, column);
         adjustComponentOrientation(stamp);
+        ComponentAdapter adapter = getComponentAdapter(row, column);
+        // hacking around DefaultTableCellRenderer color memory.
+        resetDefaultTableCellRendererHighlighter.highlight(stamp, adapter);
         if (highlighters == null) {
             return stamp; // no need to decorate renderer with highlighters
         } else {
-            // PENDING - JW: code duplication - 
-            // add method to access component adapter with row/column
-            // set as needed!
-            ComponentAdapter adapter = getComponentAdapter();
-            adapter.row = row;
-            adapter.column = column;
             return highlighters.apply(stamp, adapter);
         }
     }
