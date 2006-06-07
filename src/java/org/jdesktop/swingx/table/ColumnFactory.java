@@ -39,7 +39,7 @@ import org.jdesktop.swingx.JXTable;
  * <pre>
  * <code>
  *   MyColumnFactory extends ColumnFactory {
- *       @Override
+ *       //@Override
  *       public void configureTableColumn(TableModel model, 
  *           TableColumnExt columnExt) {
  *           super.configureTableColumn(model, columnExt);
