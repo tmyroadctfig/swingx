@@ -84,6 +84,7 @@ import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.ResetDTCRColorHighlighter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
@@ -251,83 +252,66 @@ public class JXTable extends JTable {
     /** The HighlighterPipeline for the table. */
     protected HighlighterPipeline highlighters;
 
-    
     /**
-     * This is a hack around DefaultTableCellRenderer color "memory", 
-     * see Issue #258-swingx.
-     * 
-     * The issue is that the default has internal color management 
-     * which is different from other types of renderers. The
-     * consequence of the internal color handling is that there's
-     * a color memory which must be reset somehow. The "old" hack around
-     * reset the xxColors of all types of renderers to the adapter's
-     * target XXColors, introducing #178-swingx (Highlighgters must not
-     * change any colors except those for which their color properties are
-     * explicitly set).
-     * 
-     * This hack limits the interference to renderers of type 
-     * DefaultTableCellRenderer, applying a hacking highlighter which
-     *  resets the renderers XXColors to a previously "memorized" 
-     *  color. Note that setting the color to null didn't have the desired
-     *  effect.
-     * 
+     * The Highlighter used to hack around DefaultTableCellRenderer's color memory. 
      */
-    private final static Highlighter resetDefaultTableCellRendererHighlighter = new Highlighter(null, null, true){
-
-        /**
-         * applies the memory hack for renderers of type DefaultTableCellRenderer,
-         * does nothing for other types.
-         * @param renderer the component to highlight
-         * @param adapter the renderee's component state.
-         */
-        @Override
-        public Component highlight(Component renderer, ComponentAdapter adapter) {
-            //JW
-            // table renderers have different state memory as list/tree renderers
-            // without the null they don't unstamp!
-            // but... null has adversory effect on JXList f.i. - selection
-            // color is changed. This is related to #178-swingx: 
-            // highlighter background computation is weird.
-            // 
-           if (renderer instanceof DefaultTableCellRenderer) {
-                return super.highlight(renderer, adapter);
-            } 
-            return renderer;
-        }
-
-        @Override
-        protected void applyBackground(Component renderer, ComponentAdapter adapter) {
-            if (!adapter.isSelected()) {
-                Object colorMemory = ((JComponent) renderer).getClientProperty("rendererColorMemory.background");
-                if (colorMemory instanceof ColorMemory) {
-                    renderer.setBackground(((ColorMemory) colorMemory).color);
-                } else {
-                    ((JComponent) renderer).putClientProperty("rendererColorMemory.background", new ColorMemory(renderer.getBackground()));
-                }
-            }
-        }
-
-        @Override
-        protected void applyForeground(Component renderer, ComponentAdapter adapter) {
-            if (!adapter.isSelected()) {
-                Object colorMemory = ((JComponent) renderer).getClientProperty("rendererColorMemory.foreground");
-                if (colorMemory instanceof ColorMemory) {
-                    renderer.setForeground(((ColorMemory) colorMemory).color);
-                } else {
-                    ((JComponent) renderer).putClientProperty("rendererColorMemory.foreground", new ColorMemory(renderer.getForeground()));
-                }
-            }
-        }
-        
-    };
-    
-    private static class ColorMemory {
-        public ColorMemory(Color color) {
-            this.color = color;
-        }
-
-        Color color;
-    }
+    protected Highlighter resetDefaultTableCellRendererHighlighter;
+//    private final static Highlighter resetDefaultTableCellRendererHighlighter = new Highlighter(null, null, true){
+//
+//        /**
+//         * applies the memory hack for renderers of type DefaultTableCellRenderer,
+//         * does nothing for other types.
+//         * @param renderer the component to highlight
+//         * @param adapter the renderee's component state.
+//         */
+//        @Override
+//        public Component highlight(Component renderer, ComponentAdapter adapter) {
+//            //JW
+//            // table renderers have different state memory as list/tree renderers
+//            // without the null they don't unstamp!
+//            // but... null has adversory effect on JXList f.i. - selection
+//            // color is changed. This is related to #178-swingx: 
+//            // highlighter background computation is weird.
+//            // 
+//           if (renderer instanceof DefaultTableCellRenderer) {
+//                return super.highlight(renderer, adapter);
+//            } 
+//            return renderer;
+//        }
+//
+//        @Override
+//        protected void applyBackground(Component renderer, ComponentAdapter adapter) {
+//            if (!adapter.isSelected()) {
+//                Object colorMemory = ((JComponent) renderer).getClientProperty("rendererColorMemory.background");
+//                if (colorMemory instanceof ColorMemory) {
+//                    renderer.setBackground(((ColorMemory) colorMemory).color);
+//                } else {
+//                    ((JComponent) renderer).putClientProperty("rendererColorMemory.background", new ColorMemory(renderer.getBackground()));
+//                }
+//            }
+//        }
+//
+//        @Override
+//        protected void applyForeground(Component renderer, ComponentAdapter adapter) {
+//            if (!adapter.isSelected()) {
+//                Object colorMemory = ((JComponent) renderer).getClientProperty("rendererColorMemory.foreground");
+//                if (colorMemory instanceof ColorMemory) {
+//                    renderer.setForeground(((ColorMemory) colorMemory).color);
+//                } else {
+//                    ((JComponent) renderer).putClientProperty("rendererColorMemory.foreground", new ColorMemory(renderer.getForeground()));
+//                }
+//            }
+//        }
+//        
+//    };
+//    
+//    private static class ColorMemory {
+//        public ColorMemory(Color color) {
+//            this.color = color;
+//        }
+//
+//        Color color;
+//    }
 
     /** The ComponentAdapter for model data access. */
     protected ComponentAdapter dataAdapter;
@@ -2570,11 +2554,12 @@ public class JXTable extends JTable {
     /**
      * Returns the decorated <code>Component</code> used as a stamp to render
      * the specified cell. Overrides superclass version to provide support for
-     * cell decorators. 
+     * cell decorators. <p>
      * 
      * Adjusts component orientation (guaranteed to happen before applying 
      * Highlighters).
-     * see - https://swingx.dev.java.net/issues/show_bug.cgi?id=145
+     * @linkplain https://swingx.dev.java.net/issues/show_bug.cgi?id=145
+     * 
      * 
      * @param renderer
      *            the <code>TableCellRenderer</code> to prepare
@@ -2589,18 +2574,40 @@ public class JXTable extends JTable {
     public Component prepareRenderer(TableCellRenderer renderer, int row,
             int column) {
         Component stamp = super.prepareRenderer(renderer, row, column);
+        // #145-swingx: default renderers don't respect componentOrientation.
         adjustComponentOrientation(stamp);
-        ComponentAdapter adapter = getComponentAdapter(row, column);
-        // hacking around DefaultTableCellRenderer color memory.
-        resetDefaultTableCellRendererHighlighter.highlight(stamp, adapter);
+        // #258-swingx: hacking around DefaultTableCellRenderer color memory.
+        resetDefaultTableCellRendererColors(stamp, row, column);
         if (highlighters == null) {
             return stamp; // no need to decorate renderer with highlighters
         } else {
-            return highlighters.apply(stamp, adapter);
+            return highlighters.apply(stamp, getComponentAdapter(row, column));
         }
     }
 
-    
+    /**
+     * Method to hack around #258-swingx: apply a specialized Highlighter
+     * to force reset the color "memory" of DefaultTableCellRenderer. 
+     * This is called for each renderer in {@link #prepareRenderer} after
+     * calling super, but before applying the HighlighterPipeline. Subclasses
+     * which are sure to solve the problem at the core (that is in 
+     * a well-behaved DefaultTableCellRenderer) should override this method
+     * to do nothing.
+     * 
+     * @param renderer the <code>TableCellRenderer</code> to hack 
+     * @param row  the row of the cell to render 
+     * @param column the column index of the cell to render
+     */
+    protected void resetDefaultTableCellRendererColors(Component renderer, int row, int column) {
+        ComponentAdapter adapter = getComponentAdapter(row, column);
+        if (resetDefaultTableCellRendererHighlighter == null) {
+            resetDefaultTableCellRendererHighlighter = new ResetDTCRColorHighlighter();
+        }
+        // hacking around DefaultTableCellRenderer color memory.
+        resetDefaultTableCellRendererHighlighter.highlight(renderer, adapter);
+    }
+
+
     /**
      * Overridden to adjust the editor's component orientation if 
      * appropriate.
