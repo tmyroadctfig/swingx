@@ -88,13 +88,14 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
         tree.setCellEditor(new DefaultXTreeCellEditor(tree, renderer));
         JXTree xTree = new JXTree();
         xTree.setEditable(true);
-        TreeCellRenderer xRenderer = xTree.getCellRenderer();
-        if (xRenderer instanceof JXTree.DelegatingRenderer) {
-            TreeCellRenderer delegate = ((JXTree.DelegatingRenderer) xRenderer).getDelegateRenderer();
-            if (delegate instanceof DefaultTreeCellRenderer) { 
-                xTree.setCellEditor(new DefaultXTreeCellEditor(xTree, (DefaultTreeCellRenderer) delegate));
-            }   
-        }
+        // JW: changed xTree to use the xEditor by default
+//        TreeCellRenderer xRenderer = xTree.getCellRenderer();
+//        if (xRenderer instanceof JXTree.DelegatingRenderer) {
+//            TreeCellRenderer delegate = ((JXTree.DelegatingRenderer) xRenderer).getDelegateRenderer();
+//            if (delegate instanceof DefaultTreeCellRenderer) { 
+//                xTree.setCellEditor(new DefaultXTreeCellEditor(xTree, (DefaultTreeCellRenderer) delegate));
+//            }   
+//        }
         final JXFrame frame = wrapWithScrollingInFrame(tree, xTree, "XEditing: compare tree and xtree");
         Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
 
@@ -298,6 +299,7 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
         try {
 //            test.runInteractiveTests();
             test.runInteractiveTests("interactive.*RToL.*");
+//            test.runInteractiveTests("interactive.*Edit.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();

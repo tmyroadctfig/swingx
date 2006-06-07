@@ -6,26 +6,11 @@
  */
 package org.jdesktop.swingx;
 
-import javax.swing.tree.DefaultMutableTreeNode;
 
 public class JXTreeIssues extends JXTreeUnitTest {
     
-    /**
-     * Issue #221-swingx: actionMap not initialized in JXTreeNode constructor.
-     * 
-     * PENDING: test all constructors!
-     *
-     */
-    public void testInitInConstructors() {
-        assertFindActionRegistered(new JXTree(new DefaultMutableTreeNode("dummy"), false));
-        assertFindActionRegistered(new JXTree(new DefaultMutableTreeNode("dummy")));
+    public void testDummy() {
+        // no open tree issues ??
     }
-
-    /**
-     * @param tree
-     */
-    private void assertFindActionRegistered(JXTree tree) {
-        assertNotNull("Actions must be initialized", tree.getActionMap().get("find"));
-    }
-
+    
 }

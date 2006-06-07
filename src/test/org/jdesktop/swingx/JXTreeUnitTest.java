@@ -6,6 +6,13 @@
  */
 package org.jdesktop.swingx;
 
+import java.util.Hashtable;
+import java.util.Vector;
+
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
+import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 
@@ -19,6 +26,36 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         
     public JXTreeUnitTest() {
         super("JXTree Test");
+    }
+
+    /**
+     * Issue #221-swingx: actionMap not initialized in JXTreeNode constructor.
+     * Issue #231-swingx: icons lost in editor, enhanced default editor not installed.
+     * 
+     * PENDING: test all constructors!
+     *
+     */
+    public void testInitInConstructors() {
+        assertXTreeInit(new JXTree());
+        assertXTreeInit(new JXTree(new Object[] {}));
+        assertXTreeInit(new JXTree(new Vector()));
+        assertXTreeInit(new JXTree(new Hashtable()));
+        assertXTreeInit(new JXTree(new DefaultMutableTreeNode("dummy"), false));
+        assertXTreeInit(new JXTree(new DefaultMutableTreeNode("dummy")));
+        assertXTreeInit(new JXTree(new DefaultTreeModel(new DefaultMutableTreeNode("dummy"))));
+    }
+
+    /**
+     * @param tree
+     */
+    private void assertXTreeInit(JXTree tree) {
+        assertNotNull("Actions must be initialized", tree.getActionMap().get("find"));
+        assertTrue("Editor must be DefaultXTreeCellEditor", 
+                tree.getCellEditor() instanceof DefaultXTreeCellEditor);
+        // JW: wrong assumption, available for TreeTableModel impl only?
+//        assertNotNull("conversionMethod must be initialized", 
+//                tree.getValueConversionMethod(tree.getModel()));
+//        tree.getValueConversionMethod(tree.getModel());
     }
 
     /** 

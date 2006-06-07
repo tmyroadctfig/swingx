@@ -52,6 +52,7 @@ import javax.swing.tree.TreePath;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
+import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
 
 
 /**
@@ -95,7 +96,7 @@ public class JXTree extends JTree {
      * used by this tree defines a leaf node as any node without children.
      */
     public JXTree() {
-	initActions();
+	init();
     }
 
     /**
@@ -110,7 +111,7 @@ public class JXTree extends JTree {
      */
     public JXTree(Object[] value) {
         super(value);
-	initActions();
+	init();
     }
 
     /**
@@ -125,7 +126,7 @@ public class JXTree extends JTree {
      */
     public JXTree(Vector value) {
         super(value);
-	initActions();
+	init();
     }
 
     /**
@@ -141,7 +142,7 @@ public class JXTree extends JTree {
      */
     public JXTree(Hashtable value) {
         super(value);
-	initActions();
+	init();
     }
 
     /**
@@ -156,6 +157,7 @@ public class JXTree extends JTree {
      */
     public JXTree(TreeNode root) {
         super(root, false);
+        init();
     }
 
     /**
@@ -173,7 +175,7 @@ public class JXTree extends JTree {
      */
     public JXTree(TreeNode root, boolean asksAllowsChildren) {
         super(root, asksAllowsChildren);
-		initActions();
+	init();
     }
 
     /**
@@ -188,11 +190,7 @@ public class JXTree extends JTree {
      */
     public JXTree(TreeModel newModel) {
         super(newModel);
-        initActions();
-        // To support delegation of convertValueToText() to the model...
-        // JW: need to set again (is done in setModel, but at call
-        // in super constructor the field is not yet valid)
-        conversionMethod = getValueConversionMethod(newModel);
+        init();
     }
 
     @Override
@@ -204,7 +202,13 @@ public class JXTree extends JTree {
         super.setModel(newModel);
     }
 
-    private Method getValueConversionMethod(TreeModel model) {
+    /**
+     * widened access for testing
+     * 
+     * @param model
+     * @return
+     */
+    protected Method getValueConversionMethod(TreeModel model) {
         try {
             return model == null ? null : model.getClass().getMethod(
                     "convertValueToText", methodSignature);
@@ -236,7 +240,31 @@ public class JXTree extends JTree {
         return "";
     }
 
-    private void initActions() {
+    private void init() {
+        // To support delegation of convertValueToText() to the model...
+        // JW: need to set again (is done in setModel, but at call
+        // in super constructor the field is not yet valid)
+        conversionMethod = getValueConversionMethod(getModel());
+        // Issue #233-swingx: default editor not bidi-compliant 
+        // manually install an enhanced TreeCellEditor which 
+        // behaves slightly better in RtoL orientation.
+        // Issue #231-swingx: icons lost
+        // Anyway, need to install the editor manually because
+        // the default install in BasicTreeUI doesn't know about
+        // the DelegatingRenderer and therefore can't see
+        // the DefaultTreeCellRenderer type to delegate to. 
+        // As a consequence, the icons are lost in the default
+        // setup.
+        // JW PENDING need to mimic ui-delegate default re-set?
+        // JW PENDING alternatively, cleanup and use DefaultXXTreeCellEditor in incubator
+        TreeCellRenderer xRenderer = getCellRenderer();
+        if (xRenderer instanceof JXTree.DelegatingRenderer) {
+            TreeCellRenderer delegate = ((JXTree.DelegatingRenderer) xRenderer).getDelegateRenderer();
+            if (delegate instanceof DefaultTreeCellRenderer) { 
+                setCellEditor(new DefaultXTreeCellEditor(this, (DefaultTreeCellRenderer) delegate));
+            }   
+        }
+
         // Register the actions that this class can handle.
         ActionMap map = getActionMap();
         map.put("expand-all", new Actions("expand-all"));
