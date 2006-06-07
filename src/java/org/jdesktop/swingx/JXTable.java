@@ -256,62 +256,6 @@ public class JXTable extends JTable {
      * The Highlighter used to hack around DefaultTableCellRenderer's color memory. 
      */
     protected Highlighter resetDefaultTableCellRendererHighlighter;
-//    private final static Highlighter resetDefaultTableCellRendererHighlighter = new Highlighter(null, null, true){
-//
-//        /**
-//         * applies the memory hack for renderers of type DefaultTableCellRenderer,
-//         * does nothing for other types.
-//         * @param renderer the component to highlight
-//         * @param adapter the renderee's component state.
-//         */
-//        @Override
-//        public Component highlight(Component renderer, ComponentAdapter adapter) {
-//            //JW
-//            // table renderers have different state memory as list/tree renderers
-//            // without the null they don't unstamp!
-//            // but... null has adversory effect on JXList f.i. - selection
-//            // color is changed. This is related to #178-swingx: 
-//            // highlighter background computation is weird.
-//            // 
-//           if (renderer instanceof DefaultTableCellRenderer) {
-//                return super.highlight(renderer, adapter);
-//            } 
-//            return renderer;
-//        }
-//
-//        @Override
-//        protected void applyBackground(Component renderer, ComponentAdapter adapter) {
-//            if (!adapter.isSelected()) {
-//                Object colorMemory = ((JComponent) renderer).getClientProperty("rendererColorMemory.background");
-//                if (colorMemory instanceof ColorMemory) {
-//                    renderer.setBackground(((ColorMemory) colorMemory).color);
-//                } else {
-//                    ((JComponent) renderer).putClientProperty("rendererColorMemory.background", new ColorMemory(renderer.getBackground()));
-//                }
-//            }
-//        }
-//
-//        @Override
-//        protected void applyForeground(Component renderer, ComponentAdapter adapter) {
-//            if (!adapter.isSelected()) {
-//                Object colorMemory = ((JComponent) renderer).getClientProperty("rendererColorMemory.foreground");
-//                if (colorMemory instanceof ColorMemory) {
-//                    renderer.setForeground(((ColorMemory) colorMemory).color);
-//                } else {
-//                    ((JComponent) renderer).putClientProperty("rendererColorMemory.foreground", new ColorMemory(renderer.getForeground()));
-//                }
-//            }
-//        }
-//        
-//    };
-//    
-//    private static class ColorMemory {
-//        public ColorMemory(Color color) {
-//            this.color = color;
-//        }
-//
-//        Color color;
-//    }
 
     /** The ComponentAdapter for model data access. */
     protected ComponentAdapter dataAdapter;
