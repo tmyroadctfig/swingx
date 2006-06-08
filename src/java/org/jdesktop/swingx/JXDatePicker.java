@@ -405,6 +405,22 @@ public class JXDatePicker extends JComponent {
     }
 
     /**
+     * Returns the font that is associated with the editor of this date picker.
+     */
+    @Override
+    public Font getFont() {
+        return getEditor().getFont();
+    }
+
+    /**
+     * Set the font for the editor associated with this date picker.
+     */
+    @Override
+    public void setFont(final Font font) {
+        getEditor().setFont(font);
+    }
+
+    /**
      * Get the baseline for the specified component, or a value less
      * than 0 if the baseline can not be determined.  The baseline is measured
      * from the top of the component.
