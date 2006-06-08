@@ -84,6 +84,51 @@ public class JXTableUnitTest extends InteractiveTestCase {
         defaultToSystemLF = false;
         setSystemLF(defaultToSystemLF);
     }
+    
+    /**
+     * Issue #262-swingx: expose terminateEditOnFocusLost as property.
+     * 
+     * setting client property is reflected in getter and results in event firing.
+     *
+     */
+    public void testGetTerminateEditOnFocusLost() {
+       JXTable table = new JXTable();
+       // sanity assert: setting client property set's property
+       PropertyChangeReport report = new PropertyChangeReport();
+       table.addPropertyChangeListener(report);
+       table.putClientProperty("terminateEditOnFocusLost", !table.isTerminateEditOnFocusLost());
+       assertEquals(table.getClientProperty("terminateEditOnFocusLost"), table.isTerminateEditOnFocusLost());
+       assertEquals(1, report.getEventCount());
+       assertEquals(1, report.getEventCount("terminateEditOnFocusLost"));
+    }
+    
+
+    /**
+     * Issue #262-swingx: expose terminateEditOnFocusLost as property.
+     * 
+     * default value is true.
+     * 
+     */
+    public void testInitialTerminateEditOnFocusLost() {
+       JXTable table = new JXTable();
+       assertTrue("terminate edit must be on by default", table.isTerminateEditOnFocusLost());
+    }
+
+    /**
+     * Issue #262-swingx: expose terminateEditOnFocusLost as property.
+     * 
+     * setter is same as setting client property and results in event firing.
+     */
+    public void testSetTerminateEditOnFocusLost() {
+       JXTable table = new JXTable();
+       // sanity assert: setting client property set's property
+       PropertyChangeReport report = new PropertyChangeReport();
+       table.addPropertyChangeListener(report);
+       table.setTerminateEditOnFocusLost(!table.isTerminateEditOnFocusLost());
+       assertEquals(table.getClientProperty("terminateEditOnFocusLost"), table.isTerminateEditOnFocusLost());
+       assertEquals(1, report.getEventCount());
+       assertEquals(1, report.getEventCount("terminateEditOnFocusLost"));
+    }
 
     /**
      * sanity test while cleaning up: 

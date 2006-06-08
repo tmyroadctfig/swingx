@@ -423,6 +423,7 @@ public class JXTable extends JTable {
     protected void init() {
         setSortable(true);
         setRolloverEnabled(true);
+        setTerminateEditOnFocusLost(true);
         // guarantee getFilters() to return != null
         setFilters(null);
         initActionsAndBindings();
@@ -2900,7 +2901,34 @@ public class JXTable extends JTable {
         }
     }
 
+//----------------------------- enhanced editing support
+    
+    /**
+     * @return boolean to indicate whether an ongoing edit should be terminated
+     *    if the focus is moved to somewhere outside of the table.
+     * @see #setTerminateEditOnFocusLost(boolean)
+     */
+    public boolean isTerminateEditOnFocusLost() {
+        return Boolean.TRUE.equals(getClientProperty("terminateEditOnFocusLost"));
+    }
 
+    /**
+     * Sets the property to determine whether an ongoing edit should be terminated
+     * if the focus is moved to somewhere outside of the table. If true, terminates
+     * the edit, does nothing otherwise. The exact behaviour is implemented in 
+     * {@link JTable#CellEditorRemover}: "outside" is interpreted to be on a component
+     * which is not under the table hierarchy but inside the same toplevel window,
+     * "terminate" does so in any case, first tries to stop the edit, if that's unsuccess
+     * cancels the edit.
+     * 
+     * The default value is true.
+     * 
+     * @param terminate the flag to determine whether or not to terminate the edit
+     */
+    public void setTerminateEditOnFocusLost(boolean terminate) {
+        putClientProperty("terminateEditOnFocusLost", terminate);
+    }
+    
 // ---------------------------- updateUI support
     
     /**
