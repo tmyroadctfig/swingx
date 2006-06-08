@@ -60,8 +60,8 @@ import org.jdesktop.swingx.JXTable;
  *         public void toggleSortOrder(int column, Comparator comparator) {
  *             Sorter currentSorter = getSorter();
  *             if ((currentSorter != null)
- *                     &amp;&amp; (currentSorter.getColumnIndex() == column)
- *                     &amp;&amp; !currentSorter.isAscending()) {
+ *                     && (currentSorter.getColumnIndex() == column)
+ *                     && !currentSorter.isAscending()) {
  *                 setSorter(null);
  *             } else {
  *                 super.toggleSortOrder(column, comparator);
@@ -88,22 +88,22 @@ import org.jdesktop.swingx.JXTable;
  *  the sort control part - change notification and index mapping is left to the 
  *  enclosing FilterPipeline. 
  * 
- *  @author &lt;a href=&quot;mailto:jesse@swank.ca&quot;&gt;Jesse Wilson&lt;/a&gt;
+ *  @author <a href="mailto:jesse@swank.ca">Jesse Wilson</a>
  * 
  */
 public interface SortController {
 
     /**
-     * Toggle the specified column, if its already sorted reverse its
-     * order. If it's not already sorted, sort this column.
+     * Reverses the sort order of the specified column. 
+     * It is up to implementating classes to provide the exact behavior when invoked.
      *
      * @param column the model index of the column to toggle
      */
     void toggleSortOrder(int column);
 
     /**
-     * Toggle the specified column, if its already sorted reverse its
-     * order. If it's not already sorted, sort this column.
+     * Reverses the sort order of the specified column. 
+     * It is up to implementating classes to provide the exact behavior when invoked.
      *
      * @param column the model index of the column to toggle
      * @param comparator the comparator to use
