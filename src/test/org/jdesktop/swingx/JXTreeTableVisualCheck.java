@@ -64,10 +64,10 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Highligh.*");
          //      test.runInteractiveTests("interactive.*SortingFilter.*");
-//           test.runInteractiveTests("interactive.*Expand.*");
+           test.runInteractiveTests("interactive.*Expand.*");
 //             test.runInteractiveTests("interactive.*ToolTip.*");
 //             test.runInteractiveTests("interactive.*Edit.*");
-             test.runInteractiveTests("interactive.*Large.*");
+//             test.runInteractiveTests("interactive.*Large.*");
         } catch (Exception ex) {
 
         }
@@ -263,6 +263,43 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
             
         };
         addAction(frame, insertAction);
+        Action toggleRoot = new AbstractAction("toggle root visible") {
+            public void actionPerformed(ActionEvent e) {
+                boolean rootVisible = !tree.isRootVisible();
+                treeTable.setRootVisible(rootVisible);
+                tree.setRootVisible(rootVisible);
+            }
+            
+        };
+        addAction(frame, toggleRoot);
+        frame.setVisible(true);
+    }
+ 
+    /**
+     * Issue #254-swingx: collapseAll/expandAll behaviour depends on 
+     * root visibility (same for treeTable/tree)
+     * 
+     * initial: root not visible, all root children visible
+     *  do: collapse all - has no effect, unexpected?
+     *  do: toggle root - root and all children visible, expected
+     *  do: collapse all - only root visible, expected
+     *  do: toggle root - all nodes invisible, expected
+     *  do: expand all - still all nodes invisible, unexpected?
+     *  
+     *   
+     */
+    public void interactiveTestInsertNodeEmptyModelExpand() {
+        final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+        final InsertTreeTableModel model = new InsertTreeTableModel(root, true);
+        for (int i = 0; i < 5; i++) {
+            model.addChild(root);
+        }
+        final JXTree tree = new JXTree(model);
+        tree.setRootVisible(false);
+        final JXTreeTable treeTable = new JXTreeTable(model);
+        treeTable.setColumnControlVisible(true);
+        // treetable root invisible by default
+        JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "insert into empty model");
         Action toggleRoot = new AbstractAction("toggle root") {
             public void actionPerformed(ActionEvent e) {
                 boolean rootVisible = !tree.isRootVisible();
@@ -272,6 +309,22 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
             
         };
         addAction(frame, toggleRoot);
+        Action expandAll = new AbstractAction("expandAll") {
+            public void actionPerformed(ActionEvent e) {
+                treeTable.expandAll();
+                tree.expandAll();
+            }
+            
+        };
+        addAction(frame, expandAll);
+        Action collapseAll = new AbstractAction("collapseAll") {
+            public void actionPerformed(ActionEvent e) {
+                treeTable.collapseAll();
+                tree.collapseAll();
+            }
+            
+        };
+        addAction(frame, collapseAll);
         frame.setVisible(true);
     }
  
