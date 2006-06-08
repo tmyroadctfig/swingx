@@ -58,6 +58,8 @@ import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.RolloverHighlighter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
+import org.jdesktop.swingx.decorator.SortController;
+import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
@@ -85,7 +87,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*isable.*");
           
 //          test.runInteractiveTests("interactive.*Column.*");
-        test.runInteractiveTests("interactive.*Sort.*");
+        test.runInteractiveTests("interactive.*ToggleSort.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -99,6 +101,56 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         // super has LF specific tests...
         setSystemLF(true);
     }
+
+    /**
+     * Example: how to implement a custom toggle sort cycle.
+     * unsorted - ascending - descending - unsorted.
+     */
+    public void interactiveCustomToggleSortOrder() {
+        FilterPipeline myFilterPipeline = new CustomToggleSortOrderFP();
+        JXTable table = new JXTable(sortableTableModel);
+        table.setFilters(myFilterPipeline);
+        JXFrame frame = wrapWithScrollingInFrame(table, "Custom sort toggle");
+        frame.setVisible(true);
+        
+    }
+    /**
+     * Example: how to implement a custom toggle sort cycle.
+     * 
+     */
+    public class CustomToggleSortOrderFP extends FilterPipeline {
+
+        public CustomToggleSortOrderFP() {
+            super();
+        }
+
+        public CustomToggleSortOrderFP(Filter[] inList) {
+            super(inList);
+        }
+
+        @Override
+        protected SortController createDefaultSortController() {
+            return new CustomSortController();
+        }
+        
+        protected class CustomSortController extends SorterBasedSortController {
+
+            @Override
+            public void toggleSortOrder(int column, Comparator comparator) {
+                Sorter currentSorter = getSorter();
+                if ((currentSorter != null) && 
+                     (currentSorter.getColumnIndex() == column) &&
+                     !currentSorter.isAscending()) {
+                    setSorter(null);
+                } else {
+                    super.toggleSortOrder(column, comparator);
+                } 
+            }
+            
+        }
+    };
+    
+
 
     /**
      * Respect not-sortable column.
