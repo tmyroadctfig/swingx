@@ -35,7 +35,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     }
 
     /**
-     * #321-swingx: missing tree property toggleClickCount.
+     * #321-swingx: missing tree property toggleClickCount, largeModel.
      *
      */
     public void testToggleClickCount() {
@@ -47,6 +47,10 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         treeTable.setToggleClickCount(newClickCount);
         assertEquals("toggleClickCount must be changed", 
                 newClickCount, treeTable.getToggleClickCount());
+        boolean largeModel = treeTable.isLargeModel();
+        assertFalse("initial largeModel", largeModel);
+        treeTable.setLargeModel(!largeModel);
+        assertTrue("largeModel property must be toggled", treeTable.isLargeModel());
         
     }
     /**

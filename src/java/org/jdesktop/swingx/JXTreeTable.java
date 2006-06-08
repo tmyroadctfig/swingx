@@ -1042,6 +1042,37 @@ public class JXTreeTable extends JXTable {
         renderer.setToggleClickCount(clickCount);
     }
 
+    /**
+     * Returns true if the tree is configured for a large model.
+     * The default value is false.
+     * 
+     * @return true if a large model is suggested
+     * @see #setLargeModel
+     */
+    public boolean isLargeModel() {
+        return renderer.isLargeModel();
+    }
+
+    /**
+     * Specifies whether the UI should use a large model.
+     * (Not all UIs will implement this.) <p>
+     * 
+     * <strong>NOTE</strong>: this method is exposed for completeness - currently
+     * it's not recommended (read: it's impossible :-) 
+     * to use a large model because there are some issues 
+     * (not yet fully understood), namely
+     * issue #25-swingx, and probably #270-swingx. 
+     * 
+     * @param newValue true to suggest a large model to the UI
+     */
+    public void setLargeModel(boolean newValue) {
+        renderer.setLargeModel(newValue);
+        // JW: random method calling ... doesn't help
+//        renderer.treeDidChange();
+//        revalidate();
+//        repaint();
+    }
+
 //------------------------------ exposed tree listeners
     
     /**

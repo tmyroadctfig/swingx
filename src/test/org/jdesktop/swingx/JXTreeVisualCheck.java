@@ -24,6 +24,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.event.ActionEvent;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -41,7 +42,8 @@ import org.jdesktop.swingx.decorator.RolloverHighlighter;
 import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
 
 public class JXTreeVisualCheck extends JXTreeUnitTest {
-
+    private static final Logger LOG = Logger.getLogger(JXTreeVisualCheck.class
+            .getName());
     /**
      * visualize editing of the hierarchical column, both
      * in a tree and a xTree switching CO.

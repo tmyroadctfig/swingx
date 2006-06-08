@@ -65,12 +65,29 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //            test.runInteractiveTests("interactive.*Highligh.*");
          //      test.runInteractiveTests("interactive.*SortingFilter.*");
 //           test.runInteractiveTests("interactive.*Expand.*");
-             test.runInteractiveTests("interactive.*ToolTip.*");
+//             test.runInteractiveTests("interactive.*ToolTip.*");
+//             test.runInteractiveTests("interactive.*Edit.*");
+             test.runInteractiveTests("interactive.*Large.*");
         } catch (Exception ex) {
 
         }
     }
 
+    public void interactiveLargeModel() {
+        final JXTreeTable treeTable = new JXTreeTable(treeTableModel);
+        ToolTipManager.sharedInstance().unregisterComponent(treeTable);
+        Action action = new AbstractAction("toggle largeModel") {
+
+            public void actionPerformed(ActionEvent e) {
+                treeTable.setLargeModel(!treeTable.isLargeModel());
+               
+            }
+            
+        };
+        JXFrame frame = wrapWithScrollingInFrame(treeTable, "large model");
+        addAction(frame, action);
+        frame.setVisible(true);
+    }
     /**
      * issue #296-swingx: expose scrollPathToVisible in JXTreeTable.
      * 
