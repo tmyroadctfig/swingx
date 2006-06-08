@@ -35,6 +35,21 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     }
 
     /**
+     * #321-swingx: missing tree property toggleClickCount.
+     *
+     */
+    public void testToggleClickCount() {
+        JXTreeTable treeTable = new JXTreeTable(simpleTreeTableModel);
+        int clickCount = treeTable.getToggleClickCount();
+        // asserting documented default clickCount == 2
+        assertEquals("default clickCount", 2, clickCount);
+        int newClickCount = clickCount + 1;
+        treeTable.setToggleClickCount(newClickCount);
+        assertEquals("toggleClickCount must be changed", 
+                newClickCount, treeTable.getToggleClickCount());
+        
+    }
+    /**
      * Issue #168-jdnc: dnd enabled breaks node collapse/expand.
      * testing auto-detection of dragHackEnabled.
      * 

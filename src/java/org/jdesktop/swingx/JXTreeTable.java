@@ -811,33 +811,6 @@ public class JXTreeTable extends JXTable {
 
     
     /**
-     * Determines whether or not the root node from the TreeModel is visible.
-     *
-     * @param visible true, if the root node is visible; false, otherwise
-     */
-    public void setRootVisible(boolean visible) {
-        renderer.setRootVisible(visible);
-        // JW: the revalidate forces the root to appear after a 
-        // toggling a visible from an initially invisible root.
-        // JTree fires a propertyChange on the ROOT_VISIBLE_PROPERTY
-        // BasicTreeUI reacts by (ultimately) calling JTree.treeDidChange
-        // which revalidate the tree part. 
-        // Might consider to listen for the propertyChange (fired only if there
-        // actually was a change) instead of revalidating unconditionally.
-        revalidate();
-        repaint();
-    }
-
-    /**
-     * Returns true if the root node of the tree is displayed.
-     *
-     * @return true if the root node of the tree is displayed
-     */
-    public boolean isRootVisible() {
-        return renderer.isRootVisible();
-    }
-
-    /**
      * Returns true if the value identified by path is currently viewable, which
      * means it is either the root or all of its parents are expanded. Otherwise,
      * this method returns false.
@@ -920,25 +893,6 @@ public class JXTreeTable extends JXTable {
 
     
     /**
-     * Sets the value of the <code>expandsSelectedPaths</code> property for the tree
-     * part. This property specifies whether the selected paths should be expanded.
-     *
-     * @param expand true, if selected paths should be expanded; false, otherwise
-     */
-    public void setExpandsSelectedPaths(boolean expand) {
-        renderer.setExpandsSelectedPaths(expand);
-    }
-
-    /**
-     * Returns the value of the <code>expandsSelectedPaths</code> property.
-     *
-     * @return the value of the <code>expandsSelectedPaths</code> property
-     */
-    public boolean getExpandsSelectedPaths() {
-        return renderer.getExpandsSelectedPaths();
-    }
-
-    /**
      * Returns the TreePath for a given x,y location.
      *
      * @param x x value
@@ -974,6 +928,36 @@ public class JXTreeTable extends JXTable {
      public int getRowForPath(TreePath path) {
        return renderer.getRowForPath(path);
      }
+
+//------------------------------ exposed Tree properties
+
+     /**
+      * Determines whether or not the root node from the TreeModel is visible.
+      *
+      * @param visible true, if the root node is visible; false, otherwise
+      */
+     public void setRootVisible(boolean visible) {
+         renderer.setRootVisible(visible);
+         // JW: the revalidate forces the root to appear after a 
+         // toggling a visible from an initially invisible root.
+         // JTree fires a propertyChange on the ROOT_VISIBLE_PROPERTY
+         // BasicTreeUI reacts by (ultimately) calling JTree.treeDidChange
+         // which revalidate the tree part. 
+         // Might consider to listen for the propertyChange (fired only if there
+         // actually was a change) instead of revalidating unconditionally.
+         revalidate();
+         repaint();
+     }
+
+     /**
+      * Returns true if the root node of the tree is displayed.
+      *
+      * @return true if the root node of the tree is displayed
+      */
+     public boolean isRootVisible() {
+         return renderer.isRootVisible();
+     }
+
 
     /**
      * Sets the value of the <code>scrollsOnExpand</code> property for the tree
@@ -1019,6 +1003,47 @@ public class JXTreeTable extends JXTable {
         return renderer.getShowsRootHandles();
     }
 
+    /**
+     * Sets the value of the <code>expandsSelectedPaths</code> property for the tree
+     * part. This property specifies whether the selected paths should be expanded.
+     *
+     * @param expand true, if selected paths should be expanded; false, otherwise
+     */
+    public void setExpandsSelectedPaths(boolean expand) {
+        renderer.setExpandsSelectedPaths(expand);
+    }
+
+    /**
+     * Returns the value of the <code>expandsSelectedPaths</code> property.
+     *
+     * @return the value of the <code>expandsSelectedPaths</code> property
+     */
+    public boolean getExpandsSelectedPaths() {
+        return renderer.getExpandsSelectedPaths();
+    }
+
+
+    /**
+     * Returns the number of mouse clicks needed to expand or close a node.
+     *
+     * @return number of mouse clicks before node is expanded
+     */
+    public int getToggleClickCount() {
+        return renderer.getToggleClickCount();
+    }
+
+    /**
+     * Sets the number of mouse clicks before a node will expand or close.
+     * The default is two. 
+     *
+     * @param clickCount the number of clicks required to expand/collapse a node.
+     */
+    public void setToggleClickCount(int clickCount) {
+        renderer.setToggleClickCount(clickCount);
+    }
+
+//------------------------------ exposed tree listeners
+    
     /**
      * Adds a listener for <code>TreeExpansion</code> events.
      * 
