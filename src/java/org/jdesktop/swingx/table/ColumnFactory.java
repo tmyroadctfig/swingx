@@ -72,6 +72,7 @@ import org.jdesktop.swingx.JXTable;
  */
 public class ColumnFactory {
     
+    
     private static ColumnFactory columnFactory;
     
     public static synchronized ColumnFactory getInstance() {
@@ -84,6 +85,8 @@ public class ColumnFactory {
     public static synchronized void  setInstance(ColumnFactory factory) {
         columnFactory = factory;
     }
+
+    private int packMargin = 4;
     
     /**
      * Creates a table column with modelIndex.
@@ -176,9 +179,13 @@ public class ColumnFactory {
      * Here: basically loops through all rows of the given column and measures
      * the renderers pref width. This is a potential performance sink.
      * 
+     * PENDING (JW): though 2 * margin is added as spacing, this does not really mean a
+     * left/right symmetry - it's up to the table to place the renderer which it 
+     * controlled by the intercellspacing.
+     * 
      * @param table the context the column will live in.
      * @param columnExt the Tablecolumn to configure.
-     * @param margin the spacing to add left/right 
+     * @param margin the spacing to add left/right, if -1 uses this factories default 
      * @param max an upper limit to prefWidth, -1 is interpreted as no limit
      */
     public void packColumn(JXTable table, TableColumnExt columnExt, int margin, int max) {
@@ -201,6 +208,9 @@ public class ColumnFactory {
                     table.getValueAt(r, column), false, false, r, column);
             width = Math.max(width, comp.getPreferredSize().width);
         }
+        if (margin < 0) {
+            margin = getDefaultPackMargin();
+        }
         width += 2 * margin;
 
         /* Check if the width exceeds the max */
@@ -210,4 +220,21 @@ public class ColumnFactory {
         columnExt.setPreferredWidth(width);
         
     }
+    
+//------------------------ default state
+    
+    /**
+     * @return the default pack margin to use in packColumn.
+     */
+    public int getDefaultPackMargin() {
+        return packMargin;
+    }
+    
+    /**
+     * 
+     */
+    public void setDefaultPackMargin(int margin) {
+        this.packMargin = margin;
+    }
+    
 }

@@ -843,7 +843,7 @@ public class JXTable extends JTable {
      * triggered by the "packAll" BoundAction on the table as well.
      */
     public void packAll() {
-        packTable(getDefaultPackMargin());
+        packTable(-1);
     }
 
     /**
@@ -855,7 +855,7 @@ public class JXTable extends JTable {
     public void packSelected() {
         int selected = getColumnModel().getSelectionModel().getLeadSelectionIndex();
         if (selected >= 0) {
-            packColumn(selected, getDefaultPackMargin());
+            packColumn(selected, -1);
         }
     }
 
@@ -882,11 +882,6 @@ public class JXTable extends JTable {
     /** Returns the current setting for horizontal scrolling. */
     private boolean isHorizontalScrollEnabled() {
         return getAutoResizeMode() == AUTO_RESIZE_OFF;
-    }
-
-    /** Returns the default margin for packing columns. */
-    private int getDefaultPackMargin() {
-        return 4;
     }
 
     /** Notifies the table that a new column has been selected. 
