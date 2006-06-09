@@ -203,10 +203,21 @@ public class JXTree extends JTree {
     }
 
     /**
-     * widened access for testing
+     * Tries to find and return a method for Object --> to String conversion on the
+     * model by reflection. Looks for a signature:
      * 
-     * @param model
-     * @return
+     * <pre> <code>
+     *   String convertValueToText(Object);
+     * </code> </pre>
+     * 
+     * 
+     * 
+     * PENDING JW: check - does this work with restricted permissions?
+     * JW: widened access for testing - do test!
+     * 
+     * @param model the model to detect the method
+     * @return the <code> Method </code> or null if the model has no method with
+     *   the expected signature 
      */
     protected Method getValueConversionMethod(TreeModel model) {
         try {
@@ -219,6 +230,7 @@ public class JXTree extends JTree {
         return null;
     }
 
+    
     @Override
     public String convertValueToText(Object value, boolean selected,
             boolean expanded, boolean leaf, int row, boolean hasFocus) {

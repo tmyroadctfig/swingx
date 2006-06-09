@@ -172,7 +172,7 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * JXTable guarantees to delegate creation and configuration of TableColumnExt 
  * to a ColumnFactory. By default, the application-wide shared ColumnFactory is used.
  * You can install a custom ColumnFactory, either application-wide by 
- * {@link CustomFactory.setInstance(ColumnFactory)} or per table instance by 
+ * {@link ColumnFactory#setInstance(ColumnFactory)} or per table instance by 
  * {@link #setColumnFactory(ColumnFactory)}. 
  * 
  * <p>
@@ -2272,7 +2272,9 @@ public class JXTable extends JTable {
 
     
 //----------------------------------- uniform data model access
-    
+    /**
+     * @return the unconfigured ComponentAdapter.
+     */
     protected ComponentAdapter getComponentAdapter() {
         if (dataAdapter == null) {
             dataAdapter = new TableAdapter(this);
@@ -2285,7 +2287,7 @@ public class JXTable extends JTable {
      * 
      * @param row the row index in view coordinates.
      * @param column the column index in view coordinates.
-     * @return
+     * @return the configured ComponentAdapter.
      */
     protected ComponentAdapter getComponentAdapter(int row, int column) {
         ComponentAdapter adapter = getComponentAdapter();
@@ -2916,7 +2918,7 @@ public class JXTable extends JTable {
      * Sets the property to determine whether an ongoing edit should be terminated
      * if the focus is moved to somewhere outside of the table. If true, terminates
      * the edit, does nothing otherwise. The exact behaviour is implemented in 
-     * {@link JTable#CellEditorRemover}: "outside" is interpreted to be on a component
+     * <code>JTable.CellEditorRemover</code>: "outside" is interpreted to be on a component
      * which is not under the table hierarchy but inside the same toplevel window,
      * "terminate" does so in any case, first tries to stop the edit, if that's unsuccess
      * cancels the edit.
