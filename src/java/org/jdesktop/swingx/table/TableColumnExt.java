@@ -348,10 +348,24 @@ public class TableColumnExt extends TableColumn
          copy.setVisible(this.isVisible());
          copy.setSortable(this.isSortable());
          copy.setComparator(getComparator());
+         copyClientPropertiesTo(copy);
          return copy;
      }
 
-     protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+     /**
+      * copies all clientProperties of this TableColumn to the target
+      * column.
+      * 
+      * @param copy the target column.
+      */
+     protected void copyClientPropertiesTo(TableColumnExt copy) {
+        if (clientProperties == null) return;
+        for(Object key: clientProperties.keySet()) {
+            copy.putClientProperty(key, getClientProperty(key));
+        }
+    }
+
+    protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
          if ((oldValue != null && !oldValue.equals(newValue)) ||
               oldValue == null && newValue != null) {
              PropertyChangeListener pcl[] = getPropertyChangeListeners();
