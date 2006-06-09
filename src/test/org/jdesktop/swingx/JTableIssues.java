@@ -146,6 +146,28 @@ public class JTableIssues extends InteractiveTestCase {
 //---------------------- unit tests 
     
     /**
+     * isCellEditable is doc'ed as: if false, setValueAt 
+     * will have no effect.
+     * 
+     * 
+     */
+    public void testSetValueDoNothing() {
+        JTable table = new JTable(10, 3) {
+
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+            
+        };
+        Object value = table.getValueAt(0, 0);
+        // sanity...
+        assertFalse(table.isCellEditable(0, 0));
+        table.setValueAt("wrong", 0, 0);
+        assertEquals("value must not be changed", value, table.getValueAt(0, 0));
+    }
+    
+    /**
      * Issue #272-swingx: inserted row is selected.
      * Not a bug: documented behaviour of DefaultListSelectionModel.
      *

@@ -329,6 +329,9 @@ public class JXTable extends JTable {
 
     private boolean fillsViewportHeight;
 
+
+    private boolean editable;
+
     /** Instantiates a JXTable with a default table model, no data. */
     public JXTable() {
         init();
@@ -421,6 +424,7 @@ public class JXTable extends JTable {
      * 
      */
     protected void init() {
+        setEditable(true);
         setSortable(true);
         setRolloverEnabled(true);
         setTerminateEditOnFocusLost(true);
@@ -960,6 +964,7 @@ public class JXTable extends JTable {
     }
 
     /**
+     * Overridden to account for row index mapping. 
      * {@inheritDoc}
      */
     @Override
@@ -969,21 +974,29 @@ public class JXTable extends JTable {
     }
 
     /**
+     * Overridden to account for row index mapping. This implementation 
+     * respects {@link #isCellEditable(int, int)} as documented in
+     * {@link JTable#isCellEditable(int, int)}: it has no effect if 
+     * the cell is not editable. 
+     * 
      * {@inheritDoc}
      */
     @Override
     public void setValueAt(Object aValue, int row, int column) {
+        if (!isCellEditable(row, column)) return;
         getModel().setValueAt(aValue, convertRowIndexToModel(row),
                 convertColumnIndexToModel(column));
     }
 
     /**
      * Overridden to account for row index mapping and to respect
-     * {@link TableColumnExt#isEditable()} property.
+     * both {@link #isEditable()} and {@link TableColumnExt#isEditable()} property.
+     * 
      * {@inheritDoc}
      */
     @Override
     public boolean isCellEditable(int row, int column) {
+        if (!isEditable()) return false;
         boolean editable = getModel().isCellEditable(convertRowIndexToModel(row),
                 convertColumnIndexToModel(column));
         if (editable) {
@@ -2906,6 +2919,24 @@ public class JXTable extends JTable {
 //----------------------------- enhanced editing support
     
     /**
+     * @return boolean to indicate if the table is editable.
+     */
+    public boolean isEditable() {
+        return editable;
+    }
+    
+    /**
+     * Sets the editable property. If false, all cells are not editable.
+     * 
+     * 
+     * @param editable the flag to indicate if the table is editable.
+     */
+    public void setEditable(boolean editable) {
+        boolean old = isEditable();
+        this.editable = editable;
+        firePropertyChange("editable", old, isEditable());
+    }
+    /**
      * @return boolean to indicate whether an ongoing edit should be terminated
      *    if the focus is moved to somewhere outside of the table.
      * @see #setTerminateEditOnFocusLost(boolean)
@@ -2930,6 +2961,7 @@ public class JXTable extends JTable {
     public void setTerminateEditOnFocusLost(boolean terminate) {
         putClientProperty("terminateEditOnFocusLost", terminate);
     }
+    
     
 // ---------------------------- updateUI support
     

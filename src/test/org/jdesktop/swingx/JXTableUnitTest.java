@@ -86,6 +86,47 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
     
     /**
+     * add editable property.
+     *
+     */
+    public void testEditable() {
+        JXTable table = new JXTable(10, 2);
+        assertTrue("default editable must be true", table.isEditable());
+        PropertyChangeReport report = new PropertyChangeReport();
+        table.addPropertyChangeListener(report);
+        table.setEditable(!table.isEditable());
+        assertFalse("editable must be toggled to false", table.isEditable());
+        assertEquals(1, report.getEventCount());
+        assertEquals(1, report.getEventCount("editable"));
+    }
+    
+    /**
+     * test effect of editable on cell editing.
+     *
+     */
+    public void testCellEditable() {
+        JXTable table = new JXTable(10, 2);
+        assertTrue("default table editable must be true", table.isEditable());
+        assertTrue("default cell editable must be true", table.isCellEditable(0, 0));
+        table.setEditable(!table.isEditable());
+        assertFalse("editable must be toggled to false", table.isEditable());
+        assertFalse("each cell must be not editable", table.isCellEditable(0, 0));
+    }
+    
+    /**
+     * 
+     */
+    public void testSetValueCellNotEditable() {
+        JXTable table = new JXTable(10, 2);
+        Object value = table.getValueAt(0, 0);
+        table.setEditable(false);
+        // sanity...
+        assertFalse("each cell must be not editable", table.isCellEditable(0, 0));
+        table.setValueAt("wrong", 0, 0);
+        assertEquals("cell value must not be changed", value, table.getValueAt(0, 0));
+        
+    }
+    /**
      * Issue #262-swingx: expose terminateEditOnFocusLost as property.
      * 
      * setting client property is reflected in getter and results in event firing.
