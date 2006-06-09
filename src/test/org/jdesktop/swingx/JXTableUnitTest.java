@@ -27,6 +27,7 @@ import javax.swing.DefaultListSelectionModel;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
@@ -83,6 +84,23 @@ public class JXTableUnitTest extends InteractiveTestCase {
         // make sure we have the same default for each test
         defaultToSystemLF = false;
         setSystemLF(defaultToSystemLF);
+    }
+
+    /**
+     * expose JTable.autoStartsEdit.
+     *
+     */
+    public void testAutoStartEdit() {
+        JXTable table = new JXTable(10, 2);
+        assertTrue(table.isAutoStartEditOnKeyStroke());
+        PropertyChangeReport report = new PropertyChangeReport();
+        table.addPropertyChangeListener(report);
+        table.setAutoStartEditOnKeyStroke(false);
+        assertFalse("autoStart must be toggled to false", table.isAutoStartEditOnKeyStroke());
+        // the following assumption is wrong because the old client property key is
+        // different from the method name, leading to two events fired.
+        // assertEquals(1, report.getEventCount());
+        assertEquals(1, report.getEventCount("autoStartEditOnKeyStroke"));
     }
     
     /**
@@ -169,6 +187,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
        assertEquals(table.getClientProperty("terminateEditOnFocusLost"), table.isTerminateEditOnFocusLost());
        assertEquals(1, report.getEventCount());
        assertEquals(1, report.getEventCount("terminateEditOnFocusLost"));
+       assertEquals(Boolean.FALSE, report.getLastNewValue("terminateEditOnFocusLost"));
     }
 
     /**

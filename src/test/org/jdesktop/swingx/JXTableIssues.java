@@ -41,6 +41,7 @@ import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.util.AncientSwingTeam;
+import org.jdesktop.swingx.util.PropertyChangeReport;
 
 /**
  * @author Jeanette Winzenburg
@@ -55,6 +56,25 @@ public class JXTableIssues extends InteractiveTestCase {
         // TODO Auto-generated constructor stub
     }
 
+    /**
+     * we have a slight inconsistency in event values: setting the
+     * client property to null means "false" but the event fired
+     * has the newValue null.
+     *
+     * The way out is to _not_ set the client prop manually, always go
+     * through the property setter.
+     */
+    public void testClientPropertyNull() {
+        JXTable table = new JXTable();
+        // sanity assert: setting client property set's property
+        PropertyChangeReport report = new PropertyChangeReport();
+        table.addPropertyChangeListener(report);
+        table.putClientProperty("terminateEditOnFocusLost", null);
+        assertFalse(table.isTerminateEditOnFocusLost());
+        assertEquals(1, report.getEventCount());
+        assertEquals(1, report.getEventCount("terminateEditOnFocusLost"));
+        assertEquals(false, report.getLastNewValue("terminateEditOnFocusLost"));
+    }
     /**
      * JXTable has responsibility to guarantee usage of 
      * TableColumnExt comparator and update the sort if

@@ -2959,9 +2959,37 @@ public class JXTable extends JTable {
      * @param terminate the flag to determine whether or not to terminate the edit
      */
     public void setTerminateEditOnFocusLost(boolean terminate) {
+        // JW: we can leave the propertyChange notification to the 
+        // putClientProperty - the key and method name are the same
         putClientProperty("terminateEditOnFocusLost", terminate);
     }
     
+    /**
+     * 
+     * @return boolean to indicate whether a keyStroke should try to
+     *   start editing.
+     * @see #setAutoStartEditOnKeyStroke(boolean)   
+     */
+    public boolean isAutoStartEditOnKeyStroke() {
+        return !Boolean.FALSE.equals(getClientProperty("JTable.autoStartsEdit"));
+    }
+    
+    /**
+     * Sets the autoStartsEdit property. If true, keystrokes are passed-on to
+     * the cellEditor of the lead cell to let it decide whether to start an edit.
+     * 
+     * @param autoStart boolean to determine whether a keyStroke should
+     *   try to start editing.
+     */
+    public void setAutoStartEditOnKeyStroke(boolean autoStart) {
+        boolean old = isAutoStartEditOnKeyStroke();
+        // JW: we have to take over propertyChange notification 
+        // because the key and method name are different.
+        // As a consequence, there are two events fired: one for
+        // the client prop and one for this method.
+        putClientProperty("JTable.autoStartsEdit", autoStart);
+        firePropertyChange("autoStartEditOnKeyStroke", old, isAutoStartEditOnKeyStroke());
+    }
     
 // ---------------------------- updateUI support
     
