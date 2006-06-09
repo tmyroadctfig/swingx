@@ -27,6 +27,7 @@ import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.Icon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -87,7 +88,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*isable.*");
           
 //          test.runInteractiveTests("interactive.*Column.*");
-        test.runInteractiveTests("interactive.*ToggleSort.*");
+        test.runInteractiveTests("interactive.*Toggle.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -102,6 +103,37 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         setSystemLF(true);
     }
 
+    /**
+     * visually check if terminateEditOnFocusLost, autoStartEdit
+     * work as expected.
+     *
+     */
+    public void interactiveToggleEditProperties() {
+        final JXTable table = new JXTable(10, 2);
+        JXFrame frame = wrapWithScrollingInFrame(table, new JButton("something to focus"), 
+                "JXTable: toggle terminate/autoStart on left (right is dummy) ");
+        Action toggleTerminate = new AbstractAction("toggleTerminate") {
+
+            public void actionPerformed(ActionEvent e) {
+                table.setTerminateEditOnFocusLost(!table.isTerminateEditOnFocusLost());
+                
+            }
+            
+        };
+        addAction(frame, toggleTerminate);
+        Action toggleAutoStart = new AbstractAction("toggleAutoStart") {
+
+            public void actionPerformed(ActionEvent e) {
+                table.setAutoStartEditOnKeyStroke(!table.isAutoStartEditOnKeyStroke());
+                
+            }
+            
+        };
+        addAction(frame, toggleAutoStart);
+        frame.setVisible(true);
+        
+    }
+    
     /**
      * Example: how to implement a custom toggle sort cycle.
      * unsorted - ascending - descending - unsorted.

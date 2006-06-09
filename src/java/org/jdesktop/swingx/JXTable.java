@@ -2977,6 +2977,8 @@ public class JXTable extends JTable {
     /**
      * Sets the autoStartsEdit property. If true, keystrokes are passed-on to
      * the cellEditor of the lead cell to let it decide whether to start an edit.
+     * <p>
+     * The default value is true.
      * 
      * @param autoStart boolean to determine whether a keyStroke should
      *   try to start editing.
