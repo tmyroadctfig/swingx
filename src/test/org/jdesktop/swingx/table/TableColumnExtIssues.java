@@ -22,17 +22,6 @@ public class TableColumnExtIssues extends TestCase {
         tableColumn.setHeaderValue("someheader");
         assertEquals(1, report.getEventCount("headerValue"));
     }
-    /**
-     * Client properties not preserved when cloning.
-     *
-     */
-    public void testClientPropertyClone() {
-        TableColumnExt column = new TableColumnExt(0);
-        String key = "property";
-        column.putClientProperty(key, new Object());
-        TableColumnExt cloned = (TableColumnExt) column.clone();
-        assertNotNull("client property must be in cloned", cloned.getClientProperty(key));
-    }
     
 
 }

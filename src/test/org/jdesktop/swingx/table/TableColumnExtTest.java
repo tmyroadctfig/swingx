@@ -149,4 +149,18 @@ public class TableColumnExtTest extends TestCase {
         assertTrue("min < max", clone.getMinWidth() < clone.getMaxWidth());
         assertTrue("cloned base resizable", clone.getResizable());
     }
+    /**
+     * Issue #39-swingx:
+     * Client properties not preserved when cloning.
+     *
+     */
+    public void testClientPropertyClone() {
+        TableColumnExt column = new TableColumnExt(0);
+        String key = "property";
+        Object value = new Object();
+        column.putClientProperty(key, value);
+        TableColumnExt cloned = (TableColumnExt) column.clone();
+        assertEquals("client property must be in cloned", value, cloned.getClientProperty(key));
+    }
+
 }
