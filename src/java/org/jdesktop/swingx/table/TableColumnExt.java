@@ -220,11 +220,11 @@ public class TableColumnExt extends TableColumn
     /**
      * Sets the text of the ToolTip for this column. 
      * 
-     * @param the text to show.
+     * @param toolTipText text to show.
      */
-    public void setToolTipText(String toolTip) {
+    public void setToolTipText(String toolTipText) {
         String old = getToolTipText();
-        this.toolTipText = toolTip;
+        this.toolTipText = toolTipText;
         firePropertyChange("toolTipText", old, getToolTipText());
         
     }
