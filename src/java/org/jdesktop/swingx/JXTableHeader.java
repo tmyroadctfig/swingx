@@ -32,6 +32,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
+import org.jdesktop.swingx.table.TableColumnExt;
 
 /**
  * TableHeader with extended functionality if associated Table is of
@@ -78,6 +79,32 @@ public class JXTableHeader extends JTableHeader {
         }
     }
 
+    /**
+     * overridden to respect the column tooltip, if available. 
+     * 
+     * @return the column tooltip of the column at the mouse position 
+     *   if not null or super if not available.
+     */
+    @Override
+    public String getToolTipText(MouseEvent event) {
+        String columnToolTipText = getColumnToolTipText(event);
+        return columnToolTipText != null ? columnToolTipText : super.getToolTipText(event);
+    }
+
+    /**
+     * 
+     * @param event the mouseEvent representing the mouse location.
+     * @return the column tooltip of the column below the mouse location,
+     *   or null if not available.
+     */
+    protected String getColumnToolTipText(MouseEvent event) {
+        if (getXTable() == null) return null;
+        int column = columnAtPoint(event.getPoint());
+        if (column < 0) return null;
+        TableColumnExt columnExt = getXTable().getColumnExt(column);
+        return columnExt != null ? columnExt.getToolTipText() : null;
+    }
+    
     public JXTable getXTable() {
         if (!(getTable() instanceof JXTable))
             return null;

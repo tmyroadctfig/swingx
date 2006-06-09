@@ -18,6 +18,28 @@ import org.jdesktop.swingx.util.PropertyChangeReport;
  */
 public class TableColumnExtTest extends TestCase {
 
+    /**
+     * Issue #154-swingx.
+     * 
+     * added property headerTooltip.
+     *
+     */
+    public void testHeaderTooltip() {
+        TableColumnExt columnExt = new TableColumnExt();
+        columnExt.setTitle("mytitle");
+        assertNull("tooltip is null initially", columnExt.getToolTipText());
+        String toolTip = "some column text";
+        PropertyChangeReport report = new PropertyChangeReport();
+        columnExt.addPropertyChangeListener(report);
+        columnExt.setToolTipText(toolTip);
+        assertEquals(toolTip, columnExt.getToolTipText());
+        assertEquals("must have fired one propertyChangeEvent for toolTipText ", 
+                1, report.getEventCount("toolTipText"));
+        TableColumnExt cloned = (TableColumnExt) columnExt.clone();
+        assertEquals("tooltip property must be cloned", columnExt.getToolTipText(),
+                cloned.getToolTipText());
+    }
+    
     public void testSortable() {
         TableColumnExt columnExt = new TableColumnExt();
         boolean sortable = columnExt.isSortable();

@@ -27,6 +27,7 @@ import java.util.Hashtable;
 
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 
 /**
  * TableColumn extension which adds support for view column configuration features
@@ -36,18 +37,19 @@ import javax.swing.table.TableCellRenderer;
  * @author Amy Fowler
  * @author Jeanette Winzenburg
  */
-public class TableColumnExt extends javax.swing.table.TableColumn
+public class TableColumnExt extends TableColumn
     implements Cloneable {
 
     protected boolean editable = true;
     protected boolean visible = true;
     protected Object prototypeValue = null;
 
-    private Hashtable clientProperties = null;
+    protected Hashtable clientProperties = null;
 
     /** the comparator to use for this column */
     protected Comparator comparator;
-    private boolean sortable = true;
+    protected boolean sortable = true;
+    private String toolTipText;
     
 
     /**
@@ -205,6 +207,27 @@ public class TableColumnExt extends javax.swing.table.TableColumn
         this.sortable = sortable;
         firePropertyChange("sortable", old, isSortable());
     }
+ 
+    /**
+     * 
+     * @return the text of the ToolTip for this column.
+     * @see #setToolTipText(String)
+     */
+    public String getToolTipText() {
+        return toolTipText;
+    }
+    
+    /**
+     * Sets the text of the ToolTip for this column. 
+     * 
+     * @param the text to show.
+     */
+    public void setToolTipText(String toolTip) {
+        String old = getToolTipText();
+        this.toolTipText = toolTip;
+        firePropertyChange("toolTipText", old, getToolTipText());
+        
+    }
     
     /**
      * Sets the title of this view column.  This is a convenience
@@ -314,6 +337,7 @@ public class TableColumnExt extends javax.swing.table.TableColumn
 
          copy.setEditable(this.isEditable());
          copy.setHeaderValue(this.getHeaderValue());	// no need to copy setTitle();
+         copy.setToolTipText(getToolTipText());
          copy.setIdentifier(this.getIdentifier());
          copy.setMaxWidth(this.getMaxWidth());
          copy.setMinWidth(this.getMinWidth());
