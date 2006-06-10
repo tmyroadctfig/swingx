@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.Collator;
 import java.util.Collections;
 
 import javax.swing.AbstractAction;
@@ -41,6 +42,8 @@ import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.decorator.Sorter;
+import org.jdesktop.swingx.table.TableColumnExt;
+import org.jdesktop.swingx.util.AncientSwingTeam;
 
 /**
  * Testing JXList.
@@ -49,10 +52,62 @@ import org.jdesktop.swingx.decorator.Sorter;
  */
 public class JXListTest extends InteractiveTestCase {
 
-    private ListModel listModel;
+    protected ListModel listModel;
     protected DefaultListModel ascendingListModel;
 
 
+    /**
+     * added xtable.setSortOrder(int, SortOrder)
+     * 
+     */
+    public void testSetSortOrder() {
+        JXList list = new JXList(ascendingListModel);
+        list.setFilterEnabled(true);
+        list.setSortOrder(SortOrder.ASCENDING);
+        assertEquals("column must be sorted after setting sortOrder on ", SortOrder.ASCENDING, list.getSortOrder());
+    }
+    
+    /**
+     * JXList has responsibility to guarantee usage of 
+     * its comparator.
+     * TODO not yet implemented
+     */
+    public void testComparatorToPipeline() {
+        JXList list = new JXList(ascendingListModel);
+        list.setFilterEnabled(true);
+//        list.setComparator(Collator.getInstance());
+//        list.toggleSortOrder();
+//        SortKey sortKey = SortKey.getFirstSortKeyForColumn(list.getFilters().getSortController().getSortKeys(), 0);
+//        assertNotNull(sortKey);
+//        assertEquals(list.getComparator(), sortKey.getComparator());
+    }
+
+    /**
+     * testing new sorter api: 
+     * getSortOrder(), toggleSortOrder(), resetSortOrder().
+     *
+     */
+    public void testToggleSortOrder() {
+        JXList list = new JXList(ascendingListModel);
+        list.setFilterEnabled(true);
+        assertSame(SortOrder.UNSORTED, list.getSortOrder());
+        list.toggleSortOrder();
+        assertSame(SortOrder.ASCENDING, list.getSortOrder());
+        list.toggleSortOrder();
+        assertSame(SortOrder.DESCENDING, list.getSortOrder());
+        list.resetSortOrder();
+        assertSame(SortOrder.UNSORTED, list.getSortOrder());
+    }
+
+    /**
+     * prepare sort testing: internal probs with SortController?
+     */
+    public void testSortController() {
+        JXList list = new JXList(ascendingListModel);
+        list.setFilterEnabled(true);
+        assertNotNull("sortController must be initialized", list.getSortController());
+    }
+    
     /**
      * Issue #232-swingx: selection not kept if selectionModel had been changed.
      *
@@ -295,131 +350,19 @@ public class JXListTest extends InteractiveTestCase {
         
     }
 
-    /**
-     * Issue #2-swinglabs: setting filter if not enabled throws exception on selection.
-     * Reported by Kim.
-     * 
-     * Fix: should not accept filter if not enabled.
-     *
-     */
-    public void interactiveTestFilterDisabled() {
-        JXList list = new JXList();
-        list.setModel(ascendingListModel);
-        Filter[] filter = new Filter[] { new PatternFilter("1", 0, 0) };
-        list.setFilters(new FilterPipeline(filter));
-        JXFrame frame = wrapWithScrollingInFrame(list, "filter disabled");
-        frame.setVisible(true);
-    }
-    
-    public void interactiveTestSorter() {
-        JXList list = new JXList();
-        list.setFilterEnabled(true);
-        list.setModel(ascendingListModel);
-//        final Sorter sorter = new ShuttleSorter(0, false);
-        final FilterPipeline pipeline = list.getFilters();
-        SortKey sortKey = new SortKey(SortOrder.DESCENDING, 0);
-        pipeline.getSortController().setSortKeys(Collections.singletonList(sortKey ));
-        Action action = new AbstractAction("Toggle Sort Order") {
-
-            public void actionPerformed(ActionEvent e) {
-                pipeline.getSortController().toggleSortOrder(0);
-                
-            }
-            
-        };
-        JXFrame frame = wrapWithScrollingInFrame(list, "Toggle sorter");
-        addAction(frame, action);
-        frame.setVisible(true);
-        
-    }
-    
-    public void interactiveTestCompareFocusedCellBackground() {
-        JXList xlist = new JXList(listModel);
-        xlist.setBackground(new Color(0xF5, 0xFF, 0xF5));
-        JList list = new JList(listModel);
-        list.setBackground(new Color(0xF5, 0xFF, 0xF5));
-        JFrame frame = wrapWithScrollingInFrame(xlist, list, "unselectedd focused background: JXList/JList");
-        frame.setVisible(true);
-    }
-
-    public void interactiveTestTablePatternFilter5() {
-        JXList list = new JXList(listModel);
-        String pattern = "Row";
-        list.setHighlighters(new HighlighterPipeline(new Highlighter[] {
-            new PatternHighlighter(null, Color.red, pattern, 0, 1),
-        }));
-        JFrame frame = wrapWithScrollingInFrame(list, "PatternHighlighter: " + pattern);
-        frame.setVisible(true);
-    }
-
-    public void interactiveTestTableAlternateHighlighter1() {
-        JXList list = new JXList(listModel);
-        list.setHighlighters(new HighlighterPipeline(new Highlighter[] {
-            AlternateRowHighlighter.
-            linePrinter,
-        }));
-
-        JFrame frame = wrapWithScrollingInFrame(list, "AlternateRowHighlighter - lineprinter");
-        frame.setVisible(true);
-    }
-
-    public void interactiveTestRolloverHighlight() {
-        JXList list = new JXList(listModel);
-    //    table.setLinkVisitor(new EditorPaneLinkVisitor());
-        list.setRolloverEnabled(true);
-        Highlighter conditional = new ConditionalHighlighter(
-                new Color(0xF0, 0xF0, 0xE0), null, -1, -1) {
-
-            protected boolean test(ComponentAdapter adapter) {
-                Point p = (Point) adapter.getComponent().getClientProperty(RolloverProducer.ROLLOVER_KEY);
-     
-                return p != null &&  p.y == adapter.row;
-            }
-            
-        };
-        list.setHighlighters(new HighlighterPipeline(new Highlighter[] {conditional }));
-        JFrame frame = wrapWithScrollingInFrame(list, "rollover highlight");
-        frame.setVisible(true);
-
-    }
-
-    /**
-     * Issue #20: Highlighters and LinkRenderers don't work together
-     *
-     */
-    public void interactiveTestRolloverHighlightAndLink() {
-        JXList list = new JXList(createListModelWithLinks());
-        LinkModelAction action = new LinkModelAction(new EditorPaneLinkVisitor());
-        list.setCellRenderer(new LinkRenderer(action, LinkModel.class));
-        list.setRolloverEnabled(true);
-        Highlighter conditional = new ConditionalHighlighter(
-                new Color(0xF0, 0xF0, 0xE0), null, -1, -1) {
-
-            protected boolean test(ComponentAdapter adapter) {
-                Point p = (Point) adapter.getComponent().getClientProperty(RolloverProducer.ROLLOVER_KEY);
-     
-                return p != null &&  p.y == adapter.row;
-            }
-            
-        };
-        list.setHighlighters(new HighlighterPipeline(new Highlighter[] {conditional }));
-        JFrame frame = wrapWithScrollingInFrame(list, "rollover highlight with links");
-        frame.setVisible(true);
-
-    }
-    private ListModel createListModel() {
+    protected ListModel createListModel() {
         JXList list = new JXList();
         return new DefaultComboBoxModel(list.getActionMap().allKeys());
     }
 
-    private DefaultListModel createAscendingListModel(int startRow, int count) {
+    protected DefaultListModel createAscendingListModel(int startRow, int count) {
         DefaultListModel l = new DefaultListModel();
         for (int row = startRow; row < startRow  + count; row++) {
             l.addElement(new Integer(row));
         }
         return l;
     }
-    private DefaultListModel createListModelWithLinks() {
+    protected DefaultListModel createListModelWithLinks() {
         DefaultListModel model = new DefaultListModel();
         for (int i = 0; i < 20; i++) {
             try {
@@ -449,18 +392,4 @@ public class JXListTest extends InteractiveTestCase {
     }
 
     
-    public static void main(String[] args) {
-        setSystemLF(true);
-        JXListTest test = new JXListTest();
-        try {
-          test.runInteractiveTests();
-         //   test.runInteractiveTests("interactive.*Column.*");
-         //   test.runInteractiveTests("interactive.*TableHeader.*");
-         //   test.runInteractiveTests("interactive.*Render.*");
-//            test.runInteractiveTests("interactive.*Disab.*");
-        } catch (Exception e) {
-            System.err.println("exception when executing interactive tests:");
-            e.printStackTrace();
-        }
-    }
 }

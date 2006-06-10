@@ -28,6 +28,7 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -57,7 +58,10 @@ import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PipelineEvent;
 import org.jdesktop.swingx.decorator.PipelineListener;
 import org.jdesktop.swingx.decorator.SelectionMapper;
+import org.jdesktop.swingx.decorator.SortController;
 import org.jdesktop.swingx.decorator.SortKey;
+import org.jdesktop.swingx.decorator.SortOrder;
+import org.jdesktop.swingx.table.TableColumnExt;
 
 /**
  * JXList
@@ -375,7 +379,104 @@ public class JXList extends JList {
 
     }
 
-   
+//--------------------- public sort api
+//    /** 
+//     * Returns the sortable property.
+//     * Here: same as filterEnabled.
+//     * @return true if the table is sortable. 
+//     */
+//    public boolean isSortable() {
+//        return isFilterEnabled();
+//    }
+    /**
+     * Removes the interactive sorter.
+     * 
+     */
+    public void resetSortOrder() {
+        SortController controller = getSortController();
+        if (controller != null) {
+            controller.setSortKeys(null);
+        }
+    }
+
+    /**
+     * 
+     * Toggles the sort order of the items.
+     * <p>
+     * The exact behaviour is defined by the SortController's
+     * toggleSortOrder implementation. Typically a unsorted 
+     * column is sorted in ascending order, a sorted column's
+     * order is reversed. 
+     * <p>
+     * PENDING: where to get the comparator from?
+     * <p>
+     * 
+     * 
+     */
+    public void toggleSortOrder() {
+        SortController controller = getSortController();
+        if (controller != null) {
+            controller.toggleSortOrder(0, null);
+        }
+    }
+
+    /**
+     * Sorts the list using SortOrder. 
+     * 
+     * 
+     * Respects the JXList's sortable and comparator 
+     * properties: routes the comparator to the SortController
+     * and does nothing if !isSortable(). 
+     * <p>
+     * 
+     * @param sortOrder the sort order to use. If null or SortOrder.UNSORTED, 
+     *   this method has the same effect as resetSortOrder();
+     *    
+     */
+    public void setSortOrder(SortOrder sortOrder) {
+        if ((sortOrder == null) || !sortOrder.isSorted()) {
+            resetSortOrder();
+            return;
+        }
+        SortController sortController = getSortController();
+        if (sortController != null) {
+            SortKey sortKey = new SortKey(sortOrder, 
+                    0, null);    
+            sortController.setSortKeys(Collections.singletonList(sortKey));
+        }
+    }
+
+
+    /**
+     * Returns the SortOrder of the given column. 
+     * 
+     * @param columnIndex the column index in view coordinates.
+     * @return the interactive sorter's SortOrder if matches the column 
+     *  or SortOrder.UNSORTED 
+     */
+    public SortOrder getSortOrder() {
+        SortController sortController = getSortController();
+        if (sortController == null) return SortOrder.UNSORTED;
+        SortKey sortKey = SortKey.getFirstSortKeyForColumn(sortController.getSortKeys(), 
+                0);
+        return sortKey != null ? sortKey.getSortOrder() : SortOrder.UNSORTED;
+    }
+
+    
+    /**
+     * returns the currently active SortController. Will be null if
+     * !isFilterEnabled().
+     * @return the currently active <code>SortController</code> may be null
+     */
+    protected SortController getSortController() {
+//      // this check is for the sake of the very first call after instantiation
+        // doesn't apply for JXList? need to test for filterEnabled?
+        //if (filters == null) return null;
+        if (!isFilterEnabled()) return null;
+        return getFilters().getSortController();
+    }
+    
+    
     // ---------------------------- filters
 
     /**
