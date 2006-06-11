@@ -64,6 +64,20 @@ public class JXDatePickerTest extends TestCase {
         assertTrue(-1 == datePicker.getDateInMillis());
     }
 
+    public void testSetDate() {
+        cal.setTimeInMillis(System.currentTimeMillis());
+        cal.add(Calendar.DAY_OF_MONTH, 5);
+        Date expectedDate = cleanupDate(cal);
+        JXDatePicker datePicker = new JXDatePicker();
+        datePicker.setDate(cal.getTime());
+        assertTrue(expectedDate.equals(datePicker.getDate()));
+        assertTrue(expectedDate.equals(datePicker.getEditor().getValue()));
+
+        datePicker.setDate(null);
+        assertTrue(null == datePicker.getDate());
+        assertTrue(null == datePicker.getEditor().getValue());
+    }
+
     private Date cleanupDate(Calendar cal) {
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);

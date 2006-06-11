@@ -223,6 +223,7 @@ public class JXDatePicker extends JComponent {
         } else {
             _monthView.setSelectionInterval(date, date);
         }
+        getEditor().setValue(date);
     }
 
     /**
