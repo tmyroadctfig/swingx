@@ -118,41 +118,45 @@ public class JXList extends JList {
     private Comparator comparator;
 
     /**
-     * 
-     * @inheritDoc
-     * Filters are disabled.
-     *
-     */
+    * Constructs a <code>JXList</code> with an empty model and filters disabled.
+    *
+    */                                           
     public JXList() {
         this(false);
     }
 
     /**
-     * @inheritDoc
-     * Filters are disabled.
+     * Constructs a <code>JXList</code> that displays the elements in the
+     * specified, non-<code>null</code> model and filters disabled.
      *
-     */
+     * @param dataModel   the data model for this list
+     * @exception IllegalArgumentException   if <code>dataModel</code>
+     *                                           is <code>null</code>
+     */                                           
     public JXList(ListModel dataModel) {
         this(dataModel, false);
     }
 
     /**
-     * @inheritDoc
-     * Filters are disabled.
-     * 
+     * Constructs a <code>JXList</code> that displays the elements in
+     * the specified array and filters disabled.
+     *
+     * @param  listData  the array of Objects to be loaded into the data model
      * @throws IllegalArgumentException   if <code>listData</code>
      *                                          is <code>null</code>
-     *
      */
     public JXList(Object[] listData) {
         this(listData, false);
     }
 
     /**
-     * @inheritDoc
+     * Constructs a <code>JXList</code> that displays the elements in
+     * the specified <code>Vector</code> and filtes disabled.
+     *
+     * @param  listData  the <code>Vector</code> to be loaded into the
+     *          data model
      * @throws IllegalArgumentException   if <code>listData</code>
      *                                          is <code>null</code>
-     *
      */
     public JXList(Vector listData) {
         this(listData, false);
@@ -211,8 +215,7 @@ public class JXList extends JList {
      *          data model
      * @param filterEnabled <code>boolean</code> to determine if filtering/sorting
      *   is enabled
-     * @throws IllegalArgumentException   if <code>listData</code>
-     *                                          is <code>null</code>
+     * @throws IllegalArgumentException if <code>listData</code> is <code>null</code>
      */
     public JXList(Vector<?> listData, boolean filterEnabled) {
         super(listData);
