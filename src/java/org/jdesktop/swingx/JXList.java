@@ -26,22 +26,17 @@ import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.AbstractAction;
-import javax.swing.AbstractButton;
 import javax.swing.AbstractListModel;
 import javax.swing.Action;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComponent;
 import javax.swing.JList;
-import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
@@ -51,7 +46,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-import org.jdesktop.swingx.action.LinkAction;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
@@ -61,7 +55,6 @@ import org.jdesktop.swingx.decorator.SelectionMapper;
 import org.jdesktop.swingx.decorator.SortController;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
-import org.jdesktop.swingx.table.TableColumnExt;
 
 /**
  * JXList
@@ -120,38 +113,108 @@ public class JXList extends JList {
 
     private Searchable searchable;
 
+    /**
+     * 
+     * @inheritDoc
+     * Filters are disabled.
+     *
+     */
     public JXList() {
         this(false);
     }
 
+    /**
+     * @inheritDoc
+     * Filters are disabled.
+     *
+     */
     public JXList(ListModel dataModel) {
         this(dataModel, false);
     }
 
+    /**
+     * @inheritDoc
+     * Filters are disabled.
+     * 
+     * @throws IllegalArgumentException   if <code>listData</code>
+     *                                          is <code>null</code>
+     *
+     */
     public JXList(Object[] listData) {
         this(listData, false);
     }
 
+    /**
+     * @inheritDoc
+     * @throws IllegalArgumentException   if <code>listData</code>
+     *                                          is <code>null</code>
+     *
+     */
     public JXList(Vector listData) {
         this(listData, false);
     }
 
+
+    /**
+     * Constructs a <code>JXList</code> with an empty model and
+     * filterEnabled property.
+     * 
+     * @param filterEnabled <code>boolean</code> to determine if 
+     *  filtering/sorting is enabled
+     */
     public JXList(boolean filterEnabled) {
         init(filterEnabled);
     }
 
+    /**
+     * Constructs a <code>JXList</code> with the specified model and
+     * filterEnabled property.
+     * 
+     * @param dataModel   the data model for this list
+     * @param filterEnabled <code>boolean</code> to determine if 
+     *          filtering/sorting is enabled
+     * @throws IllegalArgumentException   if <code>dataModel</code>
+     *                                          is <code>null</code>
+     */
     public JXList(ListModel dataModel, boolean filterEnabled) {
         super(dataModel);
         init(filterEnabled);
     }
 
+    /**
+     * Constructs a <code>JXList</code> that displays the elements in
+     * the specified array and filterEnabled property.
+     *
+     * @param  listData  the array of Objects to be loaded into the data model
+     * @param filterEnabled <code>boolean</code> to determine if filtering/sorting
+     *   is enabled
+     * @throws IllegalArgumentException   if <code>listData</code>
+     *                                          is <code>null</code>
+     */
     public JXList(Object[] listData, boolean filterEnabled) {
         super(listData);
+        if (listData == null) {
+            throw new IllegalArgumentException("listData must not be null");
+        } 
         init(filterEnabled);
     }
 
-    public JXList(Vector listData, boolean filterEnabled) {
+    /**
+     * Constructs a <code>JXList</code> that displays the elements in
+     * the specified <code>Vector</code> and filtersEnabled property.
+     *
+     * @param  listData  the <code>Vector</code> to be loaded into the
+     *          data model
+     * @param filterEnabled <code>boolean</code> to determine if filtering/sorting
+     *   is enabled
+     * @throws IllegalArgumentException   if <code>listData</code>
+     *                                          is <code>null</code>
+     */
+    public JXList(Vector<?> listData, boolean filterEnabled) {
         super(listData);
+        if (listData == null) {
+            throw new IllegalArgumentException("listData must not be null");
+        } 
         init(filterEnabled);
     }
 
@@ -444,7 +507,7 @@ public class JXList extends JList {
      * 
      * Respects the JXList's sortable and comparator 
      * properties: routes the comparator to the SortController
-     * and does nothing if !isSortable(). 
+     * and does nothing if !isFilterEnabled(). 
      * <p>
      * 
      * @param sortOrder the sort order to use. If null or SortOrder.UNSORTED, 
@@ -466,10 +529,9 @@ public class JXList extends JList {
 
 
     /**
-     * Returns the SortOrder of the given column. 
+     * Returns the SortOrder. 
      * 
-     * @param columnIndex the column index in view coordinates.
-     * @return the interactive sorter's SortOrder if matches the column 
+     * @return the interactive sorter's SortOrder  
      *  or SortOrder.UNSORTED 
      */
     public SortOrder getSortOrder() {

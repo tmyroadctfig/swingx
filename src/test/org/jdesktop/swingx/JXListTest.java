@@ -39,8 +39,45 @@ public class JXListTest extends InteractiveTestCase {
     protected ListModel listModel;
     protected DefaultListModel ascendingListModel;
 
+    /**
+     * test exceptions on null data(model, vector, array).
+     *
+     */
+    public void testNullData() {
+        try {
+            new JXList((ListModel) null);
+            fail("JXList contructor must throw on null data");
+        } catch (IllegalArgumentException e) {
+            // expected
+        } catch (Exception e) {
+            fail("unexpected exception type " + e);
+        }
+        
+        try {
+           new JXList((Vector) null);
+            fail("JXList contructor must throw on null data");
+        } catch (IllegalArgumentException e) {
+            // expected
+        } catch (Exception e) {
+            fail("unexpected exception type " + e);
+        }
+        
+        try {
+            new JXList((Object[]) null);
+             fail("JXList contructor must throw on null data");
+         } catch (IllegalArgumentException e) {
+             // expected
+         } catch (Exception e) {
+             fail("unexpected exception type " + e);
+         }
+    }
+    
 
-    public void testConstructorFilterEndabled() {
+    /**
+     * test filterEnabled property on initialization.
+     *
+     */
+    public void testConstructorFilterEnabled() {
         // 
         assertFilterEnabled(new JXList(), false);
         assertFilterEnabled(new JXList(new DefaultListModel()), false);
@@ -57,6 +94,7 @@ public class JXListTest extends InteractiveTestCase {
         assertFilterEnabled(new JXList(new Vector(), true), true);
         assertFilterEnabled(new JXList(new Object[] { }, true), true);
     }
+    
     private void assertFilterEnabled(JXList list, boolean b) {
         assertEquals(b, list.isFilterEnabled());
     }
