@@ -200,10 +200,7 @@ public class JXList extends JList {
      *                                          is <code>null</code>
      */
     public JXList(Object[] listData, boolean filterEnabled) {
-        super(listData);
-        if (listData == null) {
-            throw new IllegalArgumentException("listData must not be null");
-        } 
+        super(checkIllegalNull(listData) ? listData : listData);
         init(filterEnabled);
     }
 
@@ -218,12 +215,22 @@ public class JXList extends JList {
      * @throws IllegalArgumentException if <code>listData</code> is <code>null</code>
      */
     public JXList(Vector<?> listData, boolean filterEnabled) {
-        super(listData);
-        if (listData == null) {
-            throw new IllegalArgumentException("listData must not be null");
-        } 
+        super(checkIllegalNull(listData) ? listData : listData);
         init(filterEnabled);
     }
+
+    /**
+     * Checks for null and throws IllegalArgumentException if so.
+     * 
+     * @param notNull the Object to test for null.
+     */
+    protected static boolean checkIllegalNull(Object notNull) {
+        if (notNull == null) {
+            throw new IllegalArgumentException("Parameter must not be null");
+        }
+        return true;
+    }
+
 
     private void init(boolean filterEnabled) {
         setFilterEnabled(filterEnabled);
