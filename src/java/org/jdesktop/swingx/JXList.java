@@ -49,6 +49,7 @@ import javax.swing.event.ListDataListener;
 
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
+import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PipelineEvent;
 import org.jdesktop.swingx.decorator.PipelineListener;
@@ -695,6 +696,11 @@ public class JXList extends JList {
 
     }
 
+    /**
+     * 
+     * @return a <boolean> indicating if filtering is enabled.
+     * @see #setFilterEnabled(boolean)
+     */
     public boolean isFilterEnabled() {
         return filterEnabled;
     }
@@ -736,6 +742,11 @@ public class JXList extends JList {
         return selectionMapper;
     }
 
+    /**
+     * 
+     * @return the <code>FilterPipeline</code> assigned to this list, or
+     *   null if !isFiltersEnabled().
+     */
     public FilterPipeline getFilters() {
         if ((filters == null) && isFilterEnabled()) {
             setFilters(null);
@@ -743,10 +754,16 @@ public class JXList extends JList {
         return filters;
     }
 
-    /** Sets the FilterPipeline for filtering table rows. 
+    /** Sets the FilterPipeline for filtering the items of this list, maybe null
+     *  to remove all previously applied filters. 
+     *  
+     *  Note: the current "interactive" sortState is preserved (by 
+     *  internally copying the old sortKeys to the new pipeline, if any). 
+     *  
      *  PRE: isFilterEnabled()
      * 
-     * @param pipeline the filterPipeline to use.
+     * @param the <code>FilterPipeline</code> to use, null removes
+     *   all filters.
      * @throws IllegalStateException if !isFilterEnabled()
      */
     public void setFilters(FilterPipeline pipeline) {
@@ -1005,11 +1022,20 @@ public class JXList extends JList {
 
     // ------------------------------ renderers
 
+    /**
+     * @return the HighlighterPipeline assigned to the list.
+     * @see #setHighlighters(HighlighterPipeline)
+     */
     public HighlighterPipeline getHighlighters() {
         return highlighters;
     }
 
-    /** Assigns a HighlighterPipeline to the table. */
+    /**
+     * Assigns a HighlighterPipeline to the list. This is a bound property.
+     * 
+     * @param pipeline the HighlighterPipeline to use for renderer
+     *   decoration, maybe null to remove all Highlighters.
+     */
     public void setHighlighters(HighlighterPipeline pipeline) {
         HighlighterPipeline old = getHighlighters();
         if (old != null) {
@@ -1022,7 +1048,46 @@ public class JXList extends JList {
         firePropertyChange("highlighters", old, getHighlighters());
     }
 
-    private ChangeListener getHighlighterChangeListener() {
+    /**
+     * Adds a Highlighter.
+     * 
+     * If the HighlighterPipeline returned from getHighlighters() is null, creates
+     * and sets a new pipeline containing the given Highlighter. Else, appends
+     * the Highlighter to the end of the pipeline.
+     * 
+     * @param highlighter the Highlighter to add - must not be null.
+     * @throws NullPointerException if highlighter is null.
+     */
+    public void addHighlighter(Highlighter highlighter) {
+        HighlighterPipeline pipeline = getHighlighters();
+        if (pipeline == null) {
+           setHighlighters(new HighlighterPipeline(new Highlighter[] {highlighter})); 
+        } else {
+            pipeline.addHighlighter(highlighter);
+        }
+    }
+
+    /**
+     * Removes the Highlighter.
+     * 
+     * Does nothing if the HighlighterPipeline is null or does not contain
+     * the given Highlighter.
+     * 
+     * @param highlighter the Highlighter to remove.
+     */
+    public void removeHighlighter(Highlighter highlighter) {
+        if ((getHighlighters() == null)) return;
+        getHighlighters().removeHighlighter(highlighter);
+    }
+    
+
+    /**
+     * returns the ChangeListener to use with highlighters. Creates one if
+     * necessary.
+     * 
+     * @return != null
+     */
+    protected ChangeListener getHighlighterChangeListener() {
         if (highlighterChangeListener == null) {
             highlighterChangeListener = new ChangeListener() {
 

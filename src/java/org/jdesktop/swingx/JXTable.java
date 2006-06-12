@@ -1197,7 +1197,16 @@ public class JXTable extends JTable {
         return true;
     }
 
-    /** Sets the FilterPipeline for filtering table rows. */
+    /** 
+     *  Sets the FilterPipeline for filtering table rows, maybe null
+     *  to remove all previously applied filters. 
+     *  
+     *  Note: the current "interactive" sortState is preserved (by 
+     *  internally copying the old sortKeys to the new pipeline, if any).
+     * 
+     * @param the <code>FilterPipeline</code> to use, null removes
+     *   all filters.
+     */
     public void setFilters(FilterPipeline pipeline) {
         FilterPipeline old = getFilters();
         List<? extends SortKey> sortKeys = null;
@@ -2437,7 +2446,11 @@ public class JXTable extends JTable {
     }
 
     /**
-     * Assigns a HighlighterPipeline to the table. bound property.
+     * Assigns a HighlighterPipeline to the table, maybe null to 
+     * remove all Highlighters. bound property.
+     * 
+     * @param pipeline the HighlighterPipeline to use for renderer
+     *   decoration.
      */
     public void setHighlighters(HighlighterPipeline pipeline) {
         HighlighterPipeline old = getHighlighters();
@@ -2490,7 +2503,7 @@ public class JXTable extends JTable {
      * 
      * @return != null
      */
-    private ChangeListener getHighlighterChangeListener() {
+    protected ChangeListener getHighlighterChangeListener() {
         if (highlighterChangeListener == null) {
             highlighterChangeListener = new ChangeListener() {
 
