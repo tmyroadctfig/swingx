@@ -87,9 +87,32 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
     public void testConstructorsWithNullArguments() {
-        JXTable table = new JXTable((Vector) null, (Vector) null);
-        table = new JXTable((Object[][]) null, new Object[] {  });
-        table = new JXTable((Object[][]) null, (Object[]) null);
+        try {
+            new JXTable((Object[][]) null, (Object[]) null);
+            fail("null arrays must throw NPE");
+        } catch (NullPointerException e) {
+            // nothing to do - expected
+        } catch (Exception e) {
+            fail("unexpected exception type (expected NPE)" + e);
+        }
+        try {
+            new JXTable((Object[][]) null, new Object[] {  });
+            fail("null arrays must throw NPE");
+        } catch (NullPointerException e) {
+            // nothing to do - expected
+        } catch (Exception e) {
+            fail("unexpected exception type (expected NPE)" + e);
+        }
+        try {
+            new JXTable(new Object[][] {{ }, { }}, (Object[]) null);
+            fail("null arrays throw NPE");
+            
+        } catch (NullPointerException e) {
+            // nothing to do - expected
+            
+        } catch (Exception e) {
+            fail("unexpected exception type (expected NPE)" + e);
+        }
     }
     /**
      * expose JTable.autoStartsEdit.
