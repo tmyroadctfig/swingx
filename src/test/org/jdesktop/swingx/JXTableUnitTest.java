@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -27,7 +28,6 @@ import javax.swing.DefaultListSelectionModel;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
-import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
@@ -86,6 +86,11 @@ public class JXTableUnitTest extends InteractiveTestCase {
         setSystemLF(defaultToSystemLF);
     }
 
+    public void testConstructorsWithNullArguments() {
+        JXTable table = new JXTable((Vector) null, (Vector) null);
+        table = new JXTable((Object[][]) null, new Object[] {  });
+        table = new JXTable((Object[][]) null, (Object[]) null);
+    }
     /**
      * expose JTable.autoStartsEdit.
      *

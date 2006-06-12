@@ -1204,7 +1204,7 @@ public class JXTable extends JTable {
      *  Note: the current "interactive" sortState is preserved (by 
      *  internally copying the old sortKeys to the new pipeline, if any).
      * 
-     * @param the <code>FilterPipeline</code> to use, null removes
+     * @param pipeline the <code>FilterPipeline</code> to use, null removes
      *   all filters.
      */
     public void setFilters(FilterPipeline pipeline) {

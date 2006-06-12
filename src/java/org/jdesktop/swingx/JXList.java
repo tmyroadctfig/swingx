@@ -772,7 +772,7 @@ public class JXList extends JList {
      *  
      *  PRE: isFilterEnabled()
      * 
-     * @param the <code>FilterPipeline</code> to use, null removes
+     * @param pipeline the <code>FilterPipeline</code> to use, null removes
      *   all filters.
      * @throws IllegalStateException if !isFilterEnabled()
      */
