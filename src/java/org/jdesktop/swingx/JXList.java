@@ -121,25 +121,43 @@ public class JXList extends JList {
     private Searchable searchable;
 
     public JXList() {
-        init();
+        this(false);
     }
 
     public JXList(ListModel dataModel) {
-        super(dataModel);
-        init();
+        this(dataModel, false);
     }
 
     public JXList(Object[] listData) {
-        super(listData);
-        init();
+        this(listData, false);
     }
 
     public JXList(Vector listData) {
-        super(listData);
-        init();
+        this(listData, false);
     }
 
-    private void init() {
+    public JXList(boolean filterEnabled) {
+        init(filterEnabled);
+    }
+
+    public JXList(ListModel dataModel, boolean filterEnabled) {
+        super(dataModel);
+        init(filterEnabled);
+    }
+
+    public JXList(Object[] listData, boolean filterEnabled) {
+        super(listData);
+        init(filterEnabled);
+    }
+
+    public JXList(Vector listData, boolean filterEnabled) {
+        super(listData);
+        init(filterEnabled);
+    }
+
+    private void init(boolean filterEnabled) {
+        setFilterEnabled(filterEnabled);
+        
         Action findAction = createFindAction();
         getActionMap().put("find", findAction);
         // JW: this should be handled by the LF!
@@ -553,16 +571,21 @@ public class JXList extends JList {
      * 
      * PENDING: cleanup state transitions!! - currently this can be safely
      * applied once only to enable. Internal state is inconsistent if trying to
-     * disable again.
+     * disable again. As a temporary emergency measure, this will throw a 
+     * IllegalStateException. 
      * 
      * see Issue #2-swinglabs.
      * 
      * @param enabled
+     * @throws IllegalStateException if trying to disable again.
      */
     public void setFilterEnabled(boolean enabled) {
         boolean old = isFilterEnabled();
         if (old == enabled)
             return;
+        if (old == true) 
+            throw new IllegalStateException("must not reset filterEnabled");
+        // JW: filterEnabled must be set before calling super.setModel!
         filterEnabled = enabled;
         if (!old) {
             wrappingModel = new WrappingListModel(getModel());

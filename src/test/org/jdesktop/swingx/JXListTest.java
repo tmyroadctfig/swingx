@@ -6,44 +6,28 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.Color;
-import java.awt.Point;
-import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.Collator;
 import java.util.Collections;
+import java.util.Vector;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.DefaultListSelectionModel;
-import javax.swing.JFrame;
-import javax.swing.JList;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.jdesktop.swingx.action.LinkModelAction;
-import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
-import org.jdesktop.swingx.decorator.ComponentAdapter;
-import org.jdesktop.swingx.decorator.ConditionalHighlighter;
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
-import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PatternFilter;
-import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.SelectionMapper;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.decorator.Sorter;
-import org.jdesktop.swingx.table.TableColumnExt;
-import org.jdesktop.swingx.util.AncientSwingTeam;
 
 /**
  * Testing JXList.
@@ -56,13 +40,33 @@ public class JXListTest extends InteractiveTestCase {
     protected DefaultListModel ascendingListModel;
 
 
+    public void testConstructorFilterEndabled() {
+        // 
+        assertFilterEnabled(new JXList(), false);
+        assertFilterEnabled(new JXList(new DefaultListModel()), false);
+        assertFilterEnabled(new JXList(new Vector()), false);
+        assertFilterEnabled(new JXList(new Object[] { }), false);
+        
+        assertFilterEnabled(new JXList(false), false);
+        assertFilterEnabled(new JXList(new DefaultListModel(), false), false);
+        assertFilterEnabled(new JXList(new Vector(), false), false);
+        assertFilterEnabled(new JXList(new Object[] { }, false), false);
+
+        assertFilterEnabled(new JXList(true), true);
+        assertFilterEnabled(new JXList(new DefaultListModel(), true), true);
+        assertFilterEnabled(new JXList(new Vector(), true), true);
+        assertFilterEnabled(new JXList(new Object[] { }, true), true);
+    }
+    private void assertFilterEnabled(JXList list, boolean b) {
+        assertEquals(b, list.isFilterEnabled());
+    }
+
     /**
      * added xtable.setSortOrder(int, SortOrder)
      * 
      */
     public void testSetSortOrder() {
-        JXList list = new JXList(ascendingListModel);
-        list.setFilterEnabled(true);
+        JXList list = new JXList(ascendingListModel, true);
         list.setSortOrder(SortOrder.ASCENDING);
         assertEquals("column must be sorted after setting sortOrder on ", SortOrder.ASCENDING, list.getSortOrder());
     }
@@ -73,8 +77,7 @@ public class JXListTest extends InteractiveTestCase {
      * TODO not yet implemented
      */
     public void testComparatorToPipeline() {
-        JXList list = new JXList(ascendingListModel);
-        list.setFilterEnabled(true);
+        JXList list = new JXList(ascendingListModel, true);
 //        list.setComparator(Collator.getInstance());
 //        list.toggleSortOrder();
 //        SortKey sortKey = SortKey.getFirstSortKeyForColumn(list.getFilters().getSortController().getSortKeys(), 0);
@@ -88,8 +91,7 @@ public class JXListTest extends InteractiveTestCase {
      *
      */
     public void testToggleSortOrder() {
-        JXList list = new JXList(ascendingListModel);
-        list.setFilterEnabled(true);
+        JXList list = new JXList(ascendingListModel, true);
         assertSame(SortOrder.UNSORTED, list.getSortOrder());
         list.toggleSortOrder();
         assertSame(SortOrder.ASCENDING, list.getSortOrder());
@@ -103,8 +105,7 @@ public class JXListTest extends InteractiveTestCase {
      * prepare sort testing: internal probs with SortController?
      */
     public void testSortController() {
-        JXList list = new JXList(ascendingListModel);
-        list.setFilterEnabled(true);
+        JXList list = new JXList(ascendingListModel, true);
         assertNotNull("sortController must be initialized", list.getSortController());
     }
     
@@ -113,8 +114,7 @@ public class JXListTest extends InteractiveTestCase {
      *
      */
     public void testSelectionMapperUpdatedOnSelectionModelChange() {
-        JXList table = new JXList();
-        table.setFilterEnabled(true);
+        JXList table = new JXList(true);
         // created lazily, to see the failure,
         // need to get hold before replacing list's selection
         SelectionMapper mapper = table.getSelectionMapper();
@@ -165,11 +165,7 @@ public class JXListTest extends InteractiveTestCase {
     }
 
     public void testConvertToModelPreconditions() {
-        final JXList list = new JXList(ascendingListModel);
-        // a side-effect of setFilterEnabled is to clear the selection!
-        // this is done in JList.setModel(..) which is called when 
-        // changing filterEnabled!
-        list.setFilterEnabled(true);
+        final JXList list = new JXList(ascendingListModel, true);
         assertEquals(20, list.getElementCount());
         list.setFilters(new FilterPipeline(new Filter[] {new PatternFilter("0", 0, 0) }));
         assertEquals(2, list.getElementCount());
@@ -186,11 +182,7 @@ public class JXListTest extends InteractiveTestCase {
  
 
     public void testElementAtPreconditions() {
-        final JXList list = new JXList(ascendingListModel);
-        // a side-effect of setFilterEnabled is to clear the selection!
-        // this is done in JList.setModel(..) which is called when 
-        // changing filterEnabled!
-        list.setFilterEnabled(true);
+        final JXList list = new JXList(ascendingListModel, true);
         assertEquals(20, list.getElementCount());
         list.setFilters(new FilterPipeline(new Filter[] {new PatternFilter("0", 0, 0) }));
         assertEquals(2, list.getElementCount());
@@ -217,11 +209,7 @@ public class JXListTest extends InteractiveTestCase {
      *
      */
     public void testSelectionListenerNotification() {
-        final JXList list = new JXList(ascendingListModel);
-        // a side-effect of setFilterEnabled is to clear the selection!
-        // this is done in JList.setModel(..) which is called when 
-        // changing filterEnabled!
-        list.setFilterEnabled(true);
+        final JXList list = new JXList(ascendingListModel, true);
         assertEquals(20, list.getElementCount());
         final int modelRow = 0;
         // set a selection 
@@ -247,15 +235,10 @@ public class JXListTest extends InteractiveTestCase {
     /**
      * setFilterEnabled throws NPE if formerly had selection.
      * 
-     * Reason is internal state mismanagement... filterEnabled must be
-     * set before calling super.setModel!
      *
      */
     public void testSetFilterEnabledWithSelection() {
         final JXList list = new JXList(ascendingListModel);
-        // a side-effect of setFilterEnabled is to clear the selection!
-        // this is done in JList.setModel(..) which is called when 
-        // changing filterEnabled!
         assertEquals(20, list.getElementCount());
         final int modelRow = 0;
         // set a selection 
@@ -265,65 +248,83 @@ public class JXListTest extends InteractiveTestCase {
     }
 
     public void testEmptyFilter() {
-        JXList list = new JXList();
-        list.setModel(ascendingListModel);
+        JXList list = new JXList(ascendingListModel);
         assertEquals(ascendingListModel.getSize(), list.getElementCount());
         assertEquals(ascendingListModel.getElementAt(0), list.getElementAt(0));
     }
     
     public void testFilterEnabled() {
-        JXList list = new JXList();
-        list.setFilterEnabled(true);
-        list.setModel(ascendingListModel);
+        JXList list = new JXList(ascendingListModel, true);
         assertNotSame(ascendingListModel, list.getModel());
         assertEquals(ascendingListModel.getSize(), list.getElementCount());
         assertEquals(ascendingListModel.getElementAt(0), list.getElementAt(0));
         
     }
 
+    /**
+     * Emergency break for #2-swinglabs: 
+     * it's not allowed to reset filterEnabled property to false again.
+     *
+     */
     public void testFilterEnabledAndDisabled() {
-        JXList list = new JXList();
-        list.setFilterEnabled(true);
-        list.setModel(ascendingListModel);
-        FilterPipeline pipeline = list.getFilters();
-        SortKey sortKey = new SortKey(SortOrder.DESCENDING, 0);
-        pipeline.getSortController().setSortKeys(Collections.singletonList(sortKey ));
-        list.setFilterEnabled(false);
-        assertSame(ascendingListModel, list.getModel());
-        assertEquals(ascendingListModel.getSize(), list.getElementCount());
-        assertEquals(ascendingListModel.getElementAt(0), list.getElementAt(0));
+        JXList list = new JXList(ascendingListModel, true);
+        try {
+            list.setFilterEnabled(false);
+            fail("must not reset the filterEnabled property");
+        } catch (IllegalStateException e) {
+            // do nothing this is the exception we expect. 
+        } catch (Exception e) { 
+            fail("unexpected exception type" + e);
+        }
+//        assertSame(ascendingListModel, list.getModel());
+//        assertEquals(ascendingListModel.getSize(), list.getElementCount());
+//        assertEquals(ascendingListModel.getElementAt(0), list.getElementAt(0));
         
     }
+    
     public void testSortingFilterEnabled() {
-        JXList list = new JXList();
-        list.setFilterEnabled(true);
-        list.setModel(ascendingListModel);
-        Sorter sorter = new ShuttleSorter(0, false);
+        JXList list = new JXList(ascendingListModel, true);
         FilterPipeline pipeline = list.getFilters();
         assertNotNull(pipeline);
-        SortKey sortKey = new SortKey(SortOrder.DESCENDING, 0);
-        pipeline.getSortController().setSortKeys(Collections.singletonList(sortKey ));
+        list.setSortOrder(SortOrder.DESCENDING);
         assertEquals(ascendingListModel.getSize(), list.getElementCount());
         assertEquals(ascendingListModel.getElementAt(0), list.getElementAt(list.getElementCount() - 1));
         
     }
     
     public void testSortingKeepsModelSelection() {
-        JXList list = new JXList();
-        list.setFilterEnabled(true);
-        list.setModel(ascendingListModel);
+        JXList list = new JXList(ascendingListModel, true);
         list.setSelectedIndex(0);
-        FilterPipeline pipeline = list.getFilters();
-        SortKey sortKey = new SortKey(SortOrder.DESCENDING, 0);
-        pipeline.getSortController().setSortKeys(Collections.singletonList(sortKey ));
+        list.setSortOrder(SortOrder.DESCENDING);
         assertEquals("last row must be selected after sorting", 
                 ascendingListModel.getSize() - 1, list.getSelectedIndex());
     }
 
-    public void testSelectionAfterDeleteAbove() {
+    /**
+     * Issue #2-swinglabs: setting filter if not enabled throws exception on selection.
+     * Reported by Kim.
+     * 
+     * Fix: should not accept filter if not enabled. 
+     * PENDING JW: Doesn't? appears to be fixed? Check!  
+     *  
+     *
+     */
+    public void testFilterDisabled() {
         JXList list = new JXList();
-        list.setFilterEnabled(true);
         list.setModel(ascendingListModel);
+        Filter[] filter = new Filter[] { new PatternFilter("1", 0, 0) };
+        try {
+            list.setFilters(new FilterPipeline(filter));
+            fail("setFilter must not be called if filters not enabled");
+        } catch (IllegalStateException e) {
+            // do nothing, this is the documented behaviour
+        } catch (Exception e) {
+            fail("unexpected exception type " + e);
+        }
+    }
+
+    public void testSelectionAfterDeleteAbove() {
+        JXList list = new JXList(ascendingListModel, true);
         list.setSelectedIndex(1);
         ascendingListModel.remove(0);
         assertEquals("first row must be selected removing old first", 
@@ -331,24 +332,6 @@ public class JXListTest extends InteractiveTestCase {
         
     }
     
-    /**
-     * related to #2-swinglabs: clarify behaviour to expect if 
-     * filtering disabled?
-     *
-     */
-    public void testSortingFilterDisabled() {
-        JXList list = new JXList();
-        list.setModel(ascendingListModel);
-        Sorter sorter = new ShuttleSorter(0, false);
-        FilterPipeline pipeline = list.getFilters();
-        // Probably wrong assumption for disabled filtering
-//        assertNotNull(pipeline);
-//        pipeline.setSorter(sorter);
-//        assertSame(ascendingListModel, list.getModel());
-//        assertEquals(ascendingListModel.getSize(), list.getModelSize());
-//        assertEquals(ascendingListModel.getElementAt(0), list.getElementAt(0));
-        
-    }
 
     protected ListModel createListModel() {
         JXList list = new JXList();

@@ -35,43 +35,20 @@ public class JXListVisualCheck extends JXListTest {
         setSystemLF(true);
         JXListVisualCheck test = new JXListVisualCheck();
         try {
-//          test.runInteractiveTests();
+          test.runInteractiveTests();
          //   test.runInteractiveTests("interactive.*Column.*");
          //   test.runInteractiveTests("interactive.*TableHeader.*");
          //   test.runInteractiveTests("interactive.*Render.*");
-            test.runInteractiveTests("interactive.*Sort.*");
+//            test.runInteractiveTests("interactive.*Sort.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
     }
 
-    /**
-     * Issue #2-swinglabs: setting filter if not enabled throws exception on selection.
-     * Reported by Kim.
-     * 
-     * Fix: should not accept filter if not enabled. 
-     * PENDING JW: Doesn't? appears to be fixed? Check!  
-     *  
-     *
-     */
-    public void interactiveTestFilterDisabled() {
-        JXList list = new JXList();
-        list.setModel(ascendingListModel);
-        Filter[] filter = new Filter[] { new PatternFilter("1", 0, 0) };
-        try {
-            list.setFilters(new FilterPipeline(filter));
-          
-        } catch (Exception e) {
-            LOG.info("well behaved: if not enabled, JXList.setFilters throws " + e);
-        }
-        JXFrame frame = wrapWithScrollingInFrame(list, "filter disabled");
-        frame.setVisible(true);
-    }
     
     public void interactiveTestSort() {
-        final JXList list = new JXList(listModel);
-        list.setFilterEnabled(true);
+        final JXList list = new JXList(listModel, true);
         JXFrame frame = wrapWithScrollingInFrame(list, "Toggle sorter");
         Action toggleSortOrder = new AbstractAction("Toggle Sort Order") {
 
