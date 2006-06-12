@@ -9,7 +9,7 @@ package org.jdesktop.swingx;
 import java.beans.PropertyChangeListener;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collections;
+import java.text.Collator;
 import java.util.Vector;
 
 import javax.swing.DefaultComboBoxModel;
@@ -24,10 +24,9 @@ import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.SelectionMapper;
-import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
-import org.jdesktop.swingx.decorator.Sorter;
+import org.jdesktop.swingx.util.PropertyChangeReport;
 
 /**
  * Testing JXList.
@@ -111,18 +110,59 @@ public class JXListTest extends InteractiveTestCase {
     
     /**
      * JXList has responsibility to guarantee usage of 
-     * its comparator.
-     * TODO not yet implemented
+     * its comparator: setComparator if already sorted.
      */
-    public void testComparatorToPipeline() {
-        JXList list = new JXList(ascendingListModel, true);
-//        list.setComparator(Collator.getInstance());
-//        list.toggleSortOrder();
-//        SortKey sortKey = SortKey.getFirstSortKeyForColumn(list.getFilters().getSortController().getSortKeys(), 0);
-//        assertNotNull(sortKey);
-//        assertEquals(list.getComparator(), sortKey.getComparator());
+    public void testDynamicComparatorToSortController() {
+        JXList list = new JXList(listModel, true);
+        list.toggleSortOrder();
+        list.setComparator(Collator.getInstance());
+        SortKey sortKey = SortKey.getFirstSortKeyForColumn(list.getFilters().getSortController().getSortKeys(), 0);
+        assertNotNull(sortKey);
+        assertEquals(list.getComparator(), sortKey.getComparator());
     }
 
+    /**
+     * JXList has responsibility to guarantee usage of 
+     * its comparator: toggle.
+     */
+    public void testToggleComparatorToSortController() {
+        JXList list = new JXList(listModel, true);
+        list.setComparator(Collator.getInstance());
+        list.toggleSortOrder();
+        SortKey sortKey = SortKey.getFirstSortKeyForColumn(list.getFilters().getSortController().getSortKeys(), 0);
+        assertNotNull(sortKey);
+        assertEquals(list.getComparator(), sortKey.getComparator());
+    }
+
+    /**
+     * JXList has responsibility to guarantee usage of 
+     * its comparator: set.
+     */
+    public void testSetComparatorToSortController() {
+        JXList list = new JXList(listModel, true);
+        list.setComparator(Collator.getInstance());
+        list.setSortOrder(SortOrder.DESCENDING);
+        SortKey sortKey = SortKey.getFirstSortKeyForColumn(list.getFilters().getSortController().getSortKeys(), 0);
+        assertNotNull(sortKey);
+        assertEquals(list.getComparator(), sortKey.getComparator());
+    }
+    
+    /**
+     * add and test comparator property.
+     * 
+     */
+    public void testComparator() {
+        JXList list = new JXList();
+        assertNull(list.getComparator());
+        Collator comparator = Collator.getInstance();
+        PropertyChangeReport report = new PropertyChangeReport();
+        list.addPropertyChangeListener(report);
+        list.setComparator(comparator);
+        assertEquals(comparator, list.getComparator());
+        assertEquals(1, report.getEventCount());
+        assertEquals(1, report.getEventCount("comparator"));
+        
+    }
     /**
      * testing new sorter api: 
      * getSortOrder(), toggleSortOrder(), resetSortOrder().

@@ -27,6 +27,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -112,6 +113,8 @@ public class JXList extends JList {
     private SelectionMapper selectionMapper;
 
     private Searchable searchable;
+
+    private Comparator comparator;
 
     /**
      * 
@@ -497,7 +500,7 @@ public class JXList extends JList {
     public void toggleSortOrder() {
         SortController controller = getSortController();
         if (controller != null) {
-            controller.toggleSortOrder(0, null);
+            controller.toggleSortOrder(0, getComparator());
         }
     }
 
@@ -522,7 +525,7 @@ public class JXList extends JList {
         SortController sortController = getSortController();
         if (sortController != null) {
             SortKey sortKey = new SortKey(sortOrder, 
-                    0, null);    
+                    0, getComparator());    
             sortController.setSortKeys(Collections.singletonList(sortKey));
         }
     }
@@ -542,7 +545,39 @@ public class JXList extends JList {
         return sortKey != null ? sortKey.getSortOrder() : SortOrder.UNSORTED;
     }
 
+    /**
+     * 
+     * @return the comparator used.
+     * @see #setComparator(Comparator)
+     */
+    public Comparator getComparator() {
+        return comparator;
+    }
     
+    /**
+     * Sets the comparator used. As a side-effect, the 
+     * current sort might be updated. The exact behaviour
+     * is defined in #updateSortAfterComparatorChange. 
+     * 
+     * @param comparator the comparator to use.
+     */
+    public void setComparator(Comparator comparator) {
+        Comparator old = getComparator();
+        this.comparator = comparator;
+        updateSortAfterComparatorChange();
+        firePropertyChange("comparator", old, getComparator());
+    }
+    
+    /**
+     * Updates sort after comparator has changed. 
+     * Here: sets the current sortOrder with the new comparator.
+     *
+     */
+    protected void updateSortAfterComparatorChange() {
+        setSortOrder(getSortOrder());
+        
+    }
+
     /**
      * returns the currently active SortController. Will be null if
      * !isFilterEnabled().
