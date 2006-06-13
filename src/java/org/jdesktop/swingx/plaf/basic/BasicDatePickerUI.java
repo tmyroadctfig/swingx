@@ -76,7 +76,9 @@ public class BasicDatePickerUI extends DatePickerUI {
         if (editor == null || editor instanceof UIResource) {
             datePicker.setEditor(createEditor());
         }
-        datePicker.add(datePicker.getEditor());
+        editor = datePicker.getEditor();
+        datePicker.add(editor);
+        editor.addPropertyChangeListener(getHandler());
 
         popupButton = createPopupButton();
 
@@ -91,7 +93,11 @@ public class BasicDatePickerUI extends DatePickerUI {
     }
 
     protected void uninstallComponents() {
-        datePicker.remove(datePicker.getEditor());
+        JFormattedTextField editor = datePicker.getEditor();
+        if (editor != null) {
+            editor.removePropertyChangeListener(getHandler());
+            datePicker.remove(editor);
+        }
 
         if (popupButton != null) {
             datePicker.remove(popupButton);
@@ -108,25 +114,14 @@ public class BasicDatePickerUI extends DatePickerUI {
     }
 
     protected void installKeyboardActions() {
-        KeyStroke enterKey =
-                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false);
-
-        JFormattedTextField editor = datePicker.getEditor();
-        InputMap inputMap = editor.getInputMap(JComponent.WHEN_FOCUSED);
-        inputMap.put(enterKey, "COMMIT_EDIT");
-
-        ActionMap actionMap = editor.getActionMap();
-        actionMap.put("COMMIT_EDIT", new CommitEditAction());
-
         KeyStroke spaceKey =
                 KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false);
 
-        inputMap = popupButton.getInputMap(JComponent.WHEN_FOCUSED);
+        InputMap inputMap = popupButton.getInputMap(JComponent.WHEN_FOCUSED);
         inputMap.put(spaceKey, "TOGGLE_POPUP");
 
-        actionMap = popupButton.getActionMap();
+        ActionMap actionMap = popupButton.getActionMap();
         actionMap.put("TOGGLE_POPUP", new TogglePopupAction());
-
     }
 
     protected void uninstallKeyboardActions() {
@@ -453,14 +448,19 @@ public class BasicDatePickerUI extends DatePickerUI {
             } else if (JXDatePicker.EDITOR.equals(property)) {
                 JFormattedTextField oldEditor = (JFormattedTextField)e.getOldValue();
                 if (oldEditor != null) {
+                    oldEditor.removePropertyChangeListener(this);
                     datePicker.remove(oldEditor);
                 }
 
                 JFormattedTextField editor = (JFormattedTextField)e.getNewValue();
                 datePicker.add(editor);
+                editor.addPropertyChangeListener(this);
                 datePicker.revalidate();
             } else if ("componentOrientation".equals(property)) {
                 datePicker.revalidate();
+            } else if ("value".equals(property)) {
+                Date date = (Date) datePicker.getEditor().getValue();
+                datePicker.setDate(date);
             }
         }
 
