@@ -218,12 +218,18 @@ public class JXDatePicker extends JComponent {
      * @param date date
      */
     public void setDate(Date date) {
-        if (date == null) {
+        SortedSet<Date> selection = _monthView.getSelection();
+        Date selectedDate = selection.isEmpty() ? null : selection.first();
+
+        // Only set the date if the value was null and the current selection is not null or
+        // the value is not null and is not equal to the current selection.
+        if (date == null && selectedDate != date) {
             _monthView.clearSelection();
-        } else {
+            getEditor().setValue(date);
+        } else if (date != null && !date.equals(selectedDate)) {
             _monthView.setSelectionInterval(date, date);
+            getEditor().setValue(date);
         }
-        getEditor().setValue(date);
     }
 
     /**
