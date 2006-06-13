@@ -20,6 +20,8 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JComponent;
@@ -67,6 +69,7 @@ public class JXTableHeader extends JTableHeader {
      * 
      * PENDING: who is responsible for synching the columnModel?
      */
+    @Override
     public void setTable(JTable table) {
         super.setTable(table);
 //        setColumnModel(table.getColumnModel());
@@ -111,6 +114,41 @@ public class JXTableHeader extends JTableHeader {
         return (JXTable) getTable();
     }
 
+    /**
+     * Overridden to adjust for a minimum height as returned by
+     * #getMinimumHeight.
+     * 
+     * @inheritDoc
+     */
+    @Override
+    public Dimension getPreferredSize() {
+        Dimension pref = super.getPreferredSize();
+        pref.height = getMinimumHeight(pref.height);
+        return pref;
+    }
+    
+    /**
+     * Allows to enforce a minimum heigth in the 
+     * getXXSize methods.
+     * 
+     * Here: jumps in if the table's columnControl is visible and
+     *   the input height is 0  - this happens if all
+     *   columns are hidden - and configures the default
+     *   header renderer with a dummy value for measuring.
+     * 
+     * @param height the prefHeigth as calcualated by super.
+     * @return a minimum height for the preferredSize.
+     */
+    protected int getMinimumHeight(int height) {
+        if ((height == 0) && (getXTable() != null) 
+                && getXTable().isColumnControlVisible()){
+            TableCellRenderer renderer = getDefaultRenderer();
+            Component comp = renderer.getTableCellRendererComponent(getTable(), 
+                        "dummy", false, false, -1, -1);
+            height = comp.getPreferredSize().height;
+        }
+        return height;
+    }
     
     public void updateUI() {
         super.updateUI();

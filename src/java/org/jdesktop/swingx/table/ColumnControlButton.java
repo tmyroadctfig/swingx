@@ -102,6 +102,12 @@ public final class ColumnControlButton extends JButton {
 
         private PropertyChangeListener columnListener;
 
+        /** flag to distinguish selection changes triggered by
+         *  column's property change from those triggered by
+         *  user interaction. Hack around #212-swingx.
+         */
+        private boolean fromColumn;
+
         public ColumnVisibilityAction(TableColumn column) {
             super((String) null);
             setStateAction();
@@ -118,11 +124,15 @@ public final class ColumnControlButton extends JButton {
             column.removePropertyChangeListener(columnListener);
             column = null;
         }
-
+        
+        /**
+         * overriden to disable if control is not applicable.
+         */
+        @Override
         public boolean isEnabled() {
-            return super.isEnabled() && canControl();
+            return super.isEnabled() && canControl(); 
         }
-
+        
         private boolean canControl() {
             return (column instanceof TableColumnExt);
         }
@@ -137,7 +147,8 @@ public final class ColumnControlButton extends JButton {
                         // by deselecting the menu item. 
                         // TODO further check Rob's basic idea to distinguish
                         // event sources instead of unconditionally reselect!
-                        && (table.getColumnCount() <= 1)) {
+                        && (table.getColumnCount() <= 1)
+                        && !fromColumn) {
                     reselect();
                 } else {
                     ((TableColumnExt) column)
@@ -146,19 +157,32 @@ public final class ColumnControlButton extends JButton {
             }
         }
 
+        /**
+         * do nothing. Synch is done in itemStateChanged.
+         */
         public void actionPerformed(ActionEvent e) {
-            // TODO Auto-generated method stub
 
         }
-
+        
+        /**
+         * synch from TableColumnExt.visible to selected.
+         *
+         */
         private void updateSelected() {
             boolean visible = true;
             if (canControl()) {
                 visible = ((TableColumnExt) column).isVisible();
             }
+            fromColumn = true;
             setSelected(visible);
+            fromColumn = false;
         }
 
+        /**
+         * enforce selected == true. Called if user interaction
+         * tried to de-select the last single visible column.
+         *
+         */
         private void reselect() {
             firePropertyChange("selected", null, Boolean.TRUE);
         }
@@ -214,6 +238,7 @@ public final class ColumnControlButton extends JButton {
         }
     }
 
+
     @Override
     public void applyComponentOrientation(ComponentOrientation o) {
         super.applyComponentOrientation(o);
@@ -227,9 +252,9 @@ public final class ColumnControlButton extends JButton {
      * Handles cleanup of listeners to the old/new columnModel (listens to the
      * new only if we can control column visibility) and content of popupMenu.
      * 
-     * @param oldModel
+     * @param oldModel the old ColumnModel we had been listening to.
      */
-    private void updateFromColumnModelChange(TableColumnModel oldModel) {
+    protected void updateFromColumnModelChange(TableColumnModel oldModel) {
         if (oldModel != null) {
             oldModel.removeColumnModelListener(columnModelListener);
         }
@@ -239,6 +264,10 @@ public final class ColumnControlButton extends JButton {
         }
     }
     
+    /**
+     * Synchs this button's enabled with table's enabled.
+     *
+     */
     protected void updateFromTableEnabledChanged() {
         getAction().setEnabled(table.isEnabled());
         
@@ -247,9 +276,10 @@ public final class ColumnControlButton extends JButton {
      * Method to check if we can control column visibility POST: if true we can
      * be sure to have an extended TableColumnModel
      * 
-     * @return
+     * @return boolean to indicate if controlling the visibility state is
+     *   possible. 
      */
-    private boolean canControl() {
+    protected boolean canControl() {
         return table.getColumnModel() instanceof TableColumnModelExt;
     }
  

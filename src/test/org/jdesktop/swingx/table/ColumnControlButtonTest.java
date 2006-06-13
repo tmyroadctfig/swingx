@@ -90,6 +90,60 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
                 priorityColumn.getPropertyChangeListeners().length);
      }
 
+    /**
+     * Issue #212-swingx: 
+     * 
+     * Behaviour change: 
+     * <ul>
+     * <li>before - guarantee that exactly one column is always visible, 
+     *    independent of source of visibiblity change
+     * <li> now - this is true for user gesture induced invisible (through 
+     *    columnControl, but not for programmatic hiding. It's up to 
+     *    developers to not hide all. To alleviate the effects if they 
+     *    hide all, the JXTableHeader and ColumnControl is always visible.
+     * </ul>
+     * This is testing the old behaviour (guarding against regression)
+     * Here we directly set the second last visible column to invisible. This 
+     * failed if a) column visibility is set after adding the table to a frame
+     * and b) model.count = 2.
+     *
+     */
+    public void testSetAllColumnsToInvisible() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            return;
+        }
+        final JXTable table = new JXTable(10, 2);
+        table.setColumnControlVisible(true);
+        wrapWithScrollingInFrame(table, "");
+        table.getColumnExt(0).setVisible(false);
+        assertEquals(1, table.getColumnCount());
+        table.getColumnExt(0).setVisible(false);
+        assertEquals(0, table.getColumnCount());
+    }
+    /**
+     * Issue #212-swingx: 
+     * 
+     * guarantee that exactly one column is always visible if 
+     * visibility is toggled via the ColumnControl.
+     * 
+     * Here we deselect the menuitem.
+     * 
+     */
+    public void testSetLastColumnMenuItemToUnselected() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            return;
+        }
+        final JXTable table = new JXTable(10, 1);
+        table.setColumnControlVisible(true);
+        wrapWithScrollingInFrame(table, "");
+        ColumnControlButton columnControl = (ColumnControlButton) table.getColumnControl();
+        Component[] items = columnControl.popupMenu.getComponents();
+        ((JMenuItem) items[0]).setSelected(false);
+        assertEquals(1, table.getColumnCount());
+    }
+
    /** 
     * Issue #192: initially invisibility columns are hidden
     * but marked as visible in control.
@@ -172,10 +226,11 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
     /** 
      * Issue #212: programmatically toggle column vis does not work.
      * 
-     * Visual check: programmatically toggle column visibility.
+     * Visual check: compare toggle column visibility both via the columnControl 
+     * and programmatically by button. While the columnControl prevents to hide
+     * the very last visible column, developers have full control to do so 
+     * programatically.
      * 
-     * Happens if a) column visibility is set after adding the table to a frame
-     * and b) model.count = 2.
      * 
      */
     public void interactiveTestColumnControlSetModelToggleInvisibleColumns() {

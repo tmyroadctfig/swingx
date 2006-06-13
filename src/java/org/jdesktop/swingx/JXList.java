@@ -158,7 +158,7 @@ public class JXList extends JList {
      * @throws IllegalArgumentException   if <code>listData</code>
      *                                          is <code>null</code>
      */
-    public JXList(Vector listData) {
+    public JXList(Vector<?> listData) {
         this(listData, false);
     }
 
