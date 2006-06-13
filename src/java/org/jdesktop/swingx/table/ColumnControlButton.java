@@ -145,9 +145,11 @@ public final class ColumnControlButton extends JButton {
                         // the current column is the second last visible
                         // guarding against 0 leads to hiding all columns
                         // by deselecting the menu item. 
-                        // TODO further check Rob's basic idea to distinguish
-                        // event sources instead of unconditionally reselect!
                         && (table.getColumnCount() <= 1)
+                        // JW Fixed #212: basically implemented Rob's idea to distinguish
+                        // event sources instead of unconditionally reselect
+                        // not entirely sure if the state transitions are completely
+                        // defined but all related tests are passing now.
                         && !fromColumn) {
                     reselect();
                 } else {
