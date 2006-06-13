@@ -89,7 +89,7 @@ public class JXTableHeader extends JTableHeader
      * Implementing TableColumnModelExt: listening to column property changes.
      * @param event change notification from a contained TableColumn.
      */
-    public void columnPropertyChanged(PropertyChangeEvent event) {
+    public void columnPropertyChange(PropertyChangeEvent event) {
        repaint(); 
     }
     /**

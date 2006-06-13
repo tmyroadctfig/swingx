@@ -58,7 +58,7 @@ public class ColumnModelReport implements TableColumnModelExtListener {
     //---------------------- implement TableColumnModelExtListener
 
 
-    public void columnPropertyChanged(PropertyChangeEvent e) {
+    public void columnPropertyChange(PropertyChangeEvent e) {
         columnPropertyEvents.add(0, e);
         
     }

@@ -21,5 +21,5 @@ public interface TableColumnModelExtListener extends TableColumnModelListener {
      * @param event a <code>PropertyChangeEvent</code> fired by a TableColumn
      *   contained in the TableColumnModel
      */
-    void columnPropertyChanged(PropertyChangeEvent event);
+    void columnPropertyChange(PropertyChangeEvent event);
 }

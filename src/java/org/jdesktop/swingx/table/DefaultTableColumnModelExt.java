@@ -306,7 +306,7 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
         for (int i = listeners.length-2; i>=0; i-=2) {
             if (listeners[i]==TableColumnModelExtListener.class) {
                 ((TableColumnModelExtListener)listeners[i+1]).
-                    columnPropertyChanged(evt);
+                    columnPropertyChange(evt);
             }
         }
 
