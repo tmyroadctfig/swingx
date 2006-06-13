@@ -88,7 +88,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*isable.*");
           
 //          test.runInteractiveTests("interactive.*Column.*");
-        test.runInteractiveTests("interactive.*Toggle.*");
+        test.runInteractiveTests("interactive.*Header.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();

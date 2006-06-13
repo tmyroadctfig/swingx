@@ -32,8 +32,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.event.EventListenerList;
+import javax.swing.event.TableColumnModelEvent;
+import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableColumn;
+
+import org.jdesktop.swingx.event.TableColumnModelExtListener;
 
 
 /**
@@ -247,7 +252,9 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
         col.putClientProperty(IGNORE_EVENT, null);
     } 
 
-
+    /**
+     * TODO move into propertyChanged! No need for a dedicated listener.
+     */
     private final class VisibilityListener implements PropertyChangeListener {        
         public void propertyChange(PropertyChangeEvent evt) {
             if (evt.getPropertyName().equals("visible")) {
@@ -263,5 +270,61 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
             }
         }
     }
+ 
+    // enhanced listener notification
     
+    
+    /**
+     * exposed for testing only - don't use! Will be removed again!
+     * @return super's listenerlist
+     */
+    protected EventListenerList getEventListenerList() {
+        return listenerList;
+    }
+
+    
+    
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        super.propertyChange(evt);
+        fireColumnPropertyChange(evt);
+    }
+
+    /**
+     * Notifies all listeners that have registered interest for
+     * notification on this event type.  The event instance
+     * is lazily created using the parameters passed into
+     * the fire method.
+     * @param  e the event received
+     * @see EventListenerList
+     */
+    protected void fireColumnPropertyChange(PropertyChangeEvent evt) {
+        // Guaranteed to return a non-null array
+        Object[] listeners = listenerList.getListenerList();
+        // Process the listeners last to first, notifying
+        // those that are interested in this event
+        for (int i = listeners.length-2; i>=0; i-=2) {
+            if (listeners[i]==TableColumnModelExtListener.class) {
+                ((TableColumnModelExtListener)listeners[i+1]).
+                    columnPropertyChanged(evt);
+            }
+        }
+
+    }
+
+    @Override
+    public void addColumnModelListener(TableColumnModelListener x) {
+        super.addColumnModelListener(x);
+        if (x instanceof TableColumnModelExtListener) {
+            listenerList.add(TableColumnModelExtListener.class, (TableColumnModelExtListener) x);
+        }
+    }
+
+    @Override
+    public void removeColumnModelListener(TableColumnModelListener x) {
+        super.removeColumnModelListener(x);
+        if (x instanceof TableColumnModelExtListener) {
+            listenerList.remove(TableColumnModelExtListener.class, (TableColumnModelExtListener) x);
+        }
+    }
 }

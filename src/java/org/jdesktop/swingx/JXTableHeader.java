@@ -23,6 +23,7 @@ package org.jdesktop.swingx;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
 
 import javax.swing.JComponent;
 import javax.swing.JTable;
@@ -33,6 +34,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
+import org.jdesktop.swingx.event.TableColumnModelExtListener;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 import org.jdesktop.swingx.table.TableColumnExt;
 
@@ -51,7 +53,8 @@ import org.jdesktop.swingx.table.TableColumnExt;
  * 
  * @author Jeanette Winzenburg
  */
-public class JXTableHeader extends JTableHeader {
+public class JXTableHeader extends JTableHeader 
+    implements TableColumnModelExtListener {
 
     private SortGestureRecognizer sortGestureRecognizer;
 
@@ -82,6 +85,13 @@ public class JXTableHeader extends JTableHeader {
         }
     }
 
+    /**
+     * Implementing TableColumnModelExt: listening to column property changes.
+     * @param event change notification from a contained TableColumn.
+     */
+    public void columnPropertyChanged(PropertyChangeEvent event) {
+       repaint(); 
+    }
     /**
      * overridden to respect the column tooltip, if available. 
      * 

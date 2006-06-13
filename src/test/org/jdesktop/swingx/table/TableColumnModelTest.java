@@ -7,14 +7,18 @@
 
 package org.jdesktop.swingx.table;
 
+import java.beans.PropertyChangeEvent;
+
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import junit.framework.TestCase;
 
+import org.jdesktop.swingx.event.TableColumnModelExtListener;
 import org.jdesktop.swingx.util.ColumnModelReport;
 
 /**
@@ -32,6 +36,37 @@ public class TableColumnModelTest extends TestCase {
 
     private static final int COLUMN_COUNT = 3;
  
+    /**
+     * test the columnPropertyChangeEvent is fired as expected.
+     *
+     */
+    public void testColumnPropertyChangeNotification() {
+        DefaultTableColumnModelExt model = (DefaultTableColumnModelExt) createColumnModel(COLUMN_COUNT);
+        ColumnModelReport report = new ColumnModelReport();
+        model.addColumnModelListener(report);
+        TableColumn column = model.getColumn(0);
+        column.setHeaderValue("somevalue");
+        assertEquals(1, report.getColumnPropertyEventCount());
+        PropertyChangeEvent event = report.getLastColumnPropertyEvent();
+        assertEquals(column, event.getSource());
+        assertEquals("headerValue", event.getPropertyName());
+        assertEquals("somevalue", event.getNewValue());
+    }
+    /**
+     * added TableColumnModelExtListener: test for add/remove extended listeners.
+     *
+     */
+    public void testAddExtListener() {
+        DefaultTableColumnModelExt model = (DefaultTableColumnModelExt) createColumnModel(COLUMN_COUNT);
+        ColumnModelReport extListener = new ColumnModelReport();
+        model.addColumnModelListener(extListener);
+        assertEquals(1, model.getEventListenerList().getListenerCount(TableColumnModelExtListener.class));
+        assertEquals(2, model.getEventListenerList().getListenerCount());
+        model.removeColumnModelListener(extListener);
+        assertEquals(0, model.getEventListenerList().getListenerCount(TableColumnModelExtListener.class));
+        assertEquals(0, model.getEventListenerList().getListenerCount());
+        
+    }
     /**
      * Issue #??-swingx: incorrect isRemovedToInvisible after
      * removing an invisible column. 

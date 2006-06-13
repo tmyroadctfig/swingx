@@ -46,9 +46,12 @@ import javax.swing.table.TableColumnModel;
  * it is allowed to add columns of type TableColumn it doesn't make much sense to 
  * do so - they will always be visible. <p>
  * 
- * 
+ * This class guarantees to notify registered TableColumnModelExt listener of 
+ * propertyChanges fired by contained columns. 
  *
  * @author Richard Bair
+ * @author Jeanette Winzenburg
+ * 
  */
 public interface TableColumnModelExt extends TableColumnModel {
     /**
