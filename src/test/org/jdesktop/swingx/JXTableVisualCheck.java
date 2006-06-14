@@ -47,6 +47,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.JXTableHeader.SortGestureRecognizer;
+import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.LinkModelAction;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
@@ -62,6 +63,7 @@ import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.decorator.SortController;
 import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
+import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
 import org.jdesktop.swingx.table.TableColumnExt;
@@ -88,7 +90,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*isable.*");
           
 //          test.runInteractiveTests("interactive.*Column.*");
-        test.runInteractiveTests("interactive.*Header.*");
+        test.runInteractiveTests("interactive.*Viewport.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -103,6 +105,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         setSystemLF(true);
     }
 
+    
     /**
      * visually check if terminateEditOnFocusLost, autoStartEdit
      * work as expected.
@@ -318,6 +321,71 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         frame.setVisible(true);
         
     }
+    
+    /**
+     * Issue #??-swingx: column auto-sizing support.
+     *
+     */
+    public void interactiveTestExpandsToViewportWidth() {
+        final JXTable table = new JXTable();
+        ColumnFactory factory = new ColumnFactory() {
+            @Override
+            public void configureTableColumn(TableModel model, TableColumnExt columnExt) {
+                 super.configureTableColumn(model, columnExt);
+                 if (model.getColumnClass(columnExt.getModelIndex()) == Integer.class) {
+                     // to see the effect: excess width is distributed relative
+                     // to the difference between maxSize and prefSize
+                     columnExt.setMaxWidth(200);
+                 } else {
+                 
+                     columnExt.setMaxWidth(1024);
+                 }
+            }
+            
+        };
+        table.setColumnFactory(factory);
+        table.setExpandsToViewportWidthEnabled(true);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        table.setColumnControlVisible(true);
+        table.setModel(sortableTableModel);
+        table.packAll();
+        JXFrame frame = wrapWithScrollingInFrame(table, "expand to width");
+//        table.expandToViewportWidth();
+//        frame.invalidate();
+//        frame.validate();
+        Action toggleModel = new AbstractAction("toggle model") {
+
+            public void actionPerformed(ActionEvent e) {
+                table.setModel(table.getModel() == sortableTableModel ? 
+                        new DefaultTableModel(20, 4) : sortableTableModel);
+                
+            }
+            
+        };
+        addAction(frame, toggleModel);
+        Action dockAction = new AbstractActionExt("dockOnExpand: " + table.isDockedOnExpandWidth()) {
+
+            public void actionPerformed(ActionEvent e) {
+                table.setDockedOnExpandWidth(!table.isDockedOnExpandWidth());
+                this.setName("dockedOnExpand: " + table.isDockedOnExpandWidth());
+            }
+            
+        };
+        addAction(frame, dockAction);
+        Action action = new AbstractAction("expand to width") {
+
+            public void actionPerformed(ActionEvent e) {
+                table.expandToViewportWidth();
+                
+            }
+            
+        };
+        addAction(frame, action);
+        
+        frame.setVisible(true);
+
+    }
+    
     /**
      * Issue #256-swingx: viewport config.
      *

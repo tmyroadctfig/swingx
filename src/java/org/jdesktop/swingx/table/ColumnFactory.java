@@ -133,7 +133,8 @@ public class ColumnFactory {
     /**
      * configure column widths properties from JXTable. This
      * method is typically called in JXTable initialization 
-     * (TODO JW: really? need to check).
+     * (TODO JW: really? unfortunately: yes - should be called always after
+     * structureChanged).
      * 
      * Here: set column's preferredWidth from prototype. 
      *  

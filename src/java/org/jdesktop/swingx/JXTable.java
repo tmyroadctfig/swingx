@@ -64,6 +64,7 @@ import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SizeSequence;
+import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
@@ -84,13 +85,13 @@ import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
-import org.jdesktop.swingx.decorator.ResetDTCRColorHighlighter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.PipelineEvent;
 import org.jdesktop.swingx.decorator.PipelineListener;
+import org.jdesktop.swingx.decorator.ResetDTCRColorHighlighter;
 import org.jdesktop.swingx.decorator.SearchHighlighter;
 import org.jdesktop.swingx.decorator.SelectionMapper;
 import org.jdesktop.swingx.decorator.SizeSequenceMapper;
@@ -327,10 +328,20 @@ public class JXTable extends JTable {
 
     protected Searchable searchable;
 
+    /** property to control the tracksViewportHeight behaviour. */
     private boolean fillsViewportHeight;
 
+    /** internal flag to control the tracksViewportWidth behaviour. */
+    private boolean ensureFillsViewportWidth;
 
     private boolean editable;
+
+
+    private boolean expandsToViewportWidthEnabled;
+
+
+    private boolean dockedOnExpand;
+
 
     /** Instantiates a JXTable with a default table model, no data. */
     public JXTable() {
@@ -590,51 +601,6 @@ public class JXTable extends JTable {
     
 //--------------------------------- ColumnControl && Viewport
  
-    /**
-     * Set flag to control JXTable's scrollableTracksViewportHeight 
-     * property.
-     * If true the table's height will be always at least as large as the 
-     * containing (viewport?) parent, if false the table's height will be
-     * independent of parent's height.
-     *   
-     */
-    public void setFillsViewportHeight(boolean fillsViewportHeight) {
-        if (fillsViewportHeight == getFillsViewportHeight()) return;
-        boolean old = getFillsViewportHeight();
-        this.fillsViewportHeight = fillsViewportHeight;
-        firePropertyChange("fillsViewportHeight", old, getFillsViewportHeight());
-        revalidate();
-    }
-    
-    /**
-     * Returns the flag to control JXTable scrollableTracksViewportHeight
-     * property. 
-     * If true the table's height will be always at least as large as the 
-     * containing (viewport?) parent, if false the table's height will be
-     * independent of parent's height.
-     * 
-     * @return true if the table's height will always be at least as large
-     * as the containing parent, false if it is independent
-     */
-    public boolean getFillsViewportHeight() {
-        return fillsViewportHeight;
-}
-
-    /**
-     * Overridden to control the tracksHeight property depending on 
-     * fillsViewportHeight and relative size to containing parent (viewport?).
-     * 
-     * @return true if the control flag is true and the containing viewport
-     *          height > prefHeight, else returns false.
-     * 
-     */
-    @Override
-    public boolean getScrollableTracksViewportHeight() {
-        return getFillsViewportHeight()
-        && getParent() instanceof JViewport
-        && (((JViewport)getParent()).getHeight() > getPreferredSize().height);
-    }
-
     
     /**
      * overridden to addionally configure the upper right corner of an enclosing
@@ -844,6 +810,7 @@ public class JXTable extends JTable {
      */
     public void packAll() {
         packTable(-1);
+        expandToViewportWidth();
     }
 
     /**
@@ -859,6 +826,24 @@ public class JXTable extends JTable {
         }
     }
 
+    /** Notifies the table that a new column has been selected. 
+     *  overridden to update the enabled state of the packSelected
+     *  action.
+     */
+    @Override
+    public void columnSelectionChanged(ListSelectionEvent e) {
+        super.columnSelectionChanged(e);
+        if (e.getValueIsAdjusting())
+            return;
+        Action packSelected = getActionMap().get(PACKSELECTED_ACTION_COMMAND);
+        if ((packSelected != null)) {
+            packSelected.setEnabled(!((ListSelectionModel) e.getSource())
+                    .isSelectionEmpty());
+        }
+    }
+
+//----------------------- scrollable control
+    
     /**
      * Controls horizontal scrolling in the viewport, and works in coordination
      * with column sizing.
@@ -880,24 +865,8 @@ public class JXTable extends JTable {
     }
 
     /** Returns the current setting for horizontal scrolling. */
-    private boolean isHorizontalScrollEnabled() {
+    protected boolean isHorizontalScrollEnabled() {
         return getAutoResizeMode() == AUTO_RESIZE_OFF;
-    }
-
-    /** Notifies the table that a new column has been selected. 
-     *  overridden to update the enabled state of the packSelected
-     *  action.
-     */
-    @Override
-    public void columnSelectionChanged(ListSelectionEvent e) {
-        super.columnSelectionChanged(e);
-        if (e.getValueIsAdjusting())
-            return;
-        Action packSelected = getActionMap().get(PACKSELECTED_ACTION_COMMAND);
-        if ((packSelected != null)) {
-            packSelected.setEnabled(!((ListSelectionModel) e.getSource())
-                    .isSelectionEmpty());
-        }
     }
 
     /** 
@@ -906,6 +875,12 @@ public class JXTable extends JTable {
      */
     @Override
     public void setAutoResizeMode(int mode) {
+        if ((mode == AUTO_RESIZE_OFF) && (getAutoResizeMode() != mode)) {
+            ensureFillsViewportWidth = true;
+        }
+        if (mode != AUTO_RESIZE_OFF) {
+            oldAutoResizeMode = mode;
+        }
         super.setAutoResizeMode(mode);
         Action showHorizontal = getActionMap().get(
                 HORIZONTALSCROLL_ACTION_COMMAND);
@@ -913,6 +888,175 @@ public class JXTable extends JTable {
             ((BoundAction) showHorizontal)
                     .setSelected(isHorizontalScrollEnabled());
         }
+    }
+
+    /**
+     * Make the table fill the entire viewport if necessary.
+     * "necessary" might be true if the isHorizontalScrollEnabled()
+     * and the table's preferred width is less than the 
+     * parent's width (usually the viewport). <p>
+     * 
+     * Does nothing if !expandsToViewportWidthEnabled  which is 
+     * the default. <p>
+     * 
+     * Note: this feature is very experimental - that's why there 
+     * is a dedicated (probably?) temporary property to control
+     * the enablement.
+     * 
+     */
+    public void expandToViewportWidth() {
+        if (!isExpandsToViewportWidthEnabled()) return;
+        ensureFillsViewportWidth = true;
+        revalidate();
+    }
+
+    
+
+    /**
+     * overridden to support auto-expand to parent's width if 
+     * enabled and necessary.
+     */
+    @Override
+    public boolean getScrollableTracksViewportWidth() {
+        boolean shouldTrack = super.getScrollableTracksViewportWidth();
+        if (isExpandsToViewportWidthEnabled() &&
+                ensureFillsViewportWidth && isHorizontalScrollEnabled()) {
+              shouldTrack = getPreferredSize().width <= getParent().getWidth();
+         }
+                
+         return shouldTrack;
+    }
+
+    /**
+     * overridden to support auto-expand  to parent's width if enabled and 
+     * necessary.
+     */
+    @Override
+    public void doLayout() {
+        super.doLayout();
+        if (!isExpandsToViewportWidthEnabled()) return;
+        if (ensureFillsViewportWidth && (getWidth() > 0) && (getParent() != null)
+                && (getParent().getWidth() > 0)) {
+            // JW: initially this flag was introduced to prevent
+            // an endless loop when doing the layout ... 
+            // doesn't seem to be a problem any longer
+            // if commented, then the right edge of the table sticks to the
+            // border of the viewport on increasing the viewport width
+            // (that's because it's effectively always on)
+            // on decreasing the scrollbar appears
+            // if reset to false increasing the viewport width leaves
+            // doesn't increase the table width - to fit again an explicit  
+            // expandToWidth is needed.
+            if (!isDockedOnExpandWidth()) {
+                ensureFillsViewportWidth = false;
+            }
+            for (Enumeration enumeration = getColumnModel().getColumns(); enumeration
+                    .hasMoreElements();) {
+                TableColumn c = (TableColumn) enumeration.nextElement();
+                c.setPreferredWidth(c.getWidth());
+            }
+            revalidate();
+        }
+    }
+
+    /**
+     * Sets the expandsToViewportWidth property. If enabled, the table
+     * can be expanded to viewport width if isHorizontalScrollEnabled. 
+     * The expansion (if enabled) is done automatically after 
+     * in createColumnsFromModel() and in packAll(), 
+     * in all other cases client code must do so explicitly.
+     * 
+     * The default value is false.
+     * 
+     * 
+     * PENDING other candidate contexts for auto-expand?
+     * 
+     * @param enabled boolean indicating whether the table  
+     *   should auto-expand columns to fit the viewport width.
+     */
+    public void setExpandsToViewportWidthEnabled(boolean enabled) {
+        boolean old = isExpandsToViewportWidthEnabled();
+        if (old == enabled) return;
+        expandsToViewportWidthEnabled= enabled;
+        firePropertyChange("expandsToViewportWidthEnabled", old, isExpandsToViewportWidthEnabled());
+        expandToViewportWidth();
+        
+    }
+    
+    /**
+     * 
+     * @return a boolean property indicating whether the table
+     *   should auto-expand columns to fit the viewport width.
+     */
+    protected boolean isExpandsToViewportWidthEnabled() {
+        return expandsToViewportWidthEnabled;
+    }
+
+    /**
+     * 
+     * @param docked boolean to indicate whether the table width should
+     *   be kept docked to the right viewport boundary on expanding the 
+     *   viewport's width.
+     */
+    public void setDockedOnExpandWidth(boolean docked) {
+        boolean old = isDockedOnExpandWidth();
+        if (old == docked) return;
+        this.dockedOnExpand = docked;
+        expandToViewportWidth();
+        firePropertyChange("dockeOnExpandWidth", old, isDockedOnExpandWidth());
+    }
+    
+    /**
+     * 
+     * @return boolean to indicate docking state on viewport expansion.
+     */
+    protected boolean isDockedOnExpandWidth() {
+        return dockedOnExpand;
+    }
+
+    /**
+     * Set flag to control JXTable's scrollableTracksViewportHeight 
+     * property.
+     * If true the table's height will be always at least as large as the 
+     * containing (viewport?) parent, if false the table's height will be
+     * independent of parent's height.
+     *   
+     */
+    public void setFillsViewportHeight(boolean fillsViewportHeight) {
+        if (fillsViewportHeight == getFillsViewportHeight()) return;
+        boolean old = getFillsViewportHeight();
+        this.fillsViewportHeight = fillsViewportHeight;
+        firePropertyChange("fillsViewportHeight", old, getFillsViewportHeight());
+        revalidate();
+    }
+    
+    /**
+     * Returns the flag to control JXTable scrollableTracksViewportHeight
+     * property. 
+     * If true the table's height will be always at least as large as the 
+     * containing (viewport?) parent, if false the table's height will be
+     * independent of parent's height.
+     * 
+     * @return true if the table's height will always be at least as large
+     * as the containing parent, false if it is independent
+     */
+    public boolean getFillsViewportHeight() {
+        return fillsViewportHeight;
+}
+
+    /**
+     * Overridden to control the tracksHeight property depending on 
+     * fillsViewportHeight and relative size to containing parent (viewport?).
+     * 
+     * @return true if the control flag is true and the containing viewport
+     *          height > prefHeight, else returns false.
+     * 
+     */
+    @Override
+    public boolean getScrollableTracksViewportHeight() {
+        return getFillsViewportHeight()
+        && getParent() instanceof JViewport
+        && (((JViewport)getParent()).getHeight() > getPreferredSize().height);
     }
 
 
@@ -1771,6 +1915,7 @@ public class JXTable extends JTable {
                 addColumn(newColumns[i]);
             }
         }
+        expandToViewportWidth();
     }
 
 
@@ -2288,7 +2433,7 @@ public class JXTable extends JTable {
     }
 
     
-//----------------------------------- uniform data model access
+// ----------------------------------- uniform data model access
     /**
      * @return the unconfigured ComponentAdapter.
      */

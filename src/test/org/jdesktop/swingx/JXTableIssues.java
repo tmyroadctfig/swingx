@@ -57,6 +57,20 @@ public class JXTableIssues extends InteractiveTestCase {
     }
 
     /**
+     * Issue??-swingx: turn off scrollbar doesn't work if the
+     *   table was initially in autoResizeOff mode.
+     *   
+     * Problem with state management.  
+     *
+     */
+    public void testHorizontalScrollEnabled() {
+        JXTable table = new JXTable();
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        assertEquals("horizontalScroll must be on", true, table.isHorizontalScrollEnabled());
+        table.setHorizontalScrollEnabled(false);
+        assertEquals("horizontalScroll must be off", false, table.isHorizontalScrollEnabled());
+    }
+    /**
      * we have a slight inconsistency in event values: setting the
      * client property to null means "false" but the event fired
      * has the newValue null.
