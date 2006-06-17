@@ -30,7 +30,8 @@ import java.util.*;
 public class DefaultDateSelectionModel implements DateSelectionModel {
     private EventListenerMap listenerMap;
     private SelectionMode selectionMode;
-    private Set<Date> selectedDates;
+    private SortedSet<Date> selectedDates;
+    private SortedSet<Date> unselectableDates;
     private Calendar cal;
     private int firstDayOfWeek;
 
@@ -177,6 +178,29 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
      */
     public void removeDateSelectionListener(DateSelectionListener l) {
         listenerMap.remove(DateSelectionListener.class, l);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public SortedSet<Date> getUnselectableDates() {
+        return new TreeSet<Date>(unselectableDates);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setUnselectableDates(SortedSet<Date> unselectableDates) {
+        this.unselectableDates = unselectableDates;
+        removeSelectionInterval(this.unselectableDates.first(), this.unselectableDates.last());
+        fireValueChanged(EventType.UNSELECTED_DATES_CHANGED);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isUnselectableDate(Date date) {
+        return unselectableDates != null && unselectableDates.contains(date);
     }
 
     public List<DateSelectionListener> getDateSelectionListeners() {

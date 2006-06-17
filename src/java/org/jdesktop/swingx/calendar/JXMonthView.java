@@ -134,6 +134,18 @@ public class JXMonthView extends JComponent {
         WEEK_INTERVAL_SELECTION
     }
 
+    public static final String BOX_PADDING_X = "boxPaddingX";
+    public static final String BOX_PADDING_Y = "boxPaddingY";
+    public static final String DAYS_OF_THE_WEEK = "daysOfTheWeek";
+    public static final String ENSURE_DATE_VISIBILITY = "ensureDateVisibility";
+    public static final String FIRST_DISPLAYED_DATE = "firstDisplayedDate";
+    public static final String FIRST_DISPLAYED_MONTH = "firstDisplayedMonth";
+    public static final String FIRST_DISPLAYED_YEAR = "firstDisplayedYear";
+    public static final String SELECTION_MODEL = "selectionModel";
+    public static final String TRAVERSABLE = "traversable";
+    public static final String WEEK_NUMBER = "weekNumber";
+    public static final String FLAGGED_DATES = "flaggedDates";
+
     /** Return value used to identify when the month down button is pressed. */
     public static final int MONTH_DOWN = 1;
     /** Return value used to identify when the month up button is pressed. */
@@ -177,7 +189,6 @@ public class JXMonthView extends JComponent {
     private int minCalRows = 1;
     private long today;
     private TreeSet<Long> flaggedDates;
-    private TreeSet<Long> unselectableDates;
     private int firstDayOfWeek;
     private boolean antiAlias;
     private boolean traversable;
@@ -315,9 +326,9 @@ public class JXMonthView extends JComponent {
         firstDisplayedMonth = cal.get(Calendar.MONTH);
         firstDisplayedYear = cal.get(Calendar.YEAR);
 
-        firePropertyChange("firstDisplayedDate", oldFirstDisplayedDate, firstDisplayedDate);
-        firePropertyChange("firstDisplayedMonth", oldFirstDisplayedMonth, firstDisplayedMonth);
-        firePropertyChange("firstDisplayedYear", oldFirstDisplayedYear, firstDisplayedYear);
+        firePropertyChange(FIRST_DISPLAYED_DATE, oldFirstDisplayedDate, firstDisplayedDate);
+        firePropertyChange(FIRST_DISPLAYED_MONTH, oldFirstDisplayedMonth, firstDisplayedMonth);
+        firePropertyChange(FIRST_DISPLAYED_YEAR, oldFirstDisplayedYear, firstDisplayedYear);
 
         calculateLastDisplayedDate();
 
@@ -366,7 +377,7 @@ public class JXMonthView extends JComponent {
             setFirstDisplayedDate(cal.getTimeInMillis());
         }
 
-        firePropertyChange("ensureDateVisibility", null, date);
+        firePropertyChange(ENSURE_DATE_VISIBILITY, null, date);
     }
 
     /**
@@ -502,7 +513,7 @@ public class JXMonthView extends JComponent {
     public void setSelectionModel(DateSelectionModel model) {
         DateSelectionModel oldModel = this.model;
         this.model = model;
-        firePropertyChange("selectionModel", oldModel, model);
+        firePropertyChange(SELECTION_MODEL, oldModel, model);
     }
 
     /**
@@ -531,7 +542,6 @@ public class JXMonthView extends JComponent {
         firePropertyChange("selectionMode", oldSelectionMode, this.selectionMode);
     }
 
-
     /**
      * Returns true if the specified date falls within the _startSelectedDate
      * and _endSelectedDate range.  <b>All dates are modified to remove their hour of
@@ -541,6 +551,17 @@ public class JXMonthView extends JComponent {
      */
     public boolean isSelectedDate(long date) {
         return getSelectionModel().isSelected(new Date(cleanupDate(date)));
+    }
+
+    /**
+     * Identifies whether or not the date passed is an unselectable date.  <b>All dates are modified to remove their
+     * hour of day, minute, second, and millisecond before being added to the selection model</b>.
+     *
+     * @param date date which to test for unselectable status
+     * @return true if the date is unselectable, false otherwise
+     */
+    public boolean isUnselectableDate(long date) {
+        return getSelectionModel().isUnselectableDate(new Date(cleanupDate(date)));
     }
 
     /**
@@ -575,23 +596,8 @@ public class JXMonthView extends JComponent {
                 this.flaggedDates.add(cleanupDate(flaggedDate));
             }
         }
-        firePropertyChange("flaggedDates", null, this.flaggedDates);
+        firePropertyChange(FLAGGED_DATES, null, this.flaggedDates);
         repaint();
-    }
-
-    /**
-     * Identifies whether or not the date passed is an unselectable date.  <b>All dates are modified to remove their
-     * hour of day, minute, second, and millisecond before being added to the selection model</b>.
-     *
-     * @param date date which to test for unselectable status
-     * @return true if the date is unselectable, false otherwise
-     */
-    public boolean isUnselectableDate(long date) {
-        boolean result = false;
-        if (unselectableDates != null) {
-            result = unselectableDates.contains(cleanupDate(date));
-        }
-        return result;
     }
 
     /**
@@ -601,18 +607,11 @@ public class JXMonthView extends JComponent {
      * @param unselectableDates the dates that should be unselectable
      */
     public void setUnselectableDates(long[] unselectableDates) {
-        if (unselectableDates == null) {
-            this.unselectableDates = null;
-        } else {
-            this.unselectableDates = new TreeSet<Long>();
-            // Loop through the unselectableDates and clean them up so
-            // the hour, minute, seconds and milliseconds to 0 so
-            // we can compare times later.
-            for (long date : unselectableDates) {
-                this.unselectableDates.add(cleanupDate(date));
-            }
+        SortedSet<Date> unselectableSet = new TreeSet<Date>();
+        for (long unselectableDate : unselectableDates) {
+            unselectableSet.add(new Date(cleanupDate(unselectableDate)));
         }
-        firePropertyChange("unselectableDates", null, this.unselectableDates);
+        getSelectionModel().setUnselectableDates(unselectableSet);
         repaint();
     }
 
@@ -648,7 +647,7 @@ public class JXMonthView extends JComponent {
     public void setBoxPaddingX(int boxPaddingX) {
         int oldBoxPadding = this.boxPaddingX;
         this.boxPaddingX = boxPaddingX;
-        firePropertyChange("boxPaddingX", oldBoxPadding, this.boxPaddingX);
+        firePropertyChange(BOX_PADDING_X, oldBoxPadding, this.boxPaddingX);
     }
 
     /**
@@ -667,7 +666,7 @@ public class JXMonthView extends JComponent {
     public void setBoxPaddingY(int boxPaddingY) {
         int oldBoxPadding = this.boxPaddingY;
         this.boxPaddingY = boxPaddingY;
-        firePropertyChange("boxPaddingY", oldBoxPadding, this.boxPaddingY);
+        firePropertyChange(BOX_PADDING_Y, oldBoxPadding, this.boxPaddingY);
     }
 
     /**
@@ -689,7 +688,7 @@ public class JXMonthView extends JComponent {
     public void setTraversable(boolean traversable) {
         if (traversable != this.traversable) {
             this.traversable = traversable;
-            firePropertyChange("traversable", !this.traversable, this.traversable);
+            firePropertyChange(TRAVERSABLE, !this.traversable, this.traversable);
             repaint();
         }
     }
@@ -714,7 +713,7 @@ public class JXMonthView extends JComponent {
     public void setShowingWeekNumber(boolean showWeekNumber) {
         if (this.showWeekNumber != showWeekNumber) {
             this.showWeekNumber = showWeekNumber;
-            firePropertyChange("weekNumber", !this.showWeekNumber, showWeekNumber);
+            firePropertyChange(WEEK_NUMBER, !this.showWeekNumber, showWeekNumber);
             repaint();
         }
     }
@@ -738,7 +737,7 @@ public class JXMonthView extends JComponent {
 
         String[] oldValue = _daysOfTheWeek;
         _daysOfTheWeek = days;
-        firePropertyChange("daysOfTheWeek", oldValue, _daysOfTheWeek);
+        firePropertyChange(DAYS_OF_THE_WEEK, oldValue, _daysOfTheWeek);
         repaint();
     }
 

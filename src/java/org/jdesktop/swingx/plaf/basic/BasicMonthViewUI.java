@@ -1269,24 +1269,24 @@ public class BasicMonthViewUI extends MonthViewUI {
                 monthView.revalidate();
                 calculateStartPosition();
                 calculateDirtyRectForSelection();
-            } else if ("ensureDateVisibility".equals(property)) {
+            } else if (JXMonthView.ENSURE_DATE_VISIBILITY.equals(property)) {
                 calculateDirtyRectForSelection();
-            } else if ("selectionModel".equals(property)) {
+            } else if (JXMonthView.SELECTION_MODEL.equals(property)) {
                 DateSelectionModel selectionModel = (DateSelectionModel) evt.getOldValue();
                 selectionModel.removeDateSelectionListener(getHandler());
                 selectionModel = (DateSelectionModel) evt.getNewValue();
                 selectionModel.addDateSelectionListener(getHandler());
-            } else if ("firstDisplayedDate".equals(property)) {
+            } else if (JXMonthView.FIRST_DISPLAYED_DATE.equals(property)) {
                 firstDisplayedDate = (Long)evt.getNewValue();
-            } else if ("firstDisplayedMonth".equals(property)) {
+            } else if (JXMonthView.FIRST_DISPLAYED_MONTH.equals(property)) {
                 firstDisplayedMonth = (Integer)evt.getNewValue();
-            } else if ("firstDisplayedYear".equals(property)) {
+            } else if (JXMonthView.FIRST_DISPLAYED_YEAR.equals(property)) {
                 firstDisplayedYear = (Integer)evt.getNewValue();
             } else if ("today".equals(property)) {
                 today = (Long)evt.getNewValue();
-            } else if ("boxPaddingX".equals(property) || "boxPaddingY".equals(property) ||
-                    "traversable".equals(property) || "daysOfTheWeek".equals(property) ||
-                    "border".equals(property) || "font".equals(property) || "weekNumber".equals(property)) {
+            } else if (JXMonthView.BOX_PADDING_X.equals(property) || JXMonthView.BOX_PADDING_Y.equals(property) ||
+                    JXMonthView.TRAVERSABLE.equals(property) || JXMonthView.DAYS_OF_THE_WEEK.equals(property) ||
+                    "border".equals(property) || "font".equals(property) || JXMonthView.WEEK_NUMBER.equals(property)) {
                 boxPaddingX = monthView.getBoxPaddingX();
                 boxPaddingY = monthView.getBoxPaddingY();
                 showingWeekNumber = monthView.isShowingWeekNumber();

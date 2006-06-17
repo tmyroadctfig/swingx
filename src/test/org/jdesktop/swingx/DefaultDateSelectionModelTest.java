@@ -86,4 +86,25 @@ public class DefaultDateSelectionModelTest extends TestCase {
         assertTrue(startDateNextMonth.equals(selection.first()));
         assertTrue(startDateNextMonth.equals(selection.last()));
     }
+
+    public void testUnselctableDates() {
+        model.setSelectionMode(DateSelectionModel.SelectionMode.SINGLE_SELECTION);
+        Date today = new Date();
+        model.setSelectionInterval(today, today);
+        SortedSet<Date> selection = model.getSelection();
+        assertTrue(!selection.isEmpty());
+        assertTrue(1 == selection.size());
+        assertTrue(today.equals(selection.first()));
+
+        model.setUnselectableDates(selection);
+        SortedSet<Date> unselectableDates = model.getUnselectableDates();
+        assertTrue(!selection.isEmpty());
+        assertTrue(1 == selection.size());
+        assertTrue(unselectableDates.contains(today));
+
+        // Make sure setting the unselectable dates to include a selected date removes
+        // it from the selected set.
+        selection = model.getSelection();
+        assertTrue(selection.isEmpty());
+    }
 }

@@ -140,4 +140,26 @@ public interface DateSelectionModel {
      * @param listener listener to remove from this model
      */
     public void removeDateSelectionListener(DateSelectionListener listener);
+
+    /**
+     * Returns a <code>SortedSet</code> of <code>Date</codes>s that are unselectable
+     *
+     * @return sorted set of dates
+     */
+    public SortedSet<Date> getUnselectableDates();
+
+    /**
+     * Set which dates are unable to be selected
+     *
+     * @param unselectableDates dates that are unselectable
+     */
+    public void setUnselectableDates(SortedSet<Date> unselectableDates);
+
+    /**
+     * Return true is the specified date is unselectable
+     *
+     * @param unselectableDate the date to check for unselectability
+     * @return true is the date is unselectable, false otherwise
+     */
+    public boolean isUnselectableDate(Date unselectableDate);
 }
