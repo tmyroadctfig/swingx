@@ -37,6 +37,8 @@ public class BasicMonthViewUI extends MonthViewUI {
     protected SortedSet<Date> selection;
 
     private boolean usingKeyboard = false;
+    /** For interval selections we need to record the date we pivot around. */
+    private long pivotDate = -1;
     private boolean ltr;
     private boolean showingWeekNumber;
     private int arrowPaddingX = 3;
@@ -161,10 +163,10 @@ public class BasicMonthViewUI extends MonthViewUI {
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, false), "selectDayInPreviousWeek");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, false), "selectDayInNextWeek");
 
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.SHIFT_MASK, false), "addPreviousDay");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.SHIFT_MASK, false), "addNextDay");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.SHIFT_MASK, false), "addToPreviousWeek");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.SHIFT_MASK, false), "addToNextWeek");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.SHIFT_MASK, false), "adjustSelectionPreviousDay");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.SHIFT_MASK, false), "adjustSelectionNextDay");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.SHIFT_MASK, false), "adjustSelectionPreviousWeek");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.SHIFT_MASK, false), "adjustSelectionNextWeek");
 
         ActionMap actionMap = monthView.getActionMap();
         actionMap.put("acceptSelection", new KeyboardAction(KeyboardAction.ACCEPT_SELECTION));
@@ -175,10 +177,10 @@ public class BasicMonthViewUI extends MonthViewUI {
         actionMap.put("selectDayInPreviousWeek", new KeyboardAction(KeyboardAction.SELECT_DAY_PREVIOUS_WEEK));
         actionMap.put("selectDayInNextWeek", new KeyboardAction(KeyboardAction.SELECT_DAY_NEXT_WEEK));
 
-        actionMap.put("addPreviousDay", new KeyboardAction(KeyboardAction.ADD_PREVIOUS_DAY));
-        actionMap.put("addNextDay", new KeyboardAction(KeyboardAction.ADD_NEXT_DAY));
-        actionMap.put("addToPreviousWeek", new KeyboardAction(KeyboardAction.ADD_TO_PREVIOUS_WEEK));
-        actionMap.put("addToNextWeek", new KeyboardAction(KeyboardAction.ADD_TO_NEXT_WEEK));
+        actionMap.put("adjustSelectionPreviousDay", new KeyboardAction(KeyboardAction.ADJUST_SELECTION_PREVIOUS_DAY));
+        actionMap.put("adjustSelectionNextDay", new KeyboardAction(KeyboardAction.ADJUST_SELECTION_NEXT_DAY));
+        actionMap.put("adjustSelectionPreviousWeek", new KeyboardAction(KeyboardAction.ADJUST_SELECTION_PREVIOUS_WEEK));
+        actionMap.put("adjustSelectionNextWeek", new KeyboardAction(KeyboardAction.ADJUST_SELECTION_NEXT_WEEK));
     }
 
     protected void uninstallKeyboardActions() {}
@@ -969,14 +971,23 @@ public class BasicMonthViewUI extends MonthViewUI {
         g.drawLine(x + width - 1, y, x - 1, y + height);
     }
 
+    private long cleanupDate(long date) {
+        Calendar cal = monthView.getCalendar();
+        cal.setTimeInMillis(date);
+        // We only want to compare the day, month and year
+        // so reset all other values to 0.
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTimeInMillis();
+    }
+
     private class Handler implements ComponentListener, MouseListener, MouseMotionListener, LayoutManager,
             PropertyChangeListener, DateSelectionListener {
         private boolean asKirkWouldSay_FIRE;
         private long startDate;
         private long endDate;
-
-        /** For multiple selection we need to record the date we pivot around. */
-        private long pivotDate = -1;
 
         public void mouseClicked(MouseEvent e) {}
 
@@ -1033,7 +1044,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             } else {
                 monthView.setSelectionInterval(new Date(startDate), new Date(endDate));
             }
-            
+
             // Arm so we fire action performed on mouse release.
             asKirkWouldSay_FIRE = true;
         }
@@ -1326,10 +1337,10 @@ public class BasicMonthViewUI extends MonthViewUI {
         public static final int SELECT_NEXT_DAY = 3;
         public static final int SELECT_DAY_PREVIOUS_WEEK = 4;
         public static final int SELECT_DAY_NEXT_WEEK = 5;
-        public static final int ADD_PREVIOUS_DAY = 6;
-        public static final int ADD_NEXT_DAY = 7;
-        public static final int ADD_TO_PREVIOUS_WEEK = 8;
-        public static final int ADD_TO_NEXT_WEEK = 9;
+        public static final int ADJUST_SELECTION_PREVIOUS_DAY = 6;
+        public static final int ADJUST_SELECTION_NEXT_DAY = 7;
+        public static final int ADJUST_SELECTION_PREVIOUS_WEEK = 8;
+        public static final int ADJUST_SELECTION_NEXT_WEEK = 9;
 
         private int action;
 
@@ -1361,9 +1372,10 @@ public class BasicMonthViewUI extends MonthViewUI {
                     setUsingKeyboard(false);
                 } else if (action >= SELECT_PREVIOUS_DAY && action <= SELECT_DAY_NEXT_WEEK) {
                     setUsingKeyboard(true);
+                    pivotDate = -1;
                     traverse(action);
                 } else if (selectionMode == SelectionMode.SINGLE_INTERVAL_SELECTION &&
-                        action >= ADD_PREVIOUS_DAY && action <= ADD_TO_NEXT_WEEK) {
+                        action >= ADJUST_SELECTION_PREVIOUS_DAY && action <= ADJUST_SELECTION_NEXT_WEEK) {
                     setUsingKeyboard(true);
                     addToSelection(action);
                 }
@@ -1407,41 +1419,86 @@ public class BasicMonthViewUI extends MonthViewUI {
          * and we ay need to update this code to act in a way that people expect.
          */
         private void addToSelection(int action) {
-            long newStartDate = -1;
-            long newEndDate = -1;
-            long selectionStart = -1;
-            long selectionEnd = -1;
+            long newStartDate;
+            long newEndDate;
+            long selectionStart;
+            long selectionEnd;
 
             if (!selection.isEmpty()) {
                 newStartDate = selectionStart = selection.first().getTime();
                 newEndDate = selectionEnd = selection.last().getTime();
+            } else {
+                newStartDate = selectionStart = cleanupDate(System.currentTimeMillis());
+                newEndDate = selectionEnd = newStartDate;
+            }
+
+            if (-1 == pivotDate) {
+                pivotDate = newStartDate;
             }
 
             boolean isForward = true;
 
             Calendar cal = monthView.getCalendar();
             switch (action) {
-                case ADD_PREVIOUS_DAY:
-                    cal.setTimeInMillis(selectionStart);
-                    cal.add(Calendar.DAY_OF_MONTH, -1);
-                    newStartDate = cal.getTimeInMillis();
+                case ADJUST_SELECTION_PREVIOUS_DAY:
+                    if (newEndDate <= pivotDate) {
+                        cal.setTimeInMillis(newStartDate);
+                        cal.add(Calendar.DAY_OF_MONTH, -1);
+                        newStartDate = cal.getTimeInMillis();
+                    } else {
+                        cal.setTimeInMillis(newEndDate);
+                        cal.add(Calendar.DAY_OF_MONTH, -1);
+                        newEndDate = cal.getTimeInMillis();
+                    }
                     isForward = false;
                     break;
-                case ADD_NEXT_DAY:
-                    cal.setTimeInMillis(selectionEnd);
-                    cal.add(Calendar.DAY_OF_MONTH, 1);
-                    newEndDate = cal.getTimeInMillis();
+                case ADJUST_SELECTION_NEXT_DAY:
+                    if (newStartDate >= pivotDate) {
+                        cal.setTimeInMillis(newEndDate);
+                        cal.add(Calendar.DAY_OF_MONTH, 1);
+                        newStartDate = pivotDate;
+                        newEndDate = cal.getTimeInMillis();
+                    } else {
+                        cal.setTimeInMillis(newStartDate);
+                        cal.add(Calendar.DAY_OF_MONTH, 1);
+                        newStartDate = cal.getTimeInMillis();
+                    }
                     break;
-                case ADD_TO_PREVIOUS_WEEK:
-                    cal.setTimeInMillis(selectionStart);
-                    cal.add(Calendar.DAY_OF_MONTH, -JXMonthView.DAYS_IN_WEEK);
-                    newStartDate = cal.getTimeInMillis();
+                case ADJUST_SELECTION_PREVIOUS_WEEK:
+                    if (newEndDate <= pivotDate) {
+                        cal.setTimeInMillis(newStartDate);
+                        cal.add(Calendar.DAY_OF_MONTH, -JXMonthView.DAYS_IN_WEEK);
+                        newStartDate = cal.getTimeInMillis();
+                    } else {
+                        cal.setTimeInMillis(newEndDate);
+                        cal.add(Calendar.DAY_OF_MONTH, -JXMonthView.DAYS_IN_WEEK);
+                        long newTime = cal.getTimeInMillis();
+                        if (newTime <= pivotDate) {
+                            newStartDate = newTime;
+                            newEndDate = pivotDate;
+                        } else {
+                            newEndDate = cal.getTimeInMillis();
+                        }
+
+                    }
                     isForward = false;
                     break;
-                case ADD_TO_NEXT_WEEK:
-                    cal.setTimeInMillis(selectionEnd);
-                    cal.add(Calendar.DAY_OF_MONTH, JXMonthView.DAYS_IN_WEEK);
-                    newEndDate = cal.getTimeInMillis();
+                case ADJUST_SELECTION_NEXT_WEEK:
+                    if (newStartDate >= pivotDate) {
+                        cal.setTimeInMillis(newEndDate);
+                        cal.add(Calendar.DAY_OF_MONTH, JXMonthView.DAYS_IN_WEEK);
+                        newEndDate = cal.getTimeInMillis();
+                    } else {
+                        cal.setTimeInMillis(newStartDate);
+                        cal.add(Calendar.DAY_OF_MONTH, JXMonthView.DAYS_IN_WEEK);
+                        long newTime = cal.getTimeInMillis();
+                        if (newTime >= pivotDate) {
+                            newStartDate = pivotDate;
+                            newEndDate = newTime;
+                        } else {
+                            newStartDate = cal.getTimeInMillis();
+                        }
+                    }
                     break;
             }
             if (newStartDate != selectionStart || newEndDate != selectionEnd) {
