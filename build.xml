@@ -87,12 +87,16 @@
          [swing.jar. This includes the cobundled jars]
          [any other resources]
     -->
-    <target name="bin" depends="init,jar">
+    <target name="bin" depends="init,jar,javadoc">
         <delete dir="${build.dir}/bin-release" />
         <mkdir dir="${build.dir}/bin-release" />
         <mkdir dir="${build.dir}/bin-release/docs" />
         <copy todir="${build.dir}/bin-release/docs">
             <fileset dir="docs" />
+        </copy>
+        <mkdir dir="${build.dir}/bin-release/docs/javadoc" />
+        <copy todir="${build.dir}/bin-release/docs/javadoc">
+            <fileset dir="dist/javadoc" />
         </copy>
         <mkdir dir="${build.dir}/bin-release/lib" />
         <copy todir="${build.dir}/bin-release/lib">
