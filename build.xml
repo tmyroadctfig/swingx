@@ -66,8 +66,88 @@
     nbproject/build-impl.xml file. 
 
     -->
-    <target name="pack">
-        <taskdef name="pack200" classname="com.sun.tools.apache.ant.pack200.Pack200Task" classpath="c:/Program Files/Apache/Ant/lib/Pack200Task.jar" /> 
-        <pack200 src="dist/swingx.jar" destfile="dist/swingx.pack.gz" GZIPOutput="yes" verbose="0" />
+    
+    <target name="-pre-init">
+        <tstamp>
+            <format property="RELEASE_DSTAMP" pattern="yyyy_MM_dd" />
+        </tstamp>
+    </target>
+    
+    <!-- This target builds a "binary" release of the project. The resulting
+         zip file will be named something appropriately. It's contents will be:
+         
+         /docs
+            /images
+            README.html
+            swinglabs.css
+         /lib
+            /optional
+            [other libs. These are copied straight over from the /lib directory
+             in the source tree]
+         [swing.jar. This includes the cobundled jars]
+         [any other resources]
+    -->
+    <target name="bin" depends="init,jar">
+        <delete dir="${build.dir}/bin-release" />
+        <mkdir dir="${build.dir}/bin-release" />
+        <mkdir dir="${build.dir}/bin-release/docs" />
+        <copy todir="${build.dir}/bin-release/docs">
+            <fileset dir="docs" />
+        </copy>
+        <mkdir dir="${build.dir}/bin-release/lib" />
+        <copy todir="${build.dir}/bin-release/lib">
+            <fileset dir="lib" />
+        </copy>
+        <delete dir="${build.dir}/bin-release/lib/cobundle" />
+        
+        <!-- unzip the cobundle jars right into the workspace. Then combine
+             with the classes from dist/swingx.jar file. Finally, zip up
+             the remaining bit and name it swingx-[date][release].zip
+        -->
+        <mkdir dir="${build.dir}/cobundle" />
+        <unjar dest="${build.dir}/cobundle">
+            <fileset dir="lib/cobundle" />
+        </unjar>
+        <unjar src="dist/swingx.jar" dest="${build.dir}/cobundle" />
+        <jar basedir="${build.dir}/cobundle" jarfile="${build.dir}/bin-release/swingx-${RELEASE_DSTAMP}.jar" />
+        <delete dir="${build.dir}/cobundle" />
+        
+        <!-- if any other resources need to be copied, copy them here -->
+        
+        <!-- zip up the whole thing -->
+        <zip basedir="${build.dir}/bin-release" destfile="dist/swingx-${RELEASE_DSTAMP}-bin.zip" />
+        <delete dir="${build.dir}/bin-release" />
+    </target>
+    
+    <!-- This target builds a "source" release of the project. The resulting
+         zip file will be named something appropriately. It's contents will be:
+         
+         /docs
+            /images
+            README.html
+            swinglabs.css
+         /lib
+            /optional
+            /cobundle
+            [other libs. These are copied straight over from the /lib directory
+             in the source tree]
+         /src
+         [any other resources in the root dir, project files, etc]
+    -->
+    <target name="src" depends="init,jar">
+        <delete dir="${build.dir}/src-release" />
+        <mkdir dir="${build.dir}/src-release" />
+        <copy todir="${build.dir}/src-release">
+            <fileset dir=".">
+                <exclude name="build/**" />
+                <exclude name="dist/**" />
+                <exclude name="www/**" />
+                <!-- If anything else needs to be exluded, do so here -->
+            </fileset>
+        </copy>
+        
+        <!-- zip up the whole thing -->
+        <zip basedir="${build.dir}/src-release" destfile="dist/swingx-${RELEASE_DSTAMP}-src.zip" />
+        <delete dir="${build.dir}/src-release" />
     </target>
 </project>
