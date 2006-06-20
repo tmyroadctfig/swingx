@@ -25,6 +25,9 @@ import org.jdesktop.swingx.util.AncientSwingTeam;
 public class JXTableColumnSizing extends InteractiveTestCase {
     protected TableModel sortableTableModel;
 
+    public void testDummy() {
+        // no test - for viewing only
+    }
     /**
      * Issue #214-swingx: column auto-sizing support.
      *
