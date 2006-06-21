@@ -53,7 +53,7 @@ import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.ActionContainerFactory;
 
 /**
- * This class is installed in the upper right corner of the table and is a
+ * This class is installed in the trailing corner of the table and is a
  * control which allows for toggling the visibilty of individual columns.<p>
  * 
  * This class is responsible for handling/providing/updating the lists of 
@@ -292,7 +292,9 @@ public class ColumnControlButton extends JButton {
 
 
         /**
-         * Adds items corresponding to the column visibility actions.
+         * Adds items corresponding to the column visibility actions. <p>
+         * 
+         * TODO JW: get the generics correct!
          * 
          * @param actions List of ColumnVisibilityActions to add.
          */
@@ -430,15 +432,16 @@ public class ColumnControlButton extends JButton {
  
 //  ------------------------ updating the popupMenu
     /**
-     * Populates the popup menu with actions related to controlling columns.
-     * Adds an action for each columns in the table (including both visible and
-     * hidden). Adds all column-related actions from the table's actionMap.
+     * Populates the popup from scratch.
+     * 
+     * If applicable, creates and adds column visibility actions. Always adds
+     * additional actions.
      */
     protected void populatePopup() {
         clearAll();
         if (canControl()) {
             createVisibilityActions();
-            addVisibilityActionItems(getColumnVisibilityActions());
+            addVisibilityActionItems();
         }
         addAdditionalActionItems();
     }
@@ -470,24 +473,22 @@ public class ColumnControlButton extends JButton {
 
    
     /**
-     * Here: creates and adds a menuItem to a JPopupMenu as returned
-     * by #getPopupMenu(). Does nothing if the popup is null or the
-     * if the list is empty.
+     * Adds visibility actions into the popup view.
      * 
-     * PRE: actions != null.
-     * 
-     * @param actions a list containing the actions to add to the popup.
-     *    Must not be null.
+     * Here: delegates the list of actions to the ControlPopup.
+     * <p>
+     * PRE: columnVisibilityActions populated before calling this.
      * 
      */
-    protected void addVisibilityActionItems(List<ColumnVisibilityAction> actions) {
+    protected void addVisibilityActionItems() {
         getControlPopup().addVisibilityActionItems(
-                Collections.unmodifiableList(actions));
+                Collections.unmodifiableList(getColumnVisibilityActions()));
     }
 
     /**
-     * add additional actions to the popup.
-     * Here: adds a separator and uses all actions as returned by #getColumnActions(). 
+     * Adds additional actions to the popup.
+     * Here: delegates the list of actions as returned by #getAdditionalActions() 
+     *   to the ControlPopup. 
      * Does nothing if #getColumnActions() is empty.
      * 
      */
@@ -498,7 +499,7 @@ public class ColumnControlButton extends JButton {
 
 
     /**
-     * creates and adds a ColumnVisiblityAction for every column that should
+     * creates and adds a ColumnVisiblityAction for every column that should be
      * togglable via the column control. Here: all actions currently in the 
      * the table. This includes both visible and invisible columns.
      * 
@@ -514,6 +515,11 @@ public class ColumnControlButton extends JButton {
 
     }
 
+    /**
+     * Lazyly creates and returns the List of visibility actions.
+     * 
+     * @return the list of visibility actions, guaranteed to be != null.
+     */
     protected List<ColumnVisibilityAction> getColumnVisibilityActions() {
         if (columnVisibilityActions == null) {
             columnVisibilityActions = new ArrayList<ColumnVisibilityAction>();
@@ -591,7 +597,6 @@ public class ColumnControlButton extends JButton {
     private void init() {
         setFocusPainted(false);
         setFocusable(false);
-        // create the popup menu
         // this is a trick to get hold of the client prop which
         // prevents closing of the popup
         JComboBox box = new JComboBox();
@@ -601,10 +606,10 @@ public class ColumnControlButton extends JButton {
 
 
     /** 
-     * the action created for this.
+     * Creates and returns the default action for this button.
      * 
-     * @param icon
-     * @return
+     * @param icon the Icon to use in the action.
+     * @return the default action.
      */
     private Action createControlAction(Icon icon) {
         Action control = new AbstractAction() {
