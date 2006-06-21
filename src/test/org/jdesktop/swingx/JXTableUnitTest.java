@@ -20,12 +20,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
@@ -50,6 +51,7 @@ import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
+import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.util.AncientSwingTeam;
 import org.jdesktop.swingx.util.ChangeReport;
@@ -86,6 +88,28 @@ public class JXTableUnitTest extends InteractiveTestCase {
         setSystemLF(defaultToSystemLF);
     }
 
+    /**
+     * test new mutable columnControl api.
+     *
+     */
+    public void testSetColumnControl() {
+        JXTable table = new JXTable();
+        JComponent columnControl = table.getColumnControl();
+        assertTrue(columnControl instanceof ColumnControlButton);
+        JComponent newControl = new JButton();
+        PropertyChangeReport report = new PropertyChangeReport();
+        table.addPropertyChangeListener(report);
+        table.setColumnControl(newControl);
+        assertSame(newControl, table.getColumnControl());
+        assertEquals(1, report.getEventCount());
+        assertEquals(1, report.getEventCount("columnControl"));
+        assertSame(newControl, report.getLastNewValue("columnControl"));
+    }
+    
+    /**
+     * characterization tests: constructors and exceptions.
+     *
+     */
     public void testConstructorsWithNullArguments() {
         try {
             new JXTable((Object[][]) null, (Object[]) null);

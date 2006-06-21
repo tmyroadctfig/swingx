@@ -701,16 +701,44 @@ public class JXTable extends JTable {
     }
 
     /**
-     * returns the component for column control.
+     * Lazily creates and returns the component use as column control.
      * 
-     * @return component for column control
+     * @return component for column control, guaranteed to be != null.
+     * @see #setColumnControl(JComponent)
      */
     public JComponent getColumnControl() {
         if (columnControlButton == null) {
-            columnControlButton = new ColumnControlButton(this,
-                    new ColumnControlIcon());
+            columnControlButton = createDefaultColumnControl();
         }
         return columnControlButton;
+    }
+
+    /**
+     * Sets the columnControl and updates the scrollpane, if any.
+     * If the given component is null, sets and uses the default columnControl.
+     * <p>
+     * NOTE: from the table's perspective, the columnControl is simply a
+     * JComponent to add to and keep in the trailing corner of the JScrollPane (if any). 
+     * It's up to developers to configure the concrete control as needed.
+     * 
+     * @param columnControl the JComponent to use as columnControl. 
+     */
+    public void setColumnControl(JComponent columnControl) {
+        JComponent old = columnControlButton;
+        this.columnControlButton = columnControl;
+        configureColumnControl();
+        firePropertyChange("columnControl", old, getColumnControl());
+    }
+    
+    /**
+     * Factory method to create the default ColumnControl used by this table.
+     * Here: a ColumnControlButton configured
+     *   with this and the default ColumnControlIcon
+     *   
+     * @return the default ColumnControl.
+     */
+    protected JComponent createDefaultColumnControl() {
+        return new ColumnControlButton(this, new ColumnControlIcon());
     }
 
     /**
