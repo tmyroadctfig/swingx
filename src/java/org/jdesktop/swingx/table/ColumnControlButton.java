@@ -30,7 +30,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -38,6 +37,8 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
@@ -60,7 +61,7 @@ import org.jdesktop.swingx.action.ActionContainerFactory;
  * a JComponent instead.
  * 
  */
-public final class ColumnControlButton extends JButton {
+public class ColumnControlButton extends JButton {
 
     /** exposed for testing. */
     protected JPopupMenu popupMenu = null;
@@ -81,6 +82,7 @@ public final class ColumnControlButton extends JButton {
     public void updateUI() {
         super.updateUI();
         setMargin(new Insets(1, 2, 2, 1)); // Make this LAF-independent
+        JPopupMenu popupMenu = getPopupMenu();
         if (popupMenu != null) {
             // JW: Hmm, not really working....
             popupMenu.updateUI();
@@ -223,13 +225,27 @@ public final class ColumnControlButton extends JButton {
     }
 
     /** 
-     * open the popup. 
+     * Toggles the popup component's visibility. This method is
+     * called by this control's default action. <p>
      * 
-     * hmmm... really public?
+     * Here: tries to get hold of a popupMenu as returned by 
+     * getPopup(), does nothing if the returned menu is null.
      * 
      *
      */ 
     public void togglePopup() {
+        JPopupMenu popupMenu = getPopupMenu();
+        if (popupMenu != null) {
+            togglePopup(popupMenu);
+        }
+    }
+
+    /**
+     * toggles the popup's visibility.
+     * PRE: popup != null;
+     * @param popupMenu
+     */
+    protected void togglePopup(JPopupMenu popupMenu) {
         if (popupMenu.isVisible()) {
             popupMenu.setVisible(false);
         } else if (popupMenu.getComponentCount() > 0) {
@@ -241,10 +257,21 @@ public final class ColumnControlButton extends JButton {
     }
 
 
+    protected JPopupMenu getPopupMenu() {
+        if (popupMenu == null) {
+            popupMenu = new JPopupMenu();
+        }
+        return popupMenu;
+    }
+
+
     @Override
     public void applyComponentOrientation(ComponentOrientation o) {
         super.applyComponentOrientation(o);
-        popupMenu.applyComponentOrientation(o);
+        JPopupMenu popupMenu = getPopupMenu();
+        if (popupMenu != null) {
+            popupMenu.applyComponentOrientation(o);
+        }
     }
 
 //-------------------------- updates from table propertyChangelistnere
@@ -260,7 +287,7 @@ public final class ColumnControlButton extends JButton {
         if (oldModel != null) {
             oldModel.removeColumnModelListener(columnModelListener);
         }
-        populatePopupMenu();
+        populatePopup();
         if (canControl()) {
             table.getColumnModel().addColumnModelListener(columnModelListener);
         }
@@ -291,10 +318,11 @@ public final class ColumnControlButton extends JButton {
      * Adds an action for each columns in the table (including both visible and
      * hidden). Adds all column-related actions from the table's actionMap.
      */
-    protected void populatePopupMenu() {
-        clearPopupMenu();
+    protected void populatePopup() {
+        clearAll();
         if (canControl()) {
-            addColumnMenuItems();
+            createVisibilityActions();
+            addColumnItems(getColumnVisibilityActions());
         }
         addColumnActions();
     }
@@ -305,21 +333,34 @@ public final class ColumnControlButton extends JButton {
      * columnVisibility actions.
      * 
      */
-    private void clearPopupMenu() {
+    protected void clearAll() {
         clearColumnVisibilityActions();
-        popupMenu.removeAll();
+        clearPopup();
+    }
+
+    /**
+     * removes all components/items from the popup.
+     *
+     */
+    protected void clearPopup() {
+        JPopupMenu popupMenu = getPopupMenu();
+        if (popupMenu !=  null) {
+            popupMenu.removeAll();
+        }
     }
 
     /**
      * release actions and clear list of actions.
      * 
      */
-    private void clearColumnVisibilityActions() {
+    protected void clearColumnVisibilityActions() {
         if (columnVisibilityActions == null)
             return;
-        for (Iterator<ColumnVisibilityAction> iter = columnVisibilityActions
-                .iterator(); iter.hasNext();) {
-            iter.next().releaseColumn();
+        for (ColumnVisibilityAction action : columnVisibilityActions) {
+            action.releaseColumn();
+//                Iterator<ColumnVisibilityAction> iter = columnVisibilityActions
+//                .iterator(); iter.hasNext();) {
+//            iter.next().releaseColumn();
 
         }
         columnVisibilityActions.clear();
@@ -327,25 +368,63 @@ public final class ColumnControlButton extends JButton {
 
    
     /**
-     * adds a action to toggle column visibility for every column currently in
-     * the table. This includes both visible and invisible columns.
+     * Here: creates and adds a menuItem to a JPopupMenu as returned
+     * by #getPopupMenu(). Does nothing if the popup is null or the
+     * if the list is empty.
      * 
-     * pre: canControl()
+     * PRE: actions != null.
+     * 
+     * @param actions a list containing the actions to add to the popup.
+     *    Must not be null.
      * 
      */
-    private void addColumnMenuItems() {
-        // For each column in the view, add a JCheckBoxMenuItem to popup
-        List<TableColumn> columns = table.getColumns(true);
+    protected void addColumnItems(List<ColumnVisibilityAction> actions) {
+        addItems(new ArrayList<Action>(actions));
+   
+
+    }
+
+    /**
+     * Here: creates and adds a menuItem to a JPopupMenu as returned
+     * by #getPopupMenu(). Does nothing if the popup is null or the
+     * if the list is empty.
+     * 
+     * PRE: actions != null.
+     * 
+     * @param actions a list containing the actions to add to the popup.
+     *    Must not be null.
+     * 
+     */
+    protected void addItems(List<Action> actions) {
+        JPopupMenu popupMenu = getPopupMenu();
+        if (popupMenu == null) return;
         ActionContainerFactory factory = new ActionContainerFactory(null);
-        for (Iterator<TableColumn> iter = columns.iterator(); iter.hasNext();) {
-            ColumnVisibilityAction action = new ColumnVisibilityAction(iter.next());
-            getColumnVisibilityActions().add(action);
+        for (Action action : actions) {
             popupMenu.add(factory.createMenuItem(action));
         }
 
     }
 
-    private List<ColumnVisibilityAction> getColumnVisibilityActions() {
+    /**
+     * creates and adds a ColumnVisiblityAction for every column that should
+     * togglable via the column control. Here: all actions currently in the 
+     * the table. This includes both visible and invisible columns.
+     * 
+     * pre: canControl()
+     * 
+     */
+    protected void createVisibilityActions() {
+        // For each column in the view, add a JCheckBoxMenuItem to popup
+        List<TableColumn> columns = table.getColumns(true);
+        for (TableColumn column : columns) {
+//                Iterator<TableColumn> iter = columns.iterator(); iter.hasNext();) {
+            ColumnVisibilityAction action = new ColumnVisibilityAction(column);
+            getColumnVisibilityActions().add(action);
+        }
+
+    }
+
+    protected List<ColumnVisibilityAction> getColumnVisibilityActions() {
         if (columnVisibilityActions == null) {
             columnVisibilityActions = new ArrayList<ColumnVisibilityAction>();
         }
@@ -353,33 +432,54 @@ public final class ColumnControlButton extends JButton {
     }
 
     /**
-     * add additional actions from the xtable's actionMap.
+     * add additional actions to the popup.
+     * Here: adds a separator and uses all actions as returned by #getColumnActions(). 
+     * Does nothing if #getColumnActions() is empty.
      * 
      */
-    private void addColumnActions() {
-        Object[] actionKeys = getColumnControlActionKeys();
-        Arrays.sort(actionKeys);
-        List<Action> actions = new ArrayList<Action>();
-        for (int i = 0; i < actionKeys.length; i++) {
-            if (isColumnControlActionKey(actionKeys[i])) {
-                actions.add(table.getActionMap().get(actionKeys[i]));
-            }
-        }
+    protected void addColumnActions() {
+        List<Action> actions = getColumnActions();
         if (actions.size() == 0)
             return;
         if (canControl()) {
-            popupMenu.addSeparator();
+            addSeparator();
         }
-        ActionContainerFactory factory = new ActionContainerFactory(null);
-        for (Iterator<Action> iter = actions.iterator(); iter.hasNext();) {
-            popupMenu.add(factory.createMenuItem(iter.next()));
+        addItems(actions);
+    }
+
+    protected void addSeparator() {
+        JPopupMenu popupMenu = getPopupMenu();
+        if (popupMenu != null) {
+            popupMenu.addSeparator();
         }
     }
 
     /**
-     * @return
+     * creates and returns a list of additional Actions to add to the popup.
+     * Here: the actions are looked up in the table's actionMap according
+     * to the keys as returned from #getColumnControlActionKeys();
+     * 
+     * @return a list containing all additional actions to include into the popup.
      */
-    private Object[] getColumnControlActionKeys() {
+    protected List<Action> getColumnActions() {
+        Object[] actionKeys = getColumnControlActionKeys();
+        List<Action> actions = new ArrayList<Action>();
+        for (int i = 0; i < actionKeys.length; i++) {
+            actions.add(table.getActionMap().get(actionKeys[i]));
+        }
+        return actions;
+    }
+
+    /**
+     * Looks up and returns action keys to access actions in the 
+     * table's actionMap which should be included into the popup.
+     * 
+     * Here: all keys with isColumnControlActionKey(key). 
+     * 
+     * @return the action keys of table's actionMap entries whose
+     *   action should be included into the popup.
+     */
+    protected Object[] getColumnControlActionKeys() {
         Object[] allKeys = table.getActionMap().allKeys();
         List columnKeys = new ArrayList();
         for (int i = 0; i < allKeys.length; i++) {
@@ -387,11 +487,23 @@ public final class ColumnControlButton extends JButton {
                 columnKeys.add(allKeys[i]);
             }
         }
-        return columnKeys.toArray();
+        
+        Object[] actionKeys = columnKeys.toArray();
+        Arrays.sort(actionKeys);
+        return actionKeys;
     }
 
-    private boolean isColumnControlActionKey(Object actionKey) {
-        return (actionKey instanceof String) && ((String) actionKey).startsWith(COLUMN_CONTROL_MARKER);
+    /**
+     * Here: true if a String key starts with #COLUMN_CONTROL_MARKER.
+     * 
+     * @param actionKey a key in the table's actionMap.
+     * @return a boolean to indicate whether the given actionKey maps to
+     *    an action which should be included into the popup.
+     *    
+     */
+    protected boolean isColumnControlActionKey(Object actionKey) {
+        return (actionKey instanceof String) && 
+            ((String) actionKey).startsWith(COLUMN_CONTROL_MARKER);
     }
 
 
@@ -411,7 +523,6 @@ public final class ColumnControlButton extends JButton {
         setFocusPainted(false);
         setFocusable(false);
         // create the popup menu
-        popupMenu = new JPopupMenu();
         // this is a trick to get hold of the client prop which
         // prevents closing of the popup
         JComboBox box = new JComboBox();
@@ -455,14 +566,14 @@ public final class ColumnControlButton extends JButton {
         public void columnAdded(TableColumnModelEvent e) {
             // quickfix for #192
             if (!isVisibilityChange(e, true)) {
-                populatePopupMenu();
+                populatePopup();
             }
         }
 
         /** Tells listeners that a column was removed from the model. */
         public void columnRemoved(TableColumnModelEvent e) {
             if (!isVisibilityChange(e, false)) {
-                populatePopupMenu();
+                populatePopup();
             }
         }
 
