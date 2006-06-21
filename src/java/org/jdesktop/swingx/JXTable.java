@@ -720,6 +720,9 @@ public class JXTable extends JTable {
      * NOTE: from the table's perspective, the columnControl is simply a
      * JComponent to add to and keep in the trailing corner of the JScrollPane (if any). 
      * It's up to developers to configure the concrete control as needed.
+     * <p>
+     * PENDING JW: release old column control? who's responsible? 
+     *   Could implement CCB.autoRelease()?
      * 
      * @param columnControl the JComponent to use as columnControl. 
      */

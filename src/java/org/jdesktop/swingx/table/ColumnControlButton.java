@@ -309,7 +309,7 @@ public class ColumnControlButton extends JButton {
          * add additional actions to the popup. Does nothing if 
          * actions is empty or !canControl().
          * 
-         * @param a List of actions to add to the popup.
+         * @param actions List of actions to add to the popup.
          */
         public void addAdditionalActionItems(List<Action> actions) {
             if (actions.size() == 0)

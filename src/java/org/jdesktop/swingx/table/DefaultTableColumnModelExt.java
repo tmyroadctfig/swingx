@@ -50,6 +50,7 @@ import org.jdesktop.swingx.event.TableColumnModelExtListener;
  * 
  *  
  * @author Richard Bair
+ * @author Jeanette Winzenburg
  */
 public class DefaultTableColumnModelExt extends DefaultTableColumnModel 
     implements TableColumnModelExt {
@@ -295,7 +296,7 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
      * notification on this event type.  The event instance
      * is lazily created using the parameters passed into
      * the fire method.
-     * @param  e the event received
+     * @param  evt the event received
      * @see EventListenerList
      */
     protected void fireColumnPropertyChange(PropertyChangeEvent evt) {
