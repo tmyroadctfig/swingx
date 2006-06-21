@@ -1,11 +1,10 @@
 package org.jdesktop.swingx.plaf;
 
-import org.jdesktop.swingx.calendar.JXMonthView;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
 import java.util.Arrays;
 import java.util.List;
+import javax.swing.UIManager;
+import org.jdesktop.swingx.calendar.JXMonthView;
 
 public class JXMonthViewAddon extends AbstractComponentAddon {
     public JXMonthViewAddon() {

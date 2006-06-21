@@ -18,21 +18,43 @@
  */
 package org.jdesktop.swingx.plaf.basic;
 
-import org.jdesktop.swingx.JXDatePicker;
-import org.jdesktop.swingx.JXDatePickerFormatter;
-import org.jdesktop.swingx.calendar.JXMonthView;
-import org.jdesktop.swingx.plaf.DatePickerUI;
-
-import javax.swing.*;
-import javax.swing.plaf.ComponentUI;
-import javax.swing.plaf.UIResource;
-import javax.swing.text.View;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FontMetrics;
+import java.awt.Insets;
+import java.awt.LayoutManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Date;
 import java.util.SortedSet;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.Icon;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.UIResource;
+import javax.swing.text.View;
+import org.jdesktop.swingx.JXDatePicker;
+import org.jdesktop.swingx.JXDatePickerFormatter;
+import org.jdesktop.swingx.calendar.JXMonthView;
+import org.jdesktop.swingx.plaf.DatePickerUI;
 
 /**
  * @author Joshua Outwater

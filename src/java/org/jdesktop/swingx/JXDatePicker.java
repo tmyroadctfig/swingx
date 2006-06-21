@@ -20,19 +20,11 @@
  */
 package org.jdesktop.swingx;
 
-import org.jdesktop.swingx.calendar.DateSpan;
-import org.jdesktop.swingx.calendar.JXMonthView;
-import org.jdesktop.swingx.event.EventListenerMap;
-import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
-import org.jdesktop.swingx.plaf.DatePickerUI;
-import org.jdesktop.swingx.plaf.JXDatePickerAddon;
-import org.jdesktop.swingx.plaf.LookAndFeelAddons;
-
-import javax.swing.*;
-import javax.swing.JFormattedTextField.AbstractFormatter;
-import javax.swing.JFormattedTextField.AbstractFormatterFactory;
-import javax.swing.text.DefaultFormatterFactory;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.ComponentOrientation;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DateFormat;
@@ -43,6 +35,23 @@ import java.util.Date;
 import java.util.EventListener;
 import java.util.SortedSet;
 import java.util.TimeZone;
+import javax.swing.AbstractAction;
+import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
+import javax.swing.JFormattedTextField.AbstractFormatter;
+import javax.swing.JFormattedTextField.AbstractFormatterFactory;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.text.DefaultFormatterFactory;
+import org.jdesktop.swingx.calendar.DateSpan;
+import org.jdesktop.swingx.calendar.JXMonthView;
+import org.jdesktop.swingx.event.EventListenerMap;
+import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
+import org.jdesktop.swingx.plaf.DatePickerUI;
+import org.jdesktop.swingx.plaf.JXDatePickerAddon;
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 
 /**
  * A component that combines a button, an editable field and a JXMonthView

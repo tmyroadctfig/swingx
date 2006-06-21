@@ -18,14 +18,14 @@
  */
 package org.jdesktop.swingx.plaf;
 
-import org.jdesktop.swingx.JXDatePicker;
-
-import javax.swing.*;
+import java.util.Arrays;
+import java.util.List;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.border.LineBorder;
 import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.IconUIResource;
-import java.util.Arrays;
-import java.util.List;
+import org.jdesktop.swingx.JXDatePicker;
 
 /**
  * @author Joshua Outwater

@@ -20,19 +20,31 @@
  */
 package org.jdesktop.swingx.calendar;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.EventListener;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.SortedSet;
+import java.util.TimeZone;
+import java.util.TreeSet;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import javax.swing.UIManager;
 import org.jdesktop.swingx.DateSelectionModel;
 import org.jdesktop.swingx.DefaultDateSelectionModel;
 import org.jdesktop.swingx.event.EventListenerMap;
 import org.jdesktop.swingx.plaf.JXMonthViewAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.MonthViewUI;
-
-import javax.swing.*;
-import javax.swing.Timer;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.*;
 
 
 /**
@@ -1050,7 +1062,6 @@ public class JXMonthView extends JComponent {
         revalidate();
         repaint();
     }
-
 
     private void updateToday() {
         // Update today.
