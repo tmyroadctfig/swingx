@@ -139,7 +139,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
         table.setColumnControlVisible(true);
         wrapWithScrollingInFrame(table, "");
         ColumnControlButton columnControl = (ColumnControlButton) table.getColumnControl();
-        Component[] items = columnControl.popupMenu.getComponents();
+        Component[] items = columnControl.getControlPopup().getPopupMenu().getComponents();
         ((JMenuItem) items[0]).setSelected(false);
         assertEquals(1, table.getColumnCount());
     }
@@ -165,7 +165,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
        ColumnControlButton columnControl = (ColumnControlButton) table.getColumnControl();
        assertNotNull("popup menu not null", columnControl.popupMenu);
        int columnMenuItems = 0;
-       Component[] items = columnControl.popupMenu.getComponents();
+       Component[] items = columnControl.getControlPopup().getPopupMenu().getComponents();
        for (int i = 0; i < items.length; i++) {
            if (!(items[i] instanceof JMenuItem)) {
                break;
@@ -175,7 +175,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
        // wrong assumption - has separator and actions!
        assertEquals("menu items must be equal to columns", totalColumnCount, 
                columnMenuItems);
-       JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem) columnControl.popupMenu
+       JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem) columnControl.getControlPopup().getPopupMenu()
            .getComponent(0);
        // sanit assert
        assertEquals(priorityColumn.getHeaderValue(), menuItem.getText());
