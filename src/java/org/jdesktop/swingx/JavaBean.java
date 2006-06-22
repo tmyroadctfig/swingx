@@ -150,7 +150,6 @@ public class JavaBean {
      * @param propertyName  The name of the property to listen on.
      * @param listener  The PropertyChangeListener to be added
      */
-
     public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         pcs.addPropertyChangeListener(propertyName, listener);
     }
@@ -168,7 +167,6 @@ public class JavaBean {
      * @param propertyName  The name of the property that was listened on.
      * @param listener  The PropertyChangeListener to be removed
      */
-
     public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         pcs.removePropertyChangeListener(propertyName, listener);
     }
@@ -321,5 +319,14 @@ public class JavaBean {
      */
     public boolean hasListeners(String propertyName) {
         return pcs.hasListeners(propertyName);
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    public Object clone() throws CloneNotSupportedException {
+        JavaBean result = (JavaBean) super.clone();
+        result.pcs = new PropertyChangeSupport(result);
+        return result;
     }
 }
