@@ -175,10 +175,18 @@ public class ColumnControlButton extends JButton {
                         && !fromColumn) {
                     reselect();
                 } else {
-                    ((TableColumnExt) column)
-                            .setVisible(e.getStateChange() == ItemEvent.SELECTED);
+                    setSelected(e.getStateChange() == ItemEvent.SELECTED);
+//                    ((TableColumnExt) column)
+//                    .setVisible(e.getStateChange() == ItemEvent.SELECTED);
                 }
             }
+        }
+
+        
+        @Override
+        public synchronized void setSelected(boolean newValue) {
+            super.setSelected(newValue);
+            ((TableColumnExt) column).setVisible(newValue);
         }
 
         /**
