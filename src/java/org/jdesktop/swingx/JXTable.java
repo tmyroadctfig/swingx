@@ -3182,6 +3182,7 @@ public class JXTable extends JTable {
     /**
      * bug fix: super doesn't update all renderers/editors.
      */
+    @Override
     public void updateUI() {
         super.updateUI();
         if (columnControlButton != null) {
@@ -3208,12 +3209,23 @@ public class JXTable extends JTable {
         configureViewportBackground();
     }
 
+    /**
+     * Updates highlighter after ui changes.
+     *
+     */
     protected void updateHighlighters() {
         if (getHighlighters() == null) return;
         getHighlighters().updateUI();
     }
 
-    /** ? */
+    /** 
+     * internal (unsucessful?) hack to try and set rowHeight to something more
+     * pleasing then the default. Tries to measure the font and/or ask the 
+     * UIManager for a default value. 
+     *  
+     * The underlying problem is that raw types can't implement 
+     * UIResource. 
+     */
     private void updateRowHeightUI(boolean respectRowSetFlag) {
         if (respectRowSetFlag && isXTableRowHeightSet)
             return;
@@ -3223,7 +3235,10 @@ public class JXTable extends JTable {
         isXTableRowHeightSet = false;
     }
 
-    /** Changes the row height for all rows in the table. */
+    /**
+     * Overriden to keep view/model coordinates of SizeSequence in synch.
+     * @inheritDoc 
+     */
     public void setRowHeight(int rowHeight) {
         super.setRowHeight(rowHeight);
         if (rowHeight > 0) {
@@ -3233,7 +3248,14 @@ public class JXTable extends JTable {
 
     }
 
-    
+    /**
+     * Overriden to keep view/model coordinates of SizeSequence in synch.
+     * Does nothing #isRowHeightEnabled is false.
+     * 
+     * @see #isRowHeightEnabled()
+     * @inheritDoc
+     */
+    @Override
     public void setRowHeight(int row, int rowHeight) {
         if (!isRowHeightEnabled()) return;
         super.setRowHeight(row, rowHeight);
@@ -3252,7 +3274,8 @@ public class JXTable extends JTable {
      * Or silently fail - depends on runtime context, 
      * can't do anything about it.
      * 
-     * @param enabled
+     * @param enabled a boolean to indicate whether per-row heights should
+     *   be enabled.
      */
     public void setRowHeightEnabled(boolean enabled) {
         boolean old = isRowHeightEnabled();
@@ -3264,13 +3287,20 @@ public class JXTable extends JTable {
         }
         firePropertyChange("rowHeightEnabled", old, rowHeightEnabled);
     }
-    
-    private boolean canEnableRowHeight() {
-        return getRowModelField() != null;
-    }
 
+    /**
+     * 
+     * @return a boolean to indicate whether individual row height 
+     *    support is enabled.
+     * @see #isRowHeightEnabled()
+     */
     public boolean isRowHeightEnabled() {
         return rowHeightEnabled;
+    }
+
+
+    private boolean canEnableRowHeight() {
+        return getRowModelField() != null;
     }
 
     private SizeSequence getSuperRowModel() {
