@@ -186,7 +186,9 @@ public class ColumnControlButton extends JButton {
         @Override
         public synchronized void setSelected(boolean newValue) {
             super.setSelected(newValue);
-            ((TableColumnExt) column).setVisible(newValue);
+            if (canControl()) {
+                ((TableColumnExt) column).setVisible(newValue);
+            }
         }
 
         /**
@@ -329,6 +331,9 @@ public class ColumnControlButton extends JButton {
         public void addAdditionalActionItems(List<Action> actions) {
             if (actions.size() == 0)
                 return;
+            // JW: this is a reference to the enclosing class 
+            // prevents to make this implementation static
+            // Hmmm...any way around?
             if (canControl()) {
                 addSeparator();
             }
