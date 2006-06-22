@@ -18,11 +18,16 @@
  */
 package org.jdesktop.swingx;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.ArrayList;
+
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import static org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.event.EventListenerMap;
-
-import java.util.*;
 
 /**
  * @author Joshua Outwater
@@ -34,6 +39,8 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
     private SortedSet<Date> unselectableDates;
     private Calendar cal;
     private int firstDayOfWeek;
+    private Date upperBound;
+    private Date lowerBound;
 
     public DefaultDateSelectionModel() {
         this.listenerMap = new EventListenerMap();
@@ -115,7 +122,7 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
         fireValueChanged(EventType.DATES_SET);
     }
 
-     /**
+    /**
      * {@inheritDoc}
      */
     public void removeSelectionInterval(final Date startDate, final Date endDate) {
@@ -123,14 +130,20 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
             return;
         }
 
-        cal.setTime(startDate);
-        Date date = cal.getTime();
-        while (date.before(endDate) || date.equals(endDate)) {
-            selectedDates.remove(date);
-            cal.add(Calendar.DATE, 1);
-            date = cal.getTime();
+        long startDateMs = startDate.getTime();
+        long endDateMs = endDate.getTime();
+        ArrayList<Date> datesToRemove = new ArrayList<Date>();
+        for (Date selectedDate : selectedDates) {
+            long selectedDateMs = selectedDate.getTime();
+            if (selectedDateMs >= startDateMs && selectedDateMs <= endDateMs) {
+                datesToRemove.add(selectedDate);
+            }
         }
-        fireValueChanged(EventType.DATES_REMOVED);
+
+        if (!datesToRemove.isEmpty()) {
+            selectedDates.removeAll(datesToRemove);
+            fireValueChanged(EventType.DATES_REMOVED);
+        }
     }
 
     /**
@@ -192,7 +205,9 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
      */
     public void setUnselectableDates(SortedSet<Date> unselectableDates) {
         this.unselectableDates = unselectableDates;
-        removeSelectionInterval(this.unselectableDates.first(), this.unselectableDates.last());
+        for (Date unselectableDate : this.unselectableDates) {
+            removeSelectionInterval(unselectableDate, unselectableDate);
+        }
         fireValueChanged(EventType.UNSELECTED_DATES_CHANGED);
     }
 
@@ -201,6 +216,57 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
      */
     public boolean isUnselectableDate(Date date) {
         return unselectableDates != null && unselectableDates.contains(date);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Date getUpperBound() {
+        return upperBound;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setUpperBound(Date upperBound) {
+        if ((upperBound != null && !upperBound.equals(this.upperBound)) ||
+                (upperBound == null && upperBound != this.upperBound)) {
+            this.upperBound = upperBound;
+            if (!selectedDates.isEmpty() && selectedDates.last().after(this.upperBound)) {
+                if (this.upperBound != null) {
+                    // Remove anything above the upper bound
+                    long justAboveUpperBoundMs = this.upperBound.getTime() - 1;
+                    if (!selectedDates.isEmpty() && selectedDates.last().before(this.upperBound))
+                        removeSelectionInterval(this.upperBound, new Date(justAboveUpperBoundMs));
+                }
+            }
+            fireValueChanged(EventType.UPPER_BOUND_CHANGED);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Date getLowerBound() {
+        return lowerBound;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setLowerBound(Date lowerBound) {
+        if ((lowerBound != null && !lowerBound.equals(this.lowerBound)) ||
+                (lowerBound == null && lowerBound != this.lowerBound)) {
+            this.lowerBound = lowerBound;
+            if (this.lowerBound != null) {
+                // Remove anything below the lower bound
+                long justBelowLowerBoundMs = this.lowerBound.getTime() - 1;
+                if (!selectedDates.isEmpty() && selectedDates.first().before(this.lowerBound)) {
+                    removeSelectionInterval(selectedDates.first(), new Date(justBelowLowerBoundMs));
+                }
+            }
+            fireValueChanged(EventType.LOWER_BOUND_CHANGED);
+        }
     }
 
     public List<DateSelectionListener> getDateSelectionListeners() {

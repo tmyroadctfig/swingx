@@ -18,11 +18,12 @@
  */
 package org.jdesktop.swingx;
 
-import junit.framework.TestCase;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.SortedSet;
+import java.util.TreeSet;
+
+import junit.framework.TestCase;
 
 /**
  * Tests for the DefaultDateSelectionModel
@@ -88,23 +89,43 @@ public class DefaultDateSelectionModelTest extends TestCase {
     }
 
     public void testUnselctableDates() {
-        model.setSelectionMode(DateSelectionModel.SelectionMode.SINGLE_SELECTION);
-        Date today = new Date();
-        model.setSelectionInterval(today, today);
+        model.setSelectionMode(DateSelectionModel.SelectionMode.MULTIPLE_INTERVAL_SELECTION);
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(System.currentTimeMillis());
+
+        Date today = cal.getTime();
+        cal.add(Calendar.DAY_OF_MONTH, 1);
+        Date tPlus1 = cal.getTime();
+        cal.add(Calendar.DAY_OF_MONTH, 1);
+        Date tPlus2 = cal.getTime();
+        cal.add(Calendar.DAY_OF_MONTH, 1);
+        Date tPlus3 = cal.getTime();
+        cal.add(Calendar.DAY_OF_MONTH, 1);
+        Date tPlus4 = cal.getTime();
+
+        model.setSelectionInterval(today, tPlus4);
         SortedSet<Date> selection = model.getSelection();
         assertTrue(!selection.isEmpty());
-        assertTrue(1 == selection.size());
+        assertTrue(5 == selection.size());
         assertTrue(today.equals(selection.first()));
+        assertTrue(tPlus4.equals(selection.last()));
 
-        model.setUnselectableDates(selection);
-        SortedSet<Date> unselectableDates = model.getUnselectableDates();
-        assertTrue(!selection.isEmpty());
-        assertTrue(1 == selection.size());
-        assertTrue(unselectableDates.contains(today));
+        SortedSet<Date> unselectableDates = new TreeSet<Date>();
+        unselectableDates.add(tPlus1);
+        unselectableDates.add(tPlus3);
+        model.setUnselectableDates(unselectableDates);
 
         // Make sure setting the unselectable dates to include a selected date removes
         // it from the selected set.
         selection = model.getSelection();
-        assertTrue(selection.isEmpty());
+        assertTrue(!selection.isEmpty());
+        assertTrue(3 == selection.size());
+        assertTrue(selection.contains(today));
+        assertTrue(selection.contains(tPlus2));
+        assertTrue(selection.contains(tPlus4));
+
+        // Make sure the unselectable dates is the same as what we set.
+        SortedSet<Date> result = model.getUnselectableDates();
+        assertTrue(unselectableDates.equals(result));
     }
 }

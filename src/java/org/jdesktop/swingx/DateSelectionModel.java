@@ -162,4 +162,34 @@ public interface DateSelectionModel {
      * @return true is the date is unselectable, false otherwise
      */
     public boolean isUnselectableDate(Date unselectableDate);
+
+    /**
+     * Return the upper bound date that is allowed to be selected for this
+     * model
+     *
+     * @return upper bound date or null if not set
+     */
+    public Date getUpperBound();
+
+    /**
+     * Set the upper bound date that is allowed to be selected for this model
+     *
+     * @param upperBound upper bound
+     */
+    public void setUpperBound(final Date upperBound);
+
+    /**
+     * Return the lower bound date that is allowed to be selected for this
+     * model
+     *
+     * @return lower bound date or null if not set
+     */
+    public Date getLowerBound();
+
+    /**
+     * Set the lower bound date that is allowed to be selected for this model
+     *
+     * @param lowerBound lower bound date or null if not set
+     */
+    public void setLowerBound(final Date lowerBound);
 }

@@ -18,11 +18,11 @@
  */
 package org.jdesktop.swingx.event;
 
-import org.jdesktop.swingx.DateSelectionModel;
-
 import java.util.Date;
 import java.util.EventObject;
 import java.util.SortedSet;
+
+import org.jdesktop.swingx.DateSelectionModel;
 
 /**
  * @author Joshua Outwater
@@ -35,7 +35,9 @@ public class DateSelectionEvent extends EventObject {
         SELECTION_CLEARED,
         SELECTABLE_DATES_CHANGED,
         SELECTABLE_RANGE_CHANGED,
-        UNSELECTED_DATES_CHANGED
+        UNSELECTED_DATES_CHANGED,
+        LOWER_BOUND_CHANGED,
+        UPPER_BOUND_CHANGED
     }
 
     private EventType eventType;
