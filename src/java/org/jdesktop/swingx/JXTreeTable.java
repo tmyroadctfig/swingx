@@ -280,13 +280,20 @@ public class JXTreeTable extends JXTable {
      * the column contains the tree. This is done as the tree editor does
      * not fill the bounds of the cell, we need the renderer to paint
      * the tree in the background, and then draw the editor over it.
-     * You should not need to call this method directly.
+     * You should not need to call this method directly. <p>
+     * 
+     * Additionally, there is tricksery involved to expand/collapse
+     * the nodes.
+     * 
+     *  @see #expandOrCollapseNode(int, EventObject)
      *
      * {@inheritDoc}
      */
     @Override
     public boolean editCellAt(int row, int column, EventObject e) {
-        // JW: should be done in processMouseEvent
+        // JW: should be done in processMouseEvent to fix #332/#222
+        // comment the following line for playing while at the
+        // same time uncomment the call in processMouseEvent
         expandOrCollapseNode(column, e);    // RG: Fix Issue 49!
         boolean canEdit = super.editCellAt(row, column, e);
         if (canEdit && isHierarchical(column)) {
@@ -295,9 +302,37 @@ public class JXTreeTable extends JXTable {
         return canEdit;
     }
 
-    private void expandOrCollapseNode(int column, EventObject e) {
-        if (!(e instanceof MouseEvent)) return;
-        if (!isHierarchical(column)) return;
+    /**
+     * Tricksery to make the tree expand/collapse. <p>
+     * 
+     * This might be called from one of two places:
+     * <ol>
+     * <li> editCellAt: original, stable but buggy (#332, #222) 
+     *   the table's own selection
+     *   had been changed due to the click before even entering into editCellAt
+     *   so all tree selection state is lost.
+     *   
+     * <li> processMouseEvent: unstable (not fixing completely), therefore disabled
+     *   the idea is to catch the expanded/collapsed before passing the event
+     *   to super     
+     * </ol>
+     *  
+     * To play with the side-effects comment and uncomment the lines marked
+     * to pertain to the fix experiment in both methods.  
+     * <p> 
+     * widened access for testing ...
+     * 
+     * 
+     * @param column the column index under the event, if any.
+     * @param e the event which might trigger a expand/collapse.
+     * 
+     * @return this methods evaluation as to whether the event triggered
+     *   a expand/collaps
+     */
+    protected boolean expandOrCollapseNode(int column, EventObject e) {
+        if (!(e instanceof MouseEvent)) return false;
+        if (!isHierarchical(column)) return false;
+        boolean changedExpansion = false;
         MouseEvent me = (MouseEvent) e;
         if (hackAroundDragEnabled(me)) {
             /*
@@ -357,12 +392,12 @@ public class JXTreeTable extends JXTable {
                     // if it resulted in a expand/collapse)
                     // but not yet stable - so I revert to the old 
                     // buggy version
-                    // @KEEP
-//                    if (expansionChangedFlag) {
-//                        me.consume();
-//                    }
+                    if (expansionChangedFlag) {
+                        changedExpansion = true;
+                    }
         }
         expansionChangedFlag = false;
+        return changedExpansion;
     }
 
     
@@ -370,14 +405,23 @@ public class JXTreeTable extends JXTable {
         expansionChangedFlag = true;
     }
     
-// @KEEP: part of intermediate hack around #332-swingx    
-//    @Override
-//    protected void processMouseEvent(MouseEvent e) {
-//        expandOrCollapseNode(columnAtPoint(e.getPoint()), e);
-//        if (!e.isConsumed()) {
-//            super.processMouseEvent(e);
+    /**
+     * Overridden to try to intercept a mouseEvent which triggered
+     * a expand/collapse.
+     * @see #expandOrCollapseNode(int, EventObject) 
+     */
+    @Override
+    protected void processMouseEvent(MouseEvent e) {
+        // @KEEP: part of intermediate hack around #332-swingx
+        // uncomment the following lines for playing while at the
+        // same time comment the call in editCellAt
+//        boolean consume = expandOrCollapseNode(columnAtPoint(e.getPoint()), e);
+//        if (consume) {
+//            e.consume();
+//            return;
 //        }
-//    }
+        super.processMouseEvent(e);
+    }
     
 
 
