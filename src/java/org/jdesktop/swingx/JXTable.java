@@ -31,6 +31,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.print.PrinterException;
+import java.beans.PropertyChangeEvent;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -98,6 +99,7 @@ import org.jdesktop.swingx.decorator.SizeSequenceMapper;
 import org.jdesktop.swingx.decorator.SortController;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
+import org.jdesktop.swingx.event.TableColumnModelExtListener;
 import org.jdesktop.swingx.icon.ColumnControlIcon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.table.ColumnControlButton;
@@ -214,10 +216,13 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * @author Mark Davidson
  * @author Jeanette Winzenburg
  */
-public class JXTable extends JTable { 
+public class JXTable extends JTable 
+//    implements TableColumnModelExtListener 
+    { 
     private static final Logger LOG = Logger.getLogger(JXTable.class.getName());
     
-
+//    public static final int AUTO_RESIZE_INTELLI_OFF = -1;
+    
     /**
      * Constant string for horizontal scroll actions, used in JXTable's Action
      * Map.
@@ -341,6 +346,10 @@ public class JXTable extends JTable {
 
 
     private boolean dockedOnExpand;
+
+    private boolean intelliMode;
+
+    private boolean inLayout;
 
 
     /** Instantiates a JXTable with a default table model, no data. */
@@ -889,8 +898,10 @@ public class JXTable extends JTable {
             return;
         if (enabled) {
             oldAutoResizeMode = getAutoResizeMode();
+            intelliMode = true;
             setAutoResizeMode(AUTO_RESIZE_OFF);
         } else {
+            intelliMode = false;
             setAutoResizeMode(oldAutoResizeMode);
         }
     }
@@ -950,11 +961,14 @@ public class JXTable extends JTable {
     @Override
     public boolean getScrollableTracksViewportWidth() {
         boolean shouldTrack = super.getScrollableTracksViewportWidth();
+        // TODO jw remove all expandsToViewport
         if (isExpandsToViewportWidthEnabled() &&
                 ensureFillsViewportWidth && isHorizontalScrollEnabled()) {
-              shouldTrack = getPreferredSize().width <= getParent().getWidth();
+              return hasExcessWidth();
+         } 
+        if (intelliMode) {
+             return hasExcessWidth();
          }
-                
          return shouldTrack;
     }
 
@@ -964,7 +978,16 @@ public class JXTable extends JTable {
      */
     @Override
     public void doLayout() {
+        int resizeMode = getAutoResizeMode();
+        // fool super...
+        if (intelliMode && hasRealizedParent() && hasExcessWidth()) {
+           autoResizeMode = oldAutoResizeMode;
+        }
+        inLayout = true;
         super.doLayout();
+        inLayout = false;
+        autoResizeMode = resizeMode;
+        // TODO jw - remove everything related to the expandToViewport ...
         if (!isExpandsToViewportWidthEnabled()) return;
         if (ensureFillsViewportWidth && (getWidth() > 0) && (getParent() != null)
                 && (getParent().getWidth() > 0)) {
@@ -988,6 +1011,36 @@ public class JXTable extends JTable {
             }
             revalidate();
         }
+    }
+
+    private boolean hasRealizedParent() {
+        return (getWidth() > 0) && (getParent() != null)
+            && (getParent().getWidth() > 0);
+    }
+
+    private boolean hasExcessWidth() {
+        return getPreferredSize().width  < getParent().getWidth();
+    }
+
+    
+    
+    @Override
+    public void columnMarginChanged(ChangeEvent e) {
+        if (isEditing()) {
+            removeEditor();
+        }
+        TableColumn resizingColumn = getResizingColumn();
+        // Need to do this here, before the parent's
+        // layout manager calls getPreferredSize().
+        if (resizingColumn != null && autoResizeMode == AUTO_RESIZE_OFF && !inLayout) {
+            resizingColumn.setPreferredWidth(resizingColumn.getWidth());
+        }
+        resizeAndRepaint();
+    }
+
+    private TableColumn getResizingColumn() {
+        return (tableHeader == null) ? null
+                                     : tableHeader.getResizingColumn();
     }
 
     /**
