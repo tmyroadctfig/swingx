@@ -23,6 +23,7 @@ import javax.swing.table.TableModel;
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.table.ColumnControlButton.ColumnVisibilityAction;
 import org.jdesktop.swingx.table.ColumnControlButton.DefaultControlPopup;
 import org.jdesktop.swingx.util.AncientSwingTeam;
 
@@ -32,6 +33,37 @@ import org.jdesktop.swingx.util.AncientSwingTeam;
 public class ColumnControlButtonTest extends InteractiveTestCase {
     protected TableModel sortableTableModel;
 
+    /**
+     * test that the actions synch's its own selected property with 
+     * the column's visible property. <p>
+     * 
+     * Looks as if the non-synch of action.setSelected only shows 
+     * if the ControlPopup doesn't create a menuitem via ActionFactory: the
+     * listeners internally installed via ActionFactory probably take care?
+     *  <p>
+     * 
+     * An analogous test in the incubator (in kleopatra/.../table) did fail
+     * for a dialog based custom ControlPopup. For now, changed the visibility
+     * action to explicitly update the tableColumn. All tests are passing,
+     * but need to further evaluate.
+     *
+     */
+    public void testColumnVisibilityAction() {
+        JXTable table = new JXTable(10, 3);
+        table.setColumnControlVisible(true);
+        ColumnControlButton columnControl = (ColumnControlButton) table.getColumnControl();
+        ColumnVisibilityAction action = columnControl.getColumnVisibilityActions().get(0);
+        TableColumnExt columnExt = table.getColumnExt(0);
+        boolean visible = columnExt.isVisible();
+        // sanity
+        assertTrue(visible);
+        assertEquals(columnExt.isVisible(), action.isSelected());
+        action.setSelected(!visible);
+        // hmmm... here it's working? unexpected
+        // synch might be done by the listener's installed by ActionFactor.createMenuItem()?
+        assertEquals(!visible, columnExt.isVisible());
+    }
+    
     /**
      * suspected: enabled not synched on init. 
      * But is (done in ccb.installTable()). 
