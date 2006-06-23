@@ -33,14 +33,16 @@ public class OS {
   private static final boolean osIsWindows;
   private static final boolean osIsWindowsXP;
   private static final boolean osIsWindows2003;
+  private static final boolean osIsLinux;
 
   static {
     String os = System.getProperty("os.name").toLowerCase();
 
     osIsMacOsX = "mac os x".equals(os);
-    osIsWindows = os.indexOf("windows") != -1;
+    osIsWindows = os != null && os.indexOf("windows") != -1;
     osIsWindowsXP = "windows xp".equals(os);
     osIsWindows2003 = "windows 2003".equals(os);
+    osIsLinux = os != null && os.indexOf("linux") != -1;
   }
 
   /**
@@ -71,6 +73,13 @@ public class OS {
     return osIsWindows2003;
   }
 
+  /**
+   * @return true if this VM is running on a Linux distribution
+   */
+  public static boolean isLinux() {
+    return osIsLinux;
+  }
+  
   /**
    * @return true if the VM is running Windows and the Java
    *         application is rendered using XP Visual Styles.
