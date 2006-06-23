@@ -28,11 +28,14 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Enumeration;
 import java.util.EventObject;
+import java.util.logging.Logger;
 
 import javax.swing.ActionMap;
 import javax.swing.Icon;
@@ -106,7 +109,8 @@ import org.jdesktop.swingx.treetable.TreeTableModel;
  * @author Ramesh Gupta
  */
 public class JXTreeTable extends JXTable {
-
+    private static final Logger LOG = Logger.getLogger(JXTreeTable.class
+            .getName());
     /**
      * Key for clientProperty to decide whether to apply hack around #168-jdnc.
      */
@@ -117,6 +121,8 @@ public class JXTreeTable extends JXTable {
      *  renderer extends JXTree and implements TableCellRenderer
      */
     private TreeTableCellRenderer renderer;
+    private MouseListener expansionHackListener;
+    private boolean expansionChangedFlag;
 
     /**
      * Constructs a JXTreeTable using a
@@ -279,7 +285,7 @@ public class JXTreeTable extends JXTable {
      */
     @Override
     public boolean editCellAt(int row, int column, EventObject e) {
-        expandOrCollapseNode(column, e);    // RG: Fix Issue 49!
+//        expandOrCollapseNode(column, e);    // RG: Fix Issue 49!
         boolean canEdit = super.editCellAt(row, column, e);
         if (canEdit && isHierarchical(column)) {
             repaint(getCellRect(row, column, false));
@@ -342,8 +348,27 @@ public class JXTreeTable extends JXTable {
                          pressed.isPopupTrigger());
                     renderer.dispatchEvent(released);
                     renderer.setRowHeight(savedHeight);
+                    if (expansionChangedFlag) {
+                        me.consume();
+                    }
+        }
+        expansionChangedFlag = false;
+    }
+
+    
+    private void setExpansionChangedFlag() {
+        expansionChangedFlag = true;
+    }
+    
+    @Override
+    protected void processMouseEvent(MouseEvent e) {
+        expandOrCollapseNode(columnAtPoint(e.getPoint()), e);
+        if (!e.isConsumed()) {
+            super.processMouseEvent(e);
         }
     }
+    
+
 
     /**
      * decides whether we want to apply the hack for #168-jdnc.
@@ -1364,14 +1389,26 @@ public class JXTreeTable extends JXTable {
                 // Don't use fireTableRowsInserted() here; the selection model
                 // would get updated twice.
                 public void treeExpanded(TreeExpansionEvent event) {
-                    fireTableDataChanged();
+                    updateAfterExpansionEvent(event);
                 }
 
                 public void treeCollapsed(TreeExpansionEvent event) {
-                    fireTableDataChanged();
+                    updateAfterExpansionEvent(event);
                 }
             });
         }
+
+        protected void updateAfterExpansionEvent(TreeExpansionEvent event) {
+            treeTable.setExpansionChangedFlag();
+            TreePath[] selectionPaths = tree.getSelectionPaths();
+
+            fireTableDataChanged();
+
+            if (selectionPaths != null && selectionPaths.length > 0) {
+                tree.setSelectionPaths(selectionPaths);
+            }
+        }
+
 
         /**
          * 
@@ -1559,6 +1596,8 @@ public class JXTreeTable extends JXTable {
                 }
             });
         }
+
+
 
 
 
