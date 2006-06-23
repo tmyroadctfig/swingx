@@ -121,7 +121,8 @@ public class JXTreeTable extends JXTable {
      *  renderer extends JXTree and implements TableCellRenderer
      */
     private TreeTableCellRenderer renderer;
-    private MouseListener expansionHackListener;
+
+    // JW: part of #332-swingx hack - currently not really used 
     private boolean expansionChangedFlag;
 
     /**
@@ -285,7 +286,8 @@ public class JXTreeTable extends JXTable {
      */
     @Override
     public boolean editCellAt(int row, int column, EventObject e) {
-//        expandOrCollapseNode(column, e);    // RG: Fix Issue 49!
+        // JW: should be done in processMouseEvent
+        expandOrCollapseNode(column, e);    // RG: Fix Issue 49!
         boolean canEdit = super.editCellAt(row, column, e);
         if (canEdit && isHierarchical(column)) {
             repaint(getCellRect(row, column, false));
@@ -348,9 +350,17 @@ public class JXTreeTable extends JXTable {
                          pressed.isPopupTrigger());
                     renderer.dispatchEvent(released);
                     renderer.setRowHeight(savedHeight);
-                    if (expansionChangedFlag) {
-                        me.consume();
-                    }
+                    
+                    // Issue #332-swing: hacking around selection loss.
+                    // it's the right direction to go (prevent the 
+                    // _table_ selection by consuming the mouseEvent
+                    // if it resulted in a expand/collapse)
+                    // but not yet stable - so I revert to the old 
+                    // buggy version
+                    // @KEEP
+//                    if (expansionChangedFlag) {
+//                        me.consume();
+//                    }
         }
         expansionChangedFlag = false;
     }
@@ -360,13 +370,14 @@ public class JXTreeTable extends JXTable {
         expansionChangedFlag = true;
     }
     
-    @Override
-    protected void processMouseEvent(MouseEvent e) {
-        expandOrCollapseNode(columnAtPoint(e.getPoint()), e);
-        if (!e.isConsumed()) {
-            super.processMouseEvent(e);
-        }
-    }
+// @KEEP: part of intermediate hack around #332-swingx    
+//    @Override
+//    protected void processMouseEvent(MouseEvent e) {
+//        expandOrCollapseNode(columnAtPoint(e.getPoint()), e);
+//        if (!e.isConsumed()) {
+//            super.processMouseEvent(e);
+//        }
+//    }
     
 
 
