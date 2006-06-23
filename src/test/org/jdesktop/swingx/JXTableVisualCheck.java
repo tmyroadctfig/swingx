@@ -344,15 +344,11 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             
         };
         table.setColumnFactory(factory);
-        table.setExpandsToViewportWidthEnabled(true);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         table.setColumnControlVisible(true);
         table.setModel(sortableTableModel);
         table.packAll();
         JXFrame frame = wrapWithScrollingInFrame(table, "expand to width");
-//        table.expandToViewportWidth();
-//        frame.invalidate();
-//        frame.validate();
         Action toggleModel = new AbstractAction("toggle model") {
 
             public void actionPerformed(ActionEvent e) {
@@ -363,24 +359,6 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             
         };
         addAction(frame, toggleModel);
-        Action dockAction = new AbstractActionExt("dockOnExpand: " + table.isDockedOnExpandWidth()) {
-
-            public void actionPerformed(ActionEvent e) {
-                table.setDockedOnExpandWidth(!table.isDockedOnExpandWidth());
-                this.setName("dockedOnExpand: " + table.isDockedOnExpandWidth());
-            }
-            
-        };
-        addAction(frame, dockAction);
-        Action action = new AbstractAction("expand to width") {
-
-            public void actionPerformed(ActionEvent e) {
-                table.expandToViewportWidth();
-                
-            }
-            
-        };
-        addAction(frame, action);
         
         frame.setVisible(true);
 

@@ -61,7 +61,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     public void testDragHackFlagOn() {
         JXTreeTable treeTable = new JXTreeTable(simpleTreeTableModel);
         assertNull(treeTable.getClientProperty(JXTreeTable.DRAG_HACK_FLAG_KEY));
-        treeTable.editCellAt(0, 0, new MouseEvent(treeTable, 0, 0, 0, 0, 0, 1, false));
+        treeTable.expandOrCollapseNode(0, new MouseEvent(treeTable, 0, 0, 0, 0, 0, 1, false));
         Boolean dragHackFlag = (Boolean) treeTable.getClientProperty(JXTreeTable.DRAG_HACK_FLAG_KEY);
         assertNotNull(dragHackFlag);
         assertTrue(dragHackFlag);
@@ -76,7 +76,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         System.setProperty("sun.swing.enableImprovedDragGesture", "true");
         JXTreeTable treeTable = new JXTreeTable(simpleTreeTableModel);
         assertNull(treeTable.getClientProperty(JXTreeTable.DRAG_HACK_FLAG_KEY));
-        treeTable.editCellAt(0, 0, new MouseEvent(treeTable, 0, 0, 0, 0, 0, 1, false));
+        treeTable.expandOrCollapseNode(0, new MouseEvent(treeTable, 0, 0, 0, 0, 0, 1, false));
         Boolean dragHackFlag = (Boolean) treeTable.getClientProperty(JXTreeTable.DRAG_HACK_FLAG_KEY);
         assertNotNull(dragHackFlag);
         assertFalse(dragHackFlag);
