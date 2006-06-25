@@ -887,8 +887,14 @@ public class JXTable extends JTable
      * fills the Viewport horizontally and shows the horizontal scrollbar if
      * necessary. <p>
      * 
-     * PENDING: add a "real" mode and let this make sure that this method
-     * and setAutoResizeMode are always in synch. Currently they aren't...
+     * PENDING: add a "real" mode? Problematic because there are several 
+     * places in core which check for #AUTO_RESIZE_OFF, can't use different 
+     * value without unwanted side-effects. The current solution with tagging
+     * the #AUTO_RESIZE_OFF by a boolean flag #intelliMode is brittle - need 
+     * to be very careful to turn off again ... Another problem is to keep the
+     * horizontalScrollEnabled toggling action in synch with this property. 
+     * Yet another problem is the change notification: currently this is _not_
+     * a bound property. 
      * 
      * @param enabled a boolean indicating whether enhanced auto resize off is
      *   enabled.
@@ -897,18 +903,23 @@ public class JXTable extends JTable
         if (enabled == (isHorizontalScrollEnabled()))
             return;
         if (enabled) {
-            oldAutoResizeMode = getAutoResizeMode();
-            intelliMode = true;
+            // remember the resizeOn mode if any
+            if (getAutoResizeMode() != AUTO_RESIZE_OFF) {
+                oldAutoResizeMode = getAutoResizeMode();
+            }
             setAutoResizeMode(AUTO_RESIZE_OFF);
+            // setAutoResizeModel always disables the intelliMode
+            // must set after calling and update the action again
+            intelliMode = true;
+            updateHorizontalAction();
         } else {
-            intelliMode = false;
             setAutoResizeMode(oldAutoResizeMode);
         }
     }
 
     /** Returns the current setting for horizontal scrolling. */
     protected boolean isHorizontalScrollEnabled() {
-        return getAutoResizeMode() == AUTO_RESIZE_OFF;
+        return intelliMode && getAutoResizeMode() == AUTO_RESIZE_OFF;
     }
 
     /** 
@@ -926,7 +937,17 @@ public class JXTable extends JTable
         if (mode != AUTO_RESIZE_OFF) {
             oldAutoResizeMode = mode;
         }
+        intelliMode = false;
         super.setAutoResizeMode(mode);
+        updateHorizontalAction();
+    }
+
+    /**
+     * synch selected state of horizontal scroll en/disabling action 
+     * with horizont scroll enabled property. 
+     * "real" binding would help ... 
+     */
+    protected void updateHorizontalAction() {
         Action showHorizontal = getActionMap().get(
                 HORIZONTALSCROLL_ACTION_COMMAND);
         if (showHorizontal instanceof BoundAction) {
@@ -943,7 +964,7 @@ public class JXTable extends JTable
     @Override
     public boolean getScrollableTracksViewportWidth() {
         boolean shouldTrack = super.getScrollableTracksViewportWidth();
-        if (intelliMode) {
+        if (isHorizontalScrollEnabled()) {
              return hasExcessWidth();
          }
          return shouldTrack;
@@ -957,7 +978,7 @@ public class JXTable extends JTable
     public void doLayout() {
         int resizeMode = getAutoResizeMode();
         // fool super...
-        if (intelliMode && hasRealizedParent() && hasExcessWidth()) {
+        if (isHorizontalScrollEnabled() && hasRealizedParent() && hasExcessWidth()) {
            autoResizeMode = oldAutoResizeMode;
         }
         inLayout = true;

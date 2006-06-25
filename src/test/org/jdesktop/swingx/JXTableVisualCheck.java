@@ -344,9 +344,10 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             
         };
         table.setColumnFactory(factory);
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         table.setColumnControlVisible(true);
         table.setModel(sortableTableModel);
+        table.getColumnExt(1).setTitle("<html><center>Line 1<br>Line 2</center></html>");
+        table.setHorizontalScrollEnabled(true);
         table.packAll();
         JXFrame frame = wrapWithScrollingInFrame(table, "expand to width");
         Action toggleModel = new AbstractAction("toggle model") {
@@ -359,9 +360,10 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             
         };
         addAction(frame, toggleModel);
-        
+        frame.setSize(table.getPreferredSize().width - 50, 300);
         frame.setVisible(true);
-
+        LOG.info("table: " + table.getWidth());
+        LOG.info("Viewport: " + table.getParent().getWidth());
     }
     
     /**

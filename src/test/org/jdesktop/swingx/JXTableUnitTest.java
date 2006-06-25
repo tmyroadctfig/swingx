@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import javax.swing.Action;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -40,6 +41,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
+import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.Filter;
@@ -477,6 +479,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
                 tablePrefSize.height, table.getHeight());
     }
 
+    
     /**
      * Issue #256-swingx: added fillsViewportHeight property.
      * 
@@ -532,6 +535,140 @@ public class JXTableUnitTest extends InteractiveTestCase {
         
         
     }
+
+    /**
+     * Issue #214-swingX: improved auto-resize.
+     * 
+     * 
+     */
+    public void testTrackViewportWidth() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run trackViewportWidth - headless environment");
+            return;
+        }
+        JXTable table = new JXTable(10, 2);
+        table.setHorizontalScrollEnabled(true);
+        Dimension tablePrefSize = table.getPreferredSize();
+        JScrollPane scrollPane = new JScrollPane(table);
+        JXFrame frame = wrapInFrame(scrollPane, "");
+        frame.setSize(tablePrefSize.width * 2, tablePrefSize.height);
+        frame.setVisible(true);
+        assertEquals("table width must be equal to viewport", 
+                table.getWidth(), scrollPane.getViewport().getWidth());
+     }
+
+    /**
+     * Issue #214-swingX: improved auto-resize.
+     * 
+     *
+     */
+    public void testSetHorizontalEnabled() {
+        JXTable table = new JXTable(10, 2);
+        table.setHorizontalScrollEnabled(true);
+        assertTrue("enhanced resize property must be enabled", 
+                table.isHorizontalScrollEnabled());
+        assertHorizontalActionSelected(table, true);
+    }
+
+    private void assertHorizontalActionSelected(JXTable table, boolean selected) {
+        Action showHorizontal = table.getActionMap().get(
+                JXTable.HORIZONTALSCROLL_ACTION_COMMAND);
+        assertEquals("horizontAction must be selected"  , selected, 
+                ((BoundAction) showHorizontal).isSelected());
+    }
+ 
+    /**
+     * Issue #214-swingX: improved auto-resize.
+     * test autoResizeOff != intelliResizeOff 
+     * after sequence a) set intelli, b) setAutoResize
+     * 
+     */
+    public void testNotTrackViewportWidth() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run trackViewportWidth - headless environment");
+            return;
+        }
+        JXTable table = new JXTable(10, 2);
+        table.setHorizontalScrollEnabled(true);
+        table.setAutoResizeMode(JXTable.AUTO_RESIZE_OFF);
+        Dimension tablePrefSize = table.getPreferredSize();
+        JScrollPane scrollPane = new JScrollPane(table);
+        JXFrame frame = wrapInFrame(scrollPane, "");
+        frame.setSize(tablePrefSize.width * 2, tablePrefSize.height);
+        frame.setVisible(true);
+        assertEquals("table width must not be equal to viewport", 
+               table.getPreferredSize().width, table.getWidth());
+     }
+ 
+    /**
+     * Issue #214-swingX: improved auto-resize.
+     * test autoResizeOff != intelliResizeOff
+     * 
+     */
+    public void testAutoResizeOffNotHorizontalScrollEnabled() {
+        JXTable table = new JXTable(10, 2);
+        table.setAutoResizeMode(JXTable.AUTO_RESIZE_OFF);
+        // sanity: horizontal action must be selected
+        assertHorizontalActionSelected(table, false);
+        assertFalse("autoResizeOff must not enable enhanced resize", 
+                table.isHorizontalScrollEnabled());
+     }
+ 
+    /**
+     * Issue #214-swingX: improved auto-resize.
+     * 
+     * testing doc'd behaviour: horizscrollenabled toggles between
+     * enhanced resizeOff and the resizeOn mode which had been active 
+     * when toggling on. 
+     * 
+     */
+    public void testOldAutoResizeOn() {
+        JXTable table = new JXTable(10, 2);
+        int oldAutoResize = table.getAutoResizeMode();
+        table.setHorizontalScrollEnabled(true);
+        table.setHorizontalScrollEnabled(false);
+        assertEquals("old on-mode must be restored", oldAutoResize, table.getAutoResizeMode());
+       }
+    
+    /**
+     * Issue #214-swingX: improved auto-resize.
+     * 
+     * testing doc'd behaviour: horizscrollenabled toggles between
+     * enhanced resizeOff and the resizeOn mode which had been active 
+     * when toggling on. Must not restore raw resizeOff mode.
+     * 
+     * 
+     */
+    public void testNotOldAutoResizeOff() {
+        JXTable table = new JXTable(10, 2);
+        int oldAutoResize = table.getAutoResizeMode();
+        table.setAutoResizeMode(JXTable.AUTO_RESIZE_OFF);
+        table.setHorizontalScrollEnabled(true);
+        table.setHorizontalScrollEnabled(false);
+        assertEquals("old on-mode must be restored", oldAutoResize, table.getAutoResizeMode());
+       }
+    /**
+     * Issue #214-swingX: improved auto-resize.
+     * test autoResizeOff != intelliResizeOff 
+     * after sequence a) set intelli, b) setAutoResize
+     * 
+     */
+    public void testAutoResizeOffAfterHorizontalScrollEnabled() {
+        JXTable table = new JXTable(10, 2);
+        table.setHorizontalScrollEnabled(true);
+        // sanity: intelliResizeOff enabled
+        assertTrue(table.isHorizontalScrollEnabled());
+        // sanity: horizontal action must be selected
+        assertHorizontalActionSelected(table, true);
+        table.setAutoResizeMode(JXTable.AUTO_RESIZE_OFF);
+        assertFalse("autoResizeOff must not enable enhanced resize", 
+                table.isHorizontalScrollEnabled());
+        // sanity: horizontal action must be selected
+        assertHorizontalActionSelected(table, false);
+     }
+
     /**
      * Issue 252-swingx: getColumnExt throws ClassCastException if tableColumn
      * is not of type TableColumnExt.
@@ -548,6 +685,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         TableColumnExt tableColumnExt = table.getColumnExt(0);
         assertNull("getColumnExt must return null on type mismatch", tableColumnExt);
     }
+
 
     /**
      * test contract: getColumnExt(int) throws ArrayIndexOutofBounds with 
