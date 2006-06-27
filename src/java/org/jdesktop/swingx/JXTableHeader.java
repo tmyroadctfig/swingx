@@ -92,6 +92,7 @@ public class JXTableHeader extends JTableHeader
      * 
      * @param event change notification from a contained TableColumn.
      * @see #isColumnEvent(PropertyChangeEvent)
+     * 
      */
     public void columnPropertyChange(PropertyChangeEvent event) {
        if (isColumnEvent(event)) return;

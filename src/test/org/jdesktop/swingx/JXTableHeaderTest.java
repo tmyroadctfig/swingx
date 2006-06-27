@@ -26,7 +26,6 @@ public class JXTableHeaderTest extends InteractiveTestCase {
     /**
      * Issue 334-swingx: BasicTableHeaderUI.getPrefSize doesn't respect 
      *   all renderere's size requirements.
-     * 
      *
      */
     public void testPreferredHeight() {
