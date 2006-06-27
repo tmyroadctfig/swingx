@@ -90,7 +90,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*isable.*");
           
 //          test.runInteractiveTests("interactive.*Column.*");
-        test.runInteractiveTests("interactive.*Viewport.*");
+        test.runInteractiveTests("interactive.*Header.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -323,6 +323,31 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     }
     
     /**
+     * Issue #281-swingx, Issue #334-swing: 
+     * header should be auto-repainted on changes to
+     * header title, value. Must update size if appropriate.
+     * 
+     *
+     */
+    public void interactiveUpdateHeaderAndSizeRequirements() {
+        final JXTable table = new JXTable(10, 2);
+        JXFrame frame = wrapWithScrollingInFrame(table, "update header");
+        Action action = new AbstractAction("update headervalue") {
+            String[] alternate = {"simple", "<html><center>Line 1<br>Line 2</center></html>" };
+            boolean first;
+            public void actionPerformed(ActionEvent e) {
+                table.getColumn(1).setHeaderValue(first ? alternate[0] : alternate[1]);
+                first = !first;
+                
+            }
+            
+        };
+        addAction(frame, action);
+        frame.setVisible(true);
+        
+    }
+    
+    /**
      * Issue #??-swingx: column auto-sizing support.
      *
      */
@@ -346,7 +371,6 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         table.setColumnFactory(factory);
         table.setColumnControlVisible(true);
         table.setModel(sortableTableModel);
-        table.getColumnExt(1).setTitle("<html><center>Line 1<br>Line 2</center></html>");
         table.setHorizontalScrollEnabled(true);
         table.packAll();
         JXFrame frame = wrapWithScrollingInFrame(table, "expand to width");

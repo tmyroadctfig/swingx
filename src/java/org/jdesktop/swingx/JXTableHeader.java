@@ -87,11 +87,29 @@ public class JXTableHeader extends JTableHeader
 
     /**
      * Implementing TableColumnModelExt: listening to column property changes.
+     * Here: triggers a resizeAndRepaint on every propertyChange which
+     * doesn't already fire a "normal" columnModelEvent.
+     * 
      * @param event change notification from a contained TableColumn.
+     * @see #isColumnEvent(PropertyChangeEvent)
      */
     public void columnPropertyChange(PropertyChangeEvent event) {
-       repaint(); 
+       if (isColumnEvent(event)) return;
+       resizeAndRepaint(); 
     }
+    
+    
+    /**
+     * @param event the PropertyChangeEvent received as TableColumnModelExtListener.
+     * @return a boolean to decide whether the same event triggers a
+     *   base columnModelEvent.
+     */
+    protected boolean isColumnEvent(PropertyChangeEvent event) {
+        return "width".equals(event.getPropertyName()) || 
+            "preferredWidth".equals(event.getPropertyName())
+            || "visible".equals(event.getPropertyName());
+    }
+
     /**
      * overridden to respect the column tooltip, if available. 
      * 
@@ -125,6 +143,18 @@ public class JXTableHeader extends JTableHeader
     }
 
     /**
+     * Returns the TableCellRenderer used for rendering the headerCell
+     * of the column at columnIndex.
+     * 
+     * @param columnIndex the index of the column
+     * @return the renderer.
+     */
+    public TableCellRenderer getCellRenderer(int columnIndex) {
+        TableCellRenderer renderer = getColumnModel().getColumn(columnIndex).getHeaderRenderer();
+        return renderer != null ? renderer : getDefaultRenderer();
+    }
+    
+    /**
      * Overridden to adjust for a minimum height as returned by
      * #getMinimumHeight.
      * 
@@ -133,10 +163,32 @@ public class JXTableHeader extends JTableHeader
     @Override
     public Dimension getPreferredSize() {
         Dimension pref = super.getPreferredSize();
+        pref = getPreferredSize(pref);
         pref.height = getMinimumHeight(pref.height);
         return pref;
     }
     
+    /**
+     * Hack around #334-swingx: super doesnt measure all headerRenderers
+     * for prefSize. This hack does and adjusts the height of the 
+     * given Dimension to be equal to the max fo all renderers.
+     * 
+     * @param pref the adjusted preferred size respecting all renderers
+     *   size requirements.
+     */
+    protected Dimension getPreferredSize(Dimension pref) {
+        int height = pref.height;
+        for (int i = 0; i < getColumnModel().getColumnCount(); i++) {
+            TableCellRenderer renderer = getCellRenderer(i);
+            Component comp = renderer.getTableCellRendererComponent(table, 
+                    getColumnModel().getColumn(i).getHeaderValue(), false, false, -1, i);
+            height = Math.max(height, comp.getPreferredSize().height);
+        }
+        pref.height = height;
+        return pref;
+        
+    }
+
     /**
      * Allows to enforce a minimum heigth in the 
      * getXXSize methods.

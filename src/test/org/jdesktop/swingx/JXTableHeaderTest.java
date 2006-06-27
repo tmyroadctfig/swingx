@@ -4,6 +4,7 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
@@ -14,12 +15,34 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 
 import org.jdesktop.swingx.table.TableColumnExt;
 
 public class JXTableHeaderTest extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXTableHeaderTest.class
             .getName());
+
+    /**
+     * Issue 334-swingx: BasicTableHeaderUI.getPrefSize doesn't respect 
+     *   all renderere's size requirements.
+     * 
+     *
+     */
+    public void testPreferredHeight() {
+        JXTable table = new JXTable(10, 2);
+        TableColumnExt columnExt = table.getColumnExt(1);
+        columnExt.setTitle("<html><center>Line 1<br>Line 2</center></html>");
+        JXTableHeader tableHeader = (JXTableHeader) table.getTableHeader();
+        TableCellRenderer renderer = tableHeader.getCellRenderer(1);
+        Component comp = renderer.getTableCellRendererComponent(table, 
+                columnExt.getHeaderValue(), false, false, -1, 1);
+        Dimension prefRendererSize = comp.getPreferredSize();
+        assertEquals("Header pref height must respect renderer",
+                prefRendererSize.height, tableHeader.getPreferredSize().height);
+    }
+    
+
     /**
      * test doc'ed xheader.getToolTipText(MouseEvent) behaviour.
      *
