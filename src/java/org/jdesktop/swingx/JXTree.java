@@ -21,12 +21,17 @@
 
 package org.jdesktop.swingx;
 
+import java.applet.Applet;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -39,8 +44,10 @@ import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.Icon;
 import javax.swing.JComponent;
+import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicTreeUI;
@@ -91,6 +98,7 @@ public class JXTree extends JTree {
     private TreeRolloverController linkController;
     private boolean overwriteIcons;
     private Searchable searchable;
+    private CellEditorRemover editorRemover;
     
     
     
@@ -901,6 +909,131 @@ public class JXTree extends JTree {
     }
 
     
+//----------------------- edit
+    
+    /**
+     * Overridden to terminate edits on focusLost. 
+     * This method updates the internal CellEditorRemover.
+     * 
+     * @see #updateEditorRemover()
+     */
+    @Override
+    public void startEditingAtPath(TreePath path) {
+        super.startEditingAtPath(path);
+        if (isEditing()) {
+            updateEditorRemover();
+        }
+    }
+
+    
+    /**
+     * Overridden to release the CellEditorRemover, if any.
+     */
+    @Override
+    public void removeNotify() {
+        if (editorRemover != null) {
+            editorRemover.release();
+            editorRemover = null;
+        }
+        super.removeNotify();
+    }
+
+    /**
+     * Lazily creates and updates the internal CellEditorRemover.
+     * 
+     *
+     */
+    private void updateEditorRemover() {
+        if (editorRemover == null) {
+            editorRemover = new CellEditorRemover();
+        }
+        editorRemover.updateKeyboardFocusManager();
+    }
+
+    /** This class tracks changes in the keyboard focus state. It is used
+     * when the JXTree is editing to determine when to terminate the edit.
+     * If focus switches to a component outside of the JXTree, but in the
+     * same window, this will terminate editing. The exact terminate 
+     * behaviour is controlled by the invokeStopEditing property.
+     * 
+     * @see javax.swing.JTree#setInvokesStopCellEditing(boolean)
+     * 
+     */
+    public class CellEditorRemover implements PropertyChangeListener {
+        /** the focusManager this is listening to. */
+        KeyboardFocusManager focusManager;
+
+        public CellEditorRemover() {
+            updateKeyboardFocusManager();
+        }
+
+        /**
+         * Updates itself to listen to the current KeyboardFocusManager. 
+         *
+         */
+        public void updateKeyboardFocusManager() {
+            KeyboardFocusManager current = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+            setKeyboardFocusManager(current);
+        }
+
+        /**
+         * stops listening.
+         *
+         */
+        public void release() {
+            setKeyboardFocusManager(null);
+        }
+        
+        /**
+         * Sets the focusManager this is listening to. 
+         * Unregisters/registers itself from/to the old/new manager, 
+         * respectively. 
+         * 
+         * @param current the KeyboardFocusManager to listen too.
+         */
+        private void setKeyboardFocusManager(KeyboardFocusManager current) {
+            if (focusManager == current)
+                return;
+            KeyboardFocusManager old = focusManager;
+            if (old != null) {
+                old.removePropertyChangeListener("permanentFocusOwner", this);
+            }
+            focusManager = current;
+            if (focusManager != null) {
+                focusManager.addPropertyChangeListener("permanentFocusOwner",
+                        this);
+            }
+
+        }
+        public void propertyChange(PropertyChangeEvent ev) {
+            if (!isEditing()) {
+                return;
+            }
+
+            Component c = focusManager.getPermanentFocusOwner();
+            while (c != null) {
+                JXTree tree = JXTree.this;
+                if (c == tree) {
+                    // focus remains inside the table
+                    return;
+                } else if ((c instanceof Window) ||
+                           (c instanceof Applet && c.getParent() == null)) {
+                    if (c == SwingUtilities.getRoot(tree)) {
+                        if (tree.getInvokesStopCellEditing()) {
+                            tree.stopEditing();
+                        }
+                        if (tree.isEditing()) {
+                            tree.cancelEditing();
+                        }
+                    }
+                    break;
+                }
+                c = c.getParent();
+            }
+        }
+    }
+
+    
     protected ComponentAdapter getComponentAdapter() {
         return dataAdapter;
     }
@@ -968,5 +1101,6 @@ public class JXTree extends JTree {
             return null;
         }
     }
+
 
 }

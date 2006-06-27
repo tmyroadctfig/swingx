@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JTree;
@@ -44,6 +45,42 @@ import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
 public class JXTreeVisualCheck extends JXTreeUnitTest {
     private static final Logger LOG = Logger.getLogger(JXTreeVisualCheck.class
             .getName());
+
+    public static void main(String[] args) {
+//      setSystemLF(true);
+      JXTreeVisualCheck test = new JXTreeVisualCheck();
+      try {
+//          test.runInteractiveTests();
+//          test.runInteractiveTests("interactive.*RToL.*");
+          test.runInteractiveTests("interactive.*Edit.*");
+      } catch (Exception e) {
+          System.err.println("exception when executing interactive tests:");
+          e.printStackTrace();
+      }
+  }
+    
+    /**
+     * visually check if invokesStopCellEditing jumps in on focusLost.
+     *
+     */
+    public void interactiveToggleEditProperties() {
+        final JXTree table = new JXTree();
+        table.setEditable(true);
+        JXFrame frame = wrapWithScrollingInFrame(table, new JButton("something to focus"), 
+                "JXTree: toggle invokesStopEditing ");
+        Action toggleTerminate = new AbstractAction("toggleInvokesStop") {
+
+            public void actionPerformed(ActionEvent e) {
+                table.setInvokesStopCellEditing(!table.getInvokesStopCellEditing());
+                
+            }
+            
+        };
+        addAction(frame, toggleTerminate);
+        frame.setVisible(true);
+        
+    }
+
     /**
      * visualize editing of the hierarchical column, both
      * in a tree and a xTree switching CO.
@@ -295,17 +332,5 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
         frame.setVisible(true);  
     }
 
-    public static void main(String[] args) {
-//        setSystemLF(true);
-        JXTreeVisualCheck test = new JXTreeVisualCheck();
-        try {
-//            test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*RToL.*");
-//            test.runInteractiveTests("interactive.*Edit.*");
-        } catch (Exception e) {
-            System.err.println("exception when executing interactive tests:");
-            e.printStackTrace();
-        }
-    }
 
 }
