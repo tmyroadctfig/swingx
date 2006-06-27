@@ -28,6 +28,7 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -68,6 +69,8 @@ public class JXTree extends JTree {
     private Method conversionMethod = null;
     private final static Class[] methodSignature = new Class[] {Object.class};
     private final static Object[] methodArgs = new Object[] {null};
+    private static final int[] EMPTY_INT_ARRAY = new int[0];
+    private static final TreePath[] EMPTY_TREEPATH_ARRAY = new TreePath[0];
 
     protected FilterPipeline filters;
     protected HighlighterPipeline highlighters;
@@ -438,6 +441,29 @@ public class JXTree extends JTree {
         }
     }
 
+
+    /**
+     * overridden to always return a not-null array 
+     * (following SwingX convention).
+     */
+    @Override
+    public int[] getSelectionRows() {
+        int[] rows = super.getSelectionRows();
+        return rows != null ? rows : EMPTY_INT_ARRAY; 
+    }
+    
+    
+
+    /**
+     * overridden to always return a not-null array 
+     * (following SwingX convention).
+     */
+    @Override
+    public TreePath[] getSelectionPaths() {
+        // TODO Auto-generated method stub
+        TreePath[] paths = super.getSelectionPaths();
+        return paths != null ? paths : EMPTY_TREEPATH_ARRAY; 
+    }
 
     public HighlighterPipeline getHighlighters() {
         return highlighters;

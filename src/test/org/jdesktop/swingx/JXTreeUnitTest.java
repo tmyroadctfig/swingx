@@ -29,6 +29,29 @@ public class JXTreeUnitTest extends InteractiveTestCase {
     }
 
     /**
+     * test enhanced getSelectedRows contract: returned 
+     * array != null
+     *
+     */
+    public void testNotNullGetSelectedRows() {
+        JXTree tree = new JXTree(treeTableModel);
+        // sanity: no selection
+        assertEquals(0, tree.getSelectionCount());
+        assertNotNull("getSelectedRows guarantees not null array", tree.getSelectionRows());
+    }
+    
+    /**
+     * test enhanced getSelectedRows contract: returned 
+     * array != null
+     *
+     */
+    public void testNotNullGetSelectedPaths() {
+        JXTree tree = new JXTree(treeTableModel);
+        // sanity: no selection
+        assertEquals(0, tree.getSelectionCount());
+        assertNotNull("getSelectedPaths guarantees not null array", tree.getSelectionPaths());
+    }
+    /**
      * Issue #221-swingx: actionMap not initialized in JXTreeNode constructor.
      * Issue #231-swingx: icons lost in editor, enhanced default editor not installed.
      * 
