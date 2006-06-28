@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractButton;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.ButtonModel;
@@ -49,18 +48,12 @@ public class JXRadioGroup extends JPanel {
     private List<Object> values = new ArrayList<Object>();
     private ActionSelectionListener actionHandler;
     private List<ActionListener> actionListeners;
-    private int gapWidth;
 
     public JXRadioGroup() {
-        this(0);
-    }
-
-    public JXRadioGroup(int gapWidth) {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         buttonGroup = new ButtonGroup();
-        this.gapWidth = gapWidth;
-        
     }
+
     public JXRadioGroup(Object radioValues[]) {
         this();
         for(int i = 0; i < radioValues.length; i++) {
@@ -97,11 +90,6 @@ public class JXRadioGroup extends JPanel {
         super.add(button);
         if (actionHandler == null) {
             actionHandler = new ActionSelectionListener();
-//            actionHandler = new ActionListener() {
-//                public void actionPerformed(ActionEvent e) {
-//                    fireActionEvent(e);
-//                }
-//            };
         }
         button.addActionListener(actionHandler);
         button.addItemListener(actionHandler);
@@ -120,17 +108,8 @@ public class JXRadioGroup extends JPanel {
         
         }
 
-}
+    }
    
-    private void checkGap() {
-        if ((getGapWidth() > 0) && (getComponentCount() > 0)) {
-            add(Box.createHorizontalStrut(getGapWidth()));
-        }
-    }
-
-    private int getGapWidth() {
-        return gapWidth;
-    }
 
     public AbstractButton getSelectedButton() {
         ButtonModel selectedModel = buttonGroup.getSelection();
@@ -146,10 +125,10 @@ public class JXRadioGroup extends JPanel {
 
     private AbstractButton[] getButtonComponents() {
         Component[] children = getComponents();
-        List buttons = new ArrayList();
+        List<AbstractButton> buttons = new ArrayList<AbstractButton>();
         for (int i = 0; i < children.length; i++) {
             if (children[i] instanceof AbstractButton) {
-                buttons.add(children[i]);
+                buttons.add((AbstractButton) children[i]);
             }
         }
         return (AbstractButton[]) buttons.toArray(new AbstractButton[buttons.size()]);
