@@ -21,7 +21,6 @@
 
 package org.jdesktop.swingx.table;
 
-import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.Insets;
@@ -42,6 +41,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableColumnModelEvent;
@@ -273,15 +273,7 @@ public class ColumnControlButton extends JButton {
          * 
          */
         public void updateUI() {
-            // that's not enough - the individual items still have the
-            // appearance of the old ui
-            getPopupMenu().updateUI();
-            for (int i = 0; i < getPopupMenu().getComponentCount(); i++) {
-                Component comp = getPopupMenu().getComponent(i);
-                if (comp instanceof JComponent) {
-                   ((JComponent) comp).updateUI(); 
-                }
-            }
+            SwingUtilities.updateComponentTreeUI(getPopupMenu());
         }
 
         /** 
