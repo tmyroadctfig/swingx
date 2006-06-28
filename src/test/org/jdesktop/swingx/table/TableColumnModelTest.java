@@ -8,6 +8,7 @@
 package org.jdesktop.swingx.table;
 
 import java.beans.PropertyChangeEvent;
+import java.util.logging.Logger;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
@@ -33,9 +34,22 @@ import org.jdesktop.swingx.util.ColumnModelReport;
  * @author  Jeanette Winzenburg
  */
 public class TableColumnModelTest extends TestCase {
-
+    private static final Logger LOG = Logger
+            .getLogger(TableColumnModelTest.class.getName());
     private static final int COLUMN_COUNT = 3;
  
+    
+    public void testMoveColumns() {
+        DefaultTableColumnModelExt model = (DefaultTableColumnModelExt) createColumnModel(COLUMN_COUNT);
+        TableColumnExt columnExt = model.getColumnExt(1);
+        columnExt.setVisible(false);
+        model.moveColumn(1, 0);
+        columnExt.setVisible(true);
+        for (int i = 0; i < model.getColumnCount(); i++) {
+            LOG.info("modelIndex" + model.getColumnExt(i).getModelIndex());
+        }
+        assertEquals(columnExt.getModelIndex(), model.getColumnExt(2).getModelIndex());
+    }
     /**
      * test the columnPropertyChangeEvent is fired as expected.
      *
@@ -215,9 +229,9 @@ public class TableColumnModelTest extends TestCase {
         return model;
     }
 
-    private TableColumnExt createTableColumnExt(int i) {
-        TableColumnExt column = new TableColumnExt(i);
-        column.setIdentifier("" + i);
+    private TableColumnExt createTableColumnExt(int modelIndex) {
+        TableColumnExt column = new TableColumnExt(modelIndex);
+        column.setIdentifier(String.valueOf(modelIndex));
         return column;
     }
     

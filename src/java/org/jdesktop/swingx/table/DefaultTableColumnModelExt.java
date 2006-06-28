@@ -56,11 +56,16 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
     implements TableColumnModelExt {
     private static final String IGNORE_EVENT = "TableColumnModelExt.ignoreEvent";
     /**
-     * contains a list of all of the columns, in the order in which they would
-     * appear if all of the columns were visible.
+     * contains a list of all columns, in the order in which were
+     * added to the model.
      */
-    private List<TableColumn> allColumns = new ArrayList<TableColumn>();
+    private List<TableColumn> initialColumns = new ArrayList<TableColumn>();
     
+    /**
+     * contains a list of all column, in the order they would appear if
+     * all were visible.
+     */
+    private List<TableColumn> currentColumns = new ArrayList<TableColumn>();
     /**
      * Set of invisible columns. 
      */
@@ -91,7 +96,7 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
      */
     public List<TableColumn> getColumns(boolean includeHidden) {
         if (includeHidden) {
-            return new ArrayList<TableColumn>(allColumns);
+            return new ArrayList<TableColumn>(initialColumns);
         } 
         return Collections.list(getColumns());
     }
@@ -101,7 +106,7 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
      */
     public int getColumnCount(boolean includeHidden) {
         if (includeHidden) {
-            return allColumns.size();
+            return initialColumns.size();
         }
         return getColumnCount();
     }
@@ -110,11 +115,22 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
      * {@inheritDoc}
      */
     public TableColumnExt getColumnExt(Object identifier) {
-        for (Iterator<TableColumn> iter = allColumns.iterator(); iter.hasNext();) {
+        for (Iterator<TableColumn> iter = initialColumns.iterator(); iter.hasNext();) {
             TableColumn column = iter.next();
             if ((column instanceof TableColumnExt) && (identifier.equals(column.getIdentifier()))) {
                 return (TableColumnExt) column;
             }
+        }
+        return null;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public TableColumnExt getColumnExt(int columnIndex) {
+        TableColumn column = getColumn(columnIndex);
+        if (column instanceof TableColumnExt) {
+            return (TableColumnExt) column;
         }
         return null;
     }
@@ -136,7 +152,6 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
      * @return true if the column was moved to invisible
      */
     public boolean isRemovedToInvisibleEvent(int oldIndex) {
-//        Integer index = new Integer(oldIndex);
         return oldIndexes.containsValue(oldIndex);
     }
 
@@ -162,9 +177,10 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
         if (column instanceof TableColumnExt) {
             ((TableColumnExt)column).removePropertyChangeListener(visibilityListener);
         }
-        //remove from the invisible columns set and the allColumns list first
+        //remove from the invisible columns set and the initialColumns list first
         invisibleColumns.remove(column);
-        allColumns.remove(column);
+        currentColumns.remove(column);
+        initialColumns.remove(column);
         oldIndexes.remove(column);
         //let the superclass handle notification etc
         super.removeColumn(column);
@@ -182,7 +198,7 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
             xColumn.setVisible(true);
             xColumn.addPropertyChangeListener(visibilityListener);
         }
-        //append the column to the end of "allColumns". If the column is
+        //append the column to the end of "initialColumns". If the column is
         //visible, let super add it to the list of columns. If not, then
         //add it to the set of invisible columns and return.
         //In the case of an invisible column being added to the model,
@@ -190,7 +206,8 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
         //been changed so that the ColumnControlButton or other similar
         //code interacting with invisible columns knows that a new invisible
         //column has been added
-        allColumns.add(aColumn);
+        currentColumns.add(aColumn);
+        initialColumns.add(aColumn);
         super.addColumn(aColumn);
         if (aColumn instanceof TableColumnExt) {
             ((TableColumnExt) aColumn).setVisible(oldVisible);
@@ -199,9 +216,36 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
     }
 
     /**
+     * Overridden to update internal sequence of all columns.
+     */
+    @Override
+    public void moveColumn(int columnIndex, int newIndex) {
+        if (columnIndex != newIndex) {
+            updateCurrentColumns(columnIndex, newIndex);
+        }
+        super.moveColumn(columnIndex, newIndex);
+    }
+
+    /**
+     * Adjusts the current column sequence when a visible column is moved.
+     *  
+     * @param oldIndex the old visible position.
+     * @param newIndex the new visible position.
+     */
+    private void updateCurrentColumns(int oldIndex, int newIndex) {
+        TableColumn movedColumn = tableColumns.elementAt(oldIndex);
+        int oldPosition = currentColumns.indexOf(movedColumn);
+        TableColumn targetColumn = tableColumns.elementAt(newIndex);
+        int newPosition = currentColumns.indexOf(targetColumn);
+        currentColumns.remove(oldPosition);
+        currentColumns.add(newPosition, movedColumn);
+        
+    }
+
+    /**
      * Update internal state after the visibility of the column
      * was changed to invisible. The given column is assumed to
-     * be contained in allColumns.
+     * be contained in initialColumns.
      * 
      * @param col the column which was hidden.
      */    
@@ -216,16 +260,16 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
     /**
      * Update internal state after the visibility of the column
      * was changed to visible. The given column is assumed to
-     * be contained in allColumns.
+     * be contained in initialColumns.
      *  
      * @param col the column which was made visible.
      */    
     protected void moveToVisible(TableColumnExt col) {
         invisibleColumns.remove(col);
-        Integer oldIndex = oldIndexes.get(col);
-        if (oldIndex == null) {
-            oldIndex = getColumnCount();
-        }
+//        Integer oldIndex = oldIndexes.get(col);
+//        if (oldIndex == null) {
+//            oldIndex = getColumnCount();
+//        }
         oldIndexes.remove(col);
         col.putClientProperty(IGNORE_EVENT, Boolean.TRUE);
         // two step process: first add at end of columns
@@ -235,23 +279,36 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
         // JW: the question is what is the "best" position?
         // this moves back as near to the position at the time 
         // of hiding, which leads to #253-swingx
-        moveColumn(getColumnCount() - 1, Math.min(getColumnCount() - 1, oldIndex));
-        
-        // fix for #253-swingx: order of columns changed after hiding/unhiding
+//        moveColumn(getColumnCount() - 1, Math.min(getColumnCount() - 1, oldIndex));
+
+        // fix proposed for #253-swingx: order of columns changed after hiding/unhiding
         // moves back to the original position at the time of addColumn. 
         // @KEEP
-//        Integer addIndex = allColumns.indexOf(col);
+//        Integer addIndex = initialColumns.indexOf(col);
 //        for (int i = 0; i < (getColumnCount() - 1); i++) {
 //            TableColumn tableCol = getColumn(i);
-//            int actualPosition = allColumns.indexOf(tableCol);
+//            int actualPosition = initialColumns.indexOf(tableCol);
 //            if (actualPosition > addIndex) {
 //                moveColumn(getColumnCount() - 1, i);
 //                break;
 //            }
 //        }
 
+        // this is analogous to the proposed fix in #253-swingx
+        // but uses the currentColumns as reference.
+        Integer addIndex = currentColumns.indexOf(col);
+        for (int i = 0; i < (getColumnCount() - 1); i++) {
+            TableColumn tableCol = getColumn(i);
+            int actualPosition = currentColumns.indexOf(tableCol);
+            if (actualPosition > addIndex) {
+                super.moveColumn(getColumnCount() - 1, i);
+                break;
+            }
+        }
+
         col.putClientProperty(IGNORE_EVENT, null);
-    } 
+    }
+
 
     /**
      * TODO move into propertyChanged! No need for a dedicated listener.

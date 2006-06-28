@@ -89,6 +89,16 @@ public interface TableColumnModelExt extends TableColumnModel {
     public TableColumnExt getColumnExt(Object identifier);
     
     /**
+     * Returns the TableColumnExt at index or null
+     *   the column is not of extended type. 
+     *  
+     * @param columnIndex 
+     * @return the <code>TableColumnExt</code> at columnIndex
+     *      or null if not of extended type.
+     */
+    public TableColumnExt getColumnExt(int columnIndex);
+    
+    /**
      * returns the number of contained columns including invisible 
      *  if the parameter is true.
      * 
