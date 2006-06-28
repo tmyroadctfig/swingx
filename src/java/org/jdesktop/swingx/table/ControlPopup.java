@@ -19,7 +19,7 @@ import org.jdesktop.swingx.table.ColumnControlButton.ColumnVisibilityAction;
  * For now, that's a simple extraction of what a ColumnControl needs. 
  * Usage will drive further evolution.
  * 
- * @see ColumnControlButton#DefaultControlPopup
+ * @see {@link DefaultControlPopup }
  * 
  * 
  */
@@ -34,7 +34,7 @@ public interface ControlPopup {
      * popup is not visible/part of the container hierarchy, this
      * method must be messaged manually. 
      * 
-     * @see JComponent.updateUI
+     * @see javax.swing.JComponent#updateUI()
      *
      */
     void updateUI();
@@ -49,7 +49,7 @@ public interface ControlPopup {
     void toggleVisibility(JComponent owner);
 
     /**
-     * @see JComponent#applyComponentOrientation.
+     * @see javax.swing.JComponent#applyComponentOrientation(ComponentOrientation).
      * @param o the <code>ComponentOrientation to apply to all internal widgets.
      */
     void applyComponentOrientation(ComponentOrientation o);
