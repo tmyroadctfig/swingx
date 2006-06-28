@@ -529,6 +529,8 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      */
     public void interactiveToggleDnDEnabled() {
         final JXTreeTable treeTable = new JXTreeTable(treeTableModel);
+        // when used for quick testing #332-swingx  
+        treeTable.setExpandsSelectedPaths(false);
         treeTable.setColumnControlVisible(true);
         final JXTree tree = new JXTree(treeTableModel);
         JXFrame frame = wrapWithScrollingInFrame(treeTable, tree, "toggle dragEnabled (starting with false)");

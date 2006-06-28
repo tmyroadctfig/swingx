@@ -415,8 +415,8 @@ public class JXTreeTable extends JXTable {
         // @KEEP: part of intermediate hack around #332-swingx
         // uncomment the following lines for playing while at the
         // same time comment the call in editCellAt
-//        boolean consume = expandOrCollapseNode(columnAtPoint(e.getPoint()), e);
-//        if (consume) {
+//        int col = columnAtPoint(e.getPoint());
+//        if ((col >= 0) && expandOrCollapseNode(columnAtPoint(e.getPoint()), e)) {
 //            e.consume();
 //            return;
 //        }
