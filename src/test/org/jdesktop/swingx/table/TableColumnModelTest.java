@@ -38,16 +38,45 @@ public class TableColumnModelTest extends TestCase {
             .getLogger(TableColumnModelTest.class.getName());
     private static final int COLUMN_COUNT = 3;
  
+    /**
+     * Issue #253-swingx: hiding/showing columns changes column sequence.
+     * 
+     * The test is modelled after the example code as 
+     * http://forums.java.net/jive/thread.jspa?threadID=7344.
+     *
+     */
+    public void testHideShowColumns() {
+        DefaultTableColumnModelExt model = (DefaultTableColumnModelExt) createColumnModel(10);   
+        int[] columnsToHide = new int[] { 4, 7, 6, 8, };
+        for (int i = 0; i < columnsToHide.length; i++) {
+            model.getColumnExt(String.valueOf(columnsToHide[i])).setVisible(false);
+        }
+        // sanity: actually hidden
+        assertEquals(model.getColumnCount(true) - columnsToHide.length, model.getColumnCount());
+        for (int i = 0; i < columnsToHide.length; i++) {
+            model.getColumnExt(String.valueOf(columnsToHide[i])).setVisible(true);
+        }
+        // sanity: all visible again
+        assertEquals(10, model.getColumnCount());
+        for (int i = 0; i < model.getColumnCount(); i++) {
+            // the original sequence
+            assertEquals(i, model.getColumn(i).getModelIndex());
+        }
     
+    }
+    
+    /**
+     * test sequence of visible columns after hide/move/show.
+     * 
+     * Expected behaviour should be like in Thunderbird.
+     *
+     */
     public void testMoveColumns() {
         DefaultTableColumnModelExt model = (DefaultTableColumnModelExt) createColumnModel(COLUMN_COUNT);
         TableColumnExt columnExt = model.getColumnExt(1);
         columnExt.setVisible(false);
         model.moveColumn(1, 0);
         columnExt.setVisible(true);
-        for (int i = 0; i < model.getColumnCount(); i++) {
-            LOG.info("modelIndex" + model.getColumnExt(i).getModelIndex());
-        }
         assertEquals(columnExt.getModelIndex(), model.getColumnExt(2).getModelIndex());
     }
     /**
