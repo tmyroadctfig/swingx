@@ -44,7 +44,7 @@ public class TableColumnExt extends TableColumn
     protected boolean visible = true;
     protected Object prototypeValue = null;
 
-    protected Hashtable clientProperties = null;
+    protected Hashtable<Object, Object> clientProperties = null;
 
     /** the comparator to use for this column */
     protected Comparator comparator;
@@ -312,9 +312,9 @@ public class TableColumnExt extends TableColumn
                 null : clientProperties.get(key);
     }
 
-    private Hashtable getClientProperties() {
+    private Hashtable<Object, Object> getClientProperties() {
         if (clientProperties == null) {
-            clientProperties = new Hashtable();
+            clientProperties = new Hashtable<Object, Object>();
         }
         return clientProperties;
     }

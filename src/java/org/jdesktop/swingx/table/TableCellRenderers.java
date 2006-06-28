@@ -32,12 +32,12 @@ import org.jdesktop.swingx.LinkModel;
 
 public class TableCellRenderers {
 
-    private static HashMap typeMap;
+    private static HashMap<Class, String> typeMap;
 
     static {
         // load the handler map with classes designed to handle the
         // type-specific rendering
-        typeMap = new HashMap();
+        typeMap = new HashMap<Class, String>();
         typeMap.put(Number.class,
             "org.jdesktop.swingx.JXTable$NumberRenderer");
         typeMap.put(Double.class,

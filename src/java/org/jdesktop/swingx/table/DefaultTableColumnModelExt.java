@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.swing.event.EventListenerList;
-import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableColumn;
