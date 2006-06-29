@@ -53,6 +53,7 @@ import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
+import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.util.AncientSwingTeam;
@@ -1278,7 +1279,51 @@ public class JXTableUnitTest extends InteractiveTestCase {
         table.setFilters(null);
         assertEquals("selected row must be unchanged", 0, table.getSelectedRow());
     }
+
+    /**
+     * Issue #119: Exception if sorter on last column and setting
+     * model with fewer columns.
+     * 
+     * JW: related to #53-swingx - sorter not removed on column removed. 
+     * 
+     * PatternFilter does not throw - checks with modelToView if the 
+     * column is visible and returns false match if not. Hmm...
+     * 
+     * 
+     */
+    public void testFilterInChainOnModelChange() {
+        JXTable table = new JXTable(createAscendingModel(0, 10, 5, true));
+        int columnCount = table.getColumnCount();
+        assertEquals(5, columnCount);
+        Filter filter = new PatternFilter(".*", 0, columnCount - 1);
+        FilterPipeline pipeline = new FilterPipeline(new Filter[] {filter});
+        table.setFilters(pipeline);
+        assertEquals(10, pipeline.getOutputSize());
+        table.setModel(new DefaultTableModel(10, columnCount - 1));
+    }
     
+    /**
+     * Issue #119: Exception if sorter on last column and setting
+     * model with fewer columns.
+     * 
+     * 
+     * JW: related to #53-swingx - sorter not removed on column removed. 
+     * 
+     * Similar if sorter in filter pipeline -- absolutely need mutable
+     * pipeline!!
+     * Filed the latter part as Issue #55-swingx 
+     *
+     */
+    public void testSorterInChainOnModelChange() {
+        JXTable table = new JXTable(new DefaultTableModel(10, 5));
+        int columnCount = table.getColumnCount();
+        Sorter sorter = new ShuttleSorter(columnCount - 1, false);
+        FilterPipeline pipeline = new FilterPipeline(new Filter[] {sorter});
+        table.setFilters(pipeline);
+        table.setModel(new DefaultTableModel(10, columnCount - 1));
+    }
+    
+
     /**
      * Issue #119: Exception if sorter on last column and setting
      * model with fewer columns.
@@ -1868,7 +1913,37 @@ public class JXTableUnitTest extends InteractiveTestCase {
         }
         return model;
     }
+
     
+    /**
+     * returns a tableModel with count rows filled with
+     * ascending integers in first/last column depending on fillLast
+     * starting from startRow.
+     * with columnCount columns
+     * @param startRow the value of the first row
+     * @param rowCount the number of rows
+     * @param columnCount the number of columns
+     * @param fillLast boolean to indicate whether to ill the value in the first
+     *   or last column
+     * @return a configured DefaultTableModel.
+     */
+    protected DefaultTableModel createAscendingModel(int startRow, final int rowCount, 
+            final int columnCount, boolean fillLast) {
+        DefaultTableModel model = new DefaultTableModel(rowCount, columnCount) {
+            public Class getColumnClass(int column) {
+                Object value = rowCount > 0 ? getValueAt(0, column) : null;
+                return value != null ? value.getClass() : super.getColumnClass(column);
+            }
+        };
+        int filledColumn = fillLast ? columnCount - 1 : 0;
+        for (int i = 0; i < model.getRowCount(); i++) {
+            model.setValueAt(new Integer(startRow++), i, filledColumn);
+        }
+        return model;
+    }
+    
+    
+
     /**
      * check if setting to false really disables sortability.
      *

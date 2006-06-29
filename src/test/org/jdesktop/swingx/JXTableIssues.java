@@ -179,50 +179,6 @@ public class JXTableIssues extends InteractiveTestCase {
         assertEquals("selection must be cleared", -1, table.getSelectedRow());
         
     }
-    /**
-     * Issue #119: Exception if sorter on last column and setting
-     * model with fewer columns.
-     * 
-     * JW: related to #53-swingx - sorter not removed on column removed. 
-     * 
-     * PatternFilter does not throw - checks with modelToView if the 
-     * column is visible and returns false match if not. Hmm...
-     * 
-     * 
-     */
-    public void testFilterInChainOnModelChange() {
-        JXTable table = new JXTable(createAscendingModel(0, 10, 5, true));
-        int columnCount = table.getColumnCount();
-        assertEquals(5, columnCount);
-        Filter filter = new PatternFilter(".*", 0, columnCount - 1);
-        FilterPipeline pipeline = new FilterPipeline(new Filter[] {filter});
-        table.setFilters(pipeline);
-        assertEquals(10, pipeline.getOutputSize());
-        table.setModel(new DefaultTableModel(10, columnCount - 1));
-    }
-    
-    /**
-     * Issue #119: Exception if sorter on last column and setting
-     * model with fewer columns.
-     * 
-     * 
-     * JW: related to #53-swingx - sorter not removed on column removed. 
-     * 
-     * Similar if sorter in filter pipeline -- absolutely need mutable
-     * pipeline!!
-     * Filed the latter part as Issue #55-swingx 
-     *
-     */
-    public void testSorterInChainOnModelChange() {
-        JXTable table = new JXTable(new DefaultTableModel(10, 5));
-        int columnCount = table.getColumnCount();
-        Sorter sorter = new ShuttleSorter(columnCount - 1, false);
-        FilterPipeline pipeline = new FilterPipeline(new Filter[] {sorter});
-        table.setFilters(pipeline);
-        table.setModel(new DefaultTableModel(10, columnCount - 1));
-    }
-    
-    
     public void testComponentAdapterCoordinates() {
         JXTable table = new JXTable(createAscendingModel(0, 10));
         Object originalFirstRowValue = table.getValueAt(0,0);

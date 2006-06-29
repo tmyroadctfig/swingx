@@ -102,7 +102,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     protected void setUp() throws Exception {
         super.setUp();
         // super has LF specific tests...
-        setSystemLF(true);
+//        setSystemLF(true);
     }
 
     
@@ -723,6 +723,36 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         frame.setVisible(true);
     }
  
+    /**
+     * Issue #55-swingx: NPE on setModel if sorter in pipeline and new
+     * model getColumnCount() < sorter.getColumnIndex().
+     *
+     */
+    public void interactiveSetModelFilter() {
+        final DefaultTableModel model = createAscendingModel(0, 20, 3, true);
+        final AncientSwingTeam ancientSwingTeam = new AncientSwingTeam();
+        final JXTable table = new JXTable(ancientSwingTeam);
+        Sorter sorter = new ShuttleSorter(3, false);
+        FilterPipeline pipeline = new FilterPipeline(new Filter[] {sorter});
+        table.setFilters(pipeline);
+        table.setRowHeight(0, 25);
+        Action action = new AbstractAction("toggleModel") {
+
+            public void actionPerformed(ActionEvent e) {
+                if (table.getModel() == ancientSwingTeam) {
+                    table.setModel(model);
+                } else {
+                    table.setModel(ancientSwingTeam);
+                }
+                
+            }
+            
+        };
+        JXFrame frame = wrapWithScrollingInFrame(table, "model update?");
+        addAction(frame, action);
+        frame.setVisible(true);
+    }
+    
 
     /** 
      * @KEEP this is about testing Mustang sorting.
