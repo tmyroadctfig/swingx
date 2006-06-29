@@ -95,54 +95,20 @@ public abstract class Sorter extends Filter {
     }
 
     /**
-     * Adopts the row mappings of the specified sorter by cloning the mappings.
+     * Compares and returns the entries in row1 vs row2 and 
+     * returns -1, 0, -1 depending on their being <, ==, > in the
+     * current sort direction.
      * 
-     * @param oldSorter
-     *            <code>Sorter</code> whose mappings are to be cloned
-     */
-    protected abstract void adopt(Sorter oldSorter);
-
-    /**
-     * Interposes this sorter between a filter pipeline and the component that
-     * the pipeline is bound to, replacing oldSorter as the previously
-     * interposed sorter. You should not have to call this method directly.
-     * TODO: Pass in just the ComponentAdapter, and add methods to that for
-     * fetching the filter pipeline and old sorter, if any.
-     *
-     * PENDING: check when adopting from oldSorter makes sense!
+     * PRE: getColumnIndex() valid.
      * 
-     * @deprecated - use filterPipeline.setSorter instead
-     * 
-     * @param filters
-     * @param adapter
-     * @param oldSorter
+     *  NOTE: this formerly was public ... and without precondition.
+     *  
+     *  
+     * @param row1 
+     * @param row2
+     * @return 
      */
-    public void interpose(FilterPipeline filters, ComponentAdapter adapter,
-                          Sorter oldSorter) {
-        if (filters != null) {
-            // let the pipeline do all the work
-            filters.setSorter(this);
-        } else {
-            releasePipeline();
-            assign(adapter);
-            adopt(oldSorter);
-            assign(filters);
-            refresh(oldSorter == null);
-        }
-    }
-
-    /**
-     * release the old
-     *
-     */
-    protected void releasePipeline() {
-        if (getPipeline() != null) {
-            getPipeline().setSorter(null);
-            assign((FilterPipeline) null);
-        }
-    }
-
-    public int compare(int row1, int row2) {
+    protected int compare(int row1, int row2) {
         int result = compare(row1, row2, getColumnIndex());
         return ascending ? result : -result;
     }

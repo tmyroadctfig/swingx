@@ -431,29 +431,6 @@ public class FilterTest extends InteractiveTestCase {
         
     }
 
-    /**
-     * Issue #45-swingx:
-     * interpose should throw if trying to interpose to a pipeline
-     * with a differnt ComponentAdapter.
-     *
-     */
-    public void testInterposeDiffComponentAdapter() {
-        FilterPipeline pipeline = new FilterPipeline();
-        pipeline.assign(directModelAdapter);
-        Sorter sorter = new ShuttleSorter();
-        sorter.assign(new DirectModelAdapter(new DefaultTableModel(10, 5)));
-        try {
-            // PENDING: deprecate interpose ... delegates to pipeline anyway
-            sorter.interpose(pipeline, new DirectModelAdapter(new DefaultTableModel(10, 5)), null);
-            fail("interposing with a different adapter must throw an IllegalStateException");
-        } catch (IllegalStateException ex) {
-            
-        } catch (Exception e) {
-            fail("interposing with a different adapter must throw an " +
-                    "IllegalStateException instead of " + e);
-        }
-        
-    }
 
     /**
      * 
@@ -502,23 +479,6 @@ public class FilterTest extends InteractiveTestCase {
         
     }
     
-    /**
-     * stand-alone sorter must behave in the same way as 
-     * an identical sorter in a pipeline's filter chain.
-     *
-     */
-    public void testSorterInterposeNullPipeline() {
-        int sortColumn = 0;
-        // prepare the reference pipeline
-        Filter[] sorters = new Filter[] {new ShuttleSorter()};
-        FilterPipeline sortedPipeline = new FilterPipeline(sorters);
-        sortedPipeline.assign(directModelAdapter);
-        Object sortedValue = sortedPipeline.getValueAt(0, sortColumn);
-        // prepare the stand-alone sorter
-        Sorter sorter = new ShuttleSorter();
-        sorter.interpose(null, directModelAdapter, null);
-        assertEquals(sortedValue, sorter.getValueAt(0, sortColumn));
-    }
    
     /**
      * sorter.getValueAt must be same as pipeline.getValueAt.
@@ -536,34 +496,6 @@ public class FilterTest extends InteractiveTestCase {
     }
     
     
-    /**
-     * cause for #167: sorter does not release pipeline if
-     * moved to a new one.
-     *
-     */
-    public void testInterpose() {
-        int sortColumn = 0;
-        Filter filter = new PatternFilter("s", 0, sortColumn);
-        Filter[] filters = new Filter[] {filter, new ShuttleSorter()};
-        FilterPipeline pipeline = new FilterPipeline(filters);
-        pipeline.assign(directModelAdapter);
-        Object value = pipeline.getValueAt(0, sortColumn);
-        Object lastValue = pipeline.getValueAt(pipeline.getOutputSize() - 1, sortColumn);
-        Sorter sorter = new ShuttleSorter();
-        sorter.interpose(pipeline, directModelAdapter, null);
-        assertEquals("value must be unchanged by interactive sorter", value, sorter.getValueAt(0, sortColumn));
-        sorter.setAscending(false);
-        assertEquals("first value must be old last", lastValue, sorter.getValueAt(0, sortColumn));
-
-        Filter other = new PatternFilter();
-        Filter[] otherFilters = new Filter[] {other};
-        FilterPipeline otherPipeline = new FilterPipeline(otherFilters);
-        otherPipeline.assign(directModelAdapter);
-        // the interactive sorter is flexible - can be moved from one 
-        // pipeline to the other
-        sorter.interpose(otherPipeline, directModelAdapter, null);
-        
-    }
     
     /**
      * unassigned filter/-pipeline must have size 0.

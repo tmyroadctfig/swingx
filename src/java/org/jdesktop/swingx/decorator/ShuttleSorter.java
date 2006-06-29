@@ -50,20 +50,6 @@ public class ShuttleSorter extends Sorter {
         toPrevious = new int[0];
     }
 
-    /**
-     * Adopts the row mappings of the specified sorter by cloning the mappings.
-     *
-     * @param oldSorter <code>Sorter</code> whose mappings are to be cloned
-     */
-    protected void adopt(Sorter oldSorter) {
-        if (oldSorter != null) {
-            toPrevious = ((ShuttleSorter) oldSorter).toPrevious.clone();
-            /** @todo shouldn't cast */
-            fromPrevious = ((ShuttleSorter) oldSorter).fromPrevious.clone();
-            /** @todo shouldn't cast */
-        }
-    }
-
     
     /**
      * Resets the internal row mappings from this filter to the previous filter.
@@ -78,14 +64,33 @@ public class ShuttleSorter extends Sorter {
     }
 
     /**
-     * Performs the sort.
+     *  Performs the sort. Calls sort only if canFilter(), 
+     *  regards all values as equal (== doesn't sort) otherwise.
+     *  
+     *  @see #canFilter()
      */
     protected void filter() {
-        sort(toPrevious.clone(), toPrevious, 0, toPrevious.length);
+        if (canFilter() ) {
+            sort(toPrevious.clone(), toPrevious, 0, toPrevious.length);
+        }
         // Generate inverse map for implementing convertRowIndexToView();
         for (int i = 0; i < toPrevious.length; i++) {
             fromPrevious[toPrevious[i]] = i;
         }
+    }
+
+    /**
+     * This is a quickfix for #55-swingx: NPE if sorter is in pipeline.
+     * No way to automatically cleanup "from the outside" if the sorter 
+     * is hooked to a columnIndex which is no longer valid. So we check here
+     * for assigned and valid index.<p>
+     *  
+     *  PENDING: should be done higher up?
+     *  
+     * @return boolean to indicate whether accessing the values is valid.
+     */
+    protected boolean canFilter() {
+        return adapter != null && (getColumnIndex() < adapter.getColumnCount());
     }
 
     public int getSize() {
