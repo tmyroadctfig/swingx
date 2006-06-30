@@ -320,8 +320,8 @@ public class JXTreeTable extends JXTable {
     }
     
     protected TreeTableHacker createTreeTableHacker() {
-        return new TreeTableHacker();
-//        return new TreeTableHackerExt();
+//        return new TreeTableHacker();
+        return new TreeTableHackerExt();
     }
 
     /**
@@ -339,6 +339,12 @@ public class JXTreeTable extends JXTable {
      * <li> translationOffset in renderer paint adjusted for 1.5 * rowMargin
      * </ol>
      * 
+     * Note: these sizing (== height) adjustments are wrong, because they assume
+     * that table.realRowHeight is the sum rowHeight and margin. In fact it's the
+     * other way round: table.getRowHeight includes the margin! The only place
+     * where the margin has to be respected, is in the painting kludge: both
+     * graphics translation and border painting have to be adjusted be positioned into
+     * the middle of the cell. 
      * 
      */
     public class TreeTableHacker {
