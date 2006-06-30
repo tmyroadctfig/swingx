@@ -73,6 +73,21 @@
         </tstamp>
     </target>
     
+    <!-- This target builds a jar called swingx-bean.jar. This jar contains
+         JavaBean class, as well as the basic support classes in the beaninfo
+         source tree. It is intended to be small, and useable by other projects
+         that want to build non visual beans
+    -->
+    <target name="swingx-bean" depends="init,jar">
+        <delete dir="${build.dir}/swingx-bean" />
+        <mkdir  dir="${build.dir}/swingx-bean" />
+        <mkdir dir="${build.dir}/swingx-bean/org/jdesktop/swingx" />
+        <copy todir="${build.dir}/swingx-bean/org/jdesktop/swingx">
+            <fileset dir="${build.classes.dir}/org/jdesktop/swingx/" includes="BeanInfoSupport*.class,EnumerationValue*.class,JavaBean*.class" />
+        </copy>
+        <jar basedir="${build.dir}/swingx-bean" jarfile="dist/swingx-bean.jar" />
+    </target>
+    
     <!-- This target builds a "binary" release of the project. The resulting
          zip file will be named something appropriately. It's contents will be:
          
