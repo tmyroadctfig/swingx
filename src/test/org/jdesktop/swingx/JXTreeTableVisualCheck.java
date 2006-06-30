@@ -65,9 +65,9 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //            test.runInteractiveTests("interactive.*Highligh.*");
          //      test.runInteractiveTests("interactive.*SortingFilter.*");
            test.runInteractiveTests("interactive.*DnD.*");
-//             test.runInteractiveTests("interactive.*ToolTip.*");
-//             test.runInteractiveTests("interactive.*Edit.*");
-//             test.runInteractiveTests("interactive.*Large.*");
+             test.runInteractiveTests("interactive.*Compare.*");
+             test.runInteractiveTests("interactive.*Edit.*");
+             test.runInteractiveTests("interactive.*Large.*");
         } catch (Exception ex) {
 
         }
@@ -520,7 +520,44 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         };
         addAction(frame, action);
     }
-    
+
+    /**
+     * compare treeTable/tree height
+     *
+     */
+    public void interactiveTestHighlightAndRowHeightCompareTree() {
+        JXTreeTable treeTable = new JXTreeTable(treeTableModel);
+        treeTable.setRowHeight(22);
+        treeTable.setRowMargin(1);
+        treeTable.setHighlighters(new HighlighterPipeline(new Highlighter[] {
+                AlternateRowHighlighter.linePrinter,
+                new HierarchicalColumnHighlighter(), }));
+        final JXTree tree = new JXTree(treeTableModel);
+        JXTree renderer = (JXTree) treeTable.getCellRenderer(0, 0);
+        tree.setRowHeight(renderer.getRowHeight());
+
+        JFrame frame = wrapWithScrollingInFrame(treeTable, tree, 
+                "LinePrinter-, ColumnHighlighter and RowHeight");
+        frame.setVisible(true);
+    }
+
+    /**
+     * compare treeTable/tree height
+     *
+     */
+    public void interactiveTestHighlighterRowHeightCompareTree() {
+        JXTreeTable treeTable = new JXTreeTable(treeTableModel);
+        treeTable.addHighlighter(new Highlighter(Color.orange, null));
+        treeTable.setIntercellSpacing(new Dimension(15, 15));
+        treeTable.setRowHeight(48);
+        treeTable.setShowHorizontalLines(true);
+        final JXTree tree = new JXTree(treeTableModel);
+        JXTree renderer = (JXTree) treeTable.getCellRenderer(0, 0);
+        tree.setRowHeight(renderer.getRowHeight());
+        JFrame frame = wrapWithScrollingInFrame(treeTable, tree,
+                "rowheight 48, margin 15");
+        frame.setVisible(true);
+    }
 
     /**
      * Issue #168-jdnc: dnd enabled breaks node collapse/expand.
@@ -529,10 +566,13 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      */
     public void interactiveToggleDnDEnabled() {
         final JXTreeTable treeTable = new JXTreeTable(treeTableModel);
+        LOG.info("hierarchical cell" + treeTable.getCellRect(0, 0, true));
         // when used for quick testing #332-swingx  
         treeTable.setExpandsSelectedPaths(false);
         treeTable.setColumnControlVisible(true);
         final JXTree tree = new JXTree(treeTableModel);
+        JXTree renderer = (JXTree) treeTable.getCellRenderer(0, 0);
+        tree.setRowHeight(renderer.getRowHeight());
         JXFrame frame = wrapWithScrollingInFrame(treeTable, tree, "toggle dragEnabled (starting with false)");
         frame.setVisible(true);
         Action action = new AbstractAction("Toggle dnd") {
@@ -547,6 +587,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
             
         };
         addAction(frame, action);
+        LOG.info("hierarchical cell" + treeTable.getCellRect(0, 0, true));
     }
 
     public void interactiveTestFocusedCellBackground() {

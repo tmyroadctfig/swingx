@@ -122,8 +122,7 @@ public class JXTreeTable extends JXTable {
      */
     private TreeTableCellRenderer renderer;
 
-    // JW: part of #332-swingx hack - currently not really used 
-    private boolean expansionChangedFlag;
+    private TreeTableHacker treeTableHacker;
 
     /**
      * Constructs a JXTreeTable using a
@@ -291,10 +290,7 @@ public class JXTreeTable extends JXTable {
      */
     @Override
     public boolean editCellAt(int row, int column, EventObject e) {
-        // JW: should be done in processMouseEvent to fix #332/#222
-        // comment the following line for playing while at the
-        // same time uncomment the call in processMouseEvent
-        expandOrCollapseNode(column, e);    // RG: Fix Issue 49!
+        getTreeTableHacker().hitHandleDetectionFromEditCell(column, e);    // RG: Fix Issue 49!
         boolean canEdit = super.editCellAt(row, column, e);
         if (canEdit && isHierarchical(column)) {
             repaint(getCellRect(row, column, false));
@@ -303,133 +299,287 @@ public class JXTreeTable extends JXTable {
     }
 
     /**
-     * Tricksery to make the tree expand/collapse. <p>
-     * 
-     * This might be called from one of two places:
-     * <ol>
-     * <li> editCellAt: original, stable but buggy (#332, #222) 
-     *   the table's own selection
-     *   had been changed due to the click before even entering into editCellAt
-     *   so all tree selection state is lost.
-     *   
-     * <li> processMouseEvent: unstable (not fixing completely), therefore disabled
-     *   the idea is to catch the expanded/collapsed before passing the event
-     *   to super     
-     * </ol>
-     *  
-     * To play with the side-effects comment and uncomment the lines marked
-     * to pertain to the fix experiment in both methods.  
-     * <p> 
-     * widened access for testing ...
-     * 
-     * 
-     * @param column the column index under the event, if any.
-     * @param e the event which might trigger a expand/collapse.
-     * 
-     * @return this methods evaluation as to whether the event triggered
-     *   a expand/collaps
-     */
-    protected boolean expandOrCollapseNode(int column, EventObject e) {
-        if (!(e instanceof MouseEvent)) return false;
-        if (!isHierarchical(column)) return false;
-        boolean changedExpansion = false;
-        MouseEvent me = (MouseEvent) e;
-        if (hackAroundDragEnabled(me)) {
-            /*
-             * Hack around #168-jdnc:
-             * dirty little hack mentioned in the forum
-             * discussion about the issue: fake a mousePressed if drag enabled.
-             * The usability is slightly impaired because the expand/collapse
-             * is effectively triggered on released only (drag system intercepts
-             * and consumes all other).
-             */
-            me = new MouseEvent((Component)me.getSource(),
-                    MouseEvent.MOUSE_PRESSED,
-                    me.getWhen(),
-                    me.getModifiers(),
-                    me.getX(),
-                    me.getY(),
-                    me.getClickCount(),
-                    me.isPopupTrigger());
-            
-        }
-        // If the modifiers are not 0 (or the left mouse button),
-        // tree may try and toggle the selection, and table
-        // will then try and toggle, resulting in the
-        // selection remaining the same. To avoid this, we
-        // only dispatch when the modifiers are 0 (or the left mouse
-        // button).
-        if (me.getModifiers() == 0 ||
-            me.getModifiers() == InputEvent.BUTTON1_MASK) {
-                    int savedHeight = renderer.getRowHeight();
-                    renderer.setRowHeight(getRowHeight());
-                    MouseEvent pressed = new MouseEvent
-                        (renderer,
-                         me.getID(),
-                         me.getWhen(),
-                         me.getModifiers(),
-                         me.getX() - getCellRect(0, column, false).x,
-                         me.getY(),
-                         me.getClickCount(),
-                         me.isPopupTrigger());
-                    renderer.dispatchEvent(pressed);
-                    // For Mac OS X, we need to dispatch a MOUSE_RELEASED as well
-                    MouseEvent released = new MouseEvent
-                        (renderer,
-                         java.awt.event.MouseEvent.MOUSE_RELEASED,
-                         pressed.getWhen(),
-                         pressed.getModifiers(),
-                         pressed.getX(),
-                         pressed.getY(),
-                         pressed.getClickCount(),
-                         pressed.isPopupTrigger());
-                    renderer.dispatchEvent(released);
-                    renderer.setRowHeight(savedHeight);
-                    
-                    // Issue #332-swing: hacking around selection loss.
-                    // it's the right direction to go (prevent the 
-                    // _table_ selection by consuming the mouseEvent
-                    // if it resulted in a expand/collapse)
-                    // but not yet stable - so I revert to the old 
-                    // buggy version
-                    if (expansionChangedFlag) {
-                        changedExpansion = true;
-                    }
-        }
-        expansionChangedFlag = false;
-        return changedExpansion;
-    }
-
-    
-    private void setExpansionChangedFlag() {
-        expansionChangedFlag = true;
-    }
-    
-    /**
-     * Overridden to try to intercept a mouseEvent which triggered
-     * a expand/collapse.
-     * @see #expandOrCollapseNode(int, EventObject) 
+     * Overridden to enable hit handle detection a mouseEvent which triggered
+     * a expand/collapse. The exact behaviour is controlled by TreeTableHacker.
      */
     @Override
     protected void processMouseEvent(MouseEvent e) {
-        // @KEEP: part of intermediate hack around #332-swingx
-        // uncomment the following lines for playing while at the
-        // same time comment the call in editCellAt
-//        int col = columnAtPoint(e.getPoint());
-//        if ((col >= 0) && expandOrCollapseNode(columnAtPoint(e.getPoint()), e)) {
-//            e.consume();
-//            return;
-//        }
+        if (getTreeTableHacker().hitHandleDetectionFromProcessMouse(e)) {
+            e.consume();
+            return;
+        }
         super.processMouseEvent(e);
     }
     
 
+    protected TreeTableHacker getTreeTableHacker() {
+        if (treeTableHacker == null) {
+            treeTableHacker = createTreeTableHacker();
+        }
+        return treeTableHacker;
+    }
+    
+    protected TreeTableHacker createTreeTableHacker() {
+        return new TreeTableHacker();
+//        return new TreeTableHackerExt();
+    }
 
     /**
-     * decides whether we want to apply the hack for #168-jdnc.
-     * here: returns true if dragEnabled() and the improved drag
-     * handling is not activated (or the system property is not accessible).
-     * The given mouseEvent is not analysed.
+     * Temporary class to have all the hacking at one place. Naturally, it will
+     * change a lot. The base class has the "stable" behaviour as of around
+     * jun2006 (before starting the fix for 332-swingx.
+     * 
+     * specifically:
+     * 
+     * <ol>
+     * <li> hitHandleDetection triggeredn in editCellAt
+     * <li> set/restore rendererHeight in hit detection
+     * <li> no restore of selection (in expansionListener)
+     * <li> rowHeights in renderer adjusted to tableHeight and tableRowMargin
+     * <li> translationOffset in renderer paint adjusted for 1.5 * rowMargin
+     * </ol>
+     * 
+     * 
+     */
+    public class TreeTableHacker {
+
+        protected boolean expansionChangedFlag;
+
+        protected boolean isHitDetectionFromProcessMouse() {
+            return false;
+        }
+
+        public void hitHandleDetectionFromEditCell(int column, EventObject e) {
+            if (!isHitDetectionFromProcessMouse()) {
+                expandOrCollapseNode(column, e);
+            }
+        }
+
+        /**
+         * Overridden to try to intercept a mouseEvent which triggered a
+         * expand/collapse.
+         * 
+         * @see #expandOrCollapseNode(int, EventObject)
+         */
+        public boolean hitHandleDetectionFromProcessMouse(MouseEvent e) {
+            if (!isHitDetectionFromProcessMouse())
+                return false;
+            int col = columnAtPoint(e.getPoint());
+            return ((col >= 0) && expandOrCollapseNode(columnAtPoint(e
+                    .getPoint()), e));
+        }
+
+        /**
+         * Tricksery to make the tree expand/collapse.
+         * <p>
+         * 
+         * This might be called from one of two places:
+         * <ol>
+         * <li> editCellAt: original, stable but buggy (#332, #222) the table's
+         * own selection had been changed due to the click before even entering
+         * into editCellAt so all tree selection state is lost.
+         * 
+         * <li> processMouseEvent: unstable (not fixing completely), therefore
+         * disabled the idea is to catch the expanded/collapsed before passing
+         * the event to super
+         * </ol>
+         * 
+         * To play with the side-effects comment and uncomment the lines marked
+         * to pertain to the fix experiment in both methods.
+         * <p>
+         * widened access for testing ...
+         * 
+         * 
+         * @param column the column index under the event, if any.
+         * @param e the event which might trigger a expand/collapse.
+         * 
+         * @return this methods evaluation as to whether the event triggered a
+         *         expand/collaps
+         */
+        protected boolean expandOrCollapseNode(int column, EventObject e) {
+            if (!(e instanceof MouseEvent))
+                return false;
+            if (!isHierarchical(column))
+                return false;
+            boolean changedExpansion = false;
+            MouseEvent me = (MouseEvent) e;
+            if (hackAroundDragEnabled(me)) {
+                /*
+                 * Hack around #168-jdnc: dirty little hack mentioned in the
+                 * forum discussion about the issue: fake a mousePressed if drag
+                 * enabled. The usability is slightly impaired because the
+                 * expand/collapse is effectively triggered on released only
+                 * (drag system intercepts and consumes all other).
+                 */
+                me = new MouseEvent((Component) me.getSource(),
+                        MouseEvent.MOUSE_PRESSED, me.getWhen(), me
+                                .getModifiers(), me.getX(), me.getY(), me
+                                .getClickCount(), me.isPopupTrigger());
+
+            }
+            // If the modifiers are not 0 (or the left mouse button),
+            // tree may try and toggle the selection, and table
+            // will then try and toggle, resulting in the
+            // selection remaining the same. To avoid this, we
+            // only dispatch when the modifiers are 0 (or the left mouse
+            // button).
+            if (me.getModifiers() == 0
+                    || me.getModifiers() == InputEvent.BUTTON1_MASK) {
+                int savedHeight = setTemporaryRendererHeight();
+                MouseEvent pressed = new MouseEvent(renderer, me.getID(), me
+                        .getWhen(), me.getModifiers(), me.getX()
+                        - getCellRect(0, column, false).x, me.getY(), me
+                        .getClickCount(), me.isPopupTrigger());
+                renderer.dispatchEvent(pressed);
+                // For Mac OS X, we need to dispatch a MOUSE_RELEASED as well
+                MouseEvent released = new MouseEvent(renderer,
+                        java.awt.event.MouseEvent.MOUSE_RELEASED, pressed
+                                .getWhen(), pressed.getModifiers(), pressed
+                                .getX(), pressed.getY(), pressed
+                                .getClickCount(), pressed.isPopupTrigger());
+                renderer.dispatchEvent(released);
+                restoreRendererHeight(savedHeight);
+
+                // Issue #332-swing: hacking around selection loss.
+                // it's the right direction to go (prevent the
+                // _table_ selection by consuming the mouseEvent
+                // if it resulted in a expand/collapse)
+                // but not yet stable - so I revert to the old
+                // buggy version
+                if (expansionChangedFlag) {
+                    changedExpansion = true;
+                }
+            }
+            expansionChangedFlag = false;
+            return changedExpansion;
+        }
+
+        protected void restoreRendererHeight(int savedHeight) {
+            renderer.setRowHeight(savedHeight);
+        }
+
+        protected int setTemporaryRendererHeight() {
+            int savedHeight = renderer.getRowHeight();
+            renderer.setRowHeight(getRowHeight());
+            return savedHeight;
+        }
+
+        protected void setExpansionChangedFlag() {
+            expansionChangedFlag = true;
+        }
+
+        /**
+         * Reconciles semantic differences between JTable and JTree regarding
+         * row height.
+         */
+        protected void adjustTreeRowHeight() {
+            final int treeRowHeight = rowHeight + heightAdjustment();
+            if (renderer != null && renderer.getRowHeight() != treeRowHeight) {
+                renderer.setRowHeight(treeRowHeight);
+            }
+        }
+
+        protected void adjustTableRowHeight(int treeRowHeight) {
+            final int tableRowHeight = treeRowHeight - heightAdjustment();
+            if (getRowHeight() != tableRowHeight) {
+                adminSetRowHeight(tableRowHeight);
+            }
+        }
+
+        protected int heightAdjustment() {
+            return (rowMargin << 1);
+        }
+
+        protected int getTranslationOffset(int visibleRow) {
+            // MUST account for rowMargin for precise positioning.
+            // Offset by (rowMargin * 3)/2, and remember to offset by an
+            // additional pixel if rowMargin is odd!
+            int margins = rowMargin + (rowMargin >> 1) + (rowMargin % 2);
+            return margins + visibleRow * renderer.getRowHeight();
+
+        }
+
+        protected int getHighlightBorderHeight() {
+            int margins = rowMargin << 1 + rowMargin; // RG: subtract
+                                                        // (rowMargin * 3)
+            return renderer.getRowHeight() - margins;
+        }
+
+        public boolean shouldRestoreSelectionAfterExpansionEvent() {
+            return false;
+        }
+
+    }
+
+    /**
+     * <ol>
+     * <li> hit handle detection in processMouse
+     * <li> don't set/restore renderer height in hit detection
+     * <li> restore of selection (in expansionListener)
+     * <li> rowHeights in renderer not adjusted to tableHeight and tableRowMargin
+     * <li> translationOffset in renderer paint adjusted with rowMargin/2
+     * <li> 
+     * </ol>
+     */
+    public class TreeTableHackerExt extends TreeTableHacker {
+
+        
+        private boolean hasResetExpandsSelectedPaths;
+
+        /**
+         * this has the side-effect of setting setExpandsSelectedPaths
+         * to false on first call. Dirty...
+         */
+        @Override
+        protected boolean isHitDetectionFromProcessMouse() {
+            if (!hasResetExpandsSelectedPaths) {
+                setExpandsSelectedPaths(false);
+                hasResetExpandsSelectedPaths = true;
+            }
+            return true;
+        }
+
+        /**
+         * overridden to do nothing
+         */
+        protected void restoreRendererHeight(int savedHeight) {
+        }
+
+        /**
+         * overridden to do nothing
+         */
+        protected int setTemporaryRendererHeight() {
+            return renderer.getRowHeight();
+        }
+
+        /**
+         * don't adjust for rowMargin.
+         */
+        protected int heightAdjustment() {
+            return 0;
+        }
+
+        protected int getTranslationOffset(int visibleRow) {
+            int margins = rowMargin / 2;
+            return margins + visibleRow * renderer.getRowHeight();
+
+        }
+
+        protected int getHighlightBorderHeight() {
+            int margins = rowMargin / 2;
+            return renderer.getRowHeight() - margins;
+        }
+
+        public boolean shouldRestoreSelectionAfterExpansionEvent() {
+            return true;
+        }
+
+    }
+    /**
+     * decides whether we want to apply the hack for #168-jdnc. here: returns
+     * true if dragEnabled() and the improved drag handling is not activated (or
+     * the system property is not accessible). The given mouseEvent is not
+     * analysed.
      * 
      * PENDING: Mustang?
      * 
@@ -583,7 +733,7 @@ public class JXTreeTable extends JXTable {
     @Override
     public void setRowHeight(int rowHeight) {
         super.setRowHeight(rowHeight);
-        adjustTreeRowHeight(); // JTree doesn't have setRowMargin. So adjust.
+        getTreeTableHacker().adjustTreeRowHeight(); // JTree doesn't have setRowMargin. So adjust.
     }
 
     /**
@@ -617,19 +767,9 @@ public class JXTreeTable extends JXTable {
         // No need to override setIntercellSpacing, because the change in
         // rowMargin will be funneled through this method anyway.
         super.setRowMargin(rowMargin);
-        adjustTreeRowHeight(); // JTree doesn't have setRowMargin. So adjust.
+        getTreeTableHacker().adjustTreeRowHeight(); // JTree doesn't have setRowMargin. So adjust.
     }
 
-    /**
-     * Reconciles semantic differences between JTable and JTree regarding
-     * row height.
-     */
-    private void adjustTreeRowHeight() {
-        final int treeRowHeight = rowHeight + (rowMargin << 1);
-        if (renderer != null && renderer.getRowHeight() != treeRowHeight) {
-            renderer.setRowHeight(treeRowHeight);
-        }
-    }
 
     /**
      * <p>Overridden to ensure that private renderer state is kept in sync with the
@@ -1454,13 +1594,15 @@ public class JXTreeTable extends JXTable {
         }
 
         protected void updateAfterExpansionEvent(TreeExpansionEvent event) {
-            treeTable.setExpansionChangedFlag();
+            treeTable.getTreeTableHacker().setExpansionChangedFlag();
             TreePath[] selectionPaths = tree.getSelectionPaths();
 
             fireTableDataChanged();
 
-            if (selectionPaths != null && selectionPaths.length > 0) {
-                tree.setSelectionPaths(selectionPaths);
+            if (treeTable.getTreeTableHacker().shouldRestoreSelectionAfterExpansionEvent()) {
+                if (selectionPaths != null && selectionPaths.length > 0) {
+                    tree.setSelectionPaths(selectionPaths);
+                }
             }
         }
 
@@ -1785,24 +1927,12 @@ public class JXTreeTable extends JXTable {
         public void setRowHeight(int rowHeight) {
             super.setRowHeight(rowHeight);
             if (rowHeight > 0) {
-                // JW: setting the largeModel property is suggested in
-                // #25-swingx. 
-                // backing out: leads to NPEs and icons not showing
-//                setLargeModel(true);
                 if (treeTable != null) {
-                    // Reconcile semantic differences between JTable and JTree
-                    final int tableRowMargin = treeTable.getRowMargin();
-                    assert tableRowMargin >= 0;
-                    final int tableRowHeight = rowHeight - (tableRowMargin << 1);
-                    if (treeTable.getRowHeight() != tableRowHeight) {
-                        treeTable.adminSetRowHeight(tableRowHeight);
-                    }
+                    treeTable.getTreeTableHacker().adjustTableRowHeight(rowHeight);
                 }
             } 
-//            else {
-//                setLargeModel(false);
-//            }
         }
+
 
         /**
          * This is overridden to set the height to match that of the JTable.
@@ -1823,12 +1953,7 @@ public class JXTreeTable extends JXTable {
          */
         @Override
         public void paint(Graphics g) {
-            int rowMargin = treeTable.getRowMargin();
-            // MUST account for rowMargin for precise positioning.
-            // Offset by (rowMargin * 3)/2, and remember to offset by an
-            // additional pixel if rowMargin is odd!
-            int margins = rowMargin + (rowMargin >> 1) + (rowMargin % 2);
-            int translationOffset = margins + visibleRow * getRowHeight();
+            int translationOffset = treeTable.getTreeTableHacker().getTranslationOffset(visibleRow);
             g.translate(0, -translationOffset);
 
             hierarchicalColumnWidth = getWidth();
@@ -1842,12 +1967,7 @@ public class JXTreeTable extends JXTable {
                 // RG: Now it satisfies (at least for the row margins)
                 // Still need to make similar adjustments for column margins...
                 highlightBorder.paintBorder(this, g, 0, translationOffset,
-                        getWidth(),
-                        // uhhh getRowHeight() + 1 - 2 * (margins)
-                        getRowHeight() - (rowMargin << 1) - rowMargin); // RG:
-                                                                        // subtract
-                                                                        // (rowMargin
-                                                                        // * 3)
+                        getWidth(), treeTable.getTreeTableHacker().getHighlightBorderHeight());
             }
         }
 
