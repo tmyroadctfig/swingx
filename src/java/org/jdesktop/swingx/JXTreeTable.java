@@ -320,8 +320,8 @@ public class JXTreeTable extends JXTable {
     }
     
     protected TreeTableHacker createTreeTableHacker() {
-//        return new TreeTableHacker();
-        return new TreeTableHackerExt();
+        return new TreeTableHacker();
+//        return new TreeTableHackerExt();
     }
 
     /**
