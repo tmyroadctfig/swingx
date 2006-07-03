@@ -506,7 +506,7 @@ public class JXTreeTable extends JXTable {
         }
 
         protected int getHighlightBorderHeight() {
-            int margins = rowMargin << 1 + rowMargin; // RG: subtract
+            int margins = (rowMargin << 1) + rowMargin; // RG: subtract
                                                         // (rowMargin * 3)
             return renderer.getRowHeight() - margins;
         }
@@ -566,13 +566,13 @@ public class JXTreeTable extends JXTable {
         }
 
         protected int getTranslationOffset(int visibleRow) {
-            int margins = rowMargin / 2;
+            int margins = (rowMargin >> 1);
             return margins + visibleRow * renderer.getRowHeight();
 
         }
 
         protected int getHighlightBorderHeight() {
-            int margins = rowMargin / 2;
+            int margins = (rowMargin >> 1);
             return renderer.getRowHeight() - margins;
         }
 
