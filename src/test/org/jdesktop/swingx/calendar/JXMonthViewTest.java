@@ -18,14 +18,13 @@
  */
 package org.jdesktop.swingx.calendar;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.SortedSet;
 import org.jdesktop.swingx.DateSelectionListener;
 import org.jdesktop.swingx.DateSelectionModel;
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.SortedSet;
 
 /**
  * Test case for <code>JXMonthView</code>
@@ -219,6 +218,20 @@ public class JXMonthViewTest extends MockObjectTestCase {
         assertFalse(monthView.isFlaggedDate(date.getTime()));
         monthView.setFlaggedDates(new long[] { date.getTime() });
         assertTrue(monthView.isFlaggedDate(date.getTime()));
+    }
+
+    public void testShowLeadingDates() {
+        JXMonthView monthView = new JXMonthView();
+        assertFalse(monthView.isShowingLeadingDates());
+        monthView.setShowLeadingDates(true);
+        assertTrue(monthView.isShowingLeadingDates());
+    }
+
+    public void testShowTrailingDates() {
+        JXMonthView monthView = new JXMonthView();
+        assertFalse(monthView.isShowingTrailingDates());
+        monthView.setShowTrailingDates(true);
+        assertTrue(monthView.isShowingTrailingDates());
     }
 
     public void testUnselectableDate() {

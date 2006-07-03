@@ -557,6 +557,10 @@ public class BasicMonthViewUI extends MonthViewUI {
         // adjust the month we are in to calculate the bounds correctly.
         month += monthOffset;
 
+        // If we're showing leading days the week in month needs to be 1 to make the bounds
+        // calculate correctly.
+        weekOfMonth = monthOffset == LEADING_DAY_OFFSET ? 1 : weekOfMonth;
+
         // Determine what row/column we are in.
         int diffMonths = month - firstDisplayedMonth +
                 ((year - firstDisplayedYear) * JXMonthView.MONTHS_IN_YEAR);
@@ -760,7 +764,25 @@ public class BasicMonthViewUI extends MonthViewUI {
                     calendarHeight - (fullMonthBoxHeight + fullBoxHeight));
         }
 
-        // TODO: paint leading days in the month
+        if (monthView.isShowingLeadingDates()) {
+            // Figure out how many days we need to move back for the leading days.
+            int dayOfWeekViewIndex = getDayOfWeekViewIndex(cal.get(Calendar.DAY_OF_WEEK));
+            if (dayOfWeekViewIndex != 0) {
+                // Move the calendar back and paint the leading days
+                cal.add(Calendar.DAY_OF_MONTH, -dayOfWeekViewIndex);
+                for (int i = 0; i < dayOfWeekViewIndex; i++) {
+                    // Paint a day
+                    calculateBoundsForDay(bounds, LEADING_DAY_OFFSET);
+                    day = cal.getTimeInMillis();
+                    paintLeadingDayBackground(g, bounds.x, bounds.y,
+                            bounds.width, bounds.height, day);
+                    paintLeadingDayForeground(g, bounds.x, bounds.y,
+                            bounds.width, bounds.height, day);
+                    cal.add(Calendar.DAY_OF_MONTH, 1);
+                }
+            }
+        }
+
         int oldY = -1;
         for (int i = 0; i < days; i++) {
             calculateBoundsForDay(bounds, NO_OFFSET);
@@ -1033,6 +1055,50 @@ public class BasicMonthViewUI extends MonthViewUI {
         g.drawLine(x + 1, y, x + width + 1, y + height);
         g.drawLine(x + width, y, x, y + height);
         g.drawLine(x + width - 1, y, x - 1, y + height);
+    }
+
+    /**
+     * Paint the background for the specified leading day.
+     *
+     * @param g Graphics object to paint to
+     * @param x x-coordinate of upper left corner
+     * @param y y-coordinate of upper left corner
+     * @param width width of bounding box for the day
+     * @param height height of bounding box for the day
+     * @param date long value representing the leading day being painted
+     */
+    protected void paintLeadingDayBackground(Graphics g, int x, int y, int width, int height, long date) {
+        paintDayBackground(g, x, y, width, height, date);
+    }
+
+    /**
+     * Paint the foreground for the specified leading day.
+     *
+     * @param g Graphics object to paint to
+     * @param x x-coordinate of upper left corner
+     * @param y y-coordinate of upper left corner
+     * @param width width of bounding box for the day
+     * @param height height of bounding box for the day
+     * @param date long value representing the leading day being painted
+     */
+    protected void paintLeadingDayForeground(Graphics g, int x, int y, int width, int height, long date) {
+        String numericDay = dayOfMonthFormatter.format(date);
+        FontMetrics fm;
+
+        // TODO: Change this to a UI property
+        g.setColor(Color.LIGHT_GRAY);
+
+        int boxPaddingX = monthView.getBoxPaddingX();
+        int boxPaddingY = monthView.getBoxPaddingY();
+
+        fm = g.getFontMetrics();
+        g.drawString(numericDay,
+                ltr ?
+                        x + boxPaddingX +
+                                boxWidth - fm.stringWidth(numericDay) :
+                        x + boxPaddingX +
+                                boxWidth - fm.stringWidth(numericDay) - 1,
+                y + boxPaddingY + fm.getAscent());
     }
 
     private long cleanupDate(long date) {

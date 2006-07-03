@@ -154,6 +154,8 @@ public class JXMonthView extends JComponent {
     public static final String FIRST_DISPLAYED_MONTH = "firstDisplayedMonth";
     public static final String FIRST_DISPLAYED_YEAR = "firstDisplayedYear";
     public static final String SELECTION_MODEL = "selectionModel";
+    public static final String SHOW_LEADING_DATES = "showLeadingDates";
+    public static final String SHOW_TRAILING_DATES = "showTrailingDates";
     public static final String TRAVERSABLE = "traversable";
     public static final String WEEK_NUMBER = "weekNumber";
     public static final String FLAGGED_DATES = "flaggedDates";
@@ -204,6 +206,8 @@ public class JXMonthView extends JComponent {
     private int firstDayOfWeek;
     private boolean antiAlias;
     private boolean traversable;
+    private boolean leadingDates;
+    private boolean trailingDates;
     private Calendar cal;
     private String[] _daysOfTheWeek;
     private Color todayBackgroundColor;
@@ -625,6 +629,52 @@ public class JXMonthView extends JComponent {
         }
         getSelectionModel().setUnselectableDates(unselectableSet);
         repaint();
+    }
+
+    /**
+     * Whether or not to show leading dates for a months displayed by this component.
+     *
+     * @param value true if leading dates should be displayed, false otherwise.
+     */
+    public void setShowLeadingDates(boolean value) {
+        if (leadingDates == value) {
+            return;
+        }
+
+        leadingDates = value;
+        firePropertyChange(SHOW_LEADING_DATES, !leadingDates, leadingDates);
+    }
+
+    /**
+     * Whether or not we're showing leading dates.
+     *
+     * @return true if leading dates are shown, false otherwise.
+     */
+    public boolean isShowingLeadingDates() {
+        return leadingDates;
+    }
+
+    /**
+     * Whether or not to show trailing dates for the months displayed by this component.
+     *
+     * @param value true if trailing dates should be displayed, false otherwise.
+     */
+    public void setShowTrailingDates(boolean value) {
+        if (trailingDates == value) {
+            return;
+        }
+
+        trailingDates = value;
+        firePropertyChange(SHOW_TRAILING_DATES, !trailingDates, trailingDates);
+    }
+
+    /**
+     * Whether or not we're showing trailing dates.
+     *
+     * @return true if trailing dates are shown, false otherwise.
+     */
+    public boolean isShowingTrailingDates() {
+        return trailingDates;
     }
 
     private Date cleanupDate(Date date) {
