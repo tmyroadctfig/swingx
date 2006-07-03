@@ -283,26 +283,6 @@ public class BasicDatePickerUI extends DatePickerUI {
      * Action used to commit the current value in the JFormattedTextField.
      * This action is used by the keyboard bindings.
      */
-    private class CommitEditAction extends AbstractAction {
-        public CommitEditAction() {
-            super("CommitEditPopup");
-        }
-
-        public void actionPerformed(ActionEvent ev) {
-            try {
-                // Commit the current value.
-                datePicker.commitEdit();
-
-                datePicker.postActionEvent();
-            } catch (java.text.ParseException ex) {
-            }
-        }
-    }
-
-    /**
-     * Action used to commit the current value in the JFormattedTextField.
-     * This action is used by the keyboard bindings.
-     */
     private class TogglePopupAction extends AbstractAction {
         public TogglePopupAction() {
             super("TogglePopup");
@@ -372,6 +352,7 @@ public class BasicDatePickerUI extends DatePickerUI {
             if (!datePicker.isEditable()) {
                 JFormattedTextField editor = datePicker.getEditor();
                 if (editor.isEditValid()) {
+                    //noinspection EmptyCatchBlock
                     try {
                         editor.commitEdit();
                     } catch (java.text.ParseException ex) {
@@ -427,7 +408,6 @@ public class BasicDatePickerUI extends DatePickerUI {
                 popup = new BasicDatePickerPopup();
             }
             if (!popup.isVisible()) {
-                JFormattedTextField editor = datePicker.getEditor();
                 JXMonthView monthView = datePicker.getMonthView();
                 SortedSet<Date> selection = monthView.getSelection();
                 if (!selection.isEmpty()) {

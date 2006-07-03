@@ -11,6 +11,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.LayoutManager;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
@@ -46,7 +47,12 @@ import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.plaf.MonthViewUI;
 
 public class BasicMonthViewUI extends MonthViewUI {
+    private static final int LEADING_DAY_OFFSET = 1;
+    private static final int NO_OFFSET = 0;
+    private static final int TRAILING_DAY_OFFSET = -1;
+
     private static final int CALENDAR_SPACING = 10;
+    private static final Point NO_SUCH_CALENDAR = new Point(-1, -1);
 
     /** Formatter used to format the day of the week to a numerical value. */
     protected static final SimpleDateFormat dayOfMonthFormatter = new SimpleDateFormat("d");
@@ -331,13 +337,8 @@ public class BasicMonthViewUI extends MonthViewUI {
         //_cal.set(Calendar.DAY_OF_MONTH, 1);
         cal.add(Calendar.MONTH, calCol + (calRow * numCalCols));
 
-        int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-        int firstDayIndex = dayOfWeek - monthView.getFirstDayOfWeek();
-        if (firstDayIndex < 0) {
-            firstDayIndex += JXMonthView.DAYS_IN_WEEK;
-        }
-
-        int daysToAdd = (row * JXMonthView.DAYS_IN_WEEK) + (col - firstDayIndex);
+        int firstDayViewIndex = getDayOfWeekViewIndex(cal.get(Calendar.DAY_OF_WEEK));
+        int daysToAdd = (row * JXMonthView.DAYS_IN_WEEK) + (col - firstDayViewIndex);
         if (daysToAdd < 0 || daysToAdd >
                 (cal.getActualMaximum(Calendar.DAY_OF_MONTH) - 1)) {
             return -1;
@@ -366,6 +367,23 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     /**
+     * Get the view index for the specified day of the week.  This value will range
+     * from 0 to DAYS_IN_WEEK - 1.  For example if the first day of the week was set
+     * to Calendar.MONDAY and we requested the view index for Calendar.TUESDAY the result
+     * would be 1.
+     *
+     * @param dayOfWeek day of the week to calculate view index for, acceptable values are
+     * <code>Calendar.MONDAY</code> - <code>Calendar.SUNDAY</code>
+     * @return view index for the specified day of the week
+     */
+    private int getDayOfWeekViewIndex(int dayOfWeek) {
+        int result = dayOfWeek - monthView.getFirstDayOfWeek();
+        if (result < 0) {
+            result += JXMonthView.DAYS_IN_WEEK;
+        }
+        return result;
+    }
+    /**
      * Returns an index defining which, if any, of the buttons for
      * traversing the month was pressed.  This method should only be
      * called when <code>setTraversable</code> is set to true.
@@ -375,30 +393,20 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @return MONTH_UP, MONTH_DOWN or -1 when no button is selected.
      */
     protected int getTraversableButtonAt(int x, int y) {
-        if (ltr ? (startX > x) : (startX < x) || startY > y) {
-            return -1;
-        }
-
-        // Determine which column of calendars we're in.
-        int calCol = (ltr ? (x - startX) : (startX - x)) /
-                (calendarWidth + CALENDAR_SPACING);
-
-        // Determine which row of calendars we're in.
-        int calRow = (y - startY) / (calendarHeight + CALENDAR_SPACING);
-
-        if (calRow > numCalRows - 1 || calCol > numCalCols - 1) {
+        Point rowCol = getCalRowColAt(x, y);
+        if (NO_SUCH_CALENDAR.equals(rowCol)) {
             return -1;
         }
 
         // See if we're in the month string area.
         y = ((y - startY) -
-            (calRow * (calendarHeight + CALENDAR_SPACING))) - monthView.getBoxPaddingY();
+            (rowCol.x * (calendarHeight + CALENDAR_SPACING))) - monthView.getBoxPaddingY();
         if (y < arrowPaddingY || y > (monthBoxHeight - arrowPaddingY)) {
             return -1;
         }
 
         x = ((ltr ? (x - startX) : (startX - x)) -
-            (calCol * (calendarWidth + CALENDAR_SPACING)));
+            (rowCol.y * (calendarWidth + CALENDAR_SPACING)));
 
         if (x > arrowPaddingX && x < (arrowPaddingX +
                 monthDownImage.getIconWidth() + arrowPaddingX)) {
@@ -412,6 +420,37 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
         return -1;
     }
+
+    /**
+     * Get the row and column for the calendar at the specified coordinates
+     *
+     * @param x x location
+     * @param y y location
+     * @return a new <code>Point</code> object containing the row as the x value
+     * and column as the y value
+     */
+    protected Point getCalRowColAt(int x, int y) {
+        if (ltr ? (startX > x) : (startX < x) || startY > y) {
+            return NO_SUCH_CALENDAR;
+        }
+
+        Point result = new Point();
+        // Determine which row of calendars we're in.
+        result.x = (y - startY) / (calendarHeight + CALENDAR_SPACING);
+
+        // Determine which column of calendars we're in.
+        result.y = (ltr ? (x - startX) : (startX - x)) /
+                (calendarWidth + CALENDAR_SPACING);
+
+        // Make sure the row and column of calendars calculated is being
+        // managed.
+        if (result.x > numCalRows - 1 || result.y > numCalCols -1) {
+            result = NO_SUCH_CALENDAR;
+        }
+
+        return result;
+    }
+
 
     /**
      * Calculates the startX/startY position for centering the calendars
@@ -482,12 +521,12 @@ public class BasicMonthViewUI extends MonthViewUI {
         } else {
             Calendar cal = monthView.getCalendar();
             cal.setTime(selection.first());
-            calculateBoundsForDay(dirtyRect);
+            calculateBoundsForDay(dirtyRect, NO_OFFSET);
             cal.add(Calendar.DAY_OF_MONTH, 1);
 
             Rectangle tmpRect;
             while (cal.getTimeInMillis() <= selection.last().getTime()) {
-                calculateBoundsForDay(bounds);
+                calculateBoundsForDay(bounds, NO_OFFSET);
                 tmpRect = dirtyRect.union(bounds);
                 dirtyRect.x = tmpRect.x;
                 dirtyRect.y = tmpRect.y;
@@ -508,12 +547,15 @@ public class BasicMonthViewUI extends MonthViewUI {
      *
      * @param bounds Bounds of the date to draw in.
      */
-    private void calculateBoundsForDay(Rectangle bounds) {
+    private void calculateBoundsForDay(Rectangle bounds, int monthOffset) {
         Calendar cal = monthView.getCalendar();
         int year = cal.get(Calendar.YEAR);
         int month = cal.get(Calendar.MONTH);
-        int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
         int weekOfMonth = cal.get(Calendar.WEEK_OF_MONTH);
+
+        // If we are calculating the bounds for a leading/trailing day we need to
+        // adjust the month we are in to calculate the bounds correctly.
+        month += monthOffset;
 
         // Determine what row/column we are in.
         int diffMonths = month - firstDisplayedMonth +
@@ -522,10 +564,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         int calColIndex = diffMonths - (calRowIndex * numCalCols);
 
         // Modify the index relative to the first day of the week.
-        bounds.x = dayOfWeek - monthView.getFirstDayOfWeek();
-        if (bounds.x < 0) {
-            bounds.x += JXMonthView.DAYS_IN_WEEK;
-        }
+        bounds.x = getDayOfWeekViewIndex(cal.get(Calendar.DAY_OF_WEEK));
 
         // Offset for location of the day in the week.
         int boxPaddingX = monthView.getBoxPaddingX();
@@ -724,7 +763,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         // TODO: paint leading days in the month
         int oldY = -1;
         for (int i = 0; i < days; i++) {
-            calculateBoundsForDay(bounds);
+            calculateBoundsForDay(bounds, NO_OFFSET);
             // Paint the week numbers if we're displaying them.
             if (showingWeekNumber && oldY != bounds.y) {
                 oldY = bounds.y;
