@@ -63,18 +63,26 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         try {
 //            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Highligh.*");
-         //      test.runInteractiveTests("interactive.*SortingFilter.*");
+//               test.runInteractiveTests("interactive.*ToolTip.*");
            test.runInteractiveTests("interactive.*DnD.*");
              test.runInteractiveTests("interactive.*Compare.*");
-             test.runInteractiveTests("interactive.*Edit.*");
+//             test.runInteractiveTests("interactive.*Edit.*");
              test.runInteractiveTests("interactive.*Large.*");
         } catch (Exception ex) {
 
         }
     }
 
+    /**
+     * visual check what happens on toggling the largeModel property.
+     * It's okay for ComponentTreeModel, blows up for FileSystemModel.
+     *
+     */
     public void interactiveLargeModel() {
-        final JXTreeTable treeTable = new JXTreeTable(treeTableModel);
+//        final JXTreeTable treeTable = new JXTreeTable(treeTableModel); 
+
+        final JXTreeTable treeTable = new JXTreeTable(new ComponentTreeTableModel(new JXFrame()));
+        treeTable.setRootVisible(true);
         ToolTipManager.sharedInstance().unregisterComponent(treeTable);
         Action action = new AbstractAction("toggle largeModel") {
 
@@ -353,7 +361,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         treeTable.setColumnControlVisible(true);
         treeTable.setRootVisible(true);
         JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "insert problem - root collapsed");
-        Action insertAction = new AbstractAction("insert node") {
+        Action insertAction = new AbstractAction("insert node to root") {
 
             public void actionPerformed(ActionEvent e) {
                 model.addChild(childB);
@@ -407,7 +415,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         treeTable.setTreeCellRenderer(renderer);
         treeTable.setRootVisible(true);
         JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "update expanded parent on insert");
-        Action insertAction = new AbstractAction("insert node") {
+        Action insertAction = new AbstractAction("insert node selected treetable") {
 
             public void actionPerformed(ActionEvent e) {
                 int selected = treeTable.getSelectedRow();
@@ -529,6 +537,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         treeTable.setRowHeight(22);
         treeTable.setRowMargin(1);
+        treeTable.setShowHorizontalLines(true);
         treeTable.setHighlighters(new HighlighterPipeline(new Highlighter[] {
                 AlternateRowHighlighter.linePrinter,
                 new HierarchicalColumnHighlighter(), }));

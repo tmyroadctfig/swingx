@@ -65,6 +65,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.TreeTableCellEditor;
@@ -193,7 +194,6 @@ public class JXTreeTable extends JXTable {
         // understood by JTable and JTree by overriding both setRowHeight() and
         // setRowMargin();
         adminSetRowHeight(getRowHeight());
-        setRowMargin(getRowMargin()); // call overridden setRowMargin()
 
     }
 
@@ -236,42 +236,16 @@ public class JXTreeTable extends JXTable {
         // no-op
     }
 
-    /**
-     * <p>Sets whether the table draws horizontal lines between cells. It draws
-     * the lines if <code>show</code> is true; otherwise it doesn't. By default,
-     * a table draws the lines.</p>
-     *
-     * <p>If you want the lines to be drawn, make sure that the row margin or
-     * horizontal intercell spacing is greater than zero.</p>
-     *
-     * @param show true, if horizontal lines should be drawn; false, if lines
-     * should not be drawn
-     * @see javax.swing.JTable#getShowHorizontalLines() getShowHorizontalLines
-     * @see #setRowMargin(int) setRowMargin
-     * @see javax.swing.JTable#setIntercellSpacing(java.awt.Dimension) setIntercellSpacing
+    
+    /** 
+     * overridden to do nothing. 
+     * 
+     * TreeTable is not sortable by default, because 
+     * Sorters/Filters currently don't work properly.
+     * 
      */
     @Override
-    public void setShowHorizontalLines(boolean show) {
-        super.setShowHorizontalLines(show);
-    }
-
-    /**
-     * <p>Sets whether the table draws vertical lines between cells. It draws
-     * the lines if <code>show</code> is true; otherwise it doesn't. By default,
-     * a table draws the lines.</p>
-     *
-     * <p>If you want the lines to be drawn, make sure that the column margin or
-     * vertical intercell spacing is greater than zero.</p>
-     *
-     * @param show true, if vertical lines should be drawn; false, if lines
-     * should not be drawn
-     * @see javax.swing.JTable#getShowVerticalLines() getShowVerticalLines
-     * @see #setColumnMargin(int) setColumnMargin
-     * @see javax.swing.JTable#setIntercellSpacing(java.awt.Dimension) setIntercellSpacing
-     */
-    @Override
-    public void setShowVerticalLines(boolean show) {
-        super.setShowVerticalLines(show);
+    public void setFilters(FilterPipeline pipeline) {
     }
 
     /**
@@ -431,7 +405,6 @@ public class JXTreeTable extends JXTable {
             // button).
             if (me.getModifiers() == 0
                     || me.getModifiers() == InputEvent.BUTTON1_MASK) {
-                int savedHeight = setTemporaryRendererHeight();
                 MouseEvent pressed = new MouseEvent(renderer, me.getID(), me
                         .getWhen(), me.getModifiers(), me.getX()
                         - getCellRect(0, column, false).x, me.getY(), me
@@ -444,7 +417,6 @@ public class JXTreeTable extends JXTable {
                                 .getX(), pressed.getY(), pressed
                                 .getClickCount(), pressed.isPopupTrigger());
                 renderer.dispatchEvent(released);
-                restoreRendererHeight(savedHeight);
 
                 // Issue #332-swing: hacking around selection loss.
                 // it's the right direction to go (prevent the
@@ -460,55 +432,8 @@ public class JXTreeTable extends JXTable {
             return changedExpansion;
         }
 
-        protected void restoreRendererHeight(int savedHeight) {
-            renderer.setRowHeight(savedHeight);
-        }
-
-        protected int setTemporaryRendererHeight() {
-            int savedHeight = renderer.getRowHeight();
-            renderer.setRowHeight(getRowHeight());
-            return savedHeight;
-        }
-
         protected void setExpansionChangedFlag() {
             expansionChangedFlag = true;
-        }
-
-        /**
-         * Reconciles semantic differences between JTable and JTree regarding
-         * row height.
-         */
-        protected void adjustTreeRowHeight() {
-            final int treeRowHeight = rowHeight + heightAdjustment();
-            if (renderer != null && renderer.getRowHeight() != treeRowHeight) {
-                renderer.setRowHeight(treeRowHeight);
-            }
-        }
-
-        protected void adjustTableRowHeight(int treeRowHeight) {
-            final int tableRowHeight = treeRowHeight - heightAdjustment();
-            if (getRowHeight() != tableRowHeight) {
-                adminSetRowHeight(tableRowHeight);
-            }
-        }
-
-        protected int heightAdjustment() {
-            return (rowMargin << 1);
-        }
-
-        protected int getTranslationOffset(int visibleRow) {
-            // MUST account for rowMargin for precise positioning.
-            // Offset by (rowMargin * 3)/2, and remember to offset by an
-            // additional pixel if rowMargin is odd!
-            int margins = rowMargin + (rowMargin >> 1) + (rowMargin % 2);
-            return margins + visibleRow * renderer.getRowHeight();
-
-        }
-
-        protected int getHighlightBorderHeight() {
-            int margins = (rowMargin << 1) + rowMargin; // RG: subtract
-                                                        // (rowMargin * 3)
-            return renderer.getRowHeight() - margins;
         }
 
         public boolean shouldRestoreSelectionAfterExpansionEvent() {
@@ -545,36 +470,6 @@ public class JXTreeTable extends JXTable {
             return true;
         }
 
-        /**
-         * overridden to do nothing
-         */
-        protected void restoreRendererHeight(int savedHeight) {
-        }
-
-        /**
-         * overridden to do nothing
-         */
-        protected int setTemporaryRendererHeight() {
-            return renderer.getRowHeight();
-        }
-
-        /**
-         * don't adjust for rowMargin.
-         */
-        protected int heightAdjustment() {
-            return 0;
-        }
-
-        protected int getTranslationOffset(int visibleRow) {
-            int margins = (rowMargin >> 1);
-            return margins + visibleRow * renderer.getRowHeight();
-
-        }
-
-        protected int getHighlightBorderHeight() {
-            int margins = (rowMargin >> 1);
-            return renderer.getRowHeight() - margins;
-        }
 
         public boolean shouldRestoreSelectionAfterExpansionEvent() {
             return true;
@@ -657,7 +552,6 @@ public class JXTreeTable extends JXTable {
         // understood by JTable and JTree by overriding both setRowHeight() and
         // setRowMargin();
         adminSetRowHeight(getRowHeight());
-        setRowMargin(getRowMargin()); // call overridden setRowMargin()
         firePropertyChange("treeTableModel", old, getTreeTableModel());
     }
 
@@ -731,49 +625,39 @@ public class JXTreeTable extends JXTable {
     }
 
     /**
-     * Sets the row height for this JXTreeTable. Reconciles semantic differences
-     * between JTable and JTree regarding row height.
-     *
-     * @param rowHeight height of a row
+     * Sets the row height for this JXTreeTable and forwards the 
+     * row height to the renderering tree.
+     * 
+     * @param rowHeight height of a row.
      */
     @Override
     public void setRowHeight(int rowHeight) {
         super.setRowHeight(rowHeight);
-        getTreeTableHacker().adjustTreeRowHeight(); // JTree doesn't have setRowMargin. So adjust.
+        adjustTreeRowHeight(getRowHeight()); 
     }
 
     /**
-     * <p>Sets the margin between columns.</p>
-     *
-     * <p>If you set the column margin to zero, make sure that you also set
-     * <code>showVerticalLines</code> to <code>false</code>.</p>
-     *
-     * @param columnMargin margin between columns; must be greater than or equal to zero.
-     * @see #setShowVerticalLines(boolean) setShowVerticalLines
+     * Forwards tableRowHeight to tree.
+     * 
+     * @param tableRowHeight height of a row.
      */
-    @Override
-    public void setColumnMargin(int columnMargin) {
-        super.setColumnMargin(columnMargin);
+    protected void adjustTreeRowHeight(int tableRowHeight) {
+        if (renderer != null && renderer.getRowHeight() != tableRowHeight) {
+            renderer.setRowHeight(tableRowHeight);
+        }
     }
 
     /**
-     * <p>Overridden to ensure that private renderer state is kept in sync with the
-     * state of the component. Calls the inherited version after performing the
-     * necessary synchronization. If you override this method, make sure you call
-     * this version from your version of this method.</p>
-     *
-     * <p>If you set row margin to zero, make sure that you also set
-     * <code>showHorizontalLines</code> to <code>false</code>.</p>
-     *
-     * @param rowMargin margin or intercell spacing between rows
-     * @see #setShowHorizontalLines(boolean) setShowHorizontalLines
+     * Forwards treeRowHeight to table. This is for completeness only: the
+     * rendering tree is under our total control, so we don't expect 
+     * any external call to tree.setRowHeight.
+     * 
+     * @param tableRowHeight height of a row.
      */
-    @Override
-    public void setRowMargin(int rowMargin) {
-        // No need to override setIntercellSpacing, because the change in
-        // rowMargin will be funneled through this method anyway.
-        super.setRowMargin(rowMargin);
-        getTreeTableHacker().adjustTreeRowHeight(); // JTree doesn't have setRowMargin. So adjust.
+    protected void adjustTableRowHeight(int treeRowHeight) {
+        if (getRowHeight() != treeRowHeight) {
+            adminSetRowHeight(treeRowHeight);
+        }
     }
 
 
@@ -1283,8 +1167,8 @@ public class JXTreeTable extends JXTable {
      * Specifies whether the UI should use a large model.
      * (Not all UIs will implement this.) <p>
      * 
-     * <strong>NOTE</strong>: this method is exposed for completeness - currently
-     * it's not recommended (read: it's impossible :-) 
+     * <strong>NOTE</strong>: this method is exposed for completeness - 
+     * currently it's not recommended 
      * to use a large model because there are some issues 
      * (not yet fully understood), namely
      * issue #25-swingx, and probably #270-swingx. 
@@ -1599,10 +1483,19 @@ public class JXTreeTable extends JXTable {
             });
         }
 
+        /**
+         * updates the table after having received an TreeExpansionEvent.<p>
+         * 
+         * PENDING JW - further investigate revalidate instead of firing
+         * dataChanged...
+         * 
+         * @param event the TreeExpansionEvent which triggered the method call.
+         */
         protected void updateAfterExpansionEvent(TreeExpansionEvent event) {
             treeTable.getTreeTableHacker().setExpansionChangedFlag();
             TreePath[] selectionPaths = tree.getSelectionPaths();
-
+//            treeTable.revalidate();
+//            treeTable.repaint();
             fireTableDataChanged();
 
             if (treeTable.getTreeTableHacker().shouldRestoreSelectionAfterExpansionEvent()) {
@@ -1756,6 +1649,7 @@ public class JXTreeTable extends JXTable {
         private void delayedFireTableDataChanged(final TreeModelEvent tme, final int typeChange) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
+//                    treeTable.repaint();
                     int indices[] = tme.getChildIndices();
                     TreePath path = tme.getTreePath();
                     if (indices != null) { 
@@ -1928,15 +1822,21 @@ public class JXTreeTable extends JXTable {
         /**
          * Sets the row height of the tree, and forwards the row height to
          * the table.
+         * 
+         *
          */
         @Override
         public void setRowHeight(int rowHeight) {
+            // JW: can't ... updateUI invoked with rowHeight = 0
+            // hmmm... looks fishy ...
+//            if (rowHeight <= 0) throw 
+//               new IllegalArgumentException("the rendering tree must have a fixed rowHeight > 0");
             super.setRowHeight(rowHeight);
             if (rowHeight > 0) {
                 if (treeTable != null) {
-                    treeTable.getTreeTableHacker().adjustTableRowHeight(rowHeight);
+                    treeTable.adjustTableRowHeight(rowHeight);
                 }
-            } 
+            }
         }
 
 
@@ -1959,8 +1859,8 @@ public class JXTreeTable extends JXTable {
          */
         @Override
         public void paint(Graphics g) {
-            int translationOffset = treeTable.getTreeTableHacker().getTranslationOffset(visibleRow);
-            g.translate(0, -translationOffset);
+            Rectangle cellRect = treeTable.getCellRect(visibleRow, 0, false);
+            g.translate(0, -cellRect.y);
 
             hierarchicalColumnWidth = getWidth();
             super.paint(g);
@@ -1972,8 +1872,8 @@ public class JXTreeTable extends JXTable {
                 // still not satifying in all cases...
                 // RG: Now it satisfies (at least for the row margins)
                 // Still need to make similar adjustments for column margins...
-                highlightBorder.paintBorder(this, g, 0, translationOffset,
-                        getWidth(), treeTable.getTreeTableHacker().getHighlightBorderHeight());
+                highlightBorder.paintBorder(this, g, 0, cellRect.y,
+                        getWidth(), cellRect.height);
             }
         }
 
