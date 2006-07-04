@@ -1145,7 +1145,7 @@ public class JXTable extends JTable
      * @return row index in model coordinates
      */
     public int convertRowIndexToModel(int row) {
-        return getFilters().convertRowIndexToModel(row);
+        return getFilters() != null ?  getFilters().convertRowIndexToModel(row): row;
     }
 
     /**
@@ -1157,7 +1157,7 @@ public class JXTable extends JTable
      * @return row index in view coordinates
      */
     public int convertRowIndexToView(int row) {
-        return getFilters().convertRowIndexToView(row);
+        return getFilters() != null ? getFilters().convertRowIndexToView(row): row;
     }
 
     /**
