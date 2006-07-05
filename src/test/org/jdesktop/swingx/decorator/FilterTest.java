@@ -132,7 +132,7 @@ public class FilterTest extends InteractiveTestCase {
      * Registers pipelineReport if withReport.
      * 
      * @param withReport flag to indicate if pipelineReport should be registered.
-     * @return
+     * @return FilterPipeline
      */
     private FilterPipeline createAssignedPipeline(boolean withReport) {
         FilterPipeline pipeline = new FilterPipeline();
@@ -623,7 +623,7 @@ public class FilterTest extends InteractiveTestCase {
     /** returns a PatternFilter for occurences of "e" in column.
      * 
      * @param column
-     * @return
+     * @return a PatternFilter for occurences of "e" in column
      */
     protected Filter createDefaultPatternFilter(int column) {
         Filter filterZero = new PatternFilter("e", 0, column);

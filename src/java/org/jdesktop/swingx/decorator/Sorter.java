@@ -96,7 +96,7 @@ public abstract class Sorter extends Filter {
 
     /**
      * Compares and returns the entries in row1 vs row2 and 
-     * returns -1, 0, -1 depending on their being <, ==, > in the
+     * returns -1, 0, -1 depending on their being &lt;, ==, > in the
      * current sort direction.
      * 
      * PRE: getColumnIndex() valid.
@@ -106,7 +106,7 @@ public abstract class Sorter extends Filter {
      *  
      * @param row1 
      * @param row2
-     * @return 
+     * @return returns -1, 0, -1 depending on row1/row2 being &lt;, ==, > in the current sort direction
      */
     protected int compare(int row1, int row2) {
         int result = compare(row1, row2, getColumnIndex());

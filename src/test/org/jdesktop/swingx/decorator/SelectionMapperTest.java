@@ -197,7 +197,7 @@ public class SelectionMapperTest extends InteractiveTestCase {
      * starting from startRow.
      * @param startRow the value of the first row
      * @param count the number of rows
-     * @return
+     * @return table model
      */
     private DefaultTableModel createAscendingModel(int startRow, int count) {
         DefaultTableModel model = new DefaultTableModel(count, 5) {
@@ -227,7 +227,7 @@ public class SelectionMapperTest extends InteractiveTestCase {
     /** returns a PatternFilter for occurences of "e" in column.
      * 
      * @param column
-     * @return
+     * @return a PatternFilter for occurences of "e" in column
      */
     protected Filter createDefaultPatternFilter(int column) {
         Filter filterZero = new PatternFilter("e", 0, column);
