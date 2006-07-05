@@ -51,6 +51,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     private static final int NO_OFFSET = 0;
     private static final int TRAILING_DAY_OFFSET = -1;
 
+    private static final int WEEKS_IN_MONTH = 6;
     private static final int CALENDAR_SPACING = 10;
     private static final Point NO_SUCH_CALENDAR = new Point(-1, -1);
 
@@ -559,7 +560,28 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         // If we're showing leading days the week in month needs to be 1 to make the bounds
         // calculate correctly.
-        weekOfMonth = monthOffset == LEADING_DAY_OFFSET ? 1 : weekOfMonth;
+        if (LEADING_DAY_OFFSET == monthOffset) {
+            weekOfMonth = 1;
+        }
+
+        if (TRAILING_DAY_OFFSET == monthOffset) {
+            // Find which week the last day in the month is.
+            int day = cal.get(Calendar.DAY_OF_MONTH);
+            int weekOffset = cal.get(Calendar.WEEK_OF_MONTH) - 1;
+
+            cal.add(Calendar.DAY_OF_MONTH, -day);
+
+            int lastWeekOfMonth = cal.get(Calendar.WEEK_OF_MONTH);
+            int lastDay = getDayOfWeekViewIndex(cal.get(Calendar.DAY_OF_WEEK));
+            if (lastDay == (JXMonthView.DAYS_IN_WEEK - 1)) {
+                weekOffset++;
+            }
+
+            // Move back to our current day.
+            cal.add(Calendar.DAY_OF_MONTH, day);
+
+            weekOfMonth = lastWeekOfMonth + weekOffset;
+        }
 
         // Determine what row/column we are in.
         int diffMonths = month - firstDisplayedMonth +
@@ -835,7 +857,33 @@ public class BasicMonthViewUI extends MonthViewUI {
             }
             cal.add(Calendar.DAY_OF_MONTH, 1);
         }
-        // TODO: paint trailing days in the month
+
+        if (monthView.isShowingTrailingDates()) {
+            // Figure out how many days we need to paint for trailing days.
+            cal.add(Calendar.DAY_OF_MONTH, -1);
+            int weekOfMonth = cal.get(Calendar.WEEK_OF_MONTH);
+            if (JXMonthView.DAYS_IN_WEEK - 1 == getDayOfWeekViewIndex(cal.get(Calendar.DAY_OF_WEEK))) {
+                weekOfMonth++;
+            }
+            cal.add(Calendar.DAY_OF_MONTH, 1);
+
+            int daysToPaint = JXMonthView.DAYS_IN_WEEK * (WEEKS_IN_MONTH - weekOfMonth);
+            daysToPaint += JXMonthView.DAYS_IN_WEEK - getDayOfWeekViewIndex(cal.get(Calendar.DAY_OF_WEEK));
+            if (daysToPaint != 0) {
+                for (int i = 0; i < daysToPaint; i++) {
+                    // Paint a day
+                    calculateBoundsForDay(bounds, TRAILING_DAY_OFFSET);
+                    day = cal.getTimeInMillis();
+                    paintTrailingDayBackground(g, bounds.x, bounds.y,
+                            bounds.width, bounds.height, day);
+                    paintTrailingDayForeground(g, bounds.x, bounds.y,
+                            bounds.width, bounds.height, day);
+                    cal.add(Calendar.DAY_OF_MONTH, 1);
+                }
+            }
+            // Move the calendar back to the first of the month
+            cal.set(Calendar.DAY_OF_MONTH, 1);
+        }
     }
 
     private void paintDayOfTheWeekBackground(Graphics g, int x, int y, int width, int height) {
@@ -1099,6 +1147,34 @@ public class BasicMonthViewUI extends MonthViewUI {
                         x + boxPaddingX +
                                 boxWidth - fm.stringWidth(numericDay) - 1,
                 y + boxPaddingY + fm.getAscent());
+    }
+
+    /**
+     * Paint the background for the specified trailing day.
+     *
+     * @param g Graphics object to paint to
+     * @param x x-coordinate of upper left corner
+     * @param y y-coordinate of upper left corner
+     * @param width width of bounding box for the day
+     * @param height height of bounding box for the day
+     * @param date long value representing the leading day being painted
+     */
+    protected void paintTrailingDayBackground(Graphics g, int x, int y, int width, int height, long date) {
+        paintLeadingDayBackground(g, x, y, width, height, date);
+    }
+
+    /**
+     * Paint the foreground for the specified trailing day.
+     *
+     * @param g Graphics object to paint to
+     * @param x x-coordinate of upper left corner
+     * @param y y-coordinate of upper left corner
+     * @param width width of bounding box for the day
+     * @param height height of bounding box for the day
+     * @param date long value representing the leading day being painted
+     */
+    protected void paintTrailingDayForeground(Graphics g, int x, int y, int width, int height, long date) {
+        paintLeadingDayForeground(g, x, y, width, height, date);
     }
 
     private long cleanupDate(long date) {
