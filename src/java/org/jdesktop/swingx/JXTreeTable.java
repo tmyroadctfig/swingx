@@ -1466,7 +1466,9 @@ public class JXTreeTable extends JXTable {
          */
         class ListSelectionHandler implements ListSelectionListener {
             public void valueChanged(ListSelectionEvent e) {
-                updateSelectedPathsFromSelectedRows();
+                if (!e.getValueIsAdjusting()) {
+                    updateSelectedPathsFromSelectedRows();
+                }
             }
         }
     }
