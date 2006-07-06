@@ -35,6 +35,26 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     }
 
     /**
+     * test if table and tree rowHeights are the same.
+     *
+     */
+    public void testAdjustedRowHeights() {
+        JXTreeTable treeTable = new JXTreeTable(simpleTreeTableModel);
+        JXTree tree = (JXTree) treeTable.getCellRenderer(0, 0);
+        // sanity: same initially
+        assertEquals("table and tree rowHeights must be equal", 
+                treeTable.getRowHeight(), tree.getRowHeight());
+        // change treeTable height
+        treeTable.setRowHeight(treeTable.getRowHeight() * 2);
+        assertEquals("table and tree rowHeights must be equal", 
+                treeTable.getRowHeight(), tree.getRowHeight());
+        // change treeTable height
+        tree.setRowHeight(tree.getRowHeight() * 2);
+        assertEquals("table and tree rowHeights must be equal", 
+                treeTable.getRowHeight(), tree.getRowHeight());
+
+    }
+    /**
      * #321-swingx: missing tree property toggleClickCount, largeModel.
      *
      */
