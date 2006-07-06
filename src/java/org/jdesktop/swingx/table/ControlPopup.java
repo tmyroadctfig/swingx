@@ -19,7 +19,6 @@ import org.jdesktop.swingx.table.ColumnControlButton.ColumnVisibilityAction;
  * For now, that's a simple extraction of what a ColumnControl needs. 
  * Usage will drive further evolution.
  * 
- * @see {@link DefaultControlPopup }
  * 
  * 
  */
