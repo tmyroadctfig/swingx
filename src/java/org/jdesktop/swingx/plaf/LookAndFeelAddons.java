@@ -123,12 +123,18 @@ public class LookAndFeelAddons {
 
   /**
    * Adds the given defaults in UIManager.
+   *
+   * Note: the values are added only if they do not exist in the
+   * existing look and feel defaults. This makes it possible for look
+   * and feel implementors to override SwingX defaults.
    * 
    * @param keysAndValues
    */
   public void loadDefaults(Object[] keysAndValues) {
     for (int i = 0, c = keysAndValues.length; i < c; i = i + 2) {
-      UIManager.getLookAndFeelDefaults().put(keysAndValues[i], keysAndValues[i + 1]);
+      if (UIManager.getLookAndFeelDefaults().get(keysAndValues[i]) == null) {
+        UIManager.getLookAndFeelDefaults().put(keysAndValues[i], keysAndValues[i + 1]);
+      }
     }
   }
 
