@@ -10,7 +10,6 @@ package org.jdesktop.swingx;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 
-import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -23,9 +22,7 @@ import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
-import org.jdesktop.swingx.util.ComponentTreeTableModel;
 import org.jdesktop.swingx.util.PropertyChangeReport;
-import org.jdesktop.swingx.util.TreeSelectionReport;
 
 
 public class JXTreeTableUnitTest extends InteractiveTestCase {
@@ -69,7 +66,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
             }
             
         };
-        // can't use ComponentTreeTableModel in headless environment
+        // can't use ComponentTreeTableModel with JXFrame in headless environment
 //        JXTreeTable treeTable = new JXTreeTable(new ComponentTreeTableModel(new JXFrame()));
         JXTreeTable treeTable = new JXTreeTable(model);
         treeTable.setRootVisible(true);
@@ -340,19 +337,6 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         
     }
 
-    public void testTableRowAtOutsidePoint() {
-        JTable treeTable = new JTable(2, 4);
-        int negativeYRowHeight = (treeTable.getRowHeight()+ treeTable.getRowMargin()) * treeTable.getRowCount() ;
-        int negativeYRowHeightPlusOne = negativeYRowHeight - 1;
-        int negativeYMinimal = -1;
-        assertEquals("negative y location rowheight " + negativeYRowHeight + " must return row -1", 
-                -1,  treeTable.rowAtPoint(new Point(-1, negativeYRowHeight)));
-        assertEquals("negative y location " + negativeYRowHeightPlusOne +" must return row -1", 
-                -1,  treeTable.rowAtPoint(new Point(-1, negativeYRowHeightPlusOne)));
-//        assertEquals("minimal negative y location must return row -1", 
-//                -1,  treeTable.rowAtPoint(new Point(-1, negativeYMinimal)));
-        
-    }
 
     public void testPathForLocationContract() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
