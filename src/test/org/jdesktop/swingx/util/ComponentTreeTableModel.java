@@ -135,6 +135,12 @@ public class ComponentTreeTableModel extends AbstractTreeTableModel {
     
     @Override
     public boolean isCellEditable(Object node, int column) {
+        // fake accessing the node: TreeModel can expect to 
+        // be messaged with nodes that belong to the 
+        // hierarchical structure 
+        // introduced for testing #270-swingx: 
+        // NPE for invisible rows (if parent is collapsed.
+        ((Component) node).getName();
         return column == 0;
     }
 

@@ -292,8 +292,8 @@ public class JXTreeTable extends JXTable {
     }
     
     protected TreeTableHacker createTreeTableHacker() {
-        return new TreeTableHacker();
-//        return new TreeTableHackerExt();
+//        return new TreeTableHacker();
+        return new TreeTableHackerExt();
     }
 
     /**
@@ -1471,7 +1471,10 @@ public class JXTreeTable extends JXTable {
         }
     }
 
-    private static class TreeTableModelAdapter extends AbstractTableModel {
+    /**
+     * 
+     */
+    protected static class TreeTableModelAdapter extends AbstractTableModel {
         private TreeModelListener treeModelListener;
         /**
          * Maintains a TreeTableModel and a JTree as purely implementation details.
@@ -1622,21 +1625,31 @@ public class JXTreeTable extends JXTable {
         }
 
         public Object getValueAt(int row, int column) {
-            return model.getValueAt(nodeForRow(row), column);
+            // Issue #270-swingx: guard against invisible row
+            Object node = nodeForRow(row);
+            return node != null ? model.getValueAt(node, column) : null;
         }
 
         @Override
         public boolean isCellEditable(int row, int column) {
-            return model.isCellEditable(nodeForRow(row), column);
+            // Issue #270-swingx: guard against invisible row
+            Object node = nodeForRow(row);
+            return node != null ? model.isCellEditable(node, column) : false;
         }
 
         @Override
         public void setValueAt(Object value, int row, int column) {
-            model.setValueAt(value, nodeForRow(row), column);
+            // Issue #270-swingx: guard against invisible row
+            Object node = nodeForRow(row);
+            if (node != null) {
+                model.setValueAt(value, node, column);
+            }
         }
 
         protected Object nodeForRow(int row) {
-            return tree.getPathForRow(row).getLastPathComponent();
+            // Issue #270-swingx: guard against invisible row
+            TreePath path = tree.getPathForRow(row);
+            return path != null ? path.getLastPathComponent() : null;
         }
 
         /**
@@ -1658,7 +1671,6 @@ public class JXTreeTable extends JXTable {
         private void delayedFireTableDataChanged(final TreeModelEvent tme, final int typeChange) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-//                    treeTable.repaint();
                     int indices[] = tme.getChildIndices();
                     TreePath path = tme.getTreePath();
                     if (indices != null) { 

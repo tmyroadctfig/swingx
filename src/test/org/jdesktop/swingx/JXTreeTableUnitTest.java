@@ -12,6 +12,7 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
+import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
@@ -22,6 +23,7 @@ import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
+import org.jdesktop.swingx.util.ComponentTreeTableModel;
 import org.jdesktop.swingx.util.PropertyChangeReport;
 
 
@@ -34,6 +36,22 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         super("JXTreeTable Unit Test");
     }
 
+    /**
+     * Issue #270-swingx: NPE in some contexts when accessing the 
+     * TreeTableModelAdapter.
+     *
+     */
+    public void testConservativeRowForNodeInAdapter() {
+        JXTreeTable treeTable = new JXTreeTable(new ComponentTreeTableModel(new JXFrame()));
+        treeTable.setRootVisible(true);
+        TableModel adapter = treeTable.getModel();
+        treeTable.collapseAll();
+        assertEquals(1, treeTable.getRowCount());
+        // simulate contexts where the accessed row isn't currently visible
+        adapter.getValueAt(treeTable.getRowCount(), 0);
+        adapter.isCellEditable(treeTable.getRowCount(), 0);
+        adapter.setValueAt("somename", treeTable.getRowCount(), 0);
+    }
     /**
      * test if table and tree rowHeights are the same.
      *
