@@ -1255,8 +1255,19 @@ public class JXTable extends JTable
      * @param e
      */
     private void updateSelectionAndRowModel(TableModelEvent e) {
+        if (isStructureChanged(e) || isDataChanged(e)) {
+        
+            // JW fixing part of #172 - trying to adjust lead/anchor to valid
+            // indices (at least in model coordinates) after super's default clearSelection
+            // in dataChanged/structureChanged. 
+            hackLeadAnchor(e);
+
+            getSelectionMapper().clearModelSelection();
+            getRowModelMapper().clearModelSizes();
+            updateViewSizeSequence();
+             
         // JW: c&p from JTable
-        if (e.getType() == TableModelEvent.INSERT) {
+        } else if (e.getType() == TableModelEvent.INSERT) {
             int start = e.getFirstRow();
             int end = e.getLastRow();
             if (start < 0) {
@@ -1286,29 +1297,42 @@ public class JXTable extends JTable
             getSelectionMapper().removeIndexInterval(start, end);
             getRowModelMapper().removeIndexInterval(start, deletedCount);
 
-        } else if (isDataChanged(e) || isStructureChanged(e)) {
-        
-            // JW fixing part of #172 - trying to adjust lead/anchor to valid
-            // indices (at least in model coordinates) after super's default clearSelection
-            // in dataChanged/structureChanged. 
-            hackLeadAnchor(e);
-
-            getSelectionMapper().clearModelSelection();
-            getRowModelMapper().clearModelSizes();
-            updateViewSizeSequence();
-             
-        } 
+        }  
         // nothing to do on TableEvent.updated
 
     }
 
-    private boolean isDataChanged(TableModelEvent e) {
+    /**
+     * Convenience method to detect dataChanged event.
+     * 
+     * @param e the event to examine. 
+     * @return true if the event is of type dataChanged, false else.
+     */
+    protected boolean isDataChanged(TableModelEvent e) {
+        if (e == null) return false;
         return e.getType() == TableModelEvent.UPDATE && 
             e.getFirstRow() == 0 &&
             e.getLastRow() == Integer.MAX_VALUE;
     }
+    
+    /**
+     * Convenience method to detect update event.
+     * 
+     * @param e the event to examine. 
+     * @return true if the event is of type update and not dataChanged, false else.
+     */
+    protected boolean isUpdate(TableModelEvent e) {
+        if (isStructureChanged(e)) return false;
+        return e.getType() == TableModelEvent.UPDATE && 
+            e.getLastRow() < Integer.MAX_VALUE;
+    }
 
-    private boolean isStructureChanged(TableModelEvent e) {
+    /**
+     * Convenience method to detect a structureChanged event type.
+     * @param e the event to examine.
+     * @return true if the event is of type structureChanged or null, false else.
+     */
+    protected boolean isStructureChanged(TableModelEvent e) {
         return e == null || e.getFirstRow() == TableModelEvent.HEADER_ROW;
     }
 

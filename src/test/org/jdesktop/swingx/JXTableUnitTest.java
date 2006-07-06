@@ -34,6 +34,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
@@ -91,6 +92,39 @@ public class JXTableUnitTest extends InteractiveTestCase {
         setSystemLF(defaultToSystemLF);
     }
 
+    /**
+     * Issue ??-swingx: NPE if tableChanged is messaged with a null event.
+     *
+     */
+    public void testNullTableEventNPE() {
+        JXTable table = new JXTable();
+        // don't throw null events
+        table.tableChanged(null);
+        assertFalse(table.isUpdate(null));
+        assertFalse(table.isDataChanged(null));
+        assertTrue(table.isStructureChanged(null));
+        // correct detection of structureChanged
+        TableModelEvent structureChanged = new TableModelEvent(table.getModel(), -1, -1);
+        assertFalse(table.isUpdate(structureChanged));
+        assertFalse(table.isDataChanged(structureChanged));
+        assertTrue(table.isStructureChanged(structureChanged));
+        // correct detection of insert/remove
+        TableModelEvent insert = new TableModelEvent(table.getModel(), 0, 10, -1, TableModelEvent.INSERT);
+        assertFalse(table.isUpdate(insert));
+        assertFalse(table.isDataChanged(insert));
+        assertFalse(table.isStructureChanged(insert));
+        // correct detection of update
+        TableModelEvent update = new TableModelEvent(table.getModel(), 0, 10);
+        assertTrue(table.isUpdate(update));
+        assertFalse(table.isDataChanged(update));
+        assertFalse(table.isStructureChanged(update));
+        // correct detection of dataChanged
+        TableModelEvent dataChanged = new TableModelEvent(table.getModel());
+        assertFalse(table.isUpdate(dataChanged));
+        assertTrue(table.isDataChanged(dataChanged));
+        assertFalse(table.isStructureChanged(dataChanged));
+        
+    }
     /**
      * test new mutable columnControl api.
      *
