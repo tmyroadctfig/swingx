@@ -102,7 +102,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     protected void setUp() throws Exception {
         super.setUp();
         // super has LF specific tests...
-//        setSystemLF(true);
+        setSystemLF(true);
     }
 
     
@@ -327,13 +327,21 @@ public class JXTableVisualCheck extends JXTableUnitTest {
      * header should be auto-repainted on changes to
      * header title, value. Must update size if appropriate.
      * 
+     * still open: core #4292511 - autowrap not really working
      *
      */
     public void interactiveUpdateHeaderAndSizeRequirements() {
+        
+        final String[] alternate = { 
+                "simple", 
+//                "<html><b>This is a test of a large label to see if it wraps </font></b>",
+//                "simple", 
+                 "<html><center>Line 1<br>Line 2</center></html>" 
+                };
         final JXTable table = new JXTable(10, 2);
+        
         JXFrame frame = wrapWithScrollingInFrame(table, "update header");
         Action action = new AbstractAction("update headervalue") {
-            String[] alternate = {"simple", "<html><center>Line 1<br>Line 2</center></html>" };
             boolean first;
             public void actionPerformed(ActionEvent e) {
                 table.getColumn(1).setHeaderValue(first ? alternate[0] : alternate[1]);
