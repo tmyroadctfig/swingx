@@ -48,6 +48,7 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeModelEvent;
@@ -66,6 +67,8 @@ import javax.swing.tree.TreeSelectionModel;
 
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
+import org.jdesktop.swingx.decorator.SelectionMapper;
+import org.jdesktop.swingx.decorator.SizeSequenceMapper;
 import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.TreeTableCellEditor;
@@ -189,11 +192,6 @@ public class JXTreeTable extends JXTable {
         // Default intercell spacing
         setIntercellSpacing(spacing); // for both row margin and column margin
 
-        // JTable supports row margins and intercell spacing, but JTree doesn't.
-        // We must reconcile the differences in the semantics of rowHeight as
-        // understood by JTable and JTree by overriding both setRowHeight() and
-        // setRowMargin();
-        adminSetRowHeight(getRowHeight());
 
     }
 
@@ -301,24 +299,13 @@ public class JXTreeTable extends JXTable {
     /**
      * Temporary class to have all the hacking at one place. Naturally, it will
      * change a lot. The base class has the "stable" behaviour as of around
-     * jun2006 (before starting the fix for 332-swingx.
+     * jun2006 (before starting the fix for 332-swingx). <p>
      * 
      * specifically:
      * 
      * <ol>
      * <li> hitHandleDetection triggeredn in editCellAt
-     * <li> set/restore rendererHeight in hit detection
-     * <li> no restore of selection (in expansionListener)
-     * <li> rowHeights in renderer adjusted to tableHeight and tableRowMargin
-     * <li> translationOffset in renderer paint adjusted for 1.5 * rowMargin
      * </ol>
-     * 
-     * Note: these sizing (== height) adjustments are wrong, because they assume
-     * that table.realRowHeight is the sum rowHeight and margin. In fact it's the
-     * other way round: table.getRowHeight includes the margin! The only place
-     * where the margin has to be respected, is in the painting kludge: both
-     * graphics translation and border painting have to be adjusted be positioned into
-     * the middle of the cell. 
      * 
      */
     public class TreeTableHacker {
@@ -436,20 +423,11 @@ public class JXTreeTable extends JXTable {
             expansionChangedFlag = true;
         }
 
-        public boolean shouldRestoreSelectionAfterExpansionEvent() {
-            return false;
-        }
-
     }
 
     /**
      * <ol>
      * <li> hit handle detection in processMouse
-     * <li> don't set/restore renderer height in hit detection
-     * <li> restore of selection (in expansionListener)
-     * <li> rowHeights in renderer not adjusted to tableHeight and tableRowMargin
-     * <li> translationOffset in renderer paint adjusted with rowMargin/2
-     * <li> 
      * </ol>
      */
     public class TreeTableHackerExt extends TreeTableHacker {
@@ -467,11 +445,6 @@ public class JXTreeTable extends JXTable {
                 setExpandsSelectedPaths(false);
                 hasResetExpandsSelectedPaths = true;
             }
-            return true;
-        }
-
-
-        public boolean shouldRestoreSelectionAfterExpansionEvent() {
             return true;
         }
 
@@ -610,6 +583,60 @@ public class JXTreeTable extends JXTable {
         }
     }
 
+
+    
+    @Override
+    public void tableChanged(TableModelEvent e) {
+        if (isStructureChanged(e) || isUpdate(e)) {
+            super.tableChanged(e);
+        } else {
+            resizeAndRepaint();
+        }
+    }
+
+    /**
+     *  Overridden to return a do-nothing mapper.
+     *  
+     */
+    @Override
+    protected SelectionMapper getSelectionMapper() {
+        // JW: don't want to change super assumption 
+        // (mapper != null) - the selection mapping will change 
+        // anyway in Mustang (using core functionality)
+        SelectionMapper empty = new SelectionMapper(null, null) {
+
+            @Override
+            public void insertIndexInterval(int start, int length, boolean before) {
+            }
+
+            @Override
+            public void lock() {
+            }
+
+            @Override
+            public void removeIndexInterval(int start, int end) {
+            }
+
+            @Override
+            public void restoreSelection() {
+            }
+
+            @Override
+            public void setFilters(FilterPipeline pipeline) {
+            }
+
+            @Override
+            public void setViewSelectionModel(ListSelectionModel selection) {
+            }
+
+            @Override
+            public void unlock() {
+            }
+            
+        };
+        return empty ;
+    }
+
     /**
      * Throws UnsupportedOperationException because variable height rows are
      * not supported.
@@ -717,12 +744,7 @@ public class JXTreeTable extends JXTable {
         int column) {
         
         Component component = super.prepareRenderer(renderer, row, column);
-        // MUST ALWAYS ACCESS dataAdapter through accessor method!!!
-        ComponentAdapter    adapter = getComponentAdapter();
-        adapter.row = row;
-        adapter.column = column;
-        
-        return applyRenderer(component, adapter); 
+        return applyRenderer(component, getComponentAdapter(row, column)); 
     }
 
     /**
@@ -1283,9 +1305,7 @@ public class JXTreeTable extends JXTable {
     public void updateUI() {
         super.updateUI();
         if (renderer != null) {
-            //  final int savedHeight = renderer.getRowHeight();
             renderer.updateUI();
-            //  renderer.setRowHeight(savedHeight);
 
             // Do this so that the editor is referencing the current renderer
             // from the tree. The renderer can potentially change each time
@@ -1293,7 +1313,7 @@ public class JXTreeTable extends JXTable {
             setDefaultEditor(AbstractTreeTableModel.hierarchicalColumnClass,
                 new TreeTableCellEditor(renderer));
 
-            if (getBackground() == null || getBackground()instanceof UIResource) {
+            if (getBackground() == null || getBackground() instanceof UIResource) {
                 setBackground(renderer.getBackground());
             }
         }
@@ -1330,6 +1350,8 @@ public class JXTreeTable extends JXTable {
             renderer.bind(this); // IMPORTANT: link back!
             renderer.setSelectionModel(selectionWrapper);
         }
+        // adjust the tree's rowHeight to this.rowHeight
+        adjustTreeRowHeight(getRowHeight());
 
         setSelectionModel(selectionWrapper.getListSelectionModel());
         setDefaultRenderer(AbstractTreeTableModel.hierarchicalColumnClass,
@@ -1486,25 +1508,12 @@ public class JXTreeTable extends JXTable {
         /**
          * updates the table after having received an TreeExpansionEvent.<p>
          * 
-         * PENDING JW - further investigate revalidate instead of firing
-         * dataChanged...
-         * 
          * @param event the TreeExpansionEvent which triggered the method call.
          */
         protected void updateAfterExpansionEvent(TreeExpansionEvent event) {
             treeTable.getTreeTableHacker().setExpansionChangedFlag();
-            TreePath[] selectionPaths = tree.getSelectionPaths();
-//            treeTable.revalidate();
-//            treeTable.repaint();
             fireTableDataChanged();
-
-            if (treeTable.getTreeTableHacker().shouldRestoreSelectionAfterExpansionEvent()) {
-                if (selectionPaths != null && selectionPaths.length > 0) {
-                    tree.setSelectionPaths(selectionPaths);
-                }
-            }
         }
-
 
         /**
          * 
@@ -1964,7 +1973,6 @@ public class JXTreeTable extends JXTable {
         if (dataAdapter == null) {
             dataAdapter = new TreeTableDataAdapter(this); 
         }
-        // MUST ALWAYS ACCESS dataAdapter through accessor method!!!
         return dataAdapter;
     }
 
