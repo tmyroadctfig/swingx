@@ -7,12 +7,16 @@
 package org.jdesktop.swingx.plaf;
 
 import java.awt.Color;
+import java.util.List;
 
+import javax.swing.LookAndFeel;
+import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.ColorUIResource;
+import javax.swing.plaf.basic.BasicLookAndFeel;
 
 import junit.framework.TestCase;
 
@@ -24,6 +28,67 @@ public class LookAndFeelAddonsTest extends TestCase {
     super(arg0);
   }
 
+  /**
+   * A look and feel can't override SwingX defaults
+   */
+  public void testIssue293() throws Exception {
+	  class CustomLF extends BasicLookAndFeel {
+	    @Override
+	    public String getDescription() {
+	      return "custom";
+	    }
+		  @Override
+		  public String getID() {
+		    return "custom";
+		  }
+		  @Override
+		  public String getName() {
+		    return "custom";
+		  }
+		  @Override
+		  public boolean isNativeLookAndFeel() {
+		    return false;
+		  }
+		  @Override
+		  public boolean isSupportedLookAndFeel() {
+		    return true;
+		  }
+      @Override
+      protected void initComponentDefaults(UIDefaults table) {
+        super.initComponentDefaults(table);
+        table.put("CustomProperty", "CustomValue");
+      }
+	  };
+    
+    LookAndFeelAddons.setTrackingLookAndFeelChanges(true);
+    
+    // without addons, the prop is not overriden
+    LookAndFeel lf = new CustomLF();
+    UIManager.setLookAndFeel(lf);
+    assertEquals("CustomValue", UIManager.get("CustomProperty"));
+    
+    // with an addon, the prop is overriden
+    ComponentAddon myAddon = new AbstractComponentAddon("myAddon") {
+      @Override
+      protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+        defaults.add("CustomProperty");
+        defaults.add("customAddonValue");
+        defaults.add("AddonProperty");
+        defaults.add("addonValue");
+      }
+    };
+    LookAndFeelAddons.contribute(myAddon);
+    // the addon property was not registered as overriden by the l&f
+    assertEquals("CustomValue", UIManager.get("CustomProperty"));
+    assertEquals("addonValue", UIManager.get("AddonProperty"));
+    
+    // now revert to a standard look and feel
+    UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+    // now the addon properties are used 
+    assertEquals("customAddonValue", UIManager.get("CustomProperty"));
+    assertEquals("addonValue", UIManager.get("AddonProperty"));    
+  }
+  
   /**
    * LookAndFeelAddons override entries manually added to UIManager
    */
