@@ -25,6 +25,7 @@ import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.swingx.util.ComponentTreeTableModel;
 import org.jdesktop.swingx.util.PropertyChangeReport;
+import org.jdesktop.swingx.util.TreeSelectionReport;
 
 
 public class JXTreeTableUnitTest extends InteractiveTestCase {
@@ -42,7 +43,35 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      *
      */
     public void testConservativeRowForNodeInAdapter() {
-        JXTreeTable treeTable = new JXTreeTable(new ComponentTreeTableModel(new JXFrame()));
+        // for testing we need a model which relies on 
+        // node != null
+        TreeTableModel model = new DefaultTreeTableModel((TreeNode) simpleTreeTableModel.getRoot()) {
+
+            @Override
+            public Object getValueAt(Object node, int column) {
+                // access node
+                node.toString();
+                return super.getValueAt(node, column);
+            }
+
+            @Override
+            public void setValueAt(Object value, Object node, int column) {
+                // access node
+                node.toString();
+                super.setValueAt(value, node, column);
+            }
+
+            @Override
+            public boolean isCellEditable(Object node, int column) {
+                // access node
+                node.toString();
+                return super.isCellEditable(node, column);
+            }
+            
+        };
+        // can't use ComponentTreeTableModel in headless environment
+//        JXTreeTable treeTable = new JXTreeTable(new ComponentTreeTableModel(new JXFrame()));
+        JXTreeTable treeTable = new JXTreeTable(model);
         treeTable.setRootVisible(true);
         TableModel adapter = treeTable.getModel();
         treeTable.collapseAll();
