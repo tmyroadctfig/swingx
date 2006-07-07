@@ -11,6 +11,7 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 
 import javax.swing.SwingUtilities;
+import javax.swing.event.TreeSelectionEvent;
 import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -23,6 +24,7 @@ import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.swingx.util.PropertyChangeReport;
+import org.jdesktop.swingx.util.TreeSelectionReport;
 
 
 public class JXTreeTableUnitTest extends InteractiveTestCase {
@@ -32,6 +34,90 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     
     public JXTreeTableUnitTest() {
         super("JXTreeTable Unit Test");
+    }
+
+    /**
+     * Issue #4-, #340-swingx: duplicate notification
+     * 
+     * starting from unselected, the event count is 1 as expected 
+     */
+    public void testSelectionEvents() {
+        JXTreeTable treeTable = prepareTreeTable(false);
+        TreeSelectionReport report = new TreeSelectionReport();
+        treeTable.getTreeSelectionModel().addTreeSelectionListener(report);
+        treeTable.setRowSelectionInterval(1, 1);
+        assertEquals(1, report.getEventCount());
+    }
+
+
+    /**
+     * Issue #4-, #340-swingx: duplicate notification
+     * 
+     * Hmm... unexpected: the eventCount (2) is not effected by 
+     * catching isAdjusting listSelectionEvents. The reason is 
+     * an intermediate clearSelection which fires the additional.
+     */
+    public void testSelectionChangedEvents() {
+        JXTreeTable treeTable = prepareTreeTable(true);
+        TreeSelectionReport report = new TreeSelectionReport();
+        treeTable.getTreeSelectionModel().addTreeSelectionListener(report);
+        treeTable.setRowSelectionInterval(1, 1);
+        assertEquals(1, report.getEventCount());
+    }
+
+    /**
+     * Issue #4-, #340-swingx: duplicate notification
+     * 
+     * The old in the event must be the last selected. 
+     */
+    public void testSelectionChangedHasFirstOldPath() {
+        JXTreeTable treeTable = prepareTreeTable(true);
+        TreeSelectionReport report = new TreeSelectionReport();
+        treeTable.getTreeSelectionModel().addTreeSelectionListener(report);
+        treeTable.setRowSelectionInterval(1, 1);
+        TreeSelectionEvent event = report.getLastEvent();
+        assertEquals(treeTable.getPathForRow(1), event.getNewLeadSelectionPath());
+        assertEquals(treeTable.getPathForRow(0), event.getOldLeadSelectionPath());
+    }
+
+
+    /**
+     * creates and configures a treetable for usage in selection tests.
+     * 
+     * @param selectFirstRow boolean to indicate if the first row should
+     *   be selected.
+     * @return
+     */
+    protected JXTreeTable prepareTreeTable(boolean selectFirstRow) {
+        JXTreeTable treeTable = new JXTreeTable(simpleTreeTableModel);
+        treeTable.setRootVisible(true);
+        // sanity: assert that we have at least two rows to change selection
+        assertTrue(treeTable.getRowCount() > 1);
+        if (selectFirstRow) {
+            treeTable.setRowSelectionInterval(0, 0);
+        }
+        return treeTable;
+    }
+
+    /**
+     * Issue #4-, #340-swingx: duplicate notification
+     * 
+     * sanity: check if there's only one event fired if selection is 
+     * set directly via the treeSelectionModel. Characterize normal
+     * treeSelection to mimic.
+     */
+    public void testSelectionChangedOnTreeSelection() {
+        JXTreeTable treeTable = prepareTreeTable(true);
+        TreePath oldSelected = treeTable.getPathForRow(0);
+        TreeSelectionReport report = new TreeSelectionReport();
+        treeTable.getTreeSelectionModel().addTreeSelectionListener(report);
+        TreePath newSelected = treeTable.getPathForRow(1);
+        treeTable.getTreeSelectionModel().setSelectionPath(newSelected);
+        assertEquals(1, report.getEventCount());
+        // check the paths
+        TreeSelectionEvent event = report.getLastEvent();
+        assertEquals(oldSelected, event.getOldLeadSelectionPath());
+        assertEquals(newSelected, event.getNewLeadSelectionPath());
     }
 
     /**

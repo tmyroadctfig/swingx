@@ -31,8 +31,10 @@ import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.EventObject;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.ActionMap;
@@ -1432,23 +1434,26 @@ public class JXTreeTable extends JXTable {
             if (!updatingListSelectionModel) {
                 updatingListSelectionModel = true;
                 try {
-                    // This is way expensive, ListSelectionModel needs an
-                    // enumerator for iterating.
-                    int min = listSelectionModel.getMinSelectionIndex();
-                    int max = listSelectionModel.getMaxSelectionIndex();
+                    if (listSelectionModel.isSelectionEmpty()) {
+                        clearSelection();
+                    } else {
+                        // This is way expensive, ListSelectionModel needs an
+                        // enumerator for iterating.
+                        int min = listSelectionModel.getMinSelectionIndex();
+                        int max = listSelectionModel.getMaxSelectionIndex();
 
-                    clearSelection();
-                    if (min != -1 && max != -1) {
+                        List<TreePath> paths = new ArrayList<TreePath>();
                         for (int counter = min; counter <= max; counter++) {
                             if (listSelectionModel.isSelectedIndex(counter)) {
                                 TreePath selPath = renderer.getPathForRow(
                                     counter);
 
                                 if (selPath != null) {
-                                    addSelectionPath(selPath);
+                                    paths.add(selPath);
                                 }
                             }
                         }
+                        setSelectionPaths(paths.toArray(new TreePath[paths.size()]));
                     }
                 }
                 finally {
