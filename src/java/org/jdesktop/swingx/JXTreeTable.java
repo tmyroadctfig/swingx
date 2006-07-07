@@ -254,8 +254,6 @@ public class JXTreeTable extends JXTable {
      * 
      * Additionally, there is tricksery involved to expand/collapse
      * the nodes.
-     * 
-     *  @see #expandOrCollapseNode(int, EventObject)
      *
      * {@inheritDoc}
      */
@@ -678,7 +676,7 @@ public class JXTreeTable extends JXTable {
      * rendering tree is under our total control, so we don't expect 
      * any external call to tree.setRowHeight.
      * 
-     * @param tableRowHeight height of a row.
+     * @param treeRowHeight height of a row.
      */
     protected void adjustTableRowHeight(int treeRowHeight) {
         if (getRowHeight() != treeRowHeight) {
