@@ -8,6 +8,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.Point;
+import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 
 import javax.swing.SwingUtilities;
@@ -35,7 +36,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     public JXTreeTableUnitTest() {
         super("JXTreeTable Unit Test");
     }
-
+    
     /**
      * Issue #4-, #340-swingx: duplicate notification
      * 
@@ -211,7 +212,8 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     public void testDragHackFlagOn() {
         JXTreeTable treeTable = new JXTreeTable(simpleTreeTableModel);
         assertNull(treeTable.getClientProperty(JXTreeTable.DRAG_HACK_FLAG_KEY));
-        treeTable.getTreeTableHacker().expandOrCollapseNode(0, new MouseEvent(treeTable, 0, 0, 0, 0, 0, 1, false));
+        treeTable.getTreeTableHacker().expandOrCollapseNode(0, 
+                new MouseEvent(treeTable, MouseEvent.MOUSE_PRESSED, 0, InputEvent.BUTTON1_MASK, 0, 0, 1, false));
         Boolean dragHackFlag = (Boolean) treeTable.getClientProperty(JXTreeTable.DRAG_HACK_FLAG_KEY);
         assertNotNull(dragHackFlag);
         assertTrue(dragHackFlag);
@@ -226,7 +228,8 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         System.setProperty("sun.swing.enableImprovedDragGesture", "true");
         JXTreeTable treeTable = new JXTreeTable(simpleTreeTableModel);
         assertNull(treeTable.getClientProperty(JXTreeTable.DRAG_HACK_FLAG_KEY));
-        treeTable.getTreeTableHacker().expandOrCollapseNode(0, new MouseEvent(treeTable, 0, 0, 0, 0, 0, 1, false));
+        treeTable.getTreeTableHacker().expandOrCollapseNode(0, 
+                new MouseEvent(treeTable, MouseEvent.MOUSE_PRESSED, 0, InputEvent.BUTTON1_MASK, 0, 0, 1, false));
         Boolean dragHackFlag = (Boolean) treeTable.getClientProperty(JXTreeTable.DRAG_HACK_FLAG_KEY);
         assertNotNull(dragHackFlag);
         assertFalse(dragHackFlag);

@@ -361,9 +361,9 @@ public class JXTreeTable extends JXTable {
          *         expand/collaps
          */
         protected boolean expandOrCollapseNode(int column, EventObject e) {
-            if (!(e instanceof MouseEvent))
-                return false;
             if (!isHierarchical(column))
+                return false;
+            if (!mightBeExpansionTrigger(e))
                 return false;
             boolean changedExpansion = false;
             MouseEvent me = (MouseEvent) e;
@@ -414,6 +414,13 @@ public class JXTreeTable extends JXTable {
             }
             expansionChangedFlag = false;
             return changedExpansion;
+        }
+
+        protected boolean mightBeExpansionTrigger(EventObject e) {
+            if (!(e instanceof MouseEvent)) return false;
+            MouseEvent me = (MouseEvent) e;
+            if (!SwingUtilities.isLeftMouseButton(me)) return false;
+            return me.getID() == MouseEvent.MOUSE_PRESSED;
         }
 
         protected void setExpansionChangedFlag() {
