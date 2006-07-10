@@ -11,6 +11,7 @@ import java.awt.Point;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 
+import javax.swing.CellEditor;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.table.TableModel;
@@ -23,6 +24,7 @@ import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
+import org.jdesktop.swingx.treetable.TreeTableCellEditor;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.swingx.util.PropertyChangeReport;
 import org.jdesktop.swingx.util.TreeSelectionReport;
@@ -37,6 +39,18 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         super("JXTreeTable Unit Test");
     }
     
+    /**
+     * Issue #212-jdnc: reuse editor, install only once.
+     * 
+     */
+    public void testReuseEditor() {
+        JXTreeTable treeTable = new JXTreeTable(treeTableModel);
+        CellEditor editor = treeTable.getDefaultEditor(TreeTableModel.class);
+        assertTrue(editor instanceof TreeTableCellEditor);
+        treeTable.setTreeTableModel(simpleTreeTableModel);
+        assertSame("hierarchical editor must be unchanged", editor, 
+                treeTable.getDefaultEditor(TreeTableModel.class));
+    }
     /**
      * Issue #4-, #340-swingx: duplicate notification
      * 

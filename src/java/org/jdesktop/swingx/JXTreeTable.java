@@ -177,14 +177,11 @@ public class JXTreeTable extends JXTable {
             throw new IllegalArgumentException("Mismatched TreeTableModel");
         }
 
-        // renderer-related initialization -- also called from setTreeTableModel()
+        // renderer-related initialization
         init(renderer); // private method
         initActions();
         // disable sorting
         super.setSortable(false);
-        // Install the default editor.
-        setDefaultEditor(AbstractTreeTableModel.hierarchicalColumnClass,
-            new TreeTableCellEditor(renderer));
 
         // No grid.
         setShowGrid(false); // superclass default is "true"
@@ -192,8 +189,50 @@ public class JXTreeTable extends JXTable {
         // Default intercell spacing
         setIntercellSpacing(spacing); // for both row margin and column margin
 
-
     }
+
+    /**
+     * Initializes this JXTreeTable and permanently binds the specified renderer
+     * to it.
+     *
+     * @param renderer private tree/renderer permanently and exclusively bound
+     * to this JXTreeTable.
+     */
+    private void init(TreeTableCellRenderer renderer) {
+        this.renderer = renderer;
+        // Force the JTable and JTree to share their row selection models.
+        ListToTreeSelectionModelWrapper selectionWrapper =
+            new ListToTreeSelectionModelWrapper();
+
+        // JW: when would that happen?
+        if (renderer != null) {
+            renderer.bind(this); // IMPORTANT: link back!
+            renderer.setSelectionModel(selectionWrapper);
+        }
+        // adjust the tree's rowHeight to this.rowHeight
+        adjustTreeRowHeight(getRowHeight());
+
+        setSelectionModel(selectionWrapper.getListSelectionModel());
+        // install the renderer as default for hierarchicalColumn
+        setDefaultRenderer(AbstractTreeTableModel.hierarchicalColumnClass,
+            renderer);
+        // Install the default editor.
+        setDefaultEditor(AbstractTreeTableModel.hierarchicalColumnClass,
+            new TreeTableCellEditor(renderer));
+        
+        // propagate the lineStyle property to the renderer
+        PropertyChangeListener l = new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                JXTreeTable.this.renderer.putClientProperty(evt.getPropertyName(), evt.getNewValue());
+                
+            }
+            
+        };
+        addPropertyChangeListener("JTree.lineStyle", l);
+        
+    }
+
 
 
     private void initActions() {
@@ -549,16 +588,6 @@ public class JXTreeTable extends JXTable {
         if (treeModel != renderer.getModel()) { // do not use assert here!
             throw new IllegalArgumentException("Mismatched TreeTableModel");
         }
-        // Install the default editor.
-        // JW: change to re-use the editor!
-        setDefaultEditor(AbstractTreeTableModel.hierarchicalColumnClass,
-            new TreeTableCellEditor(renderer));
-
-        // JTable supports row margins and intercell spacing, but JTree doesn't.
-        // We must reconcile the differences in the semantics of rowHeight as
-        // understood by JTable and JTree by overriding both setRowHeight() and
-        // setRowMargin();
-        adminSetRowHeight(getRowHeight());
         firePropertyChange("treeTableModel", old, getTreeTableModel());
     }
 
@@ -1343,9 +1372,12 @@ public class JXTreeTable extends JXTable {
 
             // Do this so that the editor is referencing the current renderer
             // from the tree. The renderer can potentially change each time
-            // laf changes.
-            setDefaultEditor(AbstractTreeTableModel.hierarchicalColumnClass,
-                new TreeTableCellEditor(renderer));
+            // laf changes. 
+            // JW: Hmm ... really? The renderer is fixed, set once
+            // in creating treetable... 
+            // commented to fix #213-jdnc (allow custom editors)
+//            setDefaultEditor(AbstractTreeTableModel.hierarchicalColumnClass,
+//                new TreeTableCellEditor(renderer));
 
             if (getBackground() == null || getBackground() instanceof UIResource) {
                 setBackground(renderer.getBackground());
@@ -1365,45 +1397,6 @@ public class JXTreeTable extends JXTable {
         return AbstractTreeTableModel.hierarchicalColumnClass.isAssignableFrom(
             getColumnClass(column));
     }
-
-    /**
-     * Initializes this JXTreeTable and permanently binds the specified renderer
-     * to it.
-     *
-     * @param renderer private tree/renderer permanently and exclusively bound
-     * to this JXTreeTable.
-     */
-    private void init(TreeTableCellRenderer renderer) {
-        this.renderer = renderer;
-        // Force the JTable and JTree to share their row selection models.
-        ListToTreeSelectionModelWrapper selectionWrapper =
-            new ListToTreeSelectionModelWrapper();
-
-        // JW: when would that happen?
-        if (renderer != null) {
-            renderer.bind(this); // IMPORTANT: link back!
-            renderer.setSelectionModel(selectionWrapper);
-        }
-        // adjust the tree's rowHeight to this.rowHeight
-        adjustTreeRowHeight(getRowHeight());
-
-        setSelectionModel(selectionWrapper.getListSelectionModel());
-        setDefaultRenderer(AbstractTreeTableModel.hierarchicalColumnClass,
-            renderer);
-        
-        // propagate the lineStyle property to the renderer
-        PropertyChangeListener l = new PropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent evt) {
-                JXTreeTable.this.renderer.putClientProperty(evt.getPropertyName(), evt.getNewValue());
-                
-            }
-            
-        };
-        addPropertyChangeListener("JTree.lineStyle", l);
-        
-    }
-
 
     /**
      * ListToTreeSelectionModelWrapper extends DefaultTreeSelectionModel
