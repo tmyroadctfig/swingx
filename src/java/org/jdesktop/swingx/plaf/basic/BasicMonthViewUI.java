@@ -92,6 +92,8 @@ public class BasicMonthViewUI extends MonthViewUI {
     private Rectangle dirtyRect = new Rectangle();
     private Rectangle bounds = new Rectangle();
     private Font derivedFont;
+    private Color weekOfTheYearForeground;
+    private Color unselectableDayForeground;
 
     /**
      * Date span used by the keyboard actions to track the original selection.
@@ -165,6 +167,8 @@ public class BasicMonthViewUI extends MonthViewUI {
                 JXMonthView.class.getResource(UIManager.getString("JXMonthView.monthDownFileName")));
         monthUpImage = new ImageIcon(
                 JXMonthView.class.getResource(UIManager.getString("JXMonthView.monthUpFileName")));
+        weekOfTheYearForeground = UIManager.getColor("JXMonthView.weekOfTheYearForeground");
+        unselectableDayForeground = UIManager.getColor("JXMonthView.unselectableDayForeground");
     }
 
     protected void uninstallDefaults() {}
@@ -814,7 +818,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 int weekOfYear = cal.get(Calendar.WEEK_OF_YEAR);
                 if (weekOfYear != oldWeek) {
                     tmpX = ltr ? x : x + width - fullBoxWidth;
-                    paintWeekOfYear(g, tmpX, bounds.y, fullBoxWidth, fullBoxHeight, weekOfYear);
+                    paintWeekOfYearForeground(g, tmpX, bounds.y, fullBoxWidth, fullBoxHeight, weekOfYear);
                     oldWeek = weekOfYear;
                 }
             }
@@ -906,11 +910,11 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param weekOfYear week of the year
      */
     @SuppressWarnings({"UNUSED_SYMBOL"})
-    private void paintWeekOfYear(Graphics g, int x, int y, int width, int height, int weekOfYear) {
+    private void paintWeekOfYearForeground(Graphics g, int x, int y, int width, int height, int weekOfYear) {
         String str = Integer.toString(weekOfYear);
         FontMetrics fm;
 
-        g.setColor(monthView.getDayForeground(getDayOfTheWeek()));
+        g.setColor(weekOfTheYearForeground);
 
         int boxPaddingX = monthView.getBoxPaddingX();
         int boxPaddingY = monthView.getBoxPaddingY();
@@ -1088,7 +1092,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      */
     protected void paintUnselectableDayForeground(Graphics g, int x, int y, int width, int height, long date) {
         paintDayForeground(g, x, y, width, height, date);
-        g.setColor(Color.RED);
+        g.setColor(unselectableDayForeground);
 
         String numericDay = dayOfMonthFormatter.format(date);
         FontMetrics fm = monthView.getFontMetrics(derivedFont);

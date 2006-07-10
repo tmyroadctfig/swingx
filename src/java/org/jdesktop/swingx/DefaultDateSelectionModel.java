@@ -215,7 +215,9 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
      * {@inheritDoc}
      */
     public boolean isUnselectableDate(Date date) {
-        return unselectableDates != null && unselectableDates.contains(date);
+        return upperBound != null && upperBound.getTime() < date.getTime() ||
+                lowerBound != null && lowerBound.getTime() > date.getTime() ||
+                unselectableDates != null && unselectableDates.contains(date);
     }
 
     /**
@@ -235,7 +237,7 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
             if (!selectedDates.isEmpty() && selectedDates.last().after(this.upperBound)) {
                 if (this.upperBound != null) {
                     // Remove anything above the upper bound
-                    long justAboveUpperBoundMs = this.upperBound.getTime() - 1;
+                    long justAboveUpperBoundMs = this.upperBound.getTime() + 1;
                     if (!selectedDates.isEmpty() && selectedDates.last().before(this.upperBound))
                         removeSelectionInterval(this.upperBound, new Date(justAboveUpperBoundMs));
                 }
