@@ -12,6 +12,7 @@ import java.util.Vector;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
+import org.jdesktop.swingx.JXTreeTableUnitTest.InsertTreeTableModel;
 import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
@@ -26,6 +27,30 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         
     public JXTreeUnitTest() {
         super("JXTree Test");
+    }
+
+    /**
+     * Issue #254-swingx: expandAll doesn't expand if root not shown?
+     *
+     */
+    public void testExpandAllWithInvisible() {
+        final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+        final InsertTreeTableModel model = new InsertTreeTableModel(root);
+        int childCount = 5;
+        for (int i = 0; i < childCount; i++) {
+            model.addChild(root);
+        }
+        final JXTree treeTable = new JXTree(model);
+        // sanity...
+        assertTrue(treeTable.isRootVisible());
+        assertEquals("all children visible", childCount + 1, treeTable.getRowCount());
+        treeTable.collapseAll();
+        assertEquals(" all children invisible", 1, treeTable.getRowCount());
+        treeTable.setRootVisible(false);
+        assertEquals("no rows with invisible root", 0, treeTable.getRowCount());
+        treeTable.expandAll();
+        assertTrue(treeTable.getRowCount() > 0);
+        
     }
 
     /**

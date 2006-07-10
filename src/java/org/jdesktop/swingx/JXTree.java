@@ -444,11 +444,23 @@ public class JXTree extends JTree {
      * Expands all nodes in the tree table.
      */
     public void expandAll() {
+        if (getRowCount() == 0) {
+            expandRoot();
+        }
         for (int i = 0; i < getRowCount(); i++) {
             expandRow(i);
         }
     }
 
+    /**
+     * Expands the root path, assuming the current TreeModel has been set.
+     */
+    private void expandRoot() {
+        TreeModel              model = getModel();
+        if(model != null && model.getRoot() != null) {
+            expandPath(new TreePath(model.getRoot()));
+        }
+    }
 
     /**
      * overridden to always return a not-null array 
