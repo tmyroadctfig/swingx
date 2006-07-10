@@ -330,7 +330,10 @@ public class JXTreeTable extends JXTable {
 
         public void hitHandleDetectionFromEditCell(int column, EventObject e) {
             if (!isHitDetectionFromProcessMouse()) {
-                expandOrCollapseNode(column, e);
+                boolean hit = expandOrCollapseNode(column, e);
+                if (hit) {
+                    completeEditing();
+                }
             }
         }
 
@@ -344,8 +347,27 @@ public class JXTreeTable extends JXTable {
             if (!isHitDetectionFromProcessMouse())
                 return false;
             int col = columnAtPoint(e.getPoint());
-            return ((col >= 0) && expandOrCollapseNode(columnAtPoint(e
+            boolean hit = ((col >= 0) && expandOrCollapseNode(columnAtPoint(e
                     .getPoint()), e));
+            if (hit) {
+                completeEditing();
+            }
+            return hit;
+        }
+
+        /**
+         * complete editing if collapsed/expanded.
+         * Here: any editing is always cancelled.
+         * This is a rude partial fix to #120-jdnc: data corruption on
+         * collapse if editing. Partial, because it doesn't guard
+         * against programatic collapse/expand while editing.
+         *
+         */
+        protected void completeEditing() {
+            if (isEditing()) {
+                getCellEditor().cancelCellEditing();
+             }
+            
         }
 
         /**
