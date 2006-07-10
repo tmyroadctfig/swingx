@@ -1213,15 +1213,19 @@ public class BasicMonthViewUI extends MonthViewUI {
             if (monthView.isTraversable()) {
                 int arrowType = getTraversableButtonAt(e.getX(), e.getY());
                 if (arrowType == JXMonthView.MONTH_DOWN) {
-                    monthView.setFirstDisplayedDate(
-                            DateUtils.getPreviousMonth(monthView.getFirstDisplayedDate()));
-                    calculateDirtyRectForSelection();
-                    return;
+                    Date lowerBound = monthView.getSelectionModel().getLowerBound();
+                    if (lowerBound == null || lowerBound.getTime() < firstDisplayedDate) {
+                        monthView.setFirstDisplayedDate(DateUtils.getPreviousMonth(firstDisplayedDate));
+                        calculateDirtyRectForSelection();
+                        return;
+                    }
                 } else if (arrowType == JXMonthView.MONTH_UP) {
-                    monthView.setFirstDisplayedDate(
-                            DateUtils.getNextMonth(monthView.getFirstDisplayedDate()));
-                    calculateDirtyRectForSelection();
-                    return;
+                    Date upperBound = monthView.getSelectionModel().getUpperBound();
+                    if (upperBound == null || upperBound.getTime() > lastDisplayedDate) {
+                        monthView.setFirstDisplayedDate(DateUtils.getNextMonth(firstDisplayedDate));
+                        calculateDirtyRectForSelection();
+                        return;
+                    }
                 }
             }
 
