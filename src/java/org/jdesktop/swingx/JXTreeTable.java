@@ -126,6 +126,7 @@ public class JXTreeTable extends JXTable {
     private TreeTableCellRenderer renderer;
 
     private TreeTableHacker treeTableHacker;
+    private boolean consumedOnPress;
 
     /**
      * Constructs a JXTreeTable using a
@@ -269,14 +270,28 @@ public class JXTreeTable extends JXTable {
 
     /**
      * Overridden to enable hit handle detection a mouseEvent which triggered
-     * a expand/collapse. The exact behaviour is controlled by TreeTableHacker.
+     * a expand/collapse. 
      */
     @Override
     protected void processMouseEvent(MouseEvent e) {
-        if (getTreeTableHacker().hitHandleDetectionFromProcessMouse(e)) {
+        // BasicTableUI selects on released if the pressed had been 
+        // consumed. So we try to fish for the accompanying released
+        // here and consume it as wll. 
+        if ((e.getID() == MouseEvent.MOUSE_RELEASED) && consumedOnPress) {
+            consumedOnPress = false;
             e.consume();
             return;
         }
+        if (getTreeTableHacker().hitHandleDetectionFromProcessMouse(e)) {
+            // Issue #332-swing: hacking around selection loss.
+            // prevent the
+            // _table_ selection by consuming the mouseEvent
+            // if it resulted in a expand/collapse
+            consumedOnPress = true;
+            e.consume();
+            return;
+        }
+        consumedOnPress = false;
         super.processMouseEvent(e);
     }
     
@@ -401,13 +416,6 @@ public class JXTreeTable extends JXTable {
                                 .getX(), pressed.getY(), pressed
                                 .getClickCount(), pressed.isPopupTrigger());
                 renderer.dispatchEvent(released);
-
-                // Issue #332-swing: hacking around selection loss.
-                // it's the right direction to go (prevent the
-                // _table_ selection by consuming the mouseEvent
-                // if it resulted in a expand/collapse)
-                // but not yet stable - so I revert to the old
-                // buggy version
                 if (expansionChangedFlag) {
                     changedExpansion = true;
                 }
