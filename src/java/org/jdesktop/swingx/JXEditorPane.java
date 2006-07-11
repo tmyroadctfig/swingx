@@ -207,8 +207,8 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
         map.put(ACTION_CUT, new Actions(ACTION_CUT));
         map.put(ACTION_COPY, new Actions(ACTION_COPY));
         map.put(ACTION_PASTE, new Actions(ACTION_PASTE));
-        // this should be handled by the LF!
-        KeyStroke findStroke = KeyStroke.getKeyStroke("control F");
+        
+        KeyStroke findStroke = SearchFactory.getInstance().getSearchAccelerator();
         getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(findStroke, "find");
     }
 

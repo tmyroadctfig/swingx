@@ -38,9 +38,11 @@ import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.swingx.util.Utilities;
 
 /**
  * Factory to create, configure and show application consistent
@@ -105,6 +107,19 @@ public class SearchFactory {
           return searchFactory;
       }
     
+    /**
+     * 
+     * 
+     * @return the keyStroke to register with a findAction.
+     */
+    public KeyStroke getSearchAccelerator() {
+        // JW: this should be handled by the LF! 
+        // get the accelerator mnemonic from the UIManager
+        String findMnemonic = "F";
+        KeyStroke findStroke = Utilities.stringToKey("D-" + findMnemonic);
+        return findStroke;
+        
+    }
     /**
      * sets the shared SearchFactory.
      * 

@@ -229,8 +229,8 @@ public class JXList extends JList {
         
         Action findAction = createFindAction();
         getActionMap().put("find", findAction);
-        // JW: this should be handled by the LF!
-        KeyStroke findStroke = KeyStroke.getKeyStroke("control F");
+        
+        KeyStroke findStroke = SearchFactory.getInstance().getSearchAccelerator();
         getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(findStroke, "find");
         
     }

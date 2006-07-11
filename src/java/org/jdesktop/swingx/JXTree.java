@@ -293,8 +293,8 @@ public class JXTree extends JTree {
         map.put("expand-all", new Actions("expand-all"));
         map.put("collapse-all", new Actions("collapse-all"));
         map.put("find", createFindAction());
-        // JW: this should be handled by the LF!
-        KeyStroke findStroke = KeyStroke.getKeyStroke("control F");
+
+        KeyStroke findStroke = SearchFactory.getInstance().getSearchAccelerator();
         getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(findStroke, "find");
 
     }
