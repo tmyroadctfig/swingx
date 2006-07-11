@@ -123,15 +123,20 @@ public class LookAndFeelAddons {
 
   /**
    * Adds the given defaults in UIManager.
-   *
-   * Note: the values are added only if they do not exist in the
-   * existing look and feel defaults. This makes it possible for look
-   * and feel implementors to override SwingX defaults.
+   * 
+   * Note: the values are added only if they do not exist in the existing look
+   * and feel defaults. This makes it possible for look and feel implementors to
+   * override SwingX defaults.
+   * 
+   * Note: the array is traversed in reverse order. If a key is found twice in
+   * the array, the key/value with the highest position in the array gets
+   * precedence over the other key in the array
    * 
    * @param keysAndValues
    */
-  public void loadDefaults(Object[] keysAndValues) {
-    for (int i = 0, c = keysAndValues.length; i < c; i = i + 2) {
+  public void loadDefaults(Object[] keysAndValues) {    
+    // Go in reverse order so the most recent keys get added first...
+    for (int i = keysAndValues.length - 2; i >= 0; i = i - 2) {
       if (UIManager.getLookAndFeelDefaults().get(keysAndValues[i]) == null) {
         UIManager.getLookAndFeelDefaults().put(keysAndValues[i], keysAndValues[i + 1]);
       }
