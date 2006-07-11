@@ -91,9 +91,6 @@ public class ActionManager {
     // key: value of ID_ATTR, value instanceof AbstractAction
     private Map actionMap;
 
-    // Container factory instance for this ActionManager
-    private ActionContainerFactory factory;
-
     /**
      * Shared instance of the singleton ActionManager.
      */
@@ -114,24 +111,6 @@ public class ActionManager {
     public ActionManager() {
     }
 
-    /**
-     * Return the Action Container Factory associated with this ActionManager
-     * instance. Will always return a factory instance.
-     */
-    public ActionContainerFactory getFactory() {
-        if (factory == null) {
-            factory = new ActionContainerFactory(this);
-        }
-        return factory;
-    }
-
-    /**
-     * This method should be used to associate a subclassed ActionContainerFactory
-     * with this ActionManager.
-     */
-    public void setFactory(ActionContainerFactory factory) {
-        this.factory = factory;
-    }
 
     /**
      * Return the instance of the ActionManger. If this has not been explicity

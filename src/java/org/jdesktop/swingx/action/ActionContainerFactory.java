@@ -81,6 +81,13 @@ public class ActionContainerFactory {
     private Map groupMap;
 
     /**
+     * Constructs an container factory which uses the default 
+     * ActionManager.
+     *
+     */
+    public ActionContainerFactory() {
+    }
+    /**
      * Constructs an container factory which uses managed actions.
      *
      * @param manager use the actions managed with this manager for
@@ -109,15 +116,7 @@ public class ActionContainerFactory {
      * ActionContainerFactory
      */
     public void setActionManager(ActionManager manager) {
-        ActionManager oldManager = this.manager;
-        if (oldManager != null) {
-            oldManager.setFactory(null);
-        }
         this.manager = manager;
-        
-        if (manager != null) {
-            manager.setFactory(this);
-        }
     }
 
     /**

@@ -108,7 +108,7 @@ public class TargetableActionTest extends TestCase {
         list.add("expand-all");
 
         // Use the factory to build components from lists.
-        ActionContainerFactory factory = manager.getFactory();
+        ActionContainerFactory factory = new ActionContainerFactory(manager);
         JToolBar toolbar = factory.createToolBar(list);
 
         JPanel panel = new JPanel(new GridLayout(2,2, 5, 5));

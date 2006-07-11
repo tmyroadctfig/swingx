@@ -200,7 +200,7 @@ public class JXEditorPaneTest extends InteractiveTestCase {
         
         
         editor.setText(buffer.toString());
-        ActionContainerFactory factory = manager.getFactory();
+        ActionContainerFactory factory = new ActionContainerFactory(manager);
 
       JToolBar toolbar = factory.createToolBar(actionNames);
       toolbar.setOrientation(JToolBar.VERTICAL);
@@ -237,7 +237,7 @@ public class JXEditorPaneTest extends InteractiveTestCase {
             buffer.append("\n" + actions[i].toString());
         }
         editor.setText(buffer.toString());
-        ActionContainerFactory factory = manager.getFactory();
+        ActionContainerFactory factory = new ActionContainerFactory(manager);
 
       JToolBar toolbar = factory.createToolBar(actionNames);
       toolbar.setOrientation(JToolBar.VERTICAL);
@@ -288,7 +288,7 @@ public class JXEditorPaneTest extends InteractiveTestCase {
         
         // Populate the toolbar. Must use the ActionContainerFactory to ensure
         // that toggle actions are supported.
-        ActionContainerFactory factory = manager.getFactory();
+        ActionContainerFactory factory = new ActionContainerFactory(manager);
 
 //        JToolBar toolbar = new JToolBar();
 //        for (int i = 0; i < actions.length; i++) {
