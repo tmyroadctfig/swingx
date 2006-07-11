@@ -25,6 +25,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -59,7 +60,7 @@ import javax.swing.SwingUtilities;
  * @author rbair
  */
 public class JXImagePanel extends JXPanel {
-    public static enum Style {CENTERED, TILED, SCALED};
+    public static enum Style {CENTERED, TILED, SCALED, SCALED_KEEP_ASPECT_RATIO};
     private static final Logger LOG = Logger.getLogger(JXImagePanel.class
             .getName());
     /**
@@ -201,22 +202,24 @@ public class JXImagePanel extends JXPanel {
      */
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-//        Insets insets = getInsets();
-//        g.fillRect(insets.left, insets.top, getWidth() - insets.right - insets.left, getHeight() - insets.bottom - insets.top);
         Graphics2D g2 = (Graphics2D)g;
         if (img != null) {
-            int imgWidth = img.getWidth(null);
-            int imgHeight = img.getHeight(null);
+            final int imgWidth = img.getWidth(null);
+            final int imgHeight = img.getHeight(null);
             if (imgWidth == -1 || imgHeight == -1) {
                 //image hasn't completed loading, return
                 return;
             }
             
+            Insets insets = getInsets();
+            final int pw = getWidth() - insets.left - insets.right;
+            final int ph = getHeight() - insets.top - insets.bottom;
+            
             switch (style) {
                 case CENTERED:
                     Rectangle clipRect = g2.getClipBounds();
-                    int imageX = (getWidth() - imgWidth) / 2;
-                    int imageY = (getHeight() - imgHeight) / 2;
+                    int imageX = (pw - imgWidth) / 2 + insets.left;
+                    int imageY = (ph - imgHeight) / 2 + insets.top;
                     Rectangle r = SwingUtilities.computeIntersection(imageX, imageY, imgWidth, imgHeight, clipRect);
                     if (r.x == 0 && r.y == 0 && (r.width == 0 || r.height == 0)) {
                         return;
@@ -230,17 +233,33 @@ public class JXImagePanel extends JXPanel {
                     int txClipY = clipRect.y - imageY;
                     int txClipW = clipRect.width;
                     int txClipH = clipRect.height;
-                    
+
                     g2.drawImage(img, clipRect.x, clipRect.y, clipRect.x + clipRect.width, clipRect.y + clipRect.height,
                             txClipX, txClipY, txClipX + txClipW, txClipY + txClipH, null);
                     break;
                 case TILED:
                 case SCALED:
-                    g2.drawImage(img, 0, 0, getWidth(), getHeight(), null);
+                    g2.drawImage(img, insets.left, insets.top, pw, ph, null);
+                    break;
+                case SCALED_KEEP_ASPECT_RATIO:
+                    int w;
+                    int h;
+                    if ((imgWidth - pw) > (imgHeight - ph)) {
+                        w = pw;
+                        final float ratio = ((float)w) / ((float)imgWidth);
+                        h = (int)(imgHeight * ratio);
+                    } else {
+                        h = ph;
+                        final float ratio = ((float)h) / ((float)imgHeight);
+                        w = (int)(imgWidth * ratio);
+                    }
+                    final int x = (pw - w) / 2 + insets.left;
+                    final int y = (ph - h) / 2 + insets.top;
+                    g2.drawImage(img, x, y, w, h, null);
                     break;
                 default:
                     LOG.fine("unimplemented");
-                    g2.drawImage(img, 0, 0, this);
+                    g2.drawImage(img, insets.left, insets.top, this);
                     break;
             }
         }
