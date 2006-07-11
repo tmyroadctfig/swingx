@@ -22,7 +22,7 @@ import org.jdesktop.swingx.table.ColumnControlButton.ColumnVisibilityAction;
  * 
  * 
  */
-public interface ControlPopup {
+public interface ColumnControlPopup {
 
     /**
      * Updates all internal visuals after changing a UI-delegate. <p>

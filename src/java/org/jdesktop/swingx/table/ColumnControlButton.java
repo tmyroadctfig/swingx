@@ -59,7 +59,7 @@ import org.jdesktop.swingx.action.ActionContainerFactory;
  * 
  * This class is responsible for handling/providing/updating the lists of 
  * actions and to keep all action's state in synch with Table-/Column state.
- * All (most?) visible behaviour of the popup is delegated to a DefaultControlPopup. 
+ * All (most?) visible behaviour of the popup is delegated to a DefaultColumnControlPopup. 
  * 
  * 
  * TODO: the table reference is a potential leak
@@ -71,7 +71,7 @@ import org.jdesktop.swingx.action.ActionContainerFactory;
 public class ColumnControlButton extends JButton {
 
     /** exposed for testing. */
-    protected ControlPopup popupMenu = null;
+    protected ColumnControlPopup popup;
     /** the table which is controlled by this. */
     private JXTable table;
     /** a marker to auto-recognize actions which should be added to the popup */
@@ -89,7 +89,7 @@ public class ColumnControlButton extends JButton {
     public void updateUI() {
         super.updateUI();
         setMargin(new Insets(1, 2, 2, 1)); // Make this LAF-independent
-        getControlPopup().updateUI();
+        getColumnControlPopup().updateUI();
     }
 
     /** 
@@ -101,13 +101,13 @@ public class ColumnControlButton extends JButton {
      *
      */ 
     public void togglePopup() {
-        getControlPopup().toggleVisibility(this);
+        getColumnControlPopup().toggleVisibility(this);
     }
 
     @Override
     public void applyComponentOrientation(ComponentOrientation o) {
         super.applyComponentOrientation(o);
-        getControlPopup().applyComponentOrientation(o);
+        getColumnControlPopup().applyComponentOrientation(o);
     }
 
    
@@ -258,12 +258,12 @@ public class ColumnControlButton extends JButton {
     // ---------------------- the popup
 
     /**
-     * A default implementation of ControlPopup, using a JPopupMenu with 
+     * A default implementation of ColumnControlPopup, using a JPopupMenu with 
      * MenuItems corresponding to the Actions as provided by the ColumnControlButton.
      * 
      * 
      */
-    public class DefaultControlPopup implements ControlPopup {
+    public class DefaultColumnControlPopup implements ColumnControlPopup {
         private JPopupMenu popupMenu;
 
         //------------------ public methods to control visibility status
@@ -380,7 +380,7 @@ public class ColumnControlButton extends JButton {
 
         /**
          * 
-         * @return the popupMenu to add menuitems. Guaranteed to be != null.
+         * @return the popup to add menuitems. Guaranteed to be != null.
          */
         protected JPopupMenu getPopupMenu() {
             if (popupMenu == null) {
@@ -394,23 +394,23 @@ public class ColumnControlButton extends JButton {
 
     /**
      * 
-     * @return the DefaultControlPopup for showing the items.
+     * @return the DefaultColumnControlPopup for showing the items.
      */
-    protected ControlPopup getControlPopup() {
-        if (popupMenu == null) {
-            popupMenu = createControlPopup();
+    protected ColumnControlPopup getColumnControlPopup() {
+        if (popup == null) {
+            popup = createColumnControlPopup();
         }
-        return popupMenu;
+        return popup;
     }
 
     /**
-     * Factory method to return a DefaultControlPopup.
+     * Factory method to return a DefaultColumnControlPopup.
      * Subclasses can override to hook custom implementations.
      * 
-     * @return the DefaultControlPopup used.
+     * @return the DefaultColumnControlPopup used.
      */
-    protected ControlPopup createControlPopup() {
-        return new DefaultControlPopup();
+    protected ColumnControlPopup createColumnControlPopup() {
+        return new DefaultColumnControlPopup();
     }
 
 
@@ -419,7 +419,7 @@ public class ColumnControlButton extends JButton {
     /**
      * adjust internal state to after table's column model property has changed.
      * Handles cleanup of listeners to the old/new columnModel (listens to the
-     * new only if we can control column visibility) and content of popupMenu.
+     * new only if we can control column visibility) and content of popup.
      * 
      * @param oldModel the old ColumnModel we had been listening to.
      */
@@ -452,7 +452,7 @@ public class ColumnControlButton extends JButton {
         return table.getColumnModel() instanceof TableColumnModelExt;
     }
  
-//  ------------------------ updating the popupMenu
+//  ------------------------ updating the popup
     /**
      * Populates the popup from scratch.
      * 
@@ -476,7 +476,7 @@ public class ColumnControlButton extends JButton {
      */
     protected void clearAll() {
         clearColumnVisibilityActions();
-        getControlPopup().removeAll();
+        getColumnControlPopup().removeAll();
     }
 
 
@@ -497,25 +497,25 @@ public class ColumnControlButton extends JButton {
     /**
      * Adds visibility actions into the popup view.
      * 
-     * Here: delegates the list of actions to the DefaultControlPopup.
+     * Here: delegates the list of actions to the DefaultColumnControlPopup.
      * <p>
      * PRE: columnVisibilityActions populated before calling this.
      * 
      */
     protected void addVisibilityActionItems() {
-        getControlPopup().addVisibilityActionItems(
+        getColumnControlPopup().addVisibilityActionItems(
                 Collections.unmodifiableList(getColumnVisibilityActions()));
     }
 
     /**
      * Adds additional actions to the popup.
      * Here: delegates the list of actions as returned by #getAdditionalActions() 
-     *   to the DefaultControlPopup. 
+     *   to the DefaultColumnControlPopup. 
      * Does nothing if #getColumnActions() is empty.
      * 
      */
     protected void addAdditionalActionItems() {
-        getControlPopup().addAdditionalActionItems(
+        getColumnControlPopup().addAdditionalActionItems(
                 Collections.unmodifiableList(getAdditionalActions()));
     }
 
@@ -558,10 +558,10 @@ public class ColumnControlButton extends JButton {
      * @return a list containing all additional actions to include into the popup.
      */
     protected List<Action> getAdditionalActions() {
-        Object[] actionKeys = getColumnControlActionKeys();
+        List actionKeys = getColumnControlActionKeys();
         List<Action> actions = new ArrayList<Action>();
-        for (int i = 0; i < actionKeys.length; i++) {
-            actions.add(table.getActionMap().get(actionKeys[i]));
+        for (Object key : actionKeys) {
+          actions.add(table.getActionMap().get(key));
         }
         return actions;
     }
@@ -570,23 +570,26 @@ public class ColumnControlButton extends JButton {
      * Looks up and returns action keys to access actions in the 
      * table's actionMap which should be included into the popup.
      * 
-     * Here: all keys with isColumnControlActionKey(key). 
+     * Here: all keys with isColumnControlActionKey(key). The list 
+     * is sorted by those keys.
      * 
      * @return the action keys of table's actionMap entries whose
      *   action should be included into the popup.
      */
-    protected Object[] getColumnControlActionKeys() {
+    @SuppressWarnings("unchecked")
+    protected List getColumnControlActionKeys() {
         Object[] allKeys = table.getActionMap().allKeys();
-        List<Object> columnKeys = new ArrayList<Object>();
+        List columnKeys = new ArrayList();
         for (int i = 0; i < allKeys.length; i++) {
             if (isColumnControlActionKey(allKeys[i])) {
                 columnKeys.add(allKeys[i]);
             }
         }
-        
-        Object[] actionKeys = columnKeys.toArray();
-        Arrays.sort(actionKeys);
-        return actionKeys;
+        // JW: this will blow for non-String keys!
+        // so this method is less decoupled from the
+        // decision method isControl than expected. 
+        Collections.sort(columnKeys);
+        return columnKeys;
     }
 
     /**

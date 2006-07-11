@@ -24,7 +24,7 @@ import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.table.ColumnControlButton.ColumnVisibilityAction;
-import org.jdesktop.swingx.table.ColumnControlButton.DefaultControlPopup;
+import org.jdesktop.swingx.table.ColumnControlButton.DefaultColumnControlPopup;
 import org.jdesktop.swingx.util.AncientSwingTeam;
 
 /**
@@ -38,12 +38,12 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
      * the column's visible property. <p>
      * 
      * Looks as if the non-synch of action.setSelected only shows 
-     * if the ControlPopup doesn't create a menuitem via ActionFactory: the
+     * if the ColumnControlPopup doesn't create a menuitem via ActionFactory: the
      * listeners internally installed via ActionFactory probably take care?
      *  <p>
      * 
      * An analogous test in the incubator (in kleopatra/.../table) did fail
-     * for a dialog based custom ControlPopup. For now, changed the visibility
+     * for a dialog based custom ColumnControlPopup. For now, changed the visibility
      * action to explicitly update the tableColumn. All tests are passing,
      * but need to further evaluate.
      *
@@ -172,7 +172,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
         table.setColumnControlVisible(true);
         wrapWithScrollingInFrame(table, "");
         ColumnControlButton columnControl = (ColumnControlButton) table.getColumnControl();
-        Component[] items = ((DefaultControlPopup) columnControl.getControlPopup()).getPopupMenu().getComponents();
+        Component[] items = ((DefaultColumnControlPopup) columnControl.getColumnControlPopup()).getPopupMenu().getComponents();
         ((JMenuItem) items[0]).setSelected(false);
         assertEquals(1, table.getColumnCount());
     }
@@ -196,9 +196,9 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
        final TableColumnExt priorityColumn = table.getColumnExt("First Name");
        priorityColumn.setVisible(false);
        ColumnControlButton columnControl = (ColumnControlButton) table.getColumnControl();
-       assertNotNull("popup menu not null", columnControl.popupMenu);
+       assertNotNull("popup menu not null", columnControl.popup);
        int columnMenuItems = 0;
-       Component[] items = ((DefaultControlPopup) columnControl.getControlPopup()).getPopupMenu().getComponents();
+       Component[] items = ((DefaultColumnControlPopup) columnControl.getColumnControlPopup()).getPopupMenu().getComponents();
        for (int i = 0; i < items.length; i++) {
            if (!(items[i] instanceof JMenuItem)) {
                break;
@@ -208,7 +208,7 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
        // wrong assumption - has separator and actions!
        assertEquals("menu items must be equal to columns", totalColumnCount, 
                columnMenuItems);
-       JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem) ((DefaultControlPopup) columnControl.getControlPopup()).getPopupMenu()
+       JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem) ((DefaultColumnControlPopup) columnControl.getColumnControlPopup()).getPopupMenu()
            .getComponent(0);
        // sanit assert
        assertEquals(priorityColumn.getHeaderValue(), menuItem.getText());
