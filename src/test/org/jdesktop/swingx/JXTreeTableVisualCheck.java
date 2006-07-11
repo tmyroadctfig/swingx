@@ -19,7 +19,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
@@ -32,6 +31,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 
+import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.ConditionalHighlighter;
@@ -64,10 +64,10 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Highligh.*");
 //               test.runInteractiveTests("interactive.*ToolTip.*");
-           test.runInteractiveTests("interactive.*DnD.*");
-             test.runInteractiveTests("interactive.*Compare.*");
-//             test.runInteractiveTests("interactive.*Edit.*");
-             test.runInteractiveTests("interactive.*Large.*");
+//           test.runInteractiveTests("interactive.*DnD.*");
+//             test.runInteractiveTests("interactive.*Compare.*");
+//             test.runInteractiveTests("interactive.*RowHeightCompare.*");
+             test.runInteractiveTests("interactive.*Edit.*");
         } catch (Exception ex) {
 
         }
@@ -116,10 +116,6 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
             public void actionPerformed(ActionEvent e) {
                 TreePath path = model.getPathToRoot(container.getContentPane());
                 table.scrollPathToVisible(path);
-//                ((JTree) table.getDefaultRenderer(
-//                        AbstractTreeTableModel.hierarchicalColumnClass))
-//                        .scrollPathToVisible(path);
-                
                 tree.scrollPathToVisible(path);
                 
             }
@@ -414,7 +410,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         tree.setCellRenderer(renderer);
         treeTable.setTreeCellRenderer(renderer);
         treeTable.setRootVisible(true);
-        JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "update expanded parent on insert");
+        JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "update expanded parent on insert - rendering changed for > 3 children");
         Action insertAction = new AbstractAction("insert node selected treetable") {
 
             public void actionPerformed(ActionEvent e) {
@@ -575,28 +571,24 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      */
     public void interactiveToggleDnDEnabled() {
         final JXTreeTable treeTable = new JXTreeTable(treeTableModel);
-        LOG.info("hierarchical cell" + treeTable.getCellRect(0, 0, true));
-        // when used for quick testing #332-swingx  
-        treeTable.setExpandsSelectedPaths(false);
         treeTable.setColumnControlVisible(true);
         final JXTree tree = new JXTree(treeTableModel);
         JXTree renderer = (JXTree) treeTable.getCellRenderer(0, 0);
         tree.setRowHeight(renderer.getRowHeight());
         JXFrame frame = wrapWithScrollingInFrame(treeTable, tree, "toggle dragEnabled (starting with false)");
         frame.setVisible(true);
-        Action action = new AbstractAction("Toggle dnd") {
+        Action action = new AbstractActionExt("Toggle dnd: false") {
 
             public void actionPerformed(ActionEvent e) {
                 
                 boolean dragEnabled = !treeTable.getDragEnabled();
                 treeTable.setDragEnabled(dragEnabled);
                 tree.setDragEnabled(dragEnabled);
-               
+                setName("Toggle dnd: " + dragEnabled);
             }
             
         };
         addAction(frame, action);
-        LOG.info("hierarchical cell" + treeTable.getCellRect(0, 0, true));
     }
 
     public void interactiveTestFocusedCellBackground() {
