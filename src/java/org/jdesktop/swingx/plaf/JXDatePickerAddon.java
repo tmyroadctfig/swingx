@@ -41,20 +41,10 @@ public class JXDatePickerAddon extends AbstractComponentAddon {
         defaults.addAll(Arrays.asList(new Object[]{
                 defaults.add(JXDatePicker.uiClassID),
                 defaults.add("org.jdesktop.swingx.plaf.basic.BasicDatePickerUI"),
-                "JXDatePicker.linkFormat",
-                "Today is {0,date, dd MMMM yyyy}",
-                "JXDatePicker.longFormat",
-                "EEE MM/dd/yyyy",
-                "JXDatePicker.mediumFormat",
-                "MM/dd/yyyy",
-                "JXDatePicker.shortFormat",
-                "MM/dd",
                 "JXDatePicker.border",
                 new BorderUIResource(BorderFactory.createCompoundBorder(
                         LineBorder.createGrayLineBorder(),
-                        BorderFactory.createEmptyBorder(3, 3, 3, 3))),
-                "JXDatePicker.numColumns",
-                10
+                        BorderFactory.createEmptyBorder(3, 3, 3, 3)))
         }));
     }
 
