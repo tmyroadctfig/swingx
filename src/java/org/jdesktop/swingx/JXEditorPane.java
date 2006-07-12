@@ -304,10 +304,10 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
         public boolean isEnabled(Object sender) {
                 String name = getName();
                 if (ACTION_UNDO.equals(name)) {
-                    return undoManager.canUndo();
+                    return isEditable() && undoManager.canUndo();
                 } 
                 if (ACTION_REDO.equals(name)) {
-                    return undoManager.canRedo();
+                    return isEditable() && undoManager.canRedo();
                 } 
                 if (ACTION_PASTE.equals(name)) {
                     if (!isEditable()) return false;

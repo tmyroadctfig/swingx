@@ -58,22 +58,4 @@ public class JXEditorPaneIssues extends JXEditorPaneTest {
         assertEquals("undo must have no effect", testText, editor.getText());
     }
  
-    /**
-     * Issue #289-swingx: JXEditorPane actions should be disabled if not
-     * applicable.
-     * undo is enabled if there is selected text and editor editable
-     * disabled otherwise.
-     * 
-     */
-    public void testXDisabledUndoAction() {
-        JXEditorPane editor = new JXEditorPane();
-        editor.setEditable(false);
-        editor.setText(testText);
-        assertEquals(testText, editor.getText());
-        Action action = editor.getActionMap().get("undo");
-        assertFalse("undo must not be enabled", action.isEnabled());
-        ActionManager.getInstance().addAction(ActionFactory.createTargetableAction("undo", "Undo", "U"));
-        TargetManager.getInstance().addTarget(editor);
-    }
-
 }

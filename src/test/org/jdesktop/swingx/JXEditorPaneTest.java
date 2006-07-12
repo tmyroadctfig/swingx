@@ -32,31 +32,6 @@ public class JXEditorPaneTest extends InteractiveTestCase {
             .getName());
     private static String testText = "This is an example of some text";
 
-
-    public void testEditorActionManagerWoes() {
-        JXEditorPane editable = new JXEditorPane();
-        assertTrue(editable.isEditable());
-        ActionManager.getInstance().addAction(ActionFactory.createTargetableAction("undo", "Undo", "U"));
-        TargetManager.getInstance().addTarget(editable);
-        
-    }
-    
-    /**
-     * Issue #289-swingx: JXEditorPane actions should be disabled if not
-     * applicable.
-     * undo must not perform on non-editable editor.
-     * 
-     */
-    public void testXUndoActionNotEditable() {
-        JXEditorPane editor = new JXEditorPane();
-        editor.setEditable(false);
-        editor.setText(testText);
-        assertEquals(testText, editor.getText());
-        Action action = editor.getActionMap().get("undo");
-        action.actionPerformed(null);
-        assertEquals("undo must have no effect",testText, editor.getText());
-    }
- 
     /**
      * Issue #289-swingx: JXEditorPane actions should be disabled if not
      * applicable.
@@ -71,8 +46,6 @@ public class JXEditorPaneTest extends InteractiveTestCase {
         assertEquals(testText, editor.getText());
         Action action = editor.getActionMap().get("undo");
         assertFalse("undo must not be enabled", action.isEnabled());
-        ActionManager.getInstance().addAction(ActionFactory.createTargetableAction("undo", "Undo", "U"));
-        TargetManager.getInstance().addTarget(editor);
     }
 
     /**
