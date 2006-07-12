@@ -50,6 +50,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JList;
+import javax.swing.JPasswordField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
@@ -61,6 +62,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.EditorKit;
 import javax.swing.text.Element;
+import javax.swing.text.JTextComponent;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.Segment;
 import javax.swing.text.SimpleAttributeSet;
@@ -222,10 +224,19 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
     }
 
     /**
-     * Updates the state of the actions in response to an undo/redo operation.
+     * Updates the state of the actions in response to an undo/redo operation. <p>
+     * 
      */
     private void updateActionState() {
         // Update the state of the undo and redo actions
+        // JW: fiddling with actionManager's actions state? I'm pretty sure
+        // we don't want that: the manager will get nuts with multiple
+        // components with different state.
+        // It's up to whatever manager to listen
+        // to our changes and update itself accordingly. Which is not
+        // well supported with the current design ... nobody 
+        // really cares about enabled as it should. 
+        //
         Runnable doEnabled = new Runnable() {
                 public void run() {
                     ActionManager manager = ActionManager.getInstance();
@@ -239,6 +250,8 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
     /**
      * A small class which dispatches actions.
      * TODO: Is there a way that we can make this static?
+     * JW: these if-constructs are totally crazy ... we live in OO world!
+     * 
      */
     private class Actions extends UIAction {
         Actions(String name) {
@@ -286,6 +299,43 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
             }
 
         }
+
+        @Override
+        public boolean isEnabled(Object sender) {
+                String name = getName();
+                if (ACTION_UNDO.equals(name)) {
+                    return undoManager.canUndo();
+                } 
+                if (ACTION_REDO.equals(name)) {
+                    return undoManager.canRedo();
+                } 
+                if (ACTION_PASTE.equals(name)) {
+                    if (!isEditable()) return false;
+                    // is this always possible?
+                    boolean dataOnClipboard = false;
+                    try {
+                        dataOnClipboard = getToolkit()
+                        .getSystemClipboard().getContents(null) != null;
+                    } catch (Exception e) {
+                        // can't do anything - clipboard unaccessible
+                    }
+                    return dataOnClipboard;
+                } 
+                boolean selectedText = getSelectionEnd()
+                    - getSelectionStart() > 0;
+                if (ACTION_CUT.equals(name)) {
+                   return isEditable() && selectedText;
+                }
+                if (ACTION_COPY.equals(name)) {
+                    return selectedText;
+                } 
+                if (ACTION_FIND.equals(name)) {
+                    return getDocument().getLength() > 0;
+                }
+                return true;
+        }
+        
+        
     }
 
     /**

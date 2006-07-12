@@ -56,30 +56,63 @@ public class JXEditorPaneTest extends InteractiveTestCase {
     /**
      * Issue #289-swingx: JXEditorPane actions should be disabled if not
      * applicable.
-     * Can of worms? super does nothing to enable/disable default actions?
-     * TransferHandler's actions are mixed in?
+     * cut is enabled if there is selected text and editor editable
+     * disabled otherwise.
      * 
      */
-    public void testXDisabledActionsOnNotEditable() {
+    public void testXDisabledCutActionUnselected() {
         JXEditorPane editor = new JXEditorPane();
-        editor.setEditable(false);
-        Action action = editor.getActionMap().get("paste");
-        LOG.info("enabled " + action.isEnabled());
+        editor.setText("some");
+        editor.setEditable(true);
+        Action action = editor.getActionMap().get("cut");
+        assertFalse("cut of unselected must not be enabled", action.isEnabled());
         
     }
     
     /**
      * Issue #289-swingx: JXEditorPane actions should be disabled if not
      * applicable.
-     * Can of worms? super does nothing to enable/disable default actions?
-     * TransferHandler's actions are mixed in?
+     * cut is enabled if there is selected text and editor editable
+     * disabled otherwise.
+     */
+    public void testXDisabledCutActionOnNotEditable() {
+        JXEditorPane editor = new JXEditorPane();
+        editor.setText("some");
+        editor.selectAll();
+        editor.setEditable(false);
+        Action action = editor.getActionMap().get("cut");
+        assertFalse("cut of uneditable editor must not be enabled", action.isEnabled());
+        
+    }
+    /**
+     * Issue #289-swingx: JXEditorPane actions should be disabled if not
+     * applicable.
+     * 
+    *  paste is enabled if the editor is editable and the clipboard isn't empty,
+    *  disabled otherwise.
      * 
      */
-    public void testDisabledActionsOnNotEditable() {
-        JEditorPane editor = new JEditorPane();
+    public void testXDisabledPasteActionOnNotEditable() {
+        JXEditorPane editor = new JXEditorPane();
         editor.setEditable(false);
         Action action = editor.getActionMap().get("paste");
-        LOG.info("enabled " + action.isEnabled());
+        assertFalse("paste of uneditable editor must not be enabled", action.isEnabled());
+        
+    }
+    
+    /**
+     * Issue #289-swingx: JXEditorPane actions should be disabled if not
+     * applicable.
+    * 
+    *  paste is enabled if the editor is editable the clipboard isn't empty.
+    *  can't really test ... don't want to clear the clipboard as a test side-effect. 
+     */
+    public void testXDisabledPasteEmptyClipboard() {
+        JXEditorPane editor = new JXEditorPane();
+        editor.setEditable(true);
+        Action action = editor.getActionMap().get("paste");
+        // can't really test - want to erase system clipboard?
+//        assertFalse("paste with empty clipboard must not be enabled", action.isEnabled());
         
     }
     
