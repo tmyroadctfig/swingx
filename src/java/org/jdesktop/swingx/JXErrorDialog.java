@@ -537,12 +537,12 @@ public class JXErrorDialog extends JDialog {
                 if(incidentInfo.getErrorException() != null) {
                     //convert the stacktrace into a more pleasent bit of HTML
                     StringBuffer html = new StringBuffer("<html>");
-                    html.append("<h2>" + incidentInfo.getHeader() + "</h2>");
+                    html.append("<h2>" + escapeXml(incidentInfo.getHeader()) + "</h2>");
                     html.append("<HR size='1' noshade>");
                     html.append("<div></div>");
                     html.append("<b>Message:</b>");
                     html.append("<pre>");
-                    html.append("    " + incidentInfo.getErrorException().toString());
+                    html.append("    " + escapeXml(incidentInfo.getErrorException().toString()));
                     html.append("</pre>");
                     html.append("<b>Level:</b>");
                     html.append("<pre>");
@@ -551,7 +551,7 @@ public class JXErrorDialog extends JDialog {
                     html.append("<b>Stack Trace:</b>");
                     html.append("<pre>");
                     for (StackTraceElement el : incidentInfo.getErrorException().getStackTrace()) {
-                        html.append("    " + el.toString() + "\n");
+                        html.append("    " + el.toString().replace("<init>", "&lt;init&gt;") + "\n");
                     }
                     html.append("</pre></html>");
                     details = html.toString();
@@ -873,5 +873,15 @@ public class JXErrorDialog extends JDialog {
             return TransferHandler.COPY;
         }
         
+    }
+    
+    /**
+     * Converts the incoming string to an escaped output string. This method
+     * is far from perfect, only escaping &lt;, &gt; and &amp; characters
+     */
+    private static String escapeXml(String input) {
+        String s = input.replace("&", "&amp;");
+        s = s.replace("<", "&lt;");
+        return s = s.replace(">", "&gt;");
     }
 }
