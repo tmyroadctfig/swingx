@@ -706,6 +706,7 @@ public class JXEditorPane extends JEditorPane implements /*Searchable, */Targeta
             Element elem = document.getCharacterElement(dot);
             AttributeSet set = elem.getAttributes();
 
+            // JW: see comment in updateActionState
             ActionManager manager = ActionManager.getInstance();
             manager.setSelected("font-bold", StyleConstants.isBold(set));
             manager.setSelected("font-italic", StyleConstants.isItalic(set));
