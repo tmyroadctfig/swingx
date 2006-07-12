@@ -462,11 +462,11 @@ public class Utilities {
                     if (i != null) {
                         //#26854 - Default accelerator should be Command on mac
                         if (wildcard) {
-                            needed |= Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+                            needed |= getMenuShortCutKeyMask();
 
                             if ((getOperatingSystem() & OS_MAC) != 0) {
                                 if (!usableKeyOnMac(i.intValue(), needed)) {
-                                    needed &= ~Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+                                    needed &= ~getMenuShortCutKeyMask();
                                     needed |= KeyEvent.CTRL_MASK;
                                 }
                             }
@@ -489,6 +489,18 @@ public class Utilities {
         } catch (NoSuchElementException ex) {
             return null;
         }
+    }
+    /**
+     * need to guard against headlessExceptions when testing.
+     * @return the acceletor mask for shortcuts.
+     */
+    private static int getMenuShortCutKeyMask() {
+        if (GraphicsEnvironment.isHeadless()) {
+            return ((getOperatingSystem() & OS_MAC) != 0) ? 
+                    KeyEvent.META_MASK : KeyEvent.CTRL_MASK;
+        }
+ 
+        return Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
     }
 
     private static final boolean usableKeyOnMac(int key, int mask) {
