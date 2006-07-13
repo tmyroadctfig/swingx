@@ -363,24 +363,40 @@ public class JXTreeTable extends JXTable {
 
         protected boolean expansionChangedFlag;
 
+        /**
+         * Decision whether the handle hit detection
+         *   should be done in processMouseEvent or editCellAt.
+         * Here: returns false.
+         * 
+         * @return true for handle hit detection in processMouse, false
+         *   for editCellAt.
+         */
         protected boolean isHitDetectionFromProcessMouse() {
             return false;
         }
 
+        /**
+        * Entry point for hit handle detection called from editCellAt, 
+        * does nothing if isHitDetectionFromProcessMouse is true;
+        * 
+        * @see #editCellAt(int, int, EventObject)
+        * @see #isHitDetectionFromProcessMouse()
+        */
         public void hitHandleDetectionFromEditCell(int column, EventObject e) {
             if (!isHitDetectionFromProcessMouse()) {
-                boolean hit = expandOrCollapseNode(column, e);
-                if (hit) {
-                    completeEditing();
-                }
+                expandOrCollapseNode(column, e);
             }
         }
 
         /**
-         * Overridden to try to intercept a mouseEvent which triggered a
-         * expand/collapse.
+         * Entry point for hit handle detection called from processMouse.
+         * Does nothing if isHitDetectionFromProcessMouse is false. 
          * 
-         * @see #expandOrCollapseNode(int, EventObject)
+         * @return true if the mouseEvent triggered an expand/collapse in
+         *   the renderer, false otherwise. 
+         *   
+         * @see #processMouseEvent(MouseEvent)
+         * @see #isHitDetectionFromProcessMouse();
          */
         public boolean hitHandleDetectionFromProcessMouse(MouseEvent e) {
             if (!isHitDetectionFromProcessMouse())
@@ -388,44 +404,43 @@ public class JXTreeTable extends JXTable {
             int col = columnAtPoint(e.getPoint());
             boolean hit = ((col >= 0) && expandOrCollapseNode(columnAtPoint(e
                     .getPoint()), e));
-            if (hit) {
-                completeEditing();
-            }
             return hit;
         }
 
         /**
          * complete editing if collapsed/expanded.
          * Here: any editing is always cancelled.
-         * This is a rude partial fix to #120-jdnc: data corruption on
-         * collapse if editing. Partial, because it doesn't guard
-         * against programatic collapse/expand while editing.
+         * This is a rude fix to #120-jdnc: data corruption on
+         * collapse/expand if editing. This is called from 
+         * the renderer after expansion related state has changed.
+         * PENDING JW: should it take the old editing path as parameter?
+         * Might be possible to be a bit more polite, and internally
+         * reset the editing coordinates? On the other hand: the rudeness
+         * is the table's usual behaviour - which is often removing the editor
+         * as first reaction to incoming events.
          *
          */
         protected void completeEditing() {
             if (isEditing()) {
                 getCellEditor().cancelCellEditing();
              }
-            
         }
 
         /**
          * Tricksery to make the tree expand/collapse.
          * <p>
          * 
-         * This might be called from one of two places:
+         * This might be - indirectly - called from one of two places:
          * <ol>
          * <li> editCellAt: original, stable but buggy (#332, #222) the table's
          * own selection had been changed due to the click before even entering
          * into editCellAt so all tree selection state is lost.
          * 
-         * <li> processMouseEvent: unstable (not fixing completely), therefore
-         * disabled the idea is to catch the expanded/collapsed before passing
-         * the event to super
+         * <li> processMouseEvent: the idea is to catch the mouseEvent, check
+         * if it triggered an expanded/collapsed, consume and return if so or 
+         * pass to super if not.
          * </ol>
          * 
-         * To play with the side-effects comment and uncomment the lines marked
-         * to pertain to the fix experiment in both methods.
          * <p>
          * widened access for testing ...
          * 
@@ -492,32 +507,37 @@ public class JXTreeTable extends JXTable {
             return me.getID() == MouseEvent.MOUSE_PRESSED;
         }
 
-        protected void setExpansionChangedFlag() {
+        /**
+         * called from the renderer's setExpandedPath after
+         * all expansion-related updates happend.
+         *
+         */
+        protected void expansionChanged() {
             expansionChangedFlag = true;
         }
 
     }
 
     /**
+     * 
+     * Note: currently this class looks a bit funny (only overriding
+     * the hit decision method). That's because the "experimental" code
+     * as of the last round moved to stable. But I expect that there's more
+     * to come, so I leave it here.
+     * 
      * <ol>
      * <li> hit handle detection in processMouse
      * </ol>
      */
     public class TreeTableHackerExt extends TreeTableHacker {
 
-        
-        private boolean hasResetExpandsSelectedPaths;
 
         /**
-         * this has the side-effect of setting setExpandsSelectedPaths
-         * to false on first call. Dirty...
+         * Here: returns true.
+         * @inheritDoc
          */
         @Override
         protected boolean isHitDetectionFromProcessMouse() {
-            if (!hasResetExpandsSelectedPaths) {
-                setExpandsSelectedPaths(false);
-                hasResetExpandsSelectedPaths = true;
-            }
             return true;
         }
 
@@ -1549,7 +1569,9 @@ public class JXTreeTable extends JXTable {
          * @param event the TreeExpansionEvent which triggered the method call.
          */
         protected void updateAfterExpansionEvent(TreeExpansionEvent event) {
-            treeTable.getTreeTableHacker().setExpansionChangedFlag();
+            // moved to let the renderer handle directly
+//            treeTable.getTreeTableHacker().setExpansionChangedFlag();
+            // JW: delayed fire leads to a certain sluggishness occasionally? 
             fireTableDataChanged();
         }
 
@@ -1845,6 +1867,16 @@ public class JXTreeTable extends JXTable {
             else {
                 throw new IllegalArgumentException("renderer already bound");
             }
+        }
+
+        
+        @Override
+        protected void setExpandedState(TreePath path, boolean state) {
+            int count = getRowCount();
+            super.setExpandedState(path, state);
+            treeTable.getTreeTableHacker().expansionChanged();
+            treeTable.getTreeTableHacker().completeEditing();
+            
         }
 
         /**

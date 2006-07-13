@@ -22,51 +22,6 @@ import org.jdesktop.swingx.util.ComponentTreeTableModel;
 public class JXTreeTableIssues extends TestCase {
 
     /**
-     * Issue #120-jdnc: data corruption if collapsed while editing.
-     * Note: this tests programatic collapse while editing! 
-     * mouse-triggered collapse/expand is crudely hacked. 
-     */
-    public void testEditOnCollapse() {
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode("ROOT");
-        DefaultMutableTreeNode a = new DefaultMutableTreeNode("A");
-        DefaultMutableTreeNode a1 = new DefaultMutableTreeNode("A1");
-        DefaultMutableTreeNode b = new DefaultMutableTreeNode("B");
-        a.add(a1);
-        root.add(a);
-        root.add(b);
-        TreeTableModel model = new DefaultTreeTableModel(root) {
-            public boolean isCellEditable(Object obj,int col) {
-                return true;
-              }
-                                                                                      
-              public void setValueAt(Object value,Object node,int col) {
-                  MutableTreeNode treeNode = (MutableTreeNode) node;
-                 treeNode.setUserObject(value);
-                 MutableTreeNode parent = (MutableTreeNode) treeNode.getParent();
-                 nodesChanged(parent, new int[] { parent.getIndex(treeNode) } );
-              }
-                                                                                      
-              public Object getValueAt(Object node,int col) {
-                  return ((DefaultMutableTreeNode) node).getUserObject();
-              }
-            };
-            
-        JXTreeTable treeTable = new JXTreeTable(model);
-        treeTable.setEditable(true);
-        treeTable.expandAll();
-        assertEquals(3, treeTable.getRowCount());
-        Object valueBelow = treeTable.getValueAt(2, 0);
-        treeTable.editCellAt(1, 0);
-        ((JTextField) treeTable.getEditorComponent()).setText("other");
-        treeTable.collapseRow(0);
-        assertEquals(2, treeTable.getRowCount());
-        if (treeTable.isEditable()) {
-            treeTable.getCellEditor().stopCellEditing();
-        }
-        assertEquals(valueBelow, treeTable.getValueAt(1, 0));
-    }
-
-    /**
      * sanity: toggling select/unselect via mouse the lead is
      * always painted, doing unselect via model (clear/remove path) 
      * seems to clear the lead?

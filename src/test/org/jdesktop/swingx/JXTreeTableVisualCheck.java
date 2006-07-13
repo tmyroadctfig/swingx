@@ -17,9 +17,11 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
@@ -64,8 +66,8 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Highligh.*");
 //               test.runInteractiveTests("interactive.*ToolTip.*");
-//           test.runInteractiveTests("interactive.*DnD.*");
-//             test.runInteractiveTests("interactive.*Compare.*");
+           test.runInteractiveTests("interactive.*DnD.*");
+             test.runInteractiveTests("interactive.*Compare.*");
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
              test.runInteractiveTests("interactive.*Edit.*");
         } catch (Exception ex) {
@@ -81,7 +83,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     public void interactiveLargeModel() {
 //        final JXTreeTable treeTable = new JXTreeTable(treeTableModel); 
 
-        final JXTreeTable treeTable = new JXTreeTable(new ComponentTreeTableModel(new JXFrame()));
+        final JXTreeTable treeTable = new JXTreeTable(createMutableVisualizeModel());
         treeTable.setRootVisible(true);
         ToolTipManager.sharedInstance().unregisterComponent(treeTable);
         Action action = new AbstractAction("toggle largeModel") {
@@ -95,6 +97,15 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         JXFrame frame = wrapWithScrollingInFrame(treeTable, "large model");
         addAction(frame, action);
         frame.setVisible(true);
+    }
+
+    private ComponentTreeTableModel createMutableVisualizeModel() {
+        JXPanel frame = new JXPanel();
+        frame.add(new JTextField());
+        frame.add(new JTextField());
+        frame.add(new JComboBox());
+        frame.add(new JXDatePicker());
+        return new ComponentTreeTableModel(frame);
     }
     /**
      * issue #296-swingx: expose scrollPathToVisible in JXTreeTable.
@@ -169,7 +180,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      *
      */
     public void interactiveTreeTableModelEditing() {
-        final TreeTableModel model = new ComponentTreeTableModel(new JXFrame());
+        final TreeTableModel model = createMutableVisualizeModel();
         final JXTreeTable table = new JXTreeTable(model);
         JTree tree =  new JTree(model) {
 
@@ -434,7 +445,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      * the textfield for editing is at the wrong position in RToL.
      */
     public void interactiveRToLTreeTableEditor() {
-        final TreeTableModel model = new ComponentTreeTableModel(new JXFrame());
+        final TreeTableModel model = createMutableVisualizeModel();
         final JXTreeTable table = new JXTreeTable(model);
         final JXFrame frame = wrapWithScrollingInFrame(table, "Editor: position follows Component orientation");
         Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
@@ -462,7 +473,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      *  
      */
     public void interactiveTreeTableEditorIcons() {
-        final TreeTableModel model = new ComponentTreeTableModel(new JXFrame());
+        final TreeTableModel model = createMutableVisualizeModel();
         final JXTreeTable table = new JXTreeTable(model);
         JXFrame frame = wrapWithScrollingInFrame(table, "Editor: icons showing");
         frame.setVisible(true);

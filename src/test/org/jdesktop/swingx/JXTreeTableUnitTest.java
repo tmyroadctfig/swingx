@@ -12,11 +12,13 @@ import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 
 import javax.swing.CellEditor;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
@@ -38,7 +40,54 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     public JXTreeTableUnitTest() {
         super("JXTreeTable Unit Test");
     }
-    
+
+    /**
+     * Issue #120-jdnc: data corruption if collapsed while editing.
+     * Note: this tests programatic collapse while editing! 
+     * Don't know how to test mouse-triggered collapse/expand, "looked"
+     * at it in the visualCheck. 
+     */
+    public void testEditOnCollapse() {
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("ROOT");
+        DefaultMutableTreeNode a = new DefaultMutableTreeNode("A");
+        DefaultMutableTreeNode a1 = new DefaultMutableTreeNode("A1");
+        DefaultMutableTreeNode b = new DefaultMutableTreeNode("B");
+        a.add(a1);
+        root.add(a);
+        root.add(b);
+        TreeTableModel model = new DefaultTreeTableModel(root) {
+            public boolean isCellEditable(Object obj,int col) {
+                return true;
+              }
+                                                                                      
+              public void setValueAt(Object value,Object node,int col) {
+                  MutableTreeNode treeNode = (MutableTreeNode) node;
+                 treeNode.setUserObject(value);
+                 MutableTreeNode parent = (MutableTreeNode) treeNode.getParent();
+                 nodesChanged(parent, new int[] { parent.getIndex(treeNode) } );
+              }
+                                                                                      
+              public Object getValueAt(Object node,int col) {
+                  return ((DefaultMutableTreeNode) node).getUserObject();
+              }
+            };
+            
+        JXTreeTable treeTable = new JXTreeTable(model);
+        treeTable.setEditable(true);
+        treeTable.expandAll();
+        assertEquals(3, treeTable.getRowCount());
+        Object valueBelow = treeTable.getValueAt(2, 0);
+        treeTable.editCellAt(1, 0);
+        ((JTextField) treeTable.getEditorComponent()).setText("other");
+        treeTable.collapseRow(0);
+        assertEquals(2, treeTable.getRowCount());
+        if (treeTable.isEditing()) {
+            treeTable.getCellEditor().stopCellEditing();
+        }
+        assertEquals(valueBelow, treeTable.getValueAt(1, 0));
+    }
+
+
     /**
      * Issue #212-jdnc: reuse editor, install only once.
      * 
