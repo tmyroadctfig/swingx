@@ -16,7 +16,7 @@ import org.jdesktop.swingx.editors.PaintPropertyEditor;
  *
  * @author Richard
  */
-public class PinstripePainterBeanInfo extends BeanInfoSupport {
+public class PinstripePainterBeanInfo extends AbstractPainterBeanInfo {
     
     /** Creates a new instance of PinstripePainterBeanInfo */
     public PinstripePainterBeanInfo() {
@@ -24,6 +24,7 @@ public class PinstripePainterBeanInfo extends BeanInfoSupport {
     }
 
     protected void initialize() {
+        super.initialize();
         setPreferred(true, "angle", "spacing", "paint");
         setHidden(true, "class", "propertyChangeListeners", "image");
         setPropertyEditor(PaintPropertyEditor.class, "paint");
