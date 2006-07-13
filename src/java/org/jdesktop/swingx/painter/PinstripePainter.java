@@ -21,6 +21,7 @@
 
 package org.jdesktop.swingx.painter;
 
+import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.geom.Line2D;
@@ -58,6 +59,12 @@ public class PinstripePainter extends AbstractPainter {
      * The spacing between pinstripes
      */
     private double spacing = 8;
+    
+    /**
+     * The stroke width of the pinstripes
+     */
+    private double stripeWidth = 1;
+    
     /**
      * The Paint to use when drawing the pinstripes
      */
@@ -181,6 +188,8 @@ public class PinstripePainter extends AbstractPainter {
         } else {
             g.setPaint(p);
         }
+        
+        g.setStroke(new BasicStroke((float)getStripeWidth()));
 
         double hypLength = Math.sqrt((component.getWidth() * component.getWidth()) +
                                    (component.getHeight() * component.getHeight()));
@@ -188,12 +197,25 @@ public class PinstripePainter extends AbstractPainter {
         double radians = Math.toRadians(getAngle());
         g.rotate(radians);
 
-        int numLines = (int)(hypLength / getSpacing());
+        double spacing = getSpacing();
+        spacing += getStripeWidth();
+        int numLines = (int)(hypLength / spacing);
 
         for (int i=0; i<numLines; i++) {
-            double x = i * getSpacing();
+            double x = i * spacing;
             Line2D line = new Line2D.Double(x, -hypLength, x, hypLength);
             g.draw(line);
         }
     }
+
+    public double getStripeWidth() {
+        return stripeWidth;
+    }
+
+    public void setStripeWidth(double stripeWidth) {
+        double oldSripeWidth = getStripeWidth();
+        this.stripeWidth = stripeWidth;
+        firePropertyChange("stripWidth",new Double(oldSripeWidth),new Double(stripeWidth));
+    }
+
 }
