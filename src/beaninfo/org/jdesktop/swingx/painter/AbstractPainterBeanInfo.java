@@ -26,6 +26,9 @@ public class AbstractPainterBeanInfo extends BeanInfoSupport {
     public AbstractPainterBeanInfo() {
         super(AbstractPainter.class);
     }
+    public AbstractPainterBeanInfo(Class clazz) {
+        super(clazz);
+    }
 
     protected void initialize() {
         setHidden(true, "class", "propertyChangeListeners", "renderingHints");
