@@ -42,6 +42,33 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     }
 
     /**
+     * Issue #342-swingx: default margins in JXTreeTable.
+     * 
+     * This is not only a treeTable issue: the coupling of 
+     * margins to showing gridlines (and still get a "nice" 
+     * looking selection) is not overly obvious in JTable as
+     * well. Added convenience method to JXTable to adjust margins to 
+     * 0/1 if hiding/showing grid lines. 
+     *
+     */
+    public void testDefaultMargins() {
+        JXTreeTable table = new JXTreeTable(simpleTreeTableModel);
+        // sanity: initial margins are (0, 0), grid off
+        boolean show = false;
+        assertEquals(0, table.getRowMargin());
+        assertEquals(show, table.getShowHorizontalLines());
+        assertEquals(0, table.getColumnMargin());
+        assertEquals(show, table.getShowVerticalLines());
+        // show lines
+        table.setDefaultMargins(!show, !show);
+        assertEquals(1, table.getRowMargin());
+        assertEquals(!show, table.getShowHorizontalLines());
+        assertEquals(1, table.getColumnMargin());
+        assertEquals(!show, table.getShowVerticalLines());
+        
+    }
+
+    /**
      * Issue #120-jdnc: data corruption if collapsed while editing.
      * Note: this tests programatic collapse while editing! 
      * Don't know how to test mouse-triggered collapse/expand, "looked"

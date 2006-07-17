@@ -48,6 +48,7 @@ import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
+import org.jdesktop.swingx.util.AncientSwingTeam;
 import org.jdesktop.swingx.util.ComponentTreeTableModel;
 
 /**
@@ -66,10 +67,11 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Highligh.*");
 //               test.runInteractiveTests("interactive.*ToolTip.*");
-           test.runInteractiveTests("interactive.*DnD.*");
-             test.runInteractiveTests("interactive.*Compare.*");
+//           test.runInteractiveTests("interactive.*DnD.*");
+//             test.runInteractiveTests("interactive.*Compare.*");
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
-             test.runInteractiveTests("interactive.*Edit.*");
+//             test.runInteractiveTests("interactive.*Edit.*");
+             test.runInteractiveTests("interactive.*Line.*");
         } catch (Exception ex) {
 
         }
@@ -535,6 +537,23 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         };
         addAction(frame, action);
     }
+    /**
+     * compare treeTable/tree height
+     *
+     */
+    public void interactiveTestAlternateHighlightAndRowGridLines() {
+        JXTreeTable treeTable = new JXTreeTable(treeTableModel);
+        treeTable.setRowHeight(22);
+        treeTable.setDefaultMargins(true, true);
+        treeTable.addHighlighter(AlternateRowHighlighter.linePrinter);
+        JXTable table = new JXTable(new AncientSwingTeam());
+        table.addHighlighter(AlternateRowHighlighter.linePrinter);
+        table.setRowHeight(22);
+        JFrame frame = wrapWithScrollingInFrame(treeTable, table, 
+                "AlternateRow LinePrinter-with Gridlines");
+        frame.setVisible(true);
+    }
+
 
     /**
      * compare treeTable/tree height
@@ -543,8 +562,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     public void interactiveTestHighlightAndRowHeightCompareTree() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         treeTable.setRowHeight(22);
-        treeTable.setRowMargin(1);
-        treeTable.setShowHorizontalLines(true);
+        treeTable.setDefaultMargins(true, false);
         treeTable.setHighlighters(new HighlighterPipeline(new Highlighter[] {
                 AlternateRowHighlighter.linePrinter,
                 new HierarchicalColumnHighlighter(), }));
@@ -742,7 +760,6 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
             
         };
         treeTable.setRowHeight(22);
-        treeTable.setRowMargin(1);
         JXFrame frame = wrapWithScrollingInFrame(treeTable,
                 "Toggle Tree properties ");
         addAction(frame, toggleRoot);
@@ -777,7 +794,6 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //            
 //        };
         treeTable.setRowHeight(22);
-        treeTable.setRowMargin(1);
         JFrame frame = wrapWithScrollingInFrame(treeTable,
                 "Toggle Tree icons ");
 //        addAction(frame, toggleRoot);
@@ -796,7 +812,6 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         // winLF does not respect it anyway...
         treeTable.putClientProperty("JTree.lineStyle", "Angled");
         treeTable.setRowHeight(22);
-        treeTable.setRowMargin(1);
        // add a bunch of highlighters directly
         treeTable.addHighlighter(AlternateRowHighlighter.quickSilver);
         treeTable.addHighlighter(new HierarchicalColumnHighlighter());
@@ -822,7 +837,6 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         treeTable.putClientProperty("JTree.lineStyle", "Angled");
         treeTable.setRowHeight(22);
-        treeTable.setRowMargin(1);
         treeTable.setFilters(new FilterPipeline(new Filter[] {
                 new PatternFilter( "^d",
                         Pattern.CASE_INSENSITIVE, 0), }));
@@ -838,7 +852,6 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     public void interactiveTestSortingFilters() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         treeTable.setRowHeight(22);
-        treeTable.setRowMargin(1);
         treeTable.setFilters(new FilterPipeline(new Filter[] {
                 new ShuttleSorter(1, false), }));
         JFrame frame = wrapWithScrollingInFrame(treeTable,
@@ -850,7 +863,6 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     public void interactiveTestHighlightAndRowHeight() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         treeTable.setRowHeight(22);
-        treeTable.setRowMargin(1);
         treeTable.setHighlighters(new HighlighterPipeline(new Highlighter[] {
                 AlternateRowHighlighter.linePrinter,
                 new HierarchicalColumnHighlighter(), }));
@@ -863,7 +875,6 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         treeTable.addHighlighter(AlternateRowHighlighter.classicLinePrinter);
         treeTable.setRowHeight(22);
-        treeTable.setRowMargin(1);
         JFrame frame = wrapWithScrollingInFrame(treeTable,
                 "ClassicLinePrinter and RowHeight");
         frame.setVisible(true);
@@ -877,8 +888,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         treeTable.setBackground(new Color(0xFF, 0xFF, 0xCC)); // notepad
         treeTable.setGridColor(Color.cyan.darker());
         treeTable.setRowHeight(22);
-        treeTable.setRowMargin(1);
-        treeTable.setShowHorizontalLines(true);
+        treeTable.setDefaultMargins(true, false);
         JFrame frame = wrapWithScrollingInFrame(treeTable,
                 "NotePadBackground- HierarchicalColumnHighlighter and horiz lines");
         frame.setVisible(true);
@@ -889,8 +899,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         treeTable.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
         treeTable.setGridColor(Color.cyan.darker());
         treeTable.setRowHeight(22);
-        treeTable.setRowMargin(1);
-        treeTable.setShowHorizontalLines(true);
+        treeTable.setDefaultMargins(true, false);
         JFrame frame = wrapWithScrollingInFrame(treeTable, "LedgerBackground");
         frame.setVisible(true);
     }

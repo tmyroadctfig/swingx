@@ -93,6 +93,33 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
     /**
+     * Issue #342-swingx: default margins in JXTreeTable.
+     * 
+     * This is not only a treeTable issue: the coupling of 
+     * margins to showing gridlines (and still get a "nice" 
+     * looking selection) is not overly obvious in JTable as
+     * well. Added convenience method to adjust margins to 
+     * 0/1 if hiding/showing grid lines.
+     *
+     */
+    public void testDefaultMargins() {
+        JXTable table = new JXTable(10, 3);
+        // sanity: initial margins are (1, 1), grid on
+        assertEquals(1, table.getRowMargin());
+        assertTrue(table.getShowHorizontalLines());
+        assertEquals(1, table.getColumnMargin());
+        assertTrue(table.getShowVerticalLines());
+        // hide grid
+        boolean show = false;
+        table.setDefaultMargins(show, show);
+        assertEquals(0, table.getRowMargin());
+        assertEquals(show, table.getShowHorizontalLines());
+        assertEquals(0, table.getColumnMargin());
+        assertEquals(show, table.getShowVerticalLines());
+        
+    }
+    
+    /**
      * Issue ??-swingx: NPE if tableChanged is messaged with a null event.
      *
      */

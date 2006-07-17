@@ -182,12 +182,15 @@ public class JXTreeTable extends JXTable {
         initActions();
         // disable sorting
         super.setSortable(false);
+        
+        // no grid
+        setDefaultMargins(false, false);
 
-        // No grid.
-        setShowGrid(false); // superclass default is "true"
-
-        // Default intercell spacing
-        setIntercellSpacing(spacing); // for both row margin and column margin
+//        // No grid.
+//        setShowGrid(false); // superclass default is "true"
+//
+//        // Default intercell spacing
+//        setIntercellSpacing(spacing); // for both row margin and column margin
 
     }
 

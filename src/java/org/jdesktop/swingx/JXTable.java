@@ -3285,9 +3285,29 @@ public class JXTable extends JTable
     }
 
     /**
+     * Convenience to set both grid line visibility and 
+     * default margin for horizontal/vertical lines. The margin
+     * defaults to 1 or 0 if the grid lines are drawn or not drawn. 
+     * 
+     * @param showHorizontalLines boolean to decide whether to draw horizontal
+     *    grid lines.
+     * @param showVerticalLines boolean to decide whether to draw vertical
+     *   grid lines.
+     */
+    public void setDefaultMargins(boolean showHorizontalLines, boolean showVerticalLines) {
+       int defaultRowMargin = showHorizontalLines ? 1 : 0;
+       setRowMargin(defaultRowMargin);
+       setShowHorizontalLines(showHorizontalLines);
+       int defaultColumnMargin = showVerticalLines ? 1 : 0;
+       setColumnMargin(defaultColumnMargin);
+       setShowVerticalLines(showVerticalLines);
+    }
+
+    /**
      * Overriden to keep view/model coordinates of SizeSequence in synch.
      * @inheritDoc 
      */
+    @Override
     public void setRowHeight(int rowHeight) {
         super.setRowHeight(rowHeight);
         if (rowHeight > 0) {
