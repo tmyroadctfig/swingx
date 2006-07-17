@@ -21,12 +21,15 @@
 package org.jdesktop.swingx.action;
 
 import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ActionMap;
 
 /**
  * The ActionManager manages sets of <code>javax.swing.Action</code>s for an
@@ -71,37 +74,27 @@ import javax.swing.Action;
  * the widget changed. Additionally if you need to change the selected
  * state of the Action use the ActionManager method <code>setSelected</code>.
  * <p>
- * The <code>ActionContainerFactory</code> uses the managed Actions in the
- * ActionManager to create
- * user interface components. For example, to create a JMenu based on an
+ * The <code>ActionContainerFactory</code> uses the managed Actions in a
+ * ActionManager to create user interface components. It uses the shared
+ * instance of ActionManager by default. For example, to create a JMenu based on an
  * action-list id:
  * <pre>
- * JMenu file = manager.getFactory().createMenu(list);
+ * ActionContainerFactory factory = new ActionContainerFactory();
+ * JMenu file = factory.createMenu(list);
  * </pre>
  *
  * @see ActionContainerFactory
  * @see TargetableAction
  * @see BoundAction
  * @author Mark Davidson
+ * @author Neil Weber
  */
-public class ActionManager {
-
-    // Internal data structures which manage the actions.
-
-    // key: value of ID_ATTR, value instanceof AbstractAction
-    private Map actionMap;
+public class ActionManager extends ActionMap {
 
     /**
      * Shared instance of the singleton ActionManager.
      */
     private static ActionManager INSTANCE;
-
-    // To enable debugging:
-    //   Pass -Ddebug=true to the vm on start up.
-    // or
-    //   set System.setProperty("debug", "true"); before constructing this Object
-
-    private static boolean DEBUG = false;
 
     /**
      * Creates the action manager. Use this constuctor if the application should
@@ -110,7 +103,6 @@ public class ActionManager {
      */
     public ActionManager() {
     }
-
 
     /**
      * Return the instance of the ActionManger. If this has not been explicity
@@ -145,10 +137,12 @@ public class ActionManager {
      * @return a set which represents all the action ids
      */
     public Set getActionIDs() {
-        if (actionMap == null) {
+        Object[] keys = keys();
+        if (keys == null) {
             return null;
         }
-        return actionMap.keySet();
+
+        return new HashSet(Arrays.asList(keys));
     }
 
     public Action addAction(Action action) {
@@ -162,11 +156,7 @@ public class ActionManager {
      * @return the action that was added
      */
     public Action addAction(Object id, Action action)  {
-        if (actionMap == null) {
-            actionMap = new HashMap();
-        }
-        actionMap.put(id, action);
-
+        put(id, action);
         return action;
     }
 
@@ -177,10 +167,7 @@ public class ActionManager {
      * @return an Action or null if id
      */
     public Action getAction(Object id)  {
-        if (actionMap != null) {
-            return (Action)actionMap.get(id);
-        }
-        return null;
+        return get(id);
     }
 
     /**
