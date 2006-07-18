@@ -327,7 +327,7 @@ public class JXMultiThumbSlider<E> extends JComponent {
     
     private class ThumbComp extends JComponent {
         
-        private JXMultiThumbSlider slider;
+        private JXMultiThumbSlider<E> slider;
         
         public ThumbComp(JXMultiThumbSlider slider) {
             this.slider = slider;
