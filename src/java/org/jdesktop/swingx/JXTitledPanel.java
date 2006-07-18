@@ -98,7 +98,7 @@ public class JXTitledPanel extends JXPanel {
      * Create a new JTitledPanel with an empty string for the title.
      */
     public JXTitledPanel() {
-        this("");
+        this(" ");
     }
 
     /**
