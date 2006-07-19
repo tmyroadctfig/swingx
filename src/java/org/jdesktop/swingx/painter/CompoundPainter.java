@@ -101,7 +101,7 @@ public class CompoundPainter extends AbstractPainter {
     /**
      * @inheritDoc
      */
-    public void paintBackground(Graphics2D g, JComponent component) {
+    protected void paintBackground(Graphics2D g, JComponent component) {
         for (Painter p : getPainters()) {
             p.paint(g, component);
         }
