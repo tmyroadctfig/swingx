@@ -1124,7 +1124,7 @@ public class JXList extends JList {
         super.setCellRenderer(delegatingRenderer);
     }
 
-    private class DelegatingRenderer implements ListCellRenderer, RolloverRenderer {
+    public class DelegatingRenderer implements ListCellRenderer, RolloverRenderer {
 
         private ListCellRenderer delegateRenderer;
 
@@ -1137,6 +1137,11 @@ public class JXList extends JList {
                 delegate = new DefaultListCellRenderer();
             }
             delegateRenderer = delegate;
+        }
+
+        
+        public ListCellRenderer getDelegateRenderer() {
+            return delegateRenderer;
         }
 
         public boolean isEnabled() {
