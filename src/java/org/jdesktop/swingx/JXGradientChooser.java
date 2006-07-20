@@ -93,7 +93,12 @@ public class JXGradientChooser extends JXPanel {
     }
     
     
+        
     public MultipleGradientPaint getGradient() {
+        return gradientPreview.getGradient();
+    }
+    
+    public MultipleGradientPaint getFlatGradient() {
 	// get the list of colors
 	List<Thumb<Color>> stops = slider.getModel().getSortedThumbs();
 	int len = stops.size();
@@ -172,6 +177,11 @@ public class JXGradientChooser extends JXPanel {
     
     public JXMultiThumbSlider<Color> getSlider() {
         return slider;
+    }
+    
+    private void updateGradientProperty() {
+        firePropertyChange("gradient",null,getGradient());
+        gradientPreview.repaint();
     }
     
     
@@ -633,8 +643,14 @@ public class JXGradientChooser extends JXPanel {
 	slider.setThumbRenderer(new GradientThumbRenderer(this, slider));
 	slider.setTrackRenderer(new GradientTrackRenderer(this));
 	slider.addMultiThumbListener(new StopListener(slider));
-//	
-////	gradient_selector.add(slider, "Center");
+        ////	gradient_selector.add(slider, "Center");
+        
+        gradientPreview.addPropertyChangeListener("gradient", new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+                updateGradientProperty();
+            }
+        });
+        
     }
 
     private final class ChangeLocationListener implements ChangeListener {
@@ -642,9 +658,9 @@ public class JXGradientChooser extends JXPanel {
             if(slider.getSelectedIndex() >= 0) {
                 Thumb thumb = slider.getModel().getThumbAt(slider.getSelectedIndex());
                 thumb.setPosition((float)((Integer)colorLocationSpinner.getValue())/100);
-                //slider.recalc();
                 slider.repaint();
                 updateFromStop(thumb);
+                updateGradientProperty();
             }
         }
     }
@@ -667,10 +683,11 @@ public class JXGradientChooser extends JXPanel {
                     alphaSpinner.setValue(alpha);
                 }
 		slider.repaint();
-		gradientPreview.repaint();
+                updateGradientProperty();
 	    }
 	}
     }
+    
     private final class AddThumbAction extends AbstractActionExt {
 	public AddThumbAction() {
 	    super("Add");
@@ -691,6 +708,7 @@ public class JXGradientChooser extends JXPanel {
 	    
 	}
     }
+    
     private final class DeleteThumbAction extends AbstractActionExt {
 	public DeleteThumbAction() {
 	    super("Delete");
@@ -730,6 +748,7 @@ public class JXGradientChooser extends JXPanel {
 	    updateFromStop(thumb,pos,color);
 	    updateDeleteButtons();
 	}
+        
 	public void mousePressed(MouseEvent e) {
 	    if(e.getClickCount() > 1) {
 	        selectColorForThumb();
@@ -739,11 +758,11 @@ public class JXGradientChooser extends JXPanel {
     
     private final class RepaintOnEventListener implements ActionListener, ItemListener {
         public void actionPerformed(ActionEvent e) {
-            gradientPreview.repaint();
+            updateGradientProperty();
         }
 
         public void itemStateChanged(ItemEvent e) {
-            gradientPreview.repaint();
+            updateGradientProperty();
         }
     }
     
