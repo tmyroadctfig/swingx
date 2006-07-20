@@ -67,7 +67,7 @@ public class JavaBean {
      * a bean in the constructor, and the "this" argument is not valid until
      * after super construction. Hence, delegation instead of extension
      */
-    private PropertyChangeSupport pcs;
+    private transient PropertyChangeSupport pcs;
     
     /** Creates a new instance of JavaBean */
     public JavaBean() {
