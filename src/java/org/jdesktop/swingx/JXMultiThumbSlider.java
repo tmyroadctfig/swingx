@@ -125,7 +125,9 @@ public class JXMultiThumbSlider<E> extends JComponent {
         if(isVisible()) {
             if(trackRenderer != null) {
                 JComponent comp = trackRenderer.getRendererComponent(this);
+                add(comp);
                 comp.paint(g);
+                remove(comp);
             } else {
                 paintRange((Graphics2D)g);
             }
@@ -347,7 +349,6 @@ public class JXMultiThumbSlider<E> extends JComponent {
             if(slider.getThumbRenderer() != null) {
                 JComponent comp = getRenderer();
                 comp.setSize(this.getSize());
-                System.out.println("painting: " + comp);
                 comp.paint(g);
             } else {
                 g.setColor(getBackground());
