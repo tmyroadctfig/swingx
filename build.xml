@@ -134,8 +134,14 @@
         <!-- if any other resources need to be copied, copy them here -->
         
         <!-- zip up the whole thing -->
-        <zip basedir="${build.dir}/bin-release" destfile="dist/swingx-${RELEASE_DSTAMP}-bin.zip" />
+        <mkdir dir="${build.dir}/zipdir" />
+        <mkdir dir="${build.dir}/zipdir/swingx-${RELEASE_DSTAMP}-bin" />
+        <move todir="${build.dir}/zipdir/swingx-${RELEASE_DSTAMP}-bin">
+            <fileset dir="${build.dir}/bin-release" />
+        </move>
+        <zip basedir="${build.dir}/zipdir" destfile="dist/swingx-${RELEASE_DSTAMP}-bin.zip" />
         <delete dir="${build.dir}/bin-release" />
+        <delete dir="${build.dir}/zipdir" />
     </target>
     
     <!-- This target builds a "source" release of the project. The resulting
@@ -166,7 +172,13 @@
         </copy>
         
         <!-- zip up the whole thing -->
-        <zip basedir="${build.dir}/src-release" destfile="dist/swingx-${RELEASE_DSTAMP}-src.zip" />
+        <mkdir dir="${build.dir}/zipdir" />
+        <mkdir dir="${build.dir}/zipdir/swingx-${RELEASE_DSTAMP}-src" />
+        <move todir="${build.dir}/zipdir/swingx-${RELEASE_DSTAMP}-src">
+            <fileset dir="${build.dir}/src-release" />
+        </move>
+        <zip basedir="${build.dir}/zipdir" destfile="dist/swingx-${RELEASE_DSTAMP}-src.zip" />
         <delete dir="${build.dir}/src-release" />
+        <delete dir="${build.dir}/zipdir" />
     </target>
 </project>
