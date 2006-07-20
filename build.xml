@@ -124,9 +124,6 @@
              the remaining bit and name it swingx-[date][release].zip
         -->
         <mkdir dir="${build.dir}/cobundle" />
-        <unjar dest="${build.dir}/cobundle">
-            <fileset dir="lib/cobundle" />
-        </unjar>
         <unjar src="dist/swingx.jar" dest="${build.dir}/cobundle" />
         <jar basedir="${build.dir}/cobundle" jarfile="${build.dir}/bin-release/swingx-${RELEASE_DSTAMP}.jar" />
         <delete dir="${build.dir}/cobundle" />
