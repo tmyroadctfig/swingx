@@ -152,19 +152,56 @@ public abstract class ConditionalHighlighter extends Highlighter {
                 seed == null ? null : seed.brighter() : getSelectedForeground();
     }
 
+//------ following methods are the core of the "conditional" notion
+    
+    /**
+     * Returns the index of the column to use for deciding
+     * if the highlight should be on.
+     * 
+     * @return the index of the column to use for deciding about highlighting.
+     *   The index is in model coordinates, -1 denotes any column.
+     *    
+     * @see #setTestColumnIndex(int)
+     *  
+     */
     public int getTestColumnIndex() {
         return testColumn;
     }
 
+    /**
+     * Sets the index of the column to use for deciding
+     * if the highlight should be on.
+     * 
+     * @param the index of the column to used for deciding about highlighting. 
+     *   The index is in model coordinates, -1 denotes any column.
+     */
     public void setTestColumnIndex(int columnIndex) {
         this.testColumn = columnIndex;
         fireStateChanged();
     }
 
+    /**
+     * Returns the index of the column to highlight if the 
+     * condition is met.
+     * 
+     * @return the index of the column to highlight.
+     *   The index is in model coordinates, -1 denotes any column.
+     *    
+     * @see #setHighlightColumnIndex(int)
+     *  
+     */
     public int getHighlightColumnIndex() {
         return highlightColumn;
     }
 
+    /**
+     * Sets the index of the column to highlight if the 
+     * condition is met.
+     * 
+     * @param the index of the column to highlight.
+     *   The index is in model coordinates, -1 denotes every column.
+     *  
+     */
     public void setHighlightColumnIndex(int columnIndex) {
         this.highlightColumn = columnIndex;
         fireStateChanged();

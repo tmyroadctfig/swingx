@@ -45,13 +45,14 @@ import javax.swing.JComponent;
  * indices are in model coordinates with exactly two exceptions:
  * <ul>
  * <li> {@link #column} in column view coordinates
- * <li> the mapping method viewToModel(columnIndex) in view coordinates
+ * <li> the mapping method {@link #viewToModel(columnIndex)} in view coordinates
  * </ul>
  * 
  * All input row indices are in model coordinates with exactly two exceptions:
  * <ul>
  * <li> {@link #row} in row view coordinates
- * <li> the access method for the filtered value takes the row in view coordinates.
+ * <li> the getter for the filtered value {@link #getFilteredValueAt(int, int)} 
+ * takes the row in view coordinates.
  * </ul>
  *  
  * 
