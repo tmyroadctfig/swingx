@@ -317,8 +317,9 @@ public class JXGradientChooser extends JXPanel {
         changeColorButton.setText("00");
         changeColorButton.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 0);
         jPanel2.add(changeColorButton, gridBagConstraints);
 
@@ -509,8 +510,8 @@ public class JXGradientChooser extends JXPanel {
         deleteThumbButton.setAction(deleteThumbAction);
         changeColorButton.addPropertyChangeListener("background", new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                System.out.println("color bg changed");
                 selectColorForThumb();
+                updateGradientProperty();
             }
         });
         colorLocationSpinner.addChangeListener(new ChangeLocationListener());
