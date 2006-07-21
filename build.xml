@@ -137,6 +137,7 @@
             <fileset dir="${build.dir}/bin-release" />
         </move>
         <zip basedir="${build.dir}/zipdir" destfile="dist/swingx-${RELEASE_DSTAMP}-bin.zip" />
+        <copy file="dist/swingx-${RELEASE_DSTAMP}-bin.zip" tofile="dist/swingx-bin.zip" />
         <delete dir="${build.dir}/bin-release" />
         <delete dir="${build.dir}/zipdir" />
     </target>
@@ -175,6 +176,7 @@
             <fileset dir="${build.dir}/src-release" />
         </move>
         <zip basedir="${build.dir}/zipdir" destfile="dist/swingx-${RELEASE_DSTAMP}-src.zip" />
+        <copy file="dist/swingx-${RELEASE_DSTAMP}-src.zip" tofile="dist/swingx-src.zip" />
         <delete dir="${build.dir}/src-release" />
         <delete dir="${build.dir}/zipdir" />
     </target>
