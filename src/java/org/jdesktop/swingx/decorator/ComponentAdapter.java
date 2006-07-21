@@ -45,7 +45,7 @@ import javax.swing.JComponent;
  * indices are in model coordinates with exactly two exceptions:
  * <ul>
  * <li> {@link #column} in column view coordinates
- * <li> the mapping method {@link #viewToModel(columnIndex)} in view coordinates
+ * <li> the mapping method {@link #viewToModel(int)} in view coordinates
  * </ul>
  * 
  * All input row indices are in model coordinates with exactly two exceptions:

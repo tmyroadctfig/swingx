@@ -172,7 +172,7 @@ public abstract class ConditionalHighlighter extends Highlighter {
      * Sets the index of the column to use for deciding
      * if the highlight should be on.
      * 
-     * @param the index of the column to used for deciding about highlighting. 
+     * @param columnIndex index of the column to used for deciding about highlighting. 
      *   The index is in model coordinates, -1 denotes any column.
      */
     public void setTestColumnIndex(int columnIndex) {
@@ -198,7 +198,7 @@ public abstract class ConditionalHighlighter extends Highlighter {
      * Sets the index of the column to highlight if the 
      * condition is met.
      * 
-     * @param the index of the column to highlight.
+     * @param columnIndex index of the column to highlight.
      *   The index is in model coordinates, -1 denotes every column.
      *  
      */
