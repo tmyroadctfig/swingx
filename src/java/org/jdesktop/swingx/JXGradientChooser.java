@@ -50,10 +50,12 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.apache.batik.ext.awt.LinearGradientPaint;
 import org.apache.batik.ext.awt.MultipleGradientPaint;
+import org.apache.batik.ext.awt.RadialGradientPaint;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.color.*;
 import org.jdesktop.swingx.multislider.Thumb;
 import org.jdesktop.swingx.multislider.ThumbListener;
+import org.jdesktop.swingx.painter.gradient.RadialGradientPainter;
 
 /**
  * A specialized JXPanel that allows the user to construct and choose a Gradient.
@@ -125,6 +127,7 @@ public class JXGradientChooser extends JXPanel {
     }
     
     public void setGradient(MultipleGradientPaint mgrad) {
+        // removing all thumbs;
 	while(slider.getModel().getThumbCount() > 0) {
 	    slider.getModel().removeThumb(0);
 	}
@@ -133,6 +136,15 @@ public class JXGradientChooser extends JXPanel {
 	for(int i=0; i<fracts.length; i++) {
 	    slider.getModel().addThumb(fracts[i],colors[i]);
 	}
+        
+        if(mgrad instanceof RadialGradientPaint) {
+            styleCombo.setSelectedItem(GradientStyle.Radial);
+            gradientPreview.setGradient(mgrad);
+        } else {
+            styleCombo.setSelectedItem(GradientStyle.Linear);
+            gradientPreview.setGradient(mgrad);
+        }
+        
 	repaint();
     }
     
