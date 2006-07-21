@@ -27,6 +27,8 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
@@ -74,12 +76,12 @@ public class JXColorSelectionButton extends JButton {
                             getChooser(),
                             new ActionListener() {
                                 public void actionPerformed(ActionEvent actionEvent) {
-                                    //System.out.println("okay");
+                                    System.out.println("okay");
                                 }
                             },
                             new ActionListener() {
                                 public void actionPerformed(ActionEvent actionEvent) {
-                                    //System.out.println("cancel");
+                                    System.out.println("cancel");
                                 }
                             }
                             );
@@ -103,6 +105,12 @@ public class JXColorSelectionButton extends JButton {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        
+        this.addPropertyChangeListener("background",new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+                getChooser().setColor(getBackground());
+            }
+        });
     }
     
     private BufferedImage colorwell;
