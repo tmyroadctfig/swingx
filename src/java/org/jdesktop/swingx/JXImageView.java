@@ -153,10 +153,12 @@ public class JXImageView extends JXPanel {
      * @param image the new image to set, or null.
      */
     public void setImage(Image image) {
+        Image old = this.getImage();
         this.image = image;
         setImageLocation(null);
         setScale(1.0);
         repaint();
+        firePropertyChange("image",old,this.image);
     }
     
     /**
