@@ -334,10 +334,10 @@ public class JXMultiThumbSlider<E> extends JComponent {
         public ThumbComp(JXMultiThumbSlider slider) {
             this.slider = slider;
             Dimension dim = new Dimension(10,10);//slider.getHeight());
-            if(slider.getThumbRenderer() != null) {
+            /*if(slider.getThumbRenderer() != null) {
                 JComponent comp = getRenderer();
                 dim = comp.getPreferredSize();
-            }
+            }*/
             setSize(dim);
             setMinimumSize(dim);
             setPreferredSize(dim);
