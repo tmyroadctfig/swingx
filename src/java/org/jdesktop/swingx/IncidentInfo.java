@@ -17,7 +17,11 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ */
+
+package org.jdesktop.swingx;
+
+import java.util.logging.Level;
 
 /**
  * This is a simple class that incapsulates all the information needed
@@ -26,10 +30,6 @@
  * @author Alexander Zuev
  * @version 1.4
  */
-package org.jdesktop.swingx;
-
-import java.util.logging.Level;
-
 public class IncidentInfo {
     /**
      * Short string that will be used as a error header
