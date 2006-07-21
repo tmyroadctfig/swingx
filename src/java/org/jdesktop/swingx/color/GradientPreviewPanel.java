@@ -30,7 +30,10 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.List;
 import javax.swing.event.MouseInputAdapter;
+import org.apache.batik.ext.awt.LinearGradientPaint;
+import org.apache.batik.ext.awt.LinearGradientPaintContext;
 import org.apache.batik.ext.awt.MultipleGradientPaint;
+import org.apache.batik.ext.awt.RadialGradientPaint;
 import org.jdesktop.swingx.JXGradientChooser;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.multislider.Thumb;
@@ -56,6 +59,19 @@ public class GradientPreviewPanel extends JXPanel {
     }
     
     public void setGradient() {
+        repaint();
+    }
+    
+    public void setGradient(MultipleGradientPaint grad) {
+        if(grad instanceof LinearGradientPaint) {
+            LinearGradientPaint paint = (LinearGradientPaint)grad;
+            this.start = paint.getStartPoint();
+            this.end = paint.getEndPoint();
+        } else {
+            RadialGradientPaint paint = (RadialGradientPaint)grad;
+            this.start = paint.getCenterPoint();
+            this.end = new Point2D.Double(start.getX(),start.getY()+paint.getRadius());
+        }
         repaint();
     }
     
