@@ -411,10 +411,17 @@ public class ActionContainerFactory {
 
 
     /**
-     * Creates a button based on the attributes of the action element.
+     * Creates, configures and returns an AbstractButton. 
+     * 
+     * The attributes of the action element 
+     * registered with the ActionManger by the given id.
      * Will return a JButton or a JToggleButton.
+     * 
+     * @param id the identifer 
+     * @param container the JComponent which parents the group, if any.
+     * @return an AbstractButton based on the 
      */
-    private AbstractButton createButton(Object id, JComponent container) {
+    public AbstractButton createButton(Object id, JComponent container) {
         return createButton(getAction(id), container);
     }
 
