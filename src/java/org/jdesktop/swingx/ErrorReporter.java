@@ -23,7 +23,7 @@ package org.jdesktop.swingx;
 
 /**
  * Abstract class contains all the declarations that needs to be
- * implemented to add error reporting to standard JXErrorDislog.
+ * implemented to add error reporting to standard JXErrorDialog.
  *
  * @author Alexander Zuev
  * @version 1.0
