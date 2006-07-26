@@ -44,7 +44,11 @@ import org.jdesktop.swingx.table.TableColumnExt;
  * 
  * The enhancements:
  * <ul>
- * <li> supports pluggable handler to control user interaction for sorting
+ * <li> supports pluggable handler to control user interaction for sorting. 
+ * The default handler toggles sort order on mouseClicked on the header
+ * of the column to sort. On shift-mouseClicked, it resets any column sorting. 
+ * Both are done by invoking the corresponding methods of JXTable, 
+ * <code> toggleSortOrder(int) </code> and <code> resetSortOrder() </code>
  * <li> uses ColumnHeaderRenderer which can show the sort icon
  * <li> triggers column pack (== auto-resize to exactly fit the contents)
  *  on double-click in resize region.
@@ -52,6 +56,10 @@ import org.jdesktop.swingx.table.TableColumnExt;
  * 
  * 
  * @author Jeanette Winzenburg
+ * 
+ * @see ColumnHeaderRenderer
+ * @see JXTable#toggleSortOrder(int)
+ * @see JXTable#resetSortOrder()
  */
 public class JXTableHeader extends JTableHeader 
     implements TableColumnModelExtListener {

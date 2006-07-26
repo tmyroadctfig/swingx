@@ -1515,8 +1515,7 @@ public class JXTable extends JTable
 
 
     /**
-     * Removes the interactive sorter.
-     * Used by headerListener.
+     * Resets sorting of all columns.
      * 
      */
     public void resetSortOrder() {
