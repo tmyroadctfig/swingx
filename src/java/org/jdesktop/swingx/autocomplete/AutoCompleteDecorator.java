@@ -50,6 +50,10 @@ import javax.swing.text.TextAction;
  * JComboBox comboBox = [...];<br/>
  * AutoCompleteDecorator.<b>decorate</b>(comboBox);<br/>
  * &nbsp;<br/>
+ * List items = [...];<br/>
+ * JTextField textField = [...];<br/>
+ * AutoCompleteDecorator.<b>decorate</b>(textField, items);
+ * &nbsp;<br/>
  * JList list = [...];<br/>
  * JTextField textField = [...];<br/>
  * AutoCompleteDecorator.<b>decorate</b>(list, textField);
@@ -62,16 +66,27 @@ public class AutoCompleteDecorator {
     /**
      * Enables automatic completion for the given JTextComponent based on the
      * items contained in the given <tt>List</tt>.
-     *
      * @param textComponent the text component that will be used for automatic
      * completion.
-     * @param a <tt>List</tt> containing the strings to be used for automatic
-     * completion.
+     * @param items contains the items that are used for autocompletion
      * @param strictMatching <tt>true</tt>, if only given items should be allowed to be entered
      */
     public static void decorate(JTextComponent textComponent, List items, boolean strictMatching) {
+        decorate(textComponent, items, strictMatching, ObjectToStringConverter.DEFAULT_IMPLEMENTATION);
+    }
+    
+    /**
+     * Enables automatic completion for the given JTextComponent based on the
+     * items contained in the given <tt>List</tt>.
+     * @param items contains the items that are used for autocompletion
+     * @param textComponent the text component that will be used for automatic
+     * completion.
+     * @param strictMatching <tt>true</tt>, if only given items should be allowed to be entered
+     * @param stringConverter the converter used to transform items to strings
+     */
+    public static void decorate(JTextComponent textComponent, List items, boolean strictMatching, ObjectToStringConverter stringConverter) {
         AbstractAutoCompleteAdaptor adaptor = new TextComponentAdaptor(textComponent, items);
-        AutoCompleteDocument document = new AutoCompleteDocument(adaptor, strictMatching);
+        AutoCompleteDocument document = new AutoCompleteDocument(adaptor, strictMatching, stringConverter);
         decorate(textComponent, document, adaptor);
     }
     
@@ -79,14 +94,26 @@ public class AutoCompleteDecorator {
      * Enables automatic completion for the given JTextComponent based on the
      * items contained in the given JList. The two components will be
      * synchronized. The automatic completion will always be strict.
-     *
-     * @param list a list
-     * @param textComponent the text component that will be used for automatic
-     * completion.
+     * @param list a <tt>JList</tt> containing the items for automatic completion
+     * @param textComponent the text component that will be enabled for automatic
+     * completion
      */
     public static void decorate(JList list, JTextComponent textComponent) {
-        AbstractAutoCompleteAdaptor adaptor = new ListAdaptor(list, textComponent);
-        AutoCompleteDocument document = new AutoCompleteDocument(adaptor, true);
+        decorate(list, textComponent, ObjectToStringConverter.DEFAULT_IMPLEMENTATION);
+    }
+    
+    /**
+     * Enables automatic completion for the given JTextComponent based on the
+     * items contained in the given JList. The two components will be
+     * synchronized. The automatic completion will always be strict.
+     * @param list a <tt>JList</tt> containing the items for automatic completion
+     * @param textComponent the text component that will be used for automatic
+     * completion
+     * @param stringConverter the converter used to transform items to strings
+     */
+    public static void decorate(JList list, JTextComponent textComponent, ObjectToStringConverter stringConverter) {
+        AbstractAutoCompleteAdaptor adaptor = new ListAdaptor(list, textComponent, stringConverter);
+        AutoCompleteDocument document = new AutoCompleteDocument(adaptor, true, stringConverter);
         decorate(textComponent, document, adaptor);
     }
     
@@ -94,9 +121,20 @@ public class AutoCompleteDecorator {
      * Enables automatic completion for the given JComboBox. The automatic
      * completion will be strict (only items from the combo box can be selected)
      * if the combo box is not editable.
-     * @param comboBox a combobox
+     * @param comboBox a combo box
      */
     public static void decorate(final JComboBox comboBox) {
+        decorate(comboBox, ObjectToStringConverter.DEFAULT_IMPLEMENTATION);
+    }
+    
+    /**
+     * Enables automatic completion for the given JComboBox. The automatic
+     * completion will be strict (only items from the combo box can be selected)
+     * if the combo box is not editable.
+     * @param comboBox a combo box
+     * @param stringConverter the converter used to transform items to strings
+     */
+    public static void decorate(final JComboBox comboBox, final ObjectToStringConverter stringConverter) {
         boolean strictMatching = !comboBox.isEditable();
         // has to be editable
         comboBox.setEditable(true);
@@ -104,7 +142,7 @@ public class AutoCompleteDecorator {
         // configure the text component=editor component
         JTextComponent editor = (JTextComponent) comboBox.getEditor().getEditorComponent();
         final AbstractAutoCompleteAdaptor adaptor = new ComboBoxAdaptor(comboBox);
-        final AutoCompleteDocument document = new AutoCompleteDocument(adaptor, strictMatching);
+        final AutoCompleteDocument document = new AutoCompleteDocument(adaptor, strictMatching, stringConverter);
         decorate(editor, document, adaptor);
         
         // show the popup list when the user presses a key
@@ -125,6 +163,18 @@ public class AutoCompleteDecorator {
         };
         editor.addKeyListener(keyListener);
         
+        if (stringConverter!=ObjectToStringConverter.DEFAULT_IMPLEMENTATION) {
+            comboBox.setEditor(new AutoCompleteComboBoxEditor(comboBox.getEditor(), stringConverter));
+        }
+        
+        comboBox.addPropertyChangeListener("editor", new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent e) {
+                if (!(e.getNewValue() instanceof AutoCompleteComboBoxEditor)) {
+                    comboBox.setEditor(new AutoCompleteComboBoxEditor((ComboBoxEditor) e.getNewValue(), stringConverter));
+                }
+            }
+        });
+        
         // Changing the l&f can change the combobox' editor which in turn
         // would not be autocompletion-enabled. The new editor needs to be set-up.
         comboBox.addPropertyChangeListener(new PropertyChangeListener() {
@@ -132,6 +182,10 @@ public class AutoCompleteDecorator {
                 if (e.getPropertyName().equals("editor")) {
                     ComboBoxEditor editor = comboBox.getEditor();
                     if (editor!=null && editor.getEditorComponent()!=null) {
+                        if (stringConverter!=ObjectToStringConverter.DEFAULT_IMPLEMENTATION) {
+                            editor = new AutoCompleteComboBoxEditor(editor, stringConverter);
+                            comboBox.setEditor(editor);
+                        }
                         decorate((JTextComponent) editor.getEditorComponent(), document, adaptor);
                         editor.getEditorComponent().addKeyListener(keyListener);
                     }

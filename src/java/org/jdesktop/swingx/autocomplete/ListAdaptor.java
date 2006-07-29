@@ -36,6 +36,8 @@ public class ListAdaptor extends AbstractAutoCompleteAdaptor implements ListSele
     JList list;
     /** the text component that is used for automatic completion*/
     JTextComponent textComponent;
+    /** the converter used to transform items to strings */
+    ObjectToStringConverter stringConverter;
     
     /**
      * Creates a new JListAdaptor for the given list and text component.
@@ -43,10 +45,12 @@ public class ListAdaptor extends AbstractAutoCompleteAdaptor implements ListSele
      * completion
      * @param textComponent the text component that will be used automatic
      * completion
+     * @param stringConverter the converter used to transform items to strings
      */
-    public ListAdaptor(JList list, JTextComponent textComponent) {
+    public ListAdaptor(JList list, JTextComponent textComponent, ObjectToStringConverter stringConverter) {
         this.list = list;
         this.textComponent = textComponent;
+        this.stringConverter = stringConverter;
         // when a new item is selected set and mark the text
         list.addListSelectionListener(this);
     }
@@ -58,7 +62,7 @@ public class ListAdaptor extends AbstractAutoCompleteAdaptor implements ListSele
     // ListSelectionListener (listening to list)
     public void valueChanged(javax.swing.event.ListSelectionEvent listSelectionEvent) {
         // set the text to the currently selected item
-        getTextComponent().setText(list.getSelectedValue().toString());
+        getTextComponent().setText(stringConverter.getPreferredStringForItem(list.getSelectedValue()));
         // mark the entire text
         markEntireText();
     }

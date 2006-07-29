@@ -48,23 +48,36 @@ public class AutoCompleteDocument extends PlainDocument {
      */
     AbstractAutoCompleteAdaptor adaptor;
     
+    ObjectToStringConverter stringConverter;
+    
     /**
      * Creates a new AutoCompleteDocument for the given AbstractAutoCompleteAdaptor.
-     * 
-     * 
+     * @param adaptor The adaptor that will be used to find and select matching
+     * items.
+     * @param strictMatching true, if only items from the adaptor's list should
+     * be allowed to be entered
+     * @param stringConverter the converter used to transform items to strings
+     */
+    public AutoCompleteDocument(AbstractAutoCompleteAdaptor adaptor, boolean strictMatching, ObjectToStringConverter stringConverter) {
+        this.adaptor = adaptor;
+        this.strictMatching = strictMatching;
+        this.stringConverter = stringConverter;
+        
+        // Handle initially selected object
+        Object selected = adaptor.getSelectedItem();
+        if (selected!=null) setText(stringConverter.getPreferredStringForItem(selected));
+        adaptor.markEntireText();
+    }
+    
+    /**
+     * Creates a new AutoCompleteDocument for the given AbstractAutoCompleteAdaptor.
      * @param strictMatching true, if only items from the adaptor's list should
      * be allowed to be entered
      * @param adaptor The adaptor that will be used to find and select matching
      * items.
      */
     public AutoCompleteDocument(AbstractAutoCompleteAdaptor adaptor, boolean strictMatching) {
-        this.adaptor = adaptor;
-        this.strictMatching = strictMatching;
-        
-        // Handle initially selected object
-        Object selected = adaptor.getSelectedItem();
-        if (selected!=null) setText(selected.toString());
-        adaptor.markEntireText();
+        this(adaptor, strictMatching, ObjectToStringConverter.DEFAULT_IMPLEMENTATION);
     }
     
     /**
@@ -80,7 +93,7 @@ public class AutoCompleteDocument extends PlainDocument {
         if (selecting) return;
         super.remove(offs, len);
         if (!strictMatching) {
-            setSelectedItem(getText(0, getLength()));
+            setSelectedItem(getText(0, getLength()), getText(0, getLength()));
             adaptor.getTextComponent().setCaretPosition(offs);
         }
     }
@@ -91,13 +104,14 @@ public class AutoCompleteDocument extends PlainDocument {
         // insert the string into the document
         super.insertString(offs, str, a);
         // lookup and select a matching item
-        Object item = lookupItem(getText(0, getLength()));
-        if (item != null) {
-            setSelectedItem(item);
+        LookupResult lookupResult = lookupItem(getText(0, getLength()));
+        if (lookupResult.matchingItem != null) {
+            setSelectedItem(lookupResult.matchingItem, lookupResult.matchingString);
         } else {
             if (strictMatching) {
                 // keep old item selected if there is no match
-                item = adaptor.getSelectedItem();
+                lookupResult.matchingItem = adaptor.getSelectedItem();
+                lookupResult.matchingString = adaptor.getSelectedItemAsString();
                 // imitate no insert (later on offs will be incremented by
                 // str.length(): selection won't move forward)
                 offs = offs-str.length();
@@ -105,11 +119,12 @@ public class AutoCompleteDocument extends PlainDocument {
                 UIManager.getLookAndFeel().provideErrorFeedback(adaptor.getTextComponent());
             } else {
                 // no item matches => use the current input as selected item
-                item=getText(0, getLength());
-                setSelectedItem(item);
+                lookupResult.matchingItem=getText(0, getLength());
+                lookupResult.matchingString=getText(0, getLength());
+                setSelectedItem(lookupResult.matchingItem, lookupResult.matchingString);
             }
         }
-        setText(item==null?"":item.toString());
+        setText(lookupResult.matchingString);
         // select the completed part
         adaptor.markText(offs+str.length());
     }
@@ -131,12 +146,13 @@ public class AutoCompleteDocument extends PlainDocument {
     
     /**
      * Selects the given item using the AbstractAutoCompleteAdaptor.
-     * 
+     * @param itemAsString string representation of the item to be selected
      * @param item the item that is to be selected
      */
-    private void setSelectedItem(Object item) {
+    private void setSelectedItem(Object item, String itemAsString) {
         selecting = true;
         adaptor.setSelectedItem(item);
+        adaptor.setSelectedItemAsString(itemAsString);
         selecting = false;
     }
     
@@ -148,31 +164,56 @@ public class AutoCompleteDocument extends PlainDocument {
      * @param pattern the pattern that should be matched
      * @return the first item that matches the pattern or <code>null</code> if no item matches
      */
-    private Object lookupItem(String pattern) {
+    private LookupResult lookupItem(String pattern) {
         Object selectedItem = adaptor.getSelectedItem();
-        // search for an exact match, if the currently selected does match
-        if (selectedItem != null && startsWithIgnoreCase(selectedItem.toString(), pattern)) {
-            // iterate over all items
-            for (int i=0, n=adaptor.getItemCount(); i < n; i++) {
-                Object currentItem = adaptor.getItem(i);
-                // current item starts with the pattern?
-                if (currentItem != null && currentItem.toString().equalsIgnoreCase(pattern)) {
-                    return currentItem;
+        
+        String[] possibleStrings;
+
+        // iterate over all items to find an exact match
+        for (int i=0, n=adaptor.getItemCount(); i < n; i++) {
+            Object currentItem = adaptor.getItem(i);
+            possibleStrings = stringConverter.getPossibleStringsForItem(currentItem);
+            if (possibleStrings!=null) {
+                // current item exactly matches the pattern?
+                for (int j=0; j<possibleStrings.length; j++) {
+                    if (possibleStrings[j].equalsIgnoreCase(pattern)) {
+                        return new LookupResult(currentItem, possibleStrings[j]);
+                    }
                 }
             }
-            return selectedItem;
-        } else { // search for any matching item, if the currently selected does not match
-            // iterate over all items
-            for (int i=0, n=adaptor.getItemCount(); i < n; i++) {
-                Object currentItem = adaptor.getItem(i);
-                // current item starts with the pattern?
-                if (currentItem != null && startsWithIgnoreCase(currentItem.toString(), pattern)) {
-                    return currentItem;
+        }
+        // check if the currently selected item matches
+        possibleStrings = stringConverter.getPossibleStringsForItem(selectedItem);
+        if (possibleStrings!=null) {
+            for (int i=0; i<possibleStrings.length; i++) {
+                if (startsWithIgnoreCase(possibleStrings[i], pattern)) {
+                    return new LookupResult(selectedItem, possibleStrings[i]);
+                }
+            }
+        }
+        // search for any matching item, if the currently selected does not match
+        for (int i=0, n=adaptor.getItemCount(); i < n; i++) {
+            Object currentItem = adaptor.getItem(i);
+            possibleStrings = stringConverter.getPossibleStringsForItem(currentItem);
+            if (possibleStrings!=null) {
+                for (int j=0; j<possibleStrings.length; j++) {
+                    if (startsWithIgnoreCase(possibleStrings[j], pattern)) {
+                        return new LookupResult(currentItem, possibleStrings[j]);
+                    }
                 }
             }
         }
         // no item starts with the pattern => return null
-        return null;
+        return new LookupResult(null, "");
+    }
+    
+    private static class LookupResult {
+        Object matchingItem;
+        String matchingString;
+        public LookupResult(Object matchingItem, String matchingString) {
+            this.matchingItem = matchingItem;
+            this.matchingString = matchingString;
+        }
     }
     
     /**

@@ -36,6 +36,10 @@ import javax.swing.text.JTextComponent;
  * @author Thomas Bierhance
  */
 public abstract class AbstractAutoCompleteAdaptor {
+    
+    /** the string representation in use for the currently selected item*/
+    private String selectedItemAsString;
+    
     /**
      * Returns the currently selected item.
      * @return the selected item
@@ -47,6 +51,22 @@ public abstract class AbstractAutoCompleteAdaptor {
      * @param item the item that is to be selected
      */
     public abstract void setSelectedItem(Object item);
+    
+    /**
+     * Returns the string representation in use for the currently selected item.
+     * @return the string representation in use for the currently selected item
+     */
+    public String getSelectedItemAsString() {
+        return this.selectedItemAsString;
+    }
+    
+    /**
+     * Sets the string representation in use for the currently selected item.
+     * @param itemAsString the string representation in use for the currently selected item
+     */
+    public void setSelectedItemAsString(String itemAsString) {
+        this.selectedItemAsString = itemAsString;
+    }
 
     /**
      * Returns the number of items in the list.
@@ -88,7 +108,7 @@ public abstract class AbstractAutoCompleteAdaptor {
     
     /**
      * Marks/selects the text that is displayed inside the text component starting from the
-     * character with index <code>start</code>.
+     * character with index <tt>start</tt>.
      * @param start index of the first character that should be marked
      */
     public void markText(int start) {
