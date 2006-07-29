@@ -45,6 +45,17 @@ public class ListAdaptor extends AbstractAutoCompleteAdaptor implements ListSele
      * completion
      * @param textComponent the text component that will be used automatic
      * completion
+     */
+    public ListAdaptor(JList list, JTextComponent textComponent) {
+        this(list, textComponent, ObjectToStringConverter.DEFAULT_IMPLEMENTATION);
+    }
+    
+    /**
+     * Creates a new JListAdaptor for the given list and text component.
+     * @param list the list that contains the items that are used for automatic
+     * completion
+     * @param textComponent the text component that will be used automatic
+     * completion
      * @param stringConverter the converter used to transform items to strings
      */
     public ListAdaptor(JList list, JTextComponent textComponent, ObjectToStringConverter stringConverter) {
