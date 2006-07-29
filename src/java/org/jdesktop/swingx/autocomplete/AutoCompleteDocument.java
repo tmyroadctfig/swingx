@@ -150,10 +150,18 @@ public class AutoCompleteDocument extends PlainDocument {
      */
     private Object lookupItem(String pattern) {
         Object selectedItem = adaptor.getSelectedItem();
-        // only search for a different item if the currently selected does not match
+        // search for an exact match, if the currently selected does match
         if (selectedItem != null && startsWithIgnoreCase(selectedItem.toString(), pattern)) {
+            // iterate over all items
+            for (int i=0, n=adaptor.getItemCount(); i < n; i++) {
+                Object currentItem = adaptor.getItem(i);
+                // current item starts with the pattern?
+                if (currentItem != null && currentItem.toString().equalsIgnoreCase(pattern)) {
+                    return currentItem;
+                }
+            }
             return selectedItem;
-        } else {
+        } else { // search for any matching item, if the currently selected does not match
             // iterate over all items
             for (int i=0, n=adaptor.getItemCount(); i < n; i++) {
                 Object currentItem = adaptor.getItem(i);
