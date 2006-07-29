@@ -23,13 +23,12 @@ package org.jdesktop.swingx.autocomplete;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -59,6 +58,22 @@ import javax.swing.text.TextAction;
  * @author Thomas Bierhance
  */
 public class AutoCompleteDecorator {
+    
+    /**
+     * Enables automatic completion for the given JTextComponent based on the
+     * items contained in the given <tt>List</tt>.
+     *
+     * @param textComponent the text component that will be used for automatic
+     * completion.
+     * @param a <tt>List</tt> containing the strings to be used for automatic
+     * completion.
+     * @param strictMatching <tt>true</tt>, if only given items should be allowed to be entered
+     */
+    public static void decorate(JTextComponent textComponent, List items, boolean strictMatching) {
+        AbstractAutoCompleteAdaptor adaptor = new TextComponentAdaptor(textComponent, items);
+        AutoCompleteDocument document = new AutoCompleteDocument(adaptor, strictMatching);
+        decorate(textComponent, document, adaptor);
+    }
     
     /**
      * Enables automatic completion for the given JTextComponent based on the
