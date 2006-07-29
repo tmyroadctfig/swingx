@@ -53,9 +53,10 @@ import javax.swing.table.TableCellEditor;
  */
 public class ComboBoxCellEditor extends AbstractCellEditor implements TableCellEditor, Serializable {
     
+    /** the combo box */
     private JComboBox comboBox;
-    // a Listener listening for key events (handling enter-key)
-    // and changes of the combo box' editor component.
+    /** a Listener listening for key events (handling enter-key) and changes of
+     * the combo box' editor component.*/
     private Handler handler;
     
     /**
