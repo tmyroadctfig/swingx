@@ -310,7 +310,18 @@ public class Utilities {
             }
         }
 
-        Field[] fields = KeyEvent.class.getDeclaredFields();
+        Field[] fields;
+//        fields = KeyEvent.class.getDeclaredFields();
+        // Issue #353-swingx: play nicer inside sandbox.
+        try {
+            fields = KeyEvent.class.getDeclaredFields();
+        } catch (SecurityException e) {
+           fields = KeyEvent.class.getFields();
+        } finally {
+            // JW: need to do better? What are the use-cases where we don't have
+            // any access to the fields?
+            fields = new Field[0];
+        }
 
         HashMap<String,Integer> names = new HashMap<String,Integer>(((fields.length * 4) / 3) + 5, 0.75f);
         HashMap<Integer,String> values = new HashMap<Integer,String>(((fields.length * 4) / 3) + 5, 0.75f);
