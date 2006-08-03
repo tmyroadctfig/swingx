@@ -4,9 +4,9 @@
  */
 package org.jdesktop.swingx;
 
-import junit.framework.TestCase;
+import java.util.logging.Logger;
 
-import org.jdesktop.swingx.JXTable;
+import junit.framework.TestCase;
 
 /**
  * "hand test" sandbox restrictions 
@@ -18,12 +18,19 @@ import org.jdesktop.swingx.JXTable;
  *  
  * 
  */
-public class ASecurityTest extends TestCase {
+public class SandboxTest extends TestCase {
+    private static final Logger LOG = Logger.getLogger(SandboxTest.class
+            .getName());
     /**
-     * quick test if table is 
+     * quick test if table doesn't throw securityExceptions.
+     * 
      *
      */
     public void testSecurityManager() {
+        if (System.getSecurityManager() == null) {
+            LOG.info("cannot run testSecurityManager - no SecurityManager installed");
+            return;
+        }
         JXTable table = new JXTable();
         try {
             System.getProperty("user.home", "not specified");
@@ -34,7 +41,15 @@ public class ASecurityTest extends TestCase {
         
     }
     
-    public void testNoSecurityManager() {
+    /**
+     * Sanity: make sure the second-time-around is reached!
+     *
+     */
+    public void testSecurityManagerAgain() {
+        if (System.getSecurityManager() == null) {
+            LOG.info("cannot run testSecurityManagerAgain - no SecurityManager installed");
+            return;
+        }
         try {
             System.getProperty("user.home", "not specified");
             fail("Sandbox without security priviledges");
@@ -52,9 +67,9 @@ public class ASecurityTest extends TestCase {
         // (the securityManager is not uninstalled when running 
         // other test cases - in Eclipse, when running the 
         // bulk "all tests" of a projects. 
-        if (System.getSecurityManager() == null) {
-            System.setSecurityManager(new SecurityManager());
-        }
+//        if (System.getSecurityManager() == null) {
+//            System.setSecurityManager(new SecurityManager());
+//        }
         // B- if we install a SecurityManager we need to be sure
         // that we are allowed to uninstall it.
         // BUT: with this custom manager on, JXTable instantiation
