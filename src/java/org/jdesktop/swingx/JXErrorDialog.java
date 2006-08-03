@@ -499,7 +499,8 @@ public class JXErrorDialog extends JDialog {
             errorMessage.setSize( errorMessage.getPreferredSize() );
             setSize(getWidth(), collapsedHeight);
         }
-        
+        doLayout();
+        // JW: really need to repaint? doLayout should take care of that
         repaint();
     }
     
