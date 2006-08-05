@@ -538,7 +538,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         addAction(frame, action);
     }
     /**
-     * compare treeTable/tree height
+     * compare treeTable/table height: default gridlines
      *
      */
     public void interactiveTestAlternateHighlightAndRowGridLines() {
@@ -551,6 +551,24 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         table.setRowHeight(22);
         JFrame frame = wrapWithScrollingInFrame(treeTable, table, 
                 "AlternateRow LinePrinter-with Gridlines");
+        frame.setVisible(true);
+    }
+
+    /**
+     * compare table/table height: 
+     * with and without default gridlines and margins
+     *
+     */
+    public void interactiveTestAlternateHighlightAndNoGridLines() {
+        JXTable treeTable = new JXTable(new AncientSwingTeam());
+        treeTable.setRowHeight(22);
+        treeTable.addHighlighter(AlternateRowHighlighter.linePrinter);
+        JXTable table = new JXTable(new AncientSwingTeam());
+        table.addHighlighter(AlternateRowHighlighter.linePrinter);
+        table.setRowHeight(22);
+        table.setDefaultMargins(false, false);
+        JFrame frame = wrapWithScrollingInFrame(treeTable, table, 
+                "AlternateRow LinePrinter- left== with, right == out Gridlines");
         frame.setVisible(true);
     }
 
