@@ -447,7 +447,7 @@ public class JXTable extends JTable
         // guarantee getFilters() to return != null
         setFilters(null);
         initActionsAndBindings();
-        // instantiate row height depending on font size
+        // instantiate row height depending ui setting or font size.
         updateRowHeightUI(false);
         setFillsViewportHeight(true);
     }
@@ -3268,18 +3268,27 @@ public class JXTable extends JTable
 
     /** 
      * internal (unsucessful?) hack to try and set rowHeight to something more
-     * pleasing then the default. Tries to measure the font and/or ask the 
-     * UIManager for a default value. 
+     * pleasing then the default. <p> 
+     * First asks the UIManager for a default value (stored with key "JXTable.rowHeight"). 
+     * If none is available, calculates a "reasonable" height from the table's 
+     * fontMetrics, assuming that most renderers/editors will have a border with top/bottom
+     * of 1. 
      *  
+     * Does nothing if the rowHeight had been  already set by client code. 
      * The underlying problem is that raw types can't implement 
      * UIResource. 
      */
     private void updateRowHeightUI(boolean respectRowSetFlag) {
         if (respectRowSetFlag && isXTableRowHeightSet)
             return;
-        int minimumSize = getFont().getSize() + 6;
-        int uiSize = UIManager.getInt(UIPREFIX + "rowHeight");
-        setRowHeight(Math.max(minimumSize, uiSize != 0 ? uiSize : 18));
+        int uiHeight = UIManager.getInt(UIPREFIX + "rowHeight");
+        if (uiHeight > 0) {
+            setRowHeight(uiHeight);
+        } else {
+            int fontBasedHeight = getFontMetrics(getFont()).getHeight() + 2; 
+            int magicMinimum = 18;
+            setRowHeight(Math.max(fontBasedHeight, magicMinimum));
+        }
         isXTableRowHeightSet = false;
     }
 

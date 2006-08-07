@@ -104,14 +104,61 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
     /**
-     * Issue #359-swingx: table doesn't respect ui-setting of rowheight.
-     * 
+     * test default rowHeight calculation with default font.
      *
      */
-    public void testUIRowHeightUpperBound() {
-        UIManager.put("JXTable.rowHeight", 20);
+    public void testRowHeightFromFont() {
+        // sanity
+        assertNull("no ui rowheight", UIManager.get("JXTable.rowHeight"));
         JXTable table = new JXTable();
-        assertEquals("table must respect ui rowheight", 20, table.getRowHeight());
+        assertEquals("default rowHeight based on fontMetrics height " +
+                        "plus top plus bottom border (== 2)", 
+                        table.getFontMetrics(table.getFont()).getHeight() + 2, 
+                        table.getRowHeight());
+    }
+    
+    
+    /**
+     * test default rowHeight calculation with bigger font.
+     *
+     */
+    public void testRowHeightFromBigFont() {
+        // sanity
+        assertNull("no ui rowheight", UIManager.get("JXTable.rowHeight"));
+        JXTable table = new JXTable();
+        table.setFont(table.getFont().deriveFont(table.getFont().getSize() * 2f));
+        table.updateUI();
+        assertEquals("default rowHeight based on fontMetrics height " +
+                        "plus top plus bottom border (== 2)", 
+                        table.getFontMetrics(table.getFont()).getHeight() + 2, 
+                        table.getRowHeight());
+    }
+    
+    /**
+     * Issue #359-swingx: table doesn't respect ui-setting of rowheight.
+     * 
+     * lower bound is enforced to "magic number", 18
+     *
+     */
+    public void testUIRowHeightLowerBound() {
+        int tinyRowHeight = 5;
+        UIManager.put("JXTable.rowHeight", tinyRowHeight);
+        JXTable table = new JXTable();
+        assertEquals("table must respect ui rowheight", tinyRowHeight, table.getRowHeight());
+        
+    }
+
+
+    /**
+     * Issue #359-swingx: table doesn't respect ui-setting of rowheight.
+     * 
+     * upper bound is taken correctly.
+     */
+    public void testUIRowHeightUpperBound() {
+        int monsterRowHeight = 50;
+        UIManager.put("JXTable.rowHeight", monsterRowHeight);
+        JXTable table = new JXTable();
+        assertEquals("table must respect ui rowheight", monsterRowHeight, table.getRowHeight());
         
     }
     /**

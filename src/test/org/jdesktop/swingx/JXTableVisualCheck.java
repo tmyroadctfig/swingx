@@ -90,8 +90,8 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*Boolean.*");
 //          test.runInteractiveTests("interactive.*isable.*");
           
-//          test.runInteractiveTests("interactive.*Column.*");
-        test.runInteractiveTests("interactive.*HeaderAlign.*");
+          test.runInteractiveTests("interactive.*Compare.*");
+//        test.runInteractiveTests("interactive.*Header.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -103,9 +103,24 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     protected void setUp() throws Exception {
         super.setUp();
         // super has LF specific tests...
-        setSystemLF(true);
+        setSystemLF(false);
     }
 
+    /**
+     * calculate reasonable table rowHeight withouth "white pixel" in editor.
+     * Compare table and xtable
+     */
+    public void interactiveCompareRowHeight() {
+        JXTable xtable = new JXTable(sortableTableModel);
+        xtable.setDefaultMargins(false, false);
+        JTable table = new JTable(sortableTableModel);
+        table.setShowHorizontalLines(false);
+        table.setShowVerticalLines(false);
+        table.setRowMargin(0);
+        table.getColumnModel().setColumnMargin(0);
+        JXFrame frame = wrapWithScrollingInFrame(xtable, table, "compare default rowheight of xtable vs. table");
+        frame.setVisible(true);
+    }
     
     /**
      * visually check if terminateEditOnFocusLost, autoStartEdit
