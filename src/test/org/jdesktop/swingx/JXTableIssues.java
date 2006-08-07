@@ -26,6 +26,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.UIManager;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -54,6 +55,19 @@ public class JXTableIssues extends InteractiveTestCase {
     public JXTableIssues() {
         super("JXTableIssues");
         // TODO Auto-generated constructor stub
+    }
+
+    
+    /**
+     * Issue #359-swingx: table doesn't respect ui-setting of rowheight.
+     * 
+     *
+     */
+    public void testUIRowHeightLowerBound() {
+        UIManager.put("JXTable.rowHeight", 15);
+        JXTable table = new JXTable();
+        assertEquals("table must respect ui rowheight", 15, table.getRowHeight());
+        
     }
 
     /**

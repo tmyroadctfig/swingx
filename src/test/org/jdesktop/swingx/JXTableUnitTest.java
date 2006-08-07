@@ -32,6 +32,7 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
@@ -75,6 +76,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
 
     // flag used in setup to explicitly choose LF
     private boolean defaultToSystemLF;
+    // stored ui properties to reset in teardown
+    private Object uiTableRowHeight;
 
     public JXTableUnitTest() {
         super("JXTable unit test");
@@ -90,8 +93,27 @@ public class JXTableUnitTest extends InteractiveTestCase {
         // make sure we have the same default for each test
         defaultToSystemLF = false;
         setSystemLF(defaultToSystemLF);
+        uiTableRowHeight = UIManager.get("JXTable.rowHeight");
     }
 
+    
+    @Override
+    protected void tearDown() throws Exception {
+        UIManager.put("JXTable.rowHeight", uiTableRowHeight);
+        super.tearDown();
+    }
+
+    /**
+     * Issue #359-swingx: table doesn't respect ui-setting of rowheight.
+     * 
+     *
+     */
+    public void testUIRowHeightUpperBound() {
+        UIManager.put("JXTable.rowHeight", 20);
+        JXTable table = new JXTable();
+        assertEquals("table must respect ui rowheight", 20, table.getRowHeight());
+        
+    }
     /**
      * Issue #342-swingx: default margins in JXTreeTable.
      * 
