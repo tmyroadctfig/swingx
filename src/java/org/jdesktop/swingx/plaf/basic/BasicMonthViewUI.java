@@ -287,18 +287,12 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     public long getDayAt(int x, int y) {
-           if (ltr ? (startX > x) : (startX < x) || startY > y) {
+        Point rowCol = getCalRowColAt(x, y);
+        if (NO_SUCH_CALENDAR.equals(rowCol)) {
             return -1;
         }
 
-        // Determine which column of calendars we're in.
-        int calCol = (ltr ? (x - startX) : (startX - x)) /
-                (calendarWidth + CALENDAR_SPACING);
-
-        // Determine which row of calendars we're in.
-        int calRow = (y - startY) / (calendarHeight + CALENDAR_SPACING);
-
-        if (calRow > numCalRows - 1 || calCol > numCalCols - 1) {
+        if (rowCol.x > numCalRows - 1 || rowCol.y > numCalCols - 1) {
             return -1;
         }
 
@@ -307,7 +301,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         int boxPaddingX = monthView.getBoxPaddingX();
         int boxPaddingY = monthView.getBoxPaddingY();
         row += (((y - startY) -
-                (calRow * (calendarHeight + CALENDAR_SPACING))) -
+                (rowCol.x * (calendarHeight + CALENDAR_SPACING))) -
                 (boxPaddingY + monthBoxHeight + boxPaddingY)) /
                 (boxPaddingY + boxHeight + boxPaddingY);
         // The first two lines in the calendar are the month and the days
@@ -320,7 +314,7 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         // Determine which column in the selected month we're in.
         int col = ((ltr ? (x - startX) : (startX - x)) -
-                (calCol * (calendarWidth + CALENDAR_SPACING))) /
+                (rowCol.y * (calendarWidth + CALENDAR_SPACING))) /
                 (boxPaddingX + boxWidth + boxPaddingX);
 
         // If we're showing week numbers we need to reduce the selected
@@ -340,7 +334,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         Calendar cal = monthView.getCalendar();
         cal.setTimeInMillis(firstDisplayedDate);
         //_cal.set(Calendar.DAY_OF_MONTH, 1);
-        cal.add(Calendar.MONTH, calCol + (calRow * numCalCols));
+        cal.add(Calendar.MONTH, rowCol.y + (rowCol.x * numCalCols));
 
         int firstDayViewIndex = getDayOfWeekViewIndex(cal.get(Calendar.DAY_OF_WEEK));
         int daysToAdd = (row * JXMonthView.DAYS_IN_WEEK) + (col - firstDayViewIndex);
