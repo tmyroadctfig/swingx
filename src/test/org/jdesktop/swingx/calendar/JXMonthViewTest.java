@@ -20,6 +20,7 @@ package org.jdesktop.swingx.calendar;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.SortedSet;
 import org.jdesktop.swingx.DateSelectionListener;
 import org.jdesktop.swingx.DateSelectionModel;
@@ -46,6 +47,15 @@ public class JXMonthViewTest extends MockObjectTestCase {
         assertTrue(monthView.getSelection().isEmpty());
         assertTrue(JXMonthView.SelectionMode.SINGLE_SELECTION == monthView.getSelectionMode());
         assertTrue(Calendar.SUNDAY == monthView.getFirstDayOfWeek());
+    }
+
+    public void testLocale() {
+        JXMonthView monthView = new JXMonthView();
+        Locale locale = monthView.getLocale();
+        Calendar cal = Calendar.getInstance(locale);
+        int expectedFirstDayOfWeek = cal.getFirstDayOfWeek();
+
+        assertTrue(expectedFirstDayOfWeek == monthView.getFirstDayOfWeek());
     }
 
     public void testNullSelection() {

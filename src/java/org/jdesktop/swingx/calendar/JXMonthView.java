@@ -248,11 +248,11 @@ public class JXMonthView extends JComponent {
     }
 
     public JXMonthView(long firstDisplayedDate, final DateSelectionModel model) {
-        this.antiAlias = false;
-        this.traversable = false;
-        this.firstDayOfWeek = Calendar.SUNDAY;
-        this.listenerMap = new EventListenerMap();
-        this.selectionMode = SelectionMode.SINGLE_SELECTION;
+        antiAlias = false;
+        traversable = false;
+        listenerMap = new EventListenerMap();
+        selectionMode = SelectionMode.SINGLE_SELECTION;
+
         this.model = model;
         if (this.model == null) {
             this.model = new DefaultDateSelectionModel();
@@ -262,6 +262,7 @@ public class JXMonthView extends JComponent {
 
         // Set up calendar instance
         cal = Calendar.getInstance(getLocale());
+        firstDayOfWeek = cal.getFirstDayOfWeek();
         cal.setFirstDayOfWeek(firstDayOfWeek);
         cal.setMinimalDaysInFirstWeek(1);
 
