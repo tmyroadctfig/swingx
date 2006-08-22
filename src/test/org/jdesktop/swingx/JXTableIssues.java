@@ -7,7 +7,9 @@
 package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.text.Collator;
@@ -26,19 +28,14 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.UIManager;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.decorator.ComponentAdapter;
-import org.jdesktop.swingx.decorator.Filter;
-import org.jdesktop.swingx.decorator.FilterPipeline;
-import org.jdesktop.swingx.decorator.PatternFilter;
-import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.decorator.SortKey;
-import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.util.AncientSwingTeam;
@@ -57,19 +54,20 @@ public class JXTableIssues extends InteractiveTestCase {
         // TODO Auto-generated constructor stub
     }
 
-    
     /**
-     * Issue #359-swingx: table doesn't respect ui-setting of rowheight.
+     * Issue #359-swing: find suitable rowHeight.
      * 
-     *
+     * Text selection in textfield has row of metrics.getHeight.
+     * Suitable rowHeight should should take border into account:
+     * for a textfield that's the metrics height plus 2.
      */
-    public void testUIRowHeightLowerBound() {
-        UIManager.put("JXTable.rowHeight", 15);
-        JXTable table = new JXTable();
-        assertEquals("table must respect ui rowheight", 15, table.getRowHeight());
-        
+    public void testRowHeightFontMetrics() {
+        JXTable table = new JXTable(10, 2);
+        TableCellEditor editor = table.getCellEditor(1, 1);
+        Component comp = table.prepareEditor(editor, 1, 1);
+        assertEquals(comp.getPreferredSize().height, table.getRowHeight());
     }
-
+    
     /**
      * Issue??-swingx: turn off scrollbar doesn't work if the
      *   table was initially in autoResizeOff mode.
