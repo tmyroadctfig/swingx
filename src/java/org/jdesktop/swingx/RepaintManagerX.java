@@ -28,12 +28,11 @@ import javax.swing.JComponent;
 import javax.swing.RepaintManager;
 
 /**
- * This repaint manager is used by Swingx for translucency. The default implementation
- * of JXPanel (which supports translucency) will replace the current RepaintManager
- * with a RepaintManagerX *unless* the current RepaintManager is
- * tagged by the "TranslucentRepaintManager" annotation. 
- * <p>TODO: Add this to the main documentation (make it visible) so that people
- * don't bump into it accidently and spend time debugging</p>
+ * <p>An implementation of {@link RepaintManager} which adds support for transparency
+ * in {@link JXPanel}s. <code>JXPanel</code> (which supports translucency) will 
+ * replace the current RepaintManager with an instance of RepaintManagerX 
+ * <em>unless</em> the current RepaintManager is tagged by the {@link TranslucentRepaintManager}
+ * annotation.</p>
  *
  * @author zixle
  * @author rbair
