@@ -47,6 +47,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
+import org.jdesktop.swingx.painter.Painter;
 
 // TODO: keyboard navigation
 // TODO: honor clip rect with text painting
@@ -55,21 +56,19 @@ import java.util.List;
 // TODO: programmatically zoom in and out (or expose ZOOM_MULTIPLIER)
 
 /**
- * <h2>Presentation</h2>
- *
  * <p><code>JXGraph</code> provides a component which can display one or more
  * plots on top of a graduated background (or grid.)</p>
  * 
  * <h2>User input</h2>
  * 
- * <p>To help analyzing the plots, this component allows the user to pan the
+ * <p>To help analyze the plots, this component allows the user to pan the
  * view by left-clicking and dragging the mouse around. Using the mouse wheel,
  * the user is also able to zoom in and out. Clicking the middle button resets
  * the view to its original position.</p>
  *
  * <p>All user input can be disabled by calling
  * {@link #setInputEnabled(boolean)} and passing false. This does not prevent
- * subclasses to register their own event listeners, such as mouse or key
+ * subclasses from registering their own event listeners, such as mouse or key
  * listeners.</p>
  *
  * <h2>Initializing the component and setting the view</h2>
@@ -82,11 +81,11 @@ import java.util.List;
  *   <li><i>minX</i>: Minimum value initially displayed by the component on the
  *   X axis (horizontally.)</li>
  *   <li><i>minY</i>: Minimum value initially displayed by the component on the
- *   Y axis (vertycally.)</li>
+ *   Y axis (vertically.)</li>
  *   <li><i>maxX</i>: Maximum value initially displayed by the component on the
  *   X axis (horizontally.)</li>
  *   <li><i>maxY</i>: Maximum value initially displayed by the component on the
- *   Y axis (vertycally.)</li>
+ *   Y axis (vertically.)</li>
  *   <li><i>originX</i>: Origin on the X axis of the vertical axis.</li>
  *   <li><i>originY</i>: Origin on the Y axis of the horizontal axis.</li>
  *   <li><i>majorX</i>: Distance between two major vertical lines of the
@@ -131,7 +130,7 @@ import java.util.List;
  *
  * <h3>Grid lines</h3>
  *
- * <p>By default, the component defines a spacing of 0.2 unites between two
+ * <p>By default, the component defines a spacing of 0.2 units between two
  * major grid lines. It also defines 4 minor grid lines between two major
  * grid lines. The spacing between major grid lines and the number of minor
  * grid lines can be accessed through the getters {@link #getMajorX()},
@@ -166,8 +165,8 @@ import java.util.List;
  * <h3>Usage example</h3>
  *
  * <p>The following code snippet creates a new graph centered on
- * <code>(0, 0)</code>, bound to the view <code>[-1.0 1.0 -1.0 1.0</code>, with
- * a major grid line every 0.5 units and a minor grid lines count of 5:</p>
+ * <code>(0, 0)</code>, bound to the view <code>[-1.0 1.0 -1.0 1.0]</code>, with
+ * a major grid line every 0.5 units and a minor grid line count of 5:</p>
  *
  * <pre>
  * Point2D origin = new Point2D.Double(0.0d, 0.0d);
@@ -216,7 +215,7 @@ import java.util.List;
  * <p>Most of the time though, a plot requires supplementary parameters. For
  * instance, let's define the X axis of your graph as the mass of an object. To
  * compute the weight of the object given its mass, you need to use the
- * acceleration of gravity (<code>w=m.g</code> where <code>g</code> is the
+ * acceleration of gravity (<code>w=m*g</code> where <code>g</code> is the
  * acceleration.) To let the user modify this last parameter, to compute his
  * weight at the surface of the moon for instance, you need to add a parameter
  * to your plot.</p>
@@ -252,7 +251,7 @@ import java.util.List;
  * <h3>How to draw on the graph</h3>
  *
  * <p>If you need to add more information on the graph you need to extend
- * its class and override the method {@link #paintExtra(Graphics2D)}. This
+ * it and override the method {@link #paintExtra(Graphics2D)}. This
  * method has a default empty implementation and is called after everything
  * has been drawn. Its sole parameter is a reference to the component's drawing
  * surface, as configured by {@link #setupGraphics(Graphics2D)}. By default, the
@@ -291,7 +290,7 @@ import java.util.List;
  * @see JXGraph.Plot
  * @author Romain Guy <romain.guy@mac.com>
  */
-public class JXGraph extends JXPanel implements PropertyChangeListener {
+public class JXGraph extends JXPanel {
     // stroke widths used to draw the main axis and the grid
     // the main axis is slightly thicker
     private static final float STROKE_AXIS = 1.2f;
@@ -300,6 +299,9 @@ public class JXGraph extends JXPanel implements PropertyChangeListener {
     // defines by how much the view is shrinked or expanded everytime the
     // user zooms in or out
     private static final float ZOOM_MULTIPLIER = 1.1f;
+    
+    //listens to changes to plots and repaints the graph
+    private PropertyChangeListener plotChangeListener;
 
     // default color of the graph (does not include plots colors)
     private Color majorGridColor = Color.GRAY.brighter();
@@ -527,6 +529,12 @@ public class JXGraph extends JXPanel implements PropertyChangeListener {
         
         setBackground(Color.WHITE);
         setForeground(Color.BLACK);
+        
+        plotChangeListener = new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                repaint();
+            }
+        };
     }
 
     /**
@@ -563,6 +571,7 @@ public class JXGraph extends JXPanel implements PropertyChangeListener {
      */
     public void setInputEnabled(boolean enabled) {
         if (inputEnabled != enabled) {
+            boolean old = isInputEnabled();
             this.inputEnabled = inputEnabled;
 
             if (enabled) {
@@ -576,6 +585,8 @@ public class JXGraph extends JXPanel implements PropertyChangeListener {
                 removeMouseMotionListener(panMotionHandler);
                 removeMouseWheelListener(zoomHandler);
             }
+            
+            firePropertyChange("inputEnabled", old, isInputEnabled());
         }
     }
     
@@ -611,7 +622,9 @@ public class JXGraph extends JXPanel implements PropertyChangeListener {
      * @see #setForeground(Color)
      */
     public void setTextPainted(boolean textPainted) {
+        boolean old = isTextPainted();
         this.textPainted = textPainted;
+        firePropertyChange("textPainted", old, this.textPainted);
     }
 
     /**
@@ -637,7 +650,9 @@ public class JXGraph extends JXPanel implements PropertyChangeListener {
      * @see #setMinorGridColor(Color)
      */
     public void setGridPainted(boolean gridPainted) {
+        boolean old = isGridPainted();
         this.gridPainted = gridPainted;
+        firePropertyChange("gridPainted", old, isGridPainted());
     }
 
     /**
@@ -662,7 +677,9 @@ public class JXGraph extends JXPanel implements PropertyChangeListener {
      * @see #setAxisColor(Color)
      */
     public void setAxisPainted(boolean axisPainted) {
+        boolean old = isAxisPainted();
         this.axisPainted = axisPainted;
+        firePropertyChange("axisPainted", old, isAxisPainted());
     }
 
     /**
@@ -688,7 +705,9 @@ public class JXGraph extends JXPanel implements PropertyChangeListener {
      * @see #setBackground(Color)
      */
     public void setBackgroundPainted(boolean backPainted) {
+        boolean old = isBackgroundPainted();
         this.backPainted = backPainted;
+        firePropertyChange("backgroundPainted", old, isBackgroundPainted());
     }
     
     /**
@@ -717,7 +736,9 @@ public class JXGraph extends JXPanel implements PropertyChangeListener {
             throw new IllegalArgumentException("Color cannot be null.");
         }
         
+        Color old = getMajorGridColor();
         this.majorGridColor = majorGridColor;
+        firePropertyChange("majorGridColor", old, getMajorGridColor());
     }
 
     /**
@@ -745,7 +766,10 @@ public class JXGraph extends JXPanel implements PropertyChangeListener {
         if (minorGridColor == null) {
             throw new IllegalArgumentException("Color cannot be null.");
         }
+        
+        Color old = getMinorGridColor();
         this.minorGridColor = minorGridColor;
+        firePropertyChange("minorGridColor", old, getMinorGridColor());
     }
 
     /**
@@ -772,7 +796,10 @@ public class JXGraph extends JXPanel implements PropertyChangeListener {
         if (axisColor == null) {
             throw new IllegalArgumentException("Color cannot be null.");
         }
+        
+        Color old = getAxisColor();
         this.axisColor = axisColor;
+        firePropertyChange("axisColor", old, getAxisColor());
     }
     
     /**
@@ -808,9 +835,11 @@ public class JXGraph extends JXPanel implements PropertyChangeListener {
             throw new IllegalArgumentException("majorX must be > 0.0");
         }
         
+        double old = getMajorX();
         this.majorX = majorX;
         this.defaultMajorX = majorX;
         repaint();
+        firePropertyChange("majorX", old, getMajorX());
     }
     
     /**
@@ -845,9 +874,11 @@ public class JXGraph extends JXPanel implements PropertyChangeListener {
         if (minorCountX < 0) {
             throw new IllegalArgumentException("minorCountX must be >= 0");
         }
-
+        
+        int old = getMinorCountX();
         this.minorCountX = minorCountX;
         repaint();
+        firePropertyChange("minorCountX", old, getMinorCountX());
     }
 
     /**
@@ -883,9 +914,11 @@ public class JXGraph extends JXPanel implements PropertyChangeListener {
             throw new IllegalArgumentException("majorY must be > 0.0");
         }
 
+        double old = getMajorY();
         this.majorY = majorY;
         this.defaultMajorY = majorY;
         repaint();
+        firePropertyChange("majorY", old, getMajorY());
     }
 
     /**
@@ -921,8 +954,10 @@ public class JXGraph extends JXPanel implements PropertyChangeListener {
             throw new IllegalArgumentException("minorCountY must be >= 0");
         }
 
+        int old = getMinorCountY();
         this.minorCountY = minorCountY;
         repaint();
+        firePropertyChange("minorCountY", old, getMinorCountY());
     }
 
     /**
@@ -1087,7 +1122,7 @@ public class JXGraph extends JXPanel implements PropertyChangeListener {
 
         for (Plot plot : plotList) {
             if (plot != null && !plots.contains(plot)) {
-                plot.addPropertyChangeListener(this);
+                plot.addPropertyChangeListener(plotChangeListener);
                 plots.add(new DrawablePlot(plot, color));
             }
         }
@@ -1125,7 +1160,7 @@ public class JXGraph extends JXPanel implements PropertyChangeListener {
                 }
 
                 if (toRemove != null) {
-                    plot.removePropertyChangeListener(this);
+                    plot.removePropertyChangeListener(plotChangeListener);
                     plots.remove(toRemove);
                 }
             }
@@ -1155,13 +1190,6 @@ public class JXGraph extends JXPanel implements PropertyChangeListener {
         return new Dimension(400, 400);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void propertyChange(PropertyChangeEvent evt) {
-        repaint();
-    }
-    
     /**
      * <p>Converts a position, in graph units, from the Y axis into a pixel
      * coordinate. For instance, if you defined the origin so it appears at the
@@ -1516,8 +1544,13 @@ public class JXGraph extends JXPanel implements PropertyChangeListener {
      */
     protected void paintBackground(Graphics2D g2) {
         if (isBackgroundPainted()) {
-            g2.setColor(getBackground());
-            g2.fill(g2.getClipBounds());
+            Painter p = getBackgroundPainter();
+            if (p != null) {
+                p.paint(g2, this);
+            } else {
+                g2.setColor(getBackground());
+                g2.fill(g2.getClipBounds());
+            }
         }
     }
     
@@ -1548,26 +1581,22 @@ public class JXGraph extends JXPanel implements PropertyChangeListener {
      * }
      * </pre>
      *
+     * <p>When a plot is added to an instance of
+     * <code>JXGraph</code>, the <code>JXGraph</code> automatically becomes
+     * a new property change listener of the plot. If property change events are
+     * fired, the graph will be updated accordingly.</p>
+     * 
      * <p>More information about plots usage can be found in {@link JXGraph} in
      * the section entitled <i>Plots</i>.</p>
      *
      * @see JXGraph
      * @see JXGraph#addPlots(Color, JXGraph.Plot...)
      */
-    public abstract static class Plot {
-        /**
-         * <p>List of property change listeners listening to this plot's
-         * instance. When this plot is added to an instance of
-         * <code>JXGraph</code>, the <code>JXGraph</code> automatically becomes
-         * a new property change listener of this plot.</p>
-         */
-        protected PropertyChangeSupport support;
-
+    public abstract static class Plot extends JavaBean {
         /**
          * <p>Creates a new, parameter-less plot.</p>
          */
         protected Plot() {
-            this.support = new PropertyChangeSupport(this);
         }
         
         /**
@@ -1579,44 +1608,6 @@ public class JXGraph extends JXPanel implements PropertyChangeListener {
          * @return the result of the mathematical transformation of value
          */
         public abstract double compute(double value);
-
-        /**
-         * <p>Registers a new property change listener with the current plot.</p>
-         *
-         * @param listener the new property change listener to be notified of
-         *                 property changes
-         */
-        public void addPropertyChangeListener(PropertyChangeListener listener) {
-            support.addPropertyChangeListener(listener);
-        }
-
-        /**
-         * <p>Removes a new property change listener from the current plot.</p>
-         *
-         * @param listener the  property change listener to be removed
-         */
-        public void removePropertyChangeListener(PropertyChangeListener listener) {
-            support.removePropertyChangeListener(listener);
-        }
-
-        /**
-         * <p>Notifies property change listeners that a property has changed.
-         * This method must be used to notify the graph that a parameter of the
-         * mathematical transformation of this plot has changed. Failing to do
-         * so, a plot will be refreshed when its internal parameters change.</p>
-         *
-         * @param propertyName the name of the property known to have changed
-         * @param oldValue     the value of the property prior to the change
-         * @param newValue     the value of the property after the change
-         */
-        protected void firePropertyChange(String propertyName,
-                                          double oldValue, double newValue) {
-            PropertyChangeEvent changeEvent =
-                new PropertyChangeEvent(this, propertyName, oldValue, newValue);
-            for (PropertyChangeListener listener : support.getPropertyChangeListeners()) {
-                listener.propertyChange(changeEvent);
-            }
-        }
     }
 
     // Encapsulates a plot and its color. Avoids the use of a full-blown Map.
