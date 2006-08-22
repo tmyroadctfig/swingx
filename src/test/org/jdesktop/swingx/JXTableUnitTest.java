@@ -30,6 +30,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -39,10 +40,12 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
+import org.jdesktop.swingx.JXTable.GenericEditor;
 import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
@@ -104,16 +107,31 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
     /**
+     * Issue #366-swingx: enhance generic editor to take custom
+     * textfield as argument.
+     * 
+     */
+    public void testGenericEditor() {
+        JTextField textField = new JTextField(20);
+        GenericEditor editor = new GenericEditor(textField);
+        assertEquals("Table.editor", textField.getName());
+        // sanity
+        assertSame(textField, editor.getComponent());
+    }
+    /**
      * test default rowHeight calculation with default font.
-     *
+     * Beware: the default height is the font's height + 2, but 
+     * bounded by a "magic" minimum of 18.
      */
     public void testRowHeightFromFont() {
         // sanity
         assertNull("no ui rowheight", UIManager.get("JXTable.rowHeight"));
         JXTable table = new JXTable();
+        // wrong assumption: there's a "magic" minimum of 18!           
+        int fontDerivedHeight = table.getFontMetrics(table.getFont()).getHeight() + 2;
         assertEquals("default rowHeight based on fontMetrics height " +
                         "plus top plus bottom border (== 2)", 
-                        table.getFontMetrics(table.getFont()).getHeight() + 2, 
+                        Math.max(18, fontDerivedHeight), 
                         table.getRowHeight());
     }
     

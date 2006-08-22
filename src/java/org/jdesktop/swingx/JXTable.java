@@ -3077,7 +3077,11 @@ public class JXTable extends JTable
         Object value;
 
         public GenericEditor() {
-            super(new JTextField());
+            this(new JTextField());
+        }
+
+        public GenericEditor(JTextField textField) {
+            super(textField);
             getComponent().setName("Table.editor");
         }
 
