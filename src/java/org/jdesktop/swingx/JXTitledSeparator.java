@@ -35,7 +35,6 @@ import javax.swing.UIManager;
 
 /**
  * <p>A simple horizontal separator that contains a title.<br/>
- * <img src="http://www.jgui.com/SwingLabs/SwingX/JXTitledSeparator/JXTitledSeparator.png"/></p>
  *
  * <p>JXTitledSeparator allows you to specify the title via the #setTitle method.
  * The title alignment may be specified by using the #setHorizontalAlignment
@@ -89,7 +88,7 @@ public class JXTitledSeparator extends JXPanel {
     private JSeparator rightSeparator;
     
     /** 
-     * Creates a new instance of JXSeparator. The default title is simply
+     * Creates a new instance of JXTitledSeparator. The default title is simply
      * and empty string. Default justification is LEADING, and the default
      * horizontal text position is TRAILING (title follows icon)
      */
@@ -156,6 +155,8 @@ public class JXTitledSeparator extends JXPanel {
     }
     
     /**
+     * Gets the title.
+     * 
      * @return the title being used for this JXTitledSeparator. This will be
      *         the raw title text, and so may include html tags etc if they
      *         were so specified in #setTitle.
