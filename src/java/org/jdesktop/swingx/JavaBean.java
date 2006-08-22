@@ -32,6 +32,10 @@ import java.beans.VetoableChangeSupport;
  * <p>A convenience class from which to extend all non-visual JavaBeans. It
  * manages the PropertyChange notification system, making it relatively trivial
  * to add support for property change events in getters/setters.</p>
+ * 
+ * <p>A non-visual java bean is a Java class that conforms to the JavaBean 
+ * patterns to allow visual manipulation of the bean's properties and event 
+ * handlers at design-time.</p>
  *
  * <p>Here is a simple example bean that contains one property, foo, and the
  * proper pattern for implementing property change notification:
