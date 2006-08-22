@@ -24,6 +24,9 @@ package org.jdesktop.swingx;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.beans.PropertyVetoException;
+import java.beans.VetoableChangeListener;
+import java.beans.VetoableChangeSupport;
 
 /**
  * <p>A convenience class from which to extend all non-visual JavaBeans. It
@@ -57,21 +60,68 @@ import java.beans.PropertyChangeSupport;
  * value. Only if the two differ will it fire a property change event. So you can
  * be assured from the above code fragment that a property change event will only
  * occur if old is indeed different from getFoo()</p>
+ * 
+ * <p><code>JavaBean</code> also supports {@link VetoablePropertyChange} events. 
+ * These events are similar to <code>PropertyChange</code> events, except a special
+ * exception can be used to veto changing the property. For example, perhaps the
+ * property is changing from "fred" to "red", but a listener deems that "red" is 
+ * unexceptable. In this case, the listener can fire a veto exception and the property must
+ * remain "fred". For example:
+ * <pre><code>
+ *  public class ABean extends JavaBean {
+ *    private String foo;
+ *    
+ *    public void setFoo(String newFoo) throws PropertyVetoException {
+ *      String old = getFoo();
+ *      this.foo = newFoo;
+ *      fireVetoableChange("foo", old, getFoo());
+ *    }
+ *
+ *    public String getFoo() {
+ *      return foo;
+ *    }
+ *  }
+ * 
+ *  public class Tester {
+ *    public static void main(String... args) {
+ *      try {
+ *        ABean a = new ABean();
+ *        a.setFoo("fred");
+ *        a.addVetoableChangeListener(new VetoableChangeListener() {
+ *          public void vetoableChange(PropertyChangeEvent evt) throws PropertyVetoException {
+ *            if ("red".equals(evt.getNewValue()) {
+ *              throw new PropertyVetoException("Cannot be red!", evt);
+ *            }
+ *          }
+ *        }
+ *        a.setFoo("red");
+ *      } catch (Exception e) {
+ *        e.printStackTrace(); // this will be executed
+ *      }
+ *    }
+ *  }
+ * </code></pre></p>
  *
  * @author rbair
  */
 public class JavaBean {
     /**
      * Helper class that manages all the property change notification machinery.
-     * PropertyChangeSupport can not be extended directly because it requires
+     * PropertyChangeSupport cannot be extended directly because it requires
      * a bean in the constructor, and the "this" argument is not valid until
      * after super construction. Hence, delegation instead of extension
      */
     private transient PropertyChangeSupport pcs;
     
+    /**
+     * Helper class that manages all the veto property change notification machinery.
+     */
+    private transient VetoableChangeSupport vcs;
+    
     /** Creates a new instance of JavaBean */
-    public JavaBean() {
+    protected JavaBean() {
         pcs = new PropertyChangeSupport(this);
+        vcs = new VetoableChangeSupport(this);
     }
     
     /**
@@ -199,40 +249,7 @@ public class JavaBean {
      * @param oldValue  The old value of the property.
      * @param newValue  The new value of the property.
      */
-    public void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
-	pcs.firePropertyChange(propertyName, oldValue, newValue);
-    }
-
-    /**
-     * Report an int bound property update to any registered listeners.
-     * No event is fired if old and new are equal.
-     * <p>
-     * This is merely a convenience wrapper around the more general
-     * firePropertyChange method that takes Object values.
-     *
-     * @param propertyName  The programmatic name of the property
-     *		that was changed.
-     * @param oldValue  The old value of the property.
-     * @param newValue  The new value of the property.
-     */
-    public void firePropertyChange(String propertyName, int oldValue, int newValue) {
-	pcs.firePropertyChange(propertyName, oldValue, newValue);
-    }
-
-
-    /**
-     * Report a boolean bound property update to any registered listeners.
-     * No event is fired if old and new are equal.
-     * <p>
-     * This is merely a convenience wrapper around the more general
-     * firePropertyChange method that takes Object values.
-     *
-     * @param propertyName  The programmatic name of the property
-     *		that was changed.
-     * @param oldValue  The old value of the property.
-     * @param newValue  The new value of the property.
-     */
-    public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
+    protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
 	pcs.firePropertyChange(propertyName, oldValue, newValue);
     }
 
@@ -242,7 +259,7 @@ public class JavaBean {
      * equal and non-null.
      * @param evt  The PropertyChangeEvent object.
      */
-    public void firePropertyChange(PropertyChangeEvent evt) {
+    protected void firePropertyChange(PropertyChangeEvent evt) {
         pcs.firePropertyChange(evt);
     }
 
@@ -264,49 +281,9 @@ public class JavaBean {
      * @param oldValue     The old value of the property.
      * @param newValue     The new value of the property.
      */
-    public void fireIndexedPropertyChange(String propertyName, int index,
+    protected void fireIndexedPropertyChange(String propertyName, int index,
 					  Object oldValue, Object newValue) {
 	pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
-    }
-
-    /**
-     * Report an <code>int</code> bound indexed property update to any registered 
-     * listeners. 
-     * <p>
-     * No event is fired if old and new values are equal.
-     * <p>
-     * This is merely a convenience wrapper around the more general
-     * fireIndexedPropertyChange method which takes Object values.
-     *
-     * @param propertyName The programmatic name of the property that
-     *                     was changed.
-     * @param index        index of the property element that was changed.
-     * @param oldValue     The old value of the property.
-     * @param newValue     The new value of the property.
-     */
-    public void fireIndexedPropertyChange(String propertyName, int index,
-					  int oldValue, int newValue) {
-	pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
-    }
-
-    /**
-     * Report a <code>boolean</code> bound indexed property update to any 
-     * registered listeners. 
-     * <p>
-     * No event is fired if old and new values are equal.
-     * <p>
-     * This is merely a convenience wrapper around the more general
-     * fireIndexedPropertyChange method which takes Object values.
-     *
-     * @param propertyName The programmatic name of the property that
-     *                     was changed.
-     * @param index        index of the property element that was changed.
-     * @param oldValue     The old value of the property.
-     * @param newValue     The new value of the property.
-     */
-    public void fireIndexedPropertyChange(String propertyName, int index,
-					  boolean oldValue, boolean newValue) {
-        pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
     }
 
     /**
@@ -317,8 +294,149 @@ public class JavaBean {
      * @param propertyName  the property name.
      * @return true if there are one or more listeners for the given property
      */
-    public boolean hasListeners(String propertyName) {
+    protected boolean hasPropertyChangeListeners(String propertyName) {
         return pcs.hasListeners(propertyName);
+    }
+    
+    /**
+     * Check if there are any listeners for a specific property, including
+     * those registered on all properties.  If <code>propertyName</code>
+     * is null, only check for listeners registered on all properties.
+     *
+     * @param propertyName  the property name.
+     * @return true if there are one or more listeners for the given property
+     */
+    protected boolean hasVetoableChangeListeners(String propertyName) {
+        return vcs.hasListeners(propertyName);
+    }
+    
+    /**
+     * Add a VetoableListener to the listener list.
+     * The listener is registered for all properties.
+     * The same listener object may be added more than once, and will be called
+     * as many times as it is added.
+     * If <code>listener</code> is null, no exception is thrown and no action
+     * is taken.
+     *
+     * @param listener  The VetoableChangeListener to be added
+     */
+
+    public void addVetoableChangeListener(VetoableChangeListener listener) {
+        vcs.addVetoableChangeListener(listener);
+    }
+
+    /**
+     * Remove a VetoableChangeListener from the listener list.
+     * This removes a VetoableChangeListener that was registered
+     * for all properties.
+     * If <code>listener</code> was added more than once to the same event
+     * source, it will be notified one less time after being removed.
+     * If <code>listener</code> is null, or was never added, no exception is
+     * thrown and no action is taken.
+     *
+     * @param listener  The VetoableChangeListener to be removed
+     */
+    public void removeVetoableChangeListener(VetoableChangeListener listener) {
+        vcs.removeVetoableChangeListener(listener);
+    }
+
+    /**
+     * Returns the list of VetoableChangeListeners. If named vetoable change listeners
+     * were added, then VetoableChangeListenerProxy wrappers will returned
+     * <p>
+     * @return List of VetoableChangeListeners and VetoableChangeListenerProxys
+     *         if named property change listeners were added.
+     */
+    public VetoableChangeListener[] getVetoableChangeListeners(){
+        return vcs.getVetoableChangeListeners();
+    }
+
+    /**
+     * Add a VetoableChangeListener for a specific property.  The listener
+     * will be invoked only when a call on fireVetoableChange names that
+     * specific property.
+     * The same listener object may be added more than once.  For each
+     * property,  the listener will be invoked the number of times it was added
+     * for that property.
+     * If <code>propertyName</code> or <code>listener</code> is null, no
+     * exception is thrown and no action is taken.
+     *
+     * @param propertyName  The name of the property to listen on.
+     * @param listener  The VetoableChangeListener to be added
+     */
+
+    public void addVetoableChangeListener(String propertyName,
+                VetoableChangeListener listener) {
+        vcs.addVetoableChangeListener(propertyName, listener);
+    }
+
+    /**
+     * Remove a VetoableChangeListener for a specific property.
+     * If <code>listener</code> was added more than once to the same event
+     * source for the specified property, it will be notified one less time
+     * after being removed.
+     * If <code>propertyName</code> is null, no exception is thrown and no
+     * action is taken.
+     * If <code>listener</code> is null, or was never added for the specified
+     * property, no exception is thrown and no action is taken.
+     *
+     * @param propertyName  The name of the property that was listened on.
+     * @param listener  The VetoableChangeListener to be removed
+     */
+
+    public void removeVetoableChangeListener(String propertyName,
+                VetoableChangeListener listener) {
+        vcs.removeVetoableChangeListener(propertyName, listener);
+    }
+
+    /**
+     * Returns an array of all the listeners which have been associated 
+     * with the named property.
+     *
+     * @param propertyName  The name of the property being listened to
+     * @return all the <code>VetoableChangeListeners</code> associated with
+     *         the named property.  If no such listeners have been added,
+     *         or if <code>propertyName</code> is null, an empty array is
+     *         returned.
+     */
+    public VetoableChangeListener[] getVetoableChangeListeners(String propertyName) {
+        return vcs.getVetoableChangeListeners(propertyName);
+    }
+
+    /**
+     * Report a vetoable property update to any registered listeners.  If
+     * anyone vetos the change, then fire a new event reverting everyone to 
+     * the old value and then rethrow the PropertyVetoException.
+     * <p>
+     * No event is fired if old and new are equal and non-null.
+     *
+     * @param propertyName  The programmatic name of the property
+     *		that is about to change..
+     * @param oldValue  The old value of the property.
+     * @param newValue  The new value of the property.
+     * @exception PropertyVetoException if the recipient wishes the property
+     *              change to be rolled back.
+     */
+    protected void fireVetoableChange(String propertyName, 
+					Object oldValue, Object newValue)
+					throws PropertyVetoException {
+	vcs.fireVetoableChange(propertyName, oldValue, newValue);
+    }
+
+    /**
+     * Fire a vetoable property update to any registered listeners.  If
+     * anyone vetos the change, then fire a new event reverting everyone to 
+     * the old value and then rethrow the PropertyVetoException.
+     * <p>
+     * No event is fired if old and new are equal and non-null.
+     *
+     * @param evt  The PropertyChangeEvent to be fired.
+     * @exception PropertyVetoException if the recipient wishes the property
+     *              change to be rolled back.
+     */
+    protected void fireVetoableChange(PropertyChangeEvent evt)
+					throws PropertyVetoException {
+	vcs.fireVetoableChange(evt);
     }
     
     /**
@@ -327,6 +445,7 @@ public class JavaBean {
     public Object clone() throws CloneNotSupportedException {
         JavaBean result = (JavaBean) super.clone();
         result.pcs = new PropertyChangeSupport(result);
+        result.vcs = new VetoableChangeSupport(result);
         return result;
     }
 }
