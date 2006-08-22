@@ -104,7 +104,7 @@ import java.beans.VetoableChangeSupport;
  *
  * @author rbair
  */
-public class JavaBean {
+public abstract class JavaBean {
     /**
      * Helper class that manages all the property change notification machinery.
      * PropertyChangeSupport cannot be extended directly because it requires
