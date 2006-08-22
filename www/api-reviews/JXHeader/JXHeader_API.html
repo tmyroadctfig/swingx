@@ -1,0 +1,188 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>JXHeader_API.java</title>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<style type="text/css">
+<!--
+body {color: #000000; background-color: #ffffff; font-family: Monospaced}
+table {color: #000000; background-color: #e9e8e2; font-family: Monospaced}
+.java-keywords {color: #000099; font-family: Monospaced; font-weight: bold}
+.java-layer-method {font-family: Monospaced; font-weight: bold}
+.java-block-comment {color: #737373}
+.java-annotation {color: #006f00}
+.java-string-literal {color: #99006b}
+-->
+</style>
+</head>
+<body>
+<table width="100%"><tr><td align="center">/Users/richardallenbair/Documents/Source/Projects/nonsense/swingx/src/beaninfo/JXHeader_API.java</td></tr></table>
+<pre>
+<span class="java-block-comment">/*</span>
+<span class="java-block-comment"> * $Id$</span>
+<span class="java-block-comment"> *</span>
+<span class="java-block-comment"> * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,</span>
+<span class="java-block-comment"> * Santa Clara, California 95054, U.S.A. All rights reserved.</span>
+<span class="java-block-comment"> *</span>
+<span class="java-block-comment"> * This library is free software; you can redistribute it and/or</span>
+<span class="java-block-comment"> * modify it under the terms of the GNU Lesser General Public</span>
+<span class="java-block-comment"> * License as published by the Free Software Foundation; either</span>
+<span class="java-block-comment"> * version 2.1 of the License, or (at your option) any later version.</span>
+<span class="java-block-comment"> * </span>
+<span class="java-block-comment"> * This library is distributed in the hope that it will be useful,</span>
+<span class="java-block-comment"> * but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="java-block-comment"> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="java-block-comment"> * Lesser General Public License for more details.</span>
+<span class="java-block-comment"> * </span>
+<span class="java-block-comment"> * You should have received a copy of the GNU Lesser General Public</span>
+<span class="java-block-comment"> * License along with this library; if not, write to the Free Software</span>
+<span class="java-block-comment"> * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+<span class="java-block-comment"> */</span>
+
+<span class="java-keywords">package</span> org.jdesktop.swingx;
+
+<span class="java-keywords">import</span> java.awt.Color;
+<span class="java-keywords">import</span> java.awt.Font;
+<span class="java-keywords">import</span> java.awt.GridBagConstraints;
+<span class="java-keywords">import</span> java.awt.GridBagLayout;
+<span class="java-keywords">import</span> java.awt.Insets;
+<span class="java-keywords">import</span> javax.swing.Icon;
+<span class="java-keywords">import</span> javax.swing.JLabel;
+<span class="java-keywords">import</span> javax.swing.JSeparator;
+<span class="java-keywords">import</span> javax.swing.UIManager;
+<span class="java-keywords">import</span> org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
+<span class="java-keywords">import</span> org.jdesktop.swingx.plaf.HeaderUI;
+<span class="java-keywords">import</span> org.jdesktop.swingx.plaf.JXHeaderAddon;
+<span class="java-keywords">import</span> org.jdesktop.swingx.plaf.LookAndFeelAddons;
+
+<span class="java-block-comment">/**</span>
+<span class="java-block-comment"> * &lt;p&gt;A simple component that consists of a title, a description, and an icon.</span>
+<span class="java-block-comment"> * An example of such a component can be seen on</span>
+<span class="java-block-comment"> * &lt;a href=&quot;http://jext.free.fr/header.png&quot;&gt;Romain Guys ProgX website&lt;/a&gt;&lt;/p&gt;</span>
+<span class="java-block-comment"> *</span>
+<span class="java-block-comment"> * &lt;p&gt;The &lt;code&gt;JXHeader&lt;/code&gt; is sufficiently configurable to be useable. The </span>
+<span class="java-block-comment"> * title and description area accept HTML (the same set of HTML that </span>
+<span class="java-block-comment"> * {@link org.jdesktop.swingx.JXEditorPane} supports), and thus allows a great </span>
+<span class="java-block-comment"> * deal of flexibility. The icon and the various bits of text are configurable. </span>
+<span class="java-block-comment"> *</span>
+<span class="java-block-comment"> * &lt;p&gt;Here is some example code:&lt;br/&gt;</span>
+<span class="java-block-comment"> * &lt;pre&gt;&lt;code&gt;</span>
+<span class="java-block-comment"> *      JXHeader header = new JXHeader();</span>
+<span class="java-block-comment"> *      header.setTitle(&quot;Timing Framework Spline Editor&quot;);</span>
+<span class="java-block-comment"> *      header.setDescription(&quot;&amp;lt;html&amp;gt;&amp;lt;body&amp;gt;&quot; +</span>
+<span class="java-block-comment"> *          &quot;Drag control points in the display to change the shape of the spline&amp;lt;br/&amp;gt;&quot; +</span>
+<span class="java-block-comment"> *          &quot;Click the Copy Code button to generate the corrosponding Java code.&quot; +</span>
+<span class="java-block-comment"> *          &quot;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;&quot;);</span>
+<span class="java-block-comment"> *      Icon icon = new ImageIcon(getClass().getResource(&quot;tools.png&quot;));</span>
+<span class="java-block-comment"> *      header.setIcon(icon);</span>
+<span class="java-block-comment"> * &lt;/code&gt;&lt;/pre&gt;&lt;/p&gt;</span>
+<span class="java-block-comment"> * </span>
+<span class="java-block-comment"> * @author rbair</span>
+<span class="java-block-comment"> */</span>
+<span class="java-keywords">public</span> <span class="java-keywords">class</span> JXHeader <span class="java-keywords">extends</span> JXPanel {
+    <span class="java-block-comment">/**</span>
+<span class="java-block-comment">     * @see #getUIClassID // *</span>
+<span class="java-block-comment">     * @see #readObject</span>
+<span class="java-block-comment">     */</span>
+    <span class="java-keywords">public</span> <span class="java-keywords">static</span> <span class="java-keywords">final</span> String uiClassID = <span class="java-string-literal">&quot;HeaderUI&quot;</span>;
+    
+    <span class="java-block-comment">/** </span>
+<span class="java-block-comment">     * Creates a new instance of JXHeader</span>
+<span class="java-block-comment">     */</span>
+    <span class="java-keywords">public</span> <span class="java-layer-method">JXHeader</span>();
+    
+    <span class="java-block-comment">/**</span>
+<span class="java-block-comment">     * Returns the look and feel (L&amp;F) object that renders this component.</span>
+<span class="java-block-comment">     * </span>
+<span class="java-block-comment">     * @return the HeaderUI object that renders this component</span>
+<span class="java-block-comment">     */</span>
+    <span class="java-annotation">@</span>Override
+    <span class="java-keywords">public</span> HeaderUI <span class="java-layer-method">getUI</span>();
+
+    <span class="java-block-comment">/**</span>
+<span class="java-block-comment">     * Sets the look and feel (L&amp;F) object that renders this component.</span>
+<span class="java-block-comment">     * </span>
+<span class="java-block-comment">     * @param ui</span>
+<span class="java-block-comment">     *            the HeaderUI L&amp;F object</span>
+<span class="java-block-comment">     * @see javax.swing.UIDefaults#getUI</span>
+<span class="java-block-comment">     * @beaninfo bound: true hidden: true attribute: visualUpdate true</span>
+<span class="java-block-comment">     *           description: The UI object that implements the Component&apos;s</span>
+<span class="java-block-comment">     *           LookAndFeel.</span>
+<span class="java-block-comment">     */</span>
+    <span class="java-keywords">public</span> <span class="java-keywords">void</span> <span class="java-layer-method">setUI</span>(HeaderUI ui);
+
+    <span class="java-block-comment">/**</span>
+<span class="java-block-comment">     * Returns a string that specifies the name of the L&amp;F class that renders</span>
+<span class="java-block-comment">     * this component.</span>
+<span class="java-block-comment">     * </span>
+<span class="java-block-comment">     * @return &quot;HeaderUI&quot;</span>
+<span class="java-block-comment">     * @see javax.swing.JComponent#getUIClassID</span>
+<span class="java-block-comment">     * @see javax.swing.UIDefaults#getUI</span>
+<span class="java-block-comment">     * @beaninfo expert: true description: A string that specifies the name of</span>
+<span class="java-block-comment">     *           the L&amp;F class.</span>
+<span class="java-block-comment">     */</span>
+    <span class="java-annotation">@</span>Override
+    <span class="java-keywords">public</span> String <span class="java-layer-method">getUIClassID</span>();
+
+    <span class="java-block-comment">/**</span>
+<span class="java-block-comment">     * Notification from the &lt;code&gt;UIManager&lt;/code&gt; that the L&amp;F has changed.</span>
+<span class="java-block-comment">     * Replaces the current UI object with the latest version from the</span>
+<span class="java-block-comment">     * &lt;code&gt;UIManager&lt;/code&gt;.</span>
+<span class="java-block-comment">     * </span>
+<span class="java-block-comment">     * @see javax.swing.JComponent#updateUI</span>
+<span class="java-block-comment">     */</span>
+    <span class="java-annotation">@</span>Override
+    <span class="java-keywords">public</span> <span class="java-keywords">void</span> <span class="java-layer-method">updateUI</span>();
+    
+    <span class="java-block-comment">/**</span>
+<span class="java-block-comment">     * @inheritDoc</span>
+<span class="java-block-comment">     * Passes enabled state on to the child components</span>
+<span class="java-block-comment">     */</span>
+    <span class="java-annotation">@</span>Override
+    <span class="java-keywords">public</span> <span class="java-keywords">void</span> <span class="java-layer-method">setEnabled</span>(<span class="java-keywords">boolean</span> enabled);
+    
+    <span class="java-block-comment">/**</span>
+<span class="java-block-comment">     * Sets the title of the &lt;code&gt;JXHeader&lt;/code&gt;.</span>
+<span class="java-block-comment">     * </span>
+<span class="java-block-comment">     * @param title can be any value, including HTML 3.2.</span>
+<span class="java-block-comment">     */</span>
+    <span class="java-keywords">public</span> <span class="java-keywords">void</span> <span class="java-layer-method">setTitle</span>(String title);
+    
+    <span class="java-block-comment">/**</span>
+<span class="java-block-comment">     * Gets the title.</span>
+<span class="java-block-comment">     * </span>
+<span class="java-block-comment">     * @return the title</span>
+<span class="java-block-comment">     */</span>
+    <span class="java-keywords">public</span> String <span class="java-layer-method">getTitle</span>();
+    
+    <span class="java-block-comment">/**</span>
+<span class="java-block-comment">     * Sets the description.</span>
+<span class="java-block-comment">     * </span>
+<span class="java-block-comment">     * @param description any value. May be HTML based on HTML 3.2</span>
+<span class="java-block-comment">     */</span>
+    <span class="java-keywords">public</span> <span class="java-keywords">void</span> <span class="java-layer-method">setDescription</span>(String description);
+    
+    <span class="java-block-comment">/**</span>
+<span class="java-block-comment">     * Gets the description.</span>
+<span class="java-block-comment">     * </span>
+<span class="java-block-comment">     * @return description</span>
+<span class="java-block-comment">     */</span>
+    <span class="java-keywords">public</span> String <span class="java-layer-method">getDescription</span>();
+    
+    <span class="java-block-comment">/**</span>
+<span class="java-block-comment">     * Sets the icon to use with the &lt;code&gt;JXHeader&lt;/code&gt;.</span>
+<span class="java-block-comment">     * </span>
+<span class="java-block-comment">     * @param icon the icon to use. May be null.</span>
+<span class="java-block-comment">     */</span>
+    <span class="java-keywords">public</span> <span class="java-keywords">void</span> <span class="java-layer-method">setIcon</span>(Icon icon);
+    
+    <span class="java-block-comment">/**</span>
+<span class="java-block-comment">     * Gets the icon.</span>
+<span class="java-block-comment">     * </span>
+<span class="java-block-comment">     * @return icon</span>
+<span class="java-block-comment">     */</span>
+    <span class="java-keywords">public</span> Icon <span class="java-layer-method">getIcon</span>();
+}
+
+</pre></body>
+</html>
