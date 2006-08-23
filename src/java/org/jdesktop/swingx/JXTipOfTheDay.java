@@ -327,8 +327,12 @@ public class JXTipOfTheDay extends JXPanel {
         return showOnStartupPref.getBoolean(PREFERENCE_KEY, true);
       }
       public void setShowingOnStartup(boolean showOnStartup) {
-        // only save the choice if it is negative
-        if (!showOnStartup) {
+        if (showOnStartup && !showOnStartupPref.getBoolean(PREFERENCE_KEY, true)) {
+          // if the choice was previously not enable and now we re-enable it, we
+          // must remove the key
+          showOnStartupPref.remove(PREFERENCE_KEY);
+        } else if (!showOnStartup) {
+          // user does not want to see the tip
           showOnStartupPref.putBoolean(PREFERENCE_KEY, showOnStartup);
         }
       }
