@@ -230,7 +230,7 @@ public class BasicTaskPaneUI extends TaskPaneUI {
   }
   
   class ChangeListener implements PropertyChangeListener {
-    public void propertyChange(PropertyChangeEvent evt) {
+    public void propertyChange(PropertyChangeEvent evt) {     
       // if group is expanded but not animated
       // or if animated has reached expanded state
       // scroll to visible if scrollOnExpand is enabled
@@ -241,6 +241,11 @@ public class BasicTaskPaneUI extends TaskPaneUI {
         if (group.isScrollOnExpand()) {
           ensureVisible();
         }
+      } else if (JXTaskPane.ICON_CHANGED_KEY.equals(evt.getPropertyName())
+        || JXTaskPane.TITLE_CHANGED_KEY.equals(evt.getPropertyName())
+        || JXTaskPane.SPECIAL_CHANGED_KEY.equals(evt.getPropertyName())) {
+        // icon, title, special must lead to a repaint()
+        group.repaint();
       }
     }
   }
