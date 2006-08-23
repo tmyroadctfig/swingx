@@ -39,6 +39,25 @@ public class TableColumnModelTest extends TestCase {
     private static final int COLUMN_COUNT = 3;
  
     /**
+     * Issue #369-swingx: properties of hidden columns are not fired. <p>
+     * make sure that property changes in hidden columns are routed to the
+     * TableColumnModelExtListener
+     *
+     */
+    public void testHiddenTableColumnPropertyNotification() {
+        TableColumnModelExt columnModel = createColumnModel(COLUMN_COUNT);
+        Object identifier = "0";
+        columnModel.getColumnExt(identifier).setVisible(false);
+        // sanity...
+        assertNotNull(columnModel.getColumnExt(identifier));
+        String title = columnModel.getColumnExt(identifier).getTitle() + "changed";
+        ColumnModelReport report = new ColumnModelReport();
+        columnModel.addColumnModelListener(report);
+        columnModel.getColumnExt(identifier).setTitle(title);
+        assertEquals(1, report.getColumnPropertyEventCount());
+    }
+    
+    /**
      * Issue #253-swingx: hiding/showing columns changes column sequence.
      * 
      * The test is modelled after the example code as 
@@ -258,6 +277,17 @@ public class TableColumnModelTest extends TestCase {
         return model;
     }
 
+    /**
+     * Creates and returns a TableColumnExt with simple standard configuration.
+     * 
+     * <pre><code>
+     * column.getModelIndex() == modelIndex
+     * column.getIdentifier() == String.valueOf(modelIndex);
+     * </code></pre>
+     *  
+     * @param modelIndex the model column index to use for config
+     * @return a <code>TableColumnExt</code> with standard configuration
+     */
     private TableColumnExt createTableColumnExt(int modelIndex) {
         TableColumnExt column = new TableColumnExt(modelIndex);
         column.setIdentifier(String.valueOf(modelIndex));

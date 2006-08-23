@@ -18,7 +18,9 @@ import javax.swing.event.TableColumnModelEvent;
 import org.jdesktop.swingx.event.TableColumnModelExtListener;
 
 /**
- * A TableColumnListener that stores the received TableColumnEvents.
+ * A TableColumnExtListener that stores the received TableColumnEvents and
+ * PropertyChangeEvents originating from the TableColumns contained in the
+ * TableColumnModel.
  */
 public class ColumnModelReport implements TableColumnModelExtListener {
 
