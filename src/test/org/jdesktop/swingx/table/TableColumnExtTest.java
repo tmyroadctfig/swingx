@@ -6,23 +6,48 @@
  */
 package org.jdesktop.swingx.table;
 
+import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.text.Collator;
 import java.util.Comparator;
+import java.util.Date;
 
 import junit.framework.TestCase;
 
 import org.jdesktop.swingx.util.PropertyChangeReport;
+import org.jdesktop.swingx.util.SerializableSupport;
 
 /**
+ * Unit test of enhanced <code>TableColumnExt</code>.
+ * 
  * @author Jeanette Winzenburg
  */
 public class TableColumnExtTest extends TestCase {
 
     /**
+     * Sanity test Serializable.
+     * 
+     * @throws ClassNotFoundException
+     * @throws IOException
+     * 
+     */
+    public void testSerializable() throws IOException, ClassNotFoundException {
+        TableColumnExt columnExt = new TableColumnExt();
+        Object value = new Date();
+        columnExt.putClientProperty("date", value);
+        TableColumnExt serialized = SerializableSupport.serialize(columnExt);
+        assertTrue(serialized.isVisible());
+        assertEquals(value, serialized.getClientProperty("date"));
+        assertEquals(15, serialized.getMinWidth());
+        assertTrue(serialized.getResizable());
+    }
+
+    /**
      * Issue #154-swingx.
      * 
-     * added property headerTooltip.
-     *
+     * added property headerTooltip. Test initial value, propertyChange
+     * notification, cloned correctly.
+     * 
      */
     public void testHeaderTooltip() {
         TableColumnExt columnExt = new TableColumnExt();
@@ -40,6 +65,11 @@ public class TableColumnExtTest extends TestCase {
                 cloned.getToolTipText());
     }
     
+    /**
+     * Test the sortable property: must fire propertyChange and
+     * be cloned properly 
+     *
+     */
     public void testSortable() {
         TableColumnExt columnExt = new TableColumnExt();
         boolean sortable = columnExt.isSortable();
@@ -55,24 +85,6 @@ public class TableColumnExtTest extends TestCase {
         assertEquals("sortable property must be cloned", columnExt.isSortable(),
                 cloned.isSortable());
     }
-    
-    /**
-     * Issue #273-swingx: make Comparator a bound property of TableColumnExt.
-     * (instead of client property)
-     *
-     * test if comparator is taken initially. This test doesn't make much sense
-     * after removing the sorter property because there's nothing to synch any 
-     * more 
-     * 
-     * TODO remove!
-     */
-    public void testInitialComparator() {
-        TableColumnExt tableColumn = new TableColumnExt();
-        Comparator comparator = Collator.getInstance();
-        tableColumn.setComparator(comparator);
-        assertEquals(comparator, tableColumn.getComparator());
-    }
-    
     
     /**
      * Issue #273-swingx: make Comparator a bound property of TableColumnExt.
@@ -129,7 +141,7 @@ public class TableColumnExtTest extends TestCase {
     }
     
     /**
-     * user friendly resizable flag.
+     * user friendly resizable flag. 
      * 
      */
     public void testResizable() {
@@ -149,6 +161,7 @@ public class TableColumnExtTest extends TestCase {
         assertTrue("min < max", clone.getMinWidth() < clone.getMaxWidth());
         assertTrue("cloned base resizable", clone.getResizable());
     }
+    
     /**
      * Issue #39-swingx:
      * Client properties not preserved when cloning.

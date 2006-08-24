@@ -6,22 +6,88 @@
  */
 package org.jdesktop.swingx.table;
 
+import java.beans.PropertyChangeListener;
+import java.io.IOException;
+
 import junit.framework.TestCase;
 
 import org.jdesktop.swingx.util.PropertyChangeReport;
+import org.jdesktop.swingx.util.SerializableSupport;
 
 /**
+ * Test to exposed known issues of <code>TableColumnExt</code>.
+ * 
+ * Ideally, there would be at least one failing test method per open
+ * Issue in the issue tracker. Plus additional failing test methods for
+ * not fully specified or not yet decided upon features/behaviour.
+ *  
  * @author Jeanette Winzenburg
  */
 public class TableColumnExtIssues extends TestCase {
 
-    public void testHeaderValueBoundProperty() {
-        TableColumnExt tableColumn = new TableColumnExt();
+    /**
+     * Issue #??-swingx: tableColumnExt does not fire propertyChange on resizable.
+     * 
+     * Happens, if property is changed indirectly by changing min/max value
+     * to be the same.
+     *
+     */
+    public void testResizableBoundProperty() {
+        TableColumnExt columnExt = new TableColumnExt();
+        // sanity: assert expected defaults of resizable, minWidth
+        assertTrue(columnExt.getResizable());
+        assertTrue(columnExt.getMinWidth() > 0);
         PropertyChangeReport report = new PropertyChangeReport();
-        tableColumn.addPropertyChangeListener(report);
-        tableColumn.setHeaderValue("someheader");
-        assertEquals(1, report.getEventCount("headerValue"));
+        columnExt.addPropertyChangeListener(report);
+        columnExt.setMaxWidth(columnExt.getMinWidth());
+        if (!columnExt.getResizable()) {
+            assertEquals("fixing column widths must fire resizable ", 
+                    1, report.getEventCount("resizable"));
+        } else {
+           fail("resizable must respect fixed column width"); 
+        }
+        
     }
     
+    /**
+     * Sanity test Serializable: Listeners? Report not serializable?
+     * 
+     * @throws ClassNotFoundException
+     * @throws IOException
+     * 
+     */
+    public void testSerializable() throws IOException, ClassNotFoundException {
+        TableColumnExt columnExt = new TableColumnExt();
+        PropertyChangeReport report = new PropertyChangeReport();
+        columnExt.addPropertyChangeListener(report);
+        TableColumnExt serialized = SerializableSupport.serialize(columnExt);
+        PropertyChangeListener[] listeners = serialized
+                .getPropertyChangeListeners();
+        assertTrue(listeners.length > 0);
+    }
 
+
+    /**
+     * Issue #??-swingx: must handle non-serializable client properties 
+     * gracefully.
+     * @throws ClassNotFoundException 
+     * @throws IOException 
+     *    
+     *
+     */
+    public void testNonSerializableClientProperties() throws IOException, ClassNotFoundException {
+        TableColumnExt columnExt = new TableColumnExt();
+        Object value = new Object();
+        columnExt.putClientProperty("date", value );
+        SerializableSupport.serialize(columnExt);
+     }
+
+
+    /**
+     * Dummy stand-in test method, does nothing. 
+     * without, the test would fail if there are no open issues.
+     *
+     */
+    public void testDummy() {
+    }
 }

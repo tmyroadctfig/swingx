@@ -29,13 +29,43 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
+import org.jdesktop.swingx.JavaBean;
+
 /**
- * TableColumn extension which adds support for view column configuration features
- * including column-visibility, sorting, and prototype values.
+ * TableColumn extension with enhanced support for view column 
+ * configuration. The general drift is to strengthen the TableColumn
+ * abstraction as <b>the</b> place to configure and dynamically update
+ * view column properties, 
+ * covering a broad range of typical customization requirements.<p>
+ * 
+ * A prominent group of properties allows fine-grained, per-column control 
+ * of corresponding Table/-Header features. 
+ *  
+ * <ul>
+*  <li><b>Sorting</b>: <code>sortable</code> controls whether this column should
+ * sortable by user's sort gestures; <code>Comparator</code> can hold a
+ * column specific type. 
+ * 
+ * <li><b>Editing</b>: <code>editable</code> controls whether cells of this column 
+ * should accessible to in-table editing.
+ * 
+ * <li><b>Tooltip</b>: <code>toolTipText</code> holds the column tooltip which 
+ * is shown when hovering over the column's header.
+ * </ul>
+ *
+ * TODO: explain visible (collaborator-used-by TableColumnModelExt, ColumnControlButton) <p>
+ * 
+ * TODO: explain client properties (free-style app-specific, analogous to JComponent) <p>
+ * 
+ * TODO: explain prototype (sizing, collaborator-used-by ColumnFactory (?)) <p>
  *
  * @author Ramesh Gupta
  * @author Amy Fowler
  * @author Jeanette Winzenburg
+ * 
+ * @see TableColumnModelExt
+ * @see ColumnFactory
+ * 
  */
 public class TableColumnExt extends TableColumn
     implements Cloneable {
@@ -93,18 +123,27 @@ public class TableColumnExt extends TableColumn
         super(modelIndex, width, cellRenderer, cellEditor);
     }
 
-    /** cosmetic override: don't fool users if resize is
-     * not possible due to fixed column width.
+    /** 
+     * Returns true if the user <i>can</i> resize the TableColumn's width, 
+     * false otherwise. This is a usability override: it takes into account
+     * the case where it's principally <i>allowed</i> to resize the column
+     * but not possible because the column has fixed size.
+     * 
+     * @return a boolean indicating whether the user can resize this column.
      */
     @Override
     public boolean getResizable() {
+        // TODO JW: resizable is a bound property, so to be strict
+        // we'll need to override setMin/MaxWidth to fire resizable
+        // property change.
         return super.getResizable() && (getMinWidth() < getMaxWidth());
     }
 
     /**
      * Sets the editable property.  This property enables the table view to
      * control whether or not the user is permitted to edit cell values in this
-     * view column, even if the model permits.  If the table model column corresponding to this view column
+     * view column, even if the model permits.  
+     * If the table model column corresponding to this view column
      * returns <code>true</code> for <code>isCellEditable</code> and this
      * property is <code>false</code>, then the user will not be permitted to
      * edit values from this view column, dispite the model setting.
@@ -209,8 +248,10 @@ public class TableColumnExt extends TableColumn
     }
  
     /**
+     * Returns the text of the column ToolTip. This is typically used
+     * by <code>JXTableHeader</code> on mouseOver the column's header cell.
      * 
-     * @return the text of the ToolTip for this column.
+     * @return the text of the column ToolTip.
      * @see #setToolTipText(String)
      */
     public String getToolTipText() {
@@ -218,7 +259,7 @@ public class TableColumnExt extends TableColumn
     }
     
     /**
-     * Sets the text of the ToolTip for this column. 
+     * Sets the text of the header ToolTip for this column. 
      * 
      * @param toolTipText text to show.
      */
