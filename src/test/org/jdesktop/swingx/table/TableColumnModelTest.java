@@ -36,27 +36,8 @@ import org.jdesktop.swingx.util.ColumnModelReport;
 public class TableColumnModelTest extends TestCase {
     private static final Logger LOG = Logger
             .getLogger(TableColumnModelTest.class.getName());
-    private static final int COLUMN_COUNT = 3;
+    protected static final int COLUMN_COUNT = 3;
  
-    /**
-     * Issue #369-swingx: properties of hidden columns are not fired. <p>
-     * make sure that property changes in hidden columns are routed to the
-     * TableColumnModelExtListener
-     *
-     */
-    public void testHiddenTableColumnPropertyNotification() {
-        TableColumnModelExt columnModel = createColumnModel(COLUMN_COUNT);
-        Object identifier = "0";
-        columnModel.getColumnExt(identifier).setVisible(false);
-        // sanity...
-        assertNotNull(columnModel.getColumnExt(identifier));
-        String title = columnModel.getColumnExt(identifier).getTitle() + "changed";
-        ColumnModelReport report = new ColumnModelReport();
-        columnModel.addColumnModelListener(report);
-        columnModel.getColumnExt(identifier).setTitle(title);
-        assertEquals(1, report.getColumnPropertyEventCount());
-    }
-    
     /**
      * Issue #253-swingx: hiding/showing columns changes column sequence.
      * 
@@ -266,9 +247,18 @@ public class TableColumnModelTest extends TestCase {
         assertEquals("out of range", -1, model.getColumnIndexAtX(totalWidth - 10));
     }
 
-//------------------ private factory methods
+//------------------  factory methods
     
-    private TableColumnModelExt createColumnModel(int columns) {
+    /**
+     * creates and returns a TableColumnModelExt with the given number
+     * of configured columns of type <code>TableColumnExt</code>.
+     * 
+     * @param columns the number of columns to create and add to the model
+     * @return a <code>TableColumnModelExt</code> filled with columns.
+     *    
+     * @see createTableColumnExt
+     */
+    protected TableColumnModelExt createColumnModel(int columns) {
         TableColumnModelExt model = new DefaultTableColumnModelExt();
         for (int i = 0; i < columns; i++) {
             model.addColumn(createTableColumnExt(i));
@@ -288,7 +278,7 @@ public class TableColumnModelTest extends TestCase {
      * @param modelIndex the model column index to use for config
      * @return a <code>TableColumnExt</code> with standard configuration
      */
-    private TableColumnExt createTableColumnExt(int modelIndex) {
+    protected TableColumnExt createTableColumnExt(int modelIndex) {
         TableColumnExt column = new TableColumnExt(modelIndex);
         column.setIdentifier(String.valueOf(modelIndex));
         return column;
