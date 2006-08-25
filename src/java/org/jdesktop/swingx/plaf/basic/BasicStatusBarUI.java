@@ -27,6 +27,8 @@ import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
 import javax.swing.plaf.ComponentUI;
 import org.jdesktop.swingx.JXStatusBar;
 import org.jdesktop.swingx.plaf.StatusBarUI;
@@ -145,5 +147,12 @@ public class BasicStatusBarUI extends StatusBarUI {
             g2.drawImage(middleImage, leftImage.getWidth(), 0, statusBar.getWidth() - leftImage.getWidth() - rightImage.getWidth(), statusBar.getHeight(), null);
             g2.drawImage(rightImage, statusBar.getWidth() - rightImage.getWidth(), 0, rightImage.getWidth(), statusBar.getHeight(), null);
         }
+    }
+
+    @Override
+    public JSeparator createSeparator() {
+        JSeparator sep = new JSeparator(SwingConstants.VERTICAL);
+        sep.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
+        return sep;
     }
 }

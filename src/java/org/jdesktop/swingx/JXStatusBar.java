@@ -38,23 +38,29 @@ import org.jdesktop.swingx.plaf.StatusBarUI;
 /**
  * <p>A container for {@link javax.swing.JComponent}s that is typically placed at
  * the bottom of a form and runs the entire width of the form. There are 3
- * important functions that JXStatusBar provides (reasons why we created it
- * in the first place). First, JXStatusBar provides a hook for a pluggable look.
+ * important functions that <code>JXStatusBar</code> provides.
+ * First, <code>JXStatusBar</code> provides a hook for a pluggable look.
  * There is a definite look associated with status bars on windows, for instance.
- * By implementing a concrete subclass of JXPanel, we provide a way for the
- * pluggable look and feel system to modify the look of the status bar automatically.</p>
+ * By implementing a subclass of {@link JComponent}, we provide a way for the
+ * pluggable look and feel system to modify the look of the status bar.</p>
  *
- * <p>Second, JXStatusBar comes with its own layout manager. Each item is added to
- * the JXStatusBar with a JXStatusBar.Constraint as the constraint argument. The
- * JXStatusBar.Constraint contains an Insets object, as well as a "weight". The weight
- * is used the same as the GridBagLayout.</p>
- *
- * <p>Finally, JXStatusBar contains a built in JPopupMenu. This menu allows the
- * user to hide/show any of the items on the status bar. It also may optionally
- * contain an "add..." action that will allow the user to select from a handful
- * of prepacked beans that can be placed on the status bar.</p>
- *
- * <p>Constructing a JXStatusBar is very straitforward:
+ * <p>Second, <code>JXStatusBar</code> comes with its own layout manager. Each item is added to
+ * the <code>JXStatusBar</code> with a <code>JXStatusBar.Constraint</code>
+ * as the constraint argument. The <code>JXStatusBar.Constraint</code> contains 
+ * an <code>Insets</code> object, as well as a "weight". The weight
+ * is used the same as the <code>GridBagLayout</code>. All the weights of each
+ * constraint is added together to form a total weight. Each individual weight then
+ * is used as a percentage of the whole. For example:
+ * <pre><code>
+ *  //a will get 30% of the free space because .3 + .3 + .4 = 1.0 and 1.0 * .3 = 30%
+ *  bar.add(a, new JXStatusBar.Constraints(.3));
+ *  //b will get 30% of the free space because .3 + .3 + .4 = 1.0 and 1.0 * .3 = 30%
+ *  bar.add(b, new JXStatusBar.Constraints(.3));
+ *  //c will get 40% of the free space because .3 + .3 + .4 = 1.0 and 1.0 * .4 = 40%
+ *  bar.add(c, new JXStatusBar.Constraints(.4));
+ * </code></pre></p>
+ * 
+ * <p>Constructing a <code>JXStatusBar</code> is very straitforward:
  * <pre><code>
  *      JXStatusBar bar = new JXStatusBar();
  *      JLabel statusLabel = new JLabel("Ready");
@@ -63,22 +69,22 @@ import org.jdesktop.swingx.plaf.StatusBarUI;
  *      bar.add(pbar); //weight of 0.0 and no insets
  * </code></pre></p>
  *
- * <p>Two common use cases for status bars is tracking application status and
- * progress. JXStatusBar does not manage these tasks, but instead special components
- * exist or can be created that do manage these tasks. For instance, if you application
+ * <p>Two common use cases for status bars include tracking application status and
+ * progress. <code>JXStatusBar</code> does not manage these tasks, but instead special components
+ * exist or can be created that do manage these tasks. For example, if your application
  * has a TaskManager or some other repository of currently running jobs, you could
  * easily create a TaskManagerProgressBar that tracks those jobs. This component
- * could then be added to the JXStatusBar like any other component.</p>
+ * could then be added to the <code>JXStatusBar</code> like any other component.</p>
  *
  * @author pdoubleya
  * @author rbair
  */
 public class JXStatusBar extends JXPanel {
     /**
-     * @see #getUIClassID // *
+     * @see #getUIClassID
      * @see #readObject
      */
-    static public final String uiClassID = "StatusBarUI";
+    public static final String uiClassID = "StatusBarUI";
     
     /**
      * Initialization that would ideally be moved into various look and feel
@@ -88,9 +94,9 @@ public class JXStatusBar extends JXPanel {
         LookAndFeelAddons.contribute(new JXStatusBarAddon());
     }
     
-//    //TODO this should be part of the plaf UI delegate
-//    private Insets margin = new Insets(3, 3, 3, 3);
-    
+    /**
+     * Creates a new JXStatusBar
+     */
     public JXStatusBar() {
         super();
         setLayout(new Layout());
@@ -148,57 +154,81 @@ public class JXStatusBar extends JXPanel {
                 .getUI(this, StatusBarUI.class));
     }
 
-//    @Override
-//    public Insets getInsets() {
-//        Insets i = super.getInsets();
-//        i.top += margin.top;
-//        i.left += margin.left;
-//        i.right += margin.right;
-//        i.bottom += margin.bottom;
-//        return i;
-//    }
-//    
-//    @Override
-//    public Insets getInsets(Insets insets) {
-//        insets = super.getInsets(insets);
-//        insets.top += margin.top;
-//        insets.left += margin.left;
-//        insets.right += margin.right;
-//        insets.bottom += margin.bottom;
-//        return insets;
-//    }
-    
+    /**
+     * Adds a {@link JSeparator} component. The component will be configured
+     * properly based on the look and feel.
+     */
     public void addSeparator() {
-        JSeparator sep = new JSeparator(SwingConstants.VERTICAL);
-        add(sep, new Constraint(new Insets(1, 5, 1, 5)));
+        add(getUI().createSeparator());
     }
     
+    /**
+     * The constraint object to be used with the <code>JXStatusBar</code>. It takes
+     * both a weight and Insets. @see JXStatusBar class documentation.
+     */
     public static class Constraint {
         private Insets insets;
         private double weight;
         
+        /**
+         * Creates a new Constraint with no weight and no insets.
+         */
+        public Constraint() {
+            this(0.0, null);
+        }
+        
+        /**
+         * Creates a new Constraint with no weight and the given insets
+         * 
+         * @param insets may be null. If null, an Insets with 0 values will be used.
+         */
         public Constraint(Insets insets) {
             this(0.0, insets);
         }
         
+        /**
+         * Creats a new Constraint with the given weight and no insets
+         * 
+         * @param weight must be >= 0
+         */
         public Constraint(double weight) {
-            this(weight, new Insets(0,0,0,0));
+            this(weight, null);
         }
         
+        /**
+         * Creates a new Constraint with the specified weight and insets.
+         * 
+         * @param weight must be >= 0
+         * @param insets may be null. If null, an Insets with 0 values will be used.
+         */
         public Constraint(double weight, Insets insets) {
+            if (weight < 0) {
+                throw new IllegalArgumentException("weight must be >= 0");
+            }
             this.weight = weight;
-            this.insets = insets;
+            this.insets = insets == null ? new Insets(0, 0, 0, 0) : (Insets)insets.clone();
         }
         
+        /**
+         * Returns the weight.
+         * 
+         * @return weight
+         */
         public double getWeight() {
             return weight;
         }
         
+        /**
+         * Returns the insets.
+         * 
+         * @return insets
+         */
         public Insets getInsets() {
-            return new Insets(insets.top, insets.left, insets.bottom, insets.right);
+            return (Insets)insets.clone();
         }
     }
     
+    //move to UI delegate? Probably not?
     private static class Layout implements LayoutManager2 {
         private Map<Component,Constraint> constraints = new HashMap<Component,Constraint>();
         
