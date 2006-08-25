@@ -40,22 +40,15 @@ public class JXStatusBarAddon extends AbstractComponentAddon {
     defaults.addAll(Arrays.asList(new Object[] { 
       JXStatusBar.uiClassID,
       "org.jdesktop.swingx.plaf.basic.BasicStatusBarUI"
-//      "JXTitledPanel.title.font",
-//      UIManager.getFont("Button.font"),
-//      "JXTitledPanel.title.foreground", new ColorUIResource(Color.WHITE),
-//      "JXTitledPanel.title.darkBackground", new ColorUIResource(Color.GRAY),
-//      "JXTitledPanel.title.lightBackground", new ColorUIResource(Color.LIGHT_GRAY),
     }));
   }
-  
-  @Override
-  protected void addMetalDefaults(LookAndFeelAddons addon, List<Object> defaults) {
-    super.addMetalDefaults(addon, defaults);
-  }
 
   @Override
-  protected void addWindowsDefaults(LookAndFeelAddons addon, List<Object> defaults) {
-    super.addWindowsDefaults(addon, defaults);
+  protected void addMacDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+    super.addMacDefaults(addon, defaults);
+    defaults.addAll(Arrays.asList(new Object[] { 
+      JXStatusBar.uiClassID,
+      "org.jdesktop.swingx.plaf.macosx.MacOSXStatusBarUI"
+    }));
   }
-
 }
