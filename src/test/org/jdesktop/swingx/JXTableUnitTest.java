@@ -30,6 +30,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
@@ -40,7 +41,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
@@ -1392,14 +1393,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
                 table.getRowHeight(), table.getRowHeight(table.getRowCount() - 1));
     }
     
-    /*
-     * PENDING JW: looks useless, at least incomplete!
-     *
-     */
-    public void testRowModelAccess() {
-        JXTable table = new JXTable(sortableTableModel);
-        table.setRowHeight(0, 25);
-    }
 
     /**
      * Issue #197: JXTable pattern search differs from 
@@ -1484,22 +1477,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
         int columnCount = table.getColumnCount();
         table.toggleSortOrder(columnCount - 1);
         table.setModel(new DefaultTableModel(10, columnCount - 1));
-        assertTrue(table.getFilters().getSortController().getSortKeys().isEmpty());
-    }
-    /**
-     * sanity testing while refactoring support
-     * for interactive sorter.
-     *
-     */
-    public void testSorterToPipeline() {
-        JXTable table = new JXTable(sortableTableModel);
-        table.toggleSortOrder(0);
-        TableColumnExt columnX = table.getColumnExt(0);
-        // invalid assumption .. only the comparator must be used.
-        // but: not yet implemented
-//        assertEquals("interactive sorter must be same as sorter in column", 
-//                columnX.getSorter(), table.getFilters().getSorter());
-        table.resetSortOrder();
         assertTrue(table.getFilters().getSortController().getSortKeys().isEmpty());
     }
     
@@ -1861,6 +1838,46 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertEquals("last row is individual", 25, table.getRowHeight(selectedRow - 1));
         
     }
+
+    /**
+     * Issue #223 - part d)
+     * 
+     * test if selection is cleared after receiving a dataChanged.
+     * Need to specify behaviour: lead/anchor of selectionModel are 
+     * not changed in clearSelection(). So modelSelection has old 
+     * lead which is mapped as a selection in the view (may be out-of 
+     * range). Hmmm...
+     * 
+     */
+    public void testSelectionAfterDataChanged() {
+        DefaultTableModel ascendingModel = createAscendingModel(0, 20, 5, false);
+        JXTable table = new JXTable(ascendingModel);
+        int selectedRow = table.getRowCount() - 1;
+        table.setRowSelectionInterval(selectedRow, selectedRow);
+        // sanity
+        assertEquals("last row must be selected", selectedRow, table.getSelectedRow());
+        ascendingModel.fireTableDataChanged();
+        assertEquals("selection must be cleared", -1, table.getSelectedRow());
+    }
+
+    /**
+     * Issue #223 - part d)
+     * 
+     * test if selection is cleared after receiving a dataChanged.
+     * 
+     */
+    public void testCoreTableSelectionAfterDataChanged() {
+        DefaultTableModel ascendingModel = createAscendingModel(0, 20, 5, false);
+        JTable table = new JTable(ascendingModel);
+        int selectedRow = table.getRowCount() - 1;
+        table.setRowSelectionInterval(selectedRow, selectedRow);
+        // sanity
+        assertEquals("last row must be selected", selectedRow, table.getSelectedRow());
+        ascendingModel.fireTableDataChanged();
+        assertEquals("selection must be cleared", -1, table.getSelectedRow());
+        
+    }
+    
     /**
      * Issue #223
      * 
@@ -2364,6 +2381,21 @@ public class JXTableUnitTest extends InteractiveTestCase {
         // assertEquals("default LinkModel renderer", LinkRenderer.class, table.getDefaultRenderer(LinkModel.class).getClass());
         assertEquals("default Icon renderer", JXTable.IconRenderer.class, table.getDefaultRenderer(Icon.class).getClass());
     }
+    
+    /**
+     * test if created a new instance of the renderer.
+     *
+     */
+    public void testNewRendererInstance() {
+        JXTable table = new JXTable();
+        TableCellRenderer newRenderer = table.getNewDefaultRenderer(Boolean.class);
+        TableCellRenderer sharedRenderer = table.getDefaultRenderer(Boolean.class);
+        assertNotNull(newRenderer);
+        assertNotSame("new renderer must be different from shared", sharedRenderer, newRenderer);
+        assertNotSame("new renderer must be different from object renderer", 
+                table.getDefaultRenderer(Object.class), newRenderer);
+    }
+
 
     /** 
      * Issue #150: setting filters must not re-create columns.

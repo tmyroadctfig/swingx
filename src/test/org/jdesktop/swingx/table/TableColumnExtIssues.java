@@ -68,12 +68,13 @@ public class TableColumnExtIssues extends TestCase {
 
 
     /**
-     * Issue #??-swingx: must handle non-serializable client properties 
+     * Issue #??-swingx: must handle non-serializable client properties
      * gracefully.
-     * @throws ClassNotFoundException 
-     * @throws IOException 
-     *    
-     *
+     * 
+     * @throws ClassNotFoundException
+     * @throws IOException
+     * 
+     * 
      */
     public void testNonSerializableClientProperties() throws IOException, ClassNotFoundException {
         TableColumnExt columnExt = new TableColumnExt();

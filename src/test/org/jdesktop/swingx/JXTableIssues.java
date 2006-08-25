@@ -1,15 +1,28 @@
 /*
  * $Id$
  *
- * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
+ * Copyright 2006 Sun Microsystems, Inc., 4150 Network Circle,
  * Santa Clara, California 95054, U.S.A. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FontMetrics;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.text.Collator;
@@ -36,24 +49,109 @@ import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.SortKey;
+import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.util.AncientSwingTeam;
+import org.jdesktop.swingx.util.CellEditorReport;
 import org.jdesktop.swingx.util.PropertyChangeReport;
 
 /**
+ * Test to exposed known issues of <code>JXTable</code>.
+ * 
+ * Ideally, there would be at least one failing test method per open
+ * Issue in the issue tracker. Plus additional failing test methods for
+ * not fully specified or not yet decided upon features/behaviour.
+ * 
  * @author Jeanette Winzenburg
  */
 public class JXTableIssues extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXTableIssues.class
             .getName());
 
-
-    public JXTableIssues() {
-        super("JXTableIssues");
-        // TODO Auto-generated constructor stub
+    /**
+     * Issue ??-swingx: table must unsort column on sortable change.
+     *
+     */
+    public void testTableUnsortedColumnOnColumnSortableChange() {
+        JXTable table = new JXTable(10, 2);
+        TableColumnExt columnExt = table.getColumnExt(0);
+        table.toggleSortOrder(0);
+        assertTrue(table.getSortOrder(0).isSorted());
+        columnExt.setSortable(false);
+        assertFalse("table must have unsorted column on sortable change", 
+                table.getSortOrder(0).isSorted());
     }
-
+    
+    /**
+     * Issue ??-swingx: table must cancel edit if column property 
+     *   changes to not editable.
+     * Here we test if the table is not editing after the change.
+     */
+    public void testTableNotEditingOnColumnEditableChange() {
+        JXTable table = new JXTable(10, 2);
+        TableColumnExt columnExt = table.getColumnExt(0);
+        table.editCellAt(0, 0);
+        // sanity
+        assertTrue(table.isEditing());
+        assertEquals(0, table.getEditingColumn());
+        columnExt.setEditable(false);
+        assertFalse(table.isCellEditable(0, 0));
+        assertFalse("table must have terminated edit",table.isEditing());
+    }
+    
+    /**
+     * Issue ??-swingx: table must cancel edit if column property 
+     *   changes to not editable.
+     * Here we test if the table actually canceled the edit.
+     */
+    public void testTableCanceledEditOnColumnEditableChange() {
+        JXTable table = new JXTable(10, 2);
+        TableColumnExt columnExt = table.getColumnExt(0);
+        table.editCellAt(0, 0);
+        // sanity
+        assertTrue(table.isEditing());
+        assertEquals(0, table.getEditingColumn());
+        TableCellEditor editor = table.getCellEditor();
+        CellEditorReport report = new CellEditorReport();
+        editor.addCellEditorListener(report);
+        columnExt.setEditable(false);
+        // sanity
+        assertFalse(table.isCellEditable(0, 0));
+        assertEquals("editor must have fired canceled", 1, report.getCanceledEventCount());
+        assertEquals("editor must not have fired stopped",0, report.getStoppedEventCount());
+    }
+    
+    /**
+     * a quick sanity test: reporting okay?. 
+     * (doesn't belong here, should test the tools 
+     * somewhere else)
+     *
+     */
+    public void testCellEditorFired() {
+        JXTable table = new JXTable(10, 2);
+        table.editCellAt(0, 0);
+        CellEditorReport report = new CellEditorReport();
+        TableCellEditor editor = table.getCellEditor();
+        editor.addCellEditorListener(report);
+        editor.cancelCellEditing();
+        assertEquals("total count must be equals to canceled",
+                report.getCanceledEventCount(), report.getEventCount());
+        assertEquals("editor must have fired canceled", 1, report.getCanceledEventCount());
+        assertEquals("editor must not have fired stopped", 0, report.getStoppedEventCount());
+        report.clear();
+        assertEquals("canceled cleared", 0, report.getCanceledEventCount());
+        assertEquals("total cleared", 0, report.getStoppedEventCount());
+        // same cell, same editor
+        table.editCellAt(0, 0);
+        editor.stopCellEditing();
+        assertEquals("total count must be equals to stopped",
+                report.getStoppedEventCount(), report.getEventCount());
+        assertEquals("editor must not have fired canceled", 0, report.getCanceledEventCount());
+        // JW: surprising... it really fires twice?
+        assertEquals("editor must have fired stopped", 1, report.getStoppedEventCount());
+        
+    }
     /**
      * Issue #359-swing: find suitable rowHeight.
      * 
@@ -152,45 +250,7 @@ public class JXTableIssues extends InteractiveTestCase {
         
     }
 
-    /**
-     * Issue #223 - part d)
-     * 
-     * test if selection is cleared after receiving a dataChanged.
-     * Need to specify behaviour: lead/anchor of selectionModel are 
-     * not changed in clearSelection(). So modelSelection has old 
-     * lead which is mapped as a selection in the view (may be out-of 
-     * range). Hmmm...
-     * 
-     */
-    public void testSelectionAfterDataChanged() {
-        DefaultTableModel ascendingModel = createAscendingModel(0, 20, 5, false);
-        JXTable table = new JXTable(ascendingModel);
-        int selectedRow = table.getRowCount() - 1;
-        table.setRowSelectionInterval(selectedRow, selectedRow);
-        // sanity
-        assertEquals("last row must be selected", selectedRow, table.getSelectedRow());
-        ascendingModel.fireTableDataChanged();
-        assertEquals("selection must be cleared", -1, table.getSelectedRow());
-        
-    }
 
-    /**
-     * Issue #223 - part d)
-     * 
-     * test if selection is cleared after receiving a dataChanged.
-     * 
-     */
-    public void testCoreTableSelectionAfterDataChanged() {
-        DefaultTableModel ascendingModel = createAscendingModel(0, 20, 5, false);
-        JTable table = new JTable(ascendingModel);
-        int selectedRow = table.getRowCount() - 1;
-        table.setRowSelectionInterval(selectedRow, selectedRow);
-        // sanity
-        assertEquals("last row must be selected", selectedRow, table.getSelectedRow());
-        ascendingModel.fireTableDataChanged();
-        assertEquals("selection must be cleared", -1, table.getSelectedRow());
-        
-    }
     public void testComponentAdapterCoordinates() {
         JXTable table = new JXTable(createAscendingModel(0, 10));
         Object originalFirstRowValue = table.getValueAt(0,0);
@@ -251,24 +311,6 @@ public class JXTableIssues extends InteractiveTestCase {
         assertSelection(compare.tableModel, compare.xTable.getSelectionModel(), selectedObjectsAfterModify);
     }
    
-    /**
-     * Issue #223: deleting row above selection does not
-     * update the view selection correctly.
-     * 
-     * fixed - PENDING: move to normal test (need to move special models as well)
-     * 
-     */
-    public void testDeleteRowAboveSelection() {
-        CompareTableBehaviour compare = new CompareTableBehaviour(new Object[] { "A", "B", "C", "D", "E", "F", "G", "H", "I" });
-        compare.table.getSelectionModel().setSelectionInterval(2, 5);
-        compare.xTable.getSelectionModel().setSelectionInterval(2, 5);
-        Object[] selectedObjects = new Object[] { "C", "D", "E", "F" };
-        assertSelection(compare.tableModel, compare.table.getSelectionModel(), selectedObjects);
-        assertSelection(compare.tableModel, compare.xTable.getSelectionModel(), selectedObjects);
-        compare.tableModel.removeRow(0);
-        assertSelection(compare.tableModel, compare.table.getSelectionModel(), selectedObjects);
-        assertSelection(compare.tableModel, compare.xTable.getSelectionModel(), selectedObjects);
-    }
     
     /**
      * test: deleting row below selection - should not change
@@ -486,20 +528,6 @@ public class JXTableIssues extends InteractiveTestCase {
         return model;
     }
     
-    /**
-     * JW: Still needed? moved to main testCase?
-     *
-     */
-    public void testNewRendererInstance() {
-        JXTable table = new JXTable();
-        TableCellRenderer newRenderer = table.getNewDefaultRenderer(Boolean.class);
-        TableCellRenderer sharedRenderer = table.getDefaultRenderer(Boolean.class);
-        assertNotNull(newRenderer);
-        assertNotSame("new renderer must be different from shared", sharedRenderer, newRenderer);
-        assertNotSame("new renderer must be different from object renderer", 
-                table.getDefaultRenderer(Object.class), newRenderer);
-    }
-
 
     /**
      * Issue #??: JXTable pattern search differs from 
@@ -512,6 +540,8 @@ public class JXTableIssues extends InteractiveTestCase {
      *
      *  Note: this method passes as long as the issue is not
      *  fixed!
+     *  
+     *  TODO: check status!
      */
     public void testWildCardInSearchByString() {
         JXTable table = new JXTable(createAscendingModel(0, 11));
