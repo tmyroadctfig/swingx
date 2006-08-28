@@ -148,7 +148,7 @@ import javax.swing.table.TableColumnModel;
  * @see DefaultTableColumnModelExt
  * @see TableColumnExt
  * @see ColumnControlButton
- * @see JXTable#setColumnControlEnabled
+ * @see JXTable#setColumnControlVisible
  * @see ColumnFactory
  * 
  */
