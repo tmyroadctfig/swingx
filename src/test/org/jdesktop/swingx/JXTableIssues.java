@@ -70,7 +70,7 @@ public class JXTableIssues extends InteractiveTestCase {
             .getName());
 
     /**
-     * Issue ??-swingx: table must unsort column on sortable change.
+     * Issue 373-swingx: table must unsort column on sortable change.
      *
      */
     public void testTableUnsortedColumnOnColumnSortableChange() {
@@ -84,7 +84,7 @@ public class JXTableIssues extends InteractiveTestCase {
     }
     
     /**
-     * Issue ??-swingx: table must cancel edit if column property 
+     * Issue 372-swingx: table must cancel edit if column property 
      *   changes to not editable.
      * Here we test if the table is not editing after the change.
      */
@@ -101,7 +101,7 @@ public class JXTableIssues extends InteractiveTestCase {
     }
     
     /**
-     * Issue ??-swingx: table must cancel edit if column property 
+     * Issue 372-swingx: table must cancel edit if column property 
      *   changes to not editable.
      * Here we test if the table actually canceled the edit.
      */
