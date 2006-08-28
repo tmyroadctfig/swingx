@@ -135,13 +135,6 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
     }
     
     /**
-     * {@inheritDoc}
-     */
-    public Set<TableColumnExt> getInvisibleColumns() {
-        return new HashSet<TableColumnExt>(invisibleColumns);
-    }
-
-    /**
      * hot fix for #157: listeners that are aware of
      * the possible existence of invisible columns
      * should check if the received columnRemoved originated
