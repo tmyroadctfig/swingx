@@ -22,10 +22,12 @@
 package org.jdesktop.swingx.table;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+
+import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.event.TableColumnModelExtListener;
 
 /**
  * An extension of <code>TableColumnModel</code> suitable for use with
@@ -147,19 +149,26 @@ import javax.swing.table.TableColumnModel;
  * 
  * @see DefaultTableColumnModelExt
  * @see TableColumnExt
+ * @see TableColumnModelExtListener
  * @see ColumnControlButton
  * @see JXTable#setColumnControlVisible
  * @see ColumnFactory
  * 
  */
 public interface TableColumnModelExt extends TableColumnModel {
+    
     /**
-     * Returns a Set containing all of the columns that are invisible. If no
-     * columns in this model are invisible, then this will be an empty set.
+     * Returns the number of contained columns including or excluding invisible
+     * columns, depending on whether the <code>includeHidden</code> is true or
+     * false, respectively. If false, this method returns the same count as
+     * <code>getColumnCount()</code>.
      * 
-     * @return the set of invisible columns.
+     * @param includeHidden a boolean to indicate whether invisible columns
+     *        should be included
+     * @return the number of contained columns, including or excluding the
+     *         invisible as specified.
      */
-    public Set<TableColumnExt> getInvisibleColumns();
+    public int getColumnCount(boolean includeHidden);
 
     /**
      * Returns a <code>List</code> of contained <code>TableColumn</code>s.
@@ -206,16 +215,4 @@ public interface TableColumnModelExt extends TableColumnModel {
      */
     public TableColumnExt getColumnExt(int columnIndex);
 
-    /**
-     * Returns the number of contained columns including or excluding invisible
-     * columns, depending on whether the <code>includeHidden</code> is true or
-     * false, respectively. If false, this method returns the same count as
-     * <code>getColumnCount()</code>.
-     * 
-     * @param includeHidden a boolean to indicate whether invisible columns
-     *        should be included
-     * @return the number of contained columns, including or excluding the
-     *         invisible as specified.
-     */
-    public int getColumnCount(boolean includeHidden);
 }
