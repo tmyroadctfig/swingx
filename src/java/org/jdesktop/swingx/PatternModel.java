@@ -91,6 +91,9 @@ public class PatternModel {
      */
     public static final String SEARCH_PREFIX = "Search.";
 
+    /*
+     * TODO: use Enum for strategy. 
+     */
     public static final String REGEX_UNCHANGED = "regex";
 
     public static final String REGEX_ANCHORED = "anchored";
@@ -99,6 +102,9 @@ public class PatternModel {
 
     public static final String REGEX_MATCH_RULES = "explicit";
 
+    /*
+     * TODO: use Enum for rules.
+     */
     public static final String MATCH_RULE_CONTAINS = "contains";
 
     public static final String MATCH_RULE_EQUALS = "equals";
@@ -520,14 +526,40 @@ public class PatternModel {
 //     }
     }
     /**
+     * Set the strategy to use for compiling a pattern from
+     * rawtext.
      * 
-     * @param mode
+     * NOTE: This is imcomplete (in fact it wasn't implemented at 
+     * all) - only recognizes REGEX_ANCHORED, every other value
+     * results in REGEX_MATCH_RULES.
+     * 
+     * @param mode the String key of the match strategy to use.
      */
     public void setRegexCreatorKey(String mode) {
         if (getRegexCreatorKey().equals(mode)) return;
         String old = getRegexCreatorKey();
         regexCreatorKey = mode;
+        createRegexCreator(getRegexCreatorKey());
         firePropertyChange("regexCreatorKey", old, getRegexCreatorKey());
+        
+    }
+
+    /**
+     * Creates and sets the strategy to use for compiling a pattern from
+     * rawtext.
+     * 
+     * NOTE: This is imcomplete (in fact it wasn't implemented at 
+     * all) - only recognizes REGEX_ANCHORED, every other value
+     * results in REGEX_MATCH_RULES.
+     * 
+     * @param mode the String key of the match strategy to use.
+     */
+    protected void createRegexCreator(String mode) {
+        if (REGEX_ANCHORED.equals(mode)) {
+            setRegexCreator(new AnchoredSearchMode());
+        } else {
+            setRegexCreator(new RegexCreator());
+        }
         
     }
 
@@ -542,6 +574,26 @@ public class PatternModel {
         return REGEX_MATCH_RULES;
     }
 
+    private RegexCreator getRegexCreator() {
+        if (regexCreator == null) {
+            regexCreator = new RegexCreator();
+        }
+        return regexCreator;
+    }
+
+    /**
+     * This is a quick-fix to allow custom strategies for compiling
+     * rawtext to patterns.
+     * 
+     * @param regexCreator the strategy to use for compiling text
+     *   into pattern.
+     */
+    public void setRegexCreator(RegexCreator regexCreator) {
+        Object old = this.regexCreator;
+        this.regexCreator = regexCreator;
+        firePropertyChange("regexCreator", old, regexCreator);
+    }
+
     public void setMatchRule(String category) {
         if (getMatchRule().equals(category)) {
             return;
@@ -550,18 +602,10 @@ public class PatternModel {
         getRegexCreator().setMatchRule(category);
         updatePattern(createRegEx(getRawText()));
         firePropertyChange("matchRule", old, getMatchRule());
-        
     }
 
     public String getMatchRule() {
         return getRegexCreator().getMatchRule();
-    }
-
-    private RegexCreator getRegexCreator() {
-        if (regexCreator == null) {
-            regexCreator = new RegexCreator();
-        }
-        return regexCreator;
     }
 
     public List getMatchRules() {
