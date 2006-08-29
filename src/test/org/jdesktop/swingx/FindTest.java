@@ -11,6 +11,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URL;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
@@ -26,7 +27,8 @@ import org.jdesktop.swingx.JXTable.TableSearchable;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 
 public class FindTest extends InteractiveTestCase {
-
+    private static final Logger LOG = Logger
+            .getLogger(FindTest.class.getName());
     public static void main(String args[]) {
       setSystemLF(true);
 //      Locale.setDefault(new Locale("es"));
@@ -52,11 +54,35 @@ public class FindTest extends InteractiveTestCase {
         super("Find Action Test");
     }
 
+
+    /**
+     * Issue #374-swingx: default search keystroke never found.
+     * 
+     * This was probably introduced when fixing #353-swingx: 
+     * swingx must not try to leave sandbox.
+     * 
+     */
+    public void testSearchKeyStroke() {
+        if (System.getSecurityManager() != null) {
+            LOG.info("cannot run testSearchKeyStroke - SecurityManager installed");
+            return;
+        }
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run testSearchKeyStroke - headless environment");
+            return;
+        }
+        assertNotNull("searchfactory must return search accelerator", 
+                SearchFactory.getInstance().getSearchAccelerator());
+    }
+
     
     public void testWrapFindBar() {
         JXFindBar findBar = new JXFindBar();
         assertTrue("findbar must auto-wrap", findBar.getPatternModel().isWrapping());
     }
+    
+    
     /** 
      * test if internal state is reset to not found by
      * passing a null searchstring.
