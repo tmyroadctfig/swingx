@@ -32,55 +32,67 @@ import javax.swing.table.TableColumn;
 import org.jdesktop.swingx.JavaBean;
 
 /**
- * TableColumn extension with enhanced support for view column 
- * configuration. The general drift is to strengthen the TableColumn
- * abstraction as <b>the</b> place to configure and dynamically update
- * view column properties, 
- * covering a broad range of typical customization requirements.<p>
+ * TableColumn extension with enhanced support for view column configuration.
+ * The general drift is to strengthen the TableColumn abstraction as <b>the</b>
+ * place to configure and dynamically update view column properties, covering a
+ * broad range of typical customization requirements.
+ * <p>
  * 
- * A prominent group of properties allows fine-grained, per-column control 
- * of corresponding Table/-Header features. 
- *  
+ * A prominent group of properties allows fine-grained, per-column control of
+ * corresponding Table/-Header features.
+ * 
  * <ul>
-*  <li><b>Sorting</b>: <code>sortable</code> controls whether this column should
- * sortable by user's sort gestures; <code>Comparator</code> can hold a
- * column specific type. 
+ * <li><b>Sorting</b>: <code>sortable</code> controls whether this column
+ * should be sortable by user's sort gestures; <code>Comparator</code> can hold a
+ * column specific type.
  * 
- * <li><b>Editing</b>: <code>editable</code> controls whether cells of this column 
- * should accessible to in-table editing.
+ * <li><b>Editing</b>: <code>editable</code> controls whether cells of this
+ * column should be accessible to in-table editing.
  * 
- * <li><b>Tooltip</b>: <code>toolTipText</code> holds the column tooltip which 
- * is shown when hovering over the column's header.
+ * <li><b>Tooltip</b>: <code>toolTipText</code> holds the column tooltip
+ * which is shown when hovering over the column's header.
  * </ul>
- *
- * TODO: explain visible (collaborator-used-by TableColumnModelExt, ColumnControlButton) <p>
  * 
- * TODO: explain client properties (free-style app-specific, analogous to JComponent) <p>
+ * TODO: explain visible (collaborator-used-by TableColumnModelExt,
+ * ColumnControlButton)
+ * <p>
  * 
- * TODO: explain prototype (sizing, collaborator-used-by ColumnFactory (?)) <p>
- *
+ * Analogous to <code>JComponent</code>, this class supports per-instance
+ * "client" properties. They are meant as a small-scale extension mechanism.
+ * They are similar to regular bean properties in that registered
+ * <code>PropertyChangeListener</code>s are notified about changes. TODO:
+ * example?
+ * <p>
+ * 
+ * TODO: explain prototype (sizing, collaborator-used-by ColumnFactory (?))
+ * <p>
+ * 
  * @author Ramesh Gupta
  * @author Amy Fowler
  * @author Jeanette Winzenburg
  * 
  * @see TableColumnModelExt
  * @see ColumnFactory
- * 
+ * @see JComponent#setClientProperty
  */
 public class TableColumnExt extends TableColumn
     implements Cloneable {
 
-    protected boolean editable = true;
     protected boolean visible = true;
     protected Object prototypeValue = null;
 
-    protected Hashtable<Object, Object> clientProperties = null;
 
-    /** the comparator to use for this column */
+    /** per-column comparator  */
     protected Comparator comparator;
+    /** per-column sortable property. */
     protected boolean sortable = true;
+    /** per-column editable property. */
+    protected boolean editable = true;
+    /** per-column header tooltip text. */
     private String toolTipText;
     
+    /** storage for client properties. */
+    protected Hashtable<Object, Object> clientProperties = null;
 
     /**
      * Creates new table view column with a model index = 0.
@@ -140,16 +152,11 @@ public class TableColumnExt extends TableColumn
     }
 
     /**
-     * Sets the editable property.  This property enables the table view to
-     * control whether or not the user is permitted to edit cell values in this
-     * view column, even if the model permits.  
-     * If the table model column corresponding to this view column
-     * returns <code>true</code> for <code>isCellEditable</code> and this
-     * property is <code>false</code>, then the user will not be permitted to
-     * edit values from this view column, dispite the model setting.
-     * If the model's <code>isCellEditable</code> returns <code>false</code>,
-     * then this property will be ignored and cell edits will not be permitted
-     * in this view column.
+     * Sets the editable property. This property allows to mark all cells in a
+     * column as read-only, independent of the per-cell editability as returned
+     * by the <code>TableModel.isCellEditable</code>. If the cell is
+     * read-only in the model layer, this property will have no effect.
+     * 
      * @see #isEditable
      * @see javax.swing.table.TableModel#isCellEditable
      * @param editable boolean indicating whether or not the user may edit cell
@@ -316,7 +323,18 @@ public class TableColumnExt extends TableColumn
     }
 
     /**
-     * Stores the object value using the specified key.
+     * Sets the <code>key</code> "client property" to <code>value</code>. 
+     * If <code>value</code> is <code>null</code> this method will remove the property. 
+     * Changes to
+     * client properties are reported with <code>PropertyChange</code> events.
+     * The name of the property (for the sake of PropertyChange events) is
+     * <code>key.toString()</code>.
+     * <p>
+     * The <code>get/putClientProperty</code> methods provide access to a
+     * per-instance hashtable, which is intended for small scale extensions of
+     * TableColumn.
+     * <p>
+     * 
      * @see #getClientProperty
      * @param key Object which is used as key to retrieve value
      * @param value Object containing value of client property
@@ -343,10 +361,14 @@ public class TableColumnExt extends TableColumn
     }
 
     /**
-     * Retrieves the object value using the specified key.
-     * @see #putClientProperty
+     * Returns the value of the property with the specified key. Only properties
+     * added with <code>putClientProperty</code> will return a non-<code>null</code>
+     * value.
+     * 
      * @param key Object which is used as key to retrieve value
-     * @return Object containing value of client property
+     * @return Object containing value of client property or <code>null</code>
+     * 
+     * @see #putClientProperty
      */
     public Object getClientProperty(Object key) {
         return ((key == null) || (clientProperties == null)) ?
@@ -371,7 +393,6 @@ public class TableColumnExt extends TableColumn
       */
      @Override
      public Object clone() {
-         // TODO: JW: where are the client properties?
          final TableColumnExt copy = new TableColumnExt(
              this.getModelIndex(), this.getWidth(),
              this.getCellRenderer(), this.getCellEditor());

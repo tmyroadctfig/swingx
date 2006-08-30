@@ -1185,10 +1185,27 @@ public class JXTable extends JTable
     }
 
     /**
-     * Overridden to account for row index mapping and to respect
-     * both {@link #isEditable()} and {@link TableColumnExt#isEditable()} property.
+     * Returns true if the cell at <code>row</code> and <code>column</code>
+     * is editable. Otherwise, invoking <code>setValueAt</code> on the cell
+     * will have no effect.
+     * <p>
+     * Overridden to account for row index mapping and to support a layered
+     * editability control:
+     * <ul>
+     * <li> per-table: <code>JXTable.isEditable()</code>
+     * <li> per-column: <code>TableColumnExt.isEditable()</code>
+     * <li> per-cell: controlled by the model
+     * <code>TableModel.isCellEditable()</code>
+     * </ul>
+     * The view cell is considered editable only if all three layers are enabled. 
      * 
-     * {@inheritDoc}
+     * @param row the row index in view coordinates
+     * @param column the column index in view coordinates
+     * @return true if the cell is editable
+     * @see #setValueAt
+     * @see #isEditable
+     * @see TableColumnExt#isEditable
+     * @see TableModel#isCellEditable
      */
     @Override
     public boolean isCellEditable(int row, int column) {
@@ -3155,17 +3172,24 @@ public class JXTable extends JTable
 //----------------------------- enhanced editing support
     
     /**
+     * Returns the editable property of the <code>JXTable</code> as a whole.
      * @return boolean to indicate if the table is editable.
+     * @see #setEditable
      */
     public boolean isEditable() {
         return editable;
     }
     
     /**
-     * Sets the editable property. If false, all cells are not editable.
-     * 
+     * Sets the editable property. This property allows to mark all cells in a
+     * table as read-only, independent of their per-column editability as returned
+     * by <code>TableColumnExt.isEditable()</code> and their per-cell editability as returned
+     * by the <code>TableModel.isCellEditable</code>. If a cell is read-only in its 
+     * column or model layer, this property has no effect.
      * 
      * @param editable the flag to indicate if the table is editable.
+     * @see #isEditable
+     * @see #isCellEditable(int, int)
      */
     public void setEditable(boolean editable) {
         boolean old = isEditable();
