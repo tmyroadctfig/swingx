@@ -117,6 +117,10 @@ public class SearchFactory {
         // get the accelerator mnemonic from the UIManager
         String findMnemonic = "F";
         KeyStroke findStroke = Utilities.stringToKey("D-" + findMnemonic);
+        // fallback for sandbox (this should be handled in Utilities instead!)
+        if (findStroke == null) {
+            findStroke = KeyStroke.getKeyStroke("control F");
+        }
         return findStroke;
         
     }

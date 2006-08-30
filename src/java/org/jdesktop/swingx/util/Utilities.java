@@ -311,13 +311,11 @@ public class Utilities {
         }
 
         Field[] fields;
-//        fields = KeyEvent.class.getDeclaredFields();
-        // Issue #353-swingx: play nicer inside sandbox.
+        // JW - fix Issue #353-swingx: play nicer inside sandbox.
         try {
             fields = KeyEvent.class.getDeclaredFields();
-        } catch (SecurityException e) {
-           fields = KeyEvent.class.getFields();
-        } finally {
+//           fields = KeyEvent.class.getFields();
+        } catch (SecurityException e) { 
             // JW: need to do better? What are the use-cases where we don't have
             // any access to the fields?
             fields = new Field[0];
