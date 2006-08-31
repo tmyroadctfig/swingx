@@ -354,6 +354,12 @@ public class FilterPipeline {
      * @param filter a filter in this pipeline that has changed in any way
      */
     protected void filterChanged(Filter filter) {
+        // JW: quick partial fix for #370-swingx: don't
+        // fire if there are no active filters/and no sorter.
+        // can't do anything if we have filters/sorters
+        // because we have no notion to turn "auto-flush on model update" off 
+        // (Mustang does - and has it off by default)
+        if ((filter instanceof IdentityFilter) && (getSorter() == null)) return;
         Filter  next = next(filter); 
         if (next == null) {
             // prepared for additional event type
