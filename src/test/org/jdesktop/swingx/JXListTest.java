@@ -19,6 +19,7 @@ import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
 
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
@@ -26,6 +27,7 @@ import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.SelectionMapper;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
+import org.jdesktop.swingx.util.ListDataReport;
 import org.jdesktop.swingx.util.PropertyChangeReport;
 
 /**
@@ -401,15 +403,54 @@ public class JXListTest extends InteractiveTestCase {
         }
     }
 
+    /**
+     * test if selection is kept after deleting a row above the
+     * selected.
+     * 
+     * This fails after quick fix for #370-swingx. 
+     *
+     */
     public void testSelectionAfterDeleteAbove() {
         JXList list = new JXList(ascendingListModel, true);
+        // selecte second row
         list.setSelectedIndex(1);
+        // remove first 
         ascendingListModel.remove(0);
         assertEquals("first row must be selected removing old first", 
                 0, list.getSelectedIndex());
         
     }
     
+    /**
+     * Issue 377-swingx: list with filters enabled fires incorrect events.
+     * 
+     */
+    public void testListDataEvents() {
+        JXList list = new JXList(ascendingListModel, true);
+        ListDataReport report = new ListDataReport();
+        list.getModel().addListDataListener(report);
+        // remove row 
+        ascendingListModel.remove(0);
+        assertEquals("list must have fired event", 1, report.getEventCount());
+        assertEquals("list must have fired event of type removed", 
+                1, report.getRemovedEventCount());
+        
+    }
+    /**
+     * sanity test: compare table with list behaviour (#370-swingx)
+     * 
+     */
+    public void testSelectionAfterDeleteAboveCompareTable() {
+        DefaultTableModel ascendingModel = new DefaultTableModel(20, 2);
+        JXTable table = new JXTable(ascendingModel);
+        // select second row
+        table.setRowSelectionInterval(1, 1);
+        // remove first
+        ascendingModel.removeRow(0);
+        assertEquals("first row must be selected after removing old first", 
+                0, table.getSelectedRow());
+        
+    }
 
     protected ListModel createListModel() {
         JXList list = new JXList();

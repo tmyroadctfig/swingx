@@ -8,16 +8,14 @@
 
 package org.jdesktop.swingx.util;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 
 /**
- * A ChangeListener that stores the received ChangeEvents.
+ * A CellEditorListener that stores the received ChangeEvents.
  * 
  */
 public class CellEditorReport implements CellEditorListener {
