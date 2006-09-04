@@ -422,21 +422,6 @@ public class JXListTest extends InteractiveTestCase {
     }
     
     /**
-     * Issue 377-swingx: list with filters enabled fires incorrect events.
-     * 
-     */
-    public void testListDataEvents() {
-        JXList list = new JXList(ascendingListModel, true);
-        ListDataReport report = new ListDataReport();
-        list.getModel().addListDataListener(report);
-        // remove row 
-        ascendingListModel.remove(0);
-        assertEquals("list must have fired event", 1, report.getEventCount());
-        assertEquals("list must have fired event of type removed", 
-                1, report.getRemovedEventCount());
-        
-    }
-    /**
      * sanity test: compare table with list behaviour (#370-swingx)
      * 
      */

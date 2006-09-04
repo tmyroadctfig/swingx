@@ -25,6 +25,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,6 +42,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
@@ -374,7 +377,101 @@ public class JXTableIssues extends InteractiveTestCase {
         
         
     }
+    /**
+     * Issue #370-swingx: "jumping" selection while dragging.
+     * 
+     */
+    public void interactiveExtendSelection() {
+        final UpdatingTableModel model = new UpdatingTableModel();
+        JXTable table = new JXTable(model);
+        // Swing Timer - EDT in Timer
+        ActionListener l = new ActionListener() {
+            int i = 0;
+
+            public void actionPerformed(ActionEvent e) {
+                model.updateCell(i++ % 10);
+                
+            }
+            
+        };
+        Timer timer = new Timer(1000, l);
+        timer.start();
+        JXFrame frame = wrapWithScrollingInFrame(table, "#370 - extend selection by dragging");
+        frame.setVisible(true);
+    }
     
+    /** 
+     * Simple model for use in continous update tests. 
+     * Issue #370-swingx: jumping selection on dragging.
+     */
+    private class UpdatingTableModel extends AbstractTableModel {
+
+        private int[][] data = new int[10][5];
+
+        public UpdatingTableModel() {
+            for (int row = 0; row < data.length; row++) {
+                fillRow(row);
+            }
+        }
+
+        public int getRowCount() {
+            return 10;
+        }
+
+        public int getColumnCount() {
+            return 5;
+        }
+
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            return data[rowIndex][columnIndex];
+        }
+
+        /**
+         * update first column of row on EDT.
+         * @param row
+         */
+        public void invokeUpdateCell(final int row) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    updateCell(row);
+                }
+            });
+        }
+
+        /**
+         * update first column of row. Sorting on any column except the first
+         * doesn't change row sequence - shouldn't interfere with selection
+         * extension.
+         * 
+         * @param row
+         */
+        public void updateCell(final int row) {
+            updateCell(row, 0);
+            fireTableCellUpdated(row, 0);
+        }
+
+        public void fillRow(int row) {
+            for (int col = 0; col < data[row].length; col++) {
+                updateCell(row, col);
+            }
+        }
+
+        /**
+         * Fills the given cell with random value.
+         * @param row
+         * @param col
+         */
+        private void updateCell(int row, int col) {
+            data[row][col] = (int) Math.round(Math.random() * 200);
+        }
+    }
+  
+
+    /**
+     * Issue #282-swingx: compare disabled appearance of
+     * collection views.
+     *
+     */
     public void interactiveDisabledCollectionViews() {
         final JXTable table = new JXTable(new AncientSwingTeam());
         table.setEnabled(false);

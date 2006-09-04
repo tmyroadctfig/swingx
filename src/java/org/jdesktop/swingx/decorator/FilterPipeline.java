@@ -359,7 +359,10 @@ public class FilterPipeline {
         // can't do anything if we have filters/sorters
         // because we have no notion to turn "auto-flush on model update" off 
         // (Mustang does - and has it off by default)
-        if ((filter instanceof IdentityFilter) && (getSorter() == null)) return;
+        // JW: reverted - wrong place, depends on a specific 
+        // sortController implementation and "ripples" 
+        // (JXList selection not correctly updated)
+//        if ((filter instanceof IdentityFilter) && (getSorter() == null)) return;
         Filter  next = next(filter); 
         if (next == null) {
             // prepared for additional event type
