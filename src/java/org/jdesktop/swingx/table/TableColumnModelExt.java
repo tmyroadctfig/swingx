@@ -55,7 +55,7 @@ import org.jdesktop.swingx.event.TableColumnModelExtListener;
  * corresponding changes in interested views. Typically, a view column's 
  * visibility can be toggled by user interaction, f.i. via a <code>ColumnControlButton</code>.
  * <p>
- * An example to programatically hide
+ * An example to programmatically hide
  * the first visible column in the column model:
  * 
  * <pre><code>

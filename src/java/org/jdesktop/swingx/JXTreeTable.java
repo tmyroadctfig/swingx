@@ -399,7 +399,7 @@ public class JXTreeTable extends JXTable {
          *   the renderer, false otherwise. 
          *   
          * @see #processMouseEvent(MouseEvent)
-         * @see #isHitDetectionFromProcessMouse();
+         * @see #isHitDetectionFromProcessMouse()
          */
         public boolean hitHandleDetectionFromProcessMouse(MouseEvent e) {
             if (!isHitDetectionFromProcessMouse())

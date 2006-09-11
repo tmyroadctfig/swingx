@@ -73,7 +73,7 @@ import org.jdesktop.swingx.JavaBean;
  * 
  * @see TableColumnModelExt
  * @see ColumnFactory
- * @see JComponent#setClientProperty
+ * @see JComponent#putClientProperty
  */
 public class TableColumnExt extends TableColumn
     implements Cloneable {
