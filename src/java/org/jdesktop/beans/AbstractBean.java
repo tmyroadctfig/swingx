@@ -106,6 +106,7 @@ import java.beans.VetoableChangeSupport;
  *  }
  * </code></pre></p>
  *
+ * @status REVIEWED
  * @author rbair
  */
 public abstract class AbstractBean {
