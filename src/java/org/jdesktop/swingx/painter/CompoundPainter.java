@@ -23,7 +23,7 @@ package org.jdesktop.swingx.painter;
 
 import java.awt.Graphics2D;
 import javax.swing.JComponent;
-import org.jdesktop.swingx.JavaBean;
+import org.jdesktop.beans.AbstractBean;
 
 /**
  * <p>A Painter implemention that contains an array of Painters, and executes them

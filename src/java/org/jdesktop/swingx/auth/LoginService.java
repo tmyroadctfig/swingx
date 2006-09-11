@@ -26,7 +26,7 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
-import org.jdesktop.swingx.JavaBean;
+import org.jdesktop.beans.AbstractBean;
 import org.jdesktop.swingx.util.SwingWorker;
 
 /**
@@ -42,7 +42,7 @@ import org.jdesktop.swingx.util.SwingWorker;
  * @author Bino George
  * @author Shai Almog
  */
-public abstract class LoginService extends JavaBean {
+public abstract class LoginService extends AbstractBean {
     private Logger LOG = Logger.getLogger(LoginService.class.getName());
     private Vector<LoginListener> listenerList = new Vector<LoginListener>();
     private SwingWorker loginWorker;

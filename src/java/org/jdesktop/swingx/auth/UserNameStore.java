@@ -20,7 +20,7 @@
  */
 package org.jdesktop.swingx.auth;
 
-import org.jdesktop.swingx.JavaBean;
+import org.jdesktop.beans.AbstractBean;
 
 /**
  * <b>UsernameStore</b> is a class that implements persistence of usernames
@@ -28,7 +28,7 @@ import org.jdesktop.swingx.JavaBean;
  * @author Bino George
  * @author rbair
  */
-public abstract class UserNameStore extends JavaBean {
+public abstract class UserNameStore extends AbstractBean {
     /**
      * Gets the current list of users.
      */
