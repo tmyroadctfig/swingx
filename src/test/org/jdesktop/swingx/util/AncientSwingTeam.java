@@ -44,9 +44,9 @@ public class AncientSwingTeam extends AbstractTableModel {
 
     }
 
-    // public SwingTeam(int count) {
-    // rowCount = count;
-    // }
+     public AncientSwingTeam(int count) {
+         rowCount = count;
+     }
 
     public int getColumnCount() {
         return names.length;
