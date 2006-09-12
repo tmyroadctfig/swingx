@@ -331,7 +331,8 @@ public class FilterTest extends InteractiveTestCase {
     public void testAndFilter() {
         PatternFilter first = new PatternFilter("a", 0, 0);
         PatternFilter second = new PatternFilter("b", 0, 1);
-        FilterPipeline pipeline = new FilterPipeline(new Filter[] {first, second});
+//        FilterPipeline pipeline = new FilterPipeline(new Filter[] {first, second});
+        FilterPipeline pipeline = new FilterPipeline(first, second);
         pipeline.assign(directModelAdapter);
         assertTrue(pipeline.getOutputSize() > 0);
         for (int i = 0; i < pipeline.getOutputSize(); i++) {

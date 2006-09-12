@@ -21,6 +21,7 @@
 
 package org.jdesktop.swingx.decorator;
 
+
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.Comparator;
@@ -80,7 +81,7 @@ public class FilterPipeline {
      *
      * @param inList array of filters
      */
-    public FilterPipeline(Filter[] inList) {
+    public FilterPipeline(Filter... inList) {
         filters = reorderSorters(inList, locateSorters(inList));
         assignFilters();
     }
