@@ -36,18 +36,18 @@ import javax.swing.UIManager;
 /**
  * <p>A simple horizontal separator that contains a title.<br/>
  *
- * <p>JXTitledSeparator allows you to specify the title via the #setTitle method.
- * The title alignment may be specified by using the #setHorizontalAlignment
- * method, and accepts all the same arguments as the JLabel#setHorizontalAlignment
+ * <p>JXTitledSeparator allows you to specify the title via the {@link #setTitle} method.
+ * The title alignment may be specified by using the {@link #setHorizontalAlignment}
+ * method, and accepts all the same arguments as the {@link javax.swing.JLabel#setHorizontalAlignment}
  * method.</p>
  *
  * <p>In addition, you may specify an Icon to use with this separator. The icon
  * will appear "leading" the title (on the left in left-to-right languages,
  * on the right in right-to-left languages). To change the position of the
- * title with respect to the icon, call #setHorizontalTextPosition.</p>
+ * title with respect to the icon, call {@link #setHorizontalTextPosition}.</p>
  *
  * <p>The default font and color of the title comes from the LookAndFeel, mimicking
- * the font and color of the TitledBorder</p>
+ * the font and color of the {@link javax.swing.TitledBorder}</p>
  *
  * <p>Here are a few example code snippets:
  * <pre><code>
