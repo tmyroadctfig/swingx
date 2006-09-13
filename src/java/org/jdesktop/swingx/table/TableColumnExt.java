@@ -29,13 +29,20 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
-import org.jdesktop.swingx.JavaBean;
-
 /**
- * TableColumn extension with enhanced support for view column configuration.
+ * TableColumn extension for enhanced view column configuration.
  * The general drift is to strengthen the TableColumn abstraction as <b>the</b>
  * place to configure and dynamically update view column properties, covering a
- * broad range of typical customization requirements.
+ * broad range of typical customization requirements. Using collaborators are 
+ * expected to listen property changes and update themselves accordingly.
+ * <p>
+ * 
+ * A functionality enhancement is the notion of column visibility: 
+ * <code>TableColumnModelExt</code> manages sets visible/hidden 
+ * <code>TableColumnExt</code>s controlled by the columns' <code>visible</code>
+ * property. Typically, users can show/hide column visibility at runtime, f.i.
+ * through a dedicated control in the uppder trailing corner of a 
+ * <code>JScrollPane</code>.
  * <p>
  * 
  * A prominent group of properties allows fine-grained, per-column control of
@@ -53,9 +60,6 @@ import org.jdesktop.swingx.JavaBean;
  * which is shown when hovering over the column's header.
  * </ul>
  * 
- * TODO: explain visible (collaborator-used-by TableColumnModelExt,
- * ColumnControlButton)
- * <p>
  * 
  * Analogous to <code>JComponent</code>, this class supports per-instance
  * "client" properties. They are meant as a small-scale extension mechanism.
@@ -78,21 +82,24 @@ import org.jdesktop.swingx.JavaBean;
 public class TableColumnExt extends TableColumn
     implements Cloneable {
 
+    /** visible property. Initialized to <code>true</code>.*/
     protected boolean visible = true;
-    protected Object prototypeValue = null;
+    
+    /** prototype property. */
+    protected Object prototypeValue;
 
 
     /** per-column comparator  */
     protected Comparator comparator;
-    /** per-column sortable property. */
+    /** per-column sortable property. Initialized to <code>true</code>. */
     protected boolean sortable = true;
-    /** per-column editable property. */
+    /** per-column editable property. Initialized to <code>true</code>.*/
     protected boolean editable = true;
-    /** per-column header tooltip text. */
+    /** per-column tool tip text. */
     private String toolTipText;
     
     /** storage for client properties. */
-    protected Hashtable<Object, Object> clientProperties = null;
+    protected Hashtable<Object, Object> clientProperties;
 
     /**
      * Creates new table view column with a model index = 0.
@@ -157,10 +164,10 @@ public class TableColumnExt extends TableColumn
      * by the <code>TableModel.isCellEditable</code>. If the cell is
      * read-only in the model layer, this property will have no effect.
      * 
-     * @see #isEditable
-     * @see javax.swing.table.TableModel#isCellEditable
      * @param editable boolean indicating whether or not the user may edit cell
      *        values in this view column
+     * @see #isEditable
+     * @see javax.swing.table.TableModel#isCellEditable
      */
     public void setEditable(boolean editable) {
         boolean oldEditable = this.editable;
@@ -171,9 +178,12 @@ public class TableColumnExt extends TableColumn
     }
 
     /**
-     * @see #setEditable
+     * Returns the per-column editable property.
+     * The default is <code>true</code>.
+     * 
      * @return boolean indicating whether or not the user may edit cell
      *        values in this view column
+     * @see #setEditable
      */
     public boolean isEditable() {
         return editable;
@@ -186,10 +196,11 @@ public class TableColumnExt extends TableColumn
      * and set the initial preferredWidth of the column.  Note that this
      * initial preferredWidth will be overridden if the user resizes columns
      * directly.
-     * @see #getPrototypeValue
-     * @see org.jdesktop.swingx.JXTable#getPreferredScrollableViewportSize
+     * 
      * @param value Object containing the value of the prototype to be used
      *         to calculate the initial preferred width of the column
+     * @see #getPrototypeValue
+     * @see org.jdesktop.swingx.JXTable#getPreferredScrollableViewportSize
      */
     public void setPrototypeValue(Object value) {
         Object oldPrototypeValue = this.prototypeValue;
@@ -201,30 +212,27 @@ public class TableColumnExt extends TableColumn
     }
 
     /**
-     * @see #setPrototypeValue
+     * Returns the prototypeValue property.
+     * 
      * @return Object containing the value of the prototype to be used
      *         to calculate the initial preferred width of the column
+     * @see #setPrototypeValue
      */
     public Object getPrototypeValue() {
         return prototypeValue;
     }
 
-    /**
-     * @see #setComparator
-     * @return <code>Comparator</code> to use for this column
-     */
-    public Comparator getComparator() {
-        return comparator;
-    }
 
     /**
      * Sets the comparator to use for this column.
-     * JXTable sorting api respects this property by routing
-     * to the SortController.
+     * <code>JXTable</code> sorting api respects this property by passing it on
+     * to the <code>SortController</code>. 
      * 
-     * @see #getComparator
      * @param comparator a custom comparator to use in interactive
      *    sorting.
+     * @see #getComparator
+     * @see SortController
+     * @see SortKey
      */
     public void setComparator(Comparator comparator) {
         Comparator old = getComparator();
@@ -233,20 +241,24 @@ public class TableColumnExt extends TableColumn
     }
     
     /**
-     * @see #setSortable
-     * @return boolean indicating whether this view column is sortable
+     * Returns the comparator to use for the column. 
+     * The default is <code>null</code>.
+     * 
+     * @return <code>Comparator</code> to use for this column
+     * @see #setComparator
      */
-    public boolean isSortable() {
-        return sortable;
+    public Comparator getComparator() {
+        return comparator;
     }
 
     /**
-     * Sets the sortable property. JXTable sorting api respects this
+     * Sets the sortable property. <code>JXTable</code> sorting api respects this
      * property by not sorting this column if false. The default value
-     * is true.
-     * @see #isSortable 
+     * is <code>true</code>.
+     * 
      * @param sortable boolean indicating whether or not this column can
      *        be sorted in the table
+     * @see #isSortable 
      */
     public void setSortable(boolean sortable) {
         boolean old = isSortable();
@@ -255,8 +267,33 @@ public class TableColumnExt extends TableColumn
     }
  
     /**
-     * Returns the text of the column ToolTip. This is typically used
-     * by <code>JXTableHeader</code> on mouseOver the column's header cell.
+     * Returns the sortable property.
+     * 
+     * @return boolean indicating whether this view column is sortable
+     * @see #setSortable
+     */
+    public boolean isSortable() {
+        return sortable;
+    }
+    
+    /**
+     * Registers the text to display in the column's tool tip. 
+     * Typically, this is used by <code>JXTableHeader</code> to
+     * display when the mouse cursor lingers over the column's
+     * header cell.
+     * 
+     * @param toolTipText text to show.
+     * @see #setToolTipText(String)
+     */
+    public void setToolTipText(String toolTipText) {
+        String old = getToolTipText();
+        this.toolTipText = toolTipText;
+        firePropertyChange("toolTipText", old, getToolTipText());
+    }
+    
+    /**
+     * Returns the text of to display in the column's tool tip. 
+     * The default is <code>null</code>. 
      * 
      * @return the text of the column ToolTip.
      * @see #setToolTipText(String)
@@ -265,17 +302,6 @@ public class TableColumnExt extends TableColumn
         return toolTipText;
     }
     
-    /**
-     * Sets the text of the header ToolTip for this column. 
-     * 
-     * @param toolTipText text to show.
-     */
-    public void setToolTipText(String toolTipText) {
-        String old = getToolTipText();
-        this.toolTipText = toolTipText;
-        firePropertyChange("toolTipText", old, getToolTipText());
-        
-    }
     
     /**
      * Sets the title of this view column.  This is a convenience
@@ -300,9 +326,10 @@ public class TableColumnExt extends TableColumn
     /**
      * Sets the visible property.  This property controls whether or not
      * this view column is currently visible in the table.
-     * @see #setVisible
+     * 
      * @param visible boolean indicating whether or not this view column is
      *        visible in the table
+     * @see #setVisible
      */
     public void setVisible(boolean visible) {
         boolean oldVisible = this.visible;
@@ -310,13 +337,15 @@ public class TableColumnExt extends TableColumn
         firePropertyChange("visible",
                            Boolean.valueOf(oldVisible),
                            Boolean.valueOf(visible));
-
     }
 
     /**
-     * @see #setVisible
+     * Returns the visible property.
+     * The default is <code>true</code>.
+     * 
      * @return boolean indicating whether or not this view column is
      *        visible in the table
+     * @see #setVisible
      */
     public boolean isVisible() {
         return visible;
@@ -335,10 +364,10 @@ public class TableColumnExt extends TableColumn
      * TableColumn.
      * <p>
      * 
-     * @see #getClientProperty
      * @param key Object which is used as key to retrieve value
      * @param value Object containing value of client property
-     * @throws IllegalArgumentException if key == null
+     * @throws IllegalArgumentException if key is <code>null</code>
+     * @see #getClientProperty
      */
     public void putClientProperty(Object key, Object value) {
         if (key == null)
@@ -415,8 +444,8 @@ public class TableColumnExt extends TableColumn
      }
 
      /**
-      * copies all clientProperties of this TableColumn to the target
-      * column.
+      * Copies all clientProperties of this <code>TableColumnExt</code>
+      * to the target column.
       * 
       * @param copy the target column.
       */
@@ -427,8 +456,18 @@ public class TableColumnExt extends TableColumn
         }
     }
 
+    /**
+     * Notification method invoked on property changes. 
+     * Need to replicate super functionality because both
+     * super's field <code>propertyChangeSupport</code> and method
+     * <code>fireXX</code> are private.
+     * 
+     * @param propertyName  name of changed property
+     * @param oldValue old value of changed property
+     * @param newValue new value of changed property
+     */ 
     protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
-         if ((oldValue != null && !oldValue.equals(newValue)) ||
+        if ((oldValue != null && !oldValue.equals(newValue)) ||
               oldValue == null && newValue != null) {
              PropertyChangeListener pcl[] = getPropertyChangeListeners();
              if (pcl != null && pcl.length != 0) {
