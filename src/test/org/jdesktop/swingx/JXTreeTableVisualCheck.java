@@ -71,7 +71,8 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //             test.runInteractiveTests("interactive.*Compare.*");
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
 //             test.runInteractiveTests("interactive.*Edit.*");
-             test.runInteractiveTests("interactive.*Line.*");
+//             test.runInteractiveTests("interactive.*Line.*");
+             test.runInteractiveTests("interactive.*Insert.*");
         } catch (Exception ex) {
 
         }
@@ -268,6 +269,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         final JTree tree = new JTree(model);
         tree.setRootVisible(false);
         final JXTreeTable treeTable = new JXTreeTable(model);
+        treeTable.addHighlighter(AlternateRowHighlighter.linePrinter);
         treeTable.setColumnControlVisible(true);
         // treetable root invisible by default
         JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "insert into empty model");
@@ -314,6 +316,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         final JXTree tree = new JXTree(model);
         tree.setRootVisible(false);
         final JXTreeTable treeTable = new JXTreeTable(model);
+        treeTable.addHighlighter(AlternateRowHighlighter.linePrinter);
         treeTable.setColumnControlVisible(true);
         // treetable root invisible by default
         JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "insert into empty model");
@@ -367,6 +370,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         model.addChild(secondRootChild);
         JXTree tree = new JXTree(model);
         final JXTreeTable treeTable = new JXTreeTable(model);
+        treeTable.addHighlighter(AlternateRowHighlighter.linePrinter);
         treeTable.setColumnControlVisible(true);
         treeTable.setRootVisible(true);
         JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "insert problem - root collapsed");
@@ -402,6 +406,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         final  DefaultMutableTreeNode leaf = model.addChild(root);
         JXTree tree = new JXTree(model);
         final JXTreeTable treeTable = new JXTreeTable(model);
+        treeTable.addHighlighter(AlternateRowHighlighter.linePrinter);
         treeTable.setColumnControlVisible(true);
         TreeCellRenderer renderer = new DefaultTreeCellRenderer() {
 
@@ -425,6 +430,37 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         treeTable.setRootVisible(true);
         JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "update expanded parent on insert - rendering changed for > 3 children");
         Action insertAction = new AbstractAction("insert node selected treetable") {
+
+            public void actionPerformed(ActionEvent e) {
+                int selected = treeTable.getSelectedRow();
+                if (selected < 0 ) return;
+                TreePath path = treeTable.getPathForRow(selected);
+                DefaultMutableTreeNode parent = (DefaultMutableTreeNode) path.getLastPathComponent();
+                model.addChild(parent);
+                
+            }
+            
+        };
+        addAction(frame, insertAction);
+        frame.setVisible(true);
+    }
+ 
+    /**
+     * Issue #82-swingx: update probs with insert node.
+     * 
+     * Adapted from example code in report.
+     *
+     */
+    public void interactiveTestInsertNode() {
+        final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+        final InsertTreeTableModel model = new InsertTreeTableModel(root);
+        final  DefaultMutableTreeNode leaf = model.addChild(root);
+        JTree tree = new JTree(model);
+        final JXTreeTable treeTable = new JXTreeTable(model);
+        treeTable.addHighlighter(AlternateRowHighlighter.linePrinter);
+        treeTable.addHighlighter(new HierarchicalColumnHighlighter());
+        JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "update on insert");
+        Action insertAction = new AbstractAction("insert node") {
 
             public void actionPerformed(ActionEvent e) {
                 int selected = treeTable.getSelectedRow();
@@ -481,35 +517,6 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         frame.setVisible(true);
     }
 
-    /**
-     * Issue #82-swingx: update probs with insert node.
-     * 
-     * Adapted from example code in report.
-     *
-     */
-    public void interactiveTestInsertNode() {
-        final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
-        final InsertTreeTableModel model = new InsertTreeTableModel(root);
-        final  DefaultMutableTreeNode leaf = model.addChild(root);
-        JTree tree = new JTree(model);
-        final JXTreeTable treeTable = new JXTreeTable(model);
-        JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "update on insert");
-        Action insertAction = new AbstractAction("insert node") {
-
-            public void actionPerformed(ActionEvent e) {
-                int selected = treeTable.getSelectedRow();
-                if (selected < 0 ) return;
-                TreePath path = treeTable.getPathForRow(selected);
-                DefaultMutableTreeNode parent = (DefaultMutableTreeNode) path.getLastPathComponent();
-                model.addChild(parent);
-                
-            }
-            
-        };
-        addAction(frame, insertAction);
-        frame.setVisible(true);
-    }
- 
     
     
     /**

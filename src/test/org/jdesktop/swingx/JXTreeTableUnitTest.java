@@ -420,6 +420,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         public DefaultMutableTreeNode addChild(DefaultMutableTreeNode parent) {
             DefaultMutableTreeNode newNode = new DefaultMutableTreeNode("Child");
             parent.add(newNode);
+//            nodeStructureChanged(parent);
             nodesWereInserted(parent, new int[] {parent.getIndex(newNode) });
 //            fireTreeNodesInserted(this, getPathToRoot(parent),
 //                    new int[] { parent.getIndex(newNode) },
