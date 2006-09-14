@@ -30,12 +30,12 @@ import javax.swing.event.TableColumnModelListener;
  * 
  * Enhanced <code>TableColumnModelExt</code> guarantees to notify 
  * these extended column listeners. An example of a client which 
- * adjusts itself based on titles of visible columns: 
+ * adjusts itself based on <code>headerValue</code> property of visible columns: 
  * <pre><code>
  * TableColumnModelExtListener l = new TableColumnModelExtListener() {
  * 
  *     public void columnPropertyChange(PropertyChangeEvent event) {
- *         if (&quot;title&quot;.equals(event.getPropertyName())) {
+ *         if (&quot;headerValue&quot;.equals(event.getPropertyName())) {
  *             TableColumn column = (TableColumn) event.getSource();
  *             if ((column instanceof TableColumnExt)
  *                     &amp;&amp; !((TableColumnExt) column).isVisible()) {
@@ -65,12 +65,12 @@ import javax.swing.event.TableColumnModelListener;
  * </code></pre>
  * 
  * @author Jeanette Winzenburg
- * @see TableColumnModelExt
+ * @see org.jdesktop.swingx.table.TableColumnModelExt
  */
 public interface TableColumnModelExtListener extends TableColumnModelListener {
 
     /**
-     * Notifies listeners that of property changes of contained columns.
+     * Notifies listeners about property changes of contained columns.
      * The event is the original as fired from the <code>TableColumn</code>.
      * @param event a <code>PropertyChangeEvent</code> fired by a <code>TableColumn</code>
      *   contained in a <code>TableColumnModel</code>

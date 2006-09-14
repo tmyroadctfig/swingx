@@ -98,7 +98,7 @@ import org.jdesktop.swingx.event.TableColumnModelExtListener;
  * }
  * </code></pre>
  * 
- * Relying on default identifiers is inherently brittle (headerValues might
+ * Relying on default identifiers is inherently brittle (<code>headerValue</code>s might
  * change f.i. with <code>Locale</code>s), so explicit configuration of columns with
  * identifiers is strongly recommended. A custom <code>ColumnFactory</code>
  * helps to automate column configuration.
@@ -106,15 +106,16 @@ import org.jdesktop.swingx.event.TableColumnModelExtListener;
  * 
  * 
  * This class guarantees to notify registered
- * <code>TableColumnModelListener</code> which are of type
- * <code>TableColumnModelListener</code> about propertyChanges fired by
- * contained columns. An example of a client which adjusts itself based on
- * titles of visible columns: 
+ * <code>TableColumnModelListener</code>s of type 
+ * <code>TableColumnModelExtListener</code> about propertyChanges fired by
+ * contained <code>TableColumn</code>s. 
+ * An example of a client which adjusts itself based on
+ * <code>headerValue</code> property of visible columns: 
  * <pre><code>
  * TableColumnModelExtListener l = new TableColumnModelExtListener() {
  * 
  *     public void columnPropertyChange(PropertyChangeEvent event) {
- *         if (&quot;title&quot;.equals(event.getPropertyName())) {
+ *         if (&quot;headerValue&quot;.equals(event.getPropertyName())) {
  *             TableColumn column = (TableColumn) event.getSource();
  *             if ((column instanceof TableColumnExt)
  *                     &amp;&amp; !((TableColumnExt) column).isVisible()) {
@@ -158,7 +159,7 @@ import org.jdesktop.swingx.event.TableColumnModelExtListener;
 public interface TableColumnModelExt extends TableColumnModel {
     
     /**
-     * Returns the number of contained columns including or excluding invisible
+     * Returns the number of contained columns. The count includes or excludes invisible
      * columns, depending on whether the <code>includeHidden</code> is true or
      * false, respectively. If false, this method returns the same count as
      * <code>getColumnCount()</code>.
@@ -190,7 +191,9 @@ public interface TableColumnModelExt extends TableColumnModel {
 
     /**
      * Returns the first <code>TableColumnExt</code> with the given
-     * <code>identifier</code> or null if none is found. The returned column
+     * <code>identifier</code>. The return value is null if there is no contained
+     * column with <b>identifier</b> or if the column with <code>identifier</code> is not 
+     * of type <code>TableColumnExt</code>. The returned column
      * may be visible or hidden.
      * 
      * @param identifier the object used as column identifier
@@ -200,10 +203,10 @@ public interface TableColumnModelExt extends TableColumnModel {
     public TableColumnExt getColumnExt(Object identifier);
 
     /**
-     * Returns the <code>TableColumnExt</code> in the model whose current
-     * position in the list of visible columns is equal to
-     * <code>columnIndex</code> or null if the column at that position 
-     * is not of type <code>TableColumnExt</code>. 
+     * Returns the <code>TableColumnExt</code> at view position 
+     * <code>columnIndex</code>. The return value is null, if the
+     * column at position <code>columnIndex</code> is not of type
+     * <code>TableColumnExt</code>.
      * The returned column is visible.
      * 
      * @param columnIndex the index of the column desired

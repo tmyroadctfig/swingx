@@ -34,11 +34,11 @@ import javax.swing.table.TableColumn;
  * The general drift is to strengthen the TableColumn abstraction as <b>the</b>
  * place to configure and dynamically update view column properties, covering a
  * broad range of typical customization requirements. Using collaborators are 
- * expected to listen property changes and update themselves accordingly.
+ * expected to listen to property changes and update themselves accordingly.
  * <p>
  * 
  * A functionality enhancement is the notion of column visibility: 
- * <code>TableColumnModelExt</code> manages sets visible/hidden 
+ * <code>TableColumnModelExt</code> manages sets of visible/hidden 
  * <code>TableColumnExt</code>s controlled by the columns' <code>visible</code>
  * property. Typically, users can show/hide column visibility at runtime, f.i.
  * through a dedicated control in the uppder trailing corner of a 
@@ -77,7 +77,7 @@ import javax.swing.table.TableColumn;
  * 
  * @see TableColumnModelExt
  * @see ColumnFactory
- * @see JComponent#putClientProperty
+ * @see javax.swing.JComponent#putClientProperty
  */
 public class TableColumnExt extends TableColumn
     implements Cloneable {
@@ -213,6 +213,7 @@ public class TableColumnExt extends TableColumn
 
     /**
      * Returns the prototypeValue property.
+     * The default is <code>null</code>.
      * 
      * @return Object containing the value of the prototype to be used
      *         to calculate the initial preferred width of the column
@@ -231,8 +232,8 @@ public class TableColumnExt extends TableColumn
      * @param comparator a custom comparator to use in interactive
      *    sorting.
      * @see #getComparator
-     * @see SortController
-     * @see SortKey
+     * @see org.jdesktop.swingx.decorator.SortController
+     * @see org.jdesktop.swingx.decorator.SortKey
      */
     public void setComparator(Comparator comparator) {
         Comparator old = getComparator();
@@ -253,8 +254,7 @@ public class TableColumnExt extends TableColumn
 
     /**
      * Sets the sortable property. <code>JXTable</code> sorting api respects this
-     * property by not sorting this column if false. The default value
-     * is <code>true</code>.
+     * property by disabling interactive sorting on this column if false. 
      * 
      * @param sortable boolean indicating whether or not this column can
      *        be sorted in the table
@@ -268,6 +268,7 @@ public class TableColumnExt extends TableColumn
  
     /**
      * Returns the sortable property.
+     * The default value is <code>true</code>.
      * 
      * @return boolean indicating whether this view column is sortable
      * @see #setSortable
@@ -352,7 +353,7 @@ public class TableColumnExt extends TableColumn
     }
 
     /**
-     * Sets the <code>key</code> "client property" to <code>value</code>. 
+     * Sets the client property "key" to <code>value</code>. 
      * If <code>value</code> is <code>null</code> this method will remove the property. 
      * Changes to
      * client properties are reported with <code>PropertyChange</code> events.
@@ -368,6 +369,7 @@ public class TableColumnExt extends TableColumn
      * @param value Object containing value of client property
      * @throws IllegalArgumentException if key is <code>null</code>
      * @see #getClientProperty
+     * @see javax.swing.JComponent#putClientProperty
      */
     public void putClientProperty(Object key, Object value) {
         if (key == null)
@@ -457,10 +459,13 @@ public class TableColumnExt extends TableColumn
     }
 
     /**
-     * Notification method invoked on property changes. 
-     * Need to replicate super functionality because both
-     * super's field <code>propertyChangeSupport</code> and method
-     * <code>fireXX</code> are private.
+     * Notifies registered <code>PropertyChangeListener</code>s 
+     * about property changes. This method must be invoked internally
+     * whe any of the enhanced properties changed.
+     * <p>
+     * Implementation note: needed to replicate super 
+     * functionality because super's field <code>propertyChangeSupport</code> 
+     * and method <code>fireXX</code> are both private.
      * 
      * @param propertyName  name of changed property
      * @param oldValue old value of changed property

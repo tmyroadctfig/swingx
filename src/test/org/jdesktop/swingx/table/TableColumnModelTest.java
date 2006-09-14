@@ -8,6 +8,7 @@
 package org.jdesktop.swingx.table;
 
 import java.beans.PropertyChangeEvent;
+import java.util.EventListener;
 import java.util.logging.Logger;
 
 import javax.swing.event.ChangeEvent;
@@ -103,6 +104,12 @@ public class TableColumnModelTest extends TestCase {
         DefaultTableColumnModelExt model = (DefaultTableColumnModelExt) createColumnModel(COLUMN_COUNT);
         ColumnModelReport extListener = new ColumnModelReport();
         model.addColumnModelListener(extListener);
+        // JW: getListeners returns the count of exactly the given class?
+//        assertEquals(1, model.getListeners(TableColumnModelExtListener.class).length);
+//        assertEquals(2, model.getListeners(EventListener.class).length);
+//        model.removeColumnModelListener(extListener);
+//        assertEquals(0, model.getListeners(TableColumnModelExtListener.class).length);
+//        assertEquals(0, model.getListeners(EventListener.class).length);
         assertEquals(1, model.getEventListenerList().getListenerCount(TableColumnModelExtListener.class));
         assertEquals(2, model.getEventListenerList().getListenerCount());
         model.removeColumnModelListener(extListener);

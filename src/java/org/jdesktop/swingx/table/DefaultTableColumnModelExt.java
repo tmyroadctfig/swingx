@@ -41,11 +41,13 @@ import org.jdesktop.swingx.event.TableColumnModelExtListener;
 
 
 /**
- * A default implementation supporting invisible columns.
- *
- * Note (JW): hot fixed issues #156, #157. To really do it
+ * A default implementation of <code>TableColumnModelExt</code>.
+ * <p>
+ * 
+ * TODO: explain sub-optimal notification on showing/hiding columns.
+ * (hot fixed issues #156, #157. To really do it
  * need enhanced TableColumnModelEvent and -Listeners that are
- * aware of the event.
+ * aware of the event.)
  * 
  *  
  * @author Richard Bair
@@ -53,6 +55,9 @@ import org.jdesktop.swingx.event.TableColumnModelExtListener;
  */
 public class DefaultTableColumnModelExt extends DefaultTableColumnModel 
     implements TableColumnModelExt {
+    /** flag to distinguish a shown/hidden column from really added/removed
+     *  columns during notification. This is brittle! 
+     */ 
     private static final String IGNORE_EVENT = "TableColumnModelExt.ignoreEvent";
     /**
      * contains a list of all columns, in the order in which were
@@ -82,7 +87,7 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
     private VisibilityListener visibilityListener = new VisibilityListener();
     
     /** 
-     * Creates a new instance of DefaultTableColumnModelExt 
+     * Creates a an empty DefaultTableColumnModelExt. 
      */
     public DefaultTableColumnModelExt() {
         super();
@@ -163,6 +168,9 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
 
 //------------------------ TableColumnModel
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removeColumn(TableColumn column) {
         //remove the visibility listener if appropriate
@@ -178,6 +186,9 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
         super.removeColumn(column);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void addColumn(TableColumn aColumn) {
         // hacking to guarantee correct events
@@ -208,7 +219,7 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
     }
 
     /**
-     * Overridden to update internal sequence of all columns.
+     * {@inheritDoc}
      */
     @Override
     public void moveColumn(int columnIndex, int newIndex) {
@@ -237,7 +248,7 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
     /**
      * Update internal state after the visibility of the column
      * was changed to invisible. The given column is assumed to
-     * be contained in initialColumns.
+     * be contained in this model.
      * 
      * @param col the column which was hidden.
      */    
@@ -252,7 +263,7 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
     /**
      * Update internal state after the visibility of the column
      * was changed to visible. The given column is assumed to
-     * be contained in initialColumns.
+     * be contained in this model.
      *  
      * @param col the column which was made visible.
      */    
@@ -325,7 +336,7 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
     
     
     /**
-     * exposed for testing only - don't use! Will be removed again!
+     * Exposed for testing only - don't use! Will be removed again!
      * @return super's listenerlist
      */
     protected EventListenerList getEventListenerList() {
@@ -334,6 +345,9 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
 
     
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         super.propertyChange(evt);
@@ -341,10 +355,9 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
     }
 
     /**
-     * Notifies all listeners that have registered interest for
-     * notification on this event type.  The event instance
-     * is lazily created using the parameters passed into
-     * the fire method.
+     * Notifies <code>TableColumnModelExtListener</code>s about property
+     * changes of contained columns.  The event instance
+     * is the original as fired by the <code>TableColumn</code>.
      * @param  evt the event received
      * @see EventListenerList
      */
@@ -359,9 +372,12 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
                     columnPropertyChange(evt);
             }
         }
-
     }
 
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void addColumnModelListener(TableColumnModelListener x) {
         super.addColumnModelListener(x);
@@ -370,6 +386,9 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removeColumnModelListener(TableColumnModelListener x) {
         super.removeColumnModelListener(x);
