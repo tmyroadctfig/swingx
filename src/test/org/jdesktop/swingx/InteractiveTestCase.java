@@ -138,12 +138,23 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
     }
 
     public void addMessage(JXFrame frame, String message) {
+        JXStatusBar statusBar = getStatusBar(frame);
+        statusBar.add(new JLabel(message));
+    }
+
+    /**
+     * Returns the <code>JXFrame</code>'s status bar. Lazily creates and 
+     * sets an instance if necessary.
+     * @param frame the target frame
+     * @return the frame's statusbar
+     */
+    public JXStatusBar getStatusBar(JXFrame frame) {
         JXStatusBar statusBar = frame.getRootPaneExt().getStatusBar();
         if (statusBar == null) {
             statusBar = new JXStatusBar();
             frame.getRootPaneExt().setStatusBar(statusBar);
         }
-        statusBar.add(new JLabel(message));
+        return statusBar;
     }
     
     /**
