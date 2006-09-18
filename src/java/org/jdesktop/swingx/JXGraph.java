@@ -42,11 +42,11 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
+import org.jdesktop.beans.AbstractBean;
 import org.jdesktop.swingx.painter.Painter;
 
 // TODO: keyboard navigation
@@ -1592,7 +1592,7 @@ public class JXGraph extends JXPanel {
      * @see JXGraph
      * @see JXGraph#addPlots(Color, JXGraph.Plot...)
      */
-    public abstract static class Plot extends JavaBean {
+    public abstract static class Plot extends AbstractBean {
         /**
          * <p>Creates a new, parameter-less plot.</p>
          */

@@ -38,7 +38,7 @@ import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JComponent;
-import org.jdesktop.swingx.JavaBean;
+import org.jdesktop.beans.AbstractBean;
 import org.jdesktop.swingx.util.PaintUtils;
 import org.jdesktop.swingx.util.Resize;
 
@@ -86,7 +86,7 @@ import org.jdesktop.swingx.util.Resize;
  * 
  * @author rbair
  */
-public abstract class AbstractPainter<T extends JComponent> extends JavaBean implements Painter<T> {
+public abstract class AbstractPainter<T extends JComponent> extends AbstractBean implements Painter<T> {
     //------------------------------------------------- Saved Graphics State
     private boolean stateSaved = false;
     private Paint oldPaint;

@@ -11,13 +11,13 @@ package org.jdesktop.swingx.painter;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
-import org.jdesktop.swingx.JavaBean;
+import org.jdesktop.beans.AbstractBean;
 
 /**
  *
  * @author Richard
  */
-public class ImageEffect extends JavaBean implements Effect {
+public class ImageEffect extends AbstractBean implements Effect {
     private BufferedImageOp op;
     
     /**
