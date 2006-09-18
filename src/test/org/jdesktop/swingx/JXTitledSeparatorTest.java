@@ -19,13 +19,13 @@ import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
-public class JXTitledSeparatorIssues extends InteractiveTestCase {
+public class JXTitledSeparatorTest extends InteractiveTestCase {
     private static final Logger LOG = Logger
-            .getLogger(JXTitledSeparatorIssues.class.getName());
+            .getLogger(JXTitledSeparatorTest.class.getName());
     
     public static void main(String[] args) {
         setSystemLF(true);
-        JXTitledSeparatorIssues test = new JXTitledSeparatorIssues();
+        JXTitledSeparatorTest test = new JXTitledSeparatorTest();
         try {
             test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Highligh.*");
