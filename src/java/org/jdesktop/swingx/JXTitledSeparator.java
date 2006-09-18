@@ -101,10 +101,6 @@ public class JXTitledSeparator extends JXPanel {
         
         layoutSeparator();
         
-        Dimension prefSize = getPreferredSize();
-        prefSize.width = Math.max(prefSize.width, 50);
-        setPreferredSize(prefSize);
-        
         label.setForeground(UIManager.getColor("TitledBorder.titleColor"));
         label.setFont(UIManager.getFont("TitledBorder.font"));
     }
