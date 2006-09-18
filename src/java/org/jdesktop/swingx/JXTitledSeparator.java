@@ -95,7 +95,7 @@ public class JXTitledSeparator extends JXPanel {
     public JXTitledSeparator() {
         setLayout(new GridBagLayout());
         
-        label = new JLabel("");
+        label = new JLabel("Untitled");
         leftSeparator = new JSeparator();
         rightSeparator = new JSeparator();
         
