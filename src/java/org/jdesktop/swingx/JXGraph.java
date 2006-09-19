@@ -1516,7 +1516,7 @@ public class JXGraph extends JXPanel {
      * <p>This method is called by the component prior to any drawing operation
      * to configure the drawing surface. The default implementation enables
      * antialiasing on the graphics.</p>
-     * <p>This method can be overriden by subclasses to modify the drawig
+     * <p>This method can be overriden by subclasses to modify the drawing
      * surface before any painting happens.</p>
      *
      * @param g2 the graphics surface to set up
