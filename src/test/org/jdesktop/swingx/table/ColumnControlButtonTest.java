@@ -17,12 +17,15 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
+import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.icon.ColumnControlIcon;
 import org.jdesktop.swingx.table.ColumnControlButton.ColumnVisibilityAction;
 import org.jdesktop.swingx.table.ColumnControlButton.DefaultColumnControlPopup;
 import org.jdesktop.swingx.util.AncientSwingTeam;
@@ -33,6 +36,34 @@ import org.jdesktop.swingx.util.AncientSwingTeam;
 public class ColumnControlButtonTest extends InteractiveTestCase {
     protected TableModel sortableTableModel;
 
+    public void testNotNullColumnModelListener() {
+        JXTable table = new JXTable(0, 2);
+        table.setColumnControlVisible(true);
+        assertNotNull(((ColumnControlButton)table.getColumnControl()).columnModelListener);
+    }
+    /**
+     * Tests if subclasses are allowed to not create a visibility action.
+     * This might happen if they want to exempt certain columns from 
+     * user interaction.
+     *
+     */
+    public void testNullVisibilityAction() {
+        JXTable table = new JXTable();
+        ColumnControlButton columnControl = new ColumnControlButton(
+                table, new ColumnControlIcon()) {
+
+                    @Override
+                    protected ColumnVisibilityAction createColumnVisibilityAction(TableColumn column) {
+                        if (column.getModelIndex() == 0) return null;
+                        return super.createColumnVisibilityAction(column);
+                    }
+            
+            
+        };
+        table.setColumnControl(columnControl);
+        table.setColumnControlVisible(true);
+        table.setModel(sortableTableModel);
+    }
     /**
      * test that the actions synch's its own selected property with 
      * the column's visible property. <p>
@@ -63,7 +94,18 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
         // synch might be done by the listener's installed by ActionFactor.createMenuItem()?
         assertEquals(!visible, columnExt.isVisible());
     }
-    
+ 
+    /**
+     * Tests that enabled property of table and column control is synched dynamically.
+     */
+    public void testDynamicDisabled() {
+        JXTable table = new JXTable(10, 3);
+        table.setColumnControlVisible(true);
+        assertEquals(table.isEnabled(), table.getColumnControl().isEnabled());
+        table.setEnabled(!table.isEnabled());
+        assertEquals(table.isEnabled(), table.getColumnControl().isEnabled());
+    }
+
     /**
      * suspected: enabled not synched on init. 
      * But is (done in ccb.installTable()). 
@@ -216,6 +258,97 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
                priorityColumn.isVisible(), menuItem.isSelected());
    }
 
+   /**
+    * test if subclasses are allowed to not create a visibility action.
+    * This might happen, if they want to exempt certain columns from 
+    * user interaction.
+    *
+    */
+   public void interactiveNullVisibilityAction() {
+       JXTable table = new JXTable();
+       ColumnControlButton columnControl = new ColumnControlButton(
+               table, new ColumnControlIcon()) {
+
+                   @Override
+                   protected ColumnVisibilityAction createColumnVisibilityAction(TableColumn column) {
+                       if (column.getModelIndex() == 0) return null;
+                       return super.createColumnVisibilityAction(column);
+                   }
+           
+           
+       };
+       table.setColumnControl(columnControl);
+       table.setColumnControlVisible(true);
+       table.setModel(sortableTableModel);
+       JXFrame frame = wrapWithScrollingInFrame(table, "first model column not togglable");
+       frame.setVisible(true);
+   }
+
+   /** 
+    * Issue ??: Column control update on changing table model.
+    *
+    */
+   public void interactiveTestToggleTableModel() {
+       final DefaultTableModel tableModel = new DefaultTableModel(0, 20);
+       final JXTable table = new JXTable(tableModel);
+       table.setColumnControlVisible(true);
+       Action toggleAction = new AbstractAction("Toggle TableModel") {
+
+           public void actionPerformed(ActionEvent e) {
+               TableModel model = table.getModel();
+               table.setModel(model.equals(tableModel) ? sortableTableModel : tableModel);
+           }
+           
+       };
+       JXFrame frame = wrapWithScrollingInFrame(table, "ColumnControl: set tableModel update columns");
+       addAction(frame, toggleAction);
+       frame.setVisible(true);
+   }
+   /** 
+    * Issue ??: Column control on changing column model.
+    *
+    */
+   public void interactiveTestColumnControlColumnModel() {
+       final JXTable table = new JXTable(10, 5);
+       table.setColumnControlVisible(true);
+       Action toggleAction = new AbstractAction("Set ColumnModel") {
+
+           public void actionPerformed(ActionEvent e) {
+               table.setColumnModel(new DefaultTableColumnModel());
+               table.setModel(sortableTableModel);
+               setEnabled(false);
+           }
+           
+       };
+       JXFrame frame = wrapWithScrollingInFrame(table, "ColumnControl: set columnModel ext -> core default");
+       addAction(frame, toggleAction);
+       frame.setVisible(true);
+   }
+   
+   
+   /** 
+    * Issue ??: Column control cancontrol update on changing column model.
+    *
+    */
+   public void interactiveTestColumnControlColumnModelExt() {
+       final JXTable table = new JXTable();
+       table.setColumnModel( new DefaultTableColumnModel());
+       table.setModel(new DefaultTableModel(10, 5));
+       table.setColumnControlVisible(true);
+       Action toggleAction = new AbstractAction("Set ColumnModelExt") {
+
+           public void actionPerformed(ActionEvent e) {
+               table.setColumnModel(new DefaultTableColumnModelExt());
+               table.setModel(sortableTableModel);
+               table.getColumnExt(0).setVisible(false);
+               setEnabled(false);
+           }
+           
+       };
+       JXFrame frame = wrapWithScrollingInFrame(table, "ColumnControl: set ColumnModel core -> modelExt");
+       addAction(frame, toggleAction);
+       frame.setVisible(true);
+   }
 
     /** 
      * Issue #192: initially invisibility columns are hidden

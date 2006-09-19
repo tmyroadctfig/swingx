@@ -29,7 +29,6 @@ import java.awt.event.ItemEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -54,40 +53,68 @@ import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.ActionContainerFactory;
 
 /**
- * This class is installed in the trailing corner of the table and is a
- * control which allows for toggling the visibilty of individual columns.<p>
+ * A component to allow interactive customization of <code>JXTable</code>'s
+ * columns. 
+ * It's main purpose is to allow toggling of table columns' visibility. 
+ * Additionally, arbitrary configuration actions can be exposed.
+ * <p>
  * 
- * This class is responsible for handling/providing/updating the lists of 
- * actions and to keep all action's state in synch with Table-/Column state.
- * All (most?) visible behaviour of the popup is delegated to a DefaultColumnControlPopup. 
+ * This component is installed in the <code>JXTable</code>'s
+ * trailing corner, if enabled:
  * 
+ * <pre><code>
+ * table.setColumnControlVisible(true);
+ * </code></pre>
  * 
- * TODO: the table reference is a potential leak
+ * From the perspective of a <code>JXTable</code>, the component's behaviour is
+ * opaque. Typically, the button's action is to popup a component for user
+ * interaction. <p>
  * 
- * TODO: no need to extend JButton - use non-visual controller returning
- * a JComponent instead.
+ * This class is responsible for handling/providing/updating the lists of
+ * actions and to keep all action's state in synch with Table-/Column state. 
+ * The visible behaviour of the popup is delegated to a
+ * <code>ColumnControlPopup</code>. <p>
+ * 
+ * @see TableColumnExt
+ * @see TableColumnModelExt
+ * @see JXTable#setColumnControl
  * 
  */
 public class ColumnControlButton extends JButton {
-
+    // JW: really want to extend? for builders?
+    /** Marker to auto-recognize actions which should be added to the popup. */
+    public static final String COLUMN_CONTROL_MARKER = "column.";
     /** exposed for testing. */
     protected ColumnControlPopup popup;
-    /** the table which is controlled by this. */
+    // TODO: the table reference is a potential leak?
+    /** The table which is controlled by this. */
     private JXTable table;
-    /** a marker to auto-recognize actions which should be added to the popup */
-    public static final String COLUMN_CONTROL_MARKER = "column.";
+    /** Listener for table property changes. */
+    private PropertyChangeListener tablePropertyChangeListener;
+    /** Listener for table's columnModel. */
+    TableColumnModelListener columnModelListener;
     /** the list of actions for column menuitems.*/
     private List<ColumnVisibilityAction> columnVisibilityActions;
 
+    /**
+     * Creates a column control button for the table. The button
+     * uses the given icon and has no text.
+     * @param table  the <code>JXTable</code> controlled by this component
+     * @param icon the <code>Icon</code> to show
+     */
     public ColumnControlButton(JXTable table, Icon icon) {
         super();
         init();
+        // JW: icon LF dependent?
         setAction(createControlAction(icon));
         installTable(table);
     }
 
+    
+    @Override
     public void updateUI() {
         super.updateUI();
+        // JW: icon LF dependent?
         setMargin(new Insets(1, 2, 2, 1)); // Make this LAF-independent
         getColumnControlPopup().updateUI();
     }
@@ -97,8 +124,6 @@ public class ColumnControlButton extends JButton {
      * called by this control's default action. <p>
      * 
      * Here: delegates to getControlPopup().
-     * 
-     *
      */ 
     public void togglePopup() {
         getColumnControlPopup().toggleVisibility(this);
@@ -113,7 +138,7 @@ public class ColumnControlButton extends JButton {
    
 //-------------------------- Action in synch with column properties
     /**
-     * A specialized action which takes care of keeping in synch with
+     * A specialized <code>Action</code> which takes care of keeping in synch with
      * TableColumn state.
      * 
      * NOTE: client must call releaseColumn if this action is no longer needed!
@@ -131,6 +156,11 @@ public class ColumnControlButton extends JButton {
          */
         private boolean fromColumn;
 
+        /**
+         * Creates a action synched to the table column.
+         * 
+         * @param column the <code>TableColumn</code> to keep synched to.
+         */
         public ColumnVisibilityAction(TableColumn column) {
             super((String) null);
             setStateAction();
@@ -138,9 +168,9 @@ public class ColumnControlButton extends JButton {
         }
 
         /**
-         * 
-         * release listening to column. Client must call this method if the
-         * action is no longer needed. After calling it the action must not be
+         * Releases all references to the synched <code>TableColumn</code>. 
+         * Client code must call this method if the
+         * action is no longer needed. After calling this action must not be
          * used any longer.
          */
         public void releaseColumn() {
@@ -149,19 +179,34 @@ public class ColumnControlButton extends JButton {
         }
         
         /**
-         * overriden to disable if control is not applicable.
+         * Returns true if the action is enabled. Returns
+         * true only if the action is enabled and the table
+         * column can be controlled.
+         * 
+         * @return true if the action is enabled, false otherwise
+         * @see #canControlColumn()
          */
         @Override
         public boolean isEnabled() {
-            return super.isEnabled() && canControl(); 
+            return super.isEnabled() && canControlColumn(); 
         }
         
-        private boolean canControl() {
+        /**
+         * Returns flag to indicate if column's visibility can
+         * be controlled. Minimal requirement is that column is of type 
+         * <code>TableColumnExt</code>. 
+         * 
+         * @return boolean to indicate if columns's visibility can be controlled.
+         */
+        protected boolean canControlColumn() {
+            // JW: should have direction? control is from action to column, the
+            // other way round should be guaranteed always
             return (column instanceof TableColumnExt);
         }
 
+        @Override
         public void itemStateChanged(final ItemEvent e) {
-            if (canControl()) {
+            if (canControlColumn()) {
                 if ((e.getStateChange() == ItemEvent.DESELECTED)
                         //JW: guarding against 1 leads to #212-swingx: setting
                         // column visibility programatically fails if
@@ -177,8 +222,6 @@ public class ColumnControlButton extends JButton {
                     reselect();
                 } else {
                     setSelected(e.getStateChange() == ItemEvent.SELECTED);
-//                    ((TableColumnExt) column)
-//                    .setVisible(e.getStateChange() == ItemEvent.SELECTED);
                 }
             }
         }
@@ -187,34 +230,47 @@ public class ColumnControlButton extends JButton {
         @Override
         public synchronized void setSelected(boolean newValue) {
             super.setSelected(newValue);
-            if (canControl()) {
+            if (canControlColumn()) {
                 ((TableColumnExt) column).setVisible(newValue);
             }
         }
 
         /**
-         * do nothing. Synch is done in itemStateChanged.
+         * Does nothing. Synch from action state to TableColumn state
+         * is done in itemStateChanged.
          */
         public void actionPerformed(ActionEvent e) {
 
         }
         
         /**
-         * synch from TableColumnExt.visible to selected.
-         *
+         * Synchs selected property to visible. This
+         * is called on change of tablecolumn's <code>visible</code> property.
+         * 
+         * @param visible column visible state to synch to.
          */
-        private void updateSelected() {
-            boolean visible = true;
-            if (canControl()) {
-                visible = ((TableColumnExt) column).isVisible();
-            }
+        private void updateFromColumnVisible(boolean visible) {
+//            /*boolean*/ visible = true;
+//            if (canControlColumn()) {
+//                visible = ((TableColumnExt) column).isVisible();
+//            }
             fromColumn = true;
             setSelected(visible);
             fromColumn = false;
         }
+        
+        /**
+         * Synchs name property to value. This is called on change of 
+         * tableColumn's <code>headerValue</code> property.
+         * 
+         * @param value
+         */
+        private void updateFromColumnHeader(Object value) {
+            setName(String.valueOf(value));
+        }
 
         /**
-         * enforce selected == true. Called if user interaction
+         * Enforces selected to <code>true</code>. Called if user interaction
          * tried to de-select the last single visible column.
          *
          */
@@ -226,26 +282,47 @@ public class ColumnControlButton extends JButton {
         private void installColumn(TableColumn column) {
             this.column = column;
             column.addPropertyChangeListener(getColumnListener());
-            setName(String.valueOf(column.getHeaderValue()));
+            updateFromColumnHeader(column.getHeaderValue());
             setActionCommand(column.getIdentifier());
-            updateSelected();
+            boolean visible = (column instanceof TableColumnExt) ? 
+                    ((TableColumnExt) column).isVisible() : true;
+            updateFromColumnVisible(visible);
         }
 
-        private PropertyChangeListener getColumnListener() {
+        /**
+         * Returns the listener to column's property changes. The listener
+         * is created lazily if necessary.
+         * 
+         * @return the <code>PropertyChangeListener</code> listening to 
+         *   <code>TableColumn</code>'s property changes, guaranteed to be 
+         *   not <code>null</code>.
+         */
+        protected PropertyChangeListener getColumnListener() {
             if (columnListener == null) {
                 columnListener = createPropertyChangeListener();
             }
             return columnListener;
         }
 
-        private PropertyChangeListener createPropertyChangeListener() {
+        /**
+         * Creates and returns the listener to column's property changes.
+         * Subclasses are free to roll their own.
+         * <p>
+         * Implementation note: this listener reacts to column's
+         * <code>visible</code> and <code>headerValue</code> properties and
+         * calls the respective <code>updateFromXX</code> methodes.
+         * 
+         * @return the <code>PropertyChangeListener</code> to use with the
+         *         column
+         */
+        protected PropertyChangeListener createPropertyChangeListener() {
             PropertyChangeListener l = new PropertyChangeListener() {
 
                 public void propertyChange(PropertyChangeEvent evt) {
                     if ("visible".equals(evt.getPropertyName())) {
-                        updateSelected();
+                        updateFromColumnVisible((Boolean) evt.getNewValue());
                     } else if ("headerValue".equals(evt.getPropertyName())) {
-                        setName(String.valueOf(evt.getNewValue()));
+                        updateFromColumnHeader(evt.getNewValue());
                     }
                 }
 
@@ -253,13 +330,16 @@ public class ColumnControlButton extends JButton {
             return l;
         }
 
+
     }
 
     // ---------------------- the popup
 
     /**
-     * A default implementation of ColumnControlPopup, using a JPopupMenu with 
-     * MenuItems corresponding to the Actions as provided by the ColumnControlButton.
+     * A default implementation of ColumnControlPopup. 
+     * It uses a JPopupMenu with 
+     * MenuItems corresponding to the Actions as 
+     * provided by the ColumnControlButton.
      * 
      * 
      */
@@ -393,8 +473,12 @@ public class ColumnControlButton extends JButton {
 
 
     /**
+     * Returns to popup component for user interaction. Lazily 
+     * creates the component if necessary.
      * 
-     * @return the DefaultColumnControlPopup for showing the items.
+     * @return the ColumnControlPopup for showing the items, guaranteed
+     *   to be not <code>null</code>.
+     * @see #createColumnControlPopup()  
      */
     protected ColumnControlPopup getColumnControlPopup() {
         if (popup == null) {
@@ -404,10 +488,10 @@ public class ColumnControlButton extends JButton {
     }
 
     /**
-     * Factory method to return a DefaultColumnControlPopup.
+     * Factory method to return a <code>ColumnControlPopup</code>.
      * Subclasses can override to hook custom implementations.
      * 
-     * @return the DefaultColumnControlPopup used.
+     * @return the <code>ColumnControlPopup</code> used.
      */
     protected ColumnControlPopup createColumnControlPopup() {
         return new DefaultColumnControlPopup();
@@ -417,11 +501,12 @@ public class ColumnControlButton extends JButton {
 //-------------------------- updates from table propertyChangelistnere
     
     /**
-     * adjust internal state to after table's column model property has changed.
-     * Handles cleanup of listeners to the old/new columnModel (listens to the
-     * new only if we can control column visibility) and content of popup.
+     * Adjusts internal state after table's column model property has changed.
+     * Handles cleanup of listeners to the old/new columnModel (Note, that
+     * it listens to the column model only if it can control column visibility).
+     * Updates content of popup.
      * 
-     * @param oldModel the old ColumnModel we had been listening to.
+     * @param oldModel the old <code>TableColumnModel</code> we had been listening to.
      */
     protected void updateFromColumnModelChange(TableColumnModel oldModel) {
         if (oldModel != null) {
@@ -429,7 +514,7 @@ public class ColumnControlButton extends JButton {
         }
         populatePopup();
         if (canControl()) {
-            table.getColumnModel().addColumnModelListener(columnModelListener);
+            table.getColumnModel().addColumnModelListener(getColumnModelListener());
         }
     }
     
@@ -481,7 +566,7 @@ public class ColumnControlButton extends JButton {
 
 
     /**
-     * release actions and clear list of actions.
+     * Releases actions and clears list of actions.
      * 
      */
     protected void clearColumnVisibilityActions() {
@@ -521,20 +606,40 @@ public class ColumnControlButton extends JButton {
 
 
     /**
-     * creates and adds a ColumnVisiblityAction for every column that should be
-     * togglable via the column control. Here: all actions currently in the 
-     * the table. This includes both visible and invisible columns.
+     * Creates and adds a ColumnVisiblityAction for every column that should be
+     * togglable via the column control. <p>
      * 
-     * pre: canControl()
+     * Here: all table columns contained in the <code>TableColumnModel</code> - 
+     * visible and invisible columns - to <code>createColumnVisibilityAction</code> and
+     * adds all not <code>null</code> return values.
      * 
+     * <p>
+     * PRE: canControl()
+     * 
+     * @see #createColumnVisibilityAction
      */
     protected void createVisibilityActions() {
         List<TableColumn> columns = table.getColumns(true);
         for (TableColumn column : columns) {
-            ColumnVisibilityAction action = new ColumnVisibilityAction(column);
-            getColumnVisibilityActions().add(action);
+            ColumnVisibilityAction action = createColumnVisibilityAction(column);
+            if (action != null) {
+                getColumnVisibilityActions().add(action);
+            }
         }
 
+    }
+
+    /**
+     * Creates and returns a <code>ColumnVisibilityAction</code> for the given 
+     * <code>TableColumn</code>. The return value might be null, f.i. if the
+     * column should not be allowed to be toggled.
+     * 
+     * @param column the <code>TableColumn</code> to use for the action
+     * @return a ColumnVisibilityAction to use for the given column, 
+     *    may be <code>null</code>.
+     */
+    protected ColumnVisibilityAction createColumnVisibilityAction(TableColumn column) {
+        return new ColumnVisibilityAction(column);
     }
 
     /**
@@ -610,7 +715,7 @@ public class ColumnControlButton extends JButton {
 
     private void installTable(JXTable table) {
         this.table = table;
-        table.addPropertyChangeListener(columnModelChangeListener);
+        table.addPropertyChangeListener(getTablePropertyChangeListener());
         updateFromColumnModelChange(null);
         updateFromTableEnabledChanged();
     }
@@ -650,76 +755,123 @@ public class ColumnControlButton extends JButton {
     
     // -------------------------------- listeners
 
-    // TODO JW - create lazily
-    private PropertyChangeListener columnModelChangeListener = new PropertyChangeListener() {
-        public void propertyChange(PropertyChangeEvent evt) {
-            if ("columnModel".equals(evt.getPropertyName())) {
-                updateFromColumnModelChange((TableColumnModel) evt.getOldValue());
-            } else if ("enabled".equals(evt.getPropertyName())) {
-                updateFromTableEnabledChanged();
+    /**
+     * Returns the listener to table's property changes. The listener is 
+     * lazily created if necessary. 
+     * @return the <code>PropertyChangeListener</code> for use with the 
+     *  table, guaranteed to be not <code>null</code>.
+     */
+    protected PropertyChangeListener getTablePropertyChangeListener() {
+        if (tablePropertyChangeListener == null) {
+            tablePropertyChangeListener = createTablePropertyChangeListener();
+        }
+        return tablePropertyChangeListener;
+    }
+
+    /**
+     * Creates the listener to table's property changes. Subclasses are free
+     * to roll their own. <p>
+     * Implementation note: this listener reacts to table's <code>enabled</code> and
+     * <code>columnModel</code> properties and calls the respective 
+     * <code>updateFromXX</code> methodes.
+     * 
+     * @return the <code>PropertyChangeListener</code> for use with the table.
+     */
+    protected PropertyChangeListener createTablePropertyChangeListener() {
+        return new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ("columnModel".equals(evt.getPropertyName())) {
+                    updateFromColumnModelChange((TableColumnModel) evt
+                            .getOldValue());
+                } else if ("enabled".equals(evt.getPropertyName())) {
+                    updateFromTableEnabledChanged();
+                }
             }
-        }
-    };
+        };
+    }
 
-    // TODO JW - create lazily
-    private TableColumnModelListener columnModelListener = new TableColumnModelListener() {
-        /** Tells listeners that a column was added to the model. */
-        public void columnAdded(TableColumnModelEvent e) {
-            // quickfix for #192
-            if (!isVisibilityChange(e, true)) {
-                populatePopup();
+    /**
+     * Returns the listener to table's column model. The listener is 
+     * lazily created if necessary. 
+     * @return the <code>TableColumnModelListener</code> for use with the 
+     *  table's column model, guaranteed to be not <code>null</code>.
+     */
+    protected TableColumnModelListener getColumnModelListener() {
+        if (columnModelListener == null) {
+            columnModelListener = createColumnModelListener();
+        }
+        return columnModelListener;
+    }
+    
+    /**
+     * Creates the listener to columnModel. Subclasses are free to roll their
+     * own.
+     * <p>
+     * Implementation note: this listener reacts to "real" columnRemoved/-Added by
+     * populating the popups content from scratch.
+     * 
+     * @return the <code>TableColumnModelListener</code> for use with the
+     *         table's columnModel.
+     */
+    protected TableColumnModelListener createColumnModelListener() {
+        return new TableColumnModelListener() {
+            /** Tells listeners that a column was added to the model. */
+            public void columnAdded(TableColumnModelEvent e) {
+                // quickfix for #192
+                if (!isVisibilityChange(e, true)) {
+                    populatePopup();
+                }
             }
-        }
 
-        /** Tells listeners that a column was removed from the model. */
-        public void columnRemoved(TableColumnModelEvent e) {
-            if (!isVisibilityChange(e, false)) {
-                populatePopup();
+            /** Tells listeners that a column was removed from the model. */
+            public void columnRemoved(TableColumnModelEvent e) {
+                if (!isVisibilityChange(e, false)) {
+                    populatePopup();
+                }
             }
-        }
 
-        /**
-         * check if the add/remove event is triggered by a move to/from the
-         * invisible columns.
-         * 
-         * PRE: the event must be received in columnAdded/Removed.
-         * 
-         * @param e
-         *            the received event
-         * @param added
-         *            if true the event is assumed to be received via
-         *            columnAdded, otherwise via columnRemoved.
-         * @return
-         */
-        private boolean isVisibilityChange(TableColumnModelEvent e,
-                boolean added) {
-            // can't tell
-            if (!(e.getSource() instanceof DefaultTableColumnModelExt))
-                return false;
-            DefaultTableColumnModelExt model = (DefaultTableColumnModelExt) e
-                    .getSource();
-            if (added) {
-                return model.isAddedFromInvisibleEvent(e.getToIndex());
-            } else {
-                return model.isRemovedToInvisibleEvent(e.getFromIndex());
+            /**
+             * Check if the add/remove event is triggered by a move to/from the
+             * invisible columns. 
+             * 
+             * PRE: the event must be received in columnAdded/Removed.
+             * 
+             * @param e the received event
+             * @param added if true the event is assumed to be received via
+             *        columnAdded, otherwise via columnRemoved.
+             * @return boolean indicating whether the removed/added is a side-effect
+             *    of hiding/showing the column.
+             */
+            private boolean isVisibilityChange(TableColumnModelEvent e,
+                    boolean added) {
+                // can't tell
+                if (!(e.getSource() instanceof DefaultTableColumnModelExt))
+                    return false;
+                DefaultTableColumnModelExt model = (DefaultTableColumnModelExt) e
+                        .getSource();
+                if (added) {
+                    return model.isAddedFromInvisibleEvent(e.getToIndex());
+                } else {
+                    return model.isRemovedToInvisibleEvent(e.getFromIndex());
+                }
             }
-        }
 
-        /** Tells listeners that a column was repositioned. */
-        public void columnMoved(TableColumnModelEvent e) {
-        }
+            /** Tells listeners that a column was repositioned. */
+            public void columnMoved(TableColumnModelEvent e) {
+            }
 
-        /** Tells listeners that a column was moved due to a margin change. */
-        public void columnMarginChanged(ChangeEvent e) {
-        }
+            /** Tells listeners that a column was moved due to a margin change. */
+            public void columnMarginChanged(ChangeEvent e) {
+            }
 
-        /**
-         * Tells listeners that the selection model of the TableColumnModel
-         * changed.
-         */
-        public void columnSelectionChanged(ListSelectionEvent e) {
-        }
-    };
+            /**
+             * Tells listeners that the selection model of the TableColumnModel
+             * changed.
+             */
+            public void columnSelectionChanged(ListSelectionEvent e) {
+            }
+        };
+    }
 
 
 
