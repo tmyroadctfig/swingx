@@ -10,7 +10,7 @@ import java.util.List;
 import javax.swing.Action;
 import javax.swing.JComponent;
 
-import org.jdesktop.swingx.table.ColumnControlButton.ColumnVisibilityAction;
+import org.jdesktop.swingx.action.AbstractActionExt;
 
 /**
  * encapsulates the popup component which is the delegate for
@@ -65,7 +65,7 @@ public interface ColumnControlPopup {
      * 
      * @param actions List of ColumnVisibilityActions to add.
      */
-    void addVisibilityActionItems(List<ColumnVisibilityAction> actions);
+    void addVisibilityActionItems(List<? extends AbstractActionExt> actions);
 
     /**
      * add additional actions to the popup. Does nothing if 
@@ -73,6 +73,6 @@ public interface ColumnControlPopup {
      * 
      * @param actions List of actions to add to the popup.
      */
-    void addAdditionalActionItems(List<Action> actions);
+    void addAdditionalActionItems(List<? extends Action> actions);
 
 }

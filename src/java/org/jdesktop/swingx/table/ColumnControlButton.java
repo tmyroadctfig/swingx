@@ -399,7 +399,7 @@ public class ColumnControlButton extends JButton {
          * 
          */
         public void addVisibilityActionItems(
-                List<ColumnVisibilityAction> actions) {
+                List<? extends AbstractActionExt> actions) {
             addItems(new ArrayList<Action>(actions));
 
         }
@@ -409,7 +409,7 @@ public class ColumnControlButton extends JButton {
          * @inheritDoc
          * 
          */
-        public void addAdditionalActionItems(List<Action> actions) {
+        public void addAdditionalActionItems(List<? extends Action> actions) {
             if (actions.size() == 0)
                 return;
             // JW: this is a reference to the enclosing class 
@@ -434,7 +434,7 @@ public class ColumnControlButton extends JButton {
          *        Must not be null.
          * 
          */
-        protected void addItems(List<Action> actions) {
+        protected void addItems(List<? extends Action> actions) {
             ActionContainerFactory factory = new ActionContainerFactory(null);
             for (Action action : actions) {
                 addItem(factory.createMenuItem(action));
