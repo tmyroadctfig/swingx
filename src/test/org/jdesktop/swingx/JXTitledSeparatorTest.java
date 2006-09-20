@@ -45,9 +45,7 @@ public class JXTitledSeparatorTest extends InteractiveTestCase {
     public void testPrefSize() {
         JXTitledSeparator separator = new JXTitledSeparator();
         Dimension dim = separator.getPreferredSize();
-        LOG.info("initial " + dim);
         separator.setTitle("some title definitely longer than empty");
-        LOG.info("later " + separator.getPreferredSize());
         assertTrue(dim.width < separator.getPreferredSize().width);
     }
     
