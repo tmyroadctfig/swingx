@@ -7,6 +7,7 @@ package org.jdesktop.swingx;
 import java.awt.Color;
 import java.awt.ComponentOrientation;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
@@ -15,6 +16,7 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
@@ -125,6 +127,54 @@ public class JXTitledSeparatorTest extends InteractiveTestCase {
 
         };
         addAction(frame, toggleComponentOrientation);
+        // titledSeparator freaks with prefSize, need to set fixed
+        frame.setSize(200, 400);
+        frame.setVisible(true);
+        
+    }
+    
+    /**
+     * Compares JXTitledSeparator props with corresponding TitledBorder props.
+     * 
+     */
+    public void interactiveCompareAppearance() {
+        JComponent box = Box.createVerticalBox();
+        JXTitledSeparator defaultAlign = new JXTitledSeparator();
+        // default is LEADING
+       defaultAlign.setTitle("default");
+        // default is LEADING
+       Border lineBorder = BorderFactory.createLineBorder(Color.MAGENTA);
+        Border defaultBorder = new TitledBorder(lineBorder, "default");
+        defaultAlign.setBorder(defaultBorder);
+        box.add(defaultAlign);
+
+        Font font = new JLabel().getFont();
+        Font bigFont = font.deriveFont(Font.ITALIC, font.getSize() * 2.f);
+        JXTitledSeparator leading = new JXTitledSeparator();
+        leading.setTitle("big font");
+        leading.setFont(bigFont);
+        TitledBorder leadingBorder = new TitledBorder(lineBorder, "bigFont");
+        leadingBorder.setTitleFont(bigFont);
+        leading.setBorder(leadingBorder);
+        box.add(leading);
+
+        JXTitledSeparator trailing = new JXTitledSeparator();
+        trailing.setTitle("colored");
+        trailing.setForeground(Color.BLUE);
+        TitledBorder trailingBorder = new TitledBorder(lineBorder, "colored");
+        trailingBorder.setTitleColor(Color.BLUE);
+        trailing.setBorder(trailingBorder);
+        box.add(trailing);
+        
+//        JXTitledSeparator left = new JXTitledSeparator();
+//        left.setTitle("left");
+//        left.setHorizontalAlignment(SwingConstants.LEFT);
+//        Border leftBorder = new TitledBorder(lineBorder, "left", TitledBorder.LEFT, TitledBorder.TOP);
+//        left.setBorder(leftBorder);
+//        box.add(left);
+        
+        
+        final JXFrame frame = wrapInFrame(box, "Compare properties");
         // titledSeparator freaks with prefSize, need to set fixed
         frame.setSize(200, 400);
         frame.setVisible(true);
