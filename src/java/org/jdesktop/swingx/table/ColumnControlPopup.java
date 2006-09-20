@@ -13,13 +13,11 @@ import javax.swing.JComponent;
 import org.jdesktop.swingx.action.AbstractActionExt;
 
 /**
- * encapsulates the popup component which is the delegate for
- * all popup visuals, use by a ColumnControlButton.
- * 
- * For now, that's a simple extraction of what a ColumnControl needs. 
+ * Encapsulates the popup component which is the delegate for
+ * all popup visuals, used by a ColumnControlButton.
+ * <p>
+ * For now, this class a simple extraction of what a ColumnControl needs. 
  * Usage will drive further evolution.
- * 
- * 
  * 
  */
 public interface ColumnControlPopup {
@@ -48,8 +46,12 @@ public interface ColumnControlPopup {
     void toggleVisibility(JComponent owner);
 
     /**
+     * Applies the specified component orientation to all internal widgets.
+     * This method must be called by the owner if its component orientation 
+     * changes. 
+     * 
+     * @param o the componentOrientation to apply to all internal widgets.
      * @see javax.swing.JComponent#applyComponentOrientation(ComponentOrientation).
-     * @param o the <code>ComponentOrientation to apply to all internal widgets.
      */
     void applyComponentOrientation(ComponentOrientation o);
 
@@ -59,19 +61,27 @@ public interface ColumnControlPopup {
     void removeAll();
 
     /**
-     * Adds items corresponding to the column's visibility actions. <p>
+     * Adds items corresponding to the column's visibility actions.
+     * <p>
+     * Each <code>Action</code> in the list is a <code>stateAction</code>,
+     * its <code>selected</code> property bound to a column's
+     * <code>visible</code> property, that is toggling the selected will
+     * toggle the column's visibility (if the action is enabled).
      * 
-     * TODO JW: get the generics correct!
+     * The  <code>Action</code>s <code>name</code> property is bound to 
+     * the column's <code>title</code>.
      * 
-     * @param actions List of ColumnVisibilityActions to add.
+     * @param actions List of AbstractActionExt to add.
      */
     void addVisibilityActionItems(List<? extends AbstractActionExt> actions);
-
+    // JW: dooohhh ... what a winding description ...
+    // sure need to have a better abstraction! 
+    // 
+    
     /**
-     * add additional actions to the popup. Does nothing if 
-     * actions is empty or !canControl().
+     * Adds additional actions to the popup. 
      * 
-     * @param actions List of actions to add to the popup.
+     * @param actions List of <code>Action</code>s to add to the popup.
      */
     void addAdditionalActionItems(List<? extends Action> actions);
 
