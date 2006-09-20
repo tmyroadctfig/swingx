@@ -83,7 +83,11 @@
         <mkdir  dir="${build.dir}/swingx-bean" />
         <mkdir dir="${build.dir}/swingx-bean/org/jdesktop/swingx" />
         <copy todir="${build.dir}/swingx-bean/org/jdesktop/swingx">
-            <fileset dir="${build.classes.dir}/org/jdesktop/swingx/" includes="BeanInfoSupport*.class,EnumerationValue*.class,JavaBean*.class" />
+            <fileset dir="${build.classes.dir}/org/jdesktop/swingx/" includes="BeanInfoSupport*.class,EnumerationValue*.class" />
+        </copy>
+        <mkdir dir="${build.dir}/swingx-bean/org/jdesktop/beans" />
+        <copy todir="${build.dir}/swingx-bean/org/jdesktop/swingx">
+            <fileset dir="${build.classes.dir}/org/jdesktop/beans/" includes="AbstractBean*.class" />
         </copy>
         <jar basedir="${build.dir}/swingx-bean" jarfile="dist/swingx-bean.jar" />
     </target>
@@ -165,6 +169,7 @@
                 <exclude name="build/**" />
                 <exclude name="dist/**" />
                 <exclude name="www/**" />
+                <exclude name="**/CVS/**" />
                 <!-- If anything else needs to be exluded, do so here -->
             </fileset>
         </copy>
