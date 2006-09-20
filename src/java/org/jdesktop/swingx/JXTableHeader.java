@@ -228,6 +228,36 @@ public class JXTableHeader extends JTableHeader
          
         }
     }
+    
+    /**
+     * Returns the the dragged column if and only if, a drag is in process and
+     * the column is visible, otherwise returns <code>null</code>.
+     * 
+     * @return the dragged column, if a drag is in process and the column is
+     *         visible, otherwise returns <code>null</code>
+     * @see #getDraggedDistance
+     */
+    @Override
+    public TableColumn getDraggedColumn() {
+        return isVisible(draggedColumn) ? draggedColumn : null; 
+    }
+
+    /**
+     * Checks and returns the column's visibility. 
+     * Returns <code>false</code> for a <code>null</code> column, 
+     * or the <code>visible</code> property if of type <code>TableColumnExt</code>,
+     * otherwise <code>true</code>.
+     * <p>
+     * 
+     * @param column the <code>TableColumn</code> to check
+     * @return a boolean indicating if the column is visible
+     */
+    protected boolean isVisible(TableColumn column) {
+        return (column instanceof TableColumnExt) ? 
+                ((TableColumnExt) column).isVisible()
+                : (column != null);
+    }
+
     /**
      * returns the (visible) view index for the given column
      * or -1 if not visible or not contained in this header's

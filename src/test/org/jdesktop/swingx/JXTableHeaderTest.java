@@ -16,6 +16,7 @@ import javax.swing.Action;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 
 import org.jdesktop.swingx.table.TableColumnExt;
 
@@ -23,6 +24,42 @@ public class JXTableHeaderTest extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXTableHeaderTest.class
             .getName());
 
+    /**
+     * Test that getDraggedColumn is visible or null.
+     * 
+     * Problem was reported on mac:
+     * http://forums.java.net/jive/thread.jspa?threadID=18368&tstart=0
+     * when hiding column while drag(?) is in process.
+     */
+    public void testDraggedColumnVisible() {
+        JXTable table = new JXTable(10, 2);
+        TableColumnExt columnExt = table.getColumnExt(0);
+        table.getTableHeader().setDraggedColumn(columnExt);
+        // sanity assert
+        assertEquals(columnExt, table.getTableHeader().getDraggedColumn());
+        columnExt.setVisible(false);
+        assertNull("dragged column must visible or null", table.getTableHeader().getDraggedColumn());
+    }
+    
+    /**
+     * Characterization of header#isVisible(TableColumn).
+     *
+     * PENDING JW: should column be contained in model to be evaluated as
+     *   visible in the header context? This is a bit moot, because needed
+     *   mainly in context with the draggedColumn which is dirty anyway.
+     */
+    public void testColumnVisible() {
+        JXTableHeader header = new JXTableHeader();
+        assertFalse("null column must not be visible", header.isVisible(null));
+        assertTrue("TableColumn must be visible", header.isVisible(new TableColumn()));
+        TableColumnExt columnExt = new TableColumnExt();
+        assertEquals("TableColumnExt visible property", 
+                columnExt.isVisible(), header.isVisible(columnExt));
+        columnExt.setVisible(!columnExt.isVisible());
+        assertEquals("TableColumnExt visible property", 
+                columnExt.isVisible(), header.isVisible(columnExt));
+    }
+    
     /**
      * Issue 334-swingx: BasicTableHeaderUI.getPrefSize doesn't respect 
      *   all renderere's size requirements.
