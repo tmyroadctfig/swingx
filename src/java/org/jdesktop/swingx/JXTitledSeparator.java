@@ -23,6 +23,7 @@ package org.jdesktop.swingx;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -98,13 +99,33 @@ public class JXTitledSeparator extends JXPanel {
     
     /** 
      * Creates a new instance of <code>JXTitledSeparator</code> with the specified
-     * title. Default justification is <code>LEADING</code>, and the default
+     * title. Default horizontal alignment is <code>LEADING</code>, and the default
      * horizontal text position is <code>TRAILING</code> (title follows icon)
      */
     public JXTitledSeparator(String title) {
+        this(title, SwingConstants.LEADING, null);
+    }
+    
+    /** 
+     * Creates a new instance of <code>JXTitledSeparator</code> with the specified
+     * title and horizontal alignment. The default
+     * horizontal text position is <code>TRAILING</code> (title follows icon)
+     */
+    public JXTitledSeparator(String title, int horizontalAlignment) {
+        this(title, horizontalAlignment, null);
+    }
+    
+    /** 
+     * Creates a new instance of <code>JXTitledSeparator</code> with the specified
+     * title, icon, and horizontal alignment. The default
+     * horizontal text position is <code>TRAILING</code> (title follows icon)
+     */
+    public JXTitledSeparator(String title, int horizontalAlignment, Icon icon) {
         setLayout(new GridBagLayout());
         
         label = new JLabel(title);
+        label.setIcon(icon);
+        label.setHorizontalAlignment(horizontalAlignment);
         leftSeparator = new JSeparator();
         rightSeparator = new JSeparator();
         
@@ -172,12 +193,15 @@ public class JXTitledSeparator extends JXPanel {
     }
     
     /**
-     * Sets the alignment of the title along the X axis. If left/leading, then
+     * <p>Sets the alignment of the title along the X axis. If leading, then
      * the title will lead the separator (in left-to-right languages,
      * the title will be to the left and the separator to the right). If centered,
-     * then a separator will be to the left, followed by the titled (centered),
-     * followed by a separator to the right. Right/trailing will have the title
-     * on the right with a separator to its left.
+     * then a separator will be to the left, followed by the title (centered),
+     * followed by a separator to the right. Trailing will have the title
+     * on the right with a separator to its left, in left-to-right languages.</p>
+     * 
+     * <p>LEFT and RIGHT always position the text left or right of the separator,
+     * respectively, regardless of the language orientation.</p>
      *
      * @param alignment  One of the following constants
      *           defined in <code>SwingConstants</code>:
@@ -285,7 +309,6 @@ public class JXTitledSeparator extends JXPanel {
 
     /**
      * @inheritDoc
-     * Passes the foreground on to the label
      */
     @Override
     public void setForeground(Color foreground) {
@@ -293,5 +316,16 @@ public class JXTitledSeparator extends JXPanel {
             label.setForeground(foreground);
         }
         super.setForeground(foreground);
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    @Override
+    public void setFont(Font font) {
+        if (label != null) {
+            label.setFont(font);
+        }
+        super.setFont(font);
     }
 }
