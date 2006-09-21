@@ -248,7 +248,7 @@ public class JXTableHeader extends JTableHeader
      * @param column the <code>TableColumn</code> to check
      * @return a boolean indicating if the column is visible
      */
-    protected boolean isVisible(TableColumn column) {
+    private boolean isVisible(TableColumn column) {
         return getViewIndexForColumn(column) >= 0;
     }
 
