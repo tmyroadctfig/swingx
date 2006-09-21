@@ -82,7 +82,7 @@ public class SelectionMapperTest extends InteractiveTestCase {
         viewSelectionModel.setSelectionInterval(selected, selected);
         FilterPipeline pipeline =  null; //new FilterPipeline();
 //        pipeline.assign(ascendingModelAdapter);
-        SelectionMapper selectionMapper = new SelectionMapper(pipeline, viewSelectionModel);
+        DefaultSelectionMapper selectionMapper = new DefaultSelectionMapper(pipeline, viewSelectionModel);
         int anchor = selected;
         int lead = selected;
         assertAnchorLeadSynched(anchor, lead, viewSelectionModel, selectionMapper);
@@ -109,7 +109,7 @@ public class SelectionMapperTest extends InteractiveTestCase {
         assertAnchorLead(anchor, lead, viewSelectionModel);
         
     }
-    private void assertAnchorLeadSynched(int anchor, int lead, ListSelectionModel viewSelection, SelectionMapper mapper) {
+    private void assertAnchorLeadSynched(int anchor, int lead, ListSelectionModel viewSelection, DefaultSelectionMapper mapper) {
        assertAnchorLead(anchor, lead, viewSelection);
        assertAnchorLead(anchor, lead, mapper.modelSelection);
     }
@@ -122,8 +122,8 @@ public class SelectionMapperTest extends InteractiveTestCase {
     public void testSelectionNullPipeline() {
         ListSelectionModel selectionModel = new DefaultListSelectionModel();
         selectionModel.setSelectionInterval(0, 0);
-        SelectionMapper selectionMapper = new SelectionMapper(null, selectionModel);
-        selectionMapper.restoreSelection();
+        DefaultSelectionMapper selectionMapper = new DefaultSelectionMapper(null, selectionModel);
+        selectionMapper.mapTowardsView();
         assertTrue("selection must be retained", selectionModel.isSelectedIndex(0));
     }
  
@@ -141,7 +141,7 @@ public class SelectionMapperTest extends InteractiveTestCase {
         // descending sorter
         pipeline.setSorter(new ShuttleSorter(0, false));
         pipeline.assign(ascendingModelAdapter);
-        new SelectionMapper(pipeline, selectionModel);
+        new DefaultSelectionMapper(pipeline, selectionModel);
         assertEquals("lead selection must be last added", 
                 pipeline.convertRowIndexToView(lead), 
                 selectionModel.getLeadSelectionIndex());
@@ -157,9 +157,9 @@ public class SelectionMapperTest extends InteractiveTestCase {
         // select first in model coordinates
         int index = 0;
         selectionModel.setSelectionInterval(index, index);
-        SelectionMapper selectionMapper = new SelectionMapper(null, selectionModel);
+        SelectionMapper selectionMapper = new DefaultSelectionMapper(null, selectionModel);
         selectionMapper.setFilters(pipeline);
-//        selection.restoreSelection();
+//        selection.mapTowardsView();
         assertEquals("view selection must be last", ascendingModelAdapter.getRowCount() - 1, 
                 selectionModel.getMinSelectionIndex());
         

@@ -48,6 +48,7 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
 import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.DefaultSelectionMapper;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
@@ -739,7 +740,7 @@ public class JXList extends JList {
      */
     protected SelectionMapper getSelectionMapper() {
         if (selectionMapper == null) {
-            selectionMapper = new SelectionMapper(filters, getSelectionModel());
+            selectionMapper = new DefaultSelectionMapper(filters, getSelectionModel());
         }
         return selectionMapper;
     }
@@ -897,11 +898,15 @@ public class JXList extends JList {
                 }
 
                 public void contentsChanged(ListDataEvent e) {
-                    getSelectionMapper().lock();
+                    boolean wasEnabled = getSelectionMapper().isEnabled();
+                    getSelectionMapper().setEnabled(false);
+                    try {
                     fireContentsChanged(this, -1, -1);
                     updateSelection(e);
+                    } finally {
+                        getSelectionMapper().setEnabled(wasEnabled);
+                    }
                     getFilters().flush();
-
                 }
 
             };

@@ -45,6 +45,7 @@ import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -685,43 +686,49 @@ public class JXTreeTable extends JXTable {
      *  
      */
     @Override
-    protected SelectionMapper getSelectionMapper() {
+    public SelectionMapper getSelectionMapper() {
         // JW: don't want to change super assumption 
         // (mapper != null) - the selection mapping will change 
         // anyway in Mustang (using core functionality)
-        SelectionMapper empty = new SelectionMapper(null, null) {
+        return NO_OP_SELECTION_MANAGER ;
+    }
 
-            @Override
-            public void insertIndexInterval(int start, int length, boolean before) {
+    private static final SelectionMapper NO_OP_SELECTION_MANAGER = new SelectionMapper() {
+
+        private ListSelectionModel viewSelectionModel = new DefaultListSelectionModel();
+
+        public ListSelectionModel getViewSelectionModel() {
+            return viewSelectionModel;
             }
 
-            @Override
-            public void lock() {
+        public void setViewSelectionModel(ListSelectionModel viewSelectionModel) {
+            this.viewSelectionModel = viewSelectionModel;
             }
 
-            @Override
-            public void removeIndexInterval(int start, int end) {
+        public void setFilters(FilterPipeline pipeline) {
+            // do nothing
             }
 
-            @Override
-            public void restoreSelection() {
+        public void insertIndexInterval(int start, int length, boolean before) {
+            // do nothing
             }
 
-            @Override
-            public void setFilters(FilterPipeline pipeline) {
+        public void removeIndexInterval(int start, int end) {
+            // do nothing
             }
 
-            @Override
-            public void setViewSelectionModel(ListSelectionModel selection) {
+        public void setEnabled(boolean enabled) {
+            // do nothing
             }
 
-            @Override
-            public void unlock() {
+        public boolean isEnabled() {
+            return false;
             }
             
-        };
-        return empty ;
+        public void clearModelSelection() {
+            // do nothing
     }
+    };
 
     /**
      * Throws UnsupportedOperationException because variable height rows are

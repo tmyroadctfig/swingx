@@ -84,6 +84,7 @@ import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.DefaultSelectionMapper;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
@@ -1237,8 +1238,13 @@ public class JXTable extends JTable
     @Override
     public void setModel(TableModel newModel) {
         // JW: need to look here? is done in tableChanged as well. 
-        getSelectionMapper().lock();
+        boolean wasEnabled = getSelectionMapper().isEnabled();
+        getSelectionMapper().setEnabled(false);
+        try {
         super.setModel(newModel);
+        } finally {
+            getSelectionMapper().setEnabled(wasEnabled);
+        }
     }
 
     /** 
@@ -1257,9 +1263,14 @@ public class JXTable extends JTable
         // JW: make SelectionMapper deaf ... super doesn't know about row
         // mapping and sets rowSelection in model coordinates
         // causing complete confusion.
-        getSelectionMapper().lock();
+        boolean wasEnabled = getSelectionMapper().isEnabled();
+        getSelectionMapper().setEnabled(false);
+        try {
         super.tableChanged(e);
         updateSelectionAndRowModel(e);
+        } finally {
+            getSelectionMapper().setEnabled(wasEnabled);
+        }
         use(filters);
     }
 
@@ -1388,12 +1399,11 @@ public class JXTable extends JTable
     }
     
     /**
-     * temporaryly exposed for testing...
      * @return <code>SelectionMapper</code>
      */
-    protected SelectionMapper getSelectionMapper() {
+    public SelectionMapper getSelectionMapper() {
         if (selectionMapper == null) {
-            selectionMapper = new SelectionMapper(filters, getSelectionModel());
+            selectionMapper = new DefaultSelectionMapper(filters, getSelectionModel());
         }
         return selectionMapper;
     }
