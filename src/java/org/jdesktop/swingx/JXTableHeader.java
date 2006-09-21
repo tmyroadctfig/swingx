@@ -244,22 +244,16 @@ public class JXTableHeader extends JTableHeader
 
     /**
      * Checks and returns the column's visibility. 
-     * Returns <code>false</code> for a <code>null</code> column, 
-     * or the <code>visible</code> property if of type <code>TableColumnExt</code>,
-     * otherwise <code>true</code>.
-     * <p>
      * 
      * @param column the <code>TableColumn</code> to check
      * @return a boolean indicating if the column is visible
      */
     protected boolean isVisible(TableColumn column) {
-        return (column instanceof TableColumnExt) ? 
-                ((TableColumnExt) column).isVisible()
-                : (column != null);
+        return getViewIndexForColumn(column) >= 0;
     }
 
     /**
-     * returns the (visible) view index for the given column
+     * Returns the (visible) view index for the given column
      * or -1 if not visible or not contained in this header's
      * columnModel.
      * 

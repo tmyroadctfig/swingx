@@ -45,6 +45,7 @@ public class JXTableHeaderTest extends InteractiveTestCase {
         table.getColumnModel().removeColumn(columnExt);
         assertNull("draggedColumn must be null if removed", table.getTableHeader().getDraggedColumn());
     }
+    
     /**
      * Issue #390-swingx: JXTableHeader: throws AIOOB on removing dragged column.
      * Test that getDraggedColumn is visible or null.
@@ -63,25 +64,6 @@ public class JXTableHeaderTest extends InteractiveTestCase {
         assertNull("dragged column must visible or null", table.getTableHeader().getDraggedColumn());
     }
     
-    /**
-     * Issue #390-swingx: JXTableHeader: throws AIOOB on removing dragged column.
-     * Characterization of header#isVisible(TableColumn).
-     *
-     * PENDING JW: should column be contained in model to be evaluated as
-     *   visible in the header context? This is a bit moot, because needed
-     *   mainly in context with the draggedColumn which is dirty anyway.
-     */
-    public void testColumnVisible() {
-        JXTableHeader header = new JXTableHeader();
-        assertFalse("null column must not be visible", header.isVisible(null));
-        assertTrue("TableColumn must be visible", header.isVisible(new TableColumn()));
-        TableColumnExt columnExt = new TableColumnExt();
-        assertEquals("TableColumnExt visible property", 
-                columnExt.isVisible(), header.isVisible(columnExt));
-        columnExt.setVisible(!columnExt.isVisible());
-        assertEquals("TableColumnExt visible property", 
-                columnExt.isVisible(), header.isVisible(columnExt));
-    }
     
     /**
      * Issue 334-swingx: BasicTableHeaderUI.getPrefSize doesn't respect 
