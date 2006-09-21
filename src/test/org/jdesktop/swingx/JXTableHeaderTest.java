@@ -13,6 +13,8 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -25,6 +27,26 @@ public class JXTableHeaderTest extends InteractiveTestCase {
             .getName());
 
     /**
+     * Issue #390-swingx: JXTableHeader: throws AIOOB on removing dragged column.
+     * Test that getDraggedColumn is null if removed.
+     * 
+     * Problem was reported on mac:
+     * http://forums.java.net/jive/thread.jspa?threadID=18368&tstart=0
+     * when hiding column while drag(?) is in process.
+     * 
+     *
+     */
+    public void testDraggedColumnRemoved() {
+        JXTable table = new JXTable(10, 2);
+        TableColumnExt columnExt = table.getColumnExt(0);
+        table.getTableHeader().setDraggedColumn(columnExt);
+        // sanity assert
+        assertEquals(columnExt, table.getTableHeader().getDraggedColumn());
+        table.getColumnModel().removeColumn(columnExt);
+        assertNull("draggedColumn must be null if removed", table.getTableHeader().getDraggedColumn());
+    }
+    /**
+     * Issue #390-swingx: JXTableHeader: throws AIOOB on removing dragged column.
      * Test that getDraggedColumn is visible or null.
      * 
      * Problem was reported on mac:
@@ -42,6 +64,7 @@ public class JXTableHeaderTest extends InteractiveTestCase {
     }
     
     /**
+     * Issue #390-swingx: JXTableHeader: throws AIOOB on removing dragged column.
      * Characterization of header#isVisible(TableColumn).
      *
      * PENDING JW: should column be contained in model to be evaluated as
@@ -152,7 +175,30 @@ public class JXTableHeaderTest extends InteractiveTestCase {
     
 
 //--------------------------------- visual checks
-    
+    /**
+     * Issue #390-swingx: JXTableHeader: throws AIOOB on removing dragged column.
+     * 
+     */
+    public void interactiveDraggedColumnRemoved() {
+        final JXTable table = new JXTable(10, 5);
+        Action deleteColumn = new AbstractAction("deleteCurrentColumn") {
+
+            public void actionPerformed(ActionEvent e) {
+                TableColumn column = table.getTableHeader().getDraggedColumn();
+                if (column == null) return;
+                table.getColumnModel().removeColumn(column);
+            }
+            
+        };
+        KeyStroke keyStroke = KeyStroke.getKeyStroke("F1");
+        table.getInputMap(JTable.WHEN_IN_FOCUSED_WINDOW).put(keyStroke, "f1");
+        table.getActionMap().put("f1", deleteColumn);
+        JXFrame frame = wrapWithScrollingInFrame(table, "Remove dragged column with F1");
+        frame.setVisible(true);
+    }
+    /**
+     * Visual demo that header is always visible.
+     */
     public void interactiveHeaderVisible() {
         final JXTable table = new JXTable();
         table.setColumnControlVisible(true);
@@ -176,8 +222,6 @@ public class JXTableHeaderTest extends InteractiveTestCase {
         try {
           test.runInteractiveTests();
          //   test.runInteractiveTests("interactive.*Siz.*");
-         //   test.runInteractiveTests("interactive.*Render.*");
-         //   test.runInteractiveTests("interactive.*Toggle.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
