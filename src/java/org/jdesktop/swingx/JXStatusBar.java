@@ -155,26 +155,20 @@ public class JXStatusBar extends JXPanel {
     }
 
     /**
-     * Adds a {@link JSeparator} component. The component will be configured
-     * properly based on the look and feel.
-     */
-    public void addSeparator() {
-        add(getUI().createSeparator());
-    }
-    
-    /**
      * The constraint object to be used with the <code>JXStatusBar</code>. It takes
      * both a weight and Insets. @see JXStatusBar class documentation.
      */
     public static class Constraint {
+        public static enum ResizeBehavior {FILL, FIXED}
+        
         private Insets insets;
-        private double weight;
+        private ResizeBehavior resizeBehavior;
         
         /**
          * Creates a new Constraint with no weight and no insets.
          */
         public Constraint() {
-            this(0.0, null);
+            this(ResizeBehavior.FIXED, null);
         }
         
         /**
@@ -183,7 +177,7 @@ public class JXStatusBar extends JXPanel {
          * @param insets may be null. If null, an Insets with 0 values will be used.
          */
         public Constraint(Insets insets) {
-            this(0.0, insets);
+            this(ResizeBehavior.FIXED, insets);
         }
         
         /**
@@ -191,8 +185,8 @@ public class JXStatusBar extends JXPanel {
          * 
          * @param weight must be >= 0
          */
-        public Constraint(double weight) {
-            this(weight, null);
+        public Constraint(ResizeBehavior resizeBehavior) {
+            this(resizeBehavior, null);
         }
         
         /**
@@ -201,11 +195,11 @@ public class JXStatusBar extends JXPanel {
          * @param weight must be >= 0
          * @param insets may be null. If null, an Insets with 0 values will be used.
          */
-        public Constraint(double weight, Insets insets) {
-            if (weight < 0) {
-                throw new IllegalArgumentException("weight must be >= 0");
-            }
-            this.weight = weight;
+        public Constraint(ResizeBehavior resizeBehavior, Insets insets) {
+//            if (weight < 0) {
+//                throw new IllegalArgumentException("weight must be >= 0");
+//            }
+            this.resizeBehavior = resizeBehavior;
             this.insets = insets == null ? new Insets(0, 0, 0, 0) : (Insets)insets.clone();
         }
         
@@ -214,8 +208,8 @@ public class JXStatusBar extends JXPanel {
          * 
          * @return weight
          */
-        public double getWeight() {
-            return weight;
+        public ResizeBehavior getResizeBehavior() {
+            return resizeBehavior;
         }
         
         /**
@@ -237,6 +231,13 @@ public class JXStatusBar extends JXPanel {
         }
 
         public void addLayoutComponent(Component comp, Object constraint) {
+            //we accept an Insets, a ResizeBehavior, or a Constraint.
+            if (constraint instanceof Insets) {
+                constraint = new Constraint((Insets)constraint);
+            } else if (constraint instanceof Constraint.ResizeBehavior) {
+                constraint = new Constraint((Constraint.ResizeBehavior)constraint);
+            }
+            
             constraints.put(comp, (Constraint)constraint);
         }
 
@@ -247,8 +248,8 @@ public class JXStatusBar extends JXPanel {
         public Dimension preferredLayoutSize(Container parent) {
             Dimension prefSize = new Dimension();
             for (Component comp : constraints.keySet()) {
-                Dimension d = comp.getPreferredSize();
                 Constraint c = constraints.get(comp);
+                Dimension d = comp.getPreferredSize();
                 if (c != null) {
                     Insets i = c.getInsets();
                     d.width += i.left + i.right;
@@ -286,18 +287,17 @@ public class JXStatusBar extends JXPanel {
 
         public void layoutContainer(Container parent) {
             //find out the maximum weight of all the visible components
-            double maxWeight = 0.0;
+            int numFilledComponents = 0;
             for (Component comp : parent.getComponents()) {
-                if (comp.isVisible()) {
-                    Constraint c = constraints.get(comp);
-                    maxWeight += c == null ? 0.0 : c.getWeight();
+                Constraint c = constraints.get(comp);
+                if (c != null && c.getResizeBehavior() == Constraint.ResizeBehavior.FILL) {
+                    numFilledComponents++;
                 }
             }
-            maxWeight = maxWeight == 0 ? 1.0 : maxWeight; //don't let maxWeight be 0
+            double weight = 1 / numFilledComponents;
             
             //the amount of available space. If positive, it will be split up among
-            //all visible components that have a positive weight
-            //If negative, then no weights will be configured
+            //all visible components that have a FILL resize behavior
             Insets parentInsets = parent.getInsets();
             int availableSpace = parent.getWidth() - preferredLayoutSize(parent).width;
             //the next X location to place a component at
@@ -306,23 +306,21 @@ public class JXStatusBar extends JXPanel {
             
             //now lay out each visible component
             for (Component comp : parent.getComponents()) {
-                if (comp.isVisible()) {
-                    Constraint c = constraints.get(comp);
-                    double weight = c == null ? 0.0 : c.getWeight();
-                    Insets insets = c == null ? new Insets(0,0,0,0) : c.getInsets();
-                    
-                    int spaceToTake = availableSpace > 0 ? 
-                        (int)((weight/maxWeight) * availableSpace) : 0;
-                    availableSpace -= spaceToTake;
-                    
-                    int width = comp.getPreferredSize().width + spaceToTake;
+                Constraint c = constraints.get(comp);
+                Constraint.ResizeBehavior rb = c == null ? null : c.getResizeBehavior();
+                Insets insets = c == null ? new Insets(0,0,0,0) : c.getInsets();
 
-                    int x = nextX + insets.left;
-                    int y = parentInsets.top + insets.top;
-                    comp.setSize(width, height);
-                    comp.setLocation(x, y);
-                    nextX = x + width + insets.right;
-                }
+                int spaceToTake = availableSpace > 0 && rb == Constraint.ResizeBehavior.FILL ? 
+                    (int)(weight * availableSpace) : 0;
+                availableSpace -= spaceToTake;
+
+                int width = comp.getPreferredSize().width + spaceToTake;
+
+                int x = nextX + insets.left;
+                int y = parentInsets.top + insets.top;
+                comp.setSize(width, height);
+                comp.setLocation(x, y);
+                nextX = x + width + insets.right;
             }
         }
     }
