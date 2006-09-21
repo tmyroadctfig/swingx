@@ -93,13 +93,12 @@ public class JXStatusBarVisualCheck extends InteractiveTestCase {
         JXStatusBar statusBar = getStatusBar(frame);
         // JW: this is a hack .. add an empty label to force the following
         // components to trailing
-        statusBar.add(new JLabel(), new JXStatusBar.Constraint(1.0));
+        statusBar.add(new JLabel(), JXStatusBar.Constraint.ResizeBehavior.FILL);
         statusBar.add(new JLabel("Writable")); // , JLabel.TRAILING);
         final JLabel insertLabel = new JLabel("Smart Insert");
         statusBar.add(insertLabel); //, JLabel.TRAILING);
         statusBar.add(new JLabel("2440 : 59")); //, JLabel.TRAILING);
         // mimic a second statusbar?
-        statusBar.addSeparator();
         statusBar.add(new JLabel("Building workspace ..."));
         Action action = new AbstractActionExt("toggle insertLabel") {
 
@@ -134,8 +133,6 @@ public class JXStatusBarVisualCheck extends InteractiveTestCase {
         final JXFrame frame = wrapWithScrollingInFrame(panel, "Bidi-compliance of StatusBar");
         JXStatusBar statusBar = getStatusBar(frame);
         statusBar.add(new JLabel("first"));
-        // JW: shouldn't need to add the separator manually!
-        statusBar.addSeparator();
         statusBar.add(new JLabel("last"));
         Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
 
