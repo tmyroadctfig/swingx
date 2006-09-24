@@ -27,6 +27,7 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.plaf.ButtonUI;
 
 import org.jdesktop.swingx.action.LinkAction;
 import org.jdesktop.swingx.plaf.JXHyperlinkAddon;
@@ -293,4 +294,16 @@ public class JXHyperlink extends JButton {
     public String getUIClassID() {
         return uiClassID;
     }
+    
+    /**
+     * Notification from the <code>UIManager</code> that the L&F has changed.
+     * Replaces the current UI object with the latest version from the <code>UIManager</code>.
+     * 
+     * @see javax.swing.JComponent#updateUI
+     */
+    @Override
+    public void updateUI() {
+      setUI((ButtonUI)LookAndFeelAddons.getUI(this, ButtonUI.class));
+    }
+
 }

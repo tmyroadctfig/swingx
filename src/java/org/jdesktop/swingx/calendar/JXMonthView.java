@@ -303,7 +303,7 @@ public class JXMonthView extends JComponent {
      */
     @Override
     public void updateUI() {
-        setUI((MonthViewUI)UIManager.getUI(this));
+        setUI((MonthViewUI)LookAndFeelAddons.getUI(this, MonthViewUI.class));
         invalidate();
     }
 

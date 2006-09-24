@@ -95,7 +95,7 @@ public class JXMultiThumbSlider<E> extends JComponent {
     }
     
     public void updateUI() {
-        setUI((MultiThumbSliderUI)UIManager.getUI(this));
+        setUI((MultiThumbSliderUI)LookAndFeelAddons.getUI(this, MultiThumbSliderUI.class));
         invalidate();
     }
     

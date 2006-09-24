@@ -161,7 +161,7 @@ public class JXDatePicker extends JComponent {
      */
     @Override
     public void updateUI() {
-        setUI((DatePickerUI) UIManager.getUI(this));
+        setUI((DatePickerUI)LookAndFeelAddons.getUI(this, DatePickerUI.class));
         invalidate();
     }
 
