@@ -70,6 +70,7 @@ import javax.swing.UIManager;
  *  sep.setHorizontalTextPosition(SwingConstants.TRAILING);
  * </code></pre>
  *
+ * @status REVIEWED
  * @author rbair
  */
 public class JXTitledSeparator extends JXPanel {
