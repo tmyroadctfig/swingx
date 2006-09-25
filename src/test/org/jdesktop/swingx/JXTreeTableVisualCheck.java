@@ -72,7 +72,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
 //             test.runInteractiveTests("interactive.*Edit.*");
 //             test.runInteractiveTests("interactive.*Line.*");
-             test.runInteractiveTests("interactive.*Insert.*");
+             test.runInteractiveTests("interactive.*Render.*");
         } catch (Exception ex) {
 
         }
@@ -389,18 +389,21 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     /**
      * Issue #246-swingx: update probs with insert node.
      * 
-     * The reported issue is an asymmetry in updating the parent: it's done
-     * only if not expanded. With the arguments of #82-swingx, parent's
-     * appearance might be effected by child changes if expanded as well.
-     * 
-     * Here's a test for insert: the crazy renderer removes the icon if 
-     * childCount exceeds a limit. Select a node, insert a child, expand the node
-     * and keep inserting children. Interestingly the parent is
+     * The reported issue is an asymmetry in updating the parent: it's done only
+     * if not expanded. With the arguments of #82-swingx, parent's appearance
+     * might be effected by child changes if expanded as well.
+     * <p>
+     * Here's a test for insert: the crazy renderer removes the icon if
+     * childCount exceeds a limit (here > 3). Select a node, insert a child,
+     * expand the node and keep inserting children. Interestingly the parent is
      * always updated in the treeTable, but not in the tree
+     * <p>
+     * Quick test if custom icons provided by the renderer are respected. They
+     * should appear and seem to do.
      * 
-     *
      */
     public void interactiveTestInsertNodeAndChangedParentRendering() {
+        final Icon topIcon = new ImageIcon(getClass().getResource("resources/images/wellTop.gif"));
         final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
         final InsertTreeTableModel model = new InsertTreeTableModel(root);
         final  DefaultMutableTreeNode leaf = model.addChild(root);
@@ -418,8 +421,8 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
                 if (path != null) {
                     Object node = path.getLastPathComponent();
                     if ((node != null) && (tree.getModel().getChildCount(node) > 3)) {
-                        setIcon(null);
-                    }
+                        setIcon(topIcon);
+                    } 
                 }
                 return comp;
             }
