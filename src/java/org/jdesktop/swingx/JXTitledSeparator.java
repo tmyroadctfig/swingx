@@ -131,8 +131,8 @@ public class JXTitledSeparator extends JXPanel {
         
         layoutSeparator();
         
-        label.setForeground(UIManager.getColor("TitledBorder.titleColor"));
-        label.setFont(UIManager.getFont("TitledBorder.font"));
+        setForeground(UIManager.getColor("TitledBorder.titleColor"));
+        setFont(UIManager.getFont("TitledBorder.font"));
     }
     
     /**
