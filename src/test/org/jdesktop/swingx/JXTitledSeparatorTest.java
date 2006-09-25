@@ -18,6 +18,7 @@ import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
@@ -47,6 +48,16 @@ public class JXTitledSeparatorTest extends InteractiveTestCase {
         Dimension dim = separator.getPreferredSize();
         separator.setTitle("some title definitely longer than empty");
         assertTrue(dim.width < separator.getPreferredSize().width);
+    }
+    
+    /**
+     * Issue #391-swingx: JXTitledSeparator does not respect getForeground/getFont
+     */
+    public void testForeground() {
+        Color testColor = new Color(10, 213, 123);
+        UIManager.put("TitledBorder.titleColor", testColor);
+        JXTitledSeparator separator = new JXTitledSeparator();
+        assertSame(testColor, separator.getForeground());
     }
     
     /**
