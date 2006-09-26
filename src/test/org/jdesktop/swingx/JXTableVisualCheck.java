@@ -34,6 +34,7 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JViewport;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
@@ -90,8 +91,8 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*Boolean.*");
 //          test.runInteractiveTests("interactive.*isable.*");
           
-          test.runInteractiveTests("interactive.*Compare.*");
-//        test.runInteractiveTests("interactive.*Header.*");
+//          test.runInteractiveTests("interactive.*Compare.*");
+        test.runInteractiveTests("interactive.*binding.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -106,6 +107,26 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         setSystemLF(false);
     }
 
+    /**
+     * visually check if we can bind the CCB's action to a keystroke.
+     * 
+     * Working, but there's a visual glitch if opened by keystroke: 
+     * the popup is not trailing aligned to the CCB. And the 
+     * CCB must be visible, otherwise there's an IllegalStateException
+     * because the popup tries to position itself relative to the CCB.
+     *
+     */
+    public void interactiveKeybindingColumnControl() {
+        JXTable table = new JXTable(sortableTableModel);
+        // JW: currently the CCB must be visible
+//        table.setColumnControlVisible(true);
+        Action openCCPopup = ((AbstractButton) table.getColumnControl()).getAction();
+        String actionKey = "popupColumnControl";
+        table.getActionMap().put(actionKey, openCCPopup);
+        KeyStroke keyStroke = KeyStroke.getKeyStroke("F2");
+        table.getInputMap(JXTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(keyStroke, actionKey);
+        showWithScrollingInFrame(table, "Press F2 to open column control");
+    }
     /**
      * calculate reasonable table rowHeight withouth "white pixel" in editor.
      * Compare table and xtable

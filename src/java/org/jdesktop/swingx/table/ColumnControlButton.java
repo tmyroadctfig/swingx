@@ -369,7 +369,11 @@ public class ColumnControlButton extends JButton {
                 int xPos = owner.getComponentOrientation().isLeftToRight() ? buttonSize.width
                         - popupMenu.getPreferredSize().width
                         : 0;
-                popupMenu.show(owner, xPos, buttonSize.height);
+                popupMenu.show(owner,
+                        // JW: trying to allow popup without CCB showing
+                        // weird behaviour
+//                        owner.isShowing()? owner : null, 
+                        xPos, buttonSize.height);
             }
 
         }
