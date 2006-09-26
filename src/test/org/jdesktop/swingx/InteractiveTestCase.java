@@ -61,11 +61,28 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
         super(testTitle);
     }
 
+    /**
+     * Creates and returns a JXFrame with the specified title, containing
+     * the component wrapped into a JScrollPane.
+     * 
+     * @param component the JComponent to wrap
+     * @param title the title to show in the frame
+     * @return a configured, packed and located JXFrame.
+     */
     public JXFrame wrapWithScrollingInFrame(JComponent component, String title) {
         JScrollPane scroller = new JScrollPane(component);
         return wrapInFrame(scroller, title);
     }
 
+    /**
+     * Creates and returns a JXFrame with the specified title, containing
+     * two components individually wrapped into a JScrollPane.
+     * 
+     * @param leftComp the left JComponent to wrap
+     * @param rightComp the right JComponent to wrap
+     * @param title the title to show in the frame
+     * @return a configured, packed and located JXFrame
+     */
     public JXFrame wrapWithScrollingInFrame(JComponent leftComp, JComponent rightComp, String title) {
         JComponent comp = Box.createHorizontalBox();
         comp.add(new JScrollPane(leftComp));
@@ -74,7 +91,14 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
         return frame;
     }
 
-
+    /**
+     * Creates and returns a JXFrame with the specified title, containing
+     * the component.
+     * 
+     * @param component the JComponent to wrap
+     * @param title the title to show in the frame
+     * @return a configured, packed and located JXFrame.
+     */
     public JXFrame wrapInFrame(JComponent component, String title) {
         JXFrame frame = new JXFrame(title, false);
         JToolBar toolbar = new JToolBar();
@@ -89,6 +113,49 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
         }
         frameLocation.x += 30;
         frameLocation.y += 30;
+        return frame;
+    }
+
+    /**
+     * Creates, shows and returns a JXFrame with the specified title, containing
+     * the component wrapped into a JScrollPane.
+     * 
+     * @param component the JComponent to wrap
+     * @param title the title to show in the frame
+     * @return a configured, packed and located JXFrame.
+     * @see #wrapWithScrollingInFrame(JComponent, String)
+     */
+    public JXFrame showWithScrollingInFrame(JComponent component, String title) {
+        JXFrame frame = wrapWithScrollingInFrame(component, title);
+        frame.setVisible(true);
+        return frame;
+    }
+
+    /**
+     * Creates and returns a JXFrame with the specified title, containing
+     * two components individually wrapped into a JScrollPane.
+     * 
+     * @param leftComp the left JComponent to wrap
+     * @param rightComp the right JComponent to wrap
+     * @param title the title to show in the frame
+     * @return a configured, packed and located JXFrame
+     */
+    public JXFrame showWithScrollingInFrame(JComponent leftComp, JComponent rightComp, String title) {
+        JXFrame frame = wrapWithScrollingInFrame(leftComp, rightComp, title);
+        frame.setVisible(true);
+        return frame;
+    }
+    /**
+     * Creates, shows and returns a JXFrame with the specified title, containing
+     * the component.
+     * 
+     * @param component the JComponent to wrap
+     * @param title the title to show in the frame
+     * @return a configured, packed and located JXFrame.
+     */
+    public JXFrame showInFrame(JComponent component, String title) {
+        JXFrame frame = wrapInFrame(component, title);
+        frame.setVisible(true);
         return frame;
     }
 
