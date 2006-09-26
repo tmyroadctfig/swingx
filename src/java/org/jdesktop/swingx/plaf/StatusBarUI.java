@@ -29,11 +29,4 @@ import javax.swing.plaf.PanelUI;
  * @author rbair
  */
 public abstract class StatusBarUI extends PanelUI {
-    /**
-     * Creates and returns a {@link JSeparator} component configured
-     * properly based on the look and feel.
-     * 
-     * @return JSeparator. This must never be null.
-     */
-    public abstract JSeparator createSeparator();
 }

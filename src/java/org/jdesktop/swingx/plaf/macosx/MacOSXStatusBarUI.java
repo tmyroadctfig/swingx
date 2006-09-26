@@ -134,10 +134,8 @@ public class MacOSXStatusBarUI extends StatusBarUI {
         super.paint(g, c);
     }
 
-    @Override
-    public JSeparator createSeparator() {
-        JSeparator sep = new JSeparator(SwingConstants.VERTICAL);
+    public void configureSeparator(JSeparator sep) {
+        sep.setOrientation(SwingConstants.VERTICAL);
         sep.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
-        return sep;
     }
 }

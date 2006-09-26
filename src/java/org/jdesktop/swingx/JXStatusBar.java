@@ -29,14 +29,12 @@ import java.awt.Insets;
 import java.awt.LayoutManager2;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.JSeparator;
-import javax.swing.SwingConstants;
 import org.jdesktop.swingx.plaf.JXStatusBarAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.StatusBarUI;
 
 /**
- * <p>A container for {@link javax.swing.JComponent}s that is typically placed at
+ * <p>A container for <code>JComponents</code> that is typically placed at
  * the bottom of a form and runs the entire width of the form. There are 3
  * important functions that <code>JXStatusBar</code> provides.
  * First, <code>JXStatusBar</code> provides a hook for a pluggable look.
@@ -47,26 +45,36 @@ import org.jdesktop.swingx.plaf.StatusBarUI;
  * <p>Second, <code>JXStatusBar</code> comes with its own layout manager. Each item is added to
  * the <code>JXStatusBar</code> with a <code>JXStatusBar.Constraint</code>
  * as the constraint argument. The <code>JXStatusBar.Constraint</code> contains 
- * an <code>Insets</code> object, as well as a "weight". The weight
- * is used the same as the <code>GridBagLayout</code>. All the weights of each
- * constraint is added together to form a total weight. Each individual weight then
- * is used as a percentage of the whole. For example:
- * <pre><code>
- *  //a will get 30% of the free space because .3 + .3 + .4 = 1.0 and 1.0 * .3 = 30%
- *  bar.add(a, new JXStatusBar.Constraints(.3));
- *  //b will get 30% of the free space because .3 + .3 + .4 = 1.0 and 1.0 * .3 = 30%
- *  bar.add(b, new JXStatusBar.Constraints(.3));
- *  //c will get 40% of the free space because .3 + .3 + .4 = 1.0 and 1.0 * .4 = 40%
- *  bar.add(c, new JXStatusBar.Constraints(.4));
- * </code></pre></p>
+ * an <code>Insets</code> object, as well as a <code>ResizeBehavior</code>, 
+ * which can be FIXED or FILL. The resize behaviour applies to the width of
+ * components. All components added will maintain there preferred height, and the
+ * height of the <code>JXStatusBar</code> will be the height of the highest 
+ * component plus insets.</p>
+ *  
+ * <p>A constraint with <code>JXStatusBar.Constraint.ResizeBehavior.FIXED</code>
+ * will cause the component to occupy a fixed area on the <code>JXStatusBar</code>.
+ * The size of the area remains constant when the <code>JXStatusBar</code> is resized.
+ * A constraint with this behavior may also take a width value, see 
+ * {@link JXStatusBar.Constraint#setPreferredWidth(int)}. The width is a preferred
+ * minimum width. If the component preferred width is greater than the constraint
+ * width, the component width will apply.</p>
+ * 
+ * <p>All components with constraint <code>JXStatusBar.Constraint.ResizeBehavior.FILL</code>
+ * will share equally any spare space in the <code>JXStatusBar</code>. Spare space
+ * is that left over after allowing for all FIXED component and the preferred 
+ * width of FILL components, plus insets  
  * 
  * <p>Constructing a <code>JXStatusBar</code> is very straitforward:
  * <pre><code>
  *      JXStatusBar bar = new JXStatusBar();
  *      JLabel statusLabel = new JLabel("Ready");
- *      bar.add(statusLabel, new JXStatusBar.Constraints(1.0); //weight of 0.0 and no insets
+ *      JXStatusBar.Constraint c1 = new JXStatusBarConstraint() 
+ *      c1.setPreferredWidth = 100;
+ *      bar.add(statusLabel, c1);     // Fixed width of 100 with no inserts
+ *      JXStatusBar.Constraint c2 = new JXStatusBarConstraint(
+ *      		JXStatusBar.Constraint.ResizeBehavior.FILL) // Fill with no inserts
  *      JProgressBar pbar = new JProgressBar();
- *      bar.add(pbar); //weight of 0.0 and no insets
+ *      bar.add(pbar, c2);            // Fill with no inserts - will use remaining space
  * </code></pre></p>
  *
  * <p>Two common use cases for status bars include tracking application status and
@@ -99,7 +107,6 @@ public class JXStatusBar extends JXPanel {
      */
     public JXStatusBar() {
         super();
-        setLayout(new Layout());
     }
 
     /**
@@ -156,23 +163,25 @@ public class JXStatusBar extends JXPanel {
 
     /**
      * The constraint object to be used with the <code>JXStatusBar</code>. It takes
-     * both a weight and Insets. @see JXStatusBar class documentation.
+     * a ResizeBehaviour, Insets and a Width. Width is only applicable for  
+     * ResizeBehavior.FIXED. @see JXStatusBar class documentation.
      */
     public static class Constraint {
         public static enum ResizeBehavior {FILL, FIXED}
         
         private Insets insets;
         private ResizeBehavior resizeBehavior;
+        private int preferredWidth = 0;
         
         /**
-         * Creates a new Constraint with no weight and no insets.
+         * Creates a new Constraint with default FIXED behaviour and no insets.
          */
         public Constraint() {
             this(ResizeBehavior.FIXED, null);
         }
         
         /**
-         * Creates a new Constraint with no weight and the given insets
+         * Creates a new Constraint with default FIXED behaviour and the given insets
          * 
          * @param insets may be null. If null, an Insets with 0 values will be used.
          */
@@ -181,32 +190,78 @@ public class JXStatusBar extends JXPanel {
         }
         
         /**
-         * Creats a new Constraint with the given weight and no insets
+         * Creates a new Constraint with default FIXED behaviour and the given minimum
+         * preferred width.
          * 
-         * @param weight must be >= 0
+         * @param minPrefWidth must be >= 0
+         */
+        public Constraint(int minPrefWidth) {
+            this(ResizeBehavior.FIXED, null, minPrefWidth);
+        }
+        
+        /**
+         * Creates a new Constraint with the specified resize behaviour and no insets
+         * 
+         * @param resizeBehavior - either JXStatusBar.Constraint.ResizeBehavior.FIXED
+         * or JXStatusBar.Constraint.ResizeBehavior.FILL.
          */
         public Constraint(ResizeBehavior resizeBehavior) {
             this(resizeBehavior, null);
         }
         
         /**
-         * Creates a new Constraint with the specified weight and insets.
+         * Creates a new Constraint with the specified resize behavior and insets.
          * 
-         * @param weight must be >= 0
+         * @param resizeBehavior - either JXStatusBar.Constraint.ResizeBehavior.FIXED
+         * or JXStatusBar.Constraints.ResizeBehavior.FILL.
          * @param insets may be null. If null, an Insets with 0 values will be used.
          */
         public Constraint(ResizeBehavior resizeBehavior, Insets insets) {
-//            if (weight < 0) {
-//                throw new IllegalArgumentException("weight must be >= 0");
-//            }
+            this(resizeBehavior, insets, 0);
+        }
+        
+        /**
+         * Creates a new Constraint with the specified resize behavior, insets, and
+         * minimum preferred size.
+         * 
+         * @param resizeBehavior - either JXStatusBar.Constraint.ResizeBehavior.FIXED
+         * or JXStatusBar.Constraints.ResizeBehavior.FILL.
+         * @param insets may be null. If null, an Insets with 0 values will be used.
+         * @param minPrefWidth the minimum preferred width to use with a FIXED ResizeBehavior.
+         *        This value has no meaning if the ResizeBehavior is FILL. This must be
+         *        a value >= 0.
+         */
+        public Constraint(ResizeBehavior resizeBehavior, Insets insets, int minPrefWidth) {
+            if (minPrefWidth < 0) {
+                throw new IllegalArgumentException("minPrefSize must be >= 0");
+            }
+            this.preferredWidth = minPrefWidth;
             this.resizeBehavior = resizeBehavior;
             this.insets = insets == null ? new Insets(0, 0, 0, 0) : (Insets)insets.clone();
         }
         
         /**
-         * Returns the weight.
+         * Set the preferred minimum width the component added with this 
+         * constraint will occupy on the <code>JXStatusBar</code>. Only applies
+         * to ResizeBehavior.FIXED. Will be ignored for ResizeBehavior.FILL.
+         * If component preferred size width is greater than this width, 
+         * component preferred width will be used.
+         *  
+         * @param width - minimum width component will occupy. If 0, preferred
+         * width of the component will be used. This width includes any insets.
+         * The width specified must be >= 0
+         */
+        public void setPreferredWidth(int width) {
+            if (width < 0) {
+                throw new IllegalArgumentException("width must be >= 0");
+            }
+            preferredWidth = resizeBehavior == ResizeBehavior.FIXED ? width : 0;
+        }
+        
+        /**
+         * Returns the ResizeBehavior.
          * 
-         * @return weight
+         * @return ResizeBehavior
          */
         public ResizeBehavior getResizeBehavior() {
             return resizeBehavior;
@@ -220,108 +275,14 @@ public class JXStatusBar extends JXPanel {
         public Insets getInsets() {
             return (Insets)insets.clone();
         }
+        
+        /**
+         * Get preferred width. Width is zero for resize behavior FILLED
+         * @return
+         */
+        public int getPreferredWidth() {
+        	return preferredWidth;
+        }
     }
     
-    //move to UI delegate? Probably not?
-    private static class Layout implements LayoutManager2 {
-        private Map<Component,Constraint> constraints = new HashMap<Component,Constraint>();
-        
-        public void addLayoutComponent(String name, Component comp) {
-            addLayoutComponent(comp, null);
-        }
-
-        public void addLayoutComponent(Component comp, Object constraint) {
-            //we accept an Insets, a ResizeBehavior, or a Constraint.
-            if (constraint instanceof Insets) {
-                constraint = new Constraint((Insets)constraint);
-            } else if (constraint instanceof Constraint.ResizeBehavior) {
-                constraint = new Constraint((Constraint.ResizeBehavior)constraint);
-            }
-            
-            constraints.put(comp, (Constraint)constraint);
-        }
-
-        public void removeLayoutComponent(Component comp) {
-            constraints.remove(comp);
-        }
-
-        public Dimension preferredLayoutSize(Container parent) {
-            Dimension prefSize = new Dimension();
-            for (Component comp : constraints.keySet()) {
-                Constraint c = constraints.get(comp);
-                Dimension d = comp.getPreferredSize();
-                if (c != null) {
-                    Insets i = c.getInsets();
-                    d.width += i.left + i.right;
-                    d.height += i.top + i.bottom;
-                }
-                prefSize.height = Math.max(prefSize.height, d.height);
-                prefSize.width += d.width;
-            }
-            
-            Insets insets = parent.getInsets();
-            prefSize.height += insets.top + insets.bottom;
-            prefSize.width += insets.left + insets.right;
-            return prefSize;
-        }
-
-        public Dimension minimumLayoutSize(Container parent) {
-            return preferredLayoutSize(parent);
-        }
-
-        public Dimension maximumLayoutSize(Container target) {
-            return new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
-        }
-
-        public float getLayoutAlignmentX(Container target) {
-            return .5f;
-        }
-
-        public float getLayoutAlignmentY(Container target) {
-            return .5f;
-        }
-
-        public void invalidateLayout(Container target) {
-            //I don't hold on to any state, so nothing to do here
-        }
-
-        public void layoutContainer(Container parent) {
-            //find out the maximum weight of all the visible components
-            int numFilledComponents = 0;
-            for (Component comp : parent.getComponents()) {
-                Constraint c = constraints.get(comp);
-                if (c != null && c.getResizeBehavior() == Constraint.ResizeBehavior.FILL) {
-                    numFilledComponents++;
-                }
-            }
-            double weight = 1 / numFilledComponents;
-            
-            //the amount of available space. If positive, it will be split up among
-            //all visible components that have a FILL resize behavior
-            Insets parentInsets = parent.getInsets();
-            int availableSpace = parent.getWidth() - preferredLayoutSize(parent).width;
-            //the next X location to place a component at
-            int nextX = parentInsets.left;
-            int height = parent.getHeight() - parentInsets.top - parentInsets.bottom;
-            
-            //now lay out each visible component
-            for (Component comp : parent.getComponents()) {
-                Constraint c = constraints.get(comp);
-                Constraint.ResizeBehavior rb = c == null ? null : c.getResizeBehavior();
-                Insets insets = c == null ? new Insets(0,0,0,0) : c.getInsets();
-
-                int spaceToTake = availableSpace > 0 && rb == Constraint.ResizeBehavior.FILL ? 
-                    (int)(weight * availableSpace) : 0;
-                availableSpace -= spaceToTake;
-
-                int width = comp.getPreferredSize().width + spaceToTake;
-
-                int x = nextX + insets.left;
-                int y = parentInsets.top + insets.top;
-                comp.setSize(width, height);
-                comp.setLocation(x, y);
-                nextX = x + width + insets.right;
-            }
-        }
-    }
 }

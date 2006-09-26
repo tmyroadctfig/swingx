@@ -21,9 +21,17 @@
 
 package org.jdesktop.swingx.plaf.basic;
 
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Insets;
+import java.awt.LayoutManager;
+import java.awt.LayoutManager2;
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -31,6 +39,7 @@ import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.plaf.ComponentUI;
 import org.jdesktop.swingx.JXStatusBar;
+import org.jdesktop.swingx.JXStatusBar.Constraint;
 import org.jdesktop.swingx.plaf.StatusBarUI;
 
 /**
@@ -102,6 +111,8 @@ public class BasicStatusBarUI extends StatusBarUI {
         statusBar = (JXStatusBar)c;
         
         statusBar.setBorder(BorderFactory.createEmptyBorder(4, 5, 4, 22));
+        statusBar.setLayout(createLayout());
+
     }
 
     /**
@@ -146,13 +157,154 @@ public class BasicStatusBarUI extends StatusBarUI {
             g2.drawImage(leftImage, 0, 0, leftImage.getWidth(), statusBar.getHeight(), null);
             g2.drawImage(middleImage, leftImage.getWidth(), 0, statusBar.getWidth() - leftImage.getWidth() - rightImage.getWidth(), statusBar.getHeight(), null);
             g2.drawImage(rightImage, statusBar.getWidth() - rightImage.getWidth(), 0, rightImage.getWidth(), statusBar.getHeight(), null);
+            
+            //now paint the separators
+            JSeparator sep = new JSeparator();
+            configureSeparator(sep);
+            int x = 0;
+            for (int i=0; i<statusBar.getComponentCount()-1; i++) {
+                Component comp = statusBar.getComponent(i);
+                x += comp.getWidth();
+                //paint the separator here
+                sep.setLocation(x, 0);
+                sep.paint(g);
+            }
         }
     }
 
-    @Override
-    public JSeparator createSeparator() {
-        JSeparator sep = new JSeparator(SwingConstants.VERTICAL);
+    protected void configureSeparator(JSeparator sep) {
+        sep.setOrientation(SwingConstants.VERTICAL);
         sep.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
-        return sep;
+    }
+    
+    protected LayoutManager createLayout() {
+        //This is in the UI delegate because the layout
+        //manager takes into account spacing for the separators between components
+        return new LayoutManager2() {
+            private Map<Component,Constraint> constraints = new HashMap<Component,Constraint>();
+            private JSeparator sep = new JSeparator();
+
+            public void addLayoutComponent(String name, Component comp) {
+                addLayoutComponent(comp, null);
+            }
+
+            public void addLayoutComponent(Component comp, Object constraint) {
+                //we accept an Insets, a ResizeBehavior, or a Constraint.
+                if (constraint instanceof Insets) {
+                    constraint = new Constraint((Insets)constraint);
+                } else if (constraint instanceof Constraint.ResizeBehavior) {
+                    constraint = new Constraint((Constraint.ResizeBehavior)constraint);
+                }
+
+                constraints.put(comp, (Constraint)constraint);
+            }
+
+            public void removeLayoutComponent(Component comp) {
+                constraints.remove(comp);
+            }
+
+            public Dimension preferredLayoutSize(Container parent) {
+                Dimension prefSize = new Dimension();
+                int count = 0;
+                for (Component comp : constraints.keySet()) {
+                    Constraint c = constraints.get(comp);
+                    Dimension d = comp.getPreferredSize();
+                    int prefWidth = 0;
+                    if (c != null) {
+                        Insets i = c.getInsets();
+                        d.width += i.left + i.right;
+                        d.height += i.top + i.bottom;
+                        prefWidth = c.getPreferredWidth();
+                    }
+                    prefSize.height = Math.max(prefSize.height, d.height);
+                    prefSize.width += Math.max(d.width, prefWidth);
+
+                    //If this is not the last component, add extra space between each
+                    //component (for the separator).
+                    count++;
+                    if (constraints.size() < count) {
+                        configureSeparator(sep);
+                        d = sep.getPreferredSize();
+                        prefSize.height = Math.max(prefSize.height, d.height);
+                        prefSize.width += d.width;
+                    }
+                }
+
+                Insets insets = parent.getInsets();
+                prefSize.height += insets.top + insets.bottom;
+                prefSize.width += insets.left + insets.right;
+                return prefSize;
+            }
+
+            public Dimension minimumLayoutSize(Container parent) {
+                return preferredLayoutSize(parent);
+            }
+
+            public Dimension maximumLayoutSize(Container target) {
+                return new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
+            }
+
+            public float getLayoutAlignmentX(Container target) {
+                return .5f;
+            }
+
+            public float getLayoutAlignmentY(Container target) {
+                return .5f;
+            }
+
+            public void invalidateLayout(Container target) {
+                //I don't hold on to any state, so nothing to do here
+            }
+
+            public void layoutContainer(Container parent) {
+                //find out the maximum weight of all the visible components
+                int numFilledComponents = 0;
+                for (Component comp : parent.getComponents()) {
+                    Constraint c = constraints.get(comp);
+                    if (c != null && c.getResizeBehavior() == Constraint.ResizeBehavior.FILL) {
+                        numFilledComponents++;
+                    }
+                }
+                double weight = numFilledComponents > 0 ? 1 / numFilledComponents : 0;
+
+                //the amount of available space. If positive, it will be split up among
+                //all visible components that have a FILL resize behavior
+                Insets parentInsets = parent.getInsets();
+                int availableSpace = parent.getWidth() - preferredLayoutSize(parent).width;
+                //the next X location to place a component at
+                int nextX = parentInsets.left;
+                int height = parent.getHeight() - parentInsets.top - parentInsets.bottom;
+
+                //now lay out each visible component
+                for (int i=0; i<parent.getComponentCount(); i++) {
+                    Component comp = parent.getComponent(i);
+                    Constraint c = constraints.get(comp);
+                    Constraint.ResizeBehavior rb = c == null ? null : c.getResizeBehavior();
+                    Insets insets = c == null ? new Insets(0,0,0,0) : c.getInsets();
+                    int prefWidth = c == null ? 0 : c.getPreferredWidth() - insets.left - insets.right;
+
+                    int spaceToTake = availableSpace > 0 && rb == Constraint.ResizeBehavior.FILL ? 
+                        (int)(weight * availableSpace) : 0;
+                    availableSpace -= spaceToTake;
+
+                    int width = comp.getPreferredSize().width + spaceToTake;
+                    width = Math.max(width, prefWidth);
+
+                    int x = nextX + insets.left;
+                    int y = parentInsets.top + insets.top;
+                    comp.setSize(width, height);
+                    comp.setLocation(x, y);
+                    nextX = x + width + insets.right;
+                    
+                    //If this is not the last component, add extra space
+                    //for the separator
+                    if (i < parent.getComponentCount() - 1) {
+                        configureSeparator(sep);
+                        Dimension d = sep.getPreferredSize();
+                        nextX += d.width;
+                    }
+                }
+            }
+        };
     }
 }
