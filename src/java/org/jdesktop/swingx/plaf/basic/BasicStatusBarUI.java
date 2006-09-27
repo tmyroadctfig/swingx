@@ -40,6 +40,7 @@ import javax.swing.JFrame;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.border.Border;
 import javax.swing.plaf.ComponentUI;
 import org.jdesktop.swingx.JXStatusBar;
 import org.jdesktop.swingx.JXStatusBar.Constraint;
@@ -103,7 +104,7 @@ public class BasicStatusBarUI extends StatusBarUI {
         assert c instanceof JXStatusBar;
         statusBar = (JXStatusBar)c;
         
-        statusBar.setBorder(BorderFactory.createEmptyBorder(4, 5, 4, 22));
+        statusBar.setBorder(createBorder());
         statusBar.setLayout(createLayout());
 
     }
@@ -187,6 +188,10 @@ public class BasicStatusBarUI extends StatusBarUI {
     
     protected int getSeparatorWidth() {
         return 10;
+    }
+    
+    protected Border createBorder() {
+        return BorderFactory.createEmptyBorder(4, 5, 4, 22);
     }
     
     protected LayoutManager createLayout() {
@@ -278,7 +283,8 @@ public class BasicStatusBarUI extends StatusBarUI {
                 //the amount of available space. If positive, it will be split up among
                 //all visible components that have a FILL resize behavior
                 Insets parentInsets = parent.getInsets();
-                int availableSpace = parent.getWidth() - preferredLayoutSize(parent).width;
+                int availableSpace = parent.getWidth() - preferredLayoutSize(parent).width
+                        - parentInsets.left - parentInsets.right;
                 //the next X location to place a component at
                 int nextX = parentInsets.left;
                 int height = parent.getHeight() - parentInsets.top - parentInsets.bottom;
