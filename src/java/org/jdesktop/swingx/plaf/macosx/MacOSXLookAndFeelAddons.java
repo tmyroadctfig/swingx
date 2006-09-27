@@ -18,8 +18,8 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package org.jdesktop.swingx.plaf.aqua;
+package org.jdesktop.swingx.plaf.macosx;
 
 import org.jdesktop.swingx.plaf.basic.BasicLookAndFeelAddons;
 
-public class AquaLookAndFeelAddons extends BasicLookAndFeelAddons {}
+public class MacOSXLookAndFeelAddons extends BasicLookAndFeelAddons {}

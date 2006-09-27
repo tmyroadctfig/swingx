@@ -31,7 +31,7 @@ import javax.swing.JComponent;
 import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 
-import org.jdesktop.swingx.plaf.aqua.AquaLookAndFeelAddons;
+import org.jdesktop.swingx.plaf.macosx.MacOSXLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.motif.MotifLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.windows.WindowsClassicLookAndFeelAddons;
@@ -217,7 +217,7 @@ public class LookAndFeelAddons {
     String addon = WindowsClassicLookAndFeelAddons.class.getName();
 
     if (OS.isMacOSX()) {
-      addon = AquaLookAndFeelAddons.class.getName();
+      addon = MacOSXLookAndFeelAddons.class.getName();
     } else if (OS.isWindows()) {
       // see whether of not visual styles are used
       if (OS.isUsingWindowsVisualStyles()) {

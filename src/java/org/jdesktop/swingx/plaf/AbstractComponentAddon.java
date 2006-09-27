@@ -27,7 +27,7 @@ import java.util.ResourceBundle;
 
 import javax.swing.UIManager;
 
-import org.jdesktop.swingx.plaf.aqua.AquaLookAndFeelAddons;
+import org.jdesktop.swingx.plaf.macosx.MacOSXLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.motif.MotifLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.windows.WindowsLookAndFeelAddons;
@@ -40,11 +40,11 @@ import org.jdesktop.swingx.plaf.windows.WindowsLookAndFeelAddons;
 public abstract class AbstractComponentAddon implements ComponentAddon {
 
   private String name;
-  
+
   protected AbstractComponentAddon(String name) {
     this.name = name;
   }
-  
+
   public final String getName() {
     return name;
   }
@@ -85,7 +85,7 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
   protected void addMetalDefaults(LookAndFeelAddons addon, List<Object> defaults) {
     addBasicDefaults(addon, defaults);
   }
-  
+
   /**
    * Default implementation calls {@link #addBasicDefaults(LookAndFeelAddons, List)}
    * 
@@ -105,7 +105,7 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
   protected void addWindowsDefaults(LookAndFeelAddons addon, List<Object> defaults) {
     addBasicDefaults(addon, defaults);
   }
-    
+
   /**
    * Gets the defaults for the given addon.
    * 
@@ -157,33 +157,33 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
   protected void addResource(List<Object> defaults, String bundleName) {
     ResourceBundle bundle = ResourceBundle.getBundle(bundleName);
     for (Enumeration<String> keys = bundle.getKeys(); keys.hasMoreElements(); ) {
-      String key = keys.nextElement();      
+      String key = keys.nextElement();
       defaults.add(key);
       defaults.add(bundle.getObject(key));
     }
   }
-  
+
   /**
    * @return true if the addon is the Windows addon or its subclasses
    */
   protected boolean isWindows(LookAndFeelAddons addon) {
     return addon instanceof WindowsLookAndFeelAddons;
   }
-  
+
   /**
    * @return true if the addon is the Metal addon or its subclasses
    */
   protected boolean isMetal(LookAndFeelAddons addon) {
     return addon instanceof MetalLookAndFeelAddons;
   }
-  
+
   /**
    * @return true if the addon is the Aqua addon or its subclasses
    */
   protected boolean isMac(LookAndFeelAddons addon) {
-    return addon instanceof AquaLookAndFeelAddons;
+    return addon instanceof MacOSXLookAndFeelAddons;
   }
-  
+
   /**
    * @return true if the addon is the Motif addon or its subclasses
    */
@@ -202,7 +202,7 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
    * @return true if the current look and feel is Synth l&f
    */
   protected boolean isSynth() {
-    return UIManager.getLookAndFeel().getClass().getName().contains("ynth");    
+    return UIManager.getLookAndFeel().getClass().getName().contains("ynth");
   }
-  
+
 }

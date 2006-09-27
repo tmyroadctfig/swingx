@@ -34,4 +34,8 @@ public class JXMonthViewAddon extends AbstractComponentAddon {
                 "JXMonthView.boxPaddingY", 3
         }));
     }
+
+    protected void addMacDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+        super.addMacDefaults(addon, defaults);
+    }
 }

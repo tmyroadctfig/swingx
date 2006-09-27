@@ -18,7 +18,6 @@ import javax.swing.UIManager;
 
 import org.jdesktop.swingx.icon.EmptyIcon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
-import org.jdesktop.swingx.plaf.aqua.AquaLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
 import org.jdesktop.swingx.util.PropertyChangeReport;
 
@@ -129,7 +128,7 @@ public class JXTaskPaneTest extends InteractiveTestCase {
   public void testActions() throws Exception {
     JXTaskPane taskPane = new JXTaskPane();
     Action action = new AbstractAction() {
-      public void actionPerformed(java.awt.event.ActionEvent e) {};
+      public void actionPerformed(java.awt.event.ActionEvent e) {}
     };
     assertEquals(0, taskPane.getContentPane().getComponentCount());
     Component component = taskPane.add(action);
@@ -159,7 +158,7 @@ public class JXTaskPaneTest extends InteractiveTestCase {
         }
       }
     }
-    ;
+
     ListenForEvents listener = new ListenForEvents();
 
     // register a listener on the animation

@@ -14,7 +14,7 @@ import javax.swing.plaf.metal.MetalTheme;
 import javax.swing.plaf.metal.OceanTheme;
 
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
-import org.jdesktop.swingx.plaf.aqua.AquaLookAndFeelAddons;
+import org.jdesktop.swingx.plaf.macosx.MacOSXLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.motif.MotifLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.windows.WindowsClassicLookAndFeelAddons;
@@ -31,7 +31,7 @@ public class TestUtilities {
    * themselves.
    */
   public static void cycleAddons(JComponent component) throws Exception {
-    LookAndFeelAddons.setAddon(AquaLookAndFeelAddons.class.getName());
+    LookAndFeelAddons.setAddon(MacOSXLookAndFeelAddons.class.getName());
     component.updateUI();
 
     MetalTheme oldTheme = MetalLookAndFeel.getCurrentTheme();
