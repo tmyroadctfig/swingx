@@ -43,7 +43,7 @@ import org.jdesktop.swingx.JXStatusBar.Constraint;
 import org.jdesktop.swingx.plaf.basic.BasicStatusBarUI;
 
 /**
- *
+ * TODO: Need to add listener to resize handle
  * @author rbair
  */
 public class WindowsStatusBarUI extends BasicStatusBarUI {
