@@ -79,12 +79,17 @@ public class WindowsClassicStatusBarUI extends BasicStatusBarUI {
         Border b = BorderFactory.createBevelBorder(BevelBorder.LOWERED, 
                 Color.WHITE, bar.getBackground(), bar.getBackground(), Color.GRAY);
         for (Component c : bar.getComponents()) {
-            Insets insets = b.getBorderInsets(c);
-            int x = c.getX() - insets.left;
-            int y = c.getY() - insets.top;
+//            Insets insets = b.getBorderInsets(c);
+            Insets insets = new Insets(0, 0, 0, 0);
+            getSeparatorInsets(insets);
+            int x = c.getX() - insets.right;
+            int y = c.getY() - 2;
             int w = c.getWidth() + insets.left + insets.right;
-            int h = c.getHeight() + insets.top + insets.bottom;
-            
+            int h = c.getHeight() + 4;
+//            int x = c.getX();
+//            int y = c.getY();
+//            int w = c.getWidth();
+//            int h = c.getHeight();
             b.paintBorder(c, g, x, y, w, h);
         }
     }
@@ -92,4 +97,13 @@ public class WindowsClassicStatusBarUI extends BasicStatusBarUI {
     protected void paintSeparator(Graphics2D g, JXStatusBar bar, int x, int y, int w, int h) {
         //paint nothing, since paintBackground handles this
     }
+
+    protected int getSeparatorWidth() {
+        return 11;
+    }
+
+    protected Border createBorder() {
+        return BorderFactory.createEmptyBorder(4, 5, 3, 22);
+    }
+    
 }
