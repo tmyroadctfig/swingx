@@ -21,6 +21,7 @@
 
 package org.jdesktop.swingx.plaf.basic;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -38,6 +39,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 import org.jdesktop.swingx.JXStatusBar;
 import org.jdesktop.swingx.JXStatusBar.Constraint;
@@ -52,19 +54,9 @@ public class BasicStatusBarUI extends StatusBarUI {
      * The one and only JXStatusBar for this UI delegate
      */
     private JXStatusBar statusBar;
-    private BufferedImage leftImage;
-    private BufferedImage middleImage;
-    private BufferedImage rightImage;
     
     /** Creates a new instance of BasicStatusBarUI */
     public BasicStatusBarUI() {
-        try {
-            leftImage = ImageIO.read(getClass().getResource("resources/statusbar-left.png"));
-            middleImage = ImageIO.read(getClass().getResource("resources/statusbar-middle.png"));
-            rightImage = ImageIO.read(getClass().getResource("resources/statusbar-right.png"));
-        } catch (Exception e) {
-            //hmmmm... should log this I guess
-        }
     }
     
     /**
@@ -152,35 +144,51 @@ public class BasicStatusBarUI extends StatusBarUI {
         
         //paint the background if opaque
         if (statusBar.isOpaque()) {
-            //if bidi, reverse the image painting order
-            //TODO need to handle vertical stretching better
             Graphics2D g2 = (Graphics2D)g;
-            g2.drawImage(leftImage, 0, 0, leftImage.getWidth(), statusBar.getHeight(), null);
-            g2.drawImage(middleImage, leftImage.getWidth(), 0, statusBar.getWidth() - leftImage.getWidth() - rightImage.getWidth(), statusBar.getHeight(), null);
-            g2.drawImage(rightImage, statusBar.getWidth() - rightImage.getWidth(), 0, rightImage.getWidth(), statusBar.getHeight(), null);
+            paintBackground(g2, statusBar);
             
             //now paint the separators
-            JSeparator sep = new JSeparator();
-            configureSeparator(sep);
+            Insets sepInsets = new Insets(0, 0, 0, 0);
+            getSeparatorInsets(sepInsets);
             for (int i=0; i<statusBar.getComponentCount()-1; i++) {
                 Component comp = statusBar.getComponent(i);
-                int x = comp.getX() + comp.getWidth();
-                x += sep.getWidth() / 2;
-                Insets sepInsets = sep.getInsets();
-                int height = c.getHeight() - sepInsets.top - sepInsets.bottom;
-                //paint the separator here
-                g.setColor(sep.getForeground());
-                g.drawLine(x, sepInsets.top, x, height);
-
-                g.setColor(sep.getBackground());
-                g.drawLine(x+1, sepInsets.top, x+1, height);
+                int x = comp.getX() + comp.getWidth() + sepInsets.left;
+                int y = sepInsets.top;
+                int w = getSeparatorWidth() - sepInsets.left - sepInsets.right;
+                int h = c.getHeight() - sepInsets.top - sepInsets.bottom;
+                
+                paintSeparator(g2, statusBar, x, y, w, h);
             }
         }
     }
 
-    protected void configureSeparator(JSeparator sep) {
-        sep.setOrientation(SwingConstants.VERTICAL);
-        sep.setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 5));
+    //----------------------------------------------------- Extension Points
+    protected void paintBackground(Graphics2D g, JXStatusBar bar) {
+        g.setColor(bar.getBackground());
+        g.fillRect(0, 0, bar.getWidth(), bar.getHeight());
+    }
+    
+    protected void paintSeparator(Graphics2D g, JXStatusBar bar, int x, int y, int w, int h) {
+        Color fg = UIManager.getColor("Separator.foreground");
+        Color bg = UIManager.getColor("Separator.background");
+        
+        x += w / 2;
+        g.setColor(fg);
+        g.drawLine(x, y, x, h);
+
+        g.setColor(bg);
+        g.drawLine(x+1, y, x+1, h);
+    }
+    
+    protected void getSeparatorInsets(Insets insets) {
+        insets.top = 4;
+        insets.left = 4;
+        insets.bottom = 2;
+        insets.right = 4;
+    }
+    
+    protected int getSeparatorWidth() {
+        return 10;
     }
     
     protected LayoutManager createLayout() {
@@ -188,7 +196,6 @@ public class BasicStatusBarUI extends StatusBarUI {
         //manager takes into account spacing for the separators between components
         return new LayoutManager2() {
             private Map<Component,Constraint> constraints = new HashMap<Component,Constraint>();
-            private JSeparator sep = new JSeparator();
 
             public void addLayoutComponent(String name, Component comp) {
                 addLayoutComponent(comp, null);
@@ -229,10 +236,7 @@ public class BasicStatusBarUI extends StatusBarUI {
                     //component (for the separator).
                     count++;
                     if (constraints.size() < count) {
-                        configureSeparator(sep);
-                        d = sep.getPreferredSize();
-                        prefSize.height = Math.max(prefSize.height, d.height);
-                        prefSize.width += d.width;
+                        prefSize.width += getSeparatorWidth();
                     }
                 }
 
@@ -305,9 +309,7 @@ public class BasicStatusBarUI extends StatusBarUI {
                     //If this is not the last component, add extra space
                     //for the separator
                     if (i < parent.getComponentCount() - 1) {
-                        configureSeparator(sep);
-                        Dimension d = sep.getPreferredSize();
-                        nextX += d.width;
+                        nextX += getSeparatorWidth();
                     }
                 }
             }

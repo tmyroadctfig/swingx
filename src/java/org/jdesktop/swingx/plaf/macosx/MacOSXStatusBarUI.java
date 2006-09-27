@@ -128,14 +128,4 @@ public class MacOSXStatusBarUI extends StatusBarUI {
     public void uninstallUI(JComponent c) {
         assert c instanceof JXStatusBar;
     }
-
-    @Override
-    public void paint(Graphics g, JComponent c) {
-        super.paint(g, c);
-    }
-
-    public void configureSeparator(JSeparator sep) {
-        sep.setOrientation(SwingConstants.VERTICAL);
-        sep.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
-    }
 }
