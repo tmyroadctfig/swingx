@@ -196,7 +196,23 @@ public class JXStatusBar extends JXPanel {
          * @param minPrefWidth must be >= 0
          */
         public Constraint(int minPrefWidth) {
-            this(ResizeBehavior.FIXED, null, minPrefWidth);
+            this(minPrefWidth, null);
+        }
+        
+        /**
+         * Creates a new Constraint with default FIXED behaviour and the given minimum
+         * preferred width, and using the given Insets.
+         * 
+         * @param minPrefWidth must be >= 0
+         * @param insets may be null. If null, an Insets with 0 values will be used.
+         */
+        public Constraint(int minPrefWidth, Insets insets) {
+            if (minPrefWidth < 0) {
+                throw new IllegalArgumentException("minPrefSize must be >= 0");
+            }
+            this.preferredWidth = minPrefWidth;
+            this.insets = insets == null ? new Insets(0, 0, 0, 0) : (Insets)insets.clone();
+            this.resizeBehavior = resizeBehavior.FIXED;
         }
         
         /**
@@ -217,25 +233,6 @@ public class JXStatusBar extends JXPanel {
          * @param insets may be null. If null, an Insets with 0 values will be used.
          */
         public Constraint(ResizeBehavior resizeBehavior, Insets insets) {
-            this(resizeBehavior, insets, 0);
-        }
-        
-        /**
-         * Creates a new Constraint with the specified resize behavior, insets, and
-         * minimum preferred size.
-         * 
-         * @param resizeBehavior - either JXStatusBar.Constraint.ResizeBehavior.FIXED
-         * or JXStatusBar.Constraints.ResizeBehavior.FILL.
-         * @param insets may be null. If null, an Insets with 0 values will be used.
-         * @param minPrefWidth the minimum preferred width to use with a FIXED ResizeBehavior.
-         *        This value has no meaning if the ResizeBehavior is FILL. This must be
-         *        a value >= 0.
-         */
-        public Constraint(ResizeBehavior resizeBehavior, Insets insets, int minPrefWidth) {
-            if (minPrefWidth < 0) {
-                throw new IllegalArgumentException("minPrefSize must be >= 0");
-            }
-            this.preferredWidth = minPrefWidth;
             this.resizeBehavior = resizeBehavior;
             this.insets = insets == null ? new Insets(0, 0, 0, 0) : (Insets)insets.clone();
         }
