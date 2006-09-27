@@ -1021,7 +1021,7 @@ public class JXMonthView extends JComponent {
     }
 
     /**
-     * Set the color to be used for painting the foregroudn of a flagged day.
+     * Set the color to be used for painting the foreground of a flagged day.
      *
      * @param c The color to be used for painting.
      */

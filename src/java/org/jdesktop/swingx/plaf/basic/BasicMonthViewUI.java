@@ -6,7 +6,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
-import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
@@ -22,6 +21,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DateFormatSymbols;
@@ -94,6 +94,8 @@ public class BasicMonthViewUI extends MonthViewUI {
     private Font derivedFont;
     private Color weekOfTheYearForeground;
     private Color unselectableDayForeground;
+    private Color leadingDayForeground;
+    private Color trailingDayForeground;
 
     /**
      * Date span used by the keyboard actions to track the original selection.
@@ -108,6 +110,8 @@ public class BasicMonthViewUI extends MonthViewUI {
     private int numCalRows = 1;
     /** The number of calendars able to be displayed vertically. */
     private int numCalCols = 1;
+    private Rectangle[] monthStringBounds = new Rectangle[12];
+    private Rectangle[] yearStringBounds = new Rectangle[12];
 
 
     @SuppressWarnings({"UNUSED_SYMBOL"})
@@ -168,6 +172,8 @@ public class BasicMonthViewUI extends MonthViewUI {
         monthUpImage = new ImageIcon(
                 JXMonthView.class.getResource(UIManager.getString("JXMonthView.monthUpFileName")));
         weekOfTheYearForeground = UIManager.getColor("JXMonthView.weekOfTheYearForeground");
+        leadingDayForeground = UIManager.getColor("JXMonthView.leadingDayForeground");
+        trailingDayForeground = UIManager.getColor("JXMonthView.trailingDayForeground");
         unselectableDayForeground = UIManager.getColor("JXMonthView.unselectableDayForeground");
     }
 
@@ -719,6 +725,9 @@ public class BasicMonthViewUI extends MonthViewUI {
         paintMonthStringBackground(g, x, y,
                 width, boxPaddingY + monthBoxHeight + boxPaddingY);
 
+        paintMonthStringForeground(g, x, y,
+                width, boxPaddingY + monthBoxHeight + boxPaddingY);
+
         // Paint arrow buttons for traversing months if enabled.
         if (monthView.isTraversable()) {
             g.drawImage(monthDownImage.getImage(),
@@ -727,33 +736,18 @@ public class BasicMonthViewUI extends MonthViewUI {
                     y + ((fullMonthBoxHeight - monthDownImage.getIconHeight()) / 2), null);
         }
 
-        // Paint month name.
-        Font oldFont = monthView.getFont();
-        g.setFont(derivedFont);
-        FontMetrics fm = monthView.getFontMetrics(derivedFont);
-        String monthName = monthsOfTheYear[cal.get(Calendar.MONTH)];
-        monthName = monthName + " " + cal.get(Calendar.YEAR);
-
-        g.setColor(monthView.getMonthStringForeground());
-        int tmpX =
-                x + (calendarWidth / 2) -
-                        (fm.stringWidth(monthName) / 2);
-        int tmpY = y + boxPaddingY + ((monthBoxHeight - boxHeight) / 2) +
-                fm.getAscent();
-        g.drawString(monthName, tmpX, tmpY);
-        g.setFont(oldFont);
-
         // Paint background of the short names for the days of the week.
-        tmpX = ltr ? x + (showingWeekNumber ? fullBoxWidth : 0) : x;
-        tmpY = y + fullMonthBoxHeight;
+        int tmpX = ltr ? x + (showingWeekNumber ? fullBoxWidth : 0) : x;
+        int tmpY = y + fullMonthBoxHeight;
         int tmpWidth = width - (showingWeekNumber ? fullBoxWidth : 0);
         paintDayOfTheWeekBackground(g, tmpX, tmpY, tmpWidth, fullBoxHeight);
 
         // Paint short representation of day of the week.
         int dayIndex = monthView.getFirstDayOfWeek() - 1;
+        Font oldFont = monthView.getFont();
         g.setFont(derivedFont);
         g.setColor(monthView.getDaysOfTheWeekForeground());
-        fm = monthView.getFontMetrics(derivedFont);
+        FontMetrics fm = monthView.getFontMetrics(derivedFont);
         String[] daysOfTheWeek = monthView.getDaysOfTheWeek();
         for (int i = 0; i < JXMonthView.DAYS_IN_WEEK; i++) {
             tmpX = ltr ?
@@ -776,7 +770,6 @@ public class BasicMonthViewUI extends MonthViewUI {
             }
         }
         g.setFont(oldFont);
-
 
         if (showingWeekNumber) {
             tmpX = ltr ? x : x + width - fullBoxWidth;
@@ -946,12 +939,42 @@ public class BasicMonthViewUI extends MonthViewUI {
         width = width - monthStringInsets.left - monthStringInsets.right;
         height = height - monthStringInsets.top - monthStringInsets.bottom;
 
-        Graphics2D g2 = (Graphics2D)g;
-        GradientPaint gp = new GradientPaint(x, y + height, new Color(238, 238, 238), x, y, new Color(204, 204, 204));
-        g2.setPaint(gp);
-        g2.fillRect(x, y, width - 1, height - 1);
-        g2.setPaint(new Color(153, 153, 153));
-        g2.drawRect(x, y, width - 1, height - 1);
+        g.setColor(monthView.getMonthStringBackground());
+        g.fillRect(x, y, width, height);
+    }
+
+    protected void paintMonthStringForeground(Graphics g, int x, int y,
+                                              int width, int height) {
+        // Paint month name.
+        Calendar cal = monthView.getCalendar();
+        Font oldFont = monthView.getFont();
+        g.setFont(derivedFont);
+        FontMetrics fm = monthView.getFontMetrics(derivedFont);
+        int month = cal.get(Calendar.MONTH);
+        String monthName = monthsOfTheYear[month];
+        String yearString = Integer.toString(cal.get(Calendar.YEAR));
+
+        Rectangle2D rect = fm.getStringBounds(monthName, g);
+        monthStringBounds[month] = new Rectangle((int) rect.getX(), (int) rect.getY(),
+                (int) rect.getWidth(), (int) rect.getHeight());
+        int spaceWidth = (int) fm.getStringBounds(" ", g).getWidth();
+        rect = fm.getStringBounds(yearString, g);
+        yearStringBounds[month] = new Rectangle((int) rect.getX(), (int) rect.getY(),
+                (int) rect.getWidth(), (int) rect.getHeight());
+
+        g.setColor(monthView.getMonthStringForeground());
+        int tmpX =
+                x + (calendarWidth / 2) -
+                        ((monthStringBounds[month].width + yearStringBounds[month].width + spaceWidth) / 2);
+        int tmpY = y + boxPaddingY + ((monthBoxHeight - boxHeight) / 2) +
+                fm.getAscent();
+        monthStringBounds[month].x = tmpX;
+        yearStringBounds[month].x = (monthStringBounds[month].x + monthStringBounds[month].width +
+                spaceWidth);
+
+        g.drawString(monthName, monthStringBounds[month].x, tmpY);
+        g.drawString(yearString, yearStringBounds[month].x, tmpY);
+        g.setFont(oldFont);
     }
 
     /**
@@ -976,11 +999,8 @@ public class BasicMonthViewUI extends MonthViewUI {
         // If the date is today make sure we draw it's background over the selected
         // background.
         if (isToday(date)) {
-            // Paint the gradiented border
-            GradientPaint gp = new GradientPaint(x, y, new Color(91, 123, 145), x, y + height, new Color(68, 86, 98));
-            Graphics2D g2 = (Graphics2D)g;
-            g2.setPaint(gp);
-            g2.drawRect(x, y, width - 1, height - 1);
+            g.setColor(monthView.getTodayBackground());
+            g.drawRect(x, y, width - 1, height - 1);
         }
     }
 
@@ -1131,8 +1151,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         String numericDay = dayOfMonthFormatter.format(date);
         FontMetrics fm;
 
-        // TODO: Change this to a UI property
-        g.setColor(Color.LIGHT_GRAY);
+        g.setColor(leadingDayForeground);
 
         int boxPaddingX = monthView.getBoxPaddingX();
         int boxPaddingY = monthView.getBoxPaddingY();
@@ -1172,7 +1191,22 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param date long value representing the leading day being painted
      */
     protected void paintTrailingDayForeground(Graphics g, int x, int y, int width, int height, long date) {
-        paintLeadingDayForeground(g, x, y, width, height, date);
+        String numericDay = dayOfMonthFormatter.format(date);
+        FontMetrics fm;
+
+        g.setColor(trailingDayForeground);
+
+        int boxPaddingX = monthView.getBoxPaddingX();
+        int boxPaddingY = monthView.getBoxPaddingY();
+
+        fm = g.getFontMetrics();
+        g.drawString(numericDay,
+                ltr ?
+                        x + boxPaddingX +
+                                boxWidth - fm.stringWidth(numericDay) :
+                        x + boxPaddingX +
+                                boxWidth - fm.stringWidth(numericDay) - 1,
+                y + boxPaddingY + fm.getAscent());
     }
 
     private long cleanupDate(long date) {
