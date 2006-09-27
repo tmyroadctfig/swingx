@@ -21,6 +21,7 @@
 
 package org.jdesktop.swingx.plaf.windows;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -38,6 +39,8 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
 import javax.swing.plaf.ComponentUI;
 import org.jdesktop.swingx.JXStatusBar;
 import org.jdesktop.swingx.JXStatusBar.Constraint;
@@ -65,5 +68,28 @@ public class WindowsClassicStatusBarUI extends BasicStatusBarUI {
      */
     public static ComponentUI createUI(JComponent c) {
         return new WindowsClassicStatusBarUI();
-    }	
+    }
+    
+    protected void paintBackground(Graphics2D g, JXStatusBar bar) {        
+        g.setColor(bar.getBackground());
+        g.fillRect(0, 0, bar.getWidth(), bar.getHeight());
+        
+        //paint an inset border around each component. This suggests that
+        //there is an extra border around the status bar...!
+        Border b = BorderFactory.createBevelBorder(BevelBorder.LOWERED, 
+                Color.WHITE, bar.getBackground(), bar.getBackground(), Color.GRAY);
+        for (Component c : bar.getComponents()) {
+            Insets insets = b.getBorderInsets(c);
+            int x = c.getX() - insets.left;
+            int y = c.getY() - insets.top;
+            int w = c.getWidth() + insets.left + insets.right;
+            int h = c.getHeight() + insets.top + insets.bottom;
+            
+            b.paintBorder(c, g, x, y, w, h);
+        }
+    }
+    
+    protected void paintSeparator(Graphics2D g, JXStatusBar bar, int x, int y, int w, int h) {
+        //paint nothing, since paintBackground handles this
+    }
 }
