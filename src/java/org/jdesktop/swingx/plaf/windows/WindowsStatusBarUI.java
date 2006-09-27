@@ -47,10 +47,6 @@ import org.jdesktop.swingx.plaf.basic.BasicStatusBarUI;
  * @author rbair
  */
 public class WindowsStatusBarUI extends BasicStatusBarUI {
-    /**
-     * The one and only JXStatusBar for this UI delegate
-     */
-    private JXStatusBar statusBar;
     private BufferedImage leftImage;
     private BufferedImage middleImage;
     private BufferedImage rightImage;
@@ -80,7 +76,7 @@ public class WindowsStatusBarUI extends BasicStatusBarUI {
         return new WindowsStatusBarUI();
     }	
 
-    protected void paintBackground(Graphics2D g, JXStatusBar bar) {
+    protected void paintBackground(Graphics2D g, JXStatusBar statusBar) {
         //if bidi, reverse the image painting order
         //TODO need to handle vertical stretching better
         Graphics2D g2 = (Graphics2D)g;
