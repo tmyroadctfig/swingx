@@ -35,6 +35,7 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.plaf.ComponentUI;
@@ -161,20 +162,25 @@ public class BasicStatusBarUI extends StatusBarUI {
             //now paint the separators
             JSeparator sep = new JSeparator();
             configureSeparator(sep);
-            int x = 0;
             for (int i=0; i<statusBar.getComponentCount()-1; i++) {
                 Component comp = statusBar.getComponent(i);
-                x += comp.getWidth();
+                int x = comp.getX() + comp.getWidth();
+                x += sep.getWidth() / 2;
+                Insets sepInsets = sep.getInsets();
+                int height = c.getHeight() - sepInsets.top - sepInsets.bottom;
                 //paint the separator here
-                sep.setLocation(x, 0);
-                sep.paint(g);
+                g.setColor(sep.getForeground());
+                g.drawLine(x, sepInsets.top, x, height);
+
+                g.setColor(sep.getBackground());
+                g.drawLine(x+1, sepInsets.top, x+1, height);
             }
         }
     }
 
     protected void configureSeparator(JSeparator sep) {
         sep.setOrientation(SwingConstants.VERTICAL);
-        sep.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
+        sep.setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 5));
     }
     
     protected LayoutManager createLayout() {
