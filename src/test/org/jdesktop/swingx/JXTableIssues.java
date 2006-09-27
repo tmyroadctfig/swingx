@@ -27,6 +27,8 @@ import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.Collator;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,22 +39,23 @@ import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
+import org.jdesktop.swingx.JXTable.GenericEditor;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.SortKey;
-import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.util.AncientSwingTeam;
@@ -357,6 +360,81 @@ public class JXTableIssues extends InteractiveTestCase {
     
     }
 
+    /**
+     * Issue #393-swingx: localized NumberEditor.
+     * 
+     * Playing ... Nearly working ... but not reliably.
+     *
+     */
+    public void interactiveFloatingPointEditor(){
+        DefaultTableModel model = new DefaultTableModel(10, 3) {
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                if (columnIndex == 0) {
+                    return Double.class;
+                }
+                if (columnIndex == 1) {
+                    return Integer.class;
+                }
+                return Object.class;
+            }
+            
+        };
+        JXTable table = new JXTable(model);
+        table.setSurrendersFocusOnKeystroke(true);
+        table.setValueAt(10.2f, 0, 0);
+        table.setDefaultEditor(Double.class, new DoubleEditor());
+        table.setDefaultEditor(Float.class, new DoubleEditor());
+        showWithScrollingInFrame(table, "localized NumberFormatter in first float column?");
+        
+    }
+    
+    public static class DoubleEditor extends GenericEditor {
+        
+        public DoubleEditor() {
+            this((NumberFormat) null);
+        }
+        
+        public DoubleEditor(NumberFormat format) {
+            this(new JFormattedTextField(format != null ? format :
+                NumberFormat.getInstance()));
+        }
+        
+        public DoubleEditor(final JFormattedTextField textField) {
+            super(textField);
+            removeDefaultCellEditorDelegate(textField);
+            System.out.println("listener count" + textField.getActionListeners().length);
+            delegate = new EditorDelegate() {
+                public void setValue(Object value) {
+                    textField.setValue(value);
+                }
+
+                public Object getCellEditorValue() {
+                    try {
+                        textField.commitEdit();
+                        return String.valueOf(textField.getValue());
+                    } catch (ParseException e) {
+                        // TODO Auto-generated catch block
+                        return null;
+                    }
+                }
+            };
+            textField.addActionListener(delegate);
+            textField.setHorizontalAlignment(JTextField.RIGHT);
+        }
+
+        private void removeDefaultCellEditorDelegate(final JFormattedTextField textField) {
+            ActionListener[] listeners = textField.getActionListeners();
+            for (int i = 0; i < listeners.length; i++) {
+                if (listeners[i].getClass().getName().contains("DefaultCellEditor")) {
+                    textField.removeActionListener(listeners[i]);
+                    return;
+                }
+            }
+        }
+
+    }
     
     public void interactiveDeleteRowAboveSelection() {
         CompareTableBehaviour compare = new CompareTableBehaviour(new Object[] { "A", "B", "C", "D", "E", "F", "G", "H", "I" });
