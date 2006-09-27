@@ -78,18 +78,13 @@ public class WindowsClassicStatusBarUI extends BasicStatusBarUI {
         //there is an extra border around the status bar...!
         Border b = BorderFactory.createBevelBorder(BevelBorder.LOWERED, 
                 Color.WHITE, bar.getBackground(), bar.getBackground(), Color.GRAY);
+        Insets insets = new Insets(0, 0, 0, 0);
         for (Component c : bar.getComponents()) {
-//            Insets insets = b.getBorderInsets(c);
-            Insets insets = new Insets(0, 0, 0, 0);
             getSeparatorInsets(insets);
             int x = c.getX() - insets.right;
             int y = c.getY() - 2;
             int w = c.getWidth() + insets.left + insets.right;
             int h = c.getHeight() + 4;
-//            int x = c.getX();
-//            int y = c.getY();
-//            int w = c.getWidth();
-//            int h = c.getHeight();
             b.paintBorder(c, g, x, y, w, h);
         }
     }
