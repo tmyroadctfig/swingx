@@ -63,7 +63,7 @@ public class JXStatusBarAddon extends AbstractComponentAddon {
     
     protected void addWindowsDefaults(LookAndFeelAddons addon, List<Object> defaults) {
         super.addWindowsDefaults(addon, defaults);
-        if (OS.isWindowsXP()) {
+        if (OS.isUsingWindowsVisualStyles()) {
             defaults.addAll(Arrays.asList(new Object[] {
                 JXStatusBar.uiClassID,
                 "org.jdesktop.swingx.plaf.windows.WindowsStatusBarUI"
