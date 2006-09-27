@@ -140,8 +140,6 @@ public class BasicStatusBarUI extends StatusBarUI {
 
     @Override
     public void paint(Graphics g, JComponent c) {
-        super.paint(g, c);
-        
         //paint the background if opaque
         if (statusBar.isOpaque()) {
             Graphics2D g2 = (Graphics2D)g;
