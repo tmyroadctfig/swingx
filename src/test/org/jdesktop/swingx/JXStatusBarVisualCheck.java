@@ -90,10 +90,10 @@ public class JXStatusBarVisualCheck extends InteractiveTestCase {
         panel.add(createIconLabel("resources/images/eclipse_win2k_narrow.png"));
         panel.add(createIconLabel("resources/images/eclipse_win2k_empty.png"));
         final JXFrame frame = wrapInFrame(panel, "Compare with screenshots");
-        JXStatusBar statusBar = getStatusBar(frame);
         // JW: this is a hack .. add an empty label to force the following
         // components to trailing
-        statusBar.add(new JLabel(), JXStatusBar.Constraint.ResizeBehavior.FILL);
+        addMessage(frame, "");
+        JXStatusBar statusBar = getStatusBar(frame);
         statusBar.add(new JLabel("Writable")); // , JLabel.TRAILING);
         final JLabel insertLabel = new JLabel("Smart Insert");
         statusBar.add(insertLabel); //, JLabel.TRAILING);
@@ -127,13 +127,13 @@ public class JXStatusBarVisualCheck extends InteractiveTestCase {
      */
     public void interactiveRToL() {
         final JComponent panel = new JXPanel(); 
-        panel.add(new JLabel("first"));
-        panel.add(new JLabel("last"));
+        panel.add(new JLabel("leading"));
+        panel.add(new JLabel("trailing"));
         panel.setBorder(new TitledBorder("FlowLayout"));
         final JXFrame frame = wrapWithScrollingInFrame(panel, "Bidi-compliance of StatusBar");
+        addMessage(frame, "leading");
         JXStatusBar statusBar = getStatusBar(frame);
-        statusBar.add(new JLabel("first"));
-        statusBar.add(new JLabel("last"));
+        statusBar.add(new JLabel("trailing"));
         Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
 
             public void actionPerformed(ActionEvent e) {

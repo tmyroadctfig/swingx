@@ -206,7 +206,7 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
 
     public void addMessage(JXFrame frame, String message) {
         JXStatusBar statusBar = getStatusBar(frame);
-        statusBar.add(new JLabel(message));
+        statusBar.add(new JLabel(message), JXStatusBar.Constraint.ResizeBehavior.FILL);
     }
 
     /**
