@@ -339,9 +339,15 @@ public abstract class Filter {
         if (reset) {
             reset();
         }
-
         filter();
+        fireFilterChanged();
+    }
 
+    /**
+     * Notifies interested parties that this filter has changed.
+     * 
+     */
+    protected void fireFilterChanged() {
         // trigger direct notification; will cascade to next in pipeline, if any
         if (pipeline != null) {
             if (pipeline.contains(this)) {
