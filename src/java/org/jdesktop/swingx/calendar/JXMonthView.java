@@ -625,8 +625,10 @@ public class JXMonthView extends JComponent {
      */
     public void setUnselectableDates(long[] unselectableDates) {
         SortedSet<Date> unselectableSet = new TreeSet<Date>();
-        for (long unselectableDate : unselectableDates) {
-            unselectableSet.add(new Date(cleanupDate(unselectableDate)));
+        if (unselectableDates != null) {
+            for (long unselectableDate : unselectableDates) {
+                unselectableSet.add(new Date(cleanupDate(unselectableDate)));
+            }
         }
         getSelectionModel().setUnselectableDates(unselectableSet);
         repaint();
