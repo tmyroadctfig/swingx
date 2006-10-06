@@ -30,6 +30,21 @@ import javax.swing.table.TableCellRenderer;
 
 import org.jdesktop.swingx.LinkModel;
 
+/**
+ * Configurable factory for per-renderee class TableCellRenderers. <p>
+ * 
+ * This is a left-over from jdnc-api/markup. Currently used only by 
+ * <code>JNTable.setColumnHorizontalAlignment</code>. 
+ * 
+ * PENDING: delete or move to jdnc-api.
+ * 
+ * @deprecated use a JXTable instance to create renderers.
+ * 
+ * @author original ??
+ * @author Jeanette Winzenburg
+ * 
+ * @see JXTable#getNewDefaultRenderer
+ */
 public class TableCellRenderers {
 
     private static HashMap<Class, String> typeMap;

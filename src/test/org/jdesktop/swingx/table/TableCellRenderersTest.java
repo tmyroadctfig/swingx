@@ -17,6 +17,8 @@ import org.jdesktop.swingx.LinkModel;
 import org.jdesktop.swingx.LinkRenderer;
 
 /**
+ * PENDING delete TableCellRenderers or move to JDNC
+ * 
  * @author Jeanette Winzenburg
  */
 public class TableCellRenderersTest extends TestCase {
