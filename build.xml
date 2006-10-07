@@ -185,4 +185,47 @@
         <delete dir="${build.dir}/src-release" />
         <delete dir="${build.dir}/zipdir" />
     </target>
+    
+    
+    
+    <!-- Overriden targets -->
+    <target name="-javadoc-build" depends="init">
+        <property name="javadoc.core.src" value=""/>
+        <property name="javadoc.core.linkexternal" value="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+        <property name="javadoc.core.packagelist" value=""/>
+        <property name="javadoc.verbose" value="false"/>
+
+        <echo>Using custom javadoc target:
+core src: ${javadoc.core.src}
+core external: ${javadoc.core.linkexternal}
+core packagelist: ${javadoc.core.packagelist}
+</echo>
+        <mkdir dir="${dist.javadoc.dir}"/>
+        <javadoc destdir="${dist.javadoc.dir}"
+                 source="${javac.source}"
+                 notree="${javadoc.notree}" use="${javadoc.use}"
+                 nonavbar="${javadoc.nonavbar}" noindex="${javadoc.noindex}"
+                 splitindex="${javadoc.splitindex}" author="${javadoc.author}"
+                 version="${javadoc.version}" 	
+                 windowtitle="${javadoc.windowtitle}"
+                 private="${javadoc.private}"
+                 additionalparam="${javadoc.additionalparam}"
+                 failonerror="true" useexternalfile="false"
+                 verbose="${javadoc.verbose}"
+                 maxmemory="1024M">
+            <link offline="true" href="${javadoc.core.linkexternal}"
+                  packagelistLoc="${javadoc.core.packagelist}"/>
+            <classpath>
+                <path path="${javac.classpath}"/>
+            </classpath>
+            <sourcepath>
+                <pathelement location="${src.beaninfo.dir}"/>
+                <pathelement location="${java.dir}"/>
+                <pathelement location="${javadoc.core.src}"/>
+            </sourcepath>
+            <packageset dir="${src.beaninfo.dir}" includes="*/**"/>
+            <packageset dir="${java.dir}" includes="*/**"/>
+       </javadoc>
+   </target>
+
 </project>
