@@ -2968,7 +2968,9 @@ public class JXTable extends JTable
     public static class NumberRenderer extends DefaultTableCellRenderer {
         public NumberRenderer() {
             super();
-            setHorizontalAlignment(JLabel.TRAILING);
+            // JW: RIGHT is the correct thing to do for bidi-compliance
+            // numbers are right aligned even if text is LToR
+            setHorizontalAlignment(JLabel.RIGHT);
         }
     }
 
