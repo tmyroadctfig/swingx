@@ -1833,39 +1833,101 @@ public class JXTable extends JTable
         }
     }
 
-//---------------------- enhanced TableColumn/Model support    
+// ----------------- enhanced column support: delegation to TableColumnModel
     /**
-     * Remove all columns, make sure to include hidden.
+     * Returns the <code>TableColumn</code> at view position 
+     * <code>columnIndex</code>. The return value is not <code>null</code>.
      * 
+     * <p>
+     * NOTE: 
+     * This delegate method is added to protect developer's
+     * from unexpected exceptions in jdk1.5+.
+     * Super does not expose the <code>TableColumn</code> access by index  
+     * which may lead to unexpected <code>IllegalArgumentException</code>: 
+     * If client code assumes the delegate method is available, autoboxing
+     * will convert the given int to an Integer which will 
+     * call the getColumn(Object) method. 
+     * 
+     * 
+     * @param viewColumnIndex
+     *            index of the column with the object in question
+     * 
+     * @return the <code>TableColumn</code> object that matches the column
+     *         index
+     * @throws ArrayIndexOutOfBoundsException if viewColumnIndex out of allowed range.
      */
-    protected void removeColumns() {
-        /**
-         * TODO: promote this method to superclass, and change
-         *       createDefaultColumnsFromModel() to call this method
-         */
-        List<TableColumn> columns = getColumns(true);
-        for (Iterator<TableColumn> iter = columns.iterator(); iter.hasNext();) {
-            getColumnModel().removeColumn(iter.next());
-
-        }
+    public TableColumn getColumn(int viewColumnIndex) {
+        return getColumnModel().getColumn(viewColumnIndex);
     }
 
     /**
-     * returns a list of all visible TableColumns.
+     * Returns a <code>List</code> of visible <code>TableColumn</code>s.
      * 
-     * @return list of all the visible <code>TableColumns</code>
+     * @return a <code>List</code> of visible columns.
      */
     public List<TableColumn> getColumns() {
         return Collections.list(getColumnModel().getColumns());
     }
 
     /**
-     * returns a list of TableColumns including hidden if the parameter is set
-     * to true.
+     * Returns the margin between columns.
      * 
-     * @param includeHidden
-     * @return list of <code>TableColumns</code> including hidden columns if
-     * specified
+     * @return the margin between columns
+     */
+    public int getColumnMargin() {
+        return getColumnModel().getColumnMargin();
+    }
+
+    /**
+     * Sets the margin between columns.
+     * 
+     * @param value
+     *            margin between columns; must be greater than or equal to zero.
+     */
+    public void setColumnMargin(int value) {
+        getColumnModel().setColumnMargin(value);
+    }
+
+    
+// ----------------- enhanced column support: delegation to TableColumnModelExt
+    
+    /**
+     * Returns the number of contained columns. The count includes or excludes invisible
+     * columns, depending on whether the <code>includeHidden</code> is true or
+     * false, respectively. If false, this method returns the same count as
+     * <code>getColumnCount()</code>. If the columnModel is not of type
+     * <code>TableColumnModelExt</code>, the parameter value has no effect.
+     * 
+     * @param includeHidden a boolean to indicate whether invisible columns
+     *        should be included
+     * @return the number of contained columns, including or excluding the
+     *         invisible as specified.
+     */
+    public int getColumnCount(boolean includeHidden) {
+        if (getColumnModel() instanceof TableColumnModelExt) {
+            return ((TableColumnModelExt) getColumnModel())
+                    .getColumnCount(includeHidden);
+        }
+        return getColumnCount();
+    }
+    
+    /**
+     * Returns a <code>List</code> of contained <code>TableColumn</code>s.
+     * Includes or excludes invisible columns, depending on whether the
+     * <code>includeHidden</code> is true or false, respectively. If false, an
+     * <code>Iterator</code> over the List is equivalent to the
+     * <code>Enumeration</code> returned by <code>getColumns()</code>. 
+     * If the columnModel is not of type
+     * <code>TableColumnModelExt</code>, the parameter value has no effect.
+     * <p>
+     * 
+     * NOTE: the order of columns in the List depends on whether or not the
+     * invisible columns are included, in the former case it's the insertion
+     * order in the latter it's the current order of the visible columns.
+     * 
+     * @param includeHidden a boolean to indicate whether invisible columns
+     *        should be included
+     * @return a <code>List</code> of contained columns.
      */
     public List<TableColumn> getColumns(boolean includeHidden) {
         if (getColumnModel() instanceof TableColumnModelExt) {
@@ -1876,23 +1938,61 @@ public class JXTable extends JTable
     }
 
     /**
-     * returns the number of TableColumns including hidden if the parameter is set 
-     * to true.
+     * Returns the first <code>TableColumnExt</code> with the given
+     * <code>identifier</code>. The return value is null if there is no contained
+     * column with <b>identifier</b> or if the column with <code>identifier</code> is not 
+     * of type <code>TableColumnExt</code>. The returned column
+     * may be visible or hidden.
      * 
-     * @param includeHidden
-     * @return number of <code>TableColumns</code> including hidden columns
-     * if specified
+     * @param identifier the object used as column identifier
+     * @return first <code>TableColumnExt</code> with the given identifier or
+     *         null if none is found
      */
-    public int getColumnCount(boolean includeHidden) {
+    public TableColumnExt getColumnExt(Object identifier) {
         if (getColumnModel() instanceof TableColumnModelExt) {
             return ((TableColumnModelExt) getColumnModel())
-                    .getColumnCount(includeHidden);
+                    .getColumnExt(identifier);
+        } else {
+            // PENDING: not tested!
+            try {
+                TableColumn column = getColumn(identifier);
+                if (column instanceof TableColumnExt) {
+                    return (TableColumnExt) column;
+                }
+            } catch (Exception e) {
+                // TODO: handle exception
+            }
         }
-        return getColumnCount();
+        return null;
     }
 
     /**
-     * reorders the columns in the sequence given array. Logical names that do
+     * Returns the <code>TableColumnExt</code> at view position 
+     * <code>columnIndex</code>. The return value is null, if the
+     * column at position <code>columnIndex</code> is not of type
+     * <code>TableColumnExt</code>.
+     * The returned column is visible.
+     * 
+     * @param columnIndex the index of the column desired
+     * @return the <code>TableColumnExt</code> object that matches the column
+     *         index
+     * @throws ArrayIndexOutOfBoundsException if columnIndex out of allowed
+     *         range, that is if
+     *         <code> (columnIndex < 0) || (columnIndex >= getColumnCount())</code>.
+     */
+    public TableColumnExt getColumnExt(int viewColumnIndex) {
+        TableColumn column = getColumn(viewColumnIndex);
+        if (column instanceof TableColumnExt) {
+            return (TableColumnExt) column;
+        }
+        return null;
+    }
+
+//  ---------------------- enhanced TableColumn/Model support: convenience    
+    
+
+    /**
+     * Reorders the columns in the sequence given array. Logical names that do
      * not correspond to any column in the model will be ignored. Columns with
      * logical names not contained are added at the end.
      * 
@@ -1921,87 +2021,8 @@ public class JXTable extends JTable
         }
     }
 
-    /**
-     * Returns the <code>TableColumnExt</code> object for the column in the
-     * table whose identifier is equal to <code>identifier</code>, when
-     * compared using <code>equals</code>. The returned TableColumn is
-     * guaranteed to be part of the current ColumnModel but may be hidden, that
-     * is
-     * 
-     * <pre> <code>
-     * TableColumnExt column = table.getColumnExt(id);
-     * if (column != null) {
-     *     int viewIndex = table.convertColumnIndexToView(column.getModelIndex());
-     *     assertEquals(column.isVisible(), viewIndex &gt;= 0);
-     * }
-     * </code> </pre>
-     * 
-     * @param identifier
-     *            the identifier object
-     * 
-     * @return the <code>TableColumnExt</code> object that matches the
-     *         identifier or null if none is found.
-     */
-    public TableColumnExt getColumnExt(Object identifier) {
-        if (getColumnModel() instanceof TableColumnModelExt) {
-            return ((TableColumnModelExt) getColumnModel())
-                    .getColumnExt(identifier);
-        } else {
-            // PENDING: not tested!
-            try {
-                TableColumn column = getColumn(identifier);
-                if (column instanceof TableColumnExt) {
-                    return (TableColumnExt) column;
-                }
-            } catch (Exception e) {
-                // TODO: handle exception
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns the <code>TableColumnExt</code> object for the column in the
-     * table whose column index is equal to <code>viewColumnIndex</code> or 
-     * null if the column is not of type <code>TableColumnExt</code>
-     * 
-     * @param viewColumnIndex
-     *            index of the column with the object in question
-     * 
-     * @return the <code>TableColumnExt</code> object that matches the column
-     *         index
-     * @throws ArrayIndexOutOfBoundsException if viewColumnIndex out of allowed range.
-     */
-    public TableColumnExt getColumnExt(int viewColumnIndex) {
-        TableColumn column = getColumn(viewColumnIndex);
-        if (column instanceof TableColumnExt) {
-            return (TableColumnExt) column;
-        }
-        return null;
-    }
-
-    /**
-     * Returns the <code>TableColumn</code> object for the column in the
-     * table whose column index is equal to <code>viewColumnIndex</code>.
-     * 
-     * Note: 
-     * Super does not expose the TableColumn access by index which may lead to
-     * unexpected IllegalArgumentException if client code assumes the delegate
-     * method is available - autoboxing will convert the given int to an object
-     * which will call the getColumn(Object) method ... We do here.
-     * 
-     * 
-     * @param viewColumnIndex
-     *            index of the column with the object in question
-     * 
-     * @return the <code>TableColumn</code> object that matches the column
-     *         index
-     * @throws ArrayIndexOutOfBoundsException if viewColumnIndex out of allowed range.
-     */
-    public TableColumn getColumn(int viewColumnIndex) {
-        return getColumnModel().getColumn(viewColumnIndex);
-    }
-
+//-------------------------- ColumnFactory
+    
     @Override
     public void createDefaultColumnsFromModel() {
         TableModel model = getModel();
@@ -2024,6 +2045,21 @@ public class JXTable extends JTable
         }
     }
 
+    /**
+     * Remove all columns, make sure to include hidden.
+     * 
+     */
+    protected void removeColumns() {
+        /**
+         * TODO: promote this method to superclass, and change
+         *       createDefaultColumnsFromModel() to call this method
+         */
+        List<TableColumn> columns = getColumns(true);
+        for (Iterator<TableColumn> iter = columns.iterator(); iter.hasNext();) {
+            getColumnModel().removeColumn(iter.next());
+
+        }
+    }
 
     protected TableColumn createAndConfigureColumn(TableModel model,
             int modelColumn) {
@@ -2037,7 +2073,7 @@ public class JXTable extends JTable
      * @return the columnFactory to use for column creation and
      *   configuration.
      */
-    protected ColumnFactory getColumnFactory() {
+    public ColumnFactory getColumnFactory() {
         /*
         * TODO JW: think about implications of not/ copying the reference 
         *  to the shared instance into the table's field? Better 
@@ -2073,25 +2109,6 @@ public class JXTable extends JTable
     }
     
 //----------------------- delegating methods?? from super    
-    /**
-     * Returns the margin between columns.
-     * 
-     * @return the margin between columns
-     */
-    public int getColumnMargin() {
-        return getColumnModel().getColumnMargin();
-    }
-
-    /**
-     * Sets the margin between columns.
-     * 
-     * @param value
-     *            margin between columns; must be greater than or equal to zero.
-     */
-    public void setColumnMargin(int value) {
-        getColumnModel().setColumnMargin(value);
-    }
-
     /**
      * Returns the selection mode used by this table's selection model.
      * 
