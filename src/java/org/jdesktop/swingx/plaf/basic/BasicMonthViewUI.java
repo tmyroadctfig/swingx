@@ -72,11 +72,8 @@ public class BasicMonthViewUI extends MonthViewUI {
     /** For interval selections we need to record the date we pivot around. */
     private long pivotDate = -1;
     private boolean ltr;
-    private boolean showingWeekNumber;
     private int arrowPaddingX = 3;
     private int arrowPaddingY = 3;
-    private int boxPaddingX;
-    private int boxPaddingY;
     private int fullMonthBoxHeight;
     private int fullBoxWidth;
     private int fullBoxHeight;
@@ -325,7 +322,7 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         // If we're showing week numbers we need to reduce the selected
         // col index by one.
-        if (showingWeekNumber) {
+        if (monthView.isShowingWeekNumber()) {
             col--;
         }
 
@@ -602,7 +599,7 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         // If we're showing week numbers then increase the bounds.x
         // by one more boxPaddingX boxWidth boxPaddingX.
-        if (showingWeekNumber) {
+        if (monthView.isShowingWeekNumber()) {
             bounds.x++;
         }
 
@@ -720,6 +717,8 @@ public class BasicMonthViewUI extends MonthViewUI {
         Rectangle clip = g.getClipBounds();
         long day;
         int oldWeek = -1;
+        int boxPaddingX = monthView.getBoxPaddingX();
+        int boxPaddingY = monthView.getBoxPaddingY();
 
         // Paint month name background.
         paintMonthStringBackground(g, x, y,
@@ -737,6 +736,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
 
         // Paint background of the short names for the days of the week.
+        boolean showingWeekNumber = monthView.isShowingWeekNumber();
         int tmpX = ltr ? x + (showingWeekNumber ? fullBoxWidth : 0) : x;
         int tmpY = y + fullMonthBoxHeight;
         int tmpWidth = width - (showingWeekNumber ? fullBoxWidth : 0);
@@ -878,10 +878,12 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     private void paintDayOfTheWeekBackground(Graphics g, int x, int y, int width, int height) {
+        int boxPaddingX = monthView.getBoxPaddingX();
         g.drawLine(x + boxPaddingX, y + height - 1, x + width - boxPaddingX, y + height - 1);
     }
 
     private void paintWeekOfYearBackground(Graphics g, int x, int y, int width, int height) {
+        int boxPaddingY = monthView.getBoxPaddingY();
         x = ltr ? x + width - 1 : x;
         g.drawLine(x, y + boxPaddingY, x, y + height - boxPaddingY);
     }
@@ -966,7 +968,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         int tmpX =
                 x + (calendarWidth / 2) -
                         ((monthStringBounds[month].width + yearStringBounds[month].width + spaceWidth) / 2);
-        int tmpY = y + boxPaddingY + ((monthBoxHeight - boxHeight) / 2) +
+        int tmpY = y + monthView.getBoxPaddingY() + ((monthBoxHeight - boxHeight) / 2) +
                 fm.getAscent();
         monthStringBounds[month].x = tmpX;
         yearStringBounds[month].x = (monthStringBounds[month].x + monthStringBounds[month].width +
@@ -1110,6 +1112,8 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         String numericDay = dayOfMonthFormatter.format(date);
         FontMetrics fm = monthView.getFontMetrics(derivedFont);
+        int boxPaddingX = monthView.getBoxPaddingX();
+        int boxPaddingY = monthView.getBoxPaddingY();
         width = fm.stringWidth(numericDay);
         height = fm.getAscent();
         x = ltr ? x + boxPaddingX + boxWidth - fm.stringWidth(numericDay) :
@@ -1435,6 +1439,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             }
 
             // If we are displaying week numbers find the largest displayed week number.
+            boolean showingWeekNumber = monthView.isShowingWeekNumber();
             if (showingWeekNumber) {
                 int val = cal.getActualMaximum(Calendar.WEEK_OF_YEAR);
                 currWidth = fm.stringWidth(Integer.toString(val));
@@ -1540,9 +1545,6 @@ public class BasicMonthViewUI extends MonthViewUI {
             } else if (JXMonthView.BOX_PADDING_X.equals(property) || JXMonthView.BOX_PADDING_Y.equals(property) ||
                     JXMonthView.TRAVERSABLE.equals(property) || JXMonthView.DAYS_OF_THE_WEEK.equals(property) ||
                     "border".equals(property) || "font".equals(property) || JXMonthView.WEEK_NUMBER.equals(property)) {
-                boxPaddingX = monthView.getBoxPaddingX();
-                boxPaddingY = monthView.getBoxPaddingY();
-                showingWeekNumber = monthView.isShowingWeekNumber();
                 monthView.revalidate();
             }
         }
