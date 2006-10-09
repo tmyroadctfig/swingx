@@ -226,7 +226,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         Date date = new Date();
 
         assertFalse(monthView.isFlaggedDate(date.getTime()));
-        monthView.setFlaggedDates(new long[] { date.getTime() });
+        monthView.setFlaggedDates(new long[]{date.getTime()});
         assertTrue(monthView.isFlaggedDate(date.getTime()));
     }
 
@@ -249,7 +249,10 @@ public class JXMonthViewTest extends MockObjectTestCase {
         Date date = new Date();
 
         assertFalse(monthView.isUnselectableDate(date.getTime()));
-        monthView.setUnselectableDates(new long[] { date.getTime() });
+        monthView.setUnselectableDates(new long[]{date.getTime()});
         assertTrue(monthView.isUnselectableDate(date.getTime()));
+
+        monthView.setUnselectableDates(null);
+        assertFalse(monthView.isUnselectableDate(date.getTime()));
     }
 }
