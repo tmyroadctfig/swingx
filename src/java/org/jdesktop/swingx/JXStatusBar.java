@@ -171,7 +171,7 @@ public class JXStatusBar extends JXPanel {
         
         private Insets insets;
         private ResizeBehavior resizeBehavior;
-        private int preferredWidth = 0;
+        private int fixedWidth = 0;
         
         /**
          * Creates a new Constraint with default FIXED behaviour and no insets.
@@ -190,27 +190,27 @@ public class JXStatusBar extends JXPanel {
         }
         
         /**
-         * Creates a new Constraint with default FIXED behaviour and the given minimum
-         * preferred width.
+         * Creates a new Constraint with default FIXED behaviour and the given fixed
+         * width.
          * 
-         * @param minPrefWidth must be >= 0
+         * @param fixedWidth must be >= 0
          */
-        public Constraint(int minPrefWidth) {
-            this(minPrefWidth, null);
+        public Constraint(int fixedWidth) {
+            this(fixedWidth, null);
         }
         
         /**
-         * Creates a new Constraint with default FIXED behaviour and the given minimum
-         * preferred width, and using the given Insets.
+         * Creates a new Constraint with default FIXED behaviour and the given fixed
+         * width, and using the given Insets.
          * 
-         * @param minPrefWidth must be >= 0
+         * @param fixedWidth must be >= 0
          * @param insets may be null. If null, an Insets with 0 values will be used.
          */
-        public Constraint(int minPrefWidth, Insets insets) {
-            if (minPrefWidth < 0) {
-                throw new IllegalArgumentException("minPrefSize must be >= 0");
+        public Constraint(int fixedWidth, Insets insets) {
+            if (fixedWidth < 0) {
+                throw new IllegalArgumentException("fixedWidth must be >= 0");
             }
-            this.preferredWidth = minPrefWidth;
+            this.fixedWidth = fixedWidth;
             this.insets = insets == null ? new Insets(0, 0, 0, 0) : (Insets)insets.clone();
             this.resizeBehavior = resizeBehavior.FIXED;
         }
@@ -238,21 +238,19 @@ public class JXStatusBar extends JXPanel {
         }
         
         /**
-         * Set the preferred minimum width the component added with this 
+         * Set the fixed width the component added with this 
          * constraint will occupy on the <code>JXStatusBar</code>. Only applies
          * to ResizeBehavior.FIXED. Will be ignored for ResizeBehavior.FILL.
-         * If component preferred size width is greater than this width, 
-         * component preferred width will be used.
          *  
-         * @param width - minimum width component will occupy. If 0, preferred
-         * width of the component will be used. This width includes any insets.
+         * @param width - minimum width component will occupy. If 0, the preferred
+         * width of the component will be used.
          * The width specified must be >= 0
          */
-        public void setPreferredWidth(int width) {
+        public void setFixedWidth(int width) {
             if (width < 0) {
                 throw new IllegalArgumentException("width must be >= 0");
             }
-            preferredWidth = resizeBehavior == ResizeBehavior.FIXED ? width : 0;
+            fixedWidth = resizeBehavior == ResizeBehavior.FIXED ? width : 0;
         }
         
         /**
@@ -274,11 +272,11 @@ public class JXStatusBar extends JXPanel {
         }
         
         /**
-         * Get preferred width. Width is zero for resize behavior FILLED
+         * Get fixed width. Width is zero for resize behavior FILLED
          * @return
          */
-        public int getPreferredWidth() {
-        	return preferredWidth;
+        public int getFixedWidth() {
+        	return fixedWidth;
         }
     }
     

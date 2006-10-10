@@ -230,7 +230,7 @@ public class BasicStatusBarUI extends StatusBarUI {
                         Insets i = c.getInsets();
                         d.width += i.left + i.right;
                         d.height += i.top + i.bottom;
-                        prefWidth = c.getPreferredWidth();
+                        prefWidth = c.getFixedWidth();
                     }
                     prefSize.height = Math.max(prefSize.height, d.height);
                     prefSize.width += Math.max(d.width, prefWidth);
@@ -260,7 +260,7 @@ public class BasicStatusBarUI extends StatusBarUI {
                     } else if (c != null) {
                         Insets insets = c.getInsets();
                         if (c != null) {
-                            availableSpace -= c.getPreferredWidth();
+                            availableSpace -= c.getFixedWidth();
                         } else {
                             // HWC - Once this is computed, should it be stored so we don't recompute
                             // it and change the position of items
@@ -285,7 +285,7 @@ public class BasicStatusBarUI extends StatusBarUI {
                     if (rb == Constraint.ResizeBehavior.FILL) {
                         width = (int)(availableSpace * weight);
                     } else {
-                        width = c == null ? comp.getPreferredSize().width : c.getPreferredWidth();
+                        width = c == null ? comp.getPreferredSize().width : c.getFixedWidth();
                     }
                     width -= (insets.left + insets.right);
                     int x = nextX + insets.left;
