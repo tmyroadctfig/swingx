@@ -200,9 +200,13 @@ public class BasicStatusBarUI extends StatusBarUI {
         return new LayoutManager2() {
             private Map<Component,Constraint> constraints = new HashMap<Component,Constraint>();
             
-            public void addLayoutComponent(String name, Component comp) {
-                addLayoutComponent(comp, null);
-            }
+            public void addLayoutComponent(String name, Component comp) {addLayoutComponent(comp, null);}
+            public void removeLayoutComponent(Component comp) {constraints.remove(comp);}
+            public Dimension minimumLayoutSize(Container parent) {return preferredLayoutSize(parent);}
+            public Dimension maximumLayoutSize(Container target) {return new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);}
+            public float getLayoutAlignmentX(Container target) {return .5f;}
+            public float getLayoutAlignmentY(Container target) {return .5f;}
+            public void invalidateLayout(Container target) {}
             
             public void addLayoutComponent(Component comp, Object constraint) {
                 //we accept an Insets, a ResizeBehavior, or a Constraint.
@@ -213,10 +217,6 @@ public class BasicStatusBarUI extends StatusBarUI {
                 }
                 
                 constraints.put(comp, (Constraint)constraint);
-            }
-            
-            public void removeLayoutComponent(Component comp) {
-                constraints.remove(comp);
             }
             
             public Dimension preferredLayoutSize(Container parent) {
@@ -249,26 +249,6 @@ public class BasicStatusBarUI extends StatusBarUI {
                 return prefSize;
             }
             
-            public Dimension minimumLayoutSize(Container parent) {
-                return preferredLayoutSize(parent);
-            }
-            
-            public Dimension maximumLayoutSize(Container target) {
-                return new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
-            }
-            
-            public float getLayoutAlignmentX(Container target) {
-                return .5f;
-            }
-            
-            public float getLayoutAlignmentY(Container target) {
-                return .5f;
-            }
-            
-            public void invalidateLayout(Container target) {
-                //I don't hold on to any state, so nothing to do here
-            }
-            
             public void layoutContainer(Container parent) {
                 int numFilledComponents = 0;
                 Insets parentInsets = parent.getInsets();
@@ -277,7 +257,7 @@ public class BasicStatusBarUI extends StatusBarUI {
                     Constraint c = constraints.get(comp);
                     if (c != null && c.getResizeBehavior() == Constraint.ResizeBehavior.FILL) {
                         numFilledComponents++;
-                    } else {
+                    } else if (c != null) {
                         Insets insets = c.getInsets();
                         if (c != null) {
                             availableSpace -= c.getPreferredWidth();
