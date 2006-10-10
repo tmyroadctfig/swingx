@@ -8,12 +8,12 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -72,7 +72,7 @@ public class BasicStatusBarUI extends StatusBarUI {
      */
     public static ComponentUI createUI(JComponent c) {
         return new BasicStatusBarUI();
-    }	
+    }
     
     /**
      * Configures the specified component appropriate for the look and feel.
@@ -82,8 +82,8 @@ public class BasicStatusBarUI extends StatusBarUI {
      * including the following:
      * <ol>
      * <li>Install any default property values for color, fonts, borders,
-     *     icons, opacity, etc. on the component.  Whenever possible, 
-     *     property values initialized by the client program should <i>not</i> 
+     *     icons, opacity, etc. on the component.  Whenever possible,
+     *     property values initialized by the client program should <i>not</i>
      *     be overridden.
      * <li>Install a <code>LayoutManager</code> on the component if necessary.
      * <li>Create/add any required sub-components to the component.
@@ -106,16 +106,16 @@ public class BasicStatusBarUI extends StatusBarUI {
         
         statusBar.setBorder(createBorder());
         statusBar.setLayout(createLayout());
-
+        
     }
-
+    
     /**
      * Reverses configuration which was done on the specified component during
-     * <code>installUI</code>.  This method is invoked when this 
-     * <code>UIComponent</code> instance is being removed as the UI delegate 
+     * <code>installUI</code>.  This method is invoked when this
+     * <code>UIComponent</code> instance is being removed as the UI delegate
      * for the specified component.  This method should undo the
-     * configuration performed in <code>installUI</code>, being careful to 
-     * leave the <code>JComponent</code> instance in a clean state (no 
+     * configuration performed in <code>installUI</code>, being careful to
+     * leave the <code>JComponent</code> instance in a clean state (no
      * extraneous listeners, look-and-feel-specific property objects, etc.).
      * This should include the following:
      * <ol>
@@ -138,7 +138,7 @@ public class BasicStatusBarUI extends StatusBarUI {
     public void uninstallUI(JComponent c) {
         assert c instanceof JXStatusBar;
     }
-
+    
     @Override
     public void paint(Graphics g, JComponent c) {
         //paint the background if opaque
@@ -160,7 +160,7 @@ public class BasicStatusBarUI extends StatusBarUI {
             }
         }
     }
-
+    
     //----------------------------------------------------- Extension Points
     protected void paintBackground(Graphics2D g, JXStatusBar bar) {
         g.setColor(bar.getBackground());
@@ -174,7 +174,7 @@ public class BasicStatusBarUI extends StatusBarUI {
         x += w / 2;
         g.setColor(fg);
         g.drawLine(x, y, x, h);
-
+        
         g.setColor(bg);
         g.drawLine(x+1, y, x+1, h);
     }
@@ -199,11 +199,11 @@ public class BasicStatusBarUI extends StatusBarUI {
         //manager takes into account spacing for the separators between components
         return new LayoutManager2() {
             private Map<Component,Constraint> constraints = new HashMap<Component,Constraint>();
-
+            
             public void addLayoutComponent(String name, Component comp) {
                 addLayoutComponent(comp, null);
             }
-
+            
             public void addLayoutComponent(Component comp, Object constraint) {
                 //we accept an Insets, a ResizeBehavior, or a Constraint.
                 if (constraint instanceof Insets) {
@@ -211,14 +211,14 @@ public class BasicStatusBarUI extends StatusBarUI {
                 } else if (constraint instanceof Constraint.ResizeBehavior) {
                     constraint = new Constraint((Constraint.ResizeBehavior)constraint);
                 }
-
+                
                 constraints.put(comp, (Constraint)constraint);
             }
-
+            
             public void removeLayoutComponent(Component comp) {
                 constraints.remove(comp);
             }
-
+            
             public Dimension preferredLayoutSize(Container parent) {
                 Dimension prefSize = new Dimension();
                 int count = 0;
@@ -234,7 +234,7 @@ public class BasicStatusBarUI extends StatusBarUI {
                     }
                     prefSize.height = Math.max(prefSize.height, d.height);
                     prefSize.width += Math.max(d.width, prefWidth);
-
+                    
                     //If this is not the last component, add extra space between each
                     //component (for the separator).
                     count++;
@@ -242,74 +242,77 @@ public class BasicStatusBarUI extends StatusBarUI {
                         prefSize.width += getSeparatorWidth();
                     }
                 }
-
+                
                 Insets insets = parent.getInsets();
                 prefSize.height += insets.top + insets.bottom;
                 prefSize.width += insets.left + insets.right;
                 return prefSize;
             }
-
+            
             public Dimension minimumLayoutSize(Container parent) {
                 return preferredLayoutSize(parent);
             }
-
+            
             public Dimension maximumLayoutSize(Container target) {
                 return new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
             }
-
+            
             public float getLayoutAlignmentX(Container target) {
                 return .5f;
             }
-
+            
             public float getLayoutAlignmentY(Container target) {
                 return .5f;
             }
-
+            
             public void invalidateLayout(Container target) {
                 //I don't hold on to any state, so nothing to do here
             }
-
+            
             public void layoutContainer(Container parent) {
-                //find out the maximum weight of all the visible components
                 int numFilledComponents = 0;
+                Insets parentInsets = parent.getInsets();
+                int availableSpace = parent.getWidth() - parentInsets.left - parentInsets.right;
                 for (Component comp : parent.getComponents()) {
                     Constraint c = constraints.get(comp);
                     if (c != null && c.getResizeBehavior() == Constraint.ResizeBehavior.FILL) {
                         numFilledComponents++;
+                    } else {
+                        Insets insets = c.getInsets();
+                        if (c != null) {
+                            availableSpace -= c.getPreferredWidth();
+                        } else {
+                            // HWC - Once this is computed, should it be stored so we don't recompute
+                            // it and change the position of items
+                            availableSpace -= comp.getPreferredSize().width;
+                        }
+                        availableSpace -= (insets == null) ? 0 : (insets.right + insets.left);
                     }
                 }
-                double weight = numFilledComponents > 0 ? 1 / numFilledComponents : 0;
-
-                //the amount of available space. If positive, it will be split up among
-                //all visible components that have a FILL resize behavior
-                Insets parentInsets = parent.getInsets();
-                int availableSpace = parent.getWidth() - preferredLayoutSize(parent).width
-                        - parentInsets.left - parentInsets.right;
-                //the next X location to place a component at
+                availableSpace -= (parent.getComponents().length - 1) * getSeparatorWidth();
+                // figure the ratio of space for the FILLED components
+                double weight = numFilledComponents > 0 ? 1.0 / (double)numFilledComponents : 0.0;
+                // figure the position of the components
                 int nextX = parentInsets.left;
                 int height = parent.getHeight() - parentInsets.top - parentInsets.bottom;
-
-                //now lay out each visible component
+                int width = 0;
                 for (int i=0; i<parent.getComponentCount(); i++) {
                     Component comp = parent.getComponent(i);
                     Constraint c = constraints.get(comp);
                     Constraint.ResizeBehavior rb = c == null ? null : c.getResizeBehavior();
                     Insets insets = c == null ? new Insets(0,0,0,0) : c.getInsets();
-                    int prefWidth = c == null ? 0 : c.getPreferredWidth() - insets.left - insets.right;
-
-                    int spaceToTake = availableSpace > 0 && rb == Constraint.ResizeBehavior.FILL ? 
-                        (int)(weight * availableSpace) : 0;
-                    availableSpace -= spaceToTake;
-
-                    int width = comp.getPreferredSize().width + spaceToTake;
-                    width = Math.max(width, prefWidth);
-
+                    
+                    if (rb == Constraint.ResizeBehavior.FILL) {
+                        width = (int)(availableSpace * weight);
+                    } else {
+                        width = c == null ? comp.getPreferredSize().width : c.getPreferredWidth();
+                    }
+                    width -= (insets.left + insets.right);
                     int x = nextX + insets.left;
                     int y = parentInsets.top + insets.top;
                     comp.setSize(width, height);
                     comp.setLocation(x, y);
                     nextX = x + width + insets.right;
-                    
                     //If this is not the last component, add extra space
                     //for the separator
                     if (i < parent.getComponentCount() - 1) {
