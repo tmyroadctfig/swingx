@@ -30,6 +30,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.LayoutManager;
 import java.awt.Rectangle;
+import java.awt.Transparency;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -819,7 +820,8 @@ public class JXCollapsiblePane extends JXPanel {
 
                 if (dimension > 0) {
                     img = getGraphicsConfiguration().createCompatibleImage(width,
-                                                                           height);
+                                                                           height, 
+                                                                           Transparency.TRANSLUCENT);
                     c.setSize(width, height);
                     c.paint(img.getGraphics());
                 } else {
