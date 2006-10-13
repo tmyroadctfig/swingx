@@ -47,6 +47,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.DefaultCellEditor;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
@@ -55,6 +56,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -63,8 +65,9 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
+import javax.swing.text.Keymap;
+import javax.swing.text.TextAction;
 
-import org.jdesktop.swingx.JXTable.GenericEditor;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.table.TableColumnExt;
@@ -494,35 +497,43 @@ public class JXTableIssues extends InteractiveTestCase {
 
 
         /** Use a static method so that we can do some stuff before calling the superclass. */
-        private static JFormattedTextField createFormattedTextField(NumberFormat formatter)
-        {
-            JFormattedTextField textField = new JFormattedTextField(new NumberEditorNumberFormat(formatter))
-            {
-                /** the formatted text field will not call stopCellEditing() until the value is valid.
-                 * So do the red border thing here.
-                 */
-                @Override
-                protected void invalidEdit() {
-                    setBorder(new LineBorder(Color.red));
-                    super.invalidEdit();
-                }
-            };
-            // if the border was red for invalid, clear it as soon as the edit becomes valid.
-            textField.addPropertyChangeListener("editValid", new PropertyChangeListener()
-            {
-                public void propertyChange(PropertyChangeEvent evt) {
-                    if (evt.getNewValue()==Boolean.TRUE)
-                    {
-                        ((JFormattedTextField)evt.getSource()).setBorder(new LineBorder(Color.black));
-                    }
-                }
-            });
-            return textField;
-        }
+        private static JFormattedTextField createFormattedTextField(
+		NumberFormat formatter) {
+	    final JFormattedTextField textField = new JFormattedTextField(
+		    new NumberEditorNumberFormat(formatter));
+	    /* FIXME: I am sure there is a better way to do this, but I
+             * don't know what it is. JTable sets up a binding for the
+             * ESCAPE key, but JFormattedTextField overrides that binding
+             * with it's own. Remove the JFormattedTextField binding.
+             */
+	    InputMap map = textField.getInputMap();
+	    while (map != null) {
+		map.remove(KeyStroke.getKeyStroke("pressed ESCAPE"));
+		map = map.getParent();
+	    }
+	    /*
+             * the formatted text field will not call stopCellEditing()
+             * until the value is valid. So do the red border thing here.
+             */
+	    textField.addPropertyChangeListener("editValid",
+		    new PropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent evt) {
+			    if (evt.getNewValue() == Boolean.TRUE) {
+				((JFormattedTextField) evt.getSource())
+					.setBorder(new LineBorder(Color.black));
+			    } else {
+				((JFormattedTextField) evt.getSource())
+					.setBorder(new LineBorder(Color.red));
+			    }
+			}
+		    });
+	    return textField;
+	}
     }
 
     /**
-     * A specialised Format for the NumberEditor that returns a null for empty strings.
+     * A specialised Format for the NumberEditor that returns a null for
+     * empty strings.
      */
     private static class NumberEditorNumberFormat extends Format
     {
@@ -554,7 +565,18 @@ public class JXTableIssues extends InteractiveTestCase {
                 pos.setIndex(1); // otherwise Format thinks parse failed
                 return null;
             }
-            return childFormat.parseObject(source, pos);
+            Object val = childFormat.parseObject(source, pos);
+            /* The default behaviour of Format objects is to keep parsing as long as they encounter
+             * valid data. By for table editing we don't want trailing bad data to be considered
+             * a "valid value". So set the index to 0 so that the parse(Object) method knows
+             * that we had an error. 
+             */
+            if (pos.getIndex()!=source.length())
+            {
+        	pos.setErrorIndex(pos.getIndex());
+        	pos.setIndex(0);
+            }
+            return val;
         }
     }
     

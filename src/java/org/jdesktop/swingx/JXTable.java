@@ -2073,7 +2073,7 @@ public class JXTable extends JTable
      * @return the columnFactory to use for column creation and
      *   configuration.
      */
-    public ColumnFactory getColumnFactory() {
+    protected ColumnFactory getColumnFactory() {
         /*
         * TODO JW: think about implications of not/ copying the reference 
         *  to the shared instance into the table's field? Better 
