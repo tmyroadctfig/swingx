@@ -46,9 +46,16 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 
 /**
  * Header renderer class which renders column sort feedback (arrows).
+ * <p>
+ * Additionally, it allows to customize renderer properties like <code>Font</code>, 
+ * <code>Alignment</code> and similar. This part needs to go somewhere else
+ * when we switch to Mustang.
+ * <p>
  * 
- * PENDING: #25, #169 - Header doesn't look right in winXP/mac
+ * PENDING: #25, #169 - Header doesn't look right in winXP/mac. Won't do
+ * anything about it, it's handled in core Swing as of jdk1.6.
  * 
+ * @targeted_status: jdk15-glue
  * 
  * @author Amy Fowler
  * @author Ramesh Gupta
