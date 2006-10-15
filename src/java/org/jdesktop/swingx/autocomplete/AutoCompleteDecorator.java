@@ -41,6 +41,7 @@ import javax.swing.UIManager;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.TextAction;
+import org.jdesktop.swingx.combobox.workarounds.AquaLnFPopupLocationFix;
 
 /**
  * This class contains only static utility methods that can be used to set up
@@ -138,7 +139,9 @@ public class AutoCompleteDecorator {
         boolean strictMatching = !comboBox.isEditable();
         // has to be editable
         comboBox.setEditable(true);
-        
+        // fix the popup location
+        AquaLnFPopupLocationFix.install(comboBox);
+
         // configure the text component=editor component
         JTextComponent editorComponent = (JTextComponent) comboBox.getEditor().getEditorComponent();
         final AbstractAutoCompleteAdaptor adaptor = new ComboBoxAdaptor(comboBox);
