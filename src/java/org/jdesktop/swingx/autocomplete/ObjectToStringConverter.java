@@ -36,12 +36,30 @@ package org.jdesktop.swingx.autocomplete;
  *   public I18NStringConverter(ResourceBundle bundle) {
  *     this.bundle = bundle;
  *   }
- *   public String[] getPossibleStringsForItem(Object item) {
- *     String preferred = getPreferredStringForItem(item);
- *     return preferred==null ? null : new String[]{preferred};
- *   }
+ *
  *   public String getPreferredStringForItem(Object item) {
  *         return item==null ? null : bundle.getString(item.toString());
+ *   }
+ * }
+ * </code>
+ *
+ * It's also possible to return more than one string representation. The
+ * following example shows a converter that will allow a user to choose an
+ * airport using either the airport's full description (<tt>toString()</tt>) or
+ * its ICAO/IATA code:
+ *
+ * <code>
+ * public class AirportConverter extends ObjectToStringConverter {
+ *
+ *   public String[] getPossibleStringsForItem(Object item) {
+ *     if (item==null) return null;
+ *     if (!(item instanceof Airport)) throw new IllegalArgumentException();
+ *     Airport airport = (Airport) item;
+ *     return new String[]{airport.toString(), airport.icaoCode, airport.iataCode};
+ *   }
+ *       
+ *   public String getPreferredStringForItem(Object item) {
+ *     return item==null?null:getPossibleStringsForItem(item)[0];
  *   }
  * }
  * </code>
@@ -52,10 +70,17 @@ public abstract class ObjectToStringConverter {
     
     /**
      * Returns all possible <tt>String</tt> representations for a given item.
+     * The default implementation wraps the method <tt>getPreferredStringForItem</tt>.
+     * It returns <tt>null</tt>, if the wrapped method returns <tt>null</tt>. Otherwise
+     * it returns a one dimensional array containing the wrapped method's return value.
+     *
      * @param item the item to convert
      * @return possible <tt>String</tt> representation for the given item.
      */
-    public abstract String[] getPossibleStringsForItem(Object item);
+    public String[] getPossibleStringsForItem(Object item) {
+	String preferred = getPreferredStringForItem(item);
+	return preferred == null ? null : new String[] { preferred };
+    }
     
     /**
      * Returns the preferred <tt>String</tt> representations for a given item.
@@ -71,9 +96,6 @@ public abstract class ObjectToStringConverter {
     public static final ObjectToStringConverter DEFAULT_IMPLEMENTATION = new DefaultObjectToStringConverter();
     
     private static class DefaultObjectToStringConverter extends ObjectToStringConverter {
-        public String[] getPossibleStringsForItem(Object item) {
-            return item==null ? null : new String[]{item.toString()};
-        }
         public String getPreferredStringForItem(Object item) {
             return item==null ? null : item.toString();
         }
