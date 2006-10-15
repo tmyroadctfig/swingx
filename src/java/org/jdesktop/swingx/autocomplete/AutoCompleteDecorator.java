@@ -140,10 +140,10 @@ public class AutoCompleteDecorator {
         comboBox.setEditable(true);
         
         // configure the text component=editor component
-        JTextComponent editor = (JTextComponent) comboBox.getEditor().getEditorComponent();
+        JTextComponent editorComponent = (JTextComponent) comboBox.getEditor().getEditorComponent();
         final AbstractAutoCompleteAdaptor adaptor = new ComboBoxAdaptor(comboBox);
         final AutoCompleteDocument document = new AutoCompleteDocument(adaptor, strictMatching, stringConverter);
-        decorate(editor, document, adaptor);
+        decorate(editorComponent, document, adaptor);
         
         // show the popup list when the user presses a key
         final KeyListener keyListener = new KeyAdapter() {
@@ -161,35 +161,29 @@ public class AutoCompleteDecorator {
                 }
             }
         };
-        editor.addKeyListener(keyListener);
+        editorComponent.addKeyListener(keyListener);
         
         if (stringConverter!=ObjectToStringConverter.DEFAULT_IMPLEMENTATION) {
             comboBox.setEditor(new AutoCompleteComboBoxEditor(comboBox.getEditor(), stringConverter));
         }
         
-        comboBox.addPropertyChangeListener("editor", new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent e) {
-                if (!(e.getNewValue() instanceof AutoCompleteComboBoxEditor)) {
-                    comboBox.setEditor(new AutoCompleteComboBoxEditor((ComboBoxEditor) e.getNewValue(), stringConverter));
-                }
-            }
-        });
-        
         // Changing the l&f can change the combobox' editor which in turn
         // would not be autocompletion-enabled. The new editor needs to be set-up.
-        comboBox.addPropertyChangeListener(new PropertyChangeListener() {
+        comboBox.addPropertyChangeListener("editor", new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent e) {
-                if (e.getPropertyName().equals("editor")) {
-                    ComboBoxEditor editor = comboBox.getEditor();
-                    if (editor!=null && editor.getEditorComponent()!=null) {
-                        if (stringConverter!=ObjectToStringConverter.DEFAULT_IMPLEMENTATION) {
-                            editor = new AutoCompleteComboBoxEditor(editor, stringConverter);
-                            comboBox.setEditor(editor);
-                        }
+              	ComboBoxEditor editor = (ComboBoxEditor) e.getNewValue();
+              	if (editor!=null && editor.getEditorComponent()!=null) {
+                    if (!(editor instanceof AutoCompleteComboBoxEditor) 
+                        && stringConverter!=ObjectToStringConverter.DEFAULT_IMPLEMENTATION) {
+                        comboBox.setEditor(new AutoCompleteComboBoxEditor(editor, stringConverter));
+                        // Don't do the decorate step here because calling setEditor will trigger
+                        // the propertychange listener a second time, which will do the decorate
+                        // and addKeyListener step.
+                    } else {
                         decorate((JTextComponent) editor.getEditorComponent(), document, adaptor);
                         editor.getEditorComponent().addKeyListener(keyListener);
                     }
-                }
+              	}
             }
         });
     }
