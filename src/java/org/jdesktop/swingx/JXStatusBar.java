@@ -84,6 +84,19 @@ import org.jdesktop.swingx.plaf.StatusBarUI;
  * easily create a TaskManagerProgressBar that tracks those jobs. This component
  * could then be added to the <code>JXStatusBar</code> like any other component.</p>
  *
+ * <h2>Client Properties</h2>
+ * <p>The BasicStatusBarUI.AUTO_ADD_SEPARATOR client property can be specified, which
+ *    will disable the auto-adding of separators. In this case, you must add your own
+ *    JSeparator components. To use:
+ * <pre><code>
+ *      JXStatusBar sbar = new JXStatusBar();
+ *      sbar.putClientProperty(BasicStatusBarUI.AUTO_ADD_SEPARATOR, false);
+ *      sbar.add(comp1);
+ *      sbar.add(new JSeparator(JSeparator.VERTICAL));
+ *      sbar.add(comp2);
+ *      sbar.add(comp3);
+ *  </code></pre></p>
+ *
  * @author pdoubleya
  * @author rbair
  */

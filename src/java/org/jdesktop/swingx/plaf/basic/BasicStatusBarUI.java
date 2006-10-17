@@ -51,6 +51,8 @@ import org.jdesktop.swingx.plaf.StatusBarUI;
  * @author rbair
  */
 public class BasicStatusBarUI extends StatusBarUI {
+    public static final String AUTO_ADD_SEPARATOR = new StringBuffer("auto-add-separator").toString();
+    
     /**
      * The one and only JXStatusBar for this UI delegate
      */
@@ -146,17 +148,19 @@ public class BasicStatusBarUI extends StatusBarUI {
             Graphics2D g2 = (Graphics2D)g;
             paintBackground(g2, statusBar);
             
-            //now paint the separators
-            Insets sepInsets = new Insets(0, 0, 0, 0);
-            getSeparatorInsets(sepInsets);
-            for (int i=0; i<statusBar.getComponentCount()-1; i++) {
-                Component comp = statusBar.getComponent(i);
-                int x = comp.getX() + comp.getWidth() + sepInsets.left;
-                int y = sepInsets.top;
-                int w = getSeparatorWidth() - sepInsets.left - sepInsets.right;
-                int h = c.getHeight() - sepInsets.top - sepInsets.bottom;
-                
-                paintSeparator(g2, statusBar, x, y, w, h);
+            if (includeSeparators()) {
+                //now paint the separators
+                Insets sepInsets = new Insets(0, 0, 0, 0);
+                getSeparatorInsets(sepInsets);
+                for (int i=0; i<statusBar.getComponentCount()-1; i++) {
+                    Component comp = statusBar.getComponent(i);
+                    int x = comp.getX() + comp.getWidth() + sepInsets.left;
+                    int y = sepInsets.top;
+                    int w = getSeparatorWidth() - sepInsets.left - sepInsets.right;
+                    int h = c.getHeight() - sepInsets.top - sepInsets.bottom;
+
+                    paintSeparator(g2, statusBar, x, y, w, h);
+                }
             }
         }
     }
@@ -188,6 +192,11 @@ public class BasicStatusBarUI extends StatusBarUI {
     
     protected int getSeparatorWidth() {
         return 10;
+    }
+    
+    protected boolean includeSeparators() {
+        Boolean b = (Boolean)statusBar.getClientProperty(AUTO_ADD_SEPARATOR);
+        return b == null || b == true;
     }
     
     protected Border createBorder() {
@@ -238,7 +247,7 @@ public class BasicStatusBarUI extends StatusBarUI {
                     //If this is not the last component, add extra space between each
                     //component (for the separator).
                     count++;
-                    if (constraints.size() < count) {
+                    if (includeSeparators() && constraints.size() < count) {
                         prefSize.width += getSeparatorWidth();
                     }
                 }
@@ -268,8 +277,10 @@ public class BasicStatusBarUI extends StatusBarUI {
                 Insets parentInsets = parent.getInsets();
                 //the available width for putting components.
                 int availableWidth = parent.getWidth() - parentInsets.left - parentInsets.right;
-                //remove from availableWidth the amount of space the separators will take
-                availableWidth -= (parent.getComponentCount() - 1) * getSeparatorWidth();
+                if (includeSeparators()) {
+                    //remove from availableWidth the amount of space the separators will take
+                    availableWidth -= (parent.getComponentCount() - 1) * getSeparatorWidth();
+                }
                 
                 //the preferred widths of all of the components -- where preferred
                 //width mean the preferred width after calculating fixed widths and
@@ -331,7 +342,7 @@ public class BasicStatusBarUI extends StatusBarUI {
                     nextX = x + width + insets.right;
                     //If this is not the last component, add extra space
                     //for the separator
-                    if (i < parent.getComponentCount() - 1) {
+                    if (includeSeparators() && i < parent.getComponentCount() - 1) {
                         nextX += getSeparatorWidth();
                     }
                 }
@@ -356,6 +367,7 @@ public class BasicStatusBarUI extends StatusBarUI {
                     }
                 }
             }
+            
         };
     }
 }
