@@ -84,4 +84,11 @@ public class WindowsStatusBarUI extends BasicStatusBarUI {
         g2.drawImage(middleImage, leftImage.getWidth(), 0, statusBar.getWidth() - leftImage.getWidth() - rightImage.getWidth(), statusBar.getHeight(), null);
         g2.drawImage(rightImage, statusBar.getWidth() - rightImage.getWidth(), 0, rightImage.getWidth(), statusBar.getHeight(), null);
     }
+    
+    protected void getSeparatorInsets(Insets insets) {
+        insets.top = 1;
+        insets.left = 4;
+        insets.bottom = 0;
+        insets.right = 4;
+    }
 }
