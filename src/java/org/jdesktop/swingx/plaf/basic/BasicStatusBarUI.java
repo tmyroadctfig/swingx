@@ -250,44 +250,80 @@ public class BasicStatusBarUI extends StatusBarUI {
             }
             
             public void layoutContainer(Container parent) {
-                int numFilledComponents = 0;
+                /*
+                 * Layout algorithm:
+                 *      If the parent width is less than the sum of the preferred
+                 *      widths of the components (including separators), where
+                 *      preferred width means either the component preferred width + 
+                 *      constraint insets, or fixed width + constraint insets, then
+                 *      simply layout the container from left to right and let the
+                 *      right hand components flow off the parent.
+                 *
+                 *      Otherwise, lay out each component according to its preferred
+                 *      width except for components with a FILL constraint. For these,
+                 *      resize them evenly for each FILL constraint.
+                 */
+                
+                //the insets of the parent component.
                 Insets parentInsets = parent.getInsets();
-                int availableSpace = parent.getWidth() - parentInsets.left - parentInsets.right;
-                for (Component comp : parent.getComponents()) {
-                    Constraint c = constraints.get(comp);
-                    if (c != null && c.getResizeBehavior() == Constraint.ResizeBehavior.FILL) {
-                        numFilledComponents++;
-                    } else if (c != null) {
-                        Insets insets = c.getInsets();
-                        if (c != null) {
-                            availableSpace -= c.getFixedWidth();
-                        } else {
-                            // HWC - Once this is computed, should it be stored so we don't recompute
-                            // it and change the position of items
-                            availableSpace -= comp.getPreferredSize().width;
+                //the available width for putting components.
+                int availableWidth = parent.getWidth() - parentInsets.left - parentInsets.right;
+                //remove from availableWidth the amount of space the separators will take
+                availableWidth -= (parent.getComponentCount() - 1) * getSeparatorWidth();
+                
+                //the preferred widths of all of the components -- where preferred
+                //width mean the preferred width after calculating fixed widths and
+                //constraint insets
+                int[] preferredWidths = new int[parent.getComponentCount()];
+                int sumPreferredWidths = 0;
+                for (int i=0; i<preferredWidths.length; i++) {
+                    preferredWidths[i] = getPreferredWidth(parent.getComponent(i));
+                    sumPreferredWidths += preferredWidths[i];
+                }
+                
+                //if the availableWidth is greater than the sum of preferred
+                //sizes, then adjust the preferred width of each component that
+                //has a FILL constraint, to evenly use up the extra space.
+                if (availableWidth > sumPreferredWidths) {
+                    //the number of components with a fill constraint
+                    int numFilledComponents = 0;
+                    for (Component comp : parent.getComponents()) {
+                        Constraint c = constraints.get(comp);
+                        if (c != null && c.getResizeBehavior() == Constraint.ResizeBehavior.FILL) {
+                            numFilledComponents++;
                         }
-                        availableSpace -= (insets == null) ? 0 : (insets.right + insets.left);
+                    }
+                    
+                    if (numFilledComponents > 0) {
+                        //calculate the share of free space each FILL component will take
+                        availableWidth -= sumPreferredWidths;
+                        double weight = 1.0 / (double)numFilledComponents;
+                        int share = (int)(availableWidth * weight);
+                        int remaining = numFilledComponents;
+                        for (int i=0; i<parent.getComponentCount(); i++) {
+                            Component comp = parent.getComponent(i);
+                            Constraint c = constraints.get(comp);
+                            if (c != null && c.getResizeBehavior() == Constraint.ResizeBehavior.FILL) {
+                                if (remaining > 1) {
+                                    preferredWidths[i] += share;
+                                    availableWidth -= share;
+                                } else {
+                                    preferredWidths[i] += availableWidth;
+                                }
+                                remaining--;
+                            }
+                        }
                     }
                 }
-                availableSpace -= (parent.getComponents().length - 1) * getSeparatorWidth();
-                // figure the ratio of space for the FILLED components
-                double weight = numFilledComponents > 0 ? 1.0 / (double)numFilledComponents : 0.0;
-                // figure the position of the components
+                
+                //now lay out the components
                 int nextX = parentInsets.left;
                 int height = parent.getHeight() - parentInsets.top - parentInsets.bottom;
-                int width = 0;
                 for (int i=0; i<parent.getComponentCount(); i++) {
                     Component comp = parent.getComponent(i);
                     Constraint c = constraints.get(comp);
-                    Constraint.ResizeBehavior rb = c == null ? null : c.getResizeBehavior();
                     Insets insets = c == null ? new Insets(0,0,0,0) : c.getInsets();
-                    
-                    if (rb == Constraint.ResizeBehavior.FILL) {
-                        width = (int)(availableSpace * weight);
-                    } else {
-                        width = c == null ? comp.getPreferredSize().width : c.getFixedWidth();
-                    }
-                    width -= (insets.left + insets.right);
+                    int width = preferredWidths[i] - (insets.left + insets.right);
                     int x = nextX + insets.left;
                     int y = parentInsets.top + insets.top;
                     comp.setSize(width, height);
@@ -297,6 +333,26 @@ public class BasicStatusBarUI extends StatusBarUI {
                     //for the separator
                     if (i < parent.getComponentCount() - 1) {
                         nextX += getSeparatorWidth();
+                    }
+                }
+            }
+            
+            /**
+             * @return the "preferred" width, where that means either 
+             *         comp.getPreferredSize().width + constraintInsets, or
+             *         constraint.fixedWidth + constraintInsets.
+             */
+            private int getPreferredWidth(Component comp) {
+                Constraint c = constraints.get(comp);
+                if (c == null) {
+                    return comp.getPreferredSize().width;
+                } else {
+                    Insets insets = c.getInsets();
+                    assert insets != null;
+                    if (c.getFixedWidth() <= 0) {
+                        return comp.getPreferredSize().width + insets.left + insets.right;
+                    } else {
+                        return c.getFixedWidth() + insets.left + insets.right;
                     }
                 }
             }
