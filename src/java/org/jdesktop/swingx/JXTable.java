@@ -606,41 +606,151 @@ public class JXTable extends JTable
 
     
 //--------------------------------- ColumnControl && Viewport
- 
     
     /**
-     * overridden to addionally configure the upper right corner of an enclosing
-     * scrollpane with the ColumnControl.
+     * Returns the column control visible property.
+     * <p>
+     * 
+     * @return boolean to indicate whether the column control is visible.
+     * @see #setColumnControlVisible(boolean)
+     * @see #setColumnControl(JComponent)
+     */
+    public boolean isColumnControlVisible() {
+        return columnControlVisible;
+    }
+
+    /**
+     * Sets the column control visible property. If true and
+     * <code>JXTable</code> is contained in a <code>JScrollPane</code>, the
+     * table adds the column control to the trailing corner of the scroll pane.
+     * <p>
+     * 
+     * Note: if the table is not inside a <code>JScrollPane</code> the column
+     * control is not shown even if this returns true. In this case it's the
+     * responsibility of the client code to actually show it.
+     * <p>
+     * 
+     * The default value is <code>false</code>.
+     * 
+     * @param visible boolean to indicate if the column control should be shown
+     * @see #getColumnControlVisible(boolean)
+     * @see #setColumnControl(JComponent)
+     * 
+     */
+    public void setColumnControlVisible(boolean visible) {
+        boolean old = columnControlVisible;
+        this.columnControlVisible = visible;
+        configureColumnControl();
+        firePropertyChange("columnControlVisible", old, columnControlVisible);
+    }
+
+
+    /**
+     * Returns the component used as column control. Lazily creates the 
+     * control to the default if it is <code>null</code>.
+     * 
+     * @return component for column control, guaranteed to be != null.
+     * @see #setColumnControl(JComponent)
+     * @see #createDefaultColumnControl()
+     */
+    public JComponent getColumnControl() {
+        if (columnControlButton == null) {
+            columnControlButton = createDefaultColumnControl();
+        }
+        return columnControlButton;
+    }
+
+    /**
+     * Sets the component used as column control. Updates the 
+     * enclosing <code>JScrollPane</code> if appropriate. Passing a
+     * <code>null</code> parameter restores the column control to the
+     * default. <p> The component is automatically visible only if 
+     * the <code>columnControlVisible</code> property is <code>true</code>
+     * and the table is contained in a <code>JScrollPane</code>.
+     * 
+     * <p>
+     * NOTE: from the table's perspective, the columnControl is simply a
+     * JComponent to add to and keep in the trailing corner of the JScrollPane
+     * (if any). It's up to developers to configure the concrete control as
+     * needed.
+     * <p>
+     * 
+     * @param columnControl the <code>JComponent</code> to use as columnControl.
+     * @see #getColumnControl()
+     * @see #createDefaultColumnControl()
+     * @see #setColumnControlVisible(boolean)
+     * 
+     */
+    public void setColumnControl(JComponent columnControl) {
+        // PENDING JW: release old column control? who's responsible?
+        // Could implement CCB.autoRelease()?
+        JComponent old = columnControlButton;
+        this.columnControlButton = columnControl;
+        configureColumnControl();
+        firePropertyChange("columnControl", old, getColumnControl());
+    }
+    
+    /**
+     * Creates the default column control used by this table.
+     * This implementation returns a <code>ColumnControlButton</code> configured
+     * with default <code>ColumnControlIcon</code>.
+     *   
+     * @return the default component used as column control.
+     * @see #setColumnControl(JComponent)
+     * @see org.jdesktop.swingx.icon.ColumnControlIcon
+     */
+    protected JComponent createDefaultColumnControl() {
+        return new ColumnControlButton(this, new ColumnControlIcon());
+    }
+
+ 
+    /**
+     * Sets the language-sensitive orientation that is to be used to order
+     * the elements or text within this component. <p>
+     * 
+     * Overridden to work around a core bug: 
+     * <code>JScrollPane</code> can't cope with
+     * corners when changing component orientation at runtime.
+     * This method explicitly re-configures the column control. <p>
+     * 
+     * @param o the ComponentOrientation for this table.
+     */
+    @Override
+    public void setComponentOrientation(ComponentOrientation o) {
+        super.setComponentOrientation(o);
+        configureColumnControl();
+    }
+
+   
+    /**
+     * Configures the enclosing <code>JScrollPane</code>. <p>
+     *  
+     * Overridden to addionally configure the upper trailing corner 
+     * with the column control.
+     * 
+     * @see #configureColumnControl()
+     * @see #setColumnControlVisible(boolean)
+     * @see #setColumnControl(JComponent)
+     * 
      */
     @Override
     protected void configureEnclosingScrollPane() {
         super.configureEnclosingScrollPane();
         configureColumnControl();
-//        configureViewportBackground();
     }
 
-    /**
-     * set's the viewports background to this.background.<p> 
-     * 
-     * PENDING: need to
-     * repeat on background changes to this!
-     * @deprecated no longer used - replaced by fillsViewportHeight
-     * 
-     */
-    protected void configureViewportBackground() {
-        Container p = getParent();
-        if (p instanceof JViewport) {
-            p.setBackground(getBackground());
-        }
-    }
 
     /**
-     * configure the upper right corner of an enclosing scrollpane with/o the
-     * ColumnControl, depending on setting of columnControl visibility flag.<p>
+     * Configures the upper trailing corner of an enclosing 
+     * <code>JScrollPane</code>.
      * 
-     * PENDING: should choose corner depending on component orientation.
+     * Adds/removes the <code>ColumnControl</code> depending on the 
+     * <code>columnControlVisible</code> property.<p>
+     * 
+     * @see #setColumnControlVisible(boolean)
+     * @see #setColumnControl(JComponent)
      */
-    private void configureColumnControl() {
+    protected void configureColumnControl() {
         Container p = getParent();
         if (p instanceof JViewport) {
             Container gp = p.getParent();
@@ -679,87 +789,6 @@ public class JXTable extends JTable
                 }
             }
         }
-    }
-
-    /**
-     * Hack around core swing JScrollPane bug: can't cope with
-     * corners when changing component orientation at runtime.
-     * overridden to re-configure the columnControl.
-     */
-    @Override
-    public void setComponentOrientation(ComponentOrientation o) {
-        super.setComponentOrientation(o);
-        configureColumnControl();
-    }
-
-    /**
-     * returns visibility flag of column control.
-     * <p>
-     * 
-     * Note: if the table is not inside a JScrollPane the column control is not
-     * shown even if this returns true. In this case it's the responsibility of
-     * the client code to actually show it.
-     * 
-     * @return true if the column is visible, false otherwise
-     */
-    public boolean isColumnControlVisible() {
-        return columnControlVisible;
-    }
-
-    /**
-     * Lazily creates and returns the component use as column control.
-     * 
-     * @return component for column control, guaranteed to be != null.
-     * @see #setColumnControl(JComponent)
-     */
-    public JComponent getColumnControl() {
-        if (columnControlButton == null) {
-            columnControlButton = createDefaultColumnControl();
-        }
-        return columnControlButton;
-    }
-
-    /**
-     * Sets the columnControl and updates the scrollpane, if any.
-     * If the given component is null, sets and uses the default columnControl.
-     * <p>
-     * NOTE: from the table's perspective, the columnControl is simply a
-     * JComponent to add to and keep in the trailing corner of the JScrollPane (if any). 
-     * It's up to developers to configure the concrete control as needed.
-     * <p>
-     * PENDING JW: release old column control? who's responsible? 
-     *   Could implement CCB.autoRelease()?
-     * 
-     * @param columnControl the JComponent to use as columnControl. 
-     */
-    public void setColumnControl(JComponent columnControl) {
-        JComponent old = columnControlButton;
-        this.columnControlButton = columnControl;
-        configureColumnControl();
-        firePropertyChange("columnControl", old, getColumnControl());
-    }
-    
-    /**
-     * Factory method to create the default ColumnControl used by this table.
-     * Here: a ColumnControlButton configured
-     *   with this and the default ColumnControlIcon
-     *   
-     * @return the default ColumnControl.
-     */
-    protected JComponent createDefaultColumnControl() {
-        return new ColumnControlButton(this, new ColumnControlIcon());
-    }
-
-    /**
-     * bound property to flag visibility state of column control.
-     * 
-     * @param showColumnControl
-     */
-    public void setColumnControlVisible(boolean showColumnControl) {
-        boolean old = columnControlVisible;
-        this.columnControlVisible = showColumnControl;
-        configureColumnControl();
-        firePropertyChange("columnControlVisible", old, columnControlVisible);
     }
 
     
@@ -3264,7 +3293,9 @@ public class JXTable extends JTable
      * table as read-only, independent of their per-column editability as returned
      * by <code>TableColumnExt.isEditable()</code> and their per-cell editability as returned
      * by the <code>TableModel.isCellEditable</code>. If a cell is read-only in its 
-     * column or model layer, this property has no effect.
+     * column or model layer, this property has no effect. <p>
+     * 
+     * The default value is <code>true</code>.
      * 
      * @param editable the flag to indicate if the table is editable.
      * @see #isEditable
@@ -3361,7 +3392,6 @@ public class JXTable extends JTable
         }
         updateRowHeightUI(true);
         updateHighlighters();
-        configureViewportBackground();
     }
 
     /**
