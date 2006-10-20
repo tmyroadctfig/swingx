@@ -1172,6 +1172,10 @@ public class JXLoginPanel extends JXImagePanel {
                         w.setVisible(false);
                         w.dispose();
                 }
+                for (PropertyChangeListener l : w.getPropertyChangeListeners("status")) {
+                    PropertyChangeEvent pce = new PropertyChangeEvent(w, "status", evt.getOldValue(), evt.getNewValue());
+                    l.propertyChange(pce);
+                }
             }
         });
         cancelButton.setText(UIManager.getString(CLASS_NAME + ".cancelString"));
