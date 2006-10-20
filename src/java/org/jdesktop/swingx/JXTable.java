@@ -956,7 +956,7 @@ public class JXTable extends JTable
      *   exclusively #setHorizontalScrollEnabled(). This method can't
      *   cope with it.
      * 
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     public void setAutoResizeMode(int mode) {
@@ -3362,7 +3362,7 @@ public class JXTable extends JTable
 
     /**
      * Overriden to keep view/model coordinates of SizeSequence in synch.
-     * @inheritDoc 
+     * {@inheritDoc}
      */
     @Override
     public void setRowHeight(int rowHeight) {
@@ -3379,7 +3379,7 @@ public class JXTable extends JTable
      * Does nothing #isRowHeightEnabled is false.
      * 
      * @see #isRowHeightEnabled()
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     public void setRowHeight(int row, int rowHeight) {
@@ -3489,18 +3489,22 @@ public class JXTable extends JTable
         isXTableRowHeightSet = heightSet;
     }
 
-
-    private void updateEditorUI(Object value) {
+    /**
+     * Tries its best to <code>updateUI</code> of the potential <code>TableCellEditor</code>. 
+     * 
+     * @param maybeEditor the potential editor.
+     */
+    private void updateEditorUI(Object maybeEditor) {
         // maybe null or proxyValue
-        if (!(value instanceof TableCellEditor))
+        if (!(maybeEditor instanceof TableCellEditor))
             return;
         // super handled this
-        if ((value instanceof JComponent)
-                || (value instanceof DefaultCellEditor))
+        if ((maybeEditor instanceof JComponent)
+                || (maybeEditor instanceof DefaultCellEditor))
             return;
         // custom editors might balk about fake rows/columns
         try {
-            Component comp = ((TableCellEditor) value)
+            Component comp = ((TableCellEditor) maybeEditor)
                     .getTableCellEditorComponent(this, null, false, -1, -1);
             if (comp instanceof JComponent) {
                 ((JComponent) comp).updateUI();
@@ -3510,17 +3514,22 @@ public class JXTable extends JTable
         }
     }
 
-    /** ? */
-    private void updateRendererUI(Object value) {
+    /** 
+     * Tries its best to <code>updateUI</code> of the potential 
+     * <code>TableCellRenderer</code>. 
+     * 
+     * @param maybeRenderer the potential renderer.
+     */
+    private void updateRendererUI(Object maybeRenderer) {
         // maybe null or proxyValue
-        if (!(value instanceof TableCellRenderer))
+        if (!(maybeRenderer instanceof TableCellRenderer))
             return;
         // super handled this
-        if (value instanceof JComponent)
+        if (maybeRenderer instanceof JComponent)
             return;
         // custom editors might balk about fake rows/columns
         try {
-            Component comp = ((TableCellRenderer) value)
+            Component comp = ((TableCellRenderer) maybeRenderer)
                     .getTableCellRendererComponent(this, null, false, false,
                             -1, -1);
             if (comp instanceof JComponent) {
@@ -3535,9 +3544,11 @@ public class JXTable extends JTable
     
 //---------------------------- overriding super factory methods and buggy
     /**
+     * {@inheritDoc}
      * workaround bug in JTable. (Bug Parade ID #6291631 - negative y is mapped
-     * to row 0).
+     * to row 0). <p>
      */
+    @Override
     public int rowAtPoint(Point point) {
         if (point.y < 0)
             return -1;
@@ -3545,12 +3556,12 @@ public class JXTable extends JTable
     }
 
     
-    /** ? */
+    @Override
     protected JTableHeader createDefaultTableHeader() {
         return new JXTableHeader(columnModel);
     }
 
-    /** ? */
+    @Override
     protected TableColumnModel createDefaultColumnModel() {
         return new DefaultTableColumnModelExt();
     }
