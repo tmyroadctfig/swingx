@@ -105,7 +105,6 @@ import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.table.TableColumnModelExt;
-import org.jdesktop.swingx.util.Utilities;
 
 /**
  * <p>
@@ -494,6 +493,7 @@ public class JXTable extends JTable
      */
     protected RolloverProducer createRolloverProducer() {
         RolloverProducer r = new RolloverProducer() {
+            @Override
             protected void updateRolloverPoint(JComponent component,
                     Point mousePoint) {
                 JTable table = (JTable) component;
@@ -534,6 +534,7 @@ public class JXTable extends JTable
 
 //    --------------------------- JTable rollover
         
+        @Override
         protected void rollover(Point oldLocation, Point newLocation) {
             if (oldLocation != null) {
                 Rectangle r = component.getCellRect(oldLocation.y, oldLocation.x, false);
@@ -558,6 +559,7 @@ public class JXTable extends JTable
             return super.isClickable(location) && !component.isCellEditable(location.y, location.x);
         }
 
+        @Override
         protected RolloverRenderer getRolloverRenderer(Point location, boolean prepare) {
             TableCellRenderer renderer = component.getCellRenderer(location.y, location.x);
             RolloverRenderer rollover = renderer instanceof RolloverRenderer ?
@@ -589,6 +591,7 @@ public class JXTable extends JTable
         }
         
 
+        @Override
         protected Point getFocusedCell() {
             int leadRow = component.getSelectionModel()
                     .getLeadSelectionIndex();
@@ -2123,6 +2126,7 @@ public class JXTable extends JTable
         private SearchHighlighter searchHighlighter;
         
 
+        @Override
         protected void findMatchAndUpdateState(Pattern pattern, int startRow,
                 boolean backwards) {
             SearchResult matchRow = null;
@@ -2157,6 +2161,7 @@ public class JXTable extends JTable
          * @param row
          * @return an appropriate <code>SearchResult</code> if matching or null
          */
+        @Override
         protected SearchResult findExtendedMatch(Pattern pattern, int row) {
             return findMatchAt(pattern, row, lastSearchResult.foundColumn);
         }
@@ -2300,10 +2305,12 @@ public class JXTable extends JTable
         }
 
 
+        @Override
         protected int getSize() {
             return getRowCount();
         }
 
+        @Override
         protected void moveMatchMarker() {
             int row = lastSearchResult.foundRow;
             int column = lastSearchResult.foundColumn;
@@ -2578,6 +2585,7 @@ public class JXTable extends JTable
         }
 
 
+        @Override
         public String getColumnName(int columnIndex) {
             TableColumn column = getColumnByModelIndex(columnIndex);
             return column == null ? "" : column.getHeaderValue().toString();
@@ -2595,6 +2603,7 @@ public class JXTable extends JTable
         }
 
         
+        @Override
         public String getColumnIdentifier(int columnIndex) {
             
             TableColumn column = getColumnByModelIndex(columnIndex);
@@ -2615,14 +2624,17 @@ public class JXTable extends JTable
         /**
          * {@inheritDoc}
          */
+        @Override
         public Object getValueAt(int row, int column) {
             return table.getModel().getValueAt(row, column);
         }
 
+        @Override
         public void setValueAt(Object aValue, int row, int column) {
             table.getModel().setValueAt(aValue, row, column);
         }
 
+        @Override
         public boolean isCellEditable(int row, int column) {
             return table.getModel().isCellEditable(row, column);
         }
@@ -2635,6 +2647,7 @@ public class JXTable extends JTable
         }
 //-------------------------- accessing view state/values
         
+        @Override
         public Object getFilteredValueAt(int row, int column) {
             return getValueAt(table.convertRowIndexToModel(row), column);
 //            return table.getValueAt(row, modelToView(column)); // in view coordinates
@@ -2643,12 +2656,14 @@ public class JXTable extends JTable
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean isSelected() {
             return table.isCellSelected(row, column);
         }
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean hasFocus() {
             boolean rowIsLead = (table.getSelectionModel()
                     .getLeadSelectionIndex() == row);
@@ -2677,19 +2692,29 @@ public class JXTable extends JTable
     }
 
  
-//--------------------- managing renderers/editors
-    
-    /** Returns the HighlighterPipeline assigned to the table, null if none. */
+   // --------------------- managing renderers/editors
+
+    /**
+     * Returns the HighlighterPipeline assigned to the table, null if none.
+     * 
+     * @return the HighlighterPipeline assigned to the table.
+     * @see #setHighlighters(HighlighterPipeline)
+     */
     public HighlighterPipeline getHighlighters() {
         return highlighters;
     }
 
     /**
-     * Assigns a HighlighterPipeline to the table, maybe null to 
-     * remove all Highlighters. bound property.
+     * Assigns a HighlighterPipeline to the table, maybe null to remove all
+     * Highlighters.<p>
      * 
-     * @param pipeline the HighlighterPipeline to use for renderer
-     *   decoration.
+     * The default value is <code>null</code>.
+     * 
+     * @param pipeline the HighlighterPipeline to use for renderer decoration. 
+     * @see #getHighlighters()
+     * @see #addHighlighter(Highlighter)
+     * @see #removeHighlighter(Highlighter)
+     * 
      */
     public void setHighlighters(HighlighterPipeline pipeline) {
         HighlighterPipeline old = getHighlighters();
@@ -2706,13 +2731,17 @@ public class JXTable extends JTable
     
     /**
      * Adds a Highlighter.
+     * <p>
      * 
-     * If the HighlighterPipeline returned from getHighlighters() is null, creates
-     * and sets a new pipeline containing the given Highlighter. Else, appends
-     * the Highlighter to the end of the pipeline.
+     * If the <code>HighlighterPipeline</code> returned from getHighlighters()
+     * is null, creates and sets a new pipeline containing the given
+     * <code>Highlighter</code>. Else, appends the <code>Highlighter</code>
+     * to the end of the pipeline.
      * 
-     * @param highlighter the Highlighter to add - must not be null.
-     * @throws NullPointerException if highlighter is null.
+     * @param highlighter the <code>Highlighter</code> to add.
+     * @throws NullPointerException if <code>Highlighter</code> is null.
+     * @see #removeHighlighter(Highlighter)
+     * @see #setHighlighters(HighlighterPipeline)
      */
     public void addHighlighter(Highlighter highlighter) {
         HighlighterPipeline pipeline = getHighlighters();
@@ -2724,12 +2753,14 @@ public class JXTable extends JTable
     }
 
     /**
-     * Removes the Highlighter.
+     * Removes the Highlighter. <p>
      * 
      * Does nothing if the HighlighterPipeline is null or does not contain
      * the given Highlighter.
      * 
      * @param highlighter the highlighter to remove.
+     * @see #addHighlighter(Highlighter)
+     * @see #setHighlighters(HighlighterPipeline)
      */
     public void removeHighlighter(Highlighter highlighter) {
         if ((getHighlighters() == null)) return;
@@ -2737,38 +2768,48 @@ public class JXTable extends JTable
     }
     
     /**
-     * returns the ChangeListener to use with highlighters. Creates one if
-     * necessary.
+     * Returns the <code>ChangeListener</code> to use with highlighters. Lazily 
+     * creates the listener.
      * 
-     * @return != null
+     * @return the ChangeListener for observing changes of highlighters, 
+     *   guaranteed to be <code>not-null</code>
      */
     protected ChangeListener getHighlighterChangeListener() {
         if (highlighterChangeListener == null) {
-            highlighterChangeListener = new ChangeListener() {
-
-                public void stateChanged(ChangeEvent e) {
-                    repaint();
-
-                }
-
-            };
+            highlighterChangeListener = createHighlighterChangeListener();
         }
         return highlighterChangeListener;
     }
 
+    /**
+     * Creates and returns the ChangeListener observing Highlighters.
+     * <p>
+     * Here: repaints the table on receiving a stateChanged.
+     * 
+     * @return the ChangeListener defining the reaction to changes of
+     *         highlighters.
+     */
+    protected ChangeListener createHighlighterChangeListener() {
+        ChangeListener l = new ChangeListener() {
+
+            public void stateChanged(ChangeEvent e) {
+                repaint();
+
+            }
+
+        };
+        return l;
+    }
+
     
     /**
-     * Returns an appropriate renderer for the cell specified by this row and
-     * column. Overridden to fix core bug #4614616 (NPE if
-     * <code>TableModel</code>'s <code>Class</code> for the column is an
-     * interface). This method guarantees to always return a
-     * <code>not null</code> value. *
+     * {@inheritDoc}
+     * <p>
      * 
-     * @param row the row of the cell to render
-     * @param column the column of the cell to render
-     * @return the renderer for this cell
+     * Overridden to fix core bug #4614616 (NPE if <code>TableModel</code>'s
+     * <code>Class</code> for the column is an interface). This method
+     * guarantees to always return a <code>not null</code> value. *
      * 
-     * @see javax.swing.JTable#getCellRenderer(int, int);
      * 
      */
     @Override
@@ -2783,23 +2824,22 @@ public class JXTable extends JTable
     /**
      * Returns the decorated <code>Component</code> used as a stamp to render
      * the specified cell. Overrides superclass version to provide support for
-     * cell decorators. <p>
+     * cell decorators.
+     * <p>
      * 
-     * Adjusts component orientation (guaranteed to happen before applying 
+     * Adjusts component orientation (guaranteed to happen before applying
      * Highlighters).
-     * @linkplain https://swingx.dev.java.net/issues/show_bug.cgi?id=145
      * 
      * 
-     * @param renderer
-     *            the <code>TableCellRenderer</code> to prepare
-     * @param row
-     *            the row of the cell to render, where 0 is the first row
-     * @param column
-     *            the column of the cell to render, where 0 is the first column
+     * @param renderer the <code>TableCellRenderer</code> to prepare
+     * @param row the row of the cell to render, where 0 is the first row
+     * @param column the column of the cell to render, where 0 is the first
+     *        column
      * @return the decorated <code>Component</code> used as a stamp to render
      *         the specified cell
      * @see org.jdesktop.swingx.decorator.Highlighter
      */
+    @Override
     public Component prepareRenderer(TableCellRenderer renderer, int row,
             int column) {
         Component stamp = super.prepareRenderer(renderer, row, column);
@@ -2827,6 +2867,9 @@ public class JXTable extends JTable
      * @param renderer the <code>TableCellRenderer</code> to hack 
      * @param row  the row of the cell to render 
      * @param column the column index of the cell to render
+     * 
+     * @see org.jdesktop.swingx.decorator.ResetDTCRColorHighlighter
+     * @see #prepareRenderer(TableCellRenderer, int, int)
      */
     protected void resetDefaultTableCellRendererColors(Component renderer, int row, int column) {
         ComponentAdapter adapter = getComponentAdapter(row, column);
@@ -2839,6 +2882,8 @@ public class JXTable extends JTable
 
 
     /**
+     * {@inheritDoc} <p>
+     * 
      * Overridden to adjust the editor's component orientation if 
      * appropriate.
      */
@@ -2850,13 +2895,18 @@ public class JXTable extends JTable
     }
 
     /**
-     * adjusts the Component's orientation to JXTable's CO if appropriate.
-     * Here: always.
+     * Adjusts the <code>Component</code>'s orientation to this
+     * <code>JXTable</code>'s CO if appropriate. The parameter must not be
+     * <code>null</code>.
+     * <p>
      * 
-     * @param stamp
+     * This implementation synchs the CO always.
+     * 
+     * @param stamp the Component who's CO may need to be synched.
      */
     protected void adjustComponentOrientation(Component stamp) {
-        if (stamp.getComponentOrientation().equals(getComponentOrientation())) return;
+        if (stamp.getComponentOrientation().equals(getComponentOrientation()))
+            return;
         stamp.applyComponentOrientation(getComponentOrientation());
     }
 
@@ -2866,10 +2916,7 @@ public class JXTable extends JTable
      * a <b>new </b> instance each time so that the renderer may be set and
      * customized on a particular column.
      * 
-     * PENDING: must not return null!
-     * 
-     * @param columnClass
-     *            Class of value being rendered
+     * @param columnClass Class of value being rendered
      * @return TableCellRenderer instance which renders values of the specified
      *         type
      */
@@ -2877,11 +2924,12 @@ public class JXTable extends JTable
         TableCellRenderer renderer = getDefaultRenderer(columnClass);
         if (renderer != null) {
             try {
-                return (TableCellRenderer) renderer.getClass().newInstance();
+                return renderer.getClass().newInstance();
             } catch (Exception e) {
                 LOG.fine("could not create renderer for " + columnClass);
             }
         }
+        // JW PENDING: must not return null!
         return null;
     }
 
@@ -2890,7 +2938,8 @@ public class JXTable extends JTable
      * booleans, icons, and links.
      * Overridden so we can act as factory for renderers plus hacking around
      * huge memory consumption of UIDefaults (see #6345050 in core Bug parade)
-     * 
+     * <p>
+     * {@inheritDoc}
      */
     @Override
     protected void createDefaultRenderers() {
@@ -2996,6 +3045,7 @@ public class JXTable extends JTable
             this.formatter = formatter;
         }
 
+        @Override
         public void setValue(Object value) {
             setText((value == null) ? "" : formatter.format(value));
         }
@@ -3015,6 +3065,7 @@ public class JXTable extends JTable
             this.formatter = formatter;
         }
 
+        @Override
         public void setValue(Object value) {
             setText((value == null) ? "" : formatter.format(value));
         }
@@ -3026,6 +3077,7 @@ public class JXTable extends JTable
             setHorizontalAlignment(JLabel.CENTER);
         }
 
+        @Override
         public void setValue(Object value) {
             setIcon((value instanceof Icon) ? (Icon) value : null);
         }
@@ -3122,6 +3174,7 @@ public class JXTable extends JTable
             getComponent().setName("Table.editor");
         }
 
+        @Override
         public boolean stopCellEditing() {
             String s = (String)super.getCellEditorValue();
             // Here we are dealing with the case where a user
@@ -3147,6 +3200,7 @@ public class JXTable extends JTable
             return super.stopCellEditing();
         }
 
+        @Override
         public Component getTableCellEditorComponent(JTable table, Object value,
                                                  boolean isSelected,
                                                  int row, int column) {
@@ -3169,6 +3223,7 @@ public class JXTable extends JTable
             return super.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
 
+        @Override
         public Object getCellEditorValue() {
             return value;
         }
@@ -3189,10 +3244,11 @@ public class JXTable extends JTable
         }
     }
 
-//----------------------------- enhanced editing support
-    
+    // ----------------------------- enhanced editing support
+
     /**
      * Returns the editable property of the <code>JXTable</code> as a whole.
+     * 
      * @return boolean to indicate if the table is editable.
      * @see #setEditable
      */
@@ -3202,10 +3258,12 @@ public class JXTable extends JTable
     
     /**
      * Sets the editable property. This property allows to mark all cells in a
-     * table as read-only, independent of their per-column editability as returned
-     * by <code>TableColumnExt.isEditable()</code> and their per-cell editability as returned
-     * by the <code>TableModel.isCellEditable</code>. If a cell is read-only in its 
-     * column or model layer, this property has no effect. <p>
+     * table as read-only, independent of their per-column editability as
+     * returned by <code>TableColumnExt.isEditable()</code> and their per-cell
+     * editability as returned by the <code>TableModel.isCellEditable</code>.
+     * If a cell is read-only in its column or model layer, this property has no
+     * effect.
+     * <p>
      * 
      * The default value is <code>true</code>.
      * 
@@ -3219,66 +3277,84 @@ public class JXTable extends JTable
         firePropertyChange("editable", old, isEditable());
     }
     /**
+     * Returns the property which determines the edit termination behaviour on
+     * focus lost.
+     * 
      * @return boolean to indicate whether an ongoing edit should be terminated
-     *    if the focus is moved to somewhere outside of the table.
+     *         if the focus is moved to somewhere outside of the table.
      * @see #setTerminateEditOnFocusLost(boolean)
      */
     public boolean isTerminateEditOnFocusLost() {
-        return Boolean.TRUE.equals(getClientProperty("terminateEditOnFocusLost"));
+        return Boolean.TRUE
+                .equals(getClientProperty("terminateEditOnFocusLost"));
     }
 
     /**
-     * Sets the property to determine whether an ongoing edit should be terminated
-     * if the focus is moved to somewhere outside of the table. If true, terminates
-     * the edit, does nothing otherwise. The exact behaviour is implemented in 
-     * <code>JTable.CellEditorRemover</code>: "outside" is interpreted to be on a component
-     * which is not under the table hierarchy but inside the same toplevel window,
-     * "terminate" does so in any case, first tries to stop the edit, if that's unsuccess
-     * cancels the edit.
+     * Sets the property to determine whether an ongoing edit should be
+     * terminated if the focus is moved to somewhere outside of the table. If
+     * true, terminates the edit, does nothing otherwise. The exact behaviour is
+     * implemented in <code>JTable.CellEditorRemover</code>: "outside" is
+     * interpreted to be on a component which is not under the table hierarchy
+     * but inside the same toplevel window, "terminate" does so in any case,
+     * first tries to stop the edit, if that's unsuccessful it cancels the edit.
      * 
-     * The default value is true.
+     * The default value is <code>true</code>.
      * 
-     * @param terminate the flag to determine whether or not to terminate the edit
+     * @param terminate the flag to determine whether or not to terminate the
+     *        edit
+     * @see #isTerminateEditOnFocusLost()
      */
     public void setTerminateEditOnFocusLost(boolean terminate) {
-        // JW: we can leave the propertyChange notification to the 
+        // JW: we can leave the propertyChange notification to the
         // putClientProperty - the key and method name are the same
         putClientProperty("terminateEditOnFocusLost", terminate);
     }
     
     /**
+     * Returns the autoStartsEdit property.
      * 
-     * @return boolean to indicate whether a keyStroke should try to
-     *   start editing.
-     * @see #setAutoStartEditOnKeyStroke(boolean)   
+     * @return boolean to indicate whether a keyStroke should try to start
+     *         editing.
+     * @see #setAutoStartEditOnKeyStroke(boolean)
      */
     public boolean isAutoStartEditOnKeyStroke() {
-        return !Boolean.FALSE.equals(getClientProperty("JTable.autoStartsEdit"));
+        return !Boolean.FALSE
+                .equals(getClientProperty("JTable.autoStartsEdit"));
     }
     
     /**
      * Sets the autoStartsEdit property. If true, keystrokes are passed-on to
-     * the cellEditor of the lead cell to let it decide whether to start an edit.
+     * the cellEditor of the lead cell to let it decide whether to start an
+     * edit.
      * <p>
-     * The default value is true.
+     * The default value is <code>true</code>.
+     * <p>
      * 
-     * @param autoStart boolean to determine whether a keyStroke should
-     *   try to start editing.
+     * @param autoStart boolean to determine whether a keyStroke should try to
+     *        start editing.
+     * @see #isAutoStartEditOnKeyStroke()
      */
     public void setAutoStartEditOnKeyStroke(boolean autoStart) {
         boolean old = isAutoStartEditOnKeyStroke();
-        // JW: we have to take over propertyChange notification 
+        // JW: we have to take over propertyChange notification
         // because the key and method name are different.
         // As a consequence, there are two events fired: one for
         // the client prop and one for this method.
         putClientProperty("JTable.autoStartsEdit", autoStart);
-        firePropertyChange("autoStartEditOnKeyStroke", old, isAutoStartEditOnKeyStroke());
+        firePropertyChange("autoStartEditOnKeyStroke", old,
+                isAutoStartEditOnKeyStroke());
     }
     
-// ---------------------------- updateUI support
-    
+
+    // ---------------------------- updateUI support
+
     /**
-     * bug fix: super doesn't update all renderers/editors.
+     * {@inheritDoc}
+     * <p>
+     * Additionally updates auto-adjusted row height and highlighters.
+     * <p>
+     * Another of the override motivation is to fix core issue (?? ID): super
+     * fails to update <b>all</b> renderers/editors.
      */
     @Override
     public void updateUI() {
@@ -3307,34 +3383,40 @@ public class JXTable extends JTable
     }
 
     /**
-     * Updates highlighter after ui changes.
-     *
+     * Updates highlighter after <code>updateUI</code> changes.
+     * 
      */
     protected void updateHighlighters() {
-        if (getHighlighters() == null) return;
+        if (getHighlighters() == null)
+            return;
         getHighlighters().updateUI();
     }
 
-    /** 
-     * internal (unsucessful?) hack to try and set rowHeight to something more
-     * pleasing then the default. <p> 
-     * First asks the UIManager for a default value (stored with key "JXTable.rowHeight"). 
-     * If none is available, calculates a "reasonable" height from the table's 
-     * fontMetrics, assuming that most renderers/editors will have a border with top/bottom
-     * of 1. 
-     *  
-     * Does nothing if the rowHeight had been  already set by client code. 
-     * The underlying problem is that raw types can't implement 
-     * UIResource. 
+    /**
+     * Auto-adjusts rowHeight to something more pleasing then the default. This
+     * method is called after instantiation and after updating the UI. Does
+     * nothing if the given parameter is <code>true</code> and the rowHeight
+     * had been already set by client code. The underlying problem is that raw
+     * types can't implement UIResource.
+     * <p>
+     * This implementation asks the UIManager for a default value (stored with
+     * key "JXTable.rowHeight"). If none is available, calculates a "reasonable"
+     * height from the table's fontMetrics, assuming that most renderers/editors
+     * will have a border with top/bottom of 1.
+     * <p>
+     * 
+     * @param respectRowSetFlag a boolean to indicate whether client-code flag
+     *        should be respected.
+     * @see #isXTableRowHeightSet
      */
-    private void updateRowHeightUI(boolean respectRowSetFlag) {
+    protected void updateRowHeightUI(boolean respectRowSetFlag) {
         if (respectRowSetFlag && isXTableRowHeightSet)
             return;
         int uiHeight = UIManager.getInt(UIPREFIX + "rowHeight");
         if (uiHeight > 0) {
             setRowHeight(uiHeight);
         } else {
-            int fontBasedHeight = getFontMetrics(getFont()).getHeight() + 2; 
+            int fontBasedHeight = getFontMetrics(getFont()).getHeight() + 2;
             int magicMinimum = 18;
             setRowHeight(Math.max(fontBasedHeight, magicMinimum));
         }
@@ -3342,27 +3424,35 @@ public class JXTable extends JTable
     }
 
     /**
-     * Convenience to set both grid line visibility and 
-     * default margin for horizontal/vertical lines. The margin
-     * defaults to 1 or 0 if the grid lines are drawn or not drawn. 
+     * Convenience to set both grid line visibility and default margin for
+     * horizontal/vertical lines. The margin defaults to 1 or 0 if the grid
+     * lines are drawn or not drawn.
+     * <p>
+     * PENDING rename? setShowGrid(boolean, boolean) would let it appear nearer
+     * to the other setShowGrid method.
      * 
      * @param showHorizontalLines boolean to decide whether to draw horizontal
-     *    grid lines.
-     * @param showVerticalLines boolean to decide whether to draw vertical
-     *   grid lines.
+     *        grid lines.
+     * @param showVerticalLines boolean to decide whether to draw vertical grid
+     *        lines.
      */
-    public void setDefaultMargins(boolean showHorizontalLines, boolean showVerticalLines) {
-       int defaultRowMargin = showHorizontalLines ? 1 : 0;
-       setRowMargin(defaultRowMargin);
-       setShowHorizontalLines(showHorizontalLines);
-       int defaultColumnMargin = showVerticalLines ? 1 : 0;
-       setColumnMargin(defaultColumnMargin);
-       setShowVerticalLines(showVerticalLines);
+    public void setDefaultMargins(boolean showHorizontalLines,
+            boolean showVerticalLines) {
+        int defaultRowMargin = showHorizontalLines ? 1 : 0;
+        setRowMargin(defaultRowMargin);
+        setShowHorizontalLines(showHorizontalLines);
+        int defaultColumnMargin = showVerticalLines ? 1 : 0;
+        setColumnMargin(defaultColumnMargin);
+        setShowVerticalLines(showVerticalLines);
     }
 
     /**
-     * Overriden to keep view/model coordinates of SizeSequence in synch.
      * {@inheritDoc}
+     * <p>
+     * Overriden to keep view/model coordinates of SizeSequence in synch. Marks
+     * the request as client-code induced.
+     * 
+     * @see #isXTableRowHeightSet
      */
     @Override
     public void setRowHeight(int rowHeight) {
@@ -3375,38 +3465,43 @@ public class JXTable extends JTable
     }
 
     /**
+     * {@inheritDoc}
+     * <p>
+     * Does nothing if support of individual rowHeights is not enabled.
      * Overriden to keep view/model coordinates of SizeSequence in synch.
-     * Does nothing #isRowHeightEnabled is false.
      * 
      * @see #isRowHeightEnabled()
-     * {@inheritDoc}
      */
     @Override
     public void setRowHeight(int row, int rowHeight) {
-        if (!isRowHeightEnabled()) return;
+        if (!isRowHeightEnabled())
+            return;
         super.setRowHeight(row, rowHeight);
         updateViewSizeSequence();
         resizeAndRepaint();
     }
 
     /**
-     * sets enabled state of individual rowHeight support. The default 
-     * is false.
-     * Enabling the support envolves reflective access
-     * to super's private field rowModel which may fail due to security
-     * issues. If failing the support is not enabled.
+     * Sets enablement of individual rowHeight support. Enabling the support
+     * involves reflective access to super's private field rowModel which may
+     * fail due to security issues. If failing the support is not enabled.
+     * <p>
+     * The default value is false.
      * 
-     * PENDING: should we throw an Exception if the enabled fails? 
-     * Or silently fail - depends on runtime context, 
-     * can't do anything about it.
-     * 
-     * @param enabled a boolean to indicate whether per-row heights should
-     *   be enabled.
+     * @param enabled a boolean to indicate whether per-row heights should be
+     *        enabled.
+     * @see #isRowHeightEnabled()
+     * @see #setRowHeight(int, int))
      */
     public void setRowHeightEnabled(boolean enabled) {
+        // PENDING: should we throw an Exception if the enabled fails?
+        // Or silently fail - depends on runtime context,
+        // can't do anything about it.
         boolean old = isRowHeightEnabled();
-        if (old == enabled) return;
-        if (enabled && !canEnableRowHeight()) return;
+        if (old == enabled)
+            return;
+        if (enabled && !canEnableRowHeight())
+            return;
         rowHeightEnabled = enabled;
         if (!enabled) {
             adminSetRowHeight(getRowHeight());
@@ -3415,20 +3510,35 @@ public class JXTable extends JTable
     }
 
     /**
+     * Returns a boolean to indicate whether individual row height is enabled.
      * 
-     * @return a boolean to indicate whether individual row height 
-     *    support is enabled.
-     * @see #isRowHeightEnabled()
+     * @return a boolean to indicate whether individual row height support is
+     *         enabled.
+     * @see #setRowHeightEnabled(boolean)
+     * @see #setRowHeight(int, int))
      */
     public boolean isRowHeightEnabled() {
         return rowHeightEnabled;
     }
 
 
+    /**
+     * Returns if it's possible to enable individual row height support.
+     * 
+     * @return a boolean to indicate whether access of super's private
+     *         <code>rowModel</code> is allowed.
+     */
     private boolean canEnableRowHeight() {
         return getRowModelField() != null;
     }
 
+    /**
+     * Returns super's private <code>rowModel</code> which holds the
+     * individual rowHeights. This method will return <code>null</code> if the
+     * access failed, f.i. in sandbox restricted applications.
+     * 
+     * @return super's rowModel field or null if the access was not successful.
+     */
     private SizeSequence getSuperRowModel() {
         try {
             Field field = getRowModelField();
@@ -3436,20 +3546,27 @@ public class JXTable extends JTable
                 return (SizeSequence) field.get(this);
             }
         } catch (SecurityException e) {
-            LOG.fine("cannot use reflection " +
-            " - expected behaviour in sandbox");
+            LOG.fine("cannot use reflection "
+                    + " - expected behaviour in sandbox");
         } catch (IllegalArgumentException e) {
-            LOG.fine("problem while accessing super's private field - private api changed?");
+            LOG
+                    .fine("problem while accessing super's private field - private api changed?");
         } catch (IllegalAccessException e) {
-            LOG.fine("cannot access private field " +
-                " - expected behaviour in sandbox. " +
-                "Could be program logic running wild in unrestricted contexts");
+            LOG
+                    .fine("cannot access private field "
+                            + " - expected behaviour in sandbox. "
+                            + "Could be program logic running wild in unrestricted contexts");
         }
         return null;
     }
 
     /**
-     * @return <code>Field</code>
+     * Returns super's private field which holds the individual rowHeights. This
+     * method will return <code>null</code> if the access failed, f.i. in
+     * sandbox restricted applications.
+     * 
+     * @return the super's field with access allowed or null if an Exception
+     *         caught while trying to access.
      */
     private Field getRowModelField() {
         if (rowModelField == null) {
@@ -3458,19 +3575,23 @@ public class JXTable extends JTable
                 rowModelField.setAccessible(true);
             } catch (SecurityException e) {
                 rowModelField = null;
-                LOG.fine("cannot access JTable private field rowModel " +
-                                "- expected behaviour in sandbox");
+                LOG.fine("cannot access JTable private field rowModel "
+                        + "- expected behaviour in sandbox");
             } catch (NoSuchFieldException e) {
-                LOG.fine("problem while accessing super's private field" +
-                                " - private api changed?");
+                LOG.fine("problem while accessing super's private field"
+                        + " - private api changed?");
             }
         }
         return rowModelField;
     }
     
     /**
+     * Returns the mapper used synch individual rowHeights in view/model
+     * coordinates.
      * 
-     * @return <code>SizeSequenceMapper</code>
+     * @return the <code>SizeSequenceMapper</code> used to synch view/model
+     *         coordinates for individual row heights
+     * @see org.jdesktop.decorator.SizeSequenceMapper
      */
     protected SizeSequenceMapper getRowModelMapper() {
         if (rowModelMapper == null) {
@@ -3480,17 +3601,23 @@ public class JXTable extends JTable
     }
 
     /**
-     * calling setRowHeight for internal reasons.
-     * Keeps the isXTableRowHeight unchanged.
+     * Sets the rowHeight for all rows to the given value. Keeps the flag
+     * <code>isXTableRowHeight</code> unchanged to enable the distinction
+     * setting the height for internal reasons from doing so by client code.
+     * 
+     * @param rowHeight new height in pixel.
+     * @see #setRowHeight(int)
+     * @see #isXTableRowHeightSet
      */
     protected void adminSetRowHeight(int rowHeight) {
         boolean heightSet = isXTableRowHeightSet;
-        setRowHeight(rowHeight); 
+        setRowHeight(rowHeight);
         isXTableRowHeightSet = heightSet;
     }
 
     /**
-     * Tries its best to <code>updateUI</code> of the potential <code>TableCellEditor</code>. 
+     * Tries its best to <code>updateUI</code> of the potential
+     * <code>TableCellEditor</code>.
      * 
      * @param maybeEditor the potential editor.
      */
@@ -3514,9 +3641,9 @@ public class JXTable extends JTable
         }
     }
 
-    /** 
-     * Tries its best to <code>updateUI</code> of the potential 
-     * <code>TableCellRenderer</code>. 
+    /**
+     * Tries its best to <code>updateUI</code> of the potential
+     * <code>TableCellRenderer</code>.
      * 
      * @param maybeRenderer the potential renderer.
      */
@@ -3542,11 +3669,13 @@ public class JXTable extends JTable
 
 
     
-//---------------------------- overriding super factory methods and buggy
+    // ---------------------------- overriding super factory methods and buggy
     /**
      * {@inheritDoc}
-     * workaround bug in JTable. (Bug Parade ID #6291631 - negative y is mapped
-     * to row 0). <p>
+     * <p>
+     * Overridden to work around core Bug (ID #6291631): negative y is mapped to
+     * row 0).
+     * 
      */
     @Override
     public int rowAtPoint(Point point) {
@@ -3556,11 +3685,25 @@ public class JXTable extends JTable
     }
 
     
+    /**
+     * 
+     * {@inheritDoc}
+     * <p>
+     * 
+     * Overridden to return a <code>JXTableHeader</code>.
+     */
     @Override
     protected JTableHeader createDefaultTableHeader() {
         return new JXTableHeader(columnModel);
     }
 
+    /**
+     * 
+     * {@inheritDoc}
+     * <p>
+     * 
+     * Overridden to return a <code>DefaultTableColumnModelExt</code>.
+     */
     @Override
     protected TableColumnModel createDefaultColumnModel() {
         return new DefaultTableColumnModelExt();
