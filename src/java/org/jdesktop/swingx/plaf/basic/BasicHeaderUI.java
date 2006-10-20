@@ -114,7 +114,7 @@ public class BasicHeaderUI extends HeaderUI {
         descriptionPane.setOpaque(false);
         descriptionPane.setText("The description for the header goes here.\nExample: Click the Copy Code button to generate the corresponding Java code.");
         imagePanel = new JLabel();
-        imagePanel.setIcon(new ImageIcon(getClass().getResource("/org/jdesktop/swingx/plaf/resources/header-default.png")));
+        imagePanel.setIcon(UIManager.getIcon("Header.defaultIcon"));
         
         installComponents(header);
         installListeners(header);

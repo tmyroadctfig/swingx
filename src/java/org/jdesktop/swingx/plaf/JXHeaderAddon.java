@@ -20,9 +20,11 @@
  */
 package org.jdesktop.swingx.plaf;
 
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import javax.swing.ImageIcon;
+import javax.swing.plaf.IconUIResource;
 import org.jdesktop.swingx.JXHeader;
 
 /**
@@ -41,8 +43,8 @@ public class JXHeaderAddon extends AbstractComponentAddon {
     defaults.addAll(Arrays.asList(new Object[] { 
       JXHeader.uiClassID,
       "org.jdesktop.swingx.plaf.basic.BasicHeaderUI",
-      "header.defaultIcon",
-      new ImageIcon(JXHeaderAddon.class.getResource("resources/header-default.png"))
+      "Header.defaultIcon",
+      getIcon("resources/header-default.png")
     }));
   }
 
@@ -52,8 +54,17 @@ public class JXHeaderAddon extends AbstractComponentAddon {
     defaults.addAll(Arrays.asList(new Object[] { 
       JXHeader.uiClassID,
       "org.jdesktop.swingx.plaf.macosx.MacOSXHeaderUI",
-      "header.defaultIcon",
-      new ImageIcon(JXHeaderAddon.class.getResource("resources/header-default.png"))
+      "Header.defaultIcon",
+      getIcon("resources/header-default.png")
    }));
+  }
+  
+  private IconUIResource getIcon(String resourceName) {
+      URL url = JXHeaderAddon.class.getResource(resourceName);
+      if (url == null) {
+          return null;
+      } else {
+          return new IconUIResource(new ImageIcon(url));
+      }
   }
 }
