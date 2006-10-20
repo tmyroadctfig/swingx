@@ -170,9 +170,10 @@ public class BasicHeaderUI extends HeaderUI {
     protected void uninstallDefaults(JXHeader h) {
     }
     
-    protected void installListeners(JXHeader h) {
+    protected void installListeners(final JXHeader h) {
         propListener = new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
+                onPropertyChange(h, evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
             }
         };
         h.addPropertyChangeListener(propListener);
