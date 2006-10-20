@@ -89,6 +89,29 @@ public class JXTableIssues extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXTableIssues.class
             .getName());
 
+
+    /**
+     * Issue #4614616: editor lookup broken for interface types.
+     * With editors (vs. renderers), the solution is not obvious -
+     * interfaces can't be instantiated. As a consequence, the
+     * GenericEditor can't cope (returns null as component which
+     * it must not but that's another issue).
+     *  
+     */
+    public void testNPEEditorForInterface() {
+        DefaultTableModel model = new DefaultTableModel(10, 2) {
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return Comparable.class;
+            }
+            
+        };
+        JXTable table = new JXTable(model);
+        table.prepareEditor(table.getCellEditor(0, 0), 0, 0);
+    }
+
+
     /**
      * Issue 373-swingx: table must unsort column on sortable change.
      *
@@ -784,6 +807,7 @@ public class JXTableIssues extends InteractiveTestCase {
           xTable.getColumnModel().getColumn(0).setHeaderValue("JXTable");
         }
     };
+    
     /**
      * A one column table model where all the data is in an Object[] array.
      */

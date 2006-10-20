@@ -107,6 +107,25 @@ public class JXTableUnitTest extends InteractiveTestCase {
         super.tearDown();
     }
 
+    
+    /**
+     * Issue #4614616: renderer lookup broken for interface types.
+     * 
+     */
+    public void testNPERendererForInterface() {
+        DefaultTableModel model = new DefaultTableModel(10, 2) {
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return Comparable.class;
+            }
+            
+        };
+        JXTable table = new JXTable(model);
+        table.prepareRenderer(table.getCellRenderer(0, 0), 0, 0);
+    }
+
+
     /**
      * Issue #366-swingx: enhance generic editor to take custom
      * textfield as argument.
@@ -119,6 +138,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         // sanity
         assertSame(textField, editor.getComponent());
     }
+    
     /**
      * test default rowHeight calculation with default font.
      * Beware: the default height is the font's height + 2, but 

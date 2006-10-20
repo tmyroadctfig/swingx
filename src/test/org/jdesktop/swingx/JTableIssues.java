@@ -15,12 +15,14 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultListSelectionModel;
+import javax.swing.Icon;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 
 import org.jdesktop.swingx.util.ListSelectionReport;
 
@@ -145,6 +147,40 @@ public class JTableIssues extends InteractiveTestCase {
 
 //---------------------- unit tests 
     
+    /**
+     * Issue #4614616: renderer lookup broken for interface types.
+     * 
+     */
+    public void testNPERendererForInterface() {
+        DefaultTableModel model = new DefaultTableModel(10, 2) {
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return Comparable.class;
+            }
+            
+        };
+        JTable table = new JTable(model);
+        table.prepareRenderer(table.getCellRenderer(0, 0), 0, 0);
+    }
+
+    /**
+     * Issue #4614616: editor lookup broken for interface types.
+     * 
+     */
+    public void testNPEEditorForInterface() {
+        DefaultTableModel model = new DefaultTableModel(10, 2) {
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return Comparable.class;
+            }
+            
+        };
+        JTable table = new JTable(model);
+        table.prepareEditor(table.getCellEditor(0, 0), 0, 0);
+    }
+
     /**
      * isCellEditable is doc'ed as: if false, setValueAt 
      * will have no effect.

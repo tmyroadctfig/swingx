@@ -2785,8 +2785,57 @@ public class JXTable extends JTable
         return highlighterChangeListener;
     }
 
-
     
+    /**
+     * Returns an appropriate renderer for the cell specified by this row and
+     * column. Overridden to fix core bug #4614616 (NPE if
+     * <code>TableModel</code>'s <code>Class</code> for the column is an
+     * interface). This method guarantees to always return a
+     * <code>not null</code> value. *
+     * 
+     * @param row the row of the cell to render
+     * @param column the column of the cell to render
+     * @return the renderer for this cell
+     * 
+     * @see javax.swing.JTable#getCellRenderer(int, int);
+     * 
+     */
+    @Override
+    public TableCellRenderer getCellRenderer(int row, int column) {
+        TableCellRenderer renderer = super.getCellRenderer(row, column);
+        if (renderer == null) {
+            renderer = getDefaultRenderer(Object.class);
+        }
+        return renderer;
+    }
+
+//    /**
+//     * Returns an appropriate editor for the cell specified by this row and
+//     * column. Overridden to fix core bug #4614616 (NPE if
+//     * <code>TableModel</code>'s <code>Class</code> for the column is an
+//     * interface). This method guarantees to always return a
+//     * <code>not null</code> value.
+//     * 
+//     * With editors (vs. renderers), the solution is not obvious - interfaces
+//     * can't be instantiated. As a consequence, the GenericEditor can't cope
+//     * (returns null as component which it must not but that's another issue).
+//     * 
+//     * @param row the row of the cell to edit
+//     * @param column the column of the cell to edit
+//     * @return the editor for this cell
+//     * 
+//     * @see javax.swing.JTable#getCellEditor(int, int);
+//     * 
+//     */
+//    @Override
+//    public TableCellEditor getCellEditor(int row, int column) {
+//        TableCellEditor editor = super.getCellEditor(row, column);
+//        if (editor == null) {
+//            editor = getDefaultEditor(Object.class);
+//        }
+//        return editor;
+//    }
+
     /**
      * Returns the decorated <code>Component</code> used as a stamp to render
      * the specified cell. Overrides superclass version to provide support for
@@ -2821,6 +2870,7 @@ public class JXTable extends JTable
         }
     }
 
+    
     /**
      * Method to hack around #258-swingx: apply a specialized Highlighter
      * to force reset the color "memory" of DefaultTableCellRenderer. 
