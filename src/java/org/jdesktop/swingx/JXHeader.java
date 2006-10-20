@@ -94,7 +94,7 @@ public class JXHeader extends JXPanel {
     }
     
     /** Creates a new instance of JXHeader */
-    public JXHeader(String title, String description, String Icon) {
+    public JXHeader(String title, String description, Icon icon) {
         this.title = title;
         this.description = description;
         this.icon = icon;
