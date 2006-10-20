@@ -220,9 +220,7 @@ public class JXTable extends JTable
     { 
     private static final Logger LOG = Logger.getLogger(JXTable.class.getName());
     
-    public static final int AUTO_RESIZE_INTELLI_OFF = -1;
-    
-    /**
+     /**
      * Constant string for horizontal scroll actions, used in JXTable's Action
      * Map.
      */
@@ -271,9 +269,6 @@ public class JXTable extends JTable
     /** flag to indicate if table is interactively sortable. */
     private boolean sortable;
 
-    /** future - enable/disable autosort on cell updates not used */
-//    private boolean automaticSortDisabled;
-
     /** Listens for changes from the filters. */
     private PipelineListener pipelineListener;
 
@@ -297,14 +292,14 @@ public class JXTable extends JTable
      */
     private boolean columnControlVisible;
     /**
-     * ScrollPane's original vertical scroll policy. If the columnControl is
+     * ScrollPane's original vertical scroll policy. If the column control is
      * visible the policy is set to ALWAYS.
      */
     private int verticalScrollPolicy;
 
     /**
-     * A button that allows the user to select which columns to display, and
-     * which to hide
+     * The component used a column control in the upper trailing corner of 
+     * an enclosing <code>JScrollPane</code>.
      */
     private JComponent columnControlButton;
 
@@ -714,6 +709,7 @@ public class JXTable extends JTable
      * This method explicitly re-configures the column control. <p>
      * 
      * @param o the ComponentOrientation for this table.
+     * @see java.awt.Component#setComponentOrientation(ComponentOrientation)
      */
     @Override
     public void setComponentOrientation(ComponentOrientation o) {
@@ -731,6 +727,7 @@ public class JXTable extends JTable
      * @see #configureColumnControl()
      * @see #setColumnControlVisible(boolean)
      * @see #setColumnControl(JComponent)
+     * @see javax.swing.JTable#configureEnclosingScrollPane()
      * 
      */
     @Override
@@ -1045,61 +1042,6 @@ public class JXTable extends JTable
         return (tableHeader == null) ? null
                                      : tableHeader.getResizingColumn();
     }
-
-    /**
-     * Sets the expandsToViewportWidth property. If enabled, the table
-     * can be expanded to viewport width if isHorizontalScrollEnabled. 
-     * The expansion (if enabled) is done automatically after 
-     * in createColumnsFromModel() and in packAll(), 
-     * in all other cases client code must do so explicitly.
-     * 
-     * The default value is false.
-     * 
-     * 
-     * PENDING other candidate contexts for auto-expand?
-     * 
-     * @param enabled boolean indicating whether the table  
-     *   should auto-expand columns to fit the viewport width.
-     */
-//    public void setExpandsToViewportWidthEnabled(boolean enabled) {
-//        boolean old = isExpandsToViewportWidthEnabled();
-//        if (old == enabled) return;
-//        expandsToViewportWidthEnabled= enabled;
-//        firePropertyChange("expandsToViewportWidthEnabled", old, isExpandsToViewportWidthEnabled());
-//        expandToViewportWidth();
-//        
-//    }
-    
-    /**
-     * 
-     * @return a boolean property indicating whether the table
-     *   should auto-expand columns to fit the viewport width.
-     */
-//    protected boolean isExpandsToViewportWidthEnabled() {
-//        return expandsToViewportWidthEnabled;
-//    }
-
-    /**
-     * 
-     * @param docked boolean to indicate whether the table width should
-     *   be kept docked to the right viewport boundary on expanding the 
-     *   viewport's width.
-     */
-//    public void setDockedOnExpandWidth(boolean docked) {
-//        boolean old = isDockedOnExpandWidth();
-//        if (old == docked) return;
-//        this.dockedOnExpand = docked;
-//        expandToViewportWidth();
-//        firePropertyChange("dockeOnExpandWidth", old, isDockedOnExpandWidth());
-//    }
-    
-    /**
-     * 
-     * @return boolean to indicate docking state on viewport expansion.
-     */
-//    protected boolean isDockedOnExpandWidth() {
-//        return dockedOnExpand;
-//    }
 
     /**
      * Set flag to control JXTable's scrollableTracksViewportHeight 
@@ -2838,33 +2780,6 @@ public class JXTable extends JTable
         return renderer;
     }
 
-//    /**
-//     * Returns an appropriate editor for the cell specified by this row and
-//     * column. Overridden to fix core bug #4614616 (NPE if
-//     * <code>TableModel</code>'s <code>Class</code> for the column is an
-//     * interface). This method guarantees to always return a
-//     * <code>not null</code> value.
-//     * 
-//     * With editors (vs. renderers), the solution is not obvious - interfaces
-//     * can't be instantiated. As a consequence, the GenericEditor can't cope
-//     * (returns null as component which it must not but that's another issue).
-//     * 
-//     * @param row the row of the cell to edit
-//     * @param column the column of the cell to edit
-//     * @return the editor for this cell
-//     * 
-//     * @see javax.swing.JTable#getCellEditor(int, int);
-//     * 
-//     */
-//    @Override
-//    public TableCellEditor getCellEditor(int row, int column) {
-//        TableCellEditor editor = super.getCellEditor(row, column);
-//        if (editor == null) {
-//            editor = getDefaultEditor(Object.class);
-//        }
-//        return editor;
-//    }
-
     /**
      * Returns the decorated <code>Component</code> used as a stamp to render
      * the specified cell. Overrides superclass version to provide support for
@@ -2973,7 +2888,6 @@ public class JXTable extends JTable
     /**
      * Creates default cell renderers for objects, numbers, doubles, dates,
      * booleans, icons, and links.
-     * THINK: delegate to TableCellRenderers?
      * Overridden so we can act as factory for renderers plus hacking around
      * huge memory consumption of UIDefaults (see #6345050 in core Bug parade)
      * 
@@ -3033,8 +2947,6 @@ public class JXTable extends JTable
         setLazyRenderer(Boolean.class,
                 "org.jdesktop.swingx.JXTable$BooleanRenderer");
 
-        // Other
-//        setLazyRenderer(LinkModel.class, "org.jdesktop.swingx.LinkRenderer");
     }
 
 
