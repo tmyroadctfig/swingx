@@ -64,6 +64,13 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  * being used. The problem is that if "text/html" is always used, the font is wrong.
  * This same situation will be found in other parts of the code (JXErrorPane, for instance),
  * so this needs to be dealt with.
+ *
+ * <h2>Defaults</h2>
+ * <p>BasicHeaderUI uses the following UI defaults:
+ *  <ul>
+ *      <li><b>Header.defaultIcon:</b> The default icon to use when creating a new JXHeader.</li>
+ *  </ul>
+ * </p>
  * 
  * @status REVIEWED
  * @author rbair
