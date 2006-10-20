@@ -41,7 +41,8 @@ import javax.swing.UIManager;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.TextAction;
-import org.jdesktop.swingx.combobox.workarounds.AquaLnFPopupLocationFix;
+
+import org.jdesktop.swingx.autocomplete.workarounds.AquaLnFPopupLocationFix;
 
 /**
  * This class contains only static utility methods that can be used to set up

@@ -18,12 +18,23 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package org.jdesktop.swingx.combobox.workarounds;
+package org.jdesktop.swingx.autocomplete.workarounds;
 
-import javax.swing.*;
-import javax.swing.event.PopupMenuListener;
+import java.awt.Component;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JPopupMenu;
+import javax.swing.UIManager;
 import javax.swing.event.PopupMenuEvent;
-import java.awt.*;
+import javax.swing.event.PopupMenuListener;
 
 /**
  * Fix a problem where the JComboBox's popup obscures its editor in the Mac OS X
