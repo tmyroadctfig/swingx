@@ -35,6 +35,7 @@
 package org.jdesktop.swingx.graphics;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -79,6 +80,11 @@ import java.beans.PropertyChangeSupport;
  * // renderer setup
  * BufferedImage shadow = renderer.createShadow(bufferedImage);
  * </pre></p>
+ * <p>The generated image dimensions are computed as following:</p>
+ * <pre>
+ * width  = imageWidth  + 2 * shadowSize
+ * height = imageHeight + 2 * shadowSize
+ * </pre>
  * <h2>Properties Changes</h2>
  * <p>This renderer allows to register property change listeners with
  * {@link #addPropertyChangeListener}. Listening to properties changes is very
@@ -277,27 +283,39 @@ public class ShadowRenderer {
     /**
      * <p>Generates the shadow for a given picture and the current properties
      * of the renderer.</p>
+     * <p>The generated image dimensions are computed as following:</p>
+     * <pre>
+     * width  = imageWidth  + 2 * shadowSize
+     * height = imageHeight + 2 * shadowSize
+     * </pre>
      * @param image the picture from which the shadow must be cast
      * @return the picture containing the shadow of <code>image</code> 
      */
     public BufferedImage createShadow(final BufferedImage image) {
-        BufferedImage dst = GraphicsUtilities.createCompatibleImage(image);
+        int shadowColor = this.color.getRGB();
+        int shadowSize = this.size;
+
+        int width = image.getWidth() + 2 * shadowSize;
+        int height = image.getHeight() + 2 * shadowSize;
+
+        BufferedImage dst = GraphicsUtilities.createCompatibleImage(image,
+                                                                    width,
+                                                                    height);
 
         float shadowOpacity = this.opacity;
         if (shadowOpacity <= 0.0f) {
             return dst;
         }
 
-        int shadowColor = this.color.getRGB();
-        int shadowSize = this.size;
-
-        int width = image.getWidth();
-        int height = image.getHeight();
-
         int[] srcPixels = new int[width * height];
         int[] dstPixels = new int[width * height];
 
-        GraphicsUtilities.getPixels(image, 0, 0, width, height, srcPixels);
+        // XXX: Do no paint the source image here, handle this in alphaBlur()
+        Graphics2D g2 = dst.createGraphics();
+        g2.drawImage(image, size, size, null);
+        g2.dispose();
+
+        GraphicsUtilities.getPixels(dst, 0, 0, width, height, srcPixels);
         // horizontal pass
         alphaBlur(srcPixels, dstPixels, width, height,
                   shadowSize, shadowColor, 1.0f);
