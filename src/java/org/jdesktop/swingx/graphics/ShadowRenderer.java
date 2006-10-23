@@ -35,7 +35,6 @@
 package org.jdesktop.swingx.graphics;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -295,7 +294,10 @@ public class ShadowRenderer {
         int shadowColor = this.color.getRGB();
         int shadowSize = this.size;
 
-        int width = image.getWidth() + 2 * shadowSize;
+        int srcWidth = image.getWidth();
+        int srcHeight = image.getHeight();
+
+        int width = srcWidth + 2 * shadowSize;
         int height = image.getHeight() + 2 * shadowSize;
 
         BufferedImage dst = GraphicsUtilities.createCompatibleImage(image,
@@ -307,15 +309,17 @@ public class ShadowRenderer {
             return dst;
         }
 
+        int[] tmpPixels = new int[srcWidth * image.getHeight()];
         int[] srcPixels = new int[width * height];
         int[] dstPixels = new int[width * height];
 
-        // XXX: Do no paint the source image here, handle this in alphaBlur()
-        Graphics2D g2 = dst.createGraphics();
-        g2.drawImage(image, size, size, null);
-        g2.dispose();
+        GraphicsUtilities.getPixels(image, 0, 0, srcWidth, srcHeight, tmpPixels);
+        for (int y = 0; y < image.getHeight(); y++) {
+            System.arraycopy(tmpPixels, y * srcWidth,
+                             srcPixels, (y + shadowSize) * width + shadowSize,
+                             srcWidth);
+        }
 
-        GraphicsUtilities.getPixels(dst, 0, 0, width, height, srcPixels);
         // horizontal pass
         alphaBlur(srcPixels, dstPixels, width, height,
                   shadowSize, shadowColor, 1.0f);
