@@ -291,7 +291,7 @@ public class ShadowRenderer {
      * @return the picture containing the shadow of <code>image</code> 
      */
     public BufferedImage createShadow(final BufferedImage image) {
-        int shadowColor = this.color.getRGB();
+        int shadowColor = this.color.getRGB() & 0x00FFFFFF;
         int shadowSize = this.size;
 
         int srcWidth = image.getWidth();
@@ -338,7 +338,6 @@ public class ShadowRenderer {
         int windowSize = radius * 2 + 1;
         int radiusPlusOne = radius + 1;
 
-        color &= 0x00FFFFFF;
         int sumAlpha;
 
         int srcIndex = 0;
@@ -365,11 +364,10 @@ public class ShadowRenderer {
         }
 
         for (int y = 0; y < height; y++) {
-            sumAlpha = 0;
             dstIndex = y;
 
             pixel = srcPixels[srcIndex];
-            sumAlpha += (radius + 1) * ((pixel >> 24) & 0xFF);
+            sumAlpha = (radius + 1) * ((pixel >> 24) & 0xFF);
 
             for (int i = 1; i <= radius; i++) {
                 pixel = srcPixels[srcIndex + indexLookupTable[i]];
