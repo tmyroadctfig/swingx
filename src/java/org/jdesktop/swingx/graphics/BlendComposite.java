@@ -55,9 +55,8 @@ import java.awt.image.WritableRaster;
  * rules. These rules are inspired from graphics editing software packages,
  * like <em>Adobe Photoshop</em> or <em>The GIMP</em>.</p>
  * <p>Given the wide variety of implemented blending modes and the difficulty
- * to describe them with words, please refer to the
- * {@link org.jdesktop.swingx.demo.BlendCompositeDemo} to discover what results
- * they can produce.</p>
+ * to describe them with words, please refer to those tools to visually see
+ * the result of these blending modes.</p>
  * <p>Please note that the {@link #Normal} mode is equivalent to
  * {@link java.awt.AlphaComposite#SrcOver}.</p>
  * <h2>Opacity</h2>
@@ -107,7 +106,7 @@ public final class BlendComposite implements Composite {
         LIGHTEN,
         OVERLAY,
         HARD_LIGHT,
-        SOFT_LIGHT,
+        //SOFT_LIGHT,
         DIFFERENCE,
         NEGATION,
         EXCLUSION,
@@ -141,7 +140,7 @@ public final class BlendComposite implements Composite {
     public static final BlendComposite Lighten = new BlendComposite(BlendingMode.LIGHTEN);
     public static final BlendComposite Overlay = new BlendComposite(BlendingMode.OVERLAY);
     public static final BlendComposite HardLight = new BlendComposite(BlendingMode.HARD_LIGHT);
-    public static final BlendComposite SoftLight = new BlendComposite(BlendingMode.SOFT_LIGHT);
+    //public static final BlendComposite SoftLight = new BlendComposite(BlendingMode.SOFT_LIGHT);
     public static final BlendComposite Difference = new BlendComposite(BlendingMode.DIFFERENCE);
     public static final BlendComposite Negation = new BlendComposite(BlendingMode.NEGATION);
     public static final BlendComposite Exclusion = new BlendComposite(BlendingMode.EXCLUSION);
@@ -364,7 +363,9 @@ public final class BlendComposite implements Composite {
                     return new Blender() {
                         @Override
                         public int[] blend(int[] src, int[] dst) {
-                            return src;
+                            return new int[] {
+                                    src[0], src[1], src[2], 255
+                            };
                         }
                     };
                 case ADD:
@@ -755,8 +756,8 @@ public final class BlendComposite implements Composite {
                             };
                         }
                     };
-                case SOFT_LIGHT:
-                    break;
+//                case SOFT_LIGHT:
+//                    break;
                 case STAMP:
                     return new Blender() {
                         @Override
