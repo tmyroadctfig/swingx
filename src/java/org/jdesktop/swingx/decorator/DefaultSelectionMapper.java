@@ -220,7 +220,8 @@ public class DefaultSelectionMapper implements SelectionMapper {
      * @param lastIndex the last view index that changed, inclusive
      */
     private void mapTowardsModel(int firstIndex, int lastIndex) {
-        for (int i = firstIndex; i <= lastIndex; i++) {
+        int safeFirstIndex = Math.max(0, firstIndex);
+        for (int i = safeFirstIndex; i <= lastIndex; i++) {
             int modelIndex = convertToModel(i);
             if (viewSelection.isSelectedIndex(i)) {
                 modelSelection.addSelectionInterval(modelIndex, modelIndex);
