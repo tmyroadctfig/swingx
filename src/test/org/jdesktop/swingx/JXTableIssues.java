@@ -48,6 +48,7 @@ import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.DefaultCellEditor;
 import javax.swing.InputMap;
+import javax.swing.InputVerifier;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
@@ -60,13 +61,12 @@ import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.border.LineBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
-import javax.swing.text.Keymap;
-import javax.swing.text.TextAction;
 
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.SortKey;
@@ -400,7 +400,7 @@ public class JXTableIssues extends InteractiveTestCase {
     /**
      * Issue #393-swingx: localized NumberEditor.
      * 
-     * Playing ... Nearly working ... but not reliably.
+     * Playing ... looks working :-)
      *
      */
     public void interactiveFloatingPointEditor(){
@@ -476,6 +476,9 @@ public class JXTableIssues extends InteractiveTestCase {
         
         @Override
         public boolean stopCellEditing() {
+            // If the user tries to tab out of the field, the textField will call stopCellEditing().
+            // Check for a valid edit, and don't let the focus leave until the edit is valid.
+            if (!((JFormattedTextField) editorComponent).isEditValid()) return false;
             return super.stopCellEditing();
         }
         
@@ -534,8 +537,14 @@ public class JXTableIssues extends InteractiveTestCase {
 		map.remove(KeyStroke.getKeyStroke("pressed ESCAPE"));
 		map = map.getParent();
 	    }
-	    /*
-             * the formatted text field will not call stopCellEditing()
+	    /* Set an input verifier to prevent the cell losing focus when the value is invalid */
+	    textField.setInputVerifier(new InputVerifier() {
+		public boolean verify(JComponent input) {
+		    JFormattedTextField ftf = (JFormattedTextField) input;
+		    return ftf.isEditValid();
+		}
+	    });
+	    /* The formatted text field will not call stopCellEditing()
              * until the value is valid. So do the red border thing here.
              */
 	    textField.addPropertyChangeListener("editValid",
@@ -901,10 +910,10 @@ public class JXTableIssues extends InteractiveTestCase {
     public static void main(String args[]) {
         JXTableIssues test = new JXTableIssues();
         try {
-          test.runInteractiveTests();
+//          test.runInteractiveTests();
          //   test.runInteractiveTests("interactive.*Siz.*");
          //   test.runInteractiveTests("interactive.*Render.*");
-         //   test.runInteractiveTests("interactive.*Toggle.*");
+            test.runInteractiveTests("interactive.*Float.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
