@@ -274,7 +274,7 @@ public class ShadowRenderer {
         int dstWidth = srcWidth + shadowSize;
         int dstHeight = srcHeight + shadowSize;
 
-        int left = (shadowSize - 1) >> 1;
+        int left = size;
         int right = shadowSize - left;
 
         int yStop = dstHeight - right;
@@ -297,6 +297,18 @@ public class ShadowRenderer {
         float hSumDivider = 1.0f / shadowSize;
         float vSumDivider = opacity / shadowSize;
 
+        int[] hSumLookup = new int[256 * shadowSize];
+        for (int i = 0; i < hSumLookup.length; i++) {
+            hSumLookup[i] = (int) (i * hSumDivider);
+        }
+
+        int[] vSumLookup = new int[256 * shadowSize];
+        for (int i = 0; i < vSumLookup.length; i++) {
+            vSumLookup[i] = (int) (i * vSumDivider);
+        }
+
+        int srcOffset;
+
         // horizontal pass : extract the alpha mask from the source picture and
         // blur it into the destination picture
         for (int srcY = 0, dstOffset = left * dstWidth; srcY < srcHeight; srcY++) {
@@ -308,18 +320,19 @@ public class ShadowRenderer {
 
             aSum = 0;
             historyIdx = 0;
+            srcOffset = srcY * srcWidth;
 
             // compute the blur average with pixels from the source image
             for (int srcX = 0; srcX < srcWidth; srcX++) {
 
-                int a = (int) (aSum * hSumDivider); // calculate alpha value
+                int a = hSumLookup[aSum];
                 dstBuffer[dstOffset++] = a << 24;   // store the alpha value only
                                                     // the shadow color will be added in the next pass
 
                 aSum -= aHistory[historyIdx]; // substract the oldest pixel from the sum
 
                 // extract the new pixel ...
-                a = srcBuffer[srcY * srcWidth + srcX] >>> 24;
+                a = srcBuffer[srcOffset + srcX] >>> 24;
                 aHistory[historyIdx] = a;   // ... and store its value into history
                 aSum += a;                  // ... and add its value to the sum
 
@@ -331,7 +344,7 @@ public class ShadowRenderer {
             // blur the end of the row - no new pixels to grab
             for (int i = 0; i < shadowSize; i++) {
 
-                int a = (int) (aSum * hSumDivider);
+                int a = hSumLookup[aSum];
                 dstBuffer[dstOffset++] = a << 24;
 
                 // substract the oldest pixel from the sum ... and nothing new to add !
@@ -363,10 +376,10 @@ public class ShadowRenderer {
             bufferOffset = x;
             historyIdx = 0;
 
-            // compute the blur average with pixels from the previous pass
+            // compute the blur avera`ge with pixels from the previous pass
             for (int y = 0; y < yStop; y++, bufferOffset += dstWidth) {
 
-                int a = (int) (aSum * vSumDivider);             // calculate alpha value
+                int a = vSumLookup[aSum];
                 dstBuffer[bufferOffset] = a << 24 | shadowRgb;  // store alpha value + shadow color
 
                 aSum -= aHistory[historyIdx];   // substract the oldest pixel from the sum
@@ -383,7 +396,7 @@ public class ShadowRenderer {
             // blur the end of the column - no pixels to grab anymore
             for (int y = yStop; y < dstHeight; y++, bufferOffset += dstWidth) {
 
-                int a = (int) (aSum * vSumDivider);
+                int a = vSumLookup[aSum];
                 dstBuffer[bufferOffset] = a << 24 | shadowRgb;
 
                 aSum -= aHistory[historyIdx];   // substract the oldest pixel from the sum
