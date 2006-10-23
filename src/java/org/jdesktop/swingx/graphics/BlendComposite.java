@@ -57,8 +57,6 @@ import java.awt.image.WritableRaster;
  * <p>Given the wide variety of implemented blending modes and the difficulty
  * to describe them with words, please refer to those tools to visually see
  * the result of these blending modes.</p>
- * <p>Please note that the {@link #Normal} mode is equivalent to
- * {@link java.awt.AlphaComposite#SrcOver}.</p>
  * <h2>Opacity</h2>
  * <p>Each blending mode has an associated opacity, defined as a float value
  * between 0.0 and 1.0. Changing the opacity controls the force with which the
@@ -98,7 +96,6 @@ public final class BlendComposite implements Composite {
      * @author Romain Guy <romain.guy@mac.com>
      */
     public enum BlendingMode {
-        NORMAL,
         AVERAGE,
         MULTIPLY,
         SCREEN,
@@ -132,7 +129,6 @@ public final class BlendComposite implements Composite {
         LUMINOSITY
     }
 
-    public static final BlendComposite Normal = new BlendComposite(BlendingMode.NORMAL);
     public static final BlendComposite Average = new BlendComposite(BlendingMode.AVERAGE);
     public static final BlendComposite Multiply = new BlendComposite(BlendingMode.MULTIPLY);
     public static final BlendComposite Screen = new BlendComposite(BlendingMode.SCREEN);
@@ -359,15 +355,6 @@ public final class BlendComposite implements Composite {
 
         public static Blender getBlenderFor(BlendComposite composite) {
             switch (composite.getMode()) {
-                case NORMAL:
-                    return new Blender() {
-                        @Override
-                        public int[] blend(int[] src, int[] dst) {
-                            return new int[] {
-                                    src[0], src[1], src[2], 255
-                            };
-                        }
-                    };
                 case ADD:
                     return new Blender() {
                         @Override
