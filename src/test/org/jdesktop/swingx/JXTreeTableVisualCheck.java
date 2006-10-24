@@ -65,14 +65,14 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         JXTreeTableVisualCheck test = new JXTreeTableVisualCheck();
         try {
 //            test.runInteractiveTests();
-//            test.runInteractiveTests("interactive.*Highligh.*");
+            test.runInteractiveTests("interactive.*Hierarchical.*");
 //               test.runInteractiveTests("interactive.*ToolTip.*");
 //           test.runInteractiveTests("interactive.*DnD.*");
 //             test.runInteractiveTests("interactive.*Compare.*");
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
 //             test.runInteractiveTests("interactive.*Edit.*");
 //             test.runInteractiveTests("interactive.*Line.*");
-             test.runInteractiveTests("interactive.*Render.*");
+//             test.runInteractiveTests("interactive.*Render.*");
         } catch (Exception ex) {
 
         }
@@ -932,6 +932,31 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         frame.setVisible(true);
     }
 
+    /**
+     * Requirement: color the leafs of the hierarchical columns differently.
+     * 
+     * http://forums.java.net/jive/thread.jspa?messageID=165876
+     * 
+     *
+     */
+    public void interactiveTestHierarchicalColumnHighlightConditional() {
+        JXTreeTable treeTable = new JXTreeTable(treeTableModel);
+        treeTable.addHighlighter(new HierarchicalColumnHighlighter(new Color(235,234,219), null));
+        ConditionalHighlighter conditional = new ConditionalHighlighter() {
+
+            @Override
+            protected boolean test(ComponentAdapter adapter) {
+                return adapter.isLeaf();
+            }
+            
+        };
+        conditional.setBackground(new Color(247,246,239));
+        conditional.setHighlightColumnIndex(0);
+        treeTable.addHighlighter(conditional);
+        showWithScrollingInFrame(treeTable,
+        "HierarchicalColumn And Conditional ");
+    }
+    
     public void interactiveTestHierarchicalColumnHighlight() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         treeTable.addHighlighter(new HierarchicalColumnHighlighter());
