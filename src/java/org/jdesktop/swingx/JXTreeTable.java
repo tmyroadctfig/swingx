@@ -2085,20 +2085,27 @@ public class JXTreeTable extends JXTable {
             return table;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean isExpanded() {
-            return super.isExpanded(); /** TODO: implement this method */
+            return table.isExpanded(row); 
         }
 
-        @Override
-        public boolean hasFocus() {
-            boolean focus = super.hasFocus(); /** TODO: implement this method */
-            return focus;
-        }
-
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean isLeaf() {
-            return super.isLeaf(); /** TODO: implement this method */
+            // Issue #270-swingx: guard against invisible row
+            TreePath path = table.getPathForRow(row);
+            if (path != null) {
+                return table.getTreeTableModel().isLeaf(path.getLastPathComponent());
+            }
+            // JW: this is the same as BasicTreeUI.isLeaf. 
+            // Shouldn't happen anyway because must be called for visible rows only.
+            return true; 
         }
         /**
          *
