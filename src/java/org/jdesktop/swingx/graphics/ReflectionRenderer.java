@@ -38,8 +38,8 @@ import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.beans.PropertyChangeSupport;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 
 import org.jdesktop.swingx.image.StackBlurFilter;
 
@@ -131,6 +131,7 @@ public class ReflectionRenderer {
 
     // notifies listeners of properties changes
     private PropertyChangeSupport changeSupport;
+    private StackBlurFilter stackBlurFilter;
 
     /**
      * <p>Creates a default good looking reflections generator.
@@ -138,7 +139,7 @@ public class ReflectionRenderer {
      * <ul>
      *   <li><i>opacity</i>: 35%</li>
      *   <li><i>length</i>: 40%</li>
-     *   <li><i>blurring</i>: disabled</li>
+     *   <li><i>blurring</i>: disabled with a radius of 1 pixel</li>
      * </ul></p>
      * <p>These properties provide a regular, good looking reflection.</p>
      *
@@ -148,6 +149,8 @@ public class ReflectionRenderer {
      * @see #setLength(float)
      * @see #isBlurEnabled()
      * @see #setBlurEnabled(boolean)
+     * @see #getBlurRadius()
+     * @see #setBlurRadius(int)
      */
     public ReflectionRenderer() {
         this(0.35f, 0.4f, false);
@@ -159,7 +162,7 @@ public class ReflectionRenderer {
      * default values:
      * <ul>
      *   <li><i>length</i>: 40%</li>
-     *   <li><i>blurring</i>: disabled</li>
+     *   <li><i>blurring</i>: disabled with a radius of 1 pixel</li>
      * </ul></p>
      *
      * @param opacity the opacity of the reflection, between 0.0 and 1.0
@@ -169,6 +172,8 @@ public class ReflectionRenderer {
      * @see #setLength(float)
      * @see #isBlurEnabled()
      * @see #setBlurEnabled(boolean)
+     * @see #getBlurRadius()
+     * @see #setBlurRadius(int)
      */
     public ReflectionRenderer(float opacity) {
         this(opacity, 0.4f, false);
@@ -179,18 +184,21 @@ public class ReflectionRenderer {
      * opacity and length are numbers between 0.0 (0%) and 1.0 (100%). If the
      * provided numbers are outside this range, they are clamped.</p>
      * <p>Enabling the blur generates a different kind of reflections that might
-     * look more natural.</p>
+     * look more natural. The default blur radius is 1 pixel</p>
      *
      * @param opacity the opacity of the reflection
      * @param length the length of the reflection
      * @param blurEnabled if true, the reflection is blurred
      * @see #getOpacity(),#setOpacity(float),#getLength(),#setLength(float)
      * @see #isBlurEnabled(),#setBlurEnabled(boolean)
+     * @see #getBlurRadius()
+     * @see #setBlurRadius(int)
      */
     public ReflectionRenderer(float opacity, float length, boolean blurEnabled) {
         //noinspection ThisEscapedInObjectConstruction
         this.changeSupport = new PropertyChangeSupport(this);
-
+        this.stackBlurFilter = new StackBlurFilter(1);
+        
         setOpacity(opacity);
         setLength(length);
         setBlurEnabled(blurEnabled);
@@ -353,14 +361,47 @@ public class ReflectionRenderer {
     }
 
     /**
+     * <p>Returns the radius, in pixels, of the blur used by this renderer when
+     * {@link #isBlurEnabled()} is true.</p>
+     *
+     * @return the radius of the blur used when <code>isBlurEnabled</code>
+     *         is true
+     * @see #isBlurEnabled()
+     * @see #setBlurEnabled(boolean)
+     * @see #setBlurRadius(int)
+     */
+    public int getBlurRadius() {
+        return stackBlurFilter.getRadius();
+    }
+
+    /**
+     * <p>Sets the radius, in pixels, of the blur used by this renderer when
+     * {@link #isBlurEnabled()} is true. This radius changes the size of the
+     * generated image when blurring is applied.</p>
+     *
+     * @param radius the radius, in pixels, of the blur
+     * @see #isBlurEnabled()
+     * @see #setBlurEnabled(boolean)
+     * @see #getBlurRadius()
+     */
+    public void setBlurRadius(int radius) {
+        this.stackBlurFilter = new StackBlurFilter(radius);
+    }
+
+    /**
      * <p>Returns the source image and its reflection. The appearance of the
      * reflection is defined by the opacity, the length and the blur
      * properties.</p>
-     * <p><p>The returned image will always have the same width as the source image
-     * but its height will be augmented according to the value returned by
-     * {@link #getLength()}. For instance, if the length is 0.5 (or 50%) and the
-     * source image is 480 pixels high, then the returned image will be
-     * 480 + 240 pixels high.</p>
+     * <p>The width of the generated image will be augmented when
+     * {@link #isBlurEnabled()} is true. The generated image will have the width
+     * of the source image plus twice the blur radius (see
+     * {@link #getBlurRadius()}). The default blur radius is 1 so the width will
+     * be augmented by 2. You might need to take this into account at drawing
+     * time.</p>
+     * <p>The height of the generated image will be augmented according to
+     * the value returned by {@link #getLength()}. For instance, if the length
+     * is 0.5 (or 50%) and the source image is 480 pixels high, then the
+     * returned image will be 480 + 240 pixels high.</p>
      * <p>You can create only the reflection by calling
      * {@link #createReflection(java.awt.image.BufferedImage)}.</p>
      *
@@ -371,10 +412,11 @@ public class ReflectionRenderer {
     public BufferedImage appendReflection(BufferedImage image) {
         BufferedImage reflection = createReflection(image);
         BufferedImage buffer = GraphicsUtilities.createTranslucentCompatibleImage(
-                image.getWidth(), image.getHeight() + reflection.getHeight());
+                reflection.getWidth(), image.getHeight() + reflection.getHeight());
         Graphics2D g2 = buffer.createGraphics();
 
-        g2.drawImage(image, 0, 0, null);
+        int x = reflection.getWidth() - image.getWidth();
+        g2.drawImage(image, x, 0, null);
         g2.drawImage(reflection, 0, image.getHeight(), null);
 
         g2.dispose();
@@ -387,13 +429,18 @@ public class ReflectionRenderer {
      * <p>Returns the reflection of the source image. The appearance of the
      * reflection is defined by the opacity, the length and the blur
      * properties.</p>
-     * <p>The returned image will always have the same width as the source image
-     * but its height depends on the value returned by {@link #getLength()}.
-     * For instance, if the length is 0.5 (or 50%) and the source image is
-     * 480 pixels high, then the reflection will be 240 pixels high.</p>
-     * <p>The returned image contains <strong>only</strong> the reflection. You
-     * will have to append it to the source image to produce the illusion of
-     * a reflective environement. The method
+     * * <p>The width of the generated image will be augmented when
+     * {@link #isBlurEnabled()} is true. The generated image will have the width
+     * of the source image plus twice the blur radius (see
+     * {@link #getBlurRadius()}). The default blur radius is 1 so the width will
+     * be augmented by 2. You might need to take this into account at drawing
+     * time.</p>
+     * <p>The returned image height depends on the value returned by
+     * {@link #getLength()}. For instance, if the length is 0.5 (or 50%) and
+     * the source image is 480 pixels high, then the reflection will be 240
+     * pixels high.</p> <p>The returned image contains <strong>only</strong>
+     * the reflection. You will have to append it to the source image to produce
+     * the illusion of a reflective environement. The method
      * {@link #appendReflection(java.awt.image.BufferedImage)} provides an easy
      * way to create an image containing both the source and the reflection.</p>
      *
@@ -406,23 +453,31 @@ public class ReflectionRenderer {
             return GraphicsUtilities.createTranslucentCompatibleImage(1, 1);
         }
 
+        int blurOffset = isBlurEnabled() ? stackBlurFilter.getRadius() : 0;
+
         BufferedImage buffer =
-                GraphicsUtilities.createTranslucentCompatibleImage(image.getWidth(),
-                                                                   (int) (image.getHeight() * length));
+                GraphicsUtilities.createTranslucentCompatibleImage(
+                        image.getWidth() + blurOffset * 2,
+                        (int) (image.getHeight() * length));
         Graphics2D g2 = buffer.createGraphics();
+
         g2.translate(0, image.getHeight());
         g2.scale(1.0, -1.0);
-        g2.drawImage(image, isBlurEnabled() ? new StackBlurFilter(1) : null, 0, 0);
+
+        g2.drawImage(image, isBlurEnabled() ? stackBlurFilter : null,
+                     blurOffset, 0);
+
         g2.scale(1.0, -1.0);
         g2.translate(0, -image.getHeight());
+
         g2.setComposite(AlphaComposite.DstIn);
         g2.setPaint(new GradientPaint(0.0f, 0.0f,
                                       new Color(0.0f, 0.0f, 0.0f, getOpacity()),
                                       0.0f, buffer.getHeight(),
                                       new Color(0.0f, 0.0f, 0.0f, 0.0f)));
         g2.fillRect(0, 0, buffer.getWidth(), buffer.getHeight());
-        g2.dispose();
 
+        g2.dispose();
         return buffer;
     }
 }
