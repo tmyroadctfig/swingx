@@ -29,69 +29,6 @@ import org.jdesktop.swingx.util.ComponentTreeTableModel;
 public class JXTreeTableIssues extends TestCase {
 
     /**
-     * Issue #??-swingx: ComponentAdapter not fully implemented - leaf always true.
-     *
-     */
-    public void testComponentAdapterIsLeaf() {
-        // build the test treeTableModel
-        JPanel root = new JPanel();
-        JLabel label = new JLabel();
-        JPanel inner = new JPanel();
-        // last row is leaf
-        inner.add(label);
-        // first row is folder
-        root.add(inner);
-        TreeTableModel model = new ComponentTreeTableModel(root);
-        // sanity 
-        assertTrue("label is leaf", model.isLeaf(label));
-        JXTreeTable table = new JXTreeTable(model);
-        table.expandAll();
-        // sanity
-        assertEquals("number of expanded rows", 2, table.getRowCount());
-        
-        // test leafness of last
-        int lastRow = table.getRowCount() - 1;
-        TreePath leafPath = table.getPathForRow(lastRow);
-        assertEquals(label, leafPath.getLastPathComponent());
-        assertEquals("adapter must report same leafness as model", 
-                model.isLeaf(label), table.getComponentAdapter(lastRow, 0).isLeaf());
-        // test folderness of first
-        int firstRow = 0;
-        TreePath folderPath = table.getPathForRow(firstRow);
-        assertEquals(inner, folderPath.getLastPathComponent());
-        assertEquals("adapter must report same leafness as model", 
-                model.isLeaf(inner), table.getComponentAdapter(firstRow, 0).isLeaf());
-    }
-    
-    /**
-     * Issue #??-swingx: ComponentAdapter not fully implemented - expanded always true.
-     *
-     */
-    public void testComponentAdapterIsExpanded() {
-        // build the test treeTableModel
-        JPanel root = new JPanel();
-        JLabel label = new JLabel();
-        JPanel inner = new JPanel();
-        // last row is leaf
-        inner.add(label);
-        // first row is folder
-        root.add(inner);
-        TreeTableModel model = new ComponentTreeTableModel(root);
-        // sanity 
-        assertTrue("label is leaf", model.isLeaf(label));
-        JXTreeTable table = new JXTreeTable(model);
-        // sanity
-        assertEquals("number of expanded rows", 1, table.getRowCount());
-        
-        // test folderness of first
-        int firstRow = 0;
-        TreePath folderPath = table.getPathForRow(firstRow);
-        assertEquals(inner, folderPath.getLastPathComponent());
-        assertEquals("adapter must report same expansion state as tree", table.isExpanded(firstRow), 
-                table.getComponentAdapter(firstRow, 0).isExpanded());
-    }
-    
-    /**
      * Issue #399-swingx: editing terminated by selecting editing row.
      *
      */
