@@ -6,23 +6,22 @@
  */
 package org.jdesktop.swingx;
 
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.tree.TreePath;
 
 import junit.framework.TestCase;
 
-import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.treetable.FileSystemModel;
-import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.swingx.util.ComponentTreeTableModel;
 
 /**
- * Test to exposed known issues of <code>JXTreeTable</code>.
+ * Test to exposed known issues of <code>JXTreeTable</code>. <p>
  * 
  * Ideally, there would be at least one failing test method per open
  * issue in the issue tracker. Plus additional failing test methods for
- * not fully specified or not yet decided upon features/behaviour.
+ * not fully specified or not yet decided upon features/behaviour.<p>
+ * 
+ * Once the issues are fixed and the corresponding methods are passing, they
+ * should be moved over to the XXTest. 
  * 
  * @author Jeanette Winzenburg
  */

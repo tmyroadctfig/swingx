@@ -61,6 +61,7 @@ import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.table.ColumnControlButton;
+import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.util.AncientSwingTeam;
 import org.jdesktop.swingx.util.ChangeReport;
@@ -107,6 +108,81 @@ public class JXTableUnitTest extends InteractiveTestCase {
         super.tearDown();
     }
 
+    /**
+     * Sanity test for cleanup of createDefaultColumns.
+     *
+     */
+    public void testColumnFactory() {
+        JXTable table = new JXTable(sortableTableModel);
+        List<TableColumn> columns = table.getColumns();
+        // for all model columns and in same order..
+        assertEquals(sortableTableModel.getColumnCount(), columns.size());
+        for (int i = 0; i < sortableTableModel.getColumnCount(); i++) {
+            // there must have been inserted a TableColumnExt with 
+            // title == headerValue == column name in model
+            assertTrue(columns.get(i) instanceof TableColumnExt);
+            assertEquals(sortableTableModel.getColumnName(i), 
+                    String.valueOf(columns.get(i).getHeaderValue()));
+        }
+    }
+    /**
+     * Tests per-table ColumnFactory: bound property, reset to shared.
+     * 
+     */
+    public void testTableSetColumnFactory() {
+        JXTable table = new JXTable();
+        PropertyChangeReport report = new PropertyChangeReport();
+        table.addPropertyChangeListener(report);
+        ColumnFactory factory = createCustomColumnFactory();
+        table.setColumnFactory(factory);
+        assertEquals(1, report.getEventCount());
+        assertTrue(report.hasEvents("columnFactory"));
+        assertSame(factory, report.getLastNewValue("columnFactory"));
+        assertSame(ColumnFactory.getInstance(), report.getLastOldValue("columnFactory"));
+        report.clear();
+        table.setColumnFactory(null);
+        assertEquals(1, report.getEventCount());
+        assertTrue(report.hasEvents("columnFactory"));
+        assertSame(factory, report.getLastOldValue("columnFactory"));
+        assertSame(ColumnFactory.getInstance(), report.getLastNewValue("columnFactory"));
+    }
+    
+    /**
+     * Tests per-table ColumnFactory: use individual.
+     * 
+     */
+    public void testTableUseCustomColumnFactory() {
+        JXTable table = new JXTable();
+        PropertyChangeReport report = new PropertyChangeReport();
+        table.addPropertyChangeListener(report);
+        ColumnFactory factory = createCustomColumnFactory();
+        table.setColumnFactory(factory);
+        // sanity...
+        assertSame(factory, report.getLastNewValue("columnFactory"));
+        table.setModel(new DefaultTableModel(2, 5));
+        assertEquals(String.valueOf(0), table.getColumnExt(0).getTitle());
+    }
+    
+    /**
+     * Creates and returns a custom columnFactory for testing. 
+     * Sets column title to modelIndex.
+     * 
+     * @return the custom ColumnFactory.
+     */
+    protected ColumnFactory createCustomColumnFactory() {
+        ColumnFactory factory = new ColumnFactory() {
+
+            @Override
+            public void configureTableColumn(TableModel model,
+                    TableColumnExt columnExt) {
+                super.configureTableColumn(model, columnExt);
+                columnExt.setTitle(String.valueOf(columnExt.getModelIndex()));
+            }
+
+        };
+        return factory;
+        
+    }
     
     /**
      * Issue #4614616: renderer lookup broken for interface types.

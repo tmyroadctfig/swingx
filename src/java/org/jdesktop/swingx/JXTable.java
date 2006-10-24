@@ -1376,6 +1376,7 @@ public class JXTable extends JTable
      * @return <code>SelectionMapper</code>
      */
     public SelectionMapper getSelectionMapper() {
+        // JW: why is this public? Probably made so accidentally?
         if (selectionMapper == null) {
             selectionMapper = new DefaultSelectionMapper(filters, getSelectionModel());
         }
@@ -1995,27 +1996,36 @@ public class JXTable extends JTable
         }
     }
 
-//-------------------------- ColumnFactory
-    
+    // -------------------------- ColumnFactory
+
+    /**
+     * Creates, configures and adds default <code>TableColumn</code>s for
+     * columns in this table's <code>TableModel</code>. Removes all currently
+     * contained <code>TableColumn</code>s. The exact type and configuration
+     * of the columns is controlled by the <code>ColumnFactory</code>.
+     * <p>
+     * PENDING: go the whole distance and let the factory decide which model
+     * columns to map to view columns.
+     * 
+     * @see org.jdesktop.swingx.ColumnFactory
+     * 
+     */
     @Override
     public void createDefaultColumnsFromModel() {
-        TableModel model = getModel();
-        if (model != null) {
-            // Create new columns from the data model info
-            // Note: it's critical to create the new columns before
-            // deleting the old ones. Why?
-            // JW PENDING: the reason is somewhere in the early forums - search!
-            int modelColumnCount = model.getColumnCount();
-            TableColumn newColumns[] = new TableColumn[modelColumnCount];
-            for (int i = 0; i < newColumns.length; i++) {
-                newColumns[i] = createAndConfigureColumn(model, i);
-            }
-            // Remove any current columns
-            removeColumns();
-            // Now add the new columns to the column model
-            for (int i = 0; i < newColumns.length; i++) {
-                addColumn(newColumns[i]);
-            }
+        // JW: when could this happen?
+        if (getModel() == null)
+            return;
+        // Remove any current columns
+        removeColumns();
+        // Create new columns from the data model info
+        // Note: it was critical to create the new columns before
+        // deleting the old ones. Why?
+        // JW: a side-effect of DefaultTableModelExt.getColumnCount()
+        // when dynamically
+        // loading data - must be solved there (we don't maintain jdnc)
+        for (int i = 0; i < getModel().getColumnCount(); i++) {
+            addColumn(getColumnFactory().createAndConfigureTableColumn(
+                    getModel(), i));
         }
     }
 
@@ -2033,12 +2043,6 @@ public class JXTable extends JTable
             getColumnModel().removeColumn(iter.next());
 
         }
-    }
-
-    protected TableColumn createAndConfigureColumn(TableModel model,
-            int modelColumn) {
-        return getColumnFactory().createAndConfigureTableColumn(model,
-                modelColumn);
     }
 
     /**
