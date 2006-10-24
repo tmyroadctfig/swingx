@@ -474,7 +474,7 @@ public class ReflectionRenderer {
         g2.setPaint(new GradientPaint(0.0f, 0.0f,
                                       new Color(0.0f, 0.0f, 0.0f, getOpacity()),
                                       0.0f, buffer.getHeight(),
-                                      new Color(0.0f, 0.0f, 0.0f, 0.0f)));
+                                      new Color(0.0f, 0.0f, 0.0f, 0.0f), true));
         g2.fillRect(0, 0, buffer.getWidth(), buffer.getHeight());
 
         g2.dispose();
