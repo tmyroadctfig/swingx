@@ -96,15 +96,14 @@ public class JXHeader extends JXPanel {
     
     /** Creates a new instance of JXHeader */
     public JXHeader(String title, String description) {
-        this.title = title;
-        this.description = description;
+        this(title, description, null);
     }
     
     /** Creates a new instance of JXHeader */
     public JXHeader(String title, String description, Icon icon) {
-        this.title = title;
-        this.description = description;
-        this.icon = icon;
+        setTitle(title);
+        setDescription(description);
+        setIcon(icon);
     }
     
     //------------------------------------------------------------- UI Logic
