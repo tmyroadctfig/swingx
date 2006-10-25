@@ -2065,16 +2065,13 @@ public class JXTable extends JTable
     /**
      * Returns the ColumnFactory. <p>
      * 
-     * PENDING JW should be public for symmetry. Change will break 
-     * existing code - so do it when there are other breaking changes.
-     *  
      * @return the columnFactory to use for column creation and
      *   configuration.
      *   
      * @see #setColumnFactory(ColumnFactory)
      * @see org.jdesktop.swingx.ColumnFactory
      */
-    protected ColumnFactory getColumnFactory() {
+    public ColumnFactory getColumnFactory() {
         /*
         * TODO JW: think about implications of not/ copying the reference 
         *  to the shared instance into the table's field? Better 
