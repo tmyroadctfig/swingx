@@ -2115,6 +2115,195 @@ public class JXTable extends JTable
         firePropertyChange("columnFactory", old, getColumnFactory());
     }
     
+    // -------------------------------- enhanced sizing support
+
+    /**
+     * Packs all the columns to their optimal size. Works best with auto
+     * resizing turned off.
+     * 
+     * Contributed by M. Hillary (Issue #60)
+     * 
+     * @param margin the margin to apply to each column.
+     */
+    public void packTable(int margin) {
+        for (int c = 0; c < getColumnCount(); c++)
+            packColumn(c, margin, -1);
+    }
+
+    /**
+     * Packs an indivudal column in the table. Contributed by M. Hillary (Issue
+     * #60)
+     * 
+     * @param column The Column index to pack in View Coordinates
+     * @param margin The Margin to apply to the column width.
+     */
+    public void packColumn(int column, int margin) {
+        packColumn(column, margin, -1);
+    }
+
+    /**
+     * Packs an indivual column in the table to less than or equal to the
+     * maximum witdth. If maximun is -1 then the column is made as wide as it
+     * needs. Contributed by M. Hillary (Issue #60)
+     * 
+     * @param column The Column index to pack in View Coordinates
+     * @param margin The margin to apply to the column
+     * @param max The maximum width the column can be resized to. -1 mean any
+     *        size.
+     */
+    public void packColumn(int column, int margin, int max) {
+        getColumnFactory().packColumn(this, getColumnExt(column), margin, max);
+    }
+
+    /**
+     * Returns the preferred number of rows to show in a
+     * <code>JScrollPane</code>.
+     * 
+     * @return the number of rows to show in a <code>JScrollPane</code>
+     * @see #setVisibleRowCount(int)
+     */
+    public int getVisibleRowCount() {
+        return visibleRowCount;
+    }
+    
+    /**
+     * Sets the preferred number of rows to show in a <code>JScrollPane</code>.
+     * <p>
+     * 
+     * TODO JW - make bound property, reset scrollablePref(? distinguish
+     * internal from client code triggered like in rowheight?) and re-layout.
+     * 
+     * @param the number of rows to show in a <code>JScrollPane</code>
+     * @see #getVisibleRowCount()
+     */
+    public void setVisibleRowCount(int visibleRowCount) {
+        this.visibleRowCount = visibleRowCount;
+    }
+
+
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * TODO JW: refactor and comment.
+     * 
+     */
+    @Override
+    public Dimension getPreferredScrollableViewportSize() {
+        Dimension prefSize = super.getPreferredScrollableViewportSize();
+
+        // JTable hardcodes this to 450 X 400, so we'll calculate it
+        // based on the preferred widths of the columns and the
+        // visibleRowCount property instead...
+
+        if (prefSize.getWidth() == 450 && prefSize.getHeight() == 400) {
+            TableColumnModel columnModel = getColumnModel();
+            int columnCount = columnModel.getColumnCount();
+
+            int w = 0;
+            for (int i = 0; i < columnCount; i++) {
+                TableColumn column = columnModel.getColumn(i);
+                initializeColumnPreferredWidth(column);
+                w += column.getPreferredWidth();
+            }
+            prefSize.width = w;
+            JTableHeader header = getTableHeader();
+            // remind(aim): height is still off...???
+            int rowCount = getVisibleRowCount();
+            prefSize.height = rowCount * getRowHeight()
+                    + (header != null ? header.getPreferredSize().height : 0);
+            setPreferredScrollableViewportSize(prefSize);
+        }
+        return prefSize;
+    }
+    
+    /**
+     * Initialize the preferredWidth of the specified column based on the
+     * column's prototypeValue property. If the column is not an instance of
+     * <code>TableColumnExt</code> or prototypeValue is <code>null</code>
+     * then the preferredWidth is left unmodified.
+     * 
+     * TODO JW - need to cleanup getScrollablePreferred (refactor and inline)
+     *  update doc - what exactly happens is left to the columnfactory.
+     * 
+     * @param column
+     *            TableColumn object representing view column
+     * @see org.jdesktop.swingx.table.TableColumnExt#setPrototypeValue
+     */
+    protected void initializeColumnPreferredWidth(TableColumn column) {
+        if (column instanceof TableColumnExt) {
+            getColumnFactory().configureColumnWidths(this,
+                    (TableColumnExt) column);
+        }
+    }
+
+
+    // ----------------- scrolling support
+    /**
+     * Scrolls vertically to make the given row visible. This might not have any
+     * effect if the table isn't contained in a <code>JViewport</code>.
+     * <p>
+     * 
+     * Note: this method has no precondition as it internally uses
+     * <code>getCellRect</code> which is lenient to off-range coordinates.
+     * 
+     * @param row the view row index of the cell
+     * 
+     * @see #scrollColumnToVisible(int)
+     * @see #scrollCellToVisible(int, int)
+     * @see #scrollRectToVisible(Rectangle)
+     */
+    public void scrollRowToVisible(int row) {
+        Rectangle cellRect = getCellRect(row, 0, false);
+        Rectangle visibleRect = getVisibleRect();
+        cellRect.x = visibleRect.x;
+        cellRect.width = visibleRect.width;
+        scrollRectToVisible(cellRect);
+    }
+
+    /**
+     * Scrolls horizontally to make the given column visible. This might not
+     * have any effect if the table isn't contained in a <code>JViewport</code>.
+     * <p>
+     * 
+     * Note: this method has no precondition as it internally uses
+     * <code>getCellRect</code> which is lenient to off-range coordinates.
+     * 
+     * @param column the view column index of the cell
+     * 
+     * @see #scrollRowToVisible(int)
+     * @see #scrollCellToVisible(int, int)
+     * @see #scrollRectToVisible(Rectangle)
+     */
+    public void scrollColumnToVisible(int column) {
+        Rectangle cellRect = getCellRect(0, column, false);
+        Rectangle visibleRect = getVisibleRect();
+        cellRect.y = visibleRect.y;
+        cellRect.height = visibleRect.height;
+        scrollRectToVisible(cellRect);
+    }
+    
+
+    /**
+     * Scrolls to make the cell at row and column visible. This might not have
+     * any effect if the table isn't contained in a <code>JViewport</code>.
+     * <p>
+     * 
+     * Note: this method has no precondition as it internally uses
+     * <code>getCellRect</code> which is lenient to off-range coordinates.
+     * 
+     * @param row the view row index of the cell
+     * @param column the view column index of the cell
+     * 
+     * @see #scrollColumnToVisible(int)
+     * @see #scrollRowToVisible(int)
+     * @see #scrollRectToVisible(Rectangle)
+     */
+    public void scrollCellToVisible(int row, int column) {
+        Rectangle cellRect = getCellRect(row, column, false);
+        scrollRectToVisible(cellRect);
+    }
+
+    
 //----------------------- delegating methods?? from super    
     /**
      * Returns the selection mode used by this table's selection model.
@@ -2410,198 +2599,6 @@ public class JXTable extends JTable
             return new SearchHighlighter();
         }
 
-    }
-
-    // -------------------------------- sizing/scrolling support
-
-    /**
-     * Scrolls vertically to make the given row visible. This might not have any
-     * effect if the table isn't contained in a JViewport.
-     * <p>
-     * 
-     * Note: this method has no precondition as it internally uses getCellRect
-     * which is lenient to off-range coordinates.
-     * 
-     * @param row the view row index of the cell
-     * 
-     * @see #scrollColumnToVisible(int)
-     * @see #scrollCellToVisible(int, int)
-     * @see #scrollRectToVisible(Rectangle)
-     */
-    public void scrollRowToVisible(int row) {
-        Rectangle cellRect = getCellRect(row, 0, false);
-        Rectangle visibleRect = getVisibleRect();
-        cellRect.x = visibleRect.x;
-        cellRect.width = visibleRect.width;
-        scrollRectToVisible(cellRect);
-    }
-
-    /**
-     * Scrolls horizontally to make the given column visible. This might not
-     * have any effect if the table isn't contained in a JViewport.
-     * <p>
-     * 
-     * Note: this method has no precondition as it internally uses getCellRect
-     * which is lenient to off-range coordinates.
-     * 
-     * @param column the view column index of the cell
-     * 
-     * @see #scrollRowToVisible(int)
-     * @see #scrollCellToVisible(int, int)
-     * @see #scrollRectToVisible(Rectangle)
-     */
-    public void scrollColumnToVisible(int column) {
-        Rectangle cellRect = getCellRect(0, column, false);
-        Rectangle visibleRect = getVisibleRect();
-        cellRect.y = visibleRect.y;
-        cellRect.height = visibleRect.height;
-        scrollRectToVisible(cellRect);
-    }
-    
-
-    /**
-     * Scrolls to make the cell at row and column visible. This might not have
-     * any effect if the table isn't contained in a JViewport.
-     * <p>
-     * 
-     * Note: this method has no precondition as it internally uses getCellRect
-     * which is lenient to off-range coordinates.
-     * 
-     * @param row the view row index of the cell
-     * @param column the view column index of the cell
-     * 
-     * @see #scrollColumnToVisible(int)
-     * @see #scrollRowToVisible(int)
-     * @see #scrollRectToVisible(Rectangle)
-     */
-    public void scrollCellToVisible(int row, int column) {
-        Rectangle cellRect = getCellRect(row, column, false);
-        scrollRectToVisible(cellRect);
-    }
-
-    /**
-     * Returns the preferred number of rows to show in a
-     * <code>JScrollPane</code>.
-     * 
-     * @return the number of rows to show in a <code>JScrollPane</code>
-     * @see #setVisibleRowCount(int)
-     */
-    public int getVisibleRowCount() {
-        return visibleRowCount;
-    }
-    
-    /**
-     * Sets the preferred number of rows to show in a <code>JScrollPane</code>.
-     * <p>
-     * 
-     * TODO JW - make bound property, reset scrollablePref(? distinguish
-     * internal from client code triggered like in rowheight?) and re-layout.
-     * 
-     * @param the number of rows to show in a <code>JScrollPane</code>
-     * @see #getVisibleRowCount()
-     */
-    public void setVisibleRowCount(int visibleRowCount) {
-        this.visibleRowCount = visibleRowCount;
-    }
-
-
-    /**
-     * {@inheritDoc} <p>
-     * 
-     * TODO JW: refactor and comment.
-     * 
-     */
-    @Override
-    public Dimension getPreferredScrollableViewportSize() {
-        Dimension prefSize = super.getPreferredScrollableViewportSize();
-
-        // JTable hardcodes this to 450 X 400, so we'll calculate it
-        // based on the preferred widths of the columns and the
-        // visibleRowCount property instead...
-
-        if (prefSize.getWidth() == 450 && prefSize.getHeight() == 400) {
-            TableColumnModel columnModel = getColumnModel();
-            int columnCount = columnModel.getColumnCount();
-
-            int w = 0;
-            for (int i = 0; i < columnCount; i++) {
-                TableColumn column = columnModel.getColumn(i);
-                initializeColumnPreferredWidth(column);
-                w += column.getPreferredWidth();
-            }
-            prefSize.width = w;
-            JTableHeader header = getTableHeader();
-            // remind(aim): height is still off...???
-            int rowCount = getVisibleRowCount();
-            prefSize.height = rowCount * getRowHeight()
-                    + (header != null ? header.getPreferredSize().height : 0);
-            setPreferredScrollableViewportSize(prefSize);
-        }
-        return prefSize;
-    }
-
-    /**
-     * Packs all the columns to their optimal size. Works best with auto
-     * resizing turned off.
-     * 
-     * Contributed by M. Hillary (Issue #60)
-     * 
-     * @param margin
-     *            the margin to apply to each column.
-     */
-    public void packTable(int margin) {
-        for (int c = 0; c < getColumnCount(); c++)
-            packColumn(c, margin, -1);
-    }
-
-    /**
-     * Packs an indivudal column in the table. Contributed by M. Hillary (Issue
-     * #60)
-     * 
-     * @param column
-     *            The Column index to pack in View Coordinates
-     * @param margin
-     *            The Margin to apply to the column width.
-     */
-    public void packColumn(int column, int margin) {
-        packColumn(column, margin, -1);
-    }
-
-    /**
-     * Packs an indivual column in the table to less than or equal to the
-     * maximum witdth. If maximun is -1 then the column is made as wide as it
-     * needs. Contributed by M. Hillary (Issue #60)
-     * 
-     * @param column
-     *            The Column index to pack in View Coordinates
-     * @param margin
-     *            The margin to apply to the column
-     * @param max
-     *            The maximum width the column can be resized to. -1 mean any
-     *            size.
-     */
-    public void packColumn(int column, int margin, int max) {
-        getColumnFactory().packColumn(this, getColumnExt(column), margin, max);
-    }
-
-    /**
-     * Initialize the preferredWidth of the specified column based on the
-     * column's prototypeValue property. If the column is not an instance of
-     * <code>TableColumnExt</code> or prototypeValue is <code>null</code>
-     * then the preferredWidth is left unmodified.
-     * 
-     * TODO JW - need to cleanup getScrollablePreferred (refactor and inline)
-     *  update doc - what exactly happens is left to the columnfactory.
-     * 
-     * @param column
-     *            TableColumn object representing view column
-     * @see org.jdesktop.swingx.table.TableColumnExt#setPrototypeValue
-     */
-    protected void initializeColumnPreferredWidth(TableColumn column) {
-        if (column instanceof TableColumnExt) {
-            getColumnFactory().configureColumnWidths(this,
-                    (TableColumnExt) column);
-        }
     }
 
     
