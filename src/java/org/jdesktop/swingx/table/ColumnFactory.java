@@ -30,51 +30,69 @@ import javax.swing.table.TableModel;
 import org.jdesktop.swingx.JXTable;
 
 /**
- * Creates and configures TableColumns. JXTable  
- * delegates all TableColumn creation and configuration to this class. 
+ * Creates and configures <code>TableColumnExt</code>s.
  * <p>
- * It's meant to be shared across all tables of an 
- * application. To apply a custom ColumnFactory, subclass and
- * set the shared instance to the new class "early" in the application.
+ * TODO JW: explain types of configuration - initial from tableModel, initial
+ * from table context, user triggered at runtime.
+ * <p>
+ * 
+ * <code>JXTable</code> delegates all <code>TableColumn</code> creation and
+ * configuration to a <code>ColumnFactory</code>. Enhanced column
+ * configuration should be implemented in a custom factory subclass. The example
+ * beautifies the column titles to always start with a capital letter:
+ * 
  * <pre>
  * <code>
- *   MyColumnFactory extends ColumnFactory {
- *       //@Override
- *       public void configureTableColumn(TableModel model, 
- *           TableColumnExt columnExt) {
- *           super.configureTableColumn(model, columnExt);
- *           String title = columnExt.getTitle();
- *           title = title.substring(0,1).toUpperCase() + title.substring(1).toLowerCase();
- *           columnExt.setTitle(title);
- *       }
- *   };
- *   ColumnFactory.setInstance(new MyColumnFactory());
+ *    MyColumnFactory extends ColumnFactory {
+ *        //@Override
+ *        public void configureTableColumn(TableModel model, 
+ *            TableColumnExt columnExt) {
+ *            super.configureTableColumn(model, columnExt);
+ *            String title = columnExt.getTitle();
+ *            title = title.substring(0,1).toUpperCase() + title.substring(1).toLowerCase();
+ *            columnExt.setTitle(title);
+ *        }
+ *    };
  * </code>
  * </pre>
  * 
- * Alternatively, any instance of JXTable can be configured 
- * individually with a custom ColumnFactory:
+ * By default a single instance is shared across all tables of an application.
+ * This instance can be replaced by a custom implementation, preferably "early"
+ * in the application's lifetime.
  * 
- *  <pre>
+ * <pre><code>
+ * ColumnFactory.setInstance(new MyColumnFactory());
+ * </code></pre> 
+ * 
+ * Alternatively, any instance of <code>JXTable</code> can be configured
+ * individually with its own <code>ColumnFactory</code>.
+ * 
+ * <pre>
  *  <code>
- *    JXTable table = new JXTable();
- *    table.setColumnFactory(new MyColumnFactory());
- *    table.setModel(myTableModel);
- *  </code>
+ * JXTable table = new JXTable();
+ * table.setColumnFactory(new MyColumnFactory());
+ * table.setModel(myTableModel);
+ * </code>
  *  </pre>
  * 
  * <p>
  * 
- * 
- * 
+ * @see org.jdesktop.swingx.JXTable#setColumnFactory(ColumnFactory)
  * 
  * @author Jeanette Winzenburg
  */
 public class ColumnFactory {
     
-    
+    /** the shared instance. */
     private static ColumnFactory columnFactory;
-    
+    /** the default margin to use in pack. */
+    private int packMargin = 4;
+    /**
+     * Returns the shared default factory. 
+     * 
+     * @return the shared instance of <code>ColumnFactory</code>
+     * @see #setInstance(ColumnFactory)
+     */
     public static synchronized ColumnFactory getInstance() {
         if (columnFactory == null) {
             columnFactory = new ColumnFactory();
@@ -82,40 +100,21 @@ public class ColumnFactory {
         return columnFactory;
     }
 
+    /**
+     * Sets the shared default factory. The shared instance is used
+     * by <code>JXTable</code> if it has none set individually.
+     * 
+     * @param factory the default column factory.
+     * @see #getInstance()
+     * @see org.jdesktop.swingx.JXTable#getColumnFactory()
+     */
     public static synchronized void  setInstance(ColumnFactory factory) {
         columnFactory = factory;
     }
 
-    private int packMargin = 4;
-    
     /**
-     * Creates a table column with modelIndex.
-     * @param modelIndex column index in model coordinates
-     * @return TableColumnExt to use
-     */
-    public TableColumnExt createTableColumn(int modelIndex) {
-        return new TableColumnExt(modelIndex);
-    }
-    
-    /**
-     * Configure column properties from TableModel.
-     * 
-     * @param model the TableModel to read configuration properties from
-     * @param columnExt the TableColumnExt to configure.
-     * @throws NPE if model or column == null
-     * @throws IllegalStateException if column does not have valid modelIndex
-     *   (in coordinate space of the tablemodel)
-     */
-    public void configureTableColumn(TableModel model, TableColumnExt columnExt) {
-        if ((columnExt.getModelIndex() < 0) 
-                || (columnExt.getModelIndex() >= model.getColumnCount())) 
-            throw new IllegalStateException("column must have valid modelIndex");
-        columnExt.setHeaderValue(model.getColumnName(columnExt.getModelIndex()));
-
-    }
-    
-    /**
-     * Creates and configures a TableColumnExt.
+     * Creates and configures a TableColumnExt. <code>JXTable</code> calls
+     * this method for each column in the <code>TableModel</code>.
      * 
      * @param model the TableModel to read configuration properties from
      * @param modelIndex column index in model coordinates
@@ -123,25 +122,79 @@ public class ColumnFactory {
      * @throws NPE if model == null
      * @throws IllegalStateException if the modelIndex is invalid
      *   (in coordinate space of the tablemodel)
+     *  
+     * @see #createTableColumn(int)
+     * @see #configureTableColumn(TableModel, TableColumnExt)
+     * @see org.jdesktop.swingx.JXTable#createDefaultColumnsFromModel() 
      */
     public TableColumnExt createAndConfigureTableColumn(TableModel model, int modelIndex) {
         TableColumnExt column = createTableColumn(modelIndex);
         configureTableColumn(model, column);
         return column;
     }
+    
+    /**
+     * Creates a table column with modelIndex.
+     * <p>
+     * The factory's column creation is passed through this method, so 
+     * subclasses can override to return custom column types.
+     * 
+     * @param modelIndex column index in model coordinates
+     * @return a TableColumnExt with <code>modelIndex</code>
+     * 
+     * @see #createAndConfigureTableColumn(TableModel, int)
+     * 
+     */
+    protected TableColumnExt createTableColumn(int modelIndex) {
+        return new TableColumnExt(modelIndex);
+    }
+    
+    /**
+     * Configure column properties from TableModel. This implementation
+     * sets the column's <code>headerValue</code> property from the 
+     * model's <code>columnName</code>.
+     * <p>
+     * 
+     * The factory's initial column configuration is passed through this method, so 
+     * subclasses can override do custom configuration.
+     * 
+     * @param model the TableModel to read configuration properties from
+     * @param columnExt the TableColumnExt to configure.
+     * @throws NPE if model or column == null
+     * @throws IllegalStateException if column does not have valid modelIndex
+     *   (in coordinate space of the tablemodel)
+     *   
+     * @see #createAndConfigureTableColumn(TableModel, int)  
+     */
+    protected void configureTableColumn(TableModel model, TableColumnExt columnExt) {
+        if ((columnExt.getModelIndex() < 0) 
+                || (columnExt.getModelIndex() >= model.getColumnCount())) 
+            throw new IllegalStateException("column must have valid modelIndex");
+        columnExt.setHeaderValue(model.getColumnName(columnExt.getModelIndex()));
+
+    }
+    
 
     /**
-     * configure column widths properties from JXTable. This
-     * method is typically called in JXTable initialization 
-     * (TODO JW: really? unfortunately: yes - should be called always after
-     * structureChanged).
+     * Configures column initial widths properties from <code>JXTable</code>. 
+     * This bare-bones implementation sets the column's <code>preferredWidth</code>
+     * using it's <code>prototype</code> property. <p>
      * 
-     * Here: set column's preferredWidth from prototype. 
-     *  
+     * TODO JW - rename method to better convey what's happening, maybe
+     *   initializeColumnWidths like the old method in JXTable.
+     * 
      * @param table the context the column will live in.
      * @param columnExt the Tablecolumn to configure.
+     * 
+     * @see org.jdesktop.swingx.JXTable#getPreferredScrollableViewportSize()
      */
     public void configureColumnWidths(JXTable table, TableColumnExt columnExt) {
+        /*
+         * PENDING JW: really only called once in a table's lifetime? 
+         * unfortunately: yes - should be called always after
+         * structureChanged.
+         * 
+         */
         Dimension cellSpacing = table.getIntercellSpacing();
         Object prototypeValue = columnExt.getPrototypeValue();
         if (prototypeValue != null) {
@@ -174,11 +227,12 @@ public class ColumnFactory {
     }
 
     /**
-     * configure the table column's preferredWidth, respecting the table context, 
-     * a symmetric left/right margin to add and maximum width.
+     * Configures the column's <code>preferredWidth</code>, respecting the table context, 
+     * and a symmetric left/right margin to add and maximum width. <p>
      * 
-     * Here: basically loops through all rows of the given column and measures
-     * the renderers pref width. This is a potential performance sink.
+     * This implementation loops through all rows of the given column and measures
+     * the renderers pref width (it's a potential performance sink). Subclasses can
+     * override to implement a different strategy. <p>
      * 
      * PENDING (JW): though 2 * margin is added as spacing, this does not really mean a
      * left/right symmetry - it's up to the table to place the renderer which it 
@@ -188,6 +242,10 @@ public class ColumnFactory {
      * @param columnExt the Tablecolumn to configure.
      * @param margin the spacing to add left/right, if -1 uses this factories default 
      * @param max an upper limit to prefWidth, -1 is interpreted as no limit
+     * 
+     * @see org.jdesktop.swingx.JXTable#packTable(int)
+     * @see org.jdesktop.swingx.JXTable#packColumn(int, int)
+     * 
      */
     public void packColumn(JXTable table, TableColumnExt columnExt, int margin, int max) {
 
@@ -225,6 +283,8 @@ public class ColumnFactory {
 //------------------------ default state
     
     /**
+     * Returns the default pack margin.
+     * 
      * @return the default pack margin to use in packColumn.
      */
     public int getDefaultPackMargin() {
@@ -232,7 +292,10 @@ public class ColumnFactory {
     }
     
     /**
+     * Sets the default pack margin.
      * 
+     * @param margin the default marging to use in packColumn.
+     * @see #packColumn(JXTable, TableColumnExt, int, int)
      */
     public void setDefaultPackMargin(int margin) {
         this.packMargin = margin;

@@ -287,7 +287,7 @@ public class JXTable extends JTable
     private boolean rowHeightEnabled;
 
     /**
-     * flag to indicate if the column control is visible.
+     * Flag to indicate if the column control is visible.
      */
     private boolean columnControlVisible;
     /**
@@ -331,9 +331,12 @@ public class JXTable extends JTable
      */
     private boolean inLayout;
 
-    /** temporary hack: rowheight will be internally adjusted to font size 
-     *  on instantiation and in updateUI if 
-     *  the height has not been set explicitly by the application.
+    /**
+     * Flag to distinguish internal settings of rowheight from client code
+     * settings. The rowHeight will be internally adjusted to font size on
+     * instantiation and in updateUI if the height has not been set explicitly
+     * by the application.
+     * @see #adminSetRowHeight(int)
      */
     protected boolean isXTableRowHeightSet;
 
@@ -2004,8 +2007,6 @@ public class JXTable extends JTable
      * contained <code>TableColumn</code>s. The exact type and configuration
      * of the columns is controlled by the <code>ColumnFactory</code>.
      * <p>
-     * PENDING: go the whole distance and let the factory decide which model
-     * columns to map to view columns.
      * 
      * @see org.jdesktop.swingx.ColumnFactory
      * 
@@ -2017,6 +2018,22 @@ public class JXTable extends JTable
             return;
         // Remove any current columns
         removeColumns();
+        createAndAddColumns();
+    }
+
+    /**
+     * Creates and adds <code>TableColumn</code>s for each
+     * column of the table model. <p>
+     * 
+     * PENDING: go the whole distance and let the factory decide which model
+     * columns to map to view columns? That would introduce an collection
+     * managing operation into the factory, sprawling? Can't (and probably 
+     * don't want to) move all collection related operations over - the
+     * ColumnFactory relies on TableColumnExt type columns, while
+     * the JXTable has to cope with all the base types.
+     *
+     */
+    private void createAndAddColumns() {
         // Create new columns from the data model info
         // Note: it was critical to create the new columns before
         // deleting the old ones. Why?
@@ -2031,10 +2048,10 @@ public class JXTable extends JTable
 
     /**
      * Remove all columns, make sure to include hidden.
-     * 
+     * <p>
      */
-    protected void removeColumns() {
-        /**
+    private void removeColumns() {
+        /*
          * TODO: promote this method to superclass, and change
          *       createDefaultColumnsFromModel() to call this method
          */
@@ -2046,10 +2063,16 @@ public class JXTable extends JTable
     }
 
     /**
+     * Returns the ColumnFactory. <p>
      * 
-     * @see #setColumnFactory(ColumnFactory)
+     * PENDING JW should be public for symmetry. Change will break 
+     * existing code - so do it when there are other breaking changes.
+     *  
      * @return the columnFactory to use for column creation and
      *   configuration.
+     *   
+     * @see #setColumnFactory(ColumnFactory)
+     * @see org.jdesktop.swingx.ColumnFactory
      */
     protected ColumnFactory getColumnFactory() {
         /*
@@ -2069,18 +2092,24 @@ public class JXTable extends JTable
     }
 
     /**
-     * Set's the ColumnFactory to use for column creation and 
+     * Sets the <code>ColumnFactory</code> to use for column creation and 
      * configuration. The default value is the shared application
      * ColumnFactory.
      * 
-     * TODO auto-configure columns on set? or add public table api to
-     * do so? Mostly, this is meant to be done once in the lifetime
-     * of the table, preferably before a model is set ... overshoot?
-     * 
-     * @param columnFactory the factory to use, null indicates
-     *    to use the shared application ColumnFactory.
+     * @param columnFactory the factory to use, <code>null</code> indicates
+     *    to use the shared application factory.
+     *    
+     * @see #getColumnFactory()
+     * @see org.jdesktop.swingx.ColumnFactory
      */
     public void setColumnFactory(ColumnFactory columnFactory) {
+        /*
+         * 
+         * TODO auto-configure columns on set? or add public table api to
+         * do so? Mostly, this is meant to be done once in the lifetime
+         * of the table, preferably before a model is set ... overshoot?
+         * 
+         */
         ColumnFactory old = getColumnFactory();
         this.columnFactory = columnFactory;
         firePropertyChange("columnFactory", old, getColumnFactory());
@@ -2382,17 +2411,22 @@ public class JXTable extends JTable
         }
 
     }
-//-------------------------------- sizing/scrolling support
+
+    // -------------------------------- sizing/scrolling support
 
     /**
-     * Scrolls vertically to make the given row visible.
-     * This might not have any effect if the table isn't contained
-     * in a JViewport. <p>
+     * Scrolls vertically to make the given row visible. This might not have any
+     * effect if the table isn't contained in a JViewport.
+     * <p>
      * 
-     * Note: this method has no precondition as it internally uses
-     * getCellRect which is lenient to off-range coordinates.
+     * Note: this method has no precondition as it internally uses getCellRect
+     * which is lenient to off-range coordinates.
      * 
      * @param row the view row index of the cell
+     * 
+     * @see #scrollColumnToVisible(int)
+     * @see #scrollCellToVisible(int, int)
+     * @see #scrollRectToVisible(Rectangle)
      */
     public void scrollRowToVisible(int row) {
         Rectangle cellRect = getCellRect(row, 0, false);
@@ -2403,14 +2437,18 @@ public class JXTable extends JTable
     }
 
     /**
-     * Scrolls horizontally to make the given column visible.
-     * This might not have any effect if the table isn't contained
-     * in a JViewport. <p>
+     * Scrolls horizontally to make the given column visible. This might not
+     * have any effect if the table isn't contained in a JViewport.
+     * <p>
      * 
-     * Note: this method has no precondition as it internally uses
-     * getCellRect which is lenient to off-range coordinates.
+     * Note: this method has no precondition as it internally uses getCellRect
+     * which is lenient to off-range coordinates.
      * 
      * @param column the view column index of the cell
+     * 
+     * @see #scrollRowToVisible(int)
+     * @see #scrollCellToVisible(int, int)
+     * @see #scrollRectToVisible(Rectangle)
      */
     public void scrollColumnToVisible(int column) {
         Rectangle cellRect = getCellRect(0, column, false);
@@ -2422,31 +2460,57 @@ public class JXTable extends JTable
     
 
     /**
-     * Scrolls to make the cell at row and column visible.
-     * This might not have any effect if the table isn't contained
-     * in a JViewport.<p>
+     * Scrolls to make the cell at row and column visible. This might not have
+     * any effect if the table isn't contained in a JViewport.
+     * <p>
      * 
-     * Note: this method has no precondition as it internally uses
-     * getCellRect which is lenient to off-range coordinates.
+     * Note: this method has no precondition as it internally uses getCellRect
+     * which is lenient to off-range coordinates.
      * 
      * @param row the view row index of the cell
      * @param column the view column index of the cell
+     * 
+     * @see #scrollColumnToVisible(int)
+     * @see #scrollRowToVisible(int)
+     * @see #scrollRectToVisible(Rectangle)
      */
     public void scrollCellToVisible(int row, int column) {
         Rectangle cellRect = getCellRect(row, column, false);
         scrollRectToVisible(cellRect);
     }
 
-    /** ? */
+    /**
+     * Returns the preferred number of rows to show in a
+     * <code>JScrollPane</code>.
+     * 
+     * @return the number of rows to show in a <code>JScrollPane</code>
+     * @see #setVisibleRowCount(int)
+     */
+    public int getVisibleRowCount() {
+        return visibleRowCount;
+    }
+    
+    /**
+     * Sets the preferred number of rows to show in a <code>JScrollPane</code>.
+     * <p>
+     * 
+     * TODO JW - make bound property, reset scrollablePref(? distinguish
+     * internal from client code triggered like in rowheight?) and re-layout.
+     * 
+     * @param the number of rows to show in a <code>JScrollPane</code>
+     * @see #getVisibleRowCount()
+     */
     public void setVisibleRowCount(int visibleRowCount) {
         this.visibleRowCount = visibleRowCount;
     }
 
-    /** ? */
-    public int getVisibleRowCount() {
-        return visibleRowCount;
-    }
 
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * TODO JW: refactor and comment.
+     * 
+     */
     @Override
     public Dimension getPreferredScrollableViewportSize() {
         Dimension prefSize = super.getPreferredScrollableViewportSize();
@@ -2526,9 +2590,12 @@ public class JXTable extends JTable
      * <code>TableColumnExt</code> or prototypeValue is <code>null</code>
      * then the preferredWidth is left unmodified.
      * 
-     * @see org.jdesktop.swingx.table.TableColumnExt#setPrototypeValue
+     * TODO JW - need to cleanup getScrollablePreferred (refactor and inline)
+     *  update doc - what exactly happens is left to the columnfactory.
+     * 
      * @param column
      *            TableColumn object representing view column
+     * @see org.jdesktop.swingx.table.TableColumnExt#setPrototypeValue
      */
     protected void initializeColumnPreferredWidth(TableColumn column) {
         if (column instanceof TableColumnExt) {
@@ -2860,9 +2927,9 @@ public class JXTable extends JTable
 
     
     /**
-     * Method to hack around #258-swingx: apply a specialized Highlighter
-     * to force reset the color "memory" of DefaultTableCellRenderer. 
-     * This is called for each renderer in {@link #prepareRenderer} after
+     * Method to hack around #258-swingx: apply a specialized <code>Highlighter</code>
+     * to force reset the color "memory" of <code>DefaultTableCellRenderer</code>. 
+     * This is called for each renderer in <code>prepareRenderer</code> after
      * calling super, but before applying the HighlighterPipeline. Subclasses
      * which are sure to solve the problem at the core (that is in 
      * a well-behaved DefaultTableCellRenderer) should override this method
@@ -2940,6 +3007,7 @@ public class JXTable extends JTable
     /**
      * Creates default cell renderers for objects, numbers, doubles, dates,
      * booleans, icons, and links.
+     * <p>
      * Overridden so we can act as factory for renderers plus hacking around
      * huge memory consumption of UIDefaults (see #6345050 in core Bug parade)
      * <p>
@@ -2947,7 +3015,7 @@ public class JXTable extends JTable
      */
     @Override
     protected void createDefaultRenderers() {
-        // super.createDefaultRenderers();
+//         super.createDefaultRenderers();
         // This duplicates JTable's functionality in order to make the renderers
         // available in getNewDefaultRenderer(); If JTable's renderers either
         // were public, or it provided a factory for *new* renderers, this would
@@ -3003,17 +3071,17 @@ public class JXTable extends JTable
     }
 
 
-    /** ? */
+    /** c&p'ed from super */
     private void setLazyValue(Hashtable h, Class c, String s) {
         h.put(c, new UIDefaults.ProxyLazyValue(s));
     }
 
-    /** ? */
+    /** c&p'ed from super */
     private void setLazyRenderer(Class c, String s) {
         setLazyValue(defaultRenderersByColumnClass, c, s);
     }
 
-    /** ? */
+    /** c&p'ed from super */
     private void setLazyEditor(Class c, String s) {
         setLazyValue(defaultEditorsByColumnClass, c, s);
     }
@@ -3125,7 +3193,8 @@ public class JXTable extends JTable
 
     /**
      * Creates default cell editors for objects, numbers, and boolean values.
-     * Overridden to hacking around
+     * <p>
+     * Overridden to hook enhanced editors plus hacking around
      * huge memory consumption of UIDefaults (see #6345050 in core Bug parade)
      * @see DefaultCellEditor
      */
@@ -3301,7 +3370,7 @@ public class JXTable extends JTable
      * interpreted to be on a component which is not under the table hierarchy
      * but inside the same toplevel window, "terminate" does so in any case,
      * first tries to stop the edit, if that's unsuccessful it cancels the edit.
-     * 
+     * <p>
      * The default value is <code>true</code>.
      * 
      * @param terminate the flag to determine whether or not to terminate the
@@ -3389,6 +3458,7 @@ public class JXTable extends JTable
     /**
      * Updates highlighter after <code>updateUI</code> changes.
      * 
+     * @see org.jdesktop.swingx.decorator.Highlighter.UIHighlighter
      */
     protected void updateHighlighters() {
         if (getHighlighters() == null)
@@ -3439,6 +3509,8 @@ public class JXTable extends JTable
      *        grid lines.
      * @param showVerticalLines boolean to decide whether to draw vertical grid
      *        lines.
+     * @see javax.swing.JTable#setShowGrid(boolean)
+     * @see javax.swing.JTable#setIntercellSpacing(Dimension)
      */
     public void setDefaultMargins(boolean showHorizontalLines,
             boolean showVerticalLines) {
@@ -3495,7 +3567,7 @@ public class JXTable extends JTable
      * @param enabled a boolean to indicate whether per-row heights should be
      *        enabled.
      * @see #isRowHeightEnabled()
-     * @see #setRowHeight(int, int))
+     * @see #setRowHeight(int, int)
      */
     public void setRowHeightEnabled(boolean enabled) {
         // PENDING: should we throw an Exception if the enabled fails?
@@ -3519,7 +3591,7 @@ public class JXTable extends JTable
      * @return a boolean to indicate whether individual row height support is
      *         enabled.
      * @see #setRowHeightEnabled(boolean)
-     * @see #setRowHeight(int, int))
+     * @see #setRowHeight(int, int)
      */
     public boolean isRowHeightEnabled() {
         return rowHeightEnabled;
@@ -3595,7 +3667,7 @@ public class JXTable extends JTable
      * 
      * @return the <code>SizeSequenceMapper</code> used to synch view/model
      *         coordinates for individual row heights
-     * @see org.jdesktop.decorator.SizeSequenceMapper
+     * @see org.jdesktop.swingx.decorator.SizeSequenceMapper
      */
     protected SizeSequenceMapper getRowModelMapper() {
         if (rowModelMapper == null) {
@@ -3606,8 +3678,9 @@ public class JXTable extends JTable
 
     /**
      * Sets the rowHeight for all rows to the given value. Keeps the flag
-     * <code>isXTableRowHeight</code> unchanged to enable the distinction
-     * setting the height for internal reasons from doing so by client code.
+     * <code>isXTableRowHeight</code> unchanged. This enables the distinction
+     * between setting the height for internal reasons from doing so by client
+     * code.
      * 
      * @param rowHeight new height in pixel.
      * @see #setRowHeight(int)
@@ -3695,6 +3768,7 @@ public class JXTable extends JTable
      * <p>
      * 
      * Overridden to return a <code>JXTableHeader</code>.
+     * @see JXTableHeader
      */
     @Override
     protected JTableHeader createDefaultTableHeader() {
@@ -3707,6 +3781,7 @@ public class JXTable extends JTable
      * <p>
      * 
      * Overridden to return a <code>DefaultTableColumnModelExt</code>.
+     * @see org.jdesktop.swingx.table.DefaultTableColumnModelExt
      */
     @Override
     protected TableColumnModel createDefaultColumnModel() {

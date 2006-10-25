@@ -1621,17 +1621,14 @@ public class JXTableUnitTest extends InteractiveTestCase {
     
     /**
      * Issue #54-swingx: hidden columns not removed.
-     * 
-     * NOTE: this is testing internal behaviour - don't!
-     * it bubbles up to public behaviour in setModel(), 
-     * check if anywhere else?
      *
      */
     public void testRemoveAllColumns() {
         JXTable table = new JXTable(sortableTableModel);
         TableColumnExt columnX = table.getColumnExt(0);
         columnX.setVisible(false);
-        table.removeColumns();
+        // set empty model
+        table.setModel(new DefaultTableModel(0, 0));
         assertEquals("all columns must have been removed", 
                 table.getColumnCount(), table.getColumnCount(true));
     }
