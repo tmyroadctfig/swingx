@@ -109,6 +109,25 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
     /**
+     * Test if default column creation and configuration is 
+     * controlled completely by ColumnFactory.
+     *
+     */
+    public void testColumnConfigControlledByFactory() {
+        ColumnFactory factory = new ColumnFactory() {
+
+            @Override
+            public void configureTableColumn(TableModel model, TableColumnExt columnExt) {
+                assertNull(columnExt.getHeaderValue());
+            }
+            
+        };
+        JXTable table = new JXTable();
+        table.setColumnFactory(factory);
+        table.setModel(new DefaultTableModel(10, 2));
+        assertEquals(null, table.getColumn(0).getHeaderValue());
+    }
+    /**
      * Sanity test for cleanup of createDefaultColumns.
      *
      */

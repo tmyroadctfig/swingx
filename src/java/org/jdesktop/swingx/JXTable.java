@@ -2025,23 +2025,23 @@ public class JXTable extends JTable
      * Creates and adds <code>TableColumn</code>s for each
      * column of the table model. <p>
      * 
-     * PENDING: go the whole distance and let the factory decide which model
-     * columns to map to view columns? That would introduce an collection
-     * managing operation into the factory, sprawling? Can't (and probably 
-     * don't want to) move all collection related operations over - the
-     * ColumnFactory relies on TableColumnExt type columns, while
-     * the JXTable has to cope with all the base types.
      *
      */
     private void createAndAddColumns() {
-        // Create new columns from the data model info
-        // Note: it was critical to create the new columns before
-        // deleting the old ones. Why?
-        // JW: a side-effect of DefaultTableModelExt.getColumnCount()
-        // when dynamically
-        // loading data - must be solved there (we don't maintain jdnc)
+        /*
+         * PENDING: go the whole distance and let the factory decide which model
+         * columns to map to view columns? That would introduce an collection
+         * managing operation into the factory, sprawling? Can't (and probably 
+         * don't want to) move all collection related operations over - the
+         * ColumnFactory relies on TableColumnExt type columns, while
+         * the JXTable has to cope with all the base types.
+         * 
+         */
         for (int i = 0; i < getModel().getColumnCount(); i++) {
-            addColumn(getColumnFactory().createAndConfigureTableColumn(
+            // add directly to columnModel - don't go through this.addColumn
+            // to guarantee full control of ColumnFactory
+            // addColumn has the side-effect to set the header!
+            getColumnModel().addColumn(getColumnFactory().createAndConfigureTableColumn(
                     getModel(), i));
         }
     }

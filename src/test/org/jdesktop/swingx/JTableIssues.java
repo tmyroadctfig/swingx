@@ -15,14 +15,13 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultListSelectionModel;
-import javax.swing.Icon;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 
 import org.jdesktop.swingx.util.ListSelectionReport;
 
@@ -44,7 +43,17 @@ public class JTableIssues extends InteractiveTestCase {
           e.printStackTrace();
       }
   }
-
+    /**
+     * Characterization method: table.addColumn and invalid modelIndex.
+     * 
+     * Doesn't blow up because DefaultTableModel.getColumnName is lenient,
+     * that is has no precondition on the index.
+     *
+     */
+    public void testAddColumn() {
+        JTable table = new JTable(0, 0);
+        table.addColumn(new TableColumn(1));
+    }
     /**
      * forum: table does not scroll after setRowSelectionInterval?
      * 

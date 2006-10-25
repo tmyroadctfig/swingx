@@ -87,6 +87,7 @@ public class ColumnFactory {
     private static ColumnFactory columnFactory;
     /** the default margin to use in pack. */
     private int packMargin = 4;
+    
     /**
      * Returns the shared default factory. 
      * 
@@ -102,7 +103,7 @@ public class ColumnFactory {
 
     /**
      * Sets the shared default factory. The shared instance is used
-     * by <code>JXTable</code> if it has none set individually.
+     * by <code>JXTable</code> if none has been set individually.
      * 
      * @param factory the default column factory.
      * @see #getInstance()
@@ -145,7 +146,7 @@ public class ColumnFactory {
      * @see #createAndConfigureTableColumn(TableModel, int)
      * 
      */
-    protected TableColumnExt createTableColumn(int modelIndex) {
+    public TableColumnExt createTableColumn(int modelIndex) {
         return new TableColumnExt(modelIndex);
     }
     
@@ -156,22 +157,22 @@ public class ColumnFactory {
      * <p>
      * 
      * The factory's initial column configuration is passed through this method, so 
-     * subclasses can override do custom configuration.
+     * subclasses can override to customize.
+     * <p>
      * 
      * @param model the TableModel to read configuration properties from
      * @param columnExt the TableColumnExt to configure.
-     * @throws NPE if model or column == null
+     * @throws NullPointerException if model or column == null
      * @throws IllegalStateException if column does not have valid modelIndex
      *   (in coordinate space of the tablemodel)
      *   
      * @see #createAndConfigureTableColumn(TableModel, int)  
      */
-    protected void configureTableColumn(TableModel model, TableColumnExt columnExt) {
+    public void configureTableColumn(TableModel model, TableColumnExt columnExt) {
         if ((columnExt.getModelIndex() < 0) 
                 || (columnExt.getModelIndex() >= model.getColumnCount())) 
             throw new IllegalStateException("column must have valid modelIndex");
         columnExt.setHeaderValue(model.getColumnName(columnExt.getModelIndex()));
-
     }
     
 
@@ -223,48 +224,55 @@ public class ColumnFactory {
             prefWidth += table.getColumnModel().getColumnMargin();
             columnExt.setPreferredWidth(prefWidth);
         }
-
     }
 
     /**
-     * Configures the column's <code>preferredWidth</code>, respecting the table context, 
-     * and a symmetric left/right margin to add and maximum width. <p>
+     * Configures the column's <code>preferredWidth</code> to fit the content.
+     * It respects the table context, a margin to add and a maximum width. This is
+     * typically called in response to a user gesture to adjust the column's width
+     * to the "widest" cell content of a column.  
+     * <p>
      * 
-     * This implementation loops through all rows of the given column and measures
-     * the renderers pref width (it's a potential performance sink). Subclasses can
-     * override to implement a different strategy. <p>
+     * This implementation loops through all rows of the given column and
+     * measures the renderers pref width (it's a potential performance sink).
+     * Subclasses can override to implement a different strategy.
+     * <p>
      * 
-     * PENDING (JW): though 2 * margin is added as spacing, this does not really mean a
-     * left/right symmetry - it's up to the table to place the renderer which it 
-     * controlled by the intercellspacing.
+     * Note: though 2 * margin is added as spacing, this does <b>not</b> imply
+     * a left/right symmetry - it's up to the table to place the renderer and/or
+     * the renderer/highlighter to configure a border.
      * 
      * @param table the context the column will live in.
-     * @param columnExt the Tablecolumn to configure.
-     * @param margin the spacing to add left/right, if -1 uses this factories default 
-     * @param max an upper limit to prefWidth, -1 is interpreted as no limit
+     * @param columnExt the column to configure.
+     * @param margin the extra spacing to add twice, if -1 uses this factories
+     *        default
+     * @param max an upper limit to preferredWidth, -1 is interpreted as no
+     *        limit
      * 
+     * @see #setDefaultPackMargin(int)
      * @see org.jdesktop.swingx.JXTable#packTable(int)
      * @see org.jdesktop.swingx.JXTable#packColumn(int, int)
      * 
      */
-    public void packColumn(JXTable table, TableColumnExt columnExt, int margin, int max) {
+    public void packColumn(JXTable table, TableColumnExt columnExt, int margin,
+            int max) {
 
         /* Get width of column header */
         TableCellRenderer renderer = columnExt.getHeaderRenderer();
-        if (renderer == null) 
+        if (renderer == null)
             renderer = table.getTableHeader().getDefaultRenderer();
-        
+
         int column = table.convertColumnIndexToView(columnExt.getModelIndex());
-        
-        Component comp = renderer.getTableCellRendererComponent(table, 
+
+        Component comp = renderer.getTableCellRendererComponent(table,
                 columnExt.getHeaderValue(), false, false, 0, column);
         int width = comp.getPreferredSize().width;
-        
-        if(table.getRowCount() > 0)
+
+        if (table.getRowCount() > 0)
             renderer = table.getCellRenderer(0, column);
         for (int r = 0; r < table.getRowCount(); r++) {
-            comp = renderer.getTableCellRendererComponent(table, 
-                    table.getValueAt(r, column), false, false, r, column);
+            comp = renderer.getTableCellRendererComponent(table, table
+                    .getValueAt(r, column), false, false, r, column);
             width = Math.max(width, comp.getPreferredSize().width);
         }
         if (margin < 0) {
@@ -273,28 +281,36 @@ public class ColumnFactory {
         width += 2 * margin;
 
         /* Check if the width exceeds the max */
-        if( max != -1 && width > max )
+        if (max != -1 && width > max)
             width = max;
-        
+
         columnExt.setPreferredWidth(width);
-        
+
     }
     
-//------------------------ default state
+// ------------------------ default state
     
     /**
      * Returns the default pack margin.
      * 
      * @return the default pack margin to use in packColumn.
+     * 
+     * @see #setDefaultPackMargin(int)
      */
     public int getDefaultPackMargin() {
         return packMargin;
     }
     
     /**
-     * Sets the default pack margin.
+     * Sets the default pack margin. <p>
+     * 
+     * Note: this is <b>not</b> really a margin in the sense of symmetrically 
+     * adding white space to the left/right of a cell's content. It's simply an 
+     * amount of space which is added twice to the measured widths in packColumn.
      * 
      * @param margin the default marging to use in packColumn.
+     * 
+     * @see #getDefaultPackMargin()
      * @see #packColumn(JXTable, TableColumnExt, int, int)
      */
     public void setDefaultPackMargin(int margin) {
