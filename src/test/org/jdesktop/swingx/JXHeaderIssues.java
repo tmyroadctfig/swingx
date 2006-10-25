@@ -44,6 +44,10 @@ import javax.swing.JLabel;
 public class JXHeaderIssues extends InteractiveTestCase {
 
     /**
+     * This issue has been fixed, but remains here (otherwise I get a warning
+     * when running this test. Not sure if this JXHeaderIssues should just be
+     * removed, or what).
+     *
      * Issue #403-swingx: JXHeader doesn't show custom values.
      * <p>
      * 

@@ -88,5 +88,27 @@ public class JXHeaderTest extends TestCase {
                 header.getTitle(), label.getText());
     }
     
+    /**
+     * Issue #403-swingx: JXHeader doesn't show custom values.
+     * <p>
+     * 
+     * Breaking if values are passed in the constructor.
+     */
+    public void testTitleInContructor() {
+        String title = "customTitle";
+        JXHeader header = new JXHeader(title, null);
+        // sanity: the property is set
+        assertEquals(title, header.getTitle());
+        // fishing in the internals ... not really safe, there are 2 labels
+        JLabel label = null;
+        for (int i = 0; i < header.getComponentCount(); i++) {
+            if (header.getComponent(i) instanceof JLabel) {
+                label = (JLabel) header.getComponent(i);
+                break;
+            }
+        }
+        assertEquals("the label's text must be equal to the headers title", 
+                header.getTitle(), label.getText());
+    }
 
 }
