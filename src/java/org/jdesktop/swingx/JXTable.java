@@ -634,7 +634,7 @@ public class JXTable extends JTable
      * The default value is <code>false</code>.
      * 
      * @param visible boolean to indicate if the column control should be shown
-     * @see #getColumnControlVisible(boolean)
+     * @see #getColumnControlVisible()
      * @see #setColumnControl(JComponent)
      * 
      */
@@ -1951,7 +1951,7 @@ public class JXTable extends JTable
      * <code>TableColumnExt</code>.
      * The returned column is visible.
      * 
-     * @param columnIndex the index of the column desired
+     * @param viewColumnIndex the index of the column desired
      * @return the <code>TableColumnExt</code> object that matches the column
      *         index
      * @throws ArrayIndexOutOfBoundsException if columnIndex out of allowed
@@ -2008,7 +2008,7 @@ public class JXTable extends JTable
      * of the columns is controlled by the <code>ColumnFactory</code>.
      * <p>
      * 
-     * @see org.jdesktop.swingx.ColumnFactory
+     * @see org.jdesktop.swingx.table.ColumnFactory
      * 
      */
     @Override
@@ -2069,7 +2069,7 @@ public class JXTable extends JTable
      *   configuration.
      *   
      * @see #setColumnFactory(ColumnFactory)
-     * @see org.jdesktop.swingx.ColumnFactory
+     * @see org.jdesktop.swingx.table.ColumnFactory
      */
     public ColumnFactory getColumnFactory() {
         /*
@@ -2097,7 +2097,7 @@ public class JXTable extends JTable
      *    to use the shared application factory.
      *    
      * @see #getColumnFactory()
-     * @see org.jdesktop.swingx.ColumnFactory
+     * @see org.jdesktop.swingx.table.ColumnFactory
      */
     public void setColumnFactory(ColumnFactory columnFactory) {
         /*
@@ -2170,7 +2170,7 @@ public class JXTable extends JTable
      * TODO JW - make bound property, reset scrollablePref(? distinguish
      * internal from client code triggered like in rowheight?) and re-layout.
      * 
-     * @param the number of rows to show in a <code>JScrollPane</code>
+     * @param visibleRowCount number of rows to show in a <code>JScrollPane</code>
      * @see #getVisibleRowCount()
      */
     public void setVisibleRowCount(int visibleRowCount) {
