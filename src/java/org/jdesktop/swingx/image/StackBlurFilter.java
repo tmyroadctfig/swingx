@@ -96,6 +96,16 @@ public class StackBlurFilter extends AbstractFilter {
     }
 
     /**
+     * <p>Returns the effective radius of the stack blur. If the radius of the
+     * blur is 1 and the stack iterations count is 3, then the effective blur
+     * radius is 1 * 3 = 3.</p>
+     * @return the number of iterations times the blur radius
+     */
+    public int getEffectiveRadius() {
+        return getIterations() * getRadius();
+    }
+
+    /**
      * <p>Returns the radius used by this filter, in pixels.</p>
      *
      * @return the radius of the blur
