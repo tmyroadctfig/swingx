@@ -23,15 +23,21 @@ package org.jdesktop.swingx;
 
 import java.net.URL;
 
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 /**
- * Test to exposed known issues of <code>JXHeader</code>.
+ * Test to expose known issues of <code>JXHeader</code>.
+ * <p>
  * 
- * Ideally, there would be at least one failing test method per open
- * Issue in the issue tracker. Plus additional failing test methods for
- * not fully specified or not yet decided upon features/behaviour.
+ * Ideally, there would be at least one failing test method per open issue in
+ * the issue tracker. Plus additional failing test methods for not fully
+ * specified or not yet decided upon features/behaviour.
+ * <p>
+ * 
+ * If an issue is fixed and the corresponding methods are passing, they
+ * should be moved over to the XXTest.
  * 
  * @author Jeanette Winzenburg
  */
@@ -39,21 +45,22 @@ public class JXHeaderIssues extends InteractiveTestCase {
 
     /**
      * Issue #403-swingx: JXHeader doesn't show custom values.
-     *
+     * <p>
+     * 
+     * Breaking if values are passed in the constructor.
      */
-    public void testTitle() {
-        JXHeader header = new JXHeader();
+    public void testTitleInContructor() {
         String title = "customTitle";
-        header.setTitle(title);
+        JXHeader header = new JXHeader(title, null);
         // sanity: the property is set
         assertEquals(title, header.getTitle());
         // fishing in the internals ... not really safe, there are 2 labels
         JLabel label = null;
         for (int i = 0; i < header.getComponentCount(); i++) {
-           if (header.getComponent(i) instanceof JLabel) {
-               label = (JLabel) header.getComponent(i);
-               break;
-           }
+            if (header.getComponent(i) instanceof JLabel) {
+                label = (JLabel) header.getComponent(i);
+                break;
+            }
         }
         assertEquals("the label's text must be equal to the headers title", 
                 header.getTitle(), label.getText());
@@ -64,9 +71,11 @@ public class JXHeaderIssues extends InteractiveTestCase {
     /**
      * Issue #403-swingx: JXHeader doesn't show custom values.<p>
      * 
+     * All values are passed in the constructor.
      */
     public void interactiveCustomProperties() {
         URL url = getClass().getResource("resources/images/wellTop.gif");
+        assertNotNull(url);
         JXHeader header = new JXHeader("MyTitle", "MyDescription", new ImageIcon(url));
         showInFrame(header, "JXHeader with custom properties");
     }
