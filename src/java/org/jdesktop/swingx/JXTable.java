@@ -662,21 +662,23 @@ public class JXTable extends JTable
     }
 
     /**
-     * Sets the component used as column control. Updates the 
-     * enclosing <code>JScrollPane</code> if appropriate. Passing a
-     * <code>null</code> parameter restores the column control to the
-     * default. <p> The component is automatically visible only if 
-     * the <code>columnControlVisible</code> property is <code>true</code>
-     * and the table is contained in a <code>JScrollPane</code>.
+     * Sets the component used as column control. Updates the enclosing
+     * <code>JScrollPane</code> if appropriate. Passing a <code>null</code>
+     * parameter restores the column control to the default.
+     * <p>
+     * The component is automatically visible only if the
+     * <code>columnControlVisible</code> property is <code>true</code> and
+     * the table is contained in a <code>JScrollPane</code>.
      * 
      * <p>
-     * NOTE: from the table's perspective, the columnControl is simply a
-     * JComponent to add to and keep in the trailing corner of the JScrollPane
-     * (if any). It's up to developers to configure the concrete control as
-     * needed.
+     * NOTE: from the table's perspective, the column control is simply a
+     * <code>JComponent</code> to add to and keep in the trailing corner of
+     * the scrollpane. (if any). It's up the concrete control to configure
+     * itself from and keep synchronized to the columns' states.
      * <p>
      * 
-     * @param columnControl the <code>JComponent</code> to use as columnControl.
+     * @param columnControl the <code>JComponent</code> to use as
+     *        columnControl.
      * @see #getColumnControl()
      * @see #createDefaultColumnControl()
      * @see #setColumnControlVisible(boolean)
@@ -698,6 +700,7 @@ public class JXTable extends JTable
      *   
      * @return the default component used as column control.
      * @see #setColumnControl(JComponent)
+     * @see org.jdesktop.swingx.table.ColumnControlButton
      * @see org.jdesktop.swingx.icon.ColumnControlIcon
      */
     protected JComponent createDefaultColumnControl() {
@@ -731,9 +734,6 @@ public class JXTable extends JTable
      * with the column control.
      * 
      * @see #configureColumnControl()
-     * @see #setColumnControlVisible(boolean)
-     * @see #setColumnControl(JComponent)
-     * @see javax.swing.JTable#configureEnclosingScrollPane()
      * 
      */
     @Override
@@ -1149,11 +1149,11 @@ public class JXTable extends JTable
 
     /**
      * Overridden to account for row index mapping. This implementation 
-     * respects {@link #isCellEditable(int, int)} as documented in
-     * {@link JTable#isCellEditable(int, int)}: it has no effect if 
-     * the cell is not editable. 
+     * respects the cell's editability, that is it has no effect if 
+     * <code>!isCellEditable(row, column)</code>.
      * 
      * {@inheritDoc}
+     * @see #isCellEditable(int, int)
      */
     @Override
     public void setValueAt(Object aValue, int row, int column) {
@@ -1180,8 +1180,9 @@ public class JXTable extends JTable
      * @param row the row index in view coordinates
      * @param column the column index in view coordinates
      * @return true if the cell is editable
-     * @see #setValueAt
-     * @see #isEditable
+     * 
+     * @see #setValueAt(Object, int, int)
+     * @see #isEditable()
      * @see TableColumnExt#isEditable
      * @see TableModel#isCellEditable
      */
@@ -1811,28 +1812,30 @@ public class JXTable extends JTable
         }
     }
 
-// ----------------- enhanced column support: delegation to TableColumnModel
+    // ----------------- enhanced column support: delegation to TableColumnModel
     /**
-     * Returns the <code>TableColumn</code> at view position 
+     * Returns the <code>TableColumn</code> at view position
      * <code>columnIndex</code>. The return value is not <code>null</code>.
      * 
      * <p>
-     * NOTE: 
-     * This delegate method is added to protect developer's
-     * from unexpected exceptions in jdk1.5+.
-     * Super does not expose the <code>TableColumn</code> access by index  
-     * which may lead to unexpected <code>IllegalArgumentException</code>: 
-     * If client code assumes the delegate method is available, autoboxing
-     * will convert the given int to an Integer which will 
-     * call the getColumn(Object) method. 
+     * NOTE: This delegate method is added to protect developer's from
+     * unexpected exceptions in jdk1.5+. Super does not expose the
+     * <code>TableColumn</code> access by index which may lead to unexpected
+     * <code>IllegalArgumentException</code>: If client code assumes the
+     * delegate method is available, autoboxing will convert the given int to an
+     * Integer which will call the getColumn(Object) method.
      * 
      * 
-     * @param viewColumnIndex
-     *            index of the column with the object in question
+     * @param viewColumnIndex index of the column with the object in question
      * 
      * @return the <code>TableColumn</code> object that matches the column
      *         index
-     * @throws ArrayIndexOutOfBoundsException if viewColumnIndex out of allowed range.
+     * @throws ArrayIndexOutOfBoundsException if viewColumnIndex out of allowed
+     *         range.
+     *         
+     * @see #getColumn(Object)
+     * @see #getColumnExt(int)
+     * @see TableColumnModel#getColumn(int)
      */
     public TableColumn getColumn(int viewColumnIndex) {
         return getColumnModel().getColumn(viewColumnIndex);
@@ -1842,6 +1845,7 @@ public class JXTable extends JTable
      * Returns a <code>List</code> of visible <code>TableColumn</code>s.
      * 
      * @return a <code>List</code> of visible columns.
+     * @see #getColumns(boolean)
      */
     public List<TableColumn> getColumns() {
         return Collections.list(getColumnModel().getColumns());
@@ -1849,8 +1853,15 @@ public class JXTable extends JTable
 
     /**
      * Returns the margin between columns.
+     * <p>
+     * 
+     * Convenience to expose column model properties through
+     * <code>JXTable</code> api.
      * 
      * @return the margin between columns
+     * 
+     * @see #setColumnMargin(int)
+     * @see TableColumnModel#getColumnMargin()
      */
     public int getColumnMargin() {
         return getColumnModel().getColumnMargin();
@@ -1859,8 +1870,13 @@ public class JXTable extends JTable
     /**
      * Sets the margin between columns.
      * 
-     * @param value
-     *            margin between columns; must be greater than or equal to zero.
+     * Convenience to expose column model properties through
+     * <code>JXTable</code> api.
+     * 
+     * @param value margin between columns; must be greater than or equal to
+     *        zero.
+     * @see #getColumnMargin()
+     * @see TableColumnModel#setColumnMargin()
      */
     public void setColumnMargin(int value) {
         getColumnModel().setColumnMargin(value);
@@ -1880,6 +1896,8 @@ public class JXTable extends JTable
      *        should be included
      * @return the number of contained columns, including or excluding the
      *         invisible as specified.
+     * @see #getColumnCount()
+     * @see TableColumnModelExt#getColumnCount(boolean)        
      */
     public int getColumnCount(boolean includeHidden) {
         if (getColumnModel() instanceof TableColumnModelExt) {
@@ -1906,6 +1924,9 @@ public class JXTable extends JTable
      * @param includeHidden a boolean to indicate whether invisible columns
      *        should be included
      * @return a <code>List</code> of contained columns.
+     * 
+     * @see #getColumns()
+     * @see TableColumnModelExt#getColumns(boolean)
      */
     public List<TableColumn> getColumns(boolean includeHidden) {
         if (getColumnModel() instanceof TableColumnModelExt) {
@@ -1925,6 +1946,10 @@ public class JXTable extends JTable
      * @param identifier the object used as column identifier
      * @return first <code>TableColumnExt</code> with the given identifier or
      *         null if none is found
+     *         
+     * @see #getColumnExt(int)
+     * @see #getColumn(Object)
+     * @see TableColumnModelExt#getColumnExt(Object)        
      */
     public TableColumnExt getColumnExt(Object identifier) {
         if (getColumnModel() instanceof TableColumnModelExt) {
@@ -1945,11 +1970,10 @@ public class JXTable extends JTable
     }
 
     /**
-     * Returns the <code>TableColumnExt</code> at view position 
-     * <code>columnIndex</code>. The return value is null, if the
-     * column at position <code>columnIndex</code> is not of type
-     * <code>TableColumnExt</code>.
-     * The returned column is visible.
+     * Returns the <code>TableColumnExt</code> at view position
+     * <code>columnIndex</code>. The return value is null, if the column at
+     * position <code>columnIndex</code> is not of type
+     * <code>TableColumnExt</code>. The returned column is visible.
      * 
      * @param viewColumnIndex the index of the column desired
      * @return the <code>TableColumnExt</code> object that matches the column
@@ -1957,6 +1981,10 @@ public class JXTable extends JTable
      * @throws ArrayIndexOutOfBoundsException if columnIndex out of allowed
      *         range, that is if
      *         <code> (columnIndex < 0) || (columnIndex >= getColumnCount())</code>.
+     * 
+     * @see #getColumnExt(Object)
+     * @see #getColumn(int)
+     * @see TableColumnModelExt#getColumnExt(int)
      */
     public TableColumnExt getColumnExt(int viewColumnIndex) {
         TableColumn column = getColumn(viewColumnIndex);
@@ -1966,18 +1994,23 @@ public class JXTable extends JTable
         return null;
     }
 
-//  ---------------------- enhanced TableColumn/Model support: convenience    
-    
+    // ---------------------- enhanced TableColumn/Model support: convenience
 
     /**
      * Reorders the columns in the sequence given array. Logical names that do
      * not correspond to any column in the model will be ignored. Columns with
      * logical names not contained are added at the end.
      * 
-     * @param identifiers
-     *            array of logical column names
+     * PENDING JW - do we want this? It's used by JNTable. 
+     * 
+     * @param identifiers array of logical column names
+     * 
+     * @see #getColumns(boolean)
      */
     public void setColumnSequence(Object[] identifiers) {
+        /* 
+         * JW: not properly tested (not in all in fact) ... 
+         */
         List columns = getColumns(true);
         Map map = new HashMap();
         for (Iterator iter = columns.iterator(); iter.hasNext();) {
@@ -2118,9 +2151,10 @@ public class JXTable extends JTable
      * Packs all the columns to their optimal size. Works best with auto
      * resizing turned off.
      * 
-     * Contributed by M. Hillary (Issue #60)
-     * 
      * @param margin the margin to apply to each column.
+     * 
+     * @see #packColumn(int, int)
+     * @see #packColumn(int, int, int)
      */
     public void packTable(int margin) {
         for (int c = 0; c < getColumnCount(); c++)
@@ -2128,11 +2162,13 @@ public class JXTable extends JTable
     }
 
     /**
-     * Packs an indivudal column in the table. Contributed by M. Hillary (Issue
-     * #60)
+     * Packs an indivudal column in the table. 
      * 
      * @param column The Column index to pack in View Coordinates
      * @param margin The Margin to apply to the column width.
+     * 
+     * @see #packColumn(int, int, int)
+     * @see #packTable(int)
      */
     public void packColumn(int column, int margin) {
         packColumn(column, margin, -1);
@@ -2140,13 +2176,16 @@ public class JXTable extends JTable
 
     /**
      * Packs an indivual column in the table to less than or equal to the
-     * maximum witdth. If maximun is -1 then the column is made as wide as it
-     * needs. Contributed by M. Hillary (Issue #60)
+     * maximum witdth. If maximum is -1 then the column is made as wide as it
+     * needs. 
      * 
-     * @param column The Column index to pack in View Coordinates
-     * @param margin The margin to apply to the column
-     * @param max The maximum width the column can be resized to. -1 mean any
-     *        size.
+     * @param column the column index to pack in view coordinates
+     * @param margin the margin to apply to the column
+     * @param max the maximum width the column can be resized to, -1 means no limit
+     * 
+     * @see #packColumn(int, int)
+     * @see #packTable(int)
+     * @see ColumnFactory#packColumn(JXTable, TableColumnExt, int, int)
      */
     public void packColumn(int column, int margin, int max) {
         getColumnFactory().packColumn(this, getColumnExt(column), margin, max);
@@ -2218,12 +2257,12 @@ public class JXTable extends JTable
      * column's prototypeValue property. If the column is not an instance of
      * <code>TableColumnExt</code> or prototypeValue is <code>null</code>
      * then the preferredWidth is left unmodified.
+     * <p>
      * 
      * TODO JW - need to cleanup getScrollablePreferred (refactor and inline)
-     *  update doc - what exactly happens is left to the columnfactory.
+     * update doc - what exactly happens is left to the columnfactory.
      * 
-     * @param column
-     *            TableColumn object representing view column
+     * @param column TableColumn object representing view column
      * @see org.jdesktop.swingx.table.TableColumnExt#setPrototypeValue
      */
     protected void initializeColumnPreferredWidth(TableColumn column) {
@@ -2304,8 +2343,11 @@ public class JXTable extends JTable
 //----------------------- delegating methods?? from super    
     /**
      * Returns the selection mode used by this table's selection model.
+     * <p>
+     * PENDING JW - setter?
      * 
      * @return the selection mode used by this table's selection model
+     * @see ListSelectionModel#getSelectionMode()
      */
     public int getSelectionMode() {
         return getSelectionModel().getSelectionMode();

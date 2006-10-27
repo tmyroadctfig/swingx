@@ -80,6 +80,7 @@ import org.jdesktop.swingx.JXTable;
  * @see org.jdesktop.swingx.JXTable#setColumnFactory(ColumnFactory)
  * 
  * @author Jeanette Winzenburg
+ * @author M.Hillary (the pack code)
  */
 public class ColumnFactory {
     
