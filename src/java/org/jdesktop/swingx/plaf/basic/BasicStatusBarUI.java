@@ -167,8 +167,10 @@ public class BasicStatusBarUI extends StatusBarUI {
     
     //----------------------------------------------------- Extension Points
     protected void paintBackground(Graphics2D g, JXStatusBar bar) {
-        g.setColor(bar.getBackground());
-        g.fillRect(0, 0, bar.getWidth(), bar.getHeight());
+        if (bar.isOpaque()) {
+            g.setColor(bar.getBackground());
+            g.fillRect(0, 0, bar.getWidth(), bar.getHeight());
+        }
     }
     
     protected void paintSeparator(Graphics2D g, JXStatusBar bar, int x, int y, int w, int h) {
