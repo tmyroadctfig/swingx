@@ -19,7 +19,7 @@ import javax.swing.UIManager;
 import org.jdesktop.swingx.icon.EmptyIcon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
-import org.jdesktop.swingx.util.PropertyChangeReport;
+import org.jdesktop.test.util.PropertyChangeReport;
 
 public class JXTaskPaneTest extends InteractiveTestCase {
 

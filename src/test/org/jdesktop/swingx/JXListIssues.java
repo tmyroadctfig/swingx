@@ -7,7 +7,7 @@ package org.jdesktop.swingx;
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.PatternFilter;
-import org.jdesktop.swingx.util.ListDataReport;
+import org.jdesktop.test.util.ListDataReport;
 
 public class JXListIssues extends JXListTest {
 

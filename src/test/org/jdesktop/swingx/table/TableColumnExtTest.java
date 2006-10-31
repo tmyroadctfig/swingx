@@ -14,8 +14,8 @@ import java.util.Date;
 
 import junit.framework.TestCase;
 
-import org.jdesktop.swingx.util.PropertyChangeReport;
-import org.jdesktop.swingx.util.SerializableSupport;
+import org.jdesktop.test.util.PropertyChangeReport;
+import org.jdesktop.test.util.SerializableSupport;
 
 /**
  * Unit test of enhanced <code>TableColumnExt</code>.

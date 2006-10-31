@@ -10,7 +10,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.jdesktop.swingx.util.PropertyChangeReport;
+import org.jdesktop.test.util.PropertyChangeReport;
 
 /**
  * Testing PatternModel.

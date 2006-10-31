@@ -2,7 +2,7 @@
  * Created on 24.08.2006
  *
  */
-package org.jdesktop.swingx.util;
+package org.jdesktop.test.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

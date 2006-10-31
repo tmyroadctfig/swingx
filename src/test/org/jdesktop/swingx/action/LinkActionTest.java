@@ -10,7 +10,7 @@ import javax.swing.Action;
 
 import junit.framework.TestCase;
 
-import org.jdesktop.swingx.util.PropertyChangeReport;
+import org.jdesktop.test.util.PropertyChangeReport;
 
 /**
  * 

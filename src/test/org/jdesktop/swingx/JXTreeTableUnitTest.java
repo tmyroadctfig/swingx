@@ -30,9 +30,9 @@ import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableCellEditor;
 import org.jdesktop.swingx.treetable.TreeTableModel;
-import org.jdesktop.swingx.util.ComponentTreeTableModel;
-import org.jdesktop.swingx.util.PropertyChangeReport;
-import org.jdesktop.swingx.util.TreeSelectionReport;
+import org.jdesktop.test.util.ComponentTreeTableModel;
+import org.jdesktop.test.util.PropertyChangeReport;
+import org.jdesktop.test.util.TreeSelectionReport;
 
 
 public class JXTreeTableUnitTest extends InteractiveTestCase {

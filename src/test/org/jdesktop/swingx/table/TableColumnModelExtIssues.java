@@ -4,7 +4,7 @@
  */
 package org.jdesktop.swingx.table;
 
-import org.jdesktop.swingx.util.ColumnModelReport;
+import org.jdesktop.test.util.ColumnModelReport;
 
 public class TableColumnModelExtIssues extends TableColumnModelTest {
     /**

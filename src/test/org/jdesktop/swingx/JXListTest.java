@@ -27,8 +27,8 @@ import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.SelectionMapper;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
-import org.jdesktop.swingx.util.ListDataReport;
-import org.jdesktop.swingx.util.PropertyChangeReport;
+import org.jdesktop.test.util.ListDataReport;
+import org.jdesktop.test.util.PropertyChangeReport;
 
 /**
  * Testing JXList.

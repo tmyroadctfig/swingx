@@ -22,7 +22,7 @@ import javax.swing.JToggleButton;
 
 import junit.framework.TestCase;
 
-import org.jdesktop.swingx.util.PropertyChangeReport;
+import org.jdesktop.test.util.PropertyChangeReport;
 
 /**
  * Unit test driver for the ActionManager

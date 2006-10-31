@@ -17,7 +17,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JRadioButton;
 import javax.swing.JToggleButton;
 
-import org.jdesktop.swingx.util.PropertyChangeReport;
+import org.jdesktop.test.util.PropertyChangeReport;
 
 public class ActionIssues extends ActionTest {
     

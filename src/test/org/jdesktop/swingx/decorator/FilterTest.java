@@ -21,8 +21,8 @@ import javax.swing.table.TableModel;
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
-import org.jdesktop.swingx.util.AncientSwingTeam;
-import org.jdesktop.swingx.util.PipelineReport;
+import org.jdesktop.test.util.AncientSwingTeam;
+import org.jdesktop.test.util.PipelineReport;
 
 public class FilterTest extends InteractiveTestCase {
 

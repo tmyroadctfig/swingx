@@ -11,8 +11,8 @@ import java.io.IOException;
 
 import junit.framework.TestCase;
 
-import org.jdesktop.swingx.util.PropertyChangeReport;
-import org.jdesktop.swingx.util.SerializableSupport;
+import org.jdesktop.test.util.PropertyChangeReport;
+import org.jdesktop.test.util.SerializableSupport;
 
 /**
  * Test to exposed known issues of <code>TableColumnExt</code>.

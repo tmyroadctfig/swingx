@@ -23,7 +23,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
-import org.jdesktop.swingx.util.ListSelectionReport;
+import org.jdesktop.test.util.ListSelectionReport;
 
 /**
  * @author Jeanette Winzenburg

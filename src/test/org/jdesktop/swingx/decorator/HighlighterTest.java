@@ -18,7 +18,7 @@ import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
-import org.jdesktop.swingx.util.ChangeReport;
+import org.jdesktop.test.util.ChangeReport;
 
 public class HighlighterTest extends InteractiveTestCase {
 

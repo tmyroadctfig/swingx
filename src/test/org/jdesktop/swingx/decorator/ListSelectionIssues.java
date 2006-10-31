@@ -25,7 +25,7 @@ import javax.swing.DefaultListSelectionModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 
-import org.jdesktop.swingx.util.ListSelectionReport;
+import org.jdesktop.test.util.ListSelectionReport;
 
 import junit.framework.TestCase;
 

@@ -21,7 +21,7 @@ import javax.swing.table.TableColumnModel;
 import junit.framework.TestCase;
 
 import org.jdesktop.swingx.event.TableColumnModelExtListener;
-import org.jdesktop.swingx.util.ColumnModelReport;
+import org.jdesktop.test.util.ColumnModelReport;
 
 /**
  * Skeleton to unit test DefaultTableColumnExt.

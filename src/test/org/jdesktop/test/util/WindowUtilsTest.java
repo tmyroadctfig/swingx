@@ -2,7 +2,7 @@
  * Created on 19.08.2005
  *
  */
-package org.jdesktop.swingx.util;
+package org.jdesktop.test.util;
 
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;

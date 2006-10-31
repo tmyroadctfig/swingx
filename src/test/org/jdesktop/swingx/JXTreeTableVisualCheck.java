@@ -48,8 +48,8 @@ import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
-import org.jdesktop.swingx.util.AncientSwingTeam;
-import org.jdesktop.swingx.util.ComponentTreeTableModel;
+import org.jdesktop.test.util.AncientSwingTeam;
+import org.jdesktop.test.util.ComponentTreeTableModel;
 
 /**
  * @author Jeanette Winzenburg
