@@ -220,24 +220,29 @@ public class JXTable extends JTable
     private static final Logger LOG = Logger.getLogger(JXTable.class.getName());
     
      /**
-     * Constant string for horizontal scroll actions, used in JXTable's Action
-     * Map.
+     * Identifier of show horizontal scroll action, 
+     * used in JXTable's <code>ActionMap</code>.
+     * 
      */
     public static final String HORIZONTALSCROLL_ACTION_COMMAND = 
         ColumnControlButton.COLUMN_CONTROL_MARKER + "horizontalScroll";
 
-    /** Constant string for packing all columns, used in JXTable's Action Map. */
+    /** 
+     * Identifier of pack table action, used in JXTable's <code>ActionMap</code>.
+     */
     public static final String PACKALL_ACTION_COMMAND = 
         ColumnControlButton.COLUMN_CONTROL_MARKER + "packAll";
 
     /**
-     * Constant string for packing selected columns, used in JXTable's Action
-     * Map.
+     * Identifier of pack selected column action, used in JXTable's <code>ActionMap</code>.
      */
     public static final String PACKSELECTED_ACTION_COMMAND = 
         ColumnControlButton.COLUMN_CONTROL_MARKER + "packSelected";
 
-    /** The prefix marker to find component related properties in the resourcebundle. */
+    /** 
+     * The prefix marker to find table related properties 
+     * in the <code>ResourceBundle</code>. 
+     */
     public static final String UIPREFIX = "JXTable.";
 
     /** key for client property to use SearchHighlighter as match marker. */
@@ -337,6 +342,7 @@ public class JXTable extends JTable
      * instantiation and in updateUI if the height has not been set explicitly
      * by the application.
      * @see #adminSetRowHeight(int)
+     * @see #setRowHeight(int)
      */
     protected boolean isXTableRowHeightSet;
 
@@ -354,8 +360,7 @@ public class JXTable extends JTable
     /**
      * Instantiates a JXTable with a specific table model.
      * 
-     * @param dm
-     *            The model to use.
+     * @param dm The model to use.
      */
     public JXTable(TableModel dm) {
         super(dm);
@@ -365,8 +370,7 @@ public class JXTable extends JTable
     /**
      * Instantiates a JXTable with a specific table model.
      * 
-     * @param dm
-     *            The model to use.
+     * @param dm The model to use.
      */
     public JXTable(TableModel dm, TableColumnModel cm) {
         super(dm, cm);
@@ -377,12 +381,9 @@ public class JXTable extends JTable
      * Instantiates a JXTable with a specific table model, column model, and
      * selection model.
      * 
-     * @param dm
-     *            The table model to use.
-     * @param cm
-     *            The colomn model to use.
-     * @param sm
-     *            The list selection model to use.
+     * @param dm The table model to use.
+     * @param cm The colomn model to use.
+     * @param sm The list selection model to use.
      */
     public JXTable(TableModel dm, TableColumnModel cm, ListSelectionModel sm) {
         super(dm, cm, sm);
@@ -392,10 +393,8 @@ public class JXTable extends JTable
     /**
      * Instantiates a JXTable for a given number of columns and rows.
      * 
-     * @param numRows
-     *            Count of rows to accomodate.
-     * @param numColumns
-     *            Count of columns to accomodate.
+     * @param numRows Count of rows to accomodate.
+     * @param numColumns Count of columns to accomodate.
      */
     public JXTable(int numRows, int numColumns) {
         super(numRows, numColumns);
@@ -405,10 +404,8 @@ public class JXTable extends JTable
     /**
      * Instantiates a JXTable with data in a vector or rows and column names.
      * 
-     * @param rowData
-     *            Row data, as a Vector of Objects.
-     * @param columnNames
-     *            Column names, as a Vector of Strings.
+     * @param rowData Row data, as a Vector of Objects.
+     * @param columnNames Column names, as a Vector of Strings.
      */
     public JXTable(Vector rowData, Vector columnNames) {
         super(rowData, columnNames);
@@ -418,11 +415,9 @@ public class JXTable extends JTable
     /**
      * Instantiates a JXTable with data in a array or rows and column names.
      * 
-     * @param rowData
-     *            Row data, as a two-dimensional Array of Objects (by row, for
-     *            column).
-     * @param columnNames
-     *            Column names, as a Array of Strings.
+     * @param rowData Row data, as a two-dimensional Array of Objects (by row,
+     *        for column).
+     * @param columnNames Column names, as a Array of Strings.
      */
     public JXTable(Object[][] rowData, Object[] columnNames) {
         super(rowData, columnNames);
@@ -634,7 +629,7 @@ public class JXTable extends JTable
      * The default value is <code>false</code>.
      * 
      * @param visible boolean to indicate if the column control should be shown
-     * @see #getColumnControlVisible()
+     * @see #isColumnControlVisible()
      * @see #setColumnControl(JComponent)
      * 
      */
@@ -798,8 +793,11 @@ public class JXTable extends JTable
 //--------------------- actions
     
     /**
-     * A small class which dispatches actions. TODO: Is there a way that we can
-     * make this static? JW: I hate those if constructs... we are in OO-land!
+     * A small class which dispatches actions. <p>
+     * TODO (?): Is there a way that we can
+     * make this static? <p>
+     * 
+     * PENDING JW: don't use UIAction ... we are in OO-land!
      */
     private class Actions extends UIAction {
         Actions(String name) {
@@ -823,6 +821,13 @@ public class JXTable extends JTable
     }
 
 
+    /**
+     * Registers additional, per-instance <code>Action</code>s to the 
+     * this table's ActionMap. Binds the search accelerator (as returned
+     * by the SearchFactory) to the find action.
+     * 
+     *
+     */
     private void initActionsAndBindings() {
         // Register the actions that this class can handle.
         ActionMap map = getActionMap();
@@ -837,7 +842,10 @@ public class JXTable extends JTable
     }
 
 
-    /** Creates an Action for horizontal scrolling. */
+    /** 
+     * Creates and returns the default <code>Action</code> for toggling
+     * the horizontal scrollBar. 
+     */
     private Action createHorizontalScrollAction() {
         String actionName = getUIString(HORIZONTALSCROLL_ACTION_COMMAND);
         BoundAction action = new BoundAction(actionName,
@@ -848,12 +856,23 @@ public class JXTable extends JTable
         return action;
     }
 
+    /**
+     * Returns a potentially localized value from the UIManager. The given
+     * key is prefixed by this table's <code>UIPREFIX</code> before
+     * doing the lookup. Returns the key, if no value is found. 
+     *  
+     * @param key the bare key to look up in the UIManager.
+     * @return the value mapped to UIPREFIX + key or key if no value is found.
+     */
     private String getUIString(String key) {
         String text = UIManager.getString(UIPREFIX + key);
         return text != null ? text : key;
     }
 
-    /** Creates an Action for packing selected columns. */
+    /** 
+     * Creates and returns the default <code>Action</code>
+     * for packing the selected column. 
+     */
     private Action createPackSelectedAction() {
         String text = getUIString(PACKSELECTED_ACTION_COMMAND);
         BoundAction action = new BoundAction(text, PACKSELECTED_ACTION_COMMAND);
@@ -862,7 +881,10 @@ public class JXTable extends JTable
         return action;
     }
 
-    /** Creates an Action for packing all columns. */
+    /** 
+     * Creates and returns the default <b>Action </b> 
+     * for packing all columns. 
+     */
     private Action createPackAllAction() {
         String text = getUIString(PACKALL_ACTION_COMMAND);
         BoundAction action = new BoundAction(text, PACKALL_ACTION_COMMAND);
@@ -874,19 +896,21 @@ public class JXTable extends JTable
 //------------------ bound action callback methods
     
     /**
-     * This resizes all columns to fit the viewport; if horizontal scrolling is
-     * enabled, all columns will get their preferred width. This can be
-     * triggered by the "packAll" BoundAction on the table as well.
+     * Resizes all columns to fit their content. <p> 
+     * 
+     * By default this method is bound to the pack all columns
+     * <code>Action</code> and registered in the table's <code>ActionMap</code>. 
+     * 
      */
     public void packAll() {
         packTable(-1);
     }
 
     /**
-     * This resizes selected columns to fit the viewport; if horizontal
-     * scrolling is enabled, selected columns will get their preferred width.
-     * This can be triggered by the "packSelected" BoundAction on the table as
-     * well.
+     * Resizes the lead column to fit its content. <p>
+     * 
+     * By default this method is bound to the pack selected column
+     * <code>Action</code> and registered in the table's <code>ActionMap</code>. 
      */
     public void packSelected() {
         int selected = getColumnModel().getSelectionModel().getLeadSelectionIndex();
@@ -895,9 +919,11 @@ public class JXTable extends JTable
         }
     }
 
-    /** Notifies the table that a new column has been selected. 
-     *  overridden to update the enabled state of the packSelected
-     *  action.
+    /** 
+     * {@inheritDoc} <p>
+     * 
+     *  Overridden to update the enabled state of the pack selected column
+     *  <code>Action</code>.
      */
     @Override
     public void columnSelectionChanged(ListSelectionEvent e) {
@@ -914,24 +940,31 @@ public class JXTable extends JTable
 //----------------------- scrollable control
     
     /**
-     * Controls horizontal scrolling in the viewport, and works in coordination
-     * with column sizing. It enables a enhanced AutoResizeMode which always
-     * fills the Viewport horizontally and shows the horizontal scrollbar if
+     * Sets the enablement of enhanced horizontal scrolling. 
+     * If enabled, it toggles an auto-resize mode which always
+     * fills the <code>JViewport</code> horizontally and shows the horizontal scrollbar if
      * necessary. <p>
      * 
-     * PENDING: add a "real" mode? Problematic because there are several 
-     * places in core which check for #AUTO_RESIZE_OFF, can't use different 
-     * value without unwanted side-effects. The current solution with tagging
-     * the #AUTO_RESIZE_OFF by a boolean flag #intelliMode is brittle - need 
-     * to be very careful to turn off again ... Another problem is to keep the
-     * horizontalScrollEnabled toggling action in synch with this property. 
-     * Yet another problem is the change notification: currently this is _not_
-     * a bound property. 
+     * The default value is <code>false</code>. <p>
      * 
-     * @param enabled a boolean indicating whether enhanced auto resize off is
+     * PENDING JW: the name is mis-leading? 
+     * 
+     * @param enabled a boolean indicating whether enhanced auto-resize mode is
      *   enabled.
+     * @see #isHorizontalScrollEnabled()
      */
     public void setHorizontalScrollEnabled(boolean enabled) {
+        /*
+         * PENDING JW: add a "real" mode? Problematic because there are several 
+         * places in core which check for #AUTO_RESIZE_OFF, can't use different 
+         * value without unwanted side-effects. The current solution with tagging
+         * the #AUTO_RESIZE_OFF by a boolean flag #intelliMode is brittle - need 
+         * to be very careful to turn off again ... Another problem is to keep the
+         * horizontalScrollEnabled toggling action in synch with this property. 
+         * Yet another problem is the change notification: currently this is _not_
+         * a bound property. 
+         * 
+         */
         if (enabled == (isHorizontalScrollEnabled()))
             return;
         if (enabled) {
@@ -949,20 +982,29 @@ public class JXTable extends JTable
         }
     }
 
-    /** Returns the current setting for horizontal scrolling. */
+    /** 
+     * Returns the current setting for horizontal scrolling. 
+     * 
+     * @return the enablement of enhanced horizontal scrolling.
+     * @see #setHorizontalScrollEnabled(boolean)
+     */
     protected boolean isHorizontalScrollEnabled() {
         return intelliMode && getAutoResizeMode() == AUTO_RESIZE_OFF;
     }
 
-    /** 
-     * overridden to update the show horizontal scrollbar action's
-     * selected state. 
-     * 
-     * PENDING: to enable/disable the enhanced auto-resize-off use 
-     *   exclusively #setHorizontalScrollEnabled(). This method can't
-     *   cope with it.
-     * 
+    /**
      * {@inheritDoc}
+     * <p>
+     * 
+     * Overridden for internal bookkeeping related to the enhanced
+     * auto-resize behaviour.
+     * <p>
+     * 
+     * Note: to enable/disable the enhanced auto-resize mode use exclusively
+     * <code>setHorizontalScrollEnabled</code>, this method can't cope with it.
+     * 
+     * @see #setHorizontalScrollEnabled(boolean)
+     * 
      */
     @Override
     public void setAutoResizeMode(int mode) {
@@ -975,9 +1017,8 @@ public class JXTable extends JTable
     }
 
     /**
-     * synch selected state of horizontal scroll en/disabling action 
-     * with horizont scroll enabled property. 
-     * "real" binding would help ... 
+     * Synchs selected state of horizontal scrolling <code>Action</code> to
+     * enablement of enhanced auto-resize behaviour. 
      */
     protected void updateHorizontalAction() {
         Action showHorizontal = getActionMap().get(
@@ -990,8 +1031,12 @@ public class JXTable extends JTable
 
 
     /**
-     * overridden to support auto-expand to parent's width if 
-     * enabled and necessary.
+     *{@inheritDoc} <p>
+     *
+     * Overridden to support enhanced auto-resize behaviour enabled and 
+     * necessary.
+     * 
+     * @see #setHorizontalScrollEnabled(boolean)
      */
     @Override
     public boolean getScrollableTracksViewportWidth() {
@@ -1003,8 +1048,11 @@ public class JXTable extends JTable
     }
 
     /**
-     * overridden to support auto-expand  to parent's width if enabled and 
+     * {@inheritDoc} <p>
+     * Overridden to support enhanced auto-resize behaviour enabled and 
      * necessary.
+     * 
+     * @see #setHorizontalScrollEnabled(boolean)
      */
     @Override
     public void doLayout() {
@@ -1019,17 +1067,33 @@ public class JXTable extends JTable
         autoResizeMode = resizeMode;
     }
 
+    /**
+     * 
+     * @return boolean to indicate whether the table has a realized parent.
+     */
     private boolean hasRealizedParent() {
         return (getWidth() > 0) && (getParent() != null)
             && (getParent().getWidth() > 0);
     }
 
+    /**
+     * PRE: hasRealizedParent()
+     * 
+     * @return boolean to indicate whether the table has widths excessing parent's width
+     */
     private boolean hasExcessWidth() {
         return getPreferredSize().width  < getParent().getWidth();
     }
 
     
-    
+    /**
+     * {@inheritDoc}<p>
+     * 
+     * Overridden to support enhanced auto-resize behaviour enabled and 
+     * necessary.
+     * 
+     * @see #setHorizontalScrollEnabled(boolean)
+     */
     @Override
     public void columnMarginChanged(ChangeEvent e) {
         if (isEditing()) {
@@ -1044,18 +1108,31 @@ public class JXTable extends JTable
         resizeAndRepaint();
     }
 
+    /**
+     * Returns the column which is interactively resized. The return value is
+     * null if the header is null or has no resizing column.
+     * 
+     * @return the resizing column.
+     */
     private TableColumn getResizingColumn() {
         return (tableHeader == null) ? null
                                      : tableHeader.getResizingColumn();
     }
 
     /**
-     * Set flag to control JXTable's scrollableTracksViewportHeight 
-     * property.
+     * Sets the flag which controls the scrollableTracksViewportHeight property.
      * If true the table's height will be always at least as large as the 
-     * containing (viewport?) parent, if false the table's height will be
-     * independent of parent's height.
-     *   
+     * containing parent, if false the table's height will be
+     * independent of parent's height. <p>
+     * 
+     * The default value is <code>true</code>.<p>
+     * 
+     * Note: this a backport from Mustang's <code>JTable</code>.
+     * 
+     * @param a boolean to indicate whether the table should always fill
+     *   parent's height.
+     * @see #getFillsViewportHeight()
+     * @see #getScrollableTracksViewportHeight()
      */
     public void setFillsViewportHeight(boolean fillsViewportHeight) {
         if (fillsViewportHeight == getFillsViewportHeight()) return;
@@ -1066,25 +1143,27 @@ public class JXTable extends JTable
     }
     
     /**
-     * Returns the flag to control JXTable scrollableTracksViewportHeight
+     * Returns the flag which controls the scrollableTracksViewportHeight
      * property. 
-     * If true the table's height will be always at least as large as the 
-     * containing (viewport?) parent, if false the table's height will be
-     * independent of parent's height.
      * 
      * @return true if the table's height will always be at least as large
      * as the containing parent, false if it is independent
+     * @see #setFillsViewportHeight(boolean)
+     * @see #getScrollableTracksViewportHeight()
      */
     public boolean getFillsViewportHeight() {
         return fillsViewportHeight;
 }
 
     /**
-     * Overridden to control the tracksHeight property depending on 
-     * fillsViewportHeight and relative size to containing parent (viewport?).
+     * {@inheritDoc} <p>
      * 
-     * @return true if the control flag is true and the containing viewport
+     * Overridden to control the tracksHeight property depending on 
+     * fillsViewportHeight and relative size to containing parent.
+     * 
+     * @return true if the control flag is true and the containing parent
      *          height > prefHeight, else returns false.
+     * @see #setFillsViewportHeight(boolean)
      * 
      */
     @Override
@@ -1308,7 +1387,7 @@ public class JXTable extends JTable
     }
 
     /**
-     * Convenience method to detect dataChanged event.
+     * Convenience method to detect dataChanged table event type.
      * 
      * @param e the event to examine. 
      * @return true if the event is of type dataChanged, false else.
@@ -1321,7 +1400,7 @@ public class JXTable extends JTable
     }
     
     /**
-     * Convenience method to detect update event.
+     * Convenience method to detect update table event type.
      * 
      * @param e the event to examine. 
      * @return true if the event is of type update and not dataChanged, false else.
@@ -1333,7 +1412,7 @@ public class JXTable extends JTable
     }
 
     /**
-     * Convenience method to detect a structureChanged event type.
+     * Convenience method to detect a structureChanged table event type.
      * @param e the event to examine.
      * @return true if the event is of type structureChanged or null, false else.
      */
@@ -1876,7 +1955,7 @@ public class JXTable extends JTable
      * @param value margin between columns; must be greater than or equal to
      *        zero.
      * @see #getColumnMargin()
-     * @see TableColumnModel#setColumnMargin()
+     * @see TableColumnModel#setColumnMargin(int)
      */
     public void setColumnMargin(int value) {
         getColumnModel().setColumnMargin(value);
@@ -2915,7 +2994,9 @@ public class JXTable extends JTable
      * 
      * Overridden to fix core bug #4614616 (NPE if <code>TableModel</code>'s
      * <code>Class</code> for the column is an interface). This method
-     * guarantees to always return a <code>not null</code> value. *
+     * guarantees to always return a <code>not null</code> value. Returns the
+     * default renderer for <code>Object</code> if super returns
+     * <code>null</code>.
      * 
      * 
      */
@@ -2991,8 +3072,7 @@ public class JXTable extends JTable
     /**
      * {@inheritDoc} <p>
      * 
-     * Overridden to adjust the editor's component orientation if 
-     * appropriate.
+     * Overridden to adjust the editor's component orientation.
      */
     @Override
     public Component prepareEditor(TableCellEditor editor, int row, int column) {
@@ -3009,7 +3089,8 @@ public class JXTable extends JTable
      * 
      * This implementation synchs the CO always.
      * 
-     * @param stamp the Component who's CO may need to be synched.
+     * @param stamp the <code>Component</code> who's CO may need to be synched, 
+     *    must not be <code>null</code>.
      */
     protected void adjustComponentOrientation(Component stamp) {
         if (stamp.getComponentOrientation().equals(getComponentOrientation()))
@@ -3026,6 +3107,7 @@ public class JXTable extends JTable
      * @param columnClass Class of value being rendered
      * @return TableCellRenderer instance which renders values of the specified
      *         type
+     * @see getDefaultRenderer(Class)
      */
     public TableCellRenderer getNewDefaultRenderer(Class columnClass) {
         TableCellRenderer renderer = getDefaultRenderer(columnClass);
