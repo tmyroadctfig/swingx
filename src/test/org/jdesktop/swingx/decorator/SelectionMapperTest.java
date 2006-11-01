@@ -18,8 +18,8 @@ import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.FilterTest.DirectModelAdapter;
-import org.jdesktop.test.util.AncientSwingTeam;
-import org.jdesktop.test.util.ListSelectionReport;
+import org.jdesktop.test.AncientSwingTeam;
+import org.jdesktop.test.ListSelectionReport;
 
 /**
  * @author Jeanette Winzenburg

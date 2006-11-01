@@ -13,7 +13,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
-import org.jdesktop.test.util.AncientSwingTeam;
+import org.jdesktop.test.AncientSwingTeam;
 
 public class LFIssues extends InteractiveTestCase {
     protected TableModel sortableTableModel;

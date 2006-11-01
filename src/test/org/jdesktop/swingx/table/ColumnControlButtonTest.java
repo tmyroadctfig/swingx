@@ -28,7 +28,7 @@ import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.icon.ColumnControlIcon;
 import org.jdesktop.swingx.table.ColumnControlButton.ColumnVisibilityAction;
 import org.jdesktop.swingx.table.ColumnControlButton.DefaultColumnControlPopup;
-import org.jdesktop.test.util.AncientSwingTeam;
+import org.jdesktop.test.AncientSwingTeam;
 
 /**
  * @author Jeanette Winzenburg

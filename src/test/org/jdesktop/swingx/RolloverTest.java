@@ -18,7 +18,7 @@ import javax.swing.table.TableModel;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.RolloverHighlighter;
 import org.jdesktop.swingx.treetable.FileSystemModel;
-import org.jdesktop.test.util.AncientSwingTeam;
+import org.jdesktop.test.AncientSwingTeam;
 
 public class RolloverTest extends InteractiveTestCase {
 

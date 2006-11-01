@@ -63,9 +63,9 @@ import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.TableColumnExt;
-import org.jdesktop.test.util.AncientSwingTeam;
-import org.jdesktop.test.util.ChangeReport;
-import org.jdesktop.test.util.PropertyChangeReport;
+import org.jdesktop.test.AncientSwingTeam;
+import org.jdesktop.test.ChangeReport;
+import org.jdesktop.test.PropertyChangeReport;
 
 /**
 * Split from old JXTableUnitTest - contains unit test

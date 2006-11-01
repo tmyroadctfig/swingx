@@ -2,7 +2,7 @@
  * Created on 24.08.2006
  *
  */
-package org.jdesktop.test.util;
+package org.jdesktop.test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

@@ -10,8 +10,8 @@ import javax.swing.tree.TreePath;
 
 import junit.framework.TestCase;
 
+import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
-import org.jdesktop.test.util.ComponentTreeTableModel;
 
 /**
  * Test to exposed known issues of <code>JXTreeTable</code>. <p>

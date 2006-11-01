@@ -68,7 +68,7 @@ import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
 import org.jdesktop.swingx.table.TableColumnExt;
-import org.jdesktop.test.util.AncientSwingTeam;
+import org.jdesktop.test.AncientSwingTeam;
 
 /**
  * Split from old JXTableUnitTest - contains "interactive"

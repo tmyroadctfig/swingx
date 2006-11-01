@@ -6,7 +6,7 @@
  */
 
 
-package org.jdesktop.test.util;
+package org.jdesktop.swingx.test;
 
 import java.util.HashMap;
 import java.util.LinkedList;

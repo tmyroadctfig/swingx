@@ -7,13 +7,13 @@
  * and open the template in the editor.
  */
 
-package org.jdesktop.test.util;
+package org.jdesktop.test;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
+
 import junit.framework.Assert;
-import org.jdesktop.test.util.PropertyChangeReport;
 
 /**
  * Extends assert to get all the ease-of-use assert methods

@@ -1,4 +1,4 @@
-package org.jdesktop.test.util;
+package org.jdesktop.test;
 
 import javax.swing.table.AbstractTableModel;
 

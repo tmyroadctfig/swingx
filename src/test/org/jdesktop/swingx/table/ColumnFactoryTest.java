@@ -14,7 +14,7 @@ import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXTable;
-import org.jdesktop.test.util.PropertyChangeReport;
+import org.jdesktop.test.PropertyChangeReport;
 
 public class ColumnFactoryTest extends InteractiveTestCase {
 

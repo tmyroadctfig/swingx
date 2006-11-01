@@ -33,7 +33,7 @@ import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
-import org.jdesktop.test.util.PropertyChangeReport;
+import org.jdesktop.test.PropertyChangeReport;
 
 /**
  * @author Jeanette Winzenburg

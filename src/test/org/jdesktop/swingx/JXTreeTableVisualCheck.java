@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.DefaultCellEditor;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
@@ -45,11 +46,11 @@ import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
+import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
-import org.jdesktop.test.util.AncientSwingTeam;
-import org.jdesktop.test.util.ComponentTreeTableModel;
+import org.jdesktop.test.AncientSwingTeam;
 
 /**
  * @author Jeanette Winzenburg
@@ -65,12 +66,12 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         JXTreeTableVisualCheck test = new JXTreeTableVisualCheck();
         try {
 //            test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*Hierarchical.*");
+//            test.runInteractiveTests("interactive.*Hierarchical.*");
 //               test.runInteractiveTests("interactive.*ToolTip.*");
 //           test.runInteractiveTests("interactive.*DnD.*");
 //             test.runInteractiveTests("interactive.*Compare.*");
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
-//             test.runInteractiveTests("interactive.*Edit.*");
+             test.runInteractiveTests("interactive.*Edit.*");
 //             test.runInteractiveTests("interactive.*Line.*");
 //             test.runInteractiveTests("interactive.*Render.*");
         } catch (Exception ex) {
@@ -78,6 +79,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         }
     }
 
+    
     /**
      * visual check what happens on toggling the largeModel property.
      * It's okay for ComponentTreeModel, blows up for FileSystemModel.

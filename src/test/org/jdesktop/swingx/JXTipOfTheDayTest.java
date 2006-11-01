@@ -26,7 +26,7 @@ import org.jdesktop.swingx.tips.DefaultTip;
 import org.jdesktop.swingx.tips.DefaultTipOfTheDayModel;
 import org.jdesktop.swingx.tips.TipLoader;
 import org.jdesktop.swingx.tips.TipOfTheDayModel;
-import org.jdesktop.test.util.PropertyChangeReport;
+import org.jdesktop.test.PropertyChangeReport;
 
 public class JXTipOfTheDayTest extends InteractiveTestCase {
 

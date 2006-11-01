@@ -6,7 +6,7 @@
  */
 
 
-package org.jdesktop.test.util;
+package org.jdesktop.test;
 
 import java.beans.PropertyChangeEvent;
 import java.util.Iterator;

@@ -5,7 +5,7 @@
  * Santa Clara, California 95054, U.S.A. All rights reserved.
  */
 
-package org.jdesktop.test.util;
+package org.jdesktop.swingx.test;
 
 import java.beans.PropertyChangeEvent;
 import java.util.LinkedList;

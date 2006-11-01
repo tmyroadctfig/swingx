@@ -25,14 +25,14 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.table.TableColumnExt;
+import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableCellEditor;
 import org.jdesktop.swingx.treetable.TreeTableModel;
-import org.jdesktop.test.util.ComponentTreeTableModel;
-import org.jdesktop.test.util.PropertyChangeReport;
-import org.jdesktop.test.util.TreeSelectionReport;
+import org.jdesktop.test.PropertyChangeReport;
+import org.jdesktop.test.TreeSelectionReport;
 
 
 public class JXTreeTableUnitTest extends InteractiveTestCase {

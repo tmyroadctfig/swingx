@@ -6,7 +6,7 @@
  */
 
 
-package org.jdesktop.test.util;
+package org.jdesktop.test;
 
 import java.util.LinkedList;
 import java.util.List;

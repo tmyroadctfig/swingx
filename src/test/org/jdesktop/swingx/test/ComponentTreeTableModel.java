@@ -2,7 +2,7 @@
  * Created on 20.06.2005
  *
  */
-package org.jdesktop.test.util;
+package org.jdesktop.swingx.test;
 
 import java.awt.Component;
 import java.awt.Container;

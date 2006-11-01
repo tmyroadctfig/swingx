@@ -6,7 +6,7 @@
  */
 package org.jdesktop.swingx;
 
-import org.jdesktop.test.util.PropertyChangeReport;
+import org.jdesktop.test.PropertyChangeReport;
 
 import javax.swing.*;
 import java.awt.*;

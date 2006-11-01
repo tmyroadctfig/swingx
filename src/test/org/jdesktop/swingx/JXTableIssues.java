@@ -72,9 +72,9 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.treetable.FileSystemModel;
-import org.jdesktop.test.util.AncientSwingTeam;
-import org.jdesktop.test.util.CellEditorReport;
-import org.jdesktop.test.util.PropertyChangeReport;
+import org.jdesktop.test.AncientSwingTeam;
+import org.jdesktop.test.CellEditorReport;
+import org.jdesktop.test.PropertyChangeReport;
 
 /**
  * Test to exposed known issues of <code>JXTable</code>.
