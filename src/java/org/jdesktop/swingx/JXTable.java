@@ -3124,7 +3124,7 @@ public class JXTable extends JTable
 
     /**
      * Creates default cell renderers for objects, numbers, doubles, dates,
-     * booleans, icons, and links.
+     * booleans, and icons.
      * <p>
      * Overridden so we can act as factory for renderers plus hacking around
      * huge memory consumption of UIDefaults (see #6345050 in core Bug parade)
@@ -3348,7 +3348,13 @@ public class JXTable extends JTable
     }
 
     /**
-     * Default Editors
+     * Default editor registered for <code>Object</code>. The editor tries
+     * to create a new instance of the column's class by reflection. It
+     * assumes that the class has a constructor taking a single <code>String</code>
+     * parameter. <p>
+     * 
+     * The editor can be configured with a custom <code>JTextField</code>.
+     * 
      */
     public static class GenericEditor extends DefaultCellEditor {
 
@@ -3420,6 +3426,13 @@ public class JXTable extends JTable
         }
     }
 
+    /**
+     * 
+     * Default editor registered for <code>Number</code>s. <p>
+     * PENDING JW: this will be replaced soon by <code>NumberEditorExt </code>
+     * which differs from this in being locale-aware.
+     * 
+     */
     public static class NumberEditor extends GenericEditor {
 
         public NumberEditor() {
@@ -3450,7 +3463,7 @@ public class JXTable extends JTable
     /**
      * Sets the editable property. This property allows to mark all cells in a
      * table as read-only, independent of their per-column editability as
-     * returned by <code>TableColumnExt.isEditable()</code> and their per-cell
+     * returned by <code>TableColumnExt.isEditable</code> and their per-cell
      * editability as returned by the <code>TableModel.isCellEditable</code>.
      * If a cell is read-only in its column or model layer, this property has no
      * effect.
@@ -3680,7 +3693,7 @@ public class JXTable extends JTable
      * involves reflective access to super's private field rowModel which may
      * fail due to security issues. If failing the support is not enabled.
      * <p>
-     * The default value is false.
+     * The default value is <code>false</code>.
      * 
      * @param enabled a boolean to indicate whether per-row heights should be
      *        enabled.
