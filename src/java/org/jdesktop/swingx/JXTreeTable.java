@@ -185,7 +185,7 @@ public class JXTreeTable extends JXTable {
         super.setSortable(false);
         
         // no grid
-        setDefaultMargins(false, false);
+        setShowGrid(false, false);
 
 //        // No grid.
 //        setShowGrid(false); // superclass default is "true"
@@ -1422,7 +1422,6 @@ public class JXTreeTable extends JXTable {
      * @return true if the class of objects in the specified column implement
      * the {@link javax.swing.tree.TreeNode} interface; false otherwise.
      */
-    @Override
     public boolean isHierarchical(int column) {
         return AbstractTreeTableModel.hierarchicalColumnClass.isAssignableFrom(
             getColumnClass(column));

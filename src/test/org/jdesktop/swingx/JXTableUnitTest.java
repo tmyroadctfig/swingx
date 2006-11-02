@@ -305,7 +305,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
      * 0/1 if hiding/showing grid lines.
      *
      */
-    public void testDefaultMargins() {
+    public void testShowGrid() {
         JXTable table = new JXTable(10, 3);
         // sanity: initial margins are (1, 1), grid on
         assertEquals(1, table.getRowMargin());
@@ -314,7 +314,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertTrue(table.getShowVerticalLines());
         // hide grid
         boolean show = false;
-        table.setDefaultMargins(show, show);
+        table.setShowGrid(show, show);
         assertEquals(0, table.getRowMargin());
         assertEquals(show, table.getShowHorizontalLines());
         assertEquals(0, table.getColumnMargin());

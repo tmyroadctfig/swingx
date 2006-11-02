@@ -133,7 +133,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
      */
     public void interactiveCompareRowHeight() {
         JXTable xtable = new JXTable(sortableTableModel);
-        xtable.setDefaultMargins(false, false);
+        xtable.setShowGrid(false, false);
         JTable table = new JTable(sortableTableModel);
         table.setShowHorizontalLines(false);
         table.setShowVerticalLines(false);

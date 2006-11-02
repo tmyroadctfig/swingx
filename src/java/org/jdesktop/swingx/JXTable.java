@@ -428,11 +428,7 @@ public class JXTable extends JTable
      * Initializes the table for use.
      *  
      */
-    /*
-     * PENDING JW: this method should be private!
-     * 
-     */
-    protected void init() {
+    private void init() {
         setEditable(true);
         setSortable(true);
         setRolloverEnabled(true);
@@ -1121,16 +1117,18 @@ public class JXTable extends JTable
 
     /**
      * Sets the flag which controls the scrollableTracksViewportHeight property.
-     * If true the table's height will be always at least as large as the 
-     * containing parent, if false the table's height will be
-     * independent of parent's height. <p>
+     * If true the table's height will be always at least as large as the
+     * containing parent, if false the table's height will be independent of
+     * parent's height.
+     * <p>
      * 
-     * The default value is <code>true</code>.<p>
+     * The default value is <code>true</code>.
+     * <p>
      * 
      * Note: this a backport from Mustang's <code>JTable</code>.
      * 
-     * @param a boolean to indicate whether the table should always fill
-     *   parent's height.
+     * @param fillsViewportHeight boolean to indicate whether the table should
+     *        always fill parent's height.
      * @see #getFillsViewportHeight()
      * @see #getScrollableTracksViewportHeight()
      */
@@ -1186,10 +1184,6 @@ public class JXTable extends JTable
         // accessing model directly
         return filters == null ?
                 super.getRowCount() : filters.getOutputSize();
-    }
-
-    public boolean isHierarchical(int column) {
-        return false;
     }
 
     /**
@@ -1460,6 +1454,9 @@ public class JXTable extends JTable
      */
     public SelectionMapper getSelectionMapper() {
         // JW: why is this public? Probably made so accidentally?
+        // maybe not: was introduced in version 1.148 when applying
+        // Jesse's patch to #386-swingx (added functionality to 
+        // turn off the mapping
         if (selectionMapper == null) {
             selectionMapper = new DefaultSelectionMapper(filters, getSelectionModel());
         }
@@ -3107,7 +3104,7 @@ public class JXTable extends JTable
      * @param columnClass Class of value being rendered
      * @return TableCellRenderer instance which renders values of the specified
      *         type
-     * @see getDefaultRenderer(Class)
+     * @see #getDefaultRenderer(Class)
      */
     public TableCellRenderer getNewDefaultRenderer(Class columnClass) {
         TableCellRenderer renderer = getDefaultRenderer(columnClass);
@@ -3583,7 +3580,7 @@ public class JXTable extends JTable
             updateRendererUI(column.getHeaderRenderer());
         }
         updateRowHeightUI(true);
-        updateHighlighters();
+        updateHighlighterUI();
     }
 
     /**
@@ -3591,7 +3588,7 @@ public class JXTable extends JTable
      * 
      * @see org.jdesktop.swingx.decorator.Highlighter.UIHighlighter
      */
-    protected void updateHighlighters() {
+    protected void updateHighlighterUI() {
         if (getHighlighters() == null)
             return;
         getHighlighters().updateUI();
@@ -3633,9 +3630,23 @@ public class JXTable extends JTable
      * horizontal/vertical lines. The margin defaults to 1 or 0 if the grid
      * lines are drawn or not drawn.
      * <p>
-     * PENDING rename? setShowGrid(boolean, boolean) would let it appear nearer
-     * to the other setShowGrid method.
+     * @param showHorizontalLines boolean to decide whether to draw horizontal
+     *        grid lines.
+     * @param showVerticalLines boolean to decide whether to draw vertical grid
+     *        lines.
+     * @deprecated replaced by {@link #setShowGrid(boolean, boolean).
      * 
+     */
+    public void setDefaultMargins(boolean showHorizontalLines,
+            boolean showVerticalLines) {
+        setShowGrid(showHorizontalLines, showVerticalLines);
+    }
+
+    /**
+     * Convenience to set both grid line visibility and default margin for
+     * horizontal/vertical lines. The margin defaults to 1 or 0 if the grid
+     * lines are drawn or not drawn.
+     * <p>
      * @param showHorizontalLines boolean to decide whether to draw horizontal
      *        grid lines.
      * @param showVerticalLines boolean to decide whether to draw vertical grid
@@ -3643,8 +3654,7 @@ public class JXTable extends JTable
      * @see javax.swing.JTable#setShowGrid(boolean)
      * @see javax.swing.JTable#setIntercellSpacing(Dimension)
      */
-    public void setDefaultMargins(boolean showHorizontalLines,
-            boolean showVerticalLines) {
+    public void setShowGrid(boolean showHorizontalLines, boolean showVerticalLines) {
         int defaultRowMargin = showHorizontalLines ? 1 : 0;
         setRowMargin(defaultRowMargin);
         setShowHorizontalLines(showHorizontalLines);

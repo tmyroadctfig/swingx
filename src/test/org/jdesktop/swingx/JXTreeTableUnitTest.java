@@ -117,7 +117,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * 0/1 if hiding/showing grid lines. 
      *
      */
-    public void testDefaultMargins() {
+    public void testShowGrid() {
         JXTreeTable table = new JXTreeTable(simpleTreeTableModel);
         // sanity: initial margins are (0, 0), grid off
         boolean show = false;
@@ -126,7 +126,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         assertEquals(0, table.getColumnMargin());
         assertEquals(show, table.getShowVerticalLines());
         // show lines
-        table.setDefaultMargins(!show, !show);
+        table.setShowGrid(!show, !show);
         assertEquals(1, table.getRowMargin());
         assertEquals(!show, table.getShowHorizontalLines());
         assertEquals(1, table.getColumnMargin());

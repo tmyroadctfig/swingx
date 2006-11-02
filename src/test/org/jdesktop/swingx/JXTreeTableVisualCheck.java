@@ -556,7 +556,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     public void interactiveTestAlternateHighlightAndRowGridLines() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         treeTable.setRowHeight(22);
-        treeTable.setDefaultMargins(true, true);
+        treeTable.setShowGrid(true, true);
         treeTable.addHighlighter(AlternateRowHighlighter.linePrinter);
         JXTable table = new JXTable(new AncientSwingTeam());
         table.addHighlighter(AlternateRowHighlighter.linePrinter);
@@ -578,7 +578,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         JXTable table = new JXTable(new AncientSwingTeam());
         table.addHighlighter(AlternateRowHighlighter.linePrinter);
         table.setRowHeight(22);
-        table.setDefaultMargins(false, false);
+        table.setShowGrid(false, false);
         JFrame frame = wrapWithScrollingInFrame(treeTable, table, 
                 "AlternateRow LinePrinter- left== with, right == out Gridlines");
         frame.setVisible(true);
@@ -592,7 +592,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     public void interactiveTestHighlightAndRowHeightCompareTree() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         treeTable.setRowHeight(22);
-        treeTable.setDefaultMargins(true, false);
+        treeTable.setShowGrid(true, false);
         treeTable.setHighlighters(new HighlighterPipeline(new Highlighter[] {
                 AlternateRowHighlighter.linePrinter,
                 new HierarchicalColumnHighlighter(), }));
@@ -918,7 +918,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         treeTable.setBackground(new Color(0xFF, 0xFF, 0xCC)); // notepad
         treeTable.setGridColor(Color.cyan.darker());
         treeTable.setRowHeight(22);
-        treeTable.setDefaultMargins(true, false);
+        treeTable.setShowGrid(true, false);
         JFrame frame = wrapWithScrollingInFrame(treeTable,
                 "NotePadBackground- HierarchicalColumnHighlighter and horiz lines");
         frame.setVisible(true);
