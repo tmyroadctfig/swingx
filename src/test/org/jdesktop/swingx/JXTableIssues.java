@@ -111,37 +111,47 @@ public class JXTableIssues extends InteractiveTestCase {
         table.prepareEditor(table.getCellEditor(0, 0), 0, 0);
     }
 
-
     /**
      * Issue 373-swingx: table must unsort column on sortable change.
      *
+     * Here we test if switching sortable to false on the sorted column
+     * resets the sorting, special case hidden column. This fails 
+     * because columnModel doesn't fire property change events for
+     * hidden columns (see Issue #??-swingx).
+     * 
      */
-    public void testTableUnsortedColumnOnColumnSortableChange() {
+    public void testTableUnsortedColumnOnHiddenColumnSortableChange() {
         JXTable table = new JXTable(10, 2);
         TableColumnExt columnExt = table.getColumnExt(0);
-        table.toggleSortOrder(0);
-        assertTrue(table.getSortOrder(0).isSorted());
+        Object identifier = columnExt.getIdentifier();
+        table.toggleSortOrder(identifier);
+        assertTrue(table.getSortOrder(identifier).isSorted());
+        columnExt.setVisible(false);
+        assertTrue(table.getSortOrder(identifier).isSorted());
         columnExt.setSortable(false);
         assertFalse("table must have unsorted column on sortable change", 
-                table.getSortOrder(0).isSorted());
+                table.getSortOrder(identifier).isSorted());
     }
-    
+
     /**
-     * Issue 372-swingx: table must cancel edit if column property 
-     *   changes to not editable.
-     * Here we test if the table is not editing after the change.
+     * Not defined: what should happen if the edited column is hidden? 
+     * For sure, editing must be terminated - but canceled or stopped?
+     * 
+     * Here we test if the table is not editing after editable property
+     * of the currently edited column is changed to false.
      */
-    public void testTableNotEditingOnColumnEditableChange() {
+    public void testTableNotEditingOnColumnVisibleChange() {
         JXTable table = new JXTable(10, 2);
         TableColumnExt columnExt = table.getColumnExt(0);
         table.editCellAt(0, 0);
         // sanity
         assertTrue(table.isEditing());
         assertEquals(0, table.getEditingColumn());
-        columnExt.setEditable(false);
-        assertFalse(table.isCellEditable(0, 0));
+        columnExt.setVisible(false);
         assertFalse("table must have terminated edit",table.isEditing());
+        fail("forcing a fail - cancel editing is a side-effect of removal notification");
     }
+   
     
     /**
      * Issue 372-swingx: table must cancel edit if column property 

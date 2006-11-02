@@ -108,6 +108,102 @@ public class JXTableUnitTest extends InteractiveTestCase {
         super.tearDown();
     }
 
+
+    /**
+     * Issue 373-swingx: table must unsort column on sortable change.
+     *
+     * Here we test if switching sortable to false on the sorted column
+     * resets the sorting.
+     * 
+     */
+    public void testTableUnsortedColumnOnColumnSortableChange() {
+        JXTable table = new JXTable(10, 2);
+        TableColumnExt columnExt = table.getColumnExt(0);
+        table.toggleSortOrder(0);
+        assertTrue(table.getSortOrder(0).isSorted());
+        columnExt.setSortable(false);
+        assertFalse("table must have unsorted column on sortable change", 
+                table.getSortOrder(0).isSorted());
+    }
+    
+    /**
+     * Issue 373-swingx: table must unsort column on sortable change.
+     *
+     * Here we test if switching sortable to false on unsorted column has
+     * no effect.
+     */
+    public void testTableSortedColumnOnNotSortedColumnSortableChange() {
+        JXTable table = new JXTable(10, 2);
+        int unsortedColumn = 1;
+        TableColumnExt columnExt = table.getColumnExt(unsortedColumn);
+        table.toggleSortOrder(0);
+        assertTrue(table.getSortOrder(0).isSorted());
+        columnExt.setSortable(false);
+        assertTrue("table must keep sortorder on unsorted column sortable change", 
+                table.getSortOrder(0).isSorted());
+    }
+
+    
+    /**
+     * Issue 372-swingx: table must cancel edit if column property 
+     *   changes to not editable.
+     * Here we test if the table is not editing after editable property
+     * of the currently edited column is changed to false.
+     */
+    public void testTableNotEditingOnColumnEditableChange() {
+        JXTable table = new JXTable(10, 2);
+        TableColumnExt columnExt = table.getColumnExt(0);
+        table.editCellAt(0, 0);
+        // sanity
+        assertTrue(table.isEditing());
+        assertEquals(0, table.getEditingColumn());
+        columnExt.setEditable(false);
+        assertFalse(table.isCellEditable(0, 0));
+        assertFalse("table must have terminated edit",table.isEditing());
+    }
+    
+    /**
+     * Issue 372-swingx: table must cancel edit if column property 
+     *   changes to not editable.
+     * Here we test if the table is still editing after the editability 
+     * change of a non-edited column.
+     * 
+     */
+    public void testTableEditingOnNotEditingColumnEditableChange() {
+        JXTable table = new JXTable(10, 2);
+        int notEditingColumn = 1;
+        TableColumnExt columnExt = table.getColumnExt(notEditingColumn);
+        table.editCellAt(0, 0);
+        // sanity
+        assertTrue(table.isEditing());
+        assertEquals(0, table.getEditingColumn());
+        columnExt.setEditable(false);
+        assertFalse(table.isCellEditable(0, notEditingColumn));
+        assertTrue("table must still be editing", table.isEditing());
+    }
+    
+    /**
+     * Issue 372-swingx: table must cancel edit if column property 
+     *   changes to not editable.
+     * Here we test if the table is still editing after the editability 
+     * change of a non-edited column, special case of hidden column. <p>
+     * NOTE: doesn't really test, the columnModel doesn't
+     * fire propertyChanges for hidden columns (see Issue #??-swingx)
+     * 
+     */
+    public void testTableEditingOnHiddenColumnEditableChange() {
+        JXTable table = new JXTable(10, 2);
+        int hiddenNotEditingColumn = 1;
+        TableColumnExt columnExt = table.getColumnExt(hiddenNotEditingColumn);
+        columnExt.setVisible(false);
+        table.editCellAt(0, 0);
+        // sanity
+        assertTrue(table.isEditing());
+        assertEquals(0, table.getEditingColumn());
+        columnExt.setEditable(false);
+        assertTrue("table must still be editing", table.isEditing());
+    }
+
     /**
      * Test if default column creation and configuration is 
      * controlled completely by ColumnFactory.

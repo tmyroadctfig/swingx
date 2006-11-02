@@ -31,6 +31,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.print.PrinterException;
+import java.beans.PropertyChangeEvent;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -98,6 +99,7 @@ import org.jdesktop.swingx.decorator.SizeSequenceMapper;
 import org.jdesktop.swingx.decorator.SortController;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
+import org.jdesktop.swingx.event.TableColumnModelExtListener;
 import org.jdesktop.swingx.icon.ColumnControlIcon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.table.ColumnControlButton;
@@ -215,8 +217,8 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * @author Jeanette Winzenburg
  */
 public class JXTable extends JTable 
-//    implements TableColumnModelExtListener 
-    { 
+    implements TableColumnModelExtListener    {
+    
     private static final Logger LOG = Logger.getLogger(JXTable.class.getName());
     
      /**
@@ -2108,7 +2110,55 @@ public class JXTable extends JTable
         }
     }
 
+//--------------- implement TableColumnModelExtListener
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * Listens to column property changes.
+     * 
+     */
+    public void columnPropertyChange(PropertyChangeEvent event) {
+        if (event.getPropertyName().equals("editable")) {
+            updateEditingAfterColumnChanged((TableColumn) event.getSource(), 
+                    (Boolean) event.getNewValue());
+        } else if (event.getPropertyName().equals("sortable")) {
+            updateSortingAfterColumnChanged((TableColumn) event.getSource(), 
+                    (Boolean) event.getNewValue());
+           
+        }
+        
+    }
+
+    /**
+     * Adjusts editing state after column's property change. Cancels ongoing
+     * editing if the sending column is the editingColumn and the 
+     * column's editable changed to <code>false</code>, otherwise does nothing.
+     *  
+     * @param column the <code>TableColumn</code> which sent the change notifcation
+     * @param editable the new value of the column's editable property
+     */
+    private void updateEditingAfterColumnChanged(TableColumn column, boolean editable) {
+        if (!isEditing()) return;
+        int viewIndex = convertColumnIndexToView(column.getModelIndex());
+        if ((viewIndex < 0) || (viewIndex != getEditingColumn())) return;
+        getCellEditor().cancelCellEditing();
+    }
+
+    /**
+     * @param column the <code>TableColumn</code> which sent the change notifcation
+     * @param sortable the new value of the column's sortable property
+     */
+    private void updateSortingAfterColumnChanged(TableColumn column, boolean sortable) {
+        TableColumn sortedColumn = getSortedColumn();
+        if ((sortedColumn == null) || (sortedColumn != column)) return;
+        // here we assume that there's only one sorted column
+        // nothing is done to enforce at-least-one sorted column
+        // todo: search forum for when that was problem
+        resetSortOrder();
+    }
     // -------------------------- ColumnFactory
+
 
     /**
      * Creates, configures and adds default <code>TableColumn</code>s for
