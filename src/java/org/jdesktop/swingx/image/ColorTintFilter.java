@@ -64,6 +64,11 @@ public class ColorTintFilter extends AbstractFilter {
     private final Color mixColor;
     private final float mixValue;
 
+    private int[] preMultipliedAlpha;
+    private int[] preMultipliedRed;
+    private int[] preMultipliedGreen;
+    private int[] preMultipliedBlue;
+
     /**
      * <p>Creates a new color mixer filter. The specified color will be used
      * to tint the source image, with a mixing strength defined by
@@ -86,6 +91,25 @@ public class ColorTintFilter extends AbstractFilter {
             mixValue = 1.0f;
         }
         this.mixValue = mixValue;
+        
+        int mix_a = (int) (mixColor.getAlpha() * mixValue);
+        int mix_r = (int) (mixColor.getRed()   * mixValue);
+        int mix_g = (int) (mixColor.getBlue()  * mixValue);
+        int mix_b = (int) (mixColor.getGreen() * mixValue);
+        
+        float factor = 1.0f - mixValue;
+        preMultipliedAlpha = new int[256];
+        preMultipliedRed   = new int[256];
+        preMultipliedGreen = new int[256];
+        preMultipliedBlue  = new int[256];
+
+        for (int i = 0; i < 256; i++) {
+            int value = (int) (i * factor);
+            preMultipliedAlpha[i] = value + mix_a;
+            preMultipliedRed[i]   = value + mix_r;
+            preMultipliedGreen[i] = value + mix_g;
+            preMultipliedBlue[i]  = value + mix_b;
+        }
     }
 
     /**
@@ -127,31 +151,12 @@ public class ColorTintFilter extends AbstractFilter {
     }
 
     private void mixColor(int[] pixels) {
-        float mix_a = mixColor.getAlpha() * mixValue;
-        float mix_r = mixColor.getRed() * mixValue;
-        float mix_g = mixColor.getBlue() * mixValue;
-        float mix_b = mixColor.getGreen() * mixValue;
-        
-        float factor = 1.0f - mixValue;
-        float[] preMultiplied = new float[256];
-        for (int i = 0; i < preMultiplied.length; i++) {
-            preMultiplied[i] = i * factor;
-        }
-
         for (int i = 0; i < pixels.length; i++) {
             int argb = pixels[i];
-
-            int a = (argb >> 24) & 0xFF;
-            int r = (argb >> 16) & 0xFF;
-            int g = (argb >>  8) & 0xFF;
-            int b = (argb      ) & 0xFF;
-
-            a = (int) (preMultiplied[a] + mix_a);
-            r = (int) (preMultiplied[r] + mix_r);
-            g = (int) (preMultiplied[g] + mix_g);
-            b = (int) (preMultiplied[b] + mix_b);
-
-            pixels[i] = a << 24 | r << 16 | g << 8 | b;
+            pixels[i] = preMultipliedAlpha[(argb >> 24) & 0xFF] << 24 |
+                        preMultipliedRed[(argb >> 16) & 0xFF]   << 16 |
+                        preMultipliedGreen[(argb >> 8) & 0xFF]  <<  8 |
+                        preMultipliedBlue[argb & 0xFF];
         }
     }
 }
