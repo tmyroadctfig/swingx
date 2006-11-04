@@ -147,9 +147,9 @@ public class ColorTintFilter extends AbstractFilter {
             int b = (argb      ) & 0xFF;
 
             a = (int) (preMultiplied[a] + mix_a);
-            r = (int) (preMultiplied[r] * factor + mix_r);
-            g = (int) (preMultiplied[g] * factor + mix_g);
-            b = (int) (preMultiplied[b] * factor + mix_b);
+            r = (int) (preMultiplied[r] + mix_r);
+            g = (int) (preMultiplied[g] + mix_g);
+            b = (int) (preMultiplied[b] + mix_b);
 
             pixels[i] = a << 24 | r << 16 | g << 8 | b;
         }
