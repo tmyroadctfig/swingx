@@ -97,6 +97,8 @@ public class ColorTintFilter extends AbstractFilter {
         int mix_g = (int) (mixColor.getGreen() * mixValue);
         int mix_b = (int) (mixColor.getBlue()  * mixValue);
         
+        // Since we use only lookup tables to apply the filter, this filter
+        // could be implemented as a LookupOp.
         float factor = 1.0f - mixValue;
         preMultipliedAlpha = new int[256];
         preMultipliedRed   = new int[256];
