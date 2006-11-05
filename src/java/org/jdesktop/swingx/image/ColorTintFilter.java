@@ -94,8 +94,8 @@ public class ColorTintFilter extends AbstractFilter {
         
         int mix_a = (int) (mixColor.getAlpha() * mixValue);
         int mix_r = (int) (mixColor.getRed()   * mixValue);
-        int mix_g = (int) (mixColor.getBlue()  * mixValue);
-        int mix_b = (int) (mixColor.getGreen() * mixValue);
+        int mix_g = (int) (mixColor.getGreen() * mixValue);
+        int mix_b = (int) (mixColor.getBlue()  * mixValue);
         
         float factor = 1.0f - mixValue;
         preMultipliedAlpha = new int[256];
