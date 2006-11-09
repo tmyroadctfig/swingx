@@ -23,6 +23,7 @@ package org.jdesktop.swingx.plaf.windows;
 import java.awt.Graphics;
 
 import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
 
@@ -42,4 +43,8 @@ public class WindowsHyperlinkUI extends BasicHyperlinkUI {
     setTextShiftOffset();
   }
   
+    protected void installDefaults(AbstractButton b) {
+        super.installDefaults(b);
+        b.setBorder(BorderFactory.createEmptyBorder(0, 1, 0, 0));
+    }
 }
