@@ -22,13 +22,8 @@
 package org.jdesktop.swingx;
 
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.Insets;
-import java.awt.LayoutManager2;
-import java.util.HashMap;
-import java.util.Map;
+import javax.swing.JComponent;
 import org.jdesktop.swingx.plaf.JXStatusBarAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.StatusBarUI;
@@ -97,10 +92,12 @@ import org.jdesktop.swingx.plaf.StatusBarUI;
  *      sbar.add(comp3);
  *  </code></pre></p>
  *
+ * @status REVIEWED
+ *
  * @author pdoubleya
  * @author rbair
  */
-public class JXStatusBar extends JXPanel {
+public class JXStatusBar extends JComponent {
     /**
      * @see #getUIClassID
      * @see #readObject
@@ -120,6 +117,8 @@ public class JXStatusBar extends JXPanel {
      */
     public JXStatusBar() {
         super();
+        setOpaque(true);
+        updateUI();
     }
 
     /**
@@ -127,7 +126,6 @@ public class JXStatusBar extends JXPanel {
      * 
      * @return the StatusBarUI object that renders this component
      */
-    @Override
     public StatusBarUI getUI() {
         return (StatusBarUI) ui;
     }
