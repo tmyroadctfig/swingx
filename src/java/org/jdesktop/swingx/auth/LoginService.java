@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 import org.jdesktop.beans.AbstractBean;
-import org.jdesktop.swingx.util.SwingWorker;
+import org.jdesktop.swingworker.SwingWorker;
 
 /**
  * <b>LoginService</b> is the abstract base class for all classes implementing
