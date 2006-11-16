@@ -22,6 +22,9 @@
 package org.jdesktop.swingx;
 
 import java.awt.Component;
+import java.awt.Container;
+import java.awt.Cursor;
+import javax.swing.JButton;
 
 import javax.swing.JFrame;
 import javax.swing.JRootPane;
@@ -32,7 +35,12 @@ import javax.swing.JRootPane;
  * This frame uses a JXRootPane.
  */
 public class JXFrame extends JFrame {
-
+    private Component waitPane = null;
+    private Component glassPane = null;
+    private boolean waitPaneVisible = false;
+    private Cursor realCursor = null;
+    private boolean waitCursorVisible = false;
+    
     public JXFrame() {
         this(null, false);
     }
@@ -48,6 +56,103 @@ public class JXFrame extends JFrame {
         this(title, false);
     }
 
+//    public void setCancelButton(JButton button) {
+//        
+//    }
+//    
+//    public JButton getCancelButton() {
+//        
+//    }
+//    
+    public void setDefaultButton(JButton button) {
+        JButton old = getDefaultButton();
+        getRootPane().setDefaultButton(button);
+        firePropertyChange("defaultButton", old, getDefaultButton());
+    }
+    
+    public JButton getDefaultButton() {
+        return getRootPane().getDefaultButton();
+    }
+    
+//    public void setKeyPreview(boolean flag) {
+//        
+//    }
+//    
+//    public boolean getKeyPreview() {
+//        
+//    }
+//    
+//    public void setStartPosition(StartPosition position) {
+//        
+//    }
+//    
+//    public StartPosition getStartPosition() {
+//        
+//    }
+    
+    public void setWaitCursorVisible(boolean flag) {
+        boolean old = isWaitCursorVisible();
+        if (flag != old) {
+            waitCursorVisible = flag;
+            if (isWaitCursorVisible()) {
+                realCursor = getCursor();
+                super.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            } else {
+                super.setCursor(realCursor);
+            }
+            firePropertyChange("waitCursorVisible", old, isWaitCursorVisible());
+        }
+    }
+    
+    public boolean isWaitCursorVisible() {
+        return waitCursorVisible;
+    }
+    
+    @Override
+    public void setCursor(Cursor c) {
+        if (!isWaitCursorVisible()) {
+            super.setCursor(c);
+        } else {
+            this.realCursor = c;
+        }
+    }
+    
+    public void setWaitPane(Component c) {
+        Component old = getWaitPane();
+        this.waitPane = c;
+        firePropertyChange("waitPane", old, getWaitPane());
+    }
+    
+    public Component getWaitPane() {
+        return waitPane;
+    }
+    
+    public void setWaitPaneVisible(boolean flag) {
+        boolean old = isWaitPaneVisible();
+        if (flag != old) {
+            this.waitPaneVisible = flag;
+            Component wp = getWaitPane();
+            if (isWaitPaneVisible()) {
+                glassPane = getRootPane().getGlassPane();
+                if (wp != null) {
+                    getRootPane().setGlassPane(wp);
+                    wp.setVisible(true);
+                }
+            } else {
+                if (wp != null) {
+                    wp.setVisible(false);
+                }
+                getRootPane().setGlassPane(glassPane);
+            }
+            firePropertyChange("waitPaneVisible", old, isWaitPaneVisible());
+        }
+    }
+    
+    public boolean isWaitPaneVisible() {
+        return waitPaneVisible;
+    }
+    
+    //---------------------------------------------------- Root Pane Methods
     /**
      * Overloaded to create a JXRootPane.
      */
@@ -97,6 +202,5 @@ public class JXFrame extends JFrame {
         }
         return null;
     }
-
 }
 
