@@ -39,6 +39,7 @@ import java.util.Map;
 
 import javax.swing.UIManager;
 import javax.swing.border.Border;
+import org.jdesktop.swingx.graphics.GraphicsUtilities;
 
 /**
  * Implements a DropShadow for components. In general, the DropShadowBorder will
@@ -99,7 +100,7 @@ public class DropShadowBorder implements Border {
          * 1) Get images for this border
          * 2) Paint the images for each side of the border that should be painted
          */
-       	Map<Position,BufferedImage> images = getImages(null);
+       	Map<Position,BufferedImage> images = getImages((Graphics2D)graphics);
         
         //compute the edges of the component -- not including the border
 //        Insets borderInsets = getBorderInsets(c);
@@ -167,6 +168,8 @@ public class DropShadowBorder implements Border {
  
         g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
                             RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2.setRenderingHint(RenderingHints.KEY_RENDERING,
+                            RenderingHints.VALUE_RENDER_SPEED);
         
         if (showLeftShadow) {
             Rectangle leftShadowRect =
@@ -256,7 +259,7 @@ public class DropShadowBorder implements Border {
             int rectWidth = cornerSize + 1;
             RoundRectangle2D rect = new RoundRectangle2D.Double(0, 0, rectWidth, rectWidth, cornerSize, cornerSize);
             int imageWidth = rectWidth + shadowSize * 2;
-            BufferedImage image = new BufferedImage(imageWidth, imageWidth, BufferedImage.TYPE_INT_ARGB);
+            BufferedImage image = GraphicsUtilities.createTranslucentCompatibleImage(imageWidth, imageWidth);
             Graphics2D buffer = (Graphics2D)image.getGraphics();
             buffer.setColor(new Color(0.0f, 0.0f, 0.0f, shadowOpacity));
             buffer.translate(shadowSize, shadowSize);
@@ -269,7 +272,7 @@ public class DropShadowBorder implements Border {
                 blurKernel[i] = blurry;
             }
             ConvolveOp blur = new ConvolveOp(new Kernel(shadowSize, shadowSize, blurKernel));
-            BufferedImage targetImage = new BufferedImage(imageWidth, imageWidth, BufferedImage.TYPE_INT_ARGB);
+            BufferedImage targetImage = GraphicsUtilities.createTranslucentCompatibleImage(imageWidth, imageWidth);
             ((Graphics2D)targetImage.getGraphics()).drawImage(image, blur, -(shadowSize/2), -(shadowSize/2));
 
             int x = 1;
