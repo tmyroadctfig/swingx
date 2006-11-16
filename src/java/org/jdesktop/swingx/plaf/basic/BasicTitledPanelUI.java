@@ -271,7 +271,7 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
         if (right != null) topPanel.remove(right);
         right = decoration;
         if (right != null) {
-            topPanel.add(decoration, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+            topPanel.add(decoration, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(1, 1, 1, 1), 0, 0));
             
         }
     }
@@ -288,7 +288,7 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
         if (left != null) topPanel.remove(left);
         left = decoration;
         if (left != null) {
-            topPanel.add(left, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+            topPanel.add(left, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(1, 1, 1, 1), 0, 0));
         }
     }
     
