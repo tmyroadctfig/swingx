@@ -330,7 +330,7 @@ public class DropShadowBorder implements Border {
      */
     private BufferedImage getSubImage(BufferedImage img,
                                       int x, int y, int w, int h) {
-        BufferedImage ret = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage ret = GraphicsUtilities.createTranslucentCompatibleImage(w, h);
         Graphics2D g2 = ret.createGraphics();
         g2.drawImage(img,
                      0, 0, w, h,
