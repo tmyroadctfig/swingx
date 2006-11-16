@@ -178,7 +178,7 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
   }
 
   /**
-   * @return true if the addon is the Aqua addon or its subclasses
+   * @return true if the addon is the Mac OS X addon or its subclasses
    */
   protected boolean isMac(LookAndFeelAddons addon) {
     return addon instanceof MacOSXLookAndFeelAddons;
