@@ -969,7 +969,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
      * is far from perfect, only escaping &lt;, &gt; and &amp; characters
      */
     private static String escapeXml(String input) {
-        String s = input.replace("&", "&amp;");
+        String s = input == null ? "" : input.replace("&", "&amp;");
         s = s.replace("<", "&lt;");
         return s = s.replace(">", "&gt;");
     }    
