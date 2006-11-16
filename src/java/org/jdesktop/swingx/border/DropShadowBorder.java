@@ -314,6 +314,7 @@ public class DropShadowBorder implements Border {
             images.put(Position.TOP, getSubImage(targetImage, x, y, w, h));
 
             image.flush();
+            CACHE.put(shadowSize, images);
         }
         return images;
     }
