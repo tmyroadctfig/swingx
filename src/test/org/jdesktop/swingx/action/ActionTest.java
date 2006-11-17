@@ -29,6 +29,65 @@ public class ActionTest extends TestCase {
     protected void setUp() throws Exception {
         factory = new ActionContainerFactory(null);
     }
+
+    /**
+     * Issue #255-swingx: probs in synch selectable button <--> action. 
+     * 
+     * test that configured button is kept in synch with
+     *  action selected state and the other way round. This uses a 
+     *  custom configure via the ActionContainerFactory.configureSelectableButton.
+     * The direction from button to action is broken.
+     */
+    public void testButtonSelectedSynchAction() {
+        AbstractActionExt extAction = createStateAction();
+        boolean actionSelected = true;
+        extAction.setSelected(actionSelected);
+        JToggleButton button = new JToggleButton();
+        factory.configureSelectableButton(button, extAction, null);
+        // invert action selected and assert that the change is taken up
+        // by the button
+        extAction.setSelected(!actionSelected);
+        assertEquals("button selected must be synched to action", 
+                !actionSelected, button.isSelected());
+        // reset button 
+        button.setSelected(actionSelected);
+        // sanity: the button did take the direct selection change
+        assertEquals(actionSelected, button.isSelected());
+        // assert that changed selected is taken up by action
+        assertEquals("action selected must be synched to button", 
+                actionSelected, extAction.isSelected());
+    }
+
+
+    /**
+     * Issue #255-swingx: probs in synch selectable button <--> action. 
+     * 
+     * test that configured button is kept in synch with
+     *  action selected state and the other way round. This uses the 
+     *  ActionContainerFactory.createButton().
+     * The direction from button to action is broken.
+     */
+    public void testCreateButtonSelectedSynchAction() {
+        AbstractActionExt extAction = createStateAction();
+        boolean actionSelected = true;
+        extAction.setSelected(actionSelected);
+        JToggleButton button = (JToggleButton) factory.createButton(extAction);
+        // invert action selected and assert that the change is taken up
+        // by the button
+        extAction.setSelected(!actionSelected);
+        assertEquals("button selected must be synched to action", 
+                !actionSelected, button.isSelected());
+        // reset button 
+        button.setSelected(actionSelected);
+        // sanity: the button did take the direct selection change
+        assertEquals(actionSelected, button.isSelected());
+        // assert that changed selected is taken up by action
+        assertEquals("action selected must be synched to button", 
+                actionSelected, extAction.isSelected());
+    }
+
+
+
     /**
      * Issue #255-swingx: probs in synch selectable button <--> action. 
      *  
@@ -243,9 +302,6 @@ public class ActionTest extends TestCase {
 
     protected AbstractActionExt createStateAction() {
         AbstractActionExt extAction = new AbstractActionExt("dummy") {
-
-            public void itemStateChanged(ItemEvent e) {
-            }
 
             public void actionPerformed(ActionEvent e) {
             }

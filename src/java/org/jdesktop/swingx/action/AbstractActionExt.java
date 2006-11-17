@@ -422,10 +422,27 @@ public abstract class AbstractActionExt extends AbstractAction
         return buffer.toString();
     }
 
+    // /**
+    // * @inheritDoc
+    // * Default to no-op
+    // */
+    // public void itemStateChanged(ItemEvent e) {
+    // }
+    
     /**
-     * @inheritDoc
-     * Default to no-op
+     * Callback method as <code>ItemListener</code>. Updates internal state based
+     * on the given ItemEvent. <p>
+     * 
+     * Here: synchs selected property if isStateAction(), does nothing otherwise.
+     * 
+     * @param e the ItemEvent fired by a ItemSelectable on changing the selected 
+     *    state.
      */
     public void itemStateChanged(ItemEvent e) {
+        if (isStateAction()) {
+            setSelected(ItemEvent.SELECTED == e.getStateChange());
+        }
     }
+
+
 }
