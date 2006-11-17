@@ -24,15 +24,25 @@ package org.jdesktop.swingx;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 
 import javax.swing.BoxLayout;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 
 import org.jdesktop.swingx.event.MessageSource;
 import org.jdesktop.swingx.event.ProgressSource;
+import org.jdesktop.swingx.plaf.JXRootPaneAddon;
 
 /**
  * Extends the JRootPane by supporting specific placements for a toolbar and a
@@ -51,20 +61,38 @@ import org.jdesktop.swingx.event.ProgressSource;
  * @author Mark Davidson
  */
 public class JXRootPane extends JRootPane {
-
     private JXStatusBar statusBar;
 
     private JToolBar toolBar;
 
     private JPanel contentPanel;
 
+    /** 
+     * The button that gets activated when the pane has the focus and
+     * a UI-specific action like pressing the <b>ESC</b> key occurs.
+     */
+    private JButton cancelButton;
+
     public JXRootPane() {
         contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
 
         getContentPane().add(contentPanel, BorderLayout.CENTER);
+        
+        Action escAction = new AbstractAction() {
+            public void actionPerformed(ActionEvent evt) {
+                JButton cancelButton = getCancelButton();
+                if (cancelButton != null) {
+                    cancelButton.doClick(20);
+                }
+            }
+        };
+        getActionMap().put("esc-action", escAction);
+        InputMap im = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+        im.put(key, "esc-action");
     }
-
+    
     /**
      * Adds a component to the root pane. If this component and/or it's children
      * is a <code>MessageSource</code> then it will be registered with the
@@ -231,6 +259,52 @@ public class JXRootPane extends JRootPane {
         if (handler != null && menuBar != null) {
             handler.registerListeners(menuBar.getSubElements());
         }
+    }
+
+    /**
+     * Sets the <code>cancelButton</code> property,
+     * which determines the current default cancel button for this <code>JRootPane</code>.
+     * The cancel button is the button which will be activated 
+     * when a UI-defined activation event (typically the <b>ESC</b> key) 
+     * occurs in the root pane regardless of whether or not the button 
+     * has keyboard focus (unless there is another component within 
+     * the root pane which consumes the activation event,
+     * such as a <code>JTextPane</code>).
+     * For default activation to work, the button must be an enabled
+     * descendent of the root pane when activation occurs.
+     * To remove a cancel button from this root pane, set this
+     * property to <code>null</code>.
+     *
+     * @see JButton#getCancelButton 
+     * @param cancelButton the <code>JButton</code> which is to be the cancel button
+     *
+     * @beaninfo
+     *  description: The button activated by default for cancel actions in this root pane
+     */
+    public void setCancelButton(JButton cancelButton) { 
+        JButton old = this.cancelButton;
+
+        if (old != cancelButton) {
+            this.cancelButton = cancelButton;
+
+            if (old != null) {
+                old.repaint();
+            }
+            if (cancelButton != null) {
+                cancelButton.repaint();
+            } 
+        }
+
+        firePropertyChange("cancelButton", old, cancelButton);        
+    }
+
+    /**
+     * Returns the value of the <code>cancelButton</code> property. 
+     * @return the <code>JButton</code> which is currently the default cancel button
+     * @see #setCancelButton
+     */
+    public JButton getCancelButton() { 
+        return cancelButton;
     }
 
 }

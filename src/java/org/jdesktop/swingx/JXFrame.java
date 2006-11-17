@@ -94,25 +94,15 @@ public class JXFrame extends JFrame {
     public JXFrame(String title) {
         this(title, false);
     }
-
-    private void init() {
-//        Action keyPreviewAction = new KeyPreviewAction();
-//        getRootPane().getActionMap().put("key-preview-action", keyPreviewAction);
-//        InputMap im = getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-//        KeyStroke key = KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F1, java.awt.event.InputEvent.CTRL_MASK);
-//        im.put(key, "myKeyAction");
-
-        //TODO install the cancel action
+    
+    public void setCancelButton(JButton button) {
+        getRootPaneExt().setCancelButton(button);
     }
     
-//    public void setCancelButton(JButton button) {
-//        
-//    }
-//    
-//    public JButton getCancelButton() {
-//        
-//    }
-//    
+    public JButton getCancelButton() {
+        return getRootPaneExt().getCancelButton();
+    }
+    
     public void setDefaultButton(JButton button) {
         JButton old = getDefaultButton();
         getRootPane().setDefaultButton(button);
