@@ -40,6 +40,7 @@ public class JXFrame extends JFrame {
     private boolean waitPaneVisible = false;
     private Cursor realCursor = null;
     private boolean waitCursorVisible = false;
+    private boolean waiting = false;
     
     public JXFrame() {
         this(null, false);
@@ -150,6 +151,18 @@ public class JXFrame extends JFrame {
     
     public boolean isWaitPaneVisible() {
         return waitPaneVisible;
+    }
+    
+    public void setWaiting(boolean waiting) {
+        boolean old = isWaiting();
+        this.waiting = waiting;
+        firePropertyChange("waiting", old, isWaiting());
+        setWaitPaneVisible(waiting);
+        setWaitCursorVisible(waiting);
+    }
+    
+    public boolean isWaiting() {
+        return waiting;
     }
     
     //---------------------------------------------------- Root Pane Methods
