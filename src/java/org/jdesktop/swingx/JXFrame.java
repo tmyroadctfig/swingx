@@ -28,6 +28,7 @@ import javax.swing.JButton;
 
 import javax.swing.JFrame;
 import javax.swing.JRootPane;
+import org.jdesktop.swingx.util.WindowUtils;
 
 
 /**
@@ -35,12 +36,16 @@ import javax.swing.JRootPane;
  * This frame uses a JXRootPane.
  */
 public class JXFrame extends JFrame {
+    public enum StartPosition {CenterInScreen, CenterInParent, Manual};
+    
     private Component waitPane = null;
     private Component glassPane = null;
     private boolean waitPaneVisible = false;
     private Cursor realCursor = null;
     private boolean waitCursorVisible = false;
     private boolean waiting = false;
+    private StartPosition startPosition;
+    private boolean hasBeenVisible = false; //startPosition is only used the first time the window is shown
     
     public JXFrame() {
         this(null, false);
@@ -82,14 +87,16 @@ public class JXFrame extends JFrame {
 //    public boolean getKeyPreview() {
 //        
 //    }
-//    
-//    public void setStartPosition(StartPosition position) {
-//        
-//    }
-//    
-//    public StartPosition getStartPosition() {
-//        
-//    }
+    
+    public void setStartPosition(StartPosition position) {
+        StartPosition old = getStartPosition();
+        this.startPosition = position;
+        firePropertyChange("startPosition", old, getStartPosition());
+    }
+    
+    public StartPosition getStartPosition() {
+        return startPosition == null ? StartPosition.Manual : startPosition;
+    }
     
     public void setWaitCursorVisible(boolean flag) {
         boolean old = isWaitCursorVisible();
@@ -163,6 +170,26 @@ public class JXFrame extends JFrame {
     
     public boolean isWaiting() {
         return waiting;
+    }
+    
+    @Override
+    public void setVisible(boolean visible) {
+        if (!hasBeenVisible && visible) {
+            //move to the proper start position
+            StartPosition pos = getStartPosition();
+            switch (pos) {
+                case CenterInParent:
+                    setLocationRelativeTo(getParent());
+                    break;
+                case CenterInScreen:
+                    setLocation(WindowUtils.getPointForCentering(this));
+                    break;
+                case Manual:
+                default:
+                    //nothing to do!
+            }
+        }
+        super.setVisible(visible);
     }
     
     //---------------------------------------------------- Root Pane Methods
