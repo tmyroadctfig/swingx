@@ -21,9 +21,15 @@
 
 package org.jdesktop.swingx;
 
+import java.awt.AWTEvent;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Cursor;
+import java.awt.Toolkit;
+import java.awt.event.AWTEventListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
 
 import javax.swing.JFrame;
@@ -46,6 +52,8 @@ public class JXFrame extends JFrame {
     private boolean waiting = false;
     private StartPosition startPosition;
     private boolean hasBeenVisible = false; //startPosition is only used the first time the window is shown
+    private AWTEventListener keyEventListener; //for listening to KeyPreview events
+    private boolean keyPreview = false;
     
     public JXFrame() {
         this(null, false);
@@ -56,12 +64,47 @@ public class JXFrame extends JFrame {
         if (exitOnClose) {
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         }
+        
+        //create the event handler for key preview functionality
+        keyEventListener = new AWTEventListener() {
+            public void eventDispatched(AWTEvent aWTEvent) {
+                if (aWTEvent instanceof KeyEvent) {
+                    KeyEvent evt = (KeyEvent)aWTEvent;
+                    for (KeyListener kl : getKeyListeners()) {
+                        int id = aWTEvent.getID();
+                        switch (id) {
+                            case KeyEvent.KEY_PRESSED:
+                                kl.keyPressed(evt);
+                                break;
+                            case KeyEvent.KEY_RELEASED:
+                                kl.keyReleased(evt);
+                                break;
+                            case KeyEvent.KEY_TYPED:
+                                kl.keyTyped(evt);
+                                break;
+                            default:
+                                System.err.println("Unhandled Key ID: " + id);    
+                        }
+                    }
+                }
+            }
+        };
     }
 
     public JXFrame(String title) {
         this(title, false);
     }
 
+    private void init() {
+//        Action keyPreviewAction = new KeyPreviewAction();
+//        getRootPane().getActionMap().put("key-preview-action", keyPreviewAction);
+//        InputMap im = getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+//        KeyStroke key = KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F1, java.awt.event.InputEvent.CTRL_MASK);
+//        im.put(key, "myKeyAction");
+
+        //TODO install the cancel action
+    }
+    
 //    public void setCancelButton(JButton button) {
 //        
 //    }
@@ -80,13 +123,19 @@ public class JXFrame extends JFrame {
         return getRootPane().getDefaultButton();
     }
     
-//    public void setKeyPreview(boolean flag) {
-//        
-//    }
-//    
-//    public boolean getKeyPreview() {
-//        
-//    }
+    public void setKeyPreview(boolean flag) {
+        Toolkit.getDefaultToolkit().removeAWTEventListener(keyEventListener);
+        if (flag) {
+            Toolkit.getDefaultToolkit().addAWTEventListener(keyEventListener, AWTEvent.KEY_EVENT_MASK);
+        }
+        boolean old = keyPreview;
+        keyPreview = flag;
+        firePropertyChange("keyPreview", old, keyPreview);
+    }
+    
+    public final boolean getKeyPreview() {
+        return keyPreview;
+    }
     
     public void setStartPosition(StartPosition position) {
         StartPosition old = getStartPosition();
@@ -241,6 +290,11 @@ public class JXFrame extends JFrame {
             return (JXRootPane)rootPane;
         }
         return null;
+    }
+    
+    private final class KeyPreviewAction extends AbstractAction {
+        public void actionPerformed(ActionEvent actionEvent) {
+        }
     }
 }
 
