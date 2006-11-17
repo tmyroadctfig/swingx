@@ -27,6 +27,7 @@ import java.awt.Cursor;
 import java.awt.Toolkit;
 import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.AbstractAction;
@@ -34,6 +35,7 @@ import javax.swing.JButton;
 
 import javax.swing.JFrame;
 import javax.swing.JRootPane;
+import javax.swing.Timer;
 import org.jdesktop.swingx.util.WindowUtils;
 
 
@@ -54,6 +56,10 @@ public class JXFrame extends JFrame {
     private boolean hasBeenVisible = false; //startPosition is only used the first time the window is shown
     private AWTEventListener keyEventListener; //for listening to KeyPreview events
     private boolean keyPreview = false;
+    private AWTEventListener idleListener; //for listening to events. If no events happen for a specific amount of time, mark as idle
+    private Timer idleTimer;
+    private long idleThreshold = 0;
+    private boolean idle;
     
     public JXFrame() {
         this(null, false);
@@ -87,6 +93,26 @@ public class JXFrame extends JFrame {
                         }
                     }
                 }
+            }
+        };
+        
+        idleTimer = new Timer(100, new ActionListener() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                setIdle(true);
+            }
+        });
+        
+        //create the event handler for key preview functionality
+        idleListener = new AWTEventListener() {
+            public void eventDispatched(AWTEvent aWTEvent) {
+                //reset the timer
+                idleTimer.stop();
+                //if the user is idle, then change to not idle
+                if (isIdle()) {
+                    setIdle(false);
+                }
+                //start the timer
+                idleTimer.restart();
             }
         };
     }
@@ -229,6 +255,36 @@ public class JXFrame extends JFrame {
             }
         }
         super.setVisible(visible);
+    }
+    
+    public boolean isIdle() {
+        return idle;
+    }
+    
+    public void setIdle(boolean idle) {
+        boolean old = isIdle();
+        this.idle = idle;
+        firePropertyChange("idle", old, isIdle());
+    }
+    
+    public void setIdleThreshold(long threshold) {
+        long old = getIdleThreshold();
+        this.idleThreshold = threshold;
+        firePropertyChange("idleThreshold", old, getIdleThreshold());
+        
+        threshold = getIdleThreshold(); // in case the getIdleThreshold method has been overridden
+        
+        Toolkit.getDefaultToolkit().removeAWTEventListener(idleListener);
+        if (threshold > 0) {
+            Toolkit.getDefaultToolkit().addAWTEventListener(idleListener, AWTEvent.KEY_EVENT_MASK | AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK | AWTEvent.MOUSE_WHEEL_EVENT_MASK);
+        }
+        idleTimer.stop();
+        idleTimer.setInitialDelay((int)threshold);
+        idleTimer.restart();
+    }
+    
+    public long getIdleThreshold() {
+        return idleThreshold;
     }
     
     //---------------------------------------------------- Root Pane Methods
