@@ -1046,10 +1046,12 @@ public class JXTable extends JTable
     }
 
     /**
-     * {@inheritDoc} <p>
+     * Layouts column width. The exact behaviour depends on the 
+     * <code>autoResizeMode</code> property. <p> 
      * Overridden to support enhanced auto-resize behaviour enabled and 
      * necessary.
      * 
+     * @see #setAutoResizeMode(int)
      * @see #setHorizontalScrollEnabled(boolean)
      */
     @Override
@@ -3684,7 +3686,7 @@ public class JXTable extends JTable
      *        grid lines.
      * @param showVerticalLines boolean to decide whether to draw vertical grid
      *        lines.
-     * @deprecated replaced by {@link #setShowGrid(boolean, boolean).
+     * @deprecated replaced by {@link #setShowGrid(boolean, boolean)}.
      * 
      */
     public void setDefaultMargins(boolean showHorizontalLines,
