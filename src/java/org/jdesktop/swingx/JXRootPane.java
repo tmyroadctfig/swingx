@@ -42,7 +42,7 @@ import javax.swing.KeyStroke;
 
 import org.jdesktop.swingx.event.MessageSource;
 import org.jdesktop.swingx.event.ProgressSource;
-import org.jdesktop.swingx.plaf.JXRootPaneAddon;
+//import org.jdesktop.swingx.plaf.JXRootPaneAddon;
 
 /**
  * Extends the JRootPane by supporting specific placements for a toolbar and a
