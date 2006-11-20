@@ -89,6 +89,8 @@ public class JXHeader extends JXPanel {
     private String title;
     private String description;
     private Icon icon;
+    private Font titleFont;
+    private Font descriptionFont;
     
     /** Creates a new instance of JXHeader */
     public JXHeader() {
@@ -209,6 +211,33 @@ public class JXHeader extends JXPanel {
      */
     public Icon getIcon() {
         return icon;
+    }
+    
+    @Override
+    public void setFont(Font font) {
+        super.setFont(font);
+        setTitleFont(font);
+        setDescriptionFont(font);
+    }
+    
+    private void setTitleFont(Font font) {
+        Font old = getTitleFont();
+        this.titleFont = font;
+        firePropertyChange("titleFont", old, getTitleFont());
+    }
+    
+    private Font getTitleFont() {
+        return titleFont;
+    }
+    
+    private void setDescriptionFont(Font font) {
+        Font old = getDescriptionFont();
+        this.descriptionFont = font;
+        firePropertyChange("descriptionFont", old, getDescriptionFont());
+    }
+    
+    private Font getDescriptionFont() {
+        return descriptionFont;
     }
     
 //    public static void main(String[] args) {

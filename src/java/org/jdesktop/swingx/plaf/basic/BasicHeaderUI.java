@@ -195,6 +195,10 @@ public class BasicHeaderUI extends HeaderUI {
             titleLabel.setEnabled(enabled);
             descriptionPane.setEnabled(enabled);
             imagePanel.setEnabled(enabled);
+        } else if ("titleFont".equals(propertyName)) {
+            titleLabel.setFont((Font)newValue);
+        } else if ("descriptionFont".equals(propertyName)) {
+            descriptionPane.setFont((Font)newValue);
         }
     }
     
