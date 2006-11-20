@@ -337,10 +337,5 @@ public class JXFrame extends JFrame {
         }
         return null;
     }
-    
-    private final class KeyPreviewAction extends AbstractAction {
-        public void actionPerformed(ActionEvent actionEvent) {
-        }
-    }
 }
 
