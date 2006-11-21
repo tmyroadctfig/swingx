@@ -2964,6 +2964,11 @@ public class JXTable extends JTable
         repaint();
     }
     
+    public void setHighlighters(Highlighter... highlighters) {
+        HighlighterPipeline pipeline = new HighlighterPipeline(highlighters);
+        setHighlighters(pipeline);
+    }
+
     /**
      * Adds a Highlighter.
      * <p>

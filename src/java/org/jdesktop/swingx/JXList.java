@@ -1055,6 +1055,11 @@ public class JXList extends JList {
         firePropertyChange("highlighters", old, getHighlighters());
     }
 
+    public void setHighlighters(Highlighter... highlighters) {
+        HighlighterPipeline pipeline = new HighlighterPipeline(highlighters);
+        setHighlighters(pipeline);
+    }
+
     /**
      * Adds a Highlighter.
      * 
