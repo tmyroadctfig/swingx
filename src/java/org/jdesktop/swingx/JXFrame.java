@@ -287,6 +287,14 @@ public class JXFrame extends JFrame {
         return idleThreshold;
     }
     
+    public void setStatusBar(JXStatusBar statusBar) {
+        getRootPaneExt().setStatusBar(statusBar);
+    }
+    
+    public JXStatusBar getStatusBar() {
+        return getRootPaneExt().getStatusBar();
+    }
+    
     //---------------------------------------------------- Root Pane Methods
     /**
      * Overloaded to create a JXRootPane.
