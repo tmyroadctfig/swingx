@@ -34,6 +34,7 @@ import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1041,6 +1042,20 @@ public class MultiSplitLayout implements LayoutManager {
 		child.setParent(this);
 	    }
 	}
+        
+	/**
+	 * Convenience method for setting the children of this Split node.  The parent
+	 * of each new child is set to this Split node, and the parent
+	 * of each old child (if any) is set to null.  This method
+	 * defensively copies the incoming array.
+	 * 
+	 * @param children array of children
+	 * @see #getChildren
+	 * @throws IllegalArgumentException if children is null
+	 */
+        public void setChildren(Node... children) {
+            setChildren(children == null ? null : Arrays.asList(children));
+        }
 
 	/**
 	 * Convenience method that returns the last child whose weight
