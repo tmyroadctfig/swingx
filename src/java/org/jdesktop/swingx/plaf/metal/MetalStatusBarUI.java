@@ -77,7 +77,7 @@ public class MetalStatusBarUI extends BasicStatusBarUI {
         
         //This list is comprised of floats and Colors, which together
         //constitute the gradient.
-        List gradient = (List)UIManager.get("Button.gradient");
+        List gradient = (List)UIManager.get("MenuBar.gradient");
 
         if (gradient != null && w > 0 && 0 < h) {
             float ratio1 = ((Number)gradient.get(0)).floatValue();
