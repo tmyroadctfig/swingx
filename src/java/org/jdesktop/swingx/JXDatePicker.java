@@ -181,7 +181,7 @@ public class JXDatePicker extends JComponent {
      * @param formats The string formats to use.
      * @see java.text.SimpleDateFormat
      */
-    public void setFormats(String[] formats) {
+    public void setFormats(String... formats) {
         DateFormat[] dateFormats = new DateFormat[formats.length];
         for (int counter = formats.length - 1; counter >= 0; counter--) {
             dateFormats[counter] = new SimpleDateFormat(formats[counter]);
@@ -195,7 +195,7 @@ public class JXDatePicker extends JComponent {
      *
      * @param formats The date formats to use.
      */
-    public void setFormats(DateFormat[] formats) {
+    public void setFormats(DateFormat... formats) {
         _dateField.setFormatterFactory(new DefaultFormatterFactory(
                 new JXDatePickerFormatter(formats)));
     }
