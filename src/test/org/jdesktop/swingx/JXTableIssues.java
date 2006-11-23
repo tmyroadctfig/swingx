@@ -61,7 +61,6 @@ import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.border.LineBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
@@ -69,6 +68,7 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.treetable.FileSystemModel;
@@ -89,7 +89,27 @@ public class JXTableIssues extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXTableIssues.class
             .getName());
 
+    /**
+     * Issue #??-swingx: competing setHighlighters(null) break code.
+     * 
+     * More specifically: it doesn't compile without casting the null, that's why
+     * it has to be commented here.
+     *
+     */
+//    public void testHighlightersNull() {
+//        JXTable table = new JXTable();
+//        table.setHighlighters(null);
+//    }
 
+    /**
+     * Issue #??-swingx: setHighlighters(null) throws NPE. 
+     * 
+     */
+    public void testHighlightersReset() {
+        JXTable table = new JXTable();
+        table.setHighlighters((Highlighter) null);
+    }
+    
     /**
      * Issue #4614616: editor lookup broken for interface types.
      * With editors (vs. renderers), the solution is not obvious -
