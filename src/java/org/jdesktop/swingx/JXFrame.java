@@ -30,11 +30,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import javax.swing.AbstractAction;
 import javax.swing.JButton;
 
 import javax.swing.JFrame;
 import javax.swing.JRootPane;
+import javax.swing.JToolBar;
 import javax.swing.Timer;
 import org.jdesktop.swingx.util.WindowUtils;
 
@@ -293,6 +293,14 @@ public class JXFrame extends JFrame {
     
     public JXStatusBar getStatusBar() {
         return getRootPaneExt().getStatusBar();
+    }
+    
+    public void setToolBar(JToolBar toolBar) {
+        getRootPaneExt().setToolBar(toolBar);
+    }
+    
+    public JToolBar getToolBar() {
+        return getRootPaneExt().getToolBar();
     }
     
     //---------------------------------------------------- Root Pane Methods
