@@ -25,10 +25,10 @@ import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 
-import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputListener;
+import javax.swing.plaf.UIResource;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -221,11 +221,64 @@ public class JXTableHeader extends JTableHeader
         return height;
     }
     
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to update the default renderer. 
+     * 
+     * @see #preUpdateRendererUI()
+     * @see #postUpdateRendererUI(TableCellRenderer)
+     * @see ColumnHeaderRenderer
+     */
     public void updateUI() {
+        TableCellRenderer oldRenderer = preUpdateRendererUI();
         super.updateUI();
-        if (getDefaultRenderer() instanceof JComponent) {
-            ((JComponent) getDefaultRenderer()).updateUI();
-         
+        postUpdateRendererUI(oldRenderer);
+    }
+
+    /**
+     * Prepares the default renderer and internal state for updateUI. 
+     * Returns the default renderer set when entering this method.
+     * Called from updateUI before calling super.updateUI to 
+     * allow UIDelegate to cleanup, if necessary. This implementation
+     * does so by restoring the header's default renderer to the 
+     * <code>ColumnHeaderRenderer</code>'s delegate.
+     *  
+     * @return the current default renderer 
+     * @see #updateUI()
+     */
+    protected TableCellRenderer preUpdateRendererUI() {
+        TableCellRenderer oldRenderer = getDefaultRenderer();
+        // reset the default to the original to give S
+        if (oldRenderer instanceof ColumnHeaderRenderer) {
+            setDefaultRenderer(((ColumnHeaderRenderer)oldRenderer).getDelegateRenderer());
+        }
+        return oldRenderer;
+    }
+
+    /**
+     * Cleans up after the UIDelegate has updated the default renderer.
+     * Called from <code>updateUI</code> after calling <code>super.updateUI</code>.
+     * This implementation wraps a <code>UIResource</code> default renderer into a 
+     * <code>ColumnHeaderRenderer</code>.
+     * 
+     * @param oldRenderer the default renderer before updateUI
+     * 
+     * @see #updateUI()
+     * 
+     * 
+     */
+    protected void postUpdateRendererUI(TableCellRenderer oldRenderer) {
+        TableCellRenderer current = getDefaultRenderer();
+        if (!(current instanceof ColumnHeaderRenderer) && (current instanceof UIResource)) {
+            ColumnHeaderRenderer renderer;
+            if (oldRenderer instanceof ColumnHeaderRenderer) {
+                renderer = (ColumnHeaderRenderer) oldRenderer;
+                renderer.updateUI(this);
+            } else {
+                renderer = new ColumnHeaderRenderer(this);
+            }
+            setDefaultRenderer(renderer);
         }
     }
     
@@ -273,9 +326,9 @@ public class JXTableHeader extends JTableHeader
         return -1;
     }
 
-    protected TableCellRenderer createDefaultRenderer() {
-        return ColumnHeaderRenderer.createColumnHeaderRenderer();
-    }
+//    protected TableCellRenderer createDefaultRenderer() {
+//        return ColumnHeaderRenderer.createColumnHeaderRenderer();
+//    }
 
     /**
      * Lazily creates and returns the SortGestureRecognizer.

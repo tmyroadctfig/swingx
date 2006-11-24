@@ -61,7 +61,9 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  * @author Ramesh Gupta
  * @author Jeanette Winzenburg
  */
-public class ColumnHeaderRenderer extends JComponent implements TableCellRenderer {
+public class ColumnHeaderRenderer extends JComponent 
+    implements TableCellRenderer
+    , UIResource {
     // the inheritance is only to make sure we are updated on LF change
     public static final String UP_ICON_KEY = "ColumnHeaderRenderer.upIcon";
     public static final String DOWN_ICON_KEY = "ColumnHeaderRenderer.downIcon";
@@ -86,6 +88,10 @@ public class ColumnHeaderRenderer extends JComponent implements TableCellRendere
 
     private LabelProperties label;
 
+    /**
+     * 
+     * @return
+     */
     public static TableCellRenderer getSharedInstance() {
         if (sharedInstance == null) {
             sharedInstance = new ColumnHeaderRenderer();
@@ -93,13 +99,32 @@ public class ColumnHeaderRenderer extends JComponent implements TableCellRendere
         return sharedInstance;
     }
 
+    /**
+     * 
+     * @return a <code>ColumnHeaderRenderer</code>
+     */
     public static ColumnHeaderRenderer createColumnHeaderRenderer() {
         return new ColumnHeaderRenderer();
     }
 
     /*
      * JW: a story ...
+     * 
+     * Yet another chapter: The problem with some LFs is that they
+     * install a LF specific renderer in uidelegate.installUI, 
+     * unconditionally overwriting the renderer created and installed
+     * by the tableHeader.createDefaultRenderer. Looks like the
+     * ui install is needed to support rollover (maybe other?) "live"
+     * effects. If so, there are some implications:
+     * 
+     *  - the default renderer must not be shared across tableHeaders.
+     *  - the ColumnHeaderRenderer's delegateRenderer must be updated
+     *    to the last ui-installed default
+     *  - the tableHeader must reset its default to the delegateRenderer
+     *    before calling super.updateUI (to give the uidelegate the
+     *    possibility to cleanup)  
      *
+     * ------------------------------------------- 
      * latest: don't use a custom component and don't add the original
      * and the arrow - use the original only and compound a border with 
      * arrow icon. How does it look in XP/Mac?
@@ -131,12 +156,16 @@ public class ColumnHeaderRenderer extends JComponent implements TableCellRendere
      * 
      */
 
-    private ColumnHeaderRenderer() {
+    public ColumnHeaderRenderer() {
         label = new LabelProperties();
         initDelegate();
         
     }
 
+    public ColumnHeaderRenderer(JTableHeader header) {
+        label = new LabelProperties();
+        updateUI(header);
+    }
 
     private void initDelegate() {
         JTableHeader header = new JTableHeader();
@@ -290,6 +319,25 @@ public class ColumnHeaderRenderer extends JComponent implements TableCellRendere
         updateIconUI();
     }
 
+    public void updateUI(JTableHeader header) {
+        updateIconUI();
+        if (header.getDefaultRenderer() != this) {
+            delegateRenderer = header.getDefaultRenderer();
+        }
+        // don't touch if custom
+//        if (!(header.getDefaultRenderer() instanceof UIResource)) return;
+//        if (header.getDefaultRenderer() instanceof ColumnHeaderRenderer) {
+//            
+//          ((ColumnHeaderRenderer) header.getDefaultRenderer()).updateIconUI();  
+//        } else { 
+//          // the UI installed a renderer - we wrap it with the icon
+//          ColumnHeaderRenderer renderer = new ColumnHeaderRenderer();  
+//          renderer.delegateRenderer = header.getDefaultRenderer(); 
+//          header.setDefaultRenderer(renderer);
+//          ((ColumnHeaderRenderer) header.getDefaultRenderer()).updateIconUI();  
+//            
+//        }
+    }
     private void updateIconUI() {
         if (getUpIcon() instanceof UIResource) {
             Icon icon = UIManager.getIcon(UP_ICON_KEY);
@@ -301,5 +349,13 @@ public class ColumnHeaderRenderer extends JComponent implements TableCellRendere
             setDownIcon(icon != null ? icon : defaultDownIcon);
             
         }
+    }
+
+    /**
+     * @return
+     */
+    public TableCellRenderer getDelegateRenderer() {
+        // TODO Auto-generated method stub
+        return delegateRenderer;
     }
 }
