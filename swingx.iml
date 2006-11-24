@@ -7,12 +7,12 @@
         <attribute name="URI" value="/" />
       </containerElement>
     </containerInfo>
-    <setting name="jarPath" value="$MODULE_DIR$/swingx.jar" />
+    <setting name="jarUrl" value="file://$MODULE_DIR$/swingx.jar" />
     <setting name="buildJar" value="true" />
     <setting name="mainClass" value="" />
   </component>
   <component name="ModuleRootManager" />
-  <component name="NewModuleRootManager">
+  <component name="NewModuleRootManager" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$">
@@ -26,6 +26,15 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/optional/MultipleGradientPaint.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/optional/swing-worker.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
