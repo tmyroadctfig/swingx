@@ -89,6 +89,11 @@ public class DefaultDateSelectionModelTest extends TestCase {
     }
 
     public void testUnselctableDates() {
+        // Make sure the unselectable dates returns an empty set if it hasn't been
+        // used.
+        SortedSet<Date> unselectableDates = model.getUnselectableDates();
+        assert(unselectableDates.isEmpty());
+
         model.setSelectionMode(DateSelectionModel.SelectionMode.MULTIPLE_INTERVAL_SELECTION);
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(System.currentTimeMillis());
@@ -110,7 +115,7 @@ public class DefaultDateSelectionModelTest extends TestCase {
         assertTrue(today.equals(selection.first()));
         assertTrue(tPlus4.equals(selection.last()));
 
-        SortedSet<Date> unselectableDates = new TreeSet<Date>();
+        unselectableDates = new TreeSet<Date>();
         unselectableDates.add(tPlus1);
         unselectableDates.add(tPlus3);
         model.setUnselectableDates(unselectableDates);

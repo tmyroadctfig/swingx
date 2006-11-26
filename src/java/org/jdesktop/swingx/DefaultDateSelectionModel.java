@@ -46,6 +46,7 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
         this.listenerMap = new EventListenerMap();
         this.selectionMode = SelectionMode.SINGLE_SELECTION;
         this.selectedDates = new TreeSet<Date>();
+        this.unselectableDates = new TreeSet<Date>();
         this.firstDayOfWeek = Calendar.SUNDAY;
         cal = Calendar.getInstance();
     }
