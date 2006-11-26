@@ -290,7 +290,7 @@ public class JXMonthView extends JComponent {
     /**
      * Sets the L&F object that renders this component.
      *
-     * @param ui
+     * @param ui UI to use for this {@code JXMonthView}
      */
     public void setUI(MonthViewUI ui) {
         super.setUI(ui);
@@ -402,6 +402,7 @@ public class JXMonthView extends JComponent {
      * no dates are selected.
      *
      * @deprecated see #getSelection
+     * @return Date span of the selected dates.
      */
     @Deprecated
     public DateSpan getSelectedDateSpan() {
@@ -443,8 +444,8 @@ public class JXMonthView extends JComponent {
      * Adds the selection interval to the selection model.  <b>All dates are modified to remove their hour of
      * day, minute, second, and millisecond before being added to the selection model</b>.
      *
-     * @param startDate
-     * @param endDate
+     * @param startDate Start of date range to add to the selection
+     * @param endDate End of date range to add to the selection
      */
     public void addSelectionInterval(Date startDate, Date endDate) {
         if (selectionMode != SelectionMode.NO_SELECTION) {
@@ -461,8 +462,8 @@ public class JXMonthView extends JComponent {
      * Sets the selection interval to the selection model.  <b>All dates are modified to remove their hour of
      * day, minute, second, and millisecond before being added to the selection model</b>.
      *
-     * @param startDate
-     * @param endDate
+     * @param startDate Start of date range to set the selection to
+     * @param endDate End of date range to set the selection to
      */
     public void setSelectionInterval(final Date startDate, final Date endDate) {
         if (selectionMode != SelectionMode.NO_SELECTION) {
@@ -516,8 +517,8 @@ public class JXMonthView extends JComponent {
      * Removes the selection interval from the selection model.  <b>All dates are modified to remove their hour of
      * day, minute, second, and millisecond before being added to the selection model</b>.
      *
-     * @param startDate
-     * @param endDate
+     * @param startDate Start of the date range to remove from the selection
+     * @param endDate End of the date range to remove from the selection
      */
     public void removeSelectionInterval(final Date startDate, final Date endDate) {
         getSelectionModel().removeSelectionInterval(cleanupDate(startDate), cleanupDate(endDate));
@@ -544,6 +545,8 @@ public class JXMonthView extends JComponent {
 
     /**
      * Set the selection mode for this JXMonthView.
+
+     * @param selectionMode The selection mode to use for this {@code JXMonthView}
      */
     public void setSelectionMode(final SelectionMode selectionMode) {
         SelectionMode oldSelectionMode = this.selectionMode;
@@ -564,6 +567,7 @@ public class JXMonthView extends JComponent {
      * and _endSelectedDate range.  <b>All dates are modified to remove their hour of
      * day, minute, second, and millisecond before being added to the selection model</b>.
      *
+     * @param date The date to check
      * @return true if the date is selected, false otherwise
      */
     public boolean isSelectedDate(long date) {
@@ -698,6 +702,8 @@ public class JXMonthView extends JComponent {
 
     /**
      * Returns the padding used between days in the calendar.
+     *
+     * @return Padding used between days in the calendar
      */
     public int getBoxPaddingX() {
         return boxPaddingX;
@@ -708,6 +714,8 @@ public class JXMonthView extends JComponent {
      * The padding is applied to both sides of the days.  Therefore, if you
      * used the padding value of 3, the number of pixels between any two days
      * would be 6.
+     *
+     * @param boxPaddingX Number of pixels applied to both sides of a day
      */
     public void setBoxPaddingX(int boxPaddingX) {
         int oldBoxPadding = this.boxPaddingX;
@@ -717,6 +725,8 @@ public class JXMonthView extends JComponent {
 
     /**
      * Returns the padding used above and below days in the calendar.
+     *
+     * @return Padding used between dats in the calendar
      */
     public int getBoxPaddingY() {
         return boxPaddingY;
@@ -727,6 +737,8 @@ public class JXMonthView extends JComponent {
      * The padding is applied to both the top and bottom of a day.  Therefore,
      * if you used the padding value of 3, the number of pixels between any
      * two days would be 6.
+     *
+     * @param boxPaddingY Number of pixels applied to top and bottom of a day
      */
     public void setBoxPaddingY(int boxPaddingY) {
         int oldBoxPadding = this.boxPaddingY;
@@ -788,6 +800,7 @@ public class JXMonthView extends JComponent {
      * week.  For this method the first days of the week days[0] is assumed to
      * be <code>Calendar.SUNDAY</code>.
      *
+     * @param days Array of characters that represents each day
      * @throws IllegalArgumentException if <code>days.length</code> != DAYS_IN_WEEK
      * @throws NullPointerException if <code>days</code> == null
      */
@@ -1260,6 +1273,7 @@ public class JXMonthView extends JComponent {
         java.util.List<T> listeners = listenerMap.getListeners(listenerType);
         T[] result;
         if (!listeners.isEmpty()) {
+            //noinspection unchecked
             result = (T[]) java.lang.reflect.Array.newInstance(listenerType, listeners.size());
             result = listeners.toArray(result);
         } else {

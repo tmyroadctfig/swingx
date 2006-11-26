@@ -148,7 +148,7 @@ public class JXDatePicker extends JComponent {
     /**
      * Sets the L&F object that renders this component.
      *
-     * @param ui
+     * @param ui UI to use for this {@code JXDatePicker}
      */
     public void setUI(DatePickerUI ui) {
         super.setUI(ui);
@@ -396,6 +396,9 @@ public class JXDatePicker extends JComponent {
      * Forces the current value to be taken from the AbstractFormatter and
      * set as the current value. This has no effect if there is no current
      * AbstractFormatter installed.
+     *
+     * @throws java.text.ParseException Throws parse exception if the date
+     * can not be parsed.
      */
     public void commitEdit() throws ParseException {
         _dateField.commitEdit();
@@ -493,6 +496,7 @@ public class JXDatePicker extends JComponent {
         java.util.List<T> listeners = listenerMap.getListeners(listenerType);
         T[] result;
         if (!listeners.isEmpty()) {
+            //noinspection unchecked
             result = (T[]) java.lang.reflect.Array.newInstance(listenerType, listeners.size());
             result = listeners.toArray(result);
         } else {
