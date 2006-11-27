@@ -222,7 +222,7 @@ import org.jdesktop.swingx.painter.Painter;
  *
  * <p>While <code>JXGraph.Plot</code> does not give you an API for such a
  * purpose, it does define an event dispatching API (see
- * {@link JXGraph.Plot#firePropertyChange(String, double, double)}.) Whenever a
+ * {@link JXGraph#firePropertyChange(String, double, double)}.) Whenever a
  * plot is added to the graph, the component registers itself as a property
  * listener of the plot. If you take care of firing events whenever the user
  * changes a parameter of your plot, the graph will automatically update its
@@ -572,7 +572,7 @@ public class JXGraph extends JXPanel {
     public void setInputEnabled(boolean enabled) {
         if (inputEnabled != enabled) {
             boolean old = isInputEnabled();
-            this.inputEnabled = inputEnabled;
+            this.inputEnabled = enabled;
 
             if (enabled) {
                 addMouseListener(resetHandler);
@@ -1121,9 +1121,11 @@ public class JXGraph extends JXPanel {
         }
 
         for (Plot plot : plotList) {
-            if (plot != null && !plots.contains(plot)) {
+            DrawablePlot drawablePlot =
+                    new DrawablePlot(plot, color);
+            if (plot != null && !plots.contains(drawablePlot)) {
                 plot.addPropertyChangeListener(plotChangeListener);
-                plots.add(new DrawablePlot(plot, color));
+                plots.add(drawablePlot);
             }
         }
         repaint();
@@ -1236,8 +1238,9 @@ public class JXGraph extends JXPanel {
      * @see #xPositionToPixel(double)
      */
     protected double xPixelToPosition(double pixel) {
-        double axisV = xPositionToPixel(originX);
-        return (pixel - axisV) * (maxX - minX) / (double) getWidth();
+//        double axisV = xPositionToPixel(originX);
+//        return (pixel - axisV) * (maxX - minX) / (double) getWidth();
+        return minX + pixel * (maxX - minX) / (double) getWidth();
     }
     
     /**
@@ -1253,8 +1256,9 @@ public class JXGraph extends JXPanel {
      * @see #yPositionToPixel(double)
      */
     protected double yPixelToPosition(double pixel) {
-        double axisH = yPositionToPixel(originY);
-        return (getHeight() - pixel - axisH) * (maxY - minY) / (double) getHeight();
+//        double axisH = yPositionToPixel(originY);
+//        return (getHeight() - pixel - axisH) * (maxY - minY) / (double) getHeight();
+        return minY + (getHeight() - pixel) * (maxY - minY) / (double) getHeight();
     }
 
     /**
@@ -1369,7 +1373,8 @@ public class JXGraph extends JXPanel {
     private void drawVerticalAxisLabels(Graphics2D g2) {
         double axisV = xPositionToPixel(originX);
 
-        double startY = Math.floor((minY - originY) / majorY) * majorY;
+//        double startY = Math.floor((minY - originY) / majorY) * majorY;
+        double startY = Math.floor(minY / majorY) * majorY;
         for (double y = startY; y < maxY + majorY; y += majorY) {
             if (((y - majorY / 2.0) < originY) &&
                 ((y + majorY / 2.0) > originY)) {
@@ -1392,7 +1397,7 @@ public class JXGraph extends JXPanel {
         
         Rectangle clip = g2.getClipBounds();
         
-        int position = 0;
+        int position;
         
         if (!isAxisPainted()) {
             position = (int) xPositionToPixel(originX);
@@ -1402,7 +1407,8 @@ public class JXGraph extends JXPanel {
             }
         }
 
-        double startY = Math.floor((minY - originY) / majorY) * majorY;
+//        double startY = Math.floor((minY - originY) / majorY) * majorY;
+        double startY = Math.floor(minY / majorY) * majorY;
         for (double y = startY; y < maxY + majorY; y += majorY) {
             g2.setStroke(gridStroke);
             g2.setColor(getMinorGridColor());
@@ -1431,7 +1437,8 @@ public class JXGraph extends JXPanel {
         double axisH = yPositionToPixel(originY);
         FontMetrics metrics = g2.getFontMetrics();
         
-        double startX = Math.floor((minX - originX) / majorX) * majorX;
+//        double startX = Math.floor((minX - originX) / majorX) * majorX;
+        double startX = Math.floor(minX / majorX) * majorX;
         for (double x = startX; x < maxX + majorX; x += majorX) {
             if (((x - majorX / 2.0) < originX) &&
                 ((x + majorX / 2.0) > originX)) {
@@ -1455,7 +1462,7 @@ public class JXGraph extends JXPanel {
         
         Rectangle clip = g2.getClipBounds();
         
-        int position = 0;
+        int position;
         if (!isAxisPainted()) {
             position = (int) yPositionToPixel(originY);
             if (position >= clip.y && position <= clip.y + clip.height) {
@@ -1464,7 +1471,8 @@ public class JXGraph extends JXPanel {
             }
         }
         
-        double startX = Math.floor((minX - originX) / majorX) * majorX;
+//        double startX = Math.floor((minX - originX) / majorX) * majorX;
+        double startX = Math.floor(minX / majorX) * majorX;
         for (double x = startX; x < maxX + majorX; x += majorX) {
             g2.setStroke(gridStroke);
             g2.setColor(getMinorGridColor());
@@ -1611,7 +1619,7 @@ public class JXGraph extends JXPanel {
     }
 
     // Encapsulates a plot and its color. Avoids the use of a full-blown Map.
-    private class DrawablePlot {
+    private static class DrawablePlot {
         private final Plot equation;
         private final Color color;
 
@@ -1626,6 +1634,29 @@ public class JXGraph extends JXPanel {
         
         private Color getColor() {
             return color;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            final DrawablePlot that = (DrawablePlot) o;
+            if (!color.equals(that.color)) {
+                return false;
+            }
+            return equation.equals(that.equation);
+        }
+
+        @Override
+        public int hashCode() {
+            int result;
+            result = equation.hashCode();
+            result = 29 * result + color.hashCode();
+            return result;
         }
     }
     

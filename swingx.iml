@@ -7,12 +7,12 @@
         <attribute name="URI" value="/" />
       </containerElement>
     </containerInfo>
-    <setting name="jarUrl" value="file://$MODULE_DIR$/swingx.jar" />
+    <setting name="jarPath" value="" />
     <setting name="buildJar" value="true" />
     <setting name="mainClass" value="" />
   </component>
   <component name="ModuleRootManager" />
-  <component name="NewModuleRootManager" inherit-compiler-output="false">
+  <component name="NewModuleRootManager">
     <output url="file://$MODULE_DIR$/classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$">
