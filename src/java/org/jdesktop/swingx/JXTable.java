@@ -3266,6 +3266,11 @@ public class JXTable extends JTable
      * default renderer classes here so that we can instantiate them when we
      * need to create renderers to be set on specific columns.
      */
+    
+    /**
+     * The default renderer for <code>Number</code> types. Aligns to
+     * <code>RIGHT</code>.
+     */
     public static class NumberRenderer extends DefaultTableCellRenderer {
         public NumberRenderer() {
             super();
@@ -3275,6 +3280,13 @@ public class JXTable extends JTable
         }
     }
 
+    /**
+     * Default renderer for <code>Float</code> and <code>Double</code>
+     * types. Uses a <code>NumberFormat</code> to renderer. The format can be
+     * provided by client code, if null the general-purpose number format for
+     * the current locale is used.
+     * 
+     */
     public static class DoubleRenderer extends NumberRenderer {
         private final NumberFormat formatter;
 
@@ -3295,6 +3307,12 @@ public class JXTable extends JTable
         }
     }
 
+    /**
+     * The default renderer for <code>Date</code> types. Uses a
+     * <code>DateFormat</code> to render. The format can be provided by client
+     * code, if null the general-purpose date format for the current locale is
+     * used.
+     */
     public static class DateRenderer extends DefaultTableCellRenderer {
         private final DateFormat formatter;
 
@@ -3315,6 +3333,13 @@ public class JXTable extends JTable
         }
     }
 
+    /**
+     * The default renderer for <code>Icon</code> and <code>ImageIcon</code> types.<p>
+     * 
+     * Note: it's registered for both the interface and a concrete class because
+     * <code>JTable</code> class-based lookup doesn't cope well with interfaces.
+     * 
+     */
     public static class IconRenderer extends DefaultTableCellRenderer {
         public IconRenderer() {
             super();
@@ -3329,6 +3354,9 @@ public class JXTable extends JTable
 
     /*
      * re- c&p'd from 1.5 JTable. 
+     */
+    /**
+     * The default renderer for <code>Boolean</code> types.
      */
     public static class BooleanRenderer extends JCheckBox implements // , UIResource
             TableCellRenderer     {
@@ -3366,8 +3394,10 @@ public class JXTable extends JTable
     /**
      * Creates default cell editors for objects, numbers, and boolean values.
      * <p>
-     * Overridden to hook enhanced editors plus hacking around
-     * huge memory consumption of UIDefaults (see #6345050 in core Bug parade)
+     * Overridden to hook enhanced editors (f.i. <code>NumberEditorExt</code>)plus
+     * hacking around huge memory consumption of UIDefaults (see #6345050 in
+     * core Bug parade)
+     * 
      * @see DefaultCellEditor
      */
     @Override
@@ -3393,11 +3423,11 @@ public class JXTable extends JTable
         setLazyEditor(Object.class, "org.jdesktop.swingx.JXTable$GenericEditor");
 
         // Numbers
-        setLazyEditor(Number.class, "org.jdesktop.swingx.JXTable$NumberEditor");
+//        setLazyEditor(Number.class, "org.jdesktop.swingx.JXTable$NumberEditor");
+        setLazyEditor(Number.class, "org.jdesktop.swingx.table.NumberEditorExt");
 
         // Booleans
         setLazyEditor(Boolean.class, "org.jdesktop.swingx.JXTable$BooleanEditor");
-//        setLazyEditor(LinkModel.class, "org.jdesktop.swingx.LinkRenderer");
 
     }
 
@@ -3482,10 +3512,12 @@ public class JXTable extends JTable
 
     /**
      * 
-     * Default editor registered for <code>Number</code>s. <p>
-     * PENDING JW: this will be replaced soon by <code>NumberEditorExt </code>
+     * Editor for <code>Number</code>s. <p>
+     * Note: this is no longer registered by default. 
+     * The current default is <code>NumberEditorExt</code>
      * which differs from this in being locale-aware.
      * 
+     * @see NumberEditorExt
      */
     public static class NumberEditor extends GenericEditor {
 
@@ -3494,6 +3526,9 @@ public class JXTable extends JTable
         }
     }
 
+    /**
+     * The default editor for <code>Boolean</code> types.
+     */
     public static class BooleanEditor extends DefaultCellEditor {
         public BooleanEditor() {
             super(new JCheckBox());

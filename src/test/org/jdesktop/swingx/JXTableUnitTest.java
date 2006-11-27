@@ -62,6 +62,7 @@ import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.table.ColumnFactory;
+import org.jdesktop.swingx.table.NumberEditorExt;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.ChangeReport;
@@ -2572,9 +2573,20 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }   
 
     /**
+     * Symmetrical test for editors.
+     *
+     */
+    public void testLazyEditorsByClass() {
+        JXTable table = new JXTable();
+        assertEquals("default Boolean editor", JXTable.BooleanEditor.class, table.getDefaultEditor(Boolean.class).getClass());
+        assertEquals("default Number editor", NumberEditorExt.class, table.getDefaultEditor(Number.class).getClass());
+        assertEquals("default Double editor", NumberEditorExt.class, table.getDefaultEditor(Double.class).getClass());
+    }
+
+    /**
      * Issue #134: JXTable - default renderers not loaded.
      * To fix the issue the JXTable internal renderers' access scope
-     *  was changed to public. Note: if the JTable internal renderers
+     *  was changed to public. Note: if the _JTable_ internal renderers
      * access scope were to be widened then this test has to be changed
      * (the comparing class are hardcoded).
      *
@@ -2585,8 +2597,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertEquals("default Number renderer", JXTable.NumberRenderer.class, table.getDefaultRenderer(Number.class).getClass());
         assertEquals("default Double renderer", JXTable.DoubleRenderer.class, table.getDefaultRenderer(Double.class).getClass());
         assertEquals("default Date renderer", JXTable.DateRenderer.class, table.getDefaultRenderer(Date.class).getClass());
-        // JW: removed default registration
-        // assertEquals("default LinkModel renderer", LinkRenderer.class, table.getDefaultRenderer(LinkModel.class).getClass());
         assertEquals("default Icon renderer", JXTable.IconRenderer.class, table.getDefaultRenderer(Icon.class).getClass());
     }
     

@@ -41,12 +41,12 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
+import org.jdesktop.swingx.JXTable.NumberEditor;
 import org.jdesktop.swingx.JXTableHeader.SortGestureRecognizer;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.LinkModelAction;
@@ -66,7 +66,6 @@ import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
 import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
-import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.test.AncientSwingTeam;
 
@@ -92,7 +91,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*isable.*");
           
 //          test.runInteractiveTests("interactive.*Compare.*");
-        test.runInteractiveTests("interactive.*binding.*");
+        test.runInteractiveTests("interactive.*Column.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -107,6 +106,68 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         setSystemLF(false);
     }
 
+    /**
+     * Issue #393-swingx: localized NumberEditor.
+     * 
+     * Playing ... looks working :-)
+     *
+     */
+    public void interactiveFloatingPointEditor(){
+        DefaultTableModel model = new DefaultTableModel(
+                new String[] {"Double-core", "Double-ext", "Integer-core", "Integer-ext", "Object"}, 10) {
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                if ((columnIndex == 0) || (columnIndex == 1)) {
+                    return Double.class;
+                }
+                if ((columnIndex == 2) || (columnIndex == 3)){
+                    return Integer.class;
+                }
+                return Object.class;
+            }
+            
+        };
+        JXTable table = new JXTable(model);
+        table.setSurrendersFocusOnKeystroke(true);
+        table.setValueAt(10.2, 0, 0);
+        table.setValueAt(10.2, 0, 1);
+        table.setValueAt(10, 0, 2);
+        table.setValueAt(10, 0, 3);
+        
+        table.getColumn(0).setCellEditor(new NumberEditor());
+        table.getColumn(2).setCellEditor(new NumberEditor());
+        showWithScrollingInFrame(table, "Extended NumberEditors (col 1/3)");
+        
+    }
+
+    /**
+     * Issue #417-swingx: disable default find.
+     *
+     * Possible alternative to introducing disable api as suggested in the
+     * issue report: disable the action? Move the action up the hierarchy to
+     * the parent actionmap? Maybe JX specific parent?
+     *  
+     */
+    public void interactiveDisableFind() {
+        final JXTable table = new JXTable(sortableTableModel);
+        Action findAction = new AbstractActionExt() {
+
+            public void actionPerformed(ActionEvent e) {
+                SearchFactory.getInstance().showFindDialog(table, table.getSearchable());
+                
+            }
+            
+            @Override
+            public boolean isEnabled() {
+                return false;
+            }
+            
+        };
+        table.getActionMap().put("find", findAction);
+        showWithScrollingInFrame(table, "disable finding");
+    }
+    
     /**
      * visually check if we can bind the CCB's action to a keystroke.
      * 
