@@ -52,8 +52,9 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  * when we switch to Mustang.
  * <p>
  * 
- * PENDING: #25, #169 - Header doesn't look right in winXP/mac. Won't do
- * anything about it, it's handled in core Swing as of jdk1.6.
+ * Note: #169-jdnc, #193-swingx - Header doesn't look right in winXP/mac seem - to be
+ * fixed, but could be brittle. Won't do more about it, Mustang will take care once
+ * SwingLabs is switched over to 1.6.
  * 
  * @targeted_status: jdk15-glue
  * 
@@ -89,8 +90,9 @@ public class ColumnHeaderRenderer extends JComponent
     private LabelProperties label;
 
     /**
+     * Returns the shared ColumnHeaderRenderer. <p> 
+     * @return the shared header renderer.
      * 
-     * @return
      */
     public static TableCellRenderer getSharedInstance() {
         if (sharedInstance == null) {
@@ -108,7 +110,7 @@ public class ColumnHeaderRenderer extends JComponent
     }
 
     /*
-     * JW: a story ...
+     * JW: a story ... ordered from latest to older.
      * 
      * Yet another chapter: The problem with some LFs is that they
      * install a LF specific renderer in uidelegate.installUI, 
@@ -151,7 +153,6 @@ public class ColumnHeaderRenderer extends JComponent
      *     effect - and changing LF doesn't take up the LF default background ...
      *  3. if this is set to false we can't have custom cell background
      * 
-     * Any ideas?
      * 
      * 
      */
@@ -195,10 +196,10 @@ public class ColumnHeaderRenderer extends JComponent
     }
 
     /**
-     * adjusts the Component's orientation to JXTable's CO if appropriate.
+     * Adjusts the Component's orientation to JXTable's CO if appropriate.
      * Here: always.
      * 
-     * @param stamp
+     * @param stamp the component to adjust.
      */
     protected void adjustComponentOrientation(Component stamp) {
         if (stamp.getComponentOrientation().equals(getComponentOrientation())) return;
@@ -313,6 +314,13 @@ public class ColumnHeaderRenderer extends JComponent
         return label.getVerticalTextPosition();
     }
 
+    /**
+     * @return the delegate renderer.
+     */
+    public TableCellRenderer getDelegateRenderer() {
+        return delegateRenderer;
+    }
+
     public void updateUI() {
         super.updateUI();
         initDelegate();
@@ -351,11 +359,4 @@ public class ColumnHeaderRenderer extends JComponent
         }
     }
 
-    /**
-     * @return
-     */
-    public TableCellRenderer getDelegateRenderer() {
-        // TODO Auto-generated method stub
-        return delegateRenderer;
-    }
 }
