@@ -186,7 +186,7 @@
         <delete dir="${build.dir}/zipdir" />
     </target>
     
-    
+    <target name="release" depends="src,bin" /><!--,test" />-->
     
     <!-- Overriden targets -->
     <target name="-javadoc-build" depends="init">
@@ -227,5 +227,4 @@ core packagelist: ${javadoc.core.packagelist}
             <packageset dir="${java.dir}" includes="*/**"/>
        </javadoc>
    </target>
-
 </project>
