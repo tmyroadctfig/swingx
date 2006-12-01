@@ -23,6 +23,7 @@ package org.jdesktop.swingx.table;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -316,7 +317,7 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
     /**
      * TODO move into propertyChanged! No need for a dedicated listener.
      */
-    private final class VisibilityListener implements PropertyChangeListener {        
+    private final class VisibilityListener implements PropertyChangeListener, Serializable {        
         public void propertyChange(PropertyChangeEvent evt) {
             if (evt.getPropertyName().equals("visible")) {
                 boolean oldValue = ((Boolean)evt.getOldValue()).booleanValue();

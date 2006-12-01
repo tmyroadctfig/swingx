@@ -24,6 +24,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
+import java.io.Serializable;
 
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
@@ -380,7 +381,7 @@ public class JXTableHeader extends JTableHeader
 
     private MouseInputListener headerListener;
 
-    private class HeaderListener implements MouseInputListener {
+    private class HeaderListener implements MouseInputListener, Serializable {
         private TableColumn cachedResizingColumn;
 
         public void mouseClicked(MouseEvent e) {

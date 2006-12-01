@@ -26,6 +26,7 @@ import java.awt.ComponentOrientation;
 import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Rectangle;
+import java.io.Serializable;
 
 import javax.swing.Icon;
 import javax.swing.SwingConstants;
@@ -35,7 +36,7 @@ import javax.swing.border.Border;
  * @author Amy Fowler
  * @version 1.0
  */
-public class IconBorder implements Border {
+public class IconBorder implements Border, Serializable {
 
     private static final int PAD = 4;
     private Icon icon;
