@@ -8,6 +8,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.io.Serializable;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -18,9 +20,27 @@ import javax.swing.JRadioButton;
 import javax.swing.JToggleButton;
 
 import org.jdesktop.test.PropertyChangeReport;
+import org.jdesktop.test.SerializableSupport;
 
-public class ActionIssues extends ActionTest {
-    
+public class ActionIssues extends ActionTest implements Serializable {
+
+    /**
+     * Issue #349-swingx: table not serializable
+     * 
+     *
+     */
+    public void testSerializationBoundAction() {
+        BoundAction action = new BoundAction("some");
+        action.registerCallback(this, "testSerializationRolloverFalse");
+        try {
+            SerializableSupport.serialize(action);
+        } catch (IOException e) {
+            fail("not serializable " + e);
+        } catch (ClassNotFoundException e) {
+            fail("not serializable " + e);
+        }
+    }
+
     /**
      * core issue: 
      * set enabled via putValue leads to inconsistent state.

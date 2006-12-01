@@ -26,6 +26,7 @@ import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +35,7 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -49,7 +51,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
 
-import org.jdesktop.swingx.JXTable.NumberEditor;
+import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.SortKey;
@@ -58,6 +60,7 @@ import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.CellEditorReport;
 import org.jdesktop.test.PropertyChangeReport;
+import org.jdesktop.test.SerializableSupport;
 
 /**
  * Test to exposed known issues of <code>JXTable</code>.
@@ -222,6 +225,66 @@ public class JXTableIssues extends InteractiveTestCase {
         assertEquals(comp.getPreferredSize().height, table.getRowHeight());
     }
     
+    /**
+     * Issue #349-swingx: table not serializable
+     * 
+     * Part of the problem is in TableRolloverController.
+     *
+     */
+    public void testSerializationRollover() {
+        JXTable table = new JXTable();
+        try {
+            SerializableSupport.serialize(table);
+        } catch (IOException e) {
+            fail("not serializable " + e);
+        } catch (ClassNotFoundException e) {
+            fail("not serializable " + e);
+        }
+    }
+
+    /**
+     * Issue #349-swingx: table not serializable
+     * 
+     * Part of it seems to be in BoundAction. 
+     *
+     */
+    public void testSerializationRolloverFalse() {
+        JXTable table = new JXTable();
+        table.setRolloverEnabled(false);
+        ActionMap actionMap = table.getActionMap();
+        Object[] keys = actionMap.keys();
+        for (int i = 0; i < keys.length; i++) {
+            if (actionMap.get(keys[i]) instanceof BoundAction) {
+                actionMap.remove(keys[i]);
+            }
+        }
+        try {
+            SerializableSupport.serialize(table);
+        } catch (IOException e) {
+            fail("not serializable " + e);
+        } catch (ClassNotFoundException e) {
+            fail("not serializable " + e);
+        }
+    }
+
+    /**
+     * Issue #349-swingx: table not serializable
+     * 
+     * Part of it seems to be in JXTableHeader. 
+     *
+     */
+    public void testSerializationTableHeader() {
+        JXTableHeader table = new JXTableHeader();
+        try {
+            SerializableSupport.serialize(table);
+        } catch (IOException e) {
+            fail("not serializable " + e);
+        } catch (ClassNotFoundException e) {
+            fail("not serializable " + e);
+        }
+    }
+
+
     /**
      * Issue??-swingx: turn off scrollbar doesn't work if the
      *   table was initially in autoResizeOff mode.
