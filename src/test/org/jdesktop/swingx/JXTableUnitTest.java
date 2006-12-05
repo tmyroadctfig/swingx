@@ -1154,6 +1154,56 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertEquals(model, table.getSelectionMapper().getViewSelectionModel());
     }
 
+    /**
+     * Issue #??-swingx: competing setHighlighters(null) break code.
+     * 
+     * More specifically: it doesn't compile without casting the null, that's why
+     * it has to be commented here.
+     *
+     */
+//    public void testHighlightersNull() {
+//        JXTable table = new JXTable();
+//        table.setHighlighters(null);
+//    }
+
+    /**
+     * Issue #??-swingx: setHighlighters(null) throws NPE. 
+     * 
+     */
+    public void testSetHighlightersNull() {
+        JXTable table = new JXTable();
+        table.setHighlighters((Highlighter) null);
+        assertNull(table.getHighlighters());
+    }
+    
+    /**
+     * Issue #??-swingx: setHighlighters() throws NPE. 
+     * 
+     */
+    public void testSetHighlightersNoHighlighter() {
+        JXTable table = new JXTable();
+        table.setHighlighters();
+        assertNull(table.getHighlighters());
+    }
+
+    /**
+     * Issue #??-swingx: setHighlighters() throws NPE. 
+     * 
+     * Test that null highlighter resets the pipeline to null.
+     */
+    public void testSetHighlightersReset() {
+        JXTable table = new JXTable();
+        table.addHighlighter(new Highlighter());
+        // sanity
+        assertEquals(1, table.getHighlighters().getHighlighters().length);
+        table.setHighlighters();
+        assertNull(table.getHighlighters());
+    }
+
+    /**
+     * test if removeHighlighter behaves as doc'ed.
+     *
+     */
     public void testRemoveHighlighter() {
         JXTable table = new JXTable();
         // test cope with null

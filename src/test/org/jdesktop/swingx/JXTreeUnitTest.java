@@ -13,9 +13,14 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 import org.jdesktop.swingx.JXTreeTableUnitTest.InsertTreeTableModel;
+import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
+import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
+import org.jdesktop.test.ChangeReport;
+import org.jdesktop.test.PropertyChangeReport;
 
 
 /**
@@ -29,6 +34,147 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         super("JXTree Test");
     }
 
+    /**
+     * Issue #??-swingx: competing setHighlighters(null) break code.
+     * 
+     * More specifically: it doesn't compile without casting the null, that's why
+     * it has to be commented here.
+     *
+     */
+//    public void testHighlightersNull() {
+//        JXTree tree = new JXTree();
+//        tree.setHighlighters(null);
+//    }
+
+    /**
+     * Issue #??-swingx: setHighlighters(null) throws NPE. 
+     * 
+     */
+    public void testSetHighlightersNull() {
+        JXTree tree = new JXTree();
+        tree.setHighlighters((Highlighter) null);
+        assertNull(tree.getHighlighters());
+    }
+    
+    /**
+     * Issue #??-swingx: setHighlighters() throws NPE. 
+     * 
+     */
+    public void testSetHighlightersNoHighlighter() {
+        JXTree tree = new JXTree();
+        tree.setHighlighters();
+        assertNull(tree.getHighlighters());
+    }
+
+    /**
+     * Issue #??-swingx: setHighlighters() throws NPE. 
+     * 
+     * Test that null highlighter resets the pipeline to null.
+     */
+    public void testSetHighlightersReset() {
+        JXTree tree = new JXTree();
+        tree.addHighlighter(new Highlighter());
+        // sanity
+        assertEquals(1, tree.getHighlighters().getHighlighters().length);
+        tree.setHighlighters();
+        assertNull(tree.getHighlighters());
+    }
+
+
+    /**
+     * test if removeHighlighter behaves as doc'ed.
+     *
+     */
+    public void testRemoveHighlighter() {
+        JXTree table = new JXTree();
+        // test cope with null
+        table.removeHighlighter(null);
+        Highlighter presetHighlighter = AlternateRowHighlighter.classicLinePrinter;
+        HighlighterPipeline pipeline = new HighlighterPipeline(new Highlighter[] {presetHighlighter});
+        table.setHighlighters(pipeline);
+        ChangeReport report = new ChangeReport();
+        pipeline.addChangeListener(report);
+        table.removeHighlighter(new Highlighter());
+        // sanity: highlighter was not contained
+        assertFalse("pipeline must not have fired", report.hasEvents());
+        // remove the presetHighlighter
+        table.removeHighlighter(presetHighlighter);
+        assertEquals("pipeline must have fired on remove", 1, report.getEventCount());
+        assertEquals("pipeline must be empty", 0, pipeline.getHighlighters().length);
+    }
+    
+    /**
+     * test choking on precondition failure (highlighter must not be null).
+     *
+     */
+    public void testAddNullHighlighter() {
+        JXTree tree = new JXTree();
+        try {
+            tree.addHighlighter(null);
+            fail("adding a null highlighter must throw NPE");
+        } catch (NullPointerException e) {
+            // pass - this is what we expect
+        } catch (Exception e) {
+            fail("adding a null highlighter throws exception different " +
+                        "from the expected NPE \n" + e);
+        }
+    }
+    
+    public void testAddHighlighterWithNotEmptyPipeline() {
+        JXTree tree = new JXTree();
+        Highlighter presetHighlighter = AlternateRowHighlighter.classicLinePrinter;
+        HighlighterPipeline pipeline = new HighlighterPipeline(new Highlighter[] {presetHighlighter});
+        tree.setHighlighters(pipeline);
+        Highlighter highlighter = new Highlighter();
+        ChangeReport report = new ChangeReport();
+        pipeline.addChangeListener(report);
+        tree.addHighlighter(highlighter);
+        assertSame("pipeline must be same as preset", pipeline, tree.getHighlighters());
+        assertEquals("pipeline must have fired changeEvent", 1, report.getEventCount());
+        assertPipelineHasAsLast(pipeline, highlighter);
+    }
+    
+    private void assertPipelineHasAsLast(HighlighterPipeline pipeline, Highlighter highlighter) {
+        Highlighter[] highlighters = pipeline.getHighlighters();
+        assertTrue("pipeline must not be empty", highlighters.length > 0);
+        assertSame("highlighter must be added as last", highlighter, highlighters[highlighters.length - 1]);
+    }
+
+    /**
+     * test adding a highlighter.
+     *
+     *  asserts that a pipeline is created and set (firing a property change) and
+     *  that the pipeline contains the highlighter.
+     */
+    public void testAddHighlighterWithNullPipeline() {
+        JXTree tree = new JXTree();
+        PropertyChangeReport report = new PropertyChangeReport();
+        tree.addPropertyChangeListener(report);
+        Highlighter highlighter = new Highlighter();
+        tree.addHighlighter(highlighter);
+        assertNotNull("table must have created pipeline", tree.getHighlighters());
+        assertTrue("table must have fired propertyChange for highlighters", report.hasEvents("highlighters"));
+        assertPipelineContainsHighlighter(tree.getHighlighters(), highlighter);
+    }
+    
+    /**
+     * fails if the given highlighter is not contained in the pipeline.
+     * PRE: pipeline != null, highlighter != null.
+     * 
+     * @param pipeline
+     * @param highlighter
+     */
+    private void assertPipelineContainsHighlighter(HighlighterPipeline pipeline, Highlighter highlighter) {
+        Highlighter[] highlighters = pipeline.getHighlighters();
+        for (int i = 0; i < highlighters.length; i++) {
+            if (highlighter.equals(highlighters[i])) return;
+        }
+        fail("pipeline does not contain highlighter");
+        
+    }
+
+
+    
     /**
      * Issue #254-swingx: expandAll doesn't expand if root not shown?
      *

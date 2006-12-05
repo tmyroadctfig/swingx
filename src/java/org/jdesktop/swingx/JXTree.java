@@ -59,6 +59,7 @@ import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
+import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
 
@@ -485,11 +486,28 @@ public class JXTree extends JTree {
         return paths != null ? paths : EMPTY_TREEPATH_ARRAY; 
     }
 
+    /**
+     * Returns the HighlighterPipeline assigned to the table, null if none.
+     * 
+     * @return the HighlighterPipeline assigned to the table.
+     * @see #setHighlighters(HighlighterPipeline)
+     */
     public HighlighterPipeline getHighlighters() {
         return highlighters;
     }
 
-    /** Assigns a HighlighterPipeline to the table. */
+    /**
+     * Assigns a HighlighterPipeline to the table, maybe null to remove all
+     * Highlighters.<p>
+     * 
+     * The default value is <code>null</code>.
+     * 
+     * @param pipeline the HighlighterPipeline to use for renderer decoration. 
+     * @see #getHighlighters()
+     * @see #addHighlighter(Highlighter)
+     * @see #removeHighlighter(Highlighter)
+     * 
+     */
     public void setHighlighters(HighlighterPipeline pipeline) {
         HighlighterPipeline old = getHighlighters();
         if (old != null) {
@@ -501,6 +519,65 @@ public class JXTree extends JTree {
         }
         firePropertyChange("highlighters", old, getHighlighters());
     }
+
+    /**
+     * Sets the <code>Highlighter</code>s to the tree, replacing any old settings.
+     * Maybe null to remove all highlighters.<p>
+     * 
+     * 
+     * @param highlighters the highlighters to use for renderer decoration. 
+     * @see #getHighlighters()
+     * @see #addHighlighter(Highlighter)
+     * @see #removeHighlighter(Highlighter)
+     * 
+     */
+    public void setHighlighters(Highlighter... highlighters) {
+        HighlighterPipeline pipeline = null;
+        if ((highlighters != null) && (highlighters.length > 0) && 
+            (highlighters[0] != null)) {    
+           pipeline = new HighlighterPipeline(highlighters);
+        }
+        setHighlighters(pipeline);
+    }
+
+    /**
+     * Adds a Highlighter.
+     * <p>
+     * 
+     * If the <code>HighlighterPipeline</code> returned from getHighlighters()
+     * is null, creates and sets a new pipeline containing the given
+     * <code>Highlighter</code>. Else, appends the <code>Highlighter</code>
+     * to the end of the pipeline.
+     * 
+     * @param highlighter the <code>Highlighter</code> to add.
+     * @throws NullPointerException if <code>Highlighter</code> is null.
+     * @see #removeHighlighter(Highlighter)
+     * @see #setHighlighters(HighlighterPipeline)
+     */
+    public void addHighlighter(Highlighter highlighter) {
+        HighlighterPipeline pipeline = getHighlighters();
+        if (pipeline == null) {
+           setHighlighters(new HighlighterPipeline(new Highlighter[] {highlighter})); 
+        } else {
+            pipeline.addHighlighter(highlighter);
+        }
+    }
+
+    /**
+     * Removes the Highlighter. <p>
+     * 
+     * Does nothing if the HighlighterPipeline is null or does not contain
+     * the given Highlighter.
+     * 
+     * @param highlighter the highlighter to remove.
+     * @see #addHighlighter(Highlighter)
+     * @see #setHighlighters(HighlighterPipeline)
+     */
+    public void removeHighlighter(Highlighter highlighter) {
+        if ((getHighlighters() == null)) return;
+        getHighlighters().removeHighlighter(highlighter);
+    }
+    
 
     private ChangeListener getHighlighterChangeListener() {
         if (highlighterChangeListener == null) {

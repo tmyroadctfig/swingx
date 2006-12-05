@@ -2964,8 +2964,23 @@ public class JXTable extends JTable
         repaint();
     }
     
+    /**
+     * Sets the <code>Highlighter</code>s to the table, replacing any old settings.
+     * Maybe null to remove all highlighters.<p>
+     * 
+     * 
+     * @param highlighters the highlighters to use for renderer decoration. 
+     * @see #getHighlighters()
+     * @see #addHighlighter(Highlighter)
+     * @see #removeHighlighter(Highlighter)
+     * 
+     */
     public void setHighlighters(Highlighter... highlighters) {
-        HighlighterPipeline pipeline = new HighlighterPipeline(highlighters);
+        HighlighterPipeline pipeline = null;
+        if ((highlighters != null) && (highlighters.length > 0) && 
+            (highlighters[0] != null)) {    
+           pipeline = new HighlighterPipeline(highlighters);
+        }
         setHighlighters(pipeline);
     }
 

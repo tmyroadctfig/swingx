@@ -76,27 +76,6 @@ public class JXTableIssues extends InteractiveTestCase {
             .getName());
 
     /**
-     * Issue #??-swingx: competing setHighlighters(null) break code.
-     * 
-     * More specifically: it doesn't compile without casting the null, that's why
-     * it has to be commented here.
-     *
-     */
-//    public void testHighlightersNull() {
-//        JXTable table = new JXTable();
-//        table.setHighlighters(null);
-//    }
-
-    /**
-     * Issue #??-swingx: setHighlighters(null) throws NPE. 
-     * 
-     */
-    public void testHighlightersReset() {
-        JXTable table = new JXTable();
-        table.setHighlighters((Highlighter) null);
-    }
-    
-    /**
      * Issue #4614616: editor lookup broken for interface types.
      * With editors (vs. renderers), the solution is not obvious -
      * interfaces can't be instantiated. As a consequence, the
