@@ -6,17 +6,20 @@ package org.jdesktop.swingx.decorator;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.ActionEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JTable;
 import javax.swing.ListModel;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.JXEditorPaneTest;
@@ -25,12 +28,15 @@ import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.LinkModel;
+import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
+import org.jdesktop.test.AncientSwingTeam;
 
 
 public class HighlighterIssues extends HighlighterTest {
 
     protected Color ledger = new Color(0xF5, 0xFF, 0xF5);
+    protected boolean systemLF;
     
     public static void main(String args[]) {
 //        setSystemLF(true);
@@ -42,94 +48,155 @@ public class HighlighterIssues extends HighlighterTest {
             e.printStackTrace();
         }
     }
+    /**
+     * Issue #258-swingx: Background Highlighter must not change custom
+     * foreground.
+     * <p>
+     * 
+     * Visualizing effect of hack: table-internally, a ResetDTCRColorHighlighter
+     * tries to neutralize DefaultTableCellRenderer's color memory.
+     * 
+     * <ul>
+     * <li> a DTCR subclass with value-based custom foreground
+     * <li> the renderer is shared between a table with background highlighter
+     * (alternateRowHighlighter) and a table without highlighter
+     * <li> the custom value-based foreground must show in both
+     * (AlternateRowHighlighter overwrite both striped and unstriped back)
+     * </ul>
+     * 
+     * This behaves as expected after moving the hack to _before_ calling 
+     * super.prepareRenderer.
+     */
+    public void interactiveCustomRendererColorBasedOnValue() {
+        TableModel model = new AncientSwingTeam();
+        JXTable table = new JXTable(model);
+        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table,
+                    Object value, boolean isSelected, boolean hasFocus,
+                    int row, int column) {
+                // TODO Auto-generated method stub
+                super.getTableCellRendererComponent(table, value, isSelected,
+                        hasFocus, row, column);
+                if (!isSelected) {
+                    if (getText().contains("y")) {
+                        setForeground(Color.RED);
+                    } else {
+                        setForeground(Color.GREEN);
+                    }
+                }
+                return this;
+            }
 
+        };
+        table.addHighlighter(AlternateRowHighlighter.genericGrey);
+        table.setDefaultRenderer(Object.class, renderer);
+        JXTable nohighlight = new JXTable(model);
+        nohighlight.setDefaultRenderer(Object.class, renderer);
+        showWithScrollingInFrame(table, nohighlight,
+                "value-based fg renderer with bg highlighter <--> shared without highl");
+    }
+    
+
+    /**
+     * Issue #258-swingx: Background Highlighter must not change custom
+     * foreground.
+     * <p>
+     * 
+     * Visualizing effect of hack: table-internally, a ResetDTCRColorHighlighter
+     * tries to neutralize DefaultTableCellRenderer's color memory.
+     * 
+     * <ul>
+     * <li> a DTCR with custom foreground and custom background
+     * <li> the renderer is shared between a table with background highlighter
+     * (alternateRowHighlighter) and a table without highlighter
+     * <li> the custom foreground must show in both
+     * <li> the custom background must show in the table without highlighter
+     * <li> the custom background must not show in the table with highlighter
+     * (AlternateRowHighlighter overwrite both striped and unstriped back)
+     * </ul>
+     * 
+     */
+    public void interactiveCustomRendererColor() {
+        TableModel model = new AncientSwingTeam();
+        JXTable table = new JXTable(model);
+        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
+        renderer.setForeground(foreground);
+        renderer.setBackground(background);
+        table.addHighlighter(AlternateRowHighlighter.genericGrey);
+        table.setDefaultRenderer(Object.class, renderer);
+        JXTable nohighlight = new JXTable(model);
+        nohighlight.setDefaultRenderer(Object.class, renderer);
+        showWithScrollingInFrame(table, nohighlight,
+                "custom colored renderer with bg highlighter <--> shared without highl");
+    }
+    
     
     /**
-     * AlternateRowHighlighter and background.
+     * UIHighlighter: check if highlighter is updated when toggling LF.
      */
     public void interactiveUITableWithAlternateRow() {
-        final UIAlternateRowHighlighter highlighter = new UIAlternateRowHighlighter();
-        JXTable table = new JXTable(10, 2) {
-
-            @Override
-            public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
-                Component comp = super.prepareRenderer(renderer, row, column);
-                ComponentAdapter componentAdapter = getComponentAdapter();
-                componentAdapter.row = row;
-                componentAdapter.column = column;
-                return highlighter.highlight(comp, componentAdapter);
-            }
-
-            @Override
-            public void updateUI() {
-                super.updateUI();
-                highlighter.updateUI();
-                repaint();
-            }
-            
-            
-            
-        };
+        JXTable table = new JXTable(10, 2);
         table.setBackground(ledger);
+        table.addHighlighter(new UIAlternateRowHighlighter());
         JXTable nohighlight = new JXTable(10, 2);
         nohighlight.setBackground(ledger);
-        JXFrame frame = wrapWithScrollingInFrame(table, nohighlight, "colored table with alternate highlighter");
+        final JXFrame frame = wrapWithScrollingInFrame(table, nohighlight, "colored table with ui highlighter <--> without highlighter");
+        Action action = new AbstractActionExt("toggle LF") {
+
+            public void actionPerformed(ActionEvent e) {
+                systemLF = !systemLF;
+                setSystemLF(systemLF);
+                SwingUtilities.updateComponentTreeUI(frame);
+                
+            }
+            
+        };
+        addAction(frame, action);
         frame.setVisible(true);
     }
 
     /**
-     * AlternateRowHighlighter and background.
+     * Effect of background highlighters on table with custom background.
+     * 
      */
     public void interactiveColoredTableWithAlternateRow() {
-        JXTable table = new JXTable(10, 2) {
-
-            @Override
-            public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
-                Component comp = super.prepareRenderer(renderer, row, column);
-                ComponentAdapter componentAdapter = getComponentAdapter();
-                componentAdapter.row = row;
-                componentAdapter.column = column;
-                return AlternateRowHighlighter.genericGrey.highlight(comp, componentAdapter);
-            }
-            
-        };
+        JXTable table = new JXTable(10, 2);
         table.setBackground(ledger);
+        table.addHighlighter(AlternateRowHighlighter.genericGrey);
         JXTable nohighlight = new JXTable(10, 2);
         nohighlight.setBackground(ledger);
-        JXFrame frame = wrapWithScrollingInFrame(table, nohighlight, "colored table with alternate highlighter");
+        JXFrame frame = wrapWithScrollingInFrame(table, nohighlight, "colored table with bg highlighter <--> without highlighter");
         frame.setVisible(true);
     }
     
     /**
-     * Issue #178-swingx: Highlighters always change the selection color.
+     * Effect of background highlighters on list with custom background.
+     * 
      */
     public void interactiveColoredListWithAlternateRow() {
         JXList list = new JXList(createListModel());
         list.setBackground(ledger);
-        HighlighterPipeline pipeline = new HighlighterPipeline();
-        pipeline.addHighlighter(AlternateRowHighlighter.genericGrey);
-        list.setHighlighters(pipeline);
+        list.addHighlighter(AlternateRowHighlighter.genericGrey);
         JXList nohighlight = new JXList(createListModel());
         nohighlight.setBackground(ledger);
-        JXFrame frame = wrapWithScrollingInFrame(list, nohighlight, "colored list with alternate highlighter");
-        frame.setVisible(true);
-        
+        showWithScrollingInFrame(list, nohighlight, "colored list with bg highlighter <--> without highlighter");
     }
 
     /**
-     * Issue #178-swingx: Highlighters always change the selection color.
+     * 
+     * Effect of background highlighters on tree with custom background. Note:
+     * background highlighters don't work at all with DefaultTreeCellRenderers.
      */
     public void interactiveColoredTreeWithAlternateRow() {
-        JXTree nohighlight = new JXTree();
-        nohighlight.setBackground(ledger);
-        JXTree list = new JXTree();
+        JXTree nohighlightTree = new JXTree();
+        nohighlightTree.setBackground(ledger);
+        JXTree tree = new JXTree();
         HighlighterPipeline pipeline = new HighlighterPipeline();
         pipeline.addHighlighter(AlternateRowHighlighter.genericGrey);
-        list.setHighlighters(pipeline);
-        list.setBackground(ledger);
-        JXFrame frame = wrapWithScrollingInFrame(list, nohighlight, "colored tree with alternate highlighter");
-        frame.setVisible(true);
-        
+        tree.setHighlighters(pipeline);
+        tree.setBackground(ledger);
+        showWithScrollingInFrame(tree, nohighlightTree, "colored tree with bg highlighter <--> without highlighter");
     }
     
     /**
@@ -149,27 +216,17 @@ public class HighlighterIssues extends HighlighterTest {
 
     /**
      * Issue #178-swingx: Highlighters always change the selection color.
+     * 
      */
     public void interactiveTableUnSelectedDoNothingHighlighter() {
-        TableModel model = createTableModelWithLinks();
-        JXTable table = new JXTable(model) {
-
-            @Override
-            public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
-                Component comp = super.prepareRenderer(renderer, row, column);
-                ComponentAdapter componentAdapter = getComponentAdapter();
-                componentAdapter.row = row;
-                componentAdapter.column = column;
-                return emptyHighlighter.highlight(comp, componentAdapter);
-            }
-            
-        };
+        TableModel model = new AncientSwingTeam();
+        JXTable table = new JXTable(model);
         DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
         renderer.setForeground(foreground);
-        JXFrame frame = wrapWithScrollingInFrame(table,  
-                "table colored renderer with empty highlighter");
-        frame.setVisible(true);
-        
+        table.addHighlighter(emptyHighlighter);
+        table.setDefaultRenderer(Object.class, renderer);
+        showWithScrollingInFrame(table,  
+                "foreground colored renderer with empty highlighter");
     }
 
     private TableModel createTableModelWithLinks() {
@@ -206,48 +263,35 @@ public class HighlighterIssues extends HighlighterTest {
     
     /**
      * Issue #178-swingx: Highlighters always change the selection color.
+     * Compare table with empty highlighter to table without highlighter.
      */
     public void interactiveTableWithDoNothingHighlighter() {
-        JXTable table = new JXTable(10, 2) {
-
-            @Override
-            public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
-                Component comp = super.prepareRenderer(renderer, row, column);
-                ComponentAdapter componentAdapter = getComponentAdapter();
-                componentAdapter.row = row;
-                componentAdapter.column = column;
-                return emptyHighlighter.highlight(comp, componentAdapter);
-            }
-            
-        };
-        JXFrame frame = wrapWithScrollingInFrame(table, new JXTable(10, 2), "table with empty highlighter");
-        frame.setVisible(true);
+        JXTable table = new JXTable(10, 2);
+        table.addHighlighter(emptyHighlighter);
+        showWithScrollingInFrame(table, new JXTable(10, 2), "empty highlighter <--> no highlighter");
         
     }
     
     /**
      * Issue #178-swingx: Highlighters always change the selection color.
+     * Compare list with empty highlighter to list without highlighter.
      */
     public void interactiveListWithDoNothingHighlighter() {
         JXList list = new JXList(createListModel());
-        HighlighterPipeline pipeline = new HighlighterPipeline();
-        pipeline.addHighlighter(emptyHighlighter);
-        list.setHighlighters(pipeline);
-        JXFrame frame = wrapWithScrollingInFrame(list, new JXList(createListModel()), "list with empty highlighter");
-        frame.setVisible(true);
-        
+        list.addHighlighter(emptyHighlighter);
+        showWithScrollingInFrame(list, new JXList(createListModel()), "empty highlighter <--> no highlighter");
     }
 
     /**
      * Issue #178-swingx: Highlighters always change the selection color.
+     * Compare tree with empty highlighter to tree without highlighter.
      */
     public void interactiveTreeWithDoNothingHighlighter() {
-        JXTree list = new JXTree();
+        JXTree tree = new JXTree();
         HighlighterPipeline pipeline = new HighlighterPipeline();
         pipeline.addHighlighter(emptyHighlighter);
-        list.setHighlighters(pipeline);
-        JXFrame frame = wrapWithScrollingInFrame(list, new JXTree(), "list with empty highlighter");
-        frame.setVisible(true);
+        tree.setHighlighters(pipeline);
+        showWithScrollingInFrame(tree, new JXTree(), "empty highlighter <--> no highlighter");
         
     }
     
@@ -255,6 +299,8 @@ public class HighlighterIssues extends HighlighterTest {
 
     /**
      * Issue #178-swingx: Highlighters always change the selection color.
+     * 
+     * All three labels must have same background and foreground.
      */
     public void interactiveDoNothingHighlighter() {
         JComponent box = Box.createVerticalBox();
