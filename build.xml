@@ -92,13 +92,13 @@
         <jar basedir="${build.dir}/swingx-bean" jarfile="dist/swingx-bean.jar" />
     </target>
     
-    <target name="test" depends="jar">
-        <property environment="env" />
-        <echo message="${env.BUILD_NUMBER}"/>
-        <echo message="${env.BUILD_ID}"/>
-        <echo message="${env.JOB_NAME}"/>
-        <echo message="${env.BUILD_TAG}"/>
-        <echo message="${env.EXECUTOR_NUMBER}"/>
+    <target name="weekly-build" depends="jar,javadoc">
+        <!-- test calling the deploy xml file -->
+        <ant antfile="/hudson/deploy.xml" target="deploy-artifacts" >
+            <property name="project.name" value="swingx" />
+            <property name="bundle.dir" value="${dist.dir}/bundles" />
+            <property name="javadoc.dir" value="${dist.dir}/javadoc" />
+        </ant>
     </target>
     
     <!-- This target builds a "binary" release of the project. The resulting
