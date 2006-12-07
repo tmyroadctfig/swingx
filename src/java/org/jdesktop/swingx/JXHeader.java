@@ -21,17 +21,8 @@
 
 package org.jdesktop.swingx;
 
-import java.awt.Color;
 import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
 import org.jdesktop.swingx.plaf.HeaderUI;
 import org.jdesktop.swingx.plaf.JXHeaderAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
