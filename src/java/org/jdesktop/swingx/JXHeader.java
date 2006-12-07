@@ -96,12 +96,24 @@ public class JXHeader extends JXPanel {
     public JXHeader() {
     }
     
-    /** Creates a new instance of JXHeader */
+    /** 
+     * Creates a new instance of JXHeader. PropertyChangeEvents are fired
+     * when the title and description properties are set.
+     * 
+     * @param title specifies the title property for this JXHeader
+     * @param description specifies the description property for this JXHeader
+     */
     public JXHeader(String title, String description) {
         this(title, description, null);
     }
     
-    /** Creates a new instance of JXHeader */
+    /** Creates a new instance of JXHeader. PropertyChangeEvents are fired
+     * when the title and description properties are set.
+     * 
+     * @param title specifies the title property for this JXHeader
+     * @param description specifies the description property for this JXHeader
+     * @param icon specifies the icon property for this JXHeader
+     */
     public JXHeader(String title, String description, Icon icon) {
         setTitle(title);
         setDescription(description);
