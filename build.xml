@@ -93,13 +93,20 @@
     </target>
     
     <target name="weekly-build" depends="jar,javadoc">
+        <mkdir dir="${dist.dir}/bundles" />
+        <copy todir="${dist.dir}/bundles">
+            <fileset dir="${dist.dir}">
+                <include name="swingx.jar" />
+            </fileset>
+        </copy>
+        
         <!-- test calling the deploy xml file -->
         <ant antfile="/hudson/deploy.xml" target="deploy-artifacts" >
             <property name="project.name" value="swingx" />
             <property name="bundle.dir" value="${dist.dir}/bundles" />
             <property name="javadoc.dir" value="${dist.dir}/javadoc" />
         </ant>
-    </target>
+    </target>    
     
     <!-- This target builds a "binary" release of the project. The resulting
          zip file will be named something appropriately. It's contents will be:
