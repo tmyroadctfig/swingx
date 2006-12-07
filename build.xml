@@ -92,6 +92,15 @@
         <jar basedir="${build.dir}/swingx-bean" jarfile="dist/swingx-bean.jar" />
     </target>
     
+    <target name="test" depends="jar">
+        <property environment="env" />
+        <echo message="${env.BUILD_NUMBER}"/>
+        <echo message="${env.BUILD_ID}"/>
+        <echo message="${env.JOB_NAME}"/>
+        <echo message="${env.BUILD_TAG}"/>
+        <echo message="${env.EXECUTOR_NUMBER}"/>
+    </target>
+    
     <!-- This target builds a "binary" release of the project. The resulting
          zip file will be named something appropriately. It's contents will be:
          
@@ -194,12 +203,12 @@
         <property name="javadoc.core.linkexternal" value="http://java.sun.com/j2se/1.5.0/docs/api/"/>
         <property name="javadoc.core.packagelist" value=""/>
         <property name="javadoc.verbose" value="false"/>
-
+        
         <echo>Using custom javadoc target:
-core src: ${javadoc.core.src}
-core external: ${javadoc.core.linkexternal}
-core packagelist: ${javadoc.core.packagelist}
-</echo>
+            core src: ${javadoc.core.src}
+            core external: ${javadoc.core.linkexternal}
+            core packagelist: ${javadoc.core.packagelist}
+        </echo>
         <mkdir dir="${dist.javadoc.dir}"/>
         <javadoc destdir="${dist.javadoc.dir}"
                  source="${javac.source}"
@@ -225,6 +234,6 @@ core packagelist: ${javadoc.core.packagelist}
             </sourcepath>
             <packageset dir="${src.beaninfo.dir}" includes="*/**"/>
             <packageset dir="${java.dir}" includes="*/**"/>
-       </javadoc>
-   </target>
+        </javadoc>
+    </target>
 </project>
