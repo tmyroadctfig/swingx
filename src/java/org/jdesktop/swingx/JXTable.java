@@ -3157,7 +3157,6 @@ public class JXTable extends JTable
      * @see #resetDefaultTableCellRendererColors(TableCellRenderer, int, int)
      * @see org.jdesktop.swingx.decorator.ResetDTCRColorHighlighter
      * 
-     * @deprecated no longer used
      */
     protected void resetDefaultTableCellRendererColors(Component renderer, int row, int column) {
         ComponentAdapter adapter = getComponentAdapter(row, column);
@@ -3233,33 +3232,52 @@ public class JXTable extends JTable
      */
     @Override
     protected void createDefaultRenderers() {
-//         super.createDefaultRenderers();
+        // super.createDefaultRenderers();
         // This duplicates JTable's functionality in order to make the renderers
         // available in getNewDefaultRenderer(); If JTable's renderers either
         // were public, or it provided a factory for *new* renderers, this would
         // not be needed
-        
-        // hack around #6345050 - new UIDefaults() 
+
+        // hack around #6345050 - new UIDefaults()
         // is created with a huge initialCapacity
-        // giving a dummy key/value array as parameter reduces that capacity 
+        // giving a dummy key/value array as parameter reduces that capacity
         // to length/2.
-        Object[] dummies = new Object[] {
-              1, 0,
-              2, 0,
-              3, 0,
-              4, 0,
-              5, 0,
-              6, 0,
-              7, 0,
-              8, 0,
-              9, 0,
-              10, 0,
-              
-        };
+        Object[] dummies = new Object[] { 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0,
+                7, 0, 8, 0, 9, 0, 10, 0, };
         defaultRenderersByColumnClass = new UIDefaults(dummies);
         defaultRenderersByColumnClass.clear();
 
-//        defaultRenderersByColumnClass = new UIDefaults();
+        // extended renderers
+
+//        // Objects
+//        setLazyRenderer(Object.class,
+//                "org.jdesktop.swingx.renderer.DefaultTableCellRendererExt");
+//
+//        // Numbers
+//        setLazyRenderer(Number.class,
+//                "org.jdesktop.swingx.renderer.NumberRendererExt");
+//
+//        // Doubles and Floats
+//        setLazyRenderer(Float.class,
+//                "org.jdesktop.swingx.renderer.DoubleRendererExt");
+//        setLazyRenderer(Double.class,
+//                "org.jdesktop.swingx.renderer.DoubleRendererExt");
+//
+//        // Dates
+//        setLazyRenderer(Date.class,
+//                "org.jdesktop.swingx.renderer.DateRendererExt");
+//
+//        // Icons and ImageIcons
+//        setLazyRenderer(Icon.class,
+//                "org.jdesktop.swingx.renderer.IconRendererExt");
+//        setLazyRenderer(ImageIcon.class,
+//                "org.jdesktop.swingx.renderer.IconRendererExt");
+//
+//        // Booleans
+//        setLazyRenderer(Boolean.class,
+//                "org.jdesktop.swingx.renderer.BooleanRendererExt");
+
+        // standard renderers
         // Objects
         setLazyRenderer(Object.class,
                 "javax.swing.table.DefaultTableCellRenderer");
