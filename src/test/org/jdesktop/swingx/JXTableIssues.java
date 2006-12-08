@@ -596,8 +596,8 @@ public class JXTableIssues extends InteractiveTestCase {
         final DefaultTableModel model = createAscendingModel(0, 10, 5, false);
         JXTable xtable = new JXTable(model);
         xtable.setRowSelectionInterval(0, 0);
-        JTable table = new JTable(model);
-        table.setRowSelectionInterval(0, 0);
+//        JTable table = new JTable(model);
+//        table.setRowSelectionInterval(0, 0);
         AbstractAction action = new AbstractAction("fire dataChanged") {
 
             public void actionPerformed(ActionEvent e) {
@@ -606,7 +606,8 @@ public class JXTableIssues extends InteractiveTestCase {
             }
             
         };
-        JXFrame frame = wrapWithScrollingInFrame(xtable, table, "selection after data changed");
+//        JXFrame frame = wrapWithScrollingInFrame(xtable, table, "selection after data changed");
+        JXFrame frame = wrapWithScrollingInFrame(xtable, "selection after data changed");
         addAction(frame, action);
         frame.setVisible(true);
         
@@ -753,7 +754,7 @@ public class JXTableIssues extends InteractiveTestCase {
 //          test.runInteractiveTests();
          //   test.runInteractiveTests("interactive.*Siz.*");
          //   test.runInteractiveTests("interactive.*Render.*");
-            test.runInteractiveTests("interactive.*Float.*");
+            test.runInteractiveTests(".*DataChanged.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();

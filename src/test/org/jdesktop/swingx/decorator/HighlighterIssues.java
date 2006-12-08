@@ -30,6 +30,7 @@ import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.LinkModel;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
+import org.jdesktop.swingx.renderer.DefaultTableCellRendererExt;
 import org.jdesktop.test.AncientSwingTeam;
 
 
@@ -42,7 +43,7 @@ public class HighlighterIssues extends HighlighterTest {
 //        setSystemLF(true);
         HighlighterIssues test = new HighlighterIssues();
         try {
-           test.runInteractiveTests();
+           test.runInteractiveTests(".*Table.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -67,7 +68,7 @@ public class HighlighterIssues extends HighlighterTest {
      * This behaves as expected after moving the hack to _before_ calling 
      * super.prepareRenderer.
      */
-    public void interactiveCustomRendererColorBasedOnValue() {
+    public void interactiveTableCustomCoreRendererColorBasedOnValue() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
         DefaultTableCellRenderer renderer = new DefaultTableCellRenderer() {
@@ -94,10 +95,45 @@ public class HighlighterIssues extends HighlighterTest {
         JXTable nohighlight = new JXTable(model);
         nohighlight.setDefaultRenderer(Object.class, renderer);
         showWithScrollingInFrame(table, nohighlight,
-                "value-based fg renderer with bg highlighter <--> shared without highl");
+                "core - value-based fg renderer with bg highlighter <--> shared without highl");
     }
     
 
+    /**
+     * Issue #258-swingx: Background Highlighter must not change custom
+     * foreground.
+     * <p>
+     * 
+     * Use SwingX's extended default renderer.
+     */
+    public void interactiveTableCustomRendererColorBasedOnValue() {
+        TableModel model = new AncientSwingTeam();
+        JXTable table = new JXTable(model);
+        DefaultTableCellRendererExt<JLabel> renderer = new DefaultTableCellRendererExt<JLabel>() {
+
+            @Override
+            protected void configureSelectionDependentColors(JTable table, boolean isSelected) {
+                super.configureSelectionDependentColors(table, isSelected);
+                if (!isSelected) {
+                    if (rendererLabel.getText().contains("y")) {
+                        rendererLabel.setForeground(Color.RED);
+                    } else {
+                        rendererLabel.setForeground(Color.GREEN);
+                    }
+                }
+            }
+
+         
+
+        };
+        table.addHighlighter(AlternateRowHighlighter.genericGrey);
+        table.setDefaultRenderer(Object.class, renderer);
+        JXTable nohighlight = new JXTable(model);
+        nohighlight.setDefaultRenderer(Object.class, renderer);
+        showWithScrollingInFrame(table, nohighlight,
+                "ext: value-based fg renderer with bg highlighter <--> shared without highl");
+    }
+    
     /**
      * Issue #258-swingx: Background Highlighter must not change custom
      * foreground.
@@ -117,7 +153,7 @@ public class HighlighterIssues extends HighlighterTest {
      * </ul>
      * 
      */
-    public void interactiveCustomRendererColor() {
+    public void interactiveTableCustomCoreRendererColor() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
         DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
@@ -128,7 +164,60 @@ public class HighlighterIssues extends HighlighterTest {
         JXTable nohighlight = new JXTable(model);
         nohighlight.setDefaultRenderer(Object.class, renderer);
         showWithScrollingInFrame(table, nohighlight,
-                "custom colored renderer with bg highlighter <--> shared without highl");
+                "core: custom colored renderer with bg highlighter <--> shared without highl");
+    }
+    
+    
+    /**
+     * Issue #258-swingx: Background Highlighter must not change custom
+     * foreground.
+     * <p>
+     * 
+     * Visualizing effect of hack: table-internally, a ResetDTCRColorHighlighter
+     * tries to neutralize DefaultTableCellRenderer's color memory.
+     * 
+     * Problem: if pre-hack-highlighting and selected on first rendering,
+     * the renderer always uses the selection color. Bug in hacking highlighter?
+     * Not much it can do about it: the hacking does not store the color if
+     * the adapter isSelected - so in the next round the previously configured
+     * color - which was for selected state - is stored as to color to restore to.
+     * <p>
+     * Arrggghhh...
+     * 
+     */
+    public void interactiveTableCoreRendererFirstSelected() {
+        TableModel model = new AncientSwingTeam();
+        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
+//        JXTable table = new JXTable(model);
+//        table.addHighlighter(AlternateRowHighlighter.genericGrey);
+//        table.setDefaultRenderer(Object.class, renderer);
+        JXTable nohighlight = new JXTable(model);
+        nohighlight.setDefaultRenderer(Object.class, renderer);
+        nohighlight.setRowSelectionInterval(0, 0);
+//        showWithScrollingInFrame(table, nohighlight,
+        showWithScrollingInFrame(nohighlight,
+                "core: very first match is against selected");
+    }
+    
+    /**
+     * Issue #258-swingx: Background Highlighter must not change custom
+     * foreground.
+     * <p>
+     * 
+     * Use SwingX extended default renderer.
+     */
+    public void interactiveTableCustomRendererColor() {
+        TableModel model = new AncientSwingTeam();
+        JXTable table = new JXTable(model);
+        DefaultTableCellRendererExt renderer = new DefaultTableCellRendererExt();
+        renderer.setForeground(foreground);
+        renderer.setBackground(background);
+        table.addHighlighter(AlternateRowHighlighter.genericGrey);
+        table.setDefaultRenderer(Object.class, renderer);
+        JXTable nohighlight = new JXTable(model);
+        nohighlight.setDefaultRenderer(Object.class, renderer);
+        showWithScrollingInFrame(table, nohighlight,
+                "ext: custom colored renderer with bg highlighter <--> shared without highl");
     }
     
     
