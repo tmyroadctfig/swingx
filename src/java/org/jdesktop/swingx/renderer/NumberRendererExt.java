@@ -24,17 +24,17 @@ package org.jdesktop.swingx.renderer;
 import javax.swing.JLabel;
 
 /**
- * TODO add type doc
+ * Default table renderer for Numbers.
  * 
  * @author Jeanette Winzenburg
  */
-public class NumberRendererExt<T extends JLabel> extends DefaultTableCellRendererExt<T> {
+public class NumberRendererExt extends DefaultTableCellRendererExt {
 
     public NumberRendererExt() {
         super();
         // JW: RIGHT is the correct thing to do for bidi-compliance
         // numbers are right aligned even if text is LToR
-        rendererLabel.setHorizontalAlignment(JLabel.RIGHT);
+        rendererComponent.setHorizontalAlignment(JLabel.RIGHT);
     }
 
 }

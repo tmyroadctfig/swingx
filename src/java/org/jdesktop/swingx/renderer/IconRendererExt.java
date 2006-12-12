@@ -29,16 +29,16 @@ import javax.swing.JLabel;
  * 
  * @author Jeanette Winzenburg
  */
-public class IconRendererExt<T extends JLabel> extends DefaultTableCellRendererExt<T> {
+public class IconRendererExt extends DefaultTableCellRendererExt {
     
     public IconRendererExt() {
         super();
-        rendererLabel.setHorizontalAlignment(JLabel.CENTER);
+        rendererComponent.setHorizontalAlignment(JLabel.CENTER);
     }
 
     @Override
     public void setValue(Object value) {
-        rendererLabel.setIcon((value instanceof Icon) ? (Icon) value : null);
+        rendererComponent.setIcon((value instanceof Icon) ? (Icon) value : null);
     }
 
 }

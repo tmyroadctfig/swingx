@@ -34,7 +34,8 @@ import javax.swing.table.TableCellRenderer;
 import org.jdesktop.swingx.InteractiveTestCase;
 
 /**
- * TODO add type doc
+ * Tests behaviour of SwingX renderers. Currently: mostly characterization to
+ * guarantee that they behave similar to the standard.
  * 
  * @author Jeanette Winzenburg
  */
@@ -67,7 +68,7 @@ public class RendererTest extends InteractiveTestCase {
         // sanity
         assertFalse(new JLabel().isOpaque());
         assertTrue(coreRenderer.isOpaque());
-        assertTrue(xRenderer.rendererLabel.isOpaque());
+        assertTrue(xRenderer.rendererComponent.isOpaque());
     }
     
     /**

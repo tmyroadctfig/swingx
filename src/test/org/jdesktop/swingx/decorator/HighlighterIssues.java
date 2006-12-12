@@ -30,6 +30,7 @@ import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.LinkModel;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
+import org.jdesktop.swingx.renderer.CellContext;
 import org.jdesktop.swingx.renderer.DefaultTableCellRendererExt;
 import org.jdesktop.test.AncientSwingTeam;
 
@@ -109,16 +110,16 @@ public class HighlighterIssues extends HighlighterTest {
     public void interactiveTableCustomRendererColorBasedOnValue() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
-        DefaultTableCellRendererExt<JLabel> renderer = new DefaultTableCellRendererExt<JLabel>() {
+        DefaultTableCellRendererExt renderer = new DefaultTableCellRendererExt() {
 
             @Override
-            protected void configureSelectionDependentColors(JTable table, boolean isSelected) {
-                super.configureSelectionDependentColors(table, isSelected);
-                if (!isSelected) {
-                    if (rendererLabel.getText().contains("y")) {
-                        rendererLabel.setForeground(Color.RED);
+            protected void configureSelectionDependentColors(CellContext<JTable> context) {
+                super.configureSelectionDependentColors(context);
+                if (!context.isSelected()) {
+                    if (rendererComponent.getText().contains("y")) {
+                        rendererComponent.setForeground(Color.RED);
                     } else {
-                        rendererLabel.setForeground(Color.GREEN);
+                        rendererComponent.setForeground(Color.GREEN);
                     }
                 }
             }

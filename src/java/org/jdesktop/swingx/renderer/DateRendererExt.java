@@ -30,7 +30,7 @@ import javax.swing.JLabel;
  * 
  * @author Jeanette Winzenburg
  */
-public class DateRendererExt<T extends JLabel> extends DefaultTableCellRendererExt<T> {
+public class DateRendererExt extends DefaultTableCellRendererExt {
     private final DateFormat formatter;
 
     public DateRendererExt() {
@@ -46,7 +46,7 @@ public class DateRendererExt<T extends JLabel> extends DefaultTableCellRendererE
 
     @Override
     public void setValue(Object value) {
-        rendererLabel.setText((value == null) ? "" : formatter.format(value));
+        rendererComponent.setText((value == null) ? "" : formatter.format(value));
     }
 
 }

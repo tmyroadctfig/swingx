@@ -30,7 +30,7 @@ import javax.swing.JLabel;
  * 
  * @author Jeanette Winzenburg
  */
-public class DoubleRendererExt<T extends JLabel> extends NumberRendererExt<T> {
+public class DoubleRendererExt extends NumberRendererExt {
     private final NumberFormat formatter;
 
     public DoubleRendererExt() {
@@ -46,7 +46,7 @@ public class DoubleRendererExt<T extends JLabel> extends NumberRendererExt<T> {
 
     @Override
     public void setValue(Object value) {
-        rendererLabel.setText((value == null) ? "" : formatter.format(value));
+        rendererComponent.setText((value == null) ? "" : formatter.format(value));
     }
 
 }

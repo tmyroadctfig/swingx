@@ -31,24 +31,34 @@ import javax.swing.JLabel;
  * 
  * @author Jeanette Winzenburg
  */
-public class BooleanRendererExt<T extends AbstractButton> extends AbstractTableCellRendererExt<T> {
+public class BooleanRendererExt extends AbstractTableCellRendererExt<AbstractButton> {
 
+    
     @Override
-    protected T createRendererComponent() {
+    protected AbstractButton createRendererComponent() {
         JCheckBox box = new JCheckBox();
         box.setHorizontalAlignment(JLabel.CENTER);
         box.setBorderPainted(true);
-        return (T) box;
+        return  box;
     }
+
+    
 
     @Override
     protected void setValue(Object value) {
         boolean selected = Boolean.TRUE.equals(value);
-        rendererLabel.setSelected(selected);
+        rendererComponent.setSelected(selected);
         
     }
 //
 //    protected JCheckBox getRendererBox() {
 //        return (JCheckBox) rendererLabel;
 //    }
+
+//    @Override
+//    protected JComponent createRendererComponent() {
+//        // TODO Auto-generated method stub
+//        return new JCheckBox;
+//    }
+
 }

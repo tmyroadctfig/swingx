@@ -52,10 +52,10 @@ public class JXHyperlinkTest extends InteractiveTestCase {
 //      setSystemLF(true);
       JXHyperlinkTest test = new JXHyperlinkTest();
       try {
-//          test.runInteractiveTests();
+          test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*Table.*");
 //          test.runInteractiveTests("interactive.*List.*");
-          test.runInteractiveTests("interactive.*Tree.*");
+//          test.runInteractiveTests("interactive.*Tree.*");
 //          test.runInteractiveTests("interactive.*Simple.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
@@ -257,8 +257,8 @@ public class JXHyperlinkTest extends InteractiveTestCase {
         EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
         LinkModel link = new LinkModel("Click me!", null, JXEditorPaneTest.class.getResource("resources/test.html"));
 
-        LinkModelAction linkAction = new LinkModelAction<LinkModel>(link);
-        linkAction.setVisitingDelegate(visitor);
+        LinkModelAction linkAction = new LinkModelAction<LinkModel>(link, visitor);
+//        linkAction.setVisitingDelegate(visitor);
         JXHyperlink hyperlink = new JXHyperlink(linkAction);
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(new JScrollPane(visitor.getOutputComponent()));

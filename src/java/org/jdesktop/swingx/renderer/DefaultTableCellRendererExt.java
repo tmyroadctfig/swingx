@@ -30,16 +30,18 @@ import javax.swing.JLabel;
  * 
  * @author Jeanette Winzenburg
  */
-public class DefaultTableCellRendererExt<T extends JLabel> extends AbstractTableCellRendererExt<T> {
+public class DefaultTableCellRendererExt extends AbstractTableCellRendererExt<JLabel> {
 
-    @Override
-    protected T createRendererComponent() {
-        return (T) new JXRendererLabel();
-    }
 
     @Override
     protected void setValue(Object value) {
-        rendererLabel.setText((value == null) ? "" : value.toString());
+        rendererComponent.setText((value == null) ? "" : value.toString());
+    }
+
+    @Override
+    protected JLabel createRendererComponent() {
+        // TODO Auto-generated method stub
+        return new JXRendererLabel();
     }
 
 //    protected T getRendererLabel() {
