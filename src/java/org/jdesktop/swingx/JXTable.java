@@ -3100,12 +3100,12 @@ public class JXTable extends JTable
     public Component prepareRenderer(TableCellRenderer renderer, int row,
             int column) {
         // #258-swingx: hacking around DefaultTableCellRenderer color memory.
-        resetDefaultTableCellRendererColors(renderer, row, column);
+//        resetDefaultTableCellRendererColors(renderer, row, column);
         Component stamp = super.prepareRenderer(renderer, row, column);
         // #145-swingx: default renderers don't respect componentOrientation.
         adjustComponentOrientation(stamp);
         // #258-swingx: hacking around DefaultTableCellRenderer color memory.
-//        resetDefaultTableCellRendererColors(stamp, row, column);
+        resetDefaultTableCellRendererColors(stamp, row, column);
         if (highlighters == null) {
             return stamp; // no need to decorate renderer with highlighters
         } else {
