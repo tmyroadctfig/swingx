@@ -22,6 +22,7 @@
 package org.jdesktop.swingx.renderer;
 
 import javax.swing.JLabel;
+import javax.swing.JTable;
 
 /**
  * Default implementation of AbstractTableCellRendererExt. Uses 
@@ -32,18 +33,25 @@ import javax.swing.JLabel;
 public class DefaultTableCellRendererExt extends AbstractTableCellRendererExt<JLabel> {
 
 
-    @Override
-    protected void setValue(Object value) {
-        rendererComponent.setText((value == null) ? "" : value.toString());
-    }
-
+    /**
+     * {@inheritDoc}<p>
+     * Here: returns a performance-optimized JXRendererLabel as rendering component.
+     */
     @Override
     protected JLabel createRendererComponent() {
-        // TODO Auto-generated method stub
-        return new JXRendererLabel();
+        return new RendererLabel();
     }
 
-//    protected T getRendererLabel() {
-//        return  rendererLabel;
-//    }
+    /**
+     * {@inheritDoc} <p>
+     * Here: set's the rendering label's text property to the standard 
+     * string representation.
+     * 
+     * @see #getStringValue(CellContext)
+     */
+    @Override
+    protected void configureContent(CellContext<JTable> context) {
+        rendererComponent.setText(getStringValue(context));
+    }
+
 }

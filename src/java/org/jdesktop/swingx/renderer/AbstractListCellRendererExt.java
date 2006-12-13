@@ -57,7 +57,7 @@ import javax.swing.ListCellRenderer;
  * @author Philip Milne 
  * @author Jeanette Winzenburg
  * 
- * @see JXRendererLabel
+ * @see RendererLabel
  * @see JTable
  * 
  */

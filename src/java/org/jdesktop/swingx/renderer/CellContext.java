@@ -24,7 +24,6 @@ package org.jdesktop.swingx.renderer;
 import java.awt.Color;
 
 import javax.swing.JComponent;
-import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 

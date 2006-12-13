@@ -23,10 +23,12 @@ package org.jdesktop.swingx.renderer;
 
 import java.text.DateFormat;
 
-import javax.swing.JLabel;
+import javax.swing.JTable;
 
 /**
- * TODO add type doc
+ * Implementation of AbstractTableCellRendererExt for Date values. Uses 
+ * a performance-optimized JXRendererLabel for renderering. Formats the
+ * Date to a Formatter.
  * 
  * @author Jeanette Winzenburg
  */
@@ -44,9 +46,18 @@ public class DateRendererExt extends DefaultTableCellRendererExt {
         this.formatter = formatter;
     }
 
+    /**
+     * {@inheritDoc} <p>
+     * Here: returns the string representation as formatted by the renderer's
+     * dateFormatter.<p>
+     * 
+     * PENDING: think about moving up in the hierarchy?
+     * 
+     */
     @Override
-    public void setValue(Object value) {
-        rendererComponent.setText((value == null) ? "" : formatter.format(value));
+    protected String getStringValue(CellContext<JTable> context) {
+        return context.getValue() != null ? formatter.format(context.getValue()) : "";
     }
+
 
 }

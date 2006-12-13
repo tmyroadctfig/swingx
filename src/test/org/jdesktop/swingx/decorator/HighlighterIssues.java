@@ -117,7 +117,7 @@ public class HighlighterIssues extends HighlighterTest {
             protected void configureColors(CellContext<JTable> context) {
                 super.configureColors(context);
                 if (!context.isSelected()) {
-                    if (rendererComponent.getText().contains("y")) {
+                    if (getStringValue(context).contains("y")) {
                         rendererComponent.setForeground(Color.RED);
                     } else {
                         rendererComponent.setForeground(Color.GREEN);

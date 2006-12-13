@@ -53,12 +53,12 @@ import javax.swing.JLabel;
  * 
  * @author Jeanette Winzenburg
  */
-public class JXRendererLabel extends JLabel {
+public class RendererLabel extends JLabel {
 
     /**
      * 
      */
-    public JXRendererLabel() {
+    public RendererLabel() {
         super();
       setOpaque(true);
     }

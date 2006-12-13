@@ -23,6 +23,7 @@ package org.jdesktop.swingx.renderer;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
+import javax.swing.JTable;
 
 /**
  * TODO add type doc
@@ -37,7 +38,8 @@ public class IconRendererExt extends DefaultTableCellRendererExt {
     }
 
     @Override
-    public void setValue(Object value) {
+    protected void configureContent(CellContext<JTable> context) {
+        Object value = context.getValue();
         rendererComponent.setIcon((value instanceof Icon) ? (Icon) value : null);
     }
 

@@ -71,7 +71,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //           test.runInteractiveTests("interactive.*DnD.*");
 //             test.runInteractiveTests("interactive.*Compare.*");
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
-             test.runInteractiveTests("interactive.*Edit.*");
+             test.runInteractiveTests("interactive.*Grid.*");
 //             test.runInteractiveTests("interactive.*Line.*");
 //             test.runInteractiveTests("interactive.*Render.*");
         } catch (Exception ex) {
@@ -556,6 +556,10 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     public void interactiveTestAlternateHighlightAndRowGridLines() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         treeTable.setRowHeight(22);
+//        treeTable.setRootVisible(true);
+        // this leads to lines not properly drawn, as always,
+        // the margins need to be set as well.
+//        treeTable.setShowGrid(true);
         treeTable.setShowGrid(true, true);
         treeTable.addHighlighter(AlternateRowHighlighter.linePrinter);
         JXTable table = new JXTable(new AncientSwingTeam());

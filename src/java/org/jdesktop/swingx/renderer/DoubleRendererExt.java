@@ -23,7 +23,7 @@ package org.jdesktop.swingx.renderer;
 
 import java.text.NumberFormat;
 
-import javax.swing.JLabel;
+import javax.swing.JTable;
 
 /**
  * TODO add type doc
@@ -44,9 +44,17 @@ public class DoubleRendererExt extends NumberRendererExt {
         this.formatter = formatter;
     }
 
+    /**
+     * {@inheritDoc} <p>
+     * Here: returns the string representation as formatted by the renderer's
+     * dateFormatter.<p>
+     * 
+     * PENDING: think about moving up in the hierarchy?
+     * 
+     */
     @Override
-    public void setValue(Object value) {
-        rendererComponent.setText((value == null) ? "" : formatter.format(value));
+    protected String getStringValue(CellContext<JTable> context) {
+        return context.getValue() != null ? formatter.format(context.getValue()) : "";
     }
 
 }

@@ -23,17 +23,25 @@ package org.jdesktop.swingx.renderer;
 
 import javax.swing.AbstractButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JTable;
 
 /**
- * TODO add type doc
+ * Implementation of AbstractTableCellRendererExt for boolean values. Uses 
+ * a JCheckBox for renderering.
  * 
  * @author Jeanette Winzenburg
  */
 public class BooleanRendererExt extends AbstractTableCellRendererExt<AbstractButton> {
 
     
+    /**
+     * {@inheritDoc}<p>
+     * Here: returns a base-configured (centered, borderpainted) 
+     * JCheckBox as rendering component.<p>
+     * 
+     * PENDING: config should happen elsewhere?
+     */
     @Override
     protected AbstractButton createRendererComponent() {
         JCheckBox box = new JCheckBox();
@@ -44,21 +52,19 @@ public class BooleanRendererExt extends AbstractTableCellRendererExt<AbstractBut
 
     
 
+    /**
+     * {@inheritDoc} <p>
+     * Here: set's the checkbox' selected property to true if
+     * the context's value is a boolean true, false otherwise.
+     * 
+     * @see #getStringValue(CellContext)
+     */
     @Override
-    protected void setValue(Object value) {
-        boolean selected = Boolean.TRUE.equals(value);
+    protected void configureContent(CellContext<JTable> context) {
+        boolean selected = Boolean.TRUE.equals(context.getValue());
         rendererComponent.setSelected(selected);
         
     }
-//
-//    protected JCheckBox getRendererBox() {
-//        return (JCheckBox) rendererLabel;
-//    }
 
-//    @Override
-//    protected JComponent createRendererComponent() {
-//        // TODO Auto-generated method stub
-//        return new JCheckBox;
-//    }
 
 }

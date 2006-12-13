@@ -24,25 +24,67 @@ package org.jdesktop.swingx.renderer;
 import java.awt.Color;
 
 import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JTable;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
-import org.jdesktop.swingx.renderer.AbstractTableCellRendererExt.TableCellContext;
-
 /**
- * TODO add type doc
+ * Abstract base class of all extended CellRenderers in SwingX.
+ * <p>
+ * 
+ * PENDING: formulate constistently<p>
+ * 
+ * This is refactored from core <code>DefaultTableCellRenderer</code> to
+ * delegate a performance-optimized label instead of subclassing.<p>
+ * Extracted for consistency across different renderer types. Takes over all the
+ * standard (LF) specific configuration of the rendering component. Concrete
+ * renderers which choose to go from here should implement the appropriate
+ * getXXCellRendererComponent to delegate to the configureYY methods.
+ * 
+ * <pre><code>
+ * public Component getTableCellRendererComponent(JTable table, Object value,
+ *         boolean isSelected, boolean hasFocus, int row, int column) {
+ * 
+ *     CellContext&lt;JTable&gt; context = getCellContext();
+ *     context.install(table, value, row, column, isSelected, hasFocus,
+ *             true, true);
+ *     configureVisuals(context);
+ *     configureContent(context);
+ *     return rendererComponent;
+ * }
+ * 
+ * </code></pre>
+ * 
+ * 
+ * It's parameterized for both renderee (C) and rendering component(T).<p>
+ * 
+ * PENDING: extract super, parametrized in CellContext for implementation
+ * of default list, tree renderers. This will further eleminate duplication
+ * and enhance consistency of renderer behaviour.<p>
+ * 
+ * PENDING: really want to carry around the context as parameter in all methods?
+ * They are meant to be used by subclasses exclusively. <p>
+ * 
+ * PENDING: where to put the UIResource? 
+* 
+ * @see CellContext
  * 
  * @author Jeanette Winzenburg
+ * 
+ * 
  */
 public abstract class AbstractCellRenderer<T extends JComponent, C extends JComponent> {
 
     protected static Border noFocusBorder = new EmptyBorder(1, 1, 1, 1);
-    private static final Border SAFE_NO_FOCUS_BORDER = new EmptyBorder(1, 1, 1, 1);
+
+    private static final Border SAFE_NO_FOCUS_BORDER = new EmptyBorder(1, 1, 1,
+            1);
+
     private Color unselectedForeground;
+
     private Color unselectedBackground;
+
     protected T rendererComponent;
+
     protected CellContext<C> cellContext;
 
     private static Border getNoFocusBorder() {
@@ -54,30 +96,40 @@ public abstract class AbstractCellRenderer<T extends JComponent, C extends JComp
     }
 
     /**
-     * Sets the <code>String</code> object for the cell being rendered to
-     * <code>value</code>.
+     * Instantiates the renderer component to the type specified
+     * by the subclass.
      * 
-     * @param value  the string value for this cell; if value is
-     *          <code>null</code> it sets the text value to an empty string
-     * @see JLabel#setText
+     * @see #createRendererComponent()
+     */
+    public AbstractCellRenderer() {
+        rendererComponent = createRendererComponent();
+    }
+
+    //----------------- abstract methods    
+    /**
+     * Configures the renderering component's content from the
+     * given cell context.
+     * 
+     * @param context the cell context to configure from
      * 
      */
-    protected abstract void setValue(Object value);
+    protected abstract void configureContent(CellContext<C> context);
 
     /**
-     * Creates and returns the label to use for rendering.<p>
-     * Here: returns a performance-optimized JXRendererLabel.
+     * Factory method to create and return the component to use for rendering.<p>
      * 
      * @return the component to use for rendering.
      */
     protected abstract T createRendererComponent();
 
     /**
+     * Returns the cell context to use.
      * 
+     * @return the cell context to use, guaranteed to be <code>not null</code>.
      */
-    public AbstractCellRenderer() {
-        super();
-    }
+    protected abstract CellContext<C> getCellContext();
+
+    //------------------ public configuration
 
     /**
      * Overrides <code>JComponent.setForeground</code> to assign
@@ -86,25 +138,24 @@ public abstract class AbstractCellRenderer<T extends JComponent, C extends JComp
      * @param c set the foreground color to this value
      */
     public void setForeground(Color c) {
-        unselectedForeground = c; 
+        unselectedForeground = c;
     }
 
     /**
-     * Overrides <code>JComponent.setBackground</code> to assign
-     * the unselected-background color to the specified color.
+     * Sets the renderer's unselected-background color to the specified color.
      *
      * @param c set the background color to this value
      */
     public void setBackground(Color c) {
-        unselectedBackground = c; 
+        unselectedBackground = c;
     }
 
-    protected void configureContent(CellContext<C> context) {
-        setValue(context.getValue());
-    }
-
+    //---------------- subclass configuration    
     /**
-     * @param context
+     * Configures all visual state of the rendering component from the 
+     * given cell context.
+     * 
+     * @param context the cell context to configure from.
      */
     protected void configureVisuals(CellContext<C> context) {
         configureState(context);
@@ -113,46 +164,46 @@ public abstract class AbstractCellRenderer<T extends JComponent, C extends JComp
     }
 
     /**
-     * @param context
+     * Configure "divers" visual state of the rendering component from
+     * the given cell context. <p>
+     * 
+     * Here: synch <code>Font</code>, <code>ComponentOrientation</code> and 
+     * <code>enabled</code> to context's 
+     * component. 
+     * 
+     * PENDING: not fully defined - "divers" means everything that's not
+     * colors or border.<p>
+     * 
+     * PENDING: doesn't check for null context component
+     * 
+     * @param context the cell context to configure from.
      */
     protected void configureState(CellContext<C> context) {
         rendererComponent.setFont(context.getComponent().getFont());
         rendererComponent.setEnabled(context.getComponent().isEnabled());
-        rendererComponent.setComponentOrientation(context.getComponent().getComponentOrientation());
+        rendererComponent.setComponentOrientation(context.getComponent()
+                .getComponentOrientation());
     }
 
     /**
-     * @param context
+     * Configures colors of rendering component from the given cell context.
+     * 
+     * @param context the cell context to configure from.
      */
     protected void configureColors(CellContext<C> context) {
         if (context.isSelected()) {
             rendererComponent.setForeground(context.getSelectionForeground());
             rendererComponent.setBackground(context.getSelectionBackground());
-         }
-         else {
-             rendererComponent.setForeground(getForeground(context));
-             rendererComponent.setBackground(getBackground(context));
-         }
-        if (context.isFocused()) {
-            configureFocusColors(context);
-        }
-    }
-
-    protected void configureFocusColors(CellContext<C> context) {
-        if (!context.isSelected() && context.isEditable()) {
-            Color col = context.getFocusForeground();
-            if (col != null) {
-                rendererComponent.setForeground(col);
-            }
-            col = context.getFocusBackground();
-            if (col != null) {
-                rendererComponent.setBackground(col);
-            }
+        } else {
+            rendererComponent.setForeground(getForeground(context));
+            rendererComponent.setBackground(getBackground(context));
         }
     }
 
     /**
-     * @param context
+     * Configures the rendering component's border from the given cell context.<p>
+     * 
+     * @param context the cell context to configure from.
      */
     protected void configureBorder(CellContext<C> context) {
         if (context.isFocused()) {
@@ -160,23 +211,55 @@ public abstract class AbstractCellRenderer<T extends JComponent, C extends JComp
         } else {
             rendererComponent.setBorder(getNoFocusBorder());
         }
-        
+
     }
 
+    /**
+     * Returns the unselected foreground to use for the rendering 
+     * component. <p>
+     * 
+     * Here: returns this renderer's unselected foreground is not null,
+     * returns the foreground from the given context. In other words:
+     * the renderer's foreground takes precedence if set.
+     * 
+     * @param context the cell context.
+     * @return the unselected foreground.
+     */
     protected Color getForeground(CellContext<C> context) {
-        if (unselectedForeground != null) return unselectedForeground;
+        if (unselectedForeground != null)
+            return unselectedForeground;
         return context.getForeground();
     }
 
+    /**
+     * Returns the unselected background to use for the rendering 
+     * component. <p>
+     * 
+     * Here: returns this renderer's unselected background is not null,
+     * returns the background from the given context. In other words:
+     * the renderer's background takes precedence if set.
+     * 
+     * @param context the cell context.
+     * @return the unselected background.
+     */
     protected Color getBackground(CellContext<C> context) {
-        if (unselectedBackground != null) return unselectedBackground;
+        if (unselectedBackground != null)
+            return unselectedBackground;
         return context.getBackground();
     }
 
     /**
+     * Returns a string representation of the content.<p>
      * 
-     * @return the cell context to use, guaranteed to be <code>not null</code>.
+     * PENDING: This is a first attempt - we need a consistent string representation
+     * across all (new and old) theme: rendering, (pattern) filtering/highlighting,
+     * searching, auto-complete, what else??   
+     * 
+     * @param context the cell context.
+     * @return a appropriate string representation of the cell's content.
      */
-    protected abstract CellContext<C> getCellContext();
+    protected String getStringValue(CellContext<C> context) {
+        return context.getValue() != null ? context.getValue().toString() : "";
+    }
 
 }
