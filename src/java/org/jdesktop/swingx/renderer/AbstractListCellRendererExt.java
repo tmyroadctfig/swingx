@@ -27,24 +27,18 @@ import java.awt.Component;
 import java.io.Serializable;
 
 import javax.swing.JComponent;
-import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JTable;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
-import javax.swing.table.TableCellRenderer;
+import javax.swing.ListCellRenderer;
 
 
 /**
  * The standard class for rendering (displaying) individual cells
- * in a <code>JTable</code>.
+ * in a <code>JList</code>.
  * <p>
  *
- * This is refactored from core <code>DefaultTableCellRenderer</code> to
+ * This is refactored from core <code>DefaultListCellRenderer</code> to
  * delegate a performance-optimized label instead of subclassing.<p>
- * 
- * PENDING: extract super, parametrized in CellContext for implementation
- * of default list, tree renderers. This will further eleminate duplication
- * and enhance consistency of renderer behaviour.<p>
  * 
  * PENDING: really want to carry around the context as parameter in all methods?
  * They are meant to be used by subclasses exclusively. 
@@ -67,14 +61,14 @@ import javax.swing.table.TableCellRenderer;
  * @see JTable
  * 
  */
-public abstract class AbstractTableCellRendererExt<T extends JComponent> extends AbstractCellRenderer<T, JTable> 
-    implements TableCellRenderer, Serializable
+public abstract class AbstractListCellRendererExt<T extends JComponent> extends AbstractCellRenderer<T, JList> 
+    implements ListCellRenderer, Serializable
 {
 
     /**
      * Creates a default table cell renderer.
      */
-    public AbstractTableCellRendererExt() {
+    public AbstractListCellRendererExt() {
         rendererComponent = createRendererComponent();
         
     }
@@ -92,20 +86,20 @@ public abstract class AbstractTableCellRendererExt<T extends JComponent> extends
      * @param column the column of the cell to render
      * @return the default table cell renderer
      */
-    public Component getTableCellRendererComponent(JTable table, Object value,
-                          boolean isSelected, boolean hasFocus, int row, int column) {
+    public Component getListCellRendererComponent(JList table, Object value, int row,
+                          boolean isSelected, boolean hasFocus) {
 
-        CellContext<JTable> context = getCellContext();
-        context.installContext(table, value, row, column, isSelected, hasFocus, true, true);
+        CellContext<JList> context = getCellContext();
+        context.installContext(table, value, row, 0, isSelected, hasFocus, true, true);
         configureVisuals(context);
         configureContent(context); 
         return rendererComponent;
     }
     
     @Override
-    protected CellContext<JTable> getCellContext() {
+    protected CellContext<JList> getCellContext() {
         if (cellContext == null) {
-            cellContext = new TableCellContext();
+            cellContext = new ListCellContext();
         }
         return cellContext;
     }
@@ -113,12 +107,8 @@ public abstract class AbstractTableCellRendererExt<T extends JComponent> extends
     /**
      * Table specific cellContext.
      */
-    public static class TableCellContext extends CellContext<JTable> {
+    public static class ListCellContext extends CellContext<JList> {
 
-        @Override
-        public boolean isEditable() {
-            return getComponent() != null ? getComponent().isCellEditable(getRow(), getColumn()) : false;
-        }
 
         @Override
         protected Color getSelectionBackground() {
@@ -132,7 +122,7 @@ public abstract class AbstractTableCellRendererExt<T extends JComponent> extends
 
         @Override
         protected String getUIPrefix() {
-            return "Table.";
+            return "List.";
         }
         
         

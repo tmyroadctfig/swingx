@@ -24,12 +24,12 @@ package org.jdesktop.swingx.renderer;
 import javax.swing.JLabel;
 
 /**
- * Default implementation of AbstractTableCellRendererExt. Uses 
+ * Default implementation of AbstractListCellRendererExt. Uses 
  * a JXRendererLabel for renderering.
  * 
  * @author Jeanette Winzenburg
  */
-public class DefaultTableCellRendererExt extends AbstractTableCellRendererExt<JLabel> {
+public class DefaultListCellRendererExt extends AbstractListCellRendererExt<JLabel> {
 
 
     @Override
@@ -43,7 +43,4 @@ public class DefaultTableCellRendererExt extends AbstractTableCellRendererExt<JL
         return new JXRendererLabel();
     }
 
-//    protected T getRendererLabel() {
-//        return  rendererLabel;
-//    }
 }

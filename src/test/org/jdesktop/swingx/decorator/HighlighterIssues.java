@@ -30,6 +30,7 @@ import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.LinkModel;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
+import org.jdesktop.swingx.renderer.AbstractTableCellRendererExt;
 import org.jdesktop.swingx.renderer.CellContext;
 import org.jdesktop.swingx.renderer.DefaultTableCellRendererExt;
 import org.jdesktop.test.AncientSwingTeam;
@@ -110,11 +111,11 @@ public class HighlighterIssues extends HighlighterTest {
     public void interactiveTableCustomRendererColorBasedOnValue() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
-        DefaultTableCellRendererExt renderer = new DefaultTableCellRendererExt() {
+        AbstractTableCellRendererExt<JLabel> renderer = new DefaultTableCellRendererExt() {
 
             @Override
-            protected void configureSelectionDependentColors(CellContext<JTable> context) {
-                super.configureSelectionDependentColors(context);
+            protected void configureColors(CellContext<JTable> context) {
+                super.configureColors(context);
                 if (!context.isSelected()) {
                     if (rendererComponent.getText().contains("y")) {
                         rendererComponent.setForeground(Color.RED);
@@ -210,7 +211,7 @@ public class HighlighterIssues extends HighlighterTest {
     public void interactiveTableCustomRendererColor() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
-        DefaultTableCellRendererExt renderer = new DefaultTableCellRendererExt();
+        AbstractTableCellRendererExt<JLabel> renderer = new DefaultTableCellRendererExt();
         renderer.setForeground(foreground);
         renderer.setBackground(background);
         table.addHighlighter(AlternateRowHighlighter.genericGrey);

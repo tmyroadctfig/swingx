@@ -24,6 +24,9 @@ package org.jdesktop.swingx.renderer;
 import java.awt.Color;
 
 import javax.swing.JComponent;
+import javax.swing.JTable;
+import javax.swing.UIManager;
+import javax.swing.border.Border;
 
 /**
  * Encapsulates the display context passed into the getXXRendererComponent.<p>
@@ -34,7 +37,9 @@ import javax.swing.JComponent;
  * passed-in are used.<p>
  * 
  * PENDING: currently, only a dump record - can move services here, like
- * getting default colors, fonts,...?
+ * getting default colors, fonts,...? Partly done: colors and borders
+ * are decided here (taken from UIManager or from component, if supported
+ * in component api).
  *  
  * @author Jeanette Winzenburg
  */
@@ -90,6 +95,68 @@ public class CellContext<T extends JComponent> {
     }
     public Object getValue() {
         return value;
+    }
+
+
+    protected Color getForeground() {
+        return getComponent() != null ? getComponent().getForeground() : null;
+    }
+
+
+    protected Color getBackground() {
+        return getComponent() != null ? getComponent().getBackground() : null;
+    }
+
+
+    /**
+     * @return
+     */
+    protected Color getSelectionBackground() {
+        return null;
+    }
+
+
+    /**
+     * @return
+     */
+    protected Color getSelectionForeground() {
+        return null;
+    }
+
+
+    protected Border getFocusBorder() {
+        Border border = null;
+        if (isSelected()) {
+            border = UIManager.getBorder(getUIKey("focusSelectedCellHighlightBorder"));
+        }
+        if (border == null) {
+            border = UIManager.getBorder(getUIKey("focusCellHighlightBorder"));
+        }
+        return border;
+    }
+
+
+    protected String getUIKey(String key) {
+        return getUIPrefix() + key;
+    }
+
+
+    protected String getUIPrefix() {
+        return "";
+    }
+
+
+    protected Color getFocusForeground() {
+        Color col;
+        col = UIManager.getColor(getUIKey("focusCellForeground"));
+        return col;
+    }
+
+
+    protected Color getFocusBackground() {
+        Color col;
+        col = UIManager.getColor(getUIKey("focusCellBackground"));
+        return col;
     }
 
 
