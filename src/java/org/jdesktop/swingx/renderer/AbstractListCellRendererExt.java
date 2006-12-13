@@ -22,7 +22,6 @@
 package org.jdesktop.swingx.renderer;
 
 
-import java.awt.Color;
 import java.awt.Component;
 import java.io.Serializable;
 
@@ -103,53 +102,6 @@ public abstract class AbstractListCellRendererExt<T extends JComponent> extends 
         }
         return cellContext;
     }
-
-    /**
-     * Table specific cellContext.
-     */
-    public static class ListCellContext extends CellContext<JList> {
-
-
-        @Override
-        protected Color getSelectionBackground() {
-            return getComponent() != null ? getComponent().getSelectionBackground() : null;
-        }
-
-        @Override
-        protected Color getSelectionForeground() {
-            return getComponent() != null ? getComponent().getSelectionForeground() : null;
-        }
-
-        @Override
-        protected String getUIPrefix() {
-            return "List.";
-        }
-        
-        
-        
-    }
-    /**
-     * A subclass of <code>DefaultTableCellRenderer</code> that
-     * implements <code>UIResource</code>.
-     * <code>DefaultTableCellRenderer</code> doesn't implement
-     * <code>UIResource</code>
-     * directly so that applications can safely override the
-     * <code>cellRenderer</code> property with
-     * <code>DefaultTableCellRenderer</code> subclasses.
-     * <p>
-     * <strong>Warning:</strong>
-     * Serialized objects of this class will not be compatible with
-     * future Swing releases. The current serialization support is
-     * appropriate for short term storage or RMI between applications running
-     * the same version of Swing.  As of 1.4, support for long term storage
-     * of all JavaBeans<sup><font size="-2">TM</font></sup>
-     * has been added to the <code>java.beans</code> package.
-     * Please see {@link java.beans.XMLEncoder}.
-     */
-//    public static class UIResource extends AbstractTableCellRendererExt 
-//        implements javax.swing.plaf.UIResource
-//    {
-//    }
 
 }
 

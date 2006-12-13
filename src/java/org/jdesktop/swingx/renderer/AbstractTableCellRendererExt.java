@@ -111,36 +111,6 @@ public abstract class AbstractTableCellRendererExt<T extends JComponent>
         }
     }
 
-    /**
-     * Table specific cellContext.
-     */
-    public static class TableCellContext extends CellContext<JTable> {
-
-        @Override
-        public boolean isEditable() {
-            return getComponent() != null ? getComponent().isCellEditable(
-                    getRow(), getColumn()) : false;
-        }
-
-        @Override
-        protected Color getSelectionBackground() {
-            return getComponent() != null ? getComponent()
-                    .getSelectionBackground() : null;
-        }
-
-        @Override
-        protected Color getSelectionForeground() {
-            return getComponent() != null ? getComponent()
-                    .getSelectionForeground() : null;
-        }
-
-        @Override
-        protected String getUIPrefix() {
-            return "Table.";
-        }
-
-    }
-
 }
 
 
