@@ -21,20 +21,40 @@
  */
 package org.jdesktop.swingx.renderer;
 
+import javax.swing.AbstractButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 
 /**
- * Default table renderer for Numbers.
+ * TODO add type doc
  * 
  * @author Jeanette Winzenburg
  */
-public class NumberRendererExt extends DefaultTableCellRendererExt {
+public class RenderingButtonController extends
+        RenderingComponentController<AbstractButton> {
 
-    public NumberRendererExt() {
-        super();
-        // JW: RIGHT is the correct thing to do for bidi-compliance
-        // numbers are right aligned even if text is LToR
-        rendererComponent.setHorizontalAlignment(JLabel.RIGHT);
+    @Override
+    protected void configureContent(CellContext context) {
+        boolean selected = Boolean.TRUE.equals(context.getValue());
+        getRendererComponent().setSelected(selected);
+
     }
+
+    /**
+     * {@inheritDoc}<p>
+     * Here: returns a base-configured (centered, borderpainted) 
+     * JCheckBox as rendering component.<p>
+     * 
+     * PENDING: config should happen elsewhere?
+     */
+    @Override
+    protected AbstractButton createRendererComponent() {
+        JCheckBox box = new JCheckBox();
+        box.setHorizontalAlignment(JLabel.CENTER);
+        box.setBorderPainted(true);
+        return  box;
+    }
+
+    
 
 }

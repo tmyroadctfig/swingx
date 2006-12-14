@@ -30,9 +30,6 @@ import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.LinkModel;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
-import org.jdesktop.swingx.renderer.AbstractTableCellRendererExt;
-import org.jdesktop.swingx.renderer.CellContext;
-import org.jdesktop.swingx.renderer.DefaultTableCellRendererExt;
 import org.jdesktop.test.AncientSwingTeam;
 
 
@@ -101,40 +98,6 @@ public class HighlighterIssues extends HighlighterTest {
     }
     
 
-    /**
-     * Issue #258-swingx: Background Highlighter must not change custom
-     * foreground.
-     * <p>
-     * 
-     * Use SwingX's extended default renderer.
-     */
-    public void interactiveTableCustomRendererColorBasedOnValue() {
-        TableModel model = new AncientSwingTeam();
-        JXTable table = new JXTable(model);
-        AbstractTableCellRendererExt<JLabel> renderer = new DefaultTableCellRendererExt() {
-
-            @Override
-            protected void configureColors(CellContext<JTable> context) {
-                super.configureColors(context);
-                if (!context.isSelected()) {
-                    if (getStringValue(context).contains("y")) {
-                        rendererComponent.setForeground(Color.RED);
-                    } else {
-                        rendererComponent.setForeground(Color.GREEN);
-                    }
-                }
-            }
-
-         
-
-        };
-        table.addHighlighter(AlternateRowHighlighter.genericGrey);
-        table.setDefaultRenderer(Object.class, renderer);
-        JXTable nohighlight = new JXTable(model);
-        nohighlight.setDefaultRenderer(Object.class, renderer);
-        showWithScrollingInFrame(table, nohighlight,
-                "ext: value-based fg renderer with bg highlighter <--> shared without highl");
-    }
     
     /**
      * Issue #258-swingx: Background Highlighter must not change custom
@@ -199,27 +162,6 @@ public class HighlighterIssues extends HighlighterTest {
 //        showWithScrollingInFrame(table, nohighlight,
         showWithScrollingInFrame(nohighlight,
                 "core: very first match is against selected");
-    }
-    
-    /**
-     * Issue #258-swingx: Background Highlighter must not change custom
-     * foreground.
-     * <p>
-     * 
-     * Use SwingX extended default renderer.
-     */
-    public void interactiveTableCustomRendererColor() {
-        TableModel model = new AncientSwingTeam();
-        JXTable table = new JXTable(model);
-        AbstractTableCellRendererExt<JLabel> renderer = new DefaultTableCellRendererExt();
-        renderer.setForeground(foreground);
-        renderer.setBackground(background);
-        table.addHighlighter(AlternateRowHighlighter.genericGrey);
-        table.setDefaultRenderer(Object.class, renderer);
-        JXTable nohighlight = new JXTable(model);
-        nohighlight.setDefaultRenderer(Object.class, renderer);
-        showWithScrollingInFrame(table, nohighlight,
-                "ext: custom colored renderer with bg highlighter <--> shared without highl");
     }
     
     

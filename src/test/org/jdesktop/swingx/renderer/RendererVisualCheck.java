@@ -28,6 +28,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.DefaultListModel;
@@ -36,10 +37,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
@@ -48,6 +48,7 @@ import org.jdesktop.swingx.EditorPaneLinkVisitor;
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXEditorPaneTest;
 import org.jdesktop.swingx.JXFrame;
+import org.jdesktop.swingx.JXHyperlink;
 import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
@@ -59,7 +60,6 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
-import org.jdesktop.test.AncientSwingTeam.NamedColor;
 
 /**
  * Visual check of extended Swingx renderers.
@@ -94,7 +94,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         xtable.setBackground(Highlighter.notePadBackground.getBackground()); // ledger
         JTable table = new JTable(model);
         table.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
-        TableCellRenderer renderer = new DefaultTableCellRendererExt();
+        TableCellRenderer renderer = new DefaultTableRenderer<JComponent>();
         table.setDefaultRenderer(Object.class, renderer);
         JXFrame frame = wrapWithScrollingInFrame(xtable, table, "JTable: Unselected focused background: core/ext renderer");
         getStatusBar(frame).add(new JLabel("background for unselected lead: first column is not-editable"));    
@@ -119,9 +119,39 @@ public class RendererVisualCheck extends InteractiveTestCase {
         xtable.setBackground(Highlighter.notePadBackground.getBackground()); // ledger
         JXTable table = new JXTable(model);
         table.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
-        TableCellRenderer renderer = new DefaultTableCellRendererExt();
+        TableCellRenderer renderer = new DefaultTableRenderer<JComponent>();
         table.setDefaultRenderer(Object.class, renderer);
         JXFrame frame = wrapWithScrollingInFrame(xtable, table, "JXTable: Unselected focused background: core/ext renderer");
+        getStatusBar(frame).add(new JLabel("different background for unselected lead: first column is not-editable"));    
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    /**
+     * Compare xtable using core default renderer vs. swingx default renderer.<p>
+     * 
+     * Unselected background of lead is different for editable/not-editable cells.
+     * With core renderer: can't because Highlighter hack jumps in.
+     * 
+     */
+    public void interactiveXTableCompareFocusedCellBackgroundPluggable() {
+        TableModel model = new AncientSwingTeam() {
+            public boolean isCellEditable(int row, int column) {
+                return column != 0;
+            }
+        };
+        
+        JXTable xtable = new JXTable(model);
+        xtable.setBackground(Highlighter.notePadBackground.getBackground()); // ledger
+        JXTable table = new JXTable(model);
+        table.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
+//        CellRendererContext rendererContext = new CellRendererContext<JLabel, JTable>(new RendererLabelContext(), new TableCellContext());
+//        CellRendererContext rendererContext = new CellRendererContext<JLabel, JTable>(new RendererLabelContext(), JTable.class);
+         TableCellRenderer renderer = new DefaultTableRenderer();
+        table.setDefaultRenderer(Object.class, renderer);
+        TableCellRenderer booleanRenderer = new DefaultTableRenderer<AbstractButton>(new RenderingButtonController());
+        table.setDefaultRenderer(Boolean.class, booleanRenderer);
+        JXFrame frame = wrapWithScrollingInFrame(xtable, table, "JXTable- pluggable: Unselected focused background: core/ext renderer");
         getStatusBar(frame).add(new JLabel("different background for unselected lead: first column is not-editable"));    
         frame.pack();
         frame.setVisible(true);
@@ -135,11 +165,12 @@ public class RendererVisualCheck extends InteractiveTestCase {
      */
     public void interactiveDisabledCollectionViews() {
         final JXTable table = new JXTable(new AncientSwingTeam());
-        table.setDefaultRenderer(Object.class, new DefaultTableCellRendererExt());
+        table.setDefaultRenderer(Object.class, new DefaultTableRenderer<JComponent>());
         table.setEnabled(false);
         final JXList list = new JXList(new String[] {"one", "two", "and something longer"});
         list.setEnabled(false);
-        list.setCellRenderer(new DefaultListCellRendererExt());
+//        list.setCellRenderer(new DefaultListCellRendererExt());
+        list.setCellRenderer(new DefaultListRenderer());
         final JXTree tree = new JXTree(new FileSystemModel());
         tree.setEnabled(false);
         JComponent box = Box.createHorizontalBox();
@@ -169,7 +200,23 @@ public class RendererVisualCheck extends InteractiveTestCase {
         EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
         JXTable table = new JXTable(createModelWithLinks());
         LinkModelAction action = new LinkModelAction<LinkModel>(visitor);
-        table.setDefaultRenderer(LinkModel.class, new LinkTableCellRendererExt(action, LinkModel.class));
+        RenderingComponentController<JXHyperlink> context = new RenderingHyperlinkController(action, LinkModel.class);
+        RendererController configurator = new RendererController<JXHyperlink, JComponent>(context) {
+
+            @Override
+            protected void configureColors(CellContext<JComponent> context) {
+              if (context.isSelected()) {
+//            linkButton.setForeground(table.getSelectionForeground());
+            getRendererComponent().setBackground(context.getSelectionBackground());
+        }
+        else {
+//            linkButton.setForeground(table.getForeground());
+            getRendererComponent().setBackground(context.getBackground());
+        }
+            }
+            
+        };
+        table.setDefaultRenderer(LinkModel.class, new DefaultTableRenderer<JXHyperlink>(configurator));
         LinkModelAction action2 = new LinkModelAction<LinkModel>(visitor);
         table.setDefaultEditor(LinkModel.class, new LinkRenderer(action2, LinkModel.class));
         JFrame frame = wrapWithScrollingInFrame(table, visitor.getOutputComponent(), "show link renderer in table");
@@ -187,7 +234,23 @@ public class RendererVisualCheck extends InteractiveTestCase {
         list.setRolloverEnabled(true);
 //        list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
         LinkModelAction action = new LinkModelAction(visitor);
-        list.setCellRenderer(new LinkListCellRendererExt(action, LinkModel.class));
+        RenderingComponentController<JXHyperlink> context = new RenderingHyperlinkController(action, LinkModel.class);
+        RendererController configurator = new RendererController<JXHyperlink, JComponent>(context) {
+
+            @Override
+            protected void configureColors(CellContext<JComponent> context) {
+              if (context.isSelected()) {
+//            linkButton.setForeground(table.getSelectionForeground());
+            getRendererComponent().setBackground(context.getSelectionBackground());
+        }
+        else {
+//            linkButton.setForeground(table.getForeground());
+            getRendererComponent().setBackground(context.getBackground());
+        }
+            }
+            
+        };
+        list.setCellRenderer(new DefaultListRenderer<JXHyperlink>(configurator));
         JFrame frame = wrapWithScrollingInFrame(list, visitor.getOutputComponent(), "show link renderer in list");
         frame.setVisible(true);
 
@@ -244,6 +307,20 @@ public class RendererVisualCheck extends InteractiveTestCase {
 
     }
 
+    /**
+     * Compare xtable using custom color renderer - standard vs. ext.<p>
+     * Adds highlighter ... running amok.
+     */
+    public void interactiveListCustomColorRenderer() {
+//        TableModel model = new AncientSwingTeam();
+        ListModel model = createListColorModel();
+        JXList list = new JXList(model);
+        ListCellRenderer renderer = createListColorRendererExt();
+        list.setCellRenderer(renderer);
+        showWithScrollingInFrame(list, "JXList/highlighter: Custom color renderer - standard/ext");
+
+    }
+
 
     private Highlighter createPropertyRespectingHighlighter(final Highlighter delegate) {
         Highlighter highlighter = new Highlighter() {
@@ -264,22 +341,42 @@ public class RendererVisualCheck extends InteractiveTestCase {
      * @return
      */
     protected TableCellRenderer createColorRendererExt() {
-        TableCellRenderer renderer = new DefaultTableCellRendererExt() {
+        
+        RendererController context = createRendererContext();
+        
+        TableCellRenderer renderer = new DefaultTableRenderer(context);
+        return renderer;
+    }
 
+    /**
+     * creates and returns a color ext renderer.
+     * @return
+     */
+    protected ListCellRenderer createListColorRendererExt() {
+        
+        RendererController context = createRendererContext();
+        
+        ListCellRenderer renderer = new DefaultListRenderer(context);
+        return renderer;
+    }
+
+    
+    private RendererController createRendererContext() {
+        RendererController context = new RendererController<JLabel, JComponent>(new RenderingLabelController() ) {
             Border selectedBorder;
             @Override
-            protected void configureColors(CellContext<JTable> context) {
+            protected void configureColors(CellContext<JComponent> context) {
                 super.configureColors(context);
                 if (context.getValue() instanceof Color) {
-                    rendererComponent.setBackground((Color) context.getValue());
-                    rendererComponent.putClientProperty("renderer-dont-touch", "color");
+                    getRendererComponent().setBackground((Color) context.getValue());
+                    getRendererComponent().putClientProperty("renderer-dont-touch", "color");
                 } else {
-                    rendererComponent.putClientProperty("renderer-dont-touch", null);
+                    getRendererComponent().putClientProperty("renderer-dont-touch", null);
                 }
             }
 
             @Override
-            protected void configureBorder(CellContext<JTable> context) {
+            protected void configureBorder(CellContext<JComponent> context) {
                 if (context.isSelected()) {
                     selectedBorder = BorderFactory.createMatteBorder(2, 5,
                             2, 5, context.getSelectionBackground());
@@ -287,10 +384,11 @@ public class RendererVisualCheck extends InteractiveTestCase {
                     selectedBorder = BorderFactory.createMatteBorder(2, 5,
                             2, 5, context.getBackground());
                 }
-                rendererComponent.setBorder(selectedBorder);
+                getRendererComponent().setBorder(selectedBorder);
             }
+            
         };
-        return renderer;
+        return context;
     }
 
     
@@ -347,6 +445,25 @@ public class RendererVisualCheck extends InteractiveTestCase {
         }
         return model;
     }
+    /**
+     * @return
+     */
+    private ListModel createListColorModel() {
+        AncientSwingTeam tableModel = new AncientSwingTeam();
+        int colorColumn = 2;
+//        for (int i = 0; i < tableModel.getColumnCount(); i++) {
+//            if (tableModel.getColumnClass(i).isAssignableFrom(Color.class)) {
+//                colorColumn = i;
+//                break;
+//            }
+//        }
+        DefaultListModel model = new DefaultListModel();
+        for (int i = 0; i < tableModel.getRowCount(); i++) {
+            model.addElement(tableModel.getValueAt(i, colorColumn));
+        }
+        return model;
+    }
+
 
     public static class ColorRenderer extends JLabel implements
             TableCellRenderer {

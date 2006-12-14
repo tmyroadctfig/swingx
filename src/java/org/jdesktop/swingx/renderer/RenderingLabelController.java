@@ -21,26 +21,43 @@
  */
 package org.jdesktop.swingx.renderer;
 
-import javax.swing.Icon;
+import java.text.Format;
+
 import javax.swing.JLabel;
-import javax.swing.JTable;
 
 /**
  * TODO add type doc
  * 
  * @author Jeanette Winzenburg
  */
-public class IconRendererExt extends DefaultTableCellRendererExt {
+public class RenderingLabelController extends RenderingComponentController<JLabel> {
+
+    protected Format formatter;
+ 
+    public RenderingLabelController() {
+    }
     
-    public IconRendererExt() {
-        super();
-        rendererComponent.setHorizontalAlignment(JLabel.CENTER);
+    public void setFormatter(Format formatter) {
+        this.formatter = formatter;
+    }
+    
+    @Override
+    protected void configureContent(CellContext context) {
+        rendererComponent.setText(getStringValue(context));
     }
 
     @Override
-    protected void configureContent(CellContext<JTable> context) {
-        Object value = context.getValue();
-        rendererComponent.setIcon((value instanceof Icon) ? (Icon) value : null);
+    protected JLabel createRendererComponent() {
+        return new RendererLabel();
     }
 
+    @Override
+    protected String getStringValue(CellContext context) {
+        if (formatter != null) {
+            return context.getValue() != null ? formatter.format(context.getValue()) : "";
+        }
+        return super.getStringValue(context);
+    }
+
+    
 }

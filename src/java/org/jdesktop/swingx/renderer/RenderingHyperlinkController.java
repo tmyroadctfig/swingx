@@ -54,8 +54,8 @@ import org.jdesktop.swingx.action.LinkAction;
  * 
  * @author Jeanette Winzenburg
  */
-public abstract class AbstractLinkCellRendererExt<C extends JComponent> 
-   extends AbstractCellRenderer<JXHyperlink, C> implements
+public class RenderingHyperlinkController
+   extends RenderingComponentController<JXHyperlink> implements
          RolloverRenderer {
 
 
@@ -67,7 +67,7 @@ public abstract class AbstractLinkCellRendererExt<C extends JComponent>
      * targetClass.
      *
      */
-    public AbstractLinkCellRendererExt() {
+    public RenderingHyperlinkController() {
         this(null, null);
     }
 
@@ -77,7 +77,7 @@ public abstract class AbstractLinkCellRendererExt<C extends JComponent>
      * 
      * @param linkAction the action that acts on values.
      */
-    public AbstractLinkCellRendererExt(LinkAction linkAction) {
+    public RenderingHyperlinkController(LinkAction linkAction) {
         this(linkAction, null);
     }
     
@@ -90,7 +90,7 @@ public abstract class AbstractLinkCellRendererExt<C extends JComponent>
      * @param linkAction the action that acts on values.
      * @param targetClass the type of values the action can handle.
      */
-    public AbstractLinkCellRendererExt(LinkAction linkAction, Class targetClass) {
+    public RenderingHyperlinkController(LinkAction linkAction, Class targetClass) {
         super();
 //        rendererComponent.addActionListener(createEditorActionListener());
         setLinkAction(linkAction, targetClass);
@@ -134,7 +134,7 @@ public abstract class AbstractLinkCellRendererExt<C extends JComponent>
         }
         setTargetClass(targetClass); 
         this.linkAction = linkAction;
-        rendererComponent.setAction(linkAction);
+        getRendererComponent().setAction(linkAction);
         
     }
     /**
@@ -181,14 +181,14 @@ public abstract class AbstractLinkCellRendererExt<C extends JComponent>
     }
 
     public void doClick() {
-        rendererComponent.doClick();
+        getRendererComponent().doClick();
     }
     
 //------------------------ TableCellRenderer
     
 
     @Override
-    protected void configureContent(CellContext<C> context) {
+    protected void configureContent(CellContext context) {
         Object value = context.getValue();
         linkAction.setTarget(value);
         if (context.getComponent() !=  null) {
@@ -196,9 +196,9 @@ public abstract class AbstractLinkCellRendererExt<C extends JComponent>
                     .getClientProperty(RolloverProducer.ROLLOVER_KEY);
             if (/*hasFocus || */(p != null && (p.x >= 0) && 
                     (p.x == context.getColumn()) && (p.y == context.getRow()))) {
-                 rendererComponent.getModel().setRollover(true);
+                 getRendererComponent().getModel().setRollover(true);
             } else {
-                rendererComponent.getModel().setRollover(false);
+                getRendererComponent().getModel().setRollover(false);
             }
         }
         
@@ -218,16 +218,16 @@ public abstract class AbstractLinkCellRendererExt<C extends JComponent>
         };
     }
 
-    @Override
-    protected void configureColors(CellContext<C> context) {
-        if (context.isSelected()) {
-//          linkButton.setForeground(table.getSelectionForeground());
-          rendererComponent.setBackground(context.getSelectionBackground());
-      }
-      else {
-//          linkButton.setForeground(table.getForeground());
-          rendererComponent.setBackground(context.getBackground());
-      }
-    }
+//    @Override
+//    protected void configureColors(CellContext<C> context) {
+//        if (context.isSelected()) {
+////          linkButton.setForeground(table.getSelectionForeground());
+//          getRendererComponent().setBackground(context.getSelectionBackground());
+//      }
+//      else {
+////          linkButton.setForeground(table.getForeground());
+//          getRendererComponent().setBackground(context.getBackground());
+//      }
+//    }
 
 }

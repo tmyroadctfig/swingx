@@ -30,6 +30,8 @@ import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
+import org.jdesktop.swingx.RolloverRenderer;
+
 
 /**
  * Abstract base class of all extended TableCellRenderers in SwingX.
@@ -41,10 +43,31 @@ import javax.swing.table.TableCellRenderer;
  * @see RendererLabel
  * 
  */
-public abstract class AbstractTableCellRendererExt<T extends JComponent>
-        extends AbstractCellRenderer<T, JTable> implements TableCellRenderer,
-        Serializable {
+public class DefaultTableRenderer <T extends JComponent>
+        implements TableCellRenderer, RolloverRenderer, Serializable {
 
+    private RendererController rendererContext;
+    private CellContext<JTable> cellContext;
+    
+    public DefaultTableRenderer() {
+        this((RenderingComponentController<T>) null);
+    }
+    /**
+     * @param context
+     */
+    public DefaultTableRenderer(RenderingComponentController<T> context) {
+        this.rendererContext = new RendererController<T, JTable>(context);
+        this.cellContext = new TableCellContext();
+    }
+
+
+    /**
+     * @param context
+     */
+    public DefaultTableRenderer(RendererController context) {
+        this.rendererContext = context;
+        this.cellContext = new TableCellContext();
+    }
     // -------------- implements javax.swing.table.TableCellRenderer
     /**
      * 
@@ -61,54 +84,33 @@ public abstract class AbstractTableCellRendererExt<T extends JComponent>
      */
     public Component getTableCellRendererComponent(JTable table, Object value,
             boolean isSelected, boolean hasFocus, int row, int column) {
-
-        CellContext<JTable> context = getCellContext();
-        context.installContext(table, value, row, column, isSelected, hasFocus,
+        cellContext.installContext(table, value, row, column, isSelected, hasFocus,
                 true, true);
-        configureVisuals(context);
-        configureContent(context);
-        return rendererComponent;
+        rendererContext.configure(cellContext);
+        return rendererContext.getRendererComponent();
     }
-
-    @Override
-    protected CellContext<JTable> getCellContext() {
-        if (cellContext == null) {
-            cellContext = new TableCellContext();
-        }
-        return cellContext;
-    }
-
     /**
-     * {@inheritDoc} <p>
-     * Overridden to additionally configure focus colors.
+     * @param background
      */
-    @Override
-    protected void configureVisuals(CellContext<JTable> context) {
-        super.configureVisuals(context);
-        if (context.isFocused()) {
-            configureFocusColors(context);
-        }
+    public void setBackground(Color background) {
+        rendererContext.setBackground(background);
+        
+    }
+    /**
+     * @param foreground
+     */
+    public void setForeground(Color foreground) {
+        rendererContext.setForeground(foreground);
     }
 
-    /**
-     * Configures focus-related colors form given cell context.<p>
-     * 
-     * PENDING: move to context as well? - it's the only comp
-     * with focus specifics? Problem is the parameter type...
-     * 
-     * @param context the cell context to configure from.
-     */
-    protected void configureFocusColors(CellContext<JTable> context) {
-        if (!context.isSelected() && context.isEditable()) {
-            Color col = context.getFocusForeground();
-            if (col != null) {
-                rendererComponent.setForeground(col);
-            }
-            col = context.getFocusBackground();
-            if (col != null) {
-                rendererComponent.setBackground(col);
-            }
-        }
+//----------------- RolloverRenderer
+    
+    public void doClick() {
+        rendererContext.doClick();
+        
+    }
+    public boolean isEnabled() {
+        return rendererContext.isEnabled();
     }
 
 }
