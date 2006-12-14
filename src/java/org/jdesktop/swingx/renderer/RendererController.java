@@ -36,6 +36,8 @@ import org.jdesktop.swingx.RolloverRenderer;
  * 
  * It's parameterized for both renderee (C) and rendering component(T).<p>
  * 
+ * NOTE: there's a generics problem in createDefaultRenderingController. Eclipse is
+ * happy but the standard compiler barks. So it returns null for now!
  * 
  * @author Jeanette Winzenburg
  * 
@@ -89,9 +91,9 @@ public class RendererController<T extends JComponent, C extends JComponent>
      * @param componentContext the componentContext to set
      */
     protected void setComponentContext(RenderingComponentController<T> componentContext) {
-        if (componentContext == null) {
-            componentContext = createDefaultComponentContext();
-        }
+//        if (componentContext == null) {
+//            componentContext = new RenderingLabelController();//createDefaultComponentContext();
+//        }
         this.componentContext = componentContext;
     }
 
@@ -99,7 +101,10 @@ public class RendererController<T extends JComponent, C extends JComponent>
      * @return
      */
     protected RenderingComponentController<T> createDefaultComponentContext() {
-        return (RenderingComponentController<T>) new RenderingLabelController();
+        // quickfix for build failure - 
+        // generics problem? Eclipse swallows the typecase but not ant nor CC 
+        // this will lead to NPE in the test
+        return null; //(RenderingComponentController<T>) new RenderingLabelController();
     }
 
     /**
