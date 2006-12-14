@@ -22,11 +22,13 @@
 package org.jdesktop.swingx.renderer;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
@@ -35,6 +37,9 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListModel;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
@@ -49,9 +54,12 @@ import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.LinkModel;
 import org.jdesktop.swingx.LinkRenderer;
 import org.jdesktop.swingx.action.LinkModelAction;
+import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
+import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
+import org.jdesktop.test.AncientSwingTeam.NamedColor;
 
 /**
  * Visual check of extended Swingx renderers.
@@ -153,6 +161,10 @@ public class RendererVisualCheck extends InteractiveTestCase {
         
     }
 
+    /**
+     * ext link renderer in table.
+     *
+     */
     public void interactiveTestTableLinkRenderer() {
         EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
         JXTable table = new JXTable(createModelWithLinks());
@@ -165,6 +177,10 @@ public class RendererVisualCheck extends InteractiveTestCase {
 
     }
     
+    /**
+     * ext link renderer in list.
+     *
+     */
     public void interactiveTestListLinkRenderer() {
         EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
         JXList list = new JXList(createListModelWithLinks(20));
@@ -177,6 +193,109 @@ public class RendererVisualCheck extends InteractiveTestCase {
 
     }
 
+    /**
+     * Compare xtable using custom color renderer - standard vs. ext.<p>
+     * 
+     */
+    public void interactiveTableCustomColorRenderer() {
+        TableModel model = new AncientSwingTeam();
+        JXTable xtable = new JXTable(model);
+        xtable.setDefaultRenderer(Color.class, new ColorRenderer(true));
+        JXTable table = new JXTable(model);
+        TableCellRenderer renderer = createColorRendererExt();
+        table.setDefaultRenderer(Color.class, renderer);
+        showWithScrollingInFrame(xtable, table, "JXTable: Custom color renderer - standard/ext");
+
+    }
+
+    /**
+     * Compare xtable using custom color renderer - standard vs. ext.<p>
+     * Adds highlighter ... running amok.
+     */
+    public void interactiveTableCustomColorRendererWithHighlighter() {
+        TableModel model = new AncientSwingTeam();
+        JXTable xtable = new JXTable(model);
+        xtable.addHighlighter(AlternateRowHighlighter.genericGrey);
+        xtable.setDefaultRenderer(Color.class, new ColorRenderer(true));
+        JXTable table = new JXTable(model);
+        table.addHighlighter(AlternateRowHighlighter.genericGrey);
+        TableCellRenderer renderer = createColorRendererExt();
+        table.setDefaultRenderer(Color.class, renderer);
+        showWithScrollingInFrame(xtable, table, "JXTable/highlighter: Custom color renderer - standard/ext");
+
+    }
+
+
+    /**
+     * Compare xtable using custom color renderer - standard vs. ext.<p>
+     * Adds highlighter which respects renderer's dont touch.
+     */
+    public void interactiveTableCustomColorRendererWithHighlighterDontTouch() {
+        TableModel model = new AncientSwingTeam();
+        JXTable xtable = new JXTable(model);
+        Highlighter highlighter = createPropertyRespectingHighlighter(AlternateRowHighlighter.genericGrey);
+        xtable.addHighlighter(highlighter);
+        xtable.setDefaultRenderer(Color.class, new ColorRenderer(true));
+        JXTable table = new JXTable(model);
+        table.addHighlighter(highlighter);
+        TableCellRenderer renderer = createColorRendererExt();
+        table.setDefaultRenderer(Color.class, renderer);
+        showWithScrollingInFrame(xtable, table, "JXTable/highlighter dont-touch: Custom color renderer - standard/ext");
+
+    }
+
+
+    private Highlighter createPropertyRespectingHighlighter(final Highlighter delegate) {
+        Highlighter highlighter = new Highlighter() {
+
+            @Override
+            public Component highlight(Component renderer, ComponentAdapter adapter) {
+                if (((JComponent) renderer).getClientProperty("renderer-dont-touch") != null) return renderer;
+                return delegate.highlight(renderer, adapter);
+            }
+            
+        };
+        return highlighter;
+    }
+
+    
+    /**
+     * creates and returns a color ext renderer.
+     * @return
+     */
+    protected TableCellRenderer createColorRendererExt() {
+        TableCellRenderer renderer = new DefaultTableCellRendererExt() {
+
+            Border selectedBorder;
+            @Override
+            protected void configureColors(CellContext<JTable> context) {
+                super.configureColors(context);
+                if (context.getValue() instanceof Color) {
+                    rendererComponent.setBackground((Color) context.getValue());
+                    rendererComponent.putClientProperty("renderer-dont-touch", "color");
+                } else {
+                    rendererComponent.putClientProperty("renderer-dont-touch", null);
+                }
+            }
+
+            @Override
+            protected void configureBorder(CellContext<JTable> context) {
+                if (context.isSelected()) {
+                    selectedBorder = BorderFactory.createMatteBorder(2, 5,
+                            2, 5, context.getSelectionBackground());
+                } else {
+                    selectedBorder = BorderFactory.createMatteBorder(2, 5,
+                            2, 5, context.getBackground());
+                }
+                rendererComponent.setBorder(selectedBorder);
+            }
+        };
+        return renderer;
+    }
+
+    
+    
+//--------------------- utility    
     private ListModel createListModelWithLinks(int count) {
         DefaultListModel model = new DefaultListModel();
         for (int i = 0; i < count; i++) {
@@ -229,6 +348,45 @@ public class RendererVisualCheck extends InteractiveTestCase {
         return model;
     }
 
-    
+    public static class ColorRenderer extends JLabel implements
+            TableCellRenderer {
+        Border unselectedBorder = null;
+
+        Border selectedBorder = null;
+
+        boolean isBordered = true;
+
+        public ColorRenderer(boolean isBordered) {
+            this.isBordered = isBordered;
+            setOpaque(true); // MUST do this for background to show up.
+            putClientProperty("renderer-dont-touch", "color");
+        }
+
+        public Component getTableCellRendererComponent(JTable table,
+                Object color, boolean isSelected, boolean hasFocus, int row,
+                int column) {
+            Color newColor = (Color) color;
+            setBackground(newColor);
+            if (isBordered) {
+                if (isSelected) {
+                    if (selectedBorder == null) {
+                        selectedBorder = BorderFactory.createMatteBorder(2, 5,
+                                2, 5, table.getSelectionBackground());
+                    }
+                    setBorder(selectedBorder);
+                } else {
+                    if (unselectedBorder == null) {
+                        unselectedBorder = BorderFactory.createMatteBorder(2,
+                                5, 2, 5, table.getBackground());
+                    }
+                    setBorder(unselectedBorder);
+                }
+            }
+
+            setToolTipText("RGB value: " + newColor.getRed() + ", "
+                    + newColor.getGreen() + ", " + newColor.getBlue());
+            return this;
+        }
+    }   
 
 }
