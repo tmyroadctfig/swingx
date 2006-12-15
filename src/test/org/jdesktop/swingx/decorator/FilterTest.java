@@ -260,7 +260,7 @@ public class FilterTest extends InteractiveTestCase {
      */
     public void testSortControllerSortKeysInitSorter() {
         FilterPipeline pipeline = createAssignedPipeline(true);
-        int column = 2;
+        int column = 1;
         SortController controller = pipeline.getSortController();
         SortKey sortKey = new SortKey(SortOrder.DESCENDING, column, Collator.getInstance());
         controller.setSortKeys(Collections.singletonList(sortKey));
