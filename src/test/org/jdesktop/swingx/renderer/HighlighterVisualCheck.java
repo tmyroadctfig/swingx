@@ -22,15 +22,18 @@
 package org.jdesktop.swingx.renderer;
 
 import java.awt.Color;
+import java.awt.Component;
 
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
-import org.jdesktop.swingx.decorator.HighlighterIssues;
+import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.ConditionalHighlighter;
 import org.jdesktop.test.AncientSwingTeam;
 
 /**
@@ -44,7 +47,7 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
 
     public static void main(String args[]) {
 //      setSystemLF(true);
-      HighlighterIssues test = new HighlighterIssues();
+      HighlighterVisualCheck test = new HighlighterVisualCheck();
       try {
          test.runInteractiveTests(".*Table.*");
       } catch (Exception e) {
@@ -79,12 +82,16 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
      * foreground.
      * <p>
      * 
-     * Use SwingX's extended default renderer.
+     * Use SwingX's extended default renderer.<p>
+     * 
+     * Note: in Swingx' context it's not recommended to change 
+     * visual renderer properties on the renderer layer - use
+     * a conditional highlighter instead.
      */
     public void interactiveTableCustomRendererColorBasedOnValue() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
-        RendererController configurator = new RendererController<JComponent, JComponent>(null) {
+        RendererController configurator = new RendererController<JLabel, JComponent>(new RenderingLabelController()) {
             @Override
             protected void configureColors(CellContext<JComponent> context) {
                 super.configureColors(context);
@@ -107,6 +114,68 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
         nohighlight.setDefaultRenderer(Object.class, renderer);
         showWithScrollingInFrame(table, nohighlight,
                 "ext: value-based fg renderer with bg highlighter <--> shared without highl");
+    }
+
+    /**
+     * 
+     * Note: in Swingx' context it's not recommended to change 
+     * visual renderer properties on the renderer layer - use
+     * a conditional highlighter instead. So here is the above 
+     * example going the SwingX way.<p>
+     * 
+     * This is more complicated that it should be ..
+     * 
+     */
+    public void interactiveTableConditionalColorBasedOnValue() {
+        TableModel model = new AncientSwingTeam();
+        JXTable table = new JXTable(model);
+    
+        table.setDefaultRenderer(Object.class, DefaultTableRenderer.createDefaultTableRenderer());
+        ConditionalHighlighter highlighter = new ConditionalHighlighter() {
+            @Override
+            protected void applyForeground(Component renderer, ComponentAdapter adapter) {
+                // needsHighlight/test don't have access to the renderer
+                // so we check again here
+                Color foregroundx;
+                if (testAgainstComponent(renderer, adapter)) {
+                    foregroundx = Color.RED;
+                } else {
+                    foregroundx = Color.GREEN;
+                }
+                renderer.setForeground(foregroundx);
+            }
+
+            @Override
+            public Component doHighlight(Component renderer, ComponentAdapter adapter) {
+                if (adapter.isSelected()) return renderer;
+                return super.doHighlight(renderer, adapter);
+            }
+
+            private boolean testAgainstComponent(Component renderer, ComponentAdapter adapter) {
+                if (!(renderer instanceof JLabel)) return false;
+                String text = ((JLabel) renderer).getText();
+                 return text.contains("y");
+            }
+
+            /**
+             * Overridden to always return true. We test against
+             * the text property of the label.
+             */
+            @Override
+            protected boolean test(ComponentAdapter adapter) {
+                return true;
+            }
+            
+        };
+        highlighter.setHighlightColumnIndex(-1);
+        highlighter.setTestColumnIndex(-1);
+        table.addHighlighter(AlternateRowHighlighter.genericGrey);
+        table.addHighlighter(highlighter);
+        JXTable nohighlight = new JXTable(model);
+        nohighlight.setDefaultRenderer(Object.class, DefaultTableRenderer.createDefaultTableRenderer());
+        nohighlight.addHighlighter(highlighter);
+        showWithScrollingInFrame(table, nohighlight,
+                "value-based rendering by ConditionalHighlighter");
     }
 
 }
