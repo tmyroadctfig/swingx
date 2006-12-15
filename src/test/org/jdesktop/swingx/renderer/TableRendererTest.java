@@ -26,12 +26,9 @@ import java.awt.Component;
 import java.io.Serializable;
 import java.util.logging.Logger;
 
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JTable;
-import javax.swing.ListCellRenderer;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -45,9 +42,9 @@ import org.jdesktop.swingx.InteractiveTestCase;
  * 
  * @author Jeanette Winzenburg
  */
-public class RendererTest extends InteractiveTestCase {
+public class TableRendererTest extends InteractiveTestCase {
 
-    private static final Logger LOG = Logger.getLogger(RendererTest.class
+    private static final Logger LOG = Logger.getLogger(TableRendererTest.class
             .getName());
     
     private JTable table;
@@ -56,11 +53,6 @@ public class RendererTest extends InteractiveTestCase {
     private int xColumn;
     private DefaultTableRenderer<JLabel> xTableRenderer;
 
-    private DefaultListCellRenderer coreListRenderer;
-
-    private DefaultListRenderer<JLabel> xListRenderer;
-
-    private JList list;
     
     @Override
     protected void setUp() throws Exception {
@@ -73,204 +65,12 @@ public class RendererTest extends InteractiveTestCase {
         xTableRenderer = DefaultTableRenderer.createDefaultTableRenderer();
         table.getColumnModel().getColumn(xColumn).setCellRenderer(xTableRenderer);
         
-        list = new JList(new Object[] {1, 2, 3});
-        coreListRenderer = new DefaultListCellRenderer();
-        xListRenderer = DefaultListRenderer.createDefaultListRenderer();
     }
 
  
     
-    /**
-     * base interaction with list: focused, not-selected uses UI border.
-     * 
-     *
-     */
-    public void testListFocusSelectedBorder() {
-        // sanity to see test test validity
-//        UIManager.put("List.focusSelectedCellHighlightBorder", new LineBorder(Color.red));
-        // access ui colors
-        Border selectedFocusBorder = UIManager.getBorder("List.focusSelectedCellHighlightBorder");
-        // sanity
-        if (selectedFocusBorder == null) {
-            LOG.info("cannot run focusSelectedBorder - UI has no selected focus border");
-            return;
-            
-        }
-        // need to prepare directly - focus is true only if list is focusowner
-        JComponent coreComponent = (JComponent) coreListRenderer.getListCellRendererComponent(list, 
-                null, 0, true, true);
-        // sanity: known standard behaviour
-        assertEquals(selectedFocusBorder, coreComponent.getBorder());
-        // prepare extended
-        JComponent xComponent = (JComponent) xListRenderer.getListCellRendererComponent(list, 
-                null, 0, true, true);
-        // assert behaviour same as standard
-        assertEquals(coreComponent.getBorder(), xComponent.getBorder());
-    }
-
-    /**
-     * base interaction with list: focused, not-selected uses UI border.
-     * 
-     *
-     */
-    public void testListFocusBorder() {
-        // access ui colors
-        Border focusBorder = UIManager.getBorder("List.focusCellHighlightBorder");
-//        Border selectedFocusBorder = UIManager.getBorder("List.focusSelectedCellHighlightBorder");
-        // sanity
-        assertNotNull(focusBorder);
-        assertNotSame(focusBorder, UIManager.getBorder("Table.focusCellHighlightBorder"));
-        // need to prepare directly - focus is true only if list is focusowner
-        JComponent coreComponent = (JComponent) coreListRenderer.getListCellRendererComponent(list, 
-                null, 0, false, true);
-        // sanity: known standard behaviour
-        assertEquals(focusBorder, coreComponent.getBorder());
-        // prepare extended
-        JComponent xComponent = (JComponent) xListRenderer.getListCellRendererComponent(list, 
-                null, 0, false, true);
-        // assert behaviour same as standard
-        assertEquals(coreComponent.getBorder(), xComponent.getBorder());
-    }
-
-    /**
-     * base interaction with table: custom color of renderer precedes
-     * table color.
-     *
-     */
-    public void testListRendererExtCustomColor() {
-        Color background = Color.MAGENTA;
-        Color foreground = Color.YELLOW;
-        
-//        // prepare standard - not applicable for core default list renderer
-//        coreListRenderer.setBackground(background);
-//        coreListRenderer.setForeground(foreground);
-//        Component coreComponent = coreListRenderer.getListCellRendererComponent(list, 
-//                null, 0, false, false);
-
-        // prepare extended
-        xListRenderer.setBackground(background);
-        xListRenderer.setForeground(foreground);
-        Component xComponent = xListRenderer.getListCellRendererComponent(list, 
-                null, 0, false, false);
-        // assert behaviour same as standard
-        assertEquals(background, xComponent.getBackground());
-        assertEquals(foreground, xComponent.getForeground());
-    }
-
     
-    /**
-     * base interaction with list: renderer uses list's selection color.
-     *
-     */
-    public void testListRendererExtSelectedColors() {
-        // select first row
-        list.setSelectedIndex(0);
-        // prepare standard
-        Component coreComponent = coreListRenderer.getListCellRendererComponent(list, 
-                null, 0, true, false);
-        // sanity: known standard behaviour
-        assertEquals(list.getSelectionBackground(), coreComponent.getBackground());
-        assertEquals(list.getSelectionForeground(), coreComponent.getForeground());
-        // prepare extended
-        Component xComponent = xListRenderer.getListCellRendererComponent(list, 
-                null, 0, true, false);
-        // assert behaviour same as standard
-        assertEquals(coreComponent.getBackground(), xComponent.getBackground());
-        assertEquals(coreComponent.getForeground(), xComponent.getForeground());
-    }
-    
-    /**
-     * base interaction with list: renderer uses list's custom selection color.
-     *
-     */
-    public void testListRendererExtListSelectedColors() {
-        Color background = Color.MAGENTA;
-        Color foreground = Color.YELLOW;
-        list.setSelectionBackground(background);
-        list.setSelectionForeground(foreground);
-        // select first row
-        list.setSelectedIndex(0);
-        // prepare standard
-        Component coreComponent = coreListRenderer.getListCellRendererComponent(list, 
-                null, 0, true, false);
-        // sanity: known standard behaviour
-        assertEquals(list.getSelectionBackground(), coreComponent.getBackground());
-        assertEquals(list.getSelectionForeground(), coreComponent.getForeground());
-        // prepare extended
-        Component xComponent = xListRenderer.getListCellRendererComponent(list, 
-                null, 0, true, false);
-        // assert behaviour same as standard
-        assertEquals(coreComponent.getBackground(), xComponent.getBackground());
-        assertEquals(coreComponent.getForeground(), xComponent.getForeground());
-    }
-
-
-    /**
-     * base interaction with list: renderer uses list's unselected custom colors
-     * 
-     *
-     */
-    public void testListRendererExtListColors() {
-        Color background = Color.MAGENTA;
-        Color foreground = Color.YELLOW;
-        list.setBackground(background);
-        list.setForeground(foreground);
-        // prepare standard
-        Component coreComponent = coreListRenderer.getListCellRendererComponent(list, 
-                null, 0, false, false);
-        // sanity: known standard behaviour
-        assertEquals(list.getBackground(), coreComponent.getBackground());
-        assertEquals(list.getForeground(), coreComponent.getForeground());
-        // prepare extended
-        Component xComponent = xListRenderer.getListCellRendererComponent(list, 
-                null, 0, false, false);
-        // assert behaviour same as standard
-        assertEquals(coreComponent.getBackground(), xComponent.getBackground());
-        assertEquals(coreComponent.getForeground(), xComponent.getForeground());
-        
-    }
-    
-    /**
-     * base interaction with list: renderer uses list's unselected  colors
-     * 
-     *
-     */
-    public void testListRendererExtColors() {
-        // prepare standard
-        Component coreComponent = coreListRenderer.getListCellRendererComponent(list, 
-                null, 0, false, false);
-        // sanity: known standard behaviour
-        assertEquals(list.getBackground(), coreComponent.getBackground());
-        assertEquals(list.getForeground(), coreComponent.getForeground());
-        // prepare extended
-        Component xComponent = xListRenderer.getListCellRendererComponent(list, 
-                null, 0, false, false);
-        // assert behaviour same as standard
-        assertEquals(coreComponent.getBackground(), xComponent.getBackground());
-        assertEquals(coreComponent.getForeground(), xComponent.getForeground());
-    }
-    /**
-     * characterize opaqueness of rendering components.
-     *
-     */
-    public void testListOpaqueRenderer() {
-        // sanity
-        assertFalse(new JLabel().isOpaque());
-        assertTrue(coreListRenderer.isOpaque());
-//        assertTrue(xListRenderer.getRendererComponent().isOpaque());
-    }
-   
-    /**
-     * base existence/type tests while adding DefaultTableCellRendererExt.
-     *
-     */
-    public void testListRendererExt() {
-        DefaultListRenderer<JLabel> renderer = DefaultListRenderer.createDefaultListRenderer();
-        assertTrue(renderer instanceof ListCellRenderer);
-        assertTrue(renderer instanceof Serializable);
-        
-    }
-    
+ 
 //----------------- table renderer-related tests    
     /**
      * base interaction with table: focused, not-selected uses UI border.

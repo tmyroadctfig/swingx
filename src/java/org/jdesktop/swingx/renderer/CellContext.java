@@ -23,6 +23,7 @@ package org.jdesktop.swingx.renderer;
 
 import java.awt.Color;
 
+import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
@@ -52,7 +53,6 @@ public class CellContext<T extends JComponent> {
     boolean focused;
     boolean expanded;
     boolean leaf;
-    
     
     public void installContext(T component, Object value, int row, int column, 
             boolean selected, boolean focused, boolean expanded, boolean leaf) {
@@ -158,6 +158,9 @@ public class CellContext<T extends JComponent> {
         return col;
     }
 
-
+    
+    protected Icon getIcon() {
+        return null;
+    }
     
 }
