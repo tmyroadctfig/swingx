@@ -21,8 +21,6 @@
  */
 package org.jdesktop.swingx.renderer;
 
-import java.text.DateFormat;
-
 import javax.swing.JComponent;
 
 public abstract class RenderingComponentController<T extends JComponent> {

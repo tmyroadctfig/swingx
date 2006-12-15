@@ -27,6 +27,7 @@ import java.awt.Component;
 import java.io.Serializable;
 
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
@@ -37,6 +38,7 @@ import org.jdesktop.swingx.RolloverRenderer;
  * Abstract base class of all extended TableCellRenderers in SwingX.
  * <p>
  * 
+ * PENDING: this is not really serializable - no default constructor
  * 
  * @author Jeanette Winzenburg
  * 
@@ -49,9 +51,10 @@ public class DefaultTableRenderer <T extends JComponent>
     private RendererController rendererContext;
     private CellContext<JTable> cellContext;
     
-    public DefaultTableRenderer() {
-        this((RenderingComponentController<T>) null);
+    public static DefaultTableRenderer<JLabel> createDefaultTableRenderer() {
+        return new DefaultTableRenderer<JLabel>(new RenderingLabelController());
     }
+
     /**
      * @param context
      */

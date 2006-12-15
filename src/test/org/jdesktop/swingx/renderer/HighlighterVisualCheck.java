@@ -62,7 +62,7 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
     public void interactiveTableCustomRendererColor() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
-        DefaultTableRenderer renderer = new DefaultTableRenderer();
+        DefaultTableRenderer renderer = DefaultTableRenderer.createDefaultTableRenderer();
         renderer.setForeground(foreground);
         renderer.setBackground(background);
         table.addHighlighter(AlternateRowHighlighter.genericGrey);

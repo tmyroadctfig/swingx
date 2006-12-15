@@ -27,6 +27,7 @@ import java.awt.Component;
 import java.io.Serializable;
 
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
@@ -49,9 +50,12 @@ public class DefaultListRenderer <T extends JComponent>
     private RendererController rendererContext;
     private CellContext<JList> cellContext;
     
-    public DefaultListRenderer() {
-        this((RenderingComponentController<T>)null);
+    public static DefaultListRenderer<JLabel> createDefaultListRenderer() {
+        return new DefaultListRenderer<JLabel>(new RenderingLabelController());
     }
+//    public DefaultListRenderer() {
+//        this((RenderingComponentController<T>)null);
+//    }
     /**
      * @param context
      */

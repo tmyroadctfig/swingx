@@ -54,7 +54,7 @@ public class RendererTest extends InteractiveTestCase {
     private int coreColumn;
     private DefaultTableCellRenderer coreTableRenderer;
     private int xColumn;
-    private DefaultTableRenderer<JComponent> xTableRenderer;
+    private DefaultTableRenderer<JLabel> xTableRenderer;
 
     private DefaultListCellRenderer coreListRenderer;
 
@@ -70,12 +70,12 @@ public class RendererTest extends InteractiveTestCase {
         coreTableRenderer = new DefaultTableCellRenderer();
         table.getColumnModel().getColumn(coreColumn).setCellRenderer(coreTableRenderer);
         xColumn = 1;
-        xTableRenderer = new DefaultTableRenderer<JComponent>();
+        xTableRenderer = DefaultTableRenderer.createDefaultTableRenderer();
         table.getColumnModel().getColumn(xColumn).setCellRenderer(xTableRenderer);
         
         list = new JList(new Object[] {1, 2, 3});
         coreListRenderer = new DefaultListCellRenderer();
-        xListRenderer = new DefaultListRenderer<JLabel>();
+        xListRenderer = DefaultListRenderer.createDefaultListRenderer();
     }
 
  
@@ -265,7 +265,7 @@ public class RendererTest extends InteractiveTestCase {
      *
      */
     public void testListRendererExt() {
-        DefaultListRenderer<JLabel> renderer = new DefaultListRenderer();
+        DefaultListRenderer<JLabel> renderer = DefaultListRenderer.createDefaultListRenderer();
         assertTrue(renderer instanceof ListCellRenderer);
         assertTrue(renderer instanceof Serializable);
         
@@ -494,7 +494,7 @@ public class RendererTest extends InteractiveTestCase {
      *
      */
     public void testTableRendererExt() {
-        DefaultTableRenderer<JComponent> renderer = new DefaultTableRenderer<JComponent>();
+        DefaultTableRenderer<JLabel> renderer = DefaultTableRenderer.createDefaultTableRenderer();
         assertTrue(renderer instanceof TableCellRenderer);
         assertTrue(renderer instanceof Serializable);
         

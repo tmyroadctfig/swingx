@@ -67,50 +67,28 @@ public class RendererController<T extends JComponent, C extends JComponent>
     }
 
     /**
-     * Instantiates the renderer component to the type specified
-     * by the subclass.
-     * 
-     * @see #createRendererComponent()
+     * Instantiates a RendererController with the given component controller
+     * @param componentController the component controller to configure, must not be null
      */
-    public RendererController(RenderingComponentController<T> componentContext) {
-        setComponentContext(componentContext);
+    public RendererController(RenderingComponentController<T> componentController) {
+        setComponentController(componentController);
     }
 
-    /**
-     * Configures the renderering component's content from the
-     * given cell context.
-     * 
-     * @param context the cell context to configure from
-     * 
-     */
-    protected void configureContent(CellContext<C> context) {
-        getComponentContext().configureContent(context);
-    }
 
     /**
+     * The component's wrapper to use.
+     * 
      * @param componentContext the componentContext to set
      */
-    protected void setComponentContext(RenderingComponentController<T> componentContext) {
-//        if (componentContext == null) {
-//            componentContext = new RenderingLabelController();//createDefaultComponentContext();
-//        }
+    protected void setComponentController(RenderingComponentController<T> componentContext) {
         this.componentContext = componentContext;
     }
 
-    /**
-     * @return
-     */
-    protected RenderingComponentController<T> createDefaultComponentContext() {
-        // quickfix for build failure - 
-        // generics problem? Eclipse swallows the typecase but not ant nor CC 
-        // this will lead to NPE in the test
-        return null; //(RenderingComponentController<T>) new RenderingLabelController();
-    }
 
     /**
      * @return the componentContext
      */
-    protected RenderingComponentController<T> getComponentContext() {
+    protected RenderingComponentController<T> getComponentController() {
         return componentContext;
     }
     
@@ -119,7 +97,7 @@ public class RendererController<T extends JComponent, C extends JComponent>
      * @return the rendererComponent
      */
     protected T getRendererComponent() {
-        return getComponentContext().rendererComponent;
+        return getComponentController().rendererComponent;
     }
 
 
@@ -144,6 +122,13 @@ public class RendererController<T extends JComponent, C extends JComponent>
         unselectedBackground = c;
     }
 
+    /**
+     * Configure the rendering component from the given cell context.
+     * Here: handles the visuals itself, 
+     * delegates the content config to the component controller.
+     * 
+     * @param context the cell's context in the renderee.
+     */
     public void configure(CellContext<C> context) {
         configureVisuals(context);
         configureContent(context);
@@ -236,6 +221,16 @@ public class RendererController<T extends JComponent, C extends JComponent>
         }
 
     }
+    /**
+     * Configures the renderering component's content from the
+     * given cell context.
+     * 
+     * @param cellContext the cell context to configure from
+     * 
+     */
+    protected void configureContent(CellContext<C> cellContext) {
+        getComponentController().configureContent(cellContext);
+    }
 
     /**
      * Returns the unselected foreground to use for the rendering 
@@ -274,6 +269,8 @@ public class RendererController<T extends JComponent, C extends JComponent>
     /**
      * Returns a string representation of the content.<p>
      * 
+     * Here: delegates to the component controller.
+     * 
      * PENDING: This is a first attempt - we need a consistent string representation
      * across all (new and old) theme: rendering, (pattern) filtering/highlighting,
      * searching, auto-complete, what else??   
@@ -282,21 +279,26 @@ public class RendererController<T extends JComponent, C extends JComponent>
      * @return a appropriate string representation of the cell's content.
      */
     protected String getStringValue(CellContext<C> context) {
-        return getComponentContext().getStringValue(context);
-//        return context.getValue() != null ? context.getValue().toString() : "";
+        return getComponentController().getStringValue(context);
     }
 
 //--------------------- RolloverRenderer    
+    
+    /**
+     * {@inheritDoc}
+     */
     public void doClick() {
         if (isEnabled()) {
-            ((RolloverRenderer) getComponentContext()).doClick(); 
+            ((RolloverRenderer) getComponentController()).doClick(); 
         }
-        
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean isEnabled() {
-        return (getComponentContext() instanceof RolloverRenderer) && 
-           ((RolloverRenderer) getComponentContext()).isEnabled();
+        return (getComponentController() instanceof RolloverRenderer) && 
+           ((RolloverRenderer) getComponentController()).isEnabled();
     }
 
 }

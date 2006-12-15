@@ -24,6 +24,11 @@ package org.jdesktop.swingx.renderer;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -40,6 +45,7 @@ import javax.swing.JTable;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.border.Border;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
@@ -60,6 +66,8 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
+
+
 
 /**
  * Visual check of extended Swingx renderers.
@@ -94,7 +102,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         xtable.setBackground(Highlighter.notePadBackground.getBackground()); // ledger
         JTable table = new JTable(model);
         table.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
-        TableCellRenderer renderer = new DefaultTableRenderer<JComponent>();
+        TableCellRenderer renderer = DefaultTableRenderer.createDefaultTableRenderer();
         table.setDefaultRenderer(Object.class, renderer);
         JXFrame frame = wrapWithScrollingInFrame(xtable, table, "JTable: Unselected focused background: core/ext renderer");
         getStatusBar(frame).add(new JLabel("background for unselected lead: first column is not-editable"));    
@@ -119,7 +127,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         xtable.setBackground(Highlighter.notePadBackground.getBackground()); // ledger
         JXTable table = new JXTable(model);
         table.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
-        TableCellRenderer renderer = new DefaultTableRenderer<JComponent>();
+        TableCellRenderer renderer = DefaultTableRenderer.createDefaultTableRenderer();
         table.setDefaultRenderer(Object.class, renderer);
         JXFrame frame = wrapWithScrollingInFrame(xtable, table, "JXTable: Unselected focused background: core/ext renderer");
         getStatusBar(frame).add(new JLabel("different background for unselected lead: first column is not-editable"));    
@@ -145,9 +153,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         xtable.setBackground(Highlighter.notePadBackground.getBackground()); // ledger
         JXTable table = new JXTable(model);
         table.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
-//        CellRendererContext rendererContext = new CellRendererContext<JLabel, JTable>(new RendererLabelContext(), new TableCellContext());
-//        CellRendererContext rendererContext = new CellRendererContext<JLabel, JTable>(new RendererLabelContext(), JTable.class);
-         TableCellRenderer renderer = new DefaultTableRenderer();
+        TableCellRenderer renderer = DefaultTableRenderer.createDefaultTableRenderer();
         table.setDefaultRenderer(Object.class, renderer);
         TableCellRenderer booleanRenderer = new DefaultTableRenderer<AbstractButton>(new RenderingButtonController());
         table.setDefaultRenderer(Boolean.class, booleanRenderer);
@@ -165,12 +171,12 @@ public class RendererVisualCheck extends InteractiveTestCase {
      */
     public void interactiveDisabledCollectionViews() {
         final JXTable table = new JXTable(new AncientSwingTeam());
-        table.setDefaultRenderer(Object.class, new DefaultTableRenderer<JComponent>());
+        table.setDefaultRenderer(Object.class, DefaultTableRenderer.createDefaultTableRenderer());
         table.setEnabled(false);
         final JXList list = new JXList(new String[] {"one", "two", "and something longer"});
         list.setEnabled(false);
 //        list.setCellRenderer(new DefaultListCellRendererExt());
-        list.setCellRenderer(new DefaultListRenderer());
+        list.setCellRenderer(DefaultListRenderer.createDefaultListRenderer());
         final JXTree tree = new JXTree(new FileSystemModel());
         tree.setEnabled(false);
         JComponent box = Box.createHorizontalBox();
@@ -192,6 +198,73 @@ public class RendererVisualCheck extends InteractiveTestCase {
         
     }
 
+    /**
+     * xtable/xlist using the same rendererController.<p>
+     * 
+     * Note: here they really share the same instance. 
+     * That's possible only if neither controller nor rendereringController
+     * rely on the cellContext's type - hmmm...
+     * 
+     *  
+     */
+    public void interactiveTableAndListCustomRenderer() {
+        final ListModel players = createPlayerModel();
+        TableModel tableModel = new AbstractTableModel() {
+            String[] columnNames = {"Name", "Score", "Player.toString"};
+            public int getColumnCount() {
+                return 3;
+            }
+
+            public int getRowCount() {
+                return players.getSize();
+            }
+
+            public Object getValueAt(int rowIndex, int columnIndex) {
+                return players.getElementAt(rowIndex);
+            }
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return Player.class;
+            }
+            
+            
+        };
+        JXTable xtable = new JXTable(tableModel);
+        RenderingPropertyController nameController = new RenderingPropertyController("name");
+        xtable.getColumn(0).setCellRenderer(new DefaultTableRenderer<JLabel>(nameController));
+        xtable.getColumn(1).setCellRenderer(new DefaultTableRenderer<JLabel>(new RenderingPropertyController("score")));
+        xtable.packAll();
+        JXList list = new JXList(players);
+        list.setCellRenderer(new DefaultListRenderer<JLabel>(nameController));
+        showWithScrollingInFrame(xtable, list, "JXTable/JXList: Custom color renderer");
+
+    }
+
+    public static class RenderingPropertyController extends RenderingLabelController {
+        
+        private String property;
+
+        public RenderingPropertyController(String property) {
+            this.property = property;
+        }
+
+        @Override
+        protected String getStringValue(CellContext context) {
+            
+            Object value = context.getValue();
+            try {
+                PropertyDescriptor desc = getPropertyDescriptor(value.getClass(), property);
+                return getValue(value, desc).toString();
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                
+            }
+            return "";
+        }
+        
+    }
+    
     /**
      * ext link renderer in table.
      *
@@ -304,24 +377,16 @@ public class RendererVisualCheck extends InteractiveTestCase {
         TableCellRenderer renderer = createColorRendererExt();
         table.setDefaultRenderer(Color.class, renderer);
         showWithScrollingInFrame(xtable, table, "JXTable/highlighter dont-touch: Custom color renderer - standard/ext");
-
     }
 
     /**
-     * Compare xtable using custom color renderer - standard vs. ext.<p>
-     * Adds highlighter ... running amok.
+     * Creates and returns a Highlighter which does nothing if the 
+     * rendererComponent has the dont-touch property set. Otherwise
+     * delegates highlighting to the delegate.
+     * 
+     * @param delegate
+     * @return
      */
-    public void interactiveListCustomColorRenderer() {
-//        TableModel model = new AncientSwingTeam();
-        ListModel model = createListColorModel();
-        JXList list = new JXList(model);
-        ListCellRenderer renderer = createListColorRendererExt();
-        list.setCellRenderer(renderer);
-        showWithScrollingInFrame(list, "JXList/highlighter: Custom color renderer - standard/ext");
-
-    }
-
-
     private Highlighter createPropertyRespectingHighlighter(final Highlighter delegate) {
         Highlighter highlighter = new Highlighter() {
 
@@ -335,6 +400,30 @@ public class RendererVisualCheck extends InteractiveTestCase {
         return highlighter;
     }
 
+
+    /**
+     * xtable/xlist using the same rendererController.<p>
+     * 
+     * Note: here they really share the same instance. 
+     * That's possible only if neither controller nor rendereringController
+     * rely on the cellContext's type - hmmm...
+     * 
+     *  
+     */
+    public void interactiveTableAndListCustomColorRenderer() {
+        TableModel tableModel = new AncientSwingTeam();
+        RendererController controller = createColorRendererContext();
+        JXTable xtable = new JXTable(tableModel);
+        xtable.setDefaultRenderer(Color.class, new DefaultTableRenderer(controller));
+        ListModel model = createListColorModel();
+        JXList list = new JXList(model);
+        ListCellRenderer renderer = new DefaultListRenderer(controller);
+        list.setCellRenderer(renderer);
+        showWithScrollingInFrame(xtable, list, "JXTable/JXList: Custom color renderer");
+
+    }
+
+
     
     /**
      * creates and returns a color ext renderer.
@@ -342,7 +431,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
      */
     protected TableCellRenderer createColorRendererExt() {
         
-        RendererController context = createRendererContext();
+        RendererController context = createColorRendererContext();
         
         TableCellRenderer renderer = new DefaultTableRenderer(context);
         return renderer;
@@ -354,14 +443,14 @@ public class RendererVisualCheck extends InteractiveTestCase {
      */
     protected ListCellRenderer createListColorRendererExt() {
         
-        RendererController context = createRendererContext();
+        RendererController context = createColorRendererContext();
         
         ListCellRenderer renderer = new DefaultListRenderer(context);
         return renderer;
     }
 
     
-    private RendererController createRendererContext() {
+    private RendererController createColorRendererContext() {
         RendererController context = new RendererController<JLabel, JComponent>(new RenderingLabelController() ) {
             Border selectedBorder;
             @Override
@@ -451,12 +540,6 @@ public class RendererVisualCheck extends InteractiveTestCase {
     private ListModel createListColorModel() {
         AncientSwingTeam tableModel = new AncientSwingTeam();
         int colorColumn = 2;
-//        for (int i = 0; i < tableModel.getColumnCount(); i++) {
-//            if (tableModel.getColumnClass(i).isAssignableFrom(Color.class)) {
-//                colorColumn = i;
-//                break;
-//            }
-//        }
         DefaultListModel model = new DefaultListModel();
         for (int i = 0; i < tableModel.getRowCount(); i++) {
             model.addElement(tableModel.getValueAt(i, colorColumn));
@@ -465,6 +548,9 @@ public class RendererVisualCheck extends InteractiveTestCase {
     }
 
 
+    /**
+     * copied from sun's tutorial.
+     */
     public static class ColorRenderer extends JLabel implements
             TableCellRenderer {
         Border unselectedBorder = null;
@@ -505,5 +591,116 @@ public class RendererVisualCheck extends InteractiveTestCase {
             return this;
         }
     }   
+    
+    public static class Player {
+        String name;
+        int score;
+        public Player(String name, int score) {
+            this.name = name;
+            this.score = score;
+        }
+        @Override
+        public String toString() {
+            return name + " has score: " + score;
+        }
+        public String getName() {
+            return name;
+        }
+        public int getScore() {
+            return score;
+        }
+        
+        
+    }
+
+    /**
+     * create and returns a ListModel containing Players.
+     * @return
+     */
+    private ListModel createPlayerModel() {
+        DefaultListModel model = new DefaultListModel();
+        model.addElement(new Player("Henry", 10));
+        model.addElement(new Player("Berta", 112));
+        model.addElement(new Player("Dave", 20));
+        return model;
+    }
+
+    
+    /**
+     * c&p'd from JGoodies BeanUtils.
+     * 
+     * Looks up and returns a <code>PropertyDescriptor</code> for the
+     * given Java Bean class and property name using the standard 
+     * Java Bean introspection behavior.
+     * 
+     * @param beanClass     the type of the bean that holds the property
+     * @param propertyName  the name of the Bean property
+     * @return the <code>PropertyDescriptor</code> associated with the given
+     *     bean and property name as returned by the Bean introspection
+     *     
+     * @throws IntrospectionException if an exception occurs during
+     *     introspection.
+     * @throws NullPointerException if the beanClass or propertyName is <code>null</code>
+     * 
+     * @since 1.1.1
+     */
+    public static PropertyDescriptor getPropertyDescriptor(
+        Class beanClass,
+        String propertyName)
+        throws IntrospectionException {
+
+        BeanInfo info = Introspector.getBeanInfo(beanClass);
+        PropertyDescriptor[] descriptors = info.getPropertyDescriptors();
+        for (int i = 0; i < descriptors.length; i++) {
+            if (propertyName.equals(descriptors[i].getName()))
+                return descriptors[i];
+        }
+        throw new IntrospectionException(
+            "Property '" + propertyName + "' not found in bean " + beanClass);
+    }
+
+    /**
+     * c&p'd from JGoodies BeanUtils.
+     * 
+     * Returns the value of the specified property of the given non-null bean.
+     * This operation is unsupported if the bean property is read-only.<p>
+     * 
+     * If the read access fails, a PropertyAccessException is thrown
+     * that provides the Throwable that caused the failure.
+     * 
+     * @param bean                the bean to read the value from
+     * @param propertyDescriptor  describes the property to be read
+     * @return the bean's property value
+     * 
+     * @throws NullPointerException           if the bean is <code>null</code>
+     * @throws UnsupportedOperationException  if the bean property is write-only
+     * @throws PropertyAccessException        if the new value could not be read
+     */
+    public static Object getValue(Object bean, PropertyDescriptor propertyDescriptor) {
+        if (bean == null)
+            throw new NullPointerException("The bean must not be null.");
+        
+        Method getter = propertyDescriptor.getReadMethod();
+        if (getter == null) {
+            throw new UnsupportedOperationException(
+                "The property '" + propertyDescriptor.getName() + "' is write-only.");
+        }
+        
+        try {
+            return getter.invoke(bean, null);
+        } catch (Exception e) {
+            throw new RuntimeException("can't access property: " + propertyDescriptor.getName());
+        }
+
+//    } catch (IllegalAccessException e) {
+//        throw PropertyAccessException.createWriteAccessException(
+//            bean, newValue, propertyDescriptor, e);
+//    } catch (IllegalArgumentException e) {
+//        throw PropertyAccessException.createWriteAccessException(
+//            bean, newValue, propertyDescriptor, e);
+//    }
+
+    }    
+    
 
 }
