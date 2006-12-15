@@ -283,7 +283,10 @@ public class ColumnControlButton extends JButton {
             this.column = column;
             column.addPropertyChangeListener(getColumnListener());
             updateFromColumnHeader(column.getHeaderValue());
-            setActionCommand(column.getIdentifier());
+            // #429-swing: actionCommand must be string
+            if (column.getIdentifier() != null) {
+                setActionCommand(column.getIdentifier().toString());
+            }
             boolean visible = (column instanceof TableColumnExt) ? 
                     ((TableColumnExt) column).isVisible() : true;
             updateFromColumnVisible(visible);

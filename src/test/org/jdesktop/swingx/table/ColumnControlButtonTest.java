@@ -36,6 +36,18 @@ import org.jdesktop.test.AncientSwingTeam;
 public class ColumnControlButtonTest extends InteractiveTestCase {
     protected TableModel sortableTableModel;
 
+    /**
+     * Issue #429-swingx: ClassCastException if column identifiers are not
+     * String type.
+     *
+     */
+    public void testNonStringIdentifier() {
+        JXTable table = new JXTable(0, 2);
+        table.getColumn(0).setIdentifier(new Object());
+        table.setColumnControlVisible(true);
+        table.getColumnControl();
+    }
+    
     public void testNotNullColumnModelListener() {
         JXTable table = new JXTable(0, 2);
         table.setColumnControlVisible(true);
