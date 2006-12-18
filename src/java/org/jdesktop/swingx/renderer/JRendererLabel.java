@@ -23,12 +23,20 @@ package org.jdesktop.swingx.renderer;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 
 import javax.swing.JLabel;
 
+import org.jdesktop.swingx.painter.Painter;
+
 /**
- * A <code>JLabel</code> optimized for usage in renderers. <p>
+ * A <code>JLabel</code> optimized for usage in renderers and
+ * with a minimal background painter support. <p>
+ * 
+ * <i>Note</i>: the painter support will be switched to painter_work as 
+ * soon it enters main. 
  * 
  * The reasoning for the performance-overrides is copied from core: <p>
  * 
@@ -53,20 +61,22 @@ import javax.swing.JLabel;
  * 
  * @author Jeanette Winzenburg
  */
-public class RendererLabel extends JLabel {
+public class JRendererLabel extends JLabel implements PainterAware {
+
+    private Painter painter;
 
     /**
      * 
      */
-    public RendererLabel() {
+    public JRendererLabel() {
         super();
       setOpaque(true);
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a> 
-     * for more information.
+     * Overridden for performance reasons.<p>
+     * PENDING: Think about Painters and opaqueness?
+     * 
      */
     public boolean isOpaque() { 
         Color back = getBackground();
@@ -79,6 +89,30 @@ public class RendererLabel extends JLabel {
             back.equals(p.getBackground()) && 
                         p.isOpaque();
         return !colorMatch && super.isOpaque(); 
+    }
+
+    public void setPainter(Painter painter) {
+        this.painter = painter;
+//        if (painter != null) {
+//            setOpaque(false);
+//        } else {
+//            setOpaque(true);
+//        }
+    }
+
+    
+    @Override
+    public void paint(Graphics g) {
+        paintPainter((Graphics2D) g);
+        super.paint(g);
+    }
+
+    /**
+     * @param graphics2D
+     */
+    protected void paintPainter(Graphics2D g) {
+        if (painter != null)
+            painter.paint(g, this);
     }
 
     /**
@@ -146,5 +180,6 @@ public class RendererLabel extends JLabel {
      * for more information.
      */
     public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) { }
+
 
 }

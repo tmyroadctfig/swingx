@@ -22,24 +22,61 @@
 package org.jdesktop.swingx.renderer;
 
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 
+/**
+ * Wrapper around a component which is usable for rendering cells. Acts as
+ * Factory for the component. Encapsulates content-related component 
+ * configuration.
+ * 
+ * @author Jeanette Winzenburg
+ */
 public abstract class RenderingComponentController<T extends JComponent> {
     protected T rendererComponent;
+    protected int alignment;
     
     public RenderingComponentController() {
+        setAlignment(JLabel.LEADING);
         rendererComponent = createRendererComponent();
     }
+    
     public T getRendererComponent() {
         return rendererComponent;
     }
+    
+    public void setAlignment(int alignment) {
+       this.alignment = alignment; 
+    }
+    
+    public int getAlignment() {
+        return alignment;
+    }
     /**
-     * Configures the renderering component's content from the
+     * Configures the renderering component's content and state from the
      * given cell context.
      * 
      * @param context the cell context to configure from
      * 
      */
-    protected abstract void configureContent(CellContext context);
+    protected void configureContent(CellContext context) {
+        configureState(context);
+        format(context);
+    }
+
+    /**
+     * Formats the renderering component's content from the
+     * given cell context.
+     * 
+     * @param context the cell context to configure from
+     */
+    protected abstract void format(CellContext context);
+
+    /**
+     * Configures the renderering component's state from the
+     * given cell context.
+     * @param context
+     */
+    protected abstract void configureState(CellContext context); 
 
     /**
      * Factory method to create and return the component to use for rendering.<p>

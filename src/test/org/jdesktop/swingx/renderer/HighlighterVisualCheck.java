@@ -30,10 +30,13 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.ConditionalHighlighter;
+import org.jdesktop.swingx.painter.Painter;
+import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
 import org.jdesktop.test.AncientSwingTeam;
 
 /**
@@ -55,6 +58,90 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
           e.printStackTrace();
       }
   }
+    /**
+     * Use GradientPainter for value-based background highlighting
+     * Use SwingX extended default renderer.
+     */
+    public void interactiveTableNumberProportionalGradientHighlight() {
+        TableModel model = new AncientSwingTeam();
+        JXTable table = new JXTable(model);
+        RenderingLabelController wrapper = new RenderingLabelController();
+        wrapper.setAlignment(JLabel.RIGHT);
+        DefaultTableRenderer renderer = new DefaultTableRenderer<JLabel>(wrapper);
+        final float maxValue = 100;
+        ConditionalHighlighter gradientHighlighter = new ConditionalHighlighter(null, null, -1, -1) {
+
+            @Override
+            public Component highlight(Component renderer,
+                    ComponentAdapter adapter) {
+                boolean highlight = needsHighlight(adapter);
+                if (highlight && (renderer instanceof PainterAware)) {
+                    float end = getEndOfGradient((Number) adapter.getValue());
+                    if (end > 1) {
+                        renderer.setBackground(Color.YELLOW.darker());
+                    } else if (end > 0.02){
+                        Painter painter = new BasicGradientPainter(0.0f, 0.0f,
+                                Color.YELLOW, end, 0.f, Color.WHITE);
+                        ((PainterAware) renderer).setPainter(painter);
+                    }
+                    return renderer;
+                }
+                return renderer;
+            }
+
+            private float getEndOfGradient(Number number) {
+                float end = number.floatValue() / maxValue;
+                return end;
+            }
+
+            @Override
+            protected boolean test(ComponentAdapter adapter) {
+                return adapter.getValue() instanceof Number;
+            }
+            
+        };
+        table.addHighlighter(gradientHighlighter);
+        table.setDefaultRenderer(Number.class, renderer);
+        JXFrame frame = showWithScrollingInFrame(table, 
+                "painter-aware renderer with value relative highlighting");
+        getStatusBar(frame).add(new JLabel("relative gradient background number column"));
+    }
+   
+    
+    /**
+     * Use GradientPainter for value-based background highlighting
+     * Use SwingX extended default renderer.
+     */
+    public void interactiveTableGradientHighlight() {
+        TableModel model = new AncientSwingTeam();
+        JXTable table = new JXTable(model);
+        DefaultTableRenderer renderer = DefaultTableRenderer.createDefaultTableRenderer();
+        final Painter painter = new BasicGradientPainter(0.0f, 0.0f, Color.YELLOW, 0.75f, (float) 0.5, Color.WHITE);
+        ConditionalHighlighter gradientHighlighter = new ConditionalHighlighter(null, null, -1, -1) {
+
+            @Override
+            public Component highlight(Component renderer, ComponentAdapter adapter) {
+                boolean highlight = needsHighlight(adapter);
+                if (highlight && (renderer instanceof PainterAware)) {
+                    ((PainterAware) renderer).setPainter(painter);
+                    return renderer;
+                }
+                return renderer;
+            }
+
+            @Override
+            protected boolean test(ComponentAdapter adapter) {
+                return adapter.getValue().toString().contains("y");
+            }
+            
+        };
+        table.addHighlighter(gradientHighlighter);
+        table.setDefaultRenderer(Object.class, renderer);
+        JXFrame frame = showWithScrollingInFrame(table, 
+                "painter-aware renderer with value-based highlighting");
+        getStatusBar(frame).add(new JLabel("gradient background of cells with value's containing 'y'"));
+    }
+   
     /**
      * Issue #258-swingx: Background Highlighter must not change custom
      * foreground.

@@ -42,7 +42,7 @@ import org.jdesktop.swingx.RolloverRenderer;
  * 
  * @author Jeanette Winzenburg
  * 
- * @see RendererLabel
+ * @see JRendererLabel
  * 
  */
 public class DefaultTableRenderer <T extends JComponent>

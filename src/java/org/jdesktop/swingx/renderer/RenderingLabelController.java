@@ -26,7 +26,7 @@ import java.text.Format;
 import javax.swing.JLabel;
 
 /**
- * TODO add type doc
+ * A component controller which uses a JLabel. 
  * 
  * @author Jeanette Winzenburg
  */
@@ -37,26 +37,59 @@ public class RenderingLabelController extends RenderingComponentController<JLabe
     public RenderingLabelController() {
     }
     
+    /**
+     * The Format to use in content configuration. 
+     * 
+     * @param formatter the format to use.
+     */
     public void setFormatter(Format formatter) {
         this.formatter = formatter;
     }
-    
-    @Override
-    protected void configureContent(CellContext context) {
-        rendererComponent.setText(getStringValue(context));
-    }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected JLabel createRendererComponent() {
-        return new RendererLabel();
+        return new JRendererLabel();
     }
 
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to use the Format, if available. 
+     * 
+     */
     @Override
     protected String getStringValue(CellContext context) {
         if (formatter != null) {
             return context.getValue() != null ? formatter.format(context.getValue()) : "";
         }
         return super.getStringValue(context);
+    }
+
+    /**
+     * {@inheritDoc}
+     * Here: sets the Label's horizontal alignment to the alignment as configured 
+     * in the controller.
+     */
+    @Override
+    protected void configureState(CellContext context) {
+       rendererComponent.setHorizontalAlignment(getAlignment());
+    }
+
+    /**
+     * {@inheritDoc}
+     * Here: sets the labels text property to the value as returned 
+     * from the string representation.
+     * 
+     * @param the cellContext to use
+     * 
+     * @see #getStringValue(CellContext) 
+     */
+    @Override
+    protected void format(CellContext context) {
+        rendererComponent.setText(getStringValue(context));
     }
 
     

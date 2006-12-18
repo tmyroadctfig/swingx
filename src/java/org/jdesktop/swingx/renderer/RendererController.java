@@ -145,6 +145,17 @@ public class RendererController<T extends JComponent, C extends JComponent>
         configureState(context);
         configureColors(context);
         configureBorder(context);
+        configurePainter(context);
+    }
+
+    /**
+     * @param context
+     */
+    protected void configurePainter(CellContext<C> context) {
+        if (getRendererComponent() instanceof PainterAware) {
+            ((PainterAware) getRendererComponent()).setPainter(null);
+        }
+        
     }
 
     /**

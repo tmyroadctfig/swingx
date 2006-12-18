@@ -34,7 +34,7 @@ import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.basic.BasicGraphicsUtils;
 
 /**
- * TODO add type doc
+ * A LabelController specialized on rendering in JTree.  
  * 
  * @author Jeanette Winzenburg
  */
@@ -56,7 +56,6 @@ public class RenderingTreeLabelController extends RenderingLabelController {
         drawDashedFocusIndicator = (value != null && ((Boolean)value).
                                     booleanValue());
         setBorderSelectionColor(UIManager.getColor("Tree.selectionBorderColor"));
-        
 
     }
     /**
@@ -66,32 +65,51 @@ public class RenderingTreeLabelController extends RenderingLabelController {
         borderSelectionColor = color;
         
     }
+    
+    /**
+     * {@inheritDoc} <p>
+     * Overridden to copy the context's selected and focused state which are
+     * needed during the paint.
+     * 
+     */
     @Override
-    protected void configureContent(CellContext context) {
-        super.configureContent(context);
+    protected void configureState(CellContext context) {
+        super.configureState(context);
         this.selected = context.isSelected();
         this.hasFocus = context.isFocused();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected JLabel createRendererComponent() {
         return new TreeRendererLabel();
     }
 
-    class TreeRendererLabel extends RendererLabel {
+    /**
+     * A label specialized in rendering tree cells. 
+     * 
+     * Mostly c&p'ed from DefaultTreeCellRenderer.
+     */
+    class TreeRendererLabel extends JRendererLabel {
         private Color focusBGColor;
-        /**
-         * Subclassed to map <code>FontUIResource</code>s to null. If 
-         * <code>font</code> is null, or a <code>FontUIResource</code>, this
-         * has the effect of letting the font of the JTree show
-         * through. On the other hand, if <code>font</code> is non-null, and not
-         * a <code>FontUIResource</code>, the font becomes <code>font</code>.
-         */
-        public void setFont(Font font) {
-        if(font instanceof FontUIResource)
-            font = null;
-        super.setFont(font);
+        
+        TreeRendererLabel() {
+            setOpaque(false);
         }
+//        /**
+//         * Subclassed to map <code>FontUIResource</code>s to null. If 
+//         * <code>font</code> is null, or a <code>FontUIResource</code>, this
+//         * has the effect of letting the font of the JTree show
+//         * through. On the other hand, if <code>font</code> is non-null, and not
+//         * a <code>FontUIResource</code>, the font becomes <code>font</code>.
+//         */
+//        public void setFont(Font font) {
+//        if(font instanceof FontUIResource)
+//            font = null;
+//        super.setFont(font);
+//        }
 
 
         /**
@@ -135,10 +153,7 @@ public class RenderingTreeLabelController extends RenderingLabelController {
                     paintFocus(g, 0, 0, getWidth() - imageOffset, getHeight());
                 }
             }
-            setBackground(null);
-
             super.paint(g);
-            setBackground(bColor);
        }
 
        private void paintFocus(Graphics g, int x, int y, int w, int h) {

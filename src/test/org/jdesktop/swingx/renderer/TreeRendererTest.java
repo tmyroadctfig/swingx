@@ -105,11 +105,13 @@ public class TreeRendererTest extends InteractiveTestCase {
         JTree xtree = new JTree();
         Color background = Color.MAGENTA;
         Color foreground = Color.YELLOW;
-//        xtree.setBackground(background);
-//        xtree.setForeground(foreground);
-        xtree.setCellRenderer(coreTreeRenderer);
-        coreTreeRenderer.setBackgroundNonSelectionColor(background);
-        coreTreeRenderer.setTextNonSelectionColor(foreground);
+        xtree.setBackground(background);
+        xtree.setForeground(foreground);
+        DefaultTreeCellRenderer coreTreeCellRenderer = new DefaultTreeCellRenderer();
+        coreTreeCellRenderer.setBackgroundNonSelectionColor(background);
+        coreTreeCellRenderer.setTextNonSelectionColor(foreground);
+
+        xtree.setCellRenderer(coreTreeCellRenderer);
         
         JTree tree = new JTree();
         tree.setBackground(background);
@@ -118,6 +120,32 @@ public class TreeRendererTest extends InteractiveTestCase {
         
         
         final JXFrame frame = wrapWithScrollingInFrame(xtree, tree, "custom tree colors - core vs. ext renderer");
+        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
+
+            public void actionPerformed(ActionEvent e) {
+                ComponentOrientation current = frame.getComponentOrientation();
+                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
+                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+                } else {
+                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+
+                }
+
+            }
+
+        };
+        addAction(frame, toggleComponentOrientation);
+        frame.setVisible(true);
+    }
+    public void interactiveCompareTreeExtColors() {
+        JTree xtree = new JTree();
+        xtree.setCellRenderer(coreTreeRenderer);
+        
+        JTree tree = new JTree();
+        tree.setCellRenderer(xTreeRenderer);
+        
+        
+        final JXFrame frame = wrapWithScrollingInFrame(xtree, tree, "normal tree colors - core vs. ext renderer");
         Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
 
             public void actionPerformed(ActionEvent e) {

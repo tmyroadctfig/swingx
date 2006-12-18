@@ -26,33 +26,61 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 
 /**
- * TODO add type doc
+ * A component controller which uses a AbstractButton. 
  * 
  * @author Jeanette Winzenburg
  */
 public class RenderingButtonController extends
         RenderingComponentController<AbstractButton> {
 
+    private boolean borderPainted;
+    private boolean showText;
+
+    public RenderingButtonController() {
+        super();
+        setAlignment(JLabel.CENTER);
+        setBorderPainted(true);
+    }
+    
+    /**
+     * {@inheritDoc} <p>
+     * Overridden to set the button's selected state. It's set to true if the 
+     * context's value equals Boolean.TRUE, false otherwise.
+     */
     @Override
-    protected void configureContent(CellContext context) {
+    protected void format(CellContext context) {
         boolean selected = Boolean.TRUE.equals(context.getValue());
         getRendererComponent().setSelected(selected);
-
+    }
+    
+    /**
+     * {@inheritDoc}<p>
+     * 
+     * Here: set's the buttons horizontal alignment and borderpainted properties
+     * to this controller's properties.
+     */
+    protected void configureState(CellContext context) {
+        getRendererComponent().setBorderPainted(borderPainted);
+        getRendererComponent().setHorizontalAlignment(getAlignment());
     }
 
     /**
      * {@inheritDoc}<p>
-     * Here: returns a base-configured (centered, borderpainted) 
-     * JCheckBox as rendering component.<p>
+     * Here: returns a base-configured JCheckBox as rendering component.<p>
      * 
-     * PENDING: config should happen elsewhere?
      */
     @Override
     protected AbstractButton createRendererComponent() {
         JCheckBox box = new JCheckBox();
-        box.setHorizontalAlignment(JLabel.CENTER);
-        box.setBorderPainted(true);
         return  box;
+    }
+
+    /**
+     * @param b
+     */
+    protected void setBorderPainted(boolean b) {
+        this.borderPainted = b;
+        
     }
 
     

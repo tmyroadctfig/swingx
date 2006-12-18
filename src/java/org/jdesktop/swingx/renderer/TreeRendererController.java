@@ -26,7 +26,11 @@ import javax.swing.JLabel;
 import javax.swing.JTree;
 
 /**
- * TODO add type doc
+ * A RendererController specialized on JTree. 
+ * Subclassed to not install borders and to handle icons.<p>
+ * 
+ * PENDING: move icon handling into RenderingController? Custom icons
+ * often are content dependent.
  * 
  * @author Jeanette Winzenburg
  */

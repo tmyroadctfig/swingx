@@ -46,11 +46,15 @@ import org.jdesktop.swingx.action.LinkAction;
  * 
  * Internally uses JXHyperlink as rendering component. <p>
  * 
- * PENDING: make renderer respect selected cell state.
+ * PENDING: can go from RenderingButtonController? <p>
  * 
- * PENDING: TreeCellRenderer has several issues
- *   - no icons
- *   - usual background highlighter issues
+ * PENDING: make renderer respect selected cell state. <p>
+ * 
+ * PENDING: TreeCellRenderer has several issues <p>
+ * <ol>
+ *   <li> no icons
+ *   <li> usual background highlighter issues
+ * </ol>  
  * 
  * @author Jeanette Winzenburg
  */
@@ -187,23 +191,10 @@ public class RenderingHyperlinkController
 //------------------------ TableCellRenderer
     
 
-    @Override
-    protected void configureContent(CellContext context) {
-        Object value = context.getValue();
-        linkAction.setTarget(value);
-        if (context.getComponent() !=  null) {
-            Point p = (Point) context.getComponent()
-                    .getClientProperty(RolloverProducer.ROLLOVER_KEY);
-            if (/*hasFocus || */(p != null && (p.x >= 0) && 
-                    (p.x == context.getColumn()) && (p.y == context.getRow()))) {
-                 getRendererComponent().getModel().setRollover(true);
-            } else {
-                getRendererComponent().getModel().setRollover(false);
-            }
-        }
-        
-    }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected JXHyperlink createRendererComponent() {
         return new JXHyperlink() {
@@ -218,16 +209,49 @@ public class RenderingHyperlinkController
         };
     }
 
-//    @Override
-//    protected void configureColors(CellContext<C> context) {
-//        if (context.isSelected()) {
-////          linkButton.setForeground(table.getSelectionForeground());
-//          getRendererComponent().setBackground(context.getSelectionBackground());
-//      }
-//      else {
-////          linkButton.setForeground(table.getForeground());
-//          getRendererComponent().setBackground(context.getBackground());
-//      }
-//    }
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to set the hyperlink's rollover state. 
+     */
+    @Override
+    protected void configureState(CellContext context) {
+        if (context.getComponent() !=  null) {
+            Point p = (Point) context.getComponent()
+                    .getClientProperty(RolloverProducer.ROLLOVER_KEY);
+            if (/*hasFocus || */(p != null && (p.x >= 0) && 
+                    (p.x == context.getColumn()) && (p.y == context.getRow()))) {
+                 rendererComponent.getModel().setRollover(true);
+            } else {
+                rendererComponent.getModel().setRollover(false);
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * Overridden to set the LinkAction's target to the context's value, if 
+     * targetable.<p>
+     * 
+     * PENDING: Forces foreground color
+     * to those defined by hyperlink - this should happen automatically? Hyperlink
+     * bug?
+     * 
+     */
+    @Override
+    protected void format(CellContext context) {
+        Object value = context.getValue();
+        if (isTargetable(value)) {
+            linkAction.setTarget(value);
+        } else {
+            linkAction.setTarget(null);
+        }
+        // hmm... the hyperlink should do this automatically..
+        rendererComponent.setForeground(linkAction.isVisited() ? 
+                rendererComponent.getClickedColor() : rendererComponent.getUnclickedColor());
+        
+    }
+
 
 }
