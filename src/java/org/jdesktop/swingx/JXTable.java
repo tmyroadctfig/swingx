@@ -2882,10 +2882,23 @@ public class JXTable extends JTable
         }
 //-------------------------- accessing view state/values
         
+
+        
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Object getFilteredValueAt(int row, int column) {
             return getValueAt(table.convertRowIndexToModel(row), column);
 //            return table.getValueAt(row, modelToView(column)); // in view coordinates
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Object getValue() {
+            return table.getValueAt(row, column);
         }
 
         /**
