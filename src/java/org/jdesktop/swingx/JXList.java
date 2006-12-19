@@ -990,6 +990,15 @@ public class JXList extends JList {
         }
 
         /**
+         * {@inheritDoc} <p>
+         * Overridden to return value at implicit view coordinates.
+         */
+        @Override
+        public Object getValue() {
+            return list.getElementAt(row);
+        }
+
+        /**
          * {@inheritDoc}
          */
         public Object getValueAt(int row, int column) {

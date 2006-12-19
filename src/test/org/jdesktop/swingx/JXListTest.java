@@ -22,6 +22,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
+import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
@@ -44,6 +45,40 @@ public class JXListTest extends InteractiveTestCase {
     protected ListModel listModel;
     protected DefaultListModel ascendingListModel;
 
+    /**
+     * Test assumptions of accessing list model/view values through
+     * the list's componentAdapter.
+     * 
+     * PENDING: the default's getValue() implementation is incorrect!
+     *
+     */
+    public void testComponentAdapterCoordinates() {
+        JXList list = new JXList(ascendingListModel, true);
+        Object originalFirstRowValue = list.getElementAt(0);
+        Object originalLastRowValue = list.getElementAt(list.getElementCount() - 1);
+        assertEquals("view row coordinate equals model row coordinate", 
+                list.getModel().getElementAt(0), originalFirstRowValue);
+        // sort first column - actually does not change anything order 
+        list.toggleSortOrder();
+        // sanity asssert
+        assertEquals("view order must be unchanged ", 
+                list.getElementAt(0), originalFirstRowValue);
+        // invert sort
+        list.toggleSortOrder();
+        // sanity assert
+        assertEquals("view order must be reversed changed ", 
+                list.getElementAt(0), originalLastRowValue);
+        ComponentAdapter adapter = list.getComponentAdapter();
+        assertEquals("adapter filteredValue expects row view coordinates", 
+                list.getElementAt(0), adapter.getFilteredValueAt(0, 0));
+        // adapter coordinates are view coordinates
+        adapter.row = 0;
+        adapter.column = 0;
+        assertEquals("adapter.getValue must return value at adapter coordinates", 
+                list.getElementAt(0), adapter.getValue());
+        
+        
+    }
     
     /**
      * Issue #??-swingx: competing setHighlighters(null) break code.

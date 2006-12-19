@@ -348,40 +348,6 @@ public class JXTableIssues extends InteractiveTestCase {
         
     }
 
-    /**
-     * Test assumptions of accessing table model/view values through
-     * the table's componentAdapter.
-     * 
-     * PENDING: the default's getValue() implementation is incorrect!
-     *
-     */
-    public void testComponentAdapterCoordinates() {
-        JXTable table = new JXTable(createAscendingModel(0, 10));
-        Object originalFirstRowValue = table.getValueAt(0,0);
-        Object originalLastRowValue = table.getValueAt(table.getRowCount() - 1, 0);
-        assertEquals("view row coordinate equals model row coordinate", 
-                table.getModel().getValueAt(0, 0), originalFirstRowValue);
-        // sort first column - actually does not change anything order 
-        table.toggleSortOrder(0);
-        // sanity asssert
-        assertEquals("view order must be unchanged ", 
-                table.getValueAt(0, 0), originalFirstRowValue);
-        // invert sort
-        table.toggleSortOrder(0);
-        // sanity assert
-        assertEquals("view order must be reversed changed ", 
-                table.getValueAt(0, 0), originalLastRowValue);
-        ComponentAdapter adapter = table.getComponentAdapter();
-        assertEquals("adapter filteredValue expects row view coordinates", 
-                table.getValueAt(0, 0), adapter.getFilteredValueAt(0, 0));
-        // adapter coordinates are view coordinates
-        adapter.row = 0;
-        adapter.column = 0;
-        assertEquals("adapter.getValue must return value at adapter coordinates", 
-                table.getValueAt(0, 0), adapter.getValue());
-        
-        
-    }
     
 //-------------------- adapted jesse wilson: #223
 
