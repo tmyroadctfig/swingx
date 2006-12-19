@@ -32,7 +32,6 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
 import org.jdesktop.swingx.RolloverRenderer;
-import org.jdesktop.swingx.renderer.RendererVisualCheck.PropertyToStringConverter;
 
 
 /**
