@@ -42,6 +42,14 @@ public class RenderingLabelController extends RenderingComponentController<JLabe
     }
 
     /**
+     * @param alignment
+     */
+    public RenderingLabelController(int alignment) {
+        this();
+        setHorizontalAlignment(alignment);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

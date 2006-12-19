@@ -63,16 +63,19 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
       }
   }
     /**
-     * Use GradientPainter for value-based background highlighting
-     * Use SwingX extended default renderer.
+     * Use GradientPainter for value-based background highlighting Use SwingX
+     * extended default renderer.
      */
     public void interactiveTableAndListNumberProportionalGradientHighlight() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
-        RenderingComponentController<JLabel> numberRendering = new RenderingLabelController();
-        numberRendering.setHorizontalAlignment(JLabel.RIGHT);
-        DefaultTableRenderer renderer = new DefaultTableRenderer<JLabel>(numberRendering);
-        ConditionalHighlighter gradientHighlighter = new ConditionalHighlighter(null, null, -1, -1) {
+        RenderingComponentController<JLabel> numberRendering = new RenderingLabelController(
+                JLabel.RIGHT);
+        DefaultTableRenderer renderer = new DefaultTableRenderer<JLabel>(
+                numberRendering);
+        table.setDefaultRenderer(Number.class, renderer);
+        ConditionalHighlighter gradientHighlighter = new ConditionalHighlighter(
+                null, null, -1, -1) {
             float maxValue = 100;
 
             @Override
@@ -83,7 +86,7 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
                     float end = getEndOfGradient((Number) adapter.getValue());
                     if (end > 1) {
                         renderer.setBackground(Color.YELLOW.darker());
-                    } else if (end > 0.02){
+                    } else if (end > 0.02) {
                         Painter painter = new BasicGradientPainter(0.0f, 0.0f,
                                 Color.YELLOW, end, 0.f, Color.WHITE);
                         ((PainterAware) renderer).setPainter(painter);
@@ -102,10 +105,9 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
             protected boolean test(ComponentAdapter adapter) {
                 return adapter.getValue() instanceof Number;
             }
-            
+
         };
         table.addHighlighter(gradientHighlighter);
-        table.setDefaultRenderer(Number.class, renderer);
         // re-use component controller and highlighter in a JXList
         JXList list = new JXList(createListNumberModel(), true);
         list.setCellRenderer(new DefaultListRenderer<JLabel>(numberRendering));
@@ -113,7 +115,8 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
         list.toggleSortOrder();
         JXFrame frame = showWithScrollingInFrame(table, list,
                 "painter-aware renderer with value relative highlighting");
-        addStatusMessage(frame, "number column and list share the same rendering component and highlighter");
+        addStatusMessage(frame,
+                "number column and list share the same rendering component and highlighter");
         frame.pack();
     }
    
