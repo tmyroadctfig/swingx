@@ -24,13 +24,17 @@ package org.jdesktop.swingx.renderer;
 import java.awt.Color;
 import java.awt.Component;
 
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.ListModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
+import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
@@ -40,7 +44,7 @@ import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
 import org.jdesktop.test.AncientSwingTeam;
 
 /**
- * TODO add type doc
+ * Examples of interplay of Highlighters and extended Swingx renderers.
  * 
  * @author Jeanette Winzenburg
  */
@@ -62,14 +66,14 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
      * Use GradientPainter for value-based background highlighting
      * Use SwingX extended default renderer.
      */
-    public void interactiveTableNumberProportionalGradientHighlight() {
+    public void interactiveTableAndListNumberProportionalGradientHighlight() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
-        RenderingLabelController wrapper = new RenderingLabelController();
-        wrapper.setAlignment(JLabel.RIGHT);
-        DefaultTableRenderer renderer = new DefaultTableRenderer<JLabel>(wrapper);
-        final float maxValue = 100;
+        RenderingComponentController<JLabel> numberRendering = new RenderingLabelController();
+        numberRendering.setHorizontalAlignment(JLabel.RIGHT);
+        DefaultTableRenderer renderer = new DefaultTableRenderer<JLabel>(numberRendering);
         ConditionalHighlighter gradientHighlighter = new ConditionalHighlighter(null, null, -1, -1) {
+            float maxValue = 100;
 
             @Override
             public Component highlight(Component renderer,
@@ -102,9 +106,15 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
         };
         table.addHighlighter(gradientHighlighter);
         table.setDefaultRenderer(Number.class, renderer);
-        JXFrame frame = showWithScrollingInFrame(table, 
+        // re-use component controller and highlighter in a JXList
+        JXList list = new JXList(createListNumberModel(), true);
+        list.setCellRenderer(new DefaultListRenderer<JLabel>(numberRendering));
+        list.addHighlighter(gradientHighlighter);
+        list.toggleSortOrder();
+        JXFrame frame = showWithScrollingInFrame(table, list,
                 "painter-aware renderer with value relative highlighting");
-        getStatusBar(frame).add(new JLabel("relative gradient background number column"));
+        addStatusMessage(frame, "number column and list share the same rendering component and highlighter");
+        frame.pack();
     }
    
     
@@ -264,5 +274,22 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
         showWithScrollingInFrame(table, nohighlight,
                 "value-based rendering by ConditionalHighlighter");
     }
+
+//------------------ helper
+    
+    /**
+     * 
+     * @return a ListModel wrapped around the AncientSwingTeam's Number column.
+     */
+    private ListModel createListNumberModel() {
+        AncientSwingTeam tableModel = new AncientSwingTeam();
+        int colorColumn = 3;
+        DefaultListModel model = new DefaultListModel();
+        for (int i = 0; i < tableModel.getRowCount(); i++) {
+            model.addElement(tableModel.getValueAt(i, colorColumn));
+        }
+        return model;
+    }
+
 
 }

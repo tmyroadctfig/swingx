@@ -32,6 +32,7 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
 import org.jdesktop.swingx.RolloverRenderer;
+import org.jdesktop.swingx.renderer.RendererVisualCheck.PropertyToStringConverter;
 
 
 /**
@@ -52,9 +53,13 @@ public class DefaultTableRenderer <T extends JComponent>
     private CellContext<JTable> cellContext;
     
     public static DefaultTableRenderer<JLabel> createDefaultTableRenderer() {
-        return new DefaultTableRenderer<JLabel>(new RenderingLabelController());
+        return createDefaultTableRenderer(null);
     }
 
+    public static DefaultTableRenderer<JLabel> createDefaultTableRenderer(ToStringConverter converter) {
+        return new DefaultTableRenderer<JLabel>(new RenderingLabelController(converter));
+    }
+    
     /**
      * @param context
      */
@@ -71,6 +76,8 @@ public class DefaultTableRenderer <T extends JComponent>
         this.rendererContext = context;
         this.cellContext = new TableCellContext();
     }
+
+
     // -------------- implements javax.swing.table.TableCellRenderer
     /**
      * 

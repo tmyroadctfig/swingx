@@ -223,7 +223,16 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
         }
         return statusBar;
     }
-    
+
+    /**
+     * @param frame
+     * @param string
+     */
+    public void addStatusMessage(JXFrame frame, String message) {
+        JXStatusBar bar = getStatusBar(frame);
+        bar.add(new JLabel(message));
+    }
+
     /**
      * PENDING: JW - this is about toggling the LF, does nothing to
      * update the UI. Check all tests using this method to see if they 
@@ -242,4 +251,5 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
            LOG.log(Level.FINE, "caused by ", e1);
       }
     }
+
 }

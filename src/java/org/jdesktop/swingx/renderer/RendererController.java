@@ -51,13 +51,6 @@ public class RendererController<T extends JComponent, C extends JComponent>
     private static final Border SAFE_NO_FOCUS_BORDER = new EmptyBorder(1, 1, 1,
             1);
 
-    private Color unselectedForeground;
-
-    private Color unselectedBackground;
-
-
-    private RenderingComponentController<T> componentContext;
-    
     private static Border getNoFocusBorder() {
         if (System.getSecurityManager() != null) {
             return SAFE_NO_FOCUS_BORDER;
@@ -65,6 +58,15 @@ public class RendererController<T extends JComponent, C extends JComponent>
             return noFocusBorder;
         }
     }
+
+
+    private Color unselectedForeground;
+
+    private Color unselectedBackground;
+
+
+    private RenderingComponentController<T> componentContext;
+    
 
     /**
      * Instantiates a RendererController with the given component controller
@@ -225,6 +227,7 @@ public class RendererController<T extends JComponent, C extends JComponent>
      * @param context the cell context to configure from.
      */
     protected void configureBorder(CellContext<C> context) {
+//        getRendererComponent().setBorder(context.getBorder());
         if (context.isFocused()) {
             getRendererComponent().setBorder(context.getFocusBorder());
         } else {

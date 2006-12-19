@@ -21,37 +21,31 @@
  */
 package org.jdesktop.swingx.renderer;
 
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JTree;
-
 /**
- * A RendererController specialized on JTree. 
- * Subclassed to not install borders.<p>
- * 
- * PENDING: the tricksery with borders is an implementation detail of the 
- * rendering comp - should not ripple to up here. Nevertheless, this 
- * controller is responsible to reset (in case some Highlighter fiddled 
- * with it)
+ * TODO add type doc
  * 
  * @author Jeanette Winzenburg
  */
-public class TreeRendererController<T extends JComponent> 
-    extends RendererController<T, JTree> {
+public interface ToStringConverter {
+    
+    public final static ToStringConverter TO_STRING = new ToStringConverter() {
 
+        /**
+         * {@inheritDoc} <p>
+         * 
+         * Implemented to return the values toString if value not-null. Otherwise,
+         * returns an empty string.
+         */
+        public String getStringValue(Object value) {
+            return (value != null) ? value.toString() : "";
+        }
+        
+    };
     /**
-     * @param componentController
+     * Returns a string representation of the given value.
+     * @param value the object to present as a string
+     * @return a string representation of the given value, 
+     *  guaranteed to be not null
      */
-    public TreeRendererController(RenderingComponentController<T> componentController) {
-        super(componentController);
-    }
-
-    @Override
-    protected void configureBorder(CellContext<JTree> context) {
-        getRendererComponent().setBorder(BorderFactory.createEmptyBorder());
-    }
-
-    
-    
+    String getStringValue(Object value);
 }

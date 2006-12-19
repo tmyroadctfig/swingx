@@ -75,8 +75,29 @@ public class RenderingTreeLabelController extends RenderingLabelController {
     @Override
     protected void configureState(CellContext context) {
         super.configureState(context);
+        configureIcon(context);
         this.selected = context.isSelected();
         this.hasFocus = context.isFocused();
+    }
+    
+    protected void configureIcon(CellContext context) {
+        if (context.getComponent().isEnabled()) {
+            rendererComponent.setIcon(getIcon(context));
+        } else {
+            rendererComponent.setDisabledIcon(context.getIcon());
+            
+        }
+    }
+    
+    /**
+     * Returns the icon to use for rendering the current tree node.
+     * Here: returns the default icon as returned by the cell context.
+     * 
+     * @param context
+     * @return
+     */
+    protected Icon getIcon(CellContext context) {
+        return context.getIcon();
     }
 
     /**

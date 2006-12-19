@@ -27,6 +27,7 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 
 /**
  * Encapsulates the display context passed into the getXXRendererComponent.<p>
@@ -96,16 +97,13 @@ public class CellContext<T extends JComponent> {
         return value;
     }
 
-
     protected Color getForeground() {
         return getComponent() != null ? getComponent().getForeground() : null;
     }
 
-
     protected Color getBackground() {
         return getComponent() != null ? getComponent().getBackground() : null;
     }
-
 
     /**
      * @return
@@ -114,14 +112,12 @@ public class CellContext<T extends JComponent> {
         return null;
     }
 
-
     /**
      * @return
      */
     protected Color getSelectionForeground() {
         return null;
     }
-
 
     protected Border getFocusBorder() {
         Border border = null;
@@ -134,6 +130,12 @@ public class CellContext<T extends JComponent> {
         return border;
     }
 
+//    protected Border getBorder() {
+//        if (isFocused()) {
+//            return getFocusBorder();
+//        } 
+//        return getNoFocusBorder();
+//    }
 
     protected String getUIKey(String key) {
         return getUIPrefix() + key;

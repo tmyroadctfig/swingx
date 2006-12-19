@@ -87,11 +87,11 @@ import org.jdesktop.test.AncientSwingTeam;
  */
 public class RendererVisualCheck extends InteractiveTestCase {
     public static void main(String[] args) {
-        setSystemLF(true);
+//        setSystemLF(true);
         RendererVisualCheck test = new RendererVisualCheck();
         try {
 //            test.runInteractiveTests();
-          test.runInteractiveTests(".*Link.*");
+          test.runInteractiveTests(".*List.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -166,9 +166,9 @@ public class RendererVisualCheck extends InteractiveTestCase {
         xtable.setBackground(Highlighter.notePadBackground.getBackground()); // ledger
         JXTable table = new JXTable(model);
         table.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
-        TableCellRenderer renderer = DefaultTableRenderer.createDefaultTableRenderer();
-        table.setDefaultRenderer(Object.class, renderer);
-        TableCellRenderer booleanRenderer = new DefaultTableRenderer<AbstractButton>(new RenderingButtonController());
+        table.setDefaultRenderer(Object.class, DefaultTableRenderer.createDefaultTableRenderer());
+        TableCellRenderer booleanRenderer = new DefaultTableRenderer<AbstractButton>(
+                new RenderingButtonController());
         table.setDefaultRenderer(Boolean.class, booleanRenderer);
         JXFrame frame = wrapWithScrollingInFrame(xtable, table, "JXTable- pluggable: Unselected focused background: core/ext renderer");
         getStatusBar(frame).add(new JLabel("different background for unselected lead: first column is not-editable"));    
@@ -212,11 +212,10 @@ public class RendererVisualCheck extends InteractiveTestCase {
     }
 
     /**
-     * xtable/xlist using the same rendererController.<p>
      * 
-     * Note: here they really share the same instance. 
-     * That's possible only if neither controller nor rendereringController
-     * rely on the cellContext's type - hmmm...
+     * Example for custom ToStringConverter: bound to bean property.
+     * 
+     * A column of xtable and the xlist share the same component controller.<p>
      * 
      *  
      */
@@ -240,40 +239,48 @@ public class RendererVisualCheck extends InteractiveTestCase {
             public Class<?> getColumnClass(int columnIndex) {
                 return Player.class;
             }
+
+            @Override
+            public String getColumnName(int column) {
+                return columnNames[column];
+            }
             
             
         };
         JXTable xtable = new JXTable(tableModel);
-        RenderingPropertyController nameController = new RenderingPropertyController("name");
+        PropertyToStringConverter converter = new PropertyToStringConverter("name");
+        RenderingLabelController nameController = new RenderingLabelController(converter);
         xtable.getColumn(0).setCellRenderer(new DefaultTableRenderer<JLabel>(nameController));
-        xtable.getColumn(1).setCellRenderer(new DefaultTableRenderer<JLabel>(new RenderingPropertyController("score")));
+        PropertyToStringConverter scoreConverter = new PropertyToStringConverter("score");
+        xtable.getColumn(1).setCellRenderer(DefaultTableRenderer.createDefaultTableRenderer(scoreConverter));
         xtable.packAll();
         JXList list = new JXList(players);
+        // we share the component controller between table and list
         list.setCellRenderer(new DefaultListRenderer<JLabel>(nameController));
-        showWithScrollingInFrame(xtable, list, "JXTable/JXList: Custom color renderer");
+        showWithScrollingInFrame(xtable, list, "JXTable/JXList: Custom property renderer");
 
     }
 
-    /**
-     * Simple example to bind a renderer to a single property of the value.
-     */
-    public static class RenderingPropertyController extends RenderingLabelController {
-        
+  /**
+  * Simple example to bind a toStringConverter to a single property of the value.
+  */
+    public static class PropertyToStringConverter implements ToStringConverter {
         private String property;
 
-        public RenderingPropertyController(String property) {
+        public PropertyToStringConverter(String property) {
             this.property = property;
         }
 
-        @Override
-        protected String getStringValue(CellContext context) {
-            
-            Object value = context.getValue();
+        /**
+         * {@inheritDoc} <p>
+         * Implemented to return the toString of the named property value.
+         */
+        public String getStringValue(Object value) {
             try {
                 PropertyDescriptor desc = getPropertyDescriptor(value.getClass(), property);
-                return getValue(value, desc).toString();
+                return TO_STRING.getStringValue(getValue(value, desc));
             } catch (Exception e) {
-                // TODO Auto-generated catch block
+                // nothing much we can do here...
                 
             }
             return "";
@@ -322,6 +329,9 @@ public class RendererVisualCheck extends InteractiveTestCase {
     public void interactiveTableWithListColumnControl() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
+        JXList list = new JXList();
+        // quick-fill and hook to table columns' visibility state
+        configureList(list, table);
         // a custom rendering button controller showing both checkbox and text
         RenderingButtonController wrapper = new RenderingButtonController() {
 
@@ -336,15 +346,12 @@ public class RendererVisualCheck extends InteractiveTestCase {
             }
             
         };
-        wrapper.setAlignment(JLabel.LEADING);
-        DefaultListRenderer renderer = new DefaultListRenderer<AbstractButton>(wrapper);
-        final JXList list = new JXList();
-        list.setCellRenderer(renderer);
-        // quick-fill and hook to table columns' visibility state
-        configureList(list, table);
+        wrapper.setHorizontalAlignment(JLabel.LEADING);
+        list.setCellRenderer(new DefaultListRenderer<AbstractButton>(wrapper));
         JXFrame frame = showWithScrollingInFrame(table, list,
                 "checkbox list-renderer");
-        getStatusBar(frame).add(new JLabel("fake editable list: space/doubleclick on selected item toggles column visibility"));
+        addStatusMessage(frame, "fake editable list: space/doubleclick on selected item toggles column visibility");
+        frame.pack();
     }
 
     /**
@@ -467,9 +474,9 @@ public class RendererVisualCheck extends InteractiveTestCase {
         table.addHighlighter(AlternateRowHighlighter.genericGrey);
         TableCellRenderer renderer = createColorRendererExt();
         table.setDefaultRenderer(Color.class, renderer);
-        showWithScrollingInFrame(xtable, table, "JXTable/highlighter: Custom color renderer - standard/ext");
+        JXFrame frame = showWithScrollingInFrame(xtable, table, "JXTable/highlighter: Custom color renderer - standard/ext");
+        addStatusMessage(frame, "Highlighter hide custom color renderer background for unselected");
     }
-
 
     /**
      * Compare xtable using custom color renderer - standard vs. ext.<p>
@@ -485,7 +492,8 @@ public class RendererVisualCheck extends InteractiveTestCase {
         table.addHighlighter(highlighter);
         TableCellRenderer renderer = createColorRendererExt();
         table.setDefaultRenderer(Color.class, renderer);
-        showWithScrollingInFrame(xtable, table, "JXTable/highlighter dont-touch: Custom color renderer - standard/ext");
+        JXFrame frame = showWithScrollingInFrame(xtable, table, "JXTable/highlighter dont-touch: Custom color renderer - standard/ext");
+        addStatusMessage(frame, "Highlighter doesn't touch custom color renderer visual properties");
     }
 
     /**
@@ -541,7 +549,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
      */
     public void interactiveTableAndListCustomColorRenderingController() {
         TableModel tableModel = new AncientSwingTeam();
-        RenderingLabelController controller = createColorRenderingLabelController();
+        RenderingComponentController<JLabel> controller = createColorRenderingLabelController();
         JXTable xtable = new JXTable(tableModel);
         xtable.setDefaultRenderer(Color.class, new DefaultTableRenderer<JLabel>(controller));
         ListModel model = createListColorModel();
@@ -558,9 +566,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
      * @return
      */
     protected TableCellRenderer createColorRendererExt() {
-        
-//        RendererController context = createColorRendererContext();
-        RenderingLabelController context = createColorRenderingLabelController();
+        RenderingComponentController<JLabel> context = createColorRenderingLabelController();
         TableCellRenderer renderer = new DefaultTableRenderer<JLabel>(context);
         return renderer;
     }
@@ -570,10 +576,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
      * @return
      */
     protected ListCellRenderer createListColorRendererExt() {
-        
-//        RendererController context = createColorRendererContext();
-        RenderingLabelController context = createColorRenderingLabelController();
-        
+        RenderingComponentController<JLabel> context = createColorRenderingLabelController();
         ListCellRenderer renderer = new DefaultListRenderer<JLabel>(context);
         return renderer;
     }
@@ -617,11 +620,11 @@ public class RendererVisualCheck extends InteractiveTestCase {
 
     /**
      * Creates and returns a component controller specialized on Color values. <p>
-     * 
+     * Note: this implementation set's the tooltip
      * @return
      */
-    private RenderingLabelController createColorRenderingLabelController() {
-        RenderingLabelController context = new RenderingLabelController() {
+    private RenderingComponentController<JLabel> createColorRenderingLabelController() {
+        RenderingComponentController<JLabel> context = new RenderingLabelController() {
             Border selectedBorder;
             @Override
             protected void format(CellContext context) {
@@ -716,7 +719,8 @@ public class RendererVisualCheck extends InteractiveTestCase {
         return model;
     }
     /**
-     * @return
+     * 
+     * @return a ListModel wrapped around the AncientSwingTeam's Color column.
      */
     private ListModel createListColorModel() {
         AncientSwingTeam tableModel = new AncientSwingTeam();

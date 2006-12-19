@@ -21,8 +21,6 @@
  */
 package org.jdesktop.swingx.renderer;
 
-import java.text.Format;
-
 import javax.swing.JLabel;
 
 /**
@@ -32,18 +30,15 @@ import javax.swing.JLabel;
  */
 public class RenderingLabelController extends RenderingComponentController<JLabel> {
 
-    protected Format formatter;
- 
     public RenderingLabelController() {
+        this(null);
     }
     
     /**
-     * The Format to use in content configuration. 
-     * 
-     * @param formatter the format to use.
+     * @param converter
      */
-    public void setFormatter(Format formatter) {
-        this.formatter = formatter;
+    public RenderingLabelController(ToStringConverter converter) {
+        setToStringConverter(converter);
     }
 
     /**
@@ -55,27 +50,13 @@ public class RenderingLabelController extends RenderingComponentController<JLabe
     }
 
     /**
-     * {@inheritDoc} <p>
-     * 
-     * Overridden to use the Format, if available. 
-     * 
-     */
-    @Override
-    protected String getStringValue(CellContext context) {
-        if (formatter != null) {
-            return context.getValue() != null ? formatter.format(context.getValue()) : "";
-        }
-        return super.getStringValue(context);
-    }
-
-    /**
      * {@inheritDoc}
      * Here: sets the Label's horizontal alignment to the alignment as configured 
      * in the controller.
      */
     @Override
     protected void configureState(CellContext context) {
-       rendererComponent.setHorizontalAlignment(getAlignment());
+       rendererComponent.setHorizontalAlignment(getHorizontalAlignment());
     }
 
     /**

@@ -34,11 +34,10 @@ public class RenderingButtonController extends
         RenderingComponentController<AbstractButton> {
 
     private boolean borderPainted;
-    private boolean showText;
 
     public RenderingButtonController() {
         super();
-        setAlignment(JLabel.CENTER);
+        setHorizontalAlignment(JLabel.CENTER);
         setBorderPainted(true);
     }
     
@@ -61,12 +60,12 @@ public class RenderingButtonController extends
      */
     protected void configureState(CellContext context) {
         getRendererComponent().setBorderPainted(borderPainted);
-        getRendererComponent().setHorizontalAlignment(getAlignment());
+        getRendererComponent().setHorizontalAlignment(getHorizontalAlignment());
     }
 
     /**
      * {@inheritDoc}<p>
-     * Here: returns a base-configured JCheckBox as rendering component.<p>
+     * Here: returns a JCheckBox as rendering component.<p>
      * 
      */
     @Override

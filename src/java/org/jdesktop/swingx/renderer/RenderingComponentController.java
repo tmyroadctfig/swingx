@@ -26,7 +26,7 @@ import javax.swing.JLabel;
 
 /**
  * Wrapper around a component which is usable for rendering cells. Acts as
- * Factory for the component. Encapsulates content-related component 
+ * <code>Factory</code> for the component. Encapsulates content-related component 
  * configuration.
  * 
  * @author Jeanette Winzenburg
@@ -34,29 +34,79 @@ import javax.swing.JLabel;
 public abstract class RenderingComponentController<T extends JComponent> {
     protected T rendererComponent;
     protected int alignment;
+    protected ToStringConverter formatter;
     
     public RenderingComponentController() {
-        setAlignment(JLabel.LEADING);
+        setHorizontalAlignment(JLabel.LEADING);
+        setToStringConverter(null);
         rendererComponent = createRendererComponent();
     }
     
+    /**
+     * Returns the component to use for renderering.
+     * 
+     * @return the component to use for rendering, guaranteed to be 
+     *    not null.
+     */
     public T getRendererComponent() {
         return rendererComponent;
     }
     
-    public void setAlignment(int alignment) {
+    /**
+     * Sets the horizontal alignment property to configure the component with.
+     * Allowed values are those accepted by corresponding JLabel setter. The
+     * default value is JLabel.LEADING.
+     * 
+     * @param alignment the horizontal alignment to use when configuring the
+     *   rendering component.
+     */
+    public void setHorizontalAlignment(int alignment) {
        this.alignment = alignment; 
     }
     
-    public int getAlignment() {
+    /**
+     * Returns the horizontal alignment.
+     * 
+     * @return the horizontal component.
+     * 
+     * @see #setHorizontalAlignment(int)
+     * 
+     */
+    public int getHorizontalAlignment() {
         return alignment;
     }
+
+    /**
+     * Sets the ToStringConverter to use. If the given converter is null,
+     * uses the default to_string. 
+     * 
+     * @param formatter the format to use.
+     */
+    public void setToStringConverter(ToStringConverter formatter) {
+        if (formatter == null) {
+            formatter = ToStringConverter.TO_STRING;
+        }
+        this.formatter = formatter;
+    }
+
+    /**
+     * Returns the converter to use for obtaining the String representation.
+     * 
+     * @return the ToStringConverter used by this controller, guaranteed to
+     *   be not null.
+     */
+    public ToStringConverter getToStringConverter() {
+        return formatter;
+    }
+    
     /**
      * Configures the renderering component's content and state from the
      * given cell context.
      * 
      * @param context the cell context to configure from
      * 
+     * @see #configureState(CellContext)
+     * @see #format(CellContext)
      */
     protected void configureContent(CellContext context) {
         configureState(context);
@@ -97,7 +147,8 @@ public abstract class RenderingComponentController<T extends JComponent> {
      * @return a appropriate string representation of the cell's content.
      */
     protected String getStringValue(CellContext context) {
-        return context.getValue() != null ? context.getValue().toString() : "";
+        return formatter.getStringValue(context.getValue());
     }
+
 
 }
