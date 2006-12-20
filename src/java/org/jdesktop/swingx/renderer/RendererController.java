@@ -65,7 +65,7 @@ public class RendererController<T extends JComponent, C extends JComponent>
     private Color unselectedBackground;
 
 
-    private RenderingComponentController<T> componentContext;
+    protected RenderingComponentController<T> componentContext;
     
 
     /**

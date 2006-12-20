@@ -47,8 +47,8 @@ import org.jdesktop.swingx.RolloverRenderer;
 public class DefaultListRenderer <T extends JComponent>
         implements ListCellRenderer,  RolloverRenderer, Serializable {
 
-    private RendererController rendererContext;
-    private CellContext<JList> cellContext;
+    protected RendererController rendererContext;
+    protected CellContext<JList> cellContext;
     
     public static DefaultListRenderer<JLabel> createDefaultListRenderer() {
         return new DefaultListRenderer<JLabel>(new RenderingLabelController());
