@@ -427,7 +427,7 @@ public class ReflectionRenderer {
      */
     public BufferedImage appendReflection(BufferedImage image) {
         BufferedImage reflection = createReflection(image);
-        BufferedImage buffer = GraphicsUtilities.createTranslucentCompatibleImage(
+        BufferedImage buffer = GraphicsUtilities.createCompatibleTranslucentImage(
                 reflection.getWidth(), image.getHeight() + reflection.getHeight());
         Graphics2D g2 = buffer.createGraphics();
 
@@ -467,7 +467,7 @@ public class ReflectionRenderer {
      */
     public BufferedImage createReflection(BufferedImage image) {
         if (length == 0.0f) {
-            return GraphicsUtilities.createTranslucentCompatibleImage(1, 1);
+            return GraphicsUtilities.createCompatibleTranslucentImage(1, 1);
         }
 
         int blurOffset = isBlurEnabled() ?
@@ -475,7 +475,7 @@ public class ReflectionRenderer {
         int height = (int) (image.getHeight() * length);
 
         BufferedImage buffer =
-                GraphicsUtilities.createTranslucentCompatibleImage(
+                GraphicsUtilities.createCompatibleTranslucentImage(
                         image.getWidth() + blurOffset * 2,
                         height + blurOffset * 2);
         Graphics2D g2 = buffer.createGraphics();

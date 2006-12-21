@@ -108,7 +108,7 @@ public class GraphicsUtilities {
      * @see java.awt.Transparency
      * @see #createCompatibleImage(int, int)
      * @see #createCompatibleImage(java.awt.image.BufferedImage, int, int)
-     * @see #createTranslucentCompatibleImage(int, int)
+     * @see #createCompatibleTranslucentImage(int, int)
      * @see #loadCompatibleImage(java.net.URL)
      * @see #toCompatibleImage(java.awt.image.BufferedImage)
      * @param image the reference image from which the dimension and the
@@ -127,7 +127,7 @@ public class GraphicsUtilities {
      * @see java.awt.Transparency
      * @see #createCompatibleImage(java.awt.image.BufferedImage)
      * @see #createCompatibleImage(int, int)
-     * @see #createTranslucentCompatibleImage(int, int)
+     * @see #createCompatibleTranslucentImage(int, int)
      * @see #loadCompatibleImage(java.net.URL)
      * @see #toCompatibleImage(java.awt.image.BufferedImage)
      * @param width the width of the new image
@@ -149,7 +149,7 @@ public class GraphicsUtilities {
      *
      * @see #createCompatibleImage(java.awt.image.BufferedImage)
      * @see #createCompatibleImage(java.awt.image.BufferedImage, int, int)
-     * @see #createTranslucentCompatibleImage(int, int)
+     * @see #createCompatibleTranslucentImage(int, int)
      * @see #loadCompatibleImage(java.net.URL)
      * @see #toCompatibleImage(java.awt.image.BufferedImage)
      * @param width the width of the new image
@@ -175,7 +175,7 @@ public class GraphicsUtilities {
      * @return a new translucent compatible <code>BufferedImage</code> of the
      *   specified width and height
      */
-    public static BufferedImage createTranslucentCompatibleImage(int width,
+    public static BufferedImage createCompatibleTranslucentImage(int width,
                                                                  int height) {
         return CONFIGURATION.createCompatibleImage(width, height,
                                                    Transparency.TRANSLUCENT);
@@ -189,7 +189,7 @@ public class GraphicsUtilities {
      * @see #createCompatibleImage(java.awt.image.BufferedImage)
      * @see #createCompatibleImage(java.awt.image.BufferedImage, int, int)
      * @see #createCompatibleImage(int, int)
-     * @see #createTranslucentCompatibleImage(int, int)
+     * @see #createCompatibleTranslucentImage(int, int)
      * @see #toCompatibleImage(java.awt.image.BufferedImage)
      * @param resource the URL of the picture to load as a compatible image
      * @return a new translucent compatible <code>BufferedImage</code> of the
@@ -210,7 +210,7 @@ public class GraphicsUtilities {
      * @see #createCompatibleImage(java.awt.image.BufferedImage)
      * @see #createCompatibleImage(java.awt.image.BufferedImage, int, int)
      * @see #createCompatibleImage(int, int)
-     * @see #createTranslucentCompatibleImage(int, int)
+     * @see #createCompatibleTranslucentImage(int, int)
      * @see #loadCompatibleImage(java.net.URL)
      * @param image the image to copy into a new compatible image
      * @return a new compatible copy, with the

@@ -25,7 +25,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -259,7 +258,7 @@ public class DropShadowBorder implements Border {
             int rectWidth = cornerSize + 1;
             RoundRectangle2D rect = new RoundRectangle2D.Double(0, 0, rectWidth, rectWidth, cornerSize, cornerSize);
             int imageWidth = rectWidth + shadowSize * 2;
-            BufferedImage image = GraphicsUtilities.createTranslucentCompatibleImage(imageWidth, imageWidth);
+            BufferedImage image = GraphicsUtilities.createCompatibleTranslucentImage(imageWidth, imageWidth);
             Graphics2D buffer = (Graphics2D)image.getGraphics();
             buffer.setColor(new Color(0.0f, 0.0f, 0.0f, shadowOpacity));
             buffer.translate(shadowSize, shadowSize);
@@ -272,7 +271,7 @@ public class DropShadowBorder implements Border {
                 blurKernel[i] = blurry;
             }
             ConvolveOp blur = new ConvolveOp(new Kernel(shadowSize, shadowSize, blurKernel));
-            BufferedImage targetImage = GraphicsUtilities.createTranslucentCompatibleImage(imageWidth, imageWidth);
+            BufferedImage targetImage = GraphicsUtilities.createCompatibleTranslucentImage(imageWidth, imageWidth);
             ((Graphics2D)targetImage.getGraphics()).drawImage(image, blur, -(shadowSize/2), -(shadowSize/2));
 
             int x = 1;
@@ -330,7 +329,7 @@ public class DropShadowBorder implements Border {
      */
     private BufferedImage getSubImage(BufferedImage img,
                                       int x, int y, int w, int h) {
-        BufferedImage ret = GraphicsUtilities.createTranslucentCompatibleImage(w, h);
+        BufferedImage ret = GraphicsUtilities.createCompatibleTranslucentImage(w, h);
         Graphics2D g2 = ret.createGraphics();
         g2.drawImage(img,
                      0, 0, w, h,
