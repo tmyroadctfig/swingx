@@ -68,7 +68,7 @@ public class BasicDatePickerUI extends DatePickerUI {
     protected MouseListener mouseListener;
     protected MouseMotionListener mouseMotionListener;
 
-    @SuppressWarnings({"UNUSED_SYMBOL"})
+    @SuppressWarnings({"UnusedDeclaration"})
     public static ComponentUI createUI(JComponent c) {
         return new BasicDatePickerUI();
     }
@@ -406,7 +406,9 @@ public class BasicDatePickerUI extends DatePickerUI {
         public void toggleShowPopup() {
             if (popup == null) {
                 popup = new BasicDatePickerPopup();
+                popup.setLightWeightPopupEnabled(datePicker.isLightWeightPopupEnabled());
             }
+
             if (!popup.isVisible()) {
                 JXMonthView monthView = datePicker.getMonthView();
                 SortedSet<Date> selection = monthView.getSelection();
@@ -463,6 +465,12 @@ public class BasicDatePickerUI extends DatePickerUI {
             } else if ("value".equals(property)) {
                 Date date = (Date) datePicker.getEditor().getValue();
                 datePicker.setDate(date);
+            } else if ("lightWeightPopupEnabled".equals(property)) {
+                // Force recreation of the popup when this property changes.
+                if (popup != null) {
+                    popup.setVisible(false);
+                }
+                popup = null;
             }
         }
 

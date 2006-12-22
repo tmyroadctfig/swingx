@@ -42,6 +42,7 @@ import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.text.DefaultFormatterFactory;
@@ -95,6 +96,7 @@ public class JXDatePicker extends JComponent {
     private String _actionCommand = "selectionChanged";
     private boolean editable = true;
     private EventListenerMap listenerMap;
+    protected boolean lightWeightPopupEnabled = JPopupMenu.getDefaultLightWeightPopupEnabled();
 
     /**
      * Create a new date picker using the current date as the initial
@@ -161,7 +163,7 @@ public class JXDatePicker extends JComponent {
      */
     @Override
     public void updateUI() {
-        setUI((DatePickerUI)LookAndFeelAddons.getUI(this, DatePickerUI.class));
+        setUI((DatePickerUI) LookAndFeelAddons.getUI(this, DatePickerUI.class));
         invalidate();
     }
 
@@ -398,7 +400,7 @@ public class JXDatePicker extends JComponent {
      * AbstractFormatter installed.
      *
      * @throws java.text.ParseException Throws parse exception if the date
-     * can not be parsed.
+     *                                  can not be parsed.
      */
     public void commitEdit() throws ParseException {
         _dateField.commitEdit();
@@ -437,6 +439,52 @@ public class JXDatePicker extends JComponent {
     @Override
     public void setFont(final Font font) {
         getEditor().setFont(font);
+    }
+
+    /**
+     * Sets the <code>lightWeightPopupEnabled</code> property, which
+     * provides a hint as to whether or not a lightweight
+     * <code>Component</code> should be used to contain the
+     * <code>JXDatePicker</code>, versus a heavyweight
+     * <code>Component</code> such as a <code>Panel</code>
+     * or a <code>Window</code>.  The decision of lightweight
+     * versus heavyweight is ultimately up to the
+     * <code>JXDatePicker</code>.  Lightweight windows are more
+     * efficient than heavyweight windows, but lightweight
+     * and heavyweight components do not mix well in a GUI.
+     * If your application mixes lightweight and heavyweight
+     * components, you should disable lightweight popups.
+     * The default value for the <code>lightWeightPopupEnabled</code>
+     * property is <code>true</code>, unless otherwise specified
+     * by the look and feel.  Some look and feels always use
+     * heavyweight popups, no matter what the value of this property.
+     * <p/>
+     * See the article <a href="http://java.sun.com/products/jfc/tsc/articles/mixing/index.html">Mixing Heavy and Light Components</a>
+     * on <a href="http://java.sun.com/products/jfc/tsc">
+     * <em>The Swing Connection</em></a>
+     * This method fires a property changed event.
+     *
+     * @param aFlag if <code>true</code>, lightweight popups are desired
+     * @beaninfo bound: true
+     * expert: true
+     * description: Set to <code>false</code> to require heavyweight popups.
+     */
+    public void setLightWeightPopupEnabled(boolean aFlag) {
+        boolean oldFlag = lightWeightPopupEnabled;
+        lightWeightPopupEnabled = aFlag;
+        firePropertyChange("lightWeightPopupEnabled", oldFlag, lightWeightPopupEnabled);
+    }
+
+    /**
+     * Gets the value of the <code>lightWeightPopupEnabled</code>
+     * property.
+     *
+     * @return the value of the <code>lightWeightPopupEnabled</code>
+     *         property
+     * @see #setLightWeightPopupEnabled
+     */
+    public boolean isLightWeightPopupEnabled() {
+        return lightWeightPopupEnabled;
     }
 
     /**

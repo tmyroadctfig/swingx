@@ -950,6 +950,9 @@ public class BasicMonthViewUI extends MonthViewUI {
         // Paint month name.
         Calendar cal = monthView.getCalendar();
         Font oldFont = monthView.getFont();
+
+        // TODO: Calculating the bounds of the text dynamically so we can invoke
+        // a popup for selecting the month/year to view.
         g.setFont(derivedFont);
         FontMetrics fm = monthView.getFontMetrics(derivedFont);
         int month = cal.get(Calendar.MONTH);
@@ -963,6 +966,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         rect = fm.getStringBounds(yearString, g);
         yearStringBounds[month] = new Rectangle((int) rect.getX(), (int) rect.getY(),
                 (int) rect.getWidth(), (int) rect.getHeight());
+        // END
 
         g.setColor(monthView.getMonthStringForeground());
         int tmpX =
