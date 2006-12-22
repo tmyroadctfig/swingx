@@ -33,11 +33,9 @@ import org.jdesktop.swingx.RolloverRenderer;
  * Encapsulates configuration of renderering components.
  * <p>
  * 
- * 
  * It's parameterized for both renderee (C) and rendering component(T).<p>
  * 
- * NOTE: there's a generics problem in createDefaultRenderingController. Eclipse is
- * happy but the standard compiler barks. So it returns null for now!
+ * PENDING: remove C parameterization - this turned out to be the same for all types.
  * 
  * @author Jeanette Winzenburg
  * 

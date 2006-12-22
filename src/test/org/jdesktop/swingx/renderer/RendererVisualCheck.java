@@ -37,22 +37,29 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
+import javax.swing.AbstractListModel;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
+import javax.swing.UIDefaults;
 import javax.swing.border.Border;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
@@ -91,15 +98,107 @@ public class RendererVisualCheck extends InteractiveTestCase {
         RendererVisualCheck test = new RendererVisualCheck();
         try {
 //            test.runInteractiveTests();
-          test.runInteractiveTests(".*List.*");
+          test.runInteractiveTests(".*Disabled.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
     }
 
+    /**
+     * Check if all defaults show up as expected.
+     *
+     */
+    public void interactiveListDisabledIconRenderer() {
+        final TableModel model = createTableModelWithDefaultTypes();
+        ListModel listModel = new AbstractListModel() {
+
+            public Object getElementAt(int index) {
+                return model.getValueAt(index, 4);
+            }
+
+            public int getSize() {
+                return model.getRowCount();
+            }
+            
+        };
+        final JList standard = new JList(listModel);
+        final JList enhanced = new JList(listModel);
+        enhanced.setCellRenderer(new DefaultListRenderer<JLabel>(new RenderingIconController()));
+
+        AbstractAction action = new AbstractAction("toggle disabled") {
+
+            public void actionPerformed(ActionEvent e) {
+                standard.setEnabled(!standard.isEnabled());
+                enhanced.setEnabled(!enhanced.isEnabled());
+            }
+            
+        };
+        JXFrame frame = wrapWithScrollingInFrame(standard, enhanced, "Compare renderers: default <--> enhanced");
+        addAction(frame, action);
+        frame.setVisible(true);
+    }
     
+    /**
+     * Check if all defaults show up as expected.
+     *
+     */
+    public void interactiveTableDefaultRenderers() {
+        TableModel model = createTableModelWithDefaultTypes();
+        final JTable standard = new JTable(model);
+        final JTable enhanced = new JTable(model) {
+
+            @Override
+            protected void createDefaultRenderers() {
+                defaultRenderersByColumnClass = new UIDefaults();
+                setDefaultRenderer(Object.class, DefaultTableRenderer.createDefaultTableRenderer());
+                RenderingLabelController controller = new RenderingLabelController(FormatToStringConverter.NUMBER_TO_STRING);
+                controller.setHorizontalAlignment(JLabel.RIGHT);
+                setDefaultRenderer(Number.class, new DefaultTableRenderer<JLabel>(controller));
+                setDefaultRenderer(Date.class, DefaultTableRenderer.createDefaultTableRenderer(
+                        FormatToStringConverter.DATE_TO_STRING));
+                TableCellRenderer renderer  = new DefaultTableRenderer<JLabel>(new RenderingIconController());
+                setDefaultRenderer(Icon.class, renderer);
+                setDefaultRenderer(ImageIcon.class, renderer);
+            }
+            
+        };
+        AbstractAction action = new AbstractAction("toggle disabled") {
+
+            public void actionPerformed(ActionEvent e) {
+                standard.setEnabled(!standard.isEnabled());
+                enhanced.setEnabled(!enhanced.isEnabled());
+            }
+            
+        };
+        JXFrame frame = wrapWithScrollingInFrame(standard, enhanced, "Compare renderers: default <--> enhanced");
+        addAction(frame, action);
+        frame.setVisible(true);
+    }
     
+    /**
+     * @return
+     */
+    private TableModel createTableModelWithDefaultTypes() {
+        String[] names = {"Object", "Number", "Double", "Date", "ImageIcon"};
+        final Class[] types = {Object.class, Number.class, Double.class, Date.class, ImageIcon.class};
+        DefaultTableModel model = new DefaultTableModel(names, 0) {
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return types[columnIndex];
+            }
+            
+        };
+        Date today = new Date();
+        Icon icon = new ImageIcon(JXTable.class.getResource("resources/images/kleopatra.jpg"));
+        for (int i = 0; i < 10; i++) {
+            Object[] values = new Object[] {"row " + i, i, Math.random() * 100, new Date(today.getTime() + i * 100000), icon};
+            model.addRow(values);
+        }
+        return model;
+    }
+
     /**
      * Compare core table using core default renderer vs. swingx default renderer.<p>
      * Unselected background of lead is different for editable/not-editable cells.

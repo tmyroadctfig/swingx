@@ -31,7 +31,7 @@ import org.jdesktop.swingx.RolloverRenderer;
 import org.jdesktop.swingx.action.LinkAction;
 
 /**
- * Abstract base class renderer for "Links". <p>
+ * Renderer for hyperlinks". <p>
  * 
  * The renderer is configured with a LinkAction<T>. 
  * It's mostly up to the developer to guarantee that the all

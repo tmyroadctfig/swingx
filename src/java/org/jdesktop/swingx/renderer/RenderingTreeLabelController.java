@@ -49,6 +49,13 @@ public class RenderingTreeLabelController extends RenderingLabelController {
     private Color borderSelectionColor;
     
     public RenderingTreeLabelController() {
+        this(null);
+    }
+    /**
+     * @param converter
+     */
+    public RenderingTreeLabelController(ToStringConverter converter) {
+        super(converter);
         Object value = UIManager.get("Tree.drawsFocusBorderAroundIcon");
         drawsFocusBorderAroundIcon = (value != null && ((Boolean)value).
                                       booleanValue());
@@ -76,10 +83,18 @@ public class RenderingTreeLabelController extends RenderingLabelController {
     protected void configureState(CellContext context) {
         super.configureState(context);
         configureIcon(context);
+        configureBorder(context);
         this.selected = context.isSelected();
         this.hasFocus = context.isFocused();
     }
     
+    /**
+     * @param context
+     */
+    protected void configureBorder(CellContext context) {
+       rendererComponent.setBorder(null);
+        
+    }
     protected void configureIcon(CellContext context) {
         if (context.getComponent().isEnabled()) {
             rendererComponent.setIcon(getIcon(context));

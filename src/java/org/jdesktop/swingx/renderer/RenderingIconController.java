@@ -21,37 +21,26 @@
  */
 package org.jdesktop.swingx.renderer;
 
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
+import javax.swing.Icon;
 import javax.swing.JLabel;
-import javax.swing.JTree;
 
 /**
- * A RendererController specialized on JTree. 
- * Subclassed to not install borders.<p>
- * 
- * PENDING: the tricksery with borders is an implementation detail of the 
- * rendering comp - should not ripple to up here. Nevertheless, this 
- * controller is responsible to reset (in case some Highlighter fiddled 
- * with it)
+ * TODO add type doc
  * 
  * @author Jeanette Winzenburg
  */
-public class TreeRendererController<T extends JComponent> 
-    extends RendererController<T, JTree> {
-
-    /**
-     * @param componentController
-     */
-    public TreeRendererController(RenderingComponentController<T> componentController) {
-        super(componentController);
+public class RenderingIconController extends RenderingLabelController {
+    
+    public RenderingIconController() {
+        setHorizontalAlignment(JLabel.CENTER);
     }
 
     @Override
-    protected void configureBorder(CellContext<JTree> context) {
-        getRendererComponent().setBorder(BorderFactory.createEmptyBorder());
+    protected void format(CellContext context) {
+        rendererComponent.setText("");
+        Icon icon = (Icon) (context.getValue() instanceof Icon ? context.getValue() : null);
+        rendererComponent.setIcon(icon);
     }
 
-    
     
 }

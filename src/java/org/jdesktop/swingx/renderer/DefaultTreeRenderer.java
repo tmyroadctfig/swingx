@@ -49,27 +49,31 @@ import org.jdesktop.swingx.RolloverRenderer;
 public class DefaultTreeRenderer <T extends JComponent>
         implements TreeCellRenderer, RolloverRenderer, Serializable {
 
-    private RendererController rendererContext;
+    private RendererController rendererController;
     private CellContext<JTree> cellContext;
     
     public static DefaultTreeRenderer<JLabel> createDefaultTreeRenderer() {
-        return new DefaultTreeRenderer<JLabel>(new RenderingTreeLabelController());
+        return createDefaultTreeRenderer(null);
+    }
+    
+    public static DefaultTreeRenderer<JLabel> createDefaultTreeRenderer(ToStringConverter converter) {
+        return new DefaultTreeRenderer<JLabel>(new RenderingTreeLabelController(converter));
     }
 
     /**
-     * @param context
+     * @param componentController
      */
-    public DefaultTreeRenderer(RenderingComponentController<T> context) {
-        this.rendererContext = new TreeRendererController<T>(context);
+    public DefaultTreeRenderer(RenderingComponentController<T> componentController) {
+        this.rendererController = new RendererController<T, JTree>(componentController);
         this.cellContext = new TreeCellContext();
     }
 
 
     /**
-     * @param context
+     * @param rendererController
      */
-    public DefaultTreeRenderer(RendererController context) {
-        this.rendererContext = context;
+    public DefaultTreeRenderer(RendererController rendererController) {
+        this.rendererController = rendererController;
         this.cellContext = new TreeCellContext();
     }
     // -------------- implements javax.swing.table.TableCellRenderer
@@ -89,32 +93,32 @@ public class DefaultTreeRenderer <T extends JComponent>
        public Component getTreeCellRendererComponent(JTree tree, Object value, 
                 boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             cellContext.installContext(tree, value, row, 0, selected, hasFocus, expanded, leaf);
-            rendererContext.configure(cellContext);
-            return rendererContext.getRendererComponent();
+            rendererController.configure(cellContext);
+            return rendererController.getRendererComponent();
         }
     
     /**
      * @param background
      */
     public void setBackground(Color background) {
-        rendererContext.setBackground(background);
+        rendererController.setBackground(background);
         
     }
     /**
      * @param foreground
      */
     public void setForeground(Color foreground) {
-        rendererContext.setForeground(foreground);
+        rendererController.setForeground(foreground);
     }
 
 //----------------- RolloverRenderer
     
     public void doClick() {
-        rendererContext.doClick();
+        rendererController.doClick();
         
     }
     public boolean isEnabled() {
-        return rendererContext.isEnabled();
+        return rendererController.isEnabled();
     }
 
 

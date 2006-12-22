@@ -21,8 +21,12 @@
  */
 package org.jdesktop.swingx.renderer;
 
+
 /**
- * TODO add type doc
+ * A simplistic converter to return a String representation of an object. <p>
+ * 
+ * PENDING: use a  full-fledged Format instead? Would impose a higher 
+ * burden onto implementors but could be re-used in editors.
  * 
  * @author Jeanette Winzenburg
  */
@@ -41,6 +45,7 @@ public interface ToStringConverter {
         }
         
     };
+    
     /**
      * Returns a string representation of the given value.
      * @param value the object to present as a string

@@ -47,31 +47,34 @@ import org.jdesktop.swingx.RolloverRenderer;
 public class DefaultListRenderer <T extends JComponent>
         implements ListCellRenderer,  RolloverRenderer, Serializable {
 
-    protected RendererController rendererContext;
+    protected RendererController rendererController;
     protected CellContext<JList> cellContext;
     
     public static DefaultListRenderer<JLabel> createDefaultListRenderer() {
-        return new DefaultListRenderer<JLabel>(new RenderingLabelController());
+        return createDefaultListRenderer(null);
     }
-//    public DefaultListRenderer() {
-//        this((RenderingComponentController<T>)null);
-//    }
+    
+    public static DefaultListRenderer<JLabel> createDefaultListRenderer(ToStringConverter converter) {
+        return new DefaultListRenderer<JLabel>(new RenderingLabelController(converter));
+    }
+
     /**
-     * @param context
+     * @param componentController
      */
-    public DefaultListRenderer(RenderingComponentController<T> context) {
-        this.rendererContext = new RendererController<T, JList>(context);
+    public DefaultListRenderer(RenderingComponentController<T> componentController) {
+        this.rendererController = new RendererController<T, JList>(componentController);
         this.cellContext = new ListCellContext();
     }
 
 
     /**
-     * @param context
+     * @param rendererController
      */
-    public DefaultListRenderer(RendererController context) {
-        this.rendererContext = context;
+    public DefaultListRenderer(RendererController rendererController) {
+        this.rendererController = rendererController;
         this.cellContext = new ListCellContext();
     }
+    
     // -------------- implements javax.swing.table.TableCellRenderer
     /**
      * 
@@ -90,31 +93,31 @@ public class DefaultListRenderer <T extends JComponent>
              int index, boolean isSelected, boolean cellHasFocus) {
         cellContext.installContext(list, value, index, 0, isSelected, cellHasFocus,
                 true, true);
-        rendererContext.configure(cellContext);
-        return rendererContext.getRendererComponent();
+        rendererController.configure(cellContext);
+        return rendererController.getRendererComponent();
     }
     /**
      * @param background
      */
     public void setBackground(Color background) {
-        rendererContext.setBackground(background);
+        rendererController.setBackground(background);
         
     }
     /**
      * @param foreground
      */
     public void setForeground(Color foreground) {
-        rendererContext.setForeground(foreground);
+        rendererController.setForeground(foreground);
     }
 
 //----------------- RolloverRenderer
     
     public void doClick() {
-        rendererContext.doClick();
+        rendererController.doClick();
         
     }
     public boolean isEnabled() {
-        return rendererContext.isEnabled();
+        return rendererController.isEnabled();
     }
 
 
