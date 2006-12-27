@@ -25,7 +25,9 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 
 /**
- * TODO add type doc
+ * Rendering component specialized in Icons. <p>
+ * 
+ * PENDING: don't subclass - configure super.
  * 
  * @author Jeanette Winzenburg
  */

@@ -23,6 +23,8 @@ package org.jdesktop.swingx.renderer;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -46,7 +48,6 @@ import javax.swing.AbstractListModel;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -74,6 +75,7 @@ import org.jdesktop.swingx.JXHyperlink;
 import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
+import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.LinkModel;
 import org.jdesktop.swingx.LinkRenderer;
 import org.jdesktop.swingx.action.AbstractActionExt;
@@ -82,6 +84,7 @@ import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.table.ColumnControlButton;
+import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
 
@@ -98,7 +101,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         RendererVisualCheck test = new RendererVisualCheck();
         try {
 //            test.runInteractiveTests();
-          test.runInteractiveTests(".*Disabled.*");
+          test.runInteractiveTests(".*Custom.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -160,6 +163,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
                 TableCellRenderer renderer  = new DefaultTableRenderer<JLabel>(new RenderingIconController());
                 setDefaultRenderer(Icon.class, renderer);
                 setDefaultRenderer(ImageIcon.class, renderer);
+                setDefaultRenderer(Boolean.class, new DefaultTableRenderer<AbstractButton>(new RenderingButtonController()));
             }
             
         };
@@ -180,8 +184,8 @@ public class RendererVisualCheck extends InteractiveTestCase {
      * @return
      */
     private TableModel createTableModelWithDefaultTypes() {
-        String[] names = {"Object", "Number", "Double", "Date", "ImageIcon"};
-        final Class[] types = {Object.class, Number.class, Double.class, Date.class, ImageIcon.class};
+        String[] names = {"Object", "Number", "Double", "Date", "ImageIcon", "Boolean"};
+        final Class[] types = {Object.class, Number.class, Double.class, Date.class, ImageIcon.class, Boolean.class};
         DefaultTableModel model = new DefaultTableModel(names, 0) {
 
             @Override
@@ -193,7 +197,8 @@ public class RendererVisualCheck extends InteractiveTestCase {
         Date today = new Date();
         Icon icon = new ImageIcon(JXTable.class.getResource("resources/images/kleopatra.jpg"));
         for (int i = 0; i < 10; i++) {
-            Object[] values = new Object[] {"row " + i, i, Math.random() * 100, new Date(today.getTime() + i * 100000), icon};
+            Object[] values = new Object[] {"row " + i, i, Math.random() * 100, 
+                    new Date(today.getTime() + i * 1000000), icon, i % 2 == 0};
             model.addRow(values);
         }
         return model;
@@ -387,6 +392,35 @@ public class RendererVisualCheck extends InteractiveTestCase {
         
     }
     
+    public void interactiveTableCustomRenderer() {
+        JXTable table = new JXTable();
+        ToStringConverter converter = new ToStringConverter() {
+
+            public String getStringValue(Object value) {
+                if (value instanceof Point) {
+                    Point p = (Point) value;
+                    value = createString(p.x, p.y);
+                } else if (value instanceof Dimension) {
+                    Dimension dim = (Dimension) value;
+                    value = createString(dim.width, dim.height);
+                }
+               return TO_STRING.getStringValue(value);
+            }
+
+            private Object createString(int width, int height) {
+                return "(" + width + ", " + height + ")";
+            }
+            
+        };
+        TableCellRenderer renderer = DefaultTableRenderer.createDefaultTableRenderer(converter);
+        table.setDefaultRenderer(Point.class, renderer);
+        table.setDefaultRenderer(Dimension.class, renderer);
+        JXFrame frame = showWithScrollingInFrame(table, "custom renderer (from demo) for Point/Dimension");
+        ComponentTreeTableModel model = new ComponentTreeTableModel(frame);
+        JXTreeTable treeTable = new JXTreeTable(model);
+        treeTable.expandAll();
+        table.setModel(treeTable.getModel());
+    }
     /**
      * extended link renderer in table.
      *
