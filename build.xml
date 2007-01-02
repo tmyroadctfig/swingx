@@ -92,11 +92,13 @@
         <jar basedir="${build.dir}/swingx-bean" jarfile="dist/swingx-bean.jar" />
     </target>
     
-    <target name="weekly-build" depends="jar,javadoc">
+    <target name="weekly-build" depends="bin,src,javadoc">
         <mkdir dir="${dist.dir}/bundles" />
         <copy todir="${dist.dir}/bundles">
             <fileset dir="${dist.dir}">
-                <include name="swingx.jar" />
+                <include name="swingx-${RELEASE_DSTAMP}-bin.zip" />
+                <include name="swingx-${RELEASE_DSTAMP}-src.zip" />
+                <include name="javadoc/**" />
             </fileset>
         </copy>
         
@@ -106,8 +108,8 @@
             <property name="bundle.dir" value="${dist.dir}/bundles" />
             <property name="javadoc.dir" value="${dist.dir}/javadoc" />
         </ant>
-    </target>    
-    
+    </target>
+
     <!-- This target builds a "binary" release of the project. The resulting
          zip file will be named something appropriately. It's contents will be:
          
@@ -157,7 +159,6 @@
             <fileset dir="${build.dir}/bin-release" />
         </move>
         <zip basedir="${build.dir}/zipdir" destfile="dist/swingx-${RELEASE_DSTAMP}-bin.zip" />
-        <copy file="dist/swingx-${RELEASE_DSTAMP}-bin.zip" tofile="dist/swingx-bin.zip" />
         <delete dir="${build.dir}/bin-release" />
         <delete dir="${build.dir}/zipdir" />
     </target>
@@ -197,7 +198,6 @@
             <fileset dir="${build.dir}/src-release" />
         </move>
         <zip basedir="${build.dir}/zipdir" destfile="dist/swingx-${RELEASE_DSTAMP}-src.zip" />
-        <copy file="dist/swingx-${RELEASE_DSTAMP}-src.zip" tofile="dist/swingx-src.zip" />
         <delete dir="${build.dir}/src-release" />
         <delete dir="${build.dir}/zipdir" />
     </target>
