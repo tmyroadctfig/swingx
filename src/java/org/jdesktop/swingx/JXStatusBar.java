@@ -64,7 +64,7 @@ import org.jdesktop.swingx.plaf.StatusBarUI;
  *      JXStatusBar bar = new JXStatusBar();
  *      JLabel statusLabel = new JLabel("Ready");
  *      JXStatusBar.Constraint c1 = new JXStatusBarConstraint() 
- *      c1.setPreferredWidth = 100;
+ *      c1.setFixedWidth(100);
  *      bar.add(statusLabel, c1);     // Fixed width of 100 with no inserts
  *      JXStatusBar.Constraint c2 = new JXStatusBarConstraint(
  *      		JXStatusBar.Constraint.ResizeBehavior.FILL) // Fill with no inserts
