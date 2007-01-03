@@ -110,6 +110,12 @@
         </ant>
     </target>
 
+    <!--
+    <concat destfile="${build.dir}/posted.txt" append="true">       ${project.name}
+    </concat>
+    </target>
+    -->
+    
     <!-- This target builds a "binary" release of the project. The resulting
          zip file will be named something appropriately. It's contents will be:
          
