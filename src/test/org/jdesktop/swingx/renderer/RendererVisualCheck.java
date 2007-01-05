@@ -78,6 +78,7 @@ import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.LinkModel;
 import org.jdesktop.swingx.LinkRenderer;
+import org.jdesktop.swingx.RolloverRenderer;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.LinkModelAction;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
@@ -101,7 +102,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         RendererVisualCheck test = new RendererVisualCheck();
         try {
 //            test.runInteractiveTests();
-          test.runInteractiveTests(".*Custom.*");
+          test.runInteractiveTests(".*Column.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -459,12 +460,77 @@ public class RendererVisualCheck extends InteractiveTestCase {
      * Use a custom button controller to show both checkbox icon and text to
      * render Actions in a JXList.
      */
+    public void interactiveTableWithRolloverListColumnControl() {
+        TableModel model = new AncientSwingTeam();
+        JXTable table = new JXTable(model);
+        JXList list = new JXList();
+        // quick-fill and hook to table columns' visibility state
+        configureList(list, table, true);
+        // a custom rendering button controller showing both checkbox and text
+        RenderingButtonController wrapper = new RolloverRenderingButtonController();
+        list.setCellRenderer(new DefaultListRenderer<AbstractButton>(wrapper));
+        JXFrame frame = showWithScrollingInFrame(table, list,
+                "rollover checkbox list-renderer");
+        addStatusMessage(frame, "fake editable list: space/doubleclick on selected item toggles column visibility");
+        frame.pack();
+    }
+
+
+    /**
+     * 
+     * Naive implementation: toggle the selected status of the last
+     * stored action. Doesn't work reliably.... requires to leave the
+     * item before the next click updates the action.
+     * 
+     */
+    public static class RolloverRenderingButtonController extends RenderingButtonController
+       implements RolloverRenderer {
+
+        private AbstractActionExt actionExt;
+
+        public RolloverRenderingButtonController() {
+            setHorizontalAlignment(JLabel.LEADING);
+        }
+        
+        @Override
+        protected void format(CellContext context) {
+            if (!(context.getValue() instanceof AbstractActionExt)) {
+                super.format(context);
+                return;
+            }
+            
+            actionExt = (AbstractActionExt) context.getValue();
+            rendererComponent.setAction(actionExt);
+            rendererComponent.setSelected(actionExt.isSelected());
+//            rendererComponent.setText(((AbstractActionExt) context.getValue()).getName());
+        }
+
+        public void doClick() {
+            boolean selected = !actionExt.isSelected();
+                        rendererComponent.doClick(0);
+//            actionExt.setSelected(rendererComponent.isSelected());
+            actionExt.setSelected(selected);
+//            rendererComponent.setSelected(selected);
+            
+        }
+
+        public boolean isEnabled() {
+            // TODO Auto-generated method stub
+            return true;
+        }
+        
+    }
+    
+    /**
+     * Use a custom button controller to show both checkbox icon and text to
+     * render Actions in a JXList.
+     */
     public void interactiveTableWithListColumnControl() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
         JXList list = new JXList();
         // quick-fill and hook to table columns' visibility state
-        configureList(list, table);
+        configureList(list, table, false);
         // a custom rendering button controller showing both checkbox and text
         RenderingButtonController wrapper = new RenderingButtonController() {
 
@@ -474,6 +540,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
                     super.format(context);
                     return;
                 }
+//                rendererComponent.setAction((AbstractActionExt) context.getValue());
                 rendererComponent.setSelected(((AbstractActionExt) context.getValue()).isSelected());
                 rendererComponent.setText(((AbstractActionExt) context.getValue()).getName());
             }
@@ -498,7 +565,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
      * @param list
      * @param table
      */
-    private void configureList(final JXList list, final JXTable table) {
+    private void configureList(final JXList list, final JXTable table, boolean useRollover) {
         final List<Action> actions = new ArrayList();
         ColumnControlButton columnControl = new ColumnControlButton(table, null) {
 
@@ -523,9 +590,13 @@ public class RendererVisualCheck extends InteractiveTestCase {
             }
 
         };
-        // bind action to space
-        list.getInputMap().put(KeyStroke.getKeyStroke("SPACE"),
-                "toggleSelectedActionState");
+        if (useRollover) {
+            list.setRolloverEnabled(true);
+        } else {
+            // bind action to space
+            list.getInputMap().put(KeyStroke.getKeyStroke("SPACE"),
+                    "toggleSelectedActionState");
+        }
         list.getActionMap().put("toggleSelectedActionState", toggleSelected);
         // bind action to double-click
         MouseAdapter adapter = new MouseAdapter() {
