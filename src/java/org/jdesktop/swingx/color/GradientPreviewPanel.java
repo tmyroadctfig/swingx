@@ -31,7 +31,6 @@ import java.awt.geom.Point2D;
 import java.util.List;
 import javax.swing.event.MouseInputAdapter;
 import org.apache.batik.ext.awt.LinearGradientPaint;
-import org.apache.batik.ext.awt.LinearGradientPaintContext;
 import org.apache.batik.ext.awt.MultipleGradientPaint;
 import org.apache.batik.ext.awt.RadialGradientPaint;
 import org.jdesktop.swingx.JXGradientChooser;
