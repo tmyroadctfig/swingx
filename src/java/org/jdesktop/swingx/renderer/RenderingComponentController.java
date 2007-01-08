@@ -27,28 +27,40 @@ import javax.swing.JLabel;
 /**
  * Wrapper around a component which is usable for rendering cells. Acts as
  * <code>Factory</code> for the component. Encapsulates content-related component 
- * configuration.
+ * configuration, delegates default visual component configuration to a 
+ * <code>RendererController</code>.
  * 
  * @author Jeanette Winzenburg
  */
 public abstract class RenderingComponentController<T extends JComponent> {
+    /** component to render with. */
     protected T rendererComponent;
+    /** configurator of default visuals. */
+    protected RendererController<T> rendererController;
+    /** horizontal (text) alignment of component. PENDING: useful only for labels, buttons? */
     protected int alignment;
+    /** the converter to use for string representation. */
     protected ToStringConverter formatter;
     
     public RenderingComponentController() {
         setHorizontalAlignment(JLabel.LEADING);
         setToStringConverter(null);
         rendererComponent = createRendererComponent();
+        rendererController = createRendererController();
     }
     
+
+    
     /**
-     * Returns the component to use for renderering.
+     * Configures and returns an appropriate component to render a cell
+     * in the given context.
      * 
-     * @return the component to use for rendering, guaranteed to be 
-     *    not null.
+     * @param context
+     * @return a component to render a cell in the given context.
      */
-    public T getRendererComponent() {
+    public T getRendererComponent(CellContext context) {
+        rendererController.configureVisuals(rendererComponent, context);
+        configureContent(context);
         return rendererComponent;
     }
     
@@ -135,6 +147,14 @@ public abstract class RenderingComponentController<T extends JComponent> {
      */
     protected abstract T createRendererComponent();
 
+    /**
+     * Creates and returns the RendererController used by this.
+     * 
+     * @return
+     */
+    protected RendererController<T> createRendererController() {
+        return new RendererController<T>();
+    }
 
     /**
      * Returns a string representation of the content.<p>
@@ -149,6 +169,16 @@ public abstract class RenderingComponentController<T extends JComponent> {
     protected String getStringValue(CellContext context) {
         return formatter.getStringValue(context.getValue());
     }
+
+    /**
+     * Intermediate exposure during refactoring...
+     * 
+     * @return the default visual configurator used by this.
+     */
+    protected RendererController<T> getRendererController() {
+        return rendererController;
+    }
+
 
 
 }

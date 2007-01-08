@@ -23,8 +23,6 @@ package org.jdesktop.swingx.renderer;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 
-import javax.swing.JComponent;
-
 import org.jdesktop.swingx.JXHyperlink;
 import org.jdesktop.swingx.RolloverProducer;
 import org.jdesktop.swingx.RolloverRenderer;
@@ -138,7 +136,7 @@ public class RenderingHyperlinkController
         }
         setTargetClass(targetClass); 
         this.linkAction = linkAction;
-        getRendererComponent().setAction(linkAction);
+        rendererComponent.setAction(linkAction);
         
     }
     /**
@@ -185,7 +183,7 @@ public class RenderingHyperlinkController
     }
 
     public void doClick() {
-        getRendererComponent().doClick();
+        rendererComponent.doClick();
     }
     
 //------------------------ TableCellRenderer

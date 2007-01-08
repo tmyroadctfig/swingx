@@ -102,7 +102,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         RendererVisualCheck test = new RendererVisualCheck();
         try {
 //            test.runInteractiveTests();
-          test.runInteractiveTests(".*Column.*");
+          test.runInteractiveTests(".*Table.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -729,18 +729,19 @@ public class RendererVisualCheck extends InteractiveTestCase {
      * That's possible only if neither renderer controller nor component controller
      * rely on the cellContext's type - hmmm... better don't!
      * 
+     * PENDING: revise to moved controller!
      *  
      */
     public void interactiveTableAndListCustomColorRenderer() {
-        TableModel tableModel = new AncientSwingTeam();
-        RendererController controller = createColorRendererController();
-        JXTable xtable = new JXTable(tableModel);
-        xtable.setDefaultRenderer(Color.class, new DefaultTableRenderer(controller));
-        ListModel model = createListColorModel();
-        JXList list = new JXList(model);
-        ListCellRenderer renderer = new DefaultListRenderer(controller);
-        list.setCellRenderer(renderer);
-        showWithScrollingInFrame(xtable, list, "JXTable/JXList: Custom color renderer - sharing the renderer controller");
+//        TableModel tableModel = new AncientSwingTeam();
+//        RendererController controller = createColorRendererController();
+//        JXTable xtable = new JXTable(tableModel);
+//        xtable.setDefaultRenderer(Color.class, new DefaultTableRenderer(controller));
+//        ListModel model = createListColorModel();
+//        JXList list = new JXList(model);
+//        ListCellRenderer renderer = new DefaultListRenderer(controller);
+//        list.setCellRenderer(renderer);
+//        showWithScrollingInFrame(xtable, list, "JXTable/JXList: Custom color renderer - sharing the renderer controller");
 
     }
 
@@ -792,36 +793,36 @@ public class RendererVisualCheck extends InteractiveTestCase {
      * 
      * @return
      */
-    private RendererController createColorRendererController() {
-        RendererController context = new RendererController<JLabel, JComponent>(new RenderingLabelController() ) {
-            Border selectedBorder;
-            @Override
-            protected void configureColors(CellContext<JComponent> context) {
-                super.configureColors(context);
-                if (context.getValue() instanceof Color) {
-                    getRendererComponent().setBackground((Color) context.getValue());
-                    getRendererComponent().putClientProperty("renderer-dont-touch", "color");
-                } else {
-                    getRendererComponent().putClientProperty("renderer-dont-touch", null);
-                }
-            }
-
-            @Override
-            protected void configureBorder(CellContext<JComponent> context) {
-                if (context.isSelected()) {
-                    selectedBorder = BorderFactory.createMatteBorder(2, 5,
-                            2, 5, context.getSelectionBackground());
-                } else {
-                    selectedBorder = BorderFactory.createMatteBorder(2, 5,
-                            2, 5, context.getBackground());
-                }
-                getRendererComponent().setBorder(selectedBorder);
-            }
-            
-        };
-        return context;
-    }
-
+//    private RendererController createColorRendererController() {
+//        RendererController context = new RendererController<JLabel>(new RenderingLabelController() ) {
+//            Border selectedBorder;
+//            @Override
+//            protected void configureColors(CellContext context) {
+//                super.configureColors(context);
+//                if (context.getValue() instanceof Color) {
+//                    renderingComponent.setBackground((Color) context.getValue());
+//                    renderingComponent.putClientProperty("renderer-dont-touch", "color");
+//                } else {
+//                    renderingComponent.putClientProperty("renderer-dont-touch", null);
+//                }
+//            }
+//
+//            @Override
+//            protected void configureBorder(CellContext context) {
+//                if (context.isSelected()) {
+//                    selectedBorder = BorderFactory.createMatteBorder(2, 5,
+//                            2, 5, context.getSelectionBackground());
+//                } else {
+//                    selectedBorder = BorderFactory.createMatteBorder(2, 5,
+//                            2, 5, context.getBackground());
+//                }
+//                renderingComponent.setBorder(selectedBorder);
+//            }
+//            
+//        };
+//        return context;
+//    }
+//
     /**
      * Creates and returns a component controller specialized on Color values. <p>
      * Note: this implementation set's the tooltip

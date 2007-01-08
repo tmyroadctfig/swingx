@@ -27,22 +27,17 @@ import javax.swing.JComponent;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
-import org.jdesktop.swingx.RolloverRenderer;
-
 /**
  * Encapsulates configuration of renderering components.
  * <p>
  * 
  * It's parameterized for both renderee (C) and rendering component(T).<p>
  * 
- * PENDING: remove C parameterization - this turned out to be the same for all types.
- * 
  * @author Jeanette Winzenburg
  * 
  * 
  */
-public class RendererController<T extends JComponent, C extends JComponent> 
-   implements RolloverRenderer {
+public class RendererController<T extends JComponent> {
 
     protected static Border noFocusBorder = new EmptyBorder(1, 1, 1, 1);
 
@@ -64,44 +59,34 @@ public class RendererController<T extends JComponent, C extends JComponent>
 
 
     protected RenderingComponentController<T> componentContext;
+
     
+//    /**
+//     * Instantiates a RendererController with the given component controller
+//     * @param componentController the component controller to configure, must not be null
+//     */
+//    public RendererController(RenderingComponentController<T> componentController) {
+//        setComponentController(componentController);
+//    }
+//
+//
+//    /**
+//     * The component's wrapper to use.
+//     * 
+//     * @param componentContext the componentContext to set
+//     */
+//    protected void setComponentController(RenderingComponentController<T> componentContext) {
+//        this.componentContext = componentContext;
+//    }
 
-    /**
-     * Instantiates a RendererController with the given component controller
-     * @param componentController the component controller to configure, must not be null
-     */
-    public RendererController(RenderingComponentController<T> componentController) {
-        setComponentController(componentController);
-    }
 
-
-    /**
-     * The component's wrapper to use.
-     * 
-     * @param componentContext the componentContext to set
-     */
-    protected void setComponentController(RenderingComponentController<T> componentContext) {
-        this.componentContext = componentContext;
-    }
-
-
-    /**
-     * @return the componentContext
-     */
-    protected RenderingComponentController<T> getComponentController() {
-        return componentContext;
-    }
+//    /**
+//     * @return the componentContext
+//     */
+//    protected RenderingComponentController<T> getComponentController() {
+//        return componentContext;
+//    }
     
-
-    /**
-     * @return the rendererComponent
-     */
-    protected T getRendererComponent() {
-        return getComponentController().rendererComponent;
-    }
-
-
-    //------------------ public configuration
 
     /**
      * Overrides <code>JComponent.setForeground</code> to assign
@@ -122,38 +107,28 @@ public class RendererController<T extends JComponent, C extends JComponent>
         unselectedBackground = c;
     }
 
-    /**
-     * Configure the rendering component from the given cell context.
-     * Here: handles the visuals itself, 
-     * delegates the content config to the component controller.
-     * 
-     * @param context the cell's context in the renderee.
-     */
-    public void configure(CellContext<C> context) {
-        configureVisuals(context);
-        configureContent(context);
-    }
     
     //---------------- subclass configuration    
     /**
      * Configures all visual state of the rendering component from the 
      * given cell context.
-     * 
+     * @param renderingComponent TODO
      * @param context the cell context to configure from.
      */
-    protected void configureVisuals(CellContext<C> context) {
-        configureState(context);
-        configureColors(context);
-        configureBorder(context);
-        configurePainter(context);
+    public void configureVisuals(T renderingComponent, CellContext context) {
+        configureState(renderingComponent, context);
+        configureColors(renderingComponent, context);
+        configureBorder(renderingComponent, context);
+        configurePainter(renderingComponent, context);
     }
 
     /**
+     * @param renderingComponent TODO
      * @param context
      */
-    protected void configurePainter(CellContext<C> context) {
-        if (getRendererComponent() instanceof PainterAware) {
-            ((PainterAware) getRendererComponent()).setPainter(null);
+    protected void configurePainter(T renderingComponent, CellContext context) {
+        if (renderingComponent instanceof PainterAware) {
+            ((PainterAware) renderingComponent).setPainter(null);
         }
         
     }
@@ -171,12 +146,13 @@ public class RendererController<T extends JComponent, C extends JComponent>
      * 
      * PENDING: doesn't check for null context component
      * 
+     * @param renderingComponent the component to configure
      * @param context the cell context to configure from.
      */
-    protected void configureState(CellContext<C> context) {
-        getRendererComponent().setFont(context.getComponent().getFont());
-        getRendererComponent().setEnabled(context.getComponent().isEnabled());
-        getRendererComponent().setComponentOrientation(context.getComponent()
+    protected void configureState(T renderingComponent, CellContext context) {
+        renderingComponent.setFont(context.getComponent().getFont());
+        renderingComponent.setEnabled(context.getComponent().isEnabled());
+        renderingComponent.setComponentOrientation(context.getComponent()
                 .getComponentOrientation());
     }
 
@@ -185,16 +161,16 @@ public class RendererController<T extends JComponent, C extends JComponent>
      * 
      * @param context the cell context to configure from.
      */
-    protected void configureColors(CellContext<C> context) {
+    protected void configureColors(T renderingComponent, CellContext context) {
         if (context.isSelected()) {
-            getRendererComponent().setForeground(context.getSelectionForeground());
-            getRendererComponent().setBackground(context.getSelectionBackground());
+            renderingComponent.setForeground(context.getSelectionForeground());
+            renderingComponent.setBackground(context.getSelectionBackground());
         } else {
-            getRendererComponent().setForeground(getForeground(context));
-            getRendererComponent().setBackground(getBackground(context));
+            renderingComponent.setForeground(getForeground(context));
+            renderingComponent.setBackground(getBackground(context));
         }
         if (context.isFocused()) {
-            configureFocusColors(context);
+            configureFocusColors(renderingComponent, context);
         }
     }
     /**
@@ -205,15 +181,15 @@ public class RendererController<T extends JComponent, C extends JComponent>
      * 
      * @param context the cell context to configure from.
      */
-    protected void configureFocusColors(CellContext<C> context) {
+    protected void configureFocusColors(T renderingComponent, CellContext context) {
         if (!context.isSelected() && context.isEditable()) {
             Color col = context.getFocusForeground();
             if (col != null) {
-                getRendererComponent().setForeground(col);
+                renderingComponent.setForeground(col);
             }
             col = context.getFocusBackground();
             if (col != null) {
-                getRendererComponent().setBackground(col);
+                renderingComponent.setBackground(col);
             }
         }
     }
@@ -224,24 +200,14 @@ public class RendererController<T extends JComponent, C extends JComponent>
      * 
      * @param context the cell context to configure from.
      */
-    protected void configureBorder(CellContext<C> context) {
+    protected void configureBorder(T renderingComponent, CellContext context) {
 //        getRendererComponent().setBorder(context.getBorder());
         if (context.isFocused()) {
-            getRendererComponent().setBorder(context.getFocusBorder());
+            renderingComponent.setBorder(context.getFocusBorder());
         } else {
-            getRendererComponent().setBorder(getNoFocusBorder());
+            renderingComponent.setBorder(getNoFocusBorder());
         }
 
-    }
-    /**
-     * Configures the renderering component's content from the
-     * given cell context.
-     * 
-     * @param cellContext the cell context to configure from
-     * 
-     */
-    protected void configureContent(CellContext<C> cellContext) {
-        getComponentController().configureContent(cellContext);
     }
 
     /**
@@ -255,7 +221,7 @@ public class RendererController<T extends JComponent, C extends JComponent>
      * @param context the cell context.
      * @return the unselected foreground.
      */
-    protected Color getForeground(CellContext<C> context) {
+    protected Color getForeground(CellContext context) {
         if (unselectedForeground != null)
             return unselectedForeground;
         return context.getForeground();
@@ -272,45 +238,14 @@ public class RendererController<T extends JComponent, C extends JComponent>
      * @param context the cell context.
      * @return the unselected background.
      */
-    protected Color getBackground(CellContext<C> context) {
+    protected Color getBackground(CellContext context) {
         if (unselectedBackground != null)
             return unselectedBackground;
         return context.getBackground();
     }
 
-    /**
-     * Returns a string representation of the content.<p>
-     * 
-     * Here: delegates to the component controller.
-     * 
-     * PENDING: This is a first attempt - we need a consistent string representation
-     * across all (new and old) theme: rendering, (pattern) filtering/highlighting,
-     * searching, auto-complete, what else??   
-     * 
-     * @param context the cell context.
-     * @return a appropriate string representation of the cell's content.
-     */
-    protected String getStringValue(CellContext<C> context) {
-        return getComponentController().getStringValue(context);
-    }
 
 //--------------------- RolloverRenderer    
     
-    /**
-     * {@inheritDoc}
-     */
-    public void doClick() {
-        if (isEnabled()) {
-            ((RolloverRenderer) getComponentController()).doClick(); 
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isEnabled() {
-        return (getComponentController() instanceof RolloverRenderer) && 
-           ((RolloverRenderer) getComponentController()).isEnabled();
-    }
 
 }

@@ -28,7 +28,6 @@ import java.io.Serializable;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.tree.TreeCellRenderer;
 
@@ -49,7 +48,7 @@ import org.jdesktop.swingx.RolloverRenderer;
 public class DefaultTreeRenderer <T extends JComponent>
         implements TreeCellRenderer, RolloverRenderer, Serializable {
 
-    private RendererController rendererController;
+    private RenderingComponentController componentController;
     private CellContext<JTree> cellContext;
     
     public static DefaultTreeRenderer<JLabel> createDefaultTreeRenderer() {
@@ -64,18 +63,10 @@ public class DefaultTreeRenderer <T extends JComponent>
      * @param componentController
      */
     public DefaultTreeRenderer(RenderingComponentController<T> componentController) {
-        this.rendererController = new RendererController<T, JTree>(componentController);
+        this.componentController = componentController;
         this.cellContext = new TreeCellContext();
     }
 
-
-    /**
-     * @param rendererController
-     */
-    public DefaultTreeRenderer(RendererController rendererController) {
-        this.rendererController = rendererController;
-        this.cellContext = new TreeCellContext();
-    }
     // -------------- implements javax.swing.table.TableCellRenderer
     /**
      * 
@@ -93,33 +84,41 @@ public class DefaultTreeRenderer <T extends JComponent>
        public Component getTreeCellRendererComponent(JTree tree, Object value, 
                 boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             cellContext.installContext(tree, value, row, 0, selected, hasFocus, expanded, leaf);
-            rendererController.configure(cellContext);
-            return rendererController.getRendererComponent();
+            return componentController.getRendererComponent(cellContext);
         }
     
-    /**
-     * @param background
-     */
-    public void setBackground(Color background) {
-        rendererController.setBackground(background);
-        
-    }
-    /**
-     * @param foreground
-     */
-    public void setForeground(Color foreground) {
-        rendererController.setForeground(foreground);
-    }
+       /**
+        * @param background
+        */
+       public void setBackground(Color background) {
+           componentController.getRendererController().setBackground(background);
+           
+       }
+       /**
+        * @param foreground
+        */
+       public void setForeground(Color foreground) {
+           componentController.getRendererController().setForeground(foreground);
+       }
 
 //----------------- RolloverRenderer
     
-    public void doClick() {
-        rendererController.doClick();
-        
-    }
-    public boolean isEnabled() {
-        return rendererController.isEnabled();
-    }
+       /**
+        * {@inheritDoc}
+        */
+       public void doClick() {
+           if (isEnabled()) {
+               ((RolloverRenderer) componentController).doClick(); 
+           }
+       }
+
+       /**
+        * {@inheritDoc}
+        */
+       public boolean isEnabled() {
+           return (componentController instanceof RolloverRenderer) && 
+              ((RolloverRenderer) componentController).isEnabled();
+       }
 
 
 }

@@ -27,7 +27,6 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
 
 /**
  * Encapsulates the display context passed into the getXXRendererComponent.<p>

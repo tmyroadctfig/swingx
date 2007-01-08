@@ -47,7 +47,8 @@ import org.jdesktop.swingx.RolloverRenderer;
 public class DefaultListRenderer <T extends JComponent>
         implements ListCellRenderer,  RolloverRenderer, Serializable {
 
-    protected RendererController rendererController;
+//    protected RendererController rendererController;
+    protected RenderingComponentController<T> componentController;
     protected CellContext<JList> cellContext;
     
     public static DefaultListRenderer<JLabel> createDefaultListRenderer() {
@@ -62,18 +63,11 @@ public class DefaultListRenderer <T extends JComponent>
      * @param componentController
      */
     public DefaultListRenderer(RenderingComponentController<T> componentController) {
-        this.rendererController = new RendererController<T, JList>(componentController);
+        this.componentController = componentController;
         this.cellContext = new ListCellContext();
     }
 
 
-    /**
-     * @param rendererController
-     */
-    public DefaultListRenderer(RendererController rendererController) {
-        this.rendererController = rendererController;
-        this.cellContext = new ListCellContext();
-    }
     
     // -------------- implements javax.swing.table.TableCellRenderer
     /**
@@ -93,31 +87,39 @@ public class DefaultListRenderer <T extends JComponent>
              int index, boolean isSelected, boolean cellHasFocus) {
         cellContext.installContext(list, value, index, 0, isSelected, cellHasFocus,
                 true, true);
-        rendererController.configure(cellContext);
-        return rendererController.getRendererComponent();
+        return componentController.getRendererComponent(cellContext);
     }
     /**
      * @param background
      */
     public void setBackground(Color background) {
-        rendererController.setBackground(background);
+        componentController.getRendererController().setBackground(background);
         
     }
     /**
      * @param foreground
      */
     public void setForeground(Color foreground) {
-        rendererController.setForeground(foreground);
+        componentController.getRendererController().setForeground(foreground);
     }
 
 //----------------- RolloverRenderer
     
+    /**
+     * {@inheritDoc}
+     */
     public void doClick() {
-        rendererController.doClick();
-        
+        if (isEnabled()) {
+            ((RolloverRenderer) componentController).doClick(); 
+        }
     }
+
+    /**
+     * {@inheritDoc}
+     */
     public boolean isEnabled() {
-        return rendererController.isEnabled();
+        return (componentController instanceof RolloverRenderer) && 
+           ((RolloverRenderer) componentController).isEnabled();
     }
 
 

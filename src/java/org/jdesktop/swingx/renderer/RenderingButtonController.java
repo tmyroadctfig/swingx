@@ -49,7 +49,7 @@ public class RenderingButtonController extends
     @Override
     protected void format(CellContext context) {
         boolean selected = Boolean.TRUE.equals(context.getValue());
-        getRendererComponent().setSelected(selected);
+        rendererComponent.setSelected(selected);
     }
     
     /**
@@ -59,8 +59,8 @@ public class RenderingButtonController extends
      * to this controller's properties.
      */
     protected void configureState(CellContext context) {
-        getRendererComponent().setBorderPainted(borderPainted);
-        getRendererComponent().setHorizontalAlignment(getHorizontalAlignment());
+        rendererComponent.setBorderPainted(borderPainted);
+        rendererComponent.setHorizontalAlignment(getHorizontalAlignment());
     }
 
     /**

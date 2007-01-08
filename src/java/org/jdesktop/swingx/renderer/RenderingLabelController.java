@@ -38,6 +38,7 @@ public class RenderingLabelController extends RenderingComponentController<JLabe
      * @param converter
      */
     public RenderingLabelController(ToStringConverter converter) {
+        super();
         setToStringConverter(converter);
     }
 

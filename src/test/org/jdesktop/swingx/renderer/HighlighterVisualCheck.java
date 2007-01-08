@@ -187,33 +187,36 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
      * Note: in Swingx' context it's not recommended to change 
      * visual renderer properties on the renderer layer - use
      * a conditional highlighter instead.
+     * 
+     * PENDING: update to moved controller.
+     * 
      */
     public void interactiveTableCustomRendererColorBasedOnValue() {
-        TableModel model = new AncientSwingTeam();
-        JXTable table = new JXTable(model);
-        RendererController configurator = new RendererController<JLabel, JComponent>(new RenderingLabelController()) {
-            @Override
-            protected void configureColors(CellContext<JComponent> context) {
-                super.configureColors(context);
-                if (!context.isSelected()) {
-                    if (getStringValue(context).contains("y")) {
-                        getRendererComponent().setForeground(Color.RED);
-                    } else {
-                        getRendererComponent().setForeground(Color.GREEN);
-                    }
-                }
-            }
-
-         
-
-        };
-        TableCellRenderer renderer = new DefaultTableRenderer(configurator);
-        table.addHighlighter(AlternateRowHighlighter.genericGrey);
-        table.setDefaultRenderer(Object.class, renderer);
-        JXTable nohighlight = new JXTable(model);
-        nohighlight.setDefaultRenderer(Object.class, renderer);
-        showWithScrollingInFrame(table, nohighlight,
-                "ext: value-based fg renderer with bg highlighter <--> shared without highl");
+//        TableModel model = new AncientSwingTeam();
+//        JXTable table = new JXTable(model);
+//        RendererController configurator = new RendererController<JLabel>(new RenderingLabelController()) {
+//            @Override
+//            protected void configureColors(CellContext context) {
+//                super.configureColors(context);
+//                if (!context.isSelected()) {
+//                    if (getStringValue(context).contains("y")) {
+//                        getRendererComponent().setForeground(Color.RED);
+//                    } else {
+//                        getRendererComponent().setForeground(Color.GREEN);
+//                    }
+//                }
+//            }
+//
+//         
+//
+//        };
+//        TableCellRenderer renderer = new DefaultTableRenderer(configurator);
+//        table.addHighlighter(AlternateRowHighlighter.genericGrey);
+//        table.setDefaultRenderer(Object.class, renderer);
+//        JXTable nohighlight = new JXTable(model);
+//        nohighlight.setDefaultRenderer(Object.class, renderer);
+//        showWithScrollingInFrame(table, nohighlight,
+//                "ext: value-based fg renderer with bg highlighter <--> shared without highl");
     }
 
     /**
