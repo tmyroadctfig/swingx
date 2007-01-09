@@ -35,36 +35,48 @@ import org.jdesktop.swingx.RolloverRenderer;
 
 
 /**
- * Pluggable TreeCellRenderer implementation.
+ * Adapter to glue SwingX renderer support to core api.
  * <p>
  * 
  * PENDING: this is not really serializable - no default constructor
  * 
  * @author Jeanette Winzenburg
  * 
- * @see JRendererLabel
  * 
  */
-public class DefaultTreeRenderer <T extends JComponent>
+public class DefaultTreeRenderer 
         implements TreeCellRenderer, RolloverRenderer, Serializable {
 
     private RenderingComponentController componentController;
     private CellContext<JTree> cellContext;
     
-    public static DefaultTreeRenderer<JLabel> createDefaultTreeRenderer() {
+    public static DefaultTreeRenderer createDefaultTreeRenderer() {
         return createDefaultTreeRenderer(null);
     }
     
-    public static DefaultTreeRenderer<JLabel> createDefaultTreeRenderer(ToStringConverter converter) {
-        return new DefaultTreeRenderer<JLabel>(new RenderingTreeLabelController(converter));
+    public static DefaultTreeRenderer createDefaultTreeRenderer(ToStringConverter converter) {
+        return new DefaultTreeRenderer(new RenderingTreeLabelController(converter));
     }
 
     /**
+     * Instantiates a default tree renderer with the given componentController.
+     * If the controller is null, creates and uses a default.
+     * 
      * @param componentController
      */
-    public DefaultTreeRenderer(RenderingComponentController<T> componentController) {
+    public DefaultTreeRenderer(RenderingComponentController componentController) {
+        if (componentController == null) {
+            componentController = new RenderingTreeLabelController();
+        }
         this.componentController = componentController;
         this.cellContext = new TreeCellContext();
+    }
+
+    /**
+     * 
+     */
+    public DefaultTreeRenderer() {
+        this(null);
     }
 
     // -------------- implements javax.swing.table.TableCellRenderer

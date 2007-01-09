@@ -128,7 +128,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         };
         final JList standard = new JList(listModel);
         final JList enhanced = new JList(listModel);
-        enhanced.setCellRenderer(new DefaultListRenderer<JLabel>(new RenderingIconController()));
+        enhanced.setCellRenderer(new DefaultListRenderer(new RenderingIconController()));
 
         AbstractAction action = new AbstractAction("toggle disabled") {
 
@@ -158,13 +158,13 @@ public class RendererVisualCheck extends InteractiveTestCase {
                 setDefaultRenderer(Object.class, DefaultTableRenderer.createDefaultTableRenderer());
                 RenderingLabelController controller = new RenderingLabelController(FormatToStringConverter.NUMBER_TO_STRING);
                 controller.setHorizontalAlignment(JLabel.RIGHT);
-                setDefaultRenderer(Number.class, new DefaultTableRenderer<JLabel>(controller));
+                setDefaultRenderer(Number.class, new DefaultTableRenderer(controller));
                 setDefaultRenderer(Date.class, DefaultTableRenderer.createDefaultTableRenderer(
                         FormatToStringConverter.DATE_TO_STRING));
-                TableCellRenderer renderer  = new DefaultTableRenderer<JLabel>(new RenderingIconController());
+                TableCellRenderer renderer  = new DefaultTableRenderer(new RenderingIconController());
                 setDefaultRenderer(Icon.class, renderer);
                 setDefaultRenderer(ImageIcon.class, renderer);
-                setDefaultRenderer(Boolean.class, new DefaultTableRenderer<AbstractButton>(new RenderingButtonController()));
+                setDefaultRenderer(Boolean.class, new DefaultTableRenderer(new RenderingButtonController()));
             }
             
         };
@@ -272,7 +272,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         JXTable table = new JXTable(model);
         table.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
         table.setDefaultRenderer(Object.class, DefaultTableRenderer.createDefaultTableRenderer());
-        TableCellRenderer booleanRenderer = new DefaultTableRenderer<AbstractButton>(
+        TableCellRenderer booleanRenderer = new DefaultTableRenderer(
                 new RenderingButtonController());
         table.setDefaultRenderer(Boolean.class, booleanRenderer);
         JXFrame frame = wrapWithScrollingInFrame(xtable, table, "JXTable- pluggable: Unselected focused background: core/ext renderer");
@@ -355,13 +355,13 @@ public class RendererVisualCheck extends InteractiveTestCase {
         JXTable xtable = new JXTable(tableModel);
         PropertyToStringConverter converter = new PropertyToStringConverter("name");
         RenderingLabelController nameController = new RenderingLabelController(converter);
-        xtable.getColumn(0).setCellRenderer(new DefaultTableRenderer<JLabel>(nameController));
+        xtable.getColumn(0).setCellRenderer(new DefaultTableRenderer(nameController));
         PropertyToStringConverter scoreConverter = new PropertyToStringConverter("score");
         xtable.getColumn(1).setCellRenderer(DefaultTableRenderer.createDefaultTableRenderer(scoreConverter));
         xtable.packAll();
         JXList list = new JXList(players);
         // we share the component controller between table and list
-        list.setCellRenderer(new DefaultListRenderer<JLabel>(nameController));
+        list.setCellRenderer(new DefaultListRenderer(nameController));
         showWithScrollingInFrame(xtable, list, "JXTable/JXList: Custom property renderer");
 
     }
@@ -431,7 +431,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         JXTable table = new JXTable(createModelWithLinks());
         LinkModelAction action = new LinkModelAction<LinkModel>(visitor);
         RenderingComponentController<JXHyperlink> controller = new RenderingHyperlinkController(action, LinkModel.class);
-        table.setDefaultRenderer(LinkModel.class, new DefaultTableRenderer<JXHyperlink>(controller));
+        table.setDefaultRenderer(LinkModel.class, new DefaultTableRenderer(controller));
         LinkModelAction action2 = new LinkModelAction<LinkModel>(visitor);
         table.setDefaultEditor(LinkModel.class, new LinkRenderer(action2, LinkModel.class));
         JFrame frame = wrapWithScrollingInFrame(table, visitor.getOutputComponent(), "show link renderer in table");
@@ -450,7 +450,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
 //        list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
         LinkModelAction action = new LinkModelAction(visitor);
         RenderingComponentController<JXHyperlink> context = new RenderingHyperlinkController(action, LinkModel.class);
-        list.setCellRenderer(new DefaultListRenderer<JXHyperlink>(context));
+        list.setCellRenderer(new DefaultListRenderer(context));
         JFrame frame = wrapWithScrollingInFrame(list, visitor.getOutputComponent(), "show link renderer in list");
         frame.setVisible(true);
 
@@ -468,7 +468,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         configureList(list, table, true);
         // a custom rendering button controller showing both checkbox and text
         RenderingButtonController wrapper = new RolloverRenderingButtonController();
-        list.setCellRenderer(new DefaultListRenderer<AbstractButton>(wrapper));
+        list.setCellRenderer(new DefaultListRenderer(wrapper));
         JXFrame frame = showWithScrollingInFrame(table, list,
                 "rollover checkbox list-renderer");
         addStatusMessage(frame, "fake editable list: space/doubleclick on selected item toggles column visibility");
@@ -547,7 +547,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
             
         };
         wrapper.setHorizontalAlignment(JLabel.LEADING);
-        list.setCellRenderer(new DefaultListRenderer<AbstractButton>(wrapper));
+        list.setCellRenderer(new DefaultListRenderer(wrapper));
         JXFrame frame = showWithScrollingInFrame(table, list,
                 "checkbox list-renderer");
         addStatusMessage(frame, "fake editable list: space/doubleclick on selected item toggles column visibility");
@@ -756,10 +756,10 @@ public class RendererVisualCheck extends InteractiveTestCase {
         TableModel tableModel = new AncientSwingTeam();
         RenderingComponentController<JLabel> controller = createColorRenderingLabelController();
         JXTable xtable = new JXTable(tableModel);
-        xtable.setDefaultRenderer(Color.class, new DefaultTableRenderer<JLabel>(controller));
+        xtable.setDefaultRenderer(Color.class, new DefaultTableRenderer(controller));
         ListModel model = createListColorModel();
         JXList list = new JXList(model);
-        ListCellRenderer renderer = new DefaultListRenderer<JLabel>(controller);
+        ListCellRenderer renderer = new DefaultListRenderer(controller);
         list.setCellRenderer(renderer);
         showWithScrollingInFrame(xtable, list, "JXTable/JXList: Custom color renderer - sharing the component controller");
 
@@ -772,7 +772,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
      */
     protected TableCellRenderer createColorRendererExt() {
         RenderingComponentController<JLabel> context = createColorRenderingLabelController();
-        TableCellRenderer renderer = new DefaultTableRenderer<JLabel>(context);
+        TableCellRenderer renderer = new DefaultTableRenderer(context);
         return renderer;
     }
 
@@ -782,7 +782,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
      */
     protected ListCellRenderer createListColorRendererExt() {
         RenderingComponentController<JLabel> context = createColorRenderingLabelController();
-        ListCellRenderer renderer = new DefaultListRenderer<JLabel>(context);
+        ListCellRenderer renderer = new DefaultListRenderer(context);
         return renderer;
     }
 

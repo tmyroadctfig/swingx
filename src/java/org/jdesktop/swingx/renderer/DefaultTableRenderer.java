@@ -35,36 +35,48 @@ import org.jdesktop.swingx.RolloverRenderer;
 
 
 /**
- * Abstract base class of all extended TableCellRenderers in SwingX.
+ * Adapter to glue SwingX renderer support to core api.
  * <p>
  * 
- * PENDING: this is not really serializable - no default constructor
  * 
  * @author Jeanette Winzenburg
  * 
- * @see JRendererLabel
- * 
  */
-public class DefaultTableRenderer <T extends JComponent>
+public class DefaultTableRenderer 
         implements TableCellRenderer, RolloverRenderer, Serializable {
 
-    protected RenderingComponentController<T> componentController;
+    protected RenderingComponentController componentController;
     private CellContext<JTable> cellContext;
     
-    public static DefaultTableRenderer<JLabel> createDefaultTableRenderer() {
+    public static DefaultTableRenderer createDefaultTableRenderer() {
         return createDefaultTableRenderer(null);
     }
 
-    public static DefaultTableRenderer<JLabel> createDefaultTableRenderer(ToStringConverter converter) {
-        return new DefaultTableRenderer<JLabel>(new RenderingLabelController(converter));
+    public static DefaultTableRenderer createDefaultTableRenderer(ToStringConverter converter) {
+        return new DefaultTableRenderer(new RenderingLabelController(converter));
     }
     
     /**
+     * Instantiates a default table renderer with the given componentController.
+     * If the controller is null, creates and uses a default.
+     * 
      * @param componentController
      */
-    public DefaultTableRenderer(RenderingComponentController<T> componentController) {
+    public DefaultTableRenderer(RenderingComponentController componentController) {
+        if (componentController == null) {
+            componentController = new RenderingLabelController();
+        }
         this.componentController = componentController;
         this.cellContext = new TableCellContext();
+    }
+
+    /**
+     * Instantiates a default table renderer with the default component
+     * controller.
+     *
+     */
+    public DefaultTableRenderer() {
+        this(null);
     }
 
     // -------------- implements javax.swing.table.TableCellRenderer

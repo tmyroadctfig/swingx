@@ -21,6 +21,8 @@
  */
 package org.jdesktop.swingx.renderer;
 
+import java.io.Serializable;
+
 
 /**
  * A simplistic converter to return a String representation of an object. <p>
@@ -30,7 +32,7 @@ package org.jdesktop.swingx.renderer;
  * 
  * @author Jeanette Winzenburg
  */
-public interface ToStringConverter {
+public interface ToStringConverter extends Serializable {
     
     public final static ToStringConverter TO_STRING = new ToStringConverter() {
 

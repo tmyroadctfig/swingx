@@ -22,6 +22,7 @@
 package org.jdesktop.swingx.renderer;
 
 import java.awt.Color;
+import java.io.Serializable;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -43,16 +44,16 @@ import javax.swing.border.Border;
  *  
  * @author Jeanette Winzenburg
  */
-public class CellContext<T extends JComponent> {
+public class CellContext<T extends JComponent> implements Serializable {
 
-    T component;
-    Object value;
-    int row;
-    int column;
-    boolean selected;
-    boolean focused;
-    boolean expanded;
-    boolean leaf;
+    transient T component;
+    transient Object value;
+    transient int row;
+    transient int column;
+    transient boolean selected;
+    transient boolean focused;
+    transient boolean expanded;
+    transient boolean leaf;
     
     public void installContext(T component, Object value, int row, int column, 
             boolean selected, boolean focused, boolean expanded, boolean leaf) {

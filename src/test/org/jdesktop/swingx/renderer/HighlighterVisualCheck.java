@@ -71,7 +71,7 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
         JXTable table = new JXTable(model);
         RenderingComponentController<JLabel> numberRendering = new RenderingLabelController(
                 JLabel.RIGHT);
-        DefaultTableRenderer renderer = new DefaultTableRenderer<JLabel>(
+        DefaultTableRenderer renderer = new DefaultTableRenderer(
                 numberRendering);
         table.setDefaultRenderer(Number.class, renderer);
         ConditionalHighlighter gradientHighlighter = new ConditionalHighlighter(
@@ -110,7 +110,7 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
         table.addHighlighter(gradientHighlighter);
         // re-use component controller and highlighter in a JXList
         JXList list = new JXList(createListNumberModel(), true);
-        list.setCellRenderer(new DefaultListRenderer<JLabel>(numberRendering));
+        list.setCellRenderer(new DefaultListRenderer(numberRendering));
         list.addHighlighter(gradientHighlighter);
         list.toggleSortOrder();
         JXFrame frame = showWithScrollingInFrame(table, list,

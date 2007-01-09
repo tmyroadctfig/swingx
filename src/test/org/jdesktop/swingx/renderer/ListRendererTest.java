@@ -35,6 +35,8 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXTitledSeparator;
+import org.jdesktop.test.SerializableSupport;
 
 /**
  * Tests behaviour of SwingX renderers. Currently: mostly characterization to
@@ -50,7 +52,7 @@ public class ListRendererTest extends InteractiveTestCase {
 
     private DefaultListCellRenderer coreListRenderer;
 
-    private DefaultListRenderer<JLabel> xListRenderer;
+    private DefaultListRenderer xListRenderer;
 
     private JList list;
     
@@ -64,8 +66,20 @@ public class ListRendererTest extends InteractiveTestCase {
     }
 
  
-    
-// ----------------- list renderer    
+    /**
+     * test serializable of default renderer.
+     * 
+     */
+    public void testSerializeListRenderer() {
+        ListCellRenderer xListRenderer = new DefaultListRenderer();
+        try {
+            SerializableSupport.serialize(xListRenderer);
+        } catch (Exception e) {
+            fail("not serializable " + e);
+        }
+    }
+
+
     /**
      * base interaction with list: focused, not-selected uses UI border.
      * 
@@ -251,7 +265,7 @@ public class ListRendererTest extends InteractiveTestCase {
      *
      */
     public void testListRendererExt() {
-        DefaultListRenderer<JLabel> renderer = DefaultListRenderer.createDefaultListRenderer();
+        DefaultListRenderer renderer = DefaultListRenderer.createDefaultListRenderer();
         assertTrue(renderer instanceof ListCellRenderer);
         assertTrue(renderer instanceof Serializable);
         

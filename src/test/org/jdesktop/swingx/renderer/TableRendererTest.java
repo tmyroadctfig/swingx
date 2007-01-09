@@ -35,6 +35,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.test.SerializableSupport;
 
 /**
  * Tests behaviour of SwingX renderers. Currently: mostly characterization to
@@ -51,7 +52,7 @@ public class TableRendererTest extends InteractiveTestCase {
     private int coreColumn;
     private DefaultTableCellRenderer coreTableRenderer;
     private int xColumn;
-    private DefaultTableRenderer<JLabel> xTableRenderer;
+    private DefaultTableRenderer xTableRenderer;
 
     
     @Override
@@ -69,9 +70,18 @@ public class TableRendererTest extends InteractiveTestCase {
 
  
     
-    
- 
-//----------------- table renderer-related tests    
+    /**
+     * test serializable of default renderer.
+     * 
+     */
+    public void testSerializeTableRenderer() {
+        TableCellRenderer xListRenderer = new DefaultTableRenderer();
+        try {
+            SerializableSupport.serialize(xListRenderer);
+        } catch (Exception e) {
+            fail("not serializable " + e);
+        } 
+}
     /**
      * base interaction with table: focused, not-selected uses UI border.
      * 
@@ -294,7 +304,7 @@ public class TableRendererTest extends InteractiveTestCase {
      *
      */
     public void testTableRendererExt() {
-        DefaultTableRenderer<JLabel> renderer = DefaultTableRenderer.createDefaultTableRenderer();
+        DefaultTableRenderer renderer = DefaultTableRenderer.createDefaultTableRenderer();
         assertTrue(renderer instanceof TableCellRenderer);
         assertTrue(renderer instanceof Serializable);
         

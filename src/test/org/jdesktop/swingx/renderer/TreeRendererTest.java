@@ -38,6 +38,7 @@ import javax.swing.tree.TreeCellRenderer;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
+import org.jdesktop.test.SerializableSupport;
 
 /**
  * Tests behaviour of SwingX renderers. Currently: mostly characterization to
@@ -53,7 +54,7 @@ public class TreeRendererTest extends InteractiveTestCase {
     
     private JTree tree;
     private DefaultTreeCellRenderer coreTreeRenderer;
-    private DefaultTreeRenderer<JLabel> xTreeRenderer;
+    private DefaultTreeRenderer xTreeRenderer;
     
     @Override
     protected void setUp() throws Exception {
@@ -72,7 +73,18 @@ public class TreeRendererTest extends InteractiveTestCase {
         }
     }
     
-//------------------ tree renderer
+    /**
+     * test serializable of default renderer.
+     * 
+     */
+    public void testSerializeTreeRenderer() {
+        TreeCellRenderer xListRenderer = new DefaultTreeRenderer();
+        try {
+            SerializableSupport.serialize(xListRenderer);
+        } catch (Exception e) {
+            fail("not serializable " + e);
+        } 
+}
 
     /**
      * base interaction with list: renderer uses list's unselected custom colors
@@ -203,7 +215,7 @@ public class TreeRendererTest extends InteractiveTestCase {
      *
      */
     public void testTreeRendererExt() {
-        DefaultTreeRenderer<JLabel> renderer = DefaultTreeRenderer.createDefaultTreeRenderer();
+        DefaultTreeRenderer renderer = DefaultTreeRenderer.createDefaultTreeRenderer();
         assertTrue(renderer instanceof TreeCellRenderer);
         assertTrue(renderer instanceof Serializable);
         

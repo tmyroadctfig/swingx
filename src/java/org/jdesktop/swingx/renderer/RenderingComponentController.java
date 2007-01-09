@@ -21,6 +21,8 @@
  */
 package org.jdesktop.swingx.renderer;
 
+import java.io.Serializable;
+
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
@@ -32,7 +34,8 @@ import javax.swing.JLabel;
  * 
  * @author Jeanette Winzenburg
  */
-public abstract class RenderingComponentController<T extends JComponent> {
+public abstract class RenderingComponentController<T extends JComponent> 
+    implements Serializable {
     /** component to render with. */
     protected T rendererComponent;
     /** configurator of default visuals. */

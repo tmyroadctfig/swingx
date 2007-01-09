@@ -35,34 +35,46 @@ import org.jdesktop.swingx.RolloverRenderer;
 
 
 /**
- * Abstract base class of all extended TableCellRenderers in SwingX.
+ * Adapter to glue SwingX renderer support to core api.
  * <p>
- * 
  * 
  * @author Jeanette Winzenburg
  * 
- * @see JRendererLabel
  * 
  */
-public class DefaultListRenderer <T extends JComponent>
+public class DefaultListRenderer 
         implements ListCellRenderer,  RolloverRenderer, Serializable {
 
-//    protected RendererController rendererController;
-    protected RenderingComponentController<T> componentController;
+    protected RenderingComponentController componentController;
     protected CellContext<JList> cellContext;
     
-    public static DefaultListRenderer<JLabel> createDefaultListRenderer() {
+    public static DefaultListRenderer createDefaultListRenderer() {
         return createDefaultListRenderer(null);
     }
     
-    public static DefaultListRenderer<JLabel> createDefaultListRenderer(ToStringConverter converter) {
-        return new DefaultListRenderer<JLabel>(new RenderingLabelController(converter));
+    public static DefaultListRenderer createDefaultListRenderer(ToStringConverter converter) {
+        return new DefaultListRenderer(new RenderingLabelController(converter));
     }
 
     /**
+     * Instantiates a default list renderer with the default component
+     * controller.
+     *
+     */
+    public DefaultListRenderer() {
+        this(null);
+    }
+    
+    /**
+     * Instantiates a ListCellRenderer with the given componentController.
+     * If the controller is null, creates and uses a default.
+     * 
      * @param componentController
      */
-    public DefaultListRenderer(RenderingComponentController<T> componentController) {
+    public DefaultListRenderer(RenderingComponentController componentController) {
+        if (componentController == null) {
+            componentController = new RenderingLabelController();
+        }
         this.componentController = componentController;
         this.cellContext = new ListCellContext();
     }

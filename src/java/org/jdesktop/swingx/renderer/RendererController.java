@@ -22,22 +22,19 @@
 package org.jdesktop.swingx.renderer;
 
 import java.awt.Color;
+import java.io.Serializable;
 
 import javax.swing.JComponent;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 /**
- * Encapsulates configuration of renderering components.
+ * Encapsulates the default visual configuration of renderering components.
  * <p>
- * 
- * It's parameterized for both renderee (C) and rendering component(T).<p>
- * 
  * @author Jeanette Winzenburg
  * 
- * 
  */
-public class RendererController<T extends JComponent> {
+public class RendererController<T extends JComponent> implements Serializable {
 
     protected static Border noFocusBorder = new EmptyBorder(1, 1, 1, 1);
 
@@ -56,37 +53,6 @@ public class RendererController<T extends JComponent> {
     private Color unselectedForeground;
 
     private Color unselectedBackground;
-
-
-    protected RenderingComponentController<T> componentContext;
-
-    
-//    /**
-//     * Instantiates a RendererController with the given component controller
-//     * @param componentController the component controller to configure, must not be null
-//     */
-//    public RendererController(RenderingComponentController<T> componentController) {
-//        setComponentController(componentController);
-//    }
-//
-//
-//    /**
-//     * The component's wrapper to use.
-//     * 
-//     * @param componentContext the componentContext to set
-//     */
-//    protected void setComponentController(RenderingComponentController<T> componentContext) {
-//        this.componentContext = componentContext;
-//    }
-
-
-//    /**
-//     * @return the componentContext
-//     */
-//    protected RenderingComponentController<T> getComponentController() {
-//        return componentContext;
-//    }
-    
 
     /**
      * Overrides <code>JComponent.setForeground</code> to assign
