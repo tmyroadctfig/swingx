@@ -60,7 +60,7 @@ public class TreeCellContext extends CellContext<JTree> {
         return closedIcon != null ? closedIcon : UIManager.getIcon(getUIKey("closedIcon"));
     }
     
-    protected Icon getIcon() {
+    public Icon getIcon() {
         if (isLeaf()) {
             return getLeafIcon();
         }

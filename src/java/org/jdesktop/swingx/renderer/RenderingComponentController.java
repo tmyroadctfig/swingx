@@ -113,7 +113,22 @@ public abstract class RenderingComponentController<T extends JComponent>
     public ToStringConverter getToStringConverter() {
         return formatter;
     }
-    
+
+    /**
+     * Returns a string representation of the content.<p>
+     * 
+     * PENDING: This is a first attempt - we need a consistent string representation
+     * across all (new and old) theme: rendering, (pattern) filtering/highlighting,
+     * searching, auto-complete, what else??   
+     * 
+     * @param context the cell context.
+     * @return a appropriate string representation of the cell's content.
+     */
+    public String getStringValue(CellContext context) {
+        return formatter.getStringValue(context.getValue());
+    }
+
+
     /**
      * Configures the renderering component's content and state from the
      * given cell context.
@@ -160,20 +175,6 @@ public abstract class RenderingComponentController<T extends JComponent>
     }
 
     /**
-     * Returns a string representation of the content.<p>
-     * 
-     * PENDING: This is a first attempt - we need a consistent string representation
-     * across all (new and old) theme: rendering, (pattern) filtering/highlighting,
-     * searching, auto-complete, what else??   
-     * 
-     * @param context the cell context.
-     * @return a appropriate string representation of the cell's content.
-     */
-    protected String getStringValue(CellContext context) {
-        return formatter.getStringValue(context.getValue());
-    }
-
-    /**
      * Intermediate exposure during refactoring...
      * 
      * @return the default visual configurator used by this.
@@ -182,6 +183,8 @@ public abstract class RenderingComponentController<T extends JComponent>
         return rendererController;
     }
 
-
+    public T getRendererComponent() {
+        return rendererComponent;
+    }
 
 }

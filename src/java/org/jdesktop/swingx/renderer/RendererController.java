@@ -118,7 +118,7 @@ public class RendererController<T extends JComponent> implements Serializable {
     protected void configureState(T renderingComponent, CellContext context) {
         renderingComponent.setFont(context.getComponent().getFont());
         renderingComponent.setEnabled(context.getComponent().isEnabled());
-        renderingComponent.setComponentOrientation(context.getComponent()
+        renderingComponent.applyComponentOrientation(context.getComponent()
                 .getComponentOrientation());
     }
 

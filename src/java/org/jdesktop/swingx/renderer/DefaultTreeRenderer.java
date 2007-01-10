@@ -50,13 +50,13 @@ public class DefaultTreeRenderer
     private RenderingComponentController componentController;
     private CellContext<JTree> cellContext;
     
-    public static DefaultTreeRenderer createDefaultTreeRenderer() {
-        return createDefaultTreeRenderer(null);
-    }
-    
-    public static DefaultTreeRenderer createDefaultTreeRenderer(ToStringConverter converter) {
-        return new DefaultTreeRenderer(new RenderingTreeLabelController(converter));
-    }
+//    public static DefaultTreeRenderer createDefaultTreeRenderer() {
+//        return createDefaultTreeRenderer(null);
+//    }
+//    
+//    public static DefaultTreeRenderer createDefaultTreeRenderer(ToStringConverter converter) {
+//        return new DefaultTreeRenderer(new WrappingIconController(converter));
+//    }
 
     /**
      * Instantiates a default tree renderer with the given componentController.
@@ -66,7 +66,7 @@ public class DefaultTreeRenderer
      */
     public DefaultTreeRenderer(RenderingComponentController componentController) {
         if (componentController == null) {
-            componentController = new RenderingTreeLabelController();
+            componentController = new WrappingIconController();
         }
         this.componentController = componentController;
         this.cellContext = new TreeCellContext();

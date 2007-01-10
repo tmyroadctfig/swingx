@@ -161,7 +161,7 @@ public class CellContext<T extends JComponent> implements Serializable {
     }
 
     
-    protected Icon getIcon() {
+    public Icon getIcon() {
         return null;
     }
     

@@ -1,0 +1,76 @@
+/*
+ * Created on 08.01.2007
+ *
+ */
+package org.jdesktop.swingx.renderer;
+
+import java.awt.BorderLayout;
+import java.awt.ComponentOrientation;
+
+import javax.swing.BorderFactory;
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.border.Border;
+
+import org.jdesktop.swingx.JXPanel;
+
+/**
+ * Compound component for usage in tree renderer.
+ */
+public class WrappingIconPanel extends JXPanel {
+    JComponent delegate;
+    JLabel iconLabel;
+    String labelPosition = BorderLayout.CENTER; //2;
+    int iconLabelGap;
+    private Border ltorBorder;
+    private Border rtolBorder;
+    
+    
+    public WrappingIconPanel() {
+        setOpaque(false);
+        iconLabel = new JRendererLabel();
+        iconLabelGap = iconLabel.getIconTextGap();
+        iconLabel.setOpaque(false);
+        updateIconBorder();
+        setBorder(null);
+        setLayout(new BorderLayout());
+        add(iconLabel, BorderLayout.LINE_START);
+    }
+    
+    
+    @Override
+    public void setComponentOrientation(ComponentOrientation o) {
+        super.setComponentOrientation(o);
+        updateIconBorder();
+    }
+
+
+    private void updateIconBorder() {
+        if (ltorBorder == null) {
+            ltorBorder = BorderFactory.createEmptyBorder(0, 0, 0, iconLabelGap);
+            rtolBorder = BorderFactory.createEmptyBorder(0, iconLabelGap, 0, 0);
+        } 
+        if (getComponentOrientation().isLeftToRight()) {
+            iconLabel.setBorder(ltorBorder);
+        } else {
+            iconLabel.setBorder(rtolBorder);
+        }
+    }
+
+
+    public void setIcon(Icon action) {
+        iconLabel.setIcon(action);
+        iconLabel.setText(null);
+    }
+    
+    public void setComponent(JComponent comp) {
+        if (delegate != null) {
+            remove(delegate);
+        }
+        delegate = comp;
+        add(delegate, labelPosition);
+        validate();
+    }
+
+}

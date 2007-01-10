@@ -60,7 +60,7 @@ public class TreeRendererTest extends InteractiveTestCase {
     protected void setUp() throws Exception {
         tree = new JTree();
         coreTreeRenderer = new DefaultTreeCellRenderer();
-        xTreeRenderer = DefaultTreeRenderer.createDefaultTreeRenderer();
+        xTreeRenderer = new DefaultTreeRenderer();
     }
 
     public static void main(String[] args) {
@@ -87,9 +87,12 @@ public class TreeRendererTest extends InteractiveTestCase {
 }
 
     /**
-     * base interaction with list: renderer uses list's unselected custom colors
+     * base interaction with list: renderer uses list's unselected custom
+     * colors.
      * 
-     *
+     * currently, this test fails because the assumptions are wrong! Core
+     * renderer behaves slightly unexpected.
+     * 
      */
     public void testTreeRendererExtTreeColors() {
         Color background = Color.MAGENTA;
@@ -99,15 +102,16 @@ public class TreeRendererTest extends InteractiveTestCase {
         coreTreeRenderer.setBackgroundNonSelectionColor(background);
         coreTreeRenderer.setTextNonSelectionColor(foreground);
         // prepare standard
-        Component coreComponent = coreTreeRenderer.getTreeCellRendererComponent(tree, null,
-                false, false, false, 0, false);
+        Component coreComponent = coreTreeRenderer
+                .getTreeCellRendererComponent(tree, null, false, false, false,
+                        0, false);
         // sanity: known standard behaviour
-        // background is manually painted 
+        // background is manually painted
         assertEquals(background, coreComponent.getBackground());
         assertEquals(tree.getForeground(), coreComponent.getForeground());
         // prepare extended
-        Component xComponent = xTreeRenderer.getTreeCellRendererComponent(tree, null,
-                false, false, false, 0, false);
+        Component xComponent = xTreeRenderer.getTreeCellRendererComponent(tree,
+                null, false, false, false, 0, false);
         // assert behaviour same as standard
         assertEquals(background, xComponent.getBackground());
         assertEquals(foreground, xComponent.getForeground());
@@ -178,6 +182,9 @@ public class TreeRendererTest extends InteractiveTestCase {
     /**
      * base interaction with list: renderer uses list's unselected  colors
      * 
+     * currently, this test fails because the assumptions are wrong! Core
+     * renderer behaves slightly unexpected.
+     * 
      *
      */
     public void testTreeRendererExtColors() {
@@ -215,7 +222,7 @@ public class TreeRendererTest extends InteractiveTestCase {
      *
      */
     public void testTreeRendererExt() {
-        DefaultTreeRenderer renderer = DefaultTreeRenderer.createDefaultTreeRenderer();
+        DefaultTreeRenderer renderer = new DefaultTreeRenderer();
         assertTrue(renderer instanceof TreeCellRenderer);
         assertTrue(renderer instanceof Serializable);
         
