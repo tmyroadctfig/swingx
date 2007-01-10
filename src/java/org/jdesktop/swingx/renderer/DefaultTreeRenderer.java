@@ -76,7 +76,14 @@ public class DefaultTreeRenderer
      * 
      */
     public DefaultTreeRenderer() {
-        this(null);
+        this((RenderingComponentController)null);
+    }
+
+    /**
+     * @param converter
+     */
+    public DefaultTreeRenderer(ToStringConverter converter) {
+        this(new WrappingIconController(converter));
     }
 
     // -------------- implements javax.swing.table.TableCellRenderer

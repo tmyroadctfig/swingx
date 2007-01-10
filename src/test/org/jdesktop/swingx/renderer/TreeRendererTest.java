@@ -30,14 +30,26 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JScrollPane;
 import javax.swing.JTree;
+import javax.swing.ListModel;
 import javax.swing.UIManager;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreeModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
+import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.JXTree;
+import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.test.ActionMapTreeTableModel;
+import org.jdesktop.swingx.test.ComponentTreeTableModel;
+import org.jdesktop.swingx.test.ActionMapTreeTableModel.ActionEntryNode;
 import org.jdesktop.test.SerializableSupport;
 
 /**
@@ -116,6 +128,189 @@ public class TreeRendererTest extends InteractiveTestCase {
         assertEquals(background, xComponent.getBackground());
         assertEquals(foreground, xComponent.getForeground());
     }
+    /**
+     * base interaction with list: renderer uses list's unselected  colors
+     * 
+     * currently, this test fails because the assumptions are wrong! Core
+     * renderer behaves slightly unexpected.
+     * 
+     *
+     */
+    public void testTreeRendererExtColors() {
+        // prepare standard
+        Component coreComponent = coreTreeRenderer.getTreeCellRendererComponent(tree, null,
+                false, false, false, 0, false);
+        // sanity: known standard behaviour
+        assertNull(coreComponent.getBackground());
+//        assertNull(coreComponent.getForeground());
+        assertNull(tree.getForeground());
+        Color uiForeground = UIManager.getColor("Tree.textForeground");
+        assertEquals(uiForeground, coreComponent.getForeground());
+        // prepare extended
+        Component xComponent = xTreeRenderer.getTreeCellRendererComponent(tree, null,
+                false, false, false, 0, false);
+        // assert behaviour same as standard
+//        assertEquals(coreComponent.getBackground(), xComponent.getBackground());
+        assertEquals(coreComponent.getForeground(), xComponent.getForeground());
+    }
+
+    /**
+     * characterize opaqueness of rendering components.
+     * Hmm... tree-magic is different
+     */
+    public void testTreeOpaqueRenderer() {
+        // sanity
+        assertFalse(new JLabel().isOpaque());
+        
+//        assertTrue(coreTreeRenderer.isOpaque());
+//        assertTrue(xListRenderer.getRendererComponent().isOpaque());
+    }
+
+    /**
+     * base existence/type tests while adding DefaultTableCellRendererExt.
+     *
+     */
+    public void testTreeRendererExt() {
+        DefaultTreeRenderer renderer = new DefaultTreeRenderer();
+        assertTrue(renderer instanceof TreeCellRenderer);
+        assertTrue(renderer instanceof Serializable);
+        
+    }
+
+//---------------------- interactive methods
+
+    /**
+     * Example for using arbitrary wrappee controllers. Here: a 
+     * checkbox representing entries in ActionMap.
+     * 
+     */
+    public void interactiveTreeButtonFormatting() {
+        TreeModel model = createActionTreeModel();
+        JTree tree = new JTree(model);
+        RenderingButtonController wrapper = createButtonController();
+        tree.setCellRenderer(new DefaultTreeRenderer(new WrappingIconController(wrapper)));
+        
+        JList list = new JList(createActionListModel());
+        // can't re-use the same instance - the WrappingIconController adds the
+        // wrappee component to a custom container.
+        list.setCellRenderer(new DefaultListRenderer(createButtonController()));
+        final JXFrame frame = wrapWithScrollingInFrame(tree, list, "custom renderer - same in tree and list");
+        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
+
+            public void actionPerformed(ActionEvent e) {
+                ComponentOrientation current = frame.getComponentOrientation();
+                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
+                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+                } else {
+                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+
+                }
+
+            }
+
+        };
+        addAction(frame, toggleComponentOrientation);
+        frame.setVisible(true);
+    }
+
+    /**
+     * 
+     * @return a button controller specialized on ActionEntryNode.
+     */
+    private RenderingButtonController createButtonController() {
+        RenderingButtonController wrapper = new RenderingButtonController() {
+
+            @Override
+            protected void format(CellContext context) {
+                boolean selected = false;
+                String text = getStringValue(context);
+                if ((context.getValue() instanceof ActionMapTreeTableModel.ActionEntryNode)) {
+                    Action action = ((ActionEntryNode) context.getValue()).getAction();
+                    if (action instanceof AbstractActionExt) {
+                        selected = ((AbstractActionExt) action).isSelected();
+                        text = ((AbstractActionExt) action).getName();
+                    }
+                }
+                rendererComponent.setSelected(selected);
+                rendererComponent.setText(text);
+            }
+            
+        };
+        wrapper.setHorizontalAlignment(JLabel.LEADING);
+        return wrapper;
+    }
+
+
+    /**
+     * @return
+     */
+    private ListModel createActionListModel() {
+        JXTable table = new JXTable(10, 10);
+        table.setHorizontalScrollEnabled(true);
+        ActionMap map = table.getActionMap();
+        Object[] keys = map.keys();
+        DefaultListModel model = new DefaultListModel();
+        for (Object object : keys) {
+           model.addElement(new ActionEntryNode(object, map.get(object))); 
+        }
+        return model;
+    }
+
+    /**
+     * @return
+     */
+    private TreeModel createActionTreeModel() {
+        JXTable table = new JXTable(10, 10);
+        table.setHorizontalScrollEnabled(true);
+        return new ActionMapTreeTableModel(table);
+    }
+
+    public void interactiveTreeLabelFormatting() {
+        TreeModel model = createComponentHierarchyModel();
+//        JTree xtree = new JTree(model);
+        
+        JTree tree = new JTree(model);
+        ToStringConverter converter = new ToStringConverter() {
+
+            public String getStringValue(Object value) {
+                if (! (value instanceof Component) ) {
+                    return TO_STRING.getStringValue(value);
+                }
+                
+                return "Name: " + ((Component) value).getName();
+            }
+            
+        };
+        tree.setCellRenderer(new DefaultTreeRenderer(converter));
+        
+        
+        final JXFrame frame = wrapWithScrollingInFrame(tree, "custom tree colors - core vs. ext renderer");
+        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
+
+            public void actionPerformed(ActionEvent e) {
+                ComponentOrientation current = frame.getComponentOrientation();
+                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
+                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+                } else {
+                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+
+                }
+
+            }
+
+        };
+        addAction(frame, toggleComponentOrientation);
+        frame.setVisible(true);
+    }
+
+    /**
+ * @return
+ */
+private TreeModel createComponentHierarchyModel() {
+    JXFrame frame = new JXFrame("dummy");
+    frame.add(new JScrollPane(new JXTree()));
+    return new ComponentTreeTableModel(frame);
+}
 
     public void interactiveCompareTreeExtTreeColors() {
         JTree xtree = new JTree();
@@ -179,54 +374,5 @@ public class TreeRendererTest extends InteractiveTestCase {
         addAction(frame, toggleComponentOrientation);
         frame.setVisible(true);
     }
-    /**
-     * base interaction with list: renderer uses list's unselected  colors
-     * 
-     * currently, this test fails because the assumptions are wrong! Core
-     * renderer behaves slightly unexpected.
-     * 
-     *
-     */
-    public void testTreeRendererExtColors() {
-        // prepare standard
-        Component coreComponent = coreTreeRenderer.getTreeCellRendererComponent(tree, null,
-                false, false, false, 0, false);
-        // sanity: known standard behaviour
-        assertNull(coreComponent.getBackground());
-//        assertNull(coreComponent.getForeground());
-        assertNull(tree.getForeground());
-        Color uiForeground = UIManager.getColor("Tree.textForeground");
-        assertEquals(uiForeground, coreComponent.getForeground());
-        // prepare extended
-        Component xComponent = xTreeRenderer.getTreeCellRendererComponent(tree, null,
-                false, false, false, 0, false);
-        // assert behaviour same as standard
-//        assertEquals(coreComponent.getBackground(), xComponent.getBackground());
-        assertEquals(coreComponent.getForeground(), xComponent.getForeground());
-    }
-
-    /**
-     * characterize opaqueness of rendering components.
-     * Hmm... tree-magic is different
-     */
-    public void testTreeOpaqueRenderer() {
-        // sanity
-        assertFalse(new JLabel().isOpaque());
-        
-//        assertTrue(coreTreeRenderer.isOpaque());
-//        assertTrue(xListRenderer.getRendererComponent().isOpaque());
-    }
-
-    /**
-     * base existence/type tests while adding DefaultTableCellRendererExt.
-     *
-     */
-    public void testTreeRendererExt() {
-        DefaultTreeRenderer renderer = new DefaultTreeRenderer();
-        assertTrue(renderer instanceof TreeCellRenderer);
-        assertTrue(renderer instanceof Serializable);
-        
-    }
-
 
 }
