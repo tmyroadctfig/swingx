@@ -32,8 +32,12 @@ import javax.swing.plaf.basic.BasicGraphicsUtils;
 
 /**
  * A LabelController specialized on rendering in JTree.  
+ * This is no longer used, replaced by <code>WrappingIconController</code>. Will be
+ * removed as soon as the replacement is fully functional.
  * 
  * @author Jeanette Winzenburg
+ * 
+ * @see WrappingIconController
  */
 public class RenderingTreeLabelController extends RenderingLabelController {
 

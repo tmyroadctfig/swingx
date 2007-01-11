@@ -107,12 +107,14 @@ public class ActionMapTreeTableModel extends DefaultTreeTableModel {
         List children;
 
         public ActionEntryNode(Object key, Action action) {
+            super(action);
             this.key = key;
             this.action = action;
             children = Collections.EMPTY_LIST;
         }
 
         public ActionEntryNode(Object key, ActionMap map) {
+            super(key);
             this.key = key;
             this.actionMap = map;
             children = new ArrayList();

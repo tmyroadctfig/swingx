@@ -224,11 +224,11 @@ public class TreeRendererTest extends InteractiveTestCase {
             protected void format(CellContext context) {
                 boolean selected = false;
                 String text = getStringValue(context);
-                if ((context.getValue() instanceof ActionMapTreeTableModel.ActionEntryNode)) {
-                    Action action = ((ActionEntryNode) context.getValue()).getAction();
+                if (context.getValue() instanceof Action) {
+                    Action action = (Action) context.getValue();
+                    text = (String) action.getValue(Action.NAME);
                     if (action instanceof AbstractActionExt) {
                         selected = ((AbstractActionExt) action).isSelected();
-                        text = ((AbstractActionExt) action).getName();
                     }
                 }
                 rendererComponent.setSelected(selected);
@@ -251,7 +251,7 @@ public class TreeRendererTest extends InteractiveTestCase {
         Object[] keys = map.keys();
         DefaultListModel model = new DefaultListModel();
         for (Object object : keys) {
-           model.addElement(new ActionEntryNode(object, map.get(object))); 
+           model.addElement(map.get(object)); 
         }
         return model;
     }

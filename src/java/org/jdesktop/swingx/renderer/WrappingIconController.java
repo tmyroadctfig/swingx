@@ -5,6 +5,9 @@
 package org.jdesktop.swingx.renderer;
 
 import javax.swing.BorderFactory;
+import javax.swing.tree.DefaultMutableTreeNode;
+
+import org.jdesktop.swingx.RolloverRenderer;
 
 
 /**
@@ -16,7 +19,7 @@ import javax.swing.BorderFactory;
  * PENDING: ui specific focus rect variations not yet done <p>
  */
 public class WrappingIconController extends 
-    RenderingComponentController<WrappingIconPanel>  {
+    RenderingComponentController<WrappingIconPanel>  implements RolloverRenderer {
 
     private RenderingComponentController wrappee;
 
@@ -47,8 +50,37 @@ public class WrappingIconController extends
     
     @Override
     public WrappingIconPanel getRendererComponent(CellContext context) {
+        Object oldValue = adjustContextValue(context);
         wrappee.getRendererComponent(context);
-        return super.getRendererComponent(context);
+        WrappingIconPanel panel = super.getRendererComponent(context);
+        restoreContextValue(context, oldValue);
+        return panel;
+    }
+
+    /**
+     * 
+     * @param context
+     * @param oldValue
+     */
+    protected void restoreContextValue(CellContext context, Object oldValue) {
+        context.value = oldValue;
+    }
+
+    /**
+     * Replace the context's value with the userobject 
+     * if it's a treenode. <p>
+     * Subclasses may override but must guarantee to return the original 
+     * value for restoring. 
+     * 
+     * @param context the context to adjust
+     * @return the old context value
+     */
+    protected Object adjustContextValue(CellContext context) {
+        Object oldValue = context.getValue();
+        if (oldValue instanceof DefaultMutableTreeNode) {
+            context.value = ((DefaultMutableTreeNode) oldValue).getUserObject();
+        }
+        return oldValue;
     }
 
     @Override
@@ -64,6 +96,25 @@ public class WrappingIconController extends
     @Override
     protected void format(CellContext context) {
         rendererComponent.setIcon(context.getIcon());
+    }
+
+    //----------------- implement RolloverController
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void doClick() {
+        if (isEnabled()) {
+            ((RolloverRenderer) wrappee).doClick(); 
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isEnabled() {
+        return (wrappee instanceof RolloverRenderer) && 
+           ((RolloverRenderer) wrappee).isEnabled();
     }
 
 

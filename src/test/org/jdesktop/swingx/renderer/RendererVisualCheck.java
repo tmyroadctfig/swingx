@@ -43,7 +43,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.swing.AbstractAction;
-import javax.swing.AbstractButton;
 import javax.swing.AbstractListModel;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -57,15 +56,22 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.UIDefaults;
 import javax.swing.border.Border;
+import javax.swing.event.TreeModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.EditorPaneLinkVisitor;
 import org.jdesktop.swingx.InteractiveTestCase;
@@ -102,7 +108,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         RendererVisualCheck test = new RendererVisualCheck();
         try {
 //            test.runInteractiveTests();
-          test.runInteractiveTests(".*Table.*");
+          test.runInteractiveTests(".*Tree.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -457,6 +463,21 @@ public class RendererVisualCheck extends InteractiveTestCase {
     }
 
     /**
+     * extended link renderer in tree.
+     *
+     */
+    public void interactiveTestTreeLinkRenderer() {
+        EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
+        JXTree list = new JXTree(createTreeModelWithLinks(20));
+        list.setRolloverEnabled(true);
+        LinkModelAction action = new LinkModelAction(visitor);
+        RenderingComponentController<JXHyperlink> context = new RenderingHyperlinkController(action, LinkModel.class);
+        list.setCellRenderer(new DefaultTreeRenderer(new WrappingIconController(context)));
+        JFrame frame = wrapWithScrollingInFrame(list, visitor.getOutputComponent(), "show link renderer in list");
+        frame.setVisible(true);
+
+    }
+    /**
      * Use a custom button controller to show both checkbox icon and text to
      * render Actions in a JXList.
      */
@@ -662,7 +683,6 @@ public class RendererVisualCheck extends InteractiveTestCase {
         TableCellRenderer renderer = createColorRendererExt();
         table.setDefaultRenderer(Color.class, renderer);
         showWithScrollingInFrame(xtable, table, "JXTable: Custom color renderer - standard/ext");
-
     }
 
     /**
@@ -722,35 +742,10 @@ public class RendererVisualCheck extends InteractiveTestCase {
     }
 
 
-    /**
-     * xtable/xlist using the same rendererController.<p>
-     * 
-     * Note: here they really share the same instance. 
-     * That's possible only if neither renderer controller nor component controller
-     * rely on the cellContext's type - hmmm... better don't!
-     * 
-     * PENDING: revise to moved controller!
-     *  
-     */
-    public void interactiveTableAndListCustomColorRenderer() {
-//        TableModel tableModel = new AncientSwingTeam();
-//        RendererController controller = createColorRendererController();
-//        JXTable xtable = new JXTable(tableModel);
-//        xtable.setDefaultRenderer(Color.class, new DefaultTableRenderer(controller));
-//        ListModel model = createListColorModel();
-//        JXList list = new JXList(model);
-//        ListCellRenderer renderer = new DefaultListRenderer(controller);
-//        list.setCellRenderer(renderer);
-//        showWithScrollingInFrame(xtable, list, "JXTable/JXList: Custom color renderer - sharing the renderer controller");
-
-    }
-
 
     /**
      * xtable/xlist using the same custom component controller.<p>
      * 
-     * Note: this is cleaner than sharing the same RendererController.
-     *  
      */
     public void interactiveTableAndListCustomColorRenderingController() {
         TableModel tableModel = new AncientSwingTeam();
@@ -762,10 +757,25 @@ public class RendererVisualCheck extends InteractiveTestCase {
         ListCellRenderer renderer = new DefaultListRenderer(controller);
         list.setCellRenderer(renderer);
         showWithScrollingInFrame(xtable, list, "JXTable/JXList: Custom color renderer - sharing the component controller");
-
     }
 
-    
+    /**
+     * xtable/xlist using the same custom component controller.<p>
+     * 
+     */
+    public void interactiveTableAndTreeCustomColorRenderingController() {
+        TableModel tableModel = new AncientSwingTeam();
+        RenderingComponentController<JLabel> controller = createColorRenderingLabelController();
+        JXTable xtable = new JXTable(tableModel);
+        xtable.setDefaultRenderer(Color.class, new DefaultTableRenderer(controller));
+        TreeModel model = createTreeColorModel();
+        JTree tree = new JTree(model);
+        RenderingComponentController wrapper = new WrappingIconController(createColorRenderingLabelController());
+        TreeCellRenderer renderer = new DefaultTreeRenderer(wrapper);
+        tree.setCellRenderer(renderer);
+        showWithScrollingInFrame(xtable, tree, "JXTable/JXTree: Custom color renderer - sharing the component controller");
+    }
+
     /**
      * creates and returns a color ext renderer.
      * @return
@@ -787,43 +797,6 @@ public class RendererVisualCheck extends InteractiveTestCase {
     }
 
     /**
-     * creates and returns a renderer controller specialized on Color values.<p>
-     * NOTE: while this is possible, it'll probably will turn out as not recommended -
-     * content-related state should be configured in a component controller. 
-     * 
-     * @return
-     */
-//    private RendererController createColorRendererController() {
-//        RendererController context = new RendererController<JLabel>(new RenderingLabelController() ) {
-//            Border selectedBorder;
-//            @Override
-//            protected void configureColors(CellContext context) {
-//                super.configureColors(context);
-//                if (context.getValue() instanceof Color) {
-//                    renderingComponent.setBackground((Color) context.getValue());
-//                    renderingComponent.putClientProperty("renderer-dont-touch", "color");
-//                } else {
-//                    renderingComponent.putClientProperty("renderer-dont-touch", null);
-//                }
-//            }
-//
-//            @Override
-//            protected void configureBorder(CellContext context) {
-//                if (context.isSelected()) {
-//                    selectedBorder = BorderFactory.createMatteBorder(2, 5,
-//                            2, 5, context.getSelectionBackground());
-//                } else {
-//                    selectedBorder = BorderFactory.createMatteBorder(2, 5,
-//                            2, 5, context.getBackground());
-//                }
-//                renderingComponent.setBorder(selectedBorder);
-//            }
-//            
-//        };
-//        return context;
-//    }
-//
-    /**
      * Creates and returns a component controller specialized on Color values. <p>
      * Note: this implementation set's the tooltip
      * @return
@@ -834,8 +807,9 @@ public class RendererVisualCheck extends InteractiveTestCase {
             @Override
             protected void format(CellContext context) {
                 super.format(context);
-                if (context.getValue() instanceof Color) {
-                    rendererComponent.setBackground((Color) context.getValue());
+                Object value = context.getValue();
+                if (value instanceof Color) {
+                    rendererComponent.setBackground((Color) value);
                     rendererComponent.putClientProperty("renderer-dont-touch", "color");
                 } else {
                     rendererComponent.putClientProperty("renderer-dont-touch", null);
@@ -848,8 +822,9 @@ public class RendererVisualCheck extends InteractiveTestCase {
              */
             @Override
             protected void configureState(CellContext context) {
-                if (context.getValue() instanceof Color) {
-                    Color newColor = (Color) context.getValue();
+                Object value = context.getValue();
+                if (value instanceof Color) {
+                    Color newColor = (Color) value;
                     rendererComponent.setToolTipText("RGB value: " + newColor.getRed() + ", "
                             + newColor.getGreen() + ", " + newColor.getBlue());
 
@@ -872,6 +847,8 @@ public class RendererVisualCheck extends InteractiveTestCase {
 
     
 //--------------------- utility    
+    
+    
     private ListModel createListModelWithLinks(int count) {
         DefaultListModel model = new DefaultListModel();
         for (int i = 0; i < count; i++) {
@@ -892,7 +869,24 @@ public class RendererVisualCheck extends InteractiveTestCase {
         return model;
     }
     
+    private TreeModel createTreeModelWithLinks(int count) {
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Links");
+        for (int i = 0; i < count; i++) {
+            try {
+                LinkModel link = new LinkModel("a link text " + i, null, new URL("http://some.dummy.url" + i));
+                if (i == 1) {
+                    URL url = JXEditorPaneTest.class.getResource("resources/test.html");
 
+                    link = new LinkModel("a link text " + i, null, url);
+                }
+                root.add(new DefaultMutableTreeNode(link));
+            } catch (MalformedURLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        return new DefaultTreeModel(root);
+    }
     private TableModel createModelWithLinks() {
         String[] columnNames = { "text only", "Link editable", "Link not-editable", "Bool editable", "Bool not-editable" };
         
@@ -937,6 +931,19 @@ public class RendererVisualCheck extends InteractiveTestCase {
         return model;
     }
 
+    /**
+     * @return a TreeModel with tree nodes of type Color.
+     */
+    private TreeModel createTreeColorModel() {
+        final AncientSwingTeam tableModel = new AncientSwingTeam();
+        final int colorColumn = 2;
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Colors");
+        for (int row = 0; row < tableModel.getRowCount(); row++) {
+            root.add(new DefaultMutableTreeNode(tableModel.getValueAt(row, colorColumn)));
+        }
+        return new DefaultTreeModel(root);
+        
+    }
 
     /**
      * copied from sun's tutorial.
