@@ -63,7 +63,7 @@ public class TableRendererTest extends InteractiveTestCase {
         coreTableRenderer = new DefaultTableCellRenderer();
         table.getColumnModel().getColumn(coreColumn).setCellRenderer(coreTableRenderer);
         xColumn = 1;
-        xTableRenderer = DefaultTableRenderer.createDefaultTableRenderer();
+        xTableRenderer = new DefaultTableRenderer();
         table.getColumnModel().getColumn(xColumn).setCellRenderer(xTableRenderer);
         
     }
@@ -304,7 +304,7 @@ public class TableRendererTest extends InteractiveTestCase {
      *
      */
     public void testTableRendererExt() {
-        DefaultTableRenderer renderer = DefaultTableRenderer.createDefaultTableRenderer();
+        DefaultTableRenderer renderer = new DefaultTableRenderer();
         assertTrue(renderer instanceof TableCellRenderer);
         assertTrue(renderer instanceof Serializable);
         

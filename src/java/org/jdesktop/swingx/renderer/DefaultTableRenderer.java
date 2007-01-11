@@ -48,13 +48,6 @@ public class DefaultTableRenderer
     protected RenderingComponentController componentController;
     private CellContext<JTable> cellContext;
     
-    public static DefaultTableRenderer createDefaultTableRenderer() {
-        return createDefaultTableRenderer(null);
-    }
-
-    public static DefaultTableRenderer createDefaultTableRenderer(ToStringConverter converter) {
-        return new DefaultTableRenderer(new RenderingLabelController(converter));
-    }
     
     /**
      * Instantiates a default table renderer with the given componentController.
@@ -76,7 +69,14 @@ public class DefaultTableRenderer
      *
      */
     public DefaultTableRenderer() {
-        this(null);
+        this((RenderingComponentController) null);
+    }
+
+    /**
+     * @param date_to_string
+     */
+    public DefaultTableRenderer(ToStringConverter converter) {
+        this(new RenderingLabelController(converter));
     }
 
     // -------------- implements javax.swing.table.TableCellRenderer

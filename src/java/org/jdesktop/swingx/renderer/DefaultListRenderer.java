@@ -48,13 +48,6 @@ public class DefaultListRenderer
     protected RenderingComponentController componentController;
     protected CellContext<JList> cellContext;
     
-    public static DefaultListRenderer createDefaultListRenderer() {
-        return createDefaultListRenderer(null);
-    }
-    
-    public static DefaultListRenderer createDefaultListRenderer(ToStringConverter converter) {
-        return new DefaultListRenderer(new RenderingLabelController(converter));
-    }
 
     /**
      * Instantiates a default list renderer with the default component

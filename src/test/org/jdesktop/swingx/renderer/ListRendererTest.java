@@ -61,7 +61,7 @@ public class ListRendererTest extends InteractiveTestCase {
         
         list = new JList(new Object[] {1, 2, 3});
         coreListRenderer = new DefaultListCellRenderer();
-        xListRenderer = DefaultListRenderer.createDefaultListRenderer();
+        xListRenderer = new DefaultListRenderer();
         
     }
 
@@ -265,7 +265,7 @@ public class ListRendererTest extends InteractiveTestCase {
      *
      */
     public void testListRendererExt() {
-        DefaultListRenderer renderer = DefaultListRenderer.createDefaultListRenderer();
+        DefaultListRenderer renderer = new DefaultListRenderer();
         assertTrue(renderer instanceof ListCellRenderer);
         assertTrue(renderer instanceof Serializable);
         

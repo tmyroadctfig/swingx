@@ -161,11 +161,11 @@ public class RendererVisualCheck extends InteractiveTestCase {
             @Override
             protected void createDefaultRenderers() {
                 defaultRenderersByColumnClass = new UIDefaults();
-                setDefaultRenderer(Object.class, DefaultTableRenderer.createDefaultTableRenderer());
+                setDefaultRenderer(Object.class, new DefaultTableRenderer());
                 RenderingLabelController controller = new RenderingLabelController(FormatToStringConverter.NUMBER_TO_STRING);
                 controller.setHorizontalAlignment(JLabel.RIGHT);
                 setDefaultRenderer(Number.class, new DefaultTableRenderer(controller));
-                setDefaultRenderer(Date.class, DefaultTableRenderer.createDefaultTableRenderer(
+                setDefaultRenderer(Date.class, new DefaultTableRenderer(
                         FormatToStringConverter.DATE_TO_STRING));
                 TableCellRenderer renderer  = new DefaultTableRenderer(new RenderingIconController());
                 setDefaultRenderer(Icon.class, renderer);
@@ -226,7 +226,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         xtable.setBackground(Highlighter.notePadBackground.getBackground()); // ledger
         JTable table = new JTable(model);
         table.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
-        TableCellRenderer renderer = DefaultTableRenderer.createDefaultTableRenderer();
+        TableCellRenderer renderer = new DefaultTableRenderer();
         table.setDefaultRenderer(Object.class, renderer);
         JXFrame frame = wrapWithScrollingInFrame(xtable, table, "JTable: Unselected focused background: core/ext renderer");
         getStatusBar(frame).add(new JLabel("background for unselected lead: first column is not-editable"));    
@@ -251,7 +251,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         xtable.setBackground(Highlighter.notePadBackground.getBackground()); // ledger
         JXTable table = new JXTable(model);
         table.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
-        TableCellRenderer renderer = DefaultTableRenderer.createDefaultTableRenderer();
+        TableCellRenderer renderer = new DefaultTableRenderer();
         table.setDefaultRenderer(Object.class, renderer);
         JXFrame frame = wrapWithScrollingInFrame(xtable, table, "JXTable: Unselected focused background: core/ext renderer");
         getStatusBar(frame).add(new JLabel("different background for unselected lead: first column is not-editable"));    
@@ -277,7 +277,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         xtable.setBackground(Highlighter.notePadBackground.getBackground()); // ledger
         JXTable table = new JXTable(model);
         table.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
-        table.setDefaultRenderer(Object.class, DefaultTableRenderer.createDefaultTableRenderer());
+        table.setDefaultRenderer(Object.class, new DefaultTableRenderer());
         TableCellRenderer booleanRenderer = new DefaultTableRenderer(
                 new RenderingButtonController());
         table.setDefaultRenderer(Boolean.class, booleanRenderer);
@@ -295,12 +295,12 @@ public class RendererVisualCheck extends InteractiveTestCase {
      */
     public void interactiveDisabledCollectionViews() {
         final JXTable table = new JXTable(new AncientSwingTeam());
-        table.setDefaultRenderer(Object.class, DefaultTableRenderer.createDefaultTableRenderer());
+        table.setDefaultRenderer(Object.class, new DefaultTableRenderer());
         table.setEnabled(false);
         final JXList list = new JXList(new String[] {"one", "two", "and something longer"});
         list.setEnabled(false);
 //        list.setCellRenderer(new DefaultListCellRendererExt());
-        list.setCellRenderer(DefaultListRenderer.createDefaultListRenderer());
+        list.setCellRenderer(new DefaultListRenderer());
         final JXTree tree = new JXTree(new FileSystemModel());
         tree.setEnabled(false);
         JComponent box = Box.createHorizontalBox();
@@ -363,7 +363,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         RenderingLabelController nameController = new RenderingLabelController(converter);
         xtable.getColumn(0).setCellRenderer(new DefaultTableRenderer(nameController));
         PropertyToStringConverter scoreConverter = new PropertyToStringConverter("score");
-        xtable.getColumn(1).setCellRenderer(DefaultTableRenderer.createDefaultTableRenderer(scoreConverter));
+        xtable.getColumn(1).setCellRenderer(new DefaultTableRenderer(scoreConverter));
         xtable.packAll();
         JXList list = new JXList(players);
         // we share the component controller between table and list
@@ -419,7 +419,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
             }
             
         };
-        TableCellRenderer renderer = DefaultTableRenderer.createDefaultTableRenderer(converter);
+        TableCellRenderer renderer = new DefaultTableRenderer(converter);
         table.setDefaultRenderer(Point.class, renderer);
         table.setDefaultRenderer(Dimension.class, renderer);
         JXFrame frame = showWithScrollingInFrame(table, "custom renderer (from demo) for Point/Dimension");

@@ -128,7 +128,7 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
     public void interactiveTableGradientHighlight() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
-        DefaultTableRenderer renderer = DefaultTableRenderer.createDefaultTableRenderer();
+        DefaultTableRenderer renderer = new DefaultTableRenderer();
         final Painter painter = new BasicGradientPainter(0.0f, 0.0f, Color.YELLOW, 0.75f, (float) 0.5, Color.WHITE);
         ConditionalHighlighter gradientHighlighter = new ConditionalHighlighter(null, null, -1, -1) {
 
@@ -165,7 +165,7 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
     public void interactiveTableCustomRendererColor() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
-        DefaultTableRenderer renderer = DefaultTableRenderer.createDefaultTableRenderer();
+        DefaultTableRenderer renderer = new DefaultTableRenderer();
         renderer.setForeground(foreground);
         renderer.setBackground(background);
         table.addHighlighter(AlternateRowHighlighter.genericGrey);
@@ -233,7 +233,7 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
     
-        table.setDefaultRenderer(Object.class, DefaultTableRenderer.createDefaultTableRenderer());
+        table.setDefaultRenderer(Object.class, new DefaultTableRenderer());
         ConditionalHighlighter highlighter = new ConditionalHighlighter() {
             @Override
             protected void applyForeground(Component renderer, ComponentAdapter adapter) {
@@ -275,7 +275,7 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
         table.addHighlighter(AlternateRowHighlighter.genericGrey);
         table.addHighlighter(highlighter);
         JXTable nohighlight = new JXTable(model);
-        nohighlight.setDefaultRenderer(Object.class, DefaultTableRenderer.createDefaultTableRenderer());
+        nohighlight.setDefaultRenderer(Object.class, new DefaultTableRenderer());
         nohighlight.addHighlighter(highlighter);
         showWithScrollingInFrame(table, nohighlight,
                 "value-based rendering by ConditionalHighlighter");
