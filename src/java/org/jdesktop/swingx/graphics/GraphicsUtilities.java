@@ -75,11 +75,13 @@ import javax.imageio.ImageIO;
  * @author Romain Guy <romain.guy@mac.com>
  */
 public class GraphicsUtilities {
-    private static final GraphicsConfiguration CONFIGURATION =
-            GraphicsEnvironment.getLocalGraphicsEnvironment().
-                    getDefaultScreenDevice().getDefaultConfiguration();
-
     private GraphicsUtilities() {
+    }
+
+    // Returns the graphics configuration for the primary screen
+    private static GraphicsConfiguration getGraphicsConfiguration() {
+        return GraphicsEnvironment.getLocalGraphicsEnvironment().
+                    getDefaultScreenDevice().getDefaultConfiguration();
     }
 
     /**
@@ -139,7 +141,7 @@ public class GraphicsUtilities {
      */
     public static BufferedImage createCompatibleImage(BufferedImage image,
                                                       int width, int height) {
-        return CONFIGURATION.createCompatibleImage(width, height,
+        return getGraphicsConfiguration().createCompatibleImage(width, height,
                                                    image.getTransparency());
     }
 
@@ -158,7 +160,7 @@ public class GraphicsUtilities {
      *   specified width and height
      */
     public static BufferedImage createCompatibleImage(int width, int height) {
-        return CONFIGURATION.createCompatibleImage(width, height);
+        return getGraphicsConfiguration().createCompatibleImage(width, height);
     }
 
     /**
@@ -177,7 +179,7 @@ public class GraphicsUtilities {
      */
     public static BufferedImage createCompatibleTranslucentImage(int width,
                                                                  int height) {
-        return CONFIGURATION.createCompatibleImage(width, height,
+        return getGraphicsConfiguration().createCompatibleImage(width, height,
                                                    Transparency.TRANSLUCENT);
     }
 
@@ -217,12 +219,15 @@ public class GraphicsUtilities {
      *   same width and height and transparency and content, of <code>image</code>
      */
     public static BufferedImage toCompatibleImage(BufferedImage image) {
-        if (image.getColorModel().equals(CONFIGURATION.getColorModel())) {
+        if (image.getColorModel().equals(
+                getGraphicsConfiguration().getColorModel())) {
             return image;
         }
 
-        BufferedImage compatibleImage = CONFIGURATION.createCompatibleImage(
-                image.getWidth(), image.getHeight(), image.getTransparency());
+        BufferedImage compatibleImage =
+                getGraphicsConfiguration().createCompatibleImage(
+                    image.getWidth(), image.getHeight(),
+                    image.getTransparency());
         Graphics g = compatibleImage.getGraphics();
         g.drawImage(image, 0, 0, null);
         g.dispose();
