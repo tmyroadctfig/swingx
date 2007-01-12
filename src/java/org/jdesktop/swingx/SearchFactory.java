@@ -22,6 +22,7 @@ package org.jdesktop.swingx;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
@@ -310,13 +311,13 @@ public class SearchFactory {
      *            the object to search.
      */
     public void showFindDialog(JComponent target, Searchable searchable) {
-        Frame frame = JOptionPane.getRootFrame();
+        Window frame = null; //JOptionPane.getRootFrame();
         if (target != null) {
             target.putClientProperty(AbstractSearchable.MATCH_HIGHLIGHTER, Boolean.FALSE);
-            Window window = SwingUtilities.getWindowAncestor(target);
-            if (window instanceof Frame) {
-                frame = (Frame) window;
-            }
+            frame = SwingUtilities.getWindowAncestor(target);
+//            if (window instanceof Frame) {
+//                frame = (Frame) window;
+//            }
         }
         JXDialog topLevel = getDialogForSharedFilePanel();
         JXDialog findDialog;
@@ -325,7 +326,14 @@ public class SearchFactory {
             KeyboardFocusManager.getCurrentKeyboardFocusManager().focusNextComponent(findDialog);
         } else {
             Point location = hideSharedFilePanel();
-            findDialog = new JXDialog(frame, getSharedFindPanel());
+            if (frame instanceof Frame) {
+                findDialog = new JXDialog((Frame) frame, getSharedFindPanel());
+            } else if (frame instanceof Dialog) {
+                // fix #215-swingx: had problems with secondary modal dialogs.
+                findDialog = new JXDialog((Dialog) frame, getSharedFindPanel());
+            } else {
+                findDialog = new JXDialog(JOptionPane.getRootFrame(), getSharedFindPanel());
+            }
             // JW: don't - this will stay on top of all applications!
 //            findDialog.setAlwaysOnTop(true);
             findDialog.pack();

@@ -21,6 +21,8 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Dialog;
+
 import javax.swing.JPanel;
 
 import org.jdesktop.test.SerializableSupport;
@@ -420,7 +422,7 @@ public class SerializableIssues extends InteractiveTestCase {
      *
      */
     public void testDialog() {
-        JXDialog component = new JXDialog(null, new JPanel());
+        JXDialog component = new JXDialog(new JPanel());
         try {
             SerializableSupport.serialize(component);
         } catch (Exception e) {

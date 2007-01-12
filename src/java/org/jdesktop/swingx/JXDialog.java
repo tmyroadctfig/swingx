@@ -20,6 +20,7 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.KeyEvent;
@@ -77,6 +78,23 @@ public class JXDialog extends JDialog {
         setContent(content);
     }
     
+    /**
+     * @param dialog
+     * @param sharedFindPanel
+     */
+    public JXDialog(Dialog dialog, JComponent content) {
+        super(dialog);
+        setContent(content);
+    }
+
+    /**
+     * @param panel
+     */
+    public JXDialog(JComponent content) {
+        super();
+        setContent(content);
+    }
+
     private void setContent(JComponent content) {
         if (this.content != null) {
             throw new IllegalStateException("content must not be set more than once");
