@@ -46,9 +46,10 @@ public class AutoCompleteDocumentTest extends TestCase {
         textComponent.setText("exacter");
         assertTrue(adaptor.getSelectedItem().equals("exacter"));
         
-        document.remove(5, 2);
-        System.out.println(adaptor.getSelectedItem());
-        System.out.println(textComponent.getText());
+        document.remove(4, 3);
+        assertTrue(adaptor.getSelectedItem().equals("exacter"));
+        
+        document.insertString(4, "t", null);
         assertTrue(adaptor.getSelectedItem().equals("exact"));
     }
 }
