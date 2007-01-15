@@ -29,25 +29,50 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 /**
- * Encapsulates the default visual configuration of renderering components.
+ * Encapsulates the default visual configuration of renderering components,
+ * respecting the state of the passed-in <code>CellContext</code>. It's
+ * basically re-usable across all types of renderees (JTable, JList, JTree).
  * <p>
+ * 
+ * Guarantees to completely configure the default visual properties (listed
+ * below) of a given component. As a consequence, client code (f.i. in
+ * <code>Highlighter</code>s) can safely change them without long-lasting
+ * visual artefacts.
+ * 
+ * <ul>
+ * <li> foreground and background, depending on selected and focused state
+ * <li> border
+ * <li> font
+ * <li> Painter (if applicable)
+ * </ul>
+ * 
+ * Client code will rarely need to be aware of this class. It's the single
+ * place to change on introduction of new properties considered as belonging
+ * to the "default visuals" of rendering components. <p>
+ * 
+ * PENDING: allow mutators for overruling the <code>CellContext</code>s
+ * defaults? Would prefer not to, as in the context of SwingX visual config on
+ * the renderer level is discouraged (the way to go are <code>Highlighter</code>s.
+ * 
  * @author Jeanette Winzenburg
  * 
+ * @see CellContext
  */
 public class RendererController<T extends JComponent> implements Serializable {
 
-    protected static Border noFocusBorder = new EmptyBorder(1, 1, 1, 1);
-
-    private static final Border SAFE_NO_FOCUS_BORDER = new EmptyBorder(1, 1, 1,
-            1);
-
-    private static Border getNoFocusBorder() {
-        if (System.getSecurityManager() != null) {
-            return SAFE_NO_FOCUS_BORDER;
-        } else {
-            return noFocusBorder;
-        }
-    }
+//    /* PENDING: move border to CellContext. */
+//    protected static Border noFocusBorder = new EmptyBorder(1, 1, 1, 1);
+//
+//    private static final Border SAFE_NO_FOCUS_BORDER = new EmptyBorder(1, 1, 1,
+//            1);
+//
+//    private static Border getNoFocusBorder() {
+//        if (System.getSecurityManager() != null) {
+//            return SAFE_NO_FOCUS_BORDER;
+//        } else {
+//            return noFocusBorder;
+//        }
+//    }
 
 
     private Color unselectedForeground;
@@ -76,10 +101,13 @@ public class RendererController<T extends JComponent> implements Serializable {
     
     //---------------- subclass configuration    
     /**
-     * Configures all visual state of the rendering component from the 
+     * Configures all default visual state of the rendering component from the 
      * given cell context.
-     * @param renderingComponent TODO
-     * @param context the cell context to configure from.
+     * 
+     * @param renderingComponent the component to configure, must not be null
+     * @param context the cell context to configure from, must not be null
+     * @throws NullPointerException if either renderingComponent or cellContext 
+     *   is null
      */
     public void configureVisuals(T renderingComponent, CellContext context) {
         configureState(renderingComponent, context);
@@ -89,8 +117,10 @@ public class RendererController<T extends JComponent> implements Serializable {
     }
 
     /**
-     * @param renderingComponent TODO
-     * @param context
+     * Configures the default Painter if applicable. Here: set's to null.
+     * 
+     * @param renderingComponent the component to configure, must not be null
+     * @param context the cell context to configure from, must not be null
      */
     protected void configurePainter(T renderingComponent, CellContext context) {
         if (renderingComponent instanceof PainterAware) {
@@ -112,8 +142,8 @@ public class RendererController<T extends JComponent> implements Serializable {
      * 
      * PENDING: doesn't check for null context component
      * 
-     * @param renderingComponent the component to configure
-     * @param context the cell context to configure from.
+     * @param renderingComponent the component to configure, must not be null
+     * @param context the cell context to configure from, must not be null
      */
     protected void configureState(T renderingComponent, CellContext context) {
         renderingComponent.setFont(context.getComponent().getFont());
@@ -125,7 +155,8 @@ public class RendererController<T extends JComponent> implements Serializable {
     /**
      * Configures colors of rendering component from the given cell context.
      * 
-     * @param context the cell context to configure from.
+     * @param renderingComponent the component to configure, must not be null
+     * @param context the cell context to configure from, must not be null
      */
     protected void configureColors(T renderingComponent, CellContext context) {
         if (context.isSelected()) {
@@ -145,7 +176,8 @@ public class RendererController<T extends JComponent> implements Serializable {
      * PENDING: move to context as well? - it's the only comp
      * with focus specifics? Problem is the parameter type...
      * 
-     * @param context the cell context to configure from.
+     * @param renderingComponent the component to configure, must not be null
+     * @param context the cell context to configure from, must not be null
      */
     protected void configureFocusColors(T renderingComponent, CellContext context) {
         if (!context.isSelected() && context.isEditable()) {
@@ -164,15 +196,16 @@ public class RendererController<T extends JComponent> implements Serializable {
     /**
      * Configures the rendering component's border from the given cell context.<p>
      * 
-     * @param context the cell context to configure from.
+     * @param renderingComponent the component to configure, must not be null
+     * @param context the cell context to configure from, must not be null
      */
     protected void configureBorder(T renderingComponent, CellContext context) {
-//        getRendererComponent().setBorder(context.getBorder());
-        if (context.isFocused()) {
-            renderingComponent.setBorder(context.getFocusBorder());
-        } else {
-            renderingComponent.setBorder(getNoFocusBorder());
-        }
+        renderingComponent.setBorder(context.getBorder());
+//        if (context.isFocused()) {
+//            renderingComponent.setBorder(context.getFocusBorder());
+//        } else {
+//            renderingComponent.setBorder(getNoFocusBorder());
+//        }
 
     }
 
@@ -210,8 +243,6 @@ public class RendererController<T extends JComponent> implements Serializable {
         return context.getBackground();
     }
 
-
-//--------------------- RolloverRenderer    
     
 
 }

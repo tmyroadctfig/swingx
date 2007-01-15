@@ -34,8 +34,15 @@ import java.text.NumberFormat;
  * @author Jeanette Winzenburg
  */
 public class FormatToStringConverter implements ToStringConverter {
+    /**
+     * Default converter for <code>Date</code> types. Uses the default format
+     * as returned from <code>DateFormat</code>.
+     */
     public final static FormatToStringConverter DATE_TO_STRING = new FormatToStringConverter() {
         
+        /**
+         * {@inheritDoc}
+         */
         public String getStringValue(Object value) {
             if (format == null) {
                 format = DateFormat.getDateInstance();
@@ -45,8 +52,15 @@ public class FormatToStringConverter implements ToStringConverter {
         
     };
     
+    /**
+     * Default converter for <code>Number</code> types. Uses the default format
+     * as returned from <code>NumberFormat</code>.
+     */
     public final static FormatToStringConverter NUMBER_TO_STRING = new FormatToStringConverter() {
         
+        /**
+         * {@inheritDoc}
+         */
         public String getStringValue(Object value) {
             if (format == null) {
                 format = NumberFormat.getNumberInstance();
@@ -56,21 +70,37 @@ public class FormatToStringConverter implements ToStringConverter {
         
     };
 
+    /** the format used in creating the String representation. */
     protected Format format;
 
+    /**
+     * Instantiates a formatted converter with null format.
+     *
+     */
     public FormatToStringConverter() {
         this(null);
     }
     
+    /**
+     * Instantiates a formatted converter with the given Format.
+     * 
+     * @param format the format to use in creating the String representation.
+     */
     public FormatToStringConverter(Format format) {
        this.format = format; 
     }
     
-    
+    /**
+     * 
+     * @return the format used in creating the String representation.
+     */
     public Format getFormat() {
         return format;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public String getStringValue(Object value) {
         if (value == null) return "";
         if (format != null) {

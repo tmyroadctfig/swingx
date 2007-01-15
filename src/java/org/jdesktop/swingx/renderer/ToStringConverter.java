@@ -34,6 +34,9 @@ import java.io.Serializable;
  */
 public interface ToStringConverter extends Serializable {
     
+    /**
+     * Default converter using the toString.
+     */
     public final static ToStringConverter TO_STRING = new ToStringConverter() {
 
         /**
@@ -50,6 +53,7 @@ public interface ToStringConverter extends Serializable {
     
     /**
      * Returns a string representation of the given value.
+     * 
      * @param value the object to present as a string
      * @return a string representation of the given value, 
      *  guaranteed to be not null

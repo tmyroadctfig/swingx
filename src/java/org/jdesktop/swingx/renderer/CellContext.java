@@ -28,6 +28,7 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 
 /**
  * Encapsulates the display context passed into the getXXRendererComponent.<p>
@@ -45,6 +46,20 @@ import javax.swing.border.Border;
  * @author Jeanette Winzenburg
  */
 public class CellContext<T extends JComponent> implements Serializable {
+
+    /* PENDING: move border to CellContext. */
+    protected static Border noFocusBorder = new EmptyBorder(1, 1, 1, 1);
+
+    private static final Border SAFE_NO_FOCUS_BORDER = new EmptyBorder(1, 1, 1,
+            1);
+
+    private static Border getNoFocusBorder() {
+        if (System.getSecurityManager() != null) {
+            return SAFE_NO_FOCUS_BORDER;
+        } else {
+            return noFocusBorder;
+        }
+    }
 
     transient T component;
     transient Object value;
@@ -130,12 +145,12 @@ public class CellContext<T extends JComponent> implements Serializable {
         return border;
     }
 
-//    protected Border getBorder() {
-//        if (isFocused()) {
-//            return getFocusBorder();
-//        } 
-//        return getNoFocusBorder();
-//    }
+    protected Border getBorder() {
+        if (isFocused()) {
+            return getFocusBorder();
+        } 
+        return getNoFocusBorder();
+    }
 
     protected String getUIKey(String key) {
         return getUIPrefix() + key;

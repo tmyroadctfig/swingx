@@ -5,6 +5,7 @@
 package org.jdesktop.swingx.renderer;
 
 import javax.swing.BorderFactory;
+import javax.swing.UIManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jdesktop.swingx.RolloverRenderer;
@@ -14,9 +15,8 @@ import org.jdesktop.swingx.RolloverRenderer;
  * Wrapping controller for usage in tree renderers. Handles the icon, delegates the value to 
  * the wrappee. <p>
  * 
- * PENDING: slight layout problem (one-pixel jumping on selection)<p>
- * PENDING: focus rect missing <p>
- * PENDING: ui specific focus rect variations not yet done <p>
+ * PENDING: ui specific focus rect variation (draw rect around icon) missing <p>
+ * PENDING: custom icons missing
  */
 public class WrappingIconController extends 
     RenderingComponentController<WrappingIconPanel>  implements RolloverRenderer {
@@ -44,7 +44,7 @@ public class WrappingIconController extends
             wrappee = new RenderingLabelController();
         }
         this.wrappee = wrappee;
-        rendererComponent.setComponent(wrappee.getRendererComponent());
+        rendererComponent.setComponent(wrappee.rendererComponent);
     }
 
     
@@ -87,6 +87,13 @@ public class WrappingIconController extends
     protected void configureState(CellContext context) {
         rendererComponent.setBorder(BorderFactory.createEmptyBorder());
     }
+
+//    /**
+//     * @return
+//     */
+//    private boolean isBorderAroundIcon() {
+//        return Boolean.TRUE.equals(UIManager.get("Tree.drawsFocusBorderAroundIcon"));
+//    }
 
     @Override
     protected WrappingIconPanel createRendererComponent() {

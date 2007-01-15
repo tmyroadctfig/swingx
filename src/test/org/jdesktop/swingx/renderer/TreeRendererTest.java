@@ -38,6 +38,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.ListModel;
 import javax.swing.UIManager;
+import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
@@ -49,7 +50,6 @@ import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.test.ActionMapTreeTableModel;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
-import org.jdesktop.swingx.test.ActionMapTreeTableModel.ActionEntryNode;
 import org.jdesktop.test.SerializableSupport;
 
 /**
@@ -70,6 +70,10 @@ public class TreeRendererTest extends InteractiveTestCase {
     
     @Override
     protected void setUp() throws Exception {
+//        setSystemLF(true);
+//        LOG.info("LF: " + UIManager.getLookAndFeel());
+//        LOG.info("Theme: " + ((MetalLookAndFeel) UIManager.getLookAndFeel()).getCurrentTheme());
+//        UIManager.put("Tree.drawsFocusBorderAroundIcon", Boolean.TRUE);
         tree = new JTree();
         coreTreeRenderer = new DefaultTreeCellRenderer();
         xTreeRenderer = new DefaultTreeRenderer();

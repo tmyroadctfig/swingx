@@ -27,12 +27,32 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 /**
- * Wrapper around a component which is usable for rendering cells. Acts as
- * <code>Factory</code> for the component. Encapsulates content-related component 
- * configuration, delegates default visual component configuration to a 
- * <code>RendererController</code>.
+ * Abstract base class of a provider for a cell rendering component. Configures
+ * the component's content and default visuals depending on the renderee's state
+ * as captured in a <code>CellContext</code>. It's basically re-usable across
+ * all types of renderees (JTable, JList, JTree).
+ * <p>
+ * 
+ * Guarantees to completely configure the visual properties listed below. As a
+ * consequence, client code (f.i. in <code>Highlighter</code>s) can safely
+ * change them without long-lasting visual artefacts.
+ * 
+ * <ul>
+ * <li> foreground and background, depending on selected and focused state
+ * <li> border
+ * <li> font
+ * <li> Painter (if applicable)
+ * <li> horizontal alignment (if applicable)
+ * </ul>
+ * 
+ * As this internally delegates default visual configuration to a
+ * <code>RendererController</code> (which handles the first four items)
+ * subclasses have to guarantee the alignment only.
  * 
  * @author Jeanette Winzenburg
+ * 
+ * @see RendererController
+ * @see CellContext
  */
 public abstract class RenderingComponentController<T extends JComponent> 
     implements Serializable {
@@ -45,6 +65,11 @@ public abstract class RenderingComponentController<T extends JComponent>
     /** the converter to use for string representation. */
     protected ToStringConverter formatter;
     
+    /**
+     * Instantiates a default component controller with LEADING
+     * horizontal alignment and default to-String converter. <p> 
+     *
+     */
     public RenderingComponentController() {
         setHorizontalAlignment(JLabel.LEADING);
         setToStringConverter(null);
@@ -52,25 +77,29 @@ public abstract class RenderingComponentController<T extends JComponent>
         rendererController = createRendererController();
     }
     
-
-    
     /**
      * Configures and returns an appropriate component to render a cell
-     * in the given context.
+     * in the given context. If the context is null, returns the
+     * component in its current state.
      * 
-     * @param context
+     * @param context the cell context to configure from
      * @return a component to render a cell in the given context.
      */
     public T getRendererComponent(CellContext context) {
-        rendererController.configureVisuals(rendererComponent, context);
-        configureContent(context);
+        if (context != null) {
+            configureVisuals(context);
+            configureContent(context);
+        }
         return rendererComponent;
     }
     
     /**
      * Sets the horizontal alignment property to configure the component with.
      * Allowed values are those accepted by corresponding JLabel setter. The
-     * default value is JLabel.LEADING.
+     * default value is JLabel.LEADING. This controller guarantees to apply the
+     * alignment on each request for a configured rendering component, if 
+     * possible. Note that not all components have a horizontal alignment
+     * property.
      * 
      * @param alignment the horizontal alignment to use when configuring the
      *   rendering component.
@@ -82,7 +111,7 @@ public abstract class RenderingComponentController<T extends JComponent>
     /**
      * Returns the horizontal alignment.
      * 
-     * @return the horizontal component.
+     * @return the horizontal alignment of the rendering component.
      * 
      * @see #setHorizontalAlignment(int)
      * 
@@ -125,15 +154,30 @@ public abstract class RenderingComponentController<T extends JComponent>
      * @return a appropriate string representation of the cell's content.
      */
     public String getStringValue(CellContext context) {
-        return formatter.getStringValue(context.getValue());
+        Object value = null;
+        if (context != null) {
+            value = context.getValue();
+        }
+        return formatter.getStringValue(value);
     }
 
+    /**
+     * Configures the rendering component's default visuals frome
+     * the given cell context. Here: delegates to the renderer
+     * controller.
+     * 
+     * @param context the cell context to configure from, must not be null.
+     * @see RendererController
+     */
+    protected void configureVisuals(CellContext context) {
+        rendererController.configureVisuals(rendererComponent, context);
+    }
 
     /**
      * Configures the renderering component's content and state from the
      * given cell context.
      * 
-     * @param context the cell context to configure from
+     * @param context the cell context to configure from, must not be null.
      * 
      * @see #configureState(CellContext)
      * @see #format(CellContext)
@@ -147,14 +191,14 @@ public abstract class RenderingComponentController<T extends JComponent>
      * Formats the renderering component's content from the
      * given cell context.
      * 
-     * @param context the cell context to configure from
+     * @param context the cell context to configure from, must not be null.
      */
     protected abstract void format(CellContext context);
 
     /**
      * Configures the renderering component's state from the
      * given cell context.
-     * @param context
+     * @param context the cell context to configure from, must not be null.
      */
     protected abstract void configureState(CellContext context); 
 
@@ -166,9 +210,12 @@ public abstract class RenderingComponentController<T extends JComponent>
     protected abstract T createRendererComponent();
 
     /**
-     * Creates and returns the RendererController used by this.
+     * Factory method to create and return the RendererController used by this
+     * to configure the default visuals. Here: creates the default controller
+     * parameterized to the same type as this.
      * 
-     * @return
+     * @return the controller used to configure the default visuals of
+     *   the rendering component.
      */
     protected RendererController<T> createRendererController() {
         return new RendererController<T>();
@@ -181,10 +228,6 @@ public abstract class RenderingComponentController<T extends JComponent>
      */
     protected RendererController<T> getRendererController() {
         return rendererController;
-    }
-
-    public T getRendererComponent() {
-        return rendererComponent;
     }
 
 }
