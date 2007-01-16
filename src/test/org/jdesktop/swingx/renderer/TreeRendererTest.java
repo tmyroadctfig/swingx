@@ -103,62 +103,6 @@ public class TreeRendererTest extends InteractiveTestCase {
 }
 
     /**
-     * base interaction with list: renderer uses list's unselected custom
-     * colors.
-     * 
-     * currently, this test fails because the assumptions are wrong! Core
-     * renderer behaves slightly unexpected.
-     * 
-     */
-    public void testTreeRendererExtTreeColors() {
-        Color background = Color.MAGENTA;
-        Color foreground = Color.YELLOW;
-        tree.setBackground(background);
-        tree.setForeground(foreground);
-        coreTreeRenderer.setBackgroundNonSelectionColor(background);
-        coreTreeRenderer.setTextNonSelectionColor(foreground);
-        // prepare standard
-        Component coreComponent = coreTreeRenderer
-                .getTreeCellRendererComponent(tree, null, false, false, false,
-                        0, false);
-        // sanity: known standard behaviour
-        // background is manually painted
-        assertEquals(background, coreComponent.getBackground());
-        assertEquals(tree.getForeground(), coreComponent.getForeground());
-        // prepare extended
-        Component xComponent = xTreeRenderer.getTreeCellRendererComponent(tree,
-                null, false, false, false, 0, false);
-        // assert behaviour same as standard
-        assertEquals(background, xComponent.getBackground());
-        assertEquals(foreground, xComponent.getForeground());
-    }
-    /**
-     * base interaction with list: renderer uses list's unselected  colors
-     * 
-     * currently, this test fails because the assumptions are wrong! Core
-     * renderer behaves slightly unexpected.
-     * 
-     *
-     */
-    public void testTreeRendererExtColors() {
-        // prepare standard
-        Component coreComponent = coreTreeRenderer.getTreeCellRendererComponent(tree, null,
-                false, false, false, 0, false);
-        // sanity: known standard behaviour
-        assertNull(coreComponent.getBackground());
-//        assertNull(coreComponent.getForeground());
-        assertNull(tree.getForeground());
-        Color uiForeground = UIManager.getColor("Tree.textForeground");
-        assertEquals(uiForeground, coreComponent.getForeground());
-        // prepare extended
-        Component xComponent = xTreeRenderer.getTreeCellRendererComponent(tree, null,
-                false, false, false, 0, false);
-        // assert behaviour same as standard
-//        assertEquals(coreComponent.getBackground(), xComponent.getBackground());
-        assertEquals(coreComponent.getForeground(), xComponent.getForeground());
-    }
-
-    /**
      * characterize opaqueness of rendering components.
      * Hmm... tree-magic is different
      */
