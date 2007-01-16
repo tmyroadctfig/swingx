@@ -66,7 +66,7 @@
     nbproject/build-impl.xml file. 
 
     -->
-    
+
     <target name="-pre-init">
         <tstamp>
             <format property="RELEASE_DSTAMP" pattern="yyyy_MM_dd" />
@@ -217,7 +217,7 @@
         </ant>
     </target>
     
-    <target name="coverage" if="hudson.installed">
+    <target name="coverage" if="hudson.installed" depends="init">
         <ant antfile="/hudson/coverage.xml" target="coverage" >
             <property name="coverage.dist.dir" value="${dist.dir}/coverage" />
         </ant>
