@@ -215,6 +215,10 @@
         <ant antfile="/hudson/coverage.xml" target="instrument" >
             <property name="instrumented.classes.dir" value="${build.dir}/instrumented-classes" />
         </ant>
+        <!-- Modify the classpath such that ${build.dir}/instrumented-classes is first on
+             the classpath -->
+        <property name="javac.test.classpath" value="${build.dir}/instrumented-classes:${javac.test.classpath}" />
+        <echo message="New classpath is ${javac.test.classpath}" />
     </target>
     
     <target name="coverage" if="hudson.installed" depends="init">
