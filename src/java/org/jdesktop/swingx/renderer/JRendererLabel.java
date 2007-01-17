@@ -63,7 +63,7 @@ import org.jdesktop.swingx.painter.Painter;
  */
 public class JRendererLabel extends JLabel implements PainterAware {
 
-    private Painter painter;
+    protected Painter painter;
 
     /**
      * 
