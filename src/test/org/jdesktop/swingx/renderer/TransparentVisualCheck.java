@@ -42,12 +42,18 @@ import org.jdesktop.swingx.action.ActionContainerFactory;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.ConditionalHighlighter;
 import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
 import org.jdesktop.test.AncientSwingTeam;
 
 /**
- * Experiments with transparent highlighters.
+ * Experiments with transparent highlighters.<p>
+ * 
+ * Links
+ * <ul>
+ * <li> <a href="">Sneak preview II - Transparent Highlighter</a>
+ * </ul>
  * 
  * @author Jeanette Winzenburg
  */
@@ -56,20 +62,171 @@ public class TransparentVisualCheck extends InteractiveTestCase {
 //      setSystemLF(true);
       TransparentVisualCheck test = new TransparentVisualCheck();
       try {
-         test.runInteractiveTests(".*Table.*");
+         test.runInteractiveTests();
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
+    
+//  ---------------------- Transparent gradients on PainterAwareLabel
+    
+    /**
+     * Use GradientPainter for value-based background highlighting with SwingX
+     * extended default renderer. Trying to get the highlighter transparent:
+     * the background color of the cell should shine through in the "white"
+     * region of the value-hint. This uses a PainterAwareLabel as rendering 
+     * component
+     */
+    public void interactiveTransparentGradientHighlightPlusStriping() {
+        TableModel model = new AncientSwingTeam();
+        JXTable table = new JXTable(model);
+        table.setBackground(Highlighter.ledgerBackground.getBackground());
+        RenderingComponentController<JLabel> numberRendering = new RenderingLabelController(
+                JLabel.RIGHT) {
+                    @Override
+                    protected JLabel createRendererComponent() {
+                        return new PainterAwareLabel();
+                    }
+            
+        };
+        table.setDefaultRenderer(Number.class, new DefaultTableRenderer(
+                numberRendering));
+        final TransparentGradientHighlighter gradientHighlighter = createTransparentGradientHighlighter();
+        Highlighter alternateRowHighlighter = new UIAlternateRowHighlighter();
+        table.addHighlighter(alternateRowHighlighter);
+        table.addHighlighter(gradientHighlighter);
+        // re-use component controller and highlighter in a JXList
+        JXList list = new JXList(createListNumberModel(), true);
+        list.setCellRenderer(new DefaultListRenderer(numberRendering));
+        list.addHighlighter(alternateRowHighlighter);
+        list.addHighlighter(gradientHighlighter);
+        list.toggleSortOrder();
+        final JXFrame frame = showWithScrollingInFrame(table, list,
+                "transparent value relative highlighting plus striping");
+        addStatusMessage(frame,
+                "uses a PainterAwareLabel in renderer");
+        // crude binding to play with options - the factory is incomplete...
+        ActionContainerFactory factory = new ActionContainerFactory();
+        // toggle opaque optimatization
+        AbstractActionExt overrideOpaque = new AbstractActionExt("yellow transparent") {
+
+            public void actionPerformed(ActionEvent e) {
+                gradientHighlighter.setYellowTransparent(isSelected());
+                frame.repaint();
+            }
+            
+        };
+        overrideOpaque.setStateAction();
+        JCheckBox box = new JCheckBox();
+        factory.configureButton(box, overrideOpaque, null);
+        getStatusBar(frame).add(box);
+        frame.pack();
+    }
 
     /**
      * Use GradientPainter for value-based background highlighting with SwingX
      * extended default renderer. Trying to get the highlighter transparent:
      * the background color of the cell should shine through in the "white"
-     * region of the value-hint.
+     * region of the value-hint. This uses a PainterAwareLabel as rendering 
+     * component
      */
-    public void interactiveTableAndListNumberProportionalGradientHighlight() {
+    public void interactiveTransparentGradientHighlight() {
+        TableModel model = new AncientSwingTeam();
+        JXTable table = new JXTable(model);
+        table.setBackground(Highlighter.ledgerBackground.getBackground());
+        RenderingComponentController<JLabel> numberRendering = new RenderingLabelController(
+                JLabel.RIGHT) {
+                    @Override
+                    protected JLabel createRendererComponent() {
+                        return new PainterAwareLabel();
+                    }
+            
+        };
+        table.setDefaultRenderer(Number.class, new DefaultTableRenderer(
+                numberRendering));
+        Highlighter gradientHighlighter = createTransparentGradientHighlighter();
+        table.addHighlighter(gradientHighlighter);
+        // re-use component controller and highlighter in a JXList
+        JXList list = new JXList(createListNumberModel(), true);
+        list.setBackground(table.getBackground());
+        list.setCellRenderer(new DefaultListRenderer(numberRendering));
+        list.addHighlighter(gradientHighlighter);
+        list.toggleSortOrder();
+        JXFrame frame = showWithScrollingInFrame(table, list,
+                "transparent value relative highlighting");
+        addStatusMessage(frame,
+                "uses a PainterAwareLabel in renderer");
+        frame.pack();
+    }
+
+
+    public static class PainterAwareLabel extends JRendererLabel {
+        @Override
+        protected void paintComponent(Graphics g) {
+            if (painter != null) {
+                // we have a custom (background) painter
+                // try to inject if possible
+                // there's no guarantee - some LFs have their own background 
+                // handling  elsewhere
+                if (isOpaque()) {
+                    // replace the paintComponent completely 
+                    paintComponentWithPainter((Graphics2D) g);
+                } else {
+                    // transparent apply the background painter before calling super
+                    painter.paint((Graphics2D) g, this);
+                    super.paintComponent(g);
+                }
+            } else {
+                // nothing to worry about - delegate to super
+                super.paintComponent(g);
+            }
+        }
+
+        /**
+         * PRE: painter != null, isOpaque()
+         * @param g
+         */
+        protected void paintComponentWithPainter(Graphics2D g) {
+            // 1. be sure to fill the background
+            // 2. paint the painter
+            // by-pass ui.update and hook into ui.paint directly
+            if (ui != null) {
+                Graphics scratchGraphics = (g == null) ? null : g.create();
+                try {
+                    g.setColor(getBackground());
+                    g.fillRect(0, 0, getWidth(), getHeight());
+                    painter.paint(g, this);
+                    ui.paint(scratchGraphics, this);
+                }
+                finally {
+                    scratchGraphics.dispose();
+                }
+            }
+            
+        }
+
+        /**
+         * called from super.paint - overridden to do nothing if the painter
+         * is called in super.paint.
+         */
+        @Override
+        protected void paintPainter(Graphics2D g) {
+        }
+        
+        
+        
+        
+    }
+    
+//----------------- Transparent gradient on default (swingx) rendering label
+    /**
+         * Use GradientPainter for value-based background highlighting with SwingX
+         * extended default renderer. Trying to get the highlighter transparent:
+         * the background color of the cell should shine through in the "white"
+         * region of the value-hint.
+         */
+        public void interactiveTableAndListNumberProportionalGradientHighlight() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
         table.setBackground(Highlighter.ledgerBackground.getBackground());
@@ -91,6 +248,93 @@ public class TransparentVisualCheck extends InteractiveTestCase {
                 "uses the default painter-aware label in renderer");
         frame.pack();
     }
+
+
+//---------------- Transparent renderer on experimenting rendering label
+        
+        /**
+         * Use GradientPainter for value-based background highlighting with SwingX
+         * extended default renderer. Trying to get the highlighter transparent:
+         * the background color of the cell should shine through in the "white"
+         * region of the value-hint.
+         */
+        public void interactiveNumberProportionalGradientHighlightExperimentWithStriping() {
+            TableModel model = new AncientSwingTeam();
+            JXTable table = new JXTable(model);
+            // dirty, dirty - but I want to play with the options later on ...
+            final RenderingLabel label = new RenderingLabel();
+            RenderingComponentController<JLabel> numberRendering = new RenderingLabelController(
+                    JLabel.RIGHT) {
+
+                        @Override
+                        protected JLabel createRendererComponent() {
+                            return label;
+                        }
+                
+            };
+            table.setDefaultRenderer(Number.class, new DefaultTableRenderer(
+                    numberRendering));
+            Highlighter gradientHighlighter = createTransparentGradientHighlighter();
+            Highlighter alternateRowHighlighter = new UIAlternateRowHighlighter();
+            table.addHighlighter(alternateRowHighlighter);
+            table.addHighlighter(gradientHighlighter);
+            // re-use component controller and highlighter in a JXList
+            JXList list = new JXList(createListNumberModel(), true);
+            list.setCellRenderer(new DefaultListRenderer(numberRendering));
+            list.addHighlighter(alternateRowHighlighter);
+            list.addHighlighter(gradientHighlighter);
+            list.toggleSortOrder();
+            final JXFrame frame = showWithScrollingInFrame(table, list,
+                    "transparent value relative highlighting - with striping");
+            addStatusMessage(frame,
+                    "uses the play-with painter-aware label");
+            
+            // crude binding to play with options - the factory is incomplete...
+            ActionContainerFactory factory = new ActionContainerFactory();
+            // toggle opaque optimatization
+            AbstractActionExt overrideOpaque = new AbstractActionExt("plain opque") {
+
+                public void actionPerformed(ActionEvent e) {
+                    label.overrideSuperIsOpaque = isSelected();
+                    frame.repaint();
+                }
+                
+            };
+            overrideOpaque.setStateAction();
+            JCheckBox box = new JCheckBox();
+            factory.configureButton(box, overrideOpaque, null);
+            getStatusBar(frame).add(box);
+            // call painter in paintComponent
+            AbstractActionExt paintComponent = new AbstractActionExt("paintComponent") {
+
+                public void actionPerformed(ActionEvent e) {
+                    label.overrideSuperPainter = isSelected();
+                    frame.repaint();
+                }
+                
+            };
+            paintComponent.setStateAction();
+            box = new JCheckBox();
+            factory.configureButton(box, paintComponent, null);
+            getStatusBar(frame).add(box);
+            // call painter in paintComponent
+            AbstractActionExt opaqueDepends = new AbstractActionExt("opaqueDepends") {
+
+                public void actionPerformed(ActionEvent e) {
+                    label.adjustOpaqueWithPainter = isSelected();
+                    frame.repaint();
+                }
+                
+            };
+            opaqueDepends.setStateAction();
+            box = new JCheckBox();
+            factory.configureButton(box, opaqueDepends, null);
+            getStatusBar(frame).add(box);
+
+            frame.pack();
+        }
+      
+
 
     /**
      * Use GradientPainter for value-based background highlighting with SwingX
@@ -172,7 +416,7 @@ public class TransparentVisualCheck extends InteractiveTestCase {
 
         frame.pack();
     }
-    
+  
     /**
      * to play with screws to make transparency work.
      */
@@ -253,60 +497,79 @@ public class TransparentVisualCheck extends InteractiveTestCase {
             }
         }
     }
+
+//-------------------- transparent gradient highlighter  
+    
+    public static class TransparentGradientHighlighter extends ConditionalHighlighter {
+        float maxValue = 100;
+        private Painter painter;
+        private boolean yellowTransparent;
+
+        /**
+         */
+        public TransparentGradientHighlighter() {
+            super(null, null, -1, -1);
+        }
+
+        /**
+         * @param b
+         */
+        public void setYellowTransparent(boolean b) {
+            this.yellowTransparent = b;
+        }
+
+        @Override
+        public Component highlight(Component renderer,
+                ComponentAdapter adapter) {
+            boolean highlight = needsHighlight(adapter);
+            if (highlight && (renderer instanceof PainterAware)) {
+                float end = getEndOfGradient((Number) adapter.getValue());
+                if (end > 1) {
+                    renderer.setBackground(Color.YELLOW.darker());
+                } else if (end > 0.02) {
+                    Painter painter = getPainter(end);
+                    ((PainterAware) renderer).setPainter(painter);
+                }
+                return renderer;
+            }
+            return renderer;
+        }
+
+        private Painter getPainter(float end) {
+                Color startColor = getTransparentColor(Color.YELLOW, yellowTransparent ? 
+                        125 : 254);
+                Color endColor = getTransparentColor(Color.WHITE, 0);
+             painter = new BasicGradientPainter(0.0f, 0.0f,
+                    startColor, end, 0.f, endColor);
+            return painter;
+        }
+
+        private Color getTransparentColor(Color base, int transparency) {
+            return new Color(base.getRed(), base.getGreen(), base.getBlue(), transparency);
+        }
+        private float getEndOfGradient(Number number) {
+            float end = number.floatValue() / maxValue;
+            return end;
+        }
+
+        @Override
+        protected boolean test(ComponentAdapter adapter) {
+            return adapter.getValue() instanceof Number;
+        }
+
+        
+    }
     /**
      * creates and returns a highlighter with a value-based transparent 
      * gradient if the cell content type is a Number.  
      * 
      * @return 
      */
-    private ConditionalHighlighter createTransparentGradientHighlighter() {
-        ConditionalHighlighter gradientHighlighter = new ConditionalHighlighter(
-                null, null, -1, -1) {
-            float maxValue = 100;
-            private Painter painter;
-
-            @Override
-            public Component highlight(Component renderer,
-                    ComponentAdapter adapter) {
-                boolean highlight = needsHighlight(adapter);
-                if (highlight && (renderer instanceof PainterAware)) {
-                    float end = getEndOfGradient((Number) adapter.getValue());
-                    if (end > 1) {
-                        renderer.setBackground(Color.YELLOW.darker());
-                    } else if (end > 0.02) {
-                        Painter painter = getPainter(end);
-                        ((PainterAware) renderer).setPainter(painter);
-                    }
-                    return renderer;
-                }
-                return renderer;
-            }
-
-            private Painter getPainter(float end) {
-                    Color startColor = getTransparentColor(Color.YELLOW, 254);
-                    Color endColor = getTransparentColor(Color.WHITE, 0);
-                 painter = new BasicGradientPainter(0.0f, 0.0f,
-                        startColor, end, 0.f, endColor);
-                return painter;
-            }
-
-            private Color getTransparentColor(Color base, int transparency) {
-                return new Color(base.getRed(), base.getGreen(), base.getBlue(), transparency);
-            }
-            private float getEndOfGradient(Number number) {
-                float end = number.floatValue() / maxValue;
-                return end;
-            }
-
-            @Override
-            protected boolean test(ComponentAdapter adapter) {
-                return adapter.getValue() instanceof Number;
-            }
-
-        };
-        return gradientHighlighter;
+    private TransparentGradientHighlighter createTransparentGradientHighlighter() {
+        return new TransparentGradientHighlighter();
     }
-   
+
+//----------------- Utility    
     /**
      * 
      * @return a ListModel wrapped around the AncientSwingTeam's Number column.
