@@ -26,10 +26,20 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
+import javax.swing.AbstractButton;
+import javax.swing.Action;
 import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.KeyStroke;
 import javax.swing.ListModel;
 import javax.swing.table.TableModel;
 
@@ -45,6 +55,7 @@ import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
+import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.test.AncientSwingTeam;
 
 /**
@@ -62,13 +73,176 @@ public class TransparentVisualCheck extends InteractiveTestCase {
 //      setSystemLF(true);
       TransparentVisualCheck test = new TransparentVisualCheck();
       try {
-         test.runInteractiveTests();
+//         test.runInteractiveTests();
+         test.runInteractiveTests(".*List.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
+
+//------------------------ Transparent painter aware button as rendering
     
+    /**
+     * Use a custom button controller to show both checkbox icon and text to
+     * render Actions in a JXList. Use a painter-aware checkbox.
+     */
+    public void interactiveTableWithListColumnControl() {
+        TableModel model = new AncientSwingTeam();
+        JXTable table = new JXTable(model);
+        JXList list = new JXList();
+        Highlighter highlighter = new UIAlternateRowHighlighter();
+        table.addHighlighter(highlighter);
+        list.setHighlighters(highlighter, new GradientHighlighter());
+        // quick-fill and hook to table columns' visibility state
+        configureList(list, table, false);
+        // a custom rendering button controller showing both checkbox and text
+        RenderingButtonController wrapper = new RenderingButtonController() {
+
+            
+            @Override
+            protected AbstractButton createRendererComponent() {
+                return new PainterAwareButton();
+            }
+
+            @Override
+            protected void format(CellContext context) {
+                if (!(context.getValue() instanceof AbstractActionExt)) {
+                    super.format(context);
+                    return;
+                }
+                rendererComponent.setSelected(((AbstractActionExt) context.getValue()).isSelected());
+                rendererComponent.setText(((AbstractActionExt) context.getValue()).getName());
+            }
+            
+        };
+        wrapper.setHorizontalAlignment(JLabel.LEADING);
+        list.setCellRenderer(new DefaultListRenderer(wrapper));
+        JXFrame frame = showWithScrollingInFrame(table, list,
+                "checkbox list-renderer - striping and gradient");
+        addStatusMessage(frame, "fake editable list: space/doubleclick on selected item toggles column visibility");
+        frame.pack();
+    }
+
+    public static class PainterAwareButton extends JCheckBox implements PainterAware {
+        Painter painter;
+
+        public void setPainter(Painter painter) {
+            this.painter = painter;
+            if (painter != null) {
+                // ui maps to !opaque
+                // Note: this is incomplete - need to keep track of the 
+                // "real" contentfilled property
+                setContentAreaFilled(false);
+            } 
+        }
+        
+        @Override
+        protected void paintComponent(Graphics g) {
+            if (painter != null) {
+                // we have a custom (background) painter
+                // try to inject if possible
+                // there's no guarantee - some LFs have their own background 
+                // handling  elsewhere
+                // for button we need to replace the paintComponent completely 
+                    paintComponentWithPainter((Graphics2D) g);
+            } else {
+                // no painter - delegate to super
+                super.paintComponent(g);
+            }
+        }
+
+        /**
+         * PRE: painter != null
+         * @param g
+         */
+        protected void paintComponentWithPainter(Graphics2D g) {
+            // 1. be sure to fill the background
+            // 2. paint the painter
+            // by-pass ui.update and hook into ui.paint directly
+            if (ui != null) {
+                Graphics scratchGraphics = (g == null) ? null : g.create();
+                try {
+                    g.setColor(getBackground());
+                    g.fillRect(0, 0, getWidth(), getHeight());
+                    painter.paint(g, this);
+                    ui.paint(scratchGraphics, this);
+                }
+                finally {
+                    scratchGraphics.dispose();
+                }
+            }
+            
+        }
+        /**
+         * Overridden for performance reasons.<p>
+         * PENDING: Think about Painters and opaqueness?
+         * 
+         */
+//        public boolean isOpaque() { 
+//            Color back = getBackground();
+//            Component p = getParent(); 
+//            if (p != null) { 
+//                p = p.getParent(); 
+//            }
+//            // p should now be the JTable. 
+//            boolean colorMatch = (back != null) && (p != null) && 
+//                back.equals(p.getBackground()) && 
+//                            p.isOpaque();
+//            return !colorMatch && super.isOpaque(); 
+//        }
+        
+    }
+    
+    public static class GradientHighlighter extends Highlighter {
+        float maxValue = 100;
+        private Painter painter;
+        private boolean yellowTransparent;
+
+        /**
+         */
+        public GradientHighlighter() {
+            super(Color.YELLOW, null);
+        }
+
+        /**
+         * @param b
+         */
+        public void setYellowTransparent(boolean b) {
+            this.yellowTransparent = b;
+        }
+
+        @Override
+        public Component highlight(Component renderer,
+                ComponentAdapter adapter) {
+            if (renderer instanceof PainterAware) {
+                Painter painter = getPainter(0.7f);
+                ((PainterAware) renderer).setPainter(painter);
+                
+            } else {
+                    renderer.setBackground(Color.YELLOW.darker());
+                }
+                return renderer;
+         }
+
+        private Painter getPainter(float end) {
+            if (painter == null) {
+                Color startColor = getTransparentColor(Color.YELLOW, yellowTransparent ? 
+                        125 : 254);
+                Color endColor = getTransparentColor(Color.WHITE, 0);
+             painter = new BasicGradientPainter(0.0f, 0.0f,
+                    startColor, end, 0.f, endColor);
+        }
+            return painter;
+        }
+
+        private Color getTransparentColor(Color base, int transparency) {
+            return new Color(base.getRed(), base.getGreen(), base.getBlue(), transparency);
+        }
+ 
+        
+    }
+
 //  ---------------------- Transparent gradients on PainterAwareLabel
     
     /**
@@ -583,5 +757,101 @@ public class TransparentVisualCheck extends InteractiveTestCase {
         }
         return model;
     }
+
+    /**
+     * Fills the list with a collection of actions (as returned from the 
+     * table's column control). Binds space and double-click to toggle
+     * the action's selected state.
+     * 
+     * note: this is just an example to show-off the button renderer in a list!
+     * ... it's very dirty!!
+     * 
+     * @param list
+     * @param table
+     */
+    private void configureList(final JXList list, final JXTable table, boolean useRollover) {
+        final List<Action> actions = new ArrayList();
+        ColumnControlButton columnControl = new ColumnControlButton(table, null) {
+
+            @Override
+            protected void addVisibilityActionItems() {
+                actions.addAll(Collections
+                        .unmodifiableList(getColumnVisibilityActions()));
+            }
+
+        };
+        list.setModel(createListeningListModel(actions));
+        // action toggling selected state of selected list item
+        final Action toggleSelected = new AbstractActionExt(
+                "toggle column visibility") {
+
+            public void actionPerformed(ActionEvent e) {
+                if (list.isSelectionEmpty())
+                    return;
+                AbstractActionExt selectedItem = (AbstractActionExt) list
+                        .getSelectedValue();
+                selectedItem.setSelected(!selectedItem.isSelected());
+            }
+
+        };
+        if (useRollover) {
+            list.setRolloverEnabled(true);
+        } else {
+            // bind action to space
+            list.getInputMap().put(KeyStroke.getKeyStroke("SPACE"),
+                    "toggleSelectedActionState");
+        }
+        list.getActionMap().put("toggleSelectedActionState", toggleSelected);
+        // bind action to double-click
+        MouseAdapter adapter = new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    toggleSelected.actionPerformed(null);
+                }
+            }
+
+        };
+        list.addMouseListener(adapter);
+
+    }
+
+    /**
+     * Creates and returns a ListModel containing the given actions. 
+     * Registers a PropertyChangeListener with each action to get
+     * notified and fire ListEvents.
+     * 
+     * @param actions the actions to add into the model.
+     * @return the filled model.
+     */
+    private ListModel createListeningListModel(final List<Action> actions) {
+        final DefaultListModel model = new DefaultListModel() {
+
+            DefaultListModel reallyThis = this;
+            @Override
+            public void addElement(Object obj) {
+                super.addElement(obj);
+                ((Action) obj).addPropertyChangeListener(l);
+                
+            }
+            
+            PropertyChangeListener l = new PropertyChangeListener() {
+                
+                public void propertyChange(PropertyChangeEvent evt) {
+                    int index = indexOf(evt.getSource());
+                    if (index >= 0) {
+                        fireContentsChanged(reallyThis, index, index);
+                    }
+                }
+                
+            };
+        };
+        for (Action action : actions) {
+            model.addElement(action);
+        }
+        return model;
+    }
+
 
 }
