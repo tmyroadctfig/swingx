@@ -93,28 +93,54 @@ public class JRendererLabel extends JLabel implements PainterAware {
 
     public void setPainter(Painter painter) {
         this.painter = painter;
-//        if (painter != null) {
-//            setOpaque(false);
-//        } else {
-//            setOpaque(true);
-//        }
     }
 
-    
     @Override
-    public void paint(Graphics g) {
-        paintPainter((Graphics2D) g);
-        super.paint(g);
+    protected void paintComponent(Graphics g) {
+        if (painter != null) {
+            // we have a custom (background) painter
+            // try to inject if possible
+            // there's no guarantee - some LFs have their own background 
+            // handling  elsewhere
+            if (isOpaque()) {
+                // replace the paintComponent completely 
+                paintComponentWithPainter((Graphics2D) g);
+            } else {
+                // transparent apply the background painter before calling super
+                painter.paint((Graphics2D) g, this);
+                super.paintComponent(g);
+            }
+        } else {
+            // nothing to worry about - delegate to super
+            super.paintComponent(g);
+        }
     }
 
     /**
-     * @param graphics2D
+     * PRE: painter != null, isOpaque()
+     * @param g
      */
-    protected void paintPainter(Graphics2D g) {
-        if (painter != null)
-            painter.paint(g, this);
+    protected void paintComponentWithPainter(Graphics2D g) {
+        // 1. be sure to fill the background
+        // 2. paint the painter
+        // by-pass ui.update and hook into ui.paint directly
+        if (ui != null) {
+            Graphics scratchGraphics = (g == null) ? null : g.create();
+            try {
+                g.setColor(getBackground());
+                g.fillRect(0, 0, getWidth(), getHeight());
+                painter.paint(g, this);
+                ui.paint(scratchGraphics, this);
+            }
+            finally {
+                scratchGraphics.dispose();
+            }
+        }
+        
     }
 
+
+ 
     /**
      * Overridden for performance reasons.
      * See the <a href="#override">Implementation Note</a> 

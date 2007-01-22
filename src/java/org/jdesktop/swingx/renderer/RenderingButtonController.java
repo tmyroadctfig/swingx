@@ -70,7 +70,7 @@ public class RenderingButtonController extends
      */
     @Override
     protected AbstractButton createRendererComponent() {
-        JCheckBox box = new JCheckBox();
+        JCheckBox box = new JRendererCheckBox();
         return  box;
     }
 

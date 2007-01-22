@@ -115,7 +115,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
     }
 
     /**
-     * Check if all defaults show up as expected.
+     * Check disabled appearance.
      *
      */
     public void interactiveListDisabledIconRenderer() {
@@ -143,13 +143,13 @@ public class RendererVisualCheck extends InteractiveTestCase {
             }
             
         };
-        JXFrame frame = wrapWithScrollingInFrame(standard, enhanced, "Compare renderers: default <--> enhanced");
+        JXFrame frame = wrapWithScrollingInFrame(standard, enhanced, "Disabled - compare renderers: default <--> enhanced");
         addAction(frame, action);
         frame.setVisible(true);
     }
     
     /**
-     * Check if all defaults show up as expected.
+     * Check disabled appearance for all renderers.
      *
      */
     public void interactiveTableDefaultRenderers() {
@@ -181,7 +181,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
             }
             
         };
-        JXFrame frame = wrapWithScrollingInFrame(standard, enhanced, "Compare renderers: default <--> enhanced");
+        JXFrame frame = wrapWithScrollingInFrame(standard, enhanced, "Disabled Compare renderers: default <--> enhanced");
         addAction(frame, action);
         frame.setVisible(true);
     }
@@ -248,39 +248,26 @@ public class RendererVisualCheck extends InteractiveTestCase {
         
         JXTable xtable = new JXTable(model);
         xtable.setBackground(Highlighter.notePadBackground.getBackground()); // ledger
-        JXTable table = new JXTable(model);
-        table.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
-        TableCellRenderer renderer = new DefaultTableRenderer();
-        table.setDefaultRenderer(Object.class, renderer);
-        JXFrame frame = wrapWithScrollingInFrame(xtable, table, "JXTable: Unselected focused background: core/ext renderer");
-        getStatusBar(frame).add(new JLabel("different background for unselected lead: first column is not-editable"));    
-        frame.pack();
-        frame.setVisible(true);
-    }
+        JXTable table = new JXTable(model) {
 
-    /**
-     * Compare xtable using core default renderer vs. swingx default renderer.<p>
-     * 
-     * Unselected background of lead is different for editable/not-editable cells.
-     * With core renderer: can't because Highlighter hack jumps in.
-     * 
-     */
-    public void interactiveXTableCompareFocusedCellBackgroundPluggable() {
-        TableModel model = new AncientSwingTeam() {
-            public boolean isCellEditable(int row, int column) {
-                return column != 0;
+            @Override
+            protected void createDefaultRenderers() {
+                defaultRenderersByColumnClass = new UIDefaults();
+                setDefaultRenderer(Object.class, new DefaultTableRenderer());
+                RenderingLabelController controller = new RenderingLabelController(FormatToStringConverter.NUMBER_TO_STRING);
+                controller.setHorizontalAlignment(JLabel.RIGHT);
+                setDefaultRenderer(Number.class, new DefaultTableRenderer(controller));
+                setDefaultRenderer(Date.class, new DefaultTableRenderer(
+                        FormatToStringConverter.DATE_TO_STRING));
+                TableCellRenderer renderer  = new DefaultTableRenderer(new RenderingIconController());
+                setDefaultRenderer(Icon.class, renderer);
+                setDefaultRenderer(ImageIcon.class, renderer);
+                setDefaultRenderer(Boolean.class, new DefaultTableRenderer(new RenderingButtonController()));
             }
+
         };
-        
-        JXTable xtable = new JXTable(model);
-        xtable.setBackground(Highlighter.notePadBackground.getBackground()); // ledger
-        JXTable table = new JXTable(model);
-        table.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
-        table.setDefaultRenderer(Object.class, new DefaultTableRenderer());
-        TableCellRenderer booleanRenderer = new DefaultTableRenderer(
-                new RenderingButtonController());
-        table.setDefaultRenderer(Boolean.class, booleanRenderer);
-        JXFrame frame = wrapWithScrollingInFrame(xtable, table, "JXTable- pluggable: Unselected focused background: core/ext renderer");
+        table.setBackground(xtable.getBackground()); // ledger
+        JXFrame frame = wrapWithScrollingInFrame(xtable, table, "JXTable: Unselected focused background: core/ext renderer");
         getStatusBar(frame).add(new JLabel("different background for unselected lead: first column is not-editable"));    
         frame.pack();
         frame.setVisible(true);
@@ -298,7 +285,6 @@ public class RendererVisualCheck extends InteractiveTestCase {
         table.setEnabled(false);
         final JXList list = new JXList(new String[] {"one", "two", "and something longer"});
         list.setEnabled(false);
-//        list.setCellRenderer(new DefaultListCellRendererExt());
         list.setCellRenderer(new DefaultListRenderer());
         final JXTree tree = new JXTree(new FileSystemModel());
         tree.setEnabled(false);
@@ -398,6 +384,10 @@ public class RendererVisualCheck extends InteractiveTestCase {
         
     }
     
+    /**
+     * Use custom converter for Dimension/Point (from demo)
+     *
+     */
     public void interactiveTableCustomRenderer() {
         JXTable table = new JXTable();
         ToStringConverter converter = new ToStringConverter() {
@@ -426,7 +416,10 @@ public class RendererVisualCheck extends InteractiveTestCase {
         JXTreeTable treeTable = new JXTreeTable(model);
         treeTable.expandAll();
         table.setModel(treeTable.getModel());
+        
     }
+    
+//---------------- hyperlink rendering    
     /**
      * extended link renderer in table.
      *
@@ -452,7 +445,6 @@ public class RendererVisualCheck extends InteractiveTestCase {
         EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
         JXList list = new JXList(createListModelWithLinks(20));
         list.setRolloverEnabled(true);
-//        list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
         LinkModelAction action = new LinkModelAction(visitor);
         RenderingComponentController<JXHyperlink> context = new RenderingHyperlinkController(action, LinkModel.class);
         list.setCellRenderer(new DefaultListRenderer(context));
@@ -476,6 +468,9 @@ public class RendererVisualCheck extends InteractiveTestCase {
         frame.setVisible(true);
 
     }
+    
+//----------------------- experiments with "CheckList" fakes
+    
     /**
      * Use a custom button controller to show both checkbox icon and text to
      * render Actions in a JXList.
@@ -671,7 +666,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         return model;
     }
 
-
+//--------------- experiments with color renderer (content directly related to visuals)
 
     /**
      * Compare xtable using custom color renderer - standard vs. ext.<p>
