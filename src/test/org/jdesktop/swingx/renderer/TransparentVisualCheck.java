@@ -37,6 +37,8 @@ import java.util.List;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.DefaultListModel;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.KeyStroke;
@@ -46,6 +48,7 @@ import javax.swing.table.TableModel;
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXList;
+import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.ActionContainerFactory;
@@ -53,6 +56,8 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.ConditionalHighlighter;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
+import org.jdesktop.swingx.painter.IconPainter;
+import org.jdesktop.swingx.painter.ImagePainter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
 import org.jdesktop.swingx.table.ColumnControlButton;
@@ -74,7 +79,7 @@ public class TransparentVisualCheck extends InteractiveTestCase {
       TransparentVisualCheck test = new TransparentVisualCheck();
       try {
 //         test.runInteractiveTests();
-         test.runInteractiveTests(".*List.*");
+         test.runInteractiveTests(".*Icon.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -102,7 +107,7 @@ public class TransparentVisualCheck extends InteractiveTestCase {
             
             @Override
             protected AbstractButton createRendererComponent() {
-                return new PainterAwareButton();
+                return new PainterAwareCheckBox();
             }
 
             @Override
@@ -124,7 +129,7 @@ public class TransparentVisualCheck extends InteractiveTestCase {
         frame.pack();
     }
 
-    public static class PainterAwareButton extends JCheckBox implements PainterAware {
+    public static class PainterAwareCheckBox extends JCheckBox implements PainterAware {
         Painter painter;
 
         public void setPainter(Painter painter) {
@@ -137,6 +142,8 @@ public class TransparentVisualCheck extends InteractiveTestCase {
             } 
         }
         
+
+
         @Override
         protected void paintComponent(Graphics g) {
             if (painter != null) {
@@ -144,7 +151,6 @@ public class TransparentVisualCheck extends InteractiveTestCase {
                 // try to inject if possible
                 // there's no guarantee - some LFs have their own background 
                 // handling  elsewhere
-                // for button we need to replace the paintComponent completely 
                     paintComponentWithPainter((Graphics2D) g);
             } else {
                 // no painter - delegate to super
@@ -242,6 +248,59 @@ public class TransparentVisualCheck extends InteractiveTestCase {
  
         
     }
+
+//------------------------
+    
+    /**
+     * Use GradientPainter for value-based background highlighting with SwingX
+     * extended default renderer. Trying to get the highlighter transparent:
+     * the background color of the cell should shine through in the "white"
+     * region of the value-hint. This uses a PainterAwareLabel as rendering 
+     * component
+     */
+    public void interactiveIconPainterHighlight() {
+        TableModel model = new AncientSwingTeam();
+        JXTable table = new JXTable(model);
+        RenderingComponentController<JLabel> numberRendering = new RenderingLabelController(
+                JLabel.RIGHT) {
+                    @Override
+                    protected JLabel createRendererComponent() {
+                        return new PainterAwareLabel();
+                    }
+            
+        };
+        table.getColumn(0).setCellRenderer(new DefaultTableRenderer(
+                numberRendering));
+        ImageIcon icon = new ImageIcon(JXPanel.class.getResource("resources/images/kleopatra.jpg"));
+        final ImagePainter imagePainter = new ImagePainter(icon.getImage());
+        final IconPainter painter = new IconPainter(icon);
+        Highlighter gradientHighlighter = new Highlighter() {
+
+            @Override
+            public Component highlight(Component renderer, ComponentAdapter adapter) {
+                if ((adapter.column == 0) && (renderer instanceof PainterAware)){
+                    ((PainterAware) renderer).setPainter(imagePainter);
+                }
+                return renderer;
+            }
+            
+        };
+        Highlighter alternateRowHighlighter = new UIAlternateRowHighlighter();
+        table.addHighlighter(alternateRowHighlighter);
+        table.addHighlighter(gradientHighlighter);
+        // re-use component controller and highlighter in a JXList
+        JXList list = new JXList(createListNumberModel(), true);
+        list.setCellRenderer(new DefaultListRenderer(numberRendering));
+        list.addHighlighter(alternateRowHighlighter);
+        list.addHighlighter(gradientHighlighter);
+        list.toggleSortOrder();
+        final JXFrame frame = showWithScrollingInFrame(table, list,
+                "transparent value relative highlighting plus striping");
+        addStatusMessage(frame,
+                "uses a PainterAwareLabel in renderer");
+        frame.pack();
+    }
+
 
 //  ---------------------- Transparent gradients on PainterAwareLabel
     

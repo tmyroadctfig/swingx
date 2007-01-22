@@ -24,12 +24,9 @@ package org.jdesktop.swingx.renderer;
 import java.awt.Color;
 import java.awt.Component;
 
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.ListModel;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
@@ -39,6 +36,7 @@ import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.ConditionalHighlighter;
+import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
 import org.jdesktop.test.AncientSwingTeam;
@@ -69,6 +67,7 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
     public void interactiveTableAndListNumberProportionalGradientHighlight() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
+        table.setBackground(Highlighter.ledgerBackground.getBackground());
         RenderingComponentController<JLabel> numberRendering = new RenderingLabelController(
                 JLabel.RIGHT);
         DefaultTableRenderer renderer = new DefaultTableRenderer(
@@ -77,6 +76,7 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
         ConditionalHighlighter gradientHighlighter = new ConditionalHighlighter(
                 null, null, -1, -1) {
             float maxValue = 100;
+            private Painter painter;
 
             @Override
             public Component highlight(Component renderer,
@@ -87,8 +87,7 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
                     if (end > 1) {
                         renderer.setBackground(Color.YELLOW.darker());
                     } else if (end > 0.02) {
-                        Painter painter = new BasicGradientPainter(0.0f, 0.0f,
-                                Color.YELLOW, end, 0.f, Color.WHITE);
+                        Painter painter = getPainter(end);
                         ((PainterAware) renderer).setPainter(painter);
                     }
                     return renderer;
@@ -96,6 +95,19 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
                 return renderer;
             }
 
+            private Painter getPainter(float end) {
+//                if (painter != null) {
+                    Color startColor = getTransparentColor(Color.YELLOW, 254);
+                    Color endColor = getTransparentColor(Color.WHITE, 0);
+                 painter = new BasicGradientPainter(0.0f, 0.0f,
+                        startColor, end, 0.f, endColor);
+//                }
+                return painter;
+            }
+
+            private Color getTransparentColor(Color base, int transparency) {
+                return new Color(base.getRed(), base.getGreen(), base.getBlue(), transparency);
+            }
             private float getEndOfGradient(Number number) {
                 float end = number.floatValue() / maxValue;
                 return end;
