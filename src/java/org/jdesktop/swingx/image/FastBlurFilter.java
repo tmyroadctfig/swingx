@@ -104,6 +104,7 @@ public class FastBlurFilter extends AbstractFilter {
         // horizontal pass
         blur(srcPixels, dstPixels, width, height, radius);
         // vertical pass
+        //noinspection SuspiciousNameCombination
         blur(dstPixels, srcPixels, height, width, radius);
         // the result is now stored in srcPixels due to the 2nd pass
         GraphicsUtilities.setPixels(dst, 0, 0, width, height, srcPixels);
@@ -116,6 +117,8 @@ public class FastBlurFilter extends AbstractFilter {
      * the blur is specified by the radius which must be greater than 0.</p>
      * <p>The source and destination pixels arrays are expected to be in the
      * INT_ARGB format.</p>
+     * <p>After this method is executed, dstPixels contains a transposed and
+     * filtered copy of srcPixels.</p>
      *
      * @param srcPixels the source pixels
      * @param dstPixels the destination pixels
