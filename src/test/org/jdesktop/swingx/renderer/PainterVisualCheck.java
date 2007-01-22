@@ -54,7 +54,6 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.ConditionalHighlighter;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
-import org.jdesktop.swingx.painter.IconPainter;
 import org.jdesktop.swingx.painter.ImagePainter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;

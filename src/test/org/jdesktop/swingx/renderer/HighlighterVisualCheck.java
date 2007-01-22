@@ -24,21 +24,14 @@ package org.jdesktop.swingx.renderer;
 import java.awt.Color;
 import java.awt.Component;
 
-import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
-import javax.swing.ListModel;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
-import org.jdesktop.swingx.JXFrame;
-import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.ConditionalHighlighter;
-import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.painter.Painter;
-import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
 import org.jdesktop.test.AncientSwingTeam;
 
 /**
@@ -147,20 +140,5 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
     }
 
 //------------------ helper
-    
-    /**
-     * 
-     * @return a ListModel wrapped around the AncientSwingTeam's Number column.
-     */
-    private ListModel createListNumberModel() {
-        AncientSwingTeam tableModel = new AncientSwingTeam();
-        int colorColumn = 3;
-        DefaultListModel model = new DefaultListModel();
-        for (int i = 0; i < tableModel.getRowCount(); i++) {
-            model.addElement(tableModel.getValueAt(i, colorColumn));
-        }
-        return model;
-    }
-
 
 }
