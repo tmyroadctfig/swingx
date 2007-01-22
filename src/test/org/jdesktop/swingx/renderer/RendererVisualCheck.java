@@ -103,11 +103,11 @@ import org.jdesktop.test.AncientSwingTeam;
  */
 public class RendererVisualCheck extends InteractiveTestCase {
     public static void main(String[] args) {
-//        setSystemLF(true);
+        setSystemLF(true);
         RendererVisualCheck test = new RendererVisualCheck();
         try {
 //            test.runInteractiveTests();
-          test.runInteractiveTests(".*ListColumn.*");
+          test.runInteractiveTests(".*Table.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
