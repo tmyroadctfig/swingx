@@ -20,6 +20,8 @@
  */
 package org.jdesktop.swingx.plaf;
 
+import java.awt.Color;
+import java.awt.Toolkit;
 import java.util.Arrays;
 import java.util.List;
 
@@ -90,9 +92,16 @@ public class JXTaskPaneContainerAddon extends AbstractComponentAddon {
         backgroundGradientStart = new ColorUIResource(196, 200, 212);
         backgroundGradientEnd = new ColorUIResource(177, 179, 200);
       } else {        
-        background = new ColorUIResource(117, 150, 227);
-        backgroundGradientStart = new ColorUIResource(123, 162, 231);
-        backgroundGradientEnd = new ColorUIResource(99, 117, 214);
+        if (OS.isWindowsVista()) {
+          final Toolkit toolkit = Toolkit.getDefaultToolkit();
+          background = new ColorUIResource((Color)toolkit.getDesktopProperty("win.3d.backgroundColor"));
+          backgroundGradientStart = new ColorUIResource((Color)toolkit.getDesktopProperty("win.frame.activeCaptionColor"));
+          backgroundGradientEnd = new ColorUIResource((Color)toolkit.getDesktopProperty("win.frame.inactiveCaptionColor"));
+        } else {
+          background = new ColorUIResource(117, 150, 227);
+          backgroundGradientStart = new ColorUIResource(123, 162, 231);
+          backgroundGradientEnd = new ColorUIResource(99, 117, 214);
+        }
       }      
       defaults.addAll(Arrays.asList(new Object[]{
         "TaskPaneContainer.useGradient",

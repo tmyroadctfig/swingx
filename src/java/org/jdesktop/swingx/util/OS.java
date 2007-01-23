@@ -33,6 +33,7 @@ public class OS {
   private static final boolean osIsWindows;
   private static final boolean osIsWindowsXP;
   private static final boolean osIsWindows2003;
+  private static final boolean osIsWindowsVista;
   private static final boolean osIsLinux;
 
   static {
@@ -42,6 +43,7 @@ public class OS {
     osIsWindows = os != null && os.indexOf("windows") != -1;
     osIsWindowsXP = "windows xp".equals(os);
     osIsWindows2003 = "windows 2003".equals(os);
+    osIsWindowsVista = "windows vista".equals(os);
     osIsLinux = os != null && os.indexOf("linux") != -1;
   }
 
@@ -73,6 +75,13 @@ public class OS {
     return osIsWindows2003;
   }
 
+  /**
+   * @return true if this VM is running on Windows Vista
+   */
+  public static boolean isWindowsVista() {
+    return osIsWindowsVista;
+  }
+  
   /**
    * @return true if this VM is running on a Linux distribution
    */

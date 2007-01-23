@@ -23,6 +23,7 @@ package org.jdesktop.swingx.plaf;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.SystemColor;
+import java.awt.Toolkit;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -189,26 +190,46 @@ public class JXTaskPaneAddon extends AbstractComponentAddon {
           "TaskPane.borderColor",
           new ColorUIResource(Color.white),
         }));
-      } else {        
-        defaults.addAll(Arrays.asList(new Object[]{
-          "TaskPane.foreground",
-          new ColorUIResource(Color.white),
-          "TaskPane.background",
-          new ColorUIResource(214, 223, 247),
-          "TaskPane.specialTitleBackground",
-          new ColorUIResource(33, 89, 201),
-          "TaskPane.titleBackgroundGradientStart",
-          new ColorUIResource(Color.white),
-          "TaskPane.titleBackgroundGradientEnd",
-          new ColorUIResource(199, 212, 247),
-          "TaskPane.titleForeground",
-          new ColorUIResource(33, 89, 201),
-          "TaskPane.specialTitleForeground",
-          new ColorUIResource(Color.white),
-          "TaskPane.borderColor",
-          new ColorUIResource(Color.white),
-        }));
-      }
+      } else if (OS.isWindowsVista()) {
+         final Toolkit toolkit = Toolkit.getDefaultToolkit();
+         defaults.addAll(Arrays.asList(new Object[]{
+           "TaskPane.foreground",
+           new ColorUIResource(Color.white),
+           "TaskPane.background",
+           new ColorUIResource((Color)toolkit.getDesktopProperty("win.3d.backgroundColor")),
+           "TaskPane.specialTitleBackground",
+           new ColorUIResource(33, 89, 201),
+           "TaskPane.titleBackgroundGradientStart",
+           new ColorUIResource(Color.white),
+           "TaskPane.titleBackgroundGradientEnd",
+           new ColorUIResource((Color)toolkit.getDesktopProperty("win.frame.inactiveCaptionColor")),
+           "TaskPane.titleForeground",
+           new ColorUIResource((Color)toolkit.getDesktopProperty("win.frame.inactiveCaptionTextColor")),
+           "TaskPane.specialTitleForeground",
+           new ColorUIResource(Color.white),
+           "TaskPane.borderColor",
+           new ColorUIResource(Color.white),
+         }));
+       } else {
+         defaults.addAll(Arrays.asList(new Object[]{
+           "TaskPane.foreground",
+           new ColorUIResource(Color.white),
+           "TaskPane.background",
+           new ColorUIResource(214, 223, 247),
+           "TaskPane.specialTitleBackground",
+           new ColorUIResource(33, 89, 201),
+           "TaskPane.titleBackgroundGradientStart",
+           new ColorUIResource(Color.white),
+           "TaskPane.titleBackgroundGradientEnd",
+           new ColorUIResource(199, 212, 247),
+           "TaskPane.titleForeground",
+           new ColorUIResource(33, 89, 201),
+           "TaskPane.specialTitleForeground",
+           new ColorUIResource(Color.white),
+           "TaskPane.borderColor",
+           new ColorUIResource(Color.white),
+         }));
+       }
     }
     
     if (addon instanceof WindowsClassicLookAndFeelAddons) {
