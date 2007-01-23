@@ -35,6 +35,52 @@ import junit.framework.TestCase;
 public class RenderingTest extends TestCase {
 
     /**
+     * Test doc'ed constructor behaviour of default tree renderer.
+     *
+     */
+    public void testDefaultTreeRendererConstructors() {
+        DefaultTreeRenderer renderer = new DefaultTreeRenderer();
+        assertTrue(renderer.componentController instanceof WrappingIconController);
+        renderer = new DefaultTreeRenderer(FormatToStringConverter.DATE_TO_STRING);
+        assertTrue(renderer.componentController instanceof WrappingIconController);
+        // wrong assumption - we are wrapping...
+//        assertSame(FormatToStringConverter.DATE_TO_STRING, renderer.componentController.formatter);
+        assertSame(FormatToStringConverter.DATE_TO_STRING, ((WrappingIconController) renderer.componentController).wrappee.formatter);
+        RenderingComponentController controller = new RenderingButtonController();
+        renderer = new DefaultTreeRenderer(controller);
+        assertSame(controller, renderer.componentController);
+    }
+
+    /**
+     * Test doc'ed constructor behaviour of default list renderer.
+     *
+     */
+    public void testDefaultListRendererConstructors() {
+        DefaultListRenderer renderer = new DefaultListRenderer();
+        assertTrue(renderer.componentController instanceof RenderingLabelController);
+        renderer = new DefaultListRenderer(FormatToStringConverter.DATE_TO_STRING);
+        assertTrue(renderer.componentController instanceof RenderingLabelController);
+        assertSame(FormatToStringConverter.DATE_TO_STRING, renderer.componentController.formatter);
+        RenderingComponentController controller = new RenderingButtonController();
+        renderer = new DefaultListRenderer(controller);
+        assertSame(controller, renderer.componentController);
+    }
+
+    /**
+     * Test doc'ed constructor behaviour of default table renderer.
+     *
+     */
+    public void testDefaultTableRendererConstructors() {
+        DefaultTableRenderer renderer = new DefaultTableRenderer();
+        assertTrue(renderer.componentController instanceof RenderingLabelController);
+        renderer = new DefaultTableRenderer(FormatToStringConverter.DATE_TO_STRING);
+        assertTrue(renderer.componentController instanceof RenderingLabelController);
+        assertSame(FormatToStringConverter.DATE_TO_STRING, renderer.componentController.formatter);
+        RenderingComponentController controller = new RenderingButtonController();
+        renderer = new DefaultTableRenderer(controller);
+        assertSame(controller, renderer.componentController);
+    }
+    /**
      * public methods of <code>RenderingComponentController</code> must cope
      * with null context. Here: test getRenderingComponent.
      */

@@ -42,21 +42,24 @@ import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 
 /**
- * First cut for enhanced Dialog.
+ * First cut for enhanced Dialog. The idea is to have a pluggable content
+ * from which the dialog auto-configures all its "dialogueness". 
  * 
  * <ul>
- * <li> registers stand-in actions for close/execute with the dialog's RootPane
- * <li> registers keyStrokes for esc/enter to trigger the close/execute actions
- * <li> takes care of building the button panel using the close/execute actions.
  * <li> accepts a content and configures itself from content's properties - 
  *  replaces the execute action from the appropriate action in content's action map (if any)
  *  and set's its title from the content's name. 
+ * <li> registers stand-in actions for close/execute with the dialog's RootPane
+ * <li> registers keyStrokes for esc/enter to trigger the close/execute actions
+ * <li> takes care of building the button panel using the close/execute actions.
  * </ul> 
  * 
- * 
- * PENDING: add support for vetoing the close.
- * PENDING: add complete set of constructors
- * PENDING: add windowListener to delegate to close action
+ * <ul>
+ * <li>TODO: add link to forum discussion, wiki summary? 
+ * <li>PENDING: add support for vetoing the close.
+ * <li>PENDING: add complete set of constructors
+ * <li>PENDING: add windowListener to delegate to close action
+ * </ul>
  * 
  * @author Jeanette Winzenburg
  */
@@ -73,14 +76,37 @@ public class JXDialog extends JDialog {
 
     protected JComponent content;
     
+    /**
+     * Creates a non-modal dialog with the given component as 
+     * content and without specified owner.  A shared, hidden frame will be
+     * set as the owner of the dialog.
+     * <p>
+     * @param content the component to show and to auto-configure from.
+     */
+    public JXDialog(JComponent content) {
+        super();
+        setContent(content);
+    }
+    
+    
+    /**
+     * Creates a non-modal dialog with the given component as content and the
+     * specified <code>Frame</code> as owner.
+     * <p>
+     * @param frame the owner
+     * @param content the component to show and to auto-configure from.
+     */
     public JXDialog(Frame frame, JComponent content) {
         super(frame);
         setContent(content);
     }
     
     /**
-     * @param dialog
-     * @param sharedFindPanel
+     * Creates a non-modal dialog with the given component as content and the
+     * specified <code>Dialog</code> as owner.
+     * <p>
+     * @param dialog the owner
+     * @param content the component to show and to auto-configure from.
      */
     public JXDialog(Dialog dialog, JComponent content) {
         super(dialog);
@@ -88,13 +114,11 @@ public class JXDialog extends JDialog {
     }
 
     /**
-     * @param panel
+     * PENDING: widen access - this could be public to make the content really 
+     * pluggable?
+     * 
+     * @param content
      */
-    public JXDialog(JComponent content) {
-        super();
-        setContent(content);
-    }
-
     private void setContent(JComponent content) {
         if (this.content != null) {
             throw new IllegalStateException("content must not be set more than once");
@@ -131,32 +155,29 @@ public class JXDialog extends JDialog {
         
     }
 
-//    /**
-//     * 
-//     */
-//    private void locate() {
-//        GraphicsConfiguration gc =
-//            GraphicsEnvironment.getLocalGraphicsEnvironment().
-//            getDefaultScreenDevice().getDefaultConfiguration();
-//        Rectangle bounds = gc.getBounds();
-//        int x = bounds.x+bounds.width/3;
-//        int y = bounds.y+bounds.height/3;
-//
-//        setLocation(x, y);
-//    }
-
+    /**
+     * {@inheritDoc}
+     * 
+     * Overridden to check if content is available. <p>
+     * PENDING: doesn't make sense - the content is immutable and guaranteed
+     * to be not null.
+     */
     public void setVisible(boolean visible) {
         if (content == null) throw 
             new IllegalStateException("content must be built before showing the dialog");
         super.setVisible(visible);
     }
 
+    /**
+     * The callback method executed when closing the dialog. <p>
+     * Here: calls dispose. 
+     *
+     */
     public void doClose() {
         dispose();
     }
     
     private void initActions() {
-        // PENDING: factor a common dialog containing the following
         Action defaultAction = createCloseAction();
         putAction(CLOSE_ACTION_COMMAND, defaultAction);
         putAction(EXECUTE_ACTION_COMMAND, defaultAction);

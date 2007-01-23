@@ -3594,7 +3594,6 @@ public class JXTable extends JTable
      * The current default is <code>NumberEditorExt</code>
      * which differs from this in being locale-aware.
      * 
-     * @see NumberEditorExt
      */
     public static class NumberEditor extends GenericEditor {
 

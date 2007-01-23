@@ -30,12 +30,22 @@ import javax.swing.JLabel;
  */
 public class RenderingLabelController extends RenderingComponentController<JLabel> {
 
+    /**
+     * Instantiates a default component controller with LEADING
+     * horizontal alignment and default to-String converter. <p> 
+     *
+     */
     public RenderingLabelController() {
         this(null);
     }
     
     /**
-     * @param converter
+     * Instantiates a default component controller with LEADING
+     * horizontal alignment and the given to-String converter. If 
+     * the converter is null, the default TO_STRING is used. <p> 
+     * 
+     * @param converter the converter to use for mapping the cell value
+     *   to a String representation.
      */
     public RenderingLabelController(ToStringConverter converter) {
         super();
@@ -43,7 +53,10 @@ public class RenderingLabelController extends RenderingComponentController<JLabe
     }
 
     /**
-     * @param alignment
+     * Instantiates a default component controller with the given 
+     * horizontal alignment and default to-String converter. <p> 
+     * 
+     * @param alignment the horizontal alignment.
      */
     public RenderingLabelController(int alignment) {
         this();
@@ -73,7 +86,7 @@ public class RenderingLabelController extends RenderingComponentController<JLabe
      * Here: sets the labels text property to the value as returned 
      * from the string representation.
      * 
-     * @param the cellContext to use
+     * @param context the cellContext to use
      * 
      * @see #getStringValue(CellContext) 
      */

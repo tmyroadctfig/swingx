@@ -50,10 +50,21 @@ public class DefaultTableRenderer
     
     
     /**
-     * Instantiates a default table renderer with the given componentController.
-     * If the controller is null, creates and uses a default.
+     * Instantiates a default table renderer with the default component
+     * controller. 
      * 
-     * @param componentController
+     */
+    public DefaultTableRenderer() {
+        this((RenderingComponentController) null);
+    }
+
+    /**
+     * Instantiates a default table renderer with the given componentController.
+     * If the controller is null, creates and uses a default. The default
+     * controller is of type <code>RenderingLabelController</code>.
+     * 
+     * @param componentController the provider of the configured component to
+     *        use for cell rendering
      */
     public DefaultTableRenderer(RenderingComponentController componentController) {
         if (componentController == null) {
@@ -64,16 +75,12 @@ public class DefaultTableRenderer
     }
 
     /**
-     * Instantiates a default table renderer with the default component
-     * controller.
-     *
-     */
-    public DefaultTableRenderer() {
-        this((RenderingComponentController) null);
-    }
-
-    /**
-     * @param date_to_string
+     * Instantiates a default table renderer with a default component
+     * controller using the given converter. 
+     * 
+     * @param converter the converter to use for mapping the
+     *   content value to a String representation.
+     *   
      */
     public DefaultTableRenderer(ToStringConverter converter) {
         this(new RenderingLabelController(converter));
@@ -82,7 +89,8 @@ public class DefaultTableRenderer
     // -------------- implements javax.swing.table.TableCellRenderer
     /**
      * 
-     * Returns the default table cell renderer.
+     * Returns a configured component, appropriate to render the given
+     * list cell.  
      * 
      * @param table the <code>JTable</code>
      * @param value the value to assign to the cell at

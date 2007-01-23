@@ -38,7 +38,6 @@ import org.jdesktop.swingx.RolloverRenderer;
  * Adapter to glue SwingX renderer support to core api.
  * <p>
  * 
- * PENDING: this is not really serializable - no default constructor
  * 
  * @author Jeanette Winzenburg
  * 
@@ -47,15 +46,26 @@ import org.jdesktop.swingx.RolloverRenderer;
 public class DefaultTreeRenderer 
         implements TreeCellRenderer, RolloverRenderer, Serializable {
 
-    private RenderingComponentController componentController;
+    protected RenderingComponentController componentController;
     private CellContext<JTree> cellContext;
     
+    /**
+     * Instantiates a default tree renderer with the default component
+     * controller. 
+     * 
+     */
+    public DefaultTreeRenderer() {
+        this((RenderingComponentController)null);
+    }
+
 
     /**
      * Instantiates a default tree renderer with the given componentController.
-     * If the controller is null, creates and uses a default.
+     * If the controller is null, creates and uses a default. The default
+     * controller is of type <code>WrappingIconController</code>.
      * 
-     * @param componentController
+     * @param componentController the provider of the configured component to
+     *        use for cell rendering
      */
     public DefaultTreeRenderer(RenderingComponentController componentController) {
         if (componentController == null) {
@@ -66,14 +76,12 @@ public class DefaultTreeRenderer
     }
 
     /**
+     * Instantiates a default table renderer with a default component
+     * controller using the given converter. 
      * 
-     */
-    public DefaultTreeRenderer() {
-        this((RenderingComponentController)null);
-    }
-
-    /**
-     * @param converter
+     * @param converter the converter to use for mapping the
+     *   content value to a String representation.
+     *   
      */
     public DefaultTreeRenderer(ToStringConverter converter) {
         this(new WrappingIconController(converter));
@@ -82,16 +90,17 @@ public class DefaultTreeRenderer
     // -------------- implements javax.swing.table.TableCellRenderer
     /**
      * 
-     * Returns the default table cell renderer.
+     * Returns a configured component, appropriate to render the given
+     * tree cell.  
      * 
-     * @param table the <code>JTable</code>
-     * @param value the value to assign to the cell at
-     *        <code>[row, column]</code>
-     * @param isSelected true if cell is selected
+     * @param tree the <code>JTree</code>
+     * @param value the value to assign to the cell 
+     * @param selected true if cell is selected
+     * @param expanded true if the cell is expanded
+     * @param leaf true if the cell is a leaf
      * @param hasFocus true if cell has focus
      * @param row the row of the cell to render
-     * @param column the column of the cell to render
-     * @return the default table cell renderer
+     * @return a component to render the given list cell.
      */
        public Component getTreeCellRendererComponent(JTree tree, Object value, 
                 boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {

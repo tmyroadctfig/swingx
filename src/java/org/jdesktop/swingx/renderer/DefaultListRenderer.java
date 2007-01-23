@@ -42,12 +42,12 @@ import org.jdesktop.swingx.RolloverRenderer;
  * 
  * 
  */
-public class DefaultListRenderer 
-        implements ListCellRenderer,  RolloverRenderer, Serializable {
+public class DefaultListRenderer implements ListCellRenderer, RolloverRenderer,
+        Serializable {
 
     protected RenderingComponentController componentController;
+
     protected CellContext<JList> cellContext;
-    
 
     /**
      * Instantiates a default list renderer with the default component
@@ -55,14 +55,15 @@ public class DefaultListRenderer
      *
      */
     public DefaultListRenderer() {
-        this(null);
+        this((RenderingComponentController) null);
     }
-    
+
     /**
      * Instantiates a ListCellRenderer with the given componentController.
      * If the controller is null, creates and uses a default.
      * 
-     * @param componentController
+     * @param componentController the provider of the configured component to
+     *   use for cell rendering
      */
     public DefaultListRenderer(RenderingComponentController componentController) {
         if (componentController == null) {
@@ -72,35 +73,46 @@ public class DefaultListRenderer
         this.cellContext = new ListCellContext();
     }
 
+    /**
+     * Instantiates a default table renderer with a default component
+     * controller using the given converter. 
+     * 
+     * @param converter the converter to use for mapping the
+     *   content value to a String representation.
+     *   
+     */
+    public DefaultListRenderer(ToStringConverter converter) {
+        this(new RenderingLabelController(converter));
+    }
 
-    
-    // -------------- implements javax.swing.table.TableCellRenderer
+    // -------------- implements javax.swing.table.ListCellRenderer
     /**
      * 
-     * Returns the default table cell renderer.
+     * Returns a configured component, appropriate to render the given
+     * list cell.  
      * 
-     * @param table the <code>JTable</code>
-     * @param value the value to assign to the cell at
-     *        <code>[row, column]</code>
+     * @param list the <code>JList</code> to render on
+     * @param value the value to assign to the cell 
      * @param isSelected true if cell is selected
-     * @param hasFocus true if cell has focus
-     * @param row the row of the cell to render
-     * @param column the column of the cell to render
-     * @return the default table cell renderer
+     * @param cellHasFocus true if cell has focus
+     * @param index the row index (in view coordinates) of the cell to render
+     * @return a component to render the given list cell.
      */
-     public Component getListCellRendererComponent(JList list, Object value, 
-             int index, boolean isSelected, boolean cellHasFocus) {
-        cellContext.installContext(list, value, index, 0, isSelected, cellHasFocus,
-                true, true);
+    public Component getListCellRendererComponent(JList list, Object value,
+            int index, boolean isSelected, boolean cellHasFocus) {
+        cellContext.installContext(list, value, index, 0, isSelected,
+                cellHasFocus, true, true);
         return componentController.getRendererComponent(cellContext);
     }
+
     /**
      * @param background
      */
     public void setBackground(Color background) {
         componentController.getRendererController().setBackground(background);
-        
+
     }
+
     /**
      * @param foreground
      */
@@ -108,14 +120,14 @@ public class DefaultListRenderer
         componentController.getRendererController().setForeground(foreground);
     }
 
-//----------------- RolloverRenderer
-    
+    //----------------- RolloverRenderer
+
     /**
      * {@inheritDoc}
      */
     public void doClick() {
         if (isEnabled()) {
-            ((RolloverRenderer) componentController).doClick(); 
+            ((RolloverRenderer) componentController).doClick();
         }
     }
 
@@ -123,10 +135,9 @@ public class DefaultListRenderer
      * {@inheritDoc}
      */
     public boolean isEnabled() {
-        return (componentController instanceof RolloverRenderer) && 
-           ((RolloverRenderer) componentController).isEnabled();
+        return (componentController instanceof RolloverRenderer)
+                && ((RolloverRenderer) componentController).isEnabled();
     }
-
 
 }
 

@@ -21,7 +21,7 @@ import org.jdesktop.swingx.RolloverRenderer;
 public class WrappingIconController extends 
     RenderingComponentController<WrappingIconPanel>  implements RolloverRenderer {
 
-    private RenderingComponentController wrappee;
+    protected RenderingComponentController wrappee;
 
     public WrappingIconController() {
         this((RenderingComponentController) null);
