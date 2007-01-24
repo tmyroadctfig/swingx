@@ -46,35 +46,35 @@ import javax.swing.JLabel;
  * </ul>
  * 
  * As this internally delegates default visual configuration to a
- * <code>RendererController</code> (which handles the first four items)
+ * <code>DefaultVisuals</code> (which handles the first four items)
  * subclasses have to guarantee the alignment only.
  * 
  * @author Jeanette Winzenburg
  * 
- * @see RendererController
+ * @see DefaultVisuals
  * @see CellContext
  */
-public abstract class RenderingComponentController<T extends JComponent> 
+public abstract class ComponentProvider<T extends JComponent> 
     implements Serializable {
     /** component to render with. */
     protected T rendererComponent;
     /** configurator of default visuals. */
-    protected RendererController<T> rendererController;
+    protected DefaultVisuals<T> defaultVisuals;
     /** horizontal (text) alignment of component. PENDING: useful only for labels, buttons? */
     protected int alignment;
     /** the converter to use for string representation. */
-    protected ToStringConverter formatter;
+    protected StringValue formatter;
     
     /**
-     * Instantiates a default component controller with LEADING
+     * Instantiates a default component provider with LEADING
      * horizontal alignment and default to-String converter. <p> 
      *
      */
-    public RenderingComponentController() {
+    public ComponentProvider() {
         setHorizontalAlignment(JLabel.LEADING);
         setToStringConverter(null);
         rendererComponent = createRendererComponent();
-        rendererController = createRendererController();
+        defaultVisuals = createRendererController();
     }
     
     /**
@@ -121,14 +121,14 @@ public abstract class RenderingComponentController<T extends JComponent>
     }
 
     /**
-     * Sets the ToStringConverter to use. If the given converter is null,
+     * Sets the StringValue to use. If the given converter is null,
      * uses the default to_string. 
      * 
      * @param formatter the format to use.
      */
-    public void setToStringConverter(ToStringConverter formatter) {
+    public void setToStringConverter(StringValue formatter) {
         if (formatter == null) {
-            formatter = ToStringConverter.TO_STRING;
+            formatter = StringValue.TO_STRING;
         }
         this.formatter = formatter;
     }
@@ -136,10 +136,10 @@ public abstract class RenderingComponentController<T extends JComponent>
     /**
      * Returns the converter to use for obtaining the String representation.
      * 
-     * @return the ToStringConverter used by this controller, guaranteed to
+     * @return the StringValue used by this controller, guaranteed to
      *   be not null.
      */
-    public ToStringConverter getToStringConverter() {
+    public StringValue getToStringConverter() {
         return formatter;
     }
 
@@ -158,7 +158,7 @@ public abstract class RenderingComponentController<T extends JComponent>
         if (context != null) {
             value = context.getValue();
         }
-        return formatter.getStringValue(value);
+        return formatter.getString(value);
     }
 
     /**
@@ -167,10 +167,10 @@ public abstract class RenderingComponentController<T extends JComponent>
      * controller.
      * 
      * @param context the cell context to configure from, must not be null.
-     * @see RendererController
+     * @see DefaultVisuals
      */
     protected void configureVisuals(CellContext context) {
-        rendererController.configureVisuals(rendererComponent, context);
+        defaultVisuals.configureVisuals(rendererComponent, context);
     }
 
     /**
@@ -210,15 +210,15 @@ public abstract class RenderingComponentController<T extends JComponent>
     protected abstract T createRendererComponent();
 
     /**
-     * Factory method to create and return the RendererController used by this
+     * Factory method to create and return the DefaultVisuals used by this
      * to configure the default visuals. Here: creates the default controller
      * parameterized to the same type as this.
      * 
      * @return the controller used to configure the default visuals of
      *   the rendering component.
      */
-    protected RendererController<T> createRendererController() {
-        return new RendererController<T>();
+    protected DefaultVisuals<T> createRendererController() {
+        return new DefaultVisuals<T>();
     }
 
     /**
@@ -226,8 +226,8 @@ public abstract class RenderingComponentController<T extends JComponent>
      * 
      * @return the default visual configurator used by this.
      */
-    protected RendererController<T> getRendererController() {
-        return rendererController;
+    protected DefaultVisuals<T> getRendererController() {
+        return defaultVisuals;
     }
 
 }

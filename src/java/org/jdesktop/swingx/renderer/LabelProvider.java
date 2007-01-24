@@ -24,41 +24,41 @@ package org.jdesktop.swingx.renderer;
 import javax.swing.JLabel;
 
 /**
- * A component controller which uses a JLabel. 
+ * A component provider which uses a JLabel. 
  * 
  * @author Jeanette Winzenburg
  */
-public class RenderingLabelController extends RenderingComponentController<JLabel> {
+public class LabelProvider extends ComponentProvider<JLabel> {
 
     /**
-     * Instantiates a default component controller with LEADING
+     * Instantiates a default component provider with LEADING
      * horizontal alignment and default to-String converter. <p> 
      *
      */
-    public RenderingLabelController() {
+    public LabelProvider() {
         this(null);
     }
     
     /**
-     * Instantiates a default component controller with LEADING
+     * Instantiates a default component provider with LEADING
      * horizontal alignment and the given to-String converter. If 
      * the converter is null, the default TO_STRING is used. <p> 
      * 
      * @param converter the converter to use for mapping the cell value
      *   to a String representation.
      */
-    public RenderingLabelController(ToStringConverter converter) {
+    public LabelProvider(StringValue converter) {
         super();
         setToStringConverter(converter);
     }
 
     /**
-     * Instantiates a default component controller with the given 
+     * Instantiates a default component provider with the given 
      * horizontal alignment and default to-String converter. <p> 
      * 
      * @param alignment the horizontal alignment.
      */
-    public RenderingLabelController(int alignment) {
+    public LabelProvider(int alignment) {
         this();
         setHorizontalAlignment(alignment);
     }

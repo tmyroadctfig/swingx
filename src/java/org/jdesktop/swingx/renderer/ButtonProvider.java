@@ -26,16 +26,15 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 
 /**
- * A component controller which uses a AbstractButton. 
+ * A component provider which uses a AbstractButton. 
  * 
  * @author Jeanette Winzenburg
  */
-public class RenderingButtonController extends
-        RenderingComponentController<AbstractButton> {
+public class ButtonProvider extends ComponentProvider<AbstractButton> {
 
     private boolean borderPainted;
 
-    public RenderingButtonController() {
+    public ButtonProvider() {
         super();
         setHorizontalAlignment(JLabel.CENTER);
         setBorderPainted(true);

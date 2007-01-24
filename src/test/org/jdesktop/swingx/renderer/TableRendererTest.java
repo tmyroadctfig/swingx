@@ -81,17 +81,17 @@ public class TableRendererTest extends InteractiveTestCase {
         } catch (Exception e) {
             fail("not serializable " + e);
         } 
-}
+    }
+ 
+
     /**
-     * base interaction with table: focused, not-selected uses UI border.
-     * 
-     *
+     * base interaction with table: focused, selected uses UI border.
      */
     public void testTableFocusSelectedBorder() {
         // sanity to see test test validity
 //        UIManager.put("Table.focusSelectedCellHighlightBorder", new LineBorder(Color.red));
         // access ui colors
-        Border selectedFocusBorder = UIManager.getBorder("Table.focusSelectedCellHighlightBorder");
+        Border selectedFocusBorder = getFocusBorder(true);
         // sanity
         if (selectedFocusBorder == null) {
             LOG.info("cannot run focusSelectedBorder - UI has no selected focus border");
@@ -108,6 +108,14 @@ public class TableRendererTest extends InteractiveTestCase {
                 null, true, true, 0, xColumn);
         // assert behaviour same as standard
         assertEquals(coreComponent.getBorder(), xComponent.getBorder());
+    }
+
+    private Border getFocusBorder(boolean lookup) {
+        Border selectedFocusBorder = UIManager.getBorder("Table.focusSelectedCellHighlightBorder");
+        if (lookup && (selectedFocusBorder == null)) {
+            selectedFocusBorder = UIManager.getBorder("Table.focusCellHighlightBorder");
+        }
+        return selectedFocusBorder;
     }
 
     /**

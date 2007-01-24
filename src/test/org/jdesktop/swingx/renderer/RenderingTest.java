@@ -40,13 +40,13 @@ public class RenderingTest extends TestCase {
      */
     public void testDefaultTreeRendererConstructors() {
         DefaultTreeRenderer renderer = new DefaultTreeRenderer();
-        assertTrue(renderer.componentController instanceof WrappingIconController);
-        renderer = new DefaultTreeRenderer(FormatToStringConverter.DATE_TO_STRING);
-        assertTrue(renderer.componentController instanceof WrappingIconController);
+        assertTrue(renderer.componentController instanceof WrappingProvider);
+        renderer = new DefaultTreeRenderer(FormatStringValue.DATE_TO_STRING);
+        assertTrue(renderer.componentController instanceof WrappingProvider);
         // wrong assumption - we are wrapping...
-//        assertSame(FormatToStringConverter.DATE_TO_STRING, renderer.componentController.formatter);
-        assertSame(FormatToStringConverter.DATE_TO_STRING, ((WrappingIconController) renderer.componentController).wrappee.formatter);
-        RenderingComponentController controller = new RenderingButtonController();
+//        assertSame(FormatStringValue.DATE_TO_STRING, renderer.componentController.formatter);
+        assertSame(FormatStringValue.DATE_TO_STRING, ((WrappingProvider) renderer.componentController).wrappee.formatter);
+        ComponentProvider controller = new ButtonProvider();
         renderer = new DefaultTreeRenderer(controller);
         assertSame(controller, renderer.componentController);
     }
@@ -57,11 +57,11 @@ public class RenderingTest extends TestCase {
      */
     public void testDefaultListRendererConstructors() {
         DefaultListRenderer renderer = new DefaultListRenderer();
-        assertTrue(renderer.componentController instanceof RenderingLabelController);
-        renderer = new DefaultListRenderer(FormatToStringConverter.DATE_TO_STRING);
-        assertTrue(renderer.componentController instanceof RenderingLabelController);
-        assertSame(FormatToStringConverter.DATE_TO_STRING, renderer.componentController.formatter);
-        RenderingComponentController controller = new RenderingButtonController();
+        assertTrue(renderer.componentController instanceof LabelProvider);
+        renderer = new DefaultListRenderer(FormatStringValue.DATE_TO_STRING);
+        assertTrue(renderer.componentController instanceof LabelProvider);
+        assertSame(FormatStringValue.DATE_TO_STRING, renderer.componentController.formatter);
+        ComponentProvider controller = new ButtonProvider();
         renderer = new DefaultListRenderer(controller);
         assertSame(controller, renderer.componentController);
     }
@@ -72,38 +72,38 @@ public class RenderingTest extends TestCase {
      */
     public void testDefaultTableRendererConstructors() {
         DefaultTableRenderer renderer = new DefaultTableRenderer();
-        assertTrue(renderer.componentController instanceof RenderingLabelController);
-        renderer = new DefaultTableRenderer(FormatToStringConverter.DATE_TO_STRING);
-        assertTrue(renderer.componentController instanceof RenderingLabelController);
-        assertSame(FormatToStringConverter.DATE_TO_STRING, renderer.componentController.formatter);
-        RenderingComponentController controller = new RenderingButtonController();
+        assertTrue(renderer.componentController instanceof LabelProvider);
+        renderer = new DefaultTableRenderer(FormatStringValue.DATE_TO_STRING);
+        assertTrue(renderer.componentController instanceof LabelProvider);
+        assertSame(FormatStringValue.DATE_TO_STRING, renderer.componentController.formatter);
+        ComponentProvider controller = new ButtonProvider();
         renderer = new DefaultTableRenderer(controller);
         assertSame(controller, renderer.componentController);
     }
     /**
-     * public methods of <code>RenderingComponentController</code> must cope
+     * public methods of <code>ComponentProvider</code> must cope
      * with null context. Here: test getRenderingComponent.
      */
     public void testGetComponentNullContext() {
-        RenderingComponentController controller = new RenderingLabelController();
+        ComponentProvider controller = new LabelProvider();
         assertEquals(controller.rendererComponent, controller.getRendererComponent(null));
     }
     /**
-     * public methods of <code>RenderingComponentController</code> must cope
+     * public methods of <code>ComponentProvider</code> must cope
      * with null context. Here: test getRenderingComponent.
      */
     public void testStringValueNullContext() {
-        RenderingComponentController controller = new RenderingLabelController();
+        ComponentProvider controller = new LabelProvider();
         controller.getStringValue(null);
     }
     
     /**
-     * test doc'ed behaviour on rendererController configure:
+     * test doc'ed behaviour on defaultVisuals configure:
      * NPE on null context.
      *
      */
     public void testConfigureVisualsNullContext() {
-        RendererController<JLabel> controller = new RendererController<JLabel>();
+        DefaultVisuals<JLabel> controller = new DefaultVisuals<JLabel>();
         try {
             controller.configureVisuals(new JLabel(), null);
             fail("renderer controller must throw NPE on null context");
@@ -114,12 +114,12 @@ public class RenderingTest extends TestCase {
         }
     }
     /**
-     * test doc'ed behaviour on rendererController configure:
+     * test doc'ed behaviour on defaultVisuals configure:
      * NPE on null component.
      *
      */
     public void testConfigureVisualsNullComponent() {
-        RendererController<JLabel> controller = new RendererController<JLabel>();
+        DefaultVisuals<JLabel> controller = new DefaultVisuals<JLabel>();
         try {
             controller.configureVisuals(null, new TableCellContext());
             fail("renderer controller must throw NPE on null component");

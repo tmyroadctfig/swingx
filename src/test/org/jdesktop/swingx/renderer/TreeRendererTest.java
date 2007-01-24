@@ -135,11 +135,11 @@ public class TreeRendererTest extends InteractiveTestCase {
     public void interactiveTreeButtonFormatting() {
         TreeModel model = createActionTreeModel();
         JTree tree = new JTree(model);
-        RenderingButtonController wrapper = createButtonController();
-        tree.setCellRenderer(new DefaultTreeRenderer(new WrappingIconController(wrapper)));
+        ButtonProvider wrapper = createButtonController();
+        tree.setCellRenderer(new DefaultTreeRenderer(new WrappingProvider(wrapper)));
         
         JList list = new JList(createActionListModel());
-        // can't re-use the same instance - the WrappingIconController adds the
+        // can't re-use the same instance - the WrappingProvider adds the
         // wrappee component to a custom container.
         list.setCellRenderer(new DefaultListRenderer(createButtonController()));
         final JXFrame frame = wrapWithScrollingInFrame(tree, list, "custom renderer - same in tree and list");
@@ -165,8 +165,8 @@ public class TreeRendererTest extends InteractiveTestCase {
      * 
      * @return a button controller specialized on ActionEntryNode.
      */
-    private RenderingButtonController createButtonController() {
-        RenderingButtonController wrapper = new RenderingButtonController() {
+    private ButtonProvider createButtonController() {
+        ButtonProvider wrapper = new ButtonProvider() {
 
             @Override
             protected void format(CellContext context) {
@@ -218,11 +218,11 @@ public class TreeRendererTest extends InteractiveTestCase {
 //        JTree xtree = new JTree(model);
         
         JTree tree = new JTree(model);
-        ToStringConverter converter = new ToStringConverter() {
+        StringValue converter = new StringValue() {
 
-            public String getStringValue(Object value) {
+            public String getString(Object value) {
                 if (! (value instanceof Component) ) {
-                    return TO_STRING.getStringValue(value);
+                    return TO_STRING.getString(value);
                 }
                 
                 return "Name: " + ((Component) value).getName();

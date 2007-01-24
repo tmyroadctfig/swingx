@@ -31,9 +31,9 @@ import javax.swing.JLabel;
  * 
  * @author Jeanette Winzenburg
  */
-public class RenderingIconController extends RenderingLabelController {
+public class IconLabelProvider extends LabelProvider {
     
-    public RenderingIconController() {
+    public IconLabelProvider() {
         setHorizontalAlignment(JLabel.CENTER);
     }
 

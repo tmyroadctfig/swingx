@@ -46,7 +46,7 @@ import org.jdesktop.swingx.RolloverRenderer;
 public class DefaultTreeRenderer 
         implements TreeCellRenderer, RolloverRenderer, Serializable {
 
-    protected RenderingComponentController componentController;
+    protected ComponentProvider componentController;
     private CellContext<JTree> cellContext;
     
     /**
@@ -55,21 +55,21 @@ public class DefaultTreeRenderer
      * 
      */
     public DefaultTreeRenderer() {
-        this((RenderingComponentController)null);
+        this((ComponentProvider)null);
     }
 
 
     /**
      * Instantiates a default tree renderer with the given componentController.
      * If the controller is null, creates and uses a default. The default
-     * controller is of type <code>WrappingIconController</code>.
+     * controller is of type <code>WrappingProvider</code>.
      * 
      * @param componentController the provider of the configured component to
      *        use for cell rendering
      */
-    public DefaultTreeRenderer(RenderingComponentController componentController) {
+    public DefaultTreeRenderer(ComponentProvider componentController) {
         if (componentController == null) {
-            componentController = new WrappingIconController();
+            componentController = new WrappingProvider();
         }
         this.componentController = componentController;
         this.cellContext = new TreeCellContext();
@@ -83,8 +83,8 @@ public class DefaultTreeRenderer
      *   content value to a String representation.
      *   
      */
-    public DefaultTreeRenderer(ToStringConverter converter) {
-        this(new WrappingIconController(converter));
+    public DefaultTreeRenderer(StringValue converter) {
+        this(new WrappingProvider(converter));
     }
 
     // -------------- implements javax.swing.table.TableCellRenderer

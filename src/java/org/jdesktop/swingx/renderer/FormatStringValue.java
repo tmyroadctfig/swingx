@@ -26,28 +26,28 @@ import java.text.Format;
 import java.text.NumberFormat;
 
 /**
- * Base type for Format-backed ToStringConverters. Has static defaults
+ * Base type for <code>Format</code>-backed <code>StringValue</code>. Has static defaults
  * for Date and Number. <p>
  * 
  * PENDING: need to update on Locale change? How to detect? When?
  * 
  * @author Jeanette Winzenburg
  */
-public class FormatToStringConverter implements ToStringConverter {
+public class FormatStringValue implements StringValue {
     /**
      * Default converter for <code>Date</code> types. Uses the default format
      * as returned from <code>DateFormat</code>.
      */
-    public final static FormatToStringConverter DATE_TO_STRING = new FormatToStringConverter() {
+    public final static FormatStringValue DATE_TO_STRING = new FormatStringValue() {
         
         /**
          * {@inheritDoc}
          */
-        public String getStringValue(Object value) {
+        public String getString(Object value) {
             if (format == null) {
                 format = DateFormat.getDateInstance();
             }
-            return super.getStringValue(value);
+            return super.getString(value);
         }
         
     };
@@ -56,16 +56,16 @@ public class FormatToStringConverter implements ToStringConverter {
      * Default converter for <code>Number</code> types. Uses the default format
      * as returned from <code>NumberFormat</code>.
      */
-    public final static FormatToStringConverter NUMBER_TO_STRING = new FormatToStringConverter() {
+    public final static FormatStringValue NUMBER_TO_STRING = new FormatStringValue() {
         
         /**
          * {@inheritDoc}
          */
-        public String getStringValue(Object value) {
+        public String getString(Object value) {
             if (format == null) {
                 format = NumberFormat.getNumberInstance();
             }
-            return super.getStringValue(value);
+            return super.getString(value);
         }
         
     };
@@ -77,7 +77,7 @@ public class FormatToStringConverter implements ToStringConverter {
      * Instantiates a formatted converter with null format.
      *
      */
-    public FormatToStringConverter() {
+    public FormatStringValue() {
         this(null);
     }
     
@@ -86,7 +86,7 @@ public class FormatToStringConverter implements ToStringConverter {
      * 
      * @param format the format to use in creating the String representation.
      */
-    public FormatToStringConverter(Format format) {
+    public FormatStringValue(Format format) {
        this.format = format; 
     }
     
@@ -101,7 +101,7 @@ public class FormatToStringConverter implements ToStringConverter {
     /**
      * {@inheritDoc}
      */
-    public String getStringValue(Object value) {
+    public String getString(Object value) {
         if (value == null) return "";
         if (format != null) {
             try {

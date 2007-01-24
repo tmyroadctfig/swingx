@@ -31,15 +31,17 @@ import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicGraphicsUtils;
 
 /**
- * A LabelController specialized on rendering in JTree.  
- * This is no longer used, replaced by <code>WrappingIconController</code>. Will be
+ * A LabelProvider specialized on rendering in JTree.  
+ * This is no longer used, replaced by <code>WrappingProvider</code>. Will be
  * removed as soon as the replacement is fully functional.
  * 
  * @author Jeanette Winzenburg
  * 
- * @see WrappingIconController
+ * @deprecated use WrappingProvider instead.
+ * 
+ * @see WrappingProvider
  */
-public class RenderingTreeLabelController extends RenderingLabelController {
+public class TreeLabelProvider extends LabelProvider {
 
     boolean selected;
     boolean hasFocus;
@@ -49,13 +51,13 @@ public class RenderingTreeLabelController extends RenderingLabelController {
     private boolean drawDashedFocusIndicator;
     private Color borderSelectionColor;
     
-    public RenderingTreeLabelController() {
+    public TreeLabelProvider() {
         this(null);
     }
     /**
      * @param converter
      */
-    public RenderingTreeLabelController(ToStringConverter converter) {
+    public TreeLabelProvider(StringValue converter) {
         super(converter);
         Object value = UIManager.get("Tree.drawsFocusBorderAroundIcon");
         drawsFocusBorderAroundIcon = (value != null && ((Boolean)value).

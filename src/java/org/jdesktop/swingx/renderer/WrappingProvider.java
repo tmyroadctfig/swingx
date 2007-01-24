@@ -18,16 +18,16 @@ import org.jdesktop.swingx.RolloverRenderer;
  * PENDING: ui specific focus rect variation (draw rect around icon) missing <p>
  * PENDING: custom icons missing
  */
-public class WrappingIconController extends 
-    RenderingComponentController<WrappingIconPanel>  implements RolloverRenderer {
+public class WrappingProvider extends 
+    ComponentProvider<WrappingIconPanel>  implements RolloverRenderer {
 
-    protected RenderingComponentController wrappee;
+    protected ComponentProvider wrappee;
 
-    public WrappingIconController() {
-        this((RenderingComponentController) null);
+    public WrappingProvider() {
+        this((ComponentProvider) null);
     }
     
-    public WrappingIconController(RenderingComponentController wrapper) {
+    public WrappingProvider(ComponentProvider wrapper) {
         super();
         setWrappee(wrapper);
     }
@@ -35,13 +35,13 @@ public class WrappingIconController extends
     /**
      * @param converter
      */
-    public WrappingIconController(ToStringConverter converter) {
-        this(new RenderingLabelController(converter));
+    public WrappingProvider(StringValue converter) {
+        this(new LabelProvider(converter));
     }
 
-    public void setWrappee(RenderingComponentController wrappee) {
+    public void setWrappee(ComponentProvider wrappee) {
         if (wrappee == null) {
-            wrappee = new RenderingLabelController();
+            wrappee = new LabelProvider();
         }
         this.wrappee = wrappee;
         rendererComponent.setComponent(wrappee.rendererComponent);

@@ -58,7 +58,7 @@ import javax.swing.border.EmptyBorder;
  * 
  * @see CellContext
  */
-public class RendererController<T extends JComponent> implements Serializable {
+public class DefaultVisuals<T extends JComponent> implements Serializable {
 
 //    /* PENDING: move border to CellContext. */
 //    protected static Border noFocusBorder = new EmptyBorder(1, 1, 1, 1);

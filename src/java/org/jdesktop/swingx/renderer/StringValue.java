@@ -32,12 +32,12 @@ import java.io.Serializable;
  * 
  * @author Jeanette Winzenburg
  */
-public interface ToStringConverter extends Serializable {
+public interface StringValue extends Serializable {
     
     /**
      * Default converter using the toString.
      */
-    public final static ToStringConverter TO_STRING = new ToStringConverter() {
+    public final static StringValue TO_STRING = new StringValue() {
 
         /**
          * {@inheritDoc} <p>
@@ -45,7 +45,7 @@ public interface ToStringConverter extends Serializable {
          * Implemented to return the values toString if value not-null. Otherwise,
          * returns an empty string.
          */
-        public String getStringValue(Object value) {
+        public String getString(Object value) {
             return (value != null) ? value.toString() : "";
         }
         
@@ -58,5 +58,5 @@ public interface ToStringConverter extends Serializable {
      * @return a string representation of the given value, 
      *  guaranteed to be not null
      */
-    String getStringValue(Object value);
+    String getString(Object value);
 }

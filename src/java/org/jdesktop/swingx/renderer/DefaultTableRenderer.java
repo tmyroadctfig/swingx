@@ -45,7 +45,7 @@ import org.jdesktop.swingx.RolloverRenderer;
 public class DefaultTableRenderer 
         implements TableCellRenderer, RolloverRenderer, Serializable {
 
-    protected RenderingComponentController componentController;
+    protected ComponentProvider componentController;
     private CellContext<JTable> cellContext;
     
     
@@ -55,20 +55,20 @@ public class DefaultTableRenderer
      * 
      */
     public DefaultTableRenderer() {
-        this((RenderingComponentController) null);
+        this((ComponentProvider) null);
     }
 
     /**
      * Instantiates a default table renderer with the given componentController.
      * If the controller is null, creates and uses a default. The default
-     * controller is of type <code>RenderingLabelController</code>.
+     * controller is of type <code>LabelProvider</code>.
      * 
      * @param componentController the provider of the configured component to
      *        use for cell rendering
      */
-    public DefaultTableRenderer(RenderingComponentController componentController) {
+    public DefaultTableRenderer(ComponentProvider componentController) {
         if (componentController == null) {
-            componentController = new RenderingLabelController();
+            componentController = new LabelProvider();
         }
         this.componentController = componentController;
         this.cellContext = new TableCellContext();
@@ -82,8 +82,8 @@ public class DefaultTableRenderer
      *   content value to a String representation.
      *   
      */
-    public DefaultTableRenderer(ToStringConverter converter) {
-        this(new RenderingLabelController(converter));
+    public DefaultTableRenderer(StringValue converter) {
+        this(new LabelProvider(converter));
     }
 
     // -------------- implements javax.swing.table.TableCellRenderer

@@ -44,7 +44,7 @@ import org.jdesktop.swingx.action.LinkAction;
  * 
  * Internally uses JXHyperlink as rendering component. <p>
  * 
- * PENDING: can go from RenderingButtonController? <p>
+ * PENDING: can go from ButtonProvider? <p>
  * 
  * PENDING: make renderer respect selected cell state. <p>
  * 
@@ -56,8 +56,8 @@ import org.jdesktop.swingx.action.LinkAction;
  * 
  * @author Jeanette Winzenburg
  */
-public class RenderingHyperlinkController
-   extends RenderingComponentController<JXHyperlink> implements
+public class HyperlinkProvider
+   extends ComponentProvider<JXHyperlink> implements
          RolloverRenderer {
 
 
@@ -69,7 +69,7 @@ public class RenderingHyperlinkController
      * targetClass.
      *
      */
-    public RenderingHyperlinkController() {
+    public HyperlinkProvider() {
         this(null, null);
     }
 
@@ -79,7 +79,7 @@ public class RenderingHyperlinkController
      * 
      * @param linkAction the action that acts on values.
      */
-    public RenderingHyperlinkController(LinkAction linkAction) {
+    public HyperlinkProvider(LinkAction linkAction) {
         this(linkAction, null);
     }
     
@@ -92,7 +92,7 @@ public class RenderingHyperlinkController
      * @param linkAction the action that acts on values.
      * @param targetClass the type of values the action can handle.
      */
-    public RenderingHyperlinkController(LinkAction linkAction, Class targetClass) {
+    public HyperlinkProvider(LinkAction linkAction, Class targetClass) {
         super();
 //        rendererComponent.addActionListener(createEditorActionListener());
         setLinkAction(linkAction, targetClass);

@@ -45,7 +45,7 @@ import org.jdesktop.swingx.RolloverRenderer;
 public class DefaultListRenderer implements ListCellRenderer, RolloverRenderer,
         Serializable {
 
-    protected RenderingComponentController componentController;
+    protected ComponentProvider componentController;
 
     protected CellContext<JList> cellContext;
 
@@ -55,7 +55,7 @@ public class DefaultListRenderer implements ListCellRenderer, RolloverRenderer,
      *
      */
     public DefaultListRenderer() {
-        this((RenderingComponentController) null);
+        this((ComponentProvider) null);
     }
 
     /**
@@ -65,9 +65,9 @@ public class DefaultListRenderer implements ListCellRenderer, RolloverRenderer,
      * @param componentController the provider of the configured component to
      *   use for cell rendering
      */
-    public DefaultListRenderer(RenderingComponentController componentController) {
+    public DefaultListRenderer(ComponentProvider componentController) {
         if (componentController == null) {
-            componentController = new RenderingLabelController();
+            componentController = new LabelProvider();
         }
         this.componentController = componentController;
         this.cellContext = new ListCellContext();
@@ -81,8 +81,8 @@ public class DefaultListRenderer implements ListCellRenderer, RolloverRenderer,
      *   content value to a String representation.
      *   
      */
-    public DefaultListRenderer(ToStringConverter converter) {
-        this(new RenderingLabelController(converter));
+    public DefaultListRenderer(StringValue converter) {
+        this(new LabelProvider(converter));
     }
 
     // -------------- implements javax.swing.table.ListCellRenderer

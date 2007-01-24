@@ -133,7 +133,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         };
         final JList standard = new JList(listModel);
         final JList enhanced = new JList(listModel);
-        enhanced.setCellRenderer(new DefaultListRenderer(new RenderingIconController()));
+        enhanced.setCellRenderer(new DefaultListRenderer(new IconLabelProvider()));
 
         AbstractAction action = new AbstractAction("toggle disabled") {
 
@@ -161,15 +161,15 @@ public class RendererVisualCheck extends InteractiveTestCase {
             protected void createDefaultRenderers() {
                 defaultRenderersByColumnClass = new UIDefaults();
                 setDefaultRenderer(Object.class, new DefaultTableRenderer());
-                RenderingLabelController controller = new RenderingLabelController(FormatToStringConverter.NUMBER_TO_STRING);
+                LabelProvider controller = new LabelProvider(FormatStringValue.NUMBER_TO_STRING);
                 controller.setHorizontalAlignment(JLabel.RIGHT);
                 setDefaultRenderer(Number.class, new DefaultTableRenderer(controller));
                 setDefaultRenderer(Date.class, new DefaultTableRenderer(
-                        FormatToStringConverter.DATE_TO_STRING));
-                TableCellRenderer renderer  = new DefaultTableRenderer(new RenderingIconController());
+                        FormatStringValue.DATE_TO_STRING));
+                TableCellRenderer renderer  = new DefaultTableRenderer(new IconLabelProvider());
                 setDefaultRenderer(Icon.class, renderer);
                 setDefaultRenderer(ImageIcon.class, renderer);
-                setDefaultRenderer(Boolean.class, new DefaultTableRenderer(new RenderingButtonController()));
+                setDefaultRenderer(Boolean.class, new DefaultTableRenderer(new ButtonProvider()));
             }
             
         };
@@ -254,15 +254,15 @@ public class RendererVisualCheck extends InteractiveTestCase {
             protected void createDefaultRenderers() {
                 defaultRenderersByColumnClass = new UIDefaults();
                 setDefaultRenderer(Object.class, new DefaultTableRenderer());
-                RenderingLabelController controller = new RenderingLabelController(FormatToStringConverter.NUMBER_TO_STRING);
+                LabelProvider controller = new LabelProvider(FormatStringValue.NUMBER_TO_STRING);
                 controller.setHorizontalAlignment(JLabel.RIGHT);
                 setDefaultRenderer(Number.class, new DefaultTableRenderer(controller));
                 setDefaultRenderer(Date.class, new DefaultTableRenderer(
-                        FormatToStringConverter.DATE_TO_STRING));
-                TableCellRenderer renderer  = new DefaultTableRenderer(new RenderingIconController());
+                        FormatStringValue.DATE_TO_STRING));
+                TableCellRenderer renderer  = new DefaultTableRenderer(new IconLabelProvider());
                 setDefaultRenderer(Icon.class, renderer);
                 setDefaultRenderer(ImageIcon.class, renderer);
-                setDefaultRenderer(Boolean.class, new DefaultTableRenderer(new RenderingButtonController()));
+                setDefaultRenderer(Boolean.class, new DefaultTableRenderer(new ButtonProvider()));
             }
 
         };
@@ -309,7 +309,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
 
     /**
      * 
-     * Example for custom ToStringConverter: bound to bean property.
+     * Example for custom StringValue: bound to bean property.
      * 
      * A column of xtable and the xlist share the same component controller.<p>
      * 
@@ -344,10 +344,10 @@ public class RendererVisualCheck extends InteractiveTestCase {
             
         };
         JXTable xtable = new JXTable(tableModel);
-        PropertyToStringConverter converter = new PropertyToStringConverter("name");
-        RenderingLabelController nameController = new RenderingLabelController(converter);
+        PropertyStringValue converter = new PropertyStringValue("name");
+        LabelProvider nameController = new LabelProvider(converter);
         xtable.getColumn(0).setCellRenderer(new DefaultTableRenderer(nameController));
-        PropertyToStringConverter scoreConverter = new PropertyToStringConverter("score");
+        PropertyStringValue scoreConverter = new PropertyStringValue("score");
         xtable.getColumn(1).setCellRenderer(new DefaultTableRenderer(scoreConverter));
         xtable.packAll();
         JXList list = new JXList(players);
@@ -360,10 +360,10 @@ public class RendererVisualCheck extends InteractiveTestCase {
   /**
   * Simple example to bind a toStringConverter to a single property of the value.
   */
-    public static class PropertyToStringConverter implements ToStringConverter {
+    public static class PropertyStringValue implements StringValue {
         private String property;
 
-        public PropertyToStringConverter(String property) {
+        public PropertyStringValue(String property) {
             this.property = property;
         }
 
@@ -371,10 +371,10 @@ public class RendererVisualCheck extends InteractiveTestCase {
          * {@inheritDoc} <p>
          * Implemented to return the toString of the named property value.
          */
-        public String getStringValue(Object value) {
+        public String getString(Object value) {
             try {
                 PropertyDescriptor desc = getPropertyDescriptor(value.getClass(), property);
-                return TO_STRING.getStringValue(getValue(value, desc));
+                return TO_STRING.getString(getValue(value, desc));
             } catch (Exception e) {
                 // nothing much we can do here...
                 
@@ -390,9 +390,9 @@ public class RendererVisualCheck extends InteractiveTestCase {
      */
     public void interactiveTableCustomRenderer() {
         JXTable table = new JXTable();
-        ToStringConverter converter = new ToStringConverter() {
+        StringValue converter = new StringValue() {
 
-            public String getStringValue(Object value) {
+            public String getString(Object value) {
                 if (value instanceof Point) {
                     Point p = (Point) value;
                     value = createString(p.x, p.y);
@@ -400,7 +400,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
                     Dimension dim = (Dimension) value;
                     value = createString(dim.width, dim.height);
                 }
-               return TO_STRING.getStringValue(value);
+               return TO_STRING.getString(value);
             }
 
             private Object createString(int width, int height) {
@@ -428,7 +428,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
         JXTable table = new JXTable(createModelWithLinks());
         LinkModelAction action = new LinkModelAction<LinkModel>(visitor);
-        RenderingComponentController<JXHyperlink> controller = new RenderingHyperlinkController(action, LinkModel.class);
+        ComponentProvider<JXHyperlink> controller = new HyperlinkProvider(action, LinkModel.class);
         table.setDefaultRenderer(LinkModel.class, new DefaultTableRenderer(controller));
         LinkModelAction action2 = new LinkModelAction<LinkModel>(visitor);
         table.setDefaultEditor(LinkModel.class, new LinkRenderer(action2, LinkModel.class));
@@ -446,7 +446,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         JXList list = new JXList(createListModelWithLinks(20));
         list.setRolloverEnabled(true);
         LinkModelAction action = new LinkModelAction(visitor);
-        RenderingComponentController<JXHyperlink> context = new RenderingHyperlinkController(action, LinkModel.class);
+        ComponentProvider<JXHyperlink> context = new HyperlinkProvider(action, LinkModel.class);
         list.setCellRenderer(new DefaultListRenderer(context));
         JFrame frame = wrapWithScrollingInFrame(list, visitor.getOutputComponent(), "show link renderer in list");
         frame.setVisible(true);
@@ -462,8 +462,8 @@ public class RendererVisualCheck extends InteractiveTestCase {
         JXTree list = new JXTree(createTreeModelWithLinks(20));
         list.setRolloverEnabled(true);
         LinkModelAction action = new LinkModelAction(visitor);
-        RenderingComponentController<JXHyperlink> context = new RenderingHyperlinkController(action, LinkModel.class);
-        list.setCellRenderer(new DefaultTreeRenderer(new WrappingIconController(context)));
+        ComponentProvider<JXHyperlink> context = new HyperlinkProvider(action, LinkModel.class);
+        list.setCellRenderer(new DefaultTreeRenderer(new WrappingProvider(context)));
         JFrame frame = wrapWithScrollingInFrame(list, visitor.getOutputComponent(), "show link renderer in list");
         frame.setVisible(true);
 
@@ -482,7 +482,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         // quick-fill and hook to table columns' visibility state
         configureList(list, table, true);
         // a custom rendering button controller showing both checkbox and text
-        RenderingButtonController wrapper = new RolloverRenderingButtonController();
+        ButtonProvider wrapper = new RolloverRenderingButtonController();
         list.setCellRenderer(new DefaultListRenderer(wrapper));
         JXFrame frame = showWithScrollingInFrame(table, list,
                 "rollover checkbox list-renderer");
@@ -498,7 +498,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
      * item before the next click updates the action.
      * 
      */
-    public static class RolloverRenderingButtonController extends RenderingButtonController
+    public static class RolloverRenderingButtonController extends ButtonProvider
        implements RolloverRenderer {
 
         private AbstractActionExt actionExt;
@@ -550,7 +550,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         // quick-fill and hook to table columns' visibility state
         configureList(list, table, false);
         // a custom rendering button controller showing both checkbox and text
-        RenderingButtonController wrapper = new RenderingButtonController() {
+        ButtonProvider wrapper = new ButtonProvider() {
 
             @Override
             protected void format(CellContext context) {
@@ -746,7 +746,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
      */
     public void interactiveTableAndListCustomColorRenderingController() {
         TableModel tableModel = new AncientSwingTeam();
-        RenderingComponentController<JLabel> controller = createColorRenderingLabelController();
+        ComponentProvider<JLabel> controller = createColorRenderingLabelController();
         JXTable xtable = new JXTable(tableModel);
         xtable.setDefaultRenderer(Color.class, new DefaultTableRenderer(controller));
         ListModel model = createListColorModel();
@@ -762,12 +762,12 @@ public class RendererVisualCheck extends InteractiveTestCase {
      */
     public void interactiveTableAndTreeCustomColorRenderingController() {
         TableModel tableModel = new AncientSwingTeam();
-        RenderingComponentController<JLabel> controller = createColorRenderingLabelController();
+        ComponentProvider<JLabel> controller = createColorRenderingLabelController();
         JXTable xtable = new JXTable(tableModel);
         xtable.setDefaultRenderer(Color.class, new DefaultTableRenderer(controller));
         TreeModel model = createTreeColorModel();
         JTree tree = new JTree(model);
-        RenderingComponentController wrapper = new WrappingIconController(createColorRenderingLabelController());
+        ComponentProvider wrapper = new WrappingProvider(createColorRenderingLabelController());
         TreeCellRenderer renderer = new DefaultTreeRenderer(wrapper);
         tree.setCellRenderer(renderer);
         showWithScrollingInFrame(xtable, tree, "JXTable/JXTree: Custom color renderer - sharing the component controller");
@@ -778,7 +778,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
      * @return
      */
     protected TableCellRenderer createColorRendererExt() {
-        RenderingComponentController<JLabel> context = createColorRenderingLabelController();
+        ComponentProvider<JLabel> context = createColorRenderingLabelController();
         TableCellRenderer renderer = new DefaultTableRenderer(context);
         return renderer;
     }
@@ -788,7 +788,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
      * @return
      */
     protected ListCellRenderer createListColorRendererExt() {
-        RenderingComponentController<JLabel> context = createColorRenderingLabelController();
+        ComponentProvider<JLabel> context = createColorRenderingLabelController();
         ListCellRenderer renderer = new DefaultListRenderer(context);
         return renderer;
     }
@@ -798,8 +798,8 @@ public class RendererVisualCheck extends InteractiveTestCase {
      * Note: this implementation set's the tooltip
      * @return
      */
-    private RenderingComponentController<JLabel> createColorRenderingLabelController() {
-        RenderingComponentController<JLabel> context = new RenderingLabelController() {
+    private ComponentProvider<JLabel> createColorRenderingLabelController() {
+        ComponentProvider<JLabel> context = new LabelProvider() {
             Border selectedBorder;
             @Override
             protected void format(CellContext context) {

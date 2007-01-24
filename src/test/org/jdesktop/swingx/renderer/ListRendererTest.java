@@ -35,8 +35,9 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 
 import org.jdesktop.swingx.InteractiveTestCase;
-import org.jdesktop.swingx.JXTitledSeparator;
 import org.jdesktop.test.SerializableSupport;
+
+import com.sun.java.swing.plaf.windows.WindowsBorders;
 
 /**
  * Tests behaviour of SwingX renderers. Currently: mostly characterization to
@@ -58,7 +59,7 @@ public class ListRendererTest extends InteractiveTestCase {
     
     @Override
     protected void setUp() throws Exception {
-        
+        setSystemLF(true);
         list = new JList(new Object[] {1, 2, 3});
         coreListRenderer = new DefaultListCellRenderer();
         xListRenderer = new DefaultListRenderer();
@@ -82,20 +83,19 @@ public class ListRendererTest extends InteractiveTestCase {
 
     /**
      * base interaction with list: focused, not-selected uses UI border.
-     * 
-     *
      */
     public void testListFocusSelectedBorder() {
         // sanity to see test test validity
 //        UIManager.put("List.focusSelectedCellHighlightBorder", new LineBorder(Color.red));
         // access ui colors
-        Border selectedFocusBorder = UIManager.getBorder("List.focusSelectedCellHighlightBorder");
+        Border selectedFocusBorder = getFocusBorder(true);
         // sanity
         if (selectedFocusBorder == null) {
             LOG.info("cannot run focusSelectedBorder - UI has no selected focus border");
             return;
             
         }
+        LOG.info("selectedBorder: " + selectedFocusBorder);
         // need to prepare directly - focus is true only if list is focusowner
         JComponent coreComponent = (JComponent) coreListRenderer.getListCellRendererComponent(list, 
                 null, 0, true, true);
@@ -108,6 +108,15 @@ public class ListRendererTest extends InteractiveTestCase {
         assertEquals(coreComponent.getBorder(), xComponent.getBorder());
     }
 
+
+    private Border getFocusBorder(boolean lookup) {
+        Border selectedFocusBorder = UIManager.getBorder("List.focusSelectedCellHighlightBorder");
+        if (lookup && (selectedFocusBorder == null)) {
+            selectedFocusBorder = UIManager.getBorder("List.focusCellHighlightBorder");
+        }
+        return selectedFocusBorder;
+    }
+
     /**
      * base interaction with list: focused, not-selected uses UI border.
      * 
@@ -116,9 +125,9 @@ public class ListRendererTest extends InteractiveTestCase {
     public void testListFocusBorder() {
         // access ui colors
         Border focusBorder = UIManager.getBorder("List.focusCellHighlightBorder");
-//        Border selectedFocusBorder = UIManager.getBorder("List.focusSelectedCellHighlightBorder");
         // sanity
         assertNotNull(focusBorder);
+        // JW: this looks suspicious ... 
         assertNotSame(focusBorder, UIManager.getBorder("Table.focusCellHighlightBorder"));
         // need to prepare directly - focus is true only if list is focusowner
         JComponent coreComponent = (JComponent) coreListRenderer.getListCellRendererComponent(list, 

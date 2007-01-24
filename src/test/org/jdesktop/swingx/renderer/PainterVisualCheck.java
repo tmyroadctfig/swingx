@@ -136,7 +136,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         // quick-fill and hook to table columns' visibility state
         configureList(list, table, false);
         // a custom rendering button controller showing both checkbox and text
-        RenderingButtonController wrapper = new RenderingButtonController() {
+        ButtonProvider wrapper = new ButtonProvider() {
             @Override
             protected AbstractButton createRendererComponent() {
                 return new JRendererCheckBox();
@@ -226,7 +226,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
     public void interactiveIconPainterHighlight() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
-        RenderingComponentController<JLabel> controller = new RenderingLabelController(
+        ComponentProvider<JLabel> controller = new LabelProvider(
                 JLabel.RIGHT);
         table.getColumn(0).setCellRenderer(
                 new DefaultTableRenderer(controller));
@@ -272,7 +272,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
     public void interactiveNumberProportionalGradientHighlightPlusStriping() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
-        RenderingComponentController<JLabel> controller = new RenderingLabelController(
+        ComponentProvider<JLabel> controller = new LabelProvider(
                 JLabel.RIGHT) ;
         table.setDefaultRenderer(Number.class, new DefaultTableRenderer(
                 controller));
@@ -304,7 +304,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
         table.setBackground(Highlighter.ledgerBackground.getBackground());
-        RenderingComponentController<JLabel> controller = new RenderingLabelController(
+        ComponentProvider<JLabel> controller = new LabelProvider(
                 JLabel.RIGHT);
         table.setDefaultRenderer(Number.class, new DefaultTableRenderer(
                 controller));
