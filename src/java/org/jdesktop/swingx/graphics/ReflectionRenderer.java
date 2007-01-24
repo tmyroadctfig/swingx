@@ -299,7 +299,8 @@ public class ReflectionRenderer {
      * transparent and 1.0f fully opaque. If you provide a value out of these
      * boundaries, it will be restrained to the closest boundary.</p>
      *
-     * @param length
+     * @param length the length of the reflection, as a fraction of the source
+     *   image height
      * @see #getLength()
      * @see #createReflection(java.awt.image.BufferedImage)
      * @see #appendReflection(java.awt.image.BufferedImage)
@@ -431,7 +432,7 @@ public class ReflectionRenderer {
                 reflection.getWidth(), image.getHeight() + reflection.getHeight());
         Graphics2D g2 = buffer.createGraphics();
 
-        int effectiveRadius = stackBlurFilter.getEffectiveRadius();
+        int effectiveRadius = isBlurEnabled() ? stackBlurFilter.getEffectiveRadius() : 0;
         g2.drawImage(image, effectiveRadius, 0, null);
         g2.drawImage(reflection, 0, image.getHeight() - effectiveRadius, null);
 
