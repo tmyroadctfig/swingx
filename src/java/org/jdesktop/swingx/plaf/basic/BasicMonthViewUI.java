@@ -67,6 +67,8 @@ public class BasicMonthViewUI extends MonthViewUI {
     protected long lastDisplayedDate;
     protected long today;
     protected SortedSet<Date> selection;
+    /** Used as the font for flagged days. */
+    protected Font derivedFont;
 
     private boolean usingKeyboard = false;
     /** For interval selections we need to record the date we pivot around. */
@@ -88,7 +90,6 @@ public class BasicMonthViewUI extends MonthViewUI {
     private ImageIcon monthDownImage;
     private Rectangle dirtyRect = new Rectangle();
     private Rectangle bounds = new Rectangle();
-    private Font derivedFont;
     private Color weekOfTheYearForeground;
     private Color unselectableDayForeground;
     private Color leadingDayForeground;
@@ -111,7 +112,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     private Rectangle[] yearStringBounds = new Rectangle[12];
 
 
-    @SuppressWarnings({"UNUSED_SYMBOL"})
+    @SuppressWarnings({"UnusedDeclaration"})
     public static ComponentUI createUI(JComponent c) {
         return new BasicMonthViewUI();
     }
@@ -172,6 +173,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         leadingDayForeground = UIManager.getColor("JXMonthView.leadingDayForeground");
         trailingDayForeground = UIManager.getColor("JXMonthView.trailingDayForeground");
         unselectableDayForeground = UIManager.getColor("JXMonthView.unselectableDayForeground");
+        derivedFont = monthView.getFont().deriveFont(Font.BOLD);
     }
 
     protected void uninstallDefaults() {}
@@ -548,6 +550,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * for.
      *
      * @param bounds Bounds of the date to draw in.
+     * @param monthOffset Used to help calculate bounds for leading/trailing dates.
      */
     private void calculateBoundsForDay(Rectangle bounds, int monthOffset) {
         Calendar cal = monthView.getCalendar();
@@ -705,12 +708,12 @@ public class BasicMonthViewUI extends MonthViewUI {
      * first day of the month to be painted.
      *
      * @param g Graphics object.
-     * @param x
-     * @param y
-     * @param width
-     * @param height
+     * @param x x location of month
+     * @param y y location of month
+     * @param width width of month
+     * @param height height of month
      */
-    @SuppressWarnings({"UNUSED_SYMBOL"})
+    @SuppressWarnings({"UnusedDeclaration"})
     private void paintMonth(Graphics g, int x, int y, int width, int height) {
         Calendar cal = monthView.getCalendar();
         int days = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
@@ -898,7 +901,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param height height of bounding box
      * @param weekOfYear week of the year
      */
-    @SuppressWarnings({"UNUSED_SYMBOL"})
+    @SuppressWarnings({"UNUSED_SYMBOL", "UnusedDeclaration"})
     private void paintWeekOfYearForeground(Graphics g, int x, int y, int width, int height, int weekOfYear) {
         String str = Integer.toString(weekOfYear);
         FontMetrics fm;
@@ -1397,7 +1400,6 @@ public class BasicMonthViewUI extends MonthViewUI {
 
             // We use a bold font for figuring out size constraints since
             // it's larger and flaggedDates will be noted in this style.
-            derivedFont = monthView.getFont().deriveFont(Font.BOLD);
             FontMetrics fm = monthView.getFontMetrics(derivedFont);
 
             Calendar cal = monthView.getCalendar();
@@ -1665,6 +1667,8 @@ public class BasicMonthViewUI extends MonthViewUI {
          *
          * NOTE: This may not be the expected behavior for the keyboard controls
          * and we ay need to update this code to act in a way that people expect.
+         *
+         * @param action action for adjusting selection
          */
         private void addToSelection(int action) {
             long newStartDate;
