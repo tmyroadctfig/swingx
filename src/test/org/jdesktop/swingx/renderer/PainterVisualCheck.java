@@ -93,7 +93,9 @@ public class PainterVisualCheck extends InteractiveTestCase {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
         DefaultTableRenderer renderer = new DefaultTableRenderer();
-        final Painter painter = new BasicGradientPainter(0.0f, 0.0f, Color.YELLOW, 0.75f, (float) 0.5, Color.WHITE);
+        // selection should shine through in white part
+        final Painter painter = new BasicGradientPainter(0.0f, 0.0f, Color.YELLOW, 0.75f, (float) 0.5, 
+                GradientHighlighter.getTransparentColor(Color.WHITE, 0));
         ConditionalHighlighter gradientHighlighter = new ConditionalHighlighter(null, null, -1, -1) {
 
             @Override
@@ -132,7 +134,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         JXList list = new JXList();
         Highlighter highlighter = new UIAlternateRowHighlighter();
         table.addHighlighter(highlighter);
-        list.setHighlighters(highlighter, new GradientHighlighter());
+        list.setHighlighters(/*highlighter, */new GradientHighlighter());
         // quick-fill and hook to table columns' visibility state
         configureList(list, table, false);
         // a custom rendering button controller showing both checkbox and text
@@ -211,7 +213,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
             return painter;
         }
 
-        private Color getTransparentColor(Color base, int transparency) {
+        private static Color getTransparentColor(Color base, int transparency) {
             return new Color(base.getRed(), base.getGreen(), base.getBlue(),
                     transparency);
         }
