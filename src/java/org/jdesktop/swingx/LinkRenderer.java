@@ -63,6 +63,10 @@ import org.jdesktop.swingx.action.LinkAction;
  *   - usual background highlighter issues
  * 
  * @author Jeanette Winzenburg
+ * 
+ * @deprecated as renderer (the editor part is not yet handled), 
+ *    use the SwingX DefaultXXRenderer configured with a 
+ *    {@link HyperlinkProvider} instead
  */
 public class LinkRenderer extends AbstractCellEditor implements
         TableCellRenderer, TableCellEditor, ListCellRenderer, 
