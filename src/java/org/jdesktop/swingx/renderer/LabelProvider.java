@@ -21,6 +21,7 @@
  */
 package org.jdesktop.swingx.renderer;
 
+import javax.swing.Icon;
 import javax.swing.JLabel;
 
 /**
@@ -83,8 +84,15 @@ public class LabelProvider extends ComponentProvider<JLabel> {
 
     /**
      * {@inheritDoc}
-     * Here: sets the labels text property to the value as returned 
-     * from the string representation.
+     * Here: sets the labels text and icon property depending on the
+     * type of the context's value. If the value is of <code>Icon</code> type, it's 
+     * used as the label's icon and the text is set to empty. Otherwise,
+     * the icon is set to null and the text is set to the value as returned
+     * from getStringValue. <p>
+     * 
+     * Note: this is the behaviour as implemented in core default list renderer. 
+     * It is different from core default table renderer which handles icons in
+     * a subclass only. 
      * 
      * @param context the cellContext to use
      * 
@@ -92,7 +100,13 @@ public class LabelProvider extends ComponentProvider<JLabel> {
      */
     @Override
     protected void format(CellContext context) {
-        rendererComponent.setText(getStringValue(context));
+        if (context.getValue() instanceof Icon) {
+            rendererComponent.setIcon((Icon) context.getValue());
+            rendererComponent.setText(getStringValue(null));
+        } else {
+            rendererComponent.setIcon(null);
+            rendererComponent.setText(getStringValue(context));
+        }
     }
 
     

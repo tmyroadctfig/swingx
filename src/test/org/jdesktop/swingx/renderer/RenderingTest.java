@@ -21,6 +21,9 @@
  */
 package org.jdesktop.swingx.renderer;
 
+import java.awt.Component;
+import java.awt.Graphics;
+
 import javax.swing.JLabel;
 
 import junit.framework.TestCase;
@@ -34,6 +37,30 @@ import junit.framework.TestCase;
  */
 public class RenderingTest extends TestCase {
 
+    /**
+     * Test if all collaborators can cope with null component on CellContext.
+     *
+     */
+    public void testEmptyContext() {
+        // test LabelProvider
+        // same for list and table
+        assertEmptyContext(new LabelProvider());
+        assertEmptyContext(new ButtonProvider());
+        assertEmptyContext(new HyperlinkProvider());
+    }
+    
+    private void assertEmptyContext(ComponentProvider provider) {
+        DefaultListRenderer renderer = new DefaultListRenderer(provider);
+        renderer.getListCellRendererComponent(null, null, -1, false, false);
+        // treeRenderer - use the same provider, can't do in real life, 
+        // the providers component is added to the wrapping provider's component.
+        DefaultTreeRenderer treeRenderer = new DefaultTreeRenderer(provider);
+        treeRenderer.getTreeCellRendererComponent(null, null, false, false, false, -1, false);
+        // had an NPE in TreeCellContext focus border 
+        treeRenderer.getTreeCellRendererComponent(null, null, false, false, false, -1, true);
+        // random test - the input parameters don't map to a legal state
+        treeRenderer.getTreeCellRendererComponent(null, new Object(), false, true, false, 2, true);
+    }
     /**
      * Test doc'ed constructor behaviour of default tree renderer.
      *

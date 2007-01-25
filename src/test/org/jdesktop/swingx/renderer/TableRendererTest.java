@@ -24,17 +24,24 @@ package org.jdesktop.swingx.renderer;
 import java.awt.Color;
 import java.awt.Component;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.logging.Logger;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXTable;
 import org.jdesktop.test.SerializableSupport;
 
 /**
@@ -65,7 +72,54 @@ public class TableRendererTest extends InteractiveTestCase {
         xColumn = 1;
         xTableRenderer = new DefaultTableRenderer();
         table.getColumnModel().getColumn(xColumn).setCellRenderer(xTableRenderer);
-        
+    }
+    
+    /**
+     * test if icon handling is the same for core default and
+     * swingx.
+     *
+     */
+    public void testIcon() {
+        TableModel model = createTableModelWithDefaultTypes();
+        int iconColumn = 4;
+        // sanity
+        assertTrue(Icon.class.isAssignableFrom(model.getColumnClass(iconColumn)));
+        Icon icon = (Icon) model.getValueAt(0, iconColumn);
+        // default uses a different class for icon rendering
+        DefaultTableCellRenderer coreIconRenderer = (DefaultTableCellRenderer) table.getDefaultRenderer(Icon.class);
+        // core default can't cope with null component - can't really compare behaviour
+        coreIconRenderer.getTableCellRendererComponent(table, icon, false, false, -1, -1);
+        assertEquals(icon, coreIconRenderer.getIcon());
+        assertEquals("", coreIconRenderer.getText());
+        JLabel label = (JLabel) xTableRenderer.getTableCellRendererComponent(null, icon, false, false, -1, -1);
+        assertEquals(icon, label.getIcon());
+        assertEquals("", label.getText());
+        label = (JLabel) xTableRenderer.getTableCellRendererComponent(null, "dummy", false, false, -1, -1);
+        assertNull(label.getIcon());
+        assertEquals("dummy", label.getText());        
+    }
+        /**
+     * @return
+     */
+    private TableModel createTableModelWithDefaultTypes() {
+        String[] names = {"Object", "Number", "Double", "Date", "ImageIcon", "Boolean"};
+        final Class[] types = {Object.class, Number.class, Double.class, Date.class, ImageIcon.class, Boolean.class};
+        DefaultTableModel model = new DefaultTableModel(names, 0) {
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return types[columnIndex];
+            }
+            
+        };
+        Date today = new Date();
+        Icon icon = new ImageIcon(JXTable.class.getResource("resources/images/kleopatra.jpg"));
+        for (int i = 0; i < 10; i++) {
+            Object[] values = new Object[] {"row " + i, i, Math.random() * 100, 
+                    new Date(today.getTime() + i * 1000000), icon, i % 2 == 0};
+            model.addRow(values);
+        }
+        return model;
     }
 
  

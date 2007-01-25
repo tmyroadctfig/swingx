@@ -27,6 +27,8 @@ import java.io.Serializable;
 import java.util.logging.Logger;
 
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -35,6 +37,7 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXTable;
 import org.jdesktop.test.SerializableSupport;
 
 import com.sun.java.swing.plaf.windows.WindowsBorders;
@@ -56,6 +59,7 @@ public class ListRendererTest extends InteractiveTestCase {
     private DefaultListRenderer xListRenderer;
 
     private JList list;
+
     
     @Override
     protected void setUp() throws Exception {
@@ -63,9 +67,30 @@ public class ListRendererTest extends InteractiveTestCase {
         list = new JList(new Object[] {1, 2, 3});
         coreListRenderer = new DefaultListCellRenderer();
         xListRenderer = new DefaultListRenderer();
-        
+
     }
 
+    /**
+     * test if icon handling is the same for core default and
+     * swingx.
+     *
+     */
+    public void testIcon() {
+        Icon icon = new ImageIcon(JXTable.class.getResource("resources/images/kleopatra.jpg"));
+        JList list = new JList(new Object[] {icon, "dummy"});
+        coreListRenderer.getListCellRendererComponent(list, icon, 0, false, false);
+        assertEquals(icon, coreListRenderer.getIcon());
+        assertEquals("", coreListRenderer.getText());
+        coreListRenderer.getListCellRendererComponent(list, "dummy", 1, false, false);
+        assertNull(coreListRenderer.getIcon());
+        assertEquals("dummy", coreListRenderer.getText());
+        JLabel label = (JLabel) xListRenderer.getListCellRendererComponent(null, icon, 0, false, false);
+        assertEquals(icon, label.getIcon());
+        assertEquals("", label.getText());
+        label = (JLabel) xListRenderer.getListCellRendererComponent(null, "dummy", 0, false, false);
+        assertEquals("dummy", label.getText());
+        assertNull(label.getIcon());
+    }
  
     /**
      * test serializable of default renderer.

@@ -134,7 +134,9 @@ public class TreeCellContext extends CellContext<JTree> {
         public TreeFocusBorder() {
             super(Color.BLACK);
             treeBackground = getBackground();
-            focusColor = new Color(~treeBackground.getRGB());
+            if (treeBackground != null) {
+                focusColor = new Color(~treeBackground.getRGB());
+            }
         }
 
         @Override

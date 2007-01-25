@@ -120,20 +120,24 @@ public class RendererVisualCheck extends InteractiveTestCase {
      */
     public void interactiveListDisabledIconRenderer() {
         final TableModel model = createTableModelWithDefaultTypes();
+        // 
         ListModel listModel = new AbstractListModel() {
 
             public Object getElementAt(int index) {
-                return model.getValueAt(index, 4);
+                if (index == 0) {
+                    return "dummy";
+                }
+                return model.getValueAt(index - 1, 4);
             }
 
             public int getSize() {
-                return model.getRowCount();
+                return model.getRowCount() + 1;
             }
             
         };
         final JList standard = new JList(listModel);
         final JList enhanced = new JList(listModel);
-        enhanced.setCellRenderer(new DefaultListRenderer(new IconLabelProvider()));
+        enhanced.setCellRenderer(new DefaultListRenderer());
 
         AbstractAction action = new AbstractAction("toggle disabled") {
 
@@ -166,7 +170,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
                 setDefaultRenderer(Number.class, new DefaultTableRenderer(controller));
                 setDefaultRenderer(Date.class, new DefaultTableRenderer(
                         FormatStringValue.DATE_TO_STRING));
-                TableCellRenderer renderer  = new DefaultTableRenderer(new IconLabelProvider());
+                TableCellRenderer renderer  = new DefaultTableRenderer(new LabelProvider(JLabel.CENTER));
                 setDefaultRenderer(Icon.class, renderer);
                 setDefaultRenderer(ImageIcon.class, renderer);
                 setDefaultRenderer(Boolean.class, new DefaultTableRenderer(new ButtonProvider()));
@@ -259,7 +263,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
                 setDefaultRenderer(Number.class, new DefaultTableRenderer(controller));
                 setDefaultRenderer(Date.class, new DefaultTableRenderer(
                         FormatStringValue.DATE_TO_STRING));
-                TableCellRenderer renderer  = new DefaultTableRenderer(new IconLabelProvider());
+                TableCellRenderer renderer  = new DefaultTableRenderer(new LabelProvider(JLabel.CENTER));
                 setDefaultRenderer(Icon.class, renderer);
                 setDefaultRenderer(ImageIcon.class, renderer);
                 setDefaultRenderer(Boolean.class, new DefaultTableRenderer(new ButtonProvider()));

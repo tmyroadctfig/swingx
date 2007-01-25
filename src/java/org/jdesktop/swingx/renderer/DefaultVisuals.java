@@ -130,15 +130,16 @@ public class DefaultVisuals<T extends JComponent> implements Serializable {
     }
 
     /**
-     * Configure "divers" visual state of the rendering component from
-     * the given cell context. <p>
+     * Configure "divers" visual state of the rendering component from the given
+     * cell context.
+     * <p>
      * 
-     * Here: synch <code>Font</code>, <code>ComponentOrientation</code> and 
-     * <code>enabled</code> to context's 
-     * component. 
+     * Here: synch <code>Font</code>, <code>ComponentOrientation</code> and
+     * <code>enabled</code> to context's component.
      * 
-     * PENDING: not fully defined - "divers" means everything that's not
-     * colors or border.<p>
+     * PENDING: not fully defined - "divers" means everything that's not colors
+     * or border.
+     * <p>
      * 
      * PENDING: doesn't check for null context component
      * 
@@ -146,10 +147,16 @@ public class DefaultVisuals<T extends JComponent> implements Serializable {
      * @param context the cell context to configure from, must not be null
      */
     protected void configureState(T renderingComponent, CellContext context) {
-        renderingComponent.setFont(context.getComponent().getFont());
-        renderingComponent.setEnabled(context.getComponent().isEnabled());
-        renderingComponent.applyComponentOrientation(context.getComponent()
-                .getComponentOrientation());
+        if (context.getComponent() == null) {
+            // what to do?
+            // we guarantee to cleanup completely - what are the defaults?
+            // leave the decistion to the context?
+        } else {
+            renderingComponent.setFont(context.getComponent().getFont());
+            renderingComponent.setEnabled(context.getComponent().isEnabled());
+            renderingComponent.applyComponentOrientation(context.getComponent()
+                    .getComponentOrientation());
+        }
     }
 
     /**
