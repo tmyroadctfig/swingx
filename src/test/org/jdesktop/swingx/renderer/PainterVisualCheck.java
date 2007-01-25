@@ -92,7 +92,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
     public void interactiveTableGradientHighlight() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
-        DefaultTableRenderer renderer = new DefaultTableRenderer();
+//        DefaultTableRenderer renderer = new DefaultTableRenderer();
         // selection should shine through in white part
         final Painter painter = new BasicGradientPainter(0.0f, 0.0f, Color.YELLOW, 0.75f, (float) 0.5, 
                 GradientHighlighter.getTransparentColor(Color.WHITE, 0));
@@ -115,7 +115,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
             
         };
         table.addHighlighter(gradientHighlighter);
-        table.setDefaultRenderer(Object.class, renderer);
+//        table.setDefaultRenderer(Object.class, renderer);
         JXFrame frame = showWithScrollingInFrame(table, 
                 "painter-aware renderer with value-based highlighting");
         getStatusBar(frame).add(new JLabel("gradient background of cells with value's containing 'y'"));
@@ -134,7 +134,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         JXList list = new JXList();
         Highlighter highlighter = new UIAlternateRowHighlighter();
         table.addHighlighter(highlighter);
-        list.setHighlighters(/*highlighter, */new GradientHighlighter());
+        list.setHighlighters(highlighter, new GradientHighlighter());
         // quick-fill and hook to table columns' visibility state
         configureList(list, table, false);
         // a custom rendering button controller showing both checkbox and text
@@ -276,8 +276,8 @@ public class PainterVisualCheck extends InteractiveTestCase {
         JXTable table = new JXTable(model);
         ComponentProvider<JLabel> controller = new LabelProvider(
                 JLabel.RIGHT) ;
-        table.setDefaultRenderer(Number.class, new DefaultTableRenderer(
-                controller));
+//        table.setDefaultRenderer(Number.class, new DefaultTableRenderer(
+//                controller));
         final ValueBasedGradientHighlighter gradientHighlighter = createTransparentGradientHighlighter();
         Highlighter alternateRowHighlighter = new UIAlternateRowHighlighter();
         table.addHighlighter(alternateRowHighlighter);
@@ -308,8 +308,8 @@ public class PainterVisualCheck extends InteractiveTestCase {
         table.setBackground(Highlighter.ledgerBackground.getBackground());
         ComponentProvider<JLabel> controller = new LabelProvider(
                 JLabel.RIGHT);
-        table.setDefaultRenderer(Number.class, new DefaultTableRenderer(
-                controller));
+//        table.setDefaultRenderer(Number.class, new DefaultTableRenderer(
+//                controller));
         ValueBasedGradientHighlighter gradientHighlighter = createTransparentGradientHighlighter();
         table.addHighlighter(gradientHighlighter);
         // re-use component controller and highlighter in a JXList

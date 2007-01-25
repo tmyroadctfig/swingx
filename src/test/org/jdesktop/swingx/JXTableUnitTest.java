@@ -23,9 +23,9 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.DefaultListSelectionModel;
-import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -2671,7 +2671,10 @@ public class JXTableUnitTest extends InteractiveTestCase {
      * Issue #134: JXTable - default renderers not loaded. To fix the issue the
      * JXTable internal renderers' access scope was changed to public. Note: if
      * the _JTable_ internal renderers access scope were to be widened then this
-     * test has to be changed (the comparing class are hardcoded).
+     * test has to be changed (the comparing class are hardcoded). <p>
+     * 
+     * This test is obsolete for swingx renderer: the renderer type is
+     * always a DefaultTableRenderer, the difference is its configuration.
      * 
      */
     public void testLazyRenderersByClass() {
@@ -2688,33 +2691,18 @@ public class JXTableUnitTest extends InteractiveTestCase {
 //        assertEquals("default Icon renderer", IconRendererExt.class, table
 //                .getDefaultRenderer(Icon.class).getClass());
         // testing against standard renderers
-        assertEquals("default Boolean renderer", JXTable.BooleanRenderer.class,
-                table.getDefaultRenderer(Boolean.class).getClass());
-        assertEquals("default Number renderer", JXTable.NumberRenderer.class,
-                table.getDefaultRenderer(Number.class).getClass());
-        assertEquals("default Double renderer", JXTable.DoubleRenderer.class,
-                table.getDefaultRenderer(Double.class).getClass());
-        assertEquals("default Date renderer", JXTable.DateRenderer.class, table
-                .getDefaultRenderer(Date.class).getClass());
-        assertEquals("default Icon renderer", JXTable.IconRenderer.class, table
-                .getDefaultRenderer(Icon.class).getClass());
+//        assertEquals("default Boolean renderer", JXTable.BooleanRenderer.class,
+//                table.getDefaultRenderer(Boolean.class).getClass());
+//        assertEquals("default Number renderer", JXTable.NumberRenderer.class,
+//                table.getDefaultRenderer(Number.class).getClass());
+//        assertEquals("default Double renderer", JXTable.DoubleRenderer.class,
+//                table.getDefaultRenderer(Double.class).getClass());
+//        assertEquals("default Date renderer", JXTable.DateRenderer.class, table
+//                .getDefaultRenderer(Date.class).getClass());
+//        assertEquals("default Icon renderer", JXTable.IconRenderer.class, table
+//                .getDefaultRenderer(Icon.class).getClass());
     }
     
-    /**
-     * test if created a new instance of the renderer.
-     *
-     */
-    public void testNewRendererInstance() {
-        JXTable table = new JXTable();
-        TableCellRenderer newRenderer = table.getNewDefaultRenderer(Boolean.class);
-        TableCellRenderer sharedRenderer = table.getDefaultRenderer(Boolean.class);
-        assertNotNull(newRenderer);
-        assertNotSame("new renderer must be different from shared", sharedRenderer, newRenderer);
-        assertNotSame("new renderer must be different from object renderer", 
-                table.getDefaultRenderer(Object.class), newRenderer);
-    }
-
-
     /** 
      * Issue #150: setting filters must not re-create columns.
      *

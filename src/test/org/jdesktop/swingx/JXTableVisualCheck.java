@@ -71,7 +71,9 @@ import org.jdesktop.test.AncientSwingTeam;
 
 /**
  * Split from old JXTableUnitTest - contains "interactive"
- * methods only.
+ * methods only. <p>
+ * PENDING: too many frames to fit all on screen - either split into different
+ * tests or change positioning algo to start on top again if hidden.
  * 
  * @author Jeanette Winzenburg
  */
@@ -81,7 +83,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     public static void main(String args[]) {
       JXTableVisualCheck test = new JXTableVisualCheck();
       try {
-//        test.runInteractiveTests();
+        test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
 //          test.runInteractiveTests("interactive.*TableHeader.*");
 //          test.runInteractiveTests("interactive.*ColumnProp.*");
@@ -91,7 +93,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*isable.*");
           
 //          test.runInteractiveTests("interactive.*Compare.*");
-        test.runInteractiveTests("interactive.*Focus.*");
+//        test.runInteractiveTests("interactive.*Focus.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -1557,7 +1559,8 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             }
         }
 
-        JFrame frame = wrapWithScrollingInFrame(table, "TableColumnProperties Test");
+        JXFrame frame = wrapWithScrollingInFrame(table, "TableColumnProperties Test");
+        addStatusMessage(frame, "column properties currently not working");
         frame.setVisible(true);
     }
 

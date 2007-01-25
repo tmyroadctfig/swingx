@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.Box;
@@ -49,6 +50,7 @@ import javax.swing.Timer;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.action.BoundAction;
@@ -74,6 +76,33 @@ import org.jdesktop.test.SerializableSupport;
 public class JXTableIssues extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXTableIssues.class
             .getName());
+
+    
+    /**
+     * test if created a new instance of the renderer. While the old
+     * assertions are true, it's useless with swingx renderers: the renderer is
+     * a new instance but not specialized to boolean. So added an assert
+     * for the actual component type. Which fails for now - need to 
+     * think if we really need the functionality!
+     *
+     */
+    public void testNewRendererInstance() {
+        JXTable table = new JXTable();
+        TableCellRenderer newRenderer = table.getNewDefaultRenderer(Boolean.class);
+        TableCellRenderer sharedRenderer = table.getDefaultRenderer(Boolean.class);
+        // following assertions are useful only with core renderers 
+        // (they differ by type on the renderer level)
+        assertNotNull(newRenderer);
+        assertNotSame("new renderer must be different from shared", sharedRenderer, newRenderer);
+        assertNotSame("new renderer must be different from object renderer", 
+                table.getDefaultRenderer(Object.class), newRenderer);
+        Component comp = newRenderer.getTableCellRendererComponent(table, Boolean.TRUE, false, false, -1, -1);
+        assertTrue("Boolean rendering component is expected to be a Checkbox by default" +
+                        "\n but is " + comp.getClass(), 
+                comp instanceof AbstractButton);
+    }
+
+
 
     /**
      * Issue #4614616: editor lookup broken for interface types.

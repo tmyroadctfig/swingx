@@ -17,9 +17,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
 
-import org.jdesktop.swingx.action.LinkModelAction;
-
 /**
+ * TODO: revise to use the new hyperlink renderer. 
+ * 
  * @author Jeanette Winzenburg
  */
 public class LinkRendererTest extends InteractiveTestCase {

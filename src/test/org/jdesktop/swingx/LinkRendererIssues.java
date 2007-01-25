@@ -4,9 +4,14 @@
  */
 package org.jdesktop.swingx;
 
-import org.jdesktop.swingx.action.LinkAction;
 import org.jdesktop.swingx.action.LinkModelAction;
 
+/**
+ * 
+ * TODO: revise to use the new hyperlink renderer. 
+ * 
+ * @author Jeanette Winzenburg
+ */
 public class LinkRendererIssues extends LinkRendererTest {
 
     /**

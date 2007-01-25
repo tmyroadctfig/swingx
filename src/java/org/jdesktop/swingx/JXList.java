@@ -58,6 +58,7 @@ import org.jdesktop.swingx.decorator.SelectionMapper;
 import org.jdesktop.swingx.decorator.SortController;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
+import org.jdesktop.swingx.renderer.DefaultListRenderer;
 
 /**
  * JXList
@@ -1139,9 +1140,19 @@ public class JXList extends JList {
     private DelegatingRenderer getDelegatingRenderer() {
         if (delegatingRenderer == null) {
             // only called once... to get hold of the default?
-            delegatingRenderer = new DelegatingRenderer(super.getCellRenderer());
+            delegatingRenderer = new DelegatingRenderer(createDefaultCellRenderer());
         }
         return delegatingRenderer;
+    }
+
+    /**
+     * Creates and returns the default cell renderer to use. Subclasses
+     * may override to use a different type. Here: returns a <code>DefaultListRenderer</code>.
+     * 
+     * @return the default cell renderer to use with this list.
+     */
+    protected ListCellRenderer createDefaultCellRenderer() {
+        return new DefaultListRenderer();
     }
 
     @Override

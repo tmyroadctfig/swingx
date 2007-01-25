@@ -102,6 +102,10 @@ import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.event.TableColumnModelExtListener;
 import org.jdesktop.swingx.icon.ColumnControlIcon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.swingx.renderer.ButtonProvider;
+import org.jdesktop.swingx.renderer.DefaultTableRenderer;
+import org.jdesktop.swingx.renderer.FormatStringValue;
+import org.jdesktop.swingx.renderer.LabelProvider;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
@@ -3214,7 +3218,11 @@ public class JXTable extends JTable
      * Returns a new instance of the default renderer for the specified class.
      * This differs from <code>getDefaultRenderer()</code> in that it returns
      * a <b>new </b> instance each time so that the renderer may be set and
-     * customized on a particular column.
+     * customized on a particular column. <p>
+     * 
+     * NOTE: this doesn't work with swingx renderers! Do we really need it? It
+     * had been used in JNTable which is practically obsolete. If needed, we
+     * could make all renderer support classes clonable.
      * 
      * @param columnClass Class of value being rendered
      * @return TableCellRenderer instance which renders values of the specified
@@ -3259,63 +3267,45 @@ public class JXTable extends JTable
                 7, 0, 8, 0, 9, 0, 10, 0, };
         defaultRenderersByColumnClass = new UIDefaults(dummies);
         defaultRenderersByColumnClass.clear();
+        // use swingx renderers by default
+        setDefaultRenderer(Object.class, new DefaultTableRenderer());
+        LabelProvider controller = new LabelProvider(FormatStringValue.NUMBER_TO_STRING);
+        controller.setHorizontalAlignment(JLabel.RIGHT);
+        setDefaultRenderer(Number.class, new DefaultTableRenderer(controller));
+        setDefaultRenderer(Date.class, new DefaultTableRenderer(
+                FormatStringValue.DATE_TO_STRING));
+        TableCellRenderer renderer  = new DefaultTableRenderer(new LabelProvider(JLabel.CENTER));
+        setDefaultRenderer(Icon.class, renderer);
+        setDefaultRenderer(ImageIcon.class, renderer);
+        setDefaultRenderer(Boolean.class, new DefaultTableRenderer(new ButtonProvider()));
 
-        // extended renderers
 
+//        // standard renderers
 //        // Objects
 //        setLazyRenderer(Object.class,
-//                "org.jdesktop.swingx.renderer.DefaultTableCellRendererExt");
+//                "javax.swing.table.DefaultTableCellRenderer");
 //
 //        // Numbers
 //        setLazyRenderer(Number.class,
-//                "org.jdesktop.swingx.renderer.NumberRendererExt");
+//                "org.jdesktop.swingx.JXTable$NumberRenderer");
 //
 //        // Doubles and Floats
 //        setLazyRenderer(Float.class,
-//                "org.jdesktop.swingx.renderer.DoubleRendererExt");
+//                "org.jdesktop.swingx.JXTable$DoubleRenderer");
 //        setLazyRenderer(Double.class,
-//                "org.jdesktop.swingx.renderer.DoubleRendererExt");
+//                "org.jdesktop.swingx.JXTable$DoubleRenderer");
 //
 //        // Dates
-//        setLazyRenderer(Date.class,
-//                "org.jdesktop.swingx.renderer.DateRendererExt");
+//        setLazyRenderer(Date.class, "org.jdesktop.swingx.JXTable$DateRenderer");
 //
 //        // Icons and ImageIcons
-//        setLazyRenderer(Icon.class,
-//                "org.jdesktop.swingx.renderer.IconRendererExt");
+//        setLazyRenderer(Icon.class, "org.jdesktop.swingx.JXTable$IconRenderer");
 //        setLazyRenderer(ImageIcon.class,
-//                "org.jdesktop.swingx.renderer.IconRendererExt");
+//                "org.jdesktop.swingx.JXTable$IconRenderer");
 //
 //        // Booleans
 //        setLazyRenderer(Boolean.class,
-//                "org.jdesktop.swingx.renderer.BooleanRendererExt");
-
-        // standard renderers
-        // Objects
-        setLazyRenderer(Object.class,
-                "javax.swing.table.DefaultTableCellRenderer");
-
-        // Numbers
-        setLazyRenderer(Number.class,
-                "org.jdesktop.swingx.JXTable$NumberRenderer");
-
-        // Doubles and Floats
-        setLazyRenderer(Float.class,
-                "org.jdesktop.swingx.JXTable$DoubleRenderer");
-        setLazyRenderer(Double.class,
-                "org.jdesktop.swingx.JXTable$DoubleRenderer");
-
-        // Dates
-        setLazyRenderer(Date.class, "org.jdesktop.swingx.JXTable$DateRenderer");
-
-        // Icons and ImageIcons
-        setLazyRenderer(Icon.class, "org.jdesktop.swingx.JXTable$IconRenderer");
-        setLazyRenderer(ImageIcon.class,
-                "org.jdesktop.swingx.JXTable$IconRenderer");
-
-        // Booleans
-        setLazyRenderer(Boolean.class,
-                "org.jdesktop.swingx.JXTable$BooleanRenderer");
+//                "org.jdesktop.swingx.JXTable$BooleanRenderer");
 
     }
 

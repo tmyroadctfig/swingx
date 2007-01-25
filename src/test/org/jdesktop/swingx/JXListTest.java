@@ -15,12 +15,14 @@ import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.DefaultListSelectionModel;
+import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
+import org.jdesktop.swingx.JXList.DelegatingRenderer;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.Filter;
@@ -31,8 +33,8 @@ import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.SelectionMapper;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
+import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.test.ChangeReport;
-import org.jdesktop.test.ListDataReport;
 import org.jdesktop.test.PropertyChangeReport;
 
 /**
@@ -45,6 +47,17 @@ public class JXListTest extends InteractiveTestCase {
     protected ListModel listModel;
     protected DefaultListModel ascendingListModel;
 
+    /**
+     * test that swingx renderer is used by default.
+     *
+     */
+    public void testDefaultListRenderer() {
+        JXList list = new JXList();
+        ListCellRenderer renderer = ((DelegatingRenderer) list.getCellRenderer()).getDelegateRenderer();
+        assertTrue("default renderer expected to be DefaultListRenderer " +
+                        "\n but is " + renderer.getClass(),
+                renderer instanceof DefaultListRenderer);
+    }
     /**
      * Test assumptions of accessing list model/view values through
      * the list's componentAdapter.

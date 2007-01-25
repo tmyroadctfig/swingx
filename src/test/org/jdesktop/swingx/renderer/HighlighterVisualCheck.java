@@ -90,8 +90,8 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
     public void interactiveTableConditionalColorBasedOnValue() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
-    
-        table.setDefaultRenderer(Object.class, new DefaultTableRenderer());
+//    
+//        table.setDefaultRenderer(Object.class, new DefaultTableRenderer());
         ConditionalHighlighter highlighter = new ConditionalHighlighter() {
             @Override
             protected void applyForeground(Component renderer, ComponentAdapter adapter) {
@@ -133,7 +133,7 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
         table.addHighlighter(AlternateRowHighlighter.genericGrey);
         table.addHighlighter(highlighter);
         JXTable nohighlight = new JXTable(model);
-        nohighlight.setDefaultRenderer(Object.class, new DefaultTableRenderer());
+//        nohighlight.setDefaultRenderer(Object.class, new DefaultTableRenderer());
         nohighlight.addHighlighter(highlighter);
         showWithScrollingInFrame(table, nohighlight,
                 "value-based rendering by ConditionalHighlighter");
