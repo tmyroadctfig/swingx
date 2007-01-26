@@ -182,6 +182,7 @@
                 <html outfile="${dist.dir}/coverage/index.html" />
             </report>
         </emma>
+        <delete file="${basedir}/coverage.ec" />
     </target>
     <target name="-post-coverage" />
     
