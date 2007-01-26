@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    This ANT build script provides common functionality that all SwingLabs projects may
+    take advantage of. Similar to the NetBeans build-impl.xml file, this file declares
+    a few ant tasks which may be overridden by the build.xml file, or simply called to
+    directly.
+    
+    This file defines three core targets, "bundles", "javadoc", and "coverage". 
+    The "bundles" target will create the bin.zip and src.zip deliverables for the project. 
+    Properties that can be used to dictate the name of these bundles, and the location 
+    of these bundles, can be specified in the project.properties file.
+    
+    The "javadoc" target can be used to create more complete JavaDocs. References to core
+    JDK classes will be linked, and methods with the @inheritDoc JavaDoc tag will actually
+    inherit the doc. Note however, that this may require some setup on your system to work
+    properly.
+    
+    The "coverage" target uses EMMA to compute the test coverage. That is, it computes
+    what percentage of the project is covered by unit tests. Properties can also be set
+    to govern how this coverage is computed.
+    
+    As with the NetBeans build-impl.xml file, there are -pre and -post targets declared
+    for each of these core targets, allowing you to customize in the build.xml file
+    how these targets are executed.
+    
+    This build script must be placed in the root directory alongside the build.xml file.
+    
+    For the purpose of easier reading the script
+    is divided into following sections:
+
+      - bundles
+      - coverage
+      - javadoc
+-->    
+<project name="swinglabs-build-impl" default="bundle" basedir=".">
+    <!-- 
+    ======================
+    INITIALIZATION SECTION 
+    ======================
+    -->
+    <!-- path element used by EMMA taskdef below: -->
+    <!--<path id="emma.lib" >
+        <pathelement location="${emma.dir}/emma.jar" />
+        <pathelement location="${emma.dir}/emma_ant.jar" />
+    </path>-->
+
+    <!-- this loads <emma> and <emmajava> custom tasks: -->
+    <!--<taskdef resource="emma_ant.properties" classpathref="emma.lib" />-->
+
+    <!-- 
+    ======================
+    BUNDLES SECTION 
+    ======================
+    -->
+    
+    <target name="-pre-bundles-init" />
+    <!--
+        Configures the RELEASE_DSTAMP variable, which is used to create the timestamp
+        used for building the bundles
+    -->
+    <target name="-bundles-init">
+        <tstamp>
+            <format property="RELEASE_DSTAMP" pattern="yyyy_MM_dd" />
+        </tstamp>
+    </target>
+    <target name="-post-bundles-init" />
+    
+    <!--
+        Creates the dist.bundles.dir directory
+    -->
+    <target name="-pre-bundles">
+        <mkdir dir="${dist.bundles.dir}" />
+    </target>
+    <target name="-do-bundles" depends="-pre-bin-bundle,-do-bin-bundle,-post-bin-bundle,-pre-src-bundle,-do-src-bundle,-post-src-bundle" />
+    <target name="-post-bundles" />
+    
+    <target name="bundles" depends="init,jar,javadoc,-pre-bundles-init,-bundles-init,-post-bundles-init,-pre-bundles,-do-bundles,-post-bundles" />
+    
+    <target name="-pre-bin-bundle" />
+    <target name="-do-bin-bundle">
+        <!-- create the build directories -->
+        <mkdir dir="${build.bundles.dir}" />
+        <mkdir dir="${build.bundles.dir}/bin" />
+        <!-- Copy over the documentation -->
+        <mkdir dir="${build.bundles.dir}/bin/docs" />
+        <copy todir="${build.bundles.dir}/bin/docs">
+            <fileset dir="${bundles.doc.dir}" />
+        </copy>
+        <!-- Copy over the javadocs -->
+        <mkdir dir="${build.bundles.dir}/bin/docs/javadoc" />
+        <copy todir="${build.bundles.dir}/bin/docs/javadoc">
+            <fileset dir="${dist.javadoc.dir}" />
+        </copy>
+        <!-- Copy over the libraries 
+        (TODO it would be nice if libs could be copied from somewhere other
+        that dist/lib)-->
+        <mkdir dir="${build.bundles.dir}/bin/lib" />
+        <copy todir="${build.bundles.dir}/bin/lib" >
+            <fileset dir="${dist.dir}/lib" includes="**/**" />
+        </copy>
+        
+        <!-- zip up the whole thing -->
+        <delete dir="${build.bundles.dir}/zipdir" />
+        <mkdir dir="${build.bundles.dir}/zipdir" />
+        <mkdir dir="${build.bundles.dir}/zipdir/${projectname}-${RELEASE_DSTAMP}-bin" />
+        <move todir="${build.bundles.dir}/zipdir/${projectname}-${RELEASE_DSTAMP}-bin">
+            <fileset dir="${build.bundles.dir}/bin" />
+        </move>
+        <zip basedir="${build.bundles.dir}/zipdir" destfile="${dist.bundles.dir}/${projectname}-${RELEASE_DSTAMP}-bin.zip" />
+    </target>
+    <target name="-post-bin-bundle" />
+    
+    <target name="-pre-src-bundle" />
+    <target name="-do-src-bundle">
+        <mkdir dir="${build.bundles.dir}" />
+        <mkdir dir="${build.bundles.dir}/src" />
+        <copy todir="${build.bundles.dir}/src">
+            <fileset dir=".">
+                <exclude name="${build.dir}/**" />
+                <exclude name="${dist.dir}/**" />
+                <exclude name="www/**" /> <!-- TODO!! -->
+                <exclude name="**/CVS/**" /> <!-- TODO!! -->
+                <!-- If anything else needs to be exluded, do so here -->
+            </fileset>
+        </copy>
+        
+        <!-- zip up the whole thing -->
+        <delete dir="${build.bundles.dir}/zipdir" />
+        <mkdir dir="${build.bundles.dir}/zipdir" />
+        <mkdir dir="${build.bundles.dir}/zipdir/${projectname}-${RELEASE_DSTAMP}-src" />
+        <move todir="${build.bundles.dir}/zipdir/${projectname}-${RELEASE_DSTAMP}-src">
+            <fileset dir="${build.bundles.dir}/src" />
+        </move>
+        <zip basedir="${build.bundles.dir}/zipdir" destfile="${dist.bundles.dir}/${projectname}-${RELEASE_DSTAMP}-src.zip" />
+        <delete dir="${build.bundles.dir}/zipdir" />
+    </target>
+    <target name="-post-src-bundle" />
+    
+    <!-- 
+    ======================
+    COVERAGE SECTION 
+    ======================
+    -->
+    
+    <target name="-pre-coverage" />
+    <target name="-do-coverage">
+        <delete dir="${build.dir}/emma" />
+        <mkdir dir="${build.dir}/emma" />
+        <taskdef name="emma" classname="com.vladium.emma.emmaTask" classpath="${emma.dir}/emma.jar:${emma.dir}/emma_ant.jar" />
+        <emma>
+            <instr instrpath="${build.classes.dir}" destdir="${build.dir}/emma"/>
+        </emma>
+
+        <echo message="${build.dir}/emma:${run.test.classpath}" />
+
+        <junit showoutput="true" fork="true" dir="${basedir}" failureproperty="tests.failed" errorproperty="tests.failed">
+            <batchtest todir="${build.test.results.dir}">
+                <fileset dir="${test.test.dir}" includes="**/*Test.java"/>
+            </batchtest>
+            <classpath>
+                <path path="${build.dir}/emma" />
+                <path path="${emma.dir}/emma.jar" />
+                <path path="${emma.dir}/emma_ant.jar" />
+                <path path="${run.test.classpath}"/>
+            </classpath>
+            <syspropertyset>
+                <propertyref prefix="test-sys-prop."/>
+                <mapper type="glob" from="test-sys-prop.*" to="*"/>
+            </syspropertyset>
+            <formatter type="brief" usefile="false"/>
+            <formatter type="xml"/>
+            <jvmarg line="${run.jvmargs}"/>
+        </junit>
+
+        <delete dir="${build.dir}/emma" />
+        <emma>
+            <report sourcepath="${java.dir}:${src.beaninfo.dir}">
+                <fileset dir="${basedir}" >
+                  <include name="coverage.ec" />
+                </fileset>
+                <html outfile="${dist.dir}/coverage/index.html" />
+            </report>
+        </emma>
+    </target>
+    <target name="-post-coverage" />
+    
+    <target name="coverage" depends="init,compile-test,-pre-test-run,-pre-coverage,-do-coverage,-post-coverage" if="emma.dir" />
+    
+    <!-- 
+    ======================
+    JAVADOC SECTION 
+    ======================
+    -->
+    <target name="-javadoc-build" depends="init">
+        <property name="javadoc.core.src" value=""/>
+        <property name="javadoc.core.linkexternal" value="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+        <property name="javadoc.core.packagelist" value=""/>
+        <property name="javadoc.verbose" value="false"/>
+        
+        <echo>Using custom javadoc target:
+            core src: ${javadoc.core.src}
+            core external: ${javadoc.core.linkexternal}
+            core packagelist: ${javadoc.core.packagelist}
+        </echo>
+        <mkdir dir="${dist.javadoc.dir}"/>
+        <javadoc destdir="${dist.javadoc.dir}"
+                 source="${javac.source}"
+                 notree="${javadoc.notree}" use="${javadoc.use}"
+                 nonavbar="${javadoc.nonavbar}" noindex="${javadoc.noindex}"
+                 splitindex="${javadoc.splitindex}" author="${javadoc.author}"
+                 version="${javadoc.version}" 	
+                 windowtitle="${javadoc.windowtitle}"
+                 private="${javadoc.private}"
+                 additionalparam="${javadoc.additionalparam}"
+                 failonerror="true" useexternalfile="false"
+                 verbose="${javadoc.verbose}"
+                 maxmemory="1024M">
+            <link offline="true" href="${javadoc.core.linkexternal}"
+                  packagelistLoc="${javadoc.core.packagelist}"/>
+            <classpath>
+                <path path="${javac.classpath}"/>
+            </classpath>
+            <sourcepath>
+                <pathelement location="${src.beaninfo.dir}"/>
+                <pathelement location="${java.dir}"/>
+                <pathelement location="${javadoc.core.src}"/>
+            </sourcepath>
+            <packageset dir="${src.beaninfo.dir}" includes="*/**"/>
+            <packageset dir="${java.dir}" includes="*/**"/>
+        </javadoc>
+    </target>
+</project>
