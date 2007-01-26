@@ -4,74 +4,8 @@
 <!-- (If you delete it and reopen the project it will be recreated.) -->
 <project name="swingx" default="default" basedir=".">
     <description>Builds, tests, and runs the project swingx.</description>
+    <import file="swinglabs-build-impl.xml"/>
     <import file="nbproject/build-impl.xml"/>
-    <!--
-
-    There exist several targets which are by default empty and which can be 
-    used for execution of your tasks. These targets are usually executed 
-    before and after some main targets. They are: 
-
-      -pre-init:                 called before initialization of project properties
-      -post-init:                called after initialization of project properties
-      -pre-compile:              called before javac compilation
-      -post-compile:             called after javac compilation
-      -pre-compile-single:       called before javac compilation of single file
-      -post-compile-single:      called after javac compilation of single file
-      -pre-compile-test:         called before javac compilation of JUnit tests
-      -post-compile-test:        called after javac compilation of JUnit tests
-      -pre-compile-test-single:  called before javac compilation of single JUnit test
-      -post-compile-test-single: called after javac compilation of single JUunit test
-      -pre-jar:                  called before JAR building
-      -post-jar:                 called after JAR building
-      -post-clean:               called after cleaning build products
-
-    (Targets beginning with '-' are not intended to be called on their own.)
-
-    Example of inserting an obfuscator after compilation could look like this:
-
-        <target name="-post-compile">
-            <obfuscate>
-                <fileset dir="${build.classes.dir}"/>
-            </obfuscate>
-        </target>
-
-    For list of available properties check the imported 
-    nbproject/build-impl.xml file. 
-
-
-    Another way to customize the build is by overriding existing main targets.
-    The targets of interest are: 
-
-      -init-macrodef-javac:     defines macro for javac compilation
-      -init-macrodef-junit:     defines macro for junit execution
-      -init-macrodef-debug:     defines macro for class debugging
-      -init-macrodef-java:      defines macro for class execution
-      -do-jar-with-manifest:    JAR building (if you are using a manifest)
-      -do-jar-without-manifest: JAR building (if you are not using a manifest)
-      run:                      execution of project 
-      -javadoc-build:           Javadoc generation
-      test-report:              JUnit report generation
-
-    An example of overriding the target for project execution could look like this:
-
-        <target name="run" depends="swingx-impl.jar">
-            <exec dir="bin" executable="launcher.exe">
-                <arg file="${dist.jar}"/>
-            </exec>
-        </target>
-
-    Notice that the overridden target depends on the jar target and not only on 
-    the compile target as the regular run target does. Again, for a list of available 
-    properties which you can use, check the target you are overriding in the
-    nbproject/build-impl.xml file. 
-
-    -->
-
-    <target name="-pre-init">
-        <tstamp>
-            <format property="RELEASE_DSTAMP" pattern="yyyy_MM_dd" />
-        </tstamp>
-    </target>
     
     <!-- This target builds a jar called swingx-bean.jar. This jar contains
          JavaBean class, as well as the basic support classes in the beaninfo
@@ -92,7 +26,7 @@
         <jar basedir="${build.dir}/swingx-bean" jarfile="dist/swingx-bean.jar" />
     </target>
     
-    <target name="weekly-build" depends="bin,src,javadoc">
+<!--    <target name="weekly-build" depends="bin,src,javadoc">
         <mkdir dir="${dist.dir}/bundles" />
         <copy todir="${dist.dir}/bundles">
             <fileset dir="${dist.dir}">
@@ -102,167 +36,11 @@
             </fileset>
         </copy>
         
-        <!-- test calling the deploy xml file -->
         <ant antfile="/hudson/deploy.xml" target="deploy-artifacts" >
             <property name="project.name" value="swingx" />
             <property name="bundle.dir" value="${dist.dir}/bundles" />
             <property name="javadoc.dir" value="${dist.dir}/javadoc" />
         </ant>
     </target>
-
-    <!--
-    <concat destfile="${build.dir}/posted.txt" append="true">       ${project.name}
-    </concat>
-    </target>
-    -->
-    
-    <!-- This target builds a "binary" release of the project. The resulting
-         zip file will be named something appropriately. It's contents will be:
-         
-         /docs
-            /images
-            README.html
-            swinglabs.css
-         /lib
-            /optional
-            [other libs. These are copied straight over from the /lib directory
-             in the source tree]
-         [swing.jar. This includes the cobundled jars]
-         [any other resources]
-    -->
-    <target name="bin" depends="init,jar,javadoc">
-        <delete dir="${build.dir}/bin-release" />
-        <mkdir dir="${build.dir}/bin-release" />
-        <mkdir dir="${build.dir}/bin-release/docs" />
-        <copy todir="${build.dir}/bin-release/docs">
-            <fileset dir="docs" />
-        </copy>
-        <mkdir dir="${build.dir}/bin-release/docs/javadoc" />
-        <copy todir="${build.dir}/bin-release/docs/javadoc">
-            <fileset dir="dist/javadoc" />
-        </copy>
-        <mkdir dir="${build.dir}/bin-release/lib" />
-        <copy todir="${build.dir}/bin-release/lib">
-            <fileset dir="lib" />
-        </copy>
-        <delete dir="${build.dir}/bin-release/lib/cobundle" />
-        
-        <!-- unzip the cobundle jars right into the workspace. Then combine
-             with the classes from dist/swingx.jar file. Finally, zip up
-             the remaining bit and name it swingx-[date][release].zip
-        -->
-        <mkdir dir="${build.dir}/cobundle" />
-        <unjar src="dist/swingx.jar" dest="${build.dir}/cobundle" />
-        <jar basedir="${build.dir}/cobundle" jarfile="${build.dir}/bin-release/swingx-${RELEASE_DSTAMP}.jar" />
-        <delete dir="${build.dir}/cobundle" />
-        
-        <!-- if any other resources need to be copied, copy them here -->
-        
-        <!-- zip up the whole thing -->
-        <mkdir dir="${build.dir}/zipdir" />
-        <mkdir dir="${build.dir}/zipdir/swingx-${RELEASE_DSTAMP}-bin" />
-        <move todir="${build.dir}/zipdir/swingx-${RELEASE_DSTAMP}-bin">
-            <fileset dir="${build.dir}/bin-release" />
-        </move>
-        <zip basedir="${build.dir}/zipdir" destfile="dist/swingx-${RELEASE_DSTAMP}-bin.zip" />
-        <delete dir="${build.dir}/bin-release" />
-        <delete dir="${build.dir}/zipdir" />
-    </target>
-    
-    <!-- This target builds a "source" release of the project. The resulting
-         zip file will be named something appropriately. It's contents will be:
-         
-         /docs
-            /images
-            README.html
-            swinglabs.css
-         /lib
-            /optional
-            /cobundle
-            [other libs. These are copied straight over from the /lib directory
-             in the source tree]
-         /src
-         [any other resources in the root dir, project files, etc]
-    -->
-    <target name="src" depends="init,jar">
-        <delete dir="${build.dir}/src-release" />
-        <mkdir dir="${build.dir}/src-release" />
-        <copy todir="${build.dir}/src-release">
-            <fileset dir=".">
-                <exclude name="build/**" />
-                <exclude name="dist/**" />
-                <exclude name="www/**" />
-                <exclude name="**/CVS/**" />
-                <!-- If anything else needs to be exluded, do so here -->
-            </fileset>
-        </copy>
-        
-        <!-- zip up the whole thing -->
-        <mkdir dir="${build.dir}/zipdir" />
-        <mkdir dir="${build.dir}/zipdir/swingx-${RELEASE_DSTAMP}-src" />
-        <move todir="${build.dir}/zipdir/swingx-${RELEASE_DSTAMP}-src">
-            <fileset dir="${build.dir}/src-release" />
-        </move>
-        <zip basedir="${build.dir}/zipdir" destfile="dist/swingx-${RELEASE_DSTAMP}-src.zip" />
-        <delete dir="${build.dir}/src-release" />
-        <delete dir="${build.dir}/zipdir" />
-    </target>
-    
-    <target name="release" depends="src,bin" /><!--,test" />-->
-    
-    <!-- Overriden targets -->
-    <target name="-pre-compile-test" if="hudson.installed">
-        <ant antfile="/hudson/coverage.xml" target="instrument" >
-            <property name="instrumented.classes.dir" value="${build.dir}/instrumented-classes" />
-        </ant>
-        <!-- Modify the classpath such that ${build.dir}/instrumented-classes is first on
-             the classpath -->
-        <property name="javac.test.classpath" value="${build.dir}/instrumented-classes:${javac.test.classpath}" />
-        <echo message="New classpath is ${javac.test.classpath}" />
-    </target>
-    
-    <target name="coverage" if="hudson.installed" depends="init">
-        <ant antfile="/hudson/coverage.xml" target="coverage" >
-            <property name="coverage.dist.dir" value="${dist.dir}/coverage" />
-        </ant>
-    </target>
-    
-    <target name="-javadoc-build" depends="init">
-        <property name="javadoc.core.src" value=""/>
-        <property name="javadoc.core.linkexternal" value="http://java.sun.com/j2se/1.5.0/docs/api/"/>
-        <property name="javadoc.core.packagelist" value=""/>
-        <property name="javadoc.verbose" value="false"/>
-        
-        <echo>Using custom javadoc target:
-            core src: ${javadoc.core.src}
-            core external: ${javadoc.core.linkexternal}
-            core packagelist: ${javadoc.core.packagelist}
-        </echo>
-        <mkdir dir="${dist.javadoc.dir}"/>
-        <javadoc destdir="${dist.javadoc.dir}"
-                 source="${javac.source}"
-                 notree="${javadoc.notree}" use="${javadoc.use}"
-                 nonavbar="${javadoc.nonavbar}" noindex="${javadoc.noindex}"
-                 splitindex="${javadoc.splitindex}" author="${javadoc.author}"
-                 version="${javadoc.version}" 	
-                 windowtitle="${javadoc.windowtitle}"
-                 private="${javadoc.private}"
-                 additionalparam="${javadoc.additionalparam}"
-                 failonerror="true" useexternalfile="false"
-                 verbose="${javadoc.verbose}"
-                 maxmemory="1024M">
-            <link offline="true" href="${javadoc.core.linkexternal}"
-                  packagelistLoc="${javadoc.core.packagelist}"/>
-            <classpath>
-                <path path="${javac.classpath}"/>
-            </classpath>
-            <sourcepath>
-                <pathelement location="${src.beaninfo.dir}"/>
-                <pathelement location="${java.dir}"/>
-                <pathelement location="${javadoc.core.src}"/>
-            </sourcepath>
-            <packageset dir="${src.beaninfo.dir}" includes="*/**"/>
-            <packageset dir="${java.dir}" includes="*/**"/>
-        </javadoc>
-    </target>
+-->    
 </project>
