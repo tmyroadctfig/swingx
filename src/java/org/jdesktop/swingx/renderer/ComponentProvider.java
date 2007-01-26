@@ -33,6 +33,9 @@ import javax.swing.JLabel;
  * all types of renderees (JTable, JList, JTree).
  * <p>
  * 
+ * TODO: usage example
+ * <p>
+ * 
  * Guarantees to completely configure the visual properties listed below. As a
  * consequence, client code (f.i. in <code>Highlighter</code>s) can safely
  * change them without long-lasting visual artefacts.
@@ -42,17 +45,22 @@ import javax.swing.JLabel;
  * <li> border
  * <li> font
  * <li> Painter (if applicable)
+ * <li> enabled
+ * <li> componentOrientation
  * <li> horizontal alignment (if applicable)
  * </ul>
  * 
  * As this internally delegates default visual configuration to a
- * <code>DefaultVisuals</code> (which handles the first four items)
+ * <code>DefaultVisuals</code> (which handles the first six items)
  * subclasses have to guarantee the alignment only.
  * 
  * @author Jeanette Winzenburg
  * 
  * @see DefaultVisuals
  * @see CellContext
+ * @see DefaultTableRenderer
+ * @see DefaultListRenderer
+ * @see DefaultTreeRenderer
  */
 public abstract class ComponentProvider<T extends JComponent> 
     implements Serializable {

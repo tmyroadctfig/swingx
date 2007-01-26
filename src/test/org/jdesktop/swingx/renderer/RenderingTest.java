@@ -107,9 +107,20 @@ public class RenderingTest extends TestCase {
         renderer = new DefaultTableRenderer(controller);
         assertSame(controller, renderer.componentController);
     }
+
     /**
      * public methods of <code>ComponentProvider</code> must cope
-     * with null context. Here: test getRenderingComponent.
+     * with null context. Here: test getRenderingComponent in WrappingProvider.
+     *
+     */
+    public void testGetWrappingComponentNullContext() {
+        WrappingProvider provider = new WrappingProvider();
+        assertEquals(provider.rendererComponent, provider.getRendererComponent(null));
+    }
+
+    /**
+     * public methods of <code>ComponentProvider</code> must cope
+     * with null context. Here: test getRenderingComponent in LabelProvider.
      */
     public void testGetComponentNullContext() {
         ComponentProvider controller = new LabelProvider();

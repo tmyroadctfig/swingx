@@ -41,6 +41,10 @@ import org.jdesktop.swingx.RolloverRenderer;
  * 
  * @author Jeanette Winzenburg
  * 
+ * @see ComponentProvider
+ * @see LabelProvider
+ * @see CellContext
+ * 
  */
 public class DefaultTableRenderer 
         implements TableCellRenderer, RolloverRenderer, Serializable {

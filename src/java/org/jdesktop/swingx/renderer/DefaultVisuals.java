@@ -25,8 +25,6 @@ import java.awt.Color;
 import java.io.Serializable;
 
 import javax.swing.JComponent;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
 
 /**
  * Encapsulates the default visual configuration of renderering components,
@@ -44,6 +42,8 @@ import javax.swing.border.EmptyBorder;
  * <li> border
  * <li> font
  * <li> Painter (if applicable)
+ * <li> enabled
+ * <li> componentOrientation
  * </ul>
  * 
  * Client code will rarely need to be aware of this class. It's the single
@@ -60,28 +60,15 @@ import javax.swing.border.EmptyBorder;
  */
 public class DefaultVisuals<T extends JComponent> implements Serializable {
 
-//    /* PENDING: move border to CellContext. */
-//    protected static Border noFocusBorder = new EmptyBorder(1, 1, 1, 1);
-//
-//    private static final Border SAFE_NO_FOCUS_BORDER = new EmptyBorder(1, 1, 1,
-//            1);
-//
-//    private static Border getNoFocusBorder() {
-//        if (System.getSecurityManager() != null) {
-//            return SAFE_NO_FOCUS_BORDER;
-//        } else {
-//            return noFocusBorder;
-//        }
-//    }
-
 
     private Color unselectedForeground;
 
     private Color unselectedBackground;
 
     /**
-     * Overrides <code>JComponent.setForeground</code> to assign
-     * the unselected-foreground color to the specified color.
+     * Sets the renderer's unselected-foreground color to the specified color.
+     * If <code>not null</code> this color will overrule the default color of
+     * the CellContext.
      * 
      * @param c set the foreground color to this value
      */
@@ -91,7 +78,9 @@ public class DefaultVisuals<T extends JComponent> implements Serializable {
 
     /**
      * Sets the renderer's unselected-background color to the specified color.
-     *
+     * If <code>not null</code> this color will overrule the default color of
+     * the CellContext.
+     * 
      * @param c set the background color to this value
      */
     public void setBackground(Color c) {
@@ -140,8 +129,6 @@ public class DefaultVisuals<T extends JComponent> implements Serializable {
      * PENDING: not fully defined - "divers" means everything that's not colors
      * or border.
      * <p>
-     * 
-     * PENDING: doesn't check for null context component
      * 
      * @param renderingComponent the component to configure, must not be null
      * @param context the cell context to configure from, must not be null
@@ -208,12 +195,6 @@ public class DefaultVisuals<T extends JComponent> implements Serializable {
      */
     protected void configureBorder(T renderingComponent, CellContext context) {
         renderingComponent.setBorder(context.getBorder());
-//        if (context.isFocused()) {
-//            renderingComponent.setBorder(context.getFocusBorder());
-//        } else {
-//            renderingComponent.setBorder(getNoFocusBorder());
-//        }
-
     }
 
     /**

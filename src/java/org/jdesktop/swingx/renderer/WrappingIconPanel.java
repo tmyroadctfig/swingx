@@ -5,6 +5,7 @@
 package org.jdesktop.swingx.renderer;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.ComponentOrientation;
 
 import javax.swing.BorderFactory;
@@ -73,4 +74,28 @@ public class WrappingIconPanel extends JXPanel {
         validate();
     }
 
+
+    @Override
+    public void setBackground(Color bg) {
+        super.setBackground(bg);
+        if (iconLabel != null) {
+            iconLabel.setBackground(bg);
+        }
+        if (delegate != null) {
+            delegate.setBackground(bg);
+        }
+    }
+
+    @Override
+    public void setForeground(Color bg) {
+        super.setForeground(bg);
+        if (iconLabel != null) {
+            iconLabel.setForeground(bg);
+        }
+        if (delegate != null) {
+            delegate.setForeground(bg);
+        }
+    }
+    
+    
 }

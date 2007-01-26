@@ -47,14 +47,19 @@ public class WrappingProvider extends
         rendererComponent.setComponent(wrappee.rendererComponent);
     }
 
-    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public WrappingIconPanel getRendererComponent(CellContext context) {
-        Object oldValue = adjustContextValue(context);
-        wrappee.getRendererComponent(context);
-        WrappingIconPanel panel = super.getRendererComponent(context);
-        restoreContextValue(context, oldValue);
-        return panel;
+        if (context != null) {
+            Object oldValue = adjustContextValue(context);
+            wrappee.getRendererComponent(context);
+            WrappingIconPanel panel = super.getRendererComponent(context);
+            restoreContextValue(context, oldValue);
+            return panel;
+        }
+        return super.getRendererComponent(context);
     }
 
     /**

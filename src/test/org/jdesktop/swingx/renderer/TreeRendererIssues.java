@@ -60,6 +60,7 @@ public class TreeRendererIssues extends InteractiveTestCase {
         }
     }
 
+    
     /**
      * base interaction with list: renderer uses list's unselected  colors
      * 

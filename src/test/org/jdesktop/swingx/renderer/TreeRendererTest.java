@@ -37,8 +37,6 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.ListModel;
-import javax.swing.UIManager;
-import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
@@ -48,6 +46,7 @@ import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.decorator.RolloverHighlighter;
 import org.jdesktop.swingx.test.ActionMapTreeTableModel;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.test.SerializableSupport;
@@ -88,7 +87,45 @@ public class TreeRendererTest extends InteractiveTestCase {
             e.printStackTrace();
         }
     }
+
+    /**
+     * related to Issue #22-swingx: tree background highlighting broken.
+     * test if background color is moved down to delegate component.
+     *
+     */
+    public void testDelegateBackground() {
+        WrappingProvider provider = new WrappingProvider();
+        DefaultTreeRenderer renderer = new DefaultTreeRenderer(provider);
+        Component comp = renderer.getTreeCellRendererComponent(null, "dummy", false, false, false, -1, false);
+        assertTrue(comp instanceof WrappingIconPanel);
+        comp.setBackground(Color.RED);
+        // sanity
+        assertTrue(provider.getRendererComponent(null).isBackgroundSet());
+        assertEquals(Color.RED, provider.getRendererComponent(null).getBackground());
+        // sanity
+        assertTrue(provider.wrappee.getRendererComponent(null).isBackgroundSet());
+        assertEquals(Color.RED, provider.wrappee.getRendererComponent(null).getBackground());
+    }
     
+    /**
+     * related to Issue #22-swingx: tree background highlighting broken.
+     * test if foreground color is moved down to delegate component.
+     *
+     */
+    public void testDelegateForeground() {
+        WrappingProvider provider = new WrappingProvider();
+        DefaultTreeRenderer renderer = new DefaultTreeRenderer(provider);
+        Component comp = renderer.getTreeCellRendererComponent(null, "dummy", false, false, false, -1, false);
+        assertTrue(comp instanceof WrappingIconPanel);
+        comp.setForeground(Color.RED);
+        // sanity
+        assertTrue(provider.getRendererComponent(null).isForegroundSet());
+        assertEquals(Color.RED, provider.getRendererComponent(null).getForeground());
+        // sanity
+        assertTrue(provider.wrappee.getRendererComponent(null).isForegroundSet());
+        assertEquals(Color.RED, provider.wrappee.getRendererComponent(null).getForeground());
+    }
+
     /**
      * test serializable of default renderer.
      * 
@@ -160,59 +197,6 @@ public class TreeRendererTest extends InteractiveTestCase {
         addAction(frame, toggleComponentOrientation);
         frame.setVisible(true);
     }
-
-    /**
-     * 
-     * @return a button controller specialized on ActionEntryNode.
-     */
-    private ButtonProvider createButtonController() {
-        ButtonProvider wrapper = new ButtonProvider() {
-
-            @Override
-            protected void format(CellContext context) {
-                boolean selected = false;
-                String text = getStringValue(context);
-                if (context.getValue() instanceof Action) {
-                    Action action = (Action) context.getValue();
-                    text = (String) action.getValue(Action.NAME);
-                    if (action instanceof AbstractActionExt) {
-                        selected = ((AbstractActionExt) action).isSelected();
-                    }
-                }
-                rendererComponent.setSelected(selected);
-                rendererComponent.setText(text);
-            }
-            
-        };
-        wrapper.setHorizontalAlignment(JLabel.LEADING);
-        return wrapper;
-    }
-
-
-    /**
-     * @return
-     */
-    private ListModel createActionListModel() {
-        JXTable table = new JXTable(10, 10);
-        table.setHorizontalScrollEnabled(true);
-        ActionMap map = table.getActionMap();
-        Object[] keys = map.keys();
-        DefaultListModel model = new DefaultListModel();
-        for (Object object : keys) {
-           model.addElement(map.get(object)); 
-        }
-        return model;
-    }
-
-    /**
-     * @return
-     */
-    private TreeModel createActionTreeModel() {
-        JXTable table = new JXTable(10, 10);
-        table.setHorizontalScrollEnabled(true);
-        return new ActionMapTreeTableModel(table);
-    }
-
     public void interactiveTreeLabelFormatting() {
         TreeModel model = createComponentHierarchyModel();
 //        JTree xtree = new JTree(model);
@@ -251,14 +235,45 @@ public class TreeRendererTest extends InteractiveTestCase {
         frame.setVisible(true);
     }
 
-    /**
- * @return
- */
-private TreeModel createComponentHierarchyModel() {
-    JXFrame frame = new JXFrame("dummy");
-    frame.add(new JScrollPane(new JXTree()));
-    return new ComponentTreeTableModel(frame);
-}
+    public void interactiveXTreeLabelFormattingHighlighter() {
+        TreeModel model = createComponentHierarchyModel();
+//        JTree xtree = new JTree(model);
+        
+        JXTree tree = new JXTree(model);
+        tree.setHighlighters(new RolloverHighlighter(Color.RED, Color.YELLOW));
+        tree.setRolloverEnabled(true);
+        StringValue converter = new StringValue() {
+
+            public String getString(Object value) {
+                if (! (value instanceof Component) ) {
+                    return TO_STRING.getString(value);
+                }
+                
+                return "Name: " + ((Component) value).getName();
+            }
+            
+        };
+        tree.setCellRenderer(new DefaultTreeRenderer(converter));
+        
+        
+        final JXFrame frame = wrapWithScrollingInFrame(tree, "Rollover renderer");
+        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
+
+            public void actionPerformed(ActionEvent e) {
+                ComponentOrientation current = frame.getComponentOrientation();
+                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
+                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+                } else {
+                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+
+                }
+
+            }
+
+        };
+        addAction(frame, toggleComponentOrientation);
+        frame.setVisible(true);
+    }
 
     public void interactiveCompareTreeExtTreeColors() {
         JTree xtree = new JTree();
@@ -322,5 +337,69 @@ private TreeModel createComponentHierarchyModel() {
         addAction(frame, toggleComponentOrientation);
         frame.setVisible(true);
     }
+
+//-------------------------- factory methods
+    /**
+     * 
+     * @return a button controller specialized on ActionEntryNode.
+     */
+    private ButtonProvider createButtonController() {
+        ButtonProvider wrapper = new ButtonProvider() {
+
+            @Override
+            protected void format(CellContext context) {
+                boolean selected = false;
+                String text = getStringValue(context);
+                if (context.getValue() instanceof Action) {
+                    Action action = (Action) context.getValue();
+                    text = (String) action.getValue(Action.NAME);
+                    if (action instanceof AbstractActionExt) {
+                        selected = ((AbstractActionExt) action).isSelected();
+                    }
+                }
+                rendererComponent.setSelected(selected);
+                rendererComponent.setText(text);
+            }
+            
+        };
+        wrapper.setHorizontalAlignment(JLabel.LEADING);
+        return wrapper;
+    }
+
+
+    /**
+     * @return
+     */
+    private ListModel createActionListModel() {
+        JXTable table = new JXTable(10, 10);
+        table.setHorizontalScrollEnabled(true);
+        ActionMap map = table.getActionMap();
+        Object[] keys = map.keys();
+        DefaultListModel model = new DefaultListModel();
+        for (Object object : keys) {
+           model.addElement(map.get(object)); 
+        }
+        return model;
+    }
+
+    /**
+     * @return
+     */
+    private TreeModel createActionTreeModel() {
+        JXTable table = new JXTable(10, 10);
+        table.setHorizontalScrollEnabled(true);
+        return new ActionMapTreeTableModel(table);
+    }
+
+
+    /**
+ * @return
+ */
+private TreeModel createComponentHierarchyModel() {
+    JXFrame frame = new JXFrame("dummy");
+    frame.add(new JScrollPane(new JXTree()));
+    return new ComponentTreeTableModel(frame);
+}
+
 
 }
