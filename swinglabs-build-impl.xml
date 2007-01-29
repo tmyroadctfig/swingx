@@ -149,7 +149,7 @@
         <mkdir dir="${build.dir}/emma" />
         <taskdef name="emma" classname="com.vladium.emma.emmaTask" classpath="${emma.dir}/emma.jar:${emma.dir}/emma_ant.jar" />
         <emma>
-            <instr instrpath="${build.classes.dir}" destdir="${build.dir}/emma"/>
+            <instr instrpath="${build.classes.dir}" destdir="${build.dir}/emma" metadatafile="${basedir}/metadata.em"/>
         </emma>
 
         <echo message="${build.dir}/emma:${run.test.classpath}" />
@@ -174,19 +174,26 @@
         </junit>
 
         <delete dir="${build.dir}/emma" />
+        <mkdir dir="${dist.dir}/coverage" />
+        
         <emma>
             <report sourcepath="${java.dir}:${src.beaninfo.dir}">
                 <fileset dir="${basedir}" >
                   <include name="coverage.ec" />
+                  <include name="metadata.em" />
                 </fileset>
-                <html outfile="${dist.dir}/coverage/index.html" />
+                <!-- shouldn't have had to use basedir here, but it looks like a bug makes me do it -->
+                <html outfile="${basedir}/${dist.dir}/coverage/index.html" />
             </report>
         </emma>
-        <delete file="${basedir}/coverage.ec" />
+        <!--<delete file="${basedir}/coverage.ec" />-->
     </target>
     <target name="-post-coverage" />
     
-    <target name="coverage" depends="init,compile-test,-pre-test-run,-pre-coverage,-do-coverage,-post-coverage" if="emma.dir" />
+    <!-- this -->
+    <target name="coverage" depends="init,jar,compile-test,-pre-test-run,-pre-coverage,-do-coverage,-post-coverage,test-report" if="emma.dir">
+        <fail if="tests.failed">Some tests failed; see details above.</fail>
+    </target>
     
     <!-- 
     ======================
@@ -230,5 +237,16 @@
             <packageset dir="${src.beaninfo.dir}" includes="*/**"/>
             <packageset dir="${java.dir}" includes="*/**"/>
         </javadoc>
+    </target>
+
+    <target name="grok" depends="init,jar">
+        <!--
+        <mkdir dir="${dist.dir}/opengrok" />
+        <java fork="true"
+              jar ="lib/build-only/opengrok.jar">
+            <arg value="-c /usr/local/bin/ctags" />
+            <arg value="-s ${java.dir}" />
+            <arg value="${dist.dir}/opengrok" />
+        </java>-->
     </target>
 </project>
