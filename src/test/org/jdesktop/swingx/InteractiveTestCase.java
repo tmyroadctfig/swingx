@@ -172,7 +172,7 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
         for (int i = 0; i < methods.length; i++) {
             if (methods[i].getName().matches(regexPattern)) {
                 try {
-                    methods[i].invoke(this, null);
+                    methods[i].invoke(this);
                 }
                 catch (Exception e) {
                     System.out.println("could not run interactive test: " +
