@@ -192,7 +192,9 @@
     
     <!-- this -->
     <target name="coverage" depends="init,jar,compile-test,-pre-test-run,-pre-coverage,-do-coverage,-post-coverage,test-report" if="emma.dir">
+<!--
         <fail if="tests.failed">Some tests failed; see details above.</fail>
+-->
     </target>
     
     <!-- 
