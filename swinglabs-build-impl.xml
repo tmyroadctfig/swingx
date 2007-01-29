@@ -97,7 +97,7 @@
         that dist/lib)-->
         <mkdir dir="${build.bundles.dir}/bin/lib" />
         <copy todir="${build.bundles.dir}/bin/lib" >
-            <fileset dir="${dist.dir}/lib" includes="**/**" />
+            <fileset dir="lib/optional" includes="**/**" />
         </copy>
         
         <!-- zip up the whole thing -->
