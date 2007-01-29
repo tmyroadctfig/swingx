@@ -43,13 +43,15 @@ import javax.swing.table.TableCellEditor;
  * <p>
  * Usage example:
  * </p>
- * <code>
- * JTable table = ...;</br>
- * JComboBox comboBox = ...;</br>
- * ...</br>
- * TableColumn column = table.getColumnModel().getColumn(0);</br>
+ * <p>
+ * <pre><code>
+ * JTable table = ...;
+ * JComboBox comboBox = ...;
+ * ...
+ * TableColumn column = table.getColumnModel().getColumn(0);
  * column.setCellEditor(new ComboBoxCellEditor(comboBox));
- *  </code>
+ * </code></pre>
+ * </p>
  */
 public class ComboBoxCellEditor extends AbstractCellEditor implements TableCellEditor, Serializable {
     

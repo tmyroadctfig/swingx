@@ -48,18 +48,18 @@ import org.jdesktop.swingx.autocomplete.workarounds.AquaLnFPopupLocationFix;
  * This class contains only static utility methods that can be used to set up
  * automatic completion for some Swing components.
  * <p>Usage examples:</p>
- * <p><code>
- * JComboBox comboBox = [...];<br/>
- * AutoCompleteDecorator.<b>decorate</b>(comboBox);<br/>
- * &nbsp;<br/>
- * List items = [...];<br/>
- * JTextField textField = [...];<br/>
+ * <p><pre><code>
+ * JComboBox comboBox = [...];
+ * AutoCompleteDecorator.<b>decorate</b>(comboBox);
+ * 
+ * List items = [...];
+ * JTextField textField = [...];
  * AutoCompleteDecorator.<b>decorate</b>(textField, items);
- * &nbsp;<br/>
- * JList list = [...];<br/>
- * JTextField textField = [...];<br/>
+ * 
+ * JList list = [...];
+ * JTextField textField = [...];
  * AutoCompleteDecorator.<b>decorate</b>(list, textField);
- * </p></code>
+ * </code></pre></p>
  *
  * @author Thomas Bierhance
  */

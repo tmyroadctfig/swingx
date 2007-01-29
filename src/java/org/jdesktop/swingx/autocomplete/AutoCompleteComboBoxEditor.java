@@ -29,18 +29,19 @@ import javax.swing.ComboBoxEditor;
 import javax.swing.JComboBox;
 
 /**
+ * <p>
  * Wrapper around the combobox editor that translates combobox items into
  * strings. The methods <tt>setItem</tt> and <tt>getItem</tt> are modified
  * to account for the string conversion.
- * 
+ * </p><p>
  * This is necessary for those cases where the combobox items have no useful
  * <tt>toString()</tt> method and a custom <tt>ObjectToStringConverter</tt> is
  * used.
- * 
+ * </p><p>
  * If we do not do this, the interaction between ComboBoxEditor and JComboBox
  * will result in firing ActionListener events with the string value of
  * ComboBoxEditor as the currently selected value.
- *
+ * </p>
  * @author Noel Grandin noelgrandin@gmail.com
  * @author Thomas Bierhance
  */
