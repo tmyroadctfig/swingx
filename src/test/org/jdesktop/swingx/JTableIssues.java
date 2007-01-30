@@ -7,6 +7,7 @@
 
 package org.jdesktop.swingx;
 
+import java.awt.Component;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -16,6 +17,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
@@ -43,6 +45,27 @@ public class JTableIssues extends InteractiveTestCase {
           e.printStackTrace();
       }
   }
+
+    /**
+     * Issue #282-swingx: compare disabled appearance of
+     * collection views.
+     *
+     */
+    public void testDisabledRenderer() {
+        JList list = new JList(new Object[] {"one", "two"});
+        list.setEnabled(false);
+        // sanity
+        assertFalse(list.isEnabled());
+        Component comp = list.getCellRenderer().getListCellRendererComponent(list, "some", 0, false, false);
+        assertEquals(list.isEnabled(), comp.isEnabled());
+        JTable table = new JTable(10, 2);
+        table.setEnabled(false);
+        // sanity
+        assertFalse(table.isEnabled());
+        comp = table.prepareRenderer(table.getCellRenderer(0, 0), 0, 0);
+        assertEquals(table.isEnabled(), comp.isEnabled());
+    }
+
     /**
      * Characterization method: table.addColumn and invalid modelIndex.
      * 

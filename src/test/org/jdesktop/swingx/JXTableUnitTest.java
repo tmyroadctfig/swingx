@@ -109,6 +109,27 @@ public class JXTableUnitTest extends InteractiveTestCase {
         super.tearDown();
     }
 
+
+    /**
+     * Issue #282-swingx: compare disabled appearance of
+     * collection views.
+     *
+     */
+    public void testDisabledRenderer() {
+        JXList list = new JXList(new Object[] {"one", "two"});
+        list.setEnabled(false);
+        // sanity
+        assertFalse(list.isEnabled());
+        Component comp = list.getCellRenderer().getListCellRendererComponent(list, "some", 0, false, false);
+        assertEquals(list.isEnabled(), comp.isEnabled());
+        JXTable table = new JXTable(10, 2);
+        table.setEnabled(false);
+        // sanity
+        assertFalse(table.isEnabled());
+        comp = table.prepareRenderer(table.getCellRenderer(0, 0), 0, 0);
+        assertEquals(table.isEnabled(), comp.isEnabled());
+    }
+
     /**
      * Test assumptions of accessing table model/view values through
      * the table's componentAdapter.

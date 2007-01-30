@@ -54,8 +54,6 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.action.BoundAction;
-import org.jdesktop.swingx.decorator.ComponentAdapter;
-import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.treetable.FileSystemModel;
@@ -77,7 +75,6 @@ public class JXTableIssues extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXTableIssues.class
             .getName());
 
-    
     /**
      * test if created a new instance of the renderer. While the old
      * assertions are true, it's useless with swingx renderers: the renderer is
