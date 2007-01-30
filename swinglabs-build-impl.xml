@@ -77,6 +77,16 @@
     
     <target name="bundles" depends="init,jar,javadoc,-pre-bundles-init,-bundles-init,-post-bundles-init,-pre-bundles,-do-bundles,-post-bundles" />
     
+    <target name="update-posted-file" depends="init" if="posted.txt">
+        <tstamp>
+            <format property="RELEASE_DSTAMP_LONG" pattern="'week'-w-yyyy-MM-dd" />
+        </tstamp>
+        <!--MAIN week-42-2006-10-15 swingx-ws-->
+        <!--NOTE: The spacing in this next tag is critical. -->
+        <concat destfile="${posted.txt}" append="true">
+${build.branch} ${RELEASE_DSTAMP_LONG} ${projectname}</concat>
+    </target>
+
     <target name="-pre-bin-bundle" />
     <target name="-do-bin-bundle">
         <!-- create the build directories -->
