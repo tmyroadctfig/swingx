@@ -26,6 +26,8 @@ import java.io.Serializable;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
+import org.jdesktop.swingx.renderer.SimpleRendererDemo.Contributor;
+
 /**
  * Abstract base class of a provider for a cell rendering component. Configures
  * the component's content and default visuals depending on the renderee's state
@@ -33,7 +35,24 @@ import javax.swing.JLabel;
  * all types of renderees (JTable, JList, JTree).
  * <p>
  * 
- * TODO: usage example
+ * <pre><code>
+ * StringValue stringValue = new StringValue() {
+ * 
+ *     public String getString(Object value) {
+ *         if (!(value instanceof Contributor))
+ *             return TO_STRING.getString(value);
+ *         Contributor contributor = (Contributor) value;
+ *         return contributor.lastName + &quot;, &quot; + contributor.firstName;
+ *     }
+ * 
+ * };
+ * table.setDefaultRenderer(Contributor.class, new DefaultTableRenderer(
+ *         stringValue));
+ * list.setCellRenderer(new DefaultListRenderer(stringValue));
+ * tree.setCellRenderer(new DefaultTreeRenderer(stringValue));
+ * 
+ * </code></pre>
+ * 
  * <p>
  * 
  * Guarantees to completely configure the visual properties listed below. As a
@@ -51,8 +70,8 @@ import javax.swing.JLabel;
  * </ul>
  * 
  * As this internally delegates default visual configuration to a
- * <code>DefaultVisuals</code> (which handles the first six items)
- * subclasses have to guarantee the alignment only.
+ * <code>DefaultVisuals</code> (which handles the first six items) subclasses
+ * have to guarantee the alignment only.
  * 
  * @author Jeanette Winzenburg
  * 
