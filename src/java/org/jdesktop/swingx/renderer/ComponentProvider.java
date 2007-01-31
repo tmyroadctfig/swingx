@@ -26,8 +26,6 @@ import java.io.Serializable;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
-import org.jdesktop.swingx.renderer.SimpleRendererDemo.Contributor;
-
 /**
  * Abstract base class of a provider for a cell rendering component. Configures
  * the component's content and default visuals depending on the renderee's state
