@@ -52,11 +52,11 @@ public class JXHyperlinkTest extends InteractiveTestCase {
 //      setSystemLF(true);
       JXHyperlinkTest test = new JXHyperlinkTest();
       try {
-          test.runInteractiveTests();
+//          test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*Table.*");
 //          test.runInteractiveTests("interactive.*List.*");
 //          test.runInteractiveTests("interactive.*Tree.*");
-//          test.runInteractiveTests("interactive.*Simple.*");
+          test.runInteractiveTests("interactive.*Underline.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -212,7 +212,25 @@ public class JXHyperlinkTest extends InteractiveTestCase {
        assertEquals(linkAction.isVisited(), hyperlink.isClicked());
     }
 
-    
+    /**
+     * Issue #441-swingx: underline not showing for html text.
+     *
+     */
+    public void interactiveTestHtmlUnderlineButton() {
+        Action action = new AbstractAction("<html><b><i>Bold Italic Link</i></b></html>") {
+
+            public void actionPerformed(ActionEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+        };
+        JXHyperlink hyperlink = new JXHyperlink(action );
+        JFrame frame = wrapInFrame(hyperlink, "show html underline ");
+        frame.setSize(200, 200);
+        frame.setVisible(true);
+        
+    }
     
     /**
      * visually check how differently configured buttons behave on

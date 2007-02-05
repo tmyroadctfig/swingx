@@ -151,11 +151,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
         if (text != null && !text.equals("")) {
             View v = (View) c.getClientProperty(BasicHTML.propertyKey);
             if (v != null) {
-                textRect.x += getTextShiftOffset();
-                textRect.y += getTextShiftOffset();
-                v.paint(g, textRect);
-                textRect.x -= getTextShiftOffset();
-                textRect.y -= getTextShiftOffset();
+                paintHTMLText(g, b, textRect, text, v);
             } else {
                 paintText(g, b, textRect, text);
             }
@@ -169,6 +165,33 @@ public class BasicHyperlinkUI extends BasicButtonUI {
 //        ((Graphics2D) g).setComposite(oldComposite);
     }
 
+    /**
+     * Method which renders the text of the current button if html.
+     * <p>
+     * @param g Graphics context
+     * @param b Current button to render
+     * @param textRect Bounding rectangle to render the text.
+     * @param text String to render
+     * @param view the View to use.
+     */
+    protected void paintHTMLText(Graphics g, AbstractButton b, 
+            Rectangle textRect, String text, View v) {
+        textRect.x += getTextShiftOffset();
+        textRect.y += getTextShiftOffset();
+        v.paint(g, textRect);
+        // fix #441-swingx - underline not painted for html
+        if (b.getModel().isRollover()) {
+            paintUnderline(g, b, textRect, text);
+          }
+        textRect.x -= getTextShiftOffset();
+        textRect.y -= getTextShiftOffset();
+    }
+
+    /**
+     * {@inheritDoc} <p>
+     * Overridden to paint the underline on rollover.
+     */
+    @Override
     protected void paintText(Graphics g, AbstractButton b, Rectangle textRect,
             String text) {
         super.paintText(g, b, textRect, text);
