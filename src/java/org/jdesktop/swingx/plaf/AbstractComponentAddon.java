@@ -54,7 +54,9 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
   }
 
   public void uninitialize(LookAndFeelAddons addon) {
-    addon.unloadDefaults(getDefaults(addon));
+    // commented after Issue 446. Maybe addon should keep track of its
+    // added defaults to correctly remove them on uninitialize
+    // addon.unloadDefaults(getDefaults(addon));
   }
 
   /**

@@ -144,9 +144,12 @@ public class LookAndFeelAddons {
   }
 
   public void unloadDefaults(Object[] keysAndValues) {
+    // commented after Issue 446. 
+    /*
     for (int i = 0, c = keysAndValues.length; i < c; i = i + 2) {
       UIManager.getLookAndFeelDefaults().put(keysAndValues[i], null);
     }
+    */
   }
 
   public static void setAddon(String addonClassName)
