@@ -53,6 +53,7 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
+import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.table.TableColumnExt;
@@ -75,6 +76,8 @@ public class JXTableIssues extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXTableIssues.class
             .getName());
 
+    
+    
     /**
      * test if created a new instance of the renderer. While the old
      * assertions are true, it's useless with swingx renderers: the renderer is
@@ -745,14 +748,31 @@ public class JXTableIssues extends InteractiveTestCase {
         assertEquals("search must succeed", 10, found);
     }
 
+    /**
+     * Issue #445-swingx: sort icon not updated on programatic sorting.
+     *
+     */
+    public void interactiveHeaderUpdateOnSorting() {
+        final JXTable table = new JXTable(createAscendingModel(0, 10));
+        Action action = new AbstractActionExt("toggle sorter order") {
 
+            public void actionPerformed(ActionEvent e) {
+                table.toggleSortOrder(0);
+                
+            }
+        };
+        JXFrame frame = wrapWithScrollingInFrame(table, "sort icon");
+        addAction(frame, action);
+        frame.setVisible(true);
+    }
+    
     public static void main(String args[]) {
         JXTableIssues test = new JXTableIssues();
         try {
-//          test.runInteractiveTests();
+          test.runInteractiveTests();
          //   test.runInteractiveTests("interactive.*Siz.*");
          //   test.runInteractiveTests("interactive.*Render.*");
-            test.runInteractiveTests(".*DataChanged.*");
+//            test.runInteractiveTests(".*DataChanged.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
