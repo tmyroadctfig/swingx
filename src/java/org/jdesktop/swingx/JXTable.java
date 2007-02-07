@@ -1567,6 +1567,11 @@ public class JXTable extends JTable
     protected void updateOnFilterContentChanged() {
         revalidate();
         repaint();
+        // this is a quick fix for #445-swingx: sort icon not updated on 
+        // programatic sorts
+        if (getTableHeader() != null) {
+            getTableHeader().repaint();
+        }
     }
 
 

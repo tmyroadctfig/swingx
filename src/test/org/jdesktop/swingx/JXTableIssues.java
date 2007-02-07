@@ -41,6 +41,7 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -748,9 +749,11 @@ public class JXTableIssues extends InteractiveTestCase {
         assertEquals("search must succeed", 10, found);
     }
 
+
     /**
      * Issue #445-swingx: sort icon not updated on programatic sorting.
-     *
+     * The issue is the update (== repaint), so a non-visual test method
+     * will always pass (the icon-border is set in getRendererComp).
      */
     public void interactiveHeaderUpdateOnSorting() {
         final JXTable table = new JXTable(createAscendingModel(0, 10));
