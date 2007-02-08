@@ -21,6 +21,8 @@
 
 package org.jdesktop.swingx.plaf.macosx;
 
+import java.awt.FlowLayout;
+import java.awt.LayoutManager;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.border.Border;
@@ -91,6 +93,11 @@ public class MacOSXStatusBarUI extends StatusBarUI {
         Border b = statusBar.getBorder();
         if (b == null || b instanceof UIResource) {
             statusBar.setBorder(new BorderUIResource(BorderFactory.createEmptyBorder(4, 5, 4, 22)));
+        }
+        
+        LayoutManager m = statusBar.getLayout();
+        if (m == null) {
+            statusBar.setLayout(new FlowLayout());
         }
         installDefaults();
     }
