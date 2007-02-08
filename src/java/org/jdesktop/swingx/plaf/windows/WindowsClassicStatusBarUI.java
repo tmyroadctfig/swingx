@@ -42,6 +42,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.BorderUIResource;
 import org.jdesktop.swingx.JXStatusBar;
 import org.jdesktop.swingx.JXStatusBar.Constraint;
 import org.jdesktop.swingx.plaf.StatusBarUI;
@@ -97,8 +98,8 @@ public class WindowsClassicStatusBarUI extends BasicStatusBarUI {
         return 11;
     }
 
-    protected Border createBorder() {
-        return BorderFactory.createEmptyBorder(4, 5, 3, 22);
+    protected BorderUIResource createBorder() {
+        return new BorderUIResource(BorderFactory.createEmptyBorder(4, 5, 3, 22));
     }
     
 }

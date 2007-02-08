@@ -37,6 +37,8 @@ import javax.swing.JComponent;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.UIResource;
+import javax.swing.plaf.BorderUIResource;
 import org.jdesktop.swingx.JXStatusBar;
 import org.jdesktop.swingx.JXStatusBar.Constraint;
 import org.jdesktop.swingx.plaf.StatusBarUI;
@@ -101,9 +103,22 @@ public class BasicStatusBarUI extends StatusBarUI {
         assert c instanceof JXStatusBar;
         statusBar = (JXStatusBar)c;
         
-        statusBar.setBorder(createBorder());
-        statusBar.setLayout(createLayout());
-        
+        //only set the border if it is an instanceof UIResource
+        //In other words, only replace the border if it has not been
+        //set by the developer. UIResource is the flag we use to indicate whether
+        //the value was set by the UIDelegate, or by the developer.
+        Border b = statusBar.getBorder();
+        if (b == null || b instanceof UIResource) {
+            statusBar.setBorder(createBorder());
+        }
+
+        //only set the layout manager if the layout manager of the component is null.
+        //do not replace custom layout managers. it is not necessary to replace this layout
+        //manager.
+        LayoutManager m = statusBar.getLayout();
+        if (m == null) {
+            statusBar.setLayout(createLayout());
+        }
     }
     
     /**
@@ -134,6 +149,8 @@ public class BasicStatusBarUI extends StatusBarUI {
     @Override
     public void uninstallUI(JComponent c) {
         assert c instanceof JXStatusBar;
+
+        //TODO remove the border and layout if a UI resource?
     }
     
     @Override
@@ -196,8 +213,8 @@ public class BasicStatusBarUI extends StatusBarUI {
         return b == null || b == true;
     }
     
-    protected Border createBorder() {
-        return BorderFactory.createEmptyBorder(4, 5, 4, 22);
+    protected BorderUIResource createBorder() {
+        return new BorderUIResource(BorderFactory.createEmptyBorder(4, 5, 4, 22));
     }
     
     protected LayoutManager createLayout() {
