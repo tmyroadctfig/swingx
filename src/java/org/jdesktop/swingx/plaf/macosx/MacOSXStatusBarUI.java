@@ -21,15 +21,12 @@
 
 package org.jdesktop.swingx.plaf.macosx;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
-import javax.swing.JSeparator;
-import javax.swing.SwingConstants;
+import javax.swing.border.Border;
+import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.UIResource;
 import org.jdesktop.swingx.JXStatusBar;
 import org.jdesktop.swingx.plaf.StatusBarUI;
 
@@ -91,7 +88,10 @@ public class MacOSXStatusBarUI extends StatusBarUI {
         assert c instanceof JXStatusBar;
         statusBar = (JXStatusBar)c;
         
-        statusBar.setBorder(BorderFactory.createEmptyBorder(4, 5, 4, 22));
+        Border b = statusBar.getBorder();
+        if (b == null || b instanceof UIResource) {
+            statusBar.setBorder(new BorderUIResource(BorderFactory.createEmptyBorder(4, 5, 4, 22)));
+        }
         installDefaults();
     }
     
