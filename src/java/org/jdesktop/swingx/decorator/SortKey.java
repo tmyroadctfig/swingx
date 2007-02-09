@@ -81,6 +81,14 @@ public class SortKey {
     
 //---------------------- static utility methods
     
+    /**
+     * Returns the first SortKey in the list which is sorted. 
+     * If none is sorted, null is returned.
+     * 
+     * @param keys a list of SortKeys to search
+     * @return the first SortKey which is sorted or null, if no
+     *   is found.
+     */
     public static SortKey getFirstSortingKey(List<? extends SortKey> keys) {
         for (SortKey key : keys) {
             if (key.getSortOrder().isSorted()) {
@@ -90,6 +98,15 @@ public class SortKey {
         return null;
     }
 
+    /**
+     * Returns the first SortKey in the list for the given column, 
+     * or null if the column has no SortKey. 
+     * 
+     * @param keys a list of SortKeys to search
+     * @param modelColumn the column index in model coordinates
+     * @return the first SortKey for the given column or null if none is
+     *   found.
+     */
     public static SortKey getFirstSortKeyForColumn(List<? extends SortKey> keys, int modelColumn) {
         for (SortKey key : keys) {
             if (key.getColumn() == modelColumn) {

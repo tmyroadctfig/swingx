@@ -942,17 +942,24 @@ public class JXTable extends JTable
 //----------------------- scrollable control
     
     /**
-     * Sets the enablement of enhanced horizontal scrolling. 
-     * If enabled, it toggles an auto-resize mode which always
-     * fills the <code>JViewport</code> horizontally and shows the horizontal scrollbar if
-     * necessary. <p>
+     * Sets the enablement of enhanced horizontal scrolling. If enabled, it
+     * toggles an auto-resize mode which always fills the <code>JViewport</code>
+     * horizontally and shows the horizontal scrollbar if necessary.
+     * <p>
      * 
-     * The default value is <code>false</code>. <p>
+     * The default value is <code>false</code>.
+     * <p>
      * 
-     * PENDING JW: the name is mis-leading? 
+     * Note: this is <strong>not</strong> a bound property, though it follows
+     * bean naming conventions. 
+     * 
+     * PENDING: Probably should be... If so, could be taken by a
+     * listening Action as in the app-framework.
+     * <p>
+     * PENDING JW: the name is mis-leading?
      * 
      * @param enabled a boolean indicating whether enhanced auto-resize mode is
-     *   enabled.
+     *        enabled.
      * @see #isHorizontalScrollEnabled()
      */
     public void setHorizontalScrollEnabled(boolean enabled) {
@@ -990,7 +997,7 @@ public class JXTable extends JTable
      * @return the enablement of enhanced horizontal scrolling.
      * @see #setHorizontalScrollEnabled(boolean)
      */
-    protected boolean isHorizontalScrollEnabled() {
+    public boolean isHorizontalScrollEnabled() {
         return intelliMode && getAutoResizeMode() == AUTO_RESIZE_OFF;
     }
 
