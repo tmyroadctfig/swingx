@@ -72,7 +72,7 @@
     <target name="-pre-bundles">
         <mkdir dir="${dist.bundles.dir}" />
     </target>
-    <target name="-do-bundles" depends="-pre-bin-bundle,-do-bin-bundle,-post-bin-bundle,-pre-src-bundle,-do-src-bundle,-post-src-bundle" />
+    <target name="-do-bundles" depends="-pre-bin-bundle,-do-bin-bundle,-post-bin-bundle,-pre-src-bundle,-do-src-bundle,-post-src-bundle,-pre-doc-bundle,-do-doc-bundle,-post-doc-bundle" />
     <target name="-post-bundles" />
     
     <target name="bundles" depends="init,jar,javadoc,-pre-bundles-init,-bundles-init,-post-bundles-init,-pre-bundles,-do-bundles,-post-bundles" />
@@ -87,6 +87,12 @@
 ${build.branch} ${RELEASE_DSTAMP_LONG} ${projectname}</concat>
     </target>
 
+    <target name="-pre-doc-bundle" />
+    <target name="-do-doc-bundle">
+        <zip basedir="${dist.javadoc.dir}" zipfile="${dist.bundles.dir}/${projectname}-${RELEASE_DSTAMP}-javadoc.zip" compress="0"/>
+    </target>
+    <target name="-post-doc-bundle" />
+    
     <target name="-pre-bin-bundle" />
     <target name="-do-bin-bundle">
         <!-- create the build directories -->
