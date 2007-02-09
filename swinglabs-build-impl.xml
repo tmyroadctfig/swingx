@@ -194,6 +194,7 @@ ${build.branch} ${RELEASE_DSTAMP_LONG} ${projectname}</concat>
                 </fileset>
                 <!-- shouldn't have had to use basedir here, but it looks like a bug makes me do it -->
                 <html outfile="${basedir}/${dist.dir}/coverage/index.html" />
+                <xml outfile="${basedir}/${dist.dir}/coverage/coverage.xml" />
             </report>
         </emma>
         <!--<delete file="${basedir}/coverage.ec" />-->
