@@ -40,6 +40,8 @@ import java.awt.RenderingHints;
 import java.awt.image.ColorModel;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
+import java.awt.image.DirectColorModel;
+import java.awt.image.RasterFormatException;
 
 /**
  * <p>A blend composite defines the rule according to which a drawing primitive
@@ -281,6 +283,11 @@ public final class BlendComposite implements Composite {
     public CompositeContext createContext(ColorModel srcColorModel,
                                           ColorModel dstColorModel,
                                           RenderingHints hints) {
+        if (!(srcColorModel instanceof DirectColorModel) ||
+                !(dstColorModel instanceof DirectColorModel)) {
+            throw new RasterFormatException("Incompatible color models");
+        }
+
         return new BlendingContext(this);
     }
 
@@ -297,13 +304,6 @@ public final class BlendComposite implements Composite {
         }
 
         public void compose(Raster src, Raster dstIn, WritableRaster dstOut) {
-//            if (src.getSampleModel().getDataType() != DataBuffer.TYPE_INT ||
-//                dstIn.getSampleModel().getDataType() != DataBuffer.TYPE_INT ||
-//                dstOut.getSampleModel().getDataType() != DataBuffer.TYPE_INT) {
-//                throw new IllegalStateException(
-//                        "Source and destination must store pixels as INT.");
-//            }
-
             int width = Math.min(src.getWidth(), dstIn.getWidth());
             int height = Math.min(src.getHeight(), dstIn.getHeight());
 
