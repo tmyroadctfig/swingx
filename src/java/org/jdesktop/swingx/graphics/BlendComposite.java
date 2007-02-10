@@ -42,6 +42,7 @@ import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.awt.image.DirectColorModel;
 import java.awt.image.RasterFormatException;
+import java.awt.image.DataBuffer;
 
 /**
  * <p>A blend composite defines the rule according to which a drawing primitive
@@ -277,14 +278,29 @@ public final class BlendComposite implements Composite {
         return mode == bc.mode && alpha == bc.alpha;
     }
 
+    private static boolean checkComponentsOrder(ColorModel cm) {
+        if (cm instanceof DirectColorModel &&
+                cm.getTransferType() == DataBuffer.TYPE_INT) {
+            DirectColorModel directCM = (DirectColorModel) cm;
+
+            return directCM.getRedMask() == 0x00FF0000 &&
+                   directCM.getGreenMask() == 0x0000FF00 &&
+                   directCM.getBlueMask() == 0x000000FF &&
+                   (directCM.getNumComponents() == 3 ||
+                    directCM.getAlphaMask() == 0xFF000000);
+        }
+
+        return false;
+    }
+
     /**
      * {@inheritDoc}
      */
     public CompositeContext createContext(ColorModel srcColorModel,
                                           ColorModel dstColorModel,
                                           RenderingHints hints) {
-        if (!(srcColorModel instanceof DirectColorModel) ||
-                !(dstColorModel instanceof DirectColorModel)) {
+        if (!checkComponentsOrder(srcColorModel) ||
+                !checkComponentsOrder(dstColorModel)) {
             throw new RasterFormatException("Incompatible color models");
         }
 
