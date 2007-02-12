@@ -81,6 +81,7 @@
         <tstamp>
             <format property="RELEASE_DSTAMP_LONG" pattern="'week'-w-yyyy-MM-dd" />
         </tstamp>
+        
         <!--MAIN week-42-2006-10-15 swingx-ws-->
         <!--NOTE: The spacing in this next tag is critical. -->
         <concat destfile="${posted.txt}" append="true">
@@ -193,7 +194,7 @@ ${build.branch} ${RELEASE_DSTAMP_LONG} ${projectname}</concat>
         <mkdir dir="${dist.dir}/coverage" />
         
         <emma>
-            <report sourcepath="${java.dir}:${src.beaninfo.dir}">
+            <report sourcepath="${emma.report.srcpath}">
                 <fileset dir="${basedir}" >
                   <include name="coverage.ec" />
                   <include name="metadata.em" />
@@ -242,17 +243,13 @@ ${build.branch} ${RELEASE_DSTAMP_LONG} ${projectname}</concat>
                  additionalparam="${javadoc.additionalparam}"
                  failonerror="true" useexternalfile="false"
                  verbose="${javadoc.verbose}"
-                 maxmemory="1024M">
+                 maxmemory="1024M"
+                 sourcepath="${javadoc.srcpath}">
             <link offline="true" href="${javadoc.core.linkexternal}"
                   packagelistLoc="${javadoc.core.packagelist}"/>
             <classpath>
                 <path path="${javac.classpath}"/>
             </classpath>
-            <sourcepath>
-                <pathelement location="${src.beaninfo.dir}"/>
-                <pathelement location="${java.dir}"/>
-                <pathelement location="${javadoc.core.src}"/>
-            </sourcepath>
             <packageset dir="${src.beaninfo.dir}" includes="*/**"/>
             <packageset dir="${java.dir}" includes="*/**"/>
         </javadoc>
