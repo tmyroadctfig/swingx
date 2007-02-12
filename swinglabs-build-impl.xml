@@ -32,6 +32,8 @@
       - bundles
       - coverage
       - javadoc
+
+    Version 1.0
 -->    
 <project name="swinglabs-build-impl" default="bundle" basedir=".">
     <!-- 
