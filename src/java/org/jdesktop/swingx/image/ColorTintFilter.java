@@ -36,7 +36,6 @@ package org.jdesktop.swingx.image;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.awt.image.DirectColorModel;
 
 import org.jdesktop.swingx.graphics.GraphicsUtilities;
 
@@ -135,9 +134,7 @@ public class ColorTintFilter extends AbstractFilter {
     @Override
     public BufferedImage filter(BufferedImage src, BufferedImage dst) {
         if (dst == null) {
-            DirectColorModel directCM = new DirectColorModel(32,
-                    0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
-            dst = createCompatibleDestImage(src, directCM);
+            dst = createCompatibleDestImage(src, null);
         }
 
         int width = src.getWidth();
