@@ -390,6 +390,12 @@ public class GraphicsUtilities {
         float ratioHW = (float) height / (float) width;
 
         BufferedImage thumb = image;
+        BufferedImage temp = null;
+
+        Graphics2D g2 = null;
+
+        int previousWidth = width;
+        int previousHeight = height;
 
         do {
             if (isWidthGreater) {
@@ -406,16 +412,30 @@ public class GraphicsUtilities {
                 width = (int) (height / ratioHW);
             }
 
-
-            BufferedImage temp = createCompatibleImage(image, width, height);
-            Graphics2D g2 = temp.createGraphics();
-            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+            if (temp == null) {
+                temp = createCompatibleImage(image, width, height);
+                g2 = temp.createGraphics();
+                g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
                                 RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            g2.drawImage(thumb, 0, 0, temp.getWidth(), temp.getHeight(), null);
-            g2.dispose();
+            }
+            g2.drawImage(thumb, 0, 0, width, height,
+                         0, 0, previousWidth, previousHeight, null);
+
+            previousWidth = width;
+            previousHeight = height;
 
             thumb = temp;
         } while (newSize != (isWidthGreater ? width : height));
+
+        g2.dispose();
+
+        if (width != thumb.getWidth() || height != thumb.getHeight()) {
+            temp = createCompatibleImage(image, width, height);
+            g2 = temp.createGraphics();
+            g2.drawImage(thumb, 0, 0, null);
+            g2.dispose();
+            thumb = temp;
+        }
 
         return thumb;
     }
@@ -455,6 +475,12 @@ public class GraphicsUtilities {
         }
 
         BufferedImage thumb = image;
+        BufferedImage temp = null;
+
+        Graphics2D g2 = null;
+
+        int previousWidth = width;
+        int previousHeight = height;
 
         do {
             if (width > newWidth) {
@@ -471,15 +497,30 @@ public class GraphicsUtilities {
                 }
             }
 
-            BufferedImage temp = createCompatibleImage(image, width, height);
-            Graphics2D g2 = temp.createGraphics();
-            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+            if (temp == null) {
+                temp = createCompatibleImage(image, width, height);
+                g2 = temp.createGraphics();
+                g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
                                 RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            g2.drawImage(thumb, 0, 0, temp.getWidth(), temp.getHeight(), null);
-            g2.dispose();
+            }
+            g2.drawImage(thumb, 0, 0, width, height,
+                         0, 0, previousWidth, previousHeight, null);
+
+            previousWidth = width;
+            previousHeight = height;
 
             thumb = temp;
         } while (width != newWidth || height != newHeight);
+
+        g2.dispose();
+
+        if (width != thumb.getWidth() || height != thumb.getHeight()) {
+            temp = createCompatibleImage(image, width, height);
+            g2 = temp.createGraphics();
+            g2.drawImage(thumb, 0, 0, null);
+            g2.dispose();
+            thumb = temp;
+        }
 
         return thumb;
     }
