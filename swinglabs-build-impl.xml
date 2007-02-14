@@ -92,7 +92,7 @@ ${build.branch} ${RELEASE_DSTAMP_LONG} ${projectname}</concat>
 
     <target name="-pre-doc-bundle" />
     <target name="-do-doc-bundle">
-        <zip basedir="${dist.javadoc.dir}" zipfile="${dist.bundles.dir}/${projectname}-${RELEASE_DSTAMP}-javadoc.zip" compress="0"/>
+        <zip basedir="${dist.javadoc.dir}" zipfile="${dist.bundles.dir}/${projectname}-${RELEASE_DSTAMP}-javadoc.zip" compress="${javadoc.compress}"/>
     </target>
     <target name="-post-doc-bundle" />
     
