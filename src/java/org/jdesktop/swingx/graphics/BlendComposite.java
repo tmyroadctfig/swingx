@@ -38,11 +38,11 @@ import java.awt.Composite;
 import java.awt.CompositeContext;
 import java.awt.RenderingHints;
 import java.awt.image.ColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.DirectColorModel;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
-import java.awt.image.DirectColorModel;
 import java.awt.image.RasterFormatException;
-import java.awt.image.DataBuffer;
 
 /**
  * <p>A blend composite defines the rule according to which a drawing primitive
@@ -278,7 +278,7 @@ public final class BlendComposite implements Composite {
         return mode == bc.mode && alpha == bc.alpha;
     }
 
-    private static boolean checkComponentsOrder(ColorModel cm) {
+    private static boolean isRgbColorModel(ColorModel cm) {
         if (cm instanceof DirectColorModel &&
                 cm.getTransferType() == DataBuffer.TYPE_INT) {
             DirectColorModel directCM = (DirectColorModel) cm;
@@ -293,23 +293,39 @@ public final class BlendComposite implements Composite {
         return false;
     }
 
+    private static boolean isBgrColorModel(ColorModel cm) {
+        if (cm instanceof DirectColorModel &&
+                cm.getTransferType() == DataBuffer.TYPE_INT) {
+            DirectColorModel directCM = (DirectColorModel) cm;
+
+            return directCM.getRedMask() == 0x000000FF &&
+                   directCM.getGreenMask() == 0x0000FF00 &&
+                   directCM.getBlueMask() == 0x00FF0000 &&
+                   (directCM.getNumComponents() == 3 ||
+                    directCM.getAlphaMask() == 0xFF000000);
+        }
+
+        return false;
+    }
+
     /**
      * {@inheritDoc}
      */
     public CompositeContext createContext(ColorModel srcColorModel,
                                           ColorModel dstColorModel,
                                           RenderingHints hints) {
-        if (!checkComponentsOrder(srcColorModel) ||
-                !checkComponentsOrder(dstColorModel)) {
-            throw new RasterFormatException("Incompatible color models");
+        if (isRgbColorModel(srcColorModel) && isRgbColorModel(dstColorModel)) {
+            return new BlendingRgbContext(this);
+        } else if (isBgrColorModel(srcColorModel) && isBgrColorModel(dstColorModel)) {
+            return new BlendingBgrContext(this);
         }
 
-        return new BlendingContext(this);
+        throw new RasterFormatException("Incompatible color models");
     }
 
-    private static final class BlendingContext implements CompositeContext {
-        private final Blender blender;
-        private final BlendComposite composite;
+    private static abstract class BlendingContext implements CompositeContext {
+        protected final Blender blender;
+        protected final BlendComposite composite;
 
         private BlendingContext(BlendComposite composite) {
             this.composite = composite;
@@ -317,6 +333,12 @@ public final class BlendComposite implements Composite {
         }
 
         public void dispose() {
+        }
+    }
+
+    private static class BlendingRgbContext extends BlendingContext {
+        private BlendingRgbContext(BlendComposite composite) {
+            super(composite);
         }
 
         public void compose(Raster src, Raster dstIn, WritableRaster dstOut) {
@@ -356,6 +378,54 @@ public final class BlendComposite implements Composite {
                                    ((int) (dstPixel[0] + (result[0] - dstPixel[0]) * alpha) & 0xFF) << 16 |
                                    ((int) (dstPixel[1] + (result[1] - dstPixel[1]) * alpha) & 0xFF) <<  8 |
                                     (int) (dstPixel[2] + (result[2] - dstPixel[2]) * alpha) & 0xFF;
+                }
+                dstOut.setDataElements(0, y, width, 1, dstPixels);
+            }
+        }
+    }
+
+    private static class BlendingBgrContext extends BlendingContext {
+        private BlendingBgrContext(BlendComposite composite) {
+            super(composite);
+        }
+
+        public void compose(Raster src, Raster dstIn, WritableRaster dstOut) {
+            int width = Math.min(src.getWidth(), dstIn.getWidth());
+            int height = Math.min(src.getHeight(), dstIn.getHeight());
+
+            float alpha = composite.getAlpha();
+
+            int[] result = new int[4];
+            int[] srcPixel = new int[4];
+            int[] dstPixel = new int[4];
+            int[] srcPixels = new int[width];
+            int[] dstPixels = new int[width];
+
+            for (int y = 0; y < height; y++) {
+                src.getDataElements(0, y, width, 1, srcPixels);
+                dstIn.getDataElements(0, y, width, 1, dstPixels);
+                for (int x = 0; x < width; x++) {
+                    // pixels are stored as INT_ABGR
+                    // our arrays are [R, G, B, A]
+                    int pixel = srcPixels[x];
+                    srcPixel[0] = (pixel      ) & 0xFF;
+                    srcPixel[1] = (pixel >>  8) & 0xFF;
+                    srcPixel[2] = (pixel >> 16) & 0xFF;
+                    srcPixel[3] = (pixel >> 24) & 0xFF;
+
+                    pixel = dstPixels[x];
+                    dstPixel[0] = (pixel      ) & 0xFF;
+                    dstPixel[1] = (pixel >>  8) & 0xFF;
+                    dstPixel[2] = (pixel >> 16) & 0xFF;
+                    dstPixel[3] = (pixel >> 24) & 0xFF;
+
+                    blender.blend(srcPixel, dstPixel, result);
+
+                    // mixes the result with the opacity
+                    dstPixels[x] = ((int) (dstPixel[3] + (result[3] - dstPixel[3]) * alpha) & 0xFF) << 24 |
+                                   ((int) (dstPixel[0] + (result[0] - dstPixel[0]) * alpha) & 0xFF)       |
+                                   ((int) (dstPixel[1] + (result[1] - dstPixel[1]) * alpha) & 0xFF) <<  8 |
+                                   ((int) (dstPixel[2] + (result[2] - dstPixel[2]) * alpha) & 0xFF) << 16;
                 }
                 dstOut.setDataElements(0, y, width, 1, dstPixels);
             }
