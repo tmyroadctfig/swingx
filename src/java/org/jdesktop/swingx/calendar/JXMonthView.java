@@ -272,7 +272,6 @@ public class JXMonthView extends JComponent {
         // Set the first displayed date
         setFirstDisplayedDate(cleanupDate(firstDisplayedDate));
 
-        setBackground(Color.WHITE);
         setFocusable(true);
         todayBackgroundColor = getForeground();
 

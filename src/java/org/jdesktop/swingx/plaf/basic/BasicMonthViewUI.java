@@ -157,6 +157,11 @@ public class BasicMonthViewUI extends MonthViewUI {
                 daysOfTheWeek[i - 1] = dateFormatSymbols[i];
             }
         }
+
+        Color background = monthView.getBackground();
+        if (background == null || background instanceof UIResource) {
+            monthView.setBackground(UIManager.getColor("JXMonthView.background"));
+        }
         monthView.setDaysOfTheWeek(daysOfTheWeek);
         monthView.setBoxPaddingX((Integer)UIManager.get("JXMonthView.boxPaddingX"));
         monthView.setBoxPaddingY((Integer)UIManager.get("JXMonthView.boxPaddingY"));
@@ -166,8 +171,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         monthView.setSelectedBackground(UIManager.getColor("JXMonthView.selectedBackground"));
         monthView.setFlaggedDayForeground(UIManager.getColor("JXMonthView.flaggedDayForeground"));
         Font f = monthView.getFont();
-        if (f == null || f instanceof UIResource)
-        {
+        if (f == null || f instanceof UIResource) {
             monthView.setFont(UIManager.getFont("JXMonthView.font"));
         }
         monthDownImage = new ImageIcon(
