@@ -38,6 +38,7 @@ import javax.swing.KeyStroke;
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.UIResource;
 import org.jdesktop.swingx.DateSelectionListener;
 import org.jdesktop.swingx.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DateUtils;
@@ -164,7 +165,11 @@ public class BasicMonthViewUI extends MonthViewUI {
         monthView.setDaysOfTheWeekForeground(UIManager.getColor("JXMonthView.daysOfTheWeekForeground"));
         monthView.setSelectedBackground(UIManager.getColor("JXMonthView.selectedBackground"));
         monthView.setFlaggedDayForeground(UIManager.getColor("JXMonthView.flaggedDayForeground"));
-        monthView.setFont(UIManager.getFont("JXMonthView.font"));
+        Font f = monthView.getFont();
+        if (f == null || f instanceof UIResource)
+        {
+            monthView.setFont(UIManager.getFont("JXMonthView.font"));
+        }
         monthDownImage = new ImageIcon(
                 JXMonthView.class.getResource(UIManager.getString("JXMonthView.monthDownFileName")));
         monthUpImage = new ImageIcon(
@@ -173,7 +178,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         leadingDayForeground = UIManager.getColor("JXMonthView.leadingDayForeground");
         trailingDayForeground = UIManager.getColor("JXMonthView.trailingDayForeground");
         unselectableDayForeground = UIManager.getColor("JXMonthView.unselectableDayForeground");
-        derivedFont = monthView.getFont().deriveFont(Font.BOLD);
+        derivedFont = createDerivedFont();
     }
 
     protected void uninstallDefaults() {}
@@ -264,6 +269,15 @@ public class BasicMonthViewUI extends MonthViewUI {
         return getHandler();
     }
 
+    /**
+     * Create a derived font used to when painting various pieces of the
+     * month view component.  This method will be called whenever
+     * the font on the component is set so a new derived font can be created.
+     */
+    protected Font createDerivedFont() {
+        return monthView.getFont().deriveFont(Font.BOLD);
+    }
+    
     private Handler getHandler() {
         if (handler == null) {
             handler = new Handler();
@@ -1550,7 +1564,10 @@ public class BasicMonthViewUI extends MonthViewUI {
                 today = (Long)evt.getNewValue();
             } else if (JXMonthView.BOX_PADDING_X.equals(property) || JXMonthView.BOX_PADDING_Y.equals(property) ||
                     JXMonthView.TRAVERSABLE.equals(property) || JXMonthView.DAYS_OF_THE_WEEK.equals(property) ||
-                    "border".equals(property) || "font".equals(property) || JXMonthView.WEEK_NUMBER.equals(property)) {
+                    "border".equals(property) || JXMonthView.WEEK_NUMBER.equals(property)) {
+                monthView.revalidate();
+            } else if ("font".equals(property)) {
+                derivedFont = createDerivedFont();
                 monthView.revalidate();
             }
         }
