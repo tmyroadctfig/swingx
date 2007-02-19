@@ -172,14 +172,14 @@ public class GaussianBlurFilter extends AbstractFilter {
         float[] data = new float[radius * 2 + 1];
 
         float sigma = radius / 3.0f;
-        float sigmaSquare = 2.0f * sigma * sigma;
-        float sigmaRoot = (float) Math.sqrt(2.0f * (float) Math.PI * sigma);
+        float twoSigmaSquare = 2.0f * sigma * sigma;
+        float sigmaRoot = (float) Math.sqrt(twoSigmaSquare * Math.PI);
         float total = 0.0f;
 
         for (int i = -radius; i <= radius; i++) {
             float distance = i * i;
             int index = i + radius;
-            data[index] = (float) Math.exp(-distance / sigmaSquare) / sigmaRoot;
+            data[index] = (float) Math.exp(-distance / twoSigmaSquare) / sigmaRoot;
             total += data[index];
         }
 
