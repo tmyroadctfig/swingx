@@ -105,9 +105,6 @@ public class LookAndFeelAddonsTest extends TestCase {
     
     UIManager.put("Addon.title", null);
     assertEquals("my title", UIManager.get("Addon.title"));
-    
-    LookAndFeelAddons.uncontribute(addon);
-    assertNull(UIManager.get("Addon.title"));    
   }
 
   public void testContribute() throws Exception {
