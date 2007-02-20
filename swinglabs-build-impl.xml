@@ -98,35 +98,12 @@ ${build.branch} ${RELEASE_DSTAMP_LONG} ${projectname}</concat>
     
     <target name="-pre-bin-bundle" />
     <target name="-do-bin-bundle">
-        <!-- create the build directories -->
-        <mkdir dir="${build.bundles.dir}" />
-        <mkdir dir="${build.bundles.dir}/bin" />
-        <!-- Copy over the documentation -->
-        <mkdir dir="${build.bundles.dir}/bin/docs" />
-        <copy todir="${build.bundles.dir}/bin/docs">
-            <fileset dir="${bundles.doc.dir}" />
-        </copy>
-        <!-- Copy over the javadocs -->
-        <mkdir dir="${build.bundles.dir}/bin/docs/javadoc" />
-        <copy todir="${build.bundles.dir}/bin/docs/javadoc">
-            <fileset dir="${dist.javadoc.dir}" />
-        </copy>
-        <!-- Copy over the libraries 
-        (TODO it would be nice if libs could be copied from somewhere other
-        that dist/lib)-->
-        <mkdir dir="${build.bundles.dir}/bin/lib" />
-        <copy todir="${build.bundles.dir}/bin/lib" >
-            <fileset dir="lib/optional" includes="**/**" />
-        </copy>
-        
-        <!-- zip up the whole thing -->
-        <delete dir="${build.bundles.dir}/zipdir" />
-        <mkdir dir="${build.bundles.dir}/zipdir" />
-        <mkdir dir="${build.bundles.dir}/zipdir/${projectname}-${RELEASE_DSTAMP}-bin" />
-        <move todir="${build.bundles.dir}/zipdir/${projectname}-${RELEASE_DSTAMP}-bin">
-            <fileset dir="${build.bundles.dir}/bin" />
-        </move>
-        <zip basedir="${build.bundles.dir}/zipdir" destfile="${dist.bundles.dir}/${projectname}-${RELEASE_DSTAMP}-bin.zip" />
+        <zip destfile="${dist.bundles.dir}/${projectname}-${RELEASE_DSTAMP}-bin.zip">
+          <zipfileset dir="${bundles.doc.dir}" prefix="${projectname}-${RELEASE_DSTAMP}-bin/docs"/>
+          <zipfileset dir="${dist.javadoc.dir}" prefix="${projectname}-${RELEASE_DSTAMP}-bin/docs/javadoc"/>
+          <zipfileset dir="lib" includes="**/*.jar" excludes="**/build-only/**" prefix="${projectname}-${RELEASE_DSTAMP}-bin/lib"/>
+          <zipfileset file="${dist.jar}" fullpath="${projectname}-${RELEASE_DSTAMP}-bin/${projectname}-${RELEASE_DSTAMP}.jar"/>
+        </zip>
     </target>
     <target name="-post-bin-bundle" />
     
