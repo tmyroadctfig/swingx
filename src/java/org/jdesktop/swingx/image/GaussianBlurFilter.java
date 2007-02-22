@@ -67,7 +67,7 @@ public class GaussianBlurFilter extends AbstractFilter {
      *
      * @return the radius of the blur
      */
-    public float getRadius() {
+    public int getRadius() {
         return radius;
     }
 
