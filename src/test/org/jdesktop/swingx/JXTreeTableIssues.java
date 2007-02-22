@@ -6,12 +6,14 @@
  */
 package org.jdesktop.swingx;
 
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
-import junit.framework.TestCase;
-
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
+import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
+import org.jdesktop.swingx.treetable.TreeTableModel;
 
 /**
  * Test to exposed known issues of <code>JXTreeTable</code>. <p>
@@ -25,8 +27,23 @@ import org.jdesktop.swingx.treetable.FileSystemModel;
  * 
  * @author Jeanette Winzenburg
  */
-public class JXTreeTableIssues extends TestCase {
+public class JXTreeTableIssues extends InteractiveTestCase {
 
+
+    /**
+     * Issue #??-swingx: NPE if editing node with null icon.
+     */
+    public void testNPEEditingNullIcon() {
+        JXTreeTable treeTable = new JXTreeTable(new ComponentTreeTableModel(new JXErrorPane()));
+        treeTable.setEditable(true);
+        treeTable.expandAll();
+        treeTable.setOpenIcon(null);
+        treeTable.setLeafIcon(null);
+        treeTable.setClosedIcon(null);
+        assertTrue(treeTable.isCellEditable(1, 0));
+        treeTable.editCellAt(1, 0, null);
+    }
+    
     /**
      * Issue #399-swingx: editing terminated by selecting editing row.
      *
@@ -182,4 +199,5 @@ public class JXTreeTableIssues extends TestCase {
     public void testDummy() {
         
     }
+
 }
