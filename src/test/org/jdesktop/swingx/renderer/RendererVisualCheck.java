@@ -94,8 +94,6 @@ import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
 
-
-
 /**
  * Visual check of extended Swingx renderers.
  * 
@@ -590,7 +588,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
      * @param table
      */
     private void configureList(final JXList list, final JXTable table, boolean useRollover) {
-        final List<Action> actions = new ArrayList();
+        final List<Action> actions = new ArrayList<Action>();
         ColumnControlButton columnControl = new ColumnControlButton(table, null) {
 
             @Override
@@ -893,28 +891,34 @@ public class RendererVisualCheck extends InteractiveTestCase {
         return new DefaultTreeModel(root);
     }
     private TableModel createModelWithLinks() {
-        String[] columnNames = { "text only", "Link editable", "Link not-editable", "Bool editable", "Bool not-editable" };
-        
+        String[] columnNames = { "text only", "Link editable",
+                "Link not-editable", "Bool editable", "Bool not-editable" };
+
         DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
-            public Class getColumnClass(int column) {
-                return getValueAt(0, column).getClass();
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return getValueAt(0, columnIndex).getClass();
             }
 
             @Override
             public boolean isCellEditable(int row, int column) {
-                    return !getColumnName(column).contains("not");
+                return !getColumnName(column).contains("not");
             }
-            
+
         };
         for (int i = 0; i < 4; i++) {
             try {
-                LinkModel link = new LinkModel("a link text " + i, null, new URL("http://some.dummy.url" + i));
+                LinkModel link = new LinkModel("a link text " + i, null,
+                        new URL("http://some.dummy.url" + i));
                 if (i == 1) {
-                    URL url = JXEditorPaneTest.class.getResource("resources/test.html");
+                    URL url = JXEditorPaneTest.class
+                            .getResource("resources/test.html");
 
                     link = new LinkModel("a link text " + i, null, url);
                 }
-                model.addRow(new Object[] {"text only " + i, link, link, Boolean.TRUE, Boolean.TRUE });
+                model.addRow(new Object[] { "text only " + i, link, link,
+                        Boolean.TRUE, Boolean.TRUE });
             } catch (MalformedURLException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -1089,7 +1093,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         }
         
         try {
-            return getter.invoke(bean, null);
+            return getter.invoke(bean);
         } catch (Exception e) {
             throw new RuntimeException("can't access property: " + propertyDescriptor.getName());
         }
