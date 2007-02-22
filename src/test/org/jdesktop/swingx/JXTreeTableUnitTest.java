@@ -43,6 +43,21 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     public JXTreeTableUnitTest() {
         super("JXTreeTable Unit Test");
     }
+
+    /**
+     * Issue #465-swingx: NPE if editing node with null icon.
+     */
+    public void testNPEEditingNullIcon() {
+        JXTreeTable treeTable = new JXTreeTable(new ComponentTreeTableModel(new JXErrorPane()));
+        treeTable.setEditable(true);
+        treeTable.expandAll();
+        treeTable.setOpenIcon(null);
+        treeTable.setLeafIcon(null);
+        treeTable.setClosedIcon(null);
+        assertTrue(treeTable.isCellEditable(1, 0));
+        treeTable.editCellAt(1, 0, null);
+    }
+
     /**
      * Issue #??-swingx: ComponentAdapter not fully implemented - leaf always true.
      *

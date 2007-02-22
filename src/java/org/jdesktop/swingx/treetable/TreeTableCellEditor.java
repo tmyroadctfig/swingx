@@ -105,8 +105,10 @@ public class TreeTableCellEditor extends DefaultCellEditor {
      * @param row
      * @param isSelected
      */
-    protected void initEditorOffset(JTable table, int row, int column, boolean isSelected) {
-        if (tree == null) return;
+    protected void initEditorOffset(JTable table, int row, int column,
+            boolean isSelected) {
+        if (tree == null)
+            return;
         Rectangle bounds = tree.getRowBounds(row);
         int offset = bounds.x;
         Object node = tree.getPathForRow(row).getLastPathComponent();
@@ -115,16 +117,20 @@ public class TreeTableCellEditor extends DefaultCellEditor {
         TreeCellRenderer tcr = tree.getCellRenderer();
         Component treeComponent = tcr.getTreeCellRendererComponent(tree, node,
                 isSelected, expanded, leaf, row, false);
-        if ((treeComponent instanceof JLabel) 
-                // adjust the offset to account for the icon - at least
+        if ((treeComponent instanceof JLabel)
+        // adjust the offset to account for the icon - at least
                 // in LToR orientation. RToL is hard to tackle anyway...
                 && table.getComponentOrientation().isLeftToRight()) {
             JLabel label = (JLabel) treeComponent;
 
             Icon icon = label.getIcon();
-            offset += icon.getIconWidth() + label.getIconTextGap();
+            if (icon != null) {
+                offset += icon.getIconWidth() + label.getIconTextGap();
+            }
+
         }
-        ((TreeTableTextField) getComponent()).init(offset, column, bounds.width, table);
+        ((TreeTableTextField) getComponent()).init(offset, column,
+                bounds.width, table);
     }
 
     /**
