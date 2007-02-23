@@ -172,7 +172,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
      * @param b Current button to render
      * @param textRect Bounding rectangle to render the text.
      * @param text String to render
-     * @param view the View to use.
+     * @param v the View to use.
      */
     protected void paintHTMLText(Graphics g, AbstractButton b, 
             Rectangle textRect, String text, View v) {
@@ -240,7 +240,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
         }
 
         public void mouseExited(MouseEvent e) {
-            e.getComponent().setCursor(Cursor.getDefaultCursor());
+            e.getComponent().setCursor(null);
         }
     }
 }

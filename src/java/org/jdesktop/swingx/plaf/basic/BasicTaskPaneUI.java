@@ -261,7 +261,7 @@ public class BasicTaskPaneUI extends TaskPaneUI {
       }
     }
     public void mouseExited(MouseEvent e) {
-      e.getComponent().setCursor(Cursor.getDefaultCursor());
+      e.getComponent().setCursor(null);
       mouseOver = false;
       group.repaint();
     }
@@ -272,7 +272,7 @@ public class BasicTaskPaneUI extends TaskPaneUI {
         mouseOver = true;
         group.repaint();
       } else {
-        e.getComponent().setCursor(Cursor.getDefaultCursor());
+        e.getComponent().setCursor(null);
         mouseOver = false;
         group.repaint();
       }
