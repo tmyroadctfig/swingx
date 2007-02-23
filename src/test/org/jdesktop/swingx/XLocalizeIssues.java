@@ -33,6 +33,7 @@ import javax.swing.UIManager;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.error.ErrorInfo;
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 
 /**
  * Test to expose known issues around <code>Locale</code> setting.
@@ -81,18 +82,24 @@ public class XLocalizeIssues extends InteractiveTestCase {
     /**
      * Issue #??-swingx: locale-dependent values not accessible.
      * This looks like a side-effect of the first go on #159-swingx (not all values of
-     * resourceBundle available).
+     * resourceBundle available). <p>
+     * 
+     * Could be core problem (in jdk5, fixed in jdk6) around classloader and ResourceBundle: 
+     * <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4834404"> 
+     * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4834404 </a>
      * 
      *
      */
     public void testGetLocaleUIDefaults() {
+        // force the addon to load
+        LookAndFeelAddons.getAddon();
         String key = "JXTable.column.packAll";
-        Object defaultValue = UIManager.get(key, DEFAULT_LOCALE);
-        // sanity - the value must be available
-        assertNotNull(defaultValue);
         Object alternativeValue = UIManager.get(key, ALTERNATIVE_LOCALE);
         // sanity - the value must be available
         assertNotNull(alternativeValue);
+        Object defaultValue = UIManager.get(key, DEFAULT_LOCALE);
+        // sanity - the value must be available
+        assertNotNull(defaultValue);
         assertFalse("values must be different: " + defaultValue + "/" + alternativeValue, defaultValue.equals(alternativeValue));
     }
     
@@ -258,6 +265,7 @@ public class XLocalizeIssues extends InteractiveTestCase {
                 // Note: this does not effect components which are already
                 // created
                 JComponent.setDefaultLocale(Locale.getDefault());
+                UIManager.getDefaults().setDefaultLocale(Locale.getDefault());
                 table.getColumnExt(0).setTitle(
                         Locale.getDefault().getLanguage());
 
