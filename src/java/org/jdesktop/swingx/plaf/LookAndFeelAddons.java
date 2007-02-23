@@ -93,15 +93,38 @@ public class LookAndFeelAddons {
     
     setTrackingLookAndFeelChanges(true);
       
-    // this addon ensure resource bundle gets added to lookandfeel defaults
-    // and re-added by #maybeInitialize if needed      
-    contribute(new AbstractComponentAddon("MinimumAddon") {
-      @Override
-      protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
-        addResource(defaults, "org.jdesktop.swingx.plaf.resources.swingx");
-      }
-    });
+    addDefaultResourceBundle();
   }
+
+  /**
+   * Add SwingX default resource bundle.
+   *
+   */
+  private static void addDefaultResourceBundle() {
+        // this addon ensure resource bundle gets added to lookandfeel defaults
+        // and re-added by #maybeInitialize if needed
+        contribute(new AbstractComponentAddon("MinimumAddon") {
+            @Override
+            protected void addBasicDefaults(LookAndFeelAddons addon,
+                    List<Object> defaults) {
+                addResource(defaults,
+                        "org.jdesktop.swingx.plaf.resources.swingx");
+            }
+        });
+        // the following was an intermediate attempt which wasn't reliable in
+        // finding resource values
+//        UIManager.getLookAndFeelDefaults().addResourceBundle(
+//                "org.jdesktop.swingx.plaf.resources.swingx");
+        // the following was the initial attempt to lookup default resource
+        // values. it did introduce Issue ??-swingx
+        // Nevertheless it's needed to solve #466-swingx - lookup can't
+        // find alternative locale values
+        // which is blocking #459-swingx - table.setLocale doesn't update
+        // column control actions
+        // isn't working prior to jdk6
+//        UIManager.getDefaults().addResourceBundle(
+//                "org.jdesktop.swingx.plaf.resources.swingx");
+    }
 
   private static LookAndFeelAddons currentAddon;
 

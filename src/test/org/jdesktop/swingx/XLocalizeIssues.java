@@ -50,8 +50,13 @@ public class XLocalizeIssues extends InteractiveTestCase {
     private static final Locale DEFAULT_LOCALE = Locale.US;
     private static final Locale ALTERNATIVE_LOCALE = Locale.GERMAN;
 
+
     private Locale originalLocale;
-    
+    // test scope is static anyway...
+    static {
+        // force the addon to load
+        LookAndFeelAddons.getAddon();
+    }
     public static void main(String[] args) {
 //      setSystemLF(true);
       XLocalizeIssues test = new XLocalizeIssues();
@@ -80,19 +85,65 @@ public class XLocalizeIssues extends InteractiveTestCase {
     }
 
     /**
-     * Issue #??-swingx: locale-dependent values not accessible.
-     * This looks like a side-effect of the first go on #159-swingx (not all values of
-     * resourceBundle available). <p>
+     * Issue #459-swingx: JXTable setLocale doesn't update localized column
+     * control properties.
      * 
-     * Could be core problem (in jdk5, fixed in jdk6) around classloader and ResourceBundle: 
-     * <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4834404"> 
+     * Pass/fail expectation:
+     * <ul>
+     * <li> fails always with jdk5 independent of LookAndFeelAddon resource
+     * bundle registration.
+     * <li> fails with jdk6 and LookAndFeelAddon copy resource bundle values.
+     * <li> passes with jdk6 and LookAndFeelAddon addResourceBundle.
+     * </ul>
+     */
+    public void testLocaleColumnControl() {
+       assertLocaleActionUpdate(JXTable.HORIZONTALSCROLL_ACTION_COMMAND);
+       assertLocaleActionUpdate(JXTable.PACKALL_ACTION_COMMAND);
+       assertLocaleActionUpdate(JXTable.PACKSELECTED_ACTION_COMMAND);
+    }
+
+    private void assertLocaleActionUpdate(String actionCommand) {
+        JXTable table = new JXTable(10, 2);
+        Action action = table.getActionMap().get(actionCommand);
+        String name = (String) action.getValue(Action.NAME);
+        String uiValue = UIManager.getString("JXTable." + actionCommand, table
+                .getLocale());
+        // sanity
+        assertNotNull(uiValue);
+        assertEquals(name, uiValue);
+        Locale alternative = ALTERNATIVE_LOCALE;
+        if (alternative.getLanguage().equals(table.getLocale().getLanguage())) {
+            alternative = DEFAULT_LOCALE;
+        }
+        table.setLocale(alternative);
+        String altUIValue = UIManager.getString("JXTable." + actionCommand,
+                table.getLocale());
+        // sanity
+        assertNotNull(altUIValue);
+        // sanity to track unexpected failure during refactoring
+        assertFalse("new uiValue  must be different: " + uiValue + "/"
+                + altUIValue, uiValue.equals(altUIValue));
+        String altName = (String) action.getValue(Action.NAME);
+        // here are the real asserts
+        assertFalse("new action name must be different: " + name + "/"
+                + altName, name.equals(altName));
+        assertEquals(altName, altUIValue);
+    }
+    
+    /**
+     * Issue #466-swingx: locale-dependent values not accessible. This looks
+     * like a side-effect of the first go on #159-swingx (not all values of
+     * resourceBundle available).
+     * <p>
+     * 
+     * Could be core problem (in jdk5, fixed in jdk6) around classloader and
+     * ResourceBundle: <a
+     * href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4834404">
      * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4834404 </a>
      * 
-     *
+     * 
      */
     public void testGetLocaleUIDefaults() {
-        // force the addon to load
-        LookAndFeelAddons.getAddon();
         String key = "JXTable.column.packAll";
         Object alternativeValue = UIManager.get(key, ALTERNATIVE_LOCALE);
         // sanity - the value must be available

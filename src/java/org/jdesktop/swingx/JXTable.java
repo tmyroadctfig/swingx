@@ -42,6 +42,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -445,6 +446,7 @@ public class JXTable extends JTable
         // instantiate row height depending ui setting or font size.
         updateRowHeightUI(false);
         setFillsViewportHeight(true);
+        updateLocaleState();
     }
 
     /**
@@ -849,8 +851,7 @@ public class JXTable extends JTable
      * the horizontal scrollBar. 
      */
     private Action createHorizontalScrollAction() {
-        String actionName = getUIString(HORIZONTALSCROLL_ACTION_COMMAND);
-        BoundAction action = new BoundAction(actionName,
+        BoundAction action = new BoundAction(null,
                 HORIZONTALSCROLL_ACTION_COMMAND);
         action.setStateAction();
         action.registerCallback(this, "setHorizontalScrollEnabled");
@@ -859,15 +860,16 @@ public class JXTable extends JTable
     }
 
     /**
-     * Returns a potentially localized value from the UIManager. The given
-     * key is prefixed by this table's <code>UIPREFIX</code> before
-     * doing the lookup. Returns the key, if no value is found. 
-     *  
+     * Returns a potentially localized value from the UIManager. The given key
+     * is prefixed by this table's <code>UIPREFIX</code> before doing the
+     * lookup. The lookup respects this table's current <code>locale</code>
+     * property. Returns the key, if no value is found.
+     * 
      * @param key the bare key to look up in the UIManager.
      * @return the value mapped to UIPREFIX + key or key if no value is found.
      */
-    private String getUIString(String key) {
-        String text = UIManager.getString(UIPREFIX + key);
+    protected String getUIString(String key) {
+        String text = UIManager.getString(UIPREFIX + key, getLocale());
         return text != null ? text : key;
     }
 
@@ -876,8 +878,7 @@ public class JXTable extends JTable
      * for packing the selected column. 
      */
     private Action createPackSelectedAction() {
-        String text = getUIString(PACKSELECTED_ACTION_COMMAND);
-        BoundAction action = new BoundAction(text, PACKSELECTED_ACTION_COMMAND);
+        BoundAction action = new BoundAction(null, PACKSELECTED_ACTION_COMMAND);
         action.registerCallback(this, "packSelected");
         action.setEnabled(getSelectedColumnCount() > 0);
         return action;
@@ -888,15 +889,60 @@ public class JXTable extends JTable
      * for packing all columns. 
      */
     private Action createPackAllAction() {
-        String text = getUIString(PACKALL_ACTION_COMMAND);
-        BoundAction action = new BoundAction(text, PACKALL_ACTION_COMMAND);
+        BoundAction action = new BoundAction(null, PACKALL_ACTION_COMMAND);
         action.registerCallback(this, "packAll");
         return action;
     }
 
+    /**
+     * {@inheritDoc} <p>
+     * Overridden to update locale-dependent properties. 
+     * 
+     * @see #updateLocaleState() 
+     */
+    @Override
+    public void setLocale(Locale l) {
+        super.setLocale(l);
+        updateLocaleState();
+    }
+    
+    /**
+     * Updates locale-dependent state.
+     * 
+     * Here: updates registered column actions' locale-dependent state.
+     * <p>
+     * 
+     * PENDING: Try better to find all column actions including custom
+     * additions? Or move to columnControl?
+     * 
+     * @see #setLocale(Locale)
+     * @see #updateLocaleActionState(String)
+     */
+    protected void updateLocaleState() {
+        updateLocaleActionState(HORIZONTALSCROLL_ACTION_COMMAND);
+        updateLocaleActionState(PACKALL_ACTION_COMMAND);
+        updateLocaleActionState(PACKSELECTED_ACTION_COMMAND);
+    }
+    
+    /**
+     * Updates locale-dependent state of action registered with key in 
+     * <code>ActionMap</code>. Does nothing if no action with key is found. <p>
+     * 
+     * Here: updates the <code>Action</code>'s name property. 
+     * 
+     * @param key the string for lookup in this table's ActionMap
+     * @see #updateLocaleState()
+     */
+    protected void updateLocaleActionState(String key) {
+        Action action = getActionMap().get(key);
+        if (action == null) return;
+        action.putValue(Action.NAME, getUIString(key));
+    }
     
 //------------------ bound action callback methods
     
+
+
     /**
      * Resizes all columns to fit their content. <p> 
      * 
