@@ -24,7 +24,6 @@ import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Paint;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 
 import javax.swing.JComponent;
@@ -122,8 +121,6 @@ public class GlossyTaskPaneUI extends BasicTaskPaneUI {
         ((Graphics2D)g).setPaint(oldPaint);
       }
       
-      Rectangle oldRect = g.getClipBounds();
-      g.setClip(0, 0, group.getWidth(), TITLE_HEIGHT);
       g.setColor(borderColor);
       g.drawRoundRect(
         0,
@@ -133,7 +130,6 @@ public class GlossyTaskPaneUI extends BasicTaskPaneUI {
         ROUND_HEIGHT,
         ROUND_HEIGHT);
       g.drawLine(0, TITLE_HEIGHT - 1, group.getWidth(), TITLE_HEIGHT - 1);
-      g.setClip(oldRect);      
     }
 
     protected void paintExpandedControls(JXTaskPane group, Graphics g, int x,
