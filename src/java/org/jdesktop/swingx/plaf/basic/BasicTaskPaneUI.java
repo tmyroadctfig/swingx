@@ -202,15 +202,26 @@ public class BasicTaskPaneUI extends TaskPaneUI {
   }
   
   public Component createAction(Action action) {
-    JXHyperlink button = new JXHyperlink(action);
-    button.setOpaque(false);
-    button.setBorder(null);
-    button.setBorderPainted(false);
-    button.setFocusPainted(true);
-    button.setForeground(UIManager.getColor("TaskPane.titleForeground"));
-    return button;
+    JXHyperlink link = new JXHyperlink(action) {
+      @Override
+      public void updateUI() {
+        super.updateUI();
+        // ensure the ui of this link is correctly update on l&f changes
+        configure(this);
+      }
+    };
+    configure(link);
+    return link;
   }
 
+  protected void configure(JXHyperlink link) {
+    link.setOpaque(false);
+    link.setBorder(null);
+    link.setBorderPainted(false);
+    link.setFocusPainted(true);
+    link.setForeground(UIManager.getColor("TaskPane.titleForeground"));    
+  }
+  
   protected void ensureVisible() {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
@@ -250,7 +261,7 @@ public class BasicTaskPaneUI extends TaskPaneUI {
     }
   }
   
-  class ToggleListener extends MouseInputAdapter {
+  class ToggleListener extends MouseInputAdapter {    
     public void mouseEntered(MouseEvent e) {
       if (isInBorder(e)) {
         e.getComponent().setCursor(
