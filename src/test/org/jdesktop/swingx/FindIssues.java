@@ -6,7 +6,13 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Color;
+import java.awt.Component;
+
 import javax.swing.AbstractListModel;
+
+import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.SearchHighlighter;
 
 
 /**
@@ -16,6 +22,19 @@ import javax.swing.AbstractListModel;
  */
 public class FindIssues extends FindTest {
 
+    public static void main(String args[]) {
+        setSystemLF(true);
+//        Locale.setDefault(new Locale("es"));
+        FindIssues test = new FindIssues();
+        try {
+//          test.runInteractiveTests();
+            test.runInteractiveTests("interactive.*Mark.*");
+        } catch (Exception e) {
+            System.err.println("exception when executing interactive tests:");
+            e.printStackTrace();
+        }
+    }
+    
     /**
      * Issue #236-swingx: backwards match in first row shows not-found-message.
      * Trackdown from Nicfagn - findPanel.doSearch always returns the next startIndex
@@ -41,6 +60,72 @@ public class FindIssues extends FindTest {
                 patternModel.getFoundIndex(), patternModel.isBackwards());
         assertEquals("found match", matchIndex, findPanel.doSearch());
     }
-    
+
+    // -------------------- interactive tests
+
+    public void interactiveTableMarkAllMatches() {
+        JXTable table = new XXTable();
+        table.setModel(new TestTableModel());
+        SearchFactory.getInstance().setUseFindBar(true);
+        showWithScrollingInFrame(table, "quick sample for mark all matches");
+    }
+
+    public static class XXTable extends JXTable {
+
+        @Override
+        public Searchable getSearchable() {
+            if (searchable == null) {
+                searchable = new XTableSearchable();
+            }
+            return searchable;
+        }
+
+        public class XTableSearchable extends TableSearchable {
+
+            @Override
+            protected SearchHighlighter createSearchHighlighter() {
+                SearchHighlighter highlighter = new SearchHighlighter() {
+                    int currentViewRow;
+
+                    int currentModelColumn;
+
+                    /**
+                     * Overridden to always mark all.
+                     */
+                    @Override
+                    public void setHighlightCell(int row, int modelColumn) {
+                        currentViewRow = row;
+                        currentModelColumn = modelColumn;
+                        super.setHighlightCell(-1, -1);
+                    }
+
+                    @Override
+                    protected Color computeUnselectedBackground(
+                            Component renderer, ComponentAdapter adapter) {
+                        Color color = super.computeUnselectedBackground(
+                                renderer, adapter);
+                        if ((adapter.row == currentViewRow)
+                                && (adapter.column >= 0)
+                                && (adapter.viewToModel(adapter.column) == currentModelColumn)) {
+                            return color.darker();
+                        }
+                        return color;
+                    }
+
+                };
+                return highlighter;
+            }
+
+        }
+    }
+    /**
+     * #463-swingx: batch find and cellSelection don't play nicely.
+     *
+     */
+    public void interactiveTableBatchWithCellSelectionIssue() {
+        JXTable table = new JXTable(new TestTableModel());
+        table.setCellSelectionEnabled(true);
+        showComponent(table, "batch find with cell selection");
+    }
 
 }
