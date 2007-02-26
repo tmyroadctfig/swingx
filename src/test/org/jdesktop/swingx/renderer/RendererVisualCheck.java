@@ -56,6 +56,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
@@ -104,14 +105,59 @@ public class RendererVisualCheck extends InteractiveTestCase {
         setSystemLF(true);
         RendererVisualCheck test = new RendererVisualCheck();
         try {
-            test.runInteractiveTests();
-//          test.runInteractiveTests(".*Table.*");
+//            test.runInteractiveTests();
+          test.runInteractiveTests(".*TextArea.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
     }
 
+    /**
+     * Quick example of using a JTextArea as rendering component.
+     *
+     */
+    public void interactiveTextAreaRenderer() {
+        DefaultTableModel model = new DefaultTableModel(0, 1);
+        model.addRow(new String[] {"some really, maybe really really long text -  "
+                + "wrappit .... where needed "});
+        model.addRow(new String[] {"another really, maybe really really long text -  "
+                + "with nothing but junk. wrappit .... where needed"});
+        JXTable table = new JXTable(model);
+        table.setVisibleRowCount(4);
+        table.setColumnControlVisible(true);
+        table.getColumnExt(0).setCellRenderer(new DefaultTableRenderer(new TextAreaProvider()));
+        table.addHighlighter(new AlternateRowHighlighter());
+        JTextArea textArea = (JTextArea) table.prepareRenderer(table.getCellRenderer(0, 0), 0, 0);
+        table.packColumn(0, -1);
+        table.setRowHeight(textArea.getPreferredSize().height);
+        showWithScrollingInFrame(table, "textArea as rendering comp");
+    }
+    
+    public static class TextAreaProvider extends ComponentProvider<JTextArea> {
+
+        @Override
+        protected void configureState(CellContext context) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        protected JTextArea createRendererComponent() {
+            JTextArea area = new JTextArea(3, 20);
+            area.setLineWrap(true);
+            area.setWrapStyleWord(true);
+            area.setOpaque(true);
+            return area;
+        }
+
+        @Override
+        protected void format(CellContext context) {
+            rendererComponent.setText(getStringValue(context));
+            rendererComponent.revalidate();
+        }
+        
+    }
     /**
      * Check disabled appearance.
      *
