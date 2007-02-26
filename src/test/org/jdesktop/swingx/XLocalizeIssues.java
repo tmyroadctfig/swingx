@@ -86,7 +86,7 @@ public class XLocalizeIssues extends InteractiveTestCase {
 
     /**
      * Issue #459-swingx: JXTable setLocale doesn't update localized column
-     * control properties.
+     * control properties. <p>
      * 
      * Pass/fail expectation:
      * <ul>
