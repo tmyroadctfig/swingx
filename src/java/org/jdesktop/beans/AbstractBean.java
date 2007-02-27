@@ -29,18 +29,18 @@ import java.beans.VetoableChangeListener;
 import java.beans.VetoableChangeSupport;
 
 /**
- * <p>A convenience class from which to extend all non-visual JavaBeans. It
+ * <p>A convenience class from which to extend all non-visual AbstractBeans. It
  * manages the PropertyChange notification system, making it relatively trivial
  * to add support for property change events in getters/setters.</p>
  * 
- * <p>A non-visual java bean is a Java class that conforms to the JavaBean 
+ * <p>A non-visual java bean is a Java class that conforms to the AbstractBean 
  * patterns to allow visual manipulation of the bean's properties and event 
  * handlers at design-time.</p>
  *
  * <p>Here is a simple example bean that contains one property, foo, and the
  * proper pattern for implementing property change notification:
  * <pre><code>
- *  public class ABean extends JavaBean {
+ *  public class ABean extends AbstractBean {
  *    private String foo;
  *    
  *    public void setFoo(String newFoo) {
@@ -65,14 +65,14 @@ import java.beans.VetoableChangeSupport;
  * be assured from the above code fragment that a property change event will only
  * occur if old is indeed different from getFoo()</p>
  * 
- * <p><code>JavaBean</code> also supports {@link VetoablePropertyChange} events. 
+ * <p><code>AbstractBean</code> also supports {@link VetoablePropertyChange} events. 
  * These events are similar to <code>PropertyChange</code> events, except a special
  * exception can be used to veto changing the property. For example, perhaps the
  * property is changing from "fred" to "red", but a listener deems that "red" is 
  * unexceptable. In this case, the listener can fire a veto exception and the property must
  * remain "fred". For example:
  * <pre><code>
- *  public class ABean extends JavaBean {
+ *  public class ABean extends AbstractBean {
  *    private String foo;
  *    
  *    public void setFoo(String newFoo) throws PropertyVetoException {
@@ -123,14 +123,14 @@ public abstract class AbstractBean {
      */
     private transient VetoableChangeSupport vcs;
     
-    /** Creates a new instance of JavaBean */
+    /** Creates a new instance of AbstractBean */
     protected AbstractBean() {
         pcs = new PropertyChangeSupport(this);
         vcs = new VetoableChangeSupport(this);
     }
     
     /** 
-     * Creates a new instance of JavaBean, using the supplied PropertyChangeSupport and
+     * Creates a new instance of AbstractBean, using the supplied PropertyChangeSupport and
      * VetoableChangeSupport delegates. Neither of these may be null.
      */
     protected AbstractBean(PropertyChangeSupport pcs, VetoableChangeSupport vcs) {
