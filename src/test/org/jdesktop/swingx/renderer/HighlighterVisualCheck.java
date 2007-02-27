@@ -23,6 +23,8 @@ package org.jdesktop.swingx.renderer;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JLabel;
 import javax.swing.table.TableModel;
@@ -47,12 +49,65 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
 //      setSystemLF(true);
       HighlighterVisualCheck test = new HighlighterVisualCheck();
       try {
-         test.runInteractiveTests(".*Table.*");
+          test.runInteractiveTests();
+//         test.runInteractiveTests(".*Table.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
+    
+    /**
+     * Example to highlight against a value/color map.
+     * 
+     */
+    public void interactiveColorValueMappedHighlighter() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        // build a quick color lookup to simulate multi-value value-based
+        // coloring
+        int numberColumn = 3;
+        table.toggleSortOrder(numberColumn);
+        final Map<Integer, Color> lookup = new HashMap<Integer, Color>();
+        Color[] colors = new Color[] { Color.YELLOW, Color.CYAN, Color.MAGENTA,
+                Color.GREEN };
+        int rowsPerColor = (table.getRowCount() - 5) / colors.length;
+        for (int i = 0; i < colors.length; i++) {
+            for (int j = 0; j < rowsPerColor; j++) {
+                lookup.put((Integer) table.getValueAt(i * rowsPerColor + j,
+                        numberColumn), colors[i]);
+            }
+        }
+        table.resetSortOrder();
+        ConditionalHighlighter highlighter = new ConditionalHighlighter() {
+
+            @Override
+            protected Color computeUnselectedBackground(Component renderer,
+                    ComponentAdapter adapter) {
+                return lookup.get(adapter.getFilteredValueAt(adapter.row,
+                        testColumn));
+            }
+
+            /**
+             * Traditional: Override test to look-up if the value is mapped to a
+             * color.
+             */
+            @Override
+            protected boolean test(ComponentAdapter adapter) {
+                if (adapter.isTestable(testColumn)) {
+                    Object value = adapter.getFilteredValueAt(adapter.row,
+                            testColumn);
+                    return lookup.containsKey(value);
+                }
+                return false;
+            }
+
+        };
+        highlighter.setTestColumnIndex(numberColumn);
+        highlighter.setHighlightColumnIndex(-1);
+        table.addHighlighter(highlighter);
+        showWithScrollingInFrame(table,
+                "conditional highlighter with value-based color mapping");
+    }
     
     /**
      * Issue #258-swingx: Background Highlighter must not change custom
@@ -90,6 +145,7 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
     public void interactiveTableConditionalColorBasedOnValue() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
+        table.setForeground(Color.GREEN);
 //    
 //        table.setDefaultRenderer(Object.class, new DefaultTableRenderer());
         ConditionalHighlighter highlighter = new ConditionalHighlighter() {
@@ -100,10 +156,8 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
                 Color foregroundx;
                 if (testAgainstComponent(renderer, adapter)) {
                     foregroundx = Color.RED;
-                } else {
-                    foregroundx = Color.GREEN;
-                }
-                renderer.setForeground(foregroundx);
+                    renderer.setForeground(foregroundx);
+                } 
             }
 
             @Override
@@ -133,6 +187,7 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
         table.addHighlighter(AlternateRowHighlighter.genericGrey);
         table.addHighlighter(highlighter);
         JXTable nohighlight = new JXTable(model);
+        nohighlight.setForeground(table.getForeground());
 //        nohighlight.setDefaultRenderer(Object.class, new DefaultTableRenderer());
         nohighlight.addHighlighter(highlighter);
         showWithScrollingInFrame(table, nohighlight,
