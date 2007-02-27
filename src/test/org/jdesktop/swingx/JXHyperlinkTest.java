@@ -214,6 +214,28 @@ public class JXHyperlinkTest extends InteractiveTestCase {
 
     /**
      * Issue #441-swingx: underline not showing for html text.
+     * While text wrapping as such is working with html text the
+     * underline is only under the last line. 
+     */
+    public void interactiveHtmlUnderlineWrapping() {
+        Action action = new AbstractAction("<html><b><i>Bold Italic Link and another loong way way out part of the text</i></b></html>") {
+
+            public void actionPerformed(ActionEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+        };
+        JXHyperlink hyperlink = new JXHyperlink(action );
+        JFrame frame = wrapInFrame(hyperlink, "show html underline ");
+        frame.setSize(200, 200);
+        frame.setVisible(true);
+        
+    }
+    
+
+    /**
+     * Issue #441-swingx: underline not showing for html text.
      *
      */
     public void interactiveTestHtmlUnderlineButton() {
