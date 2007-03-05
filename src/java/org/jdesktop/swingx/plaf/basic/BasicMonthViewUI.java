@@ -131,6 +131,14 @@ public class BasicMonthViewUI extends MonthViewUI {
         installDefaults();
         installKeyboardActions();
         installListeners();
+        
+        if (monthView.getCalendar() != null) {
+          firstDisplayedDate = monthView.getCalendar().getTimeInMillis();
+          firstDisplayedMonth = monthView.getCalendar().get(Calendar.MONTH);
+          firstDisplayedYear = monthView.getCalendar().get(Calendar.YEAR);
+        }
+        
+        selection = monthView.getSelection();
     }
 
     public void uninstallUI(JComponent c) {
