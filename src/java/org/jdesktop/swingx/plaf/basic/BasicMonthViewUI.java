@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.SortedSet;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
@@ -87,8 +88,8 @@ public class BasicMonthViewUI extends MonthViewUI {
     private MouseListener mouseListener;
     private MouseMotionListener mouseMotionListener;
     private Handler handler;
-    private ImageIcon monthUpImage;
-    private ImageIcon monthDownImage;
+    protected Icon monthUpImage;
+    protected Icon monthDownImage;
     private Rectangle dirtyRect = new Rectangle();
     private Rectangle bounds = new Rectangle();
     private Color weekOfTheYearForeground;
@@ -758,10 +759,9 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         // Paint arrow buttons for traversing months if enabled.
         if (monthView.isTraversable()) {
-            g.drawImage(monthDownImage.getImage(),
-                    x + arrowPaddingX, y + ((fullMonthBoxHeight - monthDownImage.getIconHeight()) / 2), null);
-            g.drawImage(monthUpImage.getImage(), x + width - arrowPaddingX - monthUpImage.getIconWidth(),
-                    y + ((fullMonthBoxHeight - monthDownImage.getIconHeight()) / 2), null);
+            //draw the icons
+            monthDownImage.paintIcon(monthView, g, x + arrowPaddingX, y + ((fullMonthBoxHeight - monthDownImage.getIconHeight()) / 2));
+            monthUpImage.paintIcon(monthView, g, x + width - arrowPaddingX - monthUpImage.getIconWidth(), y + ((fullMonthBoxHeight - monthDownImage.getIconHeight()) / 2));
         }
 
         // Paint background of the short names for the days of the week.
