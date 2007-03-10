@@ -23,6 +23,8 @@ package org.jdesktop.swingx.renderer;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Polygon;
+import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -56,8 +58,10 @@ import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
 import org.jdesktop.swingx.painter.ImagePainter;
 import org.jdesktop.swingx.painter.Painter;
+import org.jdesktop.swingx.painter.ShapePainter;
 import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
 import org.jdesktop.swingx.table.ColumnControlButton;
+import org.jdesktop.swingx.util.Resize;
 import org.jdesktop.test.AncientSwingTeam;
 
 /**
@@ -84,6 +88,46 @@ public class PainterVisualCheck extends InteractiveTestCase {
           e.printStackTrace();
       }
   }
+
+    public void interactiveTriangleRenderer() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        ConditionalHighlighter highlighter = new ConditionalHighlighter() {
+            ShapePainter painter;
+            
+            @Override
+            protected Component doHighlight(Component renderer, ComponentAdapter adapter) {
+                if (renderer instanceof PainterAware) {
+                    ((PainterAware) renderer).setPainter(getPainter());                    
+                }
+                return renderer;
+            }
+
+            private ShapePainter getPainter() {
+                if (painter == null) {
+                    // todo: NPE with null shape - file issue
+                    painter = new ShapePainter();
+                    Shape polygon = new Polygon(new int[] { 0, 5, 5 },
+                            new int[] { 0, 0, 5 }, 3);
+                    painter.setShape(polygon);
+                    painter.setFillPaint(Color.RED);
+                    painter.setResize(Resize.NONE);
+                    // hmm.. how to make this stick to the trailing upper corner?
+                    painter.setResizeLocation(Resize.HORIZONTAL);
+                }
+                return painter;
+            }
+
+            @Override
+            protected boolean test(ComponentAdapter adapter) {
+                // here goes the ultimate decision - replace with context
+                return adapter.column == adapter.modelToView(getHighlightColumnIndex());
+            }
+            
+        };
+        highlighter.setHighlightColumnIndex(3);
+        table.addHighlighter(highlighter);
+        showWithScrollingInFrame(table, "Renderer with Triangle marker");
+    }
 
     /**
      * Use GradientPainter for value-based background highlighting
