@@ -19,6 +19,37 @@ import org.jdesktop.test.PropertyChangeReport;
 public class ColumnFactoryTest extends InteractiveTestCase {
 
     /**
+     * Issue #470-swingx: added getRowCount(table)
+     *
+     */
+    public void testEncapsulateRowCount() {
+        final int cutOffRowCount = 10;
+        ColumnFactory factory = new ColumnFactory() {
+           @Override
+           protected int getRowCount(JXTable table) {
+               return cutOffRowCount;
+           }
+        };
+        DefaultTableModel model = new DefaultTableModel(cutOffRowCount * 2, 2) {
+
+            @Override
+            public Object getValueAt(int row, int column) {
+                if (row >= cutOffRowCount) {
+                    throw new IllegalArgumentException("Illegal access to cutoff rows");
+                }
+                return super.getValueAt(row, column);
+            }
+             
+        };
+        JXTable table = new JXTable();
+        table.setColumnFactory(factory);
+        
+        table.setModel(model);
+        factory.packColumn(table, table.getColumnExt(0), -1, -1);
+        
+        
+    }
+    /**
      * Issue #315-swingx: pack doesn't pass column index to headerRenderer.
      * This bug shows only if the renderer relies on the column index (default doesn't). 
      */

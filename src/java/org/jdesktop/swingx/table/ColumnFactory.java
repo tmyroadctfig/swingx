@@ -269,9 +269,9 @@ public class ColumnFactory {
                 columnExt.getHeaderValue(), false, false, 0, column);
         int width = comp.getPreferredSize().width;
 
-        if (table.getRowCount() > 0)
+        if (getRowCount(table) > 0)
             renderer = table.getCellRenderer(0, column);
-        for (int r = 0; r < table.getRowCount(); r++) {
+        for (int r = 0; r < getRowCount(table); r++) {
             comp = renderer.getTableCellRendererComponent(table, table
                     .getValueAt(r, column), false, false, r, column);
             width = Math.max(width, comp.getPreferredSize().width);
@@ -287,6 +287,26 @@ public class ColumnFactory {
 
         columnExt.setPreferredWidth(width);
 
+    }
+
+    /**
+     * Returns the number of table view rows accessible during row-related
+     * config. All row-related access is bounded by the value returned from this
+     * method.
+     * 
+     * Here: delegates to table.getRowCount().
+     * <p>
+     * 
+     * Subclasses can override to reduce the number (for performance) or support
+     * restrictions due to lazy loading, f.i. Implementors must guarantee that
+     * view row access with <code>0 <= row < getRowCount(JXTable)</code>
+     * succeeds.
+     * 
+     * @param table the table to access
+     * @return valid rowCount
+     */
+    protected int getRowCount(JXTable table) {
+        return table.getRowCount();
     }
     
 // ------------------------ default state
