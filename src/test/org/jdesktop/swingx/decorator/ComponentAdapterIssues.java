@@ -21,11 +21,18 @@
  */
 package org.jdesktop.swingx.decorator;
 
-import javax.swing.table.DefaultTableModel;
+import java.awt.Color;
+import java.util.regex.Pattern;
 
-import org.jdesktop.swingx.JXTable;
+import javax.swing.ListCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.tree.TreeCellRenderer;
 
 import junit.framework.TestCase;
+
+import org.jdesktop.swingx.JXList;
+import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.JXTree;
 
 /**
  * Test to exposed known issues of <code>ComponentAdapter</code>.
@@ -39,6 +46,44 @@ import junit.framework.TestCase;
  */
 public class ComponentAdapterIssues extends TestCase {
 
+    /**
+     * Renderers are doc'ed to cope with invalid input values.
+     * Highlighters can rely on valid ComponentAdapter state. 
+     * JXList delegatingRenderer is the culprit which does set
+     * invalid ComponentAdapter state.
+     *
+     */
+    public void testIllegalListRowIndex() {
+        JXList list = new JXList(new Object[] {1, 2, 3});
+        ListCellRenderer renderer = list.getCellRenderer();
+        renderer.getListCellRendererComponent(list, "dummy", -1, false, false);
+        SearchHighlighter searchHighlighter = new SearchHighlighter(null, Color.RED);
+        searchHighlighter.setHighlightAll();
+        searchHighlighter.setPattern(Pattern.compile("\\QNode\\E"));
+        list.addHighlighter(searchHighlighter);
+        renderer.getListCellRendererComponent(list, "dummy", -1, false, false);
+    }
+    
+    /**
+     * Renderers are doc'ed to cope with invalid input values.
+     * Highlighters can rely on valid ComponentAdapter state. 
+     * JXTree delegatingRenderer is the culprit which does set
+     * invalid ComponentAdapter state.
+     *
+     */
+    public void testIllegalTreeRowIndex() {
+        JXTree tree = new JXTree();
+        tree.expandAll();
+        assertTrue(tree.getRowCount() > 0);
+        TreeCellRenderer renderer = tree.getCellRenderer();
+        renderer.getTreeCellRendererComponent(tree, "dummy", false, false, false, -1, false);
+        SearchHighlighter searchHighlighter = new SearchHighlighter(null, Color.RED);
+        searchHighlighter.setHighlightAll();
+        searchHighlighter.setPattern(Pattern.compile("\\QNode\\E"));
+        tree.addHighlighter(searchHighlighter);
+        renderer.getTreeCellRendererComponent(tree, "dummy", false, false, false, -1, false);
+    }
+    
     /**
      * Issue #??- ComponentAdapter's default implementation does not
      *    return the value at the adapter's view state.
