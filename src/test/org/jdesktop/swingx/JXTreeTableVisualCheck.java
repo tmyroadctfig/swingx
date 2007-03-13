@@ -71,12 +71,40 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //           test.runInteractiveTests("interactive.*DnD.*");
 //             test.runInteractiveTests("interactive.*Compare.*");
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
-             test.runInteractiveTests("interactive.*Grid.*");
+             test.runInteractiveTests("interactive.*RToL.*");
 //             test.runInteractiveTests("interactive.*Line.*");
 //             test.runInteractiveTests("interactive.*Render.*");
         } catch (Exception ex) {
 
         }
+    }
+
+    /**
+     * Issue #471-swingx: No selection on click into hierarchical column outside
+     * node. 
+     *
+     * Check patch and bidi-compliance.
+     */
+    public void interactiveHierarchicalSelectionAndRToL() {
+        final TreeTableModel model = createMutableVisualizeModel();
+        final JXTreeTable table = new JXTreeTable(treeTableModel);
+        final JXFrame frame = wrapWithScrollingInFrame(table, "Selection/Expansion Hacks and Bidi Compliance");
+        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
+
+            public void actionPerformed(ActionEvent e) {
+                ComponentOrientation current = frame.getComponentOrientation();
+                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
+                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+                } else {
+                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+
+                }
+
+            }
+
+        };
+        addAction(frame, toggleComponentOrientation);
+        frame.setVisible(true);
     }
 
     

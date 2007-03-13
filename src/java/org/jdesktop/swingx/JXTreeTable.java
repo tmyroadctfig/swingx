@@ -349,6 +349,7 @@ public class JXTreeTable extends JXTable {
     protected TreeTableHacker createTreeTableHacker() {
 //        return new TreeTableHacker();
         return new TreeTableHackerExt();
+//        return new TreeTableHackerExt2();
     }
 
     /**
@@ -546,6 +547,97 @@ public class JXTreeTable extends JXTable {
         }
 
     }
+    
+    /**
+     * Patch for #471-swingx: no selection on click in hierarchical column
+     * outside of node-text. Mar 2007.
+     * <p>
+     * 
+     * Note: this solves the selection issue but is not bidi-compliant - in RToL
+     * contexts the expansion/collapse handles aren't detected and consequently
+     * are disfunctional.
+     * 
+     * @author tiberiu@dev.java.net
+     */
+    public class TreeTableHackerExt2 extends TreeTableHackerExt {
+        @Override
+        protected boolean expandOrCollapseNode(int column, EventObject e) {
+            if (!isHierarchical(column))
+                return false;
+            if (!mightBeExpansionTrigger(e))
+                return false;
+            boolean changedExpansion = false;
+            MouseEvent me = (MouseEvent) e;
+            if (hackAroundDragEnabled(me)) {
+                /*
+                 * Hack around #168-jdnc: dirty little hack mentioned in the
+                 * forum discussion about the issue: fake a mousePressed if drag
+                 * enabled. The usability is slightly impaired because the
+                 * expand/collapse is effectively triggered on released only
+                 * (drag system intercepts and consumes all other).
+                 */
+                me = new MouseEvent((Component) me.getSource(),
+                        MouseEvent.MOUSE_PRESSED, me.getWhen(), me
+                                .getModifiers(), me.getX(), me.getY(), me
+                                .getClickCount(), me.isPopupTrigger());
+            }
+            // If the modifiers are not 0 (or the left mouse button),
+            // tree may try and toggle the selection, and table
+            // will then try and toggle, resulting in the
+            // selection remaining the same. To avoid this, we
+            // only dispatch when the modifiers are 0 (or the left mouse
+            // button).
+            if (me.getModifiers() == 0
+                    || me.getModifiers() == InputEvent.BUTTON1_MASK) {
+                // compute where the mouse point is relative to the tree
+                // renderer
+                Point treeMousePoint = new Point(me.getX()
+                        - getCellRect(0, column, false).x, me.getY());
+                int treeRow = renderer.getRowForLocation(treeMousePoint.x,
+                        treeMousePoint.y);
+                int row = 0;
+                if (treeRow < 0) {
+                    row = renderer.getClosestRowForLocation(treeMousePoint.x,
+                            treeMousePoint.y);
+                    Rectangle bounds = renderer.getRowBounds(row);
+                    if (bounds == null) {
+                        row = -1;
+                    } else {
+                        if ((bounds.y + bounds.height < treeMousePoint.y)
+                                || bounds.x > treeMousePoint.x) {
+                            row = -1;
+                        }
+                    }
+                    // make sure the expansionChangedFlag is set to false for
+                    // the case that up in the tree nothing happens
+                    expansionChangedFlag = false;
+                }
+
+                if ((treeRow >= 0) || ((treeRow < 0) && (row < 0))) {
+                    // default selection
+                    MouseEvent pressed = new MouseEvent(renderer, me.getID(),
+                            me.getWhen(), me.getModifiers(), treeMousePoint.x,
+                            treeMousePoint.y, me.getClickCount(), me
+                                    .isPopupTrigger());
+                    renderer.dispatchEvent(pressed);
+                    // For Mac OS X, we need to dispatch a MOUSE_RELEASED as
+                    // well
+                    MouseEvent released = new MouseEvent(renderer,
+                            java.awt.event.MouseEvent.MOUSE_RELEASED, pressed
+                                    .getWhen(), pressed.getModifiers(), pressed
+                                    .getX(), pressed.getY(), pressed
+                                    .getClickCount(), pressed.isPopupTrigger());
+                    renderer.dispatchEvent(released);
+                }
+                if (expansionChangedFlag) {
+                    changedExpansion = true;
+                }
+            }
+            expansionChangedFlag = false;
+            return changedExpansion;
+        }
+    }
+    
     /**
      * decides whether we want to apply the hack for #168-jdnc. here: returns
      * true if dragEnabled() and the improved drag handling is not activated (or
