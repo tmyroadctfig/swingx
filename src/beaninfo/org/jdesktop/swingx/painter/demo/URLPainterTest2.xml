@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<java version="1.5.0_06" class="java.beans.XMLDecoder"> 
+ <void id="PainterUtil$PersistenceOwner0" property="owner"/> 
+ <object class="org.jdesktop.swingx.painter.ImagePainter"> 
+  <void id="EffectArray0" property="effects"/> 
+  <void property="effects"> 
+   <object idref="EffectArray0"/> 
+  </void> 
+  <void property="resolver"> 
+   <object idref="PainterUtil$PersistenceOwner0"/> 
+  </void> 
+  <void property="imageString"> 
+   <string>border.gif</string> 
+  </void> 
+ </object> 
+</java> 

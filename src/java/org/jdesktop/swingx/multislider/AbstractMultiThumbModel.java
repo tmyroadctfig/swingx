@@ -8,12 +8,12 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -32,34 +32,60 @@ public abstract class AbstractMultiThumbModel<E> implements MultiThumbModel<E> {
     /** Creates a new instance of AbstractMultiThumbModel */
     public AbstractMultiThumbModel() {
     }
-
+    
     protected float maximumValue = 1.0f;
     protected float minimumValue = 0.0f;
-
+    
     public float getMaximumValue()	{
-	return maximumValue;
+        return maximumValue;
     }
-
+    
     public float getMinimumValue()	{
-	return minimumValue;
+        return minimumValue;
     }
-
+    
     public void setMaximumValue(float maximumValue)	{
-	this.maximumValue = maximumValue;
+        this.maximumValue = maximumValue;
     }
-
+    
     public void setMinimumValue(float minimumValue)	{
-	this.minimumValue = minimumValue;
+        this.minimumValue = minimumValue;
     }
-
+    
     protected List<ThumbDataListener> thumbDataListeners = new ArrayList<ThumbDataListener>();
-
+    
     public void addThumbDataListener(ThumbDataListener listener) {
-	thumbDataListeners.add(listener);
+        thumbDataListeners.add(listener);
     }
-
+    
     public void removeThumbDataListener(ThumbDataListener listener) {
-	thumbDataListeners.remove(listener);
+        thumbDataListeners.remove(listener);
     }
+    
+    
+    
+    public void thumbPositionChanged(Thumb thumb) {
+        fireThumbPositionChanged(thumb);
+    }
+    
+    protected void fireThumbPositionChanged(Thumb thumb) {
+        if(getThumbIndex(thumb) >= 0) {
+            ThumbDataEvent evt = new ThumbDataEvent(this,-1,getThumbIndex(thumb),thumb);
+            for(ThumbDataListener l : thumbDataListeners) {
+                l.positionChanged(evt);
+            }
+        }
+    }
+    public void thumbValueChanged(Thumb thumb) {
+        fireThumbValueChanged(thumb);
+    }
+    
+    protected void fireThumbValueChanged(Thumb thumb) {
+        ThumbDataEvent evt = new ThumbDataEvent(this,-1,getThumbIndex(thumb),thumb);
+        for(ThumbDataListener l : thumbDataListeners) {
+            l.valueChanged(evt);
+        }
+    }
+    
 }
 

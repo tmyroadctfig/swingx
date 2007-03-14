@@ -77,7 +77,7 @@ public class JRendererCheckBox extends JCheckBox implements PainterAware {
             try {
                 g.setColor(getBackground());
                 g.fillRect(0, 0, getWidth(), getHeight());
-                painter.paint(g, this);
+                painter.paint(g, this, getWidth(), getHeight());
                 ui.paint(scratchGraphics, this);
             } finally {
                 scratchGraphics.dispose();

@@ -11,6 +11,7 @@ package org.jdesktop.swingx.editors;
 
 import java.awt.Color;
 import java.awt.GradientPaint;
+import java.awt.Insets;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Area;
@@ -29,16 +30,13 @@ import java.beans.Expression;
 import java.beans.PersistenceDelegate;
 import java.beans.PropertyEditorSupport;
 import java.beans.Statement;
-import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import javax.swing.JFrame;
 import org.apache.batik.ext.awt.LinearGradientPaint;
 import org.apache.batik.ext.awt.MultipleGradientPaint.ColorSpaceEnum;
 import org.apache.batik.ext.awt.RadialGradientPaint;
 import org.jdesktop.swingx.JXPanel;
-import org.jdesktop.swingx.painter.BackgroundPainter;
+//import org.jdesktop.swingx.painter.BackgroundPainter;
 import org.jdesktop.swingx.painter.CheckerboardPainter;
 import org.jdesktop.swingx.painter.CompoundPainter;
 import org.jdesktop.swingx.painter.GlossPainter;
@@ -47,9 +45,9 @@ import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.painter.PinstripePainter;
 import org.jdesktop.swingx.painter.ShapePainter;
 import org.jdesktop.swingx.painter.TextPainter;
-import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
-import org.jdesktop.swingx.painter.gradient.LinearGradientPainter;
-import org.jdesktop.swingx.painter.gradient.RadialGradientPainter;
+//import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
+//import org.jdesktop.swingx.painter.gradient.LinearGradientPainter;
+//import org.jdesktop.swingx.painter.gradient.RadialGradientPainter;
 
 /**
  * Two parts to this property editor. The first part is a simple dropdown.
@@ -66,14 +64,14 @@ public class PainterPropertyEditor extends PropertyEditorSupport {
     public Painter getValue() {
         return (Painter)super.getValue();
     }
-
+    
     public String getJavaInitializationString() {
         Painter painter = getValue();
         //TODO!!!
-        return painter == null ? "null" : 
+        return painter == null ? "null" :
             "new org.jdesktop.swingx.painter.CheckerboardPainter()";
     }
-
+    
     public static void main(String... args) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(300);
         XMLEncoder e = new XMLEncoder(baos);
@@ -100,20 +98,22 @@ public class PainterPropertyEditor extends PropertyEditorSupport {
         e.setPersistenceDelegate(AffineTransform.class, new AffineTransformDelegate());
         e.setPersistenceDelegate(RadialGradientPaint.class, new RadialGradientPaintDelegate());
         e.setPersistenceDelegate(LinearGradientPaint.class, new LinearGradientPaintDelegate());
+        e.setPersistenceDelegate(Insets.class, new InsetsDelegate());
         
+        /*
         Area a = new Area(new RoundRectangle2D.Double(20, 20, 50, 50, 4, 4));
         a.add(new Area(new Ellipse2D.Double(10, 10, 100, 20)));
-        
+         
         TextPainter textPainter = new TextPainter("Yo dude");
-        textPainter.setPaint(Color.WHITE);
+        textPainter.setFillPaint(Color.WHITE);
         
         e.writeObject(new CompoundPainter(
-                new BackgroundPainter(),
+                new MattePainter(),
                 new CheckerboardPainter(),
                 new MattePainter(Color.BLACK),
-                new BasicGradientPainter(BasicGradientPainter.RED_XP),
-                new LinearGradientPainter(LinearGradientPainter.BLACK_PERSPECTIVE),
-                new RadialGradientPainter(new RadialGradientPaint(
+                //new BasicGradientPainter(BasicGradientPainter.RED_XP),
+                //new LinearGradientPainter(LinearGradientPainter.BLACK_PERSPECTIVE),
+                new MattePainter(new RadialGradientPaint(
                     new Point2D.Double(.5, .5),
                     .2f, new float[] {0f, .5f, 1f},
                     new Color[] {Color.BLACK,Color.WHITE,Color.RED})),
@@ -121,16 +121,17 @@ public class PainterPropertyEditor extends PropertyEditorSupport {
                 new PinstripePainter(),
                 textPainter,
                 new GlossPainter()
-//                new IconPainter(), 
-//                new ImagePainter(),
+        //                new IconPainter(),
+        //                new ImagePainter(),
                 ));
         e.close();
         System.out.println(baos.toString());
-        
+         
+         
         XMLDecoder d = new XMLDecoder(new ByteArrayInputStream(baos.toByteArray()));
-        
+         
         Painter p = (Painter)d.readObject();
-        
+         
         JFrame frame = new JFrame("Yo momma");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         JXPanel panel = new JXPanel();
@@ -138,6 +139,64 @@ public class PainterPropertyEditor extends PropertyEditorSupport {
         frame.add(panel);
         frame.setSize(800,600);
         frame.setVisible(true);
+         */
+        
+        RadialGradientPaint rp = new RadialGradientPaint(new Point2D.Double(0.5,0.5),
+                .2f, new float[] {0f, .5f, 1f},
+                new Color[] {Color.BLACK, Color.WHITE, Color.RED}
+        );
+        baos = new ByteArrayOutputStream(300);
+        e = new XMLEncoder(baos);
+        TestStuff ts = new TestStuff();
+        //ts.setStr("asdfasdf");
+        ts.str = "asdfasdf";
+        System.out.println("db = " + ts.getDb());
+        ts.setDb(new Point2D.Double(1.0,1.0));
+        ts.setIns(new Insets(5,5,5,5));
+        System.out.println("db = " + ts.getDb());
+        e.writeObject(ts);
+        e.close();
+        System.out.println("more stuff");
+        System.out.println(baos.toString());
+        if(new Point2D.Double(0,0).equals(new Point2D.Double(1,1))) {
+            System.out.println("they are equal");
+        } else {
+            System.out.println("they are not equal");
+        }
+    }
+    
+    public static final class TestStuff {
+        public Point2D.Double db = null;// = new Point2D.Double(5,5);
+        public TestStuff() {
+            
+        }
+        public TestStuff(Point2D.Double db, String str) {
+            setDb(db);
+            setStr(str);
+        }
+        public void setDb(Point2D.Double db) {
+            this.db = db;
+        }
+        public Point2D.Double getDb() {
+            //new Exception().printStackTrace();
+            return this.db;
+        }
+        public String str = "asdf";
+        public void setStr(String str) {
+            this.str = str;
+        }
+        public String getStr() {
+            return this.str;
+        }
+        private Insets ins = null;
+        
+        public Insets getIns() {
+            return ins;
+        }
+        
+        public void setIns(Insets ins) {
+            this.ins = ins;
+        }
     }
     
     public static final class GradientPaintDelegate extends DefaultPersistenceDelegate {
@@ -152,7 +211,7 @@ public class PainterPropertyEditor extends PropertyEditorSupport {
             //colorspace. I haven't figured out how to transfer that one yet
             //, "cycleMethod", "colorSpace", "transform"});
         }
-
+        
         protected Expression instantiate(Object oldInstance, Encoder out) {
             
             ColorSpaceEnum e = ((LinearGradientPaint)oldInstance).getColorSpace();
@@ -193,7 +252,21 @@ public class PainterPropertyEditor extends PropertyEditorSupport {
     public static final class Point2DDelegate extends DefaultPersistenceDelegate {
         public Point2DDelegate() {
             super(new String[] {"x", "y"});
-        }
+        }/*
+    protected Expression instantiate(Object oldInstance, Encoder out) {
+       Point2D pt = (Point2D)oldInstance;
+       Object[] constructorArgs = new Object[]{
+       pt.getX(), pt.getY()
+       };
+       return new Expression(new Point2D.Double(-1,-1), oldInstance.getClass(), "new", constructorArgs);
+   } */
+   /*
+        protected void initialize(Class<?> type, Object oldInstance, Object newInstance, Encoder out) {
+            super.initialize(type,oldInstance,newInstance,out);
+            System.out.println("initialize called: " + type + " " + oldInstance
+                    + " " + newInstance + " " + out);
+        }*/
+        
     }
     public static final class QuadCurve2DDelegate extends DefaultPersistenceDelegate {
         public QuadCurve2DDelegate() {
@@ -205,6 +278,19 @@ public class PainterPropertyEditor extends PropertyEditorSupport {
             super(new String[] {"x", "y", "width", "height"});
         }
     }
+    public static final class InsetsDelegate extends DefaultPersistenceDelegate {
+        public InsetsDelegate() {
+            super(new String[] {"top", "left", "bottom", "right"});
+        }
+        protected Expression instantiate(Object oldInstance,
+                Encoder out) {
+            Insets ins = (Insets)oldInstance;
+            return new Expression(oldInstance,
+                    oldInstance.getClass(),
+                    "new",
+                    new Object[]{ ins.top, ins.left, ins.bottom, ins.right });
+        }
+    }
     public static final class RoundRectangle2DDelegate extends DefaultPersistenceDelegate {
         public RoundRectangle2DDelegate() {
             super(new String[] {"x", "y", "width", "height", "arcWidth", "arcHeight"});
@@ -213,7 +299,7 @@ public class PainterPropertyEditor extends PropertyEditorSupport {
     public static final class AreaDelegate extends PersistenceDelegate {
         protected Expression instantiate(Object oldInstance, Encoder out) {
             Area a = (Area)oldInstance;
-
+            
             //use the default constructor
             AffineTransform tx = new AffineTransform();
             PathIterator itr = a.getPathIterator(tx);
@@ -224,7 +310,7 @@ public class PainterPropertyEditor extends PropertyEditorSupport {
             while (!itr.isDone()) {
                 float[] segment = new float[6]; //must use floats because lineTo etc use floats
                 int pathType = itr.currentSegment(segment);
-
+                
                 switch (pathType) {
                     case PathIterator.SEG_CLOSE:
                         out.writeStatement(new Statement(path, "closePath", new Object[0]));
@@ -259,16 +345,16 @@ public class PainterPropertyEditor extends PropertyEditorSupport {
         }
         protected void initialize(Class<?> type, Object oldInstance, Object newInstance, Encoder out) {
             GeneralPath a = (GeneralPath)oldInstance;
-
+            
             AffineTransform tx = new AffineTransform();
             PathIterator itr = a.getPathIterator(tx);
-
+            
             out.writeStatement(new Statement(a, "setWindingRule", new Object[] {a.getWindingRule()}));
-
+            
             while (!itr.isDone()) {
                 float[] segment = new float[6]; //must use floats because lineTo etc use floats
                 int pathType = itr.currentSegment(segment);
-
+                
                 switch (pathType) {
                     case PathIterator.SEG_CLOSE:
                         out.writeStatement(new Statement(a, "closePath", new Object[0]));
@@ -293,7 +379,7 @@ public class PainterPropertyEditor extends PropertyEditorSupport {
 //    public static final class PaintDelegate extends PersistenceDelegate {
 //        protected Expression instantiate(Object oldInstance, Encoder out) {
 //            if (oldInstance instanceof GradientPaint) {
-//                
+//
 //            }
 //        }
 //    }

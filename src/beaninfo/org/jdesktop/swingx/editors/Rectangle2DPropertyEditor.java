@@ -44,60 +44,10 @@ public class Rectangle2DPropertyEditor extends PropertyEditorSupport {
     }
 
     public void setAsText(String text) throws IllegalArgumentException {
-        //the text could be in many different formats. All of the supported formats are as follows:
-        //(where x and y are doubles of some form)
-        //[x,y,w,h]
-        //[x y w h]
-        //x,y,w,h]
-        //[x,y w,h
-        //[ x , y w,h] or any other arbitrary whitespace
-        // x , y w h] or any other arbitrary whitespace
-        //[ x , y w, h or any other arbitrary whitespace
-        //x,y w, h
-        // x , y w,h (or any other arbitrary whitespace)
-        //x y w h
-        //or any other such permutation
-        // (empty space)
-        //null
-        //[]
-        //[ ]
-        //any other value throws an IllegalArgumentException
-
         String originalParam = text;
-
-        if (text != null) {
-            //remove any opening or closing brackets
-            text = text.replace('[', ' ');
-            text = text.replace(']', ' ');
-            text = text.replace(',', ' ');
-            //trim whitespace
-            text = text.trim();
-        }
-
-        //test for the simple case
-        if (text == null || text.equals("") || text.equals("null")) {
-            setValue(null);
-            return;
-        }
-
-        //the first sequence of characters must now be a number. So, parse it out
-        //ending at the first whitespace. Then trim and the remaining value must
-        //be the second number. If there are any problems, throw and IllegalArgumentException
         try {
-            int index = text.indexOf(' ');
-            String x = text.substring(0, index).trim();
-            text = text.substring(index).trim();
-            index = text.indexOf(' ');
-            String y = text.substring(0, index).trim();
-            text = text.substring(index).trim();
-            index = text.indexOf(' ');
-            String w = text.substring(0, index).trim();
-            String h = text.substring(index).trim();
-            Rectangle2D.Double val = new Rectangle2D.Double(
-                    Double.parseDouble(x),
-                    Double.parseDouble(y),
-                    Double.parseDouble(w),
-                    Double.parseDouble(h));
+            Rectangle2D val = (Rectangle2D)PropertyEditorUtil.createValueFromString(
+                    text, 4, Rectangle2D.Double.class, double.class);
             setValue(val);
         } catch (Exception e) {
             throw new IllegalArgumentException("The input value " + originalParam + " is not formatted correctly. Please " +

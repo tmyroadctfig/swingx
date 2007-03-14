@@ -17,8 +17,8 @@ import java.awt.Rectangle;
 import java.beans.PropertyEditorSupport;
 import java.util.HashMap;
 import java.util.Map;
-import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
-import org.jdesktop.swingx.painter.gradient.LinearGradientPainter;
+//import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
+//import org.jdesktop.swingx.painter.gradient.LinearGradientPainter;
 
 /**
  * Two parts to this property editor. The first part is a simple dropdown.
@@ -49,6 +49,7 @@ public class PaintPropertyEditor extends PropertyEditorSupport {
 //            BasicGradientPainter.WHITE_TO_CONTROL_HORZONTAL, "White->Control (horizontal)");
 //        DEFAULT_PAINTS.put(
 //            BasicGradientPainter.WHITE_TO_CONTROL_VERTICAL, "White->Control (vertical)");
+        /* josh: this should be replaced with matte painters
         DEFAULT_PAINTS.put(
             BasicGradientPainter.AERITH, "Aerith");
         DEFAULT_PAINTS.put(
@@ -68,7 +69,7 @@ public class PaintPropertyEditor extends PropertyEditorSupport {
         DEFAULT_PAINTS.put(
             LinearGradientPainter.BLACK_STAR, "Black Star");
         DEFAULT_PAINTS.put(
-            LinearGradientPainter.ORANGE_DELIGHT, "Orange Delight");
+            LinearGradientPainter.ORANGE_DELIGHT, "Orange Delight");*/
     }
     
     /** Creates a new instance of PainterPropertyEditor */

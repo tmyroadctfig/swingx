@@ -193,4 +193,36 @@ public class ColorUtil {
                     null);
     }
 
+    public static Color setSaturation(Color color, float saturation) {
+        int alpha = color.getAlpha();
+        
+        float[] cols = Color.RGBtoHSB(color.getRed(),color.getGreen(),color.getBlue(),null);
+        cols[1] = saturation;
+        Color c2 = color.getHSBColor(cols[0],cols[1],cols[2]);
+        
+        return setAlpha(c2,alpha);
+    }
+
+    public static Color interpolate(Color b, Color a, float t) {
+        float[] acomp = a.getRGBComponents(null);
+        float[] bcomp = b.getRGBComponents(null);
+        float[] ccomp = new float[4];
+        
+//        System.out.println("a comp ");
+//        for(float f : acomp) {
+//            System.out.println(f);
+//        }
+//        for(float f : bcomp) {
+//            System.out.println(f);
+//        }
+        for(int i=0; i<4; i++) {
+            ccomp[i] = acomp[i] + (bcomp[i]-acomp[i])*t;
+        }
+//        for(float f : ccomp) {
+//            System.out.println(f);
+//        }
+        
+        return new Color(ccomp[0],ccomp[1],ccomp[2],ccomp[3]);
+    }
+
 }

@@ -21,6 +21,7 @@
 package org.jdesktop.swingx.plaf;
 
 import java.awt.Color;
+import java.awt.GradientPaint;
 import java.util.Arrays;
 import java.util.List;
 
@@ -29,7 +30,8 @@ import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import org.jdesktop.swingx.JXTitledPanel;
-import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
+import org.jdesktop.swingx.painter.MattePainter;
+//import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
 
 /**
  * Addon for <code>JXTitledPanel</code>.<br>
@@ -51,7 +53,7 @@ public class JXTitledPanelAddon extends AbstractComponentAddon {
       UIManager.getFont("Button.font"),
       "JXTitledPanel.title.foreground", new ColorUIResource(Color.WHITE),
       "JXTitledPanel.title.painter", new PainterUIResource(
-              new BasicGradientPainter(0, 0, Color.LIGHT_GRAY, 0, 1, Color.GRAY))
+              new MattePainter(new GradientPaint(0, 0, Color.LIGHT_GRAY, 0, 1, Color.GRAY)))
     }));
   }
   
@@ -63,19 +65,19 @@ public class JXTitledPanelAddon extends AbstractComponentAddon {
       defaults.addAll(Arrays.asList(new Object[] { 
         "JXTitledPanel.title.foreground", new ColorUIResource(255, 255, 255),
         "JXTitledPanel.title.painter", new PainterUIResource(
-                new BasicGradientPainter(0, 0, 
+                new MattePainter(new GradientPaint(0, 0, 
                     new Color(49, 121, 242),
                     0, 1, 
                     new Color(198, 211, 247)
-                    ))
+                    )))
       }));
     } else {
       defaults.addAll(Arrays.asList(new Object[] { 
         "JXTitledPanel.title.foreground", new ColorUIResource(255, 255, 255),
         "JXTitledPanel.title.painter", new PainterUIResource(
-                new BasicGradientPainter(0, 0, 
+                new MattePainter(new GradientPaint(0, 0, 
                     MetalLookAndFeel.getCurrentTheme().getPrimaryControl(), 0, 1,
-                    MetalLookAndFeel.getCurrentTheme().getPrimaryControlDarkShadow()))
+                    MetalLookAndFeel.getCurrentTheme().getPrimaryControlDarkShadow())))
       }));
     }
   }
@@ -97,9 +99,9 @@ public class JXTitledPanelAddon extends AbstractComponentAddon {
             "JXTitledPanel.title.foreground", 
                 getSafeColor("InternalFrame.activeTitleForeground", new ColorUIResource(255, 255, 255)),
             "JXTitledPanel.title.painter", new PainterUIResource(
-                    new BasicGradientPainter(0, 0, 
+                    new MattePainter(new GradientPaint(0, 0, 
                         getSafeColor("InternalFrame.inactiveTitleGradient", new ColorUIResource(49, 121, 242)), 0, 1,
-                        getSafeColor("InternalFrame.activeTitleBackground", new ColorUIResource(198, 211, 247))))
+                        getSafeColor("InternalFrame.activeTitleBackground", new ColorUIResource(198, 211, 247)))))
         }));
 
 //    defaults.addAll(Arrays.asList(new Object[] { 

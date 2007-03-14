@@ -49,4 +49,8 @@ public class ThumbDataEvent extends EventObject {
     public Thumb getThumb() {
 	return thumb;
     }
+    
+    public String toString() {
+        return this.getClass().getName() + " : " + type + " " + index + " " + thumb;
+    }
 }

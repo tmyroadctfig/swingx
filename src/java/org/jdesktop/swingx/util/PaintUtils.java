@@ -35,10 +35,13 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Paint;
 import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.Transparency;
+import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -205,8 +208,19 @@ public class PaintUtils {
         return buff;
     }
 
+    /**
+     * Loads the image at the URL and makes it compatible with the screen.
+     * If loading the url fails then this method will either throw an IOException
+     * or return null.
+     */
     public static BufferedImage loadCompatibleImage(URL resource) throws IOException {
         BufferedImage image = ImageIO.read(resource);
+        if(image == null) return null;
+        return toCompatibleImage(image);
+    }
+    
+    public static BufferedImage loadCompatibleImage(InputStream in) throws IOException {
+        BufferedImage image = ImageIO.read(in);
         if(image == null) return null;
         return toCompatibleImage(image);
     }
@@ -220,4 +234,21 @@ public class PaintUtils {
         return compatibleImage;
     }
 
+    
+    /** Sets then clip on a graphics object by merging with the existing
+     * clip instead of replacing it. The new clip will be an intersection of
+     * the old clip and the passed in clip shape.   The old clip shape will
+     * be returned
+     */
+    public static Shape setMergedClip(Graphics2D g, Shape newClip) {
+        Shape oldClip = g.getClip();
+        if(oldClip == null) {
+            g.setClip(newClip);
+            return null;
+        }
+        Area area = new Area(oldClip);
+        area.intersect(new Area(newClip));//new Rectangle(0,0,width,height)));
+        g.setClip(area);
+        return oldClip;
+    }
 }

@@ -24,12 +24,16 @@ package org.jdesktop.swingx;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Dialog;
+import java.awt.FileDialog;
+import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Paint;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.Window;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -61,6 +65,7 @@ import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JList;
+import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.event.MouseInputAdapter;
 import org.jdesktop.swingx.color.ColorUtil;
@@ -92,6 +97,8 @@ public class JXImageView extends JXPanel {
     /* ======= instance variables ========= */
     // the image this view will show
     private Image image;
+    // the url of the image, if available
+    private URL imageURL;
     
     // support for error listeners
     private ErrorSupport errorSupport = new ErrorSupport(this);
@@ -153,12 +160,12 @@ public class JXImageView extends JXPanel {
      * @param image the new image to set, or null.
      */
     public void setImage(Image image) {
-        Image old = this.getImage();
+        Image oldImage = getImage();
         this.image = image;
         setImageLocation(null);
         setScale(1.0);
+        firePropertyChange("image",oldImage,image);
         repaint();
-        firePropertyChange("image",old,this.image);
     }
     
     /**
@@ -167,6 +174,7 @@ public class JXImageView extends JXPanel {
      * @throws java.io.IOException thrown if the image cannot be loaded
      */
     public void setImage(URL url) throws IOException {
+        setImageURL(url);
         setImage(ImageIO.read(url));
     }
     
@@ -177,7 +185,9 @@ public class JXImageView extends JXPanel {
      */
     public void setImage(File file) throws IOException {
         System.out.println("reading: " + file.getAbsolutePath());
+        setImageURL(file.toURL());
         setImage(ImageIO.read(file));
+        System.out.println("the url = " + getImageURL());
     }
     
     /**
@@ -284,7 +294,19 @@ public class JXImageView extends JXPanel {
     protected void fireError(Throwable throwable) {
         errorSupport.fireErrorEvent(throwable);
     }
+
     
+    private static FileDialog getSafeFileDialog(Component comp) {
+        Window win = SwingUtilities.windowForComponent(comp);
+        if(win instanceof Dialog) {
+            return new FileDialog((Dialog)win);
+        }
+        if(win instanceof Frame) {
+            return new FileDialog((Frame)win);
+        }
+        return null;
+    }
+            
     // an action which will open a file chooser and load the selected image
     // if any.
     /**
@@ -297,6 +319,17 @@ public class JXImageView extends JXPanel {
     public Action getOpenAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent actionEvent) {
+                FileDialog fd = getSafeFileDialog(JXImageView.this);
+                fd.setMode(FileDialog.LOAD);
+                fd.setVisible(true);
+                if(fd.getFile() != null) {
+                    try {
+                        setImage(new File(fd.getDirectory(),fd.getFile()));
+                    } catch (IOException ex) {
+                        fireError(ex);
+                    }
+                }
+                /*
                 JFileChooser chooser = new JFileChooser();
                 chooser.showOpenDialog(JXImageView.this);
                 File file = chooser.getSelectedFile();
@@ -309,6 +342,7 @@ public class JXImageView extends JXPanel {
                         fireError(ex);
                     }
                 }
+                 */
             }
         };
         action.putValue(Action.NAME,"Open");
@@ -337,6 +371,17 @@ public class JXImageView extends JXPanel {
                                    RenderingHints.VALUE_INTERPOLATION_BICUBIC);
                 g.drawImage(img,0,0,null);
                 g.dispose();
+                FileDialog fd = new FileDialog((Frame)SwingUtilities.windowForComponent(JXImageView.this));
+                fd.setMode(FileDialog.SAVE);
+                fd.setVisible(true);
+                if(fd.getFile() != null) {
+                    try {
+                        ImageIO.write(dst,"png",new File(fd.getDirectory(),fd.getFile()));
+                    } catch (IOException ex) {
+                        fireError(ex);
+                    }
+                }
+                /*
                 JFileChooser chooser = new JFileChooser();
                 chooser.showSaveDialog(JXImageView.this);
                 File file = chooser.getSelectedFile();
@@ -349,6 +394,7 @@ public class JXImageView extends JXPanel {
                         fireError(ex);
                     }
                 }
+                 */
             }
         };
 
@@ -664,5 +710,13 @@ public class JXImageView extends JXPanel {
 
     public void setExportFormat(String exportFormat) {
         this.exportFormat = exportFormat;
+    }
+
+    public URL getImageURL() {
+        return imageURL;
+    }
+
+    public void setImageURL(URL imageURL) {
+        this.imageURL = imageURL;
     }
 }

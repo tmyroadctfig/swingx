@@ -49,7 +49,7 @@ import javax.swing.JComponent;
  *
  * @author Romain Guy <romain.guy@mac.com>
  */
-public class GlossPainter extends AbstractPainter {
+public class GlossPainter<T> extends AbstractPainter<T> {
     /**
      * <p>Used to define the position of the gloss on the painted area.</p>
      */
@@ -98,30 +98,28 @@ public class GlossPainter extends AbstractPainter {
     public GlossPainter(Paint paint, GlossPosition position) {
         this.setPaint(paint);
         this.setPosition(position);
-        
-        setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-            RenderingHints.VALUE_ANTIALIAS_ON);
     }
 
     /**
      * {@inheritDoc}
      */
-    protected void paintBackground(Graphics2D g, JComponent component) {
+    protected void doPaint(Graphics2D g, T component, int width, int height) {
         if (getPaint() != null) {
-            Ellipse2D ellipse = new Ellipse2D.Double(-component.getWidth() / 2.0,
-                component.getHeight() / 2.7, component.getWidth() * 2.0,
-                component.getHeight() * 2.0);
+            Ellipse2D ellipse = new Ellipse2D.Double(-width / 2.0,
+                height / 2.7, width * 2.0,
+                height * 2.0);
 
             Area gloss = new Area(ellipse);
             if (getPosition() == GlossPosition.TOP) {
                 Area area = new Area(new Rectangle(0, 0,
-                    component.getWidth(), component.getHeight()));
+                    width, height));
                 area.subtract(new Area(ellipse));
                 gloss = area;
             }
+            /*
             if(getClip() != null) {
                 gloss.intersect(new Area(getClip()));
-            }
+            }*/
             g.setPaint(getPaint());
             g.fill(gloss);
         }

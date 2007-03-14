@@ -380,7 +380,10 @@ public class JXMultiThumbSlider<E> extends JComponent {
     private class ThumbHandler implements ThumbDataListener {
 
         public void positionChanged(ThumbDataEvent e) {
-            System.out.println("position changed");
+            ThumbComp comp = thumbs.get(e.getIndex());
+            clipThumbPosition(comp);
+            setThumbXByPosition(comp, e.getThumb().getPosition());
+            repaint();
         }
 
         public void thumbAdded(ThumbDataEvent evt) {
@@ -401,7 +404,7 @@ public class JXMultiThumbSlider<E> extends JComponent {
         }
 
         public void valueChanged(ThumbDataEvent e) {
-            System.out.println("value changed");
+            repaint();
         }
     }
 

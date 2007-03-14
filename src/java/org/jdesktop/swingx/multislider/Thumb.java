@@ -28,9 +28,11 @@ package org.jdesktop.swingx.multislider;
 public class Thumb<E> {
     private float position;
     private E object;
+    private MultiThumbModel model;
 
     /** Creates a new instance of Thumb */
-    public Thumb() {
+    public Thumb(MultiThumbModel model) {
+        this.model = model;
     }
 
     public float getPosition() {
@@ -39,6 +41,7 @@ public class Thumb<E> {
 
     public void setPosition(float position) {
         this.position = position;
+        model.thumbPositionChanged(this);
     }
 
     public E getObject() {
@@ -47,5 +50,6 @@ public class Thumb<E> {
 
     public void setObject(E object) {
         this.object = object;
+        model.thumbValueChanged(this);
     }
 }

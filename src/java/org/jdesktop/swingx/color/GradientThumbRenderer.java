@@ -63,7 +63,7 @@ public class GradientThumbRenderer extends JComponent implements ThumbRenderer {
     }
 
     public JComponent getThumbRendererComponent(JXMultiThumbSlider slider, int index, boolean selected) {
-	Color c = (Color)gradientPicker.getSlider().getModel().getThumbAt(index).getObject();
+	Color c = (Color)slider.getModel().getThumbAt(index).getObject();
 	c = ColorUtil.removeAlpha(c);
         this.setForeground(c);
         this.selected = selected;

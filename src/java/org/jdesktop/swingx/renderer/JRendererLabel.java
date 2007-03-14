@@ -107,7 +107,7 @@ public class JRendererLabel extends JLabel implements PainterAware {
                 paintComponentWithPainter((Graphics2D) g);
             } else {
                 // transparent apply the background painter before calling super
-                painter.paint((Graphics2D) g, this);
+                painter.paint((Graphics2D) g, this, getWidth(), getHeight());
                 super.paintComponent(g);
             }
         } else {
@@ -129,7 +129,7 @@ public class JRendererLabel extends JLabel implements PainterAware {
             try {
                 g.setColor(getBackground());
                 g.fillRect(0, 0, getWidth(), getHeight());
-                painter.paint(g, this);
+                painter.paint(g, this, getWidth(), getHeight());
                 ui.paint(scratchGraphics, this);
             }
             finally {

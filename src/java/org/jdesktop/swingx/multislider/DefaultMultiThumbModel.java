@@ -41,20 +41,22 @@ public class DefaultMultiThumbModel<E> extends AbstractMultiThumbModel<E> implem
 	setMinimumValue(0.0f);
 	setMaximumValue(1.0f);
     }
-    
-    public void addThumb(float value, E obj) {
-	Thumb<E> thumb = new Thumb<E>();
+    // returns the index of the newly added thumb
+    public int addThumb(float value, E obj) {
+	Thumb<E> thumb = new Thumb<E>(this);
 	thumb.setPosition(value);
 	thumb.setObject(obj);
 	thumbs.add(thumb);
+        int n = thumbs.size();
 	ThumbDataEvent evt = new ThumbDataEvent(this,-1,thumbs.size()-1,thumb);
 	for(ThumbDataListener tdl : thumbDataListeners) {
 	    tdl.thumbAdded(evt);
 	}
+        return n-1;
     }
 
     public void insertThumb(float value, E obj, int index) {
-	Thumb thumb = new Thumb();
+	Thumb thumb = new Thumb(this);
 	thumb.setPosition(value);
 	thumb.setObject(obj);
 	thumbs.add(index,thumb);
@@ -62,11 +64,6 @@ public class DefaultMultiThumbModel<E> extends AbstractMultiThumbModel<E> implem
 	for(ThumbDataListener tdl : thumbDataListeners) {
 	    tdl.thumbAdded(evt);
 	}
-	/*
-	for(ThumbChangeListener tcl : thumbChangeListeners) {
-	    tcl.thumbAdded(thumb,index);
-	}
-	 */
     }
 
     public void removeThumb(int index) {
@@ -75,11 +72,6 @@ public class DefaultMultiThumbModel<E> extends AbstractMultiThumbModel<E> implem
 	for(ThumbDataListener tdl : thumbDataListeners) {
 	    tdl.thumbRemoved(evt);
 	}
-	/*
-	for(ThumbChangeListener tcl : thumbChangeListeners) {
-	    tcl.thumbRemoved(thumb, index);
-	}
-	 */
     }
 
     public int getThumbCount() {
@@ -111,5 +103,9 @@ public class DefaultMultiThumbModel<E> extends AbstractMultiThumbModel<E> implem
 
     public Iterator<Thumb<E>> iterator() {
 	return thumbs.iterator();
+    }
+
+    public int getThumbIndex(Thumb<E> thumb) {
+        return thumbs.indexOf(thumb);
     }
 }

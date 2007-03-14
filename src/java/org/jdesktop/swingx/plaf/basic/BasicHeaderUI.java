@@ -23,6 +23,7 @@ package org.jdesktop.swingx.plaf.basic;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -38,8 +39,9 @@ import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 import org.jdesktop.swingx.JXEditorPane;
 import org.jdesktop.swingx.JXHeader;
+import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
-import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
+//import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
 import org.jdesktop.swingx.plaf.HeaderUI;
 import org.jdesktop.swingx.plaf.PainterUIResource;
 
@@ -216,7 +218,7 @@ public class BasicHeaderUI extends HeaderUI {
     }
     
     protected Painter createBackgroundPainter() {
-        return new PainterUIResource(new BasicGradientPainter(0, 0, Color.WHITE, 1, 0, UIManager.getColor("control")));
+        return new PainterUIResource(new MattePainter(new GradientPaint(0, 0, Color.WHITE, 1, 0, UIManager.getColor("control"))));
     }
 
     @Override

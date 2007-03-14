@@ -1554,7 +1554,7 @@ public class JXGraph extends JXPanel {
         if (isBackgroundPainted()) {
             Painter p = getBackgroundPainter();
             if (p != null) {
-                p.paint(g2, this);
+                p.paint(g2, this, getWidth(), getHeight());
             } else {
                 g2.setColor(getBackground());
                 g2.fill(g2.getClipBounds());

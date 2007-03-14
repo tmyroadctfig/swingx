@@ -9,8 +9,7 @@
 
 package org.jdesktop.swingx.painter;
 
-import org.jdesktop.swingx.BeanInfoSupport;
-import org.jdesktop.swingx.editors.PaintPropertyEditor;
+import org.jdesktop.swingx.editors.Paint2PropertyEditor;
 
 /**
  *
@@ -22,11 +21,10 @@ public class PinstripePainterBeanInfo extends AbstractPainterBeanInfo {
     public PinstripePainterBeanInfo() {
         super(PinstripePainter.class);
     }
-
     protected void initialize() {
         super.initialize();
         setPreferred(true, "angle", "spacing", "paint");
-        setHidden(true, "class", "propertyChangeListeners", "image");
-        setPropertyEditor(PaintPropertyEditor.class, "paint");
+        setHidden(true, "class", "propertyChangeListeners");
+        setPropertyEditor(Paint2PropertyEditor.class, "paint");
     }
 }

@@ -8,12 +8,12 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -21,91 +21,61 @@
 
 package org.jdesktop.swingx.painter;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import javax.swing.JComponent;
+import org.jdesktop.swingx.painter.effects.AreaEffect;
 import org.jdesktop.swingx.util.Resize;
 
+
 /**
- * <p>A Painter that paints Shapes. It uses a stroke and a fillPaint to do so. The
+ * <p>A Painter that paints java.awt.Shapes. It uses a stroke and a fillPaint to do so. The
  * shape is painted as is, at a specific location. If no Shape is specified, nothing
  * will be painted. If no stroke is specified, the default for the Graphics2D
  * will be used. If no fillPaint is specified, the component background color
- * will be used. And if no location is specified, then the shape will be draw
- * at the origin (0,0)</p>
+ * will be used. The shape can be positioned using the insets, horizontal, and
+ * vertical properties.</p>
  * 
- * <p>Here is an example that draws a lowly rectangle:
+ * <p>Here is an example that draws a rectangle aligned on the center right:
  * <pre><code>
  *  Rectangle2D.Double rect = new Rectangle2D.Double(0, 0, 50, 50);
  *  ShapePainter p = new ShapePainter(rect);
- *  p.setLocation(new Point2D.Double(20, 10));
+ * p.setHorizontal(HorizontalAlignment.RIGHT);
+ * p.setVertical(VerticalAlignment.CENTER);
  * </code></pre>
- * 
- * 
  * @author rbair
  */
-public class ShapePainter extends AbstractPainter {
-    /**
-     * Different available fill styles. BOTH indicates that both the outline,
-     * and the fill should be painted. This is the default. FILLED indicates that
-     * the shape should be filled, but no outline painted. OUTLINE specifies that
-     * the shape should be outlined, but not filled
-     */
-    public enum Style {BOTH, FILLED, OUTLINE}
-    
+public class ShapePainter<T> extends AbstractAreaPainter<T> {
     /**
      * The Shape to fillPaint. If null, nothing is painted.
      */
     private Shape shape;
-    /**
-     * The Stroke to use when painting. If null, the default Stroke for
-     * the Graphics2D is used
-     */
-    private Stroke stroke;
-    /**
-     * The Paint to use when painting the shape. If null, then the component
-     * background color is used
-     */
-    private Paint fillPaint;
-    /**
-     * The Paint to use when stroking the shape (drawing the outline). If null,
-     * then the component foreground color is used
-     */
-    private Paint strokePaint;
-    /**
-     * The location at which to draw the shape. If null, 0,0 is used
-     */
-    private Point2D location = new Point2D.Double(0, 0);
-    /**
-     * Specifies if/how resizing (relocating) the location should occur.
-     */
-    private Resize resizeLocation = Resize.BOTH;
-    /**
-     * Specifies if/how resizing of the shape should occur
-     */
-    private Resize resize = Resize.BOTH;
-    /**
-     * Indicates whether the shape should be filled or outlined, or both
-     */
-    private Style style = Style.BOTH;
     
     /**
      * Create a new ShapePainter
      */
     public ShapePainter() {
         super();
+        this.shape = new Ellipse2D.Double(0,0,100,100);
+        this.setBorderWidth(3);
+        this.setFillPaint(Color.RED);
+        this.setBorderPaint(Color.BLACK);
     }
     
     /**
      * Create a new ShapePainter with the specified shape.
-     * 
-     * 
+     *
+     *
      * @param shape the shape to fillPaint
      */
     public ShapePainter(Shape shape) {
@@ -115,22 +85,22 @@ public class ShapePainter extends AbstractPainter {
     
     /**
      * Create a new ShapePainter with the specified shape and fillPaint.
-     * 
-     * 
+     *
+     *
      * @param shape the shape to fillPaint
      * @param paint the fillPaint to be used to fillPaint the shape
      */
     public ShapePainter(Shape shape, Paint paint) {
         super();
         this.shape = shape;
-        this.fillPaint = paint;
+        this.setFillPaint(paint);
     }
     
     /**
      * Create a new ShapePainter with the specified shape and fillPaint. The shape
      * can be filled or stroked (only the ouline is painted).
-     * 
-     * 
+     *
+     *
      * @param shape the shape to fillPaint
      * @param paint the fillPaint to be used to fillPaint the shape
      * @param style specifies the ShapePainter.Style to use for painting this shape.
@@ -139,16 +109,16 @@ public class ShapePainter extends AbstractPainter {
     public ShapePainter(Shape shape, Paint paint, Style style) {
         super();
         this.shape = shape;
-        this.fillPaint = paint;
-        this.style = style == null ? Style.BOTH : style;
+        this.setFillPaint(paint);
+        this.setStyle(style == null ? Style.BOTH : style);
     }
     
     /**
      * Sets the shape to fillPaint. This shape is not resized when the component
      * bounds are. To do that, create a custom shape that is bound to the
      * component width/height
-     * 
-     * 
+     *
+     *
      * @param s the Shape to fillPaint. May be null
      */
     public void setShape(Shape s) {
@@ -158,8 +128,7 @@ public class ShapePainter extends AbstractPainter {
     }
     
     /**
-     * 
-     * 
+     * Gets the current shape
      * @return the Shape to fillPaint. May be null
      */
     public Shape getShape() {
@@ -167,234 +136,91 @@ public class ShapePainter extends AbstractPainter {
     }
     
     /**
-     * Sets the stroke to use for painting. If null, then the default Graphics2D
-     * stroke use used
-     * 
-     * 
-     * @param s the Stroke to fillPaint with
-     */
-    public void setStroke(Stroke s) {
-        Stroke old = getStroke();
-        this.stroke = s;
-        firePropertyChange("stroke", old, getStroke());
-    }
-    
-    /**
-     * @return the Stroke to use for painting
-     */
-    public Stroke getStroke() {
-        return stroke;
-    }
-    
-    /**
-     * The Paint to use for filling the shape. Can be a Color, GradientPaint,
-     * TexturePaint, or any other kind of Paint. If null, the component
-     * background is used.
-     *
-     * @param p the Paint to use for painting the shape. May be null.
-     */
-    public void setFillPaint(Paint p) {
-        Paint old = getFillPaint();
-        this.fillPaint = p;
-        firePropertyChange("fillPaint", old, getFillPaint());
-    }
-    
-    /**
-     * @return the Paint used when painting the shape. May be null
-     */
-    public Paint getFillPaint() {
-        return fillPaint;
-    }
-    
-    /**
-     * The Paint to use for stroking the shape (painting the outline). 
-     * Can be a Color, GradientPaint, TexturePaint, or any other kind of Paint. 
-     * If null, the component foreground is used.
-     *
-     * @param p the Paint to use for stroking the shape. May be null.
-     */
-    public void setStrokePaint(Paint p) {
-        Paint old = getStrokePaint();
-        this.strokePaint = p;
-        firePropertyChange("strokePaint", old, getStrokePaint());
-    }
-    
-    /**
-     * @return the Paint used when stroking the shape. May be null
-     */
-    public Paint getStrokePaint() {
-        return strokePaint;
-    }
-    
-    /**
-     * Specifies the location at which to place the shape prior to painting.
-     * If null, the origin (0,0) is used
-     * 
-     * 
-     * @param location the Point2D at which to fillPaint the shape. may be null
-     */
-    public void setLocation(Point2D location) {
-        Point2D old = getLocation();
-        this.location = location == null ? new Point2D.Double(0, 0) : location;
-        firePropertyChange("location", old, getLocation());
-    }
-    
-    /**
-     * 
-     * 
-     * @return the Point2D location at which to fillPaint the shape. Will never be null
-     *         (if it was null, new Point2D.Double(0,0) will be returned)
-     */
-    public Point2D getLocation() {
-        return location;
-    }
-    
-    /**
-     * The shape can be filled or simply stroked (outlined), or both. By default,
-     * the shape is both filled and stroked. This property specifies the strategy to
-     * use.
-     *
-     * @param s the Style to use. If null, Style.BOTH is used
-     */
-    public void setStyle(Style s) {
-        Style old = getStyle();
-        this.style = s == null ? Style.BOTH : s;
-        firePropertyChange("style", old, getStyle());
-    }
-    
-    /**
-     * @return the Style used
-     */
-    public Style getStyle() {
-        return style;
-    }
-    
-    /**
-     * Specifies the resize behavior for the location property. If r is
-     * Resize.HORIZONTAL or Resize.BOTH, then the x value of the location
-     * will be treated as if it were a percentage of the width of the component.
-     * Likewise, Resize.VERTICAL or Resize.BOTH will affect the y value. For
-     * example, if I had a location (.3, .8) then the X will be situated at
-     * 30% of the width and the Y will be situated at 80% of the height.
-     *
-     * @param r value indicating whether/how to resize the Location property when
-     *        painting. If null, Resize.BOTH will be used
-     */
-    public void setResizeLocation(Resize r) {
-        Resize old = getResizeLocation();
-        this.resizeLocation = r == null ? Resize.NONE : r;
-        firePropertyChange("resizeLocation", old, getResizeLocation());
-    }
-
-    /**
-     * @return value indication whether/how to resize the location property.
-     *         This will never be null
-     */
-    public Resize getResizeLocation() {
-        return resizeLocation;
-    }
-    
-    /**
-     * Specifies the resize behavior of the shape. As with all other properties
-     * that rely on Resize, the value of the width/height of the shape will
-     * represent a percentage of the width/height of the component, as a value
-     * between 0 and 1
-     *
-     * @param r value indication whether/how to resize the shape. If null,
-     *        Resize.NONE will be used
-     */
-    public void setResize(Resize r) {
-        Resize old = getResize();
-        this.resize = r == null ? Resize.NONE : r;
-        firePropertyChange("resize", old, getResize());
-    }
-    
-    /**
-     * @return value indication whether/how to resize the shape. Will never be null
-     */
-    public Resize getResize() {
-        return resize;
-    }
-    
-    /**
      * @inheritDoc
      */
-    public void paintBackground(Graphics2D g, JComponent component) {
+    public void doPaint(Graphics2D g, T component, int w, int h) {
         //set the stroke if it is not null
-        Stroke s = getStroke();
-        if (s != null) {
-            g.setStroke(s);
-        }
+        Stroke s = new BasicStroke(this.getBorderWidth());
+        g.setStroke(s);
         
-        //handle the location
-        Point2D location = getLocation();
-        Resize resizeLocation = getResizeLocation();
-        double x = location.getX();
-        double y = location.getY();
-        if (resizeLocation == Resize.HORIZONTAL || resizeLocation == Resize.BOTH) {
-            x = x * component.getWidth();
-        }
-        if (resizeLocation == Resize.VERTICAL || resizeLocation == Resize.BOTH) {
-            y = y * component.getHeight();
-        }
-        g.translate(-location.getX(), -location.getY());
-        
-        //resize the shape if necessary
-        Shape shape = getShape();
-        Rectangle2D bounds = shape.getBounds2D();
-        double width = 1;
-        double height = 1;
-        Resize resize = getResize();
-        if (resize == Resize.HORIZONTAL || resize == Resize.BOTH) {
-            width = component.getWidth() - 1;
-        }
-        if (resize == Resize.VERTICAL || resize == Resize.BOTH) {
-            height = component.getHeight() - 1;
-        }
-        
-        if (shape instanceof RoundRectangle2D) {
-            RoundRectangle2D rect = (RoundRectangle2D)shape;
-            shape = new RoundRectangle2D.Double(
-                    rect.getX(), rect.getY(), width, height,
-                    rect.getArcWidth(), rect.getArcHeight());
-        } else {
-            shape = AffineTransform.getScaleInstance(
-                    width, height).createTransformedShape(shape);
-        }
-        
-        //draw/fill the shape
-        switch (getStyle()) {
-            case BOTH:
-                g.setPaint(calculateStrokePaint(component));
-                g.draw(shape);
-                g.setPaint(calculateFillPaint(component));
-                g.fill(shape);
-                break;
-            case FILLED:
-                g.setPaint(calculateFillPaint(component));
-                g.fill(shape);
-                break;
-            case OUTLINE:
-                g.setPaint(calculateStrokePaint(component));
-                g.draw(shape);
-                break;
+        if(getShape() != null) {
+            Shape shape = provideShape(g,component, w, h);
+            Rectangle bounds = shape.getBounds();
+            Rectangle rect = calculateLayout(bounds.width, bounds.height, w, h);
+            //u.p("rect = " + rect);
+            g = (Graphics2D)g.create();
+            g.translate(rect.x, rect.y);
+            //draw/fill the shape
+            drawPathEffects(g, shape, rect.width, rect.height);
+            switch (getStyle()) {
+                case BOTH:
+                    drawShape(g, shape, component, rect.width, rect.height);
+                    fillShape(g, shape, component, rect.width, rect.height);
+                    break;
+                case FILLED:
+                    fillShape(g, shape, component, rect.width, rect.height);
+                    break;
+                case OUTLINE:
+                    drawShape(g, shape, component, rect.width, rect.height);
+                    break;
+            }
+            
+            
+            g.dispose();
+            return;
         }
     }
     
-    private Paint calculateStrokePaint(JComponent component) {
-        Paint p = getStrokePaint();
+    private void drawShape(Graphics2D g, Shape shape, T component, int w, int h) {
+        g.setPaint(calculateStrokePaint(component, w, h));
+        g.draw(shape);
+    }
+    
+    private void fillShape(Graphics2D g, Shape shape, T component, int w, int h) {
+        g.setPaint(calculateFillPaint(component, w, h));
+        g.fill(shape);
+    }
+    
+    // shape effect stuff
+    public Shape provideShape(Graphics2D g, T comp, int width, int height) {
+        return getShape();
+    }
+    
+    private Paint calculateStrokePaint(T component, int width, int height) {
+        Paint p = getBorderPaint();
         if (p == null) {
-            p = component.getForeground();
+            if(component instanceof JComponent) {
+                p = ((JComponent)component).getForeground();
+            }
+        }
+        if(isPaintStretched()) {
+            p = calculateSnappedPaint(p, width, height);
         }
         return p;
     }
     
-    private Paint calculateFillPaint(JComponent component) {
+    private Paint calculateFillPaint(T component, int width, int height) {
         //set the fillPaint
         Paint p = getFillPaint();
+        if(isPaintStretched()) {
+            p = calculateSnappedPaint(p, width, height);
+        } else {
+            //u.p("not snapping");
+        }
         if (p == null) {
-            p = component.getBackground();
+            if(component instanceof JComponent) {
+                p = ((JComponent)component).getBackground();
+            }
         }
         return p;
+    }
+
+    private void drawPathEffects(Graphics2D g, Shape shape, int w, int h) {
+        if(getPathEffects() != null) {
+            //Paint pt = calculateFillPaint(component, w, h);
+            for(AreaEffect ef : getPathEffects()) {
+                ef.apply(g, shape, w, h);
+            }
+        }
     }
 }

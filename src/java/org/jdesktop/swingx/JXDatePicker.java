@@ -24,6 +24,7 @@ import java.awt.Color;
 import java.awt.ComponentOrientation;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -49,7 +50,8 @@ import javax.swing.text.DefaultFormatterFactory;
 import org.jdesktop.swingx.calendar.DateSpan;
 import org.jdesktop.swingx.calendar.JXMonthView;
 import org.jdesktop.swingx.event.EventListenerMap;
-import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
+import org.jdesktop.swingx.painter.MattePainter;
+//import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
 import org.jdesktop.swingx.plaf.DatePickerUI;
 import org.jdesktop.swingx.plaf.JXDatePickerAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
@@ -577,7 +579,7 @@ public class JXDatePicker extends JComponent {
     private final class TodayPanel extends JXPanel {
         TodayPanel() {
             super(new FlowLayout());
-            setBackgroundPainter(new BasicGradientPainter(0, 0, new Color(238, 238, 238), 0, 1, Color.WHITE));
+            setBackgroundPainter(new MattePainter(new GradientPaint(0, 0, new Color(238, 238, 238), 0, 1, Color.WHITE)));
             JXHyperlink todayLink = new JXHyperlink(new TodayAction());
             Color textColor = new Color(16, 66, 104);
             todayLink.setUnclickedColor(textColor);

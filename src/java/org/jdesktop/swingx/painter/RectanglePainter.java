@@ -6,7 +6,6 @@
  * To change this template, choose Tools | Template Manager
  * and open the template in the editor.
  */
-
 package org.jdesktop.swingx.painter;
 
 import java.awt.BasicStroke;
@@ -14,151 +13,260 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Paint;
+import java.awt.Rectangle;
 import java.awt.Shape;
+import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.RectangularShape;
 import java.awt.geom.RoundRectangle2D;
 import javax.swing.JComponent;
+import org.apache.batik.ext.awt.LinearGradientPaint;
+import org.jdesktop.swingx.JXGradientChooser;
+import org.jdesktop.swingx.painter.effects.AreaEffect;
+import org.jdesktop.swingx.util.PaintUtils;
 
-//import org.jdesktop.swingx.painter.Mask;
+
 
 /**
- *
- * @author jm158417
+ * A painter which paints square and rounded rectangles
+ * @author joshua.marinacci@sun.com
  */
-public class RectanglePainter extends AbstractPainter {
-    private Paint fillPaint = Color.RED;
-    private Paint borderPaint = Color.BLACK;
+
+public class RectanglePainter<T> extends AbstractAreaPainter<T> {
     private boolean rounded = false;
-    private Insets insets = new Insets(5,5,5,5);
+    //private Insets insets = new Insets(0,0,0,0);
     private int roundWidth = 20;
     private int roundHeight = 20;
-    private double strokeWidth = 1;
-    
+    private int width = -1;
+    private int height = -1;
+    //private double strokeWidth = 1;
     
     /** Creates a new instance of RectanglePainter */
     public RectanglePainter() {
+        this(0,0,0,0, 0,0, false, Color.RED, 1f, Color.BLACK);
+    }
+    
+    public RectanglePainter(Color fillPaint, Color borderPaint) {
+        this(0,0,0,0,0,0,false,fillPaint,1f,borderPaint);
+    }
+    
+    public RectanglePainter(Paint fillPaint, Paint borderPaint, float borderWidth, RectanglePainter.Style style) {
+        this();
+        setFillPaint(fillPaint);
+        setBorderPaint(borderPaint);
+        setBorderWidth(borderWidth);
+        setStyle(style);
+    }
+    public RectanglePainter(int top, int left, int bottom, int right) {
+        this(top, left, bottom, right, 0, 0, false, Color.RED, 1f, Color.BLACK);
     }
     public RectanglePainter(int top, int left, int bottom, int right,
+            int roundWidth, int roundHeight) {
+        this(top,left,bottom,right,roundWidth, roundHeight, true, Color.RED, 1f, Color.BLACK);
+    }
+    
+    public RectanglePainter(int width, int height, int cornerRadius, Paint fillPaint) {
+        this(new Insets(0,0,0,0), width,height,
+                cornerRadius, cornerRadius, true,
+                fillPaint, 1f, Color.BLACK);
+    }
+    
+    public RectanglePainter(Insets insets,
+            int width, int height,
             int roundWidth, int roundHeight, boolean rounded, Paint fillPaint,
-            double strokeWidth, Paint borderPaint) {
-        this();
-        insets = new Insets(top,left,bottom,right);
+            float strokeWidth, Paint borderPaint) {
+        this.width = width;
+        this.height = height;
+        setFillHorizontal(false);
+        setFillVertical(false);
+        setInsets(insets);
         this.roundWidth = roundWidth;
         this.roundHeight = roundHeight;
         this.rounded = rounded;
-        this.fillPaint = fillPaint;
-        this.strokeWidth = strokeWidth;
-        this.borderPaint = borderPaint;
+        this.setFillPaint(fillPaint);
+        this.setBorderWidth(strokeWidth);
+        this.setBorderPaint(borderPaint);
     }
     
-    protected Shape calculateShape(JComponent component) {
-        Shape shape = new Rectangle2D.Double(insets.left, insets.top,
-                    component.getWidth()-insets.left-insets.right,
-                    component.getHeight()-insets.top-insets.bottom);
-        if(rounded) {
-            shape = new RoundRectangle2D.Double(insets.left, insets.top,
-                    component.getWidth()-insets.left-insets.right,
-                    component.getHeight()-insets.top-insets.bottom,
-                    roundWidth, roundHeight);
-        }
-        return shape;
+    public RectanglePainter(int top, int left, int bottom, int right,
+            int roundWidth, int roundHeight, boolean rounded, Paint fillPaint,
+            float strokeWidth, Paint borderPaint) {
+        this.setInsets(new Insets(top,left,bottom,right));
+        setFillVertical(true);
+        setFillHorizontal(true);
+        this.roundWidth = roundWidth;
+        this.roundHeight = roundHeight;
+        this.rounded = rounded;
+        this.setFillPaint(fillPaint);
+        this.setBorderWidth(strokeWidth);
+        this.setBorderPaint(borderPaint);
     }
-
-    protected void paintBackground(Graphics2D g, JComponent component) {
-        Shape shape = calculateShape(component);
-        
-        // background
-        g.setPaint(fillPaint);
-        g.fill(shape);
-        
-        // border
-        g.setPaint(borderPaint);
-        g.setStroke(new BasicStroke((float)strokeWidth));
-        g.draw(shape);
-        
-        // leave the clip to support masking other painters
-        g.setClip(shape);
-    }
-
-    public Paint getFillPaint() {
-        return fillPaint;
-    }
-
-    public void setFillPaint(Paint fillPaint) {
-        Paint oldFillPaint = getFillPaint();
-        this.fillPaint = fillPaint;
-        firePropertyChange("fillPaint",oldFillPaint,fillPaint);
-    }
-
-    public Paint getBorderPaint() {
-        return borderPaint;
-    }
-
-    public void setBorderPaint(Paint borderPaint) {
-        Paint oldBorderPaint = getBorderPaint();
-        this.borderPaint = borderPaint;
-        firePropertyChange("fillPaint",oldBorderPaint,borderPaint);
-    }
-
+    
+    
+    
+    
+    /**
+     * Indicates if the rectangle is rounded
+     * @return if the rectangle is rounded
+     */
     public boolean isRounded() {
         return rounded;
     }
-
+    
+    /**
+     * sets if the rectangle should be rounded
+     * @param rounded if the rectangle should be rounded
+     */
     public void setRounded(boolean rounded) {
         boolean oldRounded = isRounded();
         this.rounded = rounded;
         firePropertyChange("rounded",oldRounded,rounded);
     }
-
-    public Insets getInsets() {
-        return insets;
-    }
-
-    public void setInsets(Insets insets) {
-        Insets oldInsets = getInsets();
-        this.insets = insets;
-        firePropertyChange("insets",oldInsets,insets);
-    }
-
+    
+    /**
+     * gets the round width of the rectangle
+     * @return the current round width
+     */
     public int getRoundWidth() {
         return roundWidth;
     }
-
+    
+    /**
+     * sets the round width of the rectangle
+     * @param roundWidth a new round width
+     */
     public void setRoundWidth(int roundWidth) {
         int oldRoundWidth = getRoundWidth();
         this.roundWidth = roundWidth;
         firePropertyChange("roundWidth",oldRoundWidth,roundWidth);
     }
-
+    
+    /**
+     * gets the round height of the rectangle
+     * @return the current round height
+     */
     public int getRoundHeight() {
         return roundHeight;
     }
-
+    
+    /**
+     * sets the round height of the rectangle
+     * @param roundHeight a new round height
+     */
     public void setRoundHeight(int roundHeight) {
         int oldRoundHeight = getRoundHeight();
         this.roundHeight = roundHeight;
         firePropertyChange("roundHeight",oldRoundHeight,roundHeight);
     }
-
-    public double getStrokeWidth() {
-        return strokeWidth;
+    
+    
+    /* ======== drawing code ============ */
+    private RectangularShape calculateShape(T component, int width, int height) {
+        Insets insets = getInsets();
+        int x = insets.left;
+        int y = insets.top;
+        
+        // use the position calcs from the super class
+        Rectangle bounds = calculateLayout(this.width, this.height, width, height);
+        if(this.width != -1 && !isFillHorizontal()) {
+            width = this.width;
+            x = bounds.x;
+        }
+        if(this.height != -1 && !isFillVertical()) {
+            height = this.height;
+            y = bounds.y;
+        }
+        
+        if(isFillHorizontal()) {
+            width = width - insets.left - insets.right;
+        }
+        if(isFillVertical()) {
+            height = height - insets.top - insets.bottom;
+        }
+        
+        
+        RectangularShape shape = new Rectangle2D.Double(x, y, width, height);
+        if(rounded) {
+            shape = new RoundRectangle2D.Double(x, y, width, height, roundWidth, roundHeight);
+        }
+        return shape;
     }
-
-    public void setStrokeWidth(double strokeWidth) {
-        double oldStrokeWidth = getStrokeWidth();
-        this.strokeWidth = strokeWidth;
-        firePropertyChange("strokeWidth",oldStrokeWidth,strokeWidth);
+    
+    
+    
+    public void doPaint(Graphics2D g, T component, int width, int height) {
+        RectangularShape shape = calculateShape(component, width, height);
+        switch (getStyle()) {
+        case BOTH:
+            drawBackground(g,shape,width,height);
+            drawBorder(g,shape,width,height);
+            break;
+        case FILLED:
+            drawBackground(g,shape,width,height);
+            break;
+        case OUTLINE:
+            drawBorder(g,shape,width,height);
+            break;
+        case NONE:
+            break;
+        }
+        
+        // background
+        // border
+        // leave the clip to support masking other painters
+        PaintUtils.setMergedClip(g,shape);
+        /*
+        Area area = new Area(g.getClip());
+        area.intersect(new Area(shape));//new Rectangle(0,0,width,height)));
+        g.setClip(area);*/
+        //g.setClip(shape);
     }
-
-    /**
-     * Getter for property maskShape.
-     * @return Value of property maskShape.
-     */
-    /*
-    public Shape getMaskShape(JComponent component) {
-        return calculateShape(component);
+    
+    private void drawBorder(Graphics2D g, RectangularShape shape, int width, int height) {
+        Paint p = getBorderPaint();
+        if(isPaintStretched()) {
+            p = calculateSnappedPaint(p, width, height);
+        }
+        
+        g.setPaint(p);
+        
+        g.setStroke(new BasicStroke(getBorderWidth()));
+        // shrink the border by 1 px
+        if(shape instanceof Rectangle2D) {
+            g.draw(new Rectangle2D.Double(shape.getX(), shape.getY(),
+                    shape.getWidth()-1, shape.getHeight()-1));
+        } else if(shape instanceof RoundRectangle2D) {
+            g.draw(new RoundRectangle2D.Double(shape.getX(), shape.getY(),
+                    shape.getWidth()-1, shape.getHeight()-1, 
+                    ((RoundRectangle2D)shape).getArcWidth(),
+                    ((RoundRectangle2D)shape).getArcHeight()));
+            
+        } else {
+            g.draw(shape);
+        }
+        
+        
     }
-     */
-
+    
+    private void drawBackground(Graphics2D g, Shape shape, int width, int height) {
+        Paint p = getFillPaint();
+        if(isPaintStretched()) {
+            p = calculateSnappedPaint(p, width, height);
+        }
+        
+        g.setPaint(p);
+        
+        g.fill(shape);
+        if(getPathEffects() != null) {
+            for(AreaEffect ef : getPathEffects()) {
+                ef.apply(g, shape, width, height);
+            }
+        }
+    }
+    
+    public Shape provideShape(Graphics2D g, T comp, int width, int height) {
+        return calculateShape(comp,width,height);
+    }
     
 }
+
