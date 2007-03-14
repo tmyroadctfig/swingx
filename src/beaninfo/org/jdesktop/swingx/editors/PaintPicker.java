@@ -78,55 +78,47 @@ public class PaintPicker extends javax.swing.JPanel {
      */
     // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
+
         tabbedPane = new javax.swing.JTabbedPane();
         colorPickerParent = new javax.swing.JPanel();
         colorPicker = new javax.swing.JColorChooser();
         jLabel1 = new javax.swing.JLabel();
         alphaSlider = new javax.swing.JSlider();
 
+        setLayout(new java.awt.GridBagLayout());
+
+        colorPickerParent.setLayout(new java.awt.GridBagLayout());
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 10.0;
+        gridBagConstraints.weighty = 10.0;
+        colorPickerParent.add(colorPicker, gridBagConstraints);
+
         jLabel1.setText("Alpha:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        colorPickerParent.add(jLabel1, gridBagConstraints);
 
         alphaSlider.setMaximum(255);
         alphaSlider.setValue(255);
-
-        org.jdesktop.layout.GroupLayout colorPickerParentLayout = new org.jdesktop.layout.GroupLayout(colorPickerParent);
-        colorPickerParent.setLayout(colorPickerParentLayout);
-        colorPickerParentLayout.setHorizontalGroup(
-            colorPickerParentLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(colorPickerParentLayout.createSequentialGroup()
-                .add(jLabel1)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(alphaSlider, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 536, Short.MAX_VALUE)
-                .addContainerGap())
-            .add(colorPicker, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 596, Short.MAX_VALUE)
-        );
-        colorPickerParentLayout.setVerticalGroup(
-            colorPickerParentLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, colorPickerParentLayout.createSequentialGroup()
-                .add(colorPicker, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 371, Short.MAX_VALUE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(colorPickerParentLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(alphaSlider, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel1))
-                .addContainerGap())
-        );
-
-        colorPickerParentLayout.linkSize(new java.awt.Component[] {alphaSlider, jLabel1}, org.jdesktop.layout.GroupLayout.VERTICAL);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        colorPickerParent.add(alphaSlider, gridBagConstraints);
 
         tabbedPane.addTab("Color", colorPickerParent);
 
-        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(tabbedPane)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(tabbedPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE)
-                .addContainerGap())
-        );
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 10.0;
+        gridBagConstraints.weighty = 10.0;
+        add(tabbedPane, gridBagConstraints);
+
     }// </editor-fold>//GEN-END:initComponents
 
     void setPaint(Paint paint) {

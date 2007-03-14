@@ -24,42 +24,28 @@ public class ImagePicker extends javax.swing.JPanel {
      */
     // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
+
         imageView = new org.jdesktop.swingx.JXImageView();
         jButton1 = new javax.swing.JButton();
 
-        org.jdesktop.layout.GroupLayout imageViewLayout = new org.jdesktop.layout.GroupLayout(imageView);
-        imageView.setLayout(imageViewLayout);
-        imageViewLayout.setHorizontalGroup(
-            imageViewLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 360, Short.MAX_VALUE)
-        );
-        imageViewLayout.setVerticalGroup(
-            imageViewLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 233, Short.MAX_VALUE)
-        );
+        setLayout(new java.awt.GridBagLayout());
+
+        imageView.setLayout(new java.awt.GridBagLayout());
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 10.0;
+        gridBagConstraints.weighty = 10.0;
+        add(imageView, gridBagConstraints);
 
         jButton1.setAction(imageView.getOpenAction());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTHWEST;
+        add(jButton1, gridBagConstraints);
 
-        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(imageView, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(jButton1))
-                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .add(imageView, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jButton1)
-                .addContainerGap())
-        );
     }// </editor-fold>//GEN-END:initComponents
     
     
