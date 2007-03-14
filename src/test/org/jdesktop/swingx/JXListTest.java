@@ -6,11 +6,13 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Color;
 import java.beans.PropertyChangeListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.Collator;
 import java.util.Vector;
+import java.util.regex.Pattern;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
@@ -30,6 +32,7 @@ import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PatternFilter;
+import org.jdesktop.swingx.decorator.SearchHighlighter;
 import org.jdesktop.swingx.decorator.SelectionMapper;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
@@ -58,6 +61,64 @@ public class JXListTest extends InteractiveTestCase {
                         "\n but is " + renderer.getClass(),
                 renderer instanceof DefaultListRenderer);
     }
+    
+    /**
+     * Issue #473-swingx: NPE in list with highlighter. <p> 
+     * 
+     * Renderers are doc'ed to cope with invalid input values.
+     * Highlighters can rely on valid ComponentAdapter state. 
+     * JXList delegatingRenderer is the culprit which does set
+     * invalid ComponentAdapter state. Negative invalid index.
+     *
+     */
+    public void testIllegalNegativeListRowIndex() {
+        JXList list = new JXList(new Object[] {1, 2, 3});
+        ListCellRenderer renderer = list.getCellRenderer();
+        renderer.getListCellRendererComponent(list, "dummy", -1, false, false);
+        SearchHighlighter searchHighlighter = new SearchHighlighter(null, Color.RED);
+        searchHighlighter.setHighlightAll();
+        searchHighlighter.setPattern(Pattern.compile("\\QNode\\E"));
+        list.addHighlighter(searchHighlighter);
+        renderer.getListCellRendererComponent(list, "dummy", -1, false, false);
+    }
+    
+    /**
+     * Issue #473-swingx: NPE in list with highlighter. <p> 
+     * 
+     * Renderers are doc'ed to cope with invalid input values.
+     * Highlighters can rely on valid ComponentAdapter state. 
+     * JXList delegatingRenderer is the culprit which does set
+     * invalid ComponentAdapter state. Invalid index > valid range.
+     *
+     */
+    public void testIllegalExceedingListRowIndex() {
+        JXList list = new JXList(new Object[] {1, 2, 3});
+        ListCellRenderer renderer = list.getCellRenderer();
+        renderer.getListCellRendererComponent(list, "dummy", list.getElementCount(), false, false);
+        SearchHighlighter searchHighlighter = new SearchHighlighter(null, Color.RED);
+        searchHighlighter.setHighlightAll();
+        searchHighlighter.setPattern(Pattern.compile("\\QNode\\E"));
+        list.addHighlighter(searchHighlighter);
+        renderer.getListCellRendererComponent(list, "dummy", list.getElementCount(), false, false);
+    }
+    
+    /**
+     * test convenience method accessing the configured adapter.
+     *
+     */
+    public void testConfiguredComponentAdapter() {
+        JXList list = new JXList(new Object[] {1, 2, 3});
+        ComponentAdapter adapter = list.getComponentAdapter();
+        assertEquals(0, adapter.column);
+        assertEquals(0, adapter.row);
+        adapter.row = 1;
+        // corrupt adapter
+        adapter.column = 1;
+        adapter = list.getComponentAdapter(0);
+        assertEquals(0, adapter.column);
+        assertEquals(0, adapter.row);
+    }
+    
     /**
      * Test assumptions of accessing list model/view values through
      * the list's componentAdapter.

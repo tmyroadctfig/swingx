@@ -946,6 +946,9 @@ public class JXList extends JList {
 
     // ---------------------------- uniform data model
 
+    /**
+     * @return the unconfigured ComponentAdapter.
+     */
     protected ComponentAdapter getComponentAdapter() {
         if (dataAdapter == null) {
             dataAdapter = new ListAdapter(this);
@@ -953,6 +956,20 @@ public class JXList extends JList {
         return dataAdapter;
     }
 
+    /**
+     * Convenience to access a configured ComponentAdapter.
+     * Note: the column index of the configured adapter is always 0.
+     * 
+     * @param index the row index in view coordinates, must be valid.
+     * @return the configured ComponentAdapter.
+     */
+    protected ComponentAdapter getComponentAdapter(int index) {
+        ComponentAdapter adapter = getComponentAdapter();
+        adapter.column = 0;
+        adapter.row = index;
+        return adapter;
+    }
+    
     protected static class ListAdapter extends ComponentAdapter {
         private final JXList list;
 
@@ -1201,15 +1218,10 @@ public class JXList extends JList {
         }
         public Component getListCellRendererComponent(JList list, Object value,
                 int index, boolean isSelected, boolean cellHasFocus) {
-            Component comp = null;
-
-            comp = delegateRenderer.getListCellRendererComponent(list,
-                        value, index, isSelected, cellHasFocus);
-            if (highlighters != null) {
-                ComponentAdapter adapter = getComponentAdapter();
-                adapter.column = 0;
-                adapter.row = index;
-                comp = highlighters.apply(comp, adapter);
+            Component comp = delegateRenderer.getListCellRendererComponent(list, value, index,
+                    isSelected, cellHasFocus);
+            if ((highlighters != null) && (index >= 0) && (index < getElementCount())) {
+                comp = highlighters.apply(comp, getComponentAdapter(index));
             }
             return comp;
         }

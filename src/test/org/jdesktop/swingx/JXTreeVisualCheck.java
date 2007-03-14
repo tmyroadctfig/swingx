@@ -25,6 +25,7 @@ import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -40,6 +41,7 @@ import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.RolloverHighlighter;
+import org.jdesktop.swingx.decorator.SearchHighlighter;
 import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
 
 public class JXTreeVisualCheck extends JXTreeUnitTest {
@@ -50,14 +52,24 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
 //      setSystemLF(true);
       JXTreeVisualCheck test = new JXTreeVisualCheck();
       try {
-//          test.runInteractiveTests();
+          test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*RToL.*");
-          test.runInteractiveTests("interactive.*Edit.*");
+//          test.runInteractiveTests("interactive.*Edit.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
+    
+    public void interactiveExpandWithHighlighters() {
+        JXTree tree = new JXTree();
+        SearchHighlighter searchHighlighter = new SearchHighlighter(null, Color.RED);
+        searchHighlighter.setHighlightAll();
+        searchHighlighter.setPattern(Pattern.compile("\\Qe\\E"));
+        tree.addHighlighter(searchHighlighter);
+        showWithScrollingInFrame(tree, "NPE on tree expand with highlighter");
+
+    }
     
     /**
      * visually check if invokesStopCellEditing jumps in on focusLost.

@@ -972,9 +972,8 @@ public class JXTree extends JTree {
                 Component result = delegate.getTreeCellRendererComponent(tree, value, 
                         selected, expanded, leaf, row, hasFocus);
 
-                    if (highlighters != null) {
-                        getComponentAdapter().row = row;
-                        result = highlighters.apply(result, getComponentAdapter());
+                    if ((highlighters != null) && (row < getRowCount()) && (row >= 0)){
+                        result = highlighters.apply(result, getComponentAdapter(row));
                     }
 
                  return result;
@@ -1121,11 +1120,31 @@ public class JXTree extends JTree {
     }
 
     
+    /**
+     * @return the unconfigured ComponentAdapter.
+     */
     protected ComponentAdapter getComponentAdapter() {
+        if (dataAdapter == null) {
+            dataAdapter = new TreeAdapter(this);
+        }
         return dataAdapter;
     }
 
-    private final ComponentAdapter dataAdapter = new TreeAdapter(this);
+    /**
+     * Convenience to access a configured ComponentAdapter.
+     * Note: the column index of the configured adapter is always 0.
+     * 
+     * @param index the row index in view coordinates, must be valid.
+     * @return the configured ComponentAdapter.
+     */
+    protected ComponentAdapter getComponentAdapter(int index) {
+        ComponentAdapter adapter = getComponentAdapter();
+        adapter.column = 0;
+        adapter.row = index;
+        return adapter;
+    }
+
+    protected ComponentAdapter dataAdapter;
 
     protected static class TreeAdapter extends ComponentAdapter {
         private final JXTree tree;
