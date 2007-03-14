@@ -207,6 +207,7 @@ public class PaintUtils {
 
     public static BufferedImage loadCompatibleImage(URL resource) throws IOException {
         BufferedImage image = ImageIO.read(resource);
+        if(image == null) return null;
         return toCompatibleImage(image);
     }
     
