@@ -21,6 +21,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
@@ -41,7 +42,6 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -54,7 +54,6 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
-import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.table.TableColumnExt;
@@ -77,7 +76,63 @@ public class JXTableIssues extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXTableIssues.class
             .getName());
 
+    /**
+     * core issue: JTable cannot cope with null selection background.
+     *
+     */
+    public void testSetSelectionBackground() {
+        JXTable table = new JXTable();
+        PropertyChangeReport report = new PropertyChangeReport();
+        table.addPropertyChangeListener(report);
+        Color oldBackground = table.getSelectionBackground();
+        Color color = Color.RED;
+        table.setSelectionBackground(color);
+        assertFalse(oldBackground.equals(table.getSelectionBackground()));
+        assertEquals(color, table.getSelectionBackground());
+        assertEquals(1, report.getEventCount());
+        assertEquals(1, report.getEventCount("selectionBackground"));
+        assertEquals(color, report.getLastNewValue());
+        assertEquals(oldBackground, report.getLastOldValue());
+        
+    }
     
+    /**
+     * core issue: JTable cannot cope with null selection background.
+     *
+     */
+    public void testNullSelectionBackground() {
+        JXTable table = new JXTable();
+        table.setSelectionBackground(null);
+    }
+
+    /**
+     * core issue: JTable cannot cope with null selection background.
+     *
+     */
+    public void testSetSelectionForeground() {
+        JXTable table = new JXTable();
+        PropertyChangeReport report = new PropertyChangeReport();
+        table.addPropertyChangeListener(report);
+        Color oldForeground = table.getSelectionForeground();
+        Color color = Color.RED;
+        table.setSelectionForeground(color);
+        assertFalse(oldForeground.equals(table.getSelectionForeground()));
+        assertEquals(color, table.getSelectionForeground());
+        assertEquals(1, report.getEventCount());
+        assertEquals(1, report.getEventCount("selectionForeground"));
+        assertEquals(color, report.getLastNewValue());
+        assertEquals(oldForeground, report.getLastOldValue());
+        
+    }
+    /**
+     * core issue: JTable cannot cope with null selection background.
+     *
+     */
+    public void testNullSelectionForeground() {
+        JXTable table = new JXTable();
+        table.setSelectionForeground(null);
+    }
+
     
     /**
      * test if created a new instance of the renderer. While the old

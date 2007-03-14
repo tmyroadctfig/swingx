@@ -47,6 +47,23 @@ public class JTableIssues extends InteractiveTestCase {
   }
 
     /**
+     * core issue: JTable cannot cope with null selection background.
+     *
+     */
+    public void testNullSelectionBackground() {
+        JTable table = new JTable();
+        table.setSelectionBackground(null);
+    }
+    
+    /**
+     * core issue: JTable cannot cope with null selection background.
+     *
+     */
+    public void testNullSelectionForeground() {
+        JTable table = new JTable();
+        table.setSelectionForeground(null);
+    }
+    /**
      * Issue #282-swingx: compare disabled appearance of
      * collection views.
      *

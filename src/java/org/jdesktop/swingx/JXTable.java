@@ -4145,5 +4145,30 @@ public class JXTable extends JTable
         return new DefaultTableColumnModelExt();
     }
 
+    /**
+     * {@inheritDoc} <p>
+     * Overridden because super throws NPE on null param.
+     */
+    @Override
+    public void setSelectionBackground(Color selectionBackground) {
+        Color old = getSelectionBackground();
+        this.selectionBackground = selectionBackground;
+        firePropertyChange("selectionBackground", old, getSelectionBackground());
+        repaint();
+//        super.setSelectionBackground(selectionBackground);
+    }
+
+    /**
+     * {@inheritDoc} <p>
+     * Overridden because super throws NPE on null param.
+     */
+    @Override
+    public void setSelectionForeground(Color selectionForeground) {
+        Color old = getSelectionForeground();
+        this.selectionForeground = selectionForeground;
+        firePropertyChange("selectionForeground", old, getSelectionForeground());
+        repaint();
+    }
+
     
 }
