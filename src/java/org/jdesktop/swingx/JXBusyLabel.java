@@ -1,39 +1,57 @@
 /*
- * BusySpinner.java
+ * $Id$
  *
- * Created on February 13, 2007, 5:56 PM
+ * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
+ * Santa Clara, California 95054, U.S.A. All rights reserved.
  *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 package org.jdesktop.swingx;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.Icon;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.Timer;
 import org.jdesktop.swingx.painter.BusyPainter;
-import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.painter.PainterIcon;
+
 /**
+ * <p>A simple circular animation, useful for denoting an action is taking
+ * place that may take an unknown lenght of time to complete. Similar to an
+ * indeterminant JProgressBar, but with a different look.</p>
  *
+ * <p>For example:
+ * <pre><code>
+ *     JXFrame frame = new JXFrame("test", true);
+ *     JXBusyLabel label = new JXBusyLabel();
+ *     frame.add(label);
+ *     //...
+ *     label.setBusy(true);
+ * </code></pre></p>
+ *
+ * @author rbair
  * @author joshy
  */
-
 public class JXBusyLabel extends JLabel {
-    
     private BusyPainter busyPainter;
     private Timer busy;
     
-    /** Creates a new instance of BusySpinner */
+    /** Creates a new instance of JXBusyLabel */
     public JXBusyLabel() {
         busyPainter = new BusyPainter();
         busyPainter.setBaseColor(Color.LIGHT_GRAY);
@@ -44,8 +62,37 @@ public class JXBusyLabel extends JLabel {
         this.setIcon(icon);
     }
     
+    /**
+     * <p>Gets whether this <code>JXBusyLabel</code> is busy. If busy, then
+     * the <code>JXBusyLabel</code> instance will indicate that it is busy,
+     * generally by animating some state.</p>
+     * 
+     * @return true if this instance is busy
+     */
+    public boolean isBusy() {
+        return busy != null;
+    }
+
+    /**
+     * <p>Sets whether this <code>JXBusyLabel</code> instance should consider
+     * itself busy. A busy component may indicate that it is busy via animation,
+     * or some other means.</p>
+     *
+     * @param busy whether this <code>JXBusyLabel</code> instance should
+     *        consider itself busy
+     */
+    public void setBusy(boolean busy) {
+        boolean old = isBusy();
+        if (!old && busy) {
+            startAnimation();
+            firePropertyChange("busy", old, isBusy());
+        } else if (old && !busy) {
+            stopAnimation();
+            firePropertyChange("busy", old, isBusy());
+        }
+    }
     
-    public void startAnimation() {
+    private void startAnimation() {
         if(busy != null) {
             stopAnimation();
         }
@@ -58,43 +105,13 @@ public class JXBusyLabel extends JLabel {
                 repaint();
             }
         });
-        //busy = PropertySetter.createAnimator(1500,busyPainter,"frame",8,16);
-        //busy.addTarget(new TimingTargetAdapter() {
-       //     public void timingEvent(float fraction) { repaint(); }
-        //});
-        //busy.setRepeatBehavior(Animator.RepeatBehavior.LOOP);
-        //busy.setRepeatCount(Animator.INFINITE);
         busy.start();
     }
     
-    public void stopAnimation() {
+    private void stopAnimation() {
         busy.stop();
         busyPainter.setFrame(-1);
         repaint();
         busy = null;
-    }
-    
-    public void setHighlightColor(Color hi) {
-        if(busyPainter != null) {
-            busyPainter.setHighlightColor(hi);
-        }
-    }
-
-    public void setBaseColor(Color color) {
-        if(busyPainter != null) {
-            busyPainter.setBaseColor(color);
-        }
-    }
-    
-    public static void main(String ... args) {
-        JFrame frame = new JFrame("test");
-        JXBusyLabel label = new JXBusyLabel();
-        //label.setBaseColor(Color.BLUE);
-        //label.setHighlightColor(Color.GREEN);
-        frame.add(label);
-        frame.pack();
-        frame.setVisible(true);
-        label.startAnimation();
-        
     }
 }
