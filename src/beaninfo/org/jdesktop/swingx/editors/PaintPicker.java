@@ -10,12 +10,15 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Paint;
 import java.awt.Rectangle;
+import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.apache.batik.ext.awt.MultipleGradientPaint;
 import org.jdesktop.swingx.JXGradientChooser;
+import org.jdesktop.swingx.multislider.Thumb;
 import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.color.EyeDropperColorChooserPanel;
 
@@ -142,12 +145,39 @@ public class PaintPicker extends javax.swing.JPanel {
     // return a paint suitable for display in a property sheet preview
     Paint getDisplayPaint(Rectangle box) {
         if(getPaint() instanceof MultipleGradientPaint) {
-            return gradientPicker.getFlatGradient(box.getWidth());
+            return getFlatGradient(gradientPicker, box.getWidth());
         }
         return getPaint();
     }
     
-    
+    /**
+     * Creates a flat version of the current gradient. This is a linear gradient
+     * from 0.0 to length,0. This gradient is suitable for drawing previews of
+     * the real gradient.
+     *
+     * @param length
+     * @return a gradient Paint with values between 0.0 and length
+     */
+    private MultipleGradientPaint getFlatGradient(JXGradientChooser chooser, double length) {
+        MultipleGradientPaint gp = chooser.getGradient();
+
+        // set up the data for the gradient
+        float[] fractions = gp.getFractions();
+        Color[] colors = gp.getColors();
+
+        // fill in the gradient
+        Point2D start = new Point2D.Float(0, 0);
+        Point2D end = new Point2D.Float((float) length, 0);
+        MultipleGradientPaint paint = new org.apache.batik.ext.awt.LinearGradientPaint(
+                (float) start.getX(),
+                (float) start.getY(),
+                (float) end.getX(),
+                (float) end.getY(),
+                fractions, colors);
+        return paint;
+    }
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JSlider alphaSlider;
     public javax.swing.JColorChooser colorPicker;
