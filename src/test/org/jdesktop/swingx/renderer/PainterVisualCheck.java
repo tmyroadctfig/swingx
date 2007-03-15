@@ -23,6 +23,7 @@ package org.jdesktop.swingx.renderer;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.GradientPaint;
 import java.awt.Polygon;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
@@ -35,10 +36,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.KeyStroke;
@@ -57,11 +58,12 @@ import org.jdesktop.swingx.decorator.ConditionalHighlighter;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
 import org.jdesktop.swingx.painter.ImagePainter;
+import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.painter.ShapePainter;
-import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
+import org.jdesktop.swingx.painter.AbstractLayoutPainter.HorizontalAlignment;
+import org.jdesktop.swingx.painter.AbstractLayoutPainter.VerticalAlignment;
 import org.jdesktop.swingx.table.ColumnControlButton;
-import org.jdesktop.swingx.util.Resize;
 import org.jdesktop.test.AncientSwingTeam;
 
 /**
@@ -110,9 +112,10 @@ public class PainterVisualCheck extends InteractiveTestCase {
                             new int[] { 0, 0, 5 }, 3);
                     painter.setShape(polygon);
                     painter.setFillPaint(Color.RED);
-                    painter.setResize(Resize.NONE);
+                    painter.setPaintStretched(false);//Resize(Resize.NONE);
                     // hmm.. how to make this stick to the trailing upper corner?
-                    painter.setResizeLocation(Resize.HORIZONTAL);
+                    painter.setHorizontalAlignment(HorizontalAlignment.RIGHT);//setResizeLocation(Resize.HORIZONTAL);
+                    painter.setVerticalAlignment(VerticalAlignment.TOP);
                 }
                 return painter;
             }
@@ -138,8 +141,11 @@ public class PainterVisualCheck extends InteractiveTestCase {
         JXTable table = new JXTable(model);
 //        DefaultTableRenderer renderer = new DefaultTableRenderer();
         // selection should shine through in white part
-        final Painter painter = new BasicGradientPainter(0.0f, 0.0f, Color.YELLOW, 0.75f, (float) 0.5, 
+        GradientPaint paint = new java.awt.GradientPaint(0.0f, 0.0f, Color.YELLOW, 0.75f, (float) 0.5, 
                 GradientHighlighter.getTransparentColor(Color.WHITE, 0));
+        final MattePainter painter = new MattePainter(paint);
+        painter.setPaintStretched(true);
+        
         ConditionalHighlighter gradientHighlighter = new ConditionalHighlighter(null, null, -1, -1) {
 
             @Override
@@ -214,7 +220,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
      */
     public static class GradientHighlighter extends Highlighter {
 
-        private Painter painter;
+        private MattePainter painter;
 
         private boolean yellowTransparent;
 
@@ -251,8 +257,11 @@ public class PainterVisualCheck extends InteractiveTestCase {
                 Color startColor = getTransparentColor(Color.YELLOW,
                         yellowTransparent ? 125 : 254);
                 Color endColor = getTransparentColor(Color.WHITE, 0);
-                painter = new BasicGradientPainter(0.0f, 0.0f, startColor, end,
+                GradientPaint paint = new java.awt.GradientPaint(0.0f, 0.0f, startColor, end,
                         0.f, endColor);
+                painter = new MattePainter(paint);
+                painter.setPaintStretched(true);
+
             }
             return painter;
         }
@@ -269,16 +278,15 @@ public class PainterVisualCheck extends InteractiveTestCase {
     /**
      * Use highlighter with background image painter. Shared by table and list.
      */
-    public void interactiveIconPainterHighlight() {
+    public void interactiveIconPainterHighlight() throws Exception {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
         ComponentProvider<JLabel> controller = new LabelProvider(
                 JLabel.RIGHT);
         table.getColumn(0).setCellRenderer(
                 new DefaultTableRenderer(controller));
-        ImageIcon icon = new ImageIcon(JXPanel.class
-                .getResource("resources/images/kleopatra.jpg"));
-        final ImagePainter imagePainter = new ImagePainter(icon.getImage());
+        final ImagePainter imagePainter = new ImagePainter(ImageIO.read(JXPanel.class
+                .getResource("resources/images/kleopatra.jpg")));
         Highlighter gradientHighlighter = new Highlighter() {
 
             @Override
@@ -383,7 +391,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
             ConditionalHighlighter {
         float maxValue = 100;
 
-        private Painter painter;
+        private MattePainter painter;
 
         private boolean yellowTransparent;
 
@@ -422,8 +430,10 @@ public class PainterVisualCheck extends InteractiveTestCase {
             Color startColor = getTransparentColor(Color.YELLOW,
                     yellowTransparent ? 125 : 254);
             Color endColor = getTransparentColor(Color.WHITE, 0);
-            painter = new BasicGradientPainter(0.0f, 0.0f, startColor, end,
+            GradientPaint paint = new java.awt.GradientPaint(0.0f, 0.0f, startColor, end,
                     0.f, endColor);
+            painter = new MattePainter(paint);
+            painter.setPaintStretched(true);
             return painter;
         }
 

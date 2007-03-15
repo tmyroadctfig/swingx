@@ -23,9 +23,8 @@ package org.jdesktop.swingx;
 
 import java.awt.Dimension;
 
-import javax.swing.ImageIcon;
+import javax.imageio.ImageIO;
 
-import org.jdesktop.swingx.painter.IconPainter;
 import org.jdesktop.swingx.painter.ImagePainter;
 
 /**
@@ -47,10 +46,8 @@ public class JXPanelVisualCheck extends InteractiveTestCase {
       }
   }
 
-    public void interactiveIconPainter() {
-        ImageIcon icon = new ImageIcon(JXPanel.class.getResource("resources/images/kleopatra.jpg"));
-        IconPainter painter = new IconPainter(icon);
-        ImagePainter imagePainter = new ImagePainter(icon.getImage());
+    public void interactiveIconPainter() throws Exception {
+        ImagePainter imagePainter = new ImagePainter(ImageIO.read(JXPanel.class.getResource("resources/images/kleopatra.jpg")));
         JXPanel panel = new JXPanel();
         panel.setBackgroundPainter(imagePainter);
 //        panel.setOpaque(false);
