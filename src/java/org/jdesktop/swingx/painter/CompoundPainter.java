@@ -23,13 +23,6 @@ package org.jdesktop.swingx.painter;
 
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.swing.JComponent;
-import org.jdesktop.beans.AbstractBean;
 
 /**
  * <p>A Painter implemention that contains an array of Painters, and executes them
@@ -141,7 +134,7 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
      * Normally the clip will be reset between each painter. Setting clipPreserved to
      * true can be used to let one painter mask other painters that come after it.
      * @return if the clip should be preserved
-     * @see setClipPreserved(boolean)
+     * @see #setClipPreserved(boolean)
      */
     public boolean isClipPreserved() {
         return clipPreserved;
@@ -153,7 +146,7 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
      * true can be used to let one painter mask other painters that come after it.
      * 
      * @param shouldRestoreState new value of the clipPreserved property
-     * @see isClipPreserved()
+     * @see #isClipPreserved()
      */
     public void setClipPreserved(boolean shouldRestoreState) {
         boolean oldShouldRestoreState = isClipPreserved();
@@ -166,17 +159,17 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
     /**
      * @inheritDoc
      */
+    @Override
     public void doPaint(Graphics2D g, T component, int width, int height) {
         Graphics2D g2 = (Graphics2D) g.create();
         if(getTransform() != null) {
             g2.setTransform(getTransform());
         }
         for (Painter p : getPainters()) {
-            Graphics2D oldGraphics = g2;
             Graphics2D g3 = (Graphics2D) g2.create();
             p.paint(g3, component, width, height);
             if(isClipPreserved()) {
-                oldGraphics.setClip(g3.getClip());
+                g2.setClip(g3.getClip());
             }
             g3.dispose();
         }
@@ -201,6 +194,7 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
         firePropertyChange("transform",old,transform);
     }
 
+    @Override
     protected boolean isUseCache() {
         return useCaching;
     }
