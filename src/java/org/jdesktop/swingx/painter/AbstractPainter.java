@@ -402,7 +402,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
         }
         
         //restoreState(g);
-        g.dispose();
+        //g.dispose();
     }
     
     /**
