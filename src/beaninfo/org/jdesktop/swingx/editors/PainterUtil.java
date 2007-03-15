@@ -69,7 +69,7 @@ public class PainterUtil {
     /** Creates a new instance of PainterUtil */
     private PainterUtil() {
     }
-    
+    /*
     public static void main(String[] args) throws Exception {
         ImagePainter ip = new ImagePainter();
         ip.setImageString("file:/Users/joshy/Pictures/cooltikis.jpg");
@@ -86,7 +86,7 @@ public class PainterUtil {
         p("==================");
         
         
-    }
+    }*/
     
     public static Painter loadPainter(File file) throws FileNotFoundException, MalformedURLException, IOException {
         return loadPainter(file.toURL(), file.toURL());
@@ -127,7 +127,7 @@ public class PainterUtil {
         
         XMLEncoder e = new XMLEncoder(new FileOutputStream(file));
         e.setOwner(new PersistenceOwner(baseURL));
-        p("owner = " + e.getOwner());
+        //p("owner = " + e.getOwner());
         //e.setOwner(compoundPainter);
         
         // serialize the enums
@@ -304,10 +304,6 @@ public class PainterUtil {
             return ((JXButton)comp).getBackgroundPainter();
         }
         return null;
-    }
-    
-    private static void p(String s) {
-        System.out.println(s);
     }
     
     public static class PersistenceOwner {

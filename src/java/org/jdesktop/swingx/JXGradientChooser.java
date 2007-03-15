@@ -841,10 +841,7 @@ public class JXGradientChooser extends JXPanel {
                 }
                 sb.append("}");
                 sb.append(");");
-                p(sb.toString());
-            }
-            public void p(String s) {
-                System.out.println(s);
+                System.out.println(sb.toString());
             }
         });
         frame.add(button);

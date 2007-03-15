@@ -37,7 +37,7 @@ public class URLPainter extends CompoundPainter {
         try {
             this.url = file.toURI().toURL();
         } catch (MalformedURLException exception) {
-            p(exception);
+            exception.printStackTrace();
             this.url = null;
         }
     }
@@ -46,7 +46,7 @@ public class URLPainter extends CompoundPainter {
         try {
             this.url = new URL(url);
         } catch (MalformedURLException ex) {
-            p(ex);
+            ex.printStackTrace();
             this.url = null;
         }
     }
@@ -86,11 +86,4 @@ public class URLPainter extends CompoundPainter {
     }
     
     
-    private static void p(String str) {
-        System.out.println(str);
-    }
-    private static void p(Throwable thr) {
-        System.out.println(thr.getMessage());
-        thr.printStackTrace();
-    }
 }

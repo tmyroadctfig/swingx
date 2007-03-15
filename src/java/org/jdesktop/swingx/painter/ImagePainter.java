@@ -142,7 +142,6 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
      * @return the image used for painting
      */
     public BufferedImage getImage() {
-        //p("image url = " + getImageString());
         if(img == null && imageURL != null) {
             loadImage();
         }
@@ -296,7 +295,6 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
      * @param resolver
      */
     public void setResolver(PainterUtil.PersistenceOwner resolver) {
-        //        p("resolver has been set: " + resolver);
         this.resolver = resolver;
     }
     
@@ -407,10 +405,6 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
         }
         return new Rectangle(0,0,0,0);
         
-    }
-    
-    private void p(String string) {
-        System.out.println(string);
     }
     
     public ScaleType getScaleType() {

@@ -205,7 +205,6 @@ public class ShapePainter<T> extends AbstractAreaPainter<T> {
         if(isPaintStretched()) {
             p = calculateSnappedPaint(p, width, height);
         } else {
-            //u.p("not snapping");
         }
         if (p == null) {
             if(component instanceof JComponent) {
