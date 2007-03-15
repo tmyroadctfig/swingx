@@ -22,12 +22,16 @@ import javax.swing.plaf.basic.BasicGraphicsUtils;
  * </ul>
  */
 public class TreeCellContext extends CellContext<JTree> {
+    /** the icon to use for a leaf node. */
     protected Icon leafIcon;
 
+    /** the default icon to use for a closed folder. */
     protected Icon closedIcon;
 
+    /** the default icon to use for a open folder. */
     protected Icon openIcon;
 
+    /** the border around a focused node. */
     private Border treeFocusBorder;
 
     /**
@@ -121,16 +125,17 @@ public class TreeCellContext extends CellContext<JTree> {
         return treeFocusBorder;
     }
 
+    /**
+     * Border used to draw around the content of the node. <p>
+     * PENDING: isn't that the same as around a list or table cell, but
+     * without a tree-specific key/value pair in UIManager?
+     */
     public class TreeFocusBorder extends LineBorder {
 
         private Color treeBackground;
 
         private Color focusColor;
 
-        /**
-         * 
-         * @param color
-         */
         public TreeFocusBorder() {
             super(Color.BLACK);
             treeBackground = getBackground();
@@ -164,7 +169,8 @@ public class TreeCellContext extends CellContext<JTree> {
         }
 
         /**
-         * @return
+         * @return a boolean indicating whether the focus border
+         *   should be painted dashed style.
          */
         private boolean isDashed() {
             return Boolean.TRUE.equals(UIManager
@@ -172,6 +178,9 @@ public class TreeCellContext extends CellContext<JTree> {
 
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean isBorderOpaque() {
             return false;
