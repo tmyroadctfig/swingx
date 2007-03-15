@@ -1298,17 +1298,9 @@ public class PainterDemoSet extends javax.swing.JFrame {
 
         jSplitPane2.setBottomComponent(jScrollPane2);
 
+        painterPanel.setLayout(new java.awt.BorderLayout());
+
         painterPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        org.jdesktop.layout.GroupLayout painterPanelLayout = new org.jdesktop.layout.GroupLayout(painterPanel);
-        painterPanel.setLayout(painterPanelLayout);
-        painterPanelLayout.setHorizontalGroup(
-            painterPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 448, Short.MAX_VALUE)
-        );
-        painterPanelLayout.setVerticalGroup(
-            painterPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 144, Short.MAX_VALUE)
-        );
         jSplitPane2.setTopComponent(painterPanel);
 
         jSplitPane1.setRightComponent(jSplitPane2);
@@ -1328,16 +1320,8 @@ public class PainterDemoSet extends javax.swing.JFrame {
 
         jSplitPane1.setLeftComponent(jScrollPane1);
 
-        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jSplitPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 707, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jSplitPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
-        );
+        getContentPane().add(jSplitPane1, java.awt.BorderLayout.CENTER);
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
     
