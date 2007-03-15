@@ -20,7 +20,7 @@
  */
 
 
-package org.jdesktop.swingx.painter;
+package org.jdesktop.swingx;
 
 import java.awt.Graphics2D;
 import java.io.File;
@@ -28,6 +28,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.jdesktop.swingx.editors.PainterUtil;
+import org.jdesktop.swingx.painter.*;
 
 /**
  *
