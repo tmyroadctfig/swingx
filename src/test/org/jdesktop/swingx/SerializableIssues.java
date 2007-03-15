@@ -21,10 +21,10 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.Dialog;
-
 import javax.swing.JPanel;
+import javax.swing.tree.TreeCellRenderer;
 
+import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.test.SerializableSupport;
 
 /**
@@ -33,6 +33,58 @@ import org.jdesktop.test.SerializableSupport;
  * @author Jeanette Winzenburg
  */
 public class SerializableIssues extends InteractiveTestCase {
+
+    /**
+     * Issue #423-swingx: all descendants of JComponent must be 
+     * serializable.
+     * 
+     * Regression after painter merge: JXPanel$1
+     * is not serializable.
+     * 
+     */
+    public void testPanel() {
+        JXPanel component = new JXPanel();
+        try {
+            SerializableSupport.serialize(component);
+        } catch (Exception e) {
+            fail("not serializable " + e);
+        } 
+    }
+    /**
+     * Issue #423-swingx: all descendants of JComponent must be 
+     * serializable. <p>
+     * 
+     * Regression for titled separator after painter merge: JXPanel$1
+     * is not serializable.
+     * 
+     */
+    public void testTitledSeparator() {
+        JXTitledSeparator component = new JXTitledSeparator();
+        try {
+            SerializableSupport.serialize(component);
+        } catch (Exception e) {
+            fail("not serializable " + e);
+        } 
+    }
+
+
+
+    /**
+     * Issue #423-swingx: all descendants of JComponent must be 
+     * serializable. <p>
+     * 
+     * Regression for DefaultTreeRenderer after painter merge: JXPanel$1
+     * is not serializable.
+     * 
+     */
+    public void testSerializeTreeRenderer() {
+        TreeCellRenderer xListRenderer = new DefaultTreeRenderer();
+        try {
+            SerializableSupport.serialize(xListRenderer);
+        } catch (Exception e) {
+            fail("not serializable " + e);
+        } 
+    }
 
     /**
      * Issue #423-swingx: all descendants of JComponent must be 

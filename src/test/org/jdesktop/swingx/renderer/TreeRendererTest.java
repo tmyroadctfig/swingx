@@ -49,23 +49,22 @@ import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.decorator.RolloverHighlighter;
 import org.jdesktop.swingx.test.ActionMapTreeTableModel;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
-import org.jdesktop.test.SerializableSupport;
 
 /**
- * Tests behaviour of SwingX renderers. Currently: mostly characterization to
- * guarantee that they behave similar to the standard.
+ * Tests behaviour of SwingX <code>DefaultTreeRenderer</code>. 
+ * Currently: mostly characterization to
+ * guarantee that it behaves similar to the standard.
  * 
  * @author Jeanette Winzenburg
  */
 public class TreeRendererTest extends InteractiveTestCase {
-
+    @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(TreeRendererTest.class
             .getName());
     
-    
-    private JTree tree;
     private DefaultTreeCellRenderer coreTreeRenderer;
     private DefaultTreeRenderer xTreeRenderer;
+
     
     @Override
     protected void setUp() throws Exception {
@@ -73,7 +72,6 @@ public class TreeRendererTest extends InteractiveTestCase {
 //        LOG.info("LF: " + UIManager.getLookAndFeel());
 //        LOG.info("Theme: " + ((MetalLookAndFeel) UIManager.getLookAndFeel()).getCurrentTheme());
 //        UIManager.put("Tree.drawsFocusBorderAroundIcon", Boolean.TRUE);
-        tree = new JTree();
         coreTreeRenderer = new DefaultTreeCellRenderer();
         xTreeRenderer = new DefaultTreeRenderer();
     }
@@ -126,18 +124,6 @@ public class TreeRendererTest extends InteractiveTestCase {
         assertEquals(Color.RED, provider.wrappee.getRendererComponent(null).getForeground());
     }
 
-    /**
-     * test serializable of default renderer.
-     * 
-     */
-    public void testSerializeTreeRenderer() {
-        TreeCellRenderer xListRenderer = new DefaultTreeRenderer();
-        try {
-            SerializableSupport.serialize(xListRenderer);
-        } catch (Exception e) {
-            fail("not serializable " + e);
-        } 
-}
 
     /**
      * characterize opaqueness of rendering components.

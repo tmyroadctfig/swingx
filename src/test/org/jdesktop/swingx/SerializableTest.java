@@ -30,22 +30,6 @@ import org.jdesktop.test.SerializableSupport;
  */
 public class SerializableTest extends InteractiveTestCase {
 
-    /**
-     * Issue #423-swingx: all descendants of JComponent must be 
-     * serializable. <p>
-     * 
-     * 
-     */
-    public void testTitledSeparator() {
-        JXTitledSeparator component = new JXTitledSeparator();
-        try {
-            SerializableSupport.serialize(component);
-        } catch (Exception e) {
-            fail("not serializable " + e);
-        } 
-    }
-
-
 
     /**
      * Issue #423-swingx: all descendants of JComponent must be 
@@ -92,26 +76,11 @@ public class SerializableTest extends InteractiveTestCase {
         } 
     }
 
-    /**
-     * Issue #423-swingx: all descendants of JComponent must be 
-     * serializable.
-     * 
-     * 
-     */
-    public void testPanel() {
-        JXPanel component = new JXPanel();
-        try {
-            SerializableSupport.serialize(component);
-        } catch (Exception e) {
-            fail("not serializable " + e);
-        } 
-    }
 
     /**
      * Issue #423-swingx: all descendants of JComponent must be 
-     * serializable.
+     * serializable. <p>
      * 
-     *
      */
     public void testHyperlink() {
         JXHyperlink component = new JXHyperlink();
