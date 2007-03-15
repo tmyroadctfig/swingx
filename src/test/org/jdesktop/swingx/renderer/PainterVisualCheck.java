@@ -83,14 +83,32 @@ public class PainterVisualCheck extends InteractiveTestCase {
 //      setSystemLF(true);
       PainterVisualCheck test = new PainterVisualCheck();
       try {
-         test.runInteractiveTests();
-//         test.runInteractiveTests(".*Icon.*");
+        test.runInteractiveTests();
+ //        test.runInteractiveTests(".*Label.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
 
+    public void interactiveRenderingLabel() {
+        JRendererLabel label = new JRendererLabel();
+        label.setText("some dummy long enough .............        ");
+        // todo: NPE with null shape - file issue
+        ShapePainter painter = new ShapePainter();
+        Shape polygon = new Polygon(new int[] { 0, 5, 5 },
+                new int[] { 0, 0, 5 }, 3);
+        painter.setShape(polygon);
+        painter.setFillPaint(Color.RED);
+        painter.setPaintStretched(false);//Resize(Resize.NONE);
+        // hmm.. how to make this stick to the trailing upper corner?
+        painter.setHorizontalAlignment(HorizontalAlignment.RIGHT);//setResizeLocation(Resize.HORIZONTAL);
+        painter.setVerticalAlignment(VerticalAlignment.TOP);
+        label.setPainter(painter);
+        label.setOpaque(false);
+        showInFrame(label, "renderer label with painter");
+    }
+    
     public void interactiveTriangleRenderer() {
         JXTable table = new JXTable(new AncientSwingTeam());
         ConditionalHighlighter highlighter = new ConditionalHighlighter() {
