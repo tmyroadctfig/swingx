@@ -74,6 +74,7 @@ public class GaussianBlurFilter extends AbstractFilter {
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings({ "SuspiciousNameCombination" })
     @Override
     public BufferedImage filter(BufferedImage src, BufferedImage dst) {
         int width = src.getWidth();
@@ -92,7 +93,6 @@ public class GaussianBlurFilter extends AbstractFilter {
         // horizontal pass
         blur(srcPixels, dstPixels, width, height, kernel, radius);
         // vertical pass
-        //noinspection SuspiciousNameCombination
         blur(dstPixels, srcPixels, height, width, kernel, radius);
         // the result is now stored in srcPixels due to the 2nd pass
         GraphicsUtilities.setPixels(dst, 0, 0, width, height, srcPixels);
