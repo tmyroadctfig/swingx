@@ -84,7 +84,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
       PainterVisualCheck test = new PainterVisualCheck();
       try {
         test.runInteractiveTests();
- //        test.runInteractiveTests(".*Label.*");
+//         test.runInteractiveTests(".*Label.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -93,7 +93,8 @@ public class PainterVisualCheck extends InteractiveTestCase {
 
     public void interactiveRenderingLabel() {
         JRendererLabel label = new JRendererLabel();
-        label.setText("some dummy long enough .............        ");
+        label.setOpaque(true);
+        label.setText("some dummy long enough .............  opaque? " + label.isOpaque());
         // todo: NPE with null shape - file issue
         ShapePainter painter = new ShapePainter();
         Shape polygon = new Polygon(new int[] { 0, 5, 5 },
@@ -105,7 +106,6 @@ public class PainterVisualCheck extends InteractiveTestCase {
         painter.setHorizontalAlignment(HorizontalAlignment.RIGHT);//setResizeLocation(Resize.HORIZONTAL);
         painter.setVerticalAlignment(VerticalAlignment.TOP);
         label.setPainter(painter);
-        label.setOpaque(false);
         showInFrame(label, "renderer label with painter");
     }
     
@@ -159,7 +159,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         JXTable table = new JXTable(model);
 //        DefaultTableRenderer renderer = new DefaultTableRenderer();
         // selection should shine through in white part
-        GradientPaint paint = new java.awt.GradientPaint(0.0f, 0.0f, Color.YELLOW, 0.75f, (float) 0.5, 
+        GradientPaint paint = new GradientPaint(0.0f, 0.0f, Color.YELLOW, 10f, (float) 0.5, 
                 GradientHighlighter.getTransparentColor(Color.WHITE, 0));
         final MattePainter painter = new MattePainter(paint);
         painter.setPaintStretched(true);

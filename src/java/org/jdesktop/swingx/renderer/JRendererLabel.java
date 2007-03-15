@@ -95,6 +95,13 @@ public class JRendererLabel extends JLabel implements PainterAware {
         this.painter = painter;
     }
 
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to inject Painter's painting. <p>
+     * TODO: cleanup logic - see JRendererCheckBox.
+     * 
+     */
     @Override
     protected void paintComponent(Graphics g) {
         if (painter != null) {
@@ -107,12 +114,30 @@ public class JRendererLabel extends JLabel implements PainterAware {
                 paintComponentWithPainter((Graphics2D) g);
             } else {
                 // transparent apply the background painter before calling super
-                painter.paint((Graphics2D) g, this, getWidth(), getHeight());
+                paintPainter(g);
                 super.paintComponent(g);
             }
         } else {
             // nothing to worry about - delegate to super
             super.paintComponent(g);
+        }
+    }
+
+    /**
+     * 
+     * Hack around AbstractPainter.paint bug which disposes the Graphics.
+     * So here we give it a scratch to paint on. <p>
+     * TODO - remove again, the issue is fixed?
+     * 
+     * @param g the graphics to paint on
+     */
+    private void paintPainter(Graphics g) {
+        Graphics2D scratch = (Graphics2D) ((g == null) ? null : g.create());
+        try {
+            painter.paint(scratch, this, getWidth(), getHeight());
+        }
+        finally {
+            scratch.dispose();
         }
     }
 
@@ -125,11 +150,11 @@ public class JRendererLabel extends JLabel implements PainterAware {
         // 2. paint the painter
         // by-pass ui.update and hook into ui.paint directly
         if (ui != null) {
-            Graphics scratchGraphics = (g == null) ? null : g.create();
+            Graphics2D scratchGraphics = (Graphics2D) ((g == null) ? null : g.create());
             try {
-                g.setColor(getBackground());
-                g.fillRect(0, 0, getWidth(), getHeight());
-                painter.paint(g, this, getWidth(), getHeight());
+                scratchGraphics.setColor(getBackground());
+                scratchGraphics.fillRect(0, 0, getWidth(), getHeight());
+                paintPainter(g);
                 ui.paint(scratchGraphics, this);
             }
             finally {

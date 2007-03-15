@@ -65,6 +65,24 @@ public class JRendererCheckBox extends JCheckBox implements PainterAware {
     }
 
     /**
+     * 
+     * Hack around AbstractPainter.paint bug which disposes the Graphics.
+     * So here we give it a scratch to paint on. <p>
+     * TODO - remove again, the issue is fixed?
+     * 
+     * @param g the graphics to paint on
+     */
+    private void paintPainter(Graphics g) {
+        Graphics2D scratch = (Graphics2D) ((g == null) ? null : g.create());
+        try {
+            painter.paint(scratch, this, getWidth(), getHeight());
+        }
+        finally {
+            scratch.dispose();
+        }
+    }
+
+    /**
      * PRE: painter != null
      * @param g
      */
@@ -75,9 +93,9 @@ public class JRendererCheckBox extends JCheckBox implements PainterAware {
         if (ui != null) {
             Graphics scratchGraphics = (g == null) ? null : g.create();
             try {
-                g.setColor(getBackground());
-                g.fillRect(0, 0, getWidth(), getHeight());
-                painter.paint(g, this, getWidth(), getHeight());
+                scratchGraphics.setColor(getBackground());
+                scratchGraphics.fillRect(0, 0, getWidth(), getHeight());
+                paintPainter(g);
                 ui.paint(scratchGraphics, this);
             } finally {
                 scratchGraphics.dispose();
