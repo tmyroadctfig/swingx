@@ -11,10 +11,9 @@ package org.jdesktop.swingx.painter;
 
 import java.awt.Graphics2D;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import javax.swing.JComponent;
+
 import org.jdesktop.swingx.editors.PainterUtil;
 
 /**
@@ -36,7 +35,7 @@ public class URLPainter extends CompoundPainter {
     
     public URLPainter(File file) {
         try {
-            this.url = file.toURL();
+            this.url = file.toURI().toURL();
         } catch (MalformedURLException exception) {
             p(exception);
             this.url = null;
@@ -52,7 +51,7 @@ public class URLPainter extends CompoundPainter {
         }
     }
     
-    public URLPainter(Class baseClass, String resource) {
+    public URLPainter(Class<?> baseClass, String resource) {
         url = baseClass.getResource(resource);
     }
     
@@ -72,13 +71,14 @@ public class URLPainter extends CompoundPainter {
         try {
             System.out.println("loading");
             Painter painter = PainterUtil.loadPainter(url);
-            this.setPainters(new Painter[] { painter });
+            this.setPainters(painter);
             loaded = true;
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
+    @Override
     public void doPaint(Graphics2D g, Object component, int width, int height) {
         System.out.println("creating new url painter");
         if(!loaded) {
