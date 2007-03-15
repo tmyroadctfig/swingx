@@ -21,7 +21,6 @@ import javax.swing.JEditorPane;
 import javax.swing.JToolBar;
 import javax.swing.ListModel;
 import javax.swing.event.ListDataListener;
-import javax.swing.text.DefaultEditorKit;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.ActionContainerFactory;
@@ -34,6 +33,7 @@ import org.jdesktop.swingx.action.ActionManager;
  * @author Mark Davidson
  */
 public class JXEditorPaneVisualCheck extends JXEditorPaneTest {
+    @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(JXEditorPaneVisualCheck.class
             .getName());
     private static String testText = "This is an example of some text";
@@ -58,7 +58,6 @@ public class JXEditorPaneVisualCheck extends JXEditorPaneTest {
      *
      */
     public void interactiveXEditorStyledActions() {
-        DefaultEditorKit kit;
         URL url = JXEditorPaneVisualCheck.class.getResource("resources/test.html");
         JXEditorPane editor = null;
         try {
@@ -79,7 +78,11 @@ public class JXEditorPaneVisualCheck extends JXEditorPaneTest {
         int count = keys != null ? keys.length : 0;
         buffer.append("\n No. of actions in ActionMap: " + count);
         for (int i = 0; i < actions.length; i++) {
+            // TODO: are names allowed to be anything else as String?
+            // same question in other test methods as well
             Object id = actions[i].getValue(Action.NAME);
+            // ?? the id in the actionManager is doc'ed as ACTION_COMMAND?
+            // which would imply to be a String (assumption somewhere in core)
             manager.addAction(id, actions[i]);
             actionNames.add(id);
             buffer.append("\n" + actions[i].toString());
@@ -146,7 +149,6 @@ public class JXEditorPaneVisualCheck extends JXEditorPaneTest {
         }
         editor.setEditable(false);
         editor.setPreferredSize(new Dimension(600, 400));
-//        JXEditorPane editor = new JXEditorPane();
         Action[] actions = editor.getActions();
         ActionManager manager = ActionManager.getInstance();
         List actionNames = new ArrayList();

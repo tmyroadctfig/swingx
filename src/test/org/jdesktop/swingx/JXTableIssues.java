@@ -499,7 +499,7 @@ public class JXTableIssues extends InteractiveTestCase {
     }
      
     private void assertSelection(TableModel tableModel, ListSelectionModel selectionModel, Object[] expected) {
-        List selected = new ArrayList();
+        List<Object> selected = new ArrayList<Object>();
         for(int r = 0; r < tableModel.getRowCount(); r++) {
             if(selectionModel.isSelectedIndex(r)) selected.add(tableModel.getValueAt(r, 0));
         }
@@ -720,6 +720,7 @@ public class JXTableIssues extends InteractiveTestCase {
      */
     static class ReallySimpleTableModel extends AbstractTableModel {
         private List contents = new ArrayList();
+        @SuppressWarnings("unchecked")
         public void setContents(List contents) {
             this.contents.clear();
             this.contents.addAll(contents);
@@ -758,7 +759,8 @@ public class JXTableIssues extends InteractiveTestCase {
     private DefaultTableModel createAscendingModel(int startRow, final int rowCount, 
             final int columnCount, boolean fillLast) {
         DefaultTableModel model = new DefaultTableModel(rowCount, columnCount) {
-            public Class getColumnClass(int column) {
+            @Override
+            public Class<?> getColumnClass(int column) {
                 Object value = rowCount > 0 ? getValueAt(0, column) : null;
                 return value != null ? value.getClass() : super.getColumnClass(column);
             }

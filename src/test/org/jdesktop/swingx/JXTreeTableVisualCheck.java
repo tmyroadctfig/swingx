@@ -15,7 +15,6 @@ import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.DefaultCellEditor;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
@@ -56,6 +55,7 @@ import org.jdesktop.test.AncientSwingTeam;
  * @author Jeanette Winzenburg
  */
 public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
+    @SuppressWarnings("all")
     private static final Logger LOG = Logger
             .getLogger(JXTreeTableVisualCheck.class.getName());
     public static void main(String[] args) {
@@ -86,7 +86,6 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      * Check patch and bidi-compliance.
      */
     public void interactiveHierarchicalSelectionAndRToL() {
-        final TreeTableModel model = createMutableVisualizeModel();
         final JXTreeTable table = new JXTreeTable(treeTableModel);
         final JXFrame frame = wrapWithScrollingInFrame(table, "Selection/Expansion Hacks and Bidi Compliance");
         Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
@@ -436,7 +435,6 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         final Icon topIcon = new ImageIcon(getClass().getResource("resources/images/wellTop.gif"));
         final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
         final InsertTreeTableModel model = new InsertTreeTableModel(root);
-        final  DefaultMutableTreeNode leaf = model.addChild(root);
         JXTree tree = new JXTree(model);
         final JXTreeTable treeTable = new JXTreeTable(model);
         treeTable.addHighlighter(AlternateRowHighlighter.linePrinter);
@@ -487,7 +485,6 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     public void interactiveTestInsertNode() {
         final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
         final InsertTreeTableModel model = new InsertTreeTableModel(root);
-        final  DefaultMutableTreeNode leaf = model.addChild(root);
         JTree tree = new JTree(model);
         final JXTreeTable treeTable = new JXTreeTable(model);
         treeTable.addHighlighter(AlternateRowHighlighter.linePrinter);
@@ -961,7 +958,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         treeTable.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
         treeTable.setGridColor(Color.cyan.darker());
         treeTable.setRowHeight(22);
-        treeTable.setDefaultMargins(true, false);
+        treeTable.setShowGrid(true, false);
         JFrame frame = wrapWithScrollingInFrame(treeTable, "LedgerBackground");
         frame.setVisible(true);
     }

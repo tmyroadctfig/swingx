@@ -45,6 +45,7 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  * @author Jeanette Winzenburg
  */
 public class XLocalizeIssues extends InteractiveTestCase {
+    @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(XLocalizeIssues.class
             .getName());
     private static final Locale DEFAULT_LOCALE = Locale.US;

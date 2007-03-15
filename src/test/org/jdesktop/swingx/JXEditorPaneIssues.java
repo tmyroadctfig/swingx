@@ -7,16 +7,9 @@
 
 package org.jdesktop.swingx;
 
-import java.awt.GraphicsEnvironment;
-import java.awt.event.ActionEvent;
-import java.io.IOException;
-import java.net.URL;
 import java.util.logging.Logger;
 
 import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.JEditorPane;
-import javax.swing.text.html.HTMLDocument;
 
 import org.jdesktop.swingx.action.ActionFactory;
 import org.jdesktop.swingx.action.ActionManager;
@@ -28,6 +21,7 @@ import org.jdesktop.swingx.action.TargetManager;
  * @author Mark Davidson
  */
 public class JXEditorPaneIssues extends JXEditorPaneTest {
+    @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(JXEditorPaneIssues.class
             .getName());
     private static String testText = "This is an example of some text";

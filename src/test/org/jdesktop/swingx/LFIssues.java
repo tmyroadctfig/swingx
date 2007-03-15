@@ -14,7 +14,12 @@ import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.test.AncientSwingTeam;
-
+/**
+ * TODO: update hyperlink related test to use HyperlinkProvider instead of the
+ * deprecated LinkRenderer.
+ * 
+ * @author Jeanette Winzenburg
+ */
 public class LFIssues extends InteractiveTestCase {
     protected TableModel sortableTableModel;
 

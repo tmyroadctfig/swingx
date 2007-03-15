@@ -72,9 +72,11 @@ import org.jdesktop.test.AncientSwingTeam;
 /**
  * Split from old JXTableUnitTest - contains "interactive"
  * methods only. <p>
- * PENDING: too many frames to fit all on screen - either split into different
- * tests or change positioning algo to start on top again if hidden.
  * 
+ * PENDING: too many frames to fit all on screen - either split into different
+ * tests or change positioning algo to start on top again if hidden. <p>
+ * TODO: update hyperlink related test to use HyperlinkProvider instead of the
+ * deprecated LinkRenderer.
  * @author Jeanette Winzenburg
  */
 public class JXTableVisualCheck extends JXTableUnitTest {
@@ -644,7 +646,8 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         String[] columnNames = { "text only", "Bool editable", "Bool not-editable" };
         
         DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
-            public Class getColumnClass(int column) {
+            @Override
+            public Class<?> getColumnClass(int column) {
                 return getValueAt(0, column).getClass();
             }
 

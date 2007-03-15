@@ -36,6 +36,10 @@ import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighl
 import org.jdesktop.test.PropertyChangeReport;
 
 /**
+ * Test of JXHyperlink. Raw usage and as hyperlinkRenderer.
+ * <p>
+ * TODO: update to usage of HyperlinkProvider.
+ * 
  * @author Jeanette Winzenburg
  */
 public class JXHyperlinkTest extends InteractiveTestCase {

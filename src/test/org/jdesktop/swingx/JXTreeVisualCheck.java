@@ -45,6 +45,7 @@ import org.jdesktop.swingx.decorator.SearchHighlighter;
 import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
 
 public class JXTreeVisualCheck extends JXTreeUnitTest {
+    @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(JXTreeVisualCheck.class
             .getName());
 

@@ -366,8 +366,6 @@ public class RootPaneTest extends TestCase {
 	    final int start = 0;
 	    final int stop = 100;
 
-	    Integer[] values = { new Integer(start), new Integer(stop) };
-
 	    // Initialized the progress start.
 	    support.fireProgressStarted(start, stop);
 

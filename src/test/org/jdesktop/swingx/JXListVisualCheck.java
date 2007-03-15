@@ -7,7 +7,6 @@ package org.jdesktop.swingx;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
-import java.util.Collections;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -19,16 +18,14 @@ import org.jdesktop.swingx.action.LinkModelAction;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.ConditionalHighlighter;
-import org.jdesktop.swingx.decorator.Filter;
-import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
-import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
-import org.jdesktop.swingx.decorator.SortKey;
-import org.jdesktop.swingx.decorator.SortOrder;
+import org.jdesktop.swingx.renderer.DefaultListRenderer;
+import org.jdesktop.swingx.renderer.HyperlinkProvider;
 
 public class JXListVisualCheck extends JXListTest {
+    @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(JXListVisualCheck.class
             .getName());
     public static void main(String[] args) {
@@ -128,8 +125,10 @@ public class JXListVisualCheck extends JXListTest {
      */
     public void interactiveTestRolloverHighlightAndLink() {
         JXList list = new JXList(createListModelWithLinks());
-        LinkModelAction action = new LinkModelAction(new EditorPaneLinkVisitor());
-        list.setCellRenderer(new LinkRenderer(action, LinkModel.class));
+        EditorPaneLinkVisitor editorPaneLinkVisitor = new EditorPaneLinkVisitor();
+        LinkModelAction action = new LinkModelAction(editorPaneLinkVisitor);
+        HyperlinkProvider h = new HyperlinkProvider(action, LinkModel.class);
+        list.setCellRenderer(new DefaultListRenderer(h));
         list.setRolloverEnabled(true);
         Highlighter conditional = new ConditionalHighlighter(
                 new Color(0xF0, 0xF0, 0xE0), null, -1, -1) {
@@ -142,7 +141,7 @@ public class JXListVisualCheck extends JXListTest {
             
         };
         list.setHighlighters(new HighlighterPipeline(new Highlighter[] {conditional }));
-        JFrame frame = wrapWithScrollingInFrame(list, "rollover highlight with links");
+        JFrame frame = wrapWithScrollingInFrame(list, editorPaneLinkVisitor.getOutputComponent(), "rollover highlight with links");
         frame.setVisible(true);
 
     }

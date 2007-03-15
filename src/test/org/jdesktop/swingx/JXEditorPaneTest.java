@@ -18,16 +18,13 @@ import javax.swing.ActionMap;
 import javax.swing.JEditorPane;
 import javax.swing.text.html.HTMLDocument;
 
-import org.jdesktop.swingx.action.ActionFactory;
-import org.jdesktop.swingx.action.ActionManager;
-import org.jdesktop.swingx.action.TargetManager;
-
 /**
  * A unit test for the JXEditorPane
  *
  * @author Mark Davidson
  */
 public class JXEditorPaneTest extends InteractiveTestCase {
+    @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(JXEditorPaneTest.class
             .getName());
     private static String testText = "This is an example of some text";
@@ -105,8 +102,8 @@ public class JXEditorPaneTest extends InteractiveTestCase {
     public void testXDisabledPasteEmptyClipboard() {
         JXEditorPane editor = new JXEditorPane();
         editor.setEditable(true);
-        Action action = editor.getActionMap().get("paste");
         // can't really test - want to erase system clipboard?
+//        Action action = editor.getActionMap().get("paste");
 //        assertFalse("paste with empty clipboard must not be enabled", action.isEnabled());
         
     }
@@ -160,7 +157,6 @@ public class JXEditorPaneTest extends InteractiveTestCase {
         // set selection markers
         editor.select(4, 15);
 
-        String selected = editor.getSelectedText();
         // get cut and paste actions and execute them simultaniously
 
         ActionMap map = editor.getActionMap();

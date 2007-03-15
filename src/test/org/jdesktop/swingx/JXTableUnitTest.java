@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
@@ -41,7 +40,6 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
@@ -69,9 +67,12 @@ import org.jdesktop.test.ChangeReport;
 import org.jdesktop.test.PropertyChangeReport;
 
 /**
-* Split from old JXTableUnitTest - contains unit test
-* methods only.
+* Tests of <code>JXTable</code>.
 * 
+* TODO: update hyperlink related test to use HyperlinkProvider instead of the
+* deprecated LinkRenderer.
+* 
+* @author Jeanette Winzenburg
 */
 public class JXTableUnitTest extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXTableUnitTest.class
@@ -2383,7 +2384,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     protected DefaultTableModel createAscendingModel(int startRow, int count) {
         DefaultTableModel model = new DefaultTableModel(count, 4) {
-            public Class getColumnClass(int column) {
+            @Override
+            public Class<?> getColumnClass(int column) {
                 return column == 0 ? Integer.class : super.getColumnClass(column);
             }
         };
@@ -2409,7 +2411,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
     protected DefaultTableModel createAscendingModel(int startRow, final int rowCount, 
             final int columnCount, boolean fillLast) {
         DefaultTableModel model = new DefaultTableModel(rowCount, columnCount) {
-            public Class getColumnClass(int column) {
+            @Override
+            public Class<?> getColumnClass(int column) {
                 Object value = rowCount > 0 ? getValueAt(0, column) : null;
                 return value != null ? value.getClass() : super.getColumnClass(column);
             }
@@ -2506,7 +2509,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
      * @return
      */
     private RowObjectTableModel createRowObjectTableModel(int rows) {
-        List rowObjects = new ArrayList();
+        List<RowObject> rowObjects = new ArrayList<RowObject>();
         for (int i = 0; i < rows; i++) {
             rowObjects.add(new RowObject("somedata" + i, i % 2 == 0));
         }
@@ -2699,7 +2702,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
      * 
      */
     public void testLazyRenderersByClass() {
-        JXTable table = new JXTable();
+//        JXTable table = new JXTable();
         // testing against extended renderers
 //        assertEquals("default Boolean renderer", BooleanRendererExt.class,
 //                table.getDefaultRenderer(Boolean.class).getClass());
@@ -2817,7 +2820,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
             this.columnSamples = columnSamples;
         }
 
-        public Class getColumnClass(int column) {
+        public Class<?> getColumnClass(int column) {
             return columnSamples[column].getClass();
         }
 
