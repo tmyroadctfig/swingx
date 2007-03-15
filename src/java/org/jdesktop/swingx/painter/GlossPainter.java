@@ -25,11 +25,8 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Shape;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
-import javax.swing.JComponent;
 
 /**
  * <p>A Painter implementation that simulates a gloss effect. The gloss can
@@ -103,6 +100,7 @@ public class GlossPainter<T> extends AbstractPainter<T> {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void doPaint(Graphics2D g, T component, int width, int height) {
         if (getPaint() != null) {
             Ellipse2D ellipse = new Ellipse2D.Double(-width / 2.0,
