@@ -20,7 +20,6 @@
  */
 package org.jdesktop.swingx.tree;
 
-import java.awt.ComponentOrientation;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;

@@ -22,9 +22,7 @@ package org.jdesktop.swingx.action;
 
 import java.io.PrintStream;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.swing.AbstractAction;

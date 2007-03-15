@@ -218,6 +218,7 @@ public class FilterPipeline {
             return new ShuttleSorter();
         }
         
+        @SuppressWarnings("unchecked")
         public List<? extends SortKey> getSortKeys() {
             Sorter sorter = getSorter();
             if (sorter == null) {
@@ -576,7 +577,7 @@ public class FilterPipeline {
     }
     private List locateSorters(Filter[] inList) {
         BitSet  sortableColumns = new BitSet(); // temporary structure for checking
-        List    sorterLocations = new Vector();
+        List<Integer>    sorterLocations = new Vector<Integer>();
         for (int i = 0; i < inList.length; i++) {
             if (inList[i] instanceof Sorter) {
                 int columnIndex = inList[i].getColumnIndex();
@@ -592,7 +593,7 @@ public class FilterPipeline {
                 }
 
                 sortableColumns.set(columnIndex);       // mark column index
-                sorterLocations.add(new Integer(i));    // mark sorter index
+                sorterLocations.add(i);    // mark sorter index
                 //columnSorterMap.put(new Integer(columnIndex), inList[i]);
             }
         }

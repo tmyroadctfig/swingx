@@ -26,8 +26,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.io.Serializable;
 
-import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 

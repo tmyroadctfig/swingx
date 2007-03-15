@@ -54,4 +54,14 @@ public class JXPanelVisualCheck extends InteractiveTestCase {
         panel.setPreferredSize(new Dimension(200, 200));
         showWithScrollingInFrame(panel, "icon painter in jxpanel");
     }
+
+    /**
+     * do-nothing method - suppress warning if there are no other
+     * test fixtures to run.
+     *
+     */
+    public void testDummy() {
+        
+    }
+
 }

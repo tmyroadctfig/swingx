@@ -2154,7 +2154,7 @@ public class JXTable extends JTable
          * JW: not properly tested (not in all in fact) ... 
          */
         List columns = getColumns(true);
-        Map map = new HashMap();
+        Map<Object, TableColumn> map = new HashMap<Object, TableColumn>();
         for (Iterator iter = columns.iterator(); iter.hasNext();) {
             // PENDING: handle duplicate identifiers ...
             TableColumn column = (TableColumn) iter.next();
@@ -3369,14 +3369,11 @@ public class JXTable extends JTable
 
 
     /** c&p'ed from super */
+    @SuppressWarnings("unchecked")    
     private void setLazyValue(Hashtable h, Class c, String s) {
         h.put(c, new UIDefaults.ProxyLazyValue(s));
     }
 
-    /** c&p'ed from super */
-    private void setLazyRenderer(Class c, String s) {
-        setLazyValue(defaultRenderersByColumnClass, c, s);
-    }
 
     /** c&p'ed from super */
     private void setLazyEditor(Class c, String s) {

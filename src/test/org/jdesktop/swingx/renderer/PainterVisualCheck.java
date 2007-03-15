@@ -77,6 +77,7 @@ import org.jdesktop.test.AncientSwingTeam;
  * @author Jeanette Winzenburg
  */
 public class PainterVisualCheck extends InteractiveTestCase {
+    @SuppressWarnings("all")
     private static final Logger LOG = Logger
             .getLogger(PainterVisualCheck.class.getName());
     public static void main(String args[]) {
@@ -372,6 +373,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
      * with SwingX extended default renderer. Shared by table and list with
      * background color.
      */
+    @SuppressWarnings("deprecation")
     public void interactiveNumberProportionalGradientHighlight() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
@@ -533,7 +535,8 @@ public class PainterVisualCheck extends InteractiveTestCase {
      * @param table
      */
     private void configureList(final JXList list, final JXTable table, boolean useRollover) {
-        final List<Action> actions = new ArrayList();
+        final List<Action> actions = new ArrayList<Action>();
+        @SuppressWarnings("all")
         ColumnControlButton columnControl = new ColumnControlButton(table, null) {
 
             @Override
@@ -616,5 +619,13 @@ public class PainterVisualCheck extends InteractiveTestCase {
         return model;
     }
 
+    /**
+     * do-nothing method - suppress warning if there are no other
+     * test fixtures to run.
+     *
+     */
+    public void testDummy() {
+        
+    }
 
 }

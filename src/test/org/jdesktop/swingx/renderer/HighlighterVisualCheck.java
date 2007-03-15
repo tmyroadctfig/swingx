@@ -194,6 +194,15 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
                 "value-based rendering by ConditionalHighlighter");
     }
 
+    /**
+     * do-nothing method - suppress warning if there are no other
+     * test fixtures to run.
+     *
+     */
+    public void testDummy() {
+        
+    }
+
 //------------------ helper
 
 }

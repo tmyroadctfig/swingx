@@ -158,4 +158,12 @@ public class JXStatusBarVisualCheck extends InteractiveTestCase {
         
     }
     
+    /**
+     * do-nothing method - suppress warning if there are no other
+     * test fixtures to run.
+     *
+     */
+    public void testDummy() {
+        
+    }
 }

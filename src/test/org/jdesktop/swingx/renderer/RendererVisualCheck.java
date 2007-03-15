@@ -635,6 +635,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
      */
     private void configureList(final JXList list, final JXTable table, boolean useRollover) {
         final List<Action> actions = new ArrayList<Action>();
+        // quick and dirty access to column visibility actions
         ColumnControlButton columnControl = new ColumnControlButton(table, null) {
 
             @Override
@@ -1154,5 +1155,13 @@ public class RendererVisualCheck extends InteractiveTestCase {
 
     }    
     
+    /**
+     * do-nothing method - suppress warning if there are no other
+     * test fixtures to run.
+     *
+     */
+    public void testDummy() {
+        
+    }
 
 }

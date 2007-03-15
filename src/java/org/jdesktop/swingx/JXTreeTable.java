@@ -22,7 +22,6 @@
 
 package org.jdesktop.swingx;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -35,9 +34,9 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.swing.ActionMap;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JTable;
@@ -45,7 +44,6 @@ import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -113,8 +111,6 @@ import org.jdesktop.swingx.treetable.TreeTableModel;
  * @author Ramesh Gupta
  */
 public class JXTreeTable extends JXTable {
-    private static final Logger LOG = Logger.getLogger(JXTreeTable.class
-            .getName());
     /**
      * Key for clientProperty to decide whether to apply hack around #168-jdnc.
      */
@@ -2156,8 +2152,6 @@ public class JXTreeTable extends JXTable {
         return dataAdapter;
     }
 
-
-    private final static Dimension spacing = new Dimension(0, 2);
 
     protected static class TreeTableDataAdapter extends JXTable.TableAdapter {
         private final JXTreeTable table;

@@ -5,7 +5,6 @@
 package org.jdesktop.swingx.renderer;
 
 import javax.swing.BorderFactory;
-import javax.swing.UIManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jdesktop.swingx.RolloverRenderer;

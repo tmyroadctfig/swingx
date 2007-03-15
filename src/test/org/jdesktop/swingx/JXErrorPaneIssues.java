@@ -65,4 +65,14 @@ public class JXErrorPaneIssues extends InteractiveTestCase {
         errorPane.setErrorInfo(new ErrorInfo("title", "xxxx-yyy", null, null, null, null, null));
         errorPane.updateUI();
     }
+
+    /**
+     * do-nothing method - suppress warning if there are no other
+     * test fixtures to run.
+     *
+     */
+    public void testDummy() {
+        
+    }
+
 }

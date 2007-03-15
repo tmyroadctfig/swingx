@@ -24,7 +24,6 @@ package org.jdesktop.swingx.decorator;
 import java.awt.Color;
 import java.awt.Component;
 
-import javax.swing.BoundedRangeModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
