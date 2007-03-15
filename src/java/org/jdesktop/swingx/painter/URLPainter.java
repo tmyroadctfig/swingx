@@ -69,7 +69,6 @@ public class URLPainter extends CompoundPainter {
     
     private void load() {
         try {
-            System.out.println("loading");
             Painter painter = PainterUtil.loadPainter(url);
             this.setPainters(painter);
             loaded = true;
@@ -80,7 +79,6 @@ public class URLPainter extends CompoundPainter {
 
     @Override
     public void doPaint(Graphics2D g, Object component, int width, int height) {
-        System.out.println("creating new url painter");
         if(!loaded) {
             load();
         }
