@@ -29,7 +29,7 @@ import java.awt.*;
 import java.awt.font.GlyphVector;
 
 /**
- * A painter which draws text. If the font or text are not provided they will be
+ * A painter which draws text. If the font, text, and paint are not provided they will be
  * obtained from the object being painted if it is a Swing text component.
  *
  * @author rbair
