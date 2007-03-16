@@ -206,8 +206,9 @@ public class CheckerboardPainter<T> extends AbstractPainter<T> {
     /**
      * @inheritDoc
      */
-    public void doPaint(Graphics2D g, T component, int width, int height) {
-        g.setPaint(getCheckerPaint(component));
+    @Override
+    public void doPaint(Graphics2D g, T t, int width, int height) {
+        g.setPaint(getCheckerPaint(t));
         g.fillRect(0, 0, width, height);
     }
 }
