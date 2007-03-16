@@ -39,15 +39,39 @@ public class CapsulePainter extends AbstractAreaPainter {
      * Create a new CapsulePainter that draws a full capsule.
      */
     public CapsulePainter() {
-        this.portion = Portion.Full;
+        this.setPortion(Portion.Full);
     }
     /**
      * Create a new CapsulePainter that only draws the portion specified.
+     * @param portion the portion to draw
      */
     public CapsulePainter(Portion portion) {
-        this.portion = portion;
+        this.setPortion(portion);
     }
 
+    
+    
+    /**
+     * Returns the current portion property. This property determines 
+     * which part of the capsule will be drawn.
+     * @return the current portion
+     */
+    public Portion getPortion() {
+        return portion;
+    }
+
+    /**
+     * Sets the current portion property. This property determines 
+     * which part of the capsule will be drawn.
+     * @param portion the new portion
+     */
+    public void setPortion(Portion portion) {
+        Portion old = this.portion;
+        this.portion = portion;
+        firePropertyChange("portion",old,getPortion());
+    }
+    
+    
     /**
      * {@inheritDoc}
      */
@@ -72,11 +96,11 @@ public class CapsulePainter extends AbstractAreaPainter {
         int round = 10;
         int rheight = height;
         int ry = 0;
-        if(portion == Portion.Top) {
+        if(getPortion() == Portion.Top) {
             round = height*2;
             rheight = height*2;
         }
-        if(portion == Portion.Bottom) {
+        if(getPortion() == Portion.Bottom) {
             round = height*2;
             rheight = height*2;
             ry = -height;
@@ -85,4 +109,5 @@ public class CapsulePainter extends AbstractAreaPainter {
         
         return new RoundRectangle2D.Double(0, ry, width, rheight, round, round);
     }
+
 }
