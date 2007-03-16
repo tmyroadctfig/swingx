@@ -112,7 +112,7 @@ public abstract class AbstractLayoutPainter<T> extends AbstractPainter<T> {
     /**
      * Sets a new horizontalAlignment alignment. Used to position the content at the left, right, or center.
      * 
-     * @param horizontalAlignment new horizontalAlignment alignment
+     * @param horizontal new horizontalAlignment alignment
      */
     public void setHorizontalAlignment(HorizontalAlignment horizontal) {
         HorizontalAlignment old = this.getHorizontalAlignment();
@@ -150,7 +150,7 @@ public abstract class AbstractLayoutPainter<T> extends AbstractPainter<T> {
     /**
      * Sets a new verticalAlignment alignment. Used to position the content at the top, bottom, or center.
      * 
-     * @param verticalAlignment new verticalAlignment alignment
+     * @param vertical new verticalAlignment alignment
      */
     public void setVerticalAlignment(VerticalAlignment vertical) {
         VerticalAlignment old = this.getVerticalAlignment();
@@ -164,7 +164,7 @@ public abstract class AbstractLayoutPainter<T> extends AbstractPainter<T> {
      * space (minus the top and bottom insets).
      * 
      * 
-     * @param fillVertical new verticalAlignment stretch value
+     * @param verticalStretch new verticalAlignment stretch value
      */
     public void setFillVertical(boolean verticalStretch) {
         boolean old = this.isFillVertical();
