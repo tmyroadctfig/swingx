@@ -248,40 +248,46 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
             return;
         }
 
-        configureGraphics(g, component);
-        
-        //if I am caching, and the cache is not null, and the image has the
-        //same dimensions as the component, then simply paint the image
-        BufferedImage image = cachedImage == null ? null : cachedImage.get();
-        if (isUseCache() && image != null
-                && image.getWidth() == width
-                && image.getHeight() == height) {
-            g.drawImage(image, 0, 0, null);
-        } else {
-            BufferedImageOp[] effects = getFilters();
-            if (effects.length > 0 || isUseCache()) {
-                image = PaintUtils.createCompatibleImage(
-                        width,
-                        height,
-                        Transparency.TRANSLUCENT);
-                
-                Graphics2D gfx = image.createGraphics();
-                configureGraphics(gfx, component);
-                doPaint(gfx, component, width, height);
-                gfx.dispose();
-                
-                for (BufferedImageOp effect : effects) {
-                    image = effect.filter(image,null);
-                }
-                
+        g = (Graphics2D)g.create();
+
+        try {
+            configureGraphics(g, component);
+
+            //if I am caching, and the cache is not null, and the image has the
+            //same dimensions as the component, then simply paint the image
+            BufferedImage image = cachedImage == null ? null : cachedImage.get();
+            if (isUseCache() && image != null
+                    && image.getWidth() == width
+                    && image.getHeight() == height) {
                 g.drawImage(image, 0, 0, null);
-                
-                if (isUseCache()) {
-                    cachedImage = new SoftReference<BufferedImage>(image);
-                }
             } else {
-                doPaint(g, component, width, height);
+                BufferedImageOp[] effects = getFilters();
+                if (effects.length > 0 || isUseCache()) {
+                    image = PaintUtils.createCompatibleImage(
+                            width,
+                            height,
+                            Transparency.TRANSLUCENT);
+
+                    Graphics2D gfx = image.createGraphics();
+                    configureGraphics(gfx, component);
+                    doPaint(gfx, component, width, height);
+                    gfx.dispose();
+
+                    for (BufferedImageOp effect : effects) {
+                        image = effect.filter(image,null);
+                    }
+
+                    g.drawImage(image, 0, 0, null);
+
+                    if (isUseCache()) {
+                        cachedImage = new SoftReference<BufferedImage>(image);
+                    }
+                } else {
+                    doPaint(g, component, width, height);
+                }
             }
+        } finally {
+            g.dispose();
         }
     }
     
