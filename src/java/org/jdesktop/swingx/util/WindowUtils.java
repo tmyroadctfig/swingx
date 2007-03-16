@@ -21,30 +21,14 @@
 
 package org.jdesktop.swingx.util;
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Font;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import java.awt.MouseInfo;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Window;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
-import javax.swing.JOptionPane;
-import javax.swing.RootPaneContainer;
-import javax.swing.SwingUtilities;
 
 /**
  * Encapsulates various utilities for windows (ie: <code>Frame</code> and
@@ -96,10 +80,9 @@ public final class WindowUtils {
                     int screenHeight = bounds.height;
                     int width = window.getWidth();
                     int height = window.getHeight();
-                    Point p = new Point(((screenWidth - width) / 2) + bounds.x,
+                    return new Point(((screenWidth - width) / 2) + bounds.x,
                                         ((screenHeight - height) / 2) + bounds
                                                 .y);
-                    return p;
                 }
             }
         } catch (Exception e) {
@@ -143,10 +126,9 @@ public final class WindowUtils {
                     int screenHeight = bounds.height;
                     int width = window.getWidth();
                     int height = window.getHeight();
-                    Point p = new Point(((screenWidth - width) / 2) + bounds.x,
+                    return new Point(((screenWidth - width) / 2) + bounds.x,
                                         ((screenHeight - height) / 2) + bounds
                                                 .y);
-                    return p;
                 }
             }
         } catch (Exception e) {
@@ -208,9 +190,7 @@ public final class WindowUtils {
      * @return a Rectangle object.  @see com.jgui.Rectangle
      */
     public static Rectangle getRectangle(Window win) {
-        Rectangle Rectangle = new Rectangle(win.getY(), win.getX(),
-                                            win.getWidth(), win.getHeight());
-        return Rectangle;
+        return new Rectangle(win.getY(), win.getX(), win.getWidth(), win.getHeight());
     }
 
     /**
@@ -222,9 +202,7 @@ public final class WindowUtils {
      * @return a Rectangle object.  @see com.jgui.Rectangle
      */
     public static Rectangle getRectangle(JComponent comp) {
-        Rectangle Rectangle = new Rectangle(comp.getY(), comp.getX(),
-                                            comp.getWidth(), comp.getHeight());
-        return Rectangle;
+        return new Rectangle(comp.getY(), comp.getX(), comp.getWidth(), comp.getHeight());
     }
 
     /**

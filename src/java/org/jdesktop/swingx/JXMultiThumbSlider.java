@@ -20,27 +20,24 @@
  */
 
 package org.jdesktop.swingx;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import javax.swing.JComponent;
-import javax.swing.UIManager;
-import javax.swing.event.MouseInputAdapter;
-import org.jdesktop.swingx.multislider.*;
+
+import org.jdesktop.swingx.multislider.DefaultMultiThumbModel;
+import org.jdesktop.swingx.multislider.MultiThumbModel;
+import org.jdesktop.swingx.multislider.ThumbDataEvent;
+import org.jdesktop.swingx.multislider.ThumbDataListener;
 import org.jdesktop.swingx.multislider.ThumbListener;
 import org.jdesktop.swingx.multislider.ThumbRenderer;
 import org.jdesktop.swingx.multislider.TrackRenderer;
 import org.jdesktop.swingx.plaf.JXMultiThumbSliderAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.MultiThumbSliderUI;
+
+import javax.swing.*;
+import javax.swing.event.MouseInputAdapter;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>A slider which can have multiple control points or <i>Thumbs</i></p>
@@ -75,7 +72,7 @@ public class JXMultiThumbSlider<E> extends JComponent {
 	tdl = new ThumbHandler();
         
         setModel(new DefaultMultiThumbModel<E>());
-        MultiThumbMouseListener mia = new MultiThumbMouseListener(this);
+        MultiThumbMouseListener mia = new MultiThumbMouseListener();
         addMouseListener(mia);
         addMouseMotionListener(mia);
         
@@ -214,10 +211,9 @@ public class JXMultiThumbSlider<E> extends JComponent {
     }
     
     private void setThumbXByPosition(ThumbComp thumb, float pos) {
-        float tu = pos;
         float lp = getWidth()-thumb.getWidth();
         float lu = getModel().getMaximumValue()-getModel().getMinimumValue();
-        float tp = (tu*lp)/lu;
+        float tp = (pos*lp)/lu;
         thumb.setLocation((int)tp-thumb.getWidth()/2 + thumb.getWidth()/2, thumb.getY());
     }
     
@@ -258,12 +254,6 @@ public class JXMultiThumbSlider<E> extends JComponent {
     }
 
     private class MultiThumbMouseListener extends MouseInputAdapter {
-        private JXMultiThumbSlider slider;
-        
-        public MultiThumbMouseListener(JXMultiThumbSlider slider) {
-            this.slider = slider;
-        }
-
         public void mousePressed(MouseEvent evt) {
             ThumbComp handle = findHandle(evt);
             if(handle != null) {
@@ -361,9 +351,8 @@ public class JXMultiThumbSlider<E> extends JComponent {
         }
 
         private JComponent getRenderer() {
-            JComponent comp = slider.getThumbRenderer().
+            return slider.getThumbRenderer().
                     getThumbRendererComponent(slider,slider.getThumbIndex(this),isSelected());
-            return comp;
         }
         
         private boolean selected;

@@ -21,12 +21,10 @@
  */
 package org.jdesktop.swingx.renderer;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-
-import javax.swing.JCheckBox;
-
 import org.jdesktop.swingx.painter.Painter;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * A <code>JCheckBox</code> optimized for usage in renderers and
@@ -78,7 +76,9 @@ public class JRendererCheckBox extends JCheckBox implements PainterAware {
             painter.paint(scratch, this, getWidth(), getHeight());
         }
         finally {
-            scratch.dispose();
+            if (scratch != null) {
+                scratch.dispose();
+            }
         }
     }
 
@@ -92,13 +92,15 @@ public class JRendererCheckBox extends JCheckBox implements PainterAware {
         // by-pass ui.update and hook into ui.paint directly
         if (ui != null) {
             Graphics scratchGraphics = (g == null) ? null : g.create();
-            try {
-                scratchGraphics.setColor(getBackground());
-                scratchGraphics.fillRect(0, 0, getWidth(), getHeight());
-                paintPainter(g);
-                ui.paint(scratchGraphics, this);
-            } finally {
-                scratchGraphics.dispose();
+            if (scratchGraphics != null) {
+                try {
+                    scratchGraphics.setColor(getBackground());
+                    scratchGraphics.fillRect(0, 0, getWidth(), getHeight());
+                    paintPainter(g);
+                    ui.paint(scratchGraphics, this);
+                } finally {
+                    scratchGraphics.dispose();
+                }
             }
         }
 

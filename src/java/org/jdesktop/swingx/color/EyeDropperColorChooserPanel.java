@@ -6,16 +6,17 @@
 
 package org.jdesktop.swingx.color;
 
+import org.jdesktop.swingx.JXColorSelectionButton;
+
+import javax.swing.*;
+import javax.swing.colorchooser.AbstractColorChooserPanel;
+import javax.swing.event.MouseInputAdapter;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javax.swing.*;
-import javax.swing.colorchooser.AbstractColorChooserPanel;
-import javax.swing.event.MouseInputAdapter;
-import org.jdesktop.swingx.JXColorSelectionButton;
 
 /**
  * <p>EyeDropperColorChooserPanel is a pluggable panel for the 
@@ -41,8 +42,7 @@ import org.jdesktop.swingx.JXColorSelectionButton;
  * @author joshua@marinacci.org
  */
 public class EyeDropperColorChooserPanel extends AbstractColorChooserPanel {
-    private Color oldColor;
-    
+
     /**
      * Example usage
      */
@@ -75,8 +75,7 @@ public class EyeDropperColorChooserPanel extends AbstractColorChooserPanel {
             }
             public void mouseReleased(MouseEvent evt) {
                 Color newColor = new Color(((MagnifyingPanel)magPanel).activeColor);
-                oldColor = newColor;
-                getColorSelectionModel().setSelectedColor(oldColor);
+                getColorSelectionModel().setSelectedColor(newColor);
             }
         };
         eyeDropper.addMouseListener(mia);
@@ -137,10 +136,10 @@ public class EyeDropperColorChooserPanel extends AbstractColorChooserPanel {
         magPanel = new MagnifyingPanel();
         activeColor = new JXColorSelectionButton();
         hexColor = new javax.swing.JTextField();
-        jTextArea1 = new javax.swing.JTextArea();
+        JTextArea jTextArea1 = new JTextArea();
         jLabel1 = new javax.swing.JLabel();
         rgbColor = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
+        JLabel jLabel2 = new JLabel();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -226,8 +225,6 @@ public class EyeDropperColorChooserPanel extends AbstractColorChooserPanel {
     private javax.swing.JButton eyeDropper;
     private javax.swing.JTextField hexColor;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JPanel magPanel;
     private javax.swing.JTextField rgbColor;
     // End of variables declaration//GEN-END:variables

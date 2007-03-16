@@ -20,13 +20,11 @@
  */
 package org.jdesktop.swingx.calendar;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-
-import javax.swing.JFormattedTextField;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 /**
  * Default formatter factory for the JXDatePicker component.  This factory
@@ -110,19 +108,17 @@ public class JXDatePickerFormatterFactory extends AbstractFormatterFactory {
             // If the current formatter did not work loop through the other
             // formatters and see if any of them can parse the string passed
             // in.
-            if (result == null) {
-                for (int i = 0; i < _formats.length; i++) {
-                    try {
-                        result = _formats[i].parse(text);
+            for (int i = 0; i < _formats.length; i++) {
+                try {
+                    result = _formats[i].parse(text);
 
-                        // We got a successful formatter.  Update the current
-                        // formatter index.
-                        _formatIndex = i;
-                        pex = null;
-                        break;
-                    } catch (ParseException ex) {
-                        pex = ex;
-                    }
+                    // We got a successful formatter.  Update the current
+                    // formatter index.
+                    _formatIndex = i;
+                    pex = null;
+                    break;
+                } catch (ParseException ex) {
+                    pex = ex;
                 }
             }
 

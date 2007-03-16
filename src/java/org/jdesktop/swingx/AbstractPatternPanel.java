@@ -20,24 +20,17 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.Dimension;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.ActionContainerFactory;
 import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * Common base class of ui clients.
@@ -225,8 +218,7 @@ public abstract class AbstractPatternPanel extends JXPanel {
      * @return newly created <code>PatternModel</code>
      */
     protected PatternModel createPatternModel() {
-        PatternModel l = new PatternModel();
-        return l;
+        return new PatternModel();
     }
 
     /**
@@ -239,8 +231,7 @@ public abstract class AbstractPatternPanel extends JXPanel {
      *  <code>PropertyChangeListener</code>
      */
     protected PropertyChangeListener getPatternModelListener() {
-        PropertyChangeListener l = new PropertyChangeListener() {
-    
+        return new PropertyChangeListener() {    
             public void propertyChange(PropertyChangeEvent evt) {
                 String property = evt.getPropertyName();
                 if ("pattern".equals(property)) {
@@ -267,7 +258,6 @@ public abstract class AbstractPatternPanel extends JXPanel {
             }
     
         };
-        return l;
     }
 
     /**
@@ -311,7 +301,7 @@ public abstract class AbstractPatternPanel extends JXPanel {
      * @return newly created <code>DocumentListener</code>
      */
     protected DocumentListener getSearchFieldListener() {
-        DocumentListener l = new DocumentListener() {
+        return new DocumentListener() {
             public void changedUpdate(DocumentEvent ev) {
                 // JW - really?? we've a PlainDoc without Attributes
                 refreshModelFromDocument();
@@ -326,7 +316,6 @@ public abstract class AbstractPatternPanel extends JXPanel {
             }
     
         };
-        return l;
     }
 
 //-------------------------- config helpers

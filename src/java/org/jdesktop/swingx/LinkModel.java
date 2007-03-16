@@ -279,10 +279,7 @@ public class LinkModel implements Comparable {
                 return false;
             }
 
-            if (!getURL().equals(other.getURL())) {
-                return false;
-            }
-            return true;
+            return getURL().equals(other.getURL());
         }
         return false;
     }

@@ -21,24 +21,18 @@
 
 package org.jdesktop.swingx.plaf.basic;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.GradientPaint;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.UIManager;
-import javax.swing.plaf.ComponentUI;
 import org.jdesktop.swingx.JXEditorPane;
 import org.jdesktop.swingx.JXHeader;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.plaf.HeaderUI;
 import org.jdesktop.swingx.plaf.PainterUIResource;
+
+import javax.swing.*;
+import javax.swing.plaf.ComponentUI;
+import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  *
@@ -49,11 +43,11 @@ public class BasicHeaderUI extends HeaderUI {
     protected JXEditorPane descriptionPane;
     protected JLabel imagePanel;
     private PropertyChangeListener propListener;
-    
+
     /** Creates a new instance of BasicHeaderUI */
     public BasicHeaderUI() {
     }
-    
+
     /**
      * Returns an instance of the UI delegate for the specified component.
      * Each subclass must provide its own static <code>createUI</code>
@@ -67,7 +61,7 @@ public class BasicHeaderUI extends HeaderUI {
     public static ComponentUI createUI(JComponent c) {
         return new BasicHeaderUI();
     }
-    
+
     /**
      * Configures the specified component appropriate for the look and feel.
      * This method is invoked when the <code>ComponentUI</code> instance is being installed
@@ -98,9 +92,9 @@ public class BasicHeaderUI extends HeaderUI {
         super.installUI(c);
         assert c instanceof JXHeader;
         JXHeader header = (JXHeader)c;
-        
+
         installDefaults(header);
-        
+
         titleLabel = new JLabel("Title For Header Goes Here");
         titleLabel.setFont(titleLabel.getFont().deriveFont(Font.BOLD));
         descriptionPane = new JXEditorPane();
@@ -110,11 +104,11 @@ public class BasicHeaderUI extends HeaderUI {
         descriptionPane.setText("The description for the header goes here.\nExample: Click the Copy Code button to generate the corresponding Java code.");
         imagePanel = new JLabel();
         imagePanel.setIcon(UIManager.getIcon("Header.defaultIcon"));
-        
+
         installComponents(header);
         installListeners(header);
     }
-    
+
     /**
      * Reverses configuration which was done on the specified component during
      * <code>installUI</code>.  This method is invoked when this
@@ -144,26 +138,26 @@ public class BasicHeaderUI extends HeaderUI {
     public void uninstallUI(JComponent c) {
         assert c instanceof JXHeader;
         JXHeader header = (JXHeader)c;
-        
+
         uninstallDefaults(header);
         uninstallListeners(header);
         uninstallComponents(header);
-        
+
         titleLabel = null;
         descriptionPane = null;
         imagePanel = null;
     }
-    
+
     protected void installDefaults(JXHeader h) {
         Painter p = h.getBackgroundPainter();
         if (p == null || p instanceof PainterUIResource) {
             h.setBackgroundPainter(createBackgroundPainter());
         }
     }
-    
+
     protected void uninstallDefaults(JXHeader h) {
     }
-    
+
     protected void installListeners(final JXHeader h) {
         propListener = new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
@@ -172,19 +166,19 @@ public class BasicHeaderUI extends HeaderUI {
         };
         h.addPropertyChangeListener(propListener);
     }
-    
+
     protected void uninstallListeners(JXHeader h) {
         h.removePropertyChangeListener(propListener);
     }
-    
+
     protected void onPropertyChange(JXHeader h, String propertyName, Object oldValue, Object newValue) {
-        if ("title".equals(propertyName) || propertyName == null) {
+        if ("title".equals(propertyName)) {
             titleLabel.setText(h.getTitle());
-        } else if ("description".equals(propertyName) || propertyName == null) {
+        } else if ("description".equals(propertyName)) {
             descriptionPane.setText(h.getDescription());
-        } else if ("icon".equals(propertyName) || propertyName == null) {
+        } else if ("icon".equals(propertyName)) {
             imagePanel.setIcon(h.getIcon());
-        } else if ("enabled".equals(propertyName) || propertyName == null) {
+        } else if ("enabled".equals(propertyName)) {
             boolean enabled = h.isEnabled();
             titleLabel.setEnabled(enabled);
             descriptionPane.setEnabled(enabled);
@@ -195,34 +189,21 @@ public class BasicHeaderUI extends HeaderUI {
             descriptionPane.setFont((Font)newValue);
         }
     }
-    
+
     protected void installComponents(JXHeader h) {
         h.setLayout(new GridBagLayout());
         h.add(titleLabel, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.HORIZONTAL, new Insets(12, 12, 0, 11), 0, 0));
         h.add(descriptionPane, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.FIRST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(0, 24, 0, 11), 0, 0));
         h.add(imagePanel, new GridBagConstraints(1, 0, 1, 2, 0.0, 1.0, GridBagConstraints.FIRST_LINE_END, GridBagConstraints.NONE, new Insets(12, 0, 11, 11), 0, 0));
     }
-    
+
     protected void uninstallComponents(JXHeader h) {
         h.remove(titleLabel);
         h.remove(descriptionPane);
         h.remove(imagePanel);
-        h.setLayout(null);
     }
-    
+
     protected Painter createBackgroundPainter() {
         return new PainterUIResource(new MattePainter(new GradientPaint(0, 0, Color.WHITE, 1, 0, UIManager.getColor("control"))));
     }
-
-//    @Override
-//    public void paint(Graphics g, JComponent c) {
-        //JPanel panel = new JPanel();//layout);
-        //panel.setOpaque(false);
-        //panel.add(titleLabel, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.HORIZONTAL, new Insets(12, 12, 0, 11), 0, 0));
-        //panel.add(descriptionPane, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.FIRST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(0, 24, 0, 11), 0, 0));
-        //panel.add(imagePanel, new GridBagConstraints(1, 0, 1, 2, 0.0, 1.0, GridBagConstraints.FIRST_LINE_END, GridBagConstraints.NONE, new Insets(12, 0, 11, 11), 0, 0));
-        //panel.setSize(c.getSize());
-        //layout.layoutContainer(panel);
-        //panel.paint(g);
-//    }
 }

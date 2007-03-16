@@ -150,15 +150,8 @@ public class PatternFilter extends Filter implements PatternMatcher {
             return false; 
         }
 
-        Object	value = getInputValue(row, getColumnIndex());
-
-        if (value == null) {
-            return false;
-        }
-        else {
-            boolean matches = pattern.matcher(value.toString()).find();
-            return matches;
-        }
+        Object value = getInputValue(row, getColumnIndex());
+        return value == null ? false : pattern.matcher(value.toString()).find();
     }
 
     /**

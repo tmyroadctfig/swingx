@@ -21,24 +21,16 @@
 
 package org.jdesktop.swingx.border;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
+import org.jdesktop.swingx.graphics.GraphicsUtilities;
+
+import javax.swing.border.Border;
+import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.swing.UIManager;
-import javax.swing.border.Border;
-import org.jdesktop.swingx.graphics.GraphicsUtilities;
 
 /**
  * Implements a DropShadow for components. In general, the DropShadowBorder will
@@ -50,13 +42,12 @@ import org.jdesktop.swingx.graphics.GraphicsUtilities;
  */
 public class DropShadowBorder implements Border {
     private static enum Position {TOP, TOP_LEFT, LEFT, BOTTOM_LEFT,
-                    BOTTOM, BOTTOM_RIGHT, RIGHT, TOP_RIGHT};
+                    BOTTOM, BOTTOM_RIGHT, RIGHT, TOP_RIGHT}
                     
-    private static final Map<Integer,Map<Position,BufferedImage>> CACHE 
-            = new HashMap<Integer,Map<Position,BufferedImage>>();
+    private static final Map<Double,Map<Position,BufferedImage>> CACHE 
+            = new HashMap<Double,Map<Position,BufferedImage>>();
                         
-    private final Color lineColor;
-    private final int lineWidth;
+    private final Color shadowColor;
     private final int shadowSize;
     private final float shadowOpacity;
     private final int cornerSize;
@@ -66,22 +57,21 @@ public class DropShadowBorder implements Border {
     private final boolean showRightShadow;
     
     public DropShadowBorder() {
-        this(UIManager.getColor("Control"), 1, 5);
+        this(Color.BLACK, 5);
     }
     
-    public DropShadowBorder(Color lineColor, int lineWidth, int shadowSize) {
-        this(lineColor, lineWidth, shadowSize, .5f, 12, false, false, true, true);
+    public DropShadowBorder(Color shadowColor, int shadowSize) {
+        this(shadowColor, shadowSize, .5f, 12, false, false, true, true);
     }
     
-    public DropShadowBorder(Color lineColor, int lineWidth, boolean showLeftShadow) {
-        this(lineColor, lineWidth, 5, .5f, 12, false, showLeftShadow, true, true);
+    public DropShadowBorder(boolean showLeftShadow) {
+        this(Color.BLACK, 5, .5f, 12, false, showLeftShadow, true, true);
     }
     
-    public DropShadowBorder(Color lineColor, int lineWidth, int shadowSize,
+    public DropShadowBorder(Color shadowColor, int shadowSize,
             float shadowOpacity, int cornerSize, boolean showTopShadow,
             boolean showLeftShadow, boolean showBottomShadow, boolean showRightShadow) {
-        this.lineColor = lineColor;
-        this.lineWidth = lineWidth;
+        this.shadowColor = shadowColor;
         this.shadowSize = shadowSize;
         this.shadowOpacity = shadowOpacity;
         this.cornerSize = cornerSize;
@@ -101,14 +91,7 @@ public class DropShadowBorder implements Border {
          */
        	Map<Position,BufferedImage> images = getImages((Graphics2D)graphics);
         
-        //compute the edges of the component -- not including the border
-//        Insets borderInsets = getBorderInsets(c);
-//        int leftEdge = x + borderInsets.left;
-//        int rightEdge = x + width - borderInsets.right;
-//        int topEdge = y + borderInsets.top;
-//        int bottomEdge = y + height - borderInsets.bottom;
         Graphics2D g2 = (Graphics2D)graphics.create();
-        g2.setColor(lineColor);
         
         //The location and size of the shadows depends on which shadows are being
         //drawn. For instance, if the left & bottom shadows are being drawn, then
@@ -117,11 +100,13 @@ public class DropShadowBorder implements Border {
         //bottom shadow is drawn, then the bottom-left corner is drawn to the
         //right of the corner, and the bottom shadow is somewhat shorter than before.
         
+        int shadowOffset = 2; //the distance between the shadow and the edge
+        
         Point topLeftShadowPoint = null;
         if (showLeftShadow || showTopShadow) {
             topLeftShadowPoint = new Point();
             if (showLeftShadow && !showTopShadow) {
-                topLeftShadowPoint.setLocation(x, y + shadowSize);
+                topLeftShadowPoint.setLocation(x, y + shadowOffset);
             } else if (showLeftShadow && showTopShadow) {
                 topLeftShadowPoint.setLocation(x, y);
             } else if (!showLeftShadow && showTopShadow) {
@@ -157,7 +142,7 @@ public class DropShadowBorder implements Border {
         if (showRightShadow || showTopShadow) {
             topRightShadowPoint = new Point();
             if (showRightShadow && !showTopShadow) {
-                topRightShadowPoint.setLocation(x + width - shadowSize, y + shadowSize);
+                topRightShadowPoint.setLocation(x + width - shadowSize, y + shadowOffset);
             } else if (showRightShadow && showTopShadow) {
                 topRightShadowPoint.setLocation(x + width - shadowSize, y);
             } else if (!showRightShadow && showTopShadow) {
@@ -237,19 +222,19 @@ public class DropShadowBorder implements Border {
     private Map<Position,BufferedImage> getImages(Graphics2D g2) {
         //first, check to see if an image for this size has already been rendered
         //if so, use the cache. Else, draw and save
-        Map<Position,BufferedImage> images = CACHE.get(shadowSize);
+        Map<Position,BufferedImage> images = CACHE.get(shadowSize + (shadowColor.hashCode() * .3) + (shadowOpacity * .12));//TODO do a real hash
         if (images == null) {
             images = new HashMap<Position,BufferedImage>();
 
             /*
-             * Do draw a drop shadow, I have to:
+             * To draw a drop shadow, I have to:
              *  1) Create a rounded rectangle
              *  2) Create a BufferedImage to draw the rounded rect in
              *  3) Translate the graphics for the image, so that the rectangle
              *     is centered in the drawn space. The border around the rectangle
              *     needs to be shadowWidth wide, so that there is space for the
              *     shadow to be drawn.
-             *  4) Draw the rounded rect as black, with an opacity of 50%
+             *  4) Draw the rounded rect as shadowColor, with an opacity of shadowOpacity
              *  5) Create the BLUR_KERNEL
              *  6) Blur the image
              *  7) copy off the corners, sides, etc into images to be used for
@@ -260,7 +245,8 @@ public class DropShadowBorder implements Border {
             int imageWidth = rectWidth + shadowSize * 2;
             BufferedImage image = GraphicsUtilities.createCompatibleTranslucentImage(imageWidth, imageWidth);
             Graphics2D buffer = (Graphics2D)image.getGraphics();
-            buffer.setColor(new Color(0.0f, 0.0f, 0.0f, shadowOpacity));
+            buffer.setPaint(new Color(shadowColor.getRed(), shadowColor.getGreen(), shadowColor.getBlue(), (int)(shadowOpacity * 255)));
+//            buffer.setColor(new Color(0.0f, 0.0f, 0.0f, shadowOpacity));
             buffer.translate(shadowSize, shadowSize);
             buffer.fill(rect);
             buffer.dispose();
@@ -316,7 +302,7 @@ public class DropShadowBorder implements Border {
             images.put(Position.TOP, getSubImage(targetImage, x, y, w, h));
 
             image.flush();
-            CACHE.put(shadowSize, images);
+            CACHE.put(shadowSize + (shadowColor.hashCode() * .3) + (shadowOpacity * .12), images); //TODO do a real hash
         }
         return images;
     }
@@ -343,10 +329,10 @@ public class DropShadowBorder implements Border {
      * @inheritDoc
      */
     public Insets getBorderInsets(Component c) {
-        int top = showTopShadow ? lineWidth + shadowSize : lineWidth;
-        int left = showLeftShadow ? lineWidth + shadowSize : lineWidth;
-        int bottom = showBottomShadow ? lineWidth + shadowSize : lineWidth;
-        int right = showRightShadow ? lineWidth + shadowSize : lineWidth;
+        int top = showTopShadow ? shadowSize : 0;
+        int left = showLeftShadow ? shadowSize : 0;
+        int bottom = showBottomShadow ? shadowSize : 0;
+        int right = showRightShadow ? shadowSize : 0;
         return new Insets(top, left, bottom, right);
     }
     
@@ -373,16 +359,12 @@ public class DropShadowBorder implements Border {
         return showBottomShadow;
     }
     
-    public int getLineWidth() {
-        return lineWidth;
-    }
-    
-    public Color getLineColor() {
-        return lineColor;
-    }
-    
     public int getShadowSize() {
         return shadowSize;
+    }
+    
+    public Color getShadowColor() {
+        return shadowColor;
     }
     
     public float getShadowOpacity() {

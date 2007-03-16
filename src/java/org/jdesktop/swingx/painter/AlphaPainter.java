@@ -22,11 +22,10 @@
 
 package org.jdesktop.swingx.painter;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import javax.swing.JFrame;
 import org.jdesktop.swingx.JXPanel;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Applies an alpha value to an entire stack of painters
@@ -45,11 +44,10 @@ public class AlphaPainter<T> extends CompoundPainter<T> {
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha));
         }
         for (Painter p : getPainters()) {
-            Graphics2D oldGraphics = g2;
             Graphics2D g3 = (Graphics2D) g2.create();
             p.paint(g3, component, width, height);
             if(isClipPreserved()) {
-                oldGraphics.setClip(g3.getClip());
+                g2.setClip(g3.getClip());
             }
             g3.dispose();
         }

@@ -516,8 +516,8 @@ public class JXGradientChooser extends JXPanel {
         slider.getModel().addThumb(0.5f,Color.red);
         slider.getModel().addThumb(1.0f,Color.white);
         
-        slider.setThumbRenderer(new GradientThumbRenderer(this, slider));
-        slider.setTrackRenderer(new GradientTrackRenderer(this));
+        slider.setThumbRenderer(new GradientThumbRenderer());
+        slider.setTrackRenderer(new GradientTrackRenderer());
         slider.addMultiThumbListener(new StopListener());
         
         // called when the gradient property of the preview pane changes

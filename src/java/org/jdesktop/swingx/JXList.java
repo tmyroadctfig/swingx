@@ -21,32 +21,6 @@
 
 package org.jdesktop.swingx;
 
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.swing.AbstractListModel;
-import javax.swing.Action;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JComponent;
-import javax.swing.JList;
-import javax.swing.KeyStroke;
-import javax.swing.ListCellRenderer;
-import javax.swing.ListModel;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
-
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.DefaultSelectionMapper;
 import org.jdesktop.swingx.decorator.FilterPipeline;
@@ -59,6 +33,20 @@ import org.jdesktop.swingx.decorator.SortController;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * JXList
@@ -238,20 +226,15 @@ public class JXList extends JList {
     }
 
     private Action createFindAction() {
-        Action findAction = new UIAction("find") {
-
+        return new UIAction("find") {
             public void actionPerformed(ActionEvent e) {
                 doFind();
-                
             }
-            
         };
-        return findAction;
     }
 
     protected void doFind() {
         SearchFactory.getInstance().showFindInput(this, getSearchable());
-        
     }
 
     /**
@@ -377,7 +360,7 @@ public class JXList extends JList {
      * @return <code>RolloverProducer</code> to use with this tree
      */
     protected RolloverProducer createRolloverProducer() {
-        RolloverProducer r = new RolloverProducer() {
+        return new RolloverProducer() {
             protected void updateRolloverPoint(JComponent component,
                     Point mousePoint) {
                 JList list = (JList) component;
@@ -394,7 +377,6 @@ public class JXList extends JList {
             }
 
         };
-        return r;
     }
     /**
      * returns the rolloverEnabled property.
@@ -685,19 +667,12 @@ public class JXList extends JList {
         boolean old = isFilterEnabled();
         if (old == enabled)
             return;
-        if (old == true) 
+        if (old) 
             throw new IllegalStateException("must not reset filterEnabled");
         // JW: filterEnabled must be set before calling super.setModel!
         filterEnabled = enabled;
-        if (!old) {
-            wrappingModel = new WrappingListModel(getModel());
-            super.setModel(wrappingModel);
-        } else {
-            ListModel model = wrappingModel.getModel();
-            wrappingModel = null;
-            super.setModel(model);
-        }
-
+        wrappingModel = new WrappingListModel(getModel());
+        super.setModel(wrappingModel);
     }
 
     /**
@@ -833,12 +808,11 @@ public class JXList extends JList {
 
     /** creates the listener for changes in filters. */
     protected PipelineListener createPipelineListener() {
-        PipelineListener l = new PipelineListener() {
+        return new PipelineListener() {
             public void contentsChanged(PipelineEvent e) {
                 updateOnFilterContentChanged();
             }
         };
-        return l;
     }
 
     /**
@@ -886,16 +860,13 @@ public class JXList extends JList {
         }
 
         private ListDataListener createListDataListener() {
-            ListDataListener l = new ListDataListener() {
-
+            return new ListDataListener() {
                 public void intervalAdded(ListDataEvent e) {
                     contentsChanged(e);
-
                 }
 
                 public void intervalRemoved(ListDataEvent e) {
                     contentsChanged(e);
-
                 }
 
                 public void contentsChanged(ListDataEvent e) {
@@ -909,9 +880,7 @@ public class JXList extends JList {
                     }
                     getFilters().flush();
                 }
-
             };
-            return l;
         }
 
         protected void updateSelection(ListDataEvent e) {

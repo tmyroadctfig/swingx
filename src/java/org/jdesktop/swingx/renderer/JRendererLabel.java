@@ -21,15 +21,10 @@
  */
 package org.jdesktop.swingx.renderer;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-
-import javax.swing.JLabel;
-
 import org.jdesktop.swingx.painter.Painter;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * A <code>JLabel</code> optimized for usage in renderers and
@@ -137,7 +132,9 @@ public class JRendererLabel extends JLabel implements PainterAware {
             painter.paint(scratch, this, getWidth(), getHeight());
         }
         finally {
-            scratch.dispose();
+            if (scratch != null) {
+                scratch.dispose();
+            }
         }
     }
 
@@ -151,17 +148,18 @@ public class JRendererLabel extends JLabel implements PainterAware {
         // by-pass ui.update and hook into ui.paint directly
         if (ui != null) {
             Graphics2D scratchGraphics = (Graphics2D) ((g == null) ? null : g.create());
-            try {
-                scratchGraphics.setColor(getBackground());
-                scratchGraphics.fillRect(0, 0, getWidth(), getHeight());
-                paintPainter(g);
-                ui.paint(scratchGraphics, this);
+            if (scratchGraphics != null) {
+                try {
+                    scratchGraphics.setColor(getBackground());
+                    scratchGraphics.fillRect(0, 0, getWidth(), getHeight());
+                    paintPainter(g);
+                    ui.paint(scratchGraphics, this);
+                }
+                finally {
+                    scratchGraphics.dispose();
+                }
             }
-            finally {
-                scratchGraphics.dispose();
-            }
-        }
-        
+        }        
     }
 
 
@@ -220,7 +218,7 @@ public class JRendererLabel extends JLabel implements PainterAware {
      */
     protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {  
         // Strings get interned...
-        if (propertyName=="text") {
+        if ("text".equals(propertyName)) {
             super.firePropertyChange(propertyName, oldValue, newValue);
         }
     }

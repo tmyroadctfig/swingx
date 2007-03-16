@@ -21,57 +21,31 @@
 
 package org.jdesktop.swingx;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dialog;
-import java.awt.FileDialog;
-import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.RenderingHints;
-import java.awt.Window;
+import org.jdesktop.swingx.color.ColorUtil;
+import org.jdesktop.swingx.error.ErrorListener;
+import org.jdesktop.swingx.error.ErrorSupport;
+import org.jdesktop.swingx.util.PaintUtils;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.event.MouseInputAdapter;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DragGestureEvent;
-import java.awt.dnd.DragGestureListener;
-import java.awt.dnd.DragGestureRecognizer;
-import java.awt.dnd.DragSource;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JList;
-import javax.swing.SwingUtilities;
-import javax.swing.TransferHandler;
-import javax.swing.event.MouseInputAdapter;
-import org.jdesktop.swingx.color.ColorUtil;
-import org.jdesktop.swingx.error.ErrorListener;
-import org.jdesktop.swingx.error.ErrorSupport;
-import org.jdesktop.swingx.util.PaintUtils;
 
 /**
  * <p>A panel which shows an image centered. The user can drag an image into the 
@@ -425,7 +399,6 @@ public class JXImageView extends JXPanel {
                 AffineTransform trans = AffineTransform.getRotateInstance(Math.PI/2,0,0);
                 trans.translate(0,-src.getHeight());
                 BufferedImageOp op = new AffineTransformOp(trans, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-                Rectangle2D rect = op.getBounds2D(src);
                 op.filter(src,dst);
                 setImage(dst);
             }
@@ -457,7 +430,6 @@ public class JXImageView extends JXPanel {
                 AffineTransform trans = AffineTransform.getRotateInstance(-Math.PI/2,0,0);
                 trans.translate(-src.getWidth(),0);
                 BufferedImageOp op = new AffineTransformOp(trans, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-                Rectangle2D rect = op.getBounds2D(src);
                 op.filter(src,dst);
                 setImage(dst);
             }
@@ -661,19 +633,15 @@ public class JXImageView extends JXPanel {
         }
 
         public DataFlavor[] getTransferDataFlavors() {
-            DataFlavor[] flavors = { DataFlavor.imageFlavor,
+            return new DataFlavor[] { DataFlavor.imageFlavor,
                 DataFlavor.javaFileListFlavor };
-            return flavors;
         }
 
         public boolean isDataFlavorSupported(DataFlavor flavor) {
             if(flavor == DataFlavor.imageFlavor) {
                 return true;
             }
-            if(flavor == DataFlavor.javaFileListFlavor) {
-                return true;
-            }
-            return false;
+            return flavor == DataFlavor.javaFileListFlavor;
         }
 
         public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {

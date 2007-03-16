@@ -20,26 +20,19 @@
  */
 package org.jdesktop.swingx.color;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import javax.imageio.ImageIO;
-import javax.swing.JComponent;
 import org.jdesktop.swingx.JXMultiThumbSlider;
-import org.jdesktop.swingx.JXGradientChooser;
 import org.jdesktop.swingx.multislider.ThumbRenderer;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+
 public class GradientThumbRenderer extends JComponent implements ThumbRenderer {
-    private final JXGradientChooser gradientPicker;
-    private JXMultiThumbSlider slider;
     private Image thumb_black;
     private Image thumb_gray;
 
-    public GradientThumbRenderer(JXGradientChooser gradientPicker, JXMultiThumbSlider slider) {
+    public GradientThumbRenderer() {
 	super();
-	this.gradientPicker = gradientPicker;
-	this.slider = slider;
 
 	try {
 	    thumb_black = ImageIO.read(this.getClass().getResourceAsStream("/icons/thumb_black.png"));

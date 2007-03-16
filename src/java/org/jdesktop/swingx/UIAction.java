@@ -21,9 +21,8 @@
 
 package org.jdesktop.swingx;
 
+import javax.swing.*;
 import java.beans.PropertyChangeListener;
-
-import javax.swing.Action;
 
 /**
  * UIAction is the basis of all of basic's action classes that are used in
@@ -68,10 +67,7 @@ public abstract class UIAction implements Action {
     }
 
     public Object getValue(String key) {
-        if (key == NAME) {
-            return name;
-        }
-        return null;
+        return NAME.equals(key) ? name : null;
     }
 
     // UIAction is not mutable, this does nothing.

@@ -59,7 +59,7 @@ public abstract class LinkAction<T> extends AbstractActionExt {
      */
     public boolean isVisited() {
         Boolean visited = (Boolean) getValue(VISITED_KEY);
-        return Boolean.TRUE.equals(visited) ? true : false;
+        return Boolean.TRUE.equals(visited);
     }
 
     

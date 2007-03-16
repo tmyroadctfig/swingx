@@ -21,6 +21,8 @@
 
 package org.jdesktop.swingx.action;
 
+import javax.swing.*;
+import javax.swing.event.EventListenerList;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -30,9 +32,6 @@ import java.beans.Statement;
 import java.util.EventListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.swing.Icon;
-import javax.swing.event.EventListenerList;
 
 /**
  * A class that represents the many type of actions that this framework supports.
@@ -241,13 +240,9 @@ public class BoundAction extends AbstractActionExt {
 	boolean newValue;
 	boolean oldValue = isSelected();
 
-        if (evt.getStateChange() == ItemEvent.SELECTED) {
-	    newValue = true;
-	} else {
-	    newValue = false;
-	}
+        newValue = evt.getStateChange() == ItemEvent.SELECTED;
 
-	if (oldValue != newValue) {
+        if (oldValue != newValue) {
 	    setSelected(newValue);
 
 	    // Forward the event to the delgate for handling.

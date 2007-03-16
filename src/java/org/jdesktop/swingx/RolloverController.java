@@ -4,15 +4,11 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.Point;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
 
 /**
  * Controller for "live" behaviour of XXRenderers.
@@ -198,8 +194,7 @@ public abstract class RolloverController<T extends JComponent> implements
      *
      */
     protected Action createExecuteButtonAction() {
-        Action action = new AbstractAction() {
-
+        return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 click(getFocusedCell());
             }
@@ -210,9 +205,7 @@ public abstract class RolloverController<T extends JComponent> implements
                     return false;
                 return isClickable(getFocusedCell());
             }
-
         };
-        return action;
     }
 
 }

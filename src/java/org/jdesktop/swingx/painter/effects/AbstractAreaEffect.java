@@ -22,16 +22,7 @@
 
 package org.jdesktop.swingx.painter.effects;
 
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.Transparency;
+import java.awt.*;
 import java.awt.geom.Area;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -120,10 +111,9 @@ public class AbstractAreaEffect implements AreaEffect {
         if(_clipImage == null ||
                 _clipImage.getWidth() != effectBounds.width ||
                 _clipImage.getHeight() != effectBounds.height) {
-            BufferedImage clipImage = new BufferedImage(
+            _clipImage = new BufferedImage(
                     effectBounds.width,
                     effectBounds.height, BufferedImage.TYPE_INT_ARGB);
-            _clipImage = clipImage;
         }
         _clipImage.getGraphics().clearRect(0,0,_clipImage.getWidth(), _clipImage.getHeight());
         return _clipImage;

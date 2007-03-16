@@ -34,8 +34,9 @@
 
 package org.jdesktop.swingx.image;
 
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
+import org.jdesktop.beans.AbstractBean;
+
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -50,7 +51,7 @@ import java.awt.image.ColorModel;
  * @author Romain Guy <romain.guy@mac.com>
  */
 
-public abstract class AbstractFilter implements BufferedImageOp {
+public abstract class AbstractFilter extends AbstractBean implements BufferedImageOp {
     public abstract BufferedImage filter(BufferedImage src, BufferedImage dest);
 
     /**

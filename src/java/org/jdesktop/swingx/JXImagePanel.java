@@ -20,25 +20,16 @@
  */
 
 package org.jdesktop.swingx;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Rectangle;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.ImageIO;
-
-import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.SwingUtilities;
 
 
 /**
@@ -60,7 +51,7 @@ import javax.swing.SwingUtilities;
  * @author rbair
  */
 public class JXImagePanel extends JXPanel {
-    public static enum Style {CENTERED, TILED, SCALED, SCALED_KEEP_ASPECT_RATIO};
+    public static enum Style {CENTERED, TILED, SCALED, SCALED_KEEP_ASPECT_RATIO}
     private static final Logger LOG = Logger.getLogger(JXImagePanel.class
             .getName());
     /**

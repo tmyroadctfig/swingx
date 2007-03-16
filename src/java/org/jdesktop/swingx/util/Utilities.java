@@ -7,14 +7,8 @@
 package org.jdesktop.swingx.util;
 
 
-import java.awt.Component;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsEnvironment;
-import java.awt.Insets;
-import java.awt.KeyboardFocusManager;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
-import java.awt.Window;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
@@ -28,8 +22,6 @@ import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 
 /**
  * Contribution from NetBeans: Issue #319-swingx. <p>
@@ -127,7 +119,7 @@ public class Utilities {
     /** Get the operating system on which NetBeans is running.
     * @return one of the <code>OS_*</code> constants (such as {@link #OS_WINNT})
     */
-    public static final int getOperatingSystem() {
+    public static int getOperatingSystem() {
         if (operatingSystem == -1) {
             String osName = System.getProperty("os.name");
 
@@ -179,7 +171,7 @@ public class Utilities {
     /** Test whether NetBeans is running on some variant of Windows.
     * @return <code>true</code> if Windows, <code>false</code> if some other manner of operating system
     */
-    public static final boolean isWindows() {
+    public static boolean isWindows() {
         return (getOperatingSystem() & OS_WINDOWS_MASK) != 0;
     }
 
@@ -187,7 +179,7 @@ public class Utilities {
     * Linux is included as well as the commercial vendors, and Mac OS X.
     * @return <code>true</code> some sort of Unix, <code>false</code> if some other manner of operating system
     */
-    public static final boolean isUnix() {
+    public static boolean isUnix() {
         return (getOperatingSystem() & OS_UNIX_MASK) != 0;
     }
     
@@ -195,7 +187,7 @@ public class Utilities {
     * @return <code>true</code> if it does <em>not</em>
     *
     */
-    public static final boolean isLargeFrameIcons() {
+    public static boolean isLargeFrameIcons() {
         return (getOperatingSystem() == OS_SOLARIS) || (getOperatingSystem() == OS_HP);
     }
 
@@ -512,7 +504,7 @@ public class Utilities {
         return Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
     }
 
-    private static final boolean usableKeyOnMac(int key, int mask) {
+    private static boolean usableKeyOnMac(int key, int mask) {
         //All permutations fail for Q except ctrl
         if (key == KeyEvent.VK_Q) {
             return false;
@@ -528,11 +520,7 @@ public class Utilities {
         //them, so CTRL should not be remapped for these
         if (isOnlyMeta) {
             return (key != KeyEvent.VK_H) && (key != KeyEvent.VK_SPACE) && (key != KeyEvent.VK_TAB);
-        } else if ((key == KeyEvent.VK_D) && isMeta && isAlt) {
-            return false;
-        } else {
-            return true;
-        }
+        } else return !((key == KeyEvent.VK_D) && isMeta && isAlt);
     }
 
     /** Convert a space-separated list of Emacs-like key binding names to a list of Swing key strokes.
@@ -656,7 +644,7 @@ public class Utilities {
             int k = array.length;
 
             for (i = 0; i < k; i++)
-                r[i] = (((Integer) array[i]) == null) ? 0 : ((Integer) array[i]).intValue();
+                r[i] = (array[i] == null) ? 0 : ((Integer) array[i]).intValue();
 
             return r;
         }
@@ -667,7 +655,7 @@ public class Utilities {
             int k = array.length;
 
             for (i = 0; i < k; i++)
-                r[i] = (((Boolean) array[i]) == null) ? false : ((Boolean) array[i]).booleanValue();
+                r[i] = (array[i] != null) && ((Boolean) array[i]).booleanValue();
 
             return r;
         }
@@ -678,7 +666,7 @@ public class Utilities {
             int k = array.length;
 
             for (i = 0; i < k; i++)
-                r[i] = (((Byte) array[i]) == null) ? 0 : ((Byte) array[i]).byteValue();
+                r[i] = (array[i] == null) ? 0 : ((Byte) array[i]).byteValue();
 
             return r;
         }
@@ -689,7 +677,7 @@ public class Utilities {
             int k = array.length;
 
             for (i = 0; i < k; i++)
-                r[i] = (((Character) array[i]) == null) ? 0 : ((Character) array[i]).charValue();
+                r[i] = (array[i] == null) ? 0 : ((Character) array[i]).charValue();
 
             return r;
         }
@@ -700,7 +688,7 @@ public class Utilities {
             int k = array.length;
 
             for (i = 0; i < k; i++)
-                r[i] = (((Double) array[i]) == null) ? 0 : ((Double) array[i]).doubleValue();
+                r[i] = (array[i] == null) ? 0 : ((Double) array[i]).doubleValue();
 
             return r;
         }
@@ -711,7 +699,7 @@ public class Utilities {
             int k = array.length;
 
             for (i = 0; i < k; i++)
-                r[i] = (((Float) array[i]) == null) ? 0 : ((Float) array[i]).floatValue();
+                r[i] = (array[i] == null) ? 0 : ((Float) array[i]).floatValue();
 
             return r;
         }
@@ -722,7 +710,7 @@ public class Utilities {
             int k = array.length;
 
             for (i = 0; i < k; i++)
-                r[i] = (((Long) array[i]) == null) ? 0 : ((Long) array[i]).longValue();
+                r[i] = (array[i] == null) ? 0 : ((Long) array[i]).longValue();
 
             return r;
         }
@@ -733,7 +721,7 @@ public class Utilities {
             int k = array.length;
 
             for (i = 0; i < k; i++)
-                r[i] = (((Short) array[i]) == null) ? 0 : ((Short) array[i]).shortValue();
+                r[i] = (array[i] == null) ? 0 : ((Short) array[i]).shortValue();
 
             return r;
         }

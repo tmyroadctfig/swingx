@@ -20,15 +20,14 @@
  */
 package org.jdesktop.swingx;
 
+import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.text.Document;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URL;
-
-import javax.swing.SwingUtilities;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-import javax.swing.text.Document;
 
 
 /**
@@ -105,8 +104,7 @@ public class EditorPaneLinkVisitor implements ActionListener {
     }
 
     protected HyperlinkListener createHyperlinkListener() {
-        HyperlinkListener l = new HyperlinkListener() {
-
+        return new HyperlinkListener() {
             public void hyperlinkUpdate(HyperlinkEvent e) {
                 if (HyperlinkEvent.EventType.ACTIVATED == e.getEventType()) {
                     visitInternal(e.getURL());
@@ -115,7 +113,6 @@ public class EditorPaneLinkVisitor implements ActionListener {
             }
             
         };
-        return l;
     }
 
     protected LinkModel getInternalLink() {

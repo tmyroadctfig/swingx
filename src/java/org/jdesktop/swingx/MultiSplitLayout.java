@@ -21,12 +21,8 @@
 
 package org.jdesktop.swingx;
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Insets;
-import java.awt.LayoutManager;
-import java.awt.Rectangle;
+import javax.swing.*;
+import java.awt.*;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
@@ -41,7 +37,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import javax.swing.UIManager;
 
 
 /**
@@ -141,12 +136,12 @@ public class MultiSplitLayout implements LayoutManager {
      * @see #getModel
      */
     public void setModel(Node model) {
-	if ((model == null) || (model instanceof Divider)) {
-	    throw new IllegalArgumentException("invalid model");
-	}
-	Node oldModel = model;
-	this.model = model;
-	firePCS("model", oldModel, model);
+        if ((model == null) || (model instanceof Divider)) {
+            throw new IllegalArgumentException("invalid model");
+        }
+        Node oldModel = getModel();
+        this.model = model;
+        firePCS("model", oldModel, getModel());
     }
 
     /**
@@ -975,6 +970,46 @@ public class MultiSplitLayout implements LayoutManager {
 	}
     }
 
+    public static class RowSplit extends Split {
+        public RowSplit() {
+        }
+        
+        public RowSplit(Node... children) {
+            setChildren(children);
+        }
+	/**
+	 * Returns true if the this Split's children are to be 
+	 * laid out in a row: all the same height, left edge
+	 * equal to the previous Node's right edge.  If false,
+	 * children are laid on in a column.
+	 * 
+	 * @return the value of the rowLayout property.
+	 * @see #setRowLayout
+	 */
+	public final boolean isRowLayout() { return true; }
+
+    }
+    
+    public static class ColSplit extends Split {
+        public ColSplit() {
+        }
+        
+        public ColSplit(Node... children) {
+            setChildren(children);
+        }
+	/**
+	 * Returns true if the this Split's children are to be 
+	 * laid out in a row: all the same height, left edge
+	 * equal to the previous Node's right edge.  If false,
+	 * children are laid on in a column.
+	 * 
+	 * @return the value of the rowLayout property.
+	 * @see #setRowLayout
+	 */
+	public final boolean isRowLayout() { return false; }
+
+    }
+    
     /** 
      * Defines a vertical or horizontal subdivision into two or more
      * tiles.
@@ -983,6 +1018,10 @@ public class MultiSplitLayout implements LayoutManager {
 	private List<Node> children = Collections.emptyList();
 	private boolean rowLayout = true;
 
+        public Split(Node... children) {
+            setChildren(children);
+        }
+        
 	/**
 	 * Returns true if the this Split's children are to be 
 	 * laid out in a row: all the same height, left edge

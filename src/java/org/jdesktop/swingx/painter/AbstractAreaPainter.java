@@ -21,20 +21,11 @@
 
 package org.jdesktop.swingx.painter;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
-import javax.swing.JComponent;
 import org.apache.batik.ext.awt.LinearGradientPaint;
-import org.jdesktop.swingx.painter.effects.AbstractAreaEffect;
 import org.jdesktop.swingx.painter.effects.AreaEffect;
+
+import java.awt.*;
+import java.awt.geom.Point2D;
 
 
 /**
@@ -248,21 +239,16 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
             pts[0] = mgp.getStartPoint();
             pts[1] = mgp.getEndPoint();
             pts = adjustPoints(pts, width, height);
-            LinearGradientPaint mgp2 = new LinearGradientPaint(
+            return new LinearGradientPaint(
                     pts[0], pts[1],
                     mgp.getFractions(),
                     mgp.getColors());
-            
-            return mgp2;
         }
         return p;
     }
     
     private static boolean isNear(double angle, double target, double error) {
-        if(Math.abs(target - Math.abs(angle)) < error) {
-            return true;
-        }
-        return false;
+        return Math.abs(target - Math.abs(angle)) < error;
     }
     
     private static double calcAngle(Point2D p1, Point2D p2) {

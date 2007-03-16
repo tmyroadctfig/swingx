@@ -20,18 +20,16 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.plaf.ButtonUI;
-
 import org.jdesktop.swingx.action.LinkAction;
 import org.jdesktop.swingx.plaf.JXHyperlinkAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+
+import javax.swing.*;
+import javax.swing.plaf.ButtonUI;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * A hyperlink component that derives from JButton to provide compatibility
@@ -249,7 +247,7 @@ public class JXHyperlink extends JButton {
                 .createActionPropertyChangeListener(a);
         // JW: need to do something better - only weak refs allowed!
         // no way to hook into super
-        PropertyChangeListener l = new PropertyChangeListener() {
+        return new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
                 if (LinkAction.VISITED_KEY.equals(evt.getPropertyName())) {
@@ -261,7 +259,6 @@ public class JXHyperlink extends JButton {
             }
 
         };
-        return l;
     }
 
     /**

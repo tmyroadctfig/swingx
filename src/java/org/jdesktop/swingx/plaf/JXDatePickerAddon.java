@@ -18,14 +18,14 @@
  */
 package org.jdesktop.swingx.plaf;
 
-import java.util.Arrays;
-import java.util.List;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
+import org.jdesktop.swingx.JXDatePicker;
+
+import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.IconUIResource;
-import org.jdesktop.swingx.JXDatePicker;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Joshua Outwater
@@ -61,6 +61,8 @@ public class JXDatePickerAddon extends AbstractComponentAddon {
     protected void addMacDefaults(LookAndFeelAddons addon, List<Object> defaults) {
         super.addMacDefaults(addon, defaults);
         defaults.addAll(Arrays.asList(new Object[] {
+                defaults.add(JXDatePicker.uiClassID),
+                defaults.add("org.jdesktop.swingx.plaf.macosx.MacOSXDatePickerUI"),
                 "JXDatePicker.arrowDown.image",
                 new IconUIResource(new ImageIcon(getClass().getResource("resources/combo-osx.png")))
         }));

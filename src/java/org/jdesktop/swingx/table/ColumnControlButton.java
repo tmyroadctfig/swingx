@@ -21,9 +21,18 @@
 
 package org.jdesktop.swingx.table;
 
-import java.awt.ComponentOrientation;
-import java.awt.Dimension;
-import java.awt.Insets;
+import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.action.ActionContainerFactory;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.TableColumnModelEvent;
+import javax.swing.event.TableColumnModelListener;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.beans.PropertyChangeEvent;
@@ -31,26 +40,6 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.TableColumnModelEvent;
-import javax.swing.event.TableColumnModelListener;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
-
-import org.jdesktop.swingx.JXTable;
-import org.jdesktop.swingx.action.AbstractActionExt;
-import org.jdesktop.swingx.action.ActionContainerFactory;
 
 /**
  * A component to allow interactive customization of <code>JXTable</code>'s
@@ -319,8 +308,7 @@ public class ColumnControlButton extends JButton {
          *         column
          */
         protected PropertyChangeListener createPropertyChangeListener() {
-            PropertyChangeListener l = new PropertyChangeListener() {
-
+            return new PropertyChangeListener() {
                 public void propertyChange(PropertyChangeEvent evt) {
                     if ("visible".equals(evt.getPropertyName())) {
                         updateFromColumnVisible((Boolean) evt.getNewValue());
@@ -328,12 +316,8 @@ public class ColumnControlButton extends JButton {
                         updateFromColumnHeader(evt.getNewValue());
                     }
                 }
-
             };
-            return l;
         }
-
-
     }
 
     // ---------------------- the popup

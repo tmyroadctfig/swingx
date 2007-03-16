@@ -21,9 +21,7 @@
  */
 package org.jdesktop.swingx.renderer;
 
-import javax.swing.AbstractButton;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
+import javax.swing.*;
 
 /**
  * A component provider which uses a AbstractButton. 
@@ -69,8 +67,7 @@ public class ButtonProvider extends ComponentProvider<AbstractButton> {
      */
     @Override
     protected AbstractButton createRendererComponent() {
-        JCheckBox box = new JRendererCheckBox();
-        return  box;
+        return new JRendererCheckBox();
     }
 
     /**

@@ -21,15 +21,6 @@
 
 package org.jdesktop.swingx.color;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.RenderingHints;
-import java.awt.event.MouseEvent;
-import java.awt.geom.Point2D;
-import java.util.List;
-import javax.swing.event.MouseInputAdapter;
 import org.apache.batik.ext.awt.LinearGradientPaint;
 import org.apache.batik.ext.awt.MultipleGradientPaint;
 import org.apache.batik.ext.awt.RadialGradientPaint;
@@ -37,6 +28,12 @@ import org.jdesktop.swingx.JXGradientChooser;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.multislider.MultiThumbModel;
 import org.jdesktop.swingx.multislider.Thumb;
+
+import javax.swing.event.MouseInputAdapter;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Point2D;
+import java.util.List;
 
 /**
  *
@@ -94,16 +91,14 @@ public class GradientPreviewPanel extends JXPanel {
         }
         
         // get the final gradient
-        MultipleGradientPaint paint = calculateGradient(fractions, colors);
-        return paint;
+        return calculateGradient(fractions, colors);
     }
 
     private MultiThumbModel model;
     
     private List<Thumb<Color>> getStops() {
         // calculate the color stops
-        List<Thumb<Color>> stops = model.getSortedThumbs();
-        return stops;
+        return model.getSortedThumbs();
     }
     
     public void setMultiThumbModel(MultiThumbModel model) {

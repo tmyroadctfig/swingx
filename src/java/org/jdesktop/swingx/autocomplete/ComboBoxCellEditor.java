@@ -20,18 +20,14 @@
  */
 package org.jdesktop.swingx.autocomplete;
 
+import javax.swing.*;
+import javax.swing.table.TableCellEditor;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.Serializable;
-
-import javax.swing.AbstractCellEditor;
-import javax.swing.ComboBoxEditor;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.table.TableCellEditor;
 
 /**
  * <p>This is a cell editor that can be used when a combo box (that has been set
@@ -57,10 +53,7 @@ public class ComboBoxCellEditor extends AbstractCellEditor implements TableCellE
     
     /** the combo box */
     private JComboBox comboBox;
-    /** a Listener listening for key events (handling enter-key) and changes of
-     * the combo box' editor component.*/
-    private Handler handler;
-    
+
     /**
      * Creates a new ComboBoxCellEditor.
      * @param comboBox the comboBox that should be used as the cell editor.
@@ -68,7 +61,7 @@ public class ComboBoxCellEditor extends AbstractCellEditor implements TableCellE
     public ComboBoxCellEditor(final JComboBox comboBox) {
         this.comboBox = comboBox;
         
-        handler = new Handler();
+        Handler handler = new Handler();
         
         // Don't do this:
         // this.comboBox.putClientProperty("JComboBox.isTableCellEditor", Boolean.TRUE);

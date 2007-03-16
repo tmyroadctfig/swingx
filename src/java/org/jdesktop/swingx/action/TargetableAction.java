@@ -21,10 +21,9 @@
 
 package org.jdesktop.swingx.action;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
-
-import javax.swing.Icon;
 
 /**
  * A class that represents a dynamically targetable action. The invocation of this
@@ -123,11 +122,7 @@ public class TargetableAction extends AbstractActionExt {
         boolean newValue;
         boolean oldValue = isSelected();
 
-        if (evt.getStateChange() == ItemEvent.SELECTED) {
-            newValue = true;
-        } else {
-            newValue = false;
-        }
+        newValue = evt.getStateChange() == ItemEvent.SELECTED;
 
         if (oldValue != newValue) {
             setSelected(newValue);

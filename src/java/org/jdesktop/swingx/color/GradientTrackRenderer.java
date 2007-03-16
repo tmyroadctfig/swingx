@@ -20,27 +20,21 @@
  */
 package org.jdesktop.swingx.color;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Rectangle;
+import org.apache.batik.ext.awt.MultipleGradientPaint;
+import org.jdesktop.swingx.JXMultiThumbSlider;
+import org.jdesktop.swingx.multislider.Thumb;
+import org.jdesktop.swingx.multislider.TrackRenderer;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
-import javax.swing.JComponent;
-import org.apache.batik.ext.awt.MultipleGradientPaint;
-import org.jdesktop.swingx.JXMultiThumbSlider;
-import org.jdesktop.swingx.JXGradientChooser;
-import org.jdesktop.swingx.multislider.TrackRenderer;
-import org.jdesktop.swingx.multislider.Thumb;
 
 public class GradientTrackRenderer extends JComponent implements TrackRenderer {
     private Paint checker_paint;
-    private final JXGradientChooser gradientPicker;
 
-    public GradientTrackRenderer(JXGradientChooser gradientPicker) {
-	this.gradientPicker = gradientPicker;
+    public GradientTrackRenderer() {
         checker_paint = ColorUtil.getCheckerPaint();
     }
     

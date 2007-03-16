@@ -22,9 +22,7 @@
 
 package org.jdesktop.swingx.painter;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Shape;
+import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 
 /**
@@ -65,11 +63,8 @@ public class CapsulePainter extends AbstractAreaPainter {
             ry = -height;
         }
         
-        RoundRectangle2D rect = new RoundRectangle2D.Double(0, ry, width, rheight, round, round);
-        return rect;
+        return new RoundRectangle2D.Double(0, ry, width, rheight, round, round);
     }
 
-    protected void paintBackground(Graphics2D g, Object component) {
-    }
-    
+    protected void paintBackground(Graphics2D g, Object component) {}    
 }

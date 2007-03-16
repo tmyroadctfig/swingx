@@ -21,27 +21,18 @@
 
 package org.jdesktop.swingx.plaf.basic;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Insets;
-import java.awt.LayoutManager;
-import java.awt.LayoutManager2;
-import java.util.HashMap;
-import java.util.Map;
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.UIManager;
-import javax.swing.border.Border;
-import javax.swing.plaf.ComponentUI;
-import javax.swing.plaf.UIResource;
-import javax.swing.plaf.BorderUIResource;
 import org.jdesktop.swingx.JXStatusBar;
 import org.jdesktop.swingx.JXStatusBar.Constraint;
 import org.jdesktop.swingx.plaf.StatusBarUI;
+
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.plaf.BorderUIResource;
+import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.UIResource;
+import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -210,7 +201,7 @@ public class BasicStatusBarUI extends StatusBarUI {
     
     protected boolean includeSeparators() {
         Boolean b = (Boolean)statusBar.getClientProperty(AUTO_ADD_SEPARATOR);
-        return b == null || b == true;
+        return b == null || b;
     }
     
     protected BorderUIResource createBorder() {

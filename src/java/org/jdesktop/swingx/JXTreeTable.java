@@ -21,29 +21,16 @@
 
 
 package org.jdesktop.swingx;
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.EventObject;
-import java.util.List;
 
-import javax.swing.ActionMap;
-import javax.swing.DefaultListSelectionModel;
-import javax.swing.Icon;
-import javax.swing.JComponent;
-import javax.swing.JTable;
-import javax.swing.JTree;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.FilterPipeline;
+import org.jdesktop.swingx.decorator.SelectionMapper;
+import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
+import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
+import org.jdesktop.swingx.treetable.TreeTableCellEditor;
+import org.jdesktop.swingx.treetable.TreeTableModel;
+
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -63,14 +50,16 @@ import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-
-import org.jdesktop.swingx.decorator.ComponentAdapter;
-import org.jdesktop.swingx.decorator.FilterPipeline;
-import org.jdesktop.swingx.decorator.SelectionMapper;
-import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
-import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
-import org.jdesktop.swingx.treetable.TreeTableCellEditor;
-import org.jdesktop.swingx.treetable.TreeTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.EventObject;
+import java.util.List;
 
 
 /**
@@ -380,7 +369,6 @@ public class JXTreeTable extends JXTable {
         * Entry point for hit handle detection called from editCellAt, 
         * does nothing if isHitDetectionFromProcessMouse is true;
         * 
-        * @see #editCellAt(int, int, EventObject)
         * @see #isHitDetectionFromProcessMouse()
         */
         public void hitHandleDetectionFromEditCell(int column, EventObject e) {
@@ -396,16 +384,14 @@ public class JXTreeTable extends JXTable {
          * @return true if the mouseEvent triggered an expand/collapse in
          *   the renderer, false otherwise. 
          *   
-         * @see #processMouseEvent(MouseEvent)
          * @see #isHitDetectionFromProcessMouse()
          */
         public boolean hitHandleDetectionFromProcessMouse(MouseEvent e) {
             if (!isHitDetectionFromProcessMouse())
                 return false;
             int col = columnAtPoint(e.getPoint());
-            boolean hit = ((col >= 0) && expandOrCollapseNode(columnAtPoint(e
+            return ((col >= 0) && expandOrCollapseNode(columnAtPoint(e
                     .getPoint()), e));
-            return hit;
         }
 
         /**

@@ -21,22 +21,12 @@
 
 package org.jdesktop.swingx.painter;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.font.GlyphVector;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import javax.swing.AbstractButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.text.JTextComponent;
 import org.jdesktop.swingx.painter.effects.AreaEffect;
-import org.jdesktop.swingx.util.Resize;
+
+import javax.swing.*;
+import javax.swing.text.JTextComponent;
+import java.awt.*;
+import java.awt.font.GlyphVector;
 
 /**
  * A painter which draws text. If the font or text are not provided they will be
@@ -190,8 +180,6 @@ public class TextPainter<T> extends AbstractAreaPainter<T> {
         //Graphics2D g2 = (Graphics2D)((JComponent)comp).getGraphics();
         FontMetrics metrics = g2.getFontMetrics(font);
         GlyphVector vect = font.createGlyphVector(g2.getFontRenderContext(),text);
-        Shape shape = vect.getOutline(0f,0f+ metrics.getAscent());//(float)-vect.getVisualBounds().getY()
-        //);
-        return shape;
+        return vect.getOutline(0f,0f+ metrics.getAscent());//(float)-vect.getVisualBounds().getY()
     }
 }

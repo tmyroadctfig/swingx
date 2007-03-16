@@ -21,27 +21,16 @@
 
 package org.jdesktop.swingx.painter;
 
-import java.awt.BasicStroke;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.TexturePaint;
+import org.jdesktop.swingx.editors.PainterUtil;
+import org.jdesktop.swingx.painter.effects.AreaEffect;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.geom.Area;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.logging.Logger;
-import javax.imageio.ImageIO;
-import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
-import org.jdesktop.swingx.editors.PainterUtil;
-import org.jdesktop.swingx.painter.effects.AreaEffect;
 
 /**
  * <p>A Painter instance that paints an image. Any Image is acceptable. This
@@ -89,7 +78,7 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
     private boolean scaleToFit = false;
     private ScaleType scaleType = ScaleType.InsideFit;
     
-    public enum ScaleType { InsideFit, OutsideFit, Distort };
+    public enum ScaleType { InsideFit, OutsideFit, Distort }
     
     /**
      * Create a new ImagePainter. By default there is no image, and the alignment
@@ -316,7 +305,6 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
             if(img != null) {
                 URL url = new URL(img);
                 setImage(ImageIO.read(url));
-                return;
             }
         } catch (IOException ex) {
             System.out.println("ex: " + ex.getMessage());
@@ -399,9 +387,7 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
             int imgWidth = img.getWidth();
             int imgHeight = img.getHeight();
             
-            Rectangle rect = calculateLayout(imgWidth, imgHeight, width, height);
-            
-            return rect;
+            return calculateLayout(imgWidth, imgHeight, width, height);
         }
         return new Rectangle(0,0,0,0);
         

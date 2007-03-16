@@ -21,13 +21,23 @@
 
 package org.jdesktop.swingx;
 
+import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.FilterPipeline;
+import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.HighlighterPipeline;
+import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.plaf.basic.BasicTreeUI;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 import java.applet.Applet;
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.KeyboardFocusManager;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Window;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
@@ -38,28 +48,6 @@ import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.Icon;
-import javax.swing.JComponent;
-import javax.swing.JTree;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.plaf.basic.BasicTreeUI;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeCellRenderer;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
-
-import org.jdesktop.swingx.decorator.ComponentAdapter;
-import org.jdesktop.swingx.decorator.FilterPipeline;
-import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.HighlighterPipeline;
-import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
 
 
 /**
@@ -321,15 +309,11 @@ public class JXTree extends JTree {
 //-------------------- search support
     
     private Action createFindAction() {
-        Action findAction = new UIAction("find") {
-
+        return new UIAction("find") {
             public void actionPerformed(ActionEvent e) {
                 doFind();
-                
             }
-            
         };
-        return findAction;
     }
 
     protected void doFind() {
@@ -636,8 +620,7 @@ public class JXTree extends JTree {
      * @return <code>RolloverProducer</code> to use with this tree
      */
     protected RolloverProducer createRolloverProducer() {
-        RolloverProducer r = new RolloverProducer() {
-            
+        return new RolloverProducer() {
             @Override
             public void mousePressed(MouseEvent e) {
                 JXTree tree = (JXTree) e.getComponent();
@@ -679,9 +662,7 @@ public class JXTree extends JTree {
                 rollover.x = col;
                 rollover.y = row;
             }
-
         };
-        return r;
     }
 
   

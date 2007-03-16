@@ -20,24 +20,17 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.Component;
-import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import org.jdesktop.swingx.action.LinkAction;
 
-import javax.swing.AbstractCellEditor;
-import javax.swing.JList;
-import javax.swing.JTable;
-import javax.swing.JTree;
-import javax.swing.ListCellRenderer;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
-
-import org.jdesktop.swingx.action.LinkAction;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * A Renderer/Editor for "Links". <p>
@@ -237,7 +230,7 @@ public class LinkRenderer extends AbstractCellEditor implements
             }
             updateSelectionColors(list, isSelected);
             updateFocusBorder(cellHasFocus);
-        };
+        }
         return linkButton;
     }
     
@@ -319,15 +312,11 @@ public class LinkRenderer extends AbstractCellEditor implements
     }
 
     private ActionListener createEditorActionListener() {
-        ActionListener l = new ActionListener() {
-
+        return new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 cancelCellEditing();
-
             }
-
         };
-        return l;
     }
 
 //----------------------- treeCellRenderer

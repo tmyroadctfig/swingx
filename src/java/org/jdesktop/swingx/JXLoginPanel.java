@@ -20,20 +20,20 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.ComponentOrientation;
-import java.awt.Cursor;
-import java.awt.Dialog;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Window;
+import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.auth.DefaultUserNameStore;
+import org.jdesktop.swingx.auth.LoginAdapter;
+import org.jdesktop.swingx.auth.LoginEvent;
+import org.jdesktop.swingx.auth.LoginService;
+import org.jdesktop.swingx.auth.PasswordStore;
+import org.jdesktop.swingx.auth.UserNameStore;
+import org.jdesktop.swingx.plaf.JXLoginPanelAddon;
+import org.jdesktop.swingx.plaf.LoginPanelUI;
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.swingx.util.WindowUtils;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -48,37 +48,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.AbstractListModel;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
 
-import javax.swing.ComboBoxModel;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPasswordField;
-import javax.swing.JProgressBar;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-import javax.swing.SwingConstants;
-import javax.swing.UIManager;
-import org.jdesktop.swingx.action.AbstractActionExt;
-
-import org.jdesktop.swingx.auth.DefaultUserNameStore;
-import org.jdesktop.swingx.auth.LoginAdapter;
-import org.jdesktop.swingx.auth.LoginEvent;
-import org.jdesktop.swingx.auth.LoginService;
-import org.jdesktop.swingx.auth.PasswordStore;
-import org.jdesktop.swingx.auth.UserNameStore;
-import org.jdesktop.swingx.plaf.JXLoginPanelAddon;
-import org.jdesktop.swingx.plaf.LoginPanelUI;
-import org.jdesktop.swingx.plaf.LookAndFeelAddons;
-import org.jdesktop.swingx.util.WindowUtils;
 /**
  *  <p>JXLoginPanel is a JPanel that implements a Login dialog with
  *  support for saving passwords supplied for future use in a secure
@@ -129,11 +99,11 @@ public class JXLoginPanel extends JXImagePanel {
      * the username, password, or both to their respective stores.
      * This type specifies what type of save should be performed.
      */
-    public static enum SaveMode {NONE, USER_NAME, PASSWORD, BOTH};
+    public static enum SaveMode {NONE, USER_NAME, PASSWORD, BOTH}
     /**
      * Returns the status of the login process
      */
-    public enum Status {NOT_STARTED, IN_PROGRESS, FAILED, CANCELLED, SUCCEEDED};
+    public enum Status {NOT_STARTED, IN_PROGRESS, FAILED, CANCELLED, SUCCEEDED}
     /**
      * Used as a prefix when pulling data out of UIManager for i18n
      */
@@ -236,11 +206,6 @@ public class JXLoginPanel extends JXImagePanel {
      */
     private SaveMode saveMode;
     /**
-     * Listens to login events on the LoginService. Updates the UI and the
-     * JXLoginPanel.state as appropriate
-     */
-    private LoginListenerImpl loginListener;
-    /**
      * Tracks the cursor at the time that authentication was started, and restores to that
      * cursor after authentication ends, or is cancelled;
      */
@@ -319,8 +284,8 @@ public class JXLoginPanel extends JXImagePanel {
         } else {
             saveMode = SaveMode.NONE;
         }
-        
-        loginListener = new LoginListenerImpl();
+
+        LoginListenerImpl loginListener = new LoginListenerImpl();
         this.loginService.addLoginListener(loginListener);
         
         // initialize banner text
@@ -1056,6 +1021,8 @@ public class JXLoginPanel extends JXImagePanel {
             dlg = new JXLoginDialog((Dialog)w, panel);
         } else if (w instanceof Frame) {
             dlg = new JXLoginDialog((Frame)w, panel);
+        } else {
+            throw new AssertionError("Shouldn't be able to happen");
         }
         dlg.setVisible(true);
         return dlg.getStatus();

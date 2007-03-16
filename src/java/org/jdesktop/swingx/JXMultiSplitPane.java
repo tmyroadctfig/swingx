@@ -21,20 +21,18 @@
 
 package org.jdesktop.swingx;
 
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
+import org.jdesktop.swingx.MultiSplitLayout.Divider;
+import org.jdesktop.swingx.MultiSplitLayout.Node;
+import org.jdesktop.swingx.painter.AbstractPainter;
+
+import javax.accessibility.AccessibleContext;
+import javax.accessibility.AccessibleRole;
+import javax.swing.*;
+import javax.swing.event.MouseInputAdapter;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
-import javax.accessibility.AccessibleContext;
-import javax.accessibility.AccessibleRole;
-import javax.swing.JPanel;
-import javax.swing.event.MouseInputAdapter;
-import org.jdesktop.swingx.MultiSplitLayout.Divider;
-import org.jdesktop.swingx.MultiSplitLayout.Node;
 
 /**
  *
@@ -111,9 +109,9 @@ public class JXMultiSplitPane extends JPanel {
      * @see #isContinuousLayout
      */
     public void setContinuousLayout(boolean continuousLayout) {
-        boolean oldContinuousLayout = continuousLayout;
+        boolean oldContinuousLayout = isContinuousLayout();
         this.continuousLayout = continuousLayout;
-        firePropertyChange("continuousLayout", oldContinuousLayout, continuousLayout);
+        firePropertyChange("continuousLayout", oldContinuousLayout, isContinuousLayout());
     }
 
     /**
@@ -141,28 +139,20 @@ public class JXMultiSplitPane extends JPanel {
     /**
      * Draws a single Divider.  Typically used to specialize the
      * way the active Divider is painted.  
-     * 
-     * @see #getDividerPainter
-     * @see #setDividerPainter
+     *
+     * @see JXMultiSplitPane#getDividerPainter
+     * @see JXMultiSplitPane#setDividerPainter
      */
-    public static abstract class DividerPainter {
-	/**
-	 * Paint a single Divider.       
-	 * 
-	 * @param g the Graphics object to paint with
-	 * @param divider the Divider to paint
-	 */
-	public abstract void paint(Graphics g, Divider divider);
+    public static abstract class DividerPainter extends AbstractPainter<Divider> {
     }
 
     private class DefaultDividerPainter extends DividerPainter {
-	public void paint(Graphics g, Divider divider) {
-	    if ((divider == activeDivider()) && !isContinuousLayout()) {
-		Graphics2D g2d = (Graphics2D)g;
-		g2d.setColor(Color.black);
-		g2d.fill(divider.getBounds());
-	    }
-	}
+        public void doPaint(Graphics2D g, Divider divider, int width, int height) {
+            if ((divider == activeDivider()) && !isContinuousLayout()) {
+                g.setColor(Color.black);
+                g.fillRect(0, 0, width, height);
+            }
+        }
     }
 
     /**
@@ -206,21 +196,21 @@ public class JXMultiSplitPane extends JPanel {
      * {@inheritDoc}
      */
     protected void paintChildren(Graphics g) {
-	super.paintChildren(g);
-	DividerPainter dp = getDividerPainter();
-	Rectangle clipR = g.getClipBounds();
-	if ((dp != null) && (clipR != null)) {
+        super.paintChildren(g);
+        DividerPainter dp = getDividerPainter();
+        Rectangle clipR = g.getClipBounds();
+        if ((dp != null) && (clipR != null)) {
             Graphics dpg = g.create();
             try {
-		MultiSplitLayout msl = getMultiSplitLayout();
-		for(Divider divider : msl.dividersThatOverlap(clipR)) {
-		    dp.paint(dpg, divider);
-		}
+                MultiSplitLayout msl = getMultiSplitLayout();
+                for(Divider divider : msl.dividersThatOverlap(clipR)) {
+                    Rectangle bounds = divider.getBounds();
+                    dp.paint((Graphics2D)dpg, divider, (int)bounds.getWidth(), (int)bounds.getHeight());
+                }
+            } finally {
+                dpg.dispose();
             }
-            finally {
-		dpg.dispose();
-            }
-	}
+	    }
     }
 
     private boolean dragUnderway = false;

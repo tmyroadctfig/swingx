@@ -22,14 +22,7 @@
 
 package org.jdesktop.swingx.painter.effects;
 
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.geom.Point2D;
+import java.awt.*;
 
 /**
  * An effect which draws a multicolored border around a painter's shape.
@@ -45,7 +38,7 @@ public class NeonBorderEffect extends AbstractAreaEffect {
     /**
      * An enum representing the position of the border: inside, outside, or centered on the border.
      */
-    public enum BorderPosition { Inside, Centered, Outside };
+    public enum BorderPosition { Inside, Centered, Outside }
     
     
     /**
@@ -94,7 +87,6 @@ public class NeonBorderEffect extends AbstractAreaEffect {
         if(borderPosition == BorderPosition.Centered) {
             steps = steps/2;
         }
-        float brushAlpha = 1f/steps;
         for(int i=0; i<steps; i++) {
             
             // make the brush width smaller each time until there is nothing left
@@ -121,10 +113,6 @@ public class NeonBorderEffect extends AbstractAreaEffect {
         
     }
     
-    private static void p(String str) {
-        System.out.println(str);
-    }
-    
     protected Color interpolateColor(float t, Color start, Color end) {
         float[] partsS = start.getRGBComponents(null);
         float[] partsE = end.getRGBComponents(null);
@@ -132,8 +120,7 @@ public class NeonBorderEffect extends AbstractAreaEffect {
         for(int i=0; i<4; i++) {
             partsR[i] = (partsS[i] - partsE[i])*t + partsE[i];
         }
-        Color c = new Color(partsR[0],partsR[1],partsR[2],partsR[3]);
-        return c;
+        return new Color(partsR[0],partsR[1],partsR[2],partsR[3]);
     }
     
     /**

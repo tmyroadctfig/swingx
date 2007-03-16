@@ -21,7 +21,7 @@
 
 package org.jdesktop.swingx.decorator;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -144,8 +144,7 @@ public class PatternHighlighter extends ConditionalHighlighter implements
         if (value == null) {
             return false;
         } else {
-            boolean matches = pattern.matcher(value.toString()).find();
-            return matches;
+            return pattern.matcher(value.toString()).find();
         }
     }
 

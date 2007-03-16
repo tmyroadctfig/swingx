@@ -22,13 +22,10 @@
 
 package org.jdesktop.swingx.painter;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
+import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 
 /**
  * This is a glasspane which will draw the specified painter on
@@ -83,9 +80,7 @@ public class PainterGlasspane extends JComponent {
         
         Point parent = calcOffset((JComponent)target.getParent());
         Point self = target.getLocation();
-        Point loc = new Point(parent.x + self.x, parent.y + self.y);
-        //u.p("loc = " + loc);
-        return loc;
+        return new Point(parent.x + self.x, parent.y + self.y);
     }
 
     public Painter getPainter() {

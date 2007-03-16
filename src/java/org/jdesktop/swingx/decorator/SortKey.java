@@ -66,9 +66,8 @@ public class SortKey {
         final SortKey sortKey = (SortKey) o;
 
         if (column != sortKey.column) return false;
-        if (sortOrder != null ? !sortOrder.equals(sortKey.sortOrder) : sortKey.sortOrder != null) return false;
+        return !(sortOrder != null ? !sortOrder.equals(sortKey.sortOrder) : sortKey.sortOrder != null);
 
-        return true;
     }
 
     /** {@inheritDoc} */
