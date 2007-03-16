@@ -24,24 +24,19 @@ package org.jdesktop.swingx.plaf.basic;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GradientPaint;
-import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.LayoutManager;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 import org.jdesktop.swingx.JXEditorPane;
 import org.jdesktop.swingx.JXHeader;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
-//import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
 import org.jdesktop.swingx.plaf.HeaderUI;
 import org.jdesktop.swingx.plaf.PainterUIResource;
 
@@ -54,9 +49,6 @@ public class BasicHeaderUI extends HeaderUI {
     protected JXEditorPane descriptionPane;
     protected JLabel imagePanel;
     private PropertyChangeListener propListener;
-    //this will not be actually put onto the component. Instead, it will
-    //be used behind the scenes for painting the text and icon
-    private LayoutManager layout;
     
     /** Creates a new instance of BasicHeaderUI */
     public BasicHeaderUI() {
@@ -103,6 +95,7 @@ public class BasicHeaderUI extends HeaderUI {
      */
     @Override
     public void installUI(JComponent c) {
+        super.installUI(c);
         assert c instanceof JXHeader;
         JXHeader header = (JXHeader)c;
         
@@ -159,7 +152,6 @@ public class BasicHeaderUI extends HeaderUI {
         titleLabel = null;
         descriptionPane = null;
         imagePanel = null;
-        layout = null;
     }
     
     protected void installDefaults(JXHeader h) {
@@ -215,21 +207,22 @@ public class BasicHeaderUI extends HeaderUI {
         h.remove(titleLabel);
         h.remove(descriptionPane);
         h.remove(imagePanel);
+        h.setLayout(null);
     }
     
     protected Painter createBackgroundPainter() {
         return new PainterUIResource(new MattePainter(new GradientPaint(0, 0, Color.WHITE, 1, 0, UIManager.getColor("control"))));
     }
 
-    @Override
-    public void paint(Graphics g, JComponent c) {
-        JPanel panel = new JPanel();
-        panel.setOpaque(false);
-        panel.add(titleLabel);
-        panel.add(descriptionPane);
-        panel.add(imagePanel);
-        panel.setSize(c.getSize());
-        layout.layoutContainer(panel);
-        panel.paint(g);
-    }
+//    @Override
+//    public void paint(Graphics g, JComponent c) {
+        //JPanel panel = new JPanel();//layout);
+        //panel.setOpaque(false);
+        //panel.add(titleLabel, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.HORIZONTAL, new Insets(12, 12, 0, 11), 0, 0));
+        //panel.add(descriptionPane, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.FIRST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(0, 24, 0, 11), 0, 0));
+        //panel.add(imagePanel, new GridBagConstraints(1, 0, 1, 2, 0.0, 1.0, GridBagConstraints.FIRST_LINE_END, GridBagConstraints.NONE, new Insets(12, 0, 11, 11), 0, 0));
+        //panel.setSize(c.getSize());
+        //layout.layoutContainer(panel);
+        //panel.paint(g);
+//    }
 }

@@ -22,20 +22,14 @@
 package org.jdesktop.swingx;
 
 import java.awt.AlphaComposite;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Composite;
 import java.awt.Dimension;
-import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
-import java.util.List;
-import java.util.Map;
-import javax.swing.JComponent;
 
 import javax.swing.JPanel;
 import javax.swing.RepaintManager;
@@ -82,13 +76,6 @@ public class JXPanel extends JPanel implements Scrollable {
      * backgroundPainter is specified
      */
     private Painter backgroundPainter;
-    /**
-     * Keeps track of the old dimensions so that if the dimensions change, the
-     * saved gradient image can be thrown out and re-rendered. This size is
-     * AFTER applying the insets!
-     */
-    private Dimension oldSize;
-    
     
     /**
      * Creates a new instance of JXPanel
@@ -123,11 +110,13 @@ public class JXPanel extends JPanel implements Scrollable {
     }
     
     private void initPainterSupport() {
-        backgroundPainter = new AbstractPainter<JXPanel>() {
-            protected void doPaint(Graphics2D g, JXPanel component, int width, int height) {
-                JXPanel.super.paintComponent(g);
-            }
-        };
+        if (backgroundPainter == null) {
+            backgroundPainter = new AbstractPainter<JXPanel>() {
+                protected void doPaint(Graphics2D g, JXPanel component, int width, int height) {
+                    JXPanel.super.paintComponent(g);
+                }
+            };
+        }
     }
     
     /**
