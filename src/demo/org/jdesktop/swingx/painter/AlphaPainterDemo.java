@@ -42,6 +42,7 @@ public class AlphaPainterDemo {
                 ));
 
         JFrame frame = new JFrame();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(panel);
         frame.pack();
         frame.setSize(200,200);
