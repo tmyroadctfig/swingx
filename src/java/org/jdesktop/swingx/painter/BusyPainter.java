@@ -26,7 +26,11 @@ import java.awt.Graphics2D;
 import java.awt.geom.RoundRectangle2D;
 import org.jdesktop.swingx.color.ColorUtil;
 
-public class BusyPainter extends AbstractPainter {
+/**
+ * A specific painter that paints an "infinite progress" like animation.
+ *
+ */
+public class BusyPainter<T> extends AbstractPainter<T> {
     private int frame = -1;
     private boolean skewed = false;
     private int points = 8;
@@ -37,10 +41,12 @@ public class BusyPainter extends AbstractPainter {
     private Color baseColor = new Color(200,200,200);
     private Color highlightColor = Color.BLACK;
     private int trailLength = 4;
-    
-    protected void doPaint(Graphics2D g, Object component, int width, int height) {
-        g = (Graphics2D) g.create();
-        
+
+    /**
+     * @inheritDoc
+     */
+    @Override
+    protected void doPaint(Graphics2D g, T t, int width, int height) {
         RoundRectangle2D rect = new RoundRectangle2D.Float(getCenterDistance(), -getBarWidth()/2,
                 getBarLength(), getBarWidth(),
                 getBarWidth(), getBarWidth());
@@ -56,13 +62,10 @@ public class BusyPainter extends AbstractPainter {
             g.fill(rect);
             g.rotate(Math.PI*2.0/(double)getPoints());
         }
-        g.dispose();
     }
     
     
     private Color calcFrameColor(final int i) {
-        // if stopped then all are grey
-        int grey = 220;
         if(frame == -1) {
             return getBaseColor();
         }
@@ -91,7 +94,9 @@ public class BusyPainter extends AbstractPainter {
     }
     
     public void setBaseColor(Color baseColor) {
+        Color old = getBaseColor();
         this.baseColor = baseColor;
+        firePropertyChange("baseColor", old, getBaseColor());
     }
     
     public Color getHighlightColor() {
@@ -99,7 +104,9 @@ public class BusyPainter extends AbstractPainter {
     }
     
     public void setHighlightColor(Color highlightColor) {
+        Color old = getHighlightColor();
         this.highlightColor = highlightColor;
+        firePropertyChange("highlightColor", old, getHighlightColor());
     }
     
     public float getBarWidth() {
@@ -107,7 +114,9 @@ public class BusyPainter extends AbstractPainter {
     }
     
     public void setBarWidth(float barWidth) {
+        float old = getBarWidth();
         this.barWidth = barWidth;
+        firePropertyChange("barWidth", old, getBarWidth());
     }
     
     public float getBarLength() {
@@ -115,7 +124,9 @@ public class BusyPainter extends AbstractPainter {
     }
     
     public void setBarLength(float barLength) {
+        float old = getBarLength();
         this.barLength = barLength;
+        firePropertyChange("barLength", old, getBarLength());
     }
     
     public float getCenterDistance() {
@@ -123,7 +134,9 @@ public class BusyPainter extends AbstractPainter {
     }
     
     public void setCenterDistance(float centerDistance) {
+        float old = getCenterDistance();
         this.centerDistance = centerDistance;
+        firePropertyChange("centerDistance", old, getCenterDistance());
     }
     
     public int getPoints() {
@@ -131,7 +144,9 @@ public class BusyPainter extends AbstractPainter {
     }
     
     public void setPoints(int points) {
+        int old = getPoints();
         this.points = points;
+        firePropertyChange("points", old, getPoints());
     }
 
     public int getTrailLength() {
@@ -139,7 +154,9 @@ public class BusyPainter extends AbstractPainter {
     }
 
     public void setTrailLength(int trailLength) {
+        int old = getTrailLength();
         this.trailLength = trailLength;
+        firePropertyChange("trailLength", old, getTrailLength());
     }
     
 }
