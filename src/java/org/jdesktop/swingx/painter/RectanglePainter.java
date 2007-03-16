@@ -270,8 +270,8 @@ public class RectanglePainter<T> extends AbstractAreaPainter<T> {
         g.setPaint(p);
         
         g.fill(shape);
-        if(getPathEffects() != null) {
-            for(AreaEffect ef : getPathEffects()) {
+        if(getAreaEffects() != null) {
+            for(AreaEffect ef : getAreaEffects()) {
                 ef.apply(g, shape, width, height);
             }
         }

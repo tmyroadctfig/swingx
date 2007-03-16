@@ -173,8 +173,8 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
             g.fill(shape);
         }
         
-        if(getPathEffects() != null) {
-            for(AreaEffect ef : getPathEffects()) {
+        if(getAreaEffects() != null) {
+            for(AreaEffect ef : getAreaEffects()) {
                 ef.apply(g, shape, width, height);
             }
         }

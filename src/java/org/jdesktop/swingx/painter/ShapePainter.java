@@ -204,9 +204,9 @@ public class ShapePainter<T> extends AbstractAreaPainter<T> {
     }
 
     private void drawPathEffects(Graphics2D g, Shape shape, int w, int h) {
-        if(getPathEffects() != null) {
+        if(getAreaEffects() != null) {
             //Paint pt = calculateFillPaint(component, w, h);
-            for(AreaEffect ef : getPathEffects()) {
+            for(AreaEffect ef : getAreaEffects()) {
                 ef.apply(g, shape, w, h);
             }
         }

@@ -62,7 +62,7 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
     // controls if the paint should be stretched to fill the available area
     private boolean stretchPaint;
     
-    private AreaEffect[] pathEffect;
+    private AreaEffect[] areaEffects;
     
     
     private Style style = Style.BOTH;
@@ -90,8 +90,8 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
         fillPaint = Color.RED;
     }
     /**
-     *
-     * @param paint
+     * Creates a new instance of AbstractAreaPainter
+     * @param paint the default paint to fill this area painter with
      */
     public AbstractAreaPainter(Paint paint) {
         this.fillPaint = paint;
@@ -133,6 +133,7 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
      * the beginning of the gradient is on the left edge of the painted region, and the end of the gradient
      * is at the right edge of the painted region.
      * Specifically, if true, the resizePaint method will be called to perform the actual resizing of the Paint
+     * @param paintStretched true if the paint should be stretched, false otherwise.
      */
     public void setPaintStretched(boolean paintStretched) {
         boolean old = this.isPaintStretched();
@@ -264,31 +265,37 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
         return angle;
     }
     
-    // shape effect stuff
+
     /**
      * Returns the outline shape of this painter. Subclasses must implement this method. This shape
      * will be used for filling, stroking, and clipping.
+     * @return the outline shape of this painter
+     * @param g graphics 
      * @param comp The Object this painter will be painted on.
      * @param width the width to paint
      * @param height the height to paint
-     * @return the outline shape of this painter
      */
     protected abstract Shape provideShape(Graphics2D g, T comp, int width, int height);
     
     /**
      * Sets the path effects to be drawn on this painter.
-     * @param pathEffect The path effects to apply to this path painter
+     * @param pathEffects the effects to apply to this painter
      */
-    public void setPathEffects(AreaEffect... pathEffect) {
-        this.pathEffect = pathEffect;
+    public void setAreaEffects(AreaEffect... areaEffects) {
+        AreaEffect[] old = getAreaEffects();
+        this.areaEffects = new AreaEffect[areaEffects == null ? 0 : areaEffects.length];
+        System.arraycopy(areaEffects, 0, this.areaEffects, 0, this.areaEffects.length);
+        firePropertyChange("areaEffects", old, getAreaEffects());
     }
     
     /**
      * Gets the current set of path effects applied to this painter
      * @return the effects applied to this path painter
      */
-    public AreaEffect[] getPathEffects() {
-        return this.pathEffect;
+    public AreaEffect[] getAreaEffects() {
+        AreaEffect[] results = new AreaEffect[areaEffects.length];
+        System.arraycopy(areaEffects, 0, results, 0, results.length);
+        return results;
     }
     
     private static Point2D[] adjustPoints(Point2D[] pts, int width, int height) {

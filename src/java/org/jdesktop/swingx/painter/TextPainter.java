@@ -135,9 +135,9 @@ public class TextPainter<T> extends AbstractAreaPainter<T> {
         }
         
         g.drawString(text, 0, 0 + metrics.getAscent());
-        if(getPathEffects() != null) {
+        if(getAreaEffects() != null) {
             Shape shape = provideShape(g, component, width, height);
-            for(AreaEffect ef : getPathEffects()) {
+            for(AreaEffect ef : getAreaEffects()) {
                 ef.apply(g, shape, width, height);
             }
         }
