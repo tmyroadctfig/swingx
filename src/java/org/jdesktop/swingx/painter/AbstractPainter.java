@@ -337,9 +337,9 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
      * 
      * @param visible New value of property visible.
      */
-    public void setVisible(boolean enabled) {
-        boolean oldEnabled = this.isVisible();
-        this.visible = enabled;
-        firePropertyChange("visible", oldEnabled, enabled);
+    public void setVisible(boolean visible) {
+        boolean oldEnabled = isVisible();
+        this.visible = visible;
+        firePropertyChange("visible", oldEnabled, isVisible());
     }
 }
