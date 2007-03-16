@@ -80,28 +80,6 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
         this.useCaching = useCaching;
     }
     
-
-    /* joshy: not used since we got rid of layers.
-    public CompoundPainter(Map<Integer,List<Painter>> painterSet) {
-        // create a flat list of painters
-        List<Painter> painterList = new ArrayList<Painter>();
-        
-        // loop through the painter by layer order
-        Set<Integer> layerSet = painterSet.keySet();
-        List<Integer> layerList = new ArrayList(layerSet);
-        Collections.sort(layerList);
-        for(Integer n : layerList) {
-            List<Painter> layer = painterSet.get(n);
-            for(Painter p : layer) {
-                painterList.add(p);
-            }
-        }
-        
-        this.painters = painterList.toArray(new Painter[0]);
-        
-    }*/
-    
-    
     /**
      * Sets the array of Painters to use. These painters will be executed in
      * order. A null value will be treated as an empty array.
@@ -161,19 +139,17 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
      */
     @Override
     public void doPaint(Graphics2D g, T component, int width, int height) {
-        Graphics2D g2 = (Graphics2D) g.create();
         if(getTransform() != null) {
-            g2.setTransform(getTransform());
+            g.setTransform(getTransform());
         }
         for (Painter p : getPainters()) {
-            Graphics2D g3 = (Graphics2D) g2.create();
-            p.paint(g3, component, width, height);
+            Graphics2D temp = (Graphics2D) g.create();
+            p.paint(temp, component, width, height);
             if(isClipPreserved()) {
-                g2.setClip(g3.getClip());
+                g.setClip(temp.getClip());
             }
-            g3.dispose();
+            temp.dispose();
         }
-        g2.dispose();
     }
     
     /**
