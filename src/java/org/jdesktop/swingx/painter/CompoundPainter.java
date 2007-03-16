@@ -89,9 +89,7 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
     public void setPainters(Painter... painters) {
         Painter[] old = getPainters();
         this.painters = new Painter[painters == null ? 0 : painters.length];
-        if (painters != null) {
-            System.arraycopy(painters, 0, this.painters, 0, painters.length);
-        }
+        System.arraycopy(painters, 0, this.painters, 0, this.painters.length);
         firePropertyChange("painters", old, getPainters());
     }
     
