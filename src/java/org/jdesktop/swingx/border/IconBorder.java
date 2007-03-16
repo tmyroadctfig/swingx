@@ -29,34 +29,128 @@ import java.awt.Rectangle;
 import java.io.Serializable;
 
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
 /**
  * @author Amy Fowler
+ * @author kschaefe@dev.java.net
+ * 
  * @version 1.0
  */
 public class IconBorder implements Border, Serializable {
 
-    private static final int PAD = 4;
+    /**
+     * An empty icon.
+     */
+    public static final Icon EMPTY_ICON = new ImageIcon();
+    private int padding;
     private Icon icon;
     private int iconPosition;
     private Rectangle iconBounds = new Rectangle();
+    
+    /**
+     * Creates an {@code IconBorder} with an empty icon in a trailing position
+     * with a padding of 4.
+     * 
+     * @see #EMPTY_ICON
+     */
     public IconBorder() {
         this(null);
     }
 
+    /**
+     * Creates an {@code IconBorder} with the specified icon in a trailing
+     * position with a padding of 4.
+     * 
+     * @param validIcon
+     *            the icon to set. This may be {@code null} to represent an
+     *            empty icon.
+     * @see #EMPTY_ICON
+     */
     public IconBorder(Icon validIcon) {
         this(validIcon, SwingConstants.TRAILING);
     }
 
+    /**
+     * Creates an {@code IconBorder} with the specified constraints and a
+     * padding of 4.
+     * 
+     * @param validIcon
+     *            the icon to set. This may be {@code null} to represent an
+     *            empty icon.
+     * @param iconPosition
+     *            the position to place the icon relative to the component
+     *            contents. This must be one of the following
+     *            {@code SwingConstants}:
+     *            <ul>
+     *            <li>{@code LEADING}</li>
+     *            <li>{@code TRAILING}</li>
+     *            <li>{@code EAST}</li>
+     *            <li>{@code WEST}</li>
+     *            </ul>
+     * @throws IllegalArgumentException
+     *             if {@code iconPosition} is not a valid position.
+     * @see #EMPTY_ICON
+     */
     public IconBorder(Icon validIcon, int iconPosition) {
-        this.icon = validIcon;
+        this(validIcon, iconPosition, 4);
+    }
+    
+    /**
+     * Creates an {@code IconBorder} with the specified constraints. If
+     * {@code validIcon} is {@code null}, {@code EMPTY_ICON} is used instead.
+     * If {@code padding} is negative, then the border does not use padding.
+     * 
+     * @param validIcon
+     *            the icon to set. This may be {@code null} to represent an
+     *            empty icon.
+     * @param iconPosition
+     *            the position to place the icon relative to the component
+     *            contents. This must be one of the following
+     *            {@code SwingConstants}:
+     *            <ul>
+     *            <li>{@code LEADING}</li>
+     *            <li>{@code TRAILING}</li>
+     *            <li>{@code EAST}</li>
+     *            <li>{@code WEST}</li>
+     *            </ul>
+     * @param padding
+     *            the padding to surround the icon with. All non-positive values
+     *            set the padding to 0.
+     * @throws IllegalArgumentException
+     *             if {@code iconPosition} is not a valid position.
+     * @see #EMPTY_ICON
+     */
+    public IconBorder(Icon validIcon, int iconPosition, int padding) {
+        if (!isValidPosition(iconPosition)) {
+            throw new IllegalArgumentException("Invalid icon position");
+        }
+        setIcon(validIcon);
+        setPadding(padding);
         this.iconPosition = iconPosition;
     }
 
+    private boolean isValidPosition(int position) {
+        boolean result = false;
+        
+        switch (position) {
+        case SwingConstants.LEADING:
+        case SwingConstants.TRAILING:
+        case SwingConstants.EAST:
+        case SwingConstants.WEST:
+            result = true;
+            break;
+        default:
+            result = false;
+        }
+        
+        return result;
+    }
+    
     public Insets getBorderInsets(Component c) {
-        int horizontalInset = icon.getIconWidth() + (2 * PAD);
+        int horizontalInset = icon.getIconWidth() + (2 * padding);
         int iconPosition = bidiDecodeLeadingTrailing(c.getComponentOrientation(), this.iconPosition);
         if (iconPosition == SwingConstants.EAST) {
             return new Insets(0, 0, 0, horizontalInset);
@@ -64,8 +158,14 @@ public class IconBorder implements Border, Serializable {
         return new Insets(0, horizontalInset, 0, 0);
     }
 
+    /**
+     * Sets the icon for this border.
+     * 
+     * @param validIcon
+     *            the icon to set
+     */
     public void setIcon(Icon validIcon) {
-        this.icon = validIcon;
+        this.icon = validIcon == null ? EMPTY_ICON : validIcon;
     }
     
     public boolean isBorderOpaque() {
@@ -76,16 +176,16 @@ public class IconBorder implements Border, Serializable {
         int height) {
         int iconPosition = bidiDecodeLeadingTrailing(c.getComponentOrientation(), this.iconPosition);
         if (iconPosition == SwingConstants.NORTH_EAST) {
-            iconBounds.y = y + PAD;
-            iconBounds.x = x + width - PAD - icon.getIconWidth();
+            iconBounds.y = y + padding;
+            iconBounds.x = x + width - padding - icon.getIconWidth();
         } else if (iconPosition == SwingConstants.EAST) {    // EAST
             iconBounds.y = y
                 + ((height - icon.getIconHeight()) / 2);
-            iconBounds.x = x + width - PAD - icon.getIconWidth();
+            iconBounds.x = x + width - padding - icon.getIconWidth();
         } else if (iconPosition == SwingConstants.WEST) {
             iconBounds.y = y
                 + ((height - icon.getIconHeight()) / 2);
-            iconBounds.x = x + PAD;
+            iconBounds.x = x + padding;
         }
         iconBounds.width = icon.getIconWidth();
         iconBounds.height = icon.getIconHeight();
@@ -111,6 +211,20 @@ public class IconBorder implements Border, Serializable {
             return SwingConstants.EAST;
         }
         return position;
+    }
+
+    /**
+     * @return the padding
+     */
+    public int getPadding() {
+        return padding;
+    }
+
+    /**
+     * @param padding the padding to set
+     */
+    public void setPadding(int padding) {
+        this.padding = padding < 0 ? 0 : padding;
     }
 
 }
