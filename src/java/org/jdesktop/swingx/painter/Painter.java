@@ -56,7 +56,8 @@ import javax.swing.JComponent;
  * 
  * <p>For convenience, AbstractPainter handles some basic painting chores and
  * should be extended for most concrete Painter implementations</p>
- * 
+ *
+ * <p>TODO: I know I wrote this documentation, but it REALLY stinks. Needs to be rewritten.</p>
  * 
  * @author rbair
  * @see AbstractPainter
@@ -73,7 +74,7 @@ public interface Painter<T> {
      * <p>The Graphics2D object does not need to be returned to the same state it started
      * at by the end of the method.</p>
      * 
-     * @param g The Graphics2D object in which to paint
+     * @param g The Graphics2D object in which to paint. This must not be null.
      * @param object The object that the Painter should paint. This may be null.
      * @param width of the area to paint. Must be greater than zero.
      * @param height of the area to paint. Must be greater than zero.
