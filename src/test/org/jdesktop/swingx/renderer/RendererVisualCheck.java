@@ -37,6 +37,10 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -61,6 +65,7 @@ import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
+import javax.swing.SwingConstants;
 import javax.swing.UIDefaults;
 import javax.swing.border.Border;
 import javax.swing.table.AbstractTableModel;
@@ -106,13 +111,44 @@ public class RendererVisualCheck extends InteractiveTestCase {
         RendererVisualCheck test = new RendererVisualCheck();
         try {
 //            test.runInteractiveTests();
-          test.runInteractiveTests(".*TextArea.*");
+          test.runInteractiveTests(".*Date.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
     }
+    
+    public void interactiveTableSQLDateTime() {
+        Date date = new Date();
+        java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+        Timestamp stamp = new Timestamp(date.getTime());
+        Time time = new Time(date.getTime());
+        DefaultTableModel model = new DefaultTableModel(1, 4) {
 
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                if (getRowCount() > 0) {
+                    Object value = getValueAt(0, columnIndex);
+                    if (value != null) {
+                        return value.getClass();
+                    }
+                }
+                return super.getColumnClass(columnIndex);
+            }
+            
+        };
+        model.setValueAt(date, 0, 0);
+        model.setValueAt(sqlDate, 0, 1);
+        model.setValueAt(stamp, 0, 2);
+        model.setValueAt(time, 0, 3);
+        JXTable table = new JXTable(model);
+        DefaultTableRenderer renderer = new DefaultTableRenderer(
+                new LabelProvider(SwingConstants.RIGHT));
+        table.setDefaultRenderer(Timestamp.class, renderer);
+        table.setDefaultRenderer(Time.class, renderer);
+        showWithScrollingInFrame(table, "date formatting"); 
+    }
+    
     /**
      * Quick example of using a JTextArea as rendering component.
      *
