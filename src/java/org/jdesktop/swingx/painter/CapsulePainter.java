@@ -26,18 +26,30 @@ import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 
 /**
- *
+ * Draws a capsule. This is a rectangle capped by two semi circles. You can draw only a
+ * portion of a capsule using the portion property.
  * @author joshy
  */
 public class CapsulePainter extends AbstractAreaPainter {
-    public enum Portion { Top, Full, Bottom }
+    public enum Portion { Top, Full, Bottom, Left, Right }
     private Portion portion;
+    
+    
+    /**
+     * Create a new CapsulePainter that draws a full capsule.
+     */
+    public CapsulePainter() {
+        this.portion = Portion.Full;
+    }
+    /**
+     * Create a new CapsulePainter that only draws the portion specified.
+     */
     public CapsulePainter(Portion portion) {
         this.portion = portion;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     protected void doPaint(Graphics2D g, Object component, int width, int height) {
@@ -53,7 +65,7 @@ public class CapsulePainter extends AbstractAreaPainter {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     protected Shape provideShape(Graphics2D g, Object comp, int width, int height) {
@@ -69,6 +81,7 @@ public class CapsulePainter extends AbstractAreaPainter {
             rheight = height*2;
             ry = -height;
         }
+        // need to support left and right!
         
         return new RoundRectangle2D.Double(0, ry, width, rheight, round, round);
     }

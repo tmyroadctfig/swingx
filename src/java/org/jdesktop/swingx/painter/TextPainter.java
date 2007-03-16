@@ -43,18 +43,38 @@ public class TextPainter<T> extends AbstractAreaPainter<T> {
         this("");
     }
     
+    /**
+     * Create a new TextPainter which will paint the specified text
+     * @param text the text to paint
+     */
     public TextPainter(String text) {
         this(text, null, null);
     }
     
+    /**
+     * Create a new TextPainter which will paint the specified text with the specified font.
+     * @param text the text to paint
+     * @param font the font to paint the text with
+     */
     public TextPainter(String text, Font font) {
         this(text, font, null);
     }
     
+    /**
+     * Create a new TextPainter which will paint the specified text with the specified paint.
+     * @param text the text to paint
+     * @param paint the paint to paint with
+     */
     public TextPainter(String text, Paint paint) {
         this(text, null, paint);
     }
     
+    /**
+     * Create a new TextPainter which will paint the specified text with the specified font and paint.
+     * @param text the text to paint
+     * @param font the font to paint the text with
+     * @param paint the paint to paint with
+     */
     public TextPainter(String text, Font font, Paint paint) {
         this.text = text;
         this.font = font;
@@ -98,7 +118,7 @@ public class TextPainter<T> extends AbstractAreaPainter<T> {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     protected void doPaint(Graphics2D g, T component, int width, int height) {
@@ -178,7 +198,7 @@ public class TextPainter<T> extends AbstractAreaPainter<T> {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     protected Shape provideShape(Graphics2D g2, T comp, int width, int height) {
