@@ -31,6 +31,7 @@ import java.awt.font.GlyphVector;
 /**
  * A painter which draws text. If the font or text are not provided they will be
  * obtained from the object being painted if it is a Swing text component.
+ *
  * @author rbair
  */
 public class TextPainter<T> extends AbstractAreaPainter<T> {
@@ -43,7 +44,7 @@ public class TextPainter<T> extends AbstractAreaPainter<T> {
     }
     
     public TextPainter(String text) {
-        this(text, (Font)null, (Paint)null);
+        this(text, null, null);
     }
     
     public TextPainter(String text, Font font) {
@@ -95,7 +96,11 @@ public class TextPainter<T> extends AbstractAreaPainter<T> {
     public String getText() {
         return text;
     }
-    
+
+    /**
+     * @inheritDoc
+     */
+    @Override
     protected void doPaint(Graphics2D g, T component, int width, int height) {
         Font font = calculateFont(component);
         if (font != null) {
@@ -171,15 +176,16 @@ public class TextPainter<T> extends AbstractAreaPainter<T> {
         }
         return font;
     }
-    
-    public Shape provideShape(Graphics2D g2, T comp, int width, int height) {
+
+    /**
+     * @inheritDoc
+     */
+    @Override
+    protected Shape provideShape(Graphics2D g2, T comp, int width, int height) {
         Font font = calculateFont(comp);
         String text = calculateText(comp);
-        // this is a hack. it will break if you use a TextPainter on something
-        // other than a JComponent
-        //Graphics2D g2 = (Graphics2D)((JComponent)comp).getGraphics();
         FontMetrics metrics = g2.getFontMetrics(font);
         GlyphVector vect = font.createGlyphVector(g2.getFontRenderContext(),text);
-        return vect.getOutline(0f,0f+ metrics.getAscent());//(float)-vect.getVisualBounds().getY()
+        return vect.getOutline(0f,0f+ metrics.getAscent());
     }
 }
