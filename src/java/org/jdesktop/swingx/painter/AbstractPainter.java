@@ -236,9 +236,8 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
     }
 
     /**
+     * Overrides paint to support painters, filters, and a global alpha value.
      * 
-     * 
-     * @inheritDoc 
      * @param g 
      * @param component 
      * @param width 

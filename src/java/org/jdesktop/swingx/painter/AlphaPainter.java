@@ -57,11 +57,43 @@ public class AlphaPainter<T> extends CompoundPainter<T> {
         }
         g2.dispose();
     }
-    
+    /*
+    public static void main(String ... args) {
+        JXPanel panel = new JXPanel();
+        AlphaPainter alpha = new AlphaPainter();
+        alpha.setAlpha(1f);
+        alpha.setPainters(new PinstripePainter(new Color(255,255,255,125),45,20,20));
+        
+        panel.setBackgroundPainter(new CompoundPainter(
+                new MattePainter(Color.RED),
+                alpha
+                ));
+        
+        JFrame frame = new JFrame();
+        frame.add(panel);
+        frame.pack();
+        frame.setSize(200,200);
+        frame.setVisible(true);
+    }*/
+
+    /**
+     * Returns the current alpha value for this painter. This is the alpha value that will be applied 
+     * to all painters set inside this painter. Alpha values will be multiplied. This means if you set an
+     * alpha of 0.5 on this painter and you nest a painter inside which uses an alpha of 0.5 then the final
+     * pixels drawn will have an alpha of 0.25.
+     * @return the current value of alpha property
+     */
     public float getAlpha() {
         return alpha;
     }
 
+    /**
+     * Sets the current alpha value for this painter. This is the alpha value that will be applied 
+     * to all painters set inside this painter. Alpha values will be multiplied. This means if you set an
+     * alpha of 0.5 on this painter and you nest a painter inside which uses an alpha of 0.5 then the final
+     * pixels drawn will have an alpha of 0.25.
+     * @param alpha the new value of the alpha property
+     */
     public void setAlpha(float alpha) {
         float old = getAlpha();
         this.alpha = alpha;
