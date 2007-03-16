@@ -291,7 +291,7 @@ public class JXPanel extends JPanel implements Scrollable {
         g2d.setComposite(alphaComp);
         super.paint(g2d);
         g2d.setComposite(oldComp);
-        g2d.dispose();
+        //josh: shouldn't be needed here. g2d.dispose();
     }
     
     /**
