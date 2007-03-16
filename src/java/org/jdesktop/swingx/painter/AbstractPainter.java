@@ -46,28 +46,25 @@ import org.jdesktop.swingx.util.PaintUtils;
 
 /**
  * <p>A convenient base class from which concrete Painter implementations may
- * extend. It extends JavaBean and thus provides property change notification
+ * extend. It extends AbstractBean and thus provides property change notification
  * (which is crucial for the Painter implementations to be available in a
- * GUI builder). It also saves off the Graphics2D state in its "saveState" method,
- * and restores that state in the "restoreState" method. Sublasses simply need
+ * GUI builder).Sublasses simply need
  * to extend AbstractPainter and implement the doPaint method.
  * 
- * <p>For example, here is the doPaint method of BackgroundPainter:
+ * <p>For example, here is the doPaint method of RectanglePainter:
  * <pre><code>
- *  public void doPaint(Graphics2D g, JComponent component) {
- *      g.setColor(component.getBackground());
- *      g.fillRect(0, 0, component.getWidth(), component.getHeight());
+ *  public void doPaint(Graphics2D g, T obj, int width, int height) {
+ *      g.setPaint(getPaint());
+ *      g.fillRect(0, 0, width, height);
  *  }
  * </code></pre>
  * 
  * <p>AbstractPainter provides a very useful default implementation of
  * the paint method. It:
  * <ol>
- *  <li>Saves off the old state</li>
  *  <li>Sets any specified rendering hints</li>
  *  <li>Sets the Composite if there is one</li>
  *  <li>Delegates to doPaint</li>
- *  <li>Restores the original Graphics2D state</li>
  * <ol></p>
  * 
  * <p>Specifying rendering hints can greatly improve the visual impact of your
@@ -88,24 +85,7 @@ import org.jdesktop.swingx.util.PaintUtils;
  * @author rbair
  */
 public abstract class AbstractPainter<T> extends AbstractBean implements Painter<T> {
-    //------------------------------------------------- Saved Graphics State
-    private boolean stateSaved = false;
-    private Stroke oldStroke;
-    private AffineTransform oldTransform;
-    private Shape oldClip;
-    private Color oldBackground;
-    private Color oldColor;
-    
     //--------------------------------------------------- Instance Variables
-    /**
-     * A Shape that is used to clip the graphics area. Anything within this
-     * clip shape is included in the final output.
-     */
-    //private Shape clip;
-    /**
-     * RenderingHints to apply when painting
-     */
-    private RenderingHints renderingHints;
     /**
      * A hint as to whether or not to attempt caching the image
      */
@@ -126,54 +106,12 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
     }
     
     /**
-     * <p>Sets whether to cache the painted image with a SoftReference in a BufferedImage
-     * between calls. If true, and if the size of the component hasn't changed,
-     * then the cached image will be used rather than causing a painting operation.</p>
-     *
-     * <p>This should be considered a hint, rather than absolute. Several factors may
-     * force repainting, including low memory, different component sizes, or possibly
-     * new rendering hint settings, etc.</p>
-     *
-     * @param b whether or not to use the cache
-     */
-    /*
-    public void setUseCache(boolean b) {
-        boolean old = isUseCache();
-        useCache = b;
-        firePropertyChange("useCache", old, isUseCache());
-        //if there was a cached image and I'm no longer using the cache, blow it away
-        if (cachedImage != null && !isUseCache()) {
-            cachedImage = null;
-        }
-    }
-     */
-    
-    /**
      * Returns true whether or not the painter is using caching.
      * @return whether or not the cache should be used
      */
     protected boolean isUseCache() {
         return useCache;
     }
-    
-    /*
-     * <p>Sets the effects to apply to the results of the AbstractPainter's
-     * painting operation. Some common effects include blurs, shadows, embossing,
-     * and so forth. If the given effects is a null array, no effects will be used</p>
-     *
-     * @param effects the Effects to apply to the results of the AbstractPainter's
-     *                painting operation
-     */
-    /*
-    public void setFilters(ImageFilter... effects) {
-        ImageFilter[] old = getFilters();
-        this.effects = new ImageFilter[effects == null ? 0 : effects.length];
-        if (effects != null) {
-            System.arraycopy(effects, 0, this.effects, 0, effects.length);
-        }
-        firePropertyChange("effects", old, getFilters());
-    }*/
-    
     
     /**
      * <p>A convenience method for specifying the effects to use based on
@@ -182,7 +120,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
      * array</p>
      * 
      * 
-     * @param filters the BufferedImageOps to wrap as effects
+     * @param effects the BufferedImageOps to wrap as effects
      */
     public void setFilters(BufferedImageOp ... effects) {
         BufferedImageOp[] old = getFilters();
@@ -204,54 +142,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
         System.arraycopy(effects, 0, results, 0, results.length);
         return results;
     }
-    
-    /**
-     * Specifies the Shape to use for clipping the painting area. This
-     * may be null
-     *
-     * @param clip the Shape to use to clip the area. Whatever is inside this
-     *        shape will be kept, everything else "clipped". May be null. If
-     *        null, the clipping is not set on the graphics object
-     */
-    /*
-    public void setClip(Shape clip) {
-        Shape old = getClip();
-        this.clip = clip;
-        firePropertyChange("clip", old, getClip());
-    }*/
-    
-    /**
-     * @return the clipping shape
-     */
-    /*
-    public Shape getClip() {
-        return clip;
-    }*/
-    
-    
-    /**
-     * Sets the Composite to use. For example, you may specify a specific
-     * AlphaComposite so that when this Painter paints, any content in the
-     * drawing area is handled properly
-     *
-     * @param c The composite to use. If null, then no composite will be
-     *        specified on the graphics object
-     *//*
-    public void setComposite(Composite c) {
-        Composite old = getComposite();
-        this.composite = c;
-        firePropertyChange("composite", old, getComposite());
-    }*/
-    
-    /**
-     * Gets the current value of the composite property
-     * @return current value of the composite property
-     *//*
-    public Composite getComposite() {
-        return composite;
-    }*/
-    
-    
+
     private boolean antialiasing = true;
     /**
      * Returns if antialiasing is turned on or not. The default value is true. 
@@ -288,14 +179,12 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
      * metrics should be used when drawing text. @see java.awt.RenderingHints.KEY_FRACTIONALMETRICS.
      * @param fractionalMetrics the new fractional metrics setting
      */
-    public void setFractionalMetricsOn(boolean frationalMetrics) {
+    public void setFractionalMetricsOn(boolean fractionalMetrics) {
         boolean old = isFractionalMetricsOn();
         this.fractionalMetrics = fractionalMetrics;
         firePropertyChange("fractionalMetricsOn", old, isFractionalMetricsOn());
     }
-    
-    
-    
+
     /**
      * An enum representing the possible interpolation values of Bicubic, Bilinear, and
      * Nearest Neighbor. These map to the underlying RenderingHints, 
@@ -345,8 +234,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
         this.interpolation = value;
         firePropertyChange("interpolation", old, getInterpolation());
     }
-    
-    
+
     /**
      * 
      * 
@@ -360,14 +248,10 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
         if(!isVisible()) {
             return;
         }
-        //saveState(g);
-        
-        //Graphics2D oldGraphics = g;
-        //g = (Graphics2D)g.create();
-        
+
         configureGraphics(g, component);
         
-        //if I am cacheing, and the cache is not null, and the image has the
+        //if I am caching, and the cache is not null, and the image has the
         //same dimensions as the component, then simply paint the image
         BufferedImage image = cachedImage == null ? null : cachedImage.get();
         if (isUseCache() && image != null
@@ -400,9 +284,6 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
                 doPaint(g, component, width, height);
             }
         }
-        
-        //restoreState(g);
-        //g.dispose();
     }
     
     /**
@@ -410,14 +291,6 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
      * composite, and clip
      */
     private void configureGraphics(Graphics2D g, T c) {
-        //if (getComposite() != null) {
-            //g.setComposite(getComposite());
-        //}
-        /*
-        Shape clip = getClip();
-        if (clip != null) {
-            g.setClip(clip);
-        }*/
         if(c instanceof JComponent) {
             g.setFont(((JComponent)c).getFont());
         }
@@ -431,19 +304,6 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
         }
         
         getInterpolation().configureGraphics(g);
-        /*
-        if(interpolation.equals(Interpolation.Bicubic)) {
-            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                    RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-        }
-        if(interpolation.equals(Interpolation.Bilinear)) {
-            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                    RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        }
-        if(interpolation.equals(Interpolation.NearestNeighbor)) {
-            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                    RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-        }*/
     }
     
     
