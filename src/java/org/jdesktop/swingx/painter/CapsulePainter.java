@@ -35,9 +35,12 @@ public class CapsulePainter extends AbstractAreaPainter {
     public CapsulePainter(Portion portion) {
         this.portion = portion;
     }
-    
+
+    /**
+     * @inheritDoc
+     */
+    @Override
     protected void doPaint(Graphics2D g, Object component, int width, int height) {
-        
         Shape rect = provideShape(g,component,width,height);
         if(getStyle() == Style.BOTH || getStyle() == Style.FILLED) {
             g.setPaint(getFillPaint());
@@ -48,7 +51,11 @@ public class CapsulePainter extends AbstractAreaPainter {
             g.draw(rect);
         }
     }
-    
+
+    /**
+     * @inheritDoc
+     */
+    @Override
     protected Shape provideShape(Graphics2D g, Object comp, int width, int height) {
         int round = 10;
         int rheight = height;
@@ -65,6 +72,4 @@ public class CapsulePainter extends AbstractAreaPainter {
         
         return new RoundRectangle2D.Double(0, ry, width, rheight, round, round);
     }
-
-    protected void paintBackground(Graphics2D g, Object component) {}    
 }
