@@ -31,8 +31,8 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.Painter;
+
 /**
- * 
  * A JLabel subclass which supports Painters with the foregroundPainter and backgroundpainter
  * properties. By default the
  * foregroundPainter is set to a special painter which will draw the label normally, as specified
@@ -47,6 +47,7 @@ import org.jdesktop.swingx.painter.Painter;
  * MattePainter blue = new MattePainter(Color.BLUE);
  * CompoundPainter compound = new CompoundPainter(blue,standardPainter);
  * label.setForegroundPainter(label);
+ * 
  * @author joshua.marinacci@sun.com
  */
 public class JXLabel extends JLabel {
@@ -107,7 +108,7 @@ public class JXLabel extends JLabel {
      * this component according to the current Look and Feel. Calling
      * <CODE>setBackgroundPainter</CODE> will replace that existing painter.
      * @param p the new painter
-     * @see getBackgroundPainter()
+     * @see #getBackgroundPainter()
      */
     public void setBackgroundPainter(Painter p) {
         Painter old = getBackgroundPainter();
@@ -120,7 +121,7 @@ public class JXLabel extends JLabel {
      * Returns the current background painter. The default value of this property 
      * is a painter which draws the normal JPanel background according to the current look and feel.
      * @return the current painter
-     * @see setBackgroundPainter(Painter)
+     * @see #setBackgroundPainter(Painter)
      */
     public Painter getBackgroundPainter() {
         return backgroundPainter;
