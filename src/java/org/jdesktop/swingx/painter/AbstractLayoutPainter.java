@@ -15,19 +15,18 @@ import java.awt.Rectangle;
 /**
  * An abstract base class for any painter which can be positioned. This means
  * the painter has some intrinsic size to what it is drawing and
- * can be stretched or aligned both horizontally and vertically.  The
+ * can be stretched or aligned both horizontally and vertically.
  * 
  * 
  * The AbstractLayoutPainter class provides the following configuraable properties:
  * 
  * <ul>
- * <li>horizonal - the horizonal alignment (left, center, and right)</li>
+ * <li>horizonalAlignment - the horizonal alignment (left, center, and right)</li>
  * <li>verticalAlignment - the verticalAlignment alignment (top, center, and bottom)</li>
+ * <li>fillHorizontal - indicates if the painter should stretch to fill the available space horizontally</li>
+ * <li>fillVertical - indicates if the painter should stretch to fill the available space vertically</li>
  * <li>insets - whitespace on the top, bottom, left, and right.
  * </ul>
- * 
- * 
- * 
  * @author joshy
  */
 public abstract class AbstractLayoutPainter<T> extends AbstractPainter<T> {
