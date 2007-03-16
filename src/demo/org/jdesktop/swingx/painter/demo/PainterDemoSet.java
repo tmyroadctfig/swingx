@@ -226,6 +226,8 @@ public class PainterDemoSet extends javax.swing.JFrame {
         JTable musicTable = createJTableWithData(false);
         //musicTable.setIntercellSpacing(new Dimension(0,0));
         musicTable.setGridColor(Color.GRAY.darker());
+        // broken for now
+        /*
         PainterTableCellRenderer tableRenderer = new PainterTableCellRenderer();
         MultipleGradientPaint shading = new LinearGradientPaint(
                 new Point(0,0), new Point(0,10),
@@ -261,7 +263,7 @@ public class PainterDemoSet extends javax.swing.JFrame {
         musicTable.setRowSelectionAllowed(true);
         musicTable.setColumnSelectionAllowed(false);
         addDemo(new JScrollPane(musicTable), "JTable with custom renderer","table01");
-        //$endcite
+        //$endcite*/
     }
     
     private void transformDemos() {
@@ -320,7 +322,7 @@ public class PainterDemoSet extends javax.swing.JFrame {
     private void listDemos(final MultipleGradientPaint gradient) {
         addDemo(new JPanel(), "---- List Renderer Demos");
         
-        
+        /* broken until the renderer classes make it out of the incubator
         //$startcite
         //$name-list01-
         //a list with painter effects
@@ -376,7 +378,7 @@ public class PainterDemoSet extends javax.swing.JFrame {
         list = createJListWithData();
         list.setCellRenderer(evenodd);
         addDemo(list,"JList with even/odd + gradient selection","list02");
-        //$endcite
+        //$endcite*/
     }
     
     private void rectangleDemos() {
