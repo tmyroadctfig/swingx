@@ -235,13 +235,22 @@ ${build.branch} ${RELEASE_DSTAMP_LONG} ${projectname}</concat>
     </target>
 
     <target name="grok" depends="init,jar">
-        <!--
-        <mkdir dir="${dist.dir}/opengrok" />
+        <property name="grok.home" value="/hudson/opengrok"/>
+        <delete dir="${grok.home}/src/${projectname}"/>
+        <copy todir="${grok.home}/src/${projectname}">
+            <fileset dir="${java.dir}" excludes="**/CVS/**/ **/.svn/**"/>
+            <fileset dir="${test.test.dir}" excludes="**/CVS/**/ **/.svn/**"/>
+            <fileset dir="${src.beaninfo.dir}" excludes="**/CVS/**/ **/.svn/**"/>
+            <fileset dir="${src.demo.dir}" excludes="**/CVS/**/ **/.svn/**"/>
+        </copy>
         <java fork="true"
-              jar ="lib/build-only/opengrok.jar">
-            <arg value="-c /usr/local/bin/ctags" />
-            <arg value="-s ${java.dir}" />
-            <arg value="${dist.dir}/opengrok" />
-        </java>-->
+              jar ="${grok.home}/opengrok.jar"
+              dir ="${grok.home}">
+            <arg value="-c"/>
+            <arg value="/usr/local/bin/ctags" />
+            <arg value="-s"/>
+            <arg value="${grok.home}/src" />
+            <arg value="${grok.home}/data" />
+        </java>
     </target>
 </project>
