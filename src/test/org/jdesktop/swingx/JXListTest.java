@@ -51,6 +51,52 @@ public class JXListTest extends InteractiveTestCase {
     protected DefaultListModel ascendingListModel;
 
     /**
+     * Issue #477-swingx: list with filter not updated after setModel.
+     * 
+     * Reason is that there's no call to filter.flush in that path
+     * of action. Probably due to mostly c&p from JXTable - which
+     * always goes through tableChanged (which JList doesn't).
+     * How to test?
+     *
+     */
+    public void testSetModelFlushFilter() {
+        final JXList list = new JXList();
+        list.setFilterEnabled(true);
+        PatternFilter filter = new PatternFilter(".*1.*", 0, 0);
+        final FilterPipeline pipeline = new FilterPipeline(filter);
+        final DefaultListModel model = new DefaultListModel();
+        for (int i = 0; i < 10; i++)
+            model.addElement("Element " + i);
+        list.setFilters(pipeline);
+        list.setModel(model);
+        assertEquals(1, list.getElementCount());
+    }
+
+    /**
+     * Issue #477-swingx:
+     * 
+     * Selection must be cleared after setModel. This is from
+     * super's contract.
+     *
+     */
+    public void testSetModelEmptySelection() {
+        final JXList list = new JXList();
+        list.setFilterEnabled(true);
+        final DefaultListModel model = new DefaultListModel();
+        for (int i = 0; i < 10; i++)
+            model.addElement("Element " + i);
+        list.setModel(model);
+        int selection = 0;
+        list.setSelectedIndex(selection);
+        PatternFilter filter = new PatternFilter(".*", 0, 0);
+        final FilterPipeline pipeline = new FilterPipeline(filter);
+        list.setFilters(pipeline);
+        assertEquals("setting filters must keep selection", selection, list.getSelectedIndex());
+        list.setModel(model);
+        assertEquals(model.getSize(), list.getElementCount());
+        assertTrue("setting model must clear selectioon", list.isSelectionEmpty());
+    }
+/**
      * test that swingx renderer is used by default.
      *
      */

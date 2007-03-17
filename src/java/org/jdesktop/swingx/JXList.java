@@ -21,6 +21,32 @@
 
 package org.jdesktop.swingx;
 
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.swing.AbstractListModel;
+import javax.swing.Action;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JComponent;
+import javax.swing.JList;
+import javax.swing.KeyStroke;
+import javax.swing.ListCellRenderer;
+import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.DefaultSelectionMapper;
 import org.jdesktop.swingx.decorator.FilterPipeline;
@@ -33,20 +59,6 @@ import org.jdesktop.swingx.decorator.SortController;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
-
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * JXList
@@ -694,11 +706,12 @@ public class JXList extends JList {
     }
 
     /**
-     * set's the underlying data model. Note that if isFilterEnabled you must
+     * 
+     * Sets the underlying data model. Note that if isFilterEnabled you must
      * call getWrappedModel to access the model given here. In this case
      * getModel returns a wrapper around the data!
      * 
-     * 
+     * @param model the data model for this list.
      * 
      */
     @Override
@@ -849,7 +862,12 @@ public class JXList extends JList {
             }
             this.delegate = model;
             delegate.addListDataListener(getListDataListener());
+            // sequence of method calls? 
+            // fire contentsChanged after internal cleanup?
             fireContentsChanged(this, -1, -1);
+            // fix #477-swingx
+            getSelectionMapper().clearModelSelection();
+            getFilters().flush();
         }
 
         private ListDataListener getListDataListener() {
