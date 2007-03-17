@@ -62,7 +62,7 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
     // controls if the paint should be stretched to fill the available area
     private boolean stretchPaint;
     
-    private AreaEffect[] areaEffects;
+    private AreaEffect[] areaEffects = new AreaEffect[0];
     
     
     private Style style = Style.BOTH;
