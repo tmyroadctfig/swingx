@@ -21,10 +21,15 @@
  */
 package org.jdesktop.swingx.renderer;
 
-import org.jdesktop.swingx.painter.Painter;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JLabel;
+
+import org.jdesktop.swingx.painter.Painter;
 
 /**
  * A <code>JLabel</code> optimized for usage in renderers and

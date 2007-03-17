@@ -21,10 +21,12 @@
  */
 package org.jdesktop.swingx.renderer;
 
-import org.jdesktop.swingx.painter.Painter;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JCheckBox;
+
+import org.jdesktop.swingx.painter.Painter;
 
 /**
  * A <code>JCheckBox</code> optimized for usage in renderers and

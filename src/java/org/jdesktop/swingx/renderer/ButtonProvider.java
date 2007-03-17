@@ -21,7 +21,9 @@
  */
 package org.jdesktop.swingx.renderer;
 
-import javax.swing.*;
+import javax.swing.AbstractButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 
 /**
  * A component provider which uses a AbstractButton. 
