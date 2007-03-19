@@ -135,17 +135,22 @@ public class JXLabel extends JLabel {
      * @param g graphics to paint on
      */
     protected void paintComponent(Graphics g) {
-        if(foregroundPainter != null) {
+        if(getBackgroundPainter() != null) {
             Graphics2D g2 = (Graphics2D)g.create();
-            foregroundPainter.paint(g2, this,
+            getBackgroundPainter().paint(g2, this,
                     this.getWidth(),
                     this.getHeight());
-            //Insets ins = this.getInsets();
-            //g2.translate(ins.left, ins.top);
-            //foregroundPainter.paint(g2, this,
-            //        this.getWidth()  - ins.left - ins.right,
-            //        this.getHeight() - ins.top  - ins.bottom);
             g2.dispose();
+        }
+        if(getForegroundPainter() != null) {
+            Graphics2D g2 = (Graphics2D)g.create();
+            getForegroundPainter().paint(g2, this,
+                    this.getWidth(),
+                    this.getHeight());
+            g2.dispose();
+        }
+        if(getBackgroundPainter() == null && getForegroundPainter() == null) {
+            super.paintComponent(g);
         }
     }
 }
