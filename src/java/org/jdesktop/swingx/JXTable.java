@@ -267,6 +267,14 @@ public class JXTable extends JTable
     protected HighlighterPipeline highlighters;
 
     /**
+     * The key for the client property deciding about whether 
+     * the color memory hack for DefaultTableCellRenderer should be used.
+     * @see #resetDefaultTableCellRendererHighlighter()
+     */
+    protected static final String USE_DTCR_COLORMEMORY_HACK = "useDTCRColorMemoryHack";
+
+
+    /**
      * The Highlighter used to hack around DefaultTableCellRenderer's color memory. 
      */
     protected Highlighter resetDefaultTableCellRendererHighlighter;
@@ -436,6 +444,7 @@ public class JXTable extends JTable
      *  
      */
     private void init() {
+        putClientProperty(USE_DTCR_COLORMEMORY_HACK, Boolean.TRUE);
         setEditable(true);
         setSortable(true);
         setRolloverEnabled(true);
@@ -3154,8 +3163,15 @@ public class JXTable extends JTable
      * <p>
      * 
      * Adjusts component orientation (guaranteed to happen before applying
-     * Highlighters).
+     * Highlighters)
+     * <p>.
      * 
+     * Note: DefaultTableCellRenderer and subclasses require a hack to play
+     * nicely with Highlighters because it has an internal "color memory" in
+     * setForeground/setBackground. The hack is applied in
+     * <code>resetDefaultTableCellRendererColors</code> which is called after
+     * super.prepareRenderer and before applying the Highlighters. The method is
+     * called always and for all renderers.
      * 
      * @param renderer the <code>TableCellRenderer</code> to prepare
      * @param row the row of the cell to render, where 0 is the first row
@@ -3163,13 +3179,12 @@ public class JXTable extends JTable
      *        column
      * @return the decorated <code>Component</code> used as a stamp to render
      *         the specified cell
+     * @see #resetDefaultTableCellRendererColors()
      * @see org.jdesktop.swingx.decorator.Highlighter
      */
     @Override
     public Component prepareRenderer(TableCellRenderer renderer, int row,
             int column) {
-        // #258-swingx: hacking around DefaultTableCellRenderer color memory.
-//        resetDefaultTableCellRendererColors(renderer, row, column);
         Component stamp = super.prepareRenderer(renderer, row, column);
         // #145-swingx: default renderers don't respect componentOrientation.
         adjustComponentOrientation(stamp);
@@ -3183,51 +3198,36 @@ public class JXTable extends JTable
     }
 
     /**
-     * Method to hack around #258-swingx: apply a specialized
-     * <code>Highlighter</code> to force reset the color "memory" of
-     * <code>DefaultTableCellRenderer</code>. This is called for each
-     * renderer in <code>prepareRenderer</code> before calling super.
-     * Subclasses which are sure to solve the problem at the core (that is in a
-     * well-behaved DefaultTableCellRenderer) should override this method to do
-     * nothing.
+     * 
+     * Method to apply a hack around DefaultTableCellRenderer "color memory"
+     * (Issue #258-swingx). Applies the hack if the client property
+     * <code>USE_DTCR_COLORMEMORY_HACK</code> having the value of
+     * <code>Boolean.TRUE</code>, does nothing otherwise. The property is
+     * true by default.
+     * <p>
+     * 
+     * The hack consists of applying a specialized <code>Highlighter</code> to
+     * force reset the color "memory" of <code>DefaultTableCellRenderer</code>.
+     * Note that the hack is applied always, that is even if there are no custom
+     * Highlighters.
+     * <p>
+     * 
+     * Client code which solves the problem at the core (that is in a
+     * well-behaved <code>DefaultTableCellRenderer</code>) can disable the hack by removing
+     * the client property or by subclassing and override this to do nothing.
      * 
      * @param renderer the <code>TableCellRenderer</code> to hack
      * @param row the row of the cell to render
      * @param column the column index of the cell to render
      * 
      * @see #prepareRenderer(TableCellRenderer, int, int)
+     * @see #USE_DTCR_COLORMEMORY_HACK
      * @see org.jdesktop.swingx.decorator.ResetDTCRColorHighlighter
      */
-    protected void resetDefaultTableCellRendererColors(TableCellRenderer renderer, int row, int column) {
-        if (!(renderer instanceof DefaultTableCellRenderer)) return;
-        ComponentAdapter adapter = getComponentAdapter(row, column);
-        if (resetDefaultTableCellRendererHighlighter == null) {
-            resetDefaultTableCellRendererHighlighter = new ResetDTCRColorHighlighter();
-        }
-        // hacking around DefaultTableCellRenderer color memory.
-        resetDefaultTableCellRendererHighlighter.highlight((DefaultTableCellRenderer)renderer, adapter);
-    }
-
-    
-    /**
-     * Method to hack around #258-swingx: apply a specialized <code>Highlighter</code>
-     * to force reset the color "memory" of <code>DefaultTableCellRenderer</code>. 
-     * This is called for each renderer in <code>prepareRenderer</code> after
-     * calling super, but before applying the HighlighterPipeline. Subclasses
-     * which are sure to solve the problem at the core (that is in 
-     * a well-behaved DefaultTableCellRenderer) should override this method
-     * to do nothing. <p>
-     * 
-     * @param renderer the <code>TableCellRenderer</code> to hack 
-     * @param row  the row of the cell to render 
-     * @param column the column index of the cell to render
-     * 
-     * @see #prepareRenderer(TableCellRenderer, int, int)
-     * @see #resetDefaultTableCellRendererColors(TableCellRenderer, int, int)
-     * @see org.jdesktop.swingx.decorator.ResetDTCRColorHighlighter
-     * 
-     */
-    protected void resetDefaultTableCellRendererColors(Component renderer, int row, int column) {
+    protected void resetDefaultTableCellRendererColors(Component renderer,
+            int row, int column) {
+        if (!Boolean.TRUE.equals(getClientProperty(USE_DTCR_COLORMEMORY_HACK)))
+            return;
         ComponentAdapter adapter = getComponentAdapter(row, column);
         if (resetDefaultTableCellRendererHighlighter == null) {
             resetDefaultTableCellRendererHighlighter = new ResetDTCRColorHighlighter();

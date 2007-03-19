@@ -38,6 +38,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
@@ -110,6 +111,35 @@ public class JXTableUnitTest extends InteractiveTestCase {
         super.tearDown();
     }
 
+    /**
+     * Test default behaviour: hack around DefaultTableCellRenderer 
+     * color memory is on. 
+     *
+     */
+    public void testDTCRendererHackEnabled() {
+        JXTable table = new JXTable(10, 2);
+        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
+        table.setDefaultRenderer(Object.class, renderer);
+        table.prepareRenderer(renderer, 0, 0);
+        assertEquals(Boolean.TRUE, table.getClientProperty(JXTable.USE_DTCR_COLORMEMORY_HACK));
+        assertNotNull(renderer.getClientProperty("rendererColorMemory.background"));
+        assertNotNull(renderer.getClientProperty("rendererColorMemory.foreground"));
+    }
+
+    /**
+     * Test custom behaviour: hack around DefaultTableCellRenderer 
+     * color memory is disabled.
+     *
+     */
+    public void testDTCRendererHackDisabled() {
+        JXTable table = new JXTable(10, 2);
+        table.putClientProperty(JXTable.USE_DTCR_COLORMEMORY_HACK, null);
+        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
+        table.setDefaultRenderer(Object.class, renderer);
+        table.prepareRenderer(renderer, 0, 0);
+        assertNull(renderer.getClientProperty("rendererColorMemory.background"));
+        assertNull(renderer.getClientProperty("rendererColorMemory.foreground"));
+    }
 
     /**
      * Issue #282-swingx: compare disabled appearance of
@@ -301,7 +331,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
      * Tests per-table ColumnFactory: bound property, reset to shared.
      * 
      */
-    public void testTableSetColumnFactory() {
+    public void testSetColumnFactory() {
         JXTable table = new JXTable();
         PropertyChangeReport report = new PropertyChangeReport();
         table.addPropertyChangeListener(report);
@@ -323,7 +353,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
      * Tests per-table ColumnFactory: use individual.
      * 
      */
-    public void testTableUseCustomColumnFactory() {
+    public void testUseCustomColumnFactory() {
         JXTable table = new JXTable();
         PropertyChangeReport report = new PropertyChangeReport();
         table.addPropertyChangeListener(report);
