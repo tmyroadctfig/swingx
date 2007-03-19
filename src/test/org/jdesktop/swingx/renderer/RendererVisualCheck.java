@@ -39,8 +39,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -298,6 +296,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
      * Compare core table using core default renderer vs. swingx default renderer.<p>
      * Unselected background of lead is different for editable/not-editable cells.
      */
+    @SuppressWarnings("deprecation")
     public void interactiveTableCompareFocusedCellBackground() {
         TableModel model = new AncientSwingTeam() {
             public boolean isCellEditable(int row, int column) {
@@ -480,15 +479,15 @@ public class RendererVisualCheck extends InteractiveTestCase {
             public String getString(Object value) {
                 if (value instanceof Point) {
                     Point p = (Point) value;
-                    value = createString(p.x, p.y);
+                    return createString(p.x, p.y);
                 } else if (value instanceof Dimension) {
                     Dimension dim = (Dimension) value;
-                    value = createString(dim.width, dim.height);
+                    return createString(dim.width, dim.height);
                 }
-               return TO_STRING.getString(value);
+               return "";
             }
 
-            private Object createString(int width, int height) {
+            private String createString(int width, int height) {
                 return "(" + width + ", " + height + ")";
             }
             
@@ -672,6 +671,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
     private void configureList(final JXList list, final JXTable table, boolean useRollover) {
         final List<Action> actions = new ArrayList<Action>();
         // quick and dirty access to column visibility actions
+        @SuppressWarnings("all")
         ColumnControlButton columnControl = new ColumnControlButton(table, null) {
 
             @Override

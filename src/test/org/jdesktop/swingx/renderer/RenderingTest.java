@@ -21,9 +21,6 @@
  */
 package org.jdesktop.swingx.renderer;
 
-import java.awt.Component;
-import java.awt.Graphics;
-
 import javax.swing.JLabel;
 
 import junit.framework.TestCase;
