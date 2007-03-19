@@ -21,7 +21,7 @@
 
 package org.jdesktop.swingx.painter;
 
-import org.jdesktop.swingx.editors.PainterUtil;
+//import org.jdesktop.swingx.editors.PainterUtil;
 import org.jdesktop.swingx.painter.effects.AreaEffect;
 
 import javax.imageio.ImageIO;
@@ -278,30 +278,10 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
         return imageScale;
     }
     
-    private PainterUtil.PersistenceOwner resolver = null;
-    /**
-     * Used by the persistence mechanism.
-     * @param resolver
-     */
-    public void setResolver(PainterUtil.PersistenceOwner resolver) {
-        this.resolver = resolver;
-    }
-    
-    /**
-     * Used by the persistence mechanism.
-     */
-    public PainterUtil.PersistenceOwner getResolver() {
-        return this.resolver;
-    }
-    
     private void loadImage() {
         try {
             String img = getImageString();
             // use the resolver if it's there
-            if(resolver != null) {
-                img = resolver.fromXMLURL(img);
-            }
-            //            p("image string = " + img);
             if(img != null) {
                 URL url = new URL(img);
                 setImage(ImageIO.read(url));
