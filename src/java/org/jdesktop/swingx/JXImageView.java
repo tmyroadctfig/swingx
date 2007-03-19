@@ -158,10 +158,8 @@ public class JXImageView extends JXPanel {
      * @throws java.io.IOException thrown if the image cannot be loaded
      */
     public void setImage(File file) throws IOException {
-        System.out.println("reading: " + file.getAbsolutePath());
         setImageURL(file.toURL());
         setImage(ImageIO.read(file));
-        System.out.println("the url = " + getImageURL());
     }
     
     /**
