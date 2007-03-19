@@ -21,11 +21,13 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.BorderLayout;
 import java.net.URL;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 /**
  * Test to expose known issues of <code>JXHeader</code>.
@@ -80,8 +82,12 @@ public class JXHeaderIssues extends InteractiveTestCase {
     public void interactiveCustomProperties() {
         URL url = getClass().getResource("resources/images/wellTop.gif");
         assertNotNull(url);
+        JPanel p = new JPanel(new BorderLayout());
         JXHeader header = new JXHeader("MyTitle", "MyDescription", new ImageIcon(url));
-        showInFrame(header, "JXHeader with custom properties");
+        p.add(header);
+        // added just to better visualize bkg gradient in the JXHeader.
+        p.add(new JLabel("Reference component"), BorderLayout.SOUTH);
+        showInFrame(p, "JXHeader with custom properties");
     }
     
     public static void main(String args[]) {

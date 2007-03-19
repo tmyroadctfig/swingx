@@ -204,6 +204,8 @@ public class BasicHeaderUI extends HeaderUI {
     }
 
     protected Painter createBackgroundPainter() {
-        return new PainterUIResource(new MattePainter(new GradientPaint(0, 0, Color.WHITE, 1, 0, UIManager.getColor("control"))));
+        MattePainter p = new MattePainter(new GradientPaint(0, 0, Color.WHITE, 1, 0, UIManager.getColor("control")));
+        p.setPaintStretched(true);
+        return new PainterUIResource(p);
     }
 }
