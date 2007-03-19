@@ -38,6 +38,7 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.Transparency;
 import java.awt.geom.Area;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -62,6 +63,50 @@ public class PaintUtils {
     //  Utility methods. 
     private static Border defaultBorder =
             BorderFactory.createBevelBorder(BevelBorder.RAISED);
+    
+    
+    
+    public static final GradientPaint BLUE_EXPERIENCE = new GradientPaint(
+            new Point2D.Double(0, 0),
+            new Color(168, 204, 241),
+            new Point2D.Double(0, 1),
+            new Color(44, 61, 146));
+    public static final GradientPaint MAC_OSX_SELECTED = new GradientPaint(
+            new Point2D.Double(0, 0),
+            new Color(81, 141, 236),
+            new Point2D.Double(0, 1),
+            new Color(36, 96, 192));
+    public static final GradientPaint MAC_OSX = new GradientPaint(
+            new Point2D.Double(0, 0),
+            new Color(167, 210, 250),
+            new Point2D.Double(0, 1),
+            new Color(99, 147, 206));
+    public static final GradientPaint AERITH = new GradientPaint(
+            new Point2D.Double(0, 0),
+            Color.WHITE,
+            new Point2D.Double(0, 1),
+            new Color(64, 110, 161));
+    public static final GradientPaint GRAY = new GradientPaint(
+            new Point2D.Double(0, 0),
+            new Color(226, 226, 226),
+            new Point2D.Double(0, 1),
+            new Color(250, 248, 248));
+    public static final GradientPaint RED_XP = new GradientPaint(
+            new Point2D.Double(0, 0),
+            new Color(236, 81, 81),
+            new Point2D.Double(0, 1),
+            new Color(192, 36, 36));
+    public static final GradientPaint NIGHT_GRAY = new GradientPaint(
+            new Point2D.Double(0, 0),
+            new Color(102, 111, 127),
+            new Point2D.Double(0, 1),
+            new Color(38, 45, 61));
+    public static final GradientPaint NIGHT_GRAY_LIGHT = new GradientPaint(
+            new Point2D.Double(0, 0),
+            new Color(129, 138, 155),
+            new Point2D.Double(0, 1),
+            new Color(58, 66, 82));
+        
 
     private PaintUtils() {
     }
