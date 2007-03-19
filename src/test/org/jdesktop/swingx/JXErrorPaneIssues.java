@@ -47,6 +47,15 @@ public class JXErrorPaneIssues extends InteractiveTestCase {
     }
 
     /**
+     * 
+     * reported in forum - details not visible, details close on focus change.
+     * Worksforme on XP, maybe OS dependent?
+     *
+     */
+    public void interactiveNoDetails() {
+        JXErrorPane.showDialog(new NullPointerException("something to show"));
+    }
+    /**
      * Issue #??-swingx: JXErrorPane can't cope with null errorInfo.
      *
      */
