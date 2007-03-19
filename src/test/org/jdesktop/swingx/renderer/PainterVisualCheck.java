@@ -24,6 +24,8 @@ package org.jdesktop.swingx.renderer;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
@@ -41,6 +43,7 @@ import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 import javax.swing.ListModel;
@@ -91,24 +94,6 @@ public class PainterVisualCheck extends InteractiveTestCase {
           e.printStackTrace();
       }
   }
-
-    public void interactiveRenderingLabel() {
-        JRendererLabel label = new JRendererLabel();
-        label.setOpaque(true);
-        label.setText("some dummy long enough .............  opaque? " + label.isOpaque());
-        // todo: NPE with null shape - file issue
-        ShapePainter painter = new ShapePainter();
-        Shape polygon = new Polygon(new int[] { 0, 5, 5 },
-                new int[] { 0, 0, 5 }, 3);
-        painter.setShape(polygon);
-        painter.setFillPaint(Color.RED);
-        painter.setPaintStretched(false);//Resize(Resize.NONE);
-        // hmm.. how to make this stick to the trailing upper corner?
-        painter.setHorizontalAlignment(HorizontalAlignment.RIGHT);//setResizeLocation(Resize.HORIZONTAL);
-        painter.setVerticalAlignment(VerticalAlignment.TOP);
-        label.setPainter(painter);
-        showInFrame(label, "renderer label with painter");
-    }
     
     public void interactiveTriangleRenderer() {
         JXTable table = new JXTable(new AncientSwingTeam());
