@@ -27,10 +27,40 @@ import java.awt.Rectangle;
  * <li>fillVertical - indicates if the painter should stretch to fill the available space vertically</li>
  * <li>insets - whitespace on the top, bottom, left, and right.
  * </ul>
- * @author joshy
+ * 
+ * By combining these five properties any AbstractLayoutPainter subclass can position it's content
+ * within the paintable area.  For example, an ImagePainter has an intrinsic size based on the image
+ * it is painting. If you wanted to paint the image in the lower right hand corner of the paintable
+ * area, but inset by 5 pixels, you could do the following:
+ * 
+ * <pre><code>
+ *     ImagePainter p = new ImagePainter(null);
+ *     p.setVerticalAlignment(AbstractLayoutPainter.VerticalAlignment.BOTTOM);
+ *     p.setHorizontalAlignment(AbstractLayoutPainter.HorizontalAlignment.RIGHT);
+ *     p.setInsets(new Insets(0,0,5,5));
+ * </code></pre>
+ * 
+ * 
+ * For something which is resizable, like a RectanglePainter, you can use the fill properties
+ * to make it resize along with the paintable area. For example, to make a rectangle with 20 px
+ * rounded corners, and which resizes with the paintable area but is inset 
+ * by 10 pixels on all sides, you could do
+ * the following:
+ * 
+ * <pre><code>
+ *     RectanglePainter p = new RectanglePainter();
+ *     p.setRoundHeight(20);
+ *     p.setRoundWidth(20);
+ *     p.setInsets(new Insets(10,10,10,10));
+ *     p.setFillHorizontal(true);
+ *     p.setFillVertical(true);
+ * </code></pre>
+ * 
+ * 
+ * @author joshua@marinacci.org
  */
 public abstract class AbstractLayoutPainter<T> extends AbstractPainter<T> {
-    
+   
     /**
      * Specifies how to draw the image, i.e. what kind of Style to use
      * when drawing
@@ -172,8 +202,11 @@ public abstract class AbstractLayoutPainter<T> extends AbstractPainter<T> {
     }
     
     /**
-     * a protected method used by subclasses to calculate the final position of the
-     * content. Subclasses usually don't need to override this.
+     * A protected method used by subclasses to calculate the final position of the
+     * content. This will position the content using the fillHorizontal, fillVertical
+     * horizontalAlignment, and verticalAlignment properties. This method
+     * is typically called by subclasses in their doPaint() methods.
+     * 
      * @param contentWidth The width of the content to be painted
      * @param contentHeight The height of the content to be painted
      * @param width the width of the area that the content will be positioned in

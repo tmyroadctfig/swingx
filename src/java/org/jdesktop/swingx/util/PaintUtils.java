@@ -199,6 +199,9 @@ public class PaintUtils {
         }
     }
 
+    /**
+     * Sets the font for a containment hierarchy.
+     */
     public static void setFont(Container cont, Font font) {
         cont.setFont(font);
         Component[] children = cont.getComponents();
@@ -296,4 +299,13 @@ public class PaintUtils {
         g.setClip(area);
         return oldClip;
     }
+
+
+/* josh: leave out until we figure out what the api should look like
+    // resize gradient
+    public static GradientPaint resizeGradient(GradientPaint p, int w, int h) {
+        
+    }
+    // stretch gradient
+*/
 }

@@ -216,6 +216,12 @@ public class PainterDemoSet extends javax.swing.JFrame {
                 ),
                 "Coming Soon Badge","misc03");
         //$endcite
+        
+        //$startcite
+        //$name-misc-flex
+        // create a pinstripe painter similar to the flex progress bar
+        RectanglePainter rp = new RectanglePainter();
+        //$endcite
     }
     
     private void tableDemos() {

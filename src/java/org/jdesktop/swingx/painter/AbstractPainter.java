@@ -241,7 +241,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
      * @param width 
      * @param height 
      */
-    public void paint(Graphics2D g, T component, int width, int height) {
+    public void paint(Graphics2D g, T obj, int width, int height) {
         if(!isVisible()) {
             return;
         }
@@ -249,10 +249,10 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
         g = (Graphics2D)g.create();
 
         try {
-            configureGraphics(g, component);
+            configureGraphics(g, obj);
 
             //if I am caching, and the cache is not null, and the image has the
-            //same dimensions as the component, then simply paint the image
+            //same dimensions as the object, then simply paint the image
             BufferedImage image = cachedImage == null ? null : cachedImage.get();
             if (isUseCache() && image != null
                     && image.getWidth() == width
@@ -267,8 +267,8 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
                             Transparency.TRANSLUCENT);
 
                     Graphics2D gfx = image.createGraphics();
-                    configureGraphics(gfx, component);
-                    doPaint(gfx, component, width, height);
+                    configureGraphics(gfx, obj);
+                    doPaint(gfx, obj, width, height);
                     gfx.dispose();
 
                     for (BufferedImageOp effect : effects) {
@@ -281,7 +281,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
                         cachedImage = new SoftReference<BufferedImage>(image);
                     }
                 } else {
-                    doPaint(g, component, width, height);
+                    doPaint(g, obj, width, height);
                 }
             }
         } finally {
@@ -291,7 +291,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
     
     /**
      * Utility method for configuring the given Graphics2D with the rendering hints,
-     * composite, and clip
+     * composite, and clip. Will also get the font if we are painting a JComponent
      */
     private void configureGraphics(Graphics2D g, T c) {
         if(c instanceof JComponent) {
@@ -327,18 +327,24 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
     private boolean visible = true;
     
     /**
-     * Getter for property visible.
+     * Gets the visible property. This controls if the painter should
+     * paint itself. It is true by default. Setting visible to false
+     * is good when you want to temporarily turn off a painter. An example
+     * of this is a painter that you only use when a button is highlighted.
      * 
-     * @return Value of property visible.
+     * @return current value of visible property
      */
     public boolean isVisible() {
         return this.visible;
     }
     
     /**
-     * Setter for property visible.
+     * Sets the visible property. This controls if the painter should
+     * paint itself. It is true by default. Setting visible to false
+     * is good when you want to temporarily turn off a painter. An example
+     * of this is a painter that you only use when a button is highlighted.
      * 
-     * @param visible New value of property visible.
+     * @param visible New value of visible property.
      */
     public void setVisible(boolean visible) {
         boolean oldEnabled = isVisible();

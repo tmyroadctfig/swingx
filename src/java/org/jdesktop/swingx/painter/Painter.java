@@ -41,12 +41,13 @@ import java.awt.Graphics2D;
  *  Color blue = new Color(0x417DDD);
  *  Color translucent = new Color(blue.getRed(), blue.getGreen(), blue.getBlue(), 0);
  *  panel.setForeground(Color.LIGHT_GRAY);
- *  GradientPaint blueToTranslucent = new GradientPaint(
- *    new Point2D.Double(.4, 0),
- *    blue,
- *    new Point2D.Double(1, 0),
- *    translucent);
- *  Painter veil =  new MattePainter(blueToTranslucent);
+ *  LinearGradientPaint blueToTranslucent = new LinearGradientPaint(
+ *    new Point(0,0), new Point(10,0),
+ *    new float[]{.4f, 1f},
+ *    new Color[] { blue, translucent }
+ *    );
+ *  MattePainter veil =  new MattePainter(blueToTranslucent);
+ *  veil.setPaintStretched(true);
  *  Painter pinstripes = new PinstripePainter(45);
  *  Painter backgroundPainter = new MattePainter(blue);
  *  Painter p = new CompoundPainter(backgroundPainter, pinstripes, veil);

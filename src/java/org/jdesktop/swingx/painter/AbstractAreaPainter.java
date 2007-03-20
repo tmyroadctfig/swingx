@@ -29,16 +29,19 @@ import java.awt.geom.Point2D;
 
 
 /**
- * The abstract base class for all painters that fill a vector path area.  This includes Shapes, Rectangles, Text, and the MattePainter
- * which fills in the entire background of a component.  The defining feature of AbstractAreaPainter subclasses
- * is that they implement the provideShape() method which returns the outline shape of the area that this
- * painter will fill.   Subclasses must implement the provideShape() method.
+ * The abstract base class for all painters that fill a vector path area.  This
+ * includes Shapes, Rectangles, Text, and the MattePainter
+ * which fills in the entire background of a component.  The defining
+ * feature of AbstractAreaPainter subclasses
+ * is that they implement the provideShape() method which returns
+ * the outline shape of the area that this
+ * painter will fill. Subclasses must implement the provideShape() method.
  *
  * The AbstractAreaPainter provides support for the following common painting properties
  *
  * <ul>
  * <li>fillPaint</li>
- * <li>snapPaint</li>
+ * <li>paintStretched</li>
  * <li>borderPaint</li>
  * <li>borderWidth</li>
  * <li>style</li>
@@ -46,7 +49,7 @@ import java.awt.geom.Point2D;
  *
  * The AbstractAreaPainter also provides support for path effects like dropshadows and glows.
  *
- * @author joshy
+ * @author joshua@marinacci.org
  */
 public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
     
@@ -211,7 +214,10 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
      * Resizes the given Paint. By default, only Gradients, LinearGradients, and RadialGradients are resized
      * in this method. If you have special resizing needs, override this method. This
      * method is mainly used to make gradient paints resize with the component this
-     * painter is attached to.
+     * painter is attached to. This method is internal to the painter api and should
+     * not be called elsewhere. It is used by the paintStretched property and
+     * painter subclasses. In the future it may be made public for use by other classes.
+     * If this happens it should probably be turned into a static utility method.
      */
     Paint calculateSnappedPaint(Paint p, int width, int height) {
         if(p instanceof Color) {
@@ -265,12 +271,12 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
         return angle;
     }
     
-
+    
     /**
      * Returns the outline shape of this painter. Subclasses must implement this method. This shape
      * will be used for filling, stroking, and clipping.
      * @return the outline shape of this painter
-     * @param g graphics 
+     * @param g graphics
      * @param comp The Object this painter will be painted on.
      * @param width the width to paint
      * @param height the height to paint
