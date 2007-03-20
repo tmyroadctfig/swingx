@@ -27,8 +27,10 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 import javax.swing.Box;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JTextField;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
@@ -136,7 +138,7 @@ public class PainterIssues extends InteractiveTestCase {
                 "setup: shared compound of first label - this doesn't show up");
         shared.setForegroundPainter(compound);
         box.add(shared);
-        showInFrame(box, "foreground painters");
+        showInFrame(box, "shared foreground painters");
     }
     
     /**
@@ -159,8 +161,125 @@ public class PainterIssues extends InteractiveTestCase {
         box.add(opaqueUnchanged);
         showInFrame(box, "background painters");
     }
+    /**
+     * 
+     * Painters and textfield. Not showing? 
+     *
+     */
+    public void interactiveXButtonShareForegroundPainter() {
+        final CompoundPainter painter = new CompoundPainter();
+        JXXButton label = new JXXButton();
+        label.setText("Painter in textfield: source for shared painter");
+        ShapePainter shapePainter = new ShapePainter();
+        AlphaPainter alpha = new AlphaPainter();
+        alpha.setAlpha(0.2f);
+        alpha.setPainters(shapePainter);
+        painter.setPainters(label.getPainter(), alpha);
+        label.setPainter(painter);
+        JXXButton labelAP = new JXXButton();
+        labelAP.setText("Painter: use shared from above");
+        labelAP.setPainter(painter);
+        JComponent box = Box.createVerticalBox();
+        box.add(label);
+        box.add(labelAP);
+        showInFrame(box, "shared ui painting in button");
+    }
     
+    
+    public static class JXXButton extends JButton {
+        
+        private Painter painter;
+        
+        @Override
+        protected void paintComponent(Graphics g) {
+            Painter painter = getPainter();
+            Graphics2D scratch = (Graphics2D) g.create();
+            try {
+                painter.paint(scratch, this, getWidth(), getHeight());
+                ui.paint(scratch, this);
+            } finally {
+                scratch.dispose();
+            }
+        }
 
+        public Painter getPainter() {
+            if (painter == null) {
+                painter = new AbstractPainter<JButton>() {
+
+                    @Override
+                    protected void doPaint(Graphics2D g, JButton component, int width, int height) {
+                        JXXButton.super.paintComponent(g);
+                    }
+                    
+                };
+            }
+            return painter;
+        }
+        
+        public void setPainter(Painter painter) {
+            this.painter = painter;
+            repaint();
+        }
+    }
+    /**
+     * 
+     * Painters and textfield. Not showing? 
+     *
+     */
+    public void interactiveXTextFieldShareForegroundPainter() {
+        final CompoundPainter painter = new CompoundPainter();
+        JXTextField label = new JXTextField();
+        label.setText("Painter in textfield: source for shared painter");
+        ShapePainter shapePainter = new ShapePainter();
+        AlphaPainter alpha = new AlphaPainter();
+        alpha.setAlpha(0.2f);
+        alpha.setPainters(shapePainter);
+        painter.setPainters(label.getPainter(), alpha);
+        label.setPainter(painter);
+        JXTextField labelAP = new JXTextField();
+        labelAP.setText("Painter: use shared from above");
+        labelAP.setPainter(painter);
+        JComponent box = Box.createVerticalBox();
+        box.add(label);
+        box.add(labelAP);
+        showInFrame(box, "shared ui painting in textfield");
+    }
+    
+    public static class JXTextField extends JTextField {
+        
+        private Painter painter;
+        
+        @Override
+        protected void paintComponent(Graphics g) {
+            Painter painter = getPainter();
+            Graphics2D scratch = (Graphics2D) g.create();
+            try {
+                painter.paint(scratch, this, getWidth(), getHeight());
+                ui.paint(scratch, this);
+            } finally {
+                scratch.dispose();
+            }
+        }
+
+        public Painter getPainter() {
+            if (painter == null) {
+                painter = new AbstractPainter<JTextField>() {
+
+                    @Override
+                    protected void doPaint(Graphics2D g, JTextField component, int width, int height) {
+                        JXTextField.super.paintComponent(g);
+                    }
+                    
+                };
+            }
+            return painter;
+        }
+        
+        public void setPainter(Painter painter) {
+            this.painter = painter;
+            repaint();
+        }
+    }
     /**
      * 
      * paint doc relieves impl from restoring graphics. Who
