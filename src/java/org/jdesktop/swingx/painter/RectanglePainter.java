@@ -28,13 +28,9 @@ import java.awt.Insets;
 import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 import java.awt.geom.RoundRectangle2D;
-import javax.swing.JComponent;
-import org.apache.batik.ext.awt.LinearGradientPaint;
-import org.jdesktop.swingx.JXGradientChooser;
 import org.jdesktop.swingx.painter.effects.AreaEffect;
 import org.jdesktop.swingx.util.PaintUtils;
 
@@ -174,7 +170,7 @@ public class RectanglePainter<T> extends AbstractAreaPainter<T> {
     
     
     /* ======== drawing code ============ */
-    private RectangularShape calculateShape(T component, int width, int height) {
+    private RectangularShape calculateShape(int width, int height) {
         Insets insets = getInsets();
         int x = insets.left;
         int y = insets.top;
@@ -208,7 +204,7 @@ public class RectanglePainter<T> extends AbstractAreaPainter<T> {
     
     
     public void doPaint(Graphics2D g, T component, int width, int height) {
-        RectangularShape shape = calculateShape(component, width, height);
+        RectangularShape shape = calculateShape(width, height);
         switch (getStyle()) {
         case BOTH:
             drawBackground(g,shape,width,height);
@@ -278,7 +274,7 @@ public class RectanglePainter<T> extends AbstractAreaPainter<T> {
     }
     
     public Shape provideShape(Graphics2D g, T comp, int width, int height) {
-        return calculateShape(comp,width,height);
+        return calculateShape(width,height);
     }
     
 }

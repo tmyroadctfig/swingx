@@ -22,7 +22,6 @@
 package org.jdesktop.swingx.painter;
 
 import java.awt.Graphics2D;
-import javax.swing.JComponent;
 
 /**
  * <p>Simple API for delegating painting. The JXPanel supports using this class
