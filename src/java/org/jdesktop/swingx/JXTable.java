@@ -646,10 +646,12 @@ public class JXTable extends JTable
      * 
      */
     public void setColumnControlVisible(boolean visible) {
-        boolean old = columnControlVisible;
+        boolean old = isColumnControlVisible();
         this.columnControlVisible = visible;
-        configureColumnControl();
-        firePropertyChange("columnControlVisible", old, columnControlVisible);
+        if (old != isColumnControlVisible()) {
+            configureColumnControl();
+            firePropertyChange("columnControlVisible", old, !old);
+        }
     }
 
 
