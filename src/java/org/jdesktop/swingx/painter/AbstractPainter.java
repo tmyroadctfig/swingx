@@ -125,9 +125,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
     public void setFilters(BufferedImageOp ... effects) {
         BufferedImageOp[] old = getFilters();
         this.effects = new BufferedImageOp[effects == null ? 0 : effects.length];
-        if (effects != null) {
-            System.arraycopy(effects, 0, this.effects, 0, effects.length);
-        }
+        System.arraycopy(effects, 0, this.effects, 0, this.effects.length);
         firePropertyChange("effects", old, getFilters());
     }
     
