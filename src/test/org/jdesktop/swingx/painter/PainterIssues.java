@@ -23,13 +23,17 @@ package org.jdesktop.swingx.painter;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
 
+import javax.swing.Action;
+import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXLabel;
-import org.jdesktop.swingx.renderer.JRendererLabel;
+import org.jdesktop.swingx.action.AbstractActionExt;
 
 /**
  * Test to exposed known issues of <code>Painter</code>s.
@@ -54,15 +58,106 @@ public class PainterIssues extends InteractiveTestCase {
       }
   }
 
+    
     /**
-     * JXLabel background painter not shown if opaque.
+     * Issue #??-swingx: default foreground painter not guaranteed after change.
      *
      */
+    public void testDefaultForegroundPainter() {
+        JXLabel label =  new JXLabel();
+        Painter defaultForeground = label.getForegroundPainter();
+        // sanity
+        assertNotNull(defaultForeground);
+        label.setForegroundPainter(null);
+        assertEquals(defaultForeground, label.getForegroundPainter());
+    }
+    
+
+    // ------------------ visual tests
+    /**
+     * JXLabel restore default foreground painter.
+     * Sequence: 
+     *   compose the default with a transparent overlay
+     *   try to reset to default
+     *   try to compose the overlay again.
+     */
+    public void interactiveRestoreDefaultForegroundPainter() {
+        JComponent box = Box.createVerticalBox();
+        final JXLabel foreground = new JXLabel(
+                "setup: compound - default and overlay ");
+        ShapePainter shapePainter = new ShapePainter();
+        final AlphaPainter alpha = new AlphaPainter();
+        alpha.setAlpha(0.2f);
+        alpha.setPainters(shapePainter);
+        CompoundPainter compound = new CompoundPainter(alpha, foreground
+                .getForegroundPainter());
+        foreground.setForegroundPainter(compound);
+        box.add(foreground);
+        Action action = new AbstractActionExt("reset default foreground") {
+            boolean reset;
+            public void actionPerformed(ActionEvent e) {
+                if (reset) {
+                    CompoundPainter painter = new CompoundPainter(alpha, foreground.getForegroundPainter());
+                    foreground.setForegroundPainter(painter);
+                } else {
+                  // try to reset to default
+                    foreground.setForegroundPainter(null);
+                }
+                reset = !reset;
+
+            }
+
+        };
+        JXFrame frame = wrapInFrame(box, "foreground painters");
+        addAction(frame, action);
+        frame.pack();
+        frame.setVisible(true);
+    }
+    
+    
+    /**
+     * JXLabel default foreground painter - share between labels.
+     * Probably illegal :-)
+     * 
+     */
+    public void interactiveXLabelSharedDefaultForegroundPainter() {
+        JComponent box = Box.createVerticalBox();
+        final JXLabel foreground = new JXLabel(
+                "setup: compound - default and overlay ");
+        ShapePainter shapePainter = new ShapePainter();
+        AlphaPainter alpha = new AlphaPainter();
+        alpha.setAlpha(0.2f);
+        alpha.setPainters(shapePainter);
+        CompoundPainter compound = new CompoundPainter(alpha, foreground
+                .getForegroundPainter());
+        foreground.setForegroundPainter(compound);
+        box.add(foreground);
+        JXLabel shared = new JXLabel(
+                "setup: shared compound of first label - this doesn't show up");
+        shared.setForegroundPainter(compound);
+        box.add(shared);
+        showInFrame(box, "foreground painters");
+    }
+    
+    /**
+     * JXLabel background painter not shown if opaque.
+     * 
+     */
     public void interactiveXLabelBackgroundPainter() {
-        JXLabel label = new JXLabel("setup: backgroundPainter, opaque = true");
-        label.setOpaque(true);
-        label.setBackgroundPainter(new ShapePainter());
-        showInFrame(label, "background painters");
+        JComponent box = Box.createVerticalBox();
+        ShapePainter shapePainter = new ShapePainter();
+        JXLabel opaqueTrue = new JXLabel("setup: backgroundPainter, opaque = true");
+        opaqueTrue.setOpaque(true);
+        opaqueTrue.setBackgroundPainter(shapePainter);
+        box.add(opaqueTrue);
+        JXLabel opaqueFalse = new JXLabel("setup: backgroundPainter, opaque = false");
+        opaqueFalse.setOpaque(false);
+        opaqueTrue.setBackgroundPainter(shapePainter);
+        box.add(opaqueFalse);
+        JXLabel opaqueUnchanged = new JXLabel("setup: backgroundPainter, opaque = unchanged");
+        opaqueUnchanged.setBackgroundPainter(shapePainter);
+        box.add(opaqueUnchanged);
+        showInFrame(box, "background painters");
     }
     
 
@@ -99,16 +194,34 @@ public class PainterIssues extends InteractiveTestCase {
     }
     
     /**
-     * undocumented default shape/properties.
+     * Style.None - use case? Always invisible?
      */
     public void interactiveRenderingLabel() {
-        JRendererLabel label = new JRendererLabel();
-        label.setText("some dummy long enough .............  opaque? ");
+        JComponent box = Box.createVerticalBox();
+        final JXLabel label = new JXLabel("setup: ShapePainter with fillstyle none");
         // fixed: NPE with null shape - but has default instead of null?
-        ShapePainter painter = new ShapePainter();
-        painter.setStyle(ShapePainter.Style.NONE);
-        label.setPainter(painter);
-        showInFrame(label, "renderer label with shape painter");
+        final ShapePainter styleNone = new ShapePainter();
+        styleNone.setStyle(ShapePainter.Style.NONE);
+        label.setBackgroundPainter(styleNone);
+        box.add(label);
+        final JXLabel label2 = new JXLabel("setup: default ShapePainter");
+        final ShapePainter painter = new ShapePainter();
+        label2.setBackgroundPainter(painter);
+        box.add(label2);
+        Action action = new AbstractActionExt("toggle painter visible") {
+
+            public void actionPerformed(ActionEvent e) {
+                styleNone.setVisible(!styleNone.isVisible());
+                painter.setVisible(!painter.isVisible());
+                label.repaint();
+                label2.repaint();
+            }
+            
+        };
+        JXFrame frame = wrapInFrame(box, "renderer label with shape painter - fillstyle none");
+        addAction(frame, action);
+        frame.pack();
+        frame.setVisible(true);
     }
 
 }
