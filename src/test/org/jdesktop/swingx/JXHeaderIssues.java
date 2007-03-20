@@ -22,6 +22,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.net.URL;
 
 import javax.swing.Icon;
@@ -88,6 +89,21 @@ public class JXHeaderIssues extends InteractiveTestCase {
         // added just to better visualize bkg gradient in the JXHeader.
         p.add(new JLabel("Reference component"), BorderLayout.SOUTH);
         showInFrame(p, "JXHeader with custom properties");
+    }
+    
+    /**
+     * Issue #469-swingx: JXHeader doesn't wrap words in description.<p>
+     * 
+     * All values are passed in the constructor.
+     */
+    public void interactiveWordWrapping() {
+        URL url = getClass().getResource("resources/images/wellTop.gif");
+        assertNotNull(url);
+        JPanel p = new JPanel(new BorderLayout());
+        JXHeader header = new JXHeader("MyTitle", "this is a long test with veeeeeeeeeeeeeery looooooong wooooooooooooords", new ImageIcon(url));
+        p.add(header);
+        p.setPreferredSize(new Dimension(200,150));
+        showInFrame(p, "word wrapping JXHeader");
     }
     
     public static void main(String args[]) {

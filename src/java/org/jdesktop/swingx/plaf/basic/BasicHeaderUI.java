@@ -29,7 +29,20 @@ import org.jdesktop.swingx.plaf.HeaderUI;
 import org.jdesktop.swingx.plaf.PainterUIResource;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
 import javax.swing.plaf.ComponentUI;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.BoxView;
+import javax.swing.text.CompositeView;
+import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.Document;
+import javax.swing.text.Element;
+import javax.swing.text.GlyphView;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.View;
+import javax.swing.text.ViewFactory;
+import javax.swing.text.WrappedPlainView;
+
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -98,9 +111,12 @@ public class BasicHeaderUI extends HeaderUI {
         titleLabel = new JLabel("Title For Header Goes Here");
         titleLabel.setFont(titleLabel.getFont().deriveFont(Font.BOLD));
         descriptionPane = new JXEditorPane();
-        //        descriptionPane.setContentType("text/html");
+        String type = "text/plain";
+        descriptionPane.setEditorKitForContentType(type, new WrappingPlainEditorKit());
+        descriptionPane.setContentType(type);
         descriptionPane.setEditable(false);
         descriptionPane.setOpaque(false);
+        
         descriptionPane.setText("The description for the header goes here.\nExample: Click the Copy Code button to generate the corresponding Java code.");
         imagePanel = new JLabel();
         imagePanel.setIcon(UIManager.getIcon("Header.defaultIcon"));
@@ -208,4 +224,201 @@ public class BasicHeaderUI extends HeaderUI {
         p.setPaintStretched(true);
         return new PainterUIResource(p);
     }
+
+    /**
+     * <code>WrappingPlainEditorKit</code> 
+     * Copy of package protected PlainEditorKit from JEditorPane with word wrapping enabled.
+     */
+    static class WrappingPlainEditorKit extends DefaultEditorKit implements ViewFactory {
+
+        /**
+         * Fetches a factory that is suitable for producing 
+         * views of any models that are produced by this
+         * kit.  The default is to have the UI produce the
+         * factory, so this method has no implementation.
+         *
+         * @return the view factory
+         */
+            public ViewFactory getViewFactory() {
+            return this;
+        }
+
+        /**
+         * Creates a view from the given structural element of a
+         * document.
+         *
+         * @param elem  the piece of the document to build a view of
+         * @return the view
+         * @see View
+         */
+            public View create(Element elem) {
+                Document doc = elem.getDocument();
+                Object i18nFlag
+                    = doc.getProperty("i18n"/*AbstractDocument.I18NProperty*/);
+                if ((i18nFlag != null) && i18nFlag.equals(Boolean.TRUE)) {
+                    // build a view that support bidi
+                    return createI18N(elem);
+                } else {
+                    return new WrappedPlainView(elem, true);
+                }
+            }
+
+            View createI18N(Element elem) {
+                String kind = elem.getName();
+                if (kind != null) {
+                    if (kind.equals(AbstractDocument.ContentElementName)) {
+                        return new PlainParagraph(elem);
+                    } else if (kind.equals(AbstractDocument.ParagraphElementName)){
+                        return new BoxView(elem, View.Y_AXIS);
+                    }
+                }
+                return null;
+            }
+
+            /**
+             * Paragraph for representing plain-text lines that support
+             * bidirectional text.
+             */
+            static class PlainParagraph extends javax.swing.text.ParagraphView {
+
+                PlainParagraph(Element elem) {
+                    super(elem);
+                    layoutPool = new LogicalView(elem);
+                    layoutPool.setParent(this);
+                }
+
+                protected void setPropertiesFromAttributes() {
+                    Component c = getContainer();
+                    if ((c != null) 
+                        && (! c.getComponentOrientation().isLeftToRight()))
+                    {
+                        setJustification(StyleConstants.ALIGN_RIGHT);
+                    } else {
+                        setJustification(StyleConstants.ALIGN_LEFT);
+                    }
+                }
+
+                /**
+                 * Fetch the constraining span to flow against for
+                 * the given child index.
+                 */
+                public int getFlowSpan(int index) {
+                    Component c = getContainer();
+                    if (c instanceof JTextArea) {
+                        JTextArea area = (JTextArea) c;
+                        if (! area.getLineWrap()) {
+                            // no limit if unwrapped
+                            return Integer.MAX_VALUE;
+                        }
+                    }
+                    return super.getFlowSpan(index);
+                }
+
+                protected SizeRequirements calculateMinorAxisRequirements(int axis,
+                                                                SizeRequirements r)
+                {
+                    SizeRequirements req 
+                        = super.calculateMinorAxisRequirements(axis, r);
+                    Component c = getContainer();
+                    if (c instanceof JTextArea) {
+                        JTextArea area = (JTextArea) c;
+                        if (! area.getLineWrap()) {
+                            // min is pref if unwrapped
+                            req.minimum = req.preferred;
+                        }
+                    }
+                    return req;
+                }
+
+                /**
+                 * This class can be used to represent a logical view for 
+                 * a flow.  It keeps the children updated to reflect the state
+                 * of the model, gives the logical child views access to the
+                 * view hierarchy, and calculates a preferred span.  It doesn't
+                 * do any rendering, layout, or model/view translation.
+                 */
+                static class LogicalView extends CompositeView {
+            
+                    LogicalView(Element elem) {
+                        super(elem);
+                    }
+
+                    protected int getViewIndexAtPosition(int pos) {
+                        Element elem = getElement();
+                        if (elem.getElementCount() > 0) {
+                            return elem.getElementIndex(pos);
+                        }
+                        return 0;
+                    }
+
+                    protected boolean 
+                    updateChildren(DocumentEvent.ElementChange ec, 
+                                   DocumentEvent e, ViewFactory f)
+                    {
+                        return false;
+                    }
+
+                    protected void loadChildren(ViewFactory f) {
+                        Element elem = getElement();
+                        if (elem.getElementCount() > 0) {
+                            super.loadChildren(f);
+                        } else {
+                            View v = new GlyphView(elem);
+                            append(v);
+                        }
+                    }
+
+                    public float getPreferredSpan(int axis) {
+                        if( getViewCount() != 1 )
+                            throw new Error("One child view is assumed.");
+                    
+                        View v = getView(0);
+                        //((GlyphView)v).setGlyphPainter(null);
+                        return v.getPreferredSpan(axis);
+                    }
+
+                    /**
+                     * Forward the DocumentEvent to the given child view.  This
+                     * is implemented to reparent the child to the logical view
+                     * (the children may have been parented by a row in the flow
+                     * if they fit without breaking) and then execute the 
+                     * superclass behavior.
+                     *
+                     * @param v the child view to forward the event to.
+                     * @param e the change information from the associated document
+                     * @param a the current allocation of the view
+                     * @param f the factory to use to rebuild if the view has 
+                     *          children
+                     * @see #forwardUpdate
+                     * @since 1.3
+                     */
+                    protected void forwardUpdateToView(View v, DocumentEvent e, 
+                                                       Shape a, ViewFactory f) {
+                        v.setParent(this);
+                        super.forwardUpdateToView(v, e, a, f);
+                    }
+
+                    // The following methods don't do anything useful, they
+                    // simply keep the class from being abstract.
+
+                    public void paint(Graphics g, Shape allocation) {
+                    }
+
+                    protected boolean isBefore(int x, int y, Rectangle alloc) {
+                        return false;
+                    }
+
+                    protected boolean isAfter(int x, int y, Rectangle alloc) {
+                        return false;
+                    }
+
+                    protected View getViewAtPoint(int x, int y, Rectangle alloc) {
+                        return null;
+                    }
+
+                    protected void childAllocation(int index, Rectangle a) {
+                    }
+                }
+            }
+        }
 }
