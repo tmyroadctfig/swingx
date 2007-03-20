@@ -49,6 +49,7 @@ import javax.swing.KeyStroke;
 import javax.swing.ListModel;
 import javax.swing.table.TableModel;
 
+import org.apache.batik.ext.awt.LinearGradientPaint;
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXList;
@@ -145,8 +146,11 @@ public class PainterVisualCheck extends InteractiveTestCase {
         JXTable table = new JXTable(model);
 //        DefaultTableRenderer renderer = new DefaultTableRenderer();
         // selection should shine through in white part
-        GradientPaint paint = new GradientPaint(0.0f, 0.0f, Color.YELLOW, 10f, (float) 0.5, 
-                GradientHighlighter.getTransparentColor(Color.WHITE, 0));
+//        GradientPaint paint = new GradientPaint(0.0f, 0.0f, Color.YELLOW, 10f, (float) 0.5, 
+//                GradientHighlighter.getTransparentColor(Color.WHITE, 0));
+        LinearGradientPaint paint = new LinearGradientPaint(0.0f, 0.0f, 0f, 1f, 
+                new float[] {0,(float) 0.5}, new Color[] {Color.RED
+                , GradientHighlighter.getTransparentColor(Color.WHITE, 0)});
         final MattePainter painter = new MattePainter(paint);
         painter.setPaintStretched(true);
         
@@ -261,8 +265,9 @@ public class PainterVisualCheck extends InteractiveTestCase {
                 Color startColor = getTransparentColor(Color.YELLOW,
                         yellowTransparent ? 125 : 254);
                 Color endColor = getTransparentColor(Color.WHITE, 0);
-                GradientPaint paint = new java.awt.GradientPaint(0.0f, 0.0f, startColor, end,
-                        0.f, endColor);
+                LinearGradientPaint paint = new LinearGradientPaint(0.0f, 0.0f, 1f, 0f, 
+                        new float[] {0,end}, new Color[] {startColor
+                        , endColor});
                 painter = new MattePainter(paint);
                 painter.setPaintStretched(true);
 
@@ -435,8 +440,9 @@ public class PainterVisualCheck extends InteractiveTestCase {
             Color startColor = getTransparentColor(Color.YELLOW,
                     yellowTransparent ? 125 : 254);
             Color endColor = getTransparentColor(Color.WHITE, 0);
-            GradientPaint paint = new java.awt.GradientPaint(0.0f, 0.0f, startColor, end,
-                    0.f, endColor);
+            LinearGradientPaint paint = new LinearGradientPaint(0.0f, 0.0f, 1f, 0f, 
+                    new float[] {0,end}, new Color[] {startColor
+                    , endColor});
             painter = new MattePainter(paint);
             painter.setPaintStretched(true);
             return painter;
