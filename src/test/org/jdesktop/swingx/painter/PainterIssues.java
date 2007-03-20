@@ -21,7 +21,6 @@
  */
 package org.jdesktop.swingx.painter;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
@@ -29,8 +28,8 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXLabel;
 import org.jdesktop.swingx.renderer.JRendererLabel;
-import org.jdesktop.swingx.renderer.PainterVisualCheck;
 
 /**
  * Test to exposed known issues of <code>Painter</code>s.
@@ -56,6 +55,19 @@ public class PainterIssues extends InteractiveTestCase {
   }
 
     /**
+     * JXLabel background painter not shown if opaque.
+     *
+     */
+    public void interactiveXLabelBackgroundPainter() {
+        JXLabel label = new JXLabel("setup: backgroundPainter, opaque = true");
+        label.setOpaque(true);
+        label.setBackgroundPainter(new ShapePainter());
+        showInFrame(label, "background painters");
+    }
+    
+
+    /**
+     * 
      * paint doc relieves impl from restoring graphics. Who
      * is responsible for cleanup?
      *
