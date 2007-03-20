@@ -91,8 +91,8 @@ public class PainterIssues extends InteractiveTestCase {
         final AlphaPainter alpha = new AlphaPainter();
         alpha.setAlpha(0.2f);
         alpha.setPainters(shapePainter);
-        CompoundPainter compound = new CompoundPainter(alpha, foreground
-                .getForegroundPainter());
+        CompoundPainter compound = new CompoundPainter(foreground
+                .getForegroundPainter(), alpha);
         foreground.setForegroundPainter(compound);
         box.add(foreground);
         Action action = new AbstractActionExt("reset default foreground") {
