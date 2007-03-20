@@ -189,8 +189,34 @@ public class PainterIssues extends InteractiveTestCase {
             }
             
         };
-        label.setText("yet another .......... let's see");
-        showInFrame(label, "unrestored graphics");
+        label.setText("Painter: translated Graphics implement Painter");
+        final AbstractPainter<JComponent> painterAP = new AbstractPainter<JComponent>() {
+
+            @Override
+            protected void doPaint(Graphics2D g, JComponent component, int width, int height) {
+                g.translate(50, 0); 
+            }
+            
+        };
+        JLabel labelAP = new JLabel() {
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D scratch = (Graphics2D) g.create();
+                try {
+                    painterAP.paint(scratch, this, getWidth(), getHeight());
+                    ui.paint(scratch, this);
+                } finally {
+                    scratch.dispose();
+                }
+            }
+            
+        };
+        labelAP.setText("Painter: translated graphics subclass AbstractPainter");
+        JComponent box = Box.createVerticalBox();
+        box.add(label);
+        box.add(labelAP);
+        showInFrame(box, "unrestored graphics");
     }
     
     /**
