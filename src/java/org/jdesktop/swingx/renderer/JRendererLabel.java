@@ -132,14 +132,15 @@ public class JRendererLabel extends JLabel implements PainterAware {
      * @param g the graphics to paint on
      */
     private void paintPainter(Graphics g) {
-        Graphics2D scratch = (Graphics2D) ((g == null) ? null : g.create());
+        // fail fast: we assume that g must not be null
+        // which throws an NPE here instead deeper down the bowels
+        // this differs from corresponding core implementation!
+        Graphics2D scratch = (Graphics2D) g.create();
         try {
             painter.paint(scratch, this, getWidth(), getHeight());
         }
         finally {
-            if (scratch != null) {
-                scratch.dispose();
-            }
+            scratch.dispose();
         }
     }
 
@@ -152,8 +153,10 @@ public class JRendererLabel extends JLabel implements PainterAware {
         // 2. paint the painter
         // by-pass ui.update and hook into ui.paint directly
         if (ui != null) {
-            Graphics2D scratchGraphics = (Graphics2D) ((g == null) ? null : g.create());
-            if (scratchGraphics != null) {
+            // fail fast: we assume that g must not be null
+            // which throws an NPE here instead deeper down the bowels
+            // this differs from corresponding core implementation!
+            Graphics2D scratchGraphics = (Graphics2D) g.create();
                 try {
                     scratchGraphics.setColor(getBackground());
                     scratchGraphics.fillRect(0, 0, getWidth(), getHeight());
@@ -163,7 +166,6 @@ public class JRendererLabel extends JLabel implements PainterAware {
                 finally {
                     scratchGraphics.dispose();
                 }
-            }
         }        
     }
 
