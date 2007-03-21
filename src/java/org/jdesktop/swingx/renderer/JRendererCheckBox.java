@@ -98,8 +98,6 @@ public class JRendererCheckBox extends JCheckBox implements PainterAware {
             // which throws an NPE here instead deeper down the bowels
             // this differs from corresponding core implementation!
             Graphics scratchGraphics = g.create();
-            if (scratchGraphics != null) {
-            }
             try {
                 scratchGraphics.setColor(getBackground());
                 scratchGraphics.fillRect(0, 0, getWidth(), getHeight());
