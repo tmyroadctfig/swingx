@@ -1,3 +1,23 @@
+/*
+ * $Id$
+ *
+ * Copyright 2006 Sun Microsystems, Inc., 4150 Network Circle,
+ * Santa Clara, California 95054, U.S.A. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
 package org.jdesktop.swingx;
 
 import org.jdesktop.swingx.painter.Painter;
@@ -11,20 +31,11 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImageOp;
 
 /**
- * Created by IntelliJ IDEA.
- * User: richardallenbair
- * Date: Mar 20, 2007
- * Time: 10:16:20 AM
- * To change this template use File | Settings | File Templates.
+ * Simple demo
+ *
  */
-public class JXButtonDemo {
-    private JXButtonDemo() {}
-
-    public static void main(String[] args) {
-        JXFrame f = new JXFrame("JXButton Demo", true);
-        JPanel p = new JPanel();
-        f.add(p);
-
+public class JXButtonDemo extends JPanel {
+    public JXButtonDemo() {
         //simple demo that blurs the button's text
         final JXButton b = new JXButton("Execute");
         final AbstractPainter fgPainter = (AbstractPainter)b.getForegroundPainter();
@@ -48,8 +59,12 @@ public class JXButtonDemo {
                 }
             }
         });
+        add(b);
+    }
 
-        p.add(b);
+    public static void main(String[] args) {
+        JXFrame f = new JXFrame("JXButton Demo", true);
+        f.add(new JXButtonDemo());
         f.setSize(400, 300);
         f.setStartPosition(JXFrame.StartPosition.CenterInScreen);
         f.setVisible(true);
