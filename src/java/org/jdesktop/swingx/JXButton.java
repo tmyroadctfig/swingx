@@ -1,10 +1,22 @@
 /*
- * JXButton.java
+ * $Id$
  *
- * Created on March 9, 2007, 8:10 AM
+ * Copyright 2006 Sun Microsystems, Inc., 4150 Network Circle,
+ * Santa Clara, California 95054, U.S.A. All rights reserved.
  *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 package org.jdesktop.swingx;
@@ -29,29 +41,10 @@ import org.jdesktop.swingx.painter.Painter;
  * <p>For example, if you wanted to blur <em>just the text</em> on the button, and let everything else be
  * handled by the UI delegate for your look and feel, then you could:
  * <pre><code>
- *  //simple demo that blurs the button's text
- *  final JXButton b = new JXButton("Execute");
- *  final AbstractPainter fgPainter = (AbstractPainter)b.getForegroundPainter();
- *  final StackBlurFilter filter = new StackBlurFilter();
+ *  JXButton b = new JXButton("Execute");
+ *  AbstractPainter fgPainter = (AbstractPainter)b.getForegroundPainter();
+ *  StackBlurFilter filter = new StackBlurFilter();
  *  fgPainter.setFilters(filter);
- *
- *  b.addMouseListener(new MouseAdapter() {
- *      boolean entered = false;
- *      public void mouseEntered(MouseEvent mouseEvent) {
- *          if (!entered) {
- *              fgPainter.setFilters(new BufferedImageOp[0]);
- *              b.repaint();
- *              entered = true;
- *          }
- *      }
- *      public void mouseExited(MouseEvent mouseEvent) {
- *          if (entered) {
- *              fgPainter.setFilters(filter);
- *              b.repaint();
- *              entered = false;
- *          }
- *      }
- * });
  * </code></pre>
  *
  * <p>If <em>either</em> the foreground painter or the background painter is set,
@@ -60,7 +53,12 @@ import org.jdesktop.swingx.painter.Painter;
  * By contrast, the <code>Painters</code> installed by default will delegate to the UI delegate,
  * thus achieving the same look as a typical JButton, but at the cost of some additional painting
  * overhead.</p>
- * 
+ *
+ * <div class="examples">
+ * <h3>Examples</h3>
+ * {@demo org.jdesktop.swingx.JXButtonDemo ../../../../../demo}
+ * </div>
+ *
  * @author rbair
  */
 public class JXButton extends JButton {
