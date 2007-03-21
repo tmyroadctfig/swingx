@@ -293,13 +293,10 @@ public class JXPanel extends JPanel implements Scrollable {
             Graphics2D g2 = (Graphics2D)g.create();
             // account for the insets
             Insets ins = this.getInsets();
-            //g2.translate(ins.left, ins.top);
-            //painterSupport.paint(g2, this,
-            //        this.getWidth()  - ins.left - ins.right,
-            //        this.getHeight() - ins.top  - ins.bottom);
-            backgroundPainter.paint(g2, this, this.getWidth(), this.getHeight());
-            //backgroundPainter.paint(g2, this, this.getWidth() - ins.left - ins.right,
-            //        this.getHeight() - ins.top - ins.bottom);
+            g2.translate(ins.left, ins.top);            
+            backgroundPainter.paint(g2, this,
+                                    this.getWidth() - ins.left - ins.right,
+                                    this.getHeight() - ins.top - ins.bottom);
             g2.dispose();
         } else {
             super.paintComponent(g);
