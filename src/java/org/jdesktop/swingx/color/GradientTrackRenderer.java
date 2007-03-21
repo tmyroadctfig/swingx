@@ -31,6 +31,10 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 
+/**
+ * <p><b>Dependency</b>: Because this class relies on LinearGradientPaint and
+ * RadialGradientPaint, it requires the optional MultipleGradientPaint.jar</p>
+ */
 public class GradientTrackRenderer extends JComponent implements TrackRenderer {
     private Paint checker_paint;
 

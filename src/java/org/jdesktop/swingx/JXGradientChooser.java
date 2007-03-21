@@ -44,9 +44,13 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 /**
- * A specialized JXPanel that allows the user to construct and choose a Gradient.
- * The returned values will be one of: LinearGradientPaint or RadialGradientPaint.
- * @author jm158417
+ * <p>A specialized JXPanel that allows the user to construct and choose a Gradient.
+ * The returned values will be one of: LinearGradientPaint or RadialGradientPaint.</p>
+ *
+ * <p><b>Dependency</b>: Because this class relies on LinearGradientPaint and
+ * RadialGradientPaint, it requires the optional MultipleGradientPaint.jar</p>
+ * 
+ * @author joshy
  */
 public class JXGradientChooser extends JXPanel {
     private enum GradientStyle { Linear, Radial }

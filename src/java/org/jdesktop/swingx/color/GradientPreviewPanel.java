@@ -36,8 +36,10 @@ import java.awt.geom.Point2D;
 import java.util.List;
 
 /**
- *
- * @author jm158417
+ * <p><b>Dependency</b>: Because this class relies on LinearGradientPaint and
+ * RadialGradientPaint, it requires the optional MultipleGradientPaint.jar</p>
+ *  
+ * @author joshy
  */
 public class GradientPreviewPanel extends JXPanel {
     private Paint checker_texture = null;
