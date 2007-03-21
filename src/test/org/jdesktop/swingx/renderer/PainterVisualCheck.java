@@ -23,14 +23,12 @@ package org.jdesktop.swingx.renderer;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.GradientPaint;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -43,7 +41,6 @@ import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 import javax.swing.ListModel;
@@ -117,7 +114,8 @@ public class PainterVisualCheck extends InteractiveTestCase {
                             new int[] { 0, 0, 5 }, 3);
                     painter.setShape(polygon);
                     painter.setFillPaint(Color.RED);
-                    painter.setPaintStretched(false);//Resize(Resize.NONE);
+                    painter.setStyle(ShapePainter.Style.FILLED);
+                    painter.setPaintStretched(false);
                     // hmm.. how to make this stick to the trailing upper corner?
                     painter.setHorizontalAlignment(HorizontalAlignment.RIGHT);//setResizeLocation(Resize.HORIZONTAL);
                     painter.setVerticalAlignment(VerticalAlignment.TOP);
@@ -144,10 +142,6 @@ public class PainterVisualCheck extends InteractiveTestCase {
     public void interactiveTableGradientHighlight() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
-//        DefaultTableRenderer renderer = new DefaultTableRenderer();
-        // selection should shine through in white part
-//        GradientPaint paint = new GradientPaint(0.0f, 0.0f, Color.YELLOW, 10f, (float) 0.5, 
-//                GradientHighlighter.getTransparentColor(Color.WHITE, 0));
         LinearGradientPaint paint = new LinearGradientPaint(0.0f, 0.0f, 0f, 1f, 
                 new float[] {0,(float) 0.5}, new Color[] {Color.RED
                 , GradientHighlighter.getTransparentColor(Color.WHITE, 0)});
@@ -161,6 +155,47 @@ public class PainterVisualCheck extends InteractiveTestCase {
                 boolean highlight = needsHighlight(adapter);
                 if (highlight && (renderer instanceof PainterAware)) {
                     ((PainterAware) renderer).setPainter(painter);
+                    return renderer;
+                }
+                return renderer;
+            }
+
+            @Override
+            protected boolean test(ComponentAdapter adapter) {
+                return adapter.getValue().toString().contains("y");
+            }
+            
+        };
+        table.addHighlighter(gradientHighlighter);
+//        table.setDefaultRenderer(Object.class, renderer);
+        JXFrame frame = showWithScrollingInFrame(table, 
+                "painter-aware renderer with value-based highlighting");
+        getStatusBar(frame).add(new JLabel("gradient background of cells with value's containing 'y'"));
+    }
+   
+    /**
+     * Use ?? for fixed portion background highlighting
+     * Use SwingX extended default renderer.
+     */
+    public void interactiveTableBarHighlight() {
+        TableModel model = new AncientSwingTeam();
+        JXTable table = new JXTable(model);
+        Color transparentRed = GradientHighlighter.getTransparentColor(Color.RED, 0);
+        // how to do the same, but not as gradient?
+        // dirty trick ... mis-use a gradient... arrgghhh
+        LinearGradientPaint blueToTranslucent = new LinearGradientPaint(
+                new Point2D.Double(.4, 0), new Point2D.Double(1, 0),
+                new float[] {0,.499f,.5f,1}, new Color[] {Color.BLUE, Color.BLUE, transparentRed, transparentRed});
+        final MattePainter p =  new MattePainter(blueToTranslucent);
+        p.setPaintStretched(true);
+
+        ConditionalHighlighter gradientHighlighter = new ConditionalHighlighter(null, null, -1, -1) {
+
+            @Override
+            public Component highlight(Component renderer, ComponentAdapter adapter) {
+                boolean highlight = needsHighlight(adapter);
+                if (highlight && (renderer instanceof PainterAware)) {
+                    ((PainterAware) renderer).setPainter(p);
                     return renderer;
                 }
                 return renderer;
@@ -225,6 +260,9 @@ public class PainterVisualCheck extends InteractiveTestCase {
      * A Highlighter which applies a simple yellow to white-transparent 
      * gradient to a PainterAware rendering component. The yellow can
      * be toggled to half-transparent.
+     * 
+     * PENDING: How to the same but not use a gradient but a solid colered bar,
+     * covering a relative portion of the comp?
      */
     public static class GradientHighlighter extends Highlighter {
 
@@ -395,7 +433,10 @@ public class PainterVisualCheck extends InteractiveTestCase {
      * A Highlighter which applies a value-proportional gradient to PainterAware
      * rendering components if the value is a Number. The gradient is a simple
      * yellow to white-transparent paint. The yellow can be toggled to
-     * half-transparent.
+     * half-transparent.<p>
+     * 
+     * PENDING: How to the same but not use a gradient but a solid colered bar,
+     * covering a relative portion of the comp?
      */
     public static class ValueBasedGradientHighlighter extends
             ConditionalHighlighter {
