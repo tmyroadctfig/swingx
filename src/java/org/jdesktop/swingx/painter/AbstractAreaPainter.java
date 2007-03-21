@@ -21,11 +21,11 @@
 
 package org.jdesktop.swingx.painter;
 
-import org.apache.batik.ext.awt.LinearGradientPaint;
 import org.jdesktop.swingx.painter.effects.AreaEffect;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import org.jdesktop.swingx.util.PaintUtils;
 
 
 /**
@@ -220,56 +220,9 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
      * If this happens it should probably be turned into a static utility method.
      */
     Paint calculateSnappedPaint(Paint p, int width, int height) {
-        if(p instanceof Color) {
-            return p;
-        }
-        if(p instanceof GradientPaint) {
-            GradientPaint gp = (GradientPaint)p;
-            Point2D start = gp.getPoint1();
-            Point2D end = gp.getPoint2();
-            
-            Point2D[] pts = new Point2D[2];
-            pts[0] = gp.getPoint1();
-            pts[1] = gp.getPoint2();
-            pts = adjustPoints(pts, width, height);
-            
-            return new GradientPaint(pts[0], gp.getColor1(), pts[1], gp.getColor2());
-            
-        }
-        
-        if(p instanceof LinearGradientPaint) {
-            LinearGradientPaint mgp = (LinearGradientPaint)p;
-            Point2D start = mgp.getStartPoint();
-            Point2D end = mgp.getEndPoint();
-            
-            Point2D[] pts = new Point2D[2];
-            pts[0] = mgp.getStartPoint();
-            pts[1] = mgp.getEndPoint();
-            pts = adjustPoints(pts, width, height);
-            return new LinearGradientPaint(
-                    pts[0], pts[1],
-                    mgp.getFractions(),
-                    mgp.getColors());
-        }
-        return p;
+        return PaintUtils.resizeGradient(p, width, height);
     }
     
-    private static boolean isNear(double angle, double target, double error) {
-        return Math.abs(target - Math.abs(angle)) < error;
-    }
-    
-    private static double calcAngle(Point2D p1, Point2D p2) {
-        double x_off = p2.getX() - p1.getX();
-        double y_off = p2.getY() - p1.getY();
-        double angle = Math.atan(y_off / x_off);
-        if (x_off < 0) {
-            angle = angle + Math.PI;
-        }
-        
-        if(angle < 0) { angle+= 2*Math.PI; }
-        if(angle > 2*Math.PI) { angle -= 2*Math.PI; }
-        return angle;
-    }
     
     
     /**
@@ -302,66 +255,6 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
         AreaEffect[] results = new AreaEffect[areaEffects.length];
         System.arraycopy(areaEffects, 0, results, 0, results.length);
         return results;
-    }
-    
-    private static Point2D[] adjustPoints(Point2D[] pts, int width, int height) {
-        Point2D start = pts[0];
-        Point2D end = pts[1];
-        
-        double angle = calcAngle(start,end);
-        double a2 = Math.toDegrees(angle);
-        double e = 1;
-        
-        // if it is near 0 degrees
-        if(Math.abs(angle) < Math.toRadians(e) ||
-                Math.abs(angle) > Math.toRadians(360-e)) {
-            start = new Point2D.Float(0,0);
-            end = new Point2D.Float(width,0);
-        }
-        
-        // near 45
-        if(isNear(a2, 45, e)) {
-            start = new Point2D.Float(0,0);
-            end = new Point2D.Float(width,height);
-        }
-        
-        // near 90
-        if(isNear(a2,  90, e)) {
-            start = new Point2D.Float(0,0);
-            end = new Point2D.Float(0,height);
-        }
-        
-        // near 135
-        if(isNear(a2, 135, e)) {
-            start = new Point2D.Float(width,0);
-            end = new Point2D.Float(0,height);
-        }
-        
-        // near 180
-        if(isNear(a2, 180, e)) {
-            start = new Point2D.Float(width,0);
-            end = new Point2D.Float(0,0);
-        }
-        
-        // near 225
-        if(isNear(a2, 225, e)) {
-            start = new Point2D.Float(width,height);
-            end = new Point2D.Float(0,0);
-        }
-        
-        // near 270
-        if(isNear(a2, 270, e)) {
-            start = new Point2D.Float(0,height);
-            end = new Point2D.Float(0,0);
-        }
-        
-        // near 315
-        if(isNear(a2, 315, e)) {
-            start = new Point2D.Float(0,height);
-            end = new Point2D.Float(width,0);
-        }
-        
-        return new Point2D[] { start, end };
     }
     
 }

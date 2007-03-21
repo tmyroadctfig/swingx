@@ -28,8 +28,6 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
 import javax.swing.JComponent;
-import org.apache.batik.ext.awt.LinearGradientPaint;
-import org.apache.batik.ext.awt.MultipleGradientPaint;
 
 /**
  * A Painter implementation that uses a Paint to fill the entire background
