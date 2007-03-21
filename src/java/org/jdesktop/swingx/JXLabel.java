@@ -33,41 +33,56 @@ import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.Painter;
 
 /**
- * A JLabel subclass which supports Painters with the foregroundPainter and backgroundpainter
- * properties. By default the
- * foregroundPainter is set to a special painter which will draw the label normally, as specified
- * by the current look and feel. Setting a new foregroundPainter will replace the existing one.
- * To modify the standard drawing behavior developers may wrap the standard painter with a
- * CompoundPainter.  
- * 
+ * <p>A {@link javax.swing.JLabel} subclass which supports {@link org.jdesktop.swingx.painter.Painter}s
+ * with the <code>foregroundPainter</code> and <code>backgroundpainter</code> properties. By default the
+ * <code>foregroundPainter</code> is set to a special painter which will draw the label normally, as specified
+ * by the current look and feel. Setting a new <code>foregroundPainter</code> will replace the existing one.
+ * To modify the standard drawing behavior developers may get the default <code>Painter</code> and add effects,
+ * wrap in a {@link org.jdesktop.swingx.painter.CompoundPainter}, or in some other way modify the look and
+ * feel's default painting code.</p>
+ *
+ * <pre><code>
  * Ex:
  * 
  * JXLabel label = new JXLabel();
  * Painter standardPainter = label.getForegroundPainter();
  * MattePainter blue = new MattePainter(Color.BLUE);
  * CompoundPainter compound = new CompoundPainter(blue,standardPainter);
- * label.setForegroundPainter(label);
+ * label.setForegroundPainter(compound);
+ * </code></pre>
  * 
  * @author joshua.marinacci@sun.com
  */
 public class JXLabel extends JLabel {
     private Painter foregroundPainter;
     private Painter backgroundPainter;
+
     /**
-     * 
+     * Create a new JXLabel. This has the same semantics as creating a new JLabel.
      */
     public JXLabel() {
         super();
         initPainterSupport();
     }
+
     /**
-     * 
-     * @param text 
+     * Create a new JXLabel with the given text as the text for the label. This is
+     * shorthand for:
+     * <pre><code>
+     * JXLabel label = new JXLabel();
+     * label.setText("Some Text");
+     * </code></pre>
+     *
+     * @param text the text to set.
      */
     public JXLabel(String text) {
         super(text);
         initPainterSupport();
     }
+
+    /**
+     * Helper method for initializing the painters.
+     */
     private void initPainterSupport() {
         foregroundPainter = new AbstractPainter<JXLabel>() {
             protected void doPaint(Graphics2D g, JXLabel component, int width, int height) {
@@ -79,7 +94,7 @@ public class JXLabel extends JLabel {
     /**
      * Returns the current foregroundPainter. This is a bound property.  By default the foregroundPainter
      * will be an internal painter which executes the standard painting code (paintComponent()).
-     * @return 
+     * @return the current foreground painter.
      */
     public Painter getForegroundPainter() {
         return foregroundPainter;
@@ -93,9 +108,6 @@ public class JXLabel extends JLabel {
     public void setForegroundPainter(Painter painter) {
         Painter old = this.getForegroundPainter();
         this.foregroundPainter = painter;
-        if (painter != null) {
-            setOpaque(false);
-        }
         firePropertyChange("foregroundPainter", old, getForegroundPainter());
         repaint();
     }
@@ -130,7 +142,9 @@ public class JXLabel extends JLabel {
     /**
      * Overridden to provide Painter support. It will call backgroundPainter.paint()
      * then foregroundPainter.paint() if they are not null. If both are null
-     * then it will call super.paintComponent().
+     * then it will call super.paintComponent(). If subclasses override this method,
+     * they <em>must</em> call super.paintComponent() or they may cease to work
+     * correctly with painters.
      * 
      * @param g graphics to paint on
      */
