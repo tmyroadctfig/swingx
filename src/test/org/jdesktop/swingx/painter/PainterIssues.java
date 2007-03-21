@@ -21,16 +21,19 @@
  */
 package org.jdesktop.swingx.painter;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.border.Border;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
@@ -76,6 +79,7 @@ public class PainterIssues extends InteractiveTestCase {
     
 
     // ------------------ visual tests
+  
     /**
      * JXLabel restore default foreground painter.
      * Sequence: 
@@ -287,7 +291,8 @@ public class PainterIssues extends InteractiveTestCase {
      *
      */
     public void interactiveRestoreGraphics() {
-        final Painter<JComponent> painter = new Painter<JComponent>() {
+        Border redLine = BorderFactory.createLineBorder(Color.RED, 3);
+        final Painter<JComponent> permanentTranslate = new Painter<JComponent>() {
 
             public void paint(Graphics2D g, JComponent object, int width, int height) {
                 g.translate(50, 0); 
@@ -300,7 +305,7 @@ public class PainterIssues extends InteractiveTestCase {
             protected void paintComponent(Graphics g) {
                 Graphics2D scratch = (Graphics2D) g.create();
                 try {
-                    painter.paint(scratch, this, getWidth(), getHeight());
+                    permanentTranslate.paint(scratch, this, getWidth(), getHeight());
                     ui.paint(scratch, this);
                 } finally {
                     scratch.dispose();
@@ -309,6 +314,20 @@ public class PainterIssues extends InteractiveTestCase {
             
         };
         label.setText("Painter: translated Graphics implement Painter");
+        label.setBorder(redLine);
+        JLabel labelP = new JLabel("setup: painter with translate, no scratch") {
+
+            /**
+             * Illegal paintComponent - painter made permanent changes
+             */
+            @Override
+            protected void paintComponent(Graphics g) {
+                permanentTranslate.paint((Graphics2D) g, this, getWidth(), getHeight());
+                super.paintComponent(g);
+            }
+            
+        };
+        labelP.setBorder(redLine);
         final AbstractPainter<JComponent> painterAP = new AbstractPainter<JComponent>() {
 
             @Override
@@ -332,9 +351,11 @@ public class PainterIssues extends InteractiveTestCase {
             
         };
         labelAP.setText("Painter: translated graphics subclass AbstractPainter");
+        labelAP.setBorder(redLine);
         JComponent box = Box.createVerticalBox();
         box.add(label);
         box.add(labelAP);
+        box.add(labelP);
         showInFrame(box, "unrestored graphics");
     }
     
