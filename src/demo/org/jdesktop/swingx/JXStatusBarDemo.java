@@ -1,33 +1,36 @@
 /*
- * JXHeaderDemo.java
+ * $Id$
  *
- * Created on November 20, 2006, 3:09 PM
+ * Copyright 2006 Sun Microsystems, Inc., 4150 Network Circle,
+ * Santa Clara, California 95054, U.S.A. All rights reserved.
  *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 package org.jdesktop.swingx;
 
 import java.awt.Dimension;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.SwingConstants;
-import javax.swing.UIManager;
+import javax.swing.*;
 
 /**
  *
- * @author richardallenbair
+ * @author rbair
  */
-public class JXStatusBarDemo {
-    private JPanel panel;
-    
+public class JXStatusBarDemo extends JPanel {
     public JXStatusBarDemo() {
-        panel = new JPanel();
-        panel.setLayout(new VerticalLayout(3));
+        setLayout(new VerticalLayout(3));
         
         //create the status bar
         JXStatusBar bar = new JXStatusBar();
@@ -58,7 +61,7 @@ public class JXStatusBarDemo {
         bar.add(progress);
         progress.setIndeterminate(true);
         
-        panel.add(bar);
+        add(bar);
         
         //Add a second bar
         bar = new JXStatusBar();
@@ -69,22 +72,20 @@ public class JXStatusBarDemo {
         bar.add(new JLabel("jabcdefghijklm"));
         bar.add(new JLabel("gnopqrstuvwxyz"));
         
-        panel.add(bar);
+        add(bar);
     }
     
     public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        
-        JFrame frame = new JFrame();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
-        frame.setSize(400, 400);
-        frame.add(new JXStatusBarDemo().panel);
-        frame.setVisible(true);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                JFrame frame = new JFrame();
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.setLocationRelativeTo(null);
+                frame.setSize(400, 400);
+                frame.add(new JXStatusBarDemo());
+                frame.setVisible(true);
+            }
+        });
     }
     
 }
