@@ -227,11 +227,17 @@ ${build.branch} ${RELEASE_DSTAMP_LONG} ${projectname}</concat>
             <link offline="true" href="${javadoc.core.linkexternal}"
                   packagelistLoc="${javadoc.core.packagelist}"/>
             <classpath>
-                <path path="${javac.classpath}"/>
+                <path path="${run.classpath}"/>
             </classpath>
             <packageset dir="${src.beaninfo.dir}" includes="*/**"/>
             <packageset dir="${java.dir}" includes="*/**"/>
+            <taglet name="org.jdesktop.swinglabs.javadoc.DemoTaglet">
+                <path path="${demo.taglet.jar}" />
+            </taglet>
         </javadoc>
+        <copy todir="${dist.javadoc.dir}" file="${demo.taglet.jar}" />
+        <copy todir="${dist.javadoc.dir}" file="dist/swingx.jar" />
+        <rename src="${dist.javadoc.dir}/swingx.jar" dest="${dist.javadoc.dir}/demos.jar" />
     </target>
 
     <target name="grok" depends="init,jar">
