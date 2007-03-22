@@ -167,9 +167,4 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
         this.transform = transform;
         firePropertyChange("transform",old,transform);
     }
-
-    @Override
-    protected boolean isUseCache() {
-        return useCaching;
-    }
 }
