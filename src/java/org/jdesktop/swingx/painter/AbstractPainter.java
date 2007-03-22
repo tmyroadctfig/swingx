@@ -87,7 +87,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
     /**
      * A hint as to whether or not to attempt caching the image
      */
-    private boolean cache = false;
+    private boolean cache = true;
     /**
      * The cached image, if useCache() returns true
      */
@@ -98,15 +98,9 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
     private boolean visible = true;
 
     /**
-     * Creates a new instance of AbstractPainter. By default, it will not cache
-     * the painting operation, even if filters are applied (since there would be
-     * no way to handle the invalidation).
+     * Creates a new instance of AbstractPainter.
      */
     public AbstractPainter() {
-    }
-
-    public AbstractPainter(boolean cacheable) {
-        setCacheable(cacheable);
     }
 
     /**
@@ -115,7 +109,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
      *  be empty but it will never be null.
      * @return the array of filters applied to this painter
      */
-    public BufferedImageOp[] getFilters() {
+    public final BufferedImageOp[] getFilters() {
         BufferedImageOp[] results = new BufferedImageOp[filters.length];
         System.arraycopy(filters, 0, results, 0, results.length);
         return results;
@@ -135,6 +129,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
         BufferedImageOp[] old = getFilters();
         this.filters = new BufferedImageOp[effects == null ? 0 : effects.length];
         System.arraycopy(effects, 0, this.filters, 0, this.filters.length);
+        clearCache();
         firePropertyChange("filters", old, getFilters());
     }
 
@@ -153,6 +148,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
     public void setAntialiasing(boolean value) {
         boolean old = isAntialiasing();
         antialiasing = value;
+        if (old != value) clearCache();
         firePropertyChange("antialiasing", old, isAntialiasing());
     }
 
@@ -173,6 +169,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
     public void setInterpolation(Interpolation value) {
         Object old = getInterpolation();
         this.interpolation = value == null ? Interpolation.NearestNeighbor : value;
+        if (old != value) clearCache();
         firePropertyChange("interpolation", old, getInterpolation());
     }
 
@@ -199,6 +196,10 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
     public void setVisible(boolean visible) {
         boolean old = isVisible();
         this.visible = visible;
+        if (old != visible) clearCache(); //not the most efficient, but I must do this otherwise a CompoundPainter
+                                          //or other aggregate painter won't know that it is now invalid
+                                          //there might be a tricky solution involving isCacheCleared, and not
+                                          //*really* throwing away the cache, but that is a performance optimization
         firePropertyChange("visible", old, isVisible());
     }
 
@@ -236,11 +237,29 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
      * the painting routines will be called.</p>
      */
     public final void clearCache() {
+        boolean old = isCacheCleared();
         BufferedImage cache = cachedImage == null ? null : cachedImage.get();
         if (cache != null) {
             cache.flush();
         }
         cachedImage = null;
+        firePropertyChange("cacheCleared", old, isCacheCleared());
+    }
+
+    public boolean isCacheCleared() {
+        BufferedImage cache = cachedImage == null ? null : cachedImage.get();
+        return useCache() && cache == null;
+    }
+
+    protected void validateCache(T object) {
+    }
+
+    /**
+     * Returns true whether or not the painter is using caching.
+     * @return whether or not the cache should be used
+     */
+    protected boolean useCache() {
+        return isCacheable() && filters.length > 0;  //NOTE, I can only do this because getFilters() is final
     }
 
     /**
@@ -275,17 +294,9 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
      * @param width 
      * @param height 
      * @param g The Graphics2D object in which to paint
-     * @param component The JComponent that the Painter is delegate for.
+     * @param object
      */
-    protected abstract void doPaint(Graphics2D g, T component, int width, int height);
-
-    /**
-     * Returns true whether or not the painter is using caching.
-     * @return whether or not the cache should be used
-     */
-    protected boolean useCache() {
-        return isCacheable() && getFilters().length > 0;
-    }
+    protected abstract void doPaint(Graphics2D g, T object, int width, int height);
 
     /**
      * @inheritDoc
@@ -301,14 +312,13 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
 
         configureGraphics(g);
 
-        //use the cache, if possible
-        BufferedImage cache = cachedImage == null ? null : cachedImage.get();
-        BufferedImageOp[] filters = getFilters();
-        boolean useCache = useCache();
-        //paint to a temporary image if I'm cacheing, or if there are filters to apply
-        if (useCache || filters.length > 0) {
+        //paint to a temporary image if I'm caching, or if there are filters to apply
+        if (useCache() || filters.length > 0) {
+            validateCache(obj);
+            BufferedImage cache = cachedImage == null ? null : cachedImage.get();
             if (cache == null || cache.getWidth() != width || cache.getHeight() != height) {
-                //rebuild the cache
+                //rebuild the cache. I do this both if a cache is needed, and if any
+                //filters exist. I only *save* the resulting image if caching is turned on
                 cache = GraphicsUtilities.createCompatibleTranslucentImage(width, height);
                 Graphics2D gfx = cache.createGraphics();
                 configureGraphics(gfx);
@@ -320,7 +330,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
                 }
 
                 //only save the temporary image as the cache if I'm caching
-                if (useCache) {
+                if (useCache()) {
                     cachedImage = new SoftReference<BufferedImage>(cache);
                 }
             }
