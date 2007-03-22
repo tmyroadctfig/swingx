@@ -50,6 +50,8 @@ import java.awt.Graphics2D;
  *     }
  * </code></pre></p>
  *
+ * <p>This class is <strong>not</strong> threadsafe.</p>
+ *
  * @author rbair
  * @see AbstractPainter
  * @see CompoundPainter
@@ -60,10 +62,14 @@ import java.awt.Graphics2D;
 public interface Painter<T> {
     /**
      * <p>Renders to the given {@link java.awt.Graphics2D} object. Implementations
-     * of this method may modify state on the <code>Graphics2D</code>, and are not
+     * of this method <em>may</em> modify state on the <code>Graphics2D</code>, and are not
      * required to restore that state upon completion. In most cases, it is recommended
      * that the caller pass in a scratch graphics object. The <code>Graphics2D</code>
      * must never be null.</p>
+     *
+     * <p>State on the graphics object may be honored by the <code>paint</code> method,
+     * but may not be. For instance, setting the antialiasing rendering hint on the
+     * graphics may or may not be respected by the <code>Painter</code> implementation.</p>
      *
      * <p>The supplied object parameter acts as an optional configuration argument.
      * For example, it could be of type <code>Component</code>. A <code>Painter</code>

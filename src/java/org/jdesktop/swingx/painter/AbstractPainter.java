@@ -21,127 +21,123 @@
 
 package org.jdesktop.swingx.painter;
 
-import java.awt.Color;
-import java.awt.Composite;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.Stroke;
-import java.awt.Transparency;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
-import java.awt.image.ColorModel;
 import java.lang.ref.SoftReference;
-import java.util.HashMap;
-import java.util.Map;
-import javax.swing.JComponent;
+
 import org.jdesktop.beans.AbstractBean;
 import org.jdesktop.swingx.util.PaintUtils;
+import org.jdesktop.swingx.graphics.GraphicsUtilities;
 
 /**
- * <p>A convenient base class from which concrete Painter implementations may
- * extend. It extends AbstractBean and thus provides property change notification
- * (which is crucial for the Painter implementations to be available in a
- * GUI builder).Sublasses simply need
- * to extend AbstractPainter and implement the doPaint method.
+ * <p>A convenient base class from which concrete {@link Painter} implementations may
+ * extend. It extends {@link org.jdesktop.beans.AbstractBean} as a convenience for
+ * adding property change notification support. In addition, <code>AbstractPainter</code>
+ * provides subclasses with the ability to cache painting operations, configure the
+ * drawing surface with common settings (such as antialiasing and interpolation), and
+ * toggle whether a subclass paints or not via the <code>visibility</code> property.</p>
+ *
+ * <p>Subclasses of <code>AbstractPainter</code> generally need only override the
+ * {@link doPaint(Graphics2D, T, int, int)} method. If a subclass requires more control
+ * over whether cacheing is enabled, or for configuring the graphics state, then it
+ * may override the appropriate protected methods to interpose its own behavior.</p>
  * 
- * <p>For example, here is the doPaint method of RectanglePainter:
+ * <p>For example, here is the doPaint method of a simple <code>Painter</code> that
+ * paints an opaque rectangle:
  * <pre><code>
  *  public void doPaint(Graphics2D g, T obj, int width, int height) {
- *      g.setPaint(getPaint());
+ *      g.setPaint(Color.BLUE);
  *      g.fillRect(0, 0, width, height);
  *  }
- * </code></pre>
- * 
- * <p>AbstractPainter provides a very useful default implementation of
- * the paint method. It:
- * <ol>
- *  <li>Sets any specified rendering hints</li>
- *  <li>Sets the Composite if there is one</li>
- *  <li>Delegates to doPaint</li>
- * <ol></p>
- * 
- * <p>Specifying rendering hints can greatly improve the visual impact of your
- * applications. For example, by default Swing doesn't do much in the way of
- * antialiasing (except for Fonts, but that's another story). Pinstripes don't
- * look so good without antialiasing. So if I were going to paint pinstripes, I
- * might do it like this:
- * <pre><code>
- *   PinstripePainter p = new PinstripePainter();
- *   p.setAntialiasing(Antialiasing.ON);
  * </code></pre></p>
- * 
- * <p>You can read more about antialiasing and other rendering hints in the
- * java.awt.RenderingHints documentation. <strong>By nature, changing the rendering
- * hints may have an impact on performance. Certain hints require more
- * computation, others require less</strong></p>
- * 
+ *
  * @author rbair
  */
 public abstract class AbstractPainter<T> extends AbstractBean implements Painter<T> {
+    /**
+     * An enum representing the possible interpolation values of Bicubic, Bilinear, and
+     * Nearest Neighbor. These map to the underlying RenderingHints,
+     * but are easier to use and serialization safe.
+     */
+    public enum Interpolation {
+        /**
+         * use bicubic interpolation
+         */
+        Bicubic(RenderingHints.VALUE_INTERPOLATION_BICUBIC),
+        /**
+         * use bilinear interpolation
+         */
+        Bilinear(RenderingHints.VALUE_INTERPOLATION_BILINEAR),
+        /**
+         * use nearest neighbor interpolation
+         */
+        NearestNeighbor(RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+
+        private Object value;
+        Interpolation(Object value) {
+            this.value = value;
+        }
+        private void configureGraphics(Graphics2D g) {
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, value);
+        }
+    }
+
     //--------------------------------------------------- Instance Variables
     /**
      * A hint as to whether or not to attempt caching the image
      */
-    private boolean useCache = false;
+    private boolean cache = false;
     /**
-     * The cached image, if useCache is true
+     * The cached image, if useCache() returns true
      */
     private transient SoftReference<BufferedImage> cachedImage;
+    private BufferedImageOp[] filters = new BufferedImageOp[0];
+    private boolean antialiasing = true;
+    private Interpolation interpolation = Interpolation.NearestNeighbor;
+    private boolean visible = true;
+
     /**
-     * The Effects to apply to the results of the paint() operation
-     */
-    private BufferedImageOp[] effects = new BufferedImageOp[0];
-    
-    /**
-     * Creates a new instance of AbstractPainter
+     * Creates a new instance of AbstractPainter. By default, it will not cache
+     * the painting operation, even if filters are applied (since there would be
+     * no way to handle the invalidation).
      */
     public AbstractPainter() {
     }
-    
-    /**
-     * Returns true whether or not the painter is using caching.
-     * @return whether or not the cache should be used
-     */
-    protected boolean isUseCache() {
-        return useCache;
+
+    public AbstractPainter(boolean cacheable) {
+        setCacheable(cacheable);
     }
-    
-    /**
-     * <p>A convenience method for specifying the effects to use based on
-     * BufferedImageOps. These will each be individually wrapped by an ImageFilter
-     * and then setFilters(Effect... effects) will be called with the resulting
-     * array</p>
-     * 
-     * 
-     * @param effects the BufferedImageOps to wrap as effects
-     */
-    public void setFilters(BufferedImageOp ... effects) {
-        BufferedImageOp[] old = getFilters();
-        this.effects = new BufferedImageOp[effects == null ? 0 : effects.length];
-        System.arraycopy(effects, 0, this.effects, 0, this.effects.length);
-        firePropertyChange("effects", old, getFilters());
-    }
-    
+
     /**
      * A defensive copy of the Effects to apply to the results
      *  of the AbstractPainter's painting operation. The array may
-     *  be empty but it Will never be null.
-     * @return the array of effects applied to this painter
+     *  be empty but it will never be null.
+     * @return the array of filters applied to this painter
      */
     public BufferedImageOp[] getFilters() {
-        BufferedImageOp[] results = new BufferedImageOp[effects.length];
-        System.arraycopy(effects, 0, results, 0, results.length);
+        BufferedImageOp[] results = new BufferedImageOp[filters.length];
+        System.arraycopy(filters, 0, results, 0, results.length);
         return results;
     }
 
-    private boolean antialiasing = true;
+    /**
+     * <p>A convenience method for specifying the filters to use based on
+     * BufferedImageOps. These will each be individually wrapped by an ImageFilter
+     * and then setFilters(Effect... filters) will be called with the resulting
+     * array</p>
+     * 
+     * 
+     * @param effects the BufferedImageOps to wrap as filters
+     */
+    public void setFilters(BufferedImageOp ... effects) {
+        if (effects == null) effects = new BufferedImageOp[0];
+        BufferedImageOp[] old = getFilters();
+        this.filters = new BufferedImageOp[effects == null ? 0 : effects.length];
+        System.arraycopy(effects, 0, this.filters, 0, this.filters.length);
+        firePropertyChange("filters", old, getFilters());
+    }
+
     /**
      * Returns if antialiasing is turned on or not. The default value is true. 
      *  This is a bound property.
@@ -159,60 +155,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
         antialiasing = value;
         firePropertyChange("antialiasing", old, isAntialiasing());
     }
-    
-    
-    private boolean fractionalMetrics = true;
-    
-    /**
-     * Gets the current fractional metrics setting. This property determines if Fractional Metrics will
-     * be used when drawing text. @see java.awt.RenderingHints.KEY_FRACTIONALMETRICS.
-     * @return the current fractional metrics setting
-     */
-    public boolean isFractionalMetricsOn() {
-        return fractionalMetrics;
-    }
-    
-    /**
-     * Sets a new value for the fractional metrics setting. This setting determines if fractional
-     * metrics should be used when drawing text. @see java.awt.RenderingHints.KEY_FRACTIONALMETRICS.
-     * @param fractionalMetrics the new fractional metrics setting
-     */
-    public void setFractionalMetricsOn(boolean fractionalMetrics) {
-        boolean old = isFractionalMetricsOn();
-        this.fractionalMetrics = fractionalMetrics;
-        firePropertyChange("fractionalMetricsOn", old, isFractionalMetricsOn());
-    }
 
-    /**
-     * An enum representing the possible interpolation values of Bicubic, Bilinear, and
-     * Nearest Neighbor. These map to the underlying RenderingHints, 
-     * but are easier to use and serialization safe.
-     */
-    public enum Interpolation { 
-        /**
-         * use bicubic interpolation
-         */
-        Bicubic(RenderingHints.VALUE_INTERPOLATION_BICUBIC), 
-        /**
-         * use bilinear interpolation
-         */
-        Bilinear(RenderingHints.VALUE_INTERPOLATION_BILINEAR), 
-        /**
-         * use nearest neighbor interpolation
-         */
-        NearestNeighbor(RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-        
-        private Object value;
-        Interpolation(Object value) {
-            this.value = value;
-        }
-        private void configureGraphics(Graphics2D g) {
-            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, value);
-        }
-    }
-    
-    private Interpolation interpolation = Interpolation.NearestNeighbor;
-    
     /**
      * Gets the current interpolation setting. This property determines if interpolation will
      * be used when drawing scaled images. @see java.awt.RenderingHints.KEY_INTERPOLATION.
@@ -229,75 +172,91 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
      */
     public void setInterpolation(Interpolation value) {
         Object old = getInterpolation();
-        this.interpolation = value;
+        this.interpolation = value == null ? Interpolation.NearestNeighbor : value;
         firePropertyChange("interpolation", old, getInterpolation());
     }
 
     /**
-     * Overrides paint to support painters, filters, and a global alpha value.
-     * 
-     * @param g 
-     * @param component 
-     * @param width 
-     * @param height 
+     * Gets the visible property. This controls if the painter should
+     * paint itself. It is true by default. Setting visible to false
+     * is good when you want to temporarily turn off a painter. An example
+     * of this is a painter that you only use when a button is highlighted.
+     *
+     * @return current value of visible property
      */
-    public void paint(Graphics2D g, T obj, int width, int height) {
-        if(!isVisible()) {
-            return;
-        }
-
-        g = (Graphics2D)g.create();
-
-        try {
-            configureGraphics(g, obj);
-
-            //if I am caching, and the cache is not null, and the image has the
-            //same dimensions as the object, then simply paint the image
-            BufferedImage image = cachedImage == null ? null : cachedImage.get();
-            if (isUseCache() && image != null
-                    && image.getWidth() == width
-                    && image.getHeight() == height) {
-                g.drawImage(image, 0, 0, null);
-            } else {
-                BufferedImageOp[] effects = getFilters();
-                if (effects.length > 0 || isUseCache()) {
-                    image = PaintUtils.createCompatibleImage(
-                            width,
-                            height,
-                            Transparency.TRANSLUCENT);
-
-                    Graphics2D gfx = image.createGraphics();
-                    configureGraphics(gfx, obj);
-                    doPaint(gfx, obj, width, height);
-                    gfx.dispose();
-
-                    for (BufferedImageOp effect : effects) {
-                        image = effect.filter(image,null);
-                    }
-
-                    g.drawImage(image, 0, 0, null);
-
-                    if (isUseCache()) {
-                        cachedImage = new SoftReference<BufferedImage>(image);
-                    }
-                } else {
-                    doPaint(g, obj, width, height);
-                }
-            }
-        } finally {
-            g.dispose();
-        }
+    public boolean isVisible() {
+        return this.visible;
     }
-    
+
     /**
-     * Utility method for configuring the given Graphics2D with the rendering hints,
-     * composite, and clip. Will also get the font if we are painting a JComponent
+     * <p>Sets the visible property. This controls if the painter should
+     * paint itself. It is true by default. Setting visible to false
+     * is good when you want to temporarily turn off a painter. An example
+     * of this is a painter that you only use when a button is highlighted.</p>
+     *
+     * @param visible New value of visible property.
      */
-    private void configureGraphics(Graphics2D g, T c) {
-        if(c instanceof JComponent) {
-            g.setFont(((JComponent)c).getFont());
+    public void setVisible(boolean visible) {
+        boolean old = isVisible();
+        this.visible = visible;
+        firePropertyChange("visible", old, isVisible());
+    }
+
+    /**
+     * <p>Gets whether this <code>AbstractPainter</code> can be cached as an image.
+     * If cacheing is enabled, then it is the responsibility of the developer to
+     * invalidate the painter (via {@link #clearCache}) if external state has
+     * changed in such a way that the painter is invalidated and needs to be
+     * repainted.</p>
+     *
+     * @return whether this is cacheable
+     */
+    public boolean isCacheable() {
+        return cache;
+    }
+
+    /**
+     * <p>Sets whether this <code>AbstractPainter</code> can be cached as an image.
+     * If true, this is treated as a hint. That is, a cache may or may not be used.
+     * The {@link #useCache} method actually determines whether the cache is used.
+     * However, if false, then this is treated as an absolute value. That is, no
+     * cache will be used.</p>
+     *
+     * @param cacheable
+     */
+    public void setCacheable(boolean cacheable) {
+        boolean old = isCacheable();
+        this.cache = cacheable;
+        firePropertyChange("cacheable", old, isCacheable());
+    }
+
+    /**
+     * <p>Call this method to clear the cache. This may be called whether there is
+     * a cache being used or not. If cleared, on the next call to <code>paint</code>,
+     * the painting routines will be called.</p>
+     */
+    public final void clearCache() {
+        BufferedImage cache = cachedImage == null ? null : cachedImage.get();
+        if (cache != null) {
+            cache.flush();
         }
-        
+        cachedImage = null;
+    }
+
+    /**
+     * <p>This method is called by the <code>paint</code> method prior to
+     * any drawing operations to configure the drawing surface. The default
+     * implementation sets the rendering hints that have been specified for
+     * this <code>AbstractPainter</code>.</p>
+     *
+     * <p>This method can be overriden by subclasses to modify the drawing
+     * surface before any painting happens.</p>
+     *
+     * @param g the graphics surface to configure. This will never be null.
+     * @see #paint(Graphics2D, T, int, int)
+     */
+    protected void configureGraphics(Graphics2D g) {
+        //configure antialiasing
         if(isAntialiasing()) {
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
@@ -305,7 +264,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_OFF);
         }
-        
+
         getInterpolation().configureGraphics(g);
     }
     
@@ -319,36 +278,57 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
      * @param component The JComponent that the Painter is delegate for.
      */
     protected abstract void doPaint(Graphics2D g, T component, int width, int height);
-    
-    
+
     /**
-     * Holds value of property visible.
+     * Returns true whether or not the painter is using caching.
+     * @return whether or not the cache should be used
      */
-    private boolean visible = true;
-    
-    /**
-     * Gets the visible property. This controls if the painter should
-     * paint itself. It is true by default. Setting visible to false
-     * is good when you want to temporarily turn off a painter. An example
-     * of this is a painter that you only use when a button is highlighted.
-     * 
-     * @return current value of visible property
-     */
-    public boolean isVisible() {
-        return this.visible;
+    protected boolean useCache() {
+        return isCacheable() && getFilters().length > 0;
     }
-    
+
     /**
-     * Sets the visible property. This controls if the painter should
-     * paint itself. It is true by default. Setting visible to false
-     * is good when you want to temporarily turn off a painter. An example
-     * of this is a painter that you only use when a button is highlighted.
-     * 
-     * @param visible New value of visible property.
+     * @inheritDoc
      */
-    public void setVisible(boolean visible) {
-        boolean oldEnabled = isVisible();
-        this.visible = visible;
-        firePropertyChange("visible", oldEnabled, isVisible());
+    public final void paint(Graphics2D g, T obj, int width, int height) {
+        if (g == null) {
+            throw new NullPointerException("The Graphics2D must be supplied");
+        }
+
+        if(!isVisible() || width < 1 || height < 1) {
+            return;
+        }
+
+        configureGraphics(g);
+
+        //use the cache, if possible
+        BufferedImage cache = cachedImage == null ? null : cachedImage.get();
+        BufferedImageOp[] filters = getFilters();
+        boolean useCache = useCache();
+        //paint to a temporary image if I'm cacheing, or if there are filters to apply
+        if (useCache || filters.length > 0) {
+            if (cache == null || cache.getWidth() != width || cache.getHeight() != height) {
+                //rebuild the cache
+                cache = GraphicsUtilities.createCompatibleTranslucentImage(width, height);
+                Graphics2D gfx = cache.createGraphics();
+                configureGraphics(gfx);
+                doPaint(gfx, obj, width, height);
+                gfx.dispose();
+
+                for (BufferedImageOp f : getFilters()) {
+                    cache = f.filter(cache, null);
+                }
+
+                //only save the temporary image as the cache if I'm caching
+                if (useCache) {
+                    cachedImage = new SoftReference<BufferedImage>(cache);
+                }
+            }
+
+            g.drawImage(cache, 0, 0, null);
+        } else {
+            //can't use the cache, so just paint
+            doPaint(g, obj, width, height);
+        }
     }
 }
