@@ -235,8 +235,14 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
      * <p>Call this method to clear the cache. This may be called whether there is
      * a cache being used or not. If cleared, on the next call to <code>paint</code>,
      * the painting routines will be called.</p>
+     *
+     * <p><strong>Subclasses</strong>If overridden in subclasses, you
+     * <strong>must</strong> call super.clearCache, or physical
+     * resources (such as an Image) may leak. Since this method fires a
+     * property change event for "cacheCleared", you probably will want to call
+     * this method last in your implemenation.</p>
      */
-    public final void clearCache() {
+    public void clearCache() {
         boolean old = isCacheCleared();
         BufferedImage cache = cachedImage == null ? null : cachedImage.get();
         if (cache != null) {
@@ -248,10 +254,14 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
 
     public boolean isCacheCleared() {
         BufferedImage cache = cachedImage == null ? null : cachedImage.get();
-        return useCache() && cache == null;
+        return cache == null;
     }
 
     protected void validateCache(T object) {
+    }
+
+    protected boolean isInvalid() {
+        return useCache() && isCacheCleared();
     }
 
     /**

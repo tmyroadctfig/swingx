@@ -25,9 +25,14 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 
 /**
- * <p>A Painter implemention that contains an array of Painters, and executes them
- * in order. This allows you to create a layered series of painters, similar to
- * the layer design style in Photoshop or other image processing software.</p>
+ * <p>A {@link Painter} implemention composed of an array of <code>Painter</code>s.
+ * <code>CompoundPainter</code> provides a means for combining several individual
+ * <code>Painter</code>s, or groups of them, into one logical unit. Each of the
+ * <code>Painter</code>s are executed in order. BufferedImageOp filter effects can
+ * be applied to them together as a whole. The entire set of painting operations
+ * may be cached together.</p>
+ *
+ * <p></p>
  *
  * <p>For example, if I want to create a CompoundPainter that started with a blue
  * background, had pinstripes on it running at a 45 degree angle, and those
@@ -55,7 +60,7 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
     private Painter[] painters = new Painter[0];
     private AffineTransform transform;
     private boolean clipPreserved = false;
-    
+
     /** Creates a new instance of CompoundPainter */
     public CompoundPainter() {
     }
@@ -74,12 +79,6 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
         }
     }
     
-    private boolean useCaching;
-    public CompoundPainter(boolean useCaching, Painter ... painters) {
-        this(painters);
-        this.useCaching = useCaching;
-    }
-    
     /**
      * Sets the array of Painters to use. These painters will be executed in
      * order. A null value will be treated as an empty array.
@@ -90,6 +89,7 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
         Painter[] old = getPainters();
         this.painters = new Painter[painters == null ? 0 : painters.length];
         System.arraycopy(painters, 0, this.painters, 0, this.painters.length);
+        clearLocalCache();
         firePropertyChange("painters", old, getPainters());
     }
     
@@ -98,7 +98,7 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
      * @return a defensive copy of the painters used by this CompoundPainter.
      *         This will never be null.
      */
-    public Painter[] getPainters() {
+    public final Painter[] getPainters() {
         Painter[] results = new Painter[painters.length];
         System.arraycopy(painters, 0, results, 0, results.length);
         return results;
@@ -127,19 +127,98 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
     public void setClipPreserved(boolean shouldRestoreState) {
         boolean oldShouldRestoreState = isClipPreserved();
         this.clipPreserved = shouldRestoreState;
+        clearCache();
         firePropertyChange("shouldRestoreState",oldShouldRestoreState,shouldRestoreState);
     }
-    
 
+    /**
+     * Gets the current transform applied to all painters in this CompoundPainter. May be null.
+     * @return the current AffineTransform
+     */
+    public AffineTransform getTransform() {
+        return transform;
+    }
+
+    /**
+     * Set a transform to be applied to all painters contained in this CompoundPainter
+     * @param transform a new AffineTransform
+     */
+    public void setTransform(AffineTransform transform) {
+        AffineTransform old = getTransform();
+        this.transform = transform;
+        clearLocalCache();
+        firePropertyChange("transform",old,transform);
+    }
     
+    /**
+     * Iterates over all child <code>Painter</code>s and queries them to see
+     * if their cache is invalidated. If so, it causes this entire stack of
+     * painters to have their cache cleared.
+     *
+     * @inheritDoc
+     */
+    @Override
+    protected void validateCache(T object) {
+        //iterate over all of the painters and query them to see if they
+        //are valid. The first invalid one clears the cache and returns.
+        for (Painter p : painters) {
+            if (p instanceof AbstractPainter) {
+                AbstractPainter ap = (AbstractPainter)p;
+                ap.validateCache(object);
+                if (ap.isInvalid()) {
+                    clearLocalCache();
+                    return;
+                }
+            }
+        }
+    }
+
+    /**
+     * Iterates over all child <code>Painter</codes> and queries them to see
+     * if they are invalid. If so, then false is returned. Otherwise, we defer
+     * to the super implementation.
+     *
+     * @inheritDoc
+     */
+    @Override
+    protected boolean isInvalid() {
+        for (Painter p : painters) {
+            if (p instanceof AbstractPainter) {
+                AbstractPainter ap = (AbstractPainter)p;
+                if (ap.isInvalid()) {
+                    return true;
+                }
+            }
+        }
+        return super.isInvalid();
+    }
+
+    /**
+     * Clears the cache of this <code>Painter</code>, and all child
+     * <code>Painters</code>.
+     *
+     * @inheritDoc
+     */
+    @Override
+    public void clearCache() {
+        for (Painter p : painters) {
+            if (p instanceof AbstractPainter) {
+                AbstractPainter ap = (AbstractPainter)p;
+                ap.clearCache();
+            }
+        }
+        super.clearCache();
+    }
+
+    private void clearLocalCache() {
+        super.clearCache();
+    }
+
     /**
      * @inheritDoc
      */
     @Override
-    public void doPaint(Graphics2D g, T component, int width, int height) {
-        if(getTransform() != null) {
-            g.setTransform(getTransform());
-        }
+    protected void doPaint(Graphics2D g, T component, int width, int height) {
         for (Painter p : getPainters()) {
             Graphics2D temp = (Graphics2D) g.create();
             p.paint(temp, component, width, height);
@@ -149,22 +228,16 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
             temp.dispose();
         }
     }
-    
+
     /**
-     * Gets the current transform applied to all painters in this CompoundPainter. May be null.
-     * @return the current AffineTransform
+     * @inheritDoc
      */
-    public AffineTransform getTransform() {
-        return transform;
-    }
-    
-    /**
-     * Set a transform to be applied to all painters contained in this GradientPainter
-     * @param transform a new AffineTransform
-     */
-    public void setTransform(AffineTransform transform) {
-        AffineTransform old = getTransform();
-        this.transform = transform;
-        firePropertyChange("transform",old,transform);
+    @Override
+    protected void configureGraphics(Graphics2D g) {
+        //applies the transform
+        AffineTransform tx = getTransform();
+        if (tx != null) {
+            g.setTransform(tx);
+        }
     }
 }

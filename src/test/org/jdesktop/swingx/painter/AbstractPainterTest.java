@@ -284,37 +284,10 @@ public class AbstractPainterTest extends TestCase {
         f2.filtered = false;
     }
 
-    private static class TestablePainter extends AbstractPainter {
-        boolean painted = false;
-        boolean configured = false;
-        boolean configureCalledFirst = false;
-        Object last;
-        protected void doPaint(Graphics2D g, Object obj, int width, int height) {
-            painted = true;
-            last = obj;
-        }
-
-        protected void validateCache(Object object) {
-            if (last != object) {
-                clearCache();
-            }
-        }
-
-        protected void configureGraphics(Graphics2D g) {
-            configured = true;
-            configureCalledFirst = configured && !painted;
-        }
-
-        void reset() {
-            painted = false;
-            configured = false;
-            setCacheable(false);
-            clearCache();
-            setFilters((BufferedImageOp[])null);
-        }
-    }
-
     //tests that compound behaviors, such as caching in compound situations, works
+    //I don't extend CompoundPainter because I don't want to test the CompoundPainter
+    //itself, just test the general concepts that go into *any* aggregate Painter
+    //implementation    
     private static final class TestableCompoundPainter extends TestablePainter {
         TestablePainter[] painters;
         public void setPainters(TestablePainter... painters) {
@@ -327,7 +300,7 @@ public class AbstractPainterTest extends TestCase {
             //are valid. The first invalid one clears the cache and returns.
             for (TestablePainter p : painters) {
                 p.validateCache(object);
-                if (p.isCacheCleared()) {
+                if (p.useCache() && p.isCacheCleared()) {
                     clearCache();
                     return;
                 }
@@ -339,18 +312,6 @@ public class AbstractPainterTest extends TestCase {
             for (TestablePainter p : painters) {
                 p.paint(g, obj, width, height);
             }
-        }
-    }
-
-    private static final class TestableFilter extends AbstractFilter {
-        boolean filtered = false;
-        public BufferedImage filter(BufferedImage src, BufferedImage dest) {
-            filtered = true;
-            return src;
-        }
-
-        void reset() {
-            filtered = false;
         }
     }
 }
