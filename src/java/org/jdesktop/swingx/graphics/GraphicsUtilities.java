@@ -84,6 +84,10 @@ public class GraphicsUtilities {
                     getDefaultScreenDevice().getDefaultConfiguration();
     }
 
+    private static boolean isHeadless() {
+        return GraphicsEnvironment.isHeadless();
+    }
+
     /**
      * <p>Returns a new <code>BufferedImage</code> using the same color model
      * as the image passed as a parameter. The returned image is only compatible
@@ -141,7 +145,9 @@ public class GraphicsUtilities {
      */
     public static BufferedImage createCompatibleImage(BufferedImage image,
                                                       int width, int height) {
-        return getGraphicsConfiguration().createCompatibleImage(width, height,
+        return isHeadless() ?
+                new BufferedImage(width, height, image.getType()) :
+                getGraphicsConfiguration().createCompatibleImage(width, height,
                                                    image.getTransparency());
     }
 
@@ -160,7 +166,9 @@ public class GraphicsUtilities {
      *   specified width and height
      */
     public static BufferedImage createCompatibleImage(int width, int height) {
-        return getGraphicsConfiguration().createCompatibleImage(width, height);
+        return isHeadless() ?
+                new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB) :
+                getGraphicsConfiguration().createCompatibleImage(width, height);
     }
 
     /**
@@ -179,7 +187,9 @@ public class GraphicsUtilities {
      */
     public static BufferedImage createCompatibleTranslucentImage(int width,
                                                                  int height) {
-        return getGraphicsConfiguration().createCompatibleImage(width, height,
+        return isHeadless() ?
+                new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB) :
+                getGraphicsConfiguration().createCompatibleImage(width, height,
                                                    Transparency.TRANSLUCENT);
     }
 
@@ -219,6 +229,10 @@ public class GraphicsUtilities {
      *   same width and height and transparency and content, of <code>image</code>
      */
     public static BufferedImage toCompatibleImage(BufferedImage image) {
+        if (isHeadless()) {
+            return image;
+        }
+
         if (image.getColorModel().equals(
                 getGraphicsConfiguration().getColorModel())) {
             return image;
