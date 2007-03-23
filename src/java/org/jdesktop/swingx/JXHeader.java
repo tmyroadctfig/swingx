@@ -241,23 +241,5 @@ public class JXHeader extends JXPanel {
     
     private Font getDescriptionFont() {
         return descriptionFont;
-    }
-    
-//    public static void main(String[] args) {
-//        SwingUtilities.invokeLater(new Runnable() {
-//            public void run() {
-////                try {
-////                    UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-////                } catch (Exception ex) {
-////                    ex.printStackTrace();
-////                }
-//                javax.swing.JFrame frame = new javax.swing.JFrame();
-//                frame.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
-//                frame.add(new JXHeader());
-//                frame.setSize(500, 125);
-//                frame.setLocation(org.jdesktop.swingx.util.WindowUtils.getPointForCentering(frame));
-//                frame.setVisible(true);
-//            }
-//        });
-//    }
+    }    
 }
