@@ -52,27 +52,34 @@ import javax.imageio.ImageIO;
  * <p><code>GraphicsUtilities</code> contains a set of tools to perform
  * common graphics operations easily. These operations are divided into
  * several themes, listed below.</p>
+ *
  * <h2>Compatible Images</h2>
+ *
  * <p>Compatible images can, and should, be used to increase drawing
  * performance. This class provides a number of methods to load compatible
  * images directly from files or to convert existing images to compatibles
  * images.</p>
+ *
  * <h2>Creating Thumbnails</h2>
+ *
  * <p>This class provides a number of methods to easily scale down images.
  * Some of these methods offer a trade-off between speed and result quality and
  * shouuld be used all the time. They also offer the advantage of producing
  * compatible images, thus automatically resulting into better runtime
  * performance.</p>
+ *
  * <p>All these methodes are both faster than
  * {@link java.awt.Image#getScaledInstance(int, int, int)} and produce
  * better-looking results than the various <code>drawImage()</code> methods
  * in {@link java.awt.Graphics}, which can be used for image scaling.</p>
  * <h2>Image Manipulation</h2>
+ *
  * <p>This class provides two methods to get and set pixels in a buffered image.
  * These methods try to avoid unmanaging the image in order to keep good
  * performance.</p>
  *
  * @author Romain Guy <romain.guy@mac.com>
+ * @author rbair
  */
 public class GraphicsUtilities {
     private GraphicsUtilities() {
@@ -109,7 +116,11 @@ public class GraphicsUtilities {
 
     /**
      * <p>Returns a new compatible image with the same width, height and
-     * transparency as the image specified as a parameter.</p>
+     * transparency as the image specified as a parameter. That is, the
+     * returned BufferedImage will be compatible with the graphics hardware.
+     * If this method is called in a headless environment, then
+     * the returned BufferedImage will be compatible with the source
+     * image.</p>
      *
      * @see java.awt.Transparency
      * @see #createCompatibleImage(int, int)
@@ -128,7 +139,11 @@ public class GraphicsUtilities {
 
     /**
      * <p>Returns a new compatible image of the specified width and height, and
-     * the same transparency setting as the image specified as a parameter.</p>
+     * the same transparency setting as the image specified as a parameter.
+     * That is, the returned <code>BufferedImage</code> is compatible with
+     * the graphics hardware. If the method is called in a headless
+     * environment, then the returned BufferedImage will be compatible with
+     * the source image.</p>
      *
      * @see java.awt.Transparency
      * @see #createCompatibleImage(java.awt.image.BufferedImage)
@@ -153,7 +168,10 @@ public class GraphicsUtilities {
 
     /**
      * <p>Returns a new opaque compatible image of the specified width and
-     * height.</p>
+     * height. That is, the returned <code>BufferedImage</code> is compatible with
+     * the graphics hardware. If the method is called in a headless
+     * environment, then the returned BufferedImage will be compatible with
+     * the source image.</p>
      *
      * @see #createCompatibleImage(java.awt.image.BufferedImage)
      * @see #createCompatibleImage(java.awt.image.BufferedImage, int, int)
@@ -172,8 +190,11 @@ public class GraphicsUtilities {
     }
 
     /**
-     * <p>Returns a new translucent compatible image of the specified width
-     * and height.</p>
+     * <p>Returns a new translucent compatible image of the specified width and
+     * height. That is, the returned <code>BufferedImage</code> is compatible with
+     * the graphics hardware. If the method is called in a headless
+     * environment, then the returned BufferedImage will be compatible with
+     * the source image.</p>
      *
      * @see #createCompatibleImage(java.awt.image.BufferedImage)
      * @see #createCompatibleImage(java.awt.image.BufferedImage, int, int)
@@ -218,6 +239,9 @@ public class GraphicsUtilities {
      * <p>Return a new compatible image that contains a copy of the specified
      * image. This method ensures an image is compatible with the hardware,
      * and therefore optimized for fast blitting operations.</p>
+     *
+     * <p>If the method is called in a headless environment, then the returned
+     * <code>BufferedImage</code> will be the source image.</p>
      *
      * @see #createCompatibleImage(java.awt.image.BufferedImage)
      * @see #createCompatibleImage(java.awt.image.BufferedImage, int, int)
