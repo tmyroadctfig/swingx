@@ -336,12 +336,11 @@ public class PaintUtils {
             pts[0] = gp.getPoint1();
             pts[1] = gp.getPoint2();
             pts = adjustPoints(pts, width, height);
-            return new GradientPaint(pts[0], gp.getColor1(), pts[1], gp.getColor2());
-            
+            return new GradientPaint(pts[0], gp.getColor1(), pts[1], gp.getColor2(), gp.isCyclic());
         }
         
-        System.out.println("class name = " + p.getClass().getName());
-        if(p.getClass().getName().endsWith("LinearGradientPaint")) {
+        if("java.awt.LinearGradientPaint".equals(p.getClass().getName()) ||
+           "org.apache.batik.ext.awt.LinearGradientPaint".equals(p.getClass().getName())) {
             return resizeLinearGradient(p,width,height);
         }
         return p;
