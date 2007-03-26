@@ -132,9 +132,9 @@ public class CompoundPainterTest extends TestCase {
         assertFalse(f3.filtered);
     }
 
-    public void testIfChildPainterIsInvalid() {
+    public void testIfChildPainterIsInvalidByBeingDirty() {
         testCacheUsedSecondPass();
-        p4.clearCache();
+        p4.setDirty(true);
         cp1.paint(g, null, 10, 10);
         assertTrue(cp1.painted);
         assertTrue(f1.filtered);
@@ -161,6 +161,36 @@ public class CompoundPainterTest extends TestCase {
         p5.painted = false;
 
         onlyCachedPainters.painted = false;
+    }
+
+    public void testUncachedPainterInvalidation() {
+        p1.setCacheable(false);
+        p2.setCacheable(false);
+        cp2.setCacheable(false);
+        p3.setCacheable(false);
+        p4.setCacheable(false);
+        p5.setCacheable(false);
+
+        cp1.paint(g, null, 10, 10);
+        reset();
+        cp1.paint(g, null, 10, 10);
+        assertFalse(cp1.painted);
+        assertFalse(p1.painted);
+        assertFalse(p2.painted);
+        assertFalse(cp2.painted);
+        assertFalse(p3.painted);
+        assertFalse(p4.painted);
+        assertFalse(p5.painted);
+
+        p1.setDirty(true);
+        cp1.paint(g, null, 10, 10);
+        assertTrue(cp1.painted);
+        assertTrue(p1.painted);
+        assertTrue(p2.painted);
+        assertTrue(cp2.painted);
+        assertTrue(p3.painted);
+        assertTrue(p4.painted);
+        assertTrue(p5.painted);
     }
 
     //tests that compound behaviors, such as caching in compound situations, works

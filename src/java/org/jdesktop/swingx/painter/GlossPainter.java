@@ -142,6 +142,7 @@ public class GlossPainter<T> extends AbstractPainter<T> {
     public void setPaint(Paint paint) {
         Paint old = this.paint;
         this.paint = paint;
+        setDirty(true);
         firePropertyChange("paint", old, getPaint());
     }
 
@@ -163,6 +164,7 @@ public class GlossPainter<T> extends AbstractPainter<T> {
     public void setPosition(GlossPosition position) {
         GlossPosition old = this.position;
         this.position = position;
+        setDirty(true);
         firePropertyChange("position", old, getPosition());
     }
 }

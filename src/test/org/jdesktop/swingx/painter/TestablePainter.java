@@ -37,9 +37,10 @@ class TestablePainter extends AbstractPainter {
         last = obj;
     }
 
-    protected void validateCache(Object object) {
+    protected void validate(Object object) {
         if (last != object) {
             clearCache();
+            setDirty(true);
         }
     }
 
@@ -54,5 +55,6 @@ class TestablePainter extends AbstractPainter {
         setCacheable(false);
         clearCache();
         setFilters((BufferedImageOp[])null);
+        setDirty(false);
     }
 }

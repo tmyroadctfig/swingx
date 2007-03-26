@@ -146,6 +146,7 @@ public abstract class AbstractLayoutPainter<T> extends AbstractPainter<T> {
     public void setHorizontalAlignment(HorizontalAlignment horizontal) {
         HorizontalAlignment old = this.getHorizontalAlignment();
         this.horizontalAlignment = horizontal;
+        setDirty(true);
         firePropertyChange("horizontal",old,this.horizontalAlignment);
     }
 
@@ -160,6 +161,7 @@ public abstract class AbstractLayoutPainter<T> extends AbstractPainter<T> {
     public void setFillHorizontal(boolean fillHorizontal) {
         boolean old = this.isFillHorizontal();
         this.fillHorizontal = fillHorizontal;
+        setDirty(true);
         firePropertyChange("horizontalStretch",old,this.fillHorizontal);
     }
 
@@ -171,6 +173,7 @@ public abstract class AbstractLayoutPainter<T> extends AbstractPainter<T> {
     public void setInsets(Insets insets) {
         Insets old = this.getInsets();
         this.insets = insets;
+        setDirty(true);
         firePropertyChange("insets",old,this.insets);
     }
 
@@ -184,6 +187,7 @@ public abstract class AbstractLayoutPainter<T> extends AbstractPainter<T> {
     public void setVerticalAlignment(VerticalAlignment vertical) {
         VerticalAlignment old = this.getVerticalAlignment();
         this.verticalAlignment = vertical;
+        setDirty(true);
         firePropertyChange("vertical",old,this.verticalAlignment);
     }
 
@@ -198,6 +202,7 @@ public abstract class AbstractLayoutPainter<T> extends AbstractPainter<T> {
     public void setFillVertical(boolean verticalStretch) {
         boolean old = this.isFillVertical();
         this.fillVertical = verticalStretch;
+        setDirty(true);
         firePropertyChange("verticalStretch",old,this.fillVertical);
     }
     

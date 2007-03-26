@@ -110,6 +110,7 @@ public class CheckerboardPainter<T> extends AbstractPainter<T> {
         double old = getSquareSize();
         this.squareSize = squareSize;
         checkerPaint = null;
+        setDirty(true);
         firePropertyChange("squareSize", old, getSquareSize());
     }
     
@@ -133,6 +134,7 @@ public class CheckerboardPainter<T> extends AbstractPainter<T> {
         Paint old = getDarkPaint();
         this.darkPaint = color;
         checkerPaint = null;
+        setDirty(true);
         firePropertyChange("darkPaint", old, getDarkPaint());
     }
     
@@ -156,6 +158,7 @@ public class CheckerboardPainter<T> extends AbstractPainter<T> {
         Paint old = getLightPaint();
         this.lightPaint = color;
         checkerPaint = null;
+        setDirty(true);
         firePropertyChange("lightPaint", old, getLightPaint());
     }
     

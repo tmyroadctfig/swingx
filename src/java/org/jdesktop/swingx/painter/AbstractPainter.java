@@ -27,14 +27,13 @@ import java.awt.image.BufferedImageOp;
 import java.lang.ref.SoftReference;
 
 import org.jdesktop.beans.AbstractBean;
-import org.jdesktop.swingx.util.PaintUtils;
 import org.jdesktop.swingx.graphics.GraphicsUtilities;
 
 /**
  * <p>A convenient base class from which concrete {@link Painter} implementations may
  * extend. It extends {@link org.jdesktop.beans.AbstractBean} as a convenience for
  * adding property change notification support. In addition, <code>AbstractPainter</code>
- * provides subclasses with the ability to cache painting operations, configure the
+ * provides subclasses with the ability to cacheable painting operations, configure the
  * drawing surface with common settings (such as antialiasing and interpolation), and
  * toggle whether a subclass paints or not via the <code>visibility</code> property.</p>
  *
@@ -85,13 +84,11 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
 
     //--------------------------------------------------- Instance Variables
     /**
-     * A hint as to whether or not to attempt caching the image
-     */
-    private boolean cache = true;
-    /**
-     * The cached image, if useCache() returns true
+     * The cached image, if shouldUseCache() returns true
      */
     private transient SoftReference<BufferedImage> cachedImage;
+    private boolean cacheable = true;
+    private boolean dirty = false;
     private BufferedImageOp[] filters = new BufferedImageOp[0];
     private boolean antialiasing = true;
     private Interpolation interpolation = Interpolation.NearestNeighbor;
@@ -100,8 +97,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
     /**
      * Creates a new instance of AbstractPainter.
      */
-    public AbstractPainter() {
-    }
+    public AbstractPainter() { }
 
     /**
      * A defensive copy of the Effects to apply to the results
@@ -129,7 +125,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
         BufferedImageOp[] old = getFilters();
         this.filters = new BufferedImageOp[effects == null ? 0 : effects.length];
         System.arraycopy(effects, 0, this.filters, 0, this.filters.length);
-        clearCache();
+        setDirty(true);
         firePropertyChange("filters", old, getFilters());
     }
 
@@ -148,7 +144,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
     public void setAntialiasing(boolean value) {
         boolean old = isAntialiasing();
         antialiasing = value;
-        if (old != value) clearCache();
+        if (old != value) setDirty(true);
         firePropertyChange("antialiasing", old, isAntialiasing());
     }
 
@@ -169,7 +165,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
     public void setInterpolation(Interpolation value) {
         Object old = getInterpolation();
         this.interpolation = value == null ? Interpolation.NearestNeighbor : value;
-        if (old != value) clearCache();
+        if (old != value) setDirty(true);
         firePropertyChange("interpolation", old, getInterpolation());
     }
 
@@ -196,10 +192,9 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
     public void setVisible(boolean visible) {
         boolean old = isVisible();
         this.visible = visible;
-        if (old != visible) clearCache(); //not the most efficient, but I must do this otherwise a CompoundPainter
-                                          //or other aggregate painter won't know that it is now invalid
-                                          //there might be a tricky solution involving isCacheCleared, and not
-                                          //*really* throwing away the cache, but that is a performance optimization
+        if (old != visible) setDirty(true); //not the most efficient, but I must do this otherwise a CompoundPainter
+                                            //or other aggregate painter won't know that it is now invalid
+                                            //there might be a tricky solution but that is a performance optimization
         firePropertyChange("visible", old, isVisible());
     }
 
@@ -213,62 +208,100 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
      * @return whether this is cacheable
      */
     public boolean isCacheable() {
-        return cache;
+        return cacheable;
     }
 
     /**
      * <p>Sets whether this <code>AbstractPainter</code> can be cached as an image.
-     * If true, this is treated as a hint. That is, a cache may or may not be used.
-     * The {@link #useCache} method actually determines whether the cache is used.
+     * If true, this is treated as a hint. That is, a cacheable may or may not be used.
+     * The {@link #shouldUseCache} method actually determines whether the cacheable is used.
      * However, if false, then this is treated as an absolute value. That is, no
-     * cache will be used.</p>
+     * cacheable will be used.</p>
+     *
+     * <p>If set to false, then #clearCache is called to free system resources.</p>
      *
      * @param cacheable
      */
     public void setCacheable(boolean cacheable) {
         boolean old = isCacheable();
-        this.cache = cacheable;
+        this.cacheable = cacheable;
         firePropertyChange("cacheable", old, isCacheable());
+        if (!isCacheable()) {
+            clearCache();
+        }
     }
 
     /**
-     * <p>Call this method to clear the cache. This may be called whether there is
-     * a cache being used or not. If cleared, on the next call to <code>paint</code>,
+     * <p>Call this method to clear the cacheable. This may be called whether there is
+     * a cacheable being used or not. If cleared, on the next call to <code>paint</code>,
      * the painting routines will be called.</p>
      *
      * <p><strong>Subclasses</strong>If overridden in subclasses, you
      * <strong>must</strong> call super.clearCache, or physical
-     * resources (such as an Image) may leak. Since this method fires a
-     * property change event for "cacheCleared", you probably will want to call
-     * this method last in your implemenation.</p>
+     * resources (such as an Image) may leak.</p>
      */
     public void clearCache() {
-        boolean old = isCacheCleared();
         BufferedImage cache = cachedImage == null ? null : cachedImage.get();
         if (cache != null) {
             cache.flush();
         }
         cachedImage = null;
-        firePropertyChange("cacheCleared", old, isCacheCleared());
     }
 
-    public boolean isCacheCleared() {
+    /**
+     * Only made package private for testing. Don't call this method outside
+     * of this class! This is NOT a bound property
+     */
+    boolean isCacheCleared() {
         BufferedImage cache = cachedImage == null ? null : cachedImage.get();
         return cache == null;
     }
 
-    protected void validateCache(T object) {
-    }
+    /**
+     * <p>Called to allow <code>Painter</code> subclasses a chance to see if any state
+     * in the given object has changed from the last paint operation. If it has, then
+     * the <code>Painter</code> has a chance to mark itself as dirty, thus causing a
+     * repaint, even if cached.</p>
+     *
+     * @param object
+     */
+    protected void validate(T object) { }
 
-    protected boolean isInvalid() {
-        return useCache() && isCacheCleared();
+    /**
+     * Ye olde dirty bit. If true, then the painter is considered dirty and in need of
+     * being repainted. This is a bound property.
+     *
+     * @return true if the painter state has changed and the painter needs to be
+     *              repainted.
+     */
+    protected boolean isDirty() {
+        return dirty;
     }
 
     /**
-     * Returns true whether or not the painter is using caching.
-     * @return whether or not the cache should be used
+     * Sets the dirty bit. If true, then the painter is considered dirty, and the cache
+     * will be cleared. This property is bound.
+     *
+     * @param d whether this <code>Painter</code> is dirty.
      */
-    protected boolean useCache() {
+    protected void setDirty(boolean d) {
+        boolean old = isDirty();
+        this.dirty = d;
+        firePropertyChange("dirty", old, isDirty());
+        if (isDirty()) {
+            clearCache();
+        }
+    }
+
+    /**
+     * <p>Returns true if the painter should use caching. This method allows subclasses to
+     * specify the heuristics regarding whether to cache or not. If a <code>Painter</code>
+     * has intelligent rules regarding painting times, and can more accurately indicate
+     * whether it should be cached, it could implement that logic in this method.</p>
+     *
+     * @return whether or not a cache should be used
+     */
+    protected boolean shouldUseCache() {
         return isCacheable() && filters.length > 0;  //NOTE, I can only do this because getFilters() is final
     }
 
@@ -323,11 +356,11 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
         configureGraphics(g);
 
         //paint to a temporary image if I'm caching, or if there are filters to apply
-        if (useCache() || filters.length > 0) {
-            validateCache(obj);
+        if (shouldUseCache() || filters.length > 0) {
+            validate(obj);
             BufferedImage cache = cachedImage == null ? null : cachedImage.get();
-            if (cache == null || cache.getWidth() != width || cache.getHeight() != height) {
-                //rebuild the cache. I do this both if a cache is needed, and if any
+            if (cache == null || cache.getWidth() != width || cache.getHeight() != height || isDirty()) {
+                //rebuild the cacheable. I do this both if a cacheable is needed, and if any
                 //filters exist. I only *save* the resulting image if caching is turned on
                 cache = GraphicsUtilities.createCompatibleTranslucentImage(width, height);
                 Graphics2D gfx = cache.createGraphics();
@@ -339,16 +372,19 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
                     cache = f.filter(cache, null);
                 }
 
-                //only save the temporary image as the cache if I'm caching
-                if (useCache()) {
+                //only save the temporary image as the cacheable if I'm caching
+                if (shouldUseCache()) {
                     cachedImage = new SoftReference<BufferedImage>(cache);
                 }
             }
 
             g.drawImage(cache, 0, 0, null);
         } else {
-            //can't use the cache, so just paint
+            //can't use the cacheable, so just paint
             doPaint(g, obj, width, height);
         }
+
+        //painting has occured, so restore the dirty bit to false
+        setDirty(false);
     }
 }

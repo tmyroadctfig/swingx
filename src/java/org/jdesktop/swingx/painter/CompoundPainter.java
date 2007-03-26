@@ -89,7 +89,7 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
         Painter[] old = getPainters();
         this.painters = new Painter[painters == null ? 0 : painters.length];
         System.arraycopy(painters, 0, this.painters, 0, this.painters.length);
-        clearLocalCache();
+        setDirty(true);
         firePropertyChange("painters", old, getPainters());
     }
     
@@ -127,7 +127,7 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
     public void setClipPreserved(boolean shouldRestoreState) {
         boolean oldShouldRestoreState = isClipPreserved();
         this.clipPreserved = shouldRestoreState;
-        clearCache();
+        setDirty(true);
         firePropertyChange("shouldRestoreState",oldShouldRestoreState,shouldRestoreState);
     }
 
@@ -146,71 +146,95 @@ public class CompoundPainter<T> extends AbstractPainter<T> {
     public void setTransform(AffineTransform transform) {
         AffineTransform old = getTransform();
         this.transform = transform;
-        clearLocalCache();
+        setDirty(true);
         firePropertyChange("transform",old,transform);
     }
     
     /**
-     * Iterates over all child <code>Painter</code>s and queries them to see
-     * if their cache is invalidated. If so, it causes this entire stack of
-     * painters to have their cache cleared.
+     * <p>Iterates over all child <code>Painter</code>s and gives them a chance
+     * to validate themselves. If any of the child painters are dirty, then
+     * this <code>CompoundPainter</code> marks itself as dirty.</p>
      *
      * @inheritDoc
      */
     @Override
-    protected void validateCache(T object) {
-        //iterate over all of the painters and query them to see if they
-        //are valid. The first invalid one clears the cache and returns.
+    protected void validate(T object) {
+        boolean dirty = false;
         for (Painter p : painters) {
             if (p instanceof AbstractPainter) {
                 AbstractPainter ap = (AbstractPainter)p;
-                ap.validateCache(object);
-                if (ap.isInvalid()) {
-                    clearLocalCache();
-                    return;
+                ap.validate(object);
+                if (ap.isDirty()) {
+                    dirty = true;
+                    break;
                 }
             }
         }
+        clearLocalCacheOnly = true;
+        setDirty(dirty); //super will call clear cache
+        clearLocalCacheOnly = false;
     }
 
+    //indicates whether the local cache should be cleared only, as opposed to the
+    //cache's of all of the children. This is needed to optimize the caching strategy
+    //when, during validate, the CompoundPainter is marked as dirty
+    private boolean clearLocalCacheOnly = false;
+
     /**
-     * Iterates over all child <code>Painter</codes> and queries them to see
-     * if they are invalid. If so, then false is returned. Otherwise, we defer
-     * to the super implementation.
+     * <p>This <code>CompoundPainter</code> is dirty if it, or any of its children,
+     * are dirty. Thus, we iterate
+     * over all child <code>Painter</code>s and query them to see
+     * if they are dirty. If so, then true is returned. Otherwise, we defer
+     * to the super implementation.</p>
      *
      * @inheritDoc
      */
     @Override
-    protected boolean isInvalid() {
-        for (Painter p : painters) {
-            if (p instanceof AbstractPainter) {
-                AbstractPainter ap = (AbstractPainter)p;
-                if (ap.isInvalid()) {
-                    return true;
+    protected boolean isDirty() {
+        boolean dirty = super.isDirty();
+        if (dirty) {
+            return true;
+        } else {
+            for (Painter p : painters) {
+                if (p instanceof AbstractPainter) {
+                    AbstractPainter ap = (AbstractPainter)p;
+                    if (ap.isDirty()) {
+                        return true;
+                    }
                 }
             }
+            return false;
         }
-        return super.isInvalid();
     }
 
     /**
-     * Clears the cache of this <code>Painter</code>, and all child
-     * <code>Painters</code>.
+     * <p>Clears the cache of this <code>Painter</code>, and all child
+     * <code>Painters</code>. This is done to ensure that resources
+     * are collected, even if clearCache is called by some framework
+     * or other code that doesn't realize this is a CompoundPainter.</p>
+     *
+     * <p>Call #clearLocalCache if you only want to clear the cache of this
+     * <code>CompoundPainter</code>
      *
      * @inheritDoc
      */
     @Override
     public void clearCache() {
-        for (Painter p : painters) {
-            if (p instanceof AbstractPainter) {
-                AbstractPainter ap = (AbstractPainter)p;
-                ap.clearCache();
+        if (!clearLocalCacheOnly) {
+            for (Painter p : painters) {
+                if (p instanceof AbstractPainter) {
+                    AbstractPainter ap = (AbstractPainter)p;
+                    ap.clearCache();
+                }
             }
         }
         super.clearCache();
     }
 
-    private void clearLocalCache() {
+    /**
+     * <p>Clears the cache of this painter only, and not of any of the children.</p>
+     */
+    public void clearLocalCache() {
         super.clearCache();
     }
 

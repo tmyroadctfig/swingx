@@ -68,6 +68,7 @@ public class CapsulePainter extends AbstractAreaPainter {
     public void setPortion(Portion portion) {
         Portion old = this.portion;
         this.portion = portion;
+        setDirty(true);
         firePropertyChange("portion",old,getPortion());
     }
     

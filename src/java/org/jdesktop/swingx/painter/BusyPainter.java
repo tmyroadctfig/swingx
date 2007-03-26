@@ -96,6 +96,7 @@ public class BusyPainter<T> extends AbstractPainter<T> {
     public void setBaseColor(Color baseColor) {
         Color old = getBaseColor();
         this.baseColor = baseColor;
+        setDirty(true);
         firePropertyChange("baseColor", old, getBaseColor());
     }
     
@@ -106,6 +107,7 @@ public class BusyPainter<T> extends AbstractPainter<T> {
     public void setHighlightColor(Color highlightColor) {
         Color old = getHighlightColor();
         this.highlightColor = highlightColor;
+        setDirty(true);
         firePropertyChange("highlightColor", old, getHighlightColor());
     }
     
@@ -116,6 +118,7 @@ public class BusyPainter<T> extends AbstractPainter<T> {
     public void setBarWidth(float barWidth) {
         float old = getBarWidth();
         this.barWidth = barWidth;
+        setDirty(true);
         firePropertyChange("barWidth", old, getBarWidth());
     }
     
@@ -126,6 +129,7 @@ public class BusyPainter<T> extends AbstractPainter<T> {
     public void setBarLength(float barLength) {
         float old = getBarLength();
         this.barLength = barLength;
+        setDirty(true);
         firePropertyChange("barLength", old, getBarLength());
     }
     
@@ -136,6 +140,7 @@ public class BusyPainter<T> extends AbstractPainter<T> {
     public void setCenterDistance(float centerDistance) {
         float old = getCenterDistance();
         this.centerDistance = centerDistance;
+        setDirty(true);
         firePropertyChange("centerDistance", old, getCenterDistance());
     }
     
@@ -146,6 +151,7 @@ public class BusyPainter<T> extends AbstractPainter<T> {
     public void setPoints(int points) {
         int old = getPoints();
         this.points = points;
+        setDirty(true);
         firePropertyChange("points", old, getPoints());
     }
 
@@ -156,6 +162,7 @@ public class BusyPainter<T> extends AbstractPainter<T> {
     public void setTrailLength(int trailLength) {
         int old = getTrailLength();
         this.trailLength = trailLength;
+        setDirty(true);
         firePropertyChange("trailLength", old, getTrailLength());
     }
     

@@ -122,6 +122,7 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
         if (image != img) {
             Image oldImage = img;
             img = image;
+            setDirty(true);
             firePropertyChange("image", oldImage, img);
         }
     }
@@ -256,6 +257,7 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
     
     public void setScaleToFit(boolean scaleToFit) {
         this.scaleToFit = scaleToFit;
+        setDirty(true);
     }
     
     
@@ -268,6 +270,7 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
     public void setImageScale(double imageScale) {
         double old = getImageScale();
         this.imageScale = imageScale;
+        setDirty(true);
         firePropertyChange("imageScale",old,this.imageScale);
     }
     /**
@@ -309,6 +312,7 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
         String old = this.getImageString();
         this.imageString = imageString;
         loadImage();
+        setDirty(true);
         firePropertyChange("imageString",old,imageString);
     }
     /*
@@ -337,6 +341,7 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
     public void setHorizontalRepeat(boolean horizontalRepeat) {
         boolean old = this.isHorizontalRepeat();
         this.horizontalRepeat = horizontalRepeat;
+        setDirty(true);
         firePropertyChange("horizontalRepeat",old,this.horizontalRepeat);
     }
     
@@ -355,6 +360,7 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
     public void setVerticalRepeat(boolean verticalRepeat) {
         boolean old = this.isVerticalRepeat();
         this.verticalRepeat = verticalRepeat;
+        setDirty(true);
         firePropertyChange("verticalRepeat",old,this.verticalRepeat);
     }
     
@@ -379,6 +385,7 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
     
     public void setScaleType(ScaleType scaleType) {
         this.scaleType = scaleType;
+        setDirty(true);
     }
     
 }

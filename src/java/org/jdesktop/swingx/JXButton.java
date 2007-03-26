@@ -28,7 +28,6 @@ import java.awt.event.ItemListener;
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
 
-import org.jdesktop.swingx.image.StackBlurFilter;
 import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.Painter;
 
@@ -129,6 +128,13 @@ public class JXButton extends JButton {
             stamp.setContentAreaFilled(true);
             stamp.paint(g);
         }
+
+        //if any of the state of the JButton that affects the background has changed,
+        //then I must clear the cache. This is really hard to get right, there are
+        //bound to be bugs. An alternative is to NEVER cache.
+        protected boolean shouldUseCache() {
+            return false;
+        }
     }
     private static final class DefaultForegroundPainter extends AbstractPainter<JButton> {
         protected void doPaint(Graphics2D g, JButton b, int width, int height) {
@@ -138,6 +144,13 @@ public class JXButton extends JButton {
             stamp.setBorderPainted(false);
             stamp.setContentAreaFilled(false);
             stamp.paint(g);
+        }
+
+        //if any of the state of the JButton that affects the foreground has changed,
+        //then I must clear the cache. This is really hard to get right, there are
+        //bound to be bugs. An alternative is to NEVER cache.
+        protected boolean shouldUseCache() {
+            return false;
         }
     }
     private static void copySettings(JButton src, JStampButton dest) {

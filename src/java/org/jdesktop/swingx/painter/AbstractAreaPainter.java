@@ -116,6 +116,7 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
     public void setFillPaint(Paint p) {
         Paint old = getFillPaint();
         this.fillPaint = p;
+        setDirty(true);
         firePropertyChange("paint", old, getFillPaint());
     }
     
@@ -141,6 +142,7 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
     public void setPaintStretched(boolean paintStretched) {
         boolean old = this.isPaintStretched();
         this.stretchPaint = paintStretched;
+        setDirty(true);
         firePropertyChange("snapPaint",old,this.stretchPaint);
     }
     
@@ -154,6 +156,7 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
     public void setBorderPaint(Paint p) {
         Paint old = getBorderPaint();
         this.borderPaint = p;
+        setDirty(true);
         firePropertyChange("borderPaint", old, getBorderPaint());
     }
     
@@ -176,6 +179,7 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
     public void setStyle(Style s) {
         Style old = getStyle();
         this.style = s == null ? Style.BOTH : s;
+        setDirty(true);
         firePropertyChange("style", old, getStyle());
     }
     
@@ -197,6 +201,7 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
     public void setBorderWidth(float s) {
         float old = getBorderWidth();
         this.borderWidth = s;
+        setDirty(true);
         firePropertyChange("strokeWidth", old, getBorderWidth());
     }
     
@@ -244,6 +249,7 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
         AreaEffect[] old = getAreaEffects();
         this.areaEffects = new AreaEffect[areaEffects == null ? 0 : areaEffects.length];
         System.arraycopy(areaEffects, 0, this.areaEffects, 0, this.areaEffects.length);
+        setDirty(true);
         firePropertyChange("areaEffects", old, getAreaEffects());
     }
     

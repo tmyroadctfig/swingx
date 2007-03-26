@@ -23,13 +23,7 @@ package org.jdesktop.swingx.painter;
 import junit.framework.TestCase;
 
 import java.awt.*;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageOp;
-import java.awt.image.ColorModel;
-
-import org.jdesktop.swingx.image.AbstractFilter;
 
 /**
  * Test for AbstractPainter
@@ -101,21 +95,21 @@ public class AbstractPainterTest extends TestCase {
     }
 
     public void testCaching() {
-        //test that the cache is always used UNLESS useCache is false, or isCacheCleared is true
+        //test that the cache is always used UNLESS shouldUseCache is false, or isCacheCleared is true, or the Painter is dirty
         p.paint(g, null, 10, 10);
-        assertEquals(!p.useCache() || p.isCacheCleared(), p.painted);
+        assertEquals(!p.shouldUseCache() || p.isCacheCleared() || p.isDirty(), p.painted);
         p.reset();
         p.setFilters(filter);
         p.paint(g, null, 10, 10);
-        assertEquals(!p.useCache() || p.isCacheCleared(), p.painted);
+        assertEquals(!p.shouldUseCache() || p.isCacheCleared() || p.isDirty(), p.painted);
         p.paint(g, null, 10, 10);
-        assertEquals(!p.useCache() || p.isCacheCleared(), p.painted);
+        assertEquals(!p.shouldUseCache() || p.isCacheCleared() || p.isDirty(), p.painted);
         p.clearCache();
         p.painted = false;
         p.paint(g, null, 10, 10);
-        assertEquals(!p.useCache() || p.isCacheCleared(), p.painted);
+        assertEquals(!p.shouldUseCache() || p.isCacheCleared() || p.isDirty(), p.painted);
         p.paint(g, null, 10, 10);
-        assertEquals(!p.useCache() || p.isCacheCleared(), p.painted);
+        assertEquals(!p.shouldUseCache() || p.isCacheCleared() || p.isDirty(), p.painted);
 
         //test that a cache is not used unless cacheable is true AND filters are set
         p.reset();
@@ -294,13 +288,14 @@ public class AbstractPainterTest extends TestCase {
             this.painters = painters;
         }
 
-        protected void validateCache(Object object) {
-            super.validateCache(object);
+        protected void validate(Object object) {
+            super.validate(object);
             //iterate over all of the painters and query them to see if they
             //are valid. The first invalid one clears the cache and returns.
             for (TestablePainter p : painters) {
-                p.validateCache(object);
-                if (p.useCache() && p.isCacheCleared()) {
+                p.validate(object);
+                if ((p.shouldUseCache() && p.isCacheCleared()) || p.isDirty()) {
+                    setDirty(true);
                     clearCache();
                     return;
                 }

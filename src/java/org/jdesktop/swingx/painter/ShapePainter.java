@@ -114,6 +114,7 @@ public class ShapePainter<T> extends AbstractAreaPainter<T> {
     public void setShape(Shape s) {
         Shape old = getShape();
         this.shape = s;
+        setDirty(true);
         firePropertyChange("shape", old, getShape());
     }
     

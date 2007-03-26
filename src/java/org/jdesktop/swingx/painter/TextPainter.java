@@ -88,6 +88,7 @@ public class TextPainter<T> extends AbstractAreaPainter<T> {
     public void setFont(Font f) {
         Font old = getFont();
         this.font = f;
+        setDirty(true);
         firePropertyChange("font", old, getFont());
     }
     
@@ -106,6 +107,7 @@ public class TextPainter<T> extends AbstractAreaPainter<T> {
     public void setText(String text) {
         String old = getText();
         this.text = text == null ? "" : text;
+        setDirty(true);
         firePropertyChange("text", old, getText());
     }
     
