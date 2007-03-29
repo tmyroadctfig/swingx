@@ -68,7 +68,7 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  */
 public class JXHeader extends JXPanel {
     /**
-     * JXTaskPane pluggable UI key <i>swingx/TaskPaneUI</i>
+     * JXHeader pluggable UI key <i>HeaderUI</i>
      */
     public final static String uiClassID = "HeaderUI";
     
@@ -241,5 +241,5 @@ public class JXHeader extends JXPanel {
     
     private Font getDescriptionFont() {
         return descriptionFont;
-    }    
+    }
 }
