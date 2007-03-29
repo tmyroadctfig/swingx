@@ -24,7 +24,6 @@ package org.jdesktop.swingx.painter;
 import org.jdesktop.swingx.painter.effects.AreaEffect;
 
 import java.awt.*;
-import java.awt.geom.Point2D;
 import org.jdesktop.swingx.util.PaintUtils;
 
 
@@ -242,19 +241,21 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
     protected abstract Shape provideShape(Graphics2D g, T comp, int width, int height);
     
     /**
-     * Sets the path effects to be drawn on this painter.
+     * Sets the path effects to be drawn on this painter. Set this to null in order to remove all installed effects.
      * @param pathEffects the effects to apply to this painter
      */
     public void setAreaEffects(AreaEffect... areaEffects) {
         AreaEffect[] old = getAreaEffects();
         this.areaEffects = new AreaEffect[areaEffects == null ? 0 : areaEffects.length];
-        System.arraycopy(areaEffects, 0, this.areaEffects, 0, this.areaEffects.length);
+        if (areaEffects != null) {
+            System.arraycopy(areaEffects, 0, this.areaEffects, 0, this.areaEffects.length);
+        }
         setDirty(true);
         firePropertyChange("areaEffects", old, getAreaEffects());
     }
     
     /**
-     * Gets the current set of path effects applied to this painter
+     * Gets the current set of path effects applied to this painter. Returned array is guarantied to be not null.
      * @return the effects applied to this path painter
      */
     public AreaEffect[] getAreaEffects() {
