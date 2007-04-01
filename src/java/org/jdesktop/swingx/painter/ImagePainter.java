@@ -85,7 +85,7 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
      * is centered.
      */
     public ImagePainter() {
-        this(null);
+        this((BufferedImage)null);
     }
     
     /**
@@ -111,6 +111,13 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
         this.setHorizontalAlignment(horizontal);
         this.setFillPaint(null);
         this.setBorderPaint(null);
+    }
+    
+    public ImagePainter(URL url) throws IOException {
+        this(ImageIO.read(url));
+    }
+    public ImagePainter(URL url, HorizontalAlignment horizontal, VerticalAlignment vertical) throws IOException {
+        this(ImageIO.read(url),horizontal,vertical);
     }
     
     /**
@@ -239,7 +246,13 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
                         }
                         g.drawImage(img, 0, 0, sw, sh, null);
                     } else {
-                        g.drawImage(img, rect.x, rect.y, rect.width, rect.height, null);
+                        int sw = rect.width;
+                        int sh = rect.height;
+                        if(imageScale != 1.0) {
+                            sw = (int)((double)sw * imageScale);
+                            sh = (int)((double)sh * imageScale);
+                        }
+                        g.drawImage(img, rect.x, rect.y, sw, sh, null);
                     }
                 }
             }
