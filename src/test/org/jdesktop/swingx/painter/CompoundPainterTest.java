@@ -193,6 +193,34 @@ public class CompoundPainterTest extends TestCase {
         assertTrue(p5.painted);
     }
 
+    public void testAb5k() {
+        TestableCompoundPainter base = new TestableCompoundPainter();
+        base.setCacheable(true);
+        TestableCompoundPainter background = new TestableCompoundPainter();
+        TestablePainter iris = new TestablePainter();
+        TestablePainter[] painters = new TestablePainter[100];
+        for (int i=0; i<painters.length; i++) {
+            painters[i] = new TestablePainter();
+        }
+        background.setPainters(painters);
+        base.setPainters(background, iris);
+        base.paint(g, null, 10, 10);
+        
+        assertTrue(base.painted);
+        assertTrue(background.painted);
+        assertTrue(iris.painted);
+        
+        base.painted = false;
+        background.painted = false;
+        iris.painted = false;
+        
+        iris.setDirty(true);
+        base.paint(g, null, 10, 10);
+        assertTrue(base.painted);
+        assertFalse(background.painted);
+        assertTrue(iris.painted);
+    }
+    
     //tests that compound behaviors, such as caching in compound situations, works
     private static final class TestableCompoundPainter extends CompoundPainter {
         boolean painted = false;
