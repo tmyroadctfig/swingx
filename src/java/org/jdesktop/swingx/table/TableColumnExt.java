@@ -30,17 +30,17 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
 /**
- * TableColumn extension for enhanced view column configuration.
+ * <code>TableColumn</code> extension for enhanced view column configuration.
  * The general drift is to strengthen the TableColumn abstraction as <b>the</b>
  * place to configure and dynamically update view column properties, covering a
- * broad range of typical customization requirements. Using collaborators are 
+ * broad range of customization requirements. Using collaborators are 
  * expected to listen to property changes and update themselves accordingly.
  * <p>
  * 
  * A functionality enhancement is the notion of column visibility: 
  * <code>TableColumnModelExt</code> manages sets of visible/hidden 
  * <code>TableColumnExt</code>s controlled by the columns' <code>visible</code>
- * property. Typically, users can show/hide column visibility at runtime, f.i.
+ * property. Typically, users can toggle column visibility at runtime, f.i.
  * through a dedicated control in the uppder trailing corner of a 
  * <code>JScrollPane</code>.
  * <p>

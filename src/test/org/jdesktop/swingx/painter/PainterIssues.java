@@ -32,7 +32,6 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JTextField;
 import javax.swing.border.Border;
 
 import org.jdesktop.swingx.InteractiveTestCase;
@@ -171,7 +170,7 @@ public class PainterIssues extends InteractiveTestCase {
      *
      */
     public void interactiveXButtonShareForegroundPainter() {
-        final CompoundPainter painter = new CompoundPainter();
+        final CompoundPainter<JComponent> painter = new CompoundPainter<JComponent>();
         JXXButton label = new JXXButton();
         label.setText("Painter in textfield: source for shared painter");
         ShapePainter shapePainter = new ShapePainter();
@@ -192,11 +191,11 @@ public class PainterIssues extends InteractiveTestCase {
     
     public static class JXXButton extends JButton {
         
-        private Painter painter;
+        private Painter<JComponent> painter;
         
         @Override
         protected void paintComponent(Graphics g) {
-            Painter painter = getPainter();
+            Painter<JComponent> painter = getPainter();
             Graphics2D scratch = (Graphics2D) g.create();
             try {
                 painter.paint(scratch, this, getWidth(), getHeight());
@@ -206,12 +205,12 @@ public class PainterIssues extends InteractiveTestCase {
             }
         }
 
-        public Painter getPainter() {
+        public Painter<JComponent> getPainter() {
             if (painter == null) {
-                painter = new AbstractPainter<JButton>() {
+                painter = new AbstractPainter<JComponent>() {
 
                     @Override
-                    protected void doPaint(Graphics2D g, JButton component, int width, int height) {
+                    protected void doPaint(Graphics2D g, JComponent component, int width, int height) {
                         JXXButton.super.paintComponent(g);
                     }
                     
@@ -220,66 +219,7 @@ public class PainterIssues extends InteractiveTestCase {
             return painter;
         }
         
-        public void setPainter(Painter painter) {
-            this.painter = painter;
-            repaint();
-        }
-    }
-    /**
-     * 
-     * Painters and textfield. Not showing? 
-     *
-     */
-    public void interactiveXTextFieldShareForegroundPainter() {
-        final CompoundPainter painter = new CompoundPainter();
-        JXTextField label = new JXTextField();
-        label.setText("Painter in textfield: source for shared painter");
-        ShapePainter shapePainter = new ShapePainter();
-        AlphaPainter alpha = new AlphaPainter();
-        alpha.setAlpha(0.2f);
-        alpha.setPainters(shapePainter);
-        painter.setPainters(label.getPainter(), alpha);
-        label.setPainter(painter);
-        JXTextField labelAP = new JXTextField();
-        labelAP.setText("Painter: use shared from above");
-        labelAP.setPainter(painter);
-        JComponent box = Box.createVerticalBox();
-        box.add(label);
-        box.add(labelAP);
-        showInFrame(box, "shared ui painting in textfield");
-    }
-    
-    public static class JXTextField extends JTextField {
-        
-        private Painter painter;
-        
-        @Override
-        protected void paintComponent(Graphics g) {
-            Painter painter = getPainter();
-            Graphics2D scratch = (Graphics2D) g.create();
-            try {
-                painter.paint(scratch, this, getWidth(), getHeight());
-                ui.paint(scratch, this);
-            } finally {
-                scratch.dispose();
-            }
-        }
-
-        public Painter getPainter() {
-            if (painter == null) {
-                painter = new AbstractPainter<JTextField>() {
-
-                    @Override
-                    protected void doPaint(Graphics2D g, JTextField component, int width, int height) {
-                        JXTextField.super.paintComponent(g);
-                    }
-                    
-                };
-            }
-            return painter;
-        }
-        
-        public void setPainter(Painter painter) {
+        public void setPainter(Painter<JComponent> painter) {
             this.painter = painter;
             repaint();
         }
