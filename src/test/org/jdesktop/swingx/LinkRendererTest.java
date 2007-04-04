@@ -17,8 +17,15 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
 
+import org.jdesktop.swingx.action.LinkModelAction;
+import org.jdesktop.swingx.renderer.DefaultTableRenderer;
+import org.jdesktop.swingx.renderer.HyperlinkProvider;
+
 /**
- * TODO: revise to use the new hyperlink renderer. 
+ * Test around hyperlink rendering.
+ * 
+ * PENDING JW: how does this relate to JXHyperlinkTest? Merge? 
+ * Move to renderer package?
  * 
  * @author Jeanette Winzenburg
  */
@@ -32,13 +39,40 @@ public class LinkRendererTest extends InteractiveTestCase {
     private boolean defaultToSystemLF;
 
     /**
+     * renderers must cope with type mismatch.
+     *
+     */
+    public void testMixedValueTypes() {
+        LinkModelAction action = new LinkModelAction(new EditorPaneLinkVisitor());
+        TableCellRenderer linkRenderer = new DefaultTableRenderer(
+                new HyperlinkProvider(action, LinkModel.class));
+        linkRenderer.getTableCellRendererComponent(null, "stringonly", false, false, -1, -1);
+
+    }
+
+    /**
+     * sanity: can cope with subclasses.
+     * a side-effect: renderers should cope with null table.
+     */
+    public void testSubclassedValueTypes() {
+        LinkModelAction action = new LinkModelAction(new EditorPaneLinkVisitor());
+        TableCellRenderer renderer = new DefaultTableRenderer(
+                new HyperlinkProvider(action, LinkModel.class));
+        LinkModel link = new LinkModel() {
+            
+        };
+        renderer.getTableCellRendererComponent(null, link, false, false, -1, -1);
+
+    }
+
+    /**
      * Issue #183-swingx. test if the selection background is updated on
      * changing LF.
      * 
      */
     public void testSelectionBackground() {
         JXTable table = new JXTable(2, 2);
-        TableCellRenderer linkRenderer = new LinkRenderer();
+        TableCellRenderer linkRenderer = new DefaultTableRenderer(new HyperlinkProvider());
         table.getColumnModel().getColumn(0).setCellRenderer(linkRenderer);
         JXHyperlink hyperlink = (JXHyperlink) linkRenderer
                 .getTableCellRendererComponent(table, link, true, false, 1, 0);
@@ -61,7 +95,7 @@ public class LinkRendererTest extends InteractiveTestCase {
      */
     public void testRendererComponentPropertiesAfterLFChange() {
         JXTable table = new JXTable(2, 2);
-        TableCellRenderer linkRenderer = new LinkRenderer();
+        TableCellRenderer linkRenderer = new DefaultTableRenderer(new HyperlinkProvider());
         table.getColumnModel().getColumn(0).setCellRenderer(linkRenderer);
         // sanity: same as set
         assertSame(linkRenderer, table.getCellRenderer(1, 0));
@@ -95,7 +129,7 @@ public class LinkRendererTest extends InteractiveTestCase {
 
     public void testRolloverRecognition() {
         JXTable table = new JXTable(2, 2);
-        TableCellRenderer linkRenderer = new LinkRenderer();
+        TableCellRenderer linkRenderer = new DefaultTableRenderer(new HyperlinkProvider());
         table.getColumnModel().getColumn(0).setCellRenderer(linkRenderer);
         JXHyperlink hyperlink = (JXHyperlink) linkRenderer
                 .getTableCellRendererComponent(table, link, false, false, 1, 0);
@@ -114,7 +148,7 @@ public class LinkRendererTest extends InteractiveTestCase {
      */
     public void interactiveTableSelectionBackgroundOnLF() {
         final JXTable table = new JXTable(2, 2);
-        final TableCellRenderer linkRenderer = new LinkRenderer();
+        TableCellRenderer linkRenderer = new DefaultTableRenderer(new HyperlinkProvider());
         table.getColumnModel().getColumn(0).setCellRenderer(linkRenderer);
         table.setRowSelectionInterval(1, 1);
         final JXFrame frame = wrapWithScrollingInFrame(table, "test background");

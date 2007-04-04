@@ -40,8 +40,6 @@ import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.test.SerializableSupport;
 
-import com.sun.java.swing.plaf.windows.WindowsBorders;
-
 /**
  * Tests behaviour of SwingX renderers. Currently: mostly characterization to
  * guarantee that they behave similar to the standard.

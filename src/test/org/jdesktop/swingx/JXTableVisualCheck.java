@@ -64,6 +64,8 @@ import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.decorator.SortController;
 import org.jdesktop.swingx.decorator.Sorter;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
+import org.jdesktop.swingx.renderer.DefaultTableRenderer;
+import org.jdesktop.swingx.renderer.HyperlinkProvider;
 import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 import org.jdesktop.swingx.table.TableColumnExt;
@@ -75,8 +77,6 @@ import org.jdesktop.test.AncientSwingTeam;
  * 
  * PENDING: too many frames to fit all on screen - either split into different
  * tests or change positioning algo to start on top again if hidden. <p>
- * TODO: update hyperlink related test to use HyperlinkProvider instead of the
- * deprecated LinkRenderer.
  * @author Jeanette Winzenburg
  */
 public class JXTableVisualCheck extends JXTableUnitTest {
@@ -1114,17 +1114,20 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         
     }
     
-    private TableModel createSplittableValues() {
-        String[] values = {"avalue:zvalue", "avalue:yvalue", "avalue:xvalue", 
-                "bvalue:zvalue", "bvalue:yvalue", "bvalue:xvalue", 
-                "cvalue:zvalue", "cvalue:yvalue", "cvalue:xvalue", 
-                };
-        DefaultTableModel model = new DefaultTableModel(values.length, 1);
-        for (int i = 0; i < values.length; i++) {
-            model.setValueAt(values[i], i, 0);
-        }
-    return model;
-}
+    /**
+     * @KEEP - this is used in the commented method above.
+     */
+//    private TableModel createSplittableValues() {
+//        String[] values = {"avalue:zvalue", "avalue:yvalue", "avalue:xvalue", 
+//                "bvalue:zvalue", "bvalue:yvalue", "bvalue:xvalue", 
+//                "cvalue:zvalue", "cvalue:yvalue", "cvalue:xvalue", 
+//                };
+//        DefaultTableModel model = new DefaultTableModel(values.length, 1);
+//        for (int i = 0; i < values.length; i++) {
+//            model.setValueAt(values[i], i, 0);
+//        }
+//    return model;
+//}
 
     public class ClassComparator implements Comparator {
         
@@ -1251,7 +1254,9 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             }
              
         };
-        table.setDefaultRenderer(LinkModel.class, new LinkRenderer(action, LinkModel.class));
+        TableCellRenderer linkRenderer = new DefaultTableRenderer(
+                new HyperlinkProvider(action, LinkModel.class));
+        table.setDefaultRenderer(LinkModel.class, linkRenderer);
     }
 
     public void interactiveTestEmptyTableSizing() {
@@ -1406,6 +1411,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         frame.setVisible(true);
     }
     
+    @SuppressWarnings("deprecation")
     public void interactiveTestFocusedCellBackground() {
         TableModel model = new AncientSwingTeam() {
             public boolean isCellEditable(int row, int column) {

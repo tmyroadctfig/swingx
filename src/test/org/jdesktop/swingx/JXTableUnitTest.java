@@ -41,6 +41,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
@@ -59,6 +60,8 @@ import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.decorator.Sorter;
+import org.jdesktop.swingx.renderer.DefaultTableRenderer;
+import org.jdesktop.swingx.renderer.HyperlinkProvider;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.NumberEditorExt;
@@ -1381,7 +1384,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     /**
      * test if renderer properties are updated on LF change. <p>
      * Note: this can be done examplary only. Here: we use the 
-     * font of a rendererComponent returned by a LinkRenderer for
+     * font of a rendererComponent returned by a HyperlinkProvider for
      * comparison. There's nothing to test if the font are equal
      * in System and crossplattform LF. <p>
      * 
@@ -1392,10 +1395,10 @@ public class JXTableUnitTest extends InteractiveTestCase {
      * 
      */
     public void testUpdateRendererOnLFChange() {
-        LinkRenderer comparison = new LinkRenderer();
-        LinkRenderer linkRenderer = new LinkRenderer();
+        TableCellRenderer comparison = new DefaultTableRenderer(new HyperlinkProvider());
+        TableCellRenderer linkRenderer = new DefaultTableRenderer(new HyperlinkProvider());
         JXTable table = new JXTable(2, 3);
-        Component comparisonComponent = comparison.getTableCellEditorComponent(table, null, false, 0, 0);
+        Component comparisonComponent = comparison.getTableCellRendererComponent(table, null, false, false, 0, 0);
         Font comparisonFont = comparisonComponent.getFont();
         table.getColumnModel().getColumn(0).setCellRenderer(linkRenderer);
         setSystemLF(!defaultToSystemLF);
