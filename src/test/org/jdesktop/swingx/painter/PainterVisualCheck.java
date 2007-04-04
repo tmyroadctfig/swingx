@@ -39,7 +39,7 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * @author rbair
  */
-public class PainterInteractiveTest extends RichInteractiveTestCase {
+public class PainterVisualCheck extends RichInteractiveTestCase {
 
     public void testJXButtonTextChangeWithBlur() {
         //Creates a button with a blur on the text. On click events, the
