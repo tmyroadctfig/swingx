@@ -37,6 +37,7 @@ import java.awt.image.BufferedImage;
 import java.lang.reflect.InvocationTargetException;
 
 /**
+ * JW: renamed from PainterInteractiveTest to fix the build failure. Revisit!
  * @author rbair
  */
 public class PainterVisualCheck extends RichInteractiveTestCase {
