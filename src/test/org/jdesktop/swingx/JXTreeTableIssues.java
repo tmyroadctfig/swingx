@@ -25,6 +25,7 @@ import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.HyperlinkProvider;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
+import org.jdesktop.swingx.treetable.TreeTableModel;
 
 /**
  * Test to exposed known issues of <code>JXTreeTable</code>. <p>
@@ -110,7 +111,45 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         tree.setTreeCellRenderer(new DefaultTreeRenderer(provider));
         tree.setHighlighters(new HighlighterPipeline(new Highlighter[] { 
                 new UIAlternateRowHighlighter()}));
-        JFrame frame = wrapWithScrollingInFrame(tree, "table and simple links");
+        JFrame frame = wrapWithScrollingInFrame(tree, "treetable and custom renderer");
+        frame.setVisible(true);
+    }
+
+    /**
+     * Dirty example how to configure a custom renderer
+     * to use treeTableModel.getValueAt(...) for showing.
+     *
+     */
+    public void interactiveTreeTableGetValueRenderer() {
+        JXTreeTable tree = new JXTreeTable(new ComponentTreeTableModel(new JXFrame()));
+        ComponentProvider provider = new ButtonProvider() {
+            /**
+             * show a unselected checkbox and text.
+             */
+            @Override
+            protected void format(CellContext context) {
+                TreeTableModel model = (TreeTableModel) ((JXTree) context.getComponent()).getModel();
+                Object nodeValue = model.getValueAt(context.getValue(), 0);
+                rendererComponent.setText(" ... " + formatter.getString(nodeValue));
+            }
+
+            /**
+             * custom tooltip: show row. Note: the context is that 
+             * of the rendering tree. No way to get at table state?
+             */
+            @Override
+            protected void configureState(CellContext context) {
+                super.configureState(context);
+                rendererComponent.setToolTipText("Row: " + context.getRow());
+            }
+            
+        };
+        provider.setHorizontalAlignment(JLabel.LEADING);
+        tree.setTreeCellRenderer(new DefaultTreeRenderer(provider));
+        tree.expandAll();
+        tree.setHighlighters(new HighlighterPipeline(new Highlighter[] { 
+                new UIAlternateRowHighlighter()}));
+        JFrame frame = wrapWithScrollingInFrame(tree, "treeTable and getValueAt renderer");
         frame.setVisible(true);
     }
 
