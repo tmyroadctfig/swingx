@@ -29,7 +29,7 @@ public class JXTableHeaderIssues extends JXTableHeaderTest {
     }
 
     /**
-     * Issue #??-swingx: table header disappears if all header values are
+     * Issue #485-swingx: table header disappears if all header values are
      * empty. 
      *
      */
@@ -45,7 +45,7 @@ public class JXTableHeaderIssues extends JXTableHeaderTest {
     }
 
     /**
-     * Issue #??-swingx: table header disappears if all header values are
+     * Issue #485-swingx: table header disappears if all header values are
      * empty. 
      *
      */
