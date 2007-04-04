@@ -6,8 +6,20 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.event.ActionEvent;
+import java.util.logging.Logger;
+
+import javax.swing.JFrame;
 import javax.swing.tree.TreePath;
 
+import org.jdesktop.swingx.action.LinkAction;
+import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.HighlighterPipeline;
+import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
+import org.jdesktop.swingx.renderer.DefaultTableRenderer;
+import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
+import org.jdesktop.swingx.renderer.HyperlinkProvider;
+import org.jdesktop.swingx.renderer.RendererVisualCheck;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 
@@ -24,9 +36,46 @@ import org.jdesktop.swingx.treetable.FileSystemModel;
  * @author Jeanette Winzenburg
  */
 public class JXTreeTableIssues extends InteractiveTestCase {
-
-
+    private static final Logger LOG = Logger.getLogger(JXTreeTableIssues.class
+            .getName());
+    public static void main(String[] args) {
+        setSystemLF(true);
+        JXTreeTableIssues test = new JXTreeTableIssues();
+        try {
+            test.runInteractiveTests();
+        } catch (Exception e) {
+            System.err.println("exception when executing interactive tests:");
+            e.printStackTrace();
+        }
+    }
     
+//-------------- interactive tests
+    /**
+     * Issue #??-swingx: hyperlink in JXTreeTable hierarchical 
+     * column not active.
+     *
+     */
+    public void interactiveTreeTableLinkRendererSimpleText() {
+        LinkAction simpleAction = new LinkAction<Object>(null) {
+
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("hit: " + getTarget());
+                
+            }
+            
+        };
+        JXTreeTable tree = new JXTreeTable(new FileSystemModel());
+        HyperlinkProvider provider =  new HyperlinkProvider(simpleAction);
+        tree.getColumn(2).setCellRenderer(new DefaultTableRenderer(provider));
+        tree.setTreeCellRenderer(new DefaultTreeRenderer(provider));
+//        tree.setCellRenderer(new LinkRenderer(simpleAction));
+        tree.setHighlighters(new HighlighterPipeline(new Highlighter[] { 
+                new UIAlternateRowHighlighter()}));
+        JFrame frame = wrapWithScrollingInFrame(tree, "table and simple links");
+        frame.setVisible(true);
+    }
+
+//------------- unit tests    
     /**
      * Issue #399-swingx: editing terminated by selecting editing row.
      *
