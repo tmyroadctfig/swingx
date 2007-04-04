@@ -2807,7 +2807,7 @@ public class JXTable extends JTable
             return Boolean.TRUE.equals(getClientProperty(MATCH_HIGHLIGHTER));
         }
 
-        private SearchHighlighter getSearchHighlighter() {
+        protected SearchHighlighter getSearchHighlighter() {
             if (searchHighlighter == null) {
                 searchHighlighter = createSearchHighlighter();
             }

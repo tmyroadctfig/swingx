@@ -358,6 +358,13 @@ public abstract class AbstractSearchable implements Searchable {
             reset();
         }
         
+        public SearchResult(Pattern ex, MatchResult result, int row, int column) {
+            pattern = ex;
+            matchResult = result;
+            foundRow = row;
+            foundColumn = column;
+        }
+        
         public void updateFrom(SearchResult searchResult) {
             if (searchResult == null) {
                 reset();
@@ -372,19 +379,28 @@ public abstract class AbstractSearchable implements Searchable {
         public String getRegEx() {
             return pattern != null ? pattern.pattern() : null;
         }
-
-        public SearchResult(Pattern ex, MatchResult result, int row, int column) {
-            pattern = ex;
-            matchResult = result;
-            foundRow = row;
-            foundColumn = column;
-        }
-        
+      
         public void reset() {
             foundRow= -1;
             foundColumn = -1;
             matchResult = null;
             pattern = null;
-        }   
+        } 
+        
+        public int getFoundColumn() {
+            return foundColumn;
+        }
+        
+        public int getFoundRow() {
+            return foundRow;
+        }
+        
+        public MatchResult getMatchResult() {
+            return matchResult;
+        }
+        
+        public Pattern getPattern() {
+            return pattern;
+        }
     }
 }
