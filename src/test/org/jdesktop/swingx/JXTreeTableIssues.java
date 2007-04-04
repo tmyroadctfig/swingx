@@ -128,7 +128,12 @@ public class JXTreeTableIssues extends InteractiveTestCase {
              */
             @Override
             protected void format(CellContext context) {
+                // this is dirty because the design idea was to keep the renderer 
+                // unaware of the context type
                 TreeTableModel model = (TreeTableModel) ((JXTree) context.getComponent()).getModel();
+                // beware: currently works only if the node is not a DefaultMutableTreeNode
+                // otherwise the WrappingProvider tries to be smart and replaces the node
+                // by the userObject before passing on to the wrappee! 
                 Object nodeValue = model.getValueAt(context.getValue(), 0);
                 rendererComponent.setText(" ... " + formatter.getString(nodeValue));
             }
