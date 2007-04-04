@@ -1,0 +1,445 @@
+/*
+ * $Id$
+ *
+ * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
+ * Santa Clara, California 95054, U.S.A. All rights reserved.
+ */
+
+package org.jdesktop.swingx;
+
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.logging.Logger;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Box;
+import javax.swing.DefaultListModel;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListModel;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+
+import org.jdesktop.swingx.action.LinkAction;
+import org.jdesktop.swingx.action.LinkModelAction;
+import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.HighlighterPipeline;
+import org.jdesktop.swingx.decorator.SortOrder;
+import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
+import org.jdesktop.swingx.renderer.DefaultListRenderer;
+import org.jdesktop.swingx.renderer.DefaultTableRenderer;
+import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
+import org.jdesktop.swingx.renderer.HyperlinkProvider;
+import org.jdesktop.swingx.treetable.FileSystemModel;
+
+/**
+ * Test of JXHyperlink visuals. Raw usage and as hyperlinkRenderer.
+ * <p>
+ * 
+ * @author Jeanette Winzenburg
+ */
+public class JXHyperlinkVisualCheck extends InteractiveTestCase {
+    private static final Logger LOG = Logger.getLogger(JXHyperlinkVisualCheck.class
+            .getName());
+    
+
+    public JXHyperlinkVisualCheck() {
+        super("JXHyperlinkLabel Test");
+    }
+
+    public static void main(String[] args) throws Exception {
+//      setSystemLF(true);
+      JXHyperlinkVisualCheck test = new JXHyperlinkVisualCheck();
+      try {
+          test.runInteractiveTests();
+//          test.runInteractiveTests("interactive.*Table.*");
+//          test.runInteractiveTests("interactive.*List.*");
+//          test.runInteractiveTests("interactive.*Tree.*");
+//          test.runInteractiveTests("interactive.*Underline.*");
+        } catch (Exception e) {
+            System.err.println("exception when executing interactive tests:");
+            e.printStackTrace();
+        } 
+  }
+    
+    /**
+     * Issue #441-swingx: underline not showing for html text.
+     * While text wrapping as such is working with html text the
+     * underline is only under the last line. 
+     */
+    public void interactiveHtmlUnderlineWrapping() {
+        Action action = new AbstractAction("<html><b><i>Bold Italic Link and another loong way way out part of the text</i></b></html>") {
+
+            public void actionPerformed(ActionEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+        };
+        JXHyperlink hyperlink = new JXHyperlink(action );
+        JFrame frame = wrapInFrame(hyperlink, "show html underline ");
+        frame.setSize(200, 200);
+        frame.setVisible(true);
+        
+    }
+    
+
+    /**
+     * Issue #441-swingx: underline not showing for html text.
+     *
+     */
+    public void interactiveHtmlUnderlineButton() {
+        Action action = new AbstractAction("<html><b><i>Bold Italic Link</i></b></html>") {
+
+            public void actionPerformed(ActionEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+        };
+        JXHyperlink hyperlink = new JXHyperlink(action );
+        JFrame frame = wrapInFrame(hyperlink, "show html underline ");
+        frame.setSize(200, 200);
+        frame.setVisible(true);
+        
+    }
+    
+    /**
+     * visually check how differently configured buttons behave on
+     * clicked.
+     *
+     */
+    public void interactiveCompareClicked() {
+        JComponent box = Box.createVerticalBox();
+        JXHyperlink noActionHyperlink = new JXHyperlink();
+        noActionHyperlink.setText("have no action - auto-click");
+        box.add(noActionHyperlink);
+        LinkAction doNothingAction = createEmptyLinkAction("have do nothing action - follow action");
+        JXHyperlink doNothingActionHyperlink = new JXHyperlink(doNothingAction);
+        box.add(doNothingActionHyperlink);
+        
+        LinkAction doNothingAction2 = createEmptyLinkAction("have do nothing action - overrule");
+        JXHyperlink overruleActionHyperlink = new JXHyperlink(doNothingAction2);
+        overruleActionHyperlink.setOverrulesActionOnClick(true);
+        box.add(overruleActionHyperlink);
+        JXFrame frame = wrapInFrame(box, "compare clicked control");
+        frame.setVisible(true);
+        
+    }
+    public void interactiveUnderlineButton() {
+        Action action = new AbstractAction("LinkModel@somewhere") {
+
+            public void actionPerformed(ActionEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+        };
+        JXHyperlink hyperlink = new JXHyperlink(action );
+        JFrame frame = wrapInFrame(hyperlink, "show underline - no link action");
+        frame.setSize(200, 200);
+        frame.setVisible(true);
+        
+    }
+    
+ 
+    public void interactiveLink() throws Exception {
+        EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
+        LinkModel link = new LinkModel("Click me!", null, JXEditorPaneTest.class.getResource("resources/test.html"));
+
+        LinkModelAction linkAction = new LinkModelAction<LinkModel>(link, visitor);
+//        linkAction.setVisitingDelegate(visitor);
+        JXHyperlink hyperlink = new JXHyperlink(linkAction);
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(new JScrollPane(visitor.getOutputComponent()));
+        panel.add(hyperlink, BorderLayout.SOUTH);
+        JFrame frame = wrapInFrame(panel, "simple hyperlink");
+        frame.setSize(200, 200);
+        frame.setVisible(true);
+        
+    }
+
+//---------------------- interactive test: JXTree
+    public void interactiveTreeLinkRendererSimpleText() {
+        LinkAction simpleAction = new LinkAction<Object>(null) {
+
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("hit: " + getTarget());
+                
+            }
+            
+        };
+        JXTree tree = new JXTree(new FileSystemModel());
+        tree.setRolloverEnabled(true);
+        HyperlinkProvider provider =  new HyperlinkProvider(simpleAction);
+        tree.setCellRenderer(new DefaultTreeRenderer(provider));
+//        tree.setCellRenderer(new LinkRenderer(simpleAction));
+        tree.setHighlighters(new HighlighterPipeline(new Highlighter[] { 
+                new UIAlternateRowHighlighter()}));
+        JFrame frame = wrapWithScrollingInFrame(tree, "tree and simple links");
+        frame.setVisible(true);
+        
+    }
+
+
+
+//---------------------- interactive test: JXTable
+    
+    /**
+     * Table with both simple "hyperlinks" targets and url activation.
+     */
+    public void interactiveTableHyperlinkSimpleText() {
+        JXTable table = new JXTable(createModelWithLinks());
+        EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
+        LinkModelAction action = new LinkModelAction<LinkModel>(visitor);
+        // set the default renderer for LinkModel - which is basically
+        // a bean wrapped around an URL
+        table.setDefaultRenderer(LinkModel.class, new DefaultTableRenderer
+                (new HyperlinkProvider(action, LinkModel.class)));
+        // JW: editor mis-use is not recommended but possible...
+        // the LinkRenderer in its role as editor is not yet deprecated but should
+        // soon. Without registering a specialized editor the column should
+        // not editable - otherwise the "normal" default editor would jump in
+//        LinkModelAction action2 = new LinkModelAction<LinkModel>(visitor);
+        // table.setDefaultEditor(LinkModel.class, new LinkRenderer(action2, LinkModel.class));
+
+        // simple activatable action on the target in the first column
+        LinkAction simpleAction = new LinkAction<Object>(null) {
+            
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("hit: " + getTarget());
+                
+            }
+            
+        };
+        // the action will be activated only if the column is not-editable
+        // here that's done in the model
+        // TODO JW: revisit
+        table.getColumn(0).setCellRenderer(new DefaultTableRenderer(
+                new HyperlinkProvider(simpleAction)));
+
+        JFrame frame = wrapWithScrollingInFrame(table, visitor.getOutputComponent(), "table and simple links");
+        frame.setVisible(true);
+    }
+    
+    
+    /** 
+     * Check visuals of hyperlink and highlighter.
+     *
+     */
+    public void interactiveTableHyperlinkLFStripingHighlighter() {
+        EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
+        JXTable table = new JXTable(createModelWithLinks());
+        LinkModelAction action = new LinkModelAction(visitor);
+        table.setDefaultRenderer(LinkModel.class, new DefaultTableRenderer
+                (new HyperlinkProvider(action, LinkModel.class)));
+        table.setHighlighters(new HighlighterPipeline(new Highlighter[] { 
+                new UIAlternateRowHighlighter()}));
+        JFrame frame = wrapWithScrollingInFrame(table, visitor.getOutputComponent(), 
+                "show link renderer in table with LF striping highlighter");
+        frame.setVisible(true);
+    }
+
+    
+//----------------- interactive tests: JXList
+ 
+    /**
+     * Custom link target action in JXList.
+     */
+    public void interactiveListHyperlikPlayer() {
+        LinkAction<Player> linkAction = new LinkAction<Player>() {
+
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("hit: " + getTarget());
+                
+            }
+            
+            protected void installTarget() {
+                setName(getTarget() != null ? getTarget().name : "");
+            }
+            
+        };
+        
+        JXList list = new JXList(createPlayerModel());
+        list.setRolloverEnabled(true);
+        // descending order - check if the action is performed for the 
+        // correct value
+        list.setFilterEnabled(true);
+        list.setSortOrder(SortOrder.DESCENDING);
+        list.setCellRenderer(new DefaultListRenderer(
+                new HyperlinkProvider(linkAction, Player.class)));
+        JFrame frame = wrapWithScrollingInFrame(list, "show simple bean link renderer in list");
+        frame.setVisible(true);
+
+    }
+    
+    private ListModel createPlayerModel() {
+        DefaultListModel model = new DefaultListModel();
+        model.addElement(new Player("Henry", 10));
+        model.addElement(new Player("Berta", 112));
+        model.addElement(new Player("Dave", 20));
+        return model;
+    }
+
+    public static class Player {
+        String name;
+        int score;
+        public Player(String name, int score) {
+            this.name = name;
+            this.score = score;
+        }
+        @Override
+        public String toString() {
+            return name + " has score: " + score;
+        }
+    }
+
+    /**
+     * Simple target action.
+     *
+     */
+    public void interactiveListHyperlinkSimpleText() {
+        LinkAction linkAction = new LinkAction<Object>(null) {
+
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("hit: " + getTarget());
+            }
+            
+        };
+        JXList list = new JXList(createTextOnlyListModel(20));
+        list.setRolloverEnabled(true);
+        list.setCellRenderer(new DefaultListRenderer(
+                new HyperlinkProvider(linkAction)));
+        JFrame frame = wrapWithScrollingInFrame(list, "show simple link renderer in list");
+        frame.setVisible(true);
+
+    }
+
+    /**
+     * ListModel with LinkModel.
+     *
+     */
+    public void interactiveListHyperlink() {
+        EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
+        JXList list = new JXList(createListModelWithLinks(20));
+        list.setRolloverEnabled(true);
+        LinkModelAction action = new LinkModelAction(visitor);
+        list.setCellRenderer(new DefaultListRenderer(
+                new HyperlinkProvider(action, LinkModel.class)));
+        JFrame frame = wrapWithScrollingInFrame(list, visitor.getOutputComponent(), "show link renderer in list");
+        frame.setVisible(true);
+
+    }
+    
+    /**
+     * Visuals of Hyperlink/Highlighter interaction.
+     *
+     */
+    public void interactiveListHyperlinkLFStripingHighlighter() {
+        EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
+        JXList list = new JXList(createListModelWithLinks(20));
+        LinkModelAction action = new LinkModelAction<LinkModel>(visitor);
+        list.setCellRenderer(new DefaultListRenderer(
+                new HyperlinkProvider(action, LinkModel.class)));
+        list.setRolloverEnabled(true);
+        list.setHighlighters(new HighlighterPipeline(new Highlighter[] {
+                new UIAlternateRowHighlighter()}));
+        JFrame frame = wrapWithScrollingInFrame(list, visitor.getOutputComponent(), 
+                "show link renderer in list with LFStriping highlighter");
+        frame.setVisible(true);
+    }
+    
+
+
+    private ListModel createTextOnlyListModel(int count) {
+        DefaultListModel model = new DefaultListModel();
+        for (int i = 0; i < count; i++) {
+                model.addElement("text #" + i);
+        }
+        return model;
+    }
+    
+    private ListModel createListModelWithLinks(int count) {
+        DefaultListModel model = new DefaultListModel();
+        for (int i = 0; i < count; i++) {
+            try {
+                LinkModel link = new LinkModel("a link text " + i, null, new URL("http://some.dummy.url" + i));
+                if (i == 1) {
+                    URL url = JXEditorPaneTest.class.getResource("resources/test.html");
+
+                    link = new LinkModel("a link text " + i, null, url);
+                }
+                model.addElement(link);
+            } catch (MalformedURLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+ 
+        return model;
+    }
+    
+    private TableModel createModelWithLinks() {
+        String[] columnNames = { "text - not-editable",  "Link not-editable", "Bool editable", "Bool not-editable" };
+        
+        DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
+            @Override
+            public Class<?> getColumnClass(int column) {
+                return getValueAt(0, column).getClass();
+            }
+
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                    return !getColumnName(column).contains("not");
+            }
+            
+        };
+        for (int i = 0; i < 4; i++) {
+            try {
+                LinkModel link = new LinkModel("a link text " + i, null, new URL("http://some.dummy.url" + i));
+                if (i == 1) {
+                    URL url = JXEditorPaneTest.class.getResource("resources/test.html");
+
+                    link = new LinkModel("a link text " + i, null, url);
+                }
+                model.addRow(new Object[] {"text only " + i, link, Boolean.TRUE, Boolean.TRUE });
+            } catch (MalformedURLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        return model;
+    }
+
+    
+    protected LinkAction<Object> createEmptyLinkAction() {
+        LinkAction<Object> linkAction = new LinkAction<Object>(null) {
+
+            public void actionPerformed(ActionEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+               
+       };
+        return linkAction;
+    }
+
+    protected LinkAction createEmptyLinkAction(String name) {
+        LinkAction linkAction = createEmptyLinkAction();
+        linkAction.setName(name);
+        return linkAction;
+    }
+
+    /**
+     * make auto-run happy in the absence of real test methods.
+     *
+     */
+    public void testDummy() {
+        
+    }
+}

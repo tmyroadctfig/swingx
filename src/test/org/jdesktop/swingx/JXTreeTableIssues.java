@@ -19,7 +19,6 @@ import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighl
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.HyperlinkProvider;
-import org.jdesktop.swingx.renderer.RendererVisualCheck;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 
