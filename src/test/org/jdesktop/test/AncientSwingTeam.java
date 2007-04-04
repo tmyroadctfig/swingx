@@ -86,6 +86,7 @@ public class AncientSwingTeam extends AbstractTableModel {
         return data[row % data.length][col];
     }
 
+    @Override
     public void setValueAt(Object value, int row, int col) {
         data[row % data.length][col] = value;
         fireTableCellUpdated(row, col);
@@ -93,12 +94,14 @@ public class AncientSwingTeam extends AbstractTableModel {
 
     // The default implementations of these methods in
     // AbstractTableModel would work, but we can refine them.
+    @Override
     public String getColumnName(int column) {
         return names[column];
     }
 
     /** returns class of column by asking class of value in first row. */
-    public Class getColumnClass(int c) {
+    @Override
+    public Class<?> getColumnClass(int c) {
         Object value = null;
         if (getRowCount() > 0) {
             value = getValueAt(0, c);
@@ -144,7 +147,6 @@ public class AncientSwingTeam extends AbstractTableModel {
         public Color getTextColor() {
             int r = getRed();
             int g = getGreen();
-            int b = getBlue();
             if(r > 240 || g > 240) {
                 return Color.black;
             } else {

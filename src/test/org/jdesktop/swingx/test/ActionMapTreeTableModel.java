@@ -73,7 +73,8 @@ public class ActionMapTreeTableModel extends DefaultTreeTableModel {
             return null;
         }
     }
-
+    
+    @SuppressWarnings("unchecked")
     private static ActionEntryNode createRootNodeExt(JComponent comp) {
         ActionMap map = comp.getActionMap();
         if (map == null)
@@ -104,8 +105,9 @@ public class ActionMapTreeTableModel extends DefaultTreeTableModel {
 
         ActionMap actionMap;
 
-        List children;
+        List<ActionEntryNode> children;
 
+        @SuppressWarnings("unchecked")
         public ActionEntryNode(Object key, Action action) {
             super(action);
             this.key = key;
@@ -117,7 +119,7 @@ public class ActionMapTreeTableModel extends DefaultTreeTableModel {
             super(key);
             this.key = key;
             this.actionMap = map;
-            children = new ArrayList();
+            children = new ArrayList<ActionEntryNode>();
             Object[] keys = map.keys();
             for (int i = 0; i < keys.length; i++) {
                 children.add(new ActionEntryNode(keys[i], (Action) map
@@ -137,7 +139,7 @@ public class ActionMapTreeTableModel extends DefaultTreeTableModel {
             return actionEntryNode;
         }
 
-        public List getChildren() {
+        public List<ActionEntryNode> getChildren() {
             return children;
         }
 

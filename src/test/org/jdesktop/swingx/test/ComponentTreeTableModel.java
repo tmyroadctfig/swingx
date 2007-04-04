@@ -7,7 +7,6 @@ package org.jdesktop.swingx.test;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Point;
 
 import javax.swing.tree.TreePath;
 

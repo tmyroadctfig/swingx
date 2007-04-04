@@ -10,11 +10,9 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXTable;
-import org.jdesktop.test.PropertyChangeReport;
 
 public class ColumnFactoryTest extends InteractiveTestCase {
 

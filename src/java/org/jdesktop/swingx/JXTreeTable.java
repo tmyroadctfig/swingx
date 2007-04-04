@@ -1747,7 +1747,7 @@ public class JXTreeTable extends JXTable {
         // TableModelListener management provided by AbstractTableModel superclass.
 
         @Override
-        public Class getColumnClass(int column) {
+        public Class<?> getColumnClass(int column) {
             return model.getColumnClass(column);
         }
 
@@ -1955,7 +1955,6 @@ public class JXTreeTable extends JXTable {
         
         @Override
         protected void setExpandedState(TreePath path, boolean state) {
-            int count = getRowCount();
             super.setExpandedState(path, state);
             treeTable.getTreeTableHacker().expansionChanged();
             treeTable.getTreeTableHacker().completeEditing();

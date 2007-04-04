@@ -14,15 +14,8 @@ import java.util.Iterator;
 
 import javax.swing.Action;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenuItem;
-import javax.swing.JRadioButton;
-import javax.swing.JToggleButton;
 
 import junit.framework.TestCase;
-
-import org.jdesktop.test.PropertyChangeReport;
 
 /**
  * Unit test driver for the ActionManager

@@ -5,7 +5,6 @@
 package org.jdesktop.swingx.action;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.logging.Logger;
 
@@ -19,6 +18,7 @@ import javax.swing.JToggleButton;
 import junit.framework.TestCase;
 
 public class ActionTest extends TestCase {
+    @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(ActionTest.class
             .getName());
     protected ActionContainerFactory factory;

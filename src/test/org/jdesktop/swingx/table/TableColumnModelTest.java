@@ -8,7 +8,6 @@
 package org.jdesktop.swingx.table;
 
 import java.beans.PropertyChangeEvent;
-import java.util.EventListener;
 import java.util.logging.Logger;
 
 import javax.swing.event.ChangeEvent;
@@ -35,6 +34,7 @@ import org.jdesktop.swingx.test.ColumnModelReport;
  * @author  Jeanette Winzenburg
  */
 public class TableColumnModelTest extends TestCase {
+    @SuppressWarnings("all")
     private static final Logger LOG = Logger
             .getLogger(TableColumnModelTest.class.getName());
     protected static final int COLUMN_COUNT = 3;

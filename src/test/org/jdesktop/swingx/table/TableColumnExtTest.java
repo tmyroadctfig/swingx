@@ -6,7 +6,6 @@
  */
 package org.jdesktop.swingx.table;
 
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.text.Collator;
 import java.util.Comparator;

@@ -108,7 +108,6 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         };
         provider.setHorizontalAlignment(JLabel.LEADING);
         tree.setTreeCellRenderer(new DefaultTreeRenderer(provider));
-//        tree.setCellRenderer(new LinkRenderer(simpleAction));
         tree.setHighlighters(new HighlighterPipeline(new Highlighter[] { 
                 new UIAlternateRowHighlighter()}));
         JFrame frame = wrapWithScrollingInFrame(tree, "table and simple links");

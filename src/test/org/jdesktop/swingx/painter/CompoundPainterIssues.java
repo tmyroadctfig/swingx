@@ -45,7 +45,6 @@ public class CompoundPainterIssues extends InteractiveTestCase {
 
     /**
      * Issue #??-swingx: clearCache has no detectable effect.
-     * detectable.
      * @throws IOException 
      *
      */
@@ -53,21 +52,21 @@ public class CompoundPainterIssues extends InteractiveTestCase {
         BufferedImage img = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = img.createGraphics();
 
-        AbstractPainter imagePainter = new ShapePainter() {
-                    @Override
-                    protected boolean shouldUseCache() {
-                        return isCacheable();
-                    }
-            
+        AbstractPainter painter = new ShapePainter() {
+            @Override
+            protected boolean shouldUseCache() {
+                return isCacheable();
+            }
+
         };
-        imagePainter.paint(g, null, 10, 10);
+        painter.paint(g, null, 10, 10);
         // sanity
-        assertFalse("clean after paint", imagePainter.isDirty());
-        assertTrue("cacheable is true by default", imagePainter.isCacheable());
-        assertFalse("has a cached image", imagePainter.isCacheCleared());
+        assertFalse("clean after paint", painter.isDirty());
+        assertTrue("cacheable is true by default", painter.isCacheable());
+        assertFalse("has a cached image", painter.isCacheCleared());
         PropertyChangeReport report = new PropertyChangeReport();
-        imagePainter.addPropertyChangeListener(report);
-        imagePainter.clearCache();
+        painter.addPropertyChangeListener(report);
+        painter.clearCache();
         assertTrue("painter must have fired change event", report.hasEvents());
         
     }
