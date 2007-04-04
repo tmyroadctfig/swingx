@@ -24,6 +24,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ListModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jdesktop.swingx.action.LinkAction;
 import org.jdesktop.swingx.action.LinkModelAction;
@@ -33,6 +34,12 @@ import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
+import org.jdesktop.swingx.renderer.DefaultTableRenderer;
+import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
+import org.jdesktop.swingx.renderer.HyperlinkProvider;
+import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
+import org.jdesktop.swingx.treetable.FileSystemModel;
+import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.test.PropertyChangeReport;
 
 /**
@@ -59,8 +66,8 @@ public class JXHyperlinkTest extends InteractiveTestCase {
 //          test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*Table.*");
 //          test.runInteractiveTests("interactive.*List.*");
-//          test.runInteractiveTests("interactive.*Tree.*");
-          test.runInteractiveTests("interactive.*Underline.*");
+          test.runInteractiveTests("interactive.*Tree.*");
+//          test.runInteractiveTests("interactive.*Underline.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -323,16 +330,20 @@ public class JXHyperlinkTest extends InteractiveTestCase {
             }
             
         };
-        JXTree tree = new JXTree();
+        JXTree tree = new JXTree(new FileSystemModel());
         tree.setRolloverEnabled(true);
-        tree.setCellRenderer(new LinkRenderer(simpleAction));
+        HyperlinkProvider provider =  new HyperlinkProvider(simpleAction);
+        tree.setCellRenderer(new DefaultTreeRenderer(provider));
+//        tree.setCellRenderer(new LinkRenderer(simpleAction));
         tree.setHighlighters(new HighlighterPipeline(new Highlighter[] { 
                 new UIAlternateRowHighlighter()}));
         JFrame frame = wrapWithScrollingInFrame(tree, "table and simple links");
         frame.setVisible(true);
         
     }
-    
+
+
+
 //---------------------- interactive test: JXTable
     
     public void interactiveTableLinkRendererSimpleText() {
