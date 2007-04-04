@@ -10,12 +10,16 @@ import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.action.LinkAction;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
+import org.jdesktop.swingx.renderer.ButtonProvider;
+import org.jdesktop.swingx.renderer.CellContext;
+import org.jdesktop.swingx.renderer.ComponentProvider;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.HyperlinkProvider;
@@ -73,6 +77,44 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         JFrame frame = wrapWithScrollingInFrame(tree, "table and simple links");
         frame.setVisible(true);
     }
+
+    /**
+     * example how to use a custom component as
+     * renderer in tree column of TreeTable.
+     *
+     */
+    public void interactiveTreeTableCustomRenderer() {
+        JXTreeTable tree = new JXTreeTable(new FileSystemModel());
+        ComponentProvider provider = new ButtonProvider() {
+            /**
+             * show a unselected checkbox and text.
+             */
+            @Override
+            protected void format(CellContext context) {
+                super.format(context);
+                rendererComponent.setText(" ... " + getStringValue(context));
+            }
+
+            /**
+             * custom tooltip: show row. Note: the context is that 
+             * of the rendering tree. No way to get at table state?
+             */
+            @Override
+            protected void configureState(CellContext context) {
+                super.configureState(context);
+                rendererComponent.setToolTipText("Row: " + context.getRow());
+            }
+            
+        };
+        provider.setHorizontalAlignment(JLabel.LEADING);
+        tree.setTreeCellRenderer(new DefaultTreeRenderer(provider));
+//        tree.setCellRenderer(new LinkRenderer(simpleAction));
+        tree.setHighlighters(new HighlighterPipeline(new Highlighter[] { 
+                new UIAlternateRowHighlighter()}));
+        JFrame frame = wrapWithScrollingInFrame(tree, "table and simple links");
+        frame.setVisible(true);
+    }
+
 
 //------------- unit tests    
     /**
