@@ -10,7 +10,6 @@ package org.jdesktop.swingx;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.beans.PropertyChangeListener;
 import java.net.MalformedURLException;
@@ -41,7 +40,6 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
@@ -60,8 +58,6 @@ import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.decorator.Sorter;
-import org.jdesktop.swingx.renderer.DefaultTableRenderer;
-import org.jdesktop.swingx.renderer.HyperlinkProvider;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.NumberEditorExt;
@@ -102,7 +98,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         }
         sortableTableModel = new AncientSwingTeam();
         // make sure we have the same default for each test
-        defaultToSystemLF = false;
+        defaultToSystemLF = true;
         setSystemLF(defaultToSystemLF);
         uiTableRowHeight = UIManager.get("JXTable.rowHeight");
     }
@@ -1381,38 +1377,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
         
     }
 
-    /**
-     * test if renderer properties are updated on LF change. <p>
-     * Note: this can be done examplary only. Here: we use the 
-     * font of a rendererComponent returned by a HyperlinkProvider for
-     * comparison. There's nothing to test if the font are equal
-     * in System and crossplattform LF. <p>
-     * 
-     * There are spurious problems when toggling UI (since when?) 
-     * with LinkRenderer
-     * "no ComponentUI class for: org.jdesktop.swingx.LinkRenderer$1"
-     * that's the inner class JXHyperlink which overrides updateUI.
-     * 
-     */
-    public void testUpdateRendererOnLFChange() {
-        TableCellRenderer comparison = new DefaultTableRenderer(new HyperlinkProvider());
-        TableCellRenderer linkRenderer = new DefaultTableRenderer(new HyperlinkProvider());
-        JXTable table = new JXTable(2, 3);
-        Component comparisonComponent = comparison.getTableCellRendererComponent(table, null, false, false, 0, 0);
-        Font comparisonFont = comparisonComponent.getFont();
-        table.getColumnModel().getColumn(0).setCellRenderer(linkRenderer);
-        setSystemLF(!defaultToSystemLF);
-        SwingUtilities.updateComponentTreeUI(comparisonComponent);
-        if (comparisonFont.equals(comparisonComponent.getFont())) {
-            LOG.info("cannot run test - equal font " + comparisonFont);
-            return;
-        }
-        SwingUtilities.updateComponentTreeUI(table);
-        Component rendererComp = table.prepareRenderer(table.getCellRenderer(0, 0), 0, 0);
-        assertEquals("renderer font must be updated", 
-                comparisonComponent.getFont(), rendererComp.getFont());
-        
-    }
     /**
      * test if LinkController/executeButtonAction is properly registered/unregistered on
      * setRolloverEnabled.
