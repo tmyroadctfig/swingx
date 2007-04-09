@@ -244,6 +244,10 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
                                 sh = (int)(sh * scale);
                             }
                         }
+                        if(scaleType == ScaleType.Distort) {
+                            sw = width;
+                            sh = height;
+                        }
                         g.drawImage(img, 0, 0, sw, sh, null);
                     } else {
                         int sw = rect.width;
