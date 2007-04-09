@@ -60,13 +60,28 @@ public class MattePainter<T> extends AbstractAreaPainter<T> {
     
     /**
      * Create a new MattePainter for the given Paint. This can be a GradientPaint
-     * (though not recommended because the gradient will not grow when the
-     * component becomes larger), TexturePaint, Color, or other Paint instance.
+     * (the gradient will not grow when the component becomes larger unless
+     * you use the paintStretched boolean property), 
+     * TexturePaint, Color, or other Paint instance.
      *
      * @param paint Paint to fill with
      */
     public MattePainter(Paint paint) {
         super(paint);
+    }
+    
+    /**
+     * Create a new MattePainter for the given Paint. This can be a GradientPaint
+     * (the gradient will not grow when the component becomes larger unless
+     * you use the paintStretched boolean property), 
+     * TexturePaint, Color, or other Paint instance.
+     *
+     * @param paint Paint to fill with
+     * @param paintStreched indicates if the paint should be stretched
+     */
+    public MattePainter(Paint paint, boolean paintStretched) {
+        super(paint);
+        this.setPaintStretched(paintStretched);
     }
     
     /**
