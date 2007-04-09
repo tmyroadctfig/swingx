@@ -203,7 +203,10 @@ public class PinstripePainter<T> extends AbstractPainter<T> {
         //draws pinstripes at the angle specified in this class
         //and at the given distance apart
         Shape oldClip = g.getClip();
-        Area area = new Area(oldClip);
+        Area area = new Area(new Rectangle(0,0,width,height));
+        if(oldClip != null) {
+            area = new Area(oldClip);
+        }
         area.intersect(new Area(new Rectangle(0,0,width,height)));
         g.setClip(area);
         //g.setClip(oldClip.intersection(new Rectangle(0,0,width,height)));
