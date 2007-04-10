@@ -47,7 +47,6 @@ import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
-import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.test.AncientSwingTeam;
 
@@ -65,13 +64,13 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         setSystemLF(true);
         JXTreeTableVisualCheck test = new JXTreeTableVisualCheck();
         try {
-//            test.runInteractiveTests();
+            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Hierarchical.*");
 //               test.runInteractiveTests("interactive.*ToolTip.*");
 //           test.runInteractiveTests("interactive.*DnD.*");
 //             test.runInteractiveTests("interactive.*Compare.*");
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
-             test.runInteractiveTests("interactive.*RToL.*");
+//             test.runInteractiveTests("interactive.*RToL.*");
 //             test.runInteractiveTests("interactive.*Line.*");
 //             test.runInteractiveTests("interactive.*Render.*");
         } catch (Exception ex) {
@@ -246,39 +245,6 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         
     }
 
-    /**
-     * visualize editing of the hierarchical column, both
-     * in a treeTable with a local version of TreeTableCellEditor
-     *  and a treeTable with the head version. <p>
-     *  
-     *  Both are loosing the icon... ehem.
-     *
-     */
-//    public void interactiveTreeTableEditingLocalVsHeadEditor() {
-//        final TreeTableModel model = new ComponentTreeTableModel(new JXFrame());
-//        final JXTreeTable table = new JXTreeTable(model);
-//        final JXTreeTable tableHead = new JXTreeTable(model);
-//        tableHead.setDefaultEditor(AbstractTreeTableModel.hierarchicalColumnClass,
-//                new TreeTableCellEditorHead(((JXTree) tableHead.getDefaultRenderer(AbstractTreeTableModel.hierarchicalColumnClass))));
-//        final JXFrame frame = wrapWithScrollingInFrame(table, tableHead, "Editing: compare treetable local and treetable head");
-//        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
-//
-//            public void actionPerformed(ActionEvent e) {
-//                ComponentOrientation current = frame.getComponentOrientation();
-//                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
-//                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-//                } else {
-//                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-//
-//                }
-//
-//            }
-//
-//        };
-//        addAction(frame, toggleComponentOrientation);
-//        frame.setVisible(true);
-//        
-//    }
 
     /**
      * Issue #248-swingx: update probs with insert into empty model when root
@@ -648,13 +614,13 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         JXTree renderer = (JXTree) treeTable.getCellRenderer(0, 0);
         tree.setRowHeight(renderer.getRowHeight());
         JFrame frame = wrapWithScrollingInFrame(treeTable, tree,
-                "rowheight 48, margin 15");
+                "compare rowheight of treetable vs tree - rowheight 48, margin 15");
         frame.setVisible(true);
     }
 
     /**
      * Issue #168-jdnc: dnd enabled breaks node collapse/expand.
-     * 
+     * Regression? Dnd doesn't work at all?
      * 
      */
     public void interactiveToggleDnDEnabled() {
@@ -679,16 +645,9 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         addAction(frame, action);
     }
 
-    public void interactiveTestFocusedCellBackground() {
-        JXTreeTable xtable = new JXTreeTable(treeTableModel);
-        xtable.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
-        JFrame frame = wrapWithScrollingInFrame(xtable, "Unselected focused background");
-        frame.setVisible(true);
-    }
-
-
     /**
-     * Issue #226: no per-cell tooltips in TreeColumn.
+     * Issue #226: no per-cell tooltips in TreeColumn. 
+     * Note: this explicitly uses core default renderers!
      */
     public void interactiveTestToolTips() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
@@ -706,6 +665,10 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         frame.setVisible(true);  
     }
 
+    /**
+     * Creates and returns a core default table cell renderer with tooltip.
+     * @return
+     */
     private TableCellRenderer createTableRenderer(final TableCellRenderer delegate) {
         TableCellRenderer l = new TableCellRenderer() {
 
@@ -719,7 +682,10 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         return l;
     }
 
-
+    /**
+     * Creates and returns a core default tree cell renderer with tooltip.
+     * @return
+     */
     private TreeCellRenderer createRenderer() {
         final TreeCellRenderer delegate = new DefaultTreeCellRenderer();
         TreeCellRenderer renderer = new TreeCellRenderer() {
@@ -736,66 +702,6 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         return renderer;
     }
 
-    /**
-     * reported: boolean not showing - not reproducible 
-     * 
-     */
-    public void interactiveTestBooleanRenderer() {
-        final JXTreeTable treeTable = new JXTreeTable(new MyTreeTableModel());
-        treeTable.setRootVisible(true);
-        JFrame frame = wrapWithScrollingInFrame(treeTable, "boolean renderers");
-        frame.setVisible(true);
-  
-    }
-    private class MyTreeTableModel extends DefaultTreeTableModel {
-        
-        public MyTreeTableModel() {            
-            final DefaultMutableTreeNode root = 
-                new DefaultMutableTreeNode("Root");
-            
-            root.add(new DefaultMutableTreeNode("A"));
-            root.add(new DefaultMutableTreeNode("B"));
-            this.setRoot(root);
-        }
-        
-        public int getColumnCount() {
-            return 2;
-        }
-        
-        public Class getColumnClass(int column) {
-            if (column == 1) {
-                return Boolean.class;
-            }
-            return super.getColumnClass(column);
-        }
-        
-        public boolean isCellEditable(int row, int column) {
-            return true;
-        }
-        
-        public boolean isCellEditable(Object value, int column) {
-            return true;
-        }
-        public Object getValueAt(Object o, int column) {
-            if (column == 0) {
-                return o.toString();
-            }
-            
-            return new Boolean(true);
-        }
-    }
-
-
-    public void interactiveTestCompareTreeProperties() {
-        JXTreeTable treeTable = new JXTreeTable(treeTableModel);
-        treeTable.setShowsRootHandles(false);
-        treeTable.setRootVisible(false);
-        JXTreeTable other = new JXTreeTable(treeTableModel);
-        other.setRootVisible(true);
-        other.setShowsRootHandles(false);
-        JFrame frame = wrapWithScrollingInFrame(treeTable, other, "compare rootVisible");
-        frame.setVisible(true);
-    }
     
     /**    
      * setting tree properties: tree not updated correctly.
@@ -827,36 +733,33 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     }
 
     /**    
-     * Issue #242: CCE when setting icons.
+     * Issue #242: CCE when setting icons. Not reproducible? 
+     * Another issue: icon setting does not repaint (with core default renderer)
+     * Does not work at all with SwingX renderer (not surprisingly, the
+     * delegating renderer in JXTree looks for a core default to wrap)
      */    
     public void interactiveTestTreeIcons() {
         final JXTreeTable treeTable = new JXTreeTable(treeTableModel);
-        Icon downIcon = new ImageIcon(getClass().getResource("resources/images/" + "wellbottom.gif"));
-//        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
-//        renderer.setClosedIcon(downIcon);
-//        treeTable.setTreeCellRenderer(renderer);
-        treeTable.setClosedIcon(downIcon);
-//        Action toggleHandles = new AbstractAction("Toggle Handles") {
-//
-//            public void actionPerformed(ActionEvent e) {
-//                treeTable.setShowsRootHandles(!treeTable.getShowsRootHandles());
-//                
-//            }
-//            
-//        };
-//        Action toggleRoot = new AbstractAction("Toggle Root") {
-//
-//            public void actionPerformed(ActionEvent e) {
-//                treeTable.setRootVisible(!treeTable.isRootVisible());
-//                
-//            }
-//            
-//        };
+        final Icon downIcon = new ImageIcon(getClass().getResource("resources/images/" + "wellbottom.gif"));
+        final Icon upIcon = new ImageIcon(getClass().getResource("resources/images/" + "welltop.gif"));
+        Action toggleClosedIcon = new AbstractAction("Toggle closed icon") {
+            boolean down;
+            public void actionPerformed(ActionEvent e) {
+                if (down) {
+                    treeTable.setClosedIcon(downIcon);
+                } else {
+                    treeTable.setClosedIcon(upIcon);
+                }
+                down = !down;
+                
+            }
+            
+        };
         treeTable.setRowHeight(22);
-        JFrame frame = wrapWithScrollingInFrame(treeTable,
+        JXFrame frame = wrapWithScrollingInFrame(treeTable,
                 "Toggle Tree icons ");
 //        addAction(frame, toggleRoot);
-//        addAction(frame, toggleHandles);
+        addAction(frame, toggleClosedIcon);
         frame.setVisible(true);
     }
 
@@ -938,12 +841,13 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
                 "ClassicLinePrinter and RowHeight");
         frame.setVisible(true);
     }
-
+    
+    @SuppressWarnings("all")
     public void interactiveTestBackgroundHighlighter() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
-        treeTable.setHighlighters(new HighlighterPipeline(new Highlighter[] {
+        treeTable.setHighlighters(
                 AlternateRowHighlighter.notePadBackground,
-                new HierarchicalColumnHighlighter(), }));
+                new HierarchicalColumnHighlighter());
         treeTable.setBackground(new Color(0xFF, 0xFF, 0xCC)); // notepad
         treeTable.setGridColor(Color.cyan.darker());
         treeTable.setRowHeight(22);

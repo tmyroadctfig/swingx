@@ -34,6 +34,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
  */
 public class FileNode extends DefaultMutableTreeNode {
     public FileNode(File file) {
+        super(file);
 	this.file = file;
 	this.isDir = file.isDirectory();
     }

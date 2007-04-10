@@ -25,6 +25,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.io.Serializable;
 import java.util.logging.Logger;
 
@@ -49,11 +50,12 @@ import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.decorator.RolloverHighlighter;
 import org.jdesktop.swingx.test.ActionMapTreeTableModel;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
+import org.jdesktop.swingx.treetable.FileSystemModel;
 
 /**
  * Tests behaviour of SwingX <code>DefaultTreeRenderer</code>. 
- * Currently: mostly characterization to
- * guarantee that it behaves similar to the standard.
+ * Contains characterization to
+ * guarantee that it behaves similar to the standard. 
  * 
  * @author Jeanette Winzenburg
  */
@@ -80,6 +82,7 @@ public class TreeRendererTest extends InteractiveTestCase {
         TreeRendererTest test = new TreeRendererTest();
         try {
             test.runInteractiveTests();
+//            test.runInteractiveTests(".*Wrapper.*");
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -145,7 +148,6 @@ public class TreeRendererTest extends InteractiveTestCase {
         DefaultTreeRenderer renderer = new DefaultTreeRenderer();
         assertTrue(renderer instanceof TreeCellRenderer);
         assertTrue(renderer instanceof Serializable);
-        
     }
 
 //---------------------- interactive methods
@@ -166,101 +168,42 @@ public class TreeRendererTest extends InteractiveTestCase {
         // wrappee component to a custom container.
         list.setCellRenderer(new DefaultListRenderer(createButtonController()));
         final JXFrame frame = wrapWithScrollingInFrame(tree, list, "custom renderer - same in tree and list");
-        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
-
-            public void actionPerformed(ActionEvent e) {
-                ComponentOrientation current = frame.getComponentOrientation();
-                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
-                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-                } else {
-                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-
-                }
-
-            }
-
-        };
-        addAction(frame, toggleComponentOrientation);
         frame.setVisible(true);
     }
-    public void interactiveTreeLabelFormatting() {
+    
+
+    /**
+     * Custom format on JTree/JXTree (latter with highlighter).
+     *
+     */
+    public void interactiveXTreeLabelFormattingHighlighter() {
         TreeModel model = createComponentHierarchyModel();
-//        JTree xtree = new JTree(model);
-        
         JTree tree = new JTree(model);
         StringValue converter = new StringValue() {
 
             public String getString(Object value) {
-                if (! (value instanceof Component) ) {
-                    return TO_STRING.getString(value);
+                if (value instanceof Component) {
+                    return "Name: " + ((Component) value).getName();
                 }
-                
-                return "Name: " + ((Component) value).getName();
+                return TO_STRING.getString(value);
             }
             
         };
         tree.setCellRenderer(new DefaultTreeRenderer(converter));
-        
-        
-        final JXFrame frame = wrapWithScrollingInFrame(tree, "custom tree colors - core vs. ext renderer");
-        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
-
-            public void actionPerformed(ActionEvent e) {
-                ComponentOrientation current = frame.getComponentOrientation();
-                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
-                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-                } else {
-                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-
-                }
-
-            }
-
-        };
-        addAction(frame, toggleComponentOrientation);
+        JXTree xtree = new JXTree(model);
+        xtree.setHighlighters(new RolloverHighlighter(Color.RED, Color.YELLOW));
+        xtree.setRolloverEnabled(true);
+        // share renderer
+        xtree.setCellRenderer(tree.getCellRenderer());
+        final JXFrame frame = wrapWithScrollingInFrame(tree, xtree, "custom format - tree vs. xtree (+Rollover renderer)");
         frame.setVisible(true);
     }
 
-    public void interactiveXTreeLabelFormattingHighlighter() {
-        TreeModel model = createComponentHierarchyModel();
-//        JTree xtree = new JTree(model);
-        
-        JXTree tree = new JXTree(model);
-        tree.setHighlighters(new RolloverHighlighter(Color.RED, Color.YELLOW));
-        tree.setRolloverEnabled(true);
-        StringValue converter = new StringValue() {
-
-            public String getString(Object value) {
-                if (! (value instanceof Component) ) {
-                    return TO_STRING.getString(value);
-                }
-                
-                return "Name: " + ((Component) value).getName();
-            }
-            
-        };
-        tree.setCellRenderer(new DefaultTreeRenderer(converter));
-        
-        
-        final JXFrame frame = wrapWithScrollingInFrame(tree, "Rollover renderer");
-        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
-
-            public void actionPerformed(ActionEvent e) {
-                ComponentOrientation current = frame.getComponentOrientation();
-                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
-                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-                } else {
-                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-
-                }
-
-            }
-
-        };
-        addAction(frame, toggleComponentOrientation);
-        frame.setVisible(true);
-    }
-
+    /**
+     * Custom tree colors in JTree. Compare core default renderer with Swingx
+     * default renderer.
+     * 
+     */
     public void interactiveCompareTreeExtTreeColors() {
         JTree xtree = new JTree();
         Color background = Color.MAGENTA;
@@ -268,45 +211,35 @@ public class TreeRendererTest extends InteractiveTestCase {
         xtree.setBackground(background);
         xtree.setForeground(foreground);
         DefaultTreeCellRenderer coreTreeCellRenderer = new DefaultTreeCellRenderer();
+        // to get a uniform color on both tree and node
+        // the core default renderer needs to be configured
         coreTreeCellRenderer.setBackgroundNonSelectionColor(background);
         coreTreeCellRenderer.setTextNonSelectionColor(foreground);
-
         xtree.setCellRenderer(coreTreeCellRenderer);
-        
         JTree tree = new JTree();
         tree.setBackground(background);
         tree.setForeground(foreground);
+        // swingx renderer uses tree colors
         tree.setCellRenderer(xTreeRenderer);
-        
-        
-        final JXFrame frame = wrapWithScrollingInFrame(xtree, tree, "custom tree colors - core vs. ext renderer");
-        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
-
-            public void actionPerformed(ActionEvent e) {
-                ComponentOrientation current = frame.getComponentOrientation();
-                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
-                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-                } else {
-                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-
-                }
-
-            }
-
-        };
-        addAction(frame, toggleComponentOrientation);
+        final JXFrame frame = wrapWithScrollingInFrame(xtree, tree,
+                "custom tree colors - core vs. ext renderer");
         frame.setVisible(true);
     }
-    public void interactiveCompareTreeExtColors() {
+    
+    /**
+     * Component orientation in JTree. Compare core default renderer with Swingx
+     * default renderer.
+     * 
+     */
+    public void interactiveCompareTreeRToL() {
         JTree xtree = new JTree();
         xtree.setCellRenderer(coreTreeRenderer);
-        
         JTree tree = new JTree();
         tree.setCellRenderer(xTreeRenderer);
-        
-        
-        final JXFrame frame = wrapWithScrollingInFrame(xtree, tree, "normal tree colors - core vs. ext renderer");
-        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
+        final JXFrame frame = wrapWithScrollingInFrame(xtree, tree,
+                "orientation - core vs. ext renderer");
+        Action toggleComponentOrientation = new AbstractAction(
+                "toggle orientation") {
 
             public void actionPerformed(ActionEvent e) {
                 ComponentOrientation current = frame.getComponentOrientation();
@@ -314,9 +247,7 @@ public class TreeRendererTest extends InteractiveTestCase {
                     frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
                 } else {
                     frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-
                 }
-
             }
 
         };
@@ -324,6 +255,39 @@ public class TreeRendererTest extends InteractiveTestCase {
         frame.setVisible(true);
     }
 
+    /**
+     * Format custom model.
+     *
+     * PENDING: editor uses default toString and looses icons -
+     *   because the renderer is not a label.
+     */
+    public void interactiveDefaultWrapper() {
+        JTree xtree = new JTree(createComponentHierarchyModel());
+        StringValue componentFormat = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Component) {
+                    return ((Component) value).getName();
+                }
+                return StringValue.TO_STRING.getString(value);
+            }};
+        xtree.setCellRenderer(new DefaultTreeRenderer(componentFormat));
+        xtree.setEditable(true);
+        JTree tree = new JTree(new FileSystemModel());
+        StringValue format = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof File) {
+                    return ((File) value).getName();
+                }
+                return StringValue.TO_STRING.getString(value);
+            }
+            
+        };
+        tree.setCellRenderer(new DefaultTreeRenderer(format));
+        final JXFrame frame = wrapWithScrollingInFrame(xtree, tree, "wrapper and different models");
+        frame.setVisible(true);
+    }
 //-------------------------- factory methods
     /**
      * 
