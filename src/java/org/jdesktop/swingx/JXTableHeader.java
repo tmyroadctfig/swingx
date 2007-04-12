@@ -203,17 +203,16 @@ public class JXTableHeader extends JTableHeader
      * Allows to enforce a minimum heigth in the 
      * getXXSize methods.
      * 
-     * Here: jumps in if the table's columnControl is visible and
-     *   the input height is 0  - this happens if all
-     *   columns are hidden - and configures the default
-     *   header renderer with a dummy value for measuring.
+     * Here: jumps in if the input height is 0, then measures the
+     * cell renderer component with a dummy value.
      * 
      * @param height the prefHeigth as calcualated by super.
      * @return a minimum height for the preferredSize.
      */
     protected int getMinimumHeight(int height) {
-        if ((height == 0) && (getXTable() != null) 
-                && getXTable().isColumnControlVisible()){
+        if ((height == 0)) {
+//                && (getXTable() != null) 
+//                && getXTable().isColumnControlVisible()){
             TableCellRenderer renderer = getDefaultRenderer();
             Component comp = renderer.getTableCellRendererComponent(getTable(), 
                         "dummy", false, false, -1, -1);

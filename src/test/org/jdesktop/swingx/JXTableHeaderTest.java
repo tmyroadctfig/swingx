@@ -27,6 +27,41 @@ public class JXTableHeaderTest extends InteractiveTestCase {
             .getName());
 
     /**
+     * Issue #485-swingx: table header disappears if all header values are
+     * empty. 
+     * 
+     * fixed for SwingX.
+     *
+     */
+    public void testHeaderSizeEmptyStringHeaderValue() {
+        final String[] alternate = { 
+                "", 
+                "", 
+                };
+        JXTable xTable = new JXTable(10, 2);
+        xTable.getColumn(0).setHeaderValue(alternate[0]);
+        xTable.getColumn(1).setHeaderValue(alternate[1]);
+        assertTrue("header height must be > 0", xTable.getTableHeader().getPreferredSize().height > 0);
+    }
+
+    /**
+     * Issue #485-swingx: table header disappears if all header values are
+     * empty. 
+     * 
+     * fixed for Swingx.
+     *
+     */
+    public void testHeaderSizeNullHeaderValue() {
+        final String[] alternate = { 
+                null, 
+                null, 
+                };
+        JXTable xTable = new JXTable(10, 2);
+        xTable.getColumn(0).setHeaderValue(alternate[0]);
+        xTable.getColumn(1).setHeaderValue(alternate[1]);
+        assertTrue("header height must be > 0", xTable.getTableHeader().getPreferredSize().height > 0);
+    }
+    /**
      * Issue #390-swingx: JXTableHeader: throws AIOOB on removing dragged column.
      * Test that getDraggedColumn is null if removed.
      * 
@@ -157,6 +192,31 @@ public class JXTableHeaderTest extends InteractiveTestCase {
     
 
 //--------------------------------- visual checks
+    /**
+     * Issue #485-swingx: table header disappears if all header values are
+     * empty. Compare core <--> JXTable
+     * fixed for SwingX.
+     *
+     */
+    public void interactiveHeaderSizeRequirements() {
+        
+        final String[] alternate = { 
+                null, 
+                null, 
+                };
+        final JTable table = new JTable(10, 2);
+        table.getColumnModel().getColumn(0).setHeaderValue(alternate[0]);
+        table.getColumnModel().getColumn(1).setHeaderValue(alternate[1]);
+        
+        JXTable xTable = new JXTable(10, 2);
+        xTable.getColumn(0).setHeaderValue(alternate[0]);
+        xTable.getColumn(1).setHeaderValue(alternate[1]);
+        
+        JXFrame frame = wrapWithScrollingInFrame(table, xTable, "header height empty (core - xtable)");
+        frame.setVisible(true);
+        
+    }
+
     /**
      * Issue #390-swingx: JXTableHeader: throws AIOOB on removing dragged column.
      * 
