@@ -6,11 +6,24 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
+import javax.swing.event.TableModelEvent;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.action.LinkAction;
@@ -23,9 +36,16 @@ import org.jdesktop.swingx.renderer.ComponentProvider;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.HyperlinkProvider;
+import org.jdesktop.swingx.renderer.LabelProvider;
+import org.jdesktop.swingx.renderer.StringValue;
+import org.jdesktop.swingx.renderer.WrappingIconPanel;
+import org.jdesktop.swingx.renderer.WrappingProvider;
+import org.jdesktop.swingx.test.ActionMapTreeTableModel;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
+import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
+import org.jdesktop.test.TableModelReport;
 
 /**
  * Test to exposed known issues of <code>JXTreeTable</code>. <p>
@@ -46,18 +66,233 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         setSystemLF(true);
         JXTreeTableIssues test = new JXTreeTableIssues();
         try {
-            test.runInteractiveTests();
+//            test.runInteractiveTests();
+            test.runInteractiveTests(".*Adapter.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
     }
     
-//-------------- interactive tests
     /**
-     * Issue #??-swingx: hyperlink in JXTreeTable hierarchical 
-     * column not active.
-     *
+     * Issue #493-swingx: JXTreeTable.TreeTableModelAdapter: Inconsistency
+     * firing update.
+     * 
+     * Test update events after updating treeTableModel.
+     * 
+     * from tiberiu@dev.java.net
+     */
+    public void testTableEventUpdateOnTreeTableModelSetValue() {
+        TreeTableModel model = createCustomTreeTableModelFromDefault();
+        final JXTreeTable table = new JXTreeTable(model);
+        table.setRootVisible(true);
+        table.expandAll();
+        final int row = 6;
+        // sanity
+        assertEquals("sports", table.getValueAt(row, 0).toString());
+        final TableModelReport report = new TableModelReport();
+        table.getModel().addTableModelListener(report);
+        model.setValueAt("games",
+                table.getPathForRow(6).getLastPathComponent(), 0);   
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                assertEquals("tableModel must have fired", 1, report.getEventCount());
+                assertEquals("the event type must be update", 1, report.getUpdateEventCount());
+                TableModelEvent event = report.getLastUpdateEvent();
+                assertEquals("the updated row ", row, event.getFirstRow());
+            }
+        });        
+    }
+
+    /**
+     * Issue #493-swingx: JXTreeTable.TreeTableModelAdapter: Inconsistency
+     * firing update.
+     * 
+     * Test delete events after tree table model.
+     * 
+     * from tiberiu@dev.java.net
+     */
+    public void testTableEventDeleteOnTreeTableModel() {
+        TreeTableModel model = createCustomTreeTableModelFromDefault();
+        MutableTreeNode root = (MutableTreeNode) model.getRoot();
+        MutableTreeNode sportsNode = (MutableTreeNode) root.getChildAt(1);
+        int childrenToDelete = sportsNode.getChildCount() - 1;
+        
+        for (int i = 0; i < childrenToDelete; i++) {
+            MutableTreeNode firstChild = (MutableTreeNode) sportsNode.getChildAt(0);
+            ((DefaultTreeModel) model).removeNodeFromParent(firstChild);
+        }
+        // sanity
+        assertEquals(1, sportsNode.getChildCount());
+        final JXTreeTable table = new JXTreeTable(model);
+        table.setRootVisible(true);
+        table.expandAll();
+        final int row = 6;
+        // sanity
+        assertEquals("sports", table.getValueAt(row, 0).toString());
+        final TableModelReport report = new TableModelReport();
+        table.getModel().addTableModelListener(report);
+        // remove the last child from sports node
+        MutableTreeNode firstChild = (MutableTreeNode) sportsNode.getChildAt(0);
+        ((DefaultTreeModel) model).removeNodeFromParent(firstChild);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                assertEquals("tableModel must have fired", 1, report.getEventCount());
+                assertEquals("the event type must not be update", 0, report.getUpdateEventCount());
+                assertEquals("the event type must be delete", 1, report.getDeleteEventCount());
+                TableModelEvent event = report.getLastDeleteEvent();
+                assertEquals("the deleted row ", row, event.getFirstRow());
+            }
+        });        
+    }
+    /**
+     * Issue #493-swingx: JXTreeTable.TreeTableModelAdapter: Inconsistency
+     * firing update.
+     * 
+     * Test update events after updating table.
+     * 
+     * from tiberiu@dev.java.net
+     */
+    public void testTableEventUpdateOnTreeTableSetValue() {
+        TreeTableModel model = createCustomTreeTableModelFromDefault();
+        final JXTreeTable table = new JXTreeTable(model);
+        table.setRootVisible(true);
+        table.expandAll();
+        final int row = 6;
+        // sanity
+        assertEquals("sports", table.getValueAt(row, 0).toString());
+        final TableModelReport report = new TableModelReport();
+        table.getModel().addTableModelListener(report);
+        // doesn't fire or isn't detectable? 
+        // Problem was: model was not-editable.
+        table.setValueAt("games", row, 0);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                assertEquals("tableModel must have fired", 1, report.getEventCount());
+                assertEquals("the event type must be update", 1, report.getUpdateEventCount());
+                TableModelEvent event = report.getLastUpdateEvent();
+                assertEquals("the updated row ", row, event.getFirstRow());
+            }
+        });        
+    }
+
+    // -------------- interactive tests
+
+    /**
+     * Issue #493-swingx: JXTreeTable.TreeTableModelAdapter: Inconsistency
+     * firing update.
+     * Use the second child of root - first is accidentally okay.
+     * 
+     * from tiberiu@dev.java.net
+     */
+    public void interactiveTreeTableModelAdapterUpdate() {
+        TreeTableModel customTreeTableModel = createCustomTreeTableModelFromDefault();
+
+        final JXTreeTable table = new JXTreeTable(customTreeTableModel);
+        table.setRootVisible(true);
+        table.expandAll();
+        table.setLargeModel(true);
+        JXTree xtree = new JXTree(customTreeTableModel);
+        xtree.setRootVisible(true);
+        xtree.expandAll();
+        final JXFrame frame = wrapWithScrollingInFrame(table, xtree,
+                "JXTreeTable.TreeTableModelAdapter: Inconsistency firing update");
+        Action changeValue = new AbstractAction("change sports to games") {
+            public void actionPerformed(ActionEvent e) {
+                String newValue = "games";
+                table.getTreeTableModel().setValueAt(newValue,
+                        table.getPathForRow(6).getLastPathComponent(), 0);
+            }
+        };
+        addAction(frame, changeValue);
+        frame.setVisible(true);
+    }
+
+    /**
+     * Issue #493-swingx: JXTreeTable.TreeTableModelAdapter: Inconsistency
+     * firing delete.
+     * 
+     * from tiberiu@dev.java.net
+     */
+    public void interactiveTreeTableModelAdapterDelete() {
+        final TreeTableModel customTreeTableModel = createCustomTreeTableModelFromDefault();
+        final JXTreeTable table = new JXTreeTable(customTreeTableModel);
+        table.setRootVisible(true);
+        table.expandAll();
+        JXTree xtree = new JXTree(customTreeTableModel);
+        xtree.setRootVisible(true);
+        xtree.expandAll();
+        final JXFrame frame = wrapWithScrollingInFrame(table, xtree,
+                "JXTreeTable.TreeTableModelAdapter: Inconsistency firing update");
+        Action changeValue = new AbstractAction("delete first child of sports") {
+            public void actionPerformed(ActionEvent e) {
+                MutableTreeNode firstChild = (MutableTreeNode) table.getPathForRow(6 +1).getLastPathComponent();
+                ((DefaultTreeModel) customTreeTableModel).removeNodeFromParent(firstChild);
+            }
+        };
+        addAction(frame, changeValue);
+        frame.setVisible(true);
+    }
+
+    /**
+     * Creates and returns a custom model from JXTree default model. The model
+     * is of type DefaultTreeModel, allowing for easy insert/remove.
+     * 
+     * @return
+     */
+    private TreeTableModel createCustomTreeTableModelFromDefault() {
+        JXTree tree = new JXTree();
+        DefaultTreeModel treeModel = (DefaultTreeModel) tree.getModel();
+         TreeTableModel customTreeTableModel = new
+         CustomTreeTableModel((TreeNode) treeModel.getRoot());
+        return customTreeTableModel;
+    }
+
+    /**
+     * A TreeTableModel inheriting from DefaultTreeModel (to ease
+     * insert/delete).
+     */
+    public static class CustomTreeTableModel extends DefaultTreeModel implements
+            TreeTableModel {
+
+        /**
+         * @param root
+         */
+        public CustomTreeTableModel(TreeNode root) {
+            super(root);
+        }
+
+        public Class getColumnClass(int column) {
+            return TreeTableModel.class;
+        }
+
+        public int getColumnCount() {
+            return 1;
+        }
+
+        public String getColumnName(int column) {
+            return "User Object";
+        }
+
+        public Object getValueAt(Object node, int column) {
+            return ((DefaultMutableTreeNode) node).getUserObject();
+        }
+
+        public boolean isCellEditable(Object node, int column) {
+            return true;
+        }
+
+        public void setValueAt(Object value, Object node, int column) {
+            ((MutableTreeNode) node).setUserObject(value);
+            nodeChanged((TreeNode) node);
+        }
+
+    }
+
+    /**
+     * Issue #??-swingx: hyperlink in JXTreeTable hierarchical column not
+     * active.
+     * 
      */
     public void interactiveTreeTableLinkRendererSimpleText() {
         LinkAction simpleAction = new LinkAction<Object>(null) {
@@ -109,9 +344,56 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         };
         provider.setHorizontalAlignment(JLabel.LEADING);
         tree.setTreeCellRenderer(new DefaultTreeRenderer(provider));
-        tree.setHighlighters(new HighlighterPipeline(new Highlighter[] { 
-                new UIAlternateRowHighlighter()}));
+        tree.setHighlighters(new UIAlternateRowHighlighter());
         JFrame frame = wrapWithScrollingInFrame(tree, "treetable and custom renderer");
+        frame.setVisible(true);
+    }
+
+    /**
+     * example how to use a custom component as
+     * renderer in tree column of TreeTable.
+     *
+     */
+    public void interactiveTreeTableWrappingProvider() {
+        final JXTreeTable treeTable = new JXTreeTable(createActionTreeModel());
+        treeTable.setHorizontalScrollEnabled(true);
+        treeTable.packColumn(0, -1);
+        
+        StringValue format = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Action) {
+                    return ((Action) value).getValue(Action.NAME) + "xx";
+                }
+                return StringValue.TO_STRING.getString(value);
+            }
+            
+        };
+        ComponentProvider tableProvider = new LabelProvider(format);
+        TableCellRenderer tableRenderer = new DefaultTableRenderer(tableProvider);
+        WrappingProvider wrappingProvider = new WrappingProvider(tableProvider) {
+            Border redBorder = BorderFactory.createLineBorder(Color.RED);
+            @Override
+            public WrappingIconPanel getRendererComponent(CellContext context) {
+                Dimension old = rendererComponent.getPreferredSize();
+                rendererComponent.setPreferredSize(null);
+                super.getRendererComponent(context);
+                Dimension dim = rendererComponent.getPreferredSize();
+                dim.width = Math.max(dim.width, treeTable.getColumn(0).getWidth());
+                rendererComponent.setPreferredSize(dim);
+                rendererComponent.setBorder(redBorder);
+                return rendererComponent;
+            }
+            
+        };
+        DefaultTreeRenderer treeCellRenderer = new DefaultTreeRenderer(wrappingProvider);
+        treeTable.setTreeCellRenderer(treeCellRenderer);
+        treeTable.setHighlighters(new UIAlternateRowHighlighter());
+        JXTree tree = new JXTree(treeTable.getTreeTableModel());
+        tree.setCellRenderer(treeCellRenderer);
+        tree.setLargeModel(true);
+        tree.setScrollsOnExpand(false);
+        JFrame frame = wrapWithScrollingInFrame(treeTable, tree, "treetable and default wrapping provider");
         frame.setVisible(true);
     }
 
@@ -314,6 +596,15 @@ public class JXTreeTableIssues extends InteractiveTestCase {
 
     public void testDummy() {
         
+    }
+
+    /**
+     * @return
+     */
+    private TreeTableModel createActionTreeModel() {
+        JXTable table = new JXTable(10, 10);
+        table.setHorizontalScrollEnabled(true);
+        return new ActionMapTreeTableModel(table);
     }
 
 }
