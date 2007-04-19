@@ -44,7 +44,7 @@ import org.jdesktop.test.PropertyChangeReport;
 public class CompoundPainterIssues extends InteractiveTestCase {
 
     /**
-     * Issue #??-swingx: setPainters can't cope with null.
+     * Issue #497-swingx: setPainters can't cope with null.
      * 
      */
     public void testSetNullPainters() {
@@ -52,7 +52,7 @@ public class CompoundPainterIssues extends InteractiveTestCase {
         painter.setPainters(null);
     }
     /**
-     * Issue #??-swingx: setPainters can't cope with null.
+     * Issue #497-swingx: setPainters can't cope with null.
      *
      */
     public void testSetEmptyPainters() {
