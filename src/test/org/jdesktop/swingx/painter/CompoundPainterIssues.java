@@ -44,6 +44,26 @@ import org.jdesktop.test.PropertyChangeReport;
 public class CompoundPainterIssues extends InteractiveTestCase {
 
     /**
+     * Issue #??-swingx: setPainters can't cope with null.
+     * 
+     */
+    public void testSetNullPainters() {
+        CompoundPainter painter = new CompoundPainter();
+        painter.setPainters(null);
+    }
+    /**
+     * Issue #??-swingx: setPainters can't cope with null.
+     *
+     */
+    public void testSetEmptyPainters() {
+        CompoundPainter painter = new CompoundPainter();
+        // okay
+        painter.setPainters();
+        // fails
+        painter.setPainters((Painter[]) null);
+    }
+    
+    /**
      * Issue #??-swingx: clearCache has no detectable effect.
      * @throws IOException 
      *
