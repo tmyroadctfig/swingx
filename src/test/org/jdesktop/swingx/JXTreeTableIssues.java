@@ -137,11 +137,10 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         ((DefaultTreeModel) model).removeNodeFromParent(firstChild);
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                assertEquals("tableModel must have fired", 1, report.getEventCount());
-                assertEquals("the event type must not be update", 0, report.getUpdateEventCount());
-                assertEquals("the event type must be delete", 1, report.getDeleteEventCount());
-                TableModelEvent event = report.getLastDeleteEvent();
-                assertEquals("the deleted row ", row, event.getFirstRow());
+                assertEquals("tableModel must have fired exactly one event", 1, report.getEventCount());
+                TableModelEvent event = report.getLastEvent();
+                assertEquals("event type must be delete", TableModelEvent.DELETE, event.getType());
+                assertEquals("the deleted row ", row + 1, event.getFirstRow());
             }
         });        
     }

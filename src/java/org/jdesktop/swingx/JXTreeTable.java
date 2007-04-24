@@ -22,15 +22,29 @@
 
 package org.jdesktop.swingx;
 
-import org.jdesktop.swingx.decorator.ComponentAdapter;
-import org.jdesktop.swingx.decorator.FilterPipeline;
-import org.jdesktop.swingx.decorator.SelectionMapper;
-import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
-import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
-import org.jdesktop.swingx.treetable.TreeTableCellEditor;
-import org.jdesktop.swingx.treetable.TreeTableModel;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.EventObject;
+import java.util.List;
 
-import javax.swing.*;
+import javax.swing.ActionMap;
+import javax.swing.DefaultListSelectionModel;
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.JTable;
+import javax.swing.JTree;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -50,16 +64,15 @@ import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.EventObject;
-import java.util.List;
+
+import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.FilterPipeline;
+import org.jdesktop.swingx.decorator.SelectionMapper;
+import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
+import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
+import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
+import org.jdesktop.swingx.treetable.TreeTableCellEditor;
+import org.jdesktop.swingx.treetable.TreeTableModel;
 
 
 /**
@@ -1675,35 +1688,6 @@ public class JXTreeTable extends JXTable {
         }
 
         /**
-         * @return <code>TreeModelListener</code>
-         */
-        private TreeModelListener getTreeModelListener() {
-            if (treeModelListener == null) {
-                treeModelListener = new TreeModelListener() {
-                    // We use delayedFireTableDataChanged as we can
-                    // not be guaranteed the tree will have finished processing
-                    // the event before us.
-                    public void treeNodesChanged(TreeModelEvent e) {
-                        delayedFireTableDataChanged(e, 0);
-                    }
-
-                    public void treeNodesInserted(TreeModelEvent e) {
-                        delayedFireTableDataChanged(e, 1);
-                    }
-
-                    public void treeNodesRemoved(TreeModelEvent e) {
-                        delayedFireTableDataChanged(e, 2);
-                    }
-
-                    public void treeStructureChanged(TreeModelEvent e) {
-                        delayedFireTableDataChanged();
-                    }
-                };
-            }
-            return treeModelListener;
-        }
-
-        /**
          * Returns the real TreeTableModel that is wrapped by this TreeTableModelAdapter.
          *
          * @return the real TreeTableModel that is wrapped by this TreeTableModelAdapter
@@ -1793,6 +1777,37 @@ public class JXTreeTable extends JXTable {
         }
 
         /**
+         * @return <code>TreeModelListener</code>
+         */
+        private TreeModelListener getTreeModelListener() {
+            if (treeModelListener == null) {
+                treeModelListener = new TreeModelListener() {
+                    
+                    public void treeNodesChanged(TreeModelEvent e) {
+                        delayedFireTableDataUpdated(e);
+                    }
+
+                    // We use delayedFireTableDataChanged as we can
+                    // not be guaranteed the tree will have finished processing
+                    // the event before us.
+                    public void treeNodesInserted(TreeModelEvent e) {
+                        delayedFireTableDataChanged(e, 1);
+                    }
+
+                    public void treeNodesRemoved(TreeModelEvent e) {
+                        delayedFireTableDataChanged(e, 2);
+                    }
+
+                    public void treeStructureChanged(TreeModelEvent e) {
+                        delayedFireTableDataChanged();
+                    }
+                };
+            }
+            return treeModelListener;
+        }
+
+
+        /**
          * Invokes fireTableDataChanged after all the pending events have been
          * processed. SwingUtilities.invokeLater is used to handle this.
          */
@@ -1807,14 +1822,20 @@ public class JXTreeTable extends JXTable {
         /**
          * Invokes fireTableDataChanged after all the pending events have been
          * processed. SwingUtilities.invokeLater is used to handle this.
+         * Allowed event types: 1 for insert, 2 for delete
          */
         private void delayedFireTableDataChanged(final TreeModelEvent tme, final int typeChange) {
+            if ((typeChange < 1 ) || (typeChange > 2)) 
+                throw new IllegalArgumentException("Event type must be 1 or 2, was " + typeChange);
+            // expansion state before invoke may be different 
+            // from expansion state in invoke 
+            final boolean expanded = tree.isExpanded(tme.getTreePath());
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     int indices[] = tme.getChildIndices();
                     TreePath path = tme.getTreePath();
                     if (indices != null) { 
-                        if (tree.isExpanded(path)) { // Dont bother to update if the parent 
+                        if (expanded) { // Dont bother to update if the parent 
                                                     // node is collapsed
                             int startingRow = tree.getRowForPath(path)+1;
                             int min = Integer.MAX_VALUE;
@@ -1828,9 +1849,6 @@ public class JXTreeTable extends JXTable {
                                 }
                             }
                             switch (typeChange) {
-                                case 0 :
-                                    fireTableRowsUpdated(startingRow + min, startingRow+max);
-                                break;
                                 case 1: 
                                     fireTableRowsInserted(startingRow + min, startingRow+max);
                                 break;
@@ -1855,8 +1873,58 @@ public class JXTreeTable extends JXTable {
             });
         }
 
+        /**
+         * This is used for updated only. PENDING: not necessary to delay?
+         * Updates are never structural changes which are the critical.
+         * 
+         * @param e
+         */
+        protected void delayedFireTableDataUpdated(final TreeModelEvent tme) {
+            final boolean expanded = tree.isExpanded(tme.getTreePath());
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    int indices[] = tme.getChildIndices();
+                    TreePath path = tme.getTreePath();
+                    if (indices != null) {
+                        if (expanded) { // Dont bother to update if the parent
+                            // node is collapsed
+                            Object children[] = tme.getChildren();
+                            // can we be sure that children.length > 0?
+                            // int min = tree.getRowForPath(path.pathByAddingChild(children[0]));
+                            // int max = tree.getRowForPath(path.pathByAddingChild(children[children.length -1]));
+                            int min = Integer.MAX_VALUE;
+                            int max = Integer.MIN_VALUE;
+                            for (int i = 0; i < indices.length; i++) {
+                                Object child = children[i];
+                                TreePath childPath = path
+                                        .pathByAddingChild(child);
+                                int index = tree.getRowForPath(childPath);
+                                if (index < min) {
+                                    min = index;
+                                }
+                                if (index > max) {
+                                    max = index;
+                                }
+                            }
+                            fireTableRowsUpdated(min, max);
+                        } else {
+                            // not expanded - but change might effect appearance
+                            // of parent Issue #82-swingx
+                            int row = tree.getRowForPath(path);
+                            // fix Issue #247-swingx: prevent accidental structureChanged
+                            // for collapsed path in this case row == -1, 
+                            // which == TableEvent.HEADER_ROW
+                            if (row >= 0)
+                                fireTableRowsUpdated(row, row);
+                        }
+                    } else { // case where the event is fired to identify
+                                // root.
+                        fireTableDataChanged();
+                    }
+                }
+            });
 
-
+        }
 
 
         private TreeTableModel model; // immutable
@@ -1866,24 +1934,28 @@ public class JXTreeTable extends JXTable {
 
     static class TreeTableCellRenderer extends JXTree implements
         TableCellRenderer {
-        // Force user to specify TreeTableModel instead of more general TreeModel
+        // Force user to specify TreeTableModel instead of more general
+        // TreeModel
         public TreeTableCellRenderer(TreeTableModel model) {
             super(model);
             putClientProperty("JTree.lineStyle", "None");
             setRootVisible(false); // superclass default is "true"
             setShowsRootHandles(true); // superclass default is "false"
-                /** TODO: Support truncated text directly in DefaultTreeCellRenderer. */
+                /**
+                 * TODO: Support truncated text directly in
+                 * DefaultTreeCellRenderer.
+                 */
             setOverwriteRendererIcons(true);
+// setCellRenderer(new DefaultTreeRenderer());
             setCellRenderer(new ClippedTreeCellRenderer());
         }
 
         /**
          * Hack around #297-swingx: tooltips shown at wrong row.
          * 
-         * The problem is that - due to much tricksery when rendering
-         * the tree - the given coordinates are rather useless. As a 
-         * consequence, super maps to wrong coordinates. This takes
-         * over completely.
+         * The problem is that - due to much tricksery when rendering the tree -
+         * the given coordinates are rather useless. As a consequence, super
+         * maps to wrong coordinates. This takes over completely.
          * 
          * PENDING: bidi?
          * 
