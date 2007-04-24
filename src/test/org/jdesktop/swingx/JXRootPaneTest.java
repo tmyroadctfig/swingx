@@ -8,13 +8,49 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
+
+import org.jdesktop.test.PropertyChangeReport;
 
 /**
  * @author  Jeanette Winzenburg
  */
 public class JXRootPaneTest extends InteractiveTestCase {
+ 
+    /**
+     * Issue #499-swingx: old toolbar not removed on setting new.
+     *
+     */
+    public void testToolBarSet() {
+        JXRootPane rootPane = new JXRootPane();
+        JToolBar toolBar = new JToolBar();
+        rootPane.setToolBar(toolBar);
+        assertTrue(SwingUtilities.isDescendingFrom(toolBar, rootPane));
+        rootPane.setToolBar(new JToolBar());
+        assertFalse(SwingUtilities.isDescendingFrom(toolBar, rootPane));
+    }
     
+    /**
+     * Issue #499-swingx: old toolbar not removed on setting new.
+     *
+     * Additional fix: rootPane must fire property change event on
+     * setToolBar. 
+     * 
+     * PENDING: similar issue with statusbar?
+     */
+    public void testToolBarFirePropertyChange() {
+        JXRootPane rootPane = new JXRootPane();
+        JToolBar toolBar = new JToolBar();
+        rootPane.setToolBar(toolBar);
+        assertTrue(SwingUtilities.isDescendingFrom(toolBar, rootPane));
+        PropertyChangeReport report = new PropertyChangeReport();
+        rootPane.addPropertyChangeListener(report);
+        rootPane.setToolBar(new JToolBar());
+        assertEquals(1, report.getEventCount());
+        assertTrue(report.hasEvents("toolBar"));
+    }
     /**
      * Issue #66-swingx: setStatusBar(null) throws NPE.
      *

@@ -212,25 +212,38 @@ public class JXRootPane extends JRootPane {
      * Set the toolbar bar for this root pane. If the status bar exists, then
      * all components will be registered with a
      * <code>MouseMessagingHandler</code> so that mouse over messages will be
-     * sent to the status bar.
+     * sent to the status bar. If a tool bar is currently registered with this
+     * {@code JXRootPane}, then it is removed prior to setting the new tool
+     * bar. If an implementation needs to handle more than one tool bar, a
+     * subclass will need to override the singleton logic used here or manually
+     * add toolbars with {@code getContentPane().add}.
      * 
      * @param toolBar
      *            the toolbar to register
      * @see MouseMessagingHandler
      */
     public void setToolBar(JToolBar toolBar) {
-        JToolBar oldToolBar = this.toolBar;
+        JToolBar oldToolBar = getToolBar();
         this.toolBar = toolBar;
 
-        if (handler != null && oldToolBar != null) {
-            handler.unregisterListeners(oldToolBar.getComponents());
+        if (oldToolBar != null) {
+            getContentPane().remove(oldToolBar);
+            
+            if (handler != null) {
+                handler.unregisterListeners(oldToolBar.getComponents());
+            }
+        }
+        
+        if (handler != null && this.toolBar != null) {
+            handler.registerListeners(this.toolBar.getComponents());
         }
 
-        if (handler != null && toolBar != null) {
-            handler.registerListeners(toolBar.getComponents());
-        }
-
-        getContentPane().add(BorderLayout.NORTH, toolBar);
+        getContentPane().add(BorderLayout.NORTH, this.toolBar);
+        
+        //ensure the new toolbar is correctly sized and displayed
+        getContentPane().validate();
+        
+        firePropertyChange("toolBar", oldToolBar, getToolBar());
     }
 
     public JToolBar getToolBar() {
