@@ -138,7 +138,7 @@ public class TableModelReport implements TableModelListener {
      * @param e the event to examine. 
      * @return true if the event is of type dataChanged, false else.
      */
-    protected boolean isDataChanged(TableModelEvent e) {
+    public boolean isDataChanged(TableModelEvent e) {
         if (e == null) return false;
         return e.getType() == TableModelEvent.UPDATE && 
             e.getFirstRow() == 0 &&
@@ -151,7 +151,7 @@ public class TableModelReport implements TableModelListener {
      * @param e the event to examine. 
      * @return true if the event is of type update and not dataChanged, false else.
      */
-    protected boolean isUpdate(TableModelEvent e) {
+    public boolean isUpdate(TableModelEvent e) {
         if (isStructureChanged(e)) return false;
         return e.getType() == TableModelEvent.UPDATE && 
             e.getLastRow() < Integer.MAX_VALUE;
@@ -162,9 +162,23 @@ public class TableModelReport implements TableModelListener {
      * @param e the event to examine.
      * @return true if the event is of type structureChanged or null, false else.
      */
-    protected boolean isStructureChanged(TableModelEvent e) {
+    public boolean isStructureChanged(TableModelEvent e) {
         return e == null || e.getFirstRow() == TableModelEvent.HEADER_ROW;
     }
 
-
+    public static String printEvent(TableModelEvent e) {
+        if (e == null) return "null";
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("Type: ");
+        buffer.append(typeStrings[e.getType() + 1]);
+        buffer.append(", firstRow: ");
+        buffer.append(e.getFirstRow());
+        buffer.append(", lastRow: ");
+        buffer.append(e.getLastRow());
+        buffer.append(", column: ");
+        buffer.append(e.getColumn());
+        return buffer.toString();
+    }
+    
+    private static String[] typeStrings = { "DELETE", "UPDATE", "INSERT" };
 }

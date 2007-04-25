@@ -73,7 +73,111 @@ public class JXTreeTableIssues extends InteractiveTestCase {
             e.printStackTrace();
         }
     }
-    
+    /**
+     * Issue #493-swingx: JXTreeTable.TreeTableModelAdapter: Inconsistency
+     * firing update.
+     * 
+     * Test update events after updating table.
+     * 
+     * from tiberiu@dev.java.net
+     */
+    public void testTableEventUpdateOnTreeTableSetValueForRoot() {
+        TreeTableModel model = createCustomTreeTableModelFromDefault();
+        final JXTreeTable table = new JXTreeTable(model);
+        table.setRootVisible(true);
+        table.expandAll();
+        final int row = 0;
+        // sanity
+        assertEquals("JTree", table.getValueAt(row, 0).toString());
+        final TableModelReport report = new TableModelReport();
+        table.getModel().addTableModelListener(report);
+        // doesn't fire or isn't detectable? 
+        // Problem was: model was not-editable.
+        table.setValueAt("games", row, 0);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                assertEquals("tableModel must have fired", 1, report.getEventCount());
+                assertEquals("the event type must be update", 1, report.getUpdateEventCount());
+                TableModelEvent event = report.getLastUpdateEvent();
+                assertEquals("the updated row ", row, event.getFirstRow());
+            }
+        });        
+    }
+    /**
+     * Issue #493-swingx: incorrect table events fired.
+     * 
+     * Here: must fire structureChanged on setRoot(null).
+     * fails - because the treeStructureChanged is mapped to a 
+     * tableDataChanged.
+     *
+     */
+    public void testTableEventOnSetNullRoot() {
+        TreeTableModel model = createCustomTreeTableModelFromDefault();
+        final JXTreeTable table = new JXTreeTable(model);
+        table.setRootVisible(true);
+        table.expandAll();
+        final TableModelReport report = new TableModelReport();
+        table.getModel().addTableModelListener(report);
+        ((DefaultTreeModel) model).setRoot(null);  
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                assertEquals("tableModel must have fired", 1, report.getEventCount());
+                assertTrue("event type must be structureChanged " + report.printEvent(report.getLastEvent()), 
+                        report.isStructureChanged(report.getLastEvent()));
+            }
+        });        
+        
+    }
+    /**
+     * Issue #493-swingx: incorrect table events fired.
+     * 
+     * Here: must fire structureChanged on setRoot(otherroot).
+     * fails - because the treeStructureChanged is mapped to a 
+     * tableDataChanged.
+     */
+    public void testTableEventOnSetRoot() {
+        TreeTableModel model = createCustomTreeTableModelFromDefault();
+        final JXTreeTable table = new JXTreeTable(model);
+        table.setRootVisible(true);
+        table.expandAll();
+        final TableModelReport report = new TableModelReport();
+        table.getModel().addTableModelListener(report);
+        ((DefaultTreeModel) model).setRoot(new DefaultMutableTreeNode("other"));  
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                assertEquals("tableModel must have fired", 1, report.getEventCount());
+                assertTrue("event type must be structureChanged " + report.printEvent(report.getLastEvent()), 
+                        report.isStructureChanged(report.getLastEvent()));
+            }
+        });        
+        
+    }
+
+
+    /**
+     * Issue #493-swingx: incorrect table events fired.
+     * 
+     * Here: must fire structureChanged on setModel.
+     *
+     */
+    public void testTableEventOnSetModel() {
+        TreeTableModel model = createCustomTreeTableModelFromDefault();
+        final JXTreeTable table = new JXTreeTable(model);
+        table.setRootVisible(true);
+        table.expandAll();
+        final TableModelReport report = new TableModelReport();
+        table.getModel().addTableModelListener(report);
+        table.setTreeTableModel(createCustomTreeTableModelFromDefault());  
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                assertEquals("tableModel must have fired", 1, report.getEventCount());
+                assertTrue("event type must be structureChanged " + report.printEvent(report.getLastEvent()), 
+                        report.isStructureChanged(report.getLastEvent()));
+            }
+        });        
+        
+    }
+
     /**
      * Issue #493-swingx: JXTreeTable.TreeTableModelAdapter: Inconsistency
      * firing update.
@@ -204,6 +308,15 @@ public class JXTreeTableIssues extends InteractiveTestCase {
             }
         };
         addAction(frame, changeValue);
+        Action changeRoot = new AbstractAction("change root") {
+            public void actionPerformed(ActionEvent e) {
+                String newValue = "new Root";
+                table.getTreeTableModel().setValueAt(newValue,
+                        table.getPathForRow(0).getLastPathComponent(), 0);
+            }
+        };
+        addAction(frame, changeRoot);
+        frame.pack();
         frame.setVisible(true);
     }
 
