@@ -50,9 +50,9 @@ public class TableModelReport implements TableModelListener {
         } else if (isDataChanged(e)) {
             // do nothing for now
         } else if (TableModelEvent.DELETE == e.getType()) { 
-            deleteEvents.add(e);
+            deleteEvents.add(0, e);
         } else if (TableModelEvent.INSERT == e.getType()) {
-            insertEvents.add(e);
+            insertEvents.add(0, e);
         }
     
     }
