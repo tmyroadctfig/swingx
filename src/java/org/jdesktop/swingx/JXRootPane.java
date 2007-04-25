@@ -200,6 +200,7 @@ public class JXRootPane extends JRootPane {
         if (statusBar != null) {
             getContentPane().add(BorderLayout.SOUTH, statusBar);
         }
+        firePropertyChange("statusBar", oldStatusBar, statusBar);
     }
 
     public JXStatusBar getStatusBar() {

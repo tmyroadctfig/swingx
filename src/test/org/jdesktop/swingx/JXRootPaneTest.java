@@ -20,6 +20,43 @@ import org.jdesktop.test.PropertyChangeReport;
 public class JXRootPaneTest extends InteractiveTestCase {
  
     /**
+     * Test setStatusBar analogous to setToolBar 
+     * (triggered by 
+     * Issue #499-swingx: old toolbar not removed on setting new).
+     * 
+     * had not been broken. 
+     */
+    public void testStatusBarSet() {
+        JXRootPane rootPane = new JXRootPane();
+        JXStatusBar toolBar = new JXStatusBar();
+        rootPane.setStatusBar(toolBar);
+        assertTrue(SwingUtilities.isDescendingFrom(toolBar, rootPane));
+        rootPane.setStatusBar(new JXStatusBar());
+        assertFalse(SwingUtilities.isDescendingFrom(toolBar, rootPane));
+    }
+    
+    /**
+     * Test setStatusBar analogous to setToolBar 
+     * (triggered by 
+     * Issue #499-swingx: old toolbar not removed on setting new).
+     *
+     * Additional fix: rootPane must fire property change event on
+     * setStatusBar. 
+     * 
+     */
+    public void testStatusBarFirePropertyChange() {
+        JXRootPane rootPane = new JXRootPane();
+        JXStatusBar toolBar = new JXStatusBar();
+        rootPane.setStatusBar(toolBar);
+        assertTrue(SwingUtilities.isDescendingFrom(toolBar, rootPane));
+        PropertyChangeReport report = new PropertyChangeReport();
+        rootPane.addPropertyChangeListener(report);
+        rootPane.setStatusBar(new JXStatusBar());
+        assertEquals("set statusBar must have fire exactly one property change", 1, report.getEventCount());
+        assertTrue(report.hasEvents("statusBar"));
+    }
+
+    /**
      * Issue #499-swingx: old toolbar not removed on setting new.
      *
      */
@@ -55,7 +92,7 @@ public class JXRootPaneTest extends InteractiveTestCase {
      * Issue #66-swingx: setStatusBar(null) throws NPE.
      *
      */
-    public void testSetStatusBar() {
+    public void testStatusBarNPE() {
         JXRootPane rootPane = new JXRootPane();
         rootPane.setStatusBar(null);
     }
