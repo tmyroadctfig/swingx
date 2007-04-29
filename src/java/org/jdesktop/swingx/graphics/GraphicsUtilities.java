@@ -450,12 +450,11 @@ public class GraphicsUtilities {
                 width = (int) (height / ratioHW);
             }
 
-            if (temp == null) {
-                temp = createCompatibleImage(image, width, height);
-                g2 = temp.createGraphics();
-                g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            }
+            temp = createCompatibleImage(image, width, height);
+            g2 = temp.createGraphics();
+            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                            RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+
             g2.drawImage(thumb, 0, 0, width, height,
                          0, 0, previousWidth, previousHeight, null);
 
@@ -537,12 +536,11 @@ public class GraphicsUtilities {
                 }
             }
 
-            if (temp == null) {
-                temp = createCompatibleImage(image, width, height);
-                g2 = temp.createGraphics();
-                g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            }
+            temp = createCompatibleImage(image, width, height);
+            g2 = temp.createGraphics();
+            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                            RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+
             g2.drawImage(thumb, 0, 0, width, height,
                          0, 0, previousWidth, previousHeight, null);
 
