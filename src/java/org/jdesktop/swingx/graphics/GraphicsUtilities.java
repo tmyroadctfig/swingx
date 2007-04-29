@@ -407,6 +407,7 @@ public class GraphicsUtilities {
         int width = image.getWidth();
         int height = image.getHeight();
 
+        boolean isTranslucent = image.getTransparency() != Transparency.OPAQUE;
         boolean isWidthGreater = width > height;
 
         if (isWidthGreater) {
@@ -428,9 +429,9 @@ public class GraphicsUtilities {
         float ratioHW = (float) height / (float) width;
 
         BufferedImage thumb = image;
-        BufferedImage temp;
+        BufferedImage temp = null;
 
-        Graphics2D g2;
+        Graphics2D g2 = null;
 
         int previousWidth = width;
         int previousHeight = height;
@@ -450,13 +451,14 @@ public class GraphicsUtilities {
                 width = (int) (height / ratioHW);
             }
 
-            temp = createCompatibleImage(image, width, height);
-            g2 = temp.createGraphics();
-            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                            RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-
+            if (temp == null || isTranslucent) {
+                temp = createCompatibleImage(image, width, height);
+                g2 = temp.createGraphics();
+                g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            }
             g2.drawImage(thumb, 0, 0, width, height,
-                         0, 0, previousWidth, previousHeight, null);
+                    0, 0, previousWidth, previousHeight, null);
 
             previousWidth = width;
             previousHeight = height;
@@ -504,6 +506,8 @@ public class GraphicsUtilities {
         int width = image.getWidth();
         int height = image.getHeight();
 
+        boolean isTranslucent = image.getTransparency() != Transparency.OPAQUE;
+
         if (newWidth >= width || newHeight >= height) {
             throw new IllegalArgumentException("newWidth and newHeight cannot" +
                                                " be greater than the image" +
@@ -514,9 +518,9 @@ public class GraphicsUtilities {
         }
 
         BufferedImage thumb = image;
-        BufferedImage temp;
+        BufferedImage temp = null;
 
-        Graphics2D g2;
+        Graphics2D g2 = null;
 
         int previousWidth = width;
         int previousHeight = height;
@@ -536,11 +540,12 @@ public class GraphicsUtilities {
                 }
             }
 
-            temp = createCompatibleImage(image, width, height);
-            g2 = temp.createGraphics();
-            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                            RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-
+            if (temp == null || isTranslucent) {
+                temp = createCompatibleImage(image, width, height);
+                g2 = temp.createGraphics();
+                g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            }
             g2.drawImage(thumb, 0, 0, width, height,
                          0, 0, previousWidth, previousHeight, null);
 
