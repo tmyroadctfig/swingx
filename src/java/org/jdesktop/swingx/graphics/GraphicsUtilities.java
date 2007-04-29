@@ -428,9 +428,9 @@ public class GraphicsUtilities {
         float ratioHW = (float) height / (float) width;
 
         BufferedImage thumb = image;
-        BufferedImage temp = null;
+        BufferedImage temp;
 
-        Graphics2D g2 = null;
+        Graphics2D g2;
 
         int previousWidth = width;
         int previousHeight = height;
@@ -514,9 +514,9 @@ public class GraphicsUtilities {
         }
 
         BufferedImage thumb = image;
-        BufferedImage temp = null;
+        BufferedImage temp;
 
-        Graphics2D g2 = null;
+        Graphics2D g2;
 
         int previousWidth = width;
         int previousHeight = height;
