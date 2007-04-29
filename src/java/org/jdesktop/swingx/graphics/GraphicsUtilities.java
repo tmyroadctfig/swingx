@@ -470,7 +470,9 @@ public class GraphicsUtilities {
         if (width != thumb.getWidth() || height != thumb.getHeight()) {
             temp = createCompatibleImage(image, width, height);
             g2 = temp.createGraphics();
-            g2.drawImage(thumb, 0, 0, null);
+            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g2.drawImage(thumb, 0, 0, width, height, null);
             g2.dispose();
             thumb = temp;
         }
@@ -555,7 +557,9 @@ public class GraphicsUtilities {
         if (width != thumb.getWidth() || height != thumb.getHeight()) {
             temp = createCompatibleImage(image, width, height);
             g2 = temp.createGraphics();
-            g2.drawImage(thumb, 0, 0, null);
+            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g2.drawImage(thumb, 0, 0, width, height, null);
             g2.dispose();
             thumb = temp;
         }
