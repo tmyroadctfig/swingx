@@ -9,14 +9,10 @@
 
 package org.jdesktop.swingx.editors;
 
-import java.beans.PropertyEditor;
 import java.beans.PropertyEditorSupport;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
-import org.jdesktop.swingx.painter.RectanglePainter;
 
 /**
  *
@@ -25,6 +21,7 @@ import org.jdesktop.swingx.painter.RectanglePainter;
 public class EnumPropertyEditor<E extends Enum<E>> extends PropertyEditorSupport {
     private Class<E> en;
     private EnumSet<E> set;
+    
     /** Creates a new instance of EnumPropertyEditor */
     public EnumPropertyEditor(Class<E> en) {
         this.en = en;
@@ -48,4 +45,12 @@ public class EnumPropertyEditor<E extends Enum<E>> extends PropertyEditorSupport
         Enum<E> e = Enum.valueOf(en, text);
         setValue(e);
     }
+
+    @Override
+    public String getJavaInitializationString() {
+        //org.jdesktop.stuff.Stuff.InsideEnum.VALUE;
+        // the '$' must be converted to '.' to deal with public inner classes
+        return new String(en.getName()+"."+getAsText()).replace("$",".");
+    }
+    
 }
