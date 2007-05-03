@@ -149,7 +149,7 @@ public class JXImageView extends JXPanel {
      */
     public void setImage(URL url) throws IOException {
         setImageURL(url);
-        setImage(ImageIO.read(url));
+        //setImage(ImageIO.read(url));
     }
     
     /**
@@ -159,7 +159,6 @@ public class JXImageView extends JXPanel {
      */
     public void setImage(File file) throws IOException {
         setImageURL(file.toURL());
-        setImage(ImageIO.read(file));
     }
     
     /**
@@ -682,7 +681,30 @@ public class JXImageView extends JXPanel {
         return imageURL;
     }
 
-    public void setImageURL(URL imageURL) {
+    public void setImageURL(URL imageURL) throws IOException {
         this.imageURL = imageURL;
+        setImage(ImageIO.read(getImageURL()));
     }
+    
+    /** Returns the current image's URL (if available) as a string.
+     * If the image has no URL, or if there is no image, then this
+     * method will return null.
+     * @return the url of the image as a string
+     */
+    public String getImageString() {
+        if(getImageURL() == null) {
+            return null;
+        }
+        return getImageURL().toString();
+    }
+    
+    /** Sets the current image using a string. This string <b>must</b>
+     * contain a valid URL.
+     * @param url string of a URL
+     * @throws java.io.IOException thrown if the URL does not parse
+     */
+    public void setImageString(String url) throws IOException {
+        setImageURL(new URL(url));
+    }
+    
 }
