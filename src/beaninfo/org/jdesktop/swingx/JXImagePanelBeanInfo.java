@@ -31,6 +31,6 @@ public class JXImagePanelBeanInfo extends BeanInfoSupport {
     }
 
     protected void initialize() {
-        setPreferred(true, "icon");
+        setPreferred(true, "editable");
     }
 }

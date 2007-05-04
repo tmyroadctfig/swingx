@@ -553,7 +553,7 @@ public class JXImageView extends JXPanel {
             return COPY;
         }
         protected void exportDone(JComponent source, Transferable data, int action) {
-            System.out.println("exportDone: " + source + " " + data + " " +action);
+            //System.out.println("exportDone: " + source + " " + data + " " +action);
         }
 
         public boolean canImport(JComponent c, DataFlavor[] flavors) {
@@ -575,27 +575,26 @@ public class JXImageView extends JXPanel {
         }
 
         protected Transferable createTransferable(JComponent c) {
-            System.out.println("creating a transferable");
             JXImageView view = (JXImageView)c;
             return new ImageTransferable(view.getImage(),
                     view.getExportName(), view.getExportFormat());
         }
         public boolean importData(JComponent comp, Transferable t) {
-            System.out.println("importData called");
             if (canImport(comp, t.getTransferDataFlavors())) {
                 try {
                     if(t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                         List files = (List) t.getTransferData(DataFlavor.javaFileListFlavor);
-                        System.out.println("doing file list flavor");
+                        //System.out.println("doing file list flavor");
                         if (files.size() > 0) {
                             File file = (File) files.get(0);
-                            System.out.println("readingt hte image: " + file.getCanonicalPath());
+                            //System.out.println("readingt hte image: " + file.getCanonicalPath());
                             /*Iterator it = ImageIO.getImageReaders(new FileInputStream(file));
                             while(it.hasNext()) {
                                 System.out.println("can read: " + it.next());
                             }*/
-                            BufferedImage img = ImageIO.read(file);
-                            setImage(img);
+                            setImageString(file.toURI().toURL().toString());
+                            //BufferedImage img = ImageIO.read(file.toURI().toURL());
+                            //setImage(img);
                             return true;
                         }
                     }
@@ -604,7 +603,7 @@ public class JXImageView extends JXPanel {
                     //System.out.println("obj = " + obj + " " + obj.getClass().getPackage() + " "
                     //        + obj.getClass().getName());
                     if(obj instanceof URL) {
-                        setImage((URL)obj);
+                        setImageString(((URL)obj).toString());
                     }
                     return true;
                 } catch (Exception ex) {
@@ -704,7 +703,9 @@ public class JXImageView extends JXPanel {
      * @throws java.io.IOException thrown if the URL does not parse
      */
     public void setImageString(String url) throws IOException {
+        String old = getImageString();
         setImageURL(new URL(url));
+        firePropertyChange("imageString", old, url);
     }
     
 }
