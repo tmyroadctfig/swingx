@@ -69,6 +69,7 @@ import org.jdesktop.swingx.renderer.HyperlinkProvider;
 import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 import org.jdesktop.swingx.table.TableColumnExt;
+import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.AncientSwingTeam;
 
 /**
@@ -85,9 +86,9 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     public static void main(String args[]) {
       JXTableVisualCheck test = new JXTableVisualCheck();
       try {
-        test.runInteractiveTests();
+//        test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
-//          test.runInteractiveTests("interactive.*TableHeader.*");
+          test.runInteractiveTests("interactive.*Header.*");
 //          test.runInteractiveTests("interactive.*ColumnProp.*");
 //          test.runInteractiveTests("interactive.*Multiple.*");
 //          test.runInteractiveTests("interactive.*RToL.*");
@@ -107,7 +108,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     protected void setUp() throws Exception {
         super.setUp();
         // super has LF specific tests...
-        setSystemLF(false);
+        setSystemLF(true);
     }
 
 
@@ -411,53 +412,6 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         addAction(frame, action);
         frame.setVisible(true);
         
-    }
-   
-    /**
-     * Issue #79-jdnc: leading/trailing (?) doesn't work.
-     *
-     */
-    public void interactiveHeaderAlignment() {
-        final String[] alignText = {"default", "center", "leading", "left", "trailing", "right"};
-        final int[] align = {-1, JLabel.CENTER, JLabel.LEADING, JLabel.LEFT, JLabel.TRAILING, JLabel.RIGHT};
-        ColumnFactory factory = new ColumnFactory() {
-
-            @Override
-            public void configureTableColumn(TableModel model, TableColumnExt columnExt) {
-                super.configureTableColumn(model, columnExt);
-                int columnIndex = columnExt.getModelIndex();
-                columnExt.setHeaderValue(alignText[columnIndex]);
-                ColumnHeaderRenderer renderer = ColumnHeaderRenderer.createColumnHeaderRenderer();
-                if (align[columnIndex] >= 0) {
-                   renderer.setHorizontalAlignment(align[columnIndex]); 
-                }
-                columnExt.setHeaderRenderer(renderer);
-            }
-            
-        };
-        final JXTable table = new JXTable();
-        table.setColumnFactory(factory);
-        table.setModel(new DefaultTableModel(10, alignText.length));
-        JScrollPane pane = new JScrollPane(table);
-       table.setColumnControlVisible(true);
-       final JXFrame frame = wrapInFrame(pane, "RToLScrollPane");
-       Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
-
-           public void actionPerformed(ActionEvent e) {
-               ComponentOrientation current = frame.getComponentOrientation();
-               if (current == ComponentOrientation.LEFT_TO_RIGHT) {
-                   frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-               } else {
-                   frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-
-               }
-
-           }
-
-       };
-       addAction(frame, toggleComponentOrientation);
-       frame.setVisible(true);
-
     }
     /**
      * Issue #281-swingx: header should be auto-repainted on changes to
