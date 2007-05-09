@@ -11,6 +11,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -88,7 +89,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
       try {
 //        test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
-          test.runInteractiveTests("interactive.*Header.*");
+//          test.runInteractiveTests("interactive.*Header.*");
 //          test.runInteractiveTests("interactive.*ColumnProp.*");
 //          test.runInteractiveTests("interactive.*Multiple.*");
 //          test.runInteractiveTests("interactive.*RToL.*");
@@ -96,7 +97,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*isable.*");
           
 //          test.runInteractiveTests("interactive.*Compare.*");
-//        test.runInteractiveTests("interactive.*Focus.*");
+        test.runInteractiveTests("interactive.*Rollover.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -1253,17 +1254,27 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         frame.setVisible(true);
     }
 
-    
-    public void interactiveTestRolloverHighlight() {
+    /**
+     * Issue #503-swingx: custom cursor respected when rollover?
+     * Seems okay for table, 
+     */
+    public void interactiveTestRolloverHighlightCustomCursor() {
         JXTable table = new JXTable(sortableTableModel);
-        table.setRolloverEnabled(true);
+        table.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
         table.addHighlighter(new RolloverHighlighter(Color.YELLOW, null));
-//        table.addHighlighter(new RolloverHighlighter(null, Color.RED));
-        JFrame frame = wrapWithScrollingInFrame(table, "rollover highlight");
-        frame.setVisible(true);
-
+        showWithScrollingInFrame(table, "rollover highlight, custom cursor");
     }
 
+    /**
+     * Plain RolloverHighlighter. 
+     *
+     */
+    public void interactiveTestRolloverHighlight() {
+        JXTable table = new JXTable(sortableTableModel);
+        table.addHighlighter(new RolloverHighlighter(Color.YELLOW, null));
+        showWithScrollingInFrame(table, "rollover highlight");
+    }
+    
     public void interactiveTestTableAlternateHighlighterGroup() {
         JXTable table = new JXTable(tableModel);
         installLinkRenderer(table);

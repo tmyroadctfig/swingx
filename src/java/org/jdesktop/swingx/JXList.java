@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -77,6 +78,8 @@ import org.jdesktop.swingx.renderer.DefaultListRenderer;
  * @author Jeanette Winzenburg
  */
 public class JXList extends JList {
+    @SuppressWarnings("all")
+    private static final Logger LOG = Logger.getLogger(JXList.class.getName());
     public static final String EXECUTE_BUTTON_ACTIONCOMMAND = "executeButtonAction";
 
     /** The pipeline holding the filters. */
@@ -415,24 +418,49 @@ public class JXList extends JList {
         // --------------------------------- JList rollover
 
         protected void rollover(Point oldLocation, Point newLocation) {
+            // PENDING JW - track down the -1 in location.y
+            if (oldLocation != null) {
+                Rectangle r = component.getCellBounds(oldLocation.y, oldLocation.y);
+                // LOG.info("old index/cellbounds: " + index + "/" + r);
+                if (r != null) {
+                    component.repaint(r);
+                }
+            }
+            if (newLocation != null) {
+                Rectangle r = component.getCellBounds(newLocation.y, newLocation.y);
+                // LOG.info("new index/cellbounds: " + index + "/" + r);
+                if (r != null) {
+                    component.repaint(r);
+                }
+            }
             setRolloverCursor(newLocation);
-            // JW: partial repaints incomplete
-            component.repaint();
         }
 
         /**
          * something weird: cursor in JList behaves different from JTable?
-         * 
+         * Hmm .. no: using the table code snippets seems to fix #503-swingx
          * @param location
          */
         private void setRolloverCursor(Point location) {
             if (hasRollover(location)) {
-                oldCursor = component.getCursor();
-                component.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                if (oldCursor == null) {
+                    oldCursor = component.getCursor();
+                    component.setCursor(Cursor
+                            .getPredefinedCursor(Cursor.HAND_CURSOR));
+                }
             } else {
-                component.setCursor(oldCursor);
-                oldCursor = null;
+                if (oldCursor != null) {
+                    component.setCursor(oldCursor);
+                    oldCursor = null;
+                }
             }
+//            if (hasRollover(location)) {
+//                oldCursor = component.getCursor();
+//                component.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+//            } else {
+//                component.setCursor(oldCursor);
+//                oldCursor = null;
+//            }
 
         }
 

@@ -693,24 +693,25 @@ public class JXTree extends JTree {
 //    -------------------------------------JTree rollover
         
         protected void rollover(Point oldLocation, Point newLocation) {
-            setRolloverCursor(newLocation);
-            //setLinkCursor(list, newLocation);
             // JW: conditional repaint not working?
-            component.repaint();
-//            if (oldLocation != null) {
-//                Rectangle r = tree.getRowBounds(oldLocation.y);
-////                r.x = 0;
-////                r.width = table.getWidth();
-//                if (r != null)
-//                tree.repaint(r);
-//            }
-//            if (newLocation != null) {
-//                Rectangle r = tree.getRowBounds(newLocation.y);
-////                r.x = 0;
-////                r.width = table.getWidth();
-//                if (r != null)
-//                tree.repaint(r);
-//            }
+//            component.repaint();
+            if (oldLocation != null) {
+                Rectangle r = component.getRowBounds(oldLocation.y);
+                if (r != null) {
+                    r.x = 0;
+                    r.width = component.getWidth();
+                    component.repaint(r);
+                }
+            }
+            if (newLocation != null) {
+                Rectangle r = component.getRowBounds(newLocation.y);
+                if (r != null) {
+                    r.x = 0;
+                    r.width = component.getWidth();
+                    component.repaint(r);
+                }
+            }
+            setRolloverCursor(newLocation);
         }
 
 

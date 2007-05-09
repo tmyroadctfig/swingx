@@ -5,6 +5,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
@@ -21,6 +22,7 @@ import org.jdesktop.swingx.decorator.ConditionalHighlighter;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
+import org.jdesktop.swingx.decorator.RolloverHighlighter;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.HyperlinkProvider;
 
@@ -33,10 +35,7 @@ public class JXListVisualCheck extends JXListTest {
         JXListVisualCheck test = new JXListVisualCheck();
         try {
           test.runInteractiveTests();
-         //   test.runInteractiveTests("interactive.*Column.*");
-         //   test.runInteractiveTests("interactive.*TableHeader.*");
-         //   test.runInteractiveTests("interactive.*Render.*");
-//            test.runInteractiveTests("interactive.*Sort.*");
+//            test.runInteractiveTests("interactive.*Rollover.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -74,54 +73,59 @@ public class JXListVisualCheck extends JXListTest {
         xlist.setBackground(new Color(0xF5, 0xFF, 0xF5));
         JList list = new JList(listModel);
         list.setBackground(new Color(0xF5, 0xFF, 0xF5));
-        JFrame frame = wrapWithScrollingInFrame(xlist, list, "unselectedd focused background: JXList/JList");
-        frame.setVisible(true);
+        showWithScrollingInFrame(xlist, list, "unselectedd focused background: JXList/JList");
     }
 
     public void interactiveTestTablePatternFilter5() {
         JXList list = new JXList(listModel);
         String pattern = "Row";
-        list.setHighlighters(new HighlighterPipeline(new Highlighter[] {
-            new PatternHighlighter(null, Color.red, pattern, 0, 1),
-        }));
-        JFrame frame = wrapWithScrollingInFrame(list, "PatternHighlighter: " + pattern);
-        frame.setVisible(true);
+        list.setHighlighters(new PatternHighlighter(null, Color.red, 
+                pattern, 0, 1));
+        showWithScrollingInFrame(list, "PatternHighlighter: " + pattern);
     }
 
     public void interactiveTestTableAlternateHighlighter1() {
         JXList list = new JXList(listModel);
-        list.setHighlighters(new HighlighterPipeline(new Highlighter[] {
-            AlternateRowHighlighter.
-            linePrinter,
-        }));
-
-        JFrame frame = wrapWithScrollingInFrame(list, "AlternateRowHighlighter - lineprinter");
-        frame.setVisible(true);
-    }
-
-    public void interactiveTestRolloverHighlight() {
-        JXList list = new JXList(listModel);
-    //    table.setLinkVisitor(new EditorPaneLinkVisitor());
-        list.setRolloverEnabled(true);
-        Highlighter conditional = new ConditionalHighlighter(
-                new Color(0xF0, 0xF0, 0xE0), null, -1, -1) {
-
-            protected boolean test(ComponentAdapter adapter) {
-                Point p = (Point) adapter.getComponent().getClientProperty(RolloverProducer.ROLLOVER_KEY);
-     
-                return p != null &&  p.y == adapter.row;
-            }
-            
-        };
-        list.setHighlighters(new HighlighterPipeline(new Highlighter[] {conditional }));
-        JFrame frame = wrapWithScrollingInFrame(list, "rollover highlight");
-        frame.setVisible(true);
-
+        list.addHighlighter(AlternateRowHighlighter.linePrinter);
+        showWithScrollingInFrame(list, "AlternateRowHighlighter - lineprinter");
     }
 
     /**
-     * Issue #20: Highlighters and LinkRenderers don't work together
+     * Plain rollover highlight, had been repaint issues.
      *
+     */
+    public void interactiveTestRolloverHighlight() {
+        JXList list = new JXList(listModel);
+        list.setRolloverEnabled(true);
+        list.addHighlighter(new RolloverHighlighter(new Color(0xF0, 0xF0, 0xE0), null));
+        showWithScrollingInFrame(list, "rollover highlight");
+    }
+
+    /**
+     * Plain rollover highlight in multi-column layout, had been repaint issues.
+     *
+     */
+    public void interactiveTestRolloverHighlightMultiColumn() {
+        JXList list = new JXList(listModel);
+        list.setRolloverEnabled(true);
+        list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+        list.addHighlighter(new RolloverHighlighter(new Color(0xF0, 0xF0, 0xE0), null));
+        showWithScrollingInFrame(list, "rollover highlight - horz. Wrap");
+    }
+    /**
+     * Issue #503-swingx: rolloverEnabled disables custom cursor
+     *
+     */
+    public void interactiveTestRolloverHighlightCustomCursor() {
+        JXList list = new JXList(listModel);
+        list.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+        list.setRolloverEnabled(true);
+        list.addHighlighter(new RolloverHighlighter(new Color(0xF0, 0xF0, 0xE0), null));
+        showWithScrollingInFrame(list, "rollover highlight - custom cursor");
+    }
+    /**
+     * Issue #20: Highlighters and LinkRenderers don't work together
+     * fixed with overhaul of SwingX renderers?
      */
     public void interactiveTestRolloverHighlightAndLink() {
         JXList list = new JXList(createListModelWithLinks());
@@ -130,20 +134,8 @@ public class JXListVisualCheck extends JXListTest {
         HyperlinkProvider h = new HyperlinkProvider(action, LinkModel.class);
         list.setCellRenderer(new DefaultListRenderer(h));
         list.setRolloverEnabled(true);
-        Highlighter conditional = new ConditionalHighlighter(
-                new Color(0xF0, 0xF0, 0xE0), null, -1, -1) {
-
-            protected boolean test(ComponentAdapter adapter) {
-                Point p = (Point) adapter.getComponent().getClientProperty(RolloverProducer.ROLLOVER_KEY);
-     
-                return p != null &&  p.y == adapter.row;
-            }
-            
-        };
-        list.setHighlighters(new HighlighterPipeline(new Highlighter[] {conditional }));
-        JFrame frame = wrapWithScrollingInFrame(list, editorPaneLinkVisitor.getOutputComponent(), "rollover highlight with links");
-        frame.setVisible(true);
-
+        list.addHighlighter(new RolloverHighlighter(new Color(0xF0, 0xF0, 0xE0), null));
+        showWithScrollingInFrame(list, editorPaneLinkVisitor.getOutputComponent(), "rollover highlight with links");
     }
 
 }

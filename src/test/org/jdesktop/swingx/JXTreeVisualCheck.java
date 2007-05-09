@@ -23,6 +23,7 @@ package org.jdesktop.swingx;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -37,11 +38,12 @@ import javax.swing.ToolTipManager;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 
+import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.HighlighterPipeline;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.RolloverHighlighter;
 import org.jdesktop.swingx.decorator.SearchHighlighter;
+import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
 
 public class JXTreeVisualCheck extends JXTreeUnitTest {
@@ -53,9 +55,9 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
 //      setSystemLF(true);
       JXTreeVisualCheck test = new JXTreeVisualCheck();
       try {
-          test.runInteractiveTests();
+//          test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*RToL.*");
-//          test.runInteractiveTests("interactive.*Edit.*");
+          test.runInteractiveTests("interactive.*Rollover.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -179,29 +181,52 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
         xtree.setBackground(new Color(0xF5, 0xFF, 0xF5));
         JTree tree = new JTree(treeTableModel);
         tree.setBackground(new Color(0xF5, 0xFF, 0xF5));
-        JFrame frame = wrapWithScrollingInFrame(xtree, tree, "Unselected focused background: JXTree/JTree" );
-        frame.setVisible(true);  
-        
+        showWithScrollingInFrame(xtree, tree, "Unselected focused background: JXTree/JTree" );
+    }
+
+    /**
+     * Issue #503-swingx: JXList rolloverEnabled disables custom cursor.
+     * 
+     * Sanity test for JXTree (looks okay).
+     *
+     */
+    public void interactiveTestRolloverHighlightCustomCursor() {
+        JXTree tree = new JXTree(treeTableModel);
+        tree.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+        tree.setRolloverEnabled(true);
+        tree.setHighlighters(createRolloverHighlighter(true));
+        showWithScrollingInFrame(tree, "foreground rollover, custom cursor " );
     }
 
     /**
      * Issue ??: Background highlighters not working on JXTree.
      *
      */
-    public void interactiveTestRolloverHighlight() {
+    public void interactiveTestRolloverHighlightForeground() {
         JXTree tree = new JXTree(treeTableModel);
         tree.setRolloverEnabled(true);
-        tree.setHighlighters(createRolloverPipeline(true));
-        JFrame frame = wrapWithScrollingInFrame(tree, "Rollover  " );
-        frame.setVisible(true);  
-        
+        tree.setHighlighters(createRolloverHighlighter(true));
+        showWithScrollingInFrame(tree, "Rollover - foreground " );
     }
 
-    private HighlighterPipeline createRolloverPipeline(boolean useForeground) {
+    /**
+     * Issue ??: Background highlighters not working on JXTree.
+     *
+     * Works with SwingX renderer
+     */
+    public void interactiveTestRolloverHighlightBackground() {
+        JXTree tree = new JXTree(treeTableModel);
+        tree.setRolloverEnabled(true);
+        tree.setCellRenderer(new DefaultTreeRenderer());
+        tree.setHighlighters(createRolloverHighlighter(false));
+        showWithScrollingInFrame(tree, "Rollover - background " );
+    }
+    
+    private Highlighter createRolloverHighlighter(boolean useForeground) {
         Color color = new Color(0xF0, 0xF0, 0xE0); //Highlighter.ledgerBackground.getBackground();
         Highlighter highlighter = new RolloverHighlighter(
                 useForeground ? null : color, useForeground ? color.darker() : null);
-        return new HighlighterPipeline( new Highlighter[] {highlighter});
+        return highlighter;
     }
     
     /**
@@ -211,14 +236,10 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
     public void interactiveTestHighlighters() {
         JXTree tree = new JXTree(treeTableModel);
         String pattern = "o";
-        tree.setHighlighters(new HighlighterPipeline(new Highlighter[] {
-                new PatternHighlighter(null, Color.red, pattern, 0, 1),
-            }));
-//        tree.setHighlighters(new HighlighterPipeline(
-//                new Highlighter[] { AlternateRowHighlighter.classicLinePrinter, }));
-        JFrame frame = wrapWithScrollingInFrame(tree, "Highlighters: " + pattern);
-        frame.setVisible(true);  
-        
+        tree.setHighlighters(new PatternHighlighter(null, Color.red, pattern, 0, 1)
+//          );
+            , AlternateRowHighlighter.classicLinePrinter);
+        showWithScrollingInFrame(tree, "Highlighters: " + pattern);
     }
     
     
