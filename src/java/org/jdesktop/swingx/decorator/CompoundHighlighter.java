@@ -42,6 +42,8 @@ import org.jdesktop.swingx.decorator.LegacyHighlighter.UIHighlighter;
  */
 public class CompoundHighlighter extends AbstractHighlighter 
     implements UIHighlighter {
+    public static final Highlighter[] EMPTY_HIGHLIGHTERS = new Highlighter[0];
+
     protected List<Highlighter> highlighters;
     
     /** the listener for changes in contained Highlighters. */

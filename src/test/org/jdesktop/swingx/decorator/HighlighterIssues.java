@@ -227,7 +227,7 @@ public class HighlighterIssues extends HighlighterTest {
         JXTree tree = new JXTree();
         CompoundHighlighter pipeline = new CompoundHighlighter();
         pipeline.addHighlighter(AlternateRowHighlighter.genericGrey);
-        tree.setCompoundHighlighter(pipeline);
+        tree.setHighlighters(pipeline);
         tree.setBackground(ledger);
         showWithScrollingInFrame(tree, nohighlightTree, "colored tree with bg highlighter <--> without highlighter");
     }
@@ -242,7 +242,7 @@ public class HighlighterIssues extends HighlighterTest {
         JXTable table = new JXTable(10, 2);
         DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
         renderer.setForeground(foreground);
-        table.setCompoundHighlighter(new CompoundHighlighter(new LegacyHighlighter[]{ }));
+        table.setHighlighters(new LegacyHighlighter());
         Component comp = table.prepareRenderer(renderer, 0, 0);
         assertEquals("do nothing highlighter must not change foreground", foreground, comp.getForeground());
     }
@@ -321,11 +321,8 @@ public class HighlighterIssues extends HighlighterTest {
      */
     public void interactiveTreeWithDoNothingHighlighter() {
         JXTree tree = new JXTree();
-        CompoundHighlighter pipeline = new CompoundHighlighter();
-        pipeline.addHighlighter(emptyHighlighter);
-        tree.setCompoundHighlighter(pipeline);
+        tree.setHighlighters(emptyHighlighter);
         showWithScrollingInFrame(tree, new JXTree(), "empty highlighter <--> no highlighter");
-        
     }
     
 

@@ -470,11 +470,11 @@ public class JXTree extends JTree {
 
     /**
      * Returns the CompoundHighlighter assigned to the table, null if none.
-     * 
+     * PENDING: open up for subclasses after Highlighter overhaul
      * @return the CompoundHighlighter assigned to the table.
      * @see #setCompoundHighlighter(CompoundHighlighter)
      */
-    public CompoundHighlighter getCompoundHighlighter() {
+    private CompoundHighlighter getCompoundHighlighter() {
         return compoundHighlighter;
     }
 
@@ -490,7 +490,7 @@ public class JXTree extends JTree {
      * @see #removeHighlighter(Highlighter)
      * 
      */
-    public void setCompoundHighlighter(CompoundHighlighter pipeline) {
+    private void setCompoundHighlighter(CompoundHighlighter pipeline) {
         CompoundHighlighter old = getCompoundHighlighter();
         if (old != null) {
             old.removeChangeListener(getHighlighterChangeListener());
@@ -520,6 +520,16 @@ public class JXTree extends JTree {
            pipeline = new CompoundHighlighter(highlighters);
         }
         setCompoundHighlighter(pipeline);
+    }
+    /**
+     * Returns the <code>Highlighter</code>s used by this table.
+     * Maybe empty, but guarantees to be never null.
+     * @return the Highlighters used by this tree, guaranteed to never null.
+     */
+    public Highlighter[] getHighlighters() {
+        return getCompoundHighlighter() != null ? 
+                getCompoundHighlighter().getHighlighters() : 
+                    CompoundHighlighter.EMPTY_HIGHLIGHTERS;
     }
 
     /**

@@ -86,11 +86,10 @@ import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.DefaultSelectionMapper;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.LegacyHighlighter;
-import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.PipelineEvent;
 import org.jdesktop.swingx.decorator.PipelineListener;
@@ -3016,11 +3015,12 @@ public class JXTable extends JTable
 
     /**
      * Returns the CompoundHighlighter assigned to the table, null if none.
+     * PENDING: open up for subclasses again.
      * 
      * @return the CompoundHighlighter assigned to the table.
      * @see #setCompoundHighlighter(CompoundHighlighter)
      */
-    public CompoundHighlighter getCompoundHighlighter() {
+    private CompoundHighlighter getCompoundHighlighter() {
         return compoundHighlighter;
     }
 
@@ -3036,7 +3036,7 @@ public class JXTable extends JTable
      * @see #removeHighlighter(Highlighter)
      * 
      */
-    public void setCompoundHighlighter(CompoundHighlighter pipeline) {
+    private void setCompoundHighlighter(CompoundHighlighter pipeline) {
         CompoundHighlighter old = getCompoundHighlighter();
         if (old != null) {
             old.removeChangeListener(getHighlighterChangeListener());
@@ -3050,7 +3050,7 @@ public class JXTable extends JTable
     }
     
     /**
-     * Sets the <code>LegacyHighlighter</code>s to the table, replacing any old settings.
+     * Sets the <code>Highlighter</code>s to the table, replacing any old settings.
      * Maybe null to remove all highlighters.<p>
      * 
      * 
@@ -3069,6 +3069,16 @@ public class JXTable extends JTable
         setCompoundHighlighter(pipeline);
     }
 
+    /**
+     * Returns the <code>Highlighter</code>s used by this table.
+     * Maybe empty, but guarantees to be never null.
+     * @return the Highlighters used by this table, guaranteed to never null.
+     */
+    public Highlighter[] getHighlighters() {
+        return getCompoundHighlighter() != null ? 
+                getCompoundHighlighter().getHighlighters() : 
+                    CompoundHighlighter.EMPTY_HIGHLIGHTERS;
+    }
     /**
      * Adds a LegacyHighlighter.
      * <p>
@@ -3095,12 +3105,11 @@ public class JXTable extends JTable
     /**
      * Removes the LegacyHighlighter. <p>
      * 
-     * Does nothing if the CompoundHighlighter is null or does not contain
-     * the given LegacyHighlighter.
+     * Does nothing if the Highlighter is not contained.
      * 
      * @param highlighter the highlighter to remove.
      * @see #addHighlighter(Highlighter)
-     * @see #setCompoundHighlighter(CompoundHighlighter)
+     * @see #setHighlighters(Highlighter..)
      */
     public void removeHighlighter(Highlighter highlighter) {
         if ((getCompoundHighlighter() == null)) return;
@@ -3196,7 +3205,7 @@ public class JXTable extends JTable
         if (compoundHighlighter == null) {
             return stamp; // no need to decorate renderer with highlighters
         } else {
-            return compoundHighlighter.apply(stamp, getComponentAdapter(row, column));
+            return compoundHighlighter.highlight(stamp, getComponentAdapter(row, column));
         }
     }
 

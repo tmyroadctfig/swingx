@@ -87,7 +87,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     public static void main(String args[]) {
       JXTableVisualCheck test = new JXTableVisualCheck();
       try {
-        test.runInteractiveTests();
+//        test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
 //          test.runInteractiveTests("interactive.*Header.*");
 //          test.runInteractiveTests("interactive.*ColumnProp.*");
@@ -96,7 +96,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*Boolean.*");
 //          test.runInteractiveTests("interactive.*isable.*");
           
-//          test.runInteractiveTests("interactive.*Compare.*");
+          test.runInteractiveTests("interactive.*High.*");
 //        test.runInteractiveTests("interactive.*Rollover.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
@@ -1321,10 +1321,9 @@ public class JXTableVisualCheck extends JXTableUnitTest {
                                             new ShuttleSorter(0, true) // column 0, ascending
         }));
 
-        table.setCompoundHighlighter(new CompoundHighlighter(new LegacyHighlighter[] {
+        table.setHighlighters(
             AlternateRowHighlighter.linePrinter,
-            new RolloverHighlighter(Color.YELLOW, null),
-        }));
+            new RolloverHighlighter(Color.YELLOW, null));
 
         JFrame frame = wrapWithScrollingInFrame(table, "LinePrinter plus yellow rollover");
         frame.setVisible(true);

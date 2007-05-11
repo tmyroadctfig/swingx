@@ -179,8 +179,7 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
         HyperlinkProvider provider =  new HyperlinkProvider(simpleAction);
         tree.setCellRenderer(new DefaultTreeRenderer(provider));
 //        tree.setCellRenderer(new LinkRenderer(simpleAction));
-        tree.setCompoundHighlighter(new CompoundHighlighter(new LegacyHighlighter[] { 
-                new UIAlternateRowHighlighter()}));
+        tree.setHighlighters(new UIAlternateRowHighlighter());
         JFrame frame = wrapWithScrollingInFrame(tree, "tree and simple links");
         frame.setVisible(true);
         
@@ -238,8 +237,7 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
         LinkModelAction action = new LinkModelAction(visitor);
         table.setDefaultRenderer(LinkModel.class, new DefaultTableRenderer
                 (new HyperlinkProvider(action, LinkModel.class)));
-        table.setCompoundHighlighter(new CompoundHighlighter(new LegacyHighlighter[] { 
-                new UIAlternateRowHighlighter()}));
+        table.setHighlighters(new UIAlternateRowHighlighter());
         JFrame frame = wrapWithScrollingInFrame(table, visitor.getOutputComponent(), 
                 "show link renderer in table with LF striping highlighter");
         frame.setVisible(true);
@@ -337,7 +335,7 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
     }
     
     /**
-     * Visuals of Hyperlink/LegacyHighlighter interaction.
+     * Visuals of Hyperlink/Highlighter interaction.
      *
      */
     public void interactiveListHyperlinkLFStripingHighlighter() {
@@ -347,8 +345,7 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
         list.setCellRenderer(new DefaultListRenderer(
                 new HyperlinkProvider(action, LinkModel.class)));
         list.setRolloverEnabled(true);
-        list.setCompoundHighlighter(new CompoundHighlighter(new LegacyHighlighter[] {
-                new UIAlternateRowHighlighter()}));
+        list.setHighlighters(new UIAlternateRowHighlighter());
         JFrame frame = wrapWithScrollingInFrame(list, visitor.getOutputComponent(), 
                 "show link renderer in list with LFStriping highlighter");
         frame.setVisible(true);

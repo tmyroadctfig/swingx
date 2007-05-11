@@ -589,9 +589,9 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         treeTable.setRowHeight(22);
         treeTable.setShowGrid(true, false);
-        treeTable.setCompoundHighlighter(new CompoundHighlighter(new LegacyHighlighter[] {
+        treeTable.setHighlighters(
                 AlternateRowHighlighter.linePrinter,
-                new HierarchicalColumnHighlighter(), }));
+                new HierarchicalColumnHighlighter());
         final JXTree tree = new JXTree(treeTableModel);
         JXTree renderer = (JXTree) treeTable.getCellRenderer(0, 0);
         tree.setRowHeight(renderer.getRowHeight());
@@ -830,9 +830,9 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     public void interactiveTestHighlightAndRowHeight() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         treeTable.setRowHeight(22);
-        treeTable.setCompoundHighlighter(new CompoundHighlighter(new LegacyHighlighter[] {
+        treeTable.setHighlighters(
                 AlternateRowHighlighter.linePrinter,
-                new HierarchicalColumnHighlighter(), }));
+                new HierarchicalColumnHighlighter());
         JFrame frame = wrapWithScrollingInFrame(treeTable,
                 "LinePrinter-, ColumnHighlighter and RowHeight");
         frame.setVisible(true);
@@ -947,15 +947,10 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
  //       treeTable.setRowHeight(0, 96);
         treeTable.setShowGrid(true);
         // set a bunch of highlighters as a pipeline
-        treeTable.setCompoundHighlighter(new CompoundHighlighter(
-                new LegacyHighlighter[] {
+        treeTable.setHighlighters(
                         new LegacyHighlighter(Color.orange, null),
                         new HierarchicalColumnHighlighter(),
-                        new PatternHighlighter(null, Color.red,
-                                "D", 0, 0, 0), 
-                        
-        
-                }));
+                        new PatternHighlighter(null, Color.red,"D", 0, 0, 0));
         LegacyHighlighter conditional = new ConditionalHighlighter(Color.BLUE, Color.WHITE, 0, 0) {
 
             protected boolean test(ComponentAdapter adapter) {

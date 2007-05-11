@@ -325,6 +325,7 @@ public class HighlighterTest extends InteractiveTestCase {
     /**
      * This is a test to ensure that the example in the javadoc actually works.
      * if the javadoc example changes, then those changes should be pasted here.
+     * PENDING: change javadoc and change this!
      */
     public void testJavaDocExample() {
         LegacyHighlighter[]   highlighters = new LegacyHighlighter[] {
@@ -334,7 +335,7 @@ public class HighlighterTest extends InteractiveTestCase {
 
         CompoundHighlighter highlighterPipeline = new CompoundHighlighter(highlighters);
         JXTable table = new JXTable();
-        table.setCompoundHighlighter(highlighterPipeline);
+        table.setHighlighters(highlighterPipeline);
     }
 
     /*

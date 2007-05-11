@@ -516,8 +516,8 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         tree.getColumn(2).setCellRenderer(new DefaultTableRenderer(provider));
         tree.setTreeCellRenderer(new DefaultTreeRenderer(provider));
 //        tree.setCellRenderer(new LinkRenderer(simpleAction));
-        tree.setCompoundHighlighter(new CompoundHighlighter(new LegacyHighlighter[] { 
-                new UIAlternateRowHighlighter()}));
+        tree.setHighlighters(
+                new UIAlternateRowHighlighter());
         JFrame frame = wrapWithScrollingInFrame(tree, "table and simple links");
         frame.setVisible(true);
     }
@@ -642,8 +642,8 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         provider.setHorizontalAlignment(JLabel.LEADING);
         tree.setTreeCellRenderer(new DefaultTreeRenderer(provider));
         tree.expandAll();
-        tree.setCompoundHighlighter(new CompoundHighlighter(new LegacyHighlighter[] { 
-                new UIAlternateRowHighlighter()}));
+        tree.setHighlighters(
+                new UIAlternateRowHighlighter());
         JFrame frame = wrapWithScrollingInFrame(tree, "treeTable and getValueAt renderer");
         frame.setVisible(true);
     }

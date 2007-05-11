@@ -49,11 +49,10 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
 import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.DefaultSelectionMapper;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.CompoundHighlighter;
-import org.jdesktop.swingx.decorator.LegacyHighlighter;
 import org.jdesktop.swingx.decorator.PipelineEvent;
 import org.jdesktop.swingx.decorator.PipelineListener;
 import org.jdesktop.swingx.decorator.SelectionMapper;
@@ -1073,10 +1072,11 @@ public class JXList extends JList {
     // ------------------------------ renderers
 
     /**
+     * PENDING: open up for subclasses again
      * @return the CompoundHighlighter assigned to the list.
      * @see #setCompoundHighlighter(CompoundHighlighter)
      */
-    public CompoundHighlighter getCompoundHighlighter() {
+    private CompoundHighlighter getCompoundHighlighter() {
         return compoundHighlighter;
     }
 
@@ -1086,7 +1086,7 @@ public class JXList extends JList {
      * @param pipeline the CompoundHighlighter to use for renderer
      *   decoration, maybe null to remove all Highlighters.
      */
-    public void setCompoundHighlighter(CompoundHighlighter pipeline) {
+    private void setCompoundHighlighter(CompoundHighlighter pipeline) {
         CompoundHighlighter old = getCompoundHighlighter();
         if (old != null) {
             old.removeChangeListener(getHighlighterChangeListener());
@@ -1118,6 +1118,17 @@ public class JXList extends JList {
         setCompoundHighlighter(pipeline);
     }
 
+    /**
+     * Returns the <code>Highlighter</code>s used by this table.
+     * Maybe empty, but guarantees to be never null.
+     * @return the Highlighters used by this list, guaranteed to never null.
+     */
+    public Highlighter[] getHighlighters() {
+        return getCompoundHighlighter() != null ? 
+                getCompoundHighlighter().getHighlighters() : 
+                    CompoundHighlighter.EMPTY_HIGHLIGHTERS;
+    }
+    
     /**
      * Adds a Highlighter.
      * 
