@@ -39,7 +39,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
-import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.LegacyHighlighter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.RolloverHighlighter;
 import org.jdesktop.swingx.decorator.SearchHighlighter;
@@ -222,9 +222,9 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
         showWithScrollingInFrame(tree, "Rollover - background " );
     }
     
-    private Highlighter createRolloverHighlighter(boolean useForeground) {
-        Color color = new Color(0xF0, 0xF0, 0xE0); //Highlighter.ledgerBackground.getBackground();
-        Highlighter highlighter = new RolloverHighlighter(
+    private LegacyHighlighter createRolloverHighlighter(boolean useForeground) {
+        Color color = new Color(0xF0, 0xF0, 0xE0); //LegacyHighlighter.ledgerBackground.getBackground();
+        LegacyHighlighter highlighter = new RolloverHighlighter(
                 useForeground ? null : color, useForeground ? color.darker() : null);
         return highlighter;
     }

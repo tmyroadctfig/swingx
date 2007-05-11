@@ -52,7 +52,8 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.DefaultSelectionMapper;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.HighlighterPipeline;
+import org.jdesktop.swingx.decorator.CompoundHighlighter;
+import org.jdesktop.swingx.decorator.LegacyHighlighter;
 import org.jdesktop.swingx.decorator.PipelineEvent;
 import org.jdesktop.swingx.decorator.PipelineListener;
 import org.jdesktop.swingx.decorator.SelectionMapper;
@@ -64,7 +65,7 @@ import org.jdesktop.swingx.renderer.DefaultListRenderer;
 /**
  * JXList
  * 
- * Enabled Rollover/LinkModel handling. Enabled Highlighter support.
+ * Enabled Rollover/LinkModel handling. Enabled LegacyHighlighter support.
  * 
  * Added experimental support for filtering/sorting. This feature is disabled by
  * default because it has side-effects which might break "normal" expectations
@@ -88,9 +89,9 @@ public class JXList extends JList {
     /**
      * The pipeline holding the highlighters.
      */
-    protected HighlighterPipeline highlighters;
+    protected CompoundHighlighter compoundHighlighter;
 
-    /** listening to changeEvents from highlighterPipeline. */
+    /** listening to changeEvents from compoundHighlighter. */
     private ChangeListener highlighterChangeListener;
 
     /** The ComponentAdapter for model data access. */
@@ -1072,81 +1073,81 @@ public class JXList extends JList {
     // ------------------------------ renderers
 
     /**
-     * @return the HighlighterPipeline assigned to the list.
-     * @see #setHighlighters(HighlighterPipeline)
+     * @return the CompoundHighlighter assigned to the list.
+     * @see #setCompoundHighlighter(CompoundHighlighter)
      */
-    public HighlighterPipeline getHighlighters() {
-        return highlighters;
+    public CompoundHighlighter getCompoundHighlighter() {
+        return compoundHighlighter;
     }
 
     /**
-     * Assigns a HighlighterPipeline to the list. This is a bound property.
+     * Assigns a CompoundHighlighter to the list. This is a bound property.
      * 
-     * @param pipeline the HighlighterPipeline to use for renderer
+     * @param pipeline the CompoundHighlighter to use for renderer
      *   decoration, maybe null to remove all Highlighters.
      */
-    public void setHighlighters(HighlighterPipeline pipeline) {
-        HighlighterPipeline old = getHighlighters();
+    public void setCompoundHighlighter(CompoundHighlighter pipeline) {
+        CompoundHighlighter old = getCompoundHighlighter();
         if (old != null) {
             old.removeChangeListener(getHighlighterChangeListener());
         }
-        highlighters = pipeline;
-        if (highlighters != null) {
-            highlighters.addChangeListener(getHighlighterChangeListener());
+        compoundHighlighter = pipeline;
+        if (compoundHighlighter != null) {
+            compoundHighlighter.addChangeListener(getHighlighterChangeListener());
         }
-        firePropertyChange("highlighters", old, getHighlighters());
+        firePropertyChange("highlighters", old, getCompoundHighlighter());
     }
 
     /**
-     * Sets the <code>Highlighter</code>s to the list, replacing any old settings.
+     * Sets the <code>LegacyHighlighter</code>s to the list, replacing any old settings.
      * May be null to remove all highlighters.<p>
      * 
      * 
      * @param highlighters the highlighters to use for renderer decoration. 
-     * @see #getHighlighters()
+     * @see #getCompoundHighlighter()
      * @see #addHighlighter(Highlighter)
      * @see #removeHighlighter(Highlighter)
      * 
      */
     public void setHighlighters(Highlighter... highlighters) {
-        HighlighterPipeline pipeline = null;
+        CompoundHighlighter pipeline = null;
         if ((highlighters != null) && (highlighters.length > 0) && 
             (highlighters[0] != null)) {    
-           pipeline = new HighlighterPipeline(highlighters);
+           pipeline = new CompoundHighlighter(highlighters);
         }
-        setHighlighters(pipeline);
+        setCompoundHighlighter(pipeline);
     }
 
     /**
      * Adds a Highlighter.
      * 
-     * If the HighlighterPipeline returned from getHighlighters() is null, creates
-     * and sets a new pipeline containing the given Highlighter. Else, appends
-     * the Highlighter to the end of the pipeline.
+     * If the CompoundHighlighter returned from getHighlighters() is null, creates
+     * and sets a new pipeline containing the given LegacyHighlighter. Else, appends
+     * the LegacyHighlighter to the end of the pipeline.
      * 
-     * @param highlighter the Highlighter to add - must not be null.
+     * @param highlighter the LegacyHighlighter to add - must not be null.
      * @throws NullPointerException if highlighter is null.
      */
     public void addHighlighter(Highlighter highlighter) {
-        HighlighterPipeline pipeline = getHighlighters();
+        CompoundHighlighter pipeline = getCompoundHighlighter();
         if (pipeline == null) {
-           setHighlighters(new HighlighterPipeline(new Highlighter[] {highlighter})); 
+           setCompoundHighlighter(new CompoundHighlighter(highlighter)); 
         } else {
             pipeline.addHighlighter(highlighter);
         }
     }
 
     /**
-     * Removes the Highlighter.
+     * Removes the LegacyHighlighter.
      * 
-     * Does nothing if the HighlighterPipeline is null or does not contain
-     * the given Highlighter.
+     * Does nothing if the CompoundHighlighter is null or does not contain
+     * the given LegacyHighlighter.
      * 
-     * @param highlighter the Highlighter to remove.
+     * @param highlighter the LegacyHighlighter to remove.
      */
     public void removeHighlighter(Highlighter highlighter) {
-        if ((getHighlighters() == null)) return;
-        getHighlighters().removeHighlighter(highlighter);
+        if ((getCompoundHighlighter() == null)) return;
+        getCompoundHighlighter().removeHighlighter(highlighter);
     }
     
 
@@ -1235,8 +1236,8 @@ public class JXList extends JList {
                 int index, boolean isSelected, boolean cellHasFocus) {
             Component comp = delegateRenderer.getListCellRendererComponent(list, value, index,
                     isSelected, cellHasFocus);
-            if ((highlighters != null) && (index >= 0) && (index < getElementCount())) {
-                comp = highlighters.apply(comp, getComponentAdapter(index));
+            if ((compoundHighlighter != null) && (index >= 0) && (index < getElementCount())) {
+                comp = compoundHighlighter.apply(comp, getComponentAdapter(index));
             }
             return comp;
         }

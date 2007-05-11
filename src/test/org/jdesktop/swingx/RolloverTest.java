@@ -15,7 +15,7 @@ import javax.swing.JTree;
 import javax.swing.ListModel;
 import javax.swing.table.TableModel;
 
-import org.jdesktop.swingx.decorator.HighlighterPipeline;
+import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.RolloverHighlighter;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
@@ -53,18 +53,18 @@ public class RolloverTest extends InteractiveTestCase {
     public void interactiveTableRollover() {
         final JXTable table = new JXTable(sortableTableModel);
         table.setRolloverEnabled(true);
-        table.setHighlighters(new HighlighterPipeline());
-        table.getHighlighters().addHighlighter(foregroundHighlighter);
+        table.setCompoundHighlighter(new CompoundHighlighter());
+        table.getCompoundHighlighter().addHighlighter(foregroundHighlighter);
         JXFrame frame = wrapWithScrollingInFrame(table, "Table with rollover");
         Action toggleAction = new AbstractAction("toggle foreground/background") {
             boolean isBackground;
             public void actionPerformed(ActionEvent e) {
                 if (isBackground) {
-                    table.getHighlighters().addHighlighter(foregroundHighlighter);
-                    table.getHighlighters().removeHighlighter(backgroundHighlighter);
+                    table.getCompoundHighlighter().addHighlighter(foregroundHighlighter);
+                    table.getCompoundHighlighter().removeHighlighter(backgroundHighlighter);
                 } else {
-                    table.getHighlighters().addHighlighter(backgroundHighlighter);
-                    table.getHighlighters().removeHighlighter(foregroundHighlighter);
+                    table.getCompoundHighlighter().addHighlighter(backgroundHighlighter);
+                    table.getCompoundHighlighter().removeHighlighter(foregroundHighlighter);
                     
                 }
                 isBackground = !isBackground;
@@ -80,18 +80,18 @@ public class RolloverTest extends InteractiveTestCase {
     public void interactiveListRollover() {
         final JXList table = new JXList(listModel);
         table.setRolloverEnabled(true);
-        table.setHighlighters(new HighlighterPipeline());
-        table.getHighlighters().addHighlighter(foregroundHighlighter);
+        table.setCompoundHighlighter(new CompoundHighlighter());
+        table.getCompoundHighlighter().addHighlighter(foregroundHighlighter);
         JXFrame frame = wrapWithScrollingInFrame(table, "JXList with rollover");
         Action toggleAction = new AbstractAction("toggle foreground/background") {
             boolean isBackground;
             public void actionPerformed(ActionEvent e) {
                 if (isBackground) {
-                    table.getHighlighters().addHighlighter(foregroundHighlighter);
-                    table.getHighlighters().removeHighlighter(backgroundHighlighter);
+                    table.getCompoundHighlighter().addHighlighter(foregroundHighlighter);
+                    table.getCompoundHighlighter().removeHighlighter(backgroundHighlighter);
                 } else {
-                    table.getHighlighters().addHighlighter(backgroundHighlighter);
-                    table.getHighlighters().removeHighlighter(foregroundHighlighter);
+                    table.getCompoundHighlighter().addHighlighter(backgroundHighlighter);
+                    table.getCompoundHighlighter().removeHighlighter(foregroundHighlighter);
                     
                 }
                 isBackground = !isBackground;
@@ -107,8 +107,8 @@ public class RolloverTest extends InteractiveTestCase {
         final JXTree table = new JXTree(treeTableModel);
         table.setRolloverEnabled(true);
         table.setComponentPopupMenu(createPopup());
-        table.setHighlighters(new HighlighterPipeline());
-        table.getHighlighters().addHighlighter(foregroundHighlighter);
+        table.setCompoundHighlighter(new CompoundHighlighter());
+        table.getCompoundHighlighter().addHighlighter(foregroundHighlighter);
         JTree tree = new JTree(treeTableModel);
         tree.setComponentPopupMenu(createPopup());
         JXFrame frame = wrapWithScrollingInFrame(table, tree, "JXTree (at left) with rollover");
@@ -116,11 +116,11 @@ public class RolloverTest extends InteractiveTestCase {
             boolean isBackground;
             public void actionPerformed(ActionEvent e) {
                 if (isBackground) {
-                    table.getHighlighters().addHighlighter(foregroundHighlighter);
-                    table.getHighlighters().removeHighlighter(backgroundHighlighter);
+                    table.getCompoundHighlighter().addHighlighter(foregroundHighlighter);
+                    table.getCompoundHighlighter().removeHighlighter(backgroundHighlighter);
                 } else {
-                    table.getHighlighters().addHighlighter(backgroundHighlighter);
-                    table.getHighlighters().removeHighlighter(foregroundHighlighter);
+                    table.getCompoundHighlighter().addHighlighter(backgroundHighlighter);
+                    table.getCompoundHighlighter().removeHighlighter(foregroundHighlighter);
                     
                 }
                 isBackground = !isBackground;
@@ -142,18 +142,18 @@ public class RolloverTest extends InteractiveTestCase {
     public void interactiveTreeTableRollover() {
         final JXTreeTable table = new JXTreeTable(treeTableModel);
         table.setRolloverEnabled(true);
-        table.setHighlighters(new HighlighterPipeline());
-        table.getHighlighters().addHighlighter(foregroundHighlighter);
+        table.setCompoundHighlighter(new CompoundHighlighter());
+        table.getCompoundHighlighter().addHighlighter(foregroundHighlighter);
         JXFrame frame = wrapWithScrollingInFrame(table, "Table with rollover");
         Action toggleAction = new AbstractAction("toggle foreground/background") {
             boolean isBackground;
             public void actionPerformed(ActionEvent e) {
                 if (isBackground) {
-                    table.getHighlighters().addHighlighter(foregroundHighlighter);
-                    table.getHighlighters().removeHighlighter(backgroundHighlighter);
+                    table.getCompoundHighlighter().addHighlighter(foregroundHighlighter);
+                    table.getCompoundHighlighter().removeHighlighter(backgroundHighlighter);
                 } else {
-                    table.getHighlighters().addHighlighter(backgroundHighlighter);
-                    table.getHighlighters().removeHighlighter(foregroundHighlighter);
+                    table.getCompoundHighlighter().addHighlighter(backgroundHighlighter);
+                    table.getCompoundHighlighter().removeHighlighter(foregroundHighlighter);
                     
                 }
                 isBackground = !isBackground;

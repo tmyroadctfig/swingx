@@ -30,7 +30,8 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.HighlighterPipeline;
+import org.jdesktop.swingx.decorator.CompoundHighlighter;
+import org.jdesktop.swingx.decorator.LegacyHighlighter;
 import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.SearchHighlighter;
 import org.jdesktop.swingx.decorator.SelectionMapper;
@@ -218,8 +219,8 @@ public class JXListTest extends InteractiveTestCase {
      */
     public void testSetHighlightersNull() {
         JXList list = new JXList();
-        list.setHighlighters((Highlighter) null);
-        assertNull(list.getHighlighters());
+        list.setHighlighters((LegacyHighlighter) null);
+        assertNull(list.getCompoundHighlighter());
     }
     
     /**
@@ -229,7 +230,7 @@ public class JXListTest extends InteractiveTestCase {
     public void testSetHighlightersNoHighlighter() {
         JXList list = new JXList();
         list.setHighlighters();
-        assertNull(list.getHighlighters());
+        assertNull(list.getCompoundHighlighter());
     }
 
     /**
@@ -239,11 +240,11 @@ public class JXListTest extends InteractiveTestCase {
      */
     public void testSetHighlightersReset() {
         JXList list = new JXList();
-        list.addHighlighter(new Highlighter());
+        list.addHighlighter(new LegacyHighlighter());
         // sanity
-        assertEquals(1, list.getHighlighters().getHighlighters().length);
+        assertEquals(1, list.getCompoundHighlighter().getHighlighters().length);
         list.setHighlighters();
-        assertNull(list.getHighlighters());
+        assertNull(list.getCompoundHighlighter());
     }
 
     /**
@@ -254,12 +255,12 @@ public class JXListTest extends InteractiveTestCase {
         JXList list = new JXList();
         // test cope with null
         list.removeHighlighter(null);
-        Highlighter presetHighlighter = AlternateRowHighlighter.classicLinePrinter;
-        HighlighterPipeline pipeline = new HighlighterPipeline(new Highlighter[] {presetHighlighter});
-        list.setHighlighters(pipeline);
+        LegacyHighlighter presetHighlighter = AlternateRowHighlighter.classicLinePrinter;
+        CompoundHighlighter pipeline = new CompoundHighlighter(new LegacyHighlighter[] {presetHighlighter});
+        list.setCompoundHighlighter(pipeline);
         ChangeReport report = new ChangeReport();
         pipeline.addChangeListener(report);
-        list.removeHighlighter(new Highlighter());
+        list.removeHighlighter(new LegacyHighlighter());
         // sanity: highlighter was not contained
         assertFalse("pipeline must not have fired", report.hasEvents());
         // remove the presetHighlighter
@@ -287,19 +288,19 @@ public class JXListTest extends InteractiveTestCase {
     
     public void testAddHighlighterWithNotEmptyPipeline() {
         JXList list = new JXList();
-        Highlighter presetHighlighter = AlternateRowHighlighter.classicLinePrinter;
-        HighlighterPipeline pipeline = new HighlighterPipeline(new Highlighter[] {presetHighlighter});
-        list.setHighlighters(pipeline);
-        Highlighter highlighter = new Highlighter();
+        LegacyHighlighter presetHighlighter = AlternateRowHighlighter.classicLinePrinter;
+        CompoundHighlighter pipeline = new CompoundHighlighter(new LegacyHighlighter[] {presetHighlighter});
+        list.setCompoundHighlighter(pipeline);
+        LegacyHighlighter highlighter = new LegacyHighlighter();
         ChangeReport report = new ChangeReport();
         pipeline.addChangeListener(report);
         list.addHighlighter(highlighter);
-        assertSame("pipeline must be same as preset", pipeline, list.getHighlighters());
+        assertSame("pipeline must be same as preset", pipeline, list.getCompoundHighlighter());
         assertEquals("pipeline must have fired changeEvent", 1, report.getEventCount());
         assertPipelineHasAsLast(pipeline, highlighter);
     }
     
-    private void assertPipelineHasAsLast(HighlighterPipeline pipeline, Highlighter highlighter) {
+    private void assertPipelineHasAsLast(CompoundHighlighter pipeline, Highlighter highlighter) {
         Highlighter[] highlighters = pipeline.getHighlighters();
         assertTrue("pipeline must not be empty", highlighters.length > 0);
         assertSame("highlighter must be added as last", highlighter, highlighters[highlighters.length - 1]);
@@ -315,11 +316,11 @@ public class JXListTest extends InteractiveTestCase {
         JXList list = new JXList();
         PropertyChangeReport report = new PropertyChangeReport();
         list.addPropertyChangeListener(report);
-        Highlighter highlighter = new Highlighter();
+        LegacyHighlighter highlighter = new LegacyHighlighter();
         list.addHighlighter(highlighter);
-        assertNotNull("table must have created pipeline", list.getHighlighters());
+        assertNotNull("table must have created pipeline", list.getCompoundHighlighter());
         assertTrue("table must have fired propertyChange for highlighters", report.hasEvents("highlighters"));
-        assertPipelineContainsHighlighter(list.getHighlighters(), highlighter);
+        assertPipelineContainsHighlighter(list.getCompoundHighlighter(), highlighter);
     }
     
     /**
@@ -329,7 +330,7 @@ public class JXListTest extends InteractiveTestCase {
      * @param pipeline
      * @param highlighter
      */
-    private void assertPipelineContainsHighlighter(HighlighterPipeline pipeline, Highlighter highlighter) {
+    private void assertPipelineContainsHighlighter(CompoundHighlighter pipeline, Highlighter highlighter) {
         Highlighter[] highlighters = pipeline.getHighlighters();
         for (int i = 0; i < highlighters.length; i++) {
             if (highlighter.equals(highlighters[i])) return;

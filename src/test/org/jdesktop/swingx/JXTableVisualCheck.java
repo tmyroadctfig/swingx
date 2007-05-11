@@ -56,8 +56,8 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.ConditionalHighlighter;
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
-import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.HighlighterPipeline;
+import org.jdesktop.swingx.decorator.LegacyHighlighter;
+import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.RolloverHighlighter;
@@ -87,7 +87,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     public static void main(String args[]) {
       JXTableVisualCheck test = new JXTableVisualCheck();
       try {
-//        test.runInteractiveTests();
+        test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*ColumnControl.*");
 //          test.runInteractiveTests("interactive.*Header.*");
 //          test.runInteractiveTests("interactive.*ColumnProp.*");
@@ -97,7 +97,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*isable.*");
           
 //          test.runInteractiveTests("interactive.*Compare.*");
-        test.runInteractiveTests("interactive.*Rollover.*");
+//        test.runInteractiveTests("interactive.*Rollover.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -1321,7 +1321,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
                                             new ShuttleSorter(0, true) // column 0, ascending
         }));
 
-        table.setHighlighters(new HighlighterPipeline(new Highlighter[] {
+        table.setCompoundHighlighter(new CompoundHighlighter(new LegacyHighlighter[] {
             AlternateRowHighlighter.linePrinter,
             new RolloverHighlighter(Color.YELLOW, null),
         }));
@@ -1384,7 +1384,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             }
         };
         JXTable xtable = new JXTable(model);
-        xtable.setBackground(Highlighter.notePadBackground.getBackground()); // ledger
+        xtable.setBackground(LegacyHighlighter.notePadBackground.getBackground()); // ledger
         JTable table = new JTable(model);
         table.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
         JFrame frame = wrapWithScrollingInFrame(xtable, table, "Unselected focused background: JXTable/JTable");
@@ -1394,7 +1394,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 
     public void interactiveTestTableSorter3() {
         JXTable table = new JXTable(sortableTableModel);
-        table.addHighlighter(new Highlighter(Color.orange, null));
+        table.addHighlighter(new LegacyHighlighter(Color.orange, null));
         table.setFilters(new FilterPipeline(new Filter[] {
                                             new ShuttleSorter(1, true), // column 1, ascending
                                             new ShuttleSorter(0, false), // column 0, descending
@@ -1477,7 +1477,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
                                             new ShuttleSorter(3, false), // column 3, descending
         }));
         table.addHighlighter(new PatternHighlighter(null, Color.red, "^S", 0, 1));
-        JFrame frame = wrapWithScrollingInFrame(table, "PatternFilter/Highlighter ^S col1");
+        JFrame frame = wrapWithScrollingInFrame(table, "PatternFilter/LegacyHighlighter ^S col1");
         frame.setVisible(true);
     }
 

@@ -30,7 +30,7 @@ import java.awt.Component;
  * 
  * @author Ramesh Gupta
  */
-public abstract class ConditionalHighlighter extends Highlighter {
+public abstract class ConditionalHighlighter extends LegacyHighlighter {
     protected int               testColumn = 0;         // always in model coordinates
     protected int               highlightColumn = -1;   // always in model coordinates
 

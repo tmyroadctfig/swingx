@@ -110,7 +110,7 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
     }
     
     /**
-     * Issue #258-swingx: Background Highlighter must not change custom
+     * Issue #258-swingx: Background LegacyHighlighter must not change custom
      * foreground.
      * <p>
      * 

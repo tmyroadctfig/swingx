@@ -24,7 +24,7 @@ package org.jdesktop.swingx;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.HighlighterPipeline;
+import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
 
 import javax.swing.*;
@@ -67,7 +67,7 @@ public class JXTree extends JTree {
     private static final TreePath[] EMPTY_TREEPATH_ARRAY = new TreePath[0];
 
     protected FilterPipeline filters;
-    protected HighlighterPipeline highlighters;
+    protected CompoundHighlighter compoundHighlighter;
     private ChangeListener highlighterChangeListener;
 
     private DelegatingRenderer delegatingRenderer;
@@ -469,95 +469,95 @@ public class JXTree extends JTree {
     }
 
     /**
-     * Returns the HighlighterPipeline assigned to the table, null if none.
+     * Returns the CompoundHighlighter assigned to the table, null if none.
      * 
-     * @return the HighlighterPipeline assigned to the table.
-     * @see #setHighlighters(HighlighterPipeline)
+     * @return the CompoundHighlighter assigned to the table.
+     * @see #setCompoundHighlighter(CompoundHighlighter)
      */
-    public HighlighterPipeline getHighlighters() {
-        return highlighters;
+    public CompoundHighlighter getCompoundHighlighter() {
+        return compoundHighlighter;
     }
 
     /**
-     * Assigns a HighlighterPipeline to the table, maybe null to remove all
+     * Assigns a CompoundHighlighter to the table, maybe null to remove all
      * Highlighters.<p>
      * 
      * The default value is <code>null</code>.
      * 
-     * @param pipeline the HighlighterPipeline to use for renderer decoration. 
-     * @see #getHighlighters()
+     * @param pipeline the CompoundHighlighter to use for renderer decoration. 
+     * @see #getCompoundHighlighter()
      * @see #addHighlighter(Highlighter)
      * @see #removeHighlighter(Highlighter)
      * 
      */
-    public void setHighlighters(HighlighterPipeline pipeline) {
-        HighlighterPipeline old = getHighlighters();
+    public void setCompoundHighlighter(CompoundHighlighter pipeline) {
+        CompoundHighlighter old = getCompoundHighlighter();
         if (old != null) {
             old.removeChangeListener(getHighlighterChangeListener());
         }
-        highlighters = pipeline;
-        if (highlighters != null) {
-            highlighters.addChangeListener(getHighlighterChangeListener());
+        compoundHighlighter = pipeline;
+        if (compoundHighlighter != null) {
+            compoundHighlighter.addChangeListener(getHighlighterChangeListener());
         }
-        firePropertyChange("highlighters", old, getHighlighters());
+        firePropertyChange("highlighters", old, getCompoundHighlighter());
     }
 
     /**
-     * Sets the <code>Highlighter</code>s to the tree, replacing any old settings.
+     * Sets the <code>LegacyHighlighter</code>s to the tree, replacing any old settings.
      * Maybe null to remove all highlighters.<p>
      * 
      * 
      * @param highlighters the highlighters to use for renderer decoration. 
-     * @see #getHighlighters()
+     * @see #getCompoundHighlighter()
      * @see #addHighlighter(Highlighter)
      * @see #removeHighlighter(Highlighter)
      * 
      */
     public void setHighlighters(Highlighter... highlighters) {
-        HighlighterPipeline pipeline = null;
+        CompoundHighlighter pipeline = null;
         if ((highlighters != null) && (highlighters.length > 0) && 
             (highlighters[0] != null)) {    
-           pipeline = new HighlighterPipeline(highlighters);
+           pipeline = new CompoundHighlighter(highlighters);
         }
-        setHighlighters(pipeline);
+        setCompoundHighlighter(pipeline);
     }
 
     /**
-     * Adds a Highlighter.
+     * Adds a LegacyHighlighter.
      * <p>
      * 
-     * If the <code>HighlighterPipeline</code> returned from getHighlighters()
+     * If the <code>CompoundHighlighter</code> returned from getHighlighters()
      * is null, creates and sets a new pipeline containing the given
-     * <code>Highlighter</code>. Else, appends the <code>Highlighter</code>
+     * <code>LegacyHighlighter</code>. Else, appends the <code>LegacyHighlighter</code>
      * to the end of the pipeline.
      * 
-     * @param highlighter the <code>Highlighter</code> to add.
-     * @throws NullPointerException if <code>Highlighter</code> is null.
+     * @param highlighter the <code>LegacyHighlighter</code> to add.
+     * @throws NullPointerException if <code>LegacyHighlighter</code> is null.
      * @see #removeHighlighter(Highlighter)
-     * @see #setHighlighters(HighlighterPipeline)
+     * @see #setCompoundHighlighter(CompoundHighlighter)
      */
     public void addHighlighter(Highlighter highlighter) {
-        HighlighterPipeline pipeline = getHighlighters();
+        CompoundHighlighter pipeline = getCompoundHighlighter();
         if (pipeline == null) {
-           setHighlighters(new HighlighterPipeline(new Highlighter[] {highlighter})); 
+           setCompoundHighlighter(new CompoundHighlighter(new Highlighter[] {highlighter})); 
         } else {
             pipeline.addHighlighter(highlighter);
         }
     }
 
     /**
-     * Removes the Highlighter. <p>
+     * Removes the LegacyHighlighter. <p>
      * 
-     * Does nothing if the HighlighterPipeline is null or does not contain
-     * the given Highlighter.
+     * Does nothing if the CompoundHighlighter is null or does not contain
+     * the given LegacyHighlighter.
      * 
      * @param highlighter the highlighter to remove.
      * @see #addHighlighter(Highlighter)
-     * @see #setHighlighters(HighlighterPipeline)
+     * @see #setCompoundHighlighter(CompoundHighlighter)
      */
     public void removeHighlighter(Highlighter highlighter) {
-        if ((getHighlighters() == null)) return;
-        getHighlighters().removeHighlighter(highlighter);
+        if ((getCompoundHighlighter() == null)) return;
+        getCompoundHighlighter().removeHighlighter(highlighter);
     }
     
 
@@ -954,8 +954,8 @@ public class JXTree extends JTree {
                 Component result = delegate.getTreeCellRendererComponent(tree, value, 
                         selected, expanded, leaf, row, hasFocus);
 
-                    if ((highlighters != null) && (row < getRowCount()) && (row >= 0)){
-                        result = highlighters.apply(result, getComponentAdapter(row));
+                    if ((compoundHighlighter != null) && (row < getRowCount()) && (row >= 0)){
+                        result = compoundHighlighter.apply(result, getComponentAdapter(row));
                     }
 
                  return result;

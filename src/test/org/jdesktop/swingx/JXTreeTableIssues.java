@@ -27,8 +27,8 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.action.LinkAction;
-import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.HighlighterPipeline;
+import org.jdesktop.swingx.decorator.LegacyHighlighter;
+import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
 import org.jdesktop.swingx.renderer.ButtonProvider;
 import org.jdesktop.swingx.renderer.CellContext;
@@ -347,6 +347,102 @@ public class JXTreeTableIssues extends InteractiveTestCase {
     }
 
     /**
+     * Issue #493-swingx: JXTreeTable.TreeTableModelAdapter: Inconsistency
+     * firing delete.
+     * 
+     * from tiberiu@dev.java.net
+     */
+    public void interactiveTreeTableModelAdapterMutateSelected() {
+        final TreeTableModel customTreeTableModel = createCustomTreeTableModelFromDefault();
+        final JXTreeTable table = new JXTreeTable(customTreeTableModel);
+        table.setRootVisible(true);
+        table.expandAll();
+        JXTree xtree = new JXTree(customTreeTableModel);
+        xtree.setRootVisible(true);
+        xtree.expandAll();
+        final JXFrame frame = wrapWithScrollingInFrame(table, xtree,
+                "JXTreeTable.TreeTableModelAdapter: Inconsistency firing delete expanded folder");
+        Action changeValue = new AbstractAction("delete selected node") {
+            public void actionPerformed(ActionEvent e) {
+                int row = table.getSelectedRow();
+                if (row < 0) return;
+                MutableTreeNode firstChild = (MutableTreeNode) table.getPathForRow(row).getLastPathComponent();
+                ((DefaultTreeModel) customTreeTableModel).removeNodeFromParent(firstChild);
+            }
+        };
+        addAction(frame, changeValue);
+        Action changeValue1 = new AbstractAction("insert as first child of selected node") {
+            public void actionPerformed(ActionEvent e) {
+                int row = table.getSelectedRow();
+                if (row < 0) return;
+                
+                MutableTreeNode firstChild = (MutableTreeNode) table.getPathForRow(row).getLastPathComponent();
+                MutableTreeNode newChild = new DefaultMutableTreeNode("inserted");
+                ((DefaultTreeModel) customTreeTableModel)
+                  .insertNodeInto(newChild, firstChild, 0);
+            }
+        };
+        addAction(frame, changeValue1);
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    /**
+     * Issue #493-swingx: JXTreeTable.TreeTableModelAdapter: Inconsistency
+     * firing delete.
+     * 
+     * from tiberiu@dev.java.net
+     */
+    public void interactiveTreeTableModelAdapterMutateSelectedDiscontinous() {
+        final TreeTableModel customTreeTableModel = createCustomTreeTableModelFromDefault();
+        final JXTreeTable table = new JXTreeTable(customTreeTableModel);
+        table.setRootVisible(true);
+        table.expandAll();
+        JXTree xtree = new JXTree(customTreeTableModel);
+        xtree.setRootVisible(true);
+        xtree.expandAll();
+        final JXFrame frame = wrapWithScrollingInFrame(table, xtree,
+                "JXTreeTable.TreeTableModelAdapter: Inconsistency firing delete expanded folder");
+        Action changeValue = new AbstractAction("delete selected node + sibling") {
+            public void actionPerformed(ActionEvent e) {
+                int row = table.getSelectedRow();
+                if (row < 0) return;
+                MutableTreeNode firstChild = (MutableTreeNode) table.getPathForRow(row).getLastPathComponent();
+                MutableTreeNode parent = (MutableTreeNode) firstChild.getParent();
+                MutableTreeNode secondNextSibling = null;
+                int firstIndex = parent.getIndex(firstChild);
+                if (firstIndex + 2 < parent.getChildCount()) {
+                    secondNextSibling = (MutableTreeNode) parent.getChildAt(firstIndex + 2);
+                }
+                if (secondNextSibling != null) {
+                    parent.remove(firstIndex + 2);
+                    parent.remove(firstIndex);
+                    int[] childIndices = new int[] {firstIndex, firstIndex + 2};
+                    Object[] children = new Object[] {firstChild, secondNextSibling};
+                    ((DefaultTreeModel) customTreeTableModel)
+                        .nodesWereRemoved(parent, childIndices, children);
+                } else { // remove selected only
+                    ((DefaultTreeModel) customTreeTableModel).removeNodeFromParent(firstChild);
+                }
+            }
+        };
+        addAction(frame, changeValue);
+        Action changeValue1 = new AbstractAction("insert as first child of selected node") {
+            public void actionPerformed(ActionEvent e) {
+                int row = table.getSelectedRow();
+                if (row < 0) return;
+                
+                MutableTreeNode firstChild = (MutableTreeNode) table.getPathForRow(row).getLastPathComponent();
+                MutableTreeNode newChild = new DefaultMutableTreeNode("inserted");
+                ((DefaultTreeModel) customTreeTableModel)
+                  .insertNodeInto(newChild, firstChild, 0);
+            }
+        };
+        addAction(frame, changeValue1);
+        frame.pack();
+        frame.setVisible(true);
+    }
+    /**
      * Creates and returns a custom model from JXTree default model. The model
      * is of type DefaultTreeModel, allowing for easy insert/remove.
      * 
@@ -420,7 +516,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         tree.getColumn(2).setCellRenderer(new DefaultTableRenderer(provider));
         tree.setTreeCellRenderer(new DefaultTreeRenderer(provider));
 //        tree.setCellRenderer(new LinkRenderer(simpleAction));
-        tree.setHighlighters(new HighlighterPipeline(new Highlighter[] { 
+        tree.setCompoundHighlighter(new CompoundHighlighter(new LegacyHighlighter[] { 
                 new UIAlternateRowHighlighter()}));
         JFrame frame = wrapWithScrollingInFrame(tree, "table and simple links");
         frame.setVisible(true);
@@ -546,7 +642,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         provider.setHorizontalAlignment(JLabel.LEADING);
         tree.setTreeCellRenderer(new DefaultTreeRenderer(provider));
         tree.expandAll();
-        tree.setHighlighters(new HighlighterPipeline(new Highlighter[] { 
+        tree.setCompoundHighlighter(new CompoundHighlighter(new LegacyHighlighter[] { 
                 new UIAlternateRowHighlighter()}));
         JFrame frame = wrapWithScrollingInFrame(tree, "treeTable and getValueAt renderer");
         frame.setVisible(true);

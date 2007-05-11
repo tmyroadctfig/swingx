@@ -29,7 +29,7 @@ import java.awt.Component;
  *
  * @author Ramesh Gupta
  */
-public class HierarchicalColumnHighlighter extends Highlighter {
+public class HierarchicalColumnHighlighter extends LegacyHighlighter {
     public HierarchicalColumnHighlighter() {
     }
 

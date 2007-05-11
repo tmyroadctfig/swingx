@@ -49,7 +49,7 @@ public class HighlighterIssues extends HighlighterTest {
         }
     }
     /**
-     * Issue #258-swingx: Background Highlighter must not change custom
+     * Issue #258-swingx: Background LegacyHighlighter must not change custom
      * foreground.
      * <p>
      * 
@@ -100,7 +100,7 @@ public class HighlighterIssues extends HighlighterTest {
 
     
     /**
-     * Issue #258-swingx: Background Highlighter must not change custom
+     * Issue #258-swingx: Background LegacyHighlighter must not change custom
      * foreground.
      * <p>
      * 
@@ -134,7 +134,7 @@ public class HighlighterIssues extends HighlighterTest {
     
     
     /**
-     * Issue #258-swingx: Background Highlighter must not change custom
+     * Issue #258-swingx: Background LegacyHighlighter must not change custom
      * foreground.
      * <p>
      * 
@@ -225,9 +225,9 @@ public class HighlighterIssues extends HighlighterTest {
         JXTree nohighlightTree = new JXTree();
         nohighlightTree.setBackground(ledger);
         JXTree tree = new JXTree();
-        HighlighterPipeline pipeline = new HighlighterPipeline();
+        CompoundHighlighter pipeline = new CompoundHighlighter();
         pipeline.addHighlighter(AlternateRowHighlighter.genericGrey);
-        tree.setHighlighters(pipeline);
+        tree.setCompoundHighlighter(pipeline);
         tree.setBackground(ledger);
         showWithScrollingInFrame(tree, nohighlightTree, "colored tree with bg highlighter <--> without highlighter");
     }
@@ -235,14 +235,14 @@ public class HighlighterIssues extends HighlighterTest {
     /**
      * Issue #258-swingx: DefaultTableCellRenderer has memory. 
      * How to formulate as test?
-     * this is testing the hack (reset the memory in HighlighterPipeline to null), not
+     * this is testing the hack (reset the memory in CompoundHighlighter to null), not
      * any highlighter!
      */
     public void testTableUnSelectedDoNothingHighlighter() {
         JXTable table = new JXTable(10, 2);
         DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
         renderer.setForeground(foreground);
-        table.setHighlighters(new HighlighterPipeline(new Highlighter[]{ }));
+        table.setCompoundHighlighter(new CompoundHighlighter(new LegacyHighlighter[]{ }));
         Component comp = table.prepareRenderer(renderer, 0, 0);
         assertEquals("do nothing highlighter must not change foreground", foreground, comp.getForeground());
     }
@@ -321,9 +321,9 @@ public class HighlighterIssues extends HighlighterTest {
      */
     public void interactiveTreeWithDoNothingHighlighter() {
         JXTree tree = new JXTree();
-        HighlighterPipeline pipeline = new HighlighterPipeline();
+        CompoundHighlighter pipeline = new CompoundHighlighter();
         pipeline.addHighlighter(emptyHighlighter);
-        tree.setHighlighters(pipeline);
+        tree.setCompoundHighlighter(pipeline);
         showWithScrollingInFrame(tree, new JXTree(), "empty highlighter <--> no highlighter");
         
     }

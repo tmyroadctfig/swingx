@@ -51,7 +51,8 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.HighlighterPipeline;
+import org.jdesktop.swingx.decorator.LegacyHighlighter;
+import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
@@ -1257,8 +1258,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     public void testSetHighlightersNull() {
         JXTable table = new JXTable();
-        table.setHighlighters((Highlighter) null);
-        assertNull(table.getHighlighters());
+        table.setHighlighters((LegacyHighlighter) null);
+        assertNull(table.getCompoundHighlighter());
     }
     
     /**
@@ -1268,7 +1269,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     public void testSetHighlightersNoHighlighter() {
         JXTable table = new JXTable();
         table.setHighlighters();
-        assertNull(table.getHighlighters());
+        assertNull(table.getCompoundHighlighter());
     }
 
     /**
@@ -1278,11 +1279,11 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     public void testSetHighlightersReset() {
         JXTable table = new JXTable();
-        table.addHighlighter(new Highlighter());
+        table.addHighlighter(new LegacyHighlighter());
         // sanity
-        assertEquals(1, table.getHighlighters().getHighlighters().length);
+        assertEquals(1, table.getCompoundHighlighter().getHighlighters().length);
         table.setHighlighters();
-        assertNull(table.getHighlighters());
+        assertNull(table.getCompoundHighlighter());
     }
 
     /**
@@ -1293,12 +1294,12 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JXTable table = new JXTable();
         // test cope with null
         table.removeHighlighter(null);
-        Highlighter presetHighlighter = AlternateRowHighlighter.classicLinePrinter;
-        HighlighterPipeline pipeline = new HighlighterPipeline(new Highlighter[] {presetHighlighter});
-        table.setHighlighters(pipeline);
+        LegacyHighlighter presetHighlighter = AlternateRowHighlighter.classicLinePrinter;
+        CompoundHighlighter pipeline = new CompoundHighlighter(new LegacyHighlighter[] {presetHighlighter});
+        table.setCompoundHighlighter(pipeline);
         ChangeReport report = new ChangeReport();
         pipeline.addChangeListener(report);
-        table.removeHighlighter(new Highlighter());
+        table.removeHighlighter(new LegacyHighlighter());
         // sanity: highlighter was not contained
         assertFalse("pipeline must not have fired", report.hasEvents());
         // remove the presetHighlighter
@@ -1326,19 +1327,19 @@ public class JXTableUnitTest extends InteractiveTestCase {
     
     public void testAddHighlighterWithNotEmptyPipeline() {
         JXTable table = new JXTable();
-        Highlighter presetHighlighter = AlternateRowHighlighter.classicLinePrinter;
-        HighlighterPipeline pipeline = new HighlighterPipeline(new Highlighter[] {presetHighlighter});
-        table.setHighlighters(pipeline);
-        Highlighter highlighter = new Highlighter();
+        LegacyHighlighter presetHighlighter = AlternateRowHighlighter.classicLinePrinter;
+        CompoundHighlighter pipeline = new CompoundHighlighter(new LegacyHighlighter[] {presetHighlighter});
+        table.setCompoundHighlighter(pipeline);
+        LegacyHighlighter highlighter = new LegacyHighlighter();
         ChangeReport report = new ChangeReport();
         pipeline.addChangeListener(report);
         table.addHighlighter(highlighter);
-        assertSame("pipeline must be same as preset", pipeline, table.getHighlighters());
+        assertSame("pipeline must be same as preset", pipeline, table.getCompoundHighlighter());
         assertEquals("pipeline must have fired changeEvent", 1, report.getEventCount());
         assertPipelineHasAsLast(pipeline, highlighter);
     }
     
-    private void assertPipelineHasAsLast(HighlighterPipeline pipeline, Highlighter highlighter) {
+    private void assertPipelineHasAsLast(CompoundHighlighter pipeline, Highlighter highlighter) {
         Highlighter[] highlighters = pipeline.getHighlighters();
         assertTrue("pipeline must not be empty", highlighters.length > 0);
         assertSame("highlighter must be added as last", highlighter, highlighters[highlighters.length - 1]);
@@ -1354,11 +1355,11 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JXTable table = new JXTable();
         PropertyChangeReport report = new PropertyChangeReport();
         table.addPropertyChangeListener(report);
-        Highlighter highlighter = new Highlighter();
+        LegacyHighlighter highlighter = new LegacyHighlighter();
         table.addHighlighter(highlighter);
-        assertNotNull("table must have created pipeline", table.getHighlighters());
+        assertNotNull("table must have created pipeline", table.getCompoundHighlighter());
         assertTrue("table must have fired propertyChange for highlighters", report.hasEvents("highlighters"));
-        assertPipelineContainsHighlighter(table.getHighlighters(), highlighter);
+        assertPipelineContainsHighlighter(table.getCompoundHighlighter(), highlighter);
     }
     
     /**
@@ -1368,7 +1369,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
      * @param pipeline
      * @param highlighter
      */
-    private void assertPipelineContainsHighlighter(HighlighterPipeline pipeline, Highlighter highlighter) {
+    private void assertPipelineContainsHighlighter(CompoundHighlighter pipeline, Highlighter highlighter) {
         Highlighter[] highlighters = pipeline.getHighlighters();
         for (int i = 0; i < highlighters.length; i++) {
             if (highlighter.equals(highlighters[i])) return;

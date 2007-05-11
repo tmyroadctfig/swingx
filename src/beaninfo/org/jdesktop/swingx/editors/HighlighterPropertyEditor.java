@@ -56,7 +56,8 @@ import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.JXTitledPanel;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.HighlighterPipeline;
+import org.jdesktop.swingx.decorator.LegacyHighlighter;
+import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 //import org.jdesktop.swingx.expression.ExpressionHighlighter;
 //import org.netbeans.modules.form.NamedPropertyEditor;
@@ -68,7 +69,7 @@ import org.jdesktop.swingx.decorator.PatternHighlighter;
  * @author rbair
  */
 public class HighlighterPropertyEditor  extends PropertyEditorSupport { //implements NamedPropertyEditor {
-    private HighlighterPipeline pipeline = new HighlighterPipeline();
+    private CompoundHighlighter pipeline = new CompoundHighlighter();
     private Editor editor;
 
     /** Creates a new instance of HighlighterPropertyEditor */
@@ -109,8 +110,8 @@ public class HighlighterPropertyEditor  extends PropertyEditorSupport { //implem
         e.writeObject(pipeline.getHighlighters());
         e.close();
         Highlighter[] blar = (Highlighter[])new XMLDecoder(new ByteArrayInputStream(baos.toString().getBytes())).readObject();
-        buffer.append("new org.jdesktop.swingx.decorator.HighlighterPipeline(\n");
-        buffer.append("\t(org.jdesktop.swingx.decorator.Highlighter[])new java.beans.XMLDecoder(new java.io.ByteArrayInputStream(\"");
+        buffer.append("new org.jdesktop.swingx.decorator.CompoundHighlighter(\n");
+        buffer.append("\t(org.jdesktop.swingx.decorator.LegacyHighlighter[])new java.beans.XMLDecoder(new java.io.ByteArrayInputStream(\"");
         buffer.append(escapeString(baos.toString()));
         buffer.append("\".getBytes())).readObject())");
         return buffer.toString();
@@ -121,19 +122,19 @@ public class HighlighterPropertyEditor  extends PropertyEditorSupport { //implem
     }
 
     public String getDisplayName() {
-        return "Highlighter Editor";
+        return "LegacyHighlighter Editor";
     }
 
     public void setAsText(String text) throws IllegalArgumentException {
     }
 
     public void setValue(Object value) {
-        //if the value is a HighlighterPipeline, hold on to this. The
+        //if the value is a CompoundHighlighter, hold on to this. The
         //editor is going to need it
-        if (value instanceof HighlighterPipeline) {
-            pipeline = new HighlighterPipeline(((HighlighterPipeline)value).getHighlighters());
+        if (value instanceof CompoundHighlighter) {
+            pipeline = new CompoundHighlighter(((CompoundHighlighter)value).getHighlighters());
         } else {
-            pipeline = new HighlighterPipeline();
+            pipeline = new CompoundHighlighter();
         }
         super.setValue(value);
     }
@@ -178,7 +179,7 @@ public class HighlighterPropertyEditor  extends PropertyEditorSupport { //implem
             sp.setBorder(BorderFactory.createEmptyBorder());
             tp.setContentContainer(sp);
             mainsp.setLeftComponent(tp);
-            final JXTitledPanel details = new JXTitledPanel("Highlighter Details");
+            final JXTitledPanel details = new JXTitledPanel("LegacyHighlighter Details");
             mainsp.setRightComponent(details);
             add(mainsp);
             
@@ -221,7 +222,7 @@ public class HighlighterPropertyEditor  extends PropertyEditorSupport { //implem
                 //get the selected items
                 Object[] values = highlightersList.getSelectedValues();
                 for (int i=0; i<values.length; i++) {
-                    pipeline.removeHighlighter((Highlighter)values[i]);
+                    pipeline.removeHighlighter((LegacyHighlighter)values[i]);
                 }
                 ListDataListener[] listeners = ((AbstractListModel)highlightersList.getModel()).getListDataListeners();
                 ListDataEvent evt = new ListDataEvent(highlightersList, ListDataEvent.CONTENTS_CHANGED, 0, pipeline.getHighlighters().length-1);
@@ -240,7 +241,7 @@ public class HighlighterPropertyEditor  extends PropertyEditorSupport { //implem
                 //show a true popup
                 final JDialog dlg = new JDialog(/*WindowManager.getDefault().getMainWindow()*/(JDialog)null, true);
                 JXPanel cp = new JXPanel(new GridBagLayout());
-                final JRadioButton newRB = new JRadioButton("New Highlighter");
+                final JRadioButton newRB = new JRadioButton("New LegacyHighlighter");
                 final JRadioButton formRB = new JRadioButton("From Form");
                 ButtonGroup bg = new ButtonGroup();
                 bg.add(newRB);
@@ -258,7 +259,7 @@ public class HighlighterPropertyEditor  extends PropertyEditorSupport { //implem
                 cp.add(label, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 24, 7, 3), 0, 0));
                 cp.add(nameTF, new GridBagConstraints(1, 2, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 7, 11), 0, 0));
                 cp.add(formRB, new GridBagConstraints(0, 3, 2, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(0, 12, 5, 11), 0, 0));
-                label = new JLabel("Choose Highlighter: ");
+                label = new JLabel("Choose LegacyHighlighter: ");
                 final JComboBox highlighterCB = new JComboBox(new Object[0]);
                 cp.add(label, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 24, 7, 3), 0, 0));
                 cp.add(highlighterCB, new GridBagConstraints(1, 4, 1, 1, 1.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 17, 11), 0, 0));
@@ -266,7 +267,7 @@ public class HighlighterPropertyEditor  extends PropertyEditorSupport { //implem
                     public void actionPerformed(ActionEvent ae) {
                         if (newRB.isSelected()) {
                             String type = (String)typeCB.getSelectedItem();
-                            Highlighter h = null;
+                            LegacyHighlighter h = null;
                             if (type == null || type == "Alternate Row") {
                                 h = new AlternateRowHighlighter();
 //                            } else if (type == "Expression") {
@@ -314,7 +315,7 @@ public class HighlighterPropertyEditor  extends PropertyEditorSupport { //implem
             protected JComboBox selectedBackgroundCB;
             protected JComboBox foregroundCB;
             protected JComboBox selectedForegroundCB;
-            private Highlighter h;
+            private LegacyHighlighter h;
             
             public HighlighterDetailPanel() {
                 setLayout(new GridBagLayout());
@@ -338,7 +339,7 @@ public class HighlighterPropertyEditor  extends PropertyEditorSupport { //implem
                 rowCounter++;
             }
             
-            protected void init(Highlighter h) {
+            protected void init(LegacyHighlighter h) {
                 this.h = h;
                 backgroundCB.setSelectedItem(h.getBackground());
                 selectedBackgroundCB.setSelectedItem(h.getSelectedBackground());
@@ -398,7 +399,7 @@ public class HighlighterPropertyEditor  extends PropertyEditorSupport { //implem
                 add("Foreground Expression: ", fgExpressionTF, true);
             }
             
-            public void init(/*Expression*/Highlighter h) {
+            public void init(/*Expression*/LegacyHighlighter h) {
                 super.init(h);
 //                this.h = h;
 //                bgExpressionTF.setText(h.getBackgroundExpression());

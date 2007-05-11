@@ -37,10 +37,10 @@ public class HighlighterTest extends InteractiveTestCase {
     protected Color background = Color.RED;
     protected Color foreground = Color.BLUE;
     
-    protected Highlighter emptyHighlighter;
+    protected LegacyHighlighter emptyHighlighter;
 
     protected void setUp() {
-        highlighters = new Highlighter[] {
+        highlighters = new LegacyHighlighter[] {
             new AlternateRowHighlighter(Color.white, new Color(0xF0, 0xF0, 0xE0), null),
             new PatternHighlighter(null, foreground, "^s", 0, 0)
         };
@@ -60,7 +60,7 @@ public class HighlighterTest extends InteractiveTestCase {
         allColored.setForeground(foreground);
         allColored.setBackground(background);
         
-        emptyHighlighter = new Highlighter();
+        emptyHighlighter = new LegacyHighlighter();
     }
 
     protected void tearDown() {
@@ -70,6 +70,14 @@ public class HighlighterTest extends InteractiveTestCase {
         highlighters = null;
     }
 
+    /**
+     * Test pipeline new api due to overhaul.
+     *
+     */
+    public void testHighlighterPipelineMutable() {
+        CompoundHighlighter pipeline = new CompoundHighlighter(new LegacyHighlighter());
+        assertFalse(pipeline.isImmutable());
+    }
     
 // UIHighlighter
     
@@ -80,25 +88,25 @@ public class HighlighterTest extends InteractiveTestCase {
  
     
     public void testConstructors() {
-        Highlighter empty = new Highlighter();
+        LegacyHighlighter empty = new LegacyHighlighter();
         assertColors(empty, null, null, null, null, false);
-        Highlighter normal = new Highlighter(background, foreground);
+        LegacyHighlighter normal = new LegacyHighlighter(background, foreground);
         assertColors(normal, background, foreground, null, null, false);
-        Highlighter normalImmutable = new Highlighter(background, foreground, true);
+        LegacyHighlighter normalImmutable = new LegacyHighlighter(background, foreground, true);
         assertColors(normalImmutable, background, foreground, null, null, true);
         Color selectedBackground = Color.YELLOW;
         Color selectedForeground = Color.BLACK;
-        Highlighter full = new Highlighter(background, foreground, 
+        LegacyHighlighter full = new LegacyHighlighter(background, foreground, 
                 selectedBackground , selectedForeground);
         assertColors(full, background, foreground, selectedBackground, selectedForeground, false);
-        Highlighter fullImmutable = new Highlighter(background, foreground, 
+        LegacyHighlighter fullImmutable = new LegacyHighlighter(background, foreground, 
                 selectedBackground , selectedForeground, true);
         assertColors(fullImmutable, background, foreground, selectedBackground, selectedForeground, true);
         
     }
     
     public void testImmutable() {
-        Highlighter immutable = new Highlighter(background, foreground, true);
+        LegacyHighlighter immutable = new LegacyHighlighter(background, foreground, true);
         ChangeReport report = new ChangeReport();
         immutable.addChangeListener(report);
         assertEquals("no listeners", 0, immutable.getChangeListeners().length);
@@ -134,8 +142,8 @@ public class HighlighterTest extends InteractiveTestCase {
     
     
     public void testImmutablePredefinedHighlighters() {
-        assertTrue("ledger must be immutable", Highlighter.ledgerBackground.isImmutable());
-        assertTrue("notepad must be immutable", Highlighter.notePadBackground.isImmutable());
+        assertTrue("ledger must be immutable", LegacyHighlighter.ledgerBackground.isImmutable());
+        assertTrue("notepad must be immutable", LegacyHighlighter.notePadBackground.isImmutable());
         assertTrue("beige must be immutable", AlternateRowHighlighter.beige.isImmutable());
         assertTrue("floral must be immutable", AlternateRowHighlighter.floralWhite.isImmutable());
         assertTrue("lineprinter must be immutable", AlternateRowHighlighter.linePrinter.isImmutable());
@@ -143,7 +151,7 @@ public class HighlighterTest extends InteractiveTestCase {
         assertTrue("quickSilver must be immutable", AlternateRowHighlighter.quickSilver.isImmutable());
     }
     
-    private void assertColors(Highlighter highlighter, Color background, Color foreground,
+    private void assertColors(LegacyHighlighter highlighter, Color background, Color foreground,
             Color  selectedBackground, Color selectedForeground, boolean immutable) {
         assertEquals("background", background, highlighter.getBackground());
         assertEquals("foreground", foreground, highlighter.getForeground());
@@ -159,16 +167,16 @@ public class HighlighterTest extends InteractiveTestCase {
      * an initially empty pipeline. 
      */
     public void testAddToEmptyHighlighterPipeline() {
-        HighlighterPipeline pipeline = new HighlighterPipeline(new Highlighter[] { });
-        pipeline.addHighlighter(new Highlighter());
+        CompoundHighlighter pipeline = new CompoundHighlighter();
+        pipeline.addHighlighter(new LegacyHighlighter());
     }
     public void testRemoveFromEmptyHighlighterPipeline() {
-        HighlighterPipeline pipeline = new HighlighterPipeline(new Highlighter[] { });
-        pipeline.removeHighlighter(new Highlighter());
+        CompoundHighlighter pipeline = new CompoundHighlighter();
+        pipeline.removeHighlighter(new LegacyHighlighter());
     }
     public void testApplyEmptyHighlighterPipeline() {
-        HighlighterPipeline pipeline = new HighlighterPipeline(new Highlighter[] { });
-        pipeline.apply(new JLabel(), createComponentAdapter(new JLabel(), false));
+        CompoundHighlighter pipeline = new CompoundHighlighter();
+        pipeline.highlight(new JLabel(), createComponentAdapter(new JLabel(), false));
     }
 //----------------- testing change notification of pipeline
     
@@ -180,8 +188,8 @@ public class HighlighterTest extends InteractiveTestCase {
     }
     
     public void testHighlighterPipelineChange() {
-        Highlighter highlighter = new Highlighter();
-        HighlighterPipeline pipeline = new HighlighterPipeline();
+        LegacyHighlighter highlighter = new LegacyHighlighter();
+        CompoundHighlighter pipeline = new CompoundHighlighter();
         ChangeReport changeReport = new ChangeReport();
         pipeline.addChangeListener(changeReport);
         int count = changeReport.getEventCount();
@@ -191,14 +199,14 @@ public class HighlighterTest extends InteractiveTestCase {
     }
     
     public void testHighlighterPipelineChangeConstructor() {
-        Highlighter highlighter = new Highlighter();
-        HighlighterPipeline pipeline = new HighlighterPipeline(new Highlighter[] { highlighter} );
+        LegacyHighlighter highlighter = new LegacyHighlighter();
+        CompoundHighlighter pipeline = new CompoundHighlighter(highlighter);
         ChangeReport changeReport = new ChangeReport();
         pipeline.addChangeListener(changeReport);
         assertPipelineChange(highlighter, pipeline, changeReport);
  
     }
-    private void assertPipelineChange(Highlighter highlighter, HighlighterPipeline pipeline, ChangeReport changeReport) {
+    private void assertPipelineChange(LegacyHighlighter highlighter, CompoundHighlighter pipeline, ChangeReport changeReport) {
         int count = changeReport.getEventCount();
         highlighter.setBackground(Color.red);
         assertEquals("event count must be increased", ++count,  changeReport.getEventCount() );
@@ -211,17 +219,17 @@ public class HighlighterTest extends InteractiveTestCase {
         assertEquals("event count must not be increased", count,  changeReport.getEventCount() );
     }
     
-//----------------- testing change notification Highlighter
+//----------------- testing change notification LegacyHighlighter
 
     
     public void testHighlighterChange() {
-        Highlighter highlighter = new Highlighter();
+        LegacyHighlighter highlighter = new LegacyHighlighter();
         ChangeReport changeReport = new ChangeReport();
         highlighter.addChangeListener(changeReport);
         assertBaseHighlighterChange(highlighter, changeReport);
     }
 
-    private void assertBaseHighlighterChange(Highlighter highlighter, ChangeReport changeReport) {
+    private void assertBaseHighlighterChange(LegacyHighlighter highlighter, ChangeReport changeReport) {
         int count = changeReport.getEventCount();
         highlighter.setBackground(Color.red);
         assertEquals("event count must be increased", ++count,  changeReport.getEventCount() );
@@ -319,23 +327,23 @@ public class HighlighterTest extends InteractiveTestCase {
      * if the javadoc example changes, then those changes should be pasted here.
      */
     public void testJavaDocExample() {
-        Highlighter[]   highlighters = new Highlighter[] {
+        LegacyHighlighter[]   highlighters = new LegacyHighlighter[] {
             new AlternateRowHighlighter(Color.white, new Color(0xF0, 0xF0, 0xE0), null),
             new PatternHighlighter(null, Color.red, "^s", 0, 0)
         };
 
-        HighlighterPipeline highlighterPipeline = new HighlighterPipeline(highlighters);
+        CompoundHighlighter highlighterPipeline = new CompoundHighlighter(highlighters);
         JXTable table = new JXTable();
-        table.setHighlighters(highlighterPipeline);
+        table.setCompoundHighlighter(highlighterPipeline);
     }
 
     /*
      */
     public void testAddRemoveHighlighter() {
-        HighlighterPipeline pipeline = new HighlighterPipeline(highlighters);
+        CompoundHighlighter pipeline = new CompoundHighlighter(highlighters);
 
-        Highlighter hl = new PatternHighlighter(Color.blue, Color.red, "mark", 0, 0);
-        Highlighter hl2 = new PatternHighlighter(Color.white, Color.black, "amy", 0, 0);
+        LegacyHighlighter hl = new PatternHighlighter(Color.blue, Color.red, "mark", 0, 0);
+        LegacyHighlighter hl2 = new PatternHighlighter(Color.white, Color.black, "amy", 0, 0);
 
         // added highlighter should be appended
         pipeline.addHighlighter(hl);
@@ -487,17 +495,17 @@ public class HighlighterTest extends InteractiveTestCase {
     }
 
     public void testNullBackgroundOnHighlighter() {
-        HighlighterPipeline pipeline =  new HighlighterPipeline(
-                new Highlighter[] { new Highlighter(null, null), });
+        CompoundHighlighter pipeline =  new CompoundHighlighter(
+                new LegacyHighlighter(null, null));
         ComponentAdapter adapter = createComponentAdapter(backgroundNull, false);
-        pipeline.apply(backgroundNull, adapter);
+        pipeline.highlight(backgroundNull, adapter);
     }
     
     public void testNullForegroundOnHighlighter() {
-        HighlighterPipeline pipeline =  new HighlighterPipeline(
-                new Highlighter[] { new Highlighter(null, null), });
+        CompoundHighlighter pipeline =  new CompoundHighlighter(
+                new LegacyHighlighter(null, null));
         ComponentAdapter adapter = createComponentAdapter(foregroundNull, false);
-        pipeline.apply(foregroundNull, adapter);
+        pipeline.highlight(foregroundNull, adapter);
     }
 
     
@@ -533,7 +541,7 @@ public class HighlighterTest extends InteractiveTestCase {
      * @param label
      * @param adapter
      */
-    protected void assertApplied(Highlighter highlighter, Component label, ComponentAdapter adapter) {
+    protected void assertApplied(LegacyHighlighter highlighter, Component label, ComponentAdapter adapter) {
         Color labelForeground = label.getForeground();
         Color labelBackground = label.getBackground();
         highlighter.highlight(label, adapter);

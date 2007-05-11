@@ -32,7 +32,7 @@ import javax.swing.table.DefaultTableCellRenderer;
  * 
  */
 
-public class ResetDTCRColorHighlighter extends Highlighter {
+public class ResetDTCRColorHighlighter extends LegacyHighlighter {
 
     public ResetDTCRColorHighlighter() {
         super(null, null, true);

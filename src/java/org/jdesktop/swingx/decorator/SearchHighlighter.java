@@ -25,7 +25,7 @@ import java.awt.Component;
 import java.util.regex.Pattern;
 
 /**
- * Convenience Highlighter to test and highlight cells in searching.
+ * Convenience LegacyHighlighter to test and highlight cells in searching.
  *  
  * @author Jeanette Winzenburg
  */

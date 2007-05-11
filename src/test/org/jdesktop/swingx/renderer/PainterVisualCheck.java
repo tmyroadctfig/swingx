@@ -56,7 +56,7 @@ import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.ActionContainerFactory;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.ConditionalHighlighter;
-import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.LegacyHighlighter;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
 import org.jdesktop.swingx.painter.ImagePainter;
 import org.jdesktop.swingx.painter.MattePainter;
@@ -72,7 +72,7 @@ import org.jdesktop.test.AncientSwingTeam;
  * 
  * Links
  * <ul>
- * <li> <a href="">Sneak preview II - Transparent Highlighter</a>
+ * <li> <a href="">Sneak preview II - Transparent LegacyHighlighter</a>
  * </ul>
  * 
  * @author Jeanette Winzenburg
@@ -225,7 +225,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
         JXList list = new JXList();
-        Highlighter highlighter = new UIAlternateRowHighlighter();
+        LegacyHighlighter highlighter = new UIAlternateRowHighlighter();
         table.addHighlighter(highlighter);
         list.setHighlighters(highlighter, new GradientHighlighter());
         // quick-fill and hook to table columns' visibility state
@@ -257,14 +257,14 @@ public class PainterVisualCheck extends InteractiveTestCase {
     }
 
     /**
-     * A Highlighter which applies a simple yellow to white-transparent 
+     * A LegacyHighlighter which applies a simple yellow to white-transparent 
      * gradient to a PainterAware rendering component. The yellow can
      * be toggled to half-transparent.
      * 
      * PENDING: How to the same but not use a gradient but a solid colered bar,
      * covering a relative portion of the comp?
      */
-    public static class GradientHighlighter extends Highlighter {
+    public static class GradientHighlighter extends LegacyHighlighter {
 
         private MattePainter painter;
 
@@ -334,7 +334,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
                 new DefaultTableRenderer(controller));
         final ImagePainter imagePainter = new ImagePainter(ImageIO.read(JXPanel.class
                 .getResource("resources/images/kleopatra.jpg")));
-        Highlighter gradientHighlighter = new Highlighter() {
+        LegacyHighlighter gradientHighlighter = new LegacyHighlighter() {
 
             @Override
             public Component highlight(Component renderer,
@@ -346,7 +346,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
             }
 
         };
-        Highlighter alternateRowHighlighter = new UIAlternateRowHighlighter();
+        LegacyHighlighter alternateRowHighlighter = new UIAlternateRowHighlighter();
         table.addHighlighter(alternateRowHighlighter);
         table.addHighlighter(gradientHighlighter);
         // re-use component controller and highlighter in a JXList
@@ -378,7 +378,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
 //        table.setDefaultRenderer(Number.class, new DefaultTableRenderer(
 //                controller));
         final ValueBasedGradientHighlighter gradientHighlighter = createTransparentGradientHighlighter();
-        Highlighter alternateRowHighlighter = new UIAlternateRowHighlighter();
+        LegacyHighlighter alternateRowHighlighter = new UIAlternateRowHighlighter();
         table.addHighlighter(alternateRowHighlighter);
         table.addHighlighter(gradientHighlighter);
         // re-use component controller and highlighter in a JXList
@@ -405,7 +405,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
     public void interactiveNumberProportionalGradientHighlight() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
-        table.setBackground(Highlighter.ledgerBackground.getBackground());
+        table.setBackground(LegacyHighlighter.ledgerBackground.getBackground());
         ComponentProvider<JLabel> controller = new LabelProvider(
                 JLabel.RIGHT);
 //        table.setDefaultRenderer(Number.class, new DefaultTableRenderer(
@@ -430,7 +430,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
     // -------------------- Value-based transparent gradient highlighter
 
     /**
-     * A Highlighter which applies a value-proportional gradient to PainterAware
+     * A LegacyHighlighter which applies a value-proportional gradient to PainterAware
      * rendering components if the value is a Number. The gradient is a simple
      * yellow to white-transparent paint. The yellow can be toggled to
      * half-transparent.<p>

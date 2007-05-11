@@ -89,7 +89,8 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.DefaultSelectionMapper;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.HighlighterPipeline;
+import org.jdesktop.swingx.decorator.LegacyHighlighter;
+import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.PipelineEvent;
 import org.jdesktop.swingx.decorator.PipelineListener;
@@ -157,10 +158,10 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * 
  * <p>
  * One can automatically highlight certain rows in a JXTable by attaching
- * Highlighters in the {@link #setHighlighters(HighlighterPipeline)}method. An
- * example would be a Highlighter that colors alternate rows in the table for
+ * Highlighters in the {@link #setCompoundHighlighter(CompoundHighlighter)}method. An
+ * example would be a LegacyHighlighter that colors alternate rows in the table for
  * readability; AlternateRowHighlighter does this. Again, like Filters,
- * Highlighters can be chained together in a HighlighterPipeline to achieve more
+ * Highlighters can be chained together in a CompoundHighlighter to achieve more
  * interesting effects.
  * 
  * <p>
@@ -263,8 +264,8 @@ public class JXTable extends JTable
     /** The FilterPipeline for the table. */
     protected FilterPipeline filters;
 
-    /** The HighlighterPipeline for the table. */
-    protected HighlighterPipeline highlighters;
+    /** The CompoundHighlighter for the table. */
+    protected CompoundHighlighter compoundHighlighter;
 
     /**
      * The key for the client property deciding about whether 
@@ -275,7 +276,7 @@ public class JXTable extends JTable
 
 
     /**
-     * The Highlighter used to hack around DefaultTableCellRenderer's color memory. 
+     * The LegacyHighlighter used to hack around DefaultTableCellRenderer's color memory. 
      */
     protected Highlighter resetDefaultTableCellRendererHighlighter;
 
@@ -2815,21 +2816,21 @@ public class JXTable extends JTable
         }
 
         private void ensureInsertedSearchHighlighters() {
-            if (getHighlighters() == null) {
-                setHighlighters(new HighlighterPipeline(
+            if (getCompoundHighlighter() == null) {
+                setCompoundHighlighter(new CompoundHighlighter(
                         new Highlighter[] { getSearchHighlighter() }));
             } else if (!isInPipeline(getSearchHighlighter())) {
-                getHighlighters().addHighlighter(getSearchHighlighter());
+                getCompoundHighlighter().addHighlighter(getSearchHighlighter());
             }
         }
 
         private boolean isInPipeline(PatternHighlighter searchHighlighter) {
-            Highlighter[] inPipeline = getHighlighters().getHighlighters();
+            Highlighter[] inPipeline = getCompoundHighlighter().getHighlighters();
             if ((inPipeline.length > 0) && 
                (searchHighlighter.equals(inPipeline[inPipeline.length -1]))) {
                 return true;
             }
-            getHighlighters().removeHighlighter(searchHighlighter);
+            getCompoundHighlighter().removeHighlighter(searchHighlighter);
             return false;
         }
 
@@ -3014,96 +3015,96 @@ public class JXTable extends JTable
    // --------------------- managing renderers/editors
 
     /**
-     * Returns the HighlighterPipeline assigned to the table, null if none.
+     * Returns the CompoundHighlighter assigned to the table, null if none.
      * 
-     * @return the HighlighterPipeline assigned to the table.
-     * @see #setHighlighters(HighlighterPipeline)
+     * @return the CompoundHighlighter assigned to the table.
+     * @see #setCompoundHighlighter(CompoundHighlighter)
      */
-    public HighlighterPipeline getHighlighters() {
-        return highlighters;
+    public CompoundHighlighter getCompoundHighlighter() {
+        return compoundHighlighter;
     }
 
     /**
-     * Assigns a HighlighterPipeline to the table, maybe null to remove all
+     * Assigns a CompoundHighlighter to the table, maybe null to remove all
      * Highlighters.<p>
      * 
      * The default value is <code>null</code>.
      * 
-     * @param pipeline the HighlighterPipeline to use for renderer decoration. 
-     * @see #getHighlighters()
+     * @param pipeline the CompoundHighlighter to use for renderer decoration. 
+     * @see #getCompoundHighlighter()
      * @see #addHighlighter(Highlighter)
      * @see #removeHighlighter(Highlighter)
      * 
      */
-    public void setHighlighters(HighlighterPipeline pipeline) {
-        HighlighterPipeline old = getHighlighters();
+    public void setCompoundHighlighter(CompoundHighlighter pipeline) {
+        CompoundHighlighter old = getCompoundHighlighter();
         if (old != null) {
             old.removeChangeListener(getHighlighterChangeListener());
         }
-        highlighters = pipeline;
-        if (highlighters != null) {
-            highlighters.addChangeListener(getHighlighterChangeListener());
+        compoundHighlighter = pipeline;
+        if (compoundHighlighter != null) {
+            compoundHighlighter.addChangeListener(getHighlighterChangeListener());
         }
-        firePropertyChange("highlighters", old, getHighlighters());
+        firePropertyChange("highlighters", old, getCompoundHighlighter());
         repaint();
     }
     
     /**
-     * Sets the <code>Highlighter</code>s to the table, replacing any old settings.
+     * Sets the <code>LegacyHighlighter</code>s to the table, replacing any old settings.
      * Maybe null to remove all highlighters.<p>
      * 
      * 
      * @param highlighters the highlighters to use for renderer decoration. 
-     * @see #getHighlighters()
+     * @see #getCompoundHighlighter()
      * @see #addHighlighter(Highlighter)
      * @see #removeHighlighter(Highlighter)
      * 
      */
     public void setHighlighters(Highlighter... highlighters) {
-        HighlighterPipeline pipeline = null;
+        CompoundHighlighter pipeline = null;
         if ((highlighters != null) && (highlighters.length > 0) && 
             (highlighters[0] != null)) {    
-           pipeline = new HighlighterPipeline(highlighters);
+           pipeline = new CompoundHighlighter(highlighters);
         }
-        setHighlighters(pipeline);
+        setCompoundHighlighter(pipeline);
     }
 
     /**
-     * Adds a Highlighter.
+     * Adds a LegacyHighlighter.
      * <p>
      * 
-     * If the <code>HighlighterPipeline</code> returned from getHighlighters()
+     * If the <code>CompoundHighlighter</code> returned from getHighlighters()
      * is null, creates and sets a new pipeline containing the given
-     * <code>Highlighter</code>. Else, appends the <code>Highlighter</code>
+     * <code>LegacyHighlighter</code>. Else, appends the <code>LegacyHighlighter</code>
      * to the end of the pipeline.
      * 
-     * @param highlighter the <code>Highlighter</code> to add.
-     * @throws NullPointerException if <code>Highlighter</code> is null.
+     * @param highlighter the <code>LegacyHighlighter</code> to add.
+     * @throws NullPointerException if <code>LegacyHighlighter</code> is null.
      * @see #removeHighlighter(Highlighter)
-     * @see #setHighlighters(HighlighterPipeline)
+     * @see #setCompoundHighlighter(CompoundHighlighter)
      */
     public void addHighlighter(Highlighter highlighter) {
-        HighlighterPipeline pipeline = getHighlighters();
+        CompoundHighlighter pipeline = getCompoundHighlighter();
         if (pipeline == null) {
-           setHighlighters(new HighlighterPipeline(new Highlighter[] {highlighter})); 
+           setCompoundHighlighter(new CompoundHighlighter(new Highlighter[] {highlighter})); 
         } else {
             pipeline.addHighlighter(highlighter);
         }
     }
 
     /**
-     * Removes the Highlighter. <p>
+     * Removes the LegacyHighlighter. <p>
      * 
-     * Does nothing if the HighlighterPipeline is null or does not contain
-     * the given Highlighter.
+     * Does nothing if the CompoundHighlighter is null or does not contain
+     * the given LegacyHighlighter.
      * 
      * @param highlighter the highlighter to remove.
      * @see #addHighlighter(Highlighter)
-     * @see #setHighlighters(HighlighterPipeline)
+     * @see #setCompoundHighlighter(CompoundHighlighter)
      */
     public void removeHighlighter(Highlighter highlighter) {
-        if ((getHighlighters() == null)) return;
-        getHighlighters().removeHighlighter(highlighter);
+        if ((getCompoundHighlighter() == null)) return;
+        getCompoundHighlighter().removeHighlighter(highlighter);
     }
     
     /**
@@ -3192,10 +3193,10 @@ public class JXTable extends JTable
         adjustComponentOrientation(stamp);
         // #258-swingx: hacking around DefaultTableCellRenderer color memory.
         resetDefaultTableCellRendererColors(stamp, row, column);
-        if (highlighters == null) {
+        if (compoundHighlighter == null) {
             return stamp; // no need to decorate renderer with highlighters
         } else {
-            return highlighters.apply(stamp, getComponentAdapter(row, column));
+            return compoundHighlighter.apply(stamp, getComponentAdapter(row, column));
         }
     }
 
@@ -3208,7 +3209,7 @@ public class JXTable extends JTable
      * true by default.
      * <p>
      * 
-     * The hack consists of applying a specialized <code>Highlighter</code> to
+     * The hack consists of applying a specialized <code>LegacyHighlighter</code> to
      * force reset the color "memory" of <code>DefaultTableCellRenderer</code>.
      * Note that the hack is applied always, that is even if there are no custom
      * Highlighters.
@@ -3795,12 +3796,12 @@ public class JXTable extends JTable
     /**
      * Updates highlighter after <code>updateUI</code> changes.
      * 
-     * @see org.jdesktop.swingx.decorator.Highlighter.UIHighlighter
+     * @see org.jdesktop.swingx.decorator.LegacyHighlighter.UIHighlighter
      */
     protected void updateHighlighterUI() {
-        if (getHighlighters() == null)
+        if (getCompoundHighlighter() == null)
             return;
-        getHighlighters().updateUI();
+        getCompoundHighlighter().updateUI();
     }
 
     /**

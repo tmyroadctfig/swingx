@@ -34,23 +34,23 @@ import javax.swing.UIManager;
  *
  * @author Ramesh Gupta
  */
-public class AlternateRowHighlighter extends Highlighter {
+public class AlternateRowHighlighter extends LegacyHighlighter {
     private final static Color  defaultOddRowColor = Color.white;
     private final static Color  defaultEvenRowColor = new Color(0xF0, 0xF0, 0xE0);
 
-    public final static Highlighter beige =
+    public final static LegacyHighlighter beige =
         new AlternateRowHighlighter(Color.white, new Color(245, 245, 220), null, true);
 
-    public final static Highlighter linePrinter =
+    public final static LegacyHighlighter linePrinter =
         new AlternateRowHighlighter(Color.white, new Color(0xCC, 0xCC, 0xFF), null, true);
 
-    public final static Highlighter classicLinePrinter =
+    public final static LegacyHighlighter classicLinePrinter =
         new AlternateRowHighlighter(Color.white, new Color(0xCC, 0xFF, 0xCC), null, true);
 
-    public final static Highlighter floralWhite =
+    public final static LegacyHighlighter floralWhite =
         new AlternateRowHighlighter(Color.white, new Color(255, 250, 240), null, true);
 
-    public final static Highlighter quickSilver =
+    public final static LegacyHighlighter quickSilver =
         new AlternateRowHighlighter(Color.white, defaultEvenRowColor, null, true);
     
     public final static AlternateRowHighlighter genericGrey = 

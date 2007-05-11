@@ -27,8 +27,8 @@ import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.action.LinkAction;
 import org.jdesktop.swingx.action.LinkModelAction;
-import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.HighlighterPipeline;
+import org.jdesktop.swingx.decorator.LegacyHighlighter;
+import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
@@ -179,7 +179,7 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
         HyperlinkProvider provider =  new HyperlinkProvider(simpleAction);
         tree.setCellRenderer(new DefaultTreeRenderer(provider));
 //        tree.setCellRenderer(new LinkRenderer(simpleAction));
-        tree.setHighlighters(new HighlighterPipeline(new Highlighter[] { 
+        tree.setCompoundHighlighter(new CompoundHighlighter(new LegacyHighlighter[] { 
                 new UIAlternateRowHighlighter()}));
         JFrame frame = wrapWithScrollingInFrame(tree, "tree and simple links");
         frame.setVisible(true);
@@ -238,7 +238,7 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
         LinkModelAction action = new LinkModelAction(visitor);
         table.setDefaultRenderer(LinkModel.class, new DefaultTableRenderer
                 (new HyperlinkProvider(action, LinkModel.class)));
-        table.setHighlighters(new HighlighterPipeline(new Highlighter[] { 
+        table.setCompoundHighlighter(new CompoundHighlighter(new LegacyHighlighter[] { 
                 new UIAlternateRowHighlighter()}));
         JFrame frame = wrapWithScrollingInFrame(table, visitor.getOutputComponent(), 
                 "show link renderer in table with LF striping highlighter");
@@ -337,7 +337,7 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
     }
     
     /**
-     * Visuals of Hyperlink/Highlighter interaction.
+     * Visuals of Hyperlink/LegacyHighlighter interaction.
      *
      */
     public void interactiveListHyperlinkLFStripingHighlighter() {
@@ -347,7 +347,7 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
         list.setCellRenderer(new DefaultListRenderer(
                 new HyperlinkProvider(action, LinkModel.class)));
         list.setRolloverEnabled(true);
-        list.setHighlighters(new HighlighterPipeline(new Highlighter[] {
+        list.setCompoundHighlighter(new CompoundHighlighter(new LegacyHighlighter[] {
                 new UIAlternateRowHighlighter()}));
         JFrame frame = wrapWithScrollingInFrame(list, visitor.getOutputComponent(), 
                 "show link renderer in list with LFStriping highlighter");

@@ -92,6 +92,7 @@ import org.jdesktop.swingx.action.LinkModelAction;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.LegacyHighlighter;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
@@ -305,7 +306,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         };
         
         JTable xtable = new JTable(model);
-        xtable.setBackground(Highlighter.notePadBackground.getBackground()); // ledger
+        xtable.setBackground(LegacyHighlighter.notePadBackground.getBackground()); // ledger
         JTable table = new JTable(model);
         table.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
         TableCellRenderer renderer = new DefaultTableRenderer();
@@ -320,7 +321,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
      * Obsolete - swingx renderers registered by default.
      * 
      * Unselected background of lead is different for editable/not-editable cells.
-     * With core renderer: can't because Highlighter hack jumps in.
+     * With core renderer: can't because LegacyHighlighter hack jumps in.
      * 
      */
     public void interactiveXTableCompareFocusedCellBackground() {
@@ -331,7 +332,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
 //        };
 //        
 //        JXTable xtable = new JXTable(model);
-//        xtable.setBackground(Highlighter.notePadBackground.getBackground()); // ledger
+//        xtable.setBackground(LegacyHighlighter.notePadBackground.getBackground()); // ledger
 //        JXTable table = new JXTable(model) {
 //
 //            @Override
@@ -629,7 +630,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
         JXList list = new JXList();
-        Highlighter highlighter = new UIAlternateRowHighlighter();
+        LegacyHighlighter highlighter = new UIAlternateRowHighlighter();
         table.addHighlighter(highlighter);
         list.addHighlighter(highlighter);
         // quick-fill and hook to table columns' visibility state
@@ -783,7 +784,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         TableCellRenderer renderer = createColorRendererExt();
         table.setDefaultRenderer(Color.class, renderer);
         JXFrame frame = wrapWithScrollingInFrame(xtable, table, "JXTable/highlighter: Custom color renderer - standard/ext");
-        addStatusMessage(frame, "Highlighter hide custom color renderer background for unselected");
+        addStatusMessage(frame, "LegacyHighlighter hide custom color renderer background for unselected");
         frame.setVisible(true);
     }
 
@@ -794,7 +795,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
     public void interactiveTableCustomColorRendererWithHighlighterDontTouch() {
         TableModel model = new AncientSwingTeam();
         JXTable xtable = new JXTable(model);
-        Highlighter highlighter = createPropertyRespectingHighlighter(AlternateRowHighlighter.genericGrey);
+        LegacyHighlighter highlighter = createPropertyRespectingHighlighter(AlternateRowHighlighter.genericGrey);
         xtable.addHighlighter(highlighter);
         xtable.setDefaultRenderer(Color.class, new ColorRenderer(true));
         JXTable table = new JXTable(model);
@@ -802,20 +803,20 @@ public class RendererVisualCheck extends InteractiveTestCase {
         TableCellRenderer renderer = createColorRendererExt();
         table.setDefaultRenderer(Color.class, renderer);
         JXFrame frame = wrapWithScrollingInFrame(xtable, table, "JXTable/highlighter dont-touch: Custom color renderer - standard/ext");
-        addStatusMessage(frame, "Highlighter doesn't touch custom color renderer visual properties");
+        addStatusMessage(frame, "LegacyHighlighter doesn't touch custom color renderer visual properties");
         frame.setVisible(true);
     }
 
     /**
-     * Creates and returns a Highlighter which does nothing if the 
+     * Creates and returns a LegacyHighlighter which does nothing if the 
      * rendererComponent has the dont-touch property set. Otherwise
      * delegates highlighting to the delegate.
      * 
      * @param delegate
      * @return
      */
-    private Highlighter createPropertyRespectingHighlighter(final Highlighter delegate) {
-        Highlighter highlighter = new Highlighter() {
+    private LegacyHighlighter createPropertyRespectingHighlighter(final Highlighter delegate) {
+        LegacyHighlighter highlighter = new LegacyHighlighter() {
 
             @Override
             public Component highlight(Component renderer, ComponentAdapter adapter) {

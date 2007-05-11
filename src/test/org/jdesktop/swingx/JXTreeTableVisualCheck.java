@@ -40,12 +40,13 @@ import org.jdesktop.swingx.decorator.ConditionalHighlighter;
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.HierarchicalColumnHighlighter;
-import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.HighlighterPipeline;
+import org.jdesktop.swingx.decorator.LegacyHighlighter;
+import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
+import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.test.AncientSwingTeam;
@@ -398,7 +399,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      * 
      */
     public void interactiveTestInsertNodeAndChangedParentRendering() {
-        final Icon topIcon = new ImageIcon(getClass().getResource("resources/images/wellTop.gif"));
+        final Icon topIcon = XTestUtils.loadDefaultIcon("wellTop.gif");
         final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
         final InsertTreeTableModel model = new InsertTreeTableModel(root);
         JXTree tree = new JXTree(model);
@@ -588,7 +589,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         treeTable.setRowHeight(22);
         treeTable.setShowGrid(true, false);
-        treeTable.setHighlighters(new HighlighterPipeline(new Highlighter[] {
+        treeTable.setCompoundHighlighter(new CompoundHighlighter(new LegacyHighlighter[] {
                 AlternateRowHighlighter.linePrinter,
                 new HierarchicalColumnHighlighter(), }));
         final JXTree tree = new JXTree(treeTableModel);
@@ -606,7 +607,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      */
     public void interactiveTestHighlighterRowHeightCompareTree() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
-        treeTable.addHighlighter(new Highlighter(Color.orange, null));
+        treeTable.addHighlighter(new LegacyHighlighter(Color.orange, null));
         treeTable.setIntercellSpacing(new Dimension(15, 15));
         treeTable.setRowHeight(48);
         treeTable.setShowHorizontalLines(true);
@@ -736,7 +737,8 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      * Issue #242: CCE when setting icons. Not reproducible? 
      * Another issue: icon setting does not repaint (with core default renderer)
      * Does not work at all with SwingX renderer (not surprisingly, the
-     * delegating renderer in JXTree looks for a core default to wrap)
+     * delegating renderer in JXTree looks for a core default to wrap).
+     * Think: tree/table should trigger repaint?
      */    
     public void interactiveTestTreeIcons() {
         final JXTreeTable treeTable = new JXTreeTable(treeTableModel);
@@ -751,7 +753,10 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
                     treeTable.setClosedIcon(upIcon);
                 }
                 down = !down;
-                
+                // need to force - but shouldn't that be done in the
+                // tree/table itself? and shouldn't the tree fire a 
+                // property change?
+                //treeTable.repaint();
             }
             
         };
@@ -780,7 +785,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         treeTable.addHighlighter(new PatternHighlighter(null, Color.red, "^s",
                 Pattern.CASE_INSENSITIVE, 0, -1));
         // alternative: set a pipeline containing the bunch of highlighters
-//        treeTable.setHighlighters(new HighlighterPipeline(new Highlighter[] {
+//        treeTable.setHighlighters(new CompoundHighlighter(new LegacyHighlighter[] {
 //                AlternateRowHighlighter.quickSilver,
 //                new HierarchicalColumnHighlighter(),
 //                new PatternHighlighter(null, Color.red, "^s",
@@ -825,7 +830,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     public void interactiveTestHighlightAndRowHeight() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         treeTable.setRowHeight(22);
-        treeTable.setHighlighters(new HighlighterPipeline(new Highlighter[] {
+        treeTable.setCompoundHighlighter(new CompoundHighlighter(new LegacyHighlighter[] {
                 AlternateRowHighlighter.linePrinter,
                 new HierarchicalColumnHighlighter(), }));
         JFrame frame = wrapWithScrollingInFrame(treeTable,
@@ -926,7 +931,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 
     public void interactiveTestHighlighterRowHeight() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
-        treeTable.addHighlighter(new Highlighter(Color.orange, null));
+        treeTable.addHighlighter(new LegacyHighlighter(Color.orange, null));
         treeTable.setIntercellSpacing(new Dimension(15, 15));
         treeTable.setRowHeight(48);
         JFrame frame = wrapWithScrollingInFrame(treeTable,
@@ -942,16 +947,16 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
  //       treeTable.setRowHeight(0, 96);
         treeTable.setShowGrid(true);
         // set a bunch of highlighters as a pipeline
-        treeTable.setHighlighters(new HighlighterPipeline(
-                new Highlighter[] {
-                        new Highlighter(Color.orange, null),
+        treeTable.setCompoundHighlighter(new CompoundHighlighter(
+                new LegacyHighlighter[] {
+                        new LegacyHighlighter(Color.orange, null),
                         new HierarchicalColumnHighlighter(),
                         new PatternHighlighter(null, Color.red,
                                 "D", 0, 0, 0), 
                         
         
                 }));
-        Highlighter conditional = new ConditionalHighlighter(Color.BLUE, Color.WHITE, 0, 0) {
+        LegacyHighlighter conditional = new ConditionalHighlighter(Color.BLUE, Color.WHITE, 0, 0) {
 
             protected boolean test(ComponentAdapter adapter) {
                 return adapter.hasFocus();
