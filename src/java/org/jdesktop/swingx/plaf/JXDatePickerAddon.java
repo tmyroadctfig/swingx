@@ -18,14 +18,17 @@
  */
 package org.jdesktop.swingx.plaf;
 
-import org.jdesktop.swingx.JXDatePicker;
+import java.util.Arrays;
+import java.util.List;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.border.LineBorder;
 import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.IconUIResource;
-import java.util.Arrays;
-import java.util.List;
+
+import org.jdesktop.swingx.JXDatePicker;
+import org.jdesktop.swingx.plaf.basic.BasicDatePickerUI;
 
 /**
  * @author Joshua Outwater
@@ -39,8 +42,8 @@ public class JXDatePickerAddon extends AbstractComponentAddon {
     protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
         super.addBasicDefaults(addon, defaults);
         defaults.addAll(Arrays.asList(new Object[]{
-                defaults.add(JXDatePicker.uiClassID),
-                defaults.add("org.jdesktop.swingx.plaf.basic.BasicDatePickerUI"),
+                JXDatePicker.uiClassID,
+                BasicDatePickerUI.class.getName(),
                 "JXDatePicker.border",
                 new BorderUIResource(BorderFactory.createCompoundBorder(
                         LineBorder.createGrayLineBorder(),
@@ -53,7 +56,8 @@ public class JXDatePickerAddon extends AbstractComponentAddon {
         super.addWindowsDefaults(addon, defaults);
         defaults.addAll(Arrays.asList(new Object[] {
                 "JXDatePicker.arrowDown.image",
-                new IconUIResource(new ImageIcon(getClass().getResource("resources/combo-xp.png")))
+                new IconUIResource(new ImageIcon(JXDatePickerAddon.class
+                        .getResource("resources/combo-xp.png")))
         }));
     }
 
@@ -61,10 +65,9 @@ public class JXDatePickerAddon extends AbstractComponentAddon {
     protected void addMacDefaults(LookAndFeelAddons addon, List<Object> defaults) {
         super.addMacDefaults(addon, defaults);
         defaults.addAll(Arrays.asList(new Object[] {
-                defaults.add(JXDatePicker.uiClassID),
-                defaults.add("org.jdesktop.swingx.plaf.macosx.MacOSXDatePickerUI"),
                 "JXDatePicker.arrowDown.image",
-                new IconUIResource(new ImageIcon(getClass().getResource("resources/combo-osx.png")))
+                new IconUIResource(new ImageIcon(JXDatePickerAddon.class
+                        .getResource("resources/combo-osx.png")))
         }));
     }
 }
