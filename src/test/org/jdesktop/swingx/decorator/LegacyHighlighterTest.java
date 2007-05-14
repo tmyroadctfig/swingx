@@ -71,7 +71,27 @@ public class LegacyHighlighterTest extends InteractiveTestCase {
         }
         highlighters = null;
     }
-
+//------------ sanity during overhaul
+    
+    @SuppressWarnings("deprecation")
+    public void testPredefinedColors() {
+        assertEquals(((AlternateRowHighlighter) AlternateRowHighlighter.beige).getEvenRowBackground()
+                , ColorHighlighter.BEIGE);
+        assertEquals(((AlternateRowHighlighter) AlternateRowHighlighter.genericGrey).getEvenRowBackground()
+                , ColorHighlighter.GENERIC_GRAY);
+        assertEquals(((AlternateRowHighlighter) AlternateRowHighlighter.classicLinePrinter).getEvenRowBackground()
+                , ColorHighlighter.CLASSIC_LINE_PRINTER);
+        assertEquals(((AlternateRowHighlighter) AlternateRowHighlighter.floralWhite).getEvenRowBackground()
+                , ColorHighlighter.FLORAL_WHITE);
+        assertEquals(AlternateRowHighlighter.ledgerBackground.getBackground()
+                , ColorHighlighter.LEDGER);
+        assertEquals(((AlternateRowHighlighter) AlternateRowHighlighter.linePrinter).getEvenRowBackground()
+                , ColorHighlighter.LINE_PRINTER);
+        assertEquals(AlternateRowHighlighter.notePadBackground.getBackground()
+                , ColorHighlighter.NOTEPAD);
+        assertEquals(((AlternateRowHighlighter) AlternateRowHighlighter.quickSilver).getEvenRowBackground()
+                , ColorHighlighter.QUICKSILVER);
+    }    
     
 //----------------------- highlighter constructors, immutable highlighters
  

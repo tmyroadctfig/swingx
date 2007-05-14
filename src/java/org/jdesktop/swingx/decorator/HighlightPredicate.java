@@ -23,6 +23,8 @@ package org.jdesktop.swingx.decorator;
 
 import java.awt.Component;
 import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jdesktop.swingx.RolloverProducer;
 
@@ -135,8 +137,45 @@ public interface HighlightPredicate {
             this.linesPerGroup = linesPerGroup;
         }
         
+        /**
+         * {@inheritDoc}
+         */
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
             return (adapter.row / linesPerGroup) % 2 == 1;
+        }
+        
+    }
+    
+    /**
+     * A HighlightPredicate based on column index.
+     * 
+     */
+    public static class ColumnHighlightPredicate implements HighlightPredicate {
+        List<Integer> columnList;
+        
+        /**
+         * Instantiates a predicate which returns true for the
+         * given columns in model coodinates.
+         * 
+         * @param columns the columns to highlight in model coordinates.
+         */
+        public ColumnHighlightPredicate(int... columns) {
+            columnList = new ArrayList<Integer>();
+            for (int i = 0; i < columns.length; i++) {
+                columnList.add(columns[i]);
+            }
+        }
+        
+        /**
+         * {@inheritDoc}
+         * 
+         * This implementation returns true if the adapters column
+         * is contained in this predicates list.
+         * 
+         */
+        public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+            int modelIndex = adapter.viewToModel(adapter.column);
+            return columnList.contains(modelIndex);
         }
         
     }

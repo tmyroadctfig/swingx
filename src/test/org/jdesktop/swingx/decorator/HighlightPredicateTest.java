@@ -15,6 +15,7 @@ import javax.swing.JLabel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.RolloverProducer;
+import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.NotHighlightPredicate;
 
 /**
@@ -102,7 +103,17 @@ public class HighlightPredicateTest extends InteractiveTestCase {
         adapter.row = 1;
         assertFalse(HighlightPredicate.ROLLOVER_ROW.isHighlighted(allColored, adapter));
     }
+
+//---------------- special predicates
     
+    public void testColumn() {
+        HighlightPredicate predicate = new ColumnHighlightPredicate(1);
+        ComponentAdapter adapter = createComponentAdapter(allColored, false);
+        assertFalse("column 0 must not be highlighted", predicate.isHighlighted(allColored, adapter));
+        adapter.column = 1;
+        assertTrue("column 1 must be highlighted", predicate.isHighlighted(allColored, adapter));
+    }
+
     public void testPattern() {
         // start with "t"
         Pattern pattern = Pattern.compile("^t", 0);

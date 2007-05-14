@@ -11,7 +11,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Container;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -51,21 +50,13 @@ import org.jdesktop.swingx.JXTable.NumberEditor;
 import org.jdesktop.swingx.JXTableHeader.SortGestureRecognizer;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.LinkModelAction;
-import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
-import org.jdesktop.swingx.decorator.ComponentAdapter;
-import org.jdesktop.swingx.decorator.ConditionalHighlighter;
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
-import org.jdesktop.swingx.decorator.HighlightPredicate;
-import org.jdesktop.swingx.decorator.LegacyHighlighter;
 import org.jdesktop.swingx.decorator.PatternFilter;
-import org.jdesktop.swingx.decorator.PatternHighlighter;
-import org.jdesktop.swingx.decorator.RolloverHighlighter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.decorator.SortController;
 import org.jdesktop.swingx.decorator.Sorter;
-import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.HyperlinkProvider;
 import org.jdesktop.swingx.table.ColumnFactory;
@@ -96,8 +87,8 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*Boolean.*");
 //          test.runInteractiveTests("interactive.*isable.*");
           
-//          test.runInteractiveTests("interactive.*High.*");
-        test.runInteractiveTests("interactive.*Rollover.*");
+          test.runInteractiveTests("interactive.*High.*");
+//        test.runInteractiveTests("interactive.*Rollover.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -1254,94 +1245,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         frame.setVisible(true);
     }
 
-    /**
-     * Issue #503-swingx: custom cursor respected when rollover?
-     * Seems okay for table, 
-     */
-    public void interactiveTestRolloverHighlightCustomCursor() {
-        JXTable table = new JXTable(sortableTableModel);
-        table.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-        table.addHighlighter(new ColorHighlighter(Color.YELLOW, null, HighlightPredicate.ROLLOVER_ROW));
-        showWithScrollingInFrame(table, "rollover highlight, custom cursor");
-    }
 
-    /**
-     * Plain RolloverHighlighter. 
-     *
-     */
-    public void interactiveTestRolloverHighlight() {
-        JXTable table = new JXTable(sortableTableModel);
-        table.addHighlighter(new ColorHighlighter(Color.YELLOW, null, HighlightPredicate.ROLLOVER_ROW));
-        showWithScrollingInFrame(table, "rollover highlight");
-    }
-    
-    public void interactiveTestTableAlternateHighlighterGroup() {
-        JXTable table = new JXTable(tableModel);
-        installLinkRenderer(table);
-        table.setRowHeight(22);
-        AlternateRowHighlighter highlighter = new UIAlternateRowHighlighter();
-        highlighter.setLinesPerGroup(5);
-        table.addHighlighter(highlighter);
-        JFrame frame = wrapWithScrollingInFrame(table, "AlternateRow with Grouping of 5 lines");
-        frame.setVisible(true);
-    }
-
-    public void interactiveTestAlternateRowWithForegroundHighlighter() {
-        JXTable table = new JXTable(tableModel);
-        installLinkRenderer(table);
-        ConditionalHighlighter highlighter = new ConditionalHighlighter(null, Color.BLUE, 1, 1) {
-            
-            @Override
-            protected boolean needsHighlight(ComponentAdapter adapter) {
-                return highlightColumn == adapter.viewToModel(adapter.column);
-            }
-
-            @Override
-            protected boolean test(ComponentAdapter adapter) {
-                // not called - the column is highlighted unconditionally
-                return false;
-            }
-            
-        };
-        
-        table.addHighlighter(highlighter);
-        table.addHighlighter(new UIAlternateRowHighlighter());
-        JFrame frame = wrapWithScrollingInFrame(table, "AlternateRow with and column");
-        frame.setVisible(true);
-    }
-
-
-    public void interactiveTestTableAlternateHighlighter1() {
-        JXTable table = new JXTable(tableModel);
-        installLinkRenderer(table);
-        table.setRowHeight(22);
-        table.setRowMargin(1);
-
-        table.setFilters(new FilterPipeline(new Filter[] {
-                                            new ShuttleSorter(0, true) // column 0, ascending
-        }));
-
-        table.setHighlighters(
-            AlternateRowHighlighter.linePrinter,
-            new RolloverHighlighter(Color.YELLOW, null));
-
-        JFrame frame = wrapWithScrollingInFrame(table, "LinePrinter plus yellow rollover");
-        frame.setVisible(true);
-    }
-
-    public void interactiveTestTableAlternateRowHighlighter2() {
-        JXTable table = new JXTable(tableModel);
-        installLinkRenderer(table);
-        table.setRowHeight(22);
-        table.setRowMargin(1);
-        table.setFilters(new FilterPipeline(new Filter[] {
-                                            new ShuttleSorter(1, false), // column 1, descending
-        }));
-
-        table.addHighlighter(AlternateRowHighlighter.classicLinePrinter);
-        JFrame frame = wrapWithScrollingInFrame(table, "classic lineprinter Test");
-        frame.setVisible(true);
-    }
 
     public void interactiveTestTableSorter1() {
         JXTable table = new JXTable(sortableTableModel);
@@ -1383,7 +1287,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             }
         };
         JXTable xtable = new JXTable(model);
-        xtable.setBackground(LegacyHighlighter.notePadBackground.getBackground()); // ledger
+        xtable.setBackground(ColorHighlighter.NOTEPAD);
         JTable table = new JTable(model);
         table.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
         JFrame frame = wrapWithScrollingInFrame(xtable, table, "Unselected focused background: JXTable/JTable");
@@ -1393,7 +1297,6 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 
     public void interactiveTestTableSorter3() {
         JXTable table = new JXTable(sortableTableModel);
-        table.addHighlighter(new LegacyHighlighter(Color.orange, null));
         table.setFilters(new FilterPipeline(new Filter[] {
                                             new ShuttleSorter(1, true), // column 1, ascending
                                             new ShuttleSorter(0, false), // column 0, descending
@@ -1464,22 +1367,6 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         frame.setVisible(true);
     }
 
-    public void interactiveTestTableSortedPatternFilterPatternHighlighter() {
-        // **** IMPORTANT TEST CASE for interaction between ****
-        // **** PatternFilter and PatternHighlighter!!! ****
-        JXTable table = new JXTable(tableModel);
-        installLinkRenderer(table);
-        table.setFilters(new FilterPipeline(new Filter[] {
-                                            new PatternFilter("^S", 0, 1),
-                                            new ShuttleSorter(0, false), // column 0, descending
-                                            new ShuttleSorter(1, true), // column 1, ascending
-                                            new ShuttleSorter(3, false), // column 3, descending
-        }));
-        table.addHighlighter(new PatternHighlighter(null, Color.red, "^S", 0, 1));
-        JFrame frame = wrapWithScrollingInFrame(table, "PatternFilter/LegacyHighlighter ^S col1");
-        frame.setVisible(true);
-    }
-
     public void interactiveTestTableViewProperties() {
         JXTable table = new JXTable(tableModel);
         installLinkRenderer(table);
@@ -1489,17 +1376,6 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         frame.setVisible(true);
     }
 
-    public void interactiveTestTablePatternHighlighter() {
-        JXTable table = new JXTable(sortableTableModel);
-        table.setColumnControlVisible(true);
-        table.setIntercellSpacing(new Dimension(15, 15));
-        table.setRowHeight(48);
-        table.setRowHeight(0, 96);
-        table.setShowGrid(true);
-        table.addHighlighter(new PatternHighlighter(null, Color.red, "^A", 0, 1));
-        JFrame frame = wrapWithScrollingInFrame(table, "PatternHighlighter ^A col 1");
-        frame.setVisible(true);
-    }
 
     public void interactiveTestTableColumnProperties() {
         JXTable table = new JXTable();
