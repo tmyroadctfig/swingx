@@ -24,6 +24,8 @@ package org.jdesktop.swingx.decorator;
 import java.awt.Color;
 import java.awt.Component;
 
+import javax.swing.event.ChangeListener;
+
 
 /**
  * The legacy Highlighter. Note JW: this will be removed "some time" 
@@ -143,6 +145,9 @@ public class LegacyHighlighter extends AbstractHighlighter {
     private Color selectedBackground = null;
     private Color selectedForeground = null;
 
+    /** flag to indicate whether the Highlighter is immutable in every respect. */
+    protected final boolean immutable;
+
     /**
      * Default constructor for mutable LegacyHighlighter.
      * Initializes background, foreground, selectedBackground, and
@@ -196,7 +201,8 @@ public class LegacyHighlighter extends AbstractHighlighter {
      */
     public LegacyHighlighter(Color cellBackground, Color cellForeground, 
             Color selectedBackground, Color selectedForeground, boolean immutable) {
-        super(immutable);
+        super();
+        this.immutable = immutable;
         this.background = cellBackground; 
         this.foreground = cellForeground; 
         this.selectedBackground = selectedBackground;
@@ -401,6 +407,18 @@ public class LegacyHighlighter extends AbstractHighlighter {
 //---------------------- state
     
     /**
+     * {@inheritDoc}<p>
+     * 
+     * Overridden to not add listener if immutable.
+     */
+    @Override
+    public void addChangeListener(ChangeListener l) {
+        if (isImmutable()) return;
+        super.addChangeListener(l);
+    }
+ 
+    
+    /**
      * Returns the background color of this <code>LegacyHighlighter</code>.
      *
      * @return the background color of this <code>LegacyHighlighter</code>,
@@ -496,7 +514,17 @@ public class LegacyHighlighter extends AbstractHighlighter {
         fireStateChanged();
     }
 
-//---------------------- 
+/**
+     * Returns immutable flag. If true, the Highlighter must not
+     * change internal state in any way. In this case,
+     * no listeners are added and no change events fired.
+     * @return true if none of the setXX methods have any effect
+     */
+    public final boolean isImmutable() {
+        return immutable;
+    }
+
+    //---------------------- 
     /**
      * Interface to implement if Highlighter state depends on the 
      * LookAndFeel. 
@@ -508,4 +536,5 @@ public class LegacyHighlighter extends AbstractHighlighter {
         
         void updateUI();
     }
+
 }

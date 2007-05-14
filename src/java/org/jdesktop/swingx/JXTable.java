@@ -157,8 +157,8 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
  * 
  * <p>
  * One can automatically highlight certain rows in a JXTable by attaching
- * Highlighters in the {@link #setCompoundHighlighter(CompoundHighlighter)}method. An
- * example would be a LegacyHighlighter that colors alternate rows in the table for
+ * Highlighters with setHighlighters(Highlighter) method. An
+ * example would be a Highlighter that colors alternate rows in the table for
  * readability; AlternateRowHighlighter does this. Again, like Filters,
  * Highlighters can be chained together in a CompoundHighlighter to achieve more
  * interesting effects.
@@ -275,7 +275,7 @@ public class JXTable extends JTable
 
 
     /**
-     * The LegacyHighlighter used to hack around DefaultTableCellRenderer's color memory. 
+     * The Highlighter used to hack around DefaultTableCellRenderer's color memory. 
      */
     protected Highlighter resetDefaultTableCellRendererHighlighter;
 
@@ -2815,21 +2815,18 @@ public class JXTable extends JTable
         }
 
         private void ensureInsertedSearchHighlighters() {
-            if (getCompoundHighlighter() == null) {
-                setCompoundHighlighter(new CompoundHighlighter(
-                        new Highlighter[] { getSearchHighlighter() }));
-            } else if (!isInPipeline(getSearchHighlighter())) {
-                getCompoundHighlighter().addHighlighter(getSearchHighlighter());
+            if (!isInPipeline(getSearchHighlighter())) {
+                addHighlighter(getSearchHighlighter());
             }
         }
 
         private boolean isInPipeline(PatternHighlighter searchHighlighter) {
-            Highlighter[] inPipeline = getCompoundHighlighter().getHighlighters();
+            Highlighter[] inPipeline = getHighlighters();
             if ((inPipeline.length > 0) && 
                (searchHighlighter.equals(inPipeline[inPipeline.length -1]))) {
                 return true;
             }
-            getCompoundHighlighter().removeHighlighter(searchHighlighter);
+            removeHighlighter(searchHighlighter);
             return false;
         }
 
@@ -3015,7 +3012,7 @@ public class JXTable extends JTable
 
     /**
      * Returns the CompoundHighlighter assigned to the table, null if none.
-     * PENDING: open up for subclasses again.
+     * PENDING: open up for subclasses again?.
      * 
      * @return the CompoundHighlighter assigned to the table.
      * @see #setCompoundHighlighter(CompoundHighlighter)
@@ -3028,8 +3025,9 @@ public class JXTable extends JTable
      * Assigns a CompoundHighlighter to the table, maybe null to remove all
      * Highlighters.<p>
      * 
-     * The default value is <code>null</code>.
+     * The default value is <code>null</code>. <p>
      * 
+     * PENDING: open up for subclasses again?.
      * @param pipeline the CompoundHighlighter to use for renderer decoration. 
      * @see #getCompoundHighlighter()
      * @see #addHighlighter(Highlighter)
@@ -3045,17 +3043,24 @@ public class JXTable extends JTable
         if (compoundHighlighter != null) {
             compoundHighlighter.addChangeListener(getHighlighterChangeListener());
         }
+        // PENDING: wrong event - the property is either "compoundHighlighter"
+        // or "highlighters" with the old/new array as value
         firePropertyChange("highlighters", old, getCompoundHighlighter());
         repaint();
     }
     
     /**
      * Sets the <code>Highlighter</code>s to the table, replacing any old settings.
-     * Maybe null to remove all highlighters.<p>
+     * None of the given Highlighters must be null.<p>
      * 
+     * Note: the implementation is lenient with a single null highighter
+     * to ease the api change from previous versions.
      * 
-     * @param highlighters the highlighters to use for renderer decoration. 
-     * @see #getCompoundHighlighter()
+     * PENDING: property change? 
+     * 
+     * @param highlighters zero or more not null highlighters to use for renderer decoration.
+     * 
+     * @see #getHighlighters()
      * @see #addHighlighter(Highlighter)
      * @see #removeHighlighter(Highlighter)
      * 
@@ -3073,6 +3078,7 @@ public class JXTable extends JTable
      * Returns the <code>Highlighter</code>s used by this table.
      * Maybe empty, but guarantees to be never null.
      * @return the Highlighters used by this table, guaranteed to never null.
+     * @see #setHighlighters(Highlighter[])
      */
     public Highlighter[] getHighlighters() {
         return getCompoundHighlighter() != null ? 
@@ -3080,34 +3086,31 @@ public class JXTable extends JTable
                     CompoundHighlighter.EMPTY_HIGHLIGHTERS;
     }
     /**
-     * Adds a LegacyHighlighter.
+     * Adds a Highlighter. Appends to the end of the list of used
+     * Highlighters.
      * <p>
      * 
-     * If the <code>CompoundHighlighter</code> returned from getHighlighters()
-     * is null, creates and sets a new pipeline containing the given
-     * <code>LegacyHighlighter</code>. Else, appends the <code>LegacyHighlighter</code>
-     * to the end of the pipeline.
+     * @param highlighter the <code>Highlighter</code> to add.
+     * @throws NullPointerException if <code>Highlighter</code> is null.
      * 
-     * @param highlighter the <code>LegacyHighlighter</code> to add.
-     * @throws NullPointerException if <code>LegacyHighlighter</code> is null.
      * @see #removeHighlighter(Highlighter)
-     * @see #setCompoundHighlighter(CompoundHighlighter)
+     * @see #setHighlighters(Highlighter[])
      */
     public void addHighlighter(Highlighter highlighter) {
         CompoundHighlighter pipeline = getCompoundHighlighter();
         if (pipeline == null) {
-           setCompoundHighlighter(new CompoundHighlighter(new Highlighter[] {highlighter})); 
+           setCompoundHighlighter(new CompoundHighlighter(highlighter)); 
         } else {
             pipeline.addHighlighter(highlighter);
         }
     }
 
     /**
-     * Removes the LegacyHighlighter. <p>
+     * Removes the given Highlighter. <p>
      * 
      * Does nothing if the Highlighter is not contained.
      * 
-     * @param highlighter the highlighter to remove.
+     * @param highlighter the Highlighter to remove.
      * @see #addHighlighter(Highlighter)
      * @see #setHighlighters(Highlighter..)
      */
@@ -3218,7 +3221,7 @@ public class JXTable extends JTable
      * true by default.
      * <p>
      * 
-     * The hack consists of applying a specialized <code>LegacyHighlighter</code> to
+     * The hack consists of applying a specialized <code>Highlighter</code> to
      * force reset the color "memory" of <code>DefaultTableCellRenderer</code>.
      * Note that the hack is applied always, that is even if there are no custom
      * Highlighters.

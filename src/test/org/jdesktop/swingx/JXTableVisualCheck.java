@@ -52,12 +52,13 @@ import org.jdesktop.swingx.JXTableHeader.SortGestureRecognizer;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.LinkModelAction;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.ConditionalHighlighter;
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
+import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.LegacyHighlighter;
-import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.RolloverHighlighter;
@@ -70,7 +71,6 @@ import org.jdesktop.swingx.renderer.HyperlinkProvider;
 import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 import org.jdesktop.swingx.table.TableColumnExt;
-import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.AncientSwingTeam;
 
 /**
@@ -96,8 +96,8 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*Boolean.*");
 //          test.runInteractiveTests("interactive.*isable.*");
           
-          test.runInteractiveTests("interactive.*High.*");
-//        test.runInteractiveTests("interactive.*Rollover.*");
+//          test.runInteractiveTests("interactive.*High.*");
+        test.runInteractiveTests("interactive.*Rollover.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -1261,7 +1261,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
     public void interactiveTestRolloverHighlightCustomCursor() {
         JXTable table = new JXTable(sortableTableModel);
         table.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-        table.addHighlighter(new RolloverHighlighter(Color.YELLOW, null));
+        table.addHighlighter(new ColorHighlighter(Color.YELLOW, null, HighlightPredicate.ROLLOVER_ROW));
         showWithScrollingInFrame(table, "rollover highlight, custom cursor");
     }
 
@@ -1271,7 +1271,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
      */
     public void interactiveTestRolloverHighlight() {
         JXTable table = new JXTable(sortableTableModel);
-        table.addHighlighter(new RolloverHighlighter(Color.YELLOW, null));
+        table.addHighlighter(new ColorHighlighter(Color.YELLOW, null, HighlightPredicate.ROLLOVER_ROW));
         showWithScrollingInFrame(table, "rollover highlight");
     }
     

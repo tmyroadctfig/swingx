@@ -89,8 +89,10 @@ import org.jdesktop.swingx.LinkRenderer;
 import org.jdesktop.swingx.RolloverRenderer;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.LinkModelAction;
+import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.LegacyHighlighter;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
@@ -630,7 +632,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
         JXList list = new JXList();
-        LegacyHighlighter highlighter = new UIAlternateRowHighlighter();
+        Highlighter highlighter = new UIAlternateRowHighlighter();
         table.addHighlighter(highlighter);
         list.addHighlighter(highlighter);
         // quick-fill and hook to table columns' visibility state
@@ -795,7 +797,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
     public void interactiveTableCustomColorRendererWithHighlighterDontTouch() {
         TableModel model = new AncientSwingTeam();
         JXTable xtable = new JXTable(model);
-        LegacyHighlighter highlighter = createPropertyRespectingHighlighter(AlternateRowHighlighter.genericGrey);
+        Highlighter highlighter = createPropertyRespectingHighlighter(AlternateRowHighlighter.genericGrey);
         xtable.addHighlighter(highlighter);
         xtable.setDefaultRenderer(Color.class, new ColorRenderer(true));
         JXTable table = new JXTable(model);
@@ -815,12 +817,18 @@ public class RendererVisualCheck extends InteractiveTestCase {
      * @param delegate
      * @return
      */
-    private LegacyHighlighter createPropertyRespectingHighlighter(final Highlighter delegate) {
-        LegacyHighlighter highlighter = new LegacyHighlighter() {
+    private Highlighter createPropertyRespectingHighlighter(final Highlighter delegate) {
+        HighlightPredicate predicate = new HighlightPredicate() {
 
-            @Override
-            public Component highlight(Component renderer, ComponentAdapter adapter) {
-                if (((JComponent) renderer).getClientProperty("renderer-dont-touch") != null) return renderer;
+            public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+                return ((JComponent) renderer).getClientProperty("renderer-dont-touch") != null;
+            }
+            
+        };
+        
+        Highlighter highlighter = new AbstractHighlighter(predicate) {
+
+            public Component doHighlight(Component renderer, ComponentAdapter adapter) {
                 return delegate.highlight(renderer, adapter);
             }
             

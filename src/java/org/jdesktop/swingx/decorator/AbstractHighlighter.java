@@ -21,15 +21,20 @@
  */
 package org.jdesktop.swingx.decorator;
 
+import java.awt.Component;
+
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 
 /**
- * Convenience abstract <code>Highlighter</code> implementation which
- * managers listeners. 
+ * Abstract <code>Highlighter</code> implementation which
+ * manages notification and highlights conditionally, controlled
+ * by a HighlightPredicate. <p> 
  * 
  * @author Jeanette Winzenburg
+ * 
+ * @see HighlightPredicate
  */
 public abstract class AbstractHighlighter implements Highlighter {
 
@@ -38,71 +43,117 @@ public abstract class AbstractHighlighter implements Highlighter {
      * event's only (read-only) state is the source property.  The source
      * of events generated here is always "this".
      */
-    protected transient ChangeEvent changeEvent = null;
+    private transient ChangeEvent changeEvent;
     /** The listeners waiting for model changes. */
     protected EventListenerList listenerList = new EventListenerList();
-    /** flag to indicate whether the Highlighter is immutable in every respect. */
-    protected final boolean immutable;
+    /** the HighlightPredicate to use. */
+    private HighlightPredicate predicate;
 
     /**
-     * Instantiates a mutable Highlighter.
+     * Instantiates a Highlighter with default HighlightPredicate.
      *
+     * @see #setHighlightPredicate(HighlightPredicate)
      */
     public AbstractHighlighter() {
-        this(false);
+        this(null);
     }
+    
     /**
-     * Instantiates a Highlighter with the given mutability.<p>
+     * Instantiates a Highlighter with the given 
+     * HighlightPredicate.<p>
      * 
-     * NOTE: Subclasses which declare themselves immutable must 
-     * take care to really be so! The flag is a bit of a hack around
-     * a memory leak with static pre-defined default highlighters.
+     * @param predicate the HighlightPredicate to use.
      * 
-     * @param immutable the immutable property.
+     * @see #setHighlightPredicate(HighlightPredicate)
      */
-    public AbstractHighlighter(boolean immutable) {
-        this.immutable = immutable;
+    public AbstractHighlighter(HighlightPredicate predicate) {
+           setHighlightPredicate(predicate);
+    }
+    
+    /**
+     * Set the HighlightPredicate used to decide whether a cell should
+     * be highlighted. If null, sets the predicate to HighlightPredicate.ALWAYS.
+     * 
+     * The default value is HighlightPredicate.ALWAYS. 
+     * 
+     * @param predicate the HighlightPredicate to use. 
+     */
+    public void setHighlightPredicate(HighlightPredicate predicate) {
+        this.predicate = predicate != null ? predicate : HighlightPredicate.ALWAYS;
+        fireStateChanged();
     }
 
     /**
-     * Returns immutable flag. If true, the Highlighter must not
-     * change internal state in any way. In this case,
-     * no listeners are added and no change events fired.
-     * @return true if none of the setXX methods have any effect
+     * Returns the HighlightPredicate used to decide whether a cell 
+     * should be highlighted. Guaranteed to be never null.
+     * 
+     * @return the HighlightPredicate to use, never null.
      */
-    public final boolean isImmutable() {
-        return immutable;
+    public HighlightPredicate getHighlightPredicate() {
+        return predicate;
     }
-
+    
+//----------------------- implement predicate respecting highlight
+    
+    /**
+     * {@inheritDoc}
+     * This implementation checks the HighlightPredicate and 
+     * calls doHighlight to apply the decoration. Returns the 
+     * undecorated component if false.
+     * 
+     * @param component the cell renderer component that is to be decorated
+     * @param adapter the ComponentAdapter for this decorate operation
+     * 
+     * @see #doHighlight(Component, ComponentAdapter)
+     * @see #getHighlightPredicate()
+     */
+    public Component highlight(Component component, ComponentAdapter adapter) {
+        if (getHighlightPredicate().isHighlighted(component, adapter)) {
+            component = doHighlight(component, adapter);
+        }
+        return component;
+    }
+    
+   
+    /**
+     * Apply the highlights. 
+     * 
+     * @param component the cell renderer component that is to be decorated
+     * @param adapter the ComponentAdapter for this decorate operation
+     * 
+     * @see #highlight(Component, ComponentAdapter)
+     */
+    protected abstract Component doHighlight(Component component,
+            ComponentAdapter adapter);
+    
 //------------------------ implement Highlighter change notification
     
     /**
-     * Adds a <code>ChangeListener</code> if this is mutable. ChangeListeners are
-     * notified after changes of any attribute. Does nothing if immutable. 
+     * Adds a <code>ChangeListener</code>. ChangeListeners are
+     * notified after changes of any attribute. 
      *
+     * PENDING: make final once the LegacyHighlighters are removed.
+     * 
      * @param l the ChangeListener to add
      * @see #removeChangeListener
      */
-    public final void addChangeListener(ChangeListener l) {
-        if (isImmutable()) return;
+    public /* final */ void addChangeListener(ChangeListener l) {
         listenerList.add(ChangeListener.class, l);
     }
 
     /**
-     * Removes a <code>ChangeListener</code> if this is mutable. 
-     * Does nothis if immutable.
+     * Removes a <code>ChangeListener</code>e. 
      *
      * @param l the <code>ChangeListener</code> to remove
      * @see #addChangeListener
      */
     public final void removeChangeListener(ChangeListener l) {
-        if (isImmutable()) return;
         listenerList.remove(ChangeListener.class, l);
     }
 
     /**
      * Returns an array of all the change listeners
-     * registered on this <code>LegacyHighlighter</code>.
+     * registered on this <code>Highlighter</code>.
      *
      * @return all of this model's <code>ChangeListener</code>s 
      *         or an empty
@@ -113,17 +164,17 @@ public abstract class AbstractHighlighter implements Highlighter {
      *
      * @since 1.4
      */
-    public ChangeListener[] getChangeListeners() {
+    public final ChangeListener[] getChangeListeners() {
         return (ChangeListener[])listenerList.getListeners(
                 ChangeListener.class);
     }
 
     /** 
-     * Runs each <code>ChangeListener</code>'s <code>stateChanged</code> method.
-     * 
+     * Notifies registered <code>ChangeListener</code>s about
+     * state changes.
+     *  
      */
     protected final void fireStateChanged() {
-        if (isImmutable()) return;
         Object[] listeners = listenerList.getListenerList();
         for (int i = listeners.length - 2; i >= 0; i -=2 ) {
             if (listeners[i] == ChangeListener.class) {

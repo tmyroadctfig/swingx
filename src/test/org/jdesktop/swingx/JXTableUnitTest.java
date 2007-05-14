@@ -46,13 +46,10 @@ import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.JXTable.GenericEditor;
 import org.jdesktop.swingx.action.BoundAction;
-import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.LegacyHighlighter;
-import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
@@ -64,7 +61,6 @@ import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.NumberEditorExt;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.test.AncientSwingTeam;
-import org.jdesktop.test.ChangeReport;
 import org.jdesktop.test.PropertyChangeReport;
 
 /**
@@ -1240,134 +1236,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertEquals(model, table.getSelectionMapper().getViewSelectionModel());
     }
 
-    /**
-     * Issue #??-swingx: competing setHighlighters(null) break code.
-     * 
-     * More specifically: it doesn't compile without casting the null, that's why
-     * it has to be commented here.
-     *
-     */
-//    public void testHighlightersNull() {
-//        JXTable table = new JXTable();
-//        table.setHighlighters(null);
-//    }
-
-    /**
-     * Issue #??-swingx: setHighlighters(null) throws NPE. 
-     * PENDING: revisit after highlighter overhaul
-     */
-    public void testSetHighlightersNull() {
-//        JXTable table = new JXTable();
-//        table.setHighlighters((LegacyHighlighter) null);
-//        assertNull(table.getCompoundHighlighter());
-    }
-    
-    /**
-     * Issue #??-swingx: setHighlighters() throws NPE. 
-     * PENDING: revisit after highlighter overhaul
-     * 
-     */
-    public void testSetHighlightersNoHighlighter() {
-//        JXTable table = new JXTable();
-//        table.setHighlighters();
-//        assertNull(table.getCompoundHighlighter());
-    }
-
-    /**
-     * Issue #??-swingx: setHighlighters() throws NPE. 
-     * 
-     * Test that zero highlighter resets the pipeline to null.
-     */
-    public void testSetHighlightersReset() {
-        JXTable table = new JXTable();
-        table.addHighlighter(new LegacyHighlighter());
-        // sanity
-        assertEquals(1, table.getHighlighters().length);
-        table.setHighlighters();
-        assertEquals(0, table.getHighlighters().length);
-    }
-
-    /**
-     * test if removeHighlighter behaves as doc'ed.
-     *
-     * PENDING: revisit after completion of highlighter overhaul.
-     */
-    public void testRemoveHighlighter() {
-        JXTable table = new JXTable();
-        // test cope with null
-        table.removeHighlighter(null);
-        LegacyHighlighter presetHighlighter = AlternateRowHighlighter.classicLinePrinter;
-        table.setHighlighters(presetHighlighter);
-        table.removeHighlighter(new LegacyHighlighter());
-    }
-    
-    /**
-     * test choking on precondition failure (highlighter must not be null).
-     *
-     */
-    public void testAddNullHighlighter() {
-        JXTable table = new JXTable();
-        try {
-            table.addHighlighter(null);
-            fail("adding a null highlighter must throw NPE");
-        } catch (NullPointerException e) {
-            // pass - this is what we expect
-        } catch (Exception e) {
-            fail("adding a null highlighter throws exception different " +
-                        "from the expected NPE \n" + e);
-        }
-    }
-    /**
-     * PENDING: revisit after highlighter overhaul.
-     *
-     */
-    public void testAddHighlighterWithNotEmptyPipeline() {
-        JXTable table = new JXTable();
-        LegacyHighlighter presetHighlighter = AlternateRowHighlighter.classicLinePrinter;
-        table.setHighlighters(presetHighlighter);
-        LegacyHighlighter highlighter = new LegacyHighlighter();
-        table.addHighlighter(highlighter);
-//        assertSame("pipeline must be same as preset", pipeline, table.getCompoundHighlighter());
-//        assertEquals("pipeline must have fired changeEvent", 1, report.getEventCount());
-//        assertPipelineHasAsLast(pipeline, highlighter);
-    }
-    
-    private void assertPipelineHasAsLast(CompoundHighlighter pipeline, Highlighter highlighter) {
-        Highlighter[] highlighters = pipeline.getHighlighters();
-        assertTrue("pipeline must not be empty", highlighters.length > 0);
-        assertSame("highlighter must be added as last", highlighter, highlighters[highlighters.length - 1]);
-    }
-
-    /**
-     * test adding a highlighter.
-     *
-     *  asserts that a pipeline is created and set (firing a property change) and
-     *  that the pipeline contains the highlighter.
-     */
-    public void testAddHighlighterWithNullPipeline() {
-        JXTable table = new JXTable();
-        PropertyChangeReport report = new PropertyChangeReport();
-        table.addPropertyChangeListener(report);
-        LegacyHighlighter highlighter = new LegacyHighlighter();
-        table.addHighlighter(highlighter);
-        assertTrue("table must have fired propertyChange for highlighters", report.hasEvents("highlighters"));
-    }
-    
-    /**
-     * fails if the given highlighter is not contained in the pipeline.
-     * PRE: pipeline != null, highlighter != null.
-     * 
-     * @param pipeline
-     * @param highlighter
-     */
-    private void assertPipelineContainsHighlighter(CompoundHighlighter pipeline, Highlighter highlighter) {
-        Highlighter[] highlighters = pipeline.getHighlighters();
-        for (int i = 0; i < highlighters.length; i++) {
-            if (highlighter.equals(highlighters[i])) return;
-        }
-        fail("pipeline does not contain highlighter");
-        
-    }
 
     /**
      * test if LinkController/executeButtonAction is properly registered/unregistered on

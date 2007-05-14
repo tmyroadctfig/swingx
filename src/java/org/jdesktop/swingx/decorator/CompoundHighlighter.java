@@ -174,21 +174,20 @@ public class CompoundHighlighter extends AbstractHighlighter
      * @see #highlight(Component, ComponentAdapter)
      */
     public Component apply(Component stamp, ComponentAdapter adapter) {
+        return highlight(stamp, adapter);
+    }
+
+//------------------- implement Highlighter    
+
+    @Override
+    protected Component doHighlight(Component stamp, ComponentAdapter adapter) {
         for (Iterator<Highlighter> iter = highlighters.iterator(); iter.hasNext();) {
             stamp = iter.next().highlight(stamp, adapter);
             
         }
         return stamp;
     }
-
-//------------------- implement Highlighter    
-    /**
-     * {@inheritDoc}
-     */
-    public Component highlight(Component stamp, ComponentAdapter adapter) {
-        return apply(stamp, adapter);
-    }
     
-
+    
 
 }

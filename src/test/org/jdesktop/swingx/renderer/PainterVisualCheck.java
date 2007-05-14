@@ -54,8 +54,11 @@ import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.ActionContainerFactory;
+import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.ConditionalHighlighter;
+import org.jdesktop.swingx.decorator.HighlightPredicate;
+import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.LegacyHighlighter;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
 import org.jdesktop.swingx.painter.ImagePainter;
@@ -225,7 +228,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
         JXList list = new JXList();
-        LegacyHighlighter highlighter = new UIAlternateRowHighlighter();
+        Highlighter highlighter = new UIAlternateRowHighlighter();
         table.addHighlighter(highlighter);
         list.setHighlighters(highlighter, new GradientHighlighter());
         // quick-fill and hook to table columns' visibility state
@@ -322,6 +325,39 @@ public class PainterVisualCheck extends InteractiveTestCase {
 
     // ------------------------
 
+    public static class PainterHighlighter extends AbstractHighlighter {
+
+        private Painter painter;
+
+        public PainterHighlighter(Painter painter, HighlightPredicate predicate) {
+            super(predicate);
+            this.painter = painter;
+        }
+        
+        @Override
+        public Component highlight(Component component, ComponentAdapter adapter) {
+            if (component instanceof PainterAware) {
+                component = super.highlight(component, adapter);
+            }
+            return component;
+        }
+
+        @Override
+        protected Component doHighlight(Component component, ComponentAdapter adapter) {
+            ((PainterAware) component).setPainter(painter);
+            return component;
+        }
+        
+    }
+    
+    public void interactiveRolloverPainterHighlight() throws Exception {
+        TableModel model = new AncientSwingTeam();
+        JXTable table = new JXTable(model);
+        MattePainter painter = new MattePainter();
+        Highlighter h = new PainterHighlighter(painter, HighlightPredicate.ROLLOVER_ROW);
+        table.addHighlighter(h);
+        showWithScrollingInFrame(table, "Rollover with painter");
+    }
     /**
      * Use highlighter with background image painter. Shared by table and list.
      */
@@ -334,19 +370,15 @@ public class PainterVisualCheck extends InteractiveTestCase {
                 new DefaultTableRenderer(controller));
         final ImagePainter imagePainter = new ImagePainter(ImageIO.read(JXPanel.class
                 .getResource("resources/images/kleopatra.jpg")));
-        LegacyHighlighter gradientHighlighter = new LegacyHighlighter() {
+        HighlightPredicate predicate = new HighlightPredicate() {
 
-            @Override
-            public Component highlight(Component renderer,
-                    ComponentAdapter adapter) {
-                if ((adapter.column == 0) && (renderer instanceof PainterAware)) {
-                    ((PainterAware) renderer).setPainter(imagePainter);
-                }
-                return renderer;
+            public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+                return (adapter.column == 0) && (renderer instanceof PainterAware);
             }
-
+            
         };
-        LegacyHighlighter alternateRowHighlighter = new UIAlternateRowHighlighter();
+        Highlighter gradientHighlighter = new PainterHighlighter(imagePainter, predicate);
+        Highlighter alternateRowHighlighter = new UIAlternateRowHighlighter();
         table.addHighlighter(alternateRowHighlighter);
         table.addHighlighter(gradientHighlighter);
         // re-use component controller and highlighter in a JXList
@@ -378,7 +410,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
 //        table.setDefaultRenderer(Number.class, new DefaultTableRenderer(
 //                controller));
         final ValueBasedGradientHighlighter gradientHighlighter = createTransparentGradientHighlighter();
-        LegacyHighlighter alternateRowHighlighter = new UIAlternateRowHighlighter();
+        Highlighter alternateRowHighlighter = new UIAlternateRowHighlighter();
         table.addHighlighter(alternateRowHighlighter);
         table.addHighlighter(gradientHighlighter);
         // re-use component controller and highlighter in a JXList
