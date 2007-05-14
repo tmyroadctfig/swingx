@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-package org.jdesktop.swingx.decorator;
+package org.jdesktop.swingx.renderer;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -27,25 +27,30 @@ import java.awt.Cursor;
 import java.util.regex.Pattern;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTreeTable;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
+import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.HighlightPredicate;
+import org.jdesktop.swingx.decorator.HighlighterFactory;
+import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
-import org.jdesktop.swingx.renderer.DefaultTableRenderer;
-import org.jdesktop.swingx.renderer.HyperlinkProvider;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
 
 /**
- * TODO add type doc
+ * visual checks of highlighter clients. Mostly by example of JXTable.
  * 
  * @author Jeanette Winzenburg
  */
 public class HighlighterClientVisualCheck extends InteractiveTestCase {
-    protected Color ledger = new Color(0xF5, 0xFF, 0xF5);
     protected TableModel tableModel;
+    protected Color background = Color.RED;
+    protected Color foreground = Color.BLUE;
     
     
     public static void main(String args[]) {
@@ -151,6 +156,57 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
                 new PatternPredicate(pattern, 1, -1)));
         showWithScrollingInFrame(table, "Pattern: highlight row if ^M col 1");
     }
+
+    /**
+     * Issue #258-swingx: Background LegacyHighlighter must not change custom
+     * foreground.
+     * <p>
+     * 
+     * Use SwingX extended default renderer.
+     */
+    public void interactiveTableCustomRendererColor() {
+        TableModel model = new AncientSwingTeam();
+        JXTable table = new JXTable(model);
+        DefaultTableRenderer renderer = new DefaultTableRenderer();
+        renderer.setForeground(foreground);
+        renderer.setBackground(background);
+        table.addHighlighter(HighlighterFactory.createAlternateStriping(Color.WHITE, ColorHighlighter.GENERIC_GRAY));
+        table.setDefaultRenderer(Object.class, renderer);
+        JXTable nohighlight = new JXTable(model);
+        nohighlight.setDefaultRenderer(Object.class, renderer);
+        showWithScrollingInFrame(table, nohighlight,
+                "ext: custom colored renderer with bg highlighter <--> shared without highl");
+    }
+    
+
+
+    /**
+     * 
+     * Note: in Swingx' context it's not recommended to change 
+     * visual renderer properties on the renderer layer - use
+     * a highlighter with a value related HighlightPredicate instead.<p>
+     * 
+     */
+    public void interactiveTableColorBasedOnComponentValue() {
+        TableModel model = new AncientSwingTeam();
+        JXTable table = new JXTable(model);
+        table.setForeground(Color.GREEN);
+        HighlightPredicate predicate = new HighlightPredicate() {
+
+            public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+                if (!(renderer instanceof JLabel)) return false;
+                String text = ((JLabel) renderer).getText();
+                 return text.contains("y");
+            }
+            
+        };
+        ColorHighlighter hl = new ColorHighlighter(null, Color.RED, predicate);
+        table.addHighlighter(HighlighterFactory.createSimpleStriping(ColorHighlighter.GENERIC_GRAY));
+        table.addHighlighter(hl);
+        showWithScrollingInFrame(table, 
+                "component value-based rendering (label text contains y) ");
+    }
+
 
     //------------------ rollover
     

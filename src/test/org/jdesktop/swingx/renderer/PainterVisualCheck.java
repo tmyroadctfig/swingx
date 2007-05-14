@@ -54,13 +54,16 @@ import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.ActionContainerFactory;
-import org.jdesktop.swingx.decorator.AbstractHighlighter;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.ConditionalHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.LegacyHighlighter;
+import org.jdesktop.swingx.decorator.PainterHighlighter;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
+import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.painter.ImagePainter;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
@@ -77,6 +80,7 @@ import org.jdesktop.test.AncientSwingTeam;
  * <ul>
  * <li> <a href="">Sneak preview II - Transparent LegacyHighlighter</a>
  * </ul>
+ * 
  * 
  * @author Jeanette Winzenburg
  */
@@ -98,82 +102,57 @@ public class PainterVisualCheck extends InteractiveTestCase {
     
     public void interactiveTriangleRenderer() {
         JXTable table = new JXTable(new AncientSwingTeam());
-        ConditionalHighlighter highlighter = new ConditionalHighlighter() {
-            ShapePainter painter;
-            
-            @Override
-            protected Component doHighlight(Component renderer, ComponentAdapter adapter) {
-                if (renderer instanceof PainterAware) {
-                    ((PainterAware) renderer).setPainter(getPainter());                    
-                }
-                return renderer;
-            }
-
-            private ShapePainter getPainter() {
-                if (painter == null) {
-                    // todo: NPE with null shape - file issue
-                    painter = new ShapePainter();
-                    Shape polygon = new Polygon(new int[] { 0, 5, 5 },
-                            new int[] { 0, 0, 5 }, 3);
-                    painter.setShape(polygon);
-                    painter.setFillPaint(Color.RED);
-                    painter.setStyle(ShapePainter.Style.FILLED);
-                    painter.setPaintStretched(false);
-                    // hmm.. how to make this stick to the trailing upper corner?
-                    painter.setHorizontalAlignment(HorizontalAlignment.RIGHT);//setResizeLocation(Resize.HORIZONTAL);
-                    painter.setVerticalAlignment(VerticalAlignment.TOP);
-                }
-                return painter;
-            }
-
-            @Override
-            protected boolean test(ComponentAdapter adapter) {
-                // here goes the ultimate decision - replace with context
-                return adapter.column == adapter.modelToView(getHighlightColumnIndex());
-            }
-            
-        };
-        highlighter.setHighlightColumnIndex(3);
-        table.addHighlighter(highlighter);
+        ShapePainter painter = new ShapePainter();
+        Shape polygon = new Polygon(new int[] { 0, 5, 5 },
+                new int[] { 0, 0, 5 }, 3);
+        painter.setShape(polygon);
+        painter.setFillPaint(Color.RED);
+        painter.setStyle(ShapePainter.Style.FILLED);
+        painter.setPaintStretched(false);
+        // hmm.. how to make this stick to the trailing upper corner?
+        painter.setHorizontalAlignment(HorizontalAlignment.RIGHT);//setResizeLocation(Resize.HORIZONTAL);
+        painter.setVerticalAlignment(VerticalAlignment.TOP);
+        Highlighter hl = new PainterHighlighter(painter, new ColumnHighlightPredicate(3)); 
+        table.addHighlighter(hl);
         showWithScrollingInFrame(table, "Renderer with Triangle marker");
     }
 
     /**
      * Use GradientPainter for value-based background highlighting
-     * Use SwingX extended default renderer.
      */
     public void interactiveTableGradientHighlight() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
+        // PENDING: make this like a thick underline
         LinearGradientPaint paint = new LinearGradientPaint(0.0f, 0.0f, 0f, 1f, 
-                new float[] {0,(float) 0.5}, new Color[] {Color.RED
-                , GradientHighlighter.getTransparentColor(Color.WHITE, 0)});
+                new float[] {0,(float) 0.5}, new Color[] {Color.WHITE
+                , getTransparentColor(Color.RED, 0)});
         final MattePainter painter = new MattePainter(paint);
         painter.setPaintStretched(true);
-        
-        ConditionalHighlighter gradientHighlighter = new ConditionalHighlighter(null, null, -1, -1) {
-
-            @Override
-            public Component highlight(Component renderer, ComponentAdapter adapter) {
-                boolean highlight = needsHighlight(adapter);
-                if (highlight && (renderer instanceof PainterAware)) {
-                    ((PainterAware) renderer).setPainter(painter);
-                    return renderer;
-                }
-                return renderer;
-            }
-
-            @Override
-            protected boolean test(ComponentAdapter adapter) {
-                return adapter.getValue().toString().contains("y");
-            }
-            
-        };
-        table.addHighlighter(gradientHighlighter);
-//        table.setDefaultRenderer(Object.class, renderer);
+        HighlightPredicate predicate = createComponentTextBasedPredicate("y");
+        Highlighter hl = new PainterHighlighter(painter, predicate);
+        table.addHighlighter(hl);
         JXFrame frame = showWithScrollingInFrame(table, 
                 "painter-aware renderer with value-based highlighting");
         getStatusBar(frame).add(new JLabel("gradient background of cells with value's containing 'y'"));
+    }
+
+    /**
+     * Creates and returns a predicate for filtering labels whose text
+     * property contains the given text.
+     * @return 
+     */
+    private HighlightPredicate createComponentTextBasedPredicate(final String substring) {
+        HighlightPredicate predicate = new HighlightPredicate() {
+
+            public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+                if (!(renderer instanceof JLabel)) return false;
+                String text = ((JLabel) renderer).getText();
+                 return text.contains(substring);
+            }
+            
+        };
+        return predicate;
     }
    
     /**
@@ -183,7 +162,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
     public void interactiveTableBarHighlight() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
-        Color transparentRed = GradientHighlighter.getTransparentColor(Color.RED, 0);
+        Color transparentRed = getTransparentColor(Color.RED, 100);
         // how to do the same, but not as gradient?
         // dirty trick ... mis-use a gradient... arrgghhh
         LinearGradientPaint blueToTranslucent = new LinearGradientPaint(
@@ -191,27 +170,8 @@ public class PainterVisualCheck extends InteractiveTestCase {
                 new float[] {0,.499f,.5f,1}, new Color[] {Color.BLUE, Color.BLUE, transparentRed, transparentRed});
         final MattePainter p =  new MattePainter(blueToTranslucent);
         p.setPaintStretched(true);
-
-        ConditionalHighlighter gradientHighlighter = new ConditionalHighlighter(null, null, -1, -1) {
-
-            @Override
-            public Component highlight(Component renderer, ComponentAdapter adapter) {
-                boolean highlight = needsHighlight(adapter);
-                if (highlight && (renderer instanceof PainterAware)) {
-                    ((PainterAware) renderer).setPainter(p);
-                    return renderer;
-                }
-                return renderer;
-            }
-
-            @Override
-            protected boolean test(ComponentAdapter adapter) {
-                return adapter.getValue().toString().contains("y");
-            }
-            
-        };
-        table.addHighlighter(gradientHighlighter);
-//        table.setDefaultRenderer(Object.class, renderer);
+        Highlighter hl = new PainterHighlighter(p, createComponentTextBasedPredicate("y"));
+        table.addHighlighter(hl);
         JXFrame frame = showWithScrollingInFrame(table, 
                 "painter-aware renderer with value-based highlighting");
         getStatusBar(frame).add(new JLabel("gradient background of cells with value's containing 'y'"));
@@ -228,9 +188,10 @@ public class PainterVisualCheck extends InteractiveTestCase {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
         JXList list = new JXList();
-        Highlighter highlighter = new UIAlternateRowHighlighter();
+        Highlighter highlighter = HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER);
         table.addHighlighter(highlighter);
-        list.setHighlighters(highlighter, new GradientHighlighter());
+        Painter gradient = createGradientPainter(Color.YELLOW, 0.7f, true);
+        list.setHighlighters(highlighter, new PainterHighlighter(gradient));
         // quick-fill and hook to table columns' visibility state
         configureList(list, table, false);
         // a custom rendering button controller showing both checkbox and text
@@ -259,105 +220,32 @@ public class PainterVisualCheck extends InteractiveTestCase {
         frame.pack();
     }
 
+
     /**
-     * A LegacyHighlighter which applies a simple yellow to white-transparent 
-     * gradient to a PainterAware rendering component. The yellow can
-     * be toggled to half-transparent.
+     * Creates and returns a Painter with a gradient paint starting with
+     * startColor to WHITE.
      * 
-     * PENDING: How to the same but not use a gradient but a solid colered bar,
-     * covering a relative portion of the comp?
+     * @param startColor
+     * @param percentage
+     * @param transparent
+     * @return
      */
-    public static class GradientHighlighter extends LegacyHighlighter {
-
-        private MattePainter painter;
-
-        private boolean yellowTransparent;
-
-        /**
-         */
-        public GradientHighlighter() {
-            super(Color.YELLOW, null);
-        }
-
-        /**
-         * @param yellowTransparent
-         */
-        public void setYellowTransparent(boolean yellowTransparent) {
-            if (this.yellowTransparent == yellowTransparent) return;
-            this.yellowTransparent = yellowTransparent;
-            painter = null;
-            fireStateChanged();
-        }
-
-        @Override
-        public Component highlight(Component renderer, ComponentAdapter adapter) {
-            if (renderer instanceof PainterAware) {
-                Painter painter = getPainter(0.7f);
-                ((PainterAware) renderer).setPainter(painter);
-
-            } else {
-                renderer.setBackground(Color.YELLOW.darker());
-            }
-            return renderer;
-        }
-
-        private Painter getPainter(float end) {
-            if (painter == null) {
-                Color startColor = getTransparentColor(Color.YELLOW,
-                        yellowTransparent ? 125 : 254);
-                Color endColor = getTransparentColor(Color.WHITE, 0);
-                LinearGradientPaint paint = new LinearGradientPaint(0.0f, 0.0f, 1f, 0f, 
-                        new float[] {0,end}, new Color[] {startColor
-                        , endColor});
-                painter = new MattePainter(paint);
-                painter.setPaintStretched(true);
-
-            }
-            return painter;
-        }
-
-        private static Color getTransparentColor(Color base, int transparency) {
-            return new Color(base.getRed(), base.getGreen(), base.getBlue(),
-                    transparency);
-        }
-
+    protected Painter createGradientPainter(Color startColor, float end,
+            boolean transparent) {
+        startColor = getTransparentColor(startColor, transparent ? 125 : 254);
+        Color endColor = getTransparentColor(Color.WHITE, 0);
+        LinearGradientPaint paint = new LinearGradientPaint(0.0f, 0.0f, 1f, 0f,
+                new float[] { 0, end }, new Color[] { startColor, endColor });
+        MattePainter painter = new MattePainter(paint);
+        painter.setPaintStretched(true);
+        return painter;
     }
 
+    private static Color getTransparentColor(Color base, int transparency) {
+        return new Color(base.getRed(), base.getGreen(), base.getBlue(),
+                transparency);
+    }
     // ------------------------
-
-    public static class PainterHighlighter extends AbstractHighlighter {
-
-        private Painter painter;
-
-        public PainterHighlighter(Painter painter, HighlightPredicate predicate) {
-            super(predicate);
-            this.painter = painter;
-        }
-        
-        @Override
-        public Component highlight(Component component, ComponentAdapter adapter) {
-            if (component instanceof PainterAware) {
-                component = super.highlight(component, adapter);
-            }
-            return component;
-        }
-
-        @Override
-        protected Component doHighlight(Component component, ComponentAdapter adapter) {
-            ((PainterAware) component).setPainter(painter);
-            return component;
-        }
-        
-    }
-    
-    public void interactiveRolloverPainterHighlight() throws Exception {
-        TableModel model = new AncientSwingTeam();
-        JXTable table = new JXTable(model);
-        MattePainter painter = new MattePainter();
-        Highlighter h = new PainterHighlighter(painter, HighlightPredicate.ROLLOVER_ROW);
-        table.addHighlighter(h);
-        showWithScrollingInFrame(table, "Rollover with painter");
-    }
     /**
      * Use highlighter with background image painter. Shared by table and list.
      */
@@ -370,29 +258,22 @@ public class PainterVisualCheck extends InteractiveTestCase {
                 new DefaultTableRenderer(controller));
         final ImagePainter imagePainter = new ImagePainter(ImageIO.read(JXPanel.class
                 .getResource("resources/images/kleopatra.jpg")));
-        HighlightPredicate predicate = new HighlightPredicate() {
-
-            public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
-                return (adapter.column == 0) && (renderer instanceof PainterAware);
-            }
-            
-        };
-        Highlighter gradientHighlighter = new PainterHighlighter(imagePainter, predicate);
+        HighlightPredicate predicate = new ColumnHighlightPredicate(0);
+        Highlighter iconHighlighter = new PainterHighlighter(imagePainter, predicate );
+        // PENDING: implement lf specific highlight in new api
         Highlighter alternateRowHighlighter = new UIAlternateRowHighlighter();
         table.addHighlighter(alternateRowHighlighter);
-        table.addHighlighter(gradientHighlighter);
+        table.addHighlighter(iconHighlighter);
         // re-use component controller and highlighter in a JXList
         JXList list = new JXList(createListNumberModel(), true);
         list.setCellRenderer(new DefaultListRenderer(controller));
         list.addHighlighter(alternateRowHighlighter);
-        list.addHighlighter(gradientHighlighter);
+        list.addHighlighter(iconHighlighter);
         list.toggleSortOrder();
         final JXFrame frame = showWithScrollingInFrame(table, list,
                 "image highlighting plus striping");
         frame.pack();
     }
-
-
   
 //  ----------------- Transparent gradient on default (swingx) rendering label
 
@@ -407,8 +288,6 @@ public class PainterVisualCheck extends InteractiveTestCase {
         JXTable table = new JXTable(model);
         ComponentProvider<JLabel> controller = new LabelProvider(
                 JLabel.RIGHT) ;
-//        table.setDefaultRenderer(Number.class, new DefaultTableRenderer(
-//                controller));
         final ValueBasedGradientHighlighter gradientHighlighter = createTransparentGradientHighlighter();
         Highlighter alternateRowHighlighter = new UIAlternateRowHighlighter();
         table.addHighlighter(alternateRowHighlighter);

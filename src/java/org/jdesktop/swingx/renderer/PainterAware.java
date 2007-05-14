@@ -33,4 +33,5 @@ import org.jdesktop.swingx.painter.Painter;
  */
 public interface PainterAware {
     void setPainter(Painter painter);
+    Painter getPainter();
 }

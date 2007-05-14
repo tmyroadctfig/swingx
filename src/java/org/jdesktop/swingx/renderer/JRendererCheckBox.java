@@ -40,6 +40,9 @@ import org.jdesktop.swingx.painter.Painter;
 public class JRendererCheckBox extends JCheckBox implements PainterAware {
     protected Painter painter;
 
+    /**
+     * {@inheritDoc}
+     */
     public void setPainter(Painter painter) {
         this.painter = painter;
         if (painter != null) {
@@ -50,6 +53,13 @@ public class JRendererCheckBox extends JCheckBox implements PainterAware {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public Painter getPainter() {
+        return painter;
+    }
+    
     @Override
     protected void paintComponent(Graphics g) {
         if (painter != null) {

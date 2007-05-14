@@ -21,12 +21,8 @@
  */
 package org.jdesktop.swingx;
 
-import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
-import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.LegacyHighlighter;
-import org.jdesktop.test.PropertyChangeReport;
 
 /**
  * Contains tests around Highlighter client api for  

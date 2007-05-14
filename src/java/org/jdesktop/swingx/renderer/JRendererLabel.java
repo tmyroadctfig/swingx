@@ -91,10 +91,19 @@ public class JRendererLabel extends JLabel implements PainterAware {
         return !colorMatch && super.isOpaque(); 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setPainter(Painter painter) {
         this.painter = painter;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public Painter getPainter() {
+        return painter;
+    }
     /**
      * {@inheritDoc} <p>
      * 

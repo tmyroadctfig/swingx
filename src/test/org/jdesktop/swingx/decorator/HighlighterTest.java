@@ -13,6 +13,8 @@ import java.awt.Component;
 import javax.swing.JLabel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.painter.MattePainter;
+import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.renderer.JRendererLabel;
 import org.jdesktop.test.ChangeReport;
 
@@ -62,6 +64,53 @@ public class HighlighterTest extends InteractiveTestCase {
         emptyHighlighter = new ColorHighlighter();
     }
 
+//-------------------PainterHighlighter
+    
+    public void testPainterHighlighterConstructors() {
+        PainterHighlighter hl = new PainterHighlighter();
+        assertEquals(HighlightPredicate.ALWAYS, hl.getHighlightPredicate());
+        assertNull(hl.getPainter());
+        Painter mattePainter = new MattePainter();
+        PainterHighlighter withPainter = new PainterHighlighter(mattePainter);
+        assertEquals(HighlightPredicate.ALWAYS, withPainter.getHighlightPredicate());
+        assertEquals(mattePainter, withPainter.getPainter());
+        PainterHighlighter all = new PainterHighlighter(mattePainter, HighlightPredicate.NEVER);
+        assertEquals(HighlightPredicate.NEVER, all.getHighlightPredicate());
+        assertEquals(mattePainter, all.getPainter());
+    }
+    
+    public void testPainterHighlighterSetPainterAndNotificatioon() {
+        PainterHighlighter hl = new PainterHighlighter();
+        ChangeReport report = new ChangeReport();
+        hl.addChangeListener(report);
+        MattePainter mattePainter = new MattePainter();
+        hl.setPainter(mattePainter);
+        assertEquals(mattePainter, hl.getPainter());
+        assertEquals(1, report.getEventCount());
+     }
+    
+    public void testPainterHighlighterUsePainter() {
+        ComponentAdapter adapter = createComponentAdapter(allColored, false);
+        MattePainter mattePainter = new MattePainter();
+        PainterHighlighter hl = new PainterHighlighter(mattePainter);
+        hl.highlight(allColored, adapter);
+        // sanity 
+        assertEquals(mattePainter, allColored.getPainter());
+    }
+    
+    /**
+     * 
+     *
+     */
+    public void testPainterHighlighterNotUseNullPainter() {
+        ComponentAdapter adapter = createComponentAdapter(allColored, false);
+        PainterHighlighter hl = new PainterHighlighter();
+        MattePainter mattePainter = new MattePainter();
+        allColored.setPainter(mattePainter);
+        hl.highlight(allColored, adapter);
+        // sanity 
+        assertEquals(mattePainter, allColored.getPainter());
+    }
 //-------------------- factory
     
     /**
