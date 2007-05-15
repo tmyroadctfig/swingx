@@ -34,17 +34,20 @@ import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
-import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
-import org.jdesktop.swingx.decorator.ConditionalHighlighter;
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
-import org.jdesktop.swingx.decorator.HierarchicalColumnHighlighter;
+import org.jdesktop.swingx.decorator.HighlightPredicate;
+import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.LegacyHighlighter;
-import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
+import org.jdesktop.swingx.decorator.ShadingColorHighlighter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
+import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
+import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
@@ -65,14 +68,14 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         setSystemLF(true);
         JXTreeTableVisualCheck test = new JXTreeTableVisualCheck();
         try {
-            test.runInteractiveTests();
+//            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Hierarchical.*");
 //               test.runInteractiveTests("interactive.*ToolTip.*");
 //           test.runInteractiveTests("interactive.*DnD.*");
 //             test.runInteractiveTests("interactive.*Compare.*");
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
 //             test.runInteractiveTests("interactive.*RToL.*");
-//             test.runInteractiveTests("interactive.*Line.*");
+             test.runInteractiveTests("interactive.*Highl.*");
 //             test.runInteractiveTests("interactive.*Render.*");
         } catch (Exception ex) {
 
@@ -265,7 +268,9 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         final JTree tree = new JTree(model);
         tree.setRootVisible(false);
         final JXTreeTable treeTable = new JXTreeTable(model);
-        treeTable.addHighlighter(AlternateRowHighlighter.linePrinter);
+        treeTable.addHighlighter(
+                HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER));
+
         treeTable.setColumnControlVisible(true);
         // treetable root invisible by default
         JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "insert into empty model");
@@ -312,7 +317,9 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         final JXTree tree = new JXTree(model);
         tree.setRootVisible(false);
         final JXTreeTable treeTable = new JXTreeTable(model);
-        treeTable.addHighlighter(AlternateRowHighlighter.linePrinter);
+        treeTable.addHighlighter(
+                HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER));
+
         treeTable.setColumnControlVisible(true);
         // treetable root invisible by default
         JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "insert into empty model");
@@ -366,7 +373,9 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         model.addChild(secondRootChild);
         JXTree tree = new JXTree(model);
         final JXTreeTable treeTable = new JXTreeTable(model);
-        treeTable.addHighlighter(AlternateRowHighlighter.linePrinter);
+        treeTable.addHighlighter(
+                HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER));
+
         treeTable.setColumnControlVisible(true);
         treeTable.setRootVisible(true);
         JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "insert problem - root collapsed");
@@ -404,7 +413,9 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         final InsertTreeTableModel model = new InsertTreeTableModel(root);
         JXTree tree = new JXTree(model);
         final JXTreeTable treeTable = new JXTreeTable(model);
-        treeTable.addHighlighter(AlternateRowHighlighter.linePrinter);
+        treeTable.addHighlighter(
+                HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER));
+
         treeTable.setColumnControlVisible(true);
         TreeCellRenderer renderer = new DefaultTreeCellRenderer() {
 
@@ -454,8 +465,12 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         final InsertTreeTableModel model = new InsertTreeTableModel(root);
         JTree tree = new JTree(model);
         final JXTreeTable treeTable = new JXTreeTable(model);
-        treeTable.addHighlighter(AlternateRowHighlighter.linePrinter);
-        treeTable.addHighlighter(new HierarchicalColumnHighlighter());
+        treeTable.addHighlighter(
+                HighlighterFactory.createSimpleStriping(ColorHighlighter.GENERIC_GRAY));
+        Highlighter hl = new ShadingColorHighlighter(
+                new ColumnHighlightPredicate(0));
+
+        treeTable.addHighlighter(hl);
         JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "update on insert");
         Action insertAction = new AbstractAction("insert node") {
 
@@ -553,9 +568,12 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         // the margins need to be set as well.
 //        treeTable.setShowGrid(true);
         treeTable.setShowGrid(true, true);
-        treeTable.addHighlighter(AlternateRowHighlighter.linePrinter);
+        treeTable.addHighlighter(
+                HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER));
+
         JXTable table = new JXTable(new AncientSwingTeam());
-        table.addHighlighter(AlternateRowHighlighter.linePrinter);
+        table.addHighlighter(
+                HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER));
         table.setRowHeight(22);
         JFrame frame = wrapWithScrollingInFrame(treeTable, table, 
                 "AlternateRow LinePrinter-with Gridlines");
@@ -570,9 +588,13 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     public void interactiveTestAlternateHighlightAndNoGridLines() {
         JXTable treeTable = new JXTable(new AncientSwingTeam());
         treeTable.setRowHeight(22);
-        treeTable.addHighlighter(AlternateRowHighlighter.linePrinter);
+        treeTable.addHighlighter(
+                HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER));
+
         JXTable table = new JXTable(new AncientSwingTeam());
-        table.addHighlighter(AlternateRowHighlighter.linePrinter);
+        table.addHighlighter(
+                HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER));
+
         table.setRowHeight(22);
         table.setShowGrid(false, false);
         JFrame frame = wrapWithScrollingInFrame(treeTable, table, 
@@ -589,9 +611,13 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         treeTable.setRowHeight(22);
         treeTable.setShowGrid(true, false);
+        Highlighter hl = new ShadingColorHighlighter(
+                new ColumnHighlightPredicate(0));
+
         treeTable.setHighlighters(
-                AlternateRowHighlighter.linePrinter,
-                new HierarchicalColumnHighlighter());
+                HighlighterFactory.createSimpleStriping(ColorHighlighter.GENERIC_GRAY),
+
+                hl);
         final JXTree tree = new JXTree(treeTableModel);
         JXTree renderer = (JXTree) treeTable.getCellRenderer(0, 0);
         tree.setRowHeight(renderer.getRowHeight());
@@ -607,7 +633,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      */
     public void interactiveTestHighlighterRowHeightCompareTree() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
-        treeTable.addHighlighter(new LegacyHighlighter(Color.orange, null));
+        treeTable.addHighlighter(new ColorHighlighter(Color.orange, null));
         treeTable.setIntercellSpacing(new Dimension(15, 15));
         treeTable.setRowHeight(48);
         treeTable.setShowHorizontalLines(true);
@@ -780,8 +806,12 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         treeTable.putClientProperty("JTree.lineStyle", "Angled");
         treeTable.setRowHeight(22);
        // add a bunch of highlighters directly
-        treeTable.addHighlighter(AlternateRowHighlighter.quickSilver);
-        treeTable.addHighlighter(new HierarchicalColumnHighlighter());
+        treeTable.addHighlighter(
+                HighlighterFactory.createSimpleStriping(ColorHighlighter.QUICKSILVER));
+        Highlighter hl = new ShadingColorHighlighter(
+                new ColumnHighlightPredicate(0));
+
+        treeTable.addHighlighter(hl);
         treeTable.addHighlighter(new PatternHighlighter(null, Color.red, "^s",
                 Pattern.CASE_INSENSITIVE, 0, -1));
         // alternative: set a pipeline containing the bunch of highlighters
@@ -830,9 +860,11 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     public void interactiveTestHighlightAndRowHeight() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         treeTable.setRowHeight(22);
+        Highlighter hl = new ShadingColorHighlighter(
+                new ColumnHighlightPredicate(0));
         treeTable.setHighlighters(
-                AlternateRowHighlighter.linePrinter,
-                new HierarchicalColumnHighlighter());
+                HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER),
+                hl);
         JFrame frame = wrapWithScrollingInFrame(treeTable,
                 "LinePrinter-, ColumnHighlighter and RowHeight");
         frame.setVisible(true);
@@ -840,19 +872,22 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 
     public void interactiveTestAlternateRowHighlighter() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
-        treeTable.addHighlighter(AlternateRowHighlighter.classicLinePrinter);
+        treeTable.addHighlighter(
+                HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER));
+
         treeTable.setRowHeight(22);
         JFrame frame = wrapWithScrollingInFrame(treeTable,
                 "ClassicLinePrinter and RowHeight");
         frame.setVisible(true);
     }
     
-    @SuppressWarnings("all")
     public void interactiveTestBackgroundHighlighter() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
+        Highlighter hl = new ShadingColorHighlighter(
+                new ColumnHighlightPredicate(0));
         treeTable.setHighlighters(
-                AlternateRowHighlighter.notePadBackground,
-                new HierarchicalColumnHighlighter());
+                HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER),
+                hl);
         treeTable.setBackground(new Color(0xFF, 0xFF, 0xCC)); // notepad
         treeTable.setGridColor(Color.cyan.darker());
         treeTable.setRowHeight(22);
@@ -881,25 +916,27 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      */
     public void interactiveTestHierarchicalColumnHighlightConditional() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
-        treeTable.addHighlighter(new HierarchicalColumnHighlighter(new Color(235,234,219), null));
-        ConditionalHighlighter conditional = new ConditionalHighlighter() {
+        HighlightPredicate hierarchical = new ColumnHighlightPredicate(0);
+        treeTable.addHighlighter(new ShadingColorHighlighter(hierarchical));
+        HighlightPredicate predicate = new HighlightPredicate() {
 
-            @Override
-            protected boolean test(ComponentAdapter adapter) {
+            public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
                 return adapter.isLeaf();
             }
             
         };
-        conditional.setBackground(new Color(247,246,239));
-        conditional.setHighlightColumnIndex(0);
-        treeTable.addHighlighter(conditional);
+        ColorHighlighter highlighter = new ColorHighlighter(new Color(247,246,239),
+                null, new AndHighlightPredicate(hierarchical, predicate));
+        treeTable.addHighlighter(highlighter);
         showWithScrollingInFrame(treeTable,
         "HierarchicalColumn And Conditional ");
     }
     
     public void interactiveTestHierarchicalColumnHighlight() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
-        treeTable.addHighlighter(new HierarchicalColumnHighlighter());
+        Highlighter hl = new ShadingColorHighlighter(
+                new ColumnHighlightPredicate(0));
+        treeTable.addHighlighter(hl);
         JFrame frame = wrapWithScrollingInFrame(treeTable,
                 "HierarchicalColumnHigh");
         frame.setVisible(true);
@@ -931,7 +968,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 
     public void interactiveTestHighlighterRowHeight() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
-        treeTable.addHighlighter(new LegacyHighlighter(Color.orange, null));
+        treeTable.addHighlighter(new ColorHighlighter(Color.orange, null));
         treeTable.setIntercellSpacing(new Dimension(15, 15));
         treeTable.setRowHeight(48);
         JFrame frame = wrapWithScrollingInFrame(treeTable,
@@ -947,19 +984,24 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
  //       treeTable.setRowHeight(0, 96);
         treeTable.setShowGrid(true);
         // set a bunch of highlighters as a pipeline
-        treeTable.setHighlighters(
-                        new LegacyHighlighter(Color.orange, null),
-                        new HierarchicalColumnHighlighter(),
-                        new PatternHighlighter(null, Color.red,"D", 0, 0, 0));
-        LegacyHighlighter conditional = new ConditionalHighlighter(Color.BLUE, Color.WHITE, 0, 0) {
+        Highlighter hl = new ShadingColorHighlighter(
+                new ColumnHighlightPredicate(0));
 
-            protected boolean test(ComponentAdapter adapter) {
+        treeTable.setHighlighters(
+                        new ColorHighlighter(Color.orange, null),
+                        hl,
+                        new PatternHighlighter(null, Color.red,"D", 0, 0, 0));
+
+        HighlightPredicate predicate = new HighlightPredicate() {
+
+            public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
                 return adapter.hasFocus();
             }
             
         };
-        // add the conditional highlighter later
-        treeTable.addHighlighter(conditional);
+        // add the conditional highlighter laterb
+        treeTable.addHighlighter(new ColorHighlighter(Color.BLUE, Color.WHITE, 
+                new AndHighlightPredicate(predicate, new ColumnHighlightPredicate(0))));
         JFrame frame = wrapWithScrollingInFrame(treeTable, "Highlighters: conditional, orange, hierarchy, pattern D");
         frame.setVisible(true);
     }

@@ -24,6 +24,7 @@ package org.jdesktop.swingx.decorator;
 import java.awt.Component;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.jdesktop.swingx.RolloverProducer;
@@ -113,6 +114,9 @@ public interface HighlightPredicate {
     * @return a boolean to indicate whether the component should be highlighted.
      */
     boolean isHighlighted(Component renderer, ComponentAdapter adapter);
+
+    
+//----------------- logical implementations
     
     public static class NotHighlightPredicate implements HighlightPredicate {
         
@@ -125,6 +129,25 @@ public interface HighlightPredicate {
         }
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
             return !predicate.isHighlighted(renderer, adapter);
+        }
+        
+    }
+    
+    public static class AndHighlightPredicate implements HighlightPredicate {
+        
+        private List<HighlightPredicate> predicate;
+        
+        public AndHighlightPredicate(HighlightPredicate... predicate) {
+            if (predicate == null) 
+                throw new NullPointerException("predicate must not be null");
+            this.predicate = Arrays.asList(predicate);
+        }
+        
+        public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+            for (HighlightPredicate hp : predicate) {
+                if (!hp.isHighlighted(renderer, adapter)) return false;
+            }
+            return true;
         }
         
     }

@@ -39,7 +39,9 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.RolloverHighlighter;
 import org.jdesktop.swingx.decorator.SearchHighlighter;
@@ -238,7 +240,8 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
         String pattern = "o";
         tree.setHighlighters(new PatternHighlighter(null, Color.red, pattern, 0, 1)
 //          );
-            , AlternateRowHighlighter.classicLinePrinter);
+            ,                 HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER));
+
         showWithScrollingInFrame(tree, "Highlighters: " + pattern);
     }
     

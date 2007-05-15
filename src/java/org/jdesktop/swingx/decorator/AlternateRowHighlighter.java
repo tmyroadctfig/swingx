@@ -33,6 +33,8 @@ import javax.swing.UIManager;
  * an alternating group is configurable (defaults to 1);
  *
  * @author Ramesh Gupta
+ * 
+ * @deprecated use {@link HighlighterFactory} instead
  */
 public class AlternateRowHighlighter extends LegacyHighlighter {
     private final static Color  defaultOddRowColor = Color.white;

@@ -17,8 +17,10 @@ import javax.swing.JList;
 
 import org.jdesktop.swingx.action.LinkModelAction;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.ConditionalHighlighter;
+import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.LegacyHighlighter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.PatternHighlighter;
@@ -86,7 +88,9 @@ public class JXListVisualCheck extends JXListTest {
 
     public void interactiveTestTableAlternateHighlighter1() {
         JXList list = new JXList(listModel);
-        list.addHighlighter(AlternateRowHighlighter.linePrinter);
+        list.addHighlighter(
+                HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER));
+
         showWithScrollingInFrame(list, "AlternateRowHighlighter - lineprinter");
     }
 

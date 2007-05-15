@@ -91,6 +91,7 @@ import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.LinkModelAction;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
@@ -165,7 +166,9 @@ public class RendererVisualCheck extends InteractiveTestCase {
         table.setVisibleRowCount(4);
         table.setColumnControlVisible(true);
         table.getColumnExt(0).setCellRenderer(new DefaultTableRenderer(new TextAreaProvider()));
-        table.addHighlighter(new AlternateRowHighlighter());
+        table.addHighlighter(
+                HighlighterFactory.createAlternateUIStriping());
+
         JTextArea textArea = (JTextArea) table.prepareRenderer(table.getCellRenderer(0, 0), 0, 0);
         table.packColumn(0, -1);
         table.setRowHeight(textArea.getPreferredSize().height);
@@ -780,10 +783,12 @@ public class RendererVisualCheck extends InteractiveTestCase {
     public void interactiveTableCustomColorRendererWithHighlighter() {
         TableModel model = new AncientSwingTeam();
         JXTable xtable = new JXTable(model);
-        xtable.addHighlighter(AlternateRowHighlighter.genericGrey);
+        xtable.addHighlighter(
+                HighlighterFactory.createSimpleStriping(ColorHighlighter.GENERIC_GRAY));
         xtable.setDefaultRenderer(Color.class, new ColorRenderer(true));
         JXTable table = new JXTable(model);
-        table.addHighlighter(AlternateRowHighlighter.genericGrey);
+        table.addHighlighter(
+                HighlighterFactory.createSimpleStriping(ColorHighlighter.GENERIC_GRAY));
         TableCellRenderer renderer = createColorRendererExt();
         table.setDefaultRenderer(Color.class, renderer);
         JXFrame frame = wrapWithScrollingInFrame(xtable, table, "JXTable/highlighter: Custom color renderer - standard/ext");
@@ -798,7 +803,9 @@ public class RendererVisualCheck extends InteractiveTestCase {
     public void interactiveTableCustomColorRendererWithHighlighterDontTouch() {
         TableModel model = new AncientSwingTeam();
         JXTable xtable = new JXTable(model);
-        Highlighter highlighter = createPropertyRespectingHighlighter(AlternateRowHighlighter.genericGrey);
+        Highlighter highlighter = createPropertyRespectingHighlighter(
+                HighlighterFactory.createSimpleStriping(ColorHighlighter.GENERIC_GRAY));
+
         xtable.addHighlighter(highlighter);
         xtable.setDefaultRenderer(Color.class, new ColorRenderer(true));
         JXTable table = new JXTable(model);

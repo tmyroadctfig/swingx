@@ -89,7 +89,9 @@ public class HighlighterIssues extends HighlighterTest {
             }
 
         };
-        table.addHighlighter(AlternateRowHighlighter.genericGrey);
+        table.addHighlighter(
+                HighlighterFactory.createSimpleStriping(ColorHighlighter.GENERIC_GRAY));
+
         table.setDefaultRenderer(Object.class, renderer);
         JXTable nohighlight = new JXTable(model);
         nohighlight.setDefaultRenderer(Object.class, renderer);
@@ -124,7 +126,9 @@ public class HighlighterIssues extends HighlighterTest {
         DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
         renderer.setForeground(foreground);
         renderer.setBackground(background);
-        table.addHighlighter(AlternateRowHighlighter.genericGrey);
+        table.addHighlighter(
+                HighlighterFactory.createSimpleStriping(ColorHighlighter.GENERIC_GRAY));
+
         table.setDefaultRenderer(Object.class, renderer);
         JXTable nohighlight = new JXTable(model);
         nohighlight.setDefaultRenderer(Object.class, renderer);
@@ -196,7 +200,9 @@ public class HighlighterIssues extends HighlighterTest {
     public void interactiveColoredTableWithAlternateRow() {
         JXTable table = new JXTable(10, 2);
         table.setBackground(ledger);
-        table.addHighlighter(AlternateRowHighlighter.genericGrey);
+        table.addHighlighter(
+                HighlighterFactory.createSimpleStriping(ColorHighlighter.GENERIC_GRAY));
+
         JXTable nohighlight = new JXTable(10, 2);
         nohighlight.setBackground(ledger);
         JXFrame frame = wrapWithScrollingInFrame(table, nohighlight, "colored table with bg highlighter <--> without highlighter");
@@ -210,7 +216,9 @@ public class HighlighterIssues extends HighlighterTest {
     public void interactiveColoredListWithAlternateRow() {
         JXList list = new JXList(createListModel());
         list.setBackground(ledger);
-        list.addHighlighter(AlternateRowHighlighter.genericGrey);
+        list.addHighlighter(
+                HighlighterFactory.createSimpleStriping(ColorHighlighter.GENERIC_GRAY));
+
         JXList nohighlight = new JXList(createListModel());
         nohighlight.setBackground(ledger);
         showWithScrollingInFrame(list, nohighlight, "colored list with bg highlighter <--> without highlighter");
@@ -226,7 +234,9 @@ public class HighlighterIssues extends HighlighterTest {
         nohighlightTree.setBackground(ledger);
         JXTree tree = new JXTree();
         CompoundHighlighter pipeline = new CompoundHighlighter();
-        pipeline.addHighlighter(AlternateRowHighlighter.genericGrey);
+        pipeline.addHighlighter(
+                HighlighterFactory.createSimpleStriping(ColorHighlighter.GENERIC_GRAY));
+
         tree.setHighlighters(pipeline);
         tree.setBackground(ledger);
         showWithScrollingInFrame(tree, nohighlightTree, "colored tree with bg highlighter <--> without highlighter");
@@ -242,7 +252,7 @@ public class HighlighterIssues extends HighlighterTest {
         JXTable table = new JXTable(10, 2);
         DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
         renderer.setForeground(foreground);
-        table.setHighlighters(new LegacyHighlighter());
+        table.setHighlighters(new ColorHighlighter());
         Component comp = table.prepareRenderer(renderer, 0, 0);
         assertEquals("do nothing highlighter must not change foreground", foreground, comp.getForeground());
     }

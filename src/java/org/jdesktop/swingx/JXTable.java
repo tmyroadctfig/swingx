@@ -3883,7 +3883,7 @@ public class JXTable extends JTable
     /**
      * Updates highlighter after <code>updateUI</code> changes.
      * 
-     * @see org.jdesktop.swingx.decorator.LegacyHighlighter.UIHighlighter
+     * @see org.jdesktop.swingx.decorator.UIDependent
      */
     protected void updateHighlighterUI() {
         if (getCompoundHighlighter() == null)
