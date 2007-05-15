@@ -28,6 +28,8 @@ import java.awt.Component;
  * HierarchicalColumnHighlighter
  *
  * @author Ramesh Gupta
+ * 
+ * @deprecated use a ColorHighlighter with a ColumnHighlightPredicate.
  */
 public class HierarchicalColumnHighlighter extends LegacyHighlighter {
     public HierarchicalColumnHighlighter() {

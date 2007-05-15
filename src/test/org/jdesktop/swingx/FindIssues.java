@@ -11,8 +11,12 @@ import java.awt.Component;
 
 import javax.swing.AbstractListModel;
 
-import org.jdesktop.swingx.decorator.ComponentAdapter;
-import org.jdesktop.swingx.decorator.SearchHighlighter;
+import org.jdesktop.swingx.decorator.AbstractHighlighter;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
+import org.jdesktop.swingx.decorator.CompoundHighlighter;
+import org.jdesktop.swingx.decorator.HighlightPredicate;
+import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.SearchPredicate;
 
 
 /**
@@ -35,6 +39,28 @@ public class FindIssues extends FindTest {
         }
     }
     
+    /** 
+     * test incremental search in JXTable.
+     *
+     */
+    public void testTableIncrementalHighlight() {
+        JXTable table = new JXTable(new TestTableModel());
+        table.putClientProperty(AbstractSearchable.MATCH_HIGHLIGHTER, Boolean.TRUE);
+        int row = 3;
+        int column = 1;
+        String firstSearchText = "wo" + row;
+        PatternModel model = new PatternModel();
+        model.setRawText(firstSearchText);
+        // make sure we had a match
+        int foundIndex = table.getSearchable().search(model.getPattern(), -1);
+        assertEquals("must return be found", row, foundIndex);
+        Highlighter hl = table.getHighlighters()[0];
+        
+        Component comp = table.prepareRenderer(table.getCellRenderer(row, column), row, column);
+        assertEquals(Color.YELLOW.brighter(), comp.getBackground());
+    }
+
+
     /**
      * Issue #236-swingx: backwards match in first row shows not-found-message.
      * Trackdown from Nicfagn - findPanel.doSearch always returns the next startIndex
@@ -82,40 +108,66 @@ public class FindIssues extends FindTest {
 
         public class XTableSearchable extends TableSearchable {
 
+            
             @Override
-            protected SearchHighlighter createSearchHighlighter() {
-                SearchHighlighter highlighter = new SearchHighlighter() {
-                    int currentViewRow;
-
-                    int currentModelColumn;
-
-                    /**
-                     * Overridden to always mark all.
-                     */
-                    @Override
-                    public void setHighlightCell(int row, int modelColumn) {
-                        currentViewRow = row;
-                        currentModelColumn = modelColumn;
-                        super.setHighlightCell(-1, -1);
-                    }
-
-                    @Override
-                    protected Color computeUnselectedBackground(
-                            Component renderer, ComponentAdapter adapter) {
-                        Color color = super.computeUnselectedBackground(
-                                renderer, adapter);
-                        if ((adapter.row == currentViewRow)
-                                && (adapter.column >= 0)
-                                && (adapter.viewToModel(adapter.column) == currentModelColumn)) {
-                            return color.darker();
-                        }
-                        return color;
-                    }
-
-                };
-                return highlighter;
+            protected AbstractHighlighter getConfiguredMatchHighlighter() {
+                CompoundHighlighter searchHL = (CompoundHighlighter) getMatchHighlighter();
+                if (!hasMatch(lastSearchResult)) {
+                    searchHL.setHighlightPredicate(HighlightPredicate.NEVER);
+                } else {
+                    searchHL.setHighlightPredicate(new SearchPredicate(lastSearchResult.getPattern()));
+                    ((AbstractHighlighter) searchHL.getHighlighters()[1]).setHighlightPredicate(
+                            new SearchPredicate(lastSearchResult.getPattern(), 
+                                    lastSearchResult.getFoundRow(), lastSearchResult.getFoundColumn()));
+                }
+                return searchHL;
             }
 
+            @Override
+            protected AbstractHighlighter createMatchHighlighter() {
+                ColorHighlighter base = new ColorHighlighter(Color.YELLOW.brighter(), null, 
+                        Color.YELLOW.darker(), null);
+                ColorHighlighter cell = new ColorHighlighter(Color.YELLOW.darker(), null);
+                CompoundHighlighter match = new CompoundHighlighter(base, cell);
+//                match.setHighlightPredicate(HighlightPredicate.NEVER);
+                return match;
+            }
+
+            
+            
+//            protected SearchHighlighter createSearchHighlighter() {
+//                SearchHighlighter highlighter = new SearchHighlighter() {
+//                    int currentViewRow;
+//
+//                    int currentModelColumn;
+//
+//                    /**
+//                     * Overridden to always mark all.
+//                     */
+//                    @Override
+//                    public void setHighlightCell(int row, int modelColumn) {
+//                        currentViewRow = row;
+//                        currentModelColumn = modelColumn;
+//                        super.setHighlightCell(-1, -1);
+//                    }
+//
+//                    @Override
+//                    protected Color computeUnselectedBackground(
+//                            Component renderer, ComponentAdapter adapter) {
+//                        Color color = super.computeUnselectedBackground(
+//                                renderer, adapter);
+//                        if ((adapter.row == currentViewRow)
+//                                && (adapter.column >= 0)
+//                                && (adapter.viewToModel(adapter.column) == currentModelColumn)) {
+//                            return color.darker();
+//                        }
+//                        return color;
+//                    }
+//
+//                };
+//                return highlighter;
+//            }
+//
         }
     }
     /**

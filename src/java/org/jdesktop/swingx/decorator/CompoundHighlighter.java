@@ -41,7 +41,8 @@ import org.jdesktop.swingx.decorator.LegacyHighlighter.UIHighlighter;
  * 
  */
 public class CompoundHighlighter extends AbstractHighlighter 
-    implements UIHighlighter {
+    // its the same api - the old will be removed
+    implements UIDependent, UIHighlighter {
     public static final Highlighter[] EMPTY_HIGHLIGHTERS = new Highlighter[0];
 
     protected List<Highlighter> highlighters;
@@ -159,7 +160,9 @@ public class CompoundHighlighter extends AbstractHighlighter
      * @param hl
      */
     private void updateUI(Highlighter hl) {
-        if (hl instanceof UIHighlighter) {
+        if (hl instanceof UIDependent) {
+            ((UIDependent) hl).updateUI();
+        } else if (hl instanceof UIHighlighter) { // this will be remove
             ((UIHighlighter) hl).updateUI();
         }
     }

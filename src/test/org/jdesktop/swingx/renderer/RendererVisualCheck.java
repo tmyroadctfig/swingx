@@ -94,6 +94,7 @@ import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.LegacyHighlighter;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
 import org.jdesktop.swingx.table.ColumnControlButton;
@@ -112,7 +113,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         RendererVisualCheck test = new RendererVisualCheck();
         try {
 //            test.runInteractiveTests();
-          test.runInteractiveTests(".*Date.*");
+          test.runInteractiveTests(".*Tree.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -631,8 +632,8 @@ public class RendererVisualCheck extends InteractiveTestCase {
     public void interactiveTableWithListColumnControl() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
-        JXList list = new JXList();
-        Highlighter highlighter = new UIAlternateRowHighlighter();
+        JXList list = new JXList(); 
+        Highlighter highlighter = HighlighterFactory.createSimpleUIStriping();
         table.addHighlighter(highlighter);
         list.addHighlighter(highlighter);
         // quick-fill and hook to table columns' visibility state

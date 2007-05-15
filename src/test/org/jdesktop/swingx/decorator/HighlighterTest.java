@@ -9,10 +9,13 @@ package org.jdesktop.swingx.decorator;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.util.logging.Logger;
 
 import javax.swing.JLabel;
+import javax.swing.UIManager;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.decorator.HighlighterFactory.UIColorHighlighter;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.renderer.JRendererLabel;
@@ -25,7 +28,8 @@ import org.jdesktop.test.ChangeReport;
  * @author Jeanette Winzenburg
  */
 public class HighlighterTest extends InteractiveTestCase {
-
+    private static final Logger LOG = Logger.getLogger(HighlighterTest.class
+            .getName());
     
     protected JLabel backgroundNull ;
     protected JLabel foregroundNull;
@@ -42,6 +46,8 @@ public class HighlighterTest extends InteractiveTestCase {
     protected Color selectedForeground = Color.MAGENTA;
     
     protected ColorHighlighter emptyHighlighter;
+    // flag used in setup to explicitly choose LF
+    private boolean defaultToSystemLF;
 
     protected void setUp() {
         backgroundNull = new JLabel("test");
@@ -62,6 +68,9 @@ public class HighlighterTest extends InteractiveTestCase {
         allColored.setBackground(background);
         
         emptyHighlighter = new ColorHighlighter();
+        // make sure we have the same default for each test
+        defaultToSystemLF = false;
+        setSystemLF(defaultToSystemLF);
     }
 
 //-------------------PainterHighlighter
@@ -325,7 +334,48 @@ public class HighlighterTest extends InteractiveTestCase {
         }
     } 
 
-
+//------------------ UIDependent
+    /**
+     * test if background changes with LF.
+     * 
+     * PENDING: this is not entirely correct, might fail because
+     *   both LFs fall back to GenericGray.
+     */
+    public void testLookupUIColor() {
+        UIColorHighlighter hl = new UIColorHighlighter();
+        Color color = hl.getBackground();
+        String lf = UIManager.getLookAndFeel().getName();
+        // switch LF
+        setSystemLF(!defaultToSystemLF);
+        if (lf.equals(UIManager.getLookAndFeel().getName())) {
+            LOG.info("cannot run lookupUIColor - equal LF" + lf);
+            return;
+        }
+        hl.updateUI();
+        assertFalse("highlighter background must be changed", 
+                color.equals(hl.getBackground()));
+    }
+    /**
+     * test if background changes with LF.
+     * 
+     * PENDING: this is not entirely correct, might fail because
+     *   both LFs fall back to GenericGray.
+     */
+    public void testLookupUIColorInCompound() {
+        UIColorHighlighter hl = new UIColorHighlighter();
+        Color color = hl.getBackground();
+        CompoundHighlighter compound = new CompoundHighlighter(hl);
+        String lf = UIManager.getLookAndFeel().getName();
+        // switch LF
+        setSystemLF(!defaultToSystemLF);
+        if (lf.equals(UIManager.getLookAndFeel().getName())) {
+            LOG.info("cannot run lookupUIColor - equal LF" + lf);
+            return;
+        }
+        compound.updateUI();
+        assertFalse("highlighter background must be changed", 
+                color.equals(hl.getBackground()));
+    }
 //-----------------------  CompoundHighlighter
     
     /**

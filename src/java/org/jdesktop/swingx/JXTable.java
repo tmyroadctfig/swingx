@@ -84,17 +84,21 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
+import org.jdesktop.swingx.AbstractSearchable.SearchResult;
 import org.jdesktop.swingx.action.BoundAction;
+import org.jdesktop.swingx.decorator.AbstractHighlighter;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.DefaultSelectionMapper;
 import org.jdesktop.swingx.decorator.FilterPipeline;
+import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.PipelineEvent;
 import org.jdesktop.swingx.decorator.PipelineListener;
 import org.jdesktop.swingx.decorator.ResetDTCRColorHighlighter;
 import org.jdesktop.swingx.decorator.SearchHighlighter;
+import org.jdesktop.swingx.decorator.SearchPredicate;
 import org.jdesktop.swingx.decorator.SelectionMapper;
 import org.jdesktop.swingx.decorator.SizeSequenceMapper;
 import org.jdesktop.swingx.decorator.SortController;
@@ -2583,8 +2587,6 @@ public class JXTable extends JTable
 
     public class TableSearchable extends AbstractSearchable {
 
-        private SearchHighlighter searchHighlighter;
-        
 
         @Override
         protected void findMatchAndUpdateState(Pattern pattern, int startRow,
@@ -2770,57 +2772,99 @@ public class JXTable extends JTable
             return getRowCount();
         }
 
-        @Override
-        protected void moveMatchMarker() {
-            int row = lastSearchResult.foundRow;
-            int column = lastSearchResult.foundColumn;
-            Pattern pattern = lastSearchResult.pattern;
-            if ((row < 0) || (column < 0)) {
-                if (markByHighlighter()) {
-                    getSearchHighlighter().setPattern(null);
+        /**
+         * use and move the match highlighter.
+         * PRE: markByHighlighter
+         *
+         */
+        protected void moveMatchByHighlighter() {
+            AbstractHighlighter searchHL = getConfiguredMatchHighlighter();
+            // no match
+            if (!hasMatch(lastSearchResult)) {
+                return;
+            } else {
+                ensureInsertedSearchHighlighters(searchHL);
+                Rectangle cellRect = getCellRect(lastSearchResult.foundRow, lastSearchResult.foundColumn, true);
+                if (cellRect != null) {
+                    scrollRectToVisible(cellRect);
                 }
+            }
+        }
+
+        /**
+         * @return
+         */
+        protected AbstractHighlighter getConfiguredMatchHighlighter() {
+            AbstractHighlighter searchHL = getMatchHighlighter();
+            HighlightPredicate predicate = HighlightPredicate.NEVER;
+            // no match
+            if (hasMatch(lastSearchResult)) {
+                predicate = new SearchPredicate(lastSearchResult.pattern, lastSearchResult.foundRow, convertColumnIndexToModel(lastSearchResult.foundColumn));
+            }
+            searchHL.setHighlightPredicate(predicate);
+            return searchHL;
+        }
+
+//        /**
+//         * @param result
+//         * @return
+//         */
+//        protected HighlightPredicate createHighlightPredicate(SearchResult result) {
+//            HighlightPredicate predicate = HighlightPredicate.NEVER;
+//            // no match
+//            if (hasMatch(result)) {
+//                predicate = new SearchPredicate(result.pattern, result.foundRow, convertColumnIndexToModel(result.foundColumn));
+//            }
+//            return predicate;
+//        }
+
+        /**
+         * @param result
+         * @return
+         */
+        protected boolean hasMatch(SearchResult result) {
+            boolean noMatch =  (result.getFoundRow() < 0) || (result.getFoundColumn() < 0);
+            return !noMatch;
+        }
+        
+        protected void moveMatchBySelection() {
+            if (!hasMatch(lastSearchResult)) {
                 return;
             }
-            if (markByHighlighter()) {
+            int row = lastSearchResult.foundRow;
+            int column = lastSearchResult.foundColumn;
+            changeSelection(row, column, false, false);
+            if (!getAutoscrolls()) {
+                // scrolling not handled by moving selection
                 Rectangle cellRect = getCellRect(row, column, true);
                 if (cellRect != null) {
                     scrollRectToVisible(cellRect);
                 }
-                ensureInsertedSearchHighlighters();
-                // TODO (JW) - cleanup SearchHighlighter state management
-                getSearchHighlighter().setPattern(pattern);
-                int modelColumn = convertColumnIndexToModel(column);
-                getSearchHighlighter().setHighlightCell(row, modelColumn);
+            }
+        }
+        
+        @Override
+        protected void moveMatchMarker() {
+            if (markByHighlighter()) {
+                moveMatchByHighlighter();
             } else { // use selection
-                changeSelection(row, column, false, false);
-                if (!getAutoscrolls()) {
-                    // scrolling not handled by moving selection
-                    Rectangle cellRect = getCellRect(row, column, true);
-                    if (cellRect != null) {
-                        scrollRectToVisible(cellRect);
-                    }
-                }
+                moveMatchBySelection();
             }
         }
 
-        private boolean markByHighlighter() {
+
+        protected boolean markByHighlighter() {
             return Boolean.TRUE.equals(getClientProperty(MATCH_HIGHLIGHTER));
         }
 
-        protected SearchHighlighter getSearchHighlighter() {
-            if (searchHighlighter == null) {
-                searchHighlighter = createSearchHighlighter();
-            }
-            return searchHighlighter;
-        }
 
-        private void ensureInsertedSearchHighlighters() {
-            if (!isInPipeline(getSearchHighlighter())) {
-                addHighlighter(getSearchHighlighter());
+        private void ensureInsertedSearchHighlighters(Highlighter highlighter) {
+            if (!isInPipeline(highlighter)) {
+                addHighlighter(highlighter);
             }
         }
 
-        private boolean isInPipeline(PatternHighlighter searchHighlighter) {
+        private boolean isInPipeline(Highlighter searchHighlighter) {
             Highlighter[] inPipeline = getHighlighters();
             if ((inPipeline.length > 0) && 
                (searchHighlighter.equals(inPipeline[inPipeline.length -1]))) {
@@ -2830,9 +2874,40 @@ public class JXTable extends JTable
             return false;
         }
 
-        protected SearchHighlighter createSearchHighlighter() {
-            return new SearchHighlighter();
+        private AbstractHighlighter matchHighlighter;
+        /**
+         * @return
+         */
+        protected AbstractHighlighter getMatchHighlighter() {
+            if (matchHighlighter == null) {
+                matchHighlighter = createMatchHighlighter();
+            }
+            return matchHighlighter;
         }
+
+        /**
+         * @return
+         */
+        protected AbstractHighlighter createMatchHighlighter() {
+            return new ColorHighlighter(Color.YELLOW.brighter(), null, 
+                    Color.YELLOW.brighter(), null, 
+                    HighlightPredicate.NEVER);
+        }
+
+        
+//        private SearchHighlighter searchHighlighter;
+        
+
+//        protected SearchHighlighter getSearchHighlighter() {
+//            if (searchHighlighter == null) {
+//                searchHighlighter = createSearchHighlighter();
+//            }
+//            return searchHighlighter;
+//        }
+//        
+//        protected SearchHighlighter createSearchHighlighter() {
+//            return new SearchHighlighter();
+//        }
 
     }
 

@@ -171,7 +171,7 @@ public class HighlighterIssues extends HighlighterTest {
     public void interactiveUITableWithAlternateRow() {
         JXTable table = new JXTable(10, 2);
         table.setBackground(ledger);
-        table.addHighlighter(new UIAlternateRowHighlighter());
+        table.setHighlighters(HighlighterFactory.createSimpleUIStriping());
         JXTable nohighlight = new JXTable(10, 2);
         nohighlight.setBackground(ledger);
         final JXFrame frame = wrapWithScrollingInFrame(table, nohighlight, "colored table with ui highlighter <--> without highlighter");

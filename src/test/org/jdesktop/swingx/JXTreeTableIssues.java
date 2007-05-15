@@ -27,6 +27,7 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.action.LinkAction;
+import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.LegacyHighlighter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
@@ -516,8 +517,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         tree.getColumn(2).setCellRenderer(new DefaultTableRenderer(provider));
         tree.setTreeCellRenderer(new DefaultTreeRenderer(provider));
 //        tree.setCellRenderer(new LinkRenderer(simpleAction));
-        tree.setHighlighters(
-                new UIAlternateRowHighlighter());
+        tree.setHighlighters(HighlighterFactory.createSimpleUIStriping());
         JFrame frame = wrapWithScrollingInFrame(tree, "table and simple links");
         frame.setVisible(true);
     }
@@ -552,7 +552,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         };
         provider.setHorizontalAlignment(JLabel.LEADING);
         tree.setTreeCellRenderer(new DefaultTreeRenderer(provider));
-        tree.setHighlighters(new UIAlternateRowHighlighter());
+        tree.setHighlighters(HighlighterFactory.createSimpleUIStriping());
         JFrame frame = wrapWithScrollingInFrame(tree, "treetable and custom renderer");
         frame.setVisible(true);
     }
@@ -596,7 +596,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         };
         DefaultTreeRenderer treeCellRenderer = new DefaultTreeRenderer(wrappingProvider);
         treeTable.setTreeCellRenderer(treeCellRenderer);
-        treeTable.setHighlighters(new UIAlternateRowHighlighter());
+        treeTable.setHighlighters(HighlighterFactory.createSimpleUIStriping());
         JXTree tree = new JXTree(treeTable.getTreeTableModel());
         tree.setCellRenderer(treeCellRenderer);
         tree.setLargeModel(true);
@@ -642,8 +642,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         provider.setHorizontalAlignment(JLabel.LEADING);
         tree.setTreeCellRenderer(new DefaultTreeRenderer(provider));
         tree.expandAll();
-        tree.setHighlighters(
-                new UIAlternateRowHighlighter());
+        tree.setHighlighters(HighlighterFactory.createSimpleUIStriping());
         JFrame frame = wrapWithScrollingInFrame(tree, "treeTable and getValueAt renderer");
         frame.setVisible(true);
     }

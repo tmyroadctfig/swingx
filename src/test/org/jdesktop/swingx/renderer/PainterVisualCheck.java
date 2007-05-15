@@ -261,7 +261,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         HighlightPredicate predicate = new ColumnHighlightPredicate(0);
         Highlighter iconHighlighter = new PainterHighlighter(imagePainter, predicate );
         // PENDING: implement lf specific highlight in new api
-        Highlighter alternateRowHighlighter = new UIAlternateRowHighlighter();
+        Highlighter alternateRowHighlighter = HighlighterFactory.createSimpleUIStriping();
         table.addHighlighter(alternateRowHighlighter);
         table.addHighlighter(iconHighlighter);
         // re-use component controller and highlighter in a JXList
@@ -289,7 +289,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         ComponentProvider<JLabel> controller = new LabelProvider(
                 JLabel.RIGHT) ;
         final ValueBasedGradientHighlighter gradientHighlighter = createTransparentGradientHighlighter();
-        Highlighter alternateRowHighlighter = new UIAlternateRowHighlighter();
+        Highlighter alternateRowHighlighter = HighlighterFactory.createSimpleUIStriping();
         table.addHighlighter(alternateRowHighlighter);
         table.addHighlighter(gradientHighlighter);
         // re-use component controller and highlighter in a JXList
