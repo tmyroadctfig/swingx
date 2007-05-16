@@ -73,6 +73,11 @@ public class JXSearchPanel extends AbstractPatternPanel {
 
 //----------------- accessing public properties
 
+    public void addPatternMatcher(PatternMatcher matcher) {
+        getPatternMatchers().add(matcher);
+        updateFieldName(matcher);
+    }
+    
     /**
      * sets the PatternFilter control.
      * 

@@ -16,20 +16,18 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellRenderer;
 
 import org.jdesktop.swingx.JXTreeTableUnitTest.InsertTreeTableModel;
-import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.LegacyHighlighter;
-import org.jdesktop.swingx.decorator.CompoundHighlighter;
-import org.jdesktop.swingx.decorator.SearchHighlighter;
+import org.jdesktop.swingx.decorator.SearchPredicate;
 import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
-import org.jdesktop.test.ChangeReport;
-import org.jdesktop.test.PropertyChangeReport;
 
 
 /**
+ * Unit tests for JXTree.
+ * 
  * @author Jeanette Winzenburg
  */
 public class JXTreeUnitTest extends InteractiveTestCase {
@@ -55,9 +53,8 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         assertTrue(tree.getRowCount() > 0);
         TreeCellRenderer renderer = tree.getCellRenderer();
         renderer.getTreeCellRendererComponent(tree, "dummy", false, false, false, -1, false);
-        SearchHighlighter searchHighlighter = new SearchHighlighter(null, Color.RED);
-        searchHighlighter.setHighlightAll();
-        searchHighlighter.setPattern(Pattern.compile("\\QNode\\E"));
+        SearchPredicate predicate = new SearchPredicate(Pattern.compile("\\QNode\\E"));
+        Highlighter searchHighlighter = new ColorHighlighter(null, Color.RED, predicate);
         tree.addHighlighter(searchHighlighter);
         renderer.getTreeCellRendererComponent(tree, "dummy", false, false, false, -1, false);
     }
@@ -77,9 +74,8 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         assertTrue(tree.getRowCount() > 0);
         TreeCellRenderer renderer = tree.getCellRenderer();
         renderer.getTreeCellRendererComponent(tree, "dummy", false, false, false, tree.getRowCount(), false);
-        SearchHighlighter searchHighlighter = new SearchHighlighter(null, Color.RED);
-        searchHighlighter.setHighlightAll();
-        searchHighlighter.setPattern(Pattern.compile("\\QNode\\E"));
+        SearchPredicate predicate = new SearchPredicate(Pattern.compile("\\QNode\\E"));
+        Highlighter searchHighlighter = new ColorHighlighter(null, Color.RED, predicate);
         tree.addHighlighter(searchHighlighter);
         renderer.getTreeCellRendererComponent(tree, "dummy", false, false, false, tree.getRowCount(), false);
     }
@@ -102,142 +98,6 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         assertEquals(0, adapter.column);
         assertEquals(0, adapter.row);
     }
-
-    /**
-     * Issue #??-swingx: competing setHighlighters(null) break code.
-     * 
-     * More specifically: it doesn't compile without casting the null, that's why
-     * it has to be commented here.
-     *
-     */
-//    public void testHighlightersNull() {
-//        JXTree tree = new JXTree();
-//        tree.setHighlighters(null);
-//    }
-
-    /**
-     * Issue #??-swingx: setHighlighters(null) throws NPE. 
-     * 
-     */
-    public void testSetHighlightersNull() {
-        JXTree tree = new JXTree();
-        tree.setHighlighters((LegacyHighlighter) null);
-        assertEquals(0, tree.getHighlighters().length);
-    }
-    
-    /**
-     * Issue #??-swingx: setHighlighters() throws NPE. 
-     * 
-     */
-    public void testSetHighlightersNoHighlighter() {
-        JXTree tree = new JXTree();
-        tree.setHighlighters();
-        assertEquals(0, tree.getHighlighters().length);
-    }
-
-    /**
-     * Issue #??-swingx: setHighlighters() throws NPE. 
-     * 
-     * Test that null highlighter resets the pipeline to null.
-     */
-    public void testSetHighlightersReset() {
-        JXTree tree = new JXTree();
-        tree.addHighlighter(new LegacyHighlighter());
-        // sanity
-        assertEquals(1, tree.getHighlighters().length);
-        tree.setHighlighters();
-        assertEquals(0, tree.getHighlighters().length);
-    }
-
-
-    /**
-     * test if removeHighlighter behaves as doc'ed.
-     * PENDING: revisit after Highlighter overhaul
-     */
-    public void testRemoveHighlighter() {
-        JXTree table = new JXTree();
-        // test cope with null
-        table.removeHighlighter(null);
-        LegacyHighlighter presetHighlighter = AlternateRowHighlighter.classicLinePrinter;
-        table.setHighlighters(presetHighlighter);
-        table.removeHighlighter(new LegacyHighlighter());
-        // remove the presetHighlighter
-        table.removeHighlighter(presetHighlighter);
-//        assertEquals("pipeline must be empty", 0, pipeline.getHighlighters().length);
-    }
-    
-    /**
-     * test choking on precondition failure (highlighter must not be null).
-     *
-     */
-    public void testAddNullHighlighter() {
-        JXTree tree = new JXTree();
-        try {
-            tree.addHighlighter(null);
-            fail("adding a null highlighter must throw NPE");
-        } catch (NullPointerException e) {
-            // pass - this is what we expect
-        } catch (Exception e) {
-            fail("adding a null highlighter throws exception different " +
-                        "from the expected NPE \n" + e);
-        }
-    }
-    /**
-     * PENDING: revisit after highligther overhaul
-     *
-     */
-    public void testAddHighlighterWithNotEmptyPipeline() {
-        JXTree tree = new JXTree();
-        LegacyHighlighter presetHighlighter = AlternateRowHighlighter.classicLinePrinter;
-        tree.setHighlighters(presetHighlighter);
-        LegacyHighlighter highlighter = new LegacyHighlighter();
-        tree.addHighlighter(highlighter);
-//        assertSame("pipeline must be same as preset", pipeline, tree.getCompoundHighlighter());
-//        assertEquals("pipeline must have fired changeEvent", 1, report.getEventCount());
-//        assertPipelineHasAsLast(pipeline, highlighter);
-    }
-    
-    private void assertPipelineHasAsLast(CompoundHighlighter pipeline, Highlighter highlighter) {
-        Highlighter[] highlighters = pipeline.getHighlighters();
-        assertTrue("pipeline must not be empty", highlighters.length > 0);
-        assertSame("highlighter must be added as last", highlighter, highlighters[highlighters.length - 1]);
-    }
-
-    /**
-     * test adding a highlighter.
-     *
-     *  asserts that a pipeline is created and set (firing a property change) and
-     *  that the pipeline contains the highlighter.
-     *  
-     *  PENDING: revisit after Highlighter overhaul
-     */
-    public void testAddHighlighterWithNullPipeline() {
-        JXTree tree = new JXTree();
-        PropertyChangeReport report = new PropertyChangeReport();
-        tree.addPropertyChangeListener(report);
-        LegacyHighlighter highlighter = new LegacyHighlighter();
-        tree.addHighlighter(highlighter);
-//        assertNotNull("table must have created pipeline", tree.getCompoundHighlighter());
-        assertTrue("table must have fired propertyChange for highlighters", report.hasEvents("highlighters"));
-//        assertPipelineContainsHighlighter(tree.getCompoundHighlighter(), highlighter);
-    }
-    
-    /**
-     * fails if the given highlighter is not contained in the pipeline.
-     * PRE: pipeline != null, highlighter != null.
-     * 
-     * @param pipeline
-     * @param highlighter
-     */
-    private void assertPipelineContainsHighlighter(CompoundHighlighter pipeline, Highlighter highlighter) {
-        Highlighter[] highlighters = pipeline.getHighlighters();
-        for (int i = 0; i < highlighters.length; i++) {
-            if (highlighter.equals(highlighters[i])) return;
-        }
-        fail("pipeline does not contain highlighter");
-        
-    }
-
 
     
     /**

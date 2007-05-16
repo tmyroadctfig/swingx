@@ -468,9 +468,12 @@ public class JXTree extends JTree {
         return paths != null ? paths : EMPTY_TREEPATH_ARRAY; 
     }
 
+//----------------------- Highlighter api
+    
     /**
      * Returns the CompoundHighlighter assigned to the table, null if none.
-     * PENDING: open up for subclasses after Highlighter overhaul
+     * PENDING: open up for subclasses again?.
+     * 
      * @return the CompoundHighlighter assigned to the table.
      * @see #setCompoundHighlighter(CompoundHighlighter)
      */
@@ -479,11 +482,12 @@ public class JXTree extends JTree {
     }
 
     /**
-     * Assigns a CompoundHighlighter to the table, maybe null to remove all
+     * Assigns a CompoundHighlighter to the tree, maybe null to remove all
      * Highlighters.<p>
      * 
-     * The default value is <code>null</code>.
+     * The default value is <code>null</code>. <p>
      * 
+     * PENDING: open up for subclasses again?.
      * @param pipeline the CompoundHighlighter to use for renderer decoration. 
      * @see #getCompoundHighlighter()
      * @see #addHighlighter(Highlighter)
@@ -503,15 +507,19 @@ public class JXTree extends JTree {
     }
 
     /**
-     * Sets the <code>LegacyHighlighter</code>s to the tree, replacing any old settings.
-     * Maybe null to remove all highlighters.<p>
+     * Sets the <code>Highlighter</code>s to the table, replacing any old settings.
+     * None of the given Highlighters must be null.<p>
      * 
+     * Note: the implementation is lenient with a single null highighter
+     * to ease the api change from previous versions.
      * 
-     * @param highlighters the highlighters to use for renderer decoration. 
-     * @see #getCompoundHighlighter()
+     * PENDING: property change? 
+     * 
+     * @param highlighters zero or more not null highlighters to use for renderer decoration.
+     * 
+     * @see #getHighlighters()
      * @see #addHighlighter(Highlighter)
      * @see #removeHighlighter(Highlighter)
-     * 
      */
     public void setHighlighters(Highlighter... highlighters) {
         CompoundHighlighter pipeline = null;
@@ -522,9 +530,10 @@ public class JXTree extends JTree {
         setCompoundHighlighter(pipeline);
     }
     /**
-     * Returns the <code>Highlighter</code>s used by this table.
+     * Returns the <code>Highlighter</code>s used by this tree.
      * Maybe empty, but guarantees to be never null.
      * @return the Highlighters used by this tree, guaranteed to never null.
+     * @see #setHighlighters(Highlighter[])
      */
     public Highlighter[] getHighlighters() {
         return getCompoundHighlighter() != null ? 
@@ -533,18 +542,15 @@ public class JXTree extends JTree {
     }
 
     /**
-     * Adds a LegacyHighlighter.
+     * Adds a Highlighter. Appends to the end of the list of used
+     * Highlighters.
      * <p>
      * 
-     * If the <code>CompoundHighlighter</code> returned from getHighlighters()
-     * is null, creates and sets a new pipeline containing the given
-     * <code>LegacyHighlighter</code>. Else, appends the <code>LegacyHighlighter</code>
-     * to the end of the pipeline.
+     * @param highlighter the <code>Highlighter</code> to add.
+     * @throws NullPointerException if <code>Highlighter</code> is null.
      * 
-     * @param highlighter the <code>LegacyHighlighter</code> to add.
-     * @throws NullPointerException if <code>LegacyHighlighter</code> is null.
      * @see #removeHighlighter(Highlighter)
-     * @see #setCompoundHighlighter(CompoundHighlighter)
+     * @see #setHighlighters(Highlighter[])
      */
     public void addHighlighter(Highlighter highlighter) {
         CompoundHighlighter pipeline = getCompoundHighlighter();
@@ -556,14 +562,13 @@ public class JXTree extends JTree {
     }
 
     /**
-     * Removes the LegacyHighlighter. <p>
+     * Removes the given Highlighter. <p>
      * 
-     * Does nothing if the CompoundHighlighter is null or does not contain
-     * the given LegacyHighlighter.
+     * Does nothing if the Highlighter is not contained.
      * 
-     * @param highlighter the highlighter to remove.
+     * @param highlighter the Highlighter to remove.
      * @see #addHighlighter(Highlighter)
-     * @see #setCompoundHighlighter(CompoundHighlighter)
+     * @see #setHighlighters(Highlighter..)
      */
     public void removeHighlighter(Highlighter highlighter) {
         if ((getCompoundHighlighter() == null)) return;
@@ -965,7 +970,7 @@ public class JXTree extends JTree {
                         selected, expanded, leaf, row, hasFocus);
 
                     if ((compoundHighlighter != null) && (row < getRowCount()) && (row >= 0)){
-                        result = compoundHighlighter.apply(result, getComponentAdapter(row));
+                        result = compoundHighlighter.highlight(result, getComponentAdapter(row));
                     }
 
                  return result;

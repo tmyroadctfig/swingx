@@ -27,8 +27,12 @@ import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.test.PropertyChangeReport;
 
 /**
- * Contains tests around issues or incompletely defined behaviour
- * Highlighter client api for collection components. <p>
+ * Test to exposed known issues of <code>Highlighter</code> client
+ * api in collection components.
+ * 
+ * Ideally, there would be at least one failing test method per open
+ * Issue in the issue tracker. Plus additional failing test methods for
+ * not fully specified or not yet decided upon features/behaviour.
  * 
  * @author Jeanette Winzenburg
  */

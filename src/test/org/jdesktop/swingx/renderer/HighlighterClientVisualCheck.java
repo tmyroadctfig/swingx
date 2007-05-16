@@ -31,12 +31,16 @@ import javax.swing.JLabel;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXFrame;
+import org.jdesktop.swingx.JXSearchPanel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
+import org.jdesktop.swingx.decorator.PatternHighlighter;
+import org.jdesktop.swingx.decorator.PatternMatcher;
 import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.treetable.FileSystemModel;
@@ -57,15 +61,63 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
 //      setSystemLF(true);
       HighlighterClientVisualCheck test = new HighlighterClientVisualCheck();
       try {
-         test.runInteractiveTests();
-//         test.runInteractiveTests(".*Table.*");
+//         test.runInteractiveTests();
+         test.runInteractiveTests(".*Search.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
+   /**
+     * test to see searchPanel functionality in new Highlighter api
+     * 
+     */
+    public void interactiveSearchPanelOld() {
+        JXTable table = new JXTable(tableModel);
+        PatternHighlighter highlighter = new PatternHighlighter();
+        highlighter.setForeground(Color.RED);
+        table.addHighlighter(highlighter);
+        JXSearchPanel searchPanel = new JXSearchPanel();
+        searchPanel.setPatternHighlighter(highlighter);
+        JXFrame frame = wrapWithScrollingInFrame(table, "Old Pattern highlighting test col 0");
+        getStatusBar(frame).add(searchPanel);
+        frame.setVisible(true);
+    }
+    /**
+     * test to see searchPanel functionality in new Highlighter api
+     * 
+     */
+    public void interactiveSearchPanel() {
+        JXTable table = new JXTable(tableModel);
+        final ColorHighlighter cl = new ColorHighlighter(null, Color.RED,
+                new PatternPredicate(null, 0, -1));
+        table.addHighlighter(cl);
+        JXSearchPanel searchPanel = new JXSearchPanel();
+        PatternMatcher patternMatcher = new PatternMatcher() {
+            public Pattern getPattern() {
+                return getPatternPredicate().getPattern();
+            }
 
- 
+            public void setPattern(Pattern pattern) {
+                PatternPredicate old = getPatternPredicate();
+                cl.setHighlightPredicate(new PatternPredicate(pattern, old
+                        .getTestColumn(), old.getHighlightColumn()));
+            }
+            
+            private PatternPredicate getPatternPredicate() {
+                return (PatternPredicate) cl.getHighlightPredicate();
+            }
+
+        };
+        searchPanel.addPatternMatcher(patternMatcher);
+        JXFrame frame = wrapWithScrollingInFrame(table,
+                "Pattern highlighting col 0");
+        getStatusBar(frame).add(searchPanel);
+        frame.setVisible(true);
+    }
+    
+//----------------- custom PatternMatcher
+    
     /**
      * columm shading (was: hierarchicalColumnHighlighter)
      *

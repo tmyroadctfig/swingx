@@ -25,20 +25,17 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import org.jdesktop.swingx.JXList.DelegatingRenderer;
-import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.CompoundHighlighter;
-import org.jdesktop.swingx.decorator.LegacyHighlighter;
 import org.jdesktop.swingx.decorator.PatternFilter;
-import org.jdesktop.swingx.decorator.SearchHighlighter;
+import org.jdesktop.swingx.decorator.SearchPredicate;
 import org.jdesktop.swingx.decorator.SelectionMapper;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
-import org.jdesktop.test.ChangeReport;
 import org.jdesktop.test.PropertyChangeReport;
 
 /**
@@ -97,7 +94,8 @@ public class JXListTest extends InteractiveTestCase {
         assertEquals(model.getSize(), list.getElementCount());
         assertTrue("setting model must clear selectioon", list.isSelectionEmpty());
     }
-/**
+    
+    /**
      * test that swingx renderer is used by default.
      *
      */
@@ -122,9 +120,8 @@ public class JXListTest extends InteractiveTestCase {
         JXList list = new JXList(new Object[] {1, 2, 3});
         ListCellRenderer renderer = list.getCellRenderer();
         renderer.getListCellRendererComponent(list, "dummy", -1, false, false);
-        SearchHighlighter searchHighlighter = new SearchHighlighter(null, Color.RED);
-        searchHighlighter.setHighlightAll();
-        searchHighlighter.setPattern(Pattern.compile("\\QNode\\E"));
+        SearchPredicate predicate = new SearchPredicate(Pattern.compile("\\QNode\\E"));
+        Highlighter searchHighlighter = new ColorHighlighter(null, Color.RED, predicate);
         list.addHighlighter(searchHighlighter);
         renderer.getListCellRendererComponent(list, "dummy", -1, false, false);
     }
@@ -142,9 +139,8 @@ public class JXListTest extends InteractiveTestCase {
         JXList list = new JXList(new Object[] {1, 2, 3});
         ListCellRenderer renderer = list.getCellRenderer();
         renderer.getListCellRendererComponent(list, "dummy", list.getElementCount(), false, false);
-        SearchHighlighter searchHighlighter = new SearchHighlighter(null, Color.RED);
-        searchHighlighter.setHighlightAll();
-        searchHighlighter.setPattern(Pattern.compile("\\QNode\\E"));
+        SearchPredicate predicate = new SearchPredicate(Pattern.compile("\\QNode\\E"));
+        Highlighter searchHighlighter = new ColorHighlighter(null, Color.RED, predicate);
         list.addHighlighter(searchHighlighter);
         renderer.getListCellRendererComponent(list, "dummy", list.getElementCount(), false, false);
     }
@@ -201,140 +197,6 @@ public class JXListTest extends InteractiveTestCase {
         
     }
     
-    /**
-     * Issue #??-swingx: competing setHighlighters(null) break code.
-     * 
-     * More specifically: it doesn't compile without casting the null, that's why
-     * it has to be commented here.
-     *
-     */
-//    public void testHighlightersNull() {
-//        JXList list = new JXList();
-//        list.setHighlighters(null);
-//    }
-
-    /**
-     * Issue #??-swingx: setHighlighters(null) throws NPE. 
-     * 
-     */
-    public void testSetHighlightersNull() {
-        JXList list = new JXList();
-        list.setHighlighters((LegacyHighlighter) null);
-        assertEquals(0, list.getHighlighters().length);
-    }
-    
-    /**
-     * Issue #??-swingx: setHighlighters() throws NPE. 
-     * 
-     */
-    public void testSetHighlightersNoHighlighter() {
-        JXList list = new JXList();
-        list.setHighlighters();
-        assertEquals(0, list.getHighlighters().length);
-    }
-
-    /**
-     * Issue #??-swingx: setHighlighters() throws NPE. 
-     * 
-     * Test that null highlighter resets the pipeline to null.
-     */
-    public void testSetHighlightersReset() {
-        JXList list = new JXList();
-        list.addHighlighter(new LegacyHighlighter());
-        // sanity
-        assertEquals(1, list.getHighlighters().length);
-        list.setHighlighters();
-        assertEquals(0, list.getHighlighters().length);
-    }
-
-    /**
-     * test if removeHighlighter behaves as doc'ed.
-     * PENDING: revisit after highligher overhaul
-     */
-    public void testRemoveHighlighter() {
-        JXList list = new JXList();
-        // test cope with null
-        list.removeHighlighter(null);
-        LegacyHighlighter presetHighlighter = AlternateRowHighlighter.classicLinePrinter;
-        list.setHighlighters(presetHighlighter);
-        list.removeHighlighter(new LegacyHighlighter());
-        // remove the presetHighlighter
-        list.removeHighlighter(presetHighlighter);
-//        assertEquals("pipeline must have fired on remove", 1, report.getEventCount());
-//        assertEquals("pipeline must be empty", 0, pipeline.getHighlighters().length);
-    }
-    
-    /**
-     * test choking on precondition failure (highlighter must not be null).
-     *
-     */
-    public void testAddNullHighlighter() {
-        JXList list = new JXList();
-        try {
-            list.addHighlighter(null);
-            fail("adding a null highlighter must throw NPE");
-        } catch (NullPointerException e) {
-            // pass - this is what we expect
-        } catch (Exception e) {
-            fail("adding a null highlighter throws exception different " +
-                        "from the expected NPE \n" + e);
-        }
-    }
-    /**
-     * PENDING: revisit after highlighter overhaul
-     *
-     */
-    public void testAddHighlighterWithNotEmptyPipeline() {
-        JXList list = new JXList();
-        LegacyHighlighter presetHighlighter = AlternateRowHighlighter.classicLinePrinter;
-//        CompoundHighlighter pipeline = new CompoundHighlighter(new LegacyHighlighter[] {presetHighlighter});
-//        list.setCompoundHighlighter(pipeline);
-//        LegacyHighlighter highlighter = new LegacyHighlighter();
-//        list.addHighlighter(highlighter);
-//        assertSame("pipeline must be same as preset", pipeline, list.getCompoundHighlighter());
-//        assertEquals("pipeline must have fired changeEvent", 1, report.getEventCount());
-//        assertPipelineHasAsLast(pipeline, highlighter);
-    }
-    
-    private void assertPipelineHasAsLast(CompoundHighlighter pipeline, Highlighter highlighter) {
-        Highlighter[] highlighters = pipeline.getHighlighters();
-        assertTrue("pipeline must not be empty", highlighters.length > 0);
-        assertSame("highlighter must be added as last", highlighter, highlighters[highlighters.length - 1]);
-    }
-
-    /**
-     * test adding a highlighter.
-     *
-     *  asserts that a pipeline is created and set (firing a property change) and
-     *  that the pipeline contains the highlighter.
-     *  PENDING: revisit after highlighter overhaul
-     */
-    public void testAddHighlighterWithNullPipeline() {
-        JXList list = new JXList();
-        PropertyChangeReport report = new PropertyChangeReport();
-        list.addPropertyChangeListener(report);
-        LegacyHighlighter highlighter = new LegacyHighlighter();
-        list.addHighlighter(highlighter);
-        assertTrue("table must have fired propertyChange for highlighters", report.hasEvents("highlighters"));
-//        assertPipelineContainsHighlighter(list.getCompoundHighlighter(), highlighter);
-    }
-    
-    /**
-     * fails if the given highlighter is not contained in the pipeline.
-     * PRE: pipeline != null, highlighter != null.
-     * 
-     * @param pipeline
-     * @param highlighter
-     */
-    private void assertPipelineContainsHighlighter(CompoundHighlighter pipeline, Highlighter highlighter) {
-        Highlighter[] highlighters = pipeline.getHighlighters();
-        for (int i = 0; i < highlighters.length; i++) {
-            if (highlighter.equals(highlighters[i])) return;
-        }
-        fail("pipeline does not contain highlighter");
-        
-    }
-
 
     /**
      * test exceptions on null data(model, vector, array).

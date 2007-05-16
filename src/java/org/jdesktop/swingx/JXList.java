@@ -1072,8 +1072,10 @@ public class JXList extends JList {
     // ------------------------------ renderers
 
     /**
-     * PENDING: open up for subclasses again
-     * @return the CompoundHighlighter assigned to the list.
+     * Returns the CompoundHighlighter assigned to the list, null if none.
+     * PENDING: open up for subclasses again?.
+     * 
+     * @return the CompoundHighlighter assigned to the table.
      * @see #setCompoundHighlighter(CompoundHighlighter)
      */
     private CompoundHighlighter getCompoundHighlighter() {
@@ -1081,10 +1083,16 @@ public class JXList extends JList {
     }
 
     /**
-     * Assigns a CompoundHighlighter to the list. This is a bound property.
+     * Assigns a CompoundHighlighter to the list, maybe null to remove all
+     * Highlighters.<p>
      * 
-     * @param pipeline the CompoundHighlighter to use for renderer
-     *   decoration, maybe null to remove all Highlighters.
+     * The default value is <code>null</code>. <p>
+     * 
+     * PENDING: open up for subclasses again?.
+     * @param pipeline the CompoundHighlighter to use for renderer decoration. 
+     * @see #getCompoundHighlighter()
+     * @see #addHighlighter(Highlighter)
+     * @see #removeHighlighter(Highlighter)
      */
     private void setCompoundHighlighter(CompoundHighlighter pipeline) {
         CompoundHighlighter old = getCompoundHighlighter();
@@ -1099,12 +1107,17 @@ public class JXList extends JList {
     }
 
     /**
-     * Sets the <code>LegacyHighlighter</code>s to the list, replacing any old settings.
-     * May be null to remove all highlighters.<p>
+     * Sets the <code>Highlighter</code>s to the list, replacing any old settings.
+     * None of the given Highlighters must be null.<p>
      * 
+     * Note: the implementation is lenient with a single null highighter
+     * to ease the api change from previous versions.
      * 
-     * @param highlighters the highlighters to use for renderer decoration. 
-     * @see #getCompoundHighlighter()
+     * PENDING: property change? 
+     * 
+     * @param highlighters zero or more not null highlighters to use for renderer decoration.
+     * 
+     * @see #getHighlighters()
      * @see #addHighlighter(Highlighter)
      * @see #removeHighlighter(Highlighter)
      * 
@@ -1119,9 +1132,10 @@ public class JXList extends JList {
     }
 
     /**
-     * Returns the <code>Highlighter</code>s used by this table.
+     * Returns the <code>Highlighter</code>s used by this list.
      * Maybe empty, but guarantees to be never null.
      * @return the Highlighters used by this list, guaranteed to never null.
+     * @see #setHighlighters(Highlighter[])
      */
     public Highlighter[] getHighlighters() {
         return getCompoundHighlighter() != null ? 
@@ -1130,14 +1144,15 @@ public class JXList extends JList {
     }
     
     /**
-     * Adds a Highlighter.
+     * Adds a Highlighter. Appends to the end of the list of used
+     * Highlighters.
+     * <p>
      * 
-     * If the CompoundHighlighter returned from getHighlighters() is null, creates
-     * and sets a new pipeline containing the given LegacyHighlighter. Else, appends
-     * the LegacyHighlighter to the end of the pipeline.
+     * @param highlighter the <code>Highlighter</code> to add.
+     * @throws NullPointerException if <code>Highlighter</code> is null.
      * 
-     * @param highlighter the LegacyHighlighter to add - must not be null.
-     * @throws NullPointerException if highlighter is null.
+     * @see #removeHighlighter(Highlighter)
+     * @see #setHighlighters(Highlighter[])
      */
     public void addHighlighter(Highlighter highlighter) {
         CompoundHighlighter pipeline = getCompoundHighlighter();
@@ -1149,12 +1164,13 @@ public class JXList extends JList {
     }
 
     /**
-     * Removes the LegacyHighlighter.
+     * Removes the given Highlighter. <p>
      * 
-     * Does nothing if the CompoundHighlighter is null or does not contain
-     * the given LegacyHighlighter.
+     * Does nothing if the Highlighter is not contained.
      * 
-     * @param highlighter the LegacyHighlighter to remove.
+     * @param highlighter the Highlighter to remove.
+     * @see #addHighlighter(Highlighter)
+     * @see #setHighlighters(Highlighter..)
      */
     public void removeHighlighter(Highlighter highlighter) {
         if ((getCompoundHighlighter() == null)) return;
@@ -1248,7 +1264,7 @@ public class JXList extends JList {
             Component comp = delegateRenderer.getListCellRendererComponent(list, value, index,
                     isSelected, cellHasFocus);
             if ((compoundHighlighter != null) && (index >= 0) && (index < getElementCount())) {
-                comp = compoundHighlighter.apply(comp, getComponentAdapter(index));
+                comp = compoundHighlighter.highlight(comp, getComponentAdapter(index));
             }
             return comp;
         }
