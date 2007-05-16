@@ -20,21 +20,22 @@
  */
 package org.jdesktop.swingx.painter;
 
-import org.jdesktop.swingx.InteractiveTestCase;
-import org.jdesktop.swingx.JXFrame;
+import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+
 import org.jdesktop.swingx.JXButton;
-import org.jdesktop.swingx.JXHeader;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.image.FastBlurFilter;
-
-import javax.swing.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * JW: renamed from PainterInteractiveTest to fix the build failure. Revisit!

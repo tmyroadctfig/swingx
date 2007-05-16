@@ -62,7 +62,6 @@ import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.LegacyHighlighter;
 import org.jdesktop.swingx.decorator.PainterHighlighter;
-import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.painter.ImagePainter;
 import org.jdesktop.swingx.painter.MattePainter;

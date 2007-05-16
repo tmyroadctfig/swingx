@@ -172,6 +172,10 @@ public class AlternateRowHighlighter extends LegacyHighlighter {
         fireStateChanged();
     }
     
+    /**
+     * @deprecated use HighlighterFactory.UIColorHighlighter
+     * 
+     */
     public static class UIAlternateRowHighlighter extends AlternateRowHighlighter 
        implements UIHighlighter {
 

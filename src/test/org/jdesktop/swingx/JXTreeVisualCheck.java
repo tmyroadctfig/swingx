@@ -38,13 +38,12 @@ import javax.swing.ToolTipManager;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 
-import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
+import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
-import org.jdesktop.swingx.decorator.PatternHighlighter;
-import org.jdesktop.swingx.decorator.RolloverHighlighter;
-import org.jdesktop.swingx.decorator.SearchHighlighter;
+import org.jdesktop.swingx.decorator.PatternPredicate;
+import org.jdesktop.swingx.decorator.SearchPredicate;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
 
@@ -59,7 +58,7 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
       try {
 //          test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*RToL.*");
-          test.runInteractiveTests("interactive.*Rollover.*");
+          test.runInteractiveTests("interactive.*Highl.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -68,9 +67,8 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
     
     public void interactiveExpandWithHighlighters() {
         JXTree tree = new JXTree();
-        SearchHighlighter searchHighlighter = new SearchHighlighter(null, Color.RED);
-        searchHighlighter.setHighlightAll();
-        searchHighlighter.setPattern(Pattern.compile("\\Qe\\E"));
+        Highlighter searchHighlighter = new ColorHighlighter(null, Color.RED, 
+                new SearchPredicate(Pattern.compile("\\Qe\\E")));
         tree.addHighlighter(searchHighlighter);
         showWithScrollingInFrame(tree, "NPE on tree expand with highlighter");
 
@@ -226,8 +224,9 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
     
     private Highlighter createRolloverHighlighter(boolean useForeground) {
         Color color = new Color(0xF0, 0xF0, 0xE0); //LegacyHighlighter.ledgerBackground.getBackground();
-        Highlighter highlighter = new RolloverHighlighter(
-                useForeground ? null : color, useForeground ? color.darker() : null);
+        Highlighter highlighter = new ColorHighlighter(
+                useForeground ? null : color, useForeground ? color.darker() : null, 
+                        HighlightPredicate.ROLLOVER_ROW);
         return highlighter;
     }
     
@@ -238,10 +237,9 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
     public void interactiveTestHighlighters() {
         JXTree tree = new JXTree(treeTableModel);
         String pattern = "o";
-        tree.setHighlighters(new PatternHighlighter(null, Color.red, pattern, 0, 1)
-//          );
-            ,                 HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER));
-
+        tree.setHighlighters(new ColorHighlighter(null, Color.red, 
+                new PatternPredicate(Pattern.compile(pattern), 0)),
+                HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER));
         showWithScrollingInFrame(tree, "Highlighters: " + pattern);
     }
     

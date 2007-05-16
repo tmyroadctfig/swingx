@@ -6,25 +6,19 @@ package org.jdesktop.swingx;
 
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JFrame;
 import javax.swing.JList;
 
 import org.jdesktop.swingx.action.LinkModelAction;
-import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
-import org.jdesktop.swingx.decorator.ComponentAdapter;
-import org.jdesktop.swingx.decorator.ConditionalHighlighter;
+import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
-import org.jdesktop.swingx.decorator.LegacyHighlighter;
-import org.jdesktop.swingx.decorator.CompoundHighlighter;
-import org.jdesktop.swingx.decorator.PatternHighlighter;
-import org.jdesktop.swingx.decorator.RolloverHighlighter;
+import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.HyperlinkProvider;
 
@@ -81,8 +75,10 @@ public class JXListVisualCheck extends JXListTest {
     public void interactiveTestTablePatternFilter5() {
         JXList list = new JXList(listModel);
         String pattern = "Row";
-        list.setHighlighters(new PatternHighlighter(null, Color.red, 
-                pattern, 0, 1));
+        list.setHighlighters(new ColorHighlighter(null, Color.red, 
+                // columns not really important, ListAdapter.getXXValue
+                // uses row only
+                new PatternPredicate(Pattern.compile(pattern), 0)));
         showWithScrollingInFrame(list, "PatternHighlighter: " + pattern);
     }
 
@@ -101,7 +97,9 @@ public class JXListVisualCheck extends JXListTest {
     public void interactiveTestRolloverHighlight() {
         JXList list = new JXList(listModel);
         list.setRolloverEnabled(true);
-        list.addHighlighter(new RolloverHighlighter(new Color(0xF0, 0xF0, 0xE0), null));
+        ColorHighlighter rollover = new ColorHighlighter(new Color(0xF0, 0xF0, 0xE0), null, 
+                        HighlightPredicate.ROLLOVER_ROW);
+        list.addHighlighter(rollover);
         showWithScrollingInFrame(list, "rollover highlight");
     }
 
@@ -113,7 +111,8 @@ public class JXListVisualCheck extends JXListTest {
         JXList list = new JXList(listModel);
         list.setRolloverEnabled(true);
         list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
-        list.addHighlighter(new RolloverHighlighter(new Color(0xF0, 0xF0, 0xE0), null));
+        list.addHighlighter(new ColorHighlighter(new Color(0xF0, 0xF0, 0xE0), null, 
+                HighlightPredicate.ROLLOVER_ROW));
         showWithScrollingInFrame(list, "rollover highlight - horz. Wrap");
     }
     /**
@@ -124,7 +123,8 @@ public class JXListVisualCheck extends JXListTest {
         JXList list = new JXList(listModel);
         list.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
         list.setRolloverEnabled(true);
-        list.addHighlighter(new RolloverHighlighter(new Color(0xF0, 0xF0, 0xE0), null));
+        list.addHighlighter(new ColorHighlighter(new Color(0xF0, 0xF0, 0xE0), null, 
+                HighlightPredicate.ROLLOVER_ROW));
         showWithScrollingInFrame(list, "rollover highlight - custom cursor");
     }
     /**
@@ -138,7 +138,8 @@ public class JXListVisualCheck extends JXListTest {
         HyperlinkProvider h = new HyperlinkProvider(action, LinkModel.class);
         list.setCellRenderer(new DefaultListRenderer(h));
         list.setRolloverEnabled(true);
-        list.addHighlighter(new RolloverHighlighter(new Color(0xF0, 0xF0, 0xE0), null));
+        list.addHighlighter(new ColorHighlighter(new Color(0xF0, 0xF0, 0xE0), null, 
+                HighlightPredicate.ROLLOVER_ROW));
         showWithScrollingInFrame(list, editorPaneLinkVisitor.getOutputComponent(), "rollover highlight with links");
     }
 

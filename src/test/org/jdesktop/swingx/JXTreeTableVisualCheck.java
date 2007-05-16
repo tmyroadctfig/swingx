@@ -41,9 +41,8 @@ import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
-import org.jdesktop.swingx.decorator.LegacyHighlighter;
 import org.jdesktop.swingx.decorator.PatternFilter;
-import org.jdesktop.swingx.decorator.PatternHighlighter;
+import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.decorator.ShadingColorHighlighter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
@@ -812,8 +811,8 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
                 new ColumnHighlightPredicate(0));
 
         treeTable.addHighlighter(hl);
-        treeTable.addHighlighter(new PatternHighlighter(null, Color.red, "^s",
-                Pattern.CASE_INSENSITIVE, 0, -1));
+        treeTable.addHighlighter(new ColorHighlighter(null, Color.red, 
+                new PatternPredicate(Pattern.compile("^s", Pattern.CASE_INSENSITIVE), 0)));
         // alternative: set a pipeline containing the bunch of highlighters
 //        treeTable.setHighlighters(new CompoundHighlighter(new LegacyHighlighter[] {
 //                AlternateRowHighlighter.quickSilver,
@@ -990,7 +989,8 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         treeTable.setHighlighters(
                         new ColorHighlighter(Color.orange, null),
                         hl,
-                        new PatternHighlighter(null, Color.red,"D", 0, 0, 0));
+                        new ColorHighlighter(null, Color.red,
+                                new PatternPredicate(Pattern.compile("D"), 0)));
 
         HighlightPredicate predicate = new HighlightPredicate() {
 

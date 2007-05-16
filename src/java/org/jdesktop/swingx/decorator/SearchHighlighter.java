@@ -28,6 +28,9 @@ import java.util.regex.Pattern;
  * Convenience LegacyHighlighter to test and highlight cells in searching.
  *  
  * @author Jeanette Winzenburg
+ * 
+ * @deprecated use AbstractHighligther with SearchPredicate
+ * 
  */
 public class SearchHighlighter extends PatternHighlighter {
     /** the row to highlight in view coordinates. -1 means all */

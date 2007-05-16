@@ -15,7 +15,6 @@ import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
-import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.SearchPredicate;
 
 
@@ -54,8 +53,6 @@ public class FindIssues extends FindTest {
         // make sure we had a match
         int foundIndex = table.getSearchable().search(model.getPattern(), -1);
         assertEquals("must return be found", row, foundIndex);
-        Highlighter hl = table.getHighlighters()[0];
-        
         Component comp = table.prepareRenderer(table.getCellRenderer(row, column), row, column);
         assertEquals(Color.YELLOW.brighter(), comp.getBackground());
     }

@@ -35,6 +35,22 @@ public class PatternPredicate implements HighlightPredicate {
     private int highlightColumn;
     private int testColumn;
     private Pattern pattern;
+    
+    /**
+     * Instantiates a Predicate with the given Pattern and testColumn index
+     * (in model coordinates) highlighting all columns.
+     *  A column index of -1 is interpreted
+     * as "all". (PENDING: search forum for the exact definition, legacy 
+     * base pattern and search behave differently?) 
+     * 
+     * 
+     * @param pattern the Pattern to test the cell value against
+     * @param testColumn the column index of the cell which contains the value
+     *   to test against the pattern 
+     */
+    public PatternPredicate(Pattern pattern, int testColumn) {
+        this(pattern, testColumn, -1);
+    }
 
     /**
      * Instantiates a Predicate with the given Pattern and test-/decorate

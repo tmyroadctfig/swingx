@@ -47,7 +47,8 @@ import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.action.AbstractActionExt;
-import org.jdesktop.swingx.decorator.RolloverHighlighter;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
+import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.test.ActionMapTreeTableModel;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
@@ -191,7 +192,8 @@ public class TreeRendererTest extends InteractiveTestCase {
         };
         tree.setCellRenderer(new DefaultTreeRenderer(converter));
         JXTree xtree = new JXTree(model);
-        xtree.setHighlighters(new RolloverHighlighter(Color.RED, Color.YELLOW));
+        xtree.setHighlighters(new ColorHighlighter(Color.RED, Color.YELLOW,
+                HighlightPredicate.ROLLOVER_ROW));
         xtree.setRolloverEnabled(true);
         // share renderer
         xtree.setCellRenderer(tree.getCellRenderer());

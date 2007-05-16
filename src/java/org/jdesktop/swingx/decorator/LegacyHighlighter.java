@@ -112,6 +112,8 @@ import javax.swing.event.ChangeListener;
  * @author Ramesh Gupta
  * @author Jeanette Winzenburg
  * 
+ * @deprecated use ColorHighligher instead
+ * 
  * @see ComponentAdapter
  * @see javax.swing.ListCellRenderer
  * @see javax.swing.table.TableCellRenderer

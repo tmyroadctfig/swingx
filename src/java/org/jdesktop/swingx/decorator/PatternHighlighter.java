@@ -29,6 +29,8 @@ import java.util.regex.PatternSyntaxException;
  * PatternHighlighter
  * 
  * @author Ramesh Gupta
+ * 
+ * @deprecated use AbstractHighlighter with PatternPredicate
  */
 public class PatternHighlighter extends ConditionalHighlighter implements
         PatternMatcher {

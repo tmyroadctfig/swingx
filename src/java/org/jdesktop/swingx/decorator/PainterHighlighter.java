@@ -23,7 +23,6 @@ package org.jdesktop.swingx.decorator;
 
 import java.awt.Component;
 
-import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.renderer.PainterAware;
 

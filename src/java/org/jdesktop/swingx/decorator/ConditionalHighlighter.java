@@ -29,6 +29,9 @@ import java.awt.Component;
  * 
  * 
  * @author Ramesh Gupta
+ * 
+ * @deprecated use a AbstractHighlighter with HighlightPredicate instead
+ * 
  */
 public abstract class ConditionalHighlighter extends LegacyHighlighter {
     protected int               testColumn = 0;         // always in model coordinates

@@ -15,8 +15,10 @@ import javax.swing.JTree;
 import javax.swing.ListModel;
 import javax.swing.table.TableModel;
 
+import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
-import org.jdesktop.swingx.decorator.RolloverHighlighter;
+import org.jdesktop.swingx.decorator.HighlightPredicate;
+import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
 
@@ -39,8 +41,8 @@ public class RolloverTest extends InteractiveTestCase {
     }
 
     private TableModel sortableTableModel;
-    private RolloverHighlighter backgroundHighlighter;
-    private RolloverHighlighter foregroundHighlighter;
+    private Highlighter backgroundHighlighter;
+    private Highlighter foregroundHighlighter;
     private ListModel listModel;
     private FileSystemModel treeTableModel;
 
@@ -179,8 +181,10 @@ public class RolloverTest extends InteractiveTestCase {
             
         };
         treeTableModel = new FileSystemModel();
-        foregroundHighlighter = new RolloverHighlighter(null, Color.MAGENTA);
-        backgroundHighlighter = new RolloverHighlighter(Color.YELLOW, null);
+        foregroundHighlighter = new ColorHighlighter(null, Color.MAGENTA,
+                HighlightPredicate.ROLLOVER_ROW);
+        backgroundHighlighter = new ColorHighlighter(Color.YELLOW, null,
+                HighlightPredicate.ROLLOVER_ROW);
      }
     
 

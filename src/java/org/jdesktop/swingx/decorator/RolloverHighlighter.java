@@ -27,6 +27,9 @@ import org.jdesktop.swingx.RolloverProducer;
 
 /**
  * @author Jeanette Winzenburg
+ * 
+ * @deprecated use AbstractHighlighter with HighlightPredicate.ROLLOVER_ROW
+ * 
  */
 public class RolloverHighlighter extends ConditionalHighlighter {
 

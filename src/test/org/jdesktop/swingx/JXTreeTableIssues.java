@@ -28,9 +28,6 @@ import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.action.LinkAction;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
-import org.jdesktop.swingx.decorator.LegacyHighlighter;
-import org.jdesktop.swingx.decorator.CompoundHighlighter;
-import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
 import org.jdesktop.swingx.renderer.ButtonProvider;
 import org.jdesktop.swingx.renderer.CellContext;
 import org.jdesktop.swingx.renderer.ComponentProvider;
@@ -43,7 +40,6 @@ import org.jdesktop.swingx.renderer.WrappingIconPanel;
 import org.jdesktop.swingx.renderer.WrappingProvider;
 import org.jdesktop.swingx.test.ActionMapTreeTableModel;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
-import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.test.TableModelReport;
@@ -123,7 +119,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 assertEquals("tableModel must have fired", 1, report.getEventCount());
-                assertTrue("event type must be structureChanged " + report.printEvent(report.getLastEvent()), 
+                assertTrue("event type must be structureChanged " + TableModelReport.printEvent(report.getLastEvent()), 
                         report.isStructureChanged(report.getLastEvent()));
             }
         });        
@@ -147,7 +143,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 assertEquals("tableModel must have fired", 1, report.getEventCount());
-                assertTrue("event type must be structureChanged " + report.printEvent(report.getLastEvent()), 
+                assertTrue("event type must be structureChanged " + TableModelReport.printEvent(report.getLastEvent()), 
                         report.isStructureChanged(report.getLastEvent()));
             }
         });        
@@ -172,7 +168,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 assertEquals("tableModel must have fired", 1, report.getEventCount());
-                assertTrue("event type must be structureChanged " + report.printEvent(report.getLastEvent()), 
+                assertTrue("event type must be structureChanged " + TableModelReport.printEvent(report.getLastEvent()), 
                         report.isStructureChanged(report.getLastEvent()));
             }
         });        

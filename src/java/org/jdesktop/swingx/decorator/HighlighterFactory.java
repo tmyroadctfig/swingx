@@ -28,7 +28,6 @@ import javax.swing.UIManager;
 
 import org.jdesktop.swingx.decorator.HighlightPredicate.NotHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.RowGroupHighlightPredicate;
-import org.jdesktop.swingx.decorator.LegacyHighlighter.UIHighlighter;
 
 /**
  * A Factory which creates common Highlighters. 

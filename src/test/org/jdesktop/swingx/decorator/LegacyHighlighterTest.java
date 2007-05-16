@@ -18,10 +18,12 @@ import org.jdesktop.test.ChangeReport;
 
 /**
  * 
- * Tests for Highlighters before overhaul. 
+ * Tests for LegacyHighlighter and subclasses. 
  * 
  * @author Jeanette Winzenburg
  */
+// this test is about the old style - turn off deprecation warnings
+@SuppressWarnings("deprecation")
 public class LegacyHighlighterTest extends InteractiveTestCase {
 
     protected Highlighter[] highlighters;

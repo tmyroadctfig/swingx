@@ -39,7 +39,6 @@ import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
-import org.jdesktop.swingx.decorator.PatternHighlighter;
 import org.jdesktop.swingx.decorator.PatternMatcher;
 import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
@@ -68,21 +67,6 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
           e.printStackTrace();
       }
   }
-   /**
-     * test to see searchPanel functionality in new Highlighter api
-     * 
-     */
-    public void interactiveSearchPanelOld() {
-        JXTable table = new JXTable(tableModel);
-        PatternHighlighter highlighter = new PatternHighlighter();
-        highlighter.setForeground(Color.RED);
-        table.addHighlighter(highlighter);
-        JXSearchPanel searchPanel = new JXSearchPanel();
-        searchPanel.setPatternHighlighter(highlighter);
-        JXFrame frame = wrapWithScrollingInFrame(table, "Old Pattern highlighting test col 0");
-        getStatusBar(frame).add(searchPanel);
-        frame.setVisible(true);
-    }
     /**
      * test to see searchPanel functionality in new Highlighter api
      * 
@@ -90,7 +74,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
     public void interactiveSearchPanel() {
         JXTable table = new JXTable(tableModel);
         final ColorHighlighter cl = new ColorHighlighter(null, Color.RED,
-                new PatternPredicate(null, 0, -1));
+                new PatternPredicate(null, 0));
         table.addHighlighter(cl);
         JXSearchPanel searchPanel = new JXSearchPanel();
         PatternMatcher patternMatcher = new PatternMatcher() {
@@ -205,7 +189,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         table.setColumnControlVisible(true);
         Pattern pattern = Pattern.compile("^M", 0);
         table.addHighlighter(new ColorHighlighter(null, Color.red, 
-                new PatternPredicate(pattern, 1, -1)));
+                new PatternPredicate(pattern, 1)));
         showWithScrollingInFrame(table, "Pattern: highlight row if ^M col 1");
     }
 

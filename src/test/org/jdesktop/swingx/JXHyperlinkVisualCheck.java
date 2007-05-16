@@ -29,7 +29,6 @@ import org.jdesktop.swingx.action.LinkAction;
 import org.jdesktop.swingx.action.LinkModelAction;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.SortOrder;
-import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
 import org.jdesktop.swingx.renderer.DefaultListRenderer;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;

@@ -29,7 +29,6 @@ import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.LinkModel;
 import org.jdesktop.swingx.action.AbstractActionExt;
-import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
 import org.jdesktop.test.AncientSwingTeam;
 
 
@@ -272,11 +271,12 @@ public class HighlighterIssues extends HighlighterTest {
                 "foreground colored renderer with empty highlighter");
     }
 
+    @SuppressWarnings("all")
     private TableModel createTableModelWithLinks() {
         String[] columnNames = { "text only", "Link editable", "Link not-editable", "Bool editable", "Bool not-editable" };
         
         DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
-            public Class getColumnClass(int column) {
+            public Class<?> getColumnClass(int column) {
                 return getValueAt(0, column).getClass();
             }
 

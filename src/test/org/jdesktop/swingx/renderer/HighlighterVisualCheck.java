@@ -26,16 +26,11 @@ import java.awt.Component;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.JLabel;
-import javax.swing.table.TableModel;
-
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
-import org.jdesktop.swingx.decorator.ConditionalHighlighter;
-import org.jdesktop.swingx.decorator.HighlightPredicate;
-import org.jdesktop.swingx.decorator.HighlighterFactory;
+import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.test.AncientSwingTeam;
 
 /**
@@ -68,7 +63,7 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
         JXTable table = new JXTable(new AncientSwingTeam());
         // build a quick color lookup to simulate multi-value value-based
         // coloring
-        int numberColumn = 3;
+        final int numberColumn = 3;
         table.toggleSortOrder(numberColumn);
         final Map<Integer, Color> lookup = new HashMap<Integer, Color>();
         Color[] colors = new Color[] { Color.YELLOW, Color.CYAN, Color.MAGENTA,
@@ -81,33 +76,19 @@ public class HighlighterVisualCheck extends InteractiveTestCase {
             }
         }
         table.resetSortOrder();
-        ConditionalHighlighter highlighter = new ConditionalHighlighter() {
+        Highlighter hl = new ColorHighlighter() {
 
             @Override
-            protected Color computeUnselectedBackground(Component renderer,
-                    ComponentAdapter adapter) {
-                return lookup.get(adapter.getFilteredValueAt(adapter.row,
-                        testColumn));
-            }
-
-            /**
-             * Traditional: Override test to look-up if the value is mapped to a
-             * color.
-             */
-            @Override
-            protected boolean test(ComponentAdapter adapter) {
-                if (adapter.isTestable(testColumn)) {
-                    Object value = adapter.getFilteredValueAt(adapter.row,
-                            testColumn);
-                    return lookup.containsKey(value);
+            protected void applyBackground(Component renderer, ComponentAdapter adapter) {
+                if (adapter.isSelected()) return;
+                Color background = lookup.get(adapter.getFilteredValueAt(adapter.row,
+                        numberColumn));
+                if (background != null) {
+                    renderer.setBackground(background);
                 }
-                return false;
             }
-
         };
-        highlighter.setTestColumnIndex(numberColumn);
-        highlighter.setHighlightColumnIndex(-1);
-        table.addHighlighter(highlighter);
+        table.addHighlighter(hl);
         showWithScrollingInFrame(table,
                 "conditional highlighter with value-based color mapping");
     }

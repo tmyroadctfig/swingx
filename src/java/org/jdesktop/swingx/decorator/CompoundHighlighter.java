@@ -40,6 +40,7 @@ import org.jdesktop.swingx.decorator.LegacyHighlighter.UIHighlighter;
  * @author Jeanette Winzenburg
  * 
  */
+@SuppressWarnings("deprecation")
 public class CompoundHighlighter extends AbstractHighlighter 
     // its the same api - the old will be removed
     implements UIDependent, UIHighlighter {
@@ -117,7 +118,7 @@ public class CompoundHighlighter extends AbstractHighlighter
     }
 
 //--------------------- implement UIHighlighter
-    
+    @SuppressWarnings("deprecation")
     public void updateUI() {
         for (Highlighter highlighter : highlighters) {
             updateUI(highlighter);

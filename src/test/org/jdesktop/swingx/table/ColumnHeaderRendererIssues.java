@@ -34,7 +34,6 @@ import javax.swing.table.TableModel;
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
-import org.jdesktop.swingx.JXTableIssues;
 import org.jdesktop.swingx.test.XTestUtils;
 
 /**

@@ -90,14 +90,11 @@ import org.jdesktop.swingx.RolloverRenderer;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.LinkModelAction;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
-import org.jdesktop.swingx.decorator.AlternateRowHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
-import org.jdesktop.swingx.decorator.LegacyHighlighter;
-import org.jdesktop.swingx.decorator.AlternateRowHighlighter.UIAlternateRowHighlighter;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
@@ -312,7 +309,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         };
         
         JTable xtable = new JTable(model);
-        xtable.setBackground(LegacyHighlighter.notePadBackground.getBackground()); // ledger
+        xtable.setBackground(ColorHighlighter.NOTEPAD); // ledger
         JTable table = new JTable(model);
         table.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
         TableCellRenderer renderer = new DefaultTableRenderer();
