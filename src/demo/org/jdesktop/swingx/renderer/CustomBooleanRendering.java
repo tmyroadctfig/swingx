@@ -31,7 +31,7 @@ import org.jdesktop.swingx.util.WindowUtils;
  * Replace default boolean rendering with custom icons.
  *  
  */
-public class BooleanWithHighlighter {
+public class CustomBooleanRendering {
 
     /**
      * Replace the default boolean rendering with a custom
@@ -111,7 +111,7 @@ public class BooleanWithHighlighter {
         Painter yesPainter = null;
         try {
             yesPainter = new ImagePainter(ImageIO
-                    .read(BooleanWithHighlighter.class
+                    .read(CustomBooleanRendering.class
                             .getResource(resource)));
         } catch (IOException e) {
             e.printStackTrace();
@@ -173,7 +173,7 @@ public class BooleanWithHighlighter {
 
     public static void main(String[] args) {
         final JXFrame frame = new JXFrame("SwingX :: Custom Boolean Rendering", true);
-        frame.add(new BooleanWithHighlighter().createContent());
+        frame.add(new CustomBooleanRendering().createContent());
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 frame.pack();
