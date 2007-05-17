@@ -31,20 +31,22 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.UIManager.LookAndFeelInfo;
 
+import org.jdesktop.swingx.JXLoginPanel.SaveMode;
+
 /**
  * Simple tests to ensure that the {@code JXDatePicker} can be instantiated and
  * displayed.
  * 
  * @author Karl Schaefer
  */
-public class JXDatePickerVisualCheck extends InteractiveTestCase {
-    public JXDatePickerVisualCheck() {
-        super("JXDatePicker Test");
+public class JXLoginPanelVisualCheck extends InteractiveTestCase {
+    public JXLoginPanelVisualCheck() {
+        super("JXLoginPanel Test");
     }
 
     public static void main(String[] args) throws Exception {
         // setSystemLF(true);
-        JXDatePickerVisualCheck test = new JXDatePickerVisualCheck();
+        JXLoginPanelVisualCheck test = new JXLoginPanelVisualCheck();
         
         try {
             test.runInteractiveTests();
@@ -108,7 +110,11 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
     }
     
     public void interactiveDisplay() {
-        JFrame frame = wrapInFrame(new JXDatePicker(), "show date picker");
+        JXLoginPanel panel = new JXLoginPanel();
+
+        panel.setSaveMode(SaveMode.BOTH);
+        
+        JFrame frame = wrapInFrame(panel, "show login panel");
         frame.pack();
         frame.setVisible(true);
     }
