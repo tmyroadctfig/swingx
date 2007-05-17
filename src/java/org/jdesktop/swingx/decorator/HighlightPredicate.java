@@ -116,33 +116,59 @@ public interface HighlightPredicate {
     boolean isHighlighted(Component renderer, ComponentAdapter adapter);
 
     
-//----------------- logical implementations
+//----------------- logical implementations amongst HighlightPredicates
     
+    /**
+     * Negation of a HighlightPredicate.
+     */
     public static class NotHighlightPredicate implements HighlightPredicate {
         
         private HighlightPredicate predicate;
         
+        /**
+         * Instantiates a not against the given predicate.
+         * @param predicate the predicate to negate, must not be null.
+         * @throws NullPointerException if the predicate is null
+         */
         public NotHighlightPredicate(HighlightPredicate predicate) {
             if (predicate == null) 
                 throw new NullPointerException("predicate must not be null");
             this.predicate = predicate;
         }
+        
+        /**
+         * @inheritDoc
+         * Implemented to return the negation of the given predicate.
+         */
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
             return !predicate.isHighlighted(renderer, adapter);
         }
         
     }
     
+    /**
+     * Ands a list of predicates.
+     */
     public static class AndHighlightPredicate implements HighlightPredicate {
         
         private List<HighlightPredicate> predicate;
         
+        /**
+         * Instantiates a predicate which ands all given predicates.
+         * @param predicate zero or more not null predicates to and
+         * @throws NullPointerException if the predicate is null
+         */
         public AndHighlightPredicate(HighlightPredicate... predicate) {
             if (predicate == null) 
                 throw new NullPointerException("predicate must not be null");
             this.predicate = Arrays.asList(predicate);
         }
         
+        /**
+         * {@inheritDoc}
+         * Implemented to return false if any of the contained predicates is
+         * false.
+         */
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
             for (HighlightPredicate hp : predicate) {
                 if (!hp.isHighlighted(renderer, adapter)) return false;
@@ -152,16 +178,61 @@ public interface HighlightPredicate {
         
     }
     
+    /**
+     * Or's a list of predicates.
+     */
+    public static class OrHighlightPredicate implements HighlightPredicate {
+        
+        private List<HighlightPredicate> predicate;
+        
+        /**
+         * Instantiates a predicate which ORs all given predicates.
+         * @param predicate zero or more not null predicates to and
+         * @throws NullPointerException if the predicate is null
+         */
+        public OrHighlightPredicate(HighlightPredicate... predicate) {
+            if (predicate == null) 
+                throw new NullPointerException("predicate must not be null");
+            this.predicate = Arrays.asList(predicate);
+        }
+        
+        /**
+         * {@inheritDoc}
+         * Implemented to return true if any of the contained predicates is
+         * true.
+         */
+        public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+            for (HighlightPredicate hp : predicate) {
+                if (!hp.isHighlighted(renderer, adapter)) return true;
+            }
+            return false;
+        }
+        
+    }
+    
+//------------------------ coordinates
+    
     public static class RowGroupHighlightPredicate implements HighlightPredicate {
 
         private int linesPerGroup;
 
+        /**
+         * Instantiates a predicate with the given grouping.
+         * 
+         * @param linesPerGroup number of lines constituting a group, must
+         *    be > 0
+         * @throws IllegalArgumentException if linesPerGroup < 1   
+         */
         public RowGroupHighlightPredicate(int linesPerGroup) {
+            if (linesPerGroup < 1) 
+                throw new IllegalArgumentException("a group contain at least 1 row, was: " + linesPerGroup);
             this.linesPerGroup = linesPerGroup;
         }
         
         /**
          * {@inheritDoc}
+         * Implemented to return true if the adapter's row falls into a 
+         * odd group number.
          */
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
             return (adapter.row / linesPerGroup) % 2 == 1;
@@ -192,13 +263,52 @@ public interface HighlightPredicate {
         /**
          * {@inheritDoc}
          * 
-         * This implementation returns true if the adapters column
+         * This implementation returns true if the adapter's column
          * is contained in this predicates list.
          * 
          */
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
             int modelIndex = adapter.viewToModel(adapter.column);
             return columnList.contains(modelIndex);
+        }
+        
+    }
+    
+    //--------------------- value testing
+    
+    /**
+     * Predicate testing the componentAdapter value against a fixed
+     * Object. 
+     */
+    public static class EqualsHighlightPredicate implements HighlightPredicate {
+
+        private Object compareValue;
+        
+        /**
+         * Instantitates a predicate with null compare value.
+         *
+         */
+        public EqualsHighlightPredicate() {
+            this(null);
+        }
+        /**
+         * Instantitates a predicate with the given compare value.
+         * @param compareValue the fixed value to compare the 
+         *   adapter against.
+         */
+        public EqualsHighlightPredicate(Object compareValue) {
+            this.compareValue = compareValue;
+        }
+        
+        /**
+         * @inheritDoc
+         * 
+         * Implemented to return true if the adapter value equals the 
+         * this predicate's compare value.
+         */
+        public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+            if (compareValue == null) return adapter.getValue() == null;
+            return compareValue.equals(adapter.getValue());
         }
         
     }

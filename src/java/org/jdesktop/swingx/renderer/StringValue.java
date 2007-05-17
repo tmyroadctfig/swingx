@@ -52,6 +52,21 @@ public interface StringValue extends Serializable {
     };
     
     /**
+     * Converter returning an empty String always.
+     */
+    public final static StringValue EMPTY = new StringValue() {
+
+        /**
+         * {@inheritDoc} <p>
+         * 
+         * Implemented to return an empty string.
+         */
+        public String getString(Object value) {
+            return "";
+        }
+        
+    };
+    /**
      * Returns a string representation of the given value.
      * 
      * @param value the object to present as a string

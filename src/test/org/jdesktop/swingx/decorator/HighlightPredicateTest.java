@@ -16,6 +16,7 @@ import javax.swing.JLabel;
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.RolloverProducer;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
+import org.jdesktop.swingx.decorator.HighlightPredicate.EqualsHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.NotHighlightPredicate;
 
 /**
@@ -105,6 +106,34 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     }
 
 //---------------- special predicates
+    
+    /**
+     * test equals predicate with null value.
+     */
+    public void testEqualsNull() {
+        HighlightPredicate predicate = new EqualsHighlightPredicate();
+        allColored.setText(null);
+        assertNull(allColored.getText());
+        ComponentAdapter adapter = createComponentAdapter(allColored, false);
+        assertTrue(predicate.isHighlighted(allColored, adapter));
+        String text = "test";
+        allColored.setText(text);
+        assertEquals(text, allColored.getText());
+        assertFalse(predicate.isHighlighted(allColored, adapter));
+    }
+    
+    /**
+     * test equals predicate with not null value.
+     *
+     */
+    public void testEqualsNotNull() {
+        HighlightPredicate predicate = new EqualsHighlightPredicate(allColored
+                .getText());
+        ComponentAdapter adapter = createComponentAdapter(allColored, false);
+        assertTrue(predicate.isHighlighted(allColored, adapter));
+        allColored.setText(null);
+        assertFalse(predicate.isHighlighted(allColored, adapter));
+    }
     
     public void testColumn() {
         HighlightPredicate predicate = new ColumnHighlightPredicate(1);
