@@ -89,7 +89,7 @@ public class HighlighterIssues extends HighlighterTest {
 
         };
         table.addHighlighter(
-                HighlighterFactory.createSimpleStriping(ColorHighlighter.GENERIC_GRAY));
+                HighlighterFactory.createSimpleStriping(HighlighterFactory.GENERIC_GRAY));
 
         table.setDefaultRenderer(Object.class, renderer);
         JXTable nohighlight = new JXTable(model);
@@ -126,7 +126,7 @@ public class HighlighterIssues extends HighlighterTest {
         renderer.setForeground(foreground);
         renderer.setBackground(background);
         table.addHighlighter(
-                HighlighterFactory.createSimpleStriping(ColorHighlighter.GENERIC_GRAY));
+                HighlighterFactory.createSimpleStriping(HighlighterFactory.GENERIC_GRAY));
 
         table.setDefaultRenderer(Object.class, renderer);
         JXTable nohighlight = new JXTable(model);
@@ -174,7 +174,7 @@ public class HighlighterIssues extends HighlighterTest {
     public void interactiveUITableWithAlternateRow() {
         JXTable table = new JXTable(10, 2);
         table.setBackground(ledger);
-        table.setHighlighters(HighlighterFactory.createSimpleUIStriping());
+        table.setHighlighters(HighlighterFactory.createSimpleStriping());
         JXTable nohighlight = new JXTable(10, 2);
         nohighlight.setBackground(ledger);
         final JXFrame frame = wrapWithScrollingInFrame(table, nohighlight, "colored table with ui highlighter <--> without highlighter");
@@ -200,7 +200,7 @@ public class HighlighterIssues extends HighlighterTest {
         JXTable table = new JXTable(10, 2);
         table.setBackground(ledger);
         table.addHighlighter(
-                HighlighterFactory.createSimpleStriping(ColorHighlighter.GENERIC_GRAY));
+                HighlighterFactory.createSimpleStriping(HighlighterFactory.GENERIC_GRAY));
 
         JXTable nohighlight = new JXTable(10, 2);
         nohighlight.setBackground(ledger);
@@ -216,7 +216,7 @@ public class HighlighterIssues extends HighlighterTest {
         JXList list = new JXList(createListModel());
         list.setBackground(ledger);
         list.addHighlighter(
-                HighlighterFactory.createSimpleStriping(ColorHighlighter.GENERIC_GRAY));
+                HighlighterFactory.createSimpleStriping(HighlighterFactory.GENERIC_GRAY));
 
         JXList nohighlight = new JXList(createListModel());
         nohighlight.setBackground(ledger);
@@ -234,7 +234,7 @@ public class HighlighterIssues extends HighlighterTest {
         JXTree tree = new JXTree();
         CompoundHighlighter pipeline = new CompoundHighlighter();
         pipeline.addHighlighter(
-                HighlighterFactory.createSimpleStriping(ColorHighlighter.GENERIC_GRAY));
+                HighlighterFactory.createSimpleStriping(HighlighterFactory.GENERIC_GRAY));
 
         tree.setHighlighters(pipeline);
         tree.setBackground(ledger);

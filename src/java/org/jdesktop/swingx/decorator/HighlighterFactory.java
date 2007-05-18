@@ -30,7 +30,11 @@ import org.jdesktop.swingx.decorator.HighlightPredicate.NotHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.RowGroupHighlightPredicate;
 
 /**
- * A Factory which creates common Highlighters. 
+ * A Factory which creates common Highlighters. <p>
+ * 
+ * PENDING JW: really need the alternate striping? That's how the
+ * old AlternateRowHighlighter did it, but feels a bit wrong to 
+ * have one stripe hardcoded to WHITE. Would prefer to remove.
  * 
  * @author Jeanette Winzenburg
  */
@@ -38,19 +42,34 @@ public final class HighlighterFactory {
 
     /**
      * Creates and returns a Highlighter which highlights every second row
-     * with the color depending on LF. The rows between are not 
-     * that is typically, they will show the container's background.
+     * background with a color depending on the LookAndFeel. The rows between
+     * are not highlighted, that is typically, they will show the container's
+     * background.
      * 
-     * @return a Highlighter striping every second row background. 
+     * @return a Highlighter striping every second row background.
      */
-    public static Highlighter createSimpleUIStriping() {
+    public static Highlighter createSimpleStriping() {
         ColorHighlighter hl = new UIColorHighlighter(HighlightPredicate.ODD);
         return hl;
     }
     
     /**
+     * Creates and returns a Highlighter which highlights every second row group
+     * background with a color depending on LF. The row groups between are not
+     * highlighted, that is typically, they will show the container's
+     * background.
+     * 
+     * @param rowsPerGroup the number of rows in a group
+     * @return a Highlighter striping every second row group background.
+     */
+    public static Highlighter createSimpleStriping(int rowsPerGroup) {
+        return new UIColorHighlighter(new RowGroupHighlightPredicate(
+                rowsPerGroup));
+    }
+
+    /**
      * Creates and returns a Highlighter which highlights every second row
-     * with the given color as background. The rows between are not 
+     * background with the given color. The rows between are not highlighted
      * that is typically, they will show the container's background.
      * 
      * @param stripeBackground the background color for the striping.
@@ -62,27 +81,31 @@ public final class HighlighterFactory {
     }
     
     /**
-     * Creates and returns a Highlighter which highlights every second row
-     * with the given color as background. The rows between are not 
-     * that is typically, they will show the container's background.
+     * Creates and returns a Highlighter which highlights every second row group
+     * background with the given color. The row groups between are not
+     * highlighted, that is they typically will show the container's background.
      * 
      * @param stripeBackground the background color for the striping.
-     * @return a Highlighter striping every second row background. 
+     * @param rowsPerGroup the number of rows in a group
+     * @return a Highlighter striping every second row group background.
      */
-    public static Highlighter createSimpleStriping(Color stripeBackground, int linesPerStripe) {
-        HighlightPredicate predicate = new RowGroupHighlightPredicate(linesPerStripe);
-        ColorHighlighter hl = new ColorHighlighter(stripeBackground, null, predicate);
+    public static Highlighter createSimpleStriping(Color stripeBackground,
+            int rowsPerGroup) {
+        HighlightPredicate predicate = new RowGroupHighlightPredicate(
+                rowsPerGroup);
+        ColorHighlighter hl = new ColorHighlighter(stripeBackground, null,
+                predicate);
         return hl;
     }
 
     /**
      * Creates and returns a Highlighter which highlights 
-     * with alternate background, the first Color.WHITE, the second
+     * with alternate background. The first is Color.WHITE, the second
      * with the color depending on LF. 
      * 
      * @return a Highlighter striping every second row background. 
      */
-    public static Highlighter createAlternateUIStriping() {
+    public static Highlighter createAlternateStriping() {
         ColorHighlighter first = new ColorHighlighter(Color.WHITE, null, HighlightPredicate.EVEN);
         ColorHighlighter hl = new UIColorHighlighter(HighlightPredicate.ODD);
         return new CompoundHighlighter(first, hl);
@@ -90,17 +113,19 @@ public final class HighlighterFactory {
 
     /**
      * Creates and returns a Highlighter which highlights 
-     * with alternate background, the first Color.WHITE, the second
+     * with alternate background. the first Color.WHITE, the second
      * with the color depending on LF. 
      * 
-     * @return a Highlighter striping every second row background. 
+     * @param rowsPerGroup the number of rows in a group
+     * @return a Highlighter striping every second row group background.
      */
-    public static Highlighter createAlternateUIStriping(int linesPerStripe) {
-        HighlightPredicate predicate = new RowGroupHighlightPredicate(linesPerStripe);
+    public static Highlighter createAlternateStriping(int rowsPerGroup) {
+        HighlightPredicate predicate = new RowGroupHighlightPredicate(rowsPerGroup);
         ColorHighlighter first = new ColorHighlighter(Color.WHITE, null, new NotHighlightPredicate(predicate));
         ColorHighlighter hl = new UIColorHighlighter(predicate);
         return new CompoundHighlighter(first, hl);
     }
+    
     /**
      * Creates and returns a Highlighter which highlights with
      * alternating background, starting with the base.
@@ -112,7 +137,6 @@ public final class HighlighterFactory {
     public static Highlighter createAlternateStriping(Color baseBackground, Color alternateBackground) {
         ColorHighlighter base = new ColorHighlighter(baseBackground, null, HighlightPredicate.EVEN);
         ColorHighlighter alternate = new ColorHighlighter(alternateBackground, null, HighlightPredicate.ODD);
-        
         return new CompoundHighlighter(base, alternate);
     }
 
@@ -122,7 +146,8 @@ public final class HighlighterFactory {
      * 
      * @param baseBackground the background color for the even rows.
      * @param alternateBackground background color for odd rows.
-     * @return a Highlighter striping every second row background. 
+     * @param rowsPerGroup the number of rows in a group
+     * @return a Highlighter striping every second row group background. 
      */
     public static Highlighter createAlternateStriping(Color baseBackground, Color alternateBackground, int linesPerStripe) {
         HighlightPredicate predicate = new RowGroupHighlightPredicate(linesPerStripe);
@@ -136,6 +161,8 @@ public final class HighlighterFactory {
     
     /**
      * A ColorHighlighter with UI-dependent background.
+     * 
+     * PENDING: move color lookup into UI!
      */
     public static class UIColorHighlighter extends ColorHighlighter 
         implements UIDependent {
@@ -164,6 +191,9 @@ public final class HighlighterFactory {
     }
 
 
+    /**
+     * @inheritDoc
+     */
     public void updateUI() {
          
          Color selection = UIManager.getColor("Table.selectionBackground");
@@ -175,7 +205,7 @@ public final class HighlighterFactory {
      private Color getMappedColor(Color selection) {
          Color color = colorMap.get(selection);
          if (color == null) {
-             color = GENERIC_GRAY;
+             color = HighlighterFactory.GENERIC_GRAY;
          }
          return color;
      }
@@ -206,5 +236,15 @@ public final class HighlighterFactory {
      }
      
  }
+
+    /** predefined colors - from old alternateRow. */
+    public final static Color BEIGE = new Color(245, 245, 220);
+    public final static Color LINE_PRINTER = new Color(0xCC, 0xCC, 0xFF);
+    public final static Color CLASSIC_LINE_PRINTER = new Color(0xCC, 0xFF, 0xCC);
+    public final static Color FLORAL_WHITE = new Color(255, 250, 240);
+    public final static Color QUICKSILVER = new Color(0xF0, 0xF0, 0xE0);
+    public final static Color GENERIC_GRAY = new Color(229, 229, 229);
+    public final static Color LEDGER = new Color(0xF5, 0xFF, 0xF5);
+    public final static Color NOTEPAD = new Color(0xFF, 0xFF, 0xCC);
 
 }

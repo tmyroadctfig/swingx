@@ -31,16 +31,6 @@ import java.awt.Component;
  */
 public class ColorHighlighter extends AbstractHighlighter {
     
-    /** predefined colors - from old alternateRow. */
-    public final static Color BEIGE = new Color(245, 245, 220);
-    public final static Color LINE_PRINTER = new Color(0xCC, 0xCC, 0xFF);
-    public final static Color CLASSIC_LINE_PRINTER = new Color(0xCC, 0xFF, 0xCC);
-    public final static Color FLORAL_WHITE = new Color(255, 250, 240);
-    public final static Color QUICKSILVER = new Color(0xF0, 0xF0, 0xE0);
-    public final static Color GENERIC_GRAY = new Color(229, 229, 229);
-    public final static Color LEDGER = new Color(0xF5, 0xFF, 0xF5);
-    public final static Color NOTEPAD = new Color(0xFF, 0xFF, 0xCC);
-    
     private Color background = null;
     private Color foreground = null;
     private Color selectedBackground = null;

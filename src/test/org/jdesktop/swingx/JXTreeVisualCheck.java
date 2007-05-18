@@ -239,7 +239,7 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
         String pattern = "o";
         tree.setHighlighters(new ColorHighlighter(null, Color.red, 
                 new PatternPredicate(Pattern.compile(pattern), 0)),
-                HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER));
+                HighlighterFactory.createSimpleStriping(HighlighterFactory.LINE_PRINTER));
         showWithScrollingInFrame(tree, "Highlighters: " + pattern);
     }
     

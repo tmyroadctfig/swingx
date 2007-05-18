@@ -90,7 +90,6 @@ import org.jdesktop.swingx.RolloverRenderer;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.LinkModelAction;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
-import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
@@ -164,7 +163,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         table.setColumnControlVisible(true);
         table.getColumnExt(0).setCellRenderer(new DefaultTableRenderer(new TextAreaProvider()));
         table.addHighlighter(
-                HighlighterFactory.createAlternateUIStriping());
+                HighlighterFactory.createAlternateStriping());
 
         JTextArea textArea = (JTextArea) table.prepareRenderer(table.getCellRenderer(0, 0), 0, 0);
         table.packColumn(0, -1);
@@ -309,7 +308,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         };
         
         JTable xtable = new JTable(model);
-        xtable.setBackground(ColorHighlighter.NOTEPAD); // ledger
+        xtable.setBackground(HighlighterFactory.NOTEPAD); // ledger
         JTable table = new JTable(model);
         table.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
         TableCellRenderer renderer = new DefaultTableRenderer();
@@ -633,7 +632,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
         JXList list = new JXList(); 
-        Highlighter highlighter = HighlighterFactory.createSimpleUIStriping();
+        Highlighter highlighter = HighlighterFactory.createSimpleStriping();
         table.addHighlighter(highlighter);
         list.addHighlighter(highlighter);
         // quick-fill and hook to table columns' visibility state
@@ -781,11 +780,11 @@ public class RendererVisualCheck extends InteractiveTestCase {
         TableModel model = new AncientSwingTeam();
         JXTable xtable = new JXTable(model);
         xtable.addHighlighter(
-                HighlighterFactory.createSimpleStriping(ColorHighlighter.GENERIC_GRAY));
+                HighlighterFactory.createSimpleStriping(HighlighterFactory.GENERIC_GRAY));
         xtable.setDefaultRenderer(Color.class, new ColorRenderer(true));
         JXTable table = new JXTable(model);
         table.addHighlighter(
-                HighlighterFactory.createSimpleStriping(ColorHighlighter.GENERIC_GRAY));
+                HighlighterFactory.createSimpleStriping(HighlighterFactory.GENERIC_GRAY));
         TableCellRenderer renderer = createColorRendererExt();
         table.setDefaultRenderer(Color.class, renderer);
         JXFrame frame = wrapWithScrollingInFrame(xtable, table, "JXTable/highlighter: Custom color renderer - standard/ext");
@@ -801,7 +800,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         TableModel model = new AncientSwingTeam();
         JXTable xtable = new JXTable(model);
         Highlighter highlighter = createPropertyRespectingHighlighter(
-                HighlighterFactory.createSimpleStriping(ColorHighlighter.GENERIC_GRAY));
+                HighlighterFactory.createSimpleStriping(HighlighterFactory.GENERIC_GRAY));
 
         xtable.addHighlighter(highlighter);
         xtable.setDefaultRenderer(Color.class, new ColorRenderer(true));

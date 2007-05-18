@@ -268,7 +268,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         tree.setRootVisible(false);
         final JXTreeTable treeTable = new JXTreeTable(model);
         treeTable.addHighlighter(
-                HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER));
+                HighlighterFactory.createSimpleStriping(HighlighterFactory.LINE_PRINTER));
 
         treeTable.setColumnControlVisible(true);
         // treetable root invisible by default
@@ -317,7 +317,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         tree.setRootVisible(false);
         final JXTreeTable treeTable = new JXTreeTable(model);
         treeTable.addHighlighter(
-                HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER));
+                HighlighterFactory.createSimpleStriping(HighlighterFactory.LINE_PRINTER));
 
         treeTable.setColumnControlVisible(true);
         // treetable root invisible by default
@@ -373,7 +373,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         JXTree tree = new JXTree(model);
         final JXTreeTable treeTable = new JXTreeTable(model);
         treeTable.addHighlighter(
-                HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER));
+                HighlighterFactory.createSimpleStriping(HighlighterFactory.LINE_PRINTER));
 
         treeTable.setColumnControlVisible(true);
         treeTable.setRootVisible(true);
@@ -413,7 +413,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         JXTree tree = new JXTree(model);
         final JXTreeTable treeTable = new JXTreeTable(model);
         treeTable.addHighlighter(
-                HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER));
+                HighlighterFactory.createSimpleStriping(HighlighterFactory.LINE_PRINTER));
 
         treeTable.setColumnControlVisible(true);
         TreeCellRenderer renderer = new DefaultTreeCellRenderer() {
@@ -465,7 +465,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         JTree tree = new JTree(model);
         final JXTreeTable treeTable = new JXTreeTable(model);
         treeTable.addHighlighter(
-                HighlighterFactory.createSimpleStriping(ColorHighlighter.GENERIC_GRAY));
+                HighlighterFactory.createSimpleStriping(HighlighterFactory.GENERIC_GRAY));
         Highlighter hl = new ShadingColorHighlighter(
                 new ColumnHighlightPredicate(0));
 
@@ -568,11 +568,11 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //        treeTable.setShowGrid(true);
         treeTable.setShowGrid(true, true);
         treeTable.addHighlighter(
-                HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER));
+                HighlighterFactory.createSimpleStriping(HighlighterFactory.LINE_PRINTER));
 
         JXTable table = new JXTable(new AncientSwingTeam());
         table.addHighlighter(
-                HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER));
+                HighlighterFactory.createSimpleStriping(HighlighterFactory.LINE_PRINTER));
         table.setRowHeight(22);
         JFrame frame = wrapWithScrollingInFrame(treeTable, table, 
                 "AlternateRow LinePrinter-with Gridlines");
@@ -588,11 +588,11 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         JXTable treeTable = new JXTable(new AncientSwingTeam());
         treeTable.setRowHeight(22);
         treeTable.addHighlighter(
-                HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER));
+                HighlighterFactory.createSimpleStriping(HighlighterFactory.LINE_PRINTER));
 
         JXTable table = new JXTable(new AncientSwingTeam());
         table.addHighlighter(
-                HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER));
+                HighlighterFactory.createSimpleStriping(HighlighterFactory.LINE_PRINTER));
 
         table.setRowHeight(22);
         table.setShowGrid(false, false);
@@ -614,7 +614,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
                 new ColumnHighlightPredicate(0));
 
         treeTable.setHighlighters(
-                HighlighterFactory.createSimpleStriping(ColorHighlighter.GENERIC_GRAY),
+                HighlighterFactory.createSimpleStriping(HighlighterFactory.GENERIC_GRAY),
 
                 hl);
         final JXTree tree = new JXTree(treeTableModel);
@@ -806,7 +806,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         treeTable.setRowHeight(22);
        // add a bunch of highlighters directly
         treeTable.addHighlighter(
-                HighlighterFactory.createSimpleStriping(ColorHighlighter.QUICKSILVER));
+                HighlighterFactory.createSimpleStriping(HighlighterFactory.QUICKSILVER));
         Highlighter hl = new ShadingColorHighlighter(
                 new ColumnHighlightPredicate(0));
 
@@ -862,7 +862,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         Highlighter hl = new ShadingColorHighlighter(
                 new ColumnHighlightPredicate(0));
         treeTable.setHighlighters(
-                HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER),
+                HighlighterFactory.createSimpleStriping(HighlighterFactory.LINE_PRINTER),
                 hl);
         JFrame frame = wrapWithScrollingInFrame(treeTable,
                 "LinePrinter-, ColumnHighlighter and RowHeight");
@@ -872,7 +872,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
     public void interactiveTestAlternateRowHighlighter() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         treeTable.addHighlighter(
-                HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER));
+                HighlighterFactory.createSimpleStriping(HighlighterFactory.LINE_PRINTER));
 
         treeTable.setRowHeight(22);
         JFrame frame = wrapWithScrollingInFrame(treeTable,
@@ -885,7 +885,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         Highlighter hl = new ShadingColorHighlighter(
                 new ColumnHighlightPredicate(0));
         treeTable.setHighlighters(
-                HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER),
+                HighlighterFactory.createSimpleStriping(HighlighterFactory.LINE_PRINTER),
                 hl);
         treeTable.setBackground(new Color(0xFF, 0xFF, 0xCC)); // notepad
         treeTable.setGridColor(Color.cyan.darker());

@@ -513,7 +513,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         tree.getColumn(2).setCellRenderer(new DefaultTableRenderer(provider));
         tree.setTreeCellRenderer(new DefaultTreeRenderer(provider));
 //        tree.setCellRenderer(new LinkRenderer(simpleAction));
-        tree.setHighlighters(HighlighterFactory.createSimpleUIStriping());
+        tree.setHighlighters(HighlighterFactory.createSimpleStriping());
         JFrame frame = wrapWithScrollingInFrame(tree, "table and simple links");
         frame.setVisible(true);
     }
@@ -548,7 +548,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         };
         provider.setHorizontalAlignment(JLabel.LEADING);
         tree.setTreeCellRenderer(new DefaultTreeRenderer(provider));
-        tree.setHighlighters(HighlighterFactory.createSimpleUIStriping());
+        tree.setHighlighters(HighlighterFactory.createSimpleStriping());
         JFrame frame = wrapWithScrollingInFrame(tree, "treetable and custom renderer");
         frame.setVisible(true);
     }
@@ -592,7 +592,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         };
         DefaultTreeRenderer treeCellRenderer = new DefaultTreeRenderer(wrappingProvider);
         treeTable.setTreeCellRenderer(treeCellRenderer);
-        treeTable.setHighlighters(HighlighterFactory.createSimpleUIStriping());
+        treeTable.setHighlighters(HighlighterFactory.createSimpleStriping());
         JXTree tree = new JXTree(treeTable.getTreeTableModel());
         tree.setCellRenderer(treeCellRenderer);
         tree.setLargeModel(true);
@@ -638,7 +638,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         provider.setHorizontalAlignment(JLabel.LEADING);
         tree.setTreeCellRenderer(new DefaultTreeRenderer(provider));
         tree.expandAll();
-        tree.setHighlighters(HighlighterFactory.createSimpleUIStriping());
+        tree.setHighlighters(HighlighterFactory.createSimpleStriping());
         JFrame frame = wrapWithScrollingInFrame(tree, "treeTable and getValueAt renderer");
         frame.setVisible(true);
     }

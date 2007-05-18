@@ -50,9 +50,9 @@ import org.jdesktop.swingx.JXTable.NumberEditor;
 import org.jdesktop.swingx.JXTableHeader.SortGestureRecognizer;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.LinkModelAction;
-import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
+import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.decorator.SortController;
@@ -1287,7 +1287,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             }
         };
         JXTable xtable = new JXTable(model);
-        xtable.setBackground(ColorHighlighter.NOTEPAD);
+        xtable.setBackground(HighlighterFactory.NOTEPAD);
         JTable table = new JTable(model);
         table.setBackground(new Color(0xF5, 0xFF, 0xF5)); // ledger
         JFrame frame = wrapWithScrollingInFrame(xtable, table, "Unselected focused background: JXTable/JTable");

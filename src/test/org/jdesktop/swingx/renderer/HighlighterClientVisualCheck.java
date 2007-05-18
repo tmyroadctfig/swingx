@@ -148,7 +148,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         table.getColumn(1).setCellRenderer(
                 new DefaultTableRenderer(new HyperlinkProvider()));
         table.addHighlighter(HighlighterFactory
-                .createSimpleStriping(ColorHighlighter.CLASSIC_LINE_PRINTER));
+                .createSimpleStriping(HighlighterFactory.CLASSIC_LINE_PRINTER));
         JFrame frame = wrapWithScrollingInFrame(table,
                 "classic lineprinter and hyperlink on column 1");
         frame.setVisible(true);
@@ -163,7 +163,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         JXTable table = new JXTable(tableModel);
         table.setRowHeight(22);
         table.setHighlighters(
-            HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER),
+            HighlighterFactory.createSimpleStriping(HighlighterFactory.LINE_PRINTER),
             new ColorHighlighter(Color.YELLOW, null, HighlightPredicate.ROLLOVER_ROW));
         showWithScrollingInFrame(table, "LinePrinter plus yellow rollover");
     }
@@ -206,7 +206,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         DefaultTableRenderer renderer = new DefaultTableRenderer();
         renderer.setForeground(foreground);
         renderer.setBackground(background);
-        table.addHighlighter(HighlighterFactory.createAlternateStriping(Color.WHITE, ColorHighlighter.GENERIC_GRAY));
+        table.addHighlighter(HighlighterFactory.createAlternateStriping(Color.WHITE, HighlighterFactory.GENERIC_GRAY));
         table.setDefaultRenderer(Object.class, renderer);
         JXTable nohighlight = new JXTable(model);
         nohighlight.setDefaultRenderer(Object.class, renderer);
@@ -237,7 +237,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
             
         };
         ColorHighlighter hl = new ColorHighlighter(null, Color.RED, predicate);
-        table.addHighlighter(HighlighterFactory.createSimpleStriping(ColorHighlighter.GENERIC_GRAY));
+        table.addHighlighter(HighlighterFactory.createSimpleStriping(HighlighterFactory.GENERIC_GRAY));
         table.addHighlighter(hl);
         showWithScrollingInFrame(table, 
                 "component value-based rendering (label text contains y) ");

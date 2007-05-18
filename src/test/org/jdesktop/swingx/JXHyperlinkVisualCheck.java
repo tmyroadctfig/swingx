@@ -177,7 +177,7 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
         HyperlinkProvider provider =  new HyperlinkProvider(simpleAction);
         tree.setCellRenderer(new DefaultTreeRenderer(provider));
 //        tree.setCellRenderer(new LinkRenderer(simpleAction));
-        tree.setHighlighters(HighlighterFactory.createSimpleUIStriping());
+        tree.setHighlighters(HighlighterFactory.createSimpleStriping());
         JFrame frame = wrapWithScrollingInFrame(tree, "tree and simple links");
         frame.setVisible(true);
         
@@ -235,7 +235,7 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
         LinkModelAction action = new LinkModelAction(visitor);
         table.setDefaultRenderer(LinkModel.class, new DefaultTableRenderer
                 (new HyperlinkProvider(action, LinkModel.class)));
-        table.setHighlighters(HighlighterFactory.createSimpleUIStriping());
+        table.setHighlighters(HighlighterFactory.createSimpleStriping());
         JFrame frame = wrapWithScrollingInFrame(table, visitor.getOutputComponent(), 
                 "show link renderer in table with LF striping highlighter");
         frame.setVisible(true);
@@ -343,7 +343,7 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
         list.setCellRenderer(new DefaultListRenderer(
                 new HyperlinkProvider(action, LinkModel.class)));
         list.setRolloverEnabled(true);
-        list.setHighlighters(HighlighterFactory.createSimpleUIStriping());
+        list.setHighlighters(HighlighterFactory.createSimpleStriping());
         JFrame frame = wrapWithScrollingInFrame(list, visitor.getOutputComponent(), 
                 "show link renderer in list with LFStriping highlighter");
         frame.setVisible(true);

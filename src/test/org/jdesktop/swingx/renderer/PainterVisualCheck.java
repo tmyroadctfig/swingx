@@ -54,7 +54,6 @@ import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.ActionContainerFactory;
-import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.ConditionalHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
@@ -187,7 +186,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
         JXList list = new JXList();
-        Highlighter highlighter = HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER);
+        Highlighter highlighter = HighlighterFactory.createSimpleStriping(HighlighterFactory.LINE_PRINTER);
         table.addHighlighter(highlighter);
         Painter gradient = createGradientPainter(Color.YELLOW, 0.7f, true);
         list.setHighlighters(highlighter, new PainterHighlighter(gradient));
@@ -260,7 +259,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         HighlightPredicate predicate = new ColumnHighlightPredicate(0);
         Highlighter iconHighlighter = new PainterHighlighter(imagePainter, predicate );
         // PENDING: implement lf specific highlight in new api
-        Highlighter alternateRowHighlighter = HighlighterFactory.createSimpleUIStriping();
+        Highlighter alternateRowHighlighter = HighlighterFactory.createSimpleStriping();
         table.addHighlighter(alternateRowHighlighter);
         table.addHighlighter(iconHighlighter);
         // re-use component controller and highlighter in a JXList
@@ -288,7 +287,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         ComponentProvider<JLabel> controller = new LabelProvider(
                 JLabel.RIGHT) ;
         final ValueBasedGradientHighlighter gradientHighlighter = createTransparentGradientHighlighter();
-        Highlighter alternateRowHighlighter = HighlighterFactory.createSimpleUIStriping();
+        Highlighter alternateRowHighlighter = HighlighterFactory.createSimpleStriping();
         table.addHighlighter(alternateRowHighlighter);
         table.addHighlighter(gradientHighlighter);
         // re-use component controller and highlighter in a JXList

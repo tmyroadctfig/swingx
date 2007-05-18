@@ -85,7 +85,7 @@ public class JXListVisualCheck extends JXListTest {
     public void interactiveTestTableAlternateHighlighter1() {
         JXList list = new JXList(listModel);
         list.addHighlighter(
-                HighlighterFactory.createSimpleStriping(ColorHighlighter.LINE_PRINTER));
+                HighlighterFactory.createSimpleStriping(HighlighterFactory.LINE_PRINTER));
 
         showWithScrollingInFrame(list, "AlternateRowHighlighter - lineprinter");
     }

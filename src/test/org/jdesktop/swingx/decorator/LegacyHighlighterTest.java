@@ -78,21 +78,21 @@ public class LegacyHighlighterTest extends InteractiveTestCase {
     @SuppressWarnings("deprecation")
     public void testPredefinedColors() {
         assertEquals(((AlternateRowHighlighter) AlternateRowHighlighter.beige).getEvenRowBackground()
-                , ColorHighlighter.BEIGE);
+                , HighlighterFactory.BEIGE);
         assertEquals(((AlternateRowHighlighter) AlternateRowHighlighter.genericGrey).getEvenRowBackground()
-                , ColorHighlighter.GENERIC_GRAY);
+                , HighlighterFactory.GENERIC_GRAY);
         assertEquals(((AlternateRowHighlighter) AlternateRowHighlighter.classicLinePrinter).getEvenRowBackground()
-                , ColorHighlighter.CLASSIC_LINE_PRINTER);
+                , HighlighterFactory.CLASSIC_LINE_PRINTER);
         assertEquals(((AlternateRowHighlighter) AlternateRowHighlighter.floralWhite).getEvenRowBackground()
-                , ColorHighlighter.FLORAL_WHITE);
+                , HighlighterFactory.FLORAL_WHITE);
         assertEquals(AlternateRowHighlighter.ledgerBackground.getBackground()
-                , ColorHighlighter.LEDGER);
+                , HighlighterFactory.LEDGER);
         assertEquals(((AlternateRowHighlighter) AlternateRowHighlighter.linePrinter).getEvenRowBackground()
-                , ColorHighlighter.LINE_PRINTER);
+                , HighlighterFactory.LINE_PRINTER);
         assertEquals(AlternateRowHighlighter.notePadBackground.getBackground()
-                , ColorHighlighter.NOTEPAD);
+                , HighlighterFactory.NOTEPAD);
         assertEquals(((AlternateRowHighlighter) AlternateRowHighlighter.quickSilver).getEvenRowBackground()
-                , ColorHighlighter.QUICKSILVER);
+                , HighlighterFactory.QUICKSILVER);
     }    
     
 //----------------------- highlighter constructors, immutable highlighters
