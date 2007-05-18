@@ -24,6 +24,8 @@ package org.jdesktop.swingx.renderer;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.swing.JFrame;
@@ -38,6 +40,7 @@ import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
+import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PatternMatcher;
 import org.jdesktop.swingx.decorator.PatternPredicate;
@@ -67,6 +70,45 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
           e.printStackTrace();
       }
   }
+
+    /**
+     * Example to highlight against a value/color map.
+     */
+    public void interactiveColorValueMappedHighlighter() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        // build a quick color lookup to simulate multi-value value-based
+        // coloring
+        final int numberColumn = 3;
+        table.toggleSortOrder(numberColumn);
+        final Map<Integer, Color> lookup = new HashMap<Integer, Color>();
+        Color[] colors = new Color[] { Color.YELLOW, Color.CYAN, Color.MAGENTA,
+                Color.GREEN };
+        int rowsPerColor = (table.getRowCount() - 5) / colors.length;
+        for (int i = 0; i < colors.length; i++) {
+            for (int j = 0; j < rowsPerColor; j++) {
+                lookup.put((Integer) table.getValueAt(i * rowsPerColor + j,
+                        numberColumn), colors[i]);
+            }
+        }
+        table.resetSortOrder();
+        Highlighter hl = new ColorHighlighter() {
+
+            @Override
+            protected void applyBackground(Component renderer, ComponentAdapter adapter) {
+                if (adapter.isSelected()) return;
+                Color background = lookup.get(adapter.getFilteredValueAt(adapter.row,
+                        numberColumn));
+                if (background != null) {
+                    renderer.setBackground(background);
+                }
+            }
+        };
+        table.addHighlighter(hl);
+        showWithScrollingInFrame(table,
+                "conditional highlighter with value-based color mapping");
+    }
+    
+
     /**
      * test to see searchPanel functionality in new Highlighter api
      * 

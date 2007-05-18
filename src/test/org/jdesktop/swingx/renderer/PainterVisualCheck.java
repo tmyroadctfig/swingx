@@ -55,11 +55,9 @@ import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.ActionContainerFactory;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
-import org.jdesktop.swingx.decorator.ConditionalHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
-import org.jdesktop.swingx.decorator.LegacyHighlighter;
 import org.jdesktop.swingx.decorator.PainterHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.painter.ImagePainter;
@@ -314,7 +312,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
     public void interactiveNumberProportionalGradientHighlight() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
-        table.setBackground(LegacyHighlighter.ledgerBackground.getBackground());
+        table.setBackground(HighlighterFactory.LEDGER);
         ComponentProvider<JLabel> controller = new LabelProvider(
                 JLabel.RIGHT);
 //        table.setDefaultRenderer(Number.class, new DefaultTableRenderer(
@@ -348,17 +346,26 @@ public class PainterVisualCheck extends InteractiveTestCase {
      * covering a relative portion of the comp?
      */
     public static class ValueBasedGradientHighlighter extends
-            ConditionalHighlighter {
+            PainterHighlighter {
         float maxValue = 100;
 
         private MattePainter painter;
 
         private boolean yellowTransparent;
 
-        /**
-         */
-        public ValueBasedGradientHighlighter() {
-            super(null, null, -1, -1);
+        
+        @Override
+        protected Component doHighlight(Component renderer, ComponentAdapter adapter) {
+            if (adapter.getValue() instanceof Number) {
+                float end = getEndOfGradient((Number) adapter.getValue());
+                if (end > 1) {
+                    renderer.setBackground(Color.YELLOW.darker());
+                } else if (end > 0.02) {
+                    Painter painter = getPainter(end);
+                    ((PainterAware) renderer).setPainter(painter);
+                }
+            }            
+            return renderer;
         }
 
         /**
@@ -370,21 +377,6 @@ public class PainterVisualCheck extends InteractiveTestCase {
             fireStateChanged();
         }
 
-        @Override
-        public Component highlight(Component renderer, ComponentAdapter adapter) {
-            boolean highlight = needsHighlight(adapter);
-            if (highlight && (renderer instanceof PainterAware)) {
-                float end = getEndOfGradient((Number) adapter.getValue());
-                if (end > 1) {
-                    renderer.setBackground(Color.YELLOW.darker());
-                } else if (end > 0.02) {
-                    Painter painter = getPainter(end);
-                    ((PainterAware) renderer).setPainter(painter);
-                }
-                return renderer;
-            }
-            return renderer;
-        }
 
         private Painter getPainter(float end) {
             Color startColor = getTransparentColor(Color.YELLOW,
@@ -408,10 +400,6 @@ public class PainterVisualCheck extends InteractiveTestCase {
             return end;
         }
 
-        @Override
-        protected boolean test(ComponentAdapter adapter) {
-            return adapter.getValue() instanceof Number;
-        }
 
     }
     /**
