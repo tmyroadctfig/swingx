@@ -166,10 +166,10 @@ public class AbstractTreeTableModelUnitTest extends TestCase {
     public void testModelGetHierarchicalColumn() {
         // method returns a constant, but test is useful for ensuring that the
         // method returns the same values over time.
-        assertEquals(dummyModel.getHierarchicalColumn(), 0);
+        assertEquals(dummyModel.getHierarchicalColumn(), -1);
         
         //demonstrate getHierarchicalColumn unaffected by root value
-        assertEquals(nullModel.getHierarchicalColumn(), 0);
+        assertEquals(nullModel.getHierarchicalColumn(), -1);
     }
     
     public void testModelGetRoot() {

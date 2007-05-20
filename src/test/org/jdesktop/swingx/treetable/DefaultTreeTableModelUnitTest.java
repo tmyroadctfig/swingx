@@ -1,6 +1,7 @@
 package org.jdesktop.swingx.treetable;
 
-import javax.swing.tree.DefaultMutableTreeNode;
+import java.util.Vector;
+
 import javax.swing.tree.TreeNode;
 
 import junit.framework.TestCase;
@@ -51,7 +52,10 @@ public class DefaultTreeTableModelUnitTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         
-        model = new DefaultTreeTableModel(createTree());
+        Vector<String> names = new Vector<String>();
+        names.add("A");
+        
+        model = new DefaultTreeTableModel(createTree(), names);
     }
     
     public void testModelGetPathToRoot() {
@@ -70,20 +74,32 @@ public class DefaultTreeTableModelUnitTest extends TestCase {
         
         assertEquals(testGroup3[0], root);
         
-        TreeNode[] testGroup4 = model.getPathToRoot(null);
-        
-        assertEquals(testGroup4.length, 0);
-        
+        try {
+            model.getPathToRoot(null);
+            fail("expected NullPointerException");
+        } catch (NullPointerException e) {
+            //success
+        }
     }
     
     public void testModelGetValueAt() {
         //Test expected cases
-        assertEquals(model.getValueAt(root, 0), root + "@column " + 0);
+        assertEquals(model.getValueAt(root, 0), "root");
         
         //Test boundary cases
-        //TODO should we boundary check?  currently we don't
-        assertEquals(model.getValueAt(child1, model.getColumnCount()), child1 + "@column " + model.getColumnCount());
-        assertEquals(model.getValueAt(grandchild4, -1), grandchild4 + "@column " + -1);
+        try {
+            model.getValueAt(child1, model.getColumnCount());
+            fail("expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            //success
+        }
+        
+        try {
+            model.getValueAt(grandchild4, -1);
+            fail("expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            //success
+        }
     }
     
     public void testModelIsLeaf() {
@@ -92,8 +108,16 @@ public class DefaultTreeTableModelUnitTest extends TestCase {
         try {
             model.isLeaf(null);
             
-            fail("NullPointerException is not thrown.");
-        } catch (NullPointerException e) {
+            fail("IllegalArgumentException is not thrown.");
+        } catch (IllegalArgumentException e) {
+            //test succeeded
+        }
+        
+        try {
+            model.isLeaf(new Object());
+            
+            fail("IllegalArgumentException is not thrown.");
+        } catch (IllegalArgumentException e) {
             //test succeeded
         }
         
@@ -101,9 +125,6 @@ public class DefaultTreeTableModelUnitTest extends TestCase {
         assertFalse(model.isLeaf(root));
         assertFalse(model.isLeaf(child2));
         assertTrue(model.isLeaf(grandchild3));
-        
-        //Test boundary cases
-        assertTrue(model.isLeaf(new Object()));
     }
     
     //TODO test "fire" methods and reloads
