@@ -22,13 +22,14 @@ package org.jdesktop.swingx.icon;
 
 import java.awt.Component;
 import java.awt.Graphics;
+import java.io.Serializable;
 
 import javax.swing.Icon;
 
 /**
  * An empty icon with arbitrary width and height.
  */
-public final class EmptyIcon implements Icon {
+public final class EmptyIcon implements Icon, Serializable {
 
   private int width;
   private int height;
