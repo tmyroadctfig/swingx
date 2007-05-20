@@ -29,22 +29,32 @@ import java.awt.Rectangle;
 import java.io.Serializable;
 
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
+import org.jdesktop.swingx.icon.EmptyIcon;
+
 /**
- * @author Amy Fowler
- * @author kschaefe@dev.java.net
+ * {@code IconBorder} creates a border that places an {@code Icon} in the border
+ * on the horizontal axis. The border does not add any additional insets other
+ * than the inset required to produce the space for the icon. If additional
+ * insets are required, users should create a
+ * {@link javax.swing.border.CompoundBorder compund border}.
+ * <p>
+ * This border is useful when attempting to add {@code Icon}s to pre-existing
+ * components without requiring specialty painting.
  * 
- * @version 1.0
+ * @author Amy Fowler
+ * @author Karl Schaefer
+ * 
+ * @version 1.1
  */
 public class IconBorder implements Border, Serializable {
 
     /**
      * An empty icon.
      */
-    public static final Icon EMPTY_ICON = new ImageIcon();
+    public static final Icon EMPTY_ICON = new EmptyIcon();
     private int padding;
     private Icon icon;
     private int iconPosition;
@@ -149,6 +159,9 @@ public class IconBorder implements Border, Serializable {
         return result;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public Insets getBorderInsets(Component c) {
         int horizontalInset = icon.getIconWidth() + (2 * padding);
         int iconPosition = bidiDecodeLeadingTrailing(c.getComponentOrientation(), this.iconPosition);
@@ -162,16 +175,26 @@ public class IconBorder implements Border, Serializable {
      * Sets the icon for this border.
      * 
      * @param validIcon
-     *            the icon to set
+     *            the icon to set.  This may be {@code null} to represent an
+     *            empty icon.
+     * @see #EMPTY_ICON
      */
     public void setIcon(Icon validIcon) {
         this.icon = validIcon == null ? EMPTY_ICON : validIcon;
     }
     
+    /**
+     * This border is not opaque.
+     * 
+     * @return always returns {@code false}
+     */
     public boolean isBorderOpaque() {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void paintBorder(Component c, Graphics g, int x, int y, int width,
         int height) {
         int iconPosition = bidiDecodeLeadingTrailing(c.getComponentOrientation(), this.iconPosition);
@@ -205,7 +228,7 @@ public class IconBorder implements Border, Serializable {
             return SwingConstants.EAST;
         }
         if(position == SwingConstants.LEADING) {
-            if(!c.isLeftToRight()) {
+            if(c.isLeftToRight()) {
                 return SwingConstants.WEST;
             }
             return SwingConstants.EAST;
@@ -214,14 +237,21 @@ public class IconBorder implements Border, Serializable {
     }
 
     /**
-     * @return the padding
+     * Gets the padding surrounding the icon.
+     * 
+     * @return the padding for the icon. This value is guaranteed to be
+     *         nonnegative.
      */
     public int getPadding() {
         return padding;
     }
 
     /**
-     * @param padding the padding to set
+     * Sets the padding around the icon.
+     * 
+     * @param padding
+     *            the padding to set. If {@code padding < 0}, then
+     *            {@code padding} will be set to {@code 0}.
      */
     public void setPadding(int padding) {
         this.padding = padding < 0 ? 0 : padding;
