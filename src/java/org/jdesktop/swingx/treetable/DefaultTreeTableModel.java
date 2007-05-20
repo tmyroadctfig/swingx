@@ -1,235 +1,337 @@
 /*
  * $Id$
- *
- * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
- * Santa Clara, California 95054, U.S.A. All rights reserved.
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
  * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
+ * California 95054, U.S.A. All rights reserved.
  * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-
 package org.jdesktop.swingx.treetable;
 
-import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
-import javax.swing.tree.TreeNode;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
+
 import javax.swing.tree.TreePath;
 
 /**
- * DefaultTreeTableModel is a concrete implementation of <code>AbstractTreeTableModel</code>
- * and is provided purely as a convenience. Applications that use <code>JXTreeTable</code>
- * are expected to provide their own implementation of a <code>TreeTableModel</code>,
- * perhaps by extending this class.
- *
+ * {@code DefaultTreeTableModel} is a concrete implementation of
+ * {@code AbstractTreeTableModel} and is provided purely as a convenience.
+ * Applications that use {@code JXTreeTable} are expected to provide their own
+ * implementation of a {@code TreeTableModel}, perhaps by extending this class.
+ * 
  * @author Ramesh Gupta
+ * @author Karl Schaefer
  */
 public class DefaultTreeTableModel extends AbstractTreeTableModel {
+    /** The <code>Vector</code> of column identifiers. */
+    protected Vector    columnIdentifiers;
 
-    protected boolean asksAllowsChildren;
-
+    /**
+     * Creates a new {@code DefaultTreeTableModel} with a {@code null} root.
+     */
     public DefaultTreeTableModel() {
         this(null);
     }
 
-    public DefaultTreeTableModel(TreeNode root) {
-        this(root, false);
-    }
-
-    public DefaultTreeTableModel(TreeNode root, boolean asksAllowsChildren) {
-        super(root);
-        this.asksAllowsChildren = asksAllowsChildren;
-    }
-
-    public void setRoot(TreeNode root) {
-        Object oldRoot = this.root;
-        this.root = root;
-        if (root == null && oldRoot != null) {
-            fireTreeStructureChanged(this, null);
-        }
-        else {
-            nodeStructureChanged(root);
-        }
-    }
-
-    /*
-     * Notifies all listeners that have registered interest for
-     * notification on this event type.  The event instance
-     * is lazily created using the parameters passed into
-     * the fire method.
-     *
-     * @param source the node where the tree model has changed
-     * @param path the path to the root node
-     * @see EventListenerList
+    /**
+     * Creates a new {@code DefaultTreeTableModel} with the specified
+     * {@code root}. {@code asksAllowsChildren} is disabled and {@code isLeaf}
+     * will provide the same semantics as {@code AbstractTreeTableModel.isLeaf}.
+     * 
+     * @param root
+     *            the root node of the tree
      */
-    private void fireTreeStructureChanged(Object source, TreePath path) {
-        // Guaranteed to return a non-null array
-        Object[] listeners = listenerList.getListenerList();
-        TreeModelEvent e = null;
-        // Process the listeners last to first, notifying
-        // those that are interested in this event
-        for (int i = listeners.length - 2; i >= 0; i -= 2) {
-            if (listeners[i] == TreeModelListener.class) {
-                // Lazily create the event:
-                if (e == null)
-                    e = new TreeModelEvent(source, path);
-                ((TreeModelListener) listeners[i + 1]).treeStructureChanged(e);
-            }
-        }
-    }
-
-    public boolean asksAllowsChildren() {
-        return asksAllowsChildren;
-    }
-
-    public void setAsksAllowsChildren(boolean newValue) {
-        asksAllowsChildren = newValue;
-    }
-
-    public Object getValueAt(Object node, int column) {
-        /**@todo Implement this org.jdesktopx.swing.treetable.TreeTableModel abstract method*/
-        return node + "@column " + column;
-    }
-
-    public void setValueAt(Object value, Object node, int column) {
-        /**@todo Implement this org.jdesktopx.swing.treetable.TreeTableModel abstract method*/
-    }
-
-    public TreeNode[] getPathToRoot(TreeNode node) {
-        return getPathToRoot(node, 0);
-    }
-
-    protected TreeNode[] getPathToRoot(TreeNode node, int depth) {
-        TreeNode[] retNodes;
-        // This method recurses, traversing towards the root in order
-        // size the array. On the way back, it fills in the nodes,
-        // starting from the root and working back to the original node.
-
-        /* Check for null, in case someone passed in a null node, or
-           they passed in an element that isn't rooted at root. */
-        if (node == null) {
-            if (depth == 0)
-                return null;
-            else
-                retNodes = new TreeNode[depth];
-        }
-        else {
-            depth++;
-            if (node == root)
-                retNodes = new TreeNode[depth];
-            else
-                retNodes = getPathToRoot(node.getParent(), depth);
-            retNodes[retNodes.length - depth] = node;
-        }
-        return retNodes;
+    public DefaultTreeTableModel(TreeTableNode root) {
+        this(root, null);
     }
 
     /**
+     * Creates a new {@code DefaultTreeTableModel} with the specified
+     * {@code root}. {@code asksAllowsChildren} is disabled and {@code isLeaf}
+     * will provide the same semantics as {@code AbstractTreeTableModel.isLeaf}.
+     * 
+     * @param root
+     *            the root node of the tree
+     */
+    public DefaultTreeTableModel(TreeTableNode root, Vector columnNames) {
+        super(root);
+        setColumnIdentifiers(columnNames);
+        
+    }
+
+    private boolean isValidTreeTableNode(Object node) {
+        boolean result = false;
+        
+        if (node instanceof TreeTableNode) {
+            TreeTableNode ttn = (TreeTableNode) node;
+            
+            while (!result && ttn != null) {
+                result = ttn == root;
+                
+                ttn = ttn.getParent();
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Replaces the column identifiers in the model.  If the number of
+     * <code>newIdentifier</code>s is greater than the current number
+     * of columns, new columns are added to the end of each row in the model.
+     * If the number of <code>newIdentifier</code>s is less than the current
+     * number of columns, all the extra columns at the end of a row are
+     * discarded. <p>
+     *
+     * @param   columnIdentifiers  vector of column identifiers.  If
+     *              <code>null</code>, set the model
+     *                          to zero columns
+     */
+    //from DefaultTableModel
+    public void setColumnIdentifiers(Vector columnIdentifiers) {
+        this.columnIdentifiers = columnIdentifiers == null ? new Vector()
+                : columnIdentifiers;
+    }
+
+    /**
+     * Returns the root of the tree. Returns {@code null} only if the tree has
+     * no nodes.
+     * 
+     * @return the root of the tree
+     * 
+     * @throws ClassCastException
+     *             if {@code root} is not a {@code TreeTableNode}. Even though
+     *             subclasses have direct access to {@code root}, they should
+     *             avoid accessing it directly.
+     * @see AbstractTreeTableModel#root
+     * @see #setRoot(TreeTableNode)
+     */
+    public TreeTableNode getRoot() {
+        return (TreeTableNode) root;
+    }
+
+    /**
+     * Gets the value for the {@code node} at {@code column}.
+     * 
+     * @impl delegates to {@code TreeTableNode.getValueAt(int)}
      * @param node
-     * @return true if the specified node is a leaf node; false otherwise
+     *            the node whose value is to be queried
+     * @param column
+     *            the column whose value is to be queried
+     * @return the value Object at the specified cell
+     * @throws IllegalArgumentException
+     *             if {@code node} is not an instance of {@code TreeTableNode}
+     *             or is not managed by this model, or {@code column} is not a
+     *             valid column index
+     */
+    public Object getValueAt(Object node, int column) {
+        if (!isValidTreeTableNode(node)) {
+            throw new IllegalArgumentException(
+                    "node must be a valid node managed by this model");
+        }
+        
+        if (column < 0 || column >= getColumnCount()) {
+            throw new IllegalArgumentException("column must be a valid index");
+        }
+        
+        return ((TreeTableNode) node).getValueAt(column);
+    }
+
+    @Override
+    public void setValueAt(Object value, Object node, int column) {
+        if (!isValidTreeTableNode(node)) {
+            throw new IllegalArgumentException(
+                    "node must be a valid node managed by this model");
+        }
+        
+        if (column < 0 || column >= getColumnCount()) {
+            throw new IllegalArgumentException("column must be a valid index");
+        }
+        
+        TreeTableNode ttn = (TreeTableNode) node;
+        
+        if (column < ttn.getColumnCount()) {
+            ttn.setValueAt(value, column);
+            
+            modelSupport.firePathChanged(new TreePath(getPathToRoot(ttn)));
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getColumnCount() {
+        return columnIdentifiers.size();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    //Can we make getColumnClass final and avoid the complex DTM copy? -- kgs
+    public String getColumnName(int column) {
+        //Copied from DefaultTableModel.
+        Object id = null;
+        
+        // This test is to cover the case when
+        // getColumnCount has been subclassed by mistake ...
+        if (column < columnIdentifiers.size() && (column >= 0)) {
+            id = columnIdentifiers.elementAt(column);
+        }
+        
+        return (id == null) ? super.getColumnName(column) : id.toString();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public Object getChild(Object parent, int index) {
+        if (!isValidTreeTableNode(parent)) {
+            throw new IllegalArgumentException(
+                    "parent must be a TreeTableNode managed by this model");
+        }
+        
+        return ((TreeTableNode) parent).getChildAt(index);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getChildCount(Object parent) {
+        if (!isValidTreeTableNode(parent)) {
+            throw new IllegalArgumentException(
+                    "parent must be a TreeTableNode managed by this model");
+        }
+        
+        return ((TreeTableNode) parent).getChildCount();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getIndexOfChild(Object parent, Object child) {
+        if (!isValidTreeTableNode(parent)) {
+            throw new IllegalArgumentException(
+                    "parent must be a TreeTableNode managed by this model");
+        }
+        
+        if (!isValidTreeTableNode(parent)) {
+            throw new IllegalArgumentException(
+                    "child must be a TreeTableNode managed by this model");
+        }
+        
+        return ((TreeTableNode) parent).getIndex((TreeTableNode) child);
+    }
+
+    @Override
+    public boolean isCellEditable(Object node, int column) {
+        if (!isValidTreeTableNode(node)) {
+            throw new IllegalArgumentException(
+                    "node must be a valid node managed by this model");
+        }
+        
+        if (column < 0 || column >= getColumnCount()) {
+            throw new IllegalArgumentException("column must be a valid index");
+        }
+        
+        TreeTableNode ttn = (TreeTableNode) node;
+        
+        if (column >= ttn.getColumnCount()) {
+            return false;
+        }
+        
+        return ttn.isEditable(column);
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public boolean isLeaf(Object node) {
-        if (node instanceof TreeNode) {
-            if (asksAllowsChildren) {
-                return!((TreeNode) node).getAllowsChildren();
-            }
+        if (!isValidTreeTableNode(node)) {
+            throw new IllegalArgumentException(
+                    "node must be a TreeTableNode managed by this model");
         }
-        return super.isLeaf(node);
+        
+        return ((TreeTableNode) node).isLeaf();
     }
-
-    public void reload() {
-        TreeNode treeNode;
-        try {
-            treeNode = (TreeNode) root;
+    
+    /**
+     * Gets the path from the root to the specified node.
+     * 
+     * @param aNode
+     *            the node to query
+     * @return an array of {@code TreeTableNode}s, where
+     *         {@code arr[0].equals(getRoot())} and
+     *         {@code arr[arr.length - 1].equals(aNode)}, or an empty array if
+     *         the node is not found.
+     * @throws NullPointerException
+     *             if {@code aNode} is {@code null}
+     */
+    public TreeTableNode[] getPathToRoot(TreeTableNode aNode) {
+        List<TreeTableNode> path = new ArrayList<TreeTableNode>();
+        TreeTableNode node = aNode;
+        
+        while (node != root) {
+            path.add(0, node);
+            
+            node = (TreeTableNode) node.getParent();
         }
-        catch (ClassCastException ex) {
-            return;
+        
+        if (node == root) {
+            path.add(0, node);
         }
-
-        reload(treeNode);
+        
+        return path.toArray(new TreeTableNode[0]);
     }
-
-    public void reload(TreeNode node) {
-        if (node != null) {
-            fireTreeStructureChanged(this, getPathToRoot(node), null, null);
-        }
+    
+    public void setRoot(TreeTableNode root) {
+        this.root = root;
+        
+        modelSupport.fireNewRoot();
     }
 
     /**
-     * Invoke this method after you've inserted some TreeNodes into
-     * node.  childIndices should be the index of the new elements and
-     * must be sorted in ascending order.
+     * Invoked this to insert newChild at location index in parents children.
+     * This will then message nodesWereInserted to create the appropriate event.
+     * This is the preferred way to add children as it will create the
+     * appropriate event.
      */
-    public void nodesWereInserted(TreeNode node, int[] childIndices) {
-        if (listenerList != null && node != null && childIndices != null
-            && childIndices.length > 0) {
-            int cCount = childIndices.length;
-            Object[] newChildren = new Object[cCount];
+    public void insertNodeInto(MutableTreeTableNode newChild,
+            MutableTreeTableNode parent, int index) {
+        parent.insert(newChild, index);
 
-            for (int counter = 0; counter < cCount; counter++)
-                newChildren[counter] = node.getChildAt(childIndices[counter]);
-            fireTreeNodesInserted(this, getPathToRoot(node), childIndices,
-                                  newChildren);
-        }
+        modelSupport.fireChildAdded(new TreePath(getPathToRoot(parent)), index,
+                newChild);
     }
 
     /**
-     * Invoke this method after you've removed some TreeNodes from
-     * node.  childIndices should be the index of the removed elements and
-     * must be sorted in ascending order. And removedChildren should be
-     * the array of the children objects that were removed.
+     * Message this to remove node from its parent. This will message
+     * nodesWereRemoved to create the appropriate event. This is the
+     * preferred way to remove a node as it handles the event creation
+     * for you.
      */
-    public void nodesWereRemoved(TreeNode node, int[] childIndices,
-                                 Object[] removedChildren) {
-        if (node != null && childIndices != null) {
-            fireTreeNodesRemoved(this, getPathToRoot(node), childIndices,
-                                 removedChildren);
+    public void removeNodeFromParent(MutableTreeTableNode node) {
+        MutableTreeTableNode parent = (MutableTreeTableNode) node.getParent();
+
+        if (parent == null) {
+            throw new IllegalArgumentException("node does not have a parent.");
         }
-    }
 
-    /**
-     * Invoke this method after you've changed how the children identified by
-     * childIndicies are to be represented in the tree.
-     */
-    public void nodesChanged(TreeNode node, int[] childIndices) {
-        if (node != null) {
-            if (childIndices != null) {
-                int cCount = childIndices.length;
-
-                if (cCount > 0) {
-                    Object[] cChildren = new Object[cCount];
-
-                    for (int counter = 0; counter < cCount; counter++)
-                        cChildren[counter] = node.getChildAt
-                            (childIndices[counter]);
-                    fireTreeNodesChanged(this, getPathToRoot(node),
-                                         childIndices, cChildren);
-                }
-            }
-            else if (node == getRoot()) {
-                fireTreeNodesChanged(this, getPathToRoot(node), null, null);
-            }
-        }
-    }
-
-    /**
-     * Invoke this method if you've totally changed the children of
-     * node and its childrens children...  This will post a
-     * treeStructureChanged event.
-     */
-    public void nodeStructureChanged(TreeNode node) {
-        if (node != null) {
-            fireTreeStructureChanged(this, getPathToRoot(node), null, null);
-        }
+        int index = parent.getIndex(node);
+        
+        modelSupport.fireChildRemoved(new TreePath(getPathToRoot(node)), index,
+                node);
     }
 }

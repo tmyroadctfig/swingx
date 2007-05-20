@@ -21,12 +21,7 @@
 
 package org.jdesktop.swingx.treetable;
 
-import java.util.EventListener;
-
-import javax.swing.event.EventListenerList;
-import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 // There is no javax.swing.tree.AbstractTreeModel; There ought to be one.
@@ -34,15 +29,31 @@ import javax.swing.tree.TreePath;
 /**
  * AbstractTreeTableModel provides an implementation of
  * {@link org.jdesktop.swingx.treetable.TreeTableModel} as a convenient starting
- * point in defining custom data models for {@link org.jdesktop.swingx.JXTreeTable}.
- *
+ * point in defining custom data models for
+ * {@link org.jdesktop.swingx.JXTreeTable}. It takes care of listener
+ * management and contains convenience methods for creating and dispatching
+ * {@code TreeModelEvent}s. To create a concreate instance of
+ * {@code TreeTableModel} you need only to provide implementations for the
+ * following methods:
+ * 
+ * <pre>
+ * public int getColumnCount();
+ * public Object getValueAt(Object node, int column);
+ * public Object getChild(Object parent, int index);
+ * public int getChildCount(Object parent);
+ * public int getIndexOfChild(Object parent, Object child);
+ * public boolean isLeaf(Object node);
+ * </pre>
+ * 
  * @author Ramesh Gupta
+ * @author Karl Schaefer
  */
 public abstract class AbstractTreeTableModel implements TreeTableModel {
     /**
      * Value returned by {@link org.jdesktop.swingx.treetable.TreeTableModel#getColumnClass(int) getColumnClass}
      * for the {@link org.jdesktop.swingx.JXTreeTable#isHierarchical(int) hierarchical} column.
      */
+    @Deprecated
 	public final static Class hierarchicalColumnClass = TreeTableModel.class;
 
     /**
@@ -51,119 +62,68 @@ public abstract class AbstractTreeTableModel implements TreeTableModel {
     protected Object root;
 
     /**
-     * Event listener list
+     * Provides support for event dispatching.
      */
-    protected EventListenerList listenerList = new EventListenerList();
-
+    protected TreeModelSupport modelSupport;
+    
     /**
-     * Constructs an <code>AbstractTreeTableModel</code> with a null root node
+     * Constructs an {@code AbstractTreeTableModel} with a {@code null} root
+     * node.
      */
     public AbstractTreeTableModel() {
         this(null);
     }
 
     /**
-     * Constructs an <code>AbstractTreeTableModel</code> with the specified node
-     * as the root node.
-     *
-     * @param root root node
+     * Constructs an {@code AbstractTreeTableModel} with the specified root
+     * node.
+     * 
+     * @param root
+     *            root node
      */
     public AbstractTreeTableModel(Object root) {
         this.root = root;
+        this.modelSupport = new TreeModelSupport(this);
     }
 
     /**
      * {@inheritDoc}
      */
-    public Class getColumnClass(int column) {
-        // Assume that the first column will contain hierarchical nodes.
-        return column == 0 ? hierarchicalColumnClass : Object.class;
+    public Class<?> getColumnClass(int column) {
+        return Object.class;
     }
 
     /**
      * {@inheritDoc}
      */
     public String getColumnName(int column) {
-        return "Column " + column; // Cheap implementation
+        //Copied from AbstractTableModel.
+        //Should use same defaults when possible.
+        String result = "";
+        
+        for (; column >= 0; column = column / 26 - 1) {
+            result = (char) ((char) (column % 26) + 'A') + result;
+        }
+        
+        return result;
     }
 
     /**
      * {@inheritDoc}
      */
-    public Object getRoot() { // From the TreeNode interface
+    public int getHierarchicalColumn() {
+        if (getColumnCount() == 0) {
+            return -1;
+        }
+        
+        return 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Object getRoot() {
         return root;
-    }
-
-    /**
-     * Returns the child of <I>parent</I> at index <I>index</I> in the parent's
-     * child array.  <I>parent</I> must be a node previously obtained from
-     * this data source. This should not return null if <i>index</i>
-     * is a valid index for <i>parent</i> (that is <i>index</i> >= 0 &&
-     * <i>index</i> < getChildCount(<i>parent</i>)).
-     *
-     * @param   parent  a node in the tree, obtained from this data source
-     * @return  the child of <I>parent</I> at index <I>index</I>, or null if the
-     * specified parent node is not a <code>TreeNode</code>.
-     */
-    public Object getChild(Object parent, int index) {
-        // meant to be overridden
-        try {
-            return ((TreeNode) parent).getChildAt(index);
-        }
-        catch (ClassCastException ex) { // not a TreeNode?
-            return null;
-        }
-    }
-
-    /**
-     * Returns the number of children in the specified parent node.
-     *
-     * @param parent node whose child count is being requested
-     * @return the number of children in the specified parent node
-     */
-    public int getChildCount(Object parent) {
-        // meant to be overridden
-        try {
-            return ((TreeNode) parent).getChildCount();
-        }
-        catch (ClassCastException ex) { // not a TreeNode?
-            return 0;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public int getColumnCount() {
-        // meant to be overridden
-        return 1; // Cheap (and woefully inadequate) implementation
-    }
-
-    /**
-     * Returns the index of child in parent.
-     * If either the parent or child is <code>null</code>, returns -1.
-     * @param parent a note in the tree, obtained from this data source
-     * @param child the node we are interested in
-     * @return the index of the child in the parent, or -1
-     *    if either the parent or the child is <code>null</code>
-     */
-    public int getIndexOfChild(Object parent, Object child) {
-        if (parent == null || child == null)
-            return -1;
-
-        try {
-            return ((TreeNode) parent).getIndex((TreeNode) child);
-        }
-        catch (ClassCastException ex) { // not a TreeNode?
-            // This is not called in the JTree's default mode.
-            // Use a naive implementation.
-            for (int i = 0; i < getChildCount(parent); i++) {
-                if (getChild(parent, i).equals(child)) {
-                    return i;
-                }
-            }
-            return -1;
-        }
     }
 
     /**
@@ -176,195 +136,73 @@ public abstract class AbstractTreeTableModel implements TreeTableModel {
     }
 
     /**
-     * Returns true if the specified node is a leaf node; false otherwise.
+     * Returns <code>true</code> if <code>node</code> is a leaf.
      *
-     * @param node node to test
-     * @return true if the specified node is a leaf node; false otherwise
+     * @impl {@code true} if {@code getChildCount(node) == 0}
+     * @param   node  a node in the tree, obtained from this data source
+     * @return  true if <code>node</code> is a leaf
      */
     public boolean isLeaf(Object node) {
-        try {
-            return ((TreeNode) node).isLeaf();
-        }
-        catch (ClassCastException ex) { // not a TreeNode?
-            return getChildCount(node) == 0;
-        }
+        return getChildCount(node) == 0;
     }
 
     /**
-     * Called when value for the item identified by path has been changed.
-     * If newValue signifies a truly new value the model should
-     * post a <code>treeNodesChanged</code> event.
-     *
-     * @param path path to the node that has changed
-     * @param newValue the new value from the <code>TreeCellEditor</code>
+     * Sets the value for the {@code node} at {@code columnIndex} to
+     * {@code value}.
+     * 
+     * @impl is no-op; provided for convenience for uneditable models
+     * @param value
+     *            the new value
+     * @param node
+     *            the node whose value is to be changed
+     * @param column
+     *            the column whose value is to be changed
+     * @see #getValueAt
+     * @see #isCellEditable
+     * @see javax.swing.table.TableModel#setValueAt(Object, int, int)
+     */
+    public void setValueAt(Object value, Object node, int column) {
+        //does nothing
+    }
+    
+    /**
+     * Called when value for the item identified by path has been changed. If
+     * newValue signifies a truly new value the model should post a
+     * {@code treeNodesChanged} event.
+     * <p>
+     * 
+     * @impl is no-op. A {@code JXTreeTable} does not usually edit the node directly.
+     * @param path
+     *            path to the node that has changed
+     * @param newValue
+     *            the new value from the <code>TreeCellEditor</code>
      */
     public void valueForPathChanged(TreePath path, Object newValue) {
-        /**@todo Implement this javax.swing.tree.TreeModel method*/
+        //does nothing
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void addTreeModelListener(TreeModelListener l) {
-        listenerList.add(TreeModelListener.class, l);
+        modelSupport.addTreeModelListener(l);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void removeTreeModelListener(TreeModelListener l) {
-        listenerList.remove(TreeModelListener.class, l);
+        modelSupport.removeTreeModelListener(l);
     }
 
+    /**
+     * Returns an array of all the <code>TreeModelListener</code>s added
+     * to this JXTreeTable with addTreeModelListener().
+     *
+     * @return all of the <code>TreeModelListener</code>s added or an empty
+     *         array if no listeners have been added
+     */
     public TreeModelListener[] getTreeModelListeners() {
-        return (TreeModelListener[]) listenerList.getListeners(
-            TreeModelListener.class);
+        return modelSupport.getTreeModelListeners();
     }
-
-    /*
-     * Notify all listeners that have registered interest for
-     * notification on this event type.  The event instance
-     * is lazily created using the parameters passed into
-     * the fire method.
-     * @see EventListenerList
-     */
-    protected void fireTreeNodesChanged(Object source, Object[] path,
-                                        int[] childIndices, Object[] children) {
-        // Guaranteed to return a non-null array
-        Object[] listeners = listenerList.getListenerList();
-        TreeModelEvent e = null;
-        // Process the listeners last to first, notifying
-        // those that are interested in this event
-        for (int i = listeners.length - 2; i >= 0; i -= 2) {
-            if (listeners[i] == TreeModelListener.class) {
-                // Lazily create the event:
-                if (e == null)
-                    e = new TreeModelEvent(source, path,
-                                           childIndices, children);
-                ((TreeModelListener) listeners[i + 1]).treeNodesChanged(e);
-            }
-        }
-    }
-
-    /*
-     * Notify all listeners that have registered interest for
-     * notification on this event type.  The event instance
-     * is lazily created using the parameters passed into
-     * the fire method.
-     * @see EventListenerList
-     */
-    protected void fireTreeNodesInserted(Object source, Object[] path,
-                                         int[] childIndices, Object[] children) {
-        // Guaranteed to return a non-null array
-        Object[] listeners = listenerList.getListenerList();
-        TreeModelEvent e = null;
-        // Process the listeners last to first, notifying
-        // those that are interested in this event
-        for (int i = listeners.length - 2; i >= 0; i -= 2) {
-            if (listeners[i] == TreeModelListener.class) {
-                // Lazily create the event:
-                if (e == null)
-                    e = new TreeModelEvent(source, path,
-                                           childIndices, children);
-                ((TreeModelListener) listeners[i + 1]).treeNodesInserted(e);
-            }
-        }
-    }
-
-    /*
-     * Notify all listeners that have registered interest for
-     * notification on this event type.  The event instance
-     * is lazily created using the parameters passed into
-     * the fire method.
-     * @see EventListenerList
-     */
-    protected void fireTreeNodesRemoved(Object source, Object[] path,
-                                        int[] childIndices, Object[] children) {
-        // Guaranteed to return a non-null array
-        Object[] listeners = listenerList.getListenerList();
-        TreeModelEvent e = null;
-        // Process the listeners last to first, notifying
-        // those that are interested in this event
-        for (int i = listeners.length - 2; i >= 0; i -= 2) {
-            if (listeners[i] == TreeModelListener.class) {
-                // Lazily create the event:
-                if (e == null)
-                    e = new TreeModelEvent(source, path,
-                                           childIndices, children);
-                ((TreeModelListener) listeners[i + 1]).treeNodesRemoved(e);
-            }
-        }
-    }
-
-    /*
-     * Notify all listeners that have registered interest for
-     * notification on this event type.  The event instance
-     * is lazily created using the parameters passed into
-     * the fire method.
-     * @see EventListenerList
-     */
-    protected void fireTreeStructureChanged(Object source, Object[] path,
-                                            int[] childIndices,
-                                            Object[] children) {
-        // Guaranteed to return a non-null array
-        Object[] listeners = listenerList.getListenerList();
-        TreeModelEvent e = null;
-        // Process the listeners last to first, notifying
-        // those that are interested in this event
-        for (int i = listeners.length - 2; i >= 0; i -= 2) {
-            if (listeners[i] == TreeModelListener.class) {
-                // Lazily create the event:
-                if (e == null) {
-                    e = new TreeModelEvent(source, path,
-                                           childIndices, children);
-                }
-                ((TreeModelListener) listeners[i + 1]).treeStructureChanged(e);
-            }
-        }
-    }
-
-    /**
-     * Returns an array of all the objects currently registered
-     * as <code><em>Foo</em>Listener</code>s
-     * upon this model.
-     * <code><em>Foo</em>Listener</code>s are registered using the
-     * <code>add<em>Foo</em>Listener</code> method.
-     *
-     * <p>
-     *
-     * You can specify the <code>listenerType</code> argument
-     * with a class literal,
-     * such as
-     * <code><em>Foo</em>Listener.class</code>.
-     * For example, you can query a
-     * <code>DefaultTreeModel</code> <code>m</code>
-     * for its tree model listeners with the following code:
-     *
-     * <pre>TreeModelListener[] tmls = (TreeModelListener[])(m.getListeners(TreeModelListener.class));</pre>
-     *
-     * If no such listeners exist, this method returns an empty array.
-     *
-     * @param listenerType the type of listeners requested; this parameter
-     *          should specify an interface that descends from
-     *          <code>java.util.EventListener</code>
-     * @return an array of all objects registered as
-     *          <code><em>Foo</em>Listener</code>s on this component,
-     *          or an empty array if no such
-     *          listeners have been added
-     * @exception ClassCastException if <code>listenerType</code>
-     *          doesn't specify a class or interface that implements
-     *          <code>java.util.EventListener</code>
-     *
-     * @see #getTreeModelListeners
-     *
-     * @since 1.3
-     */
-    public EventListener[] getListeners(Class listenerType) {
-        return listenerList.getListeners(listenerType);
-    }
-
-    // Left to be implemented in the subclass:
-
-    /**
-     * public Object getChild(Object parent, int index)
-     * public int getChildCount(Object parent)
-     * public int getColumnCount()
-     * public String getColumnName(int column)
-     * public Object getValueAt(Object node, int column)
-     * public void setValueAt(Object value, Object node, int column)
-     */
 }

@@ -35,7 +35,7 @@ public class ComponentTreeTableModel extends AbstractTreeTableModel {
             root = new JXFrame();
         }
         this.root = root;
-        fireTreeStructureChanged(this, new Object[]{ root }, null, null);
+        modelSupport.fireNewRoot();
     }
     
     //  ------------------TreeModel
@@ -64,23 +64,12 @@ public class ComponentTreeTableModel extends AbstractTreeTableModel {
     }
 
     /**
-     * This method is called by a standard JTree after
-     * editing the cell.
-     * 
-     */
-    public void valueForPathChanged(TreePath path, Object newValue) {
-        Object node = path.getLastPathComponent();
-        setValueAt(newValue, node, 0);
-        
-    }
-
-
-    /**
-     * This method is called by the "tree" part to render the 
-     * hierarchical column.
+     * This method is called by the "tree" part to render the hierarchical
+     * column.
      * 
      * @param node
-     * @return
+     *            the node to convert
+     * @return the {@code node} as a string
      */
     public String convertValueToText(Object node) {
         return String.valueOf(getValueAt(node, 0));
@@ -88,10 +77,10 @@ public class ComponentTreeTableModel extends AbstractTreeTableModel {
     
 //------------------ TreeTableModel    
 
-    public Class getColumnClass(int column) {
+    public Class<?> getColumnClass(int column) {
         switch (column) {
         case 0:
-            return hierarchicalColumnClass;
+            return Object.class;
         case 1:
             return Class.class;
         case 2:
@@ -162,9 +151,8 @@ public class ComponentTreeTableModel extends AbstractTreeTableModel {
         } else {
             Object parent = parentPath.getLastPathComponent();
 
-            fireTreeNodesChanged(this, new Object[] {parentPath} , 
-                    new int[] { getIndexOfChild(parent, node) },
-                    new Object[]  { node} );
+            modelSupport.fireChildChanged(new TreePath(parentPath),
+                    getIndexOfChild(parent, node), node);
         }
         
     }
@@ -173,7 +161,8 @@ public class ComponentTreeTableModel extends AbstractTreeTableModel {
      * exposed for test convenience.
      * 
      * @param node
-     * @return
+     * @return a {@code TreePath} representation from {@code root} to
+     *         {@code node}
      */
     public TreePath getPathToRoot(Component node) {
         return new TreePath(getPathToRoot(node, 0));

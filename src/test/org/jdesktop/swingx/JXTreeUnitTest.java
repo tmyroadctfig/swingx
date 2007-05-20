@@ -21,6 +21,7 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.SearchPredicate;
 import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
+import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 
@@ -105,7 +106,7 @@ public class JXTreeUnitTest extends InteractiveTestCase {
      *
      */
     public void testExpandAllWithInvisible() {
-        final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+        final DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode();
         final InsertTreeTableModel model = new InsertTreeTableModel(root);
         int childCount = 5;
         for (int i = 0; i < childCount; i++) {

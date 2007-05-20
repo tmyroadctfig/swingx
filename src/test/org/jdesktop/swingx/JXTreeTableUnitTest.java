@@ -1,39 +1,48 @@
 /*
  * $Id$
- *
- * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
- * Santa Clara, California 95054, U.S.A. All rights reserved.
+ * 
+ * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
+ * California 95054, U.S.A. All rights reserved.
+ * 
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-
 package org.jdesktop.swingx;
 
 import java.awt.Point;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
+import java.util.Vector;
 
-import javax.swing.CellEditor;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.table.TableModel;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.MutableTreeNode;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
-import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
+import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
-import org.jdesktop.swingx.treetable.TreeTableCellEditor;
+import org.jdesktop.swingx.treetable.MutableTreeTableNode;
 import org.jdesktop.swingx.treetable.TreeTableModel;
+import org.jdesktop.swingx.treetable.TreeTableNode;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TreeSelectionReport;
-
 
 public class JXTreeTableUnitTest extends InteractiveTestCase {
 
@@ -156,27 +165,33 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * at it in the visualCheck. 
      */
     public void testEditOnCollapse() {
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode("ROOT");
-        DefaultMutableTreeNode a = new DefaultMutableTreeNode("A");
-        DefaultMutableTreeNode a1 = new DefaultMutableTreeNode("A1");
-        DefaultMutableTreeNode b = new DefaultMutableTreeNode("B");
+        DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode("ROOT");
+        DefaultMutableTreeTableNode a = new DefaultMutableTreeTableNode("A");
+        DefaultMutableTreeTableNode a1 = new DefaultMutableTreeTableNode("A1");
+        DefaultMutableTreeTableNode b = new DefaultMutableTreeTableNode("B");
         a.add(a1);
         root.add(a);
         root.add(b);
-        TreeTableModel model = new DefaultTreeTableModel(root) {
+        
+        Vector<String> columnNames = new Vector<String>();
+        columnNames.add("A");
+        
+        TreeTableModel model = new DefaultTreeTableModel(root, columnNames) {
             public boolean isCellEditable(Object obj,int col) {
                 return true;
               }
                                                                                       
               public void setValueAt(Object value,Object node,int col) {
-                  MutableTreeNode treeNode = (MutableTreeNode) node;
+                  MutableTreeTableNode treeNode = (MutableTreeTableNode) node;
                  treeNode.setUserObject(value);
-                 MutableTreeNode parent = (MutableTreeNode) treeNode.getParent();
-                 nodesChanged(parent, new int[] { parent.getIndex(treeNode) } );
+                 MutableTreeTableNode parent = (MutableTreeTableNode) treeNode.getParent();
+                 modelSupport.fireChildChanged(new TreePath(
+                        getPathToRoot(parent)), parent.getIndex(treeNode),
+                        treeNode);
               }
                                                                                       
               public Object getValueAt(Object node,int col) {
-                  return ((DefaultMutableTreeNode) node).getUserObject();
+                  return ((DefaultMutableTreeTableNode) node).getUserObject();
               }
             };
             
@@ -201,12 +216,13 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * 
      */
     public void testReuseEditor() {
-        JXTreeTable treeTable = new JXTreeTable(treeTableModel);
-        CellEditor editor = treeTable.getDefaultEditor(TreeTableModel.class);
-        assertTrue(editor instanceof TreeTableCellEditor);
-        treeTable.setTreeTableModel(simpleTreeTableModel);
-        assertSame("hierarchical editor must be unchanged", editor, 
-                treeTable.getDefaultEditor(TreeTableModel.class));
+        //TODO rework this test, since we no longer use TreeTableModel.class
+//        JXTreeTable treeTable = new JXTreeTable(treeTableModel);
+//        CellEditor editor = treeTable.getDefaultEditor(TreeTableModel.class);
+//        assertTrue(editor instanceof TreeTableCellEditor);
+//        treeTable.setTreeTableModel(simpleTreeTableModel);
+//        assertSame("hierarchical editor must be unchanged", editor, 
+//                treeTable.getDefaultEditor(TreeTableModel.class));
     }
     /**
      * Issue #4-, #340-swingx: duplicate notification
@@ -258,7 +274,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * 
      * @param selectFirstRow boolean to indicate if the first row should
      *   be selected.
-     * @return
+     * @return a tree table configured for selection tests
      */
     protected JXTreeTable prepareTreeTable(boolean selectFirstRow) {
         JXTreeTable treeTable = new JXTreeTable(simpleTreeTableModel);
@@ -300,7 +316,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     public void testConservativeRowForNodeInAdapter() {
         // for testing we need a model which relies on 
         // node != null
-        TreeTableModel model = new DefaultTreeTableModel((TreeNode) simpleTreeTableModel.getRoot()) {
+        TreeTableModel model = new DefaultTreeTableModel((TreeTableNode) simpleTreeTableModel.getRoot()) {
 
             @Override
             public Object getValueAt(Object node, int column) {
@@ -416,7 +432,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      *
      */
     public void testEmptyModelInitiallyInvisibleRoot() {
-        final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+        final DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode();
         final InsertTreeTableModel model = new InsertTreeTableModel(root);
         final JXTreeTable treeTable = new JXTreeTable(model);
         // sanity...
@@ -445,10 +461,10 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * 
      */
     public void testInsertUnderCollapsedNode() {
-        final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+        final DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode();
         final InsertTreeTableModel model = new InsertTreeTableModel(root);
-        DefaultMutableTreeNode childA = model.addChild(root);
-        final DefaultMutableTreeNode childB = model.addChild(childA);
+        DefaultMutableTreeTableNode childA = model.addChild(root);
+        final DefaultMutableTreeTableNode childB = model.addChild(childA);
         final JXTreeTable treeTable = new JXTreeTable(model);
         treeTable.setRootVisible(true);
         // sanity...
@@ -476,11 +492,11 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     public static class InsertTreeTableModel extends DefaultTreeTableModel {
         private boolean rootIsFolder;
         
-        public InsertTreeTableModel(TreeNode root) {
+        public InsertTreeTableModel(TreeTableNode root) {
             super(root);
         }
 
-        public InsertTreeTableModel(TreeNode root, boolean rootIsFolder) {
+        public InsertTreeTableModel(TreeTableNode root, boolean rootIsFolder) {
             super(root);
             this.rootIsFolder = rootIsFolder;
         }
@@ -498,14 +514,11 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
             return 2;
         }
 
-        public DefaultMutableTreeNode addChild(DefaultMutableTreeNode parent) {
-            DefaultMutableTreeNode newNode = new DefaultMutableTreeNode("Child");
+        public DefaultMutableTreeTableNode addChild(DefaultMutableTreeTableNode parent) {
+            DefaultMutableTreeTableNode newNode = new DefaultMutableTreeTableNode("Child");
             parent.add(newNode);
-//            nodeStructureChanged(parent);
-            nodesWereInserted(parent, new int[] {parent.getIndex(newNode) });
-//            fireTreeNodesInserted(this, getPathToRoot(parent),
-//                    new int[] { parent.getIndex(newNode) },
-//                    new Object[] { newNode });
+            modelSupport.fireChildAdded(new TreePath(getPathToRoot(parent)),
+                    parent.getIndex(newNode), newNode);
 
             return newNode;
         }
@@ -559,7 +572,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     public void testRemoveListeners() {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         treeTable.setTreeTableModel(new FileSystemModel());
-        assertEquals(0, ((AbstractTreeTableModel) treeTableModel).getTreeModelListeners().length);
+        assertEquals(0, ((FileSystemModel) treeTableModel).getTreeModelListeners().length);
     }
     
     public void testRowForPath() {
@@ -679,14 +692,43 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
 
     }
 
+    //copied from JTree and modified to use TTNs
+    protected static TreeTableModel getDefaultTreeTableModel() {
+        DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode(
+                "JXTreeTable");
+        DefaultMutableTreeTableNode parent;
+
+        parent = new DefaultMutableTreeTableNode("colors");
+        root.add(parent);
+        parent.add(new DefaultMutableTreeTableNode("blue"));
+        parent.add(new DefaultMutableTreeTableNode("violet"));
+        parent.add(new DefaultMutableTreeTableNode("red"));
+        parent.add(new DefaultMutableTreeTableNode("yellow"));
+
+        parent = new DefaultMutableTreeTableNode("sports");
+        root.add(parent);
+        parent.add(new DefaultMutableTreeTableNode("basketball"));
+        parent.add(new DefaultMutableTreeTableNode("soccer"));
+        parent.add(new DefaultMutableTreeTableNode("football"));
+        parent.add(new DefaultMutableTreeTableNode("hockey"));
+
+        parent = new DefaultMutableTreeTableNode("food");
+        root.add(parent);
+        parent.add(new DefaultMutableTreeTableNode("hot dogs"));
+        parent.add(new DefaultMutableTreeTableNode("pizza"));
+        parent.add(new DefaultMutableTreeTableNode("ravioli"));
+        parent.add(new DefaultMutableTreeTableNode("bananas"));
+        return new DefaultTreeTableModel(root);
+    }
 
     // ------------------ init
     protected void setUp() throws Exception {
         super.setUp();
-        JXTree tree = new JXTree();
-        DefaultTreeModel treeModel = (DefaultTreeModel) tree.getModel();
-        simpleTreeTableModel = new DefaultTreeTableModel((TreeNode) treeModel.getRoot());
-        treeTableModel = new FileSystemModel();
+        DefaultTreeTableModel treeTableModel = (DefaultTreeTableModel) getDefaultTreeTableModel();
+        Vector<String> columnNames = new Vector<String>();
+        columnNames.add("A");
+        simpleTreeTableModel = new DefaultTreeTableModel((TreeTableNode) treeTableModel.getRoot(), columnNames);
+        this.treeTableModel = new FileSystemModel();
     }
 
 }

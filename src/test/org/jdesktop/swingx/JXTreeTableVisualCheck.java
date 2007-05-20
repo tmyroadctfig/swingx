@@ -1,6 +1,22 @@
 /*
- * Created on 25.07.2005
- *
+ * $Id$
+ * 
+ * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
+ * California 95054, U.S.A. All rights reserved.
+ * 
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 package org.jdesktop.swingx;
 
@@ -28,7 +44,6 @@ import javax.swing.ToolTipManager;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
@@ -49,7 +64,7 @@ import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.XTestUtils;
-import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
+import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.test.AncientSwingTeam;
 
@@ -67,14 +82,14 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         setSystemLF(true);
         JXTreeTableVisualCheck test = new JXTreeTableVisualCheck();
         try {
-//            test.runInteractiveTests();
+            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Hierarchical.*");
 //               test.runInteractiveTests("interactive.*ToolTip.*");
 //           test.runInteractiveTests("interactive.*DnD.*");
 //             test.runInteractiveTests("interactive.*Compare.*");
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
 //             test.runInteractiveTests("interactive.*RToL.*");
-             test.runInteractiveTests("interactive.*Highl.*");
+//             test.runInteractiveTests("interactive.*Highl.*");
 //             test.runInteractiveTests("interactive.*Render.*");
         } catch (Exception ex) {
 
@@ -183,7 +198,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         
         final JXTreeTable tree = new JXTreeTable(treeTableModel);
         tree.setColumnControlVisible(true);
-        JTree renderer = ((JTree) tree.getDefaultRenderer(AbstractTreeTableModel.hierarchicalColumnClass));            
+        JTree renderer = (JTree) tree.getCellRenderer(0, tree.getHierarchicalColumn());
         
         renderer.addTreeExpansionListener(new TreeExpansionListener(){
 
@@ -262,7 +277,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      *   
      */
     public void interactiveTestInsertNodeEmptyModel() {
-        final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+        final DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode();
         final InsertTreeTableModel model = new InsertTreeTableModel(root, true);
         final JTree tree = new JTree(model);
         tree.setRootVisible(false);
@@ -308,7 +323,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      *   
      */
     public void interactiveTestInsertNodeEmptyModelExpand() {
-        final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+        final DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode();
         final InsertTreeTableModel model = new InsertTreeTableModel(root, true);
         for (int i = 0; i < 5; i++) {
             model.addChild(root);
@@ -363,12 +378,12 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      *
      */
     public void interactiveTestInsertUnderCollapsedNode() {
-        final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+        final DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode();
         final InsertTreeTableModel model = new InsertTreeTableModel(root);
-        DefaultMutableTreeNode childA = model.addChild(root);
-        final DefaultMutableTreeNode childB = model.addChild(childA);
+        DefaultMutableTreeTableNode childA = model.addChild(root);
+        final DefaultMutableTreeTableNode childB = model.addChild(childA);
         model.addChild(childB);
-        DefaultMutableTreeNode secondRootChild = model.addChild(root);
+        DefaultMutableTreeTableNode secondRootChild = model.addChild(root);
         model.addChild(secondRootChild);
         JXTree tree = new JXTree(model);
         final JXTreeTable treeTable = new JXTreeTable(model);
@@ -408,7 +423,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      */
     public void interactiveTestInsertNodeAndChangedParentRendering() {
         final Icon topIcon = XTestUtils.loadDefaultIcon("wellTop.gif");
-        final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+        final DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode();
         final InsertTreeTableModel model = new InsertTreeTableModel(root);
         JXTree tree = new JXTree(model);
         final JXTreeTable treeTable = new JXTreeTable(model);
@@ -443,7 +458,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
                 int selected = treeTable.getSelectedRow();
                 if (selected < 0 ) return;
                 TreePath path = treeTable.getPathForRow(selected);
-                DefaultMutableTreeNode parent = (DefaultMutableTreeNode) path.getLastPathComponent();
+                DefaultMutableTreeTableNode parent = (DefaultMutableTreeTableNode) path.getLastPathComponent();
                 model.addChild(parent);
                 
             }
@@ -460,7 +475,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      *
      */
     public void interactiveTestInsertNode() {
-        final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+        final DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode();
         final InsertTreeTableModel model = new InsertTreeTableModel(root);
         JTree tree = new JTree(model);
         final JXTreeTable treeTable = new JXTreeTable(model);
@@ -477,7 +492,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
                 int selected = treeTable.getSelectedRow();
                 if (selected < 0 ) return;
                 TreePath path = treeTable.getPathForRow(selected);
-                DefaultMutableTreeNode parent = (DefaultMutableTreeNode) path.getLastPathComponent();
+                DefaultMutableTreeTableNode parent = (DefaultMutableTreeTableNode) path.getLastPathComponent();
                 model.addChild(parent);
                 
             }

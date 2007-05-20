@@ -57,6 +57,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.plaf.UIResource;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -68,12 +69,9 @@ import javax.swing.tree.TreeSelectionModel;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.SelectionMapper;
-import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
-import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.TreeTableCellEditor;
 import org.jdesktop.swingx.treetable.TreeTableModel;
-
 
 /**
  * <p><code>JXTreeTable</code> is a specialized {@link javax.swing.JTable table}
@@ -89,7 +87,7 @@ import org.jdesktop.swingx.treetable.TreeTableModel;
  * <code>JXTreeTable</code> constructor, as shown below:
  * <pre>
  *  TreeTableModel  treeTableModel = new FileSystemModel(); // any TreeTableModel
- *  JXTreeTable      treeTable = new JXTreeTable(treeTableModel);
+ *  JXTreeTable     treeTable = new JXTreeTable(treeTableModel);
  *  JScrollPane     scrollpane = new JScrollPane(treeTable);
  * </pre>
  * See {@link javax.swing.JTable} for an explanation of why putting the treetable
@@ -124,6 +122,12 @@ public class JXTreeTable extends JXTable {
      */
     private TreeTableCellRenderer renderer;
 
+    /**
+     * Editor used to edit cells within the
+     *  {@link #isHierarchical(int) hierarchical} column.
+     */
+    private TreeTableCellEditor hierarchicalEditor;
+    
     private TreeTableHacker treeTableHacker;
     private boolean consumedOnPress;
 
@@ -185,6 +189,8 @@ public class JXTreeTable extends JXTable {
         // no grid
         setShowGrid(false, false);
 
+        hierarchicalEditor = new TreeTableCellEditor(renderer);
+        
 //        // No grid.
 //        setShowGrid(false); // superclass default is "true"
 //
@@ -215,12 +221,6 @@ public class JXTreeTable extends JXTable {
         adjustTreeRowHeight(getRowHeight());
 
         setSelectionModel(selectionWrapper.getListSelectionModel());
-        // install the renderer as default for hierarchicalColumn
-        setDefaultRenderer(AbstractTreeTableModel.hierarchicalColumnClass,
-            renderer);
-        // Install the default editor.
-        setDefaultEditor(AbstractTreeTableModel.hierarchicalColumnClass,
-            new TreeTableCellEditor(renderer));
         
         // propagate the lineStyle property to the renderer
         PropertyChangeListener l = new PropertyChangeListener() {
@@ -236,7 +236,7 @@ public class JXTreeTable extends JXTable {
     }
 
 
-
+    
     private void initActions() {
         // Register the actions that this class can handle.
         ActionMap map = getActionMap();
@@ -1503,17 +1503,49 @@ public class JXTreeTable extends JXTable {
     }
 
     /**
-     * Determines if the specified column contains hierarchical nodes.
+     * Determines if the specified column is defined as the hierarchical column.
      *
      * @param column zero-based index of the column
-     * @return true if the class of objects in the specified column implement
-     * the {@link javax.swing.tree.TreeNode} interface; false otherwise.
+     * @return true if the column is the hierarchical column; false otherwise.
      */
     public boolean isHierarchical(int column) {
-        return AbstractTreeTableModel.hierarchicalColumnClass.isAssignableFrom(
-            getColumnClass(column));
+        return getHierarchicalColumn() == column;
     }
 
+    /**
+     * Returns the index of the hierarchical column. This is the column that is
+     * displayed as the tree.
+     * 
+     * @return the index of the hierarchical column
+     */
+    public int getHierarchicalColumn() {
+        return convertColumnIndexToView(((TreeTableModel) renderer.getModel()).getHierarchicalColumn());
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TableCellRenderer getCellRenderer(int row, int column) {
+        if (isHierarchical(column)) {
+            return renderer;
+        }
+        
+        return super.getCellRenderer(row, column);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TableCellEditor getCellEditor(int row, int column) {
+        if (isHierarchical(column)) {
+            return hierarchicalEditor;
+        }
+        
+        return super.getCellEditor(row, column);
+    }
+    
     /**
      * ListToTreeSelectionModelWrapper extends DefaultTreeSelectionModel
      * to listen for changes in the ListSelectionModel it maintains. Once
@@ -1927,6 +1959,7 @@ public class JXTreeTable extends JXTable {
         }
 
 
+
         private TreeTableModel model; // immutable
         private final JTree tree; // immutable
         private JXTreeTable treeTable = null; // logically immutable
@@ -2143,7 +2176,6 @@ public class JXTreeTable extends JXTable {
                         "Table.focusCellHighlightBorder");
                 }
             }
-
             
             visibleRow = row;
 
@@ -2155,7 +2187,7 @@ public class JXTreeTable extends JXTable {
                 String fullText = super.getText();
                 // getText() calls tree.convertValueToText();
                 // tree.convertValueToText() should call treeModel.convertValueToText(), if possible
-
+        
                 String shortText = SwingUtilities.layoutCompoundLabel(
                     this, g.getFontMetrics(), fullText, getIcon(),
                     getVerticalAlignment(), getHorizontalAlignment(),
@@ -2165,7 +2197,7 @@ public class JXTreeTable extends JXTable {
 
                 /** TODO: setText is more heavyweight than we want in this
                  * situation. Make JLabel.text protected instead of private.
-                 */
+         */
 
                 setText(shortText); // temporarily truncate text
                 super.paint(g);

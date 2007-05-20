@@ -1,8 +1,22 @@
 /*
  * $Id$
- *
- * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
- * Santa Clara, California 95054, U.S.A. All rights reserved.
+ * 
+ * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle, Santa Clara,
+ * California 95054, U.S.A. All rights reserved.
+ * 
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 package org.jdesktop.swingx;
 
@@ -23,7 +37,6 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.action.LinkAction;
@@ -40,8 +53,12 @@ import org.jdesktop.swingx.renderer.WrappingIconPanel;
 import org.jdesktop.swingx.renderer.WrappingProvider;
 import org.jdesktop.swingx.test.ActionMapTreeTableModel;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
+import org.jdesktop.swingx.test.TreeTableUtils;
+import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
+import org.jdesktop.swingx.treetable.MutableTreeTableNode;
 import org.jdesktop.swingx.treetable.TreeTableModel;
+import org.jdesktop.swingx.treetable.TreeTableNode;
 import org.jdesktop.test.TableModelReport;
 
 /**
@@ -63,8 +80,8 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         setSystemLF(true);
         JXTreeTableIssues test = new JXTreeTableIssues();
         try {
-//            test.runInteractiveTests();
-            test.runInteractiveTests(".*Adapter.*");
+            test.runInteractiveTests();
+//            test.runInteractiveTests(".*Adapter.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -448,8 +465,9 @@ public class JXTreeTableIssues extends InteractiveTestCase {
     private TreeTableModel createCustomTreeTableModelFromDefault() {
         JXTree tree = new JXTree();
         DefaultTreeModel treeModel = (DefaultTreeModel) tree.getModel();
-         TreeTableModel customTreeTableModel = new
-         CustomTreeTableModel((TreeNode) treeModel.getRoot());
+        TreeTableModel customTreeTableModel = TreeTableUtils
+                .convertDefaultTreeModel(treeModel);
+
         return customTreeTableModel;
     }
 
@@ -457,18 +475,13 @@ public class JXTreeTableIssues extends InteractiveTestCase {
      * A TreeTableModel inheriting from DefaultTreeModel (to ease
      * insert/delete).
      */
-    public static class CustomTreeTableModel extends DefaultTreeModel implements
-            TreeTableModel {
+    public static class CustomTreeTableModel extends DefaultTreeTableModel {
 
         /**
          * @param root
          */
-        public CustomTreeTableModel(TreeNode root) {
+        public CustomTreeTableModel(TreeTableNode root) {
             super(root);
-        }
-
-        public Class getColumnClass(int column) {
-            return TreeTableModel.class;
         }
 
         public int getColumnCount() {
@@ -488,8 +501,8 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         }
 
         public void setValueAt(Object value, Object node, int column) {
-            ((MutableTreeNode) node).setUserObject(value);
-            nodeChanged((TreeNode) node);
+            ((MutableTreeTableNode) node).setUserObject(value);
+            modelSupport.firePathChanged(new TreePath(getPathToRoot((TreeTableNode) node)));
         }
 
     }

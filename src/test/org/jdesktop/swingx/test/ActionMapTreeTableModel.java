@@ -15,17 +15,17 @@ import javax.swing.ActionMap;
 import javax.swing.JComponent;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
+import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
 
 /**
  * Convenience TreeTableModel for wrapping an ActionMap hierarchy.
  * 
  * @author Jeanette Winzenburg, Berlin
  */
-public class ActionMapTreeTableModel extends DefaultTreeTableModel {
+public class ActionMapTreeTableModel extends AbstractTreeTableModel {
 
     public ActionMapTreeTableModel(JComponent comp) {
-        super(createRootNodeExt(comp), false);
+        super(createRootNodeExt(comp));
     }
 
     public Object getChild(Object parent, int index) {
@@ -72,6 +72,16 @@ public class ActionMapTreeTableModel extends DefaultTreeTableModel {
         default:
             return null;
         }
+    }
+    
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getIndexOfChild(Object parent, Object child) {
+        ActionEntryNode node = (ActionEntryNode) parent;
+        
+        return node.getIndex((ActionEntryNode) child);
     }
     
     @SuppressWarnings("unchecked")
@@ -163,5 +173,4 @@ public class ActionMapTreeTableModel extends DefaultTreeTableModel {
             return key.toString();
         }
     }
-
 }
