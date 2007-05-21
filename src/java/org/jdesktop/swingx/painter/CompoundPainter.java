@@ -47,9 +47,10 @@ import java.awt.geom.AffineTransform;
  *    blue,
  *    new Point2D.Double(1, 0),
  *    translucent);
- *  Painter veil =  new BasicGradientPainter(blueToTranslucent);
+ *  MattePainter veil = new MattePainter(blueToTranslucent);
+ *  veil.setPaintStretched(true);
  *  Painter pinstripes = new PinstripePainter(45);
- *  Painter backgroundPainter = new BackgroundPainter();
+ *  Painter backgroundPainter = new RectanglePainter(this.getBackground(), null);
  *  Painter p = new CompoundPainter(backgroundPainter, pinstripes, veil);
  *  panel.setBackgroundPainter(p);
  * </code></pre></p>
