@@ -331,7 +331,6 @@ public class BasicDatePickerUI extends DatePickerUI {
                     datePicker.getEditor().setValue(null);
                 }
                 setVisible(false);
-                datePicker.postActionEvent();
             }
         }
     }
@@ -465,6 +464,7 @@ public class BasicDatePickerUI extends DatePickerUI {
             } else if ("value".equals(property)) {
                 Date date = (Date) datePicker.getEditor().getValue();
                 datePicker.setDate(date);
+                datePicker.postActionEvent();                
             } else if ("lightWeightPopupEnabled".equals(property)) {
                 // Force recreation of the popup when this property changes.
                 if (popup != null) {
