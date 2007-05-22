@@ -22,6 +22,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.SortedSet;
+
+import javax.swing.JComponent;
+
 import org.jdesktop.swingx.DateSelectionListener;
 import org.jdesktop.swingx.DateSelectionModel;
 import org.jmock.Mock;
@@ -34,12 +37,19 @@ import org.jmock.MockObjectTestCase;
  */
 public class JXMonthViewTest extends MockObjectTestCase {
     private Calendar cal;
+    private Locale componentLocale;
 
     public void setUp() {
         cal = Calendar.getInstance();
+        
+        //the test is configured for a US defaulted system
+        //the localization tests handle actual localization issues
+        componentLocale = JComponent.getDefaultLocale();
+        JComponent.setDefaultLocale(Locale.US);
     }
 
     public void teardown() {
+        JComponent.setDefaultLocale(componentLocale);
     }
 
     public void testDefaultConstructor() {
@@ -50,12 +60,18 @@ public class JXMonthViewTest extends MockObjectTestCase {
     }
 
     public void testLocale() {
-        JXMonthView monthView = new JXMonthView();
-        Locale locale = monthView.getLocale();
-        Calendar cal = Calendar.getInstance(locale);
-        int expectedFirstDayOfWeek = cal.getFirstDayOfWeek();
+        Locale[] locales = Locale.getAvailableLocales();
+        
+        for (Locale l : locales) {
+            JComponent.setDefaultLocale(l);
+            
+            JXMonthView monthView = new JXMonthView();
+            Locale locale = monthView.getLocale();
+            Calendar cal = Calendar.getInstance(locale);
+            int expectedFirstDayOfWeek = cal.getFirstDayOfWeek();
 
-        assertTrue(expectedFirstDayOfWeek == monthView.getFirstDayOfWeek());
+            assertTrue(expectedFirstDayOfWeek == monthView.getFirstDayOfWeek());
+        }
     }
 
     public void testNullSelection() {
