@@ -684,8 +684,8 @@ public class JXMonthView extends JComponent {
     }
 
     private Date cleanupDate(Date date) {
-        date.setTime(cleanupDate(date.getTime()));
-        return date;
+        // only modify defensive copies
+        return new Date(cleanupDate(date.getTime()));
     }
 
     private long cleanupDate(long date) {
@@ -1268,6 +1268,7 @@ public class JXMonthView extends JComponent {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T extends EventListener> T[] getListeners(Class<T> listenerType) {
         java.util.List<T> listeners = listenerMap.getListeners(listenerType);
         T[] result;

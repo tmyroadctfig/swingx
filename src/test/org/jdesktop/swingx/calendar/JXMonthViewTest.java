@@ -41,7 +41,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
 
     public void setUp() {
         cal = Calendar.getInstance();
-        
+
         //the test is configured for a US defaulted system
         //the localization tests handle actual localization issues
         componentLocale = JComponent.getDefaultLocale();
@@ -61,10 +61,10 @@ public class JXMonthViewTest extends MockObjectTestCase {
 
     public void testLocale() {
         Locale[] locales = Locale.getAvailableLocales();
-        
+
         for (Locale l : locales) {
             JComponent.setDefaultLocale(l);
-            
+
             JXMonthView monthView = new JXMonthView();
             Locale locale = monthView.getLocale();
             Calendar cal = Calendar.getInstance(locale);
@@ -83,7 +83,10 @@ public class JXMonthViewTest extends MockObjectTestCase {
         monthView.setSelectionInterval(date, date);
         selection = monthView.getSelection();
         assertTrue(1 == selection.size());
-        assertTrue(date.equals(selection.first()));
+
+        //NB JXMonthView removes the time component from its dates; oh and just in case it's tested at *exactly* midnight..
+        assertTrue(date.after(selection.first()) || (date != selection.first() && date.equals(selection.first())));    // our Date object shouldnt change
+        assertTrue(DateUtils.startOfDay(date).equals(selection.first()));
 
         monthView.clearSelection();
         selection = monthView.getSelection();
@@ -107,7 +110,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         monthView.setSelectionInterval(today, today);
         SortedSet<Date> selection = monthView.getSelection();
         assertTrue(1 == selection.size());
-        assertTrue(today.equals(selection.first()));
+        assertTrue(DateUtils.startOfDay(today).equals(selection.first()));
 
         cal.setTime(today);
         cal.add(Calendar.DAY_OF_MONTH, 1);
@@ -115,7 +118,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         monthView.setSelectionInterval(today, tomorrow);
         selection = monthView.getSelection();
         assertTrue(1 == selection.size());
-        assertTrue(today.equals(selection.first()));
+        assertTrue(DateUtils.startOfDay(today).equals(selection.first()));
     }
 
     public void testSingleIntervalSelection() {
@@ -126,7 +129,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         monthView.setSelectionInterval(today, today);
         SortedSet<Date> selection = monthView.getSelection();
         assertTrue(1 == selection.size());
-        assertTrue(today.equals(selection.first()));
+        assertTrue(DateUtils.startOfDay(today).equals(selection.first()));
 
         cal.setTime(today);
         cal.add(Calendar.DAY_OF_MONTH, 1);
@@ -134,7 +137,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         monthView.setSelectionInterval(today, tomorrow);
         selection = monthView.getSelection();
         assertTrue(2 == selection.size());
-        assertTrue(today.equals(selection.first()));
+        assertTrue(DateUtils.startOfDay(today).equals(selection.first()));
         assertTrue(tomorrow.equals(selection.last()));
     }
 
