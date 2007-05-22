@@ -24,39 +24,49 @@ package org.jdesktop.swingx;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-import javax.swing.JComponent;
+import javax.swing.Icon;
 import javax.swing.JLabel;
 import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.Painter;
 
 /**
- * <p>A {@link javax.swing.JLabel} subclass which supports {@link org.jdesktop.swingx.painter.Painter}s
- * with the <code>foregroundPainter</code> and <code>backgroundpainter</code> properties. By default the
- * <code>foregroundPainter</code> is set to a special painter which will draw the label normally, as specified
- * by the current look and feel. Setting a new <code>foregroundPainter</code> will replace the existing one.
- * To modify the standard drawing behavior developers may get the default <code>Painter</code> and add effects,
- * wrap in a {@link org.jdesktop.swingx.painter.CompoundPainter}, or in some other way modify the look and
- * feel's default painting code.</p>
+ * <p>A {@link javax.swing.JLabel} subclass which supports
+ * {@link org.jdesktop.swingx.painter.Painter}s, multi-line text, and text
+ * rotation.</p>
  *
- * <pre><code>
- * Ex:
+ * <p>Painter support consists of the <code>foregroundPainter</code> and
+ * <code>backgroundpainter</code> properties. The <code>backgroundPainter</code>
+ * refers to a painter responsible for painting <i>beneath</i> the text and icon.
+ * This painter, if set, will paint regardless of the <code>opaque</code> property.
+ * If the background painter does not fully paint each pixel, then you should
+ * make sure the <code>opaque</code> property is set to false.</p>
+ *
+ * <p>The <code>foregroundPainter</code> is responsible for painting the icon
+ * and the text label. If no foregroundPainter is specified, then the look and feel
+ * will paint the label. Note that if opaque is set to true and the look and feel is
+ * rendering the foreground, then the foreground <i>may</i> paint over the background.
+ * Most look and feels will paint a background when <code>opaque</code> is true.
+ * To avoid this behavior, set <code>opaque</code> to false.</p>
  * 
- * JXLabel label = new JXLabel();
- * Painter standardPainter = label.getForegroundPainter();
- * MattePainter blue = new MattePainter(Color.BLUE);
- * CompoundPainter compound = new CompoundPainter(blue,standardPainter);
- * label.setForegroundPainter(compound);
- * </code></pre>
- * 
+ * <p>Since JXLabel is not opaque by default (<code>isOpaque()</code> returns false),
+ * neither of these problems typically present themselves.</p>
+ *
+ * <p>Multi-line text is enabled via the <code>lineWrap</code> property. Simply
+ * set it to true. By default, line wrapping occurs on word boundaries.</p>
+ *
+ * <p>The text (actually, the entire foreground and background) of the JXLabel may
+ * be rotated. Set the <code>rotation</code> property to specify what the rotation
+ * should be.</p> TODO not yet determined what API this will use.
+ *
  * @author joshua.marinacci@sun.com
+ * @author rbair
+ * @author rah
+ * @author mario_cesar
  */
 public class JXLabel extends JLabel {
     private Painter foregroundPainter;
     private Painter backgroundPainter;
-
+    
     /**
      * Create a new JXLabel. This has the same semantics as creating a new JLabel.
      */
@@ -64,7 +74,17 @@ public class JXLabel extends JLabel {
         super();
         initPainterSupport();
     }
-
+    
+    public JXLabel(Icon image) {
+        super(image);
+        initPainterSupport();
+    }
+    
+    public JXLabel(Icon image, int horizontalAlignment) {
+        super(image, horizontalAlignment);
+        initPainterSupport();
+    }
+    
     /**
      * Create a new JXLabel with the given text as the text for the label. This is
      * shorthand for:
@@ -79,13 +99,22 @@ public class JXLabel extends JLabel {
         super(text);
         initPainterSupport();
     }
-
-    /**
-     * Helper method for initializing the painters.
-     */
+    
+    public JXLabel(String text, Icon image, int horizontalAlignment) {
+        super(text, image, horizontalAlignment);
+        initPainterSupport();
+    }
+    
+    public JXLabel(String text, int horizontalAlignment) {
+        super(text, horizontalAlignment);
+        initPainterSupport();
+    }
+    
     private void initPainterSupport() {
-        foregroundPainter = new AbstractPainter<JXLabel>() {
-            protected void doPaint(Graphics2D g, JXLabel component, int width, int height) {
+        foregroundPainter = new AbstractPainter() {
+            protected void doPaint(Graphics2D g, Object object, int width, int height) {
+                Insets i = getInsets();
+                g.translate(-i.left, -i.top);
                 JXLabel.super.paintComponent(g);
             }
         };
@@ -96,14 +125,14 @@ public class JXLabel extends JLabel {
      * will be an internal painter which executes the standard painting code (paintComponent()).
      * @return the current foreground painter.
      */
-    public Painter getForegroundPainter() {
+    public final Painter getForegroundPainter() {
         return foregroundPainter;
     }
     
     /**
      * Sets a new foregroundPainter on the label. This will replace the existing foreground painter.
      * Existing painters can be wrapped by using a CompoundPainter.
-     * @param painter 
+     * @param painter
      */
     public void setForegroundPainter(Painter painter) {
         Painter old = this.getForegroundPainter();
@@ -116,7 +145,7 @@ public class JXLabel extends JLabel {
     
     /**
      * Sets a Painter to use to paint the background of this component
-     * By default there is already a single painter installed which draws the normal background for 
+     * By default there is already a single painter installed which draws the normal background for
      * this component according to the current Look and Feel. Calling
      * <CODE>setBackgroundPainter</CODE> will replace that existing painter.
      * @param p the new painter
@@ -130,41 +159,35 @@ public class JXLabel extends JLabel {
     }
     
     /**
-     * Returns the current background painter. The default value of this property 
+     * Returns the current background painter. The default value of this property
      * is a painter which draws the normal JPanel background according to the current look and feel.
      * @return the current painter
      * @see #setBackgroundPainter(Painter)
      */
-    public Painter getBackgroundPainter() {
+    public final Painter getBackgroundPainter() {
         return backgroundPainter;
     }
     
     /**
-     * Overridden to provide Painter support. It will call backgroundPainter.paint()
-     * then foregroundPainter.paint() if they are not null. If both are null
-     * then it will call super.paintComponent(). If subclasses override this method,
-     * they <em>must</em> call super.paintComponent() or they may cease to work
-     * correctly with painters.
-     * 
      * @param g graphics to paint on
      */
+    @Override
     protected void paintComponent(Graphics g) {
-        if(getBackgroundPainter() != null) {
-            Graphics2D g2 = (Graphics2D)g.create();
-            getBackgroundPainter().paint(g2, this,
-                    this.getWidth(),
-                    this.getHeight());
-            g2.dispose();
-        }
-        if(getForegroundPainter() != null) {
-            Graphics2D g2 = (Graphics2D)g.create();
-            getForegroundPainter().paint(g2, this,
-                    this.getWidth(),
-                    this.getHeight());
-            g2.dispose();
-        }
-        if(getBackgroundPainter() == null && getForegroundPainter() == null) {
+        if (backgroundPainter == null && foregroundPainter == null) {
             super.paintComponent(g);
+        } else {
+            Graphics2D g2 = (Graphics2D)g.create();
+            Insets i = getInsets();
+            g2.translate(i.left, i.top);
+            int width = getWidth() - i.left - i.right;
+            int height = getHeight() - i.top - i.bottom;
+            if(backgroundPainter != null) {
+                backgroundPainter.paint(g2, this, width, height);
+            }
+            if(foregroundPainter != null) {
+                foregroundPainter.paint(g2, this, width, height);
+            }
+            g2.dispose();
         }
     }
 }
