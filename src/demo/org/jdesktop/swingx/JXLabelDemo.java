@@ -22,6 +22,9 @@ package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
 import java.awt.image.BufferedImageOp;
+
+import javax.swing.JCheckBox;
+import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
@@ -40,7 +43,13 @@ public class JXLabelDemo {
     public static void main(String[] args) {
         final JXFrame f = new JXFrame("JXLabel Demo", true);
 
-        JXLabel label = new JXLabel("That's All Folks!");
+        final JXLabel label = new JXLabel("<p>Painter support consists of the <code>foregroundPainter</code> and" + 
+                " <code>backgroundpainter</code> properties. The <code>backgroundPainter</code>" + 
+                " refers to a painter responsible for painting <i>beneath</i> the text and icon." + 
+                " This painter, if set, will paint regardless of the <code>opaque</code> property." + 
+                " If the background painter does not fully paint each pixel, then you should" + 
+                " make sure the <code>opaque</code> property is set to false.</p>");
+        label.setLineWrap(true);
         label.setHorizontalAlignment(SwingConstants.CENTER);
         
         Painter standardPainter = label.getForegroundPainter();
@@ -67,7 +76,16 @@ public class JXLabelDemo {
         });
         
         f.add(label);
-        f.add(slider, BorderLayout.SOUTH);
+        JPanel control = new JPanel();
+        f.add(control, BorderLayout.SOUTH);
+        control.add(slider);
+        final JCheckBox lineWrap = new JCheckBox("wrap lines", true);
+        control.add(lineWrap);
+        lineWrap.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                label.setLineWrap(lineWrap.isSelected());
+                f.repaint();
+            }});
         f.setSize(400, 300);
         f.setVisible(true);
     }
