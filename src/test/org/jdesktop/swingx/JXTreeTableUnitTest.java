@@ -317,6 +317,10 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         // for testing we need a model which relies on 
         // node != null
         TreeTableModel model = new DefaultTreeTableModel((TreeTableNode) simpleTreeTableModel.getRoot()) {
+            @Override
+            public int getColumnCount() {
+                return 1;
+            }
 
             @Override
             public Object getValueAt(Object node, int column) {

@@ -2199,15 +2199,30 @@ public class JXTreeTable extends JXTable {
                  * situation. Make JLabel.text protected instead of private.
          */
 
-                setText(shortText); // temporarily truncate text
-                super.paint(g);
-                setText(fullText); // restore full text
+                try {
+                    setText(shortText); // temporarily truncate text
+                    super.paint(g);
+                } finally {
+                    setText(fullText); // restore full text
+                }
             }
 
             private Rectangle getItemRect(Rectangle itemRect) {
                 getBounds(itemRect);
                 itemRect.width = hierarchicalColumnWidth - itemRect.x;
                 return itemRect;
+            }
+
+            @Override
+            public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+                Object val = value;
+                
+                if (treeTable != null) {
+                    val = treeTable.getValueAt(row, treeTable.getHierarchicalColumn());
+                }
+                
+                return super.getTreeCellRendererComponent(tree, val, sel, expanded, leaf,
+                        row, hasFocus);
             }
 
             // Rectangles filled in by SwingUtilities.layoutCompoundLabel();
