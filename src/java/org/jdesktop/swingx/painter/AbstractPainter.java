@@ -104,7 +104,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
      * @param cacheable indicates if this painter should be cacheable
      */
     public AbstractPainter(boolean cacheable) {
-        
+        setCacheable(cacheable);
     }
 
     /**
@@ -310,7 +310,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
      * @return whether or not a cache should be used
      */
     protected boolean shouldUseCache() {
-        return isCacheable() && filters.length > 0;  //NOTE, I can only do this because getFilters() is final
+        return isCacheable() || filters.length > 0;  //NOTE, I can only do this because getFilters() is final
     }
 
     /**

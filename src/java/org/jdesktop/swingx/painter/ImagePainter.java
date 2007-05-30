@@ -106,6 +106,7 @@ public class ImagePainter<T> extends AbstractAreaPainter<T> {
      */
     public ImagePainter(BufferedImage image, HorizontalAlignment horizontal, VerticalAlignment vertical) {
         super();
+        setCacheable(true);
         this.img = image;
         this.setVerticalAlignment(vertical);
         this.setHorizontalAlignment(horizontal);
