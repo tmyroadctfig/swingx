@@ -786,14 +786,14 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
         if (w instanceof JFrame) {
             final JFrame f = (JFrame)w;
             f.getRootPane().setDefaultButton(closeButton);
-            f.setResizable(false);
+            f.setResizable(true);
             f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             KeyStroke ks = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
             f.getRootPane().registerKeyboardAction(closeAction, ks, JComponent.WHEN_IN_FOCUSED_WINDOW);
         } else if (w instanceof JDialog) {
             final JDialog d = (JDialog)w;
             d.getRootPane().setDefaultButton(closeButton);
-            d.setResizable(false);
+            d.setResizable(true);
             d.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             KeyStroke ks = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
             d.getRootPane().registerKeyboardAction(closeAction, ks, JComponent.WHEN_IN_FOCUSED_WINDOW);
