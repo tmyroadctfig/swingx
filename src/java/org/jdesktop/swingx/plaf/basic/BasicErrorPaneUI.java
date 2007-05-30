@@ -531,11 +531,17 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
             html.append("    " + errorInfo.getErrorLevel());
             html.append("</pre>");
             html.append("<b>Stack Trace:</b>");
-            html.append("<pre>");
-            for (StackTraceElement el : errorInfo.getErrorException().getStackTrace()) {
-                html.append("    " + el.toString().replace("<init>", "&lt;init&gt;") + "\n");
+            Throwable ex = errorInfo.getErrorException();
+            while(ex != null) {
+                html.append("<h4>"+ex.getMessage()+"</h4>");
+                html.append("<pre>");
+                for (StackTraceElement el : ex.getStackTrace()) {
+                    html.append("    " + el.toString().replace("<init>", "&lt;init&gt;") + "\n");
+                }
+                html.append("</pre>");
+                ex = ex.getCause();
             }
-            html.append("</pre></html>");
+            html.append("</html>");
             return html.toString();
         } else {
             return null;
