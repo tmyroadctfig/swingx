@@ -87,7 +87,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
      * The cached image, if shouldUseCache() returns true
      */
     private transient SoftReference<BufferedImage> cachedImage;
-    private boolean cacheable = true;
+    private boolean cacheable = false;
     private boolean dirty = false;
     private BufferedImageOp[] filters = new BufferedImageOp[0];
     private boolean antialiasing = true;
