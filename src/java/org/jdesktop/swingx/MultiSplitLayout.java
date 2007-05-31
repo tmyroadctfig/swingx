@@ -215,6 +215,7 @@ public class MultiSplitLayout implements LayoutManager {
 	childMap.put(name, child);
     }
 
+
     /**
      * Removes the specified component from the layout.
      * 
@@ -222,11 +223,18 @@ public class MultiSplitLayout implements LayoutManager {
      * @see #addLayoutComponent
      */
     public void removeLayoutComponent(Component child) {
-	String name = child.getName();
+        String name = null;
+        for(Map.Entry<String,Component> kv : childMap.entrySet()) {
+            if (kv.getValue() == child) {
+                name = kv.getKey();
+                break;
+            }
+        }
 	if (name != null) {
 	    childMap.remove(name);
 	}
     }
+
 
     private Component childForNode(Node node) {
 	if (node instanceof Leaf) {

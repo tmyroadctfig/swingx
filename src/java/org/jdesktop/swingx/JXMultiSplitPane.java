@@ -99,6 +99,18 @@ public class JXMultiSplitPane extends JPanel {
 	getMultiSplitLayout().setDividerSize(dividerSize);
     }
 
+    /** 
+     * A convenience method that returns the MultiSplitLayout dividerSize
+     * property. Equivalent to 
+     * <code>getMultiSplitLayout().getDividerSize()</code>.
+     * 
+     * @see #getMultiSplitLayout
+     * @see MultiSplitLayout#getDividerSize
+     */
+    public final int getDividerSize() {
+	return getMultiSplitLayout().getDividerSize();
+    }
+
     /**
      * Sets the value of the <code>continuousLayout</code> property.
      * If true, then the layout is revalidated continuously while
