@@ -20,20 +20,20 @@
  */
 package org.jdesktop.swingx;
 
-import org.jdesktop.swingx.action.AbstractActionExt;
-import org.jdesktop.swingx.auth.DefaultUserNameStore;
-import org.jdesktop.swingx.auth.LoginAdapter;
-import org.jdesktop.swingx.auth.LoginEvent;
-import org.jdesktop.swingx.auth.LoginService;
-import org.jdesktop.swingx.auth.PasswordStore;
-import org.jdesktop.swingx.auth.UserNameStore;
-import org.jdesktop.swingx.plaf.JXLoginPanelAddon;
-import org.jdesktop.swingx.plaf.LoginPanelUI;
-import org.jdesktop.swingx.plaf.LookAndFeelAddons;
-import org.jdesktop.swingx.util.WindowUtils;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.ComponentOrientation;
+import java.awt.Cursor;
+import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -48,6 +48,38 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.AbstractListModel;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPasswordField;
+import javax.swing.JProgressBar;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+
+import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.auth.DefaultUserNameStore;
+import org.jdesktop.swingx.auth.LoginAdapter;
+import org.jdesktop.swingx.auth.LoginEvent;
+import org.jdesktop.swingx.auth.LoginListener;
+import org.jdesktop.swingx.auth.LoginService;
+import org.jdesktop.swingx.auth.PasswordStore;
+import org.jdesktop.swingx.auth.UserNameStore;
+import org.jdesktop.swingx.plaf.JXLoginPanelAddon;
+import org.jdesktop.swingx.plaf.LoginPanelUI;
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.swingx.util.WindowUtils;
 
 /**
  *  <p>JXLoginPanel is a JPanel that implements a Login dialog with
@@ -69,6 +101,7 @@ import java.util.logging.Logger;
  * @author Bino George
  * @author Shai Almog
  * @author rbair
+ * @author Karl Schaefer
  */
 
 public class JXLoginPanel extends JXImagePanel {
@@ -120,7 +153,7 @@ public class JXLoginPanel extends JXImagePanel {
     /**
      * Text that should appear on the banner
      */
-    private String bannerText = "Login";
+    private String bannerText;
     /**
      * Custom label allowing the developer to display some message to the user
      */
@@ -212,6 +245,11 @@ public class JXLoginPanel extends JXImagePanel {
     private Cursor oldCursor;
     
     /**
+     * The default login listener used by this panel.
+     */
+    private LoginListener defaultLoginListener;
+    
+    /**
      * Creates a default JXLoginPanel instance
      */
     static {
@@ -233,42 +271,75 @@ public class JXLoginPanel extends JXImagePanel {
     
     //--------------------------------------------------------- Constructors
     /**
-     * Create a new JXLoginPanel
+     * Create a {@code JXLoginPanel} that always accepts the user, never stores
+     * passwords or user ids, and has no target servers.
+     * <p>
+     * This constructor should <i>NOT</i> be used in a real application. It is
+     * provided for compliance to the bean specification and for use with visual
+     * editors.
      */
     public JXLoginPanel() {
         this(null);
     }
     
     /**
-     * Create a new JXLoginPanel
-     * @param service The LoginService to use for logging in
+     * Create a {@code JXLoginPanel} with the specified {@code LoginService}
+     * that does not store user ids or passwords and has no target servers.
+     * 
+     * @param service
+     *            the {@code LoginService} to use for logging in
      */
     public JXLoginPanel(LoginService service) {
         this(service, null, null);
     }
     
     /**
-     * Create a new JXLoginPanel
+     * Create a {@code JXLoginPanel} with the specified {@code LoginService},
+     * {@code PasswordStore}, and {@code UserNameStore}, but without a server
+     * list.
+     * <p>
+     * If you do not want to store passwords or user ids, those parameters can
+     * be {@code null}. {@code SaveMode} is autoconfigured from passed in store
+     * parameters.
+     * 
      * @param service
+     *            the {@code LoginService} to use for logging in
      * @param passwordStore
+     *            the {@code PasswordStore} to use for storing password
+     *            information
      * @param userStore
+     *            the {@code UserNameStore} to use for storing user information
      */
     public JXLoginPanel(LoginService service, PasswordStore passwordStore, UserNameStore userStore) {
         this(service, passwordStore, userStore, null);
     }
     
     /**
-     * Create a new JXLoginPanel
+     * Create a {@code JXLoginPanel} with the specified {@code LoginService},
+     * {@code PasswordStore}, {@code UserNameStore}, and server list.
+     * <p>
+     * If you do not want to store passwords or user ids, those parameters can
+     * be {@code null}. {@code SaveMode} is autoconfigured from passed in store
+     * parameters.
+     * <p>
+     * Setting the server list to {@code null} will unset all of the servers.
+     * The server list is guaranteed to be non-{@code null}.
+     * 
      * @param service
+     *            the {@code LoginService} to use for logging in
      * @param passwordStore
+     *            the {@code PasswordStore} to use for storing password
+     *            information
      * @param userStore
+     *            the {@code UserNameStore} to use for storing user information
      * @param servers
+     *            a list of servers to authenticate against
      */
     public JXLoginPanel(LoginService service, PasswordStore passwordStore, UserNameStore userStore, List<String> servers) {
-        this.loginService = service == null ? new NullLoginService() : service;
-        this.passwordStore = passwordStore == null ? new NullPasswordStore() : passwordStore;
-        this.userNameStore = userStore == null ? new DefaultUserNameStore() : userStore;
-        this.servers = servers == null ? new ArrayList<String>() : servers;
+        setLoginService(service);
+        setPasswordStore(passwordStore);
+        setUserNameStore(userStore);
+        setServers(servers);
         
         //create the login and cancel actions, and add them to the action map
         getActionMap().put(LOGIN_ACTION_COMMAND, createLoginAction());
@@ -285,20 +356,18 @@ public class JXLoginPanel extends JXImagePanel {
             saveMode = SaveMode.NONE;
         }
 
-        LoginListenerImpl loginListener = new LoginListenerImpl();
-        this.loginService.addLoginListener(loginListener);
+        updateUI();
         
         // initialize banner text
-        bannerText = UIManager.getString(CLASS_NAME + ".bannerString");
+        setBannerText(UIManager.getString(CLASS_NAME + ".bannerString"));
         
-        updateUI();
         initComponents();
     }
 
     //------------------------------------------------------------- UI Logic
     
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public LoginPanelUI getUI() {
         return (LoginPanelUI)super.getUI();
@@ -350,8 +419,7 @@ public class JXLoginPanel extends JXImagePanel {
         passwordLabel.setLabelFor(passwordField);
         
         //create the server combo box if necessary
-//            JLabel serverLabel = new JLabel(UIManager.getString(CLASS_NAME + ".serverString"));
-        JLabel serverLabel = new JLabel("Server");
+        JLabel serverLabel = new JLabel(UIManager.getString(CLASS_NAME + ".serverString"));
         if (servers.size() > 1) {
             serverCombo = new JComboBox(servers.toArray());
             serverLabel.setLabelFor(serverCombo);
@@ -548,8 +616,12 @@ public class JXLoginPanel extends JXImagePanel {
      * @param saveMode The saveMode to set either SAVE_NONE, SAVE_PASSWORD or SAVE_USERNAME
      */
     public void setSaveMode(SaveMode saveMode) {
-        this.saveMode = saveMode;
-        recreateLoginPanel();
+        if (this.saveMode != saveMode) {
+            SaveMode oldMode = getSaveMode();
+            this.saveMode = saveMode;
+            recreateLoginPanel();
+            firePropertyChange("saveMode", oldMode, getSaveMode());
+        }
     }
     
     /**
@@ -563,21 +635,49 @@ public class JXLoginPanel extends JXImagePanel {
      * Sets the list of servers. See the servers field javadoc for more info
      */
     public void setServers(List<String> servers) {
-        if (this.servers != servers) {
-            List<String> old = this.servers;
+        //only at startup
+        if (this.servers == null) {
+            this.servers = servers == null ? new ArrayList<String>() : servers;
+        } else if (this.servers != servers) {
+            List<String> old = getServers();
             this.servers = servers == null ? new ArrayList<String>() : servers;
             recreateLoginPanel();
-            firePropertyChange("servers", old, servers);
+            firePropertyChange("servers", old, getServers());
         }
     }
     
+    private LoginListener getDefaultLoginListener() {
+        if (defaultLoginListener == null) {
+            defaultLoginListener = new LoginListenerImpl();
+        }
+        
+        return defaultLoginListener;
+    }
+    
     /**
-     * Sets the <strong>LoginService</strong> for this panel.
-     *
-     * @param service service
+     * Sets the {@code LoginService} for this panel. Setting the login service
+     * to {@code null} will actually set the service to use
+     * {@code NullLoginService}.
+     * 
+     * @param service
+     *            the service to set. If {@code service == null}, then a
+     *            {@code NullLoginService} is used.
      */
     public void setLoginService(LoginService service) {
-        loginService = service;
+        LoginService oldService = getLoginService();
+        LoginService newService = service == null ? new NullLoginService() : service;
+        
+        //newService is guaranteed to be nonnull
+        if (!newService.equals(oldService)) {
+            if (oldService != null) {
+                oldService.removeLoginListener(getDefaultLoginListener());
+            }
+            
+            loginService = newService;
+            this.loginService.addLoginListener(getDefaultLoginListener());
+            
+            firePropertyChange("loginService", oldService, getLoginService());
+        }
     }
     
     /**
@@ -595,9 +695,42 @@ public class JXLoginPanel extends JXImagePanel {
      * @param store PasswordStore
      */
     public void setPasswordStore(PasswordStore store) {
-        passwordStore = store;
+        PasswordStore oldStore = getPasswordStore();
+        PasswordStore newStore = store == null ? new NullPasswordStore() : store;
+        
+        //newStore is guaranteed to be nonnull
+        if (!newStore.equals(oldStore)) {
+            passwordStore = newStore;
+            
+            firePropertyChange("passwordStore", oldStore, getPasswordStore());
+        }
     }
     
+    /**
+     * Gets the {@code UserNameStore} for this panel.
+     * 
+     * @return the {@code UserNameStore}
+     */
+    public UserNameStore getUserNameStore() {
+        return userNameStore;
+    }
+
+    /**
+     * Sets the user name store for this panel.
+     * @param store
+     */
+    public void setUserNameStore(UserNameStore store) {
+        UserNameStore oldStore = getUserNameStore();
+        UserNameStore newStore = store == null ? new DefaultUserNameStore() : store;
+        
+        //newStore is guaranteed to be nonnull
+        if (!newStore.equals(oldStore)) {
+            userNameStore = newStore;
+            
+            firePropertyChange("userNameStore", oldStore, getUserNameStore());
+        }
+    }
+
     /**
      * Gets the <strong>PasswordStore</strong> for this panel.
      *
@@ -652,15 +785,30 @@ public class JXLoginPanel extends JXImagePanel {
     }
     
     /**
-     * Set the image to use for the banner
+     * Set the image to use for the banner. If the {@code img} is {@code null},
+     * then no image will be displayed.
+     * 
+     * @param img
+     *            the image to display
      */
     public void setBanner(Image img) {
-        banner.setImage(img);
+        // we do not expose the ImagePanel, so we will produce property change
+        // events here
+        Image oldImage = getBanner();
+        
+        if (oldImage != img) {
+            banner.setImage(img);
+            firePropertyChange("banner", oldImage, getBanner());
+        }
     }
     
     /**
-     * Set the text to use when creating the banner. If a custom banner image
-     * is specified, then this is ignored
+     * Set the text to use when creating the banner. If a custom banner image is
+     * specified, then this is ignored. If {@code text} is {@code null}, then
+     * no text is displayed.
+     * 
+     * @param text
+     *            the text to display
      */
     public void setBannerText(String text) {
         if (text == null) {
@@ -849,7 +997,7 @@ public class JXLoginPanel extends JXImagePanel {
         public void loginCanceled(LoginEvent source) {
             remove(progressPanel);
             add(contentPanel, BorderLayout.CENTER);
-	    getActionMap().get(LOGIN_ACTION_COMMAND).setEnabled(true);
+            getActionMap().get(LOGIN_ACTION_COMMAND).setEnabled(true);
             errorMessageLabel.setVisible(false);
             revalidate();
             repaint();
@@ -897,6 +1045,14 @@ public class JXLoginPanel extends JXImagePanel {
         public boolean authenticate(String name, char[] password, String server) throws Exception {
             return true;
         }
+
+        public boolean equals(Object obj) {
+            return obj instanceof NullLoginService;
+        }
+
+        public int hashCode() {
+            return 7;
+        }
     }
     
     /**
@@ -910,6 +1066,14 @@ public class JXLoginPanel extends JXImagePanel {
         }
         public char[] get(String username, String server) {
             return EMPTY;
+        }
+
+        public boolean equals(Object obj) {
+            return obj instanceof NullPasswordStore;
+        }
+
+        public int hashCode() {
+            return 7;
         }
     }
     
