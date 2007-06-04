@@ -21,8 +21,12 @@
 package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImageOp;
 
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -46,11 +50,11 @@ public class JXLabelDemo {
         final JXLabel label = new JXLabel("<p>Painter support consists of the <code>foregroundPainter</code> and" + 
                 " <code>backgroundpainter</code> properties. The <code>backgroundPainter</code>" + 
                 " refers to a painter responsible for painting <i>beneath</i> the text and icon." + 
-                " This painter, if set, will paint regardless of the <code>opaque</code> property." + 
-                " If the background painter does not fully paint each pixel, then you should" + 
-                " make sure the <code>opaque</code> property is set to false.</p>");
+                "</p>");
         label.setLineWrap(true);
         label.setHorizontalAlignment(SwingConstants.CENTER);
+        label.setVerticalAlignment(SwingConstants.CENTER);
+        label.setPreferredSize(new Dimension(474,474));
         
         Painter standardPainter = label.getForegroundPainter();
         final AbstractPainter ap = (AbstractPainter)standardPainter;
@@ -79,14 +83,21 @@ public class JXLabelDemo {
         JPanel control = new JPanel();
         f.add(control, BorderLayout.SOUTH);
         control.add(slider);
-        final JCheckBox lineWrap = new JCheckBox("wrap lines", true);
+        final JCheckBox lineWrap = new JCheckBox("Wrap lines", true);
         control.add(lineWrap);
         lineWrap.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 label.setLineWrap(lineWrap.isSelected());
                 f.repaint();
             }});
-        f.setSize(400, 300);
+        control.add(new JButton(new AbstractAction("Rotate text") {
+            
+            public void actionPerformed(ActionEvent e) {
+                label.setTextRotation((label.getTextRotation() + Math.PI/16 ) % (2* Math.PI));
+                f.repaint();
+            }}));
+        //f.setSize(450, 300);
+        f.pack();
         f.setVisible(true);
     }
 }
