@@ -81,6 +81,9 @@ public class JXButton extends JButton {
     /** Creates a new instance of JXButton */
     public JXButton() {}
     public JXButton(String text) { super(text); }
+    public JXButton(Action a) { super(a); }
+    public JXButton(Icon icon) { super(icon); }
+    public JXButton(String text, Icon icon) { super(text, icon); }
     
     public Painter getBackgroundPainter() {
         return bgPainter;
