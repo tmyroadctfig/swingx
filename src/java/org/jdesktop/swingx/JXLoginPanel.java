@@ -359,6 +359,7 @@ public class JXLoginPanel extends JXImagePanel {
         updateUI();
         
         // initialize banner text
+        banner = new JXImagePanel();
         setBannerText(UIManager.getString(CLASS_NAME + ".bannerString"));
         
         initComponents();
@@ -527,7 +528,6 @@ public class JXLoginPanel extends JXImagePanel {
      */
     private void initComponents() {
         //create the default banner
-        banner = new JXImagePanel();
         banner.setImage(createLoginBanner());
 
         //create the default label
@@ -815,7 +815,7 @@ public class JXLoginPanel extends JXImagePanel {
             text = "";
         }
 
-        if (!this.bannerText.equals(text)) {
+        if (!text.equals(this.bannerText)) {
             String oldText = this.bannerText;
             this.bannerText = text;
             //fix the login banner

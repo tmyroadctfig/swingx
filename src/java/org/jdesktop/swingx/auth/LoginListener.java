@@ -20,6 +20,8 @@
  */
 package org.jdesktop.swingx.auth;
 
+import java.util.EventListener;
+
 /*
  * <b>LoginListener</b> provides a listener for the actual login
  * process.
@@ -27,7 +29,7 @@ package org.jdesktop.swingx.auth;
  * @author Bino George
  * @author Shai Almog
  */
-public interface LoginListener {
+public interface LoginListener extends EventListener {
     
     /**
      *  Called by the <strong>JXLoginPanel</strong> in the event of a login failure
