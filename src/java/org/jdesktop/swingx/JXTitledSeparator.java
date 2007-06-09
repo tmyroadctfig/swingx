@@ -22,7 +22,6 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -48,7 +47,7 @@ import javax.swing.UIManager;
  * title with respect to the icon, call {@link #setHorizontalTextPosition}.</p>
  *
  * <p>The default font and color of the title comes from the <code>LookAndFeel</code>, mimicking
- * the font and color of the {@link javax.swing.TitledBorder}</p>
+ * the font and color of the {@link javax.swing.border.TitledBorder}</p>
  *
  * <p>Here are a few example code snippets:
  * <pre><code>
@@ -134,6 +133,7 @@ public class JXTitledSeparator extends JXPanel {
         
         setForeground(UIManager.getColor("TitledBorder.titleColor"));
         setFont(UIManager.getFont("TitledBorder.font"));
+        setOpaque(false);
     }
     
     /**
