@@ -331,7 +331,7 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
 
         int index = parent.getIndex(node);
         
-        modelSupport.fireChildRemoved(new TreePath(getPathToRoot(node)), index,
+        modelSupport.fireChildRemoved(new TreePath(getPathToRoot(parent)), index,
                 node);
     }
 }

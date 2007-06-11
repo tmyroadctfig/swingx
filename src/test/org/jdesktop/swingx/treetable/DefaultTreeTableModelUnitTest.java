@@ -127,5 +127,39 @@ public class DefaultTreeTableModelUnitTest extends TestCase {
         assertTrue(model.isLeaf(grandchild3));
     }
     
+    public void testRemoveFromParent() {
+    	try {
+    		model.removeNodeFromParent(new DefaultMutableTreeTableNode());
+    		fail("Expected IllegalArgumentException");
+    	} catch (IllegalArgumentException e) {
+    		//success
+    	}
+    	
+    	try {
+    		DefaultMutableTreeTableNode p = new DefaultMutableTreeTableNode();
+    		DefaultMutableTreeTableNode c = new DefaultMutableTreeTableNode();
+    		c.setParent(p);
+    		
+    		model.removeNodeFromParent(c);
+    		
+    		fail("Expected NullPointerException");
+    	} catch (NullPointerException e) {
+    		//success
+    		//TODO does not seem like the correct exception
+    	}
+    	
+    	model.removeNodeFromParent(grandchild6);
+    	model.removeNodeFromParent(child1);
+    	
+    	try {
+    		model.removeNodeFromParent(root);
+    		fail("Expected IllegalArgumentException");
+    	} catch (IllegalArgumentException e) {
+    		//success
+    	}
+    	
+    	//TODO test removing already removed nodes?
+    }
+    
     //TODO test "fire" methods and reloads
 }
