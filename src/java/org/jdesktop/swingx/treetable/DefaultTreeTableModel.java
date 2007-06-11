@@ -330,6 +330,7 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
         }
 
         int index = parent.getIndex(node);
+        node.removeFromParent();
         
         modelSupport.fireChildRemoved(new TreePath(getPathToRoot(parent)), index,
                 node);

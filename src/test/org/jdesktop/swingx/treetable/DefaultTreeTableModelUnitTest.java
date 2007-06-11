@@ -148,8 +148,15 @@ public class DefaultTreeTableModelUnitTest extends TestCase {
     		//TODO does not seem like the correct exception
     	}
     	
+    	TreeNode parent = grandchild6.getParent();
+    	int count = parent.getChildCount();
     	model.removeNodeFromParent(grandchild6);
+    	
+    	assertNull(grandchild6.getParent());
+    	assertEquals(parent.getChildCount(), count - 1);
+    	
     	model.removeNodeFromParent(child1);
+    	assertNull(child1.getParent());
     	
     	try {
     		model.removeNodeFromParent(root);
