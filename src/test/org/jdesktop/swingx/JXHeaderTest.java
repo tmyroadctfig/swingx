@@ -51,10 +51,10 @@ public class JXHeaderTest extends TestCase {
         header.setIcon(icon);
         // sanity: the property is set
         assertEquals(icon, header.getIcon());
-        // fishing in the internals ... not really safe, there are 2 labels
+        // fishing in the internals ... not really safe, there are 2 labels and 1 jxlabel ... indeed not safe!
         JLabel label = null;
         for (int i = 0; i < header.getComponentCount(); i++) {
-           if (header.getComponent(i) instanceof JLabel) {
+           if (header.getComponent(i) instanceof JLabel && !(header.getComponent(i) instanceof JXLabel)) {
                boolean second = label != null;
                label = (JLabel) header.getComponent(i);
                if (second) {
