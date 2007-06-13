@@ -95,30 +95,39 @@ public class AbstractPainterTest extends TestCase {
     }
 
     public void testCaching() {
+        p.setCacheable(true);
+        // empty run to fill the cache
+        p.paint(g, null, 10, 10);
+        p.painted = false;
         //test that the cache is always used UNLESS shouldUseCache is false, or isCacheCleared is true, or the Painter is dirty
         p.paint(g, null, 10, 10);
         assertEquals(!p.shouldUseCache() || p.isCacheCleared() || p.isDirty(), p.painted);
+        
+        // disable cache
         p.reset();
+        // setting filters means shouldUseCache() will ALWAYS return true!!!
         p.setFilters(filter);
         p.paint(g, null, 10, 10);
-        assertEquals(!p.shouldUseCache() || p.isCacheCleared() || p.isDirty(), p.painted);
+        assertEquals(p.shouldUseCache() || p.isCacheCleared() || p.isDirty(), p.painted);
+        p.painted = false;
         p.paint(g, null, 10, 10);
         assertEquals(!p.shouldUseCache() || p.isCacheCleared() || p.isDirty(), p.painted);
         p.clearCache();
         p.painted = false;
         p.paint(g, null, 10, 10);
-        assertEquals(!p.shouldUseCache() || p.isCacheCleared() || p.isDirty(), p.painted);
+        assertEquals(p.shouldUseCache() || p.isCacheCleared() || p.isDirty(), p.painted);
+        p.painted = false;
         p.paint(g, null, 10, 10);
         assertEquals(!p.shouldUseCache() || p.isCacheCleared() || p.isDirty(), p.painted);
 
-        //test that a cache is not used unless cacheable is true AND filters are set
+        //test that a cache is not used unless cacheable is true OR filters are set
         p.reset();
         p.setCacheable(true);
         p.paint(g, null, 10, 10);
         assertTrue(p.painted);
         p.painted = false;
         p.paint(g, null, 10, 10);
-        assertTrue(p.painted);
+        assertFalse(p.painted);
 
         p.reset();
         p.setCacheable(false);
@@ -127,7 +136,7 @@ public class AbstractPainterTest extends TestCase {
         assertTrue(p.painted);
         p.painted = false;
         p.paint(g, null, 10, 10);
-        assertTrue(p.painted);
+        assertFalse(p.painted);
 
         p.reset();
         p.setCacheable(true);

@@ -186,10 +186,12 @@ public class CompoundPainterTest extends TestCase {
         cp1.paint(g, null, 10, 10);
         assertTrue(cp1.painted);
         assertTrue(p1.painted);
-        assertTrue(p2.painted);
+        // p2 has filters therefore is cacheable by default (inherited from AbstractPainter)
+        assertFalse(p2.painted);
         assertTrue(cp2.painted);
         assertTrue(p3.painted);
-        assertTrue(p4.painted);
+        // p4 has filters therefore is cacheable by default (inherited from AbstractPainter)
+        assertFalse(p4.painted);
         assertTrue(p5.painted);
     }
 
@@ -197,6 +199,8 @@ public class CompoundPainterTest extends TestCase {
         TestableCompoundPainter base = new TestableCompoundPainter();
         base.setCacheable(true);
         TestableCompoundPainter background = new TestableCompoundPainter();
+        // ... since default is now false
+        background.setCacheable(true);
         TestablePainter iris = new TestablePainter();
         TestablePainter[] painters = new TestablePainter[100];
         for (int i=0; i<painters.length; i++) {
@@ -213,10 +217,11 @@ public class CompoundPainterTest extends TestCase {
         base.painted = false;
         background.painted = false;
         iris.painted = false;
-        
+
         iris.setDirty(true);
         base.paint(g, null, 10, 10);
         assertTrue(base.painted);
+        // this can be false only as long as background is set cachable BEFORE it is painted!
         assertFalse(background.painted);
         assertTrue(iris.painted);
     }
@@ -229,7 +234,7 @@ public class CompoundPainterTest extends TestCase {
             painted = true;
             super.doPaint(g, obj, width, height);
         }
-
+        
         void reset() {
             painted = false;
         }

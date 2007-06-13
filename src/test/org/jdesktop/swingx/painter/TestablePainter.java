@@ -32,6 +32,15 @@ class TestablePainter extends AbstractPainter {
     boolean configured = false;
     boolean configureCalledFirst = false;
     Object last;
+    
+    public TestablePainter() {
+        super();
+    }
+
+    public TestablePainter(boolean cacheable) {
+        super(cacheable);
+    }
+
     protected void doPaint(Graphics2D g, Object obj, int width, int height) {
         painted = true;
         last = obj;
