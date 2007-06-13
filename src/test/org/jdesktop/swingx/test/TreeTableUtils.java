@@ -4,6 +4,7 @@
 package org.jdesktop.swingx.test;
 
 import java.util.Enumeration;
+import java.util.Vector;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -20,7 +21,9 @@ public class TreeTableUtils {
     }
     
     public static DefaultTreeTableModel convertDefaultTreeModel(DefaultTreeModel model) {
-        DefaultTreeTableModel ttModel = new DefaultTreeTableModel();
+    	Vector<String> v = new Vector<String>();
+    	v.add("A");
+        DefaultTreeTableModel ttModel = new DefaultTreeTableModel(null, v);
         
         ttModel.setRoot(convertDefaultMutableTreeNode((DefaultMutableTreeNode) model.getRoot()));
         
