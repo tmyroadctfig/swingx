@@ -65,16 +65,27 @@ public class ComponentTreeTableModel extends AbstractTreeTableModel {
 
     /**
      * This method is called by the "tree" part to render the hierarchical
-     * column.
+     * column. <p>
+     * 
+     * PENDING: currently need to comment to let the treetable show the
+     *   correct value. Need to dig why ...
      * 
      * @param node
      *            the node to convert
      * @return the {@code node} as a string
      */
-    public String convertValueToText(Object node) {
-        return String.valueOf(getValueAt(node, 0));
-    }
+//    public String convertValueToText(Object node) {
+//        return String.valueOf(getValueAt(node, getHierarchicalColumn()));
+//    }
     
+
+    @Override
+    public void valueForPathChanged(TreePath path, Object newValue) {
+        Object node = path.getLastPathComponent();
+        setValueAt(newValue, node, getHierarchicalColumn());
+    }
+
+
 //------------------ TreeTableModel    
 
     public Class<?> getColumnClass(int column) {
@@ -93,6 +104,7 @@ public class ComponentTreeTableModel extends AbstractTreeTableModel {
     public int getColumnCount() {
         return 3;
     }
+    
     public String getColumnName(int column) {
         switch (column) {
         case 0:
@@ -142,19 +154,7 @@ public class ComponentTreeTableModel extends AbstractTreeTableModel {
 
     private void nodeChanged(Component comp) {
         TreePath path = getPathToRoot(comp);
-        Object node = path.getLastPathComponent();
-        TreePath parentPath = path.getParentPath();
-
-        if (parentPath == null) {
-            //todo....
-           // fireChildrenChanged(path, null, null);
-        } else {
-            Object parent = parentPath.getLastPathComponent();
-
-            modelSupport.fireChildChanged(new TreePath(parentPath),
-                    getIndexOfChild(parent, node), node);
-        }
-        
+        modelSupport.firePathChanged(path);
     }
 
     /**

@@ -82,7 +82,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         setSystemLF(true);
         JXTreeTableVisualCheck test = new JXTreeTableVisualCheck();
         try {
-            test.runInteractiveTests();
+//            test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Hierarchical.*");
 //               test.runInteractiveTests("interactive.*ToolTip.*");
 //           test.runInteractiveTests("interactive.*DnD.*");
@@ -90,7 +90,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
 //             test.runInteractiveTests("interactive.*RToL.*");
 //             test.runInteractiveTests("interactive.*Highl.*");
-//             test.runInteractiveTests("interactive.*Render.*");
+             test.runInteractiveTests("interactive.*Edit.*");
         } catch (Exception ex) {
 
         }
@@ -150,8 +150,11 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 
     private ComponentTreeTableModel createMutableVisualizeModel() {
         JXPanel frame = new JXPanel();
-        frame.add(new JTextField());
-        frame.add(new JTextField());
+        frame.setName("somename for root");
+        JTextField textField = new JTextField();
+        textField.setName("firstchild");
+        frame.add(textField);
+        frame.add(textField);
         frame.add(new JComboBox());
         frame.add(new JXDatePicker());
         return new ComponentTreeTableModel(frame);
