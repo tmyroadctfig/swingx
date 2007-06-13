@@ -34,9 +34,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.action.LinkAction;
@@ -54,6 +54,7 @@ import org.jdesktop.swingx.renderer.WrappingProvider;
 import org.jdesktop.swingx.test.ActionMapTreeTableModel;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.TreeTableUtils;
+import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.MutableTreeTableNode;
@@ -154,7 +155,8 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         table.expandAll();
         final TableModelReport report = new TableModelReport();
         table.getModel().addTableModelListener(report);
-        ((DefaultTreeModel) model).setRoot(null);  
+        TableModel tm = table.getModel();
+        ((DefaultTreeTableModel) model).setRoot(null);
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 assertEquals("tableModel must have fired", 1, report.getEventCount());
@@ -178,7 +180,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         table.expandAll();
         final TableModelReport report = new TableModelReport();
         table.getModel().addTableModelListener(report);
-        ((DefaultTreeModel) model).setRoot(new DefaultMutableTreeNode("other"));  
+        ((DefaultTreeTableModel) model).setRoot(new DefaultMutableTreeTableNode("other"));  
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 assertEquals("tableModel must have fired", 1, report.getEventCount());
@@ -253,13 +255,13 @@ public class JXTreeTableIssues extends InteractiveTestCase {
      */
     public void testTableEventDeleteOnTreeTableModel() {
         TreeTableModel model = createCustomTreeTableModelFromDefault();
-        MutableTreeNode root = (MutableTreeNode) model.getRoot();
-        MutableTreeNode sportsNode = (MutableTreeNode) root.getChildAt(1);
+        MutableTreeTableNode root = (MutableTreeTableNode) model.getRoot();
+        MutableTreeTableNode sportsNode = (MutableTreeTableNode) root.getChildAt(1);
         int childrenToDelete = sportsNode.getChildCount() - 1;
         
         for (int i = 0; i < childrenToDelete; i++) {
-            MutableTreeNode firstChild = (MutableTreeNode) sportsNode.getChildAt(0);
-            ((DefaultTreeModel) model).removeNodeFromParent(firstChild);
+            MutableTreeTableNode firstChild = (MutableTreeTableNode) sportsNode.getChildAt(0);
+            ((DefaultTreeTableModel) model).removeNodeFromParent(firstChild);
         }
         // sanity
         assertEquals(1, sportsNode.getChildCount());
@@ -272,8 +274,8 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         final TableModelReport report = new TableModelReport();
         table.getModel().addTableModelListener(report);
         // remove the last child from sports node
-        MutableTreeNode firstChild = (MutableTreeNode) sportsNode.getChildAt(0);
-        ((DefaultTreeModel) model).removeNodeFromParent(firstChild);
+        MutableTreeTableNode firstChild = (MutableTreeTableNode) sportsNode.getChildAt(0);
+        ((DefaultTreeTableModel) model).removeNodeFromParent(firstChild);
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 assertEquals("tableModel must have fired exactly one event", 1, report.getEventCount());
@@ -318,12 +320,14 @@ public class JXTreeTableIssues extends InteractiveTestCase {
 
     
     /**
-     * Issue #493-swingx: JXTreeTable.TreeTableModelAdapter: Inconsistency
-     * firing update.
-     * Use the second child of root - first is accidentally okay.
-     * 
-     * from tiberiu@dev.java.net
-     */
+	 * Issue #493-swingx: JXTreeTable.TreeTableModelAdapter: Inconsistency
+	 * firing update. Use the second child of root - first is accidentally okay.
+	 * 
+	 * from tiberiu@dev.java.net
+	 * 
+	 * TODO DefaultMutableTreeTableNodes do not allow value changes, so this
+	 * test will never work
+	 */
     public void interactiveTreeTableModelAdapterUpdate() {
         TreeTableModel customTreeTableModel = createCustomTreeTableModelFromDefault();
 
@@ -374,8 +378,8 @@ public class JXTreeTableIssues extends InteractiveTestCase {
                 "JXTreeTable.TreeTableModelAdapter: Inconsistency firing update");
         Action changeValue = new AbstractAction("delete first child of sports") {
             public void actionPerformed(ActionEvent e) {
-                MutableTreeNode firstChild = (MutableTreeNode) table.getPathForRow(6 +1).getLastPathComponent();
-                ((DefaultTreeModel) customTreeTableModel).removeNodeFromParent(firstChild);
+                MutableTreeTableNode firstChild = (MutableTreeTableNode) table.getPathForRow(6 +1).getLastPathComponent();
+                ((DefaultTreeTableModel) customTreeTableModel).removeNodeFromParent(firstChild);
             }
         };
         addAction(frame, changeValue);
@@ -402,8 +406,8 @@ public class JXTreeTableIssues extends InteractiveTestCase {
             public void actionPerformed(ActionEvent e) {
                 int row = table.getSelectedRow();
                 if (row < 0) return;
-                MutableTreeNode firstChild = (MutableTreeNode) table.getPathForRow(row).getLastPathComponent();
-                ((DefaultTreeModel) customTreeTableModel).removeNodeFromParent(firstChild);
+                MutableTreeTableNode firstChild = (MutableTreeTableNode) table.getPathForRow(row).getLastPathComponent();
+                ((DefaultTreeTableModel) customTreeTableModel).removeNodeFromParent(firstChild);
             }
         };
         addAction(frame, changeValue);
@@ -412,9 +416,9 @@ public class JXTreeTableIssues extends InteractiveTestCase {
                 int row = table.getSelectedRow();
                 if (row < 0) return;
                 
-                MutableTreeNode firstChild = (MutableTreeNode) table.getPathForRow(row).getLastPathComponent();
-                MutableTreeNode newChild = new DefaultMutableTreeNode("inserted");
-                ((DefaultTreeModel) customTreeTableModel)
+                MutableTreeTableNode firstChild = (MutableTreeTableNode) table.getPathForRow(row).getLastPathComponent();
+                MutableTreeTableNode newChild = new DefaultMutableTreeTableNode("inserted");
+                ((DefaultTreeTableModel) customTreeTableModel)
                   .insertNodeInto(newChild, firstChild, 0);
             }
         };
@@ -443,23 +447,18 @@ public class JXTreeTableIssues extends InteractiveTestCase {
             public void actionPerformed(ActionEvent e) {
                 int row = table.getSelectedRow();
                 if (row < 0) return;
-                MutableTreeNode firstChild = (MutableTreeNode) table.getPathForRow(row).getLastPathComponent();
-                MutableTreeNode parent = (MutableTreeNode) firstChild.getParent();
-                MutableTreeNode secondNextSibling = null;
+                MutableTreeTableNode firstChild = (MutableTreeTableNode) table.getPathForRow(row).getLastPathComponent();
+                MutableTreeTableNode parent = (MutableTreeTableNode) firstChild.getParent();
+                MutableTreeTableNode secondNextSibling = null;
                 int firstIndex = parent.getIndex(firstChild);
                 if (firstIndex + 2 < parent.getChildCount()) {
-                    secondNextSibling = (MutableTreeNode) parent.getChildAt(firstIndex + 2);
+                    secondNextSibling = (MutableTreeTableNode) parent.getChildAt(firstIndex + 2);
                 }
                 if (secondNextSibling != null) {
-                    parent.remove(firstIndex + 2);
-                    parent.remove(firstIndex);
-                    int[] childIndices = new int[] {firstIndex, firstIndex + 2};
-                    Object[] children = new Object[] {firstChild, secondNextSibling};
-                    ((DefaultTreeModel) customTreeTableModel)
-                        .nodesWereRemoved(parent, childIndices, children);
-                } else { // remove selected only
-                    ((DefaultTreeModel) customTreeTableModel).removeNodeFromParent(firstChild);
+                	((DefaultTreeTableModel) customTreeTableModel).removeNodeFromParent(secondNextSibling);
                 }
+                
+                ((DefaultTreeTableModel) customTreeTableModel).removeNodeFromParent(firstChild);
             }
         };
         addAction(frame, changeValue);
@@ -468,9 +467,9 @@ public class JXTreeTableIssues extends InteractiveTestCase {
                 int row = table.getSelectedRow();
                 if (row < 0) return;
                 
-                MutableTreeNode firstChild = (MutableTreeNode) table.getPathForRow(row).getLastPathComponent();
-                MutableTreeNode newChild = new DefaultMutableTreeNode("inserted");
-                ((DefaultTreeModel) customTreeTableModel)
+                MutableTreeTableNode firstChild = (MutableTreeTableNode) table.getPathForRow(row).getLastPathComponent();
+                MutableTreeTableNode newChild = new DefaultMutableTreeTableNode("inserted");
+                ((DefaultTreeTableModel) customTreeTableModel)
                   .insertNodeInto(newChild, firstChild, 0);
             }
         };
