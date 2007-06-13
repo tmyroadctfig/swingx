@@ -87,6 +87,17 @@ public class JXTreeTableIssues extends InteractiveTestCase {
             e.printStackTrace();
         }
     }
+    
+    /**
+     * Issue #531-swingx: IllegalArgumentException on setModel.
+     *
+     */
+    public void testSetModel() {
+        TreeTableModel model = createCustomTreeTableModelFromDefault();
+        JXTreeTable treeTable = new JXTreeTable(model);
+        treeTable.setTreeTableModel(createCustomTreeTableModelFromDefault());
+    }
+    
     /**
      * Issue #493-swingx: JXTreeTable.TreeTableModelAdapter: Inconsistency
      * firing update.
@@ -117,6 +128,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
             }
         });        
     }
+
     /**
      * Issue #493-swingx: incorrect table events fired.
      * 
@@ -166,7 +178,6 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         });        
         
     }
-
 
     /**
      * Issue #493-swingx: incorrect table events fired.
@@ -295,6 +306,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
 
     // -------------- interactive tests
 
+    
     /**
      * Issue #493-swingx: JXTreeTable.TreeTableModelAdapter: Inconsistency
      * firing update.
