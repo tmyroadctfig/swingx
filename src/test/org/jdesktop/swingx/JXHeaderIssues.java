@@ -64,7 +64,7 @@ public class JXHeaderIssues extends InteractiveTestCase {
         // fishing in the internals ... not really safe, there are 2 labels
         JLabel label = null;
         for (int i = 0; i < header.getComponentCount(); i++) {
-            if (header.getComponent(i) instanceof JLabel) {
+            if (header.getComponent(i) instanceof JLabel && !(header.getComponent(i) instanceof JXLabel)) {
                 label = (JLabel) header.getComponent(i);
                 break;
             }
