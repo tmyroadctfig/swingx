@@ -100,6 +100,15 @@ public class JXTreeTableIssues extends InteractiveTestCase {
     }
     
     /**
+     * Issue #531-swingx: IllegalArgumentException on setModel.
+     *
+     */
+    public void testSetModelEmptyContructor() {
+        JXTreeTable treeTable = new JXTreeTable();
+        treeTable.setRootVisible(true);
+        treeTable.setTreeTableModel(createCustomTreeTableModelFromDefault());
+    }
+    /**
      * Issue #493-swingx: JXTreeTable.TreeTableModelAdapter: Inconsistency
      * firing update.
      * 
