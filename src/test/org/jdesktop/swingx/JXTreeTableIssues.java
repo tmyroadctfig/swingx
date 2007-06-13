@@ -95,6 +95,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
     public void testSetModel() {
         TreeTableModel model = createCustomTreeTableModelFromDefault();
         JXTreeTable treeTable = new JXTreeTable(model);
+        treeTable.setRootVisible(true);
         treeTable.setTreeTableModel(createCustomTreeTableModelFromDefault());
     }
     
