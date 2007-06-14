@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jdesktop.swingx.RolloverProducer;
+import org.jdesktop.swingx.util.Contract;
 
 /**
  * The predicate used by AbstractHighlighter to control 
@@ -187,13 +188,13 @@ public interface HighlightPredicate {
         
         /**
          * Instantiates a predicate which ORs all given predicates.
-         * @param predicate zero or more not null predicates to and
+         * @param predicate zero or more not null predicates to OR
          * @throws NullPointerException if the predicate is null
          */
         public OrHighlightPredicate(HighlightPredicate... predicate) {
-            if (predicate == null) 
-                throw new NullPointerException("predicate must not be null");
-            this.predicate = Arrays.asList(predicate);
+//            if (predicate == null) 
+//                throw new NullPointerException("predicate must not be null");
+            this.predicate = Arrays.asList(Contract.checkNull(predicate, "predicate must not be null"));
         }
         
         /**

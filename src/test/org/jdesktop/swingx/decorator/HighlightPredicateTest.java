@@ -117,6 +117,44 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     }
     
     /**
+     * Issue #5??-swingx: OrPredicate must throw if any of the parameters
+     *   is null.
+     *
+     */
+    public void testOrThrowsOnNullPredicates() {
+        try {
+            new OrHighlightPredicate((HighlightPredicate[]) null);
+            fail("orPredicate constructor must throw IllegalArgumentEx on null predicate");
+            
+        } catch (NullPointerException ex) {
+            // do nothing - the doc'ed exception
+        } catch (Exception ex) {
+            fail("unexpected exception: " + ex);
+        }
+
+        try {
+            new OrHighlightPredicate(HighlightPredicate.ALWAYS, null);
+            fail("orPredicate constructor must throw NullPointerException on null predicate");
+            
+        } catch (NullPointerException ex) {
+            // do nothing - the doc'ed exception
+        } catch (Exception ex) {
+            fail("unexpected exception: " + ex);
+        }
+            
+
+        try {
+            new OrHighlightPredicate((HighlightPredicate) null);
+            fail("orPredicate constructor must throw IllegalArgumentEx on null predicate");
+            
+        } catch (NullPointerException ex) {
+            // do nothing - the doc'ed exception
+        } catch (Exception ex) {
+            fail("unexpected exception: " + ex);
+        }
+            
+    }
+    /**
      * test the AND predicate. Boring as it is, is it complete?
      *
      */
