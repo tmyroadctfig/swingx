@@ -160,9 +160,7 @@ public interface HighlightPredicate {
          * @throws NullPointerException if the predicate is null
          */
         public AndHighlightPredicate(HighlightPredicate... predicate) {
-            if (predicate == null) 
-                throw new NullPointerException("predicate must not be null");
-            this.predicate = Arrays.asList(predicate);
+            this.predicate = Arrays.asList(Contract.asNotNull(predicate, "predicate must not be null"));
         }
         
         /**
@@ -192,9 +190,7 @@ public interface HighlightPredicate {
          * @throws NullPointerException if the predicate is null
          */
         public OrHighlightPredicate(HighlightPredicate... predicate) {
-//            if (predicate == null) 
-//                throw new NullPointerException("predicate must not be null");
-            this.predicate = Arrays.asList(Contract.checkNull(predicate, "predicate must not be null"));
+            this.predicate = Arrays.asList(Contract.asNotNull(predicate, "predicate must not be null"));
         }
         
         /**

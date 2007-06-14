@@ -117,7 +117,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     }
     
     /**
-     * Issue #5??-swingx: OrPredicate must throw if any of the parameters
+     * Issue #520-swingx: OrPredicate must throw if any of the parameters
      *   is null.
      *
      */
@@ -154,6 +154,46 @@ public class HighlightPredicateTest extends InteractiveTestCase {
         }
             
     }
+
+    /**
+     * Issue #520-swingx: OrPredicate must throw if any of the parameters
+     *   is null.
+     *
+     */
+    public void testAndThrowsOnNullPredicates() {
+        try {
+            new AndHighlightPredicate((HighlightPredicate[]) null);
+            fail("AndPredicate constructAnd must throw IllegalArgumentEx on null predicate");
+            
+        } catch (NullPointerException ex) {
+            // do nothing - the doc'ed exception
+        } catch (Exception ex) {
+            fail("unexpected exception: " + ex);
+        }
+
+        try {
+            new AndHighlightPredicate(HighlightPredicate.ALWAYS, null);
+            fail("AndPredicate constructAnd must throw NullPointerException on null predicate");
+            
+        } catch (NullPointerException ex) {
+            // do nothing - the doc'ed exception
+        } catch (Exception ex) {
+            fail("unexpected exception: " + ex);
+        }
+            
+
+        try {
+            new AndHighlightPredicate((HighlightPredicate) null);
+            fail("AndPredicate constructAnd must throw IllegalArgumentEx on null predicate");
+            
+        } catch (NullPointerException ex) {
+            // do nothing - the doc'ed exception
+        } catch (Exception ex) {
+            fail("unexpected exception: " + ex);
+        }
+            
+    }
+
     /**
      * test the AND predicate. Boring as it is, is it complete?
      *
@@ -224,6 +264,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
         adapter.column = 1;
         assertTrue("column 1 must be highlighted", predicate.isHighlighted(allColored, adapter));
     }
+
 
     public void testPattern() {
         // start with "t"
