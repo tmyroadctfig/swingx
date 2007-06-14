@@ -2218,7 +2218,11 @@ public class JXTreeTable extends JXTable {
                 Object val = value;
                 
                 if (treeTable != null) {
-                    val = treeTable.getValueAt(row, treeTable.getHierarchicalColumn());
+                    Object o = treeTable.getValueAt(row, treeTable.getHierarchicalColumn());
+                    
+                    if (o != null) {
+                    	val = o;
+                    }
                 }
                 
                 return super.getTreeCellRendererComponent(tree, val, sel, expanded, leaf,
