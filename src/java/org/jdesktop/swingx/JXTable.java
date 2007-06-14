@@ -1604,6 +1604,7 @@ public class JXTable extends JTable
         use(filters);
         getRowModelMapper().setFilters(filters);
         getSelectionMapper().setFilters(filters);
+        repaint();
     }
 
 

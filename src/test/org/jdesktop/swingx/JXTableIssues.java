@@ -55,6 +55,8 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.action.BoundAction;
+import org.jdesktop.swingx.decorator.FilterPipeline;
+import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.SortKey;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.treetable.FileSystemModel;
@@ -76,6 +78,16 @@ public class JXTableIssues extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXTableIssues.class
             .getName());
 
+    public void testIndividualRowHeightAndFilter() {
+        JXTable table = new JXTable(createAscendingModel(0, 50));
+        table.setRowHeightEnabled(true);
+        table.setRowHeight(1, 100);
+        final FilterPipeline filterPipeline = new FilterPipeline(new PatternFilter("[123]",0,0));
+        table.setFilters(filterPipeline);
+        // sanity
+        assertEquals(1, table.getValueAt(0, 0));
+        assertEquals(100, table.getRowHeight(0));
+    }
     /**
      * core issue: JTable cannot cope with null selection background.
      *
@@ -509,12 +521,34 @@ public class JXTableIssues extends InteractiveTestCase {
     
     }
 
+//----------------- interactive
     
+    public void interactiveIndividualRowHeightAndFilter() {
+        final JXTable table = new JXTable(createAscendingModel(0, 50));
+        table.setRowHeightEnabled(true);
+        table.setRowHeight(1, 100);
+        final FilterPipeline filterPipeline = new FilterPipeline(new PatternFilter(".*1.*",0,0));
+        Action action = new AbstractAction("filter") {
+
+            public void actionPerformed(ActionEvent e) {
+                if (table.getFilters() == filterPipeline) {
+                    table.setFilters(null);
+                } else {
+                    table.setFilters(filterPipeline);
+                }
+            }
+            
+        };
+        JXFrame frame = wrapWithScrollingInFrame(table, "toggle filter and indi rowheight");
+        addAction(frame, action);
+        frame.setVisible(true);
+    }
     public void interactiveDeleteRowAboveSelection() {
         CompareTableBehaviour compare = new CompareTableBehaviour(new Object[] { "A", "B", "C", "D", "E", "F", "G", "H", "I" });
         compare.table.getSelectionModel().setSelectionInterval(2, 5);
         compare.xTable.getSelectionModel().setSelectionInterval(2, 5);
         JComponent box = createContent(compare, createRowDeleteAction(0, compare.tableModel));
+        
         JFrame frame = wrapInFrame(box, "delete above selection");
         frame.setVisible(true);
     }
@@ -812,7 +846,7 @@ public class JXTableIssues extends InteractiveTestCase {
           test.runInteractiveTests();
          //   test.runInteractiveTests("interactive.*Siz.*");
          //   test.runInteractiveTests("interactive.*Render.*");
-//            test.runInteractiveTests(".*DataChanged.*");
+//            test.runInteractiveTests(".*RowHeight.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();

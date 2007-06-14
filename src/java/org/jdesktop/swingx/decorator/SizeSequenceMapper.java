@@ -20,6 +20,8 @@
  */
 package org.jdesktop.swingx.decorator;
 
+import java.util.Arrays;
+
 import javax.swing.SizeSequence;
 
 /**
@@ -99,14 +101,19 @@ public class SizeSequenceMapper {
 
     public void restoreSelection() {
         if (viewSizes == null) return;
-        viewSizes.setSizes(new int[0]);
-        viewSizes.insertEntries(0, getOutputSize(), defaultHeight);
+        int[] sizes = new int[getOutputSize()];
+        Arrays.fill(sizes, defaultHeight);
+        viewSizes.setSizes(sizes);
+//        viewSizes.setSizes(new int[0]);
+//        viewSizes.insertEntries(0, getOutputSize(), defaultHeight);
 
         int[] selected = modelSizes.getSizes();
         for (int i = 0; i < selected.length; i++) {
           int index = convertToView(i);
-          // index might be -1, but then addSelectionInterval ignores it. 
-          viewSizes.setSize(index, selected[i]);
+          // index might be -1, ignore. 
+          if (index >= 0) {
+              viewSizes.setSize(index, selected[i]);
+          }
         }
     }
 
