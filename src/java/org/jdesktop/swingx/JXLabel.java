@@ -326,7 +326,38 @@ public class JXLabel extends JLabel {
     public boolean isLineWrap() {
         return this.multiLine;
     }
-
+   
+    
+    
+    private boolean paintBorderInsets = true;
+    
+    /**
+     * Returns true if the background painter should paint where the border is
+     * or false if it should only paint inside the border. This property is 
+     * true by default. This property affects the width, height,
+     * and intial transform passed to the background painter.
+     * @return current value of the paintBorderInsets property
+     */
+    public boolean isPaintBorderInsets() {
+        return paintBorderInsets;
+    }
+    
+    /**
+     * Sets the paintBorderInsets property.
+     * Set to true if the background painter should paint where the border is
+     * or false if it should only paint inside the border. This property is true by default.
+     * This property affects the width, height,
+     * and intial transform passed to the background painter.
+     * 
+     * This is a bound property.
+     * @param paintBorderInsets new value of the paintBorderInsets property
+     */
+    public void setPaintBorderInsets(boolean paintBorderInsets) {
+        boolean old = this.isPaintBorderInsets();
+        this.paintBorderInsets = paintBorderInsets;
+        firePropertyChange("paintBorderInsets", old, isPaintBorderInsets());
+    }
+    
     /**
      * @param g graphics to paint on
      */
@@ -342,10 +373,14 @@ public class JXLabel extends JLabel {
             super.paintComponent(g);
         } else {
             Graphics2D g2 = (Graphics2D) g.create();
-            Insets i = getInsets();
-            g2.translate(i.left, i.top);
-            pWidth = getWidth() - i.left - i.right;
-            pHeight = getHeight() - i.top - i.bottom;
+            pWidth = getWidth();
+            pHeight = getHeight();
+            if(!isPaintBorderInsets()) {
+                Insets i = getInsets();
+                g2.translate(i.left, i.top);
+                pWidth = getWidth() - i.left - i.right;
+                pHeight = getHeight() - i.top - i.bottom;
+            }
             if (backgroundPainter != null) {
                 backgroundPainter.paint(g2, this, pWidth, pHeight);
             }
@@ -458,7 +493,7 @@ public class JXLabel extends JLabel {
             g2.dispose();
         }
     }
-
+    
     @Override
     public void repaint() {
         if (ignoreRepaint) {

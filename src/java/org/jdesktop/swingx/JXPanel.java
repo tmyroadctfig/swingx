@@ -262,9 +262,38 @@ public class JXPanel extends JPanel implements Scrollable {
      * is a painter which draws the normal JPanel background according to the current look and feel.
      * @return the current painter
      * @see setBackgroundPainter(Painter)
+     * @see isPaintBorderInsets()
      */
     public Painter getBackgroundPainter() {
         return backgroundPainter;
+    }
+    
+    
+    private boolean paintBorderInsets = true;
+    
+    /**
+     * Returns true if the background painter should paint where the border is
+     * or false if it should only paint inside the border. This property is 
+     * true by default. This property affects the width, height,
+     * and intial transform passed to the background painter.
+     */
+    public boolean isPaintBorderInsets() {
+        return paintBorderInsets;
+    }
+    
+    /**
+     * Sets the paintBorderInsets property.
+     * Set to true if the background painter should paint where the border is
+     * or false if it should only paint inside the border. This property is true by default.
+     * This property affects the width, height,
+     * and intial transform passed to the background painter.
+     * 
+     * This is a bound property.
+     */
+    public void setPaintBorderInsets(boolean paintBorderInsets) {
+        boolean old = this.isPaintBorderInsets();
+        this.paintBorderInsets = paintBorderInsets;
+        firePropertyChange("paintBorderInsets", old, isPaintBorderInsets());
     }
     
     /**
@@ -280,7 +309,6 @@ public class JXPanel extends JPanel implements Scrollable {
         g2d.setComposite(alphaComp);
         super.paint(g2d);
         g2d.setComposite(oldComp);
-        //josh: shouldn't be needed here. g2d.dispose();
     }
     
     /**
@@ -292,11 +320,15 @@ public class JXPanel extends JPanel implements Scrollable {
         if(backgroundPainter != null) {
             Graphics2D g2 = (Graphics2D)g.create();
             // account for the insets
-            Insets ins = this.getInsets();
-            g2.translate(ins.left, ins.top);            
-            backgroundPainter.paint(g2, this,
-                                    this.getWidth() - ins.left - ins.right,
-                                    this.getHeight() - ins.top - ins.bottom);
+            if(isPaintBorderInsets()) {
+                backgroundPainter.paint(g2, this, this.getWidth(), this.getHeight());
+            } else {
+                Insets ins = this.getInsets();
+                g2.translate(ins.left, ins.top);            
+                backgroundPainter.paint(g2, this,
+                                        this.getWidth() - ins.left - ins.right,
+                                        this.getHeight() - ins.top - ins.bottom);
+            }
             g2.dispose();
         } else {
             super.paintComponent(g);

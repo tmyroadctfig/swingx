@@ -23,6 +23,7 @@ package org.jdesktop.swingx;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import javax.swing.*;
@@ -106,19 +107,57 @@ public class JXButton extends JButton {
         repaint();
     }
     
+    private boolean paintBorderInsets = true;
+    
+    /**
+     * Returns true if the background painter should paint where the border is
+     * or false if it should only paint inside the border. This property is 
+     * true by default. This property affects the width, height,
+     * and intial transform passed to the background painter.
+     */
+    public boolean isPaintBorderInsets() {
+        return paintBorderInsets;
+    }
+    
+    /**
+     * Sets the paintBorderInsets property.
+     * Set to true if the background painter should paint where the border is
+     * or false if it should only paint inside the border. This property is true by default.
+     * This property affects the width, height,
+     * and intial transform passed to the background painter.
+     * 
+     * This is a bound property.
+     */
+    public void setPaintBorderInsets(boolean paintBorderInsets) {
+        boolean old = this.isPaintBorderInsets();
+        this.paintBorderInsets = paintBorderInsets;
+        firePropertyChange("paintBorderInsets", old, isPaintBorderInsets());
+    }
+    
     protected void paintComponent(Graphics g) {
         Painter bgPainter = getBackgroundPainter();
         Painter fgPainter = getForegroundPainter();
         if (bgPainter == null && fgPainter == null) {
             super.paintComponent(g);
         } else {
-            if (bgPainter != null) {
-                bgPainter.paint((Graphics2D)g, this, getWidth(), getHeight());
-            }
-
-            if (fgPainter != null) {
-                fgPainter.paint((Graphics2D)g, this, getWidth(), getHeight());
-            }
+            invokePainter(g, bgPainter);
+            invokePainter(g, fgPainter);
+        }
+    }
+    
+    private void invokePainter(Graphics g, Painter ptr) {
+        if(ptr == null) return;
+        
+        if(isPaintBorderInsets()) {
+            ptr.paint((Graphics2D)g, this, getWidth(), getHeight());
+        } else {
+            Graphics2D g2 = (Graphics2D) g;
+            Insets ins = this.getInsets();
+            g2.translate(ins.left, ins.top);
+            ptr.paint(g2, this,
+                    this.getWidth() - ins.left - ins.right,
+                    this.getHeight() - ins.top - ins.bottom);
+            g2.translate(-ins.left, -ins.top);
         }
     }
         
