@@ -15,9 +15,11 @@ import javax.swing.JLabel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.RolloverProducer;
+import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.EqualsHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.NotHighlightPredicate;
+import org.jdesktop.swingx.decorator.HighlightPredicate.OrHighlightPredicate;
 
 /**
  * 
@@ -84,10 +86,52 @@ public class HighlightPredicateTest extends InteractiveTestCase {
         assertFalse(HighlightPredicate.NEVER.isHighlighted(allColored, adapter));
     }
     
+    /**
+     * test the NOT predicate.
+     *
+     */
     public void testNot() {
         ComponentAdapter adapter = createComponentAdapter(allColored, true);
-        HighlightPredicate predicate = new NotHighlightPredicate(HighlightPredicate.NEVER);
-        assertTrue(predicate.isHighlighted(allColored, adapter));
+        HighlightPredicate notNever = new NotHighlightPredicate(HighlightPredicate.NEVER);
+        assertTrue(notNever.isHighlighted(allColored, adapter));
+        HighlightPredicate notAlways = new NotHighlightPredicate(HighlightPredicate.ALWAYS);
+        assertFalse(notAlways.isHighlighted(allColored, adapter));
+    }
+    
+    /**
+     * test the OR predicate. Boring as it is, is it complete?
+     *
+     */
+    public void testOr() {
+        ComponentAdapter adapter = createComponentAdapter(allColored, true);
+        HighlightPredicate oneTrue = new OrHighlightPredicate(HighlightPredicate.ALWAYS);
+        assertTrue(oneTrue.isHighlighted(allColored, adapter));
+        HighlightPredicate oneFalse = new OrHighlightPredicate(HighlightPredicate.NEVER);
+        assertFalse(oneFalse.isHighlighted(allColored, adapter));
+        HighlightPredicate oneFalseOneTrue = new OrHighlightPredicate(
+                HighlightPredicate.NEVER, HighlightPredicate.ALWAYS);
+        assertTrue(oneFalseOneTrue.isHighlighted(allColored, adapter));
+        HighlightPredicate oneTrueOneFalse = new OrHighlightPredicate(
+                HighlightPredicate.ALWAYS, HighlightPredicate.NEVER);
+        assertTrue(oneTrueOneFalse.isHighlighted(allColored, adapter));
+    }
+    
+    /**
+     * test the AND predicate. Boring as it is, is it complete?
+     *
+     */
+    public void testAnd() {
+        ComponentAdapter adapter = createComponentAdapter(allColored, true);
+        HighlightPredicate oneTrue = new AndHighlightPredicate(HighlightPredicate.ALWAYS);
+        assertTrue(oneTrue.isHighlighted(allColored, adapter));
+        HighlightPredicate oneFalse = new AndHighlightPredicate(HighlightPredicate.NEVER);
+        assertFalse(oneFalse.isHighlighted(allColored, adapter));
+        HighlightPredicate oneFalseOneTrue = new AndHighlightPredicate(
+                HighlightPredicate.NEVER, HighlightPredicate.ALWAYS);
+        assertFalse(oneFalseOneTrue.isHighlighted(allColored, adapter));
+        HighlightPredicate oneTrueOneFalse = new AndHighlightPredicate(
+                HighlightPredicate.ALWAYS, HighlightPredicate.NEVER);
+        assertFalse(oneTrueOneFalse.isHighlighted(allColored, adapter));
     }
     
     public void testRolloverRow() {

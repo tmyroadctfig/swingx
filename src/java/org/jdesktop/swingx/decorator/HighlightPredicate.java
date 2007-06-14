@@ -203,7 +203,7 @@ public interface HighlightPredicate {
          */
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
             for (HighlightPredicate hp : predicate) {
-                if (!hp.isHighlighted(renderer, adapter)) return true;
+                if (hp.isHighlighted(renderer, adapter)) return true;
             }
             return false;
         }
