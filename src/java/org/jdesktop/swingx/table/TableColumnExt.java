@@ -167,6 +167,7 @@ public class TableColumnExt extends TableColumn
      * @param editable boolean indicating whether or not the user may edit cell
      *        values in this view column
      * @see #isEditable
+     * @see org.jdesktop.swingx.JXTable#isCellEditable(int, int)
      * @see javax.swing.table.TableModel#isCellEditable
      */
     public void setEditable(boolean editable) {
