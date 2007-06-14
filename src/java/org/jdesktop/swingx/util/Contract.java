@@ -51,13 +51,13 @@ public class Contract {
      * @return the input if not null
      * @thows NullPointerException if input is null
      */
-    public static <T> T checkNull(T input, String message) {
+    public static <T> T asNotNull(T input, String message) {
         if (input == null) 
             throw new NullPointerException(message);
         if (input.getClass().isArray()) {
             T[] array = (T[]) input;
             for (int i = 0; i < array.length; i++) {
-                checkNull(array[i], message);
+                asNotNull(array[i], message);
             }
         }
         return input;
