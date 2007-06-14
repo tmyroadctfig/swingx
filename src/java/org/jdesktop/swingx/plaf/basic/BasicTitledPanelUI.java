@@ -25,12 +25,9 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Font;
-import java.awt.GradientPaint;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Image;
 import java.awt.Insets;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
@@ -42,15 +39,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.UIManager;
+import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.UIResource;
 
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.JXTitledPanel;
 import org.jdesktop.swingx.painter.Painter;
+import org.jdesktop.swingx.plaf.PainterUIResource;
 import org.jdesktop.swingx.plaf.TitledPanelUI;
 
 
@@ -62,11 +60,11 @@ import org.jdesktop.swingx.plaf.TitledPanelUI;
  *
  * @author Richard Bair
  * @author Jeanette Winzenburg
+ * @author rah003
  *
  */
-public abstract class BasicTitledPanelUI extends TitledPanelUI {
-    private static final Logger LOG = Logger.getLogger(BasicTitledPanelUI.class
-            .getName());
+public class BasicTitledPanelUI extends TitledPanelUI {
+    private static final Logger LOG = Logger.getLogger(BasicTitledPanelUI.class.getName());
     
     /**
      * JLabel used for the title in the Title section of the JTitledPanel.
@@ -80,10 +78,7 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
      * Listens to changes in the title of the JXTitledPanel component
      */
     private PropertyChangeListener titleChangeListener;
-    /**
-     * The JXTitledPanel peered with this UI
-     */
-    protected JXTitledPanel titledPanel;
+
     private JComponent left;
     private JComponent right;
     
@@ -91,6 +86,19 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
     public BasicTitledPanelUI() {
     }
     
+    /**
+     * Returns an instance of the UI delegate for the specified component.
+     * Each subclass must provide its own static <code>createUI</code>
+     * method that returns an instance of that UI delegate subclass.
+     * If the UI delegate subclass is stateless, it may return an instance
+     * that is shared by multiple components.  If the UI delegate is
+     * stateful, then it should return a new instance per component.
+     * The default implementation of this method throws an error, as it
+     * should never be invoked.
+     */
+    public static ComponentUI createUI(JComponent c) {
+        return new BasicTitledPanelUI();
+    }
     /**
      * Configures the specified component appropriate for the look and feel.
      * This method is invoked when the <code>ComponentUI</code> instance is being installed
@@ -118,26 +126,32 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
      */
     public void installUI(JComponent c) {
         assert c instanceof JXTitledPanel;
-        titledPanel = (JXTitledPanel)c;
-        
-        installProperty(titledPanel, "titlePainter", (Painter)UIManager.get("JXTitledPanel.title.painter"));
-        installProperty(titledPanel, "titleForeground", UIManager.getColor("JXTitledPanel.title.foreground"));
-        installProperty(titledPanel, "titleFont", UIManager.getFont("JXTitledPanel.title.font"));
-        
+        JXTitledPanel titledPanel = (JXTitledPanel)c;
+        installDefaults(titledPanel);
         
         caption = createAndConfigureCaption(titledPanel);
         topPanel = createAndConfigureTopPanel(titledPanel);
-        fillTopPanel();
-        titledPanel.setLayout(new BorderLayout());
-        titledPanel.add(topPanel, BorderLayout.NORTH);
-        titledPanel.setBorder(BorderFactory.createRaisedBevelBorder());
-        titledPanel.setOpaque(false);
         
-        installListeners();
+        installComponents(titledPanel);
+        installListeners(titledPanel);
         
     }
-    
-    private void fillTopPanel() {
+
+    protected void installDefaults(JXTitledPanel titledPanel) {
+        installProperty(titledPanel, "titlePainter", createBackgroundPainter());
+        installProperty(titledPanel, "titleForeground", UIManager.getColor("JXTitledPanel.title.foreground"));
+        installProperty(titledPanel, "titleFont", UIManager.getFont("JXTitledPanel.title.font"));
+    }
+
+    protected void uninstallDefaults(JXTitledPanel titledPanel) {
+    }
+
+    protected Painter createBackgroundPainter() {
+        Painter p = (Painter)UIManager.get("JXTitledPanel.title.painter");
+        return new PainterUIResource(p);
+    }
+
+    protected void installComponents(JXTitledPanel titledPanel) {
         topPanel.add(caption, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(4, 12, 4, 12), 0, 0));
         if (titledPanel.getClientProperty(JXTitledPanel.RIGHT_DECORATION) instanceof JComponent) {
             setRightDecoration((JComponent) titledPanel.getClientProperty(JXTitledPanel.RIGHT_DECORATION));
@@ -145,6 +159,13 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
         if (titledPanel.getClientProperty(JXTitledPanel.LEFT_DECORATION) instanceof JComponent) {
             setLeftDecoration((JComponent) titledPanel.getClientProperty(JXTitledPanel.LEFT_DECORATION));
         }
+        titledPanel.setLayout(new BorderLayout());
+        titledPanel.add(topPanel, BorderLayout.NORTH);
+        titledPanel.setBorder(BorderFactory.createRaisedBevelBorder());
+        titledPanel.setOpaque(false);
+    }
+    protected void uninstallComponents(JXTitledPanel titledPanel) {
+        titledPanel.remove(topPanel);
     }
     
     private JXPanel createAndConfigureTopPanel(JXTitledPanel titledPanel) {
@@ -188,6 +209,7 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
      */
     public void uninstallUI(JComponent c) {
         assert c instanceof JXTitledPanel;
+        JXTitledPanel titledPanel = (JXTitledPanel) c;
         uninstallListeners(titledPanel);
         // JW: this is needed to make the gradient paint work correctly...
         // LF changes will remove the left/right components...
@@ -203,7 +225,7 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
     }
     
     
-    protected void installListeners() {
+    protected void installListeners(final JXTitledPanel titledPanel) {
         titleChangeListener = new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 if (evt.getPropertyName().equals("title")) {
@@ -221,7 +243,7 @@ public abstract class BasicTitledPanelUI extends TitledPanelUI {
         titledPanel.addPropertyChangeListener(titleChangeListener);
     }
     
-    protected void uninstallListeners(JXTitledPanel panel) {
+    protected void uninstallListeners(JXTitledPanel titledPanel) {
         titledPanel.removePropertyChangeListener(titleChangeListener);
     }
     
