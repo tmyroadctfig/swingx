@@ -168,5 +168,14 @@ public class DefaultTreeTableModelUnitTest extends TestCase {
     	//TODO test removing already removed nodes?
     }
     
+    public void testSetRoot() {
+    	assertEquals(model.getRoot(), root);
+    	
+    	DefaultMutableTreeTableNode newRoot = new DefaultMutableTreeTableNode("a new root");
+    	model.setRoot(newRoot);
+    	
+    	assertEquals(model.getRoot(), newRoot);
+    }
+    
     //TODO test "fire" methods and reloads
 }
