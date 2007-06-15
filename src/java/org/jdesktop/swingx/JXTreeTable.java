@@ -2290,6 +2290,14 @@ public class JXTreeTable extends JXTable {
          * {@inheritDoc}
          */
         @Override
+        public int getDepth() {
+        	return table.getPathForRow(row).getPathCount() - 1;
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public boolean isLeaf() {
             // Issue #270-swingx: guard against invisible row
             TreePath path = table.getPathForRow(row);

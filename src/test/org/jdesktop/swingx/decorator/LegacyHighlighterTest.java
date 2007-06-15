@@ -499,6 +499,10 @@ public class LegacyHighlighterTest extends InteractiveTestCase {
                 return false;
             }
 
+            public boolean isEditable() {
+                return false;
+            }
+            
             public boolean isSelected() {
                 return selected;
             }

@@ -86,6 +86,15 @@ public interface HighlightPredicate {
     };
     
     /**
+     * Is editable.
+     */
+    public static final HighlightPredicate EDITABLE = new HighlightPredicate() {
+        public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+            return adapter.isEditable();
+        }
+    };
+    
+    /**
      * Even rows.
      * 
      * PENDING: this is zero based (that is "really" even 0, 2, 4 ..), differing 
@@ -148,7 +157,7 @@ public interface HighlightPredicate {
         }
         
         /**
-         * @inheritDoc
+         * {@inheritDoc}
          * Implemented to return the negation of the given predicate.
          */
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
@@ -279,6 +288,41 @@ public interface HighlightPredicate {
             return columnList.contains(modelIndex);
         }
         
+    }
+    
+    /**
+     * A {@code HighlightPredicate} based on adapter depth.
+     * 
+     * @author Karl Schaefer
+     */
+    public static class DepthHighlightPredicate implements HighlightPredicate {
+    	private List<Integer> depthList;
+    	
+        /**
+         * Instantiates a predicate which returns true for the
+         * given depths.
+         * 
+         * @param depths the depths to highlight
+         */
+    	public DepthHighlightPredicate(int... depths) {
+    		depthList = new ArrayList<Integer>();
+            for (int i = 0; i < depths.length; i++) {
+                depthList.add(depths[i]);
+            }
+    	}
+    	
+        /**
+         * {@inheritDoc}
+         * 
+         * This implementation returns true if the adapter's depth
+         * is contained in this predicates list.
+         * 
+         */
+		public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+            int depth = adapter.getDepth();
+            return depthList.contains(depth);
+		}
+    	
     }
     
     //--------------------- value testing

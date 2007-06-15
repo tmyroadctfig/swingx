@@ -1051,6 +1051,11 @@ public class JXList extends JList {
             return false;
         }
 
+        @Override
+        public boolean isEditable() {
+            return false;
+        }
+        
         /**
          * {@inheritDoc}
          */

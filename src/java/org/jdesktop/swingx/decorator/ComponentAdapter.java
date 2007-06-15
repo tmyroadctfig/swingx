@@ -57,6 +57,7 @@ import javax.swing.JComponent;
  *  
  * 
  * @author Ramesh Gupta
+ * @author Karl Schaefer
  */
 public abstract class ComponentAdapter {
     /** current row in view coordinates. */
@@ -142,6 +143,18 @@ public abstract class ComponentAdapter {
     public abstract Object getValueAt(int row, int column);
     public abstract void setValueAt(Object aValue, int row, int column);
 
+    /**
+	 * Determines whether this cell is editable.
+	 * <p>
+	 * This method is for use with {@code Filter}s.
+	 * 
+	 * @param row
+	 *            the row to query
+	 * @param column
+	 *            the column to query
+	 * @return <code>true</code> if the cell is editable, <code>false</code>
+	 *         otherwise
+	 */
     public abstract boolean isCellEditable(int row, int column);
 
     /**
@@ -207,6 +220,14 @@ public abstract class ComponentAdapter {
     public abstract boolean isSelected();
 
     /**
+     * Returns {@code true} if the cell identified by this adapter is editable,
+     * {@code false} otherwise.
+     * 
+     * @return {@code true} if the cell is editable, {@code false} otherwise
+     */
+    public abstract boolean isEditable();
+    
+    /**
      * Returns true if the cell identified by this adapter is currently expanded;
      * Otherwise, it returns false. For components that do not support
      * hierarchical data, this method always returns true because the cells in
@@ -245,6 +266,16 @@ public abstract class ComponentAdapter {
         return false; // sensible default for JList and JTable
     }
 
+    /**
+	 * Returns the depth of this row in the hierarchy where the root is 0. For
+	 * components that do not contain hierarchical data, this method returns 1.
+	 * 
+	 * @return the depth for this adapter
+	 */
+    public int getDepth() {
+        return 1; // sensible default for JList and JTable
+    }
+    
     /**
      * For target components that support multiple columns in their model,
      * along with column reordering in the view, this method transforms the

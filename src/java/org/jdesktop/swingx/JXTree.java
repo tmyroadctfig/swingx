@@ -1174,6 +1174,15 @@ public class JXTree extends JTree {
             return getValueAt(row, column);
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean isEditable() {
+            //this is not as robust as JXTable; should it be? -- kgs
+            return tree.isPathEditable(tree.getPathForRow(row));
+        }
+        
         public boolean isSelected() {
             return tree.isRowSelected(row);
         }
@@ -1183,6 +1192,11 @@ public class JXTree extends JTree {
             return tree.isExpanded(row);
         }
 
+        @Override
+        public int getDepth() {
+            return tree.getPathForRow(row).getPathCount() - 1;
+        }
+        
         @Override
         public boolean isLeaf() {
             return tree.getModel().isLeaf(getValue());

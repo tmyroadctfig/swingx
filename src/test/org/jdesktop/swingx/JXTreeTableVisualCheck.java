@@ -62,6 +62,7 @@ import org.jdesktop.swingx.decorator.ShadingColorHighlighter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
 import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
+import org.jdesktop.swingx.decorator.HighlightPredicate.DepthHighlightPredicate;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
@@ -89,8 +90,8 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //             test.runInteractiveTests("interactive.*Compare.*");
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
 //             test.runInteractiveTests("interactive.*RToL.*");
-//             test.runInteractiveTests("interactive.*Highl.*");
-             test.runInteractiveTests("interactive.*Edit.*");
+             test.runInteractiveTests("interactive.*Highl.*");
+//             test.runInteractiveTests("interactive.*Edit.*");
         } catch (Exception ex) {
 
         }
@@ -990,6 +991,16 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         treeTable.setRowHeight(48);
         JFrame frame = wrapWithScrollingInFrame(treeTable,
                 "Orange, big rowheight");
+        frame.setVisible(true);
+    }
+    
+    public void interactiveTestDepthHighlighter() {
+        JXTreeTable treeTable = new JXTreeTable(treeTableModel);
+        treeTable.addHighlighter(new ColorHighlighter(Color.MAGENTA, null, new DepthHighlightPredicate(1)));
+        treeTable.setIntercellSpacing(new Dimension(15, 15));
+        treeTable.setRowHeight(48);
+        JFrame frame = wrapWithScrollingInFrame(treeTable,
+                "Magenta depth 1, big rowheight");
         frame.setVisible(true);
     }
 

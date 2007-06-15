@@ -701,6 +701,10 @@ public class FilterTest extends InteractiveTestCase {
             return false;
         }
 
+        public boolean isEditable() {
+            return tableModel.isCellEditable(row, column);
+        }
+        
         public boolean isSelected() {
             return false;
         }

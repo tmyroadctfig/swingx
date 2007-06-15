@@ -39,11 +39,13 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 
 import org.jdesktop.swingx.decorator.ColorHighlighter;
+import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PatternPredicate;
 import org.jdesktop.swingx.decorator.SearchPredicate;
+import org.jdesktop.swingx.decorator.HighlightPredicate.DepthHighlightPredicate;
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
 
@@ -209,6 +211,19 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
         showWithScrollingInFrame(tree, "Rollover - foreground " );
     }
 
+    public void interactiveTestDepthHighlighter() {
+        JXTree tree = new JXTree(treeTableModel);
+        tree.setHighlighters(createDepthHighlighters());
+        showWithScrollingInFrame(tree, "Depth highlighter" );
+    }
+    
+    public void interactiveTestEditabilityHighlighter() {
+        JXTree tree = new JXTree(treeTableModel);
+        tree.setEditable(true);
+        tree.setHighlighters(new ColorHighlighter(Color.WHITE, Color.RED, HighlightPredicate.EDITABLE));
+        showWithScrollingInFrame(tree, "Editability highlighter" );
+    }
+    
     /**
      * Issue ??: Background highlighters not working on JXTree.
      *
@@ -228,6 +243,15 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
                 useForeground ? null : color, useForeground ? color.darker() : null, 
                         HighlightPredicate.ROLLOVER_ROW);
         return highlighter;
+    }
+    
+    private Highlighter[] createDepthHighlighters() {
+        Highlighter[] highlighters = new Highlighter[2];
+        
+        highlighters[0] = new ColorHighlighter(Color.WHITE, Color.RED, new DepthHighlightPredicate(1));
+        highlighters[1] = new ColorHighlighter(Color.WHITE, Color.BLUE, new DepthHighlightPredicate(2));
+        
+        return highlighters;
     }
     
     /**

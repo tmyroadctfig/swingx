@@ -400,6 +400,10 @@ public class HighlightPredicateTest extends InteractiveTestCase {
                 // TODO Auto-generated method stub
                 return false;
             }
+            
+            public boolean isEditable() {
+                return false;
+            }
 
             public boolean isSelected() {
                 return selected;

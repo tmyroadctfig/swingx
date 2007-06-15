@@ -518,6 +518,10 @@ public class HighlighterTest extends InteractiveTestCase {
                 return false;
             }
 
+            public boolean isEditable() {
+                return false;
+            }
+            
             public boolean isSelected() {
                 return selected;
             }

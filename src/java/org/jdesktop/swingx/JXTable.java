@@ -3047,6 +3047,14 @@ public class JXTable extends JTable
          * {@inheritDoc}
          */
         @Override
+        public boolean isEditable() {
+            return table.isCellEditable(row, column);
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
         public boolean isSelected() {
             return table.isCellSelected(row, column);
         }

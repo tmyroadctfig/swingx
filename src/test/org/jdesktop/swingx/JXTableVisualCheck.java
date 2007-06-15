@@ -50,8 +50,10 @@ import org.jdesktop.swingx.JXTable.NumberEditor;
 import org.jdesktop.swingx.JXTableHeader.SortGestureRecognizer;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.LinkModelAction;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
+import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.swingx.decorator.ShuttleSorter;
@@ -1434,6 +1436,14 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         frame.setVisible(true);
     }
 
+    public void interactiveTestEditableHighlight() {
+        JXTable table = new JXTable(tableModel);
+        table.addHighlighter(new ColorHighlighter(Color.RED, Color.WHITE,
+                HighlightPredicate.EDITABLE));
+        JFrame frame = wrapWithScrollingInFrame(table, "Editability Highlighter Test");
+        frame.setVisible(true);
+    }
+    
     /**
      * dummy
      */

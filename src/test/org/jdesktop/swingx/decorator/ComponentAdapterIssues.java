@@ -100,6 +100,11 @@ public class ComponentAdapterIssues extends TestCase {
             }
 
             @Override
+            public boolean isEditable() {
+                return false;
+            }
+            
+            @Override
             public boolean isSelected() {
                 return false;
             }
