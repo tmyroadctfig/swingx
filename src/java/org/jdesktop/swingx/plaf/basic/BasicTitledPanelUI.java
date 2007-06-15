@@ -159,7 +159,10 @@ public class BasicTitledPanelUI extends TitledPanelUI {
         if (titledPanel.getClientProperty(JXTitledPanel.LEFT_DECORATION) instanceof JComponent) {
             setLeftDecoration((JComponent) titledPanel.getClientProperty(JXTitledPanel.LEFT_DECORATION));
         }
-        titledPanel.setLayout(new BorderLayout());
+        // swingx#500
+        if (!(titledPanel.getLayout() instanceof BorderLayout)){
+            titledPanel.setLayout(new BorderLayout());
+        }
         titledPanel.add(topPanel, BorderLayout.NORTH);
         titledPanel.setBorder(BorderFactory.createRaisedBevelBorder());
         titledPanel.setOpaque(false);
