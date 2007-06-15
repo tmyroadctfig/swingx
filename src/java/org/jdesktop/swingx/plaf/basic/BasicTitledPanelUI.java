@@ -179,8 +179,16 @@ public class BasicTitledPanelUI extends TitledPanelUI {
         return topPanel;
     }
     
-    private JLabel createAndConfigureCaption(JXTitledPanel titledPanel) {
-        JLabel caption = new JLabel(titledPanel.getTitle());
+    private JLabel createAndConfigureCaption(final JXTitledPanel titledPanel) {
+        JLabel caption = new JLabel(titledPanel.getTitle()){
+            //#501
+            @Override
+            public void updateUI(){
+              super.updateUI();
+              setForeground(titledPanel.getTitleForeground());
+              setFont(titledPanel.getTitleFont());
+            } 
+          };
         caption.setFont(titledPanel.getTitleFont());
         caption.setForeground(titledPanel.getTitleForeground());
         return caption;
