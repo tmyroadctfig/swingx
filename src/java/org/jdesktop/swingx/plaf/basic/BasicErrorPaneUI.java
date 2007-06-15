@@ -62,6 +62,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.UIResource;
 import javax.swing.plaf.basic.BasicHTML;
@@ -373,7 +374,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
         //in the mac world.
         pane.add(iconLabel);
         errorScrollPane = new JScrollPane(errorMessage);
-        errorScrollPane.setBorder(null);
+        errorScrollPane.setBorder(new EmptyBorder(0,0,5,0));
         pane.add(errorScrollPane);
         pane.add(closeButton);
         pane.add(reportButton);
