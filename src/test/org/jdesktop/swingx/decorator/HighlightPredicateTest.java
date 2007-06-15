@@ -212,6 +212,10 @@ public class HighlightPredicateTest extends InteractiveTestCase {
         assertFalse(oneTrueOneFalse.isHighlighted(allColored, adapter));
     }
     
+    /**
+     * test rollover
+     *
+     */
     public void testRolloverRow() {
         ComponentAdapter adapter = createComponentAdapter(allColored, true);
         // rollover and adapter at 0, 0
@@ -224,6 +228,22 @@ public class HighlightPredicateTest extends InteractiveTestCase {
         assertTrue(HighlightPredicate.ROLLOVER_ROW.isHighlighted(allColored, adapter));
         // move adapter row 
         adapter.row = 1;
+        assertFalse(HighlightPredicate.ROLLOVER_ROW.isHighlighted(allColored, adapter));
+    }
+    
+    /**
+     * Issue #513-swingx: no rollover highlight for disabled component
+     * 
+     */
+    public void testRolloverDisabledComponent() {
+        ComponentAdapter adapter = createComponentAdapter(allColored, true);
+        // rollover and adapter at 0, 0
+        int row = 0; 
+        int col = 0;
+        allColored.putClientProperty(RolloverProducer.ROLLOVER_KEY, new Point(row, col));
+        // sanity
+        assertTrue(HighlightPredicate.ROLLOVER_ROW.isHighlighted(allColored, adapter));
+        allColored.setEnabled(false);
         assertFalse(HighlightPredicate.ROLLOVER_ROW.isHighlighted(allColored, adapter));
     }
 

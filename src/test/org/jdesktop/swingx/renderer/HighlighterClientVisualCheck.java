@@ -24,10 +24,13 @@ package org.jdesktop.swingx.renderer;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.event.ActionEvent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.table.TableModel;
@@ -63,8 +66,8 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
 //      setSystemLF(true);
       HighlighterClientVisualCheck test = new HighlighterClientVisualCheck();
       try {
-//         test.runInteractiveTests();
-         test.runInteractiveTests(".*Search.*");
+         test.runInteractiveTests();
+//         test.runInteractiveTests(".*Search.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -301,12 +304,24 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
 
     /**
      * Plain RolloverHighlighter. 
+     * Issue #513-swingx: no rollover effect for disabled table.
      *
      */
     public void interactiveRolloverHighlight() {
-        JXTable table = new JXTable(tableModel);
-        table.addHighlighter(new ColorHighlighter(Color.YELLOW, null, HighlightPredicate.ROLLOVER_ROW));
-        showWithScrollingInFrame(table, "rollover highlight");
+        final JXTable table = new JXTable(tableModel);
+        ColorHighlighter colorHighlighter = new ColorHighlighter(Color.YELLOW, null, HighlightPredicate.ROLLOVER_ROW);
+        table.addHighlighter(colorHighlighter);
+        Action action = new AbstractAction("toggle table enabled") {
+
+            public void actionPerformed(ActionEvent e) {
+                table.setEnabled(!table.isEnabled());
+                
+            }
+            
+        };
+        JXFrame frame = showWithScrollingInFrame(table, "rollover highlight, enabled/disabled table");
+        addAction(frame, action);
+        frame.pack();
     }
     
 

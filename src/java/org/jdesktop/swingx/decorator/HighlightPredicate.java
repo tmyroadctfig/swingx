@@ -61,10 +61,20 @@ public interface HighlightPredicate {
     };
     
     /**
-     * Rollover
+     * Rollover  Row.
      */
     public static final HighlightPredicate ROLLOVER_ROW = new HighlightPredicate() {
+        
+        /**
+         * @inheritDoc
+         * Implemented to return true if the adapter's component is enabled and
+         * the row of its rollover property equals the adapter's row, returns
+         * false otherwise.
+         * 
+         * @see org.jdesktop.swingx.RolloverProducer
+         */
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+            if (!adapter.getComponent().isEnabled()) return false;
             // JW: where to put constants? 
             // this is a back-reference into swingx simply to access
             // a string constant. Hmmm...

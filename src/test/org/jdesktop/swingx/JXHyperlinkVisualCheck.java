@@ -54,8 +54,8 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
 //      setSystemLF(true);
       JXHyperlinkVisualCheck test = new JXHyperlinkVisualCheck();
       try {
-          test.runInteractiveTests();
-//          test.runInteractiveTests("interactive.*Table.*");
+//          test.runInteractiveTests();
+          test.runInteractiveTests("interactive.*Table.*");
 //          test.runInteractiveTests("interactive.*List.*");
 //          test.runInteractiveTests("interactive.*Tree.*");
 //          test.runInteractiveTests("interactive.*Underline.*");
@@ -220,24 +220,36 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
         table.getColumn(0).setCellRenderer(new DefaultTableRenderer(
                 new HyperlinkProvider(simpleAction)));
 
-        JFrame frame = wrapWithScrollingInFrame(table, visitor.getOutputComponent(), "table and simple links");
+        JXFrame frame = wrapWithScrollingInFrame(table, visitor.getOutputComponent(), "table and simple links");
         frame.setVisible(true);
     }
     
     
     /** 
      * Check visuals of hyperlink and highlighter.
-     *
+     * Issue #513-swingx: no rollover effect for disabled table.
+     * Hyperlink is disabled automatically by DefaultVisuals, no need
+     * to disable the xxRolloverController.
+     * 
      */
     public void interactiveTableHyperlinkLFStripingHighlighter() {
         EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
-        JXTable table = new JXTable(createModelWithLinks());
+        final JXTable table = new JXTable(createModelWithLinks());
         LinkModelAction action = new LinkModelAction(visitor);
         table.setDefaultRenderer(LinkModel.class, new DefaultTableRenderer
                 (new HyperlinkProvider(action, LinkModel.class)));
         table.setHighlighters(HighlighterFactory.createSimpleStriping());
-        JFrame frame = wrapWithScrollingInFrame(table, visitor.getOutputComponent(), 
+        Action enabled = new AbstractAction("toggle table enabled") {
+
+            public void actionPerformed(ActionEvent e) {
+                table.setEnabled(!table.isEnabled());
+                
+            }
+            
+        };
+        JXFrame frame = wrapWithScrollingInFrame(table, visitor.getOutputComponent(), 
                 "show link renderer in table with LF striping highlighter");
+        addAction(frame, enabled);
         frame.setVisible(true);
     }
 
