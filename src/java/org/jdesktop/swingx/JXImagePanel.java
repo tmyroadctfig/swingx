@@ -21,15 +21,23 @@
 
 package org.jdesktop.swingx;
 
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.Rectangle;
 import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
+import javax.swing.SwingUtilities;
 
 
 /**
@@ -131,7 +139,7 @@ public class JXImagePanel extends JXPanel {
             this.editable = editable;
             //if it is now editable, add the mouse handler
             if (this.editable) {
-                addMouseListener(new MouseHandler());
+                addMouseListener(mhandler);
             }
             setToolTipText(editable ? TEXT : "");
             firePropertyChange("editable", !editable, editable);
@@ -190,6 +198,7 @@ public class JXImagePanel extends JXPanel {
     
     /**
      * Overriden to paint the image on the panel
+     * @param g 
      */
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -278,19 +287,15 @@ public class JXImagePanel extends JXPanel {
         }
         
         public void mouseEntered(MouseEvent evt) {
-            if(evt.getSource() instanceof JLabel) {
-                JLabel label = (JLabel)evt.getSource();
-                if (oldCursor == null) {
-                    oldCursor = label.getCursor();
-                    label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                }
+            if (oldCursor == null) {
+                oldCursor = getCursor();
+                setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             }
         }
         
         public void mouseExited(MouseEvent evt) {
-            JLabel label = (JLabel)evt.getSource();
             if (oldCursor != null) {
-                label.setCursor(oldCursor);
+                setCursor(oldCursor);
                 oldCursor = null;
             }
         }
