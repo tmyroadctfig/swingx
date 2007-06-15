@@ -21,6 +21,7 @@
  */
 package org.jdesktop.swingx.util;
 
+
 /**
  * Utility class for checking contracts.
  * 
@@ -46,20 +47,25 @@ public class Contract {
      *     
      * 
      * @param <T> the type of the input parameter
-     * @param input the argument to check against null
+     * @param input the argument to check against null.
      * @param message the text of the exception if the argument is null
      * @return the input if not null
      * @thows NullPointerException if input is null
      */
+    @SuppressWarnings("unchecked")
     public static <T> T asNotNull(T input, String message) {
         if (input == null) 
             throw new NullPointerException(message);
+        
         if (input.getClass().isArray()) {
-            T[] array = (T[]) input;
-            for (int i = 0; i < array.length; i++) {
-                asNotNull(array[i], message);
+            if (!input.getClass().getComponentType().isPrimitive()) {
+                T[] array = (T[]) input;
+                for (int i = 0; i < array.length; i++) {
+                    asNotNull(array[i], message);
+                }
             }
         }
+        
         return input;
     }
 }
