@@ -94,6 +94,11 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
      * Error message text area
      */
     protected JEditorPane errorMessage;
+    
+    /**
+     * Error message text scroll pane wrapper.
+     */
+    protected JScrollPane errorScrollPane;
     /**
      * details text area
      */
@@ -349,7 +354,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
         detailsPanel.setLayout(createDetailPanelLayout());
         detailsPanel.add(detailsScrollPane);
         detailsPanel.add(copyToClipboardButton);
-        
+
         //initialize the gui. Most of this code is similar between Mac and PC, but
         //where they differ protected methods have been written allowing the
         //mac implementation to alter the layout of the dialog.
@@ -367,7 +372,9 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
         //the image off the dialog onto the desktop. This kind of coolness is common
         //in the mac world.
         pane.add(iconLabel);
-        pane.add(errorMessage);
+        errorScrollPane = new JScrollPane(errorMessage);
+        errorScrollPane.setBorder(null);
+        pane.add(errorScrollPane);
         pane.add(closeButton);
         pane.add(reportButton);
         reportButton.setVisible(false); // not visible by default
@@ -854,7 +861,6 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
             final int prefWidth = parent.getWidth();
             int prefHeight = parent.getHeight();
             final Insets insets = parent.getInsets();
-            
             if (errorMessage != null) {
                 //set a temp editor to a certain size, just to determine what its
                 //pref height is
@@ -902,7 +908,9 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
                 dummy.setText(errorMessage.getText());
                 dummy.setSize(parent.getWidth() - leftEdge - insets.right, 20);
                 dim = dummy.getPreferredSize();
-                errorMessage.setBounds(x, y, dim.width, dim.height);
+                int spx = x;
+                int spy = y;
+                Dimension spDim = dim;
                 y += dim.height + 10;
                 int rightEdge = parent.getWidth() - insets.right;
                 x = rightEdge;
@@ -919,6 +927,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
                     detailButton.setBounds(x, buttonY, dim.width, dim.height);
                 }
 
+                errorScrollPane.setBounds(spx, spy, spDim.width, buttonY - spy);
                 if (reportButton.isVisible()) {
                     dim = reportButton.getPreferredSize();
                     x -= dim.width;
