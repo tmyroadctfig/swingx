@@ -350,9 +350,8 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         addAction(frame, changeValue);
         Action changeRoot = new AbstractAction("change root") {
             public void actionPerformed(ActionEvent e) {
-                String newValue = "new Root";
-                table.getTreeTableModel().setValueAt(newValue,
-                        table.getPathForRow(0).getLastPathComponent(), 0);
+                DefaultMutableTreeTableNode newRoot = new DefaultMutableTreeTableNode("new Root");
+                ((DefaultTreeTableModel) table.getTreeTableModel()).setRoot(newRoot);
             }
         };
         addAction(frame, changeRoot);
