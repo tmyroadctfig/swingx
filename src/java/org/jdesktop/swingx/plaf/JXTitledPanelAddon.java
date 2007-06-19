@@ -20,6 +20,7 @@
  */
 package org.jdesktop.swingx.plaf;
 
+
 import java.awt.Color;
 import java.awt.GradientPaint;
 import java.util.Arrays;
@@ -27,11 +28,11 @@ import java.util.List;
 
 import javax.swing.UIManager;
 import javax.swing.plaf.ColorUIResource;
+import javax.swing.plaf.InsetsUIResource;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import org.jdesktop.swingx.JXTitledPanel;
 import org.jdesktop.swingx.painter.MattePainter;
-//import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
 
 /**
  * Addon for <code>JXTitledPanel</code>.<br>
@@ -49,11 +50,14 @@ public class JXTitledPanelAddon extends AbstractComponentAddon {
     defaults.addAll(Arrays.asList(new Object[] { 
       JXTitledPanel.uiClassID,
       "org.jdesktop.swingx.plaf.metal.MetalTitledPanelUI",
-      "JXTitledPanel.title.font",
+      "JXTitledPanel.titleFont",
       UIManager.getFont("Button.font"),
-      "JXTitledPanel.title.foreground", new ColorUIResource(Color.WHITE),
-      "JXTitledPanel.title.painter", new PainterUIResource(
-              new MattePainter(new GradientPaint(0, 0, Color.LIGHT_GRAY, 0, 1, Color.GRAY)))
+      "JXTitledPanel.titleForeground", new ColorUIResource(Color.WHITE),
+      "JXTitledPanel.titlePainter", new PainterUIResource(
+              new MattePainter(new GradientPaint(0, 0, Color.LIGHT_GRAY, 0, 1, Color.GRAY), true)),
+              "JXTitledPanel.captionInsets", new InsetsUIResource(4, 12, 4, 12),
+              "JXTitledPanel.rightDecorationInsets", new InsetsUIResource(1,1,1,1),
+              "JXTitledPanel.leftDecorationInsets", new InsetsUIResource(1,1,1,1)
     }));
   }
   
@@ -63,21 +67,21 @@ public class JXTitledPanelAddon extends AbstractComponentAddon {
 
     if (isPlastic()) {
       defaults.addAll(Arrays.asList(new Object[] { 
-        "JXTitledPanel.title.foreground", new ColorUIResource(255, 255, 255),
-        "JXTitledPanel.title.painter", new PainterUIResource(
+        "JXTitledPanel.titleForeground", new ColorUIResource(255, 255, 255),
+        "JXTitledPanel.titlePainter", new PainterUIResource(
                 new MattePainter(new GradientPaint(0, 0, 
                     new Color(49, 121, 242),
                     0, 1, 
                     new Color(198, 211, 247)
-                    )))
+                    ), true))
       }));
     } else {
       defaults.addAll(Arrays.asList(new Object[] { 
-        "JXTitledPanel.title.foreground", new ColorUIResource(255, 255, 255),
-        "JXTitledPanel.title.painter", new PainterUIResource(
+        "JXTitledPanel.titleForeground", new ColorUIResource(255, 255, 255),
+        "JXTitledPanel.titlePainter", new PainterUIResource(
                 new MattePainter(new GradientPaint(0, 0, 
                     MetalLookAndFeel.getCurrentTheme().getPrimaryControl(), 0, 1,
-                    MetalLookAndFeel.getCurrentTheme().getPrimaryControlDarkShadow())))
+                    MetalLookAndFeel.getCurrentTheme().getPrimaryControlDarkShadow()),true))
       }));
     }
   }
@@ -96,12 +100,12 @@ public class JXTitledPanelAddon extends AbstractComponentAddon {
     // don't understand why this has blown when trying to toggle to Metal...
     // definitely needs deeper digging 
     defaults.addAll(Arrays.asList(new Object[] { 
-            "JXTitledPanel.title.foreground", 
+            "JXTitledPanel.titleForeground", 
                 getSafeColor("InternalFrame.activeTitleForeground", new ColorUIResource(255, 255, 255)),
-            "JXTitledPanel.title.painter", new PainterUIResource(
+            "JXTitledPanel.titlePainter", new PainterUIResource(
                     new MattePainter(new GradientPaint(0, 0, 
                         getSafeColor("InternalFrame.inactiveTitleGradient", new ColorUIResource(49, 121, 242)), 0, 1,
-                        getSafeColor("InternalFrame.activeTitleBackground", new ColorUIResource(198, 211, 247)))))
+                        getSafeColor("InternalFrame.activeTitleBackground", new ColorUIResource(198, 211, 247))),true))
         }));
 
 //    defaults.addAll(Arrays.asList(new Object[] { 
