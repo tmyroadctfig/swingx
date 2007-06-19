@@ -94,6 +94,27 @@ public class CompoundPainterTest extends TestCase {
         assertTrue(p5.painted);
     }
 
+
+    /**
+     * Issue #497-swingx: setPainters can't cope with null.
+     * 
+     */
+    public void testSetNullPainters() {
+        CompoundPainter painter = new CompoundPainter();
+        painter.setPainters(null);
+    }
+    /**
+     * Issue #497-swingx: setPainters can't cope with null.
+     *
+     */
+    public void testSetEmptyPainters() {
+        CompoundPainter painter = new CompoundPainter();
+        // okay
+        painter.setPainters();
+        // fails
+        painter.setPainters((Painter[]) null);
+    }
+
     public void testCacheNotUsedFirstPass2() {
         onlyCachedPainters.paint(g, null, 10, 10);
         assertTrue(onlyCachedPainters.painted);
