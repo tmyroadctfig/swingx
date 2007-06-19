@@ -36,12 +36,16 @@ import org.jdesktop.swingx.plaf.TitledPanelUI;
 
 /**
  * A special type of Panel that has a Title section and a Content section.<br>
- * The following 3 properties can be set with the UIManager to change the look
+ * The following properties can be set with the UIManager to change the look
  * and feel of the JXTitledPanel:
  * <ul>
- * <li>JXTitledPanel.title.foreground</li>
- * <li>JXTitledPanel.title.background</li>
- * <li>JXTitledPanel.title.font</li>
+ * <li>JXTitledPanel.titleForeground</li>
+ * <li>JXTitledPanel.titleBackground</li>
+ * <li>JXTitledPanel.titleFont</li>
+ * <li>JXTitledPanel.titlePainter</li>
+ * <li>JXTitledPanel.captionInsets</li>
+ * <li>JXTitledPanel.rightDecorationInsets</li>
+ * <li>JXTitledPanel.leftDecorationInsets</li>
  * </ul>
  * 
  * @author Richard Bair
