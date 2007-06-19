@@ -167,7 +167,8 @@ public class JXHeader extends JXPanel {
     }
     
     /**
-     * Gets the title.
+     * Gets the title. This may use HTML, such as
+     * that supported by JLabel (version 3.2 of the HTML spec).
      * @return the title. May be null.
      */
     public String getTitle() {
@@ -176,7 +177,7 @@ public class JXHeader extends JXPanel {
     
     /**
      * Sets the description for this header. This may use HTML, such as
-     * that supported by JEditorPane (version 3.2 of the HTML spec).
+     * that supported by JLabel (version 3.2 of the HTML spec).
      * 
      * @param description the description. May be null, may be HTML or plain text.
      */
@@ -185,7 +186,7 @@ public class JXHeader extends JXPanel {
         this.description = description;
         firePropertyChange("description", old, getDescription());
     }
-    
+
     /**
      * Gets the description.
      * 
@@ -229,7 +230,12 @@ public class JXHeader extends JXPanel {
         firePropertyChange("titleFont", old, getTitleFont());
     }
     
-    private Font getTitleFont() {
+    /**
+     * Gets title font.
+     *
+     * @return the Font being used. May be null.
+     */
+    public Font getTitleFont() {
         return titleFont;
     }
     
@@ -239,7 +245,12 @@ public class JXHeader extends JXPanel {
         firePropertyChange("descriptionFont", old, getDescriptionFont());
     }
     
-    private Font getDescriptionFont() {
+    /**
+     * Gets description font.
+     *
+     * @return the Font being used. May be null.
+     */
+    public Font getDescriptionFont() {
         return descriptionFont;
     }
 }

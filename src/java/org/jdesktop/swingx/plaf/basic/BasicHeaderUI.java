@@ -99,8 +99,10 @@ public class BasicHeaderUI extends HeaderUI {
         installDefaults(header);
 
         titleLabel = new JLabel(header.getTitle() == null ? "Title For Header Goes Here" : header.getTitle());
+        titleLabel.setFont(header.getTitleFont());
 
         descriptionPane = new JXLabel();
+        descriptionPane.setFont(header.getDescriptionFont());
         descriptionPane.setLineWrap(true);
         descriptionPane.setOpaque(false);
         descriptionPane
