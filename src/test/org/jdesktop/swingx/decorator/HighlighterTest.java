@@ -451,6 +451,24 @@ public class HighlighterTest extends InteractiveTestCase {
         
     }
     
+    /**
+     * test doc'ed NPE when adding null Highlighter.
+     *
+     */
+    public void testCompoundHighlighterAddNull() {
+        ColorHighlighter highlighter = new ColorHighlighter();
+        CompoundHighlighter pipeline = new CompoundHighlighter();
+        try {
+            pipeline.addHighlighter(null);
+            fail("compoundHighlighter must not accept null highlighter");
+        } catch(NullPointerException ex) {
+            
+        }
+        ComponentAdapter adapter = createComponentAdapter(allColored, false);
+        // was added even with NPE.
+        pipeline.highlight(allColored, adapter);
+    }
+    
     public void testCompoundHighlighterChange() {
         ColorHighlighter highlighter = new ColorHighlighter();
         CompoundHighlighter pipeline = new CompoundHighlighter();

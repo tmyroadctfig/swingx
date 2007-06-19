@@ -30,6 +30,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.jdesktop.swingx.decorator.LegacyHighlighter.UIHighlighter;
+import org.jdesktop.swingx.util.Contract;
 
 /**
  * A class which manages the lists of <code>Highlighter</code>s.
@@ -87,6 +88,7 @@ public class CompoundHighlighter extends AbstractHighlighter
      * @throws NullPointerException if highlighter is null.
      */
     public void addHighlighter(Highlighter highlighter, boolean prepend) {
+        Contract.asNotNull(highlighter, "Highlighter must not be null");
         if (prepend) {
             highlighters.add(0, highlighter);
         } else {
