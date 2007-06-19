@@ -178,11 +178,20 @@ public class BasicHyperlinkUI extends BasicButtonUI {
             Rectangle textRect, String text, View v) {
         textRect.x += getTextShiftOffset();
         textRect.y += getTextShiftOffset();
-        v.paint(g, textRect);
-        // fix #441-swingx - underline not painted for html
         if (b.getModel().isRollover()) {
-            paintUnderline(g, b, textRect, text);
-          }
+            // fix #441-swingx - underline not painted for html
+            if (text.length() > 7) {
+                text = text.trim();
+                text = "<html><u>" + text.substring(6, text.length() - 7) + "</u></html>";
+                View tmp = BasicHTML.createHTMLView(b, text);
+                tmp.paint(g, textRect);
+            } else {
+                // whatever this is, it's not html!
+                paintUnderline(g, b, textRect, text);
+            }
+         } else {
+             v.paint(g, textRect);
+         }
         textRect.x -= getTextShiftOffset();
         textRect.y -= getTextShiftOffset();
     }
