@@ -98,15 +98,17 @@ public class BasicHeaderUI extends HeaderUI {
 
         installDefaults(header);
 
-        titleLabel = new JLabel("Title For Header Goes Here");
-        titleLabel.setFont(titleLabel.getFont().deriveFont(Font.BOLD));
+        titleLabel = new JLabel(header.getTitle() == null ? "Title For Header Goes Here" : header.getTitle());
+
         descriptionPane = new JXLabel();
         descriptionPane.setLineWrap(true);
         descriptionPane.setOpaque(false);
-        
-        descriptionPane.setText("The description for the header goes here.\nExample: Click the Copy Code button to generate the corresponding Java code.");
+        descriptionPane
+                .setText(header.getDescription() == null ? "The description for the header goes here.\nExample: Click the Copy Code button to generate the corresponding Java code."
+                        : header.getDescription());
+
         imagePanel = new JLabel();
-        imagePanel.setIcon(UIManager.getIcon("Header.defaultIcon"));
+        imagePanel.setIcon(header.getIcon() == null ? UIManager.getIcon("Header.defaultIcon") : header.getIcon());
 
         installComponents(header);
         installListeners(header);
