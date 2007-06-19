@@ -14,6 +14,7 @@ import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
+import javax.swing.JComponent;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.apache.batik.ext.awt.MultipleGradientPaint;
@@ -72,7 +73,9 @@ public class PaintPicker extends javax.swing.JPanel {
         return selectedPaint;
     }
     
-   
+    public void addPicker(JComponent comp, String title) {
+        tabbedPane.addTab(title,comp);
+    }
     
     /** This method is called from within the constructor to
      * initialize the form.
@@ -124,7 +127,7 @@ public class PaintPicker extends javax.swing.JPanel {
 
     }// </editor-fold>//GEN-END:initComponents
 
-    void setPaint(Paint paint) {
+    public void setPaint(Paint paint) {
         if(paint == selectedPaint) {
             return;
         }
