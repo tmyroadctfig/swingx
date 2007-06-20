@@ -25,10 +25,13 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.net.URL;
 
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+
+import org.jdesktop.swingx.test.XTestUtils;
 
 /**
  * Test to expose known issues of <code>JXHeader</code>.
@@ -73,15 +76,94 @@ public class JXHeaderIssues extends InteractiveTestCase {
                 header.getTitle(), label.getText());
     }
 
-//------------------ interactive 
+    // ------------------ interactive
+
+    /**
+     * Short description in header produces unexpected line wraps in
+     * footer.
+     * 
+     * Note: the frame is not packed to simulate the appframework
+     * context.
+     */
+    public void interactiveHTMLTextWrapShort() {
+        JXHeader header = new JXHeader();
+        header.setTitle("AlbumManager");
+        String headerLong = "An adaption from JGoodies Binding Tutorial in the context"
+                + " of BeansBinding/AppFramework. "
+                + "The Tabs show different styles of typical interaction "
+                + "setups (in-place editing vs. dialog-editing). ";
+        String headerShort = "An adaption from JGoodies Binding Tutorial in the context"
+            + " of BeansBinding/AppFramework. ";
+        header.setDescription(headerShort);
+        header.setIcon(XTestUtils.loadDefaultIcon());
+        JXHeader footer = new JXHeader();
+        footer.setTitle("Notes:");
+        String footerDescription = "<html>"
+                + " <ul> "
+                + " <li> code: in the jdnc-incubator, section kleopatra, package appframework."
+                + " <li> technique: back the view by a shared presentation model "
+                + " <li> technique: veto selection change until editing is completed "
+                + " <li> issue: selection of tab should be vetoable "
+                + " <li> issue: empty selection should disable editing pane "
+                + " </ul> " + " </html>";
+        footer.setDescription(footerDescription);
+
+        JComponent panel = new JPanel(new BorderLayout());
+        panel.add(header, BorderLayout.NORTH);
+        panel.add(footer, BorderLayout.SOUTH);
+        JXFrame frame = new JXFrame("html wrapping in SOUTh: short text in NORTH");
+        frame.add(panel);
+        frame.setSize(800, 400);
+        frame.setVisible(true);
+    }
     
     /**
-     * Issue #403-swingx: JXHeader doesn't show custom values.<p>
+     * Long description in header produces expected line-wrap in footer.
+     * 
+     * Note: the frame is not packed to simulate the appframework
+     * context.
+     */
+    public void interactiveHTMLTextWrapLong() {
+        JXHeader header = new JXHeader();
+        header.setTitle("AlbumManager");
+        String headerLong = "An adaption from JGoodies Binding Tutorial in the context"
+                + " of BeansBinding/AppFramework. "
+                + "The Tabs show different styles of typical interaction "
+                + "setups (in-place editing vs. dialog-editing). ";
+        String headerShort = "An adaption from JGoodies Binding Tutorial in the context"
+            + " of BeansBinding/AppFramework. ";
+        header.setDescription(headerLong);
+        header.setIcon(XTestUtils.loadDefaultIcon());
+        JXHeader footer = new JXHeader();
+        footer.setTitle("Notes:");
+        String footerDescription = "<html>"
+                + " <ul> "
+                + " <li> code: in the jdnc-incubator, section kleopatra, package appframework."
+                + " <li> technique: back the view by a shared presentation model "
+                + " <li> technique: veto selection change until editing is completed "
+                + " <li> issue: selection of tab should be vetoable "
+                + " <li> issue: empty selection should disable editing pane "
+                + " </ul> " + " </html>";
+        footer.setDescription(footerDescription);
+
+        JComponent panel = new JPanel(new BorderLayout());
+        panel.add(header, BorderLayout.NORTH);
+//        panel.add(new JScrollPane(table));
+        panel.add(footer, BorderLayout.SOUTH);
+        JXFrame frame = new JXFrame("html wrapping in SOUTh: long text in NORTH");
+        frame.add(panel);
+        frame.setSize(800, 600);
+        frame.setVisible(true);
+    }
+    /**
+     * Issue #403-swingx: JXHeader doesn't show custom values.
+     * <p>
      * 
      * All values are passed in the constructor.
      */
     public void interactiveCustomProperties() {
-        URL url = getClass().getResource("resources/images/wellTop.gif");
+        URL url = getClass().getResource("resources/images/wellTop.gif");;
+        
         assertNotNull(url);
         JPanel p = new JPanel(new BorderLayout());
         JXHeader header = new JXHeader("MyTitle", "MyDescription", new ImageIcon(url));
@@ -115,6 +197,11 @@ public class JXHeaderIssues extends InteractiveTestCase {
             e.printStackTrace();
         } 
     }
-    
 
+    @Override
+    protected void setUp() throws Exception {
+        setSystemLF(true);
+    }
+    
+    
 }
