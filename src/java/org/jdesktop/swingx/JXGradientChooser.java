@@ -137,6 +137,15 @@ public class JXGradientChooser extends JXPanel {
                     styleCombo.setSelectedItem(GradientStyle.Linear);
                 }
             }
+            
+            if(mgrad.getCycleMethod() == MultipleGradientPaint.REFLECT) {
+                this.reflectedRadio.setSelected(true);
+                gradientPreview.setReflected(true);
+            }
+            if(mgrad.getCycleMethod() == MultipleGradientPaint.REPEAT) {
+                this.repeatedRadio.setSelected(true);
+                gradientPreview.setRepeated(true);
+            }
             gradientPreview.setGradient(mgrad);
             //reflectedRadio.setSelected()
             MultipleGradientPaint old = this.getGradient();
