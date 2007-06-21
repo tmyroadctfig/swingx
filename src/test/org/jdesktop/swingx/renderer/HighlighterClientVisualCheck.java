@@ -24,8 +24,13 @@ package org.jdesktop.swingx.renderer;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -40,6 +45,7 @@ import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXSearchPanel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTreeTable;
+import org.jdesktop.swingx.RolloverProducer;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
@@ -74,6 +80,53 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
       }
   }
 
+    /**
+     * Example from forum requirement: highlight all rows of a given group
+     * if mouse if over one of them.
+     * 
+     * PENDING: need to track row view-model coordinates mapping after
+     * filtering/sorting.
+     *
+     */
+    public void interactiveRolloverRowGroup() {
+        TableModel model = new AncientSwingTeam();
+       final List<Integer> rowSet = new ArrayList<Integer>();
+       for (int i = 0; i < model.getRowCount(); i++) {
+         if ((Integer)model.getValueAt(i, 3) > 10) {
+             rowSet.add(i);
+         }
+       }
+       final HighlightPredicate predicate = new HighlightPredicate() {
+
+        public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+            return rowSet.contains(adapter.row);
+        }
+           
+       };
+       final ColorHighlighter highlighter = new ColorHighlighter(Color.YELLOW, null, 
+               HighlightPredicate.NEVER);
+       JXTable table = new JXTable(model);
+       table.addHighlighter(highlighter);
+       PropertyChangeListener l = new PropertyChangeListener() {
+
+        public void propertyChange(PropertyChangeEvent evt) {
+            Point location = (Point) evt.getNewValue();
+            int row = -1;
+            if (location != null) {
+                row = location.y;
+            }
+            if (rowSet.contains(row)) {
+                highlighter.setHighlightPredicate(predicate);
+            } else {
+                highlighter.setHighlightPredicate(HighlightPredicate.NEVER);
+            }
+        }
+           
+       };
+       table.addPropertyChangeListener(RolloverProducer.ROLLOVER_KEY, l);
+       showWithScrollingInFrame(table, "rollover highlight of row groups");
+    }
+    
     /**
      * Example to highlight against a value/color map.
      */
