@@ -906,12 +906,12 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
     }
 
-    private void paintDayOfTheWeekBackground(Graphics g, int x, int y, int width, int height) {
+    protected void paintDayOfTheWeekBackground(Graphics g, int x, int y, int width, int height) {
         int boxPaddingX = monthView.getBoxPaddingX();
         g.drawLine(x + boxPaddingX, y + height - 1, x + width - boxPaddingX, y + height - 1);
     }
 
-    private void paintWeekOfYearBackground(Graphics g, int x, int y, int width, int height) {
+    protected void paintWeekOfYearBackground(Graphics g, int x, int y, int width, int height) {
         int boxPaddingY = monthView.getBoxPaddingY();
         x = ltr ? x + width - 1 : x;
         g.drawLine(x, y + boxPaddingY, x, y + height - boxPaddingY);
@@ -928,7 +928,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param weekOfYear week of the year
      */
     @SuppressWarnings({"UNUSED_SYMBOL", "UnusedDeclaration"})
-    private void paintWeekOfYearForeground(Graphics g, int x, int y, int width, int height, int weekOfYear) {
+    protected void paintWeekOfYearForeground(Graphics g, int x, int y, int width, int height, int weekOfYear) {
         String str = Integer.toString(weekOfYear);
         FontMetrics fm;
 
