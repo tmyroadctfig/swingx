@@ -89,7 +89,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*Boolean.*");
 //          test.runInteractiveTests("interactive.*isable.*");
           
-          test.runInteractiveTests("interactive.*High.*");
+          test.runInteractiveTests("interactive.*Policy.*");
 //        test.runInteractiveTests("interactive.*Rollover.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
@@ -915,7 +915,7 @@ public class JXTableVisualCheck extends JXTableUnitTest {
      * Issue #155-swingx: vertical scrollbar policy lost.
      *
      */
-    public void interactiveTestColumnControlConserveVerticalScrollBarPolicy() {
+    public void interactiveTestColumnControlConserveVerticalScrollBarPolicyAlways() {
         final JXTable table = new JXTable();
         Action toggleAction = new AbstractAction("Toggle Control") {
 
@@ -926,7 +926,8 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             
         };
         table.setModel(new DefaultTableModel(10, 5));
-//        table.setColumnControlVisible(true);
+        // initial state of column control visibility doesn't seem to matter
+//      table.setColumnControlVisible(true);
         JScrollPane scrollPane1 = new JScrollPane(table);
         scrollPane1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         
@@ -935,6 +936,31 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         frame.setVisible(true);
     }
 
+
+    /** 
+     * Issue #155-swingx: vertical scrollbar policy lost.
+     *
+     */
+    public void interactiveTestColumnControlConserveVerticalScrollBarPolicyNever() {
+        final JXTable table = new JXTable();
+        Action toggleAction = new AbstractAction("Toggle Control") {
+
+            public void actionPerformed(ActionEvent e) {
+                table.setColumnControlVisible(!table.isColumnControlVisible());
+                
+            }
+            
+        };
+        table.setModel(new DefaultTableModel(10, 5));
+        // initial state of column control visibility doesn't seem to matter
+//        table.setColumnControlVisible(true);
+        JScrollPane scrollPane1 = new JScrollPane(table);
+        scrollPane1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        
+        JXFrame frame = wrapInFrame(scrollPane1, "JXTable Vertical ScrollBar Policy");
+        addAction(frame, toggleAction);
+        frame.setVisible(true);
+    }
 
     /** 
      * Issue #11: Column control not showing with few rows.
