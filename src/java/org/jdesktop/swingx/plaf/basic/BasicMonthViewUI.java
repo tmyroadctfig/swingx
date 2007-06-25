@@ -675,10 +675,10 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         Rectangle clip = g.getClipBounds();
 
-        if (monthView.isOpaque()) {
-            g.setColor(monthView.getBackground());
-            g.fillRect(clip.x, clip.y, clip.width, clip.height);
-        }
+        Graphics tmp = g.create();
+        paintBackground(clip, tmp);
+        tmp.dispose();
+        
         g.setColor(monthView.getForeground());
 
         // Reset the calendar.
@@ -1258,6 +1258,13 @@ public class BasicMonthViewUI extends MonthViewUI {
         return cal.getTimeInMillis();
     }
 
+    protected void paintBackground(final Rectangle clip, final Graphics g) {
+        if (monthView.isOpaque()) {
+            g.setColor(monthView.getBackground());
+            g.fillRect(clip.x, clip.y, clip.width, clip.height);
+        }
+    }
+    
     private class Handler implements ComponentListener, MouseListener, MouseMotionListener, LayoutManager,
             PropertyChangeListener, DateSelectionListener {
         private boolean asKirkWouldSay_FIRE;
