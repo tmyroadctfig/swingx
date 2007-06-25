@@ -75,8 +75,8 @@ public class MacOSXErrorPaneUI extends BasicErrorPaneUI {
     
     //---------------------------------------------------------- constructor
     /** Creates a new instance of BasicErrorPanelUI */
-    public MacOSXErrorPaneUI(JXErrorPane dlg) {
-        super(dlg);
+    public MacOSXErrorPaneUI() {
+        super();
     }
 
     protected void configureDetailsButton(boolean expanded) {
@@ -97,7 +97,7 @@ public class MacOSXErrorPaneUI extends BasicErrorPaneUI {
     }
     
     public static ComponentUI createUI(JComponent c) {
-        return new MacOSXErrorPaneUI((JXErrorPane)c);
+        return new MacOSXErrorPaneUI();
     }
 
     /**

@@ -59,6 +59,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
+import javax.swing.LookAndFeel;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
@@ -103,7 +104,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
     /**
      * details text area
      */
-    private JXEditorPane details;
+    protected JXEditorPane details;
     /**
      * detail button
      */
@@ -127,6 +128,22 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
     protected JScrollPane detailsScrollPane;
     protected JButton copyToClipboardButton;
 
+    /**
+     * Property change listener for the error pane ensures that the pane's UI
+     * is reinitialized.
+     */
+    protected PropertyChangeListener errorPaneListener;
+
+    /**
+     * Action listener for the detail button.
+     */
+    protected ActionListener detailListener;
+
+    /**
+     * Action listener for the copy to clipboard button.
+     */
+    protected ActionListener copyToClipboardListener;
+
     //------------------------------------------------------ private helpers
     /**
      * The height of the window when collapsed. This value is stashed when the
@@ -138,24 +155,14 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
      * the dialog is collapsed
      */
     private int expandedHeight = 0;
-    /**
-     * Property change listener for the error pane ensures that the pane's UI
-     * is reinitialized.
-     */
-    private PropertyChangeListener errorPaneListener;
+
     //---------------------------------------------------------- constructor
     
-    /** Creates a new instance of BasicErrorPanelUI */
-    public BasicErrorPaneUI(JXErrorPane dlg) {
-        this.pane = dlg;
-        initGui();
-    }
-
     /**
      * @inheritDoc
      */
     public static ComponentUI createUI(JComponent c) {
-        return new BasicErrorPaneUI((JXErrorPane)c);
+        return new BasicErrorPaneUI();
     }
 
     /**
@@ -165,11 +172,12 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
     public void installUI(JComponent c) {
         super.installUI(c);
         
-        //add a listener to the pane so I can reinit() whenever the
-        //bean properties change (particularly error info)
-        errorPaneListener = new ErrorPaneListener();
-        ((JXErrorPane)c).addPropertyChangeListener(errorPaneListener);
-        
+        this.pane = (JXErrorPane)c;
+
+        installDefaults();
+        installComponents();
+        installListeners();
+
         //if the report action needs to be defined, do so
         Action a = c.getActionMap().get(JXErrorPane.REPORT_ACTION_KEY);
         if (a == null) {
@@ -194,10 +202,170 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
     public void uninstallUI(JComponent c) {
         super.uninstallUI(c);
 
-        //remove the property change listener from the pane
-        ((JXErrorPane)c).removePropertyChangeListener(errorPaneListener);
+        uninstallListeners();
+        uninstallComponents();
+        uninstallDefaults();
     }
     
+    /**
+     * Installs the default colors, and default font into the Error Pane
+     */
+    protected void installDefaults() {
+    }
+
+
+    /**
+     * Uninstalls the default colors, and default font into the Error Pane.
+     */
+    protected void uninstallDefaults() {
+        LookAndFeel.uninstallBorder(pane);
+    }
+
+
+    /**
+     * Create and install the listeners for the Error Pane.
+     * This method is called when the UI is installed.
+     */
+    protected void installListeners() {
+        //add a listener to the pane so I can reinit() whenever the
+        //bean properties change (particularly error info)
+        errorPaneListener = new ErrorPaneListener();
+        pane.addPropertyChangeListener(errorPaneListener);
+    }
+
+
+    /**
+     * Remove the installed listeners from the Error Pane.
+     * The number and types of listeners removed and in this method should be
+     * the same that was added in <code>installListeners</code>
+     */
+    protected void uninstallListeners() {
+        //remove the property change listener from the pane
+        pane.removePropertyChangeListener(errorPaneListener);
+    }
+
+
+    //    ===============================
+    //     begin Sub-Component Management
+    //
+
+    /**
+     * Creates and initializes the components which make up the
+     * aggregate combo box. This method is called as part of the UI
+     * installation process.
+     */
+    protected void installComponents() {
+        iconLabel = new JLabel(pane.getIcon());
+        
+        errorMessage = new JEditorPane();
+        errorMessage.setEditable(false);
+        errorMessage.setContentType("text/html");
+        errorMessage.setOpaque(false);
+        errorMessage.putClientProperty(JXEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+
+        closeButton = new JButton(UIManager.getString(CLASS_NAME + ".ok_button_text"));
+
+        reportButton = new EqualSizeJButton(pane.getActionMap().get(JXErrorPane.REPORT_ACTION_KEY));
+
+        detailButton = new EqualSizeJButton(UIManager.getString(CLASS_NAME + ".details_expand_text"));
+        
+        details = new JXEditorPane();
+        details.setContentType("text/html");
+        details.putClientProperty(JXEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+        details.setTransferHandler(createDetailsTransferHandler(details));
+        detailsScrollPane = new JScrollPane(details);
+        detailsScrollPane.setPreferredSize(new Dimension(10, 250));
+        details.setEditable(false);
+        detailsPanel = new JPanel();
+        detailsPanel.setVisible(false);
+        copyToClipboardButton = new JButton(UIManager.getString(CLASS_NAME + ".copy_to_clipboard_button_text"));
+        copyToClipboardListener = new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                details.copy();
+            }
+        };
+        copyToClipboardButton.addActionListener(copyToClipboardListener);
+
+        detailsPanel.setLayout(createDetailPanelLayout());
+        detailsPanel.add(detailsScrollPane);
+        detailsPanel.add(copyToClipboardButton);
+        
+        //initialize the gui. Most of this code is similar between Mac and PC, but
+        //where they differ protected methods have been written allowing the
+        //mac implementation to alter the layout of the dialog.
+        pane.setLayout(createErrorPaneLayout());
+        
+        //An empty border which constitutes the padding from the edge of the
+        //dialog to the content. All content that butts against this border should
+        //not be padded.
+        Insets borderInsets = new Insets(16, 24, 16, 17);
+        pane.setBorder(BorderFactory.createEmptyBorder(borderInsets.top, borderInsets.left, borderInsets.bottom, borderInsets.right));
+
+        //add the JLabel responsible for displaying the icon.
+        //TODO: in the future, replace this usage of a JLabel with a JXImagePane,
+        //which may add additional "coolness" such as allowing the user to drag
+        //the image off the dialog onto the desktop. This kind of coolness is common
+        //in the mac world.
+        pane.add(iconLabel);
+        errorScrollPane = new JScrollPane(errorMessage);
+        errorScrollPane.setBorder(new EmptyBorder(0,0,5,0));
+        pane.add(errorScrollPane);
+        pane.add(closeButton);
+        pane.add(reportButton);
+        reportButton.setVisible(false); // not visible by default
+        pane.add(detailButton);
+        pane.add(detailsPanel);
+
+        //make the buttons the same size
+        EqualSizeJButton[] buttons = new EqualSizeJButton[] {
+            (EqualSizeJButton)detailButton, (EqualSizeJButton)reportButton };
+        ((EqualSizeJButton)reportButton).setGroup(buttons);
+        ((EqualSizeJButton)detailButton).setGroup(buttons);
+
+        reportButton.setMinimumSize(reportButton.getPreferredSize());
+        detailButton.setMinimumSize(detailButton.getPreferredSize());
+
+        //set the event handling
+        detailListener = new DetailsClickEvent();
+        detailButton.addActionListener(detailListener);
+    }
+
+    /**
+     * The aggregate components which compise the combo box are 
+     * unregistered and uninitialized. This method is called as part of the
+     * UI uninstallation process.
+     */
+    protected void uninstallComponents() {
+        iconLabel = null;
+        errorMessage = null;
+        closeButton = null;
+        reportButton = null;
+
+        detailButton.removeActionListener(detailListener);
+        detailButton = null;
+
+        details.setTransferHandler(null);
+        details = null;
+
+        detailsScrollPane.removeAll();
+        detailsScrollPane = null;
+
+        detailsPanel.setLayout(null);
+        detailsPanel.removeAll();
+        detailsPanel = null;
+        
+        copyToClipboardButton.removeActionListener(copyToClipboardListener);
+        copyToClipboardButton = null;
+
+        pane.removeAll();
+        pane.setLayout(null);
+        pane.setBorder(null);
+    }
+
+    //
+    //     end Sub-Component Management
+    //    ===============================
+
     /**
      * @inheritDoc
      */
@@ -319,82 +487,6 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
         }
     }
     
-    /**
-     * initialize the gui.
-     */
-    private void initGui() {
-        iconLabel = new JLabel(pane.getIcon());
-        
-        errorMessage = new JEditorPane();
-        errorMessage.setEditable(false);
-        errorMessage.setContentType("text/html");
-        errorMessage.setOpaque(false);
-        errorMessage.putClientProperty(JXEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
-
-        closeButton = new JButton(UIManager.getString(CLASS_NAME + ".ok_button_text"));
-
-        reportButton = new EqualSizeJButton(pane.getActionMap().get(JXErrorPane.REPORT_ACTION_KEY));
-
-        detailButton = new EqualSizeJButton(UIManager.getString(CLASS_NAME + ".details_expand_text"));
-        
-        details = new JXEditorPane();
-        details.setContentType("text/html");
-        details.putClientProperty(JXEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
-        details.setTransferHandler(createDetailsTransferHandler(details));
-        detailsScrollPane = new JScrollPane(details);
-        detailsScrollPane.setPreferredSize(new Dimension(10, 250));
-        details.setEditable(false);
-        detailsPanel = new JPanel();
-        detailsPanel.setVisible(false);
-        copyToClipboardButton = new JButton(UIManager.getString(CLASS_NAME + ".copy_to_clipboard_button_text"));
-        copyToClipboardButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                details.copy();
-            }
-        });
-        detailsPanel.setLayout(createDetailPanelLayout());
-        detailsPanel.add(detailsScrollPane);
-        detailsPanel.add(copyToClipboardButton);
-
-        //initialize the gui. Most of this code is similar between Mac and PC, but
-        //where they differ protected methods have been written allowing the
-        //mac implementation to alter the layout of the dialog.
-        pane.setLayout(createErrorPaneLayout());
-        
-        //An empty border which constitutes the padding from the edge of the
-        //dialog to the content. All content that butts against this border should
-        //not be padded.
-        Insets borderInsets = new Insets(16, 24, 16, 17);
-        pane.setBorder(BorderFactory.createEmptyBorder(borderInsets.top, borderInsets.left, borderInsets.bottom, borderInsets.right));
-
-        //add the JLabel responsible for displaying the icon.
-        //TODO: in the future, replace this usage of a JLabel with a JXImagePane,
-        //which may add additional "coolness" such as allowing the user to drag
-        //the image off the dialog onto the desktop. This kind of coolness is common
-        //in the mac world.
-        pane.add(iconLabel);
-        errorScrollPane = new JScrollPane(errorMessage);
-        errorScrollPane.setBorder(new EmptyBorder(0,0,5,0));
-        pane.add(errorScrollPane);
-        pane.add(closeButton);
-        pane.add(reportButton);
-        reportButton.setVisible(false); // not visible by default
-        pane.add(detailButton);
-        pane.add(detailsPanel);
-
-        //make the buttons the same size
-        EqualSizeJButton[] buttons = new EqualSizeJButton[] {
-            (EqualSizeJButton)detailButton, (EqualSizeJButton)reportButton };
-        ((EqualSizeJButton)reportButton).setGroup(buttons);
-        ((EqualSizeJButton)detailButton).setGroup(buttons);
-
-        reportButton.setMinimumSize(reportButton.getPreferredSize());
-        detailButton.setMinimumSize(detailButton.getPreferredSize());
-
-        //set the event handling
-        detailButton.addActionListener(new DetailsClickEvent());
-    }
-
     /**
      * Set the details section of the error dialog.  If the details are either
      * null or an empty string, then hide the details button and hide the detail
