@@ -21,6 +21,12 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.Highlighter;
@@ -37,7 +43,66 @@ import org.jdesktop.test.PropertyChangeReport;
  * @author Jeanette Winzenburg
  */
 public class HighlighterClientIssues extends InteractiveTestCase {
+    public static void main(String[] args) throws Exception {
+//      setSystemLF(true);
+      HighlighterClientIssues test = new HighlighterClientIssues();
+      try {
+          test.runInteractiveTests();
+//          test.runInteractiveTests("interactive.*Table.*");
+//          test.runInteractiveTests("interactive.*List.*");
+        } catch (Exception e) {
+            System.err.println("exception when executing interactive tests:");
+            e.printStackTrace();
+        } 
+  }
 
+    /**
+     * Highlighters in JXTable must be kept on moving 
+     * the table to different container. This is a sanity test -
+     * failed in early stages of fixing #519-swing: memory leak
+     * with shared highlighters.
+     *
+     */
+    public void interactiveMemoryLeak() {
+        final ColorHighlighter shared = new ColorHighlighter(Color.RED, null);
+        JXTable first = new JXTable(10, 3);
+        first.addHighlighter(shared);
+        final JXTable second = new JXTable(10, 2);
+        second.setName("second");
+        second.addHighlighter(shared);
+        JXFrame firstFrame = wrapWithScrollingInFrame(first, "control");
+        
+        final JXFrame secondFrame = wrapWithScrollingInFrame(second, "dependent, don't close directly");
+        Action close = new AbstractAction("close second") {
+
+            public void actionPerformed(ActionEvent e) {
+                secondFrame.dispose();
+                setEnabled(false);
+            }
+            
+        };
+        Action open = new AbstractAction("open second") {
+
+            public void actionPerformed(ActionEvent e) {
+                JXFrame newFrame = wrapWithScrollingInFrame(second, "newly created");
+                newFrame.setVisible(true);
+            }
+            
+        };
+        Action color = new AbstractAction("toggle color") {
+
+            public void actionPerformed(ActionEvent e) {
+                shared.setBackground(Color.YELLOW);
+                
+            }
+            
+        };
+        addAction(firstFrame, close);
+        addAction(firstFrame, open);
+        addAction(firstFrame, color);
+        firstFrame.setVisible(true);
+        secondFrame.setVisible(true);
+    }
 //------------------------ notification
     
     /**

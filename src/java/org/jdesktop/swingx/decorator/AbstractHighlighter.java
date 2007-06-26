@@ -25,7 +25,8 @@ import java.awt.Component;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.EventListenerList;
+
+import org.jdesktop.swingx.event.EventListenerList;
 
 /**
  * Abstract <code>Highlighter</code> implementation which
