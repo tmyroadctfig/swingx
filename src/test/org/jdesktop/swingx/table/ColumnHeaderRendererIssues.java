@@ -29,11 +29,13 @@ import javax.swing.Action;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.JXTableHeader;
 import org.jdesktop.swingx.test.XTestUtils;
 
 /**
@@ -165,6 +167,44 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
         final JXTable table = new JXTable();
         table.setColumnFactory(factory);
         table.setModel(new DefaultTableModel(10, alignText.length));
+        JScrollPane pane = new JScrollPane(table);
+       table.setColumnControlVisible(true);
+       final JXFrame frame = wrapInFrame(pane, "RToL and column text alignment");
+       Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
+
+           public void actionPerformed(ActionEvent e) {
+               ComponentOrientation current = frame.getComponentOrientation();
+               if (current == ComponentOrientation.LEFT_TO_RIGHT) {
+                   frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+               } else {
+                   frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+
+               }
+
+           }
+
+       };
+       addAction(frame, toggleComponentOrientation);
+       frame.setVisible(true);
+
+    }
+
+    /**
+     * Hook into the UI-provided renderer to set the
+     * alignment of all columns. Note: this is not 
+     * bidi compliant, as of Issue #79-jdnc: leading/trailing 
+     * don't get updated on orientation toggle.
+     *
+     */
+    public void interactiveHeaderAlignmentAllRight() {
+        final JXTable table = new JXTable();
+        JXTableHeader header = (JXTableHeader) table.getTableHeader();
+        TableCellRenderer renderer = header.getDefaultRenderer();
+        if (renderer instanceof ColumnHeaderRenderer) {
+            ColumnHeaderRenderer columnRenderer = (ColumnHeaderRenderer) renderer;
+            columnRenderer.setHorizontalAlignment(JLabel.RIGHT);
+        }
+        table.setModel(new DefaultTableModel(10, 6));
         JScrollPane pane = new JScrollPane(table);
        table.setColumnControlVisible(true);
        final JXFrame frame = wrapInFrame(pane, "RToL and column text alignment");
