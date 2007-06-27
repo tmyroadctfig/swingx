@@ -56,7 +56,7 @@ public class JXErrorPaneIssues extends InteractiveTestCase {
         JXErrorPane.showDialog(new NullPointerException("something to show"));
     }
     /**
-     * Issue #??-swingx: JXErrorPane can't cope with null errorInfo.
+     * Issue #468-swingx: JXErrorPane can't cope with null errorInfo.
      *
      */
     public void interactiveNPEWithNullErrorInfo() {
@@ -65,13 +65,13 @@ public class JXErrorPaneIssues extends InteractiveTestCase {
     }
     
     /**
-     * Issue #??-swingx: calling updateUI throws error.
+     * Issue #467-swingx: calling updateUI throws error.
      *
      */
     public void interactiveUpdateUI() {
         final JXErrorPane errorPane = new JXErrorPane();
-        // work around issue #??-swingx: errorPane must cope with null errorInfo.
-        errorPane.setErrorInfo(new ErrorInfo("title", "xxxx-yyy", null, null, null, null, null));
+        // work around issue #468-swingx: errorPane must cope with null errorInfo.
+        //errorPane.setErrorInfo(new ErrorInfo("title", "xxxx-yyy", null, null, null, null, null));
         errorPane.updateUI();
     }
 
