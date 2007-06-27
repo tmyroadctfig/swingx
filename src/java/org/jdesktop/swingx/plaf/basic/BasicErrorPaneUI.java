@@ -466,7 +466,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
     /**
      * @return the default error icon
      */
-    private Icon getDefaultErrorIcon() {
+    protected Icon getDefaultErrorIcon() {
         try {
             Icon icon = UIManager.getIcon(CLASS_NAME + ".errorIcon");
             return icon == null ? UIManager.getIcon("OptionPane.errorIcon") : icon;
@@ -478,7 +478,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
     /**
      * @return the default warning icon
      */
-    private Icon getDefaultWarningIcon() {
+    protected Icon getDefaultWarningIcon() {
         try {
             Icon icon = UIManager.getIcon(CLASS_NAME + ".warningIcon");
             return icon == null ? UIManager.getIcon("OptionPane.warningIcon") : icon;
@@ -818,17 +818,18 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
             init(p);
         }
 
-	protected void init(JXErrorPane p) {
-	    setTitle(p.getErrorInfo().getTitle());
+    	protected void init(JXErrorPane p) {
+            // FYI: info can be null
+    	    setTitle(p.getErrorInfo() == null ? null : p.getErrorInfo().getTitle());
             initWindow(this, p);
-	}
+    	}
     }
 
     private final class JXErrorFrame extends JFrame {
-	public JXErrorFrame(JXErrorPane p) {
-	    setTitle(p.getErrorInfo().getTitle());
-            initWindow(this, p);
-	}
+    	public JXErrorFrame(JXErrorPane p) {
+    	    setTitle(p.getErrorInfo().getTitle());
+                initWindow(this, p);
+    	}
     }
     
     private final class JXInternalErrorFrame extends JInternalFrame {
@@ -914,7 +915,8 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
     
     private void exitIfFatal() {
         ErrorInfo info = pane.getErrorInfo();
-        if (info.getErrorLevel() == ErrorLevel.FATAL) {
+        // FYI: info can be null
+        if (info != null && info.getErrorLevel() == ErrorLevel.FATAL) {
             Action fatalAction = pane.getActionMap().get(JXErrorPane.FATAL_ACTION_KEY);
             if (fatalAction == null) {
                 System.exit(1);
