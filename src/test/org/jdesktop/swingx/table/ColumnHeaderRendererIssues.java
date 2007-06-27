@@ -39,7 +39,7 @@ import org.jdesktop.swingx.JXTableHeader;
 import org.jdesktop.swingx.test.XTestUtils;
 
 /**
- * TODO add type doc
+ * Test for known issues with ColumnHeaderRenderer.
  * 
  * @author Jeanette Winzenburg
  */
@@ -54,6 +54,21 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
             e.printStackTrace();
         } 
     }
+
+    /**
+     * Issue ??-swingx
+     * The icon of the custom renderer column is not updated
+     * to the ui. Win only
+     *
+     */
+    public void interactiveColumnHeaderRendererIcon() {
+        JXTable table = new JXTable(10, 2);
+        ColumnHeaderRenderer renderer = new ColumnHeaderRenderer();
+        renderer.setHorizontalAlignment(JLabel.RIGHT);
+        table.getColumnExt(1).setHeaderRenderer(renderer);
+        showWithScrollingInFrame(table, "sortIcon in second column");
+    }
+
 
     /**
      * Issue #??-jdnc: configure header/column to show icon.
@@ -95,7 +110,20 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
        frame.setVisible(true);
 
     }
-   
+
+    /**
+     * Issue ??-swingx: alignment of custom config not 
+     * reset.
+     *
+     */
+    public void interactiveColumnHeaderRendererCustom() {
+        JXTable table = new JXTable(10, 2);
+        ColumnHeaderRenderer renderer = new ColumnHeaderRenderer(table.getTableHeader());
+        renderer.setHorizontalAlignment(JLabel.RIGHT);
+        table.getColumnExt(1).setHeaderRenderer(renderer);
+        showWithScrollingInFrame(table, "sortIcon in second column");
+    }
+
     /**
      * Issue #??-jdnc: configure header/column to show icon.
      * 
