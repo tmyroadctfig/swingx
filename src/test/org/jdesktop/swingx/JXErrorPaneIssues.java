@@ -71,7 +71,7 @@ public class JXErrorPaneIssues extends InteractiveTestCase {
     public void interactiveUpdateUI() {
         final JXErrorPane errorPane = new JXErrorPane();
         // work around issue #468-swingx: errorPane must cope with null errorInfo.
-        //errorPane.setErrorInfo(new ErrorInfo("title", "xxxx-yyy", null, null, null, null, null));
+        errorPane.setErrorInfo(new ErrorInfo("title", "xxxx-yyy", null, null, null, null, null));
         errorPane.updateUI();
     }
 
