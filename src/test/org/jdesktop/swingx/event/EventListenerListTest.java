@@ -42,7 +42,7 @@ public class EventListenerListTest extends TestCase {
      *
      */
     public void testGetListenerListInitial() {
-        EventListenerList list = new EventListenerList();
+        WeakEventListenerList list = new WeakEventListenerList();
         // must return empty array
         assertNotNull("array must be not null", list.getListenerList());
         assertEquals("array must be empty", 0, list.getListenerList().length);
@@ -53,7 +53,7 @@ public class EventListenerListTest extends TestCase {
      *
      */
     public void testGetListenerListAddRemove() {
-        EventListenerList list = new EventListenerList();
+        WeakEventListenerList list = new WeakEventListenerList();
         // add one changeListener
         ChangeReport changeReport = new ChangeReport();
         list.add(ChangeListener.class, changeReport);
@@ -78,7 +78,7 @@ public class EventListenerListTest extends TestCase {
     }
     
     public void testGetListenersInitial() {
-        EventListenerList list = new EventListenerList();
+        WeakEventListenerList list = new WeakEventListenerList();
         // must return empty array
         assertNotNull("array must be not null", list.getListeners(ChangeListener.class));
         assertEquals("array must be empty", 0, list.getListeners(ChangeListener.class).length);
@@ -90,7 +90,7 @@ public class EventListenerListTest extends TestCase {
      *
      */
     public void testGetListenersAddRemove() {
-        EventListenerList list = new EventListenerList();
+        WeakEventListenerList list = new WeakEventListenerList();
         // add one changeListener
         ChangeReport changeReport = new ChangeReport();
         list.add(ChangeListener.class, changeReport);

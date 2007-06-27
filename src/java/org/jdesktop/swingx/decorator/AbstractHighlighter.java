@@ -26,7 +26,7 @@ import java.awt.Component;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.jdesktop.swingx.event.EventListenerList;
+import org.jdesktop.swingx.event.WeakEventListenerList;
 
 /**
  * Abstract <code>Highlighter</code> implementation which
@@ -46,7 +46,7 @@ public abstract class AbstractHighlighter implements Highlighter {
      */
     private transient ChangeEvent changeEvent;
     /** The listeners waiting for model changes. */
-    protected EventListenerList listenerList = new EventListenerList();
+    protected WeakEventListenerList listenerList = new WeakEventListenerList();
     /** the HighlightPredicate to use. */
     private HighlightPredicate predicate;
 

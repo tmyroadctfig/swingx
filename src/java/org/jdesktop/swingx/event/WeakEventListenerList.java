@@ -75,7 +75,7 @@ import java.util.List;
  *             // Lazily create the event:
  *             if (fooEvent == null)
  *                 fooEvent = new FooEvent(this);
- *             listener[i].fooXXX(fooEvent);
+ *             listener.fooXXX(fooEvent);
  *         }
  *     }
  * }
@@ -98,7 +98,7 @@ import java.util.List;
  * @author Hans Muller
  * @author James Gosling
  */
-public class EventListenerList implements Serializable {
+public class WeakEventListenerList implements Serializable {
 
     protected transient List<WeakReference> weakReferences;
     protected transient List<Class> classes;
