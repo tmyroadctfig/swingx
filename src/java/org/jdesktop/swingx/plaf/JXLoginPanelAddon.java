@@ -24,8 +24,12 @@ package org.jdesktop.swingx.plaf;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.ResourceBundle;
+
 import javax.swing.ImageIcon;
+import javax.swing.UIManager;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.IconUIResource;
@@ -56,6 +60,16 @@ public class JXLoginPanelAddon extends AbstractComponentAddon {
       "JXLoginPanel.banner.darkBackground", new ColorUIResource(Color.GRAY),
       "JXLoginPanel.banner.lightBackground", new ColorUIResource(Color.LIGHT_GRAY),
     }));
+    // Popuplate UIDefaults with the localizable Strings we will use
+    // in the Login panel.
+    String clsName = JXLoginPanel.class.getCanonicalName();
+    ResourceBundle res = ResourceBundle.getBundle("org.jdesktop.swingx.auth.resources.resources", JXLoginPanel.getDefaultLocale());
+    Enumeration<String> keys = res.getKeys();
+    while (keys.hasMoreElements()) {
+        String key = keys.nextElement();
+        UIManager.put(clsName + "." + key, res.getString(key));
+        //System.out.println("adding:" + clsName + "." + key +", val:" + res.getString(key));
+    }
   }
   
   @Override

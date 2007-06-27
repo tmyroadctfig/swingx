@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -66,6 +67,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
@@ -140,7 +142,7 @@ public class JXLoginPanel extends JXImagePanel {
     /**
      * Used as a prefix when pulling data out of UIManager for i18n
      */
-    private static String CLASS_NAME;
+    private static String CLASS_NAME = JXLoginPanel.class.getCanonicalName();
 
     /**
      * The current login status for this panel
@@ -254,19 +256,58 @@ public class JXLoginPanel extends JXImagePanel {
      */
     static {
         LookAndFeelAddons.contribute(new JXLoginPanelAddon());
-        // Popuplate UIDefaults with the localizable Strings we will use
-        // in the Login panel.
-        CLASS_NAME = JXLoginPanel.class.getCanonicalName();
-        String lookup;
-        ResourceBundle res = ResourceBundle.getBundle("org.jdesktop.swingx.auth.resources.resources");
+    }
+
+    /**
+     * Popuplate UIDefaults with the localizable Strings we will use
+     * in the Login panel.
+     */
+    private void reinitLocales(Locale l) {
+        ResourceBundle res = ResourceBundle.getBundle("org.jdesktop.swingx.auth.resources.resources", l);
         Enumeration<String> keys = res.getKeys();
         while (keys.hasMoreElements()) {
             String key = keys.nextElement();
-            lookup = CLASS_NAME + "." + key;
-            if (UIManager.getString(lookup) == null) {
-                UIManager.put(lookup, res.getString(key));
+            UIManager.put(CLASS_NAME + "." + key, res.getString(key));
+        }
+        setBannerText(UIManager.getString(CLASS_NAME + ".bannerString"));
+        banner.setImage(createLoginBanner());
+        errorMessageLabel.setText(UIManager.getString(CLASS_NAME + ".errorMessage")); 
+        progressMessageLabel.setText(UIManager.getString(CLASS_NAME + ".pleaseWait"));
+        recreateLoginPanel();
+        Window w = SwingUtilities.getWindowAncestor(this);
+        if (w instanceof JXLoginFrame) {
+            JXLoginFrame f = (JXLoginFrame) w;
+            f.setTitle(UIManager.getString(CLASS_NAME + ".titleString"));
+            for (Component c : f.getContentPane().getComponents()) {
+                if (c instanceof JXBtnPanel) {
+                    JXBtnPanel p = (JXBtnPanel) c;
+                    p.getOk().setText(UIManager.getString(CLASS_NAME + ".loginString"));
+                    p.getCancel().setText(UIManager.getString(CLASS_NAME + ".cancelString"));
+                    int h = p.getOk().getPreferredSize().height;
+                    p.getOk().setPreferredSize(null);
+                    p.getCancel().setPreferredSize(null);
+                    int prefWidth = Math.max(p.getCancel().getPreferredSize().width, p.getOk().getPreferredSize().width);
+                    p.getCancel().setPreferredSize(new Dimension(prefWidth, h));
+                    p.getOk().setPreferredSize(new Dimension(prefWidth, p.getOk().getPreferredSize().height));
+                    p.invalidate();
+                }
             }
         }
+        JLabel lbl = (JLabel) passwordField.getClientProperty("labeledBy");
+        if (lbl != null) {
+            lbl.setText(UIManager.getString(CLASS_NAME + ".passwordString"));
+        }
+        lbl = (JLabel) namePanel.getComponent().getClientProperty("labeledBy");
+        if (lbl != null) {
+            lbl.setText(UIManager.getString(CLASS_NAME + ".nameString"));
+        }
+        if (serverCombo != null) {
+            lbl = (JLabel) serverCombo.getClientProperty("labeledBy");
+            if (lbl != null) {
+                lbl.setText(UIManager.getString(CLASS_NAME + ".serverString"));
+            }
+        }
+        saveCB.setText(UIManager.getString(CLASS_NAME + ".rememberPasswordString"));
     }
     
     //--------------------------------------------------------- Constructors
@@ -357,11 +398,7 @@ public class JXLoginPanel extends JXImagePanel {
         }
 
         updateUI();
-        
-        // initialize banner text
-        banner = new JXImagePanel();
-        setBannerText(UIManager.getString(CLASS_NAME + ".bannerString"));
-        
+        //initLocales(getDefaultLocale());
         initComponents();
     }
 
@@ -528,6 +565,8 @@ public class JXLoginPanel extends JXImagePanel {
      */
     private void initComponents() {
         //create the default banner
+        banner = new JXImagePanel();
+        setBannerText(UIManager.getString(CLASS_NAME + ".bannerString"));
         banner.setImage(createLoginBanner());
 
         //create the default label
@@ -590,14 +629,14 @@ public class JXLoginPanel extends JXImagePanel {
      * Create and return an Action for logging in
      */
     protected Action createLoginAction() {
-	return new LoginAction(this);
+        return new LoginAction(this);
     }
     
     /**
      * Create and return an Action for canceling login
      */
     protected Action createCancelAction() {
-	return new CancelAction(this);
+        return new CancelAction(this);
     }
     
     //------------------------------------------------------ Bean Properties
@@ -870,11 +909,17 @@ public class JXLoginPanel extends JXImagePanel {
      * Change the status
      */
     protected void setStatus(Status newStatus) {
-	if (status != newStatus) {
-	    Status oldStatus = status;
-	    status = newStatus;
-	    firePropertyChange("status", oldStatus, newStatus);
-	}
+        if (status != newStatus) {
+            Status oldStatus = status;
+            status = newStatus;
+            firePropertyChange("status", oldStatus, newStatus);
+        }
+    }
+    
+    @Override
+    public void setLocale(Locale l) {
+        super.setLocale(l);
+        reinitLocales(l);
     }
     //-------------------------------------------------------------- Methods
     
@@ -893,9 +938,9 @@ public class JXLoginPanel extends JXImagePanel {
             String server = servers.size() == 1 ? servers.get(0) : serverCombo == null ? null : (String)serverCombo.getSelectedItem();
             loginService.startAuthentication(name, password, server);
         } catch(Exception ex) {
-	    //The status is set via the loginService listener, so no need to set
-	    //the status here. Just log the error.
-	    LOG.log(Level.WARNING, "Authentication exception while logging in", ex);
+        //The status is set via the loginService listener, so no need to set
+        //the status here. Just log the error.
+        LOG.log(Level.WARNING, "Authentication exception while logging in", ex);
         } finally {
             setCursor(oldCursor);
         }
@@ -975,7 +1020,7 @@ public class JXLoginPanel extends JXImagePanel {
         }
             
         public void loginStarted(LoginEvent source) {
-	    getActionMap().get(LOGIN_ACTION_COMMAND).setEnabled(false);
+            getActionMap().get(LOGIN_ACTION_COMMAND).setEnabled(false);
             getActionMap().get(CANCEL_LOGIN_ACTION_COMMAND).setEnabled(true);
             remove(contentPanel);
             add(progressPanel, BorderLayout.CENTER);
@@ -987,7 +1032,7 @@ public class JXLoginPanel extends JXImagePanel {
         public void loginFailed(LoginEvent source) {
             remove(progressPanel);
             add(contentPanel, BorderLayout.CENTER);
-	    getActionMap().get(LOGIN_ACTION_COMMAND).setEnabled(true);
+            getActionMap().get(LOGIN_ACTION_COMMAND).setEnabled(true);
             errorMessageLabel.setVisible(true);
             revalidate();
             repaint();
@@ -1010,31 +1055,31 @@ public class JXLoginPanel extends JXImagePanel {
      * Action that initiates a login procedure. Delegates to JXLoginPanel.startLogin
      */
     private static final class LoginAction extends AbstractActionExt {
-	private JXLoginPanel panel;
-	public LoginAction(JXLoginPanel p) {
-	    super(UIManager.getString(CLASS_NAME + ".loginString"), LOGIN_ACTION_COMMAND); 
-	    this.panel = p;
-	}
-	public void actionPerformed(ActionEvent e) {
-	    panel.startLogin();
-	}
-	public void itemStateChanged(ItemEvent e) {}
+    private JXLoginPanel panel;
+    public LoginAction(JXLoginPanel p) {
+        super(UIManager.getString(CLASS_NAME + ".loginString"), LOGIN_ACTION_COMMAND); 
+        this.panel = p;
+    }
+    public void actionPerformed(ActionEvent e) {
+        panel.startLogin();
+    }
+    public void itemStateChanged(ItemEvent e) {}
     }
     
     /**
      * Action that cancels the login procedure. 
      */
     private static final class CancelAction extends AbstractActionExt {
-	private JXLoginPanel panel;
-	public CancelAction(JXLoginPanel p) {
-	    super(UIManager.getString(CLASS_NAME + ".cancelLogin"), CANCEL_LOGIN_ACTION_COMMAND); 
-	    this.panel = p;
-	    this.setEnabled(false);
-	}
-	public void actionPerformed(ActionEvent e) {
-	    panel.cancelLogin();
-	}
-	public void itemStateChanged(ItemEvent e) {}
+        private JXLoginPanel panel;
+        public CancelAction(JXLoginPanel p) {
+            super(UIManager.getString(CLASS_NAME + ".cancelLogin"), CANCEL_LOGIN_ACTION_COMMAND); 
+            this.panel = p;
+            this.setEnabled(false);
+        }
+        public void actionPerformed(ActionEvent e) {
+            panel.cancelLogin();
+        }
+        public void itemStateChanged(ItemEvent e) {}
     }
     
     /**
@@ -1231,29 +1276,29 @@ public class JXLoginPanel extends JXImagePanel {
             init(p);
         }
         
-	protected void init(JXLoginPanel p) {
-	    setTitle(UIManager.getString(CLASS_NAME + ".titleString")); 
-            this.panel = p;
-            initWindow(this, panel);
-	}
-	
-	public JXLoginPanel.Status getStatus() {
-	    return panel.getStatus();
-	}
+    protected void init(JXLoginPanel p) {
+        setTitle(UIManager.getString(CLASS_NAME + ".titleString")); 
+        this.panel = p;
+        initWindow(this, panel);
+    }
+    
+    public JXLoginPanel.Status getStatus() {
+        return panel.getStatus();
+    }
     }
     
     public static final class JXLoginFrame extends JFrame {
-	private JXLoginPanel panel;
-	
-	public JXLoginFrame(JXLoginPanel p) {
-	    super(UIManager.getString(CLASS_NAME + ".titleString")); 
-	    this.panel = p;
+        private JXLoginPanel panel;
+    
+        public JXLoginFrame(JXLoginPanel p) {
+            super(UIManager.getString(CLASS_NAME + ".titleString")); 
+            this.panel = p;
             initWindow(this, panel);
-	}
-	
-	public JXLoginPanel.Status getStatus() {
-	    return panel.getStatus();
-	}
+        }
+        
+        public JXLoginPanel.Status getStatus() {
+            return panel.getStatus();
+        }
         
         public JXLoginPanel getPanel() {
             return panel;
@@ -1310,10 +1355,11 @@ public class JXLoginPanel extends JXImagePanel {
             }
         });
         cancelButton.setText(UIManager.getString(CLASS_NAME + ".cancelString"));
+        okButton.setText(UIManager.getString(CLASS_NAME + ".loginString"));
         int prefWidth = Math.max(cancelButton.getPreferredSize().width, okButton.getPreferredSize().width);
         cancelButton.setPreferredSize(new Dimension(prefWidth, okButton.getPreferredSize().height));
         okButton.setPreferredSize(new Dimension(prefWidth, okButton.getPreferredSize().height));
-        JXPanel buttonPanel = new JXPanel(new GridBagLayout());
+        JXPanel buttonPanel = new JXBtnPanel(new GridBagLayout(), okButton, cancelButton);
         buttonPanel.add(okButton, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(17, 12, 11, 5), 0, 0));
         buttonPanel.add(cancelButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(17, 0, 11, 11), 0, 0));
         w.add(buttonPanel, BorderLayout.SOUTH);            
@@ -1350,5 +1396,32 @@ public class JXLoginPanel extends JXImagePanel {
         }
         w.pack();
         w.setLocation(WindowUtils.getPointForCentering(w));
+    }
+    
+    private static class JXBtnPanel extends JXPanel {
+
+        private JButton cancel;
+        private JButton ok;
+
+        public JXBtnPanel(GridBagLayout layout, JButton okButton, JButton cancelButton) {
+            super(layout);
+            this.ok = okButton;
+            this.cancel = cancelButton;
+        }
+
+        /**
+         * @return the cancel
+         */
+        public JButton getCancel() {
+            return cancel;
+        }
+
+        /**
+         * @return the ok
+         */
+        public JButton getOk() {
+            return ok;
+        }
+        
     }
 }

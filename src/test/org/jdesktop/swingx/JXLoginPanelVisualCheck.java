@@ -22,6 +22,8 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
@@ -97,7 +99,7 @@ public class JXLoginPanelVisualCheck extends InteractiveTestCase {
         }
     }
     
-    private JMenuBar createMenuBar() {
+    private JMenuBar createMenuBar(final JComponent component) {
         LookAndFeelInfo[] plafs = UIManager.getInstalledLookAndFeels();
         JMenuBar bar = new JMenuBar();
         JMenu menu = new JMenu("Set L&F");
@@ -105,7 +107,15 @@ public class JXLoginPanelVisualCheck extends InteractiveTestCase {
         for (LookAndFeelInfo info : plafs) {
             menu.add(new SetPlafAction(info.getName(), info.getClassName()));
         }
-        
+        menu.add(new AbstractAction("Change Locale") {
+
+            public void actionPerformed(ActionEvent e) {
+                if (component.getLocale() == Locale.FRANCE) {
+                    component.setLocale(Locale.ENGLISH);
+                } else {
+                    component.setLocale(Locale.FRANCE);
+                }
+            }});
         bar.add(menu);
         
         return bar;
@@ -113,17 +123,24 @@ public class JXLoginPanelVisualCheck extends InteractiveTestCase {
     
     public JXFrame wrapInFrame(JComponent component, String title) {
         JXFrame frame = super.wrapInFrame(component, title);
-        frame.setJMenuBar(createMenuBar());
+        frame.setJMenuBar(createMenuBar(component));
         
         return frame;
     }
     
+    /**
+     * Issue #538-swingx Failure to set locale at runtime
+     *
+     */
     public void interactiveDisplay() {
+        sun.awt.AppContext.getAppContext().put("JComponent.defaultLocale", Locale.FRANCE);
         JXLoginPanel panel = new JXLoginPanel();
+        JFrame frame = JXLoginPanel.showLoginFrame(panel);
+        frame.setJMenuBar(createMenuBar(panel));
 
         panel.setSaveMode(SaveMode.BOTH);
         
-        JFrame frame = wrapInFrame(panel, "show login panel");
+//        JFrame frame = wrapInFrame(panel, "show login panel");
         frame.pack();
         frame.setVisible(true);
     }
