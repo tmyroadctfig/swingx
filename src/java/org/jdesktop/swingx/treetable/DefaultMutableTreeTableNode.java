@@ -61,4 +61,23 @@ public class DefaultMutableTreeTableNode extends AbstractMutableTreeTableNode {
     public int getColumnCount() {
         return 1;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isEditable(int column) {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setValueAt(Object aValue, int column) {
+        setUserObject(aValue);
+    }
+
+    
+    
 }

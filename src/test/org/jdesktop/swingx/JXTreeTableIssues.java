@@ -23,6 +23,7 @@ package org.jdesktop.swingx;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -31,6 +32,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.border.Border;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableCellRenderer;
@@ -358,7 +360,8 @@ public class JXTreeTableIssues extends InteractiveTestCase {
      * from tiberiu@dev.java.net
      */
     public void interactiveTreeTableModelAdapterDeleteUpdate() {
-        final TreeTableModel customTreeTableModel = createCustomTreeTableModelFromDefault();
+        final DefaultTreeTableModel customTreeTableModel = (DefaultTreeTableModel) 
+            createCustomTreeTableModelFromDefault();
         final JXTreeTable table = new JXTreeTable(customTreeTableModel);
         table.setRootVisible(true);
         table.expandAll();
@@ -370,32 +373,55 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         xtree.expandAll();
         final JXFrame frame = wrapWithScrollingInFrame(table, xtree,
                 "JXTreeTable.TreeTableModelAdapter: Inconsistency firing update on recursive delete");
-        Action changeValue = new AbstractAction("delete node sports recursively") {
+        final MutableTreeTableNode deletedNode = (MutableTreeTableNode) table.getPathForRow(6).getLastPathComponent();
+        MutableTreeTableNode child1 = (MutableTreeTableNode) table.getPathForRow(6+1).getLastPathComponent();
+        MutableTreeTableNode child2 = (MutableTreeTableNode) table.getPathForRow(6+2).getLastPathComponent();
+        MutableTreeTableNode child3 = (MutableTreeTableNode) table.getPathForRow(6+3).getLastPathComponent();
+        MutableTreeTableNode child4 = (MutableTreeTableNode) table.getPathForRow(6+4).getLastPathComponent();
+        
+        final MutableTreeTableNode[] children = {child1, child2, child3, child4 };
+        final String[] values = {"v1", "v2", "v3", "v4"};
+        final ActionListener l = new ActionListener() {
+            int count = 0;
             public void actionPerformed(ActionEvent e) {
-                MutableTreeTableNode deletedNode = (MutableTreeTableNode) table.getPathForRow(6).getLastPathComponent();
-                MutableTreeTableNode child1 = (MutableTreeTableNode) table.getPathForRow(6+1).getLastPathComponent();
-                MutableTreeTableNode child2 = (MutableTreeTableNode) table.getPathForRow(6+2).getLastPathComponent();
-                MutableTreeTableNode child3 = (MutableTreeTableNode) table.getPathForRow(6+3).getLastPathComponent();
-                MutableTreeTableNode child4 = (MutableTreeTableNode) table.getPathForRow(6+4).getLastPathComponent();
+                if (count > values.length) return;
+                if (count == values.length) {
+                    customTreeTableModel.removeNodeFromParent(deletedNode);
+                    count++;
+                } else {
+                    // one in each run
+                  removeChild(customTreeTableModel, deletedNode, children, values);
+                  count++;
+                  // all in one
+//                    for (int i = 0; i < values.length; i++) {
+//                        removeChild(customTreeTableModel, deletedNode, children, values);
+//                        count++;
+//                    }     
+                }
+            }
+            /**
+             * @param customTreeTableModel
+             * @param deletedNode
+             * @param children
+             * @param values
+             */
+            private void removeChild(final DefaultTreeTableModel customTreeTableModel, final MutableTreeTableNode deletedNode, final MutableTreeTableNode[] children, final String[] values) {
+                customTreeTableModel.removeNodeFromParent(children[count]);
+                customTreeTableModel.setValueAt(values[count], deletedNode, 0);
+            }
+            
+        };
+        Action changeValue = new AbstractAction("delete node sports recursively") {
+            Timer timer;
+            public void actionPerformed(ActionEvent e) {
+                if (timer == null) {
+                    timer = new Timer(10, l);
+                    timer.start();
+                } else {
+                    timer.stop();
+                    setEnabled(false);
+                }
                 
-                //after each child deleted simulate an update over the parent by setting a new name
-                ((DefaultTreeTableModel) customTreeTableModel).removeNodeFromParent(child1);
-                String newValue = "v1";
-                table.getTreeTableModel().setValueAt(newValue,
-                        deletedNode, 0);
-                ((DefaultTreeTableModel) customTreeTableModel).removeNodeFromParent(child2);
-                newValue = "v2";
-                table.getTreeTableModel().setValueAt(newValue,
-                        deletedNode, 0);
-                ((DefaultTreeTableModel) customTreeTableModel).removeNodeFromParent(child3);
-                newValue = "v3";
-                table.getTreeTableModel().setValueAt(newValue,
-                        deletedNode, 0);
-                ((DefaultTreeTableModel) customTreeTableModel).removeNodeFromParent(child4);
-                newValue = "v4";
-                table.getTreeTableModel().setValueAt(newValue,
-                        deletedNode, 0);
-                ((DefaultTreeTableModel) customTreeTableModel).removeNodeFromParent(deletedNode);
             }
         };
         addAction(frame, changeValue);
