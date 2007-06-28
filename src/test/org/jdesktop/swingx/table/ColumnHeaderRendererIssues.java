@@ -48,7 +48,8 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
         ColumnHeaderRendererIssues test = new ColumnHeaderRendererIssues();
         setSystemLF(true);
         try {
-          test.runInteractiveTests();
+//          test.runInteractiveTests();
+          test.runInteractiveTests(".*Create.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -56,19 +57,30 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
     }
 
     /**
-     * Issue ??-swingx
-     * The icon of the custom renderer column is not updated
-     * to the ui. Win only
+     * Issue #540-swingx: sort icon in custom header renderer
+     * not updated to ui. Reason was that the empty constructor
+     * didn't load the ui-specific ion.
      *
      */
-    public void interactiveColumnHeaderRendererIcon() {
+    public void interactiveHeaderRendererCreate() {
         JXTable table = new JXTable(10, 2);
         ColumnHeaderRenderer renderer = new ColumnHeaderRenderer();
-        renderer.setHorizontalAlignment(JLabel.RIGHT);
         table.getColumnExt(1).setHeaderRenderer(renderer);
-        showWithScrollingInFrame(table, "sortIcon in second column");
+        showWithScrollingInFrame(table, "sortIcon in second column wrong");
     }
 
+    /**
+     * Issue ??-swingx: sort icon in configured 
+     * shared renderer is duplicated.
+     *
+     */
+    public void interactiveHeaderRendererConfigureShared() {
+        JXTable table = new JXTable(10, 2);
+        ColumnHeaderRenderer renderer = new ColumnHeaderRenderer(table.getTableHeader());
+//        renderer.setHorizontalAlignment(JLabel.RIGHT);
+        table.getColumnExt(1).setHeaderRenderer(renderer);
+        showWithScrollingInFrame(table, "sortIcon in second column wrong");
+    }
 
     /**
      * Issue #??-jdnc: configure header/column to show icon.
@@ -111,18 +123,6 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
 
     }
 
-    /**
-     * Issue ??-swingx: alignment of custom config not 
-     * reset.
-     *
-     */
-    public void interactiveColumnHeaderRendererCustom() {
-        JXTable table = new JXTable(10, 2);
-        ColumnHeaderRenderer renderer = new ColumnHeaderRenderer(table.getTableHeader());
-        renderer.setHorizontalAlignment(JLabel.RIGHT);
-        table.getColumnExt(1).setHeaderRenderer(renderer);
-        showWithScrollingInFrame(table, "sortIcon in second column");
-    }
 
     /**
      * Issue #??-jdnc: configure header/column to show icon.

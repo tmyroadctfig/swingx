@@ -160,7 +160,7 @@ public class ColumnHeaderRenderer extends JComponent
     public ColumnHeaderRenderer() {
         label = new LabelProperties();
         initDelegate();
-        
+        updateIconUI();
     }
 
     public ColumnHeaderRenderer(JTableHeader header) {
@@ -171,7 +171,6 @@ public class ColumnHeaderRenderer extends JComponent
     private void initDelegate() {
         JTableHeader header = new JTableHeader();
         delegateRenderer = header.getDefaultRenderer();
-
     }
 
     public Component getTableCellRendererComponent(JTable table, Object value,
