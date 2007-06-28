@@ -185,8 +185,8 @@ public class SearchFactory {
         }
         lastFindBarTarget = target;
         target.putClientProperty(AbstractSearchable.MATCH_HIGHLIGHTER, Boolean.TRUE);
-        installFindRemover(target, findBar);
         getSharedFindBar().setSearchable(searchable);
+        installFindRemover(target, findBar);
     }
 
     protected void installFindRemover(Container target, Container findWidget) {
@@ -195,6 +195,7 @@ public class SearchFactory {
         }
         getFindRemover().addTarget(findWidget);
     }
+
     private FindRemover getFindRemover() {
         if (findRemover == null) {
             findRemover = new FindRemover();
@@ -334,8 +335,10 @@ public class SearchFactory {
             } else {
                 findDialog = new JXDialog(JOptionPane.getRootFrame(), getSharedFindPanel());
             }
+            // RJO: shouldn't we avoid overloaded useage like this in a JSR296 world? swap getName() for getTitle() here?            
+            findDialog.setTitle(getSharedFindPanel().getName());
             // JW: don't - this will stay on top of all applications!
-//            findDialog.setAlwaysOnTop(true);
+            // findDialog.setAlwaysOnTop(true);
             findDialog.pack();
             if (location == null) {
                 findDialog.setLocationRelativeTo(frame);
@@ -344,9 +347,9 @@ public class SearchFactory {
             }
         } 
         
-        findDialog.setVisible(true);
-        installFindRemover(target, findDialog);
         getSharedFindPanel().setSearchable(searchable);
+        installFindRemover(target, findDialog);
+        findDialog.setVisible(true);
     }
 
     
@@ -378,7 +381,6 @@ public class SearchFactory {
         if (findBar != null) {
             releaseFindBar();
          }
-        
     }
 
     /**
@@ -441,9 +443,6 @@ public class SearchFactory {
             return targets;
         }
 
-        /**
-         * 
-         */
         private void updateManager() {
             if (focusManager != null) {
                 focusManager.removePropertyChangeListener("permanentFocusOwner", this);
@@ -465,9 +464,6 @@ public class SearchFactory {
             endSearching();
        }
 
-        /**
-         * 
-         */
         public void endSearching() {
             getTargets().clear();
             stopSearching();

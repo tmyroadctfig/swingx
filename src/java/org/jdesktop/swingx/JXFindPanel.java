@@ -64,6 +64,7 @@ public class JXFindPanel extends AbstractPatternPanel {
      *                   information using methods of the <code>Searchible</code> interface.
      */
     public JXFindPanel(Searchable searchable) {
+        setName(getUIString(SEARCH_TITLE));
         setSearchable(searchable);
         initActions();
     }
@@ -106,7 +107,6 @@ public class JXFindPanel extends AbstractPatternPanel {
         initComponents();
         build();
         bind();
-        setName(getUIString(SEARCH_TITLE));
     }
     
     //------------------ support synch the model <--> components
