@@ -81,12 +81,26 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         setSystemLF(true);
         JXTreeTableIssues test = new JXTreeTableIssues();
         try {
-            test.runInteractiveTests();
-//            test.runInteractiveTests(".*Adapter.*");
+//            test.runInteractiveTests();
+            test.runInteractiveTests(".*AdapterDeleteUpdate.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
+    }
+    
+    /**
+     * Clarify contract of isHierarchical.
+     */
+    public void testIsHierarchical() {
+        TreeTableModel model = new DefaultTreeTableModel();
+        //sanity
+        assertEquals(-1, model.getHierarchicalColumn());
+        JXTreeTable treeTable = new JXTreeTable(model);
+        assertEquals(model.getHierarchicalColumn(), treeTable.getHierarchicalColumn());
+        // either this or throw an exception for -1 index
+        // illegal view index anyway
+        assertFalse(treeTable.isHierarchical(-1));
     }
     
     /**
@@ -100,6 +114,16 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         treeTable.setTreeTableModel(createCustomTreeTableModelFromDefault());
     }
     
+    /**
+     * Issue #531-swingx: IllegalArgumentException on setModel.
+     *
+     */
+    public void testSetModelOnTree() {
+        TreeTableModel model = createCustomTreeTableModelFromDefault();
+        JXTree treeTable = new JXTree(model);
+        treeTable.setRootVisible(true);
+        treeTable.setModel(createCustomTreeTableModelFromDefault());
+    }
     /**
      * Issue #531-swingx: IllegalArgumentException on setModel.
      *
@@ -125,6 +149,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         final int row = 0;
         // sanity
         assertEquals("JTree", table.getValueAt(row, 0).toString());
+        assertTrue("root must be editable", table.getModel().isCellEditable(0, 0));
         final TableModelReport report = new TableModelReport();
         table.getModel().addTableModelListener(report);
         // doesn't fire or isn't detectable? 
@@ -301,6 +326,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         final int row = 6;
         // sanity
         assertEquals("sports", table.getValueAt(row, 0).toString());
+        assertTrue("cell must be editable at row " + row, table.getModel().isCellEditable(row, 0));
         final TableModelReport report = new TableModelReport();
         table.getModel().addTableModelListener(report);
         // doesn't fire or isn't detectable? 
@@ -317,6 +343,65 @@ public class JXTreeTableIssues extends InteractiveTestCase {
     }
 
     // -------------- interactive tests
+    /**
+     * Issue #493-swingx: JXTreeTable.TreeTableModelAdapter: Inconsistency
+     * firing update on a recursive delete on a parent node.
+     * 
+     * By recursive delete on a parent node it is understood that first we 
+     * remove its children and then the parent node. After each child removed
+     * we are making an update over the parent. During this update the problem 
+     * occurs: the index row for the parent is -1 and hence it is made an update
+     * over the row -1 (the header) and as it can be seen the preffered widths
+     * of column header are not respected anymore and are restored to the default
+     * preferences (all equal).
+     * 
+     * from tiberiu@dev.java.net
+     */
+    public void interactiveTreeTableModelAdapterDeleteUpdate() {
+        final TreeTableModel customTreeTableModel = createCustomTreeTableModelFromDefault();
+        final JXTreeTable table = new JXTreeTable(customTreeTableModel);
+        table.setRootVisible(true);
+        table.expandAll();
+        table.getColumn("A").setPreferredWidth(100);
+        table.getColumn("A").setMinWidth(100);
+        table.getColumn("A").setMaxWidth(100);
+        JXTree xtree = new JXTree(customTreeTableModel);
+        xtree.setRootVisible(true);
+        xtree.expandAll();
+        final JXFrame frame = wrapWithScrollingInFrame(table, xtree,
+                "JXTreeTable.TreeTableModelAdapter: Inconsistency firing update on recursive delete");
+        Action changeValue = new AbstractAction("delete node sports recursively") {
+            public void actionPerformed(ActionEvent e) {
+                MutableTreeTableNode deletedNode = (MutableTreeTableNode) table.getPathForRow(6).getLastPathComponent();
+                MutableTreeTableNode child1 = (MutableTreeTableNode) table.getPathForRow(6+1).getLastPathComponent();
+                MutableTreeTableNode child2 = (MutableTreeTableNode) table.getPathForRow(6+2).getLastPathComponent();
+                MutableTreeTableNode child3 = (MutableTreeTableNode) table.getPathForRow(6+3).getLastPathComponent();
+                MutableTreeTableNode child4 = (MutableTreeTableNode) table.getPathForRow(6+4).getLastPathComponent();
+                
+                //after each child deleted simulate an update over the parent by setting a new name
+                ((DefaultTreeTableModel) customTreeTableModel).removeNodeFromParent(child1);
+                String newValue = "v1";
+                table.getTreeTableModel().setValueAt(newValue,
+                        deletedNode, 0);
+                ((DefaultTreeTableModel) customTreeTableModel).removeNodeFromParent(child2);
+                newValue = "v2";
+                table.getTreeTableModel().setValueAt(newValue,
+                        deletedNode, 0);
+                ((DefaultTreeTableModel) customTreeTableModel).removeNodeFromParent(child3);
+                newValue = "v3";
+                table.getTreeTableModel().setValueAt(newValue,
+                        deletedNode, 0);
+                ((DefaultTreeTableModel) customTreeTableModel).removeNodeFromParent(child4);
+                newValue = "v4";
+                table.getTreeTableModel().setValueAt(newValue,
+                        deletedNode, 0);
+                ((DefaultTreeTableModel) customTreeTableModel).removeNodeFromParent(deletedNode);
+            }
+        };
+        addAction(frame, changeValue);
+        frame.setVisible(true);
+    }
+
 
     
     /**
