@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.ActionMap;
 import javax.swing.DefaultListSelectionModel;
@@ -111,6 +112,8 @@ import org.jdesktop.swingx.treetable.TreeTableModel;
  * @author Ramesh Gupta
  */
 public class JXTreeTable extends JXTable {
+//    private static final Logger LOG = Logger.getLogger(JXTreeTable.class
+//            .getName());
     /**
      * Key for clientProperty to decide whether to apply hack around #168-jdnc.
      */
@@ -692,8 +695,11 @@ public class JXTreeTable extends JXTable {
      */
     public void setTreeTableModel(TreeTableModel treeModel) {
         TreeTableModel old = getTreeTableModel();
+//        boolean rootVisible = isRootVisible();
+//        setRootVisible(false);
         renderer.setModel(treeModel);
         ((TreeTableModelAdapter)getModel()).setTreeTableModel(treeModel);
+//        setRootVisible(rootVisible);
         // Enforce referential integrity; bail on fail
         // JW: when would that happen? we just set it... 
         if (treeModel != renderer.getModel()) { // do not use assert here!
@@ -1504,19 +1510,26 @@ public class JXTreeTable extends JXTable {
 
     /**
      * Determines if the specified column is defined as the hierarchical column.
-     *
-     * @param column zero-based index of the column
+     * <p>
+     * 
+     * @param column zero-based index of the column in view coordinates
      * @return true if the column is the hierarchical column; false otherwise.
      */
     public boolean isHierarchical(int column) {
-        return getHierarchicalColumn() == column;
+        /* 
+         * PENDING JW: sanity throw if index not valid. 
+         */
+//        if (column < 0) throw new IllegalArgumentException("column must be valid, was" + column);
+        return (getHierarchicalColumn() == column);
     }
 
     /**
      * Returns the index of the hierarchical column. This is the column that is
      * displayed as the tree.
      * 
-     * @return the index of the hierarchical column
+     * @return the index of the hierarchical column, -1 if there is
+     *   no hierarchical column
+     * 
      */
     public int getHierarchicalColumn() {
         return convertColumnIndexToView(((TreeTableModel) renderer.getModel()).getHierarchicalColumn());
@@ -1831,6 +1844,7 @@ public class JXTreeTable extends JXTable {
                     }
 
                     public void treeStructureChanged(TreeModelEvent e) {
+                        // ?? should be mapped to structureChanged -- JW
                         delayedFireTableDataChanged();
                     }
                 };
@@ -1862,43 +1876,50 @@ public class JXTreeTable extends JXTable {
             // expansion state before invoke may be different 
             // from expansion state in invoke 
             final boolean expanded = tree.isExpanded(tme.getTreePath());
+            // quick test if tree throws for unrelated path. Seems like not.
+//            tree.getRowForPath(new TreePath("dummy"));
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     int indices[] = tme.getChildIndices();
                     TreePath path = tme.getTreePath();
-                    if (indices != null) { 
-                        if (expanded) { // Dont bother to update if the parent 
-                                                    // node is collapsed
-                            int startingRow = tree.getRowForPath(path)+1;
-                            int min = Integer.MAX_VALUE;
-                            int max = Integer.MIN_VALUE;
-                            for (int i=0;i<indices.length;i++) {
-                                if (indices[i] < min) {
-                                    min = indices[i];
-                                }
-                                if (indices[i] > max) {
-                                    max = indices[i];
-                                }
-                            }
+                    // quick test to see if bailing out is an option
+//                    if (false) {
+                    if (indices != null) {
+                        if (expanded) { // Dont bother to update if the parent
+                            // node is collapsed
+                            // indices must in ascending order, as per TreeEvent/Listener doc
+                            int min = indices[0];
+                            int max = indices[indices.length - 1];
+                            int startingRow = tree.getRowForPath(path) + 1;
+                            min = startingRow + min;
+                            max = startingRow + max;
                             switch (typeChange) {
-                                case 1: 
-                                    fireTableRowsInserted(startingRow + min, startingRow+max);
+                            case 1:
+//                                LOG.info("rows inserted: path " + path + "/" + min + "/"
+//                                        + max);
+                                fireTableRowsInserted(min, max);
                                 break;
-                                case 2:
-                                    fireTableRowsDeleted(startingRow + min, startingRow+max);
+                            case 2:
+//                                LOG.info("rows deleted path " + path + "/" + min + "/"
+//                                                + max);
+                                fireTableRowsDeleted(min, max);
                                 break;
                             }
-                        } else { 
-                        // not expanded - but change might effect appearance of parent
-                        // Issue #82-swingx
+                        } else {
+                            // not expanded - but change might effect appearance
+                            // of parent
+                            // Issue #82-swingx
                             int row = tree.getRowForPath(path);
-                            // fix Issue #247-swingx: prevent accidental structureChanged
-                            // for collapsed path 
-                            // in this case row == -1, which == TableEvent.HEADER_ROW
-                            if (row >= 0) fireTableRowsUpdated(row, row);
+                            // fix Issue #247-swingx: prevent accidental
+                            // structureChanged
+                            // for collapsed path
+                            // in this case row == -1, which ==
+                            // TableEvent.HEADER_ROW
+                            if (row >= 0)
+                                fireTableRowsUpdated(row, row);
                         }
-                    }
-                    else {  // case where the event is fired to identify root.
+                    } else { // case where the event is fired to identify
+                                // root.
                         fireTableDataChanged();
                     }
                 }
@@ -1938,7 +1959,9 @@ public class JXTreeTable extends JXTable {
                                     max = index;
                                 }
                             }
-                            fireTableRowsUpdated(min, max);
+//                            LOG.info("Updated: parentPath/min/max" + path + "/" + min + "/" + max);
+                            // JW: the index is occasionally - 1 - need further digging 
+                            fireTableRowsUpdated(Math.max(0, min), Math.max(0, max));
                         } else {
                             // not expanded - but change might effect appearance
                             // of parent Issue #82-swingx
@@ -2218,8 +2241,12 @@ public class JXTreeTable extends JXTable {
                 Object val = value;
                 
                 if (treeTable != null) {
-                    Object o = treeTable.getValueAt(row, treeTable.getHierarchicalColumn());
-                    
+                    int treeColumn = treeTable.getHierarchicalColumn();
+                    Object o = null; 
+                    if (treeColumn >= 0) {
+                        o = treeTable.getValueAt(row, treeColumn);
+                    }
+                    // JW: why this? null may be a valid value? 
                     if (o != null) {
                     	val = o;
                     }
