@@ -24,6 +24,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -33,6 +34,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableCellRenderer;
@@ -41,6 +43,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.LinkAction;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.renderer.ButtonProvider;
@@ -80,11 +83,12 @@ public class JXTreeTableIssues extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXTreeTableIssues.class
             .getName());
     public static void main(String[] args) {
-        setSystemLF(true);
+//        setSystemLF(true);
         JXTreeTableIssues test = new JXTreeTableIssues();
         try {
 //            test.runInteractiveTests();
-            test.runInteractiveTests(".*AdapterDeleteUpdate.*");
+//            test.runInteractiveTests(".*AdapterDeleteUpdate.*");
+            test.runInteractiveTests(".*UI.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -345,6 +349,47 @@ public class JXTreeTableIssues extends InteractiveTestCase {
     }
 
     // -------------- interactive tests
+    
+    /**
+     * Issue #??-swingx: problem with simple striping in JXTreeTable.
+     * start with cross-platform == okay, bluish striping
+     * toggle to system (win) == striping color silver, 
+     *   but second row bluish, background not reset?
+     * toggle back to cross-platform == no striping, all bluish
+     * 
+     * start with system (win) == okay, silver striping
+     * toggle to cross-platform == okay, bluish striping
+     * back to system == trouble as above
+     * 
+     * JXTable looks okay.
+     */
+    public void interactiveUIStriping() {
+        JXTable table = new JXTable(20, 4);
+        JXTreeTable treeTable = new JXTreeTable(new FileSystemModel());
+        treeTable.setHighlighters(HighlighterFactory.createSimpleStriping());
+        table.setHighlighters(treeTable.getHighlighters());
+        final JXFrame frame = wrapWithScrollingInFrame(treeTable, table, "update ui-specific striping");
+        Action toggle = new AbstractActionExt("toggle LF") {
+            boolean system;
+            public void actionPerformed(ActionEvent e) {
+                String lfName = system ? UIManager.getSystemLookAndFeelClassName() :
+                    UIManager.getCrossPlatformLookAndFeelClassName();
+                try {
+                    UIManager.setLookAndFeel(lfName);
+                    SwingUtilities.updateComponentTreeUI(frame);
+                 } catch (Exception e1) { 
+                     LOG.info("exception when setting LF to " + lfName);
+                     LOG.log(Level.FINE, "caused by ", e1);
+                } 
+                system = !system; 
+                
+            }
+            
+        };
+        addAction(frame, toggle);
+        frame.setVisible(true);
+    }
+    
     /**
      * Issue #493-swingx: JXTreeTable.TreeTableModelAdapter: Inconsistency
      * firing update on a recursive delete on a parent node.
