@@ -28,6 +28,9 @@ import javax.swing.UIManager;
 
 import org.jdesktop.swingx.decorator.HighlightPredicate.NotHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.RowGroupHighlightPredicate;
+import org.jdesktop.swingx.plaf.ColumnHeaderRendererAddon;
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.swingx.plaf.UIColorHighlighterAddon;
 
 /**
  * A Factory which creates common Highlighters. <p>
@@ -162,12 +165,17 @@ public final class HighlighterFactory {
     /**
      * A ColorHighlighter with UI-dependent background.
      * 
-     * PENDING: move color lookup into UI!
+     * PENDING JW: internally install a AND predicate to check for LFs
+     *   which provide striping on the UI-Delegate level?
+     * 
      */
     public static class UIColorHighlighter extends ColorHighlighter 
         implements UIDependent {
 
-     private HashMap<Color, Color> colorMap;
+        static {
+            LookAndFeelAddons.contribute(new UIColorHighlighterAddon());
+        }
+
      
      /**
       * Instantiates a ColorHighlighter with LF provided unselected
@@ -186,7 +194,6 @@ public final class HighlighterFactory {
      */
     public UIColorHighlighter(HighlightPredicate odd) {
         super(null, null, odd);
-        initColorMap();
         updateUI();
     }
 
@@ -195,45 +202,55 @@ public final class HighlighterFactory {
      * @inheritDoc
      */
     public void updateUI() {
-         
-         Color selection = UIManager.getColor("Table.selectionBackground");
-         Color highlight = getMappedColor(selection);
-         
-         setBackground(highlight);
+         setBackground(getUIColor());
      }
 
-     private Color getMappedColor(Color selection) {
-         Color color = colorMap.get(selection);
+    /**
+     * Looks up and returns the LF specific color to use for striping
+     * background highlighting. 
+     * 
+     * Lookup strategy: 
+     * <ol>
+     * <li> in UIManager for key = "UIColorHighlighter.stripingBackground", if null
+     * <li> use hard-coded HighlighterFactory.GENERIC_GREY
+     * </ol>
+     * 
+     * PENDING: fallback or not? 
+     *  
+     * @return the LF specific color for background striping.
+     */
+     private Color getUIColor() {
+         Color color = UIManager.getColor("UIColorHighlighter.stripingBackground");
          if (color == null) {
              color = HighlighterFactory.GENERIC_GRAY;
          }
          return color;
      }
-     /** 
-      * this is a hack until we can think about something better!
-      * we map all known selection colors to highlighter colors.
-      *
-      */
-     private void initColorMap() {
-         colorMap = new HashMap<Color, Color>();
-         // Ocean
-         colorMap.put(new Color(184, 207, 229), new Color(230, 238, 246));
-         // xp blue
-         colorMap.put(new Color(49, 106, 197), new Color(224, 233, 246));
-         // xp silver
-         colorMap.put(new Color(178, 180, 191), new Color(235, 235, 236));
-         // xp olive
-         colorMap.put(new Color(147, 160, 112), new Color(228, 231, 219));
-         // win classic
-         colorMap.put(new Color(10, 36, 106), new Color(218, 222, 233));
-         // win 2k?
-         colorMap.put(new Color(0, 0, 128), new Color(218, 222, 233));
-         // default metal
-         colorMap.put(new Color(205, 205, 255), new Color(235, 235, 255));
-         // mac OS X
-         colorMap.put(new Color(56, 117, 215), new Color(237, 243, 254));
-         
-     }
+//     /** 
+//      * this is a hack until we can think about something better!
+//      * we map all known selection colors to highlighter colors.
+//      *
+//      */
+//     private void initColorMap() {
+//         colorMap = new HashMap<Color, Color>();
+//         // Ocean
+//         colorMap.put(new Color(184, 207, 229), new Color(230, 238, 246));
+//         // xp blue
+//         colorMap.put(new Color(49, 106, 197), new Color(224, 233, 246));
+//         // xp silver
+//         colorMap.put(new Color(178, 180, 191), new Color(235, 235, 236));
+//         // xp olive
+//         colorMap.put(new Color(147, 160, 112), new Color(228, 231, 219));
+//         // win classic
+//         colorMap.put(new Color(10, 36, 106), new Color(218, 222, 233));
+//         // win 2k?
+//         colorMap.put(new Color(0, 0, 128), new Color(218, 222, 233));
+//         // default metal
+//         colorMap.put(new Color(205, 205, 255), new Color(235, 235, 255));
+//         // mac OS X
+//         colorMap.put(new Color(56, 117, 215), new Color(237, 243, 254));
+//         
+//     }
      
  }
 
