@@ -26,6 +26,7 @@ import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -41,6 +42,7 @@ import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
+import javax.swing.UIManager;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.table.TableCellRenderer;
@@ -66,6 +68,7 @@ import org.jdesktop.swingx.decorator.HighlightPredicate.DepthHighlightPredicate;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
+import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.test.AncientSwingTeam;
 
@@ -96,6 +99,47 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 
         }
     }
+
+    /**
+     * Issue #544-swingx: problem with simple striping in JXTreeTable.
+     * start with cross-platform == okay, bluish striping
+     * toggle to system (win) == striping color silver, 
+     *   but second row bluish, background not reset?
+     * toggle back to cross-platform == no striping, all bluish
+     * 
+     * start with system (win) == okay, silver striping
+     * toggle to cross-platform == okay, bluish striping
+     * back to system == trouble as above
+     * 
+     * JXTable looks okay.
+     */
+    public void interactiveUIHighlight() {
+        JXTable table = new JXTable(20, 4);
+        JXTreeTable treeTable = new JXTreeTable(new FileSystemModel());
+        treeTable.setHighlighters(HighlighterFactory.createSimpleStriping());
+        table.setHighlighters(treeTable.getHighlighters());
+        final JXFrame frame = wrapWithScrollingInFrame(treeTable, table, "update ui-specific striping");
+        Action toggle = new AbstractActionExt("toggle LF") {
+            boolean system;
+            public void actionPerformed(ActionEvent e) {
+                String lfName = system ? UIManager.getSystemLookAndFeelClassName() :
+                    UIManager.getCrossPlatformLookAndFeelClassName();
+                try {
+                    UIManager.setLookAndFeel(lfName);
+                    SwingUtilities.updateComponentTreeUI(frame);
+                 } catch (Exception e1) { 
+                     LOG.info("exception when setting LF to " + lfName);
+                     LOG.log(Level.FINE, "caused by ", e1);
+                } 
+                system = !system; 
+                
+            }
+            
+        };
+        addAction(frame, toggle);
+        frame.setVisible(true);
+    }
+    
 
     /**
      * Issue #471-swingx: No selection on click into hierarchical column outside

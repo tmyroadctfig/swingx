@@ -56,7 +56,6 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.event.TreeWillExpandListener;
-import javax.swing.plaf.UIResource;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
@@ -112,8 +111,8 @@ import org.jdesktop.swingx.treetable.TreeTableModel;
  * @author Ramesh Gupta
  */
 public class JXTreeTable extends JXTable {
-//    private static final Logger LOG = Logger.getLogger(JXTreeTable.class
-//            .getName());
+    private static final Logger LOG = Logger.getLogger(JXTreeTable.class
+            .getName());
     /**
      * Key for clientProperty to decide whether to apply hack around #168-jdnc.
      */
@@ -1482,31 +1481,6 @@ public class JXTreeTable extends JXTable {
         }
     }
 
-    /**
-     * Overridden to message super and forward the method to the tree.
-     * Since the tree is not actually in the component hieachy it will
-     * never receive this unless we forward it in this manner.
-     */
-    @Override
-    public void updateUI() {
-        super.updateUI();
-        if (renderer != null) {
-            renderer.updateUI();
-
-            // Do this so that the editor is referencing the current renderer
-            // from the tree. The renderer can potentially change each time
-            // laf changes. 
-            // JW: Hmm ... really? The renderer is fixed, set once
-            // in creating treetable... 
-            // commented to fix #213-jdnc (allow custom editors)
-//            setDefaultEditor(AbstractTreeTableModel.hierarchicalColumnClass,
-//                new TreeTableCellEditor(renderer));
-
-            if (getBackground() == null || getBackground() instanceof UIResource) {
-                setBackground(renderer.getBackground());
-            }
-        }
-    }
 
     /**
      * Determines if the specified column is defined as the hierarchical column.
@@ -1829,6 +1803,7 @@ public class JXTreeTable extends JXTable {
                 treeModelListener = new TreeModelListener() {
                     
                     public void treeNodesChanged(TreeModelEvent e) {
+                        LOG.info("got tree event: changed " + e);
                         delayedFireTableDataUpdated(e);
                     }
 
@@ -1840,7 +1815,8 @@ public class JXTreeTable extends JXTable {
                     }
 
                     public void treeNodesRemoved(TreeModelEvent e) {
-                        delayedFireTableDataChanged(e, 2);
+                        LOG.info("got tree event: removed " + e);
+                       delayedFireTableDataChanged(e, 2);
                     }
 
                     public void treeStructureChanged(TreeModelEvent e) {
@@ -1895,13 +1871,13 @@ public class JXTreeTable extends JXTable {
                             max = startingRow + max;
                             switch (typeChange) {
                             case 1:
-//                                LOG.info("rows inserted: path " + path + "/" + min + "/"
-//                                        + max);
+                                LOG.info("rows inserted: path " + path + "/" + min + "/"
+                                        + max);
                                 fireTableRowsInserted(min, max);
                                 break;
                             case 2:
-//                                LOG.info("rows deleted path " + path + "/" + min + "/"
-//                                                + max);
+                                LOG.info("rows deleted path " + path + "/" + min + "/"
+                                                + max);
                                 fireTableRowsDeleted(min, max);
                                 break;
                             }
@@ -1959,7 +1935,7 @@ public class JXTreeTable extends JXTable {
                                     max = index;
                                 }
                             }
-//                            LOG.info("Updated: parentPath/min/max" + path + "/" + min + "/" + max);
+                            LOG.info("Updated: parentPath/min/max" + path + "/" + min + "/" + max);
                             // JW: the index is occasionally - 1 - need further digging 
                             fireTableRowsUpdated(Math.max(0, min), Math.max(0, max));
                         } else {

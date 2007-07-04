@@ -351,46 +351,6 @@ public class JXTreeTableIssues extends InteractiveTestCase {
     // -------------- interactive tests
     
     /**
-     * Issue #??-swingx: problem with simple striping in JXTreeTable.
-     * start with cross-platform == okay, bluish striping
-     * toggle to system (win) == striping color silver, 
-     *   but second row bluish, background not reset?
-     * toggle back to cross-platform == no striping, all bluish
-     * 
-     * start with system (win) == okay, silver striping
-     * toggle to cross-platform == okay, bluish striping
-     * back to system == trouble as above
-     * 
-     * JXTable looks okay.
-     */
-    public void interactiveUIStriping() {
-        JXTable table = new JXTable(20, 4);
-        JXTreeTable treeTable = new JXTreeTable(new FileSystemModel());
-        treeTable.setHighlighters(HighlighterFactory.createSimpleStriping());
-        table.setHighlighters(treeTable.getHighlighters());
-        final JXFrame frame = wrapWithScrollingInFrame(treeTable, table, "update ui-specific striping");
-        Action toggle = new AbstractActionExt("toggle LF") {
-            boolean system;
-            public void actionPerformed(ActionEvent e) {
-                String lfName = system ? UIManager.getSystemLookAndFeelClassName() :
-                    UIManager.getCrossPlatformLookAndFeelClassName();
-                try {
-                    UIManager.setLookAndFeel(lfName);
-                    SwingUtilities.updateComponentTreeUI(frame);
-                 } catch (Exception e1) { 
-                     LOG.info("exception when setting LF to " + lfName);
-                     LOG.log(Level.FINE, "caused by ", e1);
-                } 
-                system = !system; 
-                
-            }
-            
-        };
-        addAction(frame, toggle);
-        frame.setVisible(true);
-    }
-    
-    /**
      * Issue #493-swingx: JXTreeTable.TreeTableModelAdapter: Inconsistency
      * firing update on a recursive delete on a parent node.
      * 
