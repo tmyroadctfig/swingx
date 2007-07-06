@@ -2182,12 +2182,14 @@ public class JXTreeTable extends JXTable {
         }
 
         private class ClippedTreeCellRenderer extends DefaultTreeCellRenderer {
+            private boolean inpainting;
+            private String shortText;
             public void paint(Graphics g) {
                 String fullText = super.getText();
                 // getText() calls tree.convertValueToText();
                 // tree.convertValueToText() should call treeModel.convertValueToText(), if possible
         
-                String shortText = SwingUtilities.layoutCompoundLabel(
+                 shortText = SwingUtilities.layoutCompoundLabel(
                     this, g.getFontMetrics(), fullText, getIcon(),
                     getVerticalAlignment(), getHorizontalAlignment(),
                     getVerticalTextPosition(), getHorizontalTextPosition(),
@@ -2199,15 +2201,21 @@ public class JXTreeTable extends JXTable {
          */
 
                 try {
+                    inpainting = true;
+                    // TODO JW: don't - override getText to return the short version
+                    // during painting
                     setText(shortText); // temporarily truncate text
                     super.paint(g);
                 } finally {
+                    inpainting = false;
                     setText(fullText); // restore full text
                 }
             }
 
+            
             private Rectangle getItemRect(Rectangle itemRect) {
                 getBounds(itemRect);
+                LOG.info("rect" + itemRect);
                 itemRect.width = hierarchicalColumnWidth - itemRect.x;
                 return itemRect;
             }
@@ -2220,12 +2228,21 @@ public class JXTreeTable extends JXTable {
                     int treeColumn = treeTable.getHierarchicalColumn();
                     Object o = null; 
                     if (treeColumn >= 0) {
-                        o = treeTable.getValueAt(row, treeColumn);
+                        // following is unreliable during a paint cycle
+                        // somehow interferes with BasicTreeUIs painting cache
+                        //o = treeTable.getValueAt(row, treeColumn);
+                        // ask the model - that's always okay
+                        // might blow if the TreeTableModel is strict in
+                        // checking the containment of the value and 
+                        // this renderer is called for sizing with a prototype
+                        o = treeTable.getTreeTableModel().getValueAt(value, treeColumn);
                     }
                     // JW: why this? null may be a valid value? 
-                    if (o != null) {
-                    	val = o;
-                    }
+                    // removed - didn't see it after asking the model
+//                    if (o != null) {
+//                    	val = o;
+//                    }
+                    val = o;
                 }
                 
                 return super.getTreeCellRendererComponent(tree, val, sel, expanded, leaf,
