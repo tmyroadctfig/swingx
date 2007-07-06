@@ -2215,7 +2215,7 @@ public class JXTreeTable extends JXTable {
             
             private Rectangle getItemRect(Rectangle itemRect) {
                 getBounds(itemRect);
-                LOG.info("rect" + itemRect);
+//                LOG.info("rect" + itemRect);
                 itemRect.width = hierarchicalColumnWidth - itemRect.x;
                 return itemRect;
             }
@@ -2225,18 +2225,20 @@ public class JXTreeTable extends JXTable {
                 Object val = value;
                 
                 if (treeTable != null) {
-                    int treeColumn = treeTable.getHierarchicalColumn();
+                    int treeColumn = treeTable.getTreeTableModel().getHierarchicalColumn();
                     Object o = null; 
+//                    LOG.info("value ? " + value);
                     if (treeColumn >= 0) {
                         // following is unreliable during a paint cycle
                         // somehow interferes with BasicTreeUIs painting cache
-                        //o = treeTable.getValueAt(row, treeColumn);
+//                        o = treeTable.getValueAt(row, treeColumn);
                         // ask the model - that's always okay
                         // might blow if the TreeTableModel is strict in
                         // checking the containment of the value and 
                         // this renderer is called for sizing with a prototype
                         o = treeTable.getTreeTableModel().getValueAt(value, treeColumn);
                     }
+//                    LOG.info("value ? " + value);
                     // JW: why this? null may be a valid value? 
                     // removed - didn't see it after asking the model
 //                    if (o != null) {
