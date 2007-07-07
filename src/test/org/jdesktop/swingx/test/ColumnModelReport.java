@@ -16,6 +16,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableColumnModelEvent;
 
 import org.jdesktop.swingx.event.TableColumnModelExtListener;
+import org.jdesktop.test.PropertyChangeReport;
 
 /**
  * A TableColumnExtListener that stores the received TableColumnEvents and
@@ -34,8 +35,10 @@ public class ColumnModelReport implements TableColumnModelExtListener {
     private List<ListSelectionEvent> selectionEvents = new LinkedList<ListSelectionEvent>();
     private List<ChangeEvent> changeEvents = new LinkedList<ChangeEvent>();
     
-    private List<PropertyChangeEvent> columnPropertyEvents = new LinkedList<PropertyChangeEvent>();
+//    private List<PropertyChangeEvent> columnPropertyEvents = new LinkedList<PropertyChangeEvent>();
 
+    private PropertyChangeReport propertyReport = new PropertyChangeReport();
+    
 //------------------------ implement TableColumnModelListener    
     public void columnAdded(TableColumnModelEvent e) {
         addedEvents.add(0, e);
@@ -61,7 +64,7 @@ public class ColumnModelReport implements TableColumnModelExtListener {
 
 
     public void columnPropertyChange(PropertyChangeEvent e) {
-        columnPropertyEvents.add(0, e);
+        propertyReport.propertyChange(e);
         
     }
 
@@ -76,12 +79,12 @@ public class ColumnModelReport implements TableColumnModelExtListener {
         movedEvents.clear();
         changeEvents.clear();
         selectionEvents.clear();
-        columnPropertyEvents.clear();
+        propertyReport.clear();
     }
 
     public int getEventCount() {
         return addedEvents.size() + removedEvents.size() + movedEvents.size() +
-          changeEvents.size() + selectionEvents.size() + columnPropertyEvents.size();
+          changeEvents.size() + selectionEvents.size() + propertyReport.getEventCount();
     }
 
     // -------------- access reported TableModelEvents
@@ -105,15 +108,26 @@ public class ColumnModelReport implements TableColumnModelExtListener {
     //--------------- access reported propertyChangeEvent
     
     public boolean hasColumnPropertyEvent() {
-        return !columnPropertyEvents.isEmpty();
+        return propertyReport.hasEvents();
     }
     
     public int getColumnPropertyEventCount() {
-        return columnPropertyEvents.size();
-    }
-    public PropertyChangeEvent getLastColumnPropertyEvent() {
-        return columnPropertyEvents.isEmpty() ? null :
-            columnPropertyEvents.get(0);
+        return propertyReport.getEventCount();
     }
     
+    public PropertyChangeEvent getLastColumnPropertyEvent() {
+        return propertyReport.getLastEvent();
+    }
+    
+    public int getColumnPropertyEventCount(String property) {
+        return propertyReport.getEventCount(property);
+    }
+    
+    public Object getLastColumnPropertyEvent(String property) {
+        return propertyReport.getLastEvent(property);
+    }
+    
+    public PropertyChangeReport getPropertyChangeReport() {
+        return propertyReport;
+    }
 }

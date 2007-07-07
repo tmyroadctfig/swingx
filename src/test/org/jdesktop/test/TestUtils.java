@@ -9,6 +9,7 @@
 
 package org.jdesktop.test;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
@@ -21,6 +22,54 @@ import junit.framework.Assert;
  */
 public final class TestUtils extends Assert {
     private TestUtils() {}
+    
+    /**
+     * Asserts the last received propertyChangeEvent of the 
+     * report against the expected values.
+     * 
+     * @param report the PropertyReport which received the event
+     * @param source the expected event source
+     * @param property the expected name of the property
+     * @param oldValue the expected old value 
+     * @param newValue the expected new value
+     */
+    public static void assertPropertyChangeEvent(PropertyChangeReport report, 
+            Object source, String property, Object oldValue, Object newValue) {
+        assertPropertyChangeEvent(report, property, oldValue, newValue);
+        assertEquals("event source", source, report.getLastSource());
+    }
+
+    /**
+     * Asserts the last received propertyChangeEvent of the 
+     * report against the expected values.
+     * 
+     * @param report the PropertyReport which received the event
+     * @param property the expected name of the property
+     * @param oldValue the expected old value 
+     * @param newValue the expected new value
+     */
+    public static void assertPropertyChangeEvent(PropertyChangeReport report, String property, Object oldValue, Object newValue) {
+        assertEquals("exactly one event", 1, report.getEventCount());
+        assertEquals("property", property, report.getLastProperty());
+        assertEquals("last old value", oldValue, report.getLastOldValue());
+        assertEquals("last old value", newValue, report.getLastNewValue());
+    }
+    
+    /**
+     * Asserts the last received propertyChangeEvent of the 
+     * report against the expected values.
+     * 
+     * @param report the PropertyReport which received the event
+     * @param property the expected name of the property
+     * @param oldValue the expected old value 
+     * @param newValue the expected new value
+     */
+    public static void assertPropertyChangeEvent(PropertyChangeEvent event, String property, Object oldValue, Object newValue) {
+        assertNotNull("event must be not null", event);
+        assertEquals("property", property, event.getPropertyName());
+        assertEquals("last old value", oldValue, event.getOldValue());
+        assertEquals("last old value", newValue, event.getNewValue());
+    }
     
     public static void assertPropertyChangeNotification(
             Object bean, String propertyName, Object expected) throws Exception {

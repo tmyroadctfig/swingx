@@ -4,27 +4,24 @@
  */
 package org.jdesktop.swingx.table;
 
-import org.jdesktop.swingx.test.ColumnModelReport;
-
+/**
+ * Test to exposed known issues of <code>TableColumnModelExt</code>
+ * implementations.
+ * 
+ * Ideally, there would be at least one failing test method per open
+ * Issue in the issue tracker. Plus additional failing test methods for
+ * not fully specified or not yet decided upon features/behaviour.
+ * 
+ * @author Jeanette Winzenburg
+ */
 public class TableColumnModelExtIssues extends TableColumnModelTest {
-    /**
-     * Issue #369-swingx: properties of hidden columns are not fired. <p>
-     * make sure that property changes in hidden columns are routed to the
-     * TableColumnModelExtListener
+
+    /** 
+     * Do nothing, just to make the runner happy if there are no 
+     * issues.
      *
      */
-    public void testHiddenTableColumnPropertyNotification() {
-        TableColumnModelExt columnModel = createColumnModel(COLUMN_COUNT);
-        Object identifier = "0";
-        columnModel.getColumnExt(identifier).setVisible(false);
-        // sanity...
-        assertNotNull(columnModel.getColumnExt(identifier));
-        String title = columnModel.getColumnExt(identifier).getTitle() + "changed";
-        ColumnModelReport report = new ColumnModelReport();
-        columnModel.addColumnModelListener(report);
-        columnModel.getColumnExt(identifier).setTitle(title);
-        assertEquals(1, report.getColumnPropertyEventCount());
+    public void testDummy() {
+        
     }
-    
-
 }

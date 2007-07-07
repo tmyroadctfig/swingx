@@ -328,7 +328,10 @@ public class DefaultTableColumnModelExt extends DefaultTableColumnModel
                     moveToInvisible(col);
                 } else if (!oldValue && newValue) {
                     moveToVisible(col);
+                    fireColumnPropertyChange(evt);
                 }
+            } else if (!((TableColumnExt) evt.getSource()).isVisible()) {
+                fireColumnPropertyChange(evt);
             }
         }
     }

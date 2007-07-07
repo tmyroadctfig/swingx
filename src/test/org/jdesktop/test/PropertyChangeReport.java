@@ -27,8 +27,8 @@ public class PropertyChangeReport implements PropertyChangeListener {
     /**
      * Holds a list of all received PropertyChangeEvents.
      */
-    protected List events = new LinkedList();
-    protected Map eventMap = new HashMap();
+    protected List<PropertyChangeEvent> events = new LinkedList<PropertyChangeEvent>();
+    protected Map<String, PropertyChangeEvent> eventMap = new HashMap<String, PropertyChangeEvent>();
     
 //------------------------ implement PropertyChangeListener
     
@@ -85,11 +85,11 @@ public class PropertyChangeReport implements PropertyChangeListener {
     public PropertyChangeEvent getLastEvent() {
         return events.isEmpty()
             ? null
-            : (PropertyChangeEvent) events.get(0);
+            : events.get(0);
     }
 
     public PropertyChangeEvent getLastEvent(String property) {
-        return (PropertyChangeEvent) eventMap.get(property);
+        return eventMap.get(property);
     }
     
     public Object getLastOldValue() {
@@ -102,6 +102,22 @@ public class PropertyChangeReport implements PropertyChangeListener {
         return last != null ? last.getNewValue() : null;
     }
  
+    /**
+     * @return the propertyName of the last event or 
+     *    null if !hasEvents().
+     */
+    public String getLastProperty() {
+        PropertyChangeEvent last = getLastEvent();
+        return last != null ? last.getPropertyName() : null;
+    }
+    /**
+     * @return
+     */
+    public Object getLastSource() {
+        PropertyChangeEvent last = getLastEvent();
+        return last != null ? last.getSource() : null;
+    }
+    
     public Object getLastOldValue(String property) {
         PropertyChangeEvent last = getLastEvent(property);
         return last != null ? last.getOldValue() : null;
@@ -112,12 +128,22 @@ public class PropertyChangeReport implements PropertyChangeListener {
         return last != null ? last.getNewValue() : null;
     }
     
+    /**
+     * PRE: hasEvents()
+     * @return
+     */
     public boolean getLastOldBooleanValue() {
         return ((Boolean) getLastOldValue()).booleanValue();
     }
 
+    /**
+     * PRE: hasEvents()
+     * @return
+     */
     public boolean getLastNewBooleanValue() {
         return ((Boolean) getLastNewValue()).booleanValue();
     }
+
+
 
 }

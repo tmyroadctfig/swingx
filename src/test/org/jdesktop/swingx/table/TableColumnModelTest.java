@@ -21,6 +21,7 @@ import junit.framework.TestCase;
 
 import org.jdesktop.swingx.event.TableColumnModelExtListener;
 import org.jdesktop.swingx.test.ColumnModelReport;
+import org.jdesktop.test.TestUtils;
 
 /**
  * Skeleton to unit test DefaultTableColumnExt.
@@ -39,6 +40,64 @@ public class TableColumnModelTest extends TestCase {
             .getLogger(TableColumnModelTest.class.getName());
     protected static final int COLUMN_COUNT = 3;
  
+    /**
+     * Issue #369-swingx: properties of hidden columns are not fired. <p>
+     * test the change from visible to hidden.
+     */
+    public void testHideTableColumnPropertyNotification() {
+        TableColumnModelExt columnModel = createColumnModel(COLUMN_COUNT);
+        Object identifier = "0";
+        // sanity...
+        assertNotNull(columnModel.getColumnExt(identifier));
+        ColumnModelReport report = new ColumnModelReport();
+        columnModel.addColumnModelListener(report);
+        columnModel.getColumnExt(identifier).setVisible(false);
+        TestUtils.assertPropertyChangeEvent(report.getPropertyChangeReport(), 
+                "visible", true, false);
+    }
+    
+    /**
+     * Issue #369-swingx: properties of hidden columns are not fired. <p>
+     * test the change from hidden to visible.
+     */
+    public void testShowTableColumnPropertyNotification() {
+        TableColumnModelExt columnModel = createColumnModel(COLUMN_COUNT);
+        Object identifier = "0";
+        // sanity...
+        assertNotNull(columnModel.getColumnExt(identifier));
+        columnModel.getColumnExt(identifier).setVisible(false);
+        ColumnModelReport report = new ColumnModelReport();
+        columnModel.addColumnModelListener(report);
+        columnModel.getColumnExt(identifier).setVisible(true);
+        // can't use the report because of the ignore_event hack in
+        // moveToVisible of DTCMExt - revisit: maybe no longer
+        // needed now that the column property events are correctly
+        // routed?
+        TestUtils.assertPropertyChangeEvent(report.getLastColumnPropertyEvent(), 
+                "visible", false, true);
+    }
+    
+
+    /**
+     * Issue #369-swingx: properties of hidden columns are not fired. <p>
+     * test property changes while hidden 
+     *
+     */
+    public void testHiddenTableColumnPropertyNotification() {
+        TableColumnModelExt columnModel = createColumnModel(COLUMN_COUNT);
+        String identifier = "0";
+        TableColumnExt columnExt = columnModel.getColumnExt(identifier);
+        columnExt.setVisible(false);
+        // sanity...
+        assertNotNull(columnExt);
+        String title = columnExt.getTitle() + "changed";
+        ColumnModelReport report = new ColumnModelReport();
+        columnModel.addColumnModelListener(report);
+        columnExt.setIdentifier(title);
+        TestUtils.assertPropertyChangeEvent(report.getPropertyChangeReport(), 
+                "identifier", identifier, title);
+    }
+    
     /**
      * Issue #253-swingx: hiding/showing columns changes column sequence.
      * 
