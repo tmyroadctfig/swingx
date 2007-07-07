@@ -189,9 +189,30 @@ public class JXTableUnitTest extends InteractiveTestCase {
         adapter.column = 0;
         assertEquals("adapter.getValue must return value at adapter coordinates", 
                 table.getValueAt(0, 0), adapter.getValue());
-        
-        
     }
+
+    /**
+     * Issue 373-swingx: table must unsort column on sortable change.
+     *
+     * Here we test if switching sortable to false on the sorted column
+     * resets the sorting, special case hidden column. This fails 
+     * because columnModel doesn't fire property change events for
+     * hidden columns (see Issue #369-swingx).
+     * 
+     */
+    public void testTableUnsortedColumnOnHiddenColumnSortableChange() {
+        JXTable table = new JXTable(10, 2);
+        TableColumnExt columnExt = table.getColumnExt(0);
+        Object identifier = columnExt.getIdentifier();
+        table.toggleSortOrder(identifier);
+        assertTrue(table.getSortOrder(identifier).isSorted());
+        columnExt.setVisible(false);
+        assertTrue(table.getSortOrder(identifier).isSorted());
+        columnExt.setSortable(false);
+        assertFalse("table must have unsorted column on sortable change", 
+                table.getSortOrder(identifier).isSorted());
+    }
+
 
     /**
      * Issue 373-swingx: table must unsort column on sortable change.
