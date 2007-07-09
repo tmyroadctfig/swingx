@@ -121,11 +121,6 @@ public class FilterTest extends InteractiveTestCase {
 
 //---------------------------------SortController/Sorter in FilterPipeline
  
-    public void testSortControllerToggleWithComparator() {
-        FilterPipeline pipeline = createAssignedPipeline(true);
-        SortController controller = pipeline.getSortController();
-//        controller.toggleSortOrder(0, Collator.getInstance());
-    }
     
     /**
      * creates and returns a FilterPipeline assigned to directModelAdapter.
@@ -134,7 +129,7 @@ public class FilterTest extends InteractiveTestCase {
      * @param withReport flag to indicate if pipelineReport should be registered.
      * @return FilterPipeline
      */
-    private FilterPipeline createAssignedPipeline(boolean withReport) {
+    protected FilterPipeline createAssignedPipeline(boolean withReport) {
         FilterPipeline pipeline = new FilterPipeline();
         pipeline.assign(directModelAdapter);
         if (withReport) {
@@ -209,6 +204,7 @@ public class FilterTest extends InteractiveTestCase {
      * after setting properties of SortController.
      *
      */
+    @SuppressWarnings("unchecked")
     public void testSortControllerResetRemovesSorter() {
         FilterPipeline pipeline = createAssignedPipeline(false);
         int column = 2;

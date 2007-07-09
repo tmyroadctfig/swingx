@@ -6,11 +6,22 @@
  */
 package org.jdesktop.swingx.decorator;
 
+import java.text.Collator;
+
 
 /**
  * @author Jeanette Winzenburg
  */
 public class FilterIssues extends FilterTest {
+
+
+    
+    public void testSortControllerToggleWithComparator() {
+        FilterPipeline pipeline = createAssignedPipeline(true);
+        SortController controller = pipeline.getSortController();
+        controller.toggleSortOrder(0, Collator.getInstance());
+        fail("test does nothing - revisit?");
+    }
 
     /**
      * order of filters must be retained.
@@ -25,15 +36,6 @@ public class FilterIssues extends FilterTest {
         assertOrders(filters);
     }
 
-    public void testConvertRowIndicesInLastAndPipeline() {
-        Filter filterZero = createDefaultPatternFilter(0);
-        Filter filterTwo = createDefaultPatternFilter(2); 
-        Sorter sorter = new ShuttleSorter(2, true);
-        Filter[] filters = new Filter[] {filterZero, filterTwo, sorter};
-        FilterPipeline pipeline = new FilterPipeline(filters);
-        pipeline.assign(directModelAdapter);
-        
-    }
     /**
      * trying to find out how much truth is in the api doc
      * for the conversion methods.
@@ -51,8 +53,6 @@ public class FilterIssues extends FilterTest {
         pipeline.assign(directModelAdapter);
         // this is 5
         int lastViewRow = pipeline.getOutputSize() - 1;
-        Object firstValue = pipeline.getValueAt(0, 0);
-        Object lastValue = pipeline.getValueAt(lastViewRow, 0);
         // modelrow is 18
         int modelRow = pipeline.convertRowIndexToModel(lastViewRow);
         Filter intermediateFilter1 = pipeline.previous(intermediateSorter);
@@ -86,8 +86,6 @@ public class FilterIssues extends FilterTest {
         pipeline.assign(directModelAdapter);
         // this is 5
         int lastViewRow = pipeline.getOutputSize() - 1;
-        Object firstValue = pipeline.getValueAt(0, 0);
-        Object lastValue = pipeline.getValueAt(lastViewRow, 0);
         // modelrow is 18
         int modelRow = pipeline.convertRowIndexToModel(lastViewRow);
         Filter intermediateFilter1 = pipeline.previous(intermediateSorter);
@@ -103,57 +101,5 @@ public class FilterIssues extends FilterTest {
         
     }
     
-    public void testGetValue() {
-        FilterPipeline pipeline = createPipeline();
-        pipeline.assign(directModelAdapter);
-        int size = pipeline.getOutputSize();
-        Object firstValue = pipeline.getValueAt(0, 0);
-        Object lastValue = pipeline.getValueAt(size - 1, 0);
-        Sorter sorter = new ShuttleSorter();
-        // nothing changed - we have an ascending sorter on column 0 in the pipeline
-        pipeline.setSorter(sorter);
-        assertEquals(size, pipeline.getOutputSize());
-        assertEquals(firstValue, pipeline.getValueAt(0, 0));
-        // sorter has same coordinate system as pipeline
-        assertEquals(firstValue, sorter.getValueAt(0, 0));
-        assertEquals(lastValue, sorter.getValueAt(size - 1, 0));
-        sorter.setAscending(false);
-        assertEquals(lastValue, sorter.getValueAt(0, 0));
-        assertEquals(firstValue, sorter.getValueAt(size - 1, 0));
-        Filter intermediateSorter = pipeline.previous(sorter);
-        Filter intermediateFilter1 = pipeline.previous(intermediateSorter);
-        Filter intermediateFilter2 = pipeline.previous(intermediateFilter1);
-        // sanity check - to assure that filter.getValueAt(...) takes
-        // row indices in filter row-coordinates
-        assertTrue(intermediateFilter2 instanceof PatternFilter);
-        assertEquals(lastValue, intermediateFilter2.getValueAt(0, 0));
-        assertEquals(firstValue, intermediateFilter2.getValueAt(size - 1, 0));
-        
-    }
-    
-
-    /**
-     * what is the benefit of passing the old sorter?
-     *
-     */
-      public void testInterposeWithOldSorter() {
-//          int sortColumn = 0;
-//          Filter[] filters = new Filter[] {createDefaultPatternFilter(sortColumn), new ShuttleSorter()};
-//          FilterPipeline pipeline = new FilterPipeline(filters);
-//          pipeline.assign(directModelAdapter);
-//          pipeline.flush();
-//          Object value = pipeline.getValueAt(0, sortColumn);
-//          Object lastValue = pipeline.getValueAt(pipeline.getOutputSize() - 1, sortColumn);
-//          Sorter sorter = new ShuttleSorter();
-//          sorter.interpose(pipeline, directModelAdapter, null);
-//          assertEquals("value must be unchanged by interactive sorter", value, sorter.getValueAt(0, sortColumn));
-//          sorter.setAscending(false);
-//          assertEquals("first value must be old last", lastValue, sorter.getValueAt(0, sortColumn));
-//          Sorter newSorter = new ShuttleSorter();
-//          newSorter.interpose(pipeline, directModelAdapter, sorter);
-//          assertEquals("value must be unchanged by interactive sorter", value, newSorter.getValueAt(0, sortColumn));
-          
-          
-      }
 
 }

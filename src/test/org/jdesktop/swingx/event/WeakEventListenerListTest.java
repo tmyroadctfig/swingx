@@ -35,7 +35,7 @@ import org.jdesktop.test.ChangeReport;
  * 
  * @author Jeanette Winzenburg
  */
-public class EventListenerListTest extends TestCase {
+public class WeakEventListenerListTest extends TestCase {
 
     /**
      * Test intial getListenerList

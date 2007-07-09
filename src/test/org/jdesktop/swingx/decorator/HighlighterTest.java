@@ -47,7 +47,7 @@ public class HighlighterTest extends InteractiveTestCase {
     
     protected ColorHighlighter emptyHighlighter;
     // flag used in setup to explicitly choose LF
-    private boolean defaultToSystemLF;
+    protected boolean defaultToSystemLF;
 
     protected void setUp() {
         backgroundNull = new JLabel("test");
@@ -335,47 +335,21 @@ public class HighlighterTest extends InteractiveTestCase {
     } 
 
 //------------------ UIDependent
+    
     /**
-     * test if background changes with LF.
-     * 
-     * PENDING: this is not entirely correct, might fail because
-     *   both LFs fall back to GenericGray.
+     * test that the ui color highlighter comes up with 
+     * the ui-setting.
      */
-    public void testLookupUIColor() {
-        UIColorHighlighter hl = new UIColorHighlighter();
-        Color color = hl.getBackground();
-        String lf = UIManager.getLookAndFeel().getName();
-        // switch LF
-        setSystemLF(!defaultToSystemLF);
-        if (lf.equals(UIManager.getLookAndFeel().getName())) {
-            LOG.info("cannot run lookupUIColor - equal LF" + lf);
-            return;
+    public void testInitialUIColorHighlighter() {
+        ColorHighlighter h = new UIColorHighlighter();
+        Color uiBackground = h.getBackground();
+        Color uiColor = UIManager.getColor("UIColorHighlighter.stripingBackground");
+        if (uiColor == null) {
+            LOG.info("cannot test initial ui striping color - UIManager has null");
         }
-        hl.updateUI();
-        assertFalse("highlighter background must be changed", 
-                color.equals(hl.getBackground()));
+        assertEquals(uiColor, uiBackground);
     }
-    /**
-     * test if background changes with LF.
-     * 
-     * PENDING: this is not entirely correct, might fail because
-     *   both LFs fall back to GenericGray.
-     */
-    public void testLookupUIColorInCompound() {
-        UIColorHighlighter hl = new UIColorHighlighter();
-        Color color = hl.getBackground();
-        CompoundHighlighter compound = new CompoundHighlighter(hl);
-        String lf = UIManager.getLookAndFeel().getName();
-        // switch LF
-        setSystemLF(!defaultToSystemLF);
-        if (lf.equals(UIManager.getLookAndFeel().getName())) {
-            LOG.info("cannot run lookupUIColor - equal LF" + lf);
-            return;
-        }
-        compound.updateUI();
-        assertFalse("highlighter background must be changed", 
-                color.equals(hl.getBackground()));
-    }
+    
 //-----------------------  CompoundHighlighter
     
     /**
@@ -456,7 +430,6 @@ public class HighlighterTest extends InteractiveTestCase {
      *
      */
     public void testCompoundHighlighterAddNull() {
-        ColorHighlighter highlighter = new ColorHighlighter();
         CompoundHighlighter pipeline = new CompoundHighlighter();
         try {
             pipeline.addHighlighter(null);

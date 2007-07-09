@@ -9,6 +9,7 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.logging.Logger;
 
 import javax.swing.Action;
 import javax.swing.Box;
@@ -18,9 +19,12 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.plaf.ColorUIResource;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import javax.swing.text.DefaultStyledDocument;
 
 import org.jdesktop.swingx.JXEditorPaneTest;
 import org.jdesktop.swingx.JXFrame;
@@ -29,24 +33,112 @@ import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.LinkModel;
 import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.decorator.HighlighterFactory.UIColorHighlighter;
+import org.jdesktop.swingx.plaf.UIColorHighlighterAddon;
 import org.jdesktop.test.AncientSwingTeam;
 
 
 public class HighlighterIssues extends HighlighterTest {
-
+    private static final Logger LOG = Logger.getLogger(HighlighterIssues.class
+            .getName());
+    
     protected Color ledger = new Color(0xF5, 0xFF, 0xF5);
-    protected boolean systemLF;
+//    protected boolean systemLF;
     
     public static void main(String args[]) {
 //        setSystemLF(true);
         HighlighterIssues test = new HighlighterIssues();
         try {
-           test.runInteractiveTests(".*Table.*");
+           test.runInteractiveTests(".*UITable.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
     }
+    
+    //---------------- uidependent
+    
+
+    /**
+     * something's wrong with the testing: temporarily setting the
+     * UIManager striping color here blows the tests below. 
+     * 
+     *
+     */
+    public void testCustomUIColorHighlighter() {
+        UIColorHighlighter h = new UIColorHighlighter();
+        Color uiBackground = h.getBackground();
+        Color uiColor = UIManager.getColor("UIColorHighlighter.stripingBackground");
+        // very unusual ui striping
+        Color color = new ColorUIResource(Color.BLACK);
+        if (color.equals(uiBackground)) {
+            LOG.info("cannot run testUIColorHighlight - ui striping same as test color");
+            return;
+        }
+        UIManager.put("UIColorHighlighter.stripingBackground", color);
+        try {
+            h.updateUI();
+            assertEquals(color, h.getBackground());
+        } finally {
+            LOG.info("finally?");
+            UIManager.put("UIColorHighlighter.stripingBackground", uiColor);
+        }
+        // sanity - reset
+        h.updateUI();
+        assertEquals(uiColor, h.getBackground());
+    }
+
+    /**
+     * test if background changes with LF.
+     * 
+     * PENDING: this is not entirely correct, might fail because
+     *   both LFs fall back to GenericGray.
+     */
+    public void testLookupUIColor() {
+        UIColorHighlighter hl = new UIColorHighlighter();
+        Color color = hl.getBackground();
+        String lf = UIManager.getLookAndFeel().getName();
+        Color uiColor = UIManager.getColor("UIColorHighlighter.stripingBackground");
+        assertNotNull(uiColor);
+        // switch LF
+        setSystemLF(!defaultToSystemLF);
+        if (lf.equals(UIManager.getLookAndFeel().getName())) {
+            LOG.info("cannot run lookupUIColor - same LF" + lf);
+            return;
+        }
+        Color uiColor2 = UIManager.getColor("UIColorHighlighter.stripingBackground");
+        assertNotNull(uiColor2);
+        // hmm ... how to force the reloading in the addon?
+        LOG.info("color must be different " + uiColor + "/" + uiColor2);
+        assertFalse("color must be different " + uiColor + "/" + uiColor2 , uiColor2.equals(uiColor));
+        hl.updateUI();
+        assertFalse("highlighter background must be changed", 
+                color.equals(hl.getBackground()));
+    }
+    /**
+     * test if background changes with LF.
+     * 
+     * PENDING: this is not entirely correct, might fail because
+     *   both LFs fall back to GenericGray.
+     */
+    public void testLookupUIColorInCompound() {
+        UIColorHighlighter hl = new UIColorHighlighter();
+        Color color = hl.getBackground();
+        CompoundHighlighter compound = new CompoundHighlighter(hl);
+        String lf = UIManager.getLookAndFeel().getName();
+        // switch LF
+        setSystemLF(!defaultToSystemLF);
+        if (lf.equals(UIManager.getLookAndFeel().getName())) {
+            LOG.info("cannot run lookupUIColor - same LF" + lf);
+            return;
+        }
+        compound.updateUI();
+        assertFalse("highlighter background must be changed", 
+                color.equals(hl.getBackground()));
+    }
+
+    //---------------
+    
     /**
      * Issue #258-swingx: Background LegacyHighlighter must not change custom
      * foreground.
@@ -179,7 +271,7 @@ public class HighlighterIssues extends HighlighterTest {
         nohighlight.setBackground(ledger);
         final JXFrame frame = wrapWithScrollingInFrame(table, nohighlight, "colored table with ui highlighter <--> without highlighter");
         Action action = new AbstractActionExt("toggle LF") {
-
+            boolean systemLF = defaultToSystemLF;
             public void actionPerformed(ActionEvent e) {
                 systemLF = !systemLF;
                 setSystemLF(systemLF);
@@ -244,7 +336,7 @@ public class HighlighterIssues extends HighlighterTest {
     /**
      * Issue #258-swingx: DefaultTableCellRenderer has memory. 
      * How to formulate as test?
-     * this is testing the hack (reset the memory in CompoundHighlighter to null), not
+     * this is testing the hack (reset the memory in ResetDTCR to null), not
      * any highlighter!
      */
     public void testTableUnSelectedDoNothingHighlighter() {
@@ -254,6 +346,7 @@ public class HighlighterIssues extends HighlighterTest {
         table.setHighlighters(new ColorHighlighter());
         Component comp = table.prepareRenderer(renderer, 0, 0);
         assertEquals("do nothing highlighter must not change foreground", foreground, comp.getForeground());
+        fail("testing the hack around DefaultTableCellRenderer memory - not the memory itself");
     }
 
     /**

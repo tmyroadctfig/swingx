@@ -10,7 +10,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
@@ -19,7 +18,6 @@ import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.FilterTest.DirectModelAdapter;
 import org.jdesktop.test.AncientSwingTeam;
-import org.jdesktop.test.ListSelectionReport;
 
 /**
  * @author Jeanette Winzenburg
@@ -43,6 +41,7 @@ public class SelectionMapperTest extends InteractiveTestCase {
      * 
      * Fixed by guarding against -1 in mapTowardsModel(int, int).
      */
+    @SuppressWarnings("all")
     public void testNegativFirstIndex() {
         ListSelectionModel selectionModel = new DefaultListSelectionModel();
         FilterPipeline pipeline = new FilterPipeline();
@@ -185,7 +184,7 @@ public class SelectionMapperTest extends InteractiveTestCase {
      */
     private DefaultTableModel createAscendingModel(int startRow, int count) {
         DefaultTableModel model = new DefaultTableModel(count, 5) {
-            public Class getColumnClass(int column) {
+            public Class<?> getColumnClass(int column) {
                 return column == 0 ? Integer.class : super.getColumnClass(column);
             }
         };
