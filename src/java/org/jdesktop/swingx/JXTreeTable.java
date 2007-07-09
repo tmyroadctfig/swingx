@@ -1803,7 +1803,7 @@ public class JXTreeTable extends JXTable {
                 treeModelListener = new TreeModelListener() {
                     
                     public void treeNodesChanged(TreeModelEvent e) {
-                        LOG.info("got tree event: changed " + e);
+//                        LOG.info("got tree event: changed " + e);
                         delayedFireTableDataUpdated(e);
                     }
 
@@ -1815,7 +1815,7 @@ public class JXTreeTable extends JXTable {
                     }
 
                     public void treeNodesRemoved(TreeModelEvent e) {
-                        LOG.info("got tree event: removed " + e);
+//                        LOG.info("got tree event: removed " + e);
                        delayedFireTableDataChanged(e, 2);
                     }
 
@@ -1871,13 +1871,13 @@ public class JXTreeTable extends JXTable {
                             max = startingRow + max;
                             switch (typeChange) {
                             case 1:
-                                LOG.info("rows inserted: path " + path + "/" + min + "/"
-                                        + max);
+//                                LOG.info("rows inserted: path " + path + "/" + min + "/"
+//                                        + max);
                                 fireTableRowsInserted(min, max);
                                 break;
                             case 2:
-                                LOG.info("rows deleted path " + path + "/" + min + "/"
-                                                + max);
+//                                LOG.info("rows deleted path " + path + "/" + min + "/"
+//                                                + max);
                                 fireTableRowsDeleted(min, max);
                                 break;
                             }
@@ -1935,7 +1935,7 @@ public class JXTreeTable extends JXTable {
                                     max = index;
                                 }
                             }
-                            LOG.info("Updated: parentPath/min/max" + path + "/" + min + "/" + max);
+//                            LOG.info("Updated: parentPath/min/max" + path + "/" + min + "/" + max);
                             // JW: the index is occasionally - 1 - need further digging 
                             fireTableRowsUpdated(Math.max(0, min), Math.max(0, max));
                         } else {
