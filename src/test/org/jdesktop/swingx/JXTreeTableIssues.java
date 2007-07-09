@@ -736,6 +736,41 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         assertNotNull(tree.getLeadSelectionPath());
         assertEquals(0, tree.getSelectionModel().getLeadSelectionRow());
     }
+
+    
+    /**
+     * Issue #341-swingx: missing synch of lead.  
+     * test lead after setting selection via table.
+     *
+     *  PENDING: this passes locally, fails on server
+     */
+    public void testLeadSelectionFromTable() {
+        JXTreeTable treeTable = prepareTreeTable(false);
+        assertEquals(-1, treeTable.getSelectionModel().getLeadSelectionIndex());
+        assertEquals(-1, treeTable.getTreeSelectionModel().getLeadSelectionRow());
+        treeTable.setRowSelectionInterval(0, 0);
+        assertEquals(treeTable.getSelectionModel().getLeadSelectionIndex(), 
+                treeTable.getTreeSelectionModel().getLeadSelectionRow());
+    }
+    
+    /**
+     * Issue #341-swingx: missing synch of lead.  
+     * test lead after setting selection via treeSelection.
+     *  PENDING: this passes locally, fails on server
+     *
+     */
+    public void testLeadSelectionFromTree() {
+        JXTreeTable treeTable = prepareTreeTable(false);
+        assertEquals(-1, treeTable.getSelectionModel().getLeadSelectionIndex());
+        assertEquals(-1, treeTable.getTreeSelectionModel().getLeadSelectionRow());
+        treeTable.getTreeSelectionModel().setSelectionPath(treeTable.getPathForRow(0));
+        assertEquals(treeTable.getSelectionModel().getLeadSelectionIndex(), 
+                treeTable.getTreeSelectionModel().getLeadSelectionRow());
+        assertEquals(0, treeTable.getTreeSelectionModel().getLeadSelectionRow());
+
+    }
+
+
     /**
      * Issue #341-swingx: missing synch of lead.  
      * test lead after remove selection via tree.

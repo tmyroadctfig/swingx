@@ -557,19 +557,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
                         table.getRowHeight());
     }
     
-    /**
-     * Issue #359-swing: find suitable rowHeight.
-     * 
-     * Text selection in textfield has row of metrics.getHeight.
-     * Suitable rowHeight should should take border into account:
-     * for a textfield that's the metrics height plus 2.
-     */
-    public void testRowHeightFontMetrics() {
-        JXTable table = new JXTable(10, 2);
-        TableCellEditor editor = table.getCellEditor(1, 1);
-        Component comp = table.prepareEditor(editor, 1, 1);
-        assertEquals(comp.getPreferredSize().height, table.getRowHeight());
-    }
     
     /**
      * Issue #359-swingx: table doesn't respect ui-setting of rowheight.

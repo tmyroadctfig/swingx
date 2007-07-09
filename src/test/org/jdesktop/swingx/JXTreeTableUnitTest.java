@@ -369,36 +369,6 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
 
     
     /**
-     * Issue #341-swingx: missing synch of lead.  
-     * test lead after setting selection via table.
-     *
-     */
-    public void testLeadSelectionFromTable() {
-        JXTreeTable treeTable = prepareTreeTable(false);
-        assertEquals(-1, treeTable.getSelectionModel().getLeadSelectionIndex());
-        assertEquals(-1, treeTable.getTreeSelectionModel().getLeadSelectionRow());
-        treeTable.setRowSelectionInterval(0, 0);
-        assertEquals(treeTable.getSelectionModel().getLeadSelectionIndex(), 
-                treeTable.getTreeSelectionModel().getLeadSelectionRow());
-    }
-    
-    /**
-     * Issue #341-swingx: missing synch of lead.  
-     * test lead after setting selection via treeSelection.
-     *
-     */
-    public void testLeadSelectionFromTree() {
-        JXTreeTable treeTable = prepareTreeTable(false);
-        assertEquals(-1, treeTable.getSelectionModel().getLeadSelectionIndex());
-        assertEquals(-1, treeTable.getTreeSelectionModel().getLeadSelectionRow());
-        treeTable.getTreeSelectionModel().setSelectionPath(treeTable.getPathForRow(0));
-        assertEquals(treeTable.getSelectionModel().getLeadSelectionIndex(), 
-                treeTable.getTreeSelectionModel().getLeadSelectionRow());
-        assertEquals(0, treeTable.getTreeSelectionModel().getLeadSelectionRow());
-
-    }
-
-    /**
      * Issue #4-, #340-swingx: duplicate notification
      * 
      * starting from unselected, the event count is 1 as expected 

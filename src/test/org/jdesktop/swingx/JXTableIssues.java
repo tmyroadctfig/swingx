@@ -146,6 +146,21 @@ public class JXTableIssues extends InteractiveTestCase {
         fail("forcing a fail - cancel editing is a side-effect of removal notification");
     }
    
+    /**
+     * Issue #359-swing: find suitable rowHeight.
+     * 
+     * Text selection in textfield has row of metrics.getHeight.
+     * Suitable rowHeight should should take border into account:
+     * for a textfield that's the metrics height plus 2.
+     * 
+     * PENDING: this passes locally, fails on server
+     */
+    public void testRowHeightFontMetrics() {
+        JXTable table = new JXTable(10, 2);
+        TableCellEditor editor = table.getCellEditor(1, 1);
+        Component comp = table.prepareEditor(editor, 1, 1);
+        assertEquals(comp.getPreferredSize().height, table.getRowHeight());
+    }
     
     /**
      * a quick sanity test: reporting okay?. 
