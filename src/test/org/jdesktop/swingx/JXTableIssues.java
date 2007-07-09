@@ -21,7 +21,6 @@
 package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
@@ -64,7 +63,6 @@ import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.CellEditorReport;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.SerializableSupport;
-import org.jdesktop.test.TestUtils;
 
 /**
  * Test to exposed known issues of <code>JXTable</code>.
