@@ -40,6 +40,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
@@ -62,7 +63,9 @@ import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.NumberEditorExt;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.test.AncientSwingTeam;
+import org.jdesktop.test.CellEditorReport;
 import org.jdesktop.test.PropertyChangeReport;
+import org.jdesktop.test.TestUtils;
 
 /**
 * Tests of <code>JXTable</code>.
@@ -106,6 +109,69 @@ public class JXTableUnitTest extends InteractiveTestCase {
     protected void tearDown() throws Exception {
         UIManager.put("JXTable.rowHeight", uiTableRowHeight);
         super.tearDown();
+    }
+
+    /**
+     * Issue #530-swingx: problems indy rowheight and filters
+     *
+     */
+    public void testIndividualRowHeightAndFilter() {
+        JXTable table = new JXTable(createAscendingModel(0, 50));
+        table.setRowHeightEnabled(true);
+        table.setRowHeight(1, 100);
+        final FilterPipeline filterPipeline = new FilterPipeline(new PatternFilter("[123]",0,0));
+        table.setFilters(filterPipeline);
+        // sanity
+        assertEquals(1, table.getValueAt(0, 0));
+        assertEquals(100, table.getRowHeight(0));
+    }
+    /**
+     * core issue: JTable cannot cope with null selection background.
+     *
+     */
+    public void testSetSelectionBackground() {
+        JXTable table = new JXTable();
+        PropertyChangeReport report = new PropertyChangeReport();
+        table.addPropertyChangeListener(report);
+        Color oldBackground = table.getSelectionBackground();
+        Color color = Color.RED;
+        table.setSelectionBackground(color);
+        assertFalse(oldBackground.equals(table.getSelectionBackground()));
+        assertEquals(color, table.getSelectionBackground());
+        TestUtils.assertPropertyChangeEvent(report, "selectionBackground", oldBackground, color);
+    }
+    
+    /**
+     * core issue: JTable cannot cope with null selection background.
+     *
+     */
+    public void testNullSelectionBackground() {
+        JXTable table = new JXTable();
+        table.setSelectionBackground(null);
+    }
+
+    /**
+     * core issue: JTable cannot cope with null selection background.
+     *
+     */
+    public void testSetSelectionForeground() {
+        JXTable table = new JXTable();
+        PropertyChangeReport report = new PropertyChangeReport();
+        table.addPropertyChangeListener(report);
+        Color oldForeground = table.getSelectionForeground();
+        Color color = Color.RED;
+        table.setSelectionForeground(color);
+        assertFalse(oldForeground.equals(table.getSelectionForeground()));
+        assertEquals(color, table.getSelectionForeground());
+        TestUtils.assertPropertyChangeEvent(report, "selectionForeground", oldForeground, color);
+    }
+    /**
+     * core issue: JTable cannot cope with null selection background.
+     *
+     */
+    public void testNullSelectionForeground() {
+        JXTable table = new JXTable();
+        table.setSelectionForeground(null);
     }
 
     /**
@@ -248,6 +314,28 @@ public class JXTableUnitTest extends InteractiveTestCase {
                 table.getSortOrder(0).isSorted());
     }
 
+    /**
+     * Issue 372-swingx: table must cancel edit if column property 
+     *   changes to not editable.
+     * Here we test if the table actually canceled the edit.
+     */
+    public void testTableCanceledEditOnColumnEditableChange() {
+        JXTable table = new JXTable(10, 2);
+        TableColumnExt columnExt = table.getColumnExt(0);
+        table.editCellAt(0, 0);
+        // sanity
+        assertTrue(table.isEditing());
+        assertEquals(0, table.getEditingColumn());
+        TableCellEditor editor = table.getCellEditor();
+        CellEditorReport report = new CellEditorReport();
+        editor.addCellEditorListener(report);
+        columnExt.setEditable(false);
+        // sanity
+        assertFalse(table.isCellEditable(0, 0));
+        assertEquals("editor must have fired canceled", 1, report.getCanceledEventCount());
+        assertEquals("editor must not have fired stopped",0, report.getStoppedEventCount());
+    }
+    
     
     /**
      * Issue 372-swingx: table must cancel edit if column property 
@@ -467,6 +555,20 @@ public class JXTableUnitTest extends InteractiveTestCase {
                         "plus top plus bottom border (== 2)", 
                         table.getFontMetrics(table.getFont()).getHeight() + 2, 
                         table.getRowHeight());
+    }
+    
+    /**
+     * Issue #359-swing: find suitable rowHeight.
+     * 
+     * Text selection in textfield has row of metrics.getHeight.
+     * Suitable rowHeight should should take border into account:
+     * for a textfield that's the metrics height plus 2.
+     */
+    public void testRowHeightFontMetrics() {
+        JXTable table = new JXTable(10, 2);
+        TableCellEditor editor = table.getCellEditor(1, 1);
+        Component comp = table.prepareEditor(editor, 1, 1);
+        assertEquals(comp.getPreferredSize().height, table.getRowHeight());
     }
     
     /**
@@ -1567,7 +1669,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
         table.getFilters().getSortController().setSortKeys
             (Collections.singletonList(
                 new SortKey(SortOrder.DESCENDING, 0)));
-//                new ShuttleSorter(0, false));
         assertEquals(table.getRowHeight(), table.getRowHeight(1));
         assertEquals(25, table.getRowHeight(table.getRowCount() - 1));
         table.setRowHeight(table.getRowHeight());
@@ -1581,8 +1682,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
         table.getFilters().getSortController().setSortKeys
             (Collections.singletonList(
                 new SortKey(SortOrder.DESCENDING, 0)));
-//                new ShuttleSorter(0, false))
-//                new ShuttleSorter(0, false));
         assertEquals("individual row height must be moved to last row", 
                 25, table.getRowHeight(table.getRowCount() - 1));
         // reset
@@ -1716,9 +1815,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
         columnX.setVisible(false);
         assertEquals("interactive sorter must be same as sorter in column", 
                 sortKeys, table.getFilters().getSortController().getSortKeys());
-//        assertEquals("interactive sorter must be same as sorter in column", 
-//                columnX.getSorter(), table.getFilters().getSorter());
-        
     }
     
     /**
@@ -2185,7 +2281,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
         // remove row in model coordinates
         ascendingModel.removeRow(0);
         assertEquals("first row must still be selected after remove ", 0, table.getSelectedRow());
-        
     }
     /**
      * Issue #223
@@ -2197,14 +2292,11 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JXTable table = new JXTable(ascendingModel);
         int selectedRow = 0;
         table.setRowSelectionInterval(selectedRow, selectedRow);
-        // set a pipeline
+        // sort ascending 
         table.toggleSortOrder(0);
-        // revert order - fails... track down
-//        table.setSorter(0);
         assertEquals("first row must be selected", selectedRow, table.getSelectedRow());
         ascendingModel.removeRow(selectedRow + 1);
         assertEquals("first row must still be selected after remove", selectedRow, table.getSelectedRow());
-        
     }
 
     /**
@@ -2217,9 +2309,9 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JXTable table = new JXTable(ascendingModel);
         int selectedRow = 0;
         table.setRowSelectionInterval(selectedRow, selectedRow);
-        // set a pipeline
+        // sort ascending
         table.toggleSortOrder(0);
-        // revert order - fails... track down
+        // revert order 
         table.toggleSortOrder(0);
         assertEquals("last row must be selected", table.getRowCount() - 1, table.getSelectedRow());
         ascendingModel.removeRow(selectedRow + 1);

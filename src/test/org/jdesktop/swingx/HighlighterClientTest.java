@@ -59,6 +59,15 @@ public class HighlighterClientTest extends InteractiveTestCase {
     }
 
     /**
+     * Sanity: handles empty array.
+     */
+    public void testSetHighlightersEmptyArray() {
+        JXTable table = new JXTable();
+        table.setHighlighters(new Highlighter[] {});
+        assertEquals(0, table.getHighlighters().length);
+    }
+
+    /**
      * test if removeHighlighter behaves as doc'ed.
      *
      */

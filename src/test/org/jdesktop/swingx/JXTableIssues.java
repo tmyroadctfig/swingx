@@ -64,6 +64,7 @@ import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.CellEditorReport;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.SerializableSupport;
+import org.jdesktop.test.TestUtils;
 
 /**
  * Test to exposed known issues of <code>JXTable</code>.
@@ -77,73 +78,6 @@ import org.jdesktop.test.SerializableSupport;
 public class JXTableIssues extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXTableIssues.class
             .getName());
-
-    public void testIndividualRowHeightAndFilter() {
-        JXTable table = new JXTable(createAscendingModel(0, 50));
-        table.setRowHeightEnabled(true);
-        table.setRowHeight(1, 100);
-        final FilterPipeline filterPipeline = new FilterPipeline(new PatternFilter("[123]",0,0));
-        table.setFilters(filterPipeline);
-        // sanity
-        assertEquals(1, table.getValueAt(0, 0));
-        assertEquals(100, table.getRowHeight(0));
-    }
-    /**
-     * core issue: JTable cannot cope with null selection background.
-     *
-     */
-    public void testSetSelectionBackground() {
-        JXTable table = new JXTable();
-        PropertyChangeReport report = new PropertyChangeReport();
-        table.addPropertyChangeListener(report);
-        Color oldBackground = table.getSelectionBackground();
-        Color color = Color.RED;
-        table.setSelectionBackground(color);
-        assertFalse(oldBackground.equals(table.getSelectionBackground()));
-        assertEquals(color, table.getSelectionBackground());
-        assertEquals(1, report.getEventCount());
-        assertEquals(1, report.getEventCount("selectionBackground"));
-        assertEquals(color, report.getLastNewValue());
-        assertEquals(oldBackground, report.getLastOldValue());
-        
-    }
-    
-    /**
-     * core issue: JTable cannot cope with null selection background.
-     *
-     */
-    public void testNullSelectionBackground() {
-        JXTable table = new JXTable();
-        table.setSelectionBackground(null);
-    }
-
-    /**
-     * core issue: JTable cannot cope with null selection background.
-     *
-     */
-    public void testSetSelectionForeground() {
-        JXTable table = new JXTable();
-        PropertyChangeReport report = new PropertyChangeReport();
-        table.addPropertyChangeListener(report);
-        Color oldForeground = table.getSelectionForeground();
-        Color color = Color.RED;
-        table.setSelectionForeground(color);
-        assertFalse(oldForeground.equals(table.getSelectionForeground()));
-        assertEquals(color, table.getSelectionForeground());
-        assertEquals(1, report.getEventCount());
-        assertEquals(1, report.getEventCount("selectionForeground"));
-        assertEquals(color, report.getLastNewValue());
-        assertEquals(oldForeground, report.getLastOldValue());
-        
-    }
-    /**
-     * core issue: JTable cannot cope with null selection background.
-     *
-     */
-    public void testNullSelectionForeground() {
-        JXTable table = new JXTable();
-        table.setSelectionForeground(null);
-    }
 
     
     /**
@@ -214,28 +148,6 @@ public class JXTableIssues extends InteractiveTestCase {
    
     
     /**
-     * Issue 372-swingx: table must cancel edit if column property 
-     *   changes to not editable.
-     * Here we test if the table actually canceled the edit.
-     */
-    public void testTableCanceledEditOnColumnEditableChange() {
-        JXTable table = new JXTable(10, 2);
-        TableColumnExt columnExt = table.getColumnExt(0);
-        table.editCellAt(0, 0);
-        // sanity
-        assertTrue(table.isEditing());
-        assertEquals(0, table.getEditingColumn());
-        TableCellEditor editor = table.getCellEditor();
-        CellEditorReport report = new CellEditorReport();
-        editor.addCellEditorListener(report);
-        columnExt.setEditable(false);
-        // sanity
-        assertFalse(table.isCellEditable(0, 0));
-        assertEquals("editor must have fired canceled", 1, report.getCanceledEventCount());
-        assertEquals("editor must not have fired stopped",0, report.getStoppedEventCount());
-    }
-    
-    /**
      * a quick sanity test: reporting okay?. 
      * (doesn't belong here, should test the tools 
      * somewhere else)
@@ -265,20 +177,6 @@ public class JXTableIssues extends InteractiveTestCase {
         assertEquals("editor must have fired stopped", 1, report.getStoppedEventCount());
         
     }
-    /**
-     * Issue #359-swing: find suitable rowHeight.
-     * 
-     * Text selection in textfield has row of metrics.getHeight.
-     * Suitable rowHeight should should take border into account:
-     * for a textfield that's the metrics height plus 2.
-     */
-    public void testRowHeightFontMetrics() {
-        JXTable table = new JXTable(10, 2);
-        TableCellEditor editor = table.getCellEditor(1, 1);
-        Component comp = table.prepareEditor(editor, 1, 1);
-        assertEquals(comp.getPreferredSize().height, table.getRowHeight());
-    }
-    
     /**
      * Issue #349-swingx: table not serializable
      * 
@@ -312,23 +210,6 @@ public class JXTableIssues extends InteractiveTestCase {
                 actionMap.remove(keys[i]);
             }
         }
-        try {
-            SerializableSupport.serialize(table);
-        } catch (IOException e) {
-            fail("not serializable " + e);
-        } catch (ClassNotFoundException e) {
-            fail("not serializable " + e);
-        }
-    }
-
-    /**
-     * Issue #349-swingx: table not serializable
-     * 
-     * Part of it seems to be in JXTableHeader. 
-     *
-     */
-    public void testSerializationTableHeader() {
-        JXTableHeader table = new JXTableHeader();
         try {
             SerializableSupport.serialize(table);
         } catch (IOException e) {
@@ -457,36 +338,7 @@ public class JXTableIssues extends InteractiveTestCase {
     }
    
     
-    /**
-     * test: deleting row below selection - should not change
-     */
-    public void testDeleteRowBelowSelection() {
-        CompareTableBehaviour compare = new CompareTableBehaviour(new Object[] { "A", "B", "C", "D", "E", "F", "G", "H", "I" });
-        compare.table.getSelectionModel().setSelectionInterval(2, 5);
-        compare.xTable.getSelectionModel().setSelectionInterval(2, 5);
-        Object[] selectedObjects = new Object[] { "C", "D", "E", "F" };
-        assertSelection(compare.tableModel, compare.table.getSelectionModel(), selectedObjects);
-        assertSelection(compare.tableModel, compare.xTable.getSelectionModel(), selectedObjects);
-        compare.tableModel.removeRow(compare.tableModel.getRowCount() - 1);
-        assertSelection(compare.tableModel, compare.table.getSelectionModel(), selectedObjects);
-        assertSelection(compare.tableModel, compare.xTable.getSelectionModel(), selectedObjects);
-    }
     
-    /**
-     * test: deleting last row in selection - should remove last item from selection. 
-     */
-    public void testDeleteLastRowInSelection() {
-        CompareTableBehaviour compare = new CompareTableBehaviour(new Object[] { "A", "B", "C", "D", "E", "F", "G", "H", "I" });
-        compare.table.getSelectionModel().setSelectionInterval(7, 8);
-        compare.xTable.getSelectionModel().setSelectionInterval(7, 8);
-        Object[] selectedObjects = new Object[] { "H", "I" };
-        assertSelection(compare.tableModel, compare.table.getSelectionModel(), selectedObjects);
-        assertSelection(compare.tableModel, compare.xTable.getSelectionModel(), selectedObjects);
-        compare.tableModel.removeRow(compare.tableModel.getRowCount() - 1);
-        Object[] selectedObjectsAfterDelete = new Object[] { "H" };
-        assertSelection(compare.tableModel, compare.table.getSelectionModel(), selectedObjectsAfterDelete);
-        assertSelection(compare.tableModel, compare.xTable.getSelectionModel(), selectedObjectsAfterDelete);
-    }
      
     private void assertSelection(TableModel tableModel, ListSelectionModel selectionModel, Object[] expected) {
         List<Object> selected = new ArrayList<Object>();
@@ -816,6 +668,7 @@ public class JXTableIssues extends InteractiveTestCase {
         assertEquals("found must be equal to row", row, found);
         found = table.getSearchable().search(lastName, found);
         assertEquals("search must succeed", 10, found);
+        fail("check status ...");
     }
 
     public static void main(String args[]) {

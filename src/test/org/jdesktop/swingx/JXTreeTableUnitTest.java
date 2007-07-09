@@ -24,17 +24,21 @@ import java.awt.Point;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.util.Vector;
+import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.event.TableModelEvent;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.table.TableModel;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
+import org.jdesktop.swingx.test.TreeTableUtils;
 import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
@@ -42,16 +46,145 @@ import org.jdesktop.swingx.treetable.MutableTreeTableNode;
 import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.swingx.treetable.TreeTableNode;
 import org.jdesktop.test.PropertyChangeReport;
+import org.jdesktop.test.TableModelReport;
 import org.jdesktop.test.TreeSelectionReport;
 
 public class JXTreeTableUnitTest extends InteractiveTestCase {
-
+    private static final Logger LOG = Logger
+            .getLogger(JXTreeTableUnitTest.class.getName());
+    
     protected TreeTableModel treeTableModel;
     protected TreeTableModel simpleTreeTableModel;
     
     public JXTreeTableUnitTest() {
         super("JXTreeTable Unit Test");
     }
+
+    /**
+     * Issue #531-swingx: IllegalArgumentException on setModel.
+     *
+     */
+    public void testSetModelOnTree() {
+        TreeTableModel model = createCustomTreeTableModelFromDefault();
+        JXTree treeTable = new JXTree(model);
+        treeTable.setRootVisible(true);
+        treeTable.setModel(createCustomTreeTableModelFromDefault());
+    }
+    /**
+     * Issue #531-swingx: IllegalArgumentException on setModel.
+     *
+     */
+    public void testSetModelEmptyContructor() {
+        JXTreeTable treeTable = new JXTreeTable();
+        treeTable.setRootVisible(true);
+        treeTable.setTreeTableModel(createCustomTreeTableModelFromDefault());
+    }
+    
+    /**
+     * Issue #493-swingx: JXTreeTable.TreeTableModelAdapter: Inconsistency
+     * firing update.
+     * 
+     * Test update events after updating treeTableModel.
+     * 
+     * from tiberiu@dev.java.net
+     */
+    public void testTableEventUpdateOnTreeTableModelSetValue() {
+        TreeTableModel model = createCustomTreeTableModelFromDefault();
+        final JXTreeTable table = new JXTreeTable(model);
+        table.setRootVisible(true);
+        table.expandAll();
+        final int row = 6;
+        // sanity
+        assertEquals("sports", table.getValueAt(row, 0).toString());
+        final TableModelReport report = new TableModelReport();
+        table.getModel().addTableModelListener(report);
+        model.setValueAt("games",
+                table.getPathForRow(6).getLastPathComponent(), 0);   
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                LOG.info("sanity - did testTableEventUpdateOnTreeTableModelSetValue run?");
+                assertEquals("tableModel must have fired", 1, report.getEventCount());
+                assertEquals("the event type must be update", 1, report.getUpdateEventCount());
+                TableModelEvent event = report.getLastUpdateEvent();
+                assertEquals("the updated row ", row, event.getFirstRow());
+            }
+        });        
+    }
+
+    /**
+     * Issue #493-swingx: JXTreeTable.TreeTableModelAdapter: Inconsistency
+     * firing update.
+     * 
+     * Test delete events after tree table model.
+     * 
+     * from tiberiu@dev.java.net
+     */
+    public void testTableEventDeleteOnTreeTableModel() {
+        TreeTableModel model = createCustomTreeTableModelFromDefault();
+        MutableTreeTableNode root = (MutableTreeTableNode) model.getRoot();
+        MutableTreeTableNode sportsNode = (MutableTreeTableNode) root.getChildAt(1);
+        int childrenToDelete = sportsNode.getChildCount() - 1;
+        
+        for (int i = 0; i < childrenToDelete; i++) {
+            MutableTreeTableNode firstChild = (MutableTreeTableNode) sportsNode.getChildAt(0);
+            ((DefaultTreeTableModel) model).removeNodeFromParent(firstChild);
+        }
+        // sanity
+        assertEquals(1, sportsNode.getChildCount());
+        final JXTreeTable table = new JXTreeTable(model);
+        table.setRootVisible(true);
+        table.expandAll();
+        final int row = 6;
+        // sanity
+        assertEquals("sports", table.getValueAt(row, 0).toString());
+        final TableModelReport report = new TableModelReport();
+        table.getModel().addTableModelListener(report);
+        // remove the last child from sports node
+        MutableTreeTableNode firstChild = (MutableTreeTableNode) sportsNode.getChildAt(0);
+        ((DefaultTreeTableModel) model).removeNodeFromParent(firstChild);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                LOG.info("sanity - did testTableEventDeleteOnTreeTableModel run?");
+                assertEquals("tableModel must have fired exactly one event", 1, report.getEventCount());
+                TableModelEvent event = report.getLastEvent();
+                assertEquals("event type must be delete", TableModelEvent.DELETE, event.getType());
+                assertEquals("the deleted row ", row + 1, event.getFirstRow());
+            }
+        });        
+    }
+    /**
+     * Issue #493-swingx: JXTreeTable.TreeTableModelAdapter: Inconsistency
+     * firing update.
+     * 
+     * Test update events after updating table.
+     * 
+     * from tiberiu@dev.java.net
+     */
+    public void testTableEventUpdateOnTreeTableSetValue() {
+        TreeTableModel model = createCustomTreeTableModelFromDefault();
+        final JXTreeTable table = new JXTreeTable(model);
+        table.setRootVisible(true);
+        table.expandAll();
+        final int row = 6;
+        // sanity
+        assertEquals("sports", table.getValueAt(row, 0).toString());
+        assertTrue("cell must be editable at row " + row, table.getModel().isCellEditable(row, 0));
+        final TableModelReport report = new TableModelReport();
+        table.getModel().addTableModelListener(report);
+        // doesn't fire or isn't detectable? 
+        // Problem was: model was not-editable.
+        table.setValueAt("games", row, 0);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                LOG.info("sanity - did testTableEventUpdateOnTreeTableSetValue run?");
+                assertEquals("tableModel must have fired", 1, report.getEventCount());
+                assertEquals("the event type must be update", 1, report.getUpdateEventCount());
+                TableModelEvent event = report.getLastUpdateEvent();
+                assertEquals("the updated row ", row, event.getFirstRow());
+            }
+        });        
+    }
+
 
     /**
      * Issue #465-swingx: NPE if editing node with null icon.
@@ -210,20 +343,61 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         assertEquals(valueBelow, treeTable.getValueAt(1, 0));
     }
 
-
     /**
-     * Issue #212-jdnc: reuse editor, install only once.
-     * 
+     * Issue #399-swingx: editing terminated by selecting editing row.<p>
+     * Assert workaround: setExpandsSelectedPaths(false)
      */
-    public void testReuseEditor() {
-        //TODO rework this test, since we no longer use TreeTableModel.class
-//        JXTreeTable treeTable = new JXTreeTable(treeTableModel);
-//        CellEditor editor = treeTable.getDefaultEditor(TreeTableModel.class);
-//        assertTrue(editor instanceof TreeTableCellEditor);
-//        treeTable.setTreeTableModel(simpleTreeTableModel);
-//        assertSame("hierarchical editor must be unchanged", editor, 
-//                treeTable.getDefaultEditor(TreeTableModel.class));
+    public void testSelectionKeepsEditingWithExpandsFalse() {
+        JXTreeTable treeTable = new JXTreeTable(new FileSystemModel()) {
+
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return true;
+            }
+            
+        };
+        boolean canEdit = treeTable.editCellAt(1, 2);
+        // sanity: editing started
+        assertTrue(canEdit);
+        // sanity: nothing selected
+        assertTrue(treeTable.getSelectionModel().isSelectionEmpty());
+        int editingRow = treeTable.getEditingRow();
+        treeTable.setExpandsSelectedPaths(false);
+        treeTable.setRowSelectionInterval(editingRow, editingRow);
+        assertEquals("after selection treeTable editing state must be unchanged", canEdit, treeTable.isEditing());
     }
+
+    
+    /**
+     * Issue #341-swingx: missing synch of lead.  
+     * test lead after setting selection via table.
+     *
+     */
+    public void testLeadSelectionFromTable() {
+        JXTreeTable treeTable = prepareTreeTable(false);
+        assertEquals(-1, treeTable.getSelectionModel().getLeadSelectionIndex());
+        assertEquals(-1, treeTable.getTreeSelectionModel().getLeadSelectionRow());
+        treeTable.setRowSelectionInterval(0, 0);
+        assertEquals(treeTable.getSelectionModel().getLeadSelectionIndex(), 
+                treeTable.getTreeSelectionModel().getLeadSelectionRow());
+    }
+    
+    /**
+     * Issue #341-swingx: missing synch of lead.  
+     * test lead after setting selection via treeSelection.
+     *
+     */
+    public void testLeadSelectionFromTree() {
+        JXTreeTable treeTable = prepareTreeTable(false);
+        assertEquals(-1, treeTable.getSelectionModel().getLeadSelectionIndex());
+        assertEquals(-1, treeTable.getTreeSelectionModel().getLeadSelectionRow());
+        treeTable.getTreeSelectionModel().setSelectionPath(treeTable.getPathForRow(0));
+        assertEquals(treeTable.getSelectionModel().getLeadSelectionIndex(), 
+                treeTable.getTreeSelectionModel().getLeadSelectionRow());
+        assertEquals(0, treeTable.getTreeSelectionModel().getLeadSelectionRow());
+
+    }
+
     /**
      * Issue #4-, #340-swingx: duplicate notification
      * 
@@ -723,6 +897,21 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         parent.add(new DefaultMutableTreeTableNode("ravioli"));
         parent.add(new DefaultMutableTreeTableNode("bananas"));
         return new DefaultTreeTableModel(root);
+    }
+
+    /**
+     * Creates and returns a custom model from JXTree default model. The model
+     * is of type DefaultTreeModel, allowing for easy insert/remove.
+     * 
+     * @return
+     */
+    private TreeTableModel createCustomTreeTableModelFromDefault() {
+        JXTree tree = new JXTree();
+        DefaultTreeModel treeModel = (DefaultTreeModel) tree.getModel();
+        TreeTableModel customTreeTableModel = TreeTableUtils
+                .convertDefaultTreeModel(treeModel);
+
+        return customTreeTableModel;
     }
 
     // ------------------ init

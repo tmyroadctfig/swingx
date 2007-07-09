@@ -154,6 +154,7 @@ public class HighlighterClientIssues extends InteractiveTestCase {
         JXTable table = new JXTable();
         table.setHighlighters((Highlighter) null);
         assertEquals(0, table.getHighlighters().length);
+        fail("need to define how to handle setHighlighters(null)");
     }
 
     /**
@@ -163,6 +164,7 @@ public class HighlighterClientIssues extends InteractiveTestCase {
         JXTable table = new JXTable();
         table.setHighlighters((CompoundHighlighter) null);
         assertEquals(0, table.getHighlighters().length);
+        fail("need to define how to handle setHighlighters(null)");
     }
 
     /**
@@ -172,16 +174,9 @@ public class HighlighterClientIssues extends InteractiveTestCase {
         JXTable table = new JXTable();
         table.setHighlighters((Highlighter[]) null);
         assertEquals(0, table.getHighlighters().length);
+        fail("need to define how to handle setHighlighters(null)");
     }
 
-    /**
-     * PENDING: Define how to handle setHighlighters(null).
-     */
-    public void testSetHighlightersEmptyArray() {
-        JXTable table = new JXTable();
-        table.setHighlighters(new Highlighter[] {});
-        assertEquals(0, table.getHighlighters().length);
-    }
     
     /**
      * PENDING: Define how to handle setHighlighters(null).
@@ -190,5 +185,6 @@ public class HighlighterClientIssues extends InteractiveTestCase {
         JXTable table = new JXTable();
         table.setHighlighters(new Highlighter[] {null});
         assertEquals(0, table.getHighlighters().length);
+        fail("need to define how to handle setHighlighters(null)");
     }
 }

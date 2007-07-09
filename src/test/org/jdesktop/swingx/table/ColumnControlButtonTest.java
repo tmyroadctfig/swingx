@@ -9,13 +9,16 @@ package org.jdesktop.swingx.table;
 import java.awt.Component;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
+import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
@@ -25,6 +28,8 @@ import javax.swing.table.TableModel;
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.action.ActionContainerFactory;
 import org.jdesktop.swingx.icon.ColumnControlIcon;
 import org.jdesktop.swingx.table.ColumnControlButton.ColumnVisibilityAction;
 import org.jdesktop.swingx.table.ColumnControlButton.DefaultColumnControlPopup;
@@ -34,6 +39,9 @@ import org.jdesktop.test.AncientSwingTeam;
  * @author Jeanette Winzenburg
  */
 public class ColumnControlButtonTest extends InteractiveTestCase {
+    private static final Logger LOG = Logger
+            .getLogger(ColumnControlButtonTest.class.getName());
+    
     protected TableModel sortableTableModel;
 
     /**
@@ -141,6 +149,38 @@ public class ColumnControlButtonTest extends InteractiveTestCase {
         table.getColumnExt(0).setVisible(false);
         assertEquals(1, table.getColumnCount());
     }
+    
+    /**
+     * Issue #229-swingx: increasing listener list in column actions.
+     * 
+     */
+    public void testActionListenerCount() {
+        JXTable table = new JXTable(10, 1);
+        Action action = table.getActionMap().get(JXTable.HORIZONTALSCROLL_ACTION_COMMAND);
+        if (!(action instanceof AbstractActionExt)) {
+            LOG.info("cannot run testColumnActionListenerCount - action not of type AbstractAction");
+            return;
+        }
+        AbstractActionExt extAction = (AbstractActionExt) action;
+        assertTrue(extAction.isStateAction());
+        assertEquals(0, extAction.getPropertyChangeListeners().length);
+        AbstractButton menuItem = new JCheckBoxMenuItem();
+        ActionContainerFactory factory = new ActionContainerFactory(null);
+        factory.configureSelectableButton(menuItem, extAction, null);
+        // sanity: here the action is bound to a menu item in the columnControl
+        // should have one ad
+        int initialPCLCount = extAction.getPropertyChangeListeners().length;
+        // sanity: expect it to be 2 - one is the menuitem itself, another 
+        // the TogglePCL registered by the ActionContainerFacory
+        assertEquals(2, initialPCLCount);
+        menuItem = new JToggleButton();
+        factory.configureSelectableButton(menuItem, extAction, null);
+        // 2 menuitems are listening
+       assertEquals(2* initialPCLCount, extAction.getPropertyChangeListeners().length);
+        
+    }
+    
+
     /**
      * Issue #153-swingx: ClassCastException if actionMap key is not a string.
      *
