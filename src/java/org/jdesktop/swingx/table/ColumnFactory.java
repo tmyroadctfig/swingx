@@ -21,7 +21,6 @@
 package org.jdesktop.swingx.table;
 
 import java.awt.Component;
-import java.awt.Dimension;
 
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
@@ -308,7 +307,11 @@ public class ColumnFactory {
      * 
      * Note: though 2 * margin is added as spacing, this does <b>not</b> imply
      * a left/right symmetry - it's up to the table to place the renderer and/or
-     * the renderer/highlighter to configure a border.
+     * the renderer/highlighter to configure a border.<p>
+     * 
+     * PENDING: support pack for hidden column? 
+     *      This implementation can't handle it! For now, added doc and 
+     *      fail-fast.
      * 
      * @param table the context the column will live in.
      * @param columnExt the column to configure.
@@ -316,6 +319,7 @@ public class ColumnFactory {
      *        default
      * @param max an upper limit to preferredWidth, -1 is interpreted as no
      *        limit
+     * @throws IllegalStateException if column is not visible
      * 
      * @see #setDefaultPackMargin(int)
      * @see org.jdesktop.swingx.JXTable#packTable(int)
@@ -324,7 +328,9 @@ public class ColumnFactory {
      */
     public void packColumn(JXTable table, TableColumnExt columnExt, int margin,
             int max) {
-
+        if (!columnExt.isVisible()) 
+            throw new IllegalStateException("column must be visible to pack");
+        
         /* Get width of column header */
         TableCellRenderer renderer = columnExt.getHeaderRenderer();
         if (renderer == null)

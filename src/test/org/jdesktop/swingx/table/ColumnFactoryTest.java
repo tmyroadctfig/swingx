@@ -10,12 +10,74 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXTable;
 
+/**
+ * Contains unit tests for <code>ColumnFactory</code>.
+ * 
+ * @author Jeanette Winzenburg
+ */
 public class ColumnFactoryTest extends InteractiveTestCase {
 
+    /**
+     * packColumn can't handle hidden columns.
+     *
+     */
+    public void testPackHiddenColumn() {
+        JXTable table = new JXTable(10, 4);
+        TableColumnExt columnExt = table.getColumnExt(0);
+        columnExt.setVisible(false);
+        try {
+            table.getColumnFactory().packColumn(table, columnExt, -1, -1);
+            fail("packColumn is doc'ed to not handle hidden columns");
+        } catch (IllegalStateException e) {
+            // expected
+        }        
+    }
+    /**
+     * test that configure throws exceptions as doc'ed.
+     * Here: model index == negative
+     *
+     */
+    public void testConfigureTableColumnDoc() {
+        TableModel model = new DefaultTableModel(0, 4);
+        TableColumnExt columnExt = new TableColumnExt(-1);
+        try {
+            ColumnFactory.getInstance().configureTableColumn(model, columnExt);
+            fail("factory must throw on illegal column model index " + columnExt.getModelIndex());
+        } catch (IllegalStateException e) {
+            // nothing to do - that's the doc'ed behaviour
+        }        
+    }
+    /**
+     * test that configure throws exceptions as doc'ed.
+     * Here: model index == getColumnCount
+     *
+     */
+    public void testConfigureTableColumnExcessModelIndex() {
+        TableModel model = new DefaultTableModel(0, 4);
+        TableColumnExt columnExt = new TableColumnExt(model.getColumnCount());
+        try {
+            ColumnFactory.getInstance().configureTableColumn(model, columnExt);
+            fail("factory must throw on illegal column model index " + columnExt.getModelIndex());
+        } catch (IllegalStateException e) {
+            // nothing to do - that's the doc'ed behaviour
+        }        
+    }
+    /**
+     * For completeness: formally test that app-wide factory 
+     * is used by JXTable.
+     *
+     */
+    public void testSetColumnFactory() {
+        ColumnFactory myFactory = new ColumnFactory();
+        ColumnFactory.setInstance(myFactory);
+        JXTable table = new JXTable();
+        assertSame(myFactory, table.getColumnFactory());
+    }
     /**
      * Issue #470-swingx: added getRowCount(table)
      *
