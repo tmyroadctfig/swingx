@@ -47,6 +47,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.UIManager;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
@@ -77,7 +78,74 @@ public class JXTableIssues extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXTableIssues.class
             .getName());
 
+    public static void main(String args[]) {
+        JXTableIssues test = new JXTableIssues();
+        setSystemLF(true);
+        try {
+//          test.runInteractiveTests();
+            test.runInteractiveTests("interactive.*Scroll.*");
+         //   test.runInteractiveTests("interactive.*Render.*");
+//            test.runInteractiveTests(".*RowHeight.*");
+        } catch (Exception e) {
+            System.err.println("exception when executing interactive tests:");
+            e.printStackTrace();
+        } 
+    }
     
+    /**
+     * Don't have to - test coverage of rowHeight is extensive.
+     *
+     */
+    public void testUpdateUIRowHeight() {
+        int uiHeight = UIManager.getInt("JXTable." + "rowHeight");
+        int height = 30;
+        UIManager.put("JXTable.rowHeight", height);
+        JXTable table = new JXTable();
+        try {
+            assertEquals(height, table.getRowHeight());
+        } finally {
+            if (uiHeight > 0) {
+                UIManager.put("JXTable.rowHeight", uiHeight);
+            } else {
+                UIManager.put("JXTable.rowHeight", null);
+            }
+        }        
+
+    }
+    
+    /**
+     * test preference of explicit setting (over calculated).
+     *
+     */
+    public void testPrefScrollableSetPreference() {
+        JXTable table = new JXTable(10, 6);
+        Dimension dim = table.getPreferredScrollableViewportSize();
+        Dimension other = new Dimension(dim.width + 20, dim.height + 20);
+        table.setPreferredScrollableViewportSize(other);
+        assertEquals(other, table.getPreferredScrollableViewportSize());
+    }
+    
+    public void testPrefScrollableWidth() {
+        JXTable table = new JXTable(10, 6);
+        Dimension dim = table.getPreferredScrollableViewportSize();
+        // initial
+        assertEquals(6, table.getVisibleColumnCount());
+        int width = 0;
+        for (int i = 0; i < Math.min(6, table.getColumnCount()); i++) {
+            width += table.getColumn(i).getPreferredWidth();
+        }
+        assertEquals(width, dim.width);
+    }
+    
+        
+     public void interactivePrefScrollable() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        table.setColumnControlVisible(true);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        JXFrame frame = showWithScrollingInFrame(table, "initial sizing");
+        addMessage(frame, "initial size: " + table.getPreferredScrollableViewportSize());
+        frame.pack();
+    }
     /**
      * test if created a new instance of the renderer. While the old
      * assertions are true, it's useless with swingx renderers: the renderer is
@@ -684,16 +752,4 @@ public class JXTableIssues extends InteractiveTestCase {
         fail("check status ...");
     }
 
-    public static void main(String args[]) {
-        JXTableIssues test = new JXTableIssues();
-        try {
-          test.runInteractiveTests();
-         //   test.runInteractiveTests("interactive.*Siz.*");
-         //   test.runInteractiveTests("interactive.*Render.*");
-//            test.runInteractiveTests(".*RowHeight.*");
-        } catch (Exception e) {
-            System.err.println("exception when executing interactive tests:");
-            e.printStackTrace();
-        } 
-    }
 }

@@ -41,6 +41,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
@@ -110,6 +111,119 @@ public class JXTableUnitTest extends InteractiveTestCase {
         UIManager.put("JXTable.rowHeight", uiTableRowHeight);
         super.tearDown();
     }
+
+    /**
+     * Issue #547-swingx: pref scrollable height included header.
+     *
+     */
+    public void testPrefScrollableHeight() {
+        JXTable table = new JXTable(10, 6);
+        Dimension dim = table.getPreferredScrollableViewportSize();
+        assertNotNull("pref scrollable must not be null", dim);
+        assertEquals(20, table.getVisibleRowCount());
+        assertEquals("scrollable height must no include header", 
+                table.getVisibleRowCount() * table.getRowHeight(), dim.height);
+    }     
+    
+    /**
+     * Issue #547-swingx: NPE in ColumnFactory configureColumnWidth 
+     *    for hidden column
+     *
+     */
+    public void testPrefHiddenColumnNPE() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        TableColumnExt columnExt = table.getColumnExt(0);
+        columnExt.setPrototypeValue("Jessesmariaandjosefsapperlottodundteufel");
+        columnExt.setVisible(false);
+        // NPE
+        table.getColumnFactory().configureColumnWidths(table, columnExt);
+    }
+    
+    /**
+     * Issue #547-swingx: NPE in ColumnFactory configureColumnWidth 
+     *    for empty table .. no: doesn't because 
+     *    table.getCellRenderer(row,column) does not use the row
+     *    coordinate - so the illegal argument doesn't hurt.
+     *
+     */
+    public void testPrefEmptyTableNPE() {
+        JXTable table = new JXTable(0, 4);
+        TableColumnExt columnExt = table.getColumnExt(0);
+        columnExt.setPrototypeValue("Jessesmariaandjosefsapperlottodundteufel");
+        // NPE
+        table.getColumnFactory().configureColumnWidths(table, columnExt);
+    }
+    /**
+     * Issue #547-swingx: hidden columns' pref width not initialized.
+     *
+     */
+    public void testPrefHiddenColumn() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        TableColumnExt columnExt = table.getColumnExt(0);
+        columnExt.setPrototypeValue("Jessesmariaandjosefsapperlottodundteufel");
+        TableCellRenderer renderer = table.getCellRenderer(0, 0);
+        Component comp = renderer.getTableCellRendererComponent(null, columnExt.getPrototypeValue(), false, false, -1, -1);
+        columnExt.setVisible(false);
+        // make sure the column pref is initialized
+        table.getPreferredScrollableViewportSize();
+        assertEquals("hidden column's pref must be set", 
+                comp.getPreferredSize().width + table.getColumnMargin(), columnExt.getPreferredWidth());
+    }
+
+    /**
+     * Issue #547-swingx: columns' pref width - header not taken 
+     * if no prototype
+     *
+     */
+    public void testPrefColumnTitle() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        TableColumnExt columnExt = table.getColumnExt(0);
+        columnExt.setHeaderValue("Jessesmariaandjosefsapperlottodundteufel");
+        TableCellRenderer renderer = table.getTableHeader().getDefaultRenderer();
+        Component comp = renderer.getTableCellRendererComponent(table, columnExt.getHeaderValue(), false, false, -1, -1);
+        // need to store the pref - header renderer is used during initialize!
+        Dimension prefSize = comp.getPreferredSize();
+        // make sure the column pref is initialized
+        table.getPreferredScrollableViewportSize();
+        assertEquals("header must be measured", 
+                prefSize.width + table.getColumnMargin(), columnExt.getPreferredWidth());
+    }
+
+    /**
+     * Issue #547-swingx: columns' pref width - without
+     * prototype the pref is minimally the (magic) standard if
+     * the header doesn't exceed it.
+     *
+     */
+    public void testPrefStandardMinWithoutPrototype() {
+        JXTable table = new JXTable(10, 6);
+        TableColumnExt columnExt = table.getColumnExt(0);
+        int standardWidth = columnExt.getPreferredWidth();
+        // make sure the column pref is initialized
+        table.getPreferredScrollableViewportSize();
+        assertEquals("column pref width must be unchanged", 
+                standardWidth, columnExt.getPreferredWidth());
+    }
+    /**
+     * Issue #547-swingx: columns' pref width - added margin twice
+     * if has prototype.
+     *
+     */
+    public void testPrefColumnsDuplicateMargin() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        TableColumnExt columnExt = table.getColumnExt(0);
+        // force the prototype longer than the title
+        // to avoid that header measuring is triggered
+        // header renderer can have bigger fonts
+        columnExt.setPrototypeValue(columnExt.getTitle() + "longer");
+        TableCellRenderer renderer = table.getCellRenderer(0, 0);
+        Component comp = renderer.getTableCellRendererComponent(null, columnExt.getPrototypeValue(), false, false, -1, -1);
+        // make sure the column pref is initialized
+        table.getPreferredScrollableViewportSize();
+        assertEquals("column margin must be added once", table.getColumnMargin(), 
+                columnExt.getPreferredWidth() - comp.getPreferredSize().width);
+    }
+
 
     /**
      * Issue #530-swingx: problems indy rowheight and filters
