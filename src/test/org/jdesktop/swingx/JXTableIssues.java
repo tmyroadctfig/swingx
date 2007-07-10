@@ -129,7 +129,7 @@ public class JXTableIssues extends InteractiveTestCase {
         JXTable table = new JXTable(10, 6);
         Dimension dim = table.getPreferredScrollableViewportSize();
         // initial
-        assertEquals(6, table.getVisibleColumnCount());
+//        assertEquals(6, table.getVisibleColumnCount());
         int width = 0;
         for (int i = 0; i < Math.min(6, table.getColumnCount()); i++) {
             width += table.getColumn(i).getPreferredWidth();
