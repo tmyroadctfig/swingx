@@ -80,6 +80,7 @@ import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXEditorPaneTest;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXHyperlink;
+import org.jdesktop.swingx.JXLabel;
 import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
@@ -110,7 +111,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         RendererVisualCheck test = new RendererVisualCheck();
         try {
 //            test.runInteractiveTests();
-          test.runInteractiveTests(".*Tree.*");
+          test.runInteractiveTests(".*XLabel.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -186,6 +187,51 @@ public class RendererVisualCheck extends InteractiveTestCase {
             area.setWrapStyleWord(true);
             area.setOpaque(true);
             return area;
+        }
+
+        @Override
+        protected void format(CellContext context) {
+            rendererComponent.setText(getStringValue(context));
+            rendererComponent.revalidate();
+        }
+        
+    }
+
+    /**
+     * Quick example of using a JXLabel as rendering component.
+     * Looks funny .. wrapping jumps?
+     */
+    public void interactiveXLabelRenderer() {
+        DefaultTableModel model = new DefaultTableModel(0, 1);
+        model.addRow(new String[] {"some really, maybe really really long text -  "
+                + "wrappit .... where needed "});
+        model.addRow(new String[] {"another really, maybe really really long text -  "
+                + "with nothing but junk. wrappit .... where needed"});
+        JXTable table = new JXTable(model);
+        table.setVisibleRowCount(4);
+        table.setColumnControlVisible(true);
+        table.getColumnExt(0).setCellRenderer(new DefaultTableRenderer(new XLabelProvider()));
+        table.addHighlighter(
+                HighlighterFactory.createAlternateStriping());
+
+        table.setRowHeight(50);
+        showWithScrollingInFrame(table, "textArea as rendering comp");
+    }
+
+    public static class XLabelProvider extends ComponentProvider<JXLabel> {
+
+        @Override
+        protected void configureState(CellContext context) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        protected JXLabel createRendererComponent() {
+            JXLabel label = new JXLabel();
+            label.setOpaque(true);
+            label.setLineWrap(true);
+            return label;
         }
 
         @Override

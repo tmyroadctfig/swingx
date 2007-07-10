@@ -24,6 +24,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -38,6 +39,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.action.LinkAction;
@@ -52,9 +54,11 @@ import org.jdesktop.swingx.renderer.LabelProvider;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.renderer.WrappingIconPanel;
 import org.jdesktop.swingx.renderer.WrappingProvider;
+import org.jdesktop.swingx.renderer.RendererVisualCheck.TextAreaProvider;
 import org.jdesktop.swingx.test.ActionMapTreeTableModel;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.TreeTableUtils;
+import org.jdesktop.swingx.treetable.AbstractMutableTreeTableNode;
 import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.jdesktop.swingx.treetable.FileSystemModel;
@@ -84,7 +88,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         try {
 //            test.runInteractiveTests();
 //            test.runInteractiveTests(".*AdapterDeleteUpdate.*");
-            test.runInteractiveTests(".*UI.*");
+            test.runInteractiveTests(".*Text.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -587,6 +591,70 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         JFrame frame = wrapWithScrollingInFrame(tree, "treetable and custom renderer");
         frame.setVisible(true);
     }
+
+    /**
+     * Quick example to use a TextArea in the hierarchical column
+     * of a treeTable. Not really working .. the wrap is not reliable?.
+     *
+     */
+    public void interactiveTextAreaTreeTable() {
+        TreeTableModel model = createTreeTableModelWithLongNode();
+        JXTreeTable treeTable = new JXTreeTable(model);
+        treeTable.setVisibleRowCount(5);
+        treeTable.setRowHeight(50);
+        treeTable.getColumnExt(0).setPreferredWidth(200);
+        TreeCellRenderer renderer = new DefaultTreeRenderer(
+                new WrappingProvider(new TextAreaProvider()));
+        treeTable.setTreeCellRenderer(renderer);
+        showWithScrollingInFrame(treeTable, "TreeTable with text wrapping");
+    }
+    
+    /**
+     * @return
+     */
+    private TreeTableModel createTreeTableModelWithLongNode() {
+        MutableTreeTableNode root = createLongNode("some really, maybe really really long text -  "
+                + "wrappit .... where needed ");
+        root.insert(createLongNode("another really, maybe really really long text -  "
+                + "with nothing but junk. wrappit .... where needed"), 0);
+        root.insert(createLongNode("another really, maybe really really long text -  "
+                + "with nothing but junk. wrappit .... where needed"), 0);
+        MutableTreeTableNode node = createLongNode("some really, maybe really really long text -  "
+                + "wrappit .... where needed ");
+        node.insert(createLongNode("another really, maybe really really long text -  "
+                + "with nothing but junk. wrappit .... where needed"), 0);
+        root.insert(node, 0);
+        root.insert(createLongNode("another really, maybe really really long text -  "
+                + "with nothing but junk. wrappit .... where needed"), 0);
+        Vector ids = new Vector();
+        ids.add("long text");
+        ids.add("dummy");
+        return new DefaultTreeTableModel(root, ids);
+    }
+
+    /**
+     * @param string
+     * @return
+     */
+    private MutableTreeTableNode createLongNode(final String string) {
+        AbstractMutableTreeTableNode node = new AbstractMutableTreeTableNode() {
+            Object rnd = Math.random();
+            public int getColumnCount() {
+                return 2;
+            }
+
+            public Object getValueAt(int column) {
+                if (column == 0) {
+                    return string;
+                }
+                return rnd;
+            }
+            
+        };
+        node.setUserObject(string);
+        return node;
+    }
+
 
     /**
      * example how to use a custom component as
