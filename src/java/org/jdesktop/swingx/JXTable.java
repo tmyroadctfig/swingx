@@ -2505,6 +2505,9 @@ public class JXTable extends JTable
         }
         if (calculatedPrefScrollableViewportSize == null) {
             calculatedPrefScrollableViewportSize = new Dimension();
+            // JW: hmm... fishy ... shouldn't be necessary here?
+            // maybe its the "early init" in super's tableChanged();
+            initializeColumnPreferredWidths();
         }
         // PENDING JW: calc only once - need to define if/when
         // to re-calc

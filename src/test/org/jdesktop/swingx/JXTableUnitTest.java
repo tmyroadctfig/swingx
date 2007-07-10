@@ -203,6 +203,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JXTable table = new JXTable(30, 7);
         // make sure the init is called
         table.getPreferredScrollableViewportSize();
+        // following should init the column width ...
         table.setModel(compare.getModel());
         for (int i = 0; i < table.getColumnCount(); i++) {
             assertEquals("prefwidths must be same at index " + i, 
