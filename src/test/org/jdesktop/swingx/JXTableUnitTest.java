@@ -112,6 +112,105 @@ public class JXTableUnitTest extends InteractiveTestCase {
         super.tearDown();
     }
 
+    
+    /**
+     * Issue #508-swingx: cleanup pref scrollable size.
+     * test preference of explicit setting (over calculated).
+     *
+     */
+    public void testPrefScrollableSetPreference() {
+        JXTable table = new JXTable(10, 6);
+        Dimension dim = table.getPreferredScrollableViewportSize();
+        Dimension other = new Dimension(dim.width + 20, dim.height + 20);
+        table.setPreferredScrollableViewportSize(other);
+        assertEquals(other, table.getPreferredScrollableViewportSize());
+    }
+    
+    /**
+     * Issue #508-swingx: cleanup pref scrollable size.
+     * test that max number of columns used for the preferred 
+     * scrollable width i getVisibleColumnCount 
+     *
+     */
+    public void testPrefScrollableWidthMoreColumns() {
+        JXTable table = new JXTable(10, 7);
+        Dimension dim = table.getPreferredScrollableViewportSize();
+        // sanity
+        assertEquals(table.getVisibleColumnCount() + 1, table.getColumnCount());
+        int width = 0;
+        for (int i = 0; i < table.getVisibleColumnCount(); i++) {
+            width += table.getColumn(i).getPreferredWidth();
+        }
+        assertEquals(width, dim.width);
+    }
+    
+    /**
+     * Issue #508-swingx: cleanup pref scrollable size.
+     * test that max number of columns used for the preferred 
+     * scrollable width i getVisibleColumnCount 
+     *
+     */
+    public void testPrefScrollableWidthLessColumns() {
+        JXTable table = new JXTable(10, 5);
+        Dimension dim = table.getPreferredScrollableViewportSize();
+        // sanity
+        assertEquals(table.getVisibleColumnCount() - 1, table.getColumnCount());
+        int width = 0;
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            width += table.getColumn(i).getPreferredWidth();
+        }
+        width += 75;
+        assertEquals(width, dim.width);
+    }
+    
+    /**
+     * Issue #508-swingx: cleanup pref scrollable size.
+     * Sanity: test initial visible column count.
+     *
+     */
+    public void testDefaultVisibleColumnCount() {
+        JXTable table = new JXTable(10, 6);
+        assertEquals(6, table.getVisibleColumnCount());
+        // paranoid - visible column count independent on actual count
+        JXTable other =  new JXTable(10, 10);
+        assertEquals(6, other.getVisibleColumnCount());
+    }
+    /**
+     * Issue #508-swingx: cleanup pref scrollable size.
+     * test custom setting of visible column count.
+     * 
+     */
+    public void testVisibleColumnCount() {
+        JXTable table = new JXTable(30, 10);
+        int visibleColumns = 7;
+        table.setVisibleColumnCount(visibleColumns);
+        assertEquals(visibleColumns, table.getVisibleColumnCount());
+        Dimension dim = table.getPreferredScrollableViewportSize();
+        assertEquals(visibleColumns * 75, dim.width);
+    }
+    
+    
+    /**
+     * Issue #508-swingx: cleanup pref scrollable size.
+     * test that column widths are configured after setModel.
+     *
+     */    
+    public void testPrefColumnSetModel() {
+        JXTable compare = new JXTable(new AncientSwingTeam());
+        // make sure the init is called
+        compare.getPreferredScrollableViewportSize();
+        // table with arbitrary model
+        JXTable table = new JXTable(30, 7);
+        // make sure the init is called
+        table.getPreferredScrollableViewportSize();
+        table.setModel(compare.getModel());
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            assertEquals("prefwidths must be same at index " + i, 
+                    compare.getColumnExt(i).getPreferredWidth(),
+                    table.getColumnExt(i).getPreferredWidth());
+        }
+    }
+
     /**
      * Issue #547-swingx: pref scrollable height included header.
      *
@@ -120,11 +219,18 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JXTable table = new JXTable(10, 6);
         Dimension dim = table.getPreferredScrollableViewportSize();
         assertNotNull("pref scrollable must not be null", dim);
-        assertEquals(20, table.getVisibleRowCount());
         assertEquals("scrollable height must no include header", 
                 table.getVisibleRowCount() * table.getRowHeight(), dim.height);
     }     
     
+    /**
+     * Sanity: default visible row count.
+     *
+     */
+    public void testDefaultVisibleRowCount() {
+        JXTable table = new JXTable(10, 6);
+        assertEquals(20, table.getVisibleRowCount());
+    }
     /**
      * Issue #547-swingx: NPE in ColumnFactory configureColumnWidth 
      *    for hidden column
@@ -153,6 +259,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         // NPE
         table.getColumnFactory().configureColumnWidths(table, columnExt);
     }
+    
     /**
      * Issue #547-swingx: hidden columns' pref width not initialized.
      *
@@ -204,6 +311,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertEquals("column pref width must be unchanged", 
                 standardWidth, columnExt.getPreferredWidth());
     }
+    
     /**
      * Issue #547-swingx: columns' pref width - added margin twice
      * if has prototype.
@@ -223,7 +331,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertEquals("column margin must be added once", table.getColumnMargin(), 
                 columnExt.getPreferredWidth() - comp.getPreferredSize().width);
     }
-
 
     /**
      * Issue #530-swingx: problems indy rowheight and filters

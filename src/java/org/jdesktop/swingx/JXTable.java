@@ -470,6 +470,8 @@ public class JXTable extends JTable
         initActionsAndBindings();
         // instantiate row height depending ui setting or font size.
         updateRowHeightUI(false);
+        // set to null -  don't want hard-coded pixel sizes.
+        setPreferredScrollableViewportSize(null);
         setFillsViewportHeight(true);
         updateLocaleState();
     }
@@ -1410,6 +1412,9 @@ public class JXTable extends JTable
             getSelectionMapper().setEnabled(wasEnabled);
         }
         use(filters);
+        if (isStructureChanged(e)) {
+            initializeColumnPreferredWidths();
+        }
     }
 
     
@@ -2422,7 +2427,7 @@ public class JXTable extends JTable
      * Sets the preferred number of rows to show in a <code>JScrollPane</code>.
      * <p>
      * 
-     * The default value is 18. <p>
+     * The default value is 20. <p>
      * 
      * TODO JW - make bound property, reset scrollablePref(? distinguish
      * internal from client code triggered like in rowheight?) and re-layout.
@@ -2434,92 +2439,120 @@ public class JXTable extends JTable
         this.visibleRowCount = visibleRowCount;
     }
 
-
-//    public int getVisibleColumnCount() {
-//        return visibleColumnCount;
-//    }
+    /**
+     * Returns the preferred number of columns to show in the
+     * <code>JScrollPane</code>.
+     * 
+     * @return the number of columns to show in the scroll pane.
+     * 
+     * @see #setVisibleColumnCount
+     */
+    public int getVisibleColumnCount() {
+        return visibleColumnCount;
+    }
     
-//    protected void updateVisibleGrid() {
-//       if (calculatedPrefScrollableViewportSize == null) {
-//           calculatedPrefScrollableViewportSize = new Dimension();
-//       }
-//       // move this to ColumnFactory?
-//       int width = 0;
-//       for (int i = 0; i < getVisibleColumnCount(); i++) {
-//           if (i < getColumnCount()) {
-//               width += getColumn(i).getPreferredWidth();
-//           } else {
-//               // hardcoded default in TableColumn 
-//               width += 75;
-//           }
-//       }
-//       int height = getVisibleRowCount() * getRowHeight();
-//       calculatedPrefScrollableViewportSize.width = width;
-//       calculatedPrefScrollableViewportSize.height = height;
-//    }
+    /**
+     * Sets the preferred number of Columns to show in a <code>JScrollPane</code>.
+     * <p>
+     * 
+     * The default value is 6. <p>
+     * 
+     * TODO JW - make bound property, reset scrollablePref(? distinguish
+     * internal from client code triggered like in rowheight?) and re-layout.
+     * 
+     * @param visibleColumnCount number of rows to show in a <code>JScrollPane</code>
+     * @see #getVisibleColumnCount()
+     */
+    public void setVisibleColumnCount(int visibleColumnCount) {
+        this.visibleColumnCount = visibleColumnCount;
+    }
     
     /**
      * {@inheritDoc} <p>
      * 
-     * TODO JW: refactor and comment.
+     * If the given dimension is null, the auto-calculation of 
+     * the pref scrollable size is enabled, otherwise the behaviour
+     * is the same as super. 
      * 
+     * The default is auto-calc enabled on.
+     * 
+     * @see #getPreferredScrollableViewportSize()
      */
     @Override
-    public Dimension getPreferredScrollableViewportSize() {
-        Dimension prefSize = super.getPreferredScrollableViewportSize();
-        // JTable hardcodes this to 450 X 400, so we'll calculate it
-        // based on the preferred widths of the columns and the
-        // visibleRowCount property instead...
-
-        if (prefSize.getWidth() == 450 && prefSize.getHeight() == 400) {
-            initializeColumnPreferredWidths();
-            TableColumnModel columnModel = getColumnModel();
-            int columnCount = columnModel.getColumnCount();
-
-            int w = 0;
-            for (int i = 0; i < columnCount; i++) {
-                TableColumn column = columnModel.getColumn(i);
-                w += column.getPreferredWidth();
-            }
-            prefSize.width = w;
-            JTableHeader header = getTableHeader();
-            // remind(aim): height is still off...???
-            int rowCount = getVisibleRowCount();
-            prefSize.height = rowCount * getRowHeight();
-//                    + (header != null ? header.getPreferredSize().height : 0);
-            setPreferredScrollableViewportSize(prefSize);
-        }
-        return prefSize;
+    public void setPreferredScrollableViewportSize(Dimension size) {
+        super.setPreferredScrollableViewportSize(size);
     }
 
     /**
-     * @return
+     * {@inheritDoc}
+     * <p>
+     * Overridden to support auto-calculation of pref scrollable size, dependent
+     * on the visible row/column count properties. The auto-calc is on if
+     * there's no explicit pref scrollable size set. Otherwise the fixed size is
+     * returned
+     * <p>
+     * 
+     * PENDING JW: move the details to the ColumnFactory?
+     * 
+     * @see #setPreferredScrollableViewportSize(Dimension)
+     */
+    @Override
+    public Dimension getPreferredScrollableViewportSize() {
+        // client code has set this - takes precedence.
+        Dimension prefSize = super.getPreferredScrollableViewportSize();
+        if (prefSize != null) {
+            return prefSize;
+        }
+        if (calculatedPrefScrollableViewportSize == null) {
+            calculatedPrefScrollableViewportSize = new Dimension();
+        }
+        // PENDING JW: calc only once - need to define if/when
+        // to re-calc
+        if (calculatedPrefScrollableViewportSize.width <= 0) {
+            TableColumnModel columnModel = getColumnModel();
+            int columnCount = columnModel.getColumnCount();
+            int w = 0;
+            for (int i = 0; i < Math.min(columnCount, getVisibleColumnCount()); i++) {
+                // sum up column's pref size, until maximal the
+                // visibleColumnCount
+                TableColumn column = columnModel.getColumn(i);
+                w += column.getPreferredWidth();
+            }
+            if (columnCount < getVisibleColumnCount()) {
+                w += (getVisibleColumnCount() - columnCount) * 75;
+            }
+            calculatedPrefScrollableViewportSize.width = w;
+        }
+        if (calculatedPrefScrollableViewportSize.height <= 0) {
+            calculatedPrefScrollableViewportSize.height = getVisibleRowCount()
+                    * getRowHeight();
+        }
+        return calculatedPrefScrollableViewportSize;
+    }
+
+    /**
+     * Initialize the width related properties of all contained
+     * TableColumns, both visible and hidden. 
+     * 
+     * @see #initializeColumnPreferredWidth(TableColumn)
      */
     protected void initializeColumnPreferredWidths() {
         for (TableColumn column : getColumns(true)) {
             initializeColumnPreferredWidth(column);
         }
-//        TableColumnModel columnModel = getColumnModel();
-//        int columnCount = columnModel.getColumnCount();
-//
-//        for (int i = 0; i < columnCount; i++) {
-//            TableColumn column = columnModel.getColumn(i);
-//            initializeColumnPreferredWidth(column);
-//        }
     }
     
     /**
-     * Initialize the preferredWidth of the specified column based on the
-     * column's prototypeValue property. If the column is not an instance of
-     * <code>TableColumnExt</code> or prototypeValue is <code>null</code>
-     * then the preferredWidth is left unmodified.
+     * Initialize the width related properties of the specified column. The
+     * exact details are specified by the current <code>ColumnFactory</code>
+     * if the column is of type <code>TableColumnExt</code>. Otherwise
+     * nothing is changed.
      * <p>
      * 
      * TODO JW - need to cleanup getScrollablePreferred (refactor and inline)
-     * update doc - what exactly happens is left to the columnfactory.
      * 
      * @param column TableColumn object representing view column
-     * @see org.jdesktop.swingx.table.TableColumnExt#setPrototypeValue
+     * @see org.jdesktop.swingx.table.ColumnFactory#configureColumnWidths
      */
     protected void initializeColumnPreferredWidth(TableColumn column) {
         if (column instanceof TableColumnExt) {
