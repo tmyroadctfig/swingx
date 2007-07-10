@@ -37,7 +37,9 @@ import javax.swing.tree.TreePath;
  */
 public class DefaultTreeTableModel extends AbstractTreeTableModel {
     /** The <code>Vector</code> of column identifiers. */
-    protected Vector    columnIdentifiers;
+    protected Vector columnIdentifiers;
+
+    private boolean useAutoCalculatedIdentifiers;
 
     /**
      * Creates a new {@code DefaultTreeTableModel} with a {@code null} root.
@@ -69,41 +71,60 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
     public DefaultTreeTableModel(TreeTableNode root, Vector columnNames) {
         super(root);
         setColumnIdentifiers(columnNames);
-        
+
     }
 
     private boolean isValidTreeTableNode(Object node) {
-        boolean result = false;
-        
-        if (node instanceof TreeTableNode) {
-            TreeTableNode ttn = (TreeTableNode) node;
-            
-            while (!result && ttn != null) {
-                result = ttn == root;
-                
-                ttn = ttn.getParent();
+//         boolean result = false;
+//
+//        if (node instanceof TreeTableNode) {
+//            TreeTableNode ttn = (TreeTableNode) node;
+//
+//            while (!result && ttn != null) {
+//                result = ttn == root;
+//
+//                ttn = ttn.getParent();
+//            }
+//        }
+//
+//        return result;
+        return true;
+    }
+
+    /**
+     * Replaces the column identifiers in the model. If the number of
+     * <code>newIdentifier</code>s is greater than the current number of
+     * columns, new columns are added to the end of each row in the model. If
+     * the number of <code>newIdentifier</code>s is less than the current
+     * number of columns, all the extra columns at the end of a row are
+     * discarded.
+     * <p>
+     * 
+     * @param columnIdentifiers
+     *            vector of column identifiers. If <code>null</code>, set the
+     *            model to zero columns
+     */
+    // from DefaultTableModel
+    public void setColumnIdentifiers(Vector columnIdentifiers) {
+        useAutoCalculatedIdentifiers = columnIdentifiers == null;
+
+        this.columnIdentifiers = useAutoCalculatedIdentifiers
+                ? getAutoCalculatedIdentifiers(getRoot())
+                : columnIdentifiers;
+    }
+
+    private static Vector<String> getAutoCalculatedIdentifiers(
+            TreeTableNode exemplar) {
+        Vector<String> autoCalculatedIndentifiers = new Vector<String>();
+
+        if (exemplar != null) {
+            for (int i = 0, len = exemplar.getColumnCount(); i < len; i++) {
+                // forces getColumnName to use super.getColumnName
+                autoCalculatedIndentifiers.add(null);
             }
         }
-        
-        return result;
-    }
-    
-    /**
-     * Replaces the column identifiers in the model.  If the number of
-     * <code>newIdentifier</code>s is greater than the current number
-     * of columns, new columns are added to the end of each row in the model.
-     * If the number of <code>newIdentifier</code>s is less than the current
-     * number of columns, all the extra columns at the end of a row are
-     * discarded. <p>
-     *
-     * @param   columnIdentifiers  vector of column identifiers.  If
-     *              <code>null</code>, set the model
-     *                          to zero columns
-     */
-    //from DefaultTableModel
-    public void setColumnIdentifiers(Vector columnIdentifiers) {
-        this.columnIdentifiers = columnIdentifiers == null ? new Vector()
-                : columnIdentifiers;
+
+        return autoCalculatedIndentifiers;
     }
 
     /**
@@ -142,30 +163,33 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
             throw new IllegalArgumentException(
                     "node must be a valid node managed by this model");
         }
-        
+
         if (column < 0 || column >= getColumnCount()) {
             throw new IllegalArgumentException("column must be a valid index");
         }
-        
+
         return ((TreeTableNode) node).getValueAt(column);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setValueAt(Object value, Object node, int column) {
         if (!isValidTreeTableNode(node)) {
             throw new IllegalArgumentException(
                     "node must be a valid node managed by this model");
         }
-        
+
         if (column < 0 || column >= getColumnCount()) {
             throw new IllegalArgumentException("column must be a valid index");
         }
-        
+
         TreeTableNode ttn = (TreeTableNode) node;
-        
+
         if (column < ttn.getColumnCount()) {
             ttn.setValueAt(value, column);
-            
+
             modelSupport.firePathChanged(new TreePath(getPathToRoot(ttn)));
         }
     }
@@ -180,20 +204,20 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
     /**
      * {@inheritDoc}
      */
-    //Can we make getColumnClass final and avoid the complex DTM copy? -- kgs
+    // Can we make getColumnClass final and avoid the complex DTM copy? -- kgs
     public String getColumnName(int column) {
-        //Copied from DefaultTableModel.
+        // Copied from DefaultTableModel.
         Object id = null;
-        
+
         // This test is to cover the case when
         // getColumnCount has been subclassed by mistake ...
         if (column < columnIdentifiers.size() && (column >= 0)) {
             id = columnIdentifiers.elementAt(column);
         }
-        
+
         return (id == null) ? super.getColumnName(column) : id.toString();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -202,7 +226,7 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
             throw new IllegalArgumentException(
                     "parent must be a TreeTableNode managed by this model");
         }
-        
+
         return ((TreeTableNode) parent).getChildAt(index);
     }
 
@@ -214,7 +238,7 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
             throw new IllegalArgumentException(
                     "parent must be a TreeTableNode managed by this model");
         }
-        
+
         return ((TreeTableNode) parent).getChildCount();
     }
 
@@ -226,32 +250,35 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
             throw new IllegalArgumentException(
                     "parent must be a TreeTableNode managed by this model");
         }
-        
+
         if (!isValidTreeTableNode(parent)) {
             throw new IllegalArgumentException(
                     "child must be a TreeTableNode managed by this model");
         }
-        
+
         return ((TreeTableNode) parent).getIndex((TreeTableNode) child);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isCellEditable(Object node, int column) {
         if (!isValidTreeTableNode(node)) {
             throw new IllegalArgumentException(
                     "node must be a valid node managed by this model");
         }
-        
+
         if (column < 0 || column >= getColumnCount()) {
             throw new IllegalArgumentException("column must be a valid index");
         }
-        
+
         TreeTableNode ttn = (TreeTableNode) node;
-        
+
         if (column >= ttn.getColumnCount()) {
             return false;
         }
-        
+
         return ttn.isEditable(column);
     }
 
@@ -263,10 +290,10 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
             throw new IllegalArgumentException(
                     "node must be a TreeTableNode managed by this model");
         }
-        
+
         return ((TreeTableNode) node).isLeaf();
     }
-    
+
     /**
      * Gets the path from the root to the specified node.
      * 
@@ -282,23 +309,36 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
     public TreeTableNode[] getPathToRoot(TreeTableNode aNode) {
         List<TreeTableNode> path = new ArrayList<TreeTableNode>();
         TreeTableNode node = aNode;
-        
+
         while (node != root) {
             path.add(0, node);
-            
+
             node = (TreeTableNode) node.getParent();
         }
-        
+
         if (node == root) {
             path.add(0, node);
         }
-        
+
         return path.toArray(new TreeTableNode[0]);
     }
-    
+
+    /**
+     * Sets the root for this table model. If no column identifiers have been
+     * specified, this will rebuild the identifier list, using {@code root} as
+     * an examplar of the table.
+     * 
+     * @param root
+     *            the node to set as root
+     */
     public void setRoot(TreeTableNode root) {
         this.root = root;
-        
+
+        if (useAutoCalculatedIdentifiers) {
+            // rebuild the list
+            setColumnIdentifiers(null);
+        }
+
         modelSupport.fireNewRoot();
     }
 
@@ -318,9 +358,8 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
 
     /**
      * Message this to remove node from its parent. This will message
-     * nodesWereRemoved to create the appropriate event. This is the
-     * preferred way to remove a node as it handles the event creation
-     * for you.
+     * nodesWereRemoved to create the appropriate event. This is the preferred
+     * way to remove a node as it handles the event creation for you.
      */
     public void removeNodeFromParent(MutableTreeTableNode node) {
         MutableTreeTableNode parent = (MutableTreeTableNode) node.getParent();
@@ -331,8 +370,8 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
 
         int index = parent.getIndex(node);
         node.removeFromParent();
-        
-        modelSupport.fireChildRemoved(new TreePath(getPathToRoot(parent)), index,
-                node);
+
+        modelSupport.fireChildRemoved(new TreePath(getPathToRoot(parent)),
+                index, node);
     }
 }

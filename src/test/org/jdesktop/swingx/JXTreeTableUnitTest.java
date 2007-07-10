@@ -887,10 +887,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     // ------------------ init
     protected void setUp() throws Exception {
         super.setUp();
-        DefaultTreeTableModel treeTableModel = (DefaultTreeTableModel) getDefaultTreeTableModel();
-        Vector<String> columnNames = new Vector<String>();
-        columnNames.add("A");
-        simpleTreeTableModel = new DefaultTreeTableModel((TreeTableNode) treeTableModel.getRoot(), columnNames);
+        simpleTreeTableModel = getDefaultTreeTableModel();
         this.treeTableModel = new FileSystemModel();
     }
 
