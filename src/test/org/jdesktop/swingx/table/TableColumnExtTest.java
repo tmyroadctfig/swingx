@@ -36,6 +36,10 @@ public class TableColumnExtTest extends TestCase {
         assertSame(value, columnExt.getClientProperty(key));
         columnExt.putClientProperty(key, null);
         assertNull(columnExt.getClientProperty(key));
+        // again - for going into the last untested line
+        // but what to test?
+        columnExt.putClientProperty(key, null);
+        assertNull(columnExt.getClientProperty(key));
     }
     /**
      * test doc'ed exceptions in putClientProperty.
