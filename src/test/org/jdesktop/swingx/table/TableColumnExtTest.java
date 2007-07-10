@@ -24,6 +24,20 @@ import org.jdesktop.test.SerializableSupport;
 public class TableColumnExtTest extends TestCase {
 
     /**
+     * test remove
+     *
+     */
+    public void testPutClientPropertyNullValue() {
+        TableColumnExt columnExt = new TableColumnExt();
+        Object value = new Object();
+        String key = "some";
+        columnExt.putClientProperty(key, value);
+        // sanity: got it
+        assertSame(value, columnExt.getClientProperty(key));
+        columnExt.putClientProperty(key, null);
+        assertNull(columnExt.getClientProperty(key));
+    }
+    /**
      * test doc'ed exceptions in putClientProperty.
      *
      */
