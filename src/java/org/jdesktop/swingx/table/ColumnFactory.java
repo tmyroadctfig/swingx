@@ -178,12 +178,23 @@ public class ColumnFactory {
     
 
     /**
-     * Configures column initial widths properties from <code>JXTable</code>. 
-     * This bare-bones implementation sets the column's <code>preferredWidth</code>
-     * using it's <code>prototype</code> property. <p>
+     * Configures column initial widths properties from <code>JXTable</code>.
+     * This implementation sets the column's
+     * <code>preferredWidth</code> with the strategy:
+     * <ol> if the column has a prototype, measure the rendering
+     *    component with the prototype as value and use that as
+     *    pref width
+     * <ol> if the column has no prototype, use the standard magic
+     *   pref width (= 75) 
+     * <ol> try to measure the column's header and use it's preferred
+     *   width if it exceeds the former.    
+     * </ol>
      * 
      * TODO JW - rename method to better convey what's happening, maybe
-     *   initializeColumnWidths like the old method in JXTable.
+     * initializeColumnWidths like the old method in JXTable. <p>
+     * 
+     * TODO JW - how to handle default settings which are different from
+     *   standard 75?
      * 
      * @param table the context the column will live in.
      * @param columnExt the Tablecolumn to configure.
@@ -192,46 +203,102 @@ public class ColumnFactory {
      */
     public void configureColumnWidths(JXTable table, TableColumnExt columnExt) {
         /*
-         * PENDING JW: really only called once in a table's lifetime? 
-         * unfortunately: yes - should be called always after
-         * structureChanged.
+         * PENDING JW: really only called once in a table's lifetime?
+         * unfortunately: yes - should be called always after structureChanged.
          * 
          */
-        Dimension cellSpacing = table.getIntercellSpacing();
+        // magic value: default in TableColumn
+        int prefWidth = 75 - table.getColumnMargin();
+        int prototypeWidth = calcPrototypeWidth(table, columnExt);
+        if (prototypeWidth > 0) {
+            prefWidth = prototypeWidth;
+        }
+        int headerWidth = calcHeaderWidth(table, columnExt);
+        prefWidth = Math.max(prefWidth, headerWidth);
+        prefWidth += table.getColumnModel().getColumnMargin();
+        columnExt.setPreferredWidth(prefWidth);
+    }
+
+    /**
+     * Measures and returns the preferred width of the header. Returns -1 if not 
+     * applicable.
+     *  
+     * @param table the component the renderer lives in
+     * @param columnExt the TableColumn to configure
+     * @return the preferred width of the header or -1 if none.
+     */
+    protected int calcHeaderWidth(JXTable table, TableColumnExt columnExt) {
+        int prototypeWidth = -1;
+        // now calculate how much room the column header wants
+        TableCellRenderer renderer = columnExt.getHeaderRenderer();
+        if (renderer == null) {
+            JTableHeader header = table.getTableHeader();
+            if (header != null) {
+                renderer = header.getDefaultRenderer();
+            }
+        }
+        if (renderer != null) {
+            Component comp = renderer.getTableCellRendererComponent(table,
+                    columnExt.getHeaderValue(), false, false, -1, -1);
+
+            prototypeWidth = comp.getPreferredSize().width;
+        }
+        return prototypeWidth;
+    }
+
+
+    /**
+     * Measures and returns the preferred width of the rendering component
+     * configured with the prototype value, if any. Returns -1 if not 
+     * applicable.
+     *  
+     * @param table the component the renderer lives in
+     * @param columnExt the TableColumn to configure
+     * @return the preferred width of the prototype or -1 if none.
+     */
+    protected int calcPrototypeWidth(JXTable table, TableColumnExt columnExt) {
+        int prototypeWidth = -1;
         Object prototypeValue = columnExt.getPrototypeValue();
         if (prototypeValue != null) {
             // calculate how much room the prototypeValue requires
-            TableCellRenderer renderer = table.getCellRenderer(0, table
-                    .convertColumnIndexToView(columnExt.getModelIndex()));
-            Component comp = renderer.getTableCellRendererComponent(table,
-                    prototypeValue, false, false, 0, 0);
-            int prefWidth = comp.getPreferredSize().width + cellSpacing.width;
-
-            // now calculate how much room the column header wants
-            renderer = columnExt.getHeaderRenderer();
-            if (renderer == null) {
-                JTableHeader header = table.getTableHeader();
-                if (header != null) {
-                    renderer = header.getDefaultRenderer();
-                }
-            }
-            if (renderer != null) {
-                comp = renderer.getTableCellRendererComponent(table, 
-                        columnExt.getHeaderValue(), false, false, 0, 
-                        table.convertColumnIndexToView(columnExt.getModelIndex()));
-
-                prefWidth = Math.max(comp.getPreferredSize().width, prefWidth);
-            }
-            prefWidth += table.getColumnModel().getColumnMargin();
-            columnExt.setPreferredWidth(prefWidth);
+            TableCellRenderer cellRenderer = getCellRenderer(table, columnExt);
+            Component comp = cellRenderer.getTableCellRendererComponent(table,
+                    prototypeValue, false, false, 0, -1);
+            prototypeWidth = comp.getPreferredSize().width;
         }
+        return prototypeWidth;
+    }
+
+    /**
+     * Returns the cell renderer to use for measuring. Delegates to 
+     * JXTable for visible columns, duplicates table logic for hidden
+     * columns.
+     * 
+     * @param table the table which provides the renderer
+     * @param columnExt the TableColumn to configure
+     * @return
+     */
+    private TableCellRenderer getCellRenderer(JXTable table, TableColumnExt columnExt) {
+        int viewIndex = table.convertColumnIndexToView(columnExt
+                .getModelIndex());
+        if (viewIndex >= 0) {
+            return table.getCellRenderer(0, viewIndex);
+        }
+        // hidden column - need api on JXTable to access renderer for hidden?
+        // here we duplicate JXTable api ... maybe by-passing the strategy
+        // implemented there
+        TableCellRenderer renderer = columnExt.getCellRenderer();
+        if (renderer == null) {
+            renderer = table.getDefaultRenderer(table.getModel().getColumnClass(columnExt.getModelIndex()));
+        }
+        return renderer;
     }
 
     /**
      * Configures the column's <code>preferredWidth</code> to fit the content.
-     * It respects the table context, a margin to add and a maximum width. This is
-     * typically called in response to a user gesture to adjust the column's width
-     * to the "widest" cell content of a column.  
+     * It respects the table context, a margin to add and a maximum width. This
+     * is typically called in response to a user gesture to adjust the column's
+     * width to the "widest" cell content of a column.
      * <p>
      * 
      * This implementation loops through all rows of the given column and

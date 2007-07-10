@@ -300,7 +300,10 @@ public class JXTable extends JTable
     private ColumnFactory columnFactory;
 
     /** The default number of visible rows (in a ScrollPane). */
-    private int visibleRowCount = 18;
+    private int visibleRowCount = 20;
+
+    /** The default number of visible columns (in a ScrollPane). */
+    private int visibleColumnCount = 6;
 
     private SizeSequenceMapper rowModelMapper;
 
@@ -368,6 +371,9 @@ public class JXTable extends JTable
 
     /** property to control table's editability as a whole. */
     private boolean editable;
+
+    private Dimension calculatedPrefScrollableViewportSize;
+
 
     /** Instantiates a JXTable with a default table model, no data. */
     public JXTable() {
@@ -440,6 +446,14 @@ public class JXTable extends JTable
         super(rowData, columnNames);
         init();
     }
+
+    
+//    @Override
+//    protected void initializeLocalVars() {
+//        isXTableRowHeightSet = false;
+//        super.initializeLocalVars();
+//        isXTableRowHeightSet = false;
+//    }
 
     /** 
      * Initializes the table for use.
@@ -2408,6 +2422,8 @@ public class JXTable extends JTable
      * Sets the preferred number of rows to show in a <code>JScrollPane</code>.
      * <p>
      * 
+     * The default value is 18. <p>
+     * 
      * TODO JW - make bound property, reset scrollablePref(? distinguish
      * internal from client code triggered like in rowheight?) and re-layout.
      * 
@@ -2419,6 +2435,29 @@ public class JXTable extends JTable
     }
 
 
+//    public int getVisibleColumnCount() {
+//        return visibleColumnCount;
+//    }
+    
+//    protected void updateVisibleGrid() {
+//       if (calculatedPrefScrollableViewportSize == null) {
+//           calculatedPrefScrollableViewportSize = new Dimension();
+//       }
+//       // move this to ColumnFactory?
+//       int width = 0;
+//       for (int i = 0; i < getVisibleColumnCount(); i++) {
+//           if (i < getColumnCount()) {
+//               width += getColumn(i).getPreferredWidth();
+//           } else {
+//               // hardcoded default in TableColumn 
+//               width += 75;
+//           }
+//       }
+//       int height = getVisibleRowCount() * getRowHeight();
+//       calculatedPrefScrollableViewportSize.width = width;
+//       calculatedPrefScrollableViewportSize.height = height;
+//    }
+    
     /**
      * {@inheritDoc} <p>
      * 
@@ -2428,30 +2467,45 @@ public class JXTable extends JTable
     @Override
     public Dimension getPreferredScrollableViewportSize() {
         Dimension prefSize = super.getPreferredScrollableViewportSize();
-
         // JTable hardcodes this to 450 X 400, so we'll calculate it
         // based on the preferred widths of the columns and the
         // visibleRowCount property instead...
 
         if (prefSize.getWidth() == 450 && prefSize.getHeight() == 400) {
+            initializeColumnPreferredWidths();
             TableColumnModel columnModel = getColumnModel();
             int columnCount = columnModel.getColumnCount();
 
             int w = 0;
             for (int i = 0; i < columnCount; i++) {
                 TableColumn column = columnModel.getColumn(i);
-                initializeColumnPreferredWidth(column);
                 w += column.getPreferredWidth();
             }
             prefSize.width = w;
             JTableHeader header = getTableHeader();
             // remind(aim): height is still off...???
             int rowCount = getVisibleRowCount();
-            prefSize.height = rowCount * getRowHeight()
-                    + (header != null ? header.getPreferredSize().height : 0);
+            prefSize.height = rowCount * getRowHeight();
+//                    + (header != null ? header.getPreferredSize().height : 0);
             setPreferredScrollableViewportSize(prefSize);
         }
         return prefSize;
+    }
+
+    /**
+     * @return
+     */
+    protected void initializeColumnPreferredWidths() {
+        for (TableColumn column : getColumns(true)) {
+            initializeColumnPreferredWidth(column);
+        }
+//        TableColumnModel columnModel = getColumnModel();
+//        int columnCount = columnModel.getColumnCount();
+//
+//        for (int i = 0; i < columnCount; i++) {
+//            TableColumn column = columnModel.getColumn(i);
+//            initializeColumnPreferredWidth(column);
+//        }
     }
     
     /**
