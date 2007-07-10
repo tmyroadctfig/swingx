@@ -14,6 +14,7 @@ import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.test.AncientSwingTeam;
 
 /**
  * Contains unit tests for <code>ColumnFactory</code>.
@@ -22,6 +23,18 @@ import org.jdesktop.swingx.JXTable;
  */
 public class ColumnFactoryTest extends InteractiveTestCase {
 
+    
+    public void testPackColumnWithMax() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        TableColumnExt columnExt = table.getColumnExt(0);
+        table.getColumnFactory().packColumn(table, columnExt, -1, -1);
+        int prefWidth = columnExt.getPreferredWidth();
+        assertTrue("sanity: ", prefWidth > 10);
+        int max = prefWidth - 5;
+        table.getColumnFactory().packColumn(table, columnExt, -1, max);
+        assertEquals("pref width must be bounded by max", 
+                max, columnExt.getPreferredWidth());
+    }
     /**
      * packColumn can't handle hidden columns.
      *
@@ -37,6 +50,7 @@ public class ColumnFactoryTest extends InteractiveTestCase {
             // expected
         }        
     }
+    
     /**
      * test that configure throws exceptions as doc'ed.
      * Here: model index == negative
