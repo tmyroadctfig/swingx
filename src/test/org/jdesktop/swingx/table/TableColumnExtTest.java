@@ -24,6 +24,19 @@ import org.jdesktop.test.SerializableSupport;
 public class TableColumnExtTest extends TestCase {
 
     /**
+     * test doc'ed exceptions in putClientProperty.
+     *
+     */
+    public void testPutClientPropertyExc() {
+        TableColumnExt columnExt = new TableColumnExt();
+        try {
+            columnExt.putClientProperty(null, "somevalue");
+            fail("put client property with null key must throw");
+        } catch (IllegalArgumentException e) {
+            // expected behaviour
+        }        
+    }
+    /**
      * Sanity test Serializable.
      * 
      * @throws ClassNotFoundException
