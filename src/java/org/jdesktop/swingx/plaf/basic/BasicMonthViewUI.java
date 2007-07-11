@@ -1,3 +1,23 @@
+/*
+ * $Id$
+ *
+ * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
+ * Santa Clara, California 95054, U.S.A. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
 package org.jdesktop.swingx.plaf.basic;
 
 import java.awt.Color;
@@ -48,6 +68,13 @@ import org.jdesktop.swingx.calendar.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.plaf.MonthViewUI;
 
+/**
+ * Base implementation of the <code>JXMonthView</code> UI.
+ *
+ * @author dmouse
+ * @author rbair
+ * @author rah003
+ */
 public class BasicMonthViewUI extends MonthViewUI {
     private static final int LEADING_DAY_OFFSET = 1;
     private static final int NO_OFFSET = 0;
@@ -1007,9 +1034,24 @@ public class BasicMonthViewUI extends MonthViewUI {
         yearStringBounds[month].x = (monthStringBounds[month].x + monthStringBounds[month].width +
                 spaceWidth);
 
-        g.drawString(monthName, monthStringBounds[month].x, tmpY);
-        g.drawString(yearString, yearStringBounds[month].x, tmpY);
+        paintMonthStringForeground(g,monthName, monthStringBounds[month].x, tmpY, yearString, yearStringBounds[month].x, tmpY);
         g.setFont(oldFont);
+    }
+
+    /**
+     * Paints only text for month and year. No calculations made. Used by custom LAFs.
+     * @param g Graphics to paint into.
+     * @param monthName Name of the month.
+     * @param monthX Month string x coordinate.
+     * @param monthY Month string y coordinate.
+     * @param yearName Name (number) of the year.
+     * @param yearX Year string x coordinate.
+     * @param yearY Year string y coordinate.
+     */
+    protected void paintMonthStringForeground(Graphics g, String monthName, int monthX, int monthY, 
+            String yearName, int yearX, int yearY) {
+        g.drawString(monthName, monthX, monthY);
+        g.drawString(yearName, yearX, yearY);
     }
 
     /**
