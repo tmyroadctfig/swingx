@@ -2436,7 +2436,11 @@ public class JXTable extends JTable
      * @see #getVisibleRowCount()
      */
     public void setVisibleRowCount(int visibleRowCount) {
+        if (this.visibleRowCount == visibleRowCount) return;
         this.visibleRowCount = visibleRowCount;
+        if (calculatedPrefScrollableViewportSize != null) {
+            calculatedPrefScrollableViewportSize.height = -1;
+        }
     }
 
     /**
@@ -2464,7 +2468,11 @@ public class JXTable extends JTable
      * @see #getVisibleColumnCount()
      */
     public void setVisibleColumnCount(int visibleColumnCount) {
+        if (this.visibleColumnCount == visibleColumnCount) return;
         this.visibleColumnCount = visibleColumnCount;
+        if (calculatedPrefScrollableViewportSize != null) {
+            calculatedPrefScrollableViewportSize.width = -1;
+        }
     }
     
     /**
@@ -2501,7 +2509,7 @@ public class JXTable extends JTable
         // client code has set this - takes precedence.
         Dimension prefSize = super.getPreferredScrollableViewportSize();
         if (prefSize != null) {
-            return prefSize;
+            return new Dimension(prefSize);
         }
         if (calculatedPrefScrollableViewportSize == null) {
             calculatedPrefScrollableViewportSize = new Dimension();
@@ -2509,8 +2517,7 @@ public class JXTable extends JTable
             // maybe its the "early init" in super's tableChanged();
             initializeColumnPreferredWidths();
         }
-        // PENDING JW: calc only once - need to define if/when
-        // to re-calc
+        // the width is reset to -1 in setVisibleColumnCount
         if (calculatedPrefScrollableViewportSize.width <= 0) {
             TableColumnModel columnModel = getColumnModel();
             int columnCount = columnModel.getColumnCount();
@@ -2526,11 +2533,12 @@ public class JXTable extends JTable
             }
             calculatedPrefScrollableViewportSize.width = w;
         }
+        // the heigth is reset in setVisualRowCount
         if (calculatedPrefScrollableViewportSize.height <= 0) {
             calculatedPrefScrollableViewportSize.height = getVisibleRowCount()
                     * getRowHeight();
         }
-        return calculatedPrefScrollableViewportSize;
+        return new Dimension(calculatedPrefScrollableViewportSize);
     }
 
     /**

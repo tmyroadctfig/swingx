@@ -112,7 +112,29 @@ public class JXTableUnitTest extends InteractiveTestCase {
         super.tearDown();
     }
 
+    /**
+     * Issue #508-swingx: cleanup scrollable support
+     *
+     */
+    public void testVisibleRowCountUpdateSize() {
+        JXTable table = new JXTable(10, 6);
+        Dimension dim = table.getPreferredScrollableViewportSize();
+        table.setVisibleRowCount(table.getVisibleRowCount() * 2);
+        assertEquals(dim.height * 2, table.getPreferredScrollableViewportSize().height);
+        assertEquals(dim.width, table.getPreferredScrollableViewportSize().width);
+    }
     
+    /**
+     * Issue #508-swingx: cleanup scrollable support
+     *
+     */
+    public void testVisibleColumnCountUpdateSize() {
+        JXTable table = new JXTable(10, 14);
+        Dimension dim = table.getPreferredScrollableViewportSize();
+        table.setVisibleColumnCount(table.getVisibleColumnCount() * 2);
+        assertEquals(dim.width * 2, table.getPreferredScrollableViewportSize().width);
+        assertEquals(dim.height, table.getPreferredScrollableViewportSize().height);
+    }
     /**
      * Issue #508-swingx: cleanup pref scrollable size.
      * test preference of explicit setting (over calculated).
@@ -212,6 +234,36 @@ public class JXTableUnitTest extends InteractiveTestCase {
         }
     }
 
+    /**
+     * Issue #547-swingx: return copy of pref scrollable size
+     * 
+     */
+    public void testPrefScrollableSafeCalculatedDim() {
+        JXTable table = new JXTable(10, 6);
+        // sanity: compare the normal dim returns
+        assertNotSame("pref size must not be the same", 
+                table.getPreferredSize(), table.getPreferredSize());
+        assertNotSame("pref scrollable dim must not be the same", 
+                table.getPreferredScrollableViewportSize(), 
+                table.getPreferredScrollableViewportSize());
+    }
+
+    /**
+     * Issue #547-swingx: return copy of pref scrollable size
+     * This is a super prob - does use the dim as set.
+     */
+    public void testPrefScrollableSafeFixedDim() {
+        JXTable table = new JXTable(10, 6);
+        Dimension dim = new Dimension(200, 400);
+        // sanity: compare to super prf size when set
+        table.setPreferredSize(dim);
+        assertEquals(dim, table.getPreferredSize());
+        assertNotSame(dim, table.getPreferredSize());
+        table.setPreferredScrollableViewportSize(dim);
+        assertNotSame("pref scrollable dim must not be the same", 
+                dim, table.getPreferredScrollableViewportSize());
+    }
+    
     /**
      * Issue #547-swingx: pref scrollable height included header.
      *
