@@ -113,6 +113,19 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
     /**
+     * test that pref scrollable width is updated after structure changed.
+     *
+     */
+    public void testPrefScrollableUpdatedOnStructureChanged() {
+        JXTable compare = new JXTable(new AncientSwingTeam());
+        Dimension compareDim = compare.getPreferredScrollableViewportSize();
+        JXTable table = new JXTable(10, 6);
+        Dimension initialDim = table.getPreferredScrollableViewportSize();
+        assertFalse(compareDim.width == initialDim.width);
+        table.setModel(compare.getModel());
+        assertEquals(compareDim.width, table.getPreferredScrollableViewportSize().width);
+    }
+    /**
      * Issue #508-swingx: cleanup scrollable support
      *
      */
@@ -120,6 +133,10 @@ public class JXTableUnitTest extends InteractiveTestCase {
         JXTable table = new JXTable(10, 6);
         Dimension dim = table.getPreferredScrollableViewportSize();
         table.setVisibleRowCount(table.getVisibleRowCount() * 2);
+        // change the pref width of a column, the pref scrollable width must not
+        // be changed. This is testing the table internal reset code.
+        TableColumnExt columnExt = table.getColumnExt(0);
+        columnExt.setPreferredWidth(columnExt.getPreferredWidth() * 2);
         assertEquals(dim.height * 2, table.getPreferredScrollableViewportSize().height);
         assertEquals(dim.width, table.getPreferredScrollableViewportSize().width);
     }

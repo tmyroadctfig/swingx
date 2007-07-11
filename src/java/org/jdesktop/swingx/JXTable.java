@@ -1414,6 +1414,7 @@ public class JXTable extends JTable
         use(filters);
         if (isStructureChanged(e)) {
             initializeColumnPreferredWidths();
+            resetCalculatedScrollableSize(true);
         }
     }
 
@@ -2440,9 +2441,7 @@ public class JXTable extends JTable
         if (getVisibleRowCount() == visibleRowCount) return;
         int old = getVisibleRowCount();
         this.visibleRowCount = visibleRowCount;
-        if (calculatedPrefScrollableViewportSize != null) {
-            calculatedPrefScrollableViewportSize.height = -1;
-        }
+        resetCalculatedScrollableSize(false);
         firePropertyChange("visibleRowCount", old, getVisibleRowCount());
     }
 
@@ -2474,11 +2473,27 @@ public class JXTable extends JTable
         if (getVisibleColumnCount() == visibleColumnCount) return;
         int old = getVisibleColumnCount();
         this.visibleColumnCount = visibleColumnCount;
-        if (calculatedPrefScrollableViewportSize != null) {
-            calculatedPrefScrollableViewportSize.width = -1;
-        }
+        resetCalculatedScrollableSize(true);
         firePropertyChange("visibleColumnCount", old, getVisibleColumnCount());
     }
+    
+    /**
+     * Resets the calculated scrollable size in one dimension, if appropriate.
+     * 
+     * @param isColumn flag to denote which dimension to reset, true
+     *   for width, false for height
+     * 
+     */
+    private void resetCalculatedScrollableSize(boolean isColumn) {
+        if (calculatedPrefScrollableViewportSize != null) {
+            if (isColumn) {
+                calculatedPrefScrollableViewportSize.width = -1;
+            } else {
+                calculatedPrefScrollableViewportSize.height = -1;
+            }
+        }
+    }
+
     
     /**
      * {@inheritDoc} <p>
@@ -2505,7 +2520,7 @@ public class JXTable extends JTable
      * returned
      * <p>
      * 
-     * PENDING JW: move the details to the ColumnFactory?
+     * PENDING JW: move width calc to the ColumnFactory?
      * 
      * @see #setPreferredScrollableViewportSize(Dimension)
      */
