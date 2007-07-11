@@ -53,7 +53,6 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
-import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.PatternFilter;
@@ -64,6 +63,7 @@ import org.jdesktop.test.AncientSwingTeam;
 import org.jdesktop.test.CellEditorReport;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.SerializableSupport;
+import org.jdesktop.test.TestUtils;
 
 /**
  * Test to exposed known issues of <code>JXTable</code>.
@@ -92,71 +92,6 @@ public class JXTableIssues extends InteractiveTestCase {
         } 
     }
     
-
-    /**
-     * Visual check: column init on model change.
-     *
-     */
-     public void interactivePrefScrollable() {
-        final DefaultTableModel tableModel = new DefaultTableModel(30, 7);
-        final AncientSwingTeam ancientSwingTeam = new AncientSwingTeam();
-        final JXTable table = new JXTable(tableModel);
-        table.setColumnControlVisible(true);
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        JXFrame frame = showWithScrollingInFrame(table, "initial sizing");
-        addMessage(frame, "initial size: " + table.getPreferredScrollableViewportSize());
-        Action action = new AbstractActionExt("toggle model") {
-
-            public void actionPerformed(ActionEvent e) {
-                table.setModel(table.getModel() == tableModel ? ancientSwingTeam : tableModel);
-                
-            }
-            
-        };
-        addAction(frame, action);
-        frame.pack();
-    }
-
-     /**
-      * Visual check: dynamic logical scroll sizes
-      * Toggle visual row/column count.
-      */
-     public void interactivePrefScrollableDynamic() {
-         final AncientSwingTeam ancientSwingTeam = new AncientSwingTeam();
-         final JXTable table = new JXTable(ancientSwingTeam);
-         table.setColumnControlVisible(true);
-         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-         final JXFrame frame = wrapWithScrollingInFrame(table, "Dynamic pref scrollable");
-         Action action = new AbstractActionExt("vis row") {
-             
-             public void actionPerformed(ActionEvent e) {
-                 int visRowCount = table.getVisibleRowCount() + 5;
-                 if (visRowCount > 30) {
-                     visRowCount = 10;
-                 }
-                 table.setVisibleRowCount(visRowCount);
-                 frame.pack();
-             }
-             
-         };
-         addAction(frame, action);
-         Action columnAction = new AbstractActionExt("vis column") {
-             
-             public void actionPerformed(ActionEvent e) {
-                 int visColumnCount = table.getVisibleColumnCount() + 2;
-                 if (visColumnCount > 10) {
-                     visColumnCount = 2;
-                 }
-                 table.setVisibleColumnCount(visColumnCount);
-                 frame.pack();
-             }
-             
-         };
-         addAction(frame, columnAction);
-         frame.setVisible(true);
-         frame.pack();
-     }
-
      /**
      * test if created a new instance of the renderer. While the old
      * assertions are true, it's useless with swingx renderers: the renderer is

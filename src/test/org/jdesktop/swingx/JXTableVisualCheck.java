@@ -86,10 +86,10 @@ public class JXTableVisualCheck extends JXTableUnitTest {
 //          test.runInteractiveTests("interactive.*ColumnProp.*");
 //          test.runInteractiveTests("interactive.*Multiple.*");
 //          test.runInteractiveTests("interactive.*RToL.*");
-//          test.runInteractiveTests("interactive.*Boolean.*");
+          test.runInteractiveTests("interactive.*Toggle.*");
 //          test.runInteractiveTests("interactive.*isable.*");
           
-          test.runInteractiveTests("interactive.*Policy.*");
+//          test.runInteractiveTests("interactive.*Policy.*");
 //        test.runInteractiveTests("interactive.*Rollover.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
@@ -104,6 +104,72 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         // super has LF specific tests...
         setSystemLF(true);
     }
+
+    /**
+     * Issue #508/547-swingx: clean up of pref scrollable.
+     * Visual check: column init on model change.
+     *
+     */
+     public void interactivePrefScrollable() {
+        final DefaultTableModel tableModel = new DefaultTableModel(30, 7);
+        final AncientSwingTeam ancientSwingTeam = new AncientSwingTeam();
+        final JXTable table = new JXTable(tableModel);
+        table.setColumnControlVisible(true);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        JXFrame frame = showWithScrollingInFrame(table, "initial sizing");
+        addMessage(frame, "initial size: " + table.getPreferredScrollableViewportSize());
+        Action action = new AbstractActionExt("toggle model") {
+
+            public void actionPerformed(ActionEvent e) {
+                table.setModel(table.getModel() == tableModel ? ancientSwingTeam : tableModel);
+                
+            }
+            
+        };
+        addAction(frame, action);
+        frame.pack();
+    }
+
+     /**
+     * Issue #508/547-swingx: clean up of pref scrollable.
+      * Visual check: dynamic logical scroll sizes
+      * Toggle visual row/column count.
+      */
+     public void interactivePrefScrollableDynamic() {
+         final AncientSwingTeam ancientSwingTeam = new AncientSwingTeam();
+         final JXTable table = new JXTable(ancientSwingTeam);
+         table.setColumnControlVisible(true);
+         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+         final JXFrame frame = wrapWithScrollingInFrame(table, "Dynamic pref scrollable");
+         Action action = new AbstractActionExt("vis row") {
+             
+             public void actionPerformed(ActionEvent e) {
+                 int visRowCount = table.getVisibleRowCount() + 5;
+                 if (visRowCount > 30) {
+                     visRowCount = 10;
+                 }
+                 table.setVisibleRowCount(visRowCount);
+                 frame.pack();
+             }
+             
+         };
+         addAction(frame, action);
+         Action columnAction = new AbstractActionExt("vis column") {
+             
+             public void actionPerformed(ActionEvent e) {
+                 int visColumnCount = table.getVisibleColumnCount() + 2;
+                 if (visColumnCount > 10) {
+                     visColumnCount = 2;
+                 }
+                 table.setVisibleColumnCount(visColumnCount);
+                 frame.pack();
+             }
+             
+         };
+         addAction(frame, columnAction);
+         frame.setVisible(true);
+         frame.pack();
+     }
 
 
     /**
@@ -559,9 +625,10 @@ public class JXTableVisualCheck extends JXTableUnitTest {
             }
             
         };
-        JXFrame frame = wrapWithScrollingInFrame(table, "anchor lost after structure changed");
+        JXFrame frame = wrapWithScrollingInFrame(table, "JTable - anchor lost after structure changed");
         addAction(frame, toggleAction);
         frame.setVisible(true);
+        frame.pack();
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 // sanity - focus is on table

@@ -235,6 +235,58 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
 
     /**
+     * Test bound property visibleRowCount.
+     *
+     */
+    public void testVisibleRowCountProperty() {
+        JXTable table = new JXTable(10, 7);
+        int count = table.getVisibleRowCount();
+        PropertyChangeReport report = new PropertyChangeReport();
+        table.addPropertyChangeListener(report);
+        table.setVisibleRowCount(count + 1);
+        TestUtils.assertPropertyChangeEvent(report, "visibleRowCount", count, count+1);
+    }
+    /**
+     * Test bound property visibleColumnCount.
+     *
+     */
+    public void testVisibleColumnCountProperty() {
+        JXTable table = new JXTable(10, 7);
+        int count = table.getVisibleColumnCount();
+        PropertyChangeReport report = new PropertyChangeReport();
+        table.addPropertyChangeListener(report);
+        table.setVisibleColumnCount(count + 1);
+        TestUtils.assertPropertyChangeEvent(report, "visibleColumnCount", count, count+1);
+    }
+    /**
+     * test doc'ed behaviour
+     *
+     */
+    public void testVisibleRowCountNegative() {
+        JXTable table = new JXTable(10, 7);
+        try {
+            table.setVisibleRowCount(-2);
+            fail("negative count must throw IllegalArgument");
+        } catch (IllegalArgumentException e) {
+            // expected exception
+        }        
+    }
+    
+    /**
+     * test doc'ed behaviour
+     *
+     */
+    public void testVisibleColumnCountNegative() {
+        JXTable table = new JXTable(10, 7);
+        try {
+            table.setVisibleColumnCount(-2);
+            fail("negative count must throw IllegalArgument");
+        } catch (IllegalArgumentException e) {
+            // expected exception
+        }        
+    }
+
+    /**
      * Issue #547-swingx: return copy of pref scrollable size
      * 
      */

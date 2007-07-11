@@ -2427,20 +2427,23 @@ public class JXTable extends JTable
      * Sets the preferred number of rows to show in a <code>JScrollPane</code>.
      * <p>
      * 
-     * The default value is 20. <p>
-     * 
-     * TODO JW - make bound property, reset scrollablePref(? distinguish
-     * internal from client code triggered like in rowheight?) and re-layout.
+     * This is a bound property. The default value is 20. <p>
      * 
      * @param visibleRowCount number of rows to show in a <code>JScrollPane</code>
+     * @throws IllegalArgumentException if given count is negative.
+     * 
      * @see #getVisibleRowCount()
      */
     public void setVisibleRowCount(int visibleRowCount) {
-        if (this.visibleRowCount == visibleRowCount) return;
+        if (visibleRowCount < 0) throw 
+           new IllegalArgumentException("visible row count must not be negative " + visibleRowCount);
+        if (getVisibleRowCount() == visibleRowCount) return;
+        int old = getVisibleRowCount();
         this.visibleRowCount = visibleRowCount;
         if (calculatedPrefScrollableViewportSize != null) {
             calculatedPrefScrollableViewportSize.height = -1;
         }
+        firePropertyChange("visibleRowCount", old, getVisibleRowCount());
     }
 
     /**
@@ -2457,22 +2460,24 @@ public class JXTable extends JTable
     
     /**
      * Sets the preferred number of Columns to show in a <code>JScrollPane</code>.
-     * <p>
+     * <p> 
      * 
-     * The default value is 6. <p>
+     * This is a bound property. The default value is 6. <p>
      * 
-     * TODO JW - make bound property, reset scrollablePref(? distinguish
-     * internal from client code triggered like in rowheight?) and re-layout.
      * 
      * @param visibleColumnCount number of rows to show in a <code>JScrollPane</code>
      * @see #getVisibleColumnCount()
      */
     public void setVisibleColumnCount(int visibleColumnCount) {
-        if (this.visibleColumnCount == visibleColumnCount) return;
+        if (visibleColumnCount < 0) throw 
+            new IllegalArgumentException("visible row count must not be negative " + visibleColumnCount);
+        if (getVisibleColumnCount() == visibleColumnCount) return;
+        int old = getVisibleColumnCount();
         this.visibleColumnCount = visibleColumnCount;
         if (calculatedPrefScrollableViewportSize != null) {
             calculatedPrefScrollableViewportSize.width = -1;
         }
+        firePropertyChange("visibleColumnCount", old, getVisibleColumnCount());
     }
     
     /**
