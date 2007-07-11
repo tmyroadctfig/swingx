@@ -2520,9 +2520,12 @@ public class JXTable extends JTable
      * returned
      * <p>
      * 
-     * PENDING JW: move width calc to the ColumnFactory?
+     * The calculation of the preferred scrollable width is delegated to the
+     * ColumnFactory to allow configuration with custom strategies implemented
+     * in custom factories.
      * 
      * @see #setPreferredScrollableViewportSize(Dimension)
+     * @see org.jdesktop.swingx.table.ColumnFactory#getPreferredScrollableViewportWidth(JXTable)
      */
     @Override
     public Dimension getPreferredScrollableViewportSize() {
@@ -2539,19 +2542,8 @@ public class JXTable extends JTable
         }
         // the width is reset to -1 in setVisibleColumnCount
         if (calculatedPrefScrollableViewportSize.width <= 0) {
-            TableColumnModel columnModel = getColumnModel();
-            int columnCount = columnModel.getColumnCount();
-            int w = 0;
-            for (int i = 0; i < Math.min(columnCount, getVisibleColumnCount()); i++) {
-                // sum up column's pref size, until maximal the
-                // visibleColumnCount
-                TableColumn column = columnModel.getColumn(i);
-                w += column.getPreferredWidth();
-            }
-            if (columnCount < getVisibleColumnCount()) {
-                w += (getVisibleColumnCount() - columnCount) * 75;
-            }
-            calculatedPrefScrollableViewportSize.width = w;
+            calculatedPrefScrollableViewportSize.width = getColumnFactory()
+                    .getPreferredScrollableViewportWidth(this);
         }
         // the heigth is reset in setVisualRowCount
         if (calculatedPrefScrollableViewportSize.height <= 0) {
@@ -2563,7 +2555,9 @@ public class JXTable extends JTable
 
     /**
      * Initialize the width related properties of all contained
-     * TableColumns, both visible and hidden. 
+     * TableColumns, both visible and hidden. <p>
+     * 
+     * PENDING: move into ColumnFactory? respect autoCreateColumn off?
      * 
      * @see #initializeColumnPreferredWidth(TableColumn)
      */
@@ -2575,7 +2569,7 @@ public class JXTable extends JTable
     
     /**
      * Initialize the width related properties of the specified column. The
-     * exact details are specified by the current <code>ColumnFactory</code>
+     * details are specified by the current <code>ColumnFactory</code>
      * if the column is of type <code>TableColumnExt</code>. Otherwise
      * nothing is changed.
      * <p>

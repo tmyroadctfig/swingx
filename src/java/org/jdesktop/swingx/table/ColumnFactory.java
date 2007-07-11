@@ -219,6 +219,32 @@ public class ColumnFactory {
     }
 
     /**
+     * Calculates and returns the preferred scrollable viewport 
+     * width of the given table. Subclasses are free to override
+     * and implement a custom strategy.<p>
+     * 
+     * This implementation sums the pref widths of the first
+     * visibleColumnCount contained visible tableColumns. If
+     * the table contains less columns, the standard preferred
+     * width per column is added to the result. 
+     * 
+     * @param table the table containing the columns
+     */
+    public int getPreferredScrollableViewportWidth(JXTable table) {
+        int w = 0;
+        int count = Math.min(table.getColumnCount(), table.getVisibleColumnCount());
+        for (int i = 0; i < count; i++) {
+            // sum up column's pref size, until maximal the
+            // visibleColumnCount
+            w += table.getColumn(i).getPreferredWidth();
+        }
+        if (count < table.getVisibleColumnCount()) {
+            w += (table.getVisibleColumnCount() - count) * 75;
+        }
+        return w;
+        
+    }
+    /**
      * Measures and returns the preferred width of the header. Returns -1 if not 
      * applicable.
      *  
@@ -410,5 +436,6 @@ public class ColumnFactory {
     public void setDefaultPackMargin(int margin) {
         this.packMargin = margin;
     }
+
     
 }
