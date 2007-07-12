@@ -102,7 +102,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     private boolean usingKeyboard = false;
     /** For interval selections we need to record the date we pivot around. */
     private long pivotDate = -1;
-    private boolean ltr;
+    protected boolean isLeftToRight;
     private int arrowPaddingX = 3;
     private int arrowPaddingY = 3;
     private int fullMonthBoxHeight;
@@ -149,7 +149,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     public void installUI(JComponent c) {
         monthView = (JXMonthView)c;
         monthView.setLayout(createLayoutManager());
-        ltr = monthView.getComponentOrientation().isLeftToRight();
+        isLeftToRight = monthView.getComponentOrientation().isLeftToRight();
         LookAndFeel.installProperty(monthView, "opaque", Boolean.TRUE);
 
         // Get string representation of the months of the year.
@@ -372,7 +372,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
 
         // Determine which column in the selected month we're in.
-        int col = ((ltr ? (x - startX) : (startX - x)) -
+        int col = ((isLeftToRight ? (x - startX) : (startX - x)) -
                 (rowCol.y * (calendarWidth + CALENDAR_SPACING))) /
                 (boxPaddingX + boxWidth + boxPaddingX);
 
@@ -463,7 +463,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             return -1;
         }
 
-        x = ((ltr ? (x - startX) : (startX - x)) -
+        x = ((isLeftToRight ? (x - startX) : (startX - x)) -
             (rowCol.y * (calendarWidth + CALENDAR_SPACING)));
 
         if (x > arrowPaddingX && x < (arrowPaddingX +
@@ -488,7 +488,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * and column as the y value
      */
     protected Point getCalRowColAt(int x, int y) {
-        if (ltr ? (startX > x) : (startX < x) || startY > y) {
+        if (isLeftToRight ? (startX > x) : (startX < x) || startY > y) {
             return NO_SUCH_CALENDAR;
         }
 
@@ -497,7 +497,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         result.x = (y - startY) / (calendarHeight + CALENDAR_SPACING);
 
         // Determine which column of calendars we're in.
-        result.y = (ltr ? (x - startX) : (startX - x)) /
+        result.y = (isLeftToRight ? (x - startX) : (startX - x)) /
                 (calendarWidth + CALENDAR_SPACING);
 
         // Make sure the row and column of calendars calculated is being
@@ -519,7 +519,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         int width = monthView.getWidth();
         startX = (width - ((calendarWidth * numCalCols) +
                 (CALENDAR_SPACING * (numCalCols - 1)))) / 2;
-        if (!ltr) {
+        if (!isLeftToRight) {
             startX = width - startX;
         }
 
@@ -661,7 +661,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
 
         // Calculate the x location.
-        bounds.x = ltr ?
+        bounds.x = isLeftToRight ?
                 bounds.x * (boxPaddingX + boxWidth + boxPaddingX) :
                 (bounds.x + 1) * (boxPaddingX + boxWidth + boxPaddingX);
 
@@ -669,7 +669,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         bounds.x += calColIndex * (calendarWidth + CALENDAR_SPACING);
 
         // Adjust by centering value.
-        bounds.x = ltr ? startX + bounds.x : startX - bounds.x;
+        bounds.x = isLeftToRight ? startX + bounds.x : startX - bounds.x;
 
         // Initial offset for Month and Days of the Week display.
         bounds.y = boxPaddingY + monthBoxHeight + boxPaddingY +
@@ -729,7 +729,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             for (int column = 0; column < numCalCols; column++) {
                 // Check if the month to paint falls in the clip.
                 bounds.x = startX +
-                        (ltr ?
+                        (isLeftToRight ?
                             column * (calendarWidth + CALENDAR_SPACING) :
                             -(column * (calendarWidth + CALENDAR_SPACING) +
                                     calendarWidth));
@@ -793,7 +793,7 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         // Paint background of the short names for the days of the week.
         boolean showingWeekNumber = monthView.isShowingWeekNumber();
-        int tmpX = ltr ? x + (showingWeekNumber ? fullBoxWidth : 0) : x;
+        int tmpX = isLeftToRight ? x + (showingWeekNumber ? fullBoxWidth : 0) : x;
         int tmpY = y + fullMonthBoxHeight;
         int tmpWidth = width - (showingWeekNumber ? fullBoxWidth : 0);
         paintDayOfTheWeekBackground(g, tmpX, tmpY, tmpWidth, fullBoxHeight);
@@ -806,7 +806,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         FontMetrics fm = monthView.getFontMetrics(derivedFont);
         String[] daysOfTheWeek = monthView.getDaysOfTheWeek();
         for (int i = 0; i < JXMonthView.DAYS_IN_WEEK; i++) {
-            tmpX = ltr ?
+            tmpX = isLeftToRight ?
                     x + (i * fullBoxWidth) + boxPaddingX +
                             (boxWidth / 2) -
                             (fm.stringWidth(daysOfTheWeek[dayIndex]) /
@@ -816,7 +816,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                             (fm.stringWidth(daysOfTheWeek[dayIndex]) /
                                     2);
             if (showingWeekNumber) {
-                tmpX += ltr ? fullBoxWidth : -fullBoxWidth;
+                tmpX += isLeftToRight ? fullBoxWidth : -fullBoxWidth;
             }
             tmpY = y + fullMonthBoxHeight + boxPaddingY + fm.getAscent();
             g.drawString(daysOfTheWeek[dayIndex], tmpX, tmpY);
@@ -828,7 +828,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         g.setFont(oldFont);
 
         if (showingWeekNumber) {
-            tmpX = ltr ? x : x + width - fullBoxWidth;
+            tmpX = isLeftToRight ? x : x + width - fullBoxWidth;
             paintWeekOfYearBackground(g, tmpX, y + fullMonthBoxHeight + fullBoxHeight, fullBoxWidth,
                     calendarHeight - (fullMonthBoxHeight + fullBoxHeight));
         }
@@ -860,7 +860,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 oldY = bounds.y;
                 int weekOfYear = cal.get(Calendar.WEEK_OF_YEAR);
                 if (weekOfYear != oldWeek) {
-                    tmpX = ltr ? x : x + width - fullBoxWidth;
+                    tmpX = isLeftToRight ? x : x + width - fullBoxWidth;
                     paintWeekOfYearForeground(g, tmpX, bounds.y, fullBoxWidth, fullBoxHeight, weekOfYear);
                     oldWeek = weekOfYear;
                 }
@@ -940,7 +940,7 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     protected void paintWeekOfYearBackground(Graphics g, int x, int y, int width, int height) {
         int boxPaddingY = monthView.getBoxPaddingY();
-        x = ltr ? x + width - 1 : x;
+        x = isLeftToRight ? x + width - 1 : x;
         g.drawLine(x, y + boxPaddingY, x, y + height - boxPaddingY);
     }
 
@@ -966,7 +966,7 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         fm = g.getFontMetrics();
         g.drawString(str,
-                ltr ?
+                isLeftToRight ?
                         x + boxPaddingX +
                                 boxWidth - fm.stringWidth(str) :
                         x + boxPaddingX +
@@ -992,7 +992,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                                               int width, int height) {
         // Modify bounds by the month string insets.
         Insets monthStringInsets = monthView.getMonthStringInsets();
-        x = ltr ? x + monthStringInsets.left : x + monthStringInsets.right;
+        x = isLeftToRight ? x + monthStringInsets.left : x + monthStringInsets.right;
         y = y + monthStringInsets.top;
         width = width - monthStringInsets.left - monthStringInsets.right;
         height = height - monthStringInsets.top - monthStringInsets.bottom;
@@ -1091,30 +1091,34 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param height height of bounding box for the day
      * @param date long value representing the day being painted
      */
-    protected void paintDayForeground(Graphics g, int x, int y, int width, int height,
-                                      long date) {
+    protected void paintDayForeground(Graphics g, int x, int y, int width, int height, long date) {
         String numericDay = dayOfMonthFormatter.format(date);
-        FontMetrics fm;
 
         g.setColor(monthView.getDayForeground(getDayOfTheWeek()));
 
         int boxPaddingX = monthView.getBoxPaddingX();
         int boxPaddingY = monthView.getBoxPaddingY();
 
-        fm = g.getFontMetrics();
-        g.drawString(numericDay,
-                ltr ?
-                        x + boxPaddingX +
-                                boxWidth - fm.stringWidth(numericDay) :
-                        x + boxPaddingX +
-                                boxWidth - fm.stringWidth(numericDay) - 1,
-                y + boxPaddingY + fm.getAscent());
+        paintDayForeground(g, numericDay, isLeftToRight ? x + boxPaddingX + boxWidth : x + boxPaddingX + boxWidth - 1,
+                y + boxPaddingY);
     }
 
     /**
-     * Paint the background for the specified flagged day.  The default implementation just
-     * calls <code>paintDayBackground</code>.
-     *
+     * Paints string of the day. No calculations made. Used by LAFs.
+     * @param g Graphics to paint on.
+     * @param dayName Text representation of the day.
+     * @param x X coordinate of the upper left corner.
+     * @param y Y coordinate of the upper left corner.
+     */
+    protected void paintDayForeground(Graphics g, String dayName, int x, int y) {
+        FontMetrics fm = g.getFontMetrics();
+        g.drawString(dayName, x - fm.stringWidth(dayName), y + fm.getAscent());
+    }
+
+    /**
+     * Paint the background for the specified flagged day. The default implementation just calls
+     * <code>paintDayBackground</code>.
+     * 
      * @param g Graphics object to paint to
      * @param x x-coordinate of upper left corner
      * @param y y-coordinate of upper left corner
@@ -1148,7 +1152,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         g.setFont(derivedFont);
         fm = monthView.getFontMetrics(derivedFont);
         g.drawString(numericDay,
-                ltr ?
+                isLeftToRight ?
                         x + boxPaddingX +
                                 boxWidth - fm.stringWidth(numericDay):
                         x + boxPaddingX +
@@ -1191,7 +1195,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         int boxPaddingY = monthView.getBoxPaddingY();
         width = fm.stringWidth(numericDay);
         height = fm.getAscent();
-        x = ltr ? x + boxPaddingX + boxWidth - fm.stringWidth(numericDay) :
+        x = isLeftToRight ? x + boxPaddingX + boxWidth - fm.stringWidth(numericDay) :
                 x + boxPaddingX +
                         boxWidth - fm.stringWidth(numericDay) - 1;
         y = y + boxPaddingY;
@@ -1237,7 +1241,7 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         fm = g.getFontMetrics();
         g.drawString(numericDay,
-                ltr ?
+                isLeftToRight ?
                         x + boxPaddingX +
                                 boxWidth - fm.stringWidth(numericDay) :
                         x + boxPaddingX +
@@ -1280,7 +1284,7 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         fm = g.getFontMetrics();
         g.drawString(numericDay,
-                ltr ?
+                isLeftToRight ?
                         x + boxPaddingX +
                                 boxWidth - fm.stringWidth(numericDay) :
                         x + boxPaddingX +
@@ -1309,7 +1313,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     
     private class Handler implements ComponentListener, MouseListener, MouseMotionListener, LayoutManager,
             PropertyChangeListener, DateSelectionListener {
-        private boolean asKirkWouldSay_FIRE;
+        private boolean armed;
         private long startDate;
         private long endDate;
 
@@ -1374,7 +1378,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             }
 
             // Arm so we fire action performed on mouse release.
-            asKirkWouldSay_FIRE = true;
+            armed = true;
         }
 
         public void mouseReleased(MouseEvent e) {
@@ -1389,10 +1393,10 @@ public class BasicMonthViewUI extends MonthViewUI {
                 monthView.requestFocusInWindow();
             }
 
-            if (asKirkWouldSay_FIRE) {
+            if (armed) {
                 monthView.postActionEvent();
             }
-            asKirkWouldSay_FIRE = false;
+            armed = false;
         }
 
         public void mouseEntered(MouseEvent e) {}
@@ -1444,7 +1448,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             }
 
             // Set trigger.
-            asKirkWouldSay_FIRE = true;
+            armed = true;
         }
 
         public void mouseMoved(MouseEvent e) {}
@@ -1604,7 +1608,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             String property = evt.getPropertyName();
 
             if ("componentOrientation".equals(property)) {
-                ltr = monthView.getComponentOrientation().isLeftToRight();
+                isLeftToRight = monthView.getComponentOrientation().isLeftToRight();
                 monthView.revalidate();
                 calculateStartPosition();
                 calculateDirtyRectForSelection();
