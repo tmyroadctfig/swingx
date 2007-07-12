@@ -23,6 +23,8 @@ package org.jdesktop.swingx.renderer;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.GradientPaint;
+import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
@@ -60,6 +62,7 @@ import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PainterHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
+import org.jdesktop.swingx.painter.AbstractLayoutPainter;
 import org.jdesktop.swingx.painter.ImagePainter;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
@@ -114,22 +117,19 @@ public class PainterVisualCheck extends InteractiveTestCase {
     }
 
     /**
-     * Use GradientPainter for value-based background highlighting
+     * Use Painter for an underline-rollover effect.
      */
-    public void interactiveTableGradientHighlight() {
+    public void interactiveRolloverPainter() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
-        // PENDING: make this like a thick underline
-        LinearGradientPaint paint = new LinearGradientPaint(0.0f, 0.0f, 0f, 1f, 
-                new float[] {0,(float) 0.5}, new Color[] {Color.WHITE
-                , getTransparentColor(Color.RED, 0)});
-        final MattePainter painter = new MattePainter(paint);
-        painter.setPaintStretched(true);
-        HighlightPredicate predicate = createComponentTextBasedPredicate("y");
-        Highlighter hl = new PainterHighlighter(painter, predicate);
+        MattePainter matte = new MattePainter(getTransparentColor(Color.RED, 80));
+        RelativePainter painter = new RelativePainter(matte);
+        painter.setYFactor(0.2);
+        painter.setVerticalAlignment(VerticalAlignment.BOTTOM);
+        Highlighter hl = new PainterHighlighter(painter, HighlightPredicate.ROLLOVER_ROW);
         table.addHighlighter(hl);
         JXFrame frame = showWithScrollingInFrame(table, 
-                "painter-aware renderer with value-based highlighting");
+                "painter-aware renderer rollover");
         getStatusBar(frame).add(new JLabel("gradient background of cells with value's containing 'y'"));
     }
 
@@ -158,15 +158,10 @@ public class PainterVisualCheck extends InteractiveTestCase {
     public void interactiveTableBarHighlight() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
-        Color transparentRed = getTransparentColor(Color.RED, 100);
-        // how to do the same, but not as gradient?
-        // dirty trick ... mis-use a gradient... arrgghhh
-        LinearGradientPaint blueToTranslucent = new LinearGradientPaint(
-                new Point2D.Double(.4, 0), new Point2D.Double(1, 0),
-                new float[] {0,.499f,.5f,1}, new Color[] {Color.BLUE, Color.BLUE, transparentRed, transparentRed});
-        final MattePainter p =  new MattePainter(blueToTranslucent);
-        p.setPaintStretched(true);
-        Highlighter hl = new PainterHighlighter(p, createComponentTextBasedPredicate("y"));
+        MattePainter p =  new MattePainter(getTransparentColor(Color.BLUE, 125));
+        RelativePainter relativePainter = new RelativePainter(p);
+        relativePainter.setXFactor(.5);
+        Highlighter hl = new PainterHighlighter(relativePainter, createComponentTextBasedPredicate("y"));
         table.addHighlighter(hl);
         JXFrame frame = showWithScrollingInFrame(table, 
                 "painter-aware renderer with value-based highlighting");
@@ -186,7 +181,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         JXList list = new JXList();
         Highlighter highlighter = HighlighterFactory.createSimpleStriping(HighlighterFactory.LINE_PRINTER);
         table.addHighlighter(highlighter);
-        Painter gradient = createGradientPainter(Color.YELLOW, 0.7f, true);
+        Painter gradient = createGradientPainter(Color.YELLOW, .7f, true);
         list.setHighlighters(highlighter, new PainterHighlighter(gradient));
         // quick-fill and hook to table columns' visibility state
         configureList(list, table, false);
@@ -230,11 +225,19 @@ public class PainterVisualCheck extends InteractiveTestCase {
             boolean transparent) {
         startColor = getTransparentColor(startColor, transparent ? 125 : 254);
         Color endColor = getTransparentColor(Color.WHITE, 0);
-        LinearGradientPaint paint = new LinearGradientPaint(0.0f, 0.0f, 1f, 0f,
-                new float[] { 0, end }, new Color[] { startColor, endColor });
+        GradientPaint paint = new GradientPaint(
+                    new Point2D.Double(0, 0),
+                    startColor,
+                   new Point2D.Double(1000, 0),
+                   endColor);
+
         MattePainter painter = new MattePainter(paint);
         painter.setPaintStretched(true);
-        return painter;
+        // not entirely successful - the relative stretching is on
+        // top of a .5 stretched gradient in matte
+        RelativePainter wrapper = new RelativePainter(painter);
+        wrapper.setXFactor(end);
+        return wrapper;
     }
 
     private static Color getTransparentColor(Color base, int transparency) {
@@ -256,7 +259,6 @@ public class PainterVisualCheck extends InteractiveTestCase {
                 .getResource("resources/images/kleopatra.jpg")));
         HighlightPredicate predicate = new ColumnHighlightPredicate(0);
         Highlighter iconHighlighter = new PainterHighlighter(imagePainter, predicate );
-        // PENDING: implement lf specific highlight in new api
         Highlighter alternateRowHighlighter = HighlighterFactory.createSimpleStriping();
         table.addHighlighter(alternateRowHighlighter);
         table.addHighlighter(iconHighlighter);
@@ -334,6 +336,43 @@ public class PainterVisualCheck extends InteractiveTestCase {
         frame.pack();
     }
 
+    //--------- hack around missing size proportional painters
+    
+    public static class RelativePainter extends AbstractLayoutPainter {
+
+        private Painter painter;
+        private double xFactor;
+        private double yFactor;
+
+        public RelativePainter(Painter delegate) {
+            this.painter = delegate;
+        }
+        
+        public void setXFactor(double xPercent) {
+            this.xFactor = xPercent;
+        }
+        
+        public void setYFactor(double yPercent) {
+            this.yFactor = yPercent;
+        }
+        @Override
+        protected void doPaint(Graphics2D g, Object object, int width, int height) {
+            // use epsilon
+            if (xFactor != 0.0) {
+                width = (int) (xFactor * width);
+            }
+            if (yFactor != 0.0) {
+                int oldHeight = height;
+                height = (int) (yFactor * height);
+                if (getVerticalAlignment() == VerticalAlignment.BOTTOM) {
+                    g.translate(0, oldHeight - height);
+                }
+            }
+            
+            painter.paint(g, object, width, height);
+        }
+        
+    }
     // -------------------- Value-based transparent gradient highlighter
 
     /**
@@ -350,7 +389,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         float maxValue = 100;
 
         private MattePainter painter;
-
+        private RelativePainter wrapper;
         private boolean yellowTransparent;
 
         
@@ -379,15 +418,22 @@ public class PainterVisualCheck extends InteractiveTestCase {
 
 
         private Painter getPainter(float end) {
-            Color startColor = getTransparentColor(Color.YELLOW,
-                    yellowTransparent ? 125 : 254);
-            Color endColor = getTransparentColor(Color.WHITE, 0);
-            LinearGradientPaint paint = new LinearGradientPaint(0.0f, 0.0f, 1f, 0f, 
-                    new float[] {0,end}, new Color[] {startColor
-                    , endColor});
-            painter = new MattePainter(paint);
-            painter.setPaintStretched(true);
-            return painter;
+            if (painter == null) {
+                Color startColor = getTransparentColor(Color.YELLOW,
+                        yellowTransparent ? 125 : 254);
+                Color endColor = getTransparentColor(Color.WHITE, 0);
+                GradientPaint paint = new GradientPaint(new Point2D.Double(0, 0),
+                        startColor, new Point2D.Double(100, 0), endColor);
+                // LinearGradientPaint paint = new LinearGradientPaint(0.0f, 0.0f,
+                // 1f, 0f,
+                // new float[] {0,end}, new Color[] {startColor
+                // , endColor});
+                painter = new MattePainter(paint);
+                painter.setPaintStretched(true);
+                wrapper = new RelativePainter(painter);
+            } 
+            wrapper.setXFactor(end);
+            return wrapper;
         }
 
         private Color getTransparentColor(Color base, int transparency) {
