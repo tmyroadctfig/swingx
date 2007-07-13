@@ -75,20 +75,19 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
     }
 
     private boolean isValidTreeTableNode(Object node) {
-//         boolean result = false;
-//
-//        if (node instanceof TreeTableNode) {
-//            TreeTableNode ttn = (TreeTableNode) node;
-//
-//            while (!result && ttn != null) {
-//                result = ttn == root;
-//
-//                ttn = ttn.getParent();
-//            }
-//        }
-//
-//        return result;
-        return true;
+         boolean result = false;
+
+        if (node instanceof TreeTableNode) {
+            TreeTableNode ttn = (TreeTableNode) node;
+
+            while (!result && ttn != null) {
+                result = ttn == root;
+
+                ttn = ttn.getParent();
+            }
+        }
+
+        return result;
     }
 
     /**

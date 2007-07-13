@@ -696,7 +696,8 @@ public class JXTreeTable extends JXTable {
         TreeTableModel old = getTreeTableModel();
 //        boolean rootVisible = isRootVisible();
 //        setRootVisible(false);
-        renderer.setModel(treeModel);
+// When we remove the Adapter's copy of the TTModel, this will be uncommented --kgs
+//        renderer.setModel(treeModel);
         ((TreeTableModelAdapter)getModel()).setTreeTableModel(treeModel);
 //        setRootVisible(rootVisible);
         // Enforce referential integrity; bail on fail
@@ -1484,16 +1485,19 @@ public class JXTreeTable extends JXTable {
 
     /**
      * Determines if the specified column is defined as the hierarchical column.
-     * <p>
      * 
-     * @param column zero-based index of the column in view coordinates
+     * @param column
+     *            zero-based index of the column in view coordinates
      * @return true if the column is the hierarchical column; false otherwise.
+     * @throws IllegalArgumentException
+     *             if the column is less than 0 or greater than or equal to the
+     *             column count
      */
     public boolean isHierarchical(int column) {
-        /* 
-         * PENDING JW: sanity throw if index not valid. 
-         */
-//        if (column < 0) throw new IllegalArgumentException("column must be valid, was" + column);
+        if (column < 0 || column >= getColumnCount()) {
+            throw new IllegalArgumentException("column must be valid, was" + column);
+        }
+        
         return (getHierarchicalColumn() == column);
     }
 
@@ -1646,6 +1650,7 @@ public class JXTreeTable extends JXTable {
      */
     protected static class TreeTableModelAdapter extends AbstractTableModel {
         private TreeModelListener treeModelListener;
+        
         /**
          * Maintains a TreeTableModel and a JTree as purely implementation details.
          * Developers can plug in any type of custom TreeTableModel through a
@@ -1700,6 +1705,7 @@ public class JXTreeTable extends JXTable {
                 old.removeTreeModelListener(getTreeModelListener());
             }
             this.model = model;
+            tree.setModel(model);
             // Install a TreeModelListener that can update the table when
             // tree changes. 
             model.addTreeModelListener(getTreeModelListener());
@@ -1739,6 +1745,8 @@ public class JXTreeTable extends JXTable {
             }
 
             if (this.treeTable == null) {
+                assert tree == treeTable.renderer;
+                
                 this.treeTable = treeTable;
             }
             else {

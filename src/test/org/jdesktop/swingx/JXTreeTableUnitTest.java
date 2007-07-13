@@ -64,6 +64,17 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * Issue #531-swingx: IllegalArgumentException on setModel.
      *
      */
+    public void testSetModel() {
+        TreeTableModel model = createCustomTreeTableModelFromDefault();
+        JXTreeTable treeTable = new JXTreeTable(model);
+        treeTable.setRootVisible(true);
+        treeTable.setTreeTableModel(createCustomTreeTableModelFromDefault());
+    }
+    
+    /**
+     * Issue #531-swingx: IllegalArgumentException on setModel.
+     *
+     */
     public void testSetModelOnTree() {
         TreeTableModel model = createCustomTreeTableModelFromDefault();
         JXTree treeTable = new JXTree(model);
@@ -721,6 +732,25 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         JXTreeTable treeTable = new JXTreeTable(treeTableModel);
         treeTable.setTreeTableModel(new FileSystemModel());
         assertEquals(0, ((FileSystemModel) treeTableModel).getTreeModelListeners().length);
+    }
+    
+    /**
+     * Clarify contract of isHierarchical.
+     */
+    public void testIsHierarchical() {
+        TreeTableModel model = new DefaultTreeTableModel();
+        //sanity
+        assertEquals(-1, model.getHierarchicalColumn());
+        JXTreeTable treeTable = new JXTreeTable(model);
+        assertEquals(model.getHierarchicalColumn(), treeTable.getHierarchicalColumn());
+        // either this or throw an exception for -1 index
+        // illegal view index anyway
+        try {
+            treeTable.isHierarchical(-1);
+            fail("expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            //success
+        }
     }
     
     public void testRowForPath() {

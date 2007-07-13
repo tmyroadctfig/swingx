@@ -86,38 +86,13 @@ public class JXTreeTableIssues extends InteractiveTestCase {
 //        setSystemLF(true);
         JXTreeTableIssues test = new JXTreeTableIssues();
         try {
-//            test.runInteractiveTests();
+            test.runInteractiveTests();
 //            test.runInteractiveTests(".*AdapterDeleteUpdate.*");
-            test.runInteractiveTests(".*Text.*");
+//            test.runInteractiveTests(".*Text.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
-    }
-    
-    /**
-     * Clarify contract of isHierarchical.
-     */
-    public void testIsHierarchical() {
-        TreeTableModel model = new DefaultTreeTableModel();
-        //sanity
-        assertEquals(-1, model.getHierarchicalColumn());
-        JXTreeTable treeTable = new JXTreeTable(model);
-        assertEquals(model.getHierarchicalColumn(), treeTable.getHierarchicalColumn());
-        // either this or throw an exception for -1 index
-        // illegal view index anyway
-        assertFalse(treeTable.isHierarchical(-1));
-    }
-    
-    /**
-     * Issue #531-swingx: IllegalArgumentException on setModel.
-     *
-     */
-    public void testSetModel() {
-        TreeTableModel model = createCustomTreeTableModelFromDefault();
-        JXTreeTable treeTable = new JXTreeTable(model);
-        treeTable.setRootVisible(true);
-        treeTable.setTreeTableModel(createCustomTreeTableModelFromDefault());
     }
     
     /**
