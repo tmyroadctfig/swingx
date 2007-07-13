@@ -43,12 +43,12 @@ import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 import javax.swing.ListModel;
 import javax.swing.table.TableModel;
 
-import org.apache.batik.ext.awt.LinearGradientPaint;
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXList;
@@ -109,7 +109,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
         painter.setStyle(ShapePainter.Style.FILLED);
         painter.setPaintStretched(false);
         // hmm.. how to make this stick to the trailing upper corner?
-        painter.setHorizontalAlignment(HorizontalAlignment.RIGHT);//setResizeLocation(Resize.HORIZONTAL);
+        painter.setHorizontalAlignment(HorizontalAlignment.RIGHT);
         painter.setVerticalAlignment(VerticalAlignment.TOP);
         Highlighter hl = new PainterHighlighter(painter, new ColumnHighlightPredicate(3)); 
         table.addHighlighter(hl);
@@ -122,8 +122,8 @@ public class PainterVisualCheck extends InteractiveTestCase {
     public void interactiveRolloverPainter() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
-        MattePainter matte = new MattePainter(getTransparentColor(Color.RED, 80));
-        RelativePainter painter = new RelativePainter(matte);
+        MattePainter<JComponent> matte = new MattePainter<JComponent>(getTransparentColor(Color.RED, 80));
+        RelativePainter painter = new RelativePainter<JComponent>(matte);
         painter.setYFactor(0.2);
         painter.setVerticalAlignment(VerticalAlignment.BOTTOM);
         Highlighter hl = new PainterHighlighter(painter, HighlightPredicate.ROLLOVER_ROW);
@@ -158,8 +158,8 @@ public class PainterVisualCheck extends InteractiveTestCase {
     public void interactiveTableBarHighlight() {
         TableModel model = new AncientSwingTeam();
         JXTable table = new JXTable(model);
-        MattePainter p =  new MattePainter(getTransparentColor(Color.BLUE, 125));
-        RelativePainter relativePainter = new RelativePainter(p);
+        MattePainter<JComponent> p =  new MattePainter<JComponent>(getTransparentColor(Color.BLUE, 125));
+        RelativePainter relativePainter = new RelativePainter<JComponent>(p);
         relativePainter.setXFactor(.5);
         Highlighter hl = new PainterHighlighter(relativePainter, createComponentTextBasedPredicate("y"));
         table.addHighlighter(hl);
@@ -231,11 +231,11 @@ public class PainterVisualCheck extends InteractiveTestCase {
                    new Point2D.Double(1000, 0),
                    endColor);
 
-        MattePainter painter = new MattePainter(paint);
+        MattePainter<JComponent> painter = new MattePainter<JComponent>(paint);
         painter.setPaintStretched(true);
         // not entirely successful - the relative stretching is on
         // top of a .5 stretched gradient in matte
-        RelativePainter wrapper = new RelativePainter(painter);
+        RelativePainter wrapper = new RelativePainter<JComponent>(painter);
         wrapper.setXFactor(end);
         return wrapper;
     }
@@ -338,13 +338,13 @@ public class PainterVisualCheck extends InteractiveTestCase {
 
     //--------- hack around missing size proportional painters
     
-    public static class RelativePainter extends AbstractLayoutPainter {
+    public static class RelativePainter<T> extends AbstractLayoutPainter<T> {
 
-        private Painter painter;
+        private Painter<T> painter;
         private double xFactor;
         private double yFactor;
 
-        public RelativePainter(Painter delegate) {
+        public RelativePainter(Painter<T> delegate) {
             this.painter = delegate;
         }
         
@@ -356,7 +356,7 @@ public class PainterVisualCheck extends InteractiveTestCase {
             this.yFactor = yPercent;
         }
         @Override
-        protected void doPaint(Graphics2D g, Object object, int width, int height) {
+        protected void doPaint(Graphics2D g, T object, int width, int height) {
             // use epsilon
             if (xFactor != 0.0) {
                 width = (int) (xFactor * width);
@@ -388,8 +388,8 @@ public class PainterVisualCheck extends InteractiveTestCase {
             PainterHighlighter {
         float maxValue = 100;
 
-        private MattePainter painter;
-        private RelativePainter wrapper;
+        private MattePainter<JComponent> painter;
+        private RelativePainter<JComponent> wrapper;
         private boolean yellowTransparent;
 
         
@@ -428,9 +428,9 @@ public class PainterVisualCheck extends InteractiveTestCase {
                 // 1f, 0f,
                 // new float[] {0,end}, new Color[] {startColor
                 // , endColor});
-                painter = new MattePainter(paint);
+                painter = new MattePainter<JComponent>(paint);
                 painter.setPaintStretched(true);
-                wrapper = new RelativePainter(painter);
+                wrapper = new RelativePainter<JComponent>(painter);
             } 
             wrapper.setXFactor(end);
             return wrapper;
