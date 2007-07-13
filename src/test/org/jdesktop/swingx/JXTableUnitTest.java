@@ -385,16 +385,20 @@ public class JXTableUnitTest extends InteractiveTestCase {
     /**
      * Issue #547-swingx: hidden columns' pref width not initialized.
      *
+     * PENDING: the default initialize is working as expected only
+     *  if the config is done before setting the model, that is 
+     *  in the ColumnFactory. Need public api to programatically
+     *  trigger the init after the fact? 
      */
     public void testPrefHiddenColumn() {
         JXTable table = new JXTable(new AncientSwingTeam());
         TableColumnExt columnExt = table.getColumnExt(0);
-        columnExt.setPrototypeValue("Jessesmariaandjosefsapperlottodundteufel");
+      columnExt.setPrototypeValue("Jessesmariaandjosefsapperlottodundteufel");
         TableCellRenderer renderer = table.getCellRenderer(0, 0);
         Component comp = renderer.getTableCellRendererComponent(null, columnExt.getPrototypeValue(), false, false, -1, -1);
         columnExt.setVisible(false);
         // make sure the column pref is initialized
-        table.getPreferredScrollableViewportSize();
+        table.initializeColumnWidths();
         assertEquals("hidden column's pref must be set", 
                 comp.getPreferredSize().width + table.getColumnMargin(), columnExt.getPreferredWidth());
     }
@@ -402,7 +406,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     /**
      * Issue #547-swingx: columns' pref width - header not taken 
      * if no prototype
-     *
+     * 
      */
     public void testPrefColumnTitle() {
         JXTable table = new JXTable(new AncientSwingTeam());
@@ -413,7 +417,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         // need to store the pref - header renderer is used during initialize!
         Dimension prefSize = comp.getPreferredSize();
         // make sure the column pref is initialized
-        table.getPreferredScrollableViewportSize();
+        table.initializeColumnWidths();
         assertEquals("header must be measured", 
                 prefSize.width + table.getColumnMargin(), columnExt.getPreferredWidth());
     }
@@ -437,7 +441,11 @@ public class JXTableUnitTest extends InteractiveTestCase {
     /**
      * Issue #547-swingx: columns' pref width - added margin twice
      * if has prototype.
-     *
+     * 
+     * PENDING: the default initialize is working as expected only
+     *  if the config is done before setting the model, that is 
+     *  in the ColumnFactory. Need public api to programatically
+     *  trigger the init after the fact? 
      */
     public void testPrefColumnsDuplicateMargin() {
         JXTable table = new JXTable(new AncientSwingTeam());
@@ -449,7 +457,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         TableCellRenderer renderer = table.getCellRenderer(0, 0);
         Component comp = renderer.getTableCellRendererComponent(null, columnExt.getPrototypeValue(), false, false, -1, -1);
         // make sure the column pref is initialized
-        table.getPreferredScrollableViewportSize();
+        table.initializeColumnWidths();
         assertEquals("column margin must be added once", table.getColumnMargin(), 
                 columnExt.getPreferredWidth() - comp.getPreferredSize().width);
     }

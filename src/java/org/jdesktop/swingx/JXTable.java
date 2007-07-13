@@ -472,6 +472,9 @@ public class JXTable extends JTable
         updateRowHeightUI(false);
         // set to null -  don't want hard-coded pixel sizes.
         setPreferredScrollableViewportSize(null);
+        // PENDING: need to duplicate here..
+        // why doesn't the call in tableChanged work?
+        initializeColumnWidths();
         setFillsViewportHeight(true);
         updateLocaleState();
     }
@@ -1413,7 +1416,7 @@ public class JXTable extends JTable
         }
         use(filters);
         if (isStructureChanged(e)) {
-            initializeColumnPreferredWidths();
+            initializeColumnWidths();
             resetCalculatedScrollableSize(true);
         }
     }
@@ -2538,7 +2541,8 @@ public class JXTable extends JTable
             calculatedPrefScrollableViewportSize = new Dimension();
             // JW: hmm... fishy ... shouldn't be necessary here?
             // maybe its the "early init" in super's tableChanged();
-            initializeColumnPreferredWidths();
+            // moved to init which looks okay so far
+//            initializeColumnPreferredWidths();
         }
         // the width is reset to -1 in setVisibleColumnCount
         if (calculatedPrefScrollableViewportSize.width <= 0) {
@@ -2556,12 +2560,19 @@ public class JXTable extends JTable
     /**
      * Initialize the width related properties of all contained
      * TableColumns, both visible and hidden. <p>
-     * 
-     * PENDING: move into ColumnFactory? respect autoCreateColumn off?
-     * 
+     * <ul>
+     * <li>PENDING: move into ColumnFactory? 
+     * <li>PENDING: what to do if autoCreateColumn off?
+     * <li>PENDING: public? to allow manual setting of column
+     *   properties which might effect their default sizing. Needed
+     *   in testing - but real-world? the factory is meant to 
+     *   do the property setting, based on tableModel and meta-data (from where?).
+     *   But leads to funny call sequence for per-table factory (new JXTable(), 
+     *   table.setColumnFactory(..), table.setModel(...))
+     * </ul>
      * @see #initializeColumnPreferredWidth(TableColumn)
      */
-    protected void initializeColumnPreferredWidths() {
+    protected void initializeColumnWidths() {
         for (TableColumn column : getColumns(true)) {
             initializeColumnPreferredWidth(column);
         }
