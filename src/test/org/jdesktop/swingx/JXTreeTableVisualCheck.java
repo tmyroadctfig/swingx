@@ -681,7 +681,8 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 
                 hl);
         final JXTree tree = new JXTree(treeTableModel);
-        JXTree renderer = (JXTree) treeTable.getCellRenderer(0, 0);
+        JXTree renderer = (JXTree) treeTable.getCellRenderer(0, treeTable
+                .getHierarchicalColumn());
         tree.setRowHeight(renderer.getRowHeight());
 
         JFrame frame = wrapWithScrollingInFrame(treeTable, tree, 
@@ -700,7 +701,8 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         treeTable.setRowHeight(48);
         treeTable.setShowHorizontalLines(true);
         final JXTree tree = new JXTree(treeTableModel);
-        JXTree renderer = (JXTree) treeTable.getCellRenderer(0, 0);
+        JXTree renderer = (JXTree) treeTable.getCellRenderer(0, treeTable
+                .getHierarchicalColumn());
         tree.setRowHeight(renderer.getRowHeight());
         JFrame frame = wrapWithScrollingInFrame(treeTable, tree,
                 "compare rowheight of treetable vs tree - rowheight 48, margin 15");
