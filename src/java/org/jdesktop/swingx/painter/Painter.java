@@ -42,7 +42,7 @@ import java.awt.Graphics2D;
  * In that case, when the <code>Painter</code> is declared, you may declare that
  * it requires a <code>Component</code>, allowing the paint method to be type safe. Ex:
  * <pre><code>
- *     Painter<Component> p = new Painter<Component>() {
+ *     Painter&lt;Component&gt; p = new Painter&lt;Component&gt;() {
  *         public void paint(Graphics2D g, Component c, int width, int height) {
  *             g.setColor(c.getBackground());
  *             //and so forth
