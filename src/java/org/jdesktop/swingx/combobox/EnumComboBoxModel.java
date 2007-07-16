@@ -168,7 +168,7 @@ public class EnumComboBoxModel<E extends Enum<E>>
             input = valueMap.get(anItem);
         }
         
-        if (input != null) {
+        if (input != null || anItem == null) {
             selected = input;
         }
         

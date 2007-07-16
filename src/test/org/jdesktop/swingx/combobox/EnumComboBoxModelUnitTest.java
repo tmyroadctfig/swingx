@@ -49,9 +49,9 @@ public class EnumComboBoxModelUnitTest extends InteractiveTestCase {
         // always starts by selecting the first value
         assertEquals(model1.getSelectedItem(), MyEnum1.GoodStuff);
 
-        // should ignore the non-mapped string and set to null
+        // should ignore the non-mapped string
         model1.setSelectedItem("something else");
-        assertNull(model1.getSelectedItem());
+        assertEquals(model1.getSelectedItem(), MyEnum1.GoodStuff);
 
         model1.setSelectedItem(MyEnum1.BadStuff);
         assertEquals(model1.getSelectedItem(), MyEnum1.BadStuff);
@@ -71,7 +71,7 @@ public class EnumComboBoxModelUnitTest extends InteractiveTestCase {
 
         // should ignore the non-mapped string and set to null
         model2.setSelectedItem("something else");
-        assertNull(model2.getSelectedItem());
+        assertEquals(model2.getSelectedItem(), MyEnum2.EasyStuff);
 
         model2.setSelectedItem(MyEnum2.HardStuff);
         assertEquals(model2.getSelectedItem(), MyEnum2.HardStuff);
