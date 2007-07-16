@@ -52,9 +52,10 @@ public class WrappingProvider extends
     @Override
     public WrappingIconPanel getRendererComponent(CellContext context) {
         if (context != null) {
+            rendererComponent.setComponent(wrappee.rendererComponent);
             Object oldValue = adjustContextValue(context);
-            wrappee.getRendererComponent(context);
             WrappingIconPanel panel = super.getRendererComponent(context);
+            wrappee.getRendererComponent(context);
             restoreContextValue(context, oldValue);
             return panel;
         }

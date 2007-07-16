@@ -27,6 +27,8 @@ import java.awt.ComponentOrientation;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -38,14 +40,19 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.ListModel;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXEditorPaneTest;
 import org.jdesktop.swingx.JXFrame;
+import org.jdesktop.swingx.JXHyperlink;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTree;
+import org.jdesktop.swingx.LinkModel;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
@@ -90,6 +97,19 @@ public class TreeRendererTest extends InteractiveTestCase {
         }
     }
 
+    /**
+     * Wrapping provider: hyperlink foreground must be preserved.
+     *
+     */
+    public void testTreeHyperlinkForeground() {
+        JXTree tree = new JXTree(createTreeModelWithLinks(20));
+        ComponentProvider<JXHyperlink> context = new HyperlinkProvider();
+        Color foreground = context.rendererComponent.getForeground();
+        tree.setCellRenderer(new DefaultTreeRenderer(new WrappingProvider(context)));
+        tree.getCellRenderer().getTreeCellRendererComponent(tree, "something", false, false, false, -1, false);
+        assertEquals("hyperlink color must be preserved", foreground, context.rendererComponent.getForeground());
+    }
+    
     /**
      * related to Issue #22-swingx: tree background highlighting broken.
      * test if background color is moved down to delegate component.
@@ -291,6 +311,24 @@ public class TreeRendererTest extends InteractiveTestCase {
         frame.setVisible(true);
     }
 //-------------------------- factory methods
+    private TreeModel createTreeModelWithLinks(int count) {
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Links");
+        for (int i = 0; i < count; i++) {
+            try {
+                LinkModel link = new LinkModel("a link text " + i, null, new URL("http://some.dummy.url" + i));
+                if (i == 1) {
+                    URL url = JXEditorPaneTest.class.getResource("resources/test.html");
+
+                    link = new LinkModel("a link text " + i, null, url);
+                }
+                root.add(new DefaultMutableTreeNode(link));
+            } catch (MalformedURLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        return new DefaultTreeModel(root);
+    }
     /**
      * 
      * @return a button controller specialized on ActionEntryNode.

@@ -111,7 +111,8 @@ public class RendererVisualCheck extends InteractiveTestCase {
         RendererVisualCheck test = new RendererVisualCheck();
         try {
 //            test.runInteractiveTests();
-          test.runInteractiveTests(".*XLabel.*");
+          test.runInteractiveTests(".*Link.*");
+//          test.runInteractiveTests(".*XLabel.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -600,7 +601,6 @@ public class RendererVisualCheck extends InteractiveTestCase {
         tree.setCellRenderer(new DefaultTreeRenderer(new WrappingProvider(context)));
         JFrame frame = wrapWithScrollingInFrame(tree, visitor.getOutputComponent(), "show link renderer in list");
         frame.setVisible(true);
-
     }
     
 //----------------------- experiments with "CheckList" fakes
@@ -1032,6 +1032,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         }
         return new DefaultTreeModel(root);
     }
+    
     private TableModel createModelWithLinks() {
         String[] columnNames = { "text only", "Link editable",
                 "Link not-editable", "Bool editable", "Bool not-editable" };
