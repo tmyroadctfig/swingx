@@ -86,9 +86,9 @@ public class JXTreeTableIssues extends InteractiveTestCase {
 //        setSystemLF(true);
         JXTreeTableIssues test = new JXTreeTableIssues();
         try {
-            test.runInteractiveTests();
+//            test.runInteractiveTests();
 //            test.runInteractiveTests(".*AdapterDeleteUpdate.*");
-//            test.runInteractiveTests(".*Text.*");
+            test.runInteractiveTests(".*Text.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -525,11 +525,31 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         JXTreeTable tree = new JXTreeTable(new FileSystemModel());
         HyperlinkProvider provider =  new HyperlinkProvider(simpleAction);
         tree.getColumn(2).setCellRenderer(new DefaultTableRenderer(provider));
-        tree.setTreeCellRenderer(new DefaultTreeRenderer(provider));
+        tree.setTreeCellRenderer(new DefaultTreeRenderer( //provider));
+                new WrappingProvider(provider)));
 //        tree.setCellRenderer(new LinkRenderer(simpleAction));
         tree.setHighlighters(HighlighterFactory.createSimpleStriping());
         JFrame frame = wrapWithScrollingInFrame(tree, "table and simple links");
         frame.setVisible(true);
+    }
+
+    /**
+     * Issue ??-swingx: hyperlink/rollover in hierarchical column.
+     *
+     */
+    public void testTreeRendererInitialRollover() {
+        JXTreeTable tree = new JXTreeTable(new FileSystemModel());
+        assertEquals(tree.isRolloverEnabled(), ((JXTree) tree.getCellRenderer(0, 0)).isRolloverEnabled());
+    }
+
+    /**
+     * Issue ??-swingx: hyperlink/rollover in hierarchical column.
+     *
+     */
+    public void testTreeRendererModifiedRollover() {
+        JXTreeTable tree = new JXTreeTable(new FileSystemModel());
+        tree.setRolloverEnabled(!tree.isRolloverEnabled());
+        assertEquals(tree.isRolloverEnabled(), ((JXTree) tree.getCellRenderer(0, 0)).isRolloverEnabled());
     }
 
     /**

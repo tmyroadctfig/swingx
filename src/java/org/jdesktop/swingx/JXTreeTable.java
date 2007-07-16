@@ -288,7 +288,7 @@ public class JXTreeTable extends JXTable {
     @Override
     public void setFilters(FilterPipeline pipeline) {
     }
-
+    
     /**
      * Overriden to invoke repaint for the particular location if
      * the column contains the tree. This is done as the tree editor does
@@ -1973,7 +1973,17 @@ public class JXTreeTable extends JXTable {
     }
 
     static class TreeTableCellRenderer extends JXTree implements
-        TableCellRenderer {
+        TableCellRenderer
+        // need to implement RolloverRenderer
+        // PENDING JW: method name clash rolloverRenderer.isEnabled and
+        // component.isEnabled .. don't extend, use? And change
+        // the method name in rolloverRenderer? 
+        // commented - so doesn't show the rollover cursor.
+        // 
+//      ,  RolloverRenderer 
+        {
+        private PropertyChangeListener rolloverListener;
+
         // Force user to specify TreeTableModel instead of more general
         // TreeModel
         public TreeTableCellRenderer(TreeTableModel model) {
@@ -2058,13 +2068,130 @@ public class JXTreeTable extends JXTable {
 
             if (this.treeTable == null) {
                 this.treeTable = treeTable;
+                // commented because still has issus
+//                bindRollover();
             }
             else {
                 throw new IllegalArgumentException("renderer already bound");
             }
         }
 
+        /**
+         * Install rollover support.
+         * Not used - still has issues.
+         * - not bidi-compliant
+         * - no coordinate transformation for hierarchical column != 0
+         * - method name clash enabled
+         * - keyboard triggered click unreliable (triggers the treetable)
+         * ...
+         */
+        private void bindRollover() {
+            setRolloverEnabled(treeTable.isRolloverEnabled());
+            treeTable.addPropertyChangeListener(getRolloverListener());
+        }
+
         
+        /**
+         * @return
+         */
+        private PropertyChangeListener getRolloverListener() {
+            if (rolloverListener == null) {
+                rolloverListener = createRolloverListener();
+            }
+            return rolloverListener;
+        }
+
+        /**
+         * Creates and returns a property change listener for 
+         * table's rollover related properties. 
+         * 
+         * This implementation 
+         * - Synchs the tree's rolloverEnabled 
+         * - maps rollover cell from the table to the cell 
+         *   (still incomplete: first column only)
+         * 
+         * @return
+         */
+        protected PropertyChangeListener createRolloverListener() {
+            PropertyChangeListener l = new PropertyChangeListener() {
+
+                public void propertyChange(PropertyChangeEvent evt) {
+                    if ((treeTable == null) || (treeTable != evt.getSource()))
+                        return;
+                    if ("rolloverEnabled".equals(evt.getPropertyName())) {
+                        setRolloverEnabled(((Boolean) evt.getNewValue()).booleanValue());
+                    }
+                    if (RolloverProducer.ROLLOVER_KEY.equals(evt.getPropertyName())){
+                        rollover(evt);
+                    } 
+                }
+
+                private void rollover(PropertyChangeEvent evt) {
+                    boolean isHierarchical = isHierarchical((Point)evt.getNewValue());
+                    putClientProperty(evt.getPropertyName(), isHierarchical ? 
+                           new Point((Point) evt.getNewValue()) : null);
+                }
+                
+                private boolean isHierarchical(Point point) {
+                    if (point != null) {
+                        int column = point.x;
+                        if (column >= 0) {
+                            return treeTable.isHierarchical(column);
+                        }
+                    }
+                   return false;
+                }
+
+                Point rollover = new Point(-1, -1);
+            };
+            return l;
+        }
+
+        /**
+         * {@inheritDoc} <p>
+         * 
+         * Overridden to produce clicked client props only. The
+         * rollover are produced by a propertyChangeListener to 
+         * the table's corresponding prop.
+         * 
+         */
+        @Override
+        protected RolloverProducer createRolloverProducer() {
+            return new RolloverProducer() {
+
+                /**
+                 * Overridden to do nothing.
+                 * 
+                 * @param e
+                 * @param property
+                 */
+                @Override
+                protected void updateRollover(MouseEvent e, String property) {
+                    if (CLICKED_KEY.equals(property)) {
+                        super.updateRollover(e, property);
+                    }
+                }
+                protected void updateRolloverPoint(JComponent component,
+                        Point mousePoint) {
+                    JXTree tree = (JXTree) component;
+                    int row = tree.getClosestRowForLocation(mousePoint.x, mousePoint.y);
+                    Rectangle bounds = tree.getRowBounds(row);
+                    if (bounds == null) {
+                        row = -1;
+                    } else {
+                        if ((bounds.y + bounds.height < mousePoint.y) || 
+                                bounds.x > mousePoint.x)   {
+                               row = -1;
+                           }
+                    }
+                    int col = row < 0 ? -1 : 0;
+                    rollover.x = col;
+                    rollover.y = row;
+                }
+                
+            };
+        }
+
         @Override
         protected void setExpandedState(TreePath path, boolean state) {
             super.setExpandedState(path, state);
@@ -2157,6 +2284,14 @@ public class JXTreeTable extends JXTable {
                 highlightBorder.paintBorder(this, g, 0, cellRect.y,
                         getWidth(), cellRect.height);
             }
+        }
+
+        public void doClick() {
+            if ((getCellRenderer() instanceof RolloverRenderer)
+                    && ((RolloverRenderer) getCellRenderer()).isEnabled()) {
+                ((RolloverRenderer) getCellRenderer()).doClick();
+            }
+            
         }
 
         public Component getTableCellRendererComponent(JTable table,
@@ -2274,6 +2409,7 @@ public class JXTreeTable extends JXTable {
 
         // A JXTreeTable may not have more than one hierarchical column
         private int hierarchicalColumnWidth = 0;
+
     }
 
     /**
