@@ -34,13 +34,18 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.UIManager.LookAndFeelInfo;
 
+import org.jdesktop.swingx.calendar.JXMonthView;
+
 /**
  * Simple tests to ensure that the {@code JXDatePicker} can be instantiated and
- * displayed.
+ * displayed.<p>
+ * 
+ * JW: being lazy - added visuals for <code>JXMonthView</code> as well.
  * 
  * @author Karl Schaefer
  */
 public class JXDatePickerVisualCheck extends InteractiveTestCase {
+
     public JXDatePickerVisualCheck() {
         super("JXDatePicker Test");
     }
@@ -116,9 +121,26 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         return frame;
     }
     
-    public void interactiveDisplay() {
-        JFrame frame = wrapInFrame(new JXDatePicker(), "show date picker");
+    /**
+     * Issue #426-swingx: NPE on traversing 
+     * 
+     * example from bug report
+     *
+     */
+    public void interactiveMonthViewTravers() {
+        JXMonthView monthView = new JXMonthView();
+        monthView.setTraversable(true);
+        JFrame frame = wrapInFrame(monthView, "show month view - travers");
+        frame.pack();
+        frame.setVisible(true);
+        
+    }
+    
+    public void interactiveDatePickerDisplay() {
+        JXDatePicker datePicker = new JXDatePicker();
+        JFrame frame = wrapInFrame(datePicker, "show date picker");
         frame.pack();
         frame.setVisible(true);
     }
+    
 }
