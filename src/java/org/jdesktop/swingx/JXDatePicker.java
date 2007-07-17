@@ -378,6 +378,9 @@ public class JXDatePicker extends JComponent {
     public void setEditor(JFormattedTextField editor) {
         JFormattedTextField oldEditor = _dateField;
         _dateField = editor;
+        // JW: quick fix for #551-swingx - editor value not preserved
+        // need to look deeper, maybe should be done in ui-delegate?
+        _dateField.setValue(getDate());
         firePropertyChange(EDITOR, oldEditor, _dateField);
     }
 
