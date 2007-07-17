@@ -110,8 +110,8 @@ public class RendererVisualCheck extends InteractiveTestCase {
         setSystemLF(true);
         RendererVisualCheck test = new RendererVisualCheck();
         try {
-//            test.runInteractiveTests();
-          test.runInteractiveTests(".*Link.*");
+            test.runInteractiveTests();
+//          test.runInteractiveTests(".*Text.*");
 //          test.runInteractiveTests(".*XLabel.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
@@ -162,23 +162,25 @@ public class RendererVisualCheck extends InteractiveTestCase {
                 + "with nothing but junk. wrappit .... where needed"});
         JXTable table = new JXTable(model);
         table.setVisibleRowCount(4);
+        table.setVisibleColumnCount(2);
         table.setColumnControlVisible(true);
         table.getColumnExt(0).setCellRenderer(new DefaultTableRenderer(new TextAreaProvider()));
         table.addHighlighter(
                 HighlighterFactory.createAlternateStriping());
-
-        JTextArea textArea = (JTextArea) table.prepareRenderer(table.getCellRenderer(0, 0), 0, 0);
+        // simulate some means to get a reasonable rowheight
         table.packColumn(0, -1);
+        JTextArea textArea = (JTextArea) table.prepareRenderer(table.getCellRenderer(0, 0), 0, 0);
         table.setRowHeight(textArea.getPreferredSize().height);
         showWithScrollingInFrame(table, "textArea as rendering comp");
     }
     
+    /**
+     * use a JTextArea as rendering component.
+     */
     public static class TextAreaProvider extends ComponentProvider<JTextArea> {
 
         @Override
         protected void configureState(CellContext context) {
-            // TODO Auto-generated method stub
-            
         }
 
         @Override
@@ -193,7 +195,6 @@ public class RendererVisualCheck extends InteractiveTestCase {
         @Override
         protected void format(CellContext context) {
             rendererComponent.setText(getStringValue(context));
-            rendererComponent.revalidate();
         }
         
     }
@@ -210,21 +211,22 @@ public class RendererVisualCheck extends InteractiveTestCase {
                 + "with nothing but junk. wrappit .... where needed"});
         JXTable table = new JXTable(model);
         table.setVisibleRowCount(4);
+        table.setVisibleColumnCount(2);
         table.setColumnControlVisible(true);
         table.getColumnExt(0).setCellRenderer(new DefaultTableRenderer(new XLabelProvider()));
         table.addHighlighter(
                 HighlighterFactory.createAlternateStriping());
-
         table.setRowHeight(50);
         showWithScrollingInFrame(table, "textArea as rendering comp");
     }
 
+    /**
+     * Use a JXLabel as rendering component.
+     */
     public static class XLabelProvider extends ComponentProvider<JXLabel> {
 
         @Override
         protected void configureState(CellContext context) {
-            // TODO Auto-generated method stub
-            
         }
 
         @Override
@@ -238,7 +240,6 @@ public class RendererVisualCheck extends InteractiveTestCase {
         @Override
         protected void format(CellContext context) {
             rendererComponent.setText(getStringValue(context));
-            rendererComponent.revalidate();
         }
         
     }

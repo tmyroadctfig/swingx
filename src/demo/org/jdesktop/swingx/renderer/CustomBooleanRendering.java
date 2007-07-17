@@ -95,9 +95,6 @@ public class CustomBooleanRendering {
         return pane;
     }
 
-
-
-
     /**
      * @param table
      */

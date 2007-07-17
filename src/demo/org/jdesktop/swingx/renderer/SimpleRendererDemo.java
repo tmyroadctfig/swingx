@@ -62,28 +62,17 @@ public class SimpleRendererDemo {
         try {
             initData();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
+
     /**
-     * @return the component to show.
+     * Configure the given collection components with the same
+     * rendering representation.
+     * 
+     * Note: this method is extracted for emphasis only :-)
      */
-    private Component createContent() {
-        JXTable table = new JXTable(tableModel);
-        table.setColumnControlVisible(true);
-        table.getColumnExt(1).setToolTipText("Randomly generated - run again if you are disatisfied");
-        table.packColumn(0, -1);
-        JXList list = new JXList(listModel);
-        JXTree tree = new JXTree(rootNode);
-        JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("JXTable", new JScrollPane(table));
-        JSplitPane splitPane = new JSplitPane();
-        splitPane.setLeftComponent(new JScrollPane(list));
-        splitPane.setRightComponent(new JScrollPane(tree));
-        tabbedPane.addTab("JXList/JXTree", splitPane);
-        // configure table, list, tree renderer to use the same string
-        // representation 
+    private void configureRendering(JXTable table, JXList list, JXTree tree) {
         StringValue stringValue = new StringValue() {
             
             public String getString(Object value) {
@@ -96,10 +85,36 @@ public class SimpleRendererDemo {
         table.setDefaultRenderer(Contributor.class, new DefaultTableRenderer(stringValue));
         list.setCellRenderer(new DefaultListRenderer(stringValue));
         tree.setCellRenderer(new DefaultTreeRenderer(stringValue));
+    }
+
+    /**
+     * @param table
+     */
+    private void configureTable(JXTable table) {
+        table.setColumnControlVisible(true);
+        table.getColumnExt(1).setToolTipText("Randomly generated - run again if you are disatisfied");
+        table.packColumn(0, -1);
+    }
+    
+
+    /**
+     * @return the component to show.
+     */
+    private Component createContent() {
+        JXTable table = new JXTable(tableModel);
+        configureTable(table);
+        JXList list = new JXList(listModel);
+        JXTree tree = new JXTree(rootNode);
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.addTab("JXTable", new JScrollPane(table));
+        JSplitPane splitPane = new JSplitPane();
+        splitPane.setLeftComponent(new JScrollPane(list));
+        splitPane.setRightComponent(new JScrollPane(tree));
+        tabbedPane.addTab("JXList/JXTree", splitPane);
+        configureRendering(table, list, tree);
         return tabbedPane;
     }
 
-    
     
     /**
      * Create and fill a list of contributors from a resource and 
