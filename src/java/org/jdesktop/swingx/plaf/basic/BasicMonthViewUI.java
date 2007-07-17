@@ -76,9 +76,9 @@ import org.jdesktop.swingx.plaf.MonthViewUI;
  * @author rah003
  */
 public class BasicMonthViewUI extends MonthViewUI {
-    private static final int LEADING_DAY_OFFSET = 1;
-    private static final int NO_OFFSET = 0;
-    private static final int TRAILING_DAY_OFFSET = -1;
+    protected static final int LEADING_DAY_OFFSET = 1;
+    protected static final int NO_OFFSET = 0;
+    protected static final int TRAILING_DAY_OFFSET = -1;
 
     private static final int WEEKS_IN_MONTH = 6;
     private static final int CALENDAR_SPACING = 10;
@@ -606,7 +606,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param bounds Bounds of the date to draw in.
      * @param monthOffset Used to help calculate bounds for leading/trailing dates.
      */
-    private void calculateBoundsForDay(Rectangle bounds, int monthOffset) {
+    protected void calculateBoundsForDay(Rectangle bounds, int monthOffset) {
         Calendar cal = monthView.getCalendar();
         int year = cal.get(Calendar.YEAR);
         int month = cal.get(Calendar.MONTH);
@@ -1106,13 +1106,13 @@ public class BasicMonthViewUI extends MonthViewUI {
     /**
      * Paints string of the day. No calculations made. Used by LAFs.
      * @param g Graphics to paint on.
-     * @param dayName Text representation of the day.
-     * @param x X coordinate of the upper left corner.
-     * @param y Y coordinate of the upper left corner.
+     * @param numericDay Text representation of the day.
+     * @param x X coordinate of the upper <b>right</b> corner.
+     * @param y Y coordinate of the upper <b>right</b> corner.
      */
-    protected void paintDayForeground(Graphics g, String dayName, int x, int y) {
+    protected void paintDayForeground(Graphics g, String numericDay, int x, int y) {
         FontMetrics fm = g.getFontMetrics();
-        g.drawString(dayName, x - fm.stringWidth(dayName), y + fm.getAscent());
+        g.drawString(numericDay, x - fm.stringWidth(numericDay), y + fm.getAscent());
     }
 
     /**
