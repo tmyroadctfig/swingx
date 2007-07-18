@@ -255,13 +255,7 @@ public class ColumnFactory {
     protected int calcHeaderWidth(JXTable table, TableColumnExt columnExt) {
         int prototypeWidth = -1;
         // now calculate how much room the column header wants
-        TableCellRenderer renderer = columnExt.getHeaderRenderer();
-        if (renderer == null) {
-            JTableHeader header = table.getTableHeader();
-            if (header != null) {
-                renderer = header.getDefaultRenderer();
-            }
-        }
+        TableCellRenderer renderer = getHeaderRenderer(table, columnExt);
         if (renderer != null) {
             Component comp = renderer.getTableCellRendererComponent(table,
                     columnExt.getHeaderValue(), false, false, -1, -1);
@@ -270,7 +264,6 @@ public class ColumnFactory {
         }
         return prototypeWidth;
     }
-
 
     /**
      * Measures and returns the preferred width of the rendering component
@@ -297,16 +290,18 @@ public class ColumnFactory {
     /**
      * Returns the cell renderer to use for measuring. Delegates to 
      * JXTable for visible columns, duplicates table logic for hidden
-     * columns.
+     * columns. <p>
      * 
      * @param table the table which provides the renderer
      * @param columnExt the TableColumn to configure
      * @return
      */
-    private TableCellRenderer getCellRenderer(JXTable table, TableColumnExt columnExt) {
+    protected TableCellRenderer getCellRenderer(JXTable table, TableColumnExt columnExt) {
         int viewIndex = table.convertColumnIndexToView(columnExt
                 .getModelIndex());
         if (viewIndex >= 0) {
+            // JW: ok to not guard against rowCount < 0?
+            // technically, the index should be a valid coordinate
             return table.getCellRenderer(0, viewIndex);
         }
         // hidden column - need api on JXTable to access renderer for hidden?
@@ -318,6 +313,27 @@ public class ColumnFactory {
         }
         return renderer;
     }
+
+    /**
+     * Looks up and returns the renderer used for the column's header.<p>
+     * 
+     * @param table the table which contains the column
+     * @param columnExt the column to lookup the header renderer for
+     * @return the renderer for the columns header, may be null.
+     */
+    protected TableCellRenderer getHeaderRenderer(JXTable table, TableColumnExt columnExt) {
+        TableCellRenderer renderer = columnExt.getHeaderRenderer();
+        if (renderer == null) {
+            JTableHeader header = table.getTableHeader();
+            if (header != null) {
+                renderer = header.getDefaultRenderer();
+            }
+        }
+        // JW: default to something if null? 
+        // if so, could be table's default object/string header?
+        return renderer;
+    }
+
 
     /**
      * Configures the column's <code>preferredWidth</code> to fit the content.
@@ -357,21 +373,17 @@ public class ColumnFactory {
         if (!columnExt.isVisible()) 
             throw new IllegalStateException("column must be visible to pack");
         
-        /* Get width of column header */
-        TableCellRenderer renderer = columnExt.getHeaderRenderer();
-        if (renderer == null)
-            renderer = table.getTableHeader().getDefaultRenderer();
-
         int column = table.convertColumnIndexToView(columnExt.getModelIndex());
-
-        Component comp = renderer.getTableCellRendererComponent(table,
-                columnExt.getHeaderValue(), false, false, 0, column);
-        int width = comp.getPreferredSize().width;
-
-        if (getRowCount(table) > 0)
-            renderer = table.getCellRenderer(0, column);
+        int width = 0;
+        TableCellRenderer headerRenderer = getHeaderRenderer(table, columnExt);
+        if (headerRenderer != null) {
+            Component comp = headerRenderer.getTableCellRendererComponent(table,
+                    columnExt.getHeaderValue(), false, false, 0, column);
+            width = comp.getPreferredSize().width;
+        }      
+        TableCellRenderer renderer = getCellRenderer(table, columnExt);
         for (int r = 0; r < getRowCount(table); r++) {
-            comp = renderer.getTableCellRendererComponent(table, table
+            Component comp = renderer.getTableCellRendererComponent(table, table
                     .getValueAt(r, column), false, false, r, column);
             width = Math.max(width, comp.getPreferredSize().width);
         }

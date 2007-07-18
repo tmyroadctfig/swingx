@@ -23,7 +23,15 @@ import org.jdesktop.test.AncientSwingTeam;
  */
 public class ColumnFactoryTest extends InteractiveTestCase {
 
-    
+    public void testPackColumnNullHeader() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        table.setTableHeader(null);
+        table.packAll();
+    }
+    /**
+     * test if max parameter is respected.
+     *
+     */
     public void testPackColumnWithMax() {
         JXTable table = new JXTable(new AncientSwingTeam());
         TableColumnExt columnExt = table.getColumnExt(0);
