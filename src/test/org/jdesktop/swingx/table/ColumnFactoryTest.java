@@ -23,6 +23,10 @@ import org.jdesktop.test.AncientSwingTeam;
  */
 public class ColumnFactoryTest extends InteractiveTestCase {
 
+    /**
+     * Issue ??: NPE in pack for null table header.
+     *
+     */
     public void testPackColumnNullHeader() {
         JXTable table = new JXTable(new AncientSwingTeam());
         table.setTableHeader(null);

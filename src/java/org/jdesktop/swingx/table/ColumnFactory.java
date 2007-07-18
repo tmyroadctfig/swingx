@@ -232,7 +232,12 @@ public class ColumnFactory {
      */
     public int getPreferredScrollableViewportWidth(JXTable table) {
         int w = 0;
-        int count = Math.min(table.getColumnCount(), table.getVisibleColumnCount());
+        int count;
+        if (table.getVisibleColumnCount() < 0) {
+            count = table.getColumnCount();
+        } else {
+            count = Math.min(table.getColumnCount(), table.getVisibleColumnCount());
+        }
         for (int i = 0; i < count; i++) {
             // sum up column's pref size, until maximal the
             // visibleColumnCount

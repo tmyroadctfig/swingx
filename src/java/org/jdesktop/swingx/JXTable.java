@@ -303,7 +303,7 @@ public class JXTable extends JTable
     private int visibleRowCount = 20;
 
     /** The default number of visible columns (in a ScrollPane). */
-    private int visibleColumnCount = 6;
+    private int visibleColumnCount = -1;
 
     private SizeSequenceMapper rowModelMapper;
 
@@ -2433,6 +2433,8 @@ public class JXTable extends JTable
      * 
      * This is a bound property. The default value is 20. <p>
      * 
+     * PENDING: allow negative for use-all? Analogous to visColumnCount.
+     * 
      * @param visibleRowCount number of rows to show in a <code>JScrollPane</code>
      * @throws IllegalArgumentException if given count is negative.
      * 
@@ -2462,17 +2464,16 @@ public class JXTable extends JTable
     
     /**
      * Sets the preferred number of Columns to show in a <code>JScrollPane</code>.
+     * A negative number is interpreted as use-all available visible columns.
      * <p> 
      * 
-     * This is a bound property. The default value is 6. <p>
-     * 
+     * This is a bound property. The default value is -1 (effectively the same
+     * as before the introduction of this property).
      * 
      * @param visibleColumnCount number of rows to show in a <code>JScrollPane</code>
      * @see #getVisibleColumnCount()
      */
     public void setVisibleColumnCount(int visibleColumnCount) {
-        if (visibleColumnCount < 0) throw 
-            new IllegalArgumentException("visible row count must not be negative " + visibleColumnCount);
         if (getVisibleColumnCount() == visibleColumnCount) return;
         int old = getVisibleColumnCount();
         this.visibleColumnCount = visibleColumnCount;

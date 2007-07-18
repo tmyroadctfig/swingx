@@ -121,7 +121,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
         Dimension compareDim = compare.getPreferredScrollableViewportSize();
         JXTable table = new JXTable(10, 6);
         Dimension initialDim = table.getPreferredScrollableViewportSize();
-        assertFalse(compareDim.width == initialDim.width);
+        assertFalse("configured must be different from default width", 
+                compareDim.width == initialDim.width);
         table.setModel(compare.getModel());
         assertEquals(compareDim.width, table.getPreferredScrollableViewportSize().width);
     }
@@ -147,11 +148,13 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     public void testVisibleColumnCountUpdateSize() {
         JXTable table = new JXTable(10, 14);
+        table.setVisibleColumnCount(6);
         Dimension dim = table.getPreferredScrollableViewportSize();
         table.setVisibleColumnCount(table.getVisibleColumnCount() * 2);
         assertEquals(dim.width * 2, table.getPreferredScrollableViewportSize().width);
         assertEquals(dim.height, table.getPreferredScrollableViewportSize().height);
     }
+    
     /**
      * Issue #508-swingx: cleanup pref scrollable size.
      * test preference of explicit setting (over calculated).
@@ -173,6 +176,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     public void testPrefScrollableWidthMoreColumns() {
         JXTable table = new JXTable(10, 7);
+        table.setVisibleColumnCount(6);
         Dimension dim = table.getPreferredScrollableViewportSize();
         // sanity
         assertEquals(table.getVisibleColumnCount() + 1, table.getColumnCount());
@@ -191,6 +195,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
      */
     public void testPrefScrollableWidthLessColumns() {
         JXTable table = new JXTable(10, 5);
+        table.setVisibleColumnCount(6);
         Dimension dim = table.getPreferredScrollableViewportSize();
         // sanity
         assertEquals(table.getVisibleColumnCount() - 1, table.getColumnCount());
@@ -203,16 +208,24 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
     
     /**
+     * test default sizing: use all visible columns.
+     *
+     */
+    public void testPrefScrollableWidthDefault() {
+       JXTable table = new JXTable(10, 6);
+       Dimension dim = table.getPreferredScrollableViewportSize();
+       assertEquals("default must use all visible columns", 
+               table.getColumnCount() * 75, dim.width);
+    }
+    
+    /**
      * Issue #508-swingx: cleanup pref scrollable size.
      * Sanity: test initial visible column count.
      *
      */
     public void testDefaultVisibleColumnCount() {
         JXTable table = new JXTable(10, 6);
-        assertEquals(6, table.getVisibleColumnCount());
-        // paranoid - visible column count independent on actual count
-        JXTable other =  new JXTable(10, 10);
-        assertEquals(6, other.getVisibleColumnCount());
+        assertEquals(-1, table.getVisibleColumnCount());
     }
     /**
      * Issue #508-swingx: cleanup pref scrollable size.
@@ -275,8 +288,10 @@ public class JXTableUnitTest extends InteractiveTestCase {
         table.setVisibleColumnCount(count + 1);
         TestUtils.assertPropertyChangeEvent(report, "visibleColumnCount", count, count+1);
     }
+    
     /**
-     * test doc'ed behaviour
+     * test doc'ed behaviour: set visible row count must
+     * throw on negative row.
      *
      */
     public void testVisibleRowCountNegative() {
@@ -291,16 +306,12 @@ public class JXTableUnitTest extends InteractiveTestCase {
     
     /**
      * test doc'ed behaviour
-     *
+     * 
      */
     public void testVisibleColumnCountNegative() {
         JXTable table = new JXTable(10, 7);
-        try {
-            table.setVisibleColumnCount(-2);
-            fail("negative count must throw IllegalArgument");
-        } catch (IllegalArgumentException e) {
-            // expected exception
-        }        
+        table.setVisibleColumnCount(-2);
+        fail("need to implement test use-all for negative");
     }
 
     /**

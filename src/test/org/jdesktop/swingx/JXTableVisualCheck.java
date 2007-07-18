@@ -116,13 +116,13 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         final JXTable table = new JXTable(tableModel);
         table.setColumnControlVisible(true);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        JXFrame frame = showWithScrollingInFrame(table, "initial sizing");
+        final JXFrame frame = showWithScrollingInFrame(table, "initial sizing");
         addMessage(frame, "initial size: " + table.getPreferredScrollableViewportSize());
         Action action = new AbstractActionExt("toggle model") {
 
             public void actionPerformed(ActionEvent e) {
                 table.setModel(table.getModel() == tableModel ? ancientSwingTeam : tableModel);
-                
+                frame.pack();
             }
             
         };
@@ -157,9 +157,13 @@ public class JXTableVisualCheck extends JXTableUnitTest {
          Action columnAction = new AbstractActionExt("vis column") {
              
              public void actionPerformed(ActionEvent e) {
-                 int visColumnCount = table.getVisibleColumnCount() + 2;
-                 if (visColumnCount > 10) {
+                 int visColumnCount = table.getVisibleColumnCount();
+                 if (visColumnCount > 8) {
+                     visColumnCount = -1;
+                 } else if (visColumnCount < 0 ) {
                      visColumnCount = 2;
+                 } else {
+                     visColumnCount += 2;
                  }
                  table.setVisibleColumnCount(visColumnCount);
                  frame.pack();
