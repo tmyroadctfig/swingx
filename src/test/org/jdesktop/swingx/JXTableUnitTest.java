@@ -127,8 +127,8 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertEquals(compareDim.width, table.getPreferredScrollableViewportSize().width);
     }
     /**
-     * Issue #508-swingx: cleanup scrollable support
-     *
+     * Issue #508-swingx: cleanup scrollable support.
+     * 
      */
     public void testVisibleRowCountUpdateSize() {
         JXTable table = new JXTable(10, 6);
@@ -208,11 +208,26 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
     
     /**
+     * test change back to default sizing (use-all)
+     * 
+     */
+    public void testVisibleColumnCountNegative() {
+        JXTable table = new JXTable(10, 7);
+        Dimension dim = table.getPreferredScrollableViewportSize();
+        int visibleCount = table.getVisibleColumnCount();
+        // custom
+        table.setVisibleColumnCount(4);
+        // change back to default
+        table.setVisibleColumnCount(visibleCount);
+        assertEquals(dim, table.getPreferredScrollableViewportSize());
+    }
+    
+    /**
      * test default sizing: use all visible columns.
      *
      */
     public void testPrefScrollableWidthDefault() {
-       JXTable table = new JXTable(10, 6);
+       JXTable table = new JXTable(10, 7);
        Dimension dim = table.getPreferredScrollableViewportSize();
        assertEquals("default must use all visible columns", 
                table.getColumnCount() * 75, dim.width);
@@ -304,15 +319,6 @@ public class JXTableUnitTest extends InteractiveTestCase {
         }        
     }
     
-    /**
-     * test doc'ed behaviour
-     * 
-     */
-    public void testVisibleColumnCountNegative() {
-        JXTable table = new JXTable(10, 7);
-        table.setVisibleColumnCount(-2);
-        fail("need to implement test use-all for negative");
-    }
 
     /**
      * Issue #547-swingx: return copy of pref scrollable size
@@ -357,7 +363,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }     
     
     /**
-     * Sanity: default visible row count.
+     * Sanity: default visible row count == 20.
      *
      */
     public void testDefaultVisibleRowCount() {
