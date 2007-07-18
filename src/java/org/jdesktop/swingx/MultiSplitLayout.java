@@ -1026,9 +1026,16 @@ public class MultiSplitLayout implements LayoutManager {
 	private List<Node> children = Collections.emptyList();
 	private boolean rowLayout = true;
 
-        public Split(Node... children) {
-            setChildren(children);
-        }
+    public Split(Node... children) {
+        setChildren(children);
+    }
+
+    /**
+     * Default constructor to support xml (de)serialization and other bean spec dependent ops.
+     * Resulting instance of Split is invalid until setChildren() is called.
+     */
+    public Split() {
+    }
         
 	/**
 	 * Returns true if the this Split's children are to be 
