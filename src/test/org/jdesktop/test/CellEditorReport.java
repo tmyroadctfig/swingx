@@ -38,7 +38,7 @@ public class CellEditorReport implements CellEditorListener {
     
     
     public void editingStopped(ChangeEvent e) {
-        stoppedEvents.add(e);
+        stoppedEvents.add(0, e);
         allEvents.add(0, e);
         
     }
