@@ -30,6 +30,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.SortedSet;
+import java.util.TimeZone;
 import java.util.logging.Logger;
 
 import javax.swing.ComboBoxEditor;
@@ -65,6 +66,20 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 
     private Calendar calendar;
 
+    /**
+     * NYI: visual testing of bounds.
+     *
+     */
+    public void interactiveBounds() {
+        JXDatePicker picker = new JXDatePicker();
+        calendar.add(Calendar.MONTH, 2);
+        cleanupDate(calendar);
+        picker.getMonthView().getSelectionModel().setUpperBound(calendar.getTime());
+        calendar.add(Calendar.MONTH, - 4);
+        picker.getMonthView().getSelectionModel().setLowerBound(calendar.getTime());
+        showInFrame(picker, "bounds");
+    }
+    
     /**
      * Issue #235-swingx: action events
      * 
@@ -150,6 +165,38 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     
 //-------------------- unit tests
     
+    /**
+     * Issue ??-swingx: timezone of formats and picker must be synched.
+     */
+    public void testTimeZoneInitialSynched() {
+        JXDatePicker picker = new JXDatePicker();
+        assertNotNull(picker.getTimeZone());
+        for (DateFormat format : picker.getFormats()) {
+            assertEquals("timezone must be synched", picker.getTimeZone(), format.getTimeZone());
+        }
+    }
+    
+    /**
+     * Issue #554-swingx: timezone of formats and picker must be synched.
+     */
+    public void testTimeZoneModifiedSynched() {
+        JXDatePicker picker = new JXDatePicker();
+        TimeZone defaultZone = picker.getTimeZone();
+        TimeZone alternative = TimeZone.getTimeZone("GMT-6");
+        // sanity
+        assertNotNull(alternative);
+        if (alternative.equals(defaultZone)) {
+            alternative = TimeZone.getTimeZone("GMT-7");
+            // paranoid ... but shit happens
+            assertNotNull(alternative);
+            assertFalse(alternative.equals(defaultZone));
+        }
+        picker.setTimeZone(alternative);
+        assertEquals(alternative, picker.getTimeZone());
+        for (DateFormat format : picker.getFormats()) {
+            assertEquals("timezone must be synched", picker.getTimeZone(), format.getTimeZone());
+        }
+    }
     /**
      * sanity: when does the picker fire an action event?
      * @throws ParseException
