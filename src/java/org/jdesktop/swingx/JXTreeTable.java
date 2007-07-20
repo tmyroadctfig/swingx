@@ -22,12 +22,8 @@
 
 package org.jdesktop.swingx;
 
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.ComponentOrientation;
-import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -214,7 +210,7 @@ public class JXTreeTable extends JXTable {
      */
     private void init(TreeTableCellRenderer renderer) {
         this.renderer = renderer;
-        assert ((TreeTableModelAdapter) getModel()).tree == renderer;
+        assert ((TreeTableModelAdapter) getModel()).tree == this.renderer;
         
         // Force the JTable and JTree to share their row selection models.
         ListToTreeSelectionModelWrapper selectionWrapper =
@@ -1524,14 +1520,11 @@ public class JXTreeTable extends JXTable {
      */
     @Override
     public TableCellRenderer getCellRenderer(int row, int column) {
-        TableCellRenderer tcr = super.getCellRenderer(row, column);
-        
         if (isHierarchical(column)) {
-            renderer.setTableDelegate(tcr);
             return renderer;
         }
         
-        return tcr;
+        return super.getCellRenderer(row, column);
     }
 
     /**
@@ -1990,7 +1983,6 @@ public class JXTreeTable extends JXTable {
 //      ,  RolloverRenderer 
         {
         private PropertyChangeListener rolloverListener;
-        private TreeCellRenderer treeDelegate;
 
         // Force user to specify TreeTableModel instead of more general
         // TreeModel
@@ -2004,12 +1996,8 @@ public class JXTreeTable extends JXTable {
                  * DefaultTreeCellRenderer.
                  */
             setOverwriteRendererIcons(true);
-            
-            treeDelegate = new JXTree().getCellRenderer();
-            InternalTreeCellRenderer tcr = new InternalTreeCellRenderer();
-            setCellRenderer(tcr);
-//            setCellRenderer(new DefaultTreeRenderer());
-//            setCellRenderer(new ClippedTreeCellRenderer());
+// setCellRenderer(new DefaultTreeRenderer());
+            setCellRenderer(new ClippedTreeCellRenderer());
         }
 
         /**
@@ -2336,145 +2324,6 @@ public class JXTreeTable extends JXTable {
             return this;
         }
 
-        private class InternalTreeCellRenderer extends DefaultTreeCellRenderer {
-            private Component tableRenderer;
-
-            private Component treeRenderer;
-            
-            public InternalTreeCellRenderer() {
-                setOpaque(false);
-            }
-            
-            public Component getTreeCellRendererComponent(JTree tree, Object value,
-                    boolean sel, boolean expanded, boolean leaf, int row,
-                    boolean hasFocus) {
-                Object val = value;
-                
-                int treeColumn = treeTable.getTreeTableModel().getHierarchicalColumn();
-                
-                if (treeTable != null) {
-                    Object o = null; 
-//                    LOG.info("value ? " + value);
-                    if (treeColumn >= 0) {
-                        // following is unreliable during a paint cycle
-                        // somehow interferes with BasicTreeUIs painting cache
-//                        o = treeTable.getValueAt(row, treeColumn);
-                        // ask the model - that's always okay
-                        // might blow if the TreeTableModel is strict in
-                        // checking the containment of the value and 
-                        // this renderer is called for sizing with a prototype
-                        o = treeTable.getTreeTableModel().getValueAt(value, treeColumn);
-                    }
-//                    LOG.info("value ? " + value);
-                    // JW: why this? null may be a valid value? 
-                    // removed - didn't see it after asking the model
-//                    if (o != null) {
-//                      val = o;
-//                    }
-                    val = o;
-                }
-                
-                treeRenderer = super.getTreeCellRendererComponent(tree,
-                        null, sel, expanded, leaf, row, hasFocus);
-                
-                tableRenderer = tableDelegate.getTableCellRendererComponent(
-                        treeTable, val, sel, hasFocus, row,
-                        treeTable.convertColumnIndexToView(treeColumn));
-
-                if (treeRenderer instanceof JComponent) {
-                    ((JComponent) treeRenderer).setOpaque(false);
-                }
-                
-                if (tableRenderer instanceof JComponent) {
-                    ((JComponent) tableRenderer).setOpaque(false);
-                }
-                
-                add(treeRenderer);
-                add(tableRenderer);
-
-                //TODO propogate tableRenderer values as appropriate
-                
-                return this;
-            }
-            
-            /**
-             * {@inheritDoc}
-             */
-            public void doLayout() {
-                Insets insets = getInsets();
-                Rectangle r = getItemRect();
-                int width = r.width - insets.left - insets.right;
-                int height = r.height - insets.top - insets.bottom;
-                Dimension treeD = treeRenderer.getPreferredSize();
-                int w = Math.min(treeD.width, width);
-                
-                if (getComponentOrientation() == ComponentOrientation.RIGHT_TO_LEFT) {
-                   int x = Math.max(width - treeD.width, 0);
-                    
-                    treeRenderer.setBounds(insets.left + x, insets.top, w, height);
-                    
-                    if (treeD.width < width) {
-                        tableRenderer.setBounds(insets.left, insets.top,
-                                width - treeD.width, height);
-                    }
-                } else {
-                    treeRenderer.setBounds(insets.left, insets.top, w, height);
-                    if (treeD.width < width) {
-                        int remainingWidth = width - treeD.width;
-                        int preferredWidth = tableRenderer.getPreferredSize().width;
-                        
-                        if (remainingWidth < preferredWidth) {
-                            tableRenderer.setBounds(insets.left + treeD.width, insets.top,
-                                    remainingWidth, height);
-                        } else {
-                            tableRenderer.setBounds(insets.left + treeD.width, insets.top,
-                                preferredWidth, height);
-                        }
-                    }
-                }
-            }
-            
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public void setBackground(Color bg) {
-                super.setBackground(bg);
-                
-                if (treeRenderer != null) {
-                    treeRenderer.setBackground(bg);
-                }
-                
-                if (tableRenderer != null) {
-                    tableRenderer.setBackground(bg);
-                }
-            }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public void setForeground(Color fg) {
-                super.setForeground(fg);
-                
-                if (treeRenderer != null) {
-                    treeRenderer.setForeground(fg);
-                }
-                
-                if (tableRenderer != null) {
-                    tableRenderer.setForeground(fg);
-                }
-            }
-
-            private Rectangle getItemRect() {
-                Rectangle itemRect = new Rectangle();
-                getBounds(itemRect);
-//                    LOG.info("rect" + itemRect);
-                itemRect.width = hierarchicalColumnWidth - itemRect.x;
-                return itemRect;
-            }
-        }
-        
         private class ClippedTreeCellRenderer extends DefaultTreeCellRenderer {
             private boolean inpainting;
             private String shortText;
@@ -2556,25 +2405,10 @@ public class JXTreeTable extends JXTable {
          * be painted. */
         protected Border highlightBorder = null;
         protected JXTreeTable treeTable = null;
-        private TableCellRenderer tableDelegate;
         protected int visibleRow = 0;
 
         // A JXTreeTable may not have more than one hierarchical column
         private int hierarchicalColumnWidth = 0;
-
-        /**
-         * @return the tableDelegate
-         */
-        public TableCellRenderer getTableDelegate() {
-            return tableDelegate;
-        }
-
-        /**
-         * @param tableDelegate the tableDelegate to set
-         */
-        public void setTableDelegate(TableCellRenderer tableDelegate) {
-            this.tableDelegate = tableDelegate;
-        }
 
     }
 
