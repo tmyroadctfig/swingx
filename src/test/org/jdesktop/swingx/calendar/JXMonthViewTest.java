@@ -53,6 +53,18 @@ public class JXMonthViewTest extends MockObjectTestCase {
     }
 
     /**
+     * Issue #494-swingx: JXMonthView changed all passed-in dates
+     *
+     */
+    public void testCleanupCopyDate() {
+        JXMonthView monthView = new JXMonthView();
+        Date today = new Date();
+        Date copy = new Date(today.getTime());
+        monthView.setSelectionInterval(today, today);
+        assertEquals(copy, today);
+    }
+
+    /**
      * test new (convenience) api on JXMonthView
      *
      */
