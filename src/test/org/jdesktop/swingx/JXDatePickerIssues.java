@@ -21,11 +21,15 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.SortedSet;
 import java.util.logging.Logger;
 
 import javax.swing.ComboBoxEditor;
@@ -73,16 +77,24 @@ public class JXDatePickerIssues extends InteractiveTestCase {
      * - fires on click always
      * - fires on esc/enter only if selection changed
      * 
+     * ComboBox
+     * - fires on enter always
+     * - fires on click in dropdown
+     * 
      */
     public void interactiveActionEvent() {
         JXDatePicker picker = new JXDatePicker();
         JTextField simpleField = new JTextField("simple field");
         JFormattedTextField textField = new JFormattedTextField(DateFormat.getDateInstance());
         textField.setValue(new Date());
+        JComboBox box = new JComboBox(new Object[] {"one", "two", "three"});
+        box.setEditable(true);
+        
         ActionListener l = new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                LOG.info("got action from: " + e.getSource().getClass().getName());
+                LOG.info("got action from: " + e.getSource().getClass().getName() + 
+                        "\n" + e);
             }
             
         };
@@ -90,10 +102,13 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         textField.addActionListener(l);
         picker.addActionListener(l);
         picker.getMonthView().addActionListener(l);
+        box.addActionListener(l);
         JPanel panel = new JPanel();
         panel.add(simpleField);
         panel.add(textField);
         panel.add(picker);
+        panel.add(box);
+        
         JXFrame frame = showInFrame(panel, "trace action events");
         // JXRootPane eats esc 
         frame.getRootPaneExt().getActionMap().remove("esc-action");
@@ -110,6 +125,21 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         showInFrame(picker, "null date");
     }
  
+    public void interactiveInitialDate() {
+        long todaysDate = (new GregorianCalendar(2007, 6, 28)).getTimeInMillis();
+        final JXDatePicker datePicker = new JXDatePicker();
+        JXMonthView calend = new JXMonthView(todaysDate);
+
+
+        calend.setTraversable(true);
+        calend.setDayForeground(1, Color.RED);
+        calend.setDayForeground(7, Color.RED);
+        calend.setDaysOfTheWeekForeground(Color.BLUE);
+        calend.setSelectedBackground(Color.YELLOW);
+        calend.setFirstDayOfWeek(Calendar.MONDAY);
+        datePicker.setMonthView(calend);
+        showInFrame(datePicker, "null date");
+    }
 //-------------------- unit tests
     
     /**
@@ -129,19 +159,62 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 
     /**
      * Who rules? the picker or the month view?
-     * Neither - the month view's dateSelectionModel.
+     * Neither? - the month view's dateSelectionModel.
      * 
+     * Here: picker with date, monthView with empty
      * Setting the monthview resets the 
      * picker's date to the view's selected - should be documented?
      *
      */
-    public void testDatePickerSetMonthView() {
+    public void testDatePickerSetMonthViewWithEmptySelection() {
+        JXDatePicker picker = new JXDatePicker();
+        Date date = picker.getDate();
+        // sanity
+        assertNotNull(date);
+        JXMonthView monthView = new JXMonthView();
+        SortedSet<Date> selection = monthView.getSelection();
+        Date selectedDate = selection.isEmpty() ? null : selection.first();
+        assertNull(selectedDate);
+        picker.setMonthView(monthView);
+//        fail("need to clarify how to synch picker/monthView selection on setMonthView");
+        // okay, seems to be that the monthView rules 
+        // beware the monthview initial selection bug
+        assertEquals(selectedDate, picker.getDate());
+    }
+    
+    /**
+     * Who rules? the picker or the month view?
+     * Neither? - the month view's dateSelectionModel.
+     * 
+     * Here: set the monthview's selection in constructor
+     *
+     */
+    public void testDatePickerSetMonthViewWithSelection() {
         JXDatePicker picker = new JXDatePicker();
         Date date = picker.getDate();
         // why? null selection is perfectly valid?
         assertNotNull(date);
-        picker.setMonthView(new JXMonthView());
-        assertEquals(date, picker.getDate());
+        JXMonthView monthView = new JXMonthView();
+        Date other = new GregorianCalendar(2007, 6, 28).getTime();
+        monthView.setSelectionInterval(other, other);
+        picker.setMonthView(monthView);
+        // okay, seems to be that the monthView rules 
+        // beware the monthview initial selection bug
+        assertEquals("", other, picker.getDate());
+    }
+    
+    /**
+     * Issue ??-swingx: monthView does not take initial date?
+     *
+     * Okay ... looks more like a confusing (me!) doc: the date
+     * in the constructor is not the selection, but the date
+     * to use for the first display. Hmm ...
+     */
+    public void testMonthViewInitialSelection() {
+        JXMonthView monthView = new JXMonthView(new GregorianCalendar(2007, 6, 28).getTimeInMillis());
+        SortedSet<Date> selection = monthView.getSelection();
+        Date other = selection.isEmpty() ? null : selection.first();
+        assertNotNull(other);
     }
     
     /**
