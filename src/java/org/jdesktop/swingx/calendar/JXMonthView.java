@@ -440,6 +440,16 @@ public class JXMonthView extends JComponent {
     }
 
     /**
+     * Returns the selected date. 
+     * 
+     * @return the first Date in the selection or null if empty.
+     */
+    public Date getSelectedDate() {
+        SortedSet<Date> selection = getSelection();
+        return selection.isEmpty() ? null : selection.first();
+
+    }
+    /**
      * Adds the selection interval to the selection model.  <b>All dates are modified to remove their hour of
      * day, minute, second, and millisecond before being added to the selection model</b>.
      *

@@ -48,6 +48,19 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JComponent.setDefaultLocale(Locale.US);
     }
 
+    /**
+     * test new (convenience) api on JXMonthView
+     *
+     */
+    public void testMonthViewGetSelected() {
+        JXMonthView monthView = new JXMonthView();
+        Date selected = monthView.getSelectedDate();
+        assertNull(selected);
+        Date today = cleanupDate(cal);
+        monthView.setSelectionInterval(today, today);
+        assertEquals("same day", today, monthView.getSelectedDate());
+    }
+
     public void teardown() {
         JComponent.setDefaultLocale(componentLocale);
     }
