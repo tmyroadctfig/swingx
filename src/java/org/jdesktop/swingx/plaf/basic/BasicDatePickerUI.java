@@ -35,6 +35,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Date;
 import java.util.SortedSet;
+import java.util.logging.Logger;
+
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.Icon;
@@ -51,6 +53,7 @@ import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.UIResource;
 import javax.swing.text.View;
+
 import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.JXDatePickerFormatter;
 import org.jdesktop.swingx.calendar.JXMonthView;
@@ -60,6 +63,9 @@ import org.jdesktop.swingx.plaf.DatePickerUI;
  * @author Joshua Outwater
  */
 public class BasicDatePickerUI extends DatePickerUI {
+    private static final Logger LOG = Logger.getLogger(BasicDatePickerUI.class
+            .getName());
+    
     protected JXDatePicker datePicker;
     private JButton popupButton;
     private BasicDatePickerPopup popup;
@@ -100,6 +106,7 @@ public class BasicDatePickerUI extends DatePickerUI {
         }
         editor = datePicker.getEditor();
         datePicker.add(editor);
+        // JW: shouldn't all listener reg be done in installListeners() ?
         editor.addPropertyChangeListener(getHandler());
 
         popupButton = createPopupButton();
@@ -117,6 +124,7 @@ public class BasicDatePickerUI extends DatePickerUI {
     protected void uninstallComponents() {
         JFormattedTextField editor = datePicker.getEditor();
         if (editor != null) {
+            // JW: shouldn't all listener dereg be done in uninstallListeners() ?
             editor.removePropertyChangeListener(getHandler());
             datePicker.remove(editor);
         }
@@ -348,7 +356,7 @@ public class BasicDatePickerUI extends DatePickerUI {
                 return;
             }
 
-            if (!datePicker.isEditable()) {
+            if (datePicker.isEditable()) {
                 JFormattedTextField editor = datePicker.getEditor();
                 if (editor.isEditValid()) {
                     //noinspection EmptyCatchBlock
