@@ -62,6 +62,9 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         }
     }
 
+
+    private Calendar calendar;
+
     /**
      * Issue #235-swingx: action events
      * 
@@ -84,6 +87,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
      */
     public void interactiveActionEvent() {
         JXDatePicker picker = new JXDatePicker();
+        picker.setDate(null);
         JTextField simpleField = new JTextField("simple field");
         JFormattedTextField textField = new JFormattedTextField(DateFormat.getDateInstance());
         textField.setValue(new Date());
@@ -117,12 +121,15 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     /**
      * Issue #99-swingx: null date and opening popup forces selection.
      * Status? Looks fixed..
-     *
+     * 
+     * Sizing issue if init with null date
      */
     public void interactiveNullDate() {
         JXDatePicker picker = new JXDatePicker();
         picker.setDate(null);
-        showInFrame(picker, "null date");
+        JPanel panel = new JPanel();
+        panel.add(picker);
+        showInFrame(panel, "null date");
     }
  
     public void interactiveInitialDate() {
@@ -140,6 +147,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         datePicker.setMonthView(calend);
         showInFrame(datePicker, "null date");
     }
+    
 //-------------------- unit tests
     
     /**
@@ -178,7 +186,6 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         picker.setMonthView(monthView);
 //        fail("need to clarify how to synch picker/monthView selection on setMonthView");
         // okay, seems to be that the monthView rules 
-        // beware the monthview initial selection bug
         assertEquals(selectedDate, picker.getDate());
     }
     
@@ -199,22 +206,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         monthView.setSelectionInterval(other, other);
         picker.setMonthView(monthView);
         // okay, seems to be that the monthView rules 
-        // beware the monthview initial selection bug
         assertEquals("", other, picker.getDate());
-    }
-    
-    /**
-     * Issue ??-swingx: monthView does not take initial date?
-     *
-     * Okay ... looks more like a confusing (me!) doc: the date
-     * in the constructor is not the selection, but the date
-     * to use for the first display. Hmm ...
-     */
-    public void testMonthViewInitialSelection() {
-        JXMonthView monthView = new JXMonthView(new GregorianCalendar(2007, 6, 28).getTimeInMillis());
-        SortedSet<Date> selection = monthView.getSelection();
-        Date other = selection.isEmpty() ? null : selection.first();
-        assertNotNull(other);
     }
     
     /**
@@ -271,12 +263,50 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         box.setEditor(editor);
         assertEquals(value, box.getEditor().getItem());
     }
+
+    /**
+     * NYI: respect unselectables - 
+     *
+     */
+    public void testMonthViewUnselectableDates() {
+        JXMonthView monthView = new JXMonthView();
+        Date today = calendar.getTime();
+        long[] unselectableDates = new long[]{today.getTime()};
+        monthView.setUnselectableDates(unselectableDates);
+        SortedSet<Date> unselectables = monthView.getSelectionModel().getUnselectableDates();
+        // paranoid - use the date as returned from the model
+        // to be sure it's "cleaned"
+        monthView.setSelectionInterval(unselectables.first(), unselectables.first());
+        assertEquals("selection must be empty", 0, monthView.getSelection().size());
+    }
     
-//    @Override
-//    protected void setUp() throws Exception {
-//        defaultToSystemLF = true;
-//        setSystemLF(defaultToSystemLF);
-//    }
-//    
+    /**
+    *
+    * Okay ... looks more like a confusing (me!) doc: the date
+    * in the constructor is not the selection, but the date
+    * to use for the first display. Hmm ...
+    */
+   public void testMonthViewInitialSelection() {
+       JXMonthView monthView = new JXMonthView(new GregorianCalendar(2007, 6, 28).getTimeInMillis());
+       SortedSet<Date> selection = monthView.getSelection();
+       Date other = selection.isEmpty() ? null : selection.first();
+       assertNotNull(other);
+   }
+
+
+   private Date cleanupDate(Calendar cal) {
+       cal.set(Calendar.HOUR_OF_DAY, 0);
+       cal.set(Calendar.MINUTE, 0);
+       cal.set(Calendar.SECOND, 0);
+       cal.set(Calendar.MILLISECOND, 0);
+       return cal.getTime();
+   }
+
+
+    @Override
+    protected void setUp() throws Exception {
+        calendar = Calendar.getInstance();
+    }
+    
     
 }
