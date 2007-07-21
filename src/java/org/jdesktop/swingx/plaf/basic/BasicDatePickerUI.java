@@ -355,8 +355,12 @@ public class BasicDatePickerUI extends DatePickerUI {
             if (!datePicker.isEnabled()) {
                 return;
             }
-
-            if (datePicker.isEditable()) {
+            // JW: most probably the intention was to commit
+            // if the editor isEditable
+//            if (datePicker.isEditable()) {
+            // reverted to old behaviour (not commit on open) 
+            // until state transitions are defined
+              if (!datePicker.isEditable()) {
                 JFormattedTextField editor = datePicker.getEditor();
                 if (editor.isEditValid()) {
                     //noinspection EmptyCatchBlock
