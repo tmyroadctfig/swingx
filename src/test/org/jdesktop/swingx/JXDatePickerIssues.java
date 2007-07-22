@@ -37,6 +37,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ComboBoxEditor;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -69,6 +70,21 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 
 
     private Calendar calendar;
+
+    /**
+     * compare JFormattedTextField and JXDatePicker pref.
+     * date is slightly cut. Looks like an issue 
+     * of the formattedTextField.
+     */
+    public void interactivePrefSize() {
+        JXDatePicker picker = new JXDatePicker();
+        JFormattedTextField field = new JFormattedTextField(new JXDatePickerFormatter());
+        field.setValue(picker.getDate());
+        JComponent panel = new JPanel();
+        panel.add(picker);
+        panel.add(field);
+        showInFrame(panel, "compare pref width");
+    }
 
     /**
      * visual testing of selection constraints: upper/lower bounds.
