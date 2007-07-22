@@ -81,46 +81,51 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
         if (startDate.after(endDate)) {
             return;
         }
-
+        boolean added = false;
         switch (selectionMode) {
             case SINGLE_SELECTION:
                 clearSelectionImpl();
-                selectedDates.add(startDate);
+                added = addSelectionImpl(startDate, startDate);
                 break;
             case SINGLE_INTERVAL_SELECTION:
                 clearSelectionImpl();
-                addSelectionImpl(startDate, endDate);
+                added = addSelectionImpl(startDate, endDate);
                 break;
             case MULTIPLE_INTERVAL_SELECTION:
-                addSelectionImpl(startDate, endDate);
+                added = addSelectionImpl(startDate, endDate);
                 break;
             default:
                 break;
         }
-        fireValueChanged(EventType.DATES_ADDED);
+        if (added) {
+            fireValueChanged(EventType.DATES_ADDED);
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     public void setSelectionInterval(final Date startDate, final Date endDate) {
+        boolean added = false;
         switch (selectionMode) {
             case SINGLE_SELECTION:
                 clearSelectionImpl();
-                selectedDates.add(startDate);
+                added = addSelectionImpl(startDate, startDate);
                 break;
             case SINGLE_INTERVAL_SELECTION:
                 clearSelectionImpl();
-                addSelectionImpl(startDate, endDate);
+                added = addSelectionImpl(startDate, endDate);
                 break;
             case MULTIPLE_INTERVAL_SELECTION:
                 clearSelectionImpl();
-                addSelectionImpl(startDate, endDate);
+                added =addSelectionImpl(startDate, endDate);
                 break;
             default:
                 break;
         }
-        fireValueChanged(EventType.DATES_SET);
+        if (added) {
+            fireValueChanged(EventType.DATES_SET);
+        }
     }
 
     /**
@@ -288,13 +293,18 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
         }
     }
 
-    private void addSelectionImpl(final Date startDate, final Date endDate) {
+    private boolean addSelectionImpl(final Date startDate, final Date endDate) {
+        boolean hasAdded = false;
         cal.setTime(startDate);
         Date date = cal.getTime();
         while (date.before(endDate) || date.equals(endDate)) {
-            selectedDates.add(date);
+            if (!isUnselectableDate(date)) {
+                hasAdded = true;
+                selectedDates.add(date);
+            }
             cal.add(Calendar.DATE, 1);
             date = cal.getTime();
         }
+        return hasAdded;
     }
 }

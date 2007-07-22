@@ -33,15 +33,20 @@ import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ComboBoxEditor;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
 
 import org.jdesktop.swingx.calendar.JXMonthView;
 import org.jdesktop.test.ActionReport;
+import org.jdesktop.test.PropertyChangeReport;
+import org.jdesktop.test.TestUtils;
 
 /**
  * Known issues of <code>JXDatePicker</code>.
@@ -67,15 +72,15 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     private Calendar calendar;
 
     /**
-     * NYI: visual testing of bounds.
+     * visual testing of bounds.
      *
      */
     public void interactiveBounds() {
         JXDatePicker picker = new JXDatePicker();
-        calendar.add(Calendar.MONTH, 2);
-        cleanupDate(calendar);
+        calendar.add(Calendar.DAY_OF_MONTH, 10);
+        getCleanedDate(calendar);
         picker.getMonthView().getSelectionModel().setUpperBound(calendar.getTime());
-        calendar.add(Calendar.MONTH, - 4);
+        calendar.add(Calendar.DAY_OF_MONTH, - 20);
         picker.getMonthView().getSelectionModel().setLowerBound(calendar.getTime());
         showInFrame(picker, "bounds");
     }
@@ -83,7 +88,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     /**
      * Issue #235-swingx: action events
      * 
-     * Compare textfield, formatted and picker.
+     * Compare textfield, formatted, picker, combo after keyboard.
      * - simple field fires on enter always
      * - formatted (and picker) fire on enter if value had been edited
      *
@@ -101,8 +106,9 @@ public class JXDatePickerIssues extends InteractiveTestCase {
      * 
      */
     public void interactiveActionEvent() {
+        ListSelectionModel model;
         JXDatePicker picker = new JXDatePicker();
-        picker.setDate(null);
+//        picker.setDate(null);
         JTextField simpleField = new JTextField("simple field");
         JFormattedTextField textField = new JFormattedTextField(DateFormat.getDateInstance());
         textField.setValue(new Date());
@@ -128,10 +134,67 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         panel.add(picker);
         panel.add(box);
         
-        JXFrame frame = showInFrame(panel, "trace action events");
+        JXFrame frame = showInFrame(panel, "trace action events: keyboard");
         // JXRootPane eats esc 
         frame.getRootPaneExt().getActionMap().remove("esc-action");
     }
+
+    /**
+     * Issue #235-swingx: action events
+     * 
+     * Compare textfield, formatted, picker and combo: programatic change.
+     * - only picker and combo fire
+     * 
+     */
+    public void interactiveActionEventSetValue() {
+        final JXDatePicker picker = new JXDatePicker();
+//        picker.setDate(null);
+        final JTextField simpleField = new JTextField("simple field");
+        final JFormattedTextField textField = new JFormattedTextField(DateFormat.getDateInstance());
+        textField.setValue(new Date());
+        final JComboBox box = new JComboBox(new Object[] {"one", "two", "three"});
+        box.setEditable(true);
+        
+        ActionListener l = new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("got action from: " + e.getSource().getClass().getName() + 
+                        "\n" + e);
+            }
+            
+        };
+        simpleField.addActionListener(l);
+        textField.addActionListener(l);
+        picker.addActionListener(l);
+        picker.getMonthView().addActionListener(l);
+        box.addActionListener(l);
+        Action action = new AbstractAction("set new value") {
+            int dayToAdd = 1;
+            public void actionPerformed(ActionEvent e) {
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.DAY_OF_MONTH, dayToAdd++);
+                Date date = cal.getTime();
+                String text = DateFormat.getDateInstance().format(date);
+                simpleField.setText(text);
+                textField.setValue(date);
+                picker.setDate(date);
+                box.setSelectedItem(text);
+            }
+            
+        };
+        
+        JPanel panel = new JPanel();
+        panel.add(simpleField);
+        panel.add(textField);
+        panel.add(picker);
+        panel.add(box);
+        
+        JXFrame frame = showInFrame(panel, "trace action events: programmatic change");
+        // JXRootPane eats esc 
+        frame.getRootPaneExt().getActionMap().remove("esc-action");
+        addAction(frame, action);
+    }
+
 
     /**
      * Issue #99-swingx: null date and opening popup forces selection.
@@ -147,12 +210,15 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         showInFrame(panel, "null date");
     }
  
+    /**
+     * The initial date in the monthview is the dayToShow and it is
+     * not selected.
+     *
+     */
     public void interactiveInitialDate() {
         long todaysDate = (new GregorianCalendar(2007, 6, 28)).getTimeInMillis();
         final JXDatePicker datePicker = new JXDatePicker();
         JXMonthView calend = new JXMonthView(todaysDate);
-
-
         calend.setTraversable(true);
         calend.setDayForeground(1, Color.RED);
         calend.setDayForeground(7, Color.RED);
@@ -166,7 +232,58 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 //-------------------- unit tests
     
     /**
-     * Issue ??-swingx: timezone of formats and picker must be synched.
+     * Issue ??-swingx: picker has cleaned date.
+     * 
+     * Need to clarify if that's the intended behaviour. 
+     * It is tested against the cleaned - but not documented.
+     */
+    public void testSetDate() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.setDate(null);
+        Date date = new Date();
+        picker.setDate(date);
+        assertEquals(date, picker.getDate());
+    }
+    
+    /**
+     *  clarify: want to fire property change?
+     */
+    public void testSetDateProperty() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.setDate(null);
+        Date date = getCleanedToday();
+        PropertyChangeReport report = new PropertyChangeReport();
+        picker.addPropertyChangeListener(report);
+        picker.setDate(date);
+        TestUtils.assertPropertyChangeEvent(report, "date", null, date);
+    }
+    
+    /**
+     * Issue ??-swingX: date must be synched in all parts.
+     * here: initial
+     */
+    public void testSynchDateInitial() {
+        JXDatePicker picker = new JXDatePicker();
+        // sanity
+        assertNotNull(picker.getDate());
+        assertEquals(picker.getDate(), picker.getEditor().getValue());
+    } 
+
+    /**
+     * Issue ??-swingX: date must be synched in all parts.
+     * here: modified
+     */
+    public void testSynchDateModified() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.setDate(null);
+        Date date = new Date();
+        picker.setDate(date);
+        assertEquals(picker.getDate(), picker.getEditor().getValue());
+    } 
+
+    
+    /**
+     * Issue #554-swingx: timezone of formats and picker must be synched.
      */
     public void testTimeZoneInitialSynched() {
         JXDatePicker picker = new JXDatePicker();
@@ -197,6 +314,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
             assertEquals("timezone must be synched", picker.getTimeZone(), format.getTimeZone());
         }
     }
+    
     /**
      * sanity: when does the picker fire an action event?
      * @throws ParseException
@@ -340,8 +458,20 @@ public class JXDatePickerIssues extends InteractiveTestCase {
        assertNotNull(other);
    }
 
-
-   private Date cleanupDate(Calendar cal) {
+   /**
+    * 
+    * @return the current date with all time elements set to 0
+    */
+   private Date getCleanedToday() {
+       return getCleanedDate(calendar);
+   }
+   
+   /**
+    * 
+    * @param cal the calendar to clean
+    * @return the calendar's date with all time elements set to 0
+    */
+   private Date getCleanedDate(Calendar cal) {
        cal.set(Calendar.HOUR_OF_DAY, 0);
        cal.set(Calendar.MINUTE, 0);
        cal.set(Calendar.SECOND, 0);
