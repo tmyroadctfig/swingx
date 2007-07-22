@@ -63,6 +63,7 @@ import org.jdesktop.swingx.plaf.DatePickerUI;
  * @author Joshua Outwater
  */
 public class BasicDatePickerUI extends DatePickerUI {
+    @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(BasicDatePickerUI.class
             .getName());
     
@@ -254,7 +255,7 @@ public class BasicDatePickerUI extends DatePickerUI {
      */
     @Override
     public Dimension getPreferredSize(JComponent c) {
-        Dimension dim = datePicker.getEditor().getPreferredSize();
+        Dimension dim = getEditorPreferredSize();
         if (popupButton != null) {
             dim.width += popupButton.getPreferredSize().width;
         }
@@ -262,6 +263,28 @@ public class BasicDatePickerUI extends DatePickerUI {
         dim.width += insets.left + insets.right;
         dim.height += insets.top + insets.bottom;
         return (Dimension)dim.clone();
+    }
+
+    /**
+     * Returns a preferred size for the editor. If the selected date
+     * is null, returns a reasonable minimal width. <p>
+     * 
+     * PENDING: how to find the "reasonable" width is open to discussion.
+     * This implementation creates another datePicker, feeds it with 
+     * the formats and asks its prefWidth.
+     * 
+     * @return the editor's preferred size
+     */
+    private Dimension getEditorPreferredSize() {
+        Dimension dim = datePicker.getEditor().getPreferredSize();
+        if (datePicker.getDate() == null) {
+            // the editor tends to collapsing for empty values
+            // JW: better do this in a custom editor?
+            JXDatePicker picker = new JXDatePicker();
+            picker.setFormats(datePicker.getFormats());
+            dim.width = picker.getEditor().getPreferredSize().width;
+        }
+        return dim;
     }
 
     @Override

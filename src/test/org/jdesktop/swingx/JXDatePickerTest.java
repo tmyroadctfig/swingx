@@ -20,6 +20,7 @@ package org.jdesktop.swingx;
 
 import junit.framework.TestCase;
 
+import java.awt.Dimension;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -40,6 +41,21 @@ public class JXDatePickerTest extends TestCase {
     public void teardown() {
     }
 
+    /**
+     * PrefSize should be independent of empty/filled picker. 
+     * If not, the initial size might appear kind of collapsed.
+     *
+     */
+    public void testPrefSizeEmptyEditor() {
+        JXDatePicker picker = new JXDatePicker();
+        // sanity 
+        assertNotNull(picker.getDate());
+        Dimension filled = picker.getPreferredSize();
+        picker.setDate(null);
+        Dimension empty = picker.getPreferredSize();
+        assertEquals("pref width must be same for empty/filled", filled.width, empty.width);
+    }
+    
     public void testDefaultConstructor() {
         JXDatePicker datePicker = new JXDatePicker();
         cal.setTimeInMillis(System.currentTimeMillis());

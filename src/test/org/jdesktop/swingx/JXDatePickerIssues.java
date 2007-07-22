@@ -40,7 +40,6 @@ import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
 
 import org.jdesktop.swingx.calendar.JXMonthView;
@@ -57,7 +56,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXDatePickerIssues.class
             .getName());
     public static void main(String[] args) {
-        setSystemLF(true);
+//        setSystemLF(true);
         JXDatePickerIssues  test = new JXDatePickerIssues();
         try {
             test.runInteractiveTests();
@@ -72,7 +71,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     private Calendar calendar;
 
     /**
-     * visual testing of bounds.
+     * visual testing of selection constraints: upper/lower bounds.
      *
      */
     public void interactiveBounds() {
@@ -106,7 +105,6 @@ public class JXDatePickerIssues extends InteractiveTestCase {
      * 
      */
     public void interactiveActionEvent() {
-        ListSelectionModel model;
         JXDatePicker picker = new JXDatePicker();
 //        picker.setDate(null);
         JTextField simpleField = new JTextField("simple field");
