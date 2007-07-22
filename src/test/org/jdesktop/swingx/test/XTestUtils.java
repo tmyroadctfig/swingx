@@ -24,6 +24,8 @@ package org.jdesktop.swingx.test;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
@@ -73,4 +75,38 @@ public class XTestUtils {
         }
         return null;
     }
+    
+    /**
+     * 
+     * @param days
+     * @return the current day offset by days with all time elements 
+     *   set to 0
+     */
+    public static Date getCleanedToday(int days) {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DAY_OF_MONTH, days);
+        return cal.getTime();
+    }
+    /**
+     * 
+     * @return the current date with all time elements set to 0
+     */
+    public static Date getCleanedToday() {
+        return getCleanedDate(Calendar.getInstance());
+    }
+    
+    /**
+     * 
+     * @param cal the calendar to clean
+     * @return the calendar's date with all time elements set to 0
+     */
+    public static Date getCleanedDate(Calendar cal) {
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+    }
+
+
 }

@@ -25,6 +25,9 @@ import java.util.TreeSet;
 
 import junit.framework.TestCase;
 
+import org.jdesktop.swingx.test.DateSelectionReport;
+import org.jdesktop.swingx.test.XTestUtils;
+
 /**
  * Tests for the DefaultDateSelectionModel
  */
@@ -40,6 +43,114 @@ public class DefaultDateSelectionModelTest extends TestCase {
     public void tearDown() {
 
     }
+
+    /**
+     * respect both bounds - 
+     *
+     * Both bounds same --> bound allowed.
+     */
+    public void testBothBoundsSame() {
+        Date today = XTestUtils.getCleanedToday();
+        model.setLowerBound(today);
+        model.setUpperBound(today);
+        model.setSelectionInterval(today, today);
+        assertEquals("selected bounds", today, 
+                model.getSelection().first());
+    }
+
+    /**
+     * respect both bounds - 
+     *
+     * Both bounds same --> bound allowed.
+     */
+    public void testBothBoundsOverlap() {
+        Date today = XTestUtils.getCleanedToday();
+        model.setLowerBound(today);
+        Date yesterday = XTestUtils.getCleanedToday(-1);
+        model.setUpperBound(yesterday);
+        DateSelectionReport report = new DateSelectionReport();
+        model.addDateSelectionListener(report);
+        model.setSelectionInterval(today, today);
+        assertEquals("selection must be empty", 0, model.getSelection().size());
+        assertEquals("no event fired", 0, report.getEventCount());
+    }
+    
+   /**
+     *  respect lower bound - the day before is
+     *  an invalid selection.
+     *
+     */
+    public void testLowerBoundPast() {
+        Date today = XTestUtils.getCleanedToday();
+        model.setLowerBound(today);
+        Date yesterday = XTestUtils.getCleanedToday(-1);
+        DateSelectionReport report = new DateSelectionReport();
+        model.addDateSelectionListener(report);
+        model.setSelectionInterval(yesterday, yesterday);
+        assertEquals("selection must be empty", 0, model.getSelection().size());
+        assertEquals("no event fired", 0, report.getEventCount());
+    }
+    
+    /**
+     *  respect lower bound - the bound itself 
+     *  a valid selection.
+     *
+     */
+    public void testLowerBound() {
+        Date today = XTestUtils.getCleanedToday();
+        model.setLowerBound(today);
+        // the bound itself is allowed
+        model.setSelectionInterval(today, today);
+        assertEquals("selected upper bound", model.getLowerBound(), 
+                model.getSelection().first());
+    }
+    /**
+     *  respect upper bound - the day after is
+     *  an invalid selection.
+     *
+     */
+    public void testUpperBoundFuture() {
+        Date today = XTestUtils.getCleanedToday();
+        model.setUpperBound(today);
+        Date tomorrow = XTestUtils.getCleanedToday(1);
+        DateSelectionReport report = new DateSelectionReport();
+        model.addDateSelectionListener(report);
+        model.setSelectionInterval(tomorrow, tomorrow);
+        assertEquals("selection must be empty", 0, model.getSelection().size());
+        assertEquals("no event fired", 0, report.getEventCount());
+    }
+    
+    /**
+     *  respect upper bound - the bound itself 
+     *  a valid selection.
+     *
+     */
+    public void testUpperBound() {
+        Date today = XTestUtils.getCleanedToday();
+        model.setUpperBound(today);
+        // the bound itself is allowed
+        model.setSelectionInterval(today, today);
+        assertEquals("selected upper bound", model.getUpperBound(), 
+                model.getSelection().first());
+    }
+    
+    /**
+     * NYI: respect unselectables on set/addSelection
+     * first set the unselectables then set the selection to an unselectable.
+     * NOTE: the other way round - adjust the selection on setUnselectable
+     *   is implemented.
+     */
+    public void testUnselectableDates() {
+        Date today = XTestUtils.getCleanedToday();
+        SortedSet<Date> unselectableDates = new TreeSet<Date>();
+        unselectableDates.add(today);
+        model.setUnselectableDates(unselectableDates);
+        // sanity: 
+        assertTrue(model.isUnselectableDate(today));
+        model.setSelectionInterval(today, today);
+        assertEquals("selection must be empty", 0, model.getSelection().size());
+    }
+    
 
     public void testSingleSelection() {
         model.setSelectionMode(DateSelectionModel.SelectionMode.SINGLE_SELECTION);
@@ -133,4 +244,6 @@ public class DefaultDateSelectionModelTest extends TestCase {
         SortedSet<Date> result = model.getUnselectableDates();
         assertTrue(unselectableDates.equals(result));
     }
+    
+
 }
