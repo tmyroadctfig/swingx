@@ -29,6 +29,7 @@ import java.util.GregorianCalendar;
 import java.util.SortedSet;
 import java.util.logging.Logger;
 
+import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
@@ -37,7 +38,9 @@ import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.calendar.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionEvent;
+import org.jdesktop.swingx.plaf.basic.BasicMonthViewUI;
 import org.jdesktop.swingx.test.XTestUtils;
+import org.jdesktop.test.ActionReport;
 
 /**
  * Test to expose known issues with JXMonthView.
@@ -51,8 +54,8 @@ public class JXMonthViewIssues extends InteractiveTestCase {
 //      setSystemLF(true);
       JXMonthViewIssues  test = new JXMonthViewIssues();
       try {
-//          test.runInteractiveTests();
-        test.runInteractiveTests(".*Simple.*");
+          test.runInteractiveTests();
+//        test.runInteractiveTests(".*Simple.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -61,7 +64,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
 
     public void interactiveSimple() {
         JXMonthView month = new JXMonthView();
-        showInFrame(month, "simple");
+        showInFrame(month, "default - for debugging only");
     }
     /**
      * Issue ??-swingx: multiple selection with keyboard not working
@@ -88,7 +91,15 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         
     }
     /**
-     * Issue
+     * Issue #??-swingx: esc/enter does not always fire actionEvent.
+     * 
+     * To reproduce, by keyboard: 
+     * select - enter - enter: only the first fires
+     * select - enter - esc: esc does not fire
+     * 
+     * or: select by mouse - esc: esc does not fire
+     * or: select by mouse - enter: enter does not fire
+     * 
      * plus: 
      * trying to understand standalone MonthView events.
      * first is single selection, second is single interval, 
@@ -139,6 +150,44 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     
 //----------------------
     
+    /**
+     * test fire stopped after accept in monthview.
+     * 
+     *
+     */
+    public void testFireOnKeyboardAccept()  {
+        JXMonthView monthView = new JXMonthView();
+        Date date = new Date();
+        monthView.setSelectionInterval(date, date);
+        ActionReport report = new ActionReport();
+        monthView.addActionListener(report);
+        // innards ...
+        ((BasicMonthViewUI) monthView.getUI()).setUsingKeyboard(true);
+        Action accept = monthView.getActionMap().get("acceptSelection"); 
+        accept.actionPerformed(null);
+        assertEquals(1, report.getEventCount());
+    }
+
+    /**
+     * test fire stopped after accept in monthview.
+     * 
+     *
+     */
+    public void testFireOnKeyboardCancel()  {
+        JXMonthView monthView = new JXMonthView();
+        Date date = new Date();
+        monthView.setSelectionInterval(date, date);
+        ActionReport report = new ActionReport();
+        monthView.addActionListener(report);
+        // innards ...
+        ((BasicMonthViewUI) monthView.getUI()).setUsingKeyboard(true);
+        Action accept = monthView.getActionMap().get("cancelSelection");
+        // blows - internal state assumptions wrong!
+        accept.actionPerformed(null);
+        assertEquals(1, report.getEventCount());
+    }
+
+
     /**
     *
     * Okay ... looks more like a confusing (me!) doc: the date
