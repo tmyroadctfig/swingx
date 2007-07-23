@@ -85,7 +85,7 @@ public class XTestUtils {
     public static Date getCleanedToday(int days) {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_MONTH, days);
-        return cal.getTime();
+        return getCleanedDate(cal);
     }
     /**
      * 

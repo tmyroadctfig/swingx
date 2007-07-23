@@ -23,6 +23,7 @@ package org.jdesktop.swingx.calendar;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.SortedSet;
@@ -36,6 +37,7 @@ import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.calendar.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionEvent;
+import org.jdesktop.swingx.test.XTestUtils;
 
 /**
  * Test to expose known issues with JXMonthView.
@@ -50,13 +52,17 @@ public class JXMonthViewIssues extends InteractiveTestCase {
       JXMonthViewIssues  test = new JXMonthViewIssues();
       try {
 //          test.runInteractiveTests();
-        test.runInteractiveTests(".*ViewEvents.*");
+        test.runInteractiveTests(".*Simple.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
 
+    public void interactiveSimple() {
+        JXMonthView month = new JXMonthView();
+        showInFrame(month, "simple");
+    }
     /**
      * Issue ??-swingx: multiple selection with keyboard not working
      * Happens for standalone, okay for monthview in popup.
@@ -146,5 +152,22 @@ public class JXMonthViewIssues extends InteractiveTestCase {
        assertNotNull(other);
    }
 
+   /**
+    * 
+    * no invariant for the monthView's calender
+    * monthViewUI at some places restores to firstDisplayedDay, why?
+    *
+    */
+   public void testCalendar() {
+      JXMonthView monthView = new JXMonthView();
+      assertEquals(1, monthView.getCalendar().get(Calendar.DATE));
+      Date first = new Date(monthView.getFirstDisplayedDate());
+      assertEquals(first, monthView.getCalendar().getTime());
+      Date date = XTestUtils.getCleanedToday(10);
+      monthView.addSelectionInterval(date , date);
+      assertEquals(first, monthView.getCalendar().getTime());
+      monthView.isSelectedDate(new Date().getTime());
+      assertEquals(first, monthView.getCalendar().getTime());
+   }
 
 }

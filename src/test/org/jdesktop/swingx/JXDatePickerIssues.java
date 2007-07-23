@@ -58,7 +58,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         JXDatePickerIssues  test = new JXDatePickerIssues();
         try {
 //            test.runInteractiveTests();
-          test.runInteractiveTests(".*Bound.*");
+          test.runInteractiveTests(".*Event.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -74,6 +74,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
      * of the formattedTextField.
      */
     public void interactivePrefSize() {
+        JXTable t;
         JXDatePicker picker = new JXDatePicker();
         JFormattedTextField field = new JFormattedTextField(new JXDatePickerFormatter());
         field.setValue(picker.getDate());
@@ -297,6 +298,17 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         assertEquals(picker.getDate(), picker.getEditor().getValue());
     } 
 
+    /**
+     * Issue ??-swingX: date must be synched in all parts.
+     * here: editor value must be updated after selection change
+     * in monthView
+     */
+    public void testSynchValueOnSelection()  {
+        JXDatePicker picker = new JXDatePicker();
+        Date date = XTestUtils.getCleanedToday(5);
+        picker.getMonthView().setSelectionInterval(date, date);
+        assertEquals(date, picker.getEditor().getValue());
+    }
     
     
     /**
@@ -320,12 +332,27 @@ public class JXDatePickerIssues extends InteractiveTestCase {
             assertEquals("timezone must be synched", picker.getTimeZone(), format.getTimeZone());
         }
     }
-    
+ 
     /**
      * Characterization: when does the picker fire an action event?
      * @throws ParseException
      */
-    public void testDatePickerFire() throws ParseException {
+    public void testDatePickerFireOnSelection() throws ParseException {
+        JXDatePicker picker = new JXDatePicker();
+        ActionReport report = new ActionReport();
+        picker.addActionListener(report);
+        Date date = XTestUtils.getCleanedToday(5);
+        picker.getMonthView().setSelectionInterval(date, date);
+        assertEquals(date, picker.getEditor().getValue());
+        assertEquals(1, report.getEventCount());
+        fail("need to define when action events are fired");
+    }
+
+    /**
+     * Characterization: when does the picker fire an action event?
+     * @throws ParseException
+     */
+    public void testDatePickerFireOnSetDate() throws ParseException {
         JXDatePicker picker = new JXDatePicker();
         ActionReport report = new ActionReport();
         picker.addActionListener(report);
