@@ -178,7 +178,7 @@ public class JTableIssues extends InteractiveTestCase {
             }
 
         };
-        JXFrame frame = wrapWithScrollingInFrame(table, "auto-lead");
+        JXFrame frame = wrapWithScrollingInFrame(table, "auto-lead - force in table subclass");
         Action toggleAction = new AbstractAction("Toggle TableModel") {
 
             public void actionPerformed(ActionEvent e) {
@@ -384,10 +384,10 @@ public class JTableIssues extends InteractiveTestCase {
         frame.setVisible(true);
         // JW: need to explicitly set _both_ anchor and lead to >= 0
         // need to set anchor first
-        table.getSelectionModel().setAnchorSelectionIndex(0);
-        table.getSelectionModel().setLeadSelectionIndex(0);
-        table.getColumnModel().getSelectionModel().setAnchorSelectionIndex(0);
-        table.getColumnModel().getSelectionModel().setLeadSelectionIndex(0);
+//        table.getSelectionModel().setAnchorSelectionIndex(0);
+//        table.getSelectionModel().setLeadSelectionIndex(0);
+//        table.getColumnModel().getSelectionModel().setAnchorSelectionIndex(0);
+//        table.getColumnModel().getSelectionModel().setLeadSelectionIndex(0);
 
         table.requestFocus();
         SwingUtilities.invokeLater(new Runnable() {
