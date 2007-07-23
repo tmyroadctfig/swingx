@@ -1,4 +1,6 @@
 /**
+ * $Id$
+ * 
  * Copyright 2006 Sun Microsystems, Inc., 4150 Network Circle,
  * Santa Clara, California 95054, U.S.A. All rights reserved.
  *
@@ -58,10 +60,14 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testCleanupCopyDate() {
         JXMonthView monthView = new JXMonthView();
-        Date today = new Date();
+        if (cal.get(Calendar.HOUR_OF_DAY) < 5) { 
+            // sanity: has time elements
+            cal.set(Calendar.HOUR_OF_DAY, 5);
+        }
+        Date today = cal.getTime();
         Date copy = new Date(today.getTime());
         monthView.setSelectionInterval(today, today);
-        assertEquals(copy, today);
+        assertEquals("the date used for selection must be unchanged", copy, today);
     }
 
     /**

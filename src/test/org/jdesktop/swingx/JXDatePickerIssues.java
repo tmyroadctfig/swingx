@@ -21,15 +21,12 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
@@ -43,7 +40,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
 
-import org.jdesktop.swingx.calendar.JXMonthView;
+import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.ActionReport;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
@@ -60,8 +57,8 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 //        setSystemLF(true);
         JXDatePickerIssues  test = new JXDatePickerIssues();
         try {
-            test.runInteractiveTests();
-//          test.runInteractiveTests(".*Text.*");
+//            test.runInteractiveTests();
+          test.runInteractiveTests(".*ViewEvents.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -93,13 +90,13 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     public void interactiveBounds() {
         JXDatePicker picker = new JXDatePicker();
         calendar.add(Calendar.DAY_OF_MONTH, 10);
-        getCleanedDate(calendar);
+        XTestUtils.getCleanedDate(calendar);
         picker.getMonthView().getSelectionModel().setUpperBound(calendar.getTime());
         calendar.add(Calendar.DAY_OF_MONTH, - 20);
         picker.getMonthView().getSelectionModel().setLowerBound(calendar.getTime());
         showInFrame(picker, "bounds");
     }
-    
+  
     /**
      * Issue #235-swingx: action events
      * 
@@ -224,24 +221,6 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         showInFrame(panel, "null date");
     }
  
-    /**
-     * The initial date in the monthview is the dayToShow and it is
-     * not selected.
-     *
-     */
-    public void interactiveInitialDate() {
-        long todaysDate = (new GregorianCalendar(2007, 6, 28)).getTimeInMillis();
-        final JXDatePicker datePicker = new JXDatePicker();
-        JXMonthView calend = new JXMonthView(todaysDate);
-        calend.setTraversable(true);
-        calend.setDayForeground(1, Color.RED);
-        calend.setDayForeground(7, Color.RED);
-        calend.setDaysOfTheWeekForeground(Color.BLUE);
-        calend.setSelectedBackground(Color.YELLOW);
-        calend.setFirstDayOfWeek(Calendar.MONDAY);
-        datePicker.setMonthView(calend);
-        showInFrame(datePicker, "null date");
-    }
     
 //-------------------- unit tests
     
@@ -265,7 +244,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     public void testSetDateProperty() {
         JXDatePicker picker = new JXDatePicker();
         picker.setDate(null);
-        Date date = getCleanedToday();
+        Date date = XTestUtils.getCleanedToday();
         PropertyChangeReport report = new PropertyChangeReport();
         picker.addPropertyChangeListener(report);
         picker.setDate(date);
@@ -274,18 +253,24 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     
     /**
      * Issue ??-swingX: date must be synched in all parts.
-     * here: initial
+     * here: initial. 
+     * 
+     * Accidentally passing. The issue of cleaned vs. non-cleaned
+     * dates in monthview selection vs. editor is not showing.
      */
     public void testSynchDateInitial() {
         JXDatePicker picker = new JXDatePicker();
         // sanity
         assertNotNull(picker.getDate());
         assertEquals(picker.getDate(), picker.getEditor().getValue());
+        fail("accidentally passing: picker synchs explicitly in constructor");
     } 
+
 
     /**
      * Issue ??-swingX: date must be synched in all parts.
      * here: modified
+     * failing because the monthview "cleans" the date. 
      */
     public void testSynchDateModified() {
         JXDatePicker picker = new JXDatePicker();
@@ -296,16 +281,6 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     } 
 
     
-    /**
-     * Issue #554-swingx: timezone of formats and picker must be synched.
-     */
-    public void testTimeZoneInitialSynched() {
-        JXDatePicker picker = new JXDatePicker();
-        assertNotNull(picker.getTimeZone());
-        for (DateFormat format : picker.getFormats()) {
-            assertEquals("timezone must be synched", picker.getTimeZone(), format.getTimeZone());
-        }
-    }
     
     /**
      * Issue #554-swingx: timezone of formats and picker must be synched.
@@ -330,7 +305,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     }
     
     /**
-     * sanity: when does the picker fire an action event?
+     * Characterization: when does the picker fire an action event?
      * @throws ParseException
      */
     public void testDatePickerFire() throws ParseException {
@@ -340,54 +315,11 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         // fires on setDate
         picker.setDate(null);
         assertEquals(1, report.getEventCount());
+        fail("need to define when action events are fired");
     }
 
 
 
-    /**
-     * Who rules? the picker or the month view?
-     * Neither? - the month view's dateSelectionModel.
-     * 
-     * Here: picker with date, monthView with empty
-     * Setting the monthview resets the 
-     * picker's date to the view's selected - should be documented?
-     *
-     */
-    public void testDatePickerSetMonthViewWithEmptySelection() {
-        JXDatePicker picker = new JXDatePicker();
-        Date date = picker.getDate();
-        // sanity
-        assertNotNull(date);
-        JXMonthView monthView = new JXMonthView();
-        SortedSet<Date> selection = monthView.getSelection();
-        Date selectedDate = selection.isEmpty() ? null : selection.first();
-        assertNull(selectedDate);
-        picker.setMonthView(monthView);
-//        fail("need to clarify how to synch picker/monthView selection on setMonthView");
-        // okay, seems to be that the monthView rules 
-        assertEquals(selectedDate, picker.getDate());
-    }
-    
-    /**
-     * Who rules? the picker or the month view?
-     * Neither? - the month view's dateSelectionModel.
-     * 
-     * Here: set the monthview's selection in constructor
-     *
-     */
-    public void testDatePickerSetMonthViewWithSelection() {
-        JXDatePicker picker = new JXDatePicker();
-        Date date = picker.getDate();
-        // why? null selection is perfectly valid?
-        assertNotNull(date);
-        JXMonthView monthView = new JXMonthView();
-        Date other = new GregorianCalendar(2007, 6, 28).getTime();
-        monthView.setSelectionInterval(other, other);
-        picker.setMonthView(monthView);
-        // okay, seems to be that the monthView rules 
-        assertEquals("", other, picker.getDate());
-    }
-    
     /**
      * Allowed to set a null editor? No (which is reasonable) 
      * - should be documented as of SwingX doc convention.
@@ -409,6 +341,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         Object date = picker.getEditor().getValue();
         picker.updateUI();
         assertEquals(date, picker.getEditor().getValue());
+        fail("need to decide which class should synch the editor value");
     }
 
     /**
@@ -425,6 +358,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         Object value = picker.getEditor().getValue();
         picker.setEditor(new JFormattedTextField(new JXDatePickerFormatter()));
         assertEquals(value, picker.getEditor().getValue());
+        fail("need to decide which class should synch the editor value");
     }
     
     /**
@@ -443,56 +377,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         assertEquals(value, box.getEditor().getItem());
     }
 
-    /**
-     * NYI: respect unselectables - 
-     *
-     */
-    public void testMonthViewUnselectableDates() {
-        JXMonthView monthView = new JXMonthView();
-        Date today = calendar.getTime();
-        long[] unselectableDates = new long[]{today.getTime()};
-        monthView.setUnselectableDates(unselectableDates);
-        SortedSet<Date> unselectables = monthView.getSelectionModel().getUnselectableDates();
-        // paranoid - use the date as returned from the model
-        // to be sure it's "cleaned"
-        monthView.setSelectionInterval(unselectables.first(), unselectables.first());
-        assertEquals("selection must be empty", 0, monthView.getSelection().size());
-    }
     
-    /**
-    *
-    * Okay ... looks more like a confusing (me!) doc: the date
-    * in the constructor is not the selection, but the date
-    * to use for the first display. Hmm ...
-    */
-   public void testMonthViewInitialSelection() {
-       JXMonthView monthView = new JXMonthView(new GregorianCalendar(2007, 6, 28).getTimeInMillis());
-       SortedSet<Date> selection = monthView.getSelection();
-       Date other = selection.isEmpty() ? null : selection.first();
-       assertNotNull(other);
-   }
-
-   /**
-    * 
-    * @return the current date with all time elements set to 0
-    */
-   private Date getCleanedToday() {
-       return getCleanedDate(calendar);
-   }
-   
-   /**
-    * 
-    * @param cal the calendar to clean
-    * @return the calendar's date with all time elements set to 0
-    */
-   private Date getCleanedDate(Calendar cal) {
-       cal.set(Calendar.HOUR_OF_DAY, 0);
-       cal.set(Calendar.MINUTE, 0);
-       cal.set(Calendar.SECOND, 0);
-       cal.set(Calendar.MILLISECOND, 0);
-       return cal.getTime();
-   }
-
 
     @Override
     protected void setUp() throws Exception {
