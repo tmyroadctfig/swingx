@@ -1692,7 +1692,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 if (action >= ACCEPT_SELECTION && action <= CANCEL_SELECTION && isUsingKeyboard()) {
                     if (action == CANCEL_SELECTION) {
                         // Restore the original selection.
-                        if (!originalDateSpan.isEmpty()) {
+                        if ((originalDateSpan != null) && !originalDateSpan.isEmpty()) {
                             monthView.setSelectionInterval(originalDateSpan.first(), originalDateSpan.last());
                         } else {
                             monthView.clearSelection();
