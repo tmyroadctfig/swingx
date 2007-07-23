@@ -95,6 +95,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     protected int firstDisplayedYear;
     protected long lastDisplayedDate;
     protected long today;
+    // JW: why alias? can this be different from the JXMonthView selection?
     protected SortedSet<Date> selection;
     /** Used as the font for flagged days. */
     protected Font derivedFont;
