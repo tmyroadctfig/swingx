@@ -21,10 +21,8 @@
  */
 package org.jdesktop.swingx.calendar;
 
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.SortedSet;
@@ -58,24 +56,6 @@ public class JXMonthViewIssues extends InteractiveTestCase {
           e.printStackTrace();
       }
   }
-    /**
-     * The initial date in the monthview is the dayToShow and it is
-     * not selected.
-     *
-     */
-    public void interactiveInitialDate() {
-        long todaysDate = (new GregorianCalendar(2007, 6, 28)).getTimeInMillis();
-        final JXDatePicker datePicker = new JXDatePicker();
-        JXMonthView calend = new JXMonthView(todaysDate);
-        calend.setTraversable(true);
-        calend.setDayForeground(1, Color.RED);
-        calend.setDayForeground(7, Color.RED);
-        calend.setDaysOfTheWeekForeground(Color.BLUE);
-        calend.setSelectedBackground(Color.YELLOW);
-        calend.setFirstDayOfWeek(Calendar.MONDAY);
-        datePicker.setMonthView(calend);
-        showInFrame(datePicker, "null date");
-    }
 
     /**
      * Issue ??-swingx: multiple selection with keyboard not working

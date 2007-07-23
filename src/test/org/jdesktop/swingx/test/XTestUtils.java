@@ -96,6 +96,7 @@ public class XTestUtils {
     }
     
     /**
+     * Cleans the calendars time elements and returns its date.
      * 
      * @param cal the calendar to clean
      * @return the calendar's date with all time elements set to 0

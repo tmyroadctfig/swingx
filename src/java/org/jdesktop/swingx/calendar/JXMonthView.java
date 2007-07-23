@@ -648,6 +648,34 @@ public class JXMonthView extends JComponent {
     }
 
     /**
+     * Set the upper bound date that is allowed to be selected. <p>
+     * 
+     * <b>All dates are
+     * modified to remove their hour of day, minute, second, and millisecond
+     * before being added to the selection model</b>.
+     * 
+     * @param upperDateBound the upper bound
+     */
+    public void setUpperBound(long upperDateBound) {
+        Date upper = new Date(cleanupDate(upperDateBound));
+        getSelectionModel().setUpperBound(upper);
+    }
+
+    /**
+     * Set the lower bound date that is allowed to be selected. <p>
+     * 
+     * <b>All dates are
+     * modified to remove their hour of day, minute, second, and millisecond
+     * before being added to the selection model</b>.
+     * 
+     * @param lowerDateBound the lower bound
+     */
+    public void setLowerBound(long lowerDateBound) {
+        Date lower = new Date(cleanupDate(lowerDateBound));
+        getSelectionModel().setLowerBound(lower);
+    }
+
+    /**
      * Whether or not to show leading dates for a months displayed by this component.
      *
      * @param value true if leading dates should be displayed, false otherwise.

@@ -58,7 +58,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         JXDatePickerIssues  test = new JXDatePickerIssues();
         try {
 //            test.runInteractiveTests();
-          test.runInteractiveTests(".*ViewEvents.*");
+          test.runInteractiveTests(".*Bound.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -90,10 +90,13 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     public void interactiveBounds() {
         JXDatePicker picker = new JXDatePicker();
         calendar.add(Calendar.DAY_OF_MONTH, 10);
-        XTestUtils.getCleanedDate(calendar);
-        picker.getMonthView().getSelectionModel().setUpperBound(calendar.getTime());
+        // access the model directly requires to "clean" the date
+//        XTestUtils.getCleanedDate(calendar);
+//        picker.getMonthView().getSelectionModel().setUpperBound(calendar.getTime());
+        picker.getMonthView().setUpperBound(calendar.getTimeInMillis());
         calendar.add(Calendar.DAY_OF_MONTH, - 20);
-        picker.getMonthView().getSelectionModel().setLowerBound(calendar.getTime());
+        picker.getMonthView().setLowerBound(calendar.getTimeInMillis());
+//        picker.getMonthView().getSelectionModel().setLowerBound(calendar.getTime());
         showInFrame(picker, "bounds");
     }
   
@@ -225,6 +228,20 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 //-------------------- unit tests
     
     /**
+     * PickerUI listens to editable (meant: datePicker) and resets
+     * the editors property. Accidentally? Even if meant to, it's 
+     * brittle because done during the notification. 
+     */
+    public void testEditableListening() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.getEditor().setEditable(false);
+        assertTrue(picker.isEditable());
+        assertTrue(picker.getMonthView().isEnabled());
+        assertFalse("Do not change the state of the sender during notification processing", 
+                picker.getEditor().isEditable());
+    }
+    
+    /**
      * Issue ??-swingx: picker has cleaned date.
      * 
      * Need to clarify if that's the intended behaviour. 
@@ -331,7 +348,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     }
 
     /**
-     * Issue ??-swingx: editor value must preserve value on LF switch.
+     * Issue #551-swingx: editor value must preserve value on LF switch.
      * This is a side-effect of picker not updating the editor's value
      * on setEditor.
      *
@@ -345,7 +362,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     }
 
     /**
-     * Issue ??-swingx: editor value not updated after setEditor
+     * Issue #551-swingx: editor value not updated after setEditor
      * who should set it? ui-delegate when listening to editor property change?
      * or picker in setEditor?
      * 

@@ -29,6 +29,7 @@ import javax.swing.JComponent;
 
 import org.jdesktop.swingx.DateSelectionListener;
 import org.jdesktop.swingx.DateSelectionModel;
+import org.jdesktop.swingx.test.XTestUtils;
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
 
@@ -54,6 +55,29 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JComponent.setDefaultLocale(componentLocale);
     }
 
+    /**
+     * expose more selection constraint methods in JXMonthView
+     *
+     */
+    public void testUpperBound() {
+        JXMonthView view = new JXMonthView();
+        Date full = cal.getTime();
+        Date cleaned = XTestUtils.getCleanedDate(cal);
+        view.setUpperBound(full.getTime());
+        assertEquals(cleaned, view.getSelectionModel().getUpperBound());
+    }
+    
+    /**
+     * expose more selection constraint methods in JXMonthView
+     *
+     */
+    public void testLowerBound() {
+        JXMonthView view = new JXMonthView();
+        Date full = cal.getTime();
+        Date cleaned = XTestUtils.getCleanedDate(cal);
+        view.setLowerBound(full.getTime());
+        assertEquals(cleaned, view.getSelectionModel().getLowerBound());
+    }
     /**
      * Issue #494-swingx: JXMonthView changed all passed-in dates
      *
