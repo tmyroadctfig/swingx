@@ -343,20 +343,6 @@ public class BasicDatePickerUI extends DatePickerUI {
         return -1;
     }
 
-    /**
-     * Action used to commit the current value in the JFormattedTextField.
-     * This action is used by the keyboard bindings.
-     */
-    private class TogglePopupAction extends AbstractAction {
-        public TogglePopupAction() {
-            super("TogglePopup");
-        }
-
-        public void actionPerformed(ActionEvent ev) {
-            handler.toggleShowPopup();
-        }
-    }
-
     private class DefaultEditor extends JFormattedTextField implements UIResource {
         public DefaultEditor(AbstractFormatter formatter) {
             super(formatter);
@@ -370,8 +356,61 @@ public class BasicDatePickerUI extends DatePickerUI {
      * @param newDate the editor value after the change
      */
     protected void updateDateFromValueChanged(Date oldDate, Date newDate) {
+        if ((newDate != null) && datePicker.getMonthView().isUnselectableDate(newDate.getTime())) {
+            invokeRevertValueChanged(oldDate);
+            return;
+        }
         datePicker.setDate(newDate);
         datePicker.postActionEvent();                
+    }
+
+    /**
+     * PENDING: currently this resets at once - but it's a no-no,
+     * because it happens during notification
+     * 
+     * 
+     * @param oldDate the old date to revert to
+     */
+    private void invokeRevertValueChanged(Date oldDate) {
+        datePicker.getEditor().setValue(oldDate);
+
+    }
+
+    public void toggleShowPopup() {
+        if (popup == null) {
+            popup = new BasicDatePickerPopup();
+            popup.setLightWeightPopupEnabled(datePicker.isLightWeightPopupEnabled());
+        }
+
+        if (!popup.isVisible()) {
+            JXMonthView monthView = datePicker.getMonthView();
+            SortedSet<Date> selection = monthView.getSelection();
+            if (!selection.isEmpty()) {
+                Date date = selection.first();
+                monthView.setSelectionInterval(date, date);
+                monthView.ensureDateVisible(date.getTime());
+            } else {
+                // JW: hmm .. this is interfering with the firstDayToShow property
+                monthView.ensureDateVisible(System.currentTimeMillis());
+            }
+            popup.show(datePicker,
+                    0, datePicker.getHeight());
+        } else {
+            popup.setVisible(false);
+        }
+    }
+    /**
+     * Action used to commit the current value in the JFormattedTextField.
+     * This action is used by the keyboard bindings.
+     */
+    private class TogglePopupAction extends AbstractAction {
+        public TogglePopupAction() {
+            super("TogglePopup");
+        }
+
+        public void actionPerformed(ActionEvent ev) {
+            toggleShowPopup();
+        }
     }
 
 
@@ -400,12 +439,7 @@ public class BasicDatePickerUI extends DatePickerUI {
         public void actionPerformed(ActionEvent ev) {
             String command = ev.getActionCommand();
             if ("MONTH_VIEW".equals(command)) {
-                SortedSet<Date> selection = datePicker.getMonthView().getSelectionModel().getSelection();
-                if (!selection.isEmpty()) {
-                    datePicker.getEditor().setValue(selection.first());
-                } else {
-                    datePicker.getEditor().setValue(null);
-                }
+                datePicker.getEditor().setValue(datePicker.getMonthView().getSelectedDate());
                 setVisible(false);
             }
         }
@@ -482,31 +516,11 @@ public class BasicDatePickerUI extends DatePickerUI {
         public void mouseMoved(MouseEvent ev) {
         }
 
-        public void toggleShowPopup() {
-            if (popup == null) {
-                popup = new BasicDatePickerPopup();
-                popup.setLightWeightPopupEnabled(datePicker.isLightWeightPopupEnabled());
-            }
-
-            if (!popup.isVisible()) {
-                JXMonthView monthView = datePicker.getMonthView();
-                SortedSet<Date> selection = monthView.getSelection();
-                if (!selection.isEmpty()) {
-                    Date date = selection.first();
-                    monthView.setSelectionInterval(date, date);
-                    monthView.ensureDateVisible(date.getTime());
-                } else {
-                    monthView.ensureDateVisible(System.currentTimeMillis());
-                }
-                popup.show(datePicker,
-                        0, datePicker.getHeight());
-            } else {
-                popup.setVisible(false);
-            }
-        }
 
         public void propertyChange(PropertyChangeEvent e) {
             String property = e.getPropertyName();
+            // JW: as per introduction of editorListener here
+            // we are getting only properties from the datePicker.
             if ("enabled".equals(property)) {
                 boolean isEnabled = datePicker.isEnabled();
                 popupButton.setEnabled(isEnabled);
