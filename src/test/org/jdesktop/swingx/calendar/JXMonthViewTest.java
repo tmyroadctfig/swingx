@@ -30,6 +30,9 @@ import javax.swing.JComponent;
 
 import org.jdesktop.swingx.DateSelectionListener;
 import org.jdesktop.swingx.DateSelectionModel;
+import org.jdesktop.swingx.calendar.JXMonthView.SelectionMode;
+import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
+import org.jdesktop.swingx.test.DateSelectionReport;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.ActionReport;
 import org.jmock.Mock;
@@ -55,6 +58,82 @@ public class JXMonthViewTest extends MockObjectTestCase {
 
     public void teardown() {
         JComponent.setDefaultLocale(componentLocale);
+    }
+
+    
+    /**
+     * BasicMonthViewUI: use adjusting api in keyboard actions.
+     * Here: test reset in cancel action.
+     */
+    public void testAdjustingResetOnCancel() {
+        JXMonthView view = new JXMonthView();
+        Action select = view.getActionMap().get("selectNextDay");
+        select.actionPerformed(null);
+        DateSelectionReport report = new DateSelectionReport();
+        view.getSelectionModel().addDateSelectionListener(report);
+        Action cancel = view.getActionMap().get("cancelSelection");
+        cancel.actionPerformed(null);
+        assertFalse("ui keyboard action must have stopped model adjusting", 
+                view.getSelectionModel().isAdjusting());
+        assertEquals(2, report.getEventCount());
+    }
+    /**
+     * BasicMonthViewUI: use adjusting api in keyboard actions.
+     * Here: test reset in accept action.
+     */
+    public void testAdjustingResetOnAccept() {
+        JXMonthView view = new JXMonthView();
+        Action select = view.getActionMap().get("selectNextDay");
+        select.actionPerformed(null);
+        DateSelectionReport report = new DateSelectionReport();
+        view.getSelectionModel().addDateSelectionListener(report);
+        Action cancel = view.getActionMap().get("acceptSelection");
+        cancel.actionPerformed(null);
+        assertFalse("ui keyboard action must have stopped model adjusting", 
+                view.getSelectionModel().isAdjusting());
+        assertEquals(1, report.getEventCount());
+        assertEquals(EventType.ADJUSTING_STOPPED, report.getLastEvent().getEventType());
+    }
+
+    /**
+     * BasicMonthViewUI: use adjusting api in keyboard actions.
+     * Here: test set selection action.
+     */
+    public void testAdjustingSetOnSelect() {
+        JXMonthView view = new JXMonthView();
+        DateSelectionReport report = new DateSelectionReport();
+        view.getSelectionModel().addDateSelectionListener(report);
+        Action select = view.getActionMap().get("selectNextDay");
+        select.actionPerformed(null);
+        assertTrue("ui keyboard action must have started model adjusting", 
+                view.getSelectionModel().isAdjusting());
+        assertEquals(2, report.getEventCount());
+        // assert that the adjusting is fired before the set
+        assertEquals(EventType.DATES_SET, report.getLastEvent().getEventType());
+    }
+ 
+    /**
+     * BasicMonthViewUI: use adjusting api in keyboard actions.
+     * Here: test add selection action.
+     */
+    public void testAdjustingSetOnAdd() {
+        JXMonthView view = new JXMonthView();
+        // otherwise the add action isn't called
+        view.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
+        DateSelectionReport report = new DateSelectionReport();
+        view.getSelectionModel().addDateSelectionListener(report);
+        Action select = view.getActionMap().get("adjustSelectionNextDay");
+        select.actionPerformed(null);
+        assertTrue("ui keyboard action must have started model adjusting", 
+                view.getSelectionModel().isAdjusting());
+        assertEquals(2, report.getEventCount());
+        // assert that the adjusting is fired before the add
+        // only: the type a set instead or the expected added - bug or feature?
+        // assertEquals(EventType.DATES_ADDED, report.getLastEvent().getEventType());
+        // for now we are only interested in the adjusting (must not be the last)
+        // so go for what's actually fired instead of what's expected
+         assertEquals(EventType.DATES_SET, report.getLastEvent().getEventType());
+        
     }
 
     /**

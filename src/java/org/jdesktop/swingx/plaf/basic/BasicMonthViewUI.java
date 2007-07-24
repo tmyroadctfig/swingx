@@ -1372,6 +1372,8 @@ public class BasicMonthViewUI extends MonthViewUI {
                 pivotDate = selected;
             }
 
+            monthView.getSelectionModel().setAdjusting(true);
+            
             if (selectionMode == SelectionMode.MULTIPLE_INTERVAL_SELECTION && e.isControlDown()) {
                 monthView.addSelectionInterval(new Date(startDate), new Date(endDate));
             } else {
@@ -1394,6 +1396,8 @@ public class BasicMonthViewUI extends MonthViewUI {
                 monthView.requestFocusInWindow();
             }
 
+            monthView.getSelectionModel().setAdjusting(false);
+            
             if (armed) {
                 monthView.postActionEvent();
             }
@@ -1698,19 +1702,21 @@ public class BasicMonthViewUI extends MonthViewUI {
                         } else {
                             monthView.clearSelection();
                         }
-                        monthView.postActionEvent();
                     } else {
                         // Accept the keyboard selection.
-                        monthView.postActionEvent();
                     }
+                    monthView.getSelectionModel().setAdjusting(false);
+                    monthView.postActionEvent();
                     setUsingKeyboard(false);
                 } else if (action >= SELECT_PREVIOUS_DAY && action <= SELECT_DAY_NEXT_WEEK) {
                     setUsingKeyboard(true);
+                    monthView.getSelectionModel().setAdjusting(true);
                     pivotDate = -1;
                     traverse(action);
                 } else if (selectionMode == SelectionMode.SINGLE_INTERVAL_SELECTION &&
                         action >= ADJUST_SELECTION_PREVIOUS_DAY && action <= ADJUST_SELECTION_NEXT_WEEK) {
                     setUsingKeyboard(true);
+                    monthView.getSelectionModel().setAdjusting(true);
                     addToSelection(action);
                 }
             }

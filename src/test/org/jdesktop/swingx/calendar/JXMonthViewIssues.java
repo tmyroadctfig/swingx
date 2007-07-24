@@ -23,6 +23,8 @@ package org.jdesktop.swingx.calendar;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -39,9 +41,9 @@ import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.calendar.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionEvent;
-import org.jdesktop.swingx.plaf.basic.BasicMonthViewUI;
+import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
+import org.jdesktop.swingx.test.DateSelectionReport;
 import org.jdesktop.swingx.test.XTestUtils;
-import org.jdesktop.test.ActionReport;
 
 /**
  * Test to expose known issues with JXMonthView.
@@ -67,6 +69,33 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         JXMonthView month = new JXMonthView();
         showInFrame(month, "default - for debugging only");
     }
+
+    /**
+     * Informally testing adjusting property on mouse events.
+     * 
+     * Hmm .. not formally testable without mocks/ui unit tests?
+     *
+     */
+    public void interactiveAdjustingOnMouse() {
+        final JXMonthView month = new JXMonthView();
+        // we rely on being notified after the ui delegate ... brittle.
+        MouseAdapter m = new MouseAdapter() {
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                LOG.info("pressed - expect true " + month.getSelectionModel().isAdjusting());
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                LOG.info("released - expect false" + month.getSelectionModel().isAdjusting());
+            }
+            
+        };
+        month.addMouseListener(m);
+        showInFrame(month, "Mouse and adjusting - state on pressed/released");
+    }
+
     /**
      * Issue ??-swingx: multiple selection with keyboard not working
      * Happens for standalone, okay for monthview in popup.
@@ -156,6 +185,29 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     
 //----------------------
     
+    /**
+     * BasicMonthViewUI: use adjusting api in keyboard actions.
+     * Here: test add selection action.
+     * 
+     * TODO: this fails (unrelated to the adjusting) because the
+     * the selectionn changing event type is DATES_SET instead of 
+     * the expected DATES_ADDED.  What's wrong - expectation or type?
+     */
+    public void testAdjustingSetOnAdd() {
+        JXMonthView view = new JXMonthView();
+        // otherwise the add action isn't called
+        view.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
+        DateSelectionReport report = new DateSelectionReport();
+        view.getSelectionModel().addDateSelectionListener(report);
+        Action select = view.getActionMap().get("adjustSelectionNextDay");
+        select.actionPerformed(null);
+        assertTrue("ui keyboard action must have started model adjusting", 
+                view.getSelectionModel().isAdjusting());
+        assertEquals(2, report.getEventCount());
+        // assert that the adjusting is fired before the add
+        // only: the ui fires a set instead - bug or feature?
+         assertEquals(EventType.DATES_ADDED, report.getLastEvent().getEventType());
+    }
 
     /**
     *
