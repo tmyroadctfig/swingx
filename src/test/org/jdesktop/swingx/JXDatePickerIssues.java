@@ -38,9 +38,7 @@ import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
-import javax.swing.tree.TreeSelectionModel;
 
 import org.jdesktop.swingx.calendar.JXMonthView;
 import org.jdesktop.swingx.calendar.JXMonthView.SelectionMode;
@@ -78,8 +76,8 @@ public class JXDatePickerIssues extends InteractiveTestCase {
      * of the formattedTextField.
      */
     public void interactivePrefSize() {
-        ListSelectionModel l;
-        TreeSelectionModel t;
+//        ListSelectionModel l;
+//        TreeSelectionModel t;
         JXDatePicker picker = new JXDatePicker();
         JFormattedTextField field = new JFormattedTextField(new JXDatePickerFormatter());
         field.setValue(picker.getDate());
@@ -256,7 +254,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
  
     
 //-------------------- unit tests
-    
+
     /**
      * test that ui's is listening to the current selection model.
      * 
@@ -320,31 +318,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     } 
 
 
-    /**
-     * Issue ??-swingX: date must be synched in all parts.
-     * here: modified
-     * failing because the monthview "cleans" the date. 
-     */
-    public void testSynchDateModified() {
-        JXDatePicker picker = new JXDatePicker();
-        picker.setDate(null);
-        Date date = new Date();
-        picker.setDate(date);
-        assertEquals(picker.getDate(), picker.getEditor().getValue());
-    } 
 
-    /**
-     * Issue ??-swingX: date must be synched in all parts.
-     * here: editor value must be updated after selection change
-     * in monthView
-     */
-    public void testSynchValueOnSelection()  {
-        JXDatePicker picker = new JXDatePicker();
-        Date date = XTestUtils.getCleanedToday(5);
-        picker.getMonthView().setSelectionInterval(date, date);
-        assertEquals(date, picker.getEditor().getValue());
-    }
-    
     
     /**
      * Issue #554-swingx: timezone of formats and picker must be synched.

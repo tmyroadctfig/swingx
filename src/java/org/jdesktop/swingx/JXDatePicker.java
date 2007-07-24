@@ -231,18 +231,41 @@ public class JXDatePicker extends JComponent {
      * @param date date
      */
     public void setDate(Date date) {
-        SortedSet<Date> selection = _monthView.getSelection();
-        Date selectedDate = selection.isEmpty() ? null : selection.first();
-
-        // Only set the date if the value was null and the current selection is not null or
-        // the value is not null and is not equal to the current selection.
-        if (date == null && selectedDate != date) {
-            _monthView.clearSelection();
-            getEditor().setValue(date);
-        } else if (date != null && !date.equals(selectedDate)) {
+        // PENDING: move to ui-delegate
+        if (equalsDate(date)) return;
+        if (date != null) {
             _monthView.setSelectionInterval(date, date);
-            getEditor().setValue(date);
+        } else {
+            _monthView.clearSelection();
         }
+//        getEditor().setValue(date);
+//        SortedSet<Date> selection = _monthView.getSelection();
+//        Date selectedDate = selection.isEmpty() ? null : selection.first();
+//
+//        // Only set the date if the value was null and the current selection is not null or
+//        // the value is not null and is not equal to the current selection.
+//        if (date == null && selectedDate != date) {
+//            _monthView.clearSelection();
+//            getEditor().setValue(date);
+//        } else if (date != null && !date.equals(selectedDate)) {
+//            _monthView.setSelectionInterval(date, date);
+//            getEditor().setValue(date);
+//        }
+    }
+
+    /**
+     * @param date
+     * @return
+     */
+    private boolean equalsDate(Date date) {
+        Date current = getDate();
+        if ((date == null) && (current == null)) {
+            return true;
+        }
+        if ((date != null) && (date.equals(current))) {
+           return true; 
+        }
+        return false;
     }
 
     /**

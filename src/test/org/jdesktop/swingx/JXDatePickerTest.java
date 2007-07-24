@@ -51,6 +51,34 @@ public class JXDatePickerTest extends TestCase {
     }
 
     /**
+     * Issue ??-swingX: date must be synched in all parts.
+     * here: modified
+     * 
+     * had been failing because the monthview "cleans" the date. 
+     */
+    public void testSynchDateModified() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.setDate(null);
+        Date date = new Date();
+        picker.setDate(date);
+        assertEquals(picker.getDate(), picker.getEditor().getValue());
+    } 
+
+    /**
+     * Issue ??-swingX: date must be synched in all parts.
+     * here: editor value must be updated after selection change
+     * in monthView
+     */
+    public void testSynchValueOnSelection()  {
+        JXDatePicker picker = new JXDatePicker();
+        Date date = XTestUtils.getCleanedToday(5);
+        picker.getMonthView().setSelectionInterval(date, date);
+        assertEquals(date, picker.getDate());
+        assertEquals(date, picker.getEditor().getValue());
+    }
+    
+
+    /**
      * test that input of unselectable dates reverts editors value.
      */
     public void testRejectSetValueUnselectable() {

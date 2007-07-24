@@ -54,9 +54,12 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.UIResource;
 import javax.swing.text.View;
 
+import org.jdesktop.swingx.DateSelectionListener;
 import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.JXDatePickerFormatter;
 import org.jdesktop.swingx.calendar.JXMonthView;
+import org.jdesktop.swingx.event.DateSelectionEvent;
+import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.plaf.DatePickerUI;
 
 /**
@@ -76,6 +79,8 @@ public class BasicDatePickerUI extends DatePickerUI {
     protected MouseMotionListener mouseMotionListener;
 
     private PropertyChangeListener editorListener;
+
+    private DateSelectionListener selectionListener;
 
     @SuppressWarnings({"UnusedDeclaration"})
     public static ComponentUI createUI(JComponent c) {
@@ -173,8 +178,10 @@ public class BasicDatePickerUI extends DatePickerUI {
         mouseListener = createMouseListener();
         mouseMotionListener = createMouseMotionListener();
         editorListener = createEditorListener();
+        selectionListener = createSelectionListener();
         datePicker.addPropertyChangeListener(propertyChangeListener);
-
+        
+        
         if (popupButton != null) {
             popupButton.addPropertyChangeListener(propertyChangeListener);
             popupButton.addMouseListener(mouseListener);
@@ -184,7 +191,26 @@ public class BasicDatePickerUI extends DatePickerUI {
         if (datePicker.getEditor() != null) {
             datePicker.getEditor().addPropertyChangeListener(editorListener);
         }
+        if (datePicker.getMonthView() != null) {
+            datePicker.getMonthView().getSelectionModel().addDateSelectionListener(selectionListener);
+        }
 
+    }
+
+    /**
+     * Creates and returns the listener for the dateSelection.
+     * 
+     * @return
+     */
+    protected DateSelectionListener createSelectionListener() {
+        DateSelectionListener l = new DateSelectionListener() {
+
+            public void valueChanged(DateSelectionEvent ev) {
+                updateFromDateSelection(ev.getEventType(), ev.isAdjusting());
+            }
+            
+        };
+        return l;
     }
 
     /**
@@ -360,6 +386,7 @@ public class BasicDatePickerUI extends DatePickerUI {
             invokeRevertValueChanged(oldDate);
             return;
         }
+        // this is needed only if we want an change event to be generated
         datePicker.setDate(newDate);
         datePicker.postActionEvent();                
     }
@@ -375,6 +402,17 @@ public class BasicDatePickerUI extends DatePickerUI {
         datePicker.getEditor().setValue(oldDate);
 
     }
+
+    /**
+     * @param eventType
+     * @param adjusting
+     */
+    protected void updateFromDateSelection(EventType eventType, boolean adjusting) {
+        if (adjusting) return;
+        
+        datePicker.getEditor().setValue(datePicker.getMonthView().getSelectedDate());
+    }
+
 
     public void toggleShowPopup() {
         if (popup == null) {
