@@ -86,7 +86,9 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         JComponent panel = new JPanel();
         panel.add(picker);
         panel.add(field);
-        showInFrame(panel, "compare pref width");
+        JXFrame frame = showInFrame(panel, "compare pref width");
+        // JXRootPane eats esc 
+        frame.getRootPaneExt().getActionMap().remove("esc-action");
     }
 
     /**
@@ -247,13 +249,34 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         picker.setDate(null);
         JPanel panel = new JPanel();
         panel.add(picker);
-        showInFrame(panel, "null date");
+        JXFrame frame = showInFrame(panel, "null date");
+        // JXRootPane eats esc 
+        frame.getRootPaneExt().getActionMap().remove("esc-action");
     }
  
     
 //-------------------- unit tests
     
+    /**
+     * test that ui's is listening to the current selection model.
+     * 
+     * Here: test update after setSelectionModel in MonthView
+     */
+    public void testUpdateDateSelectionListeningAfterSetSelectionModel() {
+        fail("todo");
+      
+    }
+
+    /**
+     * test that ui's is listening to the current selection model.
+     * 
+     * Here: test update after setMonthView in Picker
+     */
+    public void testUpdateDateSelectionListeningAfterSetMonthView() {
+        fail("todo");
+    }
     
+
     /**
      * Issue ??-swingx: picker has cleaned date.
      * 

@@ -51,6 +51,27 @@ public class JXDatePickerTest extends TestCase {
     }
 
     /**
+     * test that input of unselectable dates reverts editors value.
+     */
+    public void testRejectSetValueUnselectable() {
+        JXDatePicker picker = new JXDatePicker();
+        Date upperBound = XTestUtils.getCleanedToday(1);
+        picker.getMonthView().setUpperBound(upperBound.getTime());
+        Date future = XTestUtils.getCleanedToday(2);
+        // sanity
+        assertTrue(picker.getMonthView().isUnselectableDate(future.getTime()));
+        Date current = picker.getDate();
+        // sanity: 
+        assertEquals(current, picker.getEditor().getValue());
+        // set the editors value to something invalid
+        picker.getEditor().setValue(future);
+        // ui must not allow an invalid value in the editor
+        assertEquals(current, picker.getEditor().getValue());
+        // okay ..
+        assertEquals(current, picker.getDate());
+    }
+
+    /**
      * PickerUI listened to editable (meant: datePicker) and resets
      * the editors property. Accidentally? Even if meant to, it's 
      * brittle because done during the notification. 
