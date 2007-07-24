@@ -255,4 +255,13 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
 
     }
 
+    /**
+     * Do nothing, make the test runner happy
+     * (would output a warning without a test fixture).
+     *
+     */
+    public void testDummy() {
+        
+    }
+
 }

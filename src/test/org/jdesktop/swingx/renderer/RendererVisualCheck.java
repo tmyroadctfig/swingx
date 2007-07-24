@@ -110,15 +110,20 @@ public class RendererVisualCheck extends InteractiveTestCase {
         setSystemLF(true);
         RendererVisualCheck test = new RendererVisualCheck();
         try {
-            test.runInteractiveTests();
+//            test.runInteractiveTests();
 //          test.runInteractiveTests(".*Text.*");
 //          test.runInteractiveTests(".*XLabel.*");
+          test.runInteractiveTests(".*Date.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
     }
     
+    /**
+     * Use formatting from sql date/time classes.
+     *
+     */
     public void interactiveTableSQLDateTime() {
         Date date = new Date();
         java.sql.Date sqlDate = new java.sql.Date(date.getTime());
@@ -138,16 +143,19 @@ public class RendererVisualCheck extends InteractiveTestCase {
             }
             
         };
+        model.setColumnIdentifiers(new Object[]{"Date", "SQL Date", "Timestamp", "Time"});
         model.setValueAt(date, 0, 0);
         model.setValueAt(sqlDate, 0, 1);
         model.setValueAt(stamp, 0, 2);
         model.setValueAt(time, 0, 3);
         JXTable table = new JXTable(model);
+        // right align to see the difference to normal date renderer
         DefaultTableRenderer renderer = new DefaultTableRenderer(
                 new LabelProvider(SwingConstants.RIGHT));
         table.setDefaultRenderer(Timestamp.class, renderer);
         table.setDefaultRenderer(Time.class, renderer);
-        showWithScrollingInFrame(table, "date formatting"); 
+        table.setDefaultRenderer(java.sql.Date.class, renderer);
+        showWithScrollingInFrame(table, "normal/sql date formatting"); 
     }
     
     /**

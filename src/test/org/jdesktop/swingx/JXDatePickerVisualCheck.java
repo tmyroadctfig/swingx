@@ -145,4 +145,13 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         frame.setVisible(true);
     }
     
+    /**
+     * Do nothing, make the test runner happy
+     * (would output a warning without a test fixture).
+     *
+     */
+    public void testDummy() {
+        
+    }
+    
 }
