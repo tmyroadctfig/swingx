@@ -192,4 +192,27 @@ public interface DateSelectionModel {
      * @param lowerBound lower bound date or null if not set
      */
     public void setLowerBound(final Date lowerBound);
+
+    /**
+     * Set the property to mark upcoming selections as intermediate/
+     * final. This will fire a event of type adjusting_start/stop.
+     * 
+     * The default value is false.
+     * 
+     * Note: Client code marking as intermediate must take care of
+     * finalizing again.
+     * 
+     * @param adjusting a flag to turn the adjusting property on/off.
+     */
+    public void setAdjusting(boolean adjusting);
+
+    /**
+     * Returns the property to decide whether the selection is 
+     * intermediate or final.
+     * 
+     * @return the adjusting property.
+     */
+    public boolean isAdjusting();
+    
+    
 }

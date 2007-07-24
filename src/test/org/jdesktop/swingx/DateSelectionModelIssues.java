@@ -23,10 +23,7 @@ package org.jdesktop.swingx;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
-import org.jdesktop.swingx.DateSelectionModel.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.test.DateSelectionReport;
 

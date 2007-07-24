@@ -37,20 +37,25 @@ public class DateSelectionEvent extends EventObject {
         SELECTABLE_RANGE_CHANGED,
         UNSELECTED_DATES_CHANGED,
         LOWER_BOUND_CHANGED,
-        UPPER_BOUND_CHANGED
+        UPPER_BOUND_CHANGED, 
+        ADJUSTING_STARTED, ADJUSTING_STOPPED
     }
 
     private EventType eventType;
+    private boolean adjusting;
 
     /**
      * Constructs a prototypical Event.
      *
      * @param source The object on which the Event initially occurred.
+     * @param eventType the type of the event
+     * @param adjusting the adjusting property of the source
      * @throws IllegalArgumentException if source is null.
      */
-    public DateSelectionEvent(Object source, EventType eventType) {
+    public DateSelectionEvent(Object source, EventType eventType, boolean adjusting) {
         super(source);
         this.eventType = eventType;
+        this.adjusting = adjusting;
     }
 
     public SortedSet<Date> getSelection() {
@@ -59,5 +64,12 @@ public class DateSelectionEvent extends EventObject {
 
     public final EventType getEventType() {
         return eventType;
+    }
+
+    /**
+     * @return
+     */
+    public boolean isAdjusting() {
+        return adjusting;
     }
 }

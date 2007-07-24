@@ -41,6 +41,7 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
     private int firstDayOfWeek;
     private Date upperBound;
     private Date lowerBound;
+    private boolean adjusting;
 
     public DefaultDateSelectionModel() {
         this.listenerMap = new EventListenerMap();
@@ -287,7 +288,7 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
 
         for (DateSelectionListener listener : listeners) {
             if (e == null) {
-                e = new DateSelectionEvent(this, eventType);
+                e = new DateSelectionEvent(this, eventType, isAdjusting());
             }
             listener.valueChanged(e);
         }
@@ -306,5 +307,22 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
             date = cal.getTime();
         }
         return hasAdded;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isAdjusting() {
+        return adjusting;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setAdjusting(boolean adjusting) {
+        if (adjusting == isAdjusting()) return;
+        this.adjusting = adjusting;
+       fireValueChanged(adjusting ? EventType.ADJUSTING_STARTED : EventType.ADJUSTING_STOPPED);
+        
     }
 }

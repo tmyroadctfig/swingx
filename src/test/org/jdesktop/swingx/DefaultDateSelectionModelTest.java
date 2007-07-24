@@ -25,6 +25,7 @@ import java.util.TreeSet;
 
 import junit.framework.TestCase;
 
+import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.test.DateSelectionReport;
 import org.jdesktop.swingx.test.XTestUtils;
 
@@ -33,16 +34,74 @@ import org.jdesktop.swingx.test.XTestUtils;
  */
 public class DefaultDateSelectionModelTest extends TestCase {
     private DefaultDateSelectionModel model;
-
+    private Calendar calendar;
     @Override
     public void setUp() {
         model = new DefaultDateSelectionModel();
+        calendar = Calendar.getInstance();
     }
 
     @Override
     public void tearDown() {
 
     }
+
+    /**
+     * adding api: adjusting
+     *
+     */
+    public void testEventsCarryAdjustingFlagTrue() {
+        Date date = calendar.getTime();
+        model.setAdjusting(true);
+        DateSelectionReport report = new DateSelectionReport();
+        model.addDateSelectionListener(report);
+        model.setSelectionInterval(date, date);
+        assertEquals(model.isAdjusting(), report.getLastEvent().isAdjusting());
+        // sanity: revert 
+        model.setAdjusting(false);
+        report.clear();
+        model.removeSelectionInterval(date, date);
+        assertEquals(model.isAdjusting(), report.getLastEvent().isAdjusting());
+        
+    }
+
+    /**
+     * adding api: adjusting
+     *
+     */
+    public void testEventsCarryAdjustingFlagFalse() {
+        Date date = calendar.getTime();
+        DateSelectionReport report = new DateSelectionReport();
+        model.addDateSelectionListener(report);
+        model.setSelectionInterval(date, date);
+        assertEquals(model.isAdjusting(), report.getLastEvent().isAdjusting());
+    }
+    
+    /**
+     * adding api: adjusting.
+     *
+     */
+    public void testAdjusting() {
+        // default value
+        assertFalse(model.isAdjusting());
+        DateSelectionReport report = new DateSelectionReport();
+        model.addDateSelectionListener(report);
+        // set adjusting
+        model.setAdjusting(true);
+        assertTrue("model must be adjusting", model.isAdjusting());
+        assertEquals(1, report.getEventCount());
+        assertEquals(DateSelectionEvent.EventType.ADJUSTING_STARTED, 
+                report.getLastEventType());
+        // next round - reset to default adjusting
+        report.clear();
+        model.setAdjusting(false);
+        assertFalse("model must not be adjusting", model.isAdjusting());
+        assertEquals(1, report.getEventCount());
+        assertEquals(DateSelectionEvent.EventType.ADJUSTING_STOPPED, 
+                report.getLastEventType());
+        
+    }
+    
 
     /**
      * respect both bounds - 
