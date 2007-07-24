@@ -38,8 +38,12 @@ import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
+import javax.swing.tree.TreeSelectionModel;
 
+import org.jdesktop.swingx.calendar.JXMonthView;
+import org.jdesktop.swingx.calendar.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.ActionReport;
 import org.jdesktop.test.PropertyChangeReport;
@@ -58,7 +62,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         JXDatePickerIssues  test = new JXDatePickerIssues();
         try {
 //            test.runInteractiveTests();
-          test.runInteractiveTests(".*Event.*");
+          test.runInteractiveTests(".*Show.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -74,7 +78,8 @@ public class JXDatePickerIssues extends InteractiveTestCase {
      * of the formattedTextField.
      */
     public void interactivePrefSize() {
-        JXTable t;
+        ListSelectionModel l;
+        TreeSelectionModel t;
         JXDatePicker picker = new JXDatePicker();
         JFormattedTextField field = new JFormattedTextField(new JXDatePickerFormatter());
         field.setValue(picker.getDate());
@@ -101,6 +106,26 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         showInFrame(picker, "bounds");
     }
   
+    /**
+     * something weird's going on: the picker's date must be null
+     * after setting a monthView with null selection. It is, until
+     * shown?
+     *
+     */
+    public void interactiveShowPickerSetMonthNull() {
+        JXDatePicker picker = new JXDatePicker();
+        JXMonthView intervalForPicker = new JXMonthView();
+        intervalForPicker.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
+        picker.setMonthView(intervalForPicker);
+        LOG.info("picker date before showing " + picker.getDate());
+        assertNull(picker.getDate());
+        JXFrame frame = showInFrame(picker, "initial null date");
+        // JXRootPane eats esc 
+        frame.getRootPaneExt().getActionMap().remove("esc-action");
+        LOG.info("picker date after showing " + picker.getDate());
+        assertNull(picker.getDate());
+
+    }
     /**
      * Issue #235-swingx: action events
      * 
@@ -227,6 +252,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
  
     
 //-------------------- unit tests
+    
     
     /**
      * PickerUI listens to editable (meant: datePicker) and resets
@@ -405,6 +431,19 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         fail("need to decide which class should synch the editor value");
     }
     
+    /**
+     * Issue #551-swingX: editor value not updated after setMonthView.
+     *
+     */
+    public void testEditorValueOnSetMonthView() {
+        JXDatePicker picker = new JXDatePicker();
+        // set unselected monthView
+        picker.setMonthView(new JXMonthView());
+        // sanity: picker takes it
+        assertNull(picker.getDate());
+        assertEquals(picker.getDate(), picker.getEditor().getValue());
+        
+    }
     /**
      * For comparison: behaviour of JComboBox on setEditor.
      *
