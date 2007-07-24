@@ -1688,8 +1688,9 @@ public class BasicMonthViewUI extends MonthViewUI {
                 if (!isUsingKeyboard()) {
                     originalDateSpan = monthView.getSelection();
                 }
-
-                if (action >= ACCEPT_SELECTION && action <= CANCEL_SELECTION && isUsingKeyboard()) {
+                // JW: removed the isUsingKeyboard from the condition
+                // need to fire always.
+                if (action >= ACCEPT_SELECTION && action <= CANCEL_SELECTION) { //&& isUsingKeyboard()) {
                     if (action == CANCEL_SELECTION) {
                         // Restore the original selection.
                         if ((originalDateSpan != null) && !originalDateSpan.isEmpty()) {
