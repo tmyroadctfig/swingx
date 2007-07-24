@@ -50,6 +50,21 @@ public class JXDatePickerTest extends TestCase {
     }
 
     /**
+     * Issue #551-swingX: editor value not updated after setMonthView.
+     * 
+     * quick&dirty fix: let the picker manually update.
+     *
+     */
+    public void testEditorValueOnSetMonthView() {
+        JXDatePicker picker = new JXDatePicker();
+        // set unselected monthView
+        picker.setMonthView(new JXMonthView());
+        // sanity: picker takes it
+        assertNull(picker.getDate());
+        assertEquals(picker.getDate(), picker.getEditor().getValue());
+        
+    }
+    /**
      * Issue #551-swingx: editor value not updated after setEditor. 
      * 
      * quick&dirty fix: let the picker manually update.

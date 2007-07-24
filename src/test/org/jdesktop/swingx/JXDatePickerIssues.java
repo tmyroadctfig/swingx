@@ -401,19 +401,6 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     }
 
     /**
-     * Issue #551-swingX: editor value not updated after setMonthView.
-     *
-     */
-    public void testEditorValueOnSetMonthView() {
-        JXDatePicker picker = new JXDatePicker();
-        // set unselected monthView
-        picker.setMonthView(new JXMonthView());
-        // sanity: picker takes it
-        assertNull(picker.getDate());
-        assertEquals(picker.getDate(), picker.getEditor().getValue());
-        
-    }
-    /**
      * For comparison: behaviour of JComboBox on setEditor.
      *
      */

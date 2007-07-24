@@ -300,6 +300,9 @@ public class JXDatePicker extends JComponent {
     public void setMonthView(JXMonthView monthView) {
         JXMonthView oldMonthView = _monthView;
         _monthView = monthView;
+        // JW: quick fix for #551-swingx - editor value not updated
+        // need to look deeper, maybe should be done in ui-delegate?
+        _dateField.setValue(getDate());
         firePropertyChange(MONTH_VIEW, oldMonthView, _monthView);
     }
 
