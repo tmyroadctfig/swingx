@@ -254,6 +254,21 @@ public class JXDatePickerIssues extends InteractiveTestCase {
  
     
 //-------------------- unit tests
+    /**
+     * test that selectionListener is uninstalled.
+     * 
+     * Hmm ... missing api or overshooting?
+     */
+    public void testSelectionListening() {
+//        JXMonthView monthView = new JXMonthView();
+//        int selectionListenerCount = monthView.getSelectionModel()).getListeners().length;
+//        JXDatePicker picker = new JXDatePicker();
+//        assertEquals("ui must have installed one listener", selectionListenerCount + 1, 
+//                picker.getMonthView().getSelectionModel().getListeners().length);
+//        picker.getUI().uninstallUI(picker);
+//        assertEquals("", selectionListenerCount, 
+//                picker.getMonthView().getSelectionModel().getListeners().length);
+    }
 
     /**
      * test that ui's is listening to the current selection model.
@@ -289,18 +304,6 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         assertEquals(date, picker.getDate());
     }
     
-    /**
-     *  clarify: want to fire property change?
-     */
-    public void testSetDateProperty() {
-        JXDatePicker picker = new JXDatePicker();
-        picker.setDate(null);
-        Date date = XTestUtils.getCleanedToday();
-        PropertyChangeReport report = new PropertyChangeReport();
-        picker.addPropertyChangeListener(report);
-        picker.setDate(date);
-        TestUtils.assertPropertyChangeEvent(report, "date", null, date);
-    }
     
     /**
      * Issue ??-swingX: date must be synched in all parts.

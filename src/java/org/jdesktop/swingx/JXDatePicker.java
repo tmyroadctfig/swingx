@@ -228,16 +228,20 @@ public class JXDatePicker extends JComponent {
     /**
      * Set the currently selected date.  If the date is <code>null</code> the selection is cleared.
      *
+     * PENDING: the fire on change is incomplete. 
+     *  
      * @param date date
      */
     public void setDate(Date date) {
         // PENDING: move to ui-delegate
         if (equalsDate(date)) return;
+        Date old = getDate();
         if (date != null) {
             _monthView.setSelectionInterval(date, date);
         } else {
             _monthView.clearSelection();
         }
+        firePropertyChange("date", old, getDate());
 //        getEditor().setValue(date);
 //        SortedSet<Date> selection = _monthView.getSelection();
 //        Date selectedDate = selection.isEmpty() ? null : selection.first();

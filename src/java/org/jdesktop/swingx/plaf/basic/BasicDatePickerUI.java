@@ -196,7 +196,30 @@ public class BasicDatePickerUI extends DatePickerUI {
         }
 
     }
+    protected void uninstallListeners() {
+        datePicker.removePropertyChangeListener(propertyChangeListener);
+        // JW: when can that be null?
+        if (datePicker.getEditor() != null) {
+            datePicker.getEditor().removePropertyChangeListener(editorListener);
+        }
+        if (datePicker.getMonthView() != null) {
+            datePicker.getMonthView().getSelectionModel().removeDateSelectionListener(selectionListener);
+        }
+        if (popupButton != null) {
+            popupButton.removePropertyChangeListener(propertyChangeListener);
+            popupButton.removeMouseListener(mouseListener);
+            popupButton.removeMouseMotionListener(mouseMotionListener);
+        }
 
+        propertyChangeListener = null;
+        mouseListener = null;
+        mouseMotionListener = null;
+        handler = null;
+        editorListener = null;
+        selectionListener = null;
+    }
+
+//------------------ listener creation
     /**
      * Creates and returns the listener for the dateSelection.
      * 
@@ -230,23 +253,6 @@ public class BasicDatePickerUI extends DatePickerUI {
         return l;
     }
 
-    protected void uninstallListeners() {
-        datePicker.removePropertyChangeListener(propertyChangeListener);
-        // JW: when can that be null?
-        if (datePicker.getEditor() != null) {
-            datePicker.getEditor().removePropertyChangeListener(editorListener);
-        }
-        if (popupButton != null) {
-            popupButton.removePropertyChangeListener(propertyChangeListener);
-            popupButton.removeMouseListener(mouseListener);
-            popupButton.removeMouseMotionListener(mouseMotionListener);
-        }
-
-        propertyChangeListener = null;
-        mouseListener = null;
-        mouseMotionListener = null;
-        handler = null;
-    }
 
     private Handler getHandler() {
         if (handler == null) {
@@ -271,6 +277,7 @@ public class BasicDatePickerUI extends DatePickerUI {
         return getHandler();
     }
 
+//---------------- component creation    
     /**
      * Creates the editor used to edit the date selection.  Subclasses should
      * override this method if they want to substitute in their own editor.
@@ -301,6 +308,13 @@ public class BasicDatePickerUI extends DatePickerUI {
         return b;
     }
 
+    private class DefaultEditor extends JFormattedTextField implements UIResource {
+        public DefaultEditor(AbstractFormatter formatter) {
+            super(formatter);
+        }
+    }
+
+// Layout    
     /**
      * {@inheritDoc}
      */
@@ -369,11 +383,6 @@ public class BasicDatePickerUI extends DatePickerUI {
         return -1;
     }
 
-    private class DefaultEditor extends JFormattedTextField implements UIResource {
-        public DefaultEditor(AbstractFormatter formatter) {
-            super(formatter);
-        }
-    }
 
 //------------------------------- controller methods/classes    
     /**

@@ -32,6 +32,8 @@ import junit.framework.TestCase;
 
 import org.jdesktop.swingx.calendar.JXMonthView;
 import org.jdesktop.swingx.test.XTestUtils;
+import org.jdesktop.test.PropertyChangeReport;
+import org.jdesktop.test.TestUtils;
 
 /**
  * Created by IntelliJ IDEA.
@@ -48,6 +50,19 @@ public class JXDatePickerTest extends TestCase {
     }
 
     public void teardown() {
+    }
+
+    /**
+     *  clarify: want to fire property change?
+     */
+    public void testSetDateProperty() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.setDate(null);
+        Date date = XTestUtils.getCleanedToday();
+        PropertyChangeReport report = new PropertyChangeReport();
+        picker.addPropertyChangeListener(report);
+        picker.setDate(date);
+        TestUtils.assertPropertyChangeEvent(report, "date", null, date);
     }
 
     /**
