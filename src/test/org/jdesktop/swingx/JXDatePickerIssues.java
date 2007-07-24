@@ -401,37 +401,6 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     }
 
     /**
-     * Issue #551-swingx: editor value must preserve value on LF switch.
-     * This is a side-effect of picker not updating the editor's value
-     * on setEditor.
-     *
-     */
-    public void testEditorUpdateOnLF() {
-        JXDatePicker picker = new JXDatePicker();
-        Object date = picker.getEditor().getValue();
-        picker.updateUI();
-        assertEquals(date, picker.getEditor().getValue());
-        fail("need to decide which class should synch the editor value");
-    }
-
-    /**
-     * Issue #551-swingx: editor value not updated after setEditor
-     * who should set it? ui-delegate when listening to editor property change?
-     * or picker in setEditor?
-     * 
-     * Compare to JComboBox: BasicComboUI listens to editor change, does internal
-     * wiring to editor and call's comboBox configureEditor with the value of the 
-     * old editor.
-     */
-    public void testEditorValueOnSetEditor() {
-        JXDatePicker picker = new JXDatePicker();
-        Object value = picker.getEditor().getValue();
-        picker.setEditor(new JFormattedTextField(new JXDatePickerFormatter()));
-        assertEquals(value, picker.getEditor().getValue());
-        fail("need to decide which class should synch the editor value");
-    }
-    
-    /**
      * Issue #551-swingX: editor value not updated after setMonthView.
      *
      */

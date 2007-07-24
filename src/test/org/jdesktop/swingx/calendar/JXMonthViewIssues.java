@@ -36,6 +36,7 @@ import javax.swing.JPanel;
 import org.jdesktop.swingx.DateSelectionListener;
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXDatePicker;
+import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.calendar.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.plaf.basic.BasicMonthViewUI;
@@ -138,6 +139,8 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         JXDatePicker picker = new JXDatePicker();
         JXMonthView intervalForPicker = new JXMonthView();
         intervalForPicker.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
+        // JW: this picker comes up with today - should have taken the
+        // empty selection (which it does the unit test)
         picker.setMonthView(intervalForPicker);
         
         JComponent comp = new JPanel();
@@ -145,48 +148,14 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         comp.add(interval);
         comp.add(multiple);
         comp.add(picker);
-        showInFrame(comp, "events from monthView");
+        JXFrame frame = showInFrame(comp, "events from monthView");
+        // JXRootPane eats esc 
+        frame.getRootPaneExt().getActionMap().remove("esc-action");
+
     }
     
 //----------------------
     
-    /**
-     * test fire stopped after accept in monthview.
-     * 
-     *
-     */
-    public void testFireOnKeyboardAccept()  {
-        JXMonthView monthView = new JXMonthView();
-        Date date = new Date();
-        monthView.setSelectionInterval(date, date);
-        ActionReport report = new ActionReport();
-        monthView.addActionListener(report);
-        // innards ...
-        ((BasicMonthViewUI) monthView.getUI()).setUsingKeyboard(true);
-        Action accept = monthView.getActionMap().get("acceptSelection"); 
-        accept.actionPerformed(null);
-        assertEquals(1, report.getEventCount());
-    }
-
-    /**
-     * test fire stopped after accept in monthview.
-     * 
-     *
-     */
-    public void testFireOnKeyboardCancel()  {
-        JXMonthView monthView = new JXMonthView();
-        Date date = new Date();
-        monthView.setSelectionInterval(date, date);
-        ActionReport report = new ActionReport();
-        monthView.addActionListener(report);
-        // innards ...
-        ((BasicMonthViewUI) monthView.getUI()).setUsingKeyboard(true);
-        Action accept = monthView.getActionMap().get("cancelSelection");
-        // blows - internal state assumptions wrong!
-        accept.actionPerformed(null);
-        assertEquals(1, report.getEventCount());
-    }
-
 
     /**
     *

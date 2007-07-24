@@ -25,11 +25,13 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.SortedSet;
 
+import javax.swing.Action;
 import javax.swing.JComponent;
 
 import org.jdesktop.swingx.DateSelectionListener;
 import org.jdesktop.swingx.DateSelectionModel;
 import org.jdesktop.swingx.test.XTestUtils;
+import org.jdesktop.test.ActionReport;
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
 
@@ -53,6 +55,38 @@ public class JXMonthViewTest extends MockObjectTestCase {
 
     public void teardown() {
         JComponent.setDefaultLocale(componentLocale);
+    }
+
+    /**
+     * Issue #557-swingx: always fire actionEvent after esc/enter.
+     * 
+     * test fire after accept.
+     */
+    public void testFireOnKeyboardAccept()  {
+        JXMonthView monthView = new JXMonthView();
+        Date date = new Date();
+        monthView.setSelectionInterval(date, date);
+        ActionReport report = new ActionReport();
+        monthView.addActionListener(report);
+        Action accept = monthView.getActionMap().get("acceptSelection"); 
+        accept.actionPerformed(null);
+        assertEquals(1, report.getEventCount());
+    }
+
+    /**
+     * Issue #557-swingx: always fire actionEvent after esc/enter.
+     * 
+     * test fire after cancel.
+     */
+    public void testFireOnKeyboardCancel()  {
+        JXMonthView monthView = new JXMonthView();
+        Date date = new Date();
+        monthView.setSelectionInterval(date, date);
+        ActionReport report = new ActionReport();
+        monthView.addActionListener(report);
+        Action accept = monthView.getActionMap().get("cancelSelection");
+        accept.actionPerformed(null);
+        assertEquals(1, report.getEventCount());
     }
 
     /**
