@@ -75,6 +75,8 @@ public class BasicDatePickerUI extends DatePickerUI {
     protected MouseListener mouseListener;
     protected MouseMotionListener mouseMotionListener;
 
+    private PropertyChangeListener editorListener;
+
     @SuppressWarnings({"UnusedDeclaration"})
     public static ComponentUI createUI(JComponent c) {
         return new BasicDatePickerUI();
@@ -108,7 +110,11 @@ public class BasicDatePickerUI extends DatePickerUI {
         editor = datePicker.getEditor();
         datePicker.add(editor);
         // JW: shouldn't all listener reg be done in installListeners() ?
-        editor.addPropertyChangeListener(getHandler());
+        // JW: brittle to use the same propertyChangeListener for 
+        // picker and contained editor. Might get unexpected effects
+        // for properties with the same name on both
+        // moved to installListeners
+//        editor.addPropertyChangeListener(getHandler());
 
         popupButton = createPopupButton();
 
@@ -124,9 +130,12 @@ public class BasicDatePickerUI extends DatePickerUI {
 
     protected void uninstallComponents() {
         JFormattedTextField editor = datePicker.getEditor();
+        // JW: when can that be?
         if (editor != null) {
             // JW: shouldn't all listener dereg be done in uninstallListeners() ?
-            editor.removePropertyChangeListener(getHandler());
+            // haha -- at this moment the handler is nulled and
+            // we create a new one for removal!
+//            editor.removePropertyChangeListener(getHandler());
             datePicker.remove(editor);
         }
 
@@ -163,7 +172,7 @@ public class BasicDatePickerUI extends DatePickerUI {
         propertyChangeListener = createPropertyChangeListener();
         mouseListener = createMouseListener();
         mouseMotionListener = createMouseMotionListener();
-
+        editorListener = createEditorListener();
         datePicker.addPropertyChangeListener(propertyChangeListener);
 
         if (popupButton != null) {
@@ -171,12 +180,36 @@ public class BasicDatePickerUI extends DatePickerUI {
             popupButton.addMouseListener(mouseListener);
             popupButton.addMouseMotionListener(mouseMotionListener);
         }
+        // JW: when can that be null?
+        if (datePicker.getEditor() != null) {
+            datePicker.getEditor().addPropertyChangeListener(editorListener);
+        }
 
+    }
+
+    /**
+     * @return a propertyChangeListener dedicated to editor property changes
+     */
+    protected PropertyChangeListener createEditorListener() {
+        PropertyChangeListener l = new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ("value".equals(evt.getPropertyName())) {
+                    updateDateFromValueChanged((Date) evt.getOldValue(), (Date) evt.getNewValue());
+                }
+                
+            }
+            
+        };
+        return l;
     }
 
     protected void uninstallListeners() {
         datePicker.removePropertyChangeListener(propertyChangeListener);
-
+        // JW: when can that be null?
+        if (datePicker.getEditor() != null) {
+            datePicker.getEditor().removePropertyChangeListener(editorListener);
+        }
         if (popupButton != null) {
             popupButton.removePropertyChangeListener(propertyChangeListener);
             popupButton.removeMouseListener(mouseListener);
@@ -329,6 +362,18 @@ public class BasicDatePickerUI extends DatePickerUI {
             super(formatter);
         }
     }
+
+//------------------------------- controller methods/classes    
+    /**
+     * 
+     * @param oldDate the editor value before the change
+     * @param newDate the editor value after the change
+     */
+    protected void updateDateFromValueChanged(Date oldDate, Date newDate) {
+        datePicker.setDate(newDate);
+        datePicker.postActionEvent();                
+    }
+
 
     /**
      * Popup component that shows a JXMonthView component along with controlling
@@ -486,20 +531,22 @@ public class BasicDatePickerUI extends DatePickerUI {
             } else if (JXDatePicker.EDITOR.equals(property)) {
                 JFormattedTextField oldEditor = (JFormattedTextField)e.getOldValue();
                 if (oldEditor != null) {
-                    oldEditor.removePropertyChangeListener(this);
+                    oldEditor.removePropertyChangeListener(editorListener);
                     datePicker.remove(oldEditor);
                 }
 
                 JFormattedTextField editor = (JFormattedTextField)e.getNewValue();
                 datePicker.add(editor);
-                editor.addPropertyChangeListener(this);
+                editor.addPropertyChangeListener(editorListener);
                 datePicker.revalidate();
             } else if ("componentOrientation".equals(property)) {
                 datePicker.revalidate();
             } else if ("value".equals(property)) {
-                Date date = (Date) datePicker.getEditor().getValue();
-                datePicker.setDate(date);
-                datePicker.postActionEvent();                
+                throw new IllegalStateException(
+                        "editor listening is moved to dedicated propertyChangeLisener");
+//                Date date = (Date) datePicker.getEditor().getValue();
+//                datePicker.setDate(date);
+//                datePicker.postActionEvent();                
             } else if ("lightWeightPopupEnabled".equals(property)) {
                 // Force recreation of the popup when this property changes.
                 if (popup != null) {

@@ -61,8 +61,8 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 //        setSystemLF(true);
         JXDatePickerIssues  test = new JXDatePickerIssues();
         try {
-//            test.runInteractiveTests();
-          test.runInteractiveTests(".*Show.*");
+            test.runInteractiveTests();
+//          test.runInteractiveTests(".*Show.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -253,20 +253,6 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     
 //-------------------- unit tests
     
-    
-    /**
-     * PickerUI listens to editable (meant: datePicker) and resets
-     * the editors property. Accidentally? Even if meant to, it's 
-     * brittle because done during the notification. 
-     */
-    public void testEditableListening() {
-        JXDatePicker picker = new JXDatePicker();
-        picker.getEditor().setEditable(false);
-        assertTrue(picker.isEditable());
-        assertTrue(picker.getMonthView().isEnabled());
-        assertFalse("Do not change the state of the sender during notification processing", 
-                picker.getEditor().isEditable());
-    }
     
     /**
      * Issue ??-swingx: picker has cleaned date.

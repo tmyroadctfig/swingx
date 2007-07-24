@@ -31,6 +31,7 @@ import javax.swing.JFormattedTextField;
 import junit.framework.TestCase;
 
 import org.jdesktop.swingx.calendar.JXMonthView;
+import org.jdesktop.swingx.test.XTestUtils;
 
 /**
  * Created by IntelliJ IDEA.
@@ -47,6 +48,74 @@ public class JXDatePickerTest extends TestCase {
     }
 
     public void teardown() {
+    }
+
+    /**
+     * PickerUI listened to editable (meant: datePicker) and resets
+     * the editors property. Accidentally? Even if meant to, it's 
+     * brittle because done during the notification. 
+     * Changed to use dedicated listener.
+     */
+    public void testEditableListening() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.getEditor().setEditable(false);
+        // sanity - that at least the other views are uneffected
+        assertTrue(picker.isEditable());
+        assertTrue(picker.getMonthView().isEnabled());
+        assertFalse("Do not change the state of the sender during notification processing", 
+                picker.getEditor().isEditable());
+    }
+
+
+    /**
+     * Issue ??-swingX: date must be synched in all parts.
+     * here: modify value must update date and selection.
+     * 
+     * Note: this started to fail during listener cleanup.
+     */
+    public void testSynchEditorSetValue() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.setDate(null);
+        Date date = XTestUtils.getCleanedToday();
+        picker.getEditor().setValue(date);
+        assertEquals(picker.getEditor().getValue(), picker.getDate());
+    } 
+
+    /**
+     * Issue ??-swingX: date must be synched in all parts.
+     * here: modify value must work after changing the editor.
+     * 
+     * Note: this started to fail during listener cleanup.
+     */
+    public void testSynchEditorSetValueAfterSetEditor() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.setEditor(new JFormattedTextField(DateFormat.getInstance()));
+        picker.setDate(null);
+        Date date = XTestUtils.getCleanedToday();
+        picker.getEditor().setValue(date);
+        assertEquals(picker.getEditor().getValue(), picker.getDate());
+    } 
+
+    /**
+     * Issue ??-swingx: uninstallUI does not release propertyChangeListener
+     * to editor. Reason is that the de-install was not done in 
+     * uninstallListeners but later in uninstallComponents - at that time
+     * the handler is already nulled, removing will actually create a new one.
+     */
+    public void testEditorListeners() {
+        JFormattedTextField field = new JFormattedTextField(DateFormat.getInstance());
+        JXDatePicker picker = new JXDatePicker();
+        int defaultListenerCount = field.getPropertyChangeListeners().length;
+        // sanity: we added one listener ...
+        assertEquals(defaultListenerCount + 1, 
+                picker.getEditor().getPropertyChangeListeners().length);
+        picker.getUI().uninstallUI(picker);
+        assertEquals("the ui installe listener must be removed", 
+                defaultListenerCount, 
+                // right now we can access the editor even after uninstall
+                // because the picker keeps a reference
+                // TODO: after cleanup, this will be done through the ui
+                picker.getEditor().getPropertyChangeListeners().length);
     }
 
     /**
