@@ -1011,7 +1011,7 @@ public class JXLoginPanel extends JXImagePanel {
             //save the user names and passwords
             String userName = namePanel.getUserName();
             savePassword();
-            if (getSaveMode() == SaveMode.USER_NAME
+            if ((getSaveMode() == SaveMode.USER_NAME || getSaveMode() == SaveMode.BOTH)
                     && userName != null && !userName.trim().equals("")) {
                 userNameStore.addUserName(userName);
                 userNameStore.saveUserNames();
