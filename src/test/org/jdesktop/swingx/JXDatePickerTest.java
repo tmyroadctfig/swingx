@@ -87,6 +87,20 @@ public class JXDatePickerTest extends TestCase {
             // nothing to do - doc'ed behaviour
         }
     }
+    /**
+     * picker has cleaned date, clarified doc.
+     * The test is not exactly true, the details 
+     * are up for the DatePickerUI to decide. 
+     * 
+     */
+    public void testSetDateCleansDate() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.setDate(null);
+        Date date = cal.getTime();
+        Date clean = XTestUtils.getCleanedDate(cal);
+        picker.setDate(date);
+        assertEquals(clean, picker.getDate());
+    }
 
     /**
      *  date is a bound property of DatePicker.

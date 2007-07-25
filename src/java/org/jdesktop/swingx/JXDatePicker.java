@@ -138,11 +138,26 @@ public class JXDatePicker extends JComponent {
 
 
     /**
-     * Set the currently selected date.  If the date is <code>null</code> the selection is cleared.
-     *
-     * PENDING: the fire on change is incomplete. 
+     * Sets the date property. <p>
+     * 
+     * Does nothing if the ui vetos the new date - as might happen if
+     * the code tries to set a date which is unselectable in the 
+     * monthView's context. The actual value of the new Date might
+     * be changed by the ui, the default implementation cleans
+     * the Date by zeroing all time components. <p>
+     * 
+     * At all "stable" (= not editing in date input field nor 
+     * in the monthView) times the date is the same in the 
+     * JXMonthView, this JXDatePicker and the editor. If a new Date
+     * is set, this invariant is enforce by the DatePickerUI.<p>
+     * 
+     * A not null default value is set on instantiation.
+     * 
+     * This is a bound property. 
+     * 
      *  
-     * @param date date
+     * @param date the new date to set.
+     * @see #getDate();
      */
     public void setDate(Date date) {
         try {
