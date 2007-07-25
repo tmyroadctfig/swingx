@@ -107,6 +107,71 @@ public class JXDatePickerTest extends TestCase {
         }
     }
 
+    /**
+     * Issue #554-swingx: timezone of formats and picker must be synched.
+     * 
+     * Here: set the timezone in the picker.
+     */
+    public void testSynchTimeOnSetMonthView() {
+        JXDatePicker picker = new JXDatePicker();
+        TimeZone defaultZone = picker.getTimeZone();
+        TimeZone alternative = TimeZone.getTimeZone("GMT-6");
+        // sanity
+        assertNotNull(alternative);
+        if (alternative.equals(defaultZone)) {
+            alternative = TimeZone.getTimeZone("GMT-7");
+            // paranoid ... but shit happens
+            assertNotNull(alternative);
+            assertFalse(alternative.equals(defaultZone));
+        }
+        JXMonthView monthView = new JXMonthView();
+        monthView.setTimeZone(alternative);
+        picker.setMonthView(monthView);
+        assertEquals(alternative, picker.getTimeZone());
+        for (DateFormat format : picker.getFormats()) {
+            assertEquals("timezone must be synched", picker.getTimeZone(), format.getTimeZone());
+        }
+    }
+
+    /**
+     * Issue #554-swingx: timezone of formats and picker must be synched.
+     * 
+     * Here: initialize the formats with the pickers timezone on setting.
+     */
+    public void testSynchTimeZoneOnSetFormats() {
+        JXDatePicker picker = new JXDatePicker();
+        TimeZone defaultZone = picker.getTimeZone();
+        TimeZone alternative = TimeZone.getTimeZone("GMT-6");
+        // sanity
+        assertNotNull(alternative);
+        if (alternative.equals(defaultZone)) {
+            alternative = TimeZone.getTimeZone("GMT-7");
+            // paranoid ... but shit happens
+            assertNotNull(alternative);
+            assertFalse(alternative.equals(defaultZone));
+        }
+        picker.setTimeZone(alternative);
+        assertEquals(alternative, picker.getTimeZone());
+        picker.setFormats(DateFormat.getDateInstance());
+        for (DateFormat format : picker.getFormats()) {
+            assertEquals("timezone must be synched", picker.getTimeZone(), format.getTimeZone());
+        }
+    }
+
+    /**
+     * setFormats should fire a propertyChange.
+     *
+     */
+    public void testFormatsProperty() {
+        JXDatePicker picker = new JXDatePicker();
+        PropertyChangeReport report = new PropertyChangeReport();
+        picker.addPropertyChangeListener(report);
+        DateFormat[] oldFormats = picker.getFormats();
+        DateFormat[] newFormats = new DateFormat[] {DateFormat.getDateInstance()};
+        picker.setFormats(newFormats);
+        TestUtils.assertPropertyChangeEvent(report, "formats", oldFormats, newFormats);
+        
+    }
 
     /**
      * Test doc'ed behaviour: editor must not be null.

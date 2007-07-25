@@ -27,7 +27,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -268,6 +267,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 //                picker.getMonthView().getSelectionModel().getListeners().length);
     }
     
+
     /**
      * Characterization: when does the picker fire an action event?
      * @throws ParseException

@@ -446,7 +446,8 @@ public class BasicDatePickerUI extends DatePickerUI {
     /**
      * Updates internals after the picker's monthView has changed. <p>
      * 
-     * Cleans to popup.
+     * Cleans to popup. Wires the listeners. Updates date. 
+     * Updates formats' timezone. 
      * 
      * @param oldMonthView the picker's monthView before the change,
      *   may be null.
@@ -454,6 +455,7 @@ public class BasicDatePickerUI extends DatePickerUI {
     protected void updateFromMonthViewChanged(JXMonthView oldMonthView) {
         popup = null;
         updateMonthViewListeners(oldMonthView);
+        updateFormatTimeZone(datePicker.getTimeZone());
         updateEditorValue();
     }
 
@@ -551,6 +553,18 @@ public class BasicDatePickerUI extends DatePickerUI {
         datePicker.getMonthView().getSelectionModel()
             .addDateSelectionListener(selectionListener);
         
+    }
+
+    //---------------------- updating other properties
+    /**
+     * Updates the picker's formats to the given TimeZone.
+     * @param zone the timezone to set on the formats.
+     */
+    protected void updateFormatTimeZone(TimeZone zone) {
+        for (DateFormat format : datePicker.getFormats()) {
+            format.setTimeZone(zone);
+        }
+
     }
 
 //---------------------- other stuff    
@@ -784,6 +798,8 @@ public class BasicDatePickerUI extends DatePickerUI {
                     popup.setVisible(false);
                 }
                 popup = null;
+            } else if ("formats".equals(property)) {
+                updateFormatTimeZone(datePicker.getTimeZone());
             }
             
         }
@@ -798,9 +814,7 @@ public class BasicDatePickerUI extends DatePickerUI {
             if ("selectionModel".equals(e.getPropertyName())) {
                 updateFromSelectionModelChanged((DateSelectionModel) e.getOldValue());
             } else if ("timeZone".equals(e.getPropertyName())) {
-                for (DateFormat format : datePicker.getFormats()) {
-                    format.setTimeZone((TimeZone) e.getNewValue());
-                }
+                updateFormatTimeZone((TimeZone) e.getNewValue());
             }
         }
 
@@ -859,6 +873,7 @@ public class BasicDatePickerUI extends DatePickerUI {
         // only modify defensive copies
         return new Date(cleanupDate(date.getTime(), datePicker.getMonthView().getCalendar()));
     }
+
     // duplication!!
     private long cleanupDate(long date, Calendar cal) {
         cal.setTimeInMillis(date);

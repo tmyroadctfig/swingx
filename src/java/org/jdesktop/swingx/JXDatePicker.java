@@ -275,8 +275,10 @@ public class JXDatePicker extends JComponent {
      * @param formats The date formats to use.
      */
     public void setFormats(DateFormat... formats) {
+        DateFormat[] old = getFormats();
         _dateField.setFormatterFactory(new DefaultFormatterFactory(
                 new JXDatePickerFormatter(formats)));
+        firePropertyChange("formats", old, getFormats());
     }
 
     /**
