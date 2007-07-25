@@ -24,7 +24,21 @@ import java.util.Date;
 import javax.swing.plaf.ComponentUI;
 
 /**
+ * The ComponentUI for a JXDatePicker.
+ * <p>
+ * 
+ * Responsible for keeping the date property of all participants synchronized at
+ * all "stable" points in their life-cycle. That is the following invariant is
+ * guaranteed:
+ * 
+ * <pre><code>
+ * Date selected = datePicker.getMonthView().getSelectedDate();
+ * assertEquals(selected, datePicker.getDate());
+ * assertEquals(selected, datePicker.getEditor().getValue());
+ * </code></pre>
+ * 
  * @author Joshua Outwater
+ * @author Jeanette Winzenburg
  */
 public abstract class DatePickerUI extends ComponentUI {
     /**

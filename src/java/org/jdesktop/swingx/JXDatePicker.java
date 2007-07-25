@@ -150,7 +150,6 @@ public class JXDatePicker extends JComponent {
         } catch (PropertyVetoException e) {
             return;
         }
-        // PENDING: move to ui-delegate
         Date old = getDate();
         this.date = date;
         firePropertyChange("date", old, getDate());
