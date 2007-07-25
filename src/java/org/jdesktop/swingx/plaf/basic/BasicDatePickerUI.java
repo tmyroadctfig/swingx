@@ -55,6 +55,7 @@ import javax.swing.plaf.UIResource;
 import javax.swing.text.View;
 
 import org.jdesktop.swingx.DateSelectionListener;
+import org.jdesktop.swingx.DateSelectionModel;
 import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.JXDatePickerFormatter;
 import org.jdesktop.swingx.calendar.JXMonthView;
@@ -110,19 +111,17 @@ public class BasicDatePickerUI extends DatePickerUI {
     protected void installComponents() {
         JFormattedTextField editor = datePicker.getEditor();
         if (editor == null || editor instanceof UIResource) {
+            // we are not yet listening ...
             datePicker.setEditor(createEditor());
         }
-        editor = datePicker.getEditor();
-        datePicker.add(editor);
-        // JW: shouldn't all listener reg be done in installListeners() ?
-        // JW: brittle to use the same propertyChangeListener for 
-        // picker and contained editor. Might get unexpected effects
-        // for properties with the same name on both
-        // moved to installListeners
-//        editor.addPropertyChangeListener(getHandler());
-
+        // JW: duplicating code: updateFromEditor does a similar job
+        // albeit more complete job
+        // but at this time the listeners are not yet ready ... hmm.
+        datePicker.add(datePicker.getEditor());
+        // #551-swingx: editor's value not updated after lf change
+        datePicker.getEditor().setValue(datePicker.getDate());
+        
         popupButton = createPopupButton();
-
         if (popupButton != null) {
             // this is a trick to get hold of the client prop which
             // prevents closing of the popup
@@ -179,21 +178,18 @@ public class BasicDatePickerUI extends DatePickerUI {
         mouseMotionListener = createMouseMotionListener();
         editorListener = createEditorListener();
         selectionListener = createSelectionListener();
+        
         datePicker.addPropertyChangeListener(propertyChangeListener);
         
         
         if (popupButton != null) {
+            // JW: which property do we want to monitor?
             popupButton.addPropertyChangeListener(propertyChangeListener);
             popupButton.addMouseListener(mouseListener);
             popupButton.addMouseMotionListener(mouseMotionListener);
         }
-        // JW: when can that be null?
-        if (datePicker.getEditor() != null) {
-            datePicker.getEditor().addPropertyChangeListener(editorListener);
-        }
-        if (datePicker.getMonthView() != null) {
-            datePicker.getMonthView().getSelectionModel().addDateSelectionListener(selectionListener);
-        }
+        updateEditorListeners(null);
+        updateFromMonthViewChanged(null);
 
     }
     protected void uninstallListeners() {
@@ -229,7 +225,7 @@ public class BasicDatePickerUI extends DatePickerUI {
         DateSelectionListener l = new DateSelectionListener() {
 
             public void valueChanged(DateSelectionEvent ev) {
-                updateFromDateSelection(ev.getEventType(), ev.isAdjusting());
+                updateDateFromSelection(ev.getEventType(), ev.isAdjusting());
             }
             
         };
@@ -244,7 +240,7 @@ public class BasicDatePickerUI extends DatePickerUI {
 
             public void propertyChange(PropertyChangeEvent evt) {
                 if ("value".equals(evt.getPropertyName())) {
-                    updateDateFromValueChanged((Date) evt.getOldValue(), (Date) evt.getNewValue());
+                    updateDateFromValue((Date) evt.getOldValue(), (Date) evt.getNewValue());
                 }
                 
             }
@@ -386,13 +382,16 @@ public class BasicDatePickerUI extends DatePickerUI {
 
 //------------------------------- controller methods/classes    
     /**
+     * Updates date related properties in picker/monthView 
+     * after a change in the editor's value. Reverts the 
+     * value if the new date is unselectable.
      * 
      * @param oldDate the editor value before the change
      * @param newDate the editor value after the change
      */
-    protected void updateDateFromValueChanged(Date oldDate, Date newDate) {
+    protected void updateDateFromValue(Date oldDate, Date newDate) {
         if ((newDate != null) && datePicker.getMonthView().isUnselectableDate(newDate.getTime())) {
-            invokeRevertValueChanged(oldDate);
+            revertValue(oldDate);
             return;
         }
         // this is needed only if we want an change event to be generated
@@ -407,21 +406,121 @@ public class BasicDatePickerUI extends DatePickerUI {
      * 
      * @param oldDate the old date to revert to
      */
-    private void invokeRevertValueChanged(Date oldDate) {
+    private void revertValue(Date oldDate) {
         datePicker.getEditor().setValue(oldDate);
 
     }
 
     /**
-     * @param eventType
-     * @param adjusting
+     * Updates date related properties picker/editor 
+     * after a change in the monthView's
+     * selection.
+     * 
+     * Here: does nothing if the change is intermediate.
+     * 
+     * @param eventType the type of the selection change
+     * @param adjusting flag to indicate whether the the selection change
+     *    is intermediate
      */
-    protected void updateFromDateSelection(EventType eventType, boolean adjusting) {
+    protected void updateDateFromSelection(EventType eventType, boolean adjusting) {
         if (adjusting) return;
         
         datePicker.getEditor().setValue(datePicker.getMonthView().getSelectedDate());
     }
 
+    /**
+     * Updates internals after the picker's monthView has changed. <p>
+     * 
+     * Cleans to popup.
+     * 
+     * @param oldMonthView the picker's monthView before the change,
+     *   may be null.
+     */
+    protected void updateFromMonthViewChanged(JXMonthView oldMonthView) {
+        popup = null;
+        updateMonthViewListeners(oldMonthView);
+        datePicker.getEditor().setValue(datePicker.getMonthView().getSelectedDate());
+    }
+
+    /**
+     * Wires the picker's monthView related listening. Removes all
+     * listeners from the given old view and adds the listeners to 
+     * the current monthView. <p>
+     * 
+     * @param oldMonthView
+     */
+    protected void updateMonthViewListeners(JXMonthView oldMonthView) {
+        DateSelectionModel model = null;
+        if (oldMonthView != null) {
+            oldMonthView.removePropertyChangeListener(propertyChangeListener);
+            model = oldMonthView.getSelectionModel();
+        }
+        datePicker.getMonthView().addPropertyChangeListener(propertyChangeListener);
+        updateSelectionModelListeners(model);
+    }
+
+    /**
+     * Updates internals after the picker's editor property 
+     * has changed. <p>
+     * 
+     * Updates the picker's children. Removes the old editor and 
+     * adds the new editor. Wires the editor listeners.
+     * 
+     * 
+     * @param oldEditor the picker's editor before the change,
+     *   may be null.
+     */
+    protected void updateFromEditorChanged(JFormattedTextField oldEditor) { 
+        if (oldEditor != null) {
+            datePicker.remove(oldEditor);
+        }
+        datePicker.add(datePicker.getEditor());
+        datePicker.getEditor().setValue(datePicker.getMonthView().getSelectedDate());
+        updateEditorListeners(oldEditor);
+        datePicker.revalidate();
+    }
+
+    /**
+     * Wires the picker's editor related listening. Removes the
+     * listeners from the old editor and adds them to 
+     * the new editor. <p>
+     * 
+     * @param oldEditor the pickers editor before the change
+     */
+    protected void updateEditorListeners(JFormattedTextField oldEditor) {
+        if (oldEditor != null) {
+            oldEditor.removePropertyChangeListener(editorListener);
+        }
+        datePicker.getEditor().addPropertyChangeListener(editorListener);
+    }
+
+    /**
+     * Updates internals after the selection model changed.
+     * 
+     * @param oldModel
+     */
+    protected void updateFromSelectionModelChanged(DateSelectionModel oldModel) {
+        updateSelectionModelListeners(oldModel);
+        datePicker.getEditor().setValue(datePicker.getMonthView().getSelectedDate());
+        
+        
+    }
+
+    
+    /**
+     * Wires monthView's selection model listening. Removes the
+     * selection listener from the old model and add to the new model.
+     * 
+     * @param oldModel the dateSelectionModel before the change, may be null.
+     */
+    protected void updateSelectionModelListeners(DateSelectionModel oldModel) {
+        if (oldModel != null) {
+            oldModel.removeDateSelectionListener(selectionListener);
+        }
+        datePicker.getMonthView().getSelectionModel()
+            .addDateSelectionListener(selectionListener);
+        
+    }
 
     public void toggleShowPopup() {
         if (popup == null) {
@@ -565,6 +664,25 @@ public class BasicDatePickerUI extends DatePickerUI {
 
 
         public void propertyChange(PropertyChangeEvent e) {
+            if (e.getSource() == datePicker) {
+                datePickerPropertyChange(e);
+            }
+            if (e.getSource() == datePicker.getMonthView()) {
+                montViewPropertyChange(e);
+            }
+            if (e.getSource() == popupButton) {
+                buttonPropertyChange(e);
+            }
+            if ("value".equals(e.getPropertyName())) {
+                throw new IllegalStateException(
+                        "editor listening is moved to dedicated propertyChangeLisener");
+            }
+        }
+        
+        /**
+         * @param e
+         */
+        private void datePickerPropertyChange(PropertyChangeEvent e) {
             String property = e.getPropertyName();
             // JW: as per introduction of editorListener here
             // we are getting only properties from the datePicker.
@@ -581,7 +699,7 @@ public class BasicDatePickerUI extends DatePickerUI {
                 datePicker.getEditor().setToolTipText(tip);
                 popupButton.setToolTipText(tip);
             } else if (JXDatePicker.MONTH_VIEW.equals(property)) {
-                popup = null;
+                updateFromMonthViewChanged((JXMonthView) e.getOldValue());
             } else if (JXDatePicker.LINK_PANEL.equals(property)) {
                 // If the popup is null we haven't shown it yet.
                 JPanel linkPanel = datePicker.getLinkPanel();
@@ -590,24 +708,9 @@ public class BasicDatePickerUI extends DatePickerUI {
                     popup.add(linkPanel, BorderLayout.SOUTH);
                 }
             } else if (JXDatePicker.EDITOR.equals(property)) {
-                JFormattedTextField oldEditor = (JFormattedTextField)e.getOldValue();
-                if (oldEditor != null) {
-                    oldEditor.removePropertyChangeListener(editorListener);
-                    datePicker.remove(oldEditor);
-                }
-
-                JFormattedTextField editor = (JFormattedTextField)e.getNewValue();
-                datePicker.add(editor);
-                editor.addPropertyChangeListener(editorListener);
-                datePicker.revalidate();
+                updateFromEditorChanged((JFormattedTextField) e.getOldValue());
             } else if ("componentOrientation".equals(property)) {
                 datePicker.revalidate();
-            } else if ("value".equals(property)) {
-                throw new IllegalStateException(
-                        "editor listening is moved to dedicated propertyChangeLisener");
-//                Date date = (Date) datePicker.getEditor().getValue();
-//                datePicker.setDate(date);
-//                datePicker.postActionEvent();                
             } else if ("lightWeightPopupEnabled".equals(property)) {
                 // Force recreation of the popup when this property changes.
                 if (popup != null) {
@@ -615,6 +718,20 @@ public class BasicDatePickerUI extends DatePickerUI {
                 }
                 popup = null;
             }
+            
+        }
+
+        /**
+         * @param e
+         */
+        private void montViewPropertyChange(PropertyChangeEvent e) {
+            if ("selectionModel".equals(e.getPropertyName())) {
+                updateFromSelectionModelChanged((DateSelectionModel) e.getOldValue());
+            }
+            
+        }
+
+        private void buttonPropertyChange(PropertyChangeEvent e) {
         }
 
         public void addLayoutComponent(String name, Component comp) { }
@@ -651,4 +768,7 @@ public class BasicDatePickerUI extends DatePickerUI {
             }
         }
     }
+
+
+
 }

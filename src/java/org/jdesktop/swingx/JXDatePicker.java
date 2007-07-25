@@ -34,27 +34,28 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.EventListener;
-import java.util.SortedSet;
 import java.util.TimeZone;
+
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
-import javax.swing.JFormattedTextField.AbstractFormatter;
-import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.JFormattedTextField.AbstractFormatter;
+import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.text.DefaultFormatterFactory;
+
 import org.jdesktop.swingx.calendar.DateSpan;
 import org.jdesktop.swingx.calendar.JXMonthView;
 import org.jdesktop.swingx.event.EventListenerMap;
 import org.jdesktop.swingx.painter.MattePainter;
-//import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
 import org.jdesktop.swingx.plaf.DatePickerUI;
 import org.jdesktop.swingx.plaf.JXDatePickerAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.swingx.util.Contract;
 
 /**
  * A component that combines a button, an editable field and a JXMonthView
@@ -126,20 +127,24 @@ public class JXDatePicker extends JComponent {
      * @see #getTimeZone
      */
     public JXDatePicker(long millis) {
+        init();
+        // install the controller before setting the date
+        updateUI();
+        setDate(new Date(millis));
+    }
+
+    /**
+     * 
+     */
+    private void init() {
         listenerMap = new EventListenerMap();
-        _monthView = new JXMonthView(millis);
-        Date date = new Date(millis);
-        _monthView.setSelectionInterval(date, date);
+        _monthView = new JXMonthView();
         _monthView.setTraversable(true);
 
         _linkFormat = new MessageFormat(UIManager.getString("JXDatePicker.linkFormat"));
 
         _linkDate = System.currentTimeMillis();
         _linkPanel = new TodayPanel();
-
-        updateUI();
-
-        _dateField.setValue(_monthView.getSelection().first());
     }
 
     /**
@@ -287,8 +292,7 @@ public class JXDatePicker extends JComponent {
      * @return Date
      */
     public Date getDate() {
-        SortedSet<Date> selection = _monthView.getSelection();
-        return selection.isEmpty() ? null : selection.first();
+        return _monthView.getSelectedDate();
     }
 
     /**
@@ -320,16 +324,16 @@ public class JXDatePicker extends JComponent {
      * is configured to a different time zone it will affect the time zone of this
      * component.
      *
-     * @param monthView month view comopnent
+     * @param monthView month view comopnent.
+     * @throws NullPointerException if view component is null
+     * 
      * @see #setTimeZone
      * @see #getTimeZone
      */
     public void setMonthView(JXMonthView monthView) {
+        Contract.asNotNull(monthView, "monthView must not be null");
         JXMonthView oldMonthView = _monthView;
         _monthView = monthView;
-        // JW: quick fix for #551-swingx - editor value not updated
-        // need to look deeper, maybe should be done in ui-delegate?
-        _dateField.setValue(getDate());
         firePropertyChange(MONTH_VIEW, oldMonthView, _monthView);
     }
 
@@ -405,12 +409,20 @@ public class JXDatePicker extends JComponent {
         return _dateField;
     }
 
+    /**
+     * Sets the editor. <p>
+     * 
+     * The default is created and set by the UI delegate.
+     * 
+     * @param editor the formatted input.
+     * @throws NullPointerException if editor is null.
+     * 
+     * @see #getEditor
+     */
     public void setEditor(JFormattedTextField editor) {
+        Contract.asNotNull(editor, "editor must not be null");
         JFormattedTextField oldEditor = _dateField;
         _dateField = editor;
-        // JW: quick fix for #551-swingx - editor value not preserved
-        // need to look deeper, maybe should be done in ui-delegate?
-        _dateField.setValue(getDate());
         firePropertyChange(EDITOR, oldEditor, _dateField);
     }
 

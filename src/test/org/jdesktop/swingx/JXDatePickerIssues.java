@@ -44,8 +44,6 @@ import org.jdesktop.swingx.calendar.JXMonthView;
 import org.jdesktop.swingx.calendar.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.ActionReport;
-import org.jdesktop.test.PropertyChangeReport;
-import org.jdesktop.test.TestUtils;
 
 /**
  * Known issues of <code>JXDatePicker</code>.
@@ -270,25 +268,6 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 //                picker.getMonthView().getSelectionModel().getListeners().length);
     }
 
-    /**
-     * test that ui's is listening to the current selection model.
-     * 
-     * Here: test update after setSelectionModel in MonthView
-     */
-    public void testUpdateDateSelectionListeningAfterSetSelectionModel() {
-        fail("todo");
-      
-    }
-
-    /**
-     * test that ui's is listening to the current selection model.
-     * 
-     * Here: test update after setMonthView in Picker
-     */
-    public void testUpdateDateSelectionListeningAfterSetMonthView() {
-        fail("todo");
-    }
-    
 
     /**
      * Issue ??-swingx: picker has cleaned date.
@@ -303,7 +282,8 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         picker.setDate(date);
         assertEquals(date, picker.getDate());
     }
-    
+ 
+
     
     /**
      * Issue ??-swingX: date must be synched in all parts.
@@ -312,7 +292,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
      * Accidentally passing. The issue of cleaned vs. non-cleaned
      * dates in monthview selection vs. editor is not showing.
      */
-    public void testSynchDateInitial() {
+    public void testSynchDateInitialDefault() {
         JXDatePicker picker = new JXDatePicker();
         // sanity
         assertNotNull(picker.getDate());
@@ -320,6 +300,23 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         fail("accidentally passing: picker synchs explicitly in constructor");
     } 
 
+    /**
+     * Issue ??-swingX: date must be synched in all parts.
+     * here: initial. 
+     * 
+     * Accidentally passing. The issue of cleaned vs. non-cleaned
+     * dates in monthview selection vs. editor is not showing.
+     * 
+     * fails because picker uses the cleaned date
+     */
+    public void testSynchDateInitialSet() {
+        calendar.add(Calendar.DATE, 5);
+        Date date = calendar.getTime();
+        JXDatePicker picker = new JXDatePicker(date.getTime());
+        assertEquals(picker.getDate(), picker.getEditor().getValue());
+        assertEquals(date, picker.getDate());
+        fail("accidentally passing: picker synchs explicitly in constructor");
+    } 
 
 
     
@@ -376,15 +373,6 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 
 
 
-    /**
-     * Allowed to set a null editor? No (which is reasonable) 
-     * - should be documented as of SwingX doc convention.
-      */
-    public void testEditorNull() {
-       JXDatePicker picker = new JXDatePicker();
-       assertNotNull(picker.getEditor());
-       picker.setEditor(null);
-    }
 
     /**
      * For comparison: behaviour of JComboBox on setEditor.

@@ -20,12 +20,14 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
+import java.util.logging.Logger;
 
+import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
 
 import junit.framework.TestCase;
@@ -43,6 +45,8 @@ import org.jdesktop.test.TestUtils;
  * To change this template use File | Settings | File Templates.
  */
 public class JXDatePickerTest extends TestCase {
+    private static final Logger LOG = Logger.getLogger(JXDatePickerTest.class
+            .getName());
     private Calendar cal;
 
     public void setUp() {
@@ -53,7 +57,37 @@ public class JXDatePickerTest extends TestCase {
     }
 
     /**
-     *  clarify: want to fire property change?
+     * Test doc'ed behaviour: editor must not be null.
+     */
+    public void testEditorNull() {
+        JXDatePicker picker = new JXDatePicker();
+        assertNotNull(picker.getEditor());
+
+        try {
+            picker.setEditor(null);
+            fail("picker must throw NPE if editor is null");
+        } catch (NullPointerException e) {
+            // nothing to do - doc'ed behaviour
+        }
+    }
+
+    /**
+     * Test doc'ed behaviour: editor must not be null.
+     */
+    public void testMonthViewNull() {
+        JXDatePicker picker = new JXDatePicker();
+        assertNotNull(picker.getMonthView());
+
+        try {
+            picker.setMonthView(null);
+            fail("picker must throw NPE if monthView is null");
+        } catch (NullPointerException e) {
+            // nothing to do - doc'ed behaviour
+        }
+    }
+
+    /**
+     *  date is a bound property of DatePicker.
      */
     public void testSetDateProperty() {
         JXDatePicker picker = new JXDatePicker();
@@ -66,32 +100,111 @@ public class JXDatePickerTest extends TestCase {
     }
 
     /**
-     * Issue ??-swingX: date must be synched in all parts.
-     * here: modified
+     * Issue #559-swingX: date must be synched in all parts.
+     * here: initial. 
      * 
-     * had been failing because the monthview "cleans" the date. 
      */
-    public void testSynchDateModified() {
+    public void testSynchAllInitialDate() {
+        Date date = XTestUtils.getCleanedToday(5);
+        JXDatePicker picker = new JXDatePicker(date.getTime());
+        assertSynchAll(picker, date);
+    } 
+    
+    /**
+     * Issue #559-swingX: date must be synched in all parts.
+     * here: set date in picker
+     * 
+     * Note: test uses a cleaned date, do same with uncleaned.
+     */
+    public void testSynchAllOnDateModified() {
         JXDatePicker picker = new JXDatePicker();
-        picker.setDate(null);
-        Date date = new Date();
+        Date date = XTestUtils.getCleanedToday(5);
         picker.setDate(date);
-        assertEquals(picker.getDate(), picker.getEditor().getValue());
+        assertSynchAll(picker, date);
     } 
 
     /**
-     * Issue ??-swingX: date must be synched in all parts.
-     * here: editor value must be updated after selection change
-     * in monthView
+     * Issue #559-swingX: date must be synched in all parts.
+     * here: set selected date in monthview
+     * Note: test uses a cleaned date, do same with uncleaned.
      */
-    public void testSynchValueOnSelection()  {
+    public void testSynchAllOnSelectionChange()  {
         JXDatePicker picker = new JXDatePicker();
         Date date = XTestUtils.getCleanedToday(5);
         picker.getMonthView().setSelectionInterval(date, date);
-        assertEquals(date, picker.getDate());
-        assertEquals(date, picker.getEditor().getValue());
+        assertSynchAll(picker, date);
     }
     
+    /**
+     * Issue #559-swingX: date must be synched in all parts.
+     * here: set value in editor.
+     * 
+     * Note: test uses a cleaned date, do same with uncleaned.
+     */
+    public void testSynchAllOnEditorSetValue() {
+        JXDatePicker picker = new JXDatePicker();
+        Date date = XTestUtils.getCleanedToday(5);
+        picker.getEditor().setValue(date);
+        assertSynchAll(picker, date);
+    } 
+    
+    /**
+     * Issue #559-swingX: date must be synched in all parts.
+     * here: modify value must work after changing the editor.
+     * 
+     * Note: this started to fail during listener cleanup.
+     */
+    public void testSynchAllOnEditorSetValueAfterSetEditor() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.setEditor(new JFormattedTextField(DateFormat.getInstance()));
+        Date date = XTestUtils.getCleanedToday(5);
+        picker.getEditor().setValue(date);
+        assertSynchAll(picker, date);
+    }
+
+    /**
+     * Issue #559-swingX: date must be synched in all parts.
+     * here: set selection must work after changing the monthView.
+     * 
+     * Note: this started to fail during listener cleanup.
+     */
+    public void testSynchAllOnSelectionChangeAfterSetMonthView() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.setMonthView(new JXMonthView());
+        Date date = XTestUtils.getCleanedToday(5);
+        picker.getMonthView().setSelectionInterval(date, date);
+        assertSynchAll(picker, date);
+    }
+
+    /**
+     * Issue #559-swingX: date must be synched in all parts.
+     * <p>
+     * 
+     * here: set selection must work after changing the monthView's selection
+     * model.
+     * 
+     * Note: this started to fail during listener cleanup.
+     */
+    public void testSynchAllOnSelectionChangeAfterSetSelectionModel() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.getMonthView().setSelectionModel(new DefaultDateSelectionModel());
+        Date date = XTestUtils.getCleanedToday(5);
+        picker.getMonthView().setSelectionInterval(date, date);
+        assertSynchAll(picker, date);
+    }
+
+    /**
+     * Asserts that all date related values in the picker are synched.
+     * 
+     * @param picker the picker to 
+     * @param date the common date
+     */
+    private void assertSynchAll(JXDatePicker picker, Date date) {
+        assertEquals(date, picker.getEditor().getValue());
+        assertEquals(date, picker.getDate());
+        assertEquals(date, picker.getMonthView().getSelectedDate());
+    } 
+
 
     /**
      * test that input of unselectable dates reverts editors value.
@@ -120,7 +233,7 @@ public class JXDatePickerTest extends TestCase {
      * brittle because done during the notification. 
      * Changed to use dedicated listener.
      */
-    public void testEditableListening() {
+    public void testSpuriousEditableListening() {
         JXDatePicker picker = new JXDatePicker();
         picker.getEditor().setEditable(false);
         // sanity - that at least the other views are uneffected
@@ -130,36 +243,43 @@ public class JXDatePickerTest extends TestCase {
                 picker.getEditor().isEditable());
     }
 
+    /**
+     * PickerUI listened to enabled of button (meant: datePicker) and resets
+     * the buttons property. 
+     */
+    public void testSpuriousEnabledListening() {
+        JXDatePicker picker = new JXDatePicker();
+        Component button = null;
+        for (int i = 0; i < picker.getComponentCount(); i++) {
+            if (picker.getComponent(i) instanceof JButton) {
+                button = picker.getComponent(i);
+            }
+        }
+        if (button == null) {
+            LOG.info("cannot run testEnabledListening - no button found");
+        }
+        button.setEnabled(false);
+        // sanity - that at least the other views are uneffected
+        assertTrue(picker.isEnabled());
+        assertTrue(picker.getEditor().isEnabled());
+        assertFalse("Do not change the state of the sender during notification processing", 
+                button.isEnabled());
+    }
 
     /**
-     * Issue ??-swingX: date must be synched in all parts.
-     * here: modify value must update date and selection.
-     * 
-     * Note: this started to fail during listener cleanup.
+     * Sanity during revision: be sure we don't loose the 
+     * ui listening to picker property changes.
+     *
      */
-    public void testSynchEditorSetValue() {
+    public void testDatePickerPropertyListening() {
         JXDatePicker picker = new JXDatePicker();
-        picker.setDate(null);
-        Date date = XTestUtils.getCleanedToday();
-        picker.getEditor().setValue(date);
-        assertEquals(picker.getEditor().getValue(), picker.getDate());
-    } 
-
-    /**
-     * Issue ??-swingX: date must be synched in all parts.
-     * here: modify value must work after changing the editor.
-     * 
-     * Note: this started to fail during listener cleanup.
-     */
-    public void testSynchEditorSetValueAfterSetEditor() {
-        JXDatePicker picker = new JXDatePicker();
-        picker.setEditor(new JFormattedTextField(DateFormat.getInstance()));
-        picker.setDate(null);
-        Date date = XTestUtils.getCleanedToday();
-        picker.getEditor().setValue(date);
-        assertEquals(picker.getEditor().getValue(), picker.getDate());
-    } 
-
+        picker.setEnabled(false);
+        assertFalse(picker.getEditor().isEnabled());
+        picker.setEditable(false);
+        assertFalse(picker.getEditor().isEditable());
+        picker.setToolTipText("dummy");
+        assertEquals("dummy", picker.getEditor().getToolTipText());
+    }
     /**
      * Issue ??-swingx: uninstallUI does not release propertyChangeListener
      * to editor. Reason is that the de-install was not done in 
@@ -244,25 +364,42 @@ public class JXDatePickerTest extends TestCase {
             assertEquals("timezone must be synched", picker.getTimeZone(), format.getTimeZone());
         }
     }
-    
+
     /**
-     * Characterization: setting the monthview updates
+     * Characterization: setting the monthview's selection model updates
      * the datePicker's date to the monthView's current
      * selection.
-     * Here: monthview with empty selection.
+     * 
+     * Here: model with selection.
      *
      */
-    public void testDatePickerSetMonthViewWithEmptySelection() {
+    public void testSynchAllAfterSetSelectionModelNotEmpty() {
         JXDatePicker picker = new JXDatePicker();
-        Date date = picker.getDate();
+        Date date = XTestUtils.getCleanedToday(5);
+        DateSelectionModel model = new DefaultDateSelectionModel();
+        model.setSelectionInterval(date, date);
         // sanity
-        assertNotNull(date);
-        JXMonthView monthView = new JXMonthView();
-        Date selectedDate = monthView.getSelectedDate();
-        assertNull(selectedDate);
-        picker.setMonthView(monthView);
-        // okay, seems to be that the monthView rules 
-        assertEquals(selectedDate, picker.getDate());
+        assertFalse(date.equals(picker.getDate()));
+        picker.getMonthView().setSelectionModel(model);
+        assertSynchAll(picker, date);
+    }
+    
+
+    /**
+     * Characterization: setting the monthview's selection model updates
+     * the datePicker's date to the monthView's current
+     * selection.
+     * 
+     * Here: model with empty selection.
+     *
+     */
+    public void testSynchAllAfterSetSelectionModelEmpty() {
+        JXDatePicker picker = new JXDatePicker();
+        assertNotNull(picker.getDate());
+        DateSelectionModel model = new DefaultDateSelectionModel();
+        assertTrue(model.isSelectionEmpty());
+        picker.getMonthView().setSelectionModel(model);
+        assertSynchAll(picker, null);
     }
     
     /**
@@ -272,19 +409,36 @@ public class JXDatePickerTest extends TestCase {
      * Here: monthview with selection.
      *
      */
-    public void testDatePickerSetMonthViewWithSelection() {
+    public void testSynchAllSetMonthViewWithSelection() {
         JXDatePicker picker = new JXDatePicker();
         JXMonthView monthView = new JXMonthView();
-        Date other = new GregorianCalendar(2007, 6, 28).getTime();
-        monthView.setSelectionInterval(other, other);
+        Date date = XTestUtils.getCleanedToday(5);
+        monthView.setSelectionInterval(date, date);
         // sanity
-        assertFalse(other.equals(picker.getDate()));
+        assertFalse(date.equals(picker.getDate()));
         picker.setMonthView(monthView);
-        // okay, seems to be that the monthView rules 
-        assertEquals("montview selection/picker date must be equal after setMonthView ", 
-                other, picker.getDate());
+        assertSynchAll(picker, date);
+    }
+
+    /**
+     * Characterization: setting the monthview updates
+     * the datePicker's date to the monthView's current
+     * selection.
+     * Here: monthview with empty selection.
+     *
+     */
+    public void testSynchAllSetMonthViewWithEmptySelection() {
+        JXDatePicker picker = new JXDatePicker();
+        // sanity
+        assertNotNull(picker.getDate());
+        JXMonthView monthView = new JXMonthView();
+        Date selectedDate = monthView.getSelectedDate();
+        assertNull(selectedDate);
+        picker.setMonthView(monthView);
+        assertSynchAll(picker, selectedDate);
     }
     
+
     /**
      * PrefSize should be independent of empty/filled picker. 
      * If not, the initial size might appear kind of collapsed.
