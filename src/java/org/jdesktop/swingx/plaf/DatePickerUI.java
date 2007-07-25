@@ -18,6 +18,9 @@
  */
 package org.jdesktop.swingx.plaf;
 
+import java.beans.PropertyVetoException;
+import java.util.Date;
+
 import javax.swing.plaf.ComponentUI;
 
 /**
@@ -36,4 +39,20 @@ public abstract class DatePickerUI extends ComponentUI {
     public int getBaseline(int width, int height) {
         return -1;
     }
+
+    /**
+     * Checks the given date for validity for selection. If valid, 
+     * returns the date as appropriate in the picker's context, otherwise
+     * throws a propertyVetoException. Note that the returned date might
+     * be different from the input date, f.i. the time fields might be
+     * cleared. The input date is guaranteed to be unchanged.
+     * 
+     * @param date date to check
+     * @return the date as allowed in the context of the picker.
+     * 
+     * @throws PropertyVetoException if the given date is not valid for 
+     *    selection
+     */
+    public abstract Date getSelectableDate(Date date) throws PropertyVetoException;
+
 }

@@ -28,6 +28,7 @@ import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyVetoException;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.ParseException;
@@ -101,6 +102,8 @@ public class JXDatePicker extends JComponent {
     private EventListenerMap listenerMap;
     protected boolean lightWeightPopupEnabled = JPopupMenu.getDefaultLightWeightPopupEnabled();
 
+    private Date date;
+
     /**
      * Create a new date picker using the current date as the initial
      * selection and the default abstract formatter
@@ -131,6 +134,59 @@ public class JXDatePicker extends JComponent {
         // install the controller before setting the date
         updateUI();
         setDate(new Date(millis));
+    }
+
+
+    /**
+     * Set the currently selected date.  If the date is <code>null</code> the selection is cleared.
+     *
+     * PENDING: the fire on change is incomplete. 
+     *  
+     * @param date date
+     */
+    public void setDate(Date date) {
+        try {
+            date = getUI().getSelectableDate(date);
+        } catch (PropertyVetoException e) {
+            return;
+        }
+        // PENDING: move to ui-delegate
+        Date old = getDate();
+        this.date = date;
+        firePropertyChange("date", old, getDate());
+    }
+
+ 
+    /**
+     * Set the currently selected date.
+     *
+     * @param millis milliseconds
+     */
+    public void setDateInMillis(long millis) {
+        setDate(new Date(millis));
+    }
+
+    /**
+     * Returns the currently selected date.
+     *
+     * @return Date
+     */
+    public Date getDate() {
+        return date; 
+    }
+
+    /**
+     * Returns the currently selected date in milliseconds.
+     *
+     * @return the date in milliseconds, -1 if there is no selection.
+     */
+    public long getDateInMillis() {
+        long result = -1;
+        Date selection = getDate();
+        if (selection != null) {
+            result = selection.getTime();
+        }
+        return result;
     }
 
     /**
@@ -228,85 +284,6 @@ public class JXDatePicker extends JComponent {
             }
         }
         return null;
-    }
-
-    /**
-     * Set the currently selected date.  If the date is <code>null</code> the selection is cleared.
-     *
-     * PENDING: the fire on change is incomplete. 
-     *  
-     * @param date date
-     */
-    public void setDate(Date date) {
-        // PENDING: move to ui-delegate
-        if (equalsDate(date)) return;
-        Date old = getDate();
-        if (date != null) {
-            _monthView.setSelectionInterval(date, date);
-        } else {
-            _monthView.clearSelection();
-        }
-        firePropertyChange("date", old, getDate());
-//        getEditor().setValue(date);
-//        SortedSet<Date> selection = _monthView.getSelection();
-//        Date selectedDate = selection.isEmpty() ? null : selection.first();
-//
-//        // Only set the date if the value was null and the current selection is not null or
-//        // the value is not null and is not equal to the current selection.
-//        if (date == null && selectedDate != date) {
-//            _monthView.clearSelection();
-//            getEditor().setValue(date);
-//        } else if (date != null && !date.equals(selectedDate)) {
-//            _monthView.setSelectionInterval(date, date);
-//            getEditor().setValue(date);
-//        }
-    }
-
-    /**
-     * @param date
-     * @return
-     */
-    private boolean equalsDate(Date date) {
-        Date current = getDate();
-        if ((date == null) && (current == null)) {
-            return true;
-        }
-        if ((date != null) && (date.equals(current))) {
-           return true; 
-        }
-        return false;
-    }
-
-    /**
-     * Set the currently selected date.
-     *
-     * @param millis milliseconds
-     */
-    public void setDateInMillis(long millis) {
-        setDate(new Date(millis));
-    }
-
-    /**
-     * Returns the currently selected date.
-     *
-     * @return Date
-     */
-    public Date getDate() {
-        return _monthView.getSelectedDate();
-    }
-
-    /**
-     * Returns the currently selected date in milliseconds.
-     *
-     * @return the date in milliseconds, -1 if there is no selection.
-     */
-    public long getDateInMillis() {
-        long result = -1;
-        Date selection = getDate();
-        if (selection != null) {
-            result = selection.getTime();
-        }
-        return result;
     }
 
     /**
@@ -451,12 +428,6 @@ public class JXDatePicker extends JComponent {
      */
     public void commitEdit() throws ParseException {
         _dateField.commitEdit();
-
-        // Reformat the value according to the formatter.
-        _dateField.setValue(_dateField.getValue());
-
-        Date date = (Date) _dateField.getValue();
-        setDate(date);
     }
 
     public void setEditable(boolean value) {

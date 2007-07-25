@@ -23,6 +23,8 @@ package org.jdesktop.swingx;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.text.DateFormat;
+import java.text.Format;
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.Logger;
@@ -89,16 +91,100 @@ public class JXDatePickerTest extends TestCase {
     /**
      *  date is a bound property of DatePicker.
      */
-    public void testSetDateProperty() {
+    public void testDateProperty() {
         JXDatePicker picker = new JXDatePicker();
         picker.setDate(null);
-        Date date = XTestUtils.getCleanedToday();
+        Date date = XTestUtils.getCleanedToday(5);
         PropertyChangeReport report = new PropertyChangeReport();
         picker.addPropertyChangeListener(report);
         picker.setDate(date);
         TestUtils.assertPropertyChangeEvent(report, "date", null, date);
     }
 
+    /**
+     *  date is a bound property of DatePicker. 
+     *  test indirect event firing: changed editor value
+     */
+    public void testDatePropertyThroughEditor() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.setDate(null);
+        Date date = XTestUtils.getCleanedToday(5);
+        PropertyChangeReport report = new PropertyChangeReport();
+        picker.addPropertyChangeListener(report);
+        picker.getEditor().setValue(date);
+        TestUtils.assertPropertyChangeEvent(report, "date", null, date);
+    }
+
+    /**
+     *  date is a bound property of DatePicker.
+     *  test indirect event firing: changed monthView selection 
+     */
+    public void testDatePropertyThroughSelection() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.setDate(null);
+        Date date = XTestUtils.getCleanedToday(5);
+        PropertyChangeReport report = new PropertyChangeReport();
+        picker.addPropertyChangeListener(report);
+        picker.getMonthView().setSelectionInterval(date, date);
+        TestUtils.assertPropertyChangeEvent(report, "date", null, date);
+    }
+
+    /**
+     *  date is a bound property of DatePicker.
+     *  test indirect event firing: commit edited value 
+     * @throws ParseException 
+     *
+     */
+    public void testDatePropertyThroughCommit() throws ParseException {
+        JXDatePicker picker = new JXDatePicker();
+        Date initialDate = picker.getDate();
+        String text = picker.getEditor().getText();
+        Format[] formats = picker.getFormats();
+        assertEquals(picker.getDate(), formats[0].parseObject(text));
+        // manipulate the text, not entirely safe ...
+        String changed = text.replace('0', '1');
+        picker.getEditor().setText(changed);
+        Date date;
+        try {
+            date = (Date) formats[0].parseObject(changed);
+        } catch (ParseException e) {
+            LOG.info("cannot run testSynchAllAfterCommit - parseException in manipulated text");
+            return;
+        }
+        // sanity ...
+        assertFalse("", date.equals(picker.getDate()));
+        PropertyChangeReport report = new PropertyChangeReport();
+        picker.addPropertyChangeListener(report);
+        picker.commitEdit();
+        TestUtils.assertPropertyChangeEvent(report, "date", initialDate, date);
+    }
+
+    /**
+     * last piece: removed synch control from picker.commit. 
+     * @throws ParseException 
+     *
+     */
+    public void testSynchAllAfterCommit() throws ParseException {
+        JXDatePicker picker = new JXDatePicker();
+        String text = picker.getEditor().getText();
+        Format[] formats = picker.getFormats();
+        assertEquals(picker.getDate(), formats[0].parseObject(text));
+        // manipulate the text, not entirely safe ...
+        String changed = text.replace('0', '1');
+        picker.getEditor().setText(changed);
+        Date date;
+        try {
+            date = (Date) formats[0].parseObject(changed);
+        } catch (ParseException e) {
+            LOG.info("cannot run testSynchAllAfterCommit - parseException in manipulated text");
+            return;
+        }
+        // sanity ...
+        assertFalse("", date.equals(picker.getDate()));
+        picker.commitEdit();
+        assertSynchAll(picker, date);
+    }
+    
     /**
      * Issue #559-swingX: date must be synched in all parts.
      * here: initial. 
