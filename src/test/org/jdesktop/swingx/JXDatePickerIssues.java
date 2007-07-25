@@ -164,7 +164,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         simpleField.addActionListener(l);
         textField.addActionListener(l);
         picker.addActionListener(l);
-        picker.getMonthView().addActionListener(l);
+//        picker.getMonthView().addActionListener(l);
         box.addActionListener(l);
         JPanel panel = new JPanel();
         panel.add(simpleField);
@@ -267,35 +267,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 //        assertEquals("", selectionListenerCount, 
 //                picker.getMonthView().getSelectionModel().getListeners().length);
     }
-
-
- 
-
-
-
     
-    /**
-     * Issue #554-swingx: timezone of formats and picker must be synched.
-     */
-    public void testTimeZoneModifiedSynched() {
-        JXDatePicker picker = new JXDatePicker();
-        TimeZone defaultZone = picker.getTimeZone();
-        TimeZone alternative = TimeZone.getTimeZone("GMT-6");
-        // sanity
-        assertNotNull(alternative);
-        if (alternative.equals(defaultZone)) {
-            alternative = TimeZone.getTimeZone("GMT-7");
-            // paranoid ... but shit happens
-            assertNotNull(alternative);
-            assertFalse(alternative.equals(defaultZone));
-        }
-        picker.setTimeZone(alternative);
-        assertEquals(alternative, picker.getTimeZone());
-        for (DateFormat format : picker.getFormats()) {
-            assertEquals("timezone must be synched", picker.getTimeZone(), format.getTimeZone());
-        }
-    }
- 
     /**
      * Characterization: when does the picker fire an action event?
      * @throws ParseException

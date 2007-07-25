@@ -914,11 +914,15 @@ public class JXMonthView extends JComponent {
 
     /**
      * Sets the time zone with the given time zone value.
-     *
+     * 
+     * This is a bound property. 
+     * 
      * @param tz The <code>TimeZone</code>.
      */
     public void setTimeZone(TimeZone tz) {
+        TimeZone old =getTimeZone();
         cal.setTimeZone(tz);
+        firePropertyChange("timeZone", old, getTimeZone());
     }
 
     /**

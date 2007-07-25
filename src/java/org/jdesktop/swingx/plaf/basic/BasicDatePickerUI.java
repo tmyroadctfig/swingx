@@ -34,9 +34,11 @@ import java.awt.event.MouseMotionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
+import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.SortedSet;
+import java.util.TimeZone;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -730,14 +732,16 @@ public class BasicDatePickerUI extends DatePickerUI {
         
         /**
          * Handles property changes from datepicker's editor.
-         * @param e the PropertyChangeEvent object describing the 
-         *     event source and the property that has changed
+         * 
+         * @param e the PropertyChangeEvent object describing the event source
+         *        and the property that has changed
          */
         private void editorPropertyChange(PropertyChangeEvent evt) {
-          if ("value".equals(evt.getPropertyName())) {
-          updateFromValueChanged((Date) evt.getOldValue(), (Date) evt.getNewValue());
-      }
-            
+            if ("value".equals(evt.getPropertyName())) {
+                updateFromValueChanged((Date) evt.getOldValue(), (Date) evt
+                        .getNewValue());
+            }
+
         }
 
         /**
@@ -793,6 +797,10 @@ public class BasicDatePickerUI extends DatePickerUI {
         private void monthViewPropertyChange(PropertyChangeEvent e) {
             if ("selectionModel".equals(e.getPropertyName())) {
                 updateFromSelectionModelChanged((DateSelectionModel) e.getOldValue());
+            } else if ("timeZone".equals(e.getPropertyName())) {
+                for (DateFormat format : datePicker.getFormats()) {
+                    format.setTimeZone((TimeZone) e.getNewValue());
+                }
             }
         }
 
