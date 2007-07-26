@@ -82,7 +82,9 @@ public class JXDatePicker extends JComponent {
     public static final String DATE_IN_MILLIS = "dateInMillis";
     public static final String LINK_PANEL = "linkPanel";
 
+    /** action command used for commit actionEvent. */
     public static final String COMMIT_KEY = "datePickerCommit";
+    /** action command used for cancel actionEvent. */
     public static final String CANCEL_KEY = "datePickerCancel";
 
     /**

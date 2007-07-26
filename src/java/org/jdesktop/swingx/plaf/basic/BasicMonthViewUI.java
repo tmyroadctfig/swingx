@@ -256,8 +256,10 @@ public class BasicMonthViewUI extends MonthViewUI {
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.SHIFT_MASK, false), "adjustSelectionNextWeek");
 
         ActionMap actionMap = monthView.getActionMap();
-        actionMap.put("acceptSelection", new KeyboardAction(KeyboardAction.ACCEPT_SELECTION));
-        actionMap.put("cancelSelection", new KeyboardAction(KeyboardAction.CANCEL_SELECTION));
+        KeyboardAction acceptAction = new KeyboardAction(KeyboardAction.ACCEPT_SELECTION);
+        actionMap.put("acceptSelection", acceptAction);
+        KeyboardAction cancelAction = new KeyboardAction(KeyboardAction.CANCEL_SELECTION);
+        actionMap.put("cancelSelection", cancelAction);
 
         actionMap.put("selectPreviousDay", new KeyboardAction(KeyboardAction.SELECT_PREVIOUS_DAY));
         actionMap.put("selectNextDay", new KeyboardAction(KeyboardAction.SELECT_NEXT_DAY));
@@ -268,6 +270,10 @@ public class BasicMonthViewUI extends MonthViewUI {
         actionMap.put("adjustSelectionNextDay", new KeyboardAction(KeyboardAction.ADJUST_SELECTION_NEXT_DAY));
         actionMap.put("adjustSelectionPreviousWeek", new KeyboardAction(KeyboardAction.ADJUST_SELECTION_PREVIOUS_WEEK));
         actionMap.put("adjustSelectionNextWeek", new KeyboardAction(KeyboardAction.ADJUST_SELECTION_NEXT_WEEK));
+
+        actionMap.put(JXMonthView.COMMIT_KEY, acceptAction);
+        actionMap.put(JXMonthView.CANCEL_KEY, cancelAction);
+    
     }
 
     protected void uninstallKeyboardActions() {}
@@ -1399,7 +1405,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             monthView.getSelectionModel().setAdjusting(false);
             
             if (armed) {
-                monthView.postActionEvent();
+                monthView.commitSelection();
             }
             armed = false;
         }
@@ -1695,6 +1701,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 // JW: removed the isUsingKeyboard from the condition
                 // need to fire always.
                 if (action >= ACCEPT_SELECTION && action <= CANCEL_SELECTION) { //&& isUsingKeyboard()) {
+                   // refactor the logic ... 
                     if (action == CANCEL_SELECTION) {
                         // Restore the original selection.
                         if ((originalDateSpan != null) && !originalDateSpan.isEmpty()) {
@@ -1702,11 +1709,13 @@ public class BasicMonthViewUI extends MonthViewUI {
                         } else {
                             monthView.clearSelection();
                         }
+                        monthView.getSelectionModel().setAdjusting(false);
+                        monthView.cancelSelection();
                     } else {
                         // Accept the keyboard selection.
+                        monthView.getSelectionModel().setAdjusting(false);
+                        monthView.commitSelection();
                     }
-                    monthView.getSelectionModel().setAdjusting(false);
-                    monthView.postActionEvent();
                     setUsingKeyboard(false);
                 } else if (action >= SELECT_PREVIOUS_DAY && action <= SELECT_DAY_NEXT_WEEK) {
                     setUsingKeyboard(true);

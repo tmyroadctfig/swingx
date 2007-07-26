@@ -35,6 +35,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.SortedSet;
@@ -42,6 +43,7 @@ import java.util.TimeZone;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.Icon;
 import javax.swing.InputMap;
@@ -68,7 +70,7 @@ import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.plaf.DatePickerUI;
 
 /**
- * The basic implementation of a DatePickerUI.
+ * The basic implementation of a <code>DatePickerUI</code>.
  * <p>
  * 
  * 
@@ -158,14 +160,67 @@ public class BasicDatePickerUI extends DatePickerUI {
     }
 
     protected void installKeyboardActions() {
+        // install picker's actions
+        ActionMap pickerMap = datePicker.getActionMap();
+        pickerMap.put(JXDatePicker.CANCEL_KEY, createCancelAction());
+        pickerMap.put(JXDatePicker.COMMIT_KEY, createCommitAction());
+        InputMap pickerInputMap = datePicker.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        pickerInputMap.put(KeyStroke.getKeyStroke("ENTER"), JXDatePicker.COMMIT_KEY);
+        pickerInputMap.put(KeyStroke.getKeyStroke("ESCAPE"), JXDatePicker.CANCEL_KEY);
+
+        // install popupButton's actions
+        // PENDING JW move the picker's input map, make popup unfocusable
+        //
         KeyStroke spaceKey =
                 KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false);
 
         InputMap inputMap = popupButton.getInputMap(JComponent.WHEN_FOCUSED);
         inputMap.put(spaceKey, "TOGGLE_POPUP");
-
+        // move to pickers action map
         ActionMap actionMap = popupButton.getActionMap();
         actionMap.put("TOGGLE_POPUP", new TogglePopupAction());
+        
+    }
+
+    
+    /**
+     * Creates and returns the action for committing the picker's 
+     * input.
+     * 
+     * @return
+     */
+    private Action createCommitAction() {
+        Action action = new AbstractAction() {
+
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    datePicker.commitEdit();
+                } catch (ParseException ex) {
+                    // can't help it
+                }
+                
+            }
+            
+        };
+        return action;
+    }
+
+    /**
+     * Creates and returns the action for cancel the picker's 
+     * edit.
+     * 
+     * @return
+     */
+    private Action createCancelAction() {
+        Action action = new AbstractAction() {
+
+            public void actionPerformed(ActionEvent e) {
+                datePicker.cancelEdit();
+                
+            }
+            
+        };
+        return action;
     }
 
     protected void uninstallKeyboardActions() {
@@ -617,7 +672,6 @@ public class BasicDatePickerUI extends DatePickerUI {
 
         public BasicDatePickerPopup() {
             JXMonthView monthView = datePicker.getMonthView();
-            monthView.setActionCommand("MONTH_VIEW");
             monthView.addActionListener(this);
 
             setLayout(new BorderLayout());
@@ -630,18 +684,16 @@ public class BasicDatePickerUI extends DatePickerUI {
 
         public void actionPerformed(ActionEvent ev) {
             String command = ev.getActionCommand();
-            if ("MONTH_VIEW".equals(command)) {
                 datePicker.getEditor().setValue(datePicker.getMonthView().getSelectedDate());
                 setVisible(false);
-            }
         }
     }
 
     /**
      * PENDING: JW - I <b>really</b> hate the one-in-all. Wont touch
-     *   is for now, maybe later. As long as we have it, the new
-     *   listeners (dateSelection) are here as well, for consistency.
-     *   Adding the Layout here as well is really gross, IMO.
+     *   it for now, maybe later. As long as we have it, the new
+     *   listeners (dateSelection) are here too, for consistency.
+     *   Adding the Layout here as well is ... , IMO.
      */
     private class Handler implements LayoutManager, MouseListener, MouseMotionListener,
             PropertyChangeListener, DateSelectionListener {

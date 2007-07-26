@@ -30,6 +30,7 @@ import javax.swing.JComponent;
 
 import org.jdesktop.swingx.DateSelectionListener;
 import org.jdesktop.swingx.DateSelectionModel;
+import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.calendar.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
@@ -58,6 +59,85 @@ public class JXMonthViewTest extends MockObjectTestCase {
 
     public void teardown() {
         JComponent.setDefaultLocale(componentLocale);
+    }
+
+    /**
+     * Enhanced commit/cancel.
+     * 
+     * test that actions fire as expected.
+     *
+     */
+    public void testCommitCancelAPIFires() {
+        JXMonthView picker = new JXMonthView();
+        ActionReport report = new ActionReport();
+        picker.addActionListener(report);
+        picker.commitSelection();
+        assertEquals(1, report.getEventCount());
+        assertEquals(JXMonthView.COMMIT_KEY, report.getLastActionCommand());
+        report.clear();
+        picker.cancelSelection();
+        assertEquals(1, report.getEventCount());
+        assertEquals(JXMonthView.CANCEL_KEY, report.getLastActionCommand());
+    }
+    
+    /**
+     * Enhanced commit/cancel.
+     * 
+     * test that actions fire as expected.
+     *
+     */
+    public void testCommitCancelActionsFire() {
+        JXMonthView picker = new JXMonthView();
+        Action commitAction = picker.getActionMap().get(JXMonthView.COMMIT_KEY);
+        ActionReport report = new ActionReport();
+        picker.addActionListener(report);
+        commitAction.actionPerformed(null);
+        assertEquals(1, report.getEventCount());
+        assertEquals(JXMonthView.COMMIT_KEY, report.getLastActionCommand());
+        report.clear();
+        Action cancelAction = picker.getActionMap().get(JXMonthView.CANCEL_KEY);
+        cancelAction.actionPerformed(null);
+        assertEquals(1, report.getEventCount());
+        assertEquals(JXMonthView.CANCEL_KEY, report.getLastActionCommand());
+    }
+
+
+    /**
+     * Enhanced commit/cancel.
+     * 
+     * test that actions are registered.
+     *
+     */
+    public void testCommitCancelActionExist() {
+        JXMonthView picker = new JXMonthView();
+        assertNotNull(picker.getActionMap().get(JXMonthView.CANCEL_KEY));
+        assertNotNull(picker.getActionMap().get(JXMonthView.COMMIT_KEY));
+    }
+    
+    /**
+     * Enhanced commit/cancel.
+     * 
+     * test that actions are the same for new/old cancel/accept.
+     *
+     */
+    public void testCommitCancelSameAsOld() {
+        JXMonthView picker = new JXMonthView();
+        assertSame(picker.getActionMap().get("cancelSelection"),
+                picker.getActionMap().get(JXMonthView.CANCEL_KEY));
+        assertSame(picker.getActionMap().get("acceptSelection"),
+                picker.getActionMap().get(JXMonthView.COMMIT_KEY));
+    }
+
+    /**
+     * for now keep the old postAction.
+     *
+     */
+    public void testCommitCancelPreserveOld() {
+        JXDatePicker picker = new JXDatePicker();
+        ActionReport report = new ActionReport();
+        picker.addActionListener(report);
+        picker.postActionEvent();
+        assertEquals(picker.getActionCommand(), report.getLastActionCommand());
     }
 
     

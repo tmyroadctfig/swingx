@@ -32,6 +32,7 @@ import java.util.SortedSet;
 import java.util.logging.Logger;
 
 import javax.swing.Action;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
@@ -65,6 +66,20 @@ public class JXMonthViewIssues extends InteractiveTestCase {
       }
   }
 
+    /**
+     * Issue ?? swingx: arrow keys active even if not focused.
+     * focus the button and use the arrow keys: selection moves.
+     * Reason 
+     *
+     */
+    public void interactiveMistargetedKeyStrokes() {
+        JXMonthView month = new JXMonthView();
+        JComponent panel = new JPanel();
+        panel.add(new JButton("something to focus"));
+        panel.add(month);
+        showInFrame(panel, "default - for debugging only");
+    }
+    
     public void interactiveSimple() {
         JXMonthView month = new JXMonthView();
         showInFrame(month, "default - for debugging only");

@@ -146,6 +146,11 @@ public class JXMonthView extends JComponent {
         WEEK_INTERVAL_SELECTION
     }
 
+    /** action command used for commit actionEvent. */
+    public static final String COMMIT_KEY = "monthViewCommit";
+    /** action command used for cancel actionEvent. */
+    public static final String CANCEL_KEY = "monthViewCancel";
+
     public static final String BOX_PADDING_X = "boxPaddingX";
     public static final String BOX_PADDING_Y = "boxPaddingY";
     public static final String DAYS_OF_THE_WEEK = "daysOfTheWeek";
@@ -1325,9 +1330,12 @@ public class JXMonthView extends JComponent {
     }
 
     /**
-     * Fires an ActionEvent to all listeners.
+     * Creates and fires an ActionEvent with the given action 
+     * command to all listeners.
+     * 
+     * @param actionCommand the command for the created.
      */
-    protected void fireActionPerformed() {
+    protected void fireActionPerformed(String actionCommand) {
         ActionListener[] listeners = getListeners(ActionListener.class);
         ActionEvent e = null;
 
@@ -1341,35 +1349,63 @@ public class JXMonthView extends JComponent {
         }
     }
 
+    /**
+     * TODO: remove after commit/cancel are installed.
+     *
+     */
     public void postActionEvent() {
-        fireActionPerformed();
+        // PENDING: remove 
+        fireActionPerformed(getActionCommand());
     }
 
-    public static void main(String args[]) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                JFrame frame = new JFrame();
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                JXMonthView mv = new JXMonthView();
-                mv.setShowingWeekNumber(true);
-                mv.setTraversable(true);
-                Calendar cal = Calendar.getInstance();
-                cal.set(2006, 5, 20);
-                mv.setUnselectableDates(new long[] { cal.getTimeInMillis() });
-                mv.setPreferredRows(2);
-                mv.setSelectionMode(SelectionMode.MULTIPLE_INTERVAL_SELECTION);
-                cal.setTimeInMillis(System.currentTimeMillis());
-                mv.setSelectionInterval(cal.getTime(), cal.getTime());
-                mv.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        System.out.println(
-                                ((JXMonthView) e.getSource()).getSelection());
-                    }
-                });
-                frame.getContentPane().add(mv);
-                frame.pack();
-                frame.setVisible(true);
-            }
-        });
+    /**
+     * Commits the current selection and fires an ActionEvent
+     * with the COMMIT_KEY action command.
+     * 
+     * PENDING: define what "commit selection" means ... currently
+     * only fires (to keep the picker happy).
+     */
+    public void commitSelection() {
+        fireActionPerformed(COMMIT_KEY);
     }
+
+    /**
+     * Fires an ActionEvent with the CANCEL_KEY action command.
+     * 
+     * @see #commitSelection
+     */
+    public void cancelSelection() {
+        fireActionPerformed(CANCEL_KEY);
+        
+    }
+
+    
+    
+//    public static void main(String args[]) {
+//        SwingUtilities.invokeLater(new Runnable() {
+//            public void run() {
+//                JFrame frame = new JFrame();
+//                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//                JXMonthView mv = new JXMonthView();
+//                mv.setShowingWeekNumber(true);
+//                mv.setTraversable(true);
+//                Calendar cal = Calendar.getInstance();
+//                cal.set(2006, 5, 20);
+//                mv.setUnselectableDates(new long[] { cal.getTimeInMillis() });
+//                mv.setPreferredRows(2);
+//                mv.setSelectionMode(SelectionMode.MULTIPLE_INTERVAL_SELECTION);
+//                cal.setTimeInMillis(System.currentTimeMillis());
+//                mv.setSelectionInterval(cal.getTime(), cal.getTime());
+//                mv.addActionListener(new ActionListener() {
+//                    public void actionPerformed(ActionEvent e) {
+//                        System.out.println(
+//                                ((JXMonthView) e.getSource()).getSelection());
+//                    }
+//                });
+//                frame.getContentPane().add(mv);
+//                frame.pack();
+//                frame.setVisible(true);
+//            }
+//        });
+//    }
 }
