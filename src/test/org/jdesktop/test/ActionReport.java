@@ -50,13 +50,20 @@ public class ActionReport implements ActionListener {
     }
  
      public ActionEvent getLastEvent() {
-        return hasEvents()
-            ? null :  events.get(0);
+        return hasEvents() ?  events.get(0) : null;
     }
 
      public ActionEvent getEvent(Object source) {
          return eventMap.get(source);
      }
+
+    /**
+     * @return the action command of the last event or null 
+     *   if no events received.
+     */
+    public Object getLastActionCommand() {
+        return hasEvents() ?  events.get(0).getActionCommand() : null;
+    }
 
 
 }
