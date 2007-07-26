@@ -170,21 +170,26 @@ public class BasicDatePickerUI extends DatePickerUI {
         ActionMap pickerMap = datePicker.getActionMap();
         pickerMap.put(JXDatePicker.CANCEL_KEY, createCancelAction());
         pickerMap.put(JXDatePicker.COMMIT_KEY, createCommitAction());
+        TogglePopupAction popupAction = createTogglePopupAction();
+        pickerMap.put("TOGGLE_POPUP", popupAction);
+        
         InputMap pickerInputMap = datePicker.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         pickerInputMap.put(KeyStroke.getKeyStroke("ENTER"), JXDatePicker.COMMIT_KEY);
         pickerInputMap.put(KeyStroke.getKeyStroke("ESCAPE"), JXDatePicker.CANCEL_KEY);
 
+        pickerInputMap.put(KeyStroke.getKeyStroke("SPACE"), "TOGGLE_POPUP");
         // install popupButton's actions
         // PENDING JW move the picker's input map, make popup unfocusable
         //
-        KeyStroke spaceKey =
-                KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false);
-
-        InputMap inputMap = popupButton.getInputMap(JComponent.WHEN_FOCUSED);
-        inputMap.put(spaceKey, "TOGGLE_POPUP");
-        // move to pickers action map
-        ActionMap actionMap = popupButton.getActionMap();
-        actionMap.put("TOGGLE_POPUP", new TogglePopupAction());
+//        KeyStroke spaceKey =
+//                KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false);
+//
+//        
+//        InputMap inputMap = popupButton.getInputMap(JComponent.WHEN_FOCUSED);
+//        inputMap.put(spaceKey, "TOGGLE_POPUP");
+//        // move to pickers action map
+//        ActionMap actionMap = popupButton.getActionMap();
+//        actionMap.put("TOGGLE_POPUP", popupAction);
         
     }
 
@@ -333,7 +338,7 @@ public class BasicDatePickerUI extends DatePickerUI {
             icon = (Icon)UIManager.get("Tree.expandedIcon");
         }
         b.setIcon(icon);
-
+        b.setFocusable(false);
         return b;
     }
 
@@ -729,6 +734,13 @@ public class BasicDatePickerUI extends DatePickerUI {
             cancel();
         }
 
+    }
+
+    /**
+     * @return
+     */
+    protected TogglePopupAction createTogglePopupAction() {
+        return new TogglePopupAction();
     }
 
 

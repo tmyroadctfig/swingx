@@ -33,7 +33,9 @@ import java.util.logging.Logger;
 
 import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
+import javax.swing.KeyStroke;
 
 import junit.framework.TestCase;
 
@@ -60,6 +62,22 @@ public class JXDatePickerTest extends TestCase {
     public void teardown() {
     }
 
+    /**
+     * test that the toggle popup is registered in the 
+     * picker's actionMap.
+     *
+     */
+    public void testTogglePopupAction() {
+       JXDatePicker picker = new JXDatePicker();
+       Action togglePopup = picker.getActionMap().get("TOGGLE_POPUP");
+       assertNotNull(togglePopup);
+       KeyStroke space = KeyStroke.getKeyStroke("SPACE");
+       Object actionKey = picker.getInputMap(
+               JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+               .get(space);
+       assertEquals(actionKey, "TOGGLE_POPUP");
+    }
+    
     /**
      * Enhanced commit/cancel.
      * 

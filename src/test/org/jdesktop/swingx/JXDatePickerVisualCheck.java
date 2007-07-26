@@ -22,7 +22,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
-import java.text.ParseException;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
@@ -36,7 +35,6 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.UIManager.LookAndFeelInfo;
 
 import org.jdesktop.swingx.calendar.JXMonthView;
-import org.jdesktop.test.ActionReport;
 
 /**
  * Simple tests to ensure that the {@code JXDatePicker} can be instantiated and

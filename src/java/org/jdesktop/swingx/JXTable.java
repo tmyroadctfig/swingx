@@ -21,23 +21,28 @@
 
 package org.jdesktop.swingx;
 
+import java.applet.Applet;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.print.PrinterException;
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -58,6 +63,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -66,6 +72,7 @@ import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SizeSequence;
+import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
@@ -3973,7 +3980,126 @@ public class JXTable extends JTable
         firePropertyChange("autoStartEditOnKeyStroke", old,
                 isAutoStartEditOnKeyStroke());
     }
+
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * overridden to install a custom editor remover.
+     */
+    @Override
+    public boolean editCellAt(int row, int column, EventObject e) {
+        boolean started = super.editCellAt(row, column, e);
+        if (started) {
+            hackEditorRemover();
+        }
+        return started;
+    }
     
+    protected transient CellEditorRemover editorRemover;
+
+    /**
+     * removes the standard editor remover and adds the custom
+     * remover.
+     *
+     */
+    private void hackEditorRemover() {
+        KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+        PropertyChangeListener[] listeners = manager.getPropertyChangeListeners("permanentFocusOwner");
+        for (int i = listeners.length - 1; i >= 0; i--) {
+            if (listeners[i].getClass().getName().startsWith("javax.swing.JTable")) {
+                manager.removePropertyChangeListener("permanentFocusOwner", listeners[i]);
+            }
+        }
+        if (editorRemover == null) {
+            editorRemover = new CellEditorRemover();
+        }
+    }
+
+
+    /**
+     * {@inheritDoc}<p>
+     * 
+     * Overridden to uninstall the custom editor remover.
+     */
+    @Override
+    public void removeNotify() {
+        if (editorRemover != null) {
+            editorRemover.uninstall();
+            editorRemover = null;
+        }
+        super.removeNotify();
+    }
+
+
+    // This class tracks changes in the keyboard focus state. It is used
+    // when the JTable is editing to determine when to cancel the edit.
+    // If focus switches to a component outside of the jtable, but in the
+    // same window, this will cancel editing.
+   class  CellEditorRemover implements PropertyChangeListener {
+        KeyboardFocusManager focusManager;
+
+        public CellEditorRemover() {
+            install();
+        }
+
+        private void install() {
+            focusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+            focusManager.addPropertyChangeListener("permanentFocusOwner", this);
+            focusManager.addPropertyChangeListener("managingfocus", this);
+        }
+
+        /**
+         * remove all listener registrations.
+         *
+         */
+        public void uninstall() {
+            focusManager.removePropertyChangeListener("permanentFocusOwner", this);
+            focusManager.removePropertyChangeListener("managingfocus", this);
+            focusManager = null;
+        }
+        
+        public void propertyChange(PropertyChangeEvent ev) {
+            if (ev == null) return;
+            if ("permanentFocusOwner".equals(ev.getPropertyName())) {
+                permanentFocusOwnerChange();
+            } else if ("managingFocus".equals(ev.getPropertyName())) {
+                // TODO uninstall/install after manager changed.
+            }
+        }
+
+        /**
+         * 
+         */
+        private void permanentFocusOwnerChange() {
+            if (!isEditing() || !isTerminateEditOnFocusLost()) {
+                return;
+            }
+
+            Component c = focusManager.getPermanentFocusOwner();
+            while (c != null) {
+                if (c == JXTable.this) {
+                    // focus remains inside the table
+                    return;
+                } else if (c instanceof JPopupMenu) {
+                    // need to switch the hierarchy to a popups invoker
+                    c = ((JPopupMenu) c).getInvoker();
+                } else if ((c instanceof Window) ||
+                           (c instanceof Applet && c.getParent() == null)) {
+                    if (c == SwingUtilities.getRoot(JXTable.this)) {
+                        if (!getCellEditor().stopCellEditing()) {
+                            getCellEditor().cancelCellEditing();
+                        }
+                    }
+                    break;
+                }
+                c = c.getParent();
+            }
+        }
+    }
+
+
+
+
 
     // ---------------------------- updateUI support
 
