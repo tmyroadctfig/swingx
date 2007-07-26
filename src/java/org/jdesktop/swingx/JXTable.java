@@ -4008,6 +4008,7 @@ public class JXTable extends JTable
         for (int i = listeners.length - 1; i >= 0; i--) {
             if (listeners[i].getClass().getName().startsWith("javax.swing.JTable")) {
                 manager.removePropertyChangeListener("permanentFocusOwner", listeners[i]);
+                break;
             }
         }
         if (editorRemover == null) {
