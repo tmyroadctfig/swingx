@@ -40,10 +40,8 @@ import java.util.TimeZone;
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
@@ -160,6 +158,16 @@ public class JXDatePicker extends JComponent {
      * @see #getDate();
      */
     public void setDate(Date date) {
+        /*
+         * JW: 
+         * this is a poor woman's constraint property.
+         * Introduces explicit coupling to the ui. 
+         * Which is unusual at this place in code.
+         * 
+         * If needed the date can be made a formal
+         * constraint property and let the ui add a
+         * VetoablePropertyListener.
+         */
         try {
             date = getUI().getSelectableDate(date);
         } catch (PropertyVetoException e) {
@@ -641,22 +649,4 @@ public class JXDatePicker extends JComponent {
         }
     }
 
-    public static void main(String args[]) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                JFrame frame = new JFrame();
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                JXDatePicker datePicker = new JXDatePicker();
-                datePicker.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        System.out.println(
-                                ((JXDatePicker) e.getSource()).getMonthView().getSelection());
-                    }
-                });
-                frame.getContentPane().add(datePicker);
-                frame.pack();
-                frame.setVisible(true);
-            }
-        });
-    }
 }
