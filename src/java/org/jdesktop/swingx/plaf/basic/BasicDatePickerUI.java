@@ -78,6 +78,7 @@ import org.jdesktop.swingx.plaf.DatePickerUI;
  * @author Jeanette Winzenburg
  */
 public class BasicDatePickerUI extends DatePickerUI {
+
     @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(BasicDatePickerUI.class
             .getName());
@@ -91,12 +92,13 @@ public class BasicDatePickerUI extends DatePickerUI {
     protected MouseMotionListener mouseMotionListener;
 
     private PropertyChangeListener editorPropertyListener;
-
+    private ActionListener editorActionListener;
+    private EditorCancelAction editorCancelAction;
+    
     private DateSelectionListener monthViewSelectionListener;
 
     private ActionListener monthViewActionListener;
 
-    private ActionListener editorActionListener;
 
     @SuppressWarnings({"UnusedDeclaration"})
     public static ComponentUI createUI(JComponent c) {
@@ -217,12 +219,16 @@ public class BasicDatePickerUI extends DatePickerUI {
     
     protected void uninstallListeners() {
         datePicker.removePropertyChangeListener(propertyChangeListener);
+        
         datePicker.getMonthView().getSelectionModel().removeDateSelectionListener(monthViewSelectionListener);
+        datePicker.getMonthView().removeActionListener(monthViewActionListener);
+        datePicker.getMonthView().removePropertyChangeListener(propertyChangeListener);
+        
         // JW: when can that be null?
         // maybe in the very beginning? if some code calls ui.uninstall
         // before ui.install? The editor is created by the ui. 
         if (datePicker.getEditor() != null) {
-            datePicker.getEditor().removePropertyChangeListener(editorPropertyListener);
+            uninstallEditorListeners(datePicker.getEditor());
         }
         if (popupButton != null) {
             popupButton.removePropertyChangeListener(propertyChangeListener);
@@ -233,8 +239,13 @@ public class BasicDatePickerUI extends DatePickerUI {
         propertyChangeListener = null;
         mouseListener = null;
         mouseMotionListener = null;
+        
         editorPropertyListener = null;
+        editorActionListener = null;
+        
         monthViewSelectionListener = null;
+        monthViewActionListener = null;
+        
         handler = null;
     }
 
@@ -573,13 +584,25 @@ public class BasicDatePickerUI extends DatePickerUI {
      */
     protected void updateEditorListeners(JFormattedTextField oldEditor) {
         if (oldEditor != null) {
-            oldEditor.removePropertyChangeListener(editorPropertyListener);
-            oldEditor.removeActionListener(editorActionListener);
+            uninstallEditorListeners(oldEditor);
         }
         datePicker.getEditor().addPropertyChangeListener(editorPropertyListener);
         datePicker.getEditor().addActionListener(editorActionListener);
+        editorCancelAction = new EditorCancelAction(datePicker.getEditor());
     }
-    
+
+    /**
+     * @param oldEditor
+     */
+    private void uninstallEditorListeners(JFormattedTextField oldEditor) {
+        oldEditor.removePropertyChangeListener(editorPropertyListener);
+        oldEditor.removeActionListener(editorActionListener);
+        if (editorCancelAction != null) {
+            editorCancelAction.uninstall();
+            editorCancelAction = null;
+        }
+    }
+
     /**
      * Wires monthView's selection model listening. Removes the
      * selection listener from the old model and add to the new model.
@@ -662,6 +685,50 @@ public class BasicDatePickerUI extends DatePickerUI {
             
         };
         return action;
+    }
+
+    /**
+     * The wrapper for the editor cancel action. 
+     * 
+     * PENDING: Need to extend TestAction?
+     * 
+     */
+    public class EditorCancelAction extends AbstractAction {
+        private JFormattedTextField editor;
+        private Action cancelAction;
+        public static final String TEXT_CANCEL_KEY = "reset-field-edit";
+       
+        public EditorCancelAction(JFormattedTextField field) {
+            install(field);
+        }
+        
+        /**
+         * Resets the contained editors actionMap to original and
+         * nulls all fields. <p>
+         * NOTE: after calling this method the action must not be
+         * used! Create a new one for the same or another editor.
+         *
+         */
+        public void uninstall() {
+            editor.getActionMap().remove(TEXT_CANCEL_KEY);
+            cancelAction = null;
+            editor = null;
+        }
+        
+        /**
+         * @param editor
+         */
+        private void install(JFormattedTextField editor) {
+            this.editor = editor;
+            cancelAction = editor.getActionMap().get(TEXT_CANCEL_KEY);
+            editor.getActionMap().put(TEXT_CANCEL_KEY, this);
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            cancelAction.actionPerformed(null);
+            cancel();
+        }
+
     }
 
 

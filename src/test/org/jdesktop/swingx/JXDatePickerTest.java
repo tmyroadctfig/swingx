@@ -38,17 +38,14 @@ import javax.swing.JFormattedTextField;
 import junit.framework.TestCase;
 
 import org.jdesktop.swingx.calendar.JXMonthView;
+import org.jdesktop.swingx.plaf.basic.BasicDatePickerUI.EditorCancelAction;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.ActionReport;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
 
 /**
- * Created by IntelliJ IDEA.
- * User: joutwate
- * Date: Jun 1, 2006
- * Time: 6:58:10 PM
- * To change this template use File | Settings | File Templates.
+ * Unit tests for JXDatePicker.
  */
 public class JXDatePickerTest extends TestCase {
     private static final Logger LOG = Logger.getLogger(JXDatePickerTest.class
@@ -102,6 +99,35 @@ public class JXDatePickerTest extends TestCase {
         assertEquals(standalone + 1, contained);
     }
 
+    /**
+     * test wrapping and resetting the editors cancel action.
+     * internals ... mostly to be sure about cleanup and re-wire.
+     */
+    public void testCancelEditorAction() {
+        JFormattedTextField field = new JFormattedTextField(new JXDatePickerFormatter());
+        // original action
+        Action original = field.getActionMap().get(EditorCancelAction.TEXT_CANCEL_KEY);
+        assertNotNull(original);
+        JXDatePicker picker = new JXDatePicker();
+        JFormattedTextField editor = picker.getEditor();
+        Action wrapper = editor.getActionMap().get(EditorCancelAction.TEXT_CANCEL_KEY);
+        // wrapper installed
+        assertTrue("PickerUI installed the wrapper action", wrapper instanceof EditorCancelAction);
+        // set editor to field
+        picker.setEditor(field);
+        // old editor back to original 
+        assertSame("original action must be reset on setEditor", original, 
+                editor.getActionMap().get(EditorCancelAction.TEXT_CANCEL_KEY));
+        Action otherWrapper = field.getActionMap().get(EditorCancelAction.TEXT_CANCEL_KEY);
+        assertTrue(otherWrapper instanceof EditorCancelAction);
+        // created a new one
+        assertNotSame(wrapper, otherWrapper);
+        // uninstall
+        picker.getUI().uninstallUI(picker);
+        assertSame("original action must be reset on uninstall", original, 
+                field.getActionMap().get(EditorCancelAction.TEXT_CANCEL_KEY));
+    }
+    
     /**
      * Enhanced commit/cancel.
      * 
