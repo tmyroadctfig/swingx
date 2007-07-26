@@ -22,6 +22,7 @@ package org.jdesktop.swingx;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.ParseException;
@@ -60,6 +61,45 @@ public class JXDatePickerTest extends TestCase {
     }
 
     public void teardown() {
+    }
+
+    /**
+     * Enhanced commit/cancel.
+     * 
+     * test the actionEvents produced by the monthview trigger
+     * commit cancel in the picker.
+     *
+     */
+    public void testCommitCancelFromMonthView() {
+        JXDatePicker picker = new JXDatePicker();
+        Action commitAction = picker.getMonthView().getActionMap().get(JXMonthView.COMMIT_KEY);
+        ActionReport report = new ActionReport();
+        picker.addActionListener(report);
+        commitAction.actionPerformed(null);
+        assertEquals("must have receive 1 event after monthView commit", 
+                1, report.getEventCount());
+        assertEquals(JXDatePicker.COMMIT_KEY, report.getLastActionCommand());
+        report.clear();
+        Action cancelAction = picker.getMonthView().getActionMap().get(JXMonthView.CANCEL_KEY);
+        cancelAction.actionPerformed(null);
+        assertEquals("must have receive 1 event after monthView cancel", 
+                1, report.getEventCount());
+        assertEquals(JXDatePicker.CANCEL_KEY, report.getLastActionCommand());
+        
+    }
+    
+    /**
+     * Enhanced commit/cancel.
+     * 
+     * test that the ui installed a listener.
+     */
+    public void testCommitCancelListeningToMonthView() {
+        JXMonthView monthView = new JXMonthView();
+        int standalone = monthView.getListeners(ActionListener.class).length;
+        assertEquals(0, standalone);
+        JXDatePicker picker = new JXDatePicker();
+        int contained = picker.getMonthView().getListeners(ActionListener.class).length;
+        assertEquals(standalone + 1, contained);
     }
 
     /**
