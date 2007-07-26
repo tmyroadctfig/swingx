@@ -148,39 +148,25 @@ public class JXTreeTable extends JXTable {
      * @param treeModel model for the JXTreeTable
      */
     public JXTreeTable(TreeTableModel treeModel) {
-        // Implementation note:
-        // Make sure that the SAME instance of treeModel is passed to the
-        // constructor for TreeTableCellRenderer as is passed in the first
-        // argument to the following chained constructor for this JXTreeTable:
-        this(treeModel, new JXTreeTable.TreeTableCellRenderer(treeModel));
+        this(new JXTreeTable.TreeTableCellRenderer(treeModel));
     }
 
     /**
      * Constructs a <code>JXTreeTable</code> using the specified
-     * {@link org.jdesktop.swingx.treetable.TreeTableModel} and
-     * {@link org.jdesktop.swingx.JXTreeTable.TreeTableCellRenderer}. The renderer
-     * must have been constructed using the same instance of
-     * {@link org.jdesktop.swingx.treetable.TreeTableModel} as passed to this
-     * constructor.
-     *
-     * @param treeModel model for the JXTreeTable
-     * @param renderer cell renderer for the tree portion of this JXTreeTable instance.
-     * @throws IllegalArgumentException if an attempt is made to instantiate
-     * JXTreeTable and TreeTableCellRenderer with different instances of TreeTableModel.
+     * {@link org.jdesktop.swingx.JXTreeTable.TreeTableCellRenderer}.
+     * 
+     * @param renderer
+     *                cell renderer for the tree portion of this JXTreeTable
+     *                instance.
      */
-    private JXTreeTable(TreeTableModel treeModel, TreeTableCellRenderer renderer) {
+    private JXTreeTable(TreeTableCellRenderer renderer) {
         // To avoid unnecessary object creation, such as the construction of a
-        // DefaultTableModel, it is better to invoke super(TreeTableModelAdapter)
-        // directly, instead of first invoking super() followed by a call to
-        // setTreeTableModel(TreeTableModel).
+        // DefaultTableModel, it is better to invoke
+        // super(TreeTableModelAdapter) directly, instead of first invoking
+        // super() followed by a call to setTreeTableModel(TreeTableModel).
 
         // Adapt tree model to table model before invoking super()
-        super(new TreeTableModelAdapter(treeModel, renderer));
-
-        // Enforce referential integrity; bail on fail
-        if (treeModel != renderer.getModel()) { // do not use assert here!
-            throw new IllegalArgumentException("Mismatched TreeTableModel");
-        }
+        super(new TreeTableModelAdapter(renderer));
 
         // renderer-related initialization
         init(renderer); // private method
@@ -698,15 +684,9 @@ public class JXTreeTable extends JXTable {
         TreeTableModel old = getTreeTableModel();
 //        boolean rootVisible = isRootVisible();
 //        setRootVisible(false);
-// When we remove the Adapter's copy of the TTModel, this will be uncommented --kgs
-//        renderer.setModel(treeModel);
-        ((TreeTableModelAdapter)getModel()).setTreeTableModel(treeModel);
+        renderer.setModel(treeModel);
 //        setRootVisible(rootVisible);
-        // Enforce referential integrity; bail on fail
-        // JW: when would that happen? we just set it... 
-        if (treeModel != renderer.getModel()) { // do not use assert here!
-            throw new IllegalArgumentException("Mismatched TreeTableModel");
-        }
+        
         firePropertyChange("treeTableModel", old, getTreeTableModel());
     }
 
@@ -716,7 +696,7 @@ public class JXTreeTable extends JXTable {
      * @return the underlying TreeTableModel for this JXTreeTable
      */
     public TreeTableModel getTreeTableModel() {
-        return ((TreeTableModelAdapter) getModel()).getTreeTableModel();
+        return (TreeTableModel) renderer.getModel();
     }
 
     /**
@@ -1207,7 +1187,7 @@ public class JXTreeTable extends JXTable {
      *		<code>parent</code> is not currently expanded
      */
     
-    public Enumeration getExpandedDescendants(TreePath parent) {
+    public Enumeration<?> getExpandedDescendants(TreePath parent) {
     	return renderer.getExpandedDescendants(parent);
     }
 
@@ -1665,13 +1645,11 @@ public class JXTreeTable extends JXTable {
          * @throws IllegalArgumentException if a null model argument is passed
          * @throws IllegalArgumentException if a null tree argument is passed
          */
-        TreeTableModelAdapter(TreeTableModel model, JTree tree) {
-            assert model != null;
+        TreeTableModelAdapter(JTree tree) {
             assert tree != null;
 
             this.tree = tree; // need tree to implement getRowCount()
-            setTreeTableModel(model);
-
+            tree.getModel().addTreeModelListener(getTreeModelListener());
             tree.addTreeExpansionListener(new TreeExpansionListener() {
                 // Don't use fireTableRowsInserted() here; the selection model
                 // would get updated twice.
@@ -1681,6 +1659,17 @@ public class JXTreeTable extends JXTable {
 
                 public void treeCollapsed(TreeExpansionEvent event) {
                     updateAfterExpansionEvent(event);
+                }
+            });
+            tree.addPropertyChangeListener("model", new PropertyChangeListener() {
+                public void propertyChange(PropertyChangeEvent evt) {
+                    TreeTableModel model = (TreeTableModel) evt.getOldValue();
+                    model.removeTreeModelListener(getTreeModelListener());
+                    
+                    model = (TreeTableModel) evt.getNewValue();
+                    model.addTreeModelListener(getTreeModelListener());
+                    
+                    fireTableStructureChanged();
                 }
             });
         }
@@ -1695,32 +1684,6 @@ public class JXTreeTable extends JXTable {
 //            treeTable.getTreeTableHacker().setExpansionChangedFlag();
             // JW: delayed fire leads to a certain sluggishness occasionally? 
             fireTableDataChanged();
-        }
-
-        /**
-         * 
-         * @param model must not be null!
-         */
-        public void setTreeTableModel(TreeTableModel model) {
-            TreeTableModel old = getTreeTableModel();
-            if (old != null) {
-                old.removeTreeModelListener(getTreeModelListener());
-            }
-            this.model = model;
-            tree.setModel(model);
-            // Install a TreeModelListener that can update the table when
-            // tree changes. 
-            model.addTreeModelListener(getTreeModelListener());
-            fireTableStructureChanged();
-        }
-
-        /**
-         * Returns the real TreeTableModel that is wrapped by this TreeTableModelAdapter.
-         *
-         * @return the real TreeTableModel that is wrapped by this TreeTableModelAdapter
-         */
-        public TreeTableModel getTreeTableModel() {
-            return model;
         }
 
         /**
@@ -1759,16 +1722,16 @@ public class JXTreeTable extends JXTable {
 
         @Override
         public Class<?> getColumnClass(int column) {
-            return model.getColumnClass(column);
+            return ((TreeTableModel) tree.getModel()).getColumnClass(column);
         }
 
         public int getColumnCount() {
-            return model.getColumnCount();
+            return ((TreeTableModel) tree.getModel()).getColumnCount();
         }
 
         @Override
         public String getColumnName(int column) {
-            return model.getColumnName(column);
+            return ((TreeTableModel) tree.getModel()).getColumnName(column);
         }
 
         public int getRowCount() {
@@ -1778,14 +1741,14 @@ public class JXTreeTable extends JXTable {
         public Object getValueAt(int row, int column) {
             // Issue #270-swingx: guard against invisible row
             Object node = nodeForRow(row);
-            return node != null ? model.getValueAt(node, column) : null;
+            return node != null ? ((TreeTableModel) tree.getModel()).getValueAt(node, column) : null;
         }
 
         @Override
         public boolean isCellEditable(int row, int column) {
             // Issue #270-swingx: guard against invisible row
             Object node = nodeForRow(row);
-            return node != null ? model.isCellEditable(node, column) : false;
+            return node != null ? ((TreeTableModel) tree.getModel()).isCellEditable(node, column) : false;
         }
 
         @Override
@@ -1793,7 +1756,7 @@ public class JXTreeTable extends JXTable {
             // Issue #270-swingx: guard against invisible row
             Object node = nodeForRow(row);
             if (node != null) {
-                model.setValueAt(value, node, column);
+                ((TreeTableModel) tree.getModel()).setValueAt(value, node, column);
             }
         }
 
@@ -1833,6 +1796,7 @@ public class JXTreeTable extends JXTable {
                     }
                 };
             }
+            
             return treeModelListener;
         }
 
@@ -1965,9 +1929,6 @@ public class JXTreeTable extends JXTable {
 
         }
 
-
-
-        private TreeTableModel model; // immutable
         private final JTree tree; // immutable
         private JXTreeTable treeTable = null; // logically immutable
     }
