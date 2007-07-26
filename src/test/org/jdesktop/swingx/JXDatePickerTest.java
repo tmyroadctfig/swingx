@@ -368,6 +368,19 @@ public class JXDatePickerTest extends TestCase {
     }
 
     /**
+     * Regression testing: make sure the passed-in date is not changed.
+     * 
+     */
+    public void testSetDateDoesNotChangeOriginal() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.setDate(null);
+        Date date = cal.getTime();
+        Date copy = new Date(date.getTime());
+        picker.setDate(date);
+        assertEquals(copy, date);
+    }
+    
+    /**
      *  date is a bound property of DatePicker.
      */
     public void testDateProperty() {
