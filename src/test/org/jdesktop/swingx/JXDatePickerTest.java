@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
 
@@ -37,6 +38,7 @@ import junit.framework.TestCase;
 
 import org.jdesktop.swingx.calendar.JXMonthView;
 import org.jdesktop.swingx.test.XTestUtils;
+import org.jdesktop.test.ActionReport;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
 
@@ -50,6 +52,7 @@ import org.jdesktop.test.TestUtils;
 public class JXDatePickerTest extends TestCase {
     private static final Logger LOG = Logger.getLogger(JXDatePickerTest.class
             .getName());
+    
     private Calendar cal;
 
     public void setUp() {
@@ -59,6 +62,76 @@ public class JXDatePickerTest extends TestCase {
     public void teardown() {
     }
 
+    /**
+     * Enhanced commit/cancel.
+     * 
+     * test that cancel action reverts silently: date related
+     * state unchanged and no events fired (except the actionEvent).
+     * @throws ParseException 
+     *
+     */
+    public void testCancelEditRevertsSilently() {
+        JXDatePicker picker = new JXDatePicker();
+        String text = picker.getEditor().getText();
+        // manipulate the text, not entirely safe ...
+        String changed = text.replace('0', '1');
+        picker.getEditor().setText(changed);
+        ActionReport actionReport = new ActionReport();
+        picker.addActionListener(actionReport);
+        picker.getEditor().addActionListener(actionReport);
+        picker.getMonthView().addActionListener(actionReport);
+        PropertyChangeReport propertyReport = new PropertyChangeReport();
+        picker.addPropertyChangeListener(propertyReport);
+        picker.getEditor().addPropertyChangeListener(propertyReport);
+        picker.cancelEdit();
+        assertEquals(0, propertyReport.getEventCount());
+        assertEquals(1, actionReport.getEventCount());
+    }
+    /**
+     * Enhanced commit/cancel.
+     * 
+     * test that actions fire as expected.
+     *
+     */
+    public void testCommitCancelActionsFire() {
+        JXDatePicker picker = new JXDatePicker();
+        Action commitAction = picker.getActionMap().get(JXDatePicker.COMMIT_KEY);
+        ActionReport report = new ActionReport();
+        picker.addActionListener(report);
+        commitAction.actionPerformed(null);
+        assertEquals(1, report.getEventCount());
+        assertEquals(JXDatePicker.COMMIT_KEY, report.getLastActionCommand());
+        report.clear();
+        Action cancelAction = picker.getActionMap().get(JXDatePicker.CANCEL_KEY);
+        cancelAction.actionPerformed(null);
+        assertEquals(1, report.getEventCount());
+        assertEquals(JXDatePicker.CANCEL_KEY, report.getLastActionCommand());
+    }
+
+    
+    /**
+     * Enhanced commit/cancel.
+     * 
+     * test that actions are registered.
+     *
+     */
+    public void testCommitCancelActionExist() {
+        JXDatePicker picker = new JXDatePicker();
+        assertNotNull(picker.getActionMap().get(JXDatePicker.CANCEL_KEY));
+        assertNotNull(picker.getActionMap().get(JXDatePicker.COMMIT_KEY));
+    }
+    
+    /**
+     * for now keep the old postAction.
+     *
+     */
+    public void testCommitCancelPreserveOld() {
+        JXDatePicker picker = new JXDatePicker();
+        ActionReport report = new ActionReport();
+        picker.addActionListener(report);
+        picker.postActionEvent();
+        assertEquals(picker.getActionCommand(), report.getLastActionCommand());
+    }
     /**
      * Issue #554-swingx: timezone of formats and picker must be synched.
      * 
@@ -112,7 +185,7 @@ public class JXDatePickerTest extends TestCase {
      * 
      * Here: set the timezone in the picker.
      */
-    public void testSynchTimeOnSetMonthView() {
+    public void testSynchTimeZoneOnSetMonthView() {
         JXDatePicker picker = new JXDatePicker();
         TimeZone defaultZone = picker.getTimeZone();
         TimeZone alternative = TimeZone.getTimeZone("GMT-6");
@@ -153,6 +226,17 @@ public class JXDatePickerTest extends TestCase {
         picker.setTimeZone(alternative);
         assertEquals(alternative, picker.getTimeZone());
         picker.setFormats(DateFormat.getDateInstance());
+        for (DateFormat format : picker.getFormats()) {
+            assertEquals("timezone must be synched", picker.getTimeZone(), format.getTimeZone());
+        }
+    }
+
+    /**
+     * Issue #554-swingx: timezone of formats and picker must be synched.
+     */
+    public void testSynchTimeZoneInitial() {
+        JXDatePicker picker = new JXDatePicker();
+        assertNotNull(picker.getTimeZone());
         for (DateFormat format : picker.getFormats()) {
             assertEquals("timezone must be synched", picker.getTimeZone(), format.getTimeZone());
         }
@@ -277,7 +361,7 @@ public class JXDatePickerTest extends TestCase {
         try {
             date = (Date) formats[0].parseObject(changed);
         } catch (ParseException e) {
-            LOG.info("cannot run testSynchAllAfterCommit - parseException in manipulated text");
+            LOG.info("cannot run DatePropertyThroughCommit - parseException in manipulated text");
             return;
         }
         // sanity ...
@@ -569,16 +653,6 @@ public class JXDatePickerTest extends TestCase {
     }
 
 
-    /**
-     * Issue #554-swingx: timezone of formats and picker must be synched.
-     */
-    public void testTimeZoneInitialSynched() {
-        JXDatePicker picker = new JXDatePicker();
-        assertNotNull(picker.getTimeZone());
-        for (DateFormat format : picker.getFormats()) {
-            assertEquals("timezone must be synched", picker.getTimeZone(), format.getTimeZone());
-        }
-    }
 
     /**
      * Characterization: setting the monthview's selection model updates

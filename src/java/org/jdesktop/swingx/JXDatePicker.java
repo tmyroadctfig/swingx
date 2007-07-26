@@ -82,6 +82,9 @@ public class JXDatePicker extends JComponent {
     public static final String DATE_IN_MILLIS = "dateInMillis";
     public static final String LINK_PANEL = "linkPanel";
 
+    public static final String COMMIT_KEY = "datePickerCommit";
+    public static final String CANCEL_KEY = "datePickerCancel";
+
     /**
      * The editable date field that displays the date
      */
@@ -443,6 +446,8 @@ public class JXDatePicker extends JComponent {
     }
 
     /**
+     * Commits the editor's changes and notifies ActionListeners.
+     * 
      * Forces the current value to be taken from the AbstractFormatter and
      * set as the current value. This has no effect if there is no current
      * AbstractFormatter installed.
@@ -451,9 +456,33 @@ public class JXDatePicker extends JComponent {
      *                                  can not be parsed.
      */
     public void commitEdit() throws ParseException {
-        _dateField.commitEdit();
+        try {
+            _dateField.commitEdit();
+            fireActionPerformed(COMMIT_KEY);
+        } catch (ParseException e) {
+            // re-throw
+            throw e;
+        } 
     }
 
+    /**
+     * Cancels the editor's changes and notifies ActionListeners.
+     * 
+     */
+    public void cancelEdit() {
+        // hmmm... no direct api?
+         _dateField.setValue(_dateField.getValue());
+         fireActionPerformed(CANCEL_KEY);
+    }
+
+    /**
+     * Sets the editable property. If false, ...?
+     * 
+     * The default value is true.
+     * 
+     * @param value
+     * @see #isEditable()
+     */
     public void setEditable(boolean value) {
         boolean oldEditable = isEditable();
         editable = value;
@@ -463,6 +492,11 @@ public class JXDatePicker extends JComponent {
         }
     }
 
+    /**
+     * Returns the editable property. 
+     * 
+     * @return
+     */
     public boolean isEditable() {
         return editable;
     }
@@ -596,22 +630,30 @@ public class JXDatePicker extends JComponent {
     }
 
     /**
-     * Fires an ActionEvent to all listeners.
+     * Fires an ActionEvent with this picker's actionCommand
+     * to all listeners.
      */
     protected void fireActionPerformed() {
+        fireActionPerformed(getActionCommand());
+    }
+
+    /**
+     * Fires an ActionEvent with the given actionCommand
+     * to all listeners.
+     */
+    protected void fireActionPerformed(String actionCommand) {
         ActionListener[] listeners = getListeners(ActionListener.class);
         ActionEvent e = null;
 
         for (ActionListener listener : listeners) {
             if (e == null) {
-                e = new ActionEvent(JXDatePicker.this,
+                e = new ActionEvent(this,
                         ActionEvent.ACTION_PERFORMED,
-                        _actionCommand);
+                        actionCommand);
             }
             listener.actionPerformed(e);
         }
     }
-
     public void postActionEvent() {
         fireActionPerformed();
     }
