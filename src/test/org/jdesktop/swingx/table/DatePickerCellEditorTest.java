@@ -4,34 +4,23 @@
  */
 package org.jdesktop.swingx.table;
 
-import java.applet.Applet;
 import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.KeyboardFocusManager;
-import java.awt.Window;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
-import java.util.EventObject;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXDatePicker;
+import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.LabelProvider;
-import org.jdesktop.swingx.table.DatePickerCellEditor;
 import org.jdesktop.test.CellEditorReport;
 
 public class DatePickerCellEditorTest extends InteractiveTestCase {
@@ -188,14 +177,13 @@ public class DatePickerCellEditorTest extends InteractiveTestCase {
         JComboBox box = new JComboBox(new String[] {"item1", "item2", "item3"});
         box.setEditable(true);
         table.getColumnExt(1).setCellEditor(new DefaultCellEditor(box));
-        JFrame frame = new JFrame("cell editor");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(new JScrollPane(table));
-        // JXRootPane is eating the esc
-//        JXFrame frame = showWithScrollingInFrame(table, "normal/sql date formatting");
+        JXFrame frame = showWithScrollingInFrame(table, "normal/sql date formatting");
+        // JXRootPane eats esc 
+        frame.getRootPaneExt().getActionMap().remove("esc-action");
         JComboBox freeBox = new JComboBox(box.getModel());
         freeBox.setEditable(true);
         frame.add(freeBox, BorderLayout.SOUTH);
+        frame.add(new JTextField("yet another thing to focus"), BorderLayout.NORTH);
         frame.pack();
         frame.setVisible(true);
     }

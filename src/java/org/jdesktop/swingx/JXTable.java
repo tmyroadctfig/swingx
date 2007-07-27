@@ -4046,7 +4046,7 @@ public class JXTable extends JTable
         private void install() {
             focusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
             focusManager.addPropertyChangeListener("permanentFocusOwner", this);
-            focusManager.addPropertyChangeListener("managingfocus", this);
+            focusManager.addPropertyChangeListener("managingFocus", this);
         }
 
         /**
@@ -4055,7 +4055,7 @@ public class JXTable extends JTable
          */
         public void uninstall() {
             focusManager.removePropertyChangeListener("permanentFocusOwner", this);
-            focusManager.removePropertyChangeListener("managingfocus", this);
+            focusManager.removePropertyChangeListener("managingFocus", this);
             focusManager = null;
         }
         
