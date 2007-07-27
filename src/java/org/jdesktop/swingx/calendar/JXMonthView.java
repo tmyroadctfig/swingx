@@ -1484,6 +1484,7 @@ public class JXMonthView extends JComponent {
     /**
      * TODO: remove after commit/cancel are installed.
      *
+     * @deprecated use {@link #commitSelection()} or {@link #cancelSelection()}
      */
     public void postActionEvent() {
         // PENDING: remove 
@@ -1491,22 +1492,34 @@ public class JXMonthView extends JComponent {
     }
 
     /**
-     * Commits the current selection and fires an ActionEvent
+     * Commits the current selection. <p>
+     * 
+     * Resets the model's adjusting property to false
+     * and fires an ActionEvent
      * with the COMMIT_KEY action command.
      * 
-     * PENDING: define what "commit selection" means ... currently
+     * <p>PENDING: define what "commit selection" means ... currently
      * only fires (to keep the picker happy).
+     * 
+     * @see #cancelSelection()
+     * @see org.jdesktop.swingx.DateSelectionModel#setAdjusting(boolean)
      */
     public void commitSelection() {
+        getSelectionModel().setAdjusting(false);
         fireActionPerformed(COMMIT_KEY);
     }
 
     /**
-     * Fires an ActionEvent with the CANCEL_KEY action command.
+     * Cancels the selection. <p>
+     * 
+     * Resets the model's adjusting to 
+     * false and fires an ActionEvent with the CANCEL_KEY action command.
      * 
      * @see #commitSelection
+     * @see org.jdesktop.swingx.DateSelectionModel#setAdjusting(boolean)
      */
     public void cancelSelection() {
+        getSelectionModel().setAdjusting(false);
         fireActionPerformed(CANCEL_KEY);
         
     }

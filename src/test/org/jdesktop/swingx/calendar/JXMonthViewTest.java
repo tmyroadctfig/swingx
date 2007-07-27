@@ -81,6 +81,24 @@ public class JXMonthViewTest extends MockObjectTestCase {
                     + ex.getMessage());
         }
     }
+    
+    /**
+     * Enhanced commit/cancel.
+     * 
+     * test that actions resets model.adjusting to false.
+     */
+    public void testCommitCancelResetsAdjusting() {
+        JXMonthView monthView = new JXMonthView();
+        monthView.getSelectionModel().setAdjusting(true);
+        monthView.commitSelection();
+        assertFalse("commit must reset adjusting", 
+                monthView.getSelectionModel().isAdjusting());
+        monthView.getSelectionModel().setAdjusting(true);
+        monthView.cancelSelection();
+        assertFalse("cancel must reset adjusting", 
+                monthView.getSelectionModel().isAdjusting());
+        
+    }
     /**
      * Enhanced commit/cancel.
      * 

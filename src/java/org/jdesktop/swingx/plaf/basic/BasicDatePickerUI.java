@@ -437,6 +437,16 @@ public class BasicDatePickerUI extends DatePickerUI {
         return cleaned;
     }
 
+    public void home(boolean commit) {
+        if (commit) {
+            Calendar cal = datePicker.getMonthView().getCalendar();
+            cal.setTimeInMillis(datePicker.getLinkDate());
+            datePicker.getMonthView().setSelectedDate(cal.getTime());
+            datePicker.getMonthView().commitSelection();
+        } else {
+            datePicker.getMonthView().ensureDateVisible(datePicker.getLinkDate());
+        }
+    }
 //-------------------- update methods called from listeners     
     /**
      * Updates internals after picker's date property changed.

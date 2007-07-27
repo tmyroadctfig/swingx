@@ -28,6 +28,9 @@ import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.beans.PropertyVetoException;
 import java.text.DateFormat;
 import java.text.MessageFormat;
@@ -661,20 +664,39 @@ public class JXDatePicker extends JComponent {
     }
 
     private final class TodayPanel extends JXPanel {
+        private TodayAction todayAction;
+
         TodayPanel() {
             super(new FlowLayout());
             setBackgroundPainter(new MattePainter(new GradientPaint(0, 0, new Color(238, 238, 238), 0, 1, Color.WHITE)));
-            JXHyperlink todayLink = new JXHyperlink(new TodayAction());
+            todayAction = new TodayAction();
+            JXHyperlink todayLink = new JXHyperlink(todayAction);
+            todayLink.addMouseListener(createDoubleClickListener());
             Color textColor = new Color(16, 66, 104);
             todayLink.setUnclickedColor(textColor);
             todayLink.setClickedColor(textColor);
             add(todayLink);
         }
 
+        /**
+         * @return
+         */
+        private MouseListener createDoubleClickListener() {
+            MouseAdapter adapter = new MouseAdapter() {
+
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    if (e.getClickCount() != 2) return;
+                    todayAction.select = true;
+                }
+                
+            };
+            return adapter;
+        }
+
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-
             g.setColor(new Color(187, 187, 187));
             g.drawLine(0, 0, getWidth(), 0);
             g.setColor(new Color(221, 221, 221));
@@ -682,13 +704,21 @@ public class JXDatePicker extends JComponent {
         }
 
         private final class TodayAction extends AbstractAction {
+            boolean select;
             TodayAction() {
                 super(_linkFormat.format(new Object[]{new Date(_linkDate)}));
             }
 
             public void actionPerformed(ActionEvent ae) {
-                DateSpan span = new DateSpan(_linkDate, _linkDate);
-                _monthView.ensureDateVisible(span.getStart());
+                Date span = new DateSpan(_linkDate, _linkDate).getStartAsDate();
+                if (select) {
+                    _monthView.setSelectedDate(span);
+                    _monthView.commitSelection();
+                    select = false;
+                } else {
+                    _monthView.ensureDateVisible(_linkDate);
+                }
+                
             }
         }
     }

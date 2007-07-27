@@ -21,6 +21,8 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Calendar;
 import java.util.logging.Logger;
 
@@ -53,6 +55,23 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 
     private Calendar calendar;
 
+    
+    public void interactiveCommitLinkPanelAction() {
+        final JXDatePicker picker = new JXDatePicker();
+        ActionListener l = new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("received: " + e + 
+                        "\n and not adjusting: " 
+                        + picker.getMonthView().getSelectionModel().isAdjusting());
+                
+            }
+            
+        };
+        picker.addActionListener(l);
+        showInFrame(picker, "click on linkpanel must commits");
+    }
+    
     /**
      * Issue #565-swingx: occasionally, the popup isn't closed. 
      * to reproduce: open the picker's popup then click into

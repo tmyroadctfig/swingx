@@ -1405,7 +1405,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 monthView.requestFocusInWindow();
             }
 
-            monthView.getSelectionModel().setAdjusting(false);
+//            monthView.getSelectionModel().setAdjusting(false);
             
             if (armed) {
                 monthView.commitSelection();
@@ -1712,11 +1712,11 @@ public class BasicMonthViewUI extends MonthViewUI {
                         } else {
                             monthView.clearSelection();
                         }
-                        monthView.getSelectionModel().setAdjusting(false);
+//                        monthView.getSelectionModel().setAdjusting(false);
                         monthView.cancelSelection();
                     } else {
                         // Accept the keyboard selection.
-                        monthView.getSelectionModel().setAdjusting(false);
+//                        monthView.getSelectionModel().setAdjusting(false);
                         monthView.commitSelection();
                     }
                     setUsingKeyboard(false);
