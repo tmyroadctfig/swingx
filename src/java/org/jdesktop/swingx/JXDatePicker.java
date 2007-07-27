@@ -41,6 +41,7 @@ import java.util.EventListener;
 import java.util.TimeZone;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
@@ -50,7 +51,6 @@ import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.text.DefaultFormatterFactory;
 
-import org.jdesktop.swingx.calendar.DateSpan;
 import org.jdesktop.swingx.calendar.JXMonthView;
 import org.jdesktop.swingx.event.EventListenerMap;
 import org.jdesktop.swingx.painter.MattePainter;
@@ -89,6 +89,10 @@ public class JXDatePicker extends JComponent {
     public static final String COMMIT_KEY = "datePickerCommit";
     /** action command used for cancel actionEvent. */
     public static final String CANCEL_KEY = "datePickerCancel";
+    /** action key for navigate home action */
+    public static final String HOME_NAVIGATE_KEY = "navigateHome";
+    /** action key for commit home action */
+    public static final String HOME_COMMIT_KEY = "commitHome";
 
     /**
      * The editable date field that displays the date
@@ -710,14 +714,20 @@ public class JXDatePicker extends JComponent {
             }
 
             public void actionPerformed(ActionEvent ae) {
-                Date span = new DateSpan(_linkDate, _linkDate).getStartAsDate();
-                if (select) {
-                    _monthView.setSelectedDate(span);
-                    _monthView.commitSelection();
-                    select = false;
-                } else {
-                    _monthView.ensureDateVisible(_linkDate);
+                String key = select ? JXDatePicker.HOME_COMMIT_KEY : JXDatePicker.HOME_NAVIGATE_KEY;
+                select = false;
+                Action delegate = JXDatePicker.this.getActionMap().get(key);
+                if (delegate !=  null) {
+                    delegate.actionPerformed(null);
                 }
+                //                Date span = new DateSpan(_linkDate, _linkDate).getStartAsDate();
+//                if (select) {
+//                    _monthView.setSelectedDate(span);
+//                    _monthView.commitSelection();
+//                    select = false;
+//                } else {
+//                    _monthView.ensureDateVisible(_linkDate);
+//                }
                 
             }
         }

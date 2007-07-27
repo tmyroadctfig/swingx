@@ -27,7 +27,6 @@ import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -38,7 +37,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
@@ -170,13 +168,16 @@ public class BasicDatePickerUI extends DatePickerUI {
         ActionMap pickerMap = datePicker.getActionMap();
         pickerMap.put(JXDatePicker.CANCEL_KEY, createCancelAction());
         pickerMap.put(JXDatePicker.COMMIT_KEY, createCommitAction());
+        pickerMap.put(JXDatePicker.HOME_NAVIGATE_KEY, createHomeAction(false));
+        pickerMap.put(JXDatePicker.HOME_COMMIT_KEY, createHomeAction(true));
         TogglePopupAction popupAction = createTogglePopupAction();
         pickerMap.put("TOGGLE_POPUP", popupAction);
         
         InputMap pickerInputMap = datePicker.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         pickerInputMap.put(KeyStroke.getKeyStroke("ENTER"), JXDatePicker.COMMIT_KEY);
         pickerInputMap.put(KeyStroke.getKeyStroke("ESCAPE"), JXDatePicker.CANCEL_KEY);
-
+        pickerInputMap.put(KeyStroke.getKeyStroke("F5"), JXDatePicker.HOME_COMMIT_KEY);
+        pickerInputMap.put(KeyStroke.getKeyStroke("shift F5"), JXDatePicker.HOME_NAVIGATE_KEY);
         pickerInputMap.put(KeyStroke.getKeyStroke("SPACE"), "TOGGLE_POPUP");
         // install popupButton's actions
         // PENDING JW move the picker's input map, make popup unfocusable
@@ -437,16 +438,6 @@ public class BasicDatePickerUI extends DatePickerUI {
         return cleaned;
     }
 
-    public void home(boolean commit) {
-        if (commit) {
-            Calendar cal = datePicker.getMonthView().getCalendar();
-            cal.setTimeInMillis(datePicker.getLinkDate());
-            datePicker.getMonthView().setSelectedDate(cal.getTime());
-            datePicker.getMonthView().commitSelection();
-        } else {
-            datePicker.getMonthView().ensureDateVisible(datePicker.getLinkDate());
-        }
-    }
 //-------------------- update methods called from listeners     
     /**
      * Updates internals after picker's date property changed.
@@ -647,6 +638,7 @@ public class BasicDatePickerUI extends DatePickerUI {
      * 
      */
     protected void commit() {
+        hidePopup();
         try {
             datePicker.commitEdit();
         } catch (ParseException ex) {
@@ -658,9 +650,35 @@ public class BasicDatePickerUI extends DatePickerUI {
      * 
      */
     protected void cancel() {
+        hidePopup();
         datePicker.cancelEdit();
     }
 
+    /**
+     * 
+     */
+    private void hidePopup() {
+        if (popup != null) popup.setVisible(false);
+    }
+
+    /**
+     * Navigates to linkDate. If commit, the linkDate is selected
+     * and committed. If not commit, the linkDate is scrolled to visible, if the 
+     * monthview is open, does nothing for invisible monthView.  
+     * 
+     * @param commit boolean to indicate whether the linkDate should be
+     *   selected and committed
+     */
+    protected void home(boolean commit) {
+        if (commit) {
+            Calendar cal = datePicker.getMonthView().getCalendar();
+            cal.setTimeInMillis(datePicker.getLinkDate());
+            datePicker.getMonthView().setSelectedDate(cal.getTime());
+            datePicker.getMonthView().commitSelection();
+        } else {
+            datePicker.getMonthView().ensureDateVisible(datePicker.getLinkDate());
+        }
+    }
 
 //---------------------- other stuff    
     
@@ -698,6 +716,17 @@ public class BasicDatePickerUI extends DatePickerUI {
         return action;
     }
 
+    private Action createHomeAction(final boolean commit) {
+        Action action = new AbstractAction( ) {
+
+            public void actionPerformed(ActionEvent e) {
+                home(commit);
+                
+            }
+            
+        };
+        return action ;
+    }
     /**
      * The wrapper for the editor cancel action. 
      * 
@@ -752,24 +781,10 @@ public class BasicDatePickerUI extends DatePickerUI {
 
     public void toggleShowPopup() {
         if (popup == null) {
-            popup = new BasicDatePickerPopup();
-            popup.setLightWeightPopupEnabled(datePicker.isLightWeightPopupEnabled());
+            popup = createMonthViewPopup();
         }
 
         if (!popup.isVisible()) {
-            // JW: shouldn't be needed - the various incarnations
-            // of the selected date are kept in synch
-            // if not, it's a bug and must be traced.
-//            final JXMonthView monthView = datePicker.getMonthView();
-//            SortedSet<Date> selection = monthView.getSelection();
-//            if (!selection.isEmpty()) {
-//                Date date = selection.first();
-//                monthView.setSelectionInterval(date, date);
-//                monthView.ensureDateVisible(date.getTime());
-//            } else {
-//                // JW: hmm .. this is interfering with the firstDayToShow property
-//                monthView.ensureDateVisible(System.currentTimeMillis());
-//            }
             popup.show(datePicker,
                     0, datePicker.getHeight());
 //            SwingUtilities.invokeLater(new Runnable() {
@@ -780,6 +795,15 @@ public class BasicDatePickerUI extends DatePickerUI {
         } else {
             popup.setVisible(false);
         }
+    }
+
+    /**
+     * 
+     */
+    private BasicDatePickerPopup createMonthViewPopup() {
+        BasicDatePickerPopup popup = new BasicDatePickerPopup();
+        popup.setLightWeightPopupEnabled(datePicker.isLightWeightPopupEnabled());
+        return popup;
     }
     /**
      * Action used to commit the current value in the JFormattedTextField.
@@ -802,28 +826,18 @@ public class BasicDatePickerUI extends DatePickerUI {
      * popup will automatically hide itself and enter the selection into the
      * editable field of the JXDatePicker.
      * 
-     * PENDING: move the logic out of here...
      */
-    protected class BasicDatePickerPopup extends JPopupMenu
-            implements ActionListener {
+    protected class BasicDatePickerPopup extends JPopupMenu {
 
         public BasicDatePickerPopup() {
-            JXMonthView monthView = datePicker.getMonthView();
-            monthView.addActionListener(this);
-
             setLayout(new BorderLayout());
-            add(monthView, BorderLayout.CENTER);
+            add(datePicker.getMonthView(), BorderLayout.CENTER);
             JPanel linkPanel = datePicker.getLinkPanel();
             if (linkPanel != null) {
                 add(linkPanel, BorderLayout.SOUTH);
+                // PENDING: some class should install the home action/keys
+                // in either the linkPanel or the monthView?
             }
-        }
-
-        public void actionPerformed(ActionEvent ev) {
-            // String command = ev.getActionCommand();
-            datePicker.getEditor().setValue(
-                    datePicker.getMonthView().getSelectedDate());
-            setVisible(false);
         }
     }
 

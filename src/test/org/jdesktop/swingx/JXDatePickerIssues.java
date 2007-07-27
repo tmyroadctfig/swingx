@@ -69,7 +69,9 @@ public class JXDatePickerIssues extends InteractiveTestCase {
             
         };
         picker.addActionListener(l);
-        showInFrame(picker, "click on linkpanel must commits");
+        JXFrame frame = showInFrame(picker, "click on linkpanel must commits");
+        // JXRootPane eats esc 
+        frame.getRootPaneExt().getActionMap().remove("esc-action");
     }
     
     /**
@@ -143,7 +145,8 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         calendar.add(Calendar.DAY_OF_MONTH, - 20);
         picker.getMonthView().setLowerBound(calendar.getTime());
         JXFrame frame = showInFrame(picker, "lower/upper bounds");
-        frame.pack();
+        // JXRootPane eats esc 
+        frame.getRootPaneExt().getActionMap().remove("esc-action");
     }
 
 
