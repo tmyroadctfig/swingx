@@ -635,10 +635,10 @@ public class JXDatePickerTest extends TestCase {
     public void testRejectSetValueUnselectable() {
         JXDatePicker picker = new JXDatePicker();
         Date upperBound = XTestUtils.getCleanedToday(1);
-        picker.getMonthView().setUpperBound(upperBound.getTime());
+        picker.getMonthView().setUpperBound(upperBound);
         Date future = XTestUtils.getCleanedToday(2);
         // sanity
-        assertTrue(picker.getMonthView().isUnselectableDate(future.getTime()));
+        assertTrue(picker.getMonthView().isUnselectableDate(future));
         Date current = picker.getDate();
         // sanity: 
         assertEquals(current, picker.getEditor().getValue());

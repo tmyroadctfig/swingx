@@ -151,7 +151,7 @@ public interface DateSelectionModel {
     /**
      * Set which dates are unable to be selected
      *
-     * @param unselectableDates dates that are unselectable
+     * @param unselectableDates dates that are unselectable, must not be null
      */
     public void setUnselectableDates(SortedSet<Date> unselectableDates);
 

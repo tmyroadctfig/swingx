@@ -24,6 +24,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.SortedSet;
+import java.util.logging.Logger;
 
 import javax.swing.Action;
 import javax.swing.JComponent;
@@ -45,6 +46,8 @@ import org.jmock.MockObjectTestCase;
  * @author Joshua Outwater
  */
 public class JXMonthViewTest extends MockObjectTestCase {
+    private static final Logger LOG = Logger.getLogger(JXMonthViewTest.class
+            .getName());
     private Calendar cal;
     private Locale componentLocale;
 
@@ -61,6 +64,23 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JComponent.setDefaultLocale(componentLocale);
     }
 
+    /**
+     * test doc'ed behaviour: model must not be null.
+     * PENDING: the old problem - how do we test fail-fast implemented? 
+     *
+     */
+    public void testSetModelNull() {
+        JXMonthView monthView = new JXMonthView();
+        assertNotNull(monthView.getSelectionModel());
+        try {
+            monthView.setSelectionModel(null);
+            fail("null model must not be accepted");
+        } catch (NullPointerException ex) {
+            // expected - but ...?
+            LOG.info("got NPE as expected - but how test fail fast? \n " 
+                    + ex.getMessage());
+        }
+    }
     /**
      * Enhanced commit/cancel.
      * 
@@ -256,8 +276,8 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JXMonthView view = new JXMonthView();
         Date full = cal.getTime();
         Date cleaned = XTestUtils.getCleanedDate(cal);
-        view.setUpperBound(full.getTime());
-        assertEquals(cleaned, view.getSelectionModel().getUpperBound());
+        view.setUpperBound(full);
+        assertEquals(cleaned, view.getUpperBound());
     }
     
     /**
@@ -268,9 +288,48 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JXMonthView view = new JXMonthView();
         Date full = cal.getTime();
         Date cleaned = XTestUtils.getCleanedDate(cal);
-        view.setLowerBound(full.getTime());
-        assertEquals(cleaned, view.getSelectionModel().getLowerBound());
+        view.setLowerBound(full);
+        assertEquals(cleaned, view.getLowerBound());
     }
+
+    /**
+     * test unselectable: use methods with Date.
+     *
+     */
+    public void testUnselectableDate() {
+        JXMonthView monthView = new JXMonthView();
+        Date date = XTestUtils.getCleanedToday();
+        assertFalse(monthView.isUnselectableDate(date));
+        monthView.setUnselectableDates(date);
+        assertTrue(monthView.isUnselectableDate(date));
+
+        monthView.setUnselectableDates();
+        assertFalse(monthView.isUnselectableDate(date));
+    }
+
+    /**
+     * test unselectable: use methods with Date.
+     * test NPE as doc'ed.
+     */
+    public void testUnselectableDatesNPE() {
+        JXMonthView monthView = new JXMonthView();
+        try {
+            monthView.setUnselectableDates((Date[])null);
+            fail("null array must throw NPE");
+        } catch (NullPointerException e) {
+            // expected
+            LOG.info("got NPE as expected - how to test fail fast?");
+        }
+        try {
+            monthView.setUnselectableDates(new Date[] {new Date(), null});
+            fail("null elements must throw NPE");
+        } catch (NullPointerException e) {
+            // expected
+            LOG.info("got NPE as expected - how to test fail fast?");
+        }
+    }
+
+   
     /**
      * Issue #494-swingx: JXMonthView changed all passed-in dates
      *
@@ -286,6 +345,54 @@ public class JXMonthViewTest extends MockObjectTestCase {
         monthView.setSelectionInterval(today, today);
         assertEquals("the date used for selection must be unchanged", copy, today);
     }
+    /**
+     * test cover method: isSelectedDate
+     *
+     */
+    public void testIsSelectedDate() {
+        JXMonthView monthView = new JXMonthView();
+        Date today = new Date();
+        Date selected = XTestUtils.getCleanedToday();
+        monthView.setSelectedDate(today);
+        assertTrue(monthView.isSelectedDate(today));
+        assertTrue(monthView.isSelectedDate(selected));
+    }
+    
+    /**
+     * Sanity: test against regression
+     * test cover method: isSelectedDate
+     *
+     */
+    public void testIsSelectedDate494() {
+        JXMonthView monthView = new JXMonthView();
+        Date today = new Date();
+        Date copy = new Date(today.getTime());
+        Date selected = XTestUtils.getCleanedToday();
+        monthView.setSelectedDate(selected);
+        // use today
+        monthView.isSelectedDate(today);
+        assertEquals("date must not be changed in isSelected", copy, today);
+    }
+   
+    /**
+     * test cover method: setSelectedDate
+     *
+     */
+    public void testSetSelectedDate() {
+        JXMonthView monthView = new JXMonthView();
+        Date today = new Date();
+        Date copy = new Date(today.getTime());
+        Date selected = XTestUtils.getCleanedToday();
+        monthView.setSelectedDate(today);
+        // sanity: date unchanged
+        assertEquals(copy, today);
+        assertEquals(selected, monthView.getSelectedDate());
+        // sanity:
+        assertEquals(selected, monthView.getSelection().first());
+        monthView.setSelectedDate(null);
+        assertTrue(monthView.isSelectionEmpty());
+    }
+    
 
     /**
      * test new (convenience) api on JXMonthView
@@ -302,7 +409,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     
     public void testDefaultConstructor() {
         JXMonthView monthView = new JXMonthView();
-        assertTrue(monthView.getSelection().isEmpty());
+        assertTrue(monthView.isSelectionEmpty());
         assertTrue(JXMonthView.SelectionMode.SINGLE_SELECTION == monthView.getSelectionMode());
         assertTrue(Calendar.SUNDAY == monthView.getFirstDayOfWeek());
     }
@@ -337,6 +444,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         assertTrue(DateUtils.startOfDay(date).equals(selection.first()));
 
         monthView.clearSelection();
+        assertTrue(monthView.isSelectionEmpty());
         selection = monthView.getSelection();
         assertTrue(selection.isEmpty());
     }
@@ -347,7 +455,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
 
         Date date = new Date();
         monthView.setSelectionInterval(date, date);
-        assertTrue(monthView.getSelection().isEmpty());
+        assertTrue(monthView.isSelectionEmpty());
     }
 
     public void testSingleSelection() {
@@ -511,15 +619,18 @@ public class JXMonthViewTest extends MockObjectTestCase {
         assertTrue(monthView.isShowingTrailingDates());
     }
 
-    public void testUnselectableDate() {
+    /**
+     * test unselectable: use methods with long.
+     */
+    public void testUnselectableDateLong() {
         JXMonthView monthView = new JXMonthView();
         Date date = new Date();
 
         assertFalse(monthView.isUnselectableDate(date.getTime()));
         monthView.setUnselectableDates(new long[]{date.getTime()});
         assertTrue(monthView.isUnselectableDate(date.getTime()));
-
-        monthView.setUnselectableDates(null);
+        // undocumented
+        monthView.setUnselectableDates((long[]) null);
         assertFalse(monthView.isUnselectableDate(date.getTime()));
     }
 }

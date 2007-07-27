@@ -431,7 +431,7 @@ public class BasicDatePickerUI extends DatePickerUI {
             throw new PropertyVetoException("date not selectable", null);
         }
         if (cleaned == null) return cleaned;
-        if (datePicker.getMonthView().isUnselectableDate(cleaned.getTime())) {
+        if (datePicker.getMonthView().isUnselectableDate(cleaned)) {
             throw new PropertyVetoException("date not selectable", null);
          }
         return cleaned;
@@ -454,17 +454,13 @@ public class BasicDatePickerUI extends DatePickerUI {
      * @param newDate the editor value after the change
      */
     protected void updateFromValueChanged(Date oldDate, Date newDate) {
-        if ((newDate != null) && datePicker.getMonthView().isUnselectableDate(newDate.getTime())) {
+        if ((newDate != null) && datePicker.getMonthView().isUnselectableDate(newDate)) {
             revertValue(oldDate);
             return;
         }
         // the other place to interrupt the update spiral
         if (!equalsDate(newDate, datePicker.getMonthView().getSelectedDate())) {
-            if (newDate == null) {
-               datePicker.getMonthView().clearSelection();
-            } else {
-                datePicker.getMonthView().setSelectionInterval(newDate, newDate);
-            }
+            datePicker.getMonthView().setSelectedDate(newDate);
         }
         datePicker.setDate(newDate);
     }
@@ -751,16 +747,19 @@ public class BasicDatePickerUI extends DatePickerUI {
         }
 
         if (!popup.isVisible()) {
-            final JXMonthView monthView = datePicker.getMonthView();
-            SortedSet<Date> selection = monthView.getSelection();
-            if (!selection.isEmpty()) {
-                Date date = selection.first();
-                monthView.setSelectionInterval(date, date);
-                monthView.ensureDateVisible(date.getTime());
-            } else {
-                // JW: hmm .. this is interfering with the firstDayToShow property
-                monthView.ensureDateVisible(System.currentTimeMillis());
-            }
+            // JW: shouldn't be needed - the various incarnations
+            // of the selected date are kept in synch
+            // if not, it's a bug and must be traced.
+//            final JXMonthView monthView = datePicker.getMonthView();
+//            SortedSet<Date> selection = monthView.getSelection();
+//            if (!selection.isEmpty()) {
+//                Date date = selection.first();
+//                monthView.setSelectionInterval(date, date);
+//                monthView.ensureDateVisible(date.getTime());
+//            } else {
+//                // JW: hmm .. this is interfering with the firstDayToShow property
+//                monthView.ensureDateVisible(System.currentTimeMillis());
+//            }
             popup.show(datePicker,
                     0, datePicker.getHeight());
 //            SwingUtilities.invokeLater(new Runnable() {

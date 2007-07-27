@@ -45,6 +45,7 @@ import org.jdesktop.swingx.event.EventListenerMap;
 import org.jdesktop.swingx.plaf.JXMonthViewAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.MonthViewUI;
+import org.jdesktop.swingx.util.Contract;
 
 
 /**
@@ -436,28 +437,64 @@ public class JXMonthView extends JComponent {
         setSelectionInterval(dateSpan.getStartAsDate(), dateSpan.getEndAsDate());
     }
 
+    
+//---------------- DateSelectionModel
+
+    /**
+     * Returns the date selection model which drives this
+     * JXMonthView.
+     * 
+     * @return the date selection model
+     */
+    public DateSelectionModel getSelectionModel() {
+        return model;
+    }
+
+    /**
+     * Sets the date selection model to drive this monthView.
+     * 
+     * @param model the selection model to use, must not be null.
+     * @throws NullPointerException if model is null
+     */
+    public void setSelectionModel(DateSelectionModel model) {
+        Contract.asNotNull(model, "date selection model must not be null");
+        DateSelectionModel oldModel = this.model;
+        this.model = model;
+        firePropertyChange(SELECTION_MODEL, oldModel, model);
+    }
+
+//-------------------- delegates to model
+    
+    /**
+     * Clear any selection from the selection model
+     */
     public void clearSelection() {
         getSelectionModel().clearSelection();
     }
 
-    public SortedSet<Date> getSelection() {
+    /**
+     * Return true if the selection is empty, false otherwise
+     *
+     * @return true if the selection is empty, false otherwise
+     */
+    public boolean isSelectionEmpty() {
+        return getSelectionModel().isSelectionEmpty();
+    }
+
+    /**
+     * Get the current selection
+     *
+     * @return sorted set of selected dates
+     */
+   public SortedSet<Date> getSelection() {
         return getSelectionModel().getSelection();
     }
 
     /**
-     * Returns the selected date. 
+     * Adds the selection interval to the selection model. <b>All dates are
+     * modified to remove their hour of day, minute, second, and millisecond
+     * before being added to the selection model</b>.
      * 
-     * @return the first Date in the selection or null if empty.
-     */
-    public Date getSelectedDate() {
-        SortedSet<Date> selection = getSelection();
-        return selection.isEmpty() ? null : selection.first();
-
-    }
-    /**
-     * Adds the selection interval to the selection model.  <b>All dates are modified to remove their hour of
-     * day, minute, second, and millisecond before being added to the selection model</b>.
-     *
      * @param startDate Start of date range to add to the selection
      * @param endDate End of date range to add to the selection
      */
@@ -468,7 +505,9 @@ public class JXMonthView extends JComponent {
             if (selectionMode == SelectionMode.WEEK_INTERVAL_SELECTION) {
                 cleanupWeekSelectionDates(startDate, endDate);
             }
-            getSelectionModel().addSelectionInterval(cleanupDate(modifyedStartDate), cleanupDate(modifyedEndDate));
+            getSelectionModel().addSelectionInterval(
+                    cleanupDate(modifyedStartDate),
+                    cleanupDate(modifyedEndDate));
         }
     }
 
@@ -490,43 +529,6 @@ public class JXMonthView extends JComponent {
         }
     }
 
-    private void cleanupWeekSelectionDates(Date startDate, Date endDate) {
-        int count = 1;
-        cal.setTime(startDate);
-        while (cal.getTimeInMillis() < endDate.getTime()) {
-            cal.add(Calendar.DAY_OF_MONTH, 1);
-            count++;
-        }
-
-        if (count > JXMonthView.DAYS_IN_WEEK) {
-            // Move the start date to the first day of the week.
-            cal.setTime(startDate);
-            int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-            int firstDayOfWeek = getFirstDayOfWeek();
-            int daysFromStart = dayOfWeek - firstDayOfWeek;
-            if (daysFromStart < 0) {
-                daysFromStart += JXMonthView.DAYS_IN_WEEK;
-            }
-            cal.add(Calendar.DAY_OF_MONTH, -daysFromStart);
-
-            modifyedStartDate = cal.getTime();
-
-            // Move the end date to the last day of the week.
-            cal.setTime(endDate);
-            dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-            int lastDayOfWeek = firstDayOfWeek - 1;
-            if (lastDayOfWeek == 0) {
-                lastDayOfWeek = Calendar.SATURDAY;
-            }
-            int daysTillEnd = lastDayOfWeek - dayOfWeek;
-            if (daysTillEnd < 0) {
-                daysTillEnd += JXMonthView.DAYS_IN_WEEK;
-            }
-            cal.add(Calendar.DAY_OF_MONTH, daysTillEnd);
-            modifyedEndDate = cal.getTime();
-        }
-    }
-
     /**
      * Removes the selection interval from the selection model.  <b>All dates are modified to remove their hour of
      * day, minute, second, and millisecond before being added to the selection model</b>.
@@ -536,16 +538,6 @@ public class JXMonthView extends JComponent {
      */
     public void removeSelectionInterval(final Date startDate, final Date endDate) {
         getSelectionModel().removeSelectionInterval(cleanupDate(startDate), cleanupDate(endDate));
-    }
-
-    public DateSelectionModel getSelectionModel() {
-        return model;
-    }
-
-    public void setSelectionModel(DateSelectionModel model) {
-        DateSelectionModel oldModel = this.model;
-        this.model = model;
-        firePropertyChange(SELECTION_MODEL, oldModel, model);
     }
 
     /**
@@ -576,6 +568,134 @@ public class JXMonthView extends JComponent {
         firePropertyChange("selectionMode", oldSelectionMode, this.selectionMode);
     }
 
+   
+    /**
+     * Returns the selected date. 
+     * 
+     * @return the first Date in the selection or null if empty.
+     */
+    public Date getSelectedDate() {
+        SortedSet<Date> selection = getSelection();
+        return selection.isEmpty() ? null : selection.first();
+    }
+
+    /**
+     * Sets the model's selection to the given date or clears the selection if
+     * null.
+     * 
+     * @param newDate the selection date to set
+     */
+    public void setSelectedDate(Date newDate) {
+        if (newDate == null) {
+            clearSelection();
+        } else {
+            setSelectionInterval(newDate, newDate);
+        }
+    }
+
+    /**
+     * Returns true if the specified date falls within the _startSelectedDate
+     * and _endSelectedDate range.  <b>All dates are modified to remove their hour of
+     * day, minute, second, and millisecond before being added to the selection model</b>.
+     *
+     * @param date The date to check
+     * @return true if the date is selected, false otherwise
+     */
+    public boolean isSelectedDate(Date date) {
+        return getSelectionModel().isSelected(cleanupDate(date));
+    }
+
+    /**
+     * Set the lower bound date that is allowed to be selected. <p>
+     * 
+     * <b>All dates are
+     * modified to remove their hour of day, minute, second, and millisecond
+     * before being added to the selection model</b>.
+     * 
+     * @param lowerBound the lower bound, null means none.
+     */
+    public void setLowerBound(Date lowerBound) {
+        Date lower = cleanupDate(lowerBound);
+        getSelectionModel().setLowerBound(lower);
+    }
+
+    /**
+     * Set the upper bound date that is allowed to be selected. <p>
+     * 
+     * <b>All dates are
+     * modified to remove their hour of day, minute, second, and millisecond
+     * before being added to the selection model</b>.
+     * 
+     * @param upperBound the upper bound, null means none.
+     */
+    public void setUpperBound(Date upperBound) {
+        Date upper = cleanupDate(upperBound);
+        getSelectionModel().setUpperBound(upper);
+    }
+
+
+    /**
+     * Return the lower bound date that is allowed to be selected for this
+     * model
+     *
+     * @return lower bound date or null if not set
+     */
+    public Date getLowerBound() {
+        return getSelectionModel().getLowerBound();
+    }
+
+    /**
+     * Return the upper bound date that is allowed to be selected for this
+     * model
+     *
+     * @return upper bound date or null if not set
+     */
+    public Date getUpperBound() {
+        return getSelectionModel().getUpperBound();
+    }
+
+    /**
+     * Identifies whether or not the date passed is an unselectable date.
+     * <p>
+     * 
+     * <b>All dates are modified to remove their hour of day, minute, second,
+     * and millisecond before being added to the selection model</b>.
+     * 
+     * @param date date which to test for unselectable status
+     * @return true if the date is unselectable, false otherwise
+     */
+    public boolean isUnselectableDate(Date date) {
+        return getSelectionModel().isUnselectableDate(cleanupDate(date));
+    }
+
+    /**
+     * Sets the dates that should be unselectable. This will replace the model's
+     * current set of unselectable dates. The implication is that calling with
+     * zero dates will remove all unselectable dates.
+     * <p>
+     * 
+     * NOTE: neither the given array nor any of its elements must be null.
+     * <p>
+     * <b>All dates are modified to remove their hour of day, minute, second,
+     * and millisecond before being added to the selection model</b>.
+     * 
+     * @param unselectableDates zero or more not-null dates that should be
+     *        unselectable.
+     * @throws NullPointerException if either the array or any of the elements
+     *         are null
+     */
+    public void setUnselectableDates(Date... unselectableDates) {
+        Contract.asNotNull(unselectableDates,
+                "unselectable dates must not be null");
+        SortedSet<Date> unselectableSet = new TreeSet<Date>();
+        for (Date unselectableDate : unselectableDates) {
+            unselectableSet.add(cleanupDate(unselectableDate));
+        }
+        getSelectionModel().setUnselectableDates(unselectableSet);
+        repaint();
+    }
+
+//---------------------- delegates to model: long param    
     /**
      * Returns true if the specified date falls within the _startSelectedDate
      * and _endSelectedDate range.  <b>All dates are modified to remove their hour of
@@ -598,6 +718,25 @@ public class JXMonthView extends JComponent {
     public boolean isUnselectableDate(long date) {
         return getSelectionModel().isUnselectableDate(new Date(cleanupDate(date)));
     }
+
+    /**
+     * An array of longs defining days that should be unselectable.  <b>All dates are modified to remove their hour of
+     * day, minute, second, and millisecond before being added to the selection model</b>.
+     *
+     * @param unselectableDates the dates that should be unselectable
+     */
+    public void setUnselectableDates(long[] unselectableDates) {
+        SortedSet<Date> unselectableSet = new TreeSet<Date>();
+        if (unselectableDates != null) {
+            for (long unselectableDate : unselectableDates) {
+                unselectableSet.add(new Date(cleanupDate(unselectableDate)));
+            }
+        }
+        getSelectionModel().setUnselectableDates(unselectableSet);
+        repaint();
+    }
+
+    
 
     /**
      * Identifies whether or not the date passed is a flagged date.  <b>All dates are modified to remove their hour of
@@ -633,51 +772,6 @@ public class JXMonthView extends JComponent {
         }
         firePropertyChange(FLAGGED_DATES, null, this.flaggedDates);
         repaint();
-    }
-
-    /**
-     * An array of longs defining days that should be unselectable.  <b>All dates are modified to remove their hour of
-     * day, minute, second, and millisecond before being added to the selection model</b>.
-     *
-     * @param unselectableDates the dates that should be unselectable
-     */
-    public void setUnselectableDates(long[] unselectableDates) {
-        SortedSet<Date> unselectableSet = new TreeSet<Date>();
-        if (unselectableDates != null) {
-            for (long unselectableDate : unselectableDates) {
-                unselectableSet.add(new Date(cleanupDate(unselectableDate)));
-            }
-        }
-        getSelectionModel().setUnselectableDates(unselectableSet);
-        repaint();
-    }
-
-    /**
-     * Set the upper bound date that is allowed to be selected. <p>
-     * 
-     * <b>All dates are
-     * modified to remove their hour of day, minute, second, and millisecond
-     * before being added to the selection model</b>.
-     * 
-     * @param upperDateBound the upper bound
-     */
-    public void setUpperBound(long upperDateBound) {
-        Date upper = new Date(cleanupDate(upperDateBound));
-        getSelectionModel().setUpperBound(upper);
-    }
-
-    /**
-     * Set the lower bound date that is allowed to be selected. <p>
-     * 
-     * <b>All dates are
-     * modified to remove their hour of day, minute, second, and millisecond
-     * before being added to the selection model</b>.
-     * 
-     * @param lowerDateBound the lower bound
-     */
-    public void setLowerBound(long lowerDateBound) {
-        Date lower = new Date(cleanupDate(lowerDateBound));
-        getSelectionModel().setLowerBound(lower);
     }
 
     /**
@@ -725,6 +819,44 @@ public class JXMonthView extends JComponent {
     public boolean isShowingTrailingDates() {
         return trailingDates;
     }
+    
+    private void cleanupWeekSelectionDates(Date startDate, Date endDate) {
+        int count = 1;
+        cal.setTime(startDate);
+        while (cal.getTimeInMillis() < endDate.getTime()) {
+            cal.add(Calendar.DAY_OF_MONTH, 1);
+            count++;
+        }
+
+        if (count > JXMonthView.DAYS_IN_WEEK) {
+            // Move the start date to the first day of the week.
+            cal.setTime(startDate);
+            int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+            int firstDayOfWeek = getFirstDayOfWeek();
+            int daysFromStart = dayOfWeek - firstDayOfWeek;
+            if (daysFromStart < 0) {
+                daysFromStart += JXMonthView.DAYS_IN_WEEK;
+            }
+            cal.add(Calendar.DAY_OF_MONTH, -daysFromStart);
+
+            modifyedStartDate = cal.getTime();
+
+            // Move the end date to the last day of the week.
+            cal.setTime(endDate);
+            dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+            int lastDayOfWeek = firstDayOfWeek - 1;
+            if (lastDayOfWeek == 0) {
+                lastDayOfWeek = Calendar.SATURDAY;
+            }
+            int daysTillEnd = lastDayOfWeek - dayOfWeek;
+            if (daysTillEnd < 0) {
+                daysTillEnd += JXMonthView.DAYS_IN_WEEK;
+            }
+            cal.add(Calendar.DAY_OF_MONTH, daysTillEnd);
+            modifyedEndDate = cal.getTime();
+        }
+    }
+
 
     private Date cleanupDate(Date date) {
         // only modify defensive copies
@@ -1378,6 +1510,7 @@ public class JXMonthView extends JComponent {
         fireActionPerformed(CANCEL_KEY);
         
     }
+
 
     
     

@@ -33,7 +33,7 @@ import org.jdesktop.swingx.test.XTestUtils;
  * Tests for the DefaultDateSelectionModel
  */
 public class DefaultDateSelectionModelTest extends TestCase {
-    private DefaultDateSelectionModel model;
+    private DateSelectionModel model;
     private Calendar calendar;
     @Override
     public void setUp() {
@@ -178,7 +178,19 @@ public class DefaultDateSelectionModelTest extends TestCase {
         assertEquals("selection must be empty", 0, model.getSelection().size());
         assertEquals("no event fired", 0, report.getEventCount());
     }
-    
+ 
+    /**
+     * Remove the upper bound constraint
+     */
+    public void testUpperBoundRemove() {
+        Date today = XTestUtils.getCleanedToday();
+        model.setUpperBound(today);
+        Date tomorrow = XTestUtils.getCleanedToday(1);
+        model.setUpperBound(null);
+        model.setSelectionInterval(tomorrow, tomorrow);
+        assertTrue("selection must be empty", model.isSelected(tomorrow));
+    }
+
     /**
      *  respect upper bound - the bound itself 
      *  a valid selection.
@@ -194,10 +206,7 @@ public class DefaultDateSelectionModelTest extends TestCase {
     }
     
     /**
-     * NYI: respect unselectables on set/addSelection
      * first set the unselectables then set the selection to an unselectable.
-     * NOTE: the other way round - adjust the selection on setUnselectable
-     *   is implemented.
      */
     public void testUnselectableDates() {
         Date today = XTestUtils.getCleanedToday();
@@ -210,6 +219,12 @@ public class DefaultDateSelectionModelTest extends TestCase {
         assertEquals("selection must be empty", 0, model.getSelection().size());
     }
     
+    /**
+     * first set the unselectables then set the selection to an unselectable.
+     */
+    public void testUnselectableDatesNull() {
+        model.setUnselectableDates(null);
+    }
 
     public void testSingleSelection() {
         model.setSelectionMode(DateSelectionModel.SelectionMode.SINGLE_SELECTION);

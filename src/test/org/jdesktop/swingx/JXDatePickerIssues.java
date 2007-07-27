@@ -120,9 +120,9 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         JXDatePicker picker = new JXDatePicker();
         calendar.add(Calendar.DAY_OF_MONTH, 10);
         // access the model directly requires to "clean" the date
-        picker.getMonthView().setUpperBound(calendar.getTimeInMillis());
+        picker.getMonthView().setUpperBound(calendar.getTime());
         calendar.add(Calendar.DAY_OF_MONTH, - 20);
-        picker.getMonthView().setLowerBound(calendar.getTimeInMillis());
+        picker.getMonthView().setLowerBound(calendar.getTime());
         JXFrame frame = showInFrame(picker, "lower/upper bounds");
         frame.pack();
     }

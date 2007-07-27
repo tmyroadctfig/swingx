@@ -232,9 +232,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     */
    public void testMonthViewInitialSelection() {
        JXMonthView monthView = new JXMonthView(new GregorianCalendar(2007, 6, 28).getTimeInMillis());
-       SortedSet<Date> selection = monthView.getSelection();
-       Date other = selection.isEmpty() ? null : selection.first();
-       assertNotNull(other);
+       assertNotNull(monthView.getSelectedDate());
    }
 
    /**
