@@ -22,6 +22,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
@@ -33,6 +34,8 @@ import org.jdesktop.swingx.test.XTestUtils;
  * Tests for the DefaultDateSelectionModel
  */
 public class DefaultDateSelectionModelTest extends TestCase {
+    private static final Logger LOG = Logger
+            .getLogger(DefaultDateSelectionModelTest.class.getName());
     private DateSelectionModel model;
     private Calendar calendar;
     @Override
@@ -220,10 +223,16 @@ public class DefaultDateSelectionModelTest extends TestCase {
     }
     
     /**
-     * first set the unselectables then set the selection to an unselectable.
+     * null unselectables not allowed.
      */
     public void testUnselectableDatesNull() {
-        model.setUnselectableDates(null);
+        try {
+            model.setUnselectableDates(null);
+            fail("must fail with null set of unselectables");
+        } catch (RuntimeException e) {
+            // expected
+            LOG.info("got NPE as expected - how to test fail-fast?");
+        }
     }
 
     public void testSingleSelection() {
