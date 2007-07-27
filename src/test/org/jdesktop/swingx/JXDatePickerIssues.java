@@ -54,7 +54,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     private Calendar calendar;
 
     /**
-     * Issue ??-swingx: occasionally, the popup isn't closed. 
+     * Issue #565-swingx: occasionally, the popup isn't closed. 
      * to reproduce: open the picker's popup then click into
      * the comboBox. All is well if click into the textfield.
      *
@@ -72,7 +72,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     }
     
     /**
-     * Issue ??-swingx: JXRootPane eats picker's popup esc.
+     * Issue #566-swingx: JXRootPane eats picker's popup esc.
      * to reproduce: open the picker's popup the press esc -
      * not closed. Same with combo is working.
      *
@@ -112,7 +112,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     /**
      * visual testing of selection constraints: upper/lower bounds.
      * 
-     * Issue ??-swingx:
+     * Issue #567-swingx:
      * clicking into a unselectable in the popup clears the
      * selection - should revert to the last valid selection.
      */
