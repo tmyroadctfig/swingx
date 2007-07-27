@@ -62,6 +62,7 @@ public class JXDatePickerTest extends TestCase {
     public void teardown() {
     }
 
+    
     /**
      * test that the toggle popup is registered in the 
      * picker's actionMap.
@@ -78,6 +79,32 @@ public class JXDatePickerTest extends TestCase {
        assertEquals(actionKey, "TOGGLE_POPUP");
     }
     
+    /**
+     * Characterization: when does picker fire action events?
+     * 
+     * Test that set date programmatically (directly or indirectly) 
+     * does not fire an actionEvent.
+     */
+    public void testSetDateSilently() {
+        JXDatePicker picker = new JXDatePicker();
+        ActionReport report = new ActionReport();
+        picker.addActionListener(report);
+        // via editor
+        Date value = XTestUtils.getCleanedToday(3);
+        picker.getEditor().setValue(value);
+        assertEquals(value, picker.getDate());
+        // via selection
+        Date selected = XTestUtils.getCleanedToday(4);
+        picker.getMonthView().setSelectionInterval(selected, selected);
+        assertEquals(selected, picker.getDate());
+        Date date = XTestUtils.getCleanedToday(5);
+        // directly
+        picker.setDate(date);
+        assertEquals(date, picker.getDate());
+        assertEquals(0, report.getEventCount());
+    }
+
+
     /**
      * Enhanced commit/cancel.
      * 

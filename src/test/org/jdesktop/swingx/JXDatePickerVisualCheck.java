@@ -22,19 +22,30 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.DateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.UIManager.LookAndFeelInfo;
 
 import org.jdesktop.swingx.calendar.JXMonthView;
+import org.jdesktop.swingx.calendar.JXMonthView.SelectionMode;
 
 /**
  * Simple tests to ensure that the {@code JXDatePicker} can be instantiated and
@@ -45,6 +56,13 @@ import org.jdesktop.swingx.calendar.JXMonthView;
  * @author Karl Schaefer
  */
 public class JXDatePickerVisualCheck extends InteractiveTestCase {
+    @SuppressWarnings("all")
+    private static final Logger LOG = Logger
+            .getLogger(JXDatePickerVisualCheck.class.getName());
+    @SuppressWarnings("unused")
+    private Calendar calendar;
+    /** flag to decide if the menubar should be created */
+    private boolean showMenu;
 
     public JXDatePickerVisualCheck() {
         super("JXDatePicker Test");
@@ -62,6 +80,190 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         }
     }
     
+  
+    /**
+     * something weird's going on: the picker's date must be null
+     * after setting a monthView with null selection. It is, until
+     * shown?
+     * Looks fixed during synch control cleanup in datePicker.
+     */
+    public void interactiveShowPickerSetMonthNull() {
+        JXDatePicker picker = new JXDatePicker();
+        JXMonthView intervalForPicker = new JXMonthView();
+        intervalForPicker.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
+        picker.setMonthView(intervalForPicker);
+        LOG.info("picker date before showing " + picker.getDate());
+        assertNull(picker.getDate());
+        JXFrame frame = showInFrame(picker, "initial null date");
+        // JXRootPane eats esc 
+        frame.getRootPaneExt().getActionMap().remove("esc-action");
+        frame.pack();
+        LOG.info("picker date after showing " + picker.getDate());
+        assertNull(picker.getDate());
+
+    }
+    /**
+     * Issue #235-swingx: action events
+     * 
+     * Compare textfield, formatted, picker, combo after keyboard.
+     * 
+     * TextField
+     * - simple field fires on enter always
+     * - formatted fire on enter if value had been edited
+     *
+     * ComboBox
+     * - fires on enter always
+     * - fires on click in dropdown
+     * 
+     * Calendar widgets after cleanup: 
+     * 
+     * Picker
+     * - fires "datePickerCommit" on click (actually released) into monthView
+     * - fires "datePickerCommit"/-"Cancel" on enter/escape, both in input field
+     * and if popup is open
+     * 
+     * MonthView
+     * - fires "monthViewCommit" on click (actually released)
+     * - fires "monthViewCommit"/-"Cancel" on enter/esc 
+     * 
+     * 
+     */
+    public void interactiveActionEvent() {
+        JXDatePicker picker = new JXDatePicker();
+        JTextField simpleField = new JTextField("simple field");
+        JFormattedTextField textField = new JFormattedTextField(DateFormat.getDateInstance());
+        textField.setValue(new Date());
+        JComboBox box = new JComboBox(new Object[] {"one", "two", "three"});
+        box.setEditable(true);
+        
+        ActionListener l = new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("got action from: " + e.getSource().getClass().getName() + 
+                        "\n" + e);
+            }
+            
+        };
+        simpleField.addActionListener(l);
+        textField.addActionListener(l);
+        picker.addActionListener(l);
+//        picker.getMonthView().addActionListener(l);
+        box.addActionListener(l);
+        JPanel panel = new JPanel();
+        panel.add(simpleField);
+        panel.add(textField);
+        panel.add(picker);
+        panel.add(box);
+        
+        JXFrame frame = showInFrame(panel, "trace action events: keyboard/mouse");
+        // JXRootPane eats esc 
+        frame.getRootPaneExt().getActionMap().remove("esc-action");
+        frame.pack();
+    }
+
+    /**
+     * Issue #235-swingx: action events
+     * 
+     * Compare textfield, formatted, picker and combo: programatic change.
+     * - only combo fires
+     * 
+     */
+    public void interactiveActionEventSetValue() {
+        final JXDatePicker picker = new JXDatePicker();
+//        picker.setDate(null);
+        final JTextField simpleField = new JTextField("simple field");
+        final JFormattedTextField textField = new JFormattedTextField(DateFormat.getDateInstance());
+        textField.setValue(new Date());
+        final JComboBox box = new JComboBox(new Object[] {"one", "two", "three"});
+        box.setEditable(true);
+        
+        ActionListener l = new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("got action from: " + e.getSource().getClass().getName() + 
+                        "\n" + e);
+            }
+            
+        };
+        simpleField.addActionListener(l);
+        textField.addActionListener(l);
+        picker.addActionListener(l);
+        picker.getMonthView().addActionListener(l);
+        box.addActionListener(l);
+        Action action = new AbstractAction("set new value") {
+            int dayToAdd = 1;
+            public void actionPerformed(ActionEvent e) {
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.DAY_OF_MONTH, dayToAdd++);
+                Date date = cal.getTime();
+                String text = DateFormat.getDateInstance().format(date);
+                simpleField.setText(text);
+                textField.setValue(date);
+                picker.setDate(date);
+                box.setSelectedItem(text);
+            }
+            
+        };
+        
+        JPanel panel = new JPanel();
+        panel.add(simpleField);
+        panel.add(textField);
+        panel.add(picker);
+        panel.add(box);
+        
+        JXFrame frame = showInFrame(panel, "trace action events: programmatic change");
+        // JXRootPane eats esc 
+        frame.getRootPaneExt().getActionMap().remove("esc-action");
+        addAction(frame, action);
+        frame.pack();
+    }
+
+
+    /**
+     * Issue #99-swingx: null date and opening popup forces selection.
+     * Status? Looks fixed..
+     * 
+     * Sizing issue if init with null date
+     */
+    public void interactiveNullDate() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.setDate(null);
+        JPanel panel = new JPanel();
+        panel.add(picker);
+        JXFrame frame = showInFrame(panel, "null date");
+        // JXRootPane eats esc 
+        frame.getRootPaneExt().getActionMap().remove("esc-action");
+    }
+
+    /**
+     * Issue #426-swingx: NPE on traversing 
+     * 
+     * example from bug report
+     *
+     */
+    public void interactiveMonthViewTravers() {
+        JXMonthView monthView = new JXMonthView();
+        monthView.setTraversable(true);
+        JFrame frame = wrapInFrame(monthView, "show month view - travers");
+        frame.pack();
+        frame.setVisible(true);
+        
+    }
+    
+    public void interactiveDatePickerDisplay() {
+        JXDatePicker datePicker = new JXDatePicker();
+        JFrame frame = wrapInFrame(datePicker, "show date picker");
+        frame.pack();
+        frame.setVisible(true);
+    }
+    
+
+    
+    @Override
+    protected void setUp() throws Exception {
+        calendar = Calendar.getInstance();
+    }
+
     private static class SetPlafAction extends AbstractAction {
         private String plaf;
         
@@ -116,33 +318,14 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
     
     public JXFrame wrapInFrame(JComponent component, String title) {
         JXFrame frame = super.wrapInFrame(component, title);
-        frame.setJMenuBar(createMenuBar());
-        
+        if (showMenu) {
+            frame.setJMenuBar(createMenuBar());
+        }
         return frame;
     }
     
-    /**
-     * Issue #426-swingx: NPE on traversing 
-     * 
-     * example from bug report
-     *
-     */
-    public void interactiveMonthViewTravers() {
-        JXMonthView monthView = new JXMonthView();
-        monthView.setTraversable(true);
-        JFrame frame = wrapInFrame(monthView, "show month view - travers");
-        frame.pack();
-        frame.setVisible(true);
-        
-    }
-    
-    public void interactiveDatePickerDisplay() {
-        JXDatePicker datePicker = new JXDatePicker();
-        JFrame frame = wrapInFrame(datePicker, "show date picker");
-        frame.pack();
-        frame.setVisible(true);
-    }
-    
+
+
     /**
      * Do nothing, make the test runner happy
      * (would output a warning without a test fixture).

@@ -21,28 +21,13 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.logging.Logger;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ComboBoxEditor;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.plaf.basic.BasicComboBoxEditor;
-
-import org.jdesktop.swingx.calendar.JXMonthView;
-import org.jdesktop.swingx.calendar.JXMonthView.SelectionMode;
-import org.jdesktop.swingx.test.XTestUtils;
-import org.jdesktop.test.ActionReport;
 
 /**
  * Known issues of <code>JXDatePicker</code>.
@@ -50,6 +35,7 @@ import org.jdesktop.test.ActionReport;
  * @author Jeanette Winzenburg
  */
 public class JXDatePickerIssues extends InteractiveTestCase {
+    @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(JXDatePickerIssues.class
             .getName());
     public static void main(String[] args) {
@@ -67,6 +53,43 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 
     private Calendar calendar;
 
+    /**
+     * Issue ??-swingx: occasionally, the popup isn't closed. 
+     * to reproduce: open the picker's popup then click into
+     * the comboBox. All is well if click into the textfield.
+     *
+     */
+    public void interactiveClosePopup() {
+        JXDatePicker picker = new JXDatePicker();
+        JComboBox box = new JComboBox(new String[] {"one", "twos"});
+        box.setEditable(true);
+        JComponent panel = new JPanel();
+        panel.add(picker);
+        panel.add(box);
+        JXFrame frame = showInFrame(panel, "closed?");
+        // JXRootPane eats esc 
+        frame.getRootPaneExt().getActionMap().remove("esc-action");
+    }
+    
+    /**
+     * Issue ??-swingx: JXRootPane eats picker's popup esc.
+     * to reproduce: open the picker's popup the press esc -
+     * not closed. Same with combo is working.
+     *
+     */
+    public void interactiveXRootPaneEatsEscape() {
+        JXDatePicker picker = new JXDatePicker();
+        JComboBox box = new JComboBox(new String[] {"one", "twos"});
+        box.setEditable(true);
+        JComponent panel = new JPanel();
+        panel.add(picker);
+        panel.add(box);
+        @SuppressWarnings("unused")
+        JXFrame frame = showInFrame(panel, "closed?");
+        // JXRootPane eats esc 
+//        frame.getRootPaneExt().getActionMap().remove("esc-action");
+    }
+    
     /**
      * compare JFormattedTextField and JXDatePicker pref.
      * date is slightly cut. Looks like an issue 
@@ -88,166 +111,23 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 
     /**
      * visual testing of selection constraints: upper/lower bounds.
-     *
+     * 
+     * Issue ??-swingx:
+     * clicking into a unselectable in the popup clears the
+     * selection - should revert to the last valid selection.
      */
     public void interactiveBounds() {
         JXDatePicker picker = new JXDatePicker();
         calendar.add(Calendar.DAY_OF_MONTH, 10);
         // access the model directly requires to "clean" the date
-//        XTestUtils.getCleanedDate(calendar);
-//        picker.getMonthView().getSelectionModel().setUpperBound(calendar.getTime());
         picker.getMonthView().setUpperBound(calendar.getTimeInMillis());
         calendar.add(Calendar.DAY_OF_MONTH, - 20);
         picker.getMonthView().setLowerBound(calendar.getTimeInMillis());
-//        picker.getMonthView().getSelectionModel().setLowerBound(calendar.getTime());
-        showInFrame(picker, "bounds");
-    }
-  
-    /**
-     * something weird's going on: the picker's date must be null
-     * after setting a monthView with null selection. It is, until
-     * shown?
-     *
-     */
-    public void interactiveShowPickerSetMonthNull() {
-        JXDatePicker picker = new JXDatePicker();
-        JXMonthView intervalForPicker = new JXMonthView();
-        intervalForPicker.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
-        picker.setMonthView(intervalForPicker);
-        LOG.info("picker date before showing " + picker.getDate());
-        assertNull(picker.getDate());
-        JXFrame frame = showInFrame(picker, "initial null date");
-        // JXRootPane eats esc 
-        frame.getRootPaneExt().getActionMap().remove("esc-action");
-        LOG.info("picker date after showing " + picker.getDate());
-        assertNull(picker.getDate());
-
-    }
-    /**
-     * Issue #235-swingx: action events
-     * 
-     * Compare textfield, formatted, picker, combo after keyboard.
-     * - simple field fires on enter always
-     * - formatted (and picker) fire on enter if value had been edited
-     *
-     * Picker
-     * - fires on click into monthView only if clicked date different
-     * - doesn't close monthview on enter/escape if unchanged
-     * 
-     * MonthView
-     * - fires on click always
-     * - fires on esc/enter only if selection changed
-     * 
-     * ComboBox
-     * - fires on enter always
-     * - fires on click in dropdown
-     * 
-     */
-    public void interactiveActionEvent() {
-        JXDatePicker picker = new JXDatePicker();
-//        picker.setDate(null);
-        JTextField simpleField = new JTextField("simple field");
-        JFormattedTextField textField = new JFormattedTextField(DateFormat.getDateInstance());
-        textField.setValue(new Date());
-        JComboBox box = new JComboBox(new Object[] {"one", "two", "three"});
-        box.setEditable(true);
-        
-        ActionListener l = new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                LOG.info("got action from: " + e.getSource().getClass().getName() + 
-                        "\n" + e);
-            }
-            
-        };
-        simpleField.addActionListener(l);
-        textField.addActionListener(l);
-        picker.addActionListener(l);
-//        picker.getMonthView().addActionListener(l);
-        box.addActionListener(l);
-        JPanel panel = new JPanel();
-        panel.add(simpleField);
-        panel.add(textField);
-        panel.add(picker);
-        panel.add(box);
-        
-        JXFrame frame = showInFrame(panel, "trace action events: keyboard");
-        // JXRootPane eats esc 
-        frame.getRootPaneExt().getActionMap().remove("esc-action");
-    }
-
-    /**
-     * Issue #235-swingx: action events
-     * 
-     * Compare textfield, formatted, picker and combo: programatic change.
-     * - only picker and combo fire
-     * 
-     */
-    public void interactiveActionEventSetValue() {
-        final JXDatePicker picker = new JXDatePicker();
-//        picker.setDate(null);
-        final JTextField simpleField = new JTextField("simple field");
-        final JFormattedTextField textField = new JFormattedTextField(DateFormat.getDateInstance());
-        textField.setValue(new Date());
-        final JComboBox box = new JComboBox(new Object[] {"one", "two", "three"});
-        box.setEditable(true);
-        
-        ActionListener l = new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                LOG.info("got action from: " + e.getSource().getClass().getName() + 
-                        "\n" + e);
-            }
-            
-        };
-        simpleField.addActionListener(l);
-        textField.addActionListener(l);
-        picker.addActionListener(l);
-        picker.getMonthView().addActionListener(l);
-        box.addActionListener(l);
-        Action action = new AbstractAction("set new value") {
-            int dayToAdd = 1;
-            public void actionPerformed(ActionEvent e) {
-                Calendar cal = Calendar.getInstance();
-                cal.add(Calendar.DAY_OF_MONTH, dayToAdd++);
-                Date date = cal.getTime();
-                String text = DateFormat.getDateInstance().format(date);
-                simpleField.setText(text);
-                textField.setValue(date);
-                picker.setDate(date);
-                box.setSelectedItem(text);
-            }
-            
-        };
-        
-        JPanel panel = new JPanel();
-        panel.add(simpleField);
-        panel.add(textField);
-        panel.add(picker);
-        panel.add(box);
-        
-        JXFrame frame = showInFrame(panel, "trace action events: programmatic change");
-        // JXRootPane eats esc 
-        frame.getRootPaneExt().getActionMap().remove("esc-action");
-        addAction(frame, action);
+        JXFrame frame = showInFrame(picker, "lower/upper bounds");
+        frame.pack();
     }
 
 
-    /**
-     * Issue #99-swingx: null date and opening popup forces selection.
-     * Status? Looks fixed..
-     * 
-     * Sizing issue if init with null date
-     */
-    public void interactiveNullDate() {
-        JXDatePicker picker = new JXDatePicker();
-        picker.setDate(null);
-        JPanel panel = new JPanel();
-        panel.add(picker);
-        JXFrame frame = showInFrame(panel, "null date");
-        // JXRootPane eats esc 
-        frame.getRootPaneExt().getActionMap().remove("esc-action");
-    }
  
     
 //-------------------- unit tests
@@ -268,53 +148,8 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     }
     
 
-    /**
-     * Characterization: when does the picker fire an action event?
-     * @throws ParseException
-     */
-    public void testDatePickerFireOnSelection() throws ParseException {
-        JXDatePicker picker = new JXDatePicker();
-        ActionReport report = new ActionReport();
-        picker.addActionListener(report);
-        Date date = XTestUtils.getCleanedToday(5);
-        picker.getMonthView().setSelectionInterval(date, date);
-        assertEquals(date, picker.getEditor().getValue());
-        assertEquals(1, report.getEventCount());
-        fail("need to define when action events are fired");
-    }
-
-    /**
-     * Characterization: when does the picker fire an action event?
-     * @throws ParseException
-     */
-    public void testDatePickerFireOnSetDate() throws ParseException {
-        JXDatePicker picker = new JXDatePicker();
-        ActionReport report = new ActionReport();
-        picker.addActionListener(report);
-        // fires on setDate
-        picker.setDate(null);
-        assertEquals(1, report.getEventCount());
-        fail("need to define when action events are fired");
-    }
 
 
-
-
-    /**
-     * For comparison: behaviour of JComboBox on setEditor.
-     *
-     */
-    public void testEditorValueOnCombo() {
-        String[] items = new String[]{"one", "two"};
-        JComboBox box = new JComboBox(items);
-        box.setEditable(true);
-        Object value = box.getEditor().getItem();
-        // sanity
-        assertEquals(items[0], value);
-        ComboBoxEditor editor = new BasicComboBoxEditor();
-        box.setEditor(editor);
-        assertEquals(value, box.getEditor().getItem());
-    }
 
     
 
