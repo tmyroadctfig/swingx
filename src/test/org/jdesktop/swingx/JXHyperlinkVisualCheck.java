@@ -186,7 +186,31 @@ public class JXHyperlinkVisualCheck extends InteractiveTestCase {
 
 
 //---------------------- interactive test: JXTable
+ 
+    /**
+     * Table url activation, disabled tooltips.
+     */
+    public void interactiveTableHyperlinkNoTooltip() {
+        JXTable table = new JXTable(createModelWithLinks());
+        EditorPaneLinkVisitor visitor = new EditorPaneLinkVisitor();
+        LinkModelAction action = new LinkModelAction<LinkModel>(visitor) {
+
+            @Override
+            protected void updateFromTarget() {
+                super.updateFromTarget();
+                putValue(Action.SHORT_DESCRIPTION, null);
+            }
+            
+        };
+        // set the default renderer for LinkModel - which is basically
+        // a bean wrapped around an URL
+        table.setDefaultRenderer(LinkModel.class, new DefaultTableRenderer
+                (new HyperlinkProvider(action, LinkModel.class)));
+        JXFrame frame = wrapWithScrollingInFrame(table, visitor.getOutputComponent(), "table and simple links");
+        frame.setVisible(true);
+    }
     
+
     /**
      * Table with both simple "hyperlinks" targets and url activation.
      */
