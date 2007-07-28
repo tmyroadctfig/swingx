@@ -73,6 +73,7 @@ public class JXDatePickerTest extends TestCase {
     public void testLinkPanelSetNull() {
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run testLinkPanelNull - headless");
+            return;
         }
         JXDatePicker picker = new JXDatePicker();
         JXFrame frame = new JXFrame("showing", false);
@@ -91,6 +92,7 @@ public class JXDatePickerTest extends TestCase {
     public void testLinkPanelInitalNull() {
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run testLinkPanelNull - headless");
+            return;
         }
         JXDatePicker picker = new JXDatePicker();
         picker.setLinkPanel(null);
@@ -110,6 +112,7 @@ public class JXDatePickerTest extends TestCase {
     public void testLinkPanelRemovedAdded() {
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run testLinkPanelNull - headless");
+            return;
         }
         JXDatePicker picker = new JXDatePicker();
         JXFrame frame = new JXFrame("showing", false);
