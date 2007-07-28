@@ -404,7 +404,8 @@ public class JXDatePicker extends JComponent {
 
     /**
      * Set the panel that will be used at the bottom of the popup.
-     *
+     * PENDING JW: why insist on JPanel? JComponent would be enough?
+     *  
      * @param linkPanel The new panel to install in the popup
      */
     public void setLinkPanel(JPanel linkPanel) {
@@ -663,6 +664,11 @@ public class JXDatePicker extends JComponent {
             listener.actionPerformed(e);
         }
     }
+    /**
+     * 
+     *  @deprecated use {@link #cancelEdit()} and {@link #commitEdit()} instead
+     */
+    @Deprecated 
     public void postActionEvent() {
         fireActionPerformed();
     }
@@ -716,7 +722,7 @@ public class JXDatePicker extends JComponent {
             public void actionPerformed(ActionEvent ae) {
                 String key = select ? JXDatePicker.HOME_COMMIT_KEY : JXDatePicker.HOME_NAVIGATE_KEY;
                 select = false;
-                Action delegate = JXDatePicker.this.getActionMap().get(key);
+                Action delegate = getActionMap().get(key);
                 if (delegate !=  null) {
                     delegate.actionPerformed(null);
                 }

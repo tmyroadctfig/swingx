@@ -49,7 +49,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -176,9 +175,12 @@ public class BasicDatePickerUI extends DatePickerUI {
         InputMap pickerInputMap = datePicker.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         pickerInputMap.put(KeyStroke.getKeyStroke("ENTER"), JXDatePicker.COMMIT_KEY);
         pickerInputMap.put(KeyStroke.getKeyStroke("ESCAPE"), JXDatePicker.CANCEL_KEY);
+        // PENDING: get from LF
         pickerInputMap.put(KeyStroke.getKeyStroke("F5"), JXDatePicker.HOME_COMMIT_KEY);
         pickerInputMap.put(KeyStroke.getKeyStroke("shift F5"), JXDatePicker.HOME_NAVIGATE_KEY);
         pickerInputMap.put(KeyStroke.getKeyStroke("SPACE"), "TOGGLE_POPUP");
+        
+        installLinkPanelKeyboardActions();
         // install popupButton's actions
         // PENDING JW move the picker's input map, make popup unfocusable
         //
@@ -194,9 +196,46 @@ public class BasicDatePickerUI extends DatePickerUI {
         
     }
 
-    
     protected void uninstallKeyboardActions() {
+        uninstallLinkPanelKeyboardActions(datePicker.getLinkPanel());
+    }
 
+    
+    /**
+     * Install key bindings on linkPanel. Does nothing if 
+     * the linkPanel is null.
+     * 
+     * PRE: keybindings installed on picker.
+     */
+    protected void installLinkPanelKeyboardActions() {
+        if (datePicker.getLinkPanel() == null) return;
+        ActionMap map = datePicker.getLinkPanel().getActionMap();
+        map.put(JXDatePicker.HOME_COMMIT_KEY, 
+                datePicker.getActionMap().get(JXDatePicker.HOME_COMMIT_KEY));
+        map.put(JXDatePicker.HOME_NAVIGATE_KEY, 
+                datePicker.getActionMap().get(JXDatePicker.HOME_NAVIGATE_KEY));
+        InputMap inputMap = datePicker.getLinkPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        // PENDING: get from LF
+        inputMap.put(KeyStroke.getKeyStroke("F5"), JXDatePicker.HOME_COMMIT_KEY);
+        inputMap.put(KeyStroke.getKeyStroke("shift F5"), JXDatePicker.HOME_NAVIGATE_KEY);
+        
+    }
+
+
+    /**
+     * @param panel 
+     * 
+     */
+    protected void uninstallLinkPanelKeyboardActions(JComponent panel) {
+        if (panel == null) return;
+        ActionMap map = panel.getActionMap();
+        map.remove(JXDatePicker.HOME_COMMIT_KEY); 
+        map.remove(JXDatePicker.HOME_NAVIGATE_KEY); 
+        InputMap inputMap = panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        // PENDING: get from LF
+        inputMap.remove(KeyStroke.getKeyStroke("F5"));
+        inputMap.remove(KeyStroke.getKeyStroke("shift F5"));
+        
     }
 
     protected void installListeners() {
@@ -632,6 +671,21 @@ public class BasicDatePickerUI extends DatePickerUI {
 
     }
 
+    /**
+     * @param oldLinkPanel 
+     * 
+     */
+    protected void updateLinkPanel(JComponent oldLinkPanel) {
+        if (oldLinkPanel != null) {
+            uninstallLinkPanelKeyboardActions(oldLinkPanel);
+        }
+        installLinkPanelKeyboardActions();
+        if (popup != null) {
+            popup.updateLinkPanel(oldLinkPanel);
+        }
+    }
+
+
 //------------------- methods called by installed actions
     
     /**
@@ -832,12 +886,20 @@ public class BasicDatePickerUI extends DatePickerUI {
         public BasicDatePickerPopup() {
             setLayout(new BorderLayout());
             add(datePicker.getMonthView(), BorderLayout.CENTER);
-            JPanel linkPanel = datePicker.getLinkPanel();
-            if (linkPanel != null) {
-                add(linkPanel, BorderLayout.SOUTH);
-                // PENDING: some class should install the home action/keys
-                // in either the linkPanel or the monthView?
+            updateLinkPanel(null);
+        }
+
+        /**
+         * @param oldLinkPanel
+         */
+        public void updateLinkPanel(JComponent oldLinkPanel) {
+            if (oldLinkPanel != null) {
+                remove(oldLinkPanel);
             }
+            if (datePicker.getLinkPanel() != null) {
+                add(datePicker.getLinkPanel(), BorderLayout.SOUTH);
+            }
+            
         }
     }
 
@@ -986,12 +1048,7 @@ public class BasicDatePickerUI extends DatePickerUI {
             } else if (JXDatePicker.MONTH_VIEW.equals(property)) {
                 updateFromMonthViewChanged((JXMonthView) e.getOldValue());
             } else if (JXDatePicker.LINK_PANEL.equals(property)) {
-                // If the popup is null we haven't shown it yet.
-                JPanel linkPanel = datePicker.getLinkPanel();
-                if (popup != null) {
-                    popup.remove(linkPanel);
-                    popup.add(linkPanel, BorderLayout.SOUTH);
-                }
+                updateLinkPanel((JComponent) e.getOldValue());
             } else if (JXDatePicker.EDITOR.equals(property)) {
                 updateFromEditorChanged((JFormattedTextField) e.getOldValue(), true);
             } else if ("componentOrientation".equals(property)) {

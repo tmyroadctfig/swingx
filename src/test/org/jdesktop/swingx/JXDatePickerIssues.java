@@ -21,6 +21,7 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
@@ -30,6 +31,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 /**
  * Known issues of <code>JXDatePicker</code>.
@@ -44,8 +46,8 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 //        setSystemLF(true);
         JXDatePickerIssues  test = new JXDatePickerIssues();
         try {
-            test.runInteractiveTests();
-//          test.runInteractiveTests(".*Show.*");
+//            test.runInteractiveTests();
+          test.runInteractiveTests(".*Link.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -69,7 +71,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
             
         };
         picker.addActionListener(l);
-        JXFrame frame = showInFrame(picker, "click on linkpanel must commits");
+        JXFrame frame = showInFrame(picker, "double-click on linkpanel must commit");
         // JXRootPane eats esc 
         frame.getRootPaneExt().getActionMap().remove("esc-action");
     }
@@ -81,15 +83,30 @@ public class JXDatePickerIssues extends InteractiveTestCase {
      *
      */
     public void interactiveClosePopup() {
-        JXDatePicker picker = new JXDatePicker();
+        final JXDatePicker picker = new JXDatePicker();
         JComboBox box = new JComboBox(new String[] {"one", "twos"});
         box.setEditable(true);
+        ActionListener l = new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("received: " + e + 
+                        "\n and not adjusting: " 
+                        + picker.getMonthView().getSelectionModel().isAdjusting());
+                
+            }
+            
+        };
+        picker.addActionListener(l);
+        box.addActionListener(l);
         JComponent panel = new JPanel();
         panel.add(picker);
         panel.add(box);
+        panel.add(new JTextField("textfield - click into with open popup"));
         JXFrame frame = showInFrame(panel, "closed?");
         // JXRootPane eats esc 
         frame.getRootPaneExt().getActionMap().remove("esc-action");
+        // check if it's a lightweight vs. heavyweight problem
+        frame.setSize(new Dimension(frame.getSize().width, 400));
     }
     
     /**

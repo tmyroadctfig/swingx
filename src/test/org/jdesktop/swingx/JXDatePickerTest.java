@@ -21,7 +21,9 @@
 package org.jdesktop.swingx;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.text.Format;
@@ -32,9 +34,11 @@ import java.util.TimeZone;
 import java.util.logging.Logger;
 
 import javax.swing.Action;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
+import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import junit.framework.TestCase;
@@ -62,7 +66,163 @@ public class JXDatePickerTest extends TestCase {
     public void teardown() {
     }
 
+    /**
+     * tests LinkPanel set to null after showing.
+     * Was: NPE.
+     */
+    public void testLinkPanelSetNull() {
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run testLinkPanelNull - headless");
+        }
+        JXDatePicker picker = new JXDatePicker();
+        JXFrame frame = new JXFrame("showing", false);
+        frame.add(picker);
+        frame.setVisible(true);
+        Action togglePopup = picker.getActionMap().get("TOGGLE_POPUP");
+        togglePopup.actionPerformed(null);
+        picker.setLinkPanel(null);
+        frame.dispose();
+    }
+
+    /**
+     * tests initial null linkPanel.
+     *
+     */
+    public void testLinkPanelInitalNull() {
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run testLinkPanelNull - headless");
+        }
+        JXDatePicker picker = new JXDatePicker();
+        picker.setLinkPanel(null);
+        JXFrame frame = new JXFrame("showing", false);
+        frame.add(picker);
+        frame.setVisible(true);
+        Action togglePopup = picker.getActionMap().get("TOGGLE_POPUP");
+        togglePopup.actionPerformed(null);
+        frame.dispose();
+    }
+
+    /**
+     * Test install/uninstall of LinkPanel when popup is showing.
+     * - removed/added from parent
+     * - bindings initially installed/uninstalled/re-installed
+     */
+    public void testLinkPanelRemovedAdded() {
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run testLinkPanelNull - headless");
+        }
+        JXDatePicker picker = new JXDatePicker();
+        JXFrame frame = new JXFrame("showing", false);
+        frame.add(picker);
+        frame.setVisible(true);
+        // show the popup ... PENDING: need api on picker.
+        Action togglePopup = picker.getActionMap().get("TOGGLE_POPUP");
+        togglePopup.actionPerformed(null);
+        JPanel linkPanel = picker.getLinkPanel();
+        // assert the bindings are installed
+        assertLinkPanelBindings(linkPanel, true);
+        Container oldParent = linkPanel.getParent();
+        // sanity
+        assertNotNull(oldParent);
+        // remove
+        picker.setLinkPanel(null);
+        // assert it is removed
+        assertNull("linkPanel must be removed", linkPanel.getParent());
+        // assert bindings removed
+        assertLinkPanelBindings(linkPanel, false);
+        // set again
+        picker.setLinkPanel(linkPanel);
+        // assert the bindings are installed again
+        assertLinkPanelBindings(linkPanel, true);
+        assertSame("linkPanel must be added to same parent", 
+                oldParent, linkPanel.getParent());
+        frame.dispose();
+    }
+
+
+    /**
+     * Tests that the linkPanel bindings and actions 
+     * are removed (no popup)
+     *
+     */
+    public void testLinkPanelBindingUninstalled() {
+        JXDatePicker picker = new JXDatePicker();
+        JComponent linkPanel = picker.getLinkPanel();
+        picker.setLinkPanel(null);
+        assertLinkPanelBindings(linkPanel, false);
+    }
     
+
+    /**
+     * Tests that the linkPanel has actions and keybindings
+     * for homeCommit/-Cancel (initially, no popup)
+     *
+     */
+    public void testLinkPanelAction() {
+        JXDatePicker picker = new JXDatePicker();
+        JComponent linkPanel = picker.getLinkPanel();
+        assertLinkPanelBindings(linkPanel, true);
+    }
+
+    /**
+     * @param linkPanel
+     */
+    private void assertLinkPanelBindings(JComponent linkPanel, boolean bound) {
+        if (bound) {
+        assertNotNull("home commit action must be registered", 
+                linkPanel.getActionMap().get(JXDatePicker.HOME_COMMIT_KEY));
+        assertNotNull("home navigate action must be registered", 
+                linkPanel.getActionMap().get(JXDatePicker.HOME_NAVIGATE_KEY));
+        } else {
+            assertNull("home commit action must not be registered", 
+                    linkPanel.getActionMap().get(JXDatePicker.HOME_COMMIT_KEY));
+            assertNull("home navigate action must not be registered", 
+                    linkPanel.getActionMap().get(JXDatePicker.HOME_NAVIGATE_KEY));
+        }
+        assertKeyBindings(linkPanel, JXDatePicker.HOME_COMMIT_KEY, bound);
+        assertKeyBindings(linkPanel, JXDatePicker.HOME_NAVIGATE_KEY, bound);
+    }
+    
+    /**
+     * PENDING: move to testUtils.
+     * @param comp
+     * @param actionKey
+     */
+    public void assertKeyBindings(JComponent comp, Object actionKey, boolean bound) {
+        boolean hasAncestorBinding = hasBinding(
+                comp.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT), 
+                actionKey);
+        boolean hasFocusedBinding = hasBinding(
+                comp.getInputMap(JComponent.WHEN_FOCUSED), 
+                actionKey);
+        boolean hasInFocusedBinding = hasBinding(
+                comp.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW), 
+                actionKey);
+        boolean hasBinding = hasAncestorBinding || hasFocusedBinding || hasInFocusedBinding;
+        assertEquals("component has keybinding for " + actionKey,
+                bound,
+                hasBinding);
+        
+    }
+
+    /**
+     * 
+     * PENDING: move to testutils.
+     * @param map
+     * @param actionKey
+     */
+    public boolean hasBinding(InputMap map, Object actionKey) {
+        KeyStroke[] keyStrokes = map.keys();
+        if (keyStrokes != null) {
+            for (KeyStroke stroke : keyStrokes) {
+                if (actionKey.equals(map.get(stroke))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * test that the toggle popup is registered in the 
      * picker's actionMap.
@@ -236,6 +396,7 @@ public class JXDatePickerTest extends TestCase {
      * for now keep the old postAction.
      *
      */
+    @SuppressWarnings("deprecation")
     public void testCommitCancelPreserveOld() {
         JXDatePicker picker = new JXDatePicker();
         ActionReport report = new ActionReport();

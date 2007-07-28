@@ -73,13 +73,35 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         JXDatePickerVisualCheck test = new JXDatePickerVisualCheck();
         
         try {
-            test.runInteractiveTests();
+//            test.runInteractiveTests();
+            test.runInteractiveTests(".*Link.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
     }
     
+    /**
+     * visual check that toggling the panel adds/removes it
+     * and installs the keybindings.
+     *
+     */
+    public void interactiveLinkPanelSet() {
+        final JXDatePicker picker = new JXDatePicker();
+        final JPanel panel = picker.getLinkPanel();
+        // initial null okay
+        JXFrame frame = showInFrame(picker, "null panel");
+        Action toggleLinkPanel = new AbstractAction("toggleLinkPanel") {
+
+            public void actionPerformed(ActionEvent e) {
+                boolean hasLinkPanel = picker.getLinkPanel() != null;
+                picker.setLinkPanel(hasLinkPanel ? null : panel);
+            }
+            
+        };
+        addAction(frame, toggleLinkPanel);
+        frame.pack();
+    }
   
     /**
      * something weird's going on: the picker's date must be null
