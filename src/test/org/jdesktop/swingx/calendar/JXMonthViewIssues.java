@@ -21,29 +21,15 @@
  */
 package org.jdesktop.swingx.calendar;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.logging.Logger;
 
-import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
 
-import org.jdesktop.swingx.DateSelectionListener;
 import org.jdesktop.swingx.InteractiveTestCase;
-import org.jdesktop.swingx.JXDatePicker;
-import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.calendar.JXMonthView.SelectionMode;
-import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
 import org.jdesktop.swingx.test.XTestUtils;
@@ -54,6 +40,7 @@ import org.jdesktop.swingx.test.XTestUtils;
  * @author Jeanette Winzenburg
  */
 public class JXMonthViewIssues extends InteractiveTestCase {
+    @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(JXMonthViewIssues.class
             .getName());
     public static void main(String[] args) {
@@ -68,155 +55,11 @@ public class JXMonthViewIssues extends InteractiveTestCase {
       }
   }
 
-
-    /**
-     * Issue #563-swingx: arrow keys active even if not focused.
-     * focus the button and use the arrow keys: selection moves.
-     * Reason was that the WHEN_IN_FOCUSED_WINDOW key bindings
-     * were always installed. Changed to only install if parent is
-     * popup. 
-     *
-     */
-    public void interactiveMistargetedKeyStrokes() {
-        JXMonthView month = new JXMonthView();
-        JComponent panel = new JPanel();
-        panel.add(new JButton("something to focus"));
-        panel.add(month);
-        showInFrame(panel, "default - for debugging only");
-    }
-    
-    /**
-     * Issue #563-swingx: arrow keys active even if not focused.
-     * focus the button and use the arrow keys: selection moves.
-     *
-     */
-    public void interactiveMistargetedKeyStrokesPicker() {
-        JXMonthView month = new JXMonthView();
-        JComponent panel = new JPanel();
-        JXDatePicker button = new JXDatePicker();
-        panel.add(button);
-        panel.add(month);
-        showInFrame(panel, "default - for debugging only");
-    }
-    
     public void interactiveSimple() {
         JXMonthView month = new JXMonthView();
         showInFrame(month, "default - for debugging only");
     }
 
-    /**
-     * Informally testing adjusting property on mouse events.
-     * 
-     * Hmm .. not formally testable without mocks/ui unit tests?
-     *
-     */
-    public void interactiveAdjustingOnMouse() {
-        final JXMonthView month = new JXMonthView();
-        // we rely on being notified after the ui delegate ... brittle.
-        MouseAdapter m = new MouseAdapter() {
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                LOG.info("pressed - expect true " + month.getSelectionModel().isAdjusting());
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                LOG.info("released - expect false" + month.getSelectionModel().isAdjusting());
-            }
-            
-        };
-        month.addMouseListener(m);
-        showInFrame(month, "Mouse and adjusting - state on pressed/released");
-    }
-
-    /**
-     * Issue ??-swingx: multiple selection with keyboard not working
-     * Happens for standalone, okay for monthview in popup.
-     * 
-     *
-     */
-    public void interactiveMultipleSelectionWithKeyboard() {
-        JXMonthView interval = new JXMonthView();
-        interval.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
-        JXMonthView multiple = new JXMonthView();
-        multiple.setSelectionMode(SelectionMode.MULTIPLE_INTERVAL_SELECTION);
-        // for comparison: single interval in popup is working
-        JXDatePicker picker = new JXDatePicker();
-        JXMonthView intervalForPicker = new JXMonthView();
-        intervalForPicker.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
-        picker.setMonthView(intervalForPicker);
-        
-        JComponent comp = new JPanel();
-        comp.add(interval);
-        comp.add(multiple);
-        comp.add(picker);
-        showInFrame(comp, "select interval with keyboard");
-        
-    }
-    /**
-     * Issue #??-swingx: esc/enter does not always fire actionEvent.
-     * 
-     * To reproduce, by keyboard: 
-     * select - enter - enter: only the first fires
-     * select - enter - esc: esc does not fire
-     * 
-     * or: select by mouse - esc: esc does not fire
-     * or: select by mouse - enter: enter does not fire
-     * 
-     * plus: 
-     * trying to understand standalone MonthView events.
-     * first is single selection, second is single interval, 
-     * third multipleInterval.
-     *
-     */
-    public void interactiveMonthViewEvents() {
-        JXMonthView monthView = new JXMonthView();
-        JXMonthView interval = new JXMonthView();
-        interval.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
-        JXMonthView multiple = new JXMonthView();
-        multiple.setSelectionMode(SelectionMode.MULTIPLE_INTERVAL_SELECTION);
-        ActionListener l = new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                LOG.info("got action from: " + e.getSource().getClass().getName() + 
-                        "\n" + e);
-            }
-            
-        };
-        monthView.addActionListener(l);
-        interval.addActionListener(l);
-        multiple.addActionListener(l);
-        DateSelectionListener d = new DateSelectionListener() {
-
-            public void valueChanged(DateSelectionEvent ev) {
-                LOG.info("got selection from: " + ev.getSource().getClass().getName() + 
-                        "\n" + ev);
-            }
-            
-        };
-        monthView.getSelectionModel().addDateSelectionListener(d);
-        interval.getSelectionModel().addDateSelectionListener(d);
-        multiple.getSelectionModel().addDateSelectionListener(d);
-        
-        JXDatePicker picker = new JXDatePicker();
-        JXMonthView intervalForPicker = new JXMonthView();
-        intervalForPicker.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
-        // JW: this picker comes up with today - should have taken the
-        // empty selection (which it does the unit test)
-        picker.setMonthView(intervalForPicker);
-        
-        JComponent comp = new JPanel();
-        comp.add(monthView);
-        comp.add(interval);
-        comp.add(multiple);
-        comp.add(picker);
-        JXFrame frame = showInFrame(comp, "events from monthView");
-        // JXRootPane eats esc 
-        frame.getRootPaneExt().getActionMap().remove("esc-action");
-
-    }
-    
 //----------------------
     
     /**

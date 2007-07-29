@@ -34,8 +34,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -57,7 +55,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
-import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
@@ -236,12 +233,8 @@ public class BasicMonthViewUI extends MonthViewUI {
         // JW: change to when-ancestor? just to be on the safe side
         // if we make the title contain active comps
         installKeyBindings(JComponent.WHEN_FOCUSED);
-
-        // Needed to allow for keyboard control in popups.
-        // maybe reason for issue ??-swingx: in normal windows, 
-        // keyboard selection working even if not focused
-//        installKeyBindings(JComponent.WHEN_IN_FOCUSED_WINDOW);
-
+        // JW: removed the automatic keybindings in WHEN_IN_FOCUSED
+        // which caused #555-swingx (binding active if not focused)
         ActionMap actionMap = monthView.getActionMap();
         KeyboardAction acceptAction = new KeyboardAction(KeyboardAction.ACCEPT_SELECTION);
         actionMap.put("acceptSelection", acceptAction);
@@ -315,7 +308,35 @@ public class BasicMonthViewUI extends MonthViewUI {
         mouseListener = null;
         propertyChangeListener = null;
     }
+//----------------------- controller
+    
+    /**
+     * Binds/clears the keystrokes in the component input map, 
+     * based on the monthView's componentInputMap enabled property.
+     * 
+     * @see org.jdesktop.swingx.calendar.JXMonthView#isComponentInputMapEnabled()
+     */
+    protected void updateComponentInputMap() {
+        if (monthView.isComponentInputMapEnabled()) {
+            installKeyBindings(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        } else {
+            uninstallKeyBindings(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        }
+        
+    }
+//---------------------- config
+    
+    /**
+     * Create a derived font used to when painting various pieces of the
+     * month view component.  This method will be called whenever
+     * the font on the component is set so a new derived font can be created.
+     */
+    protected Font createDerivedFont() {
+        return monthView.getFont().deriveFont(Font.BOLD);
+    }
+    
 
+//---------------------- listener creation    
     protected PropertyChangeListener createPropertyChangeListener() {
         return getHandler();
     }
@@ -332,15 +353,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         return getHandler();
     }
 
-    /**
-     * Create a derived font used to when painting various pieces of the
-     * month view component.  This method will be called whenever
-     * the font on the component is set so a new derived font can be created.
-     */
-    protected Font createDerivedFont() {
-        return monthView.getFont().deriveFont(Font.BOLD);
-    }
-    
     private Handler getHandler() {
         if (handler == null) {
             handler = new Handler();
@@ -1871,17 +1883,5 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
     }
 
-    /**
-     * 
-     */
-    private void updateComponentInputMap() {
-         boolean enableInFocusedWindow = monthView.isComponentInputMapEnabled();
-        if (enableInFocusedWindow) {
-            installKeyBindings(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        } else {
-            uninstallKeyBindings(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        }
-        
-    }
 
 }
