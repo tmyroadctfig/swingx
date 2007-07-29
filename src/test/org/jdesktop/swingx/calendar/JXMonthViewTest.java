@@ -37,6 +37,7 @@ import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.ActionReport;
+import org.jdesktop.test.PropertyChangeReport;
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
 
@@ -64,6 +65,49 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JComponent.setDefaultLocale(componentLocale);
     }
 
+    /**
+     * Issue #563-swingx: keybindings active if not focused.
+     * Test that the bindings are dynamically installed when
+     * shown in popup and de-installed if shown not in popup.
+    */
+    public void testComponentInputMapEnabledControlsFocusedKeyBindings() {
+        JXMonthView monthView = new JXMonthView();
+        // initial: no bindings
+        assertEquals("monthView must not have in-focused keyBindings", 0, 
+                monthView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).size());
+        monthView.setComponentInputMapEnabled(true);
+        // setting the flag installs bindings
+        assertTrue("monthView must have in-focused keyBindings after showing in popup",  
+              monthView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).size() > 0);
+        monthView.setComponentInputMapEnabled(false);
+        // resetting the flag uninstalls the bindings
+        assertEquals("monthView must not have in-focused keyBindings", 0, 
+                monthView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).size());
+    }
+
+    /**
+     * Test default value and property change notificateion of 
+     * the componentInputMapEnabled property.
+     *
+     */
+    public void testComponentInputMapEnabled() {
+        JXMonthView monthView = new JXMonthView();
+        assertFalse("the default value must be false", 
+                monthView.isComponentInputMapEnabled());
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.setComponentInputMapEnabled(true);
+        // can't use the utility method - clearing the
+        // componentInputMap fires an internal client property
+        // "_WhenInFocused_Window"
+//        TestUtils.assertPropertyChangeEvent(report, 
+//                "componentInputMapEnabled", false, true);
+        assertEquals(1, report.getEventCount("componentInputMapEnabled"));
+        report.clear();
+        monthView.setComponentInputMapEnabled(false);
+        assertEquals(1, report.getEventCount("componentInputMapEnabled"));
+    }
+    
     /**
      * test doc'ed behaviour: model must not be null.
      * PENDING: the old problem - how do we test fail-fast implemented? 
@@ -170,6 +214,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * for now keep the old postAction.
      *
      */
+    @SuppressWarnings("deprecation")
     public void testCommitCancelPreserveOld() {
         JXDatePicker picker = new JXDatePicker();
         ActionReport report = new ActionReport();

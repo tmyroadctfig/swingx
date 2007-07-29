@@ -13,6 +13,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
+import java.util.logging.Logger;
 
 import junit.framework.Assert;
 
@@ -21,6 +22,8 @@ import junit.framework.Assert;
  * @author rbair
  */
 public final class TestUtils extends Assert {
+    private static final Logger LOG = Logger.getLogger(TestUtils.class
+            .getName());
     private TestUtils() {}
     
     /**
@@ -49,6 +52,9 @@ public final class TestUtils extends Assert {
      * @param newValue the expected new value
      */
     public static void assertPropertyChangeEvent(PropertyChangeReport report, String property, Object oldValue, Object newValue) {
+        if (report.getEventCount() > 1) {
+            LOG.info("events: " + report.getEventNames());
+        }
         assertEquals("exactly one event", 1, report.getEventCount());
         assertEquals("property", property, report.getLastProperty());
         assertEquals("last old value", oldValue, report.getLastOldValue());

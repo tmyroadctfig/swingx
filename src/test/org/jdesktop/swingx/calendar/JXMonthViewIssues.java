@@ -21,6 +21,8 @@
  */
 package org.jdesktop.swingx.calendar;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -28,9 +30,9 @@ import java.awt.event.MouseEvent;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.SortedSet;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -59,23 +61,40 @@ public class JXMonthViewIssues extends InteractiveTestCase {
       JXMonthViewIssues  test = new JXMonthViewIssues();
       try {
           test.runInteractiveTests();
-//        test.runInteractiveTests(".*Simple.*");
+//        test.runInteractiveTests(".*Move.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
 
+
     /**
-     * Issue ?? swingx: arrow keys active even if not focused.
+     * Issue #563-swingx: arrow keys active even if not focused.
      * focus the button and use the arrow keys: selection moves.
-     * Reason 
+     * Reason was that the WHEN_IN_FOCUSED_WINDOW key bindings
+     * were always installed. Changed to only install if parent is
+     * popup. 
      *
      */
     public void interactiveMistargetedKeyStrokes() {
         JXMonthView month = new JXMonthView();
         JComponent panel = new JPanel();
         panel.add(new JButton("something to focus"));
+        panel.add(month);
+        showInFrame(panel, "default - for debugging only");
+    }
+    
+    /**
+     * Issue #563-swingx: arrow keys active even if not focused.
+     * focus the button and use the arrow keys: selection moves.
+     *
+     */
+    public void interactiveMistargetedKeyStrokesPicker() {
+        JXMonthView month = new JXMonthView();
+        JComponent panel = new JPanel();
+        JXDatePicker button = new JXDatePicker();
+        panel.add(button);
         panel.add(month);
         showInFrame(panel, "default - for debugging only");
     }

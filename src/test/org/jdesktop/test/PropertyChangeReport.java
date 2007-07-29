@@ -144,6 +144,18 @@ public class PropertyChangeReport implements PropertyChangeListener {
         return ((Boolean) getLastNewValue()).booleanValue();
     }
 
+    /**
+     * @return
+     */
+    public String getEventNames() {
+        StringBuffer buffer = new StringBuffer();
+        for (PropertyChangeEvent event : events) {
+            buffer.append(event.getPropertyName());
+            buffer.append(" :: ");
+        }
+        return buffer.toString();
+    }
+
 
 
 }

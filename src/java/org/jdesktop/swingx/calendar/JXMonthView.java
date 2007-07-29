@@ -233,6 +233,7 @@ public class JXMonthView extends JComponent {
     private Date modifyedStartDate;
     @SuppressWarnings({"FieldCanBeLocal"})
     private Date modifyedEndDate;
+    private boolean componentInputMapEnabled;
 
     /**
      * Create a new instance of the <code>JXMonthView</code> class using the
@@ -1522,6 +1523,38 @@ public class JXMonthView extends JComponent {
         getSelectionModel().setAdjusting(false);
         fireActionPerformed(CANCEL_KEY);
         
+    }
+
+    /**
+     * Sets the component input map enablement property.<p>
+     * 
+     * If enabled, the keybinding for WHEN_IN_FOCUSED_WINDOW are
+     * installed, otherwise not. Changing this property will
+     * install/clear the corresponding key bindings. Typically, clients 
+     * which want to use the monthview in a popup, should enable these.<p>
+     * 
+     * The default value is false.
+     * 
+     * @param enabled boolean to indicate whether the component
+     *   input map should be enabled.
+     * @see #isComponentInputMapEnabled()  
+     */
+    public void setComponentInputMapEnabled(boolean enabled) {
+        if (isComponentInputMapEnabled() == enabled) return;
+        this.componentInputMapEnabled = enabled;
+        firePropertyChange("componentInputMapEnabled", !enabled, isComponentInputMapEnabled());
+    }
+
+    /**
+     * Returns the componentInputMapEnabled property.
+     * 
+     * @return a boolean indicating whether the component input map is 
+     *   enabled.
+     * @see #setComponentInputMapEnabled(boolean)  
+     *   
+     */
+    public boolean isComponentInputMapEnabled() {
+        return componentInputMapEnabled;
     }
 
 

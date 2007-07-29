@@ -34,8 +34,8 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -49,17 +49,21 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.SortedSet;
+import java.util.logging.Logger;
+
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
+import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.UIResource;
+
 import org.jdesktop.swingx.DateSelectionListener;
 import org.jdesktop.swingx.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DateUtils;
@@ -76,6 +80,9 @@ import org.jdesktop.swingx.plaf.MonthViewUI;
  * @author rah003
  */
 public class BasicMonthViewUI extends MonthViewUI {
+    @SuppressWarnings("all")
+    private static final Logger LOG = Logger.getLogger(BasicMonthViewUI.class
+            .getName());
     protected static final int LEADING_DAY_OFFSET = 1;
     protected static final int NO_OFFSET = 0;
     protected static final int TRAILING_DAY_OFFSET = -1;
@@ -226,37 +233,14 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     protected void installKeyboardActions() {
         // Setup the keyboard handler.
-        InputMap inputMap = monthView.getInputMap(JComponent.WHEN_FOCUSED);
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false), "acceptSelection");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false), "cancelSelection");
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "selectPreviousDay");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "selectNextDay");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, false), "selectDayInPreviousWeek");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, false), "selectDayInNextWeek");
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.SHIFT_MASK, false), "addPreviousDay");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.SHIFT_MASK, false), "addNextDay");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.SHIFT_MASK, false), "addToPreviousWeek");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.SHIFT_MASK, false), "addToNextWeek");
+        // JW: change to when-ancestor? just to be on the safe side
+        // if we make the title contain active comps
+        installKeyBindings(JComponent.WHEN_FOCUSED);
 
         // Needed to allow for keyboard control in popups.
         // maybe reason for issue ??-swingx: in normal windows, 
-        // keyboard selection working 
-        // even if not focused
-        inputMap = monthView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false), "acceptSelection");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false), "cancelSelection");
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "selectPreviousDay");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "selectNextDay");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, false), "selectDayInPreviousWeek");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, false), "selectDayInNextWeek");
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.SHIFT_MASK, false), "adjustSelectionPreviousDay");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.SHIFT_MASK, false), "adjustSelectionNextDay");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.SHIFT_MASK, false), "adjustSelectionPreviousWeek");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.SHIFT_MASK, false), "adjustSelectionNextWeek");
+        // keyboard selection working even if not focused
+//        installKeyBindings(JComponent.WHEN_IN_FOCUSED_WINDOW);
 
         ActionMap actionMap = monthView.getActionMap();
         KeyboardAction acceptAction = new KeyboardAction(KeyboardAction.ACCEPT_SELECTION);
@@ -279,16 +263,45 @@ public class BasicMonthViewUI extends MonthViewUI {
     
     }
 
+    /**
+     * @param inputMap
+     */
+    private void installKeyBindings(int type) {
+        InputMap inputMap = monthView.getInputMap(type);
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false), "acceptSelection");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false), "cancelSelection");
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "selectPreviousDay");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "selectNextDay");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, false), "selectDayInPreviousWeek");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, false), "selectDayInNextWeek");
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.SHIFT_MASK, false), "adjustSelectionPreviousDay");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.SHIFT_MASK, false), "adjustSelectionNextDay");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.SHIFT_MASK, false), "adjustSelectionPreviousWeek");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.SHIFT_MASK, false), "adjustSelectionNextWeek");
+    }
+
+    /**
+     * @param inputMap
+     */
+    private void uninstallKeyBindings(int type) {
+        InputMap inputMap = monthView.getInputMap(type);
+        inputMap.clear();
+    }
+
     protected void uninstallKeyboardActions() {}
 
     protected void installListeners() {
         propertyChangeListener = createPropertyChangeListener();
         mouseListener = createMouseListener();
         mouseMotionListener = createMouseMotionListener();
-
+        
+        
         monthView.addPropertyChangeListener(propertyChangeListener);
         monthView.addMouseListener(mouseListener);
         monthView.addMouseMotionListener(mouseMotionListener);
+
         monthView.getSelectionModel().addDateSelectionListener(getHandler());
     }
 
@@ -1321,7 +1334,8 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
     }
     
-    private class Handler implements ComponentListener, MouseListener, MouseMotionListener, LayoutManager,
+    private class Handler implements  
+        MouseListener, MouseMotionListener, LayoutManager,
             PropertyChangeListener, DateSelectionListener {
         private boolean armed;
         private long startDate;
@@ -1648,19 +1662,10 @@ public class BasicMonthViewUI extends MonthViewUI {
             } else if ("font".equals(property)) {
                 derivedFont = createDerivedFont();
                 monthView.revalidate();
+            } else if ("componentInputMapEnabled".equals(property)) {
+                updateComponentInputMap();
             }
         }
-
-        public void componentResized(ComponentEvent e) {
-            monthView.revalidate();
-            monthView.repaint();
-        }
-
-        public void componentMoved(ComponentEvent e) {}
-
-        public void componentShown(ComponentEvent e) {}
-
-        public void componentHidden(ComponentEvent e) {}
 
         public void valueChanged(DateSelectionEvent ev) {
             selection = ev.getSelection();
@@ -1671,6 +1676,8 @@ public class BasicMonthViewUI extends MonthViewUI {
             // repaint new selection
             monthView.repaint(dirtyRect);
         }
+
+
     }
 
     /**
@@ -1696,7 +1703,6 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         public void actionPerformed(ActionEvent ev) {
             SelectionMode selectionMode = monthView.getSelectionMode();
-
             if (selectionMode != SelectionMode.NO_SELECTION) {
                 if (!isUsingKeyboard()) {
                     originalDateSpan = monthView.getSelection();
@@ -1864,4 +1870,18 @@ public class BasicMonthViewUI extends MonthViewUI {
             cal.setTimeInMillis(firstDisplayedDate);
         }
     }
+
+    /**
+     * 
+     */
+    private void updateComponentInputMap() {
+         boolean enableInFocusedWindow = monthView.isComponentInputMapEnabled();
+        if (enableInFocusedWindow) {
+            installKeyBindings(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        } else {
+            uninstallKeyBindings(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        }
+        
+    }
+
 }

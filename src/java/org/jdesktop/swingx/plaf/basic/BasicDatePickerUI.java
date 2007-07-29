@@ -181,19 +181,6 @@ public class BasicDatePickerUI extends DatePickerUI {
         pickerInputMap.put(KeyStroke.getKeyStroke("SPACE"), "TOGGLE_POPUP");
         
         installLinkPanelKeyboardActions();
-        // install popupButton's actions
-        // PENDING JW move the picker's input map, make popup unfocusable
-        //
-//        KeyStroke spaceKey =
-//                KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false);
-//
-//        
-//        InputMap inputMap = popupButton.getInputMap(JComponent.WHEN_FOCUSED);
-//        inputMap.put(spaceKey, "TOGGLE_POPUP");
-//        // move to pickers action map
-//        ActionMap actionMap = popupButton.getActionMap();
-//        actionMap.put("TOGGLE_POPUP", popupAction);
-        
     }
 
     protected void uninstallKeyboardActions() {
@@ -258,6 +245,12 @@ public class BasicDatePickerUI extends DatePickerUI {
         }
         
         updateEditorListeners(null);
+        // JW this does more than installing the listeners ..
+        // synchs properties of datepicker to monthView's
+        // prepares monthview for usage in popup
+        // synch the date
+        // Relies on being the last thing done in the install ..
+        //
         updateFromMonthViewChanged(null);
 
     }
@@ -543,6 +536,10 @@ public class BasicDatePickerUI extends DatePickerUI {
     protected void updateFromMonthViewChanged(JXMonthView oldMonthView) {
         popup = null;
         updateMonthViewListeners(oldMonthView);
+        if (oldMonthView != null) {
+            oldMonthView.setComponentInputMapEnabled(false);
+        }
+        datePicker.getMonthView().setComponentInputMapEnabled(true);
         updateFormatTimeZone(datePicker.getTimeZone());
         updateEditorValue();
     }
@@ -568,8 +565,15 @@ public class BasicDatePickerUI extends DatePickerUI {
             boolean updateListeners) { 
         if (oldEditor != null) {
             datePicker.remove(oldEditor);
+            oldEditor.putClientProperty("doNotCancelPopup", null);
         }
         datePicker.add(datePicker.getEditor());
+        // this is a trick to get hold of the client prop which
+        // prevents closing of the popup
+        JComboBox box = new JComboBox();
+        Object preventHide = box.getClientProperty("doNotCancelPopup");
+        datePicker.getEditor().putClientProperty("doNotCancelPopup", preventHide);
+
         updateEditorValue();
         if (updateListeners) {
             updateEditorListeners(oldEditor);
