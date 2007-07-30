@@ -25,6 +25,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusListener;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.ParseException;
@@ -66,6 +67,36 @@ public class JXDatePickerTest extends TestCase {
     public void teardown() {
     }
 
+    /**
+     * Issue #565-swingx: popup not closed when focus moved to Combo
+     * Issue #573-swingx: datePicker editor not focused on F2 (in table)
+     * 
+     * testing internals: need focus listener add/remove
+     *
+     */
+    public void testFocusListenerOnPicker() {
+        JXDatePicker picker = new JXDatePicker();
+        assertEquals(1, picker.getFocusListeners().length);
+        picker.getUI().uninstallUI(picker);
+        assertEquals(0, picker.getFocusListeners().length);
+    }
+    
+    /**
+     * Issue #565-swingx: popup not closed when focus moved to Combo
+     * Issue #573-swingx: datePicker editor not focused on F2 (in table)
+     * 
+     * testing internals: need focus listener add/remove
+     *
+     */
+    public void testFocusListenerOnEditor() {
+        JFormattedTextField field = new JFormattedTextField(new JXDatePickerFormatter());
+        int listenerCount = field.getFocusListeners().length;
+        JXDatePicker picker = new JXDatePicker();
+        assertEquals(listenerCount + 1, picker.getEditor().getFocusListeners().length);
+        picker.getUI().uninstallUI(picker);
+        assertEquals(listenerCount, picker.getEditor().getFocusListeners().length);
+    }
+    
     /**
      * tests LinkPanel set to null after showing.
      * Was: NPE.
