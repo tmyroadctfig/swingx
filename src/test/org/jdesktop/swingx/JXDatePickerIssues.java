@@ -87,8 +87,6 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         };
         picker.addActionListener(l);
         JXFrame frame = showInFrame(picker, "double-click on linkpanel must commit");
-        // JXRootPane eats esc 
-        frame.getRootPaneExt().getActionMap().remove("esc-action");
         Action nextDate = new AbstractAction("change linkdate") {
 
             public void actionPerformed(ActionEvent e) {

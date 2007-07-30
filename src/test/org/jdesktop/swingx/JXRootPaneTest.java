@@ -20,6 +20,17 @@ import org.jdesktop.test.PropertyChangeReport;
 public class JXRootPaneTest extends InteractiveTestCase {
  
     /**
+     * Issue #566: JXRootPane eats escape from popups (JXDatePicker).
+     *
+     */
+    public void testDefaultCancel() {
+        JXRootPane rootPane = new JXRootPane();
+        assertNull(rootPane.getCancelButton());
+        Action action = rootPane.getActionMap().get("esc-action");
+        assertFalse(action.isEnabled());
+    }
+    
+    /**
      * Test setStatusBar analogous to setToolBar 
      * (triggered by 
      * Issue #499-swingx: old toolbar not removed on setting new).

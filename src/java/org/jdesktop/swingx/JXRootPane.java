@@ -78,12 +78,37 @@ public class JXRootPane extends JRootPane {
 
         getContentPane().add(contentPanel, BorderLayout.CENTER);
         
+        installKeyboardActions();
+    }
+
+    /**
+     * PENDING: move to UI
+     * 
+     */
+    private void installKeyboardActions() {
         Action escAction = new AbstractAction() {
             public void actionPerformed(ActionEvent evt) {
                 JButton cancelButton = getCancelButton();
                 if (cancelButton != null) {
                     cancelButton.doClick(20);
                 }
+            }
+            
+            /**
+             * Overridden to hack around #566-swing: 
+             * JXRootPane eats escape keystrokes from datepicker popup.
+             * Disable action if there is no cancel button.<p>
+             * 
+             * That's basically what RootPaneUI does - only not in 
+             * the parameterless isEnabled, but in the one that passes
+             * in the sender (available in UIAction only). We can't test 
+             * nor compare against core behaviour, UIAction has
+             * sun package scope. <p>
+             * 
+             * 
+             */
+            public boolean isEnabled() {
+                return (cancelButton != null) && (cancelButton.isEnabled());
             }
         };
         getActionMap().put("esc-action", escAction);
