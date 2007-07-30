@@ -142,6 +142,7 @@ public class BasicDatePickerUI extends DatePickerUI {
     }
 
     protected void installComponents() {
+        
         JFormattedTextField editor = datePicker.getEditor();
         if (editor == null || editor instanceof UIResource) {
             // we are not yet listening ...
@@ -1184,14 +1185,21 @@ public class BasicDatePickerUI extends DatePickerUI {
          * but no permanent loss if the focus is transfered from 
          * the focusOwner to a new permanentFocusOwner.
          * 
+         * OOOkaay ... looks like exclusively related to a combo:
+         * we do get the expected focusLost if the focus is
+         * transferred permanently from the temporary focusowner
+         * to a new "normal" permanentFocusOwner (like a textfield),
+         * we don't get it if transfered to a tricksing owner (like
+         * a combo or picker) 
+         * 
          * listen to keyboardFocusManager?
          */
         public void focusLost(FocusEvent e) {
-//            LOG.info("lost - old " + e);
-//            if (e.isTemporary()) return;
-//            if (e.getSource() == datePicker.getEditor()) {
-//                hidePopup();
-//            }
+            LOG.info("lost - old " + e);
+            if (e.isTemporary()) return;
+            if (e.getSource() == datePicker.getEditor()) {
+                hidePopup();
+            }
             
         }
     }
