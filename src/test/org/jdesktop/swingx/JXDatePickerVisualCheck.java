@@ -80,7 +80,24 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Issue #566-swingx: JXRootPane eats picker's popup esc.
+     * to reproduce: open the picker's popup the press esc -
+     * not closed. Same with combo is working.
+     *
+     */
+    public void interactiveXRootPaneEatsEscape() {
+        JXDatePicker picker = new JXDatePicker();
+        JComboBox box = new JComboBox(new String[] {"one", "twos"});
+        box.setEditable(true);
+        JComponent panel = new JPanel();
+        panel.add(picker);
+        panel.add(box);
+        showInFrame(panel, "Escape key");
+    }
     
+
     /**
      * visual check that toggling the panel adds/removes it
      * and installs the keybindings.
@@ -116,10 +133,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         picker.setMonthView(intervalForPicker);
         LOG.info("picker date before showing " + picker.getDate());
         assertNull(picker.getDate());
-        JXFrame frame = showInFrame(picker, "initial null date");
-        // JXRootPane eats esc 
-        frame.getRootPaneExt().getActionMap().remove("esc-action");
-        frame.pack();
+        showInFrame(picker, "initial null date");
         LOG.info("picker date after showing " + picker.getDate());
         assertNull(picker.getDate());
 
@@ -178,8 +192,6 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         panel.add(box);
         
         JXFrame frame = showInFrame(panel, "trace action events: keyboard/mouse");
-        // JXRootPane eats esc 
-        frame.getRootPaneExt().getActionMap().remove("esc-action");
         frame.pack();
     }
 
@@ -234,8 +246,6 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         panel.add(box);
         
         JXFrame frame = showInFrame(panel, "trace action events: programmatic change");
-        // JXRootPane eats esc 
-        frame.getRootPaneExt().getActionMap().remove("esc-action");
         addAction(frame, action);
         frame.pack();
     }
@@ -252,9 +262,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         picker.setDate(null);
         JPanel panel = new JPanel();
         panel.add(picker);
-        JXFrame frame = showInFrame(panel, "null date");
-        // JXRootPane eats esc 
-        frame.getRootPaneExt().getActionMap().remove("esc-action");
+        showInFrame(panel, "null date");
     }
 
     /**

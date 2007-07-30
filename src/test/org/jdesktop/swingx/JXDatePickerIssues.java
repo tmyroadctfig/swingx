@@ -50,8 +50,8 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 //        setSystemLF(true);
         JXDatePickerIssues  test = new JXDatePickerIssues();
         try {
-//            test.runInteractiveTests();
-          test.runInteractiveTests(".*Link.*");
+            test.runInteractiveTests();
+//          test.runInteractiveTests(".*Link.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -126,29 +126,8 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         panel.add(box);
         panel.add(new JTextField("textfield - click into with open popup"));
         JXFrame frame = showInFrame(panel, "closed?");
-        // JXRootPane eats esc 
-        frame.getRootPaneExt().getActionMap().remove("esc-action");
         // check if it's a lightweight vs. heavyweight problem
         frame.setSize(new Dimension(frame.getSize().width, 400));
-    }
-    
-    /**
-     * Issue #566-swingx: JXRootPane eats picker's popup esc.
-     * to reproduce: open the picker's popup the press esc -
-     * not closed. Same with combo is working.
-     *
-     */
-    public void interactiveXRootPaneEatsEscape() {
-        JXDatePicker picker = new JXDatePicker();
-        JComboBox box = new JComboBox(new String[] {"one", "twos"});
-        box.setEditable(true);
-        JComponent panel = new JPanel();
-        panel.add(picker);
-        panel.add(box);
-        @SuppressWarnings("unused")
-        JXFrame frame = showInFrame(panel, "closed?");
-        // JXRootPane eats esc 
-//        frame.getRootPaneExt().getActionMap().remove("esc-action");
     }
     
     /**
@@ -165,9 +144,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         JComponent panel = new JPanel();
         panel.add(picker);
         panel.add(field);
-        JXFrame frame = showInFrame(panel, "compare pref width");
-        // JXRootPane eats esc 
-        frame.getRootPaneExt().getActionMap().remove("esc-action");
+        showInFrame(panel, "compare pref width");
     }
 
     /**
@@ -184,9 +161,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         picker.getMonthView().setUpperBound(calendar.getTime());
         calendar.add(Calendar.DAY_OF_MONTH, - 20);
         picker.getMonthView().setLowerBound(calendar.getTime());
-        JXFrame frame = showInFrame(picker, "lower/upper bounds");
-        // JXRootPane eats esc 
-        frame.getRootPaneExt().getActionMap().remove("esc-action");
+        showInFrame(picker, "lower/upper bounds");
     }
 
 

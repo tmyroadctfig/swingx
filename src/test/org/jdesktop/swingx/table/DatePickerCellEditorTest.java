@@ -178,8 +178,6 @@ public class DatePickerCellEditorTest extends InteractiveTestCase {
         box.setEditable(true);
         table.getColumnExt(1).setCellEditor(new DefaultCellEditor(box));
         JXFrame frame = showWithScrollingInFrame(table, "normal/sql date formatting");
-        // JXRootPane eats esc 
-        frame.getRootPaneExt().getActionMap().remove("esc-action");
         JComboBox freeBox = new JComboBox(box.getModel());
         freeBox.setEditable(true);
         frame.add(freeBox, BorderLayout.SOUTH);
