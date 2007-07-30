@@ -27,11 +27,15 @@ import java.awt.event.ActionListener;
 import java.util.Calendar;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import org.jdesktop.swingx.calendar.DateUtils;
 
 /**
  * Known issues of <code>JXDatePicker</code>.
@@ -57,14 +61,25 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 
     private Calendar calendar;
 
-    
+    /**
+     * link panel commit gesture (keystroke F5, double-click) must 
+     * commit the date. 
+     * 
+     * Update the linkDate must 
+     * - show in the LinkPanel. 
+     * - open the popup in the month of the link date?
+     *
+     */
     public void interactiveCommitLinkPanelAction() {
         final JXDatePicker picker = new JXDatePicker();
+        picker.setDate(null);
+        // initially
+        picker.setLinkDate(DateUtils.getNextMonth(picker.getLinkDate()));
         ActionListener l = new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
                 LOG.info("received: " + e + 
-                        "\n and not adjusting: " 
+                        "\n adjusting must be false: " 
                         + picker.getMonthView().getSelectionModel().isAdjusting());
                 
             }
@@ -74,6 +89,16 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         JXFrame frame = showInFrame(picker, "double-click on linkpanel must commit");
         // JXRootPane eats esc 
         frame.getRootPaneExt().getActionMap().remove("esc-action");
+        Action nextDate = new AbstractAction("change linkdate") {
+
+            public void actionPerformed(ActionEvent e) {
+                picker.setLinkDate(DateUtils.getNextMonth(picker.getLinkDate()));
+                
+            }
+            
+        };
+        addAction(frame, nextDate);
+        frame.pack();
     }
     
     /**

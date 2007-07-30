@@ -381,7 +381,8 @@ public class JXDatePicker extends JComponent {
      * is displayed the popup will focus on the month the linkDate is in.  Calling
      * this method will replace the currently installed linkPanel and install
      * a new one with the requested date and format.
-     *
+     * 
+     * 
      * @param linkDate         Date in milliseconds
      * @param linkFormatString String used to format the link
      * @see java.text.MessageFormat
@@ -389,6 +390,15 @@ public class JXDatePicker extends JComponent {
     public void setLinkDate(long linkDate, String linkFormatString) {
         _linkDate = linkDate;
         _linkFormat = new MessageFormat(linkFormatString);
+        setLinkPanel(new TodayPanel());
+    }
+    
+    /**
+     * PENDING JW ... quick api hack for testing.
+     * @param linkDate
+     */
+    public void setLinkDate(long linkDate) {
+        this._linkDate = linkDate;
         setLinkPanel(new TodayPanel());
     }
 
@@ -738,5 +748,7 @@ public class JXDatePicker extends JComponent {
             }
         }
     }
+
+
 
 }
