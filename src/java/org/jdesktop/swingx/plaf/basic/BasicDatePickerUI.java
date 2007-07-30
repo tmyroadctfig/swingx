@@ -1195,7 +1195,7 @@ public class BasicDatePickerUI extends DatePickerUI {
          * listen to keyboardFocusManager?
          */
         public void focusLost(FocusEvent e) {
-            LOG.info("lost - old " + e);
+//            LOG.info("lost - old " + e);
             if (e.isTemporary()) return;
             if (e.getSource() == datePicker.getEditor()) {
                 hidePopup();
