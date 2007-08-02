@@ -69,16 +69,41 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
     }
 
     public static void main(String[] args) throws Exception {
-        // setSystemLF(true);
+         setSystemLF(true);
         JXDatePickerVisualCheck test = new JXDatePickerVisualCheck();
         
         try {
-//            test.runInteractiveTests();
-            test.runInteractiveTests(".*Link.*");
+            test.runInteractiveTests();
+//            test.runInteractiveTests(".*Link.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Issue #577-swingx: JXDatePicker focus cleanup.
+     * Before open: picker's editor should be focused.
+     * After commit/cancel in popup: picker's editor should be focused.
+     */
+    public void interactiveFocusOnTogglePopup() {
+        JXDatePicker picker = new JXDatePicker();
+        final Action togglePopup = picker.getActionMap().get("TOGGLE_POPUP");
+        Action toggle = new AbstractAction("togglePopup") {
+
+            public void actionPerformed(ActionEvent e) {
+                togglePopup.actionPerformed(null);
+            }
+            
+        };
+        JComboBox box = new JComboBox(new String[] {"one", "twos"});
+        box.setEditable(true);
+        JComponent panel = new JPanel();
+        panel.add(box);
+        panel.add(picker);
+        JXFrame frame = showInFrame(panel, "Focus on editor");
+        addAction(frame, toggle);
+        frame.pack();
     }
 
     /**

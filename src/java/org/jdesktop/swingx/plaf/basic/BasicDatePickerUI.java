@@ -691,6 +691,11 @@ public class BasicDatePickerUI extends DatePickerUI {
         if (popup != null) {
             popup.updateLinkPanel(oldLinkPanel);
         }
+        // PENDING: datepicker installs a new todayPanel if 
+        // any of the linkDate related properties changed.
+        // should be less-rude - can set properties on the 
+        // panel? Fire more atomic changes.
+        datePicker.getMonthView().setFirstDisplayedDate(datePicker.getLinkDate());
     }
 
 
@@ -841,19 +846,37 @@ public class BasicDatePickerUI extends DatePickerUI {
     }
 
 
+    /**
+     * Toggles the popups visibility after preparing internal state.
+     * 
+     *
+     */
     public void toggleShowPopup() {
         if (popup == null) {
             popup = createMonthViewPopup();
         }
+        datePicker.requestFocusInWindow();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                // JW: we invoke to be more confident
+                // that the focus is not snatched back to 
+                // the datePicker after opening ... 
+                // hmm ... not sure if this always working?
+                doTogglePopup();
+            }
+        });
 
+    }
+
+    /**
+     * Toggle the popup's visibility.
+     * 
+     * PRE: popup !=  null.
+     */
+    private void doTogglePopup() {
         if (!popup.isVisible()) {
             popup.show(datePicker,
                     0, datePicker.getHeight());
-//            SwingUtilities.invokeLater(new Runnable() {
-//                public void run() {
-//                    monthView.requestFocusInWindow();
-//                }
-//            });
         } else {
             popup.setVisible(false);
         }
@@ -933,6 +956,9 @@ public class BasicDatePickerUI extends DatePickerUI {
             // PENDING JW: why do we need a mouseListener? the
             // arrowbutton should have the toggleAction installed?
             // Hmm... maybe doesn't ... check!
+            // reason might be that we want to open on pressed
+            // typically (or LF-dependent?),
+            // the button's action is invoked on released.
             toggleShowPopup();
         }
 
@@ -1196,10 +1222,10 @@ public class BasicDatePickerUI extends DatePickerUI {
          */
         public void focusLost(FocusEvent e) {
 //            LOG.info("lost - old " + e);
-            if (e.isTemporary()) return;
-            if (e.getSource() == datePicker.getEditor()) {
-                hidePopup();
-            }
+//            if (e.isTemporary()) return;
+//            if (e.getSource() == datePicker.getEditor()) {
+//                hidePopup();
+//            }
             
         }
     }

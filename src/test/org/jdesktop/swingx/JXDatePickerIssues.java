@@ -72,9 +72,9 @@ public class JXDatePickerIssues extends InteractiveTestCase {
      */
     public void interactiveCommitLinkPanelAction() {
         final JXDatePicker picker = new JXDatePicker();
-        picker.setDate(null);
+//        picker.setDate(null);
         // initially
-        picker.setLinkDate(DateUtils.getNextMonth(picker.getLinkDate()));
+//        picker.setLinkDate(DateUtils.getNextMonth(picker.getLinkDate()));
         ActionListener l = new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {

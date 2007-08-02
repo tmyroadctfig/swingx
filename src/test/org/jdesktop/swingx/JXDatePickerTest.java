@@ -25,7 +25,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusListener;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.ParseException;
@@ -44,6 +43,7 @@ import javax.swing.KeyStroke;
 
 import junit.framework.TestCase;
 
+import org.jdesktop.swingx.calendar.DateUtils;
 import org.jdesktop.swingx.calendar.JXMonthView;
 import org.jdesktop.swingx.plaf.basic.BasicDatePickerUI.EditorCancelAction;
 import org.jdesktop.swingx.test.XTestUtils;
@@ -65,6 +65,29 @@ public class JXDatePickerTest extends TestCase {
     }
 
     public void teardown() {
+    }
+
+    /**
+     * Issue #572-swingx: monthView must show linkDate on empty selection.
+     *
+     */
+    public void testLinkDate() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.setDate(null);
+        long linkDate = picker.getLinkDate();
+        long firstDisplayedDate = picker.getMonthView().getFirstDisplayedDate();
+        assertSameMonth(linkDate, firstDisplayedDate);
+        long nextDate = DateUtils.getNextMonth(linkDate);
+        picker.setLinkDate(nextDate);
+        assertFalse(firstDisplayedDate == picker.getMonthView().getFirstDisplayedDate());
+    }
+    /**
+     * @param linkDate
+     * @param firstDisplayedDate
+     */
+    private void assertSameMonth(long linkDate, long firstDisplayedDate) {
+        // TODO Auto-generated method stub
+        
     }
 
     /**
