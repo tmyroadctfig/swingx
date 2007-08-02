@@ -111,6 +111,7 @@ import org.jdesktop.swingx.treetable.TreeTableModel;
  * @author Ramesh Gupta
  */
 public class JXTreeTable extends JXTable {
+    @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(JXTreeTable.class
             .getName());
     /**
