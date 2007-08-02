@@ -34,6 +34,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableCellRenderer;
@@ -42,7 +43,9 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 
+import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.LinkAction;
+import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.renderer.ButtonProvider;
 import org.jdesktop.swingx.renderer.CellContext;
@@ -89,13 +92,67 @@ public class JXTreeTableIssues extends InteractiveTestCase {
 //            test.runInteractiveTests();
 //            test.runInteractiveTests(".*AdapterDeleteUpdate.*");
 //            test.runInteractiveTests(".*Text.*");
-            test.runInteractiveTests(".*TreeExpand.*");
+//            test.runInteractiveTests(".*TreeExpand.*");
+            test.runInteractiveTests("interactive.*ScrollAlt.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
     }
+
+    /**
+     * Issue #576-swingx: sluggish scrolling (?)
+     */
+    public void interactiveScrollAlternateHighlight() {
+        final JXTable table = new JXTable(0, 6);
+        final JXTreeTable treeTable = new JXTreeTable(new FileSystemModel());
+        final Highlighter hl =
+            HighlighterFactory.createAlternateStriping(UIManager.getColor("Panel.background"),
+            Color.WHITE);
+        treeTable.setHighlighters(hl);
+        table.setHighlighters(hl);
+        final JXFrame frame = wrapWithScrollingInFrame(treeTable, table, "sluggish scrolling");
+        Action expand = new AbstractActionExt("start expand") {
+            public void actionPerformed(ActionEvent e) {
+                for (int i = 0; i < 5000; i++) {
+                    treeTable.expandRow(i);
+                }
+                table.setModel(treeTable.getModel());
+            }
+            
+        };
+        Action toggleHighlighter = new AbstractActionExt("toggle highlighter") {
+
+            public void actionPerformed(ActionEvent e) {
+                if (treeTable.getHighlighters().length == 0) {
+                    treeTable.addHighlighter(hl);
+                    table.addHighlighter(hl);
+                } else {
+                    treeTable.removeHighlighter(hl);
+                    table.removeHighlighter(hl);
+                }
+                
+            }
+            
+        };
+        Action scroll = new AbstractActionExt("start scroll") {
+
+            public void actionPerformed(ActionEvent e) {
+                for (int i = 0; i < table.getRowCount(); i++) {
+                    table.scrollRowToVisible(i);
+                    treeTable.scrollRowToVisible(i);
+                }
+                
+            }
+            
+        };
+        addAction(frame, expand);
+        addAction(frame, toggleHighlighter);
+        addAction(frame, scroll);
+        frame.setVisible(true);
+    }
     
+
     /**
      * Issue #493-swingx: JXTreeTable.TreeTableModelAdapter: Inconsistency
      * firing update.
@@ -668,7 +725,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         root.insert(node, 0);
         root.insert(createLongNode("another really, maybe really really long text -  "
                 + "with nothing but junk. wrappit .... where needed"), 0);
-        Vector ids = new Vector();
+        Vector<String> ids = new Vector<String>();
         ids.add("long text");
         ids.add("dummy");
         return new DefaultTreeTableModel(root, ids);
