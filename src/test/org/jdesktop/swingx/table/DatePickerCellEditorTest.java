@@ -48,9 +48,9 @@ public class DatePickerCellEditorTest extends InteractiveTestCase {
     public void testDateEditorFireStopMonthAccept()  {
         DatePickerCellEditor editor = new DatePickerCellEditor();
         final CellEditorReport report = new CellEditorReport();
+        editor.addCellEditorListener(report);
         JXDatePicker picker = (JXDatePicker) editor.getTableCellEditorComponent
             (null, new Date(), false, -1, -1);
-        editor.addCellEditorListener(report);
         picker.getMonthView().commitSelection();
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -69,9 +69,9 @@ public class DatePickerCellEditorTest extends InteractiveTestCase {
     public void testDateEditorFireStopMonthCancel()  {
         DatePickerCellEditor editor = new DatePickerCellEditor();
         final CellEditorReport report = new CellEditorReport();
+        editor.addCellEditorListener(report);
         JXDatePicker picker = (JXDatePicker) editor.getTableCellEditorComponent
             (null, new Date(), false, -1, -1);
-        editor.addCellEditorListener(report);
         picker.getMonthView().cancelSelection();
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -89,29 +89,40 @@ public class DatePickerCellEditorTest extends InteractiveTestCase {
      */
     public void testDateEditorFireStopPickerCommit() throws ParseException {
         DatePickerCellEditor editor = new DatePickerCellEditor();
-        CellEditorReport report = new CellEditorReport();
+        final CellEditorReport report = new CellEditorReport();
+        editor.addCellEditorListener(report);
         JXDatePicker picker = (JXDatePicker) editor.getTableCellEditorComponent
             (null, null, false, -1, -1);
-        editor.addCellEditorListener(report);
         picker.commitEdit();
-        assertEquals(1, report.getEventCount());
-        assertEquals(1, report.getStoppedEventCount());
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                assertEquals(1, report.getEventCount());
+                assertEquals(1, report.getStoppedEventCount());
+                
+            }
+        });
     }
 
     /**
      * test fire cancel after cancel picker.editor.
-     * @throws ParseException 
-     *
+     * 
+     * @throws ParseException
+     * 
      */
     public void testDateEditorFireCancelPickerCancel() throws ParseException {
         DatePickerCellEditor editor = new DatePickerCellEditor();
-        CellEditorReport report = new CellEditorReport();
-        JXDatePicker picker = (JXDatePicker) editor.getTableCellEditorComponent
-            (null, new Date(), false, -1, -1);
+        final CellEditorReport report = new CellEditorReport();
         editor.addCellEditorListener(report);
+        JXDatePicker picker = (JXDatePicker) editor
+                .getTableCellEditorComponent(null, new Date(), false, -1, -1);
         picker.cancelEdit();
-//        assertEquals(1, report.getEventCount());
-        assertEquals(1, report.getCanceledEventCount());
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                assertEquals(1, report.getEventCount());
+                assertEquals(1, report.getCanceledEventCount());
+
+            }
+        });
     }
     /**
      * test fire stopped after stopCellEditing.
@@ -122,8 +133,8 @@ public class DatePickerCellEditorTest extends InteractiveTestCase {
     public void testDateEditorFireStop() {
         DatePickerCellEditor editor = new DatePickerCellEditor();
         CellEditorReport report = new CellEditorReport();
-        editor.getTableCellEditorComponent(null, new Date(), false, -1, -1);
         editor.addCellEditorListener(report);
+        editor.getTableCellEditorComponent(null, new Date(), false, -1, -1);
         editor.stopCellEditing();
         assertEquals(1, report.getEventCount());
         assertEquals(1, report.getStoppedEventCount());
@@ -136,8 +147,8 @@ public class DatePickerCellEditorTest extends InteractiveTestCase {
    public void testDateEditorFireCancel() {
         DatePickerCellEditor editor = new DatePickerCellEditor();
         CellEditorReport report = new CellEditorReport();
-        editor.getTableCellEditorComponent(null, null, false, -1, -1);
         editor.addCellEditorListener(report);
+        editor.getTableCellEditorComponent(null, null, false, -1, -1);
         editor.cancelCellEditing();
         assertEquals(1, report.getEventCount());
         assertEquals(1, report.getCanceledEventCount());

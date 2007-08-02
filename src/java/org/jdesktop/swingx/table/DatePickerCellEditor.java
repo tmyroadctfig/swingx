@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.table.TableCellEditor;
 
@@ -73,6 +74,7 @@ public class DatePickerCellEditor extends AbstractCellEditor implements
         if (dateFormat != null) {
             datePicker.setFormats(dateFormat);
         }
+        datePicker.getMonthView().setFocusable(false);
         datePicker.addActionListener(getPickerActionListener());
     }
 
@@ -142,7 +144,6 @@ public class DatePickerCellEditor extends AbstractCellEditor implements
     public Component getTableCellEditorComponent(JTable table, Object value,
             boolean isSelected, int row, int column) {
         ignoreAction = true;
-        // datePicker.removeActionListener(getPickerActionListener());
         if (!isEmpty(value)) {
             if (value instanceof Date) {
                 datePicker.setDate((Date) value);
@@ -165,7 +166,6 @@ public class DatePickerCellEditor extends AbstractCellEditor implements
         // datePicker.getEditor().selectAll();
         // }
         // });
-        // datePicker.addActionListener(getPickerActionListener());
         ignoreAction = false;
         return datePicker;
     }
@@ -235,14 +235,23 @@ public class DatePickerCellEditor extends AbstractCellEditor implements
                 // commit in stopCellEditing
                 if (ignoreAction)
                     return;
-                if ((e != null)
-                    && (JXDatePicker.COMMIT_KEY.equals(e.getActionCommand()))) {
-                    stopCellEditing();
-                } else if ((e != null) && (JXDatePicker.CANCEL_KEY.equals(e.getActionCommand()))) {
-                    cancelCellEditing();
-                } else { // null event or other command ...
+                invokeTerminateEdit(e);
+            }
 
-                }
+            /**
+             * @param e
+             */
+            private void invokeTerminateEdit(final ActionEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        if ((e != null)
+                                && (JXDatePicker.COMMIT_KEY.equals(e.getActionCommand()))) {
+                            stopCellEditing();
+                        } else {
+                            cancelCellEditing();
+                        }                         
+                    }
+                });
             }
         };
         return l;
