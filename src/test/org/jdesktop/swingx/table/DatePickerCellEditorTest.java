@@ -13,6 +13,7 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
@@ -46,13 +47,18 @@ public class DatePickerCellEditorTest extends InteractiveTestCase {
      */
     public void testDateEditorFireStopMonthAccept()  {
         DatePickerCellEditor editor = new DatePickerCellEditor();
-        CellEditorReport report = new CellEditorReport();
+        final CellEditorReport report = new CellEditorReport();
         JXDatePicker picker = (JXDatePicker) editor.getTableCellEditorComponent
             (null, new Date(), false, -1, -1);
         editor.addCellEditorListener(report);
         picker.getMonthView().commitSelection();
-        assertEquals(1, report.getEventCount());
-        assertEquals(1, report.getStoppedEventCount());
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                assertEquals(1, report.getEventCount());
+                assertEquals(1, report.getStoppedEventCount());
+                
+            }
+        });
     }
 
     /**
@@ -62,13 +68,18 @@ public class DatePickerCellEditorTest extends InteractiveTestCase {
      */
     public void testDateEditorFireStopMonthCancel()  {
         DatePickerCellEditor editor = new DatePickerCellEditor();
-        CellEditorReport report = new CellEditorReport();
+        final CellEditorReport report = new CellEditorReport();
         JXDatePicker picker = (JXDatePicker) editor.getTableCellEditorComponent
             (null, new Date(), false, -1, -1);
         editor.addCellEditorListener(report);
         picker.getMonthView().cancelSelection();
-        assertEquals(1, report.getEventCount());
-        assertEquals(1, report.getCanceledEventCount());
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                assertEquals(1, report.getEventCount());
+                assertEquals(1, report.getCanceledEventCount());
+                
+            }
+        });
     }
 
     /**

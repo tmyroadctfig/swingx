@@ -706,11 +706,23 @@ public class BasicDatePickerUI extends DatePickerUI {
      */
     protected void commit() {
         hidePopup();
-        try {
-            datePicker.commitEdit();
-        } catch (ParseException ex) {
-            // can't help it
-        }
+        //JW: lex cellEditor... invoke because the 
+        // editor must have focus at the time
+        // the editingStopped is received - otherwise 
+        // focus is transfered to the old permanentFocusOwner (the 
+        // editor while added to the table) at a moment where it
+        // is already removed from the hierarchy. Focus system can't
+        // cope ...
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    datePicker.commitEdit();
+                } catch (ParseException ex) {
+                    // can't help it
+                }
+                
+            }
+        });
     }
 
     /**
@@ -718,7 +730,18 @@ public class BasicDatePickerUI extends DatePickerUI {
      */
     protected void cancel() {
         hidePopup();
-        datePicker.cancelEdit();
+        //JW: lex cellEditor... invoke because the 
+        // editor must have focus at the time
+        // the editingCanceled is received - otherwise 
+        // focus is transfered to the old permanentFocusOwner (the 
+        // editor while added to the table) at a moment where it
+        // is already removed from the hierarchy. Focus system can't
+        // cope ...
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                datePicker.cancelEdit();
+            }
+        });
     }
 
     /**
@@ -855,31 +878,18 @@ public class BasicDatePickerUI extends DatePickerUI {
         if (popup == null) {
             popup = createMonthViewPopup();
         }
-        datePicker.requestFocusInWindow();
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                // JW: we invoke to be more confident
-                // that the focus is not snatched back to 
-                // the datePicker after opening ... 
-                // hmm ... not sure if this always working?
-                doTogglePopup();
-            }
-        });
-
-    }
-
-    /**
-     * Toggle the popup's visibility.
-     * 
-     * PRE: popup !=  null.
-     */
-    private void doTogglePopup() {
-        if (!popup.isVisible()) {
-            popup.show(datePicker,
-                    0, datePicker.getHeight());
-        } else {
+        if (popup.isVisible()) {
             popup.setVisible(false);
+        } else {
+            datePicker.requestFocusInWindow();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    popup.show(datePicker,
+                            0, datePicker.getHeight());
+                }
+            });
         }
+
     }
 
     /**
