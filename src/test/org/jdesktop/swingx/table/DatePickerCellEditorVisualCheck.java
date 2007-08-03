@@ -39,7 +39,7 @@ import org.jdesktop.swingx.renderer.LabelProvider;
 
 public class DatePickerCellEditorVisualCheck extends InteractiveTestCase {
     public static void main(String[] args) {
-        setSystemLF(true);
+//        setSystemLF(true);
         DatePickerCellEditorVisualCheck test = new DatePickerCellEditorVisualCheck();
         try {
             test.runInteractiveTests();
@@ -55,8 +55,11 @@ public class DatePickerCellEditorVisualCheck extends InteractiveTestCase {
 
 
     /**
-     * Use formatting from sql date/time classes.
-     *
+     * Issue ??-swingx: picker cell editor popup commit/cancel 
+     * transfers focus out-off the table (1.5)
+     * 
+     * Looks like a core issue - editable combo misbehaves as well.
+     * Here we use a JXTable.
      */
     public void interactiveDatePickerCellEditorXTable() {
         Date date = new Date();
@@ -98,8 +101,11 @@ public class DatePickerCellEditorVisualCheck extends InteractiveTestCase {
 
         
     /**
-     * Use formatting from sql date/time classes.
-     *
+     * Issue ??-swingx: picker cell editor popup commit/cancel 
+     * transfers focus out-off the table (1.5)
+     * 
+     * Looks like a core issue - editable combo misbehaves as well.
+     * Here we use a core table.
      */
     public void interactiveDatePickerCellEditorTable() {
         Date date = new Date();

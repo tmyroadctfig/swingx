@@ -40,7 +40,6 @@ import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 
 import junit.framework.TestCase;
 
@@ -330,19 +329,15 @@ public class JXDatePickerTest extends TestCase {
      * cancel in the picker.
      *
      */
-    public void testCommitCancelFromMonthView() {
+    public void testCommitCancelFromMonthViewCancel() {
         JXDatePicker picker = new JXDatePicker();
         final ActionReport report = new ActionReport();
         picker.addActionListener(report);
         Action cancelAction = picker.getMonthView().getActionMap().get(JXMonthView.CANCEL_KEY);
         cancelAction.actionPerformed(null);
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                assertEquals("must have receive 1 event after monthView cancel", 
-                        1, report.getEventCount());
-                assertEquals(JXDatePicker.CANCEL_KEY, report.getLastActionCommand());
-            }
-        });
+        assertEquals("must have receive 1 event after monthView cancel", 
+                1, report.getEventCount());
+        assertEquals(JXDatePicker.CANCEL_KEY, report.getLastActionCommand());
         
     }
     /**
@@ -358,13 +353,9 @@ public class JXDatePickerTest extends TestCase {
         final ActionReport report = new ActionReport();
         picker.addActionListener(report);
         commitAction.actionPerformed(null);
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                 assertEquals("must have receive 1 event after monthView commit", 
-                        1, report.getEventCount());
-                assertEquals(JXDatePicker.COMMIT_KEY, report.getLastActionCommand());
-            }
-        });
+         assertEquals("must have receive 1 event after monthView commit", 
+                1, report.getEventCount());
+        assertEquals(JXDatePicker.COMMIT_KEY, report.getLastActionCommand());
     }
     
     /**
@@ -431,12 +422,8 @@ public class JXDatePickerTest extends TestCase {
         picker.addPropertyChangeListener(propertyReport);
         picker.getEditor().addPropertyChangeListener(propertyReport);
         picker.cancelEdit();
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                assertEquals(0, propertyReport.getEventCount());
-                assertEquals(1, actionReport.getEventCount());
-            }
-        });
+        assertEquals(0, propertyReport.getEventCount());
+        assertEquals(1, actionReport.getEventCount());
     }
     
     /**
@@ -452,12 +439,8 @@ public class JXDatePickerTest extends TestCase {
         picker.addActionListener(report);
         Action cancelAction = picker.getActionMap().get(JXDatePicker.CANCEL_KEY);
         cancelAction.actionPerformed(null);
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                assertEquals(1, report.getEventCount());
-                assertEquals(JXDatePicker.CANCEL_KEY, report.getLastActionCommand());
-            }
-        });
+        assertEquals(1, report.getEventCount());
+        assertEquals(JXDatePicker.CANCEL_KEY, report.getLastActionCommand());
     }
 
     /**
@@ -472,12 +455,8 @@ public class JXDatePickerTest extends TestCase {
         final ActionReport report = new ActionReport();
         picker.addActionListener(report);
         commitAction.actionPerformed(null);
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                assertEquals(1, report.getEventCount());
-                assertEquals(JXDatePicker.COMMIT_KEY, report.getLastActionCommand());
-            }
-        });
+        assertEquals(1, report.getEventCount());
+        assertEquals(JXDatePicker.COMMIT_KEY, report.getLastActionCommand());
     }
     
     /**
