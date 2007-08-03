@@ -713,16 +713,16 @@ public class BasicDatePickerUI extends DatePickerUI {
         // editor while added to the table) at a moment where it
         // is already removed from the hierarchy. Focus system can't
         // cope ...
-//        SwingUtilities.invokeLater(new Runnable() {
-//            public void run() {
-//                
-//            }
-//        });
-        try {
-            datePicker.commitEdit();
-        } catch (ParseException ex) {
-            // can't help it
-        }
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    datePicker.commitEdit();
+                } catch (ParseException ex) {
+                    // can't help it
+                }
+                
+            }
+        });
     }
 
     /**
@@ -737,11 +737,11 @@ public class BasicDatePickerUI extends DatePickerUI {
         // editor while added to the table) at a moment where it
         // is already removed from the hierarchy. Focus system can't
         // cope ...
-//        SwingUtilities.invokeLater(new Runnable() {
-//            public void run() {
-//            }
-//        });
-        datePicker.cancelEdit();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                datePicker.cancelEdit();
+            }
+        });
     }
 
     /**
