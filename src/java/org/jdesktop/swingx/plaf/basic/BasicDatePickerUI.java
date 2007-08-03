@@ -708,18 +708,6 @@ public class BasicDatePickerUI extends DatePickerUI {
      */
     protected void commit() {
         hidePopup();
-        //JW: lex cellEditor... invoke because the 
-        // editor must have focus at the time
-        // the editingStopped is received - otherwise 
-        // focus is transfered to the old permanentFocusOwner (the 
-        // editor while added to the table) at a moment where it
-        // is already removed from the hierarchy. Focus system can't
-        // cope ...
-//        SwingUtilities.invokeLater(new Runnable() {
-//            public void run() {
-//                
-//            }
-//        });
         try {
             datePicker.commitEdit();
         } catch (ParseException ex) {
@@ -732,17 +720,6 @@ public class BasicDatePickerUI extends DatePickerUI {
      */
     protected void cancel() {
         hidePopup();
-        //JW: lex cellEditor... invoke because the 
-        // editor must have focus at the time
-        // the editingCanceled is received - otherwise 
-        // focus is transfered to the old permanentFocusOwner (the 
-        // editor while added to the table) at a moment where it
-        // is already removed from the hierarchy. Focus system can't
-        // cope ...
-//        SwingUtilities.invokeLater(new Runnable() {
-//            public void run() {
-//            }
-//        });
         datePicker.cancelEdit();
     }
 
