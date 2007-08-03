@@ -700,20 +700,6 @@ public class JXDatePicker extends JComponent {
         }
 
         /**
-         * Overridden to set the link's focusable to be the same.<p>
-         * 
-         * When used as cell editor component, the editor must set 
-         * all contained comps unfocusable (hack around focus issues).
-         * 
-         */
-        @Override
-        public void setFocusable(boolean focusable) {
-            todayLink.setFocusable(focusable);
-            super.setFocusable(focusable);
-        }
-
-
-        /**
          * @return
          */
         private MouseListener createDoubleClickListener() {

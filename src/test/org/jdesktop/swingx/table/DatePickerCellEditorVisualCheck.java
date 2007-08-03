@@ -91,9 +91,6 @@ public class DatePickerCellEditorVisualCheck extends InteractiveTestCase {
         box.setEditable(true);
         table.getColumnExt(1).setCellEditor(new DefaultCellEditor(box));
         JXFrame frame = showWithScrollingInFrame(table, "JXTable - date picker cell editor");
-        JComboBox freeBox = new JComboBox(box.getModel());
-        freeBox.setEditable(true);
-        frame.add(freeBox, BorderLayout.SOUTH);
         frame.add(new JTextField("yet another thing to focus"), BorderLayout.NORTH);
         frame.pack();
         frame.setVisible(true);
@@ -137,9 +134,6 @@ public class DatePickerCellEditorVisualCheck extends InteractiveTestCase {
         box.setEditable(true);
         table.getColumnModel().getColumn(1).setCellEditor(new DefaultCellEditor(box));
         JXFrame frame = showWithScrollingInFrame(table, "JTable - date picker cell editor");
-        JComboBox freeBox = new JComboBox(box.getModel());
-        freeBox.setEditable(true);
-        frame.add(freeBox, BorderLayout.SOUTH);
         frame.add(new JTextField("yet another thing to focus"), BorderLayout.NORTH);
         frame.pack();
         frame.setVisible(true);

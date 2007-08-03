@@ -34,7 +34,6 @@ import java.util.logging.Logger;
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
 import javax.swing.JTable;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.table.TableCellEditor;
 
@@ -94,10 +93,6 @@ public class DatePickerCellEditor extends AbstractCellEditor implements
         if (dateFormat != null) {
             datePicker.setFormats(dateFormat);
         }
-        datePicker.getMonthView().setFocusable(false);
-        // hack around focus issue: double/click the 
-        // hyperlink shoots focus into the moon. 
-        datePicker.getLinkPanel().setFocusable(false);
         datePicker.addActionListener(getPickerActionListener());
     }
 
@@ -259,11 +254,9 @@ public class DatePickerCellEditor extends AbstractCellEditor implements
                 if (ignoreAction)
                     return;
                 // still need to invoke .. hmm 
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        terminateEdit(e);                         
-                    }
-                });
+                // no ... with the table cooperating the
+                // invoke is contra-productive!
+                terminateEdit(e);                         
             }
 
             /**

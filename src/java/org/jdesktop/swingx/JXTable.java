@@ -4013,29 +4013,40 @@ public class JXTable extends JTable
      * Returns a boolean to indicate if the current focus owner 
      * is descending from this table. 
      * If not isEditing returns false, otherwise walks the focusOwner
-     * hierarchy. (NYI: taking popups into account).
+     * hierarchy, taking popups into account.
      * 
      * @return a boolean to indicate if the current focus
      *   owner is contained.
      */
     private boolean isFocusOwnerDescending() {
+        if (!isEditing()) return false;
         Component focusOwner = 
-                KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-        if (!isEditing() || (focusOwner == null)) return false;
-        // wrong assumption about focus owner ... 
-//        while (focusOwner !=  null) {
-//            if (focusOwner instanceof JPopupMenu) {
-//                focusOwner = ((JPopupMenu) focusOwner).getInvoker();
-//                if (focusOwner == null) {
-//                    return false;
-//                }
-//            }
-//            if (focusOwner == this) {
-//                return true;
-//            }
-//            focusOwner = focusOwner.getParent();
-//        }
-        return SwingUtilities.isDescendingFrom(focusOwner, this);                    
+            KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+        if (isDescending(focusOwner)) return true;
+        // same with permanent focus owner
+        Component permanent = 
+            KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();
+        return isDescending(permanent);
+    }
+
+    /**
+     * @param focusOwner
+     * @return
+     */
+    private boolean isDescending(Component focusOwner) {
+        while (focusOwner !=  null) {
+            if (focusOwner instanceof JPopupMenu) {
+                focusOwner = ((JPopupMenu) focusOwner).getInvoker();
+                if (focusOwner == null) {
+                    return false;
+                }
+            }
+            if (focusOwner == this) {
+                return true;
+            }
+            focusOwner = focusOwner.getParent();
+        }
+        return false;
     }
 
     protected transient CellEditorRemover editorRemover;

@@ -23,8 +23,6 @@ package org.jdesktop.swingx.table;
 import java.text.ParseException;
 import java.util.Date;
 
-import javax.swing.SwingUtilities;
-
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.test.CellEditorReport;
@@ -57,13 +55,8 @@ public class DatePickerCellEditorTest extends InteractiveTestCase {
         JXDatePicker picker = (JXDatePicker) editor.getTableCellEditorComponent
             (null, new Date(), false, -1, -1);
         picker.getMonthView().commitSelection();
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                assertEquals(1, report.getEventCount());
-                assertEquals(1, report.getStoppedEventCount());
-                
-            }
-        });
+        assertEquals(1, report.getEventCount());
+        assertEquals(1, report.getStoppedEventCount());
     }
 
     /**
@@ -78,13 +71,8 @@ public class DatePickerCellEditorTest extends InteractiveTestCase {
         JXDatePicker picker = (JXDatePicker) editor.getTableCellEditorComponent
             (null, new Date(), false, -1, -1);
         picker.getMonthView().cancelSelection();
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                assertEquals(1, report.getEventCount());
-                assertEquals(1, report.getCanceledEventCount());
-                
-            }
-        });
+        assertEquals(1, report.getEventCount());
+        assertEquals(1, report.getCanceledEventCount());
     }
 
     /**
@@ -99,13 +87,8 @@ public class DatePickerCellEditorTest extends InteractiveTestCase {
         JXDatePicker picker = (JXDatePicker) editor.getTableCellEditorComponent
             (null, null, false, -1, -1);
         picker.commitEdit();
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                assertEquals(1, report.getEventCount());
-                assertEquals(1, report.getStoppedEventCount());
-                
-            }
-        });
+        assertEquals(1, report.getEventCount());
+        assertEquals(1, report.getStoppedEventCount());
     }
 
     /**
@@ -121,14 +104,10 @@ public class DatePickerCellEditorTest extends InteractiveTestCase {
         JXDatePicker picker = (JXDatePicker) editor
                 .getTableCellEditorComponent(null, new Date(), false, -1, -1);
         picker.cancelEdit();
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                assertEquals(1, report.getEventCount());
-                assertEquals(1, report.getCanceledEventCount());
-
-            }
-        });
+        assertEquals(1, report.getEventCount());
+        assertEquals(1, report.getCanceledEventCount());
     }
+
     /**
      * test fire stopped after stopCellEditing.
      * stop commits, triggers value change in formatted, triggers
