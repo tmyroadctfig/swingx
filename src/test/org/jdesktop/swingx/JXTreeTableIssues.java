@@ -86,7 +86,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXTreeTableIssues.class
             .getName());
     public static void main(String[] args) {
-//        setSystemLF(true);
+        setSystemLF(true);
         JXTreeTableIssues test = new JXTreeTableIssues();
         try {
 //            test.runInteractiveTests();
@@ -101,7 +101,59 @@ public class JXTreeTableIssues extends InteractiveTestCase {
     }
 
     /**
+     * Issue #576-swingx: sluggish scrolling (?).
+     * Here - use default model
+     */
+    public void interactiveScrollAlternateHighlightDefaultModel() {
+        final JXTable table = new JXTable(0, 6);
+        DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode("root");
+        for (int i = 0; i < 5000; i++) {
+            root.insert(new DefaultMutableTreeTableNode(i), i);
+        }
+        final JXTreeTable treeTable = new JXTreeTable(new DefaultTreeTableModel(root));
+        treeTable.expandAll();
+        table.setModel(treeTable.getModel());
+        final Highlighter hl =
+            HighlighterFactory.createAlternateStriping(UIManager.getColor("Panel.background"),
+            Color.WHITE);
+        treeTable.setHighlighters(hl);
+        table.setHighlighters(hl);
+        final JXFrame frame = wrapWithScrollingInFrame(treeTable, table, "sluggish scrolling");
+        Action toggleHighlighter = new AbstractActionExt("toggle highlighter") {
+
+            public void actionPerformed(ActionEvent e) {
+                if (treeTable.getHighlighters().length == 0) {
+                    treeTable.addHighlighter(hl);
+                    table.addHighlighter(hl);
+                } else {
+                    treeTable.removeHighlighter(hl);
+                    table.removeHighlighter(hl);
+                }
+                
+            }
+            
+        };
+        Action scroll = new AbstractActionExt("start scroll") {
+
+            public void actionPerformed(ActionEvent e) {
+                for (int i = 0; i < table.getRowCount(); i++) {
+                    table.scrollRowToVisible(i);
+                    treeTable.scrollRowToVisible(i);
+                }
+                
+            }
+            
+        };
+        addAction(frame, toggleHighlighter);
+        addAction(frame, scroll);
+        frame.setVisible(true);
+    }
+    
+
+    /**
      * Issue #576-swingx: sluggish scrolling (?)
+     * 
+     * Here: use FileSystemModel
      */
     public void interactiveScrollAlternateHighlight() {
         final JXTable table = new JXTable(0, 6);
