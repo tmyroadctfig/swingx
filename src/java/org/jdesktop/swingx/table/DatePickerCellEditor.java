@@ -95,6 +95,9 @@ public class DatePickerCellEditor extends AbstractCellEditor implements
             datePicker.setFormats(dateFormat);
         }
         datePicker.getMonthView().setFocusable(false);
+        // hack around focus issue: double/click the 
+        // hyperlink shoots focus into the moon. 
+        datePicker.getLinkPanel().setFocusable(false);
         datePicker.addActionListener(getPickerActionListener());
     }
 
@@ -255,6 +258,7 @@ public class DatePickerCellEditor extends AbstractCellEditor implements
                 // commit in stopCellEditing
                 if (ignoreAction)
                     return;
+                // still need to invoke .. hmm 
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         terminateEdit(e);                         

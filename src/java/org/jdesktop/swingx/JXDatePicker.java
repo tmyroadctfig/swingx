@@ -685,18 +685,33 @@ public class JXDatePicker extends JComponent {
 
     private final class TodayPanel extends JXPanel {
         private TodayAction todayAction;
+        private JXHyperlink todayLink;
 
         TodayPanel() {
             super(new FlowLayout());
             setBackgroundPainter(new MattePainter(new GradientPaint(0, 0, new Color(238, 238, 238), 0, 1, Color.WHITE)));
             todayAction = new TodayAction();
-            JXHyperlink todayLink = new JXHyperlink(todayAction);
+            todayLink = new JXHyperlink(todayAction);
             todayLink.addMouseListener(createDoubleClickListener());
             Color textColor = new Color(16, 66, 104);
             todayLink.setUnclickedColor(textColor);
             todayLink.setClickedColor(textColor);
             add(todayLink);
         }
+
+        /**
+         * Overridden to set the link's focusable to be the same.<p>
+         * 
+         * When used as cell editor component, the editor must set 
+         * all contained comps unfocusable (hack around focus issues).
+         * 
+         */
+        @Override
+        public void setFocusable(boolean focusable) {
+            todayLink.setFocusable(focusable);
+            super.setFocusable(focusable);
+        }
+
 
         /**
          * @return

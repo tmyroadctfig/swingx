@@ -4001,21 +4001,41 @@ public class JXTable extends JTable
      */
     @Override
     public void removeEditor() {
-        boolean isFocusOwnerInTheTable = false;
-        TableCellEditor editor = getCellEditor();
-        if(editor != null) {
-            if (editorComp != null) {
-                Component focusOwner = 
-                        KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-                isFocusOwnerInTheTable = focusOwner != null?   
-                        SwingUtilities.isDescendingFrom(focusOwner, this):false;                    
-            }
-        }    
+        boolean isFocusOwnerInTheTable = isFocusOwnerDescending();    
         // let super do its stuff
         super.removeEditor();
         if(isFocusOwnerInTheTable) {
             requestFocusInWindow();
         }
+    }
+
+    /**
+     * Returns a boolean to indicate if the current focus owner 
+     * is descending from this table. 
+     * If not isEditing returns false, otherwise walks the focusOwner
+     * hierarchy. (NYI: taking popups into account).
+     * 
+     * @return a boolean to indicate if the current focus
+     *   owner is contained.
+     */
+    private boolean isFocusOwnerDescending() {
+        Component focusOwner = 
+                KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+        if (!isEditing() || (focusOwner == null)) return false;
+        // wrong assumption about focus owner ... 
+//        while (focusOwner !=  null) {
+//            if (focusOwner instanceof JPopupMenu) {
+//                focusOwner = ((JPopupMenu) focusOwner).getInvoker();
+//                if (focusOwner == null) {
+//                    return false;
+//                }
+//            }
+//            if (focusOwner == this) {
+//                return true;
+//            }
+//            focusOwner = focusOwner.getParent();
+//        }
+        return SwingUtilities.isDescendingFrom(focusOwner, this);                    
     }
 
     protected transient CellEditorRemover editorRemover;
@@ -4101,6 +4121,8 @@ public class JXTable extends JTable
 
             Component c = focusManager.getPermanentFocusOwner();
             while (c != null) {
+                // PENDING: incorrect sequence? invoker of the 
+                // popup might be the table itself?
                 if (c == JXTable.this) {
                     // focus remains inside the table
                     return;
