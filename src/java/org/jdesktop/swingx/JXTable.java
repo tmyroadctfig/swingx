@@ -3995,6 +3995,29 @@ public class JXTable extends JTable
         return started;
     }
     
+    
+    /**
+     * Overridden with backport from Mustang fix for #4684090, #4887999.
+     */
+    @Override
+    public void removeEditor() {
+        boolean isFocusOwnerInTheTable = false;
+        TableCellEditor editor = getCellEditor();
+        if(editor != null) {
+            if (editorComp != null) {
+                Component focusOwner = 
+                        KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+                isFocusOwnerInTheTable = focusOwner != null?   
+                        SwingUtilities.isDescendingFrom(focusOwner, this):false;                    
+            }
+        }    
+        // let super do its stuff
+        super.removeEditor();
+        if(isFocusOwnerInTheTable) {
+            requestFocusInWindow();
+        }
+    }
+
     protected transient CellEditorRemover editorRemover;
 
     /**
