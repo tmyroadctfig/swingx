@@ -127,6 +127,7 @@ public class DatePickerCellEditorVisualCheck extends InteractiveTestCase {
         model.setValueAt(date, 0, 0);
           model.setValueAt("selectedItem", 0, 1);
         JTable table = new JTable(model);
+        table.putClientProperty("terminateEditOnFocusLost", true);
         // right align to see the difference to normal date renderer
         DefaultTableRenderer renderer = new DefaultTableRenderer(
                 new LabelProvider(SwingConstants.RIGHT));
