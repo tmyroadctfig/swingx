@@ -15,16 +15,20 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 
+import org.jdesktop.test.CellEditorReport;
 import org.jdesktop.test.ListSelectionReport;
 
 /**
@@ -45,6 +49,122 @@ public class JTableIssues extends InteractiveTestCase {
           e.printStackTrace();
       }
   }
+
+    /**
+     * test that all transferFocus methods stop edits and 
+     * fire one stopped event.
+     *
+     * Hmm .. unexpected: we get two stopped?
+     */
+    public void testStopEditingCoreTable() {
+        JTable table = new JTable(10, 2);
+        table.editCellAt(0, 0);
+        // sanity
+        assertTrue(table.isEditing());
+        CellEditorReport report = new CellEditorReport();
+        table.getCellEditor().addCellEditorListener(report);
+        // sanity
+        assertFalse(report.hasEvents());
+        table.getCellEditor().stopCellEditing();
+        assertFalse("table must not be editing", table.isEditing());
+        assertEquals("", 1, report.getEventCount());
+        assertEquals("", 1, report.getStoppedEventCount());
+    }
+
+    /**
+     * test that all transferFocus methods stop edits and 
+     * fire one stopped event.
+     *
+     * Hmm .. unexpected: we get two stopped? 
+     * Here: let the table prepare the editor (but not install)
+     * 
+     *  in this case the generic.stopCellEditing calls super 
+     *  twice!
+     */
+    public void testStopEditingTableGenericPrepared() {
+        JTable table = new JTable(10, 2);
+        TableCellEditor direct = table.getDefaultEditor(Object.class);
+        CellEditorReport report = new CellEditorReport();
+        direct.addCellEditorListener(report);
+        TableCellEditor editor = table.getCellEditor(0, 0);
+        // sanity:
+        assertSame(direct, editor);
+        assertFalse(report.hasEvents());
+        table.prepareEditor(editor, 0, 0);
+        // sanity: prepare did not fire ..
+        assertFalse(report.hasEvents());
+        editor.stopCellEditing();
+        assertEquals("prepared - must have fired exactly one event", 1, report.getEventCount());
+        assertEquals("", 1, report.getStoppedEventCount());
+    }
+
+    /**
+     * test that all transferFocus methods stop edits and 
+     * fire one stopped event.
+     *
+     * Hmm .. unexpected: we get two stopped? 
+     * Here: get the table's editor and prepare manually.
+     * this test passes ... what is in the prepare which 
+     * fires?
+     * In this case it calls super.stop once only ... 
+     * 
+     */
+    public void testStopEditingTableGenericGetComp() {
+        JTable table = new JTable(10, 2);
+        TableCellEditor editor = table.getCellEditor(0, 0);
+        CellEditorReport report = new CellEditorReport();
+        editor.addCellEditorListener(report);
+        editor.getTableCellEditorComponent(table, "something", false, 0, 0);
+        editor.stopCellEditing();
+        assertEquals("", 1, report.getEventCount());
+        assertEquals("", 1, report.getStoppedEventCount());
+    }
+
+    /**
+     * test that all transferFocus methods stop edits and 
+     * fire one stopped event.
+     * 
+     * Core issue: 
+     * Table's generic editor must not return a null component.
+     */
+    public void testTableGenericEditorNullTable() {
+        JTable table = new JTable(10, 2);
+        TableCellEditor editor = table.getCellEditor(0, 0);
+        Component comp = editor.getTableCellEditorComponent(
+                null, "something", false, 0, 0);
+        assertNotNull("editor must not return null component", comp);
+    }
+    
+    /**
+     * test that all transferFocus methods stop edits and 
+     * fire one stopped event.
+     *
+     * Hmm .. unexpected: we get two stopped? 
+     * 
+     * Here: Must not throw NPE if calling stopCellEditing without previous 
+     *   getXXComponent.
+     */
+    public void testTableGenericEditorIsolatedNPE() {
+        JTable table = new JTable(10, 2);
+        TableCellEditor editor = table.getCellEditor(0, 0);
+        editor.stopCellEditing();
+    }
+    
+    /**
+     * test that all transferFocus methods stop edits and 
+     * fire one stopped event.
+     *
+     * Hmm .. unexpected: we get two stopped? Test 
+     * DefaultCellEditor - okay.
+     */
+    public void testStopEditingDefaultCellEditor() {
+        TableCellEditor editor = new DefaultCellEditor(new JTextField());
+        CellEditorReport report = new CellEditorReport();
+        editor.addCellEditorListener(report);
+        editor.stopCellEditing();
+        assertEquals("", 1, report.getEventCount());
+        assertEquals("", 1, report.getStoppedEventCount());
+    }
 
     /**
      * core issue: JTable cannot cope with null selection background.
