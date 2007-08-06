@@ -48,15 +48,15 @@ import org.jdesktop.swingx.JXDatePicker;
 public class DatePickerCellEditor extends AbstractCellEditor implements
         TableCellEditor {
 
-    private JXDatePicker datePicker;
+    protected JXDatePicker datePicker;
 
-    private DateFormat dateFormat;
+    protected DateFormat dateFormat;
 
     protected int clickCountToStart = 2;
 
     private ActionListener pickerActionListener;
 
-    private boolean ignoreAction;
+    protected boolean ignoreAction;
 
     private static Logger logger = Logger.getLogger(DatePickerCellEditor.class
             .getName());
@@ -188,7 +188,7 @@ public class DatePickerCellEditor extends AbstractCellEditor implements
         return datePicker;
     }
 
-    boolean isEmpty(Object value) {
+    protected boolean isEmpty(Object value) {
         return value == null || value instanceof String
                 && ((String) value).length() == 0;
     }

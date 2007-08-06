@@ -11,6 +11,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
+import java.awt.KeyboardFocusManager;
 import java.beans.PropertyChangeListener;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -19,17 +20,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.swing.Action;
+import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultListSelectionModel;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -71,8 +76,6 @@ import org.jdesktop.test.TestUtils;
 /**
 * Tests of <code>JXTable</code>.
 * 
-* TODO: update hyperlink related test to use HyperlinkProvider instead of the
-* deprecated LinkRenderer.
 * 
 * @author Jeanette Winzenburg
 */
@@ -112,6 +115,197 @@ public class JXTableUnitTest extends InteractiveTestCase {
         super.tearDown();
     }
 
+    /**
+     * test that transferFocus methods try to stop edit.
+     * 
+     * Here: do nothing if !isTerminateEditOnFocusLost.
+     *
+     */
+    public void testFocusTransferBackwardTerminateEditFalse() {
+        JXTable table = new JXTable(10, 2);
+        table.setTerminateEditOnFocusLost(false);
+        DefaultCellEditor editor = new DefaultCellEditor(new JTextField());        // need to replace generic editor - which fires twice
+        table.setDefaultEditor(Object.class, editor);
+        table.editCellAt(0, 0);
+        // sanity
+        assertTrue(table.isEditing());
+        CellEditorReport report = new CellEditorReport();
+        table.getCellEditor().addCellEditorListener(report);
+        table.transferFocusBackward();
+        assertTrue("table must be editing", table.isEditing());
+        assertEquals("", 0, report.getEventCount());
+    }
+   
+    /**
+     * test that transferFocus methods try to stop edit.
+     * 
+     * Here: do nothing if !isTerminateEditOnFocusLost.
+     *
+     */
+    public void testFocusTransferForwardTerminateEditFalse() {
+        JXTable table = new JXTable(10, 2);
+        table.setTerminateEditOnFocusLost(false);
+        DefaultCellEditor editor = new DefaultCellEditor(new JTextField());        // need to replace generic editor - which fires twice
+        table.setDefaultEditor(Object.class, editor);
+        table.editCellAt(0, 0);
+        // sanity
+        assertTrue(table.isEditing());
+        CellEditorReport report = new CellEditorReport();
+        table.getCellEditor().addCellEditorListener(report);
+        table.transferFocus();
+        assertTrue("table must be editing", table.isEditing());
+        assertEquals("", 0, report.getEventCount());
+    }
+
+    /**
+     * test that transferFocus methods try to stop edit.
+     * 
+     * Here: respect false on backward.
+     *
+     */
+    public void testFocusTransferBackwardStopEditingFalse() {
+        JXTable table = new JXTable(10, 2);
+        DefaultCellEditor editor = new DefaultCellEditor(new JTextField()){
+
+            @Override
+            public boolean stopCellEditing() {
+                return false;
+            }
+            
+        };
+        // need to replace generic editor - which fires twice
+        table.setDefaultEditor(Object.class, editor);
+        table.editCellAt(0, 0);
+        // sanity
+        assertTrue(table.isEditing());
+        CellEditorReport report = new CellEditorReport();
+        table.getCellEditor().addCellEditorListener(report);
+        table.transferFocusBackward();
+        assertTrue("table must be editing", table.isEditing());
+        assertEquals("", 0, report.getEventCount());
+    }
+    
+    
+    /**
+     * test that transferFocus methods try to stop edit.
+     * 
+     * Here: respect editor false on forward.
+     *
+     */
+    public void testFocusTransferForwardStopEditingFalse() {
+        JXTable table = new JXTable(10, 2);
+        DefaultCellEditor editor = new DefaultCellEditor(new JTextField()){
+
+            @Override
+            public boolean stopCellEditing() {
+                return false;
+            }
+            
+        };
+        // need to replace generic editor - which fires twice
+        table.setDefaultEditor(Object.class, editor);
+        table.editCellAt(0, 0);
+        // sanity
+        assertTrue(table.isEditing());
+        CellEditorReport report = new CellEditorReport();
+        table.getCellEditor().addCellEditorListener(report);
+        table.transferFocus();
+        assertTrue("table must be editing", table.isEditing());
+        assertEquals("", 0, report.getEventCount());
+    }
+    
+
+    /**
+     * test that transferFocus methods try to stop edit.
+     * 
+     * Here: edit stopped and editor fires on backward.
+     *
+     */
+    public void testFocusTransferBackwardStopEditing() {
+        JXTable table = new JXTable(10, 2);
+        // need to replace generic editor - which fires twice
+        table.setDefaultEditor(Object.class, new DefaultCellEditor(new JTextField()));
+        table.editCellAt(0, 0);
+        // sanity
+        assertTrue(table.isEditing());
+        CellEditorReport report = new CellEditorReport();
+        table.getCellEditor().addCellEditorListener(report);
+        table.transferFocusBackward();
+        assertFalse("table must not be editing", table.isEditing());
+        assertEquals("", 1, report.getEventCount());
+        assertEquals("", 1, report.getStoppedEventCount());
+    }
+    
+
+    /**
+     * test that transferFocus methods try to stop edit.
+     * 
+     * Here: edit stopped and editor fired. 
+     *
+     */
+    public void testFocusTransferForwardStopEditing() {
+        JXTable table = new JXTable(10, 2);
+        // need to replace generic editor - which fires twice
+        table.setDefaultEditor(Object.class, new DefaultCellEditor(new JTextField()));
+        table.editCellAt(0, 0);
+        // sanity
+        assertTrue(table.isEditing());
+        CellEditorReport report = new CellEditorReport();
+        table.getCellEditor().addCellEditorListener(report);
+        table.transferFocus();
+        assertFalse("table must not be editing", table.isEditing());
+        assertEquals("", 1, report.getEventCount());
+        assertEquals("", 1, report.getStoppedEventCount());
+    }
+    
+    
+
+    /**
+     * test that we have actions registered for forwared/backward
+     * focus transfer.
+     *
+     */
+    public void testFocusTransferActions() {
+        JXTable table = new JXTable();
+        assertNotNull("must have forward action",
+                table.getActionMap().get(JXTable.FOCUS_NEXT_COMPONENT));
+        assertNotNull("must have backward action",
+                table.getActionMap().get(JXTable.FOCUS_PREVIOUS_COMPONENT));
+    }
+
+    /**
+     * test that we have bindings for forward/backward 
+     * focusTransfer.
+     *
+     */
+    public void testFocusTransferKeyBinding() {
+        JTable core = new JTable();
+        Set forwardKeys = core.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
+        Set backwardKeys = core.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
+        JXTable table = new JXTable();
+        for (Object key : forwardKeys) {
+            InputMap map = table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+            assertNotNull("must have binding for forward focus transfer " + key, 
+                    map.get((KeyStroke) key));
+        }
+        for (Object key : backwardKeys) {
+            InputMap map = table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+            assertNotNull("must have binding for backward focus transfer " + key, 
+                    map.get((KeyStroke) key));
+        }
+    }
+    
+    /**
+     * test that we have no focusTransfer keys set.
+     *
+     */
+    public void testFocusTransferNoDefaultKeys() {
+        JXTable table = new JXTable();
+        assertTrue(table.getFocusTraversalKeys(
+                KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS).isEmpty());
+        assertTrue(table.getFocusTraversalKeys(
+                KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS).isEmpty());
+    }
     /**
      * test that pref scrollable width is updated after structure changed.
      *

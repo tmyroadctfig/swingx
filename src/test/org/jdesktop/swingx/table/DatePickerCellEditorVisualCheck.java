@@ -21,21 +21,22 @@
 package org.jdesktop.swingx.table;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
 import java.text.DateFormat;
 import java.util.Date;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
+import javax.swing.LookAndFeel;
 import javax.swing.table.DefaultTableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
-import org.jdesktop.swingx.renderer.DefaultTableRenderer;
-import org.jdesktop.swingx.renderer.LabelProvider;
 
 public class DatePickerCellEditorVisualCheck extends InteractiveTestCase {
     public static void main(String[] args) {
@@ -62,39 +63,27 @@ public class DatePickerCellEditorVisualCheck extends InteractiveTestCase {
      * Here we use a JXTable.
      */
     public void interactiveDatePickerCellEditorXTable() {
-        Date date = new Date();
-        DefaultTableModel model = new DefaultTableModel(1, 2) {
+        final JXTable table = new JXTable(createTableModel(2));
+        LookAndFeel lf;
+        table.setVisibleColumnCount(6);
+//        table.setSurrendersFocusOnKeystroke(true);
+        installEditors(table);
+        Action action = new AbstractAction("toggle terminate") {
 
-            @Override
-            public Class<?> getColumnClass(int columnIndex) {
-                if (getRowCount() > 0) {
-                    Object value = getValueAt(0, columnIndex);
-                    if (value != null) {
-                        return value.getClass();
-                    }
-                }
-                return super.getColumnClass(columnIndex);
+            public void actionPerformed(ActionEvent e) {
+                table.setTerminateEditOnFocusLost(!table.isTerminateEditOnFocusLost());
+                
             }
             
         };
-        model.setColumnIdentifiers(new Object[]{"Date", "editable combo"});
-        model.setValueAt(date, 0, 0);
-          model.setValueAt("selectedItem", 0, 1);
-        JXTable table = new JXTable(model);
-        table.setVisibleColumnCount(6);
-        // right align to see the difference to normal date renderer
-        DefaultTableRenderer renderer = new DefaultTableRenderer(
-                new LabelProvider(SwingConstants.RIGHT));
-        table.setDefaultRenderer(java.sql.Date.class, renderer);
-        table.setDefaultEditor(Date.class, new DatePickerCellEditor(DateFormat.getDateInstance()));
-        JComboBox box = new JComboBox(new String[] {"item1", "item2", "item3"});
-        box.setEditable(true);
-        table.getColumnExt(1).setCellEditor(new DefaultCellEditor(box));
-        JXFrame frame = showWithScrollingInFrame(table, "JXTable - date picker cell editor");
-        frame.add(new JTextField("yet another thing to focus"), BorderLayout.NORTH);
+        JXFrame frame = wrapWithScrollingInFrame(table, "JXTable - date picker cell editor");
+        addAction(frame, action);
+        frame.add(new JTextField("yet another thing to focus"), BorderLayout.SOUTH);
         frame.pack();
         frame.setVisible(true);
     }
+
+
 
         
     /**
@@ -105,8 +94,35 @@ public class DatePickerCellEditorVisualCheck extends InteractiveTestCase {
      * Here we use a core table.
      */
     public void interactiveDatePickerCellEditorTable() {
-        Date date = new Date();
-        DefaultTableModel model = new DefaultTableModel(1, 2) {
+        JTable table = new JTable(createTableModel(2));
+        table.putClientProperty("terminateEditOnFocusLost", true);
+        installEditors(table);
+        JXFrame frame = wrapWithScrollingInFrame(table, "JTable - date picker cell editor");
+        frame.add(new JTextField("yet another thing to focus"), BorderLayout.SOUTH);
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+
+
+    /**
+     * @param table
+     */
+    private void installEditors(JTable table) {
+        table.setDefaultEditor(Date.class, 
+                new DatePickerCellEditor(DateFormat.getDateInstance()));
+        JComboBox box = new JComboBox(new String[] {"item1", "item2", "item3"});
+        box.setEditable(true);
+        table.getColumnModel().getColumn(1).setCellEditor(
+                new DefaultCellEditor(box));
+    }
+
+    /**
+     * @return
+     */
+    private DefaultTableModel createTableModel(int rows) {
+        Object[] columns = new Object[]{"Date", "editable combo", "simple field"};
+        DefaultTableModel model = new DefaultTableModel(rows, columns.length) {
 
             @Override
             public Class<?> getColumnClass(int columnIndex) {
@@ -120,23 +136,11 @@ public class DatePickerCellEditorVisualCheck extends InteractiveTestCase {
             }
             
         };
-        model.setColumnIdentifiers(new Object[]{"Date", "editable combo"});
+        model.setColumnIdentifiers(columns);
+        Date date = new Date();
         model.setValueAt(date, 0, 0);
-          model.setValueAt("selectedItem", 0, 1);
-        JTable table = new JTable(model);
-        table.putClientProperty("terminateEditOnFocusLost", true);
-        // right align to see the difference to normal date renderer
-        DefaultTableRenderer renderer = new DefaultTableRenderer(
-                new LabelProvider(SwingConstants.RIGHT));
-        table.setDefaultRenderer(java.sql.Date.class, renderer);
-        table.setDefaultEditor(Date.class, new DatePickerCellEditor(DateFormat.getDateInstance()));
-        JComboBox box = new JComboBox(new String[] {"item1", "item2", "item3"});
-        box.setEditable(true);
-        table.getColumnModel().getColumn(1).setCellEditor(new DefaultCellEditor(box));
-        JXFrame frame = showWithScrollingInFrame(table, "JTable - date picker cell editor");
-        frame.add(new JTextField("yet another thing to focus"), BorderLayout.NORTH);
-        frame.pack();
-        frame.setVisible(true);
+        model.setValueAt("selectedItem", 0, 1);
+        return model;
     }
 
 

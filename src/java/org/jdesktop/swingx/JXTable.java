@@ -49,6 +49,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -233,6 +234,16 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
 public class JXTable extends JTable 
     implements TableColumnModelExtListener    {
     
+    /**
+     * 
+     */
+    public static final String FOCUS_PREVIOUS_COMPONENT = "focusPreviousComponent";
+
+    /**
+     * 
+     */
+    public static final String FOCUS_NEXT_COMPONENT = "focusNextComponent";
+
     private static final Logger LOG = Logger.getLogger(JXTable.class.getName());
     
      /**
@@ -454,14 +465,6 @@ public class JXTable extends JTable
         init();
     }
 
-    
-//    @Override
-//    protected void initializeLocalVars() {
-//        isXTableRowHeightSet = false;
-//        super.initializeLocalVars();
-//        isXTableRowHeightSet = false;
-//    }
-
     /** 
      * Initializes the table for use.
      *  
@@ -475,6 +478,7 @@ public class JXTable extends JTable
         // guarantee getFilters() to return != null
         setFilters(null);
         initActionsAndBindings();
+        initFocusBindings();
         // instantiate row height depending ui setting or font size.
         updateRowHeightUI(false);
         // set to null -  don't want hard-coded pixel sizes.
@@ -833,7 +837,40 @@ public class JXTable extends JTable
 
     
 //--------------------- actions
-    
+    /**
+     * Take over ctrl-tab.
+     * 
+     */
+    private void initFocusBindings() {
+        setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,
+                new TreeSet<KeyStroke>());
+        setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS,
+                   new TreeSet<KeyStroke>());
+        getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
+                KeyStroke.getKeyStroke("ctrl TAB"), FOCUS_NEXT_COMPONENT);
+        getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
+                KeyStroke.getKeyStroke("shift ctrl TAB"), FOCUS_PREVIOUS_COMPONENT);
+        getActionMap().put(FOCUS_NEXT_COMPONENT, createFocusTransferAction(true));
+        getActionMap().put(FOCUS_PREVIOUS_COMPONENT, createFocusTransferAction(false));
+    }
+
+
+    /**
+     * Creates and returns an action for forward/backward focus 
+     * transfer, depending on the given flag. 
+     * 
+     * @param forward a boolean indicating the direction of the
+     *   required focus transfer
+     * @return the action bound to focusTraversal.
+     */
+    private Action createFocusTransferAction(final boolean forward) {
+        BoundAction action = new BoundAction(null, forward ? 
+                FOCUS_NEXT_COMPONENT : FOCUS_PREVIOUS_COMPONENT);
+        action.registerCallback(this, forward ? 
+                "transferFocus" : "transferFocusBackward");
+        return action;
+    }
+
     /**
      * A small class which dispatches actions. <p>
      * TODO (?): Is there a way that we can
@@ -4001,6 +4038,10 @@ public class JXTable extends JTable
      */
     @Override
     public void removeEditor() {
+//        if (editorRemover != null) {
+//            editorRemover.uninstall();
+//            editorRemover = null;
+//        }
         boolean isFocusOwnerInTheTable = isFocusOwnerDescending();    
         // let super do its stuff
         super.removeEditor();
@@ -4012,7 +4053,7 @@ public class JXTable extends JTable
     /**
      * Returns a boolean to indicate if the current focus owner 
      * is descending from this table. 
-     * If not isEditing returns false, otherwise walks the focusOwner
+     * Returns false if not editing, otherwise walks the focusOwner
      * hierarchy, taking popups into account.
      * 
      * @return a boolean to indicate if the current focus
@@ -4022,6 +4063,8 @@ public class JXTable extends JTable
         if (!isEditing()) return false;
         Component focusOwner = 
             KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+        // PENDING JW: special casing to not fall through ... really wanted?
+        if (focusOwner == null) return false;
         if (isDescending(focusOwner)) return true;
         // same with permanent focus owner
         Component permanent = 
@@ -4085,11 +4128,66 @@ public class JXTable extends JTable
         super.removeNotify();
     }
 
+    /**
+     * {@inheritDoc}<p>
+     * 
+     * Overridden to prevent spurious focus loss to outside
+     * of table while removing the editor. This is essentially 
+     * a hack around core bug #6210779.
+     * 
+     * PENDING: add link to wiki!
+     */
+    @Override
+    public boolean isFocusCycleRoot() {
+        if (isEditingFocusCycleRoot()) {
+            return true;
+        }
+        return super.isFocusCycleRoot();
+    }
 
-    // This class tracks changes in the keyboard focus state. It is used
-    // when the JTable is editing to determine when to cancel the edit.
-    // If focus switches to a component outside of the jtable, but in the
-    // same window, this will cancel editing.
+    /**
+     * {@inheritDoc} <p>
+     * Overridden to try to stop the edit, if appropriate. Calls super
+     * if succeeded, does not yield otherwise.
+     *  
+     */
+    @Override
+    public void transferFocus() {
+        if (isEditingFocusCycleRoot() && 
+                !getCellEditor().stopCellEditing()) return;
+        super.transferFocus();
+    }
+
+    /**
+     * {@inheritDoc} <p>
+     * Overridden to try to stop the edit, if appropiate. Calls super
+     * if succeeded, does not yield otherwise.
+     *  
+     */
+    @Override
+    public void transferFocusBackward() {
+        if (isEditingFocusCycleRoot() && 
+                !getCellEditor().stopCellEditing()) return;
+        super.transferFocusBackward();
+    }
+
+
+
+    /**
+     * 
+     * @return a boolean to indicate whether the table needs
+     * to fake being focus cycle root. 
+     */
+    private boolean isEditingFocusCycleRoot() {
+        return isEditing() && isTerminateEditOnFocusLost();
+    }
+
+    /**
+     * This class tracks changes in the keyboard focus state. It is used when
+     * the JTable is editing to determine when to cancel the edit. If focus
+     * switches to a component outside of the jtable, but in the same window,
+     * this will cancel editing.
+     */ 
    class  CellEditorRemover implements PropertyChangeListener {
         KeyboardFocusManager focusManager;
 
@@ -4132,24 +4230,27 @@ public class JXTable extends JTable
 
             Component c = focusManager.getPermanentFocusOwner();
             while (c != null) {
-                // PENDING: incorrect sequence? invoker of the 
-                // popup might be the table itself?
-                if (c == JXTable.this) {
-                    // focus remains inside the table
-                    return;
-                } else if (c instanceof JPopupMenu) {
-                    // need to switch the hierarchy to a popups invoker
+                // PENDING JW: logic untested!
+                if (c instanceof JPopupMenu) {
                     c = ((JPopupMenu) c).getInvoker();
-                } else if ((c instanceof Window) ||
-                           (c instanceof Applet && c.getParent() == null)) {
-                    if (c == SwingUtilities.getRoot(JXTable.this)) {
-                        if (!getCellEditor().stopCellEditing()) {
-                            getCellEditor().cancelCellEditing();
+                } else {
+                    if (c == JXTable.this) {
+                        // focus remains inside the table
+                        return;
+                    } else if (c instanceof JPopupMenu) {
+                        // PENDING JW: left-over? we should never reach this ...
+                        // need to switch the hierarchy to a popups invoker
+                    } else if ((c instanceof Window) ||
+                               (c instanceof Applet && c.getParent() == null)) {
+                        if (c == SwingUtilities.getRoot(JXTable.this)) {
+                            if (!getCellEditor().stopCellEditing()) {
+                                getCellEditor().cancelCellEditing();
+                            }
                         }
+                        break;
                     }
-                    break;
+                    c = c.getParent();
                 }
-                c = c.getParent();
             }
         }
     }
