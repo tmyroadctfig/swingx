@@ -131,7 +131,7 @@ public class FileSystemModel extends AbstractTreeTableModel {
     }
 
     public int getColumnCount() {
-        return 1;
+        return 4;
     }
 
     public String getColumnName(int column) {
