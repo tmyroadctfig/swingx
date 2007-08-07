@@ -47,7 +47,7 @@ import java.util.Date;
  */
 public class FileSystemModel extends AbstractTreeTableModel {
     // The the returned file length for directories.
-    private static final Integer ZERO = 0;
+    private static final Long DIRECTORY = 0L;
 
     /**
      * Creates a file system model using the root directory as the model root.
@@ -92,12 +92,10 @@ public class FileSystemModel extends AbstractTreeTableModel {
         }
         
         File parentFile = (File) parent;
-        File[] files = parentFile.listFiles();
-
-        if (files != null) {
-            Arrays.sort(files);
-
-            return files[index];
+        String[] children = parentFile.list();
+        
+        if (children != null) {
+            return new File(parentFile, children[index]);
         }
         
         return null;
@@ -108,11 +106,7 @@ public class FileSystemModel extends AbstractTreeTableModel {
      */
     public int getChildCount(Object parent) {
         if (parent instanceof File) {
-            File parentFile = (File) parent;
-
-            if (parentFile.isDirectory()) {
-                return parentFile.listFiles().length;
-            }
+            return ((File) parent).list().length;
         }
 
         return 0;
@@ -122,15 +116,22 @@ public class FileSystemModel extends AbstractTreeTableModel {
      * {@inheritDoc}
      */
     public Class<?> getColumnClass(int column) {
-        if (column == 2) {
+        switch (column) {
+        case 0:
+            return String.class;
+        case 1:
+            return Long.class;
+        case 2:
             return Boolean.class;
+        case 3:
+            return Date.class;
+        default:
+            return super.getColumnClass(column);
         }
-
-        return Object.class;
     }
 
     public int getColumnCount() {
-        return 4;
+        return 1;
     }
 
     public String getColumnName(int column) {
@@ -144,7 +145,7 @@ public class FileSystemModel extends AbstractTreeTableModel {
         case 3:
             return "Modification Date";
         default:
-            return "Column " + column;
+            return super.getColumnName(column);
         }
     }
 
@@ -155,7 +156,7 @@ public class FileSystemModel extends AbstractTreeTableModel {
             case 0:
                 return file.getName();
             case 1:
-                return file.isFile() ? (int) file.length() : ZERO;
+                return isLeaf(node) ? file.length() : DIRECTORY;
             case 2:
                 return file.isDirectory();
             case 3:
@@ -211,7 +212,8 @@ public class FileSystemModel extends AbstractTreeTableModel {
      */
     public boolean isLeaf(Object node) {
         if (node instanceof File) {
-            return ((File) node).isFile();
+            //do not use isFile(); some system files return false
+            return ((File) node).list() == null;
         }
         
         return true;
