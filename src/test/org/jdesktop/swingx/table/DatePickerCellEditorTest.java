@@ -23,8 +23,11 @@ package org.jdesktop.swingx.table;
 import java.text.ParseException;
 import java.util.Date;
 
+import javax.swing.tree.DefaultMutableTreeNode;
+
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXDatePicker;
+import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
 import org.jdesktop.test.CellEditorReport;
 
 public class DatePickerCellEditorTest extends InteractiveTestCase {
@@ -42,6 +45,31 @@ public class DatePickerCellEditorTest extends InteractiveTestCase {
         }
     }
  
+    /**
+     * Test Picker's value --> date mapping strategy.
+     * @throws ParseException 
+     * 
+     *
+     */
+    public void testDateEditorValueAsDate() throws ParseException  {
+        DatePickerCellEditor editor = new DatePickerCellEditor();
+        Date input = new Date();
+        assertEquals("the input date must be unchanged", input, editor.getValueAsDate(input));
+        assertEquals("input as long must be same", input, editor.getValueAsDate(input.getTime()));
+        String dateString = editor.getFormats()[0].format(input);
+        Date fullCycle = editor.getFormats()[0].parse(dateString);
+        assertEquals("the formatted input date string must be same", fullCycle, editor.getValueAsDate(dateString));
+        String nonsenseString = "invalid";
+        assertNull("invalid string maps to null", editor.getValueAsDate(nonsenseString));
+        assertNull("empty String maps to null", editor.getValueAsDate(""));
+        // same with date/string wrapped into TreeNode
+        DefaultMutableTreeNode node = new DefaultMutableTreeNode(input);
+        assertEquals("date must be user-object", input, editor.getValueAsDate(node));
+        // same with date/string wrapped into a TreeTableNode
+        DefaultMutableTreeTableNode tableNode = new DefaultMutableTreeTableNode(input);
+        assertEquals("date must be user-object", input, editor.getValueAsDate(tableNode));
+    }
+
 
     /**
      * test fire stopped after accept in monthview.

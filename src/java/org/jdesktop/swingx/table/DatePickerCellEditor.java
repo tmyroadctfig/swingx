@@ -34,19 +34,25 @@ import java.util.logging.Logger;
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
 import javax.swing.JTable;
+import javax.swing.JTree;
 import javax.swing.UIManager;
 import javax.swing.table.TableCellEditor;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeCellEditor;
 
 import org.jdesktop.swingx.JXDatePicker;
+import org.jdesktop.swingx.treetable.AbstractMutableTreeTableNode;
 
 /**
- * A TableCellEditor using a JXDatePicker as editor component.
+ * A CellEditor using a JXDatePicker as editor component.<p>
+ * 
+ * NOTE: this class will be moved!
  * 
  * @author Richard Osbald
  * @author Jeanette Winzenburg
  */
 public class DatePickerCellEditor extends AbstractCellEditor implements
-        TableCellEditor {
+        TableCellEditor, TreeCellEditor {
 
     protected JXDatePicker datePicker;
 
@@ -161,23 +167,10 @@ public class DatePickerCellEditor extends AbstractCellEditor implements
     
     public Component getTableCellEditorComponent(JTable table, Object value,
             boolean isSelected, int row, int column) {
+        // PENDING JW: can remove the ignore flags here?
+        // the picker learnde to behave ...
         ignoreAction = true;
-        if (!isEmpty(value)) {
-            if (value instanceof Date) {
-                datePicker.setDate((Date) value);
-            } else if (value instanceof String) {
-                try {
-                    synchronized (dateFormat) {
-                        datePicker.setDate(dateFormat.parse((String) value));
-                    }
-                } catch (ParseException e) {
-                    logger.log(Level.SEVERE, "", e);
-                    datePicker.setDate((Date) null);
-                }
-            }
-        } else {
-            datePicker.setDate((Date) null);
-        }
+        datePicker.setDate(getValueAsDate(value));
         // todo how to..
         // SwingUtilities.invokeLater(new Runnable() {
         // public void run() {
@@ -186,6 +179,70 @@ public class DatePickerCellEditor extends AbstractCellEditor implements
         // });
         ignoreAction = false;
         return datePicker;
+    }
+
+    //-------------------------  TreeCellEditor
+    
+    public Component getTreeCellEditorComponent(JTree tree, Object value, boolean isSelected, boolean expanded, boolean leaf, int row) {
+        // PENDING JW: can remove the ignore flags here?
+        // the picker learnde to behave ...
+        ignoreAction = true;
+        datePicker.setDate(getValueAsDate(value));
+        // todo how to..
+        // SwingUtilities.invokeLater(new Runnable() {
+        // public void run() {
+        // datePicker.getEditor().selectAll();
+        // }
+        // });
+        ignoreAction = false;
+        return datePicker;
+    }
+
+//-------------------- helpers    
+    
+    /**
+     * Returns the given value as Date.
+     * 
+     * PENDING: abstract into something pluggable (like StringValue 
+     *   in ComponentProvider?)
+     *   
+     * @param value the value to map as Date
+     * @return the value as Date or null, if not successful.
+     * 
+     */
+    protected Date getValueAsDate(Object value) {
+        if (isEmpty(value)) return null;
+        if (value instanceof Date) {
+            return (Date) value;
+        } 
+        if (value instanceof Long) {
+            return new Date((Long) value);
+        }
+        if (value instanceof String) {
+            try {
+                // JW: why was the parsing synchronized?
+//              synchronized (dateFormat) {
+//              datePicker.setDate(dateFormat.parse((String) value));
+//          }
+                return dateFormat.parse((String) value);
+            } catch (ParseException e) {
+                handleParseException(e);
+            }
+        }
+        if (value instanceof DefaultMutableTreeNode) {
+            return getValueAsDate(((DefaultMutableTreeNode) value).getUserObject());
+        }
+        if (value instanceof AbstractMutableTreeTableNode) {
+            return getValueAsDate(((AbstractMutableTreeTableNode) value).getUserObject());
+        }
+        return null;
+    }
+
+    /**
+     * @param e
+     */
+    protected void handleParseException(ParseException e) {
+        logger.log(Level.SEVERE, e.getMessage(), e.getMessage());
     }
 
     protected boolean isEmpty(Object value) {
