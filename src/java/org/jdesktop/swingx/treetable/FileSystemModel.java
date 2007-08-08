@@ -106,7 +106,11 @@ public class FileSystemModel extends AbstractTreeTableModel {
      */
     public int getChildCount(Object parent) {
         if (parent instanceof File) {
-            return ((File) parent).list().length;
+            String[] children = ((File) parent).list();
+            
+            if (children != null) {
+                return children.length;
+            }
         }
 
         return 0;

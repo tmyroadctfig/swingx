@@ -86,10 +86,10 @@ public class SimpleFileSystemModel implements TreeTableModel {
 
     public int getChildCount(Object parent) {
         if (parent instanceof File) {
-            File parentFile = (File) parent;
-
-            if (parentFile.isDirectory()) {
-                return parentFile.listFiles().length;
+            String[] children = ((File) parent).list();
+            
+            if (children != null) {
+                return children.length;
             }
         }
 
@@ -208,7 +208,8 @@ public class SimpleFileSystemModel implements TreeTableModel {
      */
     public boolean isLeaf(Object node) {
         if (node instanceof File) {
-            return ((File) node).isFile();
+            //do not use isFile(); some system files return false
+            return ((File) node).list() == null;
         }
         
         return true;
