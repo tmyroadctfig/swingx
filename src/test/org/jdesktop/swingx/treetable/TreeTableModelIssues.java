@@ -8,11 +8,43 @@ package org.jdesktop.swingx.treetable;
 
 import java.util.logging.Logger;
 
+import javax.swing.tree.TreeModel;
+
 import junit.framework.TestCase;
 
 public class TreeTableModelIssues extends TestCase {
     private static final Logger LOG = Logger
         .getLogger(TreeTableModelIssues.class.getName());
+
+    /**
+     * Issue #??-swingx: FileSystemModel throws NPE in getChildCount.
+     *
+     */
+    public void testFileSystemModelNPE() {
+        TreeModel model = new FileSystemModel();
+        Object root = model.getRoot();
+        for (int i = 0; i < model.getChildCount(root); i++) {
+            Object child = model.getChild(root, i);
+            // sanity
+            assertNotNull("child must not be null at " + i, child);
+            model.getChildCount(child);
+        }     
+    }
+
+    
+    /**
+     * Issue #??-swingx: SimpleFileSystemModel throws NPE in getChildCount.
+     */
+    public void testFileSystemModelSimple() {
+        SimpleFileSystemModel model = new SimpleFileSystemModel();
+        Object root = model.getRoot();
+        for (int i = 0; i < model.getChildCount(root); i++) {
+            Object child = model.getChild(root, i);
+            // sanity
+            assertNotNull("child must not be null at " + i, child);
+            model.getChildCount(child);
+        }     
+    }
 
     /**
      * Issue #218-swingx: TreeTableModel impl break type contract for
