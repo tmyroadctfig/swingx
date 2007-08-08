@@ -92,8 +92,8 @@ public class JXTreeTableIssues extends InteractiveTestCase {
 //            test.runInteractiveTests();
 //            test.runInteractiveTests(".*AdapterDeleteUpdate.*");
 //            test.runInteractiveTests(".*Text.*");
-//            test.runInteractiveTests(".*TreeExpand.*");
-            test.runInteractiveTests("interactive.*ScrollAlt.*");
+            test.runInteractiveTests(".*TreeExpand.*");
+//            test.runInteractiveTests("interactive.*ScrollAlt.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -324,51 +324,6 @@ public class JXTreeTableIssues extends InteractiveTestCase {
     }
 
     // -------------- interactive tests
-
-    /**  
-     * Issue ??-swingx: JXTreeTable - scrollsOnExpand has no effect.
-     * 
-     * Compare tree/table: 
-     * - tree expands if property is true and
-     * expand triggered by mouse (not programmatically?). 
-     * - treeTable never 
-     * 
-     */    
-    public void interactiveTestTreeExpand() {
-        
-        final JXTreeTable treeTable = new JXTreeTable(new FileSystemModel());
-        final JXTree tree = new JXTree(treeTable.getTreeTableModel());
-        treeTable.setScrollsOnExpand(tree.getScrollsOnExpand());
-        tree.setRowHeight(treeTable.getRowHeight());
-        Action toggleScrolls = new AbstractAction("Toggle Scroll") {
-
-            public void actionPerformed(ActionEvent e) {
-                tree.setScrollsOnExpand(!tree.getScrollsOnExpand());
-                treeTable.setScrollsOnExpand(tree.getScrollsOnExpand());
-            }
-            
-        };
-         Action expand = new AbstractAction("Expand") {
-
-            public void actionPerformed(ActionEvent e) {
-                int[] selectedRows = tree.getSelectionRows();
-                if (selectedRows.length > 0) {
-                    tree.expandRow(selectedRows[0]);
-                }
-               int selected = treeTable.getSelectedRow();
-               if (selected >= 0) {
-                   treeTable.expandRow(selected);
-               }
-            }
-            
-        };
- 
-        JXFrame frame = wrapWithScrollingInFrame(tree, treeTable,
-                "Compare Tree/Table expand properties ");
-        addAction(frame, toggleScrolls);
-        addAction(frame, expand);
-        frame.setVisible(true);
-    }
 
 
     /**

@@ -25,6 +25,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -93,7 +95,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //             test.runInteractiveTests("interactive.*Compare.*");
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
 //             test.runInteractiveTests("interactive.*RToL.*");
-             test.runInteractiveTests("interactive.*Highl.*");
+             test.runInteractiveTests("interactive.*Scroll.*");
 //             test.runInteractiveTests("interactive.*Edit.*");
         } catch (Exception ex) {
 
@@ -204,30 +206,94 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         frame.add(new JXDatePicker());
         return new ComponentTreeTableModel(frame);
     }
+
+    /**  
+     * Issue #575-swingx: JXTreeTable - scrollsOnExpand has no effect.
+     * 
+     * Compare tree/table: 
+     * - tree expands if property is true and
+     * expand triggered by mouse (not programmatically?). 
+     * - treeTable never 
+     * 
+     * 
+     * related issue #296-swingx: expose scrollPathToVisible in JXTreeTable.
+     */    
+    public void interactiveScrollPathTreeExpand() {
+        
+        final JXTreeTable treeTable = new JXTreeTable(new FileSystemModel());
+        final JXTree tree = new JXTree(treeTable.getTreeTableModel());
+        treeTable.setScrollsOnExpand(tree.getScrollsOnExpand());
+        tree.setRowHeight(treeTable.getRowHeight());
+        Action toggleScrolls = new AbstractAction("Toggle Scroll") {
+
+            public void actionPerformed(ActionEvent e) {
+                tree.setScrollsOnExpand(!tree.getScrollsOnExpand());
+                treeTable.setScrollsOnExpand(tree.getScrollsOnExpand());
+            }
+            
+        };
+         Action expand = new AbstractAction("Expand") {
+
+            public void actionPerformed(ActionEvent e) {
+                int[] selectedRows = tree.getSelectionRows();
+                if (selectedRows.length > 0) {
+                    tree.expandRow(selectedRows[0]);
+                }
+               int selected = treeTable.getSelectedRow();
+               if (selected >= 0) {
+                   treeTable.expandRow(selected);
+               }
+            }
+            
+        };
+ 
+        JXFrame frame = wrapWithScrollingInFrame(tree, treeTable,
+                "Compare Tree/Table expand properties ");
+        addAction(frame, toggleScrolls);
+        addAction(frame, expand);
+        frame.setVisible(true);
+    }
+
+
     /**
      * issue #296-swingx: expose scrollPathToVisible in JXTreeTable.
      * 
      * Treetable should behave exactly like Tree - so
      * simply passing through to the hierarchical renderer is not quite
-     * enough - need to force a scrollTo after expanding.
-     *
+     * enough - need to force a scrollTo after expanding. 
+     * Not really: all scrolling is piped through scrollRectToVisible, 
+     * so that looks like the central place to fix (f.i. delegate to
+     * the enclosing treeTable). Related issue #575-swingx.
+     * 
+     * note: the action is not guarded against overshooting
+     *  at the end of the model!
      */
     public void interactiveScrollPathToVisible() {
-        
-        final JXFrame container = new JXFrame();
-        final ComponentTreeTableModel model = new ComponentTreeTableModel(container);
+        // PENDING: FileSystemModel throws occasional NPE on getChildCount()
+        final TreeTableModel model = new FileSystemModel();
         final JXTreeTable table = new JXTreeTable(model);
         table.setColumnControlVisible(true);
         final JXTree tree = new JXTree(model);
         Action action = new AbstractAction("path visible") {
 
             public void actionPerformed(ActionEvent e) {
-                TreePath path = model.getPathToRoot(container.getContentPane());
+                Rectangle visible = table.getVisibleRect();
+                int lastRow = table.rowAtPoint(new Point(5, visible.y + visible.height + 100));
+                TreePath path = table.getPathForRow(lastRow);
+                Object last = path.getLastPathComponent();
+                 while (model.isLeaf(last) || model.getChildCount(last) == 0) {
+                    lastRow++;
+                    path = table.getPathForRow(lastRow);
+                    last = path.getLastPathComponent();
+                }
+                // we have a node with children
+                int childCount = model.getChildCount(last); 
+                Object lastChild = model.getChild(last, childCount - 1); 
+                path = path.pathByAddingChild(lastChild);
                 table.scrollPathToVisible(path);
                 tree.scrollPathToVisible(path);
                 
             }
-            
         };
         JXFrame frame = wrapWithScrollingInFrame(table, tree, "compare scrollPathtovisible");
         addAction(frame, action);

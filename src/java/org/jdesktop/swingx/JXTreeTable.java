@@ -1087,10 +1087,11 @@ public class JXTreeTable extends JXTable {
      *          bring into view
      */
     public void scrollPathToVisible(TreePath path) {
-        if (path == null) return;
-        renderer.makeVisible(path);
-        int row = getRowForPath(path);
-        scrollRowToVisible(row);
+        renderer.scrollPathToVisible(path);
+//        if (path == null) return;
+//        renderer.makeVisible(path);
+//        int row = getRowForPath(path);
+//        scrollRowToVisible(row);
     }
 
     
@@ -2152,6 +2153,12 @@ public class JXTreeTable extends JXTable {
                 }
                 
             };
+        }
+
+        
+        @Override
+        public void scrollRectToVisible(Rectangle aRect) {
+            treeTable.scrollRectToVisible(aRect);
         }
 
         @Override
