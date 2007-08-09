@@ -112,7 +112,7 @@ public class JXTitledPanel extends JXPanel {
      * @param title
      */
     public JXTitledPanel(String title) {
-        this(title, new JXPanel());
+        this(title, createDefaultContainer());
     }
 
     /**
@@ -303,6 +303,14 @@ public class JXTitledPanel extends JXPanel {
         Color old = getTitleForeground();
         this.titleForeground = titleForeground;
         firePropertyChange("titleForeground", old, getTitleForeground());
+    }
+    
+    private static Container createDefaultContainer() {
+        //TODO: All this default container creation stuff should be in the UI
+        //delegate. Not enough time at the moment for me to do this right.
+        JXPanel p = new JXPanel();
+        p.setOpaque(false);
+        return p;
     }
 
 }
