@@ -318,6 +318,8 @@ public class JXPanel extends JPanel implements Scrollable {
     @Override
     protected void paintComponent(Graphics g) {
         if(backgroundPainter != null) {
+            if (isOpaque()) super.paintComponent(g);
+            
             Graphics2D g2 = (Graphics2D)g.create();
             // account for the insets
             if(isPaintBorderInsets()) {
