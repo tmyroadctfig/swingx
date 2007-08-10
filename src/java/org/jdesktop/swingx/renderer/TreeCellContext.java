@@ -10,6 +10,7 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.plaf.basic.BasicGraphicsUtils;
+import javax.swing.tree.TreePath;
 
 /**
  * Tree specific cellContext.
@@ -34,6 +35,17 @@ public class TreeCellContext extends CellContext<JTree> {
     /** the border around a focused node. */
     private Border treeFocusBorder;
 
+//------------------- accessors for derived state
+    
+    /**
+     * Returns the treePath for the row or null if invalid.
+     * 
+     */
+    public TreePath getTreePath() {
+        if (getComponent() == null) return null;
+        if ((row < 0) || (row >= getComponent().getRowCount())) return null;
+        return getComponent().getPathForRow(row);
+    }
     /**
      * {@inheritDoc}
      * <p>
