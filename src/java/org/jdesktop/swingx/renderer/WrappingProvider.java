@@ -8,6 +8,7 @@ import javax.swing.BorderFactory;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jdesktop.swingx.RolloverRenderer;
+import org.jdesktop.swingx.treetable.AbstractMutableTreeTableNode;
 
 
 /**
@@ -84,6 +85,10 @@ public class WrappingProvider extends
         Object oldValue = context.getValue();
         if (oldValue instanceof DefaultMutableTreeNode) {
             context.value = ((DefaultMutableTreeNode) oldValue).getUserObject();
+        } else if (oldValue instanceof AbstractMutableTreeTableNode) {
+            AbstractMutableTreeTableNode node = (AbstractMutableTreeTableNode) oldValue;
+            context.value = node.getUserObject();
+            
         }
         return oldValue;
     }

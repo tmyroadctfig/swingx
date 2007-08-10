@@ -6,7 +6,9 @@ package org.jdesktop.swingx.renderer;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.ComponentOrientation;
+import java.awt.Rectangle;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -95,6 +97,24 @@ public class WrappingIconPanel extends JXPanel {
         if (delegate != null) {
             delegate.setForeground(bg);
         }
+    }
+
+
+    /**
+     * @return
+     */
+    public Icon getIcon() {
+        return iconLabel.getIcon();
+    }
+
+
+
+    /**
+     * @return
+     */
+    public Rectangle getDelegateBounds() {
+        if (delegate == null) return null;
+        return delegate.getBounds();
     }
     
     

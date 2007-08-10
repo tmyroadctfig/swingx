@@ -38,9 +38,16 @@ public class ComponentTreeTableModel extends AbstractTreeTableModel {
         modelSupport.fireNewRoot();
     }
     
+    
     //  ------------------TreeModel
     
     
+    @Override
+    public Container getRoot() {
+        // TODO Auto-generated method stub
+        return (Container) super.getRoot();
+    }
+
     public Object getChild(Object parent, int index) {
         return ((Container) parent).getComponent(index);
     }
