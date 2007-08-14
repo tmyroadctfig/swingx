@@ -16,7 +16,7 @@ import org.jdesktop.swingx.error.ErrorInfo;
  *
  * @author rah003
  */
-public class JXErrorPaneVisualCheck extends JXEditorPaneTest {
+public class JXErrorPaneVisualCheck extends InteractiveTestCase {
 
     public static void main(String[] args) throws Exception {
       JXErrorPaneVisualCheck test = new JXErrorPaneVisualCheck();
