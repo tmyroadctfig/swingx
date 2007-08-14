@@ -561,6 +561,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
             this.errorMessage.setContentType("text/plain");
         }
         this.errorMessage.setText(errorMessage);
+        this.errorMessage.setCaretPosition(0);
     }
 
     /**
