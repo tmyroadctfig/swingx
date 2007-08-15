@@ -26,8 +26,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -37,12 +37,13 @@ import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.UIManager;
+import javax.swing.text.DefaultFormatterFactory;
 
 import org.jdesktop.swingx.calendar.DateUtils;
 
 /**
- * Known issues of <code>JXDatePicker</code>.
+ * Known issues of <code>JXDatePicker</code> and picker related 
+ * formats.
  * 
  * @author Jeanette Winzenburg
  */
@@ -173,73 +174,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     
 //-------------------- unit tests
     
-    /**
-     * Issue #584-swingx: need to clarify null handling.
-     * 
-     * Forum report: NPE under certain initial conditions.
-     * 
-     */
-    public void testPickerFormatSet() {
-        JXDatePicker picker = new JXDatePicker();
-        picker.setDate(null);
-        picker.setFormats((new DateFormat[]{}));
-        picker.getPreferredSize();
-    }
     
-    /**
-     * Issue #584-swingx: need to clarify null handling.
-     * 
-     * Forum report: NPE under certain initial conditions.
-     * 
-     */
-    public void testPickerFormatGet() {
-        JXDatePicker picker = new JXDatePicker();
-        picker.setDate(null);
-        picker.setFormats((DateFormat[])null);
-        assertNotNull(picker.getFormats());
-    }
-
-    
-    /**
-     * Issue #584-swingx: need to clarify null handling.
-     * 
-     * 
-     */
-    public void testPickerFormatterDefault() {
-        JXDatePickerFormatter picker = new JXDatePickerFormatter();
-        assertNotNull(picker.getFormats());
-        assertEquals(3, picker.getFormats().length);
-    }
-
-    /**
-     * Issue #584-swingx: need to clarify null handling.
-     * 
-     * here: picker formatter guarantee not-null format array.
-     * 
-     */
-    public void testPickerFormatterConstructor() {
-        JXDatePickerFormatter picker = new JXDatePickerFormatter(null);
-        assertNotNull(picker.getFormats());
-        assertEquals(3, picker.getFormats().length);
-    }
-
-
-    /**
-     * Issue #584-swingx: need to clarify null handling.
-     * 
-     * here: picker formatter must protect itself against null formats.
-     * 
-     */
-    public void testPickerFormatterValueToString() {
-        JXDatePickerFormatter picker = new JXDatePickerFormatter(null);
-        try {
-            picker.stringToValue("unparseble");
-        } catch (ParseException e) {
-            // expected
-        }
-        // other exceptions are unexpected ...
-    }
-
     /**
      * test that selectionListener is uninstalled.
      * 

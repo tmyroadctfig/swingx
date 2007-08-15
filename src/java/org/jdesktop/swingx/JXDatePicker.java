@@ -94,6 +94,8 @@ public class JXDatePicker extends JComponent {
     /** action key for commit home action */
     public static final String HOME_COMMIT_KEY = "commitHome";
 
+    private static final DateFormat[] EMPTY_DATE_FORMATS = new DateFormat[0];
+
     /**
      * The editable date field that displays the date
      */
@@ -274,16 +276,25 @@ public class JXDatePicker extends JComponent {
 
     /**
      * Replaces the currently installed formatter and factory used by the
-     * editor.  These string formats are defined by the
+     * editor. These string formats are defined by the
      * <code>java.text.SimpleDateFormat</code> class.
-     *
-     * @param formats The string formats to use.
+     * 
+     * @param formats zero or more not null string formats to use. Note that a 
+     *    null array is allowed and resets the formatter to use the 
+     *    localized default formats.
+     * @throws NullPointerException any array element is null.
      * @see java.text.SimpleDateFormat
      */
     public void setFormats(String... formats) {
-        DateFormat[] dateFormats = new DateFormat[formats.length];
-        for (int counter = formats.length - 1; counter >= 0; counter--) {
-            dateFormats[counter] = new SimpleDateFormat(formats[counter]);
+        DateFormat[] dateFormats = null;
+        if (formats !=  null) {
+            Contract.asNotNull(formats,
+                    "the array of format strings must not "
+                            + "must not contain null elements");
+            dateFormats = new DateFormat[formats.length];
+            for (int counter = formats.length - 1; counter >= 0; counter--) {
+                dateFormats[counter] = new SimpleDateFormat(formats[counter]);
+            }
         }
         setFormats(dateFormats);
     }
@@ -292,9 +303,15 @@ public class JXDatePicker extends JComponent {
      * Replaces the currently installed formatter and factory used by the
      * editor.
      *
-     * @param formats The date formats to use.
+     * @param formats zero or more not null formats to use. Note that a 
+     *    null array is allowed and resets the formatter to use the 
+     *    localized default formats.
+     * @throws NullPointerException any of its elements is null.
      */
     public void setFormats(DateFormat... formats) {
+        if (formats != null)
+        Contract.asNotNull(formats, "the array of formats " +
+                        "must not contain null elements");
         DateFormat[] old = getFormats();
         _dateField.setFormatterFactory(new DefaultFormatterFactory(
                 new JXDatePickerFormatter(formats)));
@@ -308,7 +325,7 @@ public class JXDatePicker extends JComponent {
      * and <code>javax.swing.text.DefaultFormatter</code> do not have
      * support for accessing the formats used.
      *
-     * @return array of formats or null if unavailable.
+     * @return array of formats guaranteed to be not null, but might be empty.
      */
     public DateFormat[] getFormats() {
         // Dig this out from the factory, if possible, otherwise return null.
@@ -319,7 +336,7 @@ public class JXDatePicker extends JComponent {
                 return ((JXDatePickerFormatter) formatter).getFormats();
             }
         }
-        return null;
+        return EMPTY_DATE_FORMATS;
     }
 
     /**

@@ -40,6 +40,7 @@ import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
+import javax.swing.text.DefaultFormatterFactory;
 
 import junit.framework.TestCase;
 
@@ -66,6 +67,189 @@ public class JXDatePickerTest extends TestCase {
 
     public void teardown() {
     }
+
+    /**
+     * Issue #584-swingx: need to clarify null handling.
+     * 
+     * Forum report: NPE under certain initial conditions.
+     * 
+     */
+    public void testPickerFormatSetFormats() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.setFormats((DateFormat[])null);
+    }
+
+    /**
+     * Issue #584-swingx: need to clarify null handling.
+     * 
+     * Forum report: NPE under certain initial conditions.
+     * 
+     */
+    public void testPickerFormatSetFormatsNullElements() {
+        JXDatePicker picker = new JXDatePicker();
+        try {
+            picker.setFormats(new DateFormat[] { null});
+            fail("must not accept null elements in format array");
+        } catch (NullPointerException e) {
+            // doc'ed behaviour
+        }
+    }
+
+    /**
+     * Issue #584-swingx: need to clarify null handling.
+     * 
+     * Forum report: NPE under certain initial conditions.
+     * 
+     */
+    public void testPickerFormatSetFormatStrings() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.setFormats((String[])null);
+    }
+    
+    /**
+     * Issue #584-swingx: need to clarify null handling.
+     * 
+     * Forum report: NPE under certain initial conditions.
+     * 
+     */
+    public void testPickerFormatSetFormatStringsNullElements() {
+        JXDatePicker picker = new JXDatePicker();
+        try {
+            picker.setFormats(new String[] {null});
+            fail("must not accept null elements in format array");
+        } catch (NullPointerException e) {
+            // doc'ed behaviour
+        }
+    }
+    /**
+     * Issue #584-swingx: need to clarify null handling.
+     * 
+     * Forum report: NPE under certain initial conditions.
+     * This produced exactly the stacktrace as reported.
+     * 
+     */
+    public void testPickerFormatsNotNull() {
+        JXDatePicker picker = new JXDatePicker();
+        // trick the picker - no formats
+        picker.getEditor().setFormatterFactory(new DefaultFormatterFactory(
+                new JXDatePickerFormatter(null)));
+        assertNotNull("picker format array must not be null", 
+                picker.getFormats());
+    }
+
+    /**
+     * Issue #584-swingx: need to clarify null handling.
+     * 
+     * 
+     */
+    public void testPickerFormatsNotNullUnknownFormatter() {
+        JXDatePicker picker = new JXDatePicker();
+        // trick the picker - no formats
+        picker.getEditor().setFormatterFactory(new DefaultFormatterFactory());
+        assertNotNull("picker format array must not be null", 
+                picker.getFormats());
+    }
+
+
+    /**
+     * Issue #584-swingx: need to clarify null handling.
+     * 
+     * here: test formatter constructor with empty formats array
+     * 
+     */
+    public void testPickerFormatterEmptyFormats() {
+        DateFormat[] formats = new DateFormat[0];
+        JXDatePickerFormatter formatter = new JXDatePickerFormatter(formats);
+        assertNotNull(formatter.getFormats());
+        assertEquals(formats.length, formatter.getFormats().length);
+    }
+
+    /**
+     * Issue #584-swingx: need to clarify null handling.
+     * 
+     * here: test formatter constructor with formats array contain
+     * null
+     * 
+     */
+    public void testPickerFormatterConstructorWithNullFormats() {
+        DateFormat[] formats = new DateFormat[] { null };
+        try {
+            new JXDatePickerFormatter(formats);
+            fail("constructor must throw NPE if array contains null formats");
+        } catch (NullPointerException e) {
+            // doc'ed behaviour
+        }
+    }
+    
+    /**
+     * Issue #584-swingx: need to clarify null handling.
+     * 
+     * here: test default constructor
+     * 
+     */
+    public void testPickerFormatterDefaultConstructor() {
+        JXDatePickerFormatter formatter = new JXDatePickerFormatter();
+        assertNotNull(formatter.getFormats());
+        assertEquals(3, formatter.getFormats().length);
+    }
+
+    /**
+     * Issue #584-swingx: need to clarify null handling.
+     * 
+     * here: test constructor with null parameter has same defaults
+     *   as parameterless
+     * 
+     */
+    public void testPickerFormatterConstructorWithParameterNull() {
+        JXDatePickerFormatter defaultFormatter = new JXDatePickerFormatter();
+        DateFormat[] defaultFormats = defaultFormatter.getFormats();
+        JXDatePickerFormatter formatter = new JXDatePickerFormatter(null);
+        DateFormat[] formats = formatter.getFormats();
+        assertNotNull("formats must not be null", formats);
+        assertEquals(defaultFormats.length, formats.length);
+        for (int i = 0; i < defaultFormats.length; i++) {
+            assertEquals("format must be equals to default at " + i, 
+                    defaultFormats[i], formats[i]);
+        }
+    }
+    
+
+
+    /**
+     * Issue #584-swingx: need to clarify null handling.
+     * 
+     * here: picker formatter must protect itself against 
+     *   empty formats.
+     * 
+     */
+    public void testPickerFormatterEmptyValueToString() {
+        JXDatePickerFormatter picker = new JXDatePickerFormatter(
+                new DateFormat[0]);
+        try {
+            picker.valueToString(new Date());
+        } catch (ParseException e) {
+            // doc'ed - but there is no parsing involved?
+        }
+        // other exceptions are unexpected ...
+    }
+
+    /**
+     * Issue #584-swingx: need to clarify null handling.
+     * 
+     * here: picker formatter must protect itself against empty formats.
+     * 
+     */
+    public void testPickerFormatterEmptyStringToValue() {
+        JXDatePickerFormatter picker = new JXDatePickerFormatter(new DateFormat[0]);
+        try {
+            picker.stringToValue("unparseble");
+        } catch (ParseException e) {
+            // expected
+        }
+        // other exceptions are unexpected ...
+    }
+    
+    
 
     /**
      * Issue #572-swingx: monthView must show linkDate on empty selection.
