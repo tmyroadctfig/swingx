@@ -38,4 +38,38 @@ public class JXErrorPaneVisualCheck extends InteractiveTestCase {
                 null, new Exception(), Level.SEVERE, null);
         JXErrorPane.showDialog(null,errorInfo );
     }
+    
+    /**
+     * Issue #468-swingx: JXErrorPane can't cope with null errorInfo.
+     *
+     */
+    public void interactiveNPEWithDefaultErrorInfo() {
+        JXErrorPane errorPane = new JXErrorPane();
+        JXErrorPane.showDialog(null, errorPane);
+    }
+    
+    /**
+     * Issue #468-swingx: JXErrorPane can't cope with null errorInfo.
+     *
+     */
+    public void interactiveSetNullErrorInfo() {
+        JXErrorPane errorPane = new JXErrorPane();
+        try {
+            errorPane.setErrorInfo(null);
+            fail("Failed to fail while setting null ErrorInfo");
+        } catch (NullPointerException e) {
+            assertEquals("Unexpected error message", "ErrorInfo can\'t be null. Provide valid ErrorInfo object.", e.getMessage());
+            // ignore - expected.
+        }
+    }
+    
+    /**
+     * Issue #467-swingx: calling updateUI throws error.
+     *
+     */
+    public void interactiveUpdateUI() {
+        final JXErrorPane errorPane = new JXErrorPane();
+        errorPane.updateUI();
+    }
+
 }

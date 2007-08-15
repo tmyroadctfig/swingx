@@ -21,7 +21,6 @@
  */
 package org.jdesktop.swingx;
 
-import org.jdesktop.swingx.error.ErrorInfo;
 
 /**
  * Test to expose known issues around <code>JXError*</code>.
@@ -54,25 +53,6 @@ public class JXErrorPaneIssues extends InteractiveTestCase {
      */
     public void interactiveNoDetails() {
         JXErrorPane.showDialog(new NullPointerException("something to show"));
-    }
-    /**
-     * Issue #468-swingx: JXErrorPane can't cope with null errorInfo.
-     *
-     */
-    public void interactiveNPEWithNullErrorInfo() {
-        JXErrorPane errorPane = new JXErrorPane();
-        JXErrorPane.showDialog(null, errorPane);
-    }
-    
-    /**
-     * Issue #467-swingx: calling updateUI throws error.
-     *
-     */
-    public void interactiveUpdateUI() {
-        final JXErrorPane errorPane = new JXErrorPane();
-        // work around issue #468-swingx: errorPane must cope with null errorInfo.
-        errorPane.setErrorInfo(new ErrorInfo("title", "xxxx-yyy", null, null, null, null, null));
-        errorPane.updateUI();
     }
 
     /**

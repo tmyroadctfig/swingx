@@ -164,6 +164,7 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  * @author Richard Bair
  * @author Alexander Zuev
  * @author Shai Almog
+ * @author rah003
  */
 public class JXErrorPane extends JComponent {
     //---------------------------------------------------- static properties
@@ -192,7 +193,7 @@ public class JXErrorPane extends JComponent {
      * ErrorInfo that contains all the information prepared for
      * reporting.
      */
-    private ErrorInfo errorInfo;
+    private ErrorInfo errorInfo = new ErrorInfo("Error", "Normally this place contains problem description.\n You see this text because one of the following reasons:\n * Either it is a test\n * Developer have not provided error details\n * This error message was invoked unexpectedly and there are no more details available", null, null, null, null, null);
     /**
      * The Icon to use, regardless of the error message. The UI delegate is
      * responsible for setting this icon, if the developer has not specified
@@ -264,11 +265,14 @@ public class JXErrorPane extends JComponent {
     //-------------------------------------------- public methods/properties
     
     /**
-     * Sets the ErrorInfo for this dialog
+     * Sets the ErrorInfo for this dialog. ErrorInfo can't be null.
      *
-     * @param info ErrorInfo that incorporates all the details about the error
+     * @param info ErrorInfo that incorporates all the details about the error. Null value is not supported.
      */
     public void setErrorInfo(ErrorInfo info) {
+        if (info == null) {
+            throw new NullPointerException("ErrorInfo can't be null. Provide valid ErrorInfo object.");
+        }
         ErrorInfo old = this.errorInfo;
         this.errorInfo = info;
         firePropertyChange("errorInfo", old, this.errorInfo);
