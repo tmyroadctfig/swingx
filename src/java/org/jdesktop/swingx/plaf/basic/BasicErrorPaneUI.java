@@ -68,6 +68,8 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.UIResource;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.StyledEditorKit;
+
 import org.jdesktop.swingx.JXEditorPane;
 import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.action.AbstractActionExt;
@@ -260,6 +262,9 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
         errorMessage = new JEditorPane();
         errorMessage.setEditable(false);
         errorMessage.setContentType("text/html");
+        errorMessage.setEditorKit(new StyledEditorKit());
+        
+        System.out.println("Doc:" + errorMessage.getDocument());
         errorMessage.setOpaque(false);
         errorMessage.putClientProperty(JXEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 
