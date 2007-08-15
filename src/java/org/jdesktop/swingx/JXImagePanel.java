@@ -190,6 +190,9 @@ public class JXImagePanel extends JXPanel {
             if (width == -1 || height == -1) {
                 return super.getPreferredSize();
             }
+            Insets insets = getInsets();
+            width += insets.left + insets.right;
+            height += insets.top + insets.bottom;
             return new Dimension(width, height);
         } else {
             return super.getPreferredSize();
