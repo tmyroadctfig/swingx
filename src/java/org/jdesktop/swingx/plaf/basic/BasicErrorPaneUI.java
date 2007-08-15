@@ -69,6 +69,7 @@ import javax.swing.plaf.UIResource;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.StyledEditorKit;
+import javax.swing.text.html.HTMLEditorKit;
 
 import org.jdesktop.swingx.JXEditorPane;
 import org.jdesktop.swingx.JXErrorPane;
@@ -83,6 +84,7 @@ import org.jdesktop.swingx.util.WindowUtils;
  * Base implementation of the <code>JXErrorPane</code> UI.
  *
  * @author rbair
+ * @author rah003
  */
 public class BasicErrorPaneUI extends ErrorPaneUI {
     /**
@@ -262,9 +264,9 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
         errorMessage = new JEditorPane();
         errorMessage.setEditable(false);
         errorMessage.setContentType("text/html");
-        errorMessage.setEditorKit(new StyledEditorKit());
-        
-        System.out.println("Doc:" + errorMessage.getDocument());
+        errorMessage.setEditorKitForContentType("text/plain", new StyledEditorKit());
+        errorMessage.setEditorKitForContentType("text/html", new HTMLEditorKit());
+
         errorMessage.setOpaque(false);
         errorMessage.putClientProperty(JXEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 
@@ -966,6 +968,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
                 //set a temp editor to a certain size, just to determine what its
                 //pref height is
                 dummy.setContentType(errorMessage.getContentType());
+                dummy.setEditorKit(errorMessage.getEditorKit());
                 dummy.setText(errorMessage.getText());
                 dummy.setSize(prefWidth, 20);
                 int errorMessagePrefHeight = dummy.getPreferredSize().height;
@@ -1011,7 +1014,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
                 dim = dummy.getPreferredSize();
                 int spx = x;
                 int spy = y;
-                Dimension spDim = dim;
+                Dimension spDim = new Dimension (parent.getWidth() - leftEdge - insets.right, dim.height);
                 y += dim.height + 10;
                 int rightEdge = parent.getWidth() - insets.right;
                 x = rightEdge;
