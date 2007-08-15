@@ -13,6 +13,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 import junit.framework.Assert;
@@ -60,7 +61,27 @@ public final class TestUtils extends Assert {
         assertEquals("last old value", oldValue, report.getLastOldValue());
         assertEquals("last old value", newValue, report.getLastNewValue());
     }
+
+    /**
+     * Asserts the last received propertyChangeEvent of the 
+     * report against the expected values (arrays).
+     * 
+     * @param report the PropertyReport which received the event
+     * @param property the expected name of the property
+     * @param oldValue the expected old aray value 
+     * @param newValue the expected new array value
+     */
+    public static void assertPropertyChangeEvent(PropertyChangeReport report, String property, Object[] oldValue, Object[] newValue) {
+        if (report.getEventCount() > 1) {
+            LOG.info("events: " + report.getEventNames());
+        }
+        assertEquals("exactly one event", 1, report.getEventCount());
+        assertEquals("property", property, report.getLastProperty());
+        assertTrue("last old array value", Arrays.equals(oldValue, (Object[]) report.getLastOldValue()));
+        assertTrue("last new array value", Arrays.equals(newValue, (Object[])report.getLastNewValue()));
+    }
     
+
     /**
      * Asserts the last received propertyChangeEvent of the 
      * report against the expected values.

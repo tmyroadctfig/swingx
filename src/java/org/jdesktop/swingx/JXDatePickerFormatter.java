@@ -20,14 +20,19 @@
  */
 package org.jdesktop.swingx;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Logger;
+
 import javax.swing.JFormattedTextField;
 import javax.swing.UIManager;
 
+import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.util.Contract;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.text.ParseException;
 
 /**
  * Default formatter for the JXDatePicker component.  
@@ -37,6 +42,9 @@ import java.text.ParseException;
  */
 public class JXDatePickerFormatter extends
         JFormattedTextField.AbstractFormatter {
+    
+    private static final Logger LOG = Logger
+            .getLogger(JXDatePickerFormatter.class.getName());
     private DateFormat _formats[] = null;
 
     /**
@@ -75,13 +83,15 @@ public class JXDatePickerFormatter extends
     }
 
     /**
-     * PENDING: return defensive copy ...
+     * Returns an array of the formats used by this formatter.
      * 
      * @return the formats used by this formatter, guaranteed to be
      *   not null.
      */
     public DateFormat[] getFormats() {
-        return _formats;
+        DateFormat[] results = new DateFormat[_formats.length];
+        System.arraycopy(_formats, 0, results, 0, results.length);
+        return results;
     }
 
     /**
@@ -131,12 +141,32 @@ public class JXDatePickerFormatter extends
      * @return the localized default formats.
      */
     protected DateFormat[] createDefaultFormats() {
-        DateFormat[] formats;
-        formats = new DateFormat[3];
-        formats[0] = new SimpleDateFormat(UIManager.getString("JXDatePicker.longFormat"));
-        formats[1] = new SimpleDateFormat(UIManager.getString("JXDatePicker.mediumFormat"));
-        formats[2] = new SimpleDateFormat(UIManager.getString("JXDatePicker.shortFormat"));
-        return formats;
+        List<DateFormat> f = new ArrayList<DateFormat>();
+        addFormat(f, "JXDatePicker.longFormat");
+        addFormat(f, "JXDatePicker.mediumFormat");
+        addFormat(f, "JXDatePicker.shortFormat");
+        return f.toArray(new DateFormat[f.size()]);
+    }
+
+    /**
+     * Creates and adds a DateFormat to the given list. Looks up
+     * a format pattern registered in the UIManager for the given 
+     * key and tries to create a SimpleDateFormat. Does nothing
+     * if there is no format pattern registered or the pattern is
+     * invalid.
+     * 
+     * @param f the list of formats
+     * @param key the key for getting the pattern from the UI
+     */
+    private void addFormat(List<DateFormat> f, String key) {
+        String longFormat = UIManager.getString(key);
+        try {
+            SimpleDateFormat format = new SimpleDateFormat(longFormat);
+            f.add(format);
+        } catch (RuntimeException e) {
+            // format string  not available or invalid
+            LOG.finer("creating date format failed for key/pattern: " + key + "/" + longFormat);
+        }
     }
 
 

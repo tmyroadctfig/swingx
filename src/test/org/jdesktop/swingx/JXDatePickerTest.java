@@ -28,6 +28,7 @@ import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -213,6 +214,25 @@ public class JXDatePickerTest extends TestCase {
         }
     }
     
+    /**
+     * Issue #584-swingx: need to clarify null handling.
+     * 
+     * here: picker formatter must protect itself against 
+     *   null formats.
+     * 
+     */
+    public void testPickerFormatterUnsafeGetFormats() {
+        JXDatePickerFormatter picker = new JXDatePickerFormatter();
+        DateFormat[] formats = picker.getFormats();
+        formats[0] = null;
+        try {
+            picker.valueToString(new Date());
+        } catch (ParseException e) {
+            // doc'ed - but there is no parsing involved?
+        }
+        // other exceptions are unexpected ...
+    }
+
 
 
     /**

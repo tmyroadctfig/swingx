@@ -36,21 +36,6 @@ public class SerializableIssues extends InteractiveTestCase {
 
     /**
      * Issue #423-swingx: all descendants of JComponent must be 
-     * serializable. <p>
-     * 
-     * Note: this blows as soon as a JXTable is set!
-     */
-    public void testDatePickerFormatter() {
-        JXDatePickerFormatter component = new JXDatePickerFormatter();
-        try {
-            SerializableSupport.serialize(component);
-        } catch (Exception e) {
-            fail("not serializable " + e);
-        } 
-    }
-
-    /**
-     * Issue #423-swingx: all descendants of JComponent must be 
      * serializable.
      * 
      * Regression after painter merge: JXPanel$1
