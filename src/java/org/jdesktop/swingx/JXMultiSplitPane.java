@@ -21,18 +21,23 @@
 
 package org.jdesktop.swingx;
 
-import org.jdesktop.swingx.MultiSplitLayout.Divider;
-import org.jdesktop.swingx.MultiSplitLayout.Node;
-import org.jdesktop.swingx.painter.AbstractPainter;
-
-import javax.accessibility.AccessibleContext;
-import javax.accessibility.AccessibleRole;
-import javax.swing.*;
-import javax.swing.event.MouseInputAdapter;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
+import javax.accessibility.AccessibleContext;
+import javax.accessibility.AccessibleRole;
+import javax.swing.JPanel;
+import javax.swing.event.MouseInputAdapter;
+import org.jdesktop.swingx.MultiSplitLayout.Divider;
+import org.jdesktop.swingx.MultiSplitLayout.Node;
+import org.jdesktop.swingx.painter.AbstractPainter;
+import org.jdesktop.swingx.painter.Painter;
 
 /**
  *
@@ -46,9 +51,10 @@ public class JXMultiSplitPane extends JPanel {
     private AccessibleContext accessibleContext = null;
     private boolean continuousLayout = true;
     private DividerPainter dividerPainter = new DefaultDividerPainter();
+    private Painter backgroundPainter;
 
     /**
-     * Creates a JXMultiSplitPane with it's LayoutManager set to 
+     * Creates a MultiSplitPane with it's LayoutManager set to 
      * to an empty MultiSplitLayout.
      */
     public JXMultiSplitPane() {
@@ -60,13 +66,11 @@ public class JXMultiSplitPane extends JPanel {
 	setFocusable(true);
     }
 
-    /**
-     * 
+    /** 
      * A convenience method that returns the layout manager cast 
      * to MutliSplitLayout.
      * 
-     * 
-     * @return this JXMultiSplitPane's layout manager
+     * @return this MultiSplitPane's layout manager
      * @see java.awt.Container#getLayout
      * @see #setModel
      */
@@ -121,9 +125,9 @@ public class JXMultiSplitPane extends JPanel {
      * @see #isContinuousLayout
      */
     public void setContinuousLayout(boolean continuousLayout) {
-        boolean oldContinuousLayout = isContinuousLayout();
+        boolean oldContinuousLayout = continuousLayout;
         this.continuousLayout = continuousLayout;
-        firePropertyChange("continuousLayout", oldContinuousLayout, isContinuousLayout());
+        firePropertyChange("continuousLayout", oldContinuousLayout, continuousLayout);
     }
 
     /**
@@ -151,27 +155,25 @@ public class JXMultiSplitPane extends JPanel {
     /**
      * Draws a single Divider.  Typically used to specialize the
      * way the active Divider is painted.  
-     *
-     * @see JXMultiSplitPane#getDividerPainter
-     * @see JXMultiSplitPane#setDividerPainter
+     * 
+     * @see #getDividerPainter
+     * @see #setDividerPainter
      */
     public static abstract class DividerPainter extends AbstractPainter<Divider> {
     }
 
     private class DefaultDividerPainter extends DividerPainter {
-        public void doPaint(Graphics2D g, Divider divider, int width, int height) {
-            if ((divider == activeDivider()) && !isContinuousLayout()) {
-                g.setColor(Color.black);
-                g.fillRect(0, 0, width, height);
-            }
-        }
+	public void doPaint(Graphics2D g, Divider divider, int width, int height) {
+	    if ((divider == activeDivider()) && !isContinuousLayout()) {
+		g.setColor(Color.black);
+		g.fillRect(0, 0, width, height);
+	    }
+	}
     }
 
-    /**
-     * 
-     * The DividerPainter that's used to paint Dividers on this JXMultiSplitPane.
+    /** 
+     * The DividerPainter that's used to paint Dividers on this MultiSplitPane.
      * This property may be null.
-     * 
      * 
      * @return the value of the dividerPainter Property
      * @see #setDividerPainter
@@ -180,16 +182,14 @@ public class JXMultiSplitPane extends JPanel {
 	return dividerPainter;
     }
 
-    /**
-     * 
+    /** 
      * Sets the DividerPainter that's used to paint Dividers on this 
-     * JXMultiSplitPane.  The default DividerPainter only draws
+     * MultiSplitPane.  The default DividerPainter only draws
      * the activeDivider (if there is one) and then, only if 
      * continuousLayout is false.  The value of this property is 
      * used by the paintChildren method: Dividers are painted after
-     * the JXMultiSplitPane's children have been rendered so that 
+     * the MultiSplitPane's children have been rendered so that 
      * the activeDivider can appear "on top of" the children.
-     * 
      * 
      * @param dividerPainter the value of the dividerPainter property, can be null
      * @see #paintChildren
@@ -200,6 +200,73 @@ public class JXMultiSplitPane extends JPanel {
     }
 
     /**
+     * Calls the UI delegate's paint method, if the UI delegate
+     * is non-<code>null</code>.  We pass the delegate a copy of the
+     * <code>Graphics</code> object to protect the rest of the
+     * paint code from irrevocable changes
+     * (for example, <code>Graphics.translate</code>).
+     * <p>
+     * If you override this in a subclass you should not make permanent
+     * changes to the passed in <code>Graphics</code>. For example, you
+     * should not alter the clip <code>Rectangle</code> or modify the
+     * transform. If you need to do these operations you may find it
+     * easier to create a new <code>Graphics</code> from the passed in
+     * <code>Graphics</code> and manipulate it. Further, if you do not
+     * invoker super's implementation you must honor the opaque property,
+     * that is
+     * if this component is opaque, you must completely fill in the background
+     * in a non-opaque color. If you do not honor the opaque property you
+     * will likely see visual artifacts.
+     * <p>
+     * The passed in <code>Graphics</code> object might
+     * have a transform other than the identify transform
+     * installed on it.  In this case, you might get
+     * unexpected results if you cumulatively apply
+     * another transform.
+     *
+     * @param g the <code>Graphics</code> object to protect
+     * @see #paint
+     * @see ComponentUI
+     */
+    protected void paintComponent(Graphics g)
+    {
+      if (backgroundPainter != null) {
+          Graphics2D g2 = (Graphics2D)g.create();
+          Insets ins = this.getInsets();
+          g2.translate(ins.left, ins.top);
+          backgroundPainter.paint(g2, this, 
+                  this.getWidth()  - ins.left - ins.right,
+                  this.getHeight() - ins.top  - ins.bottom);
+          g2.dispose();
+      } else {
+          super.paintComponent(g);
+      }
+    }
+    
+    /**
+     * Specifies a Painter to use to paint the background of this JXPanel.
+     * If <code>p</code> is not null, then setOpaque(false) will be called
+     * as a side effect. A component should not be opaque if painters are
+     * being used, because Painters may paint transparent pixels or not
+     * paint certain pixels, such as around the border insets.
+     */
+    public void setBackgroundPainter(Painter p)
+    {
+        Painter old = getBackgroundPainter();
+        this.backgroundPainter = p;
+        
+        if (p != null) {
+            setOpaque(false);
+        }
+        
+        firePropertyChange("backgroundPainter", old, getBackgroundPainter());
+        repaint();
+    }
+    
+    public Painter getBackgroundPainter() {
+        return backgroundPainter;
+    }    
+    /**
      * Uses the DividerPainter (if any) to paint each Divider that
      * overlaps the clip Rectangle.  This is done after the call to
      * <code>super.paintChildren()</code> so that Dividers can be 
@@ -208,21 +275,23 @@ public class JXMultiSplitPane extends JPanel {
      * {@inheritDoc}
      */
     protected void paintChildren(Graphics g) {
-        super.paintChildren(g);
-        DividerPainter dp = getDividerPainter();
-        Rectangle clipR = g.getClipBounds();
-        if ((dp != null) && (clipR != null)) {
-            Graphics dpg = g.create();
-            try {
-                MultiSplitLayout msl = getMultiSplitLayout();
-                for(Divider divider : msl.dividersThatOverlap(clipR)) {
-                    Rectangle bounds = divider.getBounds();
-                    dp.paint((Graphics2D)dpg, divider, (int)bounds.getWidth(), (int)bounds.getHeight());
-                }
-            } finally {
-                dpg.dispose();
+      super.paintChildren(g);
+      DividerPainter dp = getDividerPainter();
+      Rectangle clipR = g.getClipBounds();
+      if ((dp != null) && (clipR != null)) {
+        Graphics dpg = g.create();
+        try {
+          MultiSplitLayout msl = getMultiSplitLayout();
+          if ( msl.hasModel()) {
+            for(Divider divider : msl.dividersThatOverlap(clipR)) {
+              Rectangle bounds = divider.getBounds();
+              dp.paint((Graphics2D)dpg, divider, bounds.width, bounds.height );
             }
-	    }
+          }
+        } finally {
+          dpg.dispose();
+        }
+      }
     }
 
     private boolean dragUnderway = false;
