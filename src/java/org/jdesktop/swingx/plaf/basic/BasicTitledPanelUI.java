@@ -174,6 +174,7 @@ public class BasicTitledPanelUI extends TitledPanelUI {
         topPanel.setBackgroundPainter(titledPanel.getTitlePainter());
         topPanel.setBorder(BorderFactory.createEmptyBorder());
         topPanel.setLayout(new GridBagLayout());
+        topPanel.setOpaque(false);
         return topPanel;
     }
     
