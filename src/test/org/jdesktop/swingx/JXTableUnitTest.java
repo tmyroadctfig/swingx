@@ -2945,6 +2945,33 @@ public class JXTableUnitTest extends InteractiveTestCase {
         return model;
     }
     
+    /**
+     * quick check if overriding sortOnChange prevents auto-resort.
+     *
+     */
+    public void testSortOnChange() {
+        JXTable table = new JXTable(createAscendingModel(0, 10)) {
+
+            @Override
+            protected boolean shouldSortOnChange(TableModelEvent e) {
+                if (isUpdate(e)) {
+                    return false;
+                }
+                return super.shouldSortOnChange(e);
+            }
+            
+        };
+        // sort ascending
+        table.toggleSortOrder(0);
+        Integer first = (Integer) table.getValueAt(0, 0);
+        Integer second = (Integer) table.getValueAt(1, 0);
+        // sanity
+        assertTrue(first.intValue() < second.intValue());
+        int high = first.intValue() + 100;
+        // set a high value
+        table.setValueAt(high, 0, 0);
+        assertEquals("sort should not update after", high, table.getValueAt(0, 0));
+    }
     
 
     /**

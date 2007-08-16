@@ -1458,7 +1458,9 @@ public class JXTable extends JTable
         } finally {
             getSelectionMapper().setEnabled(wasEnabled);
         }
-        use(filters);
+        if (shouldSortOnChange(e)) {
+             use(filters);
+        }
         if (isStructureChanged(e)) {
             initializeColumnWidths();
             resetCalculatedScrollableSize(true);
@@ -1466,6 +1468,24 @@ public class JXTable extends JTable
     }
 
     
+    /**
+     * Returns a boolean to indicate whether the table should be
+     * resorted after receiving the given event. This implementation 
+     * returns true always. <p>
+     * 
+     * NOTE: this is a quick hack to give subclasses a hook to
+     * experiment with conditional keeping the view unsorted, f.i.
+     * after edits. It's untested ... and will not receive much
+     * work because in Mustang the DefaultRowSorter has the functionality.
+     * 
+     * @param e the event which might trigger a resort.
+     * @return a boolean indicating whether the event should 
+     *   trigger a re-sort, here true always.
+     */
+    protected boolean shouldSortOnChange(TableModelEvent e) {
+        return true;
+    }
+
     /**
      * reset model selection coordinates in SelectionMapper after
      * model events.
