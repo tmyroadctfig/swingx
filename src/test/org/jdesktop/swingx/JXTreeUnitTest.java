@@ -11,9 +11,12 @@ import java.util.Hashtable;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
+import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.JXTreeTableUnitTest.InsertTreeTableModel;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
@@ -39,6 +42,124 @@ public class JXTreeUnitTest extends InteractiveTestCase {
         super("JXTree Test");
     }
 
+    /**
+     * focus issues with popup in editors: tweak with 
+     * custom cellEditorListener.
+     *
+     */
+    public void testEditorListenerRemovedOnEditorStopped() {
+        JXTree tree = createEditingTree();
+        DefaultTreeCellEditor cellEditor = (DefaultTreeCellEditor) tree.getCellEditor();
+        // core doesn't remove the listener ... dooh
+        cellEditor.stopCellEditing();
+        // but we do ... 
+        assertEquals(1, cellEditor.getCellEditorListeners().length);
+    }
+
+
+    /**
+     * focus issues with popup in editors: tweak with 
+     * custom cellEditorListener.
+     *
+     */
+    public void testEditorListenerRemovedOnEditorCancel() {
+        JXTree tree = createEditingTree();
+        DefaultTreeCellEditor cellEditor = (DefaultTreeCellEditor) tree.getCellEditor();
+        // core doesn't remove the listener ... dooh
+        cellEditor.cancelCellEditing();
+        // but we do ... 
+        assertEquals(1, cellEditor.getCellEditorListeners().length);
+    }
+
+    /**
+     * focus issues with popup in editors: tweak with 
+     * custom cellEditorListener.
+     *
+     */
+    public void testEditorListenerRemovedOnTreeCancel() {
+        JXTree tree = createEditingTree();
+        DefaultTreeCellEditor cellEditor = (DefaultTreeCellEditor) tree.getCellEditor();
+        // core doesn't remove the listener ... dooh
+        tree.cancelEditing();
+        // but we do ... 
+        assertEquals(1, cellEditor.getCellEditorListeners().length);
+    }
+    
+    /**
+     * focus issues with popup in editors: tweak with 
+     * custom cellEditorListener.
+     *
+     */
+    public void testEditorListenerRemovedOnTreeStop() {
+        JXTree tree = createEditingTree();
+        DefaultTreeCellEditor cellEditor = (DefaultTreeCellEditor) tree.getCellEditor();
+        // core doesn't remove the listener ... dooh
+        tree.stopEditing();
+        // but we do ... 
+        assertEquals(1, cellEditor.getCellEditorListeners().length);
+    }
+
+    /**
+     * focus issues with popup in editors: tweak with 
+     * custom cellEditorListener.
+     *
+     */
+    public void testEditorListenerOnXTree() {
+        JTree core = new JTree();
+        int coreCount = getListenerCountAfterStartEditing(core);
+        JXTree tree = createEditingTree();
+        DefaultTreeCellEditor cellEditor = (DefaultTreeCellEditor) tree.getCellEditor();
+        assertEquals("need one more listener than core", 
+                coreCount + 1, cellEditor.getCellEditorListeners().length);
+    }
+    
+    /**
+     * @return a tree with default model and editing started on row 2
+     */
+    private JXTree createEditingTree() {
+        JXTree tree = new JXTree();
+        tree.setEditable(true);
+        // sanity
+        assertTrue(tree.getRowCount() > 2);
+        TreePath path = tree.getPathForRow(2);
+        tree.startEditingAtPath(path);
+        return tree;
+    }
+
+    /**
+     * characterization: listeners in core tree.
+     *
+     */
+    public void testEditorListenerOnCoreTree() {
+        JTree tree = new JTree();
+        int listenerCount = getListenerCountAfterStartEditing(tree);
+        assertEquals(1, listenerCount);
+        tree.stopEditing();
+        // doesn't remove the listener ... dooh
+        assertEquals(1, ((DefaultTreeCellEditor) tree.getCellEditor()).getCellEditorListeners().length);
+        
+    }
+
+
+    /**
+     * Starts editing on row 2 and returns the cell editor listener count after.
+     * 
+     * @param tree
+     * @return
+     */
+    private int getListenerCountAfterStartEditing(JTree tree) {
+        tree.setEditable(true);
+        // sanity
+        assertTrue(tree.getRowCount() > 2);
+        TreePath path = tree.getPathForRow(2);
+        tree.startEditingAtPath(path);
+        DefaultTreeCellEditor cellEditor = (DefaultTreeCellEditor) tree.getCellEditor();
+        int listenerCount = cellEditor.getCellEditorListeners().length;
+        return listenerCount;
+    }
+    
+
+    
     /**
      * Issue #473-swingx: NPE in JXTree with highlighter.<p>
      * 

@@ -21,6 +21,7 @@
 package org.jdesktop.swingx.table;
 
 import java.awt.BorderLayout;
+import java.awt.ComponentOrientation;
 import java.awt.event.ActionEvent;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -32,23 +33,27 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.LookAndFeel;
+import javax.swing.JTree;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellEditor;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
-import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
+import org.jdesktop.swingx.JXTree;
+import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
 
 public class DatePickerCellEditorVisualCheck extends InteractiveTestCase {
     public static void main(String[] args) {
 //        setSystemLF(true);
         DatePickerCellEditorVisualCheck test = new DatePickerCellEditorVisualCheck();
         try {
-            test.runInteractiveTests();
+//            test.runInteractiveTests();
 //          test.runInteractiveTests(".*Text.*");
-//          test.runInteractiveTests(".*XLabel.*");
+          test.runInteractiveTests(".*XTree.*");
 //          test.runInteractiveTests(".*Table.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
@@ -56,6 +61,82 @@ public class DatePickerCellEditorVisualCheck extends InteractiveTestCase {
         }
     }
  
+    /**
+     * visualize datepicker editing of the hierarchical column, both
+     * in a tree and a xTree switching CO.
+     *
+     * standard editor
+     */
+    public void interactiveTreeEditingRToLDatePicker() {
+        TreeModel model = createTreeModelWithDates();
+        JTree tree =  new JTree(model); 
+        tree.setEditable(true);
+        tree.setCellEditor(new DefaultTreeCellEditor(tree, null, new DatePickerCellEditor()));
+        JXTree xTree = new JXTree(model);
+        xTree.setEditable(true);
+        xTree.setCellEditor(new DefaultTreeCellEditor(tree, null, new DatePickerCellEditor()));
+        final JXFrame frame = wrapWithScrollingInFrame(tree, xTree, "standard Editing (DatePicker): compare tree and xtree");
+        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
+
+            public void actionPerformed(ActionEvent e) {
+                ComponentOrientation current = frame.getComponentOrientation();
+                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
+                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+                } else {
+                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+
+                }
+
+            }
+
+        };
+        addAction(frame, toggleComponentOrientation);
+        frame.setVisible(true);
+        
+    }
+
+    /**
+     * @return
+     */
+    private TreeModel createTreeModelWithDates() {
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(new Date());
+        root.add(new DefaultMutableTreeNode(new Date()));
+        TreeModel model = new DefaultTreeModel(root);
+        return model;
+    }
+
+    /**
+     * visualize date picker editing of the hierarchical column, both
+     * in a tree and a xTree switching CO.
+     * using DefaultXTreeCellEditor.
+     */
+    public void interactiveXTreeEditingRToLDatePicker() {
+        TreeModel model = createTreeModelWithDates();
+        JTree tree =  new JTree(model); 
+        tree.setEditable(true);
+        tree.setCellEditor(new DefaultXTreeCellEditor(tree, null, new DatePickerCellEditor()));
+        JXTree xTree = new JXTree(model);
+        xTree.setEditable(true);
+        xTree.setCellEditor(new DefaultXTreeCellEditor(xTree, null, new DatePickerCellEditor()));
+        final JXFrame frame = wrapWithScrollingInFrame(tree, xTree, "XEditing(DatePicker): compare tree and xtree");
+        Action toggleComponentOrientation = new AbstractAction("toggle orientation") {
+
+            public void actionPerformed(ActionEvent e) {
+                ComponentOrientation current = frame.getComponentOrientation();
+                if (current == ComponentOrientation.LEFT_TO_RIGHT) {
+                    frame.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+                } else {
+                    frame.applyComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+
+                }
+
+            }
+
+        };
+        addAction(frame, toggleComponentOrientation);
+        frame.setVisible(true);
+        
+    }
 
 
     /**
@@ -67,7 +148,6 @@ public class DatePickerCellEditorVisualCheck extends InteractiveTestCase {
      */
     public void interactiveDatePickerCellEditorXTable() {
         final JXTable table = new JXTable(createTableModel(2));
-        LookAndFeel lf;
         table.setVisibleColumnCount(6);
 //        table.setSurrendersFocusOnKeystroke(true);
         installEditors(table);
@@ -86,6 +166,47 @@ public class DatePickerCellEditorVisualCheck extends InteractiveTestCase {
         frame.setVisible(true);
     }
 
+
+    /**
+     * Issue ??-swingx: picker cell editor popup commit/cancel 
+     * transfers focus out-off the tree (1.5)
+     * 
+     * 
+     * a) commit by keyboard - commit okay but focus moved where?
+     * b) click into popup to commit - did not commit. 
+     *    Now fixed (CellEditorRemover copes with popup) okay committed, 
+     *    but focus where (as in a)?
+     * c) click on month navigation - editing canceled fixed. 
+     * d) click in month navigation, then cancel by keyboard - 
+     *    focus where?
+     *    
+     * focus handling is done in BasicTreeUI.completeEditing - and
+     * does not cope with popup. All termination is done in uidelegate,
+     * no central method in the tree called.
+     *      
+     * independent on stopCellEditing flag - semantic in tree is
+     * different from semantic in table (first is "how" to terminate, 
+     * second is "if" to terminate)  
+     *    
+     */
+    public void interactiveDatePickerCellEditorXTree() {
+        final JXTree tree = new JXTree(createTreeModelWithDates());
+        tree.setEditable(true);
+        tree.setCellEditor(new DefaultXTreeCellEditor(tree, null, new DatePickerCellEditor()));
+        Action action = new AbstractAction("toggle terminate") {
+
+            public void actionPerformed(ActionEvent e) {
+                tree.setInvokesStopCellEditing(!tree.getInvokesStopCellEditing());
+                
+            }
+            
+        };
+        JXFrame frame = wrapWithScrollingInFrame(tree, "JXTree - date picker cell editor");
+        addAction(frame, action);
+        frame.add(new JTextField("yet another thing to focus"), BorderLayout.SOUTH);
+        frame.pack();
+        frame.setVisible(true);
+    }
 
 
         

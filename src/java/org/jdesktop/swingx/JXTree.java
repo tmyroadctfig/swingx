@@ -21,23 +21,13 @@
 
 package org.jdesktop.swingx;
 
-import org.jdesktop.swingx.decorator.ComponentAdapter;
-import org.jdesktop.swingx.decorator.FilterPipeline;
-import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.CompoundHighlighter;
-import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
-
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.plaf.basic.BasicTreeUI;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeCellRenderer;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
 import java.applet.Applet;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.KeyboardFocusManager;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
@@ -48,6 +38,31 @@ import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.CellEditor;
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.JPopupMenu;
+import javax.swing.JTree;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.plaf.basic.BasicTreeUI;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+
+import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.CompoundHighlighter;
+import org.jdesktop.swingx.decorator.FilterPipeline;
+import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.tree.DefaultXTreeCellEditor;
 
 
 /**
@@ -85,7 +100,18 @@ public class JXTree extends JTree {
     private TreeRolloverController linkController;
     private boolean overwriteIcons;
     private Searchable searchable;
+    
+    // hacks around core focus issues around editing.
+    /**
+     * The propertyChangeListener responsible for terminating
+     * edits if focus lost.
+     */
     private CellEditorRemover editorRemover;
+    /**
+     * The CellEditorListener responsible to force the 
+     * focus back to the tree after terminating edits.
+     */
+    private CellEditorListener editorListener;
     
     
     
@@ -995,8 +1021,12 @@ public class JXTree extends JTree {
 //----------------------- edit
     
     /**
-     * Overridden to terminate edits on focusLost. 
-     * This method updates the internal CellEditorRemover.
+     * {@inheritDoc} <p>
+     * Overridden to fix focus issues with editors. 
+     * This method installs and updates the internal CellEditorRemover which
+     * to terminates ongoing edits if appropriate. Additionally, it
+     * registers a CellEditorListener with the cell editor to grab the 
+     * focus back to tree, if appropriate.
      * 
      * @see #updateEditorRemover()
      */
@@ -1004,11 +1034,105 @@ public class JXTree extends JTree {
     public void startEditingAtPath(TreePath path) {
         super.startEditingAtPath(path);
         if (isEditing()) {
+            updateEditorListener();
             updateEditorRemover();
         }
     }
 
     
+    /**
+     * Hack to grab focus after editing.
+     */
+    private void updateEditorListener() {
+        if (editorListener == null) {
+            editorListener = new CellEditorListener() {
+
+                public void editingCanceled(ChangeEvent e) {
+                    terminated(e);
+                }
+
+                /**
+                 * @param e
+                 */
+                private void terminated(ChangeEvent e) {
+                    analyseFocus();
+                    ((CellEditor) e.getSource()).removeCellEditorListener(editorListener);
+                }
+
+                public void editingStopped(ChangeEvent e) {
+                    terminated(e);
+                }
+                
+            };
+        }
+        getCellEditor().addCellEditorListener(editorListener);
+
+    }
+
+    /**
+     * This is called from cell editor listener if edit terminated.
+     * Trying to analyse if we should grab the focus back to the
+     * tree after. Brittle ... we assume we are the first to 
+     * get the event, so we can analyse the hierarchy before the
+     * editing component is removed.
+     */
+    protected void analyseFocus() {
+        final boolean isFocusOwnerInTheTable = isFocusOwnerDescending();    
+        if (isFocusOwnerInTheTable) {
+            requestFocusInWindow();
+        }
+    }
+
+
+    /**
+     * Returns a boolean to indicate if the current focus owner 
+     * is descending from this table. 
+     * Returns false if not editing, otherwise walks the focusOwner
+     * hierarchy, taking popups into account. <p>
+     * 
+     * PENDING: copied from JXTable ... should be somewhere in a utility
+     * class?
+     * 
+     * @return a boolean to indicate if the current focus
+     *   owner is contained.
+     */
+    private boolean isFocusOwnerDescending() {
+        if (!isEditing()) return false;
+        Component focusOwner = 
+            KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+        // PENDING JW: special casing to not fall through ... really wanted?
+        if (focusOwner == null) return false;
+        if (isDescending(focusOwner)) return true;
+        // same with permanent focus owner
+        Component permanent = 
+            KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();
+        return isDescending(permanent);
+    }
+
+    /**
+     * PENDING: copied from JXTable ... should be somewhere in a utility
+     * class?
+     * 
+     * @param focusOwner
+     * @return
+     */
+    private boolean isDescending(Component focusOwner) {
+        while (focusOwner !=  null) {
+            if (focusOwner instanceof JPopupMenu) {
+                focusOwner = ((JPopupMenu) focusOwner).getInvoker();
+                if (focusOwner == null) {
+                    return false;
+                }
+            }
+            if (focusOwner == this) {
+                return true;
+            }
+            focusOwner = focusOwner.getParent();
+        }
+        return false;
+    }
+
+
     /**
      * Overridden to release the CellEditorRemover, if any.
      */
@@ -1094,24 +1218,29 @@ public class JXTree extends JTree {
             }
 
             Component c = focusManager.getPermanentFocusOwner();
+            JXTree tree = JXTree.this;
             while (c != null) {
-                JXTree tree = JXTree.this;
-                if (c == tree) {
-                    // focus remains inside the table
-                    return;
-                } else if ((c instanceof Window) ||
-                           (c instanceof Applet && c.getParent() == null)) {
-                    if (c == SwingUtilities.getRoot(tree)) {
-                        if (tree.getInvokesStopCellEditing()) {
-                            tree.stopEditing();
+                if (c instanceof JPopupMenu) {
+                    c = ((JPopupMenu) c).getInvoker();
+                } else {
+
+                    if (c == tree) {
+                        // focus remains inside the table
+                        return;
+                    } else if ((c instanceof Window) ||
+                            (c instanceof Applet && c.getParent() == null)) {
+                        if (c == SwingUtilities.getRoot(tree)) {
+                            if (tree.getInvokesStopCellEditing()) {
+                                tree.stopEditing();
+                            }
+                            if (tree.isEditing()) {
+                                tree.cancelEditing();
+                            }
                         }
-                        if (tree.isEditing()) {
-                            tree.cancelEditing();
-                        }
+                        break;
                     }
-                    break;
+                    c = c.getParent();
                 }
-                c = c.getParent();
             }
         }
     }
