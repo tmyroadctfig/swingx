@@ -30,7 +30,6 @@ import org.jdesktop.swingx.plaf.PainterUIResource;
 
 import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
-import javax.swing.text.View;
 
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
@@ -178,7 +177,7 @@ public class BasicHeaderUI extends HeaderUI {
         h.removePropertyChangeListener(propListener);
     }
 
-    protected void onPropertyChange(JXHeader h, String propertyName, Object oldValue, Object newValue) {
+    protected void onPropertyChange(JXHeader h, String propertyName, Object oldValue, final Object newValue) {
         if ("title".equals(propertyName)) {
             titleLabel.setText(h.getTitle());
         } else if ("description".equals(propertyName)) {
@@ -194,22 +193,13 @@ public class BasicHeaderUI extends HeaderUI {
             titleLabel.setFont((Font)newValue);
         } else if ("descriptionFont".equals(propertyName)) {
             descriptionPane.setFont((Font)newValue);
-        } else if ("ancestor".equals(propertyName)) {
-            // force view resize on ancestor change to prevent initial layout probs.
-            final View view = (View) descriptionPane.getClientProperty("html");
-            Dimension d = newValue == null ? null : ((JComponent)newValue).getPreferredSize();
-            if (view != null && d != null) {
-                // reasonably small/big default line lenght to force resize of the view for layout, 
-                // but not to make it to request too big height.
-                view.setSize(d.width/2, d.height);
-            }
         }
     }
 
     protected void installComponents(JXHeader h) {
         h.setLayout(new GridBagLayout());
         h.add(titleLabel, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.HORIZONTAL, new Insets(12, 12, 0, 11), 0, 0));
-        h.add(descriptionPane, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.FIRST_LINE_START, GridBagConstraints.HORIZONTAL, new Insets(0, 24, 12, 11), 0, 0));
+        h.add(descriptionPane, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.FIRST_LINE_START, GridBagConstraints.BOTH, new Insets(0, 24, 12, 11), 0, 0));
         h.add(imagePanel, new GridBagConstraints(1, 0, 1, 2, 0.0, 1.0, GridBagConstraints.FIRST_LINE_END, GridBagConstraints.NONE, new Insets(12, 0, 11, 11), 0, 0));
     }
 
