@@ -97,41 +97,97 @@ public class MultiSplitLayout implements LayoutManager
     this(new Leaf("default"));
   }
   
+  /**
+   * Get the component associated with a MultiSplitLayout.Node
+   * @param n the layout node
+   * @return the component handled by the layout or null if not found
+   */
   public Component getComponentForNode( Node n )
   {    
       String name = ((Leaf)n).getName();
       return (name != null) ? (Component)childMap.get(name) : null;
   }
   
+  /**
+   * Get the MultiSplitLayout.Node associated with a component 
+   * @param comp the component being positioned by the layout
+   * @return the node associated with the component
+   */
   public Node getNodeForComponent( Component comp )
+  {   
+    return getNodeForComponent( getNameForComponent( comp ));
+  }
+
+  /**
+   * Get the MultiSplitLayout.Node associated with a component 
+   * @param name the name used to associate a component with the layout
+   * @return the node associated with the component
+   */
+  public Node getNodeForComponent( String name )
   {   
     if ( model instanceof Split ) {
       Split split = ((Split)model);
-      return getNodeForComponent( split, comp );
+      return getNodeForComponent( split, name );
     }
     else
       return null;
   }
   
+  /**
+   * Get the name used to map a component
+   * @param child the component
+   * @return the name used to map the component or null if no mapping is found
+   */
+  public String getNameForComponent( Component child )
+  {
+    String name = null;
+    for(Map.Entry<String,Component> kv : childMap.entrySet()) {
+      if (kv.getValue() == child) {
+        name = kv.getKey();
+        break;
+      }
+    }
+    
+    return name;
+  }
+  
+  /**
+   * Get the MultiSplitLayout.Node associated with a component 
+   * @param split the layout split that owns the requested node
+   * @param comp the component being positioned by the layout
+   * @return the node associated with the component
+   */
   public Node getNodeForComponent( Split split, Component comp )
   {    
-    List splits = split.getChildren();
-    int numChildren = splits.size();
-    for ( int i = 0; i < numChildren; i++ ) {
-      Node n = (Node)splits.get( i );
+    return getNodeForComponent( split, getNameForComponent( comp ));
+  }
+  
+  /**
+   * Get the MultiSplitLayout.Node associated with a component 
+   * @param split the layout split that owns the requested node
+   * @param name the name used to associate a component with the layout
+   * @return the node associated with the component
+   */
+  public Node getNodeForComponent( Split split, String name )
+  {    
+      for(Node n : split.getChildren()) {
         if ( n instanceof Leaf ) {
-          if ( ((Leaf)n).getName().equals( comp.getName())) 
+          if ( ((Leaf)n).getName().equals( name )) 
             return n;
         }
         else if ( n instanceof Split ) {
-          Node n1 = getNodeForComponent( (Split)n, comp );
+          Node n1 = getNodeForComponent( (Split)n, name );
           if ( n1 != null )
             return n1;
         }
       }        
       return null;
   }
-  
+
+  /**
+   * Is there a valid model for the layout?
+   * @return true if there is a model
+   */
   public boolean hasModel()
   {
     return model != null;
@@ -296,13 +352,7 @@ public class MultiSplitLayout implements LayoutManager
    * @see #addLayoutComponent
    */
   public void removeLayoutComponent(Component child) {    
-    String name = null;
-    for(Map.Entry<String,Component> kv : childMap.entrySet()) {
-      if (kv.getValue() == child) {
-        name = kv.getKey();
-        break;
-      }
-    }
+    String name = getNameForComponent( child );
   
     if ( name != null ) {
       if (removeDividers) {
@@ -310,7 +360,7 @@ public class MultiSplitLayout implements LayoutManager
         if ( !( model instanceof Split ))
           n = model;
         else
-          n = getNodeForComponent( child );
+          n = getNodeForComponent( name );
 
         childMap.remove(name);
 
@@ -1248,10 +1298,7 @@ public class MultiSplitLayout implements LayoutManager
      * <code>false</code> otherwise
      */
     public boolean isVisible() {
-      List splits = this.children;
-      int numChildren = splits.size();
-      for ( int i = 0; i < numChildren; i++ ) {
-        Node child = (Node)splits.get( i );
+	    for(Node child : children) {
         if ( child.isVisible() && !( child instanceof Divider ))
           return true;
       }
