@@ -36,6 +36,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.table.TableModel;
@@ -46,6 +47,7 @@ import org.jdesktop.swingx.JXSearchPanel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTreeTable;
 import org.jdesktop.swingx.RolloverProducer;
+import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
@@ -72,14 +74,15 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
 //      setSystemLF(true);
       HighlighterClientVisualCheck test = new HighlighterClientVisualCheck();
       try {
-         test.runInteractiveTests();
-//         test.runInteractiveTests(".*Search.*");
+//         test.runInteractiveTests();
+         test.runInteractiveTests(".*Tool.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
 
+    
     /**
      * Example from forum requirement: highlight all rows of a given group
      * if mouse if over one of them.
@@ -312,9 +315,83 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
                 "ext: custom colored renderer with bg highlighter <--> shared without highl");
     }
     
+    /**
+     * Requirement from forum: value based color and tooltip.
+     * Color is clearly the responsibility of the Highlighter/Predicate.
+     * 
+     * Tooltip is not handled currently: the provider doesn't reset. 
+     * Open question: where should the tooltip be set? Highlighter or
+     * Renderer/Provider? Both is possible ... depends on perspective.
+     * 
+     * Highlighter: characterize the tooltip as visual decoration. The
+     * implication is that the DefaultVisuals should reset it to null 
+     * or a default value returned from the cellContext.
+     * 
+     * Provider: characterize tooltip as content. The implication is that
+     * the provider must contain logic - duplicated here and in the
+     * predicate. The logic could be shared. Currently not supported
+     * because of parallel CellContext/ComponentAdapter. Which might
+     * be merged in future version (once the Filter/Pipeline is remove
+     * as the other main adapter client).
+     * 
+     *
+     */
+    public void interactiveValueBasedToolTipAndColor() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        HighlightPredicate predicate = new HighlightPredicate() {
 
+            public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+                if (!(adapter.getValue() instanceof Number)) return false;
+                return ((Number) adapter.getValue()).intValue() < 10;
+            }
+            
+        };
+        ColorHighlighter hl = new ColorHighlighter(
+                null, Color.RED, null, Color.RED, predicate);
+        // THINK this is possible, but not the correct place 
+        // ... more on the what-side of "what vs. how" ?
+        Highlighter tl = new AbstractHighlighter(predicate) {
+
+            @Override
+            protected Component doHighlight(Component component, ComponentAdapter adapter) {
+                
+                ((JComponent) component).setToolTipText(((JLabel) component).getText());
+                return component;
+            }
+            
+        };
+        table.setHighlighters(HighlighterFactory.createSimpleStriping(HighlighterFactory.GENERIC_GRAY),
+                hl); //, tl);
+        // anyway, the default provider does not reset the tooltip
+        // here: set's value based .. this duplicates logic of 
+        // predicate
+        LabelProvider provider = new LabelProvider() {
+
+            @Override
+            protected void format(CellContext context) {
+                super.format(context);
+                rendererComponent.setToolTipText(getToolTipText(context));
+            }
+
+            private String getToolTipText(CellContext context) {
+                if ((context.getValue() instanceof Number))  {
+                    int luck = ((Number) context.getValue()).intValue();
+                    if (luck < 10) {
+                        return "low on luck: " + luck;
+                    }
+                }
+                return null;
+            }
+            
+        };
+        provider.setHorizontalAlignment(JLabel.RIGHT);
+        table.setDefaultRenderer(Number.class, new DefaultTableRenderer(provider));
+        showWithScrollingInFrame(table, "Value-based Tooltip ... where?");
+    }
 
     /**
+     * Example of custom predicate based on the component's value, 
+     * (as opposed to on the value of the adapter). 
      * 
      * Note: in Swingx' context it's not recommended to change 
      * visual renderer properties on the renderer layer - use

@@ -69,7 +69,9 @@ import javax.swing.JLabel;
  * 
  * As this internally delegates default visual configuration to a
  * <code>DefaultVisuals</code> (which handles the first six items) subclasses
- * have to guarantee the alignment only.
+ * have to guarantee the alignment only. <p>
+ * 
+ * PENDING JW: ToolTips?
  * 
  * @author Jeanette Winzenburg
  * 
@@ -85,7 +87,8 @@ public abstract class ComponentProvider<T extends JComponent>
     protected T rendererComponent;
     /** configurator of default visuals. */
     protected DefaultVisuals<T> defaultVisuals;
-    /** horizontal (text) alignment of component. PENDING: useful only for labels, buttons? */
+    /** horizontal (text) alignment of component. 
+     * PENDING: useful only for labels, buttons? */
     protected int alignment;
     /** the converter to use for string representation. */
     protected StringValue formatter;
@@ -146,8 +149,10 @@ public abstract class ComponentProvider<T extends JComponent>
     }
 
     /**
-     * Sets the StringValue to use. If the given converter is null,
-     * uses the default to_string. 
+     * Sets the StringValue to use. If the given StringValue is null,
+     * uses the default to_string. <p>
+     * 
+     * PENDING JW: rename!
      * 
      * @param formatter the format to use.
      */
@@ -159,7 +164,10 @@ public abstract class ComponentProvider<T extends JComponent>
     }
 
     /**
-     * Returns the converter to use for obtaining the String representation.
+     * Returns the StringValue to use for obtaining 
+     * the String representation. <p>
+     * 
+     * PENDING JW: rename!
      * 
      * @return the StringValue used by this controller, guaranteed to
      *   be not null.
@@ -173,7 +181,9 @@ public abstract class ComponentProvider<T extends JComponent>
      * 
      * PENDING: This is a first attempt - we need a consistent string representation
      * across all (new and old) theme: rendering, (pattern) filtering/highlighting,
-     * searching, auto-complete, what else??   
+     * searching, auto-complete, what else??   <p>
+     * 
+     * PENDING JW: rename!
      * 
      * @param context the cell context.
      * @return a appropriate string representation of the cell's content.
