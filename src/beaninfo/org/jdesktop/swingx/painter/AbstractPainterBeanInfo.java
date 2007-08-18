@@ -37,18 +37,17 @@ public class AbstractPainterBeanInfo extends BeanInfoSupport {
         
         //set editor for the clip shape
         //set editor for the effects (not sure how to do this one)
-        setHidden(true,"effects");
-        setDisplayName("Use Cache","useCache");        
+        setHidden(true,"filters");
+        setDisplayName("Use Cache","cacheable");        
         //set editor for composite (incl. Alpha composites by default)
-        setPropertyEditor(CompositePropertyEditor.class, "composite");
+        //setPropertyEditor(CompositePropertyEditor.class, "composite");
         //set editors for the various rendering hints
         //setPropertyEditor(AntialiasingPropertyEditor.class, "antialiasing");
         //setPropertyEditor(FractionalMetricsPropertyEditor.class, "fractionalMetrics");
         setPropertyEditor(InterpolationPropertyEditor.class, "interpolation");
         //move some items into "Appearance" and some into "Behavior"
         //setCategory("Rendering Hints", "antialiasing", "fractionalMetrics", "interpolation");
-        setExpert(true, "antialiasing","fractionalMetrics","useCache",
-                "interpolation","clip","effects","composite");
+        setExpert(true, "antialiasing","cacheable","interpolation","filters");
     }
     
     public static final class CompositePropertyEditor extends EnumerationValuePropertyEditor {

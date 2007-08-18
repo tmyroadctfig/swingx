@@ -33,6 +33,6 @@ public class JXMultiSplitPaneBeanInfo extends BeanInfoSupport {
     // model, dividerSize, continuousLayout, dividerPainter
     protected void initialize() {
         setCategory("MultiSplitPane Layout, Appearance", "model", "dividerSize", 
-                    "continuousLayout", "dividerPainer");
+                    "continuousLayout", "dividerPainter");
     }
 }
