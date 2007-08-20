@@ -44,6 +44,8 @@ public class JXHeaderTest extends TestCase {
      *
      */
     public void testIconSet() {
+        // test of failure notification from hudson
+        fail();
         URL url = getClass().getResource("resources/images/wellTop.gif");
         Icon icon = new ImageIcon(url);
         assertNotNull(url);
