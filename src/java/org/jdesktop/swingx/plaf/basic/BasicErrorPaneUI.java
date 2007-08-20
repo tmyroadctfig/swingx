@@ -297,6 +297,11 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
         detailsPanel.add(detailsScrollPane);
         detailsPanel.add(copyToClipboardButton);
         
+        // Create error scroll pane. Make sure this happens before call to createErrorPaneLayout() in case any extending
+        // class wants to manipulate the component there.
+        errorScrollPane = new JScrollPane(errorMessage);
+        errorScrollPane.setBorder(new EmptyBorder(0,0,5,0));
+
         //initialize the gui. Most of this code is similar between Mac and PC, but
         //where they differ protected methods have been written allowing the
         //mac implementation to alter the layout of the dialog.
@@ -314,8 +319,6 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
         //the image off the dialog onto the desktop. This kind of coolness is common
         //in the mac world.
         pane.add(iconLabel);
-        errorScrollPane = new JScrollPane(errorMessage);
-        errorScrollPane.setBorder(new EmptyBorder(0,0,5,0));
         pane.add(errorScrollPane);
         pane.add(closeButton);
         pane.add(reportButton);
