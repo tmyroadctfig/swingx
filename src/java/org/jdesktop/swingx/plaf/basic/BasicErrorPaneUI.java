@@ -269,6 +269,8 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
 
         errorMessage.setOpaque(false);
         errorMessage.putClientProperty(JXEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+        errorScrollPane.setOpaque(false);
+        errorScrollPane.getViewport().setOpaque(false);
 
         closeButton = new JButton(UIManager.getString(CLASS_NAME + ".ok_button_text"));
 
