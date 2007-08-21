@@ -21,6 +21,7 @@
  */
 package org.jdesktop.swingx.renderer;
 
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 import junit.framework.TestCase;
@@ -34,6 +35,18 @@ import junit.framework.TestCase;
  */
 public class RenderingTest extends TestCase {
 
+    /**
+     * test that default visual config clears the tooltip.
+     *
+     */
+    public void testTooltipReset() {
+        DefaultVisuals<JComponent> visuals = new DefaultVisuals<JComponent>();
+        JComponent label = new  JLabel("somevalue");
+        label.setToolTipText("tooltip");
+        visuals.configureVisuals(label, new TableCellContext());
+        assertNull("default visual config must clear tooltiptext", label.getToolTipText());
+    }
+    
     /**
      * Test if all collaborators can cope with null component on CellContext.
      *

@@ -50,6 +50,7 @@ import org.jdesktop.swingx.RolloverProducer;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
@@ -76,6 +77,7 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
       try {
 //         test.runInteractiveTests();
          test.runInteractiveTests(".*Tool.*");
+//         test.runInteractiveTests(".*Color.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -132,6 +134,62 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
     
     /**
      * Example to highlight against a value/color map.
+     * Here the control is in predicate. <p>
+     * 
+     */
+    public void interactiveColorValueMappedHighlighterPredicate() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        // build a quick color lookup to simulate multi-value value-based
+        // coloring
+        final int numberColumn = 3;
+        table.toggleSortOrder(numberColumn);
+        Color[] colors = new Color[] { Color.YELLOW, Color.CYAN, Color.MAGENTA,
+                Color.GREEN };
+        int rowsPerColor = (table.getRowCount() - 5) / colors.length;
+        Map<Color, HighlightPredicate> map = new HashMap<Color, HighlightPredicate>();
+        for (int i = 0; i < colors.length; i++) {
+            List<Integer> values = new ArrayList<Integer>();
+            for (int j = 0; j < rowsPerColor; j++) {
+                values.add((Integer) table.getValueAt(i * rowsPerColor + j, numberColumn));
+            }
+            map.put(colors[i], new ValueMappedHighlightPredicate(values, numberColumn));
+        }
+        // create one ColorHighlighter for each color/predicate pair and 
+        // add to a compoundHighlighter
+        CompoundHighlighter chl = new CompoundHighlighter();
+        for (Color color : colors) {
+            chl.addHighlighter(new ColorHighlighter(color, null, map.get(color)));
+        }
+        table.resetSortOrder();
+        table.addHighlighter(chl);
+        showWithScrollingInFrame(table,
+                "compound highlighter with value-based color mapping predicate");
+    }
+    
+    /**
+     * Custom predicate which returns true if the filtered cell value
+     * of a given testColumn is contained in a list of values.
+     * PENDING: logic similar to search/pattern, enough to abstract?
+     */
+    public static class ValueMappedHighlightPredicate implements HighlightPredicate {
+
+        private List values;
+        private int testColumn;
+        public ValueMappedHighlightPredicate(List values, int testColumn) {
+            this.values = values;
+            this.testColumn = testColumn;
+        }
+        public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+            return values.contains(adapter.getFilteredValueAt(adapter.row, testColumn));
+        }
+        
+    }
+    /**
+     * Example to highlight against a value/color map. <p>
+     * Here the Highlighter takes full control. Which is a bit 
+     * on the border line of 
+     * the intended distribution of responsibility between
+     * Highlighter and HighlighterPredicate.
      */
     public void interactiveColorValueMappedHighlighter() {
         JXTable table = new JXTable(new AncientSwingTeam());
@@ -166,7 +224,6 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         showWithScrollingInFrame(table,
                 "conditional highlighter with value-based color mapping");
     }
-    
 
     /**
      * test to see searchPanel functionality in new Highlighter api
@@ -317,26 +374,12 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
     
     /**
      * Requirement from forum: value based color and tooltip.
-     * Color is clearly the responsibility of the Highlighter/Predicate.
      * 
-     * Tooltip is not handled currently: the provider doesn't reset. 
-     * Open question: where should the tooltip be set? Highlighter or
-     * Renderer/Provider? Both is possible ... depends on perspective.
-     * 
-     * Highlighter: characterize the tooltip as visual decoration. The
-     * implication is that the DefaultVisuals should reset it to null 
-     * or a default value returned from the cellContext.
-     * 
-     * Provider: characterize tooltip as content. The implication is that
-     * the provider must contain logic - duplicated here and in the
-     * predicate. The logic could be shared. Currently not supported
-     * because of parallel CellContext/ComponentAdapter. Which might
-     * be merged in future version (once the Filter/Pipeline is remove
-     * as the other main adapter client).
-     * 
+     * Here the tooltip is regarded as visual decoration and 
+     * set in a specialized Highlighter. 
      *
      */
-    public void interactiveValueBasedToolTipAndColor() {
+    public void interactiveValueBasedToolTipAndColorOnHighlighter() {
         JXTable table = new JXTable(new AncientSwingTeam());
         HighlightPredicate predicate = new HighlightPredicate() {
 
@@ -348,21 +391,47 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         };
         ColorHighlighter hl = new ColorHighlighter(
                 null, Color.RED, null, Color.RED, predicate);
-        // THINK this is possible, but not the correct place 
+        // THINK this is possible, but maybe not the correct place 
         // ... more on the what-side of "what vs. how" ?
         Highlighter tl = new AbstractHighlighter(predicate) {
 
             @Override
             protected Component doHighlight(Component component, ComponentAdapter adapter) {
-                
-                ((JComponent) component).setToolTipText(((JLabel) component).getText());
+                String text = "low on luck: " + ((JLabel) component).getText();
+                ((JComponent) component).setToolTipText(text);
                 return component;
             }
             
         };
         table.setHighlighters(HighlighterFactory.createSimpleStriping(HighlighterFactory.GENERIC_GRAY),
+                hl, tl);
+        showWithScrollingInFrame(table, "Value-based Tooltip ... on Highlighter");
+    }
+
+    /**
+     * Requirement from forum: value based color and tooltip.<p>
+     * 
+     * Here the tooltip is regarded as belonging more to the "what"
+     * of rendering and set in a custom provider. The implication
+     * is that the logic (whether to show the tooltip or not) is
+     * duplicated (in the predicate and the provider.
+     * 
+     *
+     */
+    public void interactiveValueBasedToolTipAndColorOnProvider() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        HighlightPredicate predicate = new HighlightPredicate() {
+
+            public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+                if (!(adapter.getValue() instanceof Number)) return false;
+                return ((Number) adapter.getValue()).intValue() < 10;
+            }
+            
+        };
+        ColorHighlighter hl = new ColorHighlighter(
+                null, Color.RED, null, Color.RED, predicate);
+        table.setHighlighters(HighlighterFactory.createSimpleStriping(HighlighterFactory.GENERIC_GRAY),
                 hl); //, tl);
-        // anyway, the default provider does not reset the tooltip
         // here: set's value based .. this duplicates logic of 
         // predicate
         LabelProvider provider = new LabelProvider() {
@@ -386,16 +455,13 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         };
         provider.setHorizontalAlignment(JLabel.RIGHT);
         table.setDefaultRenderer(Number.class, new DefaultTableRenderer(provider));
-        showWithScrollingInFrame(table, "Value-based Tooltip ... where?");
+        showWithScrollingInFrame(table, "Value-based Tooltip ... on provider");
     }
 
     /**
      * Example of custom predicate based on the component's value, 
      * (as opposed to on the value of the adapter). 
      * 
-     * Note: in Swingx' context it's not recommended to change 
-     * visual renderer properties on the renderer layer - use
-     * a highlighter with a value related HighlightPredicate instead.<p>
      * 
      */
     public void interactiveTableColorBasedOnComponentValue() {

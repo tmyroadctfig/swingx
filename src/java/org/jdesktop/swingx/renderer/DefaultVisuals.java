@@ -44,6 +44,7 @@ import javax.swing.JComponent;
  * <li> Painter (if applicable)
  * <li> enabled
  * <li> componentOrientation
+ * <li> toolTipText
  * </ul>
  * 
  * Client code will rarely need to be aware of this class. It's the single
@@ -52,7 +53,11 @@ import javax.swing.JComponent;
  * 
  * PENDING: allow mutators for overruling the <code>CellContext</code>s
  * defaults? Would prefer not to, as in the context of SwingX visual config on
- * the renderer level is discouraged (the way to go are <code>Highlighter</code>s.
+ * the renderer level is discouraged (the way to go are <code>Highlighter</code>s.<p>
+ * 
+ * PENDING: not yet quite decided whether the toolTipText property belongs
+ * into the visual default config. Doing so gives client code the choice to
+ * set it either in a Highlighter or a custom ComponentProvider.
  * 
  * @author Jeanette Winzenburg
  * 
@@ -124,16 +129,18 @@ public class DefaultVisuals<T extends JComponent> implements Serializable {
      * <p>
      * 
      * Here: synch <code>Font</code>, <code>ComponentOrientation</code> and
-     * <code>enabled</code> to context's component.
-     * 
-     * PENDING: not fully defined - "divers" means everything that's not colors
-     * or border.
+     * <code>enabled</code> to context's component. Resets toolTipText to null.
      * <p>
      * 
+     * PENDING: not fully defined - "divers" means everything that's not 
+     * <code>Color</code>s
+     * nor <code>Border</code> nor <code>Painter</code>.
+     *      * 
      * @param renderingComponent the component to configure, must not be null
      * @param context the cell context to configure from, must not be null
      */
     protected void configureState(T renderingComponent, CellContext context) {
+        renderingComponent.setToolTipText(null);
         if (context.getComponent() == null) {
             // what to do?
             // we guarantee to cleanup completely - what are the defaults?

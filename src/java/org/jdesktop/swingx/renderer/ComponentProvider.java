@@ -64,16 +64,16 @@ import javax.swing.JLabel;
  * <li> Painter (if applicable)
  * <li> enabled
  * <li> componentOrientation
+ * <li> tooltipText
  * <li> horizontal alignment (if applicable)
  * </ul>
  * 
  * As this internally delegates default visual configuration to a
- * <code>DefaultVisuals</code> (which handles the first six items) subclasses
+ * <code>DefaultVisuals</code> (which handles the first seven items) subclasses
  * have to guarantee the alignment only. <p>
  * 
  * PENDING JW: ToolTips?
  * 
- * @author Jeanette Winzenburg
  * 
  * @see DefaultVisuals
  * @see CellContext
