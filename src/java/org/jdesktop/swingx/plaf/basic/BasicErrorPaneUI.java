@@ -269,8 +269,6 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
 
         errorMessage.setOpaque(false);
         errorMessage.putClientProperty(JXEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
-        errorScrollPane.setOpaque(false);
-        errorScrollPane.getViewport().setOpaque(false);
 
         closeButton = new JButton(UIManager.getString(CLASS_NAME + ".ok_button_text"));
 
@@ -303,6 +301,8 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
         // class wants to manipulate the component there.
         errorScrollPane = new JScrollPane(errorMessage);
         errorScrollPane.setBorder(new EmptyBorder(0,0,5,0));
+        errorScrollPane.setOpaque(false);
+        errorScrollPane.getViewport().setOpaque(false);
 
         //initialize the gui. Most of this code is similar between Mac and PC, but
         //where they differ protected methods have been written allowing the
