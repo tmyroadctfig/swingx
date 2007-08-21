@@ -56,12 +56,19 @@ public class JXErrorPaneIssues extends InteractiveTestCase {
     }
 
     /**
+     * 
+     * NPE in constructor? Since build #454, during fix of 
+     * #587-swingx.
+     */
+    public void testNPE() {
+        new JXErrorPane();
+    }
+    /**
      * do-nothing method - suppress warning if there are no other
      * test fixtures to run.
      *
      */
     public void testDummy() {
-        
     }
 
 }
