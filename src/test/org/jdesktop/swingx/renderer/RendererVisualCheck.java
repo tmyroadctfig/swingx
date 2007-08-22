@@ -39,6 +39,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -129,7 +130,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         java.sql.Date sqlDate = new java.sql.Date(date.getTime());
         Timestamp stamp = new Timestamp(date.getTime());
         Time time = new Time(date.getTime());
-        DefaultTableModel model = new DefaultTableModel(1, 4) {
+        DefaultTableModel model = new DefaultTableModel(1, 5) {
 
             @Override
             public Class<?> getColumnClass(int columnIndex) {
@@ -143,11 +144,12 @@ public class RendererVisualCheck extends InteractiveTestCase {
             }
             
         };
-        model.setColumnIdentifiers(new Object[]{"Date", "SQL Date", "Timestamp", "Time"});
+        model.setColumnIdentifiers(new Object[]{"Date - normal", "SQL Date", "SQL Timestamp", "SQL Time", "Date - as time"});
         model.setValueAt(date, 0, 0);
         model.setValueAt(sqlDate, 0, 1);
         model.setValueAt(stamp, 0, 2);
         model.setValueAt(time, 0, 3);
+        model.setValueAt(date, 0, 4);
         JXTable table = new JXTable(model);
         // right align to see the difference to normal date renderer
         DefaultTableRenderer renderer = new DefaultTableRenderer(
@@ -155,6 +157,9 @@ public class RendererVisualCheck extends InteractiveTestCase {
         table.setDefaultRenderer(Timestamp.class, renderer);
         table.setDefaultRenderer(Time.class, renderer);
         table.setDefaultRenderer(java.sql.Date.class, renderer);
+        // format the given Date as short time
+        table.getColumnExt(4).setCellRenderer(new DefaultTableRenderer(
+                new FormatStringValue(DateFormat.getTimeInstance(DateFormat.SHORT))));
         showWithScrollingInFrame(table, "normal/sql date formatting"); 
     }
     
