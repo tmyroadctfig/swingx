@@ -25,9 +25,22 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 
 /**
- * A component provider which uses a JLabel. 
+ * A component provider which uses a <code>JLabel</code> as rendering
+ * component. <p>
+ * 
+ * It configures the label from the cell value depending on it's type:
+ * <ul>
+ * <li> Icon - sets the icon property to the value and clears the text
+ *   property.
+ * <li> all other types - sets the icon property to null and sets
+ *   its text property to the String representation as returned from
+ *   the StringValue.
+ * </ul>    
  * 
  * @author Jeanette Winzenburg
+ * 
+ * @see StringValue
+ * @see FormatStringValue
  */
 public class LabelProvider extends ComponentProvider<JLabel> {
 

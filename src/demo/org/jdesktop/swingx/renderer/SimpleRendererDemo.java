@@ -224,6 +224,7 @@ public class SimpleRendererDemo {
     public static class Contributor implements Comparable {
         private String firstName;
         private String lastName;
+        @SuppressWarnings("unused")
         private String userID;
         
         public Contributor(String rawData) {
