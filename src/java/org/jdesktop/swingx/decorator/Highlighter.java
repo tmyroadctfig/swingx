@@ -26,25 +26,34 @@ import java.awt.Component;
 import javax.swing.event.ChangeListener;
 
 /**
- * <code>Highlighter</code> provide a  mechanism to modify visual 
- * attributes of cell rendering components. The mechanism is uniform across
- * both rendered and rendering component types: it is the same for 
- * SwingX collection views (JXTable, JXList, JXTree/Table) and independent
- * of the concrete component type used for rendering the cell. The view
- * cell state is factored into a <code>ComponentAdapter</code>.<p>
+ * <code>Highlighter</code> provide a mechanism to modify visual attributes of
+ * cell rendering components. The mechanism is uniform across both rendered and
+ * rendering component types: it is the same for SwingX collection views
+ * (JXTable, JXList, JXTree/Table) and independent of the concrete component
+ * type used for rendering the cell. The view cell state is factored into a
+ * <code>ComponentAdapter</code>.
+ * <p>
  * 
- * For example, in data visualization components
- * that support multiple columns with potentially different types of data, a 
- * <code>ColorHighlighter</code> imparts the same background color consistently across <em>all</em>
- * columns of the rendered component
- * regardless of the actual cell renderer registered for any specific column.<p>
- *  
- * Implementations supporting mutable internal state which effects 
- * the decoration must notify its listeners about the change. Typically, 
- * the rendered component installs a listener to its <code>Highlighter</code>s
+ * For example, in data visualization components that support multiple columns
+ * with potentially different types of data, a <code>ColorHighlighter</code>
+ * imparts the same background color consistently across <em>all</em> columns
+ * of the rendered component regardless of the actual cell renderer registered
+ * for any specific column.
+ * <p>
+ * 
+ * The highlightable properties are basically defined by the renderer in use:
+ * only attributes the renderer guarantees to reset on every call are safe to
+ * alter. For SwingX renderering support these are listed in
+ * <code>ComponentProvider</code>.
+ * 
+ * 
+ * Implementations supporting mutable internal state which effects the
+ * decoration must notify its listeners about the change. Typically, the
+ * rendered component installs a listener to its <code>Highlighter</code>s
  * and triggeres a repaint on notification.
- *  
+ * 
  * @see ComponentAdapter
+ * @see ComponentProvider
  * 
  * @author Ramesh Gupta
  * @author Jeanette Winzenburg

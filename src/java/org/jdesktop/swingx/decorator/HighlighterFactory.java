@@ -22,13 +22,11 @@
 package org.jdesktop.swingx.decorator;
 
 import java.awt.Color;
-import java.util.HashMap;
 
 import javax.swing.UIManager;
 
 import org.jdesktop.swingx.decorator.HighlightPredicate.NotHighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlightPredicate.RowGroupHighlightPredicate;
-import org.jdesktop.swingx.plaf.ColumnHeaderRendererAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.UIColorHighlighterAddon;
 

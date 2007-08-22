@@ -31,13 +31,33 @@ import org.jdesktop.swingx.RolloverProducer;
 import org.jdesktop.swingx.util.Contract;
 
 /**
- * The predicate used by AbstractHighlighter to control 
- * highlight on/off.
+ * A controller which decides whether or not a visual decoration should
+ * be applied to the given Component in the given ComponentAdapter state. 
+ * This is a on/off <b>decision</b> only, the actual decoration is
+ * left to the AbstractHighlighter which typically respects this predicate. <p>
  * 
  * @author Jeanette Winzenburg
+ * 
+ * @see AbstractHighlighter
  */
 public interface HighlightPredicate {
+
+    /**
+     * Returns a boolean to indicate whether the component should be 
+     * highlighted.<p>
+     * 
+     * Note: both parameters should be considered strictly read-only!
+     * 
+    * @param renderer the cell renderer component that is to be decorated,
+    *    must not be null
+    * @param adapter the ComponentAdapter for this decorate operation,
+    *    most not be null
+    * @return a boolean to indicate whether the component should be highlighted.
+     */
+    boolean isHighlighted(Component renderer, ComponentAdapter adapter);
+
     
+//--------------------- implemented Constants    
     /**
      * Unconditional true.
      */
@@ -125,15 +145,6 @@ public interface HighlightPredicate {
     };
     
     
-    /**
-     * Returns a boolean to indicate whether the component should be 
-     * highlighted.
-     * 
-    * @param renderer the cell renderer component that is to be decorated
-    * @param adapter the ComponentAdapter for this decorate operation
-    * @return a boolean to indicate whether the component should be highlighted.
-     */
-    boolean isHighlighted(Component renderer, ComponentAdapter adapter);
 
     
 //----------------- logical implementations amongst HighlightPredicates

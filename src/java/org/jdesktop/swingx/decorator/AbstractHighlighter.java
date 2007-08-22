@@ -29,13 +29,53 @@ import javax.swing.event.ChangeListener;
 import org.jdesktop.swingx.event.WeakEventListenerList;
 
 /**
- * Abstract <code>Highlighter</code> implementation which
- * manages notification and highlights conditionally, controlled
- * by a HighlightPredicate. <p> 
+ * Abstract <code>Highlighter</code> implementation which manages notification
+ * and highlights conditionally, controlled by a HighlightPredicate.
+ * <p>
+ * 
+ * Concrete custom implementations should focus on a single (or few) visual
+ * attributes to highlight - this enhances re-use. F.i. a custom
+ * FontHighlighter:
+ * 
+ * <pre><code>
+ * public static class FontHighlighter extends AbstractHighlighter {
+ * 
+ *     private Font font;
+ * 
+ *     public FontHighlighter(Font font, HighlightPredicate predicate) {
+ *         super(predicate);
+ *         this.font = font;
+ *     }
+ * 
+ *     @Override
+ *     protected Component doHighlight(Component component,
+ *             ComponentAdapter adapter) {
+ *         component.setFont(font);
+ *         return component;
+ *     }
+ * 
+ * }
+ * 
+ * </code></pre>
+ * 
+ * Client code can combine the effect with a f.i. Color decoration, and use a
+ * shared HighlightPredicate to apply both for the same condition.
+ * 
+ * <pre><code>
+ * HighlightPredicate predicate = new HighlightPredicate() {
+ *     public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+ *         Object value = adapter.getFilteredValueAt(adapter.row, adapter.column);
+ *         return (value instanceof Number) &amp;&amp; ((Number) value).intValue() &lt; 0;
+ *     }
+ * };
+ * table.setHighlighters(new ColorHighlighter(Color.RED, null, predicate),
+ *         new FontHighlighter(myBoldFont, predicate));
+ * </code></pre>
  * 
  * @author Jeanette Winzenburg
  * 
  * @see HighlightPredicate
+ * @see org.jdesktop.swingx.renderer.ComponentProvider
  */
 public abstract class AbstractHighlighter implements Highlighter {
 
@@ -45,8 +85,10 @@ public abstract class AbstractHighlighter implements Highlighter {
      * of events generated here is always "this".
      */
     private transient ChangeEvent changeEvent;
+
     /** The listeners waiting for model changes. */
     protected WeakEventListenerList listenerList = new WeakEventListenerList();
+
     /** the HighlightPredicate to use. */
     private HighlightPredicate predicate;
 
@@ -58,7 +100,7 @@ public abstract class AbstractHighlighter implements Highlighter {
     public AbstractHighlighter() {
         this(null);
     }
-    
+
     /**
      * Instantiates a Highlighter with the given 
      * HighlightPredicate.<p>
@@ -68,9 +110,9 @@ public abstract class AbstractHighlighter implements Highlighter {
      * @see #setHighlightPredicate(HighlightPredicate)
      */
     public AbstractHighlighter(HighlightPredicate predicate) {
-           setHighlightPredicate(predicate);
+        setHighlightPredicate(predicate);
     }
-    
+
     /**
      * Set the HighlightPredicate used to decide whether a cell should
      * be highlighted. If null, sets the predicate to HighlightPredicate.ALWAYS.
@@ -80,7 +122,8 @@ public abstract class AbstractHighlighter implements Highlighter {
      * @param predicate the HighlightPredicate to use. 
      */
     public void setHighlightPredicate(HighlightPredicate predicate) {
-        this.predicate = predicate != null ? predicate : HighlightPredicate.ALWAYS;
+        this.predicate = predicate != null ? predicate
+                : HighlightPredicate.ALWAYS;
         fireStateChanged();
     }
 
@@ -93,9 +136,9 @@ public abstract class AbstractHighlighter implements Highlighter {
     public HighlightPredicate getHighlightPredicate() {
         return predicate;
     }
-    
-//----------------------- implement predicate respecting highlight
-    
+
+    //----------------------- implement predicate respecting highlight
+
     /**
      * {@inheritDoc}
      * This implementation checks the HighlightPredicate and 
@@ -114,8 +157,7 @@ public abstract class AbstractHighlighter implements Highlighter {
         }
         return component;
     }
-    
-   
+
     /**
      * Apply the highlights. 
      * 
@@ -126,9 +168,9 @@ public abstract class AbstractHighlighter implements Highlighter {
      */
     protected abstract Component doHighlight(Component component,
             ComponentAdapter adapter);
-    
-//------------------------ implement Highlighter change notification
-    
+
+    //------------------------ implement Highlighter change notification
+
     /**
      * Adds a <code>ChangeListener</code>. ChangeListeners are
      * notified after changes of any attribute. 
@@ -138,7 +180,7 @@ public abstract class AbstractHighlighter implements Highlighter {
      * @param l the ChangeListener to add
      * @see #removeChangeListener
      */
-    public /* final */ void addChangeListener(ChangeListener l) {
+    public/* final */void addChangeListener(ChangeListener l) {
         listenerList.add(ChangeListener.class, l);
     }
 
@@ -166,8 +208,8 @@ public abstract class AbstractHighlighter implements Highlighter {
      * @since 1.4
      */
     public final ChangeListener[] getChangeListeners() {
-        return (ChangeListener[])listenerList.getListeners(
-                ChangeListener.class);
+        return (ChangeListener[]) listenerList
+                .getListeners(ChangeListener.class);
     }
 
     /** 
@@ -177,15 +219,14 @@ public abstract class AbstractHighlighter implements Highlighter {
      */
     protected final void fireStateChanged() {
         Object[] listeners = listenerList.getListenerList();
-        for (int i = listeners.length - 2; i >= 0; i -=2 ) {
+        for (int i = listeners.length - 2; i >= 0; i -= 2) {
             if (listeners[i] == ChangeListener.class) {
                 if (changeEvent == null) {
                     changeEvent = new ChangeEvent(this);
                 }
-                ((ChangeListener)listeners[i+1]).stateChanged(changeEvent);
-            }          
+                ((ChangeListener) listeners[i + 1]).stateChanged(changeEvent);
+            }
         }
     }
-
 
 }
