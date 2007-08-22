@@ -21,10 +21,15 @@
  */
 package org.jdesktop.swingx.renderer;
 
+import java.text.DateFormat;
+
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.table.TableCellRenderer;
 
 import junit.framework.TestCase;
+
+import org.jdesktop.swingx.JXTable;
 
 /**
  * Tests swingx rendering infrastructure: RenderingXController, CellContext, 
@@ -34,6 +39,58 @@ import junit.framework.TestCase;
  * @author Jeanette Winzenburg
  */
 public class RenderingTest extends TestCase {
+
+    /**
+     * use convenience constructor where appropriate: 
+     * test clients code (default renderers in JXTable).
+     * 
+     *
+     */
+    public void testConstructorClients() {
+        JXTable table = new JXTable();
+        TableCellRenderer renderer = table.getDefaultRenderer(Number.class);
+        JLabel label = (JLabel) renderer.getTableCellRendererComponent(table, null, false, false, 0, 0);
+        assertEquals(JLabel.RIGHT, label.getHorizontalAlignment());
+    }
+    /**
+     * Test constructors: convenience constructor.
+     */
+    public void testConstructorConvenience() {
+        FormatStringValue sv = new FormatStringValue(DateFormat.getTimeInstance());
+        int align = JLabel.RIGHT;
+        LabelProvider provider = new LabelProvider(sv, align);
+        assertEquals(align, provider.getHorizontalAlignment());
+        assertEquals(sv, provider.getToStringConverter());
+    }
+    
+    /**
+     * Test constructors: parameterless.
+     */
+    public void testConstructorDefault() {
+        LabelProvider provider = new LabelProvider();
+        assertEquals(JLabel.LEADING, provider.getHorizontalAlignment());
+        assertEquals(StringValue.TO_STRING, provider.getToStringConverter());
+    }
+    
+    /**
+     * Test constructors: convenience constructor.
+     */
+    public void testConstructorAlignment() {
+        int align = JLabel.RIGHT;
+        LabelProvider provider = new LabelProvider(align);
+        assertEquals(align, provider.getHorizontalAlignment());
+        assertEquals(StringValue.TO_STRING, provider.getToStringConverter());
+    }
+    
+    /**
+     * Test constructors: convenience constructor.
+     */
+    public void testConstructorStringValue() {
+        FormatStringValue sv = new FormatStringValue(DateFormat.getTimeInstance());
+        LabelProvider provider = new LabelProvider(sv);
+        assertEquals(JLabel.LEADING, provider.getHorizontalAlignment());
+        assertEquals(sv, provider.getToStringConverter());
+    }
 
     /**
      * test that default visual config clears the tooltip.

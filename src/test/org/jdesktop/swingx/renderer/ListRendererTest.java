@@ -24,6 +24,7 @@ package org.jdesktop.swingx.renderer;
 import java.awt.Color;
 import java.awt.Component;
 import java.io.Serializable;
+import java.text.DateFormat;
 import java.util.logging.Logger;
 
 import javax.swing.DefaultListCellRenderer;
@@ -66,6 +67,18 @@ public class ListRendererTest extends InteractiveTestCase {
         coreListRenderer = new DefaultListCellRenderer();
         xListRenderer = new DefaultListRenderer();
 
+    }
+
+    /**
+     * Test constructors: here convenience with alignment and converter
+     *
+     */
+    public void testConstructor() {
+        FormatStringValue sv = new FormatStringValue(DateFormat.getTimeInstance());
+        int align = JLabel.RIGHT;
+        DefaultListRenderer renderer = new DefaultListRenderer(sv, align);
+        assertEquals(sv, renderer.componentController.getToStringConverter());
+        assertEquals(align, renderer.componentController.getHorizontalAlignment());
     }
 
     /**

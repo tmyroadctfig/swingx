@@ -3580,13 +3580,16 @@ public class JXTable extends JTable
     }
 
     /**
-     * Creates default cell renderers for objects, numbers, doubles, dates,
-     * booleans, and icons.
+     * Creates default cell renderers for <code>Object</code>s, <code>Number</code>s,  
+     * <code>Date</code>s, <code>Boolean</code>s, and <code>Icon/Image/</code>s.
      * <p>
-     * Overridden so we can act as factory for renderers plus hacking around
+     * Overridden to install SwingX renderers plus hacking around
      * huge memory consumption of UIDefaults (see #6345050 in core Bug parade)
      * <p>
      * {@inheritDoc}
+     * 
+     * @see org.jdesktop.swingx.renderer.DefaultTableRenderer
+     * @see org.jdesktop.swingx.renderer.ComponentProvider
      */
     @Override
     protected void createDefaultRenderers() {
@@ -3606,12 +3609,13 @@ public class JXTable extends JTable
         defaultRenderersByColumnClass.clear();
         // use swingx renderers by default
         setDefaultRenderer(Object.class, new DefaultTableRenderer());
-        LabelProvider controller = new LabelProvider(FormatStringValue.NUMBER_TO_STRING);
-        controller.setHorizontalAlignment(JLabel.RIGHT);
+        LabelProvider controller = new LabelProvider(
+                FormatStringValue.NUMBER_TO_STRING, JLabel.RIGHT);
         setDefaultRenderer(Number.class, new DefaultTableRenderer(controller));
         setDefaultRenderer(Date.class, new DefaultTableRenderer(
                 FormatStringValue.DATE_TO_STRING));
-        TableCellRenderer renderer  = new DefaultTableRenderer(new LabelProvider(JLabel.CENTER));
+        TableCellRenderer renderer  = new DefaultTableRenderer(
+                new LabelProvider(JLabel.CENTER));
         setDefaultRenderer(Icon.class, renderer);
         setDefaultRenderer(ImageIcon.class, renderer);
         setDefaultRenderer(Boolean.class, new DefaultTableRenderer(new ButtonProvider()));
@@ -3671,6 +3675,8 @@ public class JXTable extends JTable
     /**
      * The default renderer for <code>Number</code> types. Aligns to
      * <code>RIGHT</code>.
+     * @deprecated instead use a org.jdesktop.swingx.renderer.DefaultTableRenderer 
+     *    configured with a org.jdesktop.swingx.renderer.FormatStringValue 
      */
     public static class NumberRenderer extends DefaultTableCellRenderer {
         public NumberRenderer() {
@@ -3686,6 +3692,8 @@ public class JXTable extends JTable
      * types. Uses a <code>NumberFormat</code> to renderer. The format can be
      * provided by client code, if null the general-purpose number format for
      * the current locale is used.
+     * @deprecated instead use a org.jdesktop.swingx.renderer.DefaultTableRenderer 
+     *    configured with a org.jdesktop.swingx.renderer.FormatStringValue 
      * 
      */
     public static class DoubleRenderer extends NumberRenderer {
@@ -3713,6 +3721,8 @@ public class JXTable extends JTable
      * <code>DateFormat</code> to render. The format can be provided by client
      * code, if null the general-purpose date format for the current locale is
      * used.
+     * @deprecated instead use a org.jdesktop.swingx.renderer.DefaultTableRenderer 
+     *    configured with a org.jdesktop.swingx.renderer.FormatStringValue 
      */
     public static class DateRenderer extends DefaultTableCellRenderer {
         private final DateFormat formatter;
@@ -3740,6 +3750,8 @@ public class JXTable extends JTable
      * Note: it's registered for both the interface and a concrete class because
      * <code>JTable</code> class-based lookup doesn't cope well with interfaces.
      * 
+     * @deprecated instead use a org.jdesktop.swingx.renderer.DefaultTableRenderer 
+     * 
      */
     public static class IconRenderer extends DefaultTableCellRenderer {
         public IconRenderer() {
@@ -3758,6 +3770,8 @@ public class JXTable extends JTable
      */
     /**
      * The default renderer for <code>Boolean</code> types.
+     * @deprecated instead use a org.jdesktop.swingx.renderer.DefaultTableRenderer 
+     *    configured with a org.jdesktop.swingx.renderer.ButtonProvider 
      */
     public static class BooleanRenderer extends JCheckBox implements // , UIResource
             TableCellRenderer     {

@@ -32,36 +32,49 @@ import javax.swing.JLabel;
 public class LabelProvider extends ComponentProvider<JLabel> {
 
     /**
-     * Instantiates a default component provider with LEADING
-     * horizontal alignment and default to-String converter. <p> 
-     *
+     * Instantiates a LabelProvider with default to-String converter and LEADING
+     * horizontal alignment .
+     * <p>
+     * 
      */
     public LabelProvider() {
         this(null);
     }
     
     /**
-     * Instantiates a default component provider with LEADING
-     * horizontal alignment and the given to-String converter. If 
-     * the converter is null, the default TO_STRING is used. <p> 
+     * Instantiates a LabelProvider with the given to-String converter and LEADING
+     * horizontal alignment. If the converter is null, the default TO_STRING is
+     * used.
+     * <p>
      * 
-     * @param converter the converter to use for mapping the cell value
-     *   to a String representation.
+     * @param converter the converter to use for mapping the cell value to a
+     *        String representation.
      */
     public LabelProvider(StringValue converter) {
-        super();
-        setToStringConverter(converter);
+        this(converter, JLabel.LEADING);
     }
 
     /**
-     * Instantiates a default component provider with the given 
-     * horizontal alignment and default to-String converter. <p> 
+     * Instantiates a LabelProvider with default to-String converter and given
+     * horizontal alignment. 
      * 
      * @param alignment the horizontal alignment.
      */
     public LabelProvider(int alignment) {
-        this();
-        setHorizontalAlignment(alignment);
+        this(null, alignment);
+    }
+
+    /**
+     * Instantiates a LabelProvider with given to-String converter and given
+     * horizontal alignment. If the converter is null, the default TO_STRING is
+     * used.
+     * 
+     * @param converter the converter to use for mapping the cell value to a
+     *        String representation.
+     * @param alignment the horizontal alignment.
+     */
+    public LabelProvider(StringValue converter, int alignment) {
+        super(converter, alignment);
     }
 
     /**

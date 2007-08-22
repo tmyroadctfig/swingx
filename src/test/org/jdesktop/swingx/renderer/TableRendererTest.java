@@ -24,6 +24,7 @@ package org.jdesktop.swingx.renderer;
 import java.awt.Color;
 import java.awt.Component;
 import java.io.Serializable;
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.logging.Logger;
 
@@ -73,6 +74,17 @@ public class TableRendererTest extends InteractiveTestCase {
         table.getColumnModel().getColumn(xColumn).setCellRenderer(xTableRenderer);
     }
     
+    /**
+     * Test constructors: here convenience with alignment and converter
+     *
+     */
+    public void testConstructor() {
+        FormatStringValue sv = new FormatStringValue(DateFormat.getTimeInstance());
+        int align = JLabel.RIGHT;
+        DefaultTableRenderer renderer = new DefaultTableRenderer(sv, align);
+        assertEquals(sv, renderer.componentController.getToStringConverter());
+        assertEquals(align, renderer.componentController.getHorizontalAlignment());
+    }
     /**
      * test if icon handling is the same for core default and
      * swingx.

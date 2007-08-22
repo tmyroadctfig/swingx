@@ -33,6 +33,17 @@ import javax.swing.JLabel;
  * all types of renderees (JTable, JList, JTree).
  * <p>
  * 
+ * To ease content configuration, it supports a pluggable
+ * <code>StringValue</code> which purpose is to create and return a string
+ * representation of a given object. Implemenations of a ComponentProvider can
+ * use it to configure their rendering component as appropriate.<p>
+ * 
+ * F.i. to show a Contributor cell object as "Busywoman, Herta" implement a
+ * custom StringValue and use it in a text rendering provider. (Note that SwingX
+ * default implementations of Table/List/TreeCellRenderer have convenience
+ * constructors to take the converter and create a default LabelProvider which
+ * uses it).
+ * 
  * <pre><code>
  * StringValue stringValue = new StringValue() {
  * 
@@ -50,6 +61,21 @@ import javax.swing.JLabel;
  * tree.setCellRenderer(new DefaultTreeRenderer(stringValue));
  * 
  * </code></pre>
+ * 
+ * To ease handling of formatted localizable content, there's a
+ * <code>FormatStringValue</code> which is pluggable with a
+ * <code>Format</code>. <p>
+ * 
+ * F.i. to show a Date's time in the default Locale's SHORT
+ * version and right align the cell
+ * 
+ * <pre><code>
+ *   StringValue stringValue = new FormatStringValue(
+ *       DateFormat.getTimeInstance(DateFormat.SHORT));
+ *   table.getColumnExt(&quot;timeID&quot;).setCellRenderer(
+ *       new DefaultTableRenderer(stringValue, JLabel.RIGHT);  
+ * </code></pre>
+ * 
  * 
  * <p>
  * 
@@ -69,17 +95,19 @@ import javax.swing.JLabel;
  * </ul>
  * 
  * As this internally delegates default visual configuration to a
- * <code>DefaultVisuals</code> (which handles the first seven items) subclasses
- * have to guarantee the alignment only. <p>
+ * <code>DefaultVisuals</code> (which handles the first seven items)
+ * subclasses have to guarantee the alignment only.
+ * <p>
  * 
  * PENDING JW: ToolTips?
  * 
- * 
- * @see DefaultVisuals
+ * @see StringValue
+ * @see FormatStringValue
  * @see CellContext
  * @see DefaultTableRenderer
  * @see DefaultListRenderer
  * @see DefaultTreeRenderer
+ * @see DefaultVisuals
  */
 public abstract class ComponentProvider<T extends JComponent> 
     implements Serializable {
@@ -99,12 +127,25 @@ public abstract class ComponentProvider<T extends JComponent>
      *
      */
     public ComponentProvider() {
-        setHorizontalAlignment(JLabel.LEADING);
-        setToStringConverter(null);
+        this(null, JLabel.LEADING);
+    }
+    
+    /**
+     * Instantiates a LabelProvider with given to-String converter and given
+     * horizontal alignment. If the converter is null, the default TO_STRING is
+     * used.
+     * 
+     * @param converter the converter to use for mapping the cell value to a
+     *        String representation.
+     * @param alignment the horizontal alignment.
+     */
+    public ComponentProvider(StringValue converter, int alignment) {
+        setHorizontalAlignment(alignment);
+        setToStringConverter(converter);
         rendererComponent = createRendererComponent();
         defaultVisuals = createRendererController();
     }
-    
+
     /**
      * Configures and returns an appropriate component to render a cell
      * in the given context. If the context is null, returns the

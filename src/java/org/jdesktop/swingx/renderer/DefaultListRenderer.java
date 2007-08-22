@@ -83,6 +83,19 @@ public class DefaultListRenderer implements ListCellRenderer, RolloverRenderer,
         this(new LabelProvider(converter));
     }
 
+    /**
+     * Instantiates a default list renderer with a default component
+     * controller using the given converter and horizontal 
+     * alignment. 
+     * 
+     * @param converter the converter to use for mapping the
+     *   content value to a String representation.
+     * @param alignment the horizontal alignment.
+     */
+    public DefaultListRenderer(StringValue converter, int alignment) {
+        this(new LabelProvider(converter, alignment));
+    }
+
     // -------------- implements javax.swing.table.ListCellRenderer
     /**
      * 

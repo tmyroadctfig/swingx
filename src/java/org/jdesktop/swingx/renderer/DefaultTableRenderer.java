@@ -88,6 +88,18 @@ public class DefaultTableRenderer
         this(new LabelProvider(converter));
     }
 
+    /**
+     * Instantiates a default table renderer with a default component
+     * controller using the given converter and horizontal 
+     * alignment. 
+     * 
+     * @param converter the converter to use for mapping the
+     *   content value to a String representation.
+     */
+    public DefaultTableRenderer(StringValue converter, int alignment) {
+        this(new LabelProvider(converter, alignment));
+    }
+
     // -------------- implements javax.swing.table.TableCellRenderer
     /**
      * 
