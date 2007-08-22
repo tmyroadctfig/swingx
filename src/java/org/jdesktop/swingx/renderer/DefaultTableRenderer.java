@@ -33,8 +33,29 @@ import org.jdesktop.swingx.RolloverRenderer;
 
 
 /**
- * Adapter to glue SwingX renderer support to core api.
+ * Adapter to glue SwingX renderer support to core api. It has convenience
+ * constructors to create a LabelProvider, optionally configured with a
+ * StringValue and horizontal alignment. Typically, client code does not
+ * interact with this class except at instantiation time.
  * <p>
+ * 
+ * <code>JXTable</code> uses instances of this as per-class default renderers.
+ * 
+ * <pre><code>
+ * setDefaultRenderer(Object.class, new DefaultTableRenderer());
+ * setDefaultRenderer(Number.class, new DefaultTableRenderer(
+ *         FormatStringValue.NUMBER_TO_STRING, JLabel.RIGHT));
+ * setDefaultRenderer(Date.class, new DefaultTableRenderer(
+ *         FormatStringValue.DATE_TO_STRING));
+ * // use the same center aligned default for Image/Icon
+ * TableCellRenderer renderer = new DefaultTableRenderer(null, JLabel.CENTER);
+ * setDefaultRenderer(Icon.class, renderer);
+ * setDefaultRenderer(ImageIcon.class, renderer);
+ * // use a ButtonProvider for booleans
+ * setDefaultRenderer(Boolean.class,
+ *         new DefaultTableRenderer(new ButtonProvider()));
+ * </code></pre>
+ * 
  * 
  * 
  * @author Jeanette Winzenburg
@@ -121,6 +142,7 @@ public class DefaultTableRenderer
                 true, true);
         return componentController.getRendererComponent(cellContext);
     }
+    
     /**
      * @param background
      */

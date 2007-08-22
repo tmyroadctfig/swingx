@@ -23,9 +23,10 @@ package org.jdesktop.swingx.renderer;
 
 import java.text.DateFormat;
 
+import javax.swing.AbstractButton;
+import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.table.TableCellRenderer;
 
 import junit.framework.TestCase;
 
@@ -41,6 +42,32 @@ import org.jdesktop.swingx.JXTable;
 public class RenderingTest extends TestCase {
 
     /**
+     * Test provider property reset: borderPainted.
+     *
+     */
+    public void testButtonProviderBorderPainted() {
+        ButtonProvider provider = new ButtonProvider();
+        TableCellContext context = new TableCellContext();
+        AbstractButton button = provider.getRendererComponent(context);
+        assertEquals(provider.isBorderPainted(), button.isBorderPainted());
+        button.setBorderPainted(!provider.isBorderPainted());
+        provider.getRendererComponent(context);
+        assertEquals(provider.isBorderPainted(), button.isBorderPainted());
+    }
+    /**
+     * Test provider property reset: horizontal.
+     *
+     */
+    public void testButtonProviderHorizontalAlignment() {
+        ButtonProvider provider = new ButtonProvider();
+        CellContext context = new TableCellContext();
+        AbstractButton button = provider.getRendererComponent(context);
+        assertEquals(provider.getHorizontalAlignment(), button.getHorizontalAlignment());
+        button.setHorizontalAlignment(JLabel.TRAILING);
+        provider.getRendererComponent(context);
+        assertEquals(provider.getHorizontalAlignment(), button.getHorizontalAlignment());
+    }
+   /**
      * use convenience constructor where appropriate: 
      * test clients code (default renderers in JXTable).
      * 
@@ -48,9 +75,23 @@ public class RenderingTest extends TestCase {
      */
     public void testConstructorClients() {
         JXTable table = new JXTable();
-        TableCellRenderer renderer = table.getDefaultRenderer(Number.class);
-        JLabel label = (JLabel) renderer.getTableCellRendererComponent(table, null, false, false, 0, 0);
+        // Number
+        DefaultTableRenderer numberRenderer = (DefaultTableRenderer) table.getDefaultRenderer(Number.class);
+        JLabel label = (JLabel) numberRenderer.getTableCellRendererComponent(table, null, false, false, 0, 0);
         assertEquals(JLabel.RIGHT, label.getHorizontalAlignment());
+        assertEquals(FormatStringValue.NUMBER_TO_STRING, numberRenderer.componentController.getToStringConverter());
+        // icon
+        DefaultTableRenderer iconRenderer = (DefaultTableRenderer) table.getDefaultRenderer(Icon.class);
+        JLabel iconLabel = (JLabel) iconRenderer.getTableCellRendererComponent(table, null, false, false, 0, 0);
+        assertEquals(JLabel.CENTER, iconLabel.getHorizontalAlignment());
+        assertEquals(StringValue.TO_STRING, iconRenderer.componentController.getToStringConverter());
+    }
+    
+    public void testConstructorButtonProvider() {
+        ComponentProvider provider = new ButtonProvider();
+        assertEquals(JLabel.CENTER, provider.getHorizontalAlignment());
+        assertEquals(StringValue.TO_STRING, provider.getToStringConverter());
+       
     }
     /**
      * Test constructors: convenience constructor.

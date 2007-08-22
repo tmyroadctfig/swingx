@@ -25,20 +25,49 @@ import javax.swing.AbstractButton;
 import javax.swing.JLabel;
 
 /**
- * A component provider which uses a AbstractButton. 
+ * A component provider which uses a AbstractButton. <p>
+ * 
+ * PENDING: rename ... this is actually a CheckBoxProvider.
  * 
  * @author Jeanette Winzenburg
  */
 public class ButtonProvider extends ComponentProvider<AbstractButton> {
 
     private boolean borderPainted;
-
+    /**
+     * Instantiates a ButtonProvider with CENTER
+     * horizontal alignment and default border painted. <p> 
+     *
+     */
     public ButtonProvider() {
-        super();
-        setHorizontalAlignment(JLabel.CENTER);
+        super(null, JLabel.CENTER);
         setBorderPainted(true);
     }
     
+    /**
+     * Returns the border painted flag.
+     * @return the borderpainted flag to use on the checkbox.
+     * @see #setBorderPainted(boolean)
+     */
+    public boolean isBorderPainted() {
+        return borderPainted;
+    }
+    
+    /**
+     * Sets the border painted flag. the underlying checkbox
+     * is configured with this value on every request.<p>
+     * 
+     * The default value is true.
+     * 
+     * @param borderPainted the borderPainted property to configure
+     *   the underlying checkbox with.
+     *   
+     *  @see #isBorderPainted() 
+     */
+    public void setBorderPainted(boolean borderPainted) {
+        this.borderPainted = borderPainted;
+    }
+
     /**
      * {@inheritDoc} <p>
      * Overridden to set the button's selected state. It's set to true if the 
@@ -57,9 +86,10 @@ public class ButtonProvider extends ComponentProvider<AbstractButton> {
      * to this controller's properties.
      */
     protected void configureState(CellContext context) {
-        rendererComponent.setBorderPainted(borderPainted);
+        rendererComponent.setBorderPainted(isBorderPainted());
         rendererComponent.setHorizontalAlignment(getHorizontalAlignment());
     }
+
 
     /**
      * {@inheritDoc}<p>
@@ -69,14 +99,6 @@ public class ButtonProvider extends ComponentProvider<AbstractButton> {
     @Override
     protected AbstractButton createRendererComponent() {
         return new JRendererCheckBox();
-    }
-
-    /**
-     * @param b
-     */
-    protected void setBorderPainted(boolean b) {
-        this.borderPainted = b;
-        
     }
 
     

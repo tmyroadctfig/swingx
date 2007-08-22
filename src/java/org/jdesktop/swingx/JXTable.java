@@ -116,7 +116,6 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.renderer.ButtonProvider;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.FormatStringValue;
-import org.jdesktop.swingx.renderer.LabelProvider;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
@@ -3607,18 +3606,20 @@ public class JXTable extends JTable
                 7, 0, 8, 0, 9, 0, 10, 0, };
         defaultRenderersByColumnClass = new UIDefaults(dummies);
         defaultRenderersByColumnClass.clear();
-        // use swingx renderers by default
+        // configured default table renderer (internally LabelProvider)
         setDefaultRenderer(Object.class, new DefaultTableRenderer());
-        LabelProvider controller = new LabelProvider(
-                FormatStringValue.NUMBER_TO_STRING, JLabel.RIGHT);
-        setDefaultRenderer(Number.class, new DefaultTableRenderer(controller));
+        setDefaultRenderer(Number.class, new DefaultTableRenderer(
+                FormatStringValue.NUMBER_TO_STRING, JLabel.RIGHT));
         setDefaultRenderer(Date.class, new DefaultTableRenderer(
                 FormatStringValue.DATE_TO_STRING));
+        // use the same center aligned default for Image/Icon
         TableCellRenderer renderer  = new DefaultTableRenderer(
-                new LabelProvider(JLabel.CENTER));
+                null, JLabel.CENTER);
         setDefaultRenderer(Icon.class, renderer);
         setDefaultRenderer(ImageIcon.class, renderer);
-        setDefaultRenderer(Boolean.class, new DefaultTableRenderer(new ButtonProvider()));
+        // use a ButtonProvider for booleans
+        setDefaultRenderer(Boolean.class, new DefaultTableRenderer(
+                new ButtonProvider()));
 
 
 //        // standard renderers
