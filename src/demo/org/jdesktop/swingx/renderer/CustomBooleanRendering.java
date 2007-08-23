@@ -11,7 +11,6 @@ import java.net.URL;
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
@@ -35,29 +34,30 @@ public class CustomBooleanRendering {
 
     /**
      * Replace the default boolean rendering with a custom
-     * ComponentProvider.
+     * content-icon mapping.
      * 
-     * @see org.javadesktop.swingx.renderer.ComponentProvider
+     * @see org.javadesktop.swingx.renderer.IconValue
+     * @see org.javadesktop.swingx.renderer.StringValue
      */
     private void configureRendering(JXTable table) {
-        LabelProvider provider = new LabelProvider(JLabel.CENTER) {
-            Icon yesIcon = getIcon("resources/green-orb.png");
-            Icon noIcon = getIcon("resources/exit.png");
-            @Override
-            protected void format(CellContext context) {
-                if (Boolean.TRUE.equals(context.getValue())) {
-                    rendererComponent.setIcon(yesIcon);
-                } else if (Boolean.FALSE.equals(context.getValue())) {
-                    rendererComponent.setIcon(noIcon);
-                } else {
-                    rendererComponent.setIcon(null);
-                }
-                rendererComponent.setText(null);
+        final Icon yesIcon = getIcon("resources/green-orb.png");
+        final Icon noIcon = getIcon("resources/exit.png");
+        IconValue iv = new IconValue() {
+
+            public Icon getIcon(Object value) {
+                if (Boolean.TRUE.equals(value)) {
+                    return yesIcon;
+                } else if (Boolean.FALSE.equals(value)) {
+                    return noIcon;
+                } 
+                return null;
             }
             
-        }; 
-        table.setDefaultRenderer(Boolean.class, new DefaultTableRenderer(provider));
+        };
+        table.setDefaultRenderer(Boolean.class, 
+                new DefaultTableRenderer(new StringIconValue(StringValue.EMPTY, iv)));
     }
+    
     /**
      * Replace the default boolean rendering with a Highlighter.
      * Note: this is just for fun! Typically, the "what" to render
@@ -89,7 +89,7 @@ public class CustomBooleanRendering {
         configureTable(fun);
         configureFunRendering(fun);
         JTabbedPane pane = new JTabbedPane();
-        pane.addTab("Custom Provider", new JScrollPane(table));
+        pane.addTab("Custom Content Mapping", new JScrollPane(table));
         pane.addTab("Boolean Highlighter", new JScrollPane(fun));
         pane.setToolTipTextAt(1, "Just for fun!");
         return pane;
