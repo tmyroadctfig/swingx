@@ -42,6 +42,7 @@ import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.SerializableSupport;
 
 /**
@@ -102,12 +103,16 @@ public class TableRendererTest extends InteractiveTestCase {
         coreIconRenderer.getTableCellRendererComponent(table, icon, false, false, -1, -1);
         assertEquals(icon, coreIconRenderer.getIcon());
         assertEquals("", coreIconRenderer.getText());
-        JLabel label = (JLabel) xTableRenderer.getTableCellRendererComponent(null, icon, false, false, -1, -1);
+        JXTable xTable = new JXTable();
+        TableCellRenderer xIconRenderer = xTable.getDefaultRenderer(Icon.class);
+        JLabel label = (JLabel) xIconRenderer.getTableCellRendererComponent(null, icon, false, false, -1, -1);
         assertEquals(icon, label.getIcon());
         assertEquals("", label.getText());
-        label = (JLabel) xTableRenderer.getTableCellRendererComponent(null, "dummy", false, false, -1, -1);
-        assertNull(label.getIcon());
-        assertEquals("dummy", label.getText());        
+        // wrong assumption after fix of #591-swingx - default icon renderer
+        // no longer tries to be clever
+//        label = (JLabel) xIconRenderer.getTableCellRendererComponent(null, "dummy", false, false, -1, -1);
+//        assertNull(label.getIcon());
+//        assertEquals("dummy", label.getText());        
     }
         /**
      * @return
@@ -124,7 +129,7 @@ public class TableRendererTest extends InteractiveTestCase {
             
         };
         Date today = new Date();
-        Icon icon = new ImageIcon(JXTable.class.getResource("resources/images/kleopatra.jpg"));
+        Icon icon = XTestUtils.loadDefaultIcon();
         for (int i = 0; i < 10; i++) {
             Object[] values = new Object[] {"row " + i, i, Math.random() * 100, 
                     new Date(today.getTime() + i * 1000000), icon, i % 2 == 0};

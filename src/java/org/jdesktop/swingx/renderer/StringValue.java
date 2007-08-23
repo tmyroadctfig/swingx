@@ -100,7 +100,9 @@ public interface StringValue extends Serializable {
         
     };
     /**
-     * Returns a string representation of the given value.
+     * Returns a string representation of the given value. <p>
+     * 
+     * PENDING JW: forgot - why not null return guaranteed?
      * 
      * @param value the object to present as a string
      * @return a string representation of the given value, 

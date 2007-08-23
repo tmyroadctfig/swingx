@@ -75,8 +75,8 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
 //      setSystemLF(true);
       HighlighterClientVisualCheck test = new HighlighterClientVisualCheck();
       try {
-//         test.runInteractiveTests();
-         test.runInteractiveTests(".*Tool.*");
+         test.runInteractiveTests();
+//         test.runInteractiveTests(".*Tool.*");
 //         test.runInteractiveTests(".*Color.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");

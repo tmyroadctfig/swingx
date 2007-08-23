@@ -677,7 +677,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
             @Override
             protected void format(CellContext context) {
                 super.format(context);
-                rendererComponent.setText(" ... " + getStringValue(context));
+                rendererComponent.setText(" ... " + getValueAsString(context));
             }
 
             /**

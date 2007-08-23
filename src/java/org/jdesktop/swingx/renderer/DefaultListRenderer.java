@@ -26,6 +26,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.io.Serializable;
 
+import javax.swing.Icon;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
@@ -65,19 +66,43 @@ public class DefaultListRenderer implements ListCellRenderer, RolloverRenderer,
      */
     public DefaultListRenderer(ComponentProvider componentController) {
         if (componentController == null) {
-            componentController = new LabelProvider();
+            componentController = new LabelProvider(createDefaultStringValue());
         }
         this.componentController = componentController;
         this.cellContext = new ListCellContext();
     }
 
     /**
-     * Instantiates a default table renderer with a default component
-     * controller using the given converter. 
+     * Creates and returns the default StringValue for a JList.<p>
+     * This is added to keep consistent with core list rendering which
+     * shows either the Icon (for Icon value types) or the default 
+     * to-string for non-icon types.
      * 
-     * @param converter the converter to use for mapping the
-     *   content value to a String representation.
-     *   
+     * @return the StringValue to use by default.
+     */
+    private StringValue createDefaultStringValue() {
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof Icon) {
+                    return "";
+                }
+                return StringValue.TO_STRING.getString(value);
+            }
+
+        };
+        return new StringIconValue(sv, IconValue.ICON);
+    }
+
+    /**
+     * Instantiates a default table renderer with a default component controller
+     * using the given converter.<p>
+     * 
+     * PENDING JW: how to guarantee core consistent icon handling?
+     * 
+     * @param converter the converter to use for mapping the content value to a
+     *        String representation.
+     * 
      */
     public DefaultListRenderer(StringValue converter) {
         this(new LabelProvider(converter));
@@ -87,6 +112,9 @@ public class DefaultListRenderer implements ListCellRenderer, RolloverRenderer,
      * Instantiates a default list renderer with a default component
      * controller using the given converter and horizontal 
      * alignment. 
+     * 
+     * PENDING JW: how to guarantee core consistent icon handling?
+     * 
      * 
      * @param converter the converter to use for mapping the
      *   content value to a String representation.

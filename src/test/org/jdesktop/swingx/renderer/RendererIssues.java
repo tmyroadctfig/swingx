@@ -25,12 +25,14 @@ import java.awt.Component;
 import java.awt.Font;
 import java.util.logging.Logger;
 
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableCellRenderer;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXTable;
-import org.jdesktop.swingx.painter.ShapePainter;
+import org.jdesktop.swingx.test.XTestUtils;
 
 /**
  * Test around known issues of SwingX renderers. <p>
@@ -44,6 +46,61 @@ import org.jdesktop.swingx.painter.ShapePainter;
 public class RendererIssues extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(RendererIssues.class
             .getName());
+
+    /**
+     * Test provider respect converter. 
+     * 
+     * Here: must show the
+     * description instead of setting the icon.
+     *
+     */
+    public void testLabelProviderRespectStringValueNoIcon() {
+        ImageIcon icon = (ImageIcon) XTestUtils.loadDefaultIcon();
+        icon.setDescription("description");
+        LabelProvider provider = new LabelProvider(
+                new StringIconValue(StringValue.TO_STRING, IconValue.EMPTY));
+        TableCellContext context = new TableCellContext();
+        context.value = icon;
+        JLabel label = provider.getRendererComponent(context);
+        assertNull("icon must be null", label.getIcon());
+        assertEquals("label text must be default to-string", StringValue.TO_STRING.getString(icon), label.getText());
+    }
+    
+    /**
+     * Test provider respect converter. 
+     * 
+     * Here: must show the icon and empty text.
+     *
+     */
+    public void testLabelProviderRespectIconValueNoString() {
+        ImageIcon icon = (ImageIcon) XTestUtils.loadDefaultIcon();
+        icon.setDescription("description");
+        LabelProvider provider = new LabelProvider(
+                new StringIconValue(StringValue.EMPTY, IconValue.ICON));
+        TableCellContext context = new TableCellContext();
+        context.value = icon;
+        JLabel label = provider.getRendererComponent(context);
+        assertEquals(icon, label.getIcon());
+        assertEquals("label text must be empty", StringValue.EMPTY.getString(icon), label.getText());
+    }
+    
+    /**
+     * Test provider respect converter. 
+     * 
+     * Here: must show both description and icon.
+     *
+     */
+    public void testLabelProviderRespectStringIconValueBoth() {
+        ImageIcon icon = (ImageIcon) XTestUtils.loadDefaultIcon();
+        icon.setDescription("description");
+        LabelProvider provider = new LabelProvider(
+                new StringIconValue(StringValue.TO_STRING, IconValue.ICON));
+        TableCellContext context = new TableCellContext();
+        context.value = icon;
+        JLabel label = provider.getRendererComponent(context);
+        assertEquals(icon, label.getIcon());
+        assertEquals(StringValue.TO_STRING.getString(icon), label.getText());
+    }
 
     /**
      * test if renderer properties are updated on LF change. <p>
@@ -111,88 +168,6 @@ public class RendererIssues extends InteractiveTestCase {
         label.paintComponent(null);
     }
 
-    /**
-     * RendererLabel NPE with null Graphics. 
-     * Fail-fast NPE in label.paintComponentWithPainter.
-     *
-     */
-    public void testLabelNPEPaintComponentOpaqueWithPainter() {
-        JRendererLabel label = new JRendererLabel();
-        label.setOpaque(true);
-        label.setPainter(new ShapePainter());
-        try {
-            label.paintComponent(null);
-            fail("invoke paintComponent with null graphics must throw NPE");
-        } catch (NullPointerException e) {
-            // basically the right thing - but how to test the fail-fast?
-            LOG.info("got the expected NPE - " +
-                        "but how to test the fail-fast impl? " + e);
-        } catch (Exception e) {
-            fail("unexpected exception invoke paintcomponent with null" + e);
-        }
-    }
-    /**
-     * RendererLabel NPE with null Graphics. 
-     * Fail-fast NPE in paintPainter.
-     *
-     */
-    public void testLabelNPEPaintComponentWithPainter() {
-        JRendererLabel label = new JRendererLabel();
-        label.setOpaque(false);
-        label.setPainter(new ShapePainter());
-        try {
-            label.paintComponent(null);
-            fail("invoke paintComponent with null graphics must throw NPE");
-        } catch (NullPointerException e) {
-            // basically the right thing - but how to test the fail-fast?
-            LOG.info("got the expected NPE - " +
-                        "but how to test the fail-fast impl? " + e);
-        } catch (Exception e) {
-            fail("unexpected exception invoke paintcomponent with null" + e);
-        }
-    }
-
-    /**
-     * RendererLabel NPE with null Graphics. 
-     * NPE in label.paintComponentWithPainter finally block.
-     *
-     */
-    public void testButtonNPEPaintComponentOpaqueWithPainter() {
-        JRendererCheckBox  checkBox = new JRendererCheckBox();
-        checkBox.setOpaque(true);
-        checkBox.setPainter(new ShapePainter());
-        try {
-            checkBox.paintComponent(null);
-            fail("invoke paintComponent with null graphics must throw NPE");
-        } catch (NullPointerException e) {
-            // basically the right thing - but how to test the fail-fast?
-            LOG.info("got the expected NPE - " +
-                        "but how to test the fail-fast impl? " + e);
-        } catch (Exception e) {
-            fail("unexpected exception invoke paintcomponent with null" + e);
-        }
-    }
-
-    /**
-     * RendererCheckBox NPE with null Graphics. NPE in
-     * label.paintComponentWithPainter finally block.
-     * 
-     */
-    public void testButtonNPEPaintComponentWithPainter() {
-        JRendererCheckBox checkBox = new JRendererCheckBox();
-        checkBox.setOpaque(false);
-        checkBox.setPainter(new ShapePainter());
-        try {
-            checkBox.paintComponent(null);
-            fail("invoke paintComponent with null graphics must throw NPE");
-        } catch (NullPointerException e) {
-            // basically the right thing - but how to test the fail-fast?
-            LOG.info("got the expected NPE - " +
-                        "but how to test the fail-fast impl? " + e);
-        } catch (Exception e) {
-            fail("unexpected exception invoke paintcomponent with null" + e);
-        }
-    }
 
 
 }

@@ -98,6 +98,7 @@ import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
+import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
 
@@ -114,7 +115,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
 //            test.runInteractiveTests();
 //          test.runInteractiveTests(".*Text.*");
 //          test.runInteractiveTests(".*XLabel.*");
-          test.runInteractiveTests(".*Date.*");
+          test.runInteractiveTests(".*Color.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -207,7 +208,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
 
         @Override
         protected void format(CellContext context) {
-            rendererComponent.setText(getStringValue(context));
+            rendererComponent.setText(getValueAsString(context));
         }
         
     }
@@ -252,7 +253,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
 
         @Override
         protected void format(CellContext context) {
-            rendererComponent.setText(getStringValue(context));
+            rendererComponent.setText(getValueAsString(context));
         }
         
     }
@@ -301,21 +302,19 @@ public class RendererVisualCheck extends InteractiveTestCase {
     public void interactiveTableDefaultRenderers() {
         TableModel model = createTableModelWithDefaultTypes();
         final JTable standard = new JTable(model);
+        // used as source for swingx renderers
+        final JXTable xTable = new JXTable();
         final JTable enhanced = new JTable(model) {
 
             @Override
             protected void createDefaultRenderers() {
                 defaultRenderersByColumnClass = new UIDefaults();
-                setDefaultRenderer(Object.class, new DefaultTableRenderer());
-                LabelProvider controller = new LabelProvider(FormatStringValue.NUMBER_TO_STRING);
-                controller.setHorizontalAlignment(JLabel.RIGHT);
-                setDefaultRenderer(Number.class, new DefaultTableRenderer(controller));
-                setDefaultRenderer(Date.class, new DefaultTableRenderer(
-                        FormatStringValue.DATE_TO_STRING));
-                TableCellRenderer renderer  = new DefaultTableRenderer(new LabelProvider(JLabel.CENTER));
-                setDefaultRenderer(Icon.class, renderer);
-                setDefaultRenderer(ImageIcon.class, renderer);
-                setDefaultRenderer(Boolean.class, new DefaultTableRenderer(new ButtonProvider()));
+                setDefaultRenderer(Object.class, xTable.getDefaultRenderer(Object.class));
+                setDefaultRenderer(Number.class, xTable.getDefaultRenderer(Number.class));
+                setDefaultRenderer(Date.class, xTable.getDefaultRenderer(Date.class));
+                setDefaultRenderer(Icon.class, xTable.getDefaultRenderer(Icon.class));
+                setDefaultRenderer(ImageIcon.class, xTable.getDefaultRenderer(ImageIcon.class));
+                setDefaultRenderer(Boolean.class, xTable.getDefaultRenderer(Boolean.class));
             }
             
         };
@@ -347,7 +346,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
             
         };
         Date today = new Date();
-        Icon icon = new ImageIcon(JXTable.class.getResource("resources/images/kleopatra.jpg"));
+        Icon icon = XTestUtils.loadDefaultIcon();
         for (int i = 0; i < 10; i++) {
             Object[] values = new Object[] {"row " + i, i, Math.random() * 100, 
                     new Date(today.getTime() + i * 1000000), icon, i % 2 == 0};
@@ -848,7 +847,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         TableCellRenderer renderer = createColorRendererExt();
         table.setDefaultRenderer(Color.class, renderer);
         JXFrame frame = wrapWithScrollingInFrame(xtable, table, "JXTable/highlighter: Custom color renderer - standard/ext");
-        addStatusMessage(frame, "LegacyHighlighter hide custom color renderer background for unselected");
+        addStatusMessage(frame, "Highlighter hide custom color renderer background for unselected");
         frame.setVisible(true);
     }
 
@@ -869,7 +868,8 @@ public class RendererVisualCheck extends InteractiveTestCase {
         TableCellRenderer renderer = createColorRendererExt();
         table.setDefaultRenderer(Color.class, renderer);
         JXFrame frame = wrapWithScrollingInFrame(xtable, table, "JXTable/highlighter dont-touch: Custom color renderer - standard/ext");
-        addStatusMessage(frame, "LegacyHighlighter doesn't touch custom color renderer visual properties");
+        addStatusMessage(frame, "Highlighter doesn't touch custom color renderer visual properties");
+        frame.pack();
         frame.setVisible(true);
     }
 
@@ -885,7 +885,7 @@ public class RendererVisualCheck extends InteractiveTestCase {
         HighlightPredicate predicate = new HighlightPredicate() {
 
             public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
-                return ((JComponent) renderer).getClientProperty("renderer-dont-touch") != null;
+                return ((JComponent) renderer).getClientProperty("renderer-dont-touch") == null;
             }
             
         };
@@ -915,7 +915,10 @@ public class RendererVisualCheck extends InteractiveTestCase {
         JXList list = new JXList(model);
         ListCellRenderer renderer = new DefaultListRenderer(controller);
         list.setCellRenderer(renderer);
-        showWithScrollingInFrame(xtable, list, "JXTable/JXList: Custom color renderer - sharing the component controller");
+        JXFrame frame = wrapWithScrollingInFrame(xtable, list, "JXTable/JXList: Custom color renderer - sharing the component controller");
+        addMessage(frame, "share provider in normally in different comps is okay?");
+        frame.pack();
+        frame.setVisible(true);
     }
 
     /**
@@ -929,10 +932,13 @@ public class RendererVisualCheck extends InteractiveTestCase {
         xtable.setDefaultRenderer(Color.class, new DefaultTableRenderer(controller));
         TreeModel model = createTreeColorModel();
         JTree tree = new JTree(model);
-        ComponentProvider wrapper = new WrappingProvider(createColorRenderingLabelController());
+        ComponentProvider wrapper = new WrappingProvider(controller); //;createColorRenderingLabelController());
         TreeCellRenderer renderer = new DefaultTreeRenderer(wrapper);
         tree.setCellRenderer(renderer);
-        showWithScrollingInFrame(xtable, tree, "JXTable/JXTree: Custom color renderer - sharing the component controller");
+        JXFrame frame = wrapWithScrollingInFrame(xtable, tree, "JXTable/JXTree: Custom color renderer - sharing the component controller");
+        addMessage(frame, "share provider in table and in wrappingProvider does not work?");
+        frame.pack();
+        frame.setVisible(true);
     }
 
     /**

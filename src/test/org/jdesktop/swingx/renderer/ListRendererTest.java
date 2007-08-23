@@ -39,6 +39,7 @@ import javax.swing.border.Border;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.SerializableSupport;
 
 /**
@@ -87,7 +88,7 @@ public class ListRendererTest extends InteractiveTestCase {
      *
      */
     public void testIcon() {
-        Icon icon = new ImageIcon(JXTable.class.getResource("resources/images/kleopatra.jpg"));
+        Icon icon = XTestUtils.loadDefaultIcon();
         JList list = new JList(new Object[] {icon, "dummy"});
         coreListRenderer.getListCellRendererComponent(list, icon, 0, false, false);
         assertEquals(icon, coreListRenderer.getIcon());
@@ -95,6 +96,19 @@ public class ListRendererTest extends InteractiveTestCase {
         coreListRenderer.getListCellRendererComponent(list, "dummy", 1, false, false);
         assertNull(coreListRenderer.getIcon());
         assertEquals("dummy", coreListRenderer.getText());
+        // must be handled by DefaultListRenderer
+//        StringValue sv = new StringValue() {
+//
+//            public String getString(Object value) {
+//                if (value instanceof Icon) {
+//                    return "";
+//                }
+//                return StringValue.TO_STRING.getString(value);
+//            }
+//            
+//        };
+//        ListCellRenderer xListRenderer = new DefaultListRenderer(
+//                new StringIconValue(sv, IconValue.ICON));
         JLabel label = (JLabel) xListRenderer.getListCellRendererComponent(null, icon, 0, false, false);
         assertEquals(icon, label.getIcon());
         assertEquals("", label.getText());

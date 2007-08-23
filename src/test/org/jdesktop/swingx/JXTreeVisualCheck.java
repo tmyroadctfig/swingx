@@ -34,12 +34,13 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JTree;
+import javax.swing.LookAndFeel;
 import javax.swing.ToolTipManager;
+import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 
 import org.jdesktop.swingx.decorator.ColorHighlighter;
-import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
@@ -60,7 +61,7 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
       try {
 //          test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*RToL.*");
-          test.runInteractiveTests("interactive.*Highl.*");
+          test.runInteractiveTests("interactive.*Edit.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -81,8 +82,22 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
      *
      */
     public void interactiveToggleEditProperties() {
+        LookAndFeel lf;
         final JXTree table = new JXTree();
         table.setEditable(true);
+        DefaultTreeCellEditor editor = new DefaultTreeCellEditor(null, null) {
+
+            @Override
+            public boolean stopCellEditing() {
+                String value = String.valueOf(getCellEditorValue());
+                if (value.startsWith("s")) {
+                    return false;
+                }
+                return super.stopCellEditing();
+            }
+            
+        };
+        table.setCellEditor(editor);
         JXFrame frame = wrapWithScrollingInFrame(table, new JButton("something to focus"), 
                 "JXTree: toggle invokesStopEditing ");
         Action toggleTerminate = new AbstractAction("toggleInvokesStop") {

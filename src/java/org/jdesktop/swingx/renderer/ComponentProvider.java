@@ -23,6 +23,7 @@ package org.jdesktop.swingx.renderer;
 
 import java.io.Serializable;
 
+import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
@@ -99,7 +100,6 @@ import javax.swing.JLabel;
  * subclasses have to guarantee the alignment only.
  * <p>
  * 
- * PENDING JW: ToolTips?
  * 
  * @see StringValue
  * @see FormatStringValue
@@ -118,7 +118,8 @@ public abstract class ComponentProvider<T extends JComponent>
     /** horizontal (text) alignment of component. 
      * PENDING: useful only for labels, buttons? */
     protected int alignment;
-    /** the converter to use for string representation. */
+    /** the converter to use for string representation. 
+     * PENDING: IconValue? */
     protected StringValue formatter;
     
     /**
@@ -224,10 +225,18 @@ public abstract class ComponentProvider<T extends JComponent>
      * across all (new and old) theme: rendering, (pattern) filtering/highlighting,
      * searching, auto-complete, what else??   <p>
      * 
-     * PENDING JW: rename!
+     * PENDING JW: this _cannot_ be the hook for client code as described above. Instead,
+     * it is used internally for safely getting at the value (need to check against
+     * null). For now it's deprecated, will remove. Subclasses should use ??, client
+     * code should use ??.
+     * 
+     * <p>
+     * PENDING JW: rename! <p>
+     * 
      * 
      * @param context the cell context.
      * @return a appropriate string representation of the cell's content.
+     * @deprecated use 
      */
     public String getStringValue(CellContext context) {
         Object value = null;
@@ -235,6 +244,45 @@ public abstract class ComponentProvider<T extends JComponent>
             value = context.getValue();
         }
         return formatter.getString(value);
+    }
+
+    /**
+     * Returns a String representation of the content.<p>
+     * 
+     * This method copes with null context and messages the 
+     * <code>StringValue</code> to get the String rep. Meant as 
+     * a convenience for subclasses.
+     * 
+     * @param context the cell context.
+     * @return a appropriate string representation of the cell's content.
+     */
+    protected String getValueAsString(CellContext context) {
+        Object value = null;
+        if (context != null) {
+            value = context.getValue();
+        }
+        return formatter.getString(value);
+    }
+
+    /**
+     * Returns a Icon representation of the content.<p>
+     * 
+     * This method copes with null context and messages the 
+     * <code>IconValue</code> to get the Icon rep. Meant as 
+     * a convenience for subclasses.
+     * 
+     * @param context the cell context.
+     * @return a appropriate string representation of the cell's content.
+     */
+    protected Icon getValueAsIcon(CellContext context) {
+        Object value = null;
+        if (context != null) {
+            value = context.getValue();
+        }
+        if (formatter instanceof IconValue) {
+            return ((IconValue) formatter).getIcon(value);
+        }
+        return null;
     }
 
     /**

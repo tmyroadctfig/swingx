@@ -339,7 +339,7 @@ public class TreeRendererTest extends InteractiveTestCase {
             @Override
             protected void format(CellContext context) {
                 boolean selected = false;
-                String text = getStringValue(context);
+                String text = getValueAsString(context);
                 if (context.getValue() instanceof Action) {
                     Action action = (Action) context.getValue();
                     text = (String) action.getValue(Action.NAME);

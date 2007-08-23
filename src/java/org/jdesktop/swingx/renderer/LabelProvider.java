@@ -28,19 +28,14 @@ import javax.swing.JLabel;
  * A component provider which uses a <code>JLabel</code> as rendering
  * component. <p>
  * 
- * It configures the label from the cell value depending on it's type:
- * <ul>
- * <li> Icon - sets the icon property to the value and clears the text
- *   property.
- * <li> all other types - sets the icon property to null and sets
- *   its text property to the String representation as returned from
- *   the StringValue.
- * </ul>    
+ * It configures the Label's text and icon property from the  
+ * StringValue.
  * 
  * @author Jeanette Winzenburg
  * 
  * @see StringValue
  * @see FormatStringValue
+ * @see IconValue
  */
 public class LabelProvider extends ComponentProvider<JLabel> {
 
@@ -110,29 +105,18 @@ public class LabelProvider extends ComponentProvider<JLabel> {
 
     /**
      * {@inheritDoc}
-     * Here: sets the labels text and icon property depending on the
-     * type of the context's value. If the value is of <code>Icon</code> type, it's 
-     * used as the label's icon and the text is set to empty. Otherwise,
-     * the icon is set to null and the text is set to the value as returned
-     * from getStringValue. <p>
-     * 
-     * Note: this is the behaviour as implemented in core default list renderer. 
-     * It is different from core default table renderer which handles icons in
-     * a subclass only. 
+     * Here: sets the labels's text and icon property to the value as 
+     * returned by getValueAsString/Icon, respectively.
      * 
      * @param context the cellContext to use
      * 
-     * @see #getStringValue(CellContext) 
+     * @see #getValueAsString(CellContext)
+     * @see #getValueAsIcon(CellContext) 
      */
     @Override
     protected void format(CellContext context) {
-        if (context.getValue() instanceof Icon) {
-            rendererComponent.setIcon((Icon) context.getValue());
-            rendererComponent.setText(getStringValue(null));
-        } else {
-            rendererComponent.setIcon(null);
-            rendererComponent.setText(getStringValue(context));
-        }
+        rendererComponent.setIcon(getValueAsIcon(context));
+        rendererComponent.setText(getValueAsString(context));
     }
 
     

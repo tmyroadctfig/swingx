@@ -35,7 +35,6 @@ import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -898,8 +897,8 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      */    
     public void interactiveTestTreeIcons() {
         final JXTreeTable treeTable = new JXTreeTable(treeTableModel);
-        final Icon downIcon = new ImageIcon(getClass().getResource("resources/images/" + "wellbottom.gif"));
-        final Icon upIcon = new ImageIcon(getClass().getResource("resources/images/" + "welltop.gif"));
+        final Icon downIcon = XTestUtils.loadDefaultIcon("wellbottom.gif");
+        final Icon upIcon = XTestUtils.loadDefaultIcon("welltop.gif");
         Action toggleClosedIcon = new AbstractAction("Toggle closed icon") {
             boolean down;
             public void actionPerformed(ActionEvent e) {
