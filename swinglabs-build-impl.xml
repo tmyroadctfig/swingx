@@ -35,7 +35,7 @@
 
     Version 1.0
 -->    
-<project name="swinglabs-build-impl" default="bundle" basedir=".">
+<project name="swinglabs-build-impl" default="bundles" basedir=".">
     <!-- 
     ======================
     INITIALIZATION SECTION 
@@ -259,4 +259,44 @@ ${build.branch} ${RELEASE_DSTAMP_LONG} ${projectname}</concat>
             <arg value="${grok.home}/data" />
         </java>
     </target>
+
+    <target name="push-to-maven-prepare" depends="init,jar">
+	  <taskdef resource="maven-repository-importer.properties">
+	    <classpath>
+	      <pathelement path="lib/build-only/maven-repository-importer-1.2.jar" />
+	    </classpath>
+	  </taskdef>
+      <property environment="env"/>
+      <property name="version" value="0.9-b${env.BUILD_NUMBER}"/>
+	  <delete dir="build/maven-repo" /><!-- clean it -->
+      <copy file="swingx.pom" toFile="build/swingx.pom">
+        <filterset>
+          <filter token="VERSION" value="${version}"/>
+        </filterset>
+      </copy>
+      <zip destfile="build/swingxsrc.zip">
+        <fileset dir="${java.dir}" excludes="**/CVS/**/ **/.svn/**"/>
+        <fileset dir="${test.test.dir}" excludes="**/CVS/**/ **/.svn/**"/>
+        <fileset dir="${src.beaninfo.dir}" excludes="**/CVS/**/ **/.svn/**"/>
+        <fileset dir="${src.demo.dir}" excludes="**/CVS/**/ **/.svn/**"/>
+      </zip>
+	  <maven-repository-importer destdir="build/maven-repo" version="${version}">
+        <artifact jar="dist/swingx.jar"  pom="build/swingx.pom" srczip="build/swingxsrc.zip" />
+	  </maven-repository-importer>
+	</target>
+
+	<target name="push-to-maven" depends="push-to-maven-prepare">
+	  <!-- import to CVS-->
+	  <tstamp />
+	  <echo>importing to CVS...</echo>
+	  <cvs dest="build/maven-repo">
+	    <commandline>
+	      <argument line="-z9 import -ko -W *.jar -kb -m" />
+	      <argument value="deploying new jars to the java.net maven repository" />
+
+	      <argument value="repo" />
+	      <argument line="deployment-to-maven-repository t${DSTAMP}${TSTAMP}" />
+	    </commandline>
+	  </cvs>
+	</target>
 </project>
