@@ -1,0 +1,94 @@
+<project>
+  <pomVersion>3</pomVersion>
+  <groupId>swinglabs</groupId>
+  <artifactId>swingx</artifactId>
+  <version>0.9-b3</version>
+  <name>SwingLabs Swing Component Extensions</name>
+  <shortDescription>Extensions to the Swing GUI toolkit</shortDescription>
+  <description>Contains extensions to the Swing GUI toolkit, including new and enhanced components that provide functionality commonly required by rich client applications.</description>
+  <url>https://swingx.dev.java.net/</url>
+  <issueTrackingUrl>https://swingx.dev.java.net/servlets/ProjectIssues</issueTrackingUrl>
+  <inceptionYear>2003</inceptionYear>
+  <siteAddress>swingx.dev.java.net</siteAddress>
+  <siteDirectory>/</siteDirectory>
+  <mailingLists>
+    <mailingList>
+      <name>discussion list</name>
+      <subscribe>jdnc-subscribe@jdnc.dev.java.net</subscribe>
+      <unsubscribe>jdnc-unsubscribe@jdnc.dev.java.net</unsubscribe>
+      <archive>https://jdnc.dev.java.net/servlets/SummarizeList?listName=jdnc</archive>
+    </mailingList>
+  </mailingLists>
+  <licenses>
+    <license>
+      <name>Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/copyleft/lesser.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <repository>
+    <connection>scm:cvs:pserver:guest@cvs.dev.java.net:/cvs:swingx</connection>
+    <url>https://swingx.dev.java.net/source/browse/swingx/</url>
+  </repository>
+  <organization>
+    <url>http://www.java.net/</url>
+    <logo>https://dalma.dev.java.net/maven/images/java.net-logo.png</logo>
+  </organization>
+  <package>org.jdesktop.swingx</package>
+  <build>
+    <sourceDirectory>src/java</sourceDirectory>
+    <unitTestSourceDirectory>src/test</unitTestSourceDirectory>
+    <unitTest>
+      <resources>
+        <resource>
+          <directory>src/test</directory>
+          <includes>
+            <include>**/*.xml</include>
+            <include>**/*.xsl</include>
+            <include>**/*.rng</include>
+            <include>**/*.dtd</include>
+          </includes>
+        </resource>
+      </resources>
+      <includes>
+        <include>**/*Test.java</include>
+      </includes>
+    </unitTest>
+    <resources>
+      <resource>
+        <directory>src/java</directory>
+        <includes>
+          <include>**/*.properties</include>
+        </includes>
+      </resource>
+    </resources>
+  </build>
+  <!--dependencies>
+    <dependency>
+      <groupId>swing-worker</groupId>
+      <artifactId>swing-worker</artifactId>
+      <version>0.9.5</version>
+    </dependency>
+    <dependency>
+      <groupId>MultipleGradientPaint</groupId>
+      <artifactId>MultipleGradientPaint</artifactId>
+      <version>1.5.4</version>
+    </dependency>
+    <dependency>
+      <groupId>Filters</groupId>
+      <artifactId>Filters</artifactId>
+      <version>2.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>jmock</groupId>
+      <artifactId>jmock</artifactId>
+      <version>1.1.0.rc1</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+    </dependency>
+  </dependencies-->
+</project>
