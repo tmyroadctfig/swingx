@@ -291,7 +291,7 @@ ${build.branch} ${RELEASE_DSTAMP_LONG} ${projectname}</concat>
 	  <echo>importing to CVS...</echo>
 	  <cvs dest="build/maven-repo">
 	    <commandline>
-          <argument value="-d :pserver:swinglabs@cvs.dev.java.net:/cvs" />
+          <argument value="-d:pserver:swinglabs@cvs.dev.java.net:/cvs" />
 	      <argument line="-z9 import -ko -W *.jar -kb -m" />
 	      <argument value="deploying new jars to the java.net maven repository" />
 
