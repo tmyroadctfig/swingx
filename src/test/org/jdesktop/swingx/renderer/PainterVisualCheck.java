@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
-import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
@@ -186,24 +185,27 @@ public class PainterVisualCheck extends InteractiveTestCase {
         // quick-fill and hook to table columns' visibility state
         configureList(list, table, false);
         // a custom rendering button controller showing both checkbox and text
-        ButtonProvider wrapper = new ButtonProvider() {
-            @Override
-            protected AbstractButton createRendererComponent() {
-                return new JRendererCheckBox();
-            }
+        StringValue sv = new StringValue() {
 
-            @Override
-            protected void format(CellContext context) {
-                if (!(context.getValue() instanceof AbstractActionExt)) {
-                    super.format(context);
-                    return;
+            public String getString(Object value) {
+                if (value instanceof AbstractActionExt) {
+                    return ((AbstractActionExt) value).getName();
                 }
-                rendererComponent.setSelected(((AbstractActionExt) context.getValue()).isSelected());
-                rendererComponent.setText(((AbstractActionExt) context.getValue()).getName());
+                return "";
             }
             
         };
-        wrapper.setHorizontalAlignment(JLabel.LEADING);
+        BooleanValue bv = new BooleanValue() {
+
+            public boolean getBoolean(Object value) {
+                if (value instanceof AbstractActionExt) {
+                    return ((AbstractActionExt) value).isSelected();
+                }
+                return false;
+            }
+            
+        };
+        ButtonProvider wrapper = new ButtonProvider(new MappedValue(sv, null, bv), JLabel.LEADING);
         list.setCellRenderer(new DefaultListRenderer(wrapper));
         JXFrame frame = showWithScrollingInFrame(table, list,
                 "checkbox list-renderer - striping and gradient");

@@ -91,7 +91,7 @@ public class DefaultListRenderer implements ListCellRenderer, RolloverRenderer,
             }
 
         };
-        return new StringIconValue(sv, IconValue.ICON);
+        return new MappedValue(sv, IconValue.ICON);
     }
 
     /**

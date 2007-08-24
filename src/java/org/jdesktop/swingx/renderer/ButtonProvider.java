@@ -40,10 +40,25 @@ public class ButtonProvider extends ComponentProvider<AbstractButton> {
      *
      */
     public ButtonProvider() {
-        super(null, JLabel.CENTER);
-        setBorderPainted(true);
+        this(null);
     }
     
+    /**
+     * @param object
+     * @param center
+     */
+    public ButtonProvider(StringValue stringValue, int alignment) {
+        super(stringValue == null ? StringValue.EMPTY : stringValue, alignment);
+        setBorderPainted(true);
+    }
+
+    /**
+     * @param object
+     */
+    public ButtonProvider(StringValue stringValue) {
+        this(stringValue, JLabel.CENTER);
+    }
+
     /**
      * Returns the border painted flag.
      * @return the borderpainted flag to use on the checkbox.
@@ -75,8 +90,28 @@ public class ButtonProvider extends ComponentProvider<AbstractButton> {
      */
     @Override
     protected void format(CellContext context) {
+        rendererComponent.setSelected(getValueAsBoolean(context));
+        rendererComponent.setText(getValueAsString(context));
+    }
+
+    /**
+     * Returns a boolean representation of the content.<p>
+     * 
+     * This method messages the 
+     * <code>BooleanValue</code> to get the boolean rep. If none available,
+     * checks for Boolean type directly and returns its value. Returns
+     * false otherwise. 
+     * 
+     * @param context the cell context, must not be null.
+     * @return a appropriate icon representation of the cell's content,
+     *   or null if non if available.
+     */
+    protected boolean getValueAsBoolean(CellContext context) {
+        if (formatter instanceof BooleanValue) {
+            return ((BooleanValue) formatter).getBoolean(context.getValue());
+        }
         boolean selected = Boolean.TRUE.equals(context.getValue());
-        rendererComponent.setSelected(selected);
+        return selected;
     }
     
     /**

@@ -181,13 +181,13 @@ public class TreeRendererTest extends InteractiveTestCase {
     public void interactiveTreeButtonFormatting() {
         TreeModel model = createActionTreeModel();
         JTree tree = new JTree(model);
-        ButtonProvider wrapper = createButtonController();
+        ButtonProvider wrapper = createButtonProvider();
         tree.setCellRenderer(new DefaultTreeRenderer(new WrappingProvider(wrapper)));
         
         JList list = new JList(createActionListModel());
         // can't re-use the same instance - the WrappingProvider adds the
         // wrappee component to a custom container.
-        list.setCellRenderer(new DefaultListRenderer(createButtonController()));
+        list.setCellRenderer(new DefaultListRenderer(createButtonProvider()));
         final JXFrame frame = wrapWithScrollingInFrame(tree, list, "custom renderer - same in tree and list");
         frame.setVisible(true);
     }
@@ -333,26 +333,29 @@ public class TreeRendererTest extends InteractiveTestCase {
      * 
      * @return a button controller specialized on ActionEntryNode.
      */
-    private ButtonProvider createButtonController() {
-        ButtonProvider wrapper = new ButtonProvider() {
+    private ButtonProvider createButtonProvider() {
+        StringValue sv = new StringValue() {
 
-            @Override
-            protected void format(CellContext context) {
-                boolean selected = false;
-                String text = getValueAsString(context);
-                if (context.getValue() instanceof Action) {
-                    Action action = (Action) context.getValue();
-                    text = (String) action.getValue(Action.NAME);
-                    if (action instanceof AbstractActionExt) {
-                        selected = ((AbstractActionExt) action).isSelected();
-                    }
+            public String getString(Object value) {
+                if (value instanceof Action) {
+                    return (String) ((Action) value).getValue(Action.NAME);
                 }
-                rendererComponent.setSelected(selected);
-                rendererComponent.setText(text);
+                return "";
             }
             
         };
-        wrapper.setHorizontalAlignment(JLabel.LEADING);
+        BooleanValue bv = new BooleanValue() {
+
+            public boolean getBoolean(Object value) {
+                if (value instanceof AbstractActionExt) {
+                    return ((AbstractActionExt) value).isSelected();
+                }
+                return false;
+            }
+            
+        };
+
+        ButtonProvider wrapper = new ButtonProvider(new MappedValue(sv, null, bv), JLabel.LEADING);
         return wrapper;
     }
 

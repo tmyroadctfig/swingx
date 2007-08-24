@@ -112,10 +112,11 @@ public class RendererVisualCheck extends InteractiveTestCase {
         setSystemLF(true);
         RendererVisualCheck test = new RendererVisualCheck();
         try {
-//            test.runInteractiveTests();
+            test.runInteractiveTests();
 //          test.runInteractiveTests(".*Text.*");
 //          test.runInteractiveTests(".*XLabel.*");
-          test.runInteractiveTests(".*Color.*");
+//          test.runInteractiveTests(".*Color.*");
+//          test.runInteractiveTests(".*List.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -697,21 +698,27 @@ public class RendererVisualCheck extends InteractiveTestCase {
         // quick-fill and hook to table columns' visibility state
         configureList(list, table, false);
         // a custom rendering button controller showing both checkbox and text
-        ButtonProvider wrapper = new ButtonProvider() {
+        StringValue sv = new StringValue() {
 
-            @Override
-            protected void format(CellContext context) {
-                if (!(context.getValue() instanceof AbstractActionExt)) {
-                    super.format(context);
-                    return;
+            public String getString(Object value) {
+                if (value instanceof AbstractActionExt) {
+                    return ((AbstractActionExt) value).getName();
                 }
-//                rendererComponent.setAction((AbstractActionExt) context.getValue());
-                rendererComponent.setSelected(((AbstractActionExt) context.getValue()).isSelected());
-                rendererComponent.setText(((AbstractActionExt) context.getValue()).getName());
+                return "";
             }
             
         };
-        wrapper.setHorizontalAlignment(JLabel.LEADING);
+        BooleanValue bv = new BooleanValue() {
+
+            public boolean getBoolean(Object value) {
+                if (value instanceof AbstractActionExt) {
+                    return ((AbstractActionExt) value).isSelected();
+                }
+                return false;
+            }
+            
+        };
+        ComponentProvider wrapper = new ButtonProvider(new MappedValue(sv, null, bv), JLabel.LEADING); 
         list.setCellRenderer(new DefaultListRenderer(wrapper));
         JXFrame frame = showWithScrollingInFrame(table, list,
                 "checkbox list-renderer");

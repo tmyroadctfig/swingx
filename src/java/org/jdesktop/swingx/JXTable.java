@@ -117,7 +117,7 @@ import org.jdesktop.swingx.renderer.ButtonProvider;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.FormatStringValue;
 import org.jdesktop.swingx.renderer.IconValue;
-import org.jdesktop.swingx.renderer.StringIconValue;
+import org.jdesktop.swingx.renderer.MappedValue;
 import org.jdesktop.swingx.renderer.StringValue;
 import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.table.ColumnFactory;
@@ -3617,7 +3617,7 @@ public class JXTable extends JTable
                 FormatStringValue.DATE_TO_STRING));
         // use the same center aligned default for Image/Icon
         TableCellRenderer renderer  = new DefaultTableRenderer(
-                new StringIconValue(StringValue.EMPTY, IconValue.ICON), 
+                new MappedValue(StringValue.EMPTY, IconValue.ICON), 
                 JLabel.CENTER);
         setDefaultRenderer(Icon.class, renderer);
         setDefaultRenderer(ImageIcon.class, renderer);

@@ -33,6 +33,7 @@ import junit.framework.TestCase;
 
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.painter.ShapePainter;
+import org.jdesktop.swingx.table.TableColumnExt;
 
 /**
  * Tests swingx rendering infrastructure: RenderingXController, CellContext, 
@@ -44,8 +45,128 @@ import org.jdesktop.swingx.painter.ShapePainter;
 public class RenderingTest extends TestCase {
     private static final Logger LOG = Logger.getLogger(RenderingTest.class
             .getName());
+
+    /**
+     * Test text and boolean taken from MappedValue
+     */
+    public void testButtonProviderCustomValue() {
+        // some object to map
+        String identifier = "dummyID";
+        final TableColumnExt column = new TableColumnExt();
+        column.setTitle(identifier);
+        BooleanValue bv = new BooleanValue(){
+
+            public boolean getBoolean(Object value) {
+                return column.isVisible();
+            }
+            
+        };
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                return column.getTitle();
+            }
+            
+        };
+        ButtonProvider provider = new ButtonProvider(new MappedValue(sv, null, bv));
+        TableCellContext context = new TableCellContext();
+        context.value = column;
+        AbstractButton button = provider.getRendererComponent(context);
+        assertEquals(column.isVisible(), button.isSelected());
+        assertEquals(column.getTitle(), button.getText());
+    }
     
+    /**
+     * safety net for addition of BooleanValue. Defaults to
+     * selected from boolean value, text empty.
+     * 
+     * here: constructor with null stringValue and align
+     *
+     */
+    public void testButtonProviderDefaultsTwoConstructor() {
+        ButtonProvider provider = new ButtonProvider(null, JLabel.RIGHT);
+        TableCellContext context = new TableCellContext();
+        AbstractButton button = provider.getRendererComponent(context);
+        // empty context
+        assertFalse(button.isSelected());
+        assertEquals("", button.getText());
+        // boolean true
+        context.value = true;
+        provider.getRendererComponent(context);
+        assertEquals(context.value, button.isSelected());
+        assertEquals("", button.getText());
+        // non-boolean
+        context.value = "dummy";
+        provider.getRendererComponent(context);
+        assertFalse(button.isSelected());
+        assertEquals("", button.getText());
+    }
     
+
+    /**
+     * safety net for addition of BooleanValue. Defaults to
+     * selected from boolean value, text empty.
+     * 
+     * here: constructor with null stringValue
+     *
+     */
+    public void testButtonProviderDefaultsOneConstructor() {
+        ButtonProvider provider = new ButtonProvider(null);
+        TableCellContext context = new TableCellContext();
+        AbstractButton button = provider.getRendererComponent(context);
+        // empty context
+        assertFalse(button.isSelected());
+        assertEquals("", button.getText());
+        // boolean true
+        context.value = true;
+        provider.getRendererComponent(context);
+        assertEquals(context.value, button.isSelected());
+        assertEquals("", button.getText());
+        // non-boolean
+        context.value = "dummy";
+        provider.getRendererComponent(context);
+        assertFalse(button.isSelected());
+        assertEquals("", button.getText());
+    }
+    
+
+    /**
+     * safety net for addition of BooleanValue. Defaults to
+     * selected from boolean value, text empty.
+     * 
+     * here: parameterless constructor
+     *
+     */
+    public void testButtonProviderDefaultsEmptyConstructor() {
+        ButtonProvider provider = new ButtonProvider();
+        TableCellContext context = new TableCellContext();
+        AbstractButton button = provider.getRendererComponent(context);
+        // empty context
+        assertFalse(button.isSelected());
+        assertEquals("", button.getText());
+        // boolean true
+        context.value = true;
+        provider.getRendererComponent(context);
+        assertEquals(context.value, button.isSelected());
+        assertEquals("", button.getText());
+        // non-boolean
+        context.value = "dummy";
+        provider.getRendererComponent(context);
+        assertFalse(button.isSelected());
+        assertEquals("", button.getText());
+    }
+
+    /**
+     * test ButtonProvider default constructor and properties.
+     *
+     */
+    public void testButtonProviderConstructor() {
+        ComponentProvider provider = new ButtonProvider();
+        assertEquals(JLabel.CENTER, provider.getHorizontalAlignment());
+        assertEquals(StringValue.EMPTY, provider.getToStringConverter());
+       
+    }
+
     /**
      * Test provider property reset: borderPainted.
      *
@@ -94,12 +215,6 @@ public class RenderingTest extends TestCase {
 //        assertEquals(StringValue.TO_STRING, iconRenderer.componentController.getToStringConverter());
     }
     
-    public void testConstructorButtonProvider() {
-        ComponentProvider provider = new ButtonProvider();
-        assertEquals(JLabel.CENTER, provider.getHorizontalAlignment());
-        assertEquals(StringValue.TO_STRING, provider.getToStringConverter());
-       
-    }
     /**
      * Test constructors: convenience constructor.
      */
@@ -243,11 +358,11 @@ public class RenderingTest extends TestCase {
     }
     /**
      * public methods of <code>ComponentProvider</code> must cope
-     * with null context. Here: test getRenderingComponent.
+     * with null context. Here: test getStringValue.
      */
     public void testStringValueNullContext() {
         ComponentProvider controller = new LabelProvider();
-        controller.getValueAsString(null);
+        controller.getStringValue(null);
     }
     
     /**

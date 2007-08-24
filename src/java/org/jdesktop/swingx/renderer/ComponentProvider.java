@@ -249,42 +249,55 @@ public abstract class ComponentProvider<T extends JComponent>
     /**
      * Returns a String representation of the content.<p>
      * 
-     * This method copes with null context and messages the 
+     * This method messages the 
      * <code>StringValue</code> to get the String rep. Meant as 
      * a convenience for subclasses.
      * 
-     * @param context the cell context.
+     * @param context the cell context, must not be null.
      * @return a appropriate string representation of the cell's content.
      */
     protected String getValueAsString(CellContext context) {
-        Object value = null;
-        if (context != null) {
-            value = context.getValue();
-        }
+        Object value = context.getValue();
         return formatter.getString(value);
     }
 
     /**
      * Returns a Icon representation of the content.<p>
      * 
-     * This method copes with null context and messages the 
+     * This method messages the 
      * <code>IconValue</code> to get the Icon rep. Meant as 
      * a convenience for subclasses.
      * 
-     * @param context the cell context.
-     * @return a appropriate string representation of the cell's content.
+     * @param context the cell context, must not be null.
+     * @return a appropriate icon representation of the cell's content,
+     *   or null if non if available.
      */
     protected Icon getValueAsIcon(CellContext context) {
-        Object value = null;
-        if (context != null) {
-            value = context.getValue();
-        }
+        Object value = context.getValue();
         if (formatter instanceof IconValue) {
             return ((IconValue) formatter).getIcon(value);
         }
         return null;
     }
 
+    /**
+     * Returns a Icon representation of the content.<p>
+     * 
+     * This method messages the 
+     * <code>IconValue</code> to get the Icon rep. Meant as 
+     * a convenience for subclasses.
+     * 
+     * @param context the cell context, must not be null.
+     * @return a appropriate icon representation of the cell's content,
+     *   or null if non if available.
+     */
+//    protected boolean getValueAsIcon(CellContext context) {
+//        Object value = context.getValue();
+//        if (formatter instanceof IconValue) {
+//            return ((IconValue) formatter).getIcon(value);
+//        }
+//        return null;
+//    }
     /**
      * Configures the rendering component's default visuals frome
      * the given cell context. Here: delegates to the renderer

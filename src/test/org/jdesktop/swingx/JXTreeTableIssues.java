@@ -89,10 +89,10 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         setSystemLF(true);
         JXTreeTableIssues test = new JXTreeTableIssues();
         try {
-//            test.runInteractiveTests();
+            test.runInteractiveTests();
 //            test.runInteractiveTests(".*AdapterDeleteUpdate.*");
 //            test.runInteractiveTests(".*Text.*");
-            test.runInteractiveTests(".*TreeExpand.*");
+//            test.runInteractiveTests(".*TreeExpand.*");
 //            test.runInteractiveTests("interactive.*ScrollAlt.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
@@ -670,28 +670,26 @@ public class JXTreeTableIssues extends InteractiveTestCase {
      */
     public void interactiveTreeTableCustomRenderer() {
         JXTreeTable tree = new JXTreeTable(new FileSystemModel());
-        ComponentProvider provider = new ButtonProvider() {
-            /**
-             * show a unselected checkbox and text.
-             */
-            @Override
-            protected void format(CellContext context) {
-                super.format(context);
-                rendererComponent.setText(" ... " + getValueAsString(context));
-            }
+        
+        StringValue sv = new StringValue( ){
 
-            /**
-             * custom tooltip: show row. Note: the context is that 
-             * of the rendering tree. No way to get at table state?
-             */
-            @Override
-            protected void configureState(CellContext context) {
-                super.configureState(context);
-                rendererComponent.setToolTipText("Row: " + context.getRow());
+            public String getString(Object value) {
+                return "..." + TO_STRING.getString(value);
             }
             
         };
-        provider.setHorizontalAlignment(JLabel.LEADING);
+        ComponentProvider provider = new ButtonProvider(sv);
+//            /**
+//             * custom tooltip: show row. Note: the context is that 
+//             * of the rendering tree. No way to get at table state?
+//             */
+//            @Override
+//            protected void configureState(CellContext context) {
+//                super.configureState(context);
+//                rendererComponent.setToolTipText("Row: " + context.getRow());
+//            }
+//            
+//        };
         tree.setTreeCellRenderer(new DefaultTreeRenderer(provider));
         tree.setHighlighters(HighlighterFactory.createSimpleStriping());
         JFrame frame = wrapWithScrollingInFrame(tree, "treetable and custom renderer");
@@ -817,12 +815,10 @@ public class JXTreeTableIssues extends InteractiveTestCase {
      */
     public void interactiveTreeTableGetValueRenderer() {
         JXTreeTable tree = new JXTreeTable(new ComponentTreeTableModel(new JXFrame()));
-        ComponentProvider provider = new ButtonProvider() {
-            /**
-             * show a unselected checkbox and text.
-             */
+        ComponentProvider provider = new ButtonProvider(StringValue.TO_STRING) {
+            
             @Override
-            protected void format(CellContext context) {
+            protected String getValueAsString(CellContext context) {
                 // this is dirty because the design idea was to keep the renderer 
                 // unaware of the context type
                 TreeTableModel model = (TreeTableModel) ((JXTree) context.getComponent()).getModel();
@@ -830,8 +826,9 @@ public class JXTreeTableIssues extends InteractiveTestCase {
                 // otherwise the WrappingProvider tries to be smart and replaces the node
                 // by the userObject before passing on to the wrappee! 
                 Object nodeValue = model.getValueAt(context.getValue(), 0);
-                rendererComponent.setText(" ... " + formatter.getString(nodeValue));
-            }
+                return formatter.getString(nodeValue);            
+              }
+
 
             /**
              * custom tooltip: show row. Note: the context is that 
@@ -844,7 +841,6 @@ public class JXTreeTableIssues extends InteractiveTestCase {
             }
             
         };
-        provider.setHorizontalAlignment(JLabel.LEADING);
         tree.setTreeCellRenderer(new DefaultTreeRenderer(provider));
         tree.expandAll();
         tree.setHighlighters(HighlighterFactory.createSimpleStriping());

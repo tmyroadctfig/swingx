@@ -10,15 +10,23 @@ import javax.swing.Icon;
  * 
  * Note: this will change!
  */
-public class StringIconValue implements StringValue, IconValue {
+public class MappedValue implements StringValue, IconValue, BooleanValue {
 
     private StringValue stringDelegate;
     private IconValue iconDelegate;
+    private BooleanValue booleanDelegate;
 
-    public StringIconValue(StringValue stringDelegate, IconValue iconDelegate) {
+    public MappedValue(StringValue stringDelegate, IconValue iconDelegate) {
+        this(stringDelegate, iconDelegate, null);
+    }
+    
+    public MappedValue(StringValue stringDelegate, IconValue iconDelegate, 
+            BooleanValue booleanDelegate) {
         this.stringDelegate = stringDelegate;
         this.iconDelegate = iconDelegate;
+        this.booleanDelegate = booleanDelegate;
     }
+    
     public String getString(Object value) {
         if (stringDelegate != null) {
             return stringDelegate.getString(value);
@@ -31,6 +39,13 @@ public class StringIconValue implements StringValue, IconValue {
             return iconDelegate.getIcon(value);
         }
         return null;
+    }
+    
+    public boolean getBoolean(Object value) {
+        if (booleanDelegate != null) {
+            return booleanDelegate.getBoolean(value);
+        }
+        return false;
     }
     
 }

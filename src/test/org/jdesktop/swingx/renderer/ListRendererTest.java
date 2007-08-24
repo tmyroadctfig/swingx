@@ -108,7 +108,7 @@ public class ListRendererTest extends InteractiveTestCase {
 //            
 //        };
 //        ListCellRenderer xListRenderer = new DefaultListRenderer(
-//                new StringIconValue(sv, IconValue.ICON));
+//                new MappedValue(sv, IconValue.ICON));
         JLabel label = (JLabel) xListRenderer.getListCellRendererComponent(null, icon, 0, false, false);
         assertEquals(icon, label.getIcon());
         assertEquals("", label.getText());

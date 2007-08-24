@@ -58,7 +58,7 @@ public class RendererIssues extends InteractiveTestCase {
         ImageIcon icon = (ImageIcon) XTestUtils.loadDefaultIcon();
         icon.setDescription("description");
         LabelProvider provider = new LabelProvider(
-                new StringIconValue(StringValue.TO_STRING, IconValue.EMPTY));
+                new MappedValue(StringValue.TO_STRING, IconValue.EMPTY));
         TableCellContext context = new TableCellContext();
         context.value = icon;
         JLabel label = provider.getRendererComponent(context);
@@ -76,7 +76,7 @@ public class RendererIssues extends InteractiveTestCase {
         ImageIcon icon = (ImageIcon) XTestUtils.loadDefaultIcon();
         icon.setDescription("description");
         LabelProvider provider = new LabelProvider(
-                new StringIconValue(StringValue.EMPTY, IconValue.ICON));
+                new MappedValue(StringValue.EMPTY, IconValue.ICON));
         TableCellContext context = new TableCellContext();
         context.value = icon;
         JLabel label = provider.getRendererComponent(context);
@@ -94,7 +94,7 @@ public class RendererIssues extends InteractiveTestCase {
         ImageIcon icon = (ImageIcon) XTestUtils.loadDefaultIcon();
         icon.setDescription("description");
         LabelProvider provider = new LabelProvider(
-                new StringIconValue(StringValue.TO_STRING, IconValue.ICON));
+                new MappedValue(StringValue.TO_STRING, IconValue.ICON));
         TableCellContext context = new TableCellContext();
         context.value = icon;
         JLabel label = provider.getRendererComponent(context);
