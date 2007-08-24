@@ -5,6 +5,7 @@
 package org.jdesktop.swingx.renderer;
 
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jdesktop.swingx.RolloverRenderer;
@@ -27,24 +28,42 @@ public class WrappingProvider extends
         this((ComponentProvider) null);
     }
     
-    public WrappingProvider(ComponentProvider wrapper) {
+    /**
+     * Instantiates a WrappingProvider with the given delegate
+     * provider for the node content. If null, a default 
+     * LabelProvider will be used.
+     * 
+     * @param delegate the provider to use as delegate
+     */
+    public WrappingProvider(ComponentProvider delegate) {
         super();
-        setWrappee(wrapper);
+        setWrappee(delegate);
     }
    
     /**
-     * @param converter
+     * Instantiates a WrappingProvider with default wrappee configured
+     * with the given StringValue.
+     * 
+     * @param converter the StringValue to use in the wrappee.
      */
     public WrappingProvider(StringValue converter) {
         this(new LabelProvider(converter));
     }
 
-    public void setWrappee(ComponentProvider wrappee) {
-        if (wrappee == null) {
-            wrappee = new LabelProvider();
+    /**
+     * Sets the given provider as delegate for the node content. 
+     * If the delegate is null, a default LabelProvider is set.<p>
+     * 
+     *  PENDING: rename to setDelegate?
+     *  
+     * @param delegate the provider to use as delegate. 
+     */
+    public void setWrappee(ComponentProvider delegate) {
+        if (delegate == null) {
+            delegate = new LabelProvider();
         }
-        this.wrappee = wrappee;
-        rendererComponent.setComponent(wrappee.rendererComponent);
+        this.wrappee = delegate;
+        rendererComponent.setComponent(delegate.rendererComponent);
     }
 
     /**
@@ -58,15 +77,16 @@ public class WrappingProvider extends
             WrappingIconPanel panel = super.getRendererComponent(context);
             wrappee.getRendererComponent(context);
             restoreContextValue(context, oldValue);
-            return panel;
+            return rendererComponent;
         }
         return super.getRendererComponent(context);
     }
 
     /**
+     * Restores the context value to the old value.
      * 
-     * @param context
-     * @param oldValue
+     * @param context the CellContext to restore.
+     * @param oldValue the value to restore the context to.
      */
     protected void restoreContextValue(CellContext context, Object oldValue) {
         context.value = oldValue;
@@ -110,13 +130,38 @@ public class WrappingProvider extends
         return new WrappingIconPanel();
     }
 
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Here: implemented to set the icon.
+     */
     @Override
     protected void format(CellContext context) {
-        rendererComponent.setIcon(context.getIcon());
+        rendererComponent.setIcon(getValueAsIcon(context));
     }
 
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to fallback to the default icons supplied by the 
+     * context if super returns null.
+     * 
+     * PENDING: make fallback configurable - null icons might be
+     *   valid.
+     *   
+     */
+    @Override
+    protected Icon getValueAsIcon(CellContext context) {
+        Icon icon = super.getValueAsIcon(context);
+        if (icon == null) {
+            return context.getIcon();
+        }
+        return icon;
+    }
+    
     //----------------- implement RolloverController
     
+
     /**
      * {@inheritDoc}
      */

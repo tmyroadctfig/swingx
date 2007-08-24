@@ -802,7 +802,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         treeTable.setHighlighters(HighlighterFactory.createSimpleStriping());
         JXTree tree = new JXTree(treeTable.getTreeTableModel());
         tree.setCellRenderer(treeCellRenderer);
-        tree.setLargeModel(true);
+//        tree.setLargeModel(true);
         tree.setScrollsOnExpand(false);
         JFrame frame = wrapWithScrollingInFrame(treeTable, tree, "treetable and default wrapping provider");
         frame.setVisible(true);
@@ -829,17 +829,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
                 return formatter.getString(nodeValue);            
               }
 
-
-            /**
-             * custom tooltip: show row. Note: the context is that 
-             * of the rendering tree. No way to get at table state?
-             */
-            @Override
-            protected void configureState(CellContext context) {
-                super.configureState(context);
-                rendererComponent.setToolTipText("Row: " + context.getRow());
-            }
-            
+          
         };
         tree.setTreeCellRenderer(new DefaultTreeRenderer(provider));
         tree.expandAll();

@@ -25,27 +25,65 @@ import javax.swing.AbstractButton;
 import javax.swing.JLabel;
 
 /**
- * A component provider which uses a AbstractButton. <p>
+ * A component provider which uses a AbstractButton.
+ * <p>
+ * 
+ * This implementation respects a BooleanValue and a StringValue to configure
+ * the button's selected and text property. By default, the selected is mapped
+ * to a Boolean-type value and the text is empty.
+ * <p>
+ * 
+ * To allow mapping to different types, client code can supply a custom
+ * StringValue which also implements BooleanValue. F.i. to render a cell value
+ * of type TableColumnExt with the column's visibility mapped to the selected
+ * and the column's title to the text:
+ * 
+ * <pre><code>
+ *            
+ *     BooleanValue bv = new BooleanValue(){
+ *        public boolean getBoolean(Object value) {
+ *           if (value instanceof TableColumnExt) 
+ *               return ((TableColumnExt) value).isVisible();
+ *           return false;
+ *        }
+ *     };
+ *     StringValue sv = new StringValue() {
+ *         public String getString(Object value) {
+ *           if (value instanceof TableColumnExt) {
+ *               return ((TableColumnExt) value).getTitle();
+ *           return &quot;&quot;;
+ *         }
+ *     };
+ *     list.setCellRenderer(new DefaultListRenderer(
+ *           new ButtonProvider(new MappedValue(sv, bv), JLabel.LEADING))); 
+ * </code></pre>
  * 
  * PENDING: rename ... this is actually a CheckBoxProvider.
+ * 
+ * @see BooleanValue
+ * @see StringValue
+ * @see MappedValue
  * 
  * @author Jeanette Winzenburg
  */
 public class ButtonProvider extends ComponentProvider<AbstractButton> {
 
     private boolean borderPainted;
+
     /**
-     * Instantiates a ButtonProvider with CENTER
-     * horizontal alignment and default border painted. <p> 
+     * Instantiates a ButtonProvider with default properties. <p> 
      *
      */
     public ButtonProvider() {
         this(null);
     }
-    
+
     /**
-     * @param object
-     * @param center
+     * Instantiates a ButtonProvider with the given StringValue and
+     * alignment. 
+     * 
+     * @param stringValue the StringValue to use for formatting.
+     * @param alignment the horizontalAlignment.
      */
     public ButtonProvider(StringValue stringValue, int alignment) {
         super(stringValue == null ? StringValue.EMPTY : stringValue, alignment);
@@ -67,7 +105,7 @@ public class ButtonProvider extends ComponentProvider<AbstractButton> {
     public boolean isBorderPainted() {
         return borderPainted;
     }
-    
+
     /**
      * Sets the border painted flag. the underlying checkbox
      * is configured with this value on every request.<p>
@@ -85,8 +123,12 @@ public class ButtonProvider extends ComponentProvider<AbstractButton> {
 
     /**
      * {@inheritDoc} <p>
-     * Overridden to set the button's selected state. It's set to true if the 
-     * context's value equals Boolean.TRUE, false otherwise.
+     * Overridden to set the button's selected state and text.<p>
+     * 
+     *  PENDING: set icon?
+     *  
+     *  @see #getValueAsBoolean(CellContext)
+     *  @see #getValueAsString(CellContext)
      */
     @Override
     protected void format(CellContext context) {
@@ -100,7 +142,10 @@ public class ButtonProvider extends ComponentProvider<AbstractButton> {
      * This method messages the 
      * <code>BooleanValue</code> to get the boolean rep. If none available,
      * checks for Boolean type directly and returns its value. Returns
-     * false otherwise. 
+     * false otherwise. <p>
+     * 
+     * PENDING: fallback to check for boolean is convenient .. could cleanup
+     *   to use a default BooleanValue instead.
      * 
      * @param context the cell context, must not be null.
      * @return a appropriate icon representation of the cell's content,
@@ -110,10 +155,9 @@ public class ButtonProvider extends ComponentProvider<AbstractButton> {
         if (formatter instanceof BooleanValue) {
             return ((BooleanValue) formatter).getBoolean(context.getValue());
         }
-        boolean selected = Boolean.TRUE.equals(context.getValue());
-        return selected;
+        return Boolean.TRUE.equals(context.getValue());
     }
-    
+
     /**
      * {@inheritDoc}<p>
      * 
@@ -125,7 +169,6 @@ public class ButtonProvider extends ComponentProvider<AbstractButton> {
         rendererComponent.setHorizontalAlignment(getHorizontalAlignment());
     }
 
-
     /**
      * {@inheritDoc}<p>
      * Here: returns a JCheckBox as rendering component.<p>
@@ -135,7 +178,5 @@ public class ButtonProvider extends ComponentProvider<AbstractButton> {
     protected AbstractButton createRendererComponent() {
         return new JRendererCheckBox();
     }
-
-    
 
 }

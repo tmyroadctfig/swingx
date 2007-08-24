@@ -436,11 +436,13 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
         // predicate
         LabelProvider provider = new LabelProvider() {
 
+            
             @Override
-            protected void format(CellContext context) {
-                super.format(context);
+            protected void configureState(CellContext context) {
+                super.configureState(context);
                 rendererComponent.setToolTipText(getToolTipText(context));
             }
+
 
             private String getToolTipText(CellContext context) {
                 if ((context.getValue() instanceof Number))  {
