@@ -55,7 +55,7 @@ public class CustomBooleanRendering {
             
         };
         table.setDefaultRenderer(Boolean.class, 
-                new DefaultTableRenderer(new MappedValue(StringValue.EMPTY, iv)));
+                new DefaultTableRenderer(new StringIconValue(StringValue.EMPTY, iv)));
     }
     
     /**
