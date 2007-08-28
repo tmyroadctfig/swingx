@@ -23,7 +23,6 @@ import java.awt.Container;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
