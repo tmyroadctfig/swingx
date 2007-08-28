@@ -355,32 +355,49 @@ public class MultiSplitLayout implements LayoutManager
     String name = getNameForComponent( child );
   
     if ( name != null ) {
-      if (removeDividers) {
-        Node n;
-        if ( !( model instanceof Split ))
-          n = model;
-        else
-          n = getNodeForComponent( name );
+      childMap.remove( name );
+    }
+  }
 
-        childMap.remove(name);
+  /**
+   * Removes the specified node from the layout.
+   *
+   * @param child the component to be removed
+   * @see #addLayoutComponent
+   */
+  public void removeLayoutNode(String name) {    
+ 
+    if ( name != null ) {
+      Node n;
+      if ( !( model instanceof Split ))
+        n = model;
+      else
+        n = getNodeForComponent( name );
 
+      childMap.remove(name);
+
+      if ( n != null ) {
         Split s = n.getParent();
         s.remove( n );
-        while ( s.getChildren().size() < 2 ) {
-          Split p = s.getParent();
-          if ( p == null ) {
-            if ( s.getChildren().size() > 0 )
-            model = (Node)s.getChildren().get( 0 );
-            else 
-              model = null;
-            return;
+        if (removeDividers) {
+          while ( s.getChildren().size() < 2 ) {
+            Split p = s.getParent();
+            if ( p == null ) {
+              if ( s.getChildren().size() > 0 )
+              model = (Node)s.getChildren().get( 0 );
+              else 
+                model = null;
+              return;
+            }
+            if ( s.getChildren().size() == 1 ) {
+              Node next = s.getChildren().get( 0 );          
+              p.replace( s, next );
+              next.setParent( p );
+            }
+            else
+              p.remove( s );
+            s = p;
           }
-          if ( s.getChildren().size() == 1 ) {
-            p.replace( s, (Node)s.getChildren().get( 0 ));
-          }
-          else
-            p.remove( s );
-          s = p;
         }
       }
       else {
