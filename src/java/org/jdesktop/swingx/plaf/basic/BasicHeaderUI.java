@@ -30,8 +30,12 @@ import org.jdesktop.swingx.plaf.PainterUIResource;
 
 import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.basic.BasicHTML;
+import javax.swing.text.View;
 
 import java.awt.*;
+import java.awt.event.HierarchyBoundsAdapter;
+import java.awt.event.HierarchyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -100,7 +104,14 @@ public class BasicHeaderUI extends HeaderUI {
         titleLabel = new JLabel(header.getTitle() == null ? "Title For Header Goes Here" : header.getTitle());
         titleLabel.setFont(header.getTitleFont());
 
-        descriptionPane = new JXLabel();
+        descriptionPane = new JXLabel(){
+            @Override
+            public void paint(Graphics g) {
+                // switch off jxlabel default antialiasing
+                ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                        RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+                super.paint(g);
+            }};
         descriptionPane.setFont(header.getDescriptionFont());
         descriptionPane.setLineWrap(true);
         descriptionPane.setOpaque(false);
@@ -171,6 +182,13 @@ public class BasicHeaderUI extends HeaderUI {
             }
         };
         h.addPropertyChangeListener(propListener);
+        h.addHierarchyBoundsListener(new HierarchyBoundsAdapter() {
+            public void ancestorResized(HierarchyEvent e) {
+                if (h == e.getComponent()) {
+                    View v = (View) descriptionPane.getClientProperty(BasicHTML.propertyKey);
+                    v.setSize(h.getParent().getWidth() - h.getInsets().left - h.getInsets().right - descriptionPane.getInsets().left - descriptionPane.getInsets().right - descriptionPane.getBounds().x, descriptionPane.getHeight());
+                }
+            }});
     }
 
     protected void uninstallListeners(JXHeader h) {
