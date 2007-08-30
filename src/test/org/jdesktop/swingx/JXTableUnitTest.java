@@ -13,6 +13,7 @@ import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.KeyboardFocusManager;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.Collator;
@@ -2527,9 +2528,11 @@ public class JXTableUnitTest extends InteractiveTestCase {
     }
     /**
      * Issue #174: componentAdapter.hasFocus() looks for anchor instead of lead.
+     * @throws InvocationTargetException 
+     * @throws InterruptedException 
      *
      */
-    public void testLeadFocusCell() {
+    public void testLeadFocusCell() throws InterruptedException, InvocationTargetException {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run leadFocusCell - headless environment");
@@ -2552,7 +2555,7 @@ public class JXTableUnitTest extends InteractiveTestCase {
         assertEquals("anchor must be second last row", table.getRowCount() - 2, anchorRow);
         assertEquals("lead must be first column", 0, leadColumn);
         assertEquals("anchor must be first column", 0, anchorColumn);
-         SwingUtilities.invokeLater(new Runnable() {
+         SwingUtilities.invokeAndWait(new Runnable() {
             public void run() {
                 ComponentAdapter adapter = table.getComponentAdapter();
                 adapter.row = leadRow;

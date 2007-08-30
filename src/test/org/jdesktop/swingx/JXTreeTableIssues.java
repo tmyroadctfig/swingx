@@ -24,6 +24,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -214,8 +215,10 @@ public class JXTreeTableIssues extends InteractiveTestCase {
      * 
      * NOTE: the failing assert is wrapped in invokeLater ..., so 
      * appears to pass in the testrunner.
+     * @throws InvocationTargetException 
+     * @throws InterruptedException 
      */
-    public void testTableEventUpdateOnTreeTableSetValueForRoot() {
+    public void testTableEventUpdateOnTreeTableSetValueForRoot() throws InterruptedException, InvocationTargetException {
         TreeTableModel model = createCustomTreeTableModelFromDefault();
         final JXTreeTable table = new JXTreeTable(model);
         table.setRootVisible(true);
@@ -229,7 +232,7 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         // doesn't fire or isn't detectable? 
         // Problem was: model was not-editable.
         table.setValueAt("games", row, 0);
-        SwingUtilities.invokeLater(new Runnable() {
+        SwingUtilities.invokeAndWait(new Runnable() {
             public void run() {
                 LOG.info("sanity - did testTableEventUpdateOnTreeTableSetValueForRoot run?");
                 assertEquals("tableModel must have fired", 1, report.getEventCount());

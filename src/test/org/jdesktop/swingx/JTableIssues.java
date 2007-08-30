@@ -11,6 +11,7 @@ import java.awt.Component;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -478,9 +479,11 @@ public class JTableIssues extends InteractiveTestCase {
      * 
      * Now: need to explicitly set _both_ anchor and lead to >= 0
      * need to set anchor first. Need to do so for both row/column selection model.
+     * @throws InvocationTargetException 
+     * @throws InterruptedException 
      * 
      */
-    public void testInitialLeadAnchor() {
+    public void testInitialLeadAnchor() throws InterruptedException, InvocationTargetException {
         // This test will not work in a headless configuration.
         if (GraphicsEnvironment.isHeadless()) {
             LOG.info("cannot run testLeadAnchorOnFocusGained - headless environment");
@@ -510,7 +513,7 @@ public class JTableIssues extends InteractiveTestCase {
 //        table.getColumnModel().getSelectionModel().setLeadSelectionIndex(0);
 
         table.requestFocus();
-        SwingUtilities.invokeLater(new Runnable() {
+        SwingUtilities.invokeAndWait(new Runnable() {
             public void run() {
                 assertTrue("table is focused ", table.hasFocus());
                 assertEquals("anchor must be 0", 0, table.getSelectionModel().getAnchorSelectionIndex());

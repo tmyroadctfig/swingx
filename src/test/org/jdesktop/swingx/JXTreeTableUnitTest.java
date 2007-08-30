@@ -23,6 +23,7 @@ package org.jdesktop.swingx;
 import java.awt.Point;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -69,10 +70,10 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * fails - because the treeStructureChanged is mapped to a 
      * tableDataChanged.
      *
-     * NOTE: the failing assert is wrapped in invokeLater ..., so 
-     * appears to pass in the testrunner.
+     * @throws InvocationTargetException 
+     * @throws InterruptedException 
      */
-    public void testTableEventOnSetNullRoot() {
+    public void testTableEventOnSetNullRoot() throws InterruptedException, InvocationTargetException {
         TreeTableModel model = createCustomTreeTableModelFromDefault();
         final JXTreeTable table = new JXTreeTable(model);
         table.setRootVisible(true);
@@ -80,9 +81,8 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         final TableModelReport report = new TableModelReport();
         table.getModel().addTableModelListener(report);
         ((DefaultTreeTableModel) model).setRoot(null);
-        SwingUtilities.invokeLater(new Runnable() {
+        SwingUtilities.invokeAndWait(new Runnable() {
             public void run() {
-                LOG.info("sanity - did testTableEventOnSetNullRoot run?");
                 assertEquals("tableModel must have fired", 1, report.getEventCount());
                 assertTrue("event type must be structureChanged " + TableModelReport.printEvent(report.getLastEvent()), 
                         report.isStructureChanged(report.getLastEvent()));
@@ -100,10 +100,10 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * fails - because the treeStructureChanged is mapped to a 
      * tableDataChanged.
      * 
-     * NOTE: the failing assert is wrapped in invokeLater ..., so 
-     * appears to pass in the testrunner.
+     * @throws InvocationTargetException 
+     * @throws InterruptedException 
      */
-    public void testTableEventOnSetRoot() {
+    public void testTableEventOnSetRoot() throws InterruptedException, InvocationTargetException {
         TreeTableModel model = createCustomTreeTableModelFromDefault();
         final JXTreeTable table = new JXTreeTable(model);
         table.setRootVisible(true);
@@ -111,9 +111,8 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         final TableModelReport report = new TableModelReport();
         table.getModel().addTableModelListener(report);
         ((DefaultTreeTableModel) model).setRoot(new DefaultMutableTreeTableNode("other"));  
-        SwingUtilities.invokeLater(new Runnable() {
+        SwingUtilities.invokeAndWait(new Runnable() {
             public void run() {
-                LOG.info("sanity - did testTableEventOnSetRoot run?");
                 assertEquals("tableModel must have fired", 1, report.getEventCount());
                 assertTrue("event type must be structureChanged " + TableModelReport.printEvent(report.getLastEvent()), 
                         report.isStructureChanged(report.getLastEvent()));
@@ -131,10 +130,10 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * fails - because the treeStructureChanged is mapped to a 
      * tableDataChanged.
      * 
-     * NOTE: the failing assert is wrapped in invokeLater ..., so 
-     * appears to pass in the testrunner.
+     * @throws InvocationTargetException 
+     * @throws InterruptedException 
      */
-    public void testTableEventOnReloadNonRoot() {
+    public void testTableEventOnReloadNonRoot() throws InterruptedException, InvocationTargetException {
         DefaultTreeTableModel model = new DefaultTreeTableModel(
                 (TreeTableNode) createCustomTreeTableModelFromDefault().getRoot()) {
 
@@ -158,9 +157,8 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         final TableModelReport report = new TableModelReport();
         table.getModel().addTableModelListener(report);
         model.removeNodeFromParent(node);
-        SwingUtilities.invokeLater(new Runnable() {
+        SwingUtilities.invokeAndWait(new Runnable() {
             public void run() {
-                LOG.info("sanity - did testTableEventOnReloadNonRoot run?");
                 assertEquals("tableModel must have fired", 1, report.getEventCount());
                 assertTrue("event type must be dataChanged " + TableModelReport.printEvent(report.getLastEvent()), 
                         report.isDataChanged(report.getLastEvent()));
@@ -176,8 +174,10 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * Here: must fire structureChanged on setModel.
      * This was okay, because the setTreeTableModel on the table is handled
      * directly (through tableChanged)
+     * @throws InvocationTargetException 
+     * @throws InterruptedException 
      */
-    public void testTableEventOnSetModel() {
+    public void testTableEventOnSetModel() throws InterruptedException, InvocationTargetException {
         TreeTableModel model = createCustomTreeTableModelFromDefault();
         final JXTreeTable table = new JXTreeTable(model);
         table.setRootVisible(true);
@@ -185,7 +185,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         final TableModelReport report = new TableModelReport();
         table.getModel().addTableModelListener(report);
         table.setTreeTableModel(createCustomTreeTableModelFromDefault());  
-        SwingUtilities.invokeLater(new Runnable() {
+        SwingUtilities.invokeAndWait(new Runnable() {
             public void run() {
                 LOG.info("sanity - did testTableEventOnSetModel run?");
                 assertEquals("tableModel must have fired", 1, report.getEventCount());
@@ -235,8 +235,10 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * Test update events after updating treeTableModel.
      * 
      * from tiberiu@dev.java.net
+     * @throws InvocationTargetException 
+     * @throws InterruptedException 
      */
-    public void testTableEventUpdateOnTreeTableModelSetValue() {
+    public void testTableEventUpdateOnTreeTableModelSetValue() throws InterruptedException, InvocationTargetException {
         TreeTableModel model = createCustomTreeTableModelFromDefault();
         final JXTreeTable table = new JXTreeTable(model);
         table.setRootVisible(true);
@@ -248,9 +250,8 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         table.getModel().addTableModelListener(report);
         model.setValueAt("games",
                 table.getPathForRow(6).getLastPathComponent(), 0);   
-        SwingUtilities.invokeLater(new Runnable() {
+        SwingUtilities.invokeAndWait(new Runnable() {
             public void run() {
-                LOG.info("sanity - did testTableEventUpdateOnTreeTableModelSetValue run?");
                 assertEquals("tableModel must have fired", 1, report.getEventCount());
                 assertEquals("the event type must be update", 1, report.getUpdateEventCount());
                 TableModelEvent event = report.getLastUpdateEvent();
@@ -266,8 +267,10 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * Test delete events after tree table model.
      * 
      * from tiberiu@dev.java.net
+     * @throws InvocationTargetException 
+     * @throws InterruptedException 
      */
-    public void testTableEventDeleteOnTreeTableModel() {
+    public void testTableEventDeleteOnTreeTableModel() throws InterruptedException, InvocationTargetException {
         TreeTableModel model = createCustomTreeTableModelFromDefault();
         MutableTreeTableNode root = (MutableTreeTableNode) model.getRoot();
         MutableTreeTableNode sportsNode = (MutableTreeTableNode) root.getChildAt(1);
@@ -290,9 +293,8 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         // remove the last child from sports node
         MutableTreeTableNode firstChild = (MutableTreeTableNode) sportsNode.getChildAt(0);
         ((DefaultTreeTableModel) model).removeNodeFromParent(firstChild);
-        SwingUtilities.invokeLater(new Runnable() {
+        SwingUtilities.invokeAndWait(new Runnable() {
             public void run() {
-                LOG.info("sanity - did testTableEventDeleteOnTreeTableModel run?");
                 assertEquals("tableModel must have fired exactly one event", 1, report.getEventCount());
                 TableModelEvent event = report.getLastEvent();
                 assertEquals("event type must be delete", TableModelEvent.DELETE, event.getType());
@@ -307,8 +309,10 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * Test update events after updating table.
      * 
      * from tiberiu@dev.java.net
+     * @throws InvocationTargetException 
+     * @throws InterruptedException 
      */
-    public void testTableEventUpdateOnTreeTableSetValue() {
+    public void testTableEventUpdateOnTreeTableSetValue() throws InterruptedException, InvocationTargetException {
         TreeTableModel model = createCustomTreeTableModelFromDefault();
         final JXTreeTable table = new JXTreeTable(model);
         table.setRootVisible(true);
@@ -322,9 +326,8 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         // doesn't fire or isn't detectable? 
         // Problem was: model was not-editable.
         table.setValueAt("games", row, 0);
-        SwingUtilities.invokeLater(new Runnable() {
+        SwingUtilities.invokeAndWait(new Runnable() {
             public void run() {
-                LOG.info("sanity - did testTableEventUpdateOnTreeTableSetValue run?");
                 assertEquals("tableModel must have fired", 1, report.getEventCount());
                 assertEquals("the event type must be update", 1, report.getUpdateEventCount());
                 TableModelEvent event = report.getLastUpdateEvent();
@@ -754,9 +757,11 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
      * In the view childA is collapsed:
      * root
      *   childA  
+     * @throws InvocationTargetException 
+     * @throws InterruptedException 
      * 
      */
-    public void testInsertUnderCollapsedNode() {
+    public void testInsertUnderCollapsedNode() throws InterruptedException, InvocationTargetException {
         final DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode();
         final InsertTreeTableModel model = new InsertTreeTableModel(root);
         DefaultMutableTreeTableNode childA = model.addChild(root);
@@ -770,10 +775,7 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         treeTable.setRowSelectionInterval(selected, selected);
         model.addChild(childB);
         // need to invoke - the tableEvent is fired delayed as well
-        // Note: doing so will make the test _appear_ to pass, the
-        // assertion failure can be seen as an output only!
-        // any idea how to make the test fail?
-        SwingUtilities.invokeLater(new Runnable() {
+        SwingUtilities.invokeAndWait(new Runnable() {
             public void run() {
                 int selectedAfterInsert = treeTable.getSelectedRow();
                 assertEquals(selected, selectedAfterInsert);
