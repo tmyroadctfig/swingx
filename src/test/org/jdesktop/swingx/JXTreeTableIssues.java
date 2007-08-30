@@ -31,7 +31,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
@@ -243,7 +242,9 @@ public class JXTreeTableIssues extends InteractiveTestCase {
 
     /**
      * Issue #493-swingx: incorrect table events fired.
-     * 
+     * Issue #592-swingx: (no structureChanged table events) is a special
+     *   case of the former.
+     *    
      * Here: must fire structureChanged on setRoot(null).
      * fails - because the treeStructureChanged is mapped to a 
      * tableDataChanged.
