@@ -61,42 +61,6 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
         super("JXTreeTable Unit Test");
     }
 
-    /**
-     * Issue #493-swingx: JXTreeTable.TreeTableModelAdapter: Inconsistency
-     * firing update.
-     * 
-     * Test update events after updating table.
-     * 
-     * from tiberiu@dev.java.net
-     * 
-     * @throws InvocationTargetException 
-     * @throws InterruptedException 
-     */
-    public void testTableEventUpdateOnTreeTableSetValueForRoot() throws InterruptedException, InvocationTargetException {
-        TreeTableModel model = createCustomTreeTableModelFromDefault();
-        final JXTreeTable table = new JXTreeTable(model);
-        table.setRootVisible(true);
-        table.expandAll();
-        final int row = 0;
-        // sanity
-        assertEquals("JTree", table.getValueAt(row, 0).toString());
-        assertTrue("root must be editable", table.getModel().isCellEditable(0, 0));
-        final TableModelReport report = new TableModelReport();
-        table.getModel().addTableModelListener(report);
-        // doesn't fire or isn't detectable? 
-        // Problem was: model was not-editable.
-        table.setValueAt("games", row, 0);
-        SwingUtilities.invokeAndWait(new Runnable() {
-            public void run() {
-                assertEquals("tableModel must have fired", 1, report.getEventCount());
-                assertEquals("the event type must be update " + TableModelReport.printEvent(report.getLastEvent())
-                        , 1, report.getUpdateEventCount());
-                TableModelEvent event = report.getLastUpdateEvent();
-                assertEquals("the updated row ", row, event.getFirstRow());
-            }
-        });        
-    }
-
 
     /**
      * Issue #493-swingx: incorrect table events fired.
