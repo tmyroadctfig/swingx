@@ -1778,7 +1778,7 @@ public class JXTreeTable extends JXTable {
                     public void treeNodesChanged(TreeModelEvent e) {
 //                        LOG.info("got tree event: changed " + e);
                         delayedFireTableDataUpdated(e);
-                    }
+                    }   
 
                     // We use delayedFireTableDataChanged as we can
                     // not be guaranteed the tree will have finished processing
@@ -1794,7 +1794,11 @@ public class JXTreeTable extends JXTable {
 
                     public void treeStructureChanged(TreeModelEvent e) {
                         // ?? should be mapped to structureChanged -- JW
-                        delayedFireTableDataChanged();
+                        if (isTableStructureChanged(e)) {
+                            delayedFireTableStructureChanged();
+                        } else {
+                            delayedFireTableDataChanged();
+                        }
                     }
                 };
             }
@@ -1802,6 +1806,35 @@ public class JXTreeTable extends JXTable {
             return treeModelListener;
         }
 
+        /**
+         * Decides if the given treeModel structureChanged should 
+         * trigger a table structureChanged. Returns true if the 
+         * source path is the root or null, false otherwise.<p>
+         * 
+         * PENDING: need to refine? "Marker" in Event-Object?
+         * 
+         * @param e the TreeModelEvent received in the treeModelListener's 
+         *   treeStructureChanged
+         * @return a boolean indicating whether the given TreeModelEvent
+         *   should trigger a structureChanged.
+         */
+        private boolean isTableStructureChanged(TreeModelEvent e) {
+            if ((e.getTreePath() == null) ||
+                    (e.getTreePath().getParentPath() == null)) return true;
+            return false;
+        }
+
+        /**
+         * Invokes fireTableDataChanged after all the pending events have been
+         * processed. SwingUtilities.invokeLater is used to handle this.
+         */
+        private void delayedFireTableStructureChanged() {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    fireTableStructureChanged();
+                }
+            });
+        }
 
         /**
          * Invokes fireTableDataChanged after all the pending events have been

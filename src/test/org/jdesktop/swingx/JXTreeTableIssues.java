@@ -233,95 +233,12 @@ public class JXTreeTableIssues extends InteractiveTestCase {
             public void run() {
                 LOG.info("sanity - did testTableEventUpdateOnTreeTableSetValueForRoot run?");
                 assertEquals("tableModel must have fired", 1, report.getEventCount());
-                assertEquals("the event type must be update", 1, report.getUpdateEventCount());
+                assertEquals("the event type must be update " + TableModelReport.printEvent(report.getLastEvent())
+                        , 1, report.getUpdateEventCount());
                 TableModelEvent event = report.getLastUpdateEvent();
                 assertEquals("the updated row ", row, event.getFirstRow());
             }
         });        
-    }
-
-    /**
-     * Issue #493-swingx: incorrect table events fired.
-     * Issue #592-swingx: (no structureChanged table events) is a special
-     *   case of the former.
-     *    
-     * Here: must fire structureChanged on setRoot(null).
-     * fails - because the treeStructureChanged is mapped to a 
-     * tableDataChanged.
-     *
-     * NOTE: the failing assert is wrapped in invokeLater ..., so 
-     * appears to pass in the testrunner.
-     */
-    public void testTableEventOnSetNullRoot() {
-        TreeTableModel model = createCustomTreeTableModelFromDefault();
-        final JXTreeTable table = new JXTreeTable(model);
-        table.setRootVisible(true);
-        table.expandAll();
-        final TableModelReport report = new TableModelReport();
-        table.getModel().addTableModelListener(report);
-        ((DefaultTreeTableModel) model).setRoot(null);
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                LOG.info("sanity - did testTableEventOnSetNullRoot run?");
-                assertEquals("tableModel must have fired", 1, report.getEventCount());
-                assertTrue("event type must be structureChanged " + TableModelReport.printEvent(report.getLastEvent()), 
-                        report.isStructureChanged(report.getLastEvent()));
-            }
-        });        
-        
-    }
-    /**
-     * Issue #493-swingx: incorrect table events fired.
-     * 
-     * Here: must fire structureChanged on setRoot(otherroot).
-     * fails - because the treeStructureChanged is mapped to a 
-     * tableDataChanged.
-     * 
-     * NOTE: the failing assert is wrapped in invokeLater ..., so 
-     * appears to pass in the testrunner.
-     */
-    public void testTableEventOnSetRoot() {
-        TreeTableModel model = createCustomTreeTableModelFromDefault();
-        final JXTreeTable table = new JXTreeTable(model);
-        table.setRootVisible(true);
-        table.expandAll();
-        final TableModelReport report = new TableModelReport();
-        table.getModel().addTableModelListener(report);
-        ((DefaultTreeTableModel) model).setRoot(new DefaultMutableTreeTableNode("other"));  
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                LOG.info("sanity - did testTableEventOnSetRoot run?");
-                assertEquals("tableModel must have fired", 1, report.getEventCount());
-                assertTrue("event type must be structureChanged " + TableModelReport.printEvent(report.getLastEvent()), 
-                        report.isStructureChanged(report.getLastEvent()));
-            }
-        });        
-        
-    }
-
-    /**
-     * Issue #493-swingx: incorrect table events fired.
-     * 
-     * Here: must fire structureChanged on setModel.
-     *
-     */
-    public void testTableEventOnSetModel() {
-        TreeTableModel model = createCustomTreeTableModelFromDefault();
-        final JXTreeTable table = new JXTreeTable(model);
-        table.setRootVisible(true);
-        table.expandAll();
-        final TableModelReport report = new TableModelReport();
-        table.getModel().addTableModelListener(report);
-        table.setTreeTableModel(createCustomTreeTableModelFromDefault());  
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                LOG.info("sanity - did testTableEventOnSetModel run?");
-                assertEquals("tableModel must have fired", 1, report.getEventCount());
-                assertTrue("event type must be structureChanged " + TableModelReport.printEvent(report.getLastEvent()), 
-                        report.isStructureChanged(report.getLastEvent()));
-            }
-        });        
-        
     }
 
     // -------------- interactive tests
