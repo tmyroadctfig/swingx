@@ -213,8 +213,6 @@ public class JXTreeTableIssues extends InteractiveTestCase {
      * 
      * from tiberiu@dev.java.net
      * 
-     * NOTE: the failing assert is wrapped in invokeLater ..., so 
-     * appears to pass in the testrunner.
      * @throws InvocationTargetException 
      * @throws InterruptedException 
      */
@@ -234,7 +232,6 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         table.setValueAt("games", row, 0);
         SwingUtilities.invokeAndWait(new Runnable() {
             public void run() {
-                LOG.info("sanity - did testTableEventUpdateOnTreeTableSetValueForRoot run?");
                 assertEquals("tableModel must have fired", 1, report.getEventCount());
                 assertEquals("the event type must be update " + TableModelReport.printEvent(report.getLastEvent())
                         , 1, report.getUpdateEventCount());
