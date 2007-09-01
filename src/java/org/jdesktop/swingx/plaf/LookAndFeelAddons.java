@@ -31,6 +31,7 @@ import javax.swing.JComponent;
 import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 
+import org.jdesktop.swingx.plaf.linux.LinuxLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.macosx.MacOSXLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.motif.MotifLookAndFeelAddons;
@@ -251,6 +252,8 @@ public class LookAndFeelAddons {
       } else {
         addon = WindowsClassicLookAndFeelAddons.class.getName();
       }
+    } else if (OS.isLinux()) {
+      addon = LinuxLookAndFeelAddons.class.getName();
     }
 
     return addon;

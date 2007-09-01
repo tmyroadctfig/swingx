@@ -27,6 +27,7 @@ import java.util.ResourceBundle;
 
 import javax.swing.UIManager;
 
+import org.jdesktop.swingx.plaf.linux.LinuxLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.macosx.MacOSXLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.motif.MotifLookAndFeelAddons;
@@ -109,6 +110,16 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
   }
 
   /**
+   * Default implementation calls {@link #addBasicDefaults(LookAndFeelAddons, List)}
+   * 
+   * @param addon
+   * @param defaults
+   */
+   protected void addLinuxDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+     addBasicDefaults(addon, defaults);
+   }
+ 
+   /**
    * Gets the defaults for the given addon.
    * 
    * Based on the addon, it calls
@@ -141,6 +152,8 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
       addMacDefaults(addon, defaults);
     } else if (isMotif(addon)) {
       addMotifDefaults(addon, defaults);
+    } else if (isLinux(addon)) {
+      addLinuxDefaults(addon, defaults);
     } else {
       // at least add basic defaults
       addBasicDefaults(addon, defaults);
@@ -193,6 +206,13 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
     return addon instanceof MotifLookAndFeelAddons;
   }
 
+  /**
+   * @return true if the current look and feel is Linux
+   */
+  protected boolean isLinux(LookAndFeelAddons addon) {
+      return addon instanceof LinuxLookAndFeelAddons;
+  }
+  
   /**
    * @return true if the current look and feel is one of JGoodies Plastic l&fs
    */

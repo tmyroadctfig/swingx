@@ -62,6 +62,10 @@ public class JXTitledPanelAddon extends AbstractComponentAddon {
   }
   
   @Override
+  protected void addLinuxDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+    addMetalDefaults(addon, defaults);
+  }
+  @Override
   protected void addMetalDefaults(LookAndFeelAddons addon, List<Object> defaults) {
     super.addMetalDefaults(addon, defaults);
 
