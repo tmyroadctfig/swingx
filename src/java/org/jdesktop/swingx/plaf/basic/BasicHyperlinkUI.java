@@ -26,7 +26,6 @@ import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.Shape;
@@ -39,7 +38,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.text.AttributedCharacterIterator;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
