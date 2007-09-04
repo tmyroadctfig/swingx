@@ -24,6 +24,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -47,6 +48,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
@@ -82,15 +84,60 @@ public class JXTableIssues extends InteractiveTestCase {
         setSystemLF(true);
         try {
 //          test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*Scroll.*");
+//            test.runInteractiveTests("interactive.*Scroll.*");
          //   test.runInteractiveTests("interactive.*Render.*");
-//            test.runInteractiveTests(".*RowHeight.*");
+            test.runInteractiveTests(".*SortOn.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         } 
     }
+
+    /**
+     * row index conversion goes nuts if not re-sorted on update.
+     * Looks like a repaint problem.
+     */
+    public void interactiveSortOnUpdate() {
+        JXTable xtable = new JXTable(new AncientSwingTeam()) {
+
+            @Override
+            protected boolean shouldSortOnChange(TableModelEvent e) {
+                if (isUpdate(e)) {
+                    return false;
+                }
+                return super.shouldSortOnChange(e);
+            }
+            
+        };
+        JXTable table = new JXTable(xtable.getModel()) {
+
+            @Override
+            protected boolean shouldSortOnChange(TableModelEvent e) {
+                if (isUpdate(e)) {
+                    repaint(e);
+                    return false;
+                }
+                return super.shouldSortOnChange(e);
+            }
+
+            /**
+             * Hack to repaint at the correct row in terms of 
+             * view coordinates.
+             * @param e
+             */
+            private void repaint(TableModelEvent e) {
+                int firstRow = convertRowIndexToView(e.getFirstRow());
+                Rectangle rowRect = getCellRect(firstRow, 0, true);
+                rowRect.width = getWidth();
+                repaint(rowRect);
+            }
+            
+        };
+        JXFrame frame = wrapWithScrollingInFrame(xtable, table, "edit and shouldSortOnChange false");
+        frame.setVisible(true);
+    }
     
+
      /**
      * test if created a new instance of the renderer. While the old
      * assertions are true, it's useless with swingx renderers: the renderer is
