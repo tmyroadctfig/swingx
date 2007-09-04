@@ -8,7 +8,7 @@ Name: org/jdesktop/swingx/JXDatePicker.class
 Java-Bean: True
 
 Name: org/jdesktop/swingx/JXDialog.class
-Java-Bean: True
+Java-Bean: False
 
 Name: org/jdesktop/swingx/JXEditorPane.class
 Java-Bean: True
@@ -113,7 +113,7 @@ Name: org/jdesktop/swingx/border/DropShadowBorder.class
 Java-Bean: True
 
 Name: org/jdesktop/swingx/border/MatteBorderExt.class
-Java-Bean: True
+Java-Bean: False
 
 Name: org/jdesktop/swingx/painter/BackgroundPainter.class
 Java-Bean: True
