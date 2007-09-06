@@ -443,9 +443,13 @@ public class JXDatePicker extends JComponent {
 
     /**
      * Returns the formatted text field used to edit the date selection.
-     *
+     * <p>
+     * Clients should NOT use this method. It is provided to temporarily support
+     * the PLAF code.
+     * 
      * @return the formatted text field
      */
+    @Deprecated
     public JFormattedTextField getEditor() {
         return _dateField;
     }
