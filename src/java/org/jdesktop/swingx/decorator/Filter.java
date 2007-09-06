@@ -308,14 +308,14 @@ public abstract class Filter {
     }
 
     /**
-     * returns the filter to use for accessing input.
+     * Returns the filter to use for accessing input.
      * That's the previous (model is first) filter if this is 
      * part of a pipeline or null if this is standalone or the first
      * in the pipeline.
      * 
      * @return filter to use for accessing input
      */
-    private Filter getMappingFilter() {
+    protected Filter getMappingFilter() {
         Filter filter = null;
         if (pipeline != null) {
             filter = pipeline.previous(this);
