@@ -35,6 +35,7 @@ import org.jdesktop.swingx.plaf.linux.LinuxLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.macosx.MacOSXLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.motif.MotifLookAndFeelAddons;
+import org.jdesktop.swingx.plaf.nimbus.NimbusLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.windows.WindowsClassicLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.windows.WindowsLookAndFeelAddons;
 import org.jdesktop.swingx.util.OS;
@@ -228,6 +229,8 @@ public class LookAndFeelAddons {
       addon = WindowsClassicLookAndFeelAddons.class.getName();
     } else if (UIManager.getLookAndFeel().getID().equals("Motif")) {
       addon = MotifLookAndFeelAddons.class.getName();
+    } else if (UIManager.getLookAndFeel().getID().equals("Nimbus")) {
+      addon = NimbusLookAndFeelAddons.class.getName();
     } else {
       addon = getSystemAddonClassName();
     }
