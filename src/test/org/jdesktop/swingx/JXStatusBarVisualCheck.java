@@ -20,6 +20,7 @@ import javax.swing.border.TitledBorder;
 import org.jdesktop.swingx.action.AbstractActionExt;
 
 public class JXStatusBarVisualCheck extends InteractiveTestCase {
+    @SuppressWarnings("unused")
     private static final Logger LOG = Logger
             .getLogger(JXStatusBarVisualCheck.class.getName());
     

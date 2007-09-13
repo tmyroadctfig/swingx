@@ -25,8 +25,8 @@ public class ChangeReport implements ChangeListener {
     /**
      * Holds a list of all received PropertyChangeEvents.
      */
-    protected List events = new LinkedList();
-    protected Map eventMap = new HashMap();
+    protected List<ChangeEvent> events = new LinkedList<ChangeEvent>();
+    protected Map<Object, ChangeEvent> eventMap = new HashMap<Object, ChangeEvent>();
     
 //------------------------ implement PropertyChangeListener
     

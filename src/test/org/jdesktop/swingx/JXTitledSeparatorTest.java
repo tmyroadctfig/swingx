@@ -23,6 +23,7 @@ import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
 public class JXTitledSeparatorTest extends InteractiveTestCase {
+    @SuppressWarnings("unused")
     private static final Logger LOG = Logger
             .getLogger(JXTitledSeparatorTest.class.getName());
     

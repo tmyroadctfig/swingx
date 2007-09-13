@@ -29,7 +29,6 @@ import java.util.logging.Logger;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -38,7 +37,6 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 
 import org.jdesktop.swingx.InteractiveTestCase;
-import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.SerializableSupport;
 

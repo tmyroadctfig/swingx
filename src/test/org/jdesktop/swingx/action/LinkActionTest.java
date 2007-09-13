@@ -54,8 +54,7 @@ public class LinkActionTest extends TestCase {
      */
     public void testConstructors() {
         Object target = new Object();
-        boolean visitedIsTrue = true;
-        LinkAction linkAction = new LinkAction(target) {
+        LinkAction<Object> linkAction = new LinkAction<Object>(target) {
 
             public void actionPerformed(ActionEvent e) {
                 // TODO Auto-generated method stub
@@ -71,7 +70,7 @@ public class LinkActionTest extends TestCase {
      *
      */
     public void testLinkAction() {
-       LinkAction linkAction = new LinkAction(null) {
+       LinkAction<Object> linkAction = new LinkAction<Object>(null) {
 
         public void actionPerformed(ActionEvent e) {
             // TODO Auto-generated method stub

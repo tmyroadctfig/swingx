@@ -24,10 +24,9 @@ package org.jdesktop.swingx;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.DateFormat;
-import java.text.ParseException;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -37,7 +36,6 @@ import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.text.DefaultFormatterFactory;
 
 import org.jdesktop.swingx.calendar.DateUtils;
 
@@ -55,8 +53,8 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         setSystemLF(true);
         JXDatePickerIssues  test = new JXDatePickerIssues();
         try {
-            test.runInteractiveTests();
-//          test.runInteractiveTests(".*Link.*");
+//            test.runInteractiveTests();
+          test.runInteractiveTests(".*Focus.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -65,6 +63,34 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 
 
     private Calendar calendar;
+
+    
+    /**
+     * Issue #577-swingx: JXDatePicker focus cleanup.
+     */
+    public void interactiveFocusOnTogglePopup() {
+        JXDatePicker picker = new JXDatePicker();
+        FocusListener l = new FocusListener() {
+
+            public void focusGained(FocusEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+
+            public void focusLost(FocusEvent e) {
+                if (e.isTemporary()) return;
+                LOG.info("focus lost from editor");
+            }};
+        picker.getEditor().addFocusListener(l);    
+        JComboBox box = new JComboBox(new String[] {"one", "twos"});
+//        box.setEditable(true);
+        JComponent panel = new JPanel();
+        panel.add(box);
+        panel.add(picker);
+        JXFrame frame = showInFrame(panel, "FocusEvents on editor");
+        frame.pack();
+    }
+
 
     /**
      * link panel commit gesture (keystroke F5, double-click) must 

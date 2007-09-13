@@ -101,6 +101,38 @@ public class JXTreeTableIssues extends InteractiveTestCase {
     }
 
     /**
+     * Issue #493-swingx: incorrect table events fired.
+     * Issue #592-swingx: (no structureChanged table events) is a special
+     *   case of the former.
+     * 
+     * Here: add support to prevent a structureChanged even when setting
+     * the root. May be required if the columns are stable and the
+     * model lazily loaded. Quick hack would be to add a clientProperty?
+     * 
+     * @throws InvocationTargetException 
+     * @throws InterruptedException 
+     */
+    public void testTableEventOnSetRootNoStructureChange() throws InterruptedException, InvocationTargetException {
+        TreeTableModel model = createCustomTreeTableModelFromDefault();
+        final JXTreeTable table = new JXTreeTable(model);
+        table.setRootVisible(true);
+        table.expandAll();
+        final TableModelReport report = new TableModelReport();
+        table.getModel().addTableModelListener(report);
+        ((DefaultTreeTableModel) model).setRoot(new DefaultMutableTreeTableNode("other"));  
+        SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+                assertEquals("tableModel must have fired", 1, report.getEventCount());
+                assertTrue("event type must be dataChanged " + TableModelReport.printEvent(report.getLastEvent()), 
+                        report.isDataChanged(report.getLastEvent()));
+            }
+        });        
+        
+    }
+
+
+
+    /**
      * Issue #576-swingx: sluggish scrolling (?).
      * Here - use default model
      */

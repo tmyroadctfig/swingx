@@ -24,7 +24,6 @@ import javax.swing.plaf.ColorUIResource;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
-import javax.swing.text.DefaultStyledDocument;
 
 import org.jdesktop.swingx.JXEditorPaneTest;
 import org.jdesktop.swingx.JXFrame;
@@ -34,7 +33,6 @@ import org.jdesktop.swingx.JXTree;
 import org.jdesktop.swingx.LinkModel;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.decorator.HighlighterFactory.UIColorHighlighter;
-import org.jdesktop.swingx.plaf.UIColorHighlighterAddon;
 import org.jdesktop.test.AncientSwingTeam;
 
 

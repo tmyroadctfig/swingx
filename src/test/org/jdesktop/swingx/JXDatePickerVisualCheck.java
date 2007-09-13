@@ -73,8 +73,8 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         JXDatePickerVisualCheck test = new JXDatePickerVisualCheck();
         
         try {
-            test.runInteractiveTests();
-//            test.runInteractiveTests(".*Link.*");
+//            test.runInteractiveTests();
+            test.runInteractiveTests(".*Action.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -97,7 +97,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
             
         };
         JComboBox box = new JComboBox(new String[] {"one", "twos"});
-        box.setEditable(true);
+//        box.setEditable(true);
         JComponent panel = new JPanel();
         panel.add(box);
         panel.add(picker);

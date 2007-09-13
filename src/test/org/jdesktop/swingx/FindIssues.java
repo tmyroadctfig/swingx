@@ -38,6 +38,23 @@ public class FindIssues extends FindTest {
         }
     }
     
+    /**
+     * Issue #487-swingx: NPE if instantiating with not null Searchable
+     */
+    @SuppressWarnings("unused")
+    public void testFindBarNPEConstructor() {
+        JXFindBar findBar = new JXFindBar(new JXTable().getSearchable());
+    }
+    /**
+     * Issue #487-swingx: NPE if setting a not-null Searchable before 
+     * showing
+     */
+    public void testFindBarNPE() {
+        Searchable searchable = new JXTable().getSearchable();
+        JXFindBar findBar = new JXFindBar();
+        findBar.setSearchable(searchable);
+    }
+    
     /** 
      * test incremental search in JXTable.
      *

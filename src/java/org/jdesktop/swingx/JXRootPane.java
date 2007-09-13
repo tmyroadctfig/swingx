@@ -25,11 +25,10 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-
 import javax.swing.BoxLayout;
 import javax.swing.InputMap;
 import javax.swing.JButton;

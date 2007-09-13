@@ -29,7 +29,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 import org.jdesktop.swingx.test.XTestUtils;
 
@@ -88,10 +87,6 @@ public class JXHeaderIssues extends InteractiveTestCase {
     public void interactiveHTMLTextWrapShort() {
         JXHeader header = new JXHeader();
         header.setTitle("AlbumManager");
-        String headerLong = "An adaption from JGoodies Binding Tutorial in the context"
-                + " of BeansBinding/AppFramework. "
-                + "The Tabs show different styles of typical interaction "
-                + "setups (in-place editing vs. dialog-editing). ";
         String headerShort = "An adaption from JGoodies Binding Tutorial in the context"
             + " of BeansBinding/AppFramework. ";
         header.setDescription(headerShort);
@@ -130,8 +125,6 @@ public class JXHeaderIssues extends InteractiveTestCase {
                 + " of BeansBinding/AppFramework. "
                 + "The Tabs show different styles of typical interaction "
                 + "setups (in-place editing vs. dialog-editing). ";
-        String headerShort = "An adaption from JGoodies Binding Tutorial in the context"
-            + " of BeansBinding/AppFramework. ";
         header.setDescription(headerLong);
         header.setIcon(XTestUtils.loadDefaultIcon());
         JXHeader footer = new JXHeader();

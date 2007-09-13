@@ -34,11 +34,11 @@ import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
+
 import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
+
 import org.jdesktop.swingx.DateSelectionModel;
 import org.jdesktop.swingx.DefaultDateSelectionModel;
 import org.jdesktop.swingx.event.EventListenerMap;
@@ -171,9 +171,9 @@ public class JXMonthView extends JComponent {
     /** Return value used to identify when the month up button is pressed. */
     public static final int MONTH_UP = 2;
 
-    @SuppressWarnings({"UNUSED_SYMBOL"})
+    @SuppressWarnings({"unused"})
     private static final int MONTH_TRAVERSABLE = 1;
-    @SuppressWarnings({"UNUSED_SYMBOL"})
+    @SuppressWarnings({"unused"})
     private static final int YEAR_TRAVERSABLE = 2;
 
     static {
