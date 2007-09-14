@@ -22,7 +22,6 @@
 package org.jdesktop.swingx.treetable;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.Date;
 
 import javax.swing.event.EventListenerList;
@@ -52,15 +51,22 @@ import javax.swing.tree.TreePath;
 public class SimpleFileSystemModel implements TreeTableModel {
     protected EventListenerList listenerList;
 
-    // The the returned file length for directories.
-    private static final Integer ZERO = new Integer(0);
+    // the returned file length for directories
+    private static final Long ZERO = Long.valueOf(0);
 
     private File root;
 
+    /**
+     * Creates a file system model, using the root directory as the model root.
+     */
     public SimpleFileSystemModel() {
         this(new File(File.separator));
     }
 
+    /**
+     * Creates a file system model, using the specified {@code root} as the
+     * model root.
+     */
     public SimpleFileSystemModel(File root) {
         this.root = root;
         this.listenerList = new EventListenerList();
@@ -75,8 +81,6 @@ public class SimpleFileSystemModel implements TreeTableModel {
             File[] files = parentFile.listFiles();
 
             if (files != null) {
-                Arrays.sort(files);
-
                 return files[index];
             }
         }
@@ -84,6 +88,9 @@ public class SimpleFileSystemModel implements TreeTableModel {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int getChildCount(Object parent) {
         if (parent instanceof File) {
             String[] children = ((File) parent).list();
@@ -96,18 +103,34 @@ public class SimpleFileSystemModel implements TreeTableModel {
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Class<?> getColumnClass(int column) {
-        if (column == 2) {
+        switch(column) {
+        case 0:
+            return String.class;
+        case 1:
+            return Long.class;
+        case 2:
             return Boolean.class;
+        case 3:
+            return Date.class;
+        default:
+            return Object.class;
         }
-
-        return Object.class;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int getColumnCount() {
         return 4;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getColumnName(int column) {
         switch (column) {
         case 0:
@@ -123,6 +146,9 @@ public class SimpleFileSystemModel implements TreeTableModel {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Object getValueAt(Object node, int column) {
         if (node instanceof File) {
             File file = (File) node;
@@ -130,9 +156,9 @@ public class SimpleFileSystemModel implements TreeTableModel {
             case 0:
                 return file.getName();
             case 1:
-                return file.isFile() ? new Integer((int) file.length()) : ZERO;
+                return file.isFile() ? file.length() : ZERO;
             case 2:
-                return new Boolean(file.isDirectory());
+                return file.isDirectory();
             case 3:
                 return new Date(file.lastModified());
             }
@@ -158,13 +184,6 @@ public class SimpleFileSystemModel implements TreeTableModel {
     /**
      * {@inheritDoc}
      */
-    public void setHierarchicalColumn(int column) {
-        //does nothing
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public void setValueAt(Object value, Object node, int column) {
         //does nothing
     }
@@ -183,8 +202,6 @@ public class SimpleFileSystemModel implements TreeTableModel {
         if (parent instanceof File && child instanceof File) {
             File parentFile = (File) parent;
             File[] files = parentFile.listFiles();
-            
-            Arrays.sort(files);
             
             for (int i = 0, len = files.length; i < len; i++) {
                 if (files[i].equals(child)) {
@@ -229,6 +246,12 @@ public class SimpleFileSystemModel implements TreeTableModel {
         //does nothing
     }
     
+    /**
+     * Gets a an array of all the listeners attached to this model.
+     * 
+     * @return an array of listeners; this array is guaranteed to be
+     * non-{@code null}
+     */
     public TreeModelListener[] getTreeModelListeners() {
         return listenerList.getListeners(TreeModelListener.class);
     }
