@@ -449,7 +449,7 @@ public class JXDatePicker extends JComponent {
      * 
      * @return the formatted text field
      */
-    @Deprecated
+//    @Deprecated
     public JFormattedTextField getEditor() {
         return _dateField;
     }
@@ -458,12 +458,16 @@ public class JXDatePicker extends JComponent {
      * Sets the editor. <p>
      * 
      * The default is created and set by the UI delegate.
+     * <p>
+     * Clients should NOT use this method. It is provided to temporarily support
+     * the PLAF code.
      * 
      * @param editor the formatted input.
      * @throws NullPointerException if editor is null.
      * 
      * @see #getEditor
      */
+//    @Deprecated
     public void setEditor(JFormattedTextField editor) {
         Contract.asNotNull(editor, "editor must not be null");
         JFormattedTextField oldEditor = _dateField;
