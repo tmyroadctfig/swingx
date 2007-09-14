@@ -38,40 +38,18 @@ public class FindIssues extends FindTest {
         }
     }
     
-    /**
-     * Issue #487-swingx: NPE if instantiating with not null Searchable
-     */
-    @SuppressWarnings("unused")
-    public void testFindBarNPEConstructor() {
-        JXFindBar findBar = new JXFindBar(new JXTable().getSearchable());
-    }
+
     /**
      * Issue #487-swingx: NPE if setting a not-null Searchable before 
-     * showing
+     * showing. Hack around ...
      */
-    public void testFindBarNPE() {
+    public void testFindBarNPEComponents() {
         Searchable searchable = new JXTable().getSearchable();
         JXFindBar findBar = new JXFindBar();
+        // old hack
+//        findBar.addNotify();
         findBar.setSearchable(searchable);
-    }
-    
-    /** 
-     * test incremental search in JXTable.
-     *
-     */
-    public void testTableIncrementalHighlight() {
-        JXTable table = new JXTable(new TestTableModel());
-        table.putClientProperty(AbstractSearchable.MATCH_HIGHLIGHTER, Boolean.TRUE);
-        int row = 3;
-        int column = 1;
-        String firstSearchText = "wo" + row;
-        PatternModel model = new PatternModel();
-        model.setRawText(firstSearchText);
-        // make sure we had a match
-        int foundIndex = table.getSearchable().search(model.getPattern(), -1);
-        assertEquals("must return be found", row, foundIndex);
-        Component comp = table.prepareRenderer(table.getCellRenderer(row, column), row, column);
-        assertEquals(Color.YELLOW.brighter(), comp.getBackground());
+        fail("quick hack ... remove me if really fixed");
     }
 
 

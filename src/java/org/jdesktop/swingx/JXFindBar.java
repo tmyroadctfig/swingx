@@ -95,6 +95,8 @@ public class JXFindBar extends JXFindPanel {
      */
     @Override
     protected void showNotFoundMessage() {
+        //JW: quick hack around #487-swingx - NPE in setSearchable
+        if (searchField ==  null) return;
         searchField.setForeground(notFoundForegroundColor);
         searchField.setBackground(notFoundBackgroundColor);
     }
@@ -104,6 +106,8 @@ public class JXFindBar extends JXFindPanel {
      */
     @Override
     protected void showFoundMessage() {
+        //JW: quick hack around #487-swingx - NPE in setSearchable
+        if (searchField ==  null) return;
         searchField.setBackground(previousBackgroundColor);
         searchField.setForeground(previousForegroundColor);
     }

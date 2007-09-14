@@ -7,6 +7,8 @@
 
 package org.jdesktop.swingx;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -54,6 +56,23 @@ public class FindTest extends InteractiveTestCase {
         super("Find Action Test");
     }
 
+    /**
+     * Issue #487-swingx: NPE if instantiating with not null Searchable
+     */
+    @SuppressWarnings("unused")
+    public void testFindBarNPEConstructor() {
+        JXFindBar findBar = new JXFindBar(new JXTable().getSearchable());
+    }
+    /**
+     * Issue #487-swingx: NPE if setting a not-null Searchable before 
+     * showing
+     */
+    public void testFindBarNPE() {
+        Searchable searchable = new JXTable().getSearchable();
+        JXFindBar findBar = new JXFindBar();
+        findBar.setSearchable(searchable);
+    }
+    
 
     /**
      * Issue #374-swingx: default search keystroke never found.
@@ -132,7 +151,27 @@ public class FindTest extends InteractiveTestCase {
         assertEquals("column must be reset", -1, ((TableSearchable) table.getSearchable()).lastSearchResult.foundColumn);
 
     }
-    
+
+    /** 
+     * Test SearchHighlight used in incremental search of JXTable.  
+     *
+     */
+    public void testTableIncrementalHighlighter() {
+        JXTable table = new JXTable(new TestTableModel());
+        table.putClientProperty(AbstractSearchable.MATCH_HIGHLIGHTER, Boolean.TRUE);
+        int row = 3;
+        int column = 1;
+        String firstSearchText = "wo" + row;
+        PatternModel model = new PatternModel();
+        model.setRawText(firstSearchText);
+        // make sure we had a match
+        int foundIndex = table.getSearchable().search(model.getPattern(), -1);
+        assertEquals("must return be found", row, foundIndex);
+        Component comp = table.prepareRenderer(table.getCellRenderer(row, column), row, column);
+        assertEquals(Color.YELLOW.brighter(), comp.getBackground());
+    }
+
+
     /** 
      * test incremental search in JXTable.
      *
