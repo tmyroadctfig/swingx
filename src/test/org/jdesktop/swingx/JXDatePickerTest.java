@@ -65,7 +65,7 @@ public class JXDatePickerTest extends TestCase {
         cal = Calendar.getInstance();
     }
 
-    public void teardown() {
+    public void tearDown() {
     }
 
     /**
@@ -1123,6 +1123,7 @@ public class JXDatePickerTest extends TestCase {
         }
         if (button == null) {
             LOG.info("cannot run testEnabledListening - no button found");
+            return;
         }
         button.setEnabled(false);
         // sanity - that at least the other views are uneffected

@@ -61,7 +61,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JComponent.setDefaultLocale(Locale.US);
     }
 
-    public void teardown() {
+    public void tearDown() {
         JComponent.setDefaultLocale(componentLocale);
     }
 
