@@ -64,19 +64,22 @@ public class WindowsStatusBarUI extends BasicStatusBarUI {
         return new WindowsStatusBarUI();
     }	
 
-    protected void paintBackground(Graphics2D g, JXStatusBar statusBar) {
+    @Override protected void paintBackground(Graphics2D g, JXStatusBar statusBar) {
         //if bidi, reverse the image painting order
         //TODO need to handle vertical stretching better
-        Graphics2D g2 = (Graphics2D)g;
-        g2.drawImage(leftImage, 0, 0, leftImage.getWidth(), statusBar.getHeight(), null);
-        g2.drawImage(middleImage, leftImage.getWidth(), 0, statusBar.getWidth() - leftImage.getWidth() - rightImage.getWidth(), statusBar.getHeight(), null);
-        g2.drawImage(rightImage, statusBar.getWidth() - rightImage.getWidth(), 0, rightImage.getWidth(), statusBar.getHeight(), null);
+        g.drawImage(leftImage, 0, 0, leftImage.getWidth(), statusBar.getHeight(), null);
+        g.drawImage(middleImage, leftImage.getWidth(), 0, statusBar.getWidth() - leftImage.getWidth() - rightImage.getWidth(), statusBar.getHeight(), null);
+        g.drawImage(rightImage, statusBar.getWidth() - rightImage.getWidth(), 0, rightImage.getWidth(), statusBar.getHeight(), null);
     }
     
-    protected void getSeparatorInsets(Insets insets) {
+    @Override protected Insets getSeparatorInsets(Insets insets) {
+        if (insets == null) {
+            insets = new Insets(0, 0, 0, 0);
+        }
         insets.top = 1;
         insets.left = 4;
         insets.bottom = 0;
         insets.right = 4;
+        return insets;
     }
 }

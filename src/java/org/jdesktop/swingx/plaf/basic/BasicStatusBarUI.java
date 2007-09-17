@@ -40,7 +40,10 @@ import java.util.Map;
  */
 public class BasicStatusBarUI extends StatusBarUI {
     public static final String AUTO_ADD_SEPARATOR = new StringBuffer("auto-add-separator").toString();
-    
+    /**
+     * Used to help reduce the amount of trash being generated
+     */
+    private static Insets TEMP_INSETS;
     /**
      * The one and only JXStatusBar for this UI delegate
      */
@@ -94,15 +97,9 @@ public class BasicStatusBarUI extends StatusBarUI {
         assert c instanceof JXStatusBar;
         statusBar = (JXStatusBar)c;
         
-        //only set the border if it is an instanceof UIResource
-        //In other words, only replace the border if it has not been
-        //set by the developer. UIResource is the flag we use to indicate whether
-        //the value was set by the UIDelegate, or by the developer.
-        Border b = statusBar.getBorder();
-        if (b == null || b instanceof UIResource) {
-            statusBar.setBorder(createBorder());
-        }
-
+        installDefaults(statusBar);
+        installListeners(statusBar);
+        
         //only set the layout manager if the layout manager of the component is null.
         //do not replace custom layout managers. it is not necessary to replace this layout
         //manager.
@@ -111,6 +108,19 @@ public class BasicStatusBarUI extends StatusBarUI {
             statusBar.setLayout(createLayout());
         }
     }
+    
+    protected void installDefaults(JXStatusBar sb) {
+        //only set the border if it is an instanceof UIResource
+        //In other words, only replace the border if it has not been
+        //set by the developer. UIResource is the flag we use to indicate whether
+        //the value was set by the UIDelegate, or by the developer.
+        Border b = statusBar.getBorder();
+        if (b == null || b instanceof UIResource) {
+            statusBar.setBorder(createBorder());
+        }
+    }
+    
+    protected void installListeners(JXStatusBar sb) { }
     
     /**
      * Reverses configuration which was done on the specified component during
@@ -141,8 +151,13 @@ public class BasicStatusBarUI extends StatusBarUI {
     public void uninstallUI(JComponent c) {
         assert c instanceof JXStatusBar;
 
+        uninstallDefaults(statusBar);
+        uninstallListeners(statusBar);
         //TODO remove the border and layout if a UI resource?
     }
+    
+    protected void uninstallDefaults(JXStatusBar sb) { }
+    protected void uninstallListeners(JXStatusBar sb) { }
     
     @Override
     public void paint(Graphics g, JComponent c) {
@@ -150,20 +165,19 @@ public class BasicStatusBarUI extends StatusBarUI {
         if (statusBar.isOpaque()) {
             Graphics2D g2 = (Graphics2D)g;
             paintBackground(g2, statusBar);
-            
-            if (includeSeparators()) {
-                //now paint the separators
-                Insets sepInsets = new Insets(0, 0, 0, 0);
-                getSeparatorInsets(sepInsets);
-                for (int i=0; i<statusBar.getComponentCount()-1; i++) {
-                    Component comp = statusBar.getComponent(i);
-                    int x = comp.getX() + comp.getWidth() + sepInsets.left;
-                    int y = sepInsets.top;
-                    int w = getSeparatorWidth() - sepInsets.left - sepInsets.right;
-                    int h = c.getHeight() - sepInsets.top - sepInsets.bottom;
+        }
+        
+        if (includeSeparators()) {
+            //now paint the separators
+            TEMP_INSETS = getSeparatorInsets(TEMP_INSETS);
+            for (int i=0; i<statusBar.getComponentCount()-1; i++) {
+                Component comp = statusBar.getComponent(i);
+                int x = comp.getX() + comp.getWidth() + TEMP_INSETS.left;
+                int y = TEMP_INSETS.top;
+                int w = getSeparatorWidth() - TEMP_INSETS.left - TEMP_INSETS.right;
+                int h = c.getHeight() - TEMP_INSETS.top - TEMP_INSETS.bottom;
 
-                    paintSeparator(g2, statusBar, x, y, w, h);
-                }
+                paintSeparator((Graphics2D)g, statusBar, x, y, w, h);
             }
         }
     }
@@ -188,11 +202,17 @@ public class BasicStatusBarUI extends StatusBarUI {
         g.drawLine(x+1, y, x+1, h);
     }
     
-    protected void getSeparatorInsets(Insets insets) {
+    protected Insets getSeparatorInsets(Insets insets) {
+        if (insets == null) {
+            insets = new Insets(0, 0, 0, 0);
+        }
+        
         insets.top = 4;
         insets.left = 4;
         insets.bottom = 2;
         insets.right = 4;
+        
+        return insets;
     }
     
     protected int getSeparatorWidth() {

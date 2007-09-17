@@ -23,29 +23,15 @@ package org.jdesktop.swingx.plaf.windows;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
-import java.awt.LayoutManager;
-import java.awt.LayoutManager2;
-import java.awt.image.BufferedImage;
-import java.util.HashMap;
-import java.util.Map;
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JSeparator;
-import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.BorderUIResource;
 import org.jdesktop.swingx.JXStatusBar;
-import org.jdesktop.swingx.JXStatusBar.Constraint;
-import org.jdesktop.swingx.plaf.StatusBarUI;
 import org.jdesktop.swingx.plaf.basic.BasicStatusBarUI;
 
 /**
@@ -71,7 +57,7 @@ public class WindowsClassicStatusBarUI extends BasicStatusBarUI {
         return new WindowsClassicStatusBarUI();
     }
     
-    protected void paintBackground(Graphics2D g, JXStatusBar bar) {        
+    @Override protected void paintBackground(Graphics2D g, JXStatusBar bar) {        
         g.setColor(bar.getBackground());
         g.fillRect(0, 0, bar.getWidth(), bar.getHeight());
         
@@ -90,16 +76,15 @@ public class WindowsClassicStatusBarUI extends BasicStatusBarUI {
         }
     }
     
-    protected void paintSeparator(Graphics2D g, JXStatusBar bar, int x, int y, int w, int h) {
+    @Override protected void paintSeparator(Graphics2D g, JXStatusBar bar, int x, int y, int w, int h) {
         //paint nothing, since paintBackground handles this
     }
 
-    protected int getSeparatorWidth() {
+    @Override protected int getSeparatorWidth() {
         return 11;
     }
 
-    protected BorderUIResource createBorder() {
+    @Override protected BorderUIResource createBorder() {
         return new BorderUIResource(BorderFactory.createEmptyBorder(4, 5, 3, 22));
     }
-    
 }
