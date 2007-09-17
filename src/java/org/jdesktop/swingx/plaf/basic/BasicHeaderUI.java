@@ -49,6 +49,8 @@ public class BasicHeaderUI extends HeaderUI {
     protected JXLabel descriptionPane;
     protected JLabel imagePanel;
     private PropertyChangeListener propListener;
+    private Color gradientLightColor;
+    private Color gradientDarkColor;
 
     /** Creates a new instance of BasicHeaderUI */
     public BasicHeaderUI() {
@@ -121,7 +123,7 @@ public class BasicHeaderUI extends HeaderUI {
 
         imagePanel = new JLabel();
         imagePanel.setIcon(header.getIcon() == null ? UIManager.getIcon("Header.defaultIcon") : header.getIcon());
-
+        
         installComponents(header);
         installListeners(header);
     }
@@ -166,6 +168,15 @@ public class BasicHeaderUI extends HeaderUI {
     }
 
     protected void installDefaults(JXHeader h) {
+        gradientLightColor = Color.WHITE; //TODO need to get this out of UI defaults
+        gradientDarkColor = UIManager.getColor("JXHeader.background");
+        //for backwards compatibility (mostly for substance and synthetica,
+        //I suspect) I'll fall back on the "control" color if JXHeader.background
+        //isn't specified.
+        if (gradientDarkColor == null) {
+            gradientDarkColor = UIManager.getColor("control"); 
+        }
+        
         Painter p = h.getBackgroundPainter();
         if (p == null || p instanceof PainterUIResource) {
             h.setBackgroundPainter(createBackgroundPainter());
@@ -228,7 +239,7 @@ public class BasicHeaderUI extends HeaderUI {
     }
 
     protected Painter createBackgroundPainter() {
-        MattePainter p = new MattePainter(new GradientPaint(0, 0, Color.WHITE, 1, 0, UIManager.getColor("control")));
+        MattePainter p = new MattePainter(new GradientPaint(0, 0, gradientLightColor, 1, 0, gradientDarkColor));
         p.setPaintStretched(true);
         return new PainterUIResource(p);
     }
