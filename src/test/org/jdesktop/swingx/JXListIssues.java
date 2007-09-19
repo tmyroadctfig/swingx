@@ -4,12 +4,27 @@
  */
 package org.jdesktop.swingx;
 
+import javax.swing.JList;
+import javax.swing.plaf.UIResource;
+
 import org.jdesktop.swingx.decorator.Filter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
 import org.jdesktop.swingx.decorator.PatternFilter;
 import org.jdesktop.test.ListDataReport;
 
 public class JXListIssues extends JXListTest {
+
+    /**
+     * Issue #601-swingx: allow LAF to hook in LAF provided renderers.
+     * 
+     * Expected: plain ol' list does install UIResource (while tree doesn't)
+     */
+    public void testLAFRendererList() {
+        JList tree = new JList();
+        assertNotNull("default renderer installed", tree.getCellRenderer());
+        assertTrue("expected UIResource, but was: " + tree.getCellRenderer().getClass(), 
+                tree.getCellRenderer() instanceof UIResource);
+    }
 
     /**
      * Issue 377-swingx: list with filters enabled fires incorrect events.

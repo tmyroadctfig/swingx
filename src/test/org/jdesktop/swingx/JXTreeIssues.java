@@ -12,6 +12,8 @@ import java.io.File;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
+import javax.swing.JTree;
+import javax.swing.plaf.UIResource;
 
 import org.jdesktop.swingx.renderer.DefaultTreeRenderer;
 import org.jdesktop.swingx.renderer.IconValue;
@@ -38,7 +40,7 @@ import org.jdesktop.swingx.test.XTestUtils;
 public class JXTreeIssues extends JXTreeUnitTest {
 
     public static void main(String[] args) {
-//      setSystemLF(true);
+      setSystemLF(true);
       JXTreeIssues test = new JXTreeIssues();
       try {
           test.runInteractiveTests();
@@ -50,6 +52,18 @@ public class JXTreeIssues extends JXTreeUnitTest {
       }
   }
 
+    /**
+     * Issue #601-swingx: allow LAF to hook in LAF provided renderers.
+     * 
+     * Unexpected: plain ol' tree doesn't install UIResource?
+     */
+    public void testLAFRenderer() {
+        JTree tree = new JTree();
+        assertNotNull("default renderer installed", tree.getCellRenderer());
+        assertTrue("expected UIResource, but was: " + tree.getCellRenderer().getClass(), 
+                tree.getCellRenderer() instanceof UIResource);
+    }
+    
     /**    
      * Issue #242: CCE when setting icons. Not reproducible? 
      * Another issue: icon setting does not repaint (with core default renderer)
