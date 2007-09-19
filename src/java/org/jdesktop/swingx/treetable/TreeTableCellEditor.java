@@ -139,15 +139,21 @@ public class TreeTableCellEditor extends DefaultCellEditor {
      */
     @Override
     public boolean isCellEditable(EventObject e) {
-        if (e == null) {
-            return true;
+        // JW: quick fix for #592-swingx - 
+        // editing not started on keyEvent in hierarchical column (1.6)
+        if (e instanceof MouseEvent) {
+          return (((MouseEvent) e).getClickCount() >= clickCountToStart);
         }
-        else if (e instanceof MouseEvent) {
-            return (((MouseEvent) e).getClickCount() >= clickCountToStart);
-        }
-
-	// e is some other type of event...
-        return false;
+        return true;
+//        if (e == null) {
+//            return true;
+//        }
+//        else if (e instanceof MouseEvent) {
+//            return (((MouseEvent) e).getClickCount() >= clickCountToStart);
+//        }
+//
+//	// e is some other type of event...
+//        return false;
     }
 
     /**

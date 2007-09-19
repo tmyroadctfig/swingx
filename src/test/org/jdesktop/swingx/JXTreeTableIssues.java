@@ -24,6 +24,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -32,6 +33,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
@@ -100,6 +102,47 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         }
     }
 
+    /**
+     * #561-swingx: KeyEvent on hierarchical column doesn't start editing.
+     * 
+     * Here: test method without event (delegates to event == null)
+     */
+    public void testEditCellAt() {
+        JXTreeTable treeTable = prepareTreeTable(true);
+        treeTable.expandAll();
+        // sanity
+        assertTrue(treeTable.isCellEditable(0, 0));
+        assertTrue(treeTable.editCellAt(0, 0));
+    }
+    
+    /**
+     * #561-swingx: KeyEvent on hierarchical column doesn't start editing.
+     * 
+     * Here: test method taking the event
+     */
+    public void testEditCellAtByKeyEvent() {
+        JXTreeTable treeTable = prepareTreeTable(true);
+        treeTable.expandAll();
+        // sanity
+        assertTrue(treeTable.isCellEditable(0, 0));
+        KeyEvent e = new KeyEvent(treeTable, KeyEvent.KEY_PRESSED, 0L,
+                0, KeyEvent.VK_T, KeyEvent.CHAR_UNDEFINED);
+        assertTrue("keyEvent must start editing", treeTable.editCellAt(0, 0, e));
+    }
+    
+    /**
+     * #561-swingx: KeyEvent on hierarchical column doesn't start editing.
+     * 
+     * Here: compare with plain table (in fact plain DefaultCellEditor)
+     */
+    public void testTableEditCellAtByKeyEvent() {
+        JXTable table = new JXTable(10, 20);
+        // sanity
+        assertTrue(table.isCellEditable(0, 0));
+        KeyEvent e = new KeyEvent(table, KeyEvent.KEY_PRESSED, 0L,
+                0, KeyEvent.VK_T, KeyEvent.CHAR_UNDEFINED);
+        assertTrue(table.editCellAt(0, 0, e));
+    }
     /**
      * Issue #493-swingx: incorrect table events fired.
      * Issue #592-swingx: (no structureChanged table events) is a special
