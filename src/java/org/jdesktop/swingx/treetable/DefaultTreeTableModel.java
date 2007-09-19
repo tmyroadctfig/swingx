@@ -22,7 +22,6 @@ package org.jdesktop.swingx.treetable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import javax.swing.tree.TreePath;
 
@@ -36,8 +35,8 @@ import javax.swing.tree.TreePath;
  * @author Karl Schaefer
  */
 public class DefaultTreeTableModel extends AbstractTreeTableModel {
-    /** The <code>Vector</code> of column identifiers. */
-    protected Vector columnIdentifiers;
+    /** The <code>List</code> of column identifiers. */
+    protected List<?> columnIdentifiers;
 
     private boolean useAutoCalculatedIdentifiers;
 
@@ -68,7 +67,7 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
      * @param root
      *            the root node of the tree
      */
-    public DefaultTreeTableModel(TreeTableNode root, Vector columnNames) {
+    public DefaultTreeTableModel(TreeTableNode root, List<?> columnNames) {
         super(root);
         setColumnIdentifiers(columnNames);
 
@@ -104,17 +103,19 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
      *            model to zero columns
      */
     // from DefaultTableModel
-    public void setColumnIdentifiers(Vector columnIdentifiers) {
+    public void setColumnIdentifiers(List<?> columnIdentifiers) {
         useAutoCalculatedIdentifiers = columnIdentifiers == null;
 
         this.columnIdentifiers = useAutoCalculatedIdentifiers
                 ? getAutoCalculatedIdentifiers(getRoot())
                 : columnIdentifiers;
+                
+        modelSupport.fireNewRoot();
     }
 
-    private static Vector<String> getAutoCalculatedIdentifiers(
+    private static List<String> getAutoCalculatedIdentifiers(
             TreeTableNode exemplar) {
-        Vector<String> autoCalculatedIndentifiers = new Vector<String>();
+        List<String> autoCalculatedIndentifiers = new ArrayList<String>();
 
         if (exemplar != null) {
             for (int i = 0, len = exemplar.getColumnCount(); i < len; i++) {
@@ -167,7 +168,13 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
             throw new IllegalArgumentException("column must be a valid index");
         }
 
-        return ((TreeTableNode) node).getValueAt(column);
+        TreeTableNode ttn = (TreeTableNode) node;
+        
+        if (column >= ttn.getColumnCount()) {
+            return null;
+        }
+        
+        return ttn.getValueAt(column);
     }
 
     /**
@@ -211,7 +218,7 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
         // This test is to cover the case when
         // getColumnCount has been subclassed by mistake ...
         if (column < columnIdentifiers.size() && (column >= 0)) {
-            id = columnIdentifiers.elementAt(column);
+            id = columnIdentifiers.indexOf(column);
         }
 
         return (id == null) ? super.getColumnName(column) : id.toString();
@@ -335,10 +342,11 @@ public class DefaultTreeTableModel extends AbstractTreeTableModel {
 
         if (useAutoCalculatedIdentifiers) {
             // rebuild the list
+            //this already fires an event don't duplicate
             setColumnIdentifiers(null);
+        } else {
+            modelSupport.fireNewRoot();
         }
-
-        modelSupport.fireNewRoot();
     }
 
     /**

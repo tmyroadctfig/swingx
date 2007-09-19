@@ -96,4 +96,19 @@ public interface TreeTableNode extends TreeNode {
      *            the column to set the value on
      */
     void setValueAt(Object aValue, int column);
+    
+    /**
+     * Returns this node's user object.
+     * 
+     * @return the Object stored at this node by the user
+     */
+    Object getUserObject();
+    
+    /**
+     * Sets the user object stored in this node.
+     * 
+     * @param userObject
+     *                the object to store
+     */
+    void setUserObject(Object userObject);
 }

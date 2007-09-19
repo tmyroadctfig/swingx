@@ -54,7 +54,7 @@ public abstract class AbstractTreeTableModel implements TreeTableModel {
      * for the {@link org.jdesktop.swingx.JXTreeTable#isHierarchical(int) hierarchical} column.
      */
     @Deprecated
-	public final static Class hierarchicalColumnClass = TreeTableModel.class;
+    public final static Class<TreeTableModel> hierarchicalColumnClass = TreeTableModel.class;
 
     /**
      * Root node of the model
@@ -130,8 +130,8 @@ public abstract class AbstractTreeTableModel implements TreeTableModel {
      * {@inheritDoc}
      */
     public boolean isCellEditable(Object node, int column) {
-		// RG: Fix Issue 49 -- Cell not editable, by default.
-		// Subclasses might override this to return true.
+	// RG: Fix Issue 49 -- Cell not editable, by default.
+	// Subclasses might override this to return true.
         return false;
     }
 
