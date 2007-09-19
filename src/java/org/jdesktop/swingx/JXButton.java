@@ -24,10 +24,8 @@ package org.jdesktop.swingx;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemListener;
+
 import javax.swing.*;
-import javax.swing.event.ChangeListener;
 
 import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.painter.Painter;
@@ -48,7 +46,7 @@ import org.jdesktop.swingx.painter.Painter;
  * </code></pre>
  *
  * <p>If <em>either</em> the foreground painter or the background painter is set,
- * then super.paintComponent() is not called. By setting botht he foreground and background
+ * then super.paintComponent() is not called. By setting both the foreground and background
  * painters to null, you get <em>exactly</em> the same painting behavior as JButton.
  * By contrast, the <code>Painters</code> installed by default will delegate to the UI delegate,
  * thus achieving the same look as a typical JButton, but at the cost of some additional painting
@@ -60,24 +58,21 @@ import org.jdesktop.swingx.painter.Painter;
  * </div>
  *
  * @author rbair
+ * @author rah003
  */
 public class JXButton extends JButton {
-    //a dummy JDialog, needed to convince a rubber-stamp
-    //like component to paint
-    private static JDialog invisibleParent = new JDialog();
-    //rubber-stamp like component for painting a button
-    private static JStampButton stamp = new JStampButton();
-    //initialize the rubber-stamp parent
-    static {
-        invisibleParent.add(stamp);
-        invisibleParent.setSize(1, 1);
-    }
+    //properties used to split foreground and background painting.
+    //overwritten to suppress event notification while painting
+    private String text;
+    private boolean borderPainted = true;
+    private boolean contentAreaFilled = true;
+    
     //the default fg and bg painters
-    private static final Painter DEFAULT_BACKGROUND_PAINTER = new DefaultBackgroundPainter();
-    private static final Painter DEFAULT_FOREGROUND_PAINTER = new DefaultForegroundPainter();
+    private static final Painter<JXButton> DEFAULT_BACKGROUND_PAINTER = new DefaultBackgroundPainter();
+    private static final Painter<JXButton> DEFAULT_FOREGROUND_PAINTER = new DefaultForegroundPainter();
 
-    private Painter fgPainter = DEFAULT_FOREGROUND_PAINTER;
-    private Painter bgPainter = DEFAULT_BACKGROUND_PAINTER;
+    private Painter<JXButton> fgPainter = DEFAULT_FOREGROUND_PAINTER;
+    private Painter<JXButton> bgPainter = DEFAULT_BACKGROUND_PAINTER;
 
     /** Creates a new instance of JXButton */
     public JXButton() {}
@@ -86,21 +81,54 @@ public class JXButton extends JButton {
     public JXButton(Icon icon) { super(icon); }
     public JXButton(String text, Icon icon) { super(text, icon); }
     
-    public Painter getBackgroundPainter() {
+    @Override
+    public void setText(String text) {
+        this.text = text;
+        super.setText(text);
+    }
+    
+    @Override
+    public String getText() {
+        return this.text;
+    }
+    
+    @Override
+    public void setBorderPainted(boolean b) {
+        this.borderPainted = b;
+        super.setBorderPainted(b);
+    }
+    
+    @Override
+    public boolean isBorderPainted() {
+        return this.borderPainted;
+    }
+    
+    @Override
+    public void setContentAreaFilled(boolean b) {
+        this.contentAreaFilled = b;
+        super.setContentAreaFilled(b);
+    }
+    
+    @Override
+    public boolean isContentAreaFilled() {
+        return this.contentAreaFilled;
+    }
+    
+    public Painter<JXButton> getBackgroundPainter() {
         return bgPainter;
     }
 
-    public void setBackgroundPainter(Painter p) {
+    public void setBackgroundPainter(Painter<JXButton> p) {
         Painter old = getBackgroundPainter();
         this.bgPainter = p;
         firePropertyChange("backgroundPainter", old, getBackgroundPainter());
         repaint();
     }
-    public Painter getForegroundPainter() {
+    public Painter<JXButton> getForegroundPainter() {
         return fgPainter;
     }
 
-    public void setForegroundPainter(Painter p) {
+    public void setForegroundPainter(Painter<JXButton> p) {
         Painter old = getForegroundPainter();
         this.fgPainter = p;
         firePropertyChange("foregroundPainter", old, getForegroundPainter());
@@ -108,6 +136,7 @@ public class JXButton extends JButton {
     }
     
     private boolean paintBorderInsets = true;
+    private boolean painting;
     
     /**
      * Returns true if the background painter should paint where the border is
@@ -135,9 +164,9 @@ public class JXButton extends JButton {
     }
     
     protected void paintComponent(Graphics g) {
-        Painter bgPainter = getBackgroundPainter();
-        Painter fgPainter = getForegroundPainter();
-        if (bgPainter == null && fgPainter == null) {
+        Painter<JXButton> bgPainter = getBackgroundPainter();
+        Painter<JXButton> fgPainter = getForegroundPainter();
+        if (painting || (bgPainter == null && fgPainter == null)) {
             super.paintComponent(g);
         } else {
             invokePainter(g, bgPainter);
@@ -145,7 +174,7 @@ public class JXButton extends JButton {
         }
     }
     
-    private void invokePainter(Graphics g, Painter ptr) {
+    private void invokePainter(Graphics g, Painter<JXButton> ptr) {
         if(ptr == null) return;
         
         if(isPaintBorderInsets()) {
@@ -160,15 +189,15 @@ public class JXButton extends JButton {
             g2.translate(-ins.left, -ins.top);
         }
     }
-        
-    private static final class DefaultBackgroundPainter extends AbstractPainter<JButton> {
-        protected void doPaint(Graphics2D g, JButton b, int width, int height) {
-            copySettings(b, stamp);
-            stamp.setSize(b.getWidth(), b.getHeight());
-            stamp.setText("");
-            stamp.setBorderPainted(true);
-            stamp.setContentAreaFilled(true);
-            stamp.paint(g);
+    // paint anything but text and icon
+    private static final class DefaultBackgroundPainter extends AbstractPainter<JXButton> {
+        protected void doPaint(Graphics2D g, JXButton b, int width, int height) {
+            b.setPainting(true);
+            String tmp = b.text;
+            b.text = "";
+            b.paint(g);
+            b.text = tmp;
+            b.setPainting(false);
         }
 
         //if any of the state of the JButton that affects the background has changed,
@@ -178,14 +207,19 @@ public class JXButton extends JButton {
             return false;
         }
     }
-    private static final class DefaultForegroundPainter extends AbstractPainter<JButton> {
-        protected void doPaint(Graphics2D g, JButton b, int width, int height) {
-            copySettings(b, stamp);
-            stamp.setSize(b.getWidth(), b.getHeight());
-            stamp.setText(b.getText());
-            stamp.setBorderPainted(false);
-            stamp.setContentAreaFilled(false);
-            stamp.paint(g);
+    // paint only a text and icon (if any)
+    private static final class DefaultForegroundPainter extends AbstractPainter<JXButton> {
+        protected void doPaint(Graphics2D g, JXButton b, int width, int height) {
+            b.setPainting(true);
+            boolean t1 = b.isBorderPainted();
+            boolean t2 = b.isContentAreaFilled();
+            b.borderPainted = false;
+            b.contentAreaFilled = false;
+            b.paint(g);
+            b.borderPainted = t1;
+            b.contentAreaFilled = t2;
+            b.setPainting(false);
+             
         }
 
         //if any of the state of the JButton that affects the foreground has changed,
@@ -195,68 +229,8 @@ public class JXButton extends JButton {
             return false;
         }
     }
-    private static void copySettings(JButton src, JStampButton dest) {
-        dest.setBounds(src.getBounds());
-        dest.setText(src.getText());
-        dest.setBackground(src.getBackground());
-        dest.setForeground(src.getForeground());
-        dest.setBorder(src.getBorder());
-        dest.setBorderPainted(src.isBorderPainted());
-        dest.setDefaultButton(src.isDefaultButton());
-        dest.setDefaultCapable(src.isDefaultCapable());
-        dest.setSelected(src.isSelected());
-        dest.setMargin(src.getMargin());
-        dest.setIcon(src.getIcon());
-        dest.setPressedIcon(src.getPressedIcon());
-        dest.setSelectedIcon(src.getSelectedIcon());
-        dest.setRolloverIcon(src.getRolloverIcon());
-        dest.setRolloverSelectedIcon(src.getRolloverSelectedIcon());
-        dest.setDisabledIcon(src.getDisabledIcon());
-        dest.setDisabledSelectedIcon(src.getDisabledSelectedIcon());
-        dest.setVerticalAlignment(src.getVerticalAlignment());
-        dest.setHorizontalAlignment(src.getHorizontalAlignment());
-        dest.setVerticalTextPosition(src.getVerticalTextPosition());
-        dest.setHorizontalTextPosition(src.getHorizontalTextPosition());
-        dest.setIconTextGap(src.getIconTextGap());
-        dest.setFocusPainted(src.isFocusPainted());
-        dest.setContentAreaFilled(src.isContentAreaFilled());
-        dest.setRolloverEnabled(src.isRolloverEnabled());
-        dest.setMnemonic(src.getMnemonic());
-        dest.setDisplayedMnemonicIndex(src.getDisplayedMnemonicIndex());
-        dest.setModel(src.getModel());
-        dest.setAlignmentY(src.getAlignmentY());
-        dest.setAlignmentX(src.getAlignmentX());
-//        dest.setVisible(src.isVisible());
-    }
-    private static final class JStampButton extends JButton {
-        private boolean isDefault = false;
-        public void setDefaultButton(boolean b) { isDefault = b; }
-        public boolean isDefaultButton() { return isDefault; }
-        public void setModel(final ButtonModel delegate) {
-            super.setModel(new ButtonModel() {
-                public boolean isArmed() { return delegate.isArmed(); }
-                public boolean isSelected() { return delegate.isSelected(); }
-                public boolean isEnabled() { return delegate.isEnabled(); }
-                public boolean isPressed() { return delegate.isPressed(); }
-                public boolean isRollover() { return delegate.isRollover(); }
-                public void setArmed(boolean b) {}
-                public void setSelected(boolean b) {}
-                public void setEnabled(boolean b) {}
-                public void setPressed(boolean b) {}
-                public void setRollover(boolean b) {}
-                public void setMnemonic(int i) {}
-                public int getMnemonic() { return delegate.getMnemonic(); }
-                public void setActionCommand(String string) {}
-                public String getActionCommand() { return delegate.getActionCommand(); }
-                public void setGroup(ButtonGroup buttonGroup) {}
-                public void addActionListener(ActionListener actionListener) {}
-                public void removeActionListener(ActionListener actionListener) {}
-                public Object[] getSelectedObjects() { return delegate.getSelectedObjects(); }
-                public void addItemListener(ItemListener itemListener) {}
-                public void removeItemListener(ItemListener itemListener) {}
-                public void addChangeListener(ChangeListener changeListener) {}
-                public void removeChangeListener(ChangeListener changeListener) {}
-            });
-        }
+
+    protected void setPainting(boolean b) {
+        painting = b;
     }
 }

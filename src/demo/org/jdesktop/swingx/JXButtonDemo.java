@@ -20,12 +20,10 @@
  */
 package org.jdesktop.swingx;
 
-import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.painter.AbstractPainter;
 import org.jdesktop.swingx.image.StackBlurFilter;
 
 import javax.swing.*;
-import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImageOp;
