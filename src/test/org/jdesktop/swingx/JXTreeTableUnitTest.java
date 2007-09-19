@@ -22,6 +22,7 @@ package org.jdesktop.swingx;
 
 import java.awt.Point;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Vector;
@@ -59,6 +60,47 @@ public class JXTreeTableUnitTest extends InteractiveTestCase {
     
     public JXTreeTableUnitTest() {
         super("JXTreeTable Unit Test");
+    }
+    /**
+     * #561-swingx: KeyEvent on hierarchical column doesn't start editing.
+     * 
+     * Here: test method without event (delegates to event == null)
+     */
+    public void testEditCellAt() {
+        JXTreeTable treeTable = prepareTreeTable(true);
+        treeTable.expandAll();
+        // sanity
+        assertTrue(treeTable.isCellEditable(0, 0));
+        assertTrue(treeTable.editCellAt(0, 0));
+    }
+    
+    /**
+     * #561-swingx: KeyEvent on hierarchical column doesn't start editing.
+     * 
+     * Here: test method taking the event
+     */
+    public void testEditCellAtByKeyEvent() {
+        JXTreeTable treeTable = prepareTreeTable(true);
+        treeTable.expandAll();
+        // sanity
+        assertTrue(treeTable.isCellEditable(0, 0));
+        KeyEvent e = new KeyEvent(treeTable, KeyEvent.KEY_PRESSED, 0L,
+                0, KeyEvent.VK_T, KeyEvent.CHAR_UNDEFINED);
+        assertTrue("keyEvent must start editing", treeTable.editCellAt(0, 0, e));
+    }
+    
+    /**
+     * #561-swingx: KeyEvent on hierarchical column doesn't start editing.
+     * 
+     * Here: compare with plain table (in fact plain DefaultCellEditor)
+     */
+    public void testTableEditCellAtByKeyEvent() {
+        JXTable table = new JXTable(10, 20);
+        // sanity
+        assertTrue(table.isCellEditable(0, 0));
+        KeyEvent e = new KeyEvent(table, KeyEvent.KEY_PRESSED, 0L,
+                0, KeyEvent.VK_T, KeyEvent.CHAR_UNDEFINED);
+        assertTrue(table.editCellAt(0, 0, e));
     }
 
     /**
