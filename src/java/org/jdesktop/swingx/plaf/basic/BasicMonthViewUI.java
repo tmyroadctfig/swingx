@@ -264,6 +264,10 @@ public class BasicMonthViewUI extends MonthViewUI {
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false), "acceptSelection");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false), "cancelSelection");
 
+        // quickly check #606-swingx: keybindings not working in internalframe
+        // eaten somewhere
+//        inputMap.put(KeyStroke.getKeyStroke("F1"), "selectPreviousDay");
+
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "selectPreviousDay");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "selectNextDay");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, false), "selectDayInPreviousWeek");

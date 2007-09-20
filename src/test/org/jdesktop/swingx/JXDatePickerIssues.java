@@ -26,16 +26,22 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
 import java.util.Calendar;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Box;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JDesktopPane;
 import javax.swing.JFormattedTextField;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 
 import org.jdesktop.swingx.calendar.DateUtils;
 
@@ -54,7 +60,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         JXDatePickerIssues  test = new JXDatePickerIssues();
         try {
 //            test.runInteractiveTests();
-          test.runInteractiveTests(".*Focus.*");
+          test.runInteractiveTests(".*Binding.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -64,7 +70,53 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 
     private Calendar calendar;
 
-    
+    /**
+     * Issue #606-swingx: keybindings in monthView popup not working 
+     * in InternalFrame.
+     * 
+     * Looks like a problem with componentInputMaps in internalFrame:
+     * the registered keys are eaten somewhere (f.i. bind f1 for left is okay)
+     *  
+     */
+    public void interactiveKeyBindingInternalFrame() {
+        JXDatePicker picker = new JXDatePicker();
+        JInternalFrame iFrame = new JInternalFrame("iFrame", true, true, true, true) {
+
+            @Override
+            protected boolean processKeyBinding(KeyStroke ks, KeyEvent e,
+                    int condition, boolean pressed) {
+                // hook for debugging
+                return super.processKeyBinding(ks, e, condition, pressed);
+            }
+            
+        };
+        JComponent box = Box.createVerticalBox();
+        box.add(picker);
+        box.add(new JLabel("where????"));
+        iFrame.getContentPane().add(box);
+        iFrame.pack();
+        iFrame.setVisible(true);
+        JDesktopPane desktop = new JDesktopPane() {
+
+            @Override
+            protected boolean processKeyBinding(KeyStroke ks, KeyEvent e,
+                    int condition, boolean pressed) {
+                // hook for debugging
+                return super.processKeyBinding(ks, e, condition, pressed);
+            }
+            
+        };
+        desktop.add(iFrame);
+        JInternalFrame other = new JInternalFrame("other", true, true, true, true);
+        other.add(new JLabel("Dummy .... we want it!"));
+        other.pack();
+        other.setVisible(true);
+        desktop.add(other);
+        
+        JXFrame frame = wrapInFrame(desktop, "InternalFrame keybinding");
+        frame.setSize(400, 300);
+        frame.setVisible(true);
+    }
     /**
      * Issue #577-swingx: JXDatePicker focus cleanup.
      */
