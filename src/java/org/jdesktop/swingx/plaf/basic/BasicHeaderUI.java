@@ -35,6 +35,7 @@ import javax.swing.text.View;
 
 import java.awt.*;
 import java.awt.event.HierarchyBoundsAdapter;
+import java.awt.event.HierarchyBoundsListener;
 import java.awt.event.HierarchyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -49,6 +50,7 @@ public class BasicHeaderUI extends HeaderUI {
     protected JXLabel descriptionPane;
     protected JLabel imagePanel;
     private PropertyChangeListener propListener;
+    private HierarchyBoundsListener boundsListener;
     private Color gradientLightColor;
     private Color gradientDarkColor;
 
@@ -192,18 +194,20 @@ public class BasicHeaderUI extends HeaderUI {
                 onPropertyChange(h, evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
             }
         };
-        h.addPropertyChangeListener(propListener);
-        h.addHierarchyBoundsListener(new HierarchyBoundsAdapter() {
+        boundsListener = new HierarchyBoundsAdapter() {
             public void ancestorResized(HierarchyEvent e) {
                 if (h == e.getComponent()) {
                     View v = (View) descriptionPane.getClientProperty(BasicHTML.propertyKey);
                     v.setSize(h.getParent().getWidth() - h.getInsets().left - h.getInsets().right - descriptionPane.getInsets().left - descriptionPane.getInsets().right - descriptionPane.getBounds().x, descriptionPane.getHeight());
                 }
-            }});
+            }};
+        h.addPropertyChangeListener(propListener);
+        h.addHierarchyBoundsListener(boundsListener);
     }
 
     protected void uninstallListeners(JXHeader h) {
         h.removePropertyChangeListener(propListener);
+        h.removeHierarchyBoundsListener(boundsListener);
     }
 
     protected void onPropertyChange(JXHeader h, String propertyName, Object oldValue, final Object newValue) {
