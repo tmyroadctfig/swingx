@@ -46,8 +46,22 @@ import java.beans.PropertyChangeListener;
  * @author rah003
  */
 public class BasicHeaderUI extends HeaderUI {
-    protected JLabel titleLabel;
-    protected JXLabel descriptionPane;
+    private class DescriptionPane extends JXLabel {
+            @Override
+            public void paint(Graphics g) {
+                // switch off jxlabel default antialiasing
+                ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                        RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+                super.paint(g);
+            }
+            
+            public MultiLineSupport getMultiLineSupport() {
+            	return super.getMultiLineSupport();
+            }
+	}
+
+	protected JLabel titleLabel;
+    protected DescriptionPane descriptionPane;
     protected JLabel imagePanel;
     private PropertyChangeListener propListener;
     private HierarchyBoundsListener boundsListener;
@@ -108,14 +122,7 @@ public class BasicHeaderUI extends HeaderUI {
         titleLabel = new JLabel(header.getTitle() == null ? "Title For Header Goes Here" : header.getTitle());
         titleLabel.setFont(header.getTitleFont());
 
-        descriptionPane = new JXLabel(){
-            @Override
-            public void paint(Graphics g) {
-                // switch off jxlabel default antialiasing
-                ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                        RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
-                super.paint(g);
-            }};
+        descriptionPane = new DescriptionPane();
         descriptionPane.setFont(header.getDescriptionFont());
         descriptionPane.setLineWrap(true);
         descriptionPane.setOpaque(false);
@@ -198,7 +205,14 @@ public class BasicHeaderUI extends HeaderUI {
             public void ancestorResized(HierarchyEvent e) {
                 if (h == e.getComponent()) {
                     View v = (View) descriptionPane.getClientProperty(BasicHTML.propertyKey);
-                    v.setSize(h.getParent().getWidth() - h.getInsets().left - h.getInsets().right - descriptionPane.getInsets().left - descriptionPane.getInsets().right - descriptionPane.getBounds().x, descriptionPane.getHeight());
+                    // view might get lost on LAF change ...
+                    if (v == null) {
+                    	descriptionPane.putClientProperty(BasicHTML.propertyKey, descriptionPane.getMultiLineSupport().createView(descriptionPane));
+                    	v = (View) descriptionPane.getClientProperty(BasicHTML.propertyKey);
+                    }
+                    if (v != null) {
+                    	v.setSize(h.getParent().getWidth() - h.getInsets().left - h.getInsets().right - descriptionPane.getInsets().left - descriptionPane.getInsets().right - descriptionPane.getBounds().x, descriptionPane.getHeight());
+                    }
                 }
             }};
         h.addPropertyChangeListener(propListener);
