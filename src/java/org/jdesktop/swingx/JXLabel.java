@@ -530,6 +530,9 @@ public class JXLabel extends JLabel {
         return retValue;
     }
 
+    protected MultiLineSupport getMultiLineSupport() {
+    	return new MultiLineSupport();
+    }
     // ----------------------------------------------------------
     // WARNING:
     // Anything below this line is related to lineWrap support and can be safely ignored unless
@@ -545,7 +548,7 @@ public class JXLabel extends JLabel {
     // before casting JComponent into JTextComponent to find out selected region since
     // JLabel/JXLabel does not support selection of the text.
 
-    private static class MultiLineSupport implements PropertyChangeListener {
+    public static class MultiLineSupport implements PropertyChangeListener {
 
         private static final String HTML = "<html>";
 
@@ -597,7 +600,7 @@ public class JXLabel extends JLabel {
             return s != null && s.toLowerCase().startsWith(HTML);
         }
 
-        private static View createView(JXLabel c) {
+        public static View createView(JXLabel c) {
             BasicEditorKit kit = getFactory();
             Document doc = kit.createDefaultDocument(c.getFont(), c.getForeground());
             Reader r = new StringReader(c.getText());
