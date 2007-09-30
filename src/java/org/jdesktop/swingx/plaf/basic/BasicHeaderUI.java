@@ -46,7 +46,9 @@ import java.beans.PropertyChangeListener;
  * @author rah003
  */
 public class BasicHeaderUI extends HeaderUI {
-    private class DescriptionPane extends JXLabel {
+	// Implementation detail. Neeeded to expose getMultiLineSupport() method to allow restoring view
+	// lost after LAF switch 
+    protected class DescriptionPane extends JXLabel {
             @Override
             public void paint(Graphics g) {
                 // switch off jxlabel default antialiasing
