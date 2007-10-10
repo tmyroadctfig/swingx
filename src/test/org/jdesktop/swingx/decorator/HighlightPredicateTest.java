@@ -102,6 +102,16 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     }
     
     /**
+     * test that empty array doesn't highlight. 
+     */
+    public void testOrEmpty() {
+        ComponentAdapter adapter = createComponentAdapter(allColored, true);
+        HighlightPredicate emptyArray = new OrHighlightPredicate();
+        assertFalse(emptyArray.isHighlighted(allColored, adapter));
+        HighlightPredicate emptyList = new OrHighlightPredicate(new ArrayList<HighlightPredicate>());
+        assertFalse(emptyList.isHighlighted(allColored, adapter));
+    }
+    /**
      * test the OR predicate array constructor. Boring as it is, is it complete?
      *
      */
@@ -243,6 +253,17 @@ public class HighlightPredicateTest extends InteractiveTestCase {
             fail("unexpected exception: " + ex);
         }
 
+    }
+
+    /**
+     * test that empty array doesn't highlight. 
+     */
+    public void testAndEmpty() {
+        ComponentAdapter adapter = createComponentAdapter(allColored, true);
+        HighlightPredicate emptyArray = new AndHighlightPredicate();
+        assertFalse(emptyArray.isHighlighted(allColored, adapter));
+        HighlightPredicate emptyList = new AndHighlightPredicate(new ArrayList<HighlightPredicate>());
+        assertFalse(emptyList.isHighlighted(allColored, adapter));
     }
 
     /**

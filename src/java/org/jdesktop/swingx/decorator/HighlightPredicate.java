@@ -206,13 +206,13 @@ public interface HighlightPredicate {
         /**
          * {@inheritDoc}
          * Implemented to return false if any of the contained predicates is
-         * false.
+         * false or if there are no predicates.
          */
         public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
             for (HighlightPredicate hp : predicate) {
                 if (!hp.isHighlighted(renderer, adapter)) return false;
             }
-            return true;
+            return !predicate.isEmpty();
         }
         
     }
