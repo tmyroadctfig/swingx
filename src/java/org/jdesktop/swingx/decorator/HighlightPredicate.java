@@ -25,6 +25,7 @@ import java.awt.Component;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.jdesktop.swingx.RolloverProducer;
@@ -194,6 +195,15 @@ public interface HighlightPredicate {
         }
         
         /**
+         * Instantiates a predicate which ANDs all contained predicates.
+         * @param list a collection with zero or more not null predicates to AND
+         * @throws NullPointerException if the collection is null
+         */
+        public AndHighlightPredicate(Collection<HighlightPredicate> list) {
+            this.predicate = new ArrayList<HighlightPredicate>(Contract.asNotNull(list, "predicate list must not be null"));
+        }
+
+        /**
          * {@inheritDoc}
          * Implemented to return false if any of the contained predicates is
          * false.
@@ -223,6 +233,15 @@ public interface HighlightPredicate {
             this.predicate = Arrays.asList(Contract.asNotNull(predicate, "predicate must not be null"));
         }
         
+        /**
+         * Instantiates a predicate which ORs all contained predicates.
+         * @param list a collection with zero or more not null predicates to OR
+         * @throws NullPointerException if the collection is null
+         */
+        public OrHighlightPredicate(Collection<HighlightPredicate> list) {
+            this.predicate = new ArrayList<HighlightPredicate>(Contract.asNotNull(list, "predicate list must not be null"));
+        }
+
         /**
          * {@inheritDoc}
          * Implemented to return true if any of the contained predicates is

@@ -9,6 +9,9 @@ package org.jdesktop.swingx.decorator;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.swing.JLabel;
@@ -99,7 +102,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     }
     
     /**
-     * test the OR predicate. Boring as it is, is it complete?
+     * test the OR predicate array constructor. Boring as it is, is it complete?
      *
      */
     public void testOr() {
@@ -117,6 +120,35 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     }
     
     /**
+     * test the OR predicate collection constructor. Boring as it is, is it complete?
+     *
+     */
+    public void testOrCollectionConstructor() {
+        ComponentAdapter adapter = createComponentAdapter(allColored, true);
+        List<HighlightPredicate> containsOneTrue = new ArrayList<HighlightPredicate>();
+        containsOneTrue.add(HighlightPredicate.ALWAYS);
+        HighlightPredicate oneTrue = new OrHighlightPredicate(containsOneTrue);
+        assertTrue(oneTrue.isHighlighted(allColored, adapter));
+        
+        List<HighlightPredicate> containsOneFalse = new ArrayList<HighlightPredicate>();
+        containsOneFalse.add(HighlightPredicate.NEVER);
+        HighlightPredicate oneFalse = new OrHighlightPredicate(containsOneFalse);
+        assertFalse(oneFalse.isHighlighted(allColored, adapter));
+        
+        List<HighlightPredicate> containsOneFalseOneTrue = new ArrayList<HighlightPredicate>();
+        containsOneFalseOneTrue.add(HighlightPredicate.NEVER);
+        containsOneFalseOneTrue.add(HighlightPredicate.ALWAYS);
+        HighlightPredicate oneFalseOneTrue = new OrHighlightPredicate(containsOneFalseOneTrue);
+        assertTrue(oneFalseOneTrue.isHighlighted(allColored, adapter));
+
+        List<HighlightPredicate> containsOneTrueOneFalse = new ArrayList<HighlightPredicate>();
+        containsOneTrueOneFalse.add(HighlightPredicate.ALWAYS);
+        containsOneTrueOneFalse.add(HighlightPredicate.NEVER);
+        HighlightPredicate oneTrueOneFalse = new OrHighlightPredicate(containsOneTrueOneFalse);
+        assertTrue(oneTrueOneFalse.isHighlighted(allColored, adapter));
+    }
+    
+    /**
      * Issue #520-swingx: OrPredicate must throw if any of the parameters
      *   is null.
      *
@@ -124,7 +156,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     public void testOrThrowsOnNullPredicates() {
         try {
             new OrHighlightPredicate((HighlightPredicate[]) null);
-            fail("orPredicate constructor must throw IllegalArgumentEx on null predicate");
+            fail("orPredicate constructor must throw NullPointerException on null predicate");
             
         } catch (NullPointerException ex) {
             // do nothing - the doc'ed exception
@@ -145,7 +177,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
 
         try {
             new OrHighlightPredicate((HighlightPredicate) null);
-            fail("orPredicate constructor must throw IllegalArgumentEx on null predicate");
+            fail("orPredicate constructor must throw NullPointerException on null predicate");
             
         } catch (NullPointerException ex) {
             // do nothing - the doc'ed exception
@@ -153,6 +185,15 @@ public class HighlightPredicateTest extends InteractiveTestCase {
             fail("unexpected exception: " + ex);
         }
             
+        try {
+            new OrHighlightPredicate((Collection<HighlightPredicate>) null);
+            fail("orPredicate constructor must throw NullPointerException on null predicate");
+            
+        } catch (NullPointerException ex) {
+            // do nothing - the doc'ed exception
+        } catch (Exception ex) {
+            fail("unexpected exception: " + ex);
+        }
     }
 
     /**
@@ -163,7 +204,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     public void testAndThrowsOnNullPredicates() {
         try {
             new AndHighlightPredicate((HighlightPredicate[]) null);
-            fail("AndPredicate constructAnd must throw IllegalArgumentEx on null predicate");
+            fail("AndPredicate constructAnd must throw NullPointerException on null predicate");
             
         } catch (NullPointerException ex) {
             // do nothing - the doc'ed exception
@@ -184,18 +225,28 @@ public class HighlightPredicateTest extends InteractiveTestCase {
 
         try {
             new AndHighlightPredicate((HighlightPredicate) null);
-            fail("AndPredicate constructAnd must throw IllegalArgumentEx on null predicate");
+            fail("AndPredicate constructAnd must throw NullPointerException on null predicate");
             
         } catch (NullPointerException ex) {
             // do nothing - the doc'ed exception
         } catch (Exception ex) {
             fail("unexpected exception: " + ex);
         }
+
+        try {
+            new AndHighlightPredicate((Collection<HighlightPredicate>) null);
+            fail("orPredicate constructor must throw NullPointerException on null predicate");
             
+        } catch (NullPointerException ex) {
+            // do nothing - the doc'ed exception
+        } catch (Exception ex) {
+            fail("unexpected exception: " + ex);
+        }
+
     }
 
     /**
-     * test the AND predicate. Boring as it is, is it complete?
+     * test the AND predicate array constructor. Boring as it is, is it complete?
      *
      */
     public void testAnd() {
@@ -211,7 +262,37 @@ public class HighlightPredicateTest extends InteractiveTestCase {
                 HighlightPredicate.ALWAYS, HighlightPredicate.NEVER);
         assertFalse(oneTrueOneFalse.isHighlighted(allColored, adapter));
     }
+
+    /**
+     * test the AND predicate collection constructor. Boring as it is, is it complete?
+     *
+     */
+    public void testAndCollectionConstructor() {
+        ComponentAdapter adapter = createComponentAdapter(allColored, true);
+        List<HighlightPredicate> containsOneTrue = new ArrayList<HighlightPredicate>();
+        containsOneTrue.add(HighlightPredicate.ALWAYS);
+        HighlightPredicate oneTrue = new AndHighlightPredicate(containsOneTrue);
+        assertTrue(oneTrue.isHighlighted(allColored, adapter));
+        
+        List<HighlightPredicate> containsOneFalse = new ArrayList<HighlightPredicate>();
+        containsOneFalse.add(HighlightPredicate.NEVER);
+        HighlightPredicate oneFalse = new AndHighlightPredicate(containsOneFalse);
+        assertFalse(oneFalse.isHighlighted(allColored, adapter));
+        
+        List<HighlightPredicate> containsOneFalseOneTrue = new ArrayList<HighlightPredicate>();
+        containsOneFalseOneTrue.add(HighlightPredicate.NEVER);
+        containsOneFalseOneTrue.add(HighlightPredicate.ALWAYS);
+        HighlightPredicate oneFalseOneTrue = new AndHighlightPredicate(containsOneFalseOneTrue);
+        assertFalse(oneFalseOneTrue.isHighlighted(allColored, adapter));
+        
+        List<HighlightPredicate> containsOneTrueOneFalse = new ArrayList<HighlightPredicate>();
+        containsOneTrueOneFalse.add(HighlightPredicate.ALWAYS);
+        containsOneTrueOneFalse.add(HighlightPredicate.NEVER);
+        HighlightPredicate oneTrueOneFalse = new AndHighlightPredicate(containsOneTrueOneFalse);
+        assertFalse(oneTrueOneFalse.isHighlighted(allColored, adapter));
+    }
     
+
     /**
      * test rollover
      *
