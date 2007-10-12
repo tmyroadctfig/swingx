@@ -917,7 +917,7 @@ public class JXTable extends JTable
         map.put("find", new Actions("find"));
         // hack around core bug: cancel editing doesn't fire
         // reported against SwingX as of #610-swingx
-        map.put("cancel", createCancelAction());
+//        map.put("cancel", createCancelAction());
         map.put(PACKALL_ACTION_COMMAND, createPackAllAction());
         map.put(PACKSELECTED_ACTION_COMMAND, createPackSelectedAction());
         map.put(HORIZONTALSCROLL_ACTION_COMMAND, createHorizontalScrollAction());
