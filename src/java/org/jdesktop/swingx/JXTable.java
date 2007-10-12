@@ -92,6 +92,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
+import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
@@ -896,7 +897,7 @@ public class JXTable extends JTable
                 }
             } else if ("find".equals(getName())) {
                 find();
-            }
+            } 
         }
 
     }
@@ -914,6 +915,9 @@ public class JXTable extends JTable
         ActionMap map = getActionMap();
         map.put("print", new Actions("print"));
         map.put("find", new Actions("find"));
+        // hack around core bug: cancel editing doesn't fire
+        // reported against SwingX as of #610-swingx
+        map.put("cancel", createCancelAction());
         map.put(PACKALL_ACTION_COMMAND, createPackAllAction());
         map.put(PACKSELECTED_ACTION_COMMAND, createPackSelectedAction());
         map.put(HORIZONTALSCROLL_ACTION_COMMAND, createHorizontalScrollAction());
@@ -922,6 +926,26 @@ public class JXTable extends JTable
         getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(findStroke, "find");
     }
 
+
+    /**
+     * Creates and returns an Action which cancels an ongoing edit correctly.
+     * Note: the correct thing to do is to call the editor's cancelEditing, the wrong
+     * thing to do is to call table removeEditor (as core JTable does...). So this
+     * is a quick hack around a core bug, reported against SwingX in #610-swingx.
+     * 
+     * @return an Action which cancels an edit.
+     */
+    private Action createCancelAction() {
+        Action action = new AbstractActionExt() {
+
+            public void actionPerformed(ActionEvent e) {
+                if (!isEditing()) return;
+                getCellEditor().cancelCellEditing();
+            }
+            
+        };
+        return action;
+    }
 
     /** 
      * Creates and returns the default <code>Action</code> for toggling

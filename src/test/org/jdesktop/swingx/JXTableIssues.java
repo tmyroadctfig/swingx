@@ -39,15 +39,19 @@ import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.Box;
+import javax.swing.CellEditor;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
@@ -86,13 +90,50 @@ public class JXTableIssues extends InteractiveTestCase {
 //          test.runInteractiveTests();
 //            test.runInteractiveTests("interactive.*Scroll.*");
          //   test.runInteractiveTests("interactive.*Render.*");
-            test.runInteractiveTests(".*SortOn.*");
+            test.runInteractiveTests(".*OnEscape.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         } 
     }
 
+    /**
+     * Issue #610-swingx: Cancel editing via Escape doesn't fire editingCanceled.
+     * 
+     * Reported against ComboBoxCellEditor in the autoComplete package, but actually
+     * a JTable _never_ fires a editingCanceled for any editor. Reason is that the
+     * cancel Action registered in BasisTableUI incorrectly calls table.removeEditor
+     * instead of getCelleditor.cancelEditing.
+     * 
+     * Quick hack around that: JXTable registers its own cancel action.
+     * 
+     * Still open: esc when popup is open will only close the popup, not cancel the
+     * edit (which requires a second esc). 
+     *  
+     */
+    public void interactiveEditingCanceledOnEscape() {
+        final JTextField field = new JTextField();
+        JXTable xTable = new JXTable(10, 3);
+        CellEditor editor = xTable.getDefaultEditor(Object.class);
+        CellEditorListener l =  new CellEditorListener() {
+
+            public void editingCanceled(ChangeEvent e) {
+                field.setText("canceled");
+                
+            }
+
+            public void editingStopped(ChangeEvent e) {
+                field.setText("stopped");
+                
+            }};
+        editor.addCellEditorListener(l);
+        JTable table = new JTable(xTable.getModel());
+        CellEditor coreEditor = table.getDefaultEditor(Object.class);
+        coreEditor.addCellEditorListener(l);
+        JXFrame frame = wrapWithScrollingInFrame(xTable, table, "#610-swingx: escape doesn't fire editing canceled");
+        frame.add(field, BorderLayout.SOUTH);
+        frame.setVisible(true);
+    }
     /**
      * row index conversion goes nuts if not re-sorted on update.
      * Looks like a repaint problem.
