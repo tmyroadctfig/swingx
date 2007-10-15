@@ -24,7 +24,9 @@ package org.jdesktop.swingx.table;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.util.logging.Logger;
 
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -65,10 +67,12 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 public class ColumnHeaderRenderer extends JComponent 
     implements TableCellRenderer
     , UIResource {
+    private static final Logger LOG = Logger
+            .getLogger(ColumnHeaderRenderer.class.getName());
     // the inheritance is only to make sure we are updated on LF change
     public static final String UP_ICON_KEY = "ColumnHeaderRenderer.upIcon";
     public static final String DOWN_ICON_KEY = "ColumnHeaderRenderer.downIcon";
-
+    public static final String VISTA_BORDER_HACK = "ColumnHeaderRenderer.vistaBorderHack";
     static {
         LookAndFeelAddons.contribute(new ColumnHeaderRendererAddon());
     }
@@ -88,6 +92,7 @@ public class ColumnHeaderRenderer extends JComponent
     private TableCellRenderer delegateRenderer;
 
     private LabelProperties label;
+    private Border vistaBorder;
 
     /**
      * Returns the shared ColumnHeaderRenderer. <p> 
@@ -172,14 +177,15 @@ public class ColumnHeaderRenderer extends JComponent
         JTableHeader header = new JTableHeader();
         delegateRenderer = header.getDefaultRenderer();
     }
+//    private final Border border=BorderFactory.createEmptyBorder(5, 5, 5, 5);
 
     public Component getTableCellRendererComponent(JTable table, Object value,
             boolean isSelected, boolean hasFocus, int rowIndex, int columnIndex) {
         Component comp = configureDelegate(table, value, isSelected, hasFocus, rowIndex,
                 columnIndex);
-
         if ((table instanceof JXTable) && (comp instanceof JComponent)) {
-            
+//            LOG.info("border: " + ((JComponent) comp).getBorder().getBorderInsets(comp));
+            hackVistaBorder((JComponent) comp);
             SortOrder sortOrder = ((JXTable) table).getSortOrder(columnIndex);
 
             Border border = UIManager.getBorder("TableHeader.cellBorder");
@@ -192,6 +198,17 @@ public class ColumnHeaderRenderer extends JComponent
         }
         adjustComponentOrientation(comp);
         return comp;
+    }
+
+    /**
+     * 
+     * @param jComp
+     */
+    private void hackVistaBorder(JComponent jComp) {
+        Border hackBorder = UIManager.getBorder(VISTA_BORDER_HACK);
+        if (hackBorder != null) {
+            jComp.setBorder(hackBorder);
+        }
     }
 
     /**
@@ -325,7 +342,7 @@ public class ColumnHeaderRenderer extends JComponent
         initDelegate();
         updateIconUI();
     }
-
+    
     public void updateUI(JTableHeader header) {
         updateIconUI();
         if (header.getDefaultRenderer() != this) {

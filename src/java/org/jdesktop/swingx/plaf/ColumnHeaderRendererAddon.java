@@ -25,7 +25,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.LookAndFeel;
+import javax.swing.plaf.BorderUIResource;
 
+import org.jdesktop.swingx.plaf.windows.WindowsClassicLookAndFeelAddons;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 import org.jdesktop.swingx.util.OS;
 
@@ -59,6 +61,9 @@ public class ColumnHeaderRendererAddon extends AbstractComponentAddon {
               downIcon = "sort-w2k-dn.png";
               
           }
+          if (OS.isWindowsVista()) {
+              hackHeaderBorder(addon);
+          }
       } else if (isSynth()) {
           upIcon = "sort-gtk-up.png";
           downIcon = "sort-gtk-dn.png";
@@ -77,17 +82,32 @@ public class ColumnHeaderRendererAddon extends AbstractComponentAddon {
   }
 
 
-  public void uninitialize(LookAndFeelAddons addon) {
-      List defaults = new ArrayList();
-      defaults.addAll(Arrays.asList(new Object[] { 
-              ColumnHeaderRenderer.UP_ICON_KEY, null,
-              ColumnHeaderRenderer.DOWN_ICON_KEY,  null,
-      }));
-      addon.loadDefaults(defaults.toArray());
-  }
+  /**
+     * @param addon
+     */
+  private void hackHeaderBorder(LookAndFeelAddons addon) {
+      // do nothing for classic windows
+        if (addon instanceof WindowsClassicLookAndFeelAddons) return;
+        List defaults = new ArrayList();
+        defaults.addAll(Arrays.asList(new Object[] {
+                ColumnHeaderRenderer.VISTA_BORDER_HACK, 
+                new BorderUIResource.EmptyBorderUIResource(5, 5, 5, 5), 
+        }));
+        addon.loadDefaults(defaults.toArray());
+    }
+
+    public void uninitialize(LookAndFeelAddons addon) {
+        List defaults = new ArrayList();
+        defaults.addAll(Arrays.asList(new Object[] {
+                ColumnHeaderRenderer.UP_ICON_KEY, null,
+                ColumnHeaderRenderer.DOWN_ICON_KEY, null, 
+                ColumnHeaderRenderer.VISTA_BORDER_HACK, null,
+                }));
+        addon.loadDefaults(defaults.toArray());
+    }
 
   private boolean isXP(LookAndFeelAddons addon) {
-      return OS.isWindowsXP();
-  }
+        return OS.isWindowsXP();
+    }
 
 }

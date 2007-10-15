@@ -23,11 +23,17 @@ package org.jdesktop.swingx.table;
 
 import java.awt.ComponentOrientation;
 import java.awt.event.ActionEvent;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.LookAndFeel;
+import javax.swing.UIManager;
+import javax.swing.border.Border;
+import javax.swing.plaf.UIResource;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
@@ -37,6 +43,7 @@ import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTableHeader;
 import org.jdesktop.swingx.test.XTestUtils;
+import org.jdesktop.swingx.util.OS;
 
 /**
  * Test for known issues with ColumnHeaderRenderer.
@@ -44,6 +51,8 @@ import org.jdesktop.swingx.test.XTestUtils;
  * @author Jeanette Winzenburg
  */
 public class ColumnHeaderRendererIssues extends InteractiveTestCase {
+    private static final Logger LOG = Logger
+            .getLogger(ColumnHeaderRendererIssues.class.getName());
     public static void main(String args[]) {
         ColumnHeaderRendererIssues test = new ColumnHeaderRendererIssues();
         setSystemLF(true);
@@ -57,17 +66,93 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
     }
 
     /**
-     * Issue #540-swingx: sort icon in custom header renderer
-     * not updated to ui. Reason was that the empty constructor
-     * didn't load the ui-specific ion.
-     *
+     * test hack around Vista's tableHeader too big.
+     * ColumnHeaderRendererAddon should install a smaller custom border.
+     * 
+     * Here: test that the addon installs/uninstalls a border as uiresource.
+     * 
+     * Hmm ... how to test against different windows versions? Classic/(XP?) under
+     * the hood of Vista?
+     * 
      */
-    public void interactiveHeaderRendererCreate() {
-        JXTable table = new JXTable(10, 2);
+    public void testVistaHeaderBorderDefault() throws Exception {
+        if (!OS.isWindowsVista() || 
+            !UIManager.getSystemLookAndFeelClassName().contains("Windows")) {
+            LOG.info("cannot run VistaHeaderBorder - no Vista system");
+            return;
+        }
+        LookAndFeel old = UIManager.getLookAndFeel();
+        LOG.info("System-lf " + UIManager.getSystemLookAndFeelClassName());
+        // force addon loading
         ColumnHeaderRenderer renderer = new ColumnHeaderRenderer();
-        table.getColumnExt(1).setHeaderRenderer(renderer);
-        showWithScrollingInFrame(table, "sortIcon in second column wrong");
+        // be sure to install system LF
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            LOG.info("installed: " + UIManager.getLookAndFeel());
+            Border border = UIManager.getBorder(ColumnHeaderRenderer.VISTA_BORDER_HACK);
+            assertNotNull("vista hack border must be installed", border);
+            assertTrue("vista hack border must be UIResource", border instanceof UIResource);
+            // be sure to install crossplatform LF
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            LOG.info("installed: " + UIManager.getLookAndFeel());
+            Border noborder = UIManager.getBorder(ColumnHeaderRenderer.VISTA_BORDER_HACK);
+            assertNull("vista hack border must be un-installed", noborder);
+        } finally {
+            // revert to default LF
+            UIManager.setLookAndFeel(old);
+        }
     }
+
+    /**
+     * test hack around Vista's tableHeader too big.
+     * ColumnHeaderRendererAddon should install a smaller custom border.
+     * 
+     * Here: test that addon doesn't touch a custom border.
+     * 
+     * Hmm ... how to test against different windows versions? Classic/(XP?) under
+     * the hood of Vista?
+     * 
+     */
+    public void testVistaHeaderBorderCustom() throws Exception {
+        if (!OS.isWindowsVista() || 
+            !UIManager.getSystemLookAndFeelClassName().contains("Windows")) {
+            LOG.info("cannot run VistaHeaderBorder - no Vista system");
+            return;
+        }
+        LookAndFeel old = UIManager.getLookAndFeel();
+        LOG.info("System-lf " + UIManager.getSystemLookAndFeelClassName());
+        // force addon loading
+        ColumnHeaderRenderer renderer = new ColumnHeaderRenderer();
+        // be sure to install system LF
+        try {
+            Border customBorder = BorderFactory.createEmptyBorder(20, 20, 20, 20);
+            UIManager.put(ColumnHeaderRenderer.VISTA_BORDER_HACK, customBorder);
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            LOG.info("installed: " + UIManager.getLookAndFeel());
+            assertEquals("custom border must be untouched", 
+                    customBorder,
+                    UIManager.getBorder(ColumnHeaderRenderer.VISTA_BORDER_HACK));
+            // be sure to install crossplatform LF
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            LOG.info("installed: " + UIManager.getLookAndFeel());
+            assertSame("custom border must be untouched", 
+                    UIManager.getBorder(ColumnHeaderRenderer.VISTA_BORDER_HACK),
+                    customBorder);
+        } finally {
+            // revert to default LF
+            UIManager.setLookAndFeel(old);
+        }
+    }
+    
+    private void toggleLAF() throws Exception {
+        LookAndFeel laf = UIManager.getLookAndFeel();
+        if (laf == null || laf.getName().equals(UIManager.getSystemLookAndFeelClassName())) {
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+        } else {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        }
+    }
+    
 
     /**
      * Issue ??-swingx: sort icon in configured 
