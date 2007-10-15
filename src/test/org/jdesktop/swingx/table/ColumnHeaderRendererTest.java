@@ -92,5 +92,8 @@ public class ColumnHeaderRendererTest extends InteractiveTestCase {
         table.getColumnExt(1).setHeaderRenderer(renderer);
         showWithScrollingInFrame(table, "sortIcon in second column wrong");
     }
-    
+ 
+    public void testDummy() {
+        // keep the test framework happy
+    }
 }
