@@ -94,7 +94,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 //             test.runInteractiveTests("interactive.*Compare.*");
 //             test.runInteractiveTests("interactive.*RowHeightCompare.*");
 //             test.runInteractiveTests("interactive.*RToL.*");
-             test.runInteractiveTests("interactive.*Icon.*");
+             test.runInteractiveTests("interactive.*Insert.*");
 //             test.runInteractiveTests("interactive.*Edit.*");
         } catch (Exception ex) {
 
@@ -400,7 +400,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 
         treeTable.setColumnControlVisible(true);
         // treetable root invisible by default
-        JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "insert into empty model");
+        JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "JTree vs. JXTreeTable: insert into empty model");
         Action insertAction = new AbstractAction("insert node") {
 
             public void actionPerformed(ActionEvent e) {
@@ -419,6 +419,8 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
             
         };
         addAction(frame, toggleRoot);
+        addMessage(frame, "model reports root as non-leaf");
+        frame.pack();
         frame.setVisible(true);
     }
  
@@ -449,7 +451,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 
         treeTable.setColumnControlVisible(true);
         // treetable root invisible by default
-        JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "insert into empty model");
+        JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "collaps/expand root");
         Action toggleRoot = new AbstractAction("toggle root") {
             public void actionPerformed(ActionEvent e) {
                 boolean rootVisible = !tree.isRootVisible();
@@ -505,8 +507,8 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
 
         treeTable.setColumnControlVisible(true);
         treeTable.setRootVisible(true);
-        JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "insert problem - root collapsed");
-        Action insertAction = new AbstractAction("insert node to root") {
+        JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "JXTree vs. JXTreeTable insert node to nested child");
+        Action insertAction = new AbstractAction("insert node") {
 
             public void actionPerformed(ActionEvent e) {
                 model.addChild(childB);
@@ -515,6 +517,8 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
             
         };
         addAction(frame, insertAction);
+        addMessage(frame, "insert nested child must not loose selection/expanseion state");
+        frame.pack();
         frame.setVisible(true);
     }
 
@@ -540,9 +544,6 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         final InsertTreeTableModel model = new InsertTreeTableModel(root);
         JXTree tree = new JXTree(model);
         final JXTreeTable treeTable = new JXTreeTable(model);
-        treeTable.addHighlighter(
-                HighlighterFactory.createSimpleStriping(HighlighterFactory.LINE_PRINTER));
-
         treeTable.setColumnControlVisible(true);
         TreeCellRenderer renderer = new DefaultTreeCellRenderer() {
 
@@ -553,7 +554,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
                 TreePath path = tree.getPathForRow(row);
                 if (path != null) {
                     Object node = path.getLastPathComponent();
-                    if ((node != null) && (tree.getModel().getChildCount(node) > 3)) {
+                    if ((node != null) && (tree.getModel().getChildCount(node) > 2)) {
                         setIcon(topIcon);
                     } 
                 }
@@ -564,7 +565,7 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
         tree.setCellRenderer(renderer);
         treeTable.setTreeCellRenderer(renderer);
         treeTable.setRootVisible(true);
-        JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "update expanded parent on insert - rendering changed for > 3 children");
+        JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "JXTree vs. JXTreeTable - update parent on insert child");
         Action insertAction = new AbstractAction("insert node selected treetable") {
 
             public void actionPerformed(ActionEvent e) {
@@ -578,6 +579,8 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
             
         };
         addAction(frame, insertAction);
+        addMessage(frame, " - rendering changed for > 2 children");
+        frame.pack();
         frame.setVisible(true);
     }
  
@@ -585,12 +588,14 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
      * Issue #82-swingx: update probs with insert node.
      * 
      * Adapted from example code in report.
-     *
+     * Insert node under selected in treetable (or under root if none selected)
+     * Here: old problem with root not expanded because it's reported as a leaf.
      */
     public void interactiveTestInsertNode() {
         final DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode();
         final InsertTreeTableModel model = new InsertTreeTableModel(root);
         JTree tree = new JTree(model);
+        tree.setRootVisible(false);
         final JXTreeTable treeTable = new JXTreeTable(model);
         treeTable.addHighlighter(
                 HighlighterFactory.createSimpleStriping(HighlighterFactory.GENERIC_GRAY));
@@ -598,20 +603,26 @@ public class JXTreeTableVisualCheck extends JXTreeTableUnitTest {
                 new ColumnHighlightPredicate(0));
 
         treeTable.addHighlighter(hl);
-        JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "update on insert");
+        JXFrame frame = wrapWithScrollingInFrame(tree, treeTable, "JTree vs. JXTreeTable - insert to collapsed root");
         Action insertAction = new AbstractAction("insert node") {
 
             public void actionPerformed(ActionEvent e) {
                 int selected = treeTable.getSelectedRow();
-                if (selected < 0 ) return;
+                DefaultMutableTreeTableNode parent;
+                if (selected < 0 ) {
+                    parent = root;
+                } else {
                 TreePath path = treeTable.getPathForRow(selected);
-                DefaultMutableTreeTableNode parent = (DefaultMutableTreeTableNode) path.getLastPathComponent();
+                 parent = (DefaultMutableTreeTableNode) path.getLastPathComponent();
+                }
                 model.addChild(parent);
                 
             }
             
         };
         addAction(frame, insertAction);
+        addMessage(frame, "insert into root-only model - does not show");
+        frame.pack();
         frame.setVisible(true);
     }
  
