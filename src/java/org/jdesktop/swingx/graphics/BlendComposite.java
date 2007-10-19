@@ -476,7 +476,7 @@ public final class BlendComposite implements Composite {
                             float[] dstHSL = new float[3];
                             ColorUtilities.RGBtoHSL(dst[0], dst[1], dst[2], dstHSL);
 
-                            ColorUtilities.HSLtoRGB(srcHSL[0], srcHSL[1], dstHSL[2], result);
+                            ColorUtilities.HSLtoRGB(dstHSL[0], dstHSL[1], srcHSL[2], result);
                             result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
                         }
                     };
