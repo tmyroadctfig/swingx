@@ -32,6 +32,8 @@ import javax.swing.JLabel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.plaf.ColorUIResource;
+import javax.swing.plaf.FontUIResource;
 
 /**
  * <p>A simple horizontal separator that contains a title.<br/>
@@ -123,7 +125,13 @@ public class JXTitledSeparator extends JXPanel {
     public JXTitledSeparator(String title, int horizontalAlignment, Icon icon) {
         setLayout(new GridBagLayout());
         
-        label = new JLabel(title);
+        label = new JLabel(title) {
+            @Override
+            public void updateUI(){
+              super.updateUI();
+              updateTitle();
+            }
+        };
         label.setIcon(icon);
         label.setHorizontalAlignment(horizontalAlignment);
         leftSeparator = new JSeparator();
@@ -131,11 +139,27 @@ public class JXTitledSeparator extends JXPanel {
         
         layoutSeparator();
         
-        setForeground(UIManager.getColor("TitledBorder.titleColor"));
-        setFont(UIManager.getFont("TitledBorder.font"));
+        updateTitle();
         setOpaque(false);
     }
     
+    /**
+     * Implementation detail. Handles updates of title color and font on LAF change. For more 
+     * details see swingx#451.
+     */
+    protected void updateTitle()
+    {
+      if (label == null) return;
+      
+      Color c = label.getForeground();
+      if (c == null || c instanceof ColorUIResource)
+        setForeground(UIManager.getColor("TitledBorder.titleColor"));
+
+      Font f = label.getFont();
+      if (f == null || f instanceof FontUIResource)
+        setFont(UIManager.getFont("TitledBorder.font"));
+    }
+
     /**
      * Implementation detail. lays out this component, showing/hiding components
      * as necessary. Actually changes the containment (removes and adds components).
