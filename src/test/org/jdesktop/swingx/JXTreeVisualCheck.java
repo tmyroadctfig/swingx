@@ -36,9 +36,12 @@ import javax.swing.JFrame;
 import javax.swing.JTree;
 import javax.swing.LookAndFeel;
 import javax.swing.ToolTipManager;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreePath;
 
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
@@ -61,7 +64,8 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
       try {
 //          test.runInteractiveTests();
 //          test.runInteractiveTests("interactive.*RToL.*");
-          test.runInteractiveTests("interactive.*Edit.*");
+//          test.runInteractiveTests("interactive.*Edit.*");
+          test.runInteractiveTests("interactiveRootExpansionTest");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -406,5 +410,30 @@ public class JXTreeVisualCheck extends JXTreeUnitTest {
         frame.setVisible(true);  
     }
 
-
+    /**
+     * Ensure that the root node is expanded if invisible and child added.
+     */
+    public void interactiveRootExpansionTest() {
+        final DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+        final DefaultTreeModel model = new DefaultTreeModel(root);
+        final JXTree tree = new JXTree(model);
+        tree.setRootVisible(false);
+        assertFalse(tree.isExpanded(new TreePath(root)));
+        
+        Action addChild = new AbstractAction("Add Root Child") {
+            private int counter = 0;
+            
+            public void actionPerformed(ActionEvent e) {
+                root.add(new DefaultMutableTreeNode("Child " + (counter + 1)));
+                model.nodesWereInserted(root, new int[]{counter});
+                counter++;
+                
+                assertTrue(tree.isExpanded(new TreePath(root)));
+            }
+        };
+ 
+        JXFrame frame = wrapWithScrollingInFrame(tree, "Root Node Expansion Test");
+        addAction(frame, addChild);
+        frame.setVisible(true);
+    }
 }

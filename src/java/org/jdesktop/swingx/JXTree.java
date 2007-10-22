@@ -51,6 +51,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
@@ -309,7 +311,41 @@ public class JXTree extends JTree {
 
         KeyStroke findStroke = SearchFactory.getInstance().getSearchAccelerator();
         getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(findStroke, "find");
+    }
 
+    /**
+     * Listens to the model and updates the {@code expandedState} accordingly
+     * when nodes are removed, or changed.
+     * <p>
+     * This class will expand an invisible root when a child has been added to
+     * it.
+     * 
+     * @author Karl George Schaefer
+     */
+    protected class XTreeModelHandler extends TreeModelHandler {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void treeNodesInserted(TreeModelEvent e) {
+            TreePath path = e.getTreePath();
+            
+            //fixes SwingX bug #612
+            if (path.getParentPath() == null && !isRootVisible() && isCollapsed(path)) {
+                //should this be wrapped in SwingUtilities.invokeLater?
+                expandPath(path);
+            }
+            
+            super.treeNodesInserted(e);
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected TreeModelListener createTreeModelListener() {
+        return new XTreeModelHandler();
     }
 
     /**

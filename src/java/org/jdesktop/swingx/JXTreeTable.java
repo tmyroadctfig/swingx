@@ -1888,9 +1888,6 @@ public class JXTreeTable extends JXTable {
                                 fireTableRowsDeleted(min, max);
                                 break;
                             }
-                        } else if (path.getParentPath() == null && !tree.isRootVisible() && tree.isCollapsed(path)) {
-                            //#612 must expand invisible collapsed root
-                            tree.expandPath(path);
                         } else {
                             // not expanded - but change might effect appearance
                             // of parent
