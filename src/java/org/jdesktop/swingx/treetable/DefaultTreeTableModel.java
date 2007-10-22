@@ -29,7 +29,19 @@ import javax.swing.tree.TreePath;
  * {@code DefaultTreeTableModel} is a concrete implementation of
  * {@code AbstractTreeTableModel} and is provided purely as a convenience.
  * Applications that use {@code JXTreeTable} are expected to provide their own
- * implementation of a {@code TreeTableModel}, perhaps by extending this class.
+ * implementation of a {@code TreeTableModel}.
+ * <p>
+ * The {@code DefaultTreeTableModel} is designed to be used with
+ * {@code TreeTableNode}s. Specifically, users should extend
+ * {@code AbstractMutableTreeTableNode} to provide custom implementations for
+ * data display.
+ * <p>
+ * Users who do not provide a list of column identifiers must provide a root
+ * that contains at least one column. Without specified identifiers the model
+ * will attempt to calculate the columns required for display by querying the
+ * root node. Normally, the root node can be little more than a shell (in
+ * displays that hide it), but without identifiers, the model relies on the root
+ * node metadata for display.
  * 
  * @author Ramesh Gupta
  * @author Karl Schaefer
