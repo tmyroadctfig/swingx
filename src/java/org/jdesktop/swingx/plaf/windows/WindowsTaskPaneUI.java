@@ -57,7 +57,7 @@ public class WindowsTaskPaneUI extends BasicTaskPaneUI {
       g.setColor(c.getParent().getBackground());
       g.fillRect(0, 0, c.getWidth(), c.getHeight());
       g.setColor(c.getBackground());
-      g.fillRect(0, ROUND_HEIGHT, c.getWidth(), c.getHeight() - ROUND_HEIGHT);
+      g.fillRect(0, getRoundHeight(), c.getWidth(), c.getHeight() - getRoundHeight());
     }
     paint(g, c);
   }
@@ -76,14 +76,14 @@ public class WindowsTaskPaneUI extends BasicTaskPaneUI {
           0,
           0,
           group.getWidth(),
-          ROUND_HEIGHT * 2,
-          ROUND_HEIGHT,
-          ROUND_HEIGHT);
+          getRoundHeight() * 2,
+          getRoundHeight(),
+          getRoundHeight());
         g.fillRect(
           0,
-          ROUND_HEIGHT,
+          getRoundHeight(),
           group.getWidth(),
-          TITLE_HEIGHT - ROUND_HEIGHT);
+          getTitleHeight() - getRoundHeight());
       } else {
         Paint oldPaint = ((Graphics2D)g).getPaint();
         GradientPaint gradient = new GradientPaint(
@@ -93,7 +93,7 @@ public class WindowsTaskPaneUI extends BasicTaskPaneUI {
             titleBackgroundGradientStart
             :titleBackgroundGradientEnd,
           group.getWidth(),
-          TITLE_HEIGHT,
+          getTitleHeight(),
           group.getComponentOrientation().isLeftToRight()?
             titleBackgroundGradientEnd
             :titleBackgroundGradientStart);
@@ -112,14 +112,14 @@ public class WindowsTaskPaneUI extends BasicTaskPaneUI {
           0,
           0,
           group.getWidth(),
-          ROUND_HEIGHT * 2,
-          ROUND_HEIGHT,
-          ROUND_HEIGHT);
+          getRoundHeight() * 2,
+          getRoundHeight(),
+          getRoundHeight());
         g.fillRect(
           0,
-          ROUND_HEIGHT,
+          getRoundHeight(),
           group.getWidth(),
-          TITLE_HEIGHT - ROUND_HEIGHT);
+          getTitleHeight() - getRoundHeight());
         ((Graphics2D)g).setPaint(oldPaint);
       }
     }

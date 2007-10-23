@@ -57,7 +57,7 @@ public class GlossyTaskPaneUI extends BasicTaskPaneUI {
       g.setColor(c.getParent().getBackground());
       g.fillRect(0, 0, c.getWidth(), c.getHeight());
       g.setColor(c.getBackground());
-      g.fillRect(0, ROUND_HEIGHT, c.getWidth(), c.getHeight() - ROUND_HEIGHT);
+      g.fillRect(0, getRoundHeight(), c.getWidth(), c.getHeight() - getRoundHeight());
     }
     paint(g, c);
   }
@@ -76,14 +76,14 @@ public class GlossyTaskPaneUI extends BasicTaskPaneUI {
           0,
           0,
           group.getWidth(),
-          ROUND_HEIGHT * 2,
-          ROUND_HEIGHT,
-          ROUND_HEIGHT);
+          getRoundHeight() * 2,
+          getRoundHeight(),
+          getRoundHeight());
         g.fillRect(
           0,
-          ROUND_HEIGHT,
+          getRoundHeight(),
           group.getWidth(),
-          TITLE_HEIGHT - ROUND_HEIGHT);
+          getTitleHeight() - getRoundHeight());
       } else {
         Paint oldPaint = ((Graphics2D)g).getPaint();
         GradientPaint gradient =
@@ -92,7 +92,7 @@ public class GlossyTaskPaneUI extends BasicTaskPaneUI {
             0f, //group.getWidth() / 2,
             titleBackgroundGradientStart,
             0f, //group.getWidth(),
-            TITLE_HEIGHT,
+            getTitleHeight(),
             titleBackgroundGradientEnd);
                 
         ((Graphics2D)g).setRenderingHint(
@@ -110,14 +110,14 @@ public class GlossyTaskPaneUI extends BasicTaskPaneUI {
           0,
           0,
           group.getWidth(),
-          ROUND_HEIGHT * 2,
-          ROUND_HEIGHT,
-          ROUND_HEIGHT);
+          getRoundHeight() * 2,
+          getRoundHeight(),
+          getRoundHeight());
         g.fillRect(
           0,
-          ROUND_HEIGHT,
+          getRoundHeight(),
           group.getWidth(),
-          TITLE_HEIGHT - ROUND_HEIGHT);
+          getTitleHeight() - getRoundHeight());
         ((Graphics2D)g).setPaint(oldPaint);
       }
       
@@ -126,10 +126,10 @@ public class GlossyTaskPaneUI extends BasicTaskPaneUI {
         0,
         0,
         group.getWidth() - 1,
-        TITLE_HEIGHT + ROUND_HEIGHT,
-        ROUND_HEIGHT,
-        ROUND_HEIGHT);
-      g.drawLine(0, TITLE_HEIGHT - 1, group.getWidth(), TITLE_HEIGHT - 1);
+        getTitleHeight() + getRoundHeight(),
+        getRoundHeight(),
+        getRoundHeight());
+      g.drawLine(0, getTitleHeight() - 1, group.getWidth(), getTitleHeight() - 1);
     }
 
     protected void paintExpandedControls(JXTaskPane group, Graphics g, int x,

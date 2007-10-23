@@ -52,7 +52,7 @@ public class MetalTaskPaneUI extends BasicTaskPaneUI {
   }
 
   /**
-   * The border of the taskpane group paints the "text", the "icon",
+   * The border of the task pane group paints the "text", the "icon",
    * the "expanded" status and the "special" type.
    *  
    */
