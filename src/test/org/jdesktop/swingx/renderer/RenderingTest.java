@@ -34,9 +34,10 @@ import junit.framework.TestCase;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.painter.ShapePainter;
 import org.jdesktop.swingx.table.TableColumnExt;
+import org.jdesktop.swingx.test.XTestUtils;
 
 /**
- * Tests swingx rendering infrastructure: RenderingXController, CellContext, 
+ * Tests swingx rendering infrastructure: ComponentProvider, CellContext, 
  * ..
  * 
  * 
@@ -46,6 +47,71 @@ public class RenderingTest extends TestCase {
     private static final Logger LOG = Logger.getLogger(RenderingTest.class
             .getName());
 
+    /**
+     * WrappingProvider: test custom icon
+     */
+    public void testWrappingProviderIcon() {
+        final Icon icon = XTestUtils.loadDefaultIcon();
+        IconValue iv = new IconValue() {
+            public Icon getIcon(Object value) {
+                return icon;
+            }};
+        WrappingProvider provider = new WrappingProvider(iv);
+        CellContext context = new TreeCellContext();
+        WrappingIconPanel iconPanel = provider.getRendererComponent(context);
+        assertEquals(icon, iconPanel.getIcon());
+    }
+    
+    /**
+     * WrappingProvider: test custom icon
+     */
+    public void testWrappingProviderIconAndContent() {
+        final Icon icon = XTestUtils.loadDefaultIcon();
+        IconValue iv = new IconValue() {
+            public Icon getIcon(Object value) {
+                return icon;
+            }};
+            
+        WrappingProvider provider = new WrappingProvider(iv, FormatStringValue.DATE_TO_STRING);
+        CellContext context = new TreeCellContext();
+        WrappingIconPanel iconPanel = provider.getRendererComponent(context);
+        assertEquals(icon, iconPanel.getIcon());
+        
+    }
+    
+    /**
+     * WrappingProvider: 
+     * test wrappee and its state after instantiation.
+     */
+    public void testWrappingProviderWrappee() {
+        WrappingProvider provider = new WrappingProvider();
+        // sanity ...
+        assertTrue(provider.getWrappee() instanceof LabelProvider);
+        assertEquals("wrappee's StringValue must be default", 
+                new LabelProvider().getToStringConverter(),
+                provider.getWrappee().getToStringConverter()); 
+        StringValue sv = FormatStringValue.DATE_TO_STRING;
+        WrappingProvider customStringValue = new WrappingProvider(sv);
+        assertEquals("wrappee's StringValue must be configured to given", sv, 
+                customStringValue.getWrappee().getToStringConverter());
+        WrappingProvider iconValueAndCustomStringValue = new WrappingProvider(null, sv);
+        assertEquals("wrappee's StringValue must be configured to given", sv, 
+                iconValueAndCustomStringValue.getWrappee().getToStringConverter());
+    }
+    
+    /**
+     * WrappingProvider: 
+     * test provider's own state after instantiation.
+     */
+    public void testWrappingProviderDefaults() {
+        WrappingProvider provider = new WrappingProvider();
+        assertTrue("default wrappee must be LabelProvider but was " + 
+                     provider.getWrappee().getClass(), 
+                provider.getWrappee() instanceof LabelProvider);
+        assertEquals("default StringValue must be empty", StringValue.EMPTY, 
+                provider.getToStringConverter());
+    }
+    
     /**
      * Test text and boolean taken from MappedValue
      */

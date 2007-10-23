@@ -34,6 +34,7 @@ import java.beans.Introspector;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyDescriptor;
+import java.io.File;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -67,6 +68,7 @@ import javax.swing.ListModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIDefaults;
 import javax.swing.border.Border;
+import javax.swing.filechooser.FileSystemView;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -100,6 +102,7 @@ import org.jdesktop.swingx.table.ColumnControlButton;
 import org.jdesktop.swingx.test.ComponentTreeTableModel;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.swingx.treetable.FileSystemModel;
+import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.test.AncientSwingTeam;
 
 /**
@@ -112,15 +115,41 @@ public class RendererVisualCheck extends InteractiveTestCase {
         setSystemLF(true);
         RendererVisualCheck test = new RendererVisualCheck();
         try {
-            test.runInteractiveTests();
+//            test.runInteractiveTests();
 //          test.runInteractiveTests(".*Text.*");
 //          test.runInteractiveTests(".*XLabel.*");
 //          test.runInteractiveTests(".*Color.*");
-//          test.runInteractiveTests(".*List.*");
+          test.runInteractiveTests("interactive.*CustomIcons.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
+    }
+    
+    public void interactiveTreeTableCustomIcons() {
+        TreeTableModel model = new FileSystemModel();
+        JXTreeTable table = new JXTreeTable(model);
+        StringValue sv = new StringValue() {
+
+            public String getString(Object value) {
+                if (value instanceof File) {
+                    return FileSystemView.getFileSystemView().getSystemDisplayName((File) value); 
+                } 
+                return TO_STRING.getString(value);
+            }
+            
+        };
+        IconValue iv = new IconValue() {
+
+            public Icon getIcon(Object value) {
+                if (value instanceof File) {
+                    return  FileSystemView.getFileSystemView().getSystemIcon((File) value);
+                } 
+                return null;
+            }};
+        table.setTreeCellRenderer(new DefaultTreeRenderer(iv, sv));
+        showWithScrollingInFrame(table, "Tree/Table: wrapping provider with custom");
+        
     }
     
     /**

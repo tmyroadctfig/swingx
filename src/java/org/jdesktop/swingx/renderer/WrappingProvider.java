@@ -9,47 +9,113 @@ import javax.swing.Icon;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jdesktop.swingx.RolloverRenderer;
-import org.jdesktop.swingx.treetable.AbstractMutableTreeTableNode;
+import org.jdesktop.swingx.treetable.TreeTableNode;
 
 
 /**
- * Wrapping controller for usage in tree renderers. Handles the icon, delegates the value to 
- * the wrappee. <p>
+ * Wrapping ComponentProvider for usage in tree rendering. Handles the icon
+ * itself, delegates the node content to the wrappee. Value-based icon and
+ * content mapping can be configured by custom <code>IconValue</code>s and
+ * <b>StringValue</b>, respectively.
+ * <p>
  * 
- * PENDING: ui specific focus rect variation (draw rect around icon) missing <p>
- * PENDING: custom icons missing
+ * An example of how to configure a file tree by using the system icons and
+ * display names
+ * 
+ * <pre><code>
+ * StringValue sv = new StringValue() {
+ * 
+ *     public String getString(Object value) {
+ *         if (value instanceof File) {
+ *             return FileSystemView.getFileSystemView().getSystemDisplayName(
+ *                     (File) value);
+ *         }
+ *         return TO_STRING.getString(value);
+ *     }
+ * 
+ * };
+ * IconValue iv = new IconValue() {
+ * 
+ *     public Icon getIcon(Object value) {
+ *         if (value instanceof File) {
+ *             return FileSystemView.getFileSystemView().getSystemIcon(
+ *                     (File) value);
+ *         }
+ *         return null;
+ *     }
+ * };
+ * TreeCellRenderer r = new DefaultTreeRenderer(iv, sv);
+ * tree.setCellRenderer(r);
+ * treeTable.setTreeCellRenderer(r);
+ * </code></pre>
+ * 
+ * PENDING: ui specific focus rect variation (draw rect around icon) missing
+ * <p>
  */
 public class WrappingProvider extends 
     ComponentProvider<WrappingIconPanel>  implements RolloverRenderer {
 
     protected ComponentProvider wrappee;
 
+    /**
+     * Instantiates a WrappingProvider with default LabelProvider.
+     * 
+     */
     public WrappingProvider() {
         this((ComponentProvider) null);
     }
-    
+
+    /**
+     * Instantiates a WrappingProvider with default wrappee. Uses the 
+     * given IconValue to configure the icon. 
+     * 
+     * @param iconValue the IconValue to use for configuring the icon.
+     */
+    public WrappingProvider(IconValue iconValue, StringValue wrappeeStringValue) {
+        this(wrappeeStringValue);
+        setToStringConverter(new MappedValue(null, iconValue));
+    }
+
+    /**
+     * Instantiates a WrappingProvider with default wrappee. Uses the 
+     * given IconValue to configure the icon. 
+     * 
+     * @param iconValue the IconValue to use for configuring the icon.
+     */
+    public WrappingProvider(IconValue iconValue) {
+        this();
+        setToStringConverter(new MappedValue(null, iconValue));
+    }
+   
+    /**
+     * Instantiates a WrappingProvider with default wrappee configured
+     * with the given StringValue. 
+     * 
+     * PENDING: we have a slight semantic glitch compared to super because
+     * the given StringValue is <b>not</b> for use in this provider but for use 
+     * in the wrappee!
+     * 
+     * @param wrappeeStringValue the StringValue to use in the wrappee.
+     */
+    public WrappingProvider(StringValue wrappeeStringValue) {
+        this(new LabelProvider(wrappeeStringValue));
+    }
+
     /**
      * Instantiates a WrappingProvider with the given delegate
      * provider for the node content. If null, a default 
-     * LabelProvider will be used.
+     * LabelProvider will be used. 
      * 
      * @param delegate the provider to use as delegate
      */
     public WrappingProvider(ComponentProvider delegate) {
         super();
+        // PENDING JW: this is inherently unsafe - must not call 
+        // non-final methods from constructor
         setWrappee(delegate);
+        setToStringConverter(StringValue.EMPTY);
     }
-   
-    /**
-     * Instantiates a WrappingProvider with default wrappee configured
-     * with the given StringValue.
-     * 
-     * @param converter the StringValue to use in the wrappee.
-     */
-    public WrappingProvider(StringValue converter) {
-        this(new LabelProvider(converter));
-    }
-
+    
     /**
      * Sets the given provider as delegate for the node content. 
      * If the delegate is null, a default LabelProvider is set.<p>
@@ -66,6 +132,15 @@ public class WrappingProvider extends
         rendererComponent.setComponent(delegate.rendererComponent);
     }
 
+    /**
+     * Returns the delegate provider used to render the node content.
+     * 
+     * @return the provider used for rendering the node content.
+     */
+    public ComponentProvider getWrappee() {
+        return wrappee;
+    }
+    
     /**
      * {@inheritDoc}
      */
@@ -105,8 +180,8 @@ public class WrappingProvider extends
         Object oldValue = context.getValue();
         if (oldValue instanceof DefaultMutableTreeNode) {
             context.value = ((DefaultMutableTreeNode) oldValue).getUserObject();
-        } else if (oldValue instanceof AbstractMutableTreeTableNode) {
-            AbstractMutableTreeTableNode node = (AbstractMutableTreeTableNode) oldValue;
+        } else if (oldValue instanceof TreeTableNode) {
+            TreeTableNode node = (TreeTableNode) oldValue;
             context.value = node.getUserObject();
             
         }

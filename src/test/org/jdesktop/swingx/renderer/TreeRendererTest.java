@@ -181,13 +181,11 @@ public class TreeRendererTest extends InteractiveTestCase {
     public void interactiveTreeButtonFormatting() {
         TreeModel model = createActionTreeModel();
         JTree tree = new JTree(model);
-        ButtonProvider wrapper = createButtonProvider();
-        tree.setCellRenderer(new DefaultTreeRenderer(new WrappingProvider(wrapper)));
+        ButtonProvider wrappee = createButtonProvider();
+        tree.setCellRenderer(new DefaultTreeRenderer(new WrappingProvider(wrappee)));
         
         JList list = new JList(createActionListModel());
-        // can't re-use the same instance - the WrappingProvider adds the
-        // wrappee component to a custom container.
-        list.setCellRenderer(new DefaultListRenderer(createButtonProvider()));
+        list.setCellRenderer(new DefaultListRenderer(wrappee)); 
         final JXFrame frame = wrapWithScrollingInFrame(tree, list, "custom renderer - same in tree and list");
         frame.setVisible(true);
     }
@@ -311,6 +309,7 @@ public class TreeRendererTest extends InteractiveTestCase {
         frame.setVisible(true);
     }
 //-------------------------- factory methods
+    
     private TreeModel createTreeModelWithLinks(int count) {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("Links");
         for (int i = 0; i < count; i++) {

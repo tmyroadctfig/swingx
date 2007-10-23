@@ -21,6 +21,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -32,6 +33,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
+import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
@@ -39,6 +41,7 @@ import javax.swing.border.Border;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
@@ -86,14 +89,14 @@ public class JXTreeTableIssues extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXTreeTableIssues.class
             .getName());
     public static void main(String[] args) {
-        setSystemLF(true);
+//        setSystemLF(true);
         JXTreeTableIssues test = new JXTreeTableIssues();
         try {
-            test.runInteractiveTests();
+//            test.runInteractiveTests();
 //            test.runInteractiveTests(".*AdapterDeleteUpdate.*");
 //            test.runInteractiveTests(".*Text.*");
 //            test.runInteractiveTests(".*TreeExpand.*");
-//            test.runInteractiveTests("interactive.*ScrollAlt.*");
+            test.runInteractiveTests("interactive.*ClipIssueD.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -715,11 +718,12 @@ public class JXTreeTableIssues extends InteractiveTestCase {
      * renderer in tree column of TreeTable.
      *
      */
-    public void interactiveTreeTableWrappingProvider() {
+    public void interactiveTreeTableClipIssueWrappingProvider() {
         final JXTreeTable treeTable = new JXTreeTable(createActionTreeModel());
         treeTable.setHorizontalScrollEnabled(true);
         treeTable.packColumn(0, -1);
-        
+        treeTable.setLargeModel(true);
+               
         StringValue format = new StringValue() {
 
             public String getString(Object value) {
@@ -736,12 +740,12 @@ public class JXTreeTableIssues extends InteractiveTestCase {
             Border redBorder = BorderFactory.createLineBorder(Color.RED);
             @Override
             public WrappingIconPanel getRendererComponent(CellContext context) {
-                Dimension old = rendererComponent.getPreferredSize();
-                rendererComponent.setPreferredSize(null);
+//                Dimension old = rendererComponent.getPreferredSize();
+//                rendererComponent.setPreferredSize(null);
                 super.getRendererComponent(context);
-                Dimension dim = rendererComponent.getPreferredSize();
-                dim.width = Math.max(dim.width, treeTable.getColumn(0).getWidth());
-                rendererComponent.setPreferredSize(dim);
+//                Dimension dim = rendererComponent.getPreferredSize();
+//                dim.width = Math.max(dim.width, treeTable.getColumn(0).getWidth());
+//                rendererComponent.setPreferredSize(dim);
                 rendererComponent.setBorder(redBorder);
                 return rendererComponent;
             }
@@ -750,11 +754,84 @@ public class JXTreeTableIssues extends InteractiveTestCase {
         DefaultTreeRenderer treeCellRenderer = new DefaultTreeRenderer(wrappingProvider);
         treeTable.setTreeCellRenderer(treeCellRenderer);
         treeTable.setHighlighters(HighlighterFactory.createSimpleStriping());
-        JXTree tree = new JXTree(treeTable.getTreeTableModel());
+        final JXTree tree = new JXTree(treeTable.getTreeTableModel());
         tree.setCellRenderer(treeCellRenderer);
-//        tree.setLargeModel(true);
-        tree.setScrollsOnExpand(false);
-        JFrame frame = wrapWithScrollingInFrame(treeTable, tree, "treetable and default wrapping provider");
+       tree.setScrollsOnExpand(false);
+        JXFrame frame = wrapWithScrollingInFrame(treeTable, tree, "treetable and default wrapping provider");
+        Action revalidate = new AbstractActionExt("revalidate") {
+
+            public void actionPerformed(ActionEvent e) {
+                treeTable.revalidate();
+                tree.revalidate();
+                
+            } };
+        addAction(frame, revalidate);
+        frame.setVisible(true);
+    }
+
+    /**
+     * quick check for text clipping probs.
+     */
+    public void interactiveTreeTableClipIssueDefaultRenderer() {
+        final JXTreeTable treeTable = new JXTreeTable(createActionTreeModel());
+//        treeTable.setHorizontalScrollEnabled(true);
+        treeTable.setRootVisible(true);
+        treeTable.collapseAll();
+        treeTable.packColumn(0, -1);
+        
+        final JTree tree = new JTree(treeTable.getTreeTableModel());
+        tree.collapseRow(0);
+        tree.setLargeModel(true);
+//        tree.collapseAll();
+        JXFrame frame = wrapWithScrollingInFrame(//treeTable, 
+                tree, "JXTreeTable vs. JTree: default renderer");
+        Action revalidate = new AbstractActionExt("revalidate") {
+
+            public void actionPerformed(ActionEvent e) {
+                treeTable.revalidate();
+                tree.revalidate();
+                
+            } };
+        addAction(frame, revalidate);
+        frame.setVisible(true);
+    }
+
+    /**
+     * quick check for text clipping probs. Reset treeTable.treeCellRenderer 
+     * removes ellipses altogether.
+     * 
+     */
+    public void interactiveTreeTableClipIssueCustomDefaultRenderer() {
+        TreeCellRenderer renderer =  new DefaultTreeCellRenderer() {
+
+            @Override
+            public Component getTreeCellRendererComponent(JTree tree,
+                    Object value, boolean sel, boolean expanded, boolean leaf,
+                    int row, boolean hasFocus) {
+                return super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf,
+                        row, hasFocus);
+            }
+            
+        };
+        final JXTreeTable treeTable = new JXTreeTable(createActionTreeModel());
+        treeTable.setTreeCellRenderer(renderer);
+//        treeTable.setHorizontalScrollEnabled(true);
+        treeTable.setRootVisible(true);
+        treeTable.collapseAll();
+        treeTable.packColumn(0, -1);
+        
+        final JTree tree = new JTree(treeTable.getTreeTableModel());
+        tree.setCellRenderer(renderer);
+        tree.collapseRow(0);
+        JXFrame frame = wrapWithScrollingInFrame(treeTable, tree, "JXTreeTable vs. JTree: custom default renderer");
+        Action revalidate = new AbstractActionExt("revalidate") {
+
+            public void actionPerformed(ActionEvent e) {
+                treeTable.revalidate();
+                tree.revalidate();
+                
+            } };
+        addAction(frame, revalidate);
         frame.setVisible(true);
     }
 

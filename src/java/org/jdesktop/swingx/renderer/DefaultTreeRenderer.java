@@ -74,17 +74,33 @@ public class DefaultTreeRenderer
     }
 
     /**
-     * Instantiates a default table renderer with a default component
+     * Instantiates a default tree renderer with a default component
      * controller using the given converter. 
      * 
-     * @param converter the converter to use for mapping the
+     * @param sv the converter to use for mapping the
      *   content value to a String representation.
      *   
      */
-    public DefaultTreeRenderer(StringValue converter) {
-        this(new WrappingProvider(converter));
+    public DefaultTreeRenderer(StringValue sv) {
+        this(new WrappingProvider(sv));
     }
 
+    /**
+     * Instantiates a default tree renderer with the default
+     * wrapping provider, using the given IconValue for 
+     * customizing the icons and the given StringValue for
+     * node content.
+     * 
+     * @param iv the IconValue to use for mapping a custom icon 
+     *    for a given value
+     * @param sv the converter to use for mapping the
+     *   content value to a String representation.
+     *   
+     */
+    public DefaultTreeRenderer(IconValue iv, StringValue sv) {
+        this(new WrappingProvider(iv, sv));
+    }
+    
     // -------------- implements javax.swing.table.TableCellRenderer
     /**
      * 
