@@ -140,6 +140,7 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
                     customBorder);
         } finally {
             // revert to default LF
+            UIManager.put(ColumnHeaderRenderer.VISTA_BORDER_HACK, null);
             UIManager.setLookAndFeel(old);
         }
     }
