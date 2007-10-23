@@ -6,86 +6,41 @@
  */
 package org.jdesktop.swingx.test;
 
+
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Vector;
 
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.JComponent;
-import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
 
-import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
+import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
+import org.jdesktop.swingx.treetable.TreeTableNode;
 
 /**
  * Convenience TreeTableModel for wrapping an ActionMap hierarchy.
  * 
  * @author Jeanette Winzenburg, Berlin
  */
-public class ActionMapTreeTableModel extends AbstractTreeTableModel {
+public class ActionMapTreeTableModel extends DefaultTreeTableModel {
 
+    
     public ActionMapTreeTableModel(JComponent comp) {
-        super(createRootNodeExt(comp));
+        super();
+        setRoot(createRootNodeExt(comp));
+        Vector names = new Vector();
+        names.add("Key Name");
+        names.add("Action Name");
+        names.add("Action Command");
+        setColumnIdentifiers(names);
     }
 
-    public Object getChild(Object parent, int index) {
-        return ((ActionEntryNode) parent).getChildren().get(index);
-    }
 
-    public int getChildCount(Object parent) {
-        return ((ActionEntryNode) parent).getChildren().size();
-    }
-
-    public int getColumnCount() {
-        return 2;
-    }
-
-    public String getColumnName(int column) {
-        switch (column) {
-        case 0:
-            return "Key Name";
-        case 1:
-            return "Action Name";
-        case 2:
-            return "Action Command";
-        default:
-            return "Column " + column;
-        }
-    }
-
-    public Object getValueAt(Object node, int column) {
-        ActionEntryNode actionNode = (ActionEntryNode) node;
-
-        switch (column) {
-        case 0:
-            return actionNode.key;
-        case 1:
-            if (actionNode.isLeaf())
-                return actionNode.getAction().getValue(Action.NAME);
-            return null;
-        case 2:
-            if (actionNode.isLeaf())
-                return actionNode.getAction().getValue(
-                        Action.ACTION_COMMAND_KEY);
-        // case 3:
-        // return "Modification Date";
-        default:
-            return null;
-        }
-    }
-    
-
-    /**
-     * {@inheritDoc}
-     */
-    public int getIndexOfChild(Object parent, Object child) {
-        ActionEntryNode node = (ActionEntryNode) parent;
-        
-        return node.getIndex((ActionEntryNode) child);
-    }
-    
-    @SuppressWarnings("unchecked")
-    private static ActionEntryNode createRootNodeExt(JComponent comp) {
+    private ActionEntryNode createRootNodeExt(JComponent comp) {
         ActionMap map = comp.getActionMap();
         if (map == null)
             throw new IllegalArgumentException("Component must have ActionMap");
@@ -97,9 +52,9 @@ public class ActionMapTreeTableModel extends AbstractTreeTableModel {
         return createActionEntryNodes(actionMaps);
     }
 
-    private static ActionEntryNode createActionEntryNodes(List actionMaps) {
+    private ActionEntryNode createActionEntryNodes(List actionMaps) {
         ActionMap topLevel = (ActionMap) actionMaps.get(0);
-        ActionEntryNode mapRoot = new ActionEntryNode("topLevel", topLevel);
+        ActionEntryNode mapRoot = new ActionEntryNode("topLevel", topLevel, null);
         ActionEntryNode current = mapRoot;
         for (int i = 1; i < actionMaps.size(); i++) {
             current = current.addActionMapAsChild("childMap " + i,
@@ -108,7 +63,9 @@ public class ActionMapTreeTableModel extends AbstractTreeTableModel {
         return mapRoot;
     }
 
-    public static class ActionEntryNode extends DefaultMutableTreeNode {
+    private static class ActionEntryNode implements TreeTableNode {
+        ActionEntryNode parent;
+        
         Object key;
 
         Action action;
@@ -117,23 +74,22 @@ public class ActionMapTreeTableModel extends AbstractTreeTableModel {
 
         List<ActionEntryNode> children;
 
-        @SuppressWarnings("unchecked")
-        public ActionEntryNode(Object key, Action action) {
-            super(action);
+        public ActionEntryNode(Object key, Action action, ActionEntryNode parent) {
+            this.parent = parent;
             this.key = key;
             this.action = action;
             children = Collections.EMPTY_LIST;
         }
 
-        public ActionEntryNode(Object key, ActionMap map) {
-            super(key);
+        public ActionEntryNode(Object key, ActionMap map, ActionEntryNode parent) {
+            this.parent = parent;
             this.key = key;
             this.actionMap = map;
             children = new ArrayList<ActionEntryNode>();
             Object[] keys = map.keys();
             for (int i = 0; i < keys.length; i++) {
                 children.add(new ActionEntryNode(keys[i], (Action) map
-                        .get(keys[i])));
+                        .get(keys[i]), this));
             }
         }
 
@@ -144,7 +100,7 @@ public class ActionMapTreeTableModel extends AbstractTreeTableModel {
          * @param map
          */
         public ActionEntryNode addActionMapAsChild(Object key, ActionMap map) {
-            ActionEntryNode actionEntryNode = new ActionEntryNode(key, map);
+            ActionEntryNode actionEntryNode = new ActionEntryNode(key, map, this);
             getChildren().add(0, actionEntryNode);
             return actionEntryNode;
         }
@@ -153,9 +109,6 @@ public class ActionMapTreeTableModel extends AbstractTreeTableModel {
             return children;
         }
 
-        public boolean isLeaf() {
-            return action != null;
-        }
 
         public ActionMap getActionMap() {
             return actionMap;
@@ -165,12 +118,90 @@ public class ActionMapTreeTableModel extends AbstractTreeTableModel {
             return action;
         }
 
-        public boolean getAllowsChildren() {
-            return !isLeaf();
-        }
 
         public String toString() {
             return key.toString();
         }
+
+        // --------------- implement TreeNode
+        public boolean isLeaf() {
+            return action != null;
+        }
+        
+        public boolean getAllowsChildren() {
+            return !isLeaf();
+        }
+
+        public int getChildCount() {
+            return children.size();
+        }
+
+        public int getIndex(TreeNode node) {
+            return children.indexOf(node);
+        }
+        
+        
+        //------------- implement re-defined methods of TreeNode
+        
+        public Enumeration<? extends TreeTableNode> children() {
+            return Collections.enumeration(children);
+        }
+
+        
+        public TreeTableNode getChildAt(int childIndex) {
+            return children.get(childIndex);
+        }
+
+        public TreeTableNode getParent() {
+            return parent;
+        }
+
+        //---------------- implement TreeTableNode
+        
+        public int getColumnCount() {
+            return 2;
+        }
+        
+        public Object getValueAt(int column) {
+            ActionEntryNode actionNode = this;
+
+            switch (column) {
+            case 0:
+                return actionNode.key;
+            case 1:
+                if (actionNode.isLeaf())
+                    return actionNode.getAction().getValue(Action.NAME);
+                return null;
+            case 2:
+                if (actionNode.isLeaf())
+                    return actionNode.getAction().getValue(
+                            Action.ACTION_COMMAND_KEY);
+            // case 3:
+            // return "Modification Date";
+            default:
+                return null;
+            }
+        }
+
+        public boolean isEditable(int column) {
+            return false;
+        }
+
+        public void setValueAt(Object aValue, int column) {
+            // do nothing
+            
+        }
+
+        public Object getUserObject() {
+             return getAction();
+        }
+
+        public void setUserObject(Object userObject) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        
     }
+
 }
