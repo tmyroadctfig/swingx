@@ -24,6 +24,75 @@ import org.jdesktop.test.AncientSwingTeam;
 public class ColumnFactoryTest extends InteractiveTestCase {
 
     /**
+     * Issue #564-swingx: allow custom factories to return null column.
+     * Here: test that table can cope with null columns on create.
+     */
+    public void testTableCopeWithCreateNullColumn() {
+        // factory returns null on create
+        ColumnFactory factory = new ColumnFactory() {
+
+            @Override
+            public TableColumnExt createTableColumn(int modelIndex) {
+                return modelIndex > 0 ? super.createTableColumn(modelIndex) : null;
+            }
+            
+            
+        };
+        JXTable table = new JXTable();
+        table.setColumnFactory(factory);
+        TableModel model = new DefaultTableModel(0, 10);
+        table.setModel(model);
+        assertEquals("factory must have created one less than model columns", 
+                model.getColumnCount() - 1, table.getColumnCount());
+    }
+
+    /**
+     * Issue #564-swingx: allow custom factories to return null column.
+     * Here: test that ColumnFactory can handle null creation.
+     */
+    public void testCreateNullColumn() {
+        // factory returns null on create
+        ColumnFactory factory = new ColumnFactory() {
+
+            @Override
+            public TableColumnExt createTableColumn(int modelIndex) {
+                return null;
+            }
+            
+            
+        };
+        TableModel model = new DefaultTableModel(0, 10);
+        factory.createAndConfigureTableColumn(model, 0);
+        
+    }
+
+    /**
+     * Issue #564-swingx: allow custom factories to return null column.
+     * Here: check how to implement model-based decision.
+     * 
+     * PENDING: need additional api? Left to subclasses for now. 
+     */
+    public void testCreateNullColumnFromModelProperty() {
+        // factory returns null on create
+        ColumnFactory factory = new ColumnFactory() {
+
+            @Override
+            public TableColumnExt createAndConfigureTableColumn(
+                    TableModel model, int modelIndex) {
+                if ("A".equals(model.getColumnName(modelIndex))) return null;
+                return super.createAndConfigureTableColumn(model, modelIndex);
+            }
+
+            
+            
+        };
+        TableModel model = new DefaultTableModel(0, 10);
+        TableColumnExt column = factory.createAndConfigureTableColumn(model, 0);
+        assertNull("", column);
+        
+    }
+
+    /**
      * Issue ??: NPE in pack for null table header.
      *
      */

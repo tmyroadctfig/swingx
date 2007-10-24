@@ -130,7 +130,9 @@ public class ColumnFactory {
      */
     public TableColumnExt createAndConfigureTableColumn(TableModel model, int modelIndex) {
         TableColumnExt column = createTableColumn(modelIndex);
-        configureTableColumn(model, column);
+        if (column != null) {
+            configureTableColumn(model, column);
+        }
         return column;
     }
     

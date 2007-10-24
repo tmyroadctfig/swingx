@@ -2389,8 +2389,11 @@ public class JXTable extends JTable
             // add directly to columnModel - don't go through this.addColumn
             // to guarantee full control of ColumnFactory
             // addColumn has the side-effect to set the header!
-            getColumnModel().addColumn(getColumnFactory().createAndConfigureTableColumn(
-                    getModel(), i));
+            TableColumnExt tableColumn = getColumnFactory().createAndConfigureTableColumn(
+                    getModel(), i);
+            if (tableColumn != null) {
+                getColumnModel().addColumn(tableColumn);
+            }
         }
     }
 
