@@ -21,14 +21,20 @@
  */
 package org.jdesktop.swingx.calendar;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 import java.util.logging.Logger;
 
 import javax.swing.Action;
+import javax.swing.JComboBox;
+import javax.swing.JPanel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.calendar.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
@@ -55,8 +61,41 @@ public class JXMonthViewIssues extends InteractiveTestCase {
       }
   }
 
+    /**
+     * Issue #618-swingx: JXMonthView displays problems with non-default
+     * timezones.
+     * 
+     */
+    public void interactiveUpdateOnTimeZone() {
+        JPanel panel = new JPanel();
+
+        final JComboBox zoneSelector = new JComboBox(TimeZone.getAvailableIDs());
+        final JXDatePicker picker = new JXDatePicker();
+        final JXMonthView monthView = new JXMonthView();
+        monthView.setSelectedDate(picker.getDate());
+        monthView.setTraversable(true);
+        // Synchronize the picker and selector's zones.
+        zoneSelector.setSelectedItem(picker.getTimeZone().getID());
+
+        // Set the picker's time zone based on the selected time zone.
+        zoneSelector.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                String zone = (String) zoneSelector.getSelectedItem();
+                TimeZone tz = TimeZone.getTimeZone(zone);
+                picker.setTimeZone(tz);
+                monthView.setTimeZone(tz);
+            }
+        });
+
+        panel.add(zoneSelector);
+        panel.add(picker);
+        panel.add(monthView);
+        showInFrame(panel, "display problems with non-default timezones");
+    }
+    
     public void interactiveSimple() {
         JXMonthView month = new JXMonthView();
+        month.setTraversable(true);
         showInFrame(month, "default - for debugging only");
     }
 
