@@ -25,7 +25,9 @@ import java.awt.Toolkit;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.UIManager;
+import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
@@ -54,7 +56,9 @@ public class JXTaskPaneContainerAddon extends AbstractComponentAddon {
       "TaskPaneContainer.useGradient",
       Boolean.FALSE,
       "TaskPaneContainer.background",
-      UIManager.getColor("Desktop.background")
+      UIManager.getColor("Desktop.background"),
+      "TaskPaneContainer.border",
+      new BorderUIResource(BorderFactory.createEmptyBorder(10, 10, 0, 10))
     }));
   }
 

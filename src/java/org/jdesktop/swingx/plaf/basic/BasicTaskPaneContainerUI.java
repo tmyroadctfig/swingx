@@ -26,8 +26,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 
-import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.ComponentUI;
@@ -56,7 +56,7 @@ public class BasicTaskPaneContainerUI extends TaskPaneContainerUI {
     super.installUI(c);
     taskPane = (JXTaskPaneContainer)c;
     taskPane.setLayout(new VerticalLayout(14));
-    taskPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
+    LookAndFeel.installBorder(taskPane, "TaskPaneContainer.border");
     taskPane.setOpaque(true);
 
     if (taskPane.getBackground() == null
