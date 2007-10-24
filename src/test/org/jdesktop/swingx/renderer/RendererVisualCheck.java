@@ -119,13 +119,18 @@ public class RendererVisualCheck extends InteractiveTestCase {
 //          test.runInteractiveTests(".*Text.*");
 //          test.runInteractiveTests(".*XLabel.*");
 //          test.runInteractiveTests(".*Color.*");
-          test.runInteractiveTests("interactive.*CustomIcons.*");
+          test.runInteractiveTests("interactive.*Custom.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
     }
     
+    /**
+     * example to configure treeTable hierarchical column (same for tree) with
+     * custom icon and content mapping.
+     * 
+     */
     public void interactiveTreeTableCustomIcons() {
         TreeTableModel model = new FileSystemModel();
         JXTreeTable table = new JXTreeTable(model);

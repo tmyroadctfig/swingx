@@ -31,6 +31,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.LookAndFeel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.plaf.UIResource;
@@ -42,6 +43,7 @@ import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTableHeader;
+import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.swingx.util.OS;
 
@@ -145,14 +147,57 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
         }
     }
     
+    /**
+     * Vista border is kept when switching (on OS level) between vista
+     * and classic mode.
+     * 
+     * TODO check on XP for core bug: 
+     * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6429812
+     * here no problem, JXTableHeader tries hard to update LF-provided
+     * renderer.
+     */
+    public void interactiveLFHeaderRenderer() {
+        final JXTable table = new JXTable(20, 5);
+        final JXFrame frame = wrapWithScrollingInFrame(table, "LF provided renderer");
+        Action toggleLF = new AbstractActionExt("toggleLF") {
+
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    toggleLAF();
+                    SwingUtilities.updateComponentTreeUI(frame);
+                } catch (Exception e1) {
+                    LOG.info("error when toggling LF - ignore");
+                } finally {
+                    LOG.info("current LF: " + UIManager.getLookAndFeel());
+                    
+                }
+                
+            }
+            
+        };
+        Action reloadLF = new AbstractActionExt("reloadLF") {
+
+            public void actionPerformed(ActionEvent e) {
+                SwingUtilities.updateComponentTreeUI(frame);
+            }
+            
+        };
+        
+        addAction(frame, toggleLF);
+        addAction(frame, reloadLF);
+        frame.pack();
+        frame.setVisible(true);
+    }
+    
     private void toggleLAF() throws Exception {
         LookAndFeel laf = UIManager.getLookAndFeel();
-        if (laf == null || laf.getName().equals(UIManager.getSystemLookAndFeelClassName())) {
+        if (laf == null || laf.isNativeLookAndFeel()) { 
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         } else {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         }
     }
+
     
 
     /**
