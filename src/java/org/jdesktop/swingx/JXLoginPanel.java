@@ -408,7 +408,29 @@ public class JXLoginPanel extends JXImagePanel {
      * {@inheritDoc}
      */
     public LoginPanelUI getUI() {
-        return (LoginPanelUI)super.getUI();
+        return (LoginPanelUI) super.getUI();
+    }
+    
+    /**
+     * Sets the look and feel (L&F) object that renders this component.
+     *
+     * @param ui the LoginPanelUI L&F object
+     * @see javax.swing.UIDefaults#getUI
+     */
+    public void setUI(LoginPanelUI ui) {
+        super.setUI(ui);
+    }
+    
+    /**
+     * Notification from the <code>UIManager</code> that the L&F has changed.
+     * Replaces the current UI object with the latest version from the
+     * <code>UIManager</code>.
+     *
+     * @see javax.swing.JComponent#updateUI
+     */
+    @Override
+    public void updateUI() {
+        setUI((LoginPanelUI) LookAndFeelAddons.getUI(this, LoginPanelUI.class));
     }
 
     /**
@@ -921,7 +943,7 @@ public class JXLoginPanel extends JXImagePanel {
         super.setLocale(l);
         reinitLocales(l);
     }
-    //-------------------------------------------------------------- Methods
+    // -------------------------------------------------------------- Methods
     
     /**
      * Initiates the login procedure. This method is called internally by
