@@ -20,10 +20,11 @@
  */
 package org.jdesktop.swingx.autocomplete;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.KeyAdapter;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.beans.PropertyChangeEvent;
@@ -64,6 +65,35 @@ import org.jdesktop.swingx.autocomplete.workarounds.AquaLnFPopupLocationFix;
  * @author Thomas Bierhance
  */
 public class AutoCompleteDecorator {
+    private static void removeFocusListener(Component c) {
+        FocusListener[] listeners = c.getFocusListeners();
+        
+        for (FocusListener l : listeners) {
+            if (l instanceof AutoCompleteFocusAdapter) {
+                c.removeFocusListener(l);
+            }
+        }
+    }
+    
+    private static void removeKeyListener(Component c) {
+        KeyListener[] listeners = c.getKeyListeners();
+        
+        for (KeyListener l : listeners) {
+            if (l instanceof AutoCompleteKeyAdapter) {
+                c.removeKeyListener(l);
+            }
+        }
+    }
+    
+    private static void removePropertyChangeListener(Component c) {
+        PropertyChangeListener[] listeners = c.getPropertyChangeListeners("editor");
+        
+        for (PropertyChangeListener l : listeners) {
+            if (l instanceof AutoCompletePropertyChangeListener) {
+                c.removePropertyChangeListener("editor", l);
+            }
+        }
+    }
     
     /**
      * Enables automatic completion for the given JTextComponent based on the
@@ -149,8 +179,11 @@ public class AutoCompleteDecorator {
         final AutoCompleteDocument document = new AutoCompleteDocument(adaptor, strictMatching, stringConverter);
         decorate(editorComponent, document, adaptor);
         
+        //remove old key listener
+        removeKeyListener(editorComponent);
+        
         // show the popup list when the user presses a key
-        final KeyListener keyListener = new KeyAdapter() {
+        final KeyListener keyListener = new AutoCompleteKeyAdapter() {
             public void keyPressed(KeyEvent keyEvent) {
                 // don't popup on action keys (cursor movements, etc...)
                 if (keyEvent.isActionKey()) return;
@@ -171,11 +204,19 @@ public class AutoCompleteDecorator {
             comboBox.setEditor(new AutoCompleteComboBoxEditor(comboBox.getEditor(), stringConverter));
         }
         
+        //remove old property change listener
+        removePropertyChangeListener(comboBox);
+        
         // Changing the l&f can change the combobox' editor which in turn
         // would not be autocompletion-enabled. The new editor needs to be set-up.
-        comboBox.addPropertyChangeListener("editor", new PropertyChangeListener() {
+        comboBox.addPropertyChangeListener("editor", new AutoCompletePropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent e) {
-              	ComboBoxEditor editor = (ComboBoxEditor) e.getNewValue();
+                ComboBoxEditor editor = (ComboBoxEditor) e.getOldValue();
+                if (editor != null && editor.getEditorComponent() != null) {
+                    removeKeyListener(editor.getEditorComponent());
+                }
+                
+              	editor = (ComboBoxEditor) e.getNewValue();
               	if (editor!=null && editor.getEditorComponent()!=null) {
                     if (!(editor instanceof AutoCompleteComboBoxEditor) 
                         && stringConverter!=ObjectToStringConverter.DEFAULT_IMPLEMENTATION) {
@@ -205,9 +246,12 @@ public class AutoCompleteDecorator {
         // install the document on the text component
         textComponent.setDocument(document);
         
+        //remove old focus listener
+        removeFocusListener(textComponent);
+        
         // mark entire text when the text component gains focus
         // otherwise the last mark would have been retained which is quiet confusing
-        textComponent.addFocusListener(new FocusAdapter() {
+        textComponent.addFocusListener(new AutoCompleteFocusAdapter() {
             public void focusGained(FocusEvent e) {
                 JTextComponent textComponent = (JTextComponent) e.getSource();
                 adaptor.markEntireText();
