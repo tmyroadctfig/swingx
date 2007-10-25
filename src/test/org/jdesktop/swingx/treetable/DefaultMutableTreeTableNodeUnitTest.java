@@ -6,7 +6,6 @@ package org.jdesktop.swingx.treetable;
 import java.util.Enumeration;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeNode;
 
 import junit.framework.TestCase;
 
@@ -91,15 +90,15 @@ public class DefaultMutableTreeTableNodeUnitTest extends TestCase {
          
          try {
              root.getChildAt(-1);
-             fail("expected ArrayIndexOutOfBoundsException");
-         } catch (ArrayIndexOutOfBoundsException e) {
+             fail("expected IndexOutOfBoundsException");
+         } catch (IndexOutOfBoundsException e) {
              //do nothing
          }
          
          try {
              root.getChildAt(root.getChildCount());
-             fail("expected ArrayIndexOutOfBoundsException");
-         } catch (ArrayIndexOutOfBoundsException e) {
+             fail("expected IndexOutOfBoundsException");
+         } catch (IndexOutOfBoundsException e) {
              //do nothing
          }
          
@@ -120,8 +119,8 @@ public class DefaultMutableTreeTableNodeUnitTest extends TestCase {
          
          try {
              root.getChildAt(root.getChildCount());
-             fail("expected ArrayIndexOutOfBoundsException");
-         } catch (ArrayIndexOutOfBoundsException e) {
+             fail("expected IndexOutOfBoundsException");
+         } catch (IndexOutOfBoundsException e) {
              //do nothing
          }
      }

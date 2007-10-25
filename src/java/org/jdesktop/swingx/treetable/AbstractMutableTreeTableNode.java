@@ -20,8 +20,10 @@
  */
 package org.jdesktop.swingx.treetable;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
-import java.util.Vector;
+import java.util.List;
 
 import javax.swing.tree.TreeNode;
 
@@ -37,7 +39,7 @@ public abstract class AbstractMutableTreeTableNode implements
     protected MutableTreeTableNode parent;
 
     /** array of children, may be null if this node has no children */
-    protected Vector<MutableTreeTableNode> children;
+    protected List<MutableTreeTableNode> children;
 
     /** optional user object */
     protected transient Object userObject;
@@ -56,7 +58,7 @@ public abstract class AbstractMutableTreeTableNode implements
             boolean allowsChildren) {
         this.userObject = userObject;
         this.allowsChildren = allowsChildren;
-        children = new Vector<MutableTreeTableNode>();
+        children = new ArrayList<MutableTreeTableNode>();
     }
 
     public void add(MutableTreeTableNode child) {
@@ -142,7 +144,7 @@ public abstract class AbstractMutableTreeTableNode implements
      * {@inheritDoc}
      */
     public TreeTableNode getChildAt(int childIndex) {
-        return children.elementAt(childIndex);
+        return children.get(childIndex);
     }
 
     /**
@@ -163,7 +165,7 @@ public abstract class AbstractMutableTreeTableNode implements
      * {@inheritDoc}
      */
     public Enumeration<? extends MutableTreeTableNode> children() {
-        return children.elements();
+        return Collections.enumeration(children);
     }
 
     /**
@@ -187,7 +189,7 @@ public abstract class AbstractMutableTreeTableNode implements
         this.allowsChildren = allowsChildren;
 
         if (!this.allowsChildren) {
-            children.removeAllElements();
+            children.clear();
         }
     }
 
