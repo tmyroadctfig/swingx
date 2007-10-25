@@ -38,7 +38,10 @@ public abstract class AbstractMutableTreeTableNode implements
     /** this node's parent, or null if this node has no parent */
     protected MutableTreeTableNode parent;
 
-    /** array of children, may be null if this node has no children */
+    /**
+     * List of children, if this node has no children the list will be empty.
+     * This list will never be null.
+     */
     protected List<MutableTreeTableNode> children;
 
     /** optional user object */
