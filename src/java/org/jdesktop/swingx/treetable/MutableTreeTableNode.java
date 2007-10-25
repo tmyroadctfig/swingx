@@ -95,12 +95,4 @@ public interface MutableTreeTableNode extends TreeTableNode {
      *            the new parent for this node
      */
     void setParent(MutableTreeTableNode newParent);
-
-    /**
-     * Sets the user {@code object} for this node.
-     * 
-     * @param object
-     *            the object to set
-     */
-    void setUserObject(Object object);
 }
