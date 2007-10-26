@@ -590,6 +590,7 @@ public class JXMonthView extends JComponent {
         if (newDate == null) {
             clearSelection();
         } else {
+            if (isSelectedDate(newDate)) return;
             setSelectionInterval(newDate, newDate);
         }
     }
