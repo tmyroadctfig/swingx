@@ -823,7 +823,13 @@ public class JXCollapsiblePane extends JXPanel {
                                                                            height, 
                                                                            Transparency.TRANSLUCENT);
                     c.setSize(width, height);
-                    c.paint(img.getGraphics());
+                    Graphics g = img.getGraphics();
+                    
+                    try {
+                        c.paint(g);
+                    } finally {
+                        g.dispose();
+                    }
                 } else {
                     img = null;
                 }
