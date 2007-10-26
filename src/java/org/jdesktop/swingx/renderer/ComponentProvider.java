@@ -103,6 +103,8 @@ import javax.swing.JLabel;
  * 
  * @see StringValue
  * @see FormatStringValue
+ * @see IconValue
+ * @see BooleanValue
  * @see CellContext
  * @see DefaultTableRenderer
  * @see DefaultListRenderer
@@ -280,24 +282,6 @@ public abstract class ComponentProvider<T extends JComponent>
         return null;
     }
 
-    /**
-     * Returns a Icon representation of the content.<p>
-     * 
-     * This method messages the 
-     * <code>IconValue</code> to get the Icon rep. Meant as 
-     * a convenience for subclasses.
-     * 
-     * @param context the cell context, must not be null.
-     * @return a appropriate icon representation of the cell's content,
-     *   or null if non if available.
-     */
-//    protected boolean getValueAsIcon(CellContext context) {
-//        Object value = context.getValue();
-//        if (formatter instanceof IconValue) {
-//            return ((IconValue) formatter).getIcon(value);
-//        }
-//        return null;
-//    }
     /**
      * Configures the rendering component's default visuals frome
      * the given cell context. Here: delegates to the renderer
