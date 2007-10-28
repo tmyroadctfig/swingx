@@ -32,7 +32,7 @@ import org.jdesktop.swingx.painter.PainterIcon;
 
 /**
  * <p>A simple circular animation, useful for denoting an action is taking
- * place that may take an unknown lenght of time to complete. Similar to an
+ * place that may take an unknown length of time to complete. Similar to an
  * indeterminant JProgressBar, but with a different look.</p>
  *
  * <p>For example:
@@ -50,6 +50,7 @@ import org.jdesktop.swingx.painter.PainterIcon;
 public class JXBusyLabel extends JLabel {
     private BusyPainter busyPainter;
     private Timer busy;
+    private boolean running;
     
     /** Creates a new instance of JXBusyLabel */
     public JXBusyLabel() {
@@ -84,19 +85,23 @@ public class JXBusyLabel extends JLabel {
     public void setBusy(boolean busy) {
         boolean old = isBusy();
         if (!old && busy) {
+        	running = true;
             startAnimation();
             firePropertyChange("busy", old, isBusy());
         } else if (old && !busy) {
+        	running = false;
             stopAnimation();
             firePropertyChange("busy", old, isBusy());
         }
     }
     
     private void startAnimation() {
+        if (!running || getParent() == null) {
+        	return;
+        }
         if(busy != null) {
             stopAnimation();
         }
-        
         busy = new Timer(100, new ActionListener() {
             int frame = 8;
             public void actionPerformed(ActionEvent e) {
@@ -113,5 +118,19 @@ public class JXBusyLabel extends JLabel {
         busyPainter.setFrame(-1);
         repaint();
         busy = null;
+    }
+    
+    @Override
+    public void removeNotify() {
+    	// fix for #626
+    	stopAnimation();
+    	super.removeNotify();
+    }
+    
+    @Override
+    public void addNotify() {
+    	super.addNotify();
+    	// fix for #626
+    	startAnimation();
     }
 }
