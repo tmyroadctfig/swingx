@@ -66,27 +66,6 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JComponent.setDefaultLocale(componentLocale);
     }
 
-    /**
-     * Issue #625-swingx: Stackoverflow when resetting the date in
-     * DateSelectionModel.
-     * 
-     * Here: test on model level - quick fix on view level, must be 
-     * fixed more thoroughly!!
-     */
-    public void testStackOverflowModelView() {
-        final JXMonthView monthView = new JXMonthView();
-        // monthView.setSelectionMode(DateSelectionModel.SelectionMode.SINGLE_SELECTION);
-        final Date date = new Date();
-        monthView.getSelectionModel().addDateSelectionListener(
-                new DateSelectionListener() {
-                    public void valueChanged(DateSelectionEvent ev) {
-                        monthView.setSelectedDate(date);
-                    }
-                });
-        monthView.setSelectedDate(date);
-
-    }
-
 
     /**
      * Issue #563-swingx: keybindings active if not focused.
