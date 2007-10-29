@@ -25,7 +25,9 @@ import java.awt.Graphics;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.UIResource;
 
 import org.jdesktop.swingx.plaf.basic.BasicHyperlinkUI;
 
@@ -39,12 +41,20 @@ public class WindowsHyperlinkUI extends BasicHyperlinkUI {
     return new WindowsHyperlinkUI();
   }
   
+  /**
+   * {@inheritDoc}
+   */
   protected void paintButtonPressed(Graphics g, AbstractButton b) {
     setTextShiftOffset();
   }
   
+    /**
+     * {@inheritDoc}
+     */
     protected void installDefaults(AbstractButton b) {
         super.installDefaults(b);
-        b.setBorder(BorderFactory.createEmptyBorder(0, 1, 0, 0));
+        if (b.getBorder() == null || b.getBorder() instanceof UIResource) {
+            b.setBorder(new BorderUIResource(BorderFactory.createEmptyBorder(0, 1, 0, 0)));
+        }
     }
 }

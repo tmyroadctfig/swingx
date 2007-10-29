@@ -46,6 +46,7 @@ import javax.swing.JComponent;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.UIResource;
 import javax.swing.plaf.basic.BasicButtonUI;
@@ -109,7 +110,7 @@ public class BasicHyperlinkUI extends BasicButtonUI {
         b.setBorderPainted(false);
         b.setRolloverEnabled(true);
         if (b.getBorder() == null || b.getBorder() instanceof UIResource) {
-            b.setBorder(BorderFactory.createEmptyBorder());
+            b.setBorder(new BorderUIResource(BorderFactory.createEmptyBorder()));
         }
 
         dashedRectGapX = UIManager.getInt("ButtonUI.dashedRectGapX");
