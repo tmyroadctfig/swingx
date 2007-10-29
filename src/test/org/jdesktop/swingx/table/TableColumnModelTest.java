@@ -17,8 +17,7 @@ import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import junit.framework.TestCase;
-
+import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.event.TableColumnModelExtListener;
 import org.jdesktop.swingx.test.ColumnModelReport;
 import org.jdesktop.test.TestUtils;
@@ -34,7 +33,7 @@ import org.jdesktop.test.TestUtils;
  * 
  * @author  Jeanette Winzenburg
  */
-public class TableColumnModelTest extends TestCase {
+public class TableColumnModelTest extends InteractiveTestCase {
     @SuppressWarnings("all")
     private static final Logger LOG = Logger
             .getLogger(TableColumnModelTest.class.getName());

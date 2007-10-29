@@ -4,6 +4,18 @@
  */
 package org.jdesktop.swingx.table;
 
+import java.awt.event.ActionEvent;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.swing.Action;
+import javax.swing.table.TableColumn;
+
+import org.jdesktop.swingx.JXFrame;
+import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.action.AbstractActionExt;
+
 /**
  * Test to exposed known issues of <code>TableColumnModelExt</code>
  * implementations.
@@ -16,6 +28,85 @@ package org.jdesktop.swingx.table;
  */
 public class TableColumnModelExtIssues extends TableColumnModelTest {
 
+    public static void main(String args[]) {
+        setSystemLF(false);
+       TableColumnModelExtIssues test = new TableColumnModelExtIssues();
+       try {
+         test.runInteractiveTests();
+       //    test.runInteractiveTests("interactive.*Column.*");
+//           test.runInteractiveTests("interactive.*TableHeader.*");
+       //    test.runInteractiveTests("interactive.*SorterP.*");
+       //    test.runInteractiveTests("interactive.*Column.*");
+       } catch (Exception e) {
+           System.err.println("exception when executing interactive tests:");
+           e.printStackTrace();
+       }
+   }
+
+    /**
+     * Issue #624-swingx: support use-case to store/restore column sequence.
+     */
+    public void interactiveRestoreColumnOrder() {
+        final JXTable source = new JXTable(20, 5);
+        source.setColumnControlVisible(true);
+        final JXTable target = new JXTable(source.getModel());
+        target.setColumnControlVisible(true);
+        JXFrame frame = wrapWithScrollingInFrame(source, target, "source --> target: copy column sequence");
+        Action resetOrder = new AbstractActionExt("reset to initial") {
+
+            public void actionPerformed(ActionEvent e) {
+                source.tableChanged(null);
+                target.tableChanged(null);
+                
+            }
+            
+        };
+        Action copyOrder = new AbstractActionExt("copy source order to target") {
+
+            public void actionPerformed(ActionEvent e) {
+                // source ...
+                // hidden columns, don't care about sequence
+                Collection<TableColumn> hiddenSourceColumns = source.getColumns(true);
+                hiddenSourceColumns.removeAll(source.getColumns());
+                // temporary set visible so we can get hold of their "virtual" 
+                // view index
+                for (TableColumn tableColumn : hiddenSourceColumns) {
+                    ((TableColumnExt) tableColumn).setVisible(true);
+                }
+                
+                // target
+                Collection<TableColumn> hiddenTargetColumns = target.getColumns(true);
+                hiddenTargetColumns.removeAll(target.getColumns());
+                for (TableColumn tableColumn : hiddenTargetColumns) {
+                    ((TableColumnExt) tableColumn).setVisible(true);
+                }
+                // visible sequence if all were visible
+                List<TableColumn> sourceColumns = source.getColumns();
+                for (int i = 0; i < sourceColumns.size(); i++) {
+                    int sourceID = sourceColumns.get(i).getModelIndex();
+                    List<TableColumn> targetColumns = target.getColumns();
+                    for (int j = 0; j < targetColumns.size(); j++) {
+                        if (targetColumns.get(j).getModelIndex() == sourceID) {
+                            target.getColumnModel().moveColumn(j, i);
+                            break;
+                        }
+                    }
+                }
+                // cleanup: hide originally hidden columns
+                for (TableColumn tableColumn : hiddenSourceColumns) {
+                    ((TableColumnExt) tableColumn).setVisible(false);
+                }
+                for (TableColumn tableColumn : hiddenTargetColumns) {
+                    ((TableColumnExt) tableColumn).setVisible(false);
+                }
+            }
+            
+        };
+        addAction(frame, resetOrder);
+        addAction(frame, copyOrder);
+        frame.pack();
+        frame.setVisible(true);
+    }
     /** 
      * Do nothing, just to make the runner happy if there are no 
      * issues.
