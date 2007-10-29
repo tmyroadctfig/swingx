@@ -18,16 +18,16 @@
  */
 package org.jdesktop.swingx;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.ArrayList;
 
 import org.jdesktop.swingx.event.DateSelectionEvent;
-import static org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.event.EventListenerMap;
+import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 
 /**
  * @author Joshua Outwater
@@ -85,14 +85,17 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
         boolean added = false;
         switch (selectionMode) {
             case SINGLE_SELECTION:
+                if (isSelected(startDate)) return;
                 clearSelectionImpl();
                 added = addSelectionImpl(startDate, startDate);
                 break;
             case SINGLE_INTERVAL_SELECTION:
+                if (isIntervalSelected(startDate, endDate)) return;
                 clearSelectionImpl();
                 added = addSelectionImpl(startDate, endDate);
                 break;
             case MULTIPLE_INTERVAL_SELECTION:
+                if (isIntervalSelected(startDate, endDate)) return;
                 added = addSelectionImpl(startDate, endDate);
                 break;
             default:
@@ -106,28 +109,54 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
     /**
      * {@inheritDoc}
      */
-    public void setSelectionInterval(final Date startDate, final Date endDate) {
-        boolean added = false;
-        switch (selectionMode) {
-            case SINGLE_SELECTION:
-                if (isSelected(startDate)) return;
-                clearSelectionImpl();
-                added = addSelectionImpl(startDate, startDate);
-                break;
-            case SINGLE_INTERVAL_SELECTION:
-                clearSelectionImpl();
-                added = addSelectionImpl(startDate, endDate);
-                break;
-            case MULTIPLE_INTERVAL_SELECTION:
-                clearSelectionImpl();
-                added =addSelectionImpl(startDate, endDate);
-                break;
-            default:
-                break;
+    public void setSelectionInterval(final Date startDate, Date endDate) {
+        if (SelectionMode.SINGLE_SELECTION.equals(selectionMode)) {
+           if (isSelected(startDate)) return;
+           endDate = startDate;
+        } else {
+            if (isIntervalSelected(startDate, endDate)) return;
         }
-        if (added) {
+        clearSelectionImpl();
+        if (addSelectionImpl(startDate, endDate)) {
             fireValueChanged(EventType.DATES_SET);
         }
+//        boolean added = false;
+//        switch (selectionMode) {
+//            case SINGLE_SELECTION:
+//                if (isSelected(startDate)) return;
+//                clearSelectionImpl();
+//                added = addSelectionImpl(startDate, startDate);
+//                break;
+//            case SINGLE_INTERVAL_SELECTION:
+//                if (isIntervalSelected(startDate, endDate)) return;
+//                clearSelectionImpl();
+//                added = addSelectionImpl(startDate, endDate);
+//                break;
+//            case MULTIPLE_INTERVAL_SELECTION:
+//                if (isIntervalSelected(startDate, endDate)) return;
+//                clearSelectionImpl();
+//                added =addSelectionImpl(startDate, endDate);
+//                break;
+//            default:
+//                break;
+//        }
+//        if (added) {
+//            fireValueChanged(EventType.DATES_SET);
+//        }
+    }
+
+    /**
+     * Checks and returns if the single date interval bounded by startDate and endDate
+     * is selected. This is useful only for SingleInterval mode.
+     * 
+     * @param startDate the start of the interval
+     * @param endDate the end of the interval, must be >= startDate
+     * @return true the interval is selected, false otherwise.
+     */
+    private boolean isIntervalSelected(Date startDate, Date endDate) {
+        if (isSelectionEmpty()) return false;
+        return selectedDates.first().equals(startDate) 
+           && selectedDates.last().equals(endDate);
     }
 
     /**

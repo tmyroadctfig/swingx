@@ -39,23 +39,6 @@ public class DateSelectionModelIssues extends InteractiveTestCase {
     @SuppressWarnings("unused")
     private Calendar calendar;
 
-    /**
-     * Issue #625-swingx: Stackoverflow when resetting the date in DateSelectionModel.
-     * 
-     * Here: test on model level
-     */
-    public void testStackOverflowModel() {
-      model.setSelectionMode(DateSelectionModel.SelectionMode.SINGLE_SELECTION);
-      final Date date = new Date();
-      model.addDateSelectionListener(
-              new DateSelectionListener() {
-                  public void valueChanged(DateSelectionEvent ev) {
-                      model.setSelectionInterval(date, date);
-                  }
-              });
-      model.setSelectionInterval(date, date);
-    }
-
     
     public void testUnselectableDatesCleanupOneRemovedEvent() {
         fail("TODO: test that we fire only one remove event");

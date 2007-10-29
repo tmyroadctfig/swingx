@@ -24,6 +24,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
+import javax.swing.DefaultListSelectionModel;
+
 import junit.framework.TestCase;
 
 import org.jdesktop.swingx.event.DateSelectionEvent;
@@ -39,6 +41,119 @@ public class DefaultDateSelectionModelTest extends TestCase {
     private DateSelectionModel model;
     private Calendar calendar;
 
+    
+    /**
+     * Issue #625-swingx: Stackoverflow when resetting the date in DateSelectionModel.
+     * 
+     * Here: test addSelectionInterval on model level
+     */
+    public void testStackOverflowModelAddSameSelectionSingle() {
+      model.setSelectionMode(DateSelectionModel.SelectionMode.SINGLE_SELECTION);
+      final Date date = new Date();
+      model.addDateSelectionListener(
+              new DateSelectionListener() {
+                  public void valueChanged(DateSelectionEvent ev) {
+                      model.addSelectionInterval(date, date);
+                  }
+              });
+      model.addSelectionInterval(date, date);
+    }
+
+    /**
+     * Issue #625-swingx: Stackoverflow when resetting the date in DateSelectionModel.
+     * 
+     * Here: test setSelection on model level, single selection
+     */
+    public void testStackOverflowModelSetSelectionSingle() {
+      model.setSelectionMode(DateSelectionModel.SelectionMode.SINGLE_SELECTION);
+      final Date date = new Date();
+      model.addDateSelectionListener(
+              new DateSelectionListener() {
+                  public void valueChanged(DateSelectionEvent ev) {
+                      model.setSelectionInterval(date, date);
+                  }
+              });
+      model.setSelectionInterval(date, date);
+    }
+
+    /**
+     * Issue #625-swingx: Stackoverflow when resetting the date in DateSelectionModel.
+     * 
+     * Here: test setSelection on model level, single interval selection
+     */
+    public void testStackOverflowModelSetSelectionSingleInterval() {
+        DefaultListSelectionModel l;
+      model.setSelectionMode(DateSelectionModel.SelectionMode.SINGLE_INTERVAL_SELECTION);
+      final Date date = calendar.getTime();
+      calendar.add(Calendar.DATE, 2);
+      final Date end = calendar.getTime();
+      model.addDateSelectionListener(
+              new DateSelectionListener() {
+                  public void valueChanged(DateSelectionEvent ev) {
+                      model.setSelectionInterval(date, end);
+                  }
+              });
+      model.setSelectionInterval(date, end);
+    }
+
+    /**
+     * Issue #625-swingx: Stackoverflow when resetting the date in DateSelectionModel.
+     * 
+     * Here: test setSelection on model level, single interval selection
+     */
+    public void testStackOverflowModelAddSelectionSingleInterval() {
+      model.setSelectionMode(DateSelectionModel.SelectionMode.SINGLE_INTERVAL_SELECTION);
+      final Date date = calendar.getTime();
+      calendar.add(Calendar.DATE, 2);
+      final Date end = calendar.getTime();
+      model.addDateSelectionListener(
+              new DateSelectionListener() {
+                  public void valueChanged(DateSelectionEvent ev) {
+                      model.addSelectionInterval(date, end);
+                  }
+              });
+      model.addSelectionInterval(date, end);
+    }
+
+    /**
+     * Issue #625-swingx: Stackoverflow when resetting the date in DateSelectionModel.
+     * 
+     * Here: test setSelection on model level, multiple interval selection
+     */
+    public void testStackOverflowModelSetSelectionMultipleInterval() {
+        DefaultListSelectionModel l;
+      model.setSelectionMode(DateSelectionModel.SelectionMode.MULTIPLE_INTERVAL_SELECTION);
+      final Date date = calendar.getTime();
+      calendar.add(Calendar.DATE, 2);
+      final Date end = calendar.getTime();
+      model.addDateSelectionListener(
+              new DateSelectionListener() {
+                  public void valueChanged(DateSelectionEvent ev) {
+                      model.setSelectionInterval(date, end);
+                  }
+              });
+      model.setSelectionInterval(date, end);
+    }
+
+    /**
+     * Issue #625-swingx: Stackoverflow when resetting the date in DateSelectionModel.
+     * 
+     * Here: test addSelection on model level, multiple interval selection
+     */
+    public void testStackOverflowModelAddSelectionMultipleInterval() {
+      model.setSelectionMode(DateSelectionModel.SelectionMode.MULTIPLE_INTERVAL_SELECTION);
+      final Date date = calendar.getTime();
+      calendar.add(Calendar.DATE, 2);
+      final Date end = calendar.getTime();
+      model.addDateSelectionListener(
+              new DateSelectionListener() {
+                  public void valueChanged(DateSelectionEvent ev) {
+                      model.addSelectionInterval(date, end);
+                  }
+              });
+      model.addSelectionInterval(date, end);
+    }
+    
     /**
      * related to #625-swingx: DateSelectionModel must not fire on clearing empty selection.
      */
@@ -351,6 +466,40 @@ public class DefaultDateSelectionModelTest extends TestCase {
         assertTrue(startDateNextMonth.equals(selection.last()));
     }
 
+    /**
+     * characterize behaviour on setSelectionInterval depending on selection mode.
+     * Here: compare singleInterval and multipleInterval - must be same.
+     */
+    public void testSetIntervalSameForSingleAndMultipleIntervalMode() {
+        Date date = new Date();
+        // pre-select 
+        model.setSelectionMode(DateSelectionModel.SelectionMode.SINGLE_INTERVAL_SELECTION);
+        model.setSelectionInterval(date, date);
+        
+        // get span in future
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.add(Calendar.DAY_OF_MONTH, 5);
+        Date startDate = cal.getTime();
+        cal.add(Calendar.DAY_OF_MONTH, 5);
+        Date endDate = cal.getTime();
+        // set the interval
+        model.setSelectionInterval(startDate, endDate);
+        SortedSet<Date> selection = model.getSelection();
+        // sanity
+        assertEquals(6, selection.size());
+
+        // prepare model for multiple interval selection
+        model.clearSelection();
+        model.setSelectionMode(DateSelectionModel.SelectionMode.MULTIPLE_INTERVAL_SELECTION);
+        model.setSelectionInterval(date, date);
+        
+        model.setSelectionInterval(startDate, endDate);
+        assertEquals(selection.size(), model.getSelection().size());
+        assertEquals(selection.first(), model.getSelection().first());
+        assertEquals(selection.last(), model.getSelection().last());
+    }
+    
     public void testUnselctableDates() {
         // Make sure the unselectable dates returns an empty set if it hasn't been
         // used.
