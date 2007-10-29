@@ -51,6 +51,7 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.MouseInputListener;
 import javax.swing.plaf.ActionMapUIResource;
 import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.UIResource;
 import javax.swing.plaf.basic.BasicGraphicsUtils;
 
 import org.jdesktop.swingx.JXCollapsiblePane;
@@ -423,7 +424,7 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 	/**
 	 * The border around the content pane
 	 */
-	protected static class ContentPaneBorder implements Border {
+	protected static class ContentPaneBorder implements Border, UIResource {
 		Color color;
 
 		public ContentPaneBorder(Color color) {
@@ -452,7 +453,7 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 	 * "expanded" status and the "special" type.
 	 * 
 	 */
-	protected class PaneBorder implements Border {
+	protected class PaneBorder implements Border, UIResource {
 
 		protected Color borderColor;
 		protected Color titleForeground;
