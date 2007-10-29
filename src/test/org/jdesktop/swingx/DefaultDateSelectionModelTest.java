@@ -38,16 +38,85 @@ public class DefaultDateSelectionModelTest extends TestCase {
             .getLogger(DefaultDateSelectionModelTest.class.getName());
     private DateSelectionModel model;
     private Calendar calendar;
-    @Override
-    public void setUp() {
-        model = new DefaultDateSelectionModel();
-        calendar = Calendar.getInstance();
-    }
 
-    @Override
-    public void tearDown() {
-
+    /**
+     * related to #625-swingx: DateSelectionModel must not fire on clearing empty selection.
+     */
+    public void testDateSelectionClearSelectionNotFireIfUnselected() {
+        // sanity
+        assertTrue(model.isSelectionEmpty());
+        DateSelectionReport report = new DateSelectionReport();
+        model.addDateSelectionListener(report);
+        model.clearSelection();
+        assertEquals("selection must not fire on clearing empty selection",
+                0,
+                report.getEventCount());
     }
+    
+    /**
+     * related to #625-swingx: DateSelectionModel must fire SELECTION_CLEARED if 
+     * had selection.
+     * Testing here for sanity reasons ... be sure we didn't prevent the firing
+     * altogether while changing.
+     */
+    public void testDateSelectionClearSelectionFireIfSelected() {
+        Date date = new Date();
+        model.setSelectionInterval(date, date);
+        // sanity
+        assertFalse(model.isSelectionEmpty());
+        DateSelectionReport report = new DateSelectionReport();
+        model.addDateSelectionListener(report);
+        model.clearSelection();
+        assertEquals("selection must fire on clearing selection",
+                1,
+                report.getEventCount());
+        assertEquals("event type must be SELECTION_CLEARED",
+                DateSelectionEvent.EventType.SELECTION_CLEARED,
+                report.getLastEventType());
+    }
+    
+    /**
+     * related to #625-swingx: DateSelectionModel must not fire on clearing empty selection.
+     */
+    public void testDateSelectionSetSelectionNotFireIfSelected() {
+        Date date = new Date();
+        model.setSelectionInterval(date, date);
+        // sanity
+        assertTrue(model.isSelected(date));
+        DateSelectionReport report = new DateSelectionReport();
+        model.addDateSelectionListener(report);
+        model.setSelectionInterval(date, date);
+        assertEquals("selection must not fire on selecting already selected date",
+                0,
+                report.getEventCount());
+    }
+    
+    /**
+     * related to #625-swingx: DateSelectionModel must fire SELECTION_CLEARED if 
+     * had selection.
+     * Testing here for sanity reasons ... be sure we didn't prevent the firing
+     * altogether while changing.
+     */
+    public void testDateSelectionSetSelectionFire() {
+        Date date = new Date();
+        model.setSelectionInterval(date, date);
+        // sanity
+        assertTrue(model.isSelected(date));
+        DateSelectionReport report = new DateSelectionReport();
+        model.addDateSelectionListener(report);
+        // modify the date
+        calendar.setTime(date);
+        calendar.add(Calendar.HOUR, 1);
+        model.setSelectionInterval(calendar.getTime(), calendar.getTime());
+        assertEquals("selection must fire on selection",
+                1,
+                report.getEventCount());
+        assertEquals("event type must be DATES_SET",
+                DateSelectionEvent.EventType.DATES_SET,
+                report.getLastEventType());
+    }
+    
+
 
     /**
      * adding api: adjusting
@@ -328,5 +397,10 @@ public class DefaultDateSelectionModelTest extends TestCase {
         assertTrue(unselectableDates.equals(result));
     }
     
+    @Override
+    public void setUp() {
+        model = new DefaultDateSelectionModel();
+        calendar = Calendar.getInstance();
+    }
 
 }

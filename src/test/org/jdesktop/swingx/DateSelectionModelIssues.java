@@ -56,17 +56,6 @@ public class DateSelectionModelIssues extends InteractiveTestCase {
       model.setSelectionInterval(date, date);
     }
 
-    /**
-     * related to #625-swingx: DateSelectionModel must not fire on clearing empty selection.
-     */
-    public void testDateSelectionClearSelectionNotFireIfUnselected() {
-        // sanity
-        assertTrue(model.isSelectionEmpty());
-        DateSelectionReport report = new DateSelectionReport();
-        model.addDateSelectionListener(report);
-        model.clearSelection();
-        assertFalse("selection must not fire on clearing empty selection", report.hasEvents());
-    }
     
     public void testUnselectableDatesCleanupOneRemovedEvent() {
         fail("TODO: test that we fire only one remove event");

@@ -110,6 +110,7 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
         boolean added = false;
         switch (selectionMode) {
             case SINGLE_SELECTION:
+                if (isSelected(startDate)) return;
                 clearSelectionImpl();
                 added = addSelectionImpl(startDate, startDate);
                 break;
@@ -157,6 +158,7 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
      * {@inheritDoc}
      */
     public void clearSelection() {
+        if (isSelectionEmpty()) return;
         clearSelectionImpl();
         fireValueChanged(EventType.SELECTION_CLEARED);
     }

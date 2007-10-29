@@ -101,7 +101,9 @@ public interface DateSelectionModel {
     public void removeSelectionInterval(Date startDate, Date endDate);
 
     /**
-     * Clear any selection from the selection model
+     * Clear any selection from the selection model. Fires an Event of 
+     * type SELECTION_CLEARED if there had been a selection, does nothing
+     * otherwise.
      */
     public void clearSelection();
 
