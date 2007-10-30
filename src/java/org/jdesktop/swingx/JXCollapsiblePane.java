@@ -36,11 +36,13 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.border.Border;
 
 /**
  * <code>JXCollapsiblePane</code> provides a component which can collapse or
@@ -496,6 +498,29 @@ public class JXCollapsiblePane extends JXPanel {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public Border getBorder() {
+        if (getContentPane() instanceof JComponent) {
+            return ((JComponent) getContentPane()).getBorder();
+        }
+        
+        return null;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void setBorder(Border border) {
+        if (getContentPane() instanceof JComponent) {
+            ((JComponent) getContentPane()).setBorder(border);
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Dimension getMinimumSize() {
         return getPreferredSize();
