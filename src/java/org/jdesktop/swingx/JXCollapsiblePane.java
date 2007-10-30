@@ -319,6 +319,10 @@ public class JXCollapsiblePane extends JXPanel {
      * @return the content pane
      */
     public Container getContentPane() {
+        if (wrapper == null) {
+            return null;
+        }
+        
         return wrapper.c;
     }
 
