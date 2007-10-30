@@ -279,17 +279,17 @@ public class JXMultiSplitPane extends JPanel {
       DividerPainter dp = getDividerPainter();
       Rectangle clipR = g.getClipBounds();
       if ((dp != null) && (clipR != null)) {
-        Graphics dpg = g.create();
-        try {
-          MultiSplitLayout msl = getMultiSplitLayout();
-          if ( msl.hasModel()) {
-            for(Divider divider : msl.dividersThatOverlap(clipR)) {
-              Rectangle bounds = divider.getBounds();
-              dp.paint((Graphics2D)dpg, divider, bounds.width, bounds.height );
+        MultiSplitLayout msl = getMultiSplitLayout();
+        if ( msl.hasModel()) {
+          for(Divider divider : msl.dividersThatOverlap(clipR)) {
+            Rectangle bounds = divider.getBounds();
+            Graphics cg = g.create( bounds.x, bounds.y, bounds.width, bounds.height );
+            try {
+              dp.paint((Graphics2D)cg, divider, bounds.width, bounds.height );
+            } finally {
+              cg.dispose();
             }
           }
-        } finally {
-          dpg.dispose();
         }
       }
     }
