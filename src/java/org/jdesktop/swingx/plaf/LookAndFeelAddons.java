@@ -30,7 +30,9 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.UIResource;
 
+import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.plaf.linux.LinuxLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.macosx.MacOSXLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.metal.MetalLookAndFeelAddons;
@@ -306,7 +308,7 @@ public class LookAndFeelAddons {
     // solve issue with ClassLoader not able to find classes
     String uiClassname = (String)UIManager.get(component.getUIClassID());
     try {
-      Class uiClass = Class.forName(uiClassname);
+      Class<?> uiClass = Class.forName(uiClassname);
       UIManager.put(uiClassname, uiClass);
     } catch (ClassNotFoundException e) {
       // we ignore the ClassNotFoundException
@@ -318,7 +320,7 @@ public class LookAndFeelAddons {
       return ui;
     } else {
       String realUI = ui.getClass().getName();
-      Class realUIClass;
+      Class<?> realUIClass;
       try {
         realUIClass = expectedUIClass.getClassLoader()
         .loadClass(realUI);
@@ -411,4 +413,68 @@ public class LookAndFeelAddons {
     return trackingChanges;
   }
    
+    /**
+     * Convenience method for setting a component's background painter property
+     * with a value from the defaults. The painter is only set if the painter is
+     * {@code null} or an instance of {@code UIResource}.
+     * 
+     * @param c
+     *                component to set the painter on
+     * @param defaultPainterName
+     *                key specifying the painter
+     * @throws NullPointerException
+     *                 if the component or painter is {@code null}
+     * @throws IllegalArgumentException
+     *                 if the component does not contain the "backgroundPainter"
+     *                 property or the property cannot be set
+     */
+    public static void installBackgroundPainter(JComponent c, String painter) {
+        Class<?> clazz = c.getClass();
+        
+        try {
+            Method getter = clazz.getMethod("getBackgroundPainter");
+            Method setter = clazz.getMethod("setBackgroundPainter", Painter.class);
+            
+            Painter<?> p = (Painter<?>) getter.invoke(c);
+            
+            if (p == null || p instanceof UIResource) {
+                setter.invoke(c, UIManagerExt.getPainter(painter));
+            }
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("cannot set painter on " + c.getClass());
+        }
+    }
+    
+    /**
+     * Convenience method for uninstalling a background painter. If the painter
+     * of the component is a {@code UIResource}, it is set to {@code null}.
+     * 
+     * @param c
+     *                component to uninstall the painter on
+     * @throws NullPointerException
+     *                 if {@code c} is {@code null}
+     * @throws IllegalArgumentException
+     *                 if the component does not contain the "backgroundPainter"
+     *                 property or the property cannot be set
+     */
+    public static void uninstallBackgroundPainter(JComponent c) {
+        Class<?> clazz = c.getClass();
+        
+        try {
+            Method getter = clazz.getMethod("getBackgroundPainter");
+            Method setter = clazz.getMethod("setBackgroundPainter", Painter.class);
+            
+            Painter<?> p = (Painter<?>) getter.invoke(c);
+            
+            if (p == null || p instanceof UIResource) {
+                setter.invoke(c, (Painter<?>) null);
+            }
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("cannot set painter on " + c.getClass());
+        }
+    }
 }

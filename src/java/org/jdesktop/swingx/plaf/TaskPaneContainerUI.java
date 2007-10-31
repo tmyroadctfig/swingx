@@ -20,13 +20,13 @@
  */
 package org.jdesktop.swingx.plaf;
 
-import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.PanelUI;
 
 /**
  * Pluggable UI for <code>JXTaskPaneContainer</code>.
  * 
  * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
  */
-public class TaskPaneContainerUI extends ComponentUI {
+public abstract class TaskPaneContainerUI extends PanelUI {
 
 }

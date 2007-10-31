@@ -20,71 +20,78 @@
  */
 package org.jdesktop.swingx.plaf.basic;
 
-import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-
 import javax.swing.JComponent;
 import javax.swing.LookAndFeel;
-import javax.swing.UIManager;
-import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.ComponentUI;
 
 import org.jdesktop.swingx.JXTaskPaneContainer;
 import org.jdesktop.swingx.VerticalLayout;
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.TaskPaneContainerUI;
 
 /**
  * Base implementation of the <code>JXTaskPaneContainer</code> UI.
  * 
  * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
+ * @author Karl Schaefer
  */
 public class BasicTaskPaneContainerUI extends TaskPaneContainerUI {
 
+  /**
+   * Returns a new instance of BasicTaskPaneContainerUI.
+   * BasicTaskPaneContainerUI delegates are allocated one per
+   * JXTaskPaneContainer.
+   * 
+   * @return A new TaskPaneContainerUI implementation for the Basic look and
+   *         feel.
+   */
   public static ComponentUI createUI(JComponent c) {
     return new BasicTaskPaneContainerUI();
   }
 
+  /**
+   * The task pane container managed by this UI delegate.
+   */
   protected JXTaskPaneContainer taskPane;
-  protected boolean useGradient;
-  protected Color gradientStart;
-  protected Color gradientEnd;
 
+  /**
+   * {@inheritDoc}
+   */
   public void installUI(JComponent c) {
     super.installUI(c);
     taskPane = (JXTaskPaneContainer)c;
+    installDefaults();
     taskPane.setLayout(new VerticalLayout(14));
-    LookAndFeel.installBorder(taskPane, "TaskPaneContainer.border");
-    taskPane.setOpaque(true);
+  }
 
-    if (taskPane.getBackground() == null
-      || taskPane.getBackground() instanceof ColorUIResource) {
-      taskPane
-        .setBackground(UIManager.getColor("TaskPaneContainer.background"));
+    /**
+     * Installs the default colors, border, and painter of the task pane
+     * container.
+     */
+    protected void installDefaults() {
+        LookAndFeel.installColors(taskPane, "TaskPaneContainer.background",
+                "TaskPaneContainer.foreground");
+        LookAndFeel.installBorder(taskPane, "TaskPaneContainer.border");
+        LookAndFeelAddons.installBackgroundPainter(taskPane,
+                "TaskPaneContainer.backgroundPainter");
+        LookAndFeel.installProperty(taskPane, "opaque", Boolean.TRUE);
     }
     
-    useGradient = UIManager.getBoolean("TaskPaneContainer.useGradient");
-    if (useGradient) {
-      gradientStart = UIManager
-      .getColor("TaskPaneContainer.backgroundGradientStart");
-      gradientEnd = UIManager
-      .getColor("TaskPaneContainer.backgroundGradientEnd");
+    /**
+     * {@inheritDoc}
+     */
+    public void uninstallUI(JComponent c) {
+        uninstallDefaults();
+        
+        super.uninstallUI(c);
     }
-  }
 
-  @Override
-  public void paint(Graphics g, JComponent c) {
-    Graphics2D g2d = (Graphics2D)g;
-    if (useGradient) {
-      Paint old = g2d.getPaint();
-      GradientPaint gradient = new GradientPaint(0, 0, gradientStart, 0, c
-        .getHeight(), gradientEnd);
-      g2d.setPaint(gradient);
-      g.fillRect(0, 0, c.getWidth(), c.getHeight());      
-      g2d.setPaint(old);
+    /**
+     * Uninstalls the default colors, border, and painter of the task pane
+     * container.
+     */
+    protected void uninstallDefaults() {
+        LookAndFeel.uninstallBorder(taskPane);
+        LookAndFeelAddons.uninstallBackgroundPainter(taskPane);
     }
-  }
-
 }

@@ -20,10 +20,6 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.Dimension;
-import java.awt.Rectangle;
-
-import javax.swing.JComponent;
 import javax.swing.JViewport;
 import javax.swing.Scrollable;
 
@@ -33,7 +29,7 @@ import org.jdesktop.swingx.plaf.TaskPaneContainerUI;
 
 /**
  * <code>JXTaskPaneContainer</code> provides an elegant view
- * to display a list of tasks ordered by groups ({@link org.jdesktop.swingx.JXTaskPane}.
+ * to display a list of tasks ordered by groups ({@link org.jdesktop.swingx.JXTaskPane}s).
  * 
  * <p>
  * Although {@link org.jdesktop.swingx.JXTaskPane} can be added to any other
@@ -98,7 +94,7 @@ import org.jdesktop.swingx.plaf.TaskPaneContainerUI;
  *          mono32="JXTaskPaneContainer32-mono.gif"
  *          color32="JXTaskPaneContainer32.gif"
  */
-public class JXTaskPaneContainer extends JComponent implements Scrollable {
+public class JXTaskPaneContainer extends JXPanel {
 
   public final static String uiClassID = "swingx/TaskPaneContainerUI";
   
@@ -167,23 +163,6 @@ public class JXTaskPaneContainer extends JComponent implements Scrollable {
   }
 
   /**
-   * @see Scrollable#getPreferredScrollableViewportSize()
-   */
-  public Dimension getPreferredScrollableViewportSize() {
-    return getPreferredSize();
-  }
-
-  /**
-   * @see Scrollable#getScrollableBlockIncrement(java.awt.Rectangle, int, int)
-   */
-  public int getScrollableBlockIncrement(
-    Rectangle visibleRect,
-    int orientation,
-    int direction) {
-    return 10;
-  }
-  
-  /**
    * @see Scrollable#getScrollableTracksViewportHeight()
    */
   public boolean getScrollableTracksViewportHeight() {
@@ -200,15 +179,4 @@ public class JXTaskPaneContainer extends JComponent implements Scrollable {
   public boolean getScrollableTracksViewportWidth() {
     return true;
   }
-  
-  /**
-   * @see Scrollable#getScrollableUnitIncrement(java.awt.Rectangle, int, int)
-   */
-  public int getScrollableUnitIncrement(
-    Rectangle visibleRect,
-    int orientation,
-    int direction) {
-    return 10;
-  }
-  
 }

@@ -21,25 +21,34 @@
 package org.jdesktop.swingx.plaf;
 
 import java.awt.Color;
+import java.awt.GradientPaint;
 import java.awt.Toolkit;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.BorderFactory;
-import javax.swing.UIManager;
 import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import org.jdesktop.swingx.JXTaskPaneContainer;
+import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.plaf.windows.WindowsClassicLookAndFeelAddons;
 import org.jdesktop.swingx.plaf.windows.WindowsLookAndFeelAddons;
 import org.jdesktop.swingx.util.OS;
 
 /**
- * Addon for <code>JXTaskPaneContainer</code>. <br>
+ * Addon for <code>JXTaskPaneContainer</code>. This addon defines the following properties:
+ * <table>
+ * <tr><td>TaskPaneContainer.background</td><td>background color</td></tr>
+ * <tr><td>TaskPaneContainer.backgroundPainter</td><td>background painter</td></tr>
+ * <tr><td>TaskPaneContainer.border</td><td>container border</td></tr>
+ * <tr><td>TaskPaneContainer.font</td><td>font (currently unused)</td></tr>
+ * <tr><td>TaskPaneContainer.foreground</td><td>foreground color (currently unused)</td></tr>
+ * </table>
  *  
  * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
+ * @author Karl Schaefer
  */
 public class JXTaskPaneContainerAddon extends AbstractComponentAddon {
 
@@ -53,10 +62,9 @@ public class JXTaskPaneContainerAddon extends AbstractComponentAddon {
     defaults.addAll(Arrays.asList(new Object[]{
       JXTaskPaneContainer.uiClassID,
       "org.jdesktop.swingx.plaf.basic.BasicTaskPaneContainerUI",
-      "TaskPaneContainer.useGradient",
-      Boolean.FALSE,
       "TaskPaneContainer.background",
-      UIManager.getColor("Desktop.background"),
+      UIManagerExt.getSafeColor("Desktop.background",
+                        new ColorUIResource(Color.decode("#005C5C"))),
       "TaskPaneContainer.border",
       new BorderUIResource(BorderFactory.createEmptyBorder(10, 10, 0, 10))
     }));
@@ -77,30 +85,31 @@ public class JXTaskPaneContainerAddon extends AbstractComponentAddon {
     if (addon instanceof WindowsClassicLookAndFeelAddons) {
       defaults.addAll(Arrays.asList(new Object[]{
         "TaskPaneContainer.background",
-        UIManager.getColor("List.background")
+        UIManagerExt.getSafeColor("List.background",
+                new ColorUIResource(Color.decode("#005C5C")))
       }));      
     } else if (addon instanceof WindowsLookAndFeelAddons) {     
       String xpStyle = OS.getWindowsVisualStyle();
       ColorUIResource background;
-      ColorUIResource backgroundGradientStart;
-      ColorUIResource backgroundGradientEnd;
+      Color backgroundGradientStart;
+      Color backgroundGradientEnd;
       
       if (WindowsLookAndFeelAddons.HOMESTEAD_VISUAL_STYLE
         .equalsIgnoreCase(xpStyle)) {        
         background = new ColorUIResource(201, 215, 170);
-        backgroundGradientStart = new ColorUIResource(204, 217, 173);
-        backgroundGradientEnd = new ColorUIResource(165, 189, 132);
+        backgroundGradientStart = new Color(204, 217, 173);
+        backgroundGradientEnd = new Color(165, 189, 132);
       } else if (WindowsLookAndFeelAddons.SILVER_VISUAL_STYLE
         .equalsIgnoreCase(xpStyle)) {
         background = new ColorUIResource(192, 195, 209);
-        backgroundGradientStart = new ColorUIResource(196, 200, 212);
-        backgroundGradientEnd = new ColorUIResource(177, 179, 200);
+        backgroundGradientStart = new Color(196, 200, 212);
+        backgroundGradientEnd = new Color(177, 179, 200);
       } else {        
         if (OS.isWindowsVista()) {
           final Toolkit toolkit = Toolkit.getDefaultToolkit();
           background = new ColorUIResource((Color)toolkit.getDesktopProperty("win.3d.backgroundColor"));
-          backgroundGradientStart = new ColorUIResource((Color)toolkit.getDesktopProperty("win.frame.activeCaptionColor"));
-          backgroundGradientEnd = new ColorUIResource((Color)toolkit.getDesktopProperty("win.frame.inactiveCaptionColor"));
+          backgroundGradientStart = (Color)toolkit.getDesktopProperty("win.frame.activeCaptionColor");
+          backgroundGradientEnd = (Color)toolkit.getDesktopProperty("win.frame.inactiveCaptionColor");
         } else {
           background = new ColorUIResource(117, 150, 227);
           backgroundGradientStart = new ColorUIResource(123, 162, 231);
@@ -108,14 +117,12 @@ public class JXTaskPaneContainerAddon extends AbstractComponentAddon {
         }
       }      
       defaults.addAll(Arrays.asList(new Object[]{
-        "TaskPaneContainer.useGradient",
-        Boolean.TRUE,
+        "TaskPaneContainer.backgroundPainter",
+        new PainterUIResource(new MattePainter(new GradientPaint(
+                            0f, 0f, backgroundGradientStart, 0f, 1f,
+                            backgroundGradientEnd), true)),
         "TaskPaneContainer.background",
         background,
-        "TaskPaneContainer.backgroundGradientStart",
-        backgroundGradientStart,
-        "TaskPaneContainer.backgroundGradientEnd",
-        backgroundGradientEnd,
       }));
     }
   }
