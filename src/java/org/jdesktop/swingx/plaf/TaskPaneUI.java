@@ -31,7 +31,7 @@ import javax.swing.plaf.PanelUI;
  *  
  * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
  */
-public class TaskPaneUI extends PanelUI {
+public abstract class TaskPaneUI extends PanelUI {
 
   /**
    * Called by the component when an action is added to the component through

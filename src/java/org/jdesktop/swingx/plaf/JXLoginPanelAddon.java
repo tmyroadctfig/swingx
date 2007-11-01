@@ -28,13 +28,14 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import javax.swing.ImageIcon;
+import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.FontUIResource;
-import javax.swing.plaf.IconUIResource;
 import javax.swing.plaf.metal.MetalLookAndFeel;
+
 import org.jdesktop.swingx.JXLoginPanel;
+
 /**
  *
  * @author rbair
@@ -52,8 +53,9 @@ public class JXLoginPanelAddon extends AbstractComponentAddon {
     defaults.addAll(Arrays.asList(new Object[] { 
       JXLoginPanel.uiClassID,
       "org.jdesktop.swingx.plaf.basic.BasicLoginPanelUI",
+      //TODO this icon is unused; remove?
       "JXLoginPanel.error.icon",
-      new IconUIResource(new ImageIcon(getClass().getResource("resources/error16.png"))),
+      LookAndFeel.makeIcon(JXLoginPanelAddon.class, "resources/error16.png"),
       "JXLoginPanel.banner.font",
       new FontUIResource("Arial Bold", Font.PLAIN, 36),
       "JXLoginPanel.banner.foreground", new ColorUIResource(Color.WHITE),

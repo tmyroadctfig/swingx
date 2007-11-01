@@ -21,13 +21,12 @@
 package org.jdesktop.swingx.plaf;
 
 import java.awt.Color;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
-import javax.swing.ImageIcon;
-import javax.swing.UIManager;
+
+import javax.swing.LookAndFeel;
 import javax.swing.plaf.ColorUIResource;
-import javax.swing.plaf.IconUIResource;
+
 import org.jdesktop.swingx.JXHeader;
 
 /**
@@ -45,8 +44,10 @@ public class JXHeaderAddon extends AbstractComponentAddon {
         super.addBasicDefaults(addon, defaults);
         defaults.addAll(Arrays.asList(new Object[]{
             JXHeader.uiClassID, "org.jdesktop.swingx.plaf.basic.BasicHeaderUI",
-            "Header.defaultIcon", getIcon("resources/header-default.png"),
-            "Header.background", UIManager.getColor("control")
+            "Header.defaultIcon", LookAndFeel.makeIcon(JXHeaderAddon.class,
+                    "resources/header-default.png"),
+            "Header.background", UIManagerExt.getSafeColor("control",
+                    new ColorUIResource(Color.decode("#C0C0C0")))
         }));
     }
 
@@ -55,7 +56,6 @@ public class JXHeaderAddon extends AbstractComponentAddon {
         super.addMacDefaults(addon, defaults);
         defaults.addAll(Arrays.asList(new Object[]{
             JXHeader.uiClassID, "org.jdesktop.swingx.plaf.macosx.MacOSXHeaderUI",
-            "Header.defaultIcon", getIcon("resources/header-default.png")
         }));
     }
 
@@ -65,14 +65,5 @@ public class JXHeaderAddon extends AbstractComponentAddon {
         defaults.addAll(Arrays.asList(new Object[]{
             "Header.background", new ColorUIResource(new Color(214, 217, 223, 255))
         }));
-    }
-
-    private IconUIResource getIcon(String resourceName) {
-        URL url = JXHeaderAddon.class.getResource(resourceName);
-        if (url == null) {
-            return null;
-        } else {
-            return new IconUIResource(new ImageIcon(url));
-        }
     }
 }

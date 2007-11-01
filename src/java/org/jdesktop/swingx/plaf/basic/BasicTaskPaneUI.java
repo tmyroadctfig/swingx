@@ -83,6 +83,9 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 
 	protected PropertyChangeListener propertyListener;
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void installUI(JComponent c) {
 		super.installUI(c);

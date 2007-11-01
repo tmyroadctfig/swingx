@@ -22,10 +22,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
+import javax.swing.LookAndFeel;
 import javax.swing.border.LineBorder;
 import javax.swing.plaf.BorderUIResource;
-import javax.swing.plaf.IconUIResource;
 
 import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.plaf.basic.BasicDatePickerUI;
@@ -56,8 +55,7 @@ public class JXDatePickerAddon extends AbstractComponentAddon {
         super.addWindowsDefaults(addon, defaults);
         defaults.addAll(Arrays.asList(new Object[] {
                 "JXDatePicker.arrowDown.image",
-                new IconUIResource(new ImageIcon(JXDatePickerAddon.class
-                        .getResource("resources/combo-xp.png")))
+                LookAndFeel.makeIcon(JXDatePickerAddon.class, "resources/combo-xp.png")
         }));
     }
 
@@ -66,8 +64,7 @@ public class JXDatePickerAddon extends AbstractComponentAddon {
         super.addMacDefaults(addon, defaults);
         defaults.addAll(Arrays.asList(new Object[] {
                 "JXDatePicker.arrowDown.image",
-                new IconUIResource(new ImageIcon(JXDatePickerAddon.class
-                        .getResource("resources/combo-osx.png")))
+                LookAndFeel.makeIcon(JXDatePickerAddon.class, "resources/combo-osx.png")
         }));
     }
 }

@@ -53,10 +53,8 @@ public class JXTaskPaneAddon extends AbstractComponentAddon {
 
   @Override
   protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
-    Font taskPaneFont = UIManager.getFont("Label.font");
-    if (taskPaneFont == null) {
-      taskPaneFont = new Font("Dialog", Font.PLAIN, 12);
-    }
+    Font taskPaneFont = UIManagerExt.getSafeFont("Label.font", new Font(
+                "Dialog", Font.PLAIN, 12));
     taskPaneFont = taskPaneFont.deriveFont(Font.BOLD);
     
     Color menuBackground = new ColorUIResource(SystemColor.menu);
@@ -66,7 +64,8 @@ public class JXTaskPaneAddon extends AbstractComponentAddon {
       "TaskPane.font",
       new FontUIResource(taskPaneFont),        
       "TaskPane.background",
-      UIManager.getColor("List.background"),
+      UIManagerExt.getSafeColor("List.background",
+              new ColorUIResource(Color.decode("#005C5C"))),
       "TaskPane.specialTitleBackground",
       new ColorUIResource(menuBackground.darker()),
       "TaskPane.titleBackgroundGradientStart",

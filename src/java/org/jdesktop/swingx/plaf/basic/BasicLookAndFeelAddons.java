@@ -25,6 +25,6 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 /**
  * Install simple pluggable UI. Usually not used directly, subclasses should be
  * preferred as this addon may not provide complete implementation of the
- * additionnal pluggable UIs.
+ * additional pluggable UIs.
  */
 public class BasicLookAndFeelAddons extends LookAndFeelAddons { }

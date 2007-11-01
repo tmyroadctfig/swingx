@@ -22,12 +22,13 @@ package org.jdesktop.swingx.plaf;
 
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.GradientPaint;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.UIManager;
 import javax.swing.plaf.ColorUIResource;
+import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.InsetsUIResource;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
@@ -51,7 +52,7 @@ public class JXTitledPanelAddon extends AbstractComponentAddon {
       JXTitledPanel.uiClassID,
       "org.jdesktop.swingx.plaf.metal.MetalTitledPanelUI",
       "JXTitledPanel.titleFont",
-      UIManager.getFont("Button.font"),
+      UIManagerExt.getSafeFont("Button.font", new FontUIResource("Dialog", Font.PLAIN, 12)),
       "JXTitledPanel.titleForeground", new ColorUIResource(Color.WHITE),
       "JXTitledPanel.titlePainter", new PainterUIResource(
               new MattePainter(new GradientPaint(0, 0, Color.LIGHT_GRAY, 0, 1, Color.GRAY), true)),
@@ -103,13 +104,20 @@ public class JXTitledPanelAddon extends AbstractComponentAddon {
     // all LFs, so changed to fall-back to something real
     // don't understand why this has blown when trying to toggle to Metal...
     // definitely needs deeper digging 
+    // kgs: moved to using getSafeXXX from UIManagerExt
     defaults.addAll(Arrays.asList(new Object[] { 
             "JXTitledPanel.titleForeground", 
-                getSafeColor("InternalFrame.activeTitleForeground", new ColorUIResource(255, 255, 255)),
+                UIManagerExt.getSafeColor(
+                        "InternalFrame.activeTitleForeground",
+                        new ColorUIResource(255, 255, 255)),
             "JXTitledPanel.titlePainter", new PainterUIResource(
                     new MattePainter(new GradientPaint(0, 0, 
-                        getSafeColor("InternalFrame.inactiveTitleGradient", new ColorUIResource(49, 121, 242)), 0, 1,
-                        getSafeColor("InternalFrame.activeTitleBackground", new ColorUIResource(198, 211, 247))),true))
+                        UIManagerExt.getSafeColor(
+                                "InternalFrame.inactiveTitleGradient",
+                                new ColorUIResource(49, 121, 242)), 0, 1,
+                        UIManagerExt.getSafeColor(
+                                "InternalFrame.activeTitleBackground",
+                                new ColorUIResource(198, 211, 247))), true))
         }));
 
 //    defaults.addAll(Arrays.asList(new Object[] { 
@@ -121,13 +129,5 @@ public class JXTitledPanelAddon extends AbstractComponentAddon {
 //    }));
 
   
-  }
-
-  protected Color getSafeColor(String uiKey, Color fallBack) {
-      Color color = UIManager.getColor(uiKey);
-      if (color == null) {
-          color = fallBack;
-      }
-      return color;
   }
 }

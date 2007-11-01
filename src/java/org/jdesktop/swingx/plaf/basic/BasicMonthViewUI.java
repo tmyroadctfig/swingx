@@ -204,8 +204,8 @@ public class BasicMonthViewUI extends MonthViewUI {
             monthView.setBackground(UIManager.getColor("JXMonthView.background"));
         }
         monthView.setDaysOfTheWeek(daysOfTheWeek);
-        monthView.setBoxPaddingX((Integer)UIManager.get("JXMonthView.boxPaddingX"));
-        monthView.setBoxPaddingY((Integer)UIManager.get("JXMonthView.boxPaddingY"));
+        monthView.setBoxPaddingX(UIManager.getInt("JXMonthView.boxPaddingX"));
+        monthView.setBoxPaddingY(UIManager.getInt("JXMonthView.boxPaddingY"));
         monthView.setMonthStringBackground(UIManager.getColor("JXMonthView.monthStringBackground"));
         monthView.setMonthStringForeground(UIManager.getColor("JXMonthView.monthStringForeground"));
         monthView.setDaysOfTheWeekForeground(UIManager.getColor("JXMonthView.daysOfTheWeekForeground"));

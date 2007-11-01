@@ -4,6 +4,7 @@
 package org.jdesktop.swingx.plaf;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.util.Locale;
 
 import javax.swing.UIDefaults;
@@ -91,5 +92,30 @@ public class UIManagerExt {
         }
         
         return safeColor;
+    }
+    
+    /**
+     * Returns a font from the defaults. If the value for {@code key} is not a
+     * {@code Font}, {@code defaultFont} is returned.
+     * 
+     * @param key
+     *                an {@code Object} specifying the font
+     * @param defaultFont
+     *                the font to return if the font specified by {@code key}
+     *                does not exist
+     * @return the {@code Font} object
+     * @throws NullPointerException
+     *                 if {@code key} or {@code defaultFont} is {@code null}
+     */
+    public static Font getSafeFont(Object key, Font defaultFont) {
+        Contract.asNotNull(defaultFont, "defaultColor cannot be null");
+        
+        Font safeFont = UIManager.getFont(key);
+        
+        if (safeFont == null) {
+            safeFont = defaultFont;
+        }
+        
+        return safeFont;
     }
 }

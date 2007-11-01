@@ -26,7 +26,6 @@ import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.LookAndFeel;
-import javax.swing.UIManager;
 import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.FontUIResource;
@@ -52,17 +51,12 @@ public class JXTipOfTheDayAddon extends AbstractComponentAddon {
     defaults.add(BasicTipOfTheDayUI.class.getName());
 
     defaults.add("TipOfTheDay.font");
-    Font font = UIManager.getFont("TextPane.font");
-    if (font == null) {
-      font = new Font("Serif", Font.PLAIN, 12);
-    }
-    defaults.add(new FontUIResource(font));
+    defaults.add(UIManagerExt.getSafeFont("TipOfTheDay.font",
+                new FontUIResource("Serif", Font.PLAIN, 12)));
 
     defaults.add("TipOfTheDay.tipFont");
-    font = UIManager.getFont("Label.font");
-    if (font == null) {
-      font = new Font("Dialog", Font.PLAIN, 12);
-    }
+    Font font = UIManagerExt.getSafeFont("Label.font",
+            new Font("Dialog", Font.PLAIN, 12));
     font = font.deriveFont(Font.BOLD, 13f);
     defaults.add(new FontUIResource(font));
 
@@ -93,10 +87,8 @@ public class JXTipOfTheDayAddon extends AbstractComponentAddon {
     defaults.add(new ColorUIResource(128, 128, 128));
 
     defaults.add("TipOfTheDay.font");
-    Font font = UIManager.getFont("Label.font");
-    if (font == null) {
-      font = new Font("Dialog", Font.PLAIN, 12);
-    }
+    Font font = UIManagerExt.getSafeFont("Label.font",
+            new Font("Dialog", Font.PLAIN, 12));
     font = font.deriveFont(13f);
     defaults.add(new FontUIResource(font));
 
