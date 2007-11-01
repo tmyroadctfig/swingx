@@ -54,7 +54,7 @@ public class JXDatePickerAddon extends AbstractComponentAddon {
     protected void addWindowsDefaults(LookAndFeelAddons addon, List<Object> defaults) {
         super.addWindowsDefaults(addon, defaults);
         defaults.addAll(Arrays.asList(new Object[] {
-                "JXDatePicker.arrowDown.image",
+                "JXDatePicker.arrowIcon",
                 LookAndFeel.makeIcon(JXDatePickerAddon.class, "resources/combo-xp.png")
         }));
     }
@@ -63,7 +63,7 @@ public class JXDatePickerAddon extends AbstractComponentAddon {
     protected void addMacDefaults(LookAndFeelAddons addon, List<Object> defaults) {
         super.addMacDefaults(addon, defaults);
         defaults.addAll(Arrays.asList(new Object[] {
-                "JXDatePicker.arrowDown.image",
+                "JXDatePicker.arrowIcon",
                 LookAndFeel.makeIcon(JXDatePickerAddon.class, "resources/combo-osx.png")
         }));
     }

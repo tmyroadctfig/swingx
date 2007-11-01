@@ -26,10 +26,11 @@ import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
+
 import javax.swing.JComponent;
 import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
-import org.jdesktop.swingx.JXLoginDialog;
+
 import org.jdesktop.swingx.JXLoginPanel;
 import org.jdesktop.swingx.plaf.LoginPanelUI;
 /**
@@ -57,7 +58,7 @@ public class BasicLoginPanelUI extends LoginPanelUI {
 
         BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2 = img.createGraphics();
-        Font font = UIManager.getFont("JXLoginPanel.banner.font");
+        Font font = UIManager.getFont("JXLoginPanel.bannerFont");
         g2.setFont(font);
         Graphics2D originalGraphics = g2;
         if(!dlg.getComponentOrientation().isLeftToRight()) {
@@ -74,7 +75,7 @@ public class BasicLoginPanelUI extends LoginPanelUI {
         g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
 
         //draw a big square
-        g2.setColor(UIManager.getColor("JXLoginPanel.banner.darkBackground"));
+        g2.setColor(UIManager.getColor("JXLoginPanel.bannerDarkBackground"));
         g2.fillRect(0, 0, w, h);
 
         //create the curve shape
@@ -87,12 +88,12 @@ public class BasicLoginPanelUI extends LoginPanelUI {
         curveShape.closePath();
 
         //draw into the buffer a gradient (bottom to top), and the text "Login"
-        GradientPaint gp = new GradientPaint(0, h, UIManager.getColor("JXLoginPanel.banner.darkBackground"),
-                0, 0, UIManager.getColor("JXLoginPanel.banner.lightBackground"));
+        GradientPaint gp = new GradientPaint(0, h, UIManager.getColor("JXLoginPanel.bannerDarkBackground"),
+                0, 0, UIManager.getColor("JXLoginPanel.bannerLightBackground"));
         g2.setPaint(gp);
         g2.fill(curveShape);
 
-        originalGraphics.setColor(UIManager.getColor("JXLoginPanel.banner.foreground"));
+        originalGraphics.setColor(UIManager.getColor("JXLoginPanel.bannerForeground"));
         originalGraphics.drawString(dlg.getBannerText(), loginStringX, loginStringY);
         return img;
     }

@@ -54,13 +54,13 @@ public class JXLoginPanelAddon extends AbstractComponentAddon {
       JXLoginPanel.uiClassID,
       "org.jdesktop.swingx.plaf.basic.BasicLoginPanelUI",
       //TODO this icon is unused; remove?
-      "JXLoginPanel.error.icon",
+      "JXLoginPanel.errorIcon",
       LookAndFeel.makeIcon(JXLoginPanelAddon.class, "resources/error16.png"),
-      "JXLoginPanel.banner.font",
+      "JXLoginPanel.bannerFont",
       new FontUIResource("Arial Bold", Font.PLAIN, 36),
-      "JXLoginPanel.banner.foreground", new ColorUIResource(Color.WHITE),
-      "JXLoginPanel.banner.darkBackground", new ColorUIResource(Color.GRAY),
-      "JXLoginPanel.banner.lightBackground", new ColorUIResource(Color.LIGHT_GRAY),
+      "JXLoginPanel.bannerForeground", new ColorUIResource(Color.WHITE),
+      "JXLoginPanel.bannerDarkBackground", new ColorUIResource(Color.GRAY),
+      "JXLoginPanel.bannerLightBackground", new ColorUIResource(Color.LIGHT_GRAY),
     }));
     // Popuplate UIDefaults with the localizable Strings we will use
     // in the Login panel.
@@ -80,15 +80,15 @@ public class JXLoginPanelAddon extends AbstractComponentAddon {
 
     if (isPlastic()) {
       defaults.addAll(Arrays.asList(new Object[] { 
-        "JXLoginPanel.banner.foreground", new ColorUIResource(Color.WHITE),
-        "JXLoginPanel.banner.darkBackground", new ColorUIResource(Color.GRAY),
-        "JXLoginPanel.banner.lightBackground", new ColorUIResource(Color.LIGHT_GRAY),
+        "JXLoginPanel.bannerForeground", new ColorUIResource(Color.WHITE),
+        "JXLoginPanel.bannerDarkBackground", new ColorUIResource(Color.GRAY),
+        "JXLoginPanel.bannerLightBackground", new ColorUIResource(Color.LIGHT_GRAY),
       }));
     } else {
       defaults.addAll(Arrays.asList(new Object[] { 
-        "JXLoginPanel.banner.foreground", new ColorUIResource(255, 255, 255),
-        "JXLoginPanel.banner.darkBackground", MetalLookAndFeel.getCurrentTheme().getPrimaryControlDarkShadow(),
-        "JXLoginPanel.banner.lightBackground", MetalLookAndFeel.getCurrentTheme().getPrimaryControl()
+        "JXLoginPanel.bannerForeground", new ColorUIResource(Color.WHITE),
+        "JXLoginPanel.bannerDarkBackground", MetalLookAndFeel.getCurrentTheme().getPrimaryControlDarkShadow(),
+        "JXLoginPanel.bannerLightBackground", MetalLookAndFeel.getCurrentTheme().getPrimaryControl()
       }));
     }
   }
@@ -97,9 +97,9 @@ public class JXLoginPanelAddon extends AbstractComponentAddon {
   protected void addWindowsDefaults(LookAndFeelAddons addon, List<Object> defaults) {
     super.addWindowsDefaults(addon, defaults);
     defaults.addAll(Arrays.asList(new Object[] { 
-      "JXLoginPanel.banner.foreground", new ColorUIResource(255, 255, 255),
-      "JXLoginPanel.banner.darkBackground", new ColorUIResource(49, 121, 242),
-      "JXLoginPanel.banner.lightBackground", new ColorUIResource(198, 211, 247),
+      "JXLoginPanel.bannerForeground", new ColorUIResource(Color.WHITE),
+      "JXLoginPanel.bannerDarkBackground", new ColorUIResource(49, 121, 242),
+      "JXLoginPanel.bannerLightBackground", new ColorUIResource(198, 211, 247),
     }));
   }
 }

@@ -436,7 +436,7 @@ public class BasicDatePickerUI extends DatePickerUI {
         b.setRolloverEnabled(false);
         b.setMargin(new Insets(0, 3, 0, 3));
 
-        Icon icon = UIManager.getIcon("JXDatePicker.arrowDown.image");
+        Icon icon = UIManager.getIcon("JXDatePicker.arrowIcon");
         if (icon == null) {
             icon = (Icon)UIManager.get("Tree.expandedIcon");
         }
