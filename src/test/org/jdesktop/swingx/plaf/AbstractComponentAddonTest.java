@@ -10,5 +10,10 @@ import junit.framework.TestCase;
  *
  */
 public class AbstractComponentAddonTest extends TestCase {
-
+    /**
+     * Added until the centralization of the child testing works.
+     */
+    public void testDummy() {
+        
+    }
 }
