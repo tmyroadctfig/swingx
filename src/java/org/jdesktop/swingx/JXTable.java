@@ -4442,6 +4442,22 @@ public class JXTable extends JTable
     }
 
     /**
+     * {@inheritDoc} <p>
+     * Behaves exactly like super. <p>
+     * It's overridden to 
+     * warn against a frequent programming error: this method toggles only the
+     * <b>visibility</b> of the grid lines, it <b>does not</b> update the row/column
+     * margins - which may lead to visual artefacts, as f.i. not showing the lines at all or
+     * showing normal table background in selected state where the lines should have been.
+     * 
+     * @see #setShowGrid(boolean, boolean) for an alternative
+     */
+    @Override
+    public void setShowGrid(boolean showGrid) {
+        super.setShowGrid(showGrid);
+    }
+
+    /**
      * {@inheritDoc}
      * <p>
      * Overriden to keep view/model coordinates of SizeSequence in synch. Marks
