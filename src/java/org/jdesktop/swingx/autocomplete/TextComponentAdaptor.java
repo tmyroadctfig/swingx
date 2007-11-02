@@ -33,7 +33,7 @@ public class TextComponentAdaptor extends AbstractAutoCompleteAdaptor {
     
     /** a <tt>List</tt> containing the strings to be used for automatic
      * completion */
-    List items;
+    List<?> items;
     /** the text component that is used for automatic completion*/
     JTextComponent textComponent;
     /** the item that is currently selected */
@@ -48,7 +48,7 @@ public class TextComponentAdaptor extends AbstractAutoCompleteAdaptor {
      * @param textComponent the text component that will be used automatic
      * completion
      */
-    public TextComponentAdaptor(JTextComponent textComponent, List items) {
+    public TextComponentAdaptor(JTextComponent textComponent, List<?> items) {
         this.items = items;
         this.textComponent = textComponent;
     }

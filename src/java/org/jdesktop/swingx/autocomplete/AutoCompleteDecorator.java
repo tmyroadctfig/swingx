@@ -22,7 +22,6 @@ package org.jdesktop.swingx.autocomplete;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -103,7 +102,7 @@ public class AutoCompleteDecorator {
      * @param items contains the items that are used for autocompletion
      * @param strictMatching <tt>true</tt>, if only given items should be allowed to be entered
      */
-    public static void decorate(JTextComponent textComponent, List items, boolean strictMatching) {
+    public static void decorate(JTextComponent textComponent, List<?> items, boolean strictMatching) {
         decorate(textComponent, items, strictMatching, ObjectToStringConverter.DEFAULT_IMPLEMENTATION);
     }
     
@@ -116,7 +115,7 @@ public class AutoCompleteDecorator {
      * @param strictMatching <tt>true</tt>, if only given items should be allowed to be entered
      * @param stringConverter the converter used to transform items to strings
      */
-    public static void decorate(JTextComponent textComponent, List items, boolean strictMatching, ObjectToStringConverter stringConverter) {
+    public static void decorate(JTextComponent textComponent, List<?> items, boolean strictMatching, ObjectToStringConverter stringConverter) {
         AbstractAutoCompleteAdaptor adaptor = new TextComponentAdaptor(textComponent, items);
         AutoCompleteDocument document = new AutoCompleteDocument(adaptor, strictMatching, stringConverter);
         decorate(textComponent, document, adaptor);
@@ -191,9 +190,9 @@ public class AutoCompleteDecorator {
                 if (comboBox.isDisplayable() && !comboBox.isPopupVisible()) {
                     int keyCode = keyEvent.getKeyCode();
                     // don't popup when the user hits shift,ctrl or alt
-                    if (keyCode==keyEvent.VK_SHIFT || keyCode==keyEvent.VK_CONTROL || keyCode==keyEvent.VK_ALT) return;
+                    if (keyCode==KeyEvent.VK_SHIFT || keyCode==KeyEvent.VK_CONTROL || keyCode==KeyEvent.VK_ALT) return;
                     // don't popup when the user hits escape (see issue #311)
-                    if (keyCode==keyEvent.VK_ESCAPE) return;
+                    if (keyCode==KeyEvent.VK_ESCAPE) return;
                     comboBox.setPopupVisible(true);
                 }
             }

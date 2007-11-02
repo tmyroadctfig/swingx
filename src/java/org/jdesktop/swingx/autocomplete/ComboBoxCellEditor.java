@@ -128,7 +128,7 @@ public class ComboBoxCellEditor extends AbstractCellEditor implements TableCellE
     class Handler extends KeyAdapter implements PropertyChangeListener {
         public void keyPressed(KeyEvent keyEvent) {
             int keyCode = keyEvent.getKeyCode();
-            if (keyCode==keyEvent.VK_ENTER) stopCellEditing();
+            if (keyCode==KeyEvent.VK_ENTER) stopCellEditing();
         }
         public void propertyChange(PropertyChangeEvent e) {
             if (e.getPropertyName().equals("editor")) {

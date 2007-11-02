@@ -22,11 +22,8 @@ package org.jdesktop.swingx.autocomplete;
 
 import java.awt.Component;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 import javax.swing.ComboBoxEditor;
-import javax.swing.JComboBox;
 
 /**
  * <p>
