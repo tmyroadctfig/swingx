@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractButton;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
@@ -46,6 +47,61 @@ import org.jdesktop.swingx.test.XTestUtils;
 public class RenderingTest extends TestCase {
     private static final Logger LOG = Logger.getLogger(RenderingTest.class
             .getName());
+
+    /**
+     * Test provider respect converter. 
+     * 
+     * Here: must show the
+     * description instead of setting the icon.
+     *
+     */
+    public void testLabelProviderRespectStringValueNoIcon() {
+        ImageIcon icon = (ImageIcon) XTestUtils.loadDefaultIcon();
+        icon.setDescription("description");
+        LabelProvider provider = new LabelProvider(
+                new MappedValue(StringValue.TO_STRING, IconValue.EMPTY));
+        TableCellContext context = new TableCellContext();
+        context.value = icon;
+        JLabel label = provider.getRendererComponent(context);
+        assertNull("icon must be null", label.getIcon());
+        assertEquals("label text must be default to-string", StringValue.TO_STRING.getString(icon), label.getText());
+    }
+    
+    /**
+     * Test provider respect converter. 
+     * 
+     * Here: must show the icon and empty text.
+     *
+     */
+    public void testLabelProviderRespectIconValueNoString() {
+        ImageIcon icon = (ImageIcon) XTestUtils.loadDefaultIcon();
+        icon.setDescription("description");
+        LabelProvider provider = new LabelProvider(
+                new MappedValue(StringValue.EMPTY, IconValue.ICON));
+        TableCellContext context = new TableCellContext();
+        context.value = icon;
+        JLabel label = provider.getRendererComponent(context);
+        assertEquals(icon, label.getIcon());
+        assertEquals("label text must be empty", StringValue.EMPTY.getString(icon), label.getText());
+    }
+    
+    /**
+     * Test provider respect converter. 
+     * 
+     * Here: must show both description and icon.
+     *
+     */
+    public void testLabelProviderRespectStringIconValueBoth() {
+        ImageIcon icon = (ImageIcon) XTestUtils.loadDefaultIcon();
+        icon.setDescription("description");
+        LabelProvider provider = new LabelProvider(
+                new MappedValue(StringValue.TO_STRING, IconValue.ICON));
+        TableCellContext context = new TableCellContext();
+        context.value = icon;
+        JLabel label = provider.getRendererComponent(context);
+        assertEquals(icon, label.getIcon());
+        assertEquals(StringValue.TO_STRING.getString(icon), label.getText());
+    }
 
     /**
      * WrappingProvider: test custom icon
