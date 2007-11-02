@@ -64,6 +64,33 @@ public final class TestUtils extends Assert {
 
     /**
      * Asserts the last received propertyChangeEvent of the 
+     * report against the expected values.
+     * 
+     * @param report the PropertyReport which received the event
+     * @param property the expected name of the property
+     * @param oldValue the expected old value 
+     * @param newValue the expected new value
+     * @param single flag to denote if we expect one event only
+     */
+    public static void assertPropertyChangeEvent(PropertyChangeReport report, 
+            String property, Object oldValue, Object newValue, boolean single) {
+        if (report.getEventCount() > 1) {
+            LOG.info("events: " + report.getEventNames());
+        }
+        if (single) {
+            assertEquals("exactly one event", 1, report.getEventCount());
+            assertEquals("property", property, report.getLastProperty());
+            assertEquals("last old value", oldValue, report.getLastOldValue());
+            assertEquals("last old value", newValue, report.getLastNewValue());
+        } else {
+            assertEquals("one event of property " + property, 1, report.getEventCount(property));
+            assertEquals("old property", oldValue, report.getLastOldValue(property));
+            assertEquals("new property", newValue, report.getLastNewValue(property));
+        }
+    }
+
+    /**
+     * Asserts the last received propertyChangeEvent of the 
      * report against the expected values (arrays).
      * 
      * @param report the PropertyReport which received the event
