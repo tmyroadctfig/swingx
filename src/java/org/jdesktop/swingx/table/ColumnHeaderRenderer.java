@@ -26,7 +26,6 @@ import java.awt.Component;
 import java.awt.Font;
 import java.util.logging.Logger;
 
-import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -67,6 +66,7 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 public class ColumnHeaderRenderer extends JComponent 
     implements TableCellRenderer
     , UIResource {
+    @SuppressWarnings("unused")
     private static final Logger LOG = Logger
             .getLogger(ColumnHeaderRenderer.class.getName());
     // the inheritance is only to make sure we are updated on LF change
@@ -92,7 +92,6 @@ public class ColumnHeaderRenderer extends JComponent
     private TableCellRenderer delegateRenderer;
 
     private LabelProperties label;
-    private Border vistaBorder;
 
     /**
      * Returns the shared ColumnHeaderRenderer. <p> 
@@ -177,7 +176,6 @@ public class ColumnHeaderRenderer extends JComponent
         JTableHeader header = new JTableHeader();
         delegateRenderer = header.getDefaultRenderer();
     }
-//    private final Border border=BorderFactory.createEmptyBorder(5, 5, 5, 5);
 
     public Component getTableCellRendererComponent(JTable table, Object value,
             boolean isSelected, boolean hasFocus, int rowIndex, int columnIndex) {
@@ -348,20 +346,8 @@ public class ColumnHeaderRenderer extends JComponent
         if (header.getDefaultRenderer() != this) {
             delegateRenderer = header.getDefaultRenderer();
         }
-        // don't touch if custom
-//        if (!(header.getDefaultRenderer() instanceof UIResource)) return;
-//        if (header.getDefaultRenderer() instanceof ColumnHeaderRenderer) {
-//            
-//          ((ColumnHeaderRenderer) header.getDefaultRenderer()).updateIconUI();  
-//        } else { 
-//          // the UI installed a renderer - we wrap it with the icon
-//          ColumnHeaderRenderer renderer = new ColumnHeaderRenderer();  
-//          renderer.delegateRenderer = header.getDefaultRenderer(); 
-//          header.setDefaultRenderer(renderer);
-//          ((ColumnHeaderRenderer) header.getDefaultRenderer()).updateIconUI();  
-//            
-//        }
     }
+    
     private void updateIconUI() {
         if (getUpIcon() instanceof UIResource) {
             Icon icon = UIManager.getIcon(UP_ICON_KEY);

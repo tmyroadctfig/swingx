@@ -86,6 +86,7 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
         LookAndFeel old = UIManager.getLookAndFeel();
         LOG.info("System-lf " + UIManager.getSystemLookAndFeelClassName());
         // force addon loading
+        @SuppressWarnings("unused")
         ColumnHeaderRenderer renderer = new ColumnHeaderRenderer();
         // be sure to install system LF
         try {
@@ -124,6 +125,7 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
         LookAndFeel old = UIManager.getLookAndFeel();
         LOG.info("System-lf " + UIManager.getSystemLookAndFeelClassName());
         // force addon loading
+        @SuppressWarnings("unused")
         ColumnHeaderRenderer renderer = new ColumnHeaderRenderer();
         // be sure to install system LF
         try {

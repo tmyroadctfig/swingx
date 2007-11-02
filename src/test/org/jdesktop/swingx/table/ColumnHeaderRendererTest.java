@@ -24,22 +24,12 @@ package org.jdesktop.swingx.table;
 import java.awt.BorderLayout;
 import java.util.logging.Logger;
 
-import javax.swing.BorderFactory;
-import javax.swing.CellEditor;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.LookAndFeel;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.border.Border;
-import javax.swing.event.CellEditorListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.plaf.UIResource;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
-import org.jdesktop.swingx.util.OS;
 
 /**
  * Test ColumnHeaderRenderer.
@@ -47,6 +37,7 @@ import org.jdesktop.swingx.util.OS;
  * @author Jeanette Winzenburg
  */
 public class ColumnHeaderRendererTest extends InteractiveTestCase {
+    @SuppressWarnings("unused")
     private static final Logger LOG = Logger
             .getLogger(ColumnHeaderRendererTest.class.getName());
 
