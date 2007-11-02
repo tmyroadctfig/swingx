@@ -20,25 +20,38 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dialog;
-import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Robot;
+import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.ContainerListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -53,6 +66,8 @@ import java.util.logging.Logger;
 import javax.swing.AbstractListModel;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -62,6 +77,7 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
@@ -69,6 +85,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.auth.DefaultUserNameStore;
@@ -104,9 +121,11 @@ import org.jdesktop.swingx.util.WindowUtils;
  * @author Shai Almog
  * @author rbair
  * @author Karl Schaefer
+ * @author rah003
  */
 
 public class JXLoginPanel extends JXImagePanel {
+    
     /**
      * The Logger
      */
@@ -203,6 +222,10 @@ public class JXLoginPanel extends JXImagePanel {
      */
     private JCheckBox saveCB;
     /**
+     * Label displayed whenever caps lock is on.
+     */
+    private JLabel capsOn;
+    /**
      * A special panel that displays a progress bar and cancel button, and
      * which notify the user of the login process, and allow them to cancel
      * that process.
@@ -210,7 +233,7 @@ public class JXLoginPanel extends JXImagePanel {
     private JXPanel progressPanel;
     /**
      * A JLabel on the progressPanel that is used for informing the user
-     * of the status of the login procedure (logging in..., cancelling login...)
+     * of the status of the login procedure (logging in..., canceling login...)
      */
     private JLabel progressMessageLabel;
     /**
@@ -250,6 +273,45 @@ public class JXLoginPanel extends JXImagePanel {
      * The default login listener used by this panel.
      */
     private LoginListener defaultLoginListener;
+    private CapsOnTestListener capsOnTestListener = new CapsOnTestListener();
+    private boolean caps;
+    private boolean isTestingCaps;
+    private AWTEventListener capsOnListener = new AWTEventListener() {
+        @Override
+        public void eventDispatched(AWTEvent event) {
+            if (!(event instanceof KeyEvent)) {
+                return;
+            }
+            KeyEvent e = (KeyEvent)event;
+            if (e.getID() != KeyEvent.KEY_PRESSED) {
+                return;
+            }
+            if (e.getKeyCode() == 20) {
+                setCapsLock(!isCapsLockOn());
+            }
+        }};
+	/**
+	 * Caps lock detection support
+	 */
+	private boolean capsLockSupport = true;
+
+	
+	/**
+	 * Login/cancel control pane;
+	 */
+	private JXBtnPanel buttonPanel;
+	private WindowFocusListener capsOnWinListener = new WindowFocusListener() {
+
+		@Override
+		public void windowGainedFocus(WindowEvent e) {
+			capsOnTestListener.focusGained(null);
+		}
+
+		@Override
+		public void windowLostFocus(WindowEvent e) {
+			// TODO Auto-generated method stub
+			
+		}};
     
     /**
      * Creates a default JXLoginPanel instance
@@ -259,7 +321,7 @@ public class JXLoginPanel extends JXImagePanel {
     }
 
     /**
-     * Popuplate UIDefaults with the localizable Strings we will use
+     * Populates UIDefaults with the localizable Strings we will use
      * in the Login panel.
      */
     private void reinitLocales(Locale l) {
@@ -278,19 +340,9 @@ public class JXLoginPanel extends JXImagePanel {
         if (w instanceof JXLoginFrame) {
             JXLoginFrame f = (JXLoginFrame) w;
             f.setTitle(UIManager.getString(CLASS_NAME + ".titleString"));
-            for (Component c : f.getContentPane().getComponents()) {
-                if (c instanceof JXBtnPanel) {
-                    JXBtnPanel p = (JXBtnPanel) c;
-                    p.getOk().setText(UIManager.getString(CLASS_NAME + ".loginString"));
-                    p.getCancel().setText(UIManager.getString(CLASS_NAME + ".cancelString"));
-                    int h = p.getOk().getPreferredSize().height;
-                    p.getOk().setPreferredSize(null);
-                    p.getCancel().setPreferredSize(null);
-                    int prefWidth = Math.max(p.getCancel().getPreferredSize().width, p.getOk().getPreferredSize().width);
-                    p.getCancel().setPreferredSize(new Dimension(prefWidth, h));
-                    p.getOk().setPreferredSize(new Dimension(prefWidth, p.getOk().getPreferredSize().height));
-                    p.invalidate();
-                }
+            if (buttonPanel != null) {
+                buttonPanel.getOk().setText(UIManager.getString(CLASS_NAME + ".loginString"));
+                buttonPanel.getCancel().setText(UIManager.getString(CLASS_NAME + ".cancelString"));
             }
         }
         JLabel lbl = (JLabel) passwordField.getClientProperty("labeledBy");
@@ -308,6 +360,9 @@ public class JXLoginPanel extends JXImagePanel {
             }
         }
         saveCB.setText(UIManager.getString(CLASS_NAME + ".rememberPasswordString"));
+        // by default, caps is initialized in off state - i.e. without warning. Setting to 
+        // whitespace preserves formatting of the panel.
+        capsOn.setText(isCapsLockOn() ? UIManager.getString(CLASS_NAME + ".capsOnWarning") : " ");
     }
     
     //--------------------------------------------------------- Constructors
@@ -398,10 +453,45 @@ public class JXLoginPanel extends JXImagePanel {
         }
 
         updateUI();
-        //initLocales(getDefaultLocale());
         initComponents();
     }
+    
+    /**
+     * Sets current state of the caps lock key as detected by the component.
+     * @param b True when caps lock is turned on, false otherwise.
+     */
+    private void setCapsLock(boolean b) {
+        caps = b;
+        capsOn.setText(caps ? UIManager.getString(CLASS_NAME + ".capsOnWarning") : " ");
+    }
+    
+    /**
+     * Gets current state of the caps lock as seen by the login panel. The state seen by the login 
+     * panel and therefore returned by this method can be delayed in comparison to the real caps 
+     * lock state and displayed by the keyboard light. This is usually the case when component or 
+     * its text fields are not focused.
+     * 
+     * @return True when caps lock is on, false otherwise. Returns always false when 
+     * <code>isCapsLockDetectionSupported()</code> returns false.
+     */
+    public boolean isCapsLockOn() {
+        return caps;
+    }
 
+    /**
+     * Check current state of the caps lock state detection. Note that the value can change after 
+     * component have been made visible. Due to current problems in locking key state detection by 
+     * core java detection of the changes in caps lock can be always reliably determined. When 
+     * component can't guarantee reliable detection it will switch it off. This is usually the case 
+     * for unsigned applets and webstart invoked application. Since your users are going to pass 
+     * their password in the component you should always sign it when distributing application over 
+     * the network.
+     * @return True if changes in caps lock state can be monitored by the component, false otherwise.
+     */
+    public boolean isCapsLockDetectionSupported() {
+        return capsLockSupport;
+    }
+    
     //------------------------------------------------------------- UI Logic
     
     /**
@@ -467,14 +557,18 @@ public class JXLoginPanel extends JXImagePanel {
         //create the NameComponent
         if (saveMode == SaveMode.NONE) {
             namePanel = new SimpleNamePanel();
+            namePanel.getComponent().addFocusListener(capsOnTestListener);
         } else {
             namePanel = new ComboNamePanel(userNameStore);
+            ((JComboBox) namePanel).getEditor().getEditorComponent().addFocusListener(capsOnTestListener);
         }
         JLabel nameLabel = new JLabel(UIManager.getString(CLASS_NAME + ".nameString"));
         nameLabel.setLabelFor(namePanel.getComponent());
         
         //create the password component
         passwordField = new JPasswordField("", 15);
+        passwordField.addFocusListener(capsOnTestListener);
+
         JLabel passwordLabel = new JLabel(UIManager.getString(CLASS_NAME + ".passwordString"));
         passwordLabel.setLabelFor(passwordField);
         
@@ -489,51 +583,54 @@ public class JXLoginPanel extends JXImagePanel {
         
         //create the save check box. By default, it is not selected
         saveCB = new JCheckBox(UIManager.getString(CLASS_NAME + ".rememberPasswordString"));
+        saveCB.setIconTextGap(10);
         saveCB.setSelected(false); //TODO should get this from prefs!!! And, it should be based on the user
         //determine whether to show/hide the save check box based on the SaveMode
         saveCB.setVisible(saveMode == SaveMode.PASSWORD || saveMode == SaveMode.BOTH);
         
+        capsOn = new JLabel(" ");
+        // don't show by default. We perform test when login panel gets focus.
+        
+        int lShift = 3;// lShift is used to align all other components with the checkbox
+        Insets labelInsets = new Insets(0, lShift, 5, 11);
+        GridLayout grid = new GridLayout(2,1);
+        grid.setVgap(5);
+        JPanel fields = new JPanel(grid);
+        fields.add(namePanel.getComponent());
+        fields.add(passwordField);
+
         loginPanel.setLayout(new GridBagLayout());
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        gridBagConstraints.insets = new Insets(0, 0, 5, 11);
+        gridBagConstraints.insets = new Insets(4, lShift, 5, 11);
         loginPanel.add(nameLabel, gridBagConstraints);
         
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.gridheight = 2;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new Insets(0, 0, 5, 0);
-        loginPanel.add(namePanel.getComponent(), gridBagConstraints);
+        loginPanel.add(fields, gridBagConstraints);
         
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        gridBagConstraints.insets = new Insets(0, 0, 5, 11);
+        gridBagConstraints.insets = new Insets(5, lShift, 5, 11);
         loginPanel.add(passwordLabel, gridBagConstraints);
-        
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new Insets(0, 0, 5, 0);
-        loginPanel.add(passwordField, gridBagConstraints);
         
         if (serverCombo != null) {
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 2;
             gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-            gridBagConstraints.insets = new Insets(0, 0, 5, 11);
+            gridBagConstraints.insets = labelInsets;
             loginPanel.add(serverLabel, gridBagConstraints);
 
             gridBagConstraints = new GridBagConstraints();
@@ -553,8 +650,18 @@ public class JXLoginPanel extends JXImagePanel {
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.LINE_START;
             gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(6, 0, 0, 0);
+            gridBagConstraints.insets = new Insets(6, 0, 5, 0);
             loginPanel.add(saveCB, gridBagConstraints);
+
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 4;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = labelInsets;
+            loginPanel.add(capsOn, gridBagConstraints);
         } else {
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -563,8 +670,18 @@ public class JXLoginPanel extends JXImagePanel {
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.LINE_START;
             gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(6, 0, 0, 0);
+            gridBagConstraints.insets = new Insets(6, 0, 5, 0);
             loginPanel.add(saveCB, gridBagConstraints);
+
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 3;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = labelInsets;
+            loginPanel.add(capsOn, gridBagConstraints);
         }
         return loginPanel;
     }
@@ -943,7 +1060,7 @@ public class JXLoginPanel extends JXImagePanel {
         super.setLocale(l);
         reinitLocales(l);
     }
-    // -------------------------------------------------------------- Methods
+    //-------------------------------------------------------------- Methods
     
     /**
      * Initiates the login procedure. This method is called internally by
@@ -990,6 +1107,42 @@ public class JXLoginPanel extends JXImagePanel {
         }
     }
     
+    @Override
+    public void removeNotify() {
+    	try {
+	    	// TODO: keep it here until all ui stuff is moved to uidelegate.
+    		if (capsLockSupport)
+    			Toolkit.getDefaultToolkit().removeAWTEventListener(capsOnListener);
+    	    Container c = JXLoginPanel.this;
+    	    while (c.getParent() != null) {
+    	    	c = c.getParent();
+    	    }
+    	    if (c instanceof Window) {
+    	    	((Window) c).addWindowFocusListener(capsOnWinListener );
+    	    }
+    	} catch (Exception e) {
+    		// bail out probably in unsigned app distributed over web
+    	}
+    	super.removeNotify();
+    }
+    
+    @Override
+    public void addNotify() {
+    	try {
+    	    Toolkit.getDefaultToolkit().addAWTEventListener(capsOnListener, AWTEvent.KEY_EVENT_MASK);
+    	    Container c = JXLoginPanel.this;
+    	    while (c.getParent() != null) {
+    	    	c = c.getParent();
+    	    }
+    	    if (c instanceof Window) {
+    	    	((Window) c).addWindowFocusListener(capsOnWinListener );
+    	    }
+    	} catch (Exception e) {
+    		// probably unsigned app over web, disable capslock support and bail out
+    		capsLockSupport = false;
+    	}
+    	super.addNotify();
+    }
     //--------------------------------------------- Listener Implementations
     /*
      
@@ -1181,6 +1334,7 @@ public class JXLoginPanel extends JXImagePanel {
             this.userNameStore = userNameStore;
             setModel(new NameComboBoxModel());
             setEditable(true);
+
         }
         public String getUserName() {
             Object item = getModel().getSelectedItem();
@@ -1378,13 +1532,13 @@ public class JXLoginPanel extends JXImagePanel {
         });
         cancelButton.setText(UIManager.getString(CLASS_NAME + ".cancelString"));
         okButton.setText(UIManager.getString(CLASS_NAME + ".loginString"));
-        int prefWidth = Math.max(cancelButton.getPreferredSize().width, okButton.getPreferredSize().width);
-        cancelButton.setPreferredSize(new Dimension(prefWidth, okButton.getPreferredSize().height));
-        okButton.setPreferredSize(new Dimension(prefWidth, okButton.getPreferredSize().height));
-        JXPanel buttonPanel = new JXBtnPanel(new GridBagLayout(), okButton, cancelButton);
-        buttonPanel.add(okButton, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(17, 12, 11, 5), 0, 0));
-        buttonPanel.add(cancelButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(17, 0, 11, 11), 0, 0));
-        w.add(buttonPanel, BorderLayout.SOUTH);            
+        JXBtnPanel buttonPanel = new JXBtnPanel(okButton, cancelButton);
+        panel.setButtonPanel(buttonPanel);
+        JXPanel controls = new JXPanel(new FlowLayout(FlowLayout.RIGHT));
+        new BoxLayout(controls, BoxLayout.X_AXIS);
+        controls.add(Box.createHorizontalGlue());
+        controls.add(buttonPanel);
+        w.add(controls, BorderLayout.SOUTH);            
         w.addWindowListener(new WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent e) {
                 panel.cancelLogin();
@@ -1420,15 +1574,23 @@ public class JXLoginPanel extends JXImagePanel {
         w.setLocation(WindowUtils.getPointForCentering(w));
     }
     
-    private static class JXBtnPanel extends JXPanel {
+    private void setButtonPanel(JXBtnPanel buttonPanel) {
+		this.buttonPanel = buttonPanel;
+	}
+	private static class JXBtnPanel extends JXPanel {
 
         private JButton cancel;
         private JButton ok;
 
-        public JXBtnPanel(GridBagLayout layout, JButton okButton, JButton cancelButton) {
-            super(layout);
+        public JXBtnPanel(JButton okButton, JButton cancelButton) {
+        	GridLayout layout = new GridLayout(1,2);
+            layout.setHgap(5);
+            setLayout(layout);
             this.ok = okButton;
             this.cancel = cancelButton;
+            add(okButton);
+            add(cancelButton);
+            setBorder(new EmptyBorder(17,0,11,11));
         }
 
         /**
@@ -1445,5 +1607,58 @@ public class JXLoginPanel extends JXImagePanel {
             return ok;
         }
         
+    }
+    
+    private class CapsOnTestListener extends FocusAdapter {
+
+        @Override
+        public void focusGained(FocusEvent e) {
+            boolean success = false;
+        	// there's an issue with this - http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4414164
+        	// TODO: check the progress from time to time
+            //try {
+            //     java.awt.Toolkit.getDefaultToolkit().getLockingKeyState(java.awt.event.KeyEvent.VK_CAPS_LOCK);
+            //     System.out.println("GOTCHA");
+            //} catch (Exception ex) {
+            //ex.printStackTrace();
+            //success = false;
+            //}
+            if (!success) {
+	            try {
+	            	//Temporarily installed listener with auto-uninstall after test is finished.
+	                Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
+	
+	                    @Override
+	                    public void eventDispatched(AWTEvent event) {
+	                        if (!(event instanceof KeyEvent)) {
+	                            return;
+	                        }
+	                        KeyEvent e = (KeyEvent)event;
+	                        if (e.getID() != KeyEvent.KEY_PRESSED) {
+	                            return;
+	                        }
+	                        if (isTestingCaps && e.getKeyCode() > 64 && e.getKeyCode() < 91) {
+	                            setCapsLock (!e.isShiftDown() && Character.isUpperCase(e.getKeyChar()));
+	                        }
+	                        if (isTestingCaps && e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+	                        	//uninstall
+	                        	isTestingCaps = false;
+	                        	Toolkit.getDefaultToolkit().removeAWTEventListener(this);
+	                        }
+	                        
+	                    }}, AWTEvent.KEY_EVENT_MASK);
+	                Robot r = new Robot();
+	                isTestingCaps = true;
+	                r.keyPress(65);
+	                r.keyRelease(65);
+	                r.keyPress(KeyEvent.VK_BACK_SPACE);
+	                r.keyRelease(KeyEvent.VK_BACK_SPACE);
+	            } catch (Exception e1) {
+	            	// this can happen for example due to security reasons in unsigned applets
+	                // when we can't test caps lock state programatically bail out silently
+	            }
+            }
+
+        }
     }
 }
