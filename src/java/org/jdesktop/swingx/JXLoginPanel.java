@@ -277,7 +277,6 @@ public class JXLoginPanel extends JXImagePanel {
     private boolean caps;
     private boolean isTestingCaps;
     private AWTEventListener capsOnListener = new AWTEventListener() {
-        @Override
         public void eventDispatched(AWTEvent event) {
             if (!(event instanceof KeyEvent)) {
                 return;
@@ -302,12 +301,10 @@ public class JXLoginPanel extends JXImagePanel {
 	private JXBtnPanel buttonPanel;
 	private WindowFocusListener capsOnWinListener = new WindowFocusListener() {
 
-		@Override
 		public void windowGainedFocus(WindowEvent e) {
 			capsOnTestListener.focusGained(null);
 		}
 
-		@Override
 		public void windowLostFocus(WindowEvent e) {
 			// TODO Auto-generated method stub
 			
@@ -518,7 +515,6 @@ public class JXLoginPanel extends JXImagePanel {
      *
      * @see javax.swing.JComponent#updateUI
      */
-    @Override
     public void updateUI() {
         setUI((LoginPanelUI) LookAndFeelAddons.getUI(this, LoginPanelUI.class));
     }
@@ -1055,7 +1051,6 @@ public class JXLoginPanel extends JXImagePanel {
         }
     }
     
-    @Override
     public void setLocale(Locale l) {
         super.setLocale(l);
         reinitLocales(l);
@@ -1107,7 +1102,6 @@ public class JXLoginPanel extends JXImagePanel {
         }
     }
     
-    @Override
     public void removeNotify() {
     	try {
 	    	// TODO: keep it here until all ui stuff is moved to uidelegate.
@@ -1126,7 +1120,6 @@ public class JXLoginPanel extends JXImagePanel {
     	super.removeNotify();
     }
     
-    @Override
     public void addNotify() {
     	try {
     	    Toolkit.getDefaultToolkit().addAWTEventListener(capsOnListener, AWTEvent.KEY_EVENT_MASK);
@@ -1611,7 +1604,6 @@ public class JXLoginPanel extends JXImagePanel {
     
     private class CapsOnTestListener extends FocusAdapter {
 
-        @Override
         public void focusGained(FocusEvent e) {
             boolean success = false;
         	// there's an issue with this - http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4414164
@@ -1628,7 +1620,6 @@ public class JXLoginPanel extends JXImagePanel {
 	            	//Temporarily installed listener with auto-uninstall after test is finished.
 	                Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
 	
-	                    @Override
 	                    public void eventDispatched(AWTEvent event) {
 	                        if (!(event instanceof KeyEvent)) {
 	                            return;
