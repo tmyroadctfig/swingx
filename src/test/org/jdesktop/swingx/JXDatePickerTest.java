@@ -132,7 +132,7 @@ public class JXDatePickerTest extends TestCase {
         JXDatePicker picker = new JXDatePicker();
         // trick the picker - no formats
         picker.getEditor().setFormatterFactory(new DefaultFormatterFactory(
-                new JXDatePickerFormatter(null)));
+                new DatePickerFormatter(null)));
         assertNotNull("picker format array must not be null", 
                 picker.getFormats());
     }
@@ -159,7 +159,7 @@ public class JXDatePickerTest extends TestCase {
      */
     public void testPickerFormatterEmptyFormats() {
         DateFormat[] formats = new DateFormat[0];
-        JXDatePickerFormatter formatter = new JXDatePickerFormatter(formats);
+        DatePickerFormatter formatter = new DatePickerFormatter(formats);
         assertNotNull(formatter.getFormats());
         assertEquals(formats.length, formatter.getFormats().length);
     }
@@ -174,7 +174,7 @@ public class JXDatePickerTest extends TestCase {
     public void testPickerFormatterConstructorWithNullFormats() {
         DateFormat[] formats = new DateFormat[] { null };
         try {
-            new JXDatePickerFormatter(formats);
+            new DatePickerFormatter(formats);
             fail("constructor must throw NPE if array contains null formats");
         } catch (NullPointerException e) {
             // doc'ed behaviour
@@ -188,7 +188,7 @@ public class JXDatePickerTest extends TestCase {
      * 
      */
     public void testPickerFormatterDefaultConstructor() {
-        JXDatePickerFormatter formatter = new JXDatePickerFormatter();
+        DatePickerFormatter formatter = new DatePickerFormatter();
         assertNotNull(formatter.getFormats());
         assertEquals(3, formatter.getFormats().length);
     }
@@ -201,9 +201,9 @@ public class JXDatePickerTest extends TestCase {
      * 
      */
     public void testPickerFormatterConstructorWithParameterNull() {
-        JXDatePickerFormatter defaultFormatter = new JXDatePickerFormatter();
+        DatePickerFormatter defaultFormatter = new DatePickerFormatter();
         DateFormat[] defaultFormats = defaultFormatter.getFormats();
-        JXDatePickerFormatter formatter = new JXDatePickerFormatter(null);
+        DatePickerFormatter formatter = new DatePickerFormatter(null);
         DateFormat[] formats = formatter.getFormats();
         assertNotNull("formats must not be null", formats);
         assertEquals(defaultFormats.length, formats.length);
@@ -221,7 +221,7 @@ public class JXDatePickerTest extends TestCase {
      * 
      */
     public void testPickerFormatterUnsafeGetFormats() {
-        JXDatePickerFormatter picker = new JXDatePickerFormatter();
+        DatePickerFormatter picker = new DatePickerFormatter();
         DateFormat[] formats = picker.getFormats();
         formats[0] = null;
         try {
@@ -242,7 +242,7 @@ public class JXDatePickerTest extends TestCase {
      * 
      */
     public void testPickerFormatterEmptyValueToString() {
-        JXDatePickerFormatter picker = new JXDatePickerFormatter(
+        DatePickerFormatter picker = new DatePickerFormatter(
                 new DateFormat[0]);
         try {
             picker.valueToString(new Date());
@@ -259,7 +259,7 @@ public class JXDatePickerTest extends TestCase {
      * 
      */
     public void testPickerFormatterEmptyStringToValue() {
-        JXDatePickerFormatter picker = new JXDatePickerFormatter(new DateFormat[0]);
+        DatePickerFormatter picker = new DatePickerFormatter(new DateFormat[0]);
         try {
             picker.stringToValue("unparseble");
         } catch (ParseException e) {
@@ -315,7 +315,7 @@ public class JXDatePickerTest extends TestCase {
      *
      */
     public void testFocusListenerOnEditor() {
-        JFormattedTextField field = new JFormattedTextField(new JXDatePickerFormatter());
+        JFormattedTextField field = new JFormattedTextField(new DatePickerFormatter());
         int listenerCount = field.getFocusListeners().length;
         JXDatePicker picker = new JXDatePicker();
         assertEquals(listenerCount + 1, picker.getEditor().getFocusListeners().length);
@@ -580,7 +580,7 @@ public class JXDatePickerTest extends TestCase {
      * internals ... mostly to be sure about cleanup and re-wire.
      */
     public void testCancelEditorAction() {
-        JFormattedTextField field = new JFormattedTextField(new JXDatePickerFormatter());
+        JFormattedTextField field = new JFormattedTextField(new DatePickerFormatter());
         // original action
         Action original = field.getActionMap().get(EditorCancelAction.TEXT_CANCEL_KEY);
         assertNotNull(original);
@@ -1201,7 +1201,7 @@ public class JXDatePickerTest extends TestCase {
     public void testEditorValueOnSetEditor() {
         JXDatePicker picker = new JXDatePicker();
         Object value = picker.getEditor().getValue();
-        picker.setEditor(new JFormattedTextField(new JXDatePickerFormatter()));
+        picker.setEditor(new JFormattedTextField(new DatePickerFormatter()));
         assertEquals(value, picker.getEditor().getValue());
     }
     

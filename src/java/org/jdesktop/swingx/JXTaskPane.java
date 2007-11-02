@@ -33,7 +33,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
-import org.jdesktop.swingx.plaf.JXTaskPaneAddon;
+import org.jdesktop.swingx.plaf.TaskPaneAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.TaskPaneUI;
 
@@ -137,7 +137,7 @@ import org.jdesktop.swingx.plaf.TaskPaneUI;
  *          color32="JXTaskPane32.gif"
  */
 public class JXTaskPane extends JPanel implements
-  JXCollapsiblePane.JCollapsiblePaneContainer {
+  JXCollapsiblePane.CollapsiblePaneContainer {
 
   /**
    * JXTaskPane pluggable UI key <i>swingx/TaskPaneUI</i> 
@@ -146,7 +146,7 @@ public class JXTaskPane extends JPanel implements
   
   // ensure at least the default ui is registered
   static {
-    LookAndFeelAddons.contribute(new JXTaskPaneAddon());
+    LookAndFeelAddons.contribute(new TaskPaneAddon());
   }
 
   /**
@@ -438,7 +438,7 @@ public class JXTaskPane extends JPanel implements
   }
 
   /**
-   * @see JXCollapsiblePane.JCollapsiblePaneContainer
+   * @see JXCollapsiblePane.CollapsiblePaneContainer
    */
   public Container getValidatingContainer() {
     return getParent();

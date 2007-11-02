@@ -38,11 +38,11 @@ import org.jdesktop.swingx.util.Contract;
  *
  * @author Joshua Outwater
  */
-public class JXDatePickerFormatter extends
+public class DatePickerFormatter extends
         JFormattedTextField.AbstractFormatter {
     
     private static final Logger LOG = Logger
-            .getLogger(JXDatePickerFormatter.class.getName());
+            .getLogger(DatePickerFormatter.class.getName());
     private DateFormat _formats[] = null;
 
     /**
@@ -59,7 +59,7 @@ public class JXDatePickerFormatter extends
      * </ul>
      *
      */
-    public JXDatePickerFormatter() {
+    public DatePickerFormatter() {
         this(null);
     }
 
@@ -72,7 +72,7 @@ public class JXDatePickerFormatter extends
      *   use defaults or empty to do nothing (?), but must not contain
      *   null formats.
      */
-    public JXDatePickerFormatter(DateFormat formats[]) {
+    public DatePickerFormatter(DateFormat formats[]) {
         if (formats == null) {
             formats = createDefaultFormats();
         }

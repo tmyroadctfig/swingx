@@ -1,5 +1,5 @@
 /*
- * JXMultiThumbSliderAddon.java
+ * MultiThumbSliderAddon.java
  *
  * Created on May 9, 2006, 4:19 PM
  *
@@ -17,11 +17,11 @@ import org.jdesktop.swingx.JXMultiThumbSlider;
  *
  * @author jm158417
  */
-public class JXMultiThumbSliderAddon extends AbstractComponentAddon {
+public class MultiThumbSliderAddon extends AbstractComponentAddon {
     
-    /** Creates a new instance of JXMultiThumbSliderAddon */
-    public JXMultiThumbSliderAddon() {
-        super("JXMultiThumbSliderAddon");
+    /** Creates a new instance of MultiThumbSliderAddon */
+    public MultiThumbSliderAddon() {
+        super("MultiThumbSliderAddon");
     }
     
     @Override

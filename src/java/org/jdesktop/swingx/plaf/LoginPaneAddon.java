@@ -34,38 +34,38 @@ import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 
-import org.jdesktop.swingx.JXLoginPanel;
+import org.jdesktop.swingx.JXLoginPane;
 
 /**
  *
  * @author rbair
  */
-public class JXLoginPanelAddon extends AbstractComponentAddon {
+public class LoginPaneAddon extends AbstractComponentAddon {
     
-    /** Creates a new instance of JXLoginPanelAddon */
-    public JXLoginPanelAddon() {
-        super("JXLoginPanel");
+    /** Creates a new instance of LoginPaneAddon */
+    public LoginPaneAddon() {
+        super("JXLoginPane");
     }
     
   @Override
   protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
     super.addBasicDefaults(addon, defaults);
     defaults.addAll(Arrays.asList(new Object[] { 
-      JXLoginPanel.uiClassID,
-      "org.jdesktop.swingx.plaf.basic.BasicLoginPanelUI",
+      JXLoginPane.uiClassID,
+      "org.jdesktop.swingx.plaf.basic.BasicLoginPaneUI",
       //TODO this icon is unused; remove?
-      "JXLoginPanel.errorIcon",
-      LookAndFeel.makeIcon(JXLoginPanelAddon.class, "resources/error16.png"),
-      "JXLoginPanel.bannerFont",
+      "JXLoginPane.errorIcon",
+      LookAndFeel.makeIcon(LoginPaneAddon.class, "resources/error16.png"),
+      "JXLoginPane.bannerFont",
       new FontUIResource("Arial Bold", Font.PLAIN, 36),
-      "JXLoginPanel.bannerForeground", new ColorUIResource(Color.WHITE),
-      "JXLoginPanel.bannerDarkBackground", new ColorUIResource(Color.GRAY),
-      "JXLoginPanel.bannerLightBackground", new ColorUIResource(Color.LIGHT_GRAY),
+      "JXLoginPane.bannerForeground", new ColorUIResource(Color.WHITE),
+      "JXLoginPane.bannerDarkBackground", new ColorUIResource(Color.GRAY),
+      "JXLoginPane.bannerLightBackground", new ColorUIResource(Color.LIGHT_GRAY),
     }));
     // Popuplate UIDefaults with the localizable Strings we will use
     // in the Login panel.
-    String clsName = JXLoginPanel.class.getCanonicalName();
-    ResourceBundle res = ResourceBundle.getBundle("org.jdesktop.swingx.auth.resources.resources", JXLoginPanel.getDefaultLocale());
+    String clsName = JXLoginPane.class.getCanonicalName();
+    ResourceBundle res = ResourceBundle.getBundle("org.jdesktop.swingx.auth.resources.resources", JXLoginPane.getDefaultLocale());
     Enumeration<String> keys = res.getKeys();
     while (keys.hasMoreElements()) {
         String key = keys.nextElement();
@@ -80,15 +80,15 @@ public class JXLoginPanelAddon extends AbstractComponentAddon {
 
     if (isPlastic()) {
       defaults.addAll(Arrays.asList(new Object[] { 
-        "JXLoginPanel.bannerForeground", new ColorUIResource(Color.WHITE),
-        "JXLoginPanel.bannerDarkBackground", new ColorUIResource(Color.GRAY),
-        "JXLoginPanel.bannerLightBackground", new ColorUIResource(Color.LIGHT_GRAY),
+        "JXLoginPane.bannerForeground", new ColorUIResource(Color.WHITE),
+        "JXLoginPane.bannerDarkBackground", new ColorUIResource(Color.GRAY),
+        "JXLoginPane.bannerLightBackground", new ColorUIResource(Color.LIGHT_GRAY),
       }));
     } else {
       defaults.addAll(Arrays.asList(new Object[] { 
-        "JXLoginPanel.bannerForeground", new ColorUIResource(Color.WHITE),
-        "JXLoginPanel.bannerDarkBackground", MetalLookAndFeel.getCurrentTheme().getPrimaryControlDarkShadow(),
-        "JXLoginPanel.bannerLightBackground", MetalLookAndFeel.getCurrentTheme().getPrimaryControl()
+        "JXLoginPane.bannerForeground", new ColorUIResource(Color.WHITE),
+        "JXLoginPane.bannerDarkBackground", MetalLookAndFeel.getCurrentTheme().getPrimaryControlDarkShadow(),
+        "JXLoginPane.bannerLightBackground", MetalLookAndFeel.getCurrentTheme().getPrimaryControl()
       }));
     }
   }
@@ -97,9 +97,9 @@ public class JXLoginPanelAddon extends AbstractComponentAddon {
   protected void addWindowsDefaults(LookAndFeelAddons addon, List<Object> defaults) {
     super.addWindowsDefaults(addon, defaults);
     defaults.addAll(Arrays.asList(new Object[] { 
-      "JXLoginPanel.bannerForeground", new ColorUIResource(Color.WHITE),
-      "JXLoginPanel.bannerDarkBackground", new ColorUIResource(49, 121, 242),
-      "JXLoginPanel.bannerLightBackground", new ColorUIResource(198, 211, 247),
+      "JXLoginPane.bannerForeground", new ColorUIResource(Color.WHITE),
+      "JXLoginPane.bannerDarkBackground", new ColorUIResource(49, 121, 242),
+      "JXLoginPane.bannerLightBackground", new ColorUIResource(198, 211, 247),
     }));
   }
 }

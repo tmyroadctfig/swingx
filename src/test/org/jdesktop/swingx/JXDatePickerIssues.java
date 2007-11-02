@@ -222,7 +222,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 //        ListSelectionModel l;
 //        TreeSelectionModel t;
         JXDatePicker picker = new JXDatePicker();
-        JFormattedTextField field = new JFormattedTextField(new JXDatePickerFormatter());
+        JFormattedTextField field = new JFormattedTextField(new DatePickerFormatter());
         field.setValue(picker.getDate());
         JComponent panel = new JPanel();
         panel.add(picker);

@@ -595,7 +595,7 @@ public class JXCollapsiblePane extends JXPanel {
      * is enough but there might be cases where the parent parent must be
      * validated.
      */
-    public static interface JCollapsiblePaneContainer {
+    public static interface CollapsiblePaneContainer {
         Container getValidatingContainer();
     }
 
@@ -762,9 +762,9 @@ public class JXCollapsiblePane extends JXPanel {
 
         void validate() {
             Container parent = SwingUtilities.getAncestorOfClass(
-                    JCollapsiblePaneContainer.class, JXCollapsiblePane.this);
+                    CollapsiblePaneContainer.class, JXCollapsiblePane.this);
             if (parent != null) {
-                parent = ((JCollapsiblePaneContainer)parent).getValidatingContainer();
+                parent = ((CollapsiblePaneContainer)parent).getValidatingContainer();
             } else {
                 parent = getParent();
             }

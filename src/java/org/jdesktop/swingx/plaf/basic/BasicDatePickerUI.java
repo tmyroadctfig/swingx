@@ -64,7 +64,7 @@ import javax.swing.text.View;
 import org.jdesktop.swingx.DateSelectionListener;
 import org.jdesktop.swingx.DateSelectionModel;
 import org.jdesktop.swingx.JXDatePicker;
-import org.jdesktop.swingx.JXDatePickerFormatter;
+import org.jdesktop.swingx.DatePickerFormatter;
 import org.jdesktop.swingx.calendar.JXMonthView;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
@@ -422,7 +422,7 @@ public class BasicDatePickerUI extends DatePickerUI {
      * @return an instance of a JFormattedTextField
      */
     protected JFormattedTextField createEditor() {
-        JFormattedTextField f = new DefaultEditor(new JXDatePickerFormatter());
+        JFormattedTextField f = new DefaultEditor(new DatePickerFormatter());
         f.setName("dateField");
         f.setColumns(UIManager.getInt("JXDatePicker.numColumns"));
         f.setBorder(UIManager.getBorder("JXDatePicker.border"));

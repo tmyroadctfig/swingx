@@ -30,7 +30,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import org.jdesktop.swingx.painter.Painter;
 
-import org.jdesktop.swingx.plaf.JXTitledPanelAddon;
+import org.jdesktop.swingx.plaf.TitledPanelAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.TitledPanelUI;
 
@@ -69,7 +69,7 @@ public class JXTitledPanel extends JXPanel {
      * classes.
      */
     static {
-        LookAndFeelAddons.contribute(new JXTitledPanelAddon());
+        LookAndFeelAddons.contribute(new TitledPanelAddon());
     }
 
     /**

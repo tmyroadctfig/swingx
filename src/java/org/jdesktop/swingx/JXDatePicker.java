@@ -55,7 +55,7 @@ import org.jdesktop.swingx.calendar.JXMonthView;
 import org.jdesktop.swingx.event.EventListenerMap;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.plaf.DatePickerUI;
-import org.jdesktop.swingx.plaf.JXDatePickerAddon;
+import org.jdesktop.swingx.plaf.DatePickerAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.util.Contract;
 
@@ -72,7 +72,7 @@ import org.jdesktop.swingx.util.Contract;
 public class JXDatePicker extends JComponent {
 
     static {
-        LookAndFeelAddons.contribute(new JXDatePickerAddon());
+        LookAndFeelAddons.contribute(new DatePickerAddon());
     }
 
     /**
@@ -314,7 +314,7 @@ public class JXDatePicker extends JComponent {
                         "must not contain null elements");
         DateFormat[] old = getFormats();
         _dateField.setFormatterFactory(new DefaultFormatterFactory(
-                new JXDatePickerFormatter(formats)));
+                new DatePickerFormatter(formats)));
         firePropertyChange("formats", old, getFormats());
     }
 
@@ -332,8 +332,8 @@ public class JXDatePicker extends JComponent {
         AbstractFormatterFactory factory = _dateField.getFormatterFactory();
         if (factory != null) {
             AbstractFormatter formatter = factory.getFormatter(_dateField);
-            if (formatter instanceof JXDatePickerFormatter) {
-                return ((JXDatePickerFormatter) formatter).getFormats();
+            if (formatter instanceof DatePickerFormatter) {
+                return ((DatePickerFormatter) formatter).getFormats();
             }
         }
         return EMPTY_DATE_FORMATS;

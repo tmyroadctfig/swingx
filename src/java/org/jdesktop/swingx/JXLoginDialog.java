@@ -41,7 +41,7 @@ public class JXLoginDialog extends JDialog {
      * The login panel containing the username & password fields, and handling
      * the login procedures.
      */
-    private JXLoginPanel panel;
+    private JXLoginPane panel;
     
     /**
      * Creates a non-modal dialog without a title and without a specified
@@ -309,28 +309,28 @@ public class JXLoginDialog extends JDialog {
      */
     public JXLoginDialog(LoginService service, PasswordStore ps, UserNameStore us) {
         super();
-        setTitle(UIManager.getString(JXLoginPanel.class.getCanonicalName() + ".loginString")); 
-        setPanel(new JXLoginPanel(service, ps, us));
-        JXLoginPanel.initWindow(this, getPanel());
+        setTitle(UIManager.getString(JXLoginPane.class.getCanonicalName() + ".loginString")); 
+        setPanel(new JXLoginPane(service, ps, us));
+        JXLoginPane.initWindow(this, getPanel());
     }
     
     protected void init() {
-        setPanel(new JXLoginPanel());
-        JXLoginPanel.initWindow(this, getPanel());
+        setPanel(new JXLoginPane());
+        JXLoginPane.initWindow(this, getPanel());
     }
 
     /**
      * @return the status of the login dialog
      */
-    public JXLoginPanel.Status getStatus() {
+    public JXLoginPane.Status getStatus() {
         return getPanel().getStatus();
     }
 
-    public JXLoginPanel getPanel() {
+    public JXLoginPane getPanel() {
         return panel;
     }
 
-    public void setPanel(JXLoginPanel panel) {
+    public void setPanel(JXLoginPane panel) {
         this.panel = panel;
     }
 }

@@ -33,9 +33,9 @@ import org.jdesktop.swingx.JXHeader;
  * Addon for <code>JXHeader</code>.<br>
  *
  */
-public class JXHeaderAddon extends AbstractComponentAddon {
+public class HeaderAddon extends AbstractComponentAddon {
 
-    public JXHeaderAddon() {
+    public HeaderAddon() {
         super("JXHeader");
     }
 
@@ -44,7 +44,7 @@ public class JXHeaderAddon extends AbstractComponentAddon {
         super.addBasicDefaults(addon, defaults);
         defaults.addAll(Arrays.asList(new Object[]{
             JXHeader.uiClassID, "org.jdesktop.swingx.plaf.basic.BasicHeaderUI",
-            "Header.defaultIcon", LookAndFeel.makeIcon(JXHeaderAddon.class,
+            "Header.defaultIcon", LookAndFeel.makeIcon(HeaderAddon.class,
                     "resources/header-default.png"),
             "Header.background", UIManagerExt.getSafeColor("control",
                     new ColorUIResource(Color.decode("#C0C0C0")))

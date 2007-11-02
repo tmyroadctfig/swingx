@@ -39,9 +39,9 @@ import org.jdesktop.swingx.painter.MattePainter;
  * Addon for <code>JXTitledPanel</code>.<br>
  *
  */
-public class JXTitledPanelAddon extends AbstractComponentAddon {
+public class TitledPanelAddon extends AbstractComponentAddon {
 
-  public JXTitledPanelAddon() {
+  public TitledPanelAddon() {
     super("JXTitledPanel");
   }
 

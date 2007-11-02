@@ -21,7 +21,7 @@
 package org.jdesktop.swingx;
 
 import org.jdesktop.swingx.action.LinkAction;
-import org.jdesktop.swingx.plaf.JXHyperlinkAddon;
+import org.jdesktop.swingx.plaf.HyperlinkAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 
 import javax.swing.*;
@@ -85,7 +85,7 @@ public class JXHyperlink extends JButton {
 
     // ensure at least the default ui is registered
     static {
-      LookAndFeelAddons.contribute(new JXHyperlinkAddon());
+      LookAndFeelAddons.contribute(new HyperlinkAddon());
     }
 
     private boolean hasBeenVisited = false;

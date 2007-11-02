@@ -12,7 +12,7 @@ import javax.swing.plaf.UIResource;
  */
 public class JXMonthViewAddonTest extends AbstractComponentAddonTest {
     public void testUIDefaults() {
-        LookAndFeelAddons.contribute(new JXMonthViewAddon());
+        LookAndFeelAddons.contribute(new MonthViewAddon());
         
         assertTrue(UIManager.get("JXMonthView.background") instanceof UIResource);
         assertTrue(UIManager.get("JXMonthView.monthStringBackground") instanceof UIResource);

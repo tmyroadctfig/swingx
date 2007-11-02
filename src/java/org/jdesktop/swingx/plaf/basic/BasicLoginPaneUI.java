@@ -31,23 +31,23 @@ import javax.swing.JComponent;
 import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 
-import org.jdesktop.swingx.JXLoginPanel;
-import org.jdesktop.swingx.plaf.LoginPanelUI;
+import org.jdesktop.swingx.JXLoginPane;
+import org.jdesktop.swingx.plaf.LoginPaneUI;
 /**
- * Base implementation of the <code>JXLoginPanel</code> UI.
+ * Base implementation of the <code>JXLoginPane</code> UI.
  *
  * @author rbair
  */
-public class BasicLoginPanelUI extends LoginPanelUI {
-    private JXLoginPanel dlg;
+public class BasicLoginPaneUI extends LoginPaneUI {
+    private JXLoginPane dlg;
     
     /** Creates a new instance of BasicLoginDialogUI */
-    public BasicLoginPanelUI(JXLoginPanel dlg) {
+    public BasicLoginPaneUI(JXLoginPane dlg) {
         this.dlg = dlg;
     }
     
   public static ComponentUI createUI(JComponent c) {
-    return new BasicLoginPanelUI((JXLoginPanel)c);
+    return new BasicLoginPaneUI((JXLoginPane)c);
   }
 
     public Image getBanner() {
@@ -58,7 +58,7 @@ public class BasicLoginPanelUI extends LoginPanelUI {
 
         BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2 = img.createGraphics();
-        Font font = UIManager.getFont("JXLoginPanel.bannerFont");
+        Font font = UIManager.getFont("JXLoginPane.bannerFont");
         g2.setFont(font);
         Graphics2D originalGraphics = g2;
         if(!dlg.getComponentOrientation().isLeftToRight()) {
@@ -75,7 +75,7 @@ public class BasicLoginPanelUI extends LoginPanelUI {
         g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
 
         //draw a big square
-        g2.setColor(UIManager.getColor("JXLoginPanel.bannerDarkBackground"));
+        g2.setColor(UIManager.getColor("JXLoginPane.bannerDarkBackground"));
         g2.fillRect(0, 0, w, h);
 
         //create the curve shape
@@ -88,12 +88,12 @@ public class BasicLoginPanelUI extends LoginPanelUI {
         curveShape.closePath();
 
         //draw into the buffer a gradient (bottom to top), and the text "Login"
-        GradientPaint gp = new GradientPaint(0, h, UIManager.getColor("JXLoginPanel.bannerDarkBackground"),
-                0, 0, UIManager.getColor("JXLoginPanel.bannerLightBackground"));
+        GradientPaint gp = new GradientPaint(0, h, UIManager.getColor("JXLoginPane.bannerDarkBackground"),
+                0, 0, UIManager.getColor("JXLoginPane.bannerLightBackground"));
         g2.setPaint(gp);
         g2.fill(curveShape);
 
-        originalGraphics.setColor(UIManager.getColor("JXLoginPanel.bannerForeground"));
+        originalGraphics.setColor(UIManager.getColor("JXLoginPane.bannerForeground"));
         originalGraphics.drawString(dlg.getBannerText(), loginStringX, loginStringY);
         return img;
     }

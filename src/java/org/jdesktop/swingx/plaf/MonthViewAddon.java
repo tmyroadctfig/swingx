@@ -10,8 +10,8 @@ import javax.swing.plaf.FontUIResource;
 
 import org.jdesktop.swingx.calendar.JXMonthView;
 
-public class JXMonthViewAddon extends AbstractComponentAddon {
-    public JXMonthViewAddon() {
+public class MonthViewAddon extends AbstractComponentAddon {
+    public MonthViewAddon() {
         super("JXMonthView");
     }
 

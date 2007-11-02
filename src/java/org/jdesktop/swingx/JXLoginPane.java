@@ -95,22 +95,22 @@ import org.jdesktop.swingx.auth.LoginListener;
 import org.jdesktop.swingx.auth.LoginService;
 import org.jdesktop.swingx.auth.PasswordStore;
 import org.jdesktop.swingx.auth.UserNameStore;
-import org.jdesktop.swingx.plaf.JXLoginPanelAddon;
-import org.jdesktop.swingx.plaf.LoginPanelUI;
+import org.jdesktop.swingx.plaf.LoginPaneAddon;
+import org.jdesktop.swingx.plaf.LoginPaneUI;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.util.WindowUtils;
 
 /**
- *  <p>JXLoginPanel is a JPanel that implements a Login dialog with
+ *  <p>JXLoginPane is a JPanel that implements a Login dialog with
  *  support for saving passwords supplied for future use in a secure
  *  manner. It is intended to work with <strong>LoginService</strong>
  *  and <strong>PasswordStore</strong> to implement the
  *  authentication.</p>
  *
- *  <p> In order to perform the authentication, <strong>JXLoginPanel</strong>
+ *  <p> In order to perform the authentication, <strong>JXLoginPane</strong>
  *  calls the <code>authenticate</code> method of the <strong>LoginService
  *  </strong>. In order to perform the persistence of the password,
- *  <strong>JXLoginPanel</strong> calls the put method of the
+ *  <strong>JXLoginPane</strong> calls the put method of the
  *  <strong>PasswordStore</strong> object that is supplied. If
  *  the <strong>PasswordStore</strong> is <code>null</code>, then the password
  *  is not saved. Similarly, if a <strong>PasswordStore</strong> is
@@ -124,12 +124,12 @@ import org.jdesktop.swingx.util.WindowUtils;
  * @author rah003
  */
 
-public class JXLoginPanel extends JXImagePanel {
+public class JXLoginPane extends JXImagePanel {
     
     /**
      * The Logger
      */
-    private static final Logger LOG = Logger.getLogger(JXLoginPanel.class.getName());
+    private static final Logger LOG = Logger.getLogger(JXLoginPane.class.getName());
     /**
      * Comment for <code>serialVersionUID</code>
      */
@@ -137,7 +137,7 @@ public class JXLoginPanel extends JXImagePanel {
     /**
      * UI Class ID
      */
-    public final static String uiClassID = "LoginPanelUI";
+    public final static String uiClassID = "LoginPaneUI";
     /**
      * Action key for an Action in the ActionMap that initiates the Login
      * procedure
@@ -149,7 +149,7 @@ public class JXLoginPanel extends JXImagePanel {
      */
     public static final String CANCEL_LOGIN_ACTION_COMMAND = "cancel-login";
     /**
-     * The JXLoginPanel can attempt to save certain user information such as
+     * The JXLoginPane can attempt to save certain user information such as
      * the username, password, or both to their respective stores.
      * This type specifies what type of save should be performed.
      */
@@ -161,7 +161,7 @@ public class JXLoginPanel extends JXImagePanel {
     /**
      * Used as a prefix when pulling data out of UIManager for i18n
      */
-    private static String CLASS_NAME = JXLoginPanel.class.getCanonicalName();
+    private static String CLASS_NAME = JXLoginPane.class.getCanonicalName();
 
     /**
      * The current login status for this panel
@@ -212,7 +212,7 @@ public class JXLoginPanel extends JXImagePanel {
     /**
      * A combo box presenting the user with a list of servers to which they
      * may log in. This is an optional feature, which is only enabled if
-     * the List of servers supplied to the JXLoginPanel has a length greater
+     * the List of servers supplied to the JXLoginPane has a length greater
      * than 1.
      */
     private JComboBox serverCombo;
@@ -311,10 +311,10 @@ public class JXLoginPanel extends JXImagePanel {
 		}};
     
     /**
-     * Creates a default JXLoginPanel instance
+     * Creates a default JXLoginPane instance
      */
     static {
-        LookAndFeelAddons.contribute(new JXLoginPanelAddon());
+        LookAndFeelAddons.contribute(new LoginPaneAddon());
     }
 
     /**
@@ -364,30 +364,30 @@ public class JXLoginPanel extends JXImagePanel {
     
     //--------------------------------------------------------- Constructors
     /**
-     * Create a {@code JXLoginPanel} that always accepts the user, never stores
+     * Create a {@code JXLoginPane} that always accepts the user, never stores
      * passwords or user ids, and has no target servers.
      * <p>
      * This constructor should <i>NOT</i> be used in a real application. It is
      * provided for compliance to the bean specification and for use with visual
      * editors.
      */
-    public JXLoginPanel() {
+    public JXLoginPane() {
         this(null);
     }
     
     /**
-     * Create a {@code JXLoginPanel} with the specified {@code LoginService}
+     * Create a {@code JXLoginPane} with the specified {@code LoginService}
      * that does not store user ids or passwords and has no target servers.
      * 
      * @param service
      *            the {@code LoginService} to use for logging in
      */
-    public JXLoginPanel(LoginService service) {
+    public JXLoginPane(LoginService service) {
         this(service, null, null);
     }
     
     /**
-     * Create a {@code JXLoginPanel} with the specified {@code LoginService},
+     * Create a {@code JXLoginPane} with the specified {@code LoginService},
      * {@code PasswordStore}, and {@code UserNameStore}, but without a server
      * list.
      * <p>
@@ -403,12 +403,12 @@ public class JXLoginPanel extends JXImagePanel {
      * @param userStore
      *            the {@code UserNameStore} to use for storing user information
      */
-    public JXLoginPanel(LoginService service, PasswordStore passwordStore, UserNameStore userStore) {
+    public JXLoginPane(LoginService service, PasswordStore passwordStore, UserNameStore userStore) {
         this(service, passwordStore, userStore, null);
     }
     
     /**
-     * Create a {@code JXLoginPanel} with the specified {@code LoginService},
+     * Create a {@code JXLoginPane} with the specified {@code LoginService},
      * {@code PasswordStore}, {@code UserNameStore}, and server list.
      * <p>
      * If you do not want to store passwords or user ids, those parameters can
@@ -428,7 +428,7 @@ public class JXLoginPanel extends JXImagePanel {
      * @param servers
      *            a list of servers to authenticate against
      */
-    public JXLoginPanel(LoginService service, PasswordStore passwordStore, UserNameStore userStore, List<String> servers) {
+    public JXLoginPane(LoginService service, PasswordStore passwordStore, UserNameStore userStore, List<String> servers) {
         setLoginService(service);
         setPasswordStore(passwordStore);
         setUserNameStore(userStore);
@@ -494,17 +494,17 @@ public class JXLoginPanel extends JXImagePanel {
     /**
      * {@inheritDoc}
      */
-    public LoginPanelUI getUI() {
-        return (LoginPanelUI) super.getUI();
+    public LoginPaneUI getUI() {
+        return (LoginPaneUI) super.getUI();
     }
     
     /**
      * Sets the look and feel (L&F) object that renders this component.
      *
-     * @param ui the LoginPanelUI L&F object
+     * @param ui the LoginPaneUI L&F object
      * @see javax.swing.UIDefaults#getUI
      */
-    public void setUI(LoginPanelUI ui) {
+    public void setUI(LoginPaneUI ui) {
         super.setUI(ui);
     }
     
@@ -516,7 +516,7 @@ public class JXLoginPanel extends JXImagePanel {
      * @see javax.swing.JComponent#updateUI
      */
     public void updateUI() {
-        setUI((LoginPanelUI) LookAndFeelAddons.getUI(this, LoginPanelUI.class));
+        setUI((LoginPaneUI) LookAndFeelAddons.getUI(this, LoginPaneUI.class));
     }
 
     /**
@@ -1107,7 +1107,7 @@ public class JXLoginPanel extends JXImagePanel {
 	    	// TODO: keep it here until all ui stuff is moved to uidelegate.
     		if (capsLockSupport)
     			Toolkit.getDefaultToolkit().removeAWTEventListener(capsOnListener);
-    	    Container c = JXLoginPanel.this;
+    	    Container c = JXLoginPane.this;
     	    while (c.getParent() != null) {
     	    	c = c.getParent();
     	    }
@@ -1123,7 +1123,7 @@ public class JXLoginPanel extends JXImagePanel {
     public void addNotify() {
     	try {
     	    Toolkit.getDefaultToolkit().addAWTEventListener(capsOnListener, AWTEvent.KEY_EVENT_MASK);
-    	    Container c = JXLoginPanel.this;
+    	    Container c = JXLoginPane.this;
     	    while (c.getParent() != null) {
     	    	c = c.getParent();
     	    }
@@ -1220,11 +1220,11 @@ public class JXLoginPanel extends JXImagePanel {
     
     //---------------------------------------------- Default Implementations
     /**
-     * Action that initiates a login procedure. Delegates to JXLoginPanel.startLogin
+     * Action that initiates a login procedure. Delegates to JXLoginPane.startLogin
      */
     private static final class LoginAction extends AbstractActionExt {
-    private JXLoginPanel panel;
-    public LoginAction(JXLoginPanel p) {
+    private JXLoginPane panel;
+    public LoginAction(JXLoginPane p) {
         super(UIManager.getString(CLASS_NAME + ".loginString"), LOGIN_ACTION_COMMAND); 
         this.panel = p;
     }
@@ -1238,8 +1238,8 @@ public class JXLoginPanel extends JXImagePanel {
      * Action that cancels the login procedure. 
      */
     private static final class CancelAction extends AbstractActionExt {
-        private JXLoginPanel panel;
-        public CancelAction(JXLoginPanel p) {
+        private JXLoginPane panel;
+        public CancelAction(JXLoginPane p) {
             super(UIManager.getString(CLASS_NAME + ".cancelLogin"), CANCEL_LOGIN_ACTION_COMMAND); 
             this.panel = p;
             this.setEnabled(false);
@@ -1382,7 +1382,7 @@ public class JXLoginPanel extends JXImagePanel {
      * @return The status of the login operation
      */
     public static Status showLoginDialog(Component parent, LoginService svc, PasswordStore ps, UserNameStore us, List<String> servers) {
-        JXLoginPanel panel = new JXLoginPanel(svc, ps, us, servers);
+        JXLoginPane panel = new JXLoginPane(svc, ps, us, servers);
         return showLoginDialog(parent, panel);
     }
     
@@ -1390,7 +1390,7 @@ public class JXLoginPanel extends JXImagePanel {
      * Shows a login dialog. This method blocks.
      * @return The status of the login operation
      */
-    public static Status showLoginDialog(Component parent, JXLoginPanel panel) {
+    public static Status showLoginDialog(Component parent, JXLoginPane panel) {
         Window w = WindowUtils.findWindow(parent);
         JXLoginDialog dlg =  null;
         if (w == null) {
@@ -1422,54 +1422,54 @@ public class JXLoginPanel extends JXImagePanel {
     /**
      */
     public static JXLoginFrame showLoginFrame(LoginService svc, PasswordStore ps, UserNameStore us, List<String> servers) {
-        JXLoginPanel panel = new JXLoginPanel(svc, ps, us, servers);
+        JXLoginPane panel = new JXLoginPane(svc, ps, us, servers);
         return showLoginFrame(panel);
     }
 
     /**
      */
-    public static JXLoginFrame showLoginFrame(JXLoginPanel panel) {
+    public static JXLoginFrame showLoginFrame(JXLoginPane panel) {
         return new JXLoginFrame(panel);
     }
 
     public static final class JXLoginDialog extends JDialog {
-        private JXLoginPanel panel;
+        private JXLoginPane panel;
         
-        public JXLoginDialog(Frame parent, JXLoginPanel p) {
+        public JXLoginDialog(Frame parent, JXLoginPane p) {
             super(parent, true);
             init(p);
         }
         
-        public JXLoginDialog(Dialog parent, JXLoginPanel p) {
+        public JXLoginDialog(Dialog parent, JXLoginPane p) {
             super(parent, true);
             init(p);
         }
         
-    protected void init(JXLoginPanel p) {
+    protected void init(JXLoginPane p) {
         setTitle(UIManager.getString(CLASS_NAME + ".titleString")); 
         this.panel = p;
         initWindow(this, panel);
     }
     
-    public JXLoginPanel.Status getStatus() {
+    public JXLoginPane.Status getStatus() {
         return panel.getStatus();
     }
     }
     
     public static final class JXLoginFrame extends JFrame {
-        private JXLoginPanel panel;
+        private JXLoginPane panel;
     
-        public JXLoginFrame(JXLoginPanel p) {
+        public JXLoginFrame(JXLoginPane p) {
             super(UIManager.getString(CLASS_NAME + ".titleString")); 
             this.panel = p;
             initWindow(this, panel);
         }
         
-        public JXLoginPanel.Status getStatus() {
+        public JXLoginPane.Status getStatus() {
             return panel.getStatus();
         }
         
-        public JXLoginPanel getPanel() {
+        public JXLoginPane getPanel() {
             return panel;
         }
     }
@@ -1480,10 +1480,10 @@ public class JXLoginPanel extends JXImagePanel {
      * JDialog are so minor.
      *
      * Note: This method is package private for use by JXLoginDialog (proper, 
-     * not JXLoginPanel.JXLoginDialog). Change to private if JXLoginDialog is
+     * not JXLoginPane.JXLoginDialog). Change to private if JXLoginDialog is
      * removed.
      */
-    static void initWindow(final Window w, final JXLoginPanel panel) {
+    static void initWindow(final Window w, final JXLoginPane panel) {
         w.setLayout(new BorderLayout());
         w.add(panel, BorderLayout.CENTER);
         JButton okButton = new JButton(panel.getActionMap().get(LOGIN_ACTION_COMMAND));
@@ -1491,14 +1491,14 @@ public class JXLoginPanel extends JXImagePanel {
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //change panel status to cancelled!
-                panel.status = JXLoginPanel.Status.CANCELLED;
+                panel.status = JXLoginPane.Status.CANCELLED;
                 w.setVisible(false);
                 w.dispose();
             }
         });
         panel.addPropertyChangeListener("status", new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                JXLoginPanel.Status status = (JXLoginPanel.Status)evt.getNewValue();
+                JXLoginPane.Status status = (JXLoginPane.Status)evt.getNewValue();
                 switch (status) {
                     case NOT_STARTED:
                         break;

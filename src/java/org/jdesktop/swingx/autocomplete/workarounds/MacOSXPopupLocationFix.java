@@ -49,7 +49,7 @@ import javax.swing.event.PopupMenuListener;
  *
  * @author <a href="mailto:jesse@swank.ca">Jesse Wilson</a>
  */
-public final class AquaLnFPopupLocationFix {
+public final class MacOSXPopupLocationFix {
     
     /** the components being fixed */
     private final JComboBox comboBox;
@@ -62,7 +62,7 @@ public final class AquaLnFPopupLocationFix {
      * Private constructor so users use the more action-oriented
      * {@link #install} method.
      */
-    private AquaLnFPopupLocationFix(JComboBox comboBox) {
+    private MacOSXPopupLocationFix(JComboBox comboBox) {
         this.comboBox = comboBox;
         this.popupMenu = (JPopupMenu)comboBox.getUI().getAccessibleChild(comboBox, 0);
         
@@ -72,9 +72,9 @@ public final class AquaLnFPopupLocationFix {
     /**
      * Install the fix for the specified combo box.
      */
-    public static AquaLnFPopupLocationFix install(JComboBox comboBox) {
+    public static MacOSXPopupLocationFix install(JComboBox comboBox) {
         if(comboBox == null) throw new IllegalArgumentException();
-        return new AquaLnFPopupLocationFix(comboBox);
+        return new MacOSXPopupLocationFix(comboBox);
     }
     
     /**

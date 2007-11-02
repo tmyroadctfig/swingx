@@ -23,7 +23,7 @@ package org.jdesktop.swingx;
 import javax.swing.JViewport;
 import javax.swing.Scrollable;
 
-import org.jdesktop.swingx.plaf.JXTaskPaneContainerAddon;
+import org.jdesktop.swingx.plaf.TaskPaneContainerAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.TaskPaneContainerUI;
 
@@ -100,7 +100,7 @@ public class JXTaskPaneContainer extends JXPanel {
   
   // ensure at least the default ui is registered
   static {
-    LookAndFeelAddons.contribute(new JXTaskPaneContainerAddon());
+    LookAndFeelAddons.contribute(new TaskPaneContainerAddon());
   }
 
   /**

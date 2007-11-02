@@ -39,9 +39,9 @@ import org.jdesktop.swingx.plaf.windows.WindowsTipOfTheDayUI;
  * 
  * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
  */
-public class JXTipOfTheDayAddon extends AbstractComponentAddon {
+public class TipOfTheDayAddon extends AbstractComponentAddon {
 
-  public JXTipOfTheDayAddon() {
+  public TipOfTheDayAddon() {
     super("JXTipOfTheDay");
   }
 

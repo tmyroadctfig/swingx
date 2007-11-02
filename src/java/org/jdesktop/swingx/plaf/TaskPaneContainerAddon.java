@@ -50,9 +50,9 @@ import org.jdesktop.swingx.util.OS;
  * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
  * @author Karl Schaefer
  */
-public class JXTaskPaneContainerAddon extends AbstractComponentAddon {
+public class TaskPaneContainerAddon extends AbstractComponentAddon {
 
-  public JXTaskPaneContainerAddon() {
+  public TaskPaneContainerAddon() {
     super("JXTaskPaneContainer");
   }
 

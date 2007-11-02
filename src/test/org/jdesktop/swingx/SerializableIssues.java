@@ -276,7 +276,7 @@ public class SerializableIssues extends InteractiveTestCase {
      * 
      */
     public void testLoginPanel() {
-        JXLoginPanel component = new JXLoginPanel();
+        JXLoginPane component = new JXLoginPane();
         try {
             SerializableSupport.serialize(component);
         } catch (Exception e) {

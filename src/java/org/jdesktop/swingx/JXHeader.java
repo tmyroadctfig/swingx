@@ -24,7 +24,7 @@ package org.jdesktop.swingx;
 import java.awt.Font;
 import javax.swing.Icon;
 import org.jdesktop.swingx.plaf.HeaderUI;
-import org.jdesktop.swingx.plaf.JXHeaderAddon;
+import org.jdesktop.swingx.plaf.HeaderAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 
 /**
@@ -74,7 +74,7 @@ public class JXHeader extends JXPanel {
     
     // ensure at least the default ui is registered
     static {
-        LookAndFeelAddons.contribute(new JXHeaderAddon());
+        LookAndFeelAddons.contribute(new HeaderAddon());
     }
     
     private String title;

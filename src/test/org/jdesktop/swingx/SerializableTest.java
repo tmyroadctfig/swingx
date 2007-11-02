@@ -37,7 +37,7 @@ public class SerializableTest extends InteractiveTestCase {
      * Note: this blows as soon as a JXTable is set!
      */
     public void testDatePickerFormatter() {
-        JXDatePickerFormatter component = new JXDatePickerFormatter();
+        DatePickerFormatter component = new DatePickerFormatter();
         try {
             SerializableSupport.serialize(component);
         } catch (Exception e) {

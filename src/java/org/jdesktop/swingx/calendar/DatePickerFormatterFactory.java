@@ -32,7 +32,7 @@ import java.text.SimpleDateFormat;
  *
  * @author Joshua Outwater
  */
-public class JXDatePickerFormatterFactory extends AbstractFormatterFactory {
+public class DatePickerFormatterFactory extends AbstractFormatterFactory {
     /** Cached formatter */
     protected AbstractFormatter formatter = null;
 
@@ -42,7 +42,7 @@ public class JXDatePickerFormatterFactory extends AbstractFormatterFactory {
     @Override
     public AbstractFormatter getFormatter(JFormattedTextField ftf) {
         if (formatter == null) {
-            formatter = new JXDatePickerFormatter();
+            formatter = new DatePickerFormatter();
         }
         return formatter;
     }
@@ -67,12 +67,12 @@ public class JXDatePickerFormatterFactory extends AbstractFormatterFactory {
      * least complex as it is possible for less complex formats to match more
      * complex strings.
      */
-    private class JXDatePickerFormatter extends
+    private class DatePickerFormatter extends
             JFormattedTextField.AbstractFormatter {
         private SimpleDateFormat _formats[] = null;
         private int _formatIndex = 0;
         
-        public JXDatePickerFormatter() {
+        public DatePickerFormatter() {
             _formats = new SimpleDateFormat[3];
             String format = UIManager.getString("JXDatePicker.longFormat");
             if (format == null) {

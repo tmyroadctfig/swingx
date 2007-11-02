@@ -45,9 +45,9 @@ import org.jdesktop.swingx.util.OS;
  *
  * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
  */
-public class JXTaskPaneAddon extends AbstractComponentAddon {
+public class TaskPaneAddon extends AbstractComponentAddon {
 
-  public JXTaskPaneAddon() {
+  public TaskPaneAddon() {
     super("JXTaskPane");
   }
 

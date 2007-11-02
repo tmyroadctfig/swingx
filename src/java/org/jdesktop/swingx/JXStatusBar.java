@@ -24,7 +24,7 @@ package org.jdesktop.swingx;
 
 import java.awt.Insets;
 import javax.swing.JComponent;
-import org.jdesktop.swingx.plaf.JXStatusBarAddon;
+import org.jdesktop.swingx.plaf.StatusBarAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.StatusBarUI;
 
@@ -109,7 +109,7 @@ public class JXStatusBar extends JComponent {
      * classes.
      */
     static {
-        LookAndFeelAddons.contribute(new JXStatusBarAddon());
+        LookAndFeelAddons.contribute(new StatusBarAddon());
     }
     
     /**

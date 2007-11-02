@@ -25,7 +25,7 @@ package org.jdesktop.swingx.auth;
 import java.beans.PropertyChangeSupport;
 import java.util.prefs.Preferences;
 
-import org.jdesktop.swingx.JXLoginPanel;
+import org.jdesktop.swingx.JXLoginPane;
 
 /**
  * Saves the user names in Preferences. Because any string could be part

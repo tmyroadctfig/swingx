@@ -28,9 +28,9 @@ import org.jdesktop.swingx.JXHyperlink;
  * Addon for <code>JXHyperlink</code>.<br>
  *
  */
-public class JXHyperlinkAddon extends AbstractComponentAddon {
+public class HyperlinkAddon extends AbstractComponentAddon {
 
-  public JXHyperlinkAddon() {
+  public HyperlinkAddon() {
     super("JXHyperlink");
   }
 

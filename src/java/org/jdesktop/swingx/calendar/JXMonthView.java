@@ -42,7 +42,7 @@ import javax.swing.UIManager;
 import org.jdesktop.swingx.DateSelectionModel;
 import org.jdesktop.swingx.DefaultDateSelectionModel;
 import org.jdesktop.swingx.event.EventListenerMap;
-import org.jdesktop.swingx.plaf.JXMonthViewAddon;
+import org.jdesktop.swingx.plaf.MonthViewAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.MonthViewUI;
 import org.jdesktop.swingx.util.Contract;
@@ -177,7 +177,7 @@ public class JXMonthView extends JComponent {
     private static final int YEAR_TRAVERSABLE = 2;
 
     static {
-        LookAndFeelAddons.contribute(new JXMonthViewAddon());
+        LookAndFeelAddons.contribute(new MonthViewAddon());
     }
 
     /**

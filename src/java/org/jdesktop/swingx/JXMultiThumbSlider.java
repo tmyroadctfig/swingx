@@ -28,7 +28,7 @@ import org.jdesktop.swingx.multislider.ThumbDataListener;
 import org.jdesktop.swingx.multislider.ThumbListener;
 import org.jdesktop.swingx.multislider.ThumbRenderer;
 import org.jdesktop.swingx.multislider.TrackRenderer;
-import org.jdesktop.swingx.plaf.JXMultiThumbSliderAddon;
+import org.jdesktop.swingx.plaf.MultiThumbSliderAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.MultiThumbSliderUI;
 
@@ -59,7 +59,7 @@ import java.util.List;
  */
 public class JXMultiThumbSlider<E> extends JComponent {
     static {
-        LookAndFeelAddons.contribute(new JXMultiThumbSliderAddon());
+        LookAndFeelAddons.contribute(new MultiThumbSliderAddon());
     }
 
     public static final String uiClassID = "MultiThumbSliderUI";

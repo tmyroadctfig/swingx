@@ -42,7 +42,7 @@ import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.TextAction;
 
-import org.jdesktop.swingx.autocomplete.workarounds.AquaLnFPopupLocationFix;
+import org.jdesktop.swingx.autocomplete.workarounds.MacOSXPopupLocationFix;
 
 /**
  * This class contains only static utility methods that can be used to set up
@@ -170,7 +170,7 @@ public class AutoCompleteDecorator {
         // has to be editable
         comboBox.setEditable(true);
         // fix the popup location
-        AquaLnFPopupLocationFix.install(comboBox);
+        MacOSXPopupLocationFix.install(comboBox);
 
         // configure the text component=editor component
         JTextComponent editorComponent = (JTextComponent) comboBox.getEditor().getEditorComponent();

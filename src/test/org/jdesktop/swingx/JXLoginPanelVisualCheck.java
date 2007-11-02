@@ -35,7 +35,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.UIManager.LookAndFeelInfo;
 
-import org.jdesktop.swingx.JXLoginPanel.SaveMode;
+import org.jdesktop.swingx.JXLoginPane.SaveMode;
 
 /**
  * Simple tests to ensure that the {@code JXDatePicker} can be instantiated and
@@ -45,7 +45,7 @@ import org.jdesktop.swingx.JXLoginPanel.SaveMode;
  */
 public class JXLoginPanelVisualCheck extends InteractiveTestCase {
     public JXLoginPanelVisualCheck() {
-        super("JXLoginPanel Test");
+        super("JXLoginPane Test");
     }
 
     public static void main(String[] args) throws Exception {
@@ -133,8 +133,8 @@ public class JXLoginPanelVisualCheck extends InteractiveTestCase {
      */
     public void interactiveDisplay() {
         sun.awt.AppContext.getAppContext().put("JComponent.defaultLocale", Locale.FRANCE);
-        JXLoginPanel panel = new JXLoginPanel();
-        JFrame frame = JXLoginPanel.showLoginFrame(panel);
+        JXLoginPane panel = new JXLoginPane();
+        JFrame frame = JXLoginPane.showLoginFrame(panel);
         frame.setJMenuBar(createMenuBar(panel));
 
         panel.setSaveMode(SaveMode.BOTH);

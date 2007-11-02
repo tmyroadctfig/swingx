@@ -32,8 +32,8 @@ import org.jdesktop.swingx.plaf.basic.BasicDatePickerUI;
 /**
  * @author Joshua Outwater
  */
-public class JXDatePickerAddon extends AbstractComponentAddon {
-    public JXDatePickerAddon() {
+public class DatePickerAddon extends AbstractComponentAddon {
+    public DatePickerAddon() {
         super("JXDatePicker");
     }
 
@@ -55,7 +55,7 @@ public class JXDatePickerAddon extends AbstractComponentAddon {
         super.addWindowsDefaults(addon, defaults);
         defaults.addAll(Arrays.asList(new Object[] {
                 "JXDatePicker.arrowIcon",
-                LookAndFeel.makeIcon(JXDatePickerAddon.class, "resources/combo-xp.png")
+                LookAndFeel.makeIcon(DatePickerAddon.class, "resources/combo-xp.png")
         }));
     }
 
@@ -64,7 +64,8 @@ public class JXDatePickerAddon extends AbstractComponentAddon {
         super.addMacDefaults(addon, defaults);
         defaults.addAll(Arrays.asList(new Object[] {
                 "JXDatePicker.arrowIcon",
-                LookAndFeel.makeIcon(JXDatePickerAddon.class, "resources/combo-osx.png")
+                LookAndFeel.makeIcon(DatePickerAddon.class, "resources/combo-osx.png")
         }));
     }
 }
+

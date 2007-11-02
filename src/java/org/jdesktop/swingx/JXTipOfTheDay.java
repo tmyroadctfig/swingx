@@ -26,7 +26,7 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JDialog;
 
-import org.jdesktop.swingx.plaf.JXTipOfTheDayAddon;
+import org.jdesktop.swingx.plaf.TipOfTheDayAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.TipOfTheDayUI;
 import org.jdesktop.swingx.tips.DefaultTipOfTheDayModel;
@@ -122,7 +122,7 @@ public class JXTipOfTheDay extends JXPanel {
 
   // ensure at least the default ui is registered
   static {
-    LookAndFeelAddons.contribute(new JXTipOfTheDayAddon());
+    LookAndFeelAddons.contribute(new TipOfTheDayAddon());
   }
 
   /**
