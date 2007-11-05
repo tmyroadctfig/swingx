@@ -21,7 +21,6 @@
 
 package org.jdesktop.swingx.plaf;
 
-import javax.swing.JSeparator;
 import javax.swing.plaf.PanelUI;
 
 /**

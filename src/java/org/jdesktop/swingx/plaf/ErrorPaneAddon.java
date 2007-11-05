@@ -36,6 +36,9 @@ public class ErrorPaneAddon extends AbstractComponentAddon {
         super("JXErrorPane");
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
         super.addBasicDefaults(addon, defaults);
@@ -45,6 +48,9 @@ public class ErrorPaneAddon extends AbstractComponentAddon {
         }));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected void addMacDefaults(LookAndFeelAddons addon, List<Object> defaults) {
         super.addMacDefaults(addon, defaults);
         defaults.addAll(Arrays.asList(new Object[] {
