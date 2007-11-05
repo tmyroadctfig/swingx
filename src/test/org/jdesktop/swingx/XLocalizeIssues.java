@@ -48,8 +48,8 @@ public class XLocalizeIssues extends InteractiveTestCase {
     @SuppressWarnings("all")
     private static final Logger LOG = Logger.getLogger(XLocalizeIssues.class
             .getName());
-    private static final Locale DEFAULT_LOCALE = Locale.US;
-    private static final Locale ALTERNATIVE_LOCALE = Locale.GERMAN;
+    private static final Locale A_LOCALE = Locale.FRENCH;
+    private static final Locale OTHER_LOCALE = Locale.GERMAN;
 
 
     private Locale originalLocale;
@@ -62,8 +62,8 @@ public class XLocalizeIssues extends InteractiveTestCase {
 //      setSystemLF(true);
       XLocalizeIssues test = new XLocalizeIssues();
       try {
-        test.runInteractiveTests();
-//          test.runInteractiveTests("interactive.*File.*");
+//        test.runInteractiveTests();
+          test.runInteractiveTests("interactive.*Find.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -112,9 +112,9 @@ public class XLocalizeIssues extends InteractiveTestCase {
         // sanity
         assertNotNull(uiValue);
         assertEquals(name, uiValue);
-        Locale alternative = ALTERNATIVE_LOCALE;
+        Locale alternative = OTHER_LOCALE;
         if (alternative.getLanguage().equals(table.getLocale().getLanguage())) {
-            alternative = DEFAULT_LOCALE;
+            alternative = A_LOCALE;
         }
         table.setLocale(alternative);
         String altUIValue = UIManager.getString("JXTable." + actionCommand,
@@ -146,10 +146,10 @@ public class XLocalizeIssues extends InteractiveTestCase {
      */
     public void testGetLocaleUIDefaults() {
         String key = "JXTable.column.packAll";
-        Object alternativeValue = UIManager.get(key, ALTERNATIVE_LOCALE);
+        Object alternativeValue = UIManager.get(key, OTHER_LOCALE);
         // sanity - the value must be available
         assertNotNull(alternativeValue);
-        Object defaultValue = UIManager.get(key, DEFAULT_LOCALE);
+        Object defaultValue = UIManager.get(key, A_LOCALE);
         // sanity - the value must be available
         assertNotNull(defaultValue);
         assertFalse("values must be different: " + defaultValue + "/" + alternativeValue, defaultValue.equals(alternativeValue));
@@ -167,7 +167,8 @@ public class XLocalizeIssues extends InteractiveTestCase {
 
             public void actionPerformed(ActionEvent e) {
                 Locale old = table.getLocale();
-                table.setLocale(old == DEFAULT_LOCALE ? ALTERNATIVE_LOCALE : DEFAULT_LOCALE);
+                table.setLocale(old == A_LOCALE ? OTHER_LOCALE : A_LOCALE);
+                table.getColumnExt(0).setTitle(table.getLocale().getLanguage());
                 
             }
             
@@ -178,44 +179,59 @@ public class XLocalizeIssues extends InteractiveTestCase {
     }
     
     /**
+     * Issue #459-swingx: columnControl properties not updated on locale setting.
+     *
+     */
+    public void interactiveLocaleColumnControl2() {
+        final JXTable table = new JXTable(10, 4);
+        table.setColumnControlVisible(true);
+        table.getColumnExt(0).setTitle(table.getLocale().getLanguage());
+        JXTable other = new JXTable(10, 4);
+        other.setColumnControlVisible(true);
+        other.setLocale(A_LOCALE);
+        other.getColumnExt(0).setTitle(other.getLocale().getLanguage());
+        JXFrame frame = wrapWithScrollingInFrame(table, other, "different locals: ");
+        frame.setVisible(true);
+    }
+    /**
      * similar to Issue #459-swingx: findPanel properties not updated on setLocale.
      *
      */
     public void interactiveLocaleFindPanel() {
         final JXTable table = new JXTable(10, 4);
-        table.setColumnControlVisible(true);
         table.getColumnExt(0).setTitle(Locale.getDefault().getLanguage());
         final JXFrame frame = wrapWithScrollingInFrame(table, "toggle locale on default - FindPanel");
         Action toggleLocale = new AbstractActionExt("toggleLocale") {
 
             public void actionPerformed(ActionEvent e) {
                 Locale old = Locale.getDefault();
-                Locale.setDefault(old == DEFAULT_LOCALE ? ALTERNATIVE_LOCALE : DEFAULT_LOCALE);
+                Locale.setDefault(old == A_LOCALE ? OTHER_LOCALE : A_LOCALE);
                 // make sure newly created comps get the new locale by default
                 // Note: this does not effect components which are already
                 // created
                 JComponent.setDefaultLocale(Locale.getDefault());
                 table.getColumnExt(0).setTitle(Locale.getDefault().getLanguage());
+                LOG.info("old/new " + old + "/" + Locale.getDefault());
                 
             }
             
         };
-        Action open = new AbstractActionExt("open") {
+        Action open = new AbstractActionExt("open find") {
 
             public void actionPerformed(ActionEvent e) {
-                JXFindPanel errorPane = SearchFactory.getInstance().getSharedFindPanel();
+                JXFindPanel findPanel = SearchFactory.getInstance().getSharedFindPanel();
                 
                 // we are fine if the chooser is re-created in each call
                 // _and_ the JComponent.defaultLocale is kept in synch with
                 // with Locale.getDefault()
                 // JFileChooser chooser = new JFileChooser();
                 // otherwise we have to update the chooser's locale manually
-                if (!Locale.getDefault().equals(errorPane.getLocale())) {
-                    errorPane.setLocale(Locale.getDefault());
+                if (!Locale.getDefault().equals(findPanel.getLocale())) {
+                    findPanel.setLocale(Locale.getDefault());
                     // need to explicitly trigger re-install to pick up the new
                     // locale-dependent state
                     // this throws java error - UIDefaults.getUI() failed ... ??
-                    errorPane.updateUI();
+                    findPanel.updateUI();
                 }
                 SearchFactory.getInstance().showFindDialog(table, table.getSearchable());
             }
@@ -225,6 +241,57 @@ public class XLocalizeIssues extends InteractiveTestCase {
         addAction(frame, open);
         frame.setVisible(true);
     }
+
+
+    /**
+     * similar to Issue #459-swingx: findPanel properties not updated on setLocale.
+     *
+     */
+    public void interactiveLocaleFindBar() {
+        final JXTable table = new JXTable(10, 4);
+        table.getColumnExt(0).setTitle(Locale.getDefault().getLanguage());
+        final JXFrame frame = wrapWithScrollingInFrame(table, "toggle locale on default - FindPanel");
+        Action toggleLocale = new AbstractActionExt("toggleLocale") {
+
+            public void actionPerformed(ActionEvent e) {
+                Locale old = Locale.getDefault();
+                Locale.setDefault(old == A_LOCALE ? OTHER_LOCALE : A_LOCALE);
+                // make sure newly created comps get the new locale by default
+                // Note: this does not effect components which are already
+                // created
+                JComponent.setDefaultLocale(Locale.getDefault());
+                table.getColumnExt(0).setTitle(Locale.getDefault().getLanguage());
+                LOG.info("old/new " + old + "/" + Locale.getDefault());
+                
+            }
+            
+        };
+        Action open = new AbstractActionExt("open find") {
+
+            public void actionPerformed(ActionEvent e) {
+                JXFindBar findPanel = SearchFactory.getInstance().getSharedFindBar();
+                
+                // we are fine if the chooser is re-created in each call
+                // _and_ the JComponent.defaultLocale is kept in synch with
+                // with Locale.getDefault()
+                // JFileChooser chooser = new JFileChooser();
+                // otherwise we have to update the chooser's locale manually
+                if (!Locale.getDefault().equals(findPanel.getLocale())) {
+                    findPanel.setLocale(Locale.getDefault());
+                    // need to explicitly trigger re-install to pick up the new
+                    // locale-dependent state
+                    // this throws java error - UIDefaults.getUI() failed ... ??
+                    findPanel.updateUI();
+                }
+                SearchFactory.getInstance().showFindBar(table, table.getSearchable());
+            }
+
+        };
+        addAction(frame, toggleLocale);
+        addAction(frame, open);
+        frame.setVisible(true);
+    }
+
 
     /**
      * similar to Issue #459-swingx: errorPane properties not updated on setLocale.<p>
@@ -241,8 +308,8 @@ public class XLocalizeIssues extends InteractiveTestCase {
 
             public void actionPerformed(ActionEvent e) {
                 Locale old = Locale.getDefault();
-                Locale.setDefault(old == DEFAULT_LOCALE ? ALTERNATIVE_LOCALE
-                        : DEFAULT_LOCALE);
+                Locale.setDefault(old == A_LOCALE ? OTHER_LOCALE
+                        : A_LOCALE);
                 // make sure newly created comps get the new locale by default
                 // Note: this does not effect components which are already
                 // created
@@ -256,7 +323,7 @@ public class XLocalizeIssues extends InteractiveTestCase {
         final JXErrorPane errorPane = new JXErrorPane();
         // work around issue #??-swingx: errorPane must cope with null errorInfo.
         errorPane.setErrorInfo(new ErrorInfo("title", "xxxx-yyy", null, null, null, null, null));
-        Action open = new AbstractActionExt("open") {
+        Action open = new AbstractActionExt("open error") {
 
             public void actionPerformed(ActionEvent e) {
                 // we are fine if the chooser is re-created in each call
@@ -311,8 +378,8 @@ public class XLocalizeIssues extends InteractiveTestCase {
 
             public void actionPerformed(ActionEvent e) {
                 Locale old = Locale.getDefault();
-                Locale.setDefault(old == DEFAULT_LOCALE ? ALTERNATIVE_LOCALE
-                        : DEFAULT_LOCALE);
+                Locale.setDefault(old == A_LOCALE ? OTHER_LOCALE
+                        : A_LOCALE);
                 // make sure newly created comps get the new locale by default
                 // Note: this does not effect components which are already
                 // created
@@ -371,8 +438,8 @@ public class XLocalizeIssues extends InteractiveTestCase {
 
             public void actionPerformed(ActionEvent e) {
                 Locale old = Locale.getDefault();
-                Locale.setDefault(old == DEFAULT_LOCALE ? ALTERNATIVE_LOCALE
-                        : DEFAULT_LOCALE);
+                Locale.setDefault(old == A_LOCALE ? OTHER_LOCALE
+                        : A_LOCALE);
                 // make sure newly created comps get the new locale by default
                 // Note: this does not effect components which are already
                 // created

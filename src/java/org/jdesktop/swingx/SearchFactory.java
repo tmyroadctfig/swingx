@@ -324,6 +324,8 @@ public class SearchFactory {
         JXDialog findDialog;
         if ((topLevel != null) && (topLevel.getOwner().equals(frame))) {
             findDialog = topLevel;
+            // JW: #635-swingx - quick hack to update title to current locale ...
+            findDialog.setTitle(getSharedFindPanel().getName());
             KeyboardFocusManager.getCurrentKeyboardFocusManager().focusNextComponent(findDialog);
         } else {
             Point location = hideSharedFilePanel();

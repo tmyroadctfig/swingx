@@ -31,6 +31,7 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Locale;
 
 /**
  * Common base class of ui clients.
@@ -138,7 +139,7 @@ public abstract class AbstractPatternPanel extends JXPanel {
      *  if no value bound to this key in UIManager
      */
     protected String getUIString(String key) {
-        String text = UIManager.getString(PatternModel.SEARCH_PREFIX + key);
+        String text = UIManager.getString(PatternModel.SEARCH_PREFIX + key, getLocale());
         return text != null ? text : key;
     }
 
@@ -178,6 +179,40 @@ public abstract class AbstractPatternPanel extends JXPanel {
         return action;
     }
 
+//------------------------ dynamic locale support
+    
+
+    @Override
+    public void setLocale(Locale l) {
+        super.setLocale(l);
+        updateLocaleState();
+    }
+    
+    /**
+     * Updates locale-dependent state.
+     * 
+     * Here: updates registered column actions' locale-dependent state.
+     * <p>
+     * 
+     * PENDING: Try better to find all column actions including custom
+     * additions? Or move to columnControl?
+     * 
+     * @see #setLocale(Locale)
+     * @see #updateLocaleActionState(String)
+     */
+    protected void updateLocaleState() {
+        for (Object key : getActionMap().allKeys()) {
+            if (key instanceof String) {
+                String keyString = getUIString((String) key);
+                if (!key.equals(keyString)) {
+                    getActionMap().get(key).putValue(Action.NAME, keyString);
+                    
+                }
+            }
+        }
+        bindSearchLabel();
+    }
+    
 
     //---------------------- synch patternModel <--> components
 

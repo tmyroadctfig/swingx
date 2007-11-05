@@ -226,9 +226,19 @@ public class JXFindPanel extends AbstractPatternPanel {
         JOptionPane.showMessageDialog(this, "Value not found");
     }
 
-
+    
+//-------------- dynamic Locale support
+    
+    
+    
+    @Override
+    protected void updateLocaleState() {
+        super.updateLocaleState();
+        setName(getUIString(SEARCH_TITLE));
+    }
     //-------------------------- initial
     
+
     /**
      * creates and registers all "executable" actions.
      * Meaning: the actions bound to a callback method on this.
@@ -278,4 +288,5 @@ public class JXFindPanel extends AbstractPatternPanel {
         add(lBox);
         add(rBox);
     }
+
 }
