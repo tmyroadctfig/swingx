@@ -1013,12 +1013,12 @@ public class JXTable extends JTable
      * {@inheritDoc} <p>
      * Overridden to update locale-dependent properties. 
      * 
-     * @see #updateLocaleState() 
+     * @see #updateLocaleState(Locale) 
      */
     @Override
-    public void setLocale(Locale l) {
-        updateLocaleState(l);
-        super.setLocale(l);
+    public void setLocale(Locale locale) {
+        updateLocaleState(locale);
+        super.setLocale(locale);
     }
     
     /**
