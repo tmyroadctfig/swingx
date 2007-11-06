@@ -67,12 +67,8 @@ public class JXButton extends JButton {
     private boolean borderPainted = true;
     private boolean contentAreaFilled = true;
     
-    //the default fg and bg painters
-    private static final Painter<JXButton> DEFAULT_BACKGROUND_PAINTER = new DefaultBackgroundPainter();
-    private static final Painter<JXButton> DEFAULT_FOREGROUND_PAINTER = new DefaultForegroundPainter();
-
-    private Painter<JXButton> fgPainter = DEFAULT_FOREGROUND_PAINTER;
-    private Painter<JXButton> bgPainter = DEFAULT_BACKGROUND_PAINTER;
+    private Painter<JXButton> fgPainter = new DefaultForegroundPainter();
+    private Painter<JXButton> bgPainter = new DefaultBackgroundPainter();
 
     /** Creates a new instance of JXButton */
     public JXButton() {}
