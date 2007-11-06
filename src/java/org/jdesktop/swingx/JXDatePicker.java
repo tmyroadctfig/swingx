@@ -233,7 +233,12 @@ public class JXDatePicker extends JComponent {
         _monthView = new JXMonthView();
         _monthView.setTraversable(true);
 
-        _linkFormat = new MessageFormat(UIManager.getString("JXDatePicker.linkFormat"));
+        String linkFormat = UIManager.getString("JXDatePicker.linkFormat");
+        if (linkFormat != null) {
+            _linkFormat = new MessageFormat(linkFormat);
+        } else {
+            _linkFormat = new MessageFormat("{0,date, dd MMMM yyyy}");
+        }
 
         _linkDate = System.currentTimeMillis();
         _linkPanel = new TodayPanel();

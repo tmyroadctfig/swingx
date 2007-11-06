@@ -1,0 +1,228 @@
+/*
+ * $Id$
+ *
+ * Copyright 2006 Sun Microsystems, Inc., 4150 Network Circle,
+ * Santa Clara, California 95054, U.S.A. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+package org.jdesktop.swingx;
+
+import java.awt.event.ActionEvent;
+import java.util.Locale;
+import java.util.logging.Logger;
+
+import javax.swing.Action;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+
+import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.error.ErrorInfo;
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+
+/**
+ * Test to expose known issues around <code>Locale</code> setting.
+ * 
+ * Ideally, there would be at least one failing test method per open
+ * Issue in the issue tracker. Plus additional failing test methods for
+ * not fully specified or not yet decided upon features/behaviour.
+ * 
+ * @author Jeanette Winzenburg
+ */
+public class XLocalizeTest extends InteractiveTestCase {
+    @SuppressWarnings("all")
+    private static final Logger LOG = Logger.getLogger(XLocalizeTest.class
+            .getName());
+    private static final Locale A_LOCALE = Locale.FRENCH;
+    private static final Locale OTHER_LOCALE = Locale.GERMAN;
+
+
+    private Locale originalLocale;
+    // test scope is static anyway...
+    static {
+        // force the addon to load
+        LookAndFeelAddons.getAddon();
+    }
+    public static void main(String[] args) {
+//      setSystemLF(true);
+      XLocalizeTest test = new XLocalizeTest();
+      try {
+        test.runInteractiveTests();
+//          test.runInteractiveTests("interactive.*TwoTable.*");
+      } catch (Exception e) {
+          System.err.println("exception when executing interactive tests:");
+          e.printStackTrace();
+      }
+
+    }
+
+    @Override
+    protected void setUp() throws Exception {
+        originalLocale = Locale.getDefault();
+        super.setUp();
+    }
+    
+    
+
+    @Override
+    protected void tearDown() throws Exception {
+        Locale.setDefault(originalLocale);
+        super.tearDown();
+    }
+
+    /**
+     * Issue #635-swingx: find widgets must support dynamic localization
+     * Here: test findPanel's actions (incomplete ..)
+     */
+    public void testLocaleFindPanel() {
+        JXFindPanel panel = new JXFindPanel();
+        // JW: arrrgghh ... dirty! Consequence of dirty initialization 
+        // of AbstractPatternPanel subclasses ...
+        panel.addNotify();
+        String prefix = PatternModel.SEARCH_PREFIX;
+        assertLocaleActionUpdate(panel, prefix, AbstractPatternPanel.MATCH_ACTION_COMMAND);
+        assertLocaleActionUpdate(panel, prefix, JXFindPanel.FIND_NEXT_ACTION_COMMAND);
+        assertLocaleActionUpdate(panel, prefix, JXFindPanel.FIND_PREVIOUS_ACTION_COMMAND);
+    }
+    
+    /**
+     * Issue #459-swingx: JXTable setLocale doesn't update localized column
+     * control properties. <p>
+     * 
+     * Pass/fail expectation:
+     * <ul>
+     * <li> fails always with jdk5 independent of LookAndFeelAddon resource
+     * bundle registration.
+     * <li> fails with jdk6 and LookAndFeelAddon copy resource bundle values.
+     * <li> passes with jdk6 and LookAndFeelAddon addResourceBundle.
+     * </ul>
+     */
+    public void testLocaleColumnControl() {
+       String prefix = "JXTable.";
+       JXTable table = new JXTable(10, 2);
+       assertLocaleActionUpdate(table, prefix, JXTable.HORIZONTALSCROLL_ACTION_COMMAND);
+       assertLocaleActionUpdate(table, prefix, JXTable.PACKALL_ACTION_COMMAND);
+       assertLocaleActionUpdate(table, prefix, JXTable.PACKSELECTED_ACTION_COMMAND);
+    }
+
+    private void assertLocaleActionUpdate(JComponent table, String prefix, String actionCommand) {
+        Action action = table.getActionMap().get(actionCommand);
+        String name = (String) action.getValue(Action.NAME);
+        String uiValue = UIManager.getString(prefix + actionCommand, table
+                .getLocale());
+        // sanity
+        assertNotNull(uiValue);
+        assertEquals(name, uiValue);
+        Locale alternative = OTHER_LOCALE;
+        if (alternative.getLanguage().equals(table.getLocale().getLanguage())) {
+            alternative = A_LOCALE;
+        }
+        table.setLocale(alternative);
+        String altUIValue = UIManager.getString(prefix + actionCommand,
+                table.getLocale());
+        // sanity
+        assertNotNull(altUIValue);
+        // sanity to track unexpected failure during refactoring
+        assertFalse("new uiValue  must be different: " + uiValue + "/"
+                + altUIValue, uiValue.equals(altUIValue));
+        String altName = (String) action.getValue(Action.NAME);
+        // here are the real asserts
+        assertFalse("new action name must be different: " + name + "/"
+                + altName, name.equals(altName));
+        assertEquals(altName, altUIValue);
+    }
+    
+    /**
+     * Issue #466-swingx: locale-dependent values not accessible. This looks
+     * like a side-effect of the first go on #159-swingx (not all values of
+     * resourceBundle available).
+     * <p>
+     * 
+     * Could be core problem (in jdk5, fixed in jdk6) around classloader and
+     * ResourceBundle: <a
+     * href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4834404">
+     * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4834404 </a>
+     * 
+     * 
+     */
+    public void testGetLocaleUIDefaults() {
+        String key = "JXTable.column.packAll";
+        Object alternativeValue = UIManager.get(key, OTHER_LOCALE);
+        // sanity - the value must be available
+        assertNotNull(alternativeValue);
+        Object defaultValue = UIManager.get(key, A_LOCALE);
+        // sanity - the value must be available
+        assertNotNull(defaultValue);
+        assertFalse("values must be different: " + defaultValue + "/" + alternativeValue, defaultValue.equals(alternativeValue));
+    }
+    
+    /**
+     * Issue #459-swingx: columnControl properties not updated on locale setting.
+     *
+     */
+    public void interactiveLocaleColumnControl() {
+        final JXTable table = new JXTable(10, 4);
+        table.setColumnControlVisible(true);
+        table.getColumnExt(0).setTitle(table.getLocale().getLanguage());
+        Action toggleLocale = new AbstractActionExt("toggleLocale") {
+
+            public void actionPerformed(ActionEvent e) {
+                Locale old = table.getLocale();
+                table.setLocale(old == A_LOCALE ? OTHER_LOCALE : A_LOCALE);
+                table.getColumnExt(0).setTitle(table.getLocale().getLanguage());
+                
+            }
+            
+        };
+        JXFrame frame = wrapWithScrollingInFrame(table, "toggle locale on table - column control not updated");
+        addAction(frame, toggleLocale);
+        frame.setVisible(true);
+    }
+    
+    /**
+     * Issue #459-swingx: columnControl properties not updated on locale setting.
+     *
+     * 
+     */
+    public void interactiveLocaleColumnControlTwoTables() {
+        final JXTable table = new JXTable(10, 4);
+        table.setColumnControlVisible(true);
+        table.getColumnExt(0).setTitle(table.getLocale().getLanguage());
+        JXTable other = new JXTable(10, 4);
+        other.setColumnControlVisible(true);
+        other.setLocale(A_LOCALE);
+        other.getColumnExt(0).setTitle(other.getLocale().getLanguage());
+        JXFrame frame = wrapWithScrollingInFrame(table, other, "different locals: de <--> vs fr");
+        Action toggleLocale = new AbstractActionExt("toggle useFindBar") {
+
+            private boolean useFindBar;
+
+            public void actionPerformed(ActionEvent e) {
+                useFindBar = !useFindBar;
+                SearchFactory.getInstance().setUseFindBar(useFindBar);
+            }
+            
+        };
+        addAction(frame, toggleLocale);
+        addMessage(frame, "Find panel/bar should be localized per-table");
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+
+}

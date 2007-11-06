@@ -24,6 +24,7 @@ import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.KeyEvent;
+import java.util.Locale;
 
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -134,6 +135,19 @@ public class JXDialog extends JDialog {
         }
         this.content = content;
         build();
+        setTitleFromContent();
+    }
+
+    /**
+     * Infers and sets this dialog's title from the the content. 
+     * Does nothing if content is null. 
+     * 
+     * Here: uses the content's name as title. 
+     * 
+     * @param content the contained component 
+     */
+    protected void setTitleFromContent() {
+        if (content == null) return;
         setTitle(content.getName());
     }
 
@@ -168,6 +182,55 @@ public class JXDialog extends JDialog {
         super.setVisible(visible);
     }
 
+//------------------------ dynamic locale support
+    
+
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to set the content's Locale and then updated
+     * this dialog's internal state. <p>
+     * 
+     * 
+     */
+    @Override
+    public void setLocale(Locale l) {
+        super.setLocale(l);
+        /*
+        * NOTE: this is called from super's constructor as one of the
+        * first methods (prior to setting the rootPane!). So back out
+        * 
+        */  
+        if (content == null) return; 
+        content.setLocale(l);
+        updateLocaleState();
+    }
+    
+    /**
+     * Updates this dialog's locale-dependent state.
+     * 
+     * Here: updates title and actions.
+     * <p>
+     * 
+     * 
+     * @see #setLocale(Locale)
+     */
+    protected void updateLocaleState() {
+        setTitleFromContent();
+        for (Object key : getRootPane().getActionMap().allKeys()) {
+            if (key instanceof String) {
+                Action contentAction = content.getActionMap().get(key);
+                Action rootPaneAction = getAction(key);
+                if ((!rootPaneAction.equals(contentAction))) {
+                    String keyString = getUIString((String) key);
+                    if (!key.equals(keyString)) {
+                        rootPaneAction.putValue(Action.NAME, keyString);
+                    }
+                }
+            }
+        }
+    }
+    
     /**
      * The callback method executed when closing the dialog. <p>
      * Here: calls dispose. 
@@ -207,12 +270,12 @@ public class JXDialog extends JDialog {
         };
 
         panel.setBorder(BorderFactory.createEmptyBorder(9, 0, 0, 0));
-        Action findAction = getAction(EXECUTE_ACTION_COMMAND);
+        Action executeAction = getAction(EXECUTE_ACTION_COMMAND);
         Action closeAction = getAction(CLOSE_ACTION_COMMAND);
 
-        JButton findButton = new JButton(findAction);
+        JButton findButton = new JButton(executeAction);
         panel.add(findButton);
-        if (findAction != closeAction) {
+        if (executeAction != closeAction) {
             panel.add(new JButton(closeAction));
         }
 
@@ -257,7 +320,7 @@ public class JXDialog extends JDialog {
      *   value was null.
      */
     private String getUIString(String key) {
-        String text = UIManager.getString(UIPREFIX + key);
+        String text = UIManager.getString(UIPREFIX + key, getLocale());
         return text != null ? text : key;
     }
 

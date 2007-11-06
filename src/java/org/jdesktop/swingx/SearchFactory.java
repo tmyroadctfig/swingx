@@ -97,7 +97,7 @@ public class SearchFactory {
     private FindRemover findRemover;
     
     /** 
-     * returns the shared SearchFactory.
+     * Returns the shared SearchFactory.
      * 
      * @return the shared <code>SearchFactory</code>
      */
@@ -107,9 +107,22 @@ public class SearchFactory {
           }
           return searchFactory;
       }
-    
+
     /**
+     * Sets the shared SearchFactory.
      * 
+     * @param factory
+     */
+    public static void setInstance(SearchFactory factory) {
+        searchFactory = factory;
+    }
+
+    /**
+     * Returns a common Keystroke for triggering 
+     * a search. Tries to be OS-specific. <p>
+     * 
+     * PENDING: this should be done in the LF and the
+     * keyStroke looked up in the UIManager. 
      * 
      * @return the keyStroke to register with a findAction.
      */
@@ -126,23 +139,41 @@ public class SearchFactory {
         
     }
     /**
-     * sets the shared SearchFactory.
+     * Returns decision about using a batch- vs. incremental-find for the
+     * searchable. This implementation returns the useFindBar property directly.
      * 
-     * @param factory
+     * @param target - the component associated with the searchable
+     * @param searchable - the object to search.
+     * @return true if a incremental-find should be used, false otherwise.
      */
-    public static void setInstance(SearchFactory factory) {
-        searchFactory = factory;
+    public boolean isUseFindBar(JComponent target, Searchable searchable) {
+        return useFindBar;
     }
+ 
+    /**
+     * Sets the default search type to incremental or batch, for a
+     * true/false boolean. The default value is false (== batch).
+     * 
+     * @param incremental a boolean to indicate the default search
+     * type, true for incremental and false for batch.
+     */
+    public void setUseFindBar(boolean incremental) {
+        if (incremental == useFindBar) return;
+        this.useFindBar = incremental;
+        getFindRemover().endSearching();
+    }
+
     
     /**
      * Shows an appropriate find widget targeted at the searchable.
-     * This implementation opens a batch-find or incremental-find 
-     * widget based on the showFindInToolBar property (which defaults
-     * to false).
-     *  
+     * Opens a batch-find or incremental-find 
+     * widget based on the return value of <code>isUseFindBar</code>. 
      *  
      * @param target - the component associated with the searchable
      * @param searchable - the object to search.
+     * 
+     * @see #isUseFindBar(JComponent, Searchable)
+     * @see #setUseFindBar(boolean)
      */
     public void showFindInput(JComponent target, Searchable searchable) {
         if (isUseFindBar(target, searchable)) {
@@ -152,6 +183,8 @@ public class SearchFactory {
         }
     }
 
+//------------------------- incremental search
+    
     /**
      * Show a incremental-find widget targeted at the searchable.
      * 
@@ -184,10 +217,35 @@ public class SearchFactory {
             
         }
         lastFindBarTarget = target;
+        findBar.setLocale(target.getLocale());
         target.putClientProperty(AbstractSearchable.MATCH_HIGHLIGHTER, Boolean.TRUE);
         getSharedFindBar().setSearchable(searchable);
         installFindRemover(target, findBar);
     }
+
+    /**
+     * Returns the shared JXFindBar. Creates and configures on 
+     * first call.
+     * 
+     * @return the shared <code>JXFindBar</code>
+     */
+    public JXFindBar getSharedFindBar() {
+        if (findBar == null) {
+            findBar = createFindBar();
+            configureSharedFindBar();
+        }
+        return findBar;
+    }
+
+    /**
+     * Factory method to create a JXFindBar.
+     * 
+     * @return the <code>JXFindBar</code>
+     */
+    public JXFindBar createFindBar() {
+        return new JXFindBar();
+    }
+
 
     protected void installFindRemover(Container target, Container findWidget) {
         if (target != null) {
@@ -221,22 +279,34 @@ public class SearchFactory {
         }
     }
 
-    /**
-     * returns the shared JXFindBar. Creates and configures on 
-     * first call.
-     * @return the shared <code>JXFindBar</code>
-     */
-    public JXFindBar getSharedFindBar() {
-        if (findBar == null) {
-            findBar = createFindBar();
-            configureSharedFindBar();
+    protected void stopSearching() {
+        if (findPanel != null) {
+            lastFindDialogLocation = hideSharedFindPanel();
+            findPanel.setSearchable(null);
         }
-        return findBar;
+        if (findBar != null) {
+            releaseFindBar();
+         }
     }
+
+    /**
+     * Pre: findbar != null.
+     */
+    protected void releaseFindBar() {
+        findBar.setSearchable(null);
+        if (lastFindBarTarget != null) {
+            lastFindBarTarget.putClientProperty(AbstractSearchable.MATCH_HIGHLIGHTER, Boolean.FALSE);
+            lastFindBarTarget = null;
+        }
+        removeFromParent(findBar);
+    }
+
     
     /**
-     * called after creation of shared FindBar.
-     * Subclasses can add configuration code. 
+     * Configures the shared FindBar. This method is
+     * called once after creation of the shared FindBar.
+     * Subclasses can override to add configuration code. <p>
+     * 
      * Here: registers a custom action to remove the 
      * findbar from its ancestor container.
      * 
@@ -257,48 +327,7 @@ public class SearchFactory {
         findBar.getActionMap().put(JXDialog.CLOSE_ACTION_COMMAND, removeAction);
     }
 
-    /**
-     * Factory method to create a JXFindBar.
-     * 
-     * @return the <code>JXFindBar</code>
-     */
-    public JXFindBar createFindBar() {
-        return new JXFindBar();
-    }
-
-
-    /**
-     * returns the shared JXFindPanel. Creates and configures on 
-     * first call.
-     * @return the shared <code>JXFindPanel</code>
-     */
-    public JXFindPanel getSharedFindPanel() {
-        if (findPanel == null) {
-            findPanel = createFindPanel();
-            configureSharedFindPanel();
-        }
-        return findPanel;
-    }
-    
-    /**
-     * called after creation of shared FindPanel.
-     * Subclasses can add configuration code. 
-     * Here: no-op
-     * PRE: findPanel != null.
-     *
-     */
-    protected void configureSharedFindPanel() {
-    }
-
-    /**
-     * Factory method to create a JXFindPanel.
-     * 
-     * @return <code>JXFindPanel</code>
-     */
-    public JXFindPanel createFindPanel() {
-        return new JXFindPanel();
-    }
-
+//------------------------ batch search
 
     /**
      * Show a batch-find widget targeted at the given Searchable.
@@ -320,15 +349,15 @@ public class SearchFactory {
 //                frame = (Frame) window;
 //            }
         }
-        JXDialog topLevel = getDialogForSharedFilePanel();
+        JXDialog topLevel = getDialogForSharedFindPanel();
         JXDialog findDialog;
         if ((topLevel != null) && (topLevel.getOwner().equals(frame))) {
             findDialog = topLevel;
             // JW: #635-swingx - quick hack to update title to current locale ...
-            findDialog.setTitle(getSharedFindPanel().getName());
+//            findDialog.setTitle(getSharedFindPanel().getName());
             KeyboardFocusManager.getCurrentKeyboardFocusManager().focusNextComponent(findDialog);
         } else {
-            Point location = hideSharedFilePanel();
+            Point location = hideSharedFindPanel();
             if (frame instanceof Frame) {
                 findDialog = new JXDialog((Frame) frame, getSharedFindPanel());
             } else if (frame instanceof Dialog) {
@@ -338,7 +367,7 @@ public class SearchFactory {
                 findDialog = new JXDialog(JOptionPane.getRootFrame(), getSharedFindPanel());
             }
             // RJO: shouldn't we avoid overloaded useage like this in a JSR296 world? swap getName() for getTitle() here?            
-            findDialog.setTitle(getSharedFindPanel().getName());
+//            findDialog.setTitle(getSharedFindPanel().getName());
             // JW: don't - this will stay on top of all applications!
             // findDialog.setAlwaysOnTop(true);
             findDialog.pack();
@@ -348,20 +377,58 @@ public class SearchFactory {
                 findDialog.setLocation(location);
             }
         } 
-        
+        findDialog.setLocale(target.getLocale());
         getSharedFindPanel().setSearchable(searchable);
         installFindRemover(target, findDialog);
         findDialog.setVisible(true);
     }
 
+
+    /**
+     * Returns the shared JXFindPanel. Lazyly creates and configures on 
+     * first call.
+     * 
+     * @return the shared <code>JXFindPanel</code>
+     */
+    public JXFindPanel getSharedFindPanel() {
+        if (findPanel == null) {
+            findPanel = createFindPanel();
+            configureSharedFindPanel();
+        }
+        return findPanel;
+    }
+
+    /**
+     * Factory method to create a JXFindPanel.
+     * 
+     * @return <code>JXFindPanel</code>
+     */
+    public JXFindPanel createFindPanel() {
+        return new JXFindPanel();
+    }
+
+
+    /**
+     * Configures the shared FindPanel. This method is
+     * called once after creation of the shared FindPanel.
+     * Subclasses can override to add configuration code. <p>
+     * 
+     * Here: no-op
+     * PRE: findPanel != null.
+     *
+     */
+    protected void configureSharedFindPanel() {
+    }
+
+
     
-    private JXDialog getDialogForSharedFilePanel() {
+    private JXDialog getDialogForSharedFindPanel() {
         if (findPanel == null) return null;
         Window window = SwingUtilities.getWindowAncestor(findPanel);
         return (window instanceof JXDialog) ? (JXDialog) window : null;
     }
 
-    protected Point hideSharedFilePanel() {
+    protected Point hideSharedFindPanel() {
         if (findPanel == null) return null;
         Window window = SwingUtilities.getWindowAncestor(findPanel);
         Point location = lastFindDialogLocation;
@@ -373,53 +440,6 @@ public class SearchFactory {
             window.dispose();
         }
         return location;
-    }
-
-    protected void stopSearching() {
-        if (findPanel != null) {
-            lastFindDialogLocation = hideSharedFilePanel();
-            findPanel.setSearchable(null);
-        }
-        if (findBar != null) {
-            releaseFindBar();
-         }
-    }
-
-    /**
-     * Pre: findbar != null.
-     */
-    protected void releaseFindBar() {
-        findBar.setSearchable(null);
-        if (lastFindBarTarget != null) {
-            lastFindBarTarget.putClientProperty(AbstractSearchable.MATCH_HIGHLIGHTER, Boolean.FALSE);
-            lastFindBarTarget = null;
-        }
-        removeFromParent(findBar);
-    }
-
-    /**
-     * Returns decision about using a batch- vs. incremental-find for the
-     * searchable. This implementation returns the useFindBar property
-     * directly.
-     * 
-     * @param target -
-     *            the component associated with the searchable
-     * @param searchable -
-     *            the object to search.
-     * @return true if a incremental-find should be used, false otherwise.
-     */
-    public boolean isUseFindBar(JComponent target, Searchable searchable) {
-        return useFindBar;
-    }
- 
-    /**
-     * 
-     * @param inToolBar
-     */
-    public void setUseFindBar(boolean inToolBar) {
-        if (inToolBar == useFindBar) return;
-        this.useFindBar = inToolBar;
-        getFindRemover().endSearching();
     }
 
     public class FindRemover implements PropertyChangeListener {
