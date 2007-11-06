@@ -42,9 +42,6 @@ import java.awt.Window;
 import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.ContainerListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
@@ -588,7 +585,6 @@ public class JXLoginPane extends JXImagePanel {
         // don't show by default. We perform test when login panel gets focus.
         
         int lShift = 3;// lShift is used to align all other components with the checkbox
-        Insets labelInsets = new Insets(0, lShift, 5, 11);
         GridLayout grid = new GridLayout(2,1);
         grid.setVgap(5);
         JPanel fields = new JPanel(grid);
@@ -626,7 +622,7 @@ public class JXLoginPane extends JXImagePanel {
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 2;
             gridBagConstraints.anchor = GridBagConstraints.LINE_START;
-            gridBagConstraints.insets = labelInsets;
+            gridBagConstraints.insets = new Insets(0, lShift, 5, 11);
             loginPanel.add(serverLabel, gridBagConstraints);
 
             gridBagConstraints = new GridBagConstraints();
@@ -646,7 +642,7 @@ public class JXLoginPane extends JXImagePanel {
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.LINE_START;
             gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(6, 0, 5, 0);
+            gridBagConstraints.insets = new Insets(0, 0, 4, 0);
             loginPanel.add(saveCB, gridBagConstraints);
 
             gridBagConstraints = new GridBagConstraints();
@@ -656,7 +652,7 @@ public class JXLoginPane extends JXImagePanel {
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.LINE_START;
             gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = labelInsets;
+            gridBagConstraints.insets = new Insets(0, lShift, 0, 11);
             loginPanel.add(capsOn, gridBagConstraints);
         } else {
             gridBagConstraints = new GridBagConstraints();
@@ -666,7 +662,7 @@ public class JXLoginPane extends JXImagePanel {
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.LINE_START;
             gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(6, 0, 5, 0);
+            gridBagConstraints.insets = new Insets(0, 0, 4, 0);
             loginPanel.add(saveCB, gridBagConstraints);
 
             gridBagConstraints = new GridBagConstraints();
@@ -676,7 +672,7 @@ public class JXLoginPane extends JXImagePanel {
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.LINE_START;
             gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = labelInsets;
+            gridBagConstraints.insets = new Insets(0, lShift, 0, 11);
             loginPanel.add(capsOn, gridBagConstraints);
         }
         return loginPanel;
@@ -1583,7 +1579,7 @@ public class JXLoginPane extends JXImagePanel {
             this.cancel = cancelButton;
             add(okButton);
             add(cancelButton);
-            setBorder(new EmptyBorder(17,0,11,11));
+            setBorder(new EmptyBorder(0,0,7,11));
         }
 
         /**
