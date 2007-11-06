@@ -22,6 +22,8 @@
 package org.jdesktop.swingx;
 
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Locale;
 import java.util.logging.Logger;
 
@@ -34,6 +36,8 @@ import javax.swing.UIManager;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.error.ErrorInfo;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.test.PropertyChangeReport;
+import org.jdesktop.test.TestUtils;
 
 /**
  * Test to expose known issues around <code>Locale</code> setting.
@@ -254,5 +258,12 @@ public class XLocalizeIssues extends InteractiveTestCase {
         addAction(frame, toggleLocale);
         addAction(frame, open);
         frame.setVisible(true);
+    }
+    
+    /**
+     * do nothing except make the testrunner happy.
+     */
+    public void testDummy() {
+        
     }
 }

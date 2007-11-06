@@ -1022,7 +1022,7 @@ public class JXTable extends JTable
     }
     
     /**
-     * Updates locale-dependent state.
+     * Updates locale-dependent state to the given <code>Locale</code>.
      * 
      * Here: updates registered column actions' locale-dependent state.
      * <p>
@@ -1030,6 +1030,7 @@ public class JXTable extends JTable
      * PENDING: Try better to find all column actions including custom
      * additions? Or move to columnControl?
      * 
+     * @param locale the Locale to use for value lookup
      * @see #setLocale(Locale)
      * @see #updateLocaleActionState(String)
      */

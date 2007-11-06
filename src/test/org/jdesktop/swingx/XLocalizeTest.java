@@ -22,6 +22,8 @@
 package org.jdesktop.swingx;
 
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Locale;
 import java.util.logging.Logger;
 
@@ -34,6 +36,8 @@ import javax.swing.UIManager;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.error.ErrorInfo;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.test.PropertyChangeReport;
+import org.jdesktop.test.TestUtils;
 
 /**
  * Test to expose known issues around <code>Locale</code> setting.
@@ -84,6 +88,73 @@ public class XLocalizeTest extends InteractiveTestCase {
         Locale.setDefault(originalLocale);
         super.tearDown();
     }
+
+    /**
+     * test correct PropertyChangeNotification: must fire after
+     * all internal state is set ... dooohhh.
+     */
+    public void testLocalePropertyNotification() {
+        String prefix = "JXTable.";
+        JXTable table = new JXTable(10, 2);
+        String actionCommand = JXTable.HORIZONTALSCROLL_ACTION_COMMAND;
+        
+        Action action = table.getActionMap().get(actionCommand);
+        String name = (String) action.getValue(Action.NAME);
+        String uiValue = UIManager.getString(prefix + actionCommand, table
+                .getLocale());
+        // sanity
+        assertNotNull(uiValue);
+        assertEquals(name, uiValue);
+        Locale old = table.getLocale();
+        Locale alternative = getAlternativeLocale(table);
+        PropertyChangeReport report = new PropertyChangeReport();
+        table.addPropertyChangeListener(report);
+        table.setLocale(alternative);
+        TestUtils.assertPropertyChangeEvent(report, "locale", old, alternative);
+    }
+
+    /**
+     * test correct PropertyChangeNotification: must fire after
+     * all internal state is set ... dooohhh.
+     */
+    public void testLocalePropertyNotificationInListener() {
+        final String prefix = "JXTable.";
+        final JXTable table = new JXTable(10, 2);
+        final String actionCommand = JXTable.HORIZONTALSCROLL_ACTION_COMMAND;
+        
+        final Action action = table.getActionMap().get(actionCommand);
+        String name = (String) action.getValue(Action.NAME);
+        String uiValue = UIManager.getString(prefix + actionCommand, table
+                .getLocale());
+        // sanity
+        assertNotNull(uiValue);
+        assertEquals(name, uiValue);
+        final Locale alternative = getAlternativeLocale(table);
+        PropertyChangeListener report = new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                // sanity
+                assertTrue("locale property changed", "locale".equals(evt.getPropertyName()));
+                String altUIValue = UIManager.getString(prefix + actionCommand,
+                        alternative);
+                String altName = (String) action.getValue(Action.NAME);
+                assertEquals("name must be updated before fire propertyChange", 
+                        altUIValue, altName);
+
+                
+            }};
+        table.addPropertyChangeListener(report);
+        table.setLocale(alternative);
+    }
+
+    private Locale getAlternativeLocale(final JXTable table) {
+        Locale alternative = OTHER_LOCALE;
+        if (alternative.getLanguage().equals(table.getLocale().getLanguage())) {
+            alternative = A_LOCALE;
+        }
+        return alternative;
+    }
+
 
     /**
      * Issue #635-swingx: find widgets must support dynamic localization
