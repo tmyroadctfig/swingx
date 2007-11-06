@@ -29,7 +29,9 @@ import org.jdesktop.swingx.plaf.HeaderUI;
 import org.jdesktop.swingx.plaf.PainterUIResource;
 
 import javax.swing.*;
+import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.text.View;
 
@@ -119,18 +121,12 @@ public class BasicHeaderUI extends HeaderUI {
         assert c instanceof JXHeader;
         JXHeader header = (JXHeader)c;
 
-        installDefaults(header);
-
-        titleLabel = new JLabel(header.getTitle() == null ? "Title For Header Goes Here" : header.getTitle());
-        titleLabel.setFont(header.getTitleFont());
-
+        titleLabel = new JLabel();
         descriptionPane = new DescriptionPane();
-        descriptionPane.setFont(header.getDescriptionFont());
         descriptionPane.setLineWrap(true);
         descriptionPane.setOpaque(false);
-        descriptionPane
-                .setText(header.getDescription() == null ? "The description for the header goes here.\nExample: Click the Copy Code button to generate the corresponding Java code."
-                        : header.getDescription());
+
+        installDefaults(header);
 
         imagePanel = new JLabel();
         imagePanel.setIcon(header.getIcon() == null ? UIManager.getIcon("Header.defaultIcon") : header.getIcon());
@@ -179,7 +175,11 @@ public class BasicHeaderUI extends HeaderUI {
     }
 
     protected void installDefaults(JXHeader h) {
-        gradientLightColor = Color.WHITE; //TODO need to get this out of UI defaults
+        gradientLightColor = UIManager.getColor("JXHeader.startBackground");
+        if (gradientLightColor == null) {
+        	// fallback to white
+        	gradientLightColor = Color.WHITE;
+        }
         gradientDarkColor = UIManager.getColor("JXHeader.background");
         //for backwards compatibility (mostly for substance and synthetica,
         //I suspect) I'll fall back on the "control" color if JXHeader.background
@@ -192,6 +192,42 @@ public class BasicHeaderUI extends HeaderUI {
         if (p == null || p instanceof PainterUIResource) {
             h.setBackgroundPainter(createBackgroundPainter());
         }
+ 
+        // title properties
+        Font titleFont = h.getTitleFont();
+        if (titleFont == null || titleFont instanceof FontUIResource) {
+        	titleFont = UIManager.getFont("JXHeader.titleFont");
+        	// fallback to label font
+        	titleLabel.setFont(titleFont != null ? titleFont : UIManager.getFont("Label.font"));
+        }
+        
+        Color titleForeground = h.getTitleForeground();
+        if (titleForeground == null || titleForeground instanceof ColorUIResource) {
+        	titleForeground = UIManager.getColor("JXHeader.titleForeground");
+        	// fallback to label foreground
+        	titleLabel.setForeground(titleForeground != null ? titleForeground : UIManager.getColor("Label.foreground"));
+        }
+
+        titleLabel.setText(h.getTitle() == null ? "Title For Header Goes Here" : h.getTitle());
+        
+        // description properties
+        Font descFont = h.getDescriptionFont();
+        if (descFont == null || descFont instanceof FontUIResource) {
+        	descFont = UIManager.getFont("JXHeader.descriptionFont");
+        	// fallback to label font
+        	descriptionPane.setFont(descFont != null ? descFont : UIManager.getFont("Label.font"));
+        }
+            
+        Color descForeground = h.getDescriptionForeground();
+        if (descForeground == null || descForeground instanceof ColorUIResource) {
+        	descForeground = UIManager.getColor("JXHeader.descriptionForeground");
+        	// fallback to label foreground
+        	descriptionPane.setForeground(descForeground != null ? descForeground : UIManager.getColor("Label.foreground"));
+        }
+        
+        descriptionPane
+                .setText(h.getDescription() == null ? "The description for the header goes here.\nExample: Click the Copy Code button to generate the corresponding Java code."
+                        : h.getDescription());
     }
 
     protected void uninstallDefaults(JXHeader h) {
@@ -242,6 +278,10 @@ public class BasicHeaderUI extends HeaderUI {
             titleLabel.setFont((Font)newValue);
         } else if ("descriptionFont".equals(propertyName)) {
             descriptionPane.setFont((Font)newValue);
+        } else if ("titleForeground".equals(propertyName)) {
+            titleLabel.setForeground((Color)newValue);
+        } else if ("descriptionForeground".equals(propertyName)) {
+            descriptionPane.setForeground((Color)newValue);
         }
     }
 

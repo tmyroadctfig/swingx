@@ -22,7 +22,9 @@
 package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.net.URL;
 
 import javax.swing.ImageIcon;
@@ -49,136 +51,10 @@ import org.jdesktop.swingx.test.XTestUtils;
 public class JXHeaderIssues extends InteractiveTestCase {
 
     /**
-     * This issue has been fixed, but remains here (otherwise I get a warning
-     * when running this test. Not sure if this JXHeaderIssues should just be
-     * removed, or what).
-     *
-     * Issue #403-swingx: JXHeader doesn't show custom values.
-     * <p>
-     * 
-     * Breaking if values are passed in the constructor.
+     * Dummy empty test just to keep it from whining.
      */
-    public void testTitleInContructor() {
-        String title = "customTitle";
-        JXHeader header = new JXHeader(title, null);
-        // sanity: the property is set
-        assertEquals(title, header.getTitle());
-        // fishing in the internals ... not really safe, there are 2 labels
-        JLabel label = null;
-        for (int i = 0; i < header.getComponentCount(); i++) {
-            if (header.getComponent(i) instanceof JLabel && !(header.getComponent(i) instanceof JXLabel)) {
-                label = (JLabel) header.getComponent(i);
-                break;
-            }
-        }
-        assertEquals("the label's text must be equal to the headers title", 
-                header.getTitle(), label.getText());
-    }
-
-    // ------------------ interactive
-
-    /**
-     * Short description in header produces unexpected line wraps in
-     * footer.
-     * 
-     * Note: the frame is not packed to simulate the appframework
-     * context.
-     */
-    public void interactiveHTMLTextWrapShort() {
-        JXHeader header = new JXHeader();
-        header.setTitle("AlbumManager");
-        String headerShort = "An adaption from JGoodies Binding Tutorial in the context"
-            + " of BeansBinding/AppFramework. ";
-        header.setDescription(headerShort);
-        header.setIcon(XTestUtils.loadDefaultIcon());
-        JXHeader footer = new JXHeader();
-        footer.setTitle("Notes:");
-        String footerDescription = "<html>"
-                + " <ul> "
-                + " <li> code: in the jdnc-incubator, section kleopatra, package appframework."
-                + " <li> technique: back the view by a shared presentation model "
-                + " <li> technique: veto selection change until editing is completed "
-                + " <li> issue: selection of tab should be vetoable "
-                + " <li> issue: empty selection should disable editing pane "
-                + " </ul> " + " </html>";
-        footer.setDescription(footerDescription);
-
-        JComponent panel = new JPanel(new BorderLayout());
-        panel.add(header, BorderLayout.NORTH);
-        panel.add(footer, BorderLayout.SOUTH);
-        JXFrame frame = new JXFrame("html wrapping in SOUTh: short text in NORTH");
-        frame.add(panel);
-        frame.setSize(800, 400);
-        frame.setVisible(true);
-    }
-    
-    /**
-     * Long description in header produces expected line-wrap in footer.
-     * 
-     * Note: the frame is not packed to simulate the appframework
-     * context.
-     */
-    public void interactiveHTMLTextWrapLong() {
-        JXHeader header = new JXHeader();
-        header.setTitle("AlbumManager");
-        String headerLong = "An adaption from JGoodies Binding Tutorial in the context"
-                + " of BeansBinding/AppFramework. "
-                + "The Tabs show different styles of typical interaction "
-                + "setups (in-place editing vs. dialog-editing). ";
-        header.setDescription(headerLong);
-        header.setIcon(XTestUtils.loadDefaultIcon());
-        JXHeader footer = new JXHeader();
-        footer.setTitle("Notes:");
-        String footerDescription = "<html>"
-                + " <ul> "
-                + " <li> code: in the jdnc-incubator, section kleopatra, package appframework."
-                + " <li> technique: back the view by a shared presentation model "
-                + " <li> technique: veto selection change until editing is completed "
-                + " <li> issue: selection of tab should be vetoable "
-                + " <li> issue: empty selection should disable editing pane "
-                + " </ul> " + " </html>";
-        footer.setDescription(footerDescription);
-
-        JComponent panel = new JPanel(new BorderLayout());
-        panel.add(header, BorderLayout.NORTH);
-//        panel.add(new JScrollPane(table));
-        panel.add(footer, BorderLayout.SOUTH);
-        JXFrame frame = new JXFrame("html wrapping in SOUTh: long text in NORTH");
-        frame.add(panel);
-        frame.setSize(800, 600);
-        frame.setVisible(true);
-    }
-    /**
-     * Issue #403-swingx: JXHeader doesn't show custom values.
-     * <p>
-     * 
-     * All values are passed in the constructor.
-     */
-    public void interactiveCustomProperties() {
-        URL url = getClass().getResource("resources/images/wellTop.gif");;
-        
-        assertNotNull(url);
-        JPanel p = new JPanel(new BorderLayout());
-        JXHeader header = new JXHeader("MyTitle", "MyDescription", new ImageIcon(url));
-        p.add(header);
-        // added just to better visualize bkg gradient in the JXHeader.
-        p.add(new JLabel("Reference component"), BorderLayout.SOUTH);
-        showInFrame(p, "JXHeader with custom properties");
-    }
-    
-    /**
-     * Issue #469-swingx: JXHeader doesn't wrap words in description.<p>
-     * 
-     * All values are passed in the constructor.
-     */
-    public void interactiveWordWrapping() {
-        URL url = getClass().getResource("resources/images/wellTop.gif");
-        assertNotNull(url);
-        JPanel p = new JPanel(new BorderLayout());
-        JXHeader header = new JXHeader("MyTitle", "this is a long test with veeeeeeeeeeeeeery looooooong wooooooooooooords", new ImageIcon(url));
-        p.add(header);
-        p.setPreferredSize(new Dimension(200,150));
-        showInFrame(p, "word wrapping JXHeader");
+    public void interactiveDummy() {
+        // do nothing
     }
     
     public static void main(String args[]) {

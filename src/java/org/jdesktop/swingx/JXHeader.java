@@ -21,6 +21,7 @@
 
 package org.jdesktop.swingx;
 
+import java.awt.Color;
 import java.awt.Font;
 import javax.swing.Icon;
 import org.jdesktop.swingx.plaf.HeaderUI;
@@ -82,6 +83,8 @@ public class JXHeader extends JXPanel {
     private Icon icon;
     private Font titleFont;
     private Font descriptionFont;
+    private Color titleForeground;
+    private Color descriptionForeground;
     
     /** Creates a new instance of JXHeader */
     public JXHeader() {
@@ -217,6 +220,10 @@ public class JXHeader extends JXPanel {
         return icon;
     }
     
+    /**
+     * Sets new font for both, title and description line of the header. 
+     * @see javax.swing.JComponent#setFont(java.awt.Font)
+     */
     @Override
     public void setFont(Font font) {
         super.setFont(font);
@@ -224,7 +231,11 @@ public class JXHeader extends JXPanel {
         setDescriptionFont(font);
     }
     
-    private void setTitleFont(Font font) {
+    /**
+     * Sets new font for title.
+     * @param font New title font.
+     */
+    public void setTitleFont(Font font) {
         Font old = getTitleFont();
         this.titleFont = font;
         firePropertyChange("titleFont", old, getTitleFont());
@@ -239,7 +250,11 @@ public class JXHeader extends JXPanel {
         return titleFont;
     }
     
-    private void setDescriptionFont(Font font) {
+    /**
+     * Sets font for the description line of header.
+     * @param font New description font.
+     */
+    public void setDescriptionFont(Font font) {
         Font old = getDescriptionFont();
         this.descriptionFont = font;
         firePropertyChange("descriptionFont", old, getDescriptionFont());
@@ -253,4 +268,42 @@ public class JXHeader extends JXPanel {
     public Font getDescriptionFont() {
         return descriptionFont;
     }
+
+	/**
+	 * Gets current title foreground color.
+	 * @return the Color used to paint title. May be null.
+	 */
+	public Color getTitleForeground() {
+		return titleForeground;
+	}
+
+	/**
+	 * Sets title foreground color.
+	 * @param titleForeground the Color to be used to paint title.
+	 */
+	public void setTitleForeground(Color titleForeground) {
+		Color old = getTitleForeground();
+		this.titleForeground = titleForeground;
+        firePropertyChange("titleForeground", old, getTitleForeground());
+	}
+
+	/**
+	 * Gets current description foreground color.
+	 * @return the Color used to paint description. May be null.
+	 */
+	public Color getDescriptionForeground() {
+		return descriptionForeground;
+	}
+
+	/**
+	 * Sets description foreground color.
+	 * @param descriptionForeground the Color to be used to paint description.
+	 */
+	public void setDescriptionForeground(Color descriptionForeground) {
+		Color old = getDescriptionForeground();
+		this.descriptionForeground = descriptionForeground;
+        firePropertyChange("descriptionForeground", old, getDescriptionForeground());
+	}
+    
+
 }

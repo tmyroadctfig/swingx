@@ -21,11 +21,15 @@
 package org.jdesktop.swingx.plaf;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.LookAndFeel;
+import javax.swing.UIManager;
 import javax.swing.plaf.ColorUIResource;
+import javax.swing.plaf.FontUIResource;
+import javax.swing.plaf.LabelUI;
 
 import org.jdesktop.swingx.JXHeader;
 
@@ -44,10 +48,15 @@ public class HeaderAddon extends AbstractComponentAddon {
         super.addBasicDefaults(addon, defaults);
         defaults.addAll(Arrays.asList(new Object[]{
             JXHeader.uiClassID, "org.jdesktop.swingx.plaf.basic.BasicHeaderUI",
-            "Header.defaultIcon", LookAndFeel.makeIcon(HeaderAddon.class,
+            "JXHeader.defaultIcon", LookAndFeel.makeIcon(HeaderAddon.class,
                     "resources/header-default.png"),
-            "Header.background", UIManagerExt.getSafeColor("control",
-                    new ColorUIResource(Color.decode("#C0C0C0")))
+                    "JXHeader.titleFont", UIManager.getFont("Label.font"),
+                    "JXHeader.titleForeground", UIManager.getColor("Label.foreground"),
+                    "JXHeader.descriptionFont", UIManager.getFont("Label.font"),
+                    "JXHeader.descriptionForeground", UIManager.getColor("Label.foreground"),
+                    "JXHeader.background", UIManagerExt.getSafeColor("control",
+                            new ColorUIResource(Color.decode("#C0C0C0"))),
+                    "JXHeader.startBackground", new ColorUIResource(Color.WHITE)
         }));
     }
 
@@ -63,7 +72,7 @@ public class HeaderAddon extends AbstractComponentAddon {
     protected void addNimbusDefaults(LookAndFeelAddons addon, List<Object> defaults) {
         super.addNimbusDefaults(addon, defaults);
         defaults.addAll(Arrays.asList(new Object[]{
-            "Header.background", new ColorUIResource(new Color(214, 217, 223, 255))
+            "JXHeader.background", new ColorUIResource(new Color(214, 217, 223, 255))
         }));
     }
 }
