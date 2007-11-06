@@ -21,6 +21,7 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -29,12 +30,9 @@ import java.util.logging.Logger;
 
 import javax.swing.Action;
 import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
-import org.jdesktop.swingx.error.ErrorInfo;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
@@ -92,8 +90,146 @@ public class XLocalizeTest extends InteractiveTestCase {
     /**
      * test correct PropertyChangeNotification: must fire after
      * all internal state is set ... dooohhh.
+     * 
+     * Here: test JXDialog.
      */
-    public void testLocalePropertyNotification() {
+    /**
+     * test correct PropertyChangeNotification: must fire after
+     * all internal state is set ...
+     * 
+     * Here: test FindPanel
+     */
+    public void testLocaleDialogPropertyNotificationInListener() {
+        final String prefix = PatternModel.SEARCH_PREFIX;
+        final JXFindPanel findPanel = new JXFindPanel();
+        final JXDialog dialog = new JXDialog(findPanel);
+        final String titleKey = AbstractPatternPanel.SEARCH_TITLE;
+        // JW: arrrgghh ... dirty! Consequence of dirty initialization 
+        // of AbstractPatternPanel subclasses ...
+        findPanel.addNotify();
+        String name = dialog.getTitle();
+        String uiValue = UIManager.getString(prefix + titleKey, findPanel
+                .getLocale());
+        // sanity
+        assertNotNull(uiValue);
+        assertEquals(name, uiValue);
+        final Locale alternative = getAlternativeLocale(dialog);
+        PropertyChangeListener report = new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                // sanity
+                // wrong assumption: find widgets name is changed as well
+//                assertTrue("locale property changed, instead: " + evt.getPropertyName(), "locale".equals(evt.getPropertyName()));
+                if (!"locale".equals(evt.getPropertyName())) return;
+                String altUIValue = UIManager.getString(prefix + titleKey,
+                        alternative);
+                String altName = dialog.getTitle();
+                assertEquals("name must be updated before fire propertyChange", 
+                        altUIValue, altName);
+
+                
+            }};
+        dialog.addPropertyChangeListener(report);
+        PropertyChangeReport r = new PropertyChangeReport();
+        dialog.addPropertyChangeListener(r);
+        dialog.setLocale(alternative);
+        // sanity: guarantee that we got a locale change notification
+        assertEquals(1, r.getEventCount("locale"));
+    }
+
+
+    /**
+     * test correct PropertyChangeNotification: must fire after
+     * all internal state is set ... dooohhh.
+     * 
+     * Here: test FindBar.
+     */
+    public void testLocaleFindBarPropertyNotificationInListener() {
+        final String prefix = PatternModel.SEARCH_PREFIX;
+        final JXFindBar findPanel = new JXFindBar();
+        final String actionCommand = JXFindBar.FIND_NEXT_ACTION_COMMAND;
+        // JW: arrrgghh ... dirty! Consequence of dirty initialization 
+        // of AbstractPatternPanel subclasses ...
+        findPanel.addNotify();
+        
+        final Action action = findPanel.getActionMap().get(actionCommand);
+        String name = (String) action.getValue(Action.NAME);
+        String uiValue = UIManager.getString(prefix + actionCommand, findPanel
+                .getLocale());
+        // sanity
+        assertNotNull(uiValue);
+        assertEquals(name, uiValue);
+        final Locale alternative = getAlternativeLocale(findPanel);
+        PropertyChangeListener report = new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                // sanity
+//                assertTrue("locale property changed", "locale".equals(evt.getPropertyName()));
+                if (!"locale".equals(evt.getPropertyName())) return;
+                String altUIValue = UIManager.getString(prefix + actionCommand,
+                        alternative);
+                String altName = (String) action.getValue(Action.NAME);
+                assertEquals("name must be updated before fire propertyChange", 
+                        altUIValue, altName);
+
+                
+            }};
+            PropertyChangeReport r = new PropertyChangeReport();
+            findPanel.addPropertyChangeListener(r);
+            findPanel.setLocale(alternative);
+            assertEquals(1, r.getEventCount("locale"));
+    }
+
+
+    /**
+     * test correct PropertyChangeNotification: must fire after
+     * all internal state is set ...
+     * 
+     * Here: test FindPanel
+     */
+    public void testLocaleFindPanelPropertyNotificationInListener() {
+        final String prefix = PatternModel.SEARCH_PREFIX;
+        final JXFindPanel findPanel = new JXFindPanel();
+        final String actionCommand = AbstractPatternPanel.MATCH_ACTION_COMMAND;
+        // JW: arrrgghh ... dirty! Consequence of dirty initialization 
+        // of AbstractPatternPanel subclasses ...
+        findPanel.addNotify();
+        
+        final Action action = findPanel.getActionMap().get(actionCommand);
+        String name = (String) action.getValue(Action.NAME);
+        String uiValue = UIManager.getString(prefix + actionCommand, findPanel
+                .getLocale());
+        // sanity
+        assertNotNull(uiValue);
+        assertEquals(name, uiValue);
+        final Locale alternative = getAlternativeLocale(findPanel);
+        PropertyChangeListener report = new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                // sanity
+                // wrong assumption: find widgets name is changed as well
+//                assertTrue("locale property changed, instead: " + evt.getPropertyName(), "locale".equals(evt.getPropertyName()));
+                if (!"locale".equals(evt.getPropertyName())) return;
+                String altUIValue = UIManager.getString(prefix + actionCommand,
+                        alternative);
+                String altName = (String) action.getValue(Action.NAME);
+                assertEquals("name must be updated before fire propertyChange", 
+                        altUIValue, altName);
+
+                
+            }};
+        findPanel.addPropertyChangeListener(report);
+        PropertyChangeReport r = new PropertyChangeReport();
+        findPanel.addPropertyChangeListener(r);
+        findPanel.setLocale(alternative);
+        assertEquals(1, r.getEventCount("locale"));
+    }
+
+    /**
+     * test correct PropertyChangeNotification: must fire after
+     * all internal state is set ... dooohhh.
+     */
+    public void testLocaleTablePropertyNotification() {
         String prefix = "JXTable.";
         JXTable table = new JXTable(10, 2);
         String actionCommand = JXTable.HORIZONTALSCROLL_ACTION_COMMAND;
@@ -115,9 +251,11 @@ public class XLocalizeTest extends InteractiveTestCase {
 
     /**
      * test correct PropertyChangeNotification: must fire after
-     * all internal state is set ... dooohhh.
+     * all internal state is set ... 
+     * 
+     * Here: test JXTable.
      */
-    public void testLocalePropertyNotificationInListener() {
+    public void testLocaleTablePropertyNotificationInListener() {
         final String prefix = "JXTable.";
         final JXTable table = new JXTable(10, 2);
         final String actionCommand = JXTable.HORIZONTALSCROLL_ACTION_COMMAND;
@@ -147,7 +285,7 @@ public class XLocalizeTest extends InteractiveTestCase {
         table.setLocale(alternative);
     }
 
-    private Locale getAlternativeLocale(final JXTable table) {
+    private Locale getAlternativeLocale(final Component table) {
         Locale alternative = OTHER_LOCALE;
         if (alternative.getLanguage().equals(table.getLocale().getLanguage())) {
             alternative = A_LOCALE;

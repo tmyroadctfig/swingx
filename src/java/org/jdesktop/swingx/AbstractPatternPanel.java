@@ -129,17 +129,31 @@ public abstract class AbstractPatternPanel extends JXPanel {
     }
 
     /**
-     * tries to find a String value from the UIManager, prefixing the
-     * given key with the UIPREFIX. 
+     * Returns a potentially localized value from the UIManager. The given key
+     * is prefixed by this component|s <code>UIPREFIX</code> before doing the
+     * lookup. The lookup respects this table's current <code>locale</code>
+     * property. Returns the key, if no value is found.
      * 
-     * TODO: move to utilities?
-     * 
-     * @param key <code>String</code> that specifyes the value in UIManager
-     * @return the <code>String</code> as returned by the UIManager or key itself 
-     *  if no value bound to this key in UIManager
+     * @param key the bare key to look up in the UIManager.
+     * @return the value mapped to UIPREFIX + key or key if no value is found.
      */
     protected String getUIString(String key) {
-        String text = UIManager.getString(PatternModel.SEARCH_PREFIX + key, getLocale());
+        return getUIString(key, getLocale());
+    }
+
+    /**
+     * Returns a potentially localized value from the UIManager for the 
+     * given locale. The given key
+     * is prefixed by this component's <code>UIPREFIX</code> before doing the
+     * lookup. Returns the key, if no value is found.
+     * 
+     * @param key the bare key to look up in the UIManager.
+     * @param locale the locale use for lookup
+     * @return the value mapped to UIPREFIX + key in the given locale,
+     *    or key if no value is found.
+     */
+    protected String getUIString(String key, Locale locale) {
+        String text = UIManager.getString(PatternModel.SEARCH_PREFIX + key, locale);
         return text != null ? text : key;
     }
 
@@ -182,10 +196,16 @@ public abstract class AbstractPatternPanel extends JXPanel {
 //------------------------ dynamic locale support
     
 
+    /**
+     * {@inheritDoc} <p>
+     * Overridden to update locale-dependent properties. 
+     * 
+     * @see #updateLocaleState(Locale) 
+     */
     @Override
     public void setLocale(Locale l) {
+        updateLocaleState(l);
         super.setLocale(l);
-        updateLocaleState();
     }
     
     /**
@@ -200,17 +220,17 @@ public abstract class AbstractPatternPanel extends JXPanel {
      * @see #setLocale(Locale)
      * @see #updateLocaleActionState(String)
      */
-    protected void updateLocaleState() {
+    protected void updateLocaleState(Locale locale) {
         for (Object key : getActionMap().allKeys()) {
             if (key instanceof String) {
-                String keyString = getUIString((String) key);
+                String keyString = getUIString((String) key, locale);
                 if (!key.equals(keyString)) {
                     getActionMap().get(key).putValue(Action.NAME, keyString);
                     
                 }
             }
         }
-        bindSearchLabel();
+        bindSearchLabel(locale);
     }
     
 
@@ -359,7 +379,7 @@ public abstract class AbstractPatternPanel extends JXPanel {
      * configure and bind components to/from PatternModel
      */
     protected void bind() {
-      bindSearchLabel();
+       bindSearchLabel(getLocale());
         searchField.getDocument().addDocumentListener(getSearchFieldListener());
         getActionContainerFactory().configureButton(matchCheck, 
                 (AbstractActionExt) getActionMap().get(PatternModel.MATCH_CASE_ACTION_COMMAND),
@@ -372,9 +392,9 @@ public abstract class AbstractPatternPanel extends JXPanel {
      * Here: sets text and mnenomic properties form ui values, 
      * configures as label for searchField.
      */
-    protected void bindSearchLabel() {
-        searchLabel.setText(getUIString(SEARCH_FIELD_LABEL));
-          String mnemonic = getUIString(SEARCH_FIELD_MNEMONIC);
+    protected void bindSearchLabel(Locale locale) {
+        searchLabel.setText(getUIString(SEARCH_FIELD_LABEL, locale));
+          String mnemonic = getUIString(SEARCH_FIELD_MNEMONIC, locale);
           if (mnemonic != SEARCH_FIELD_MNEMONIC) {
               searchLabel.setDisplayedMnemonic(mnemonic.charAt(0));
           }

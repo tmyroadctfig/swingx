@@ -22,6 +22,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.Component;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 import javax.swing.Box;
@@ -232,10 +233,11 @@ public class JXFindPanel extends AbstractPatternPanel {
     
     
     @Override
-    protected void updateLocaleState() {
-        super.updateLocaleState();
-        setName(getUIString(SEARCH_TITLE));
+    protected void updateLocaleState(Locale locale) {
+        super.updateLocaleState(locale);
+        setName(getUIString(SEARCH_TITLE, locale));
     }
+    
     //-------------------------- initial
     
 

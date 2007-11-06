@@ -195,15 +195,16 @@ public class JXDialog extends JDialog {
      */
     @Override
     public void setLocale(Locale l) {
-        super.setLocale(l);
         /*
-        * NOTE: this is called from super's constructor as one of the
-        * first methods (prior to setting the rootPane!). So back out
-        * 
-        */  
-        if (content == null) return; 
-        content.setLocale(l);
-        updateLocaleState();
+         * NOTE: this is called from super's constructor as one of the
+         * first methods (prior to setting the rootPane!). So back out
+         * 
+         */  
+        if (content != null) {
+            content.setLocale(l);
+            updateLocaleState(l);
+        }
+        super.setLocale(l);
     }
     
     /**
@@ -215,14 +216,14 @@ public class JXDialog extends JDialog {
      * 
      * @see #setLocale(Locale)
      */
-    protected void updateLocaleState() {
+    protected void updateLocaleState(Locale locale) {
         setTitleFromContent();
         for (Object key : getRootPane().getActionMap().allKeys()) {
             if (key instanceof String) {
                 Action contentAction = content.getActionMap().get(key);
                 Action rootPaneAction = getAction(key);
                 if ((!rootPaneAction.equals(contentAction))) {
-                    String keyString = getUIString((String) key);
+                    String keyString = getUIString((String) key, locale);
                     if (!key.equals(keyString)) {
                         rootPaneAction.putValue(Action.NAME, keyString);
                     }
@@ -309,20 +310,36 @@ public class JXDialog extends JDialog {
     private Action getAction(Object key) {
         return getRootPane().getActionMap().get(key);
     }
+
     /**
-     * tries to find a String value from the UIManager, prefixing the
-     * given key with the UIPREFIX. 
+     * Returns a potentially localized value from the UIManager. The given key
+     * is prefixed by this component|s <code>UIPREFIX</code> before doing the
+     * lookup. The lookup respects this table's current <code>locale</code>
+     * property. Returns the key, if no value is found.
      * 
-     * TODO: move to utilities?
-     * 
-     * @param key 
-     * @return the String as returned by the UIManager or key if the returned
-     *   value was null.
+     * @param key the bare key to look up in the UIManager.
+     * @return the value mapped to UIPREFIX + key or key if no value is found.
      */
-    private String getUIString(String key) {
-        String text = UIManager.getString(UIPREFIX + key, getLocale());
+    protected String getUIString(String key) {
+        return getUIString(key, getLocale());
+    }
+
+    /**
+     * Returns a potentially localized value from the UIManager for the 
+     * given locale. The given key
+     * is prefixed by this component's <code>UIPREFIX</code> before doing the
+     * lookup. Returns the key, if no value is found.
+     * 
+     * @param key the bare key to look up in the UIManager.
+     * @param locale the locale use for lookup
+     * @return the value mapped to UIPREFIX + key in the given locale,
+     *    or key if no value is found.
+     */
+    protected String getUIString(String key, Locale locale) {
+        String text = UIManager.getString(UIPREFIX + key, locale);
         return text != null ? text : key;
     }
+
 
 
 }
