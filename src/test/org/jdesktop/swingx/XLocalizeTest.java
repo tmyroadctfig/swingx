@@ -22,6 +22,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.Component;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -100,6 +101,11 @@ public class XLocalizeTest extends InteractiveTestCase {
      * Here: test FindPanel
      */
     public void testLocaleDialogPropertyNotificationInListener() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run localeDialogPropertyNotificationInListener - headless environment");
+            return;
+        }
         final String prefix = PatternModel.SEARCH_PREFIX;
         final JXFindPanel findPanel = new JXFindPanel();
         final JXDialog dialog = new JXDialog(findPanel);
