@@ -490,7 +490,7 @@ public class JXTable extends JTable
         // why doesn't the call in tableChanged work?
         initializeColumnWidths();
         setFillsViewportHeight(true);
-        updateLocaleState();
+        updateLocaleState(getLocale());
     }
 
     /**
@@ -970,10 +970,24 @@ public class JXTable extends JTable
      * @return the value mapped to UIPREFIX + key or key if no value is found.
      */
     protected String getUIString(String key) {
-        String text = UIManager.getString(UIPREFIX + key, getLocale());
-        return text != null ? text : key;
+        return getUIString(key, getLocale());
     }
 
+    /**
+     * Returns a potentially localized value from the UIManager for the 
+     * given locale. The given key
+     * is prefixed by this table's <code>UIPREFIX</code> before doing the
+     * lookup. Returns the key, if no value is found.
+     * 
+     * @param key the bare key to look up in the UIManager.
+     * @param locale the locale use for lookup
+     * @return the value mapped to UIPREFIX + key in the given locale,
+     *    or key if no value is found.
+     */
+    protected String getUIString(String key, Locale locale) {
+        String text = UIManager.getString(UIPREFIX + key, locale);
+        return text != null ? text : key;
+    }
     /** 
      * Creates and returns the default <code>Action</code>
      * for packing the selected column. 
@@ -1003,8 +1017,8 @@ public class JXTable extends JTable
      */
     @Override
     public void setLocale(Locale l) {
+        updateLocaleState(l);
         super.setLocale(l);
-        updateLocaleState();
     }
     
     /**
@@ -1019,10 +1033,10 @@ public class JXTable extends JTable
      * @see #setLocale(Locale)
      * @see #updateLocaleActionState(String)
      */
-    protected void updateLocaleState() {
-        updateLocaleActionState(HORIZONTALSCROLL_ACTION_COMMAND);
-        updateLocaleActionState(PACKALL_ACTION_COMMAND);
-        updateLocaleActionState(PACKSELECTED_ACTION_COMMAND);
+    protected void updateLocaleState(Locale locale) {
+        updateLocaleActionState(HORIZONTALSCROLL_ACTION_COMMAND, locale);
+        updateLocaleActionState(PACKALL_ACTION_COMMAND, locale);
+        updateLocaleActionState(PACKSELECTED_ACTION_COMMAND, locale);
     }
     
     /**
@@ -1034,10 +1048,10 @@ public class JXTable extends JTable
      * @param key the string for lookup in this table's ActionMap
      * @see #updateLocaleState()
      */
-    protected void updateLocaleActionState(String key) {
+    protected void updateLocaleActionState(String key, Locale locale) {
         Action action = getActionMap().get(key);
         if (action == null) return;
-        action.putValue(Action.NAME, getUIString(key));
+        action.putValue(Action.NAME, getUIString(key, locale));
     }
     
 //------------------ bound action callback methods
