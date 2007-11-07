@@ -46,6 +46,7 @@ import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.SortedSet;
 import java.util.logging.Logger;
 
@@ -158,7 +159,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         LookAndFeel.installProperty(monthView, "opaque", Boolean.TRUE);
 
         // Get string representation of the months of the year.
-        monthsOfTheYear = new DateFormatSymbols().getMonths();
+        monthsOfTheYear = new DateFormatSymbols(monthView.getLocale()).getMonths();
 
         installComponents();
         installDefaults();
@@ -192,7 +193,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 (String[])UIManager.get("JXMonthView.daysOfTheWeek");
         if (daysOfTheWeek == null) {
             String[] dateFormatSymbols =
-                new DateFormatSymbols().getShortWeekdays();
+                new DateFormatSymbols(monthView.getLocale()).getShortWeekdays();
             daysOfTheWeek = new String[JXMonthView.DAYS_IN_WEEK];
             for (int i = Calendar.SUNDAY; i <= Calendar.SATURDAY; i++) {
                 daysOfTheWeek[i - 1] = dateFormatSymbols[i];
@@ -328,6 +329,24 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
         
     }
+
+
+   /**
+    * Updates month and day names according to specified locale.
+    */
+   protected void updateLocale() {
+        Locale locale = monthView.getLocale();
+        monthsOfTheYear = new DateFormatSymbols(locale).getMonths();
+        
+        String[] daysOfTheWeek = new String[7];
+        String[] dateFormatSymbols = new DateFormatSymbols(locale).getShortWeekdays();
+        daysOfTheWeek = new String[JXMonthView.DAYS_IN_WEEK];
+        for (int i = Calendar.SUNDAY; i <= Calendar.SATURDAY; i++) {
+            daysOfTheWeek[i - 1] = dateFormatSymbols[i];
+        }
+        monthView.setDaysOfTheWeek(daysOfTheWeek);
+    }
+
 //---------------------- config
     
     /**
@@ -1680,6 +1699,8 @@ public class BasicMonthViewUI extends MonthViewUI {
                 monthView.revalidate();
             } else if ("componentInputMapEnabled".equals(property)) {
                 updateComponentInputMap();
+            } else if ("locale".equals(property)) { // "locale" is bound property
+                updateLocale();
             }
         }
 

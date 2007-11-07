@@ -31,13 +31,13 @@ import java.util.Date;
 import java.util.EventListener;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
 import javax.swing.JComponent;
 import javax.swing.Timer;
-import javax.swing.UIManager;
 
 import org.jdesktop.swingx.DateSelectionModel;
 import org.jdesktop.swingx.DefaultDateSelectionModel;
@@ -240,9 +240,19 @@ public class JXMonthView extends JComponent {
      * month and year of the current day as the first date to display.
      */
     public JXMonthView() {
-        this(System.currentTimeMillis(), null);
+        this(System.currentTimeMillis(), null, null);
     }
 
+    /**
+     * Cretate a new instance of the <code>JXMonthView</code> class 
+     * and set locale used to display month and day text.
+     * 
+     * @param locale desired locale
+     */
+    public JXMonthView(final Locale locale) {
+        this(System.currentTimeMillis(), null, locale);
+    }
+    
     /**
      * Create a new instance of the <code>JXMonthView</code> class using the
      * month and year from <code>initialTime</code> as the first date to
@@ -251,10 +261,15 @@ public class JXMonthView extends JComponent {
      * @param firstDisplayedDate The first month to display.
      */
     public JXMonthView(long firstDisplayedDate) {
-        this(firstDisplayedDate, null);
+        this(firstDisplayedDate, null, null);
     }
 
     public JXMonthView(long firstDisplayedDate, final DateSelectionModel model) {
+        this(firstDisplayedDate, model, null);
+    }
+
+    public JXMonthView(long firstDisplayedDate, final DateSelectionModel model, final Locale locale) {
+        super();
         antiAlias = false;
         traversable = false;
         listenerMap = new EventListenerMap();
@@ -284,6 +299,8 @@ public class JXMonthView extends JComponent {
 
         // Restore original time value
         cal.setTimeInMillis(this.firstDisplayedDate);
+
+        setLocale(locale);
     }
 
     /**
@@ -1558,6 +1575,33 @@ public class JXMonthView extends JComponent {
     }
 
 
+    /**
+     * Sets locale and resets text and format used to display months and days. 
+     * Also resets firstDayOfWeek.
+     * 
+     * <p>
+     * <b>Warning:</b> Since this resets any string labels that are cached in UI
+     * (month and day names) and firstDayofWeek, use <code>setDaysOfTheWeek</code> and/or
+     * setFirstDayOfWeek after (re)setting locale.
+     * </p>
+     * 
+     * @param   locale new Locale to be used for formatting
+     * @see     setDaysOfTheWeek
+     * @see     setFirstDayOfWeek
+     */
+    @Override
+    public void setLocale(Locale locale) {
+        if (locale != null) {
+            // Locale is bound property, no need to firePropertyChange
+            super.setLocale(locale);
+
+            cal = Calendar.getInstance(getLocale());
+            setFirstDayOfWeek(cal.getFirstDayOfWeek());
+
+            repaint();
+        }
+    }
+    
     
     
 //    public static void main(String args[]) {

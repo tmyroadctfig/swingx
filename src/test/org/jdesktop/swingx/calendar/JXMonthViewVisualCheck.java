@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -58,6 +59,20 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
       }
   }
 
+    /**
+     * Issue #637-swingx: make JXMonthView Locale-aware.
+     * 
+     * Applied the patch as provided by pes17.
+     * 
+     */
+    public void interactiveLocale() {
+        JXMonthView monthView = new JXMonthView(Locale.GERMAN);
+        JXMonthView other = new JXMonthView(Locale.US);
+        JComponent comp = new JPanel();
+        comp.add(monthView);
+        comp.add(other);
+        showInFrame(comp, "Localized monthView");
+    }
 
     /**
      * Issue #563-swingx: arrow keys active even if not focused.
