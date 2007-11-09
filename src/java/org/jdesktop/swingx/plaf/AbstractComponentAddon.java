@@ -179,19 +179,6 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
   //
 
   /**
-   * Adds the all keys/values from the given named resource bundle to the
-   * defaults
-   */
-  protected void addResource(List<Object> defaults, String bundleName) {
-    ResourceBundle bundle = ResourceBundle.getBundle(bundleName);
-    for (Enumeration<String> keys = bundle.getKeys(); keys.hasMoreElements(); ) {
-      String key = keys.nextElement();
-      defaults.add(key);
-      defaults.add(bundle.getObject(key));
-    }
-  }
-
-  /**
    * @return true if the addon is the Windows addon or its subclasses
    */
   protected boolean isWindows(LookAndFeelAddons addon) {

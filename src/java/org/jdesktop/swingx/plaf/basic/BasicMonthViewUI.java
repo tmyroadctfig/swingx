@@ -216,10 +216,8 @@ public class BasicMonthViewUI extends MonthViewUI {
         if (f == null || f instanceof UIResource) {
             monthView.setFont(UIManager.getFont("JXMonthView.font"));
         }
-        monthDownImage = new ImageIcon(
-                JXMonthView.class.getResource(UIManager.getString("JXMonthView.monthDownFileName")));
-        monthUpImage = new ImageIcon(
-                JXMonthView.class.getResource(UIManager.getString("JXMonthView.monthUpFileName")));
+        monthDownImage = UIManager.getIcon("JXMonthView.monthDownFileName");
+        monthUpImage = UIManager.getIcon("JXMonthView.monthUpFileName");
         weekOfTheYearForeground = UIManager.getColor("JXMonthView.weekOfTheYearForeground");
         leadingDayForeground = UIManager.getColor("JXMonthView.leadingDayForeground");
         trailingDayForeground = UIManager.getColor("JXMonthView.trailingDayForeground");

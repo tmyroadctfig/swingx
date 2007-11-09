@@ -26,6 +26,8 @@ import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.JComponent;
 import javax.swing.UIManager;
@@ -39,17 +41,48 @@ import org.jdesktop.swingx.plaf.LoginPaneUI;
  * @author rbair
  */
 public class BasicLoginPaneUI extends LoginPaneUI {
+    private class LocaleHandler implements PropertyChangeListener {
+        /**
+         * {@inheritDoc}
+         */
+        public void propertyChange(PropertyChangeEvent evt) {
+            System.out.println("LocaleHandler.propertyChange()");
+            Object src = evt.getSource();
+            
+            if (src instanceof JComponent) {
+                ((JComponent) src).updateUI();
+            }
+        }
+    }
+    
     private JXLoginPane dlg;
     
     /** Creates a new instance of BasicLoginDialogUI */
     public BasicLoginPaneUI(JXLoginPane dlg) {
         this.dlg = dlg;
+        dlg.addPropertyChangeListener("locale", new LocaleHandler());
     }
     
   public static ComponentUI createUI(JComponent c) {
     return new BasicLoginPaneUI((JXLoginPane)c);
   }
 
+    public void installUI(JComponent c) {
+        installDefaults();
+    }
+    
+    protected void installDefaults() {
+        String s = dlg.getBannerText();
+        if (s == null || s.equals("")) {
+            dlg.setBannerText(UIManager.getString("JXLoginPane.bannerString", dlg.getLocale()));
+        }
+        
+        s = dlg.getErrorMessage();
+        if (s == null || s.equals("")) {
+            dlg.setErrorMessage(UIManager.getString("JXLoginPane.errorMessage", dlg.getLocale()));
+        }
+    }
+    
     public Image getBanner() {
         int w = 400;
         int h = 60;
@@ -95,6 +128,7 @@ public class BasicLoginPaneUI extends LoginPaneUI {
 
         originalGraphics.setColor(UIManager.getColor("JXLoginPane.bannerForeground"));
         originalGraphics.drawString(dlg.getBannerText(), loginStringX, loginStringY);
+        
         return img;
     }
 }

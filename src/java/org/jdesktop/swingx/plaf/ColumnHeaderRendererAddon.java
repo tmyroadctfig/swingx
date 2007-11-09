@@ -20,14 +20,12 @@
  */
 package org.jdesktop.swingx.plaf;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.LookAndFeel;
 import javax.swing.plaf.BorderUIResource;
 
-import org.jdesktop.swingx.plaf.windows.WindowsClassicLookAndFeelAddons;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 import org.jdesktop.swingx.util.OS;
 
@@ -36,7 +34,7 @@ import org.jdesktop.swingx.util.OS;
  * Loads LF specific sort icons.
  * 
  * @author Jeanette Winzenburg
- *
+ * @author Karl Schaefer
  */
 public class ColumnHeaderRendererAddon extends AbstractComponentAddon {
     
@@ -44,70 +42,83 @@ public class ColumnHeaderRendererAddon extends AbstractComponentAddon {
     super("ColumnHeaderRenderer");
   }
   
-  public void initialize(LookAndFeelAddons addon) {
-      List defaults = new ArrayList();
-      String upIcon = null;
-      String downIcon = null;
-      if (isMac(addon)) {
-          upIcon = "sort-osx-up.png";
-          downIcon = "sort-osx-dn.png";
-      } else if (isWindows(addon)) {
-          if (isXP(addon)) {
-              upIcon = "sort-xp-up.png";
-              downIcon = "sort-xp-dn.png";
-              
-          } else {
-              upIcon = "sort-w2k-up.png";
-              downIcon = "sort-w2k-dn.png";
-              
-          }
-          if (OS.isWindowsVista()) {
-              hackHeaderBorder(addon);
-          }
-      } else if (isSynth()) {
-          upIcon = "sort-gtk-up.png";
-          downIcon = "sort-gtk-dn.png";
-          
-      } else {
-          upIcon = "sort-jlf-up.png";
-          downIcon = "sort-jlf-dn.png";
-      }
-      defaults.addAll(Arrays.asList(new Object[] { 
-              ColumnHeaderRenderer.UP_ICON_KEY, 
-                  LookAndFeel.makeIcon(getClass(), "resources/" + upIcon),
-              ColumnHeaderRenderer.DOWN_ICON_KEY, 
-                  LookAndFeel.makeIcon(getClass(), "resources/" + downIcon),
-      }));
-      addon.loadDefaults(defaults.toArray());
-  }
-
-
-  /**
-     * @param addon
+    /**
+     * {@inheritDoc}
      */
-  private void hackHeaderBorder(LookAndFeelAddons addon) {
-      // do nothing for classic windows
-        if (addon instanceof WindowsClassicLookAndFeelAddons) return;
-        List defaults = new ArrayList();
-        defaults.addAll(Arrays.asList(new Object[] {
-                ColumnHeaderRenderer.VISTA_BORDER_HACK, 
-                new BorderUIResource.EmptyBorderUIResource(5, 5, 5, 5), 
+    @Override
+    protected void addBasicDefaults(LookAndFeelAddons addon,
+            List<Object> defaults) {
+        super.addBasicDefaults(addon, defaults);
+        
+        defaults.addAll(Arrays.asList(new Object[] { 
+            ColumnHeaderRenderer.UP_ICON_KEY,
+            LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "basic/resources/sort-jlf-up.png"),
+            ColumnHeaderRenderer.DOWN_ICON_KEY,
+            LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "basic/resources/sort-jlf-dn.png"),
         }));
-        addon.loadDefaults(defaults.toArray());
     }
 
-    public void uninitialize(LookAndFeelAddons addon) {
-        List defaults = new ArrayList();
-        defaults.addAll(Arrays.asList(new Object[] {
-                ColumnHeaderRenderer.UP_ICON_KEY, null,
-                ColumnHeaderRenderer.DOWN_ICON_KEY, null, 
-                ColumnHeaderRenderer.VISTA_BORDER_HACK, null,
-                }));
-        addon.loadDefaults(defaults.toArray());
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void addLinuxDefaults(LookAndFeelAddons addon,
+            List<Object> defaults) {
+        super.addLinuxDefaults(addon, defaults);
+        
+        if (isSynth()) {
+            defaults.addAll(Arrays.asList(new Object[] { 
+                    ColumnHeaderRenderer.UP_ICON_KEY,
+                    LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "linux/resources/sort-gtk-up.png"),
+                    ColumnHeaderRenderer.DOWN_ICON_KEY,
+                    LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "linux/resources/sort-gtk-dn.png"),
+            }));
+        }
     }
 
-  private boolean isXP(LookAndFeelAddons addon) {
-        return OS.isWindowsXP();
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void addMacDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+        super.addMacDefaults(addon, defaults);
+        
+        defaults.addAll(Arrays.asList(new Object[] { 
+                ColumnHeaderRenderer.UP_ICON_KEY,
+                LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "macosx/resources/sort-osx-up.png"),
+                ColumnHeaderRenderer.DOWN_ICON_KEY,
+                LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "macosx/resources/sort-osx-dn.png"),
+        }));
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void addWindowsDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+        super.addWindowsDefaults(addon, defaults);
+        
+        if (OS.isWindowsXP()) {
+            defaults.addAll(Arrays.asList(new Object[] { 
+                    ColumnHeaderRenderer.UP_ICON_KEY,
+                    LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "windows/resources/sort-xp-up.png"),
+                    ColumnHeaderRenderer.DOWN_ICON_KEY,
+                    LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "windows/resources/sort-xp-dn.png"),
+            }));
+        } else {
+            defaults.addAll(Arrays.asList(new Object[] { 
+                    ColumnHeaderRenderer.UP_ICON_KEY,
+                    LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "windows/resources/sort-w2k-up.png"),
+                    ColumnHeaderRenderer.DOWN_ICON_KEY,
+                    LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "windows/resources/sort-w2k-dn.png"),
+            }));
+        }
+        
+        if (OS.isWindowsVista()) {
+            defaults.addAll(Arrays.asList(new Object[] { 
+                    ColumnHeaderRenderer.VISTA_BORDER_HACK,
+                    new BorderUIResource.EmptyBorderUIResource(5, 5, 5, 5), 
+            }));
+        }
+    }
 }

@@ -157,6 +157,7 @@ public class DatePickerFormatter extends
      * @param key the key for getting the pattern from the UI
      */
     private void addFormat(List<DateFormat> f, String key) {
+        //TODO localize
         String longFormat = UIManager.getString(key);
         try {
             SimpleDateFormat format = new SimpleDateFormat(longFormat);

@@ -80,16 +80,17 @@ public class MacOSXErrorPaneUI extends BasicErrorPaneUI {
 
     protected void configureDetailsButton(boolean expanded) {
         if (expanded) {
-            detailButton.setText(UIManager.getString(CLASS_NAME + ".mac.details_contract_text"));
+            detailButton.setText(UIManager.getString(CLASS_NAME + ".details_contract_text", detailButton.getLocale()));
             detailButton.setIcon(UIManager.getIcon("Tree.expandedIcon"));
         } else {
-            detailButton.setText(UIManager.getString(CLASS_NAME + ".mac.details_expand_text"));
+            detailButton.setText(UIManager.getString(CLASS_NAME + ".details_expand_text", detailButton.getLocale()));
             detailButton.setIcon(UIManager.getIcon("Tree.collapsedIcon"));
         }
     }
     
     protected void configureReportAction(AbstractActionExt reportAction) {
-        reportAction.setName(UIManager.getString(CLASS_NAME + ".mac.report_button_text"));
+        //TODO localize
+        reportAction.setName(UIManager.getString(CLASS_NAME + ".report_button_text"));
 //        reportButton.setText("Send Report To Apple");
 //        reportButton.setPreferredSize(new Dimension(100, 30));
 //        reportButton.setMinimumSize(new Dimension(100, 30));
@@ -167,9 +168,9 @@ public class MacOSXErrorPaneUI extends BasicErrorPaneUI {
         disclaimerText.setVisible(text != null);
         
         if (info != null && info.getErrorLevel() == ErrorLevel.FATAL) {
-            closeButton.setText(UIManager.getString(CLASS_NAME + ".fatal_button_text"));
+            closeButton.setText(UIManager.getString(CLASS_NAME + ".fatal_button_text", closeButton.getLocale()));
         } else {
-            closeButton.setText(UIManager.getString(CLASS_NAME + ".mac.ok_button_text"));
+            closeButton.setText(UIManager.getString(CLASS_NAME + ".ok_button_text", closeButton.getLocale()));
         }
     }
 
@@ -213,8 +214,8 @@ public class MacOSXErrorPaneUI extends BasicErrorPaneUI {
         detailButton.setBorder(BorderFactory.createEmptyBorder());
         detailButton.setMargin(new Insets(0, 0, 0 ,0));
         detailButton.setIcon(UIManager.getIcon("Tree.collapsedIcon"));
-        detailButton.setText(UIManager.getString(CLASS_NAME + ".mac.details_expand_text"));
+        detailButton.setText(UIManager.getString(CLASS_NAME + ".details_expand_text", detailButton.getLocale()));
         
-        closeButton.setText(UIManager.getString(CLASS_NAME + ".mac.ok_button_text"));
+        closeButton.setText(UIManager.getString(CLASS_NAME + ".ok_button_text", closeButton.getLocale()));
     }
 }

@@ -28,6 +28,7 @@ import javax.swing.plaf.BorderUIResource;
 
 import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.plaf.basic.BasicDatePickerUI;
+import org.jdesktop.swingx.util.OS;
 
 /**
  * @author Joshua Outwater
@@ -37,6 +38,9 @@ public class DatePickerAddon extends AbstractComponentAddon {
         super("JXDatePicker");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
         super.addBasicDefaults(addon, defaults);
@@ -50,21 +54,48 @@ public class DatePickerAddon extends AbstractComponentAddon {
         }));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void addWindowsDefaults(LookAndFeelAddons addon, List<Object> defaults) {
         super.addWindowsDefaults(addon, defaults);
+        
+        defaults.add("JXDatePicker.arrowIcon");
+        
+        if (OS.isWindowsXP()) {
+            if (OS.isUsingWindowsVisualStyles()) {
+                defaults.add(LookAndFeel.makeIcon(DatePickerAddon.class,
+                        "windows/resources/combo-xp.png"));
+            } else {
+                defaults.add(LookAndFeel.makeIcon(DatePickerAddon.class,
+                        "windows/resources/combo-w2k.png"));
+            }
+        }
+        
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void addLinuxDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+        super.addLinuxDefaults(addon, defaults);
         defaults.addAll(Arrays.asList(new Object[] {
                 "JXDatePicker.arrowIcon",
-                LookAndFeel.makeIcon(DatePickerAddon.class, "resources/combo-xp.png")
+                LookAndFeel.makeIcon(DatePickerAddon.class, "linux/resources/combo-gtk.png")
         }));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void addMacDefaults(LookAndFeelAddons addon, List<Object> defaults) {
         super.addMacDefaults(addon, defaults);
         defaults.addAll(Arrays.asList(new Object[] {
                 "JXDatePicker.arrowIcon",
-                LookAndFeel.makeIcon(DatePickerAddon.class, "resources/combo-osx.png")
+                LookAndFeel.makeIcon(DatePickerAddon.class, "macosx/resources/combo-osx.png")
         }));
     }
 }

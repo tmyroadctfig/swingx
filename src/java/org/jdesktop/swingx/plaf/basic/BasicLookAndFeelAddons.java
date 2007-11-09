@@ -20,6 +20,8 @@
  */
 package org.jdesktop.swingx.plaf.basic;
 
+import javax.swing.UIManager;
+
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 
 /**
@@ -27,4 +29,27 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  * preferred as this addon may not provide complete implementation of the
  * additional pluggable UIs.
  */
-public class BasicLookAndFeelAddons extends LookAndFeelAddons { }
+public class BasicLookAndFeelAddons extends LookAndFeelAddons {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void initialize() {
+        super.initialize();
+        //must add resource bundle before adding component values
+        UIManager.getDefaults().addResourceBundle(
+                "org.jdesktop.swingx.plaf.basic.resources.swingx");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void uninitialize() {
+        //must remove resource bundle before adding component values
+        UIManager.getDefaults().removeResourceBundle(
+                "org.jdesktop.swingx.plaf.basic.resources.swingx");
+        super.uninitialize();
+    }
+    
+}

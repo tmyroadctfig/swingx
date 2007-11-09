@@ -56,6 +56,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.plaf.ActionMapUIResource;
 import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.basic.BasicHTML;
 
 import org.jdesktop.swingx.JXTipOfTheDay;
 import org.jdesktop.swingx.JXTipOfTheDay.ShowOnStartupChoice;
@@ -94,7 +95,7 @@ public class BasicTipOfTheDayUI extends TipOfTheDayUI {
   protected JDialog createDialog(Component parentComponent,
     final ShowOnStartupChoice choice,
     boolean showPreviousButton) {    
-    String title = UIManager.getString("TipOfTheDay.dialogTitle");
+    String title = UIManager.getString("TipOfTheDay.dialogTitle", parentComponent.getLocale());
 
     final JDialog dialog;
 
@@ -125,7 +126,7 @@ public class BasicTipOfTheDayUI extends TipOfTheDayUI {
 
     if (choice != null) {
       showOnStartupBox = new JCheckBox(UIManager
-        .getString("TipOfTheDay.showOnStartupText"), choice
+        .getString("TipOfTheDay.showOnStartupText", parentComponent.getLocale()), choice
         .isShowingOnStartup());
       controls.add(showOnStartupBox, BorderLayout.CENTER);
     } else {
@@ -138,18 +139,18 @@ public class BasicTipOfTheDayUI extends TipOfTheDayUI {
     
     if (showPreviousButton) {
       JButton previousTipButton = new JButton(UIManager
-        .getString("TipOfTheDay.previousTipText"));
+        .getString("TipOfTheDay.previousTipText", parentComponent.getLocale()));
       buttons.add(previousTipButton);
       previousTipButton.addActionListener(getActionMap().get("previousTip"));
     }
     
     JButton nextTipButton = new JButton(UIManager
-      .getString("TipOfTheDay.nextTipText"));
+      .getString("TipOfTheDay.nextTipText", parentComponent.getLocale()));
     buttons.add(nextTipButton);
     nextTipButton.addActionListener(getActionMap().get("nextTip"));
     
     JButton closeButton = new JButton(UIManager
-      .getString("TipOfTheDay.closeText"));
+      .getString("TipOfTheDay.closeText", parentComponent.getLocale()));
     buttons.add(closeButton);
     
     final ActionListener saveChoice = new ActionListener() {
@@ -223,8 +224,8 @@ public class BasicTipOfTheDayUI extends TipOfTheDayUI {
     LookAndFeel.installColorsAndFont(tipPane, "TipOfTheDay.background",
       "TipOfTheDay.foreground", "TipOfTheDay.font");
     LookAndFeel.installBorder(tipPane, "TipOfTheDay.border");
+    LookAndFeel.installProperty(tipPane, "opaque", Boolean.TRUE);
     tipFont = UIManager.getFont("TipOfTheDay.tipFont");
-    tipPane.setOpaque(true);
   }
 
   protected void installComponents() {
@@ -232,7 +233,7 @@ public class BasicTipOfTheDayUI extends TipOfTheDayUI {
 
     // tip icon
     JLabel tipIcon = new JLabel(UIManager
-      .getString("TipOfTheDay.didYouKnowText"));
+      .getString("TipOfTheDay.didYouKnowText", tipPane.getLocale()));
     tipIcon.setIcon(UIManager.getIcon("TipOfTheDay.icon"));
     tipIcon.setBorder(BorderFactory.createEmptyBorder(22, 15, 22, 15));
     tipPane.add("North", tipIcon);
@@ -285,8 +286,10 @@ public class BasicTipOfTheDayUI extends TipOfTheDayUI {
 
         String text = tipObject == null?"":tipObject.toString();
 
-        if (text.toLowerCase().startsWith("<html>")) {
+        if (BasicHTML.isHTMLString(text)) {
           JEditorPane editor = new JEditorPane("text/html", text);
+          editor.setFont(tipPane.getFont());
+//          BasicHTML.updateRenderer(editor, text);
           UIManagerUtils.htmlize(editor, tipPane.getFont());
           editor.setEditable(false);
           editor.setBorder(null);

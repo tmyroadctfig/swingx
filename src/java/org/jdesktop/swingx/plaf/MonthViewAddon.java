@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.LookAndFeel;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.FontUIResource;
 
@@ -15,6 +16,9 @@ public class MonthViewAddon extends AbstractComponentAddon {
         super("JXMonthView");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
         super.addBasicDefaults(addon, defaults);
@@ -35,13 +39,18 @@ public class MonthViewAddon extends AbstractComponentAddon {
                         new FontUIResource("Dialog", Font.PLAIN, 12)),
                 //These should be loaded into defaults using LookAndFeel.makeIcon
                 //Currently these are loaded via getResourceAsStream in UI delegate
-                "JXMonthView.monthDownFileName", "resources/month-down.png",
-                "JXMonthView.monthUpFileName", "resources/month-up.png",
+                "JXMonthView.monthDownFileName", LookAndFeel.makeIcon(
+                        MonthViewAddon.class, "basic/resources/month-down.png"),
+                "JXMonthView.monthUpFileName", LookAndFeel.makeIcon(
+                        MonthViewAddon.class, "basic/resources/month-up.png"),
                 "JXMonthView.boxPaddingX", 3,
                 "JXMonthView.boxPaddingY", 3
         }));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected void addMacDefaults(LookAndFeelAddons addon, List<Object> defaults) {
         super.addMacDefaults(addon, defaults);
     }

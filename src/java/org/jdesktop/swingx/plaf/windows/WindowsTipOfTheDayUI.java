@@ -78,7 +78,7 @@ public class WindowsTipOfTheDayUI extends BasicTipOfTheDayUI {
     // tip area
     JPanel rightPane = new JPanel(new BorderLayout());
     JLabel didYouKnow = new JLabel(UIManager
-      .getString("TipOfTheDay.didYouKnowText"));
+      .getString("TipOfTheDay.didYouKnowText", tipPane.getLocale()));
     didYouKnow.setPreferredSize(new Dimension(50, 32));
     didYouKnow.setOpaque(true);
     didYouKnow.setBackground(UIManager.getColor("TextArea.background"));

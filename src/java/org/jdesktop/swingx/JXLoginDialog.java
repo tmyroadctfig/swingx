@@ -309,7 +309,8 @@ public class JXLoginDialog extends JDialog {
      */
     public JXLoginDialog(LoginService service, PasswordStore ps, UserNameStore us) {
         super();
-        setTitle(UIManager.getString(JXLoginPane.class.getCanonicalName() + ".loginString")); 
+        setTitle(UIManager.getString(
+                JXLoginPane.class.getCanonicalName() + ".loginString", getLocale())); 
         setPanel(new JXLoginPane(service, ps, us));
         JXLoginPane.initWindow(this, getPanel());
     }

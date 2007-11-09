@@ -48,8 +48,9 @@ public class HeaderAddon extends AbstractComponentAddon {
         super.addBasicDefaults(addon, defaults);
         defaults.addAll(Arrays.asList(new Object[]{
             JXHeader.uiClassID, "org.jdesktop.swingx.plaf.basic.BasicHeaderUI",
+            //TODO image is missing
             "JXHeader.defaultIcon", LookAndFeel.makeIcon(HeaderAddon.class,
-                    "resources/header-default.png"),
+                    "basic/resources/header-default.png"),
                     "JXHeader.titleFont", new FontUIResource(UIManager.getFont("Label.font").deriveFont(Font.BOLD)),
                     "JXHeader.titleForeground", UIManager.getColor("Label.foreground"),
                     "JXHeader.descriptionFont", UIManager.getFont("Label.font"),

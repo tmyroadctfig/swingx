@@ -170,7 +170,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     public void installUI(JComponent c) {
@@ -200,7 +200,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     public void uninstallUI(JComponent c) {
@@ -270,11 +270,13 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
         errorMessage.setOpaque(false);
         errorMessage.putClientProperty(JXEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 
-        closeButton = new JButton(UIManager.getString(CLASS_NAME + ".ok_button_text"));
+        closeButton = new JButton(UIManager.getString(
+                CLASS_NAME + ".ok_button_text", closeButton.getLocale()));
 
         reportButton = new EqualSizeJButton(pane.getActionMap().get(JXErrorPane.REPORT_ACTION_KEY));
 
-        detailButton = new EqualSizeJButton(UIManager.getString(CLASS_NAME + ".details_expand_text"));
+        detailButton = new EqualSizeJButton(UIManager.getString(
+                CLASS_NAME + ".details_expand_text", detailButton.getLocale()));
         
         details = new JXEditorPane();
         details.setContentType("text/html");
@@ -285,7 +287,8 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
         details.setEditable(false);
         detailsPanel = new JPanel();
         detailsPanel.setVisible(false);
-        copyToClipboardButton = new JButton(UIManager.getString(CLASS_NAME + ".copy_to_clipboard_button_text"));
+        copyToClipboardButton = new JButton(UIManager.getString(
+                CLASS_NAME + ".copy_to_clipboard_button_text", copyToClipboardButton.getLocale()));
         copyToClipboardListener = new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 details.copy();
@@ -459,6 +462,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
     }
     
     protected void configureReportAction(AbstractActionExt reportAction) {
+        //TODO localize
         reportAction.setName(UIManager.getString(CLASS_NAME + ".report_button_text"));
     }
     
@@ -519,9 +523,11 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
 
     protected void configureDetailsButton(boolean expanded) {
         if (expanded) {
-            detailButton.setText(UIManager.getString(CLASS_NAME + ".details_contract_text"));
+            detailButton.setText(UIManager.getString(
+                    CLASS_NAME + ".details_contract_text", detailButton.getLocale()));
         } else {
-            detailButton.setText(UIManager.getString(CLASS_NAME + ".details_expand_text"));
+            detailButton.setText(UIManager.getString(
+                    CLASS_NAME + ".details_expand_text", detailButton.getLocale()));
         }
     }
     
@@ -590,7 +596,8 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
         if (errorInfo == null) {
             iconLabel.setIcon(pane.getIcon());
             setErrorMessage("");
-            closeButton.setText(UIManager.getString(CLASS_NAME + ".ok_button_text"));
+            closeButton.setText(UIManager.getString(
+                    CLASS_NAME + ".ok_button_text", closeButton.getLocale()));
             setDetails("");
             //TODO Does this ever happen? It seems like if errorInfo is null and
             //this is called, it would be an IllegalStateException. 
@@ -598,9 +605,11 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
             //change the "closeButton"'s text to either the default "ok"/"close" text
             //or to the "fatal" text depending on the error level of the incident info
             if (errorInfo.getErrorLevel() == ErrorLevel.FATAL) {
-                closeButton.setText(UIManager.getString(CLASS_NAME + ".fatal_button_text"));
+                closeButton.setText(UIManager.getString(
+                        CLASS_NAME + ".fatal_button_text", closeButton.getLocale()));
             } else {
-                closeButton.setText(UIManager.getString(CLASS_NAME + ".ok_button_text"));
+                closeButton.setText(UIManager.getString(
+                        CLASS_NAME + ".ok_button_text", closeButton.getLocale()));
             }
             
             //if the icon for the pane has not been specified by the developer,

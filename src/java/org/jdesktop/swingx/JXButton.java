@@ -173,16 +173,20 @@ public class JXButton extends JButton {
     private void invokePainter(Graphics g, Painter<JXButton> ptr) {
         if(ptr == null) return;
         
-        if(isPaintBorderInsets()) {
-            ptr.paint((Graphics2D)g, this, getWidth(), getHeight());
-        } else {
-            Graphics2D g2 = (Graphics2D) g;
-            Insets ins = this.getInsets();
-            g2.translate(ins.left, ins.top);
-            ptr.paint(g2, this,
-                    this.getWidth() - ins.left - ins.right,
-                    this.getHeight() - ins.top - ins.bottom);
-            g2.translate(-ins.left, -ins.top);
+        Graphics2D g2d = (Graphics2D) g.create();
+        
+        try {
+            if(isPaintBorderInsets()) {
+                ptr.paint(g2d, this, getWidth(), getHeight());
+            } else {
+                Insets ins = this.getInsets();
+                g2d.translate(ins.left, ins.top);
+                ptr.paint(g2d, this,
+                        this.getWidth() - ins.left - ins.right,
+                        this.getHeight() - ins.top - ins.bottom);
+            }
+        } finally {
+            g2d.dispose();
         }
     }
     // paint anything but text and icon

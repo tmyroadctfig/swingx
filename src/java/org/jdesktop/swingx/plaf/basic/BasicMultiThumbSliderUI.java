@@ -22,12 +22,11 @@ package org.jdesktop.swingx.plaf.basic;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Polygon;
-import javax.imageio.ImageIO;
+
 import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
+
 import org.jdesktop.swingx.JXMultiThumbSlider;
 import org.jdesktop.swingx.multislider.ThumbRenderer;
 import org.jdesktop.swingx.multislider.TrackRenderer;
@@ -55,14 +54,7 @@ public class BasicMultiThumbSliderUI extends MultiThumbSliderUI {
     }
 
     private class BasicThumbRenderer extends JComponent implements ThumbRenderer {
-        Image thumb;
         public BasicThumbRenderer() {
-            try {
-                thumb = ImageIO.read(this.getClass().getResourceAsStream("resources/JXMultiThumbSlider.thumb.png"));
-            } catch (Exception ex) {
-                System.out.println(ex.getMessage());
-                ex.printStackTrace();
-            }
             setPreferredSize(new Dimension(14,14));
         }
 
@@ -97,7 +89,4 @@ public class BasicMultiThumbSliderUI extends MultiThumbSliderUI {
             return this;
         }
     }
-
-
-    
 }

@@ -26,6 +26,7 @@ import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.LookAndFeel;
+import javax.swing.UIManager;
 import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.FontUIResource;
@@ -71,8 +72,8 @@ public class TipOfTheDayAddon extends AbstractComponentAddon {
     defaults.add(new BorderUIResource(BorderFactory.createLineBorder(new Color(
       117, 117, 117))));
 
-    addResource(defaults,
-      "org.jdesktop.swingx.plaf.basic.resources.TipOfTheDay");
+    UIManager.getDefaults().addResourceBundle(
+            "org.jdesktop.swingx.plaf.basic.resources.TipOfTheDay");
   }
 
   @Override
@@ -100,8 +101,8 @@ public class TipOfTheDayAddon extends AbstractComponentAddon {
     defaults
       .add(new BorderUIResource(new WindowsTipOfTheDayUI.TipAreaBorder()));
 
-    addResource(defaults,
-      "org.jdesktop.swingx.plaf.windows.resources.TipOfTheDay");
+    UIManager.getDefaults().addResourceBundle(
+        "org.jdesktop.swingx.plaf.windows.resources.TipOfTheDay");
   }
 
 }

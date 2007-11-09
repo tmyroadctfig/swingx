@@ -20,8 +20,9 @@
  */
 
 package org.jdesktop.swingx.plaf;
+
 import java.awt.Component;
-import javax.swing.Icon;
+
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
