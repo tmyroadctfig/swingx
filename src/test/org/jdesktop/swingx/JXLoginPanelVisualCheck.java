@@ -157,7 +157,6 @@ public class JXLoginPanelVisualCheck extends InteractiveTestCase {
         sun.awt.AppContext.getAppContext().put("JComponent.defaultLocale", Locale.FRANCE);
         final JXLoginPane panel = new JXLoginPane(new LoginService() {
 
-			@Override
 			public boolean authenticate(String name, char[] password,
 					String server) throws Exception {
 				if (true) {
@@ -177,7 +176,6 @@ public class JXLoginPanelVisualCheck extends InteractiveTestCase {
         frame.pack();
         frame.setVisible(true);
         SwingUtilities.invokeLater(new Runnable() {
-			@Override
 			public void run() {
 				evaluateChildren(frame.getContentPane().getComponents());
 			}});
@@ -192,7 +190,6 @@ public class JXLoginPanelVisualCheck extends InteractiveTestCase {
         final JFrame frame = JXLoginPane.showLoginFrame(panel);
         panel.setLoginService(new LoginService() {
 
-			@Override
 			public boolean authenticate(String name, char[] password,
 					String server) throws Exception {
 				panel.startLogin();
@@ -209,7 +206,6 @@ public class JXLoginPanelVisualCheck extends InteractiveTestCase {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
         SwingUtilities.invokeLater(new Runnable() {
-			@Override
 			public void run() {
 				evaluateChildren(frame.getContentPane().getComponents());
 			}});
