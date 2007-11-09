@@ -34,7 +34,7 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  * <a href="http://jext.free.fr/header.png">Romain Guys ProgX website</a></p>
  *
  * <p><code>JXHeader</code> is a simple component that is also sufficiently 
- * configurable to be useable. The description area
+ * configurable to be usable. The description area
  * accepts HTML conforming to version 3.2 of the HTML standard. The icon, title,
  * and description are all configurable. <code>JXHeader</code> itself extends 
  * {@link JXPanel}, providing translucency and painting delegates.</p>
@@ -46,7 +46,7 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  *      header.setTitle("Timing Framework Spline Editor");
  *      header.setDescription("Drag control points in the display to change the " +
  *          "shape of the spline\n" +
- *          "Click the Copy Code button to generate the corrosponding Java code.");
+ *          "Click the Copy Code button to generate the corresponding Java code.");
  *      Icon icon = new ImageIcon(getClass().getResource("tools.png"));
  *      header.setIcon(icon);
  * </code></pre></p>
@@ -66,9 +66,15 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  * 
  * @status REVIEWED
  * @author rbair
+ * @author rah003
  */
 public class JXHeader extends JXPanel {
     /**
+	 * SerialVersionUID.
+	 */
+	private static final long serialVersionUID = 3593838231433068954L;
+	
+	/**
      * JXHeader pluggable UI key <i>HeaderUI</i>
      */
     public final static String uiClassID = "HeaderUI";
@@ -78,6 +84,19 @@ public class JXHeader extends JXPanel {
         LookAndFeelAddons.contribute(new HeaderAddon());
     }
     
+    /**
+     * Specifies desired location of the icon relative to the title/description text.
+     */
+    public static enum IconPosition {
+    	/**
+    	 * Positions icon left from the text.
+    	 */
+    	LEFT,
+    	/**
+    	 * Positions icon right from the text.
+    	 */
+    	RIGHT
+    }
     private String title;
     private String description;
     private Icon icon;
@@ -85,6 +104,7 @@ public class JXHeader extends JXPanel {
     private Font descriptionFont;
     private Color titleForeground;
     private Color descriptionForeground;
+    private IconPosition iconPosition = IconPosition.RIGHT;
     
     /** Creates a new instance of JXHeader */
     public JXHeader() {
@@ -305,5 +325,22 @@ public class JXHeader extends JXPanel {
         firePropertyChange("descriptionForeground", old, getDescriptionForeground());
 	}
     
+	/**
+	 * Gets current icon position. Default is RIGHT.
+	 * @return Current Icon position.
+	 */
+	public IconPosition getIconPosition() {
+		return iconPosition;
+	}
 
+	/**
+	 * Sets new Icon position. Position is relative to the text. Default value is RIGHT.
+	 * @see #getIconPosition()
+	 * @param iconPosition new desired icon position
+	 */
+	public void setIconPosition(IconPosition iconPosition) {
+		IconPosition old = getIconPosition();
+		this.iconPosition = iconPosition;
+		firePropertyChange("iconPosition", old, getIconPosition());
+	}
 }

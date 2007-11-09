@@ -23,6 +23,7 @@ package org.jdesktop.swingx.plaf.basic;
 
 import org.jdesktop.swingx.JXHeader;
 import org.jdesktop.swingx.JXLabel;
+import org.jdesktop.swingx.JXHeader.IconPosition;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
 import org.jdesktop.swingx.plaf.HeaderUI;
@@ -282,17 +283,34 @@ public class BasicHeaderUI extends HeaderUI {
             titleLabel.setForeground((Color)newValue);
         } else if ("descriptionForeground".equals(propertyName)) {
             descriptionPane.setForeground((Color)newValue);
+        } else if ("iconPosition".equals(propertyName)) {
+            resetLayout(h);
         }
     }
 
     protected void installComponents(JXHeader h) {
         h.setLayout(new GridBagLayout());
-        h.add(titleLabel, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.HORIZONTAL, new Insets(12, 12, 0, 11), 0, 0));
-        h.add(descriptionPane, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.FIRST_LINE_START, GridBagConstraints.BOTH, new Insets(0, 24, 12, 11), 0, 0));
-        h.add(imagePanel, new GridBagConstraints(1, 0, 1, 2, 0.0, 1.0, GridBagConstraints.FIRST_LINE_END, GridBagConstraints.NONE, new Insets(12, 0, 11, 11), 0, 0));
+        resetLayout(h);
     }
 
-    protected void uninstallComponents(JXHeader h) {
+    private void resetLayout(JXHeader h) {
+    	h.remove(titleLabel);
+    	h.remove(descriptionPane);
+    	h.remove(imagePanel);
+    	System.out.println(h.getIconPosition());
+    	if (h.getIconPosition() == null || h.getIconPosition() == IconPosition.RIGHT) {
+    		System.out.println("right");
+	        h.add(titleLabel, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.HORIZONTAL, new Insets(12, 12, 0, 11), 0, 0));
+	        h.add(descriptionPane, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.FIRST_LINE_START, GridBagConstraints.BOTH, new Insets(0, 24, 12, 11), 0, 0));
+	        h.add(imagePanel, new GridBagConstraints(1, 0, 1, 2, 0.0, 1.0, GridBagConstraints.FIRST_LINE_END, GridBagConstraints.NONE, new Insets(12, 0, 11, 11), 0, 0));
+    	} else {
+	        h.add(titleLabel, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.HORIZONTAL, new Insets(12, 12, 0, 11), 0, 0));
+	        h.add(descriptionPane, new GridBagConstraints(1, 1, 1, 1, 1.0, 1.0, GridBagConstraints.FIRST_LINE_START, GridBagConstraints.BOTH, new Insets(0, 24, 12, 11), 0, 0));
+	        h.add(imagePanel, new GridBagConstraints(0, 0, 1, 2, 0.0, 1.0, GridBagConstraints.FIRST_LINE_END, GridBagConstraints.NONE, new Insets(12, 11, 0, 11), 0, 0));
+    	}
+	}
+
+	protected void uninstallComponents(JXHeader h) {
         h.remove(titleLabel);
         h.remove(descriptionPane);
         h.remove(imagePanel);

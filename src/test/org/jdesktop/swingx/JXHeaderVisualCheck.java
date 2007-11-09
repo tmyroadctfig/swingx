@@ -32,6 +32,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.jdesktop.swingx.JXHeader.IconPosition;
 import org.jdesktop.swingx.test.XTestUtils;
 
 /**
@@ -155,6 +156,7 @@ public class JXHeaderVisualCheck extends InteractiveTestCase {
         assertNotNull(url);
         JPanel p = new JPanel(new BorderLayout());
         JXHeader header = new JXHeader("MyTitle", "MyDescription", new ImageIcon(url));
+        header.setIconPosition(IconPosition.LEFT);
         p.add(header);
         // added just to better visualize bkg gradient in the JXHeader.
         p.add(new JLabel("Reference component"), BorderLayout.SOUTH);
