@@ -50,7 +50,7 @@ public class HeaderAddon extends AbstractComponentAddon {
             JXHeader.uiClassID, "org.jdesktop.swingx.plaf.basic.BasicHeaderUI",
             "JXHeader.defaultIcon", LookAndFeel.makeIcon(HeaderAddon.class,
                     "resources/header-default.png"),
-                    "JXHeader.titleFont", UIManager.getFont("Label.font"),
+                    "JXHeader.titleFont", new FontUIResource(UIManager.getFont("Label.font").deriveFont(Font.BOLD)),
                     "JXHeader.titleForeground", UIManager.getColor("Label.foreground"),
                     "JXHeader.descriptionFont", UIManager.getFont("Label.font"),
                     "JXHeader.descriptionForeground", UIManager.getColor("Label.foreground"),
