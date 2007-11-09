@@ -29,6 +29,7 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.Reader;
@@ -314,6 +315,8 @@ public class JXLabel extends JLabel {
     
     
     private boolean paintBorderInsets = true;
+
+	private int maxLineSpan = -1;
     
     /**
      * Returns true if the background painter should paint where the border is
@@ -348,7 +351,7 @@ public class JXLabel extends JLabel {
     @Override
     protected void paintComponent(Graphics g) {
         // resizing the text view causes recursive callback to the paint down the road. In order to prevent such
-        // computationaly intensive series of repiants every call to paint is skipped while top most call is being
+        // computationally intensive series of repaints every call to paint is skipped while top most call is being
         // executed.
         if (ignoreRepaint) {
             return;
@@ -356,112 +359,33 @@ public class JXLabel extends JLabel {
         if (backgroundPainter == null && foregroundPainter == null) {
             super.paintComponent(g);
         } else {
-            Graphics2D g2 = (Graphics2D) g.create();
             pWidth = getWidth();
             pHeight = getHeight();
-            if(!isPaintBorderInsets()) {
-                Insets i = getInsets();
-                g2.translate(i.left, i.top);
-                pWidth = getWidth() - i.left - i.right;
-                pHeight = getHeight() - i.top - i.bottom;
-            }
+            Insets i = getInsets();
             if (backgroundPainter != null) {
-                backgroundPainter.paint(g2, this, pWidth, pHeight);
+            	Graphics2D tmp = (Graphics2D) g.create();
+                if(!isPaintBorderInsets()) {
+                    tmp.translate(i.left, i.top);
+            	}
+                backgroundPainter.paint(tmp, this, pWidth, pHeight);
+                tmp.dispose();
             }
             if (foregroundPainter != null) {
-                double tx = (double) getWidth();
-                double ty = (double) getHeight();
+                pWidth = getWidth() - i.left - i.right;
+                pHeight = getHeight() - i.top - i.bottom;
 
-                // orthogonal cases are most likely the most often used ones, so give them preferential treatment.
-                if ((textRotation > 4.697 && textRotation < 4.727) || (textRotation > 1.555 && textRotation < 1.585)) {
-                    // vertical
-                    int tmp = pHeight;
-                    pHeight = pWidth;
-                    pWidth = tmp;
-                    tx = pWidth;
-                    ty = pHeight;
-                } else if ((textRotation > -0.015 && textRotation < 0.015)
-                        || (textRotation > 3.140 && textRotation < 3.1430)) {
-                    // normal & inverted
-                    pHeight = getHeight();
-                    pWidth = getWidth();
-                } else {
-                    // the rest of it. Calculate best rectangle that fits the bounds. "Best" is considered one that
-                    // allows whole text to fit in, spanned on preferred axis (X). If that doesn't work, fit the text
-                    // inside square with diagonal equal min(height, width) (Should be the largest rectangular area that
-                    // fits in, math proof available upon request)
-
-                    ignoreRepaint = true;
-                    double square = Math.min(getHeight(), getWidth()) * Math.cos(Math.PI / 4d);
-
-                    View v = (View) getClientProperty(BasicHTML.propertyKey);
-                    if (v == null) {
-                        // no html and no wrapline enabled means no view
-                        // ... find another way to figure out the heigh
-                        ty = getFontMetrics(getFont()).getHeight();
-                        double cw = (getWidth() - Math.abs(ty * Math.sin(textRotation)))
-                                / Math.abs(Math.cos(textRotation));
-                        double ch = (getHeight() - Math.abs(ty * Math.cos(textRotation)))
-                                / Math.abs(Math.sin(textRotation));
-                        // min of whichever is above 0 (!!! no min of abs values)
-                        tx = cw < 0 ? ch : ch > 0 ? Math.min(cw, ch) : cw;
-                    } else {
-                        float w = v.getPreferredSpan(View.X_AXIS);
-                        float h = v.getPreferredSpan(View.Y_AXIS);
-                        double c = w;
-                        double alpha = textRotation;// % (Math.PI/2d);
-                        boolean ready = false;
-                        while (!ready) {
-                            // shorten the view len until line break is forced
-                            while (h == v.getPreferredSpan(View.Y_AXIS)) {
-                                w -= 10;
-                                v.setSize(w, h);
-                            }
-                            if (w < square || h > square) {
-                                // text is too long to fit no matter what. Revert shape to square since that is the
-                                // best option (1st derivation for area size of rotated rect in rect is equal 0 for
-                                // rotated rect with equal w and h i.e. for square)
-                                w = h = (float) square;
-                                // set view height to something big to prevent recursive resize/repaint requests
-                                v.setSize(w, 100000);
-                                break;
-                            }
-                            // calc avail width with new view height
-                            h = v.getPreferredSpan(View.Y_AXIS);
-                            double cw = (getWidth() - Math.abs(h * Math.sin(alpha))) / Math.abs(Math.cos(alpha));
-                            double ch = (getHeight() - Math.abs(h * Math.cos(alpha))) / Math.abs(Math.sin(alpha));
-                            // min of whichever is above 0 (!!! no min of abs values)
-                            c = cw < 0 ? ch : ch > 0 ? Math.min(cw, ch) : cw;
-                            // make it one pix smaller to ensure text is not cut on the left
-                            c--;
-                            if (c > w) {
-                                v.setSize((float) c, 10 * h);
-                                ready = true;
-                            } else {
-                                v.setSize((float) c, 10 * h);
-                                if (v.getPreferredSpan(View.Y_AXIS) > h) {
-                                    // set size back to figure out new line break and height after
-                                    v.setSize(w, 10 * h);
-                                } else {
-                                    w = (float) c;
-                                    ready = true;
-                                }
-                            }
-                        }
-
-                        tx = Math.floor(w);// xxx: watch out for first letter on each line missing some pixs!!!
-                        ty = h;
-                    }
-                    pWidth = (int) tx;
-                    pHeight = (int) ty;
-                    ignoreRepaint = false;
-                }
-                double wx = Math.sin(textRotation) * ty + Math.cos(textRotation) * tx;
-                double wy = Math.sin(textRotation) * tx + Math.cos(textRotation) * ty;
-                double x = (getWidth() - wx) / 2 + Math.sin(textRotation) * ty;
+                Point2D tPoint = calculateT();
+                double wx = Math.sin(textRotation) * tPoint.getY() + Math.cos(textRotation) * tPoint.getX();
+                double wy = Math.sin(textRotation) * tPoint.getX() + Math.cos(textRotation) * tPoint.getY();
+                double x = (getWidth() - wx) / 2 + Math.sin(textRotation) * tPoint.getY();
                 double y = (getHeight() - wy) / 2;
-                g2.translate(x, y);
-                g2.rotate(textRotation);
+            	Graphics2D tmp = (Graphics2D) g.create();
+            	if (i != null) {
+                    tmp.translate(i.left + x, i.top + y);
+            	} else {
+            		tmp.translate(x, y);
+            	}
+                tmp.rotate(textRotation);
 
                 painting = true;
                 // uncomment to highlight text area
@@ -469,16 +393,107 @@ public class JXLabel extends JLabel {
                 // g2.setColor(Color.RED);
                 // g2.fillRect(0, 0, getWidth(), getHeight());
                 // g2.setColor(c);
-                foregroundPainter.paint(g2, this, pWidth, pHeight);
+                foregroundPainter.paint(tmp, this, pWidth, pHeight);
+                tmp.dispose();
                 painting = false;
                 pWidth = 0;
                 pHeight = 0;
             }
-            g2.dispose();
         }
     }
     
-    @Override
+    private Point2D calculateT() {
+        double tx = (double) getWidth();
+        double ty = (double) getHeight();
+
+        // orthogonal cases are most likely the most often used ones, so give them preferential treatment.
+        if ((textRotation > 4.697 && textRotation < 4.727) || (textRotation > 1.555 && textRotation < 1.585)) {
+            // vertical
+            int tmp = pHeight;
+            pHeight = pWidth;
+            pWidth = tmp;
+            tx = pWidth;
+            ty = pHeight;
+        } else if ((textRotation > -0.015 && textRotation < 0.015)
+                || (textRotation > 3.140 && textRotation < 3.1430)) {
+            // normal & inverted
+            pHeight = getHeight();
+            pWidth = getWidth();
+        } else {
+            // the rest of it. Calculate best rectangle that fits the bounds. "Best" is considered one that
+            // allows whole text to fit in, spanned on preferred axis (X). If that doesn't work, fit the text
+            // inside square with diagonal equal min(height, width) (Should be the largest rectangular area that
+            // fits in, math proof available upon request)
+
+            ignoreRepaint = true;
+            double square = Math.min(getHeight(), getWidth()) * Math.cos(Math.PI / 4d);
+
+            View v = (View) getClientProperty(BasicHTML.propertyKey);
+            if (v == null) {
+                // no html and no wrapline enabled means no view
+                // ... find another way to figure out the heigh
+                ty = getFontMetrics(getFont()).getHeight();
+                double cw = (getWidth() - Math.abs(ty * Math.sin(textRotation)))
+                        / Math.abs(Math.cos(textRotation));
+                double ch = (getHeight() - Math.abs(ty * Math.cos(textRotation)))
+                        / Math.abs(Math.sin(textRotation));
+                // min of whichever is above 0 (!!! no min of abs values)
+                tx = cw < 0 ? ch : ch > 0 ? Math.min(cw, ch) : cw;
+            } else {
+                float w = v.getPreferredSpan(View.X_AXIS);
+                float h = v.getPreferredSpan(View.Y_AXIS);
+                double c = w;
+                double alpha = textRotation;// % (Math.PI/2d);
+                boolean ready = false;
+                while (!ready) {
+                    // shorten the view len until line break is forced
+                    while (h == v.getPreferredSpan(View.Y_AXIS)) {
+                        w -= 10;
+                        v.setSize(w, h);
+                    }
+                    if (w < square || h > square) {
+                        // text is too long to fit no matter what. Revert shape to square since that is the
+                        // best option (1st derivation for area size of rotated rect in rect is equal 0 for
+                        // rotated rect with equal w and h i.e. for square)
+                        w = h = (float) square;
+                        // set view height to something big to prevent recursive resize/repaint requests
+                        v.setSize(w, 100000);
+                        break;
+                    }
+                    // calc avail width with new view height
+                    h = v.getPreferredSpan(View.Y_AXIS);
+                    double cw = (getWidth() - Math.abs(h * Math.sin(alpha))) / Math.abs(Math.cos(alpha));
+                    double ch = (getHeight() - Math.abs(h * Math.cos(alpha))) / Math.abs(Math.sin(alpha));
+                    // min of whichever is above 0 (!!! no min of abs values)
+                    c = cw < 0 ? ch : ch > 0 ? Math.min(cw, ch) : cw;
+                    // make it one pix smaller to ensure text is not cut on the left
+                    c--;
+                    if (c > w) {
+                        v.setSize((float) c, 10 * h);
+                        ready = true;
+                    } else {
+                        v.setSize((float) c, 10 * h);
+                        if (v.getPreferredSpan(View.Y_AXIS) > h) {
+                            // set size back to figure out new line break and height after
+                            v.setSize(w, 10 * h);
+                        } else {
+                            w = (float) c;
+                            ready = true;
+                        }
+                    }
+                }
+
+                tx = Math.floor(w);// xxx: watch out for first letter on each line missing some pixs!!!
+                ty = h;
+            }
+            pWidth = (int) tx;
+            pHeight = (int) ty;
+            ignoreRepaint = false;
+        }
+		return new Point2D.Double(tx,ty);
+	}
+
+	@Override
     public void repaint() {
         if (ignoreRepaint) {
             return;
@@ -560,7 +575,7 @@ public class JXLabel extends JLabel {
             String name = evt.getPropertyName();
             JXLabel src = (JXLabel) evt.getSource();
             if (src.isLineWrap()) {
-                if ("font".equals(name) || "foreground".equals(name)) {
+                if ("font".equals(name) || "foreground".equals(name) || "maxLineSpan".equals(name)) {
                     if (evt.getOldValue() != null) {
                         updateRenderer(src);
                     }
@@ -736,7 +751,7 @@ public class JXLabel extends JLabel {
             view.setParent(this);
             host = c;
             // initially layout to the preferred size
-            setSize(view.getPreferredSpan(X_AXIS), view.getPreferredSpan(Y_AXIS));
+            setSize(c.getMaxLineSpan() > -1 ? c.getMaxLineSpan() : view.getPreferredSpan(X_AXIS), view.getPreferredSpan(Y_AXIS));
         }
 
         public void preferenceChanged(View child, boolean width, boolean height) {
@@ -765,11 +780,13 @@ public class JXLabel extends JLabel {
             Rectangle alloc = allocation.getBounds();
             view.setSize(alloc.width, alloc.height);
             if (g.getClipBounds() == null) {
-                g.setClip(alloc);
+            	g.setClip(alloc);
                 view.paint(g, allocation);
                 g.setClip(null);
             } else {
+                //g.translate(alloc.x, alloc.y);
                 view.paint(g, allocation);
+                //g.translate(-alloc.x, -alloc.y);
             }
         }
 
@@ -1496,4 +1513,14 @@ public class JXLabel extends JLabel {
         }
 
     }
+
+	public int getMaxLineSpan() {
+		return maxLineSpan ;
+	}
+	
+	public void setMaxLineSpan(int maxLineSpan) {
+		int old = getMaxLineSpan();
+		this.maxLineSpan = maxLineSpan;
+		firePropertyChange("maxLineSpan", old, getMaxLineSpan());
+	}
 }
