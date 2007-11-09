@@ -22,7 +22,6 @@ package org.jdesktop.swingx;
 
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Container;
@@ -92,6 +91,7 @@ import org.jdesktop.swingx.auth.LoginListener;
 import org.jdesktop.swingx.auth.LoginService;
 import org.jdesktop.swingx.auth.PasswordStore;
 import org.jdesktop.swingx.auth.UserNameStore;
+import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.plaf.LoginPaneAddon;
 import org.jdesktop.swingx.plaf.LoginPaneUI;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
@@ -181,7 +181,7 @@ public class JXLoginPane extends JXImagePanel {
      * "could not contact server" or something like that if something
      * goes wrong
      */
-    private JLabel errorMessageLabel;
+    private JXLabel errorMessageLabel;
     /**
      * A Panel containing all of the input fields, check boxes, etc necessary
      * for the user to do their job. The items on this panel change whenever
@@ -303,8 +303,7 @@ public class JXLoginPane extends JXImagePanel {
 		}
 
 		public void windowLostFocus(WindowEvent e) {
-			// TODO Auto-generated method stub
-			
+			// ignore
 		}};
     
     /**
@@ -709,14 +708,13 @@ public class JXLoginPane extends JXImagePanel {
         loginPanel = createLoginPanel();
         
         //create the message and hyperlink and hide them
-        errorMessageLabel = new JLabel(UIManager.getString(CLASS_NAME + ".errorMessage")); 
-        errorMessageLabel.setIcon(UIManager.getIcon("JXLoginDialog.error.icon"));
+        errorMessageLabel = new JXLabel(UIManager.getString(CLASS_NAME + ".errorMessage")); 
+        errorMessageLabel.setIcon(UIManager.getIcon("JXLoginPane.errorIcon"));
         errorMessageLabel.setVerticalTextPosition(SwingConstants.TOP);
-        errorMessageLabel.setOpaque(true);
-        errorMessageLabel.setBackground(new Color(255, 215, 215));//TODO get from UIManager
-        errorMessageLabel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(errorMessageLabel.getBackground().darker()),
-                BorderFactory.createEmptyBorder(5, 7, 5, 5))); //TODO get color from UIManager
+        errorMessageLabel.setLineWrap(true);
+        errorMessageLabel.setBackgroundPainter(new MattePainter(UIManager.getColor("JXLoginPane.errorBackground"), true));
+        errorMessageLabel.setBorder(UIManager.getBorder("JXLoginPane.errorBorder")); 
+        errorMessageLabel.setMaxLineSpan(320);
         errorMessageLabel.setVisible(false);
         
         //aggregate the optional message label, content, and error label into
@@ -734,7 +732,8 @@ public class JXLoginPane extends JXImagePanel {
         //create the progress panel
         progressPanel = new JXPanel(new GridBagLayout());
         progressMessageLabel = new JLabel(UIManager.getString(CLASS_NAME + ".pleaseWait"));
-        progressMessageLabel.setFont(progressMessageLabel.getFont().deriveFont(Font.BOLD)); //TODO get from UIManager
+        progressMessageLabel.setFont(UIManager.getFont("JXLoginPane.pleaseWaitFont"));
+        //progressMessageLabel.setFont(progressMessageLabel.getFont().deriveFont(Font.BOLD));
         JProgressBar pb = new JProgressBar();
         pb.setIndeterminate(true);
         JButton cancelButton = new JButton(getActionMap().get(CANCEL_LOGIN_ACTION_COMMAND));
@@ -1088,7 +1087,8 @@ public class JXLoginPane extends JXImagePanel {
     }
     
     /**
-     * TODO
+     * Puts the password into the password store. If password store is not set, method will do 
+     * nothing.
      */
     protected void savePassword() {
         if (saveCB.isSelected() 

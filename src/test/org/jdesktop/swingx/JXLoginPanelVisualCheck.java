@@ -23,8 +23,11 @@ import java.awt.Container;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.AbstractAction;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -36,6 +39,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.UIManager.LookAndFeelInfo;
 
 import org.jdesktop.swingx.JXLoginPane.SaveMode;
+import org.jdesktop.swingx.auth.LoginService;
 
 /**
  * Simple tests to ensure that the {@code JXDatePicker} can be instantiated and
@@ -135,6 +139,7 @@ public class JXLoginPanelVisualCheck extends InteractiveTestCase {
         sun.awt.AppContext.getAppContext().put("JComponent.defaultLocale", Locale.FRANCE);
         JXLoginPane panel = new JXLoginPane();
         JFrame frame = JXLoginPane.showLoginFrame(panel);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setJMenuBar(createMenuBar(panel));
 
         panel.setSaveMode(SaveMode.BOTH);
@@ -143,8 +148,91 @@ public class JXLoginPanelVisualCheck extends InteractiveTestCase {
         frame.pack();
         frame.setVisible(true);
     }
+
+    /**
+     * Issue #636-swingx Unexpected resize on long exception message.
+     *
+     */
+    public void interactiveError() {
+        sun.awt.AppContext.getAppContext().put("JComponent.defaultLocale", Locale.FRANCE);
+        final JXLoginPane panel = new JXLoginPane(new LoginService() {
+
+			@Override
+			public boolean authenticate(String name, char[] password,
+					String server) throws Exception {
+				if (true) {
+					throw new Exception("Ex.");
+				}
+				return false;
+			}});
+        final JFrame frame = JXLoginPane.showLoginFrame(panel);
+        // if uncomented dialog will disappear immediatelly dou to invocation of login action
+        //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setJMenuBar(createMenuBar(panel));
+        panel.setErrorMessage("TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO TO Unexpected resize on long exception message. Unexpected resize on long exception message.");
+
+        panel.setSaveMode(SaveMode.BOTH);
+        
+//        JFrame frame = wrapInFrame(panel, "show login panel");
+        frame.pack();
+        frame.setVisible(true);
+        SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				evaluateChildren(frame.getContentPane().getComponents());
+			}});
+        
+    }
     
     /**
+     * Progress message test.
+     */
+    public void interactiveProgress() {
+        final JXLoginPane panel = new JXLoginPane();
+        final JFrame frame = JXLoginPane.showLoginFrame(panel);
+        panel.setLoginService(new LoginService() {
+
+			@Override
+			public boolean authenticate(String name, char[] password,
+					String server) throws Exception {
+				panel.startLogin();
+				Thread.sleep(5000);
+				return true;
+			}});
+        
+        frame.setJMenuBar(createMenuBar(panel));
+
+        panel.setSaveMode(SaveMode.BOTH);
+        
+//        JFrame frame = wrapInFrame(panel, "show login panel");
+        frame.pack();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+        SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				evaluateChildren(frame.getContentPane().getComponents());
+			}});
+        
+    }
+
+    private boolean evaluateChildren(Component[] components) {
+        for (Component c: components) {
+        	if (c instanceof JButton && "login".equals(((JButton) c).getActionCommand())) {
+        		((JButton) c).doClick();
+        		
+        		return true;
+        	} else if (c instanceof Container) {
+        		if (evaluateChildren(((Container) c).getComponents()) ){
+        			return true;
+        		}
+        	}
+        }
+        return false;
+
+	}
+
+	/**
      * Do nothing, make the test runner happy
      * (would output a warning without a test fixture).
      *

@@ -28,8 +28,10 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import javax.swing.BorderFactory;
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
+import javax.swing.plaf.BorderUIResource;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.metal.MetalLookAndFeel;
@@ -53,14 +55,18 @@ public class LoginPaneAddon extends AbstractComponentAddon {
     defaults.addAll(Arrays.asList(new Object[] { 
       JXLoginPane.uiClassID,
       "org.jdesktop.swingx.plaf.basic.BasicLoginPaneUI",
-      //TODO this icon is unused; remove?
       "JXLoginPane.errorIcon",
       LookAndFeel.makeIcon(LoginPaneAddon.class, "resources/error16.png"),
       "JXLoginPane.bannerFont",
       new FontUIResource("Arial Bold", Font.PLAIN, 36),
+      "JXLoginPane.pleaseWaitFont",new FontUIResource(UIManager.getFont("Label.font").deriveFont(Font.BOLD)),
       "JXLoginPane.bannerForeground", new ColorUIResource(Color.WHITE),
       "JXLoginPane.bannerDarkBackground", new ColorUIResource(Color.GRAY),
       "JXLoginPane.bannerLightBackground", new ColorUIResource(Color.LIGHT_GRAY),
+      "JXLoginPane.errorBackground", new ColorUIResource(new Color(255, 215, 215)),
+      "JXLoginPane.errorBorder", new BorderUIResource(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.GRAY.darker()),
+                BorderFactory.createEmptyBorder(5, 7, 5, 5)))
     }));
     // Popuplate UIDefaults with the localizable Strings we will use
     // in the Login panel.
