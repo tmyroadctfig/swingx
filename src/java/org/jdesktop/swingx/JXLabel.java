@@ -576,7 +576,7 @@ public class JXLabel extends JLabel {
             JXLabel src = (JXLabel) evt.getSource();
             if (src.isLineWrap()) {
                 if ("font".equals(name) || "foreground".equals(name) || "maxLineSpan".equals(name)) {
-                    if (evt.getOldValue() != null) {
+                    if (evt.getOldValue() != null && !isHTML(src.getText())) {
                         updateRenderer(src);
                     }
                 } else if ("text".equals(name)) {

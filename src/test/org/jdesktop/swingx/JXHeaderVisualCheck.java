@@ -25,12 +25,17 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.net.URL;
 
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.JXHeader.IconPosition;
 import org.jdesktop.swingx.test.XTestUtils;
@@ -72,6 +77,32 @@ public class JXHeaderVisualCheck extends InteractiveTestCase {
     }
 
     // ------------------ interactive
+
+    /**
+     * #647-swingx JXLabel looses html rendering on font change.
+     */
+	public void interactiveFontLayoutReset() {
+		JFrame f = new JFrame("Header Test");
+		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		final JXHeader header = new JXHeader("My Title",
+				"<html>My short description<br>some text<html>");
+		f.add(header, BorderLayout.CENTER);
+ 
+		JButton changeFont = new JButton("Font");
+		f.add(changeFont, BorderLayout.SOUTH);
+		changeFont.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						header.setFont(new Font("Tahoma", Font.PLAIN, 18));
+					}
+				});
+			}
+		});
+	     
+		f.setSize(400, 200);
+		f.setVisible(true);
+	}
 
     /**
      * Short description in header produces unexpected line wraps in
