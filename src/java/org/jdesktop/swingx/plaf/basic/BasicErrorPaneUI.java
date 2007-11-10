@@ -271,12 +271,12 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
         errorMessage.putClientProperty(JXEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 
         closeButton = new JButton(UIManager.getString(
-                CLASS_NAME + ".ok_button_text", closeButton.getLocale()));
+                CLASS_NAME + ".ok_button_text", errorMessage.getLocale()));
 
         reportButton = new EqualSizeJButton(pane.getActionMap().get(JXErrorPane.REPORT_ACTION_KEY));
 
         detailButton = new EqualSizeJButton(UIManager.getString(
-                CLASS_NAME + ".details_expand_text", detailButton.getLocale()));
+                CLASS_NAME + ".details_expand_text", errorMessage.getLocale()));
         
         details = new JXEditorPane();
         details.setContentType("text/html");
@@ -288,7 +288,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
         detailsPanel = new JPanel();
         detailsPanel.setVisible(false);
         copyToClipboardButton = new JButton(UIManager.getString(
-                CLASS_NAME + ".copy_to_clipboard_button_text", copyToClipboardButton.getLocale()));
+                CLASS_NAME + ".copy_to_clipboard_button_text", errorMessage.getLocale()));
         copyToClipboardListener = new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 details.copy();
