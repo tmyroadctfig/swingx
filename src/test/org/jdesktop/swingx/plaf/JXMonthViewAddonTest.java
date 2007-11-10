@@ -3,6 +3,7 @@
  */
 package org.jdesktop.swingx.plaf;
 
+import javax.swing.Icon;
 import javax.swing.UIManager;
 import javax.swing.plaf.UIResource;
 
@@ -25,8 +26,8 @@ public class JXMonthViewAddonTest extends AbstractComponentAddonTest {
         assertTrue(UIManager.get("JXMonthView.leadingDayForeground") instanceof UIResource);
         assertTrue(UIManager.get("JXMonthView.trailingDayForeground") instanceof UIResource);
         assertTrue(UIManager.get("JXMonthView.font") instanceof UIResource);
-        assertTrue(UIManager.get("JXMonthView.monthDownFileName") instanceof String);
-        assertTrue(UIManager.get("JXMonthView.monthUpFileName") instanceof String);
+        assertTrue(UIManager.get("JXMonthView.monthDownFileName") instanceof Icon);
+        assertTrue(UIManager.get("JXMonthView.monthUpFileName") instanceof Icon);
         assertTrue(UIManager.get("JXMonthView.boxPaddingX") instanceof Integer);
         assertTrue(UIManager.get("JXMonthView.boxPaddingY") instanceof Integer);
     }
