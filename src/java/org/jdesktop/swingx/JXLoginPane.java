@@ -318,44 +318,39 @@ public class JXLoginPane extends JXImagePanel {
      * in the Login panel.
      */
     private void reinitLocales(Locale l) {
-        ResourceBundle res = ResourceBundle.getBundle("org.jdesktop.swingx.plaf.basic.resources.LoginPane", l);
-        Enumeration<String> keys = res.getKeys();
-        while (keys.hasMoreElements()) {
-            String key = keys.nextElement();
-            UIManager.put(CLASS_NAME + "." + key, res.getString(key));
-        }
-        setBannerText(UIManager.getString(CLASS_NAME + ".bannerString"));
+        setBannerText(UIManager.getString(CLASS_NAME + ".bannerString", getLocale()));
         banner.setImage(createLoginBanner());
-        errorMessageLabel.setText(UIManager.getString(CLASS_NAME + ".errorMessage")); 
-        progressMessageLabel.setText(UIManager.getString(CLASS_NAME + ".pleaseWait"));
+        // TODO: Can't change the error message since it might have been already changed by the user!
+        //errorMessageLabel.setText(UIManager.getString(CLASS_NAME + ".errorMessage", getLocale()));
+        progressMessageLabel.setText(UIManager.getString(CLASS_NAME + ".pleaseWait", getLocale()));
         recreateLoginPanel();
         Window w = SwingUtilities.getWindowAncestor(this);
         if (w instanceof JXLoginFrame) {
             JXLoginFrame f = (JXLoginFrame) w;
-            f.setTitle(UIManager.getString(CLASS_NAME + ".titleString"));
+            f.setTitle(UIManager.getString(CLASS_NAME + ".titleString", getLocale()));
             if (buttonPanel != null) {
-                buttonPanel.getOk().setText(UIManager.getString(CLASS_NAME + ".loginString"));
-                buttonPanel.getCancel().setText(UIManager.getString(CLASS_NAME + ".cancelString"));
+                buttonPanel.getOk().setText(UIManager.getString(CLASS_NAME + ".loginString", getLocale()));
+                buttonPanel.getCancel().setText(UIManager.getString(CLASS_NAME + ".cancelString", getLocale()));
             }
         }
         JLabel lbl = (JLabel) passwordField.getClientProperty("labeledBy");
         if (lbl != null) {
-            lbl.setText(UIManager.getString(CLASS_NAME + ".passwordString"));
+            lbl.setText(UIManager.getString(CLASS_NAME + ".passwordString", getLocale()));
         }
         lbl = (JLabel) namePanel.getComponent().getClientProperty("labeledBy");
         if (lbl != null) {
-            lbl.setText(UIManager.getString(CLASS_NAME + ".nameString"));
+            lbl.setText(UIManager.getString(CLASS_NAME + ".nameString", getLocale()));
         }
         if (serverCombo != null) {
             lbl = (JLabel) serverCombo.getClientProperty("labeledBy");
             if (lbl != null) {
-                lbl.setText(UIManager.getString(CLASS_NAME + ".serverString"));
+                lbl.setText(UIManager.getString(CLASS_NAME + ".serverString", getLocale()));
             }
         }
-        saveCB.setText(UIManager.getString(CLASS_NAME + ".rememberPasswordString"));
+        saveCB.setText(UIManager.getString(CLASS_NAME + ".rememberPasswordString", getLocale()));
         // by default, caps is initialized in off state - i.e. without warning. Setting to 
         // whitespace preserves formatting of the panel.
-        capsOn.setText(isCapsLockOn() ? UIManager.getString(CLASS_NAME + ".capsOnWarning") : " ");
+        capsOn.setText(isCapsLockOn() ? UIManager.getString(CLASS_NAME + ".capsOnWarning", getLocale()) : " ");
     }
     
     //--------------------------------------------------------- Constructors
@@ -729,9 +724,7 @@ public class JXLoginPane extends JXImagePanel {
         contentPanel.add(messageLabel);
         loginPanel.setBorder(BorderFactory.createEmptyBorder(0, 36, 7, 11));
         contentPanel.add(loginPanel);
-        errorMessageLabel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 36, 0, 11, contentPanel.getBackground()),
-                errorMessageLabel.getBorder()));
+        errorMessageLabel.setBorder(UIManager.getBorder(CLASS_NAME + ".errorBorder", getLocale()));
         contentPanel.add(errorMessageLabel);
         
         //create the progress panel

@@ -46,7 +46,6 @@ public class BasicLoginPaneUI extends LoginPaneUI {
          * {@inheritDoc}
          */
         public void propertyChange(PropertyChangeEvent evt) {
-            System.out.println("LocaleHandler.propertyChange()");
             Object src = evt.getSource();
             
             if (src instanceof JComponent) {

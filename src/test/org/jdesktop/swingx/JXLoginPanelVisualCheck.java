@@ -57,7 +57,7 @@ public class JXLoginPanelVisualCheck extends InteractiveTestCase {
         JXLoginPanelVisualCheck test = new JXLoginPanelVisualCheck();
         
         try {
-            test.runInteractiveTests();
+            test.runInteractiveTests("interactiveError");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -113,10 +113,13 @@ public class JXLoginPanelVisualCheck extends InteractiveTestCase {
         menu.add(new AbstractAction("Change Locale") {
 
             public void actionPerformed(ActionEvent e) {
+            	System.out.println("loc:" + component.getLocale());
                 if (component.getLocale() == Locale.FRANCE) {
                     component.setLocale(Locale.ENGLISH);
+                	System.out.println("new loc:" + component.getLocale());
                 } else {
                     component.setLocale(Locale.FRANCE);
+                	System.out.println("new loc:" + component.getLocale());
                 }
             }});
         bar.add(menu);
