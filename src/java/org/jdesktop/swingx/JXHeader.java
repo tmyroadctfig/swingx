@@ -137,7 +137,7 @@ public class JXHeader extends JXPanel {
     //------------------------------------------------------------- UI Logic
     
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public HeaderUI getUI() {
         return (HeaderUI)super.getUI();

@@ -66,7 +66,7 @@ public class JXMultiThumbSlider<E> extends JComponent {
     
     /** Creates a new instance of JMultiThumbSlider */
     public JXMultiThumbSlider() {
-        thumbs = new ArrayList();
+        thumbs = new ArrayList<ThumbComp>();
         setLayout(null);
         
 	tdl = new ThumbHandler();
@@ -114,7 +114,7 @@ public class JXMultiThumbSlider<E> extends JComponent {
     
     private MultiThumbModel<E> model;
 
-    private List<ThumbListener> listeners = new ArrayList();
+    private List<ThumbListener> listeners = new ArrayList<ThumbListener>();
         
     private ThumbComp selected;
     
@@ -317,11 +317,11 @@ public class JXMultiThumbSlider<E> extends JComponent {
         }
     }
     
-    private class ThumbComp extends JComponent {
+    private static class ThumbComp extends JComponent {
         
-        private JXMultiThumbSlider<E> slider;
+        private JXMultiThumbSlider<?> slider;
         
-        public ThumbComp(JXMultiThumbSlider slider) {
+        public ThumbComp(JXMultiThumbSlider<?> slider) {
             this.slider = slider;
             Dimension dim = new Dimension(10,10);//slider.getHeight());
             /*if(slider.getThumbRenderer() != null) {
