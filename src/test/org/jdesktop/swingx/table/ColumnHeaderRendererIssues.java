@@ -60,7 +60,7 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
         setSystemLF(true);
         try {
 //          test.runInteractiveTests();
-          test.runInteractiveTests(".*Create.*");
+          test.runInteractiveTests("interactive.*LF.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();

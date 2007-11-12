@@ -26,6 +26,7 @@ import java.util.List;
 import javax.swing.LookAndFeel;
 import javax.swing.plaf.BorderUIResource;
 
+import org.jdesktop.swingx.plaf.windows.WindowsClassicLookAndFeelAddons;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
 import org.jdesktop.swingx.util.OS;
 
@@ -114,11 +115,28 @@ public class ColumnHeaderRendererAddon extends AbstractComponentAddon {
             }));
         }
         
-        if (OS.isWindowsVista()) {
-            defaults.addAll(Arrays.asList(new Object[] { 
-                    ColumnHeaderRenderer.VISTA_BORDER_HACK,
-                    new BorderUIResource.EmptyBorderUIResource(5, 5, 5, 5), 
-            }));
-        }
+        hackVistaHeaderBorder(addon, defaults);
     }
+    
+    /**
+     * Hack around the oversized vista header border installed by core.
+     * Registers a (5,5,5,5) empty border for vista themes. Does nothing if the
+     * OS is not Vista or the addon is classic windows. 
+     * 
+     * PENDING: can we have XP themes under vista? If so, this needs to be changed - 
+     * most probably the xp border is okay.
+     * 
+     * @param addon
+     * @param 
+     */
+    private void hackVistaHeaderBorder(LookAndFeelAddons addon, List<Object> defaults) {
+        // do nothing if not vista or for classic design under vista
+        if (!OS.isWindowsVista() || (addon instanceof WindowsClassicLookAndFeelAddons))
+            return;
+        defaults.addAll(Arrays.asList(new Object[] {
+                ColumnHeaderRenderer.VISTA_BORDER_HACK,
+                new BorderUIResource.EmptyBorderUIResource(5, 5, 5, 5), 
+                }));
+    }
+
 }
