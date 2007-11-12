@@ -39,4 +39,8 @@ public class UIDefaultsResourceBundleInteractiveTest {
         System.out.println(UIManager.getString("LoginPane.1", new Locale("pt", "BR")));
         System.out.println(UIManager.getString("LoginPane.1", Locale.KOREAN));
     }
+    
+    public void testDummy() {
+        //does nothing
+    }
 }
