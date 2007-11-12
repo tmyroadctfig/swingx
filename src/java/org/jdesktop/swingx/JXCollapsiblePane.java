@@ -20,26 +20,26 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Composite;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.LayoutManager;
 import java.awt.Rectangle;
-import java.awt.Transparency;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTree;
+import javax.swing.JViewport;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.border.Border;
@@ -312,6 +312,7 @@ public class JXCollapsiblePane extends JXPanel {
             super.remove(0);
         }
         wrapper = new WrapperContainer(contentPanel);
+        wrapper.collapsedState = isCollapsed();
         super.addImpl(wrapper, BorderLayout.CENTER, -1);
     }
 
@@ -323,7 +324,7 @@ public class JXCollapsiblePane extends JXPanel {
             return null;
         }
         
-        return wrapper.c;
+        return (Container) wrapper.getView();
     }
 
     /**
@@ -493,9 +494,8 @@ public class JXCollapsiblePane extends JXPanel {
                     animateTimer.start();
                 }
             } else {
-                wrapper.c.setVisible(!collapsed);
-                invalidate();
-                doLayout();
+                wrapper.collapsedState = collapsed;
+                revalidate();
             }
             repaint();
             firePropertyChange("collapsed", !collapsed, collapsed);
@@ -550,21 +550,18 @@ public class JXCollapsiblePane extends JXPanel {
          * in the currentDimension variable and when orientation is VERTICAL, otherwise
          * the same applies to the width)
          */
-        Dimension dim;
-        if (!isAnimated()) {
-            if (getContentPane().isVisible()) {
-                dim = getContentPane().getPreferredSize();
-            } else {
-                dim = super.getPreferredSize();
-            }
-        } else {
-            dim = new Dimension(getContentPane().getPreferredSize());
-            if (!getContentPane().isVisible() && currentDimension != -1) {
+        Dimension dim = getContentPane().getPreferredSize();
+        if (currentDimension != -1) {
                 if (orientation == Orientation.VERTICAL) {
                     dim.height = currentDimension;
                 } else {
                     dim.width = currentDimension;
                 }
+        } else if(wrapper.collapsedState) {
+            if (orientation == Orientation.VERTICAL) {
+                dim.height = 0;
+            } else {
+                dim.width = 0;
             }
         }
         return dim;
@@ -676,12 +673,14 @@ public class JXCollapsiblePane extends JXPanel {
                     // keep the content pane hidden when it is collapsed, other it may
                     // still receive focus.
                     if (finalDimension > 0) {
-                        wrapper.showContent();
+                        currentDimension = -1;
+                        wrapper.collapsedState = false;
                         validate();
                         JXCollapsiblePane.this.firePropertyChange(ANIMATION_STATE_KEY, null,
                                                                   "expanded");
                         return;
                     } else {
+                        wrapper.collapsedState = true;
                         JXCollapsiblePane.this.firePropertyChange(ANIMATION_STATE_KEY, null,
                                                                   "collapsed");
                     }
@@ -707,9 +706,9 @@ public class JXCollapsiblePane extends JXPanel {
                 }
                 int dimension;
                 if (orientation == Orientation.VERTICAL) {
-                    dimension = wrapper.c.getPreferredSize().height;
+                    dimension = wrapper.getView().getPreferredSize().height;
                 } else {
-                    dimension = wrapper.c.getPreferredSize().width;
+                    dimension = wrapper.getView().getPreferredSize().width;
                 }
                 animateAlpha = (float)newDimension / (float)dimension;
 
@@ -719,6 +718,8 @@ public class JXCollapsiblePane extends JXPanel {
                     int oldHeight = bounds.height;
                     bounds.height = newDimension;
                     wrapper.setBounds(bounds);
+                    //TODO this is the open a window vs. open a shade
+//                    wrapper.setViewPosition(new Point(0, wrapper.getView().getPreferredSize().height - newDimension));
                     bounds = getBounds();
                     bounds.height = (bounds.height - oldHeight) + newDimension;
                     currentDimension = bounds.height;
@@ -796,20 +797,18 @@ public class JXCollapsiblePane extends JXPanel {
                 this.finalDimension = stopDimension;
                 animateAlpha = animationParams.alphaStart;
                 currentDimension = -1;
-                wrapper.showImage();
             }
         }
     }
 
-    private final class WrapperContainer extends JXPanel {
-        private BufferedImage img;
-        private Container c;
-        float alpha = 1.0f;
+    private final class WrapperContainer extends JViewport {
+        float alpha;
+        boolean collapsedState;
 
         public WrapperContainer(Container c) {
-            super(new BorderLayout());
-            this.c = c;
-            add(c, BorderLayout.CENTER);
+            alpha = 1.0f;
+            collapsedState = false;
+            setView(c);
 
             // we must ensure the container is opaque. It is not opaque it introduces
             // painting glitches specially on Linux with JDK 1.5 and GTK look and feel.
@@ -818,87 +817,6 @@ public class JXCollapsiblePane extends JXPanel {
                 ((JComponent) c).setOpaque(true);
             }
         }
-
-        public void showImage() {
-            // render c into the img
-            makeImage();
-            c.setVisible(false);
-        }
-
-        public void showContent() {
-            currentDimension = -1;
-            c.setVisible(true);
-        }
-
-        void makeImage() {
-            // if we have no image or if the image has changed
-            if (getGraphicsConfiguration() != null && getWidth() > 0) {
-                Dimension dim = c.getPreferredSize();
-                // width and height must be > 0 to be able to create an image
-                int dimension;
-                int width;
-                int height;
-
-                if (orientation == Orientation.VERTICAL) {
-                    width = getWidth();
-                    dimension = height = dim.height;
-                } else {
-                    height = getHeight();
-                    dimension = width = dim.width;
-                }
-
-                if (dimension > 0) {
-                    img = getGraphicsConfiguration().createCompatibleImage(width,
-                                                                           height, 
-                                                                           Transparency.TRANSLUCENT);
-                    c.setSize(width, height);
-                    Graphics g = img.getGraphics();
-                    
-                    try {
-                        c.paint(g);
-                    } finally {
-                        g.dispose();
-                    }
-                } else {
-                    img = null;
-                }
-            }
-        }
-
-        @Override
-        protected void paintComponent(Graphics g) {
-            if (!useAnimation || c.isVisible()) {
-                super.paintComponent(g);
-            } else {
-                // within netbeans, it happens we arrive here and the image has not been
-                // created yet. We ensure it is.
-                if (img == null) {
-                    makeImage();
-                }
-                // and we paint it only if it has been created and only if we have a
-                // valid graphics
-                if (g != null && img != null) {
-                    // draw the image with y being height - imageHeight
-                    if (orientation == Orientation.VERTICAL) {
-                        g.drawImage(img, 0, getHeight() - img.getHeight(), null);
-                    } else {
-                        g.drawImage(img, getWidth() - img.getWidth(), 0, null);
-                    }
-                }
-            }
-        }
-
-        @Override
-        public void paint(Graphics g) {
-            Graphics2D g2d = (Graphics2D)g;
-            Composite oldComp = g2d.getComposite();
-            Composite alphaComp = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
-                                                             alpha);
-            g2d.setComposite(alphaComp);
-            super.paint(g2d);
-            g2d.setComposite(oldComp);
-        }
-
     }
 
 // TEST CASE
@@ -915,6 +833,7 @@ public class JXCollapsiblePane extends JXPanel {
 //                f.add(tree1);
 //
 //                JXCollapsiblePane pane = new JXCollapsiblePane(Orientation.VERTICAL);
+//                pane.setCollapsed(true);
 //                JTree tree2 = new JTree();
 //                tree2.setBorder(BorderFactory.createEtchedBorder());
 //                pane.add(tree2);
@@ -922,8 +841,8 @@ public class JXCollapsiblePane extends JXPanel {
 //
 //                pane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
 //                        KeyStroke.getKeyStroke("ctrl F"),
-//                        JXCollapsiblePane.TOGGLE_ACTION);
-//
+//                        PatchedJXCollapsiblePane.TOGGLE_ACTION);
+//                    
 //                pane = new JXCollapsiblePane(Orientation.HORIZONTAL);
 //                JTree tree3 = new JTree();
 //                pane.add(tree3);
@@ -932,12 +851,12 @@ public class JXCollapsiblePane extends JXPanel {
 //
 //                pane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
 //                        KeyStroke.getKeyStroke("ctrl G"),
-//                        JXCollapsiblePane.TOGGLE_ACTION);
+//                        PatchedJXCollapsiblePane.TOGGLE_ACTION);
 //
 //                f.setSize(640, 480);
 //                f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //                f.setVisible(true);
-//            }
+//        }
 //        });
 //    }
 }
