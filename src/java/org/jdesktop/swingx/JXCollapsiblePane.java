@@ -25,6 +25,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -32,14 +33,9 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTree;
 import javax.swing.JViewport;
-import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.border.Border;
@@ -718,8 +714,7 @@ public class JXCollapsiblePane extends JXPanel {
                     int oldHeight = bounds.height;
                     bounds.height = newDimension;
                     wrapper.setBounds(bounds);
-                    //TODO this is the open a window vs. open a shade
-//                    wrapper.setViewPosition(new Point(0, wrapper.getView().getPreferredSize().height - newDimension));
+                    wrapper.setViewPosition(new Point(0, wrapper.getView().getPreferredSize().height - newDimension));
                     bounds = getBounds();
                     bounds.height = (bounds.height - oldHeight) + newDimension;
                     currentDimension = bounds.height;
@@ -727,6 +722,7 @@ public class JXCollapsiblePane extends JXPanel {
                     int oldWidth = bounds.width;
                     bounds.width = newDimension;
                     wrapper.setBounds(bounds);
+                    wrapper.setViewPosition(new Point(wrapper.getView().getPreferredSize().width - newDimension, 0));
                     bounds = getBounds();
                     bounds.width = (bounds.width - oldWidth) + newDimension;
                     currentDimension = bounds.width;
@@ -841,7 +837,7 @@ public class JXCollapsiblePane extends JXPanel {
 //
 //                pane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
 //                        KeyStroke.getKeyStroke("ctrl F"),
-//                        PatchedJXCollapsiblePane.TOGGLE_ACTION);
+//                        JXCollapsiblePane.TOGGLE_ACTION);
 //                    
 //                pane = new JXCollapsiblePane(Orientation.HORIZONTAL);
 //                JTree tree3 = new JTree();
@@ -851,7 +847,7 @@ public class JXCollapsiblePane extends JXPanel {
 //
 //                pane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
 //                        KeyStroke.getKeyStroke("ctrl G"),
-//                        PatchedJXCollapsiblePane.TOGGLE_ACTION);
+//                        JXCollapsiblePane.TOGGLE_ACTION);
 //
 //                f.setSize(640, 480);
 //                f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
