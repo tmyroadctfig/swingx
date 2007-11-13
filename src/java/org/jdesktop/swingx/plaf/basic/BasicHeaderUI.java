@@ -297,9 +297,7 @@ public class BasicHeaderUI extends HeaderUI {
     	h.remove(titleLabel);
     	h.remove(descriptionPane);
     	h.remove(imagePanel);
-    	System.out.println(h.getIconPosition());
     	if (h.getIconPosition() == null || h.getIconPosition() == IconPosition.RIGHT) {
-    		System.out.println("right");
 	        h.add(titleLabel, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.HORIZONTAL, new Insets(12, 12, 0, 11), 0, 0));
 	        h.add(descriptionPane, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.FIRST_LINE_START, GridBagConstraints.BOTH, new Insets(0, 24, 12, 11), 0, 0));
 	        h.add(imagePanel, new GridBagConstraints(1, 0, 1, 2, 0.0, 1.0, GridBagConstraints.FIRST_LINE_END, GridBagConstraints.NONE, new Insets(12, 0, 11, 11), 0, 0));
