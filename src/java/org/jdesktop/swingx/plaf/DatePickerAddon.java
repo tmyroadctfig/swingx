@@ -67,16 +67,13 @@ public class DatePickerAddon extends AbstractComponentAddon {
         
         defaults.add("JXDatePicker.arrowIcon");
         
-        if (OS.isWindowsXP()) {
-            if (OS.isUsingWindowsVisualStyles()) {
-                defaults.add(LookAndFeel.makeIcon(DatePickerAddon.class,
-                        "windows/resources/combo-xp.png"));
-            } else {
-                defaults.add(LookAndFeel.makeIcon(DatePickerAddon.class,
-                        "windows/resources/combo-w2k.png"));
-            }
+        if (OS.isWindowsXP() && OS.isUsingWindowsVisualStyles()) {
+            defaults.add(LookAndFeel.makeIcon(DatePickerAddon.class,
+                    "windows/resources/combo-xp.png"));
+        } else {
+            defaults.add(LookAndFeel.makeIcon(DatePickerAddon.class,
+                    "windows/resources/combo-w2k.png"));
         }
-        
     }
 
     /**
