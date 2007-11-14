@@ -366,6 +366,8 @@ public class JXLabel extends JLabel {
             	Graphics2D tmp = (Graphics2D) g.create();
                 if(!isPaintBorderInsets()) {
                     tmp.translate(i.left, i.top);
+                    pWidth = pWidth - i.left - i.right;
+                    pHeight = pHeight - i.top - i.bottom;
             	}
                 backgroundPainter.paint(tmp, this, pWidth, pHeight);
                 tmp.dispose();
