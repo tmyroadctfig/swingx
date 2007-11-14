@@ -24,9 +24,7 @@ package org.jdesktop.swingx.plaf;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 import javax.swing.LookAndFeel;
@@ -65,8 +63,8 @@ public class LoginPaneAddon extends AbstractComponentAddon {
       "JXLoginPane.bannerLightBackground", new ColorUIResource(Color.LIGHT_GRAY),
       "JXLoginPane.errorBackground", new ColorUIResource(new Color(255, 215, 215)),
       "JXLoginPane.errorBorder", new BorderUIResource(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.GRAY.darker()),
-                BorderFactory.createEmptyBorder(5, 7, 5, 5)))
+                BorderFactory.createEmptyBorder(5, 7, 5, 5),
+                BorderFactory.createLineBorder(Color.GRAY.darker())))
     }));
     
     UIManager.getDefaults().addResourceBundle(

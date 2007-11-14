@@ -52,10 +52,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -712,8 +710,8 @@ public class JXLoginPane extends JXImagePanel {
         errorMessageLabel.setIcon(UIManager.getIcon(CLASS_NAME + ".errorIcon", getLocale()));
         errorMessageLabel.setVerticalTextPosition(SwingConstants.TOP);
         errorMessageLabel.setLineWrap(true);
+        errorMessageLabel.setPaintBorderInsets(false);
         errorMessageLabel.setBackgroundPainter(new MattePainter(UIManager.getColor(CLASS_NAME + ".errorBackground", getLocale()), true));
-        errorMessageLabel.setBorder(UIManager.getBorder(CLASS_NAME + ".errorBorder", getLocale())); 
         errorMessageLabel.setMaxLineSpan(320);
         errorMessageLabel.setVisible(false);
         
@@ -724,7 +722,7 @@ public class JXLoginPane extends JXImagePanel {
         contentPanel.add(messageLabel);
         loginPanel.setBorder(BorderFactory.createEmptyBorder(0, 36, 7, 11));
         contentPanel.add(loginPanel);
-        errorMessageLabel.setBorder(UIManager.getBorder(CLASS_NAME + ".errorBorder", getLocale()));
+        errorMessageLabel.setBorder(UIManager.getBorder(CLASS_NAME + ".errorBorder", getLocale())); 
         contentPanel.add(errorMessageLabel);
         
         //create the progress panel
