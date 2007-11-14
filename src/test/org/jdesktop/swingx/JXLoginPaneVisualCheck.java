@@ -47,14 +47,14 @@ import org.jdesktop.swingx.auth.LoginService;
  * 
  * @author Karl Schaefer
  */
-public class JXLoginPanelVisualCheck extends InteractiveTestCase {
-    public JXLoginPanelVisualCheck() {
+public class JXLoginPaneVisualCheck extends InteractiveTestCase {
+    public JXLoginPaneVisualCheck() {
         super("JXLoginPane Test");
     }
 
     public static void main(String[] args) throws Exception {
         // setSystemLF(true);
-        JXLoginPanelVisualCheck test = new JXLoginPanelVisualCheck();
+        JXLoginPaneVisualCheck test = new JXLoginPaneVisualCheck();
         
         try {
             test.runInteractiveTests("interactiveError");
