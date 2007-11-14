@@ -34,6 +34,7 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.plaf.UIResource;
+import javax.swing.plaf.metal.MetalBorders;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 
@@ -182,10 +183,8 @@ public class ColumnHeaderRenderer extends JComponent
         Component comp = configureDelegate(table, value, isSelected, hasFocus, rowIndex,
                 columnIndex);
         if ((table instanceof JXTable) && (comp instanceof JComponent)) {
-//            LOG.info("border: " + ((JComponent) comp).getBorder().getBorderInsets(comp));
             hackVistaBorder((JComponent) comp);
             SortOrder sortOrder = ((JXTable) table).getSortOrder(columnIndex);
-
             Border border = UIManager.getBorder("TableHeader.cellBorder");
             if (sortOrder.isSorted()) {
                 iconBorder.setIcon(sortOrder.isAscending() ? upIcon : downIcon);

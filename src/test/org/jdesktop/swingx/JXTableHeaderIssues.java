@@ -4,7 +4,9 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.util.List;
@@ -12,10 +14,21 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JTable;
+import javax.swing.border.AbstractBorder;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.plaf.metal.MetalBorders;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
+import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.table.DefaultTableColumnModelExt;
 import org.jdesktop.swingx.table.TableColumnExt;
@@ -26,12 +39,12 @@ public class JXTableHeaderIssues extends JXTableHeaderTest {
             .getLogger(JXTableHeaderIssues.class.getName());
     public static void main(String args[]) {
         JXTableHeaderIssues test = new JXTableHeaderIssues();
-        setSystemLF(true);
+//        setSystemLF(true);
         try {
 //          test.runInteractiveTests();
          //   test.runInteractiveTests("interactive.*Siz.*");
          //   test.runInteractiveTests("interactive.*Render.*");
-            test.runInteractiveTests("interactive.*Dock.*");
+            test.runInteractiveTests("interactive.*Sorted.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -172,6 +185,73 @@ public class JXTableHeaderIssues extends JXTableHeaderTest {
         
     }
 
+    /**
+     * Issue 337-swingx: header heigth depends on sort icon (for ocean only?) 
+     * Looks like a problem in MetalBorders.TableHeaderBorder: extends AbstractBorder but
+     * does not override getBorderInsets(comp, insets) which is used by the labelUI getPrefSize
+     * to determine the insets and calc the view rect.
+     * 
+     * NOTE: this seems to be independent of the tweaks to xTableHeaders
+     *   prefSize.
+     */
+    public void interactiveSortedPreferredHeight() {
+        final JXTable table = new JXTable(10, 1);
+        table.getColumnExt(0).setPreferredWidth(200);
+        final JTable other = new JTable(10, 1);
+//        other.setAutoCreateRowSorter(true);
+        other.getColumnModel().getColumn(0).setPreferredWidth(200);
+        final DefaultTableCellRenderer renderer =(DefaultTableCellRenderer) other.getTableHeader().getDefaultRenderer(); 
+        Component comp = renderer.getTableCellRendererComponent(other, "A", false, false, -1, 0);
+        final Border border = renderer.getBorder();
+        final Border emptyBorder = BorderFactory.createEmptyBorder(0, 0, 0, 20);
+        TableCellRenderer wrapper = new TableCellRenderer() {
+
+            public Component getTableCellRendererComponent(JTable mtable,
+                    Object value, boolean isSelected, boolean hasFocus,
+                    int row, int column) {
+                JComponent comp = (JComponent) renderer.getTableCellRendererComponent(mtable, value, 
+                        isSelected, hasFocus, row, column);
+                if (table.getSortedColumn() == null) {
+                    comp.setBorder(border);
+                } else {
+                    comp.setBorder(new CompoundBorder(border, emptyBorder));
+                }
+                return comp;
+            }
+            
+        };
+        other.getTableHeader().setDefaultRenderer(wrapper);
+        Action action = new AbstractActionExt("toggle sorter order") {
+
+            public void actionPerformed(ActionEvent e) {
+                if (table.getSortedColumn() == null) {
+                    table.toggleSortOrder(0);
+                } else {
+                    table.resetSortOrder();
+                }
+                table.getTableHeader().revalidate();
+                other.getTableHeader().revalidate();
+                
+            }
+        };
+        JXFrame frame = wrapWithScrollingInFrame(table, other, "xheader <--> header border height");
+        addAction(frame, action);
+        frame.setVisible(true);
+    }
+
+    /**
+     * Issue 337-swingx: header heigth depends on sort icon (for ocean only?) 
+     * Looks like a problem in MetalBorders.TableHeaderBorder: extends AbstractBorder but
+     * does not override getBorderInsets(comp, insets) which is used by the labelUI getPrefSize
+     * to determine the insets and calc the view rect.
+     * 
+     */
+    public void testMetalBorderInsets() {
+        JLabel label = new JLabel("sometext");
+        AbstractBorder metalBorder = new MetalBorders.TableHeaderBorder();
+        assertEquals(metalBorder.getBorderInsets(label), 
+                metalBorder.getBorderInsets(label, new Insets(0,0,0,0)));
+    }
     /**
      * Issue 337-swingx: header heigth depends on sort icon (for ocean only?) 
      * NOTE: this seems to be independent of the tweaks to xTableHeaders
