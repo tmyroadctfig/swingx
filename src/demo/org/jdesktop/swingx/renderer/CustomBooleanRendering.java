@@ -11,6 +11,7 @@ import java.net.URL;
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
@@ -55,7 +56,7 @@ public class CustomBooleanRendering {
             
         };
         table.setDefaultRenderer(Boolean.class, 
-                new DefaultTableRenderer(new MappedValue(StringValue.EMPTY, iv)));
+                new DefaultTableRenderer(new MappedValue(StringValue.EMPTY, iv), JLabel.CENTER));
     }
     
     /**

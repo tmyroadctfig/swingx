@@ -48,7 +48,8 @@ import org.jdesktop.swingx.RolloverRenderer;
  * setDefaultRenderer(Date.class, new DefaultTableRenderer(
  *         FormatStringValue.DATE_TO_STRING));
  * // use the same center aligned default for Image/Icon
- * TableCellRenderer renderer = new DefaultTableRenderer(null, JLabel.CENTER);
+ * TableCellRenderer renderer = new DefaultTableRenderer(new MappedValue(
+ *         StringValue.EMPTY, IconValue.ICON), JLabel.CENTER);
  * setDefaultRenderer(Icon.class, renderer);
  * setDefaultRenderer(ImageIcon.class, renderer);
  * // use a ButtonProvider for booleans
@@ -62,6 +63,9 @@ import org.jdesktop.swingx.RolloverRenderer;
  * 
  * @see ComponentProvider
  * @see LabelProvider
+ * @see StringValue
+ * @see IconValue
+ * @see MappedValue
  * @see CellContext
  * 
  */
@@ -74,36 +78,38 @@ public class DefaultTableRenderer
     
     /**
      * Instantiates a default table renderer with the default component
-     * controller. 
+     * provider. 
      * 
+     * @see #DefaultTableRenderer(ComponentProvider)
      */
     public DefaultTableRenderer() {
         this((ComponentProvider) null);
     }
 
     /**
-     * Instantiates a default table renderer with the given componentController.
+     * Instantiates a default table renderer with the given component provider.
      * If the controller is null, creates and uses a default. The default
-     * controller is of type <code>LabelProvider</code>.
+     * provider is of type <code>LabelProvider</code>.
      * 
-     * @param componentController the provider of the configured component to
+     * @param componentProvider the provider of the configured component to
      *        use for cell rendering
      */
-    public DefaultTableRenderer(ComponentProvider componentController) {
-        if (componentController == null) {
-            componentController = new LabelProvider();
+    public DefaultTableRenderer(ComponentProvider componentProvider) {
+        if (componentProvider == null) {
+            componentProvider = new LabelProvider();
         }
-        this.componentController = componentController;
+        this.componentController = componentProvider;
         this.cellContext = new TableCellContext();
     }
 
     /**
      * Instantiates a default table renderer with a default component
-     * controller using the given converter. 
+     * provider using the given converter. 
      * 
      * @param converter the converter to use for mapping the
      *   content value to a String representation.
      *   
+     * @see #DefaultTableRenderer(ComponentProvider)  
      */
     public DefaultTableRenderer(StringValue converter) {
         this(new LabelProvider(converter));
@@ -111,11 +117,13 @@ public class DefaultTableRenderer
 
     /**
      * Instantiates a default table renderer with a default component
-     * controller using the given converter and horizontal 
+     * provider using the given converter and horizontal 
      * alignment. 
      * 
      * @param converter the converter to use for mapping the
      *   content value to a String representation.
+     *   
+     * @see #DefaultTableRenderer(ComponentProvider)  
      */
     public DefaultTableRenderer(StringValue converter, int alignment) {
         this(new LabelProvider(converter, alignment));

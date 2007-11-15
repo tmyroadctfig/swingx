@@ -34,10 +34,46 @@ import org.jdesktop.swingx.RolloverRenderer;
 
 
 /**
- * Adapter to glue SwingX renderer support to core api.
+ * Adapter to glue SwingX renderer support to core api. It has convenience
+ * constructors to create a LabelProvider, optionally configured with a
+ * StringValue and horizontal alignment. Typically, client code does not
+ * interact with this class except at instantiation time.
  * <p>
  * 
+ * Note: core DefaultListCellRenderer shows either an icon or the element's
+ * toString representation, depending on whether or not the given value given
+ * value is of type icon or implementors. The empty/null provider taking
+ * constructor takes care of configuring the default provider with a converter
+ * which mimics that behaviour. When using of the converter taking constructors,
+ * it's up to the client code to supply the appropriate converter, if needed:
+ * 
+ * 
+ * <pre><code>
+ * StringValue sv = new StringValue() {
+ * 
+ *     public String getString(Object value) {
+ *         if (value instanceof Icon) {
+ *             return &quot;&quot;;
+ *         }
+ *         return StringValue.TO_STRING.getString(value);
+ *     }
+ * 
+ * };
+ * StringValue lv = new MappedValue(sv, IconValue.ICON);
+ * listRenderer = new DefaultListRenderer(lv, alignment);
+ * 
+ * </code></pre>
+ * 
+ * <p>
+ * 
+ * PENDING: better support core consistent icon handling? 
+ * 
  * @author Jeanette Winzenburg
+ * 
+ * @see ComponentProvider
+ * @see StringValue
+ * @see IconValue
+ * @see MappedValue
  * 
  * 
  */
@@ -50,7 +86,7 @@ public class DefaultListRenderer implements ListCellRenderer, RolloverRenderer,
 
     /**
      * Instantiates a default list renderer with the default component
-     * controller.
+     * provider.
      *
      */
     public DefaultListRenderer() {
@@ -58,17 +94,23 @@ public class DefaultListRenderer implements ListCellRenderer, RolloverRenderer,
     }
 
     /**
-     * Instantiates a ListCellRenderer with the given componentController.
-     * If the controller is null, creates and uses a default.
+     * Instantiates a ListCellRenderer with the given ComponentProvider.
+     * If the provider is null, creates and uses a default. The default
+     * provider is of type <code>LabelProvider</code><p>
      * 
-     * @param componentController the provider of the configured component to
+     * Note: the default provider is configured with a custom StringValue
+     * which behaves exactly as core DefaultListCellRenderer: depending on 
+     * whether or not given value is of type icon or implementors, it shows 
+     * the icon or the element's toString.  
+     * 
+     * @param componentProvider the provider of the configured component to
      *   use for cell rendering
      */
-    public DefaultListRenderer(ComponentProvider componentController) {
-        if (componentController == null) {
-            componentController = new LabelProvider(createDefaultStringValue());
+    public DefaultListRenderer(ComponentProvider componentProvider) {
+        if (componentProvider == null) {
+            componentProvider = new LabelProvider(createDefaultStringValue());
         }
-        this.componentController = componentController;
+        this.componentController = componentProvider;
         this.cellContext = new ListCellContext();
     }
 
@@ -98,7 +140,8 @@ public class DefaultListRenderer implements ListCellRenderer, RolloverRenderer,
      * Instantiates a default table renderer with a default component controller
      * using the given converter.<p>
      * 
-     * PENDING JW: how to guarantee core consistent icon handling?
+     * PENDING JW: how to guarantee core consistent icon handling? Leave to 
+     * client code?
      * 
      * @param converter the converter to use for mapping the content value to a
      *        String representation.
@@ -113,7 +156,8 @@ public class DefaultListRenderer implements ListCellRenderer, RolloverRenderer,
      * controller using the given converter and horizontal 
      * alignment. 
      * 
-     * PENDING JW: how to guarantee core consistent icon handling?
+     * PENDING JW: how to guarantee core consistent icon handling? Leave to
+     * client code?
      * 
      * 
      * @param converter the converter to use for mapping the

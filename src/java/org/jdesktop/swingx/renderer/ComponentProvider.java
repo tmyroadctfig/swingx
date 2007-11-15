@@ -194,7 +194,7 @@ public abstract class ComponentProvider<T extends JComponent>
 
     /**
      * Sets the StringValue to use. If the given StringValue is null,
-     * uses the default to_string. <p>
+     * defaults to <code>StringValue.TO_STRING</code>. <p>
      * 
      * PENDING JW: rename!
      * 
@@ -213,7 +213,7 @@ public abstract class ComponentProvider<T extends JComponent>
      * 
      * PENDING JW: rename!
      * 
-     * @return the StringValue used by this controller, guaranteed to
+     * @return the StringValue used by this provider, guaranteed to
      *   be not null.
      */
     public StringValue getToStringConverter() {
@@ -229,7 +229,7 @@ public abstract class ComponentProvider<T extends JComponent>
      * 
      * PENDING JW: this _cannot_ be the hook for client code as described above. Instead,
      * it is used internally for safely getting at the value (need to check against
-     * null). For now it's deprecated, will remove. Subclasses should use ??, client
+     * null). For now it's deprecated, will remove. Subclasses should use getValueAsString(), client
      * code should use ??.
      * 
      * <p>
@@ -238,7 +238,7 @@ public abstract class ComponentProvider<T extends JComponent>
      * 
      * @param context the cell context.
      * @return a appropriate string representation of the cell's content.
-     * @deprecated use 
+     * @deprecated use ??
      */
     public String getStringValue(CellContext context) {
         Object value = null;
