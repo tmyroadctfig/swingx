@@ -44,6 +44,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
 import org.jdesktop.swingx.calendar.DateUtils;
+import org.jdesktop.swingx.calendar.JXMonthView;
 
 /**
  * Known issues of <code>JXDatePicker</code> and picker related 
@@ -60,7 +61,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         JXDatePickerIssues  test = new JXDatePickerIssues();
         try {
 //            test.runInteractiveTests();
-          test.runInteractiveTests(".*Binding.*");
+          test.runInteractiveTests("interactive.*Bounds.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -248,7 +249,33 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     }
 
 
- 
+
+    /**
+     * Issue #567-swingx: JXDatepicker - clicking on unselectable date clears
+     * picker's selection.
+     * 
+     * Here: visualize JXMonthView's behaviour. It fires a commit ... probably the 
+     * wrong thing to do?. 
+     */
+    public void interactiveBoundsMonthView() {
+        JXMonthView monthView = new JXMonthView();
+        calendar.add(Calendar.DAY_OF_MONTH, 10);
+        // access the model directly requires to "clean" the date
+        monthView.setUpperBound(calendar.getTime());
+        calendar.add(Calendar.DAY_OF_MONTH, - 20);
+        monthView.setLowerBound(calendar.getTime());
+        ActionListener l = new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("got action " + e);
+                
+            }
+            
+        };
+        monthView.addActionListener(l);
+        showInFrame(monthView, "lower/upper bounds");
+    }
+
     
 //-------------------- unit tests
     
