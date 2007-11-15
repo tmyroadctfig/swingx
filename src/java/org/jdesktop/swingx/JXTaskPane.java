@@ -450,6 +450,8 @@ public class JXTaskPane extends JPanel implements
   @Override
   protected void addImpl(Component comp, Object constraints, int index) {
     getContentPane().add(comp, constraints, index);
+    //Fixes SwingX #364; adding to internal component we need to revalidate ourself
+    revalidate();
   }
 
   /**
