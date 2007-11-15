@@ -33,15 +33,16 @@ public abstract class PasswordStore {
      *
      *  @param username username used to authenticate.
      *  @param server server used for authentication
-     *  @param password password to save
+     *  @param password password to save. Password can't be null. Use empty array for empty password.
      */
     public abstract boolean set(String username, String server, char[] password);
     
     /** 
-     * Fetches the password for a given server and username
+     * Fetches the password for a given server and username.
      *  @param username username
      *  @param server server
-     *  @return password 
+     *  @return <code>null</code> if not found, a character array representing the password 
+     *  otherwise. Returned array can be empty if the password is empty.
      */
     public abstract char[] get(String username, String server);
 }
