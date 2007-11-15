@@ -304,16 +304,21 @@ public class JXDatePickerTest extends TestCase {
         long linkDate = picker.getLinkDate();
         long firstDisplayedDate = picker.getMonthView().getFirstDisplayedDate();
         assertSameMonth(linkDate, firstDisplayedDate);
-        long nextDate = DateUtils.getNextMonth(linkDate);
+        long nextDate = DateUtils.getNextMonth(DateUtils.getNextMonth(linkDate));
         picker.setLinkDate(nextDate);
         assertFalse(firstDisplayedDate == picker.getMonthView().getFirstDisplayedDate());
+        assertSameMonth(nextDate, picker.getMonthView().getFirstDisplayedDate());
     }
+    
     /**
      * @param linkDate
      * @param firstDisplayedDate
      */
     private void assertSameMonth(long linkDate, long firstDisplayedDate) {
-        // TODO Auto-generated method stub
+        cal.setTimeInMillis(linkDate);
+        int linkMonth = cal.get(Calendar.MONTH);
+        cal.setTimeInMillis(firstDisplayedDate);
+        assertEquals(linkMonth, cal.get(Calendar.MONTH));
         
     }
 

@@ -44,6 +44,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.UIManager.LookAndFeelInfo;
 
+import org.jdesktop.swingx.calendar.DateUtils;
 import org.jdesktop.swingx.calendar.JXMonthView;
 import org.jdesktop.swingx.calendar.JXMonthView.SelectionMode;
 
@@ -74,13 +75,43 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         
         try {
 //            test.runInteractiveTests();
-            test.runInteractiveTests(".*Action.*");
+            test.runInteractiveTests("interactive.*LinkDate.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
     }
 
+    /**
+     * Issue #572-swingx: monthView must show linkDate on empty selection.
+     *
+     * add month to linkDate, popup must show month containing link date.
+     * Note: client code using the link date for something different than today
+     * must take care to update the message format (PENDING: is that possible?)
+     */
+    public void interactiveLinkDate() {
+        final JXDatePicker picker = new JXDatePicker();
+        picker.setDate(null);
+        long linkDate = picker.getLinkDate();
+        // add two months and set as new link date
+        long nextDate = DateUtils.getNextMonth(DateUtils.getNextMonth(linkDate));
+        picker.setLinkDate(nextDate);
+        Action action = new AbstractAction("next linkdate month") {
+
+            public void actionPerformed(ActionEvent e) {
+                long linkDate = picker.getLinkDate();
+                long nextDate = DateUtils.getNextMonth(DateUtils.getNextMonth(linkDate));
+                picker.setLinkDate(nextDate);
+                
+            }
+            
+        };
+        JXFrame frame = wrapInFrame(picker, "null selection and linkdate");
+        addAction(frame, action);
+        addMessage(frame, "incr linkDate and open popup: must show new linkMonth");
+        frame.pack();
+        frame.setVisible(true);
+    }
     /**
      * Issue #577-swingx: JXDatePicker focus cleanup.
      * Before open: picker's editor should be focused.
