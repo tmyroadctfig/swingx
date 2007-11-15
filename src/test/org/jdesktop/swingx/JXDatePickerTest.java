@@ -40,6 +40,7 @@ import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
+import javax.swing.UIManager;
 import javax.swing.text.DefaultFormatterFactory;
 
 import junit.framework.TestCase;
@@ -68,6 +69,29 @@ public class JXDatePickerTest extends TestCase {
     public void tearDown() {
     }
 
+    /**
+     * Issue #542-swingx: NPE in init if linkFormat not set.
+     * 
+     * After plaf cleanup no longer as virulent as earlier: with
+     * addResourceBundle, there's always at least the fall-back value in the
+     * bundle, so as long as the bundle is loaded at all, we have a not-null
+     * value (and no way to remove which is okay).
+     * 
+     */
+    public void testLinkFormatStringNull() {
+        // force loading
+        new JXDatePicker();
+        String key = "JXDatePicker.linkFormat";
+        String oldLinkFormat = UIManager.getString(key);
+        // sanity: the addon was loaded
+        assertNotNull(oldLinkFormat);
+        UIManager.put(key, null);
+        assertEquals("no null overwrite", oldLinkFormat, UIManager.getString(key));
+        UIManager.getLookAndFeelDefaults().remove(key);
+        assertEquals("no remove", oldLinkFormat, UIManager.getString(key));
+        new JXDatePicker();
+    }
+    
     /**
      * Issue #584-swingx: need to clarify null handling.
      * 
