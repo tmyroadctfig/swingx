@@ -191,8 +191,6 @@ public class JXTableHeaderIssues extends JXTableHeaderTest {
      * does not override getBorderInsets(comp, insets) which is used by the labelUI getPrefSize
      * to determine the insets and calc the view rect.
      * 
-     * NOTE: this seems to be independent of the tweaks to xTableHeaders
-     *   prefSize.
      */
     public void interactiveSortedPreferredHeight() {
         final JXTable table = new JXTable(10, 1);
@@ -252,6 +250,23 @@ public class JXTableHeaderIssues extends JXTableHeaderTest {
         assertEquals(metalBorder.getBorderInsets(label), 
                 metalBorder.getBorderInsets(label, new Insets(0,0,0,0)));
     }
+    
+    /**
+     * Issue 337-swingx: header heigth depends on sort icon (for ocean only?) 
+     * Looks like a problem in MetalBorders.TableHeaderBorder: extends AbstractBorder but
+     * does not override getBorderInsets(comp, insets) which is used by the labelUI getPrefSize
+     * to determine the insets and calc the view rect.
+     * 
+     * Here we compound the default metal border
+     */
+    public void testMetalBorderInsetsHack() {
+        JLabel label = new JLabel("sometext");
+        AbstractBorder metalBorder = new MetalBorders.TableHeaderBorder();
+        CompoundBorder compound = new CompoundBorder(metalBorder, BorderFactory.createEmptyBorder());
+        assertEquals(compound.getBorderInsets(label), 
+                compound.getBorderInsets(label, new Insets(0,0,0,0)));
+    }
+    
     /**
      * Issue 337-swingx: header heigth depends on sort icon (for ocean only?) 
      * NOTE: this seems to be independent of the tweaks to xTableHeaders

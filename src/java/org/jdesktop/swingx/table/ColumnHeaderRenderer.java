@@ -34,7 +34,6 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.plaf.UIResource;
-import javax.swing.plaf.metal.MetalBorders;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 
@@ -74,6 +73,7 @@ public class ColumnHeaderRenderer extends JComponent
     public static final String UP_ICON_KEY = "ColumnHeaderRenderer.upIcon";
     public static final String DOWN_ICON_KEY = "ColumnHeaderRenderer.downIcon";
     public static final String VISTA_BORDER_HACK = "ColumnHeaderRenderer.vistaBorderHack";
+    public static final String METAL_BORDER_HACK = "ColumnHeaderRenderer.metalBorderHack";
     static {
         LookAndFeelAddons.contribute(new ColumnHeaderRendererAddon());
     }
@@ -183,13 +183,15 @@ public class ColumnHeaderRenderer extends JComponent
         Component comp = configureDelegate(table, value, isSelected, hasFocus, rowIndex,
                 columnIndex);
         if ((table instanceof JXTable) && (comp instanceof JComponent)) {
-            hackVistaBorder((JComponent) comp);
+            // work-around core issues
+            hackBorder((JComponent) comp);
             SortOrder sortOrder = ((JXTable) table).getSortOrder(columnIndex);
-            Border border = UIManager.getBorder("TableHeader.cellBorder");
+//            Border border = UIManager.getBorder("TableHeader.cellBorder");
+//            LOG.info("in renderer: " + UIManager.getBorder("TableHeader.cellBorder"));
             if (sortOrder.isSorted()) {
                 iconBorder.setIcon(sortOrder.isAscending() ? upIcon : downIcon);
                 Border origBorder = ((JComponent) comp).getBorder();
-                border = new CompoundBorder(origBorder, iconBorder);
+                Border border = new CompoundBorder(origBorder, iconBorder);
                 ((JComponent) comp).setBorder(border);
             }
         }
@@ -197,15 +199,25 @@ public class ColumnHeaderRenderer extends JComponent
         return comp;
     }
 
+
     /**
      * 
-     * @param jComp
+     * @param component
      */
-    private void hackVistaBorder(JComponent jComp) {
-        Border hackBorder = UIManager.getBorder(VISTA_BORDER_HACK);
-        if (hackBorder != null) {
-            jComp.setBorder(hackBorder);
-        }
+    private void hackBorder(JComponent component) {
+        if (hackBorder(component, VISTA_BORDER_HACK)) return;
+        hackBorder(component, METAL_BORDER_HACK);
+    }
+
+    /**
+     * 
+     * @param component
+     */
+    private boolean hackBorder(JComponent component, Object key) {
+        Border hackBorder = UIManager.getBorder(key);
+        if (hackBorder == null) return false;
+            component.setBorder(hackBorder);
+            return true;
     }
 
     /**

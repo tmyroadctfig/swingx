@@ -30,11 +30,13 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.LookAndFeel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.plaf.UIResource;
+import javax.swing.plaf.metal.MetalBorders;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
@@ -68,6 +70,49 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
     }
 
     /**
+     * Issue #337-swingx: test hack around Metals tableHeaderBorder not respecting
+     * insets.
+     * 
+     * ColumnHeaderRendererAddon should install a  custom border.
+     * 
+     * Here: test that the addon installs/uninstalls a border as uiresource.
+     * 
+     * 
+     */
+    public void testMetalHeaderBorderDefault() throws Exception {
+        LookAndFeel old = UIManager.getLookAndFeel();
+        // force addon loading
+        @SuppressWarnings("unused")
+        ColumnHeaderRenderer renderer = new ColumnHeaderRenderer();
+        // be sure to install cross-platform LF 
+        try {
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            if (hasMetalBordersTableHeaderBorder()) {
+                Border border = UIManager.getBorder(ColumnHeaderRenderer.METAL_BORDER_HACK);
+                assertNotNull("metal hack border must be installed", border);
+                assertTrue("metal hack border must be UIResource", border instanceof UIResource);
+                // be sure to install crossplatform LF
+                // not really safe - blows if system == cross-platform
+//                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//                Border noborder = UIManager.getBorder(ColumnHeaderRenderer.METAL_BORDER_HACK);
+//                assertNull("metal hack border must be un-installed", noborder);
+            } else {
+                LOG.info("metalHaderBorderHack not run: cross-platform does not default the MetalBorders");
+            }
+        } finally {
+            // revert to default LF
+            UIManager.setLookAndFeel(old);
+        }
+    }
+
+    /**
+     * @return
+     */
+    private boolean hasMetalBordersTableHeaderBorder() {
+        return UIManager.getBorder("TableHeader.cellBorder") instanceof MetalBorders.TableHeaderBorder;
+    }
+
+    /**
      * test hack around Vista's tableHeader too big.
      * ColumnHeaderRendererAddon should install a smaller custom border.
      * 
@@ -84,20 +129,17 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
             return;
         }
         LookAndFeel old = UIManager.getLookAndFeel();
-        LOG.info("System-lf " + UIManager.getSystemLookAndFeelClassName());
         // force addon loading
         @SuppressWarnings("unused")
         ColumnHeaderRenderer renderer = new ColumnHeaderRenderer();
         // be sure to install system LF
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            LOG.info("installed: " + UIManager.getLookAndFeel());
             Border border = UIManager.getBorder(ColumnHeaderRenderer.VISTA_BORDER_HACK);
             assertNotNull("vista hack border must be installed", border);
             assertTrue("vista hack border must be UIResource", border instanceof UIResource);
             // be sure to install crossplatform LF
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-            LOG.info("installed: " + UIManager.getLookAndFeel());
             Border noborder = UIManager.getBorder(ColumnHeaderRenderer.VISTA_BORDER_HACK);
             assertNull("vista hack border must be un-installed", noborder);
         } finally {
@@ -123,7 +165,6 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
             return;
         }
         LookAndFeel old = UIManager.getLookAndFeel();
-        LOG.info("System-lf " + UIManager.getSystemLookAndFeelClassName());
         // force addon loading
         @SuppressWarnings("unused")
         ColumnHeaderRenderer renderer = new ColumnHeaderRenderer();
@@ -132,13 +173,11 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
             Border customBorder = BorderFactory.createEmptyBorder(20, 20, 20, 20);
             UIManager.put(ColumnHeaderRenderer.VISTA_BORDER_HACK, customBorder);
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            LOG.info("installed: " + UIManager.getLookAndFeel());
             assertEquals("custom border must be untouched", 
                     customBorder,
                     UIManager.getBorder(ColumnHeaderRenderer.VISTA_BORDER_HACK));
             // be sure to install crossplatform LF
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-            LOG.info("installed: " + UIManager.getLookAndFeel());
             assertSame("custom border must be untouched", 
                     UIManager.getBorder(ColumnHeaderRenderer.VISTA_BORDER_HACK),
                     customBorder);
@@ -160,7 +199,8 @@ public class ColumnHeaderRendererIssues extends InteractiveTestCase {
      */
     public void interactiveLFHeaderRenderer() {
         final JXTable table = new JXTable(20, 5);
-        final JXFrame frame = wrapWithScrollingInFrame(table, "LF provided renderer");
+        JTable core = new JTable(20, 5);
+        final JXFrame frame = wrapWithScrollingInFrame(table, core, "LF provided renderer");
         Action toggleLF = new AbstractActionExt("toggleLF") {
 
             public void actionPerformed(ActionEvent e) {

@@ -22,9 +22,14 @@ package org.jdesktop.swingx.plaf;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
+import javax.swing.BorderFactory;
 import javax.swing.LookAndFeel;
+import javax.swing.UIManager;
+import javax.swing.border.Border;
 import javax.swing.plaf.BorderUIResource;
+import javax.swing.plaf.metal.MetalBorders;
 
 import org.jdesktop.swingx.plaf.windows.WindowsClassicLookAndFeelAddons;
 import org.jdesktop.swingx.table.ColumnHeaderRenderer;
@@ -38,10 +43,13 @@ import org.jdesktop.swingx.util.OS;
  * @author Karl Schaefer
  */
 public class ColumnHeaderRendererAddon extends AbstractComponentAddon {
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger
+            .getLogger(ColumnHeaderRendererAddon.class.getName());
     
-  public ColumnHeaderRendererAddon() {
-    super("ColumnHeaderRenderer");
-  }
+    public ColumnHeaderRendererAddon() {
+        super("ColumnHeaderRenderer");
+    }
   
     /**
      * {@inheritDoc}
@@ -57,6 +65,21 @@ public class ColumnHeaderRendererAddon extends AbstractComponentAddon {
             ColumnHeaderRenderer.DOWN_ICON_KEY,
             LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "basic/resources/sort-jlf-dn.png"),
         }));
+        hackMetalBorder(addon, defaults);
+
+    }
+
+    private void hackMetalBorder(LookAndFeelAddons addon, List<Object> defaults) {
+        Border border = UIManager.getBorder("TableHeader.cellBorder");
+        if (border instanceof MetalBorders.TableHeaderBorder) {
+            border = new BorderUIResource.CompoundBorderUIResource(border, 
+                    BorderFactory.createEmptyBorder());
+            // too heavyweight ...
+//            UIManager.put("TableHeader.cellBorder", border);
+//            LOG.info("updated border " + border);
+            defaults.add(ColumnHeaderRenderer.METAL_BORDER_HACK);
+            defaults.add(border);
+        }
     }
 
     /**
