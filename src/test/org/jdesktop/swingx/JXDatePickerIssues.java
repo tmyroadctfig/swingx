@@ -220,8 +220,6 @@ public class JXDatePickerIssues extends InteractiveTestCase {
      * of the formattedTextField.
      */
     public void interactivePrefSize() {
-//        ListSelectionModel l;
-//        TreeSelectionModel t;
         JXDatePicker picker = new JXDatePicker();
         JFormattedTextField field = new JFormattedTextField(new DatePickerFormatter());
         field.setValue(picker.getDate());
@@ -239,14 +237,13 @@ public class JXDatePickerIssues extends InteractiveTestCase {
      * selection - should revert to the last valid selection.
      * PENDING: better control the bounds ... 
      */
-    public void interactiveBounds() {
+    public void interactiveBoundsDatePickerClickUnselectable() {
         JXDatePicker picker = new JXDatePicker();
         calendar.add(Calendar.DAY_OF_MONTH, 10);
-        // access the model directly requires to "clean" the date
         picker.getMonthView().setUpperBound(calendar.getTime());
         calendar.add(Calendar.DAY_OF_MONTH, - 20);
         picker.getMonthView().setLowerBound(calendar.getTime());
-        showInFrame(picker, "lower/upper bounds");
+        showInFrame(picker, "click unselectable clears date");
     }
 
 
@@ -258,14 +255,15 @@ public class JXDatePickerIssues extends InteractiveTestCase {
      * Here: visualize JXMonthView's behaviour. It fires a commit ... probably the 
      * wrong thing to do?. 
      * PENDING: better control the bounds ... 
+     * PENDING: move into monthView after rename
      */
-    public void interactiveBoundsMonthView() {
+    public void interactiveBoundsMonthViewClickUnselectable() {
         JXMonthView monthView = new JXMonthView();
-        calendar.add(Calendar.DAY_OF_MONTH, 10);
-        // access the model directly requires to "clean" the date
-        monthView.setUpperBound(calendar.getTime());
-        calendar.add(Calendar.DAY_OF_MONTH, - 20);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_MONTH, 7);
         monthView.setLowerBound(calendar.getTime());
+        calendar.set(Calendar.DAY_OF_MONTH, 20);
+        monthView.setUpperBound(calendar.getTime());
         ActionListener l = new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
@@ -275,7 +273,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
             
         };
         monthView.addActionListener(l);
-        showInFrame(monthView, "lower/upper bounds");
+        showInFrame(monthView, "click unselectable fires ActionEvent");
     }
 
     /**
@@ -285,15 +283,16 @@ public class JXDatePickerIssues extends InteractiveTestCase {
      * There's a leak in the region of the leading/trailing dates 
      * when navigating week-wise. 
      * 
-     * PENDING: better control the bounds ... 
+     * PENDING: move into monthView after rename
      */
-    public void interactiveBoundsNavigate() {
+    public void interactiveBoundsNavigateBeyond() {
         JXMonthView monthView = new JXMonthView();
-        calendar.add(Calendar.DAY_OF_MONTH, 10);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_MONTH, 2);
         // access the model directly requires to "clean" the date
-        monthView.setUpperBound(calendar.getTime());
-        calendar.add(Calendar.DAY_OF_MONTH, - 20);
         monthView.setLowerBound(calendar.getTime());
+        calendar.set(Calendar.DAY_OF_MONTH, 27);
+        monthView.setUpperBound(calendar.getTime());
         ActionListener l = new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
@@ -303,7 +302,34 @@ public class JXDatePickerIssues extends InteractiveTestCase {
             
         };
         monthView.addActionListener(l);
-        showInFrame(monthView, "navigate beyond lower/upper bounds");
+        showInFrame(monthView, "navigate beyond bounds");
+    }
+
+    
+    /**
+     * Issue #657-swingx: JXMonthView - unintuitive week-wise navigation with bounds
+     * 
+     * Can't navigate at all if today is beyound the bounds
+     * PENDING: move into monthView after rename
+     */
+    public void interactiveBoundsNavigateLocked() {
+        JXMonthView monthView = new JXMonthView();
+        // same time as monthView's today
+        Calendar calendar = Calendar.getInstance();
+        // set upper bound a week before today, 
+        // to block navigation into all directions
+        calendar.add(Calendar.DAY_OF_MONTH, -8);
+        monthView.setUpperBound(calendar.getTime());
+        ActionListener l = new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("got action " + e);
+                
+            }
+            
+        };
+        monthView.addActionListener(l);
+        showInFrame(monthView, "navigate: locked for today beyond bounds");
     }
 
 //-------------------- unit tests
