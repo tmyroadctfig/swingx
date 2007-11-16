@@ -3798,6 +3798,7 @@ public class JXTable extends JTable
      * <code>JTable</code> class-based lookup doesn't cope well with interfaces.
      * 
      * @deprecated instead use a org.jdesktop.swingx.renderer.DefaultTableRenderer 
+     *    configured with a org.jdesktop.swingx.renderer.IconValue 
      * 
      */
     public static class IconRenderer extends DefaultTableCellRenderer {
