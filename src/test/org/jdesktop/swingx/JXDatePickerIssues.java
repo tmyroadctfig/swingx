@@ -237,6 +237,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
      * Issue #567-swingx:
      * clicking into a unselectable in the popup clears the
      * selection - should revert to the last valid selection.
+     * PENDING: better control the bounds ... 
      */
     public void interactiveBounds() {
         JXDatePicker picker = new JXDatePicker();
@@ -256,6 +257,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
      * 
      * Here: visualize JXMonthView's behaviour. It fires a commit ... probably the 
      * wrong thing to do?. 
+     * PENDING: better control the bounds ... 
      */
     public void interactiveBoundsMonthView() {
         JXMonthView monthView = new JXMonthView();
@@ -276,7 +278,34 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         showInFrame(monthView, "lower/upper bounds");
     }
 
-    
+    /**
+     * Issue #657-swingx: JXMonthView - unintuitive week-wise navigation with bounds
+     * 
+     * In a month, keyboard navigation beyond the upper/lower bound is prevented.
+     * There's a leak in the region of the leading/trailing dates 
+     * when navigating week-wise. 
+     * 
+     * PENDING: better control the bounds ... 
+     */
+    public void interactiveBoundsNavigate() {
+        JXMonthView monthView = new JXMonthView();
+        calendar.add(Calendar.DAY_OF_MONTH, 10);
+        // access the model directly requires to "clean" the date
+        monthView.setUpperBound(calendar.getTime());
+        calendar.add(Calendar.DAY_OF_MONTH, - 20);
+        monthView.setLowerBound(calendar.getTime());
+        ActionListener l = new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("got action " + e);
+                
+            }
+            
+        };
+        monthView.addActionListener(l);
+        showInFrame(monthView, "navigate beyond lower/upper bounds");
+    }
+
 //-------------------- unit tests
     
     
