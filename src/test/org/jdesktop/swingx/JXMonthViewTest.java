@@ -30,9 +30,9 @@ import javax.swing.Action;
 import javax.swing.JComponent;
 
 import org.jdesktop.swingx.JXMonthView.SelectionMode;
-import org.jdesktop.swingx.calendar.DateSelectionListener;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DateUtils;
+import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
 import org.jdesktop.swingx.test.XTestUtils;

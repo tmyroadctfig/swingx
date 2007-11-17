@@ -21,6 +21,8 @@ package org.jdesktop.swingx.calendar;
 import java.util.Date;
 import java.util.SortedSet;
 
+import org.jdesktop.swingx.event.DateSelectionListener;
+
 
 /**
  * @author Joshua Outwater

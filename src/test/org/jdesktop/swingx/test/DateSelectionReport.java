@@ -11,8 +11,8 @@ package org.jdesktop.swingx.test;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.jdesktop.swingx.calendar.DateSelectionListener;
 import org.jdesktop.swingx.event.DateSelectionEvent;
+import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 
 /**

@@ -64,10 +64,10 @@ import javax.swing.plaf.UIResource;
 
 import org.jdesktop.swingx.JXMonthView;
 import org.jdesktop.swingx.JXMonthView.SelectionMode;
-import org.jdesktop.swingx.calendar.DateSelectionListener;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DateUtils;
 import org.jdesktop.swingx.event.DateSelectionEvent;
+import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.plaf.MonthViewUI;
 
 /**

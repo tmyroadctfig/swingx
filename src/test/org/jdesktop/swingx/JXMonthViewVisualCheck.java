@@ -33,8 +33,8 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import org.jdesktop.swingx.JXMonthView.SelectionMode;
-import org.jdesktop.swingx.calendar.DateSelectionListener;
 import org.jdesktop.swingx.event.DateSelectionEvent;
+import org.jdesktop.swingx.event.DateSelectionListener;
 
 /**
  * Test to expose known issues with JXMonthView.
