@@ -43,8 +43,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
+import org.jdesktop.swingx.calendar.DatePickerFormatter;
 import org.jdesktop.swingx.calendar.DateUtils;
-import org.jdesktop.swingx.calendar.JXMonthView;
 
 /**
  * Known issues of <code>JXDatePicker</code> and picker related 

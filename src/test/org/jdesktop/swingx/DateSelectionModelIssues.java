@@ -24,6 +24,8 @@ package org.jdesktop.swingx;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.jdesktop.swingx.calendar.DateSelectionModel;
+import org.jdesktop.swingx.calendar.DefaultDateSelectionModel;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.test.DateSelectionReport;
 

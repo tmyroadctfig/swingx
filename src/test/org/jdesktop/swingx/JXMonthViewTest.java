@@ -18,7 +18,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package org.jdesktop.swingx.calendar;
+package org.jdesktop.swingx;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -29,11 +29,10 @@ import java.util.logging.Logger;
 import javax.swing.Action;
 import javax.swing.JComponent;
 
-import org.jdesktop.swingx.DateSelectionListener;
-import org.jdesktop.swingx.DateSelectionModel;
-import org.jdesktop.swingx.JXDatePicker;
-import org.jdesktop.swingx.calendar.JXMonthView.SelectionMode;
-import org.jdesktop.swingx.event.DateSelectionEvent;
+import org.jdesktop.swingx.JXMonthView.SelectionMode;
+import org.jdesktop.swingx.calendar.DateSelectionListener;
+import org.jdesktop.swingx.calendar.DateSelectionModel;
+import org.jdesktop.swingx.calendar.DateUtils;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
 import org.jdesktop.swingx.test.XTestUtils;

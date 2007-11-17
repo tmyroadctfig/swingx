@@ -31,7 +31,7 @@ import javax.swing.JPanel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXImagePanel;
-import org.jdesktop.swingx.calendar.JXMonthViewVisualCheck;
+import org.jdesktop.swingx.JXMonthViewVisualCheck;
 
 /**
  * JW: renamed from PainterInteractiveTest to fix the build failure. Revisit!

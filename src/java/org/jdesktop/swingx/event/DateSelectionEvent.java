@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.EventObject;
 import java.util.SortedSet;
 
-import org.jdesktop.swingx.DateSelectionModel;
+import org.jdesktop.swingx.calendar.DateSelectionModel;
 
 /**
  * @author Joshua Outwater

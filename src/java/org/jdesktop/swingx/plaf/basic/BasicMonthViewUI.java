@@ -62,11 +62,11 @@ import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.UIResource;
 
-import org.jdesktop.swingx.DateSelectionListener;
-import org.jdesktop.swingx.DateSelectionModel;
+import org.jdesktop.swingx.JXMonthView;
+import org.jdesktop.swingx.JXMonthView.SelectionMode;
+import org.jdesktop.swingx.calendar.DateSelectionListener;
+import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DateUtils;
-import org.jdesktop.swingx.calendar.JXMonthView;
-import org.jdesktop.swingx.calendar.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.plaf.MonthViewUI;
 
@@ -317,7 +317,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * Binds/clears the keystrokes in the component input map, 
      * based on the monthView's componentInputMap enabled property.
      * 
-     * @see org.jdesktop.swingx.calendar.JXMonthView#isComponentInputMapEnabled()
+     * @see org.jdesktop.swingx.JXMonthView#isComponentInputMapEnabled()
      */
     protected void updateComponentInputMap() {
         if (monthView.isComponentInputMapEnabled()) {
@@ -1036,8 +1036,8 @@ public class BasicMonthViewUI extends MonthViewUI {
      * setMonthStringInsets.  The color of the background can be set via
      * setMonthStringBackground.
      *
-     * @see org.jdesktop.swingx.calendar.JXMonthView#setMonthStringBackground
-     * @see org.jdesktop.swingx.calendar.JXMonthView#setMonthStringInsets
+     * @see org.jdesktop.swingx.JXMonthView#setMonthStringBackground
+     * @see org.jdesktop.swingx.JXMonthView#setMonthStringInsets
      * @param g Graphics object to paint to.
      * @param x x-coordinate of upper left corner.
      * @param y y-coordinate of upper left corner.
@@ -1119,7 +1119,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param width width of bounding box for the day
      * @param height height of bounding box for the day
      * @param date long value representing the day being painted
-     * @see  org.jdesktop.swingx.calendar.JXMonthView#isSelectedDate
+     * @see  org.jdesktop.swingx.JXMonthView#isSelectedDate
      * @see  #isToday
      */
     protected void paintDayBackground(Graphics g, int x, int y, int width, int height,

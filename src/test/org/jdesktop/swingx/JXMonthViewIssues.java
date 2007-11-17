@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-package org.jdesktop.swingx.calendar;
+package org.jdesktop.swingx;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -39,11 +39,11 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.JXFrame;
+import org.jdesktop.swingx.JXMonthView;
+import org.jdesktop.swingx.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.action.AbstractActionExt;
-import org.jdesktop.swingx.calendar.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
 import org.jdesktop.swingx.test.XTestUtils;

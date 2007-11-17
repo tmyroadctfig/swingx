@@ -61,11 +61,11 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.UIResource;
 import javax.swing.text.View;
 
-import org.jdesktop.swingx.DateSelectionListener;
-import org.jdesktop.swingx.DateSelectionModel;
 import org.jdesktop.swingx.JXDatePicker;
-import org.jdesktop.swingx.DatePickerFormatter;
-import org.jdesktop.swingx.calendar.JXMonthView;
+import org.jdesktop.swingx.JXMonthView;
+import org.jdesktop.swingx.calendar.DatePickerFormatter;
+import org.jdesktop.swingx.calendar.DateSelectionListener;
+import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.plaf.DatePickerUI;

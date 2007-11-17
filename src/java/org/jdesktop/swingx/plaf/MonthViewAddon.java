@@ -9,7 +9,7 @@ import javax.swing.LookAndFeel;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.FontUIResource;
 
-import org.jdesktop.swingx.calendar.JXMonthView;
+import org.jdesktop.swingx.JXMonthView;
 
 public class MonthViewAddon extends AbstractComponentAddon {
     public MonthViewAddon() {

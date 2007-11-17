@@ -21,6 +21,7 @@
  */
 package org.jdesktop.swingx;
 
+import org.jdesktop.swingx.calendar.DatePickerFormatter;
 import org.jdesktop.test.SerializableSupport;
 
 /**

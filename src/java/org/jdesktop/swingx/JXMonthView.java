@@ -18,7 +18,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package org.jdesktop.swingx.calendar;
+package org.jdesktop.swingx;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -39,8 +39,9 @@ import java.util.TreeSet;
 import javax.swing.JComponent;
 import javax.swing.Timer;
 
-import org.jdesktop.swingx.DateSelectionModel;
-import org.jdesktop.swingx.DefaultDateSelectionModel;
+import org.jdesktop.swingx.calendar.DateSelectionModel;
+import org.jdesktop.swingx.calendar.DateSpan;
+import org.jdesktop.swingx.calendar.DefaultDateSelectionModel;
 import org.jdesktop.swingx.event.EventListenerMap;
 import org.jdesktop.swingx.plaf.MonthViewAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
@@ -1520,7 +1521,7 @@ public class JXMonthView extends JComponent {
      * only fires (to keep the picker happy).
      * 
      * @see #cancelSelection()
-     * @see org.jdesktop.swingx.DateSelectionModel#setAdjusting(boolean)
+     * @see org.jdesktop.swingx.calendar.DateSelectionModel#setAdjusting(boolean)
      */
     public void commitSelection() {
         getSelectionModel().setAdjusting(false);
@@ -1534,7 +1535,7 @@ public class JXMonthView extends JComponent {
      * false and fires an ActionEvent with the CANCEL_KEY action command.
      * 
      * @see #commitSelection
-     * @see org.jdesktop.swingx.DateSelectionModel#setAdjusting(boolean)
+     * @see org.jdesktop.swingx.calendar.DateSelectionModel#setAdjusting(boolean)
      */
     public void cancelSelection() {
         getSelectionModel().setAdjusting(false);

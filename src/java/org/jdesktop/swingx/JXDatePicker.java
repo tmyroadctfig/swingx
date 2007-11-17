@@ -51,7 +51,7 @@ import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.text.DefaultFormatterFactory;
 
-import org.jdesktop.swingx.calendar.JXMonthView;
+import org.jdesktop.swingx.calendar.DatePickerFormatter;
 import org.jdesktop.swingx.event.EventListenerMap;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.plaf.DatePickerAddon;
