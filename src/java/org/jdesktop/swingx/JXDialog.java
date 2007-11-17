@@ -143,8 +143,6 @@ public class JXDialog extends JDialog {
      * Does nothing if content is null. 
      * 
      * Here: uses the content's name as title. 
-     * 
-     * @param content the contained component 
      */
     protected void setTitleFromContent() {
         if (content == null) return;

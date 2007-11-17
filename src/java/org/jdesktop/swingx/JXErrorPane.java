@@ -48,10 +48,10 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  * use <code>JOptionPane</code>.</p>
  * 
  * <p>Data and application state associated with an error are encapsulated
- * in the {@link ErrorInfo} class. The <code>JXErrorPane</code> displays the
- * data contained in the <code>ErrorInfo</code>. In addition,
- * <code>ErrorInfo</code> is passed to the {@link ErrorReporter} if the user decides
- * to report the incident.</p>
+ * in the {@link org.jdesktop.swingx.error.ErrorInfo} class. The
+ * {@code JXErrorPane} displays the data contained in the {@code ErrorInfo}.
+ * In addition, {@code ErrorInfo} is passed to the {@link ErrorReporter} if the
+ * user decides to report the incident.</p>
  * 
  * <h2>Basic Usage</h2>
  * <p>Typically, the <code>JXErrorPane</code>
@@ -122,7 +122,7 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  *
  * <p><code>JXErrorPane</code> may also be configured with a "Report" button which allows
  * the user to send a bug report, typically through email. This is done through
- * the pluggable {@link ErrorReporter} class. Simply instantiate
+ * the pluggable {@link org.jdesktop.swingx.error.ErrorReporter} class. Simply instantiate
  * {@link EmailErrorReporter} or some custom
  * subclass of <code>ErrorReporter</code> and pass the instance into the
  * {@link #setErrorReporter} method.</p>

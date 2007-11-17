@@ -169,7 +169,7 @@ public class JXDatePicker extends JComponent {
      * 
      *  
      * @param date the new date to set.
-     * @see #getDate();
+     * @see #getDate()
      */
     public void setDate(Date date) {
         /*
@@ -547,7 +547,7 @@ public class JXDatePicker extends JComponent {
     /**
      * Returns the editable property. 
      * 
-     * @return
+     * @return {@code true} if the picker is editable; {@code false} otherwise
      */
     public boolean isEditable() {
         return editable;
