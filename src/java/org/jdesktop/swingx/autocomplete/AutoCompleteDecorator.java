@@ -153,6 +153,7 @@ public class AutoCompleteDecorator {
      * completion will be strict (only items from the combo box can be selected)
      * if the combo box is not editable.
      * @param comboBox a combo box
+     * @see #decorate(JComboBox, ObjectToStringConverter)
      */
     public static void decorate(final JComboBox comboBox) {
         decorate(comboBox, ObjectToStringConverter.DEFAULT_IMPLEMENTATION);
@@ -162,8 +163,23 @@ public class AutoCompleteDecorator {
      * Enables automatic completion for the given JComboBox. The automatic
      * completion will be strict (only items from the combo box can be selected)
      * if the combo box is not editable.
-     * @param comboBox a combo box
-     * @param stringConverter the converter used to transform items to strings
+     * <p>
+     * <b>Note:</b> the {@code AutoCompleteDecorator} will alter the state of
+     * the {@code JComboBox} to be editable. This can cause side effects with
+     * layouts and sizing. {@code JComboBox} caches the size, which differs
+     * depending on the component's editability. Therefore, if the component's
+     * size is accesed prior to being decorated and then the cached size is
+     * forced to be recalculated, the size of the component will change.
+     * <p>
+     * Because the size of the component can be altered (recalculated), the
+     * decorator does not attempt to set any sizes on the supplied
+     * {@code JComboBox}. Users that need to ensure sizes of supplied combos
+     * should take measures to set the size of the combo.
+     * 
+     * @param comboBox
+     *                a combo box
+     * @param stringConverter
+     *                the converter used to transform items to strings
      */
     public static void decorate(final JComboBox comboBox, final ObjectToStringConverter stringConverter) {
         boolean strictMatching = !comboBox.isEditable();
