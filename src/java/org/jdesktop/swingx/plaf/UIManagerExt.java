@@ -108,7 +108,7 @@ public class UIManagerExt {
      *                 if {@code key} or {@code defaultFont} is {@code null}
      */
     public static Font getSafeFont(Object key, Font defaultFont) {
-        Contract.asNotNull(defaultFont, "defaultColor cannot be null");
+        Contract.asNotNull(defaultFont, "defaultFont cannot be null");
         
         Font safeFont = UIManager.getFont(key);
         
