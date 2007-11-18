@@ -247,7 +247,9 @@ public class JXDatePicker extends JComponent {
     }
 
     /**
-     * @inheritDoc
+     * Returns the look and feel (L&F) object that renders this component.
+     *
+     * @return the DatePickerUI object that renders this component
      */
     public DatePickerUI getUI() {
         return (DatePickerUI) ui;
