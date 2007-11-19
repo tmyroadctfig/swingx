@@ -50,6 +50,7 @@ import org.jdesktop.swingx.calendar.DatePickerFormatter;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DateUtils;
 import org.jdesktop.swingx.calendar.DefaultDateSelectionModel;
+import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.plaf.basic.BasicDatePickerUI.EditorCancelAction;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.ActionReport;
@@ -85,13 +86,13 @@ public class JXDatePickerTest extends TestCase {
         // force loading
         new JXDatePicker();
         String key = "JXDatePicker.linkFormat";
-        String oldLinkFormat = UIManager.getString(key);
+        String oldLinkFormat = UIManagerExt.getString(key);
         // sanity: the addon was loaded
         assertNotNull(oldLinkFormat);
         UIManager.put(key, null);
-        assertEquals("no null overwrite", oldLinkFormat, UIManager.getString(key));
+        assertEquals("no null overwrite", oldLinkFormat, UIManagerExt.getString(key));
         UIManager.getLookAndFeelDefaults().remove(key);
-        assertEquals("no remove", oldLinkFormat, UIManager.getString(key));
+        assertEquals("no remove", oldLinkFormat, UIManagerExt.getString(key));
         new JXDatePicker();
     }
     
