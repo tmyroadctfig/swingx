@@ -28,7 +28,7 @@ import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.TexturePaint;
 import java.awt.image.BufferedImage;
-import javax.imageio.ImageIO;
+
 import javax.swing.JComponent;
 
 /**
@@ -76,7 +76,7 @@ public class ColorUtil {
         
         float[] cols = Color.RGBtoHSB(color.getRed(),color.getGreen(),color.getBlue(),null);
         cols[2] = brightness;
-        Color c2 = color.getHSBColor(cols[0],cols[1],cols[2]);
+        Color c2 = Color.getHSBColor(cols[0],cols[1],cols[2]);
         
         return setAlpha(c2,alpha);
     }
@@ -92,9 +92,6 @@ public class ColorUtil {
         return "#"+(""+Integer.toHexString(color.getRGB())).substring(2);        
     }
         
-    private static Paint checker_texture = null;
-
-    
     /**
      * Obtain a <code>java.awt.Paint</code> instance which draws a checker
      * background of black and white. 
@@ -198,7 +195,7 @@ public class ColorUtil {
         
         float[] cols = Color.RGBtoHSB(color.getRed(),color.getGreen(),color.getBlue(),null);
         cols[1] = saturation;
-        Color c2 = color.getHSBColor(cols[0],cols[1],cols[2]);
+        Color c2 = Color.getHSBColor(cols[0],cols[1],cols[2]);
         
         return setAlpha(c2,alpha);
     }

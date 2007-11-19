@@ -22,25 +22,13 @@
 package org.jdesktop.swingx.plaf.macosx;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.GradientPaint;
-import java.awt.Graphics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.LayoutManager;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+
 import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.UIManager;
 import javax.swing.plaf.ComponentUI;
-import org.jdesktop.swingx.JXEditorPane;
-import org.jdesktop.swingx.JXHeader;
+
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.painter.Painter;
-//import org.jdesktop.swingx.painter.gradient.BasicGradientPainter;
 import org.jdesktop.swingx.plaf.PainterUIResource;
 import org.jdesktop.swingx.plaf.basic.BasicHeaderUI;
 

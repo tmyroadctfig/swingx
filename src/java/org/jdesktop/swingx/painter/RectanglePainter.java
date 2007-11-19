@@ -28,13 +28,10 @@ import java.awt.Insets;
 import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 import java.awt.geom.RoundRectangle2D;
-import javax.swing.JComponent;
-import org.apache.batik.ext.awt.LinearGradientPaint;
-import org.jdesktop.swingx.JXGradientChooser;
+
 import org.jdesktop.swingx.painter.effects.AreaEffect;
 import org.jdesktop.swingx.util.PaintUtils;
 

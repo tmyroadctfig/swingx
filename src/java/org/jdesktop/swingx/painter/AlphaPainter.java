@@ -22,10 +22,8 @@
 
 package org.jdesktop.swingx.painter;
 
-import org.jdesktop.swingx.JXPanel;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.AlphaComposite;
+import java.awt.Graphics2D;
 
 /**
  * Applies an alpha value to an entire stack of painters.
@@ -36,7 +34,7 @@ public class AlphaPainter<T> extends CompoundPainter<T> {
     private float alpha = 1.0f;
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     public void doPaint(Graphics2D g, T component, int width, int height) {

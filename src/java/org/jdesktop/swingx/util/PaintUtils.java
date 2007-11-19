@@ -34,7 +34,6 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Paint;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.Transparency;
@@ -44,11 +43,11 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
+
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -330,8 +329,6 @@ public class PaintUtils {
         
         if(p instanceof GradientPaint) {
             GradientPaint gp = (GradientPaint)p;
-            Point2D start = gp.getPoint1();
-            Point2D end = gp.getPoint2();
             Point2D[] pts = new Point2D[2];
             pts[0] = gp.getPoint1();
             pts[1] = gp.getPoint2();
@@ -356,7 +353,7 @@ public class PaintUtils {
             float[] fractions = (float[]) invokeMethod(p,"getFractions");
             Color[] colors = (Color[]) invokeMethod(p,"getColors");
             
-            Constructor con = p.getClass().getDeclaredConstructor(
+            Constructor<?> con = p.getClass().getDeclaredConstructor(
                     Point2D.class, Point2D.class,
                     new float[0].getClass(),
                     new Color[0].getClass());
@@ -370,7 +367,7 @@ public class PaintUtils {
     private static Object invokeMethod(final Object p, final String methodName)
             throws NoSuchMethodException, InvocationTargetException, IllegalArgumentException, SecurityException, IllegalAccessException {
         Method meth = p.getClass().getMethod(methodName);
-        return meth.invoke(p,null);
+        return meth.invoke(p);
     }
     
     
@@ -485,8 +482,8 @@ public class PaintUtils {
         return buffer.toString();
     }*/
     
-    private static void p(String string) {
-        System.out.println(string);
-    }
+//    private static void p(String string) {
+//        System.out.println(string);
+//    }
 
 }
