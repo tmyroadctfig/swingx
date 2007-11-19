@@ -34,6 +34,26 @@ import java.util.Calendar;
 public class CalendarUtils {
 
     /**
+     * Adjusts the calendar to the start of the current week.
+     * That is, first day of the week with all time fields cleared.
+     * @param calendar the calendar to adjust.
+     */
+    public static void startOfWeek(Calendar calendar) {
+        calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
+        startOfDay(calendar);
+    }
+
+    /**
+     * Adjusts the calendar to the end of the current week.
+     * That is, last day of the week with all time fields at max.
+     * @param calendar the calendar to adjust.
+     */
+    public static void endOfWeek(Calendar calendar) {
+        startOfWeek(calendar);
+        calendar.add(Calendar.DATE, 7);
+        calendar.add(Calendar.MILLISECOND, -1);
+    }
+    /**
      * Adjusts the calendar to the start of the current month.
      * That is, first day of the month with all time fields cleared.
      * @param calendar

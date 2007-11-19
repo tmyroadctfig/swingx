@@ -33,6 +33,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.calendar.CalendarUtils;
 
 /**
  * Static convenience methods for testing. Note that the resources
@@ -78,21 +79,56 @@ public class XTestUtils {
     
     /**
      * 
+     * @param days offset from today
+     * @return the start of the day offset from today by the given value, 
+     *  of the calendar default instance.
+     */
+    public static Date getStartOfToday(int days) {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DAY_OF_MONTH, days);
+        return getStartOfDay(cal);
+    }
+    /**
+     * 
+     * @return the start of today of the calendar default instance.
+     */
+    public static Date getStartOfToday() {
+        return getStartOfDay(Calendar.getInstance());
+    }
+    
+    /**
+     * Adjusts the given calendar to the start of the 
+     * current day and returns its date. 
+     * <p>
+     * Note that the calendar is 
+     * changed! This is a convenience wrapper around CalendarUtils.startOfDay, 
+     * might be moved there?
+     * 
+     * @param cal the calendar to clean
+     * @return the calendar's date with all time elements set to 0
+     */
+    public static Date getStartOfDay(Calendar cal) {
+        CalendarUtils.startOfDay(cal);
+        return cal.getTime();
+    }
+
+    /**
+     * 
      * @param days
      * @return the current day offset by days with all time elements 
      *   set to 0
+     * @deprecated use getStartOfToday(int)
      */
     public static Date getCleanedToday(int days) {
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_MONTH, days);
-        return getCleanedDate(cal);
+        return getStartOfToday(days);
     }
     /**
      * 
      * @return the current date with all time elements set to 0
+     * @deprecated use getStartOfToday()
      */
     public static Date getCleanedToday() {
-        return getCleanedDate(Calendar.getInstance());
+        return getStartOfToday();
     }
     
     /**
@@ -100,12 +136,14 @@ public class XTestUtils {
      * 
      * @param cal the calendar to clean
      * @return the calendar's date with all time elements set to 0
+     * @deprecated use getStartOfDay
      */
     public static Date getCleanedDate(Calendar cal) {
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
+        CalendarUtils.startOfDay(cal);
+//        cal.set(Calendar.HOUR_OF_DAY, 0);
+//        cal.set(Calendar.MINUTE, 0);
+//        cal.set(Calendar.SECOND, 0);
+//        cal.set(Calendar.MILLISECOND, 0);
         return cal.getTime();
     }
 

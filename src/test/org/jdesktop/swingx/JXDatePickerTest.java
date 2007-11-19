@@ -45,6 +45,7 @@ import javax.swing.text.DefaultFormatterFactory;
 
 import junit.framework.TestCase;
 
+import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DatePickerFormatter;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DateUtils;
@@ -541,14 +542,14 @@ public class JXDatePickerTest extends TestCase {
         ActionReport report = new ActionReport();
         picker.addActionListener(report);
         // via editor
-        Date value = XTestUtils.getCleanedToday(3);
+        Date value = XTestUtils.getStartOfToday(3);
         picker.getEditor().setValue(value);
         assertEquals(value, picker.getDate());
         // via selection
-        Date selected = XTestUtils.getCleanedToday(4);
+        Date selected = XTestUtils.getStartOfToday(4);
         picker.getMonthView().setSelectionInterval(selected, selected);
         assertEquals(selected, picker.getDate());
-        Date date = XTestUtils.getCleanedToday(5);
+        Date date = XTestUtils.getStartOfToday(5);
         // directly
         picker.setDate(date);
         assertEquals(date, picker.getDate());
@@ -881,9 +882,9 @@ public class JXDatePickerTest extends TestCase {
         JXDatePicker picker = new JXDatePicker();
         picker.setDate(null);
         Date date = cal.getTime();
-        Date clean = XTestUtils.getCleanedDate(cal);
         picker.setDate(date);
-        assertEquals(clean, picker.getDate());
+        CalendarUtils.startOfDay(cal);
+        assertEquals(cal.getTime(), picker.getDate());
     }
 
     /**
@@ -905,7 +906,7 @@ public class JXDatePickerTest extends TestCase {
     public void testDateProperty() {
         JXDatePicker picker = new JXDatePicker();
         picker.setDate(null);
-        Date date = XTestUtils.getCleanedToday(5);
+        Date date = XTestUtils.getStartOfToday(5);
         PropertyChangeReport report = new PropertyChangeReport();
         picker.addPropertyChangeListener(report);
         picker.setDate(date);
@@ -919,7 +920,7 @@ public class JXDatePickerTest extends TestCase {
     public void testDatePropertyThroughEditor() {
         JXDatePicker picker = new JXDatePicker();
         picker.setDate(null);
-        Date date = XTestUtils.getCleanedToday(5);
+        Date date = XTestUtils.getStartOfToday(5);
         PropertyChangeReport report = new PropertyChangeReport();
         picker.addPropertyChangeListener(report);
         picker.getEditor().setValue(date);
@@ -933,7 +934,7 @@ public class JXDatePickerTest extends TestCase {
     public void testDatePropertyThroughSelection() {
         JXDatePicker picker = new JXDatePicker();
         picker.setDate(null);
-        Date date = XTestUtils.getCleanedToday(5);
+        Date date = XTestUtils.getStartOfToday(5);
         PropertyChangeReport report = new PropertyChangeReport();
         picker.addPropertyChangeListener(report);
         picker.getMonthView().setSelectionInterval(date, date);
@@ -1002,7 +1003,7 @@ public class JXDatePickerTest extends TestCase {
      * 
      */
     public void testSynchAllInitialDate() {
-        Date date = XTestUtils.getCleanedToday(5);
+        Date date = XTestUtils.getStartOfToday(5);
         JXDatePicker picker = new JXDatePicker(date.getTime());
         assertSynchAll(picker, date);
     } 
@@ -1015,7 +1016,7 @@ public class JXDatePickerTest extends TestCase {
      */
     public void testSynchAllOnDateModified() {
         JXDatePicker picker = new JXDatePicker();
-        Date date = XTestUtils.getCleanedToday(5);
+        Date date = XTestUtils.getStartOfToday(5);
         picker.setDate(date);
         assertSynchAll(picker, date);
     } 
@@ -1027,7 +1028,7 @@ public class JXDatePickerTest extends TestCase {
      */
     public void testSynchAllOnSelectionChange()  {
         JXDatePicker picker = new JXDatePicker();
-        Date date = XTestUtils.getCleanedToday(5);
+        Date date = XTestUtils.getStartOfToday(5);
         picker.getMonthView().setSelectionInterval(date, date);
         assertSynchAll(picker, date);
     }
@@ -1040,7 +1041,7 @@ public class JXDatePickerTest extends TestCase {
      */
     public void testSynchAllOnEditorSetValue() {
         JXDatePicker picker = new JXDatePicker();
-        Date date = XTestUtils.getCleanedToday(5);
+        Date date = XTestUtils.getStartOfToday(5);
         picker.getEditor().setValue(date);
         assertSynchAll(picker, date);
     } 
@@ -1054,7 +1055,7 @@ public class JXDatePickerTest extends TestCase {
     public void testSynchAllOnEditorSetValueAfterSetEditor() {
         JXDatePicker picker = new JXDatePicker();
         picker.setEditor(new JFormattedTextField(DateFormat.getInstance()));
-        Date date = XTestUtils.getCleanedToday(5);
+        Date date = XTestUtils.getStartOfToday(5);
         picker.getEditor().setValue(date);
         assertSynchAll(picker, date);
     }
@@ -1068,7 +1069,7 @@ public class JXDatePickerTest extends TestCase {
     public void testSynchAllOnSelectionChangeAfterSetMonthView() {
         JXDatePicker picker = new JXDatePicker();
         picker.setMonthView(new JXMonthView());
-        Date date = XTestUtils.getCleanedToday(5);
+        Date date = XTestUtils.getStartOfToday(5);
         picker.getMonthView().setSelectionInterval(date, date);
         assertSynchAll(picker, date);
     }
@@ -1085,7 +1086,7 @@ public class JXDatePickerTest extends TestCase {
     public void testSynchAllOnSelectionChangeAfterSetSelectionModel() {
         JXDatePicker picker = new JXDatePicker();
         picker.getMonthView().setSelectionModel(new DefaultDateSelectionModel());
-        Date date = XTestUtils.getCleanedToday(5);
+        Date date = XTestUtils.getStartOfToday(5);
         picker.getMonthView().setSelectionInterval(date, date);
         assertSynchAll(picker, date);
     }
@@ -1108,9 +1109,9 @@ public class JXDatePickerTest extends TestCase {
      */
     public void testRejectSetValueUnselectable() {
         JXDatePicker picker = new JXDatePicker();
-        Date upperBound = XTestUtils.getCleanedToday(1);
+        Date upperBound = XTestUtils.getStartOfToday(1);
         picker.getMonthView().setUpperBound(upperBound);
-        Date future = XTestUtils.getCleanedToday(2);
+        Date future = XTestUtils.getStartOfToday(2);
         // sanity
         assertTrue(picker.getMonthView().isUnselectableDate(future));
         Date current = picker.getDate();
@@ -1263,7 +1264,7 @@ public class JXDatePickerTest extends TestCase {
      */
     public void testSynchAllAfterSetSelectionModelNotEmpty() {
         JXDatePicker picker = new JXDatePicker();
-        Date date = XTestUtils.getCleanedToday(5);
+        Date date = XTestUtils.getStartOfToday(5);
         DateSelectionModel model = new DefaultDateSelectionModel();
         model.setSelectionInterval(date, date);
         // sanity
@@ -1300,7 +1301,7 @@ public class JXDatePickerTest extends TestCase {
     public void testSynchAllSetMonthViewWithSelection() {
         JXDatePicker picker = new JXDatePicker();
         JXMonthView monthView = new JXMonthView();
-        Date date = XTestUtils.getCleanedToday(5);
+        Date date = XTestUtils.getStartOfToday(5);
         monthView.setSelectionInterval(date, date);
         // sanity
         assertFalse(date.equals(picker.getDate()));

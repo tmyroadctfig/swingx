@@ -339,7 +339,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     public void testUpperBound() {
         JXMonthView view = new JXMonthView();
         Date full = cal.getTime();
-        Date cleaned = XTestUtils.getCleanedDate(cal);
+        Date cleaned = XTestUtils.getStartOfDay(cal);
         view.setUpperBound(full);
         assertEquals(cleaned, view.getUpperBound());
     }
@@ -351,7 +351,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     public void testLowerBound() {
         JXMonthView view = new JXMonthView();
         Date full = cal.getTime();
-        Date cleaned = XTestUtils.getCleanedDate(cal);
+        Date cleaned = XTestUtils.getStartOfDay(cal);
         view.setLowerBound(full);
         assertEquals(cleaned, view.getLowerBound());
     }
@@ -362,7 +362,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testUnselectableDate() {
         JXMonthView monthView = new JXMonthView();
-        Date date = XTestUtils.getCleanedToday();
+        Date date = XTestUtils.getStartOfToday();
         assertFalse(monthView.isUnselectableDate(date));
         monthView.setUnselectableDates(date);
         assertTrue(monthView.isUnselectableDate(date));
@@ -416,7 +416,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     public void testIsSelectedDate() {
         JXMonthView monthView = new JXMonthView();
         Date today = new Date();
-        Date selected = XTestUtils.getCleanedToday();
+        Date selected = XTestUtils.getStartOfToday();
         monthView.setSelectedDate(today);
         assertTrue(monthView.isSelectedDate(today));
         assertTrue(monthView.isSelectedDate(selected));
@@ -431,7 +431,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JXMonthView monthView = new JXMonthView();
         Date today = new Date();
         Date copy = new Date(today.getTime());
-        Date selected = XTestUtils.getCleanedToday();
+        Date selected = XTestUtils.getStartOfToday();
         monthView.setSelectedDate(selected);
         // use today
         monthView.isSelectedDate(today);
@@ -446,7 +446,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JXMonthView monthView = new JXMonthView();
         Date today = new Date();
         Date copy = new Date(today.getTime());
-        Date selected = XTestUtils.getCleanedToday();
+        Date selected = XTestUtils.getStartOfToday();
         monthView.setSelectedDate(today);
         // sanity: date unchanged
         assertEquals(copy, today);

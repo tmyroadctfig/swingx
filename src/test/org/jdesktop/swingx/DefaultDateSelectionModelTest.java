@@ -301,7 +301,7 @@ public class DefaultDateSelectionModelTest extends TestCase {
      * Both bounds same --> bound allowed.
      */
     public void testBothBoundsSame() {
-        Date today = XTestUtils.getCleanedToday();
+        Date today = XTestUtils.getStartOfToday();
         model.setLowerBound(today);
         model.setUpperBound(today);
         model.setSelectionInterval(today, today);
@@ -315,9 +315,9 @@ public class DefaultDateSelectionModelTest extends TestCase {
      * Both bounds same --> bound allowed.
      */
     public void testBothBoundsOverlap() {
-        Date today = XTestUtils.getCleanedToday();
+        Date today = XTestUtils.getStartOfToday();
         model.setLowerBound(today);
-        Date yesterday = XTestUtils.getCleanedToday(-1);
+        Date yesterday = XTestUtils.getStartOfToday(-1);
         model.setUpperBound(yesterday);
         DateSelectionReport report = new DateSelectionReport();
         model.addDateSelectionListener(report);
@@ -332,9 +332,9 @@ public class DefaultDateSelectionModelTest extends TestCase {
      *
      */
     public void testLowerBoundPast() {
-        Date today = XTestUtils.getCleanedToday();
+        Date today = XTestUtils.getStartOfToday();
         model.setLowerBound(today);
-        Date yesterday = XTestUtils.getCleanedToday(-1);
+        Date yesterday = XTestUtils.getStartOfToday(-1);
         DateSelectionReport report = new DateSelectionReport();
         model.addDateSelectionListener(report);
         model.setSelectionInterval(yesterday, yesterday);
@@ -348,7 +348,7 @@ public class DefaultDateSelectionModelTest extends TestCase {
      *
      */
     public void testLowerBound() {
-        Date today = XTestUtils.getCleanedToday();
+        Date today = XTestUtils.getStartOfToday();
         model.setLowerBound(today);
         // the bound itself is allowed
         model.setSelectionInterval(today, today);
@@ -361,9 +361,9 @@ public class DefaultDateSelectionModelTest extends TestCase {
      *
      */
     public void testUpperBoundFuture() {
-        Date today = XTestUtils.getCleanedToday();
+        Date today = XTestUtils.getStartOfToday();
         model.setUpperBound(today);
-        Date tomorrow = XTestUtils.getCleanedToday(1);
+        Date tomorrow = XTestUtils.getStartOfToday(1);
         DateSelectionReport report = new DateSelectionReport();
         model.addDateSelectionListener(report);
         model.setSelectionInterval(tomorrow, tomorrow);
@@ -375,9 +375,9 @@ public class DefaultDateSelectionModelTest extends TestCase {
      * Remove the upper bound constraint
      */
     public void testUpperBoundRemove() {
-        Date today = XTestUtils.getCleanedToday();
+        Date today = XTestUtils.getStartOfToday();
         model.setUpperBound(today);
-        Date tomorrow = XTestUtils.getCleanedToday(1);
+        Date tomorrow = XTestUtils.getStartOfToday(1);
         model.setUpperBound(null);
         model.setSelectionInterval(tomorrow, tomorrow);
         assertTrue("selection must be empty", model.isSelected(tomorrow));
@@ -389,7 +389,7 @@ public class DefaultDateSelectionModelTest extends TestCase {
      *
      */
     public void testUpperBound() {
-        Date today = XTestUtils.getCleanedToday();
+        Date today = XTestUtils.getStartOfToday();
         model.setUpperBound(today);
         // the bound itself is allowed
         model.setSelectionInterval(today, today);
@@ -401,7 +401,7 @@ public class DefaultDateSelectionModelTest extends TestCase {
      * first set the unselectables then set the selection to an unselectable.
      */
     public void testUnselectableDates() {
-        Date today = XTestUtils.getCleanedToday();
+        Date today = XTestUtils.getStartOfToday();
         SortedSet<Date> unselectableDates = new TreeSet<Date>();
         unselectableDates.add(today);
         model.setUnselectableDates(unselectableDates);
