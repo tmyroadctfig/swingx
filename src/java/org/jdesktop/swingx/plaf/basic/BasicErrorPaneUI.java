@@ -44,6 +44,7 @@ import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Level;
+
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
@@ -74,10 +75,11 @@ import javax.swing.text.html.HTMLEditorKit;
 import org.jdesktop.swingx.JXEditorPane;
 import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.action.AbstractActionExt;
-import org.jdesktop.swingx.error.ErrorLevel;
 import org.jdesktop.swingx.error.ErrorInfo;
+import org.jdesktop.swingx.error.ErrorLevel;
 import org.jdesktop.swingx.error.ErrorReporter;
 import org.jdesktop.swingx.plaf.ErrorPaneUI;
+import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.util.WindowUtils;
 
 /**
@@ -270,12 +272,12 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
         errorMessage.setOpaque(false);
         errorMessage.putClientProperty(JXEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 
-        closeButton = new JButton(UIManager.getString(
+        closeButton = new JButton(UIManagerExt.getString(
                 CLASS_NAME + ".ok_button_text", errorMessage.getLocale()));
 
         reportButton = new EqualSizeJButton(pane.getActionMap().get(JXErrorPane.REPORT_ACTION_KEY));
 
-        detailButton = new EqualSizeJButton(UIManager.getString(
+        detailButton = new EqualSizeJButton(UIManagerExt.getString(
                 CLASS_NAME + ".details_expand_text", errorMessage.getLocale()));
         
         details = new JXEditorPane();
@@ -287,7 +289,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
         details.setEditable(false);
         detailsPanel = new JPanel();
         detailsPanel.setVisible(false);
-        copyToClipboardButton = new JButton(UIManager.getString(
+        copyToClipboardButton = new JButton(UIManagerExt.getString(
                 CLASS_NAME + ".copy_to_clipboard_button_text", errorMessage.getLocale()));
         copyToClipboardListener = new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
@@ -462,8 +464,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
     }
     
     protected void configureReportAction(AbstractActionExt reportAction) {
-        //TODO localize
-        reportAction.setName(UIManager.getString(CLASS_NAME + ".report_button_text"));
+        reportAction.setName(UIManagerExt.getString(CLASS_NAME + ".report_button_text", pane.getLocale()));
     }
     
     //----------------------------------------------- private helper methods
@@ -523,10 +524,10 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
 
     protected void configureDetailsButton(boolean expanded) {
         if (expanded) {
-            detailButton.setText(UIManager.getString(
+            detailButton.setText(UIManagerExt.getString(
                     CLASS_NAME + ".details_contract_text", detailButton.getLocale()));
         } else {
-            detailButton.setText(UIManager.getString(
+            detailButton.setText(UIManagerExt.getString(
                     CLASS_NAME + ".details_expand_text", detailButton.getLocale()));
         }
     }
@@ -596,7 +597,7 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
         if (errorInfo == null) {
             iconLabel.setIcon(pane.getIcon());
             setErrorMessage("");
-            closeButton.setText(UIManager.getString(
+            closeButton.setText(UIManagerExt.getString(
                     CLASS_NAME + ".ok_button_text", closeButton.getLocale()));
             setDetails("");
             //TODO Does this ever happen? It seems like if errorInfo is null and
@@ -605,10 +606,10 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
             //change the "closeButton"'s text to either the default "ok"/"close" text
             //or to the "fatal" text depending on the error level of the incident info
             if (errorInfo.getErrorLevel() == ErrorLevel.FATAL) {
-                closeButton.setText(UIManager.getString(
+                closeButton.setText(UIManagerExt.getString(
                         CLASS_NAME + ".fatal_button_text", closeButton.getLocale()));
             } else {
-                closeButton.setText(UIManager.getString(
+                closeButton.setText(UIManagerExt.getString(
                         CLASS_NAME + ".ok_button_text", closeButton.getLocale()));
             }
             

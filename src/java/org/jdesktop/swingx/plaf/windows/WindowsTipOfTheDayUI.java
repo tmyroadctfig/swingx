@@ -40,6 +40,7 @@ import javax.swing.plaf.ComponentUI;
 
 import org.jdesktop.swingx.JXTipOfTheDay;
 import org.jdesktop.swingx.JXTipOfTheDay.ShowOnStartupChoice;
+import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.plaf.basic.BasicTipOfTheDayUI;
 
 /**
@@ -77,7 +78,7 @@ public class WindowsTipOfTheDayUI extends BasicTipOfTheDayUI {
     
     // tip area
     JPanel rightPane = new JPanel(new BorderLayout());
-    JLabel didYouKnow = new JLabel(UIManager
+    JLabel didYouKnow = new JLabel(UIManagerExt
       .getString("TipOfTheDay.didYouKnowText", tipPane.getLocale()));
     didYouKnow.setPreferredSize(new Dimension(50, 32));
     didYouKnow.setOpaque(true);

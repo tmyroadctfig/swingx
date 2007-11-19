@@ -23,7 +23,6 @@ import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.LookAndFeel;
-import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 import javax.swing.plaf.BorderUIResource;
 
@@ -54,7 +53,7 @@ public class DatePickerAddon extends AbstractComponentAddon {
                         BorderFactory.createEmptyBorder(3, 3, 3, 3)))
         }));
         
-        UIManager.getDefaults().addResourceBundle(
+        UIManagerExt.addResourceBundle(
                 "org.jdesktop.swingx.plaf.basic.resources.DatePicker");
     }
 

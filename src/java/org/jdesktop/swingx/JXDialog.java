@@ -36,11 +36,11 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
-import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicOptionPaneUI;
 
 import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.swingx.plaf.UIManagerExt;
 
 /**
  * First cut for enhanced Dialog. The idea is to have a pluggable content
@@ -334,7 +334,7 @@ public class JXDialog extends JDialog {
      *    or key if no value is found.
      */
     protected String getUIString(String key, Locale locale) {
-        String text = UIManager.getString(UIPREFIX + key, locale);
+        String text = UIManagerExt.getString(UIPREFIX + key, locale);
         return text != null ? text : key;
     }
 

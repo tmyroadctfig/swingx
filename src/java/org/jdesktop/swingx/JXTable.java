@@ -114,6 +114,7 @@ import org.jdesktop.swingx.decorator.SortOrder;
 import org.jdesktop.swingx.event.TableColumnModelExtListener;
 import org.jdesktop.swingx.icon.ColumnControlIcon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.renderer.ButtonProvider;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.FormatStringValue;
@@ -985,7 +986,7 @@ public class JXTable extends JTable
      *    or key if no value is found.
      */
     protected String getUIString(String key, Locale locale) {
-        String text = UIManager.getString(UIPREFIX + key, locale);
+        String text = UIManagerExt.getString(UIPREFIX + key, locale);
         return text != null ? text : key;
     }
     /** 

@@ -20,18 +20,25 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Dimension;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.Locale;
+
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.action.ActionContainerFactory;
 import org.jdesktop.swingx.action.BoundAction;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
-
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import java.awt.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.Locale;
+import org.jdesktop.swingx.plaf.UIManagerExt;
 
 /**
  * Common base class of ui clients.
@@ -153,7 +160,7 @@ public abstract class AbstractPatternPanel extends JXPanel {
      *    or key if no value is found.
      */
     protected String getUIString(String key, Locale locale) {
-        String text = UIManager.getString(PatternModel.SEARCH_PREFIX + key, locale);
+        String text = UIManagerExt.getString(PatternModel.SEARCH_PREFIX + key, locale);
         return text != null ? text : key;
     }
 

@@ -35,6 +35,7 @@ import javax.swing.plaf.ComponentUI;
 
 import org.jdesktop.swingx.JXLoginPane;
 import org.jdesktop.swingx.plaf.LoginPaneUI;
+import org.jdesktop.swingx.plaf.UIManagerExt;
 /**
  * Base implementation of the <code>JXLoginPane</code> UI.
  *
@@ -73,12 +74,12 @@ public class BasicLoginPaneUI extends LoginPaneUI {
     protected void installDefaults() {
         String s = dlg.getBannerText();
         if (s == null || s.equals("")) {
-            dlg.setBannerText(UIManager.getString("JXLoginPane.bannerString", dlg.getLocale()));
+            dlg.setBannerText(UIManagerExt.getString("JXLoginPane.bannerString", dlg.getLocale()));
         }
         
         s = dlg.getErrorMessage();
         if (s == null || s.equals("")) {
-            dlg.setErrorMessage(UIManager.getString("JXLoginPane.errorMessage", dlg.getLocale()));
+            dlg.setErrorMessage(UIManagerExt.getString("JXLoginPane.errorMessage", dlg.getLocale()));
         }
     }
     

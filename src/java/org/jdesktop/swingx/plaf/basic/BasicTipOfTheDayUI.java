@@ -61,6 +61,7 @@ import javax.swing.plaf.basic.BasicHTML;
 import org.jdesktop.swingx.JXTipOfTheDay;
 import org.jdesktop.swingx.JXTipOfTheDay.ShowOnStartupChoice;
 import org.jdesktop.swingx.plaf.TipOfTheDayUI;
+import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.tips.TipOfTheDayModel.Tip;
 import org.jdesktop.swingx.util.UIManagerUtils;
 
@@ -95,7 +96,7 @@ public class BasicTipOfTheDayUI extends TipOfTheDayUI {
   protected JDialog createDialog(Component parentComponent,
     final ShowOnStartupChoice choice,
     boolean showPreviousButton) {    
-    String title = UIManager.getString("TipOfTheDay.dialogTitle", parentComponent.getLocale());
+    String title = UIManagerExt.getString("TipOfTheDay.dialogTitle", parentComponent.getLocale());
 
     final JDialog dialog;
 
@@ -125,7 +126,7 @@ public class BasicTipOfTheDayUI extends TipOfTheDayUI {
     dialog.add("South", controls);
 
     if (choice != null) {
-      showOnStartupBox = new JCheckBox(UIManager
+      showOnStartupBox = new JCheckBox(UIManagerExt
         .getString("TipOfTheDay.showOnStartupText", parentComponent.getLocale()), choice
         .isShowingOnStartup());
       controls.add(showOnStartupBox, BorderLayout.CENTER);
@@ -138,18 +139,18 @@ public class BasicTipOfTheDayUI extends TipOfTheDayUI {
     controls.add(buttons, BorderLayout.LINE_END);
     
     if (showPreviousButton) {
-      JButton previousTipButton = new JButton(UIManager
+      JButton previousTipButton = new JButton(UIManagerExt
         .getString("TipOfTheDay.previousTipText", parentComponent.getLocale()));
       buttons.add(previousTipButton);
       previousTipButton.addActionListener(getActionMap().get("previousTip"));
     }
     
-    JButton nextTipButton = new JButton(UIManager
+    JButton nextTipButton = new JButton(UIManagerExt
       .getString("TipOfTheDay.nextTipText", parentComponent.getLocale()));
     buttons.add(nextTipButton);
     nextTipButton.addActionListener(getActionMap().get("nextTip"));
     
-    JButton closeButton = new JButton(UIManager
+    JButton closeButton = new JButton(UIManagerExt
       .getString("TipOfTheDay.closeText", parentComponent.getLocale()));
     buttons.add(closeButton);
     
@@ -232,7 +233,7 @@ public class BasicTipOfTheDayUI extends TipOfTheDayUI {
     tipPane.setLayout(new BorderLayout());
 
     // tip icon
-    JLabel tipIcon = new JLabel(UIManager
+    JLabel tipIcon = new JLabel(UIManagerExt
       .getString("TipOfTheDay.didYouKnowText", tipPane.getLocale()));
     tipIcon.setIcon(UIManager.getIcon("TipOfTheDay.icon"));
     tipIcon.setBorder(BorderFactory.createEmptyBorder(22, 15, 22, 15));

@@ -57,6 +57,7 @@ import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.plaf.DatePickerAddon;
 import org.jdesktop.swingx.plaf.DatePickerUI;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.util.Contract;
 
 /**
@@ -233,7 +234,7 @@ public class JXDatePicker extends JComponent {
         _monthView = new JXMonthView();
         _monthView.setTraversable(true);
 
-        String linkFormat = UIManager.getString(
+        String linkFormat = UIManagerExt.getString(
                 "JXDatePicker.linkFormat", getLocale());
         
         if (linkFormat != null) {

@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JFormattedTextField;
-import javax.swing.UIManager;
 
+import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.util.Contract;
 
 /**
@@ -158,7 +158,7 @@ public class DatePickerFormatter extends
      */
     private void addFormat(List<DateFormat> f, String key) {
         //TODO localize
-        String longFormat = UIManager.getString(key);
+        String longFormat = UIManagerExt.getString(key);
         try {
             SimpleDateFormat format = new SimpleDateFormat(longFormat);
             f.add(format);

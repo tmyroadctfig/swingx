@@ -71,7 +71,7 @@ public class LoginPaneAddon extends AbstractComponentAddon {
     }));
     
     
-    UIManager.getDefaults().addResourceBundle(
+    UIManagerExt.addResourceBundle(
         "org.jdesktop.swingx.plaf.basic.resources.LoginPane");
   }
   

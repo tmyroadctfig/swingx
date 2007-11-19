@@ -35,6 +35,7 @@ import javax.swing.UIManager;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
 
@@ -114,7 +115,7 @@ public class XLocalizeTest extends InteractiveTestCase {
         // of AbstractPatternPanel subclasses ...
         findPanel.addNotify();
         String name = dialog.getTitle();
-        String uiValue = UIManager.getString(prefix + titleKey, findPanel
+        String uiValue = UIManagerExt.getString(prefix + titleKey, findPanel
                 .getLocale());
         // sanity
         assertNotNull(uiValue);
@@ -127,7 +128,7 @@ public class XLocalizeTest extends InteractiveTestCase {
                 // wrong assumption: find widgets name is changed as well
 //                assertTrue("locale property changed, instead: " + evt.getPropertyName(), "locale".equals(evt.getPropertyName()));
                 if (!"locale".equals(evt.getPropertyName())) return;
-                String altUIValue = UIManager.getString(prefix + titleKey,
+                String altUIValue = UIManagerExt.getString(prefix + titleKey,
                         alternative);
                 String altName = dialog.getTitle();
                 assertEquals("name must be updated before fire propertyChange", 
@@ -160,7 +161,7 @@ public class XLocalizeTest extends InteractiveTestCase {
         
         final Action action = findPanel.getActionMap().get(actionCommand);
         String name = (String) action.getValue(Action.NAME);
-        String uiValue = UIManager.getString(prefix + actionCommand, findPanel
+        String uiValue = UIManagerExt.getString(prefix + actionCommand, findPanel
                 .getLocale());
         // sanity
         assertNotNull(uiValue);
@@ -172,7 +173,7 @@ public class XLocalizeTest extends InteractiveTestCase {
                 // sanity
 //                assertTrue("locale property changed", "locale".equals(evt.getPropertyName()));
                 if (!"locale".equals(evt.getPropertyName())) return;
-                String altUIValue = UIManager.getString(prefix + actionCommand,
+                String altUIValue = UIManagerExt.getString(prefix + actionCommand,
                         alternative);
                 String altName = (String) action.getValue(Action.NAME);
                 assertEquals("name must be updated before fire propertyChange", 
@@ -203,7 +204,7 @@ public class XLocalizeTest extends InteractiveTestCase {
         
         final Action action = findPanel.getActionMap().get(actionCommand);
         String name = (String) action.getValue(Action.NAME);
-        String uiValue = UIManager.getString(prefix + actionCommand, findPanel
+        String uiValue = UIManagerExt.getString(prefix + actionCommand, findPanel
                 .getLocale());
         // sanity
         assertNotNull(uiValue);
@@ -216,7 +217,7 @@ public class XLocalizeTest extends InteractiveTestCase {
                 // wrong assumption: find widgets name is changed as well
 //                assertTrue("locale property changed, instead: " + evt.getPropertyName(), "locale".equals(evt.getPropertyName()));
                 if (!"locale".equals(evt.getPropertyName())) return;
-                String altUIValue = UIManager.getString(prefix + actionCommand,
+                String altUIValue = UIManagerExt.getString(prefix + actionCommand,
                         alternative);
                 String altName = (String) action.getValue(Action.NAME);
                 assertEquals("name must be updated before fire propertyChange", 
@@ -242,7 +243,7 @@ public class XLocalizeTest extends InteractiveTestCase {
         
         Action action = table.getActionMap().get(actionCommand);
         String name = (String) action.getValue(Action.NAME);
-        String uiValue = UIManager.getString(prefix + actionCommand, table
+        String uiValue = UIManagerExt.getString(prefix + actionCommand, table
                 .getLocale());
         // sanity
         assertNotNull(uiValue);
@@ -268,7 +269,7 @@ public class XLocalizeTest extends InteractiveTestCase {
         
         final Action action = table.getActionMap().get(actionCommand);
         String name = (String) action.getValue(Action.NAME);
-        String uiValue = UIManager.getString(prefix + actionCommand, table
+        String uiValue = UIManagerExt.getString(prefix + actionCommand, table
                 .getLocale());
         // sanity
         assertNotNull(uiValue);
@@ -279,7 +280,7 @@ public class XLocalizeTest extends InteractiveTestCase {
             public void propertyChange(PropertyChangeEvent evt) {
                 // sanity
                 assertTrue("locale property changed", "locale".equals(evt.getPropertyName()));
-                String altUIValue = UIManager.getString(prefix + actionCommand,
+                String altUIValue = UIManagerExt.getString(prefix + actionCommand,
                         alternative);
                 String altName = (String) action.getValue(Action.NAME);
                 assertEquals("name must be updated before fire propertyChange", 
@@ -338,7 +339,7 @@ public class XLocalizeTest extends InteractiveTestCase {
     private void assertLocaleActionUpdate(JComponent table, String prefix, String actionCommand) {
         Action action = table.getActionMap().get(actionCommand);
         String name = (String) action.getValue(Action.NAME);
-        String uiValue = UIManager.getString(prefix + actionCommand, table
+        String uiValue = UIManagerExt.getString(prefix + actionCommand, table
                 .getLocale());
         // sanity
         assertNotNull(uiValue);
@@ -348,7 +349,7 @@ public class XLocalizeTest extends InteractiveTestCase {
             alternative = A_LOCALE;
         }
         table.setLocale(alternative);
-        String altUIValue = UIManager.getString(prefix + actionCommand,
+        String altUIValue = UIManagerExt.getString(prefix + actionCommand,
                 table.getLocale());
         // sanity
         assertNotNull(altUIValue);

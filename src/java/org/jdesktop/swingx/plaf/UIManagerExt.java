@@ -5,7 +5,13 @@ package org.jdesktop.swingx.plaf;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+import java.util.Vector;
 
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
@@ -30,8 +36,121 @@ import org.jdesktop.swingx.util.Contract;
  * @see UIDefaults
  */
 public class UIManagerExt {
+    private static class UIDefaultsExt {
+        //use vector; we want synchronization
+        private Vector<String> resourceBundles;
+
+        /**
+         * Maps from a Locale to a cached Map of the ResourceBundle. This is done
+         * so as to avoid an exception being thrown when a value is asked for.
+         * Access to this should be done while holding a lock on the
+         * UIDefaults, eg synchronized(this).
+         */
+        private Map<Locale, Map<String, String>> resourceCache;
+        
+        UIDefaultsExt() {
+            resourceCache = new HashMap<Locale, Map<String,String>>();
+        }
+        
+        private Object getFromResourceBundle(Object key, Locale l) {
+
+            if( resourceBundles == null ||
+                resourceBundles.isEmpty() ||
+                !(key instanceof String) ) {
+                return null;
+            }
+
+            // A null locale means use the default locale.
+            if( l == null ) {
+                    l = Locale.getDefault();
+            }
+
+            synchronized(this) {
+                return getResourceCache(l).get((String)key);
+            }
+        }
+
+        /**
+         * Returns a Map of the known resources for the given locale.
+         */
+        private Map<String, String> getResourceCache(Locale l) {
+            Map<String, String> values = (Map<String, String>) resourceCache.get(l);
+
+            if (values == null) {
+                values = new HashMap<String, String>();
+                for (int i=resourceBundles.size()-1; i >= 0; i--) {
+                    String bundleName = (String)resourceBundles.get(i);
+                    
+                    try {
+                        ResourceBundle b = ResourceBundle.
+                            getBundle(bundleName, l, UIManagerExt.class.getClassLoader());
+                        Enumeration<String> keys = b.getKeys();
+
+                        while (keys.hasMoreElements()) {
+                            String key = (String)keys.nextElement();
+
+                            if (values.get(key) == null) {
+                                Object value = b.getObject(key);
+
+                                values.put(key, (String) value);
+                            }
+                        }
+                    } catch( MissingResourceException mre ) {
+                        // Keep looking
+                    }
+                }
+                resourceCache.put(l, values);
+            }
+            return values;
+        }
+
+        public synchronized void addResourceBundle(String bundleName) {
+            if( bundleName == null ) {
+                return;
+            }
+            if( resourceBundles == null ) {
+                resourceBundles = new Vector<String>(5);
+            }
+            if (!resourceBundles.contains(bundleName)) {
+                resourceBundles.add( bundleName );
+                resourceCache.clear();
+            }
+        }
+        
+        public synchronized void removeResourceBundle( String bundleName ) {
+            if( resourceBundles != null ) {
+                resourceBundles.remove( bundleName );
+            }
+            resourceCache.clear();
+        }
+    }
+    
+    private static UIDefaultsExt uiDefaultsExt = new UIDefaultsExt();
+    
     private UIManagerExt() {
         //does nothing
+    }
+    
+    public static void addResourceBundle(String bundleName) {
+        uiDefaultsExt.addResourceBundle(bundleName);
+    }
+    
+    public static void removeResourceBundle(String bundleName) {
+        uiDefaultsExt.removeResourceBundle(bundleName);
+    }
+    
+    public static String getString(Object key) {
+        return getString(key, null);
+    }
+    
+    public static String getString(Object key, Locale l) {
+        String value = UIManager.getString(key, l);
+        
+        if (value == null) {
+            value = (String) uiDefaultsExt.getFromResourceBundle(key, l);
+        }
+        
+        return value;
     }
     
     /**

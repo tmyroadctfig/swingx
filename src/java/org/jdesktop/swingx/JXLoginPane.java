@@ -90,6 +90,7 @@ import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.plaf.LoginPaneAddon;
 import org.jdesktop.swingx.plaf.LoginPaneUI;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.util.WindowUtils;
 
 /**
@@ -306,39 +307,39 @@ public class JXLoginPane extends JXImagePanel {
      * in the Login panel.
      */
     private void reinitLocales(Locale l) {
-        setBannerText(UIManager.getString(CLASS_NAME + ".bannerString", getLocale()));
+        setBannerText(UIManagerExt.getString(CLASS_NAME + ".bannerString", getLocale()));
         banner.setImage(createLoginBanner());
         // TODO: Can't change the error message since it might have been already changed by the user!
         //errorMessageLabel.setText(UIManager.getString(CLASS_NAME + ".errorMessage", getLocale()));
-        progressMessageLabel.setText(UIManager.getString(CLASS_NAME + ".pleaseWait", getLocale()));
+        progressMessageLabel.setText(UIManagerExt.getString(CLASS_NAME + ".pleaseWait", getLocale()));
         recreateLoginPanel();
         Window w = SwingUtilities.getWindowAncestor(this);
         if (w instanceof JXLoginFrame) {
             JXLoginFrame f = (JXLoginFrame) w;
-            f.setTitle(UIManager.getString(CLASS_NAME + ".titleString", getLocale()));
+            f.setTitle(UIManagerExt.getString(CLASS_NAME + ".titleString", getLocale()));
             if (buttonPanel != null) {
-                buttonPanel.getOk().setText(UIManager.getString(CLASS_NAME + ".loginString", getLocale()));
-                buttonPanel.getCancel().setText(UIManager.getString(CLASS_NAME + ".cancelString", getLocale()));
+                buttonPanel.getOk().setText(UIManagerExt.getString(CLASS_NAME + ".loginString", getLocale()));
+                buttonPanel.getCancel().setText(UIManagerExt.getString(CLASS_NAME + ".cancelString", getLocale()));
             }
         }
         JLabel lbl = (JLabel) passwordField.getClientProperty("labeledBy");
         if (lbl != null) {
-            lbl.setText(UIManager.getString(CLASS_NAME + ".passwordString", getLocale()));
+            lbl.setText(UIManagerExt.getString(CLASS_NAME + ".passwordString", getLocale()));
         }
         lbl = (JLabel) namePanel.getComponent().getClientProperty("labeledBy");
         if (lbl != null) {
-            lbl.setText(UIManager.getString(CLASS_NAME + ".nameString", getLocale()));
+            lbl.setText(UIManagerExt.getString(CLASS_NAME + ".nameString", getLocale()));
         }
         if (serverCombo != null) {
             lbl = (JLabel) serverCombo.getClientProperty("labeledBy");
             if (lbl != null) {
-                lbl.setText(UIManager.getString(CLASS_NAME + ".serverString", getLocale()));
+                lbl.setText(UIManagerExt.getString(CLASS_NAME + ".serverString", getLocale()));
             }
         }
-        saveCB.setText(UIManager.getString(CLASS_NAME + ".rememberPasswordString", getLocale()));
+        saveCB.setText(UIManagerExt.getString(CLASS_NAME + ".rememberPasswordString", getLocale()));
         // by default, caps is initialized in off state - i.e. without warning. Setting to 
         // whitespace preserves formatting of the panel.
-        capsOn.setText(isCapsLockOn() ? UIManager.getString(CLASS_NAME + ".capsOnWarning", getLocale()) : " ");
+        capsOn.setText(isCapsLockOn() ? UIManagerExt.getString(CLASS_NAME + ".capsOnWarning", getLocale()) : " ");
     }
     
     //--------------------------------------------------------- Constructors
@@ -442,7 +443,7 @@ public class JXLoginPane extends JXImagePanel {
      */
     private void setCapsLock(boolean b) {
         caps = b;
-        capsOn.setText(caps ? UIManager.getString(CLASS_NAME + ".capsOnWarning", getLocale()) : " ");
+        capsOn.setText(caps ? UIManagerExt.getString(CLASS_NAME + ".capsOnWarning", getLocale()) : " ");
     }
     
     /**
@@ -543,16 +544,16 @@ public class JXLoginPane extends JXImagePanel {
         } else {
             namePanel = new ComboNamePanel(userNameStore);
         }
-        JLabel nameLabel = new JLabel(UIManager.getString(CLASS_NAME + ".nameString", getLocale()));
+        JLabel nameLabel = new JLabel(UIManagerExt.getString(CLASS_NAME + ".nameString", getLocale()));
         nameLabel.setLabelFor(namePanel.getComponent());
         
         //create the password component
         passwordField = new JPasswordField("", 15);
-        JLabel passwordLabel = new JLabel(UIManager.getString(CLASS_NAME + ".passwordString", getLocale()));
+        JLabel passwordLabel = new JLabel(UIManagerExt.getString(CLASS_NAME + ".passwordString", getLocale()));
         passwordLabel.setLabelFor(passwordField);
         
         //create the server combo box if necessary
-        JLabel serverLabel = new JLabel(UIManager.getString(CLASS_NAME + ".serverString", getLocale()));
+        JLabel serverLabel = new JLabel(UIManagerExt.getString(CLASS_NAME + ".serverString", getLocale()));
         if (servers.size() > 1) {
             serverCombo = new JComboBox(servers.toArray());
             serverLabel.setLabelFor(serverCombo);
@@ -561,7 +562,7 @@ public class JXLoginPane extends JXImagePanel {
         }
         
         //create the save check box. By default, it is not selected
-        saveCB = new JCheckBox(UIManager.getString(CLASS_NAME + ".rememberPasswordString", getLocale()));
+        saveCB = new JCheckBox(UIManagerExt.getString(CLASS_NAME + ".rememberPasswordString", getLocale()));
         saveCB.setIconTextGap(10);
         saveCB.setSelected(false); //TODO should get this from prefs!!! And, it should be based on the user
         //determine whether to show/hide the save check box based on the SaveMode
@@ -694,7 +695,7 @@ public class JXLoginPane extends JXImagePanel {
         loginPanel = createLoginPanel();
         
         //create the message and hyperlink and hide them
-        errorMessageLabel = new JXLabel(UIManager.getString(CLASS_NAME + ".errorMessage", getLocale())); 
+        errorMessageLabel = new JXLabel(UIManagerExt.getString(CLASS_NAME + ".errorMessage", getLocale())); 
         errorMessageLabel.setIcon(UIManager.getIcon(CLASS_NAME + ".errorIcon", getLocale()));
         errorMessageLabel.setVerticalTextPosition(SwingConstants.TOP);
         errorMessageLabel.setLineWrap(true);
@@ -715,7 +716,7 @@ public class JXLoginPane extends JXImagePanel {
         
         //create the progress panel
         progressPanel = new JXPanel(new GridBagLayout());
-        progressMessageLabel = new JLabel(UIManager.getString(CLASS_NAME + ".pleaseWait", getLocale()));
+        progressMessageLabel = new JLabel(UIManagerExt.getString(CLASS_NAME + ".pleaseWait", getLocale()));
         progressMessageLabel.setFont(UIManager.getFont("JXLoginPane.pleaseWaitFont", getLocale()));
         JProgressBar pb = new JProgressBar();
         pb.setIndeterminate(true);
@@ -1046,7 +1047,7 @@ public class JXLoginPane extends JXImagePanel {
         oldCursor = getCursor();
         try {
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            progressMessageLabel.setText(UIManager.getString(CLASS_NAME + ".pleaseWait", getLocale()));
+            progressMessageLabel.setText(UIManagerExt.getString(CLASS_NAME + ".pleaseWait", getLocale()));
             String name = getUserName();
             char[] password = getPassword();
             String server = servers.size() == 1 ? servers.get(0) : serverCombo == null ? null : (String)serverCombo.getSelectedItem();
@@ -1065,7 +1066,7 @@ public class JXLoginPane extends JXImagePanel {
      * with the LoginService's cancelAuthentication method
      */
     protected void cancelLogin() {
-        progressMessageLabel.setText(UIManager.getString(CLASS_NAME + ".cancelWait", getLocale()));
+        progressMessageLabel.setText(UIManagerExt.getString(CLASS_NAME + ".cancelWait", getLocale()));
         getActionMap().get(CANCEL_LOGIN_ACTION_COMMAND).setEnabled(false);
         loginService.cancelAuthentication();
         setCursor(oldCursor);
@@ -1211,7 +1212,7 @@ public class JXLoginPane extends JXImagePanel {
     private static final class LoginAction extends AbstractActionExt {
     private JXLoginPane panel;
     public LoginAction(JXLoginPane p) {
-        super(UIManager.getString(CLASS_NAME + ".loginString", p.getLocale()), LOGIN_ACTION_COMMAND); 
+        super(UIManagerExt.getString(CLASS_NAME + ".loginString", p.getLocale()), LOGIN_ACTION_COMMAND); 
         this.panel = p;
     }
     public void actionPerformed(ActionEvent e) {
@@ -1433,7 +1434,7 @@ public class JXLoginPane extends JXImagePanel {
         }
         
     protected void init(JXLoginPane p) {
-        setTitle(UIManager.getString(CLASS_NAME + ".titleString", getLocale())); 
+        setTitle(UIManagerExt.getString(CLASS_NAME + ".titleString", getLocale())); 
         this.panel = p;
         initWindow(this, panel);
     }
@@ -1447,7 +1448,7 @@ public class JXLoginPane extends JXImagePanel {
         private JXLoginPane panel;
     
         public JXLoginFrame(JXLoginPane p) {
-            super(UIManager.getString(CLASS_NAME + ".titleString", p.getLocale())); 
+            super(UIManagerExt.getString(CLASS_NAME + ".titleString", p.getLocale())); 
             this.panel = p;
             initWindow(this, panel);
         }
@@ -1475,7 +1476,7 @@ public class JXLoginPane extends JXImagePanel {
         w.add(panel, BorderLayout.CENTER);
         JButton okButton = new JButton(panel.getActionMap().get(LOGIN_ACTION_COMMAND));
         final JButton cancelButton = new JButton(
-                UIManager.getString(CLASS_NAME + ".cancelString", panel.getLocale()));
+                UIManagerExt.getString(CLASS_NAME + ".cancelString", panel.getLocale()));
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //change panel status to cancelled!

@@ -24,11 +24,13 @@ import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.GraphicsConfiguration;
 import java.awt.HeadlessException;
+
 import javax.swing.JDialog;
-import javax.swing.UIManager;
+
 import org.jdesktop.swingx.auth.LoginService;
 import org.jdesktop.swingx.auth.PasswordStore;
 import org.jdesktop.swingx.auth.UserNameStore;
+import org.jdesktop.swingx.plaf.UIManagerExt;
 
 /**
  * A standard login dialog that provides a reasonable amount of flexibility
@@ -309,7 +311,7 @@ public class JXLoginDialog extends JDialog {
      */
     public JXLoginDialog(LoginService service, PasswordStore ps, UserNameStore us) {
         super();
-        setTitle(UIManager.getString(
+        setTitle(UIManagerExt.getString(
                 JXLoginPane.class.getCanonicalName() + ".loginString", getLocale())); 
         setPanel(new JXLoginPane(service, ps, us));
         JXLoginPane.initWindow(this, getPanel());

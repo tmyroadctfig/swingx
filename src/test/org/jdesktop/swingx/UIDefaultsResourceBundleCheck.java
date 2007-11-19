@@ -6,8 +6,7 @@ package org.jdesktop.swingx;
 
 import java.util.Locale;
 
-import javax.swing.UIManager;
-
+import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.resources.swingx;
 
 /**
@@ -26,17 +25,17 @@ public class UIDefaultsResourceBundleCheck {
      *                unused
      */
     public static void main(String[] args) {
-        UIManager.getDefaults().addResourceBundle(
+        UIManagerExt.addResourceBundle(
                 swingx.class.getName());
-        System.out.println(UIManager.getString("LoginPane.1"));
-        System.out.println(UIManager.getString("LoginPane.1", Locale.US));
-        System.out.println(UIManager.getString("LoginPane.1", Locale.GERMAN));
-        System.out.println(UIManager.getString("LoginPane.1", Locale.GERMANY));
-        System.out.println(UIManager.getString("LoginPane.1", Locale.FRENCH));
-        System.out.println(UIManager.getString("LoginPane.1", Locale.FRANCE));
-        System.out.println(UIManager.getString("LoginPane.1", Locale.CANADA_FRENCH));
-        System.out.println(UIManager.getString("LoginPane.1", new Locale("pt")));
-        System.out.println(UIManager.getString("LoginPane.1", new Locale("pt", "BR")));
-        System.out.println(UIManager.getString("LoginPane.1", Locale.KOREAN));
+        System.out.println(UIManagerExt.getString("LoginPane.1"));
+        System.out.println(UIManagerExt.getString("LoginPane.1", Locale.US));
+        System.out.println(UIManagerExt.getString("LoginPane.1", Locale.GERMAN));
+        System.out.println(UIManagerExt.getString("LoginPane.1", Locale.GERMANY));
+        System.out.println(UIManagerExt.getString("LoginPane.1", Locale.FRENCH));
+        System.out.println(UIManagerExt.getString("LoginPane.1", Locale.FRANCE));
+        System.out.println(UIManagerExt.getString("LoginPane.1", Locale.CANADA_FRENCH));
+        System.out.println(UIManagerExt.getString("LoginPane.1", new Locale("pt")));
+        System.out.println(UIManagerExt.getString("LoginPane.1", new Locale("pt", "BR")));
+        System.out.println(UIManagerExt.getString("LoginPane.1", Locale.KOREAN));
     }
 }
