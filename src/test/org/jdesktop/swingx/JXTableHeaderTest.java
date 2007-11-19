@@ -159,7 +159,7 @@ public class JXTableHeaderTest extends InteractiveTestCase {
         JXTable table = new JXTable();
         table.setColumnControlVisible(true);
         wrapWithScrollingInFrame(table, "");
-        assertEquals("headerHeight must be > 0", 16, table.getTableHeader().getHeight());
+        assertTrue("headerHeight must be > 0", table.getTableHeader().getHeight() > 0);
         assertEquals("headerWidth must be table width", 
                 table.getWidth(), table.getTableHeader().getWidth());
         
@@ -184,9 +184,9 @@ public class JXTableHeaderTest extends InteractiveTestCase {
         JXTable table = new JXTable(10, 2);
         table.setColumnControlVisible(true);
         wrapWithScrollingInFrame(table, "");
-        assertEquals("headerHeight must be > 0", 16, table.getTableHeader().getHeight());
+        assertTrue("headerHeight must be > 0", table.getTableHeader().getHeight() > 0);
         table.setModel(new DefaultTableModel());
-        assertEquals("headerHeight must be > 0", 16, table.getTableHeader().getHeight());
+        assertTrue("headerHeight must be > 0", table.getTableHeader().getHeight() > 0);
         
     }
     
