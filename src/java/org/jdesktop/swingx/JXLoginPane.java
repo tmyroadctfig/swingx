@@ -20,7 +20,6 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
@@ -35,14 +34,12 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.Robot;
-import java.awt.Toolkit;
 import java.awt.Window;
-import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -120,9 +117,9 @@ import org.jdesktop.swingx.util.WindowUtils;
  */
 public class JXLoginPane extends JXImagePanel {
     
-    /**
-     * The Logger
-     */
+	/**
+	 * The Logger
+	 */
     private static final Logger LOG = Logger.getLogger(JXLoginPane.class.getName());
     /**
      * Comment for <code>serialVersionUID</code>
@@ -267,22 +264,19 @@ public class JXLoginPane extends JXImagePanel {
      * The default login listener used by this panel.
      */
     private LoginListener defaultLoginListener;
-    private CapsOnTestListener capsOnTestListener = new CapsOnTestListener();
+    private CapsOnTest capsOnTest = new CapsOnTest();
     private boolean caps;
     private boolean isTestingCaps;
-    private AWTEventListener capsOnListener = new AWTEventListener() {
-        public void eventDispatched(AWTEvent event) {
-            if (!(event instanceof KeyEvent)) {
-                return;
-            }
-            KeyEvent e = (KeyEvent)event;
+    private KeyEventDispatcher capsOnListener = new KeyEventDispatcher() {
+        public boolean dispatchKeyEvent(KeyEvent e) {
             if (e.getID() != KeyEvent.KEY_PRESSED) {
-                return;
+                return false;
             }
             if (e.getKeyCode() == 20) {
                 setCapsLock(!isCapsLockOn());
             }
-        }};
+            return false;
+		}};
 	/**
 	 * Caps lock detection support
 	 */
@@ -293,15 +287,11 @@ public class JXLoginPane extends JXImagePanel {
 	 * Login/cancel control pane;
 	 */
 	private JXBtnPanel buttonPanel;
-	private WindowFocusListener capsOnWinListener = new WindowFocusListener() {
-
-		public void windowGainedFocus(WindowEvent e) {
-			capsOnTestListener.focusGained(null);
-		}
-
-		public void windowLostFocus(WindowEvent e) {
-			// ignore
-		}};
+	/**
+	 * Window event listener responsible for triggering caps lock test on vindow activation and 
+	 * focus changes.
+	 */
+	private CapsOnWinListener capsOnWinListener = new CapsOnWinListener(capsOnTest);
 	private boolean initDone;
     
     /**
@@ -422,6 +412,7 @@ public class JXLoginPane extends JXImagePanel {
         setPasswordStore(passwordStore);
         setUserNameStore(userStore);
         setServers(servers);
+        
         
         //create the login and cancel actions, and add them to the action map
         getActionMap().put(LOGIN_ACTION_COMMAND, createLoginAction());
@@ -549,17 +540,14 @@ public class JXLoginPane extends JXImagePanel {
         //create the NameComponent
         if (saveMode == SaveMode.NONE) {
             namePanel = new SimpleNamePanel();
-            namePanel.getComponent().addFocusListener(capsOnTestListener);
         } else {
             namePanel = new ComboNamePanel(userNameStore);
-            ((JComboBox) namePanel).getEditor().getEditorComponent().addFocusListener(capsOnTestListener);
         }
         JLabel nameLabel = new JLabel(UIManager.getString(CLASS_NAME + ".nameString", getLocale()));
         nameLabel.setLabelFor(namePanel.getComponent());
         
         //create the password component
         passwordField = new JPasswordField("", 15);
-        passwordField.addFocusListener(capsOnTestListener);
         JLabel passwordLabel = new JLabel(UIManager.getString(CLASS_NAME + ".passwordString", getLocale()));
         passwordLabel.setLabelFor(passwordField);
         
@@ -722,7 +710,7 @@ public class JXLoginPane extends JXImagePanel {
         contentPanel.add(messageLabel);
         loginPanel.setBorder(BorderFactory.createEmptyBorder(0, 36, 7, 11));
         contentPanel.add(loginPanel);
-        errorMessageLabel.setBorder(UIManager.getBorder(CLASS_NAME + ".errorBorder", getLocale())); 
+        errorMessageLabel.setBorder(UIManager.getBorder(CLASS_NAME + ".errorBorder", getLocale()));
         contentPanel.add(errorMessageLabel);
         
         //create the progress panel
@@ -1099,13 +1087,15 @@ public class JXLoginPane extends JXImagePanel {
     	try {
 	    	// TODO: keep it here until all ui stuff is moved to uidelegate.
     		if (capsLockSupport)
-    			Toolkit.getDefaultToolkit().removeAWTEventListener(capsOnListener);
+    			KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(capsOnListener);
     	    Container c = JXLoginPane.this;
     	    while (c.getParent() != null) {
     	    	c = c.getParent();
     	    }
     	    if (c instanceof Window) {
-    	    	((Window) c).addWindowFocusListener(capsOnWinListener );
+    	    	Window w = (Window) c;
+    	    	w.removeWindowFocusListener(capsOnWinListener );
+    	    	w.removeWindowListener(capsOnWinListener );
     	    }
     	} catch (Exception e) {
     		// bail out probably in unsigned app distributed over web
@@ -1115,13 +1105,16 @@ public class JXLoginPane extends JXImagePanel {
     
     public void addNotify() {
     	try {
-    	    Toolkit.getDefaultToolkit().addAWTEventListener(capsOnListener, AWTEvent.KEY_EVENT_MASK);
+    		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(
+    				capsOnListener);
     	    Container c = JXLoginPane.this;
     	    while (c.getParent() != null) {
     	    	c = c.getParent();
     	    }
     	    if (c instanceof Window) {
-    	    	((Window) c).addWindowFocusListener(capsOnWinListener );
+    	    	Window w = (Window) c;
+    	    	w.addWindowFocusListener(capsOnWinListener );
+    	    	w.addWindowListener(capsOnWinListener);
     	    }
     	} catch (Exception e) {
     		// probably unsigned app over web, disable capslock support and bail out
@@ -1597,9 +1590,9 @@ public class JXLoginPane extends JXImagePanel {
         
     }
     
-    private class CapsOnTestListener extends FocusAdapter {
+    private class CapsOnTest {
 
-        public void focusGained(FocusEvent e) {
+        public void runTest() {
             boolean success = false;
         	// there's an issue with this - http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4414164
         	// TODO: check the progress from time to time
@@ -1613,26 +1606,25 @@ public class JXLoginPane extends JXImagePanel {
             if (!success) {
 	            try {
 	            	//Temporarily installed listener with auto-uninstall after test is finished.
-	                Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
+	            	KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(
+            			new KeyEventDispatcher() {
 	
-	                    public void eventDispatched(AWTEvent event) {
-	                        if (!(event instanceof KeyEvent)) {
-	                            return;
-	                        }
-	                        KeyEvent e = (KeyEvent)event;
+   						public boolean dispatchKeyEvent(KeyEvent e) {
 	                        if (e.getID() != KeyEvent.KEY_PRESSED) {
-	                            return;
+	                            return true;
 	                        }
 	                        if (isTestingCaps && e.getKeyCode() > 64 && e.getKeyCode() < 91) {
 	                            setCapsLock (!e.isShiftDown() && Character.isUpperCase(e.getKeyChar()));
 	                        }
-	                        if (isTestingCaps && e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+	                        if (isTestingCaps && (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)) {
 	                        	//uninstall
 	                        	isTestingCaps = false;
-	                        	Toolkit.getDefaultToolkit().removeAWTEventListener(this);
+	                        	KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(this);
 	                        }
+	                        return true;
 	                        
-	                    }}, AWTEvent.KEY_EVENT_MASK);
+	                    }});
+
 	                Robot r = new Robot();
 	                isTestingCaps = true;
 	                r.keyPress(65);
@@ -1647,4 +1639,34 @@ public class JXLoginPane extends JXImagePanel {
 
         }
     }
+
+    /**
+     * Window event listener to invoke capslock test when login panel get activated.
+     */
+    public static class CapsOnWinListener extends WindowAdapter implements
+			WindowFocusListener {
+		private CapsOnTest cot;
+		private long stamp;
+
+		public CapsOnWinListener(CapsOnTest cot) {
+			this.cot = cot;
+		}
+
+		public void windowActivated(WindowEvent e) {
+			cot.runTest();
+			stamp = System.currentTimeMillis();
+		}
+
+		public void windowGainedFocus(WindowEvent e) {
+			// repeat test only if more then 20ms passed between activation test and now.
+			if (stamp + 20 < System.currentTimeMillis()) {
+				cot.runTest();
+			}
+		}
+
+		public void windowLostFocus(WindowEvent e) {
+			// ignore
+		}
+
+	}
 }
