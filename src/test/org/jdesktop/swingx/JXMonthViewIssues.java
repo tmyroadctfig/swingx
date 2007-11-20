@@ -21,8 +21,10 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -37,6 +39,7 @@ import java.util.logging.Logger;
 import javax.swing.Action;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.action.AbstractActionExt;
@@ -68,8 +71,8 @@ public class JXMonthViewIssues extends InteractiveTestCase {
 //      setSystemLF(true);
       JXMonthViewIssues  test = new JXMonthViewIssues();
       try {
-//          test.runInteractiveTests();
-        test.runInteractiveTests("interactive.*TimeZone.*");
+          test.runInteractiveTests();
+//        test.runInteractiveTests("interactive.*TimeZone.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -180,15 +183,93 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         return zoneIds.toArray(new String[zoneIds.size()]);
     }
     
-    public void interactiveSimple() {
-        JXMonthView month = new JXMonthView();
+    /**
+     * Issue #659-swingx: lastDisplayedDate must be synched.
+     * 
+     */
+    public void interactiveLastDisplayed() {
+        final JXMonthView month = new JXMonthView();
         month.setTraversable(true);
-        showInFrame(month, "default - for debugging only");
+        Action action = new AbstractActionExt("check lastDisplayed") {
+
+            public void actionPerformed(ActionEvent e) {
+                Calendar cal = Calendar.getInstance();
+                cal.setTimeInMillis(month.getLastDisplayedDate());
+                Date viewLast = cal.getTime();
+                cal.setTimeInMillis(month.getUI().calculateLastDisplayedDate());
+                Date uiLast = cal.getTime();
+                if (!uiLast.equals(viewLast))
+                LOG.info("last(view/ui): " + viewLast + "/" + uiLast);
+                
+            }
+            
+        };
+        JXFrame frame = wrapInFrame(month, "default - for debugging only");
+        addAction(frame, action);
+        frame.setVisible(true);
     }
 
 //----------------------
     
-
+    /**
+     * Issue #659-swingx: lastDisplayedDate must be synched.
+     * test that lastDisplayed from monthView is same as lastDisplayed from ui.
+     * 
+     * Here: initial packed size - one month shown.
+     * 
+     * @throws InvocationTargetException 
+     * @throws InterruptedException 
+     */
+    public void testLastDisplayedDateInitial() throws InterruptedException, InvocationTargetException {
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run lastDisplayedDate - headless");
+            return;
+        }
+        final JXMonthView monthView = new JXMonthView();
+        final JXFrame frame = wrapInFrame(monthView, "");
+        frame.setVisible(true);
+        SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+                long uiLast = monthView.getUI().calculateLastDisplayedDate();
+                long viewLast = monthView.getLastDisplayedDate();
+                assertEquals(uiLast, viewLast);
+            }
+        });
+    }
+    
+    /**
+     * 
+     * Issue #659-swingx: lastDisplayedDate must be synched.
+     * 
+     * test that lastDisplayed from monthView is same as lastDisplayed from ui.
+     * 
+     * Here: change the size of the view which allows the ui to display more
+     * columns/rows.
+     * 
+     * @throws InvocationTargetException 
+     * @throws InterruptedException 
+     */
+    public void testLastDisplayedDateSizeChanged() throws InterruptedException, InvocationTargetException {
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run lastDisplayedDate - headless");
+            return;
+        }
+        final JXMonthView monthView = new JXMonthView();
+        final JXFrame frame = wrapInFrame(monthView, "");
+        frame.setVisible(true);
+        frame.setSize(frame.getWidth() * 3, frame.getHeight() * 2);
+        // force a revalidate
+        frame.invalidate();
+        frame.validate();
+        SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+                long uiLast = monthView.getUI().calculateLastDisplayedDate();
+                long viewLast = monthView.getLastDisplayedDate();
+                assertEquals(uiLast, viewLast);
+            }
+        });
+    }
+    
    /**
     * Characterize MonthView: initial firstDisplayedDate set to 
     * first day in the month of the current date.

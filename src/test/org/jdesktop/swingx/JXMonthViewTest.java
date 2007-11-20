@@ -75,6 +75,53 @@ public class JXMonthViewTest extends MockObjectTestCase {
     }
 
     /**
+     * safety net: refactor ensureDateVisible
+     */
+    public void testEnsureDateVisibleNextYear() {
+        JXMonthView monthView = new JXMonthView();
+        Calendar temp = (Calendar) cal.clone();
+        CalendarUtils.startOfMonth(temp);
+        assertEquals(monthView.getFirstDisplayedDate(), temp.getTimeInMillis());
+        cal.add(Calendar.YEAR, 1);
+        Date nextYear = cal.getTime();
+        temp = (Calendar) cal.clone();
+        CalendarUtils.startOfMonth(temp);
+        monthView.ensureDateVisible(nextYear.getTime());
+        assertEquals(monthView.getFirstDisplayedDate(), temp.getTimeInMillis());
+    }
+    
+    /**
+     * safety net: refactor ensureDateVisible
+     */
+    public void testEnsureDateVisibleNextMonth() {
+        JXMonthView monthView = new JXMonthView();
+        Calendar temp = (Calendar) cal.clone();
+        CalendarUtils.startOfMonth(temp);
+        assertEquals(monthView.getFirstDisplayedDate(), temp.getTimeInMillis());
+        cal.add(Calendar.MONTH, 1);
+        Date nextMonth = cal.getTime();
+        temp = (Calendar) cal.clone();
+        CalendarUtils.startOfMonth(temp);
+        monthView.ensureDateVisible(nextMonth.getTime());
+        assertEquals(monthView.getFirstDisplayedDate(), temp.getTimeInMillis());
+    }
+
+    /**
+     * safety net: refactor ensureDateVisible
+     */
+    public void testEnsureDateVisibleThisMonth() {
+        JXMonthView monthView = new JXMonthView();
+        Calendar temp = (Calendar) cal.clone();
+        CalendarUtils.startOfMonth(temp);
+        long first = monthView.getFirstDisplayedDate();
+        assertEquals(first, temp.getTimeInMillis());
+        CalendarUtils.endOfMonth(cal);
+        Date thisMonth = cal.getTime();
+        monthView.ensureDateVisible(thisMonth.getTime());
+        assertEquals("same month, nothing changed", first, monthView.getFirstDisplayedDate());
+    }
+
+    /**
      * Issue #618-swingx: JXMonthView displays problems with non-default
      * timezones.
      * 

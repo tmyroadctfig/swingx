@@ -616,7 +616,7 @@ public class BasicMonthViewUI extends MonthViewUI {
 //        cal.setTimeInMillis(firstDisplayedDate);
 
 //        // Figure out the last displayed date.
-//        cal.add(Calendar.MONTH, ((numCalCols * numCalRows) - 1));
+        cal.add(Calendar.MONTH, ((numCalCols * numCalRows) - 1));
 //        cal.set(Calendar.DAY_OF_MONTH,
 //                cal.getActualMaximum(Calendar.DAY_OF_MONTH));
 //        cal.set(Calendar.HOUR_OF_DAY, 23);
