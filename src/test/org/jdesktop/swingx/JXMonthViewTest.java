@@ -47,6 +47,11 @@ import org.jmock.MockObjectTestCase;
 /**
  * Test case for <code>JXMonthView</code>
  *
+ * There's another class with passing unit tests for JXMonthView (JXMonthViewVisualTest)
+ * because this 
+ * extends mock while the other extends InteractiveTestCase. Both are expected
+ * to pass.
+ * 
  * @author Joshua Outwater
  */
 public class JXMonthViewTest extends MockObjectTestCase {

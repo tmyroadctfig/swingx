@@ -21,14 +21,11 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -37,11 +34,9 @@ import java.util.logging.Logger;
 import javax.swing.Action;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.action.AbstractActionExt;
-import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
 import org.jdesktop.swingx.test.XTestUtils;
@@ -211,121 +206,14 @@ public class JXMonthViewIssues extends InteractiveTestCase {
 
 //----------------------
     
-    /**
-     * Issue #659-swingx: lastDisplayedDate must be synched.
-     * test that lastDisplayed from monthView is same as lastDisplayed from ui.
-     * 
-     * Here: initial packed size - one month shown.
-     * 
-     * @throws InvocationTargetException 
-     * @throws InterruptedException 
-     */
-    public void testLastDisplayedDateInitial() throws InterruptedException, InvocationTargetException {
-        if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run lastDisplayedDate - headless");
-            return;
-        }
-        final JXMonthView monthView = new JXMonthView();
-        final JXFrame frame = wrapInFrame(monthView, "");
-        frame.setVisible(true);
-        SwingUtilities.invokeAndWait(new Runnable() {
-            public void run() {
-                long uiLast = monthView.getUI().getLastDisplayedDate();
-                long viewLast = monthView.getLastDisplayedDate();
-                assertEquals(uiLast, viewLast);
-            }
-        });
-    }
-    
-    /**
-     * 
-     * Issue #659-swingx: lastDisplayedDate must be synched.
-     * 
-     * test that lastDisplayed from monthView is same as lastDisplayed from ui.
-     * 
-     * Here: change the size of the view which allows the ui to display more
-     * columns/rows.
-     * 
-     * @throws InvocationTargetException 
-     * @throws InterruptedException 
-     */
-    public void testLastDisplayedDateSizeChanged() throws InterruptedException, InvocationTargetException {
-        if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run lastDisplayedDate - headless");
-            return;
-        }
-        final JXMonthView monthView = new JXMonthView();
-        final JXFrame frame = wrapInFrame(monthView, "");
-        frame.setVisible(true);
-        frame.setSize(frame.getWidth() * 3, frame.getHeight() * 2);
-        // force a revalidate
-        frame.invalidate();
-        frame.validate();
-        SwingUtilities.invokeAndWait(new Runnable() {
-            public void run() {
-                long uiLast = monthView.getUI().getLastDisplayedDate();
-                long viewLast = monthView.getLastDisplayedDate();
-                assertEquals(uiLast, viewLast);
-            }
-        });
-    }
-    
-
-    /**
-     * 
-     * Issue #659-swingx: lastDisplayedDate must be synched.
-     * 
-     * test that ensureDateVisible works as doc'ed if multiple months shown: 
-     * if the new date is in the
-     * month following the last visible then the first must be set in a manner that
-     * the date must be visible in the last month. 
-     * 
-     * @throws InvocationTargetException 
-     * @throws InterruptedException 
-     */
-    public void testLastDisplayedDateSizeChangedEnsureVisible() throws InterruptedException, InvocationTargetException {
-        if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run lastDisplayedDate - headless");
-            return;
-        }
-        final JXMonthView monthView = new JXMonthView();
-        final JXFrame frame = wrapInFrame(monthView, "");
-        frame.setVisible(true);
-        frame.setSize(frame.getWidth() * 3, frame.getHeight() * 2);
-        // force a revalidate
-        frame.invalidate();
-        frame.validate();
-        SwingUtilities.invokeAndWait(new Runnable() {
-            public void run() {
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTimeInMillis(monthView.getFirstDisplayedDate());
-                int firstMonth = calendar.get(Calendar.MONTH);
-                long uiLast = monthView.getUI().getLastDisplayedDate();
-                calendar.setTimeInMillis(uiLast);
-                int lastMonth = calendar.get(Calendar.MONTH);
-                // sanity: more than one month shown
-                assertFalse(firstMonth == lastMonth);
-                // first day of next month 
-                calendar.add(Calendar.DATE, 1);
-                // sanity
-                int newLastMonth = calendar.get(Calendar.MONTH);
-                assertFalse(lastMonth == newLastMonth);
-                monthView.ensureDateVisible(calendar.getTimeInMillis());
-                CalendarUtils.endOfMonth(calendar);
-                long newUILast = monthView.getUI().getLastDisplayedDate();
-                assertEquals(newUILast, monthView.getLastDisplayedDate());
-                calendar.setTimeInMillis(newUILast);
-                LOG.info("first/last: " + new Date(monthView.getFirstDisplayedDate()) + 
-                        "/" + new Date(newUILast));
-                assertEquals(newLastMonth, calendar.get(Calendar.MONTH));
-            }
-        });
-    }
     
 
     /**
     * Characterize MonthView: initial firstDisplayedDate set to 
     * first day in the month of the current date.
+    * 
+    * KEEP: JXMonthView should protect its calendar by giving out 
+    * a clone only.
     */
    public void testMonthViewCalendarInvariantOnSetFirstDisplayedDate() {
      JXMonthView monthView = new JXMonthView();
@@ -355,6 +243,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
      monthView.setFirstDisplayedDate(next.getTime());
      assertEquals("calendar is changed to lastDisplayedDate", 
              new Date(monthView.getLastDisplayedDate()), monthView.getCalendar().getTime());
+     fail("calendar must not be changed to lastDisplayedDate");
    }
    /**
     * 
@@ -362,6 +251,8 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     * monthViewUI at some places restores to firstDisplayedDay, why?
     * It probably should always - the calendar represents the 
     * first day of the currently shown month.
+    * KEEP: JXMonthView should protect its calendar by giving out 
+    * a clone only.
     */
    public void testMonthViewCalendarInvariantOnSetSelection() {
       JXMonthView monthView = new JXMonthView();
@@ -387,6 +278,8 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     * monthViewUI at some places restores to firstDisplayedDay, why?
     * It probably should always - the calendar represents the 
     * first day of the currently shown month.
+    * KEEP: JXMonthView should protect its calendar by giving out 
+    * a clone only.
     */
    public void testMonthViewCalendarInvariantOnQuerySelectioon() {
       JXMonthView monthView = new JXMonthView();
@@ -412,7 +305,8 @@ public class JXMonthViewIssues extends InteractiveTestCase {
        Calendar us = Calendar.getInstance(Locale.US);
        assertEquals(1, us.getMinimalDaysInFirstWeek());
        Calendar french = Calendar.getInstance(Locale.FRENCH);
-       assertEquals("french/european calendar", 1, french.getMinimalDaysInFirstWeek());
+       assertEquals("french/european calendar", 4, french.getMinimalDaysInFirstWeek());
+       fail("Revisit: monthView should respect locale setting? (need to test)");
    }
    
    /**
@@ -427,18 +321,9 @@ public class JXMonthViewIssues extends InteractiveTestCase {
        // JW: when would we want that?
        us.setFirstDayOfWeek(Calendar.FRIDAY);
        assertEquals(Calendar.FRIDAY, us.getFirstDayOfWeek());
+       fail("Revisit: why expose setting of firstDayOfWeek? Auto-set with locale");
    }
 
-   /**
-    * Trying to figure monthView's calendar's invariant: has none?
-    */
-   public void testTimeZone() {
-       JXMonthView monthView = new JXMonthView();
-       Calendar cal = monthView.getCalendar();
-       assertEquals(cal.getTimeZone(), monthView.getTimeZone());
-       assertEquals(cal.getTime(), new Date(monthView.getFirstDisplayedDate()));
-       assertEquals(0, cal.getTimeZone().getRawOffset() / ONE_HOUR);
-   }
    
    /**
     * BasicMonthViewUI: use adjusting api in keyboard actions.
@@ -465,19 +350,6 @@ public class JXMonthViewIssues extends InteractiveTestCase {
    }
 
   
-
-   /**
-     * 
-     * Okay ... looks more like a confusing (me!) doc: the date in the
-     * constructor is not the selection, but the date to use for the first
-     * display. Hmm ...
-     */
-    public void testMonthViewInitialSelection() {
-        JXMonthView monthView = new JXMonthView(new GregorianCalendar(2007, 6,
-                28).getTimeInMillis());
-        assertNotNull(monthView.getSelectedDate());
-    }
-
     @Override
     protected void setUp() throws Exception {
         calendar = Calendar.getInstance();
