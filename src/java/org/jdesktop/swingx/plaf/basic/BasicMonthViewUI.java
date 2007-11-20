@@ -48,12 +48,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.SortedSet;
+import java.util.TimeZone;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
@@ -64,8 +64,8 @@ import javax.swing.plaf.UIResource;
 
 import org.jdesktop.swingx.JXMonthView;
 import org.jdesktop.swingx.JXMonthView.SelectionMode;
+import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
-import org.jdesktop.swingx.calendar.DateUtils;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.plaf.MonthViewUI;
@@ -145,6 +145,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     private int numCalCols = 1;
     private Rectangle[] monthStringBounds = new Rectangle[12];
     private Rectangle[] yearStringBounds = new Rectangle[12];
+    private Calendar cal;
 
 
     @SuppressWarnings({"UnusedDeclaration"})
@@ -166,10 +167,10 @@ public class BasicMonthViewUI extends MonthViewUI {
         installKeyboardActions();
         installListeners();
         
-        if (monthView.getCalendar() != null) {
-          firstDisplayedDate = monthView.getCalendar().getTimeInMillis();
-          firstDisplayedMonth = monthView.getCalendar().get(Calendar.MONTH);
-          firstDisplayedYear = monthView.getCalendar().get(Calendar.YEAR);
+        if (getCalendar() != null) {
+          firstDisplayedDate = getCalendar().getTimeInMillis();
+          firstDisplayedMonth = getCalendar().get(Calendar.MONTH);
+          firstDisplayedYear = getCalendar().get(Calendar.YEAR);
         }
         
         selection = monthView.getSelection();
@@ -446,8 +447,8 @@ public class BasicMonthViewUI extends MonthViewUI {
         // Use the first day of the month as a key point for determining the
         // date of our click.
         // The week index of the first day will always be 0.
-        Calendar cal = monthView.getCalendar();
-        cal.setTimeInMillis(firstDisplayedDate);
+        Calendar cal = getCalendar(firstDisplayedDate);
+//        cal.setTimeInMillis(firstDisplayedDate);
         //_cal.set(Calendar.DAY_OF_MONTH, 1);
         cal.add(Calendar.MONTH, rowCol.y + (rowCol.x * numCalCols));
 
@@ -455,6 +456,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         int daysToAdd = (row * JXMonthView.DAYS_IN_WEEK) + (col - firstDayViewIndex);
         if (daysToAdd < 0 || daysToAdd >
                 (cal.getActualMaximum(Calendar.DAY_OF_MONTH) - 1)) {
+            resetCalendar();
             return -1;
         }
 
@@ -464,7 +466,7 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         // Restore the time.
         cal.setTimeInMillis(firstDisplayedDate);
-
+        resetCalendar();
         return selected;
     }
 
@@ -477,7 +479,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @return day of the week (Calendar.SATURDAY, Calendar.SUNDAY, ...)
      */
     protected int getDayOfTheWeek() {
-        return monthView.getCalendar().get(Calendar.DAY_OF_WEEK);
+        return getCalendar().get(Calendar.DAY_OF_WEEK);
     }
 
     /**
@@ -610,19 +612,19 @@ public class BasicMonthViewUI extends MonthViewUI {
 
 
     public long calculateLastDisplayedDate() {
-        Calendar cal = monthView.getCalendar();
-        cal.setTimeInMillis(firstDisplayedDate);
+        Calendar cal = getCalendar(firstDisplayedDate);
+//        cal.setTimeInMillis(firstDisplayedDate);
 
-        // Figure out the last displayed date.
-        cal.add(Calendar.MONTH, ((numCalCols * numCalRows) - 1));
-        cal.set(Calendar.DAY_OF_MONTH,
-                cal.getActualMaximum(Calendar.DAY_OF_MONTH));
-        cal.set(Calendar.HOUR_OF_DAY, 23);
-        cal.set(Calendar.MINUTE, 59);
-        cal.set(Calendar.SECOND, 59);
-
+//        // Figure out the last displayed date.
+//        cal.add(Calendar.MONTH, ((numCalCols * numCalRows) - 1));
+//        cal.set(Calendar.DAY_OF_MONTH,
+//                cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+//        cal.set(Calendar.HOUR_OF_DAY, 23);
+//        cal.set(Calendar.MINUTE, 59);
+//        cal.set(Calendar.SECOND, 59);
+        CalendarUtils.endOfMonth(cal);
         lastDisplayedDate = cal.getTimeInMillis();
-
+        resetCalendar();
         return lastDisplayedDate;
     }
 
@@ -633,7 +635,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             dirtyRect.width = 0;
             dirtyRect.height = 0;
         } else {
-            Calendar cal = monthView.getCalendar();
+            Calendar cal = getCalendar();
             cal.setTime(selection.first());
             calculateBoundsForDay(dirtyRect, NO_OFFSET);
             cal.add(Calendar.DAY_OF_MONTH, 1);
@@ -651,8 +653,10 @@ public class BasicMonthViewUI extends MonthViewUI {
 
             // Restore the time.
             cal.setTimeInMillis(firstDisplayedDate);
+            resetCalendar();
         }
     }
+
 
     /**
      * Calculate the bounding box for drawing a date.  It is assumed that the
@@ -663,7 +667,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param monthOffset Used to help calculate bounds for leading/trailing dates.
      */
     protected void calculateBoundsForDay(Rectangle bounds, int monthOffset) {
-        Calendar cal = monthView.getCalendar();
+        Calendar cal = getCalendar();
         int year = cal.get(Calendar.YEAR);
         int month = cal.get(Calendar.MONTH);
         int weekOfMonth = cal.get(Calendar.WEEK_OF_MONTH);
@@ -743,6 +747,34 @@ public class BasicMonthViewUI extends MonthViewUI {
         bounds.height = boxPaddingY + boxHeight + boxPaddingY;
     }
 
+    /**
+     * 
+     * @return the local copy of the monthView's calendar
+     */
+    private Calendar getCalendar() {
+        return monthView.getCalendar();
+//        if (cal == null) {
+//             cal = monthView.getCalendar();
+//             if (cal != null) {
+//                 cal = (Calendar) cal.clone();
+//                 cal.setTimeInMillis(firstDisplayedDate);
+//             }
+//        }
+//        return cal;
+    }
+
+    private Calendar getCalendar(long date) {
+        Calendar cal = getCalendar();
+        cal.setTimeInMillis(date);
+        return cal;
+    }
+    /**
+     * 
+     */
+    private void resetCalendar() {
+        cal = null;
+    }
+
     @Override
     public void paint(Graphics g, JComponent c) {
         super.paint(g, c);
@@ -765,8 +797,8 @@ public class BasicMonthViewUI extends MonthViewUI {
         g.setColor(monthView.getForeground());
 
         // Reset the calendar.
-        Calendar cal = monthView.getCalendar();
-        cal.setTimeInMillis(firstDisplayedDate);
+        Calendar cal = getCalendar(firstDisplayedDate);
+//        cal.setTimeInMillis(firstDisplayedDate);
 
         // Center the calendars horizontally/vertically in the available space.
         for (int row = 0; row < numCalRows; row++) {
@@ -807,6 +839,7 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         // Restore the calendar.
         cal.setTimeInMillis(firstDisplayedDate);
+        resetCalendar();
         if (g2 != null && monthView.isAntialiased()) {
             g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
                                 oldAAValue);
@@ -825,7 +858,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      */
     @SuppressWarnings({"UnusedDeclaration"})
     private void paintMonth(Graphics g, int x, int y, int width, int height) {
-        Calendar cal = monthView.getCalendar();
+        Calendar cal = getCalendar();
         int days = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
         Rectangle clip = g.getClipBounds();
         long day;
@@ -1060,7 +1093,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     protected void paintMonthStringForeground(Graphics g, int x, int y,
                                               int width, int height) {
         // Paint month name.
-        Calendar cal = monthView.getCalendar();
+        Calendar cal = getCalendar();
         Font oldFont = monthView.getFont();
 
         // TODO: Calculating the bounds of the text dynamically so we can invoke
@@ -1349,7 +1382,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     private long cleanupDate(long date) {
-        Calendar cal = monthView.getCalendar();
+        Calendar cal = getCalendar();
         cal.setTimeInMillis(date);
         // We only want to compare the day, month and year
         // so reset all other values to 0.
@@ -1357,6 +1390,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
+        resetCalendar();
         return cal.getTimeInMillis();
     }
 
@@ -1367,6 +1401,41 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
     }
     
+    private void traverseMonth(int arrowType) {
+        if (arrowType == JXMonthView.MONTH_DOWN) {
+            previousMonth();
+        } else if (arrowType == JXMonthView.MONTH_UP) {
+            nextMonth();
+        }
+    }
+
+    private void nextMonth() {
+        Date upperBound = monthView.getUpperBound();
+        if (upperBound == null
+                || upperBound.getTime() > lastDisplayedDate) {
+            Calendar cal = getCalendar(firstDisplayedDate);
+            cal.add(Calendar.MONTH, 1);
+            monthView.setFirstDisplayedDate(cal.getTimeInMillis());
+//            monthView.setFirstDisplayedDate(DateUtils
+//                    .getNextMonth(firstDisplayedDate));
+            calculateDirtyRectForSelection();
+        }
+    }
+
+    private void previousMonth() {
+        Date lowerBound = monthView.getLowerBound();
+        if (lowerBound == null
+                || lowerBound.getTime() < firstDisplayedDate) {
+            Calendar cal = getCalendar(firstDisplayedDate);
+            cal.add(Calendar.MONTH, -1);
+            monthView.setFirstDisplayedDate(cal.getTimeInMillis());
+            
+//            monthView.setFirstDisplayedDate(DateUtils
+//                    .getPreviousMonth(firstDisplayedDate));
+            calculateDirtyRectForSelection();
+        }
+    }
+
     private class Handler implements  
         MouseListener, MouseMotionListener, LayoutManager,
             PropertyChangeListener, DateSelectionListener {
@@ -1391,20 +1460,9 @@ public class BasicMonthViewUI extends MonthViewUI {
             // Check if one of the month traverse buttons was pushed.
             if (monthView.isTraversable()) {
                 int arrowType = getTraversableButtonAt(e.getX(), e.getY());
-                if (arrowType == JXMonthView.MONTH_DOWN) {
-                    Date lowerBound = monthView.getLowerBound();
-                    if (lowerBound == null || lowerBound.getTime() < firstDisplayedDate) {
-                        monthView.setFirstDisplayedDate(DateUtils.getPreviousMonth(firstDisplayedDate));
-                        calculateDirtyRectForSelection();
-                        return;
-                    }
-                } else if (arrowType == JXMonthView.MONTH_UP) {
-                    Date upperBound = monthView.getUpperBound();
-                    if (upperBound == null || upperBound.getTime() > lastDisplayedDate) {
-                        monthView.setFirstDisplayedDate(DateUtils.getNextMonth(firstDisplayedDate));
-                        calculateDirtyRectForSelection();
-                        return;
-                    }
+                if (arrowType != -1) {
+                    traverseMonth(arrowType);
+                    return;
                 }
             }
 
@@ -1542,7 +1600,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             // it's larger and flaggedDates will be noted in this style.
             FontMetrics fm = monthView.getFontMetrics(derivedFont);
 
-            Calendar cal = monthView.getCalendar();
+            Calendar cal = getCalendar();
             cal.set(Calendar.MONTH, cal.getMinimum(Calendar.MONTH));
             cal.set(Calendar.DAY_OF_MONTH,
                     cal.getActualMinimum(Calendar.DAY_OF_MONTH));
@@ -1699,6 +1757,8 @@ public class BasicMonthViewUI extends MonthViewUI {
                 updateComponentInputMap();
             } else if ("locale".equals(property)) { // "locale" is bound property
                 updateLocale();
+            } else if ("timeZone".equals(property)) {
+                dayOfMonthFormatter.setTimeZone((TimeZone) evt.getNewValue());
             }
         }
 
@@ -1777,7 +1837,7 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         private void traverse(int action) {
             long oldStart = selection.isEmpty() ? System.currentTimeMillis() : selection.first().getTime();
-            Calendar cal = monthView.getCalendar();
+            Calendar cal = getCalendar();
             cal.setTimeInMillis(oldStart);
             switch (action) {
                 case SELECT_PREVIOUS_DAY:
@@ -1833,7 +1893,7 @@ public class BasicMonthViewUI extends MonthViewUI {
 
             boolean isForward = true;
 
-            Calendar cal = monthView.getCalendar();
+            Calendar cal = getCalendar();
             switch (action) {
                 case ADJUST_SELECTION_PREVIOUS_DAY:
                     if (newEndDate <= pivotDate) {

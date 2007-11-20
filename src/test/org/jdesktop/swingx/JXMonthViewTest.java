@@ -24,12 +24,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.SortedSet;
+import java.util.TimeZone;
 import java.util.logging.Logger;
 
 import javax.swing.Action;
 import javax.swing.JComponent;
 
 import org.jdesktop.swingx.JXMonthView.SelectionMode;
+import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DateUtils;
 import org.jdesktop.swingx.event.DateSelectionListener;
@@ -38,6 +40,7 @@ import org.jdesktop.swingx.test.DateSelectionReport;
 import org.jdesktop.swingx.test.XTestUtils;
 import org.jdesktop.test.ActionReport;
 import org.jdesktop.test.PropertyChangeReport;
+import org.jdesktop.test.TestUtils;
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
 
@@ -51,6 +54,12 @@ public class JXMonthViewTest extends MockObjectTestCase {
             .getName());
     private Calendar cal;
     private Locale componentLocale;
+    // Constants used internally; unit is milliseconds
+    private static final int ONE_MINUTE = 60*1000;
+    private static final int ONE_HOUR   = 60*ONE_MINUTE;
+    private static final int THREE_HOURS = 3 * ONE_HOUR;
+    @SuppressWarnings("unused")
+    private static final int ONE_DAY    = 24*ONE_HOUR;
 
     public void setUp() {
         cal = Calendar.getInstance();
@@ -65,6 +74,276 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JComponent.setDefaultLocale(componentLocale);
     }
 
+    /**
+     * Issue #618-swingx: JXMonthView displays problems with non-default
+     * timezones.
+     * 
+     * Selected dates are "start of day" in the timezone they had been 
+     * selected. As such they make no sense in a new timezone: must
+     * either be adjusted or cleared. Currently we clear the selection. 
+     */
+    public void testTimeZoneChangeClearSelection() {
+        JXMonthView monthView = new JXMonthView();
+        Date date = new Date();
+        monthView.setSelectedDate(date);
+        // sanity
+        assertTrue(monthView.isSelectedDate(date));
+        monthView.setTimeZone(getTimeZone(monthView.getTimeZone(), THREE_HOURS));
+        // makes sense only in the timezone it had been selected in
+        assertFalse(monthView.isSelectedDate(date));
+        assertTrue("selection must have been cleared", monthView.isSelectionEmpty());
+    }
+    
+    /**
+     * Issue #618-swingx: JXMonthView displays problems with non-default
+     * timezones.
+     * 
+     * Bound dates are "start of day" in the timezone they had been 
+     * set. As such they make no sense in a new timezone: must
+     * either be adjusted or cleared. Currently we clear the bound. 
+     */
+    public void testTimeZoneChangeResetLowerBound() {
+        JXMonthView monthView = new JXMonthView();
+        monthView.setLowerBound(XTestUtils.getStartOfToday(-5));
+        monthView.setTimeZone(getTimeZone(monthView.getTimeZone(), THREE_HOURS));
+        assertEquals("lowerBound must have been reset", null, monthView.getLowerBound());
+    }
+    
+    /**
+     * Issue #618-swingx: JXMonthView displays problems with non-default
+     * timezones.
+     * 
+     * Bound dates are "start of day" in the timezone they had been 
+     * set. As such they make no sense in a new timezone: must
+     * either be adjusted or cleared. Currently we clear the bound. 
+     */
+    public void testTimeZoneChangeResetUpperBound() {
+        JXMonthView monthView = new JXMonthView();
+        monthView.setUpperBound(XTestUtils.getStartOfToday(-5));
+        monthView.setTimeZone(getTimeZone(monthView.getTimeZone(), THREE_HOURS));
+        assertEquals("upperbound must have been reset", null, monthView.getUpperBound());
+    }
+    
+    /**
+     * Issue #618-swingx: JXMonthView displays problems with non-default
+     * timezones.
+     * 
+     * Flagged dates are "start of day" in the timezone they had been 
+     * set. As such they make no sense in a new timezone: must
+     * either be adjusted or cleared. Currently we clear them. 
+     */
+    public void testTimeZoneChangeResetFlaggedDates() {
+        JXMonthView monthView = new JXMonthView();
+        long time = XTestUtils.getStartOfToday(-5).getTime();
+        monthView.setFlaggedDates(new long[] {time});
+        monthView.setTimeZone(getTimeZone(monthView.getTimeZone(), THREE_HOURS));
+        // accidentally passes - because it is meaningful only in the timezone 
+        // it was set ...
+        assertFalse(monthView.isFlaggedDate(time));
+        // missing api
+        assertFalse("flagged dates must have been cleared", monthView.hasFlaggedDates());
+    }
+    
+    /**
+     * Issue #618-swingx: JXMonthView displays problems with non-default
+     * timezones.
+     * 
+     * Unselectable dates are "start of day" in the timezone they had been 
+     * set. As such they make no sense in a new timezone: must
+     * either be adjusted or cleared. Currently we clear them. 
+     */
+    public void testTimeZoneChangeResetUnselectableDates() {
+        JXMonthView monthView = new JXMonthView();
+        Date date = XTestUtils.getStartOfToday(-5);
+        monthView.setUnselectableDates(date);
+        monthView.setTimeZone(getTimeZone(monthView.getTimeZone(), THREE_HOURS));
+        // accidentally passes - because it is meaningful only in the timezone 
+        // it was set ...
+        assertFalse(monthView.isUnselectableDate(date));
+        // missing api on JXMonthView
+        assertEquals("unselectable dates must have been cleared", 
+                0, monthView.getSelectionModel().getUnselectableDates().size());
+    }
+    
+    /**
+     * test anchor invariant.
+     */
+    public void testAnchorDate() {
+        JXMonthView monthView = new JXMonthView();
+        // sometime next month
+        cal.add(Calendar.MONTH, 1);
+        monthView.setFirstDisplayedDate(cal.getTimeInMillis());
+        assertEquals(cal.getTime(), monthView.getAnchorDate());
+        CalendarUtils.startOfMonth(cal);
+        assertEquals(cal.getTimeInMillis(), monthView.getFirstDisplayedDate());
+    }
+
+    /**
+     * Issue #618-swingx: JXMonthView displays problems with non-default
+     * timezones.
+     * 
+     * Here: test anchor invariant to time zone change
+     */
+    public void testTimeZoneChangeAnchorInvariant() {
+        JXMonthView monthView = new JXMonthView();
+        Date anchor = monthView.getAnchorDate();
+        TimeZone timeZone = monthView.getTimeZone();
+        int offset = timeZone.getRawOffset();
+        int diffRawOffset = THREE_HOURS;
+        int newOffset = offset < 0 ? offset + diffRawOffset : offset - diffRawOffset;
+        String[] availableIDs = TimeZone.getAvailableIDs(newOffset);
+        TimeZone newTimeZone = TimeZone.getTimeZone(availableIDs[0]);
+        monthView.setTimeZone(newTimeZone);
+        //sanity ... 
+        assertEquals(timeZone.getRawOffset() - diffRawOffset, monthView.getTimeZone().getRawOffset());
+        assertEquals("anchor must be invariant to timezone change", 
+                anchor, monthView.getAnchorDate());
+    }
+
+    /**
+     * Issue #618-swingx: JXMonthView displays problems with non-default
+     * timezones.
+     * 
+     * Here: test that the first displayed date is offset by offset diff of 
+     * timezones.
+     * Configure the monthView with a fixed timezone to clear up the mist ...
+     * 
+     */
+    public void testTimeZoneChangeToday() {
+        JXMonthView monthView = new JXMonthView();
+        // config with a known timezone and date
+        TimeZone tz = TimeZone.getTimeZone("GMT+4");
+        monthView.setTimeZone(tz);
+        Calendar calendar = Calendar.getInstance(tz);
+        Date today = calendar.getTime();
+        monthView.setFirstDisplayedDate(today.getTime());
+        Date anchor = monthView.getAnchorDate();
+        assertEquals(today, anchor);
+        long firstDisplayed = monthView.getFirstDisplayedDate();
+        calendar.setTimeInMillis(firstDisplayed);
+        assertTrue(CalendarUtils.isStartOfMonth(calendar));
+        
+        // get another timezone with known offset
+        TimeZone tzOther = TimeZone.getTimeZone("GMT+7");
+        // newOffset minus oldOffset (real time, adjusted to DST)
+        int oldOffset = tz.getOffset(anchor.getTime());
+        int newOffset = tzOther.getOffset(anchor.getTime());
+        int realOffset = oldOffset - newOffset;
+        monthView.setTimeZone(tzOther);
+        Calendar otherCalendar = Calendar.getInstance(tzOther);
+        otherCalendar.setTimeInMillis(monthView.getFirstDisplayedDate());
+        assertTrue(CalendarUtils.isStartOfMonth(otherCalendar));
+        // PENDING JW: sure this is the correct direction of the shift?
+        // yeah, think so: the anchor is fixed, moving the timezone results
+        // in a shift into the opposite direction of the offset
+        assertEquals("first displayed must be offset by real offset", 
+                realOffset,  monthView.getFirstDisplayedDate() - firstDisplayed);
+    }
+
+    /**
+     * Issue #618-swingx: JXMonthView displays problems with non-default
+     * timezones.
+     * 
+     * Here: test today notification.
+     */
+    public void testTimeZoneChangeTodayNotification() {
+        JXMonthView monthView = new JXMonthView();
+        TimeZone other = getTimeZone(monthView.getTimeZone(), THREE_HOURS);
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.setTimeZone(other);
+        Calendar calendar = Calendar.getInstance();
+        CalendarUtils.startOfDay(calendar);
+        Date today = calendar.getTime();
+        calendar.setTimeZone(other);
+        CalendarUtils.startOfDay(calendar);
+        Date otherToday = calendar.getTime(); 
+            // sanity
+        assertFalse(today.equals(otherToday));
+        TestUtils.assertPropertyChangeEvent(report, 
+                "today", today.getTime(), otherToday.getTime(), false);
+    }
+    /**
+     * Issue #618-swingx: JXMonthView displays problems with non-default
+     * timezones.
+     * 
+     * Here: test that the first displayed date is offset by offset diff of 
+     * timezones.
+     * Configure the monthView with a fixed timezone to clear up the mist ...
+     * 
+     */
+    public void testTimeZoneChangeOffsetFirstDisplayedDate() {
+        JXMonthView monthView = new JXMonthView();
+        // config with a known timezone and date
+        TimeZone tz = TimeZone.getTimeZone("GMT+4");
+        monthView.setTimeZone(tz);
+        Calendar calendar = Calendar.getInstance(tz);
+        Date today = calendar.getTime();
+        monthView.setFirstDisplayedDate(today.getTime());
+        Date anchor = monthView.getAnchorDate();
+        assertEquals(today, anchor);
+        long firstDisplayed = monthView.getFirstDisplayedDate();
+        calendar.setTimeInMillis(firstDisplayed);
+        assertTrue(CalendarUtils.isStartOfMonth(calendar));
+        
+        // get another timezone with known offset
+        TimeZone tzOther = TimeZone.getTimeZone("GMT+7");
+        // newOffset minus oldOffset (real time, adjusted to DST)
+        int oldOffset = tz.getOffset(anchor.getTime());
+        int newOffset = tzOther.getOffset(anchor.getTime());
+        int realOffset = oldOffset - newOffset;
+        monthView.setTimeZone(tzOther);
+        Calendar otherCalendar = Calendar.getInstance(tzOther);
+        otherCalendar.setTimeInMillis(monthView.getFirstDisplayedDate());
+        assertTrue(CalendarUtils.isStartOfMonth(otherCalendar));
+        // PENDING JW: sure this is the correct direction of the shift?
+        // yeah, think so: the anchor is fixed, moving the timezone results
+        // in a shift into the opposite direction of the offset
+        assertEquals("first displayed must be offset by real offset", 
+                realOffset,  monthView.getFirstDisplayedDate() - firstDisplayed);
+    }
+    
+    /**
+     * Returns a timezone with a rawoffset with a different offset.
+     * 
+     * 
+     * PENDING: this is acutally for european time, not really thought of 
+     *   negative/rolling +/- problem?
+     * 
+     * @param timeZone the timezone to start with 
+     * @param diffRawOffset the raw offset difference.
+     * @return
+     */
+    private TimeZone getTimeZone(TimeZone timeZone, int diffRawOffset) {
+        int offset = timeZone.getRawOffset();
+        int newOffset = offset < 0 ? offset + diffRawOffset : offset - diffRawOffset;
+        String[] availableIDs = TimeZone.getAvailableIDs(newOffset);
+        TimeZone newTimeZone = TimeZone.getTimeZone(availableIDs[0]);
+        return newTimeZone;
+    }
+    /**
+     * Issue #618-swingx: JXMonthView displays problems with non-default
+     * timezones.
+     * 
+     * Here: test timezone fire
+     */
+    public void testTimeZoneChangeNotification() {
+        JXMonthView monthView = new JXMonthView();
+        TimeZone timezone = monthView.getTimeZone();
+        int offset = timezone.getRawOffset();
+        int oneHour = 60 * 1000 * 60;
+        int newOffset = offset < 0 ? offset + oneHour : offset - oneHour;
+        String[] availableIDs = TimeZone.getAvailableIDs(newOffset);
+        TimeZone newTimeZone = TimeZone.getTimeZone(availableIDs[0]);
+        // sanity
+        assertFalse(timezone.equals(newTimeZone));
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.setTimeZone(newTimeZone);
+        TestUtils.assertPropertyChangeEvent(report, 
+                "timeZone", timezone, newTimeZone, false);
+    }
+    
 
     /**
      * Issue #563-swingx: keybindings active if not focused.
@@ -342,6 +621,9 @@ public class JXMonthViewTest extends MockObjectTestCase {
         Date cleaned = XTestUtils.getStartOfDay(cal);
         view.setUpperBound(full);
         assertEquals(cleaned, view.getUpperBound());
+        // remove again
+        view.setUpperBound(null);
+        assertEquals(null, view.getUpperBound());
     }
     
     /**
@@ -354,6 +636,9 @@ public class JXMonthViewTest extends MockObjectTestCase {
         Date cleaned = XTestUtils.getStartOfDay(cal);
         view.setLowerBound(full);
         assertEquals(cleaned, view.getLowerBound());
+        // remove again
+        view.setLowerBound(null);
+        assertEquals(null, view.getLowerBound());
     }
 
     /**

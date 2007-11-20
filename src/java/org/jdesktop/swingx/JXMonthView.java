@@ -39,12 +39,13 @@ import java.util.TreeSet;
 import javax.swing.JComponent;
 import javax.swing.Timer;
 
+import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DateSpan;
 import org.jdesktop.swingx.calendar.DefaultDateSelectionModel;
 import org.jdesktop.swingx.event.EventListenerMap;
-import org.jdesktop.swingx.plaf.MonthViewAddon;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
+import org.jdesktop.swingx.plaf.MonthViewAddon;
 import org.jdesktop.swingx.plaf.MonthViewUI;
 import org.jdesktop.swingx.util.Contract;
 
@@ -119,11 +120,16 @@ import org.jdesktop.swingx.util.Contract;
  *        }
  *    });
  * </pre>
- *
+ * 
+ *  
  * @author Joshua Outwater
  * @version  $Revision$
  */
 public class JXMonthView extends JComponent {
+    
+    /*
+     * moved from package calendar to core at version 1.51
+     */
     public static enum SelectionMode {
         /**
          * Mode that disallows selection of days from the calendar.
@@ -235,6 +241,7 @@ public class JXMonthView extends JComponent {
     @SuppressWarnings({"FieldCanBeLocal"})
     private Date modifyedEndDate;
     private boolean componentInputMapEnabled;
+    private Calendar anchor;
 
     /**
      * Create a new instance of the <code>JXMonthView</code> class using the
@@ -292,16 +299,13 @@ public class JXMonthView extends JComponent {
         // Keep track of today
         setToday(cleanupDate(cal.getTimeInMillis()));
 
-        // Set the first displayed date
-        setFirstDisplayedDate(cleanupDate(firstDisplayedDate));
-
         setFocusable(true);
         todayBackgroundColor = getForeground();
 
-        // Restore original time value
-        cal.setTimeInMillis(this.firstDisplayedDate);
 
         setLocale(locale);
+        anchor = (Calendar) cal.clone();
+        setFirstDisplayedDate(firstDisplayedDate);
     }
 
     /**
@@ -348,6 +352,7 @@ public class JXMonthView extends JComponent {
         return firstDisplayedDate;
     }
 
+    
     /**
      * Set the first displayed date.  We only use the month and year of
      * this date.  The <code>Calendar.DAY_OF_MONTH</code> field is reset to
@@ -357,12 +362,16 @@ public class JXMonthView extends JComponent {
      * @param date The first displayed date.
      */
     public void setFirstDisplayedDate(long date) {
+        anchor.setTimeInMillis(date);
+        
         long oldFirstDisplayedDate = firstDisplayedDate;
         int oldFirstDisplayedMonth = firstDisplayedMonth;
         int oldFirstDisplayedYear = firstDisplayedYear;
 
-        cal.setTimeInMillis(cleanupDate(date));
-        cal.set(Calendar.DAY_OF_MONTH, 1);
+        cal.setTimeInMillis(anchor.getTimeInMillis());
+        CalendarUtils.startOfMonth(cal);
+//        cal.setTimeInMillis(cleanupDate(date));
+//        cal.set(Calendar.DAY_OF_MONTH, 1);
         firstDisplayedDate = cal.getTimeInMillis();
         firstDisplayedMonth = cal.get(Calendar.MONTH);
         firstDisplayedYear = cal.get(Calendar.YEAR);
@@ -376,6 +385,18 @@ public class JXMonthView extends JComponent {
         repaint();
     }
 
+    /**
+     * Returns the anchor date. Currently, this is the "uncleaned" input date 
+     * of setFirstDisplayedDate. This is a quick hack for Issue #618-swingx, to
+     * have some invariant for testing. Do not use in client code, may change
+     * without notice!
+     * 
+     * @return the "uncleaned" first display date.
+     */
+    protected Date getAnchorDate() {
+        return anchor.getTime();
+    }
+    
     /**
      * Returns the last date able to be displayed.  For example, if the last
      * visible month was April the time returned would be April 30, 23:59:59.
@@ -634,7 +655,7 @@ public class JXMonthView extends JComponent {
      * @param lowerBound the lower bound, null means none.
      */
     public void setLowerBound(Date lowerBound) {
-        Date lower = cleanupDate(lowerBound);
+        Date lower = lowerBound != null ? cleanupDate(lowerBound) : null;
         getSelectionModel().setLowerBound(lower);
     }
 
@@ -648,7 +669,7 @@ public class JXMonthView extends JComponent {
      * @param upperBound the upper bound, null means none.
      */
     public void setUpperBound(Date upperBound) {
-        Date upper = cleanupDate(upperBound);
+        Date upper = upperBound != null ? cleanupDate(upperBound) : null;
         getSelectionModel().setUpperBound(upper);
     }
 
@@ -794,6 +815,16 @@ public class JXMonthView extends JComponent {
     }
 
     /**
+     * Temporary api to allow testing of cleanup after setting TimeZone.
+     * 
+     * PENDING: need access to the set of flagged dates.
+     * 
+     * @return a boolean indicating if this monthView has flagged dates.
+     */
+    public boolean hasFlaggedDates() {
+        return (flaggedDates != null) && (flaggedDates.size() > 0);
+    }
+    /**
      * Whether or not to show leading dates for a months displayed by this component.
      *
      * @param value true if leading dates should be displayed, false otherwise.
@@ -884,12 +915,7 @@ public class JXMonthView extends JComponent {
 
     private long cleanupDate(long date) {
         cal.setTimeInMillis(date);
-        // We only want to compare the day, month and year
-        // so reset all other values to 0.
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
+        CalendarUtils.startOfDay(cal);
         return cal.getTimeInMillis();
     }
 
@@ -1078,7 +1104,35 @@ public class JXMonthView extends JComponent {
     public void setTimeZone(TimeZone tz) {
         TimeZone old =getTimeZone();
         cal.setTimeZone(tz);
+        anchor.setTimeZone(tz);
+        setFirstDisplayedDate(anchor.getTimeInMillis());
+        updateTodayFromCurrentTime();
+        updateDatesAfterTimeZoneChange(old);
         firePropertyChange("timeZone", old, getTimeZone());
+        
+    }
+
+    /**
+     * All dates are "cleaned" relative to the timezone they had been set.
+     * After changing the timezone, the need to be updated to the new.
+     * 
+     * Here: clear everything. 
+     * 
+     * @param oldTimeZone the timezone before the change
+     */
+    protected void updateDatesAfterTimeZoneChange(TimeZone oldTimeZone) {
+        clearSelection();
+        setLowerBound(null);
+        setUpperBound(null);
+        setFlaggedDates(null);
+        setUnselectableDates(new Date[0]);
+    }
+    /**
+     * 
+     */
+    private void updateTodayFromCurrentTime() {
+        setToday(cleanupDate(System.currentTimeMillis()));
+        
     }
 
     /**

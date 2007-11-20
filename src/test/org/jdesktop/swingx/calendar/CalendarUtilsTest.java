@@ -25,6 +25,7 @@ package org.jdesktop.swingx.calendar;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.logging.Logger;
 
 import org.jdesktop.swingx.InteractiveTestCase;
@@ -44,6 +45,8 @@ public class CalendarUtilsTest extends InteractiveTestCase {
     private Calendar calendar;
     private Calendar calendarUS;
 
+    
+    
     public void testEndOfWeek() {
         int week = calendar.get(Calendar.WEEK_OF_YEAR);
         CalendarUtils.endOfWeek(calendar);
@@ -101,6 +104,34 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         assertEquals(week, calendarUS.get(Calendar.WEEK_OF_YEAR));
     }
     
+    
+    public void testIsStartOfMonth() {
+        // want to be in the middle of a year
+        int month = 5;
+        calendar.set(Calendar.MONTH, month);
+        CalendarUtils.startOfMonth(calendar);
+        Date start = calendar.getTime();
+        assertTrue(CalendarUtils.isStartOfMonth(calendar));
+        // sanity: calendar must not be changed
+        assertEquals(start, calendar.getTime());
+        calendar.add(Calendar.MILLISECOND, 1);
+        assertFalse(CalendarUtils.isStartOfMonth(calendar));
+    }
+    
+    
+    public void testIsEndOfMonth() {
+        // want to be in the middle of a year
+        int month = 5;
+        calendar.set(Calendar.MONTH, month);
+        CalendarUtils.endOfMonth(calendar);
+        Date start = calendar.getTime();
+        assertTrue(CalendarUtils.isEndOfMonth(calendar));
+        assertEquals(start, calendar.getTime());
+        calendar.add(Calendar.MILLISECOND, -1);
+        assertFalse(CalendarUtils.isEndOfMonth(calendar));
+        // sanity: calendar must not be changed
+    }
+    
     public void testEndOfMonth() {
         // want to be in the middle of a year
         int month = 5;
@@ -141,6 +172,37 @@ public class CalendarUtilsTest extends InteractiveTestCase {
         assertEquals(day - 1, calendar.get(Calendar.DATE));
     }
 
+    public void testStartOfDayUnique() {
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+0"));
+        CalendarUtils.startOfMonth(calendar);
+        // sanity
+        assertTrue(CalendarUtils.isStartOfDay(calendar));
+        assertNotStartOfDayInTimeZones(calendar, "GMT+");
+        assertNotStartOfDayInTimeZones(calendar, "GMT-");
+    }
+    
+    private void assertNotStartOfDayInTimeZones(Calendar calendar, String id) {
+        for (int i = 1; i < 13; i++) {
+            calendar.setTimeZone(TimeZone.getTimeZone(id + i));
+            assertFalse(CalendarUtils.isStartOfDay(calendar));
+        }
+    }
+
+    public void testStartOfMonthUnique() {
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+0"));
+        CalendarUtils.startOfMonth(calendar);
+        // sanity
+        assertTrue(CalendarUtils.isStartOfMonth(calendar));
+        assertNotStartOfMonthInTimeZones(calendar, "GMT+");
+        assertNotStartOfMonthInTimeZones(calendar, "GMT-");
+    }
+
+    private void assertNotStartOfMonthInTimeZones(Calendar calendar, String id) {
+        for (int i = 1; i < 13; i++) {
+            calendar.setTimeZone(TimeZone.getTimeZone(id + i));
+            assertFalse(CalendarUtils.isStartOfMonth(calendar));
+        }
+    }
     /**
      * sanity ...
      */

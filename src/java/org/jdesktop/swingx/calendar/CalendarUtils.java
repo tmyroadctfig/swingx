@@ -22,6 +22,7 @@
 package org.jdesktop.swingx.calendar;
 
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Calendar manipulation.
@@ -32,7 +33,69 @@ import java.util.Calendar;
  * @author Jeanette Winzenburg
  */
 public class CalendarUtils {
+ 
+    /**
+     * Returns a boolean indicating if the given calendar represents the 
+     * start of a day (in the calendar's time zone). The calendar is unchanged.
+     * 
+     * @param calendar the calendar to check.
+     * 
+     * @return true if the calendar's time is the start of the day,
+     *   false otherwise.
+     */
+    public static boolean isStartOfDay(Calendar calendar) {
+        Calendar temp = (Calendar) calendar.clone();
+        temp.add(Calendar.MILLISECOND, -1);
+        return temp.get(Calendar.DATE) != calendar.get(Calendar.DATE);
+    }
 
+    /**
+     * Returns a boolean indicating if the given calendar represents the 
+     * end of a day (in the calendar's time zone). The calendar is unchanged.
+     * 
+     * @param calendar the calendar to check.
+     * 
+     * @return true if the calendar's time is the end of the day,
+     *   false otherwise.
+     */
+    public static boolean isEndOfDay(Calendar calendar) {
+        Calendar temp = (Calendar) calendar.clone();
+        temp.add(Calendar.MILLISECOND, 1);
+        return temp.get(Calendar.DATE) != calendar.get(Calendar.DATE);
+    }
+    
+    /**
+     * Returns a boolean indicating if the given calendar represents the 
+     * start of a month (in the calendar's time zone). Returns true, if the time is 
+     * the start of the first day of the month, false otherwise. The calendar is unchanged.
+     * 
+     * @param calendar the calendar to check.
+     * 
+     * @return true if the calendar's time is the start of the first day of the month,
+     *   false otherwise.
+     */
+    public static boolean isStartOfMonth(Calendar calendar) {
+        Calendar temp = (Calendar) calendar.clone();
+        temp.add(Calendar.MILLISECOND, -1);
+        return temp.get(Calendar.MONTH) != calendar.get(Calendar.MONTH);
+    }
+
+    /**
+     * Returns a boolean indicating if the given calendar represents the 
+     * end of a month (in the calendar's time zone). Returns true, if the time is 
+     * the end of the last day of the month, false otherwise. The calendar is unchanged.
+     * 
+     * @param calendar the calendar to check.
+     * 
+     * @return true if the calendar's time is the end of the last day of the month,
+     *   false otherwise.
+     */
+    public static boolean isEndOfMonth(Calendar calendar) {
+        Calendar temp = (Calendar) calendar.clone();
+        temp.add(Calendar.MILLISECOND, 1);
+        return temp.get(Calendar.MONTH) != calendar.get(Calendar.MONTH);
+    }
+    
     /**
      * Adjusts the calendar to the start of the current week.
      * That is, first day of the week with all time fields cleared.
@@ -71,41 +134,37 @@ public class CalendarUtils {
      * @param calendar
      */
     public static void endOfMonth(Calendar calendar) {
+        // start of next month
         calendar.add(Calendar.MONTH, 1);
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MINUTE, 0);
+        startOfMonth(calendar);
+        // one millisecond back
         calendar.add(Calendar.MILLISECOND, -1);
     }
 
 
 
     /**
-     * Adjust the given calendar to the first millisecond of the 
-     * current day. that is all time fields cleared.
-     *
+     * Adjust the given calendar to the first millisecond of the current day.
+     * that is all time fields cleared.
+     * 
      * @param calendar calendar to adjust.
      */
     public static void startOfDay(Calendar calendar) {
-            calendar.set(Calendar.HOUR_OF_DAY, 0);
-            calendar.set(Calendar.MILLISECOND, 0);
-            calendar.set(Calendar.SECOND, 0);
-            calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MINUTE, 0);
     }
 
     /**
      * Adjust the given calendar to the last millisecond of the specified date.
-     *
-     * Hmm ... really set the fields? Not next day, startOfDay and back a milli?
+     * 
      * @param calendar calendar to adjust.
      */
     public static void endOfDay(Calendar calendar) {
-            calendar.set(Calendar.HOUR_OF_DAY, 23);
-            calendar.set(Calendar.MILLISECOND, 999);
-            calendar.set(Calendar.SECOND, 59);
-            calendar.set(Calendar.MINUTE, 59);
+        calendar.add(Calendar.DATE, 1);
+        startOfDay(calendar);
+        calendar.add(Calendar.MILLISECOND, -1);
     }
 
 

@@ -28,27 +28,20 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
 import javax.swing.Action;
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
-import org.jdesktop.swingx.JXDatePicker;
-import org.jdesktop.swingx.JXFrame;
-import org.jdesktop.swingx.JXMonthView;
 import org.jdesktop.swingx.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
-import org.jdesktop.swingx.test.XTestUtils;
-import org.jdesktop.test.PropertyChangeReport;
-import org.jdesktop.test.TestUtils;
 
 /**
  * Test to expose known issues with JXMonthView.
@@ -61,8 +54,12 @@ public class JXMonthViewIssues extends InteractiveTestCase {
             .getName());
 
     // Constants used internally; unit is milliseconds
+    @SuppressWarnings("unused")
     private static final int ONE_MINUTE = 60*1000;
+    @SuppressWarnings("unused")
     private static final int ONE_HOUR   = 60*ONE_MINUTE;
+    @SuppressWarnings("unused")
+    private static final int THREE_HOURS = 3 * ONE_HOUR;
     @SuppressWarnings("unused")
     private static final int ONE_DAY    = 24*ONE_HOUR;
 
@@ -71,14 +68,14 @@ public class JXMonthViewIssues extends InteractiveTestCase {
       JXMonthViewIssues  test = new JXMonthViewIssues();
       try {
 //          test.runInteractiveTests();
-        test.runInteractiveTests(".*Stack.*");
+        test.runInteractiveTests("interactive.*TimeZone.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
-
-    
+    @SuppressWarnings("unused")
+    private Calendar calendar;
     /**
      * Issue #618-swingx: JXMonthView displays problems with non-default
      * timezones.
@@ -95,6 +92,8 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         final Calendar cal = Calendar.getInstance();
         // Synchronize the picker and selector's zones.
         zoneSelector.setSelectedItem(picker.getTimeZone().getID());
+        Date first = new Date(monthView.getFirstDisplayedDate());
+        cal.setTime(first);
 
         // Set the picker's time zone based on the selected time zone.
         zoneSelector.addActionListener(new ActionListener() {
@@ -103,14 +102,17 @@ public class JXMonthViewIssues extends InteractiveTestCase {
                 TimeZone tz = TimeZone.getTimeZone(zone);
                 picker.setTimeZone(tz);
                 monthView.setTimeZone(tz);
-                
+              
                 assertEquals(tz, monthView.getCalendar().getTimeZone());
                 cal.setTimeZone(tz);
-                String formatS = "EEE, d MMM yyyy HH:mm:ss z";
+                String formatS = "EEE, d MMM yyyy HH:mm:ss Z";
                 DateFormat format = new SimpleDateFormat(formatS);
                 format.setTimeZone(tz);
-                LOG.info("time in cal " + format.format(cal.getTime()));
-                
+                LOG.info("time in cal " + format.format(cal.getTime()) 
+                       + "\n first in monthView " + format.format(new Date(monthView.getFirstDisplayedDate())) 
+                       + "\n last in monthView " + format.format(new Date(monthView.getLastDisplayedDate()))
+                        
+                );
             }
         });
 
@@ -131,7 +133,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         frame.pack();
     }
     
-   
+    
     public void interactiveSimple() {
         JXMonthView month = new JXMonthView();
         month.setTraversable(true);
@@ -141,87 +143,165 @@ public class JXMonthViewIssues extends InteractiveTestCase {
 //----------------------
     
 
-    public void testTimeZone() {
-        JXMonthView monthView = new JXMonthView();
-        Calendar cal = monthView.getCalendar();
-        assertEquals(cal.getTimeZone(), monthView.getTimeZone());
-        assertEquals(cal.getTime(), new Date(monthView.getFirstDisplayedDate()));
-        assertEquals(0, cal.getTimeZone().getRawOffset() / ONE_HOUR);
-        
-    }
-    /**
-     * Issue #618-swingx: JXMonthView displays problems with non-default
-     * timezones.
-     * 
-     */
-    public void testTimeZoneUpdate() {
-        JXMonthView monthView = new JXMonthView();
-        monthView.setSelectedDate(new Date());
-        TimeZone timezone = monthView.getTimeZone();
-        int offset = timezone.getRawOffset();
-        int oneHour = 60 * 1000 * 60;
-        int newOffset = offset < 0 ? offset + oneHour : offset - oneHour;
-        String[] availableIDs = TimeZone.getAvailableIDs(newOffset);
-        TimeZone newTimeZone = TimeZone.getTimeZone(availableIDs[0]);
-        // sanity
-        assertFalse(timezone.equals(newTimeZone));
-        PropertyChangeReport report = new PropertyChangeReport();
-        monthView.addPropertyChangeListener(report);
-        monthView.setTimeZone(newTimeZone);
-        TestUtils.assertPropertyChangeEvent(report, monthView, 
-                "timeZone", timezone, newTimeZone);
-    }
-    /**
-     * BasicMonthViewUI: use adjusting api in keyboard actions.
-     * Here: test add selection action.
-     * 
-     * TODO: this fails (unrelated to the adjusting) because the
-     * the selectionn changing event type is DATES_SET instead of 
-     * the expected DATES_ADDED.  What's wrong - expectation or type?
-     */
-    public void testAdjustingSetOnAdd() {
-        JXMonthView view = new JXMonthView();
-        // otherwise the add action isn't called
-        view.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
-        DateSelectionReport report = new DateSelectionReport();
-        view.getSelectionModel().addDateSelectionListener(report);
-        Action select = view.getActionMap().get("adjustSelectionNextDay");
-        select.actionPerformed(null);
-        assertTrue("ui keyboard action must have started model adjusting", 
-                view.getSelectionModel().isAdjusting());
-        assertEquals(2, report.getEventCount());
-        // assert that the adjusting is fired before the add
-        // only: the ui fires a set instead - bug or feature?
-         assertEquals(EventType.DATES_ADDED, report.getLastEvent().getEventType());
-    }
-
-    /**
-    *
-    * Okay ... looks more like a confusing (me!) doc: the date
-    * in the constructor is not the selection, but the date
-    * to use for the first display. Hmm ...
+   /**
+    * Characterize MonthView: initial firstDisplayedDate set to 
+    * first day in the month of the current date.
     */
-   public void testMonthViewInitialSelection() {
-       JXMonthView monthView = new JXMonthView(new GregorianCalendar(2007, 6, 28).getTimeInMillis());
-       assertNotNull(monthView.getSelectedDate());
+   public void testMonthViewCalendarInvariantOnSetFirstDisplayedDate() {
+     JXMonthView monthView = new JXMonthView();
+     Date first = new Date(monthView.getFirstDisplayedDate());
+     Calendar cal = Calendar.getInstance();
+     // add one day, now we are on the second
+     cal.setTime(first);
+     cal.add(Calendar.MONTH, 1);
+     Date next = cal.getTime();
+     monthView.setFirstDisplayedDate(next.getTime());
+     assertEquals("monthViews calendar represents the first day of the month", 
+             next, monthView.getCalendar().getTime());
    }
-
+   
+   /**
+    * Characterize MonthView: initial firstDisplayedDate set to 
+    * first day in the month of the current date.
+    */
+   public void testMonthViewCalendarWasLastDisplayedDateSetFirstDisplayedDate() {
+     JXMonthView monthView = new JXMonthView();
+     Date first = new Date(monthView.getFirstDisplayedDate());
+     Calendar cal = Calendar.getInstance();
+     // add one day, now we are on the second
+     cal.setTime(first);
+     cal.add(Calendar.MONTH, 1);
+     Date next = cal.getTime();
+     monthView.setFirstDisplayedDate(next.getTime());
+     assertEquals("calendar is changed to lastDisplayedDate", 
+             new Date(monthView.getLastDisplayedDate()), monthView.getCalendar().getTime());
+   }
    /**
     * 
-    * no invariant for the monthView's calender
+    * no invariant for the monthView's calender?
     * monthViewUI at some places restores to firstDisplayedDay, why?
-    *
+    * It probably should always - the calendar represents the 
+    * first day of the currently shown month.
     */
-   public void testCalendar() {
+   public void testMonthViewCalendarInvariantOnSetSelection() {
       JXMonthView monthView = new JXMonthView();
       assertEquals(1, monthView.getCalendar().get(Calendar.DATE));
       Date first = new Date(monthView.getFirstDisplayedDate());
-      assertEquals(first, monthView.getCalendar().getTime());
-      Date date = XTestUtils.getCleanedToday(10);
+      assertEquals("monthViews calendar represents the first day of the month", 
+              first, monthView.getCalendar().getTime());
+      Calendar cal = Calendar.getInstance();
+      // add one day, now we are on the second
+      cal.setTime(first);
+      cal.add(Calendar.DATE, 1);
+      Date date = cal.getTime();
       monthView.addSelectionInterval(date , date);
-      assertEquals(first, monthView.getCalendar().getTime());
+      assertEquals("selection must not change the calendar", 
+              first, monthView.getCalendar().getTime());
       monthView.isSelectedDate(new Date().getTime());
       assertEquals(first, monthView.getCalendar().getTime());
    }
 
+   /**
+    * 
+    * no invariant for the monthView's calender?
+    * monthViewUI at some places restores to firstDisplayedDay, why?
+    * It probably should always - the calendar represents the 
+    * first day of the currently shown month.
+    */
+   public void testMonthViewCalendarInvariantOnQuerySelectioon() {
+      JXMonthView monthView = new JXMonthView();
+      assertEquals(1, monthView.getCalendar().get(Calendar.DATE));
+      Date first = new Date(monthView.getFirstDisplayedDate());
+      assertEquals("monthViews calendar represents the first day of the month", 
+              first, monthView.getCalendar().getTime());
+      Calendar cal = Calendar.getInstance();
+      // add one day, now we are on the second
+      cal.setTime(first);
+      cal.add(Calendar.DATE, 1);
+      Date date = cal.getTime();
+      monthView.isSelectedDate(date);
+      assertEquals("query selection must not change the calendar", 
+              first, monthView.getCalendar().getTime());
+   }
+
+   /**
+    * characterize calendar: minimal days in first week
+    * Different for US (1) and Europe (4)
+    */
+   public void testCalendarMinimalDaysInFirstWeek() {
+       Calendar us = Calendar.getInstance(Locale.US);
+       assertEquals(1, us.getMinimalDaysInFirstWeek());
+       Calendar french = Calendar.getInstance(Locale.FRENCH);
+       assertEquals("french/european calendar", 1, french.getMinimalDaysInFirstWeek());
+   }
+   
+   /**
+    * characterize calendar: first day of week 
+    * Can be set arbitrarily. Hmmm ... when is that useful?
+    */
+   public void testCalendarFirstDayOfWeek() {
+       Calendar french = Calendar.getInstance(Locale.FRENCH);
+       assertEquals(Calendar.MONDAY, french.getFirstDayOfWeek());
+       Calendar us = Calendar.getInstance(Locale.US);
+       assertEquals(Calendar.SUNDAY, us.getFirstDayOfWeek());
+       // JW: when would we want that?
+       us.setFirstDayOfWeek(Calendar.FRIDAY);
+       assertEquals(Calendar.FRIDAY, us.getFirstDayOfWeek());
+   }
+
+   /**
+    * Trying to figure monthView's calendar's invariant: has none?
+    */
+   public void testTimeZone() {
+       JXMonthView monthView = new JXMonthView();
+       Calendar cal = monthView.getCalendar();
+       assertEquals(cal.getTimeZone(), monthView.getTimeZone());
+       assertEquals(cal.getTime(), new Date(monthView.getFirstDisplayedDate()));
+       assertEquals(0, cal.getTimeZone().getRawOffset() / ONE_HOUR);
+   }
+   
+   /**
+    * BasicMonthViewUI: use adjusting api in keyboard actions.
+    * Here: test add selection action.
+    * 
+    * TODO: this fails (unrelated to the adjusting) because the
+    * the selectionn changing event type is DATES_SET instead of 
+    * the expected DATES_ADDED.  What's wrong - expectation or type?
+    */
+   public void testAdjustingSetOnAdd() {
+       JXMonthView view = new JXMonthView();
+       // otherwise the add action isn't called
+       view.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
+       DateSelectionReport report = new DateSelectionReport();
+       view.getSelectionModel().addDateSelectionListener(report);
+       Action select = view.getActionMap().get("adjustSelectionNextDay");
+       select.actionPerformed(null);
+       assertTrue("ui keyboard action must have started model adjusting", 
+               view.getSelectionModel().isAdjusting());
+       assertEquals(2, report.getEventCount());
+       // assert that the adjusting is fired before the add
+       // only: the ui fires a set instead - bug or feature?
+        assertEquals(EventType.DATES_ADDED, report.getLastEvent().getEventType());
+   }
+
+  
+
+   /**
+     * 
+     * Okay ... looks more like a confusing (me!) doc: the date in the
+     * constructor is not the selection, but the date to use for the first
+     * display. Hmm ...
+     */
+    public void testMonthViewInitialSelection() {
+        JXMonthView monthView = new JXMonthView(new GregorianCalendar(2007, 6,
+                28).getTimeInMillis());
+        assertNotNull(monthView.getSelectedDate());
+    }
+
+    @Override
+    protected void setUp() throws Exception {
+        calendar = Calendar.getInstance();
+    }
+
+  
 }
