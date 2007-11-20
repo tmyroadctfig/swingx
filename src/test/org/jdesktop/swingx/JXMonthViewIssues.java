@@ -25,8 +25,6 @@ import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -43,6 +41,7 @@ import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
 import org.jdesktop.swingx.test.XTestUtils;
@@ -270,7 +269,60 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         });
     }
     
-   /**
+
+    /**
+     * 
+     * Issue #659-swingx: lastDisplayedDate must be synched.
+     * 
+     * test that ensureDateVisible works as doc'ed if multiple months shown: 
+     * if the new date is in the
+     * month following the last visible then the first must be set in a manner that
+     * the date must be visible in the last month. 
+     * 
+     * @throws InvocationTargetException 
+     * @throws InterruptedException 
+     */
+    public void testLastDisplayedDateSizeChangedEnsureVisible() throws InterruptedException, InvocationTargetException {
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run lastDisplayedDate - headless");
+            return;
+        }
+        final JXMonthView monthView = new JXMonthView();
+        final JXFrame frame = wrapInFrame(monthView, "");
+        frame.setVisible(true);
+        frame.setSize(frame.getWidth() * 3, frame.getHeight() * 2);
+        // force a revalidate
+        frame.invalidate();
+        frame.validate();
+        SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(monthView.getFirstDisplayedDate());
+                int firstMonth = calendar.get(Calendar.MONTH);
+                long uiLast = monthView.getUI().calculateLastDisplayedDate();
+                calendar.setTimeInMillis(uiLast);
+                int lastMonth = calendar.get(Calendar.MONTH);
+                // sanity: more than one month shown
+                assertFalse(firstMonth == lastMonth);
+                // first day of next month 
+                calendar.add(Calendar.DATE, 1);
+                // sanity
+                int newLastMonth = calendar.get(Calendar.MONTH);
+                assertFalse(lastMonth == newLastMonth);
+                monthView.ensureDateVisible(calendar.getTimeInMillis());
+                CalendarUtils.endOfMonth(calendar);
+                long newUILast = monthView.getUI().calculateLastDisplayedDate();
+                assertEquals(newUILast, monthView.getLastDisplayedDate());
+                calendar.setTimeInMillis(newUILast);
+                LOG.info("first/last: " + new Date(monthView.getFirstDisplayedDate()) + 
+                        "/" + new Date(newUILast));
+                assertEquals(newLastMonth, calendar.get(Calendar.MONTH));
+            }
+        });
+    }
+    
+
+    /**
     * Characterize MonthView: initial firstDisplayedDate set to 
     * first day in the month of the current date.
     */
