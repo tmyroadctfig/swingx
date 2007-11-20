@@ -378,10 +378,10 @@ public class XLocalizeTest extends InteractiveTestCase {
      */
     public void testGetLocaleUIDefaults() {
         String key = "JXTable.column.packAll";
-        Object alternativeValue = UIManager.get(key, OTHER_LOCALE);
+        Object alternativeValue = UIManagerExt.getString(key, OTHER_LOCALE);
         // sanity - the value must be available
         assertNotNull(alternativeValue);
-        Object defaultValue = UIManager.get(key, A_LOCALE);
+        Object defaultValue = UIManagerExt.getString(key, A_LOCALE);
         // sanity - the value must be available
         assertNotNull(defaultValue);
         assertFalse("values must be different: " + defaultValue + "/" + alternativeValue, defaultValue.equals(alternativeValue));
