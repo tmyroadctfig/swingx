@@ -142,6 +142,28 @@ public class JXMonthViewIssues extends InteractiveTestCase {
 
 //----------------------
     
+    /**
+     * Issue #618-swingx: JXMonthView displays problems with non-default
+     * timezones.
+     * 
+     * Here: test anchor invariant to time zone change
+     */
+    public void testTimeZoneChangeAnchorInvariant() {
+        JXMonthView monthView = new JXMonthView();
+        Date anchor = monthView.getAnchorDate();
+        TimeZone timeZone = monthView.getTimeZone();
+        int offset = timeZone.getRawOffset();
+        int diffRawOffset = THREE_HOURS;
+        int newOffset = offset < 0 ? offset + diffRawOffset : offset - diffRawOffset;
+        String[] availableIDs = TimeZone.getAvailableIDs(newOffset);
+        TimeZone newTimeZone = TimeZone.getTimeZone(availableIDs[0]);
+        monthView.setTimeZone(newTimeZone);
+        //sanity ... 
+        assertEquals(timeZone.getRawOffset() - diffRawOffset, monthView.getTimeZone().getRawOffset());
+        assertEquals("anchor must be invariant to timezone change", 
+                anchor, monthView.getAnchorDate());
+    }
+
 
    /**
     * Characterize MonthView: initial firstDisplayedDate set to 
