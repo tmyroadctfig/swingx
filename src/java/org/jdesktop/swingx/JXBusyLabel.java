@@ -114,10 +114,12 @@ public class JXBusyLabel extends JLabel {
     }
     
     private void stopAnimation() {
-        busy.stop();
-        busyPainter.setFrame(-1);
-        repaint();
-        busy = null;
+        if (busy != null) {
+    		busy.stop();
+            busyPainter.setFrame(-1);
+            repaint();
+            busy = null;
+        }
     }
     
     @Override
