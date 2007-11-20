@@ -18,7 +18,24 @@ public abstract class MonthViewUI extends ComponentUI {
      * Calculate the last possible date that can be displayed.
      * This is implemented by the UI since it is in control of layout
      * and may possibly yeild different results based on implementation.
+     * 
      * @return long The date.
+     * 
+     * @deprecated use getLastDisplayedDate() instead
+     * 
      */
     public abstract long calculateLastDisplayedDate();
+    
+    
+    /**
+     * Returns the last possible date that can be displayed.
+     * This is implemented by the UI since it is in control of layout
+     * and may possibly yeild different results based on implementation. <p>
+     * 
+     * It's up to the UI to keep this property, based on internal state and
+     * the firstDisplayed as controlled by the JXMonthView.
+     * 
+     * @return long The date.
+     */
+    public abstract long getLastDisplayedDate();
 }

@@ -208,7 +208,7 @@ public class JXMonthView extends JComponent {
     private long firstDisplayedDate;
     private int firstDisplayedMonth;
     private int firstDisplayedYear;
-    private long lastDisplayedDate;
+//    private long lastDisplayedDate;
 
     private int boxPaddingX;
     private int boxPaddingY;
@@ -378,7 +378,8 @@ public class JXMonthView extends JComponent {
         firePropertyChange(FIRST_DISPLAYED_MONTH, oldFirstDisplayedMonth, firstDisplayedMonth);
         firePropertyChange(FIRST_DISPLAYED_YEAR, oldFirstDisplayedYear, firstDisplayedYear);
 
-        calculateLastDisplayedDate();
+        // it's up to the ui to calculate
+//        calculateLastDisplayedDate();
 
         repaint();
     }
@@ -402,39 +403,43 @@ public class JXMonthView extends JComponent {
      * @return long The last displayed date.
      */
     public long getLastDisplayedDate() {
-        return lastDisplayedDate;
+        return getUI().getLastDisplayedDate();
     }
 
-    private void calculateLastDisplayedDate() {
-        lastDisplayedDate = getUI().calculateLastDisplayedDate();
-    }
+//    private long calculateLastDisplayedDate() {
+//        return getUI().calculateLastDisplayedDate();
+//    }
 
     /**
-     * Moves the <code>date</code> into the visible region of the calendar.
-     * If the date is greater than the last visible date it will become the
-     * last visible date.  While if it is less than the first visible date
-     * it will become the first visible date.
-     *
+     * Moves the <code>date</code> into the visible region of the calendar. If
+     * the date is greater than the last visible date it will become the last
+     * visible date. While if it is less than the first visible date it will
+     * become the first visible date.
+     * 
      * @param date Date to make visible.
      */
     public void ensureDateVisible(long date) {
         if (date < firstDisplayedDate) {
             setFirstDisplayedDate(date);
-        } else if (date > lastDisplayedDate) {
-            cal.setTimeInMillis(date);
-            int month = cal.get(Calendar.MONTH);
-            int year = cal.get(Calendar.YEAR);
+        } else {
+            long lastDisplayedDate = getLastDisplayedDate();
+            if (date > lastDisplayedDate) {
 
-            cal.setTimeInMillis(lastDisplayedDate);
-            int lastMonth = cal.get(Calendar.MONTH);
-            int lastYear = cal.get(Calendar.YEAR);
+                cal.setTimeInMillis(date);
+                int month = cal.get(Calendar.MONTH);
+                int year = cal.get(Calendar.YEAR);
 
-            int diffMonths = month - lastMonth +
-                    ((year - lastYear) * MONTHS_IN_YEAR);
+                cal.setTimeInMillis(lastDisplayedDate);
+                int lastMonth = cal.get(Calendar.MONTH);
+                int lastYear = cal.get(Calendar.YEAR);
 
-            cal.setTimeInMillis(firstDisplayedDate);
-            cal.add(Calendar.MONTH, diffMonths);
-            setFirstDisplayedDate(cal.getTimeInMillis());
+                int diffMonths = month - lastMonth
+                        + ((year - lastYear) * MONTHS_IN_YEAR);
+
+                cal.setTimeInMillis(firstDisplayedDate);
+                cal.add(Calendar.MONTH, diffMonths);
+                setFirstDisplayedDate(cal.getTimeInMillis());
+            }
         }
 
         firePropertyChange(ENSURE_DATE_VISIBILITY, null, date);

@@ -122,6 +122,16 @@ public class JXMonthViewTest extends MockObjectTestCase {
     }
 
     /**
+     * safety net: move responsibility for lastDisplayedDate completely into ui.
+     */
+    public void testLastDisplayedDateInitial() {
+        JXMonthView monthView = new JXMonthView();
+        cal.setTimeInMillis(monthView.getFirstDisplayedDate());
+        CalendarUtils.endOfMonth(cal);
+        assertEquals(cal.getTime(), new Date(monthView.getLastDisplayedDate()));
+    }
+    
+    /**
      * Issue #618-swingx: JXMonthView displays problems with non-default
      * timezones.
      * 

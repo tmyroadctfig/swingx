@@ -606,25 +606,50 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         if (oldNumCalCols != numCalCols ||
                 oldNumCalRows != numCalRows) {
-            calculateLastDisplayedDate();
+            updateLastDisplayedDate(firstDisplayedDate);
         }
     }
 
-
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * This method will be hidden soon: the newer perspective is that the
+     * ui is responsible to keep the value in a reasonable state to query from
+     * the outside. 
+     */
     public long calculateLastDisplayedDate() {
-        Calendar cal = getCalendar(firstDisplayedDate);
-//        cal.setTimeInMillis(firstDisplayedDate);
+        updateLastDisplayedDate(firstDisplayedDate);
+        return lastDisplayedDate;
+    }
 
-//        // Figure out the last displayed date.
+    /**
+     * Updates the lastDisplayedDate property based on the given first and 
+     * visible # of months.
+     * 
+     * @param first the date of the first visible day.
+     */
+    private void updateLastDisplayedDate(long first) {
+        Calendar cal = getCalendar(first);
         cal.add(Calendar.MONTH, ((numCalCols * numCalRows) - 1));
-//        cal.set(Calendar.DAY_OF_MONTH,
-//                cal.getActualMaximum(Calendar.DAY_OF_MONTH));
-//        cal.set(Calendar.HOUR_OF_DAY, 23);
-//        cal.set(Calendar.MINUTE, 59);
-//        cal.set(Calendar.SECOND, 59);
         CalendarUtils.endOfMonth(cal);
         lastDisplayedDate = cal.getTimeInMillis();
-        resetCalendar();
+    }
+
+    /**
+     * Updates internals after first displayed date changed in monthView.
+     * Here: sets local copies of first displayed and last displayed.
+     *  
+     * PENDING: assumption is that the new first is start of day?
+     * 
+     * @param first the new first displayed date
+     */
+    private void updateFirstDisplayedDate(long first) {
+        firstDisplayedDate = first;
+        updateLastDisplayedDate(first);
+    }
+
+    @Override
+    public long getLastDisplayedDate() {
         return lastDisplayedDate;
     }
 
@@ -1436,6 +1461,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
     }
 
+
     private class Handler implements  
         MouseListener, MouseMotionListener, LayoutManager,
             PropertyChangeListener, DateSelectionListener {
@@ -1739,7 +1765,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 selectionModel = (DateSelectionModel) evt.getNewValue();
                 selectionModel.addDateSelectionListener(getHandler());
             } else if (JXMonthView.FIRST_DISPLAYED_DATE.equals(property)) {
-                firstDisplayedDate = (Long)evt.getNewValue();
+                updateFirstDisplayedDate(((Long) evt.getNewValue()));
             } else if (JXMonthView.FIRST_DISPLAYED_MONTH.equals(property)) {
                 firstDisplayedMonth = (Integer)evt.getNewValue();
             } else if (JXMonthView.FIRST_DISPLAYED_YEAR.equals(property)) {
