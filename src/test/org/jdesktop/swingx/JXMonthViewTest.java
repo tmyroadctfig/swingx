@@ -89,7 +89,8 @@ public class JXMonthViewTest extends MockObjectTestCase {
         // sanity
         assertTrue(monthView.isSelectedDate(date));
         monthView.setTimeZone(getTimeZone(monthView.getTimeZone(), THREE_HOURS));
-        // makes sense only in the timezone it had been selected in
+        // accidentally passes - because it is meaningful only in the timezone 
+        // it was set ...
         assertFalse(monthView.isSelectedDate(date));
         assertTrue("selection must have been cleared", monthView.isSelectionEmpty());
     }
@@ -141,6 +142,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         // it was set ...
         assertFalse(monthView.isFlaggedDate(time));
         // missing api
+        // assertEquals(0, monthView.getFlaggedDates().size());
         assertFalse("flagged dates must have been cleared", monthView.hasFlaggedDates());
     }
     
@@ -166,9 +168,9 @@ public class JXMonthViewTest extends MockObjectTestCase {
     }
     
     /**
-     * test anchor invariant.
+     * test anchor: set to param as passed int setFirstDisplayedDate
      */
-    public void testAnchorDate() {
+    public void testAnchorDateInitial() {
         JXMonthView monthView = new JXMonthView();
         // sometime next month
         cal.add(Calendar.MONTH, 1);
@@ -176,6 +178,22 @@ public class JXMonthViewTest extends MockObjectTestCase {
         assertEquals(cal.getTime(), monthView.getAnchorDate());
         CalendarUtils.startOfMonth(cal);
         assertEquals(cal.getTimeInMillis(), monthView.getFirstDisplayedDate());
+    }
+
+    /**
+     * Issue #618-swingx: JXMonthView displays problems with non-default
+     * timezones.
+     * 
+     * Here: test anchor invariant to time zone change
+     */
+    public void testTimeZoneChangeAnchorInvariant() {
+        JXMonthView monthView = new JXMonthView();
+        Date anchor = monthView.getAnchorDate();
+        TimeZone timeZone = monthView.getTimeZone();
+        // just interested in a different timezone, no quantification intended
+        monthView.setTimeZone(getTimeZone(timeZone, THREE_HOURS));
+        assertEquals("anchor must be invariant to timezone change", 
+                anchor, monthView.getAnchorDate());
     }
 
     /**
@@ -299,6 +317,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         TimeZone newTimeZone = TimeZone.getTimeZone(availableIDs[0]);
         return newTimeZone;
     }
+    
     /**
      * Issue #618-swingx: JXMonthView displays problems with non-default
      * timezones.
@@ -355,15 +374,12 @@ public class JXMonthViewTest extends MockObjectTestCase {
         PropertyChangeReport report = new PropertyChangeReport();
         monthView.addPropertyChangeListener(report);
         monthView.setComponentInputMapEnabled(true);
-        // can't use the utility method - clearing the
-        // componentInputMap fires an internal client property
-        // "_WhenInFocused_Window"
-//        TestUtils.assertPropertyChangeEvent(report, 
-//                "componentInputMapEnabled", false, true);
-        assertEquals(1, report.getEventCount("componentInputMapEnabled"));
+        TestUtils.assertPropertyChangeEvent(report, 
+                "componentInputMapEnabled", false, true, false);
         report.clear();
         monthView.setComponentInputMapEnabled(false);
-        assertEquals(1, report.getEventCount("componentInputMapEnabled"));
+        TestUtils.assertPropertyChangeEvent(report, 
+                "componentInputMapEnabled", true, false, false);
     }
     
     /**

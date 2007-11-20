@@ -25,12 +25,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
@@ -42,6 +42,7 @@ import org.jdesktop.swingx.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
+import org.jdesktop.swingx.test.XTestUtils;
 
 /**
  * Test to expose known issues with JXMonthView.
@@ -89,11 +90,8 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         final JXMonthView monthView = new JXMonthView();
         monthView.setSelectedDate(picker.getDate());
         monthView.setTraversable(true);
-        final Calendar cal = Calendar.getInstance();
         // Synchronize the picker and selector's zones.
         zoneSelector.setSelectedItem(picker.getTimeZone().getID());
-        Date first = new Date(monthView.getFirstDisplayedDate());
-        cal.setTime(first);
 
         // Set the picker's time zone based on the selected time zone.
         zoneSelector.addActionListener(new ActionListener() {
@@ -104,15 +102,6 @@ public class JXMonthViewIssues extends InteractiveTestCase {
                 monthView.setTimeZone(tz);
               
                 assertEquals(tz, monthView.getCalendar().getTimeZone());
-                cal.setTimeZone(tz);
-                String formatS = "EEE, d MMM yyyy HH:mm:ss Z";
-                DateFormat format = new SimpleDateFormat(formatS);
-                format.setTimeZone(tz);
-                LOG.info("time in cal " + format.format(cal.getTime()) 
-                       + "\n first in monthView " + format.format(new Date(monthView.getFirstDisplayedDate())) 
-                       + "\n last in monthView " + format.format(new Date(monthView.getLastDisplayedDate()))
-                        
-                );
             }
         });
 
@@ -133,6 +122,63 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         frame.pack();
     }
     
+    /**
+     * Issue #618-swingx: JXMonthView displays problems with non-default
+     * timezones.
+     * 
+     */
+    public void interactiveTimeZoneClearDateState() {
+        JPanel panel = new JPanel();
+
+        final JComboBox zoneSelector = new JComboBox(TimeZone.getAvailableIDs());
+        final JXDatePicker picker = new JXDatePicker();
+        final JXMonthView monthView = new JXMonthView();
+        monthView.setSelectedDate(picker.getDate());
+        monthView.setLowerBound(XTestUtils.getStartOfToday(-10));
+        monthView.setUpperBound(XTestUtils.getStartOfToday(10));
+        monthView.setUnselectableDates(XTestUtils.getStartOfToday(2));
+        monthView.setFlaggedDates(new long[] {XTestUtils.getStartOfToday(4).getTime()});
+        monthView.setTraversable(true);
+        // Synchronize the picker and selector's zones.
+        zoneSelector.setSelectedItem(picker.getTimeZone().getID());
+
+        // Set the picker's time zone based on the selected time zone.
+        zoneSelector.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                String zone = (String) zoneSelector.getSelectedItem();
+                TimeZone tz = TimeZone.getTimeZone(zone);
+                picker.setTimeZone(tz);
+                monthView.setTimeZone(tz);
+              
+                assertEquals(tz, monthView.getCalendar().getTimeZone());
+            }
+        });
+
+        panel.add(zoneSelector);
+        panel.add(picker);
+        panel.add(monthView);
+        JXFrame frame = showInFrame(panel, "clear internal date-related state");
+        Action assertAction = new AbstractActionExt("assert dates") {
+
+            public void actionPerformed(ActionEvent e) {
+                Calendar cal = monthView.getCalendar();
+                LOG.info("cal/firstDisplayed" + 
+                        cal.getTime() +"/" + new Date(monthView.getFirstDisplayedDate()));
+            }
+            
+        };
+        addAction(frame, assertAction);
+        frame.pack();
+    }
+    
+    private String[] getTimeZoneIDs() {
+        List<String> zoneIds = new ArrayList<String>();
+        for (int i = -12; i <= 12; i++) {
+            String sign = i < 0 ? "-" : "+";
+            zoneIds.add("GMT" + sign + i);
+        }
+        return zoneIds.toArray(new String[zoneIds.size()]);
+    }
     
     public void interactiveSimple() {
         JXMonthView month = new JXMonthView();
@@ -142,28 +188,6 @@ public class JXMonthViewIssues extends InteractiveTestCase {
 
 //----------------------
     
-    /**
-     * Issue #618-swingx: JXMonthView displays problems with non-default
-     * timezones.
-     * 
-     * Here: test anchor invariant to time zone change
-     */
-    public void testTimeZoneChangeAnchorInvariant() {
-        JXMonthView monthView = new JXMonthView();
-        Date anchor = monthView.getAnchorDate();
-        TimeZone timeZone = monthView.getTimeZone();
-        int offset = timeZone.getRawOffset();
-        int diffRawOffset = THREE_HOURS;
-        int newOffset = offset < 0 ? offset + diffRawOffset : offset - diffRawOffset;
-        String[] availableIDs = TimeZone.getAvailableIDs(newOffset);
-        TimeZone newTimeZone = TimeZone.getTimeZone(availableIDs[0]);
-        monthView.setTimeZone(newTimeZone);
-        //sanity ... 
-        assertEquals(timeZone.getRawOffset() - diffRawOffset, monthView.getTimeZone().getRawOffset());
-        assertEquals("anchor must be invariant to timezone change", 
-                anchor, monthView.getAnchorDate());
-    }
-
 
    /**
     * Characterize MonthView: initial firstDisplayedDate set to 

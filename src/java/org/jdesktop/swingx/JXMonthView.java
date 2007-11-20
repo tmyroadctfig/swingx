@@ -128,7 +128,7 @@ import org.jdesktop.swingx.util.Contract;
 public class JXMonthView extends JComponent {
     
     /*
-     * moved from package calendar to core at version 1.51
+     * moved from package calendar to swingx at version 1.51
      */
     public static enum SelectionMode {
         /**
@@ -297,7 +297,7 @@ public class JXMonthView extends JComponent {
         cal.setMinimalDaysInFirstWeek(1);
 
         // Keep track of today
-        setToday(cleanupDate(cal.getTimeInMillis()));
+        updateTodayFromCurrentTime();
 
         setFocusable(true);
         todayBackgroundColor = getForeground();
@@ -370,8 +370,6 @@ public class JXMonthView extends JComponent {
 
         cal.setTimeInMillis(anchor.getTimeInMillis());
         CalendarUtils.startOfMonth(cal);
-//        cal.setTimeInMillis(cleanupDate(date));
-//        cal.set(Calendar.DAY_OF_MONTH, 1);
         firstDisplayedDate = cal.getTimeInMillis();
         firstDisplayedMonth = cal.get(Calendar.MONTH);
         firstDisplayedYear = cal.get(Calendar.YEAR);
@@ -821,7 +819,7 @@ public class JXMonthView extends JComponent {
      * 
      * @return a boolean indicating if this monthView has flagged dates.
      */
-    public boolean hasFlaggedDates() {
+    protected boolean hasFlaggedDates() {
         return (flaggedDates != null) && (flaggedDates.size() > 0);
     }
     /**
