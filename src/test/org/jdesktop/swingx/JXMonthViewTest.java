@@ -79,15 +79,84 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JComponent.setDefaultLocale(componentLocale);
     }
 
+
+    /**
+     * Issue #660-swingx: JXMonthView must protect its calendar.
+     * Client manipulation on calendar must not change internal state.
+     * 
+     * This is guaranteed by returning a clone instead of the life object.
+     */
+    public void testMonthViewCalendarInvariant() {
+        JXMonthView monthView = new JXMonthView();
+        TimeZone tz = monthView.getTimeZone();
+        Calendar calendar = monthView.getCalendar();
+        calendar.setTimeZone(getTimeZone(tz, THREE_HOURS));
+        assertEquals("monthView must protect its calendar", tz, monthView.getTimeZone());
+    }
+
     /**
      * Issue #660-swingx: JXMonthView must protect its calendar.
      * 
-     * Characterize MonthView: initial firstDisplayedDate set to 
-     * first day in the month of the current date.
+     * Added invariant to the monthView's getCalender: clone and
+     * config to firstDisplayDate.
      * 
-     * JXMonthView should protect its calendar by giving out 
-     * a clone only - currently this passes because the BasicMonthViewUI
-     * uses a clone. Must still pass once we remove the cloning in the ui.
+     * The various tests are various contexts which broke the 
+     * expectation before fixing the issue. 
+     * Here the context is: select.
+     */
+   public void testMonthViewCalendarInvariantOnSetSelection() {
+      JXMonthView monthView = new JXMonthView();
+      assertEquals(1, monthView.getCalendar().get(Calendar.DATE));
+      Date first = new Date(monthView.getFirstDisplayedDate());
+      assertEquals("monthViews calendar represents the first day of the month", 
+              first, monthView.getCalendar().getTime());
+      Calendar cal = Calendar.getInstance();
+      // add one day, now we are on the second
+      cal.setTime(first);
+      cal.add(Calendar.DATE, 1);
+      Date date = cal.getTime();
+      monthView.addSelectionInterval(date , date);
+      assertEquals("selection must not change the calendar", 
+              first, monthView.getCalendar().getTime());
+   }
+
+   /**
+    * Issue #660-swingx: JXMonthView must protect its calendar.
+    * 
+    * Added invariant to the monthView's getCalender: clone and
+    * config to firstDisplayDate.
+    * 
+    * The various tests are various contexts which broke the 
+    * expectation before fixing the issue. 
+    * Here the context is: check for selection.
+    */
+   public void testMonthViewCalendarInvariantOnQuerySelectioon() {
+      JXMonthView monthView = new JXMonthView();
+      assertEquals(1, monthView.getCalendar().get(Calendar.DATE));
+      Date first = new Date(monthView.getFirstDisplayedDate());
+      assertEquals("monthViews calendar represents the first day of the month", 
+              first, monthView.getCalendar().getTime());
+      Calendar cal = Calendar.getInstance();
+      // add one day, now we are on the second
+      cal.setTime(first);
+      cal.add(Calendar.DATE, 1);
+      Date date = cal.getTime();
+      monthView.isSelectedDate(date);
+      assertEquals("query selection must not change the calendar", 
+              first, monthView.getCalendar().getTime());
+   }
+
+
+    /**
+     * Issue #660-swingx: JXMonthView must protect its calendar.
+     * 
+     * Added invariant to the monthView's getCalender: clone and
+     * config to firstDisplayDate.
+     * 
+     * The various tests are various contexts which broke the 
+     * expectation before fixing the issue. 
+     * Here the context is: set first displayed date (formerly left
+     * the calendar at the last displayed date).
      */
     public void testMonthViewCalendarInvariantOnSetFirstDisplayedDate() {
       JXMonthView monthView = new JXMonthView();

@@ -63,6 +63,7 @@ import javax.swing.text.View;
 
 import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.JXMonthView;
+import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DatePickerFormatter;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.event.DateSelectionEvent;
@@ -1311,14 +1312,11 @@ public class BasicDatePickerUI extends DatePickerUI {
     }
 
     // duplication!!
+    // PENDING: move to CalendarUtils ?
     private long cleanupDate(long date, Calendar cal) {
         cal.setTimeInMillis(date);
         // We only want to compare the day, month and year
-        // so reset all other values to 0.
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
+        CalendarUtils.startOfDay(cal);
         return cal.getTimeInMillis();
     }
 

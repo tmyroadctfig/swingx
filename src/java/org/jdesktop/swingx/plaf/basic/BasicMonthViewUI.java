@@ -778,7 +778,7 @@ public class BasicMonthViewUI extends MonthViewUI {
 
 
     /**
-     * Clones and returns the monthViews calendar configured to the given time.
+     * Returns the monthViews calendar configured to the given time.
      * 
      * PENDING: remove the cloning once the monthView guarantees to return a clone
      * 
@@ -786,7 +786,8 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @return the clone of the monthView's calendar, configured with the given date
      */
     private Calendar getCalendar(long date) {
-        Calendar calendar = (Calendar) monthView.getCalendar().clone();
+//        Calendar calendar = (Calendar) monthView.getCalendar().clone();
+        Calendar calendar = monthView.getCalendar();
         calendar.setTimeInMillis(date);
         return calendar;
     }

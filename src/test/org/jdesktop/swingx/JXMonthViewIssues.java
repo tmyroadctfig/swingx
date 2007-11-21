@@ -169,15 +169,6 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         frame.pack();
     }
     
-    private String[] getTimeZoneIDs() {
-        List<String> zoneIds = new ArrayList<String>();
-        for (int i = -12; i <= 12; i++) {
-            String sign = i < 0 ? "-" : "+";
-            zoneIds.add("GMT" + sign + i);
-        }
-        return zoneIds.toArray(new String[zoneIds.size()]);
-    }
-    
     /**
      * Issue #659-swingx: lastDisplayedDate must be synched.
      * 
@@ -206,98 +197,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
 
 //----------------------
     
-    /**
-     * Characterize MonthView: initial firstDisplayedDate set to 
-     * first day in the month of the current date.
-     * 
-     * KEEP: JXMonthView should protect its calendar by giving out 
-     * a clone only.
-     */
-    public void testMonthViewCalendarInvariant() {
-        JXMonthView monthView = new JXMonthView();
-        TimeZone tz = monthView.getTimeZone();
-        Calendar calendar = monthView.getCalendar();
-        calendar.setTimeZone(getTimeZone(tz, THREE_HOURS));
-        assertEquals("monthView must protect its calendar", tz, monthView.getTimeZone());
-    }
-    /**
-     * Returns a timezone with a rawoffset with a different offset.
-     * 
-     * 
-     * PENDING: this is acutally for european time, not really thought of 
-     *   negative/rolling +/- problem?
-     * 
-     * @param timeZone the timezone to start with 
-     * @param diffRawOffset the raw offset difference.
-     * @return
-     */
-    private TimeZone getTimeZone(TimeZone timeZone, int diffRawOffset) {
-        int offset = timeZone.getRawOffset();
-        int newOffset = offset < 0 ? offset + diffRawOffset : offset - diffRawOffset;
-        String[] availableIDs = TimeZone.getAvailableIDs(newOffset);
-        TimeZone newTimeZone = TimeZone.getTimeZone(availableIDs[0]);
-        return newTimeZone;
-    }
-
    
-   /**
-    * 
-    * no invariant for the monthView's calender?
-    * monthViewUI at some places restores to firstDisplayedDay, why?
-    * It probably should always - the calendar represents the 
-    * first day of the currently shown month.
-    * 
-    * MonthView internal misbehaviour.
-    * 
-    * KEEP: JXMonthView should protect its calendar by giving out 
-    * a clone only.
-    */
-   public void testMonthViewCalendarInvariantOnSetSelection() {
-      JXMonthView monthView = new JXMonthView();
-      assertEquals(1, monthView.getCalendar().get(Calendar.DATE));
-      Date first = new Date(monthView.getFirstDisplayedDate());
-      assertEquals("monthViews calendar represents the first day of the month", 
-              first, monthView.getCalendar().getTime());
-      Calendar cal = Calendar.getInstance();
-      // add one day, now we are on the second
-      cal.setTime(first);
-      cal.add(Calendar.DATE, 1);
-      Date date = cal.getTime();
-      monthView.addSelectionInterval(date , date);
-      assertEquals("selection must not change the calendar", 
-              first, monthView.getCalendar().getTime());
-      monthView.isSelectedDate(new Date().getTime());
-      assertEquals(first, monthView.getCalendar().getTime());
-   }
-
-   /**
-    * 
-    * no invariant for the monthView's calender?
-    * monthViewUI at some places restores to firstDisplayedDay, why?
-    * It probably should always - the calendar represents the 
-    * first day of the currently shown month.
-    * 
-    * Monthview internal misbehaviour.
-    * 
-    * KEEP: JXMonthView should protect its calendar by giving out 
-    * a clone only.
-    */
-   public void testMonthViewCalendarInvariantOnQuerySelectioon() {
-      JXMonthView monthView = new JXMonthView();
-      assertEquals(1, monthView.getCalendar().get(Calendar.DATE));
-      Date first = new Date(monthView.getFirstDisplayedDate());
-      assertEquals("monthViews calendar represents the first day of the month", 
-              first, monthView.getCalendar().getTime());
-      Calendar cal = Calendar.getInstance();
-      // add one day, now we are on the second
-      cal.setTime(first);
-      cal.add(Calendar.DATE, 1);
-      Date date = cal.getTime();
-      monthView.isSelectedDate(date);
-      assertEquals("query selection must not change the calendar", 
-              first, monthView.getCalendar().getTime());
-   }
-
    /**
     * characterize calendar: minimal days in first week
     * Different for US (1) and Europe (4)
@@ -350,6 +250,38 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         assertEquals(EventType.DATES_ADDED, report.getLastEvent().getEventType());
    }
 
+//------------------- utility
+   
+   /**
+    * Returns a timezone with a rawoffset with a different offset.
+    * 
+    * 
+    * PENDING: this is acutally for european time, not really thought of 
+    *   negative/rolling +/- problem?
+    * 
+    * @param timeZone the timezone to start with 
+    * @param diffRawOffset the raw offset difference.
+    * @return
+    */
+   @SuppressWarnings("unused")
+   private TimeZone getTimeZone(TimeZone timeZone, int diffRawOffset) {
+       int offset = timeZone.getRawOffset();
+       int newOffset = offset < 0 ? offset + diffRawOffset : offset - diffRawOffset;
+       String[] availableIDs = TimeZone.getAvailableIDs(newOffset);
+       TimeZone newTimeZone = TimeZone.getTimeZone(availableIDs[0]);
+       return newTimeZone;
+   }
+
+   @SuppressWarnings("unused")
+   private String[] getTimeZoneIDs() {
+       List<String> zoneIds = new ArrayList<String>();
+       for (int i = -12; i <= 12; i++) {
+           String sign = i < 0 ? "-" : "+";
+           zoneIds.add("GMT" + sign + i);
+       }
+       return zoneIds.toArray(new String[zoneIds.size()]);
+   }
+   
   
     @Override
     protected void setUp() throws Exception {

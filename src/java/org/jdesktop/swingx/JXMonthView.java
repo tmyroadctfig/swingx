@@ -1466,8 +1466,18 @@ public class JXMonthView extends JComponent {
         cal.setTimeInMillis(firstDisplayedDate);
     }
 
+    /**
+     * Returns a clone of the internal calendar, with it's time set to firstDisplayedDate.
+     * 
+     * PENDING: firstDisplayed useful as reference time? It's timezone dependent anyway. 
+     * 
+     * @return a clone of internal calendar, configured to the current firstDisplayedDate
+     */
     public Calendar getCalendar() {
-        return cal;
+        if (cal == null) return null;
+        Calendar calendar = (Calendar) cal.clone();
+        calendar.setTimeInMillis(firstDisplayedDate);
+        return calendar;
     }
 
     /**
