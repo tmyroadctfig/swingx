@@ -80,6 +80,29 @@ public class JXMonthViewTest extends MockObjectTestCase {
     }
 
     /**
+     * Issue #660-swingx: JXMonthView must protect its calendar.
+     * 
+     * Characterize MonthView: initial firstDisplayedDate set to 
+     * first day in the month of the current date.
+     * 
+     * JXMonthView should protect its calendar by giving out 
+     * a clone only - currently this passes because the BasicMonthViewUI
+     * uses a clone. Must still pass once we remove the cloning in the ui.
+     */
+    public void testMonthViewCalendarInvariantOnSetFirstDisplayedDate() {
+      JXMonthView monthView = new JXMonthView();
+      Date first = new Date(monthView.getFirstDisplayedDate());
+      Calendar cal = Calendar.getInstance();
+      // add one day, now we are on the second
+      cal.setTime(first);
+      cal.add(Calendar.MONTH, 1);
+      Date next = cal.getTime();
+      monthView.setFirstDisplayedDate(next.getTime());
+      assertEquals("monthViews calendar represents the first day of the month", 
+              next, monthView.getCalendar().getTime());
+    }
+
+    /**
      * safety net: refactor ensureDateVisible
      */
     public void testEnsureDateVisibleNextYear() {

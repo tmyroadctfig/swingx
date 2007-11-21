@@ -239,45 +239,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         return newTimeZone;
     }
 
-    /**
-    * Characterize MonthView: initial firstDisplayedDate set to 
-    * first day in the month of the current date.
-    * 
-    * KEEP: JXMonthView should protect its calendar by giving out 
-    * a clone only.
-    */
-   public void testMonthViewCalendarInvariantOnSetFirstDisplayedDate() {
-     JXMonthView monthView = new JXMonthView();
-     Date first = new Date(monthView.getFirstDisplayedDate());
-     Calendar cal = Calendar.getInstance();
-     // add one day, now we are on the second
-     cal.setTime(first);
-     cal.add(Calendar.MONTH, 1);
-     Date next = cal.getTime();
-     monthView.setFirstDisplayedDate(next.getTime());
-     assertEquals("monthViews calendar represents the first day of the month", 
-             next, monthView.getCalendar().getTime());
-   }
    
-   /**
-    * Characterize MonthView: initial firstDisplayedDate set to 
-    * first day in the month of the current date.
-    * 
-    * characterizes the current state. Can be removed if solved.
-    */
-   public void testMonthViewCalendarWasLastDisplayedDateSetFirstDisplayedDate() {
-     JXMonthView monthView = new JXMonthView();
-     Date first = new Date(monthView.getFirstDisplayedDate());
-     Calendar cal = Calendar.getInstance();
-     // add one day, now we are on the second
-     cal.setTime(first);
-     cal.add(Calendar.MONTH, 1);
-     Date next = cal.getTime();
-     monthView.setFirstDisplayedDate(next.getTime());
-     assertEquals("calendar is changed to lastDisplayedDate", 
-             new Date(monthView.getLastDisplayedDate()), monthView.getCalendar().getTime());
-     fail("calendar must not be changed to lastDisplayedDate");
-   }
    /**
     * 
     * no invariant for the monthView's calender?
