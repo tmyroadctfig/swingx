@@ -50,6 +50,22 @@ public class SerializableIssues extends InteractiveTestCase {
             fail("not serializable " + e);
         } 
     }
+
+    /**
+     * Issue #423-swingx: all descendants of JComponent must be 
+     * serializable.
+     * 
+     * 
+     */
+    public void testRootPane() {
+        JXRootPane component = new JXRootPane();
+        try {
+            SerializableSupport.serialize(component);
+        } catch (Exception e) {
+            fail("not serializable " + e);
+        } 
+    }
+    
     /**
      * Issue #423-swingx: all descendants of JComponent must be 
      * serializable. <p>
