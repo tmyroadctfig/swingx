@@ -2,8 +2,6 @@ package org.jdesktop.swingx.plaf;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.util.Arrays;
-import java.util.List;
 
 import javax.swing.LookAndFeel;
 import javax.swing.plaf.ColorUIResource;
@@ -20,38 +18,27 @@ public class MonthViewAddon extends AbstractComponentAddon {
      * {@inheritDoc}
      */
     @Override
-    protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+    protected void addBasicDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
         super.addBasicDefaults(addon, defaults);
-        defaults.addAll(Arrays.asList(new Object[] {
-                JXMonthView.uiClassID,
-                "org.jdesktop.swingx.plaf.basic.BasicMonthViewUI",
-                "JXMonthView.background", new ColorUIResource(Color.WHITE),
-                "JXMonthView.monthStringBackground", new ColorUIResource(138, 173, 209),
-                "JXMonthView.monthStringForeground", new ColorUIResource(68, 68, 68),
-                "JXMonthView.daysOfTheWeekForeground", new ColorUIResource(68, 68, 68),
-                "JXMonthView.weekOfTheYearForeground", new ColorUIResource(68, 68, 68),
-                "JXMonthView.unselectableDayForeground", new ColorUIResource(Color.RED),
-                "JXMonthView.selectedBackground", new ColorUIResource(197, 220, 240),
-                "JXMonthView.flaggedDayForeground", new ColorUIResource(Color.RED),
-                "JXMonthView.leadingDayForeground", new ColorUIResource(Color.LIGHT_GRAY),
-                "JXMonthView.trailingDayForeground", new ColorUIResource(Color.LIGHT_GRAY),
-                "JXMonthView.font", UIManagerExt.getSafeFont("Button.font",
-                        new FontUIResource("Dialog", Font.PLAIN, 12)),
-                //These should be loaded into defaults using LookAndFeel.makeIcon
-                //Currently these are loaded via getResourceAsStream in UI delegate
-                "JXMonthView.monthDownFileName", LookAndFeel.makeIcon(
-                        MonthViewAddon.class, "basic/resources/month-down.png"),
-                "JXMonthView.monthUpFileName", LookAndFeel.makeIcon(
-                        MonthViewAddon.class, "basic/resources/month-up.png"),
-                "JXMonthView.boxPaddingX", 3,
-                "JXMonthView.boxPaddingY", 3
-        }));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected void addMacDefaults(LookAndFeelAddons addon, List<Object> defaults) {
-        super.addMacDefaults(addon, defaults);
+        
+        defaults.add(JXMonthView.uiClassID, "org.jdesktop.swingx.plaf.basic.BasicMonthViewUI");
+        defaults.add("JXMonthView.background", new ColorUIResource(Color.WHITE));
+        defaults.add("JXMonthView.monthStringBackground", new ColorUIResource(138, 173, 209));
+        defaults.add("JXMonthView.monthStringForeground", new ColorUIResource(68, 68, 68));
+        defaults.add("JXMonthView.daysOfTheWeekForeground", new ColorUIResource(68, 68, 68));
+        defaults.add("JXMonthView.weekOfTheYearForeground", new ColorUIResource(68, 68, 68));
+        defaults.add("JXMonthView.unselectableDayForeground", new ColorUIResource(Color.RED));
+        defaults.add("JXMonthView.selectedBackground", new ColorUIResource(197, 220, 240));
+        defaults.add("JXMonthView.flaggedDayForeground", new ColorUIResource(Color.RED));
+        defaults.add("JXMonthView.leadingDayForeground", new ColorUIResource(Color.LIGHT_GRAY));
+        defaults.add("JXMonthView.trailingDayForeground", new ColorUIResource(Color.LIGHT_GRAY));
+        defaults.add("JXMonthView.font", UIManagerExt.getSafeFont("Button.font",
+                        new FontUIResource("Dialog", Font.PLAIN, 12)));
+        defaults.add("JXMonthView.monthDownFileName",
+                LookAndFeel.makeIcon(MonthViewAddon.class, "basic/resources/month-down.png"));
+        defaults.add("JXMonthView.monthUpFileName",
+                LookAndFeel.makeIcon(MonthViewAddon.class, "basic/resources/month-up.png"));
+        defaults.add("JXMonthView.boxPaddingX", 3);
+        defaults.add("JXMonthView.boxPaddingY", 3);
     }
 }

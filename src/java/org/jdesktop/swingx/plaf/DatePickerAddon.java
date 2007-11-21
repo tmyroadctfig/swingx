@@ -18,9 +18,6 @@
  */
 package org.jdesktop.swingx.plaf;
 
-import java.util.Arrays;
-import java.util.List;
-
 import javax.swing.BorderFactory;
 import javax.swing.LookAndFeel;
 import javax.swing.border.LineBorder;
@@ -42,16 +39,14 @@ public class DatePickerAddon extends AbstractComponentAddon {
      * {@inheritDoc}
      */
     @Override
-    protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+    protected void addBasicDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
         super.addBasicDefaults(addon, defaults);
-        defaults.addAll(Arrays.asList(new Object[]{
-                JXDatePicker.uiClassID,
-                BasicDatePickerUI.class.getName(),
-                "JXDatePicker.border",
+        
+        defaults.add(JXDatePicker.uiClassID, BasicDatePickerUI.class.getName());
+        defaults.add("JXDatePicker.border",
                 new BorderUIResource(BorderFactory.createCompoundBorder(
                         LineBorder.createGrayLineBorder(),
-                        BorderFactory.createEmptyBorder(3, 3, 3, 3)))
-        }));
+                        BorderFactory.createEmptyBorder(3, 3, 3, 3))));
         
         UIManagerExt.addResourceBundle(
                 "org.jdesktop.swingx.plaf.basic.resources.DatePicker");
@@ -61,17 +56,15 @@ public class DatePickerAddon extends AbstractComponentAddon {
      * {@inheritDoc}
      */
     @Override
-    protected void addWindowsDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+    protected void addWindowsDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
         super.addWindowsDefaults(addon, defaults);
         
-        defaults.add("JXDatePicker.arrowIcon");
-        
         if (OS.isWindowsXP() && OS.isUsingWindowsVisualStyles()) {
-            defaults.add(LookAndFeel.makeIcon(DatePickerAddon.class,
-                    "windows/resources/combo-xp.png"));
+            defaults.add("JXDatePicker.arrowIcon",
+                    LookAndFeel.makeIcon(DatePickerAddon.class, "windows/resources/combo-xp.png"));
         } else {
-            defaults.add(LookAndFeel.makeIcon(DatePickerAddon.class,
-                    "windows/resources/combo-w2k.png"));
+            defaults.add("JXDatePicker.arrowIcon",
+                    LookAndFeel.makeIcon(DatePickerAddon.class, "windows/resources/combo-w2k.png"));
         }
     }
 
@@ -79,24 +72,22 @@ public class DatePickerAddon extends AbstractComponentAddon {
      * {@inheritDoc}
      */
     @Override
-    protected void addLinuxDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+    protected void addLinuxDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
         super.addLinuxDefaults(addon, defaults);
-        defaults.addAll(Arrays.asList(new Object[] {
-                "JXDatePicker.arrowIcon",
-                LookAndFeel.makeIcon(DatePickerAddon.class, "linux/resources/combo-gtk.png")
-        }));
+        
+        defaults.add("JXDatePicker.arrowIcon",
+                LookAndFeel.makeIcon(DatePickerAddon.class, "linux/resources/combo-gtk.png"));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void addMacDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+    protected void addMacDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
         super.addMacDefaults(addon, defaults);
-        defaults.addAll(Arrays.asList(new Object[] {
-                "JXDatePicker.arrowIcon",
-                LookAndFeel.makeIcon(DatePickerAddon.class, "macosx/resources/combo-osx.png")
-        }));
+        
+        defaults.add("JXDatePicker.arrowIcon",
+                LookAndFeel.makeIcon(DatePickerAddon.class, "macosx/resources/combo-osx.png"));
     }
 }
 

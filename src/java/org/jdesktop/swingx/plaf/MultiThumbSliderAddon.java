@@ -9,8 +9,6 @@
 
 package org.jdesktop.swingx.plaf;
 
-import java.util.Arrays;
-import java.util.List;
 import org.jdesktop.swingx.JXMultiThumbSlider;
 
 /**
@@ -21,15 +19,15 @@ public class MultiThumbSliderAddon extends AbstractComponentAddon {
     
     /** Creates a new instance of MultiThumbSliderAddon */
     public MultiThumbSliderAddon() {
-        super("MultiThumbSliderAddon");
+        super("JXMultiThumbSlider");
     }
     
     @Override
-    protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
-        defaults.addAll(Arrays.asList(new Object[] {
-                JXMultiThumbSlider.uiClassID,
-                "org.jdesktop.swingx.plaf.basic.BasicMultiThumbSliderUI"
-        }));
+    protected void addBasicDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
+        super.addBasicDefaults(addon, defaults);
+        
+        defaults.add(JXMultiThumbSlider.uiClassID,
+                "org.jdesktop.swingx.plaf.basic.BasicMultiThumbSliderUI");
     }
     
 }

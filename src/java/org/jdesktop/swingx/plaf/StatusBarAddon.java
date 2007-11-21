@@ -20,8 +20,6 @@
  */
 package org.jdesktop.swingx.plaf;
 
-import java.util.Arrays;
-import java.util.List;
 import org.jdesktop.swingx.JXStatusBar;
 import org.jdesktop.swingx.util.OS;
 
@@ -36,43 +34,36 @@ public class StatusBarAddon extends AbstractComponentAddon {
     }
     
     @Override
-    protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+    protected void addBasicDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
         super.addBasicDefaults(addon, defaults);
-        defaults.addAll(Arrays.asList(new Object[] {
-            JXStatusBar.uiClassID,
-            "org.jdesktop.swingx.plaf.basic.BasicStatusBarUI"
-        }));
+        
+        defaults.add(JXStatusBar.uiClassID,
+                "org.jdesktop.swingx.plaf.basic.BasicStatusBarUI");
     }
     
     @Override
-    protected void addMacDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+    protected void addMacDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
         super.addMacDefaults(addon, defaults);
-        defaults.addAll(Arrays.asList(new Object[] {
-            JXStatusBar.uiClassID,
-            "org.jdesktop.swingx.plaf.macosx.MacOSXStatusBarUI"
-        }));
+        
+        defaults.add(JXStatusBar.uiClassID,
+                "org.jdesktop.swingx.plaf.macosx.MacOSXStatusBarUI");
     }
     
-    protected void addMetalDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+    protected void addMetalDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
         super.addMetalDefaults(addon, defaults);
-        defaults.addAll(Arrays.asList(new Object[] {
-            JXStatusBar.uiClassID,
-            "org.jdesktop.swingx.plaf.metal.MetalStatusBarUI"
-        }));
+        
+        defaults.add(JXStatusBar.uiClassID,
+                "org.jdesktop.swingx.plaf.metal.MetalStatusBarUI");
     }
     
-    protected void addWindowsDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+    protected void addWindowsDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
         super.addWindowsDefaults(addon, defaults);
         if (OS.isUsingWindowsVisualStyles()) {
-            defaults.addAll(Arrays.asList(new Object[] {
-                JXStatusBar.uiClassID,
-                "org.jdesktop.swingx.plaf.windows.WindowsStatusBarUI"
-            }));
+            defaults.add(JXStatusBar.uiClassID,
+                    "org.jdesktop.swingx.plaf.windows.WindowsStatusBarUI");
         } else {
-            defaults.addAll(Arrays.asList(new Object[] {
-                JXStatusBar.uiClassID,
-                "org.jdesktop.swingx.plaf.windows.WindowsClassicStatusBarUI"
-            }));
+            defaults.add(JXStatusBar.uiClassID,
+                    "org.jdesktop.swingx.plaf.windows.WindowsClassicStatusBarUI");
         }
     }
 }

@@ -22,7 +22,6 @@ package org.jdesktop.swingx.plaf;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.LookAndFeel;
@@ -46,59 +45,43 @@ public class TipOfTheDayAddon extends AbstractComponentAddon {
   }
 
   @Override
-  protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
-    defaults.add(JXTipOfTheDay.uiClassID);
-    defaults.add(BasicTipOfTheDayUI.class.getName());
-
-    defaults.add("TipOfTheDay.font");
-    defaults.add(UIManagerExt.getSafeFont("TipOfTheDay.font",
+  protected void addBasicDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
+      super.addBasicDefaults(addon, defaults);
+      
+      Font font = UIManagerExt.getSafeFont("Label.font", new Font("Dialog", Font.PLAIN, 12));
+      font = font.deriveFont(Font.BOLD, 13f);
+      
+      defaults.add(JXTipOfTheDay.uiClassID, BasicTipOfTheDayUI.class.getName());
+      defaults.add("TipOfTheDay.font", UIManagerExt.getSafeFont("TextPane.font",
                 new FontUIResource("Serif", Font.PLAIN, 12)));
-
-    defaults.add("TipOfTheDay.tipFont");
-    Font font = UIManagerExt.getSafeFont("Label.font",
-            new Font("Dialog", Font.PLAIN, 12));
-    font = font.deriveFont(Font.BOLD, 13f);
-    defaults.add(new FontUIResource(font));
-
-    defaults.add("TipOfTheDay.background");
-    defaults.add(new ColorUIResource(Color.white));
-
-    defaults.add("TipOfTheDay.icon");
-    defaults.add(LookAndFeel.makeIcon(BasicTipOfTheDayUI.class,
-      "resources/TipOfTheDay24.gif"));
-
-    defaults.add("TipOfTheDay.border");
-    defaults.add(new BorderUIResource(BorderFactory.createLineBorder(new Color(
-      117, 117, 117))));
+      defaults.add("TipOfTheDay.tipFont", new FontUIResource(font));
+      defaults.add("TipOfTheDay.background", new ColorUIResource(Color.WHITE));
+      defaults.add("TipOfTheDay.icon",
+              LookAndFeel.makeIcon(BasicTipOfTheDayUI.class, "resources/TipOfTheDay24.gif"));
+      defaults.add("TipOfTheDay.border", new BorderUIResource(
+              BorderFactory.createLineBorder(new Color(117, 117, 117))));
 
     UIManagerExt.addResourceBundle(
             "org.jdesktop.swingx.plaf.basic.resources.TipOfTheDay");
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  protected void addWindowsDefaults(LookAndFeelAddons addon,
-    List<Object> defaults) {
+  protected void addWindowsDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
     super.addWindowsDefaults(addon, defaults);
 
-    defaults.add(JXTipOfTheDay.uiClassID);
-    defaults.add(WindowsTipOfTheDayUI.class.getName());
-
-    defaults.add("TipOfTheDay.background");
-    defaults.add(new ColorUIResource(128, 128, 128));
-
-    defaults.add("TipOfTheDay.font");
     Font font = UIManagerExt.getSafeFont("Label.font",
             new Font("Dialog", Font.PLAIN, 12));
     font = font.deriveFont(13f);
-    defaults.add(new FontUIResource(font));
-
-    defaults.add("TipOfTheDay.icon");
-    defaults.add(LookAndFeel.makeIcon(WindowsTipOfTheDayUI.class,
-      "resources/tipoftheday.png"));
-
-    defaults.add("TipOfTheDay.border");
-    defaults
-      .add(new BorderUIResource(new WindowsTipOfTheDayUI.TipAreaBorder()));
+    
+    defaults.add(JXTipOfTheDay.uiClassID, WindowsTipOfTheDayUI.class.getName());
+    defaults.add("TipOfTheDay.background", new ColorUIResource(Color.GRAY));
+    defaults.add("TipOfTheDay.font", new FontUIResource(font));
+    defaults.add("TipOfTheDay.icon",
+            LookAndFeel.makeIcon(WindowsTipOfTheDayUI.class, "resources/tipoftheday.png"));
+    defaults.add("TipOfTheDay.border" ,new BorderUIResource(new WindowsTipOfTheDayUI.TipAreaBorder()));
 
     UIManagerExt.addResourceBundle(
         "org.jdesktop.swingx.plaf.windows.resources.TipOfTheDay");

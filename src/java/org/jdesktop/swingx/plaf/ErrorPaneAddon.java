@@ -21,9 +21,6 @@
 
 package org.jdesktop.swingx.plaf;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.jdesktop.swingx.JXErrorPane;
 
 /**
@@ -41,12 +38,10 @@ public class ErrorPaneAddon extends AbstractComponentAddon {
      * {@inheritDoc}
      */
     @Override
-    protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+    protected void addBasicDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
         super.addBasicDefaults(addon, defaults);
-        defaults.addAll(Arrays.asList(new Object[] {
-            JXErrorPane.uiClassID,
-            "org.jdesktop.swingx.plaf.basic.BasicErrorPaneUI"
-        }));
+        
+        defaults.add(JXErrorPane.uiClassID, "org.jdesktop.swingx.plaf.basic.BasicErrorPaneUI");
         
         UIManagerExt.addResourceBundle(
             "org.jdesktop.swingx.plaf.basic.resources.ErrorPane");
@@ -55,12 +50,10 @@ public class ErrorPaneAddon extends AbstractComponentAddon {
     /**
      * {@inheritDoc}
      */
-    protected void addMacDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+    protected void addMacDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
         super.addMacDefaults(addon, defaults);
-        defaults.addAll(Arrays.asList(new Object[] {
-            JXErrorPane.uiClassID,
-            "org.jdesktop.swingx.plaf.macosx.MacOSXErrorPaneUI"
-        }));
+        
+        defaults.add(JXErrorPane.uiClassID, "org.jdesktop.swingx.plaf.macosx.MacOSXErrorPaneUI");
         
         UIManagerExt.addResourceBundle(
             "org.jdesktop.swingx.plaf.macosx.resources.ErrorPane");

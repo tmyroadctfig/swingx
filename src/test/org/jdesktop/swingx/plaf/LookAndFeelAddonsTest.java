@@ -7,7 +7,6 @@
 package org.jdesktop.swingx.plaf;
 
 import java.awt.Color;
-import java.util.List;
 
 import javax.swing.LookAndFeel;
 import javax.swing.UIDefaults;
@@ -70,11 +69,9 @@ public class LookAndFeelAddonsTest extends TestCase {
     // with an addon, the prop is overriden
     ComponentAddon myAddon = new AbstractComponentAddon("myAddon") {
       @Override
-      protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
-        defaults.add("CustomProperty");
-        defaults.add("customAddonValue");
-        defaults.add("AddonProperty");
-        defaults.add("addonValue");
+      protected void addBasicDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
+        defaults.add("CustomProperty", "customAddonValue");
+        defaults.add("AddonProperty", "addonValue");
       }
     };
     LookAndFeelAddons.contribute(myAddon);

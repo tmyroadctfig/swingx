@@ -23,8 +23,6 @@ package org.jdesktop.swingx.plaf;
 import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Toolkit;
-import java.util.Arrays;
-import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.plaf.BorderUIResource;
@@ -57,37 +55,34 @@ public class TaskPaneContainerAddon extends AbstractComponentAddon {
   }
 
   @Override
-  protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+  protected void addBasicDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
     super.addBasicDefaults(addon, defaults);
-    defaults.addAll(Arrays.asList(new Object[]{
-      JXTaskPaneContainer.uiClassID,
-      "org.jdesktop.swingx.plaf.basic.BasicTaskPaneContainerUI",
-      "TaskPaneContainer.background",
-      UIManagerExt.getSafeColor("Desktop.background",
-                        new ColorUIResource(Color.decode("#005C5C"))),
-      "TaskPaneContainer.border",
-      new BorderUIResource(BorderFactory.createEmptyBorder(10, 10, 0, 10))
-    }));
+    
+    defaults.add(JXTaskPaneContainer.uiClassID, "org.jdesktop.swingx.plaf.basic.BasicTaskPaneContainerUI");
+    defaults.add("TaskPaneContainer.background", UIManagerExt.getSafeColor("Desktop.background",
+                        new ColorUIResource(Color.decode("#005C5C"))));
+    defaults.add("TaskPaneContainer.border", new BorderUIResource(BorderFactory.createEmptyBorder(10, 10, 0, 10)));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  protected void addMetalDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+  protected void addMetalDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
     super.addMetalDefaults(addon, defaults);
-    defaults.addAll(Arrays.asList(new Object[]{
-      "TaskPaneContainer.background",
-      MetalLookAndFeel.getDesktopColor()
-    }));
+    
+    defaults.add("TaskPaneContainer.background", MetalLookAndFeel.getDesktopColor());
   }
   
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  protected void addWindowsDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+  protected void addWindowsDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
     super.addWindowsDefaults(addon, defaults);
     if (addon instanceof WindowsClassicLookAndFeelAddons) {
-      defaults.addAll(Arrays.asList(new Object[]{
-        "TaskPaneContainer.background",
-        UIManagerExt.getSafeColor("List.background",
-                new ColorUIResource(Color.decode("#005C5C")))
-      }));      
+      defaults.add("TaskPaneContainer.background", UIManagerExt.getSafeColor("List.background",
+                new ColorUIResource(Color.decode("#005C5C"))));
     } else if (addon instanceof WindowsLookAndFeelAddons) {     
       String xpStyle = OS.getWindowsVisualStyle();
       ColorUIResource background;
@@ -116,24 +111,22 @@ public class TaskPaneContainerAddon extends AbstractComponentAddon {
           backgroundGradientEnd = new ColorUIResource(99, 117, 214);
         }
       }      
-      defaults.addAll(Arrays.asList(new Object[]{
-        "TaskPaneContainer.backgroundPainter",
-        new PainterUIResource(new MattePainter(new GradientPaint(
-                            0f, 0f, backgroundGradientStart, 0f, 1f,
-                            backgroundGradientEnd), true)),
-        "TaskPaneContainer.background",
-        background,
-      }));
+      
+      defaults.add("TaskPaneContainer.backgroundPainter", new PainterUIResource(
+              new MattePainter<JXTaskPaneContainer>(new GradientPaint(0f, 0f,
+                      backgroundGradientStart, 0f, 1f, backgroundGradientEnd), true)));
+      defaults.add("TaskPaneContainer.background", background);
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  protected void addMacDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+  protected void addMacDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
     super.addMacDefaults(addon, defaults);
-    defaults.addAll(Arrays.asList(new Object[]{
-      "TaskPaneContainer.background",
-      new ColorUIResource(238, 238, 238),
-    }));            
+    
+    defaults.add("TaskPaneContainer.background", new ColorUIResource(238, 238, 238));
   }
 
 }

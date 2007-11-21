@@ -20,9 +20,6 @@
  */
 package org.jdesktop.swingx.plaf;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.swing.UIManager;
 
 import org.jdesktop.swingx.plaf.linux.LinuxLookAndFeelAddons;
@@ -65,66 +62,66 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
    * @param addon
    * @param defaults
    */
-  protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+  protected void addBasicDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
   }
 
   /**
-   * Default implementation calls {@link #addBasicDefaults(LookAndFeelAddons, List)}
+   * Default implementation calls {@link #addBasicDefaults(LookAndFeelAddons, DefaultsList)}
    * 
    * @param addon
    * @param defaults
    */
-  protected void addMacDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+  protected void addMacDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
     addBasicDefaults(addon, defaults);
   }
 
   /**
-   * Default implementation calls {@link #addBasicDefaults(LookAndFeelAddons, List)}
+   * Default implementation calls {@link #addBasicDefaults(LookAndFeelAddons, DefaultsList)}
    * 
    * @param addon
    * @param defaults
    */
-  protected void addMetalDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+  protected void addMetalDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
     addBasicDefaults(addon, defaults);
   }
 
   /**
-   * Default implementation calls {@link #addBasicDefaults(LookAndFeelAddons, List)}
+   * Default implementation calls {@link #addBasicDefaults(LookAndFeelAddons, DefaultsList)}
    * 
    * @param addon
    * @param defaults
    */
-  protected void addMotifDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+  protected void addMotifDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
     addBasicDefaults(addon, defaults);
   }
 
   /**
-   * Default implementation calls {@link #addBasicDefaults(LookAndFeelAddons, List)}
+   * Default implementation calls {@link #addBasicDefaults(LookAndFeelAddons, DefaultsList)}
    * 
    * @param addon
    * @param defaults
    */
-  protected void addWindowsDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+  protected void addWindowsDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
     addBasicDefaults(addon, defaults);
   }
 
   /**
-   * Default implementation calls {@link #addBasicDefaults(LookAndFeelAddons, List)}
+   * Default implementation calls {@link #addBasicDefaults(LookAndFeelAddons, DefaultsList)}
    * 
    * @param addon
    * @param defaults
    */
-   protected void addLinuxDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+   protected void addLinuxDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
      addBasicDefaults(addon, defaults);
    }
  
   /**
-   * Default implementation calls {@link #addBasicDefaults(LookAndFeelAddons, List)}
+   * Default implementation calls {@link #addBasicDefaults(LookAndFeelAddons, DefaultsList)}
    * 
    * @param addon
    * @param defaults
    */
-   protected void addNimbusDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+   protected void addNimbusDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
      addBasicDefaults(addon, defaults);
    }
  
@@ -132,15 +129,15 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
    * Gets the defaults for the given addon.
    * 
    * Based on the addon, it calls
-   * {@link #addMacDefaults(LookAndFeelAddons, List)} if isMac()
+   * {@link #addMacDefaults(LookAndFeelAddons, DefaultsList)} if isMac()
    * or
-   * {@link #addMetalDefaults(LookAndFeelAddons, List)} if isMetal()
+   * {@link #addMetalDefaults(LookAndFeelAddons, DefaultsList)} if isMetal()
    * or
-   * {@link #addMotifDefaults(LookAndFeelAddons, List)} if isMotif()
+   * {@link #addMotifDefaults(LookAndFeelAddons, DefaultsList)} if isMotif()
    * or
-   * {@link #addWindowsDefaults(LookAndFeelAddons, List)} if isWindows()
+   * {@link #addWindowsDefaults(LookAndFeelAddons, DefaultsList)} if isWindows()
    * or
-   * {@link #addBasicDefaults(LookAndFeelAddons, List)} if none of the above was called.
+   * {@link #addBasicDefaults(LookAndFeelAddons, DefaultsList)} if none of the above was called.
    * @param addon
    * @return an array of key/value pairs. For example:
    * <pre>
@@ -152,7 +149,7 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
    * </pre>
    */
   private Object[] getDefaults(LookAndFeelAddons addon) {
-    List<Object> defaults = new ArrayList<Object>();
+    DefaultsList defaults = new DefaultsList();
     if (isWindows(addon)) {
       addWindowsDefaults(addon, defaults);
     } else if (isMetal(addon)) {

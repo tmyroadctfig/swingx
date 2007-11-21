@@ -20,7 +20,6 @@
  */
 package org.jdesktop.swingx.plaf;
 
-import java.util.List;
 
 import org.jdesktop.swingx.JXHyperlink;
 
@@ -35,12 +34,13 @@ public class HyperlinkAddon extends AbstractComponentAddon {
   }
 
   @Override
-  protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
-    defaults.add(JXHyperlink.uiClassID);
+  protected void addBasicDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
+      super.addBasicDefaults(addon, defaults);
+      
     if (isMetal(addon)) {
-      defaults.add("org.jdesktop.swingx.plaf.basic.BasicHyperlinkUI");
+        defaults.add(JXHyperlink.uiClassID, "org.jdesktop.swingx.plaf.basic.BasicHyperlinkUI");
     } else {
-      defaults.add("org.jdesktop.swingx.plaf.windows.WindowsHyperlinkUI");
+        defaults.add(JXHyperlink.uiClassID, "org.jdesktop.swingx.plaf.windows.WindowsHyperlinkUI");
     }
   }
 

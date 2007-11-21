@@ -20,8 +20,6 @@
  */
 package org.jdesktop.swingx.plaf;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -56,20 +54,18 @@ public class ColumnHeaderRendererAddon extends AbstractComponentAddon {
      */
     @Override
     protected void addBasicDefaults(LookAndFeelAddons addon,
-            List<Object> defaults) {
+            DefaultsList defaults) {
         super.addBasicDefaults(addon, defaults);
         
-        defaults.addAll(Arrays.asList(new Object[] { 
-            ColumnHeaderRenderer.UP_ICON_KEY,
-            LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "basic/resources/sort-jlf-up.png"),
-            ColumnHeaderRenderer.DOWN_ICON_KEY,
-            LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "basic/resources/sort-jlf-dn.png"),
-        }));
+        defaults.add(ColumnHeaderRenderer.UP_ICON_KEY,
+                LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "basic/resources/sort-jlf-up.png"));
+        defaults.add(ColumnHeaderRenderer.DOWN_ICON_KEY,
+                LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "basic/resources/sort-jlf-dn.png"));
         hackMetalBorder(addon, defaults);
 
     }
 
-    private void hackMetalBorder(LookAndFeelAddons addon, List<Object> defaults) {
+    private void hackMetalBorder(LookAndFeelAddons addon, DefaultsList defaults) {
         Border border = UIManager.getBorder("TableHeader.cellBorder");
         if (border instanceof MetalBorders.TableHeaderBorder) {
             border = new BorderUIResource.CompoundBorderUIResource(border, 
@@ -77,8 +73,7 @@ public class ColumnHeaderRendererAddon extends AbstractComponentAddon {
             // too heavyweight ...
 //            UIManager.put("TableHeader.cellBorder", border);
 //            LOG.info("updated border " + border);
-            defaults.add(ColumnHeaderRenderer.METAL_BORDER_HACK);
-            defaults.add(border);
+            defaults.add(ColumnHeaderRenderer.METAL_BORDER_HACK, border);
         }
     }
 
@@ -87,16 +82,14 @@ public class ColumnHeaderRendererAddon extends AbstractComponentAddon {
      */
     @Override
     protected void addLinuxDefaults(LookAndFeelAddons addon,
-            List<Object> defaults) {
+            DefaultsList defaults) {
         super.addLinuxDefaults(addon, defaults);
         
         if (isSynth()) {
-            defaults.addAll(Arrays.asList(new Object[] { 
-                    ColumnHeaderRenderer.UP_ICON_KEY,
-                    LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "linux/resources/sort-gtk-up.png"),
-                    ColumnHeaderRenderer.DOWN_ICON_KEY,
-                    LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "linux/resources/sort-gtk-dn.png"),
-            }));
+            defaults.add(ColumnHeaderRenderer.UP_ICON_KEY,
+                    LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "linux/resources/sort-gtk-up.png"));
+            defaults.add(ColumnHeaderRenderer.DOWN_ICON_KEY,
+                    LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "linux/resources/sort-gtk-dn.png"));
         }
     }
 
@@ -104,38 +97,32 @@ public class ColumnHeaderRendererAddon extends AbstractComponentAddon {
      * {@inheritDoc}
      */
     @Override
-    protected void addMacDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+    protected void addMacDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
         super.addMacDefaults(addon, defaults);
         
-        defaults.addAll(Arrays.asList(new Object[] { 
-                ColumnHeaderRenderer.UP_ICON_KEY,
-                LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "macosx/resources/sort-osx-up.png"),
-                ColumnHeaderRenderer.DOWN_ICON_KEY,
-                LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "macosx/resources/sort-osx-dn.png"),
-        }));
+        defaults.add(ColumnHeaderRenderer.UP_ICON_KEY,
+                LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "macosx/resources/sort-osx-up.png"));
+        defaults.add(ColumnHeaderRenderer.DOWN_ICON_KEY,
+                LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "macosx/resources/sort-osx-dn.png"));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void addWindowsDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+    protected void addWindowsDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
         super.addWindowsDefaults(addon, defaults);
         
         if (OS.isWindowsXP()) {
-            defaults.addAll(Arrays.asList(new Object[] { 
-                    ColumnHeaderRenderer.UP_ICON_KEY,
-                    LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "windows/resources/sort-xp-up.png"),
-                    ColumnHeaderRenderer.DOWN_ICON_KEY,
-                    LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "windows/resources/sort-xp-dn.png"),
-            }));
+            defaults.add(ColumnHeaderRenderer.UP_ICON_KEY,
+                    LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "windows/resources/sort-xp-up.png"));
+            defaults.add(ColumnHeaderRenderer.DOWN_ICON_KEY,
+                    LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "windows/resources/sort-xp-dn.png"));
         } else {
-            defaults.addAll(Arrays.asList(new Object[] { 
-                    ColumnHeaderRenderer.UP_ICON_KEY,
-                    LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "windows/resources/sort-w2k-up.png"),
-                    ColumnHeaderRenderer.DOWN_ICON_KEY,
-                    LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "windows/resources/sort-w2k-dn.png"),
-            }));
+            defaults.add(ColumnHeaderRenderer.UP_ICON_KEY,
+                    LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "windows/resources/sort-w2k-up.png"));
+            defaults.add(ColumnHeaderRenderer.DOWN_ICON_KEY,
+                    LookAndFeel.makeIcon(ColumnHeaderRendererAddon.class, "windows/resources/sort-w2k-dn.png"));
         }
         
         hackVistaHeaderBorder(addon, defaults);
@@ -150,16 +137,14 @@ public class ColumnHeaderRendererAddon extends AbstractComponentAddon {
      * most probably the xp border is okay.
      * 
      * @param addon
-     * @param 
+     * @param defaults
      */
-    private void hackVistaHeaderBorder(LookAndFeelAddons addon, List<Object> defaults) {
+    private void hackVistaHeaderBorder(LookAndFeelAddons addon, DefaultsList defaults) {
         // do nothing if not vista or for classic design under vista
         if (!OS.isWindowsVista() || (addon instanceof WindowsClassicLookAndFeelAddons))
             return;
-        defaults.addAll(Arrays.asList(new Object[] {
-                ColumnHeaderRenderer.VISTA_BORDER_HACK,
-                new BorderUIResource.EmptyBorderUIResource(5, 5, 5, 5), 
-                }));
+        defaults.add(ColumnHeaderRenderer.VISTA_BORDER_HACK,
+                new BorderUIResource.EmptyBorderUIResource(5, 5, 5, 5));
     }
 
 }
