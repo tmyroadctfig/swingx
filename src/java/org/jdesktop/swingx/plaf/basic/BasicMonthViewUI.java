@@ -145,7 +145,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     private int numCalCols = 1;
     private Rectangle[] monthStringBounds = new Rectangle[12];
     private Rectangle[] yearStringBounds = new Rectangle[12];
-    private Calendar calendar;
+//    private Calendar calendar;
 
 
     @SuppressWarnings({"UnusedDeclaration"})
@@ -173,10 +173,10 @@ public class BasicMonthViewUI extends MonthViewUI {
          * Should ask to monthView for the firstDisplayedDate directly and remove the
          * firstMonth/year fields (could query the calendar if needed)
          */
-        if (getCalendar() != null) {
-          firstDisplayedDate = getCalendar().getTimeInMillis();
-          firstDisplayedMonth = getCalendar().get(Calendar.MONTH);
-          firstDisplayedYear = getCalendar().get(Calendar.YEAR);
+        if (monthView.getCalendar() != null) {
+          firstDisplayedDate = monthView.getCalendar().getTimeInMillis();
+          firstDisplayedMonth = monthView.getCalendar().get(Calendar.MONTH);
+          firstDisplayedYear = monthView.getCalendar().get(Calendar.YEAR);
         }
         
         selection = monthView.getSelection();
@@ -486,8 +486,8 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @see java.util.Calendar
      * @return day of the week (Calendar.SATURDAY, Calendar.SUNDAY, ...)
      */
-    protected int getDayOfTheWeek() {
-        return getCalendar().get(Calendar.DAY_OF_WEEK);
+    protected int getDayOfTheWeek(Calendar cal) {
+        return cal.get(Calendar.DAY_OF_WEEK);
     }
 
     /**
@@ -671,12 +671,12 @@ public class BasicMonthViewUI extends MonthViewUI {
             Calendar cal = getCalendar(selection.first().getTime());
 //            Calendar cal = getCalendar();
 //            cal.setTime(selection.first());
-            calculateBoundsForDay(dirtyRect, NO_OFFSET);
+            calculateBoundsForDay(dirtyRect, NO_OFFSET, cal);
             cal.add(Calendar.DAY_OF_MONTH, 1);
 
             Rectangle tmpRect;
             while (cal.getTimeInMillis() <= selection.last().getTime()) {
-                calculateBoundsForDay(bounds, NO_OFFSET);
+                calculateBoundsForDay(bounds, NO_OFFSET, cal);
                 tmpRect = dirtyRect.union(bounds);
                 dirtyRect.x = tmpRect.x;
                 dirtyRect.y = tmpRect.y;
@@ -702,10 +702,8 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param bounds Bounds of the date to draw in.
      * @param monthOffset Used to help calculate bounds for leading/trailing dates.
      */
-    protected void calculateBoundsForDay(Rectangle bounds, int monthOffset) {
-        Calendar cal = getCalendar();
-        // PEDNIGN: temporary safety net:
-        Date initial = cal.getTime();
+    protected void calculateBoundsForDay(Rectangle bounds, int monthOffset, Calendar cal) {
+//        Calendar cal = getCalendar();
         
         int year = cal.get(Calendar.YEAR);
         int month = cal.get(Calendar.MONTH);
@@ -784,8 +782,6 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         bounds.width = boxPaddingX + boxWidth + boxPaddingX;
         bounds.height = boxPaddingY + boxHeight + boxPaddingY;
-        if (!initial.equals(cal.getTime())) 
-            throw new IllegalStateException("must not change calendar!"); 
     }
 
     /**
@@ -800,9 +796,9 @@ public class BasicMonthViewUI extends MonthViewUI {
      * 
      * @return the local copy of the monthView's calendar
      */
-    private Calendar getCalendar() {
-        return calendar;
-    }
+//    private Calendar getCalendar() {
+//        return calendar;
+//    }
 
     /**
      * Task #660-swingx: lighten coupling with monthView's calendar.
@@ -817,7 +813,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @return the local copy of the monthView's calendar
      */
     private Calendar getCalendar(long date) {
-        calendar = (Calendar) monthView.getCalendar().clone();
+        Calendar calendar = (Calendar) monthView.getCalendar().clone();
         calendar.setTimeInMillis(date);
         return calendar;
     }
@@ -887,7 +883,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 // the calendar forward a month as it would have if paintMonth
                 // was called.
                 if (bounds.intersects(clip)) {
-                    paintMonth(g, bounds.x, bounds.y, bounds.width, bounds.height);
+                    paintMonth(g, bounds.x, bounds.y, bounds.width, bounds.height, cal);
                 } else {
                     cal.add(Calendar.MONTH, 1);
                 }
@@ -916,8 +912,8 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param height height of month
      */
     @SuppressWarnings({"UnusedDeclaration"})
-    private void paintMonth(Graphics g, int x, int y, int width, int height) {
-        Calendar cal = getCalendar();
+    private void paintMonth(Graphics g, int x, int y, int width, int height, Calendar cal) {
+//        Calendar cal = getCalendar();
         int days = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
         Rectangle clip = g.getClipBounds();
         long day;
@@ -930,7 +926,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 width, boxPaddingY + monthBoxHeight + boxPaddingY);
 
         paintMonthStringForeground(g, x, y,
-                width, boxPaddingY + monthBoxHeight + boxPaddingY);
+                width, boxPaddingY + monthBoxHeight + boxPaddingY, cal);
 
         // Paint arrow buttons for traversing months if enabled.
         if (monthView.isTraversable()) {
@@ -989,12 +985,12 @@ public class BasicMonthViewUI extends MonthViewUI {
                 cal.add(Calendar.DAY_OF_MONTH, -dayOfWeekViewIndex);
                 for (int i = 0; i < dayOfWeekViewIndex; i++) {
                     // Paint a day
-                    calculateBoundsForDay(bounds, LEADING_DAY_OFFSET);
+                    calculateBoundsForDay(bounds, LEADING_DAY_OFFSET, cal);
                     day = cal.getTimeInMillis();
                     paintLeadingDayBackground(g, bounds.x, bounds.y,
-                            bounds.width, bounds.height, day);
+                            bounds.width, bounds.height, cal);
                     paintLeadingDayForeground(g, bounds.x, bounds.y,
-                            bounds.width, bounds.height, day);
+                            bounds.width, bounds.height, cal);
                     cal.add(Calendar.DAY_OF_MONTH, 1);
                 }
             }
@@ -1002,7 +998,7 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         int oldY = -1;
         for (int i = 0; i < days; i++) {
-            calculateBoundsForDay(bounds, NO_OFFSET);
+            calculateBoundsForDay(bounds, NO_OFFSET, cal);
             // Paint the week numbers if we're displaying them.
             if (showingWeekNumber && oldY != bounds.y) {
                 oldY = bounds.y;
@@ -1034,20 +1030,20 @@ public class BasicMonthViewUI extends MonthViewUI {
 
                 if (monthView.isUnselectableDate(day)) {
                     paintUnselectableDayBackground(g, bounds.x, bounds.y,
-                            bounds.width, bounds.height, day);
+                            bounds.width, bounds.height, cal);
                     paintUnselectableDayForeground(g, bounds.x, bounds.y,
-                            bounds.width, bounds.height, day);
+                            bounds.width, bounds.height, cal);
                 }
                 else if (monthView.isFlaggedDate(day)) {
                     paintFlaggedDayBackground(g, bounds.x, bounds.y,
-                            bounds.width, bounds.height, day);
+                            bounds.width, bounds.height, cal);
                     paintFlaggedDayForeground(g, bounds.x, bounds.y,
-                            bounds.width, bounds.height, day);
+                            bounds.width, bounds.height, cal);
                 } else {
                     paintDayBackground(g, bounds.x, bounds.y,
-                            bounds.width, bounds.height, day);
+                            bounds.width, bounds.height, cal);
                     paintDayForeground(g, bounds.x, bounds.y,
-                            bounds.width, bounds.height, day);
+                            bounds.width, bounds.height, cal);
                 }
             }
             cal.add(Calendar.DAY_OF_MONTH, 1);
@@ -1067,12 +1063,12 @@ public class BasicMonthViewUI extends MonthViewUI {
             if (daysToPaint != 0) {
                 for (int i = 0; i < daysToPaint; i++) {
                     // Paint a day
-                    calculateBoundsForDay(bounds, TRAILING_DAY_OFFSET);
+                    calculateBoundsForDay(bounds, TRAILING_DAY_OFFSET, cal);
                     day = cal.getTimeInMillis();
                     paintTrailingDayBackground(g, bounds.x, bounds.y,
-                            bounds.width, bounds.height, day);
+                            bounds.width, bounds.height, cal);
                     paintTrailingDayForeground(g, bounds.x, bounds.y,
-                            bounds.width, bounds.height, day);
+                            bounds.width, bounds.height, cal);
                     cal.add(Calendar.DAY_OF_MONTH, 1);
                 }
             }
@@ -1160,10 +1156,10 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param height
      */
     protected void paintMonthStringForeground(Graphics g, int x, int y,
-                                              int width, int height) {
+                                              int width, int height, Calendar cal) {
         // Paint month name.
         // 
-        Calendar cal = getCalendar();
+//        Calendar cal = getCalendar();
         Font oldFont = monthView.getFont();
 
         // TODO: Calculating the bounds of the text dynamically so we can invoke
@@ -1214,19 +1210,21 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     /**
-     * Paint the background for the specified day.
+     * Paint the background for the day specified by the given calendar.
      *
      * @param g Graphics object to paint to
      * @param x x-coordinate of upper left corner
      * @param y y-coordinate of upper left corner
      * @param width width of bounding box for the day
      * @param height height of bounding box for the day
-     * @param date long value representing the day being painted
+     * @param calendar the calendar specifying the day to paint, must not be null
      * @see  org.jdesktop.swingx.JXMonthView#isSelectedDate
      * @see  #isToday
      */
     protected void paintDayBackground(Graphics g, int x, int y, int width, int height,
-                                      long date) {
+                                      Calendar cal) {
+        long date = cal.getTimeInMillis();
+        
         if (monthView.isSelectedDate(date)) {
             g.setColor(monthView.getSelectedBackground());
             g.fillRect(x, y, width, height);
@@ -1248,12 +1246,12 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param y y-coordinate of upper left corner
      * @param width width of bounding box for the day
      * @param height height of bounding box for the day
-     * @param date long value representing the day being painted
+     * @param cal the calendar specifying the day to paint, must not be null
      */
-    protected void paintDayForeground(Graphics g, int x, int y, int width, int height, long date) {
-        String numericDay = dayOfMonthFormatter.format(date);
+    protected void paintDayForeground(Graphics g, int x, int y, int width, int height, Calendar cal) {
+        String numericDay = dayOfMonthFormatter.format(cal.getTime());
 
-        g.setColor(monthView.getDayForeground(getDayOfTheWeek()));
+        g.setColor(monthView.getDayForeground(getDayOfTheWeek(cal)));
 
         int boxPaddingX = monthView.getBoxPaddingX();
         int boxPaddingY = monthView.getBoxPaddingY();
@@ -1283,10 +1281,10 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param y y-coordinate of upper left corner
      * @param width width of bounding box for the day
      * @param height height of bounding box for the day
-     * @param date long value representing the flagged day being painted
+     * @param cal the calendar specifying the day to paint, must not be null
      */
-    protected void paintFlaggedDayBackground(Graphics g, int x, int y, int width, int height, long date) {
-        paintDayBackground(g, x, y, width, height, date);
+    protected void paintFlaggedDayBackground(Graphics g, int x, int y, int width, int height, Calendar cal) {
+        paintDayBackground(g, x, y, width, height, cal);
     }
 
     /**
@@ -1297,9 +1295,10 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param y y-coordinate of upper left corner
      * @param width width of bounding box for the day
      * @param height height of bounding box for the day
-     * @param date long value representing the flagged day being painted
+     * @param cal the calendar specifying the day to paint, must not be null
      */
-    protected void paintFlaggedDayForeground(Graphics g, int x, int y, int width, int height, long date) {
+    protected void paintFlaggedDayForeground(Graphics g, int x, int y, int width, int height, Calendar cal) {
+        Date date = cal.getTime();
         String numericDay = dayOfMonthFormatter.format(date);
         FontMetrics fm;
 
@@ -1328,10 +1327,10 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param y y-coordinate of upper left corner
      * @param width width of bounding box for the day
      * @param height height of bounding box for the day
-     * @param date long value representing the flagged day being painted
+     * @param cal the calendar specifying the day to paint, must not be null
      */
-    protected void paintUnselectableDayBackground(Graphics g, int x, int y, int width, int height, long date) {
-        paintDayBackground(g, x, y, width, height, date);
+    protected void paintUnselectableDayBackground(Graphics g, int x, int y, int width, int height, Calendar cal) {
+        paintDayBackground(g, x, y, width, height, cal);
     }
 
     /**
@@ -1342,13 +1341,13 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param y y-coordinate of upper left corner
      * @param width width of bounding box for the day
      * @param height height of bounding box for the day
-     * @param date long value representing the flagged day being painted
+     * @param cal the calendar specifying the day to paint, must not be null
      */
-    protected void paintUnselectableDayForeground(Graphics g, int x, int y, int width, int height, long date) {
-        paintDayForeground(g, x, y, width, height, date);
+    protected void paintUnselectableDayForeground(Graphics g, int x, int y, int width, int height, Calendar cal) {
+        paintDayForeground(g, x, y, width, height, cal);
         g.setColor(unselectableDayForeground);
 
-        String numericDay = dayOfMonthFormatter.format(date);
+        String numericDay = dayOfMonthFormatter.format(cal.getTime());
         FontMetrics fm = monthView.getFontMetrics(derivedFont);
         int boxPaddingX = monthView.getBoxPaddingX();
         int boxPaddingY = monthView.getBoxPaddingY();
@@ -1373,10 +1372,10 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param y y-coordinate of upper left corner
      * @param width width of bounding box for the day
      * @param height height of bounding box for the day
-     * @param date long value representing the leading day being painted
+     * @param cal the calendar specifying the day to paint, must not be null
      */
-    protected void paintLeadingDayBackground(Graphics g, int x, int y, int width, int height, long date) {
-        paintDayBackground(g, x, y, width, height, date);
+    protected void paintLeadingDayBackground(Graphics g, int x, int y, int width, int height, Calendar cal) {
+        paintDayBackground(g, x, y, width, height, cal);
     }
 
     /**
@@ -1387,10 +1386,10 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param y y-coordinate of upper left corner
      * @param width width of bounding box for the day
      * @param height height of bounding box for the day
-     * @param date long value representing the leading day being painted
+     * @param cal the calendar specifying the day to paint, must not be null
      */
-    protected void paintLeadingDayForeground(Graphics g, int x, int y, int width, int height, long date) {
-        String numericDay = dayOfMonthFormatter.format(date);
+    protected void paintLeadingDayForeground(Graphics g, int x, int y, int width, int height, Calendar cal) {
+        String numericDay = dayOfMonthFormatter.format(cal.getTime());
         FontMetrics fm;
 
         g.setColor(leadingDayForeground);
@@ -1416,10 +1415,10 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param y y-coordinate of upper left corner
      * @param width width of bounding box for the day
      * @param height height of bounding box for the day
-     * @param date long value representing the leading day being painted
+     * @param cal the calendar specifying the day to paint, must not be null
      */
-    protected void paintTrailingDayBackground(Graphics g, int x, int y, int width, int height, long date) {
-        paintLeadingDayBackground(g, x, y, width, height, date);
+    protected void paintTrailingDayBackground(Graphics g, int x, int y, int width, int height, Calendar cal) {
+        paintLeadingDayBackground(g, x, y, width, height, cal);
     }
 
     /**
@@ -1430,10 +1429,10 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param y y-coordinate of upper left corner
      * @param width width of bounding box for the day
      * @param height height of bounding box for the day
-     * @param date long value representing the leading day being painted
+     * @param cal the calendar specifying the day to paint, must not be null
      */
-    protected void paintTrailingDayForeground(Graphics g, int x, int y, int width, int height, long date) {
-        String numericDay = dayOfMonthFormatter.format(date);
+    protected void paintTrailingDayForeground(Graphics g, int x, int y, int width, int height, Calendar cal) {
+        String numericDay = dayOfMonthFormatter.format(cal.getTime());
         FontMetrics fm;
 
         g.setColor(trailingDayForeground);
@@ -1454,12 +1453,6 @@ public class BasicMonthViewUI extends MonthViewUI {
     private long cleanupDate(long date) {
         Calendar cal = getCalendar(date);
         CalendarUtils.startOfDay(cal);
-        // We only want to compare the day, month and year
-        // so reset all other values to 0.
-//        cal.set(Calendar.HOUR_OF_DAY, 0);
-//        cal.set(Calendar.MINUTE, 0);
-//        cal.set(Calendar.SECOND, 0);
-//        cal.set(Calendar.MILLISECOND, 0);
         resetCalendar();
         return cal.getTimeInMillis();
     }
