@@ -145,7 +145,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     private int numCalCols = 1;
     private Rectangle[] monthStringBounds = new Rectangle[12];
     private Rectangle[] yearStringBounds = new Rectangle[12];
-    private Calendar cal;
+    private Calendar calendar;
 
 
     @SuppressWarnings({"UnusedDeclaration"})
@@ -167,6 +167,12 @@ public class BasicMonthViewUI extends MonthViewUI {
         installKeyboardActions();
         installListeners();
         
+        /*
+         * PENDING - JW: why? it is fishy anyway .. the calendar is not guaranteed to
+         * be in any particular state.
+         * Should ask to monthView for the firstDisplayedDate directly and remove the
+         * firstMonth/year fields (could query the calendar if needed)
+         */
         if (getCalendar() != null) {
           firstDisplayedDate = getCalendar().getTimeInMillis();
           firstDisplayedMonth = getCalendar().get(Calendar.MONTH);
@@ -474,6 +480,8 @@ public class BasicMonthViewUI extends MonthViewUI {
     /**
      * Convenience method so subclasses can get the currently painted day's day of the
      * week. It is assumed the calendar, _cal, is already set to the correct day.
+     * 
+     * PENDING JW: this is brittle - the one-liner really worth the trouble?
      *
      * @see java.util.Calendar
      * @return day of the week (Calendar.SATURDAY, Calendar.SUNDAY, ...)
@@ -660,8 +668,9 @@ public class BasicMonthViewUI extends MonthViewUI {
             dirtyRect.width = 0;
             dirtyRect.height = 0;
         } else {
-            Calendar cal = getCalendar();
-            cal.setTime(selection.first());
+            Calendar cal = getCalendar(selection.first().getTime());
+//            Calendar cal = getCalendar();
+//            cal.setTime(selection.first());
             calculateBoundsForDay(dirtyRect, NO_OFFSET);
             cal.add(Calendar.DAY_OF_MONTH, 1);
 
@@ -688,11 +697,16 @@ public class BasicMonthViewUI extends MonthViewUI {
      * calendar, _cal, is already set to the date you want to find the offset
      * for.
      *
+     * PENDING JW: pass calendar as param
+     *  
      * @param bounds Bounds of the date to draw in.
      * @param monthOffset Used to help calculate bounds for leading/trailing dates.
      */
     protected void calculateBoundsForDay(Rectangle bounds, int monthOffset) {
         Calendar cal = getCalendar();
+        // PEDNIGN: temporary safety net:
+        Date initial = cal.getTime();
+        
         int year = cal.get(Calendar.YEAR);
         int month = cal.get(Calendar.MONTH);
         int weekOfMonth = cal.get(Calendar.WEEK_OF_MONTH);
@@ -770,36 +784,54 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         bounds.width = boxPaddingX + boxWidth + boxPaddingX;
         bounds.height = boxPaddingY + boxHeight + boxPaddingY;
+        if (!initial.equals(cal.getTime())) 
+            throw new IllegalStateException("must not change calendar!"); 
     }
 
     /**
+     * Task #660-swingx: lighten coupling with monthView's calendar.
+     * 
+     * This method is meant to be used by code which relies on a certain
+     * pre-config state of the calendar. The code doing the preconfig should
+     * use getCalendar(long). 
+     * 
+     * Note: this is intermediate api! In the longer run, the calendar should be
+     * passed round as parameter.
      * 
      * @return the local copy of the monthView's calendar
      */
     private Calendar getCalendar() {
-        return monthView.getCalendar();
-//        if (cal == null) {
-//             cal = monthView.getCalendar();
-//             if (cal != null) {
-//                 cal = (Calendar) cal.clone();
-//                 cal.setTimeInMillis(firstDisplayedDate);
-//             }
-//        }
-//        return cal;
+        return calendar;
     }
 
-    private Calendar getCalendar(long date) {
-        Calendar cal = getCalendar();
-        cal.setTimeInMillis(date);
-        return cal;
-    }
     /**
+     * Task #660-swingx: lighten coupling with monthView's calendar.
      * 
+     * Sets the local copy to a clone of the monthViews calendar and 
+     * sets it's time to the given value.
+     * 
+     * This method is meant to be used by code which does the preconfig of the
+     * calendar.
+     * 
+     * 
+     * @return the local copy of the monthView's calendar
+     */
+    private Calendar getCalendar(long date) {
+        calendar = (Calendar) monthView.getCalendar().clone();
+        calendar.setTimeInMillis(date);
+        return calendar;
+    }
+    
+    /**
+     * Don't really care, the copy of the calendar is re-set on every call to getCalendar(long).
+     * 
+     * Does nothing: used as marker method to document to "reset" intention
      */
     private void resetCalendar() {
-        cal = null;
+//        cal = null;
     }
 
+    
     @Override
     public void paint(Graphics g, JComponent c) {
         super.paint(g, c);
@@ -875,6 +907,8 @@ public class BasicMonthViewUI extends MonthViewUI {
      * Paints a month.  It is assumed the calendar, <code>monthView.getCalendar()</code>, is already set to the
      * first day of the month to be painted.
      *
+     * PENDING: pass calendar as parameter? Modifies/resets. 
+     * 
      * @param g Graphics object.
      * @param x x location of month
      * @param y y location of month
@@ -1115,9 +1149,20 @@ public class BasicMonthViewUI extends MonthViewUI {
         g.fillRect(x, y, width, height);
     }
 
+    /**
+     * PENDING JW: expects the calendar config'ed to the date of the month to paint.
+     * Add as param. Or month/year only as param - don't really need the full calendar?
+     * 
+     * @param g
+     * @param x
+     * @param y
+     * @param width
+     * @param height
+     */
     protected void paintMonthStringForeground(Graphics g, int x, int y,
                                               int width, int height) {
         // Paint month name.
+        // 
         Calendar cal = getCalendar();
         Font oldFont = monthView.getFont();
 
@@ -1407,14 +1452,14 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     private long cleanupDate(long date) {
-        Calendar cal = getCalendar();
-        cal.setTimeInMillis(date);
+        Calendar cal = getCalendar(date);
+        CalendarUtils.startOfDay(cal);
         // We only want to compare the day, month and year
         // so reset all other values to 0.
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
+//        cal.set(Calendar.HOUR_OF_DAY, 0);
+//        cal.set(Calendar.MINUTE, 0);
+//        cal.set(Calendar.SECOND, 0);
+//        cal.set(Calendar.MILLISECOND, 0);
         resetCalendar();
         return cal.getTimeInMillis();
     }
@@ -1625,8 +1670,9 @@ public class BasicMonthViewUI extends MonthViewUI {
             // We use a bold font for figuring out size constraints since
             // it's larger and flaggedDates will be noted in this style.
             FontMetrics fm = monthView.getFontMetrics(derivedFont);
-
-            Calendar cal = getCalendar();
+            // JW PENDING: relies on calendar being set at least to year?
+            // No, just on the bare calendar - so don't care about actual time
+            Calendar cal = getCalendar(firstDisplayedDate);
             cal.set(Calendar.MONTH, cal.getMinimum(Calendar.MONTH));
             cal.set(Calendar.DAY_OF_MONTH,
                     cal.getActualMinimum(Calendar.DAY_OF_MONTH));
@@ -1732,7 +1778,8 @@ public class BasicMonthViewUI extends MonthViewUI {
 
             // Restore calendar.
             cal.setTimeInMillis(firstDisplayedDate);
-
+            resetCalendar();
+            
             calculateNumDisplayedCals();
             calculateStartPosition();
 
@@ -1863,8 +1910,8 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         private void traverse(int action) {
             long oldStart = selection.isEmpty() ? System.currentTimeMillis() : selection.first().getTime();
-            Calendar cal = getCalendar();
-            cal.setTimeInMillis(oldStart);
+            Calendar cal = getCalendar(oldStart);
+//            cal.setTimeInMillis(oldStart);
             switch (action) {
                 case SELECT_PREVIOUS_DAY:
                     cal.add(Calendar.DAY_OF_MONTH, -1);
@@ -1888,6 +1935,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             }
             // Restore the original time value.
             cal.setTimeInMillis(firstDisplayedDate);
+            resetCalendar();
         }
 
         /**
@@ -1918,8 +1966,9 @@ public class BasicMonthViewUI extends MonthViewUI {
             }
 
             boolean isForward = true;
-
-            Calendar cal = getCalendar();
+            // want a copy to play with - each branch sets and reads the time
+            // actually don't care about the pre-set time.
+            Calendar cal = getCalendar(firstDisplayedDate);
             switch (action) {
                 case ADJUST_SELECTION_PREVIOUS_DAY:
                     if (newEndDate <= pivotDate) {
@@ -1989,6 +2038,7 @@ public class BasicMonthViewUI extends MonthViewUI {
 
             // Restore the original time value.
             cal.setTimeInMillis(firstDisplayedDate);
+            resetCalendar();
         }
     }
 

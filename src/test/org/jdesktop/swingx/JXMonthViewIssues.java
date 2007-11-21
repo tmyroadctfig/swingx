@@ -66,7 +66,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
       JXMonthViewIssues  test = new JXMonthViewIssues();
       try {
           test.runInteractiveTests();
-//        test.runInteractiveTests("interactive.*TimeZone.*");
+//        test.runInteractiveTests("interactive.*Last.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -74,6 +74,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
   }
     @SuppressWarnings("unused")
     private Calendar calendar;
+    
     /**
      * Issue #618-swingx: JXMonthView displays problems with non-default
      * timezones.
@@ -193,7 +194,6 @@ public class JXMonthViewIssues extends InteractiveTestCase {
                 Date viewLast = cal.getTime();
                 cal.setTimeInMillis(month.getUI().getLastDisplayedDate());
                 Date uiLast = cal.getTime();
-                if (!uiLast.equals(viewLast))
                 LOG.info("last(view/ui): " + viewLast + "/" + uiLast);
                 
             }
@@ -206,7 +206,38 @@ public class JXMonthViewIssues extends InteractiveTestCase {
 
 //----------------------
     
-    
+    /**
+     * Characterize MonthView: initial firstDisplayedDate set to 
+     * first day in the month of the current date.
+     * 
+     * KEEP: JXMonthView should protect its calendar by giving out 
+     * a clone only.
+     */
+    public void testMonthViewCalendarInvariant() {
+        JXMonthView monthView = new JXMonthView();
+        TimeZone tz = monthView.getTimeZone();
+        Calendar calendar = monthView.getCalendar();
+        calendar.setTimeZone(getTimeZone(tz, THREE_HOURS));
+        assertEquals("monthView must protect its calendar", tz, monthView.getTimeZone());
+    }
+    /**
+     * Returns a timezone with a rawoffset with a different offset.
+     * 
+     * 
+     * PENDING: this is acutally for european time, not really thought of 
+     *   negative/rolling +/- problem?
+     * 
+     * @param timeZone the timezone to start with 
+     * @param diffRawOffset the raw offset difference.
+     * @return
+     */
+    private TimeZone getTimeZone(TimeZone timeZone, int diffRawOffset) {
+        int offset = timeZone.getRawOffset();
+        int newOffset = offset < 0 ? offset + diffRawOffset : offset - diffRawOffset;
+        String[] availableIDs = TimeZone.getAvailableIDs(newOffset);
+        TimeZone newTimeZone = TimeZone.getTimeZone(availableIDs[0]);
+        return newTimeZone;
+    }
 
     /**
     * Characterize MonthView: initial firstDisplayedDate set to 
@@ -231,6 +262,8 @@ public class JXMonthViewIssues extends InteractiveTestCase {
    /**
     * Characterize MonthView: initial firstDisplayedDate set to 
     * first day in the month of the current date.
+    * 
+    * characterizes the current state. Can be removed if solved.
     */
    public void testMonthViewCalendarWasLastDisplayedDateSetFirstDisplayedDate() {
      JXMonthView monthView = new JXMonthView();
@@ -251,6 +284,9 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     * monthViewUI at some places restores to firstDisplayedDay, why?
     * It probably should always - the calendar represents the 
     * first day of the currently shown month.
+    * 
+    * MonthView internal misbehaviour.
+    * 
     * KEEP: JXMonthView should protect its calendar by giving out 
     * a clone only.
     */
@@ -278,6 +314,9 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     * monthViewUI at some places restores to firstDisplayedDay, why?
     * It probably should always - the calendar represents the 
     * first day of the currently shown month.
+    * 
+    * Monthview internal misbehaviour.
+    * 
     * KEEP: JXMonthView should protect its calendar by giving out 
     * a clone only.
     */
