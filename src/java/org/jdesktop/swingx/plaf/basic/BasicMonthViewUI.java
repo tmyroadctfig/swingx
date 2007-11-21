@@ -461,7 +461,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         int daysToAdd = (row * JXMonthView.DAYS_IN_WEEK) + (col - firstDayViewIndex);
         if (daysToAdd < 0 || daysToAdd >
                 (cal.getActualMaximum(Calendar.DAY_OF_MONTH) - 1)) {
-            resetCalendar();
             return -1;
         }
 
@@ -469,9 +468,6 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         long selected = cal.getTimeInMillis();
 
-        // Restore the time.
-        cal.setTimeInMillis(firstDisplayedDate);
-        resetCalendar();
         return selected;
     }
 
@@ -687,9 +683,6 @@ public class BasicMonthViewUI extends MonthViewUI {
                 cal.add(Calendar.DAY_OF_MONTH, 1);
             }
 
-            // Restore the time.
-            cal.setTimeInMillis(firstDisplayedDate);
-            resetCalendar();
         }
     }
 
@@ -783,33 +776,14 @@ public class BasicMonthViewUI extends MonthViewUI {
         bounds.height = boxPaddingY + boxHeight + boxPaddingY;
     }
 
-    /**
-     * Task #660-swingx: lighten coupling with monthView's calendar.
-     * 
-     * This method is meant to be used by code which relies on a certain
-     * pre-config state of the calendar. The code doing the preconfig should
-     * use getCalendar(long). 
-     * 
-     * Note: this is intermediate api! In the longer run, the calendar should be
-     * passed round as parameter.
-     * 
-     * @return the local copy of the monthView's calendar
-     */
-//    private Calendar getCalendar() {
-//        return calendar;
-//    }
 
     /**
-     * Task #660-swingx: lighten coupling with monthView's calendar.
+     * Clones and returns the monthViews calendar configured to the given time.
      * 
-     * Sets the local copy to a clone of the monthViews calendar and 
-     * sets it's time to the given value.
+     * PENDING: remove the cloning once the monthView guarantees to return a clone
      * 
-     * This method is meant to be used by code which does the preconfig of the
-     * calendar.
-     * 
-     * 
-     * @return the local copy of the monthView's calendar
+     * @param date the date to configure the calendar with
+     * @return the clone of the monthView's calendar, configured with the given date
      */
     private Calendar getCalendar(long date) {
         Calendar calendar = (Calendar) monthView.getCalendar().clone();
@@ -817,14 +791,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         return calendar;
     }
     
-    /**
-     * Don't really care, the copy of the calendar is re-set on every call to getCalendar(long).
-     * 
-     * Does nothing: used as marker method to document to "reset" intention
-     */
-    private void resetCalendar() {
-//        cal = null;
-    }
 
     /**
      * {@inheritDoc}
@@ -890,9 +856,6 @@ public class BasicMonthViewUI extends MonthViewUI {
             }
         }
 
-        // Restore the calendar.
-        cal.setTimeInMillis(firstDisplayedDate);
-        resetCalendar();
         if (g2 != null && monthView.isAntialiased()) {
             g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
                                 oldAAValue);
@@ -1763,11 +1726,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             Insets insets = monthView.getInsets();
             dim.width += insets.left + insets.right;
             dim.height += insets.top + insets.bottom;
-
-            // Restore calendar.
-            cal.setTimeInMillis(firstDisplayedDate);
-            resetCalendar();
-            
+           
             calculateNumDisplayedCals();
             calculateStartPosition();
 
@@ -1918,9 +1877,6 @@ public class BasicMonthViewUI extends MonthViewUI {
                 monthView.setSelectionInterval(startDate, startDate);
                 monthView.ensureDateVisible(newStartDate);
             }
-            // Restore the original time value.
-            cal.setTimeInMillis(firstDisplayedDate);
-            resetCalendar();
         }
 
         /**
@@ -2021,9 +1977,6 @@ public class BasicMonthViewUI extends MonthViewUI {
                 monthView.ensureDateVisible(isForward ? newEndDate : newStartDate);
             }
 
-            // Restore the original time value.
-            cal.setTimeInMillis(firstDisplayedDate);
-            resetCalendar();
         }
     }
 
