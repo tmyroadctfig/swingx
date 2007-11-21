@@ -82,11 +82,11 @@ public class RootPaneTest extends TestCase {
 	rootPane.setStatusBar(statusBar);
 
 	for (int i = 0; i < comps.length; i++) {
-	    rootPane.addComponent(comps[i]);
+	    rootPane.getContentPane().add(comps[i]);
 	}
 
-	Component[] cs = rootPane.getContentComponents();
-	assertTrue(cs.length == comps.length);
+	Component[] cs = rootPane.getContentPane().getComponents();
+	assertEquals(cs.length, comps.length);
 
 //	// Ensure that messages are passed to the
 //	// status bar. The PERSISTENT message is sent to the
@@ -99,10 +99,10 @@ public class RootPaneTest extends TestCase {
 //
 	// Remove all components.
 	for (int i = 0; i < comps.length; i++) {
-	    rootPane.removeComponent(comps[i]);
+	    rootPane.getContentPane().remove(comps[i]);
 	}
-	cs = rootPane.getContentComponents();
-	assertTrue(cs.length == 0);
+	cs = rootPane.getContentPane().getComponents();
+	assertEquals(cs.length, 0);
 
 //	// Ensure that the status bar has been unregistered.
 //	statusBar.setTrailingMessage("");
@@ -127,10 +127,10 @@ public class RootPaneTest extends TestCase {
 	JXStatusBar statusBar = new JXStatusBar();
 	rootPane.setStatusBar(statusBar);
 
-	rootPane.addComponent(comps[HEAD]);
+	rootPane.getContentPane().add(comps[HEAD]);
 
-	Component[] cs = rootPane.getContentComponents();
-	assertTrue(cs.length == 1);
+	Component[] cs = rootPane.getContentPane().getComponents();
+	assertEquals(1, cs.length);
 
 //	// The status bar should get all messages send to all
 //	// components.
@@ -141,9 +141,9 @@ public class RootPaneTest extends TestCase {
 //	}
 
 	// Remove the head. There shouldn't be any components.
-	rootPane.removeComponent(comps[HEAD]);
-	cs = rootPane.getContentComponents();
-	assertTrue(cs.length == 0);
+	rootPane.getContentPane().remove(comps[HEAD]);
+	cs = rootPane.getContentPane().getComponents();
+	assertEquals(0, cs.length);
 
 //	// Ensure that the status bar has been unregistered.
 //	statusBar.setTrailingMessage("");
@@ -161,7 +161,7 @@ public class RootPaneTest extends TestCase {
     public void testStatusBar() {
 	JXRootPane rootPane = new JXRootPane();
 	for (int i = 0; i < comps.length; i++) {
-	    rootPane.addComponent(comps[i]);
+	    rootPane.add(comps[i]);
 	}
 
 	JXStatusBar statusBar = new JXStatusBar();
@@ -297,9 +297,9 @@ public class RootPaneTest extends TestCase {
 	rootPane.setJMenuBar(menuBar);
 
 	for (int i = 0; i < comps.length; i++) {
-	    rootPane.addComponent(comps[i]);
+	    rootPane.add(comps[i]);
 	}
-	rootPane.addComponent(new ProgressComponent());
+	rootPane.add(new ProgressComponent());
 
 	JXFrame frame = new JXFrame();
 	frame.setRootPane(rootPane);

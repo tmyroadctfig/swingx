@@ -24,17 +24,19 @@ package org.jdesktop.swingx;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.LayoutManager;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.BoxLayout;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JMenuBar;
-import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
@@ -46,11 +48,6 @@ import org.jdesktop.swingx.event.ProgressSource;
  * Extends the JRootPane by supporting specific placements for a toolbar and a
  * status bar. If a status bar exists, then toolbars, menus and any
  * MessageSource components will be registered with the status bar.
- * <p>
- * Components should be added using the <code>addComponent</code> method. This
- * method will walk the containment hierarchy of the added component and will
- * register all <code>MessageSource</code> or <code>ProgressSource</code>
- * components.
  * 
  * @see JXStatusBar
  * @see org.jdesktop.swingx.event.MessageEvent
@@ -59,11 +56,133 @@ import org.jdesktop.swingx.event.ProgressSource;
  * @author Mark Davidson
  */
 public class JXRootPane extends JRootPane {
-    private JXStatusBar statusBar;
+    protected class XRootLayout extends RootLayout {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Dimension preferredLayoutSize(Container parent) {
+            Dimension rd, mbd, sbd;
+            Insets i = getInsets();
+        
+            if(contentPane != null) {
+                rd = contentPane.getPreferredSize();
+            } else {
+                rd = parent.getSize();
+            }
+            if(menuBar != null && menuBar.isVisible()) {
+                mbd = menuBar.getPreferredSize();
+            } else {
+                mbd = new Dimension(0, 0);
+            }
+            if(statusBar != null && statusBar.isVisible()) {
+                sbd = statusBar.getPreferredSize();
+            } else {
+                sbd = new Dimension(0, 0);
+            }
+            
+            return new Dimension(Math.max(rd.width, Math.max(mbd.width, sbd.width))
+                    + i.left + i.right, rd.height + mbd.height + sbd.height
+                    + i.top + i.bottom);
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Dimension minimumLayoutSize(Container parent) {
+            Dimension rd, mbd, sbd;
+            Insets i = getInsets();
+            
+            if(contentPane != null) {
+                rd = contentPane.getMinimumSize();
+            } else {
+                rd = parent.getSize();
+            }
+            if(menuBar != null && menuBar.isVisible()) {
+                mbd = menuBar.getMinimumSize();
+            } else {
+                mbd = new Dimension(0, 0);
+            }
+            if(statusBar != null && statusBar.isVisible()) {
+                sbd = statusBar.getMinimumSize();
+            } else {
+                sbd = new Dimension(0, 0);
+            }
+            
+            return new Dimension(Math.max(rd.width, Math.max(mbd.width, sbd.width))
+                    + i.left + i.right, rd.height + mbd.height + sbd.height
+                    + i.top + i.bottom);
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Dimension maximumLayoutSize(Container target) {
+            Dimension rd, mbd, sbd;
+            Insets i = getInsets();
+            if(menuBar != null && menuBar.isVisible()) {
+                mbd = menuBar.getMaximumSize();
+            } else {
+                mbd = new Dimension(0, 0);
+            }
+            if(statusBar != null && statusBar.isVisible()) {
+                sbd = statusBar.getMaximumSize();
+            } else {
+                sbd = new Dimension(0, 0);
+            }
+            if(contentPane != null) {
+                rd = contentPane.getMaximumSize();
+            } else {
+                // This is silly, but should stop an overflow error
+                rd = new Dimension(Integer.MAX_VALUE, 
+                        Integer.MAX_VALUE - i.top - i.bottom - mbd.height - sbd.height - 1);
+            }
+            
+            return new Dimension(Math.min(rd.width, Math.min(mbd.width, sbd.width)) + i.left + i.right,
+                                         rd.height + mbd.height + sbd.height + i.top + i.bottom);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void layoutContainer(Container parent) {
+            Rectangle b = parent.getBounds();
+            Insets i = getInsets();
+            int contentY = 0;
+            int adjustH = 0;
+            int w = b.width - i.right - i.left;
+            int h = b.height - i.top - i.bottom;
+        
+            if(layeredPane != null) {
+                layeredPane.setBounds(i.left, i.top, w, h);
+            }
+            if(glassPane != null) {
+                glassPane.setBounds(i.left, i.top, w, h);
+            }
+            // Note: This is laying out the children in the layeredPane,
+            // technically, these are not our children.
+            if(menuBar != null && menuBar.isVisible()) {
+                Dimension mbd = menuBar.getPreferredSize();
+                menuBar.setBounds(0, 0, w, mbd.height);
+                contentY += mbd.height;
+            }
+            if(statusBar != null && statusBar.isVisible()) {
+                Dimension sbd = statusBar.getPreferredSize();
+                statusBar.setBounds(0, h - sbd.height, w, sbd.height);
+                adjustH += sbd.height;
+            }
+            if(contentPane != null) {
+                contentPane.setBounds(0, contentY, w, h - contentY - adjustH);
+            }
+        }
+    }
+    
+    protected JXStatusBar statusBar;
 
     private JToolBar toolBar;
-
-    private JPanel contentPanel;
 
     /** 
      * The button that gets activated when the pane has the focus and
@@ -72,13 +191,73 @@ public class JXRootPane extends JRootPane {
     private JButton cancelButton;
 
     public JXRootPane() {
-        contentPanel = new JPanel();
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-
-        getContentPane().add(contentPanel, BorderLayout.CENTER);
-        
         installKeyboardActions();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Container createContentPane() {
+        JComponent c = new JXPanel() {
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            protected void addImpl(Component comp, Object constraints, int index) {
+                synchronized (getTreeLock()) {
+                    super.addImpl(comp, constraints, index);
+                    registerStatusBar(comp);
+                }
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public void remove(int index) {
+                synchronized (getTreeLock()) {
+                    unregisterStatusBar(getComponent(index));
+                    super.remove(index);
+                }
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public void removeAll() {
+                synchronized (getTreeLock()) {
+                    for (Component c : getComponents()) {
+                        unregisterStatusBar(c);
+                    }
+                    
+                    super.removeAll();
+                }
+            }
+        };
+        c.setName(this.getName()+".contentPane");
+        c.setLayout(new BorderLayout() {
+            /* This BorderLayout subclass maps a null constraint to CENTER.
+             * Although the reference BorderLayout also does this, some VMs
+             * throw an IllegalArgumentException.
+             */
+            public void addLayoutComponent(Component comp, Object constraints) {
+                if (constraints == null) {
+                    constraints = BorderLayout.CENTER;
+                }
+                super.addLayoutComponent(comp, constraints);
+            }
+        });
+        return c;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected LayoutManager createRootLayout() {
+        return new XRootLayout();
+    } 
 
     /**
      * PENDING: move to UI
@@ -116,32 +295,6 @@ public class JXRootPane extends JRootPane {
         im.put(key, "esc-action");
     }
     
-    /**
-     * Adds a component to the root pane. If this component and/or it's children
-     * is a <code>MessageSource</code> then it will be registered with the
-     * status bar.
-     */
-    public void addComponent(Component comp) {
-        contentPanel.add(comp);
-        registerStatusBar(comp);
-    }
-
-    /**
-     * Removes a component from the center panel.
-     */
-    public void removeComponent(Component comp) {
-        contentPanel.remove(comp);
-        unregisterStatusBar(statusBar, comp);
-    }
-
-    /**
-     * Return an array of components that were added to the content panel with
-     * addComponent.
-     */
-    public Component[] getContentComponents() {
-        return contentPanel.getComponents();
-    }
-
     private void registerStatusBar(Component comp) {
         if (statusBar == null || comp == null) {
             return;
@@ -162,7 +315,7 @@ public class JXRootPane extends JRootPane {
         }
     }
 
-    private void unregisterStatusBar(JXStatusBar statusBar, Component comp) {
+    private void unregisterStatusBar(Component comp) {
         if (statusBar == null || comp == null) {
             return;
         }
@@ -177,7 +330,7 @@ public class JXRootPane extends JRootPane {
         if (comp instanceof Container) {
             Component[] comps = ((Container) comp).getComponents();
             for (int i = 0; i < comps.length; i++) {
-                unregisterStatusBar(statusBar, comps[i]);
+                unregisterStatusBar(comps[i]);
             }
         }
     }
@@ -210,21 +363,21 @@ public class JXRootPane extends JRootPane {
             }
         }
 
-        Component[] comps = contentPanel.getComponents();
+        Component[] comps = getContentPane().getComponents();
         for (int i = 0; i < comps.length; i++) {
             // Unregister the old status bar.
-            unregisterStatusBar(oldStatusBar, comps[i]);
+            unregisterStatusBar(comps[i]);
 
             // register the new status bar.
             registerStatusBar(comps[i]);
         }
         if (oldStatusBar != null) {
-            getContentPane().remove(oldStatusBar);
+            remove(oldStatusBar);
         }
         if (statusBar != null) {
-            getContentPane().add(BorderLayout.SOUTH, statusBar);
+            add(statusBar);
         }
-        firePropertyChange("statusBar", oldStatusBar, statusBar);
+        firePropertyChange("statusBar", oldStatusBar, getStatusBar());
     }
 
     public JXStatusBar getStatusBar() {

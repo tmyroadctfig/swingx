@@ -312,28 +312,6 @@ public class JXFrame extends JFrame {
     }
 
     /**
-     * Add a component to the Frame.
-     */
-    public void addComponent(Component comp) {
-        JXRootPane root = getRootPaneExt();
-        if (root != null) {
-            root.addComponent(comp);
-        }
-        // XXX should probably fire some sort of container event.
-    }
-
-    /**
-     * Removes a component from the frame.
-     */
-    public void removeComponent(Component comp) {
-        JXRootPane root = getRootPaneExt();
-        if (root != null) {
-            root.removeComponent(comp);
-        }
-        // XXX should probably fire some sort of container event.
-    }
-
-    /**
      * Return the extended root pane. If this frame doesn't contain
      * an extended root pane the root pane should be accessed with
      * getRootPane().

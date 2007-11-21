@@ -219,7 +219,7 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
         JXStatusBar statusBar = frame.getRootPaneExt().getStatusBar();
         if (statusBar == null) {
             statusBar = new JXStatusBar();
-            frame.getRootPaneExt().setStatusBar(statusBar);
+            frame.setStatusBar(statusBar);
         }
         return statusBar;
     }
