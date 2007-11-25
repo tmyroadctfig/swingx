@@ -36,6 +36,7 @@ import javax.swing.border.Border;
 import javax.swing.plaf.UIResource;
 
 import org.jdesktop.swingx.painter.Painter;
+import org.jdesktop.swingx.util.Contract;
 
 /**
  * A specialty "list" for working with UI defaults. Requires adds to be done
@@ -78,7 +79,7 @@ public final class DefaultsList {
      *                 cause an exception.  This checking must be enabled.
      */
     public void add(Object key, Object value) {
-        delegate.add(key);
+        delegate.add(Contract.asNotNull(key, "key cannot be null"));
         delegate.add(asUIResource(value, value + " must be a UIResource"));
     }
 

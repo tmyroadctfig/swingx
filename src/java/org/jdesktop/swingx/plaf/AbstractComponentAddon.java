@@ -20,6 +20,9 @@
  */
 package org.jdesktop.swingx.plaf;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.UIManager;
 
 import org.jdesktop.swingx.plaf.linux.LinuxLookAndFeelAddons;
@@ -33,6 +36,7 @@ import org.jdesktop.swingx.plaf.windows.WindowsLookAndFeelAddons;
  * Ease the work of creating an addon for a component.<br>
  * 
  * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a>
+ * @author Karl Schaefer
  */
 public abstract class AbstractComponentAddon implements ComponentAddon {
 
@@ -48,6 +52,7 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
 
   public void initialize(LookAndFeelAddons addon) {
     addon.loadDefaults(getDefaults(addon));
+    addon.loadDefaults(getOldDefaults(addon));
   }
 
   public void uninitialize(LookAndFeelAddons addon) {
@@ -66,6 +71,16 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
   }
 
   /**
+   * Adds default key/value pairs to the given list.
+   * 
+   * @param addon
+   * @param defaults
+   */
+  @Deprecated
+  protected void addBasicDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+  }
+  
+  /**
    * Default implementation calls {@link #addBasicDefaults(LookAndFeelAddons, DefaultsList)}
    * 
    * @param addon
@@ -76,6 +91,17 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
   }
 
   /**
+   * Default implementation calls {@link #addBasicDefaults(LookAndFeelAddons, List))}
+   * 
+   * @param addon
+   * @param defaults
+   */
+  @Deprecated
+  protected void addMacDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+      addBasicDefaults(addon, defaults);
+  }
+  
+  /**
    * Default implementation calls {@link #addBasicDefaults(LookAndFeelAddons, DefaultsList)}
    * 
    * @param addon
@@ -85,6 +111,17 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
     addBasicDefaults(addon, defaults);
   }
 
+  /**
+   * Default implementation calls {@link #addBasicDefaults(LookAndFeelAddons, List)}
+   * 
+   * @param addon
+   * @param defaults
+   */
+  @Deprecated
+  protected void addMetalDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+      addBasicDefaults(addon, defaults);
+  }
+  
   /**
    * Default implementation calls {@link #addBasicDefaults(LookAndFeelAddons, DefaultsList)}
    * 
@@ -101,6 +138,17 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
    * @param addon
    * @param defaults
    */
+  @Deprecated
+  protected void addMotifDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+      addBasicDefaults(addon, defaults);
+  }
+  
+  /**
+   * Default implementation calls {@link #addBasicDefaults(LookAndFeelAddons, DefaultsList)}
+   * 
+   * @param addon
+   * @param defaults
+   */
   protected void addWindowsDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
     addBasicDefaults(addon, defaults);
   }
@@ -111,10 +159,32 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
    * @param addon
    * @param defaults
    */
+  @Deprecated
+  protected void addWindowsDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+      addBasicDefaults(addon, defaults);
+  }
+  
+  /**
+   * Default implementation calls {@link #addBasicDefaults(LookAndFeelAddons, DefaultsList)}
+   * 
+   * @param addon
+   * @param defaults
+   */
    protected void addLinuxDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
      addBasicDefaults(addon, defaults);
    }
  
+   /**
+    * Default implementation calls {@link #addBasicDefaults(LookAndFeelAddons, DefaultsList)}
+    * 
+    * @param addon
+    * @param defaults
+    */
+   @Deprecated
+   protected void addLinuxDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+       addBasicDefaults(addon, defaults);
+   }
+   
   /**
    * Default implementation calls {@link #addBasicDefaults(LookAndFeelAddons, DefaultsList)}
    * 
@@ -126,6 +196,17 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
    }
  
    /**
+    * Default implementation calls {@link #addBasicDefaults(LookAndFeelAddons, DefaultsList)}
+    * 
+    * @param addon
+    * @param defaults
+    */
+   @Deprecated
+   protected void addNimbusDefaults(LookAndFeelAddons addon, List<Object> defaults) {
+       addBasicDefaults(addon, defaults);
+   }
+   
+  /**
    * Gets the defaults for the given addon.
    * 
    * Based on the addon, it calls
@@ -169,6 +250,51 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
     return defaults.toArray();
   }
 
+  /**
+   * Gets the defaults for the given addon.
+   * 
+   * Based on the addon, it calls
+   * {@link #addMacDefaults(LookAndFeelAddons, DefaultsList)} if isMac()
+   * or
+   * {@link #addMetalDefaults(LookAndFeelAddons, DefaultsList)} if isMetal()
+   * or
+   * {@link #addMotifDefaults(LookAndFeelAddons, DefaultsList)} if isMotif()
+   * or
+   * {@link #addWindowsDefaults(LookAndFeelAddons, DefaultsList)} if isWindows()
+   * or
+   * {@link #addBasicDefaults(LookAndFeelAddons, DefaultsList)} if none of the above was called.
+   * @param addon
+   * @return an array of key/value pairs. For example:
+   * <pre>
+   * Object[] uiDefaults = {
+   *   "Font", new Font("Dialog", Font.BOLD, 12),
+   *   "Color", Color.red,
+   *   "five", new Integer(5)
+   * };
+   * </pre>
+   */
+  @Deprecated
+  private Object[] getOldDefaults(LookAndFeelAddons addon) {
+      List<Object> defaults = new ArrayList<Object>();
+      if (isWindows(addon)) {
+          addWindowsDefaults(addon, defaults);
+      } else if (isMetal(addon)) {
+          addMetalDefaults(addon, defaults);
+      } else if (isMac(addon)) {
+          addMacDefaults(addon, defaults);
+      } else if (isMotif(addon)) {
+          addMotifDefaults(addon, defaults);
+      } else if (isLinux(addon)) {
+          addLinuxDefaults(addon, defaults);
+      } else if (isNimbus(addon)) {
+          addNimbusDefaults(addon, defaults);
+      } else {
+          // at least add basic defaults
+          addBasicDefaults(addon, defaults);
+      }
+      return defaults.toArray();
+  }
+  
   //
   // Helper methods to make ComponentAddon developer life easier
   //

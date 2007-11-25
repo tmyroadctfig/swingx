@@ -63,6 +63,7 @@ import org.jdesktop.swingx.util.OS;
  * <code>LookAndFeelAddons.setAddon("org.jdesktop.swingx.plaf.windows.WindowsLookAndFeelAddons");</code>.
  * 
  * @author <a href="mailto:fred@L2FProd.com">Frederic Lavigne</a> 
+ * @author Karl Schaefer
  */
 public abstract class LookAndFeelAddons {
 
@@ -270,7 +271,7 @@ public abstract class LookAndFeelAddons {
    * @param expectedUIClass
    * @return an instance of expectedUIClass 
    */
-  public static ComponentUI getUI(JComponent component, Class expectedUIClass) {
+  public static ComponentUI getUI(JComponent component, Class<?> expectedUIClass) {
     maybeInitialize();
 
     // solve issue with ClassLoader not able to find classes
