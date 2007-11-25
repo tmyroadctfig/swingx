@@ -225,8 +225,8 @@ public class JXMultiSplitPane extends JPanel {
      * another transform.
      *
      * @param g the <code>Graphics</code> object to protect
-     * @see #paint
-     * @see ComponentUI
+     * @see #paint(Graphics)
+     * @see javax.swing.plaf.ComponentUI
      */
     protected void paintComponent(Graphics g)
     {

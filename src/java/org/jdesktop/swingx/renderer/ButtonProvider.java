@@ -91,7 +91,7 @@ public class ButtonProvider extends ComponentProvider<AbstractButton> {
     }
 
     /**
-     * @param object
+     * @param stringValue
      */
     public ButtonProvider(StringValue stringValue) {
         this(stringValue, JLabel.CENTER);

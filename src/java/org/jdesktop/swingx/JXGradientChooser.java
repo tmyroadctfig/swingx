@@ -754,9 +754,13 @@ public class JXGradientChooser extends JXPanel {
     }
     
     /**
-     * {@inheritDoc}
-     * @param paint 
-     * @return 
+     * Creates a string representation of a {@code MultipleGradientPaint}. This
+     * string is used for debugging purposes. Its contents cannot be guaranteed
+     * between releases.
+     * 
+     * @param paint
+     *                the {@code paint} to create a string for
+     * @return a string representing the supplied {@code paint}
      */
     public static String toString(MultipleGradientPaint paint) {
         StringBuffer buffer = new StringBuffer();

@@ -103,7 +103,7 @@ public class MacOSXErrorPaneUI extends BasicErrorPaneUI {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     public JFrame getErrorFrame(Component owner) {
@@ -113,7 +113,7 @@ public class MacOSXErrorPaneUI extends BasicErrorPaneUI {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     public JDialog getErrorDialog(Component owner) {
@@ -124,7 +124,7 @@ public class MacOSXErrorPaneUI extends BasicErrorPaneUI {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     public JInternalFrame getErrorInternalFrame(Component owner) {
@@ -133,6 +133,9 @@ public class MacOSXErrorPaneUI extends BasicErrorPaneUI {
         return frame;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected LayoutManager createErrorPaneLayout() {
         createExtraComponents();
@@ -152,6 +155,9 @@ public class MacOSXErrorPaneUI extends BasicErrorPaneUI {
         return layout;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     protected LayoutManager createDetailPanelLayout() {
         GridBagLayout layout = new GridBagLayout();
         layout.addLayoutComponent(detailsScrollPane, new GridBagConstraints(0,0,1,1,1.0,1.0,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0,0,0,0),0,0));
@@ -159,6 +165,9 @@ public class MacOSXErrorPaneUI extends BasicErrorPaneUI {
         return layout;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     protected void reinit() {
         super.reinit();
         ErrorInfo info = pane == null ? null : pane.getErrorInfo();
@@ -176,6 +185,9 @@ public class MacOSXErrorPaneUI extends BasicErrorPaneUI {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected Dimension calculatePreferredDialogSize() {
         //TODO returns a Dimension that is either X wide, or as wide as necessary
         //to show the title. It is Y high.
@@ -186,6 +198,9 @@ public class MacOSXErrorPaneUI extends BasicErrorPaneUI {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected int getDetailsHeight() {
         return 150;
     }

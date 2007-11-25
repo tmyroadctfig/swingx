@@ -630,7 +630,7 @@ public class JXTree extends JTree {
      * 
      * @param highlighter the Highlighter to remove.
      * @see #addHighlighter(Highlighter)
-     * @see #setHighlighters(Highlighter..)
+     * @see #setHighlighters(Highlighter...)
      */
     public void removeHighlighter(Highlighter highlighter) {
         if ((getCompoundHighlighter() == null)) return;

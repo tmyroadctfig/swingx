@@ -53,7 +53,7 @@ import javax.swing.event.ChangeListener;
  * and triggeres a repaint on notification.
  * 
  * @see ComponentAdapter
- * @see ComponentProvider
+ * @see org.jdesktop.swingx.renderer.ComponentProvider
  * 
  * @author Ramesh Gupta
  * @author Jeanette Winzenburg

@@ -242,7 +242,7 @@ public abstract class AbstractAreaPainter<T> extends AbstractLayoutPainter<T> {
     
     /**
      * Sets the path effects to be drawn on this painter. Set this to null in order to remove all installed effects.
-     * @param pathEffects the effects to apply to this painter
+     * @param areaEffects the effects to apply to this painter
      */
     public void setAreaEffects(AreaEffect... areaEffects) {
         AreaEffect[] old = getAreaEffects();

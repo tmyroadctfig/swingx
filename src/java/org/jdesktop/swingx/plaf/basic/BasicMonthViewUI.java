@@ -694,7 +694,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      *  
      * @param bounds Bounds of the date to draw in.
      * @param monthOffset Used to help calculate bounds for leading/trailing dates.
-     * @param calendar the calendar specifying the day to use, must not be null
+     * @param cal the calendar specifying the day to use, must not be null
      */
     protected void calculateBoundsForDay(Rectangle bounds, int monthOffset, Calendar cal) {
         int year = cal.get(Calendar.YEAR);
@@ -1119,7 +1119,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param y y-coordinate of upper left corner.
      * @param width width of the bounding box.
      * @param height height of the bounding box.
-     * @param calendar the calendar specifying the day to use, must not be null
+     * @param cal the calendar specifying the day to use, must not be null
      */
     protected void paintMonthStringForeground(Graphics g, int x, int y,
                                               int width, int height, Calendar cal) {
@@ -1182,7 +1182,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param y y-coordinate of upper left corner
      * @param width width of bounding box for the day
      * @param height height of bounding box for the day
-     * @param calendar the calendar specifying the day to paint, must not be null
+     * @param cal the calendar specifying the day to paint, must not be null
      * @see  org.jdesktop.swingx.JXMonthView#isSelectedDate
      * @see  #isToday
      */

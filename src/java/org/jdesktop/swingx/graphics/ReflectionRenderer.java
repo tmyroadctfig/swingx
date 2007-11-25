@@ -189,8 +189,12 @@ public class ReflectionRenderer {
      * @param opacity the opacity of the reflection
      * @param length the length of the reflection
      * @param blurEnabled if true, the reflection is blurred
-     * @see #getOpacity(),#setOpacity(float),#getLength(),#setLength(float)
-     * @see #isBlurEnabled(),#setBlurEnabled(boolean)
+     * @see #getOpacity()
+     * @see #setOpacity(float)
+     * @see #getLength()
+     * @see #setLength(float)
+     * @see #isBlurEnabled()
+     * @see #setBlurEnabled(boolean)
      * @see #getBlurRadius()
      * @see #setBlurRadius(int)
      */

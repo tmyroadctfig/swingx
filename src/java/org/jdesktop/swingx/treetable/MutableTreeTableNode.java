@@ -73,7 +73,7 @@ public interface MutableTreeTableNode extends TreeTableNode {
      * This method calls {@code setParent} on {@code child} with a {@code null}
      * parameter.
      * 
-     * @param index
+     * @param node
      *            the index of the child
      */
     void remove(MutableTreeTableNode node);

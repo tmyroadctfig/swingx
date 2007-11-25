@@ -1913,7 +1913,7 @@ public class JXTreeTable extends JXTable {
          * This is used for updated only. PENDING: not necessary to delay?
          * Updates are never structural changes which are the critical.
          * 
-         * @param e
+         * @param tme
          */
         protected void delayedFireTableDataUpdated(final TreeModelEvent tme) {
             final boolean expanded = tree.isExpanded(tme.getTreePath());

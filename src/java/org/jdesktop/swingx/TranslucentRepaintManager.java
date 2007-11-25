@@ -27,7 +27,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <p>An annotation that can be applied to a {@link RepaintManager} to suggest that
+ * <p>An annotation that can be applied to a {@link javax.swing.RepaintManager} to suggest that
  * the <code>RepaintManager</code> supports translucency. If a <code>JXPanel</code>
  * is made translucent by setting it's alpha property to a value between 0 and 1, 
  * then the <code>JXPanel</code> must ensure that a <code>RepaintManager</code>
@@ -39,10 +39,10 @@ import java.lang.annotation.Target;
  * <p>A <code>RepaintManager</code> supports translucency if, when a repaint on a
  * child component occurs, it begins painting <em>not</em> on the child component,
  * but on the child component's <code>JXPanel</code> ancestor if: a) there is such
- * an ancestor and b) the ancestor returns an effective alpha of < 1.</p>
+ * an ancestor and b) the ancestor returns an effective alpha of &lt; 1.</p>
  * 
- * @see {@link RepaintManagerX}
- * @see {@link JXPanel}
+ * @see RepaintManagerX
+ * @see JXPanel
  * @author rbair
  */
 @Retention(RetentionPolicy.RUNTIME)

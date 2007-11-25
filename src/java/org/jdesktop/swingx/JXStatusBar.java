@@ -223,7 +223,7 @@ public class JXStatusBar extends JComponent {
             }
             this.fixedWidth = fixedWidth;
             this.insets = insets == null ? new Insets(0, 0, 0, 0) : (Insets)insets.clone();
-            this.resizeBehavior = resizeBehavior.FIXED;
+            this.resizeBehavior = ResizeBehavior.FIXED;
         }
         
         /**
@@ -284,7 +284,7 @@ public class JXStatusBar extends JComponent {
         
         /**
          * Get fixed width. Width is zero for resize behavior FILLED
-         * @return
+         * @return the width of this constraint
          */
         public int getFixedWidth() {
         	return fixedWidth;

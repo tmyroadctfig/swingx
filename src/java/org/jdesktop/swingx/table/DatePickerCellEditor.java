@@ -280,7 +280,7 @@ public class DatePickerCellEditor extends AbstractCellEditor implements
      * 
      * @param formats the formats to use in the datepicker.
      * 
-     * @see org.jdesktop.swingx.JXDatePicker#setFormats(DateFormat...)).
+     * @see org.jdesktop.swingx.JXDatePicker#setFormats(DateFormat...)
      * 
      */
     public void setFormats(DateFormat... formats) {

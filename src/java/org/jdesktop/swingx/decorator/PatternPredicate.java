@@ -62,7 +62,7 @@ public class PatternPredicate implements HighlightPredicate {
      * @param pattern the Pattern to test the cell value against
      * @param testColumn the column index of the cell which contains the value
      *   to test against the pattern 
-     * @param highlightColumn the column index of the cell which should be 
+     * @param decorateColumn the column index of the cell which should be 
      *   decorated if the test against the value succeeds.
      */
     public PatternPredicate(Pattern pattern, int testColumn, int decorateColumn) {

@@ -74,7 +74,7 @@ public class MattePainter<T> extends AbstractAreaPainter<T> {
      * TexturePaint, Color, or other Paint instance.
      *
      * @param paint Paint to fill with
-     * @param paintStreched indicates if the paint should be stretched
+     * @param paintStretched indicates if the paint should be stretched
      */
     public MattePainter(Paint paint, boolean paintStretched) {
         super(paint);

@@ -65,7 +65,7 @@ import java.beans.VetoableChangeSupport;
  * be assured from the above code fragment that a property change event will only
  * occur if old is indeed different from getFoo()</p>
  * 
- * <p><code>AbstractBean</code> also supports {@link VetoablePropertyChange} events. 
+ * <p><code>AbstractBean</code> also supports vetoable {@link PropertyChangeEvent} events. 
  * These events are similar to <code>PropertyChange</code> events, except a special
  * exception can be used to veto changing the property. For example, perhaps the
  * property is changing from "fred" to "red", but a listener deems that "red" is 

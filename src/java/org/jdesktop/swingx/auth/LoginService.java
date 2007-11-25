@@ -41,7 +41,7 @@ import org.jdesktop.swingworker.SwingWorker;
  * <p>
  * Asynchronous login behavior requires the {@code SwingWorker}. For Java 5.0,
  * users will need the
- * {@link http://swingworker.dev.java.net/ SwingWorker BackPort}.
+ * <a href="http://swingworker.dev.java.net/">SwingWorker BackPort</a>.
  * 
  * @author Bino George
  * @author Shai Almog

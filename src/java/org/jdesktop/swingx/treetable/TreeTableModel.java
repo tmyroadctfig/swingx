@@ -77,7 +77,6 @@ public interface TreeTableModel extends TreeModel {
      * 
      * @return the index of the hierarchical column or -1 if no column is the
      *         hierarchical column.
-     * @see #setHierarchicalColumn(int)
      */
     public int getHierarchicalColumn();
     

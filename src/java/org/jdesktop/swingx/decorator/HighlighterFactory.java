@@ -147,7 +147,7 @@ public final class HighlighterFactory {
      * 
      * @param baseBackground the background color for the even rows.
      * @param alternateBackground background color for odd rows.
-     * @param rowsPerGroup the number of rows in a group
+     * @param linesPerStripe the number of rows in a group
      * @return a Highlighter striping every second row group background. 
      */
     public static Highlighter createAlternateStriping(Color baseBackground, Color alternateBackground, int linesPerStripe) {

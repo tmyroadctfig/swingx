@@ -133,14 +133,14 @@ public class Morphing2D implements Shape {
     }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public Rectangle getBounds() {
         return getBounds2D().getBounds();
     }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public Rectangle2D getBounds2D() {
         int n = startGeometry.getNumCoords();
@@ -171,56 +171,56 @@ public class Morphing2D implements Shape {
     }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public boolean contains(double x, double y) {
         throw new InternalError("unimplemented");
     }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public boolean contains(Point2D p) {
         return contains(p.getX(), p.getY());
     }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public boolean intersects(double x, double y, double w, double h) {
         throw new InternalError("unimplemented");
     }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public boolean intersects(Rectangle2D r) {
         return intersects(r.getX(), r.getY(), r.getWidth(), r.getHeight());
     }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public boolean contains(double x, double y, double w, double h) {
         throw new InternalError("unimplemented");
     }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public boolean contains(Rectangle2D r) {
         return contains(r.getX(), r.getY(), r.getWidth(), r.getHeight());
     }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public PathIterator getPathIterator(AffineTransform at) {
         return new Iterator(at, startGeometry, endGeometry, morph);
     }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public PathIterator getPathIterator(AffineTransform at, double flatness) {
         return new FlatteningPathIterator(getPathIterator(at), flatness);
@@ -604,21 +604,21 @@ public class Morphing2D implements Shape {
         }
 
         /**
-         * @{inheritDoc}
+         * {@inheritDoc}
          */
         public int getWindingRule() {
             return g0.getWindingRule();
         }
 
         /**
-         * @{inheritDoc}
+         * {@inheritDoc}
          */
         public boolean isDone() {
             return (cindex > g0.getNumCoords());
         }
 
         /**
-         * @{inheritDoc}
+         * {@inheritDoc}
          */
         public void next() {
             if (cindex == 0) {
@@ -631,7 +631,7 @@ public class Morphing2D implements Shape {
         double dcoords[];
 
         /**
-         * @{inheritDoc}
+         * {@inheritDoc}
          */
         public int currentSegment(float[] coords) {
             if (dcoords == null) {
@@ -652,7 +652,7 @@ public class Morphing2D implements Shape {
         }
 
         /**
-         * @{inheritDoc}
+         * {@inheritDoc}
          */
         public int currentSegment(double[] coords) {
             int type;

@@ -38,6 +38,7 @@ import java.util.TreeSet;
 
 import javax.swing.JComponent;
 import javax.swing.Timer;
+import javax.swing.UIManager;
 
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
@@ -327,7 +328,7 @@ public class JXMonthView extends JComponent {
     /**
      * Resets the UI property with the value from the current look and feel.
      *
-     * @see UIManager#getUI
+     * @see UIManager#getUI(JComponent)
      */
     @Override
     public void updateUI() {
@@ -1654,8 +1655,8 @@ public class JXMonthView extends JComponent {
      * </p>
      * 
      * @param   locale new Locale to be used for formatting
-     * @see     setDaysOfTheWeek
-     * @see     setFirstDayOfWeek
+     * @see     #setDaysOfTheWeek(String[])
+     * @see     #setFirstDayOfWeek(int)
      */
     @Override
     public void setLocale(Locale locale) {

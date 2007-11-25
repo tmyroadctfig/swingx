@@ -256,7 +256,7 @@ public class JXLabel extends JLabel {
     /**
      * Gets current value of text rotation in rads.
      * 
-     * @return
+     * @return a double representing the current rotation of the text
      * @see #setTextRotation(double)
      */
     public double getTextRotation() {
@@ -286,7 +286,6 @@ public class JXLabel extends JLabel {
      * Value of this property has no effect on HTML text.
      * 
      * @param b the new value
-     * @see #isMultiLine()
      */
     public void setLineWrap(boolean b) {
         boolean old = isLineWrap();
@@ -306,7 +305,6 @@ public class JXLabel extends JLabel {
      * JLabel behavior. Value of this property has no effect on HTML text.
      * 
      * @return the current multiple line splitting status
-     * @see #setMultiLine(boolean)
      */
     public boolean isLineWrap() {
         return this.multiLine;

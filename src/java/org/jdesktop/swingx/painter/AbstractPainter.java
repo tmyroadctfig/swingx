@@ -38,7 +38,7 @@ import org.jdesktop.swingx.graphics.GraphicsUtilities;
  * toggle whether a subclass paints or not via the <code>visibility</code> property.</p>
  *
  * <p>Subclasses of <code>AbstractPainter</code> generally need only override the
- * {@link doPaint(Graphics2D, T, int, int)} method. If a subclass requires more control
+ * {@link #doPaint(Graphics2D, Object, int, int)} method. If a subclass requires more control
  * over whether cacheing is enabled, or for configuring the graphics state, then it
  * may override the appropriate protected methods to interpose its own behavior.</p>
  * 
@@ -323,7 +323,7 @@ public abstract class AbstractPainter<T> extends AbstractBean implements Painter
      * surface before any painting happens.</p>
      *
      * @param g the graphics surface to configure. This will never be null.
-     * @see #paint(Graphics2D, T, int, int)
+     * @see #paint(Graphics2D, Object, int, int)
      */
     protected void configureGraphics(Graphics2D g) {
         //configure antialiasing

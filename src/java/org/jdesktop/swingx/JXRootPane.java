@@ -465,8 +465,8 @@ public class JXRootPane extends JRootPane {
      * To remove a cancel button from this root pane, set this
      * property to <code>null</code>.
      *
-     * @see JButton#getCancelButton 
      * @param cancelButton the <code>JButton</code> which is to be the cancel button
+     * @see #getCancelButton() 
      *
      * @beaninfo
      *  description: The button activated by default for cancel actions in this root pane

@@ -225,7 +225,6 @@ public abstract class AbstractPatternPanel extends JXPanel {
      * additions? Or move to columnControl?
      * 
      * @see #setLocale(Locale)
-     * @see #updateLocaleActionState(String)
      */
     protected void updateLocaleState(Locale locale) {
         for (Object key : getActionMap().allKeys()) {

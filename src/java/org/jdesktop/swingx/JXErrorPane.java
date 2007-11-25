@@ -50,8 +50,9 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  * <p>Data and application state associated with an error are encapsulated
  * in the {@link org.jdesktop.swingx.error.ErrorInfo} class. The
  * {@code JXErrorPane} displays the data contained in the {@code ErrorInfo}.
- * In addition, {@code ErrorInfo} is passed to the {@link ErrorReporter} if the
- * user decides to report the incident.</p>
+ * In addition, {@code ErrorInfo} is passed to the
+ * {@link org.jdesktop.swingx.error.ErrorReporter} if the user decides to report
+ * the incident.</p>
  * 
  * <h2>Basic Usage</h2>
  * <p>Typically, the <code>JXErrorPane</code>
@@ -123,7 +124,7 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  * <p><code>JXErrorPane</code> may also be configured with a "Report" button which allows
  * the user to send a bug report, typically through email. This is done through
  * the pluggable {@link org.jdesktop.swingx.error.ErrorReporter} class. Simply instantiate
- * {@link EmailErrorReporter} or some custom
+ * {@link org.jdesktop.swingx.error.EmailErrorReporter} or some custom
  * subclass of <code>ErrorReporter</code> and pass the instance into the
  * {@link #setErrorReporter} method.</p>
  *
@@ -132,7 +133,8 @@ import org.jdesktop.swingx.plaf.LookAndFeelAddons;
  * be corrected and that must result in the termination of the application. 
  * After the close of a fatal error dialog, the application should
  * automatically exit. Fatal messages are identified by the <code>Level</code>
- * of the <code>ErrorInfo</code> being {@link ErrorLevel}<code>.FATAL</code>.</p>
+ * of the <code>ErrorInfo</code> being 
+ * {@link org.jdesktop.swingx.error.ErrorLevel}<code>.FATAL</code>.</p>
  * 
  * <p>By default, when Fatal error dialogs are closed the application exits with
  * a code of "1". In other words, <code>System.exit(1)</code>. If you wish to implement

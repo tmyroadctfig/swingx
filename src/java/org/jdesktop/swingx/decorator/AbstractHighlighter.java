@@ -47,7 +47,7 @@ import org.jdesktop.swingx.event.WeakEventListenerList;
  *         this.font = font;
  *     }
  * 
- *     @Override
+ *     &#64;Override
  *     protected Component doHighlight(Component component,
  *             ComponentAdapter adapter) {
  *         component.setFont(font);

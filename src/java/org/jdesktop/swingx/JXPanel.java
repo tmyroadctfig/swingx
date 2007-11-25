@@ -248,7 +248,7 @@ public class JXPanel extends JPanel implements Scrollable {
      * according to the current Look and Feel. Calling
      * <CODE>setBackgroundPainter</CODE> will replace that existing painter.
      * @param p the new painter
-     * @see getBackgroundPainter()
+     * @see #getBackgroundPainter()
      */
     public void setBackgroundPainter(Painter p) {
         Painter old = getBackgroundPainter();
@@ -261,8 +261,8 @@ public class JXPanel extends JPanel implements Scrollable {
      * Returns the current background painter. The default value of this property 
      * is a painter which draws the normal JPanel background according to the current look and feel.
      * @return the current painter
-     * @see setBackgroundPainter(Painter)
-     * @see isPaintBorderInsets()
+     * @see #setBackgroundPainter(Painter)
+     * @see #isPaintBorderInsets()
      */
     public Painter getBackgroundPainter() {
         return backgroundPainter;

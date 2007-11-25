@@ -293,7 +293,7 @@ public class JXTable extends JTable
     /**
      * The key for the client property deciding about whether 
      * the color memory hack for DefaultTableCellRenderer should be used.
-     * @see #resetDefaultTableCellRendererHighlighter()
+     * @see #resetDefaultTableCellRendererHighlighter
      */
     protected static final String USE_DTCR_COLORMEMORY_HACK = "useDTCRColorMemoryHack";
 
@@ -1033,7 +1033,7 @@ public class JXTable extends JTable
      * 
      * @param locale the Locale to use for value lookup
      * @see #setLocale(Locale)
-     * @see #updateLocaleActionState(String)
+     * @see #updateLocaleActionState(String, Locale)
      */
     protected void updateLocaleState(Locale locale) {
         updateLocaleActionState(HORIZONTALSCROLL_ACTION_COMMAND, locale);
@@ -1048,7 +1048,7 @@ public class JXTable extends JTable
      * Here: updates the <code>Action</code>'s name property. 
      * 
      * @param key the string for lookup in this table's ActionMap
-     * @see #updateLocaleState()
+     * @see #updateLocaleState(Locale)
      */
     protected void updateLocaleActionState(String key, Locale locale) {
         Action action = getActionMap().get(key);
@@ -3024,7 +3024,7 @@ public class JXTable extends JTable
         }
 
         /**
-         * @return
+         * @return a highlighter configured for matching
          */
         protected AbstractHighlighter getConfiguredMatchHighlighter() {
             AbstractHighlighter searchHL = getMatchHighlighter();
@@ -3052,7 +3052,8 @@ public class JXTable extends JTable
 
         /**
          * @param result
-         * @return
+         * @return {@code true} if the {@code result} contains a match;
+         *         {@code false} otherwise
          */
         protected boolean hasMatch(SearchResult result) {
             boolean noMatch =  (result.getFoundRow() < 0) || (result.getFoundColumn() < 0);
@@ -3107,8 +3108,9 @@ public class JXTable extends JTable
         }
 
         private AbstractHighlighter matchHighlighter;
+        
         /**
-         * @return
+         * @return a highlighter used for matching
          */
         protected AbstractHighlighter getMatchHighlighter() {
             if (matchHighlighter == null) {
@@ -3118,7 +3120,7 @@ public class JXTable extends JTable
         }
 
         /**
-         * @return
+         * @return a highlighter used for matching
          */
         protected AbstractHighlighter createMatchHighlighter() {
             return new ColorHighlighter(Color.YELLOW.brighter(), null, 
@@ -3427,7 +3429,7 @@ public class JXTable extends JTable
      * 
      * @param highlighter the Highlighter to remove.
      * @see #addHighlighter(Highlighter)
-     * @see #setHighlighters(Highlighter..)
+     * @see #setHighlighters(Highlighter...)
      */
     public void removeHighlighter(Highlighter highlighter) {
         if ((getCompoundHighlighter() == null)) return;
@@ -3509,7 +3511,7 @@ public class JXTable extends JTable
      *        column
      * @return the decorated <code>Component</code> used as a stamp to render
      *         the specified cell
-     * @see #resetDefaultTableCellRendererColors()
+     * @see #resetDefaultTableCellRendererColors(Component, int, int)
      * @see org.jdesktop.swingx.decorator.Highlighter
      */
     @Override

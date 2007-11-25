@@ -91,7 +91,7 @@ public abstract class AbstractComponentAddon implements ComponentAddon {
   }
 
   /**
-   * Default implementation calls {@link #addBasicDefaults(LookAndFeelAddons, List))}
+   * Default implementation calls {@link #addBasicDefaults(LookAndFeelAddons, List)}
    * 
    * @param addon
    * @param defaults

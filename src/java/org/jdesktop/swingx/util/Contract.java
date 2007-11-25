@@ -50,7 +50,7 @@ public class Contract {
      * @param input the argument to check against null.
      * @param message the text of the exception if the argument is null
      * @return the input if not null
-     * @thows NullPointerException if input is null
+     * @throws NullPointerException if input is null
      */
     @SuppressWarnings("unchecked")
     public static <T> T asNotNull(T input, String message) {

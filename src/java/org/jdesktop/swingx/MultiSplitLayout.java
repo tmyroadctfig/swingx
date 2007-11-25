@@ -69,7 +69,7 @@ import javax.swing.UIManager;
  *
  * 
  * @author Hans Muller 
- * @see MultiSplitPane
+ * @see JXMultiSplitPane
  */
 
 /* 
@@ -362,7 +362,7 @@ public class MultiSplitLayout implements LayoutManager
   /**
    * Removes the specified node from the layout.
    *
-   * @param child the component to be removed
+   * @param name the name of the component to be removed
    * @see #addLayoutComponent
    */
   public void removeLayoutNode(String name) {    

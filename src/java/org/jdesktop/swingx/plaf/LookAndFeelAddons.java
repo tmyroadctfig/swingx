@@ -389,7 +389,7 @@ public abstract class LookAndFeelAddons {
      * 
      * @param c
      *                component to set the painter on
-     * @param defaultPainterName
+     * @param painter
      *                key specifying the painter
      * @throws NullPointerException
      *                 if the component or painter is {@code null}
