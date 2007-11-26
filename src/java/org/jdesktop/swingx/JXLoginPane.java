@@ -1512,8 +1512,9 @@ public class JXLoginPane extends JXImagePanel {
                 }
             }
         });
-        cancelButton.setText(UIManager.getString(CLASS_NAME + ".cancelString"));
-        okButton.setText(UIManager.getString(CLASS_NAME + ".loginString"));
+        // FIX for #663 - commented out two lines below. Not sure why they were here in a first place.
+        // cancelButton.setText(UIManager.getString(CLASS_NAME + ".cancelString"));
+        // okButton.setText(UIManager.getString(CLASS_NAME + ".loginString"));
         JXBtnPanel buttonPanel = new JXBtnPanel(okButton, cancelButton);
         panel.setButtonPanel(buttonPanel);
         JXPanel controls = new JXPanel(new FlowLayout(FlowLayout.RIGHT));
