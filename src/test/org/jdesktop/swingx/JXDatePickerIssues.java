@@ -28,6 +28,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -42,6 +43,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.UIManager;
 
 import org.jdesktop.swingx.calendar.DatePickerFormatter;
 import org.jdesktop.swingx.calendar.DateUtils;
@@ -61,7 +63,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         JXDatePickerIssues  test = new JXDatePickerIssues();
         try {
 //            test.runInteractiveTests();
-          test.runInteractiveTests("interactive.*Bounds.*");
+          test.runInteractiveTests("interactive.*Locale.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -70,6 +72,37 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 
 
     private Calendar calendar;
+
+    /**
+     * Issue #665-swingx: make JXDatePicker Locale-aware.
+     * 
+     * 
+     */
+    public void interactiveLocale() {
+        JComponent comp = new JPanel();
+        Locale old = addDatePickerWithLocale(comp, Locale.UK);
+        addDatePickerWithLocale(comp, Locale.FRANCE);
+        addDatePickerWithLocale(comp, Locale.US);
+        addDatePickerWithLocale(comp, Locale.GERMAN);
+        addDatePickerWithLocale(comp, Locale.ITALIAN);
+        showInFrame(comp, "Localized DatePicker");
+        setLocale(old);
+    }
+
+    private Locale addDatePickerWithLocale(JComponent comp, Locale uk) {
+        Locale old = setLocale(uk);
+        JXDatePicker datePicker = new JXDatePicker();
+        comp.add(new JLabel(uk.getDisplayName()));
+        comp.add(datePicker);
+        return old;
+    }
+
+    private Locale setLocale(Locale locale) {
+        Locale old = JComponent.getDefaultLocale();
+        JComponent.setDefaultLocale(locale);
+        Locale.setDefault(locale);
+        return old;
+    }
 
     /**
      * Issue #606-swingx: keybindings in monthView popup not working 
