@@ -295,7 +295,7 @@ public class JXTable extends JTable
      * the color memory hack for DefaultTableCellRenderer should be used.
      * @see #resetDefaultTableCellRendererHighlighter
      */
-    protected static final String USE_DTCR_COLORMEMORY_HACK = "useDTCRColorMemoryHack";
+    public static final String USE_DTCR_COLORMEMORY_HACK = "useDTCRColorMemoryHack";
 
 
     /**
