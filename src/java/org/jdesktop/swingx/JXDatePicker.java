@@ -38,6 +38,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.EventListener;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import javax.swing.AbstractAction;
@@ -46,7 +47,6 @@ import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.UIManager;
 import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.text.DefaultFormatterFactory;
@@ -128,7 +128,7 @@ public class JXDatePicker extends JComponent {
      * @see #getTimeZone
      */
     public JXDatePicker() {
-        this(System.currentTimeMillis());
+        this(System.currentTimeMillis(), null);
     }
 
     /**
@@ -143,12 +143,47 @@ public class JXDatePicker extends JComponent {
      * @see #getTimeZone
      */
     public JXDatePicker(long millis) {
+        this(millis, null);
+    }
+
+    /**
+     * Create a new date picker using the current date as the initial
+     * selection and the default abstract formatter
+     * <code>JXDatePickerFormatter</code>.
+     * <p/>
+     * The date picker is configured with the default time zone and specified 
+     * locale
+     *
+     * @param locale    initial Locale
+     * @see #setTimeZone
+     * @see #getTimeZone
+     */
+    public JXDatePicker(Locale locale) {
+        this(System.currentTimeMillis(), locale);
+    }
+
+    /**
+     * Create a new date picker using the specified time as the initial
+     * selection and the default abstract formatter
+     * <code>JXDatePickerFormatter</code>.
+     * <p/>
+     * The date picker is configured with the default time zone and specified locale
+     *
+     * @param millis initial time in milliseconds
+     * @param locale initial Locale
+     * @see #setTimeZone
+     * @see #getTimeZone
+     */
+    public JXDatePicker(long millis, Locale locale) {
         init();
         // install the controller before setting the date
         updateUI();
+        if (locale != null) {
+            setLocale(locale);
+        }
         setDate(new Date(millis));
     }
-
+    
 
     /**
      * Sets the date property. <p>
@@ -234,15 +269,9 @@ public class JXDatePicker extends JComponent {
         _monthView = new JXMonthView();
         _monthView.setTraversable(true);
 
-        String linkFormat = UIManagerExt.getString(
-                "JXDatePicker.linkFormat", getLocale());
-        
-        if (linkFormat != null) {
-            _linkFormat = new MessageFormat(linkFormat);
-        } else {
-            _linkFormat = new MessageFormat("{0,date, dd MMMM yyyy}");
-        }
 
+        updateLinkFormat();
+        
         _linkDate = System.currentTimeMillis();
         _linkPanel = new TodayPanel();
     }
@@ -303,7 +332,7 @@ public class JXDatePicker extends JComponent {
                             + "must not contain null elements");
             dateFormats = new DateFormat[formats.length];
             for (int counter = formats.length - 1; counter >= 0; counter--) {
-                dateFormats[counter] = new SimpleDateFormat(formats[counter]);
+                dateFormats[counter] = new SimpleDateFormat(formats[counter], getLocale());
             }
         }
         setFormats(dateFormats);
@@ -319,12 +348,13 @@ public class JXDatePicker extends JComponent {
      * @throws NullPointerException any of its elements is null.
      */
     public void setFormats(DateFormat... formats) {
-        if (formats != null)
-        Contract.asNotNull(formats, "the array of formats " +
-                        "must not contain null elements");
+        if (formats != null) {
+            Contract.asNotNull(formats, "the array of formats " + "must not contain null elements");
+        }
+        
         DateFormat[] old = getFormats();
         _dateField.setFormatterFactory(new DefaultFormatterFactory(
-                new DatePickerFormatter(formats)));
+                new DatePickerFormatter(formats, getLocale())));
         firePropertyChange("formats", old, getFormats());
     }
 
@@ -709,6 +739,12 @@ public class JXDatePicker extends JComponent {
             listener.actionPerformed(e);
         }
     }
+    /*
+    public void setLocale(Locale l) {
+        super.setLocale(l);
+        _monthView.setLocale(l);
+    }*/
+    
     /**
      * 
      *  @deprecated use {@link #cancelEdit()} and {@link #commitEdit()} instead
@@ -718,6 +754,9 @@ public class JXDatePicker extends JComponent {
         fireActionPerformed();
     }
 
+    /**
+     * Pes: added setLocale method to refresh link text on locale changes
+     */
     private final class TodayPanel extends JXPanel {
         private TodayAction todayAction;
         private JXHyperlink todayLink;
@@ -759,6 +798,18 @@ public class JXDatePicker extends JComponent {
             g.drawLine(0, 1, getWidth(), 1);
         }
 
+        @Override
+        public void setLocale(Locale l) {
+            super.setLocale(l);
+            /* FIXME: PeS: Uncomment this after updateLinkFormat works correctly
+            updateLinkFormat();
+            todayLink.setText(_linkFormat.format(new Object[]{new Date(_linkDate)}));
+             * 
+             * and then delete following line
+             */
+            todayLink.setText(DateFormat.getDateInstance(DateFormat.MEDIUM, l).format(new Date(_linkDate)));
+        }
+        
         private final class TodayAction extends AbstractAction {
             boolean select;
             TodayAction() {
@@ -785,6 +836,25 @@ public class JXDatePicker extends JComponent {
         }
     }
 
-
-
-}
+    /**
+     * Update text on the link panel.
+     * 
+     */
+    private void updateLinkFormat() {
+        /* FIXME: PeS: Again, run into trouble with UIManagerExt as it seems to have 
+         * something installed as locale. I do not want to touch that as I am
+         * not sure I understand fully. Feel free to improve. Once done,
+         * uncomment code in TodayPanel setLocale method. Thanks.
+         */ 
+  
+        String linkFormat = UIManagerExt.getString(
+                "JXDatePicker.linkFormat", getLocale());
+        
+        if (linkFormat != null) {
+            _linkFormat = new MessageFormat(linkFormat);
+        } else {
+            _linkFormat = new MessageFormat("{0,date, dd MMMM yyyy}");
+        }
+    }
+}    
+ 

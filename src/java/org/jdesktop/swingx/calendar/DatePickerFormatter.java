@@ -25,6 +25,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import javax.swing.JFormattedTextField;
@@ -45,6 +46,7 @@ public class DatePickerFormatter extends
             .getLogger(DatePickerFormatter.class.getName());
     private DateFormat _formats[] = null;
 
+    
     /**
      * Instantiates a formatter with the localized format patterns defined
      * in the swingx.properties.
@@ -60,7 +62,7 @@ public class DatePickerFormatter extends
      *
      */
     public DatePickerFormatter() {
-        this(null);
+        this(null, null);
     }
 
     /**
@@ -73,13 +75,25 @@ public class DatePickerFormatter extends
      *   null formats.
      */
     public DatePickerFormatter(DateFormat formats[]) {
+        this(formats, null);
+    }
+
+    public DatePickerFormatter(Locale locale) {
+        this(null, locale);
+    }
+
+    public DatePickerFormatter(DateFormat formats[], Locale locale) {
+//        super();
+        if (locale == null) {
+            locale = Locale.getDefault();
+        }
         if (formats == null) {
-            formats = createDefaultFormats();
+            formats = createDefaultFormats(locale);
         }
         Contract.asNotNull(formats, "The array of DateFormats must not contain null formats");
         _formats = formats;
     }
-
+    
     /**
      * Returns an array of the formats used by this formatter.
      * 
@@ -127,7 +141,7 @@ public class DatePickerFormatter extends
      * {@inheritDoc}
      */
     public String valueToString(Object value) throws ParseException {
-        if ((value != null) && (_formats.length > 0)){
+         if ((value != null) && (_formats.length > 0)){
             return _formats[0].format(value);
         }
         return null;
@@ -138,11 +152,11 @@ public class DatePickerFormatter extends
      * 
      * @return the localized default formats.
      */
-    protected DateFormat[] createDefaultFormats() {
+    protected DateFormat[] createDefaultFormats(Locale locale) {
         List<DateFormat> f = new ArrayList<DateFormat>();
-        addFormat(f, "JXDatePicker.longFormat");
-        addFormat(f, "JXDatePicker.mediumFormat");
-        addFormat(f, "JXDatePicker.shortFormat");
+        addFormat(f, "JXDatePicker.longFormat", locale);
+        addFormat(f, "JXDatePicker.mediumFormat", locale);
+        addFormat(f, "JXDatePicker.shortFormat", locale);
         return f.toArray(new DateFormat[f.size()]);
     }
 
@@ -156,17 +170,17 @@ public class DatePickerFormatter extends
      * @param f the list of formats
      * @param key the key for getting the pattern from the UI
      */
-    private void addFormat(List<DateFormat> f, String key) {
-        //TODO localize
-        String longFormat = UIManagerExt.getString(key);
+    private void addFormat(List<DateFormat> f, String key, Locale locale) {
+        // FIXME: PeS: UIManagerExt.getString(key) always seems to return same 
+        // pattern (as for default locale) no matter what locale we pass as parameter.
+        String pattern = UIManagerExt.getString(key);
         try {
-            SimpleDateFormat format = new SimpleDateFormat(longFormat);
+            SimpleDateFormat format = new SimpleDateFormat(pattern, locale);
             f.add(format);
         } catch (RuntimeException e) {
             // format string  not available or invalid
-            LOG.finer("creating date format failed for key/pattern: " + key + "/" + longFormat);
+            LOG.finer("creating date format failed for key/pattern: " + key + "/" + pattern);
         }
     }
-
 
 }

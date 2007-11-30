@@ -38,7 +38,6 @@ import java.util.TreeSet;
 
 import javax.swing.JComponent;
 import javax.swing.Timer;
-import javax.swing.UIManager;
 
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
@@ -238,9 +237,9 @@ public class JXMonthView extends JComponent {
     private EventListenerMap listenerMap;
     private SelectionMode selectionMode;
     @SuppressWarnings({"FieldCanBeLocal"})
-    private Date modifyedStartDate;
+    private Date modifiedStartDate;
     @SuppressWarnings({"FieldCanBeLocal"})
-    private Date modifyedEndDate;
+    private Date modifiedEndDate;
     private boolean componentInputMapEnabled;
     private Calendar anchor;
 
@@ -544,14 +543,14 @@ public class JXMonthView extends JComponent {
      */
     public void addSelectionInterval(Date startDate, Date endDate) {
         if (selectionMode != SelectionMode.NO_SELECTION) {
-            modifyedStartDate = startDate;
-            modifyedEndDate = endDate;
+            modifiedStartDate = startDate;
+            modifiedEndDate = endDate;
             if (selectionMode == SelectionMode.WEEK_INTERVAL_SELECTION) {
                 cleanupWeekSelectionDates(startDate, endDate);
             }
             getSelectionModel().addSelectionInterval(
-                    cleanupDate(modifyedStartDate),
-                    cleanupDate(modifyedEndDate));
+                    cleanupDate(modifiedStartDate),
+                    cleanupDate(modifiedEndDate));
         }
     }
 
@@ -564,12 +563,12 @@ public class JXMonthView extends JComponent {
      */
     public void setSelectionInterval(final Date startDate, final Date endDate) {
         if (selectionMode != SelectionMode.NO_SELECTION) {
-            modifyedStartDate = startDate;
-            modifyedEndDate = endDate;
+            modifiedStartDate = startDate;
+            modifiedEndDate = endDate;
             if (selectionMode == SelectionMode.WEEK_INTERVAL_SELECTION) {
                 cleanupWeekSelectionDates(startDate, endDate);
             }
-            getSelectionModel().setSelectionInterval(cleanupDate(modifyedStartDate), cleanupDate(modifyedEndDate));
+            getSelectionModel().setSelectionInterval(cleanupDate(modifiedStartDate), cleanupDate(modifiedEndDate));
         }
     }
 
@@ -893,7 +892,7 @@ public class JXMonthView extends JComponent {
             }
             cal.add(Calendar.DAY_OF_MONTH, -daysFromStart);
 
-            modifyedStartDate = cal.getTime();
+            modifiedStartDate = cal.getTime();
 
             // Move the end date to the last day of the week.
             cal.setTime(endDate);
@@ -907,7 +906,7 @@ public class JXMonthView extends JComponent {
                 daysTillEnd += JXMonthView.DAYS_IN_WEEK;
             }
             cal.add(Calendar.DAY_OF_MONTH, daysTillEnd);
-            modifyedEndDate = cal.getTime();
+            modifiedEndDate = cal.getTime();
         }
     }
 

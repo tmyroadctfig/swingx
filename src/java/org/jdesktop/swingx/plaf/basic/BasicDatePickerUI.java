@@ -39,8 +39,10 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
@@ -423,7 +425,7 @@ public class BasicDatePickerUI extends DatePickerUI {
      * @return an instance of a JFormattedTextField
      */
     protected JFormattedTextField createEditor() {
-        JFormattedTextField f = new DefaultEditor(new DatePickerFormatter());
+        JFormattedTextField f = new DefaultEditor(new DatePickerFormatter(datePicker.getLocale()));
         f.setName("dateField");
         f.setColumns(UIManager.getInt("JXDatePicker.numColumns"));
         f.setBorder(UIManager.getBorder("JXDatePicker.border"));
@@ -679,9 +681,40 @@ public class BasicDatePickerUI extends DatePickerUI {
         for (DateFormat format : datePicker.getFormats()) {
             format.setTimeZone(zone);
         }
-
     }
 
+    /**
+     * Called form property listener, updates all components locale, formats etc.
+     * 
+     * @author PeS
+     */
+    protected void updateLocale() {
+        Locale locale = datePicker.getLocale();
+        if (locale != null) {
+            /* FIXME: PeS: It should probably use this 
+             
+             datePicker.getEditor().setFormatterFactory(new DefaultFormatterFactory(
+                new DatePickerFormatter(null, locale)));
+
+             * however that gets beyond my understanding of the inner workings. 
+             * It reaches to UiManagerExt for date formats?
+             * Therefore I am using simply JRE defined formats
+             */
+            DateFormat[] formats = new DateFormat[3];
+            SimpleDateFormat f = (SimpleDateFormat)DateFormat.getDateInstance(DateFormat.SHORT, locale);
+            if (!f.toPattern().contains("E")) {
+                f.applyPattern("EE " + f.toPattern());
+            }
+            formats[0] = f;
+            formats[1] = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
+            formats[2] = DateFormat.getDateInstance(DateFormat.MEDIUM, locale);
+            datePicker.setFormats(formats);
+            
+            datePicker.getLinkPanel().setLocale(locale);
+            datePicker.getMonthView().setLocale(locale);
+        }
+    }
+    
     /**
      * @param oldLinkPanel 
      * 
@@ -1074,7 +1107,9 @@ public class BasicDatePickerUI extends DatePickerUI {
             } else if ("formats".equals(property)) {
                 updateFormatTimeZone(datePicker.getTimeZone());
             }
-            
+            else if ("locale".equals(property)) {
+                updateLocale();
+            }            
         }
 
         /**

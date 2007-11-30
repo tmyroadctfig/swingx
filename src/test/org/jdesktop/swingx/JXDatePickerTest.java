@@ -160,7 +160,7 @@ public class JXDatePickerTest extends TestCase {
         JXDatePicker picker = new JXDatePicker();
         // trick the picker - no formats
         picker.getEditor().setFormatterFactory(new DefaultFormatterFactory(
-                new DatePickerFormatter(null)));
+                new DatePickerFormatter((DateFormat[]) null)));
         assertNotNull("picker format array must not be null", 
                 picker.getFormats());
     }
@@ -231,7 +231,7 @@ public class JXDatePickerTest extends TestCase {
     public void testPickerFormatterConstructorWithParameterNull() {
         DatePickerFormatter defaultFormatter = new DatePickerFormatter();
         DateFormat[] defaultFormats = defaultFormatter.getFormats();
-        DatePickerFormatter formatter = new DatePickerFormatter(null);
+        DatePickerFormatter formatter = new DatePickerFormatter((DateFormat[])null);
         DateFormat[] formats = formatter.getFormats();
         assertNotNull("formats must not be null", formats);
         assertEquals(defaultFormats.length, formats.length);

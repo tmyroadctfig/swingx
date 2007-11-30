@@ -90,9 +90,9 @@ public class BasicMonthViewUI extends MonthViewUI {
     private static final Point NO_SUCH_CALENDAR = new Point(-1, -1);
 
     /** Formatter used to format the day of the week to a numerical value. */
-    protected static final SimpleDateFormat dayOfMonthFormatter = new SimpleDateFormat("d");
+    protected final SimpleDateFormat dayOfMonthFormatter = new SimpleDateFormat("d");
 
-    private static String[] monthsOfTheYear;
+    private String[] monthsOfTheYear;
 
     protected JXMonthView monthView;
     protected long firstDisplayedDate;
@@ -1980,6 +1980,6 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         }
     }
-
-
+    
+    
 }
