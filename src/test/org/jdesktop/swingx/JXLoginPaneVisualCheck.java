@@ -23,8 +23,6 @@ import java.awt.Container;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -57,7 +55,7 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
         JXLoginPaneVisualCheck test = new JXLoginPaneVisualCheck();
         
         try {
-            test.runInteractiveTests("interactiveError");
+            test.runInteractiveTests();
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -113,13 +111,10 @@ public class JXLoginPaneVisualCheck extends InteractiveTestCase {
         menu.add(new AbstractAction("Change Locale") {
 
             public void actionPerformed(ActionEvent e) {
-            	System.out.println("loc:" + component.getLocale());
                 if (component.getLocale() == Locale.FRANCE) {
                     component.setLocale(Locale.ENGLISH);
-                	System.out.println("new loc:" + component.getLocale());
                 } else {
                     component.setLocale(Locale.FRANCE);
-                	System.out.println("new loc:" + component.getLocale());
                 }
             }});
         bar.add(menu);
