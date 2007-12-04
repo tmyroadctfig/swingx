@@ -307,6 +307,8 @@ public class JXLoginPane extends JXImagePanel {
      * in the Login panel.
      */
     private void reinitLocales(Locale l) {
+        // PENDING: JW - use the locale given as parameter
+        // as this probably (?) should be called before super.setLocale
         setBannerText(UIManagerExt.getString(CLASS_NAME + ".bannerString", getLocale()));
         banner.setImage(createLoginBanner());
         // TODO: Can't change the error message since it might have been already changed by the user!
@@ -1228,7 +1230,7 @@ public class JXLoginPane extends JXImagePanel {
         private JXLoginPane panel;
         public CancelAction(JXLoginPane p) {
             //TODO localize
-            super(UIManager.getString(CLASS_NAME + ".cancelLogin"), CANCEL_LOGIN_ACTION_COMMAND); 
+            super(UIManagerExt.getString(CLASS_NAME + ".cancelLogin", p.getLocale()), CANCEL_LOGIN_ACTION_COMMAND); 
             this.panel = p;
             this.setEnabled(false);
         }
