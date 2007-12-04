@@ -342,6 +342,10 @@ public class JXLoginPane extends JXImagePanel {
         // by default, caps is initialized in off state - i.e. without warning. Setting to 
         // whitespace preserves formatting of the panel.
         capsOn.setText(isCapsLockOn() ? UIManagerExt.getString(CLASS_NAME + ".capsOnWarning", getLocale()) : " ");
+        
+        getActionMap().get(LOGIN_ACTION_COMMAND).putValue(Action.NAME, UIManagerExt.getString(CLASS_NAME + ".loginString", getLocale()));
+        getActionMap().get(CANCEL_LOGIN_ACTION_COMMAND).putValue(Action.NAME, UIManagerExt.getString(CLASS_NAME + ".cancelString", getLocale()));
+
     }
     
     //--------------------------------------------------------- Constructors
@@ -719,7 +723,7 @@ public class JXLoginPane extends JXImagePanel {
         //create the progress panel
         progressPanel = new JXPanel(new GridBagLayout());
         progressMessageLabel = new JLabel(UIManagerExt.getString(CLASS_NAME + ".pleaseWait", getLocale()));
-        progressMessageLabel.setFont(UIManager.getFont("JXLoginPane.pleaseWaitFont", getLocale()));
+        progressMessageLabel.setFont(UIManager.getFont(CLASS_NAME +".pleaseWaitFont", getLocale()));
         JProgressBar pb = new JProgressBar();
         pb.setIndeterminate(true);
         JButton cancelButton = new JButton(getActionMap().get(CANCEL_LOGIN_ACTION_COMMAND));
