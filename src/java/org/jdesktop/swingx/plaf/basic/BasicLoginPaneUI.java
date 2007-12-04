@@ -83,6 +83,10 @@ public class BasicLoginPaneUI extends LoginPaneUI {
         }
     }
     
+    /**
+     * Creates default 400x60 banner for the login panel.
+     * @see org.jdesktop.swingx.plaf.LoginPaneUI#getBanner()
+     */
     public Image getBanner() {
         int w = 400;
         int h = 60;
