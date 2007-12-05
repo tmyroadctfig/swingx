@@ -3577,7 +3577,11 @@ public class JXTable extends JTable
     @Override
     public Component prepareEditor(TableCellEditor editor, int row, int column) {
         Component comp =  super.prepareEditor(editor, row, column);
-        adjustComponentOrientation(comp);
+        // JW: might be null if generic editor barks about constructor
+        // super silently backs out - we do the same here
+        if (comp != null) {
+            adjustComponentOrientation(comp);
+        }
         return comp;
     }
 

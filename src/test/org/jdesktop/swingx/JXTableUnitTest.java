@@ -16,6 +16,8 @@ import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -114,6 +116,40 @@ public class JXTableUnitTest extends InteractiveTestCase {
     protected void tearDown() throws Exception {
         UIManager.put("JXTable.rowHeight", uiTableRowHeight);
         super.tearDown();
+    }
+    
+    /**
+     * NPE if Generic editor barks about constructor. Hacked around ...
+     * 
+     *  PENDING JW: too verbose ... strip down to essentials
+     */
+    public void testGenericEditorNPE() {
+        Date date = new Date();
+        java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+        Timestamp stamp = new Timestamp(date.getTime());
+        Time time = new Time(date.getTime());
+        DefaultTableModel model = new DefaultTableModel(1, 5) {
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                if (getRowCount() > 0) {
+                    Object value = getValueAt(0, columnIndex);
+                    if (value != null) {
+                        return value.getClass();
+                    }
+                }
+                return super.getColumnClass(columnIndex);
+            }
+            
+        };
+        model.setColumnIdentifiers(new Object[]{"Date - normal", "SQL Date", "SQL Timestamp", "SQL Time", "Date - as time"});
+        model.setValueAt(date, 0, 0);
+        model.setValueAt(sqlDate, 0, 1);
+        model.setValueAt(stamp, 0, 2);
+        model.setValueAt(time, 0, 3);
+        model.setValueAt(date, 0, 4);
+        JXTable table = new JXTable(model);
+        table.editCellAt(0, 1);
     }
 
     /**
