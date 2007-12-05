@@ -171,8 +171,11 @@ public class MultiSplitLayout implements LayoutManager
         
         if ( splitChild instanceof Split )
           layoutByWeight( splitChild, splitChildBounds );
-        else
-          getComponentForNode( splitChild ).setPreferredSize( splitChildBounds.getSize());
+        else {
+          Component comp = getComponentForNode( splitChild );
+          if ( comp != null )
+            comp.setPreferredSize( splitChildBounds.getSize());
+        }
       }
     }
     else {
@@ -198,7 +201,9 @@ public class MultiSplitLayout implements LayoutManager
         if ( splitChild instanceof Split )
           layoutByWeight( splitChild, splitChildBounds );
         else {
-          getComponentForNode( splitChild ).setPreferredSize( splitChildBounds.getSize());
+          Component comp = getComponentForNode( splitChild );
+          if ( comp != null )
+            comp.setPreferredSize( splitChildBounds.getSize());
         }
       }
     }
