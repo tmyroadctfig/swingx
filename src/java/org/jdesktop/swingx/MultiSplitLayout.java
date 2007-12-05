@@ -919,7 +919,7 @@ public class MultiSplitLayout implements LayoutManager
    */
     else {
       double y = bounds.getY();
-      double extraHeight = bounds.getMaxY() - splitBounds.getHeight();
+      double extraHeight = bounds.getHeight() - splitBounds.getHeight();
       double availableHeight = extraHeight;
       
       while(splitChildren.hasNext()) {
@@ -1218,7 +1218,7 @@ public class MultiSplitLayout implements LayoutManager
     Dimension size = parent.getSize();
     int width = size.width - (insets.left + insets.right);
     int height = size.height - (insets.top + insets.bottom);
-    Rectangle bounds = new Rectangle(insets.left, insets.top, width, height);
+    Rectangle bounds = new Rectangle( insets.left, insets.top, width, height);
     layout1(getModel(), bounds);
     layout2(getModel(), bounds);
   }
