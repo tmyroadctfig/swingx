@@ -318,18 +318,28 @@ public class JXMultiSplitPane extends JPanel {
 		dragOffsetX = mx - initialDividerBounds.x;
 		dragOffsetY = my - initialDividerBounds.y;
 		dragDivider  = divider;
+	
 		Rectangle prevNodeBounds = prevNode.getBounds();
 		Rectangle nextNodeBounds = nextNode.getBounds();
 		if (dragDivider.isVertical()) {
 		    dragMin = prevNodeBounds.x;
 		    dragMax = nextNodeBounds.x + nextNodeBounds.width;
 		    dragMax -= dragDivider.getBounds().width;
+            if ( msl.getLayoutMode() == MultiSplitLayout.USER_MIN_SIZE_LAYOUT ) 
+              dragMax -= msl.getUserMinSize();
 		}
 		else {
 		    dragMin = prevNodeBounds.y;
 		    dragMax = nextNodeBounds.y + nextNodeBounds.height;
 		    dragMax -= dragDivider.getBounds().height;
+            if ( msl.getLayoutMode() == MultiSplitLayout.USER_MIN_SIZE_LAYOUT ) 
+              dragMax -= msl.getUserMinSize();
 		}
+        
+        if ( msl.getLayoutMode() == MultiSplitLayout.USER_MIN_SIZE_LAYOUT ) {
+          dragMin = dragMin + msl.getUserMinSize();
+        }
+                
 		oldFloatingDividers = getMultiSplitLayout().getFloatingDividers();
 		getMultiSplitLayout().setFloatingDividers(false);
 		dragUnderway = true;
@@ -361,12 +371,12 @@ public class JXMultiSplitPane extends JPanel {
 	Rectangle bounds = new Rectangle(oldBounds);
 	if (dragDivider.isVertical()) {
 	    bounds.x = mx - dragOffsetX;
-	    bounds.x = Math.max(bounds.x, dragMin);
+	    bounds.x = Math.max(bounds.x, dragMin );
 	    bounds.x = Math.min(bounds.x, dragMax);
 	}
 	else {
 	    bounds.y = my - dragOffsetY;
-	    bounds.y = Math.max(bounds.y, dragMin);
+	    bounds.y = Math.max(bounds.y, dragMin );
 	    bounds.y = Math.min(bounds.y, dragMax);
 	}
 	dragDivider.setBounds(bounds);
