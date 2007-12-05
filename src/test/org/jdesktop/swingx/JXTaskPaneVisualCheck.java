@@ -18,8 +18,10 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Font;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.util.Locale;
@@ -138,6 +140,8 @@ public class JXTaskPaneVisualCheck extends InteractiveTestCase {
         sun.awt.AppContext.getAppContext().put("JComponent.defaultLocale", Locale.FRANCE);
         JXTaskPane panel = new JXTaskPane();
         panel.setTitle("Hi there");
+        panel.setForeground(Color.RED);
+        panel.setFont(new Font("tahoma",Font.BOLD, 72));
         panel.add(new JLabel("Hi there again"));
         JXFrame frame = wrapInFrame(panel, "JXTaskPane interactive");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

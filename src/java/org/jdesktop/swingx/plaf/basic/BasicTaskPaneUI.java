@@ -50,7 +50,9 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.MouseInputListener;
 import javax.swing.plaf.ActionMapUIResource;
+import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.UIResource;
 import javax.swing.plaf.basic.BasicGraphicsUtils;
 
@@ -198,16 +200,27 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 	 * @return True if event occurred within task pane area, false otherwise. 
 	 */
 	protected boolean isInBorder(MouseEvent event) {
-		return event.getY() < getTitleHeight();
+		return event.getY() < getTitleHeight(event.getComponent());
 	}
 
-	/**
-	 * Gets current title height. Default value is 25.
-	 * @return Current title height.
-	 */
-	protected int getTitleHeight() {
-		return titleHeight;
-	}
+        /**
+         * Gets current title height. Default value is 25.
+         * @return Current title height.
+         * @deprecated. Use getTitleHeight(java.awt.Component) instead. Kept only for compatibility reasons. Will be removed before 1.0 release.
+         */
+        protected int getTitleHeight() {
+                return titleHeight;
+        }
+ 
+        /**
+         * Gets current title height. Default value is 25 if not specified otherwise. Method checks 
+         * provided component for user set font (!instanceof FontUIResource), if font is set, height 
+         * will be calculated from font metrics instead of using internal preset height.
+         * @return Current title height.
+         */
+        protected int getTitleHeight(Component c) {
+                return c == null || c.getFont() == null || c.getFont() instanceof FontUIResource ? titleHeight : c.getFontMetrics(c.getFont()).getHeight();
+        }
 
 	/**
 	 * Creates new border for task pane.
@@ -235,7 +248,7 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 			dim.width = Math.max(dim.width, border.width);
 			dim.height += border.height;
 		} else {
-			dim.height += getTitleHeight();
+			dim.height += getTitleHeight(c);
 		}
 
 		return dim;
@@ -503,7 +516,7 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 		}
 
 		public Insets getBorderInsets(Component c) {
-			return new Insets(getTitleHeight(), 0, 0, 0);
+			return new Insets(getTitleHeight(c), 0, 0, 0);
 		}
 
 		/**
@@ -532,11 +545,11 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 			// add the title left offset
 			dim.width += 3;
 			// add the controls width
-			dim.width += getTitleHeight();
+			dim.width += getTitleHeight(group);
 			// and some space between label and controls
 			dim.width += 3;
 
-			dim.height = getTitleHeight();
+			dim.height = getTitleHeight(group);
 			return dim;
 		}
 
@@ -555,7 +568,7 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 			} else {
 				g.setColor(titleBackgroundGradientStart);
 			}
-			g.fillRect(0, 0, group.getWidth(), getTitleHeight() - 1);
+			g.fillRect(0, 0, group.getWidth(), getTitleHeight(group) - 1);
 		}
 
 		/**
@@ -580,6 +593,9 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 				Color textColor, int x, int y, int width, int height) {
 			configureLabel(group);
 			label.setForeground(textColor);
+			if (group.getFont() != null && ! (group.getFont() instanceof FontUIResource)) {
+			    label.setFont(group.getFont());
+			}
 			g.translate(x, y);
 			label.setBounds(0, 0, width, height);
 			label.paint(g);
@@ -641,14 +657,14 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 					if (group.isSpecial()) {
 						paintColor = specialTitleForeground;
 					} else {
-						paintColor = titleForeground;
+						paintColor = group.getForeground() == null || group.getForeground() instanceof ColorUIResource ? titleForeground : group.getForeground();
 					}
 				}
 			} else {
 				if (group.isSpecial()) {
 					paintColor = specialTitleForeground;
 				} else {
-					paintColor = titleForeground;
+					paintColor = group.getForeground() == null || group.getForeground() instanceof ColorUIResource ? titleForeground : group.getForeground();
 				}
 			}
 			return paintColor;
@@ -664,13 +680,13 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 			JXTaskPane group = (JXTaskPane) c;
 
 			// calculate position of title and toggle controls
-			int controlWidth = getTitleHeight() - 2 * getRoundHeight();
-			int controlX = group.getWidth() - getTitleHeight();
+			int controlWidth = getTitleHeight(group) - 2 * getRoundHeight();
+			int controlX = group.getWidth() - getTitleHeight(group);
 			int controlY = getRoundHeight() - 1;
 			int titleX = 3;
 			int titleY = 0;
-			int titleWidth = group.getWidth() - getTitleHeight() - 3;
-			int titleHeight = getTitleHeight();
+			int titleWidth = group.getWidth() - getTitleHeight(group) - 3;
+			int titleHeight = getTitleHeight(group);
 
 			if (!group.getComponentOrientation().isLeftToRight()) {
 				controlX = group.getWidth() - controlX - controlWidth;
@@ -689,7 +705,7 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 
 			// focus painted same color as text
 			if (group.hasFocus()) {
-				paintFocus(g, paintColor, 3, 3, width - 6, getTitleHeight() - 6);
+				paintFocus(g, paintColor, 3, 3, width - 6, getTitleHeight(group) - 6);
 			}
 
 			paintTitle(group, g, paintColor, titleX, titleY, titleWidth,

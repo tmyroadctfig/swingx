@@ -83,7 +83,7 @@ public class GlossyTaskPaneUI extends BasicTaskPaneUI {
           0,
           getRoundHeight(),
           group.getWidth(),
-          getTitleHeight() - getRoundHeight());
+          getTitleHeight(group) - getRoundHeight());
       } else {
         Paint oldPaint = ((Graphics2D)g).getPaint();
         GradientPaint gradient =
@@ -92,7 +92,7 @@ public class GlossyTaskPaneUI extends BasicTaskPaneUI {
             0f, //group.getWidth() / 2,
             titleBackgroundGradientStart,
             0f, //group.getWidth(),
-            getTitleHeight(),
+            getTitleHeight(group),
             titleBackgroundGradientEnd);
                 
         ((Graphics2D)g).setRenderingHint(
@@ -117,7 +117,7 @@ public class GlossyTaskPaneUI extends BasicTaskPaneUI {
           0,
           getRoundHeight(),
           group.getWidth(),
-          getTitleHeight() - getRoundHeight());
+          getTitleHeight(group) - getRoundHeight());
         ((Graphics2D)g).setPaint(oldPaint);
       }
       
@@ -126,10 +126,10 @@ public class GlossyTaskPaneUI extends BasicTaskPaneUI {
         0,
         0,
         group.getWidth() - 1,
-        getTitleHeight() + getRoundHeight(),
+        getTitleHeight(group) + getRoundHeight(),
         getRoundHeight(),
         getRoundHeight());
-      g.drawLine(0, getTitleHeight() - 1, group.getWidth(), getTitleHeight() - 1);
+      g.drawLine(0, getTitleHeight(group) - 1, group.getWidth(), getTitleHeight(group) - 1);
     }
 
     protected void paintExpandedControls(JXTaskPane group, Graphics g, int x,
