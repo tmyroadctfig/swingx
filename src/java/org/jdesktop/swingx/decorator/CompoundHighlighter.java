@@ -62,12 +62,25 @@ public class CompoundHighlighter extends AbstractHighlighter
      * @throws NullPointerException if array is null or array contains null values.
      */
     public CompoundHighlighter(Highlighter... inList) {
-      highlighters = new ArrayList<Highlighter>();
+        this(null, inList);
+    }
+
+    /**
+     * Instantiates a CompoundHighlighter with the given predicate containing the given 
+     * <code>Highlighter</code>s. 
+     * 
+     * @param predicate the highlightPredicate to use
+     * @param inList zero or more not-null Highlighters to manage by this
+     *   CompoundHighlighter.
+     * @throws NullPointerException if array is null or array contains null values.
+     */
+    public CompoundHighlighter(HighlightPredicate predicate, Highlighter... inList) {
+        super(predicate);
+        highlighters = new ArrayList<Highlighter>();
         for (int i = 0; i < inList.length; i++) {
             addHighlighter(inList[i]);
         }
     }
-
     /**
      * Appends a highlighter to the pipeline.
      *

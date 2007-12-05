@@ -415,4 +415,42 @@ public interface HighlightPredicate {
         }
         
     }
+
+    /**
+     * Predicate testing the componentAdapter value type against a given
+     * Clazz. 
+     */
+    public static class TypeHighlightPredicate implements HighlightPredicate {
+
+        private Class clazz;
+        
+        /**
+         * Instantitates a predicate with Object.clazz. This is essentially the
+         * same as testing against null.
+         *
+         */
+        public TypeHighlightPredicate() {
+            this(Object.class);
+        }
+        /**
+         * Instantitates a predicate with the given compare class.
+         * @param compareValue the fixed class to compare the 
+         *   adapter value against.
+         */
+        public TypeHighlightPredicate(Class compareValue) {
+            this.clazz = compareValue;
+        }
+        
+        /**
+         * @inheritDoc
+         * 
+         * Implemented to return true if the adapter value is an instance
+         * of this predicate's class type.
+         */
+        public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+            return adapter.getValue() != null ? 
+                    clazz.isAssignableFrom(adapter.getValue().getClass()) : false;
+        }
+        
+    }
 }
