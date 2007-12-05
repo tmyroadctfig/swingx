@@ -9,6 +9,7 @@ package org.jdesktop.swingx.decorator;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -93,6 +94,27 @@ public class HighlightPredicateTest extends InteractiveTestCase {
      * test the NOT predicate.
      *
      */
+    public void testEditable() {
+        ComponentAdapter adapter = createComponentAdapter(allColored, false, true);
+        assertTrue(HighlightPredicate.EDITABLE.isHighlighted(allColored, adapter));
+        assertFalse(HighlightPredicate.READ_ONLY.isHighlighted(allColored, adapter));
+    }
+
+    /**
+     * test the NOT predicate.
+     *
+     */
+    public void testNotEditable() {
+        ComponentAdapter adapter = createComponentAdapter(allColored, false, false);
+        assertFalse(HighlightPredicate.EDITABLE.isHighlighted(allColored, adapter));
+        assertTrue(HighlightPredicate.READ_ONLY.isHighlighted(allColored, adapter));
+    }
+    
+    
+    /**
+     * test the NOT predicate.
+     *
+     */
     public void testNot() {
         ComponentAdapter adapter = createComponentAdapter(allColored, true);
         HighlightPredicate notNever = new NotHighlightPredicate(HighlightPredicate.NEVER);
@@ -100,7 +122,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
         HighlightPredicate notAlways = new NotHighlightPredicate(HighlightPredicate.ALWAYS);
         assertFalse(notAlways.isHighlighted(allColored, adapter));
     }
-    
+
     /**
      * test that empty array doesn't highlight. 
      */
@@ -349,6 +371,22 @@ public class HighlightPredicateTest extends InteractiveTestCase {
         assertFalse(HighlightPredicate.ROLLOVER_ROW.isHighlighted(allColored, adapter));
     }
 
+    /**
+     * test the BIG_DECIMAL_NEGATIVE predicate.
+     *
+     */
+    public void testNegative() {
+        ComponentAdapter negative = createBigDecimalComponentAdapter(new JLabel("-50.00"));
+        assertTrue(HighlightPredicate.BIG_DECIMAL_NEGATIVE.isHighlighted(negative.getComponent(), negative));
+        ComponentAdapter positive = createBigDecimalComponentAdapter(new JLabel("50.00"));
+        assertFalse(HighlightPredicate.BIG_DECIMAL_NEGATIVE.isHighlighted(positive.getComponent(), positive));
+        ComponentAdapter zero = createBigDecimalComponentAdapter(new JLabel(BigDecimal.ZERO.toString()));
+        // sanity
+        assertEquals(BigDecimal.ZERO, zero.getValue());
+        assertFalse(HighlightPredicate.BIG_DECIMAL_NEGATIVE.isHighlighted(zero.getComponent(), zero));
+        
+    }
+
 //---------------- special predicates
     
     /**
@@ -471,13 +509,27 @@ public class HighlightPredicateTest extends InteractiveTestCase {
     // --------------------- factory methods
     /**
      * Creates and returns a ComponentAdapter on the given 
-     * label with the specified selection state.
+     * label with the specified selection state and non-editable.
      * 
      * @param label
      * @param selected
      * @return
      */
     protected ComponentAdapter createComponentAdapter(final JLabel label, final boolean selected) {
+        return createComponentAdapter(label, selected, false);
+    }
+
+    /**
+     * Creates and returns a ComponentAdapter on the given 
+     * label with the specified selection and editable state.
+     * 
+     * @param label
+     * @param selected
+     * @param editable
+     * @return
+     */
+    protected ComponentAdapter createComponentAdapter(final JLabel label,
+            final boolean selected, final boolean editable) {
         ComponentAdapter adapter = new ComponentAdapter(label) {
 
             public Object getValueAt(int row, int column) {
@@ -504,7 +556,7 @@ public class HighlightPredicateTest extends InteractiveTestCase {
             }
             
             public boolean isEditable() {
-                return false;
+                return editable;
             }
 
             public boolean isSelected() {
@@ -523,4 +575,56 @@ public class HighlightPredicateTest extends InteractiveTestCase {
         return adapter;
     }
     
+    /**
+     * Creates and returns a ComponentAdapter on the given 
+     * label. The labels text is parsed as BigDecimal.
+     * 
+     * @param label
+     * @return
+     */
+    protected ComponentAdapter createBigDecimalComponentAdapter(final JLabel label) {
+        ComponentAdapter adapter = new ComponentAdapter(label) {
+
+            public Object getValueAt(int row, int column) {
+                return new BigDecimal(label.getText());
+            }
+
+            public Object getFilteredValueAt(int row, int column) {
+                return getValueAt(row, column);
+            }
+
+            public void setValueAt(Object aValue, int row, int column) {
+                // TODO Auto-generated method stub
+                
+            }
+
+            public boolean isCellEditable(int row, int column) {
+                // TODO Auto-generated method stub
+                return false;
+            }
+
+            public boolean hasFocus() {
+                // TODO Auto-generated method stub
+                return false;
+            }
+            
+            public boolean isEditable() {
+                return false;
+            }
+
+            public boolean isSelected() {
+                return false;
+            }
+
+            public String getColumnName(int columnIndex) {
+                return null;
+            }
+
+            public String getColumnIdentifier(int columnIndex) {
+                return null;
+            }
+            
+        };
+        return adapter;
+    }
 }

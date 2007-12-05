@@ -23,6 +23,7 @@ package org.jdesktop.swingx.decorator;
 
 import java.awt.Component;
 import java.awt.Point;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -116,6 +117,16 @@ public interface HighlightPredicate {
     };
     
     /**
+     * Convenience for read-only (same as !editable).
+     */
+    public static final HighlightPredicate READ_ONLY = new HighlightPredicate() {
+        public boolean isHighlighted(Component renderer, ComponentAdapter adapter) {
+            return !adapter.isEditable();
+        }
+    };
+    
+    
+    /**
      * Even rows.
      * 
      * PENDING: this is zero based (that is "really" even 0, 2, 4 ..), differing 
@@ -145,7 +156,18 @@ public interface HighlightPredicate {
         
     };
     
-    
+    /**
+     * Negative BigDecimals.
+     */
+     public static final HighlightPredicate BIG_DECIMAL_NEGATIVE = new HighlightPredicate() {
+
+        public boolean isHighlighted(Component renderer,
+                ComponentAdapter adapter) {
+            return (adapter.getValue() instanceof BigDecimal) 
+               && ((BigDecimal) adapter.getValue()).compareTo(BigDecimal.ZERO) < 0;
+        }
+        
+    };
 
     
 //----------------- logical implementations amongst HighlightPredicates
