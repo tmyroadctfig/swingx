@@ -13,9 +13,6 @@ Java-Bean: False
 Name: org/jdesktop/swingx/JXEditorPane.class
 Java-Bean: True
 
-Name: org/jdesktop/swingx/JXErrorDialog.class
-Java-Bean: True
-
 Name: org/jdesktop/swingx/JXFindBar.class
 Java-Bean: True
 
@@ -49,7 +46,10 @@ Java-Bean: True
 Name: org/jdesktop/swingx/JXLoginDialog.class
 Java-Bean: True
 
-Name: org/jdesktop/swingx/JXLoginPanel.class
+Name: org/jdesktop/swingx/JXLoginPane.class
+Java-Bean: True
+
+Name: org/jdesktop/swingx/JXMonthView.class
 Java-Bean: True
 
 Name: org/jdesktop/swingx/JXMultiSplitPane.class
@@ -97,9 +97,6 @@ Java-Bean: True
 Name: org/jdesktop/swingx/JXTreeTable.class
 Java-Bean: True
 
-Name: org/jdesktop/swingx/calendar/JXMonthView.class
-Java-Bean: True
-
 Name: org/jdesktop/swingx/auth/DefaultUserNameStore.class
 Java-Bean: True
 
@@ -115,7 +112,7 @@ Java-Bean: True
 Name: org/jdesktop/swingx/border/MatteBorderExt.class
 Java-Bean: False
 
-Name: org/jdesktop/swingx/painter/BackgroundPainter.class
+Name: org/jdesktop/swingx/painter/AlphaPainter.class
 Java-Bean: True
 
 Name: org/jdesktop/swingx/painter/CheckerboardPainter.class
@@ -127,9 +124,6 @@ Java-Bean: True
 Name: org/jdesktop/swingx/painter/GlossPainter.class
 Java-Bean: True
 
-Name: org/jdesktop/swingx/painter/IconPainter.class
-Java-Bean: True
-
 Name: org/jdesktop/swingx/painter/ImagePainter.class
 Java-Bean: True
 
@@ -139,17 +133,11 @@ Java-Bean: True
 Name: org/jdesktop/swingx/painter/PinstripePainter.class
 Java-Bean: True
 
+Name: org/jdesktop/swingx/painter/RectanglePainter.class
+Java-Bean: True
+
 Name: org/jdesktop/swingx/painter/ShapePainter.class
 Java-Bean: True
 
 Name: org/jdesktop/swingx/painter/TextPainter.class
-Java-Bean: True
-
-Name: org/jdesktop/swingx/painter/gradient/BasicGradientPainter.class
-Java-Bean: True
-
-Name: org/jdesktop/swingx/painter/gradient/LinearGradientPainter.class
-Java-Bean: True
-
-Name: org/jdesktop/swingx/painter/gradient/RadialGradientPainter.class
 Java-Bean: True
