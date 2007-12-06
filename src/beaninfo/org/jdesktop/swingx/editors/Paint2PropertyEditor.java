@@ -1,12 +1,3 @@
-/*
- * Paint2PropertyEditor.java
- *
- * Created on July 19, 2006, 8:23 PM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
-
 package org.jdesktop.swingx.editors;
 
 import java.awt.Color;
@@ -18,11 +9,6 @@ import java.awt.Rectangle;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyEditorSupport;
-import javax.swing.JButton;
-import javax.swing.colorchooser.ColorSelectionModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import org.apache.batik.ext.awt.MultipleGradientPaint;
 
 /**
  *
@@ -70,8 +56,6 @@ public class Paint2PropertyEditor extends PropertyEditorSupport {
     }
     
     public void paintValue(Graphics g, Rectangle box) {
-        System.out.println("painting the value with: " + getValue());
-        System.out.println("picker value = " + picker.getPaint());
         Graphics2D g2 = (Graphics2D)g;
         //picker.setPaint(getValue());
         g2.setPaint(picker.getDisplayPaint(box));
