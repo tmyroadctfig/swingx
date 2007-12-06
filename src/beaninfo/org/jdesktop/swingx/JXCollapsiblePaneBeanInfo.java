@@ -21,16 +21,19 @@
 package org.jdesktop.swingx;
 
 import java.beans.BeanDescriptor;
+import org.jdesktop.swingx.editors.EnumPropertyEditor;
 
 /**
  * BeanInfo class for JXCollapsiblePane.
+ * 
+ * @author Jan Stola
  */
 public class JXCollapsiblePaneBeanInfo extends BeanInfoSupport {
     /** Constructor for the JXCollapsiblePaneBeanInfo object */
     public JXCollapsiblePaneBeanInfo() {
         super(JXCollapsiblePane.class);        
     }
-    
+
     protected void initialize() {
         BeanDescriptor bd = getBeanDescriptor();
         bd.setName("JXCollapsiblePane");
@@ -40,15 +43,13 @@ public class JXCollapsiblePaneBeanInfo extends BeanInfoSupport {
         
         setPreferred(true, "animated", "collapsed", "orientation");
         setBound(true, "animated", "collapsed", "orientation");
-        
-//        BeanInfo info = Introspector.getBeanInfo(getBeanDescriptor().getBeanClass().getSuperclass());
-//        String order = info.getBeanDescriptor().getValue("propertyorder") == null ? "" : (String) info.getBeanDescriptor().getValue("propertyorder");
-//        PropertyDescriptor[] pd = getPropertyDescriptors();
-//        for (int i = 0; i != pd.length; i++) {
-//            if (order.indexOf(pd[i].getName()) == -1) {
-//                order = order + (order.length() == 0 ? "" : ":") + pd[i].getName();
-//            }
-//        }
-//        getBeanDescriptor().setValue("propertyorder", order);
+        setPropertyEditor(OrientationPropertyEditor.class, "orientation");
     }
+
+    public static final class OrientationPropertyEditor extends EnumPropertyEditor<JXCollapsiblePane.Orientation> {
+        public OrientationPropertyEditor() {
+            super(JXCollapsiblePane.Orientation.class);
+        }
+    }
+
 }
