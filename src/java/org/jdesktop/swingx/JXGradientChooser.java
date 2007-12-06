@@ -672,7 +672,6 @@ public class JXGradientChooser extends JXPanel {
             gradientPreview.setRepeated(repeatedRadio.isSelected());
             //updateGradientProperty();
             recalcGradientFromStops();
-            System.out.println("updating to: " + reversedCheck.isSelected());
             gradientPreview.repaint();
         }
         
