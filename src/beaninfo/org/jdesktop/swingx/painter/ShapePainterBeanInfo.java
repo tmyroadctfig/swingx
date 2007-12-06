@@ -1,24 +1,14 @@
-/*
- * ShapePainterBeanInfo.java
- *
- * Created on August 1, 2006, 5:38 PM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
-
 package org.jdesktop.swingx.painter;
 
-import org.jdesktop.swingx.editors.EnumPropertyEditor;
-import org.jdesktop.swingx.editors.InsetsPropertyEditor;
-import org.jdesktop.swingx.editors.Paint2PropertyEditor;
+import org.jdesktop.swingx.BeanInfoSupport;
 import org.jdesktop.swingx.editors.ShapePropertyEditor;
 
 /**
+ * BeanInfo of ShapePainter.
  *
- * @author joshy
+ * @author joshy, Jan Stola
  */
-public class ShapePainterBeanInfo extends PositionedPainterBeanInfo {
+public class ShapePainterBeanInfo extends BeanInfoSupport {
     
     /** Creates a new instance of ShapePainterBeanInfo */
     public ShapePainterBeanInfo() {
@@ -26,16 +16,8 @@ public class ShapePainterBeanInfo extends PositionedPainterBeanInfo {
     }
     
     protected void initialize() {
-        super.initialize();
-        setPropertyEditor(Paint2PropertyEditor.class, "fillPaint", "borderPaint");
-        setPropertyEditor(InsetsPropertyEditor.class,"insets");
-        setPropertyEditor(StylePropertyEditor.class,"style");
-        setPropertyEditor(ShapePropertyEditor.class,"shape");
+        setPropertyEditor(ShapePropertyEditor.class, "shape");
+        setPreferred(true, "shape");
     }
-    
-    public static final class StylePropertyEditor extends EnumPropertyEditor {
-        public StylePropertyEditor() {
-            super(RectanglePainter.Style.class);
-        }
-    }
+
 }

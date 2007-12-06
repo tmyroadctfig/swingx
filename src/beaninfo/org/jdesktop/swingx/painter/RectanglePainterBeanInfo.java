@@ -1,25 +1,13 @@
-/*
- * RectanglePainterBeanInfo.java
- *
- * Created on July 18, 2006, 3:22 PM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
-
 package org.jdesktop.swingx.painter;
 
-import org.jdesktop.swingx.EnumerationValue;
-import org.jdesktop.swingx.editors.EnumPropertyEditor;
-import org.jdesktop.swingx.editors.EnumerationValuePropertyEditor;
-import org.jdesktop.swingx.editors.InsetsPropertyEditor;
-import org.jdesktop.swingx.editors.Paint2PropertyEditor;
+import org.jdesktop.swingx.BeanInfoSupport;
 
 /**
+ * BeanInfo of RectanglePainter.
  *
- * @author joshy
+ * @author joshy, Jan Stola
  */
-public class RectanglePainterBeanInfo extends AbstractPainterBeanInfo {
+public class RectanglePainterBeanInfo extends BeanInfoSupport {
     
     /** Creates a new instance of RectanglePainterBeanInfo */
     public RectanglePainterBeanInfo() {
@@ -27,17 +15,7 @@ public class RectanglePainterBeanInfo extends AbstractPainterBeanInfo {
     }
     
     protected void initialize() {
-        super.initialize();
-        setPropertyEditor(Paint2PropertyEditor.class, "fillPaint", "borderPaint");
-        setPropertyEditor(InsetsPropertyEditor.class,"insets");
-        setPropertyEditor(StylePropertyEditor.class,"style");
+        setPreferred(true, "roundHeight", "roundWidth", "rounded");
     }
-    
-    public static final class StylePropertyEditor extends EnumPropertyEditor {
-        public StylePropertyEditor() {
-            super(RectanglePainter.Style.class);
-        }
-    }
-    
-    
+
 }

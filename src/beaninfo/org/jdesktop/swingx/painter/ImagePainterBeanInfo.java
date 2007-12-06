@@ -1,26 +1,16 @@
-/*
- * ImagePainterBeanInfo.java
- *
- * Created on July 20, 2006, 1:35 PM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
-
 package org.jdesktop.swingx.painter;
 
-import org.jdesktop.swingx.EnumerationValue;
-import org.jdesktop.swingx.editors.EnumerationValuePropertyEditor;
+import org.jdesktop.swingx.BeanInfoSupport;
+import org.jdesktop.swingx.editors.EnumPropertyEditor;
 import org.jdesktop.swingx.editors.ImageEditor;
 import org.jdesktop.swingx.editors.ImageURLEditor;
-import org.jdesktop.swingx.editors.InsetsPropertyEditor;
-import org.jdesktop.swingx.editors.Point2DPropertyEditor;
 
 /**
+ * BeanInfo of ImagePainter.
  *
- * @author joshy
+ * @author joshy, Jan Stola
  */
-public class ImagePainterBeanInfo extends PositionedPainterBeanInfo {
+public class ImagePainterBeanInfo extends BeanInfoSupport {
     
     /** Creates a new instance of ImagePainterBeanInfo */
     public ImagePainterBeanInfo() {
@@ -28,10 +18,16 @@ public class ImagePainterBeanInfo extends PositionedPainterBeanInfo {
     }
     
     protected void initialize() {
-        super.initialize();
         setPropertyEditor(ImageEditor.class,"image");
         setPropertyEditor(ImageURLEditor.class,"imageString");
+        setPropertyEditor(ScaleTypePropertyEditor.class, "scaleType");
+        setPreferred(true, "image", "imageString", "scaleType", "scaleToFit");
     }
 
-    
+    public static final class ScaleTypePropertyEditor extends EnumPropertyEditor<ImagePainter.ScaleType> {
+        public ScaleTypePropertyEditor() {
+            super(ImagePainter.ScaleType.class);
+        }
+    }
+
 }

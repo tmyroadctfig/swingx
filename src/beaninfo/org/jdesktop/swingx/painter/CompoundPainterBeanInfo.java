@@ -1,19 +1,11 @@
-/*
- * CompoundPainterBeanInfo.java
- *
- * Created on March 21, 2006, 12:10 PM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
-
 package org.jdesktop.swingx.painter;
 
 import org.jdesktop.swingx.BeanInfoSupport;
 
 /**
+ * BeanInfo of CompoundPainter.
  *
- * @author Richard
+ * @author Richard, Jan Stola
  */
 public class CompoundPainterBeanInfo extends BeanInfoSupport {
     
@@ -24,6 +16,5 @@ public class CompoundPainterBeanInfo extends BeanInfoSupport {
 
     protected void initialize() {
         setPreferred(true, "painters");
-        setHidden(true, "class", "propertyChangeListeners");
     }
 }
