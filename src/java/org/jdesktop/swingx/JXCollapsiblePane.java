@@ -563,6 +563,11 @@ public class JXCollapsiblePane extends JXPanel {
         return dim;
     }
 
+    @Override
+    public void setPreferredSize(Dimension preferredSize) {
+        getContentPane().setPreferredSize(preferredSize);
+    }
+
     /**
      * Sets the parameters controlling the animation
      *
