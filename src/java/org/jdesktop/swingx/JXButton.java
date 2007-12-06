@@ -63,7 +63,7 @@ import org.jdesktop.swingx.painter.Painter;
 public class JXButton extends JButton {
     //properties used to split foreground and background painting.
     //overwritten to suppress event notification while painting
-    private String text;
+    private String text = "";
     private boolean borderPainted = true;
     private boolean contentAreaFilled = true;
     
