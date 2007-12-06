@@ -112,6 +112,11 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
         if (!isIntrospecting()) {
             introspectingState.put(beanClass, Boolean.TRUE);
             try {
+                Class superClass = beanClass.getSuperclass();
+                while (superClass != null) {
+                    Introspector.flushFromCaches(superClass);
+                    superClass = superClass.getSuperclass();
+                }
                 BeanInfo info = Introspector.getBeanInfo(beanClass);
                 beanDescriptor = info.getBeanDescriptor();
                 if (beanDescriptor != null) {
