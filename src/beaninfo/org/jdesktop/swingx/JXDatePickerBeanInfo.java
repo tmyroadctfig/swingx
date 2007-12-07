@@ -20,9 +20,12 @@
  */
 package org.jdesktop.swingx;
 
+import java.beans.BeanDescriptor;
+
 /**
+ * BeanInfo class for JXDatePicker.
  *
- * @author rbair
+ * @author rbair, Jan Stola
  */
 public class JXDatePickerBeanInfo extends BeanInfoSupport {
     
@@ -32,5 +35,9 @@ public class JXDatePickerBeanInfo extends BeanInfoSupport {
     }
 
     protected void initialize() {
+        BeanDescriptor bd = getBeanDescriptor();
+        bd.setValue("isContainer", Boolean.FALSE);
+        setPreferred(true, "date", "dateInMillis", "formats");
+        setPreferred(false, "background", "border", "foreground", "toolTipText");
     }
 }
