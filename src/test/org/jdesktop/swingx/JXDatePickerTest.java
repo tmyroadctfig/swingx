@@ -909,7 +909,7 @@ public class JXDatePickerTest extends TestCase {
         picker.setDate(null);
         Date date = XTestUtils.getStartOfToday(5);
         PropertyChangeReport report = new PropertyChangeReport();
-        picker.addPropertyChangeListener(report);
+        picker.addPropertyChangeListener("date", report);
         picker.setDate(date);
         TestUtils.assertPropertyChangeEvent(report, "date", null, date);
     }
@@ -923,7 +923,7 @@ public class JXDatePickerTest extends TestCase {
         picker.setDate(null);
         Date date = XTestUtils.getStartOfToday(5);
         PropertyChangeReport report = new PropertyChangeReport();
-        picker.addPropertyChangeListener(report);
+        picker.addPropertyChangeListener("date", report);
         picker.getEditor().setValue(date);
         TestUtils.assertPropertyChangeEvent(report, "date", null, date);
     }
@@ -937,7 +937,7 @@ public class JXDatePickerTest extends TestCase {
         picker.setDate(null);
         Date date = XTestUtils.getStartOfToday(5);
         PropertyChangeReport report = new PropertyChangeReport();
-        picker.addPropertyChangeListener(report);
+        picker.addPropertyChangeListener("date", report);
         picker.getMonthView().setSelectionInterval(date, date);
         TestUtils.assertPropertyChangeEvent(report, "date", null, date);
     }
@@ -967,7 +967,7 @@ public class JXDatePickerTest extends TestCase {
         // sanity ...
         assertFalse("", date.equals(picker.getDate()));
         PropertyChangeReport report = new PropertyChangeReport();
-        picker.addPropertyChangeListener(report);
+        picker.addPropertyChangeListener("date", report);
         picker.commitEdit();
         TestUtils.assertPropertyChangeEvent(report, "date", initialDate, date);
     }
