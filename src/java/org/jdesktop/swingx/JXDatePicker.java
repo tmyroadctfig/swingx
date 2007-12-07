@@ -224,8 +224,10 @@ public class JXDatePicker extends JComponent {
             return;
         }
         Date old = getDate();
+        long oldMillis = getDateInMillis();
         this.date = date;
         firePropertyChange("date", old, getDate());
+        firePropertyChange("dateInMillis", oldMillis, getDateInMillis());
     }
 
  
