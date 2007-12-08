@@ -20,9 +20,13 @@
  */
 package org.jdesktop.swingx;
 
+import java.beans.BeanDescriptor;
+import org.jdesktop.swingx.editors.EnumPropertyEditor;
+
 /**
+ * BeanInfo class for JXHeader.
  *
- * @author rbair
+ * @author rbair, Jan Stola
  */
 public class JXHeaderBeanInfo extends BeanInfoSupport {
     
@@ -31,6 +35,19 @@ public class JXHeaderBeanInfo extends BeanInfoSupport {
     }
 
     protected void initialize() {
-        setPreferred(true, "title", "description", "icon");
+        BeanDescriptor bd = getBeanDescriptor();
+        bd.setValue("isContainer", Boolean.FALSE);
+        setPreferred(true, "title", "titleFont", "titleForeground");
+        setPreferred(true, "description", "descriptionFont", "descriptionForeground");
+        setPreferred(true, "icon", "iconPosition");
+        setPreferred(false, "alpha", "background", "backgroundPainter", "border", "inheritAlpha", "opaque", "font");
+        setPropertyEditor(IconPositionPropertyEditor.class, "iconPosition");
     }
+
+    public static final class IconPositionPropertyEditor extends EnumPropertyEditor<JXHeader.IconPosition> {
+        public IconPositionPropertyEditor() {
+            super(JXHeader.IconPosition.class);
+        }
+    }
+
 }
