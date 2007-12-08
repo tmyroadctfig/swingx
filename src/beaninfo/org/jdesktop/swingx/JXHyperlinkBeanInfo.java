@@ -21,8 +21,9 @@
 package org.jdesktop.swingx;
 
 /**
+ * BeanInfo class for JXHyperlink.
  *
- * @author rbair
+ * @author rbair, Jan Stola
  */
 public class JXHyperlinkBeanInfo extends BeanInfoSupport {
     
@@ -31,5 +32,8 @@ public class JXHyperlinkBeanInfo extends BeanInfoSupport {
     }
 
     protected void initialize() {
+        setPreferred(true, "clickedColor", "unclickedColor");
+        setPreferred(false, "background", "foreground", "border");
     }
+
 }
