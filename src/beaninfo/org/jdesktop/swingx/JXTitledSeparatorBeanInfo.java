@@ -20,11 +20,13 @@
  */
 package org.jdesktop.swingx;
 
+import java.beans.BeanDescriptor;
 import javax.swing.SwingConstants;
 
 /**
+ * BeanInfo class for JXTitledSeparator.
  *
- * @author rbair
+ * @author rbair, Jan Stola
  */
 public class JXTitledSeparatorBeanInfo extends BeanInfoSupport {
     
@@ -33,8 +35,12 @@ public class JXTitledSeparatorBeanInfo extends BeanInfoSupport {
     }
 
     protected void initialize() {
-        setPreferred(true, "icon", "title", "horizontalAlignment", 
-                "horizontalTextPosition");
+        BeanDescriptor bd = getBeanDescriptor();
+        bd.setValue("isContainer", Boolean.FALSE);
+        setPreferred(true, "icon", "title", "horizontalAlignment", "horizontalTextPosition");
+        setPreferred(false, "alpha", "inheritAlpha");
+        setPreferred(false, "background", "backgroundPainter");
+        setPreferred(false, "border", "opaque");
         
         setEnumerationValues(new EnumerationValue[] {
             new EnumerationValue("Center", SwingConstants.CENTER, "SwingConstants.CENTER"),
