@@ -23,8 +23,9 @@ package org.jdesktop.swingx;
 import org.jdesktop.swingx.editors.PainterPropertyEditor;
 
 /**
+ * BeanInfo class for JXPanel.
  *
- * @author rbair
+ * @author rbair, Jan Stola
  */
 public class JXPanelBeanInfo extends BeanInfoSupport {
     
@@ -34,7 +35,8 @@ public class JXPanelBeanInfo extends BeanInfoSupport {
 
     protected void initialize() {
         setPreferred(true, "opaque", "alpha", "inheritAlpha", "backgroundPainter");
-//        setHidden(true, "drawGradient", "gradientPaint");
+        setPreferred(false, "foreground");
+        setExpert(false, "opaque");
         setPropertyEditor(PainterPropertyEditor.class, "backgroundPainter");
     }
 }
