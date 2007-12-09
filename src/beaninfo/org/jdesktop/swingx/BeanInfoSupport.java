@@ -28,11 +28,13 @@ import java.beans.Introspector;
 import java.beans.MethodDescriptor;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 
 /**
  * Useful baseclass for BeanInfos. With this class, normal introspection occurs
@@ -193,6 +195,12 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
         return image;
     }
     
+    @Override
+    public Image loadImage(final String resourceName) {
+        URL url = getClass().getResource(resourceName);
+        return (url == null) ? null : new ImageIcon(url).getImage();
+    }
+
     /**
      * Called by the constructor during the proper time so that subclasses
      * can override the settings/values for the various beaninfo properties.
