@@ -41,7 +41,7 @@ import javax.swing.ImageIcon;
  * and then you are given the opportunity to reconfigure portions of the
  * bean info in the <code>initialize</code> method.
  *
- * @author rbair
+ * @author rbair, Jan Stola
  */
 public abstract class BeanInfoSupport extends SimpleBeanInfo {
     private static Logger LOG = Logger.getLogger(BeanInfoSupport.class.getName());
@@ -107,10 +107,13 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
     private Map<String, EventSetDescriptor> events = new TreeMap<String, EventSetDescriptor>();
     private Map<String, MethodDescriptor> methods = new TreeMap<String, MethodDescriptor>();
 
-    /** Creates a new instance of BeanInfoSupport */
+    /**
+     * Creates a new instance of BeanInfoSupport.
+     * 
+     * @param beanClass class of the bean.
+     */
     public BeanInfoSupport(Class beanClass) {
         this.beanClass = beanClass;
-        Boolean b = (Boolean)introspectingState.get(beanClass);
         if (!isIntrospecting()) {
             introspectingState.put(beanClass, Boolean.TRUE);
             try {
@@ -155,7 +158,7 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
     }
     
     private boolean isIntrospecting() {
-        Boolean b = (Boolean)introspectingState.get(beanClass);
+        Boolean b = introspectingState.get(beanClass);
         return b == null ? false : b.booleanValue();
     }
 
@@ -188,10 +191,6 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
             LOG.info("No icon named " + iconName + " was found");
         }
         
-//        if (image == null) {
-//            image = info.getIcon(size);
-//        }
-        
         return image;
     }
     
@@ -212,6 +211,8 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
     /**
      * Override this method if you want to return a custom customizer class
      * for the bean
+     * 
+     * @return <code>null</code>.
      */
     protected Class getCustomizerClass() {
         return null;
@@ -220,6 +221,8 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
     //------------------------------------ Methods for mutating the BeanInfo    
     /**
      * Specify the name/url/path to the small 16x16 color icon
+     * 
+     * @param name name of the icon.
      */
     protected void setSmallColorIconName(String name) {
         iconNameC16 = name;
@@ -227,6 +230,8 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
     
     /**
      * Specify the name/url/path to the 32x32 color icon
+     * 
+     * @param name name of the icon.
      */
     protected void setColorIconName(String name) {
         iconNameC32 = name;
@@ -234,6 +239,8 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
 
     /**
      * Specify the name/url/path to the small 16x16 monochrome icon
+     * 
+     * @param name name of the icon.
      */
     protected void setSmallMonoIconName(String name) {
         iconNameM16 = name;
@@ -241,6 +248,8 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
 
     /**
      * Specify the name/url/path to the 32x32 monochrome icon
+     * 
+     * @param name name of the icon.
      */
     protected void setMonoIconName(String name) {
         iconNameM32 = name;
@@ -249,6 +258,9 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
     /**
      * Changes the display name of the given named property. Property names
      * are always listed last to allow for varargs
+     * 
+     * @param displayName display name of the property.
+     * @param propertyName name of the property.
      */
     protected void setDisplayName(String displayName, String propertyName) {
         PropertyDescriptor pd = properties.get(propertyName);
@@ -262,6 +274,9 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
     
     /**
      * Sets the given named properties to be "hidden".
+     * 
+     * @param hidden determines whether the properties should be marked as hidden or not.
+     * @param propertyNames name of properties.
      * @see PropertyDescriptor
      */
     protected void setHidden(boolean hidden, String... propertyNames) {
@@ -380,6 +395,7 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
      * properties of this bean.  May return null if the
      * information should be obtained by automatic analysis.
      */
+    @Override
     public BeanDescriptor getBeanDescriptor() {
         return isIntrospecting() ? null : beanDescriptor;
     }
@@ -396,6 +412,7 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
      * A client of getPropertyDescriptors can use "instanceof" to check
      * if a given PropertyDescriptor is an IndexedPropertyDescriptor.
      */
+    @Override
     public PropertyDescriptor[] getPropertyDescriptors() {
         return isIntrospecting() 
             ? null
@@ -409,6 +426,7 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
      * events fired by this bean.  May return null if the information
      * should be obtained by automatic analysis.
      */
+    @Override
     public EventSetDescriptor[] getEventSetDescriptors() {
         return isIntrospecting()
             ? null
@@ -422,6 +440,7 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
      * implemented by this bean.  May return null if the information
      * should be obtained by automatic analysis.
      */
+    @Override
     public MethodDescriptor[] getMethodDescriptors() {
         return isIntrospecting()
             ? null
@@ -436,6 +455,7 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
      * 		returned by getPropertyDescriptors.
      * <P>	Returns -1 if there is no default property.
      */
+    @Override
     public int getDefaultPropertyIndex() {
         return isIntrospecting() ? -1 : defaultPropertyIndex;
     }
@@ -447,6 +467,7 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
      *		returned by getEventSetDescriptors.
      * <P>	Returns -1 if there is no default event.
      */
+    @Override
     public int getDefaultEventIndex() {
         return isIntrospecting() ? -1 : defaultEventIndex;
     }
@@ -472,6 +493,7 @@ public abstract class BeanInfoSupport extends SimpleBeanInfo {
      * @return  An image object representing the requested icon.  May
      *    return null if no suitable icon is available.
      */
+    @Override
     public java.awt.Image getIcon(int iconKind) {
         switch ( iconKind ) {
             case ICON_COLOR_16x16:
