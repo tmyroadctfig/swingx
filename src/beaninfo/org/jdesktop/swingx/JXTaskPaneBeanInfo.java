@@ -24,6 +24,8 @@ import java.beans.BeanDescriptor;
 
 /**
  * BeanInfo class for JXTaskPane.
+ * 
+ * @author rbair, Jan Stola
  */
 public class JXTaskPaneBeanInfo extends BeanInfoSupport {
     
@@ -41,7 +43,9 @@ public class JXTaskPaneBeanInfo extends BeanInfoSupport {
         bd.setValue("isContainer", Boolean.TRUE);
         bd.setValue("containerDelegate", "getContentPane");
         
-        setPreferred(true, "title", "icon", "special", "scrollOnExpand", "expanded");
+        setPreferred(true, "title", "icon", "special");
+        setPreferred(true, "animated", "scrollOnExpand", "expanded", "font");
         setBound(true, "title", "icon", "special", "scrollOnExpand", "expanded");
+        setPreferred(false, "border");
     }
 }
