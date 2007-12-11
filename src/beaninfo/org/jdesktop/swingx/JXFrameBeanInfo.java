@@ -20,9 +20,12 @@
  */
 package org.jdesktop.swingx;
 
+import org.jdesktop.swingx.editors.EnumPropertyEditor;
+
 /**
+ * BeanInfo class for JXFrame.
  *
- * @author rbair
+ * @author rbair, Jan Stola
  */
 public class JXFrameBeanInfo extends BeanInfoSupport {
     
@@ -31,5 +34,16 @@ public class JXFrameBeanInfo extends BeanInfoSupport {
     }
 
     protected void initialize() {
+        setPreferred(true, "cancelButton", "defaultButton");
+        setPreferred(true, "startPosition");
+        setPropertyEditor(StartPositionPropertyEditor.class, "startPosition");
+        setHidden(true, "statusBar", "toolBar");
     }
+
+    public static final class StartPositionPropertyEditor extends EnumPropertyEditor<JXFrame.StartPosition> {
+        public StartPositionPropertyEditor() {
+            super(JXFrame.StartPosition.class);
+        }
+    }
+
 }
