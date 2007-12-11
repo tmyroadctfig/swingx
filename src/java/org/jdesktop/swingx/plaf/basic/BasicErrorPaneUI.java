@@ -1034,8 +1034,6 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
                 int rightEdge = parent.getWidth() - insets.right;
                 x = rightEdge;
 
-                //place the buttons (whichever are visible), from right to left
-                //except for the "Exit App" button which is on the far left
                 dim = detailButton.getPreferredSize(); //all buttons should be the same height!
                 int buttonY = detailsPanel.isVisible() ? 
                     parent.getHeight() - insets.bottom - detailsPanel.getHeight() - dim.height : 
@@ -1054,8 +1052,9 @@ public class BasicErrorPaneUI extends ErrorPaneUI {
                     reportButton.setBounds(x, buttonY, dim.width, dim.height);
                 }
 
-                x = leftEdge;
                 dim = closeButton.getPreferredSize();
+                x -= dim.width;
+                x -= 5;
                 closeButton.setBounds(x, buttonY, dim.width, dim.height);
 
                 //if the dialog is expanded...
