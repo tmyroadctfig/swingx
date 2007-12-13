@@ -29,6 +29,7 @@ import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +41,7 @@ import java.util.Map;
  *
  * @author rbair
  */
-public class DropShadowBorder implements Border {
+public class DropShadowBorder implements Border, Serializable {
     private static enum Position {TOP, TOP_LEFT, LEFT, BOTTOM_LEFT,
                     BOTTOM, BOTTOM_RIGHT, RIGHT, TOP_RIGHT}
                     
