@@ -81,7 +81,7 @@ public class JXGlassBox extends JXPanel {
 
         animateTimer = new Timer(TIMER_INCREMENT, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                setAlpha(getAlpha() + alphaIncrement);
+                setAlpha(Math.min(alphaEnd, getAlpha() + alphaIncrement));
             }
         });
     }
