@@ -12,7 +12,7 @@ public class JXLabelBeanInfo extends BeanInfoSupport {
     }
     
     protected void initialize() {
-        String iconName = JXLabel.class.getSimpleName();
+        String iconName = "resources/" + JXLabel.class.getSimpleName();
         setSmallMonoIconName(iconName + "16.png");
         setMonoIconName(iconName + "32.png");
         setPreferred(true, "foregroundPainter", "backgroundPainter");

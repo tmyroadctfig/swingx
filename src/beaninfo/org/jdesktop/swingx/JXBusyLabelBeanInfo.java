@@ -13,7 +13,7 @@ public class JXBusyLabelBeanInfo extends BeanInfoSupport {
     
     protected void initialize() {
         setPreferred(true, "busy");
-        String iconName = JXBusyLabel.class.getSimpleName();
+        String iconName = "resources/" + JXBusyLabel.class.getSimpleName();
         setSmallMonoIconName(iconName + "16.png");
         setMonoIconName(iconName + "32.png");
     }

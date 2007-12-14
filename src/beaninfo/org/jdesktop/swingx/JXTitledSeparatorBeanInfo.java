@@ -35,7 +35,7 @@ public class JXTitledSeparatorBeanInfo extends BeanInfoSupport {
     }
 
     protected void initialize() {
-        String iconName = JXTitledSeparator.class.getSimpleName();
+        String iconName = "resources/" + JXTitledSeparator.class.getSimpleName();
         setSmallMonoIconName(iconName + "16.png");
         setMonoIconName(iconName + "32.png");
         BeanDescriptor bd = getBeanDescriptor();
