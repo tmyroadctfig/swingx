@@ -134,12 +134,9 @@ public class IconBorder implements Border, Serializable {
      * @see #EMPTY_ICON
      */
     public IconBorder(Icon validIcon, int iconPosition, int padding) {
-        if (!isValidPosition(iconPosition)) {
-            throw new IllegalArgumentException("Invalid icon position");
-        }
         setIcon(validIcon);
         setPadding(padding);
-        this.iconPosition = iconPosition;
+        setIconPosition(iconPosition);
     }
 
     private boolean isValidPosition(int position) {
@@ -255,6 +252,41 @@ public class IconBorder implements Border, Serializable {
      */
     public void setPadding(int padding) {
         this.padding = padding < 0 ? 0 : padding;
+    }
+
+    /**
+     * Returns the position to place the icon (relative to the component contents).
+     * 
+     * @return one of the following {@code SwingConstants}:
+     *        <ul>
+     *          <li>{@code LEADING}</li>
+     *          <li>{@code TRAILING}</li>
+     *          <li>{@code EAST}</li>
+     *          <li>{@code WEST}</li>
+     *        </ul>
+     */
+    public int getIconPosition() {
+        return iconPosition;
+    }
+
+    /**
+     * Sets the position to place the icon (relative to the component contents).
+     * 
+     * @param iconPosition must be one of the following {@code SwingConstants}:
+     *        <ul>
+     *          <li>{@code LEADING}</li>
+     *          <li>{@code TRAILING}</li>
+     *          <li>{@code EAST}</li>
+     *          <li>{@code WEST}</li>
+     *        </ul>
+     * @throws IllegalArgumentException
+     *             if {@code iconPosition} is not a valid position.
+     */
+    public void setIconPosition(int iconPosition) {
+        if (!isValidPosition(iconPosition)) {
+            throw new IllegalArgumentException("Invalid icon position");
+        }
+        this.iconPosition = iconPosition;
     }
 
 }
