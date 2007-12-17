@@ -32,7 +32,10 @@ import java.util.TimeZone;
 import java.util.logging.Logger;
 
 import javax.swing.Action;
+import javax.swing.Box;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.jdesktop.swingx.JXMonthView.SelectionMode;
@@ -65,8 +68,8 @@ public class JXMonthViewIssues extends InteractiveTestCase {
 //      setSystemLF(true);
       JXMonthViewIssues  test = new JXMonthViewIssues();
       try {
-          test.runInteractiveTests();
-//        test.runInteractiveTests("interactive.*Last.*");
+//          test.runInteractiveTests();
+        test.runInteractiveTests("interactive.*First.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -74,7 +77,18 @@ public class JXMonthViewIssues extends InteractiveTestCase {
   }
     @SuppressWarnings("unused")
     private Calendar calendar;
-    
+ 
+    /**
+     * #681-swingx: first row overlaps days.
+     */
+    public void interactiveFirstRowOfMonth() {
+        JXMonthView monthView = new JXMonthView();
+        calendar.set(2008, 1, 1);
+        monthView.setSelectedDate(calendar.getTime());
+        showInFrame(monthView, "first row");
+        
+    }
+
     /**
      * Issue #618-swingx: JXMonthView displays problems with non-default
      * timezones.
@@ -120,6 +134,41 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         frame.pack();
     }
     
+    /**
+     * Issue #618-swingx: JXMonthView displays problems with non-default
+     * timezones.
+     * 
+     */
+    public void interactiveUpdateOnTimeZoneJP() {
+        JComponent panel = Box.createVerticalBox();
+
+        final JComboBox zoneSelector = new JComboBox(TimeZone.getAvailableIDs());
+        final JXMonthView monthView = new JXMonthView();
+        monthView.setTraversable(true);
+        // Synchronize the picker and selector's zones.
+        zoneSelector.setSelectedItem(monthView.getTimeZone().getID());
+
+        // Set the picker's time zone based on the selected time zone.
+        zoneSelector.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                String zone = (String) zoneSelector.getSelectedItem();
+                TimeZone tz = TimeZone.getTimeZone(zone);
+                monthView.setTimeZone(tz);
+              
+                assertEquals(tz, monthView.getCalendar().getTimeZone());
+            }
+        });
+
+        panel.add(monthView);
+//        JPanel bar = new JPanel();
+        JLabel label = new JLabel("Select TimeZone:");
+        label.setHorizontalAlignment(JLabel.CENTER);
+//        panel.add(label);
+        panel.add(zoneSelector);
+        JXFrame frame = wrapInFrame(panel, "TimeZone");
+        frame.pack();
+        frame.setVisible(true);
+    }
     /**
      * Issue #618-swingx: JXMonthView displays problems with non-default
      * timezones.
