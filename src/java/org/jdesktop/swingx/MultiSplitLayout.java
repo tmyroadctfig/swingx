@@ -69,6 +69,7 @@ import javax.swing.UIManager;
  *
  * 
  * @author Hans Muller 
+ * @author Luan O'Carroll
  * @see JXMultiSplitPane
  */
 
@@ -575,7 +576,14 @@ public class MultiSplitLayout implements LayoutManager
     }
   }
   
-  private Dimension minimumNodeSize(Node root) {
+  /**
+   * Get the minimum size of this node. Sums the minumum sizes of rows or 
+   * columns to get the overall minimum size for the layout node, including the 
+   * dividers.
+   * @param root the node whose size is required.
+   * @return the minimum size.
+   */
+  Dimension minimumNodeSize(Node root) {
     assert( root.isVisible );
     if (root instanceof Leaf) {
       Component child = childForNode(root);

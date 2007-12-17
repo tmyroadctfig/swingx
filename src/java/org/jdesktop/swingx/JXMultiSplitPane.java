@@ -22,6 +22,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -46,6 +47,7 @@ import org.jdesktop.swingx.painter.Painter;
  * is changed, all PropertyChangeListeners are fired.
  * 
  * @author Hans Muller
+ * @author Luan O'Carroll
  */
 public class JXMultiSplitPane extends JPanel {
     private AccessibleContext accessibleContext = null;
@@ -338,6 +340,16 @@ public class JXMultiSplitPane extends JPanel {
         
         if ( msl.getLayoutMode() == MultiSplitLayout.USER_MIN_SIZE_LAYOUT ) {
           dragMin = dragMin + msl.getUserMinSize();
+        }
+        else {
+          if (dragDivider.isVertical()) {           
+            dragMin = Math.max( dragMin, dragMin + msl.minimumNodeSize(prevNode).width );
+            dragMax = Math.min( dragMax, dragMax - msl.minimumNodeSize(nextNode).width );
+          }
+          else {
+            dragMin = Math.max( dragMin, dragMin + msl.minimumNodeSize(prevNode).height );
+            dragMax = Math.min( dragMax, dragMax - msl.minimumNodeSize(nextNode).height );
+          }
         }
                 
 		oldFloatingDividers = getMultiSplitLayout().getFloatingDividers();
