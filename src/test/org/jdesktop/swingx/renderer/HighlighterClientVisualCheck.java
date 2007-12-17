@@ -24,6 +24,7 @@ package org.jdesktop.swingx.renderer;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Font;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
@@ -35,14 +36,19 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
+import javax.swing.AbstractListModel;
 import javax.swing.Action;
+import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.ListModel;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
+import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.JXSearchPanel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTreeTable;
@@ -56,7 +62,9 @@ import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PatternMatcher;
 import org.jdesktop.swingx.decorator.PatternPredicate;
+import org.jdesktop.swingx.decorator.ShadingColorHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate.ColumnHighlightPredicate;
+import org.jdesktop.swingx.renderer.PainterVisualCheck.ValueBasedGradientHighlighter;
 import org.jdesktop.swingx.treetable.FileSystemModel;
 import org.jdesktop.test.AncientSwingTeam;
 
@@ -75,16 +83,159 @@ public class HighlighterClientVisualCheck extends InteractiveTestCase {
 //      setSystemLF(true);
       HighlighterClientVisualCheck test = new HighlighterClientVisualCheck();
       try {
-         test.runInteractiveTests();
+//         test.runInteractiveTests();
 //         test.runInteractiveTests(".*Tool.*");
-//         test.runInteractiveTests(".*Color.*");
+         test.runInteractiveTests(".*JP.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
       }
   }
+    /**
+     * ColorHighlighter with pattern predicate
+     *  PENDING JW: dummy doing nothing except give me a 
+     *  frame without the "close me" title - Remove again!
+     */
+    public void interactiveTablePatternHighlighterJPDummy() {
+        JXTable table = new JXTable(tableModel);
+        table.setColumnControlVisible(true);
+        table.addHighlighter(HighlighterFactory.createSimpleStriping());
+        Pattern pattern = Pattern.compile("^M", 0);
+        table.addHighlighter(new ColorHighlighter(null, Color.MAGENTA, 
+                new PatternPredicate(pattern, 1)));
+        table.addHighlighter(new ShadingColorHighlighter(new HighlightPredicate.ColumnHighlightPredicate(1)));
+        showWithScrollingInFrame(table, "Multiple Highlighters");
+    }
+
+    /**
+     * Multiple Highlighters (shown as example in Javapolis 2007).
+     *
+     */
+    public void interactiveTablePatternHighlighterJP() {
+        JXTable table = new JXTable(tableModel);
+        table.setVisibleRowCount(table.getRowCount());
+        table.setVisibleColumnCount(7);
+        table.packAll();
+        table.setColumnControlVisible(true);
+        
+        Font font = table.getFont().deriveFont(Font.BOLD | Font.ITALIC);
+        Highlighter simpleStriping = HighlighterFactory.createSimpleStriping();
+        Pattern pattern = Pattern.compile("^M", 0);
+        PatternPredicate patternPredicate = new PatternPredicate(pattern, 1);
+        ColorHighlighter magenta = new ColorHighlighter(null, Color.MAGENTA,
+                null, Color.MAGENTA, patternPredicate);
+        FontHighlighter derivedFont = new FontHighlighter(font,
+                patternPredicate);
+        Highlighter gradient = new ValueBasedGradientHighlighter();
+        Highlighter shading = new ShadingColorHighlighter(
+                new HighlightPredicate.ColumnHighlightPredicate(1));
+
+        table.setHighlighters(simpleStriping,
+                magenta,
+                derivedFont,
+                shading,
+                gradient);
+        showWithScrollingInFrame(table, "Multiple Highlighters");
+    }
+
+    /**
+     * Simulates table by one-list per column.
+     * 
+     * NOTE: the only purpose is to demonstrate the similarity
+     * of highlighter usage across collection components!
+     * (shown as example in Javapolis 2007)
+     * 
+     * @see #interactiveTablePatternHighlighterJP()
+     */
+    public void interactiveListPatternHighlighterJP() {
+        JXTable source = new JXTable(tableModel);
+        source.toggleSortOrder(3);
+        Font font = source.getFont().deriveFont(Font.BOLD | Font.ITALIC);
+        Highlighter simpleStriping = HighlighterFactory.createSimpleStriping();
+        Pattern pattern = Pattern.compile("^M", 0);
+        PatternPredicate patternPredicate = new PatternPredicate(pattern, 0);
+        ColorHighlighter magenta = new ColorHighlighter(null, Color.MAGENTA,
+                null, Color.MAGENTA, patternPredicate);
+        FontHighlighter derivedFont = new FontHighlighter(font,
+                patternPredicate);
+        Highlighter gradient = new ValueBasedGradientHighlighter(true);
+        Highlighter shading = new ShadingColorHighlighter(
+                new HighlightPredicate.ColumnHighlightPredicate(0));
+        // create and configure one JXList per column.
+        List<JXList> lists = new ArrayList<JXList>();
+        // first name
+        JXList list0 = new JXList(createListModel(source, 0));
+        list0.setHighlighters(simpleStriping);
+        lists.add(list0);
+        // last name
+        JXList list1 = new JXList(createListModel(source, 1));
+        list1.setHighlighters(simpleStriping, magenta, derivedFont, shading);
+        lists.add(list1);
+
+        // color
+        JXList listc = new JXList(createListModel(source, 2));
+        listc.setHighlighters(simpleStriping);
+        lists.add(listc);
+
+        // number
+        JXList listn = new JXList(createListModel(source, 3));
+        listn.setCellRenderer(new DefaultListRenderer(
+                FormatStringValue.NUMBER_TO_STRING, JLabel.RIGHT));
+        listn.setHighlighters(simpleStriping, gradient);
+        lists.add(listn);
+
+        // boolean
+        JXList listb = new JXList(createListModel(source, 4));
+        listb.setCellRenderer(new DefaultListRenderer(new ButtonProvider()));
+        listb.setFixedCellHeight(list0.getPreferredSize().height
+                / source.getRowCount());
+        listb.setHighlighters(simpleStriping, magenta, derivedFont, gradient);
+        lists.add(listb);
+
+        JComponent panel = Box.createHorizontalBox();
+        for (JXList l : lists) {
+            listb.setVisibleRowCount(source.getRowCount());
+            l.setFont(source.getFont());
+            panel.add(new JScrollPane(l));
+        }
+        showInFrame(panel, "Multiple Highlighters");
+    }
 
     
+    /**
+     * @param tableModel2
+     * @param i
+     * @return
+     */
+    private ListModel createListModel(final JXTable tableModel, final int i) {
+        ListModel listModel = new AbstractListModel(){
+
+            public Object getElementAt(int index) {
+                return tableModel.getValueAt(index, i);
+            }
+
+            public int getSize() {
+                return tableModel.getRowCount();
+            }};
+        return listModel ;
+    }
+
+
+    public static class FontHighlighter extends AbstractHighlighter {
+        
+        private Font font;
+        public FontHighlighter(Font font, HighlightPredicate predicate) {
+            super(predicate);
+            this.font = font;
+        }
+        @Override
+        protected Component doHighlight(Component component,
+                ComponentAdapter adapter) {
+            component.setFont(font);
+            return component;
+        }
+        
+    }
     /**
      * Example from forum requirement: highlight all rows of a given group
      * if mouse if over one of them.

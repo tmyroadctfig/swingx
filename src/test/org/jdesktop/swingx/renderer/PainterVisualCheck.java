@@ -394,7 +394,21 @@ public class PainterVisualCheck extends InteractiveTestCase {
         private RelativePainter<JComponent> wrapper;
         private boolean yellowTransparent;
 
+        public ValueBasedGradientHighlighter() {
+            this(false);
+        }
         
+        
+        
+        /**
+         * @param b
+         */
+        public ValueBasedGradientHighlighter(boolean b) {
+            setYellowTransparent(b);
+        }
+
+
+
         @Override
         protected Component doHighlight(Component renderer, ComponentAdapter adapter) {
             if (adapter.getValue() instanceof Number) {
