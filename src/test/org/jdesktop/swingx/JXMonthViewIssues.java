@@ -78,15 +78,37 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     @SuppressWarnings("unused")
     private Calendar calendar;
  
+
     /**
      * #681-swingx: first row overlaps days.
+     * 
+     * Looks like a problem with the constructor taking a locale? 
+     * Default is okay (even if German), US is okay, explicit german is wrong.
+     * Additionally: with explicit locale the linkpanel message is not taken
+     * correctly (text missing).
+     */
+    public void interactiveFirstRowOfMonthLocaleDependent() {
+        JPanel p = new JPanel();
+        // default constructor
+        p.add(new JXDatePicker());
+        // explicit us locale
+        p.add(new JXDatePicker(Locale.US));
+        // explicit german locale
+        p.add(new JXDatePicker(Locale.GERMAN));
+        showInFrame(p, "first row overlapping");
+    }
+   
+    /**
+     * #681-swingx: first row overlaps days.
+     * Here everything looks okay.
+     * 
+     * @see #interactiveFirstRowOfMonthLocaleDependent()
      */
     public void interactiveFirstRowOfMonth() {
         JXMonthView monthView = new JXMonthView();
         calendar.set(2008, 1, 1);
         monthView.setSelectedDate(calendar.getTime());
         showInFrame(monthView, "first row");
-        
     }
 
     /**
