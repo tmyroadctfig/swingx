@@ -69,7 +69,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
       JXMonthViewIssues  test = new JXMonthViewIssues();
       try {
 //          test.runInteractiveTests();
-        test.runInteractiveTests("interactive.*First.*");
+        test.runInteractiveTests("interactive.*Locale.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -78,26 +78,44 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     @SuppressWarnings("unused")
     private Calendar calendar;
  
-
     /**
      * #681-swingx: first row overlaps days.
      * 
      * Looks like a problem with the constructor taking a locale? 
      * Default is okay (even if German), US is okay, explicit german is wrong.
-     * Additionally: with explicit locale the linkpanel message is not taken
-     * correctly (text missing).
      */
-    public void interactiveFirstRowOfMonthLocaleDependent() {
+    public void interactiveFirstRowOfMonthSetLocale() {
         JPanel p = new JPanel();
         // default constructor
-        p.add(new JXDatePicker());
+        p.add(new JXMonthView());
         // explicit us locale
-        p.add(new JXDatePicker(Locale.US));
+        JXMonthView us = new JXMonthView();
+        us.setLocale(Locale.US);
+        p.add(us);
         // explicit german locale
-        p.add(new JXDatePicker(Locale.GERMAN));
-        showInFrame(p, "first row overlapping");
+        JXMonthView german = new JXMonthView();
+        german.setLocale(Locale.GERMAN);
+        p.add(german);
+        showInFrame(p, "first row overlapping - setLocale");
     }
+
    
+    /**
+     * #681-swingx: first row overlaps days.
+     * 
+     * Looks like a problem with the constructor taking a locale? 
+     * Default is okay (even if German), US is okay, explicit german is wrong.
+     */
+    public void interactiveFirstRowOfMonthLocaleConstructor() {
+        JPanel p = new JPanel();
+        // default constructor
+        p.add(new JXMonthView());
+        // explicit us locale
+        p.add(new JXMonthView(Locale.US));
+        // explicit german locale
+        p.add(new JXMonthView(Locale.GERMAN));
+        showInFrame(p, "first row overlapping - constructor");
+    }
     /**
      * #681-swingx: first row overlaps days.
      * Here everything looks okay.

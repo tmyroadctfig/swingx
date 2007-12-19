@@ -76,7 +76,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         
         try {
 //            test.runInteractiveTests();
-            test.runInteractiveTests("interactive.*LinkDate.*");
+            test.runInteractiveTests("interactive.*Locale.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -91,6 +91,10 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
      * the US locale (on a machine with default German). The other way 
      * round is still in the issues - then the messageFormat for the 
      * US linkPanel is German.
+     * 
+     * PENDING: Issue #681-swingx - the first row of days in the monthview
+     * overlaps with the day names for locales which have the monday as the 
+     * first day of week.
      */
     public void interactiveLocaleConstructor() {
         JComponent comp = new JPanel();
@@ -113,6 +117,11 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
      * 
      * Tests reaction to default locales set via both JComponent.setDefault and
      * Locale.setDefault. Going that way, catches the locales fine.
+     * 
+     * PENDING: Issue #681-swingx - the first row of days in the monthview
+     * overlaps with the day names for locales which have the monday as the 
+     * first day of week. Here is okay, happens only if Locale is given in 
+     * constructor.
      */
     public void interactiveLocaleDefault() {
         JComponent comp = new JPanel();

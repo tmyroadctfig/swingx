@@ -64,7 +64,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
      */
     public void interactiveLocale() {
         JXMonthView monthView = new JXMonthView(Locale.GERMAN);
-        JXMonthView other = new JXMonthView(Locale.US);
+        JXMonthView other = new JXMonthView(Locale.FRANCE);
         JComponent comp = new JPanel();
         comp.add(monthView);
         comp.add(other);
