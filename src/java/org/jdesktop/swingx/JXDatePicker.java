@@ -40,6 +40,7 @@ import java.util.Date;
 import java.util.EventListener;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -47,6 +48,7 @@ import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.UIManager;
 import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.text.DefaultFormatterFactory;
@@ -71,7 +73,9 @@ import org.jdesktop.swingx.util.Contract;
  * @author Joshua Outwater
  */
 public class JXDatePicker extends JComponent {
-
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger.getLogger(JXDatePicker.class
+            .getName());
     static {
         LookAndFeelAddons.contribute(new DatePickerAddon());
     }
@@ -804,12 +808,12 @@ public class JXDatePicker extends JComponent {
         public void setLocale(Locale l) {
             super.setLocale(l);
             /* FIXME: PeS: Uncomment this after updateLinkFormat works correctly
-            updateLinkFormat();
-            todayLink.setText(_linkFormat.format(new Object[]{new Date(_linkDate)}));
              * 
              * and then delete following line
              */
-            todayLink.setText(DateFormat.getDateInstance(DateFormat.MEDIUM, l).format(new Date(_linkDate)));
+            updateLinkFormat();
+            todayLink.setText(_linkFormat.format(new Object[]{new Date(_linkDate)}));
+//            todayLink.setText(DateFormat.getDateInstance(DateFormat.MEDIUM, l).format(new Date(_linkDate)));
         }
         
         private final class TodayAction extends AbstractAction {

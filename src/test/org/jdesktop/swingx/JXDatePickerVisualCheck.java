@@ -26,6 +26,7 @@ import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -34,6 +35,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
@@ -80,6 +82,64 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Issue #665-swingx: make JXDatePicker Locale-aware.
+     * 
+     * Here: instantiate the picker with a non-default locale. The 
+     * LinkPanel here is okay, but only if the UK locale is used _before_
+     * the US locale (on a machine with default German). The other way 
+     * round is still in the issues - then the messageFormat for the 
+     * US linkPanel is German.
+     */
+    public void interactiveLocaleConstructor() {
+        JComponent comp = new JPanel();
+        addDatePickerWithLocaleConstructor(comp, Locale.FRANCE);
+        addDatePickerWithLocaleConstructor(comp, Locale.UK);
+        addDatePickerWithLocaleConstructor(comp, Locale.US);
+        addDatePickerWithLocaleConstructor(comp, Locale.GERMAN);
+        addDatePickerWithLocaleConstructor(comp, Locale.ITALIAN);
+        showInFrame(comp, "Localized DatePicker: constructor");
+    }
+
+    private void addDatePickerWithLocaleConstructor(JComponent comp, Locale uk) {
+        JXDatePicker datePicker = new JXDatePicker(uk);
+        comp.add(new JLabel(uk.getDisplayName()));
+        comp.add(datePicker);
+    }
+
+    /**
+     * Issue #665-swingx: make JXDatePicker Locale-aware.
+     * 
+     * Tests reaction to default locales set via both JComponent.setDefault and
+     * Locale.setDefault. Going that way, catches the locales fine.
+     */
+    public void interactiveLocaleDefault() {
+        JComponent comp = new JPanel();
+        Locale old = addDatePickerWithLocale(comp, Locale.UK);
+        addDatePickerWithLocale(comp, Locale.FRANCE);
+        addDatePickerWithLocale(comp, Locale.US);
+        addDatePickerWithLocale(comp, Locale.GERMAN);
+        addDatePickerWithLocale(comp, Locale.ITALIAN);
+        showInFrame(comp, "Localized DatePicker");
+        setLocale(old);
+    }
+
+    private Locale addDatePickerWithLocale(JComponent comp, Locale uk) {
+        Locale old = setLocale(uk);
+        JXDatePicker datePicker = new JXDatePicker();
+        comp.add(new JLabel(uk.getDisplayName()));
+        comp.add(datePicker);
+        return old;
+    }
+
+    private Locale setLocale(Locale locale) {
+        Locale old = JComponent.getDefaultLocale();
+        JComponent.setDefaultLocale(locale);
+        Locale.setDefault(locale);
+        return old;
+    }
+
 
     /**
      * Issue #572-swingx: monthView must show linkDate on empty selection.

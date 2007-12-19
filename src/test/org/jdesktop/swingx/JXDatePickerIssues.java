@@ -76,33 +76,33 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     /**
      * Issue #665-swingx: make JXDatePicker Locale-aware.
      * 
-     * 
+     * Here: instantiate the picker with a non-default locale. The 
+     * LinkPanel is okay, if the UK locale is used _before_
+     * the US locale (on a machine with default German). The other way 
+     * round the messageFormat for the 
+     * US linkPanel is German.
      */
-    public void interactiveLocale() {
+    public void interactiveLocaleConstructor() {
         JComponent comp = new JPanel();
-        Locale old = addDatePickerWithLocale(comp, Locale.UK);
-        addDatePickerWithLocale(comp, Locale.FRANCE);
         addDatePickerWithLocale(comp, Locale.US);
+        addDatePickerWithLocale(comp, Locale.UK);
         addDatePickerWithLocale(comp, Locale.GERMAN);
         addDatePickerWithLocale(comp, Locale.ITALIAN);
-        showInFrame(comp, "Localized DatePicker");
-        setLocale(old);
+        showInFrame(comp, "Localized DatePicker: constructor");
     }
 
-    private Locale addDatePickerWithLocale(JComponent comp, Locale uk) {
-        Locale old = setLocale(uk);
-        JXDatePicker datePicker = new JXDatePicker();
+    private void addDatePickerWithLocale(JComponent comp, Locale uk) {
+        JXDatePicker datePicker = new JXDatePicker(uk);
         comp.add(new JLabel(uk.getDisplayName()));
         comp.add(datePicker);
-        return old;
     }
 
-    private Locale setLocale(Locale locale) {
-        Locale old = JComponent.getDefaultLocale();
-        JComponent.setDefaultLocale(locale);
-        Locale.setDefault(locale);
-        return old;
-    }
+//    private Locale setLocale(Locale locale) {
+//        Locale old = JComponent.getDefaultLocale();
+//        JComponent.setDefaultLocale(locale);
+//        Locale.setDefault(locale);
+//        return old;
+//    }
 
     /**
      * Issue #606-swingx: keybindings in monthView popup not working 
