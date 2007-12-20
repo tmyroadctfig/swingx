@@ -7,6 +7,7 @@
 
 package org.jdesktop.swingx;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
@@ -105,6 +106,33 @@ public class JXTableVisualCheck extends JXTableUnitTest {
         setSystemLF(true);
     }
 
+    /**
+     * Issue #675-swingx: esc doesn't reach rootpane.
+     * 
+     * Verify that the escape is intercepted only if editing.
+     * BUT: (core behaviour) starts editing in table processKeyBinding. So every
+     * second is not passed on.
+     */
+    public void interactiveDialogCancelOnEscape() {
+        Action cancel = new AbstractActionExt("cancel") {
+
+            public void actionPerformed(ActionEvent e) {
+                LOG.info("performed: cancel action");
+                
+            }
+            
+        };
+        final JButton field = new JButton(cancel);
+        JXTable xTable = new JXTable(10, 3);
+        JTable table = new JTable(xTable.getModel());
+        JXFrame frame = wrapWithScrollingInFrame(xTable, table, "escape passed to rootpane (if editing)");
+        frame.setCancelButton(field);
+        frame.add(field, BorderLayout.SOUTH);
+        frame.setVisible(true);
+    }
+    
+
+    
     /**
      * Issue #508/547-swingx: clean up of pref scrollable.
      * Visual check: column init on model change.
