@@ -44,13 +44,12 @@ public class JXTableHeaderIssues extends JXTableHeaderTest {
 //          test.runInteractiveTests();
          //   test.runInteractiveTests("interactive.*Siz.*");
          //   test.runInteractiveTests("interactive.*Render.*");
-            test.runInteractiveTests("interactive.*Sorted.*");
+            test.runInteractiveTests("interactive.*Header.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         } 
     }
-
     /**
      * Quick proof-of-concept: JXTableHeader can go dirty and
      * suppress moving of "docked" column.

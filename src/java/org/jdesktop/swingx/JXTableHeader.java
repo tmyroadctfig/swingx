@@ -53,6 +53,8 @@ import org.jdesktop.swingx.table.TableColumnExt;
  * <li> uses ColumnHeaderRenderer which can show the sort icon
  * <li> triggers column pack (== auto-resize to exactly fit the contents)
  *  on double-click in resize region.
+ *  <li> auto-scrolls if column is dragged outside visible rectangle.
+ *  <li> listens to TableColumn propertyChanges to update itself accordingly.
  * </ul>
  * 
  * 
@@ -67,12 +69,38 @@ public class JXTableHeader extends JTableHeader
 
     private SortGestureRecognizer sortGestureRecognizer;
 
+    /**
+     *  Constructs a <code>JTableHeader</code> with a default 
+     *  <code>TableColumnModel</code>.
+     *
+     * @see #createDefaultColumnModel
+     */
     public JXTableHeader() {
         super();
     }
 
+    /**
+     *  Constructs a <code>JTableHeader</code> which is initialized with
+     *  <code>cm</code> as the column model.  If <code>cm</code> is
+     *  <code>null</code> this method will initialize the table header
+     *  with a default <code>TableColumnModel</code>.
+     *
+     * @param cm        the column model for the table
+     * @see #createDefaultColumnModel
+     */
     public JXTableHeader(TableColumnModel columnModel) {
         super(columnModel);
+    }
+
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Overridden to initialize autoscrolls property to true.
+     */
+    @Override
+    protected void initializeLocalVars() {
+        super.initializeLocalVars();
+        setAutoscrolls(true);
     }
 
     /**
@@ -280,6 +308,21 @@ public class JXTableHeader extends JTableHeader
             }
             setDefaultRenderer(renderer);
         }
+    }
+    
+    /**
+     * {@inheritedDoc} <p>
+     * 
+     * Overridden to scroll the table to keep the dragged column visible.
+     * This side-effect is enabled only if the header's autoscroll property is
+     * <code>true</code> and the associated table is of type JXTable.
+     * 
+     */
+    @Override
+    public void setDraggedDistance(int distance) {
+        super.setDraggedDistance(distance);
+        if (!getAutoscrolls() || (getXTable() == null)) return;
+        getXTable().scrollColumnToVisible(getViewIndexForColumn(getDraggedColumn()));
     }
     
     /**
