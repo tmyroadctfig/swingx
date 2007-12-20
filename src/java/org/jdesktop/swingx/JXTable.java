@@ -943,6 +943,12 @@ public class JXTable extends JTable
                 if (!isEditing()) return;
                 getCellEditor().cancelCellEditing();
             }
+
+            @Override
+            public boolean isEnabled() {
+                return isEditing();
+            }
+            
             
         };
         return action;

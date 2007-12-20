@@ -118,6 +118,21 @@ public class JXTableUnitTest extends InteractiveTestCase {
         super.tearDown();
     }
     
+    public void testCancelEditEnabled() {
+        JXTable table = new JXTable(10, 3);
+        table.editCellAt(0, 0);
+        // sanity
+        assertTrue(table.isEditing());
+        assertEquals(table.isEditing(), table.getActionMap().get("cancel").isEnabled());
+    }
+
+    public void testCancelEditDisabled() {
+        JXTable table = new JXTable(10, 3);
+        // sanity
+        assertFalse(table.isEditing());
+        assertEquals(table.isEditing(), table.getActionMap().get("cancel").isEnabled());
+    }
+
     /**
      * NPE if Generic editor barks about constructor. Hacked around ...
      * 
