@@ -27,6 +27,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
+import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.logging.Logger;
@@ -367,6 +368,40 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 
 //-------------------- unit tests
     
+    /**
+     * Issue #690-swingx: custom dateformats lost on switching LF.
+     * 
+     * Sanity test: custom format set as expected.
+     */
+    public void testCustomFormatsSet() {
+        JXDatePicker picker = new JXDatePicker();
+        DateFormat format = DateFormat.getDateInstance(DateFormat.MEDIUM,Locale.UK);
+        picker.setFormats(format);
+        DateFormat[] formats = picker.getFormats();
+        // sanity
+        assertEquals(1, formats.length);
+        assertSame(format, formats[0]);
+        picker.updateUI();
+        // unchanged formats
+        assertEquals(1, formats.length);
+        assertSame(format, formats[0]);
+        
+    }
+    
+    /**
+     * Issue #690-swingx: custom dateformats lost on switching LF.
+     * 
+     * Here: test that custom format is unchanged after updateUI
+     */
+    public void testCustomFormatsKept() {
+        JXDatePicker picker = new JXDatePicker();
+        DateFormat format = DateFormat.getDateInstance(DateFormat.MEDIUM,Locale.UK);
+        picker.setFormats(format);
+        picker.updateUI();
+        DateFormat[] formats = picker.getFormats();
+        assertEquals(1, formats.length);
+        assertSame(format, formats[0]);
+    }
     
     /**
      * test that selectionListener is uninstalled.
