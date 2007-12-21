@@ -44,7 +44,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import javax.swing.UIManager;
 
 import org.jdesktop.swingx.calendar.DatePickerFormatter;
 import org.jdesktop.swingx.calendar.DateUtils;
@@ -367,7 +366,21 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     }
 
 //-------------------- unit tests
-    
+ 
+
+    /**
+     * Issue #690-swingx: custom dateformats lost on switching LF.
+     * 
+     * Here: default formats re-set.
+     */
+    public void testDefaultFormats() {
+        JXDatePicker picker = new JXDatePicker();
+        DateFormat[] formats = picker.getFormats();
+        assertEquals(formats.length, picker.getFormats().length);
+        picker.updateUI();
+        assertNotSame(formats[0], picker.getFormats()[0]);
+    }
+
     /**
      * Issue #690-swingx: custom dateformats lost on switching LF.
      * 
@@ -381,13 +394,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         // sanity
         assertEquals(1, formats.length);
         assertSame(format, formats[0]);
-        picker.updateUI();
-        // unchanged formats
-        assertEquals(1, formats.length);
-        assertSame(format, formats[0]);
-        
     }
-    
     /**
      * Issue #690-swingx: custom dateformats lost on switching LF.
      * 
