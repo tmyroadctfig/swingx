@@ -26,10 +26,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import junit.framework.TestCase;
 
 import org.jdesktop.swingx.JXDatePicker;
+import org.jdesktop.swingx.calendar.DatePickerFormatter.DatePickerFormatterUIResource;
 import org.jdesktop.swingx.plaf.UIManagerExt;
 
 /**
@@ -42,11 +44,45 @@ import org.jdesktop.swingx.plaf.UIManagerExt;
 public class DatePickerFormatterTest extends TestCase {
 
     /**
-     * triggered by
-     * Issue #690-swingx: custom dateformats lost on switching LF.
-     * 
-     * As of code comment: locale setting not taken?
-     * 
+     * Issue #691-swingx: locale setting not taken.
+     * Here: test contructor with locale.
+     */
+    public void testPickerFormatterCustomLocale() {
+        Locale locale = Locale.FRENCH;
+        DatePickerFormatter formatter = new DatePickerFormatter(locale);
+        SimpleDateFormat format = (SimpleDateFormat) formatter.getFormats()[0];
+        String pattern = UIManagerExt.getString("JXDatePicker.longFormat", locale);
+        assertEquals("format pattern must be same as from localized resource", 
+                pattern, format.toPattern());
+    }
+
+    /**
+     * Issue #691-swingx: locale setting not taken.
+     * Here: test contructor with locale in uiresource.
+     */
+    public void testPickerFormatterUIResourceCustomLocale() {
+        Locale locale = Locale.FRENCH;
+        DatePickerFormatter formatter = new DatePickerFormatterUIResource(locale);
+        SimpleDateFormat format = (SimpleDateFormat) formatter.getFormats()[0];
+        String pattern = UIManagerExt.getString("JXDatePicker.longFormat", locale);
+        assertEquals("format pattern must be same as from localized resource", 
+                pattern, format.toPattern());
+    }
+    
+    /**
+     * Issue #691-swingx: locale setting not taken.
+     * Here: test empty contructor == default locale in uiresource.
+     */
+    public void testPickerFormatterUIResourceDefaultLocale() {
+        DatePickerFormatter formatter = new DatePickerFormatterUIResource();
+        SimpleDateFormat format = (SimpleDateFormat) formatter.getFormats()[0];
+        String pattern = UIManagerExt.getString("JXDatePicker.longFormat");
+        assertEquals(pattern, format.toPattern());
+    }
+
+    /**
+     * Issue #691-swingx: locale setting not taken.
+     * Here: test empty contructor == default locale.
      */
     public void testPickerFormatterDefaultLocale() {
         DatePickerFormatter formatter = new DatePickerFormatter();

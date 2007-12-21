@@ -30,6 +30,7 @@ import java.text.Format;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
@@ -72,6 +73,49 @@ public class JXDatePickerTest extends TestCase {
 
     public void tearDown() {
     }
+
+    /**
+     * Issue #690-swingx: custom dateformats lost on switching LF.
+     * 
+     * Here: default formats re-set.
+     */
+    public void testDefaultFormats() {
+        JXDatePicker picker = new JXDatePicker();
+        DateFormat[] formats = picker.getFormats();
+        assertEquals(formats.length, picker.getFormats().length);
+        picker.updateUI();
+        assertNotSame(formats[0], picker.getFormats()[0]);
+    }
+
+    /**
+     * Issue #690-swingx: custom dateformats lost on switching LF.
+     * 
+     * Sanity test: custom format set as expected.
+     */
+    public void testCustomFormatsSet() {
+        JXDatePicker picker = new JXDatePicker();
+        DateFormat format = DateFormat.getDateInstance(DateFormat.MEDIUM,Locale.UK);
+        picker.setFormats(format);
+        DateFormat[] formats = picker.getFormats();
+        // sanity
+        assertEquals(1, formats.length);
+        assertSame(format, formats[0]);
+    }
+    /**
+     * Issue #690-swingx: custom dateformats lost on switching LF.
+     * 
+     * Here: test that custom format is unchanged after updateUI
+     */
+    public void testCustomFormatsKept() {
+        JXDatePicker picker = new JXDatePicker();
+        DateFormat format = DateFormat.getDateInstance(DateFormat.MEDIUM,Locale.UK);
+        picker.setFormats(format);
+        picker.updateUI();
+        DateFormat[] formats = picker.getFormats();
+        assertEquals(1, formats.length);
+        assertSame(format, formats[0]);
+    }
+    
 
     /**
      * Issue #542-swingx: NPE in init if linkFormat not set.

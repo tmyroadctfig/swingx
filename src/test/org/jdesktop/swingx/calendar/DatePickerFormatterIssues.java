@@ -28,6 +28,7 @@ import java.util.Locale;
 import junit.framework.TestCase;
 
 import org.jdesktop.swingx.JXDatePicker;
+import org.jdesktop.swingx.calendar.DatePickerFormatter.DatePickerFormatterUIResource;
 import org.jdesktop.swingx.plaf.UIManagerExt;
 
 /**
@@ -37,21 +38,6 @@ import org.jdesktop.swingx.plaf.UIManagerExt;
  */
 public class DatePickerFormatterIssues extends TestCase {
 
-    /**
-     * triggered by
-     * Issue #690-swingx: custom dateformats lost on switching LF.
-     * 
-     * As of code comment: locale setting not taken?
-     * 
-     */
-    public void testPickerFormatterCustomLocale() {
-        Locale locale = Locale.FRENCH;
-        DatePickerFormatter formatter = new DatePickerFormatter(locale);
-        SimpleDateFormat format = (SimpleDateFormat) formatter.getFormats()[0];
-        String pattern = UIManagerExt.getString("JXDatePicker.longFormat", locale);
-        assertEquals(pattern, format.toPattern());
-    }
-    
     @SuppressWarnings("unused")
     private Calendar cal;
 
@@ -62,6 +48,13 @@ public class DatePickerFormatterIssues extends TestCase {
     }
 
     public void tearDown() {
+    }
+    
+    /**
+     * Dummy method to keep the testRunner happy ...
+     */
+    public void testDummy() {
+        
     }
 
 }

@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.logging.Logger;
 
 import javax.swing.JFormattedTextField;
+import javax.swing.plaf.UIResource;
 
 import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.util.Contract;
@@ -78,10 +79,27 @@ public class DatePickerFormatter extends
         this(formats, null);
     }
 
+    /**
+     * Instantiates a formatter with default date formats in the 
+     * given locale. The default formats are created from the localized
+     * patterns in swingx.properties. 
+     * 
+     * @param locale the Locale the use for the default formats.
+     */
     public DatePickerFormatter(Locale locale) {
         this(null, locale);
     }
 
+    /**
+     * Instantiates a formatter with the given formats and locale.
+     * 
+     * PENDING JW: makes no sense as a public constructor because the locale is ignored
+     * if the formats are null. So has same public behaviour as the constructor with
+     * formats only ...
+     * 
+     * @param formats
+     * @param locale
+     */
     public DatePickerFormatter(DateFormat formats[], Locale locale) {
 //        super();
         if (locale == null) {
@@ -173,7 +191,8 @@ public class DatePickerFormatter extends
     private void addFormat(List<DateFormat> f, String key, Locale locale) {
         // FIXME: PeS: UIManagerExt.getString(key) always seems to return same 
         // pattern (as for default locale) no matter what locale we pass as parameter.
-        String pattern = UIManagerExt.getString(key);
+        // JW: no wonder - you forgot to pass-on the locale parameter :-)
+        String pattern = UIManagerExt.getString(key, locale);
         try {
             SimpleDateFormat format = new SimpleDateFormat(pattern, locale);
             f.add(format);
@@ -183,4 +202,28 @@ public class DatePickerFormatter extends
         }
     }
 
+    /**
+     * 
+     * Same as DatePickerFormatter, but tagged as UIResource.
+     * 
+     * @author Jeanette Winzenburg
+     */
+    public static class DatePickerFormatterUIResource extends DatePickerFormatter 
+        implements UIResource {
+
+        /**
+         * @param locale
+         */
+        public DatePickerFormatterUIResource(Locale locale) {
+            super(locale);
+        }
+
+        /**
+         * 
+         */
+        public DatePickerFormatterUIResource() {
+            this(null);
+        }
+        
+    }
 }

@@ -86,35 +86,6 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
     /**
      * Issue #665-swingx: make JXDatePicker Locale-aware.
      * 
-     * Here: instantiate the picker with a non-default locale. The 
-     * LinkPanel here is okay, but only if the UK locale is used _before_
-     * the US locale (on a machine with default German). The other way 
-     * round is still in the issues - then the messageFormat for the 
-     * US linkPanel is German.
-     * 
-     * PENDING: Issue #681-swingx - the first row of days in the monthview
-     * overlaps with the day names for locales which have the monday as the 
-     * first day of week.
-     */
-    public void interactiveLocaleConstructor() {
-        JComponent comp = new JPanel();
-        addDatePickerWithLocaleConstructor(comp, Locale.FRANCE);
-        addDatePickerWithLocaleConstructor(comp, Locale.UK);
-        addDatePickerWithLocaleConstructor(comp, Locale.US);
-        addDatePickerWithLocaleConstructor(comp, Locale.GERMAN);
-        addDatePickerWithLocaleConstructor(comp, Locale.ITALIAN);
-        showInFrame(comp, "Localized DatePicker: constructor");
-    }
-
-    private void addDatePickerWithLocaleConstructor(JComponent comp, Locale uk) {
-        JXDatePicker datePicker = new JXDatePicker(uk);
-        comp.add(new JLabel(uk.getDisplayName()));
-        comp.add(datePicker);
-    }
-
-    /**
-     * Issue #665-swingx: make JXDatePicker Locale-aware.
-     * 
      * Tests reaction to default locales set via both JComponent.setDefault and
      * Locale.setDefault. Going that way, catches the locales fine.
      * 

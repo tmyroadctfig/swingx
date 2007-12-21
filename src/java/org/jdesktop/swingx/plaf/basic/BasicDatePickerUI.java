@@ -59,6 +59,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.JFormattedTextField.AbstractFormatter;
+import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.UIResource;
 import javax.swing.text.View;
@@ -68,6 +70,7 @@ import org.jdesktop.swingx.JXMonthView;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DatePickerFormatter;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
+import org.jdesktop.swingx.calendar.DatePickerFormatter.DatePickerFormatterUIResource;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
@@ -150,8 +153,22 @@ public class BasicDatePickerUI extends DatePickerUI {
         
         JFormattedTextField editor = datePicker.getEditor();
         if (editor == null || editor instanceof UIResource) {
+            DateFormat[] formats = null;
+            if (editor != null) {
+                AbstractFormatterFactory factory = editor.getFormatterFactory();
+                if (factory != null) {
+                    AbstractFormatter formatter = factory.getFormatter(editor);
+                    if (!(formatter instanceof DatePickerFormatterUIResource))  {
+                        formats = ((DatePickerFormatter) formatter).getFormats();
+                    }
+                }
+
+            }
             // we are not yet listening ...
             datePicker.setEditor(createEditor());
+            if (formats != null) {
+                datePicker.setFormats(formats);
+            }
         }
         updateFromEditorChanged(null, false);
         
@@ -425,7 +442,7 @@ public class BasicDatePickerUI extends DatePickerUI {
      * @return an instance of a JFormattedTextField
      */
     protected JFormattedTextField createEditor() {
-        JFormattedTextField f = new DefaultEditor(new DatePickerFormatter(datePicker.getLocale()));
+        JFormattedTextField f = new DefaultEditor(new DatePickerFormatterUIResource(datePicker.getLocale()));
         f.setName("dateField");
         f.setColumns(UIManager.getInt("JXDatePicker.numColumns"));
         f.setBorder(UIManager.getBorder("JXDatePicker.border"));
