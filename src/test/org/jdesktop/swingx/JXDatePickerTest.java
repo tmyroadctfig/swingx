@@ -28,6 +28,7 @@ import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -72,6 +73,31 @@ public class JXDatePickerTest extends TestCase {
     }
 
     public void tearDown() {
+    }
+
+    /**
+     * Issue #693-swingx: format of custom locale.
+     * Here: test constructor with locale parameter.
+     */
+    public void testCustomLocaleConstructor() {
+        Locale german = Locale.GERMAN;
+        JXDatePicker picker = new JXDatePicker(german);
+        SimpleDateFormat format = (SimpleDateFormat) picker.getFormats()[0];
+        String pattern = UIManagerExt.getString("JXDatePicker.longFormat", german);
+        assertEquals(pattern , format.toPattern());
+    }
+
+    /**
+     * Issue #693-swingx: format of custom locale.
+     * Here: test setLocale.
+     */
+    public void testCustomLocaleSet() {
+        Locale german = Locale.GERMAN;
+        JXDatePicker picker = new JXDatePicker();
+        picker.setLocale(german);
+        SimpleDateFormat format = (SimpleDateFormat) picker.getFormats()[0];
+        String pattern = UIManagerExt.getString("JXDatePicker.longFormat", german);
+        assertEquals(pattern , format.toPattern());
     }
 
     /**

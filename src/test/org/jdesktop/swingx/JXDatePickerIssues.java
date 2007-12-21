@@ -396,30 +396,6 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 //-------------------- unit tests
  
     /**
-     * Issue #693-swingx: format of custom locale.
-     * Here: test constructor with locale parameter.
-     */
-    public void testCustomLocaleConstructor() {
-        Locale german = Locale.GERMAN;
-        JXDatePicker picker = new JXDatePicker(german);
-        SimpleDateFormat format = (SimpleDateFormat) picker.getFormats()[0];
-        String pattern = UIManagerExt.getString("JXDatePicker.longFormat", german);
-        assertEquals(pattern , format.toPattern());
-    }
-
-    /**
-     * Issue #693-swingx: format of custom locale.
-     * Here: test constructor with locale parameter.
-     */
-    public void testCustomLocaleSet() {
-        Locale german = Locale.GERMAN;
-        JXDatePicker picker = new JXDatePicker();
-        picker.setLocale(german);
-        SimpleDateFormat format = (SimpleDateFormat) picker.getFormats()[0];
-        String pattern = UIManagerExt.getString("JXDatePicker.longFormat", german);
-        assertEquals(pattern , format.toPattern());
-    }
-    /**
      * test that selectionListener is uninstalled.
      * 
      * Hmm ... missing api or overshooting?
