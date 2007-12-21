@@ -72,7 +72,8 @@ public class JXMonthViewTest extends MockObjectTestCase {
         //the test is configured for a US defaulted system
         //the localization tests handle actual localization issues
         componentLocale = JComponent.getDefaultLocale();
-        JComponent.setDefaultLocale(Locale.US);
+//        LOG.info("componentLocale " + componentLocale);
+//        JComponent.setDefaultLocale(Locale.US);
     }
 
     public void tearDown() {
@@ -905,7 +906,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     }
     
     public void testDefaultConstructor() {
-        JXMonthView monthView = new JXMonthView();
+        JXMonthView monthView = new JXMonthView(Locale.US);
         assertTrue(monthView.isSelectionEmpty());
         assertTrue(JXMonthView.SelectionMode.SINGLE_SELECTION == monthView.getSelectionMode());
         assertTrue(Calendar.SUNDAY == monthView.getFirstDayOfWeek());
@@ -995,7 +996,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     }
 
     public void testWeekIntervalSelection() {
-        JXMonthView monthView = new JXMonthView();
+        JXMonthView monthView = new JXMonthView(Locale.US);
         monthView.setSelectionMode(JXMonthView.SelectionMode.WEEK_INTERVAL_SELECTION);
 
         // Use a known date that falls on a Sunday, which just happens to be my birthday.
@@ -1021,7 +1022,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         endDate = cal.getTime();
         selection = monthView.getSelection();
 
-        assertTrue(startDate.equals(selection.first()));
+        assertEquals(startDate, selection.first());
         assertTrue(endDate.equals((selection.last())));
     }
 

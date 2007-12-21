@@ -180,11 +180,20 @@ public class JXDatePicker extends JComponent {
      */
     public JXDatePicker(long millis, Locale locale) {
         init();
-        // install the controller before setting the date
-        updateUI();
+        // JW: set the locale before the ui has the format and rows correct
+        // but doesn't update the linkPanel/monthView (not surprisingly, 
+        // those are handled in the delegate
         if (locale != null) {
             setLocale(locale);
         }
+        // install the controller before setting the date
+        updateUI();
+        // JW: set the locale after the ui has the linkPanel/monthView correct
+        // but wrong editor format and overlapping rows
+//        if (locale != null) {
+//            setLocale(locale);
+//        }
+        
         setDate(new Date(millis));
     }
     

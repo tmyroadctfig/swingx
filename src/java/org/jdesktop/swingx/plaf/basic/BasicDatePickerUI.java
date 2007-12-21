@@ -39,7 +39,6 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -63,6 +62,7 @@ import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.UIResource;
+import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.View;
 
 import org.jdesktop.swingx.JXDatePicker;
@@ -153,17 +153,7 @@ public class BasicDatePickerUI extends DatePickerUI {
         
         JFormattedTextField editor = datePicker.getEditor();
         if (editor == null || editor instanceof UIResource) {
-            DateFormat[] formats = null;
-            if (editor != null) {
-                AbstractFormatterFactory factory = editor.getFormatterFactory();
-                if (factory != null) {
-                    AbstractFormatter formatter = factory.getFormatter(editor);
-                    if (!(formatter instanceof DatePickerFormatterUIResource))  {
-                        formats = ((DatePickerFormatter) formatter).getFormats();
-                    }
-                }
-
-            }
+            DateFormat[] formats = getCustomFormats(editor);
             // we are not yet listening ...
             datePicker.setEditor(createEditor());
             if (formats != null) {
@@ -181,6 +171,36 @@ public class BasicDatePickerUI extends DatePickerUI {
             popupButton.putClientProperty("doNotCancelPopup", preventHide);
             datePicker.add(popupButton);
         }
+        // JW: the condition is hacking around #681-swingx: overlapping rows in JXMonthView
+        // in locales with first day of week monday if locale is set
+        // this way the current brittle behaviour is at least not detoriated
+        // (== default locales are okay)
+//        if ((datePicker.getLocale() != null) && 
+//                !datePicker.getLocale().equals(Locale.getDefault())) 
+            updateChildLocale(datePicker.getLocale());
+        
+    }
+
+    /**
+     * Checks and returns custom formats on the editor, if any.
+     * 
+     * @param editor the editor to check
+     * @return the custom formats uses in the editor or null if it had
+     *   used defaults as defined in the datepicker properties
+     */
+    private DateFormat[] getCustomFormats(JFormattedTextField editor) {
+        DateFormat[] formats = null;
+        if (editor != null) {
+            AbstractFormatterFactory factory = editor.getFormatterFactory();
+            if (factory != null) {
+                AbstractFormatter formatter = factory.getFormatter(editor);
+                if (!(formatter instanceof DatePickerFormatterUIResource))  {
+                    formats = ((DatePickerFormatter) formatter).getFormats();
+                }
+            }
+
+        }
+        return formats;
     }
 
     protected void uninstallComponents() {
@@ -701,32 +721,54 @@ public class BasicDatePickerUI extends DatePickerUI {
     }
 
     /**
-     * Called form property listener, updates all components locale, formats etc.
+     * Called form property listener, updates all components locale, formats
+     * etc.
      * 
      * @author PeS
      */
     protected void updateLocale() {
         Locale locale = datePicker.getLocale();
-        if (locale != null) {
-            /* FIXME: PeS: It should probably use this 
-             
-             datePicker.getEditor().setFormatterFactory(new DefaultFormatterFactory(
-                new DatePickerFormatter(null, locale)));
+        updateFormatLocale(locale);
+        updateChildLocale(locale);
+    }
 
-             * however that gets beyond my understanding of the inner workings. 
-             * It reaches to UiManagerExt for date formats?
-             * Therefore I am using simply JRE defined formats
+    private void updateFormatLocale(Locale locale) {
+        if (locale != null) {
+            /*
+             * FIXME: PeS: It should probably use this
+             * 
+             * however that gets beyond my understanding of the inner workings.
+             * It reaches to UiManagerExt for date formats? Therefore I am using
+             * simply JRE defined formats
              */
-            DateFormat[] formats = new DateFormat[3];
-            SimpleDateFormat f = (SimpleDateFormat)DateFormat.getDateInstance(DateFormat.SHORT, locale);
-            if (!f.toPattern().contains("E")) {
-                f.applyPattern("EE " + f.toPattern());
+            // JW: yes should do that - but only if we have no custom formats
+            // installed.
+            // PENDING: timezone?
+            if (getCustomFormats(datePicker.getEditor()) == null) {
+                datePicker.getEditor().setFormatterFactory(
+                        new DefaultFormatterFactory(
+                                new DatePickerFormatterUIResource(locale)));
             }
-            formats[0] = f;
-            formats[1] = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
-            formats[2] = DateFormat.getDateInstance(DateFormat.MEDIUM, locale);
-            datePicker.setFormats(formats);
-            
+            // DateFormat[] formats = new DateFormat[3];
+            // SimpleDateFormat f =
+            // (SimpleDateFormat)DateFormat.getDateInstance(DateFormat.SHORT,
+            // locale);
+            // if (!f.toPattern().contains("E")) {
+            // f.applyPattern("EE " + f.toPattern());
+            // }
+            // formats[0] = f;
+            // formats[1] = DateFormat.getDateInstance(DateFormat.DEFAULT,
+            // locale);
+            // formats[2] = DateFormat.getDateInstance(DateFormat.MEDIUM,
+            // locale);
+            // datePicker.setFormats(formats);
+
+        }
+    }
+
+    private void updateChildLocale(Locale locale) {
+        if (locale != null) {
+            datePicker.getEditor().setLocale(locale);
             datePicker.getLinkPanel().setLocale(locale);
             datePicker.getMonthView().setLocale(locale);
         }

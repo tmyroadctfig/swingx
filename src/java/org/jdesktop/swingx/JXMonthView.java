@@ -35,9 +35,11 @@ import java.util.Locale;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
+import java.util.logging.Logger;
 
 import javax.swing.JComponent;
 import javax.swing.Timer;
+import javax.swing.UIManager;
 
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
@@ -126,7 +128,9 @@ import org.jdesktop.swingx.util.Contract;
  * @version  $Revision$
  */
 public class JXMonthView extends JComponent {
-    
+    @SuppressWarnings("unused")
+    private static final Logger LOG = Logger.getLogger(JXMonthView.class
+            .getName());
     /*
      * moved from package calendar to swingx at version 1.51
      */
@@ -288,13 +292,13 @@ public class JXMonthView extends JComponent {
             this.model = new DefaultDateSelectionModel();
         }
 
+        setLocale(locale);
+        // install the controller
         updateUI();
 
+//        if (cal == null)
         // Set up calendar instance
-        cal = Calendar.getInstance(getLocale());
-        firstDayOfWeek = cal.getFirstDayOfWeek();
-        cal.setFirstDayOfWeek(firstDayOfWeek);
-        cal.setMinimalDaysInFirstWeek(1);
+//        installCalendar();
 
         // Keep track of today
         updateTodayFromCurrentTime();
@@ -303,9 +307,50 @@ public class JXMonthView extends JComponent {
         todayBackgroundColor = getForeground();
 
 
-        setLocale(locale);
-        anchor = (Calendar) cal.clone();
         setFirstDisplayedDate(firstDisplayedDate);
+    }
+
+    /**
+     * Sets locale and resets text and format used to display months and days. 
+     * Also resets firstDayOfWeek.
+     * 
+     * <p>
+     * <b>Warning:</b> Since this resets any string labels that are cached in UI
+     * (month and day names) and firstDayofWeek, use <code>setDaysOfTheWeek</code> and/or
+     * setFirstDayOfWeek after (re)setting locale.
+     * </p>
+     * 
+     * @param   locale new Locale to be used for formatting
+     * @see     #setDaysOfTheWeek(String[])
+     * @see     #setFirstDayOfWeek(int)
+     */
+    @Override
+    public void setLocale(Locale locale) {
+        installCalendar(locale);
+        if (locale != null) {
+            // JW: update internals first to keep the cal consistent
+            // PENDING: timezone?
+//            cal = Calendar.getInstance(locale);
+//            setFirstDayOfWeek(cal.getFirstDayOfWeek());        
+//            cal.setMinimalDaysInFirstWeek(1);
+            // Locale is bound property, no need to firePropertyChange
+            super.setLocale(locale);
+
+
+            repaint();
+            }
+    }
+    
+
+    private void installCalendar(Locale locale) {
+        if (locale == null) {
+            locale = JComponent.getDefaultLocale();
+        }
+        cal = Calendar.getInstance(locale);
+        firstDayOfWeek = cal.getFirstDayOfWeek();
+        cal.setFirstDayOfWeek(firstDayOfWeek);
+        cal.setMinimalDaysInFirstWeek(1);
+        anchor = (Calendar) cal.clone();
     }
 
     /**
@@ -1643,33 +1688,6 @@ public class JXMonthView extends JComponent {
     }
 
 
-    /**
-     * Sets locale and resets text and format used to display months and days. 
-     * Also resets firstDayOfWeek.
-     * 
-     * <p>
-     * <b>Warning:</b> Since this resets any string labels that are cached in UI
-     * (month and day names) and firstDayofWeek, use <code>setDaysOfTheWeek</code> and/or
-     * setFirstDayOfWeek after (re)setting locale.
-     * </p>
-     * 
-     * @param   locale new Locale to be used for formatting
-     * @see     #setDaysOfTheWeek(String[])
-     * @see     #setFirstDayOfWeek(int)
-     */
-    @Override
-    public void setLocale(Locale locale) {
-        if (locale != null) {
-            // Locale is bound property, no need to firePropertyChange
-            super.setLocale(locale);
-
-            cal = Calendar.getInstance(getLocale());
-            setFirstDayOfWeek(cal.getFirstDayOfWeek());
-
-            repaint();
-        }
-    }
-    
     
     
 //    public static void main(String args[]) {

@@ -112,7 +112,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         p.add(new JXMonthView());
         // explicit us locale
         p.add(new JXMonthView(Locale.US));
-        // explicit german locale
+//         explicit german locale
         p.add(new JXMonthView(Locale.GERMAN));
         showInFrame(p, "first row overlapping - constructor");
     }

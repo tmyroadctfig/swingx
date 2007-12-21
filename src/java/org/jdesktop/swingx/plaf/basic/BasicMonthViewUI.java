@@ -348,6 +348,9 @@ public class BasicMonthViewUI extends MonthViewUI {
             daysOfTheWeek[i - 1] = dateFormatSymbols[i];
         }
         monthView.setDaysOfTheWeek(daysOfTheWeek);
+        monthView.invalidate();
+        monthView.validate();
+        getHandler().layoutContainer(null);
     }
 
 //---------------------- config

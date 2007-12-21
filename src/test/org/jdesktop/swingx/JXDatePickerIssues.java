@@ -27,7 +27,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.logging.Logger;
@@ -47,6 +47,7 @@ import javax.swing.KeyStroke;
 
 import org.jdesktop.swingx.calendar.DatePickerFormatter;
 import org.jdesktop.swingx.calendar.DateUtils;
+import org.jdesktop.swingx.plaf.UIManagerExt;
 
 /**
  * Known issues of <code>JXDatePicker</code> and picker related 
@@ -73,6 +74,31 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 
     private Calendar calendar;
 
+    /**
+     * Issue #665-swingx: make JXDatePicker Locale-aware.
+     * 
+     * Here: instantiate the picker with a non-default locale. The 
+     * LinkPanel is okay, if the UK locale is used _before_
+     * the US locale (on a machine with default German). The other way 
+     * round the messageFormat for the 
+     * US linkPanel is German.
+     */
+    public void interactiveLocaleSet() {
+        JComponent comp = new JPanel();
+        comp.add(new JXDatePicker());
+        addDatePickerWithLocaleSet(comp, Locale.US);
+        addDatePickerWithLocaleSet(comp, Locale.UK);
+        addDatePickerWithLocaleSet(comp, Locale.GERMAN);
+        addDatePickerWithLocaleSet(comp, Locale.ITALIAN);
+        showInFrame(comp, "Localized DatePicker: setLocale");
+    }
+
+    private void addDatePickerWithLocaleSet(JComponent comp, Locale uk) {
+        JXDatePicker datePicker = new JXDatePicker();
+        datePicker.setLocale(uk);
+        comp.add(new JLabel(uk.getDisplayName()));
+        comp.add(datePicker);
+    }
 
     /**
      * Issue #665-swingx: make JXDatePicker Locale-aware.
@@ -369,7 +395,30 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 
 //-------------------- unit tests
  
+    /**
+     * Issue #693-swingx: format of custom locale.
+     * Here: test constructor with locale parameter.
+     */
+    public void testCustomLocaleConstructor() {
+        Locale german = Locale.GERMAN;
+        JXDatePicker picker = new JXDatePicker(german);
+        SimpleDateFormat format = (SimpleDateFormat) picker.getFormats()[0];
+        String pattern = UIManagerExt.getString("JXDatePicker.longFormat", german);
+        assertEquals(pattern , format.toPattern());
+    }
 
+    /**
+     * Issue #693-swingx: format of custom locale.
+     * Here: test constructor with locale parameter.
+     */
+    public void testCustomLocaleSet() {
+        Locale german = Locale.GERMAN;
+        JXDatePicker picker = new JXDatePicker();
+        picker.setLocale(german);
+        SimpleDateFormat format = (SimpleDateFormat) picker.getFormats()[0];
+        String pattern = UIManagerExt.getString("JXDatePicker.longFormat", german);
+        assertEquals(pattern , format.toPattern());
+    }
     /**
      * test that selectionListener is uninstalled.
      * 
