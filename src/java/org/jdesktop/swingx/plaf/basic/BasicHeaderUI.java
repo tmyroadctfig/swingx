@@ -209,7 +209,7 @@ public class BasicHeaderUI extends HeaderUI {
         	titleLabel.setForeground(titleForeground != null ? titleForeground : UIManager.getColor("Label.foreground"));
         }
 
-        titleLabel.setText(h.getTitle() == null ? "Title For Header Goes Here" : h.getTitle());
+        titleLabel.setText(h.getTitle());
         
         // description properties
         Font descFont = h.getDescriptionFont();
@@ -226,9 +226,7 @@ public class BasicHeaderUI extends HeaderUI {
         	descriptionPane.setForeground(descForeground != null ? descForeground : UIManager.getColor("Label.foreground"));
         }
         
-        descriptionPane
-                .setText(h.getDescription() == null ? "The description for the header goes here.\nExample: Click the Copy Code button to generate the corresponding Java code."
-                        : h.getDescription());
+        descriptionPane.setText(h.getDescription());
     }
 
     protected void uninstallDefaults(JXHeader h) {
