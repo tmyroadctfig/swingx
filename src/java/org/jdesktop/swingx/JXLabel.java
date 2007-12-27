@@ -618,7 +618,7 @@ public class JXLabel extends JLabel {
         public static View createView(JXLabel c) {
             BasicEditorKit kit = getFactory();
             Document doc = kit.createDefaultDocument(c.getFont(), c.getForeground());
-            Reader r = new StringReader(c.getText());
+            Reader r = new StringReader(c.getText() == null ? "" : c.getText());
             try {
                 kit.read(r, doc, 0);
             } catch (Throwable e) {
