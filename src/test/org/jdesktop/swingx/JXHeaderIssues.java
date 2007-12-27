@@ -49,12 +49,65 @@ import org.jdesktop.swingx.test.XTestUtils;
  * @author Jeanette Winzenburg
  */
 public class JXHeaderIssues extends InteractiveTestCase {
+    
+    /**
+     * Issue #695-swingx: not-null default values break class invariant.
+     * Here initial empty constructor.
+     */
+    public void testTitleSynchInitialEmpty() {
+        JXHeader header = new JXHeader();
+        // fishing in the internals ... not really safe, there are 2 labels
+        JLabel label = null;
+        for (int i = 0; i < header.getComponentCount(); i++) {
+           if (header.getComponent(i) instanceof JLabel) {
+               label = (JLabel) header.getComponent(i);
+               break;
+           }
+        }
+        assertEquals(header.getTitle(), label.getText());
+    }
 
     /**
-     * Dummy empty test just to keep it from whining.
+     * Issue #695-swingx: not-null default values break invariant.
+     * Here: initial not-null explicitly set to null and updateUI (to
+     * simulate LF toggle).
      */
-    public void interactiveDummy() {
-        // do nothing
+    public void testTitleSynchUpdateUI() {
+        JXHeader header = new JXHeader("dummy", null);
+        header.setTitle(null);
+        header.updateUI();
+        // fishing in the internals ... not really safe, there are 2 labels
+        JLabel label = null;
+        for (int i = 0; i < header.getComponentCount(); i++) {
+           if (header.getComponent(i) instanceof JLabel) {
+               label = (JLabel) header.getComponent(i);
+               break;
+           }
+        }
+        assertEquals(header.getTitle(), label.getText());
+    }
+
+    /**
+     * Issue #695-swingx: not-null default values break invariant.
+     * Here: initial null params constructor.
+     */
+    public void testTitleSynchInitialNull() {
+        JXHeader header = new JXHeader(null, null);
+        header.setTitle(null);
+        // fishing in the internals ... not really safe, there are 2 labels
+        JLabel label = null;
+        for (int i = 0; i < header.getComponentCount(); i++) {
+           if (header.getComponent(i) instanceof JLabel) {
+               label = (JLabel) header.getComponent(i);
+               break;
+           }
+        }
+        assertEquals(header.getTitle(), label.getText());
+    }
+
+    public void interactiveHeaderEmpty() {
+        JXHeader header = new JXHeader();
+        showInFrame(header, "empty constructor");
     }
     
     public static void main(String args[]) {
@@ -72,5 +125,11 @@ public class JXHeaderIssues extends InteractiveTestCase {
         setSystemLF(true);
     }
     
+    /**
+     * Dummy empty test just to keep it from whining.
+     */
+    public void testDummy() {
+        // do nothing
+    }
     
 }
