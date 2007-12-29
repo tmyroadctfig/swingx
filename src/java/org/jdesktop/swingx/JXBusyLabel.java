@@ -25,6 +25,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.JLabel;
 import javax.swing.Timer;
 import org.jdesktop.swingx.painter.BusyPainter;
@@ -43,21 +44,69 @@ import org.jdesktop.swingx.painter.PainterIcon;
  *     //...
  *     label.setBusy(true);
  * </code></pre></p>
+ * Another more complicated example:
+ * <pre><code>
+ * JXBusyLabel label = new JXBusyLabel(new Dimension(100,84));
+ * BusyPainter painter = new BusyPainter(
+ * new Rectangle2D.Float(0, 0,13.500001f,1),
+ * new RoundRectangle2D.Float(12.5f,12.5f,59.0f,59.0f,10,10));
+ * painter.setTrailLength(5);
+ * painter.setPoints(31);
+ * painter.setFrame(1);
+ * label.setPreferredSize(new Dimension(100,84));
+ * label.setIcon(new EmptyIcon(100,84));
+ * label.setBusyPainter(painter);
+
+ *</code></pre>
  *
  * @author rbair
  * @author joshy
+ * @author rah003
  */
 public class JXBusyLabel extends JLabel {
     private BusyPainter busyPainter;
     private Timer busy;
-    private boolean running;
+    private int delay = 100;
     
-    /** Creates a new instance of JXBusyLabel */
+
+    /**
+     * Direction is used to set the initial direction in which the
+     * animation starts.
+     * 
+     * @see #setStartDirection
+     */
+    public static enum Direction {
+        /**
+         * cycle proceeds forward
+         */
+    RIGHT,
+        /** cycle proceeds backward */
+    LEFT,
+    };
+
+    public void setDirection(Direction dir) {
+        direction = dir;
+        busyPainter.setDirection(dir);
+    }
+    private Direction direction;
+
+    /** Creates a new instance of <code>JXBusyLabel</code> initialized to circular shape in bounds of 26 by 26 points.*/
     public JXBusyLabel() {
-        busyPainter = new BusyPainter();
+        this(new Dimension(26,26));
+    }
+    
+    /**
+     * Creates a new instance of <code>JXBusyLabel</code> initialized to the arbitrary size and using default circular progress indicator.
+     * @param dim Preferred size of the label.
+     */
+    public JXBusyLabel(Dimension dim) {
+        busyPainter = new BusyPainter(dim.height);
+        initPainter(dim);
+    }
+
+    private void initPainter(Dimension dim) {
         busyPainter.setBaseColor(Color.LIGHT_GRAY);
         busyPainter.setHighlightColor(getForeground());
-        Dimension dim = new Dimension(26,26);
         PainterIcon icon = new PainterIcon(dim);
         icon.setPainter(busyPainter);
         this.setIcon(icon);
@@ -85,37 +134,36 @@ public class JXBusyLabel extends JLabel {
     public void setBusy(boolean busy) {
         boolean old = isBusy();
         if (!old && busy) {
-        	running = true;
             startAnimation();
             firePropertyChange("busy", old, isBusy());
         } else if (old && !busy) {
-        	running = false;
             stopAnimation();
             firePropertyChange("busy", old, isBusy());
         }
     }
     
     private void startAnimation() {
-        if (!running || getParent() == null) {
-        	return;
-        }
         if(busy != null) {
             stopAnimation();
         }
-        busy = new Timer(100, new ActionListener() {
-            int frame = 8;
+        
+        busy = new Timer(delay, new ActionListener() {
+            int frame = busyPainter.getPoints();
             public void actionPerformed(ActionEvent e) {
-                frame = (frame+1)%8;
-                busyPainter.setFrame(frame);
-                repaint();
+                frame = (frame+1)%busyPainter.getPoints();
+                busyPainter.setFrame(direction == Direction.LEFT ? busyPainter.getPoints() - frame : frame);
+                frameChanged();
             }
         });
         busy.start();
     }
     
+    
+    
+    
     private void stopAnimation() {
         if (busy != null) {
-    		busy.stop();
+            busy.stop();
             busyPainter.setFrame(-1);
             repaint();
             busy = null;
@@ -134,5 +182,45 @@ public class JXBusyLabel extends JLabel {
     	super.addNotify();
     	// fix for #626
     	startAnimation();
+    }
+
+    protected void frameChanged() {
+        repaint();
+    }
+
+    /**
+     * @return the busyPainter
+     */
+    public final BusyPainter getBusyPainter() {
+        return busyPainter;
+    }
+
+    /**
+     * @param busyPainter the busyPainter to set
+     */
+    public final void setBusyPainter(BusyPainter busyPainter) {
+        this.busyPainter = busyPainter;
+        initPainter(new Dimension(getIcon().getIconWidth(), getIcon().getIconHeight()));
+    }
+
+    /**
+     * @return the delay
+     */
+    public int getDelay() {
+        return delay;
+    }
+
+    /**
+     * @param delay the delay to set
+     */
+    public void setDelay(int delay) {
+        int old = getDelay();
+        this.delay = delay;
+        if (old != getDelay()) {
+            if (busy != null && busy.isRunning()) {
+                busy.setDelay(getDelay());
+            }
+            firePropertyChange("delay", old, getDelay());
+        }
     }
 }
