@@ -1,77 +1,93 @@
 /*
- * MapComboBoxModel.java
+ * $Id$
  *
- * Created on July 12, 2006, 6:37 PM
+ * Copyright 2004 Sun Microsystems, Inc., 4150 Network Circle,
+ * Santa Clara, California 95054, U.S.A. All rights reserved.
  *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
 package org.jdesktop.swingx.combobox;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * A {@code ComboBoxModel} for {@code Map}s.
+ * 
  * @author jm158417
+ * @author Karl George Schaefer
+ *
+ * @param <K> the type of keys maintained by the map backing this model
+ * @param <V> the type of mapped values
  */
-public class MapComboBoxModel extends ListComboBoxModel {
+public class MapComboBoxModel<K, V> extends ListComboBoxModel<K> {
 
-    protected Map map_data;
-    protected List index;
-    protected List invertedIndex;
+    protected Map<K, V> map_data;
     protected boolean inverted;
     
     public MapComboBoxModel() {
-        this.map_data = new HashMap();
-        index = new ArrayList();
+        this(new HashMap<K, V>());
     }
     
-    public MapComboBoxModel(Map map) {
+    public MapComboBoxModel(Map<K, V> map) {
         this.map_data = map;
-        this.inverted = inverted;
+        
         buildIndex();
-        if(index.size() > 0) {
-            selected = index.get(0);
+        
+        if(data.size() > 0) {
+            selected = data.get(0);
         }
     }
     
     protected void buildIndex() {
-        invertedIndex = new ArrayList(map_data.values());
-        index = new ArrayList(map_data.keySet());
+        data = new ArrayList<K>(map_data.keySet());
     }
-
-
-    public Object getElementAt(int i) {
-        return index.get(i);
-    }
+    
+    /**
+     * {@inheritDoc}
+     */
     public int getSize() {
         return map_data.size();
     }
     
-    public Map getMap() {
-        return map_data;
-    }
-    
-    
+    /**
+     * {@inheritDoc}
+     */
     public void actionPerformed(ActionEvent evt) {
-        if(evt.getActionCommand().equals("update")) {
+        if(evt.getActionCommand().equals(UPDATE)) {
             buildIndex();
-            fireUpdate();
+            fireContentsChanged(this, 0, getSize());
         }
     }
 
-    
-    public Object getValue(Object selectedItem) {
+    /**
+     * @param selectedItem
+     * @return
+     */
+    public V getValue(Object selectedItem) {
         return map_data.get(selectedItem);
     }
     
-    public Object getValue(int selectedItem) {
-        return getValue(index.get(selectedItem));
+    /**
+     * @param selectedItem
+     * @return
+     */
+    public V getValue(int selectedItem) {
+        return getValue(getElementAt(selectedItem));
     }
     
 }
