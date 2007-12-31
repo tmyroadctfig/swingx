@@ -76,12 +76,12 @@ public class JXColorSelectionButton extends JButton {
                             getChooser(),
                             new ActionListener() {
                                 public void actionPerformed(ActionEvent actionEvent) {
-                                    System.out.println("okay");
+                                    //System.out.println("okay");
                                 }
                             },
                             new ActionListener() {
                                 public void actionPerformed(ActionEvent actionEvent) {
-                                    System.out.println("cancel");
+                                    //System.out.println("cancel");
                                 }
                             }
                             );
