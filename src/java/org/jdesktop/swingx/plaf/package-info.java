@@ -125,7 +125,7 @@
  * <td>X</td>
  * </tr>
  * <tr>
- * <td>JXTaskPaneContainer<td>
+ * <td>JXTipOfTheDay<td>
  * <td>X</td>
  * <td>Basic</td>
  * <td>Basic</td>
@@ -136,7 +136,7 @@
  * <td>Windows XP</td>
  * </tr>
  * <tr>
- * <td>JXTaskPaneContainer<td>
+ * <td>JXTitledPanel<td>
  * <td>X</td>
  * <td>X</td>
  * <td>X</td>
