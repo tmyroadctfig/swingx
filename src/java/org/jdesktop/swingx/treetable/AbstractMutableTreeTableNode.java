@@ -42,7 +42,7 @@ public abstract class AbstractMutableTreeTableNode implements
      * List of children, if this node has no children the list will be empty.
      * This list will never be null.
      */
-    protected List<MutableTreeTableNode> children;
+    protected final List<MutableTreeTableNode> children;
 
     /** optional user object */
     protected transient Object userObject;
@@ -61,9 +61,20 @@ public abstract class AbstractMutableTreeTableNode implements
             boolean allowsChildren) {
         this.userObject = userObject;
         this.allowsChildren = allowsChildren;
-        children = new ArrayList<MutableTreeTableNode>();
+        children = createChildrenList();
     }
 
+    /**
+     * Creates the list used to manage the children of this node.
+     * <p>
+     * This method is called by the constructor.
+     * 
+     * @return a list; this list is guaranteed to be non-{@code null}
+     */
+    protected List<MutableTreeTableNode> createChildrenList() {
+        return new ArrayList<MutableTreeTableNode>();
+    }
+    
     public void add(MutableTreeTableNode child) {
         insert(child, getChildCount());
     }
@@ -76,6 +87,11 @@ public abstract class AbstractMutableTreeTableNode implements
             throw new IllegalStateException("this node cannot accept children");
         }
 
+        if (children.contains(child)) {
+            children.remove(child);
+            index--;
+        }
+        
         children.add(index, child);
 
         if (child.getParent() != this) {
@@ -109,11 +125,11 @@ public abstract class AbstractMutableTreeTableNode implements
      * {@inheritDoc}
      */
     public void setParent(MutableTreeTableNode newParent) {
-        if (newParent != null && newParent.getAllowsChildren()) {
+        if (newParent == null || newParent.getAllowsChildren()) {
             if (parent != null && parent.getIndex(this) != -1) {
                 parent.remove(this);
             }
-        } else if (newParent != null) {
+        } else {
             throw new IllegalArgumentException(
                     "newParent does not allow children");
         }

@@ -27,6 +27,21 @@ public class DefaultMutableTreeTableNodeUnitTest extends TestCase {
          assertEquals(root.getChildCount(), 2);
      }
      
+     public void testAddDoesNotDuplicate() {
+         DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode("root");
+         
+         assertEquals(root.getChildCount(), 0);
+         
+         DefaultMutableTreeTableNode a = new DefaultMutableTreeTableNode("a");
+         root.add(a);
+         
+         assertEquals(root.getChildCount(), 1);
+         
+         root.add(a);
+         
+         assertEquals(root.getChildCount(), 1);
+     }
+     
      public void testChildren() {
          DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode("root");
          
@@ -231,6 +246,30 @@ public class DefaultMutableTreeTableNodeUnitTest extends TestCase {
          
          assertEquals(c.getParent(), root);
          assertEquals(b.getChildCount(), 0);
+     }
+     
+     public void testSetParent() {
+         DefaultMutableTreeTableNode root = new DefaultMutableTreeTableNode("root");
+         DefaultMutableTreeTableNode a = new DefaultMutableTreeTableNode("a");
+         root.add(a);
+         assertEquals(root.getChildCount(), 1);
+         
+         a.setParent(null);
+         assertEquals(root.getChildCount(), 0);
+         
+         a.setParent(root);
+         assertEquals(root.getChildCount(), 1);
+         
+         a.setParent(null);
+         assertEquals(root.getChildCount(), 0);
+         
+         root.setAllowsChildren(false);
+         try {
+             a.setParent(root);
+             fail("should throw IllegalArgumentException");
+         } catch (IllegalArgumentException e) {
+             //success
+         }
      }
      
      public void testUserObject() {
