@@ -47,7 +47,7 @@ public class TitledPanelAddon extends AbstractComponentAddon {
   protected void addBasicDefaults(LookAndFeelAddons addon, DefaultsList defaults) {
     super.addBasicDefaults(addon, defaults);
     
-    defaults.add(JXTitledPanel.uiClassID, "org.jdesktop.swingx.plaf.metal.MetalTitledPanelUI");
+    defaults.add(JXTitledPanel.uiClassID, "org.jdesktop.swingx.plaf.basic.BasicTitledPanelUI");
     defaults.add("JXTitledPanel.titleFont", UIManagerExt.getSafeFont("Button.font",
             new FontUIResource("Dialog", Font.PLAIN, 12)));
     defaults.add("JXTitledPanel.titleForeground", new ColorUIResource(Color.WHITE));
