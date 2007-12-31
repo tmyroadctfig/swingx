@@ -26,8 +26,6 @@ import java.awt.Font;
 import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.ActionMap;
 import javax.swing.Icon;
@@ -42,20 +40,10 @@ import org.jdesktop.swingx.util.Contract;
  * A specialty "list" for working with UI defaults. Requires adds to be done
  * using key/value pairs. The purpose of this list is to enforce additions as
  * pairs.
- * <p>
- * {@code DefaultsList} validates the {@code value} objects to ensure that
- * {@code UIResource}s are used where appropriate. By default any {@code value}
- * that could be a {@code UIResource} and is not is logged as a warning.
- * However, if the system property {@code "swingx.enableStrictResourceChecking"}
- * is {@code true}, then a runtime exception is thrown instead. This more
- * strigent checking is useful when initially configuring UI delegates or when
- * creating test cases.
  * 
  * @author Karl George Schaefer
  */
 public final class DefaultsList {
-    private static final Logger LOG = Logger.getLogger(DefaultsList.class.getName());
-
     private List<Object> delegate;
 
     /**
@@ -66,23 +54,53 @@ public final class DefaultsList {
     }
 
     /**
+     * Adds a key/value pair to the defaults list. This implementation defers to
+     * {@link #add(Object, Object, boolean)} with {@code enableChecking} set to
+     * {@code true}.
+     * 
+     * @param key
+     *                the key that will be used to query {@code UIDefaults}
+     * @param value
+     *                the value associated with the key
+     * @throws NullPointerException
+     *                 if {@code key} is {@code null}
+     * @throws IllegalArgumentException
+     *                 if {@code value} is a type that should be a
+     *                 {@code UIResource} but is not. For instance, passing in a
+     *                 {@code Border} that is not a {@code UIResource} will
+     *                 cause an exception. This checking must be enabled.
+     */
+    public void add(Object key, Object value) {
+        add(key, value, true);
+    }
+
+    /**
      * Adds a key/value pair to the defaults list.
      * 
      * @param key
      *                the key that will be used to query {@code UIDefaults}
      * @param value
      *                the value associated with the key
+     * @param enableChecking
+     *                if {@code true} then the value is checked to ensure that
+     *                it is a {@code UIResource}, if appropriate
+     * @throws NullPointerException
+     *                 if {@code key} is {@code null}
      * @throws IllegalArgumentException
      *                 if {@code value} is a type that should be a
      *                 {@code UIResource} but is not. For instance, passing in a
      *                 {@code Border} that is not a {@code UIResource} will
-     *                 cause an exception.  This checking must be enabled.
+     *                 cause an exception. This checking must be enabled.
      */
-    public void add(Object key, Object value) {
+    public void add(Object key, Object value, boolean enableChecking) {
+        if (enableChecking) {
+            asUIResource(value, value + " must be a UIResource");
+        }
+        
         delegate.add(Contract.asNotNull(key, "key cannot be null"));
-        delegate.add(asUIResource(value, value + " must be a UIResource"));
+        delegate.add(value);
     }
-
+    
     //TODO move to Contract?
     private static <T> T asUIResource(T value, String message) {
         if (!(value instanceof UIResource)) {
@@ -99,12 +117,7 @@ public final class DefaultsList {
             shouldThrow |= value instanceof Painter;
             
             if (shouldThrow) {
-                if (Boolean.getBoolean("swingx.enableStrictResourceChecking")) {
-                    throw new IllegalArgumentException(message);
-                } else {
-                    //where's the debug level?
-                    LOG.log(Level.WARNING, message);
-                }
+                throw new IllegalArgumentException(message);
             }
         }
         
