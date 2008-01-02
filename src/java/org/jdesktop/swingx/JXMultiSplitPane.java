@@ -24,6 +24,7 @@ package org.jdesktop.swingx;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
@@ -343,12 +344,20 @@ public class JXMultiSplitPane extends JPanel {
         }
         else {
           if (dragDivider.isVertical()) {           
-            dragMin = Math.max( dragMin, dragMin + msl.minimumNodeSize(prevNode).width );
-            dragMax = Math.min( dragMax, dragMax - msl.minimumNodeSize(nextNode).width );
+            dragMin = Math.max( dragMin, dragMin + getMinNodeSize(msl,prevNode).width );
+            dragMax = Math.min( dragMax, dragMax - getMinNodeSize(msl,nextNode).width );
+
+            Dimension maxDim = getMaxNodeSize(msl,prevNode);
+            if ( maxDim != null )
+              dragMax = Math.min( dragMax, prevNodeBounds.x + maxDim.width );
           }
           else {
-            dragMin = Math.max( dragMin, dragMin + msl.minimumNodeSize(prevNode).height );
-            dragMax = Math.min( dragMax, dragMax - msl.minimumNodeSize(nextNode).height );
+            dragMin = Math.max( dragMin, dragMin + getMinNodeSize(msl,prevNode).height );
+            dragMax = Math.min( dragMax, dragMax - getMinNodeSize(msl,nextNode).height );
+
+            Dimension maxDim  = getMaxNodeSize(msl,prevNode);
+            if ( maxDim != null )
+              dragMax = Math.min( dragMax, prevNodeBounds.y + maxDim.height );
           }
         }
                 
@@ -362,6 +371,44 @@ public class JXMultiSplitPane extends JPanel {
 	}
     }
 
+    /**
+     * Set the maximum node size. This method can be overridden to limit the 
+     * size of a node during a drag operation on a divider. When implementing 
+     * this method in a subclass the node instance should be checked, for 
+     * example:
+     * <code>
+     * class MyMultiSplitPane extends JXMultiSplitPane
+     * {
+     *   protected Dimension getMaxNodeSize( MultiSplitLayout msl, Node n )
+     *   {
+     *     if (( n instanceof Leaf ) && ((Leaf)n).getName().equals( "top" ))
+     *       return msl.maximumNodeSize( n );
+     *     return null;
+     *   }
+     * }
+     * </code>
+     * @param msl the MultiSplitLayout used by this pane
+     * @param n the node being resized
+     * @return the maximum size or null (by default) to ignore the maximum size.
+     */
+    protected Dimension getMaxNodeSize( MultiSplitLayout msl, Node n )
+    {
+      return null;
+    }
+
+    /**
+     * Set the minimum node size. This method can be overridden to limit the 
+     * size of a node during a drag operation on a divider. 
+     * @param msl the MultiSplitLayout used by this pane
+     * @param n the node being resized
+     * @return the maximum size or null (by default) to ignore the maximum size.
+     * @see getMaxNodeSize
+     */
+    protected Dimension getMinNodeSize( MultiSplitLayout msl, Node n )
+    {
+      return msl.minimumNodeSize(n);
+    }
+    
     private void repaintDragLimits() {
 	Rectangle damageR = dragDivider.getBounds();
 	if (dragDivider.isVertical()) {
@@ -418,6 +465,7 @@ public class JXMultiSplitPane extends JPanel {
 		repaint();
 	    }
 	}
+	    setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     }
     
     private void cancelDrag() {       
