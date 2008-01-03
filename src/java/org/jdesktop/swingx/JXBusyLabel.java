@@ -21,15 +21,20 @@
 
 package org.jdesktop.swingx;
 
-import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JLabel;
 import javax.swing.Timer;
+import javax.swing.plaf.LabelUI;
+
 import org.jdesktop.swingx.painter.BusyPainter;
 import org.jdesktop.swingx.painter.PainterIcon;
+import org.jdesktop.swingx.plaf.BusyLabelAddon;
+import org.jdesktop.swingx.plaf.BusyLabelUI;
+import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 
 /**
  * <p>A simple circular animation, useful for denoting an action is taking
@@ -64,10 +69,18 @@ import org.jdesktop.swingx.painter.PainterIcon;
  * @author rah003
  */
 public class JXBusyLabel extends JLabel {
+
+    private static final long serialVersionUID = 5979268460848257147L;
     private BusyPainter busyPainter;
     private Timer busy;
-    private int delay = 100;
+    private int delay;
+    /** Status flag to save/restore status of timer when moving component between containers. */
+    private boolean wasBusyOnNotify = false;
     
+    /**
+     * UI Class ID
+     */
+    public final static String uiClassID = "BusyLabelUI";
 
     /**
      * Direction is used to set the initial direction in which the
@@ -84,15 +97,28 @@ public class JXBusyLabel extends JLabel {
     LEFT,
     };
 
+    /**
+     * Sets direction of rotation. <code>Direction.RIGHT</code> is the default 
+     * value. Direction is taken from the very top point so <code>Direction.RIGHT</code> enables rotation clockwise.
+     * @param dir Direction of rotation.
+     */
     public void setDirection(Direction dir) {
         direction = dir;
         busyPainter.setDirection(dir);
     }
+    
     private Direction direction;
+
+    /**
+     * Creates a default JXLoginPane instance
+     */
+    static {
+        LookAndFeelAddons.contribute(new BusyLabelAddon());
+    }
 
     /** Creates a new instance of <code>JXBusyLabel</code> initialized to circular shape in bounds of 26 by 26 points.*/
     public JXBusyLabel() {
-        this(new Dimension(26,26));
+        this(null);
     }
     
     /**
@@ -100,16 +126,36 @@ public class JXBusyLabel extends JLabel {
      * @param dim Preferred size of the label.
      */
     public JXBusyLabel(Dimension dim) {
-        busyPainter = new BusyPainter(dim.height);
-        initPainter(dim);
+        super();
+        createBusyPainter(dim);
     }
 
-    private void initPainter(Dimension dim) {
-        busyPainter.setBaseColor(Color.LIGHT_GRAY);
-        busyPainter.setHighlightColor(getForeground());
+    protected void initPainter(Dimension dim) {
         PainterIcon icon = new PainterIcon(dim);
         icon.setPainter(busyPainter);
+        this.setPreferredSize(dim);
         this.setIcon(icon);
+    }
+    /**
+     * Create and return an painter to use for the Label. This may be overridden
+     * to return any painter you like.
+     * @param dim Painter size.
+     */
+    protected void createBusyPainter(Dimension dim) {
+        BusyLabelUI ui = getUI() == null ? null : (BusyLabelUI)getUI();
+        if (ui != null) {
+            busyPainter = ui.getBusyPainter();
+            delay = ui.getDelay();
+        }
+        if (busyPainter != null) {
+            if (dim == null) {
+                Rectangle rt = busyPainter.getTrajectory().getBounds();
+                Rectangle rp = busyPainter.getPointShape().getBounds();
+                int max = Math.max(rp.width, rp.height);
+                dim = new Dimension(rt.width + max, rt.height + max);
+            }
+            initPainter(dim);
+        }
     }
     
     /**
@@ -172,6 +218,8 @@ public class JXBusyLabel extends JLabel {
     
     @Override
     public void removeNotify() {
+        // fix for #698
+        wasBusyOnNotify = isBusy();
     	// fix for #626
     	stopAnimation();
     	super.removeNotify();
@@ -180,8 +228,11 @@ public class JXBusyLabel extends JLabel {
     @Override
     public void addNotify() {
     	super.addNotify();
-    	// fix for #626
-    	startAnimation();
+        // fix for #698
+        if (wasBusyOnNotify) {
+            // fix for #626
+            startAnimation();
+        }
     }
 
     protected void frameChanged() {
@@ -223,4 +274,29 @@ public class JXBusyLabel extends JLabel {
             firePropertyChange("delay", old, getDelay());
         }
     }
+    //------------------------------------------------------------- UI Logic
+    
+    /**
+     * Notification from the <code>UIManager</code> that the L&F has changed.
+     * Replaces the current UI object with the latest version from the
+     * <code>UIManager</code>.
+     *
+     * @see javax.swing.JComponent#updateUI
+     */
+    public void updateUI() {
+        setUI((LabelUI) LookAndFeelAddons.getUI(this, BusyLabelUI.class));
+    }
+
+    /**
+     * Returns the name of the L&F class that renders this component.
+     *
+     * @return the string {@link #uiClassID}
+     * @see javax.swing.JComponent#getUIClassID
+     * @see javax.swing.UIDefaults#getUI
+     */
+    public String getUIClassID() {
+        return uiClassID;
+    }
+
+
 }

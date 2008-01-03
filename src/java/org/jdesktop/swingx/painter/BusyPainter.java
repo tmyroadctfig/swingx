@@ -70,20 +70,29 @@ public class BusyPainter<T> extends AbstractPainter<T> {
      * @param height Painter height.
      */
     public BusyPainter(int height) {
-        float barLength = (height * 8) / 26;
-        float barWidth = 4;
-        trajectory = new Ellipse2D.Float(barLength / 2, barLength / 2, height
-                - barLength, height - barLength);
-        pointShape = new RoundRectangle2D.Float(0, 0, barLength, barWidth,
-                barWidth, barWidth);
+        this(new RoundRectangle2D.Float(0, 0, (height * 8) / 26, 4,
+                4, 4),
+        new Ellipse2D.Float(((height * 8) / 26) / 2, ((height * 8) / 26) / 2, height
+                - ((height * 8) / 26), height - ((height * 8) / 26)));
     }
 
     /**
-     * Initialized painter to the specified trajectory and and point shape. Bounds are dynamically calculated to so the specified trajectory fits in.
+     * Initializes painter to the specified trajectory and and point shape. Bounds are dynamically calculated to so the specified trajectory fits in.
      * @param point Point shape.
      * @param trajectory Trajectory shape.
      */
     public BusyPainter(Shape point, Shape trajectory) {
+        init(point, trajectory, Color.LIGHT_GRAY, Color.BLACK);
+    }
+
+    /**
+     * Initializes painter to provided shapes and default colors.
+     * @param point Point shape.
+     * @param trajectory Trajectory shape.
+     */
+    protected void init(Shape point, Shape trajectory, Color baseColor, Color highlightColor) {
+        this.baseColor = baseColor;
+        this.highlightColor = highlightColor;
         this.pointShape = point;
         this.trajectory = trajectory;
     }
@@ -93,7 +102,6 @@ public class BusyPainter<T> extends AbstractPainter<T> {
      */
     @Override
     protected void doPaint(Graphics2D g, T t, int width, int height) {
-        g.setColor(Color.GRAY);
         PathIterator pi = trajectory.getPathIterator(null);
         float[] coords = new float[6];
         Float cp = new Point2D.Float();
