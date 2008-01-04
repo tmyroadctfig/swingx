@@ -21,6 +21,8 @@
 
 package org.jdesktop.swingx.plaf;
 
+import java.awt.Dimension;
+
 import org.jdesktop.swingx.painter.BusyPainter;
 
 /**
@@ -32,7 +34,7 @@ public interface BusyLabelUI {
      * @return The BusyPainter for the JXBusyLabel. If
      * this method returns null, then no progress indication will be shown by busy label.
      */
-    public BusyPainter getBusyPainter();
+    public BusyPainter getBusyPainter(Dimension dim);
     
     /**
      * Delay between moving from one point to another. The exact timing will be close to the selected value but is not guearantied to be precise (subject to the timing precision of underlaying jvm).

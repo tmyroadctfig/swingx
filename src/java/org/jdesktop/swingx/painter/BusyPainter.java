@@ -70,10 +70,18 @@ public class BusyPainter<T> extends AbstractPainter<T> {
      * @param height Painter height.
      */
     public BusyPainter(int height) {
-        this(new RoundRectangle2D.Float(0, 0, (height * 8) / 26, 4,
-                4, 4),
-        new Ellipse2D.Float(((height * 8) / 26) / 2, ((height * 8) / 26) / 2, height
-                - ((height * 8) / 26), height - ((height * 8) / 26)));
+        this(getScaledDefaultPoint(height),
+        getScaledDefaultTrajectory(height));
+    }
+
+    protected static Shape getScaledDefaultTrajectory(int height) {
+        return new Ellipse2D.Float(((height * 8) / 26) / 2, ((height * 8) / 26) / 2, height
+                - ((height * 8) / 26), height - ((height * 8) / 26));
+    }
+
+    protected static Shape getScaledDefaultPoint(int height) {
+        return new RoundRectangle2D.Float(0, 0, (height * 8) / 26, 4,
+                4, 4);
     }
 
     /**

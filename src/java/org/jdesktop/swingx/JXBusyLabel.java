@@ -144,7 +144,7 @@ public class JXBusyLabel extends JLabel {
     protected void createBusyPainter(Dimension dim) {
         BusyLabelUI ui = getUI() == null ? null : (BusyLabelUI)getUI();
         if (ui != null) {
-            busyPainter = ui.getBusyPainter();
+            busyPainter = ui.getBusyPainter(dim);
             delay = ui.getDelay();
         }
         if (busyPainter != null) {

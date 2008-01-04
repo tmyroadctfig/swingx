@@ -20,6 +20,7 @@
  */
 package org.jdesktop.swingx.plaf.basic;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Shape;
 
 import javax.swing.JComponent;
@@ -47,12 +48,12 @@ public class BasicBusyLabelUI extends BasicLabelUI implements BusyLabelUI {
     return new BasicBusyLabelUI((JXBusyLabel)c);
   }
 
-    public BusyPainter getBusyPainter() {
+    public BusyPainter getBusyPainter(final Dimension dim) {
         BusyPainter p = new BusyPainter() {
             @Override
             protected void init(Shape point, Shape trajectory, Color b, Color h) {
-                super.init((Shape) UIManager.get("JXBusyLabel.pointShape"), 
-                        (Shape) UIManager.get("JXBusyLabel.trajectoryShape"),
+                super.init(dim == null ? (Shape) UIManager.get("JXBusyLabel.pointShape") : getScaledDefaultPoint(dim.height), 
+                        dim == null ? (Shape) UIManager.get("JXBusyLabel.trajectoryShape") : getScaledDefaultTrajectory(dim.height),
                         UIManagerExt.getSafeColor("JXBusyLabel.baseColor", Color.LIGHT_GRAY),
                         UIManagerExt.getSafeColor("JXBusyLabel.highlightColor", Color.BLACK));
             }
