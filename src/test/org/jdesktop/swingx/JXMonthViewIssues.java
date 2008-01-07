@@ -21,13 +21,16 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
@@ -37,9 +40,15 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jdesktop.swingx.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.calendar.CalendarUtils;
+import org.jdesktop.swingx.combobox.ListComboBoxModel;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
 import org.jdesktop.swingx.test.XTestUtils;
@@ -69,7 +78,9 @@ public class JXMonthViewIssues extends InteractiveTestCase {
       JXMonthViewIssues  test = new JXMonthViewIssues();
       try {
 //          test.runInteractiveTests();
-        test.runInteractiveTests("interactive.*Locale.*");
+//        test.runInteractiveTests("interactive.*Locale.*");
+          test.runInteractiveTests("interactive.*AutoScroll.*");
+//        test.runInteractiveTests("interactive.*Blank.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -78,6 +89,197 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     @SuppressWarnings("unused")
     private Calendar calendar;
  
+    /**
+     * #702-swingx: no days shown?
+     * 
+     * Not reproducible.
+     */
+    public void interactiveBlankMonthViewOnAdd() {
+       final JComponent comp = Box.createHorizontalBox();
+       comp.add(new JXMonthView());
+       final JXFrame frame = wrapInFrame(comp, "blank view on add");
+       Action next = new AbstractActionExt("new monthView") {
+
+           public void actionPerformed(ActionEvent e) {
+               comp.add(new JXMonthView());
+               frame.pack();
+           }
+           
+       };
+       addAction(frame, next);
+       frame.pack();
+       frame.setVisible(true);
+    };
+    
+    /**
+     * #703-swingx: set date to first of next doesn't update the view.
+     * 
+     * Behaviour is consistent with core components. Except that it is doing 
+     * too much: revalidate most probably shouldn't change the scrolling state?
+     * 
+     */
+    public void interactiveAutoScrollOnSelectionMonthView() {
+        final JXMonthView us = new JXMonthView();
+        us.setSelectionMode(JXMonthView.SelectionMode.SINGLE_INTERVAL_SELECTION);
+        final Calendar today = Calendar.getInstance();
+        CalendarUtils.endOfMonth(today);
+        us.setSelectedDate(today.getTime());
+        JXFrame frame = wrapInFrame(us, "first day of next month");
+        Action nextMonthInterval = new AbstractActionExt("next month interval") {
+
+            public void actionPerformed(ActionEvent e) {
+                if (us.isSelectionEmpty()) return;
+                today.setTime(us.getSelectedDate());
+                today.add(Calendar.DAY_OF_MONTH, -20);
+                Date start = today.getTime();
+                today.add(Calendar.DAY_OF_MONTH, +40);
+                us.setSelectionInterval(start, today.getTime());
+                // shouldn't effect scrolling state
+                us.revalidate();
+                // client code must trigger 
+//                us.ensureDateVisible(start.getTime());
+            }
+            
+        };
+        addAction(frame, nextMonthInterval);
+        Action next = new AbstractActionExt("next month") {
+
+            public void actionPerformed(ActionEvent e) {
+                if (us.isSelectionEmpty()) return;
+                if (!CalendarUtils.isEndOfMonth(today)) {
+                    CalendarUtils.endOfMonth(today);
+                    
+                }
+                today.add(Calendar.DAY_OF_MONTH, 1);
+                us.setSelectedDate(today.getTime());
+                LOG.info("firstDisplayed before: " + new Date(us.getFirstDisplayedDate()));
+                
+                // shouldn't effect scrolling state
+                us.revalidate();
+                LOG.info("firstDisplayed: " + new Date(us.getFirstDisplayedDate()));
+                // client code must trigger 
+//                us.ensureDateVisible(today.getTimeInMillis());
+            }
+            
+        };
+        addAction(frame, next);
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    /**
+     * #703-swingx: select date doesn't ensure visibility of selected.
+     * 
+     * compare with core list: doesn't scroll as well.
+     * 
+     */
+    public void interactiveAutoScrollOnSelectionList() {
+        // add hoc model
+        SortedSet<Date> dates = getDates();
+        
+        final JXList us = new JXList(new ListComboBoxModel<Date>(new ArrayList<Date>(dates)));
+        us.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        JXFrame frame = wrapWithScrollingInFrame(us, "list - autoscroll on selection");
+        Action next = new AbstractActionExt("select last + 1") {
+
+            public void actionPerformed(ActionEvent e) {
+                int last = us.getLastVisibleIndex();
+                us.setSelectedIndex(last + 1);
+                // shouldn't effect scrolling state
+                us.revalidate();
+                // client code must trigger 
+//                us.ensureIndexIsVisible(last+1);
+            }
+            
+        };
+        addAction(frame, next);
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    /**
+     * #703-swingx: set date to first of next doesn't "scroll".
+     * 
+     * compare with core tree: doesn't scroll as well.
+     * 
+     */
+    public void interactiveAutoScrollOnSelectionTree() {
+        // add hoc model
+        SortedSet<Date> dates = getDates();
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("dates");
+        for (Date date : dates) {
+            root.add(new DefaultMutableTreeNode(date));
+        }
+        
+        final JXTree us = new JXTree(root);
+        JXFrame frame = wrapWithScrollingInFrame(us, "tree - autoscroll on selection");
+        Action next = new AbstractActionExt("select last + 1") {
+
+            public void actionPerformed(ActionEvent e) {
+                int last = us.getLeadSelectionRow();
+                us.setSelectionRow(last + 1);
+                // shouldn't effect scrolling state
+                us.revalidate();
+                // client code must trigger 
+//                us.scrollRowToVisible(last + 1);
+            }
+            
+        };
+        addAction(frame, next);
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    /**
+     * #703-swingx: set date to first of next doesn't "scroll".
+     * 
+     * compare with core tree: doesn't scroll as well.
+     * 
+     */
+    public void interactiveAutoScrollOnSelectionTable() {
+        // add hoc model
+        SortedSet<Date> dates = getDates();
+        DefaultTableModel model = new DefaultTableModel(0, 1);
+        for (Date date : dates) {
+            model.addRow(new Object[] {date});
+        }
+        
+        final JXTable us = new JXTable(model);
+        JXFrame frame = wrapWithScrollingInFrame(us, "table - autoscroll on selection");
+        Action next = new AbstractActionExt("select last + 1") {
+
+            public void actionPerformed(ActionEvent e) {
+                int last = us.getSelectedRow();
+                us.setRowSelectionInterval(last + 1, last + 1);
+                // shouldn't effect scrolling state
+                us.revalidate();
+                // client code must trigger 
+//                us.scrollRowToVisible(last + 1);
+            }
+            
+        };
+        addAction(frame, next);
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    /**
+     * Convenience to get a bunch of dates.
+     * 
+     * @return
+     */
+    private SortedSet<Date> getDates() {
+        JXMonthView source = new JXMonthView();
+        source.setSelectionMode(JXMonthView.SelectionMode.SINGLE_INTERVAL_SELECTION);
+        final Calendar today = Calendar.getInstance();
+        Date start = today.getTime();
+        today.add(Calendar.DAY_OF_MONTH, +40);
+        source.setSelectionInterval(start, today.getTime());
+        SortedSet<Date> dates = source.getSelection();
+        return dates;
+    }
+    
+    
     /**
      * #681-swingx: first row overlaps days.
      * 
@@ -285,6 +487,66 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     }
 
 //----------------------
+    
+    /**
+     * #703-swingx: set date to first of next doesn't update the view.
+     * 
+     * Behaviour is consistent with core components. Except that it is doing 
+     * too much: revalidate most probably shouldn't change the scrolling state?
+     * 
+     */
+    public void testAutoScrollOnSelection() {
+        JXMonthView us = new JXMonthView();
+        final Calendar today = Calendar.getInstance();
+        CalendarUtils.endOfMonth(today);
+        us.setSelectedDate(today.getTime());
+        long first = us.getFirstDisplayedDate();
+        today.add(Calendar.DAY_OF_MONTH, 1);
+        us.setSelectedDate(today.getTime());
+        assertEquals(first, us.getFirstDisplayedDate());
+        fail("expected behaviour but test is unsafe as long as the revalidate doesn't fail");
+    }
+    
+    /**
+     * #703-swingx: set date to first of next doesn't update the view.
+     * 
+     * Behaviour is consistent with core components. Except that it is doing 
+     * too much: revalidate most probably shouldn't change the scrolling state?
+     * 
+     * Note: this test is inconclusive - expected to fail because the Handler.layoutContainer
+     * actually triggers a ensureVisible (which it shouldn't) which changes the 
+     * firstDisplayedDate, but the change has not yet happened in the invoke. Can be seen
+     * while debugging, though. 
+     * 
+     * 
+     * @throws InvocationTargetException 
+     * @throws InterruptedException 
+     * 
+     */
+    public void testAutoScrollOnSelectionRevalidate() throws InterruptedException, InvocationTargetException {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        final JXMonthView us = new JXMonthView();
+        final Calendar today = Calendar.getInstance();
+        CalendarUtils.endOfMonth(today);
+        us.setSelectedDate(today.getTime());
+        final long first = us.getFirstDisplayedDate();
+        JXFrame frame = showInFrame(us, "");
+        today.add(Calendar.DAY_OF_MONTH, 1);
+        us.setSelectedDate(today.getTime());
+        us.revalidate();
+        LOG.info("firstdisplayed: " + new Date(us.getFirstDisplayedDate()));
+        SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+                LOG.info("firstdisplayed: " + new Date(us.getFirstDisplayedDate()));
+                assertEquals(first, us.getFirstDisplayedDate());
+                fail("weird (threading issue?): the firstDisplayed is changed in layoutContainer - not testable here");
+            }
+        });
+    }
     
    
    /**
