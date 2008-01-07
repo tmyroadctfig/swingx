@@ -110,6 +110,72 @@ public class JXMonthViewIssues extends InteractiveTestCase {
        frame.pack();
        frame.setVisible(true);
     };
+
+    
+    /**
+     * #703-swingx: set date to first of next doesn't update the view.
+     * 
+     * Behaviour is consistent with core components. Except that it is doing 
+     * too much: revalidate most probably shouldn't change the scrolling state?
+     * 
+     * Misbehaviour here : multi-month spanning selection, travers two month into the future and
+     * resize the frame - jumps back to first. Auto-scroll in the delegates
+     * selection listener would have a similar effect.
+     * 
+     */
+    public void interactiveAutoScrollOnResize() {
+        final JXMonthView us = new JXMonthView();
+        us.setTraversable(true);
+        us.setSelectionMode(JXMonthView.SelectionMode.SINGLE_INTERVAL_SELECTION);
+        final Calendar today = Calendar.getInstance();
+        CalendarUtils.endOfMonth(today);
+        Date start = today.getTime();
+        today.add(Calendar.DAY_OF_MONTH, 60);
+        us.setSelectionInterval(start, today.getTime());
+        JXFrame frame = wrapInFrame(us, "resize");
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    /**
+     * #703-swingx: set date to first of next doesn't update the view.
+     * 
+     * Behaviour is consistent with core components. Except that it is doing 
+     * too much: revalidate most probably shouldn't change the scrolling state?
+     * 
+     * Simulated misbehaviour here: multi-month spanning selection, travers into the future and
+     * add selection at the end - jumps back to first. Auto-scroll in the delegates
+     * selection listener would have the effect.
+     * 
+     */
+    public void interactiveAutoScrollOnSelectionSim() {
+        final JXMonthView us = new JXMonthView();
+        us.setTraversable(true);
+        us.setSelectionMode(JXMonthView.SelectionMode.SINGLE_INTERVAL_SELECTION);
+        final Calendar today = Calendar.getInstance();
+        CalendarUtils.endOfMonth(today);
+        Date start = today.getTime();
+        today.add(Calendar.DAY_OF_MONTH, 60);
+        us.setSelectionInterval(start, today.getTime());
+        JXFrame frame = wrapInFrame(us, "resize");
+        Action nextMonthInterval = new AbstractActionExt("add selected") {
+
+            public void actionPerformed(ActionEvent e) {
+                if (us.isSelectionEmpty()) return;
+                Date start = us.getSelectedDate();
+                
+                today.setTime(us.getSelection().last());
+                today.add(Calendar.DAY_OF_MONTH, 5);
+                us.addSelectionInterval(start, today.getTime());
+                // here we simulate an auto-scroll
+                us.ensureDateVisible(start.getTime());
+            }
+            
+        };
+        addAction(frame, nextMonthInterval);
+        frame.pack();
+        frame.setVisible(true);
+    }
     
     /**
      * #703-swingx: set date to first of next doesn't update the view.
@@ -123,6 +189,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         us.setSelectionMode(JXMonthView.SelectionMode.SINGLE_INTERVAL_SELECTION);
         final Calendar today = Calendar.getInstance();
         CalendarUtils.endOfMonth(today);
+        today.add(Calendar.DAY_OF_MONTH, 1);
         us.setSelectedDate(today.getTime());
         JXFrame frame = wrapInFrame(us, "first day of next month");
         Action nextMonthInterval = new AbstractActionExt("next month interval") {
