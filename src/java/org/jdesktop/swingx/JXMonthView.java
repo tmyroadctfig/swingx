@@ -292,9 +292,10 @@ public class JXMonthView extends JComponent {
             this.model = new DefaultDateSelectionModel();
         }
 
-        setLocale(locale);
         // install the controller
         updateUI();
+        // JW: something fishy going on - see #702-swingx and related discussion
+        setLocale(locale);
 
 //        if (cal == null)
         // Set up calendar instance
