@@ -395,29 +395,6 @@ public class JXMonthViewTest extends MockObjectTestCase {
      * Issue #618-swingx: JXMonthView displays problems with non-default
      * timezones.
      * 
-     * Here: test today notification.
-     */
-    public void testTimeZoneChangeTodayNotification() {
-        JXMonthView monthView = new JXMonthView();
-        TimeZone other = getTimeZone(monthView.getTimeZone(), THREE_HOURS);
-        PropertyChangeReport report = new PropertyChangeReport();
-        monthView.addPropertyChangeListener(report);
-        monthView.setTimeZone(other);
-        Calendar calendar = Calendar.getInstance();
-        CalendarUtils.startOfDay(calendar);
-        Date today = calendar.getTime();
-        calendar.setTimeZone(other);
-        CalendarUtils.startOfDay(calendar);
-        Date otherToday = calendar.getTime(); 
-            // sanity
-        assertFalse(today.equals(otherToday));
-        TestUtils.assertPropertyChangeEvent(report, 
-                "today", today.getTime(), otherToday.getTime(), false);
-    }
-    /**
-     * Issue #618-swingx: JXMonthView displays problems with non-default
-     * timezones.
-     * 
      * Here: test that the first displayed date is offset by offset diff of 
      * timezones.
      * Configure the monthView with a fixed timezone to clear up the mist ...

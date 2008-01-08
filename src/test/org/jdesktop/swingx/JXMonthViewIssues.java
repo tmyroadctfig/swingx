@@ -52,6 +52,8 @@ import org.jdesktop.swingx.combobox.ListComboBoxModel;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
 import org.jdesktop.swingx.test.XTestUtils;
+import org.jdesktop.test.PropertyChangeReport;
+import org.jdesktop.test.TestUtils;
 
 /**
  * Test to expose known issues with JXMonthView.
@@ -78,8 +80,8 @@ public class JXMonthViewIssues extends InteractiveTestCase {
       JXMonthViewIssues  test = new JXMonthViewIssues();
       try {
 //          test.runInteractiveTests();
-//        test.runInteractiveTests("interactive.*Locale.*");
-          test.runInteractiveTests("interactive.*AutoScroll.*");
+        test.runInteractiveTests("interactive.*Locale.*");
+//          test.runInteractiveTests("interactive.*AutoScroll.*");
 //        test.runInteractiveTests("interactive.*Blank.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
@@ -615,6 +617,30 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         });
     }
     
+    /**
+     * Issue #618-swingx: JXMonthView displays problems with non-default
+     * timezones.
+     * 
+     * Here: test today notification.
+     */
+    public void testTimeZoneChangeTodayNotification() {
+        JXMonthView monthView = new JXMonthView();
+        TimeZone other = getTimeZone(monthView.getTimeZone(), THREE_HOURS);
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.setTimeZone(other);
+        Calendar calendar = Calendar.getInstance();
+        CalendarUtils.startOfDay(calendar);
+        Date today = calendar.getTime();
+        calendar.setTimeZone(other);
+        CalendarUtils.startOfDay(calendar);
+        Date otherToday = calendar.getTime(); 
+            // sanity
+        assertFalse(today.equals(otherToday));
+        TestUtils.assertPropertyChangeEvent(report, 
+                "today", today.getTime(), otherToday.getTime(), false);
+        fail("spurious failures - probably wrong assumption in Timezone math");
+    }
    
    /**
     * characterize calendar: minimal days in first week
