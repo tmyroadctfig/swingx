@@ -82,8 +82,8 @@ public class JXMonthViewIssues extends InteractiveTestCase {
       try {
 //          test.runInteractiveTests();
 //        test.runInteractiveTests("interactive.*Locale.*");
-//          test.runInteractiveTests("interactive.*AutoScroll.*");
-        test.runInteractiveTests("interactive.*UpdateUI.*");
+          test.runInteractiveTests("interactive.*AutoScroll.*");
+//        test.runInteractiveTests("interactive.*UpdateUI.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -157,6 +157,16 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         today.add(Calendar.DAY_OF_MONTH, 60);
         us.setSelectionInterval(start, today.getTime());
         JXFrame frame = wrapInFrame(us, "resize");
+        // quick check if lastDisplayed is updated on resize
+        Action printLast = new AbstractActionExt("log last") {
+
+            public void actionPerformed(ActionEvent e) {
+                
+                LOG.info("last updated?" + new Date(us.getLastDisplayedDate()));
+            }
+            
+        };
+        addAction(frame, printLast);
         frame.pack();
         frame.setVisible(true);
     }
@@ -590,6 +600,22 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     };
 
     
+    public void testLastDisplayed() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        JXMonthView monthView = new JXMonthView();
+        JXFrame frame = new JXFrame();
+        frame.add(monthView);
+        frame.pack();
+        long last = monthView.getLastDisplayedDate();
+        frame.setSize(monthView.getPreferredSize().width * 3, monthView.getPreferredSize().height + 50);
+        frame.validate();
+        assertEquals(new Date(last), new Date(monthView.getLastDisplayedDate()));
+        
+    }
 
     /**
      * #703-swingx: set date to first of next doesn't update the view.
@@ -636,15 +662,17 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         final Calendar today = Calendar.getInstance();
         CalendarUtils.endOfMonth(today);
         us.setSelectedDate(today.getTime());
+        final JXFrame frame = showInFrame(us, "");
         final long first = us.getFirstDisplayedDate();
-        JXFrame frame = showInFrame(us, "");
         today.add(Calendar.DAY_OF_MONTH, 1);
         us.setSelectedDate(today.getTime());
-        us.revalidate();
-        LOG.info("firstdisplayed: " + new Date(us.getFirstDisplayedDate()));
         SwingUtilities.invokeAndWait(new Runnable() {
             public void run() {
-                LOG.info("firstdisplayed: " + new Date(us.getFirstDisplayedDate()));
+                us.revalidate();
+                // need to validate frame - why?
+                frame.validate();
+                assertEquals("firstDisplayed must not be changed on revalidate", 
+                        new Date(first), new Date(us.getFirstDisplayedDate()));
                 assertEquals(first, us.getFirstDisplayedDate());
                 fail("weird (threading issue?): the firstDisplayed is changed in layoutContainer - not testable here");
             }
