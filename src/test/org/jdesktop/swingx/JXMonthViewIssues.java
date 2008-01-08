@@ -42,6 +42,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -90,7 +91,28 @@ public class JXMonthViewIssues extends InteractiveTestCase {
   }
     @SuppressWarnings("unused")
     private Calendar calendar;
- 
+
+    
+    /**
+     * Issue #706-swingx: picker doesn't update monthView.
+     * 
+     * Here: visualize weird side-effects of monthView.updateUI - year 
+     * incremented.
+     */
+    public void interactiveUpdateUIMonthView() {
+        final JXMonthView monthView = new JXMonthView();
+        final JXFrame frame = showInFrame(monthView, "MonthView update ui");
+        Action action = new AbstractActionExt("toggleUI") {
+            public void actionPerformed(ActionEvent e) {
+                monthView.updateUI();
+//                SwingUtilities.updateComponentTreeUI(frame);
+            }
+            
+        };
+        addAction(frame, action);
+        frame.pack();
+    };
+
     /**
      * #702-swingx: no days shown?
      * 
@@ -556,7 +578,35 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     }
 
 //----------------------
-    
+
+    /**
+     * Issue #706-swingx: picker doesn't update monthView.
+     * 
+     * Here: visualize weird side-effects of monthView.updateUI - year 
+     * incremented.
+     */
+    public void testUpdateUIFirst() {
+        final JXMonthView monthView = new JXMonthView();
+        long first = monthView.getFirstDisplayedDate();
+        monthView.updateUI();
+        assertEquals(first, monthView.getFirstDisplayedDate());
+    };
+
+
+    /**
+     * Issue #706-swingx: picker doesn't update monthView.
+     * 
+     * Here: visualize weird side-effects of monthView.updateUI - year 
+     * incremented.
+     */
+    public void testUpdateUILast() {
+        final JXMonthView monthView = new JXMonthView();
+        long first = monthView.getLastDisplayedDate();
+        monthView.updateUI();
+        assertEquals(first, monthView.getLastDisplayedDate());
+    };
+
+
     /**
      * #703-swingx: set date to first of next doesn't update the view.
      * 
