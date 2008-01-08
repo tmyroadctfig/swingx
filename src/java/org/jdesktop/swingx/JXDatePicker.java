@@ -317,6 +317,10 @@ public class JXDatePicker extends JComponent {
     @Override
     public void updateUI() {
         setUI((DatePickerUI) LookAndFeelAddons.getUI(this, DatePickerUI.class));
+        // JW: quick hack around #706-swingx - monthView not updated
+        // not sure if this here is the correct place nor 
+        // the correct method - SwingUtilities.updateComponentTree might be better
+        getMonthView().updateUI();
         invalidate();
     }
 

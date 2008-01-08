@@ -22,12 +22,17 @@
 package org.jdesktop.swingx;
 
 import java.awt.GraphicsEnvironment;
+import java.awt.event.ActionEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Calendar;
 import java.util.logging.Logger;
 
+import javax.swing.Action;
+import javax.swing.Box;
+import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
+import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 
 /**
@@ -56,6 +61,28 @@ public class JXMonthViewVisualTest extends InteractiveTestCase {
 
     @SuppressWarnings("unused")
     private Calendar calendar;
+
+    /**
+     * #702-swingx: no days shown?
+     * 
+     * Not reproducible.
+     */
+    public void testBlankMonthViewOnAdd() {
+       final JComponent comp = Box.createHorizontalBox();
+       comp.add(new JXMonthView());
+       final JXFrame frame = wrapInFrame(comp, "blank view on add");
+       Action next = new AbstractActionExt("new monthView") {
+
+           public void actionPerformed(ActionEvent e) {
+               comp.add(new JXMonthView());
+               frame.pack();
+           }
+           
+       };
+       addAction(frame, next);
+       frame.pack();
+       frame.setVisible(true);
+    };
 
 //----------------------
     

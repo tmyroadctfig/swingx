@@ -77,13 +77,13 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     private static final int ONE_DAY    = 24*ONE_HOUR;
 
     public static void main(String[] args) {
-//      setSystemLF(true);
+      setSystemLF(true);
       JXMonthViewIssues  test = new JXMonthViewIssues();
       try {
 //          test.runInteractiveTests();
-        test.runInteractiveTests("interactive.*Locale.*");
+//        test.runInteractiveTests("interactive.*Locale.*");
 //          test.runInteractiveTests("interactive.*AutoScroll.*");
-//        test.runInteractiveTests("interactive.*Blank.*");
+        test.runInteractiveTests("interactive.*UpdateUI.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -578,34 +578,18 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     }
 
 //----------------------
-
+    
     /**
-     * Issue #706-swingx: picker doesn't update monthView.
+     * Issue #708-swingx: updateUI changes state.
      * 
-     * Here: visualize weird side-effects of monthView.updateUI - year 
-     * incremented.
+     * Here: test that today is unchanged.
      */
-    public void testUpdateUIFirst() {
+    public void testUpdateUIToday() {
         final JXMonthView monthView = new JXMonthView();
-        long first = monthView.getFirstDisplayedDate();
-        monthView.updateUI();
-        assertEquals(first, monthView.getFirstDisplayedDate());
+        fail("today is lost in ui - no way to access as it is notification-only property");
     };
 
-
-    /**
-     * Issue #706-swingx: picker doesn't update monthView.
-     * 
-     * Here: visualize weird side-effects of monthView.updateUI - year 
-     * incremented.
-     */
-    public void testUpdateUILast() {
-        final JXMonthView monthView = new JXMonthView();
-        long first = monthView.getLastDisplayedDate();
-        monthView.updateUI();
-        assertEquals(first, monthView.getLastDisplayedDate());
-    };
-
+    
 
     /**
      * #703-swingx: set date to first of next doesn't update the view.

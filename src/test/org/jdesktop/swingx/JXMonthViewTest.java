@@ -80,6 +80,31 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JComponent.setDefaultLocale(componentLocale);
     }
 
+    /**
+     * Issue #708-swingx: updateUI changes state.
+     * 
+     * Here: test that firstDisplayedDate is unchanged.
+     */
+    public void testUpdateUIFirst() {
+        final JXMonthView monthView = new JXMonthView();
+        long first = monthView.getFirstDisplayedDate();
+        monthView.updateUI();
+        assertEquals(first, monthView.getFirstDisplayedDate());
+    };
+
+
+    /**
+     * Issue #708-swingx: updateUI changes state.
+     * 
+     * Here: test that lastDisplayedDate is unchanged.
+     */
+    public void testUpdateUILast() {
+        final JXMonthView monthView = new JXMonthView();
+        long first = monthView.getLastDisplayedDate();
+        monthView.updateUI();
+        assertEquals(first, monthView.getLastDisplayedDate());
+    };
+
 
     /**
      * Issue #660-swingx: JXMonthView must protect its calendar.

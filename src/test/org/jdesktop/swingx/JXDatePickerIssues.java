@@ -27,8 +27,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.logging.Logger;
 
@@ -44,10 +44,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
+import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.DatePickerFormatter;
 import org.jdesktop.swingx.calendar.DateUtils;
-import org.jdesktop.swingx.plaf.UIManagerExt;
 
 /**
  * Known issues of <code>JXDatePicker</code> and picker related 
@@ -64,7 +66,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         JXDatePickerIssues  test = new JXDatePickerIssues();
         try {
 //            test.runInteractiveTests();
-          test.runInteractiveTests("interactive.*Locale.*");
+          test.runInteractiveTests("interactive.*UpdateUI.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -74,6 +76,75 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 
     private Calendar calendar;
 
+    /**
+     * Issue #706-swingx: picker doesn't update monthView.
+     * 
+     */
+    public void interactiveUpdateUIPickerMonthView() {
+        final JXDatePicker picker = new JXDatePicker();
+        JXFrame frame = showInFrame(picker, "picker update ui");
+        Action action = new AbstractActionExt("toggleUI") {
+            public void actionPerformed(ActionEvent e) {
+                String uiClass = (String) UIManager.get(JXMonthView.uiClassID);
+                boolean custom = uiClass.indexOf("Custom") > 0;
+                if (!custom) {
+                    UIManager.put(JXMonthView.uiClassID, "org.jdesktop.swingx.test.CustomMonthViewUI");
+                } else {
+                    UIManager.put(JXMonthView.uiClassID, null);
+                }
+//                picker.setMonthView(new JXMonthView());
+                picker.updateUI();
+                custom = !custom;
+            }
+            
+        };
+        addAction(frame, action);
+        frame.pack();
+    };
+    
+    /**
+     * Issue #706-swingx: picker doesn't update monthView.
+     * 
+     */
+    public void interactiveUpdateUIMonthView() {
+        final JXMonthView monthView = new JXMonthView();
+//        picker.setSelectedDate(new Date());
+        final JXFrame frame = showInFrame(monthView, "MonthView update ui");
+        Action action = new AbstractActionExt("toggleUI") {
+            public void actionPerformed(ActionEvent e) {
+                String uiClass = (String) UIManager.get(JXMonthView.uiClassID);
+                boolean custom = uiClass.indexOf("Custom") > 0;
+                if (!custom) {
+                    UIManager.put(JXMonthView.uiClassID, "org.jdesktop.swingx.test.CustomMonthViewUI");
+                } else {
+                    UIManager.put(JXMonthView.uiClassID, null);
+                }
+                monthView.updateUI();
+//                SwingUtilities.updateComponentTreeUI(frame);
+                custom = !custom;
+            }
+            
+        };
+        addAction(frame, action);
+        frame.pack();
+    };
+    
+    /**
+     * Issue #??-swingx: DatePicker should have empty constructor which doesn't select.
+     * 
+     * Plus deprecate constructors with long - replace by Date parameters.
+     * Deprecate other methods taking long.
+     */
+    public void interactiveNullDate() {
+        JComponent comp = Box.createVerticalBox();
+        comp.add(new JLabel("setDate(null)"));
+        JXDatePicker picker = new JXDatePicker();
+        picker.setDate(null);
+        comp.add(picker);
+        comp.add(new JLabel("initial -1"));
+        comp.add(new JXDatePicker(-1));
+        showInFrame(comp, "null date");
+    }
     /**
      * Issue #665-swingx: make JXDatePicker Locale-aware.
      * 
