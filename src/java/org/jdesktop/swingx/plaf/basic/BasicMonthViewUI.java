@@ -176,6 +176,8 @@ public class BasicMonthViewUI extends MonthViewUI {
           firstDisplayedDate = monthView.getCalendar().getTimeInMillis();
           firstDisplayedMonth = monthView.getCalendar().get(Calendar.MONTH);
           firstDisplayedYear = monthView.getCalendar().get(Calendar.YEAR);
+          // JW: quick hack around #708-swingx - visible month changed decades into future
+          updateLastDisplayedDate(firstDisplayedDate);
         }
         
         selection = monthView.getSelection();
