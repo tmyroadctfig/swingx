@@ -80,6 +80,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JComponent.setDefaultLocale(componentLocale);
     }
 
+    
     /**
      * Issue #708-swingx: updateUI changes state.
      * 
@@ -196,6 +197,58 @@ public class JXMonthViewTest extends MockObjectTestCase {
       assertEquals("monthViews calendar represents the first day of the month", 
               next, monthView.getCalendar().getTime());
     }
+    
+    /**
+     * safety net: add api ensureDateVisible with Date parameter
+     */
+    public void testEnsureDateVisibleDateParamNextYear() {
+        JXMonthView monthView = new JXMonthView();
+        Calendar temp = (Calendar) cal.clone();
+        CalendarUtils.startOfMonth(temp);
+        // sanity
+        assertEquals("sanity...", temp.getTimeInMillis(), monthView.getFirstDisplayedDate());
+        cal.add(Calendar.YEAR, 1);
+        Date nextYear = cal.getTime();
+        temp = (Calendar) cal.clone();
+        CalendarUtils.startOfMonth(temp);
+        monthView.ensureDateVisible(nextYear);
+        assertEquals("must be scrolled to next year", 
+                temp.getTime(), new Date(monthView.getFirstDisplayedDate()));
+    }
+    
+    /**
+     * safety net: add api ensureDateVisible with Date parameter
+     */
+    public void testEnsureDateVisibleDateParamNextMonth() {
+        JXMonthView monthView = new JXMonthView();
+        Calendar temp = (Calendar) cal.clone();
+        CalendarUtils.startOfMonth(temp);
+        assertEquals("sanity..", temp.getTimeInMillis(), monthView.getFirstDisplayedDate());
+        cal.add(Calendar.MONTH, 1);
+        Date nextMonth = cal.getTime();
+        temp = (Calendar) cal.clone();
+        CalendarUtils.startOfMonth(temp);
+        monthView.ensureDateVisible(nextMonth);
+        assertEquals("must be scrolled to next month", 
+                temp.getTime(), new Date(monthView.getFirstDisplayedDate()));
+    }
+
+    /**
+     * safety net: add api ensureDateVisible with Date parameter
+     */
+    public void testEnsureDateVisibleDateParamThisMonth() {
+        JXMonthView monthView = new JXMonthView();
+        Calendar temp = (Calendar) cal.clone();
+        CalendarUtils.startOfMonth(temp);
+        long first = monthView.getFirstDisplayedDate();
+        assertEquals("sanity...", temp.getTimeInMillis(), first);
+        CalendarUtils.endOfMonth(cal);
+        Date thisMonth = cal.getTime();
+        monthView.ensureDateVisible(thisMonth);
+        assertEquals("same month, nothing changed", 
+                first, monthView.getFirstDisplayedDate());
+    }
+
 
     /**
      * safety net: refactor ensureDateVisible
@@ -204,13 +257,13 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JXMonthView monthView = new JXMonthView();
         Calendar temp = (Calendar) cal.clone();
         CalendarUtils.startOfMonth(temp);
-        assertEquals(monthView.getFirstDisplayedDate(), temp.getTimeInMillis());
+        assertEquals("sanity...", temp.getTimeInMillis(), monthView.getFirstDisplayedDate());
         cal.add(Calendar.YEAR, 1);
         Date nextYear = cal.getTime();
         temp = (Calendar) cal.clone();
         CalendarUtils.startOfMonth(temp);
         monthView.ensureDateVisible(nextYear.getTime());
-        assertEquals(monthView.getFirstDisplayedDate(), temp.getTimeInMillis());
+        assertEquals("must be scrolled to next year", temp.getTimeInMillis(), monthView.getFirstDisplayedDate());
     }
     
     /**
@@ -220,13 +273,13 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JXMonthView monthView = new JXMonthView();
         Calendar temp = (Calendar) cal.clone();
         CalendarUtils.startOfMonth(temp);
-        assertEquals(monthView.getFirstDisplayedDate(), temp.getTimeInMillis());
+        assertEquals("sanity ...", temp.getTimeInMillis(), monthView.getFirstDisplayedDate());
         cal.add(Calendar.MONTH, 1);
         Date nextMonth = cal.getTime();
         temp = (Calendar) cal.clone();
         CalendarUtils.startOfMonth(temp);
         monthView.ensureDateVisible(nextMonth.getTime());
-        assertEquals(monthView.getFirstDisplayedDate(), temp.getTimeInMillis());
+        assertEquals("must be scrolled to next month", temp.getTimeInMillis(), monthView.getFirstDisplayedDate());
     }
 
     /**
@@ -237,7 +290,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         Calendar temp = (Calendar) cal.clone();
         CalendarUtils.startOfMonth(temp);
         long first = monthView.getFirstDisplayedDate();
-        assertEquals(first, temp.getTimeInMillis());
+        assertEquals("sanity ...", temp.getTimeInMillis(), first);
         CalendarUtils.endOfMonth(cal);
         Date thisMonth = cal.getTime();
         monthView.ensureDateVisible(thisMonth.getTime());

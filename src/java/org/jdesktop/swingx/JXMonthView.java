@@ -459,9 +459,30 @@ public class JXMonthView extends JComponent {
      * Moves the <code>date</code> into the visible region of the calendar. If
      * the date is greater than the last visible date it will become the last
      * visible date. While if it is less than the first visible date it will
-     * become the first visible date.
+     * become the first visible date. <p>
+     * 
+     * NOTE: this is the recommended method to scroll to a particular date, the
+     * functionally equivalent method taking a long as parameter will most 
+     * probably be deprecated.
      * 
      * @param date Date to make visible.
+     * @see #ensureDateVisible(long)
+     */
+    public void ensureDateVisible(Date date) {
+        ensureDateVisible(date.getTime());
+    }
+    
+    /**
+     * Moves the <code>date</code> into the visible region of the calendar. If
+     * the date is greater than the last visible date it will become the last
+     * visible date. While if it is less than the first visible date it will
+     * become the first visible date. <p>
+     * 
+     * NOTE: this method will probably be deprecated, it's recommended
+     * to use the functionally equivalent method taking a Date parameter.
+     * 
+     * @param date millis representing the date to make visible.
+     * @see #ensureDateVisible(Date)
      */
     public void ensureDateVisible(long date) {
         if (date < firstDisplayedDate) {
