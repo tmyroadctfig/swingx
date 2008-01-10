@@ -48,6 +48,19 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
           e.printStackTrace();
       }
   }
+    
+    /**
+     * Issue ??-swingx: zero millis are valid.
+     * 
+     * bad marker in ui-delegate ... but looks okay? 
+     */
+    public void testZeroFirstDisplayedDate() {
+        JXMonthView monthView = new JXMonthView(0);
+        long first = monthView.getUI().getLastDisplayedDate();
+        monthView.updateUI();
+        assertEquals(first, monthView.getUI().getLastDisplayedDate());
+    }
+
 
     /**
      * Issue #708-swingx: updateUI changes state.

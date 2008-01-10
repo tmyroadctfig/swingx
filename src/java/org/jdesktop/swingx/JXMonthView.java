@@ -166,10 +166,7 @@ public class JXMonthView extends JComponent {
     public static final String BOX_PADDING_X = "boxPaddingX";
     public static final String BOX_PADDING_Y = "boxPaddingY";
     public static final String DAYS_OF_THE_WEEK = "daysOfTheWeek";
-    public static final String ENSURE_DATE_VISIBILITY = "ensureDateVisibility";
     public static final String FIRST_DISPLAYED_DATE = "firstDisplayedDate";
-    public static final String FIRST_DISPLAYED_MONTH = "firstDisplayedMonth";
-    public static final String FIRST_DISPLAYED_YEAR = "firstDisplayedYear";
     public static final String SELECTION_MODEL = "selectionModel";
     public static final String SHOW_LEADING_DATES = "showLeadingDates";
     public static final String SHOW_TRAILING_DATES = "showTrailingDates";
@@ -553,8 +550,6 @@ public class JXMonthView extends JComponent {
                 setFirstDisplayedDate(cal.getTimeInMillis());
             }
         }
-        // PENDING JW: remove ... nobody's listening ... 
-        firePropertyChange(ENSURE_DATE_VISIBILITY, null, date);
     }
 
     /**

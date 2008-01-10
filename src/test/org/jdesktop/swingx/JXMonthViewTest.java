@@ -81,6 +81,44 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JComponent.setDefaultLocale(componentLocale);
     }
 
+    /**
+     * Issue #711-swingx: remove fake property change notification.
+     * 
+     * Here: test that ensureVisibleDate with millis fires once only.
+     */
+    public void testEnsureVisibleDateNofication() {
+        JXMonthView monthView = new JXMonthView();
+        long firstDisplayedDate = monthView.getFirstDisplayedDate();
+        // previous month
+        cal.add(Calendar.MONTH, -1);
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.ensureDateVisible(cal.getTimeInMillis());
+        CalendarUtils.startOfMonth(cal);
+        TestUtils.assertPropertyChangeEvent(report, "firstDisplayedDate", firstDisplayedDate, cal.getTimeInMillis());
+    }
+
+    /**
+     * Issue #711-swingx: remove fake property change notification.
+     * 
+     * Here: test that ensureVisibleDate with date fires once only.
+     */
+    public void testEnsureVisibleDateParamNofication() {
+        JXMonthView monthView = new JXMonthView();
+        long firstDisplayedDate = monthView.getFirstDisplayedDate();
+        // previous month
+        cal.add(Calendar.MONTH, -1);
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.ensureDateVisible(cal.getTime());
+        CalendarUtils.startOfMonth(cal);
+        TestUtils.assertPropertyChangeEvent(report, "firstDisplayedDate", firstDisplayedDate, cal.getTimeInMillis());
+    }
+    /**
+     * Issue #711-swingx: remove fake property change notification.
+     * 
+     * Here: test that setFirstDisplayedDate fires once only.
+     */
     public void testFirstDisplayedDateNofication() {
         JXMonthView monthView = new JXMonthView();
         long firstDisplayedDate = monthView.getFirstDisplayedDate();

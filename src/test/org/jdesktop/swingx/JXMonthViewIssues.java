@@ -100,7 +100,8 @@ public class JXMonthViewIssues extends InteractiveTestCase {
      * incremented.
      */
     public void interactiveUpdateUIMonthView() {
-        final JXMonthView monthView = new JXMonthView();
+//        calendar.set(1955, 10, 9);
+        final JXMonthView monthView = new JXMonthView(); //calendar.getTimeInMillis());
         monthView.setTraversable(true);
         final JXFrame frame = showInFrame(monthView, "MonthView update ui");
         Action action = new AbstractActionExt("toggleUI") {
