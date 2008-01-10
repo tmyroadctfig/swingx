@@ -709,6 +709,7 @@ public class JXMonthView extends JComponent {
      * @return the first Date in the selection or null if empty.
      */
     public Date getSelectedDate() {
+        // PENDING JW: swap logic - ask first if empty 
         SortedSet<Date> selection = getSelection();
         return selection.isEmpty() ? null : selection.first();
     }

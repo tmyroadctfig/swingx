@@ -91,24 +91,51 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     /** Formatter used to format the day of the week to a numerical value. */
     protected final SimpleDateFormat dayOfMonthFormatter = new SimpleDateFormat("d");
-
+    /** localized names of all months. */
     private String[] monthsOfTheYear;
 
+    /** the component we are installed for. */
     protected JXMonthView monthView;
-    
+    // listeners
+    private PropertyChangeListener propertyChangeListener;
+    private MouseListener mouseListener;
+    private MouseMotionListener mouseMotionListener;
+    private Handler handler;
+
+    // fields related to visible date range
+    /** start of day of the first visible month. 
+     *  PENDING: this is an alias of monthView's property - should be removed and dynamically requested?
+     */
     private long firstDisplayedDate;
+    /** first visible month. */
     private int firstDisplayedMonth;
+    /** first visible year. */
     private int firstDisplayedYear;
-    protected long lastDisplayedDate;
+    /** end of day of the last visible month. */
+    private long lastDisplayedDate;
+    /** 
+     * today in monthView's coordinates.
+     * PENDING: this is an alias of monthView's property - should be removed and dynamically requested?
+     * PENDING: it's a notification only property - revisit!
+     */
     protected long today;
+    
+    //---------- fields related to selection/navigation
     // JW: why alias? can this be different from the JXMonthView selection?
     private SortedSet<Date> selection;
-    /** Used as the font for flagged days. */
-    protected Font derivedFont;
-
+    /** flag indicating keyboard navigation. */
     private boolean usingKeyboard = false;
     /** For interval selections we need to record the date we pivot around. */
     private long pivotDate = -1;
+    /**
+     * Date span used by the keyboard actions to track the original selection.
+     */
+    private SortedSet<Date> originalDateSpan;
+
+    //------------------ visuals
+    /** Used as the font for flagged days. */
+    protected Font derivedFont;
+
     protected boolean isLeftToRight;
     private int arrowPaddingX = 3;
     private int arrowPaddingY = 3;
@@ -117,13 +144,9 @@ public class BasicMonthViewUI extends MonthViewUI {
     private int fullBoxHeight;
     private int startX;
     private int startY;
-    private Dimension dim = new Dimension();
-    private PropertyChangeListener propertyChangeListener;
-    private MouseListener mouseListener;
-    private MouseMotionListener mouseMotionListener;
-    private Handler handler;
     protected Icon monthUpImage;
     protected Icon monthDownImage;
+    private Dimension dim = new Dimension();
     private Rectangle dirtyRect = new Rectangle();
     private Rectangle bounds = new Rectangle();
     private Color weekOfTheYearForeground;
@@ -131,10 +154,6 @@ public class BasicMonthViewUI extends MonthViewUI {
     private Color leadingDayForeground;
     private Color trailingDayForeground;
 
-    /**
-     * Date span used by the keyboard actions to track the original selection.
-     */
-    private SortedSet<Date> originalDateSpan;
     private int calendarWidth;
     private int monthBoxHeight;
     private int boxWidth;
@@ -630,35 +649,11 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     /**
-     * {@inheritDoc} <p>
-     * 
-     * This method will be hidden soon: the newer perspective is that the
-     * ui is responsible to keep the value in a reasonable state to query from
-     * the outside. 
-     */
-    public long calculateLastDisplayedDate() {
-        updateLastDisplayedDate(getFirstDisplayedDate());
-        return lastDisplayedDate;
-    }
-
-    /**
-     * Updates the lastDisplayedDate property based on the given first and 
-     * visible # of months.
-     * 
-     * @param first the date of the first visible day.
-     */
-    private void updateLastDisplayedDate(long first) {
-        Calendar cal = getCalendar(first);
-        cal.add(Calendar.MONTH, ((numCalCols * numCalRows) - 1));
-        CalendarUtils.endOfMonth(cal);
-        lastDisplayedDate = cal.getTimeInMillis();
-    }
-
-    /**
      * PENDING JW: understand what we are doing here - (assumed?) performance optimization?
      */
     private void calculateDirtyRectForSelection() {
-        if (getSelection() == null || getSelection().isEmpty()) {
+        if (monthView.isSelectionEmpty()) {
+//        if (getSelection() == null || getSelection().isEmpty()) {
             dirtyRect.x = 0;
             dirtyRect.y = 0;
             dirtyRect.width = 0;
@@ -772,22 +767,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         bounds.height = boxPaddingY + boxHeight + boxPaddingY;
     }
 
-
-    /**
-     * Returns the monthViews calendar configured to the given time.
-     * 
-     * PENDING: remove the cloning once the monthView guarantees to return a clone
-     * 
-     * @param date the date to configure the calendar with
-     * @return the clone of the monthView's calendar, configured with the given date
-     */
-    private Calendar getCalendar(long date) {
-//        Calendar calendar = (Calendar) monthView.getCalendar().clone();
-        Calendar calendar = monthView.getCalendar();
-        calendar.setTimeInMillis(date);
-        return calendar;
-    }
-    
+//-------------------- painting
 
     /**
      * {@inheritDoc}
@@ -1423,6 +1403,10 @@ public class BasicMonthViewUI extends MonthViewUI {
             g.fillRect(clip.x, clip.y, clip.width, clip.height);
         }
     }
+
+//---------------------- end of painting
+    
+//---------------------- navigation support    
     
     private void traverseMonth(int arrowType) {
         if (arrowType == JXMonthView.MONTH_DOWN) {
@@ -1435,7 +1419,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     private void nextMonth() {
         Date upperBound = monthView.getUpperBound();
         if (upperBound == null
-                || upperBound.getTime() > lastDisplayedDate) {
+                || upperBound.getTime() > getLastDisplayedDate()) {
             Calendar cal = getCalendar(getFirstDisplayedDate());
             cal.add(Calendar.MONTH, 1);
             monthView.setFirstDisplayedDate(cal.getTimeInMillis());
@@ -1453,6 +1437,54 @@ public class BasicMonthViewUI extends MonthViewUI {
             calculateDirtyRectForSelection();
         }
     }
+
+//--------------------------- displayed dates, calendar
+    
+    /**
+     * Returns the monthViews calendar configured to the given time.
+     * 
+     * NOTE: it's safe to change the calendar state without resetting because
+     * it's JXMonthView's responsibility to protect itself.
+     * 
+     * @param date the date to configure the calendar with
+     * @return the monthView's calendar, configured with the given date.
+     */
+    protected Calendar getCalendar(long date) {
+        Calendar calendar = monthView.getCalendar();
+        calendar.setTimeInMillis(date);
+        return calendar;
+    }
+    
+
+    
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * This method will be hidden soon: the newer perspective is that the
+     * ui is responsible to keep the value in a reasonable state to query from
+     * the outside. 
+     */
+    public long calculateLastDisplayedDate() {
+        updateLastDisplayedDate(getFirstDisplayedDate());
+        // NOTE JW: this is the only place (outside the getter/setter) 
+        // where the field is accessed directly - no need to cleanup because
+        // this will be removed before final.
+        return lastDisplayedDate;
+    }
+
+    /**
+     * Updates the lastDisplayedDate property based on the given first and 
+     * visible # of months.
+     * 
+     * @param first the date of the first visible day.
+     */
+    private void updateLastDisplayedDate(long first) {
+        Calendar cal = getCalendar(first);
+        cal.add(Calendar.MONTH, ((numCalCols * numCalRows) - 1));
+        CalendarUtils.endOfMonth(cal);
+        lastDisplayedDate = cal.getTimeInMillis();
+    }
+
 
     /**
      * {@inheritDoc}
@@ -1549,6 +1581,10 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
 //-----------------------end encapsulation
+ 
+    
+//------------------ Handler implementation 
+//     
     
     private class Handler implements  
         MouseListener, MouseMotionListener, LayoutManager,
@@ -1824,7 +1860,7 @@ public class BasicMonthViewUI extends MonthViewUI {
 
             if (!monthView.getSelectionModel().isSelectionEmpty()) {
                 long startDate = getSelection().first().getTime();
-                if (startDate > lastDisplayedDate ||
+                if (startDate > getLastDisplayedDate() ||
                         startDate < getFirstDisplayedDate()) {
                     // Already does the recalculation for the dirty rect.
                     monthView.ensureDateVisible(startDate);
@@ -1947,7 +1983,8 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
 
         private void traverse(int action) {
-            long oldStart = getSelection().isEmpty() ? System.currentTimeMillis() : getSelection().first().getTime();
+//            long oldStart = getSelection().isEmpty() ? System.currentTimeMillis() : getSelection().first().getTime();
+            long oldStart = monthView.isSelectionEmpty() ? System.currentTimeMillis() : getSelection().first().getTime();
             Calendar cal = getCalendar(oldStart);
             switch (action) {
                 case SELECT_PREVIOUS_DAY:
@@ -1986,8 +2023,8 @@ public class BasicMonthViewUI extends MonthViewUI {
             long newEndDate;
             long selectionStart;
             long selectionEnd;
-
-            if (!getSelection().isEmpty()) {
+            if (!monthView.isSelectionEmpty()) {
+//            if (!getSelection().isEmpty()) {
                 newStartDate = selectionStart = getSelection().first().getTime();
                 newEndDate = selectionEnd = getSelection().last().getTime();
             } else {
