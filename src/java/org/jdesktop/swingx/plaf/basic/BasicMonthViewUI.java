@@ -122,7 +122,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     
     //---------- fields related to selection/navigation
     // JW: why alias? can this be different from the JXMonthView selection?
-    private SortedSet<Date> selection;
+//    private SortedSet<Date> selection;
     /** flag indicating keyboard navigation. */
     private boolean usingKeyboard = false;
     /** For interval selections we need to record the date we pivot around. */
@@ -205,7 +205,7 @@ public class BasicMonthViewUI extends MonthViewUI {
 //          updateLastDisplayedDate(getFirstDisplayedDate());
 //        }
 //        updateFirstDisplayedDate(monthView.getFirstDisplayedDate());
-        setSelection(monthView.getSelection());
+//        setSelection(monthView.getSelection());
     }
 
     public void uninstallUI(JComponent c) {
@@ -1569,15 +1569,15 @@ public class BasicMonthViewUI extends MonthViewUI {
     /**
      * @param selection the selection to set
      */
-    protected void setSelection(SortedSet<Date> selection) {
-        this.selection = selection;
-    }
+//    protected void setSelection(SortedSet<Date> selection) {
+//        this.selection = selection;
+//    }
 
     /**
      * @return the selection
      */
     protected SortedSet<Date> getSelection() {
-        return selection;
+        return monthView.getSelection();
     }
 
 //-----------------------end encapsulation
@@ -1912,7 +1912,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
 
         public void valueChanged(DateSelectionEvent ev) {
-            setSelection(ev.getSelection());
+//            setSelection(ev.getSelection());
             // repaint old dirty region
             monthView.repaint(dirtyRect);
             // calculate new dirty region based on selection
