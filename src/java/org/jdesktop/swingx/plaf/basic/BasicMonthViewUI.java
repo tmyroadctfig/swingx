@@ -654,6 +654,9 @@ public class BasicMonthViewUI extends MonthViewUI {
         lastDisplayedDate = cal.getTimeInMillis();
     }
 
+    /**
+     * PENDING JW: understand what we are doing here - (assumed?) performance optimization?
+     */
     private void calculateDirtyRectForSelection() {
         if (getSelection() == null || getSelection().isEmpty()) {
             dirtyRect.x = 0;
@@ -1482,6 +1485,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         setFirstDisplayedMonth(calendar.get(Calendar.MONTH));
         setFirstDisplayedYear(calendar.get(Calendar.YEAR));
         updateLastDisplayedDate(firstDisplayedDate);
+        calculateDirtyRectForSelection();
     }
 
     /**
