@@ -1001,7 +1001,11 @@ public class JXMonthViewTest extends MockObjectTestCase {
         Date today = cleanupDate(cal);
         monthView.setSelectionInterval(today, today);
         assertEquals("same day", today, monthView.getSelectedDate());
+        // clear selection
+        monthView.clearSelection();
+        assertNull(monthView.getSelectedDate());
     }
+    
     
     public void testDefaultConstructor() {
         JXMonthView monthView = new JXMonthView(Locale.US);

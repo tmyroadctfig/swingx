@@ -121,8 +121,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     protected long today;
     
     //---------- fields related to selection/navigation
-    // JW: why alias? can this be different from the JXMonthView selection?
-//    private SortedSet<Date> selection;
+
     /** flag indicating keyboard navigation. */
     private boolean usingKeyboard = false;
     /** For interval selections we need to record the date we pivot around. */
@@ -187,25 +186,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         installDefaults();
         installKeyboardActions();
         installListeners();
-        
-        /*
-         * PENDING - JW: why? it is fishy anyway .. the calendar is not guaranteed to
-         * be in any particular state.
-         * Should ask the monthView for the firstDisplayedDate directly and remove the
-         * firstMonth/year fields (could query the calendar if needed)
-         * 
-         * Removed - update is done dynamically on accessing the fields. Doing it here
-         * is basically unsafe, as the component is not yet fully initialized
-         */
-//        if (monthView.getCalendar() != null) {
-//          setFirstDisplayedDate(monthView.getCalendar().getTimeInMillis());
-//          setFirstDisplayedMonth(monthView.getCalendar().get(Calendar.MONTH));
-//          setFirstDisplayedYear(monthView.getCalendar().get(Calendar.YEAR));
-//          // JW: quick hack around #708-swingx - visible month changed decades into future
-//          updateLastDisplayedDate(getFirstDisplayedDate());
-//        }
-//        updateFirstDisplayedDate(monthView.getFirstDisplayedDate());
-//        setSelection(monthView.getSelection());
     }
 
     public void uninstallUI(JComponent c) {
@@ -262,7 +242,7 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     protected void installKeyboardActions() {
         // Setup the keyboard handler.
-        // JW: change to when-ancestor? just to be on the safe side
+        // PENDING JW: change to when-ancestor? just to be on the safe side
         // if we make the title contain active comps
         installKeyBindings(JComponent.WHEN_FOCUSED);
         // JW: removed the automatic keybindings in WHEN_IN_FOCUSED
@@ -285,7 +265,6 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         actionMap.put(JXMonthView.COMMIT_KEY, acceptAction);
         actionMap.put(JXMonthView.CANCEL_KEY, cancelAction);
-    
     }
 
     /**
@@ -369,7 +348,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         monthsOfTheYear = new DateFormatSymbols(locale).getMonths();
         
         String[] daysOfTheWeek = new String[7];
-        // JW: probably incomplete - we have a ui property which might have been set
+        // PENDING JW: probably incomplete - we have a ui property which might have been set
         // but never used?
         String[] dateFormatSymbols = new DateFormatSymbols(locale).getShortWeekdays();
         daysOfTheWeek = new String[JXMonthView.DAYS_IN_WEEK];
@@ -649,11 +628,10 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     /**
-     * PENDING JW: understand what we are doing here - (assumed?) performance optimization?
      */
     private void calculateDirtyRectForSelection() {
+        // PENDING JW: understand what we are doing here - (assumed?) performance optimization?
         if (monthView.isSelectionEmpty()) {
-//        if (getSelection() == null || getSelection().isEmpty()) {
             dirtyRect.x = 0;
             dirtyRect.y = 0;
             dirtyRect.width = 0;
@@ -1391,11 +1369,6 @@ public class BasicMonthViewUI extends MonthViewUI {
                 y + boxPaddingY + fm.getAscent());
     }
 
-    private long cleanupDate(long date) {
-        Calendar cal = getCalendar(date);
-        CalendarUtils.startOfDay(cal);
-        return cal.getTimeInMillis();
-    }
 
     protected void paintBackground(final Rectangle clip, final Graphics g) {
         if (monthView.isOpaque()) {
@@ -1439,6 +1412,19 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
 //--------------------------- displayed dates, calendar
+
+    /**
+     * Returns the start of the day of the given date in the monthView's 
+     * current calendar.
+     * 
+     * @param date the instant to normalize to the start of the day
+     * @return the start of the day in millis.
+     */
+    private long cleanupDate(long date) {
+        Calendar cal = getCalendar(date);
+        CalendarUtils.startOfDay(cal);
+        return cal.getTimeInMillis();
+    }
     
     /**
      * Returns the monthViews calendar configured to the given time.
@@ -1499,6 +1485,8 @@ public class BasicMonthViewUI extends MonthViewUI {
     /*-------------- refactored: encapsulate aliased fields
      * Issue #712-swingx: in the longer run they should be removed where possible
      * The delegate can ask instead of duplicating state.
+     * Maybe not - the accessors have the responsibility to check if the fields have
+     * been initialized.
      * 
      */
 
@@ -1529,6 +1517,8 @@ public class BasicMonthViewUI extends MonthViewUI {
     }
 
     private void ensureDateFieldsInitialized() {
+        // PENDING JW: this is not good enough - zero and negative times are 
+        // valid!
         if (firstDisplayedDate == 0) {
             setFirstDisplayedDate(monthView.getFirstDisplayedDate());
         }
@@ -1566,12 +1556,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         return firstDisplayedYear;
     }
 
-    /**
-     * @param selection the selection to set
-     */
-//    protected void setSelection(SortedSet<Date> selection) {
-//        this.selection = selection;
-//    }
 
     /**
      * @return the selection
@@ -1858,7 +1842,8 @@ public class BasicMonthViewUI extends MonthViewUI {
             calculateNumDisplayedCals();
             calculateStartPosition();
 
-            if (!monthView.getSelectionModel().isSelectionEmpty()) {
+            // PENDING JW: remove - #705-swingx
+            if (!monthView.isSelectionEmpty()) {
                 long startDate = getSelection().first().getTime();
                 if (startDate > getLastDisplayedDate() ||
                         startDate < getFirstDisplayedDate()) {
@@ -1886,13 +1871,6 @@ public class BasicMonthViewUI extends MonthViewUI {
                 selectionModel.addDateSelectionListener(getHandler());
             } else if (JXMonthView.FIRST_DISPLAYED_DATE.equals(property)) {
                 setFirstDisplayedDate(((Long) evt.getNewValue()));
-                // no longer fired
-//            } else if (JXMonthView.ENSURE_DATE_VISIBILITY.equals(property)) {
-//                calculateDirtyRectForSelection();
-//            } else if (JXMonthView.FIRST_DISPLAYED_MONTH.equals(property)) {
-//                setFirstDisplayedMonth((Integer)evt.getNewValue());
-//            } else if (JXMonthView.FIRST_DISPLAYED_YEAR.equals(property)) {
-//                setFirstDisplayedYear((Integer)evt.getNewValue());
             } else if ("today".equals(property)) {
                 today = (Long)evt.getNewValue();
             } else if (JXMonthView.BOX_PADDING_X.equals(property) || JXMonthView.BOX_PADDING_Y.equals(property) ||
@@ -1912,7 +1890,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
 
         public void valueChanged(DateSelectionEvent ev) {
-//            setSelection(ev.getSelection());
             // repaint old dirty region
             monthView.repaint(dirtyRect);
             // calculate new dirty region based on selection

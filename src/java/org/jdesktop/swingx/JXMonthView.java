@@ -191,7 +191,7 @@ public class JXMonthView extends JComponent {
         LookAndFeelAddons.contribute(new MonthViewAddon());
     }
 
-    /**
+     /**
      * UI Class ID
      */
     public static final String uiClassID = "MonthViewUI";
@@ -199,67 +199,86 @@ public class JXMonthView extends JComponent {
     public static final int DAYS_IN_WEEK = 7;
     public static final int MONTHS_IN_YEAR = 12;
 
+
+    /**
+     * Keeps track of the first date we are displaying.  We use this as a
+     * restore point for the calendar. This is normalized to the start of the
+     * first day of the month given in setFirstDisplayedDate.
+     */
+    private long firstDisplayedDate;
+    /** the calendar to base all selections, flagging upon. */
+    private Calendar cal;
+    /** calendar to store the real input of firstDisplayedDate. */
+    private Calendar anchor;
+    // PENDING JW: why kept apart from cal? Why writable? - shouldn't the calendar have complete
+    // control?
+    private int firstDayOfWeek;
+    /** 
+     * Start of the day which contains System.millis() in the current calendar.
+     * Kept in synch via a timer started in addNotify.
+     */
+    private long today;
+    /**
+     * The timer used to keep today in synch with system time.
+     */
+    private Timer todayTimer = null;
+    private TreeSet<Long> flaggedDates;
+    //-------------- selection
+    private DateSelectionModel model;
+    private SelectionMode selectionMode;
+    private EventListenerMap listenerMap;
+    
+    // PENDING JW: ??
+    @SuppressWarnings({"FieldCanBeLocal"})
+    private Date modifiedStartDate;
+    @SuppressWarnings({"FieldCanBeLocal"})
+    private Date modifiedEndDate;
+    
+    //------------- visuals
+    
+    /**
+     * localizable day column headers. Default typically installed by the uidelegate.
+     */
+    private String[] _daysOfTheWeek;
     /**
      * Insets used in determining the rectangle for the month string
      * background.
      */
     protected Insets _monthStringInsets = new Insets(0, 0, 0, 0);
-
-    /**
-     * Keeps track of the first date we are displaying.  We use this as a
-     * restore point for the calendar.
-     */
-    private long firstDisplayedDate;
-//    private int firstDisplayedMonth;
-//    private int firstDisplayedYear;
-//    private long lastDisplayedDate;
-
     private int boxPaddingX;
     private int boxPaddingY;
     private int minCalCols = 1;
     private int minCalRows = 1;
-    private long today;
-    private TreeSet<Long> flaggedDates;
-    private int firstDayOfWeek;
     private boolean antiAlias;
     private boolean traversable;
     private boolean leadingDates;
     private boolean trailingDates;
-    private Calendar cal;
-    private String[] _daysOfTheWeek;
     private Color todayBackgroundColor;
     private Color monthStringBackground;
     private Color monthStringForeground;
     private Color daysOfTheWeekForeground;
     private Color selectedBackground;
     private String actionCommand = "selectionChanged";
-    private Timer todayTimer = null;
     private Hashtable<Integer, Color> dayToColorTable = new Hashtable<Integer, Color>();
     private Color flaggedDayForeground;
     private boolean showWeekNumber;
-    private DateSelectionModel model;
-    private EventListenerMap listenerMap;
-    private SelectionMode selectionMode;
-    @SuppressWarnings({"FieldCanBeLocal"})
-    private Date modifiedStartDate;
-    @SuppressWarnings({"FieldCanBeLocal"})
-    private Date modifiedEndDate;
     private boolean componentInputMapEnabled;
-    private Calendar anchor;
 
     /**
      * Create a new instance of the <code>JXMonthView</code> class using the
-     * month and year of the current day as the first date to display.
+     * default Locale and the current system time as the first date to 
+     * display.
      */
     public JXMonthView() {
         this(System.currentTimeMillis(), null, null);
     }
 
     /**
-     * Cretate a new instance of the <code>JXMonthView</code> class 
-     * and set locale used to display month and day text.
+     * Create a new instance of the <code>JXMonthView</code> class using the 
+     * default Locale and the current system time as the first date to 
+     * display.
      * 
-     * @param locale desired locale
+     * @param locale desired locale, if null the system default locale is used
      */
     public JXMonthView(final Locale locale) {
         this(System.currentTimeMillis(), null, locale);
@@ -267,7 +286,7 @@ public class JXMonthView extends JComponent {
     
     /**
      * Create a new instance of the <code>JXMonthView</code> class using the
-     * month and year from <code>initialTime</code> as the first date to
+     * default Locale and the given time as the first date to 
      * display.
      *
      * @param firstDisplayedDate The first month to display.
@@ -276,10 +295,29 @@ public class JXMonthView extends JComponent {
         this(firstDisplayedDate, null, null);
     }
 
+    /**
+     * Create a new instance of the <code>JXMonthView</code> class using the
+     * default Locale, the given time as the first date to 
+     * display and the given selection model. 
+     * 
+     * @param firstDisplayedDate The first month to display.
+     * @param model the selection model to use, if null a <code>DefaultSelectionModel</code> is
+     *   created.
+     */
     public JXMonthView(long firstDisplayedDate, final DateSelectionModel model) {
         this(firstDisplayedDate, model, null);
     }
 
+    /**
+     * Create a new instance of the <code>JXMonthView</code> class using the
+     * given Locale, the given time as the first date to 
+     * display and the given selection model. 
+     * 
+     * @param firstDisplayedDate 
+     * @param model the selection model to use, if null a <code>DefaultSelectionModel</code> is
+     *   created.
+     * @param locale desired locale, if null the system default locale is used
+     */
     public JXMonthView(long firstDisplayedDate, final DateSelectionModel model, final Locale locale) {
         super();
         antiAlias = false;
@@ -295,11 +333,10 @@ public class JXMonthView extends JComponent {
         // install the controller
         updateUI();
         // JW: something fishy going on - see #702-swingx and related discussion
+        // installing the cal before or after the controller should no longer 
+        // matter as the controller must not access the calendar before this is
+        // instantiation is complete (getCalender throws)
         setLocale(locale);
-
-//        if (cal == null)
-        // Set up calendar instance
-//        installCalendar();
 
         // Keep track of today
         updateTodayFromCurrentTime();
@@ -327,18 +364,13 @@ public class JXMonthView extends JComponent {
     @Override
     public void setLocale(Locale locale) {
         installCalendar(locale);
+        // PENDING JW: formally, a null value is allowed and must be passed on to super
+        // I suspect this is not done here to keep the logic out off the constructor?
+        // 
         if (locale != null) {
-            // JW: update internals first to keep the cal consistent
-            // PENDING: timezone?
-//            cal = Calendar.getInstance(locale);
-//            setFirstDayOfWeek(cal.getFirstDayOfWeek());        
-//            cal.setMinimalDaysInFirstWeek(1);
-            // Locale is bound property, no need to firePropertyChange
             super.setLocale(locale);
-
-
             repaint();
-            }
+       }
     }
     
     /**
@@ -362,7 +394,7 @@ public class JXMonthView extends JComponent {
     }
 
     /**
-     * Installs the internal calendar with the given locale. If null, JComponent.getDefaultLocale
+     * Installs the internal calendars with the given locale. If null, JComponent.getDefaultLocale
      * is used.
      * 
      * @param locale Lhe locale to use, defaults to JComponent.getDefaultLocale if null.
@@ -371,9 +403,11 @@ public class JXMonthView extends JComponent {
         if (locale == null) {
             locale = JComponent.getDefaultLocale();
         }
+        // PENDING JW: respect current timezone!
         cal = Calendar.getInstance(locale);
         firstDayOfWeek = cal.getFirstDayOfWeek();
-        cal.setFirstDayOfWeek(firstDayOfWeek);
+        // next line is left-over from its time in constructor - let's see what happens if removed
+//        cal.setFirstDayOfWeek(firstDayOfWeek);
         cal.setMinimalDaysInFirstWeek(1);
         anchor = (Calendar) cal.clone();
     }
@@ -435,22 +469,12 @@ public class JXMonthView extends JComponent {
         anchor.setTimeInMillis(date);
         
         long oldFirstDisplayedDate = firstDisplayedDate;
-//        int oldFirstDisplayedMonth = firstDisplayedMonth;
-//        int oldFirstDisplayedYear = firstDisplayedYear;
 
         cal.setTimeInMillis(anchor.getTimeInMillis());
         CalendarUtils.startOfMonth(cal);
         firstDisplayedDate = cal.getTimeInMillis();
-//        firstDisplayedMonth = cal.get(Calendar.MONTH);
-//        firstDisplayedYear = cal.get(Calendar.YEAR);
 
         firePropertyChange(FIRST_DISPLAYED_DATE, oldFirstDisplayedDate, firstDisplayedDate);
-//        firePropertyChange(FIRST_DISPLAYED_MONTH, oldFirstDisplayedMonth, firstDisplayedMonth);
-//        firePropertyChange(FIRST_DISPLAYED_YEAR, oldFirstDisplayedYear, firstDisplayedYear);
-
-        // it's up to the ui to calculate
-//        calculateLastDisplayedDate();
-
         repaint();
     }
 
@@ -476,9 +500,6 @@ public class JXMonthView extends JComponent {
         return getUI().getLastDisplayedDate();
     }
 
-//    private long calculateLastDisplayedDate() {
-//        return getUI().calculateLastDisplayedDate();
-//    }
 
     /**
      * Moves the <code>date</code> into the visible region of the calendar. If
@@ -532,7 +553,7 @@ public class JXMonthView extends JComponent {
                 setFirstDisplayedDate(cal.getTimeInMillis());
             }
         }
-
+        // PENDING JW: remove ... nobody's listening ... 
         firePropertyChange(ENSURE_DATE_VISIBILITY, null, date);
     }
 
@@ -540,8 +561,8 @@ public class JXMonthView extends JComponent {
      * Returns a date span of the selected dates.  The result will be null if
      * no dates are selected.
      *
-     * @deprecated see #getSelection
      * @return Date span of the selected dates.
+     * @deprecated see #getSelection
      */
     @Deprecated
     public DateSpan getSelectedDateSpan() {
@@ -709,9 +730,7 @@ public class JXMonthView extends JComponent {
      * @return the first Date in the selection or null if empty.
      */
     public Date getSelectedDate() {
-        // PENDING JW: swap logic - ask first if empty 
-        SortedSet<Date> selection = getSelection();
-        return selection.isEmpty() ? null : selection.first();
+        return isSelectionEmpty() ? null : getSelection().first();    
     }
 
     /**
@@ -1722,33 +1741,4 @@ public class JXMonthView extends JComponent {
     }
 
 
-    
-    
-//    public static void main(String args[]) {
-//        SwingUtilities.invokeLater(new Runnable() {
-//            public void run() {
-//                JFrame frame = new JFrame();
-//                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//                JXMonthView mv = new JXMonthView();
-//                mv.setShowingWeekNumber(true);
-//                mv.setTraversable(true);
-//                Calendar cal = Calendar.getInstance();
-//                cal.set(2006, 5, 20);
-//                mv.setUnselectableDates(new long[] { cal.getTimeInMillis() });
-//                mv.setPreferredRows(2);
-//                mv.setSelectionMode(SelectionMode.MULTIPLE_INTERVAL_SELECTION);
-//                cal.setTimeInMillis(System.currentTimeMillis());
-//                mv.setSelectionInterval(cal.getTime(), cal.getTime());
-//                mv.addActionListener(new ActionListener() {
-//                    public void actionPerformed(ActionEvent e) {
-//                        System.out.println(
-//                                ((JXMonthView) e.getSource()).getSelection());
-//                    }
-//                });
-//                frame.getContentPane().add(mv);
-//                frame.pack();
-//                frame.setVisible(true);
-//            }
-//        });
-//    }
 }

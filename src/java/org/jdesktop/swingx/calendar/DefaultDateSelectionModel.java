@@ -215,8 +215,7 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
      * {@inheritDoc}
      */
     public boolean isSelectionEmpty() {
-        // PENDING JW: use isEmpty method of treeset
-        return selectedDates.size() == 0;
+        return selectedDates.isEmpty();
     }
 
     /**
@@ -274,8 +273,7 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
         if ((upperBound != null && !upperBound.equals(this.upperBound)) ||
                 (upperBound == null && upperBound != this.upperBound)) {
             this.upperBound = upperBound;
-            // PENDING JW: use delegate method isSelectionEmpty
-            if (!selectedDates.isEmpty() && selectedDates.last().after(this.upperBound)) {
+            if (!isSelectionEmpty() && selectedDates.last().after(this.upperBound)) {
                 if (this.upperBound != null) {
                     // Remove anything above the upper bound
                     long justAboveUpperBoundMs = this.upperBound.getTime() + 1;
@@ -304,8 +302,7 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
             if (this.lowerBound != null) {
                 // Remove anything below the lower bound
                 long justBelowLowerBoundMs = this.lowerBound.getTime() - 1;
-                // PENDING JW: use delegate method 
-                if (!selectedDates.isEmpty() && selectedDates.first().before(this.lowerBound)) {
+                if (!isSelectionEmpty() && selectedDates.first().before(this.lowerBound)) {
                     removeSelectionInterval(selectedDates.first(), new Date(justBelowLowerBoundMs));
                 }
             }
