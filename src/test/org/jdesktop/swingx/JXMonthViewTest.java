@@ -20,6 +20,7 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.GraphicsEnvironment;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -78,6 +79,48 @@ public class JXMonthViewTest extends MockObjectTestCase {
 
     public void tearDown() {
         JComponent.setDefaultLocale(componentLocale);
+    }
+
+    public void testFirstDisplayedDateNofication() {
+        JXMonthView monthView = new JXMonthView();
+        long firstDisplayedDate = monthView.getFirstDisplayedDate();
+        // previous month
+        cal.add(Calendar.MONTH, -1);
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.setFirstDisplayedDate(cal.getTimeInMillis());
+        CalendarUtils.startOfMonth(cal);
+        TestUtils.assertPropertyChangeEvent(report, "firstDisplayedDate", firstDisplayedDate, cal.getTimeInMillis());
+    }
+    
+    /**
+     * Issue #708-swingx
+     * 
+     * test update of lastDisplayedDate if resized.
+     */
+    public void testLastDisplayedOnResize() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        // get a reference width so we can simulate a one-month resize
+        JXMonthView compare = new JXMonthView();
+        compare.setPreferredCols(2);
+        JXMonthView monthView = new JXMonthView();
+        JXFrame frame = new JXFrame();
+        frame.add(monthView);
+        frame.pack();
+        long last = monthView.getLastDisplayedDate();
+        // set a size that should guarantee the same number of columns as the compare monthView
+        frame.setSize(compare.getPreferredSize().width + 50, monthView.getPreferredSize().height + 50);
+        frame.validate();
+        // build a date corresponding to the expected end of next month
+        cal.setTimeInMillis(last);
+        // next month
+        cal.add(Calendar.DAY_OF_MONTH, 1);
+        CalendarUtils.endOfMonth(cal);
+        assertEquals(cal.getTime(), new Date(monthView.getLastDisplayedDate()));
     }
 
     

@@ -21,6 +21,7 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -42,7 +43,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -82,8 +82,8 @@ public class JXMonthViewIssues extends InteractiveTestCase {
       try {
 //          test.runInteractiveTests();
 //        test.runInteractiveTests("interactive.*Locale.*");
-          test.runInteractiveTests("interactive.*AutoScroll.*");
-//        test.runInteractiveTests("interactive.*UpdateUI.*");
+//          test.runInteractiveTests("interactive.*AutoScroll.*");
+        test.runInteractiveTests("interactive.*UpdateUI.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -101,6 +101,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
      */
     public void interactiveUpdateUIMonthView() {
         final JXMonthView monthView = new JXMonthView();
+        monthView.setTraversable(true);
         final JXFrame frame = showInFrame(monthView, "MonthView update ui");
         Action action = new AbstractActionExt("toggleUI") {
             public void actionPerformed(ActionEvent e) {
@@ -598,24 +599,6 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         final JXMonthView monthView = new JXMonthView();
         fail("today is lost in ui - no way to access as it is notification-only property");
     };
-
-    
-    public void testLastDisplayed() {
-        // This test will not work in a headless configuration.
-        if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
-            return;
-        }
-        JXMonthView monthView = new JXMonthView();
-        JXFrame frame = new JXFrame();
-        frame.add(monthView);
-        frame.pack();
-        long last = monthView.getLastDisplayedDate();
-        frame.setSize(monthView.getPreferredSize().width * 3, monthView.getPreferredSize().height + 50);
-        frame.validate();
-        assertEquals(new Date(last), new Date(monthView.getLastDisplayedDate()));
-        
-    }
 
     /**
      * #703-swingx: set date to first of next doesn't update the view.

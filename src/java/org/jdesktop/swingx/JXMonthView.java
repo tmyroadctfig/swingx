@@ -210,8 +210,8 @@ public class JXMonthView extends JComponent {
      * restore point for the calendar.
      */
     private long firstDisplayedDate;
-    private int firstDisplayedMonth;
-    private int firstDisplayedYear;
+//    private int firstDisplayedMonth;
+//    private int firstDisplayedYear;
 //    private long lastDisplayedDate;
 
     private int boxPaddingX;
@@ -341,7 +341,32 @@ public class JXMonthView extends JComponent {
             }
     }
     
+    /**
+     * Returns a clone of the internal calendar, with it's time set to firstDisplayedDate.
+     * 
+     * PENDING: firstDisplayed useful as reference time? It's timezone dependent anyway. 
+     * Think: could return with monthView's today instead? The alternative might be to 
+     * expose the today property (needs to be re-visited anyway)
+     * 
+     * @return a clone of internal calendar, configured to the current firstDisplayedDate
+     * @throws IllegalStateException if called before instantitation is completed
+     */
+    public Calendar getCalendar() {
+        // JW: this is to guard against a regression of not-fully understood 
+        // problems in constructor (UI used to call back into this before we were ready)
+        if (cal == null) throw 
+            new IllegalStateException("must not be called before instantiation is complete");
+        Calendar calendar = (Calendar) cal.clone();
+        calendar.setTimeInMillis(firstDisplayedDate);
+        return calendar;
+    }
 
+    /**
+     * Installs the internal calendar with the given locale. If null, JComponent.getDefaultLocale
+     * is used.
+     * 
+     * @param locale Lhe locale to use, defaults to JComponent.getDefaultLocale if null.
+     */
     private void installCalendar(Locale locale) {
         if (locale == null) {
             locale = JComponent.getDefaultLocale();
@@ -410,18 +435,18 @@ public class JXMonthView extends JComponent {
         anchor.setTimeInMillis(date);
         
         long oldFirstDisplayedDate = firstDisplayedDate;
-        int oldFirstDisplayedMonth = firstDisplayedMonth;
-        int oldFirstDisplayedYear = firstDisplayedYear;
+//        int oldFirstDisplayedMonth = firstDisplayedMonth;
+//        int oldFirstDisplayedYear = firstDisplayedYear;
 
         cal.setTimeInMillis(anchor.getTimeInMillis());
         CalendarUtils.startOfMonth(cal);
         firstDisplayedDate = cal.getTimeInMillis();
-        firstDisplayedMonth = cal.get(Calendar.MONTH);
-        firstDisplayedYear = cal.get(Calendar.YEAR);
+//        firstDisplayedMonth = cal.get(Calendar.MONTH);
+//        firstDisplayedYear = cal.get(Calendar.YEAR);
 
         firePropertyChange(FIRST_DISPLAYED_DATE, oldFirstDisplayedDate, firstDisplayedDate);
-        firePropertyChange(FIRST_DISPLAYED_MONTH, oldFirstDisplayedMonth, firstDisplayedMonth);
-        firePropertyChange(FIRST_DISPLAYED_YEAR, oldFirstDisplayedYear, firstDisplayedYear);
+//        firePropertyChange(FIRST_DISPLAYED_MONTH, oldFirstDisplayedMonth, firstDisplayedMonth);
+//        firePropertyChange(FIRST_DISPLAYED_YEAR, oldFirstDisplayedYear, firstDisplayedYear);
 
         // it's up to the ui to calculate
 //        calculateLastDisplayedDate();
@@ -1532,19 +1557,6 @@ public class JXMonthView extends JComponent {
         cal.setTimeInMillis(firstDisplayedDate);
     }
 
-    /**
-     * Returns a clone of the internal calendar, with it's time set to firstDisplayedDate.
-     * 
-     * PENDING: firstDisplayed useful as reference time? It's timezone dependent anyway. 
-     * 
-     * @return a clone of internal calendar, configured to the current firstDisplayedDate
-     */
-    public Calendar getCalendar() {
-        if (cal == null) return null;
-        Calendar calendar = (Calendar) cal.clone();
-        calendar.setTimeInMillis(firstDisplayedDate);
-        return calendar;
-    }
 
     /**
      * Return a long representing the date at the specified x/y position.

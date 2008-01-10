@@ -95,13 +95,14 @@ public class BasicMonthViewUI extends MonthViewUI {
     private String[] monthsOfTheYear;
 
     protected JXMonthView monthView;
-    protected long firstDisplayedDate;
-    protected int firstDisplayedMonth;
-    protected int firstDisplayedYear;
+    
+    private long firstDisplayedDate;
+    private int firstDisplayedMonth;
+    private int firstDisplayedYear;
     protected long lastDisplayedDate;
     protected long today;
     // JW: why alias? can this be different from the JXMonthView selection?
-    protected SortedSet<Date> selection;
+    private SortedSet<Date> selection;
     /** Used as the font for flagged days. */
     protected Font derivedFont;
 
@@ -158,6 +159,8 @@ public class BasicMonthViewUI extends MonthViewUI {
         isLeftToRight = monthView.getComponentOrientation().isLeftToRight();
         LookAndFeel.installProperty(monthView, "opaque", Boolean.TRUE);
 
+        // PENDING JW: move "near" the init of days symbols and 
+        // set by calling updateLocale
         // Get string representation of the months of the year.
         monthsOfTheYear = new DateFormatSymbols(monthView.getLocale()).getMonths();
 
@@ -171,16 +174,19 @@ public class BasicMonthViewUI extends MonthViewUI {
          * be in any particular state.
          * Should ask the monthView for the firstDisplayedDate directly and remove the
          * firstMonth/year fields (could query the calendar if needed)
+         * 
+         * Removed - update is done dynamically on accessing the fields. Doing it here
+         * is basically unsafe, as the component is not yet fully initialized
          */
-        if (monthView.getCalendar() != null) {
-          firstDisplayedDate = monthView.getCalendar().getTimeInMillis();
-          firstDisplayedMonth = monthView.getCalendar().get(Calendar.MONTH);
-          firstDisplayedYear = monthView.getCalendar().get(Calendar.YEAR);
-          // JW: quick hack around #708-swingx - visible month changed decades into future
-          updateLastDisplayedDate(firstDisplayedDate);
-        }
-        
-        selection = monthView.getSelection();
+//        if (monthView.getCalendar() != null) {
+//          setFirstDisplayedDate(monthView.getCalendar().getTimeInMillis());
+//          setFirstDisplayedMonth(monthView.getCalendar().get(Calendar.MONTH));
+//          setFirstDisplayedYear(monthView.getCalendar().get(Calendar.YEAR));
+//          // JW: quick hack around #708-swingx - visible month changed decades into future
+//          updateLastDisplayedDate(getFirstDisplayedDate());
+//        }
+//        updateFirstDisplayedDate(monthView.getFirstDisplayedDate());
+        setSelection(monthView.getSelection());
     }
 
     public void uninstallUI(JComponent c) {
@@ -344,6 +350,8 @@ public class BasicMonthViewUI extends MonthViewUI {
         monthsOfTheYear = new DateFormatSymbols(locale).getMonths();
         
         String[] daysOfTheWeek = new String[7];
+        // JW: probably incomplete - we have a ui property which might have been set
+        // but never used?
         String[] dateFormatSymbols = new DateFormatSymbols(locale).getShortWeekdays();
         daysOfTheWeek = new String[JXMonthView.DAYS_IN_WEEK];
         for (int i = Calendar.SUNDAY; i <= Calendar.SATURDAY; i++) {
@@ -352,6 +360,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         monthView.setDaysOfTheWeek(daysOfTheWeek);
         monthView.invalidate();
         monthView.validate();
+        // JW: why? invalidate cached state?
         getHandler().layoutContainer(null);
     }
 
@@ -459,7 +468,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         // Use the first day of the month as a key point for determining the
         // date of our click.
         // The week index of the first day will always be 0.
-        Calendar cal = getCalendar(firstDisplayedDate);
+        Calendar cal = getCalendar(getFirstDisplayedDate());
         cal.add(Calendar.MONTH, rowCol.y + (rowCol.x * numCalCols));
 
         int firstDayViewIndex = getDayOfWeekViewIndex(cal.get(Calendar.DAY_OF_WEEK));
@@ -616,7 +625,7 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         if (oldNumCalCols != numCalCols ||
                 oldNumCalRows != numCalRows) {
-            updateLastDisplayedDate(firstDisplayedDate);
+            updateLastDisplayedDate(getFirstDisplayedDate());
         }
     }
 
@@ -628,7 +637,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * the outside. 
      */
     public long calculateLastDisplayedDate() {
-        updateLastDisplayedDate(firstDisplayedDate);
+        updateLastDisplayedDate(getFirstDisplayedDate());
         return lastDisplayedDate;
     }
 
@@ -645,40 +654,19 @@ public class BasicMonthViewUI extends MonthViewUI {
         lastDisplayedDate = cal.getTimeInMillis();
     }
 
-    /**
-     * Updates internals after first displayed date changed in monthView.
-     * Here: sets local copies of first displayed and last displayed.
-     *  
-     * PENDING: JW assumption is that the new first is start of day?
-     * 
-     * @param first the new first displayed date
-     */
-    private void updateFirstDisplayedDate(long first) {
-        firstDisplayedDate = first;
-        updateLastDisplayedDate(first);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getLastDisplayedDate() {
-        return lastDisplayedDate;
-    }
-
     private void calculateDirtyRectForSelection() {
-        if (selection == null || selection.isEmpty()) {
+        if (getSelection() == null || getSelection().isEmpty()) {
             dirtyRect.x = 0;
             dirtyRect.y = 0;
             dirtyRect.width = 0;
             dirtyRect.height = 0;
         } else {
-            Calendar cal = getCalendar(selection.first().getTime());
+            Calendar cal = getCalendar(getSelection().first().getTime());
             calculateBoundsForDay(dirtyRect, NO_OFFSET, cal);
             cal.add(Calendar.DAY_OF_MONTH, 1);
 
             Rectangle tmpRect;
-            while (cal.getTimeInMillis() <= selection.last().getTime()) {
+            while (cal.getTimeInMillis() <= getSelection().last().getTime()) {
                 calculateBoundsForDay(bounds, NO_OFFSET, cal);
                 tmpRect = dirtyRect.union(bounds);
                 dirtyRect.x = tmpRect.x;
@@ -736,8 +724,8 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
 
         // Determine what row/column we are in.
-        int diffMonths = month - firstDisplayedMonth +
-                ((year - firstDisplayedYear) * JXMonthView.MONTHS_IN_YEAR);
+        int diffMonths = month - getFirstDisplayedMonth() +
+                ((year - getFirstDisplayedYear()) * JXMonthView.MONTHS_IN_YEAR);
         int calRowIndex = diffMonths / numCalCols;
         int calColIndex = diffMonths - (calRowIndex * numCalCols);
 
@@ -823,7 +811,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         g.setColor(monthView.getForeground());
 
         // Get a calender set to the first displayed date
-        Calendar cal = getCalendar(firstDisplayedDate);
+        Calendar cal = getCalendar(getFirstDisplayedDate());
 
         // Center the calendars horizontally/vertically in the available space.
         for (int row = 0; row < numCalRows; row++) {
@@ -1445,7 +1433,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         Date upperBound = monthView.getUpperBound();
         if (upperBound == null
                 || upperBound.getTime() > lastDisplayedDate) {
-            Calendar cal = getCalendar(firstDisplayedDate);
+            Calendar cal = getCalendar(getFirstDisplayedDate());
             cal.add(Calendar.MONTH, 1);
             monthView.setFirstDisplayedDate(cal.getTimeInMillis());
             calculateDirtyRectForSelection();
@@ -1455,15 +1443,109 @@ public class BasicMonthViewUI extends MonthViewUI {
     private void previousMonth() {
         Date lowerBound = monthView.getLowerBound();
         if (lowerBound == null
-                || lowerBound.getTime() < firstDisplayedDate) {
-            Calendar cal = getCalendar(firstDisplayedDate);
+                || lowerBound.getTime() < getFirstDisplayedDate()) {
+            Calendar cal = getCalendar(getFirstDisplayedDate());
             cal.add(Calendar.MONTH, -1);
             monthView.setFirstDisplayedDate(cal.getTimeInMillis());
             calculateDirtyRectForSelection();
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getLastDisplayedDate() {
+        ensureDateFieldsInitialized();
+        return lastDisplayedDate;
+    }
 
+
+    /*-------------- refactored: encapsulate aliased fields
+     * Issue #712-swingx: in the longer run they should be removed where possible
+     * The delegate can ask instead of duplicating state.
+     * 
+     */
+
+    /**
+     * Sets the firstDisplayedDate property to the given value. Must update
+     * dependent state as well. 
+     * 
+     * Here: updated lastDisplayedDatefirstDisplayedMonth/Year accordingly.
+     * 
+     * 
+     * @param firstDisplayedDate the firstDisplayedDate to set
+     */
+    protected void setFirstDisplayedDate(long firstDisplayedDate) {
+        this.firstDisplayedDate = firstDisplayedDate;
+        Calendar calendar = getCalendar(firstDisplayedDate);
+        setFirstDisplayedMonth(calendar.get(Calendar.MONTH));
+        setFirstDisplayedYear(calendar.get(Calendar.YEAR));
+        updateLastDisplayedDate(firstDisplayedDate);
+    }
+
+    /**
+     * @return the firstDisplayedDate
+     */
+    protected long getFirstDisplayedDate() {
+        ensureDateFieldsInitialized();
+        return firstDisplayedDate;
+    }
+
+    private void ensureDateFieldsInitialized() {
+        if (firstDisplayedDate == 0) {
+            setFirstDisplayedDate(monthView.getFirstDisplayedDate());
+        }
+    }
+
+
+    /**
+     * @param firstDisplayedMonth the firstDisplayedMonth to set
+     */
+    protected void setFirstDisplayedMonth(int firstDisplayedMonth) {
+        this.firstDisplayedMonth = firstDisplayedMonth;
+    }
+
+    /**
+     * @return the firstDisplayedMonth
+     */
+    protected int getFirstDisplayedMonth() {
+        ensureDateFieldsInitialized();
+        return firstDisplayedMonth;
+    }
+
+
+    /**
+     * @param firstDisplayedYear the firstDisplayedYear to set
+     */
+    protected void setFirstDisplayedYear(int firstDisplayedYear) {
+        this.firstDisplayedYear = firstDisplayedYear;
+    }
+
+    /**
+     * @return the firstDisplayedYear
+     */
+    protected int getFirstDisplayedYear() {
+        ensureDateFieldsInitialized();
+        return firstDisplayedYear;
+    }
+
+    /**
+     * @param selection the selection to set
+     */
+    protected void setSelection(SortedSet<Date> selection) {
+        this.selection = selection;
+    }
+
+    /**
+     * @return the selection
+     */
+    protected SortedSet<Date> getSelection() {
+        return selection;
+    }
+
+//-----------------------end encapsulation
+    
     private class Handler implements  
         MouseListener, MouseMotionListener, LayoutManager,
             PropertyChangeListener, DateSelectionListener {
@@ -1629,7 +1711,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             FontMetrics fm = monthView.getFontMetrics(derivedFont);
             // JW PENDING: relies on calendar being set at least to year?
             // No, just on the bare calendar - so don't care about actual time
-            Calendar cal = getCalendar(firstDisplayedDate);
+            Calendar cal = getCalendar(getFirstDisplayedDate());
             cal.set(Calendar.MONTH, cal.getMinimum(Calendar.MONTH));
             cal.set(Calendar.DAY_OF_MONTH,
                     cal.getActualMinimum(Calendar.DAY_OF_MONTH));
@@ -1737,9 +1819,9 @@ public class BasicMonthViewUI extends MonthViewUI {
             calculateStartPosition();
 
             if (!monthView.getSelectionModel().isSelectionEmpty()) {
-                long startDate = selection.first().getTime();
+                long startDate = getSelection().first().getTime();
                 if (startDate > lastDisplayedDate ||
-                        startDate < firstDisplayedDate) {
+                        startDate < getFirstDisplayedDate()) {
                     // Already does the recalculation for the dirty rect.
                     monthView.ensureDateVisible(startDate);
                 } else {
@@ -1757,19 +1839,20 @@ public class BasicMonthViewUI extends MonthViewUI {
                 monthView.revalidate();
                 calculateStartPosition();
                 calculateDirtyRectForSelection();
-            } else if (JXMonthView.ENSURE_DATE_VISIBILITY.equals(property)) {
-                calculateDirtyRectForSelection();
             } else if (JXMonthView.SELECTION_MODEL.equals(property)) {
                 DateSelectionModel selectionModel = (DateSelectionModel) evt.getOldValue();
                 selectionModel.removeDateSelectionListener(getHandler());
                 selectionModel = (DateSelectionModel) evt.getNewValue();
                 selectionModel.addDateSelectionListener(getHandler());
             } else if (JXMonthView.FIRST_DISPLAYED_DATE.equals(property)) {
-                updateFirstDisplayedDate(((Long) evt.getNewValue()));
-            } else if (JXMonthView.FIRST_DISPLAYED_MONTH.equals(property)) {
-                firstDisplayedMonth = (Integer)evt.getNewValue();
-            } else if (JXMonthView.FIRST_DISPLAYED_YEAR.equals(property)) {
-                firstDisplayedYear = (Integer)evt.getNewValue();
+                setFirstDisplayedDate(((Long) evt.getNewValue()));
+                // no longer fired
+//            } else if (JXMonthView.ENSURE_DATE_VISIBILITY.equals(property)) {
+//                calculateDirtyRectForSelection();
+//            } else if (JXMonthView.FIRST_DISPLAYED_MONTH.equals(property)) {
+//                setFirstDisplayedMonth((Integer)evt.getNewValue());
+//            } else if (JXMonthView.FIRST_DISPLAYED_YEAR.equals(property)) {
+//                setFirstDisplayedYear((Integer)evt.getNewValue());
             } else if ("today".equals(property)) {
                 today = (Long)evt.getNewValue();
             } else if (JXMonthView.BOX_PADDING_X.equals(property) || JXMonthView.BOX_PADDING_Y.equals(property) ||
@@ -1789,7 +1872,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
 
         public void valueChanged(DateSelectionEvent ev) {
-            selection = ev.getSelection();
+            setSelection(ev.getSelection());
             // repaint old dirty region
             monthView.repaint(dirtyRect);
             // calculate new dirty region based on selection
@@ -1860,7 +1943,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
 
         private void traverse(int action) {
-            long oldStart = selection.isEmpty() ? System.currentTimeMillis() : selection.first().getTime();
+            long oldStart = getSelection().isEmpty() ? System.currentTimeMillis() : getSelection().first().getTime();
             Calendar cal = getCalendar(oldStart);
             switch (action) {
                 case SELECT_PREVIOUS_DAY:
@@ -1900,9 +1983,9 @@ public class BasicMonthViewUI extends MonthViewUI {
             long selectionStart;
             long selectionEnd;
 
-            if (!selection.isEmpty()) {
-                newStartDate = selectionStart = selection.first().getTime();
-                newEndDate = selectionEnd = selection.last().getTime();
+            if (!getSelection().isEmpty()) {
+                newStartDate = selectionStart = getSelection().first().getTime();
+                newEndDate = selectionEnd = getSelection().last().getTime();
             } else {
                 newStartDate = selectionStart = cleanupDate(System.currentTimeMillis());
                 newEndDate = selectionEnd = newStartDate;
@@ -1915,7 +1998,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             boolean isForward = true;
             // want a copy to play with - each branch sets and reads the time
             // actually don't care about the pre-set time.
-            Calendar cal = getCalendar(firstDisplayedDate);
+            Calendar cal = getCalendar(getFirstDisplayedDate());
             switch (action) {
                 case ADJUST_SELECTION_PREVIOUS_DAY:
                     if (newEndDate <= pivotDate) {

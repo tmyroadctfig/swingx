@@ -113,7 +113,7 @@ public final class TestUtils extends Assert {
      * Asserts the last received propertyChangeEvent of the 
      * report against the expected values.
      * 
-     * @param report the PropertyReport which received the event
+     * @param event the event to assert.
      * @param property the expected name of the property
      * @param oldValue the expected old value 
      * @param newValue the expected new value

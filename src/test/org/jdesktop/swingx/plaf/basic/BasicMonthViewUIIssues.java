@@ -47,8 +47,8 @@ public class BasicMonthViewUIIssues extends InteractiveTestCase {
       }
   }
 
-
-/**
+    
+    /**
      * Do nothing - just to keep the test runner from complaining 
      * if there are no issues.
      *
