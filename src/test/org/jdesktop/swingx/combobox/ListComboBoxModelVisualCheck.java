@@ -68,4 +68,11 @@ public class ListComboBoxModelVisualCheck extends InteractiveTestCase {
         frame.pack();
         frame.setVisible(true);
     }
+    
+    /**
+     * do nothing test - keep the testrunner happy.
+     */
+    public void testDummy() {
+    }
+
 }

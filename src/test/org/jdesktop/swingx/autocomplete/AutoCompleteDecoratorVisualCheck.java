@@ -53,4 +53,11 @@ public class AutoCompleteDecoratorVisualCheck extends InteractiveTestCase {
         frame.setSize(200, 200);
         frame.setVisible(true);
     }
+    
+    /**
+     * do nothing test - keep the testrunner happy.
+     */
+    public void testDummy() {
+    }
+
 }

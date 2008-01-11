@@ -79,5 +79,10 @@ public class JXMultiSplitPaneVisualIssues extends InteractiveTestCase {
               e.printStackTrace();
           } 
     }
+    /**
+     * do nothing test - keep the testrunner happy.
+     */
+    public void testDummy() {
+    }
 
 }

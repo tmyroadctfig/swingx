@@ -127,13 +127,18 @@ public class JXTableHeaderVisualCheck extends InteractiveTestCase {
                 int columnCount = table.getColumnCount(true);
                 table.setModel(columnCount > 0 ?
                         new DefaultTableModel() : new DefaultTableModel(10, 2));
-                
             }
             
         };
         addAction(frame, action);
         frame.setVisible(true);
         
+    }
+
+    /**
+     * do nothing test - keep the testrunner happy.
+     */
+    public void testDummy() {
     }
 
 }

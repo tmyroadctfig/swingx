@@ -101,5 +101,12 @@ public class BlenderVisualCheck extends InteractiveTestCase {
 	        ipa.setImage(ImageIO.read(getClass().getResourceAsStream("/org/jdesktop/swingx/resources/images/dog.jpg")));
 	        showInFrame(ipa, "default - for debugging only");
 	    }
+
 	    
+    /**
+     * do nothing test - keep the testrunner happy.
+     */
+    public void testDummy() {
+    }
+
 }

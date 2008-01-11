@@ -123,4 +123,10 @@ public class JXBusyLabelVisualCheck extends InteractiveTestCase {
           } 
     }
 
+    /**
+     * do nothing test - keep the testrunner happy.
+     */
+    public void testDummy() {
+    }
+
 }

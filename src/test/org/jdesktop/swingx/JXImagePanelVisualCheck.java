@@ -47,4 +47,10 @@ DropShadowBorder()));
         p.add(imagePanel);
         showInFrame(p, "JXImagePanel with drop shadow border");
     }
+    
+    /**
+     * do nothing test - keep the testrunner happy.
+     */
+    public void testDummy() {
+    }
 }

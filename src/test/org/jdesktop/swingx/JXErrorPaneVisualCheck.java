@@ -72,4 +72,10 @@ public class JXErrorPaneVisualCheck extends InteractiveTestCase {
         errorPane.updateUI();
     }
 
+    /**
+     * do nothing test - keep the testrunner happy.
+     */
+    public void testDummy() {
+    }
+
 }
