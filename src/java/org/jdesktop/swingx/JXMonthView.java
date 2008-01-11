@@ -327,21 +327,25 @@ public class JXMonthView extends JComponent {
             this.model = new DefaultDateSelectionModel();
         }
 
-        // install the controller
-        updateUI();
         // JW: something fishy going on - see #702-swingx and related discussion
         // installing the cal before or after the controller should no longer 
         // matter as the controller must not access the calendar before this is
         // instantiation is complete (getCalender throws)
+        // JW: problem might have been that the init was incomplete (#715-swingx)  
+        // cal installed but not yet the firstDisplayedDate
+        // so move both before intalling the ui 
         setLocale(locale);
+        setFirstDisplayedDate(firstDisplayedDate);
 
+        // install the controller
+        updateUI();
+        
         // Keep track of today
         updateTodayFromCurrentTime();
 
         setFocusable(true);
         todayBackgroundColor = getForeground();
 
-        setFirstDisplayedDate(firstDisplayedDate);
     }
 
     /**

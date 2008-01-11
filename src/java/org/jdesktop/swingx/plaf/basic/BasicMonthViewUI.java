@@ -202,6 +202,11 @@ public class BasicMonthViewUI extends MonthViewUI {
     protected void uninstallComponents() {}
 
     protected void installDefaults() {
+        // save to do after fixing #715-swingx:
+        // delegate must not be installed before complete init
+        setFirstDisplayedDate(monthView.getFirstDisplayedDate());
+        
+        // PENDING JW: cleanup locale related init
         String[] daysOfTheWeek =
                 (String[])UIManager.get("JXMonthView.daysOfTheWeek");
         if (daysOfTheWeek == null) {
@@ -1516,12 +1521,19 @@ public class BasicMonthViewUI extends MonthViewUI {
         return firstDisplayedDate;
     }
 
-    private void ensureDateFieldsInitialized() {
+    /**
+     * left-over from workaround #715-swingx: 
+     * JXMonthView had not been fully initialized before calling 
+     * updateUI.
+     * With that issue fixed, we no longer need this methods.
+     * Keep until the fix is verified.
+     */
+    protected void ensureDateFieldsInitialized() {
         // PENDING JW: this is not good enough - zero and negative times are 
         // valid!
-        if (firstDisplayedDate == 0) {
-            setFirstDisplayedDate(monthView.getFirstDisplayedDate());
-        }
+//        if (firstDisplayedDate == 0) {
+//            setFirstDisplayedDate(monthView.getFirstDisplayedDate());
+//        }
     }
 
 
