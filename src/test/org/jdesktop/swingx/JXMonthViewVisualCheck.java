@@ -61,8 +61,8 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
 //      setSystemLF(true);
       JXMonthViewVisualCheck  test = new JXMonthViewVisualCheck();
       try {
-          test.runInteractiveTests();
-//        test.runInteractiveTests(".*Move.*");
+//          test.runInteractiveTests();
+        test.runInteractiveTests(".*Locale.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -125,52 +125,35 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
      * timezones.
      * 
      */
-    public void interactiveUpdateOnTimeZone() {
-        JPanel panel = new JPanel();
+    public void interactiveUpdateLocale() {
+        JComponent panel = Box.createVerticalBox();
 
-        final JComboBox zoneSelector = new JComboBox(TimeZone.getAvailableIDs());
-        final JXDatePicker picker = new JXDatePicker();
+        final JComboBox zoneSelector = new JComboBox(Locale.getAvailableLocales());
         final JXMonthView monthView = new JXMonthView();
-        monthView.setSelectedDate(picker.getDate());
         monthView.setTraversable(true);
         // Synchronize the picker and selector's zones.
-        zoneSelector.setSelectedItem(picker.getTimeZone().getID());
+        zoneSelector.setSelectedItem(monthView.getLocale());
 
         // Set the picker's time zone based on the selected time zone.
         zoneSelector.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                String zone = (String) zoneSelector.getSelectedItem();
-                TimeZone tz = TimeZone.getTimeZone(zone);
-                picker.setTimeZone(tz);
-                monthView.setTimeZone(tz);
-              
-                assertEquals(tz, monthView.getCalendar().getTimeZone());
+                Locale zone = (Locale) zoneSelector.getSelectedItem();
+                monthView.setLocale(zone);
             }
         });
 
-        panel.add(zoneSelector);
-        panel.add(picker);
         panel.add(monthView);
-        JXFrame frame = showInFrame(panel, "display problems with non-default timezones");
-        Action assertAction = new AbstractActionExt("assert dates") {
-
-            public void actionPerformed(ActionEvent e) {
-                Calendar cal = monthView.getCalendar();
-                LOG.info("cal/firstDisplayed" + 
-                        cal.getTime() +"/" + new Date(monthView.getFirstDisplayedDate()));
-            }
-            
-        };
-        addAction(frame, assertAction);
-        frame.pack();
+        panel.add(zoneSelector);
+        showInFrame(panel, "Locale");
     }
+
     
     /**
      * Issue #618-swingx: JXMonthView displays problems with non-default
      * timezones.
      * 
      */
-    public void interactiveUpdateOnTimeZoneJP() {
+    public void interactiveUpdateOnTimeZone() {
         JComponent panel = Box.createVerticalBox();
 
         final JComboBox zoneSelector = new JComboBox(TimeZone.getAvailableIDs());
@@ -191,14 +174,8 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         });
 
         panel.add(monthView);
-//        JPanel bar = new JPanel();
-        JLabel label = new JLabel("Select TimeZone:");
-        label.setHorizontalAlignment(JLabel.CENTER);
-//        panel.add(label);
         panel.add(zoneSelector);
-        JXFrame frame = wrapInFrame(panel, "TimeZone");
-        frame.pack();
-        frame.setVisible(true);
+        showInFrame(panel, "TimeZone");
     }
     /**
      * Issue #618-swingx: JXMonthView displays problems with non-default

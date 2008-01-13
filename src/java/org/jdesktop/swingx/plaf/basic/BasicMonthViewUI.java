@@ -91,8 +91,12 @@ public class BasicMonthViewUI extends MonthViewUI {
 
     /** Formatter used to format the day of the week to a numerical value. */
     protected final SimpleDateFormat dayOfMonthFormatter = new SimpleDateFormat("d");
-    /** localized names of all months. */
-    private String[] monthsOfTheYear;
+    /** localized names of all months.
+     * protected for testing only!
+     * PENDING: JW - should be property on JXMonthView, for symmetry with
+     *   daysOfTheWeek? 
+     */
+    protected String[] monthsOfTheYear;
 
     /** the component we are installed for. */
     protected JXMonthView monthView;
@@ -177,10 +181,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         isLeftToRight = monthView.getComponentOrientation().isLeftToRight();
         LookAndFeel.installProperty(monthView, "opaque", Boolean.TRUE);
 
-        // PENDING JW: move "near" the init of days symbols and 
-        // set by calling updateLocale
-        // Get string representation of the months of the year.
-        monthsOfTheYear = new DateFormatSymbols(monthView.getLocale()).getMonths();
 
         installComponents();
         installDefaults();
@@ -202,27 +202,14 @@ public class BasicMonthViewUI extends MonthViewUI {
     protected void uninstallComponents() {}
 
     protected void installDefaults() {
-        // save to do after fixing #715-swingx:
+        // safe to do after fixing #715-swingx:
         // delegate must not be installed before complete init
         setFirstDisplayedDate(monthView.getFirstDisplayedDate());
-        
-        // PENDING JW: cleanup locale related init
-        String[] daysOfTheWeek =
-                (String[])UIManager.get("JXMonthView.daysOfTheWeek");
-        if (daysOfTheWeek == null) {
-            String[] dateFormatSymbols =
-                new DateFormatSymbols(monthView.getLocale()).getShortWeekdays();
-            daysOfTheWeek = new String[JXMonthView.DAYS_IN_WEEK];
-            for (int i = Calendar.SUNDAY; i <= Calendar.SATURDAY; i++) {
-                daysOfTheWeek[i - 1] = dateFormatSymbols[i];
-            }
-        }
 
         Color background = monthView.getBackground();
         if (background == null || background instanceof UIResource) {
             monthView.setBackground(UIManager.getColor("JXMonthView.background"));
         }
-        monthView.setDaysOfTheWeek(daysOfTheWeek);
         monthView.setBoxPaddingX(UIManager.getInt("JXMonthView.boxPaddingX"));
         monthView.setBoxPaddingY(UIManager.getInt("JXMonthView.boxPaddingY"));
         monthView.setMonthStringBackground(UIManager.getColor("JXMonthView.monthStringBackground"));
@@ -241,6 +228,27 @@ public class BasicMonthViewUI extends MonthViewUI {
         trailingDayForeground = UIManager.getColor("JXMonthView.trailingDayForeground");
         unselectableDayForeground = UIManager.getColor("JXMonthView.unselectableDayForeground");
         derivedFont = createDerivedFont();
+        
+        updateLocale();
+        
+//        // PENDING JW: move "near" the init of days symbols and 
+//        // set by calling updateLocale
+//        // Get string representation of the months of the year.
+//        monthsOfTheYear = new DateFormatSymbols(monthView.getLocale()).getMonths();
+//        
+//        // PENDING JW: cleanup locale related init
+//        String[] daysOfTheWeek =
+//            (String[])UIManager.get("JXMonthView.daysOfTheWeek");
+//        if (daysOfTheWeek == null) {
+//            String[] dateFormatSymbols =
+//                new DateFormatSymbols(monthView.getLocale()).getShortWeekdays();
+//            daysOfTheWeek = new String[JXMonthView.DAYS_IN_WEEK];
+//            for (int i = Calendar.SUNDAY; i <= Calendar.SATURDAY; i++) {
+//                daysOfTheWeek[i - 1] = dateFormatSymbols[i];
+//            }
+//        }
+//        monthView.setDaysOfTheWeek(daysOfTheWeek);
+        
     }
 
     protected void uninstallDefaults() {}
@@ -352,13 +360,20 @@ public class BasicMonthViewUI extends MonthViewUI {
         Locale locale = monthView.getLocale();
         monthsOfTheYear = new DateFormatSymbols(locale).getMonths();
         
-        String[] daysOfTheWeek = new String[7];
-        // PENDING JW: probably incomplete - we have a ui property which might have been set
-        // but never used?
-        String[] dateFormatSymbols = new DateFormatSymbols(locale).getShortWeekdays();
-        daysOfTheWeek = new String[JXMonthView.DAYS_IN_WEEK];
-        for (int i = Calendar.SUNDAY; i <= Calendar.SATURDAY; i++) {
-            daysOfTheWeek[i - 1] = dateFormatSymbols[i];
+        // fixed JW: respect property in UIManager if available
+        // PENDING JW: what to do if weekdays had been set 
+        // with JXMonthView method? how to detect?
+        String[] daysOfTheWeek =
+          (String[])UIManager.get("JXMonthView.daysOfTheWeek");
+        
+        if (daysOfTheWeek == null) {
+            daysOfTheWeek = new String[7];
+            String[] dateFormatSymbols = new DateFormatSymbols(locale)
+                    .getShortWeekdays();
+            daysOfTheWeek = new String[JXMonthView.DAYS_IN_WEEK];
+            for (int i = Calendar.SUNDAY; i <= Calendar.SATURDAY; i++) {
+                daysOfTheWeek[i - 1] = dateFormatSymbols[i];
+            }
         }
         monthView.setDaysOfTheWeek(daysOfTheWeek);
         monthView.invalidate();
@@ -1507,8 +1522,8 @@ public class BasicMonthViewUI extends MonthViewUI {
     protected void setFirstDisplayedDate(long firstDisplayedDate) {
         this.firstDisplayedDate = firstDisplayedDate;
         Calendar calendar = getCalendar(firstDisplayedDate);
-        setFirstDisplayedMonth(calendar.get(Calendar.MONTH));
-        setFirstDisplayedYear(calendar.get(Calendar.YEAR));
+        this.firstDisplayedMonth = calendar.get(Calendar.MONTH);
+        this.firstDisplayedYear = calendar.get(Calendar.YEAR);
         updateLastDisplayedDate(firstDisplayedDate);
         calculateDirtyRectForSelection();
     }
@@ -1538,13 +1553,6 @@ public class BasicMonthViewUI extends MonthViewUI {
 
 
     /**
-     * @param firstDisplayedMonth the firstDisplayedMonth to set
-     */
-    protected void setFirstDisplayedMonth(int firstDisplayedMonth) {
-        this.firstDisplayedMonth = firstDisplayedMonth;
-    }
-
-    /**
      * @return the firstDisplayedMonth
      */
     protected int getFirstDisplayedMonth() {
@@ -1552,13 +1560,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         return firstDisplayedMonth;
     }
 
-
-    /**
-     * @param firstDisplayedYear the firstDisplayedYear to set
-     */
-    protected void setFirstDisplayedYear(int firstDisplayedYear) {
-        this.firstDisplayedYear = firstDisplayedYear;
-    }
 
     /**
      * @return the firstDisplayedYear

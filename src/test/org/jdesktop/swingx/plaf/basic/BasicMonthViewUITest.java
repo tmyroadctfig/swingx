@@ -21,8 +21,12 @@
  */
 package org.jdesktop.swingx.plaf.basic;
 
+import java.text.DateFormatSymbols;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.logging.Logger;
+
+import javax.swing.UIManager;
 
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXMonthView;
@@ -48,6 +52,68 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
           e.printStackTrace();
       }
   }
+
+    /**
+     * test localized month names.
+     */
+    public void testLocaleMonths() {
+        Locale french = Locale.FRENCH;
+        JXMonthView monthView = new JXMonthView(french);
+        assertMonths(monthView, french);
+        Locale german = Locale.GERMAN;
+        monthView.setLocale(german);
+        assertMonths(monthView, german);
+    }
+
+    private void assertMonths(JXMonthView monthView, Locale french) {
+        // sanity
+        assertEquals(french, monthView.getLocale());
+        BasicMonthViewUI ui = (BasicMonthViewUI) monthView.getUI();
+        String[] months = new DateFormatSymbols(french).getMonths();
+        for (int i = 0; i < months.length; i++) {
+            assertEquals(months[i], ui.monthsOfTheYear[i]);
+        }
+    }
+
+    public void testCustomWeekdays() {
+        String[] days = new String[] {"1", "2", "3", "4", "5", "6", "7"};
+        UIManager.put("JXMonthView.daysOfTheWeek", days);
+        JXMonthView monthView = new JXMonthView(Locale.GERMAN);
+        try {
+            assertWeekdays(monthView, days);
+            monthView.setLocale(Locale.FRENCH);
+            assertWeekdays(monthView, days);
+        } finally {
+            UIManager.put("JXMonthView.daysOfTheWeek", null);
+        }
+    }
+    private void assertWeekdays(JXMonthView monthView, String[] weekdays) {
+        // sanity
+        for (int i = 0; i < 7; i++) {
+            assertEquals(weekdays[i], monthView.getDaysOfTheWeek()[i]);
+        }
+    }
+    /**
+     * test localized weekday names.
+     */
+    public void testLocaleWeekdays() {
+        Locale french = Locale.FRENCH;
+        JXMonthView monthView = new JXMonthView(french);
+        assertWeekdays(monthView, french);
+        Locale german = Locale.GERMAN;
+        monthView.setLocale(german);
+        assertWeekdays(monthView, german);
+    }
+
+    private void assertWeekdays(JXMonthView monthView, Locale french) {
+        // sanity
+        assertEquals(french, monthView.getLocale());
+        String[] weekdays =
+            new DateFormatSymbols(french).getShortWeekdays();
+        for (int i = Calendar.SUNDAY; i <= Calendar.SATURDAY; i++) {
+            assertEquals(weekdays[i], monthView.getDaysOfTheWeek()[i-1]);
+        }
+    }
     
     /**
      * Issue ??-swingx: zero millis are valid.
