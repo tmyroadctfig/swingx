@@ -118,11 +118,11 @@ public class BasicMonthViewUI extends MonthViewUI {
     /** end of day of the last visible month. */
     private long lastDisplayedDate;
     /** 
-     * today in monthView's coordinates.
-     * PENDING: this is an alias of monthView's property - should be removed and dynamically requested?
-     * PENDING: it's a notification only property - revisit!
-     */
-    protected long today;
+//     * today in monthView's coordinates.
+//     * PENDING: this is an alias of monthView's property - should be removed and dynamically requested?
+//     * PENDING: it's a notification only property - revisit!
+//     */
+//    private long today;
     
     //---------- fields related to selection/navigation
 
@@ -181,7 +181,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         isLeftToRight = monthView.getComponentOrientation().isLeftToRight();
         LookAndFeel.installProperty(monthView, "opaque", Boolean.TRUE);
 
-
         installComponents();
         installDefaults();
         installKeyboardActions();
@@ -202,10 +201,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     protected void uninstallComponents() {}
 
     protected void installDefaults() {
-        // safe to do after fixing #715-swingx:
-        // delegate must not be installed before complete init
-        setFirstDisplayedDate(monthView.getFirstDisplayedDate());
-
+        
         Color background = monthView.getBackground();
         if (background == null || background instanceof UIResource) {
             monthView.setBackground(UIManager.getColor("JXMonthView.background"));
@@ -229,25 +225,10 @@ public class BasicMonthViewUI extends MonthViewUI {
         unselectableDayForeground = UIManager.getColor("JXMonthView.unselectableDayForeground");
         derivedFont = createDerivedFont();
         
+        // install date/locale related state
+        setFirstDisplayedDate(monthView.getFirstDisplayedDate());
         updateLocale();
         
-//        // PENDING JW: move "near" the init of days symbols and 
-//        // set by calling updateLocale
-//        // Get string representation of the months of the year.
-//        monthsOfTheYear = new DateFormatSymbols(monthView.getLocale()).getMonths();
-//        
-//        // PENDING JW: cleanup locale related init
-//        String[] daysOfTheWeek =
-//            (String[])UIManager.get("JXMonthView.daysOfTheWeek");
-//        if (daysOfTheWeek == null) {
-//            String[] dateFormatSymbols =
-//                new DateFormatSymbols(monthView.getLocale()).getShortWeekdays();
-//            daysOfTheWeek = new String[JXMonthView.DAYS_IN_WEEK];
-//            for (int i = Calendar.SUNDAY; i <= Calendar.SATURDAY; i++) {
-//                daysOfTheWeek[i - 1] = dateFormatSymbols[i];
-//            }
-//        }
-//        monthView.setDaysOfTheWeek(daysOfTheWeek);
         
     }
 
@@ -431,11 +412,13 @@ public class BasicMonthViewUI extends MonthViewUI {
     /**
      * Returns true if the date passed in is the same as today.
      *
+     * PENDING JW: really want the exact test?
+     * 
      * @param date long representing the date you want to compare to today.
      * @return true if the date passed is the same as today.
      */
     protected boolean isToday(long date) {
-        return date == today;
+        return date == getToday();
     }
 
     /**
@@ -1497,7 +1480,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      */
     @Override
     public long getLastDisplayedDate() {
-        ensureDateFieldsInitialized();
+//        ensureDateFieldsInitialized();
         return lastDisplayedDate;
     }
 
@@ -1532,23 +1515,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @return the firstDisplayedDate
      */
     protected long getFirstDisplayedDate() {
-        ensureDateFieldsInitialized();
         return firstDisplayedDate;
-    }
-
-    /**
-     * left-over from workaround #715-swingx: 
-     * JXMonthView had not been fully initialized before calling 
-     * updateUI.
-     * With that issue fixed, we no longer need this methods.
-     * Keep until the fix is verified.
-     */
-    protected void ensureDateFieldsInitialized() {
-        // PENDING JW: this is not good enough - zero and negative times are 
-        // valid!
-//        if (firstDisplayedDate == 0) {
-//            setFirstDisplayedDate(monthView.getFirstDisplayedDate());
-//        }
     }
 
 
@@ -1556,7 +1523,6 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @return the firstDisplayedMonth
      */
     protected int getFirstDisplayedMonth() {
-        ensureDateFieldsInitialized();
         return firstDisplayedMonth;
     }
 
@@ -1565,7 +1531,6 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @return the firstDisplayedYear
      */
     protected int getFirstDisplayedYear() {
-        ensureDateFieldsInitialized();
         return firstDisplayedYear;
     }
 
@@ -1576,6 +1541,15 @@ public class BasicMonthViewUI extends MonthViewUI {
     protected SortedSet<Date> getSelection() {
         return monthView.getSelection();
     }
+    
+    
+    /**
+     * @return the start of today.
+     */
+    protected long getToday() {
+        return monthView.getTodayInMillis();
+    }
+
 
 //-----------------------end encapsulation
  
@@ -1583,6 +1557,7 @@ public class BasicMonthViewUI extends MonthViewUI {
 //------------------ Handler implementation 
 //     
     
+
     private class Handler implements  
         MouseListener, MouseMotionListener, LayoutManager,
             PropertyChangeListener, DateSelectionListener {
@@ -1884,8 +1859,8 @@ public class BasicMonthViewUI extends MonthViewUI {
                 selectionModel.addDateSelectionListener(getHandler());
             } else if (JXMonthView.FIRST_DISPLAYED_DATE.equals(property)) {
                 setFirstDisplayedDate(((Long) evt.getNewValue()));
-            } else if ("today".equals(property)) {
-                today = (Long)evt.getNewValue();
+//            } else if ("todayInMillis".equals(property)) {
+//                setToday((Long)evt.getNewValue());
             } else if (JXMonthView.BOX_PADDING_X.equals(property) || JXMonthView.BOX_PADDING_Y.equals(property) ||
                     JXMonthView.TRAVERSABLE.equals(property) || JXMonthView.DAYS_OF_THE_WEEK.equals(property) ||
                     "border".equals(property) || JXMonthView.WEEK_NUMBER.equals(property)) {

@@ -24,6 +24,7 @@ package org.jdesktop.swingx.plaf.basic;
 import java.util.logging.Logger;
 
 import org.jdesktop.swingx.InteractiveTestCase;
+import org.jdesktop.swingx.JXMonthView;
 
 /**
  * Tests to expose known issues of BasicMonthViewUI.

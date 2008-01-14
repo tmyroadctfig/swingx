@@ -30,7 +30,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.EventListener;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.SortedSet;
 import java.util.TimeZone;
@@ -43,7 +42,6 @@ import javax.swing.UIManager;
 
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
-import org.jdesktop.swingx.calendar.DateSpan;
 import org.jdesktop.swingx.calendar.DefaultDateSelectionModel;
 import org.jdesktop.swingx.event.EventListenerMap;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
@@ -203,7 +201,11 @@ public class JXMonthView extends JComponent {
      * first day of the month given in setFirstDisplayedDate.
      */
     private long firstDisplayedDate;
-    /** the calendar to base all selections, flagging upon. */
+    /** 
+     * the calendar to base all selections, flagging upon. 
+     * NOTE: the time of this calendar is undefined - before using, internal
+     * code must explicitly set it.
+     */
     private Calendar cal;
     /** calendar to store the real input of firstDisplayedDate. */
     private Calendar anchor;
@@ -336,12 +338,12 @@ public class JXMonthView extends JComponent {
         // so move both before intalling the ui 
         setLocale(locale);
         setFirstDisplayedDate(firstDisplayedDate);
+        // Keep track of today
+        updateTodayFromCurrentTime();
 
         // install the controller
         updateUI();
         
-        // Keep track of today
-        updateTodayFromCurrentTime();
 
         setFocusable(true);
         todayBackgroundColor = getForeground();
@@ -414,39 +416,47 @@ public class JXMonthView extends JComponent {
     }
 
     /**
-     * @inheritDoc
-     */
-    public MonthViewUI getUI() {
-        return (MonthViewUI)ui;
-    }
-
-    /**
-     * Sets the L&F object that renders this component.
+     * Gets the time zone.
      *
-     * @param ui UI to use for this {@code JXMonthView}
+     * @return The <code>TimeZone</code> used by the <code>JXMonthView</code>.
      */
-    public void setUI(MonthViewUI ui) {
-        super.setUI(ui);
+    public TimeZone getTimeZone() {
+        return cal.getTimeZone();
     }
 
     /**
-     * Resets the UI property with the value from the current look and feel.
-     *
-     * @see UIManager#getUI(JComponent)
+     * Sets the time zone with the given time zone value.
+     * 
+     * This is a bound property. 
+     * 
+     * @param tz The <code>TimeZone</code>.
      */
-    @Override
-    public void updateUI() {
-        setUI((MonthViewUI)LookAndFeelAddons.getUI(this, MonthViewUI.class));
-        invalidate();
+    public void setTimeZone(TimeZone tz) {
+        TimeZone old =getTimeZone();
+        cal.setTimeZone(tz);
+        anchor.setTimeZone(tz);
+        setFirstDisplayedDate(anchor.getTimeInMillis());
+        updateTodayFromCurrentTime();
+        updateDatesAfterTimeZoneChange(old);
+        firePropertyChange("timeZone", old, getTimeZone());
     }
 
     /**
-     * @inheritDoc
+     * All dates are "cleaned" relative to the timezone they had been set.
+     * After changing the timezone, the need to be updated to the new.
+     * 
+     * Here: clear everything. 
+     * 
+     * @param oldTimeZone the timezone before the change
      */
-    @Override
-    public String getUIClassID() {
-        return uiClassID;
+    protected void updateDatesAfterTimeZoneChange(TimeZone oldTimeZone) {
+        clearSelection();
+        setLowerBound(null);
+        setUpperBound(null);
+        setFlaggedDates(null);
+        setUnselectableDates(new Date[0]);
     }
+    
 
     /**
      * Returns the first displayed date.
@@ -556,39 +566,155 @@ public class JXMonthView extends JComponent {
         }
     }
 
+//------------------ today
+    
     /**
-     * Returns a date span of the selected dates.  The result will be null if
-     * no dates are selected.
-     *
-     * @return Date span of the selected dates.
-     * @deprecated see #getSelection
+     * Sets today from the current system time. 
+     * 
+     * temporary widened access for testing.
      */
-    @Deprecated
-    public DateSpan getSelectedDateSpan() {
-        DateSpan result = null;
-        Iterator<Date> itr = getSelection().iterator();
-        if (itr.hasNext()) {
-            Date date = itr.next();
-            result = new DateSpan(date, date);
-        }
-        return result;
+    protected void updateTodayFromCurrentTime() {
+        setTodayInMillis(System.currentTimeMillis());
     }
 
     /**
-     * Selects the dates in the DateSpan.  This method will not change the
-     * initial date displayed so the caller must update this if necessary.
-     * If we are in SINGLE_SELECTION mode only the start time from the DateSpan
-     * will be used.  If we are in WEEK_INTERVAL_SELECTION mode the span will be
-     * modified to be valid if necessary.
-     *
-     * @param dateSpan DateSpan defining the selected dates.  Passing
-     * <code>null</code> will clear the selection.
-     *
-     * @deprecated see #setSelectionInterval
+     * Increments today. This is used by the timer.
+     * 
+     * PENDING: is it safe? doesn't check if we are really tomorrow?
+     * temporary widened access for testing.
      */
-    @Deprecated
-    public void setSelectedDateSpan(DateSpan dateSpan) {
-        setSelectionInterval(dateSpan.getStartAsDate(), dateSpan.getEndAsDate());
+    protected void incrementToday() {
+        cal.setTimeInMillis(getTodayInMillis());
+        cal.add(Calendar.DAY_OF_MONTH, 1);
+        setTodayInMillis(cal.getTimeInMillis());
+    }
+
+    /**
+     * Sets the todayInMillis property to the start of the day which contains the
+     * given millis in this monthView's calendar coordinates.
+     *  
+     * temporary widened access for testing.
+     * 
+     * @param millis the instance in millis which should be used as today.
+     */
+    protected void setTodayInMillis(long millis) {
+        long oldToday = getTodayInMillis();
+        this.today = startOfDay(millis);
+        firePropertyChange("todayInMillis", oldToday, getTodayInMillis());
+        repaint();
+    }
+    
+    /**
+     * Returns the start of today in this monthviews calendar coordinates.
+     * 
+     * @return the start of today in millis.
+     */
+    public long getTodayInMillis() {
+        return today;
+    }
+    
+//----   internal date manipulation ("cleanup" == start of day in monthView's calendar)
+    
+    private void cleanupWeekSelectionDates(Date startDate, Date endDate) {
+        int count = 1;
+        cal.setTime(startDate);
+        while (cal.getTimeInMillis() < endDate.getTime()) {
+            cal.add(Calendar.DAY_OF_MONTH, 1);
+            count++;
+        }
+
+        if (count > JXMonthView.DAYS_IN_WEEK) {
+            // Move the start date to the first day of the week.
+            cal.setTime(startDate);
+            int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+            int firstDayOfWeek = getFirstDayOfWeek();
+            int daysFromStart = dayOfWeek - firstDayOfWeek;
+            if (daysFromStart < 0) {
+                daysFromStart += JXMonthView.DAYS_IN_WEEK;
+            }
+            cal.add(Calendar.DAY_OF_MONTH, -daysFromStart);
+
+            modifiedStartDate = cal.getTime();
+
+            // Move the end date to the last day of the week.
+            cal.setTime(endDate);
+            dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+            int lastDayOfWeek = firstDayOfWeek - 1;
+            if (lastDayOfWeek == 0) {
+                lastDayOfWeek = Calendar.SATURDAY;
+            }
+            int daysTillEnd = lastDayOfWeek - dayOfWeek;
+            if (daysTillEnd < 0) {
+                daysTillEnd += JXMonthView.DAYS_IN_WEEK;
+            }
+            cal.add(Calendar.DAY_OF_MONTH, daysTillEnd);
+            modifiedEndDate = cal.getTime();
+        }
+    }
+
+
+    /**
+     * Returns the start of the day of the given Date. The input date is 
+     * unchanged.
+     * 
+     * @param date the time as Date.
+     * @return the date corresponding to the start of the given day, relative to this
+     *    monthView's calendar.
+     */
+    private Date startOfDay(Date date) {
+        cal.setTime(date);
+        CalendarUtils.startOfDay(cal);
+        return cal.getTime();
+    }
+
+    /**
+     * Returns the start of the day of the given millis.
+     * 
+     * @param millis the time in millis.
+     * @return start of the given day in millis, relative to this
+     *    monthView's calendar.
+     */
+    private long startOfDay(long millis) {
+        cal.setTimeInMillis(millis);
+        CalendarUtils.startOfDay(cal);
+        return cal.getTimeInMillis();
+    }
+
+
+//------------------- ui delegate    
+    /**
+     * @inheritDoc
+     */
+    public MonthViewUI getUI() {
+        return (MonthViewUI)ui;
+    }
+
+    /**
+     * Sets the L&F object that renders this component.
+     *
+     * @param ui UI to use for this {@code JXMonthView}
+     */
+    public void setUI(MonthViewUI ui) {
+        super.setUI(ui);
+    }
+
+    /**
+     * Resets the UI property with the value from the current look and feel.
+     *
+     * @see UIManager#getUI(JComponent)
+     */
+    @Override
+    public void updateUI() {
+        setUI((MonthViewUI)LookAndFeelAddons.getUI(this, MonthViewUI.class));
+        invalidate();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    @Override
+    public String getUIClassID() {
+        return uiClassID;
     }
 
     
@@ -660,8 +786,8 @@ public class JXMonthView extends JComponent {
                 cleanupWeekSelectionDates(startDate, endDate);
             }
             getSelectionModel().addSelectionInterval(
-                    cleanupDate(modifiedStartDate),
-                    cleanupDate(modifiedEndDate));
+                    startOfDay(modifiedStartDate),
+                    startOfDay(modifiedEndDate));
         }
     }
 
@@ -679,7 +805,7 @@ public class JXMonthView extends JComponent {
             if (selectionMode == SelectionMode.WEEK_INTERVAL_SELECTION) {
                 cleanupWeekSelectionDates(startDate, endDate);
             }
-            getSelectionModel().setSelectionInterval(cleanupDate(modifiedStartDate), cleanupDate(modifiedEndDate));
+            getSelectionModel().setSelectionInterval(startOfDay(modifiedStartDate), startOfDay(modifiedEndDate));
         }
     }
 
@@ -691,7 +817,7 @@ public class JXMonthView extends JComponent {
      * @param endDate End of the date range to remove from the selection
      */
     public void removeSelectionInterval(final Date startDate, final Date endDate) {
-        getSelectionModel().removeSelectionInterval(cleanupDate(startDate), cleanupDate(endDate));
+        getSelectionModel().removeSelectionInterval(startOfDay(startDate), startOfDay(endDate));
     }
 
     /**
@@ -755,7 +881,7 @@ public class JXMonthView extends JComponent {
      * @return true if the date is selected, false otherwise
      */
     public boolean isSelectedDate(Date date) {
-        return getSelectionModel().isSelected(cleanupDate(date));
+        return getSelectionModel().isSelected(startOfDay(date));
     }
 
     /**
@@ -768,7 +894,7 @@ public class JXMonthView extends JComponent {
      * @param lowerBound the lower bound, null means none.
      */
     public void setLowerBound(Date lowerBound) {
-        Date lower = lowerBound != null ? cleanupDate(lowerBound) : null;
+        Date lower = lowerBound != null ? startOfDay(lowerBound) : null;
         getSelectionModel().setLowerBound(lower);
     }
 
@@ -782,7 +908,7 @@ public class JXMonthView extends JComponent {
      * @param upperBound the upper bound, null means none.
      */
     public void setUpperBound(Date upperBound) {
-        Date upper = upperBound != null ? cleanupDate(upperBound) : null;
+        Date upper = upperBound != null ? startOfDay(upperBound) : null;
         getSelectionModel().setUpperBound(upper);
     }
 
@@ -818,7 +944,7 @@ public class JXMonthView extends JComponent {
      * @return true if the date is unselectable, false otherwise
      */
     public boolean isUnselectableDate(Date date) {
-        return getSelectionModel().isUnselectableDate(cleanupDate(date));
+        return getSelectionModel().isUnselectableDate(startOfDay(date));
     }
 
     /**
@@ -842,7 +968,7 @@ public class JXMonthView extends JComponent {
                 "unselectable dates must not be null");
         SortedSet<Date> unselectableSet = new TreeSet<Date>();
         for (Date unselectableDate : unselectableDates) {
-            unselectableSet.add(cleanupDate(unselectableDate));
+            unselectableSet.add(startOfDay(unselectableDate));
         }
         getSelectionModel().setUnselectableDates(unselectableSet);
         repaint();
@@ -858,7 +984,7 @@ public class JXMonthView extends JComponent {
      * @return true if the date is selected, false otherwise
      */
     public boolean isSelectedDate(long date) {
-        return getSelectionModel().isSelected(new Date(cleanupDate(date)));
+        return getSelectionModel().isSelected(new Date(startOfDay(date)));
     }
 
     /**
@@ -869,7 +995,7 @@ public class JXMonthView extends JComponent {
      * @return true if the date is unselectable, false otherwise
      */
     public boolean isUnselectableDate(long date) {
-        return getSelectionModel().isUnselectableDate(new Date(cleanupDate(date)));
+        return getSelectionModel().isUnselectableDate(new Date(startOfDay(date)));
     }
 
     /**
@@ -882,7 +1008,7 @@ public class JXMonthView extends JComponent {
         SortedSet<Date> unselectableSet = new TreeSet<Date>();
         if (unselectableDates != null) {
             for (long unselectableDate : unselectableDates) {
-                unselectableSet.add(new Date(cleanupDate(unselectableDate)));
+                unselectableSet.add(new Date(startOfDay(unselectableDate)));
             }
         }
         getSelectionModel().setUnselectableDates(unselectableSet);
@@ -901,7 +1027,7 @@ public class JXMonthView extends JComponent {
     public boolean isFlaggedDate(long date) {
         boolean result = false;
         if (flaggedDates != null) {
-            result = flaggedDates.contains(cleanupDate(date));
+            result = flaggedDates.contains(startOfDay(date));
         }
         return result;
     }
@@ -920,7 +1046,7 @@ public class JXMonthView extends JComponent {
             // the hour, minute, seconds and milliseconds to 0 so
             // we can compare times later.
             for (long flaggedDate : flaggedDates) {
-                this.flaggedDates.add(cleanupDate(flaggedDate));
+                this.flaggedDates.add(startOfDay(flaggedDate));
             }
         }
         firePropertyChange(FLAGGED_DATES, null, this.flaggedDates);
@@ -983,55 +1109,6 @@ public class JXMonthView extends JComponent {
         return trailingDates;
     }
     
-    private void cleanupWeekSelectionDates(Date startDate, Date endDate) {
-        int count = 1;
-        cal.setTime(startDate);
-        while (cal.getTimeInMillis() < endDate.getTime()) {
-            cal.add(Calendar.DAY_OF_MONTH, 1);
-            count++;
-        }
-
-        if (count > JXMonthView.DAYS_IN_WEEK) {
-            // Move the start date to the first day of the week.
-            cal.setTime(startDate);
-            int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-            int firstDayOfWeek = getFirstDayOfWeek();
-            int daysFromStart = dayOfWeek - firstDayOfWeek;
-            if (daysFromStart < 0) {
-                daysFromStart += JXMonthView.DAYS_IN_WEEK;
-            }
-            cal.add(Calendar.DAY_OF_MONTH, -daysFromStart);
-
-            modifiedStartDate = cal.getTime();
-
-            // Move the end date to the last day of the week.
-            cal.setTime(endDate);
-            dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-            int lastDayOfWeek = firstDayOfWeek - 1;
-            if (lastDayOfWeek == 0) {
-                lastDayOfWeek = Calendar.SATURDAY;
-            }
-            int daysTillEnd = lastDayOfWeek - dayOfWeek;
-            if (daysTillEnd < 0) {
-                daysTillEnd += JXMonthView.DAYS_IN_WEEK;
-            }
-            cal.add(Calendar.DAY_OF_MONTH, daysTillEnd);
-            modifiedEndDate = cal.getTime();
-        }
-    }
-
-
-    private Date cleanupDate(Date date) {
-        // only modify defensive copies
-        return new Date(cleanupDate(date.getTime()));
-    }
-
-    private long cleanupDate(long date) {
-        cal.setTimeInMillis(date);
-        CalendarUtils.startOfDay(cal);
-        return cal.getTimeInMillis();
-    }
-
     /**
      * Returns the padding used between days in the calendar.
      *
@@ -1196,56 +1273,6 @@ public class JXMonthView extends JComponent {
         firePropertyChange("firstDayOfWeek", oldFirstDayOfWeek, this.firstDayOfWeek);
 
         repaint();
-    }
-
-    /**
-     * Gets the time zone.
-     *
-     * @return The <code>TimeZone</code> used by the <code>JXMonthView</code>.
-     */
-    public TimeZone getTimeZone() {
-        return cal.getTimeZone();
-    }
-
-    /**
-     * Sets the time zone with the given time zone value.
-     * 
-     * This is a bound property. 
-     * 
-     * @param tz The <code>TimeZone</code>.
-     */
-    public void setTimeZone(TimeZone tz) {
-        TimeZone old =getTimeZone();
-        cal.setTimeZone(tz);
-        anchor.setTimeZone(tz);
-        setFirstDisplayedDate(anchor.getTimeInMillis());
-        updateTodayFromCurrentTime();
-        updateDatesAfterTimeZoneChange(old);
-        firePropertyChange("timeZone", old, getTimeZone());
-        
-    }
-
-    /**
-     * All dates are "cleaned" relative to the timezone they had been set.
-     * After changing the timezone, the need to be updated to the new.
-     * 
-     * Here: clear everything. 
-     * 
-     * @param oldTimeZone the timezone before the change
-     */
-    protected void updateDatesAfterTimeZoneChange(TimeZone oldTimeZone) {
-        clearSelection();
-        setLowerBound(null);
-        setUpperBound(null);
-        setFlaggedDates(null);
-        setUnselectableDates(new Date[0]);
-    }
-    /**
-     * 
-     */
-    private void updateTodayFromCurrentTime() {
-        setToday(cleanupDate(System.currentTimeMillis()));
-        
     }
 
     /**
@@ -1493,22 +1520,6 @@ public class JXMonthView extends JComponent {
         repaint();
     }
 
-    private void updateToday() {
-        // Update today.
-        cal.setTimeInMillis(today);
-        cal.add(Calendar.DAY_OF_MONTH, 1);
-        setToday(cal.getTimeInMillis());
-
-        // Restore calendar.
-        cal.setTimeInMillis(firstDisplayedDate);
-        repaint();
-    }
-
-    private void setToday(long today) {
-        long oldToday = this.today;
-        this.today = today;
-        firePropertyChange("today", oldToday, this.today);
-    }
 
     /**
      * Moves and resizes this component to conform to the new bounding
@@ -1558,7 +1569,7 @@ public class JXMonthView extends JComponent {
             todayTimer = new Timer(secondsTillTomorrow * 1000,
                     new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
-                            updateToday();
+                            incrementToday();
                         }
                     });
         }
@@ -1571,9 +1582,6 @@ public class JXMonthView extends JComponent {
                 cal.get(Calendar.SECOND);
         todayTimer.setInitialDelay(secondsTillTomorrow * 1000);
         todayTimer.start();
-
-        // Restore calendar
-        cal.setTimeInMillis(firstDisplayedDate);
     }
 
 

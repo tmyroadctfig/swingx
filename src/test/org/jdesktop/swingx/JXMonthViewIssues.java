@@ -39,6 +39,7 @@ import org.jdesktop.swingx.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
+import org.jdesktop.swingx.plaf.basic.BasicMonthViewUI;
 import org.jdesktop.swingx.test.DateSelectionReport;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
@@ -79,7 +80,29 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     @SuppressWarnings("unused")
     private Calendar calendar;
 
-    
+
+    /**
+     * Issue #706-swingx: picker doesn't update monthView.
+     * 
+     * Here: visualize weird side-effects of monthView.updateUI - year 
+     * incremented.
+     */
+    public void interactiveSetToday() {
+        final JXMonthView monthView = new JXMonthView(); //calendar.getTimeInMillis());
+        monthView.setTraversable(true);
+        final JXFrame frame = showInFrame(monthView, "MonthView update ui");
+        Action action = new AbstractActionExt("increment today") {
+            public void actionPerformed(ActionEvent e) {
+                monthView.incrementToday();
+//                SwingUtilities.updateComponentTreeUI(frame);
+            }
+            
+        };
+        addAction(frame, action);
+        frame.pack();
+    };
+
+
     /**
      * Issue #706-swingx: picker doesn't update monthView.
      * 
@@ -181,13 +204,66 @@ public class JXMonthViewIssues extends InteractiveTestCase {
 //----------------------
     
     /**
+     * Issue 711-swingx: today is notify-only property.
+     * Today is start of day.
+     */
+    public void testTodayIntial() {
+        JXMonthView monthView = new JXMonthView();
+        CalendarUtils.startOfDay(calendar);
+        assertEquals(calendar.getTimeInMillis(), monthView.getTodayInMillis());
+    }
+    
+    /**
+     * Issue 711-swingx: today is notify-only property.
+     * Increment sets to start of day of tomorrow.
+     */
+    public void testTodayIncrement() {
+        JXMonthView monthView = new JXMonthView();
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        CalendarUtils.startOfDay(calendar);
+        monthView.incrementToday();
+        assertEquals(calendar.getTimeInMillis(), monthView.getTodayInMillis());
+    }
+    
+    /**
+     * Issue 711-swingx: today is notify-only property.
+     * SetToday should 
+     */
+    public void testTodaySet() {
+        JXMonthView monthView = new JXMonthView();
+        // tomorrow
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        monthView.setTodayInMillis(calendar.getTimeInMillis());
+        CalendarUtils.startOfDay(calendar);
+        assertEquals(calendar.getTime(), new Date(monthView.getTodayInMillis()));
+    }
+    
+    /**
+     * Issue 711-swingx: today is notify-only property.
+     * SetToday should 
+     */
+    public void testTodaySetNotification() {
+        JXMonthView monthView = new JXMonthView();
+        long today = monthView.getTodayInMillis();
+        // tomorrow
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.setTodayInMillis(calendar.getTimeInMillis());
+        CalendarUtils.startOfDay(calendar);
+        TestUtils.assertPropertyChangeEvent(report, "todayInMillis", 
+                today, calendar.getTimeInMillis());
+    }
+    /**
      * Issue #708-swingx: updateUI changes state.
      * 
      * Here: test that today is unchanged.
      */
     public void testUpdateUIToday() {
-        final JXMonthView monthView = new JXMonthView();
-        fail("today is lost in ui - no way to access as it is notification-only property");
+        JXMonthView monthView = new JXMonthView(0);
+        long first = monthView.getTodayInMillis();
+        monthView.updateUI();
+        assertEquals(first, monthView.getTodayInMillis());
     };
 
     /**

@@ -54,6 +54,19 @@ public class BasicMonthViewUITest extends InteractiveTestCase {
   }
 
     /**
+     * Issue 711-swingx: today notify-only property.
+     * 
+     * the delegate makes an educated guess (until it gets notified next time)
+     * of today. 
+     */
+    public void testTodayUpdate() {
+        JXMonthView monthView = new JXMonthView(0);
+        long first = ((BasicMonthViewUI) monthView.getUI()).getToday();
+        monthView.updateUI();
+        assertEquals(first, ((BasicMonthViewUI) monthView.getUI()).getToday());
+    }
+
+    /**
      * test localized month names.
      */
     public void testLocaleMonths() {

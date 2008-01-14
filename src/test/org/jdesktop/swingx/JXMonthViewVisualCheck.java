@@ -36,7 +36,6 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.jdesktop.swingx.JXMonthView.SelectionMode;
@@ -61,8 +60,8 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
 //      setSystemLF(true);
       JXMonthViewVisualCheck  test = new JXMonthViewVisualCheck();
       try {
-//          test.runInteractiveTests();
-        test.runInteractiveTests(".*Locale.*");
+          test.runInteractiveTests();
+//        test.runInteractiveTests(".*Locale.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
