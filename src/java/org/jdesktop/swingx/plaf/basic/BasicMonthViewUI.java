@@ -76,6 +76,7 @@ import org.jdesktop.swingx.plaf.MonthViewUI;
  * @author dmouse
  * @author rbair
  * @author rah003
+ * @author Jeanette Winzenburg
  */
 public class BasicMonthViewUI extends MonthViewUI {
     @SuppressWarnings("all")
@@ -107,9 +108,7 @@ public class BasicMonthViewUI extends MonthViewUI {
     private Handler handler;
 
     // fields related to visible date range
-    /** start of day of the first visible month. 
-     *  PENDING: this is an alias of monthView's property - should be removed and dynamically requested?
-     */
+    /** start of day of the first visible month. */
     private long firstDisplayedDate;
     /** first visible month. */
     private int firstDisplayedMonth;
@@ -118,11 +117,6 @@ public class BasicMonthViewUI extends MonthViewUI {
     /** end of day of the last visible month. */
     private long lastDisplayedDate;
     /** 
-//     * today in monthView's coordinates.
-//     * PENDING: this is an alias of monthView's property - should be removed and dynamically requested?
-//     * PENDING: it's a notification only property - revisit!
-//     */
-//    private long today;
     
     //---------- fields related to selection/navigation
 
@@ -228,8 +222,6 @@ public class BasicMonthViewUI extends MonthViewUI {
         // install date/locale related state
         setFirstDisplayedDate(monthView.getFirstDisplayedDate());
         updateLocale();
-        
-        
     }
 
     protected void uninstallDefaults() {}
@@ -359,7 +351,9 @@ public class BasicMonthViewUI extends MonthViewUI {
         monthView.setDaysOfTheWeek(daysOfTheWeek);
         monthView.invalidate();
         monthView.validate();
-        // JW: why? invalidate cached state?
+        // PENDING JW: why? invalidate cached state?
+        // has the side-effect that updateLocale must not be called before
+        // the derived font is installed .... Cleanup!
         getHandler().layoutContainer(null);
     }
 
@@ -1423,7 +1417,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param date the instant to normalize to the start of the day
      * @return the start of the day in millis.
      */
-    private long cleanupDate(long date) {
+    private long startOfDay(long date) {
         Calendar cal = getCalendar(date);
         CalendarUtils.startOfDay(cal);
         return cal.getTimeInMillis();
@@ -1435,12 +1429,12 @@ public class BasicMonthViewUI extends MonthViewUI {
      * NOTE: it's safe to change the calendar state without resetting because
      * it's JXMonthView's responsibility to protect itself.
      * 
-     * @param date the date to configure the calendar with
+     * @param millis the date to configure the calendar with
      * @return the monthView's calendar, configured with the given date.
      */
-    protected Calendar getCalendar(long date) {
+    protected Calendar getCalendar(long millis) {
         Calendar calendar = monthView.getCalendar();
-        calendar.setTimeInMillis(date);
+        calendar.setTimeInMillis(millis);
         return calendar;
     }
     
@@ -1480,7 +1474,6 @@ public class BasicMonthViewUI extends MonthViewUI {
      */
     @Override
     public long getLastDisplayedDate() {
-//        ensureDateFieldsInitialized();
         return lastDisplayedDate;
     }
 
@@ -1859,8 +1852,6 @@ public class BasicMonthViewUI extends MonthViewUI {
                 selectionModel.addDateSelectionListener(getHandler());
             } else if (JXMonthView.FIRST_DISPLAYED_DATE.equals(property)) {
                 setFirstDisplayedDate(((Long) evt.getNewValue()));
-//            } else if ("todayInMillis".equals(property)) {
-//                setToday((Long)evt.getNewValue());
             } else if (JXMonthView.BOX_PADDING_X.equals(property) || JXMonthView.BOX_PADDING_Y.equals(property) ||
                     JXMonthView.TRAVERSABLE.equals(property) || JXMonthView.DAYS_OF_THE_WEEK.equals(property) ||
                     "border".equals(property) || JXMonthView.WEEK_NUMBER.equals(property)) {
@@ -1993,7 +1984,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 newStartDate = selectionStart = getSelection().first().getTime();
                 newEndDate = selectionEnd = getSelection().last().getTime();
             } else {
-                newStartDate = selectionStart = cleanupDate(System.currentTimeMillis());
+                newStartDate = selectionStart = startOfDay(System.currentTimeMillis());
                 newEndDate = selectionEnd = newStartDate;
             }
 

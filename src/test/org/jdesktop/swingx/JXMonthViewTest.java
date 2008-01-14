@@ -58,7 +58,7 @@ import org.jmock.MockObjectTestCase;
 public class JXMonthViewTest extends MockObjectTestCase {
     private static final Logger LOG = Logger.getLogger(JXMonthViewTest.class
             .getName());
-    private Calendar cal;
+    private Calendar calendar;
     private Locale componentLocale;
     // Constants used internally; unit is milliseconds
     private static final int ONE_MINUTE = 60*1000;
@@ -68,7 +68,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     private static final int ONE_DAY    = 24*ONE_HOUR;
 
     public void setUp() {
-        cal = Calendar.getInstance();
+        calendar = Calendar.getInstance();
 
         //the test is configured for a US defaulted system
         //the localization tests handle actual localization issues
@@ -82,6 +82,70 @@ public class JXMonthViewTest extends MockObjectTestCase {
     }
 
     /**
+     * Issue 711-swingx: today is notify-only property.
+     * Today is start of day.
+     */
+    public void testTodayIntial() {
+        JXMonthView monthView = new JXMonthView();
+        CalendarUtils.startOfDay(calendar);
+        assertEquals(calendar.getTimeInMillis(), monthView.getTodayInMillis());
+    }
+    
+    /**
+     * Issue 711-swingx: today is notify-only property.
+     * Increment sets to start of day of tomorrow.
+     */
+    public void testTodayIncrement() {
+        JXMonthView monthView = new JXMonthView();
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        CalendarUtils.startOfDay(calendar);
+        monthView.incrementToday();
+        assertEquals(calendar.getTimeInMillis(), monthView.getTodayInMillis());
+    }
+    
+    /**
+     * Issue 711-swingx: today is notify-only property.
+     * SetToday should 
+     */
+    public void testTodaySet() {
+        JXMonthView monthView = new JXMonthView();
+        // tomorrow
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        monthView.setTodayInMillis(calendar.getTimeInMillis());
+        CalendarUtils.startOfDay(calendar);
+        assertEquals(calendar.getTime(), new Date(monthView.getTodayInMillis()));
+    }
+    
+    /**
+     * Issue 711-swingx: today is notify-only property.
+     * SetToday should 
+     */
+    public void testTodaySetNotification() {
+        JXMonthView monthView = new JXMonthView();
+        long today = monthView.getTodayInMillis();
+        // tomorrow
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        PropertyChangeReport report = new PropertyChangeReport();
+        monthView.addPropertyChangeListener(report);
+        monthView.setTodayInMillis(calendar.getTimeInMillis());
+        CalendarUtils.startOfDay(calendar);
+        TestUtils.assertPropertyChangeEvent(report, "todayInMillis", 
+                today, calendar.getTimeInMillis());
+    }
+    /**
+     * Issue #708-swingx: updateUI changes state.
+     * 
+     * Here: test that today is unchanged.
+     */
+    public void testUpdateUIToday() {
+        JXMonthView monthView = new JXMonthView(0);
+        long first = monthView.getTodayInMillis();
+        monthView.updateUI();
+        assertEquals(first, monthView.getTodayInMillis());
+    };
+
+    
+    /**
      * Issue #711-swingx: remove fake property change notification.
      * 
      * Here: test that ensureVisibleDate with millis fires once only.
@@ -90,12 +154,12 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JXMonthView monthView = new JXMonthView();
         long firstDisplayedDate = monthView.getFirstDisplayedDate();
         // previous month
-        cal.add(Calendar.MONTH, -1);
+        calendar.add(Calendar.MONTH, -1);
         PropertyChangeReport report = new PropertyChangeReport();
         monthView.addPropertyChangeListener(report);
-        monthView.ensureDateVisible(cal.getTimeInMillis());
-        CalendarUtils.startOfMonth(cal);
-        TestUtils.assertPropertyChangeEvent(report, "firstDisplayedDate", firstDisplayedDate, cal.getTimeInMillis());
+        monthView.ensureDateVisible(calendar.getTimeInMillis());
+        CalendarUtils.startOfMonth(calendar);
+        TestUtils.assertPropertyChangeEvent(report, "firstDisplayedDate", firstDisplayedDate, calendar.getTimeInMillis());
     }
 
     /**
@@ -107,12 +171,12 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JXMonthView monthView = new JXMonthView();
         long firstDisplayedDate = monthView.getFirstDisplayedDate();
         // previous month
-        cal.add(Calendar.MONTH, -1);
+        calendar.add(Calendar.MONTH, -1);
         PropertyChangeReport report = new PropertyChangeReport();
         monthView.addPropertyChangeListener(report);
-        monthView.ensureDateVisible(cal.getTime());
-        CalendarUtils.startOfMonth(cal);
-        TestUtils.assertPropertyChangeEvent(report, "firstDisplayedDate", firstDisplayedDate, cal.getTimeInMillis());
+        monthView.ensureDateVisible(calendar.getTime());
+        CalendarUtils.startOfMonth(calendar);
+        TestUtils.assertPropertyChangeEvent(report, "firstDisplayedDate", firstDisplayedDate, calendar.getTimeInMillis());
     }
     /**
      * Issue #711-swingx: remove fake property change notification.
@@ -123,12 +187,12 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JXMonthView monthView = new JXMonthView();
         long firstDisplayedDate = monthView.getFirstDisplayedDate();
         // previous month
-        cal.add(Calendar.MONTH, -1);
+        calendar.add(Calendar.MONTH, -1);
         PropertyChangeReport report = new PropertyChangeReport();
         monthView.addPropertyChangeListener(report);
-        monthView.setFirstDisplayedDate(cal.getTimeInMillis());
-        CalendarUtils.startOfMonth(cal);
-        TestUtils.assertPropertyChangeEvent(report, "firstDisplayedDate", firstDisplayedDate, cal.getTimeInMillis());
+        monthView.setFirstDisplayedDate(calendar.getTimeInMillis());
+        CalendarUtils.startOfMonth(calendar);
+        TestUtils.assertPropertyChangeEvent(report, "firstDisplayedDate", firstDisplayedDate, calendar.getTimeInMillis());
     }
     
     /**
@@ -154,11 +218,11 @@ public class JXMonthViewTest extends MockObjectTestCase {
         frame.setSize(compare.getPreferredSize().width + 50, monthView.getPreferredSize().height + 50);
         frame.validate();
         // build a date corresponding to the expected end of next month
-        cal.setTimeInMillis(last);
+        calendar.setTimeInMillis(last);
         // next month
-        cal.add(Calendar.DAY_OF_MONTH, 1);
-        CalendarUtils.endOfMonth(cal);
-        assertEquals(cal.getTime(), new Date(monthView.getLastDisplayedDate()));
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        CalendarUtils.endOfMonth(calendar);
+        assertEquals(calendar.getTime(), new Date(monthView.getLastDisplayedDate()));
     }
 
     
@@ -284,13 +348,13 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testEnsureDateVisibleDateParamNextYear() {
         JXMonthView monthView = new JXMonthView();
-        Calendar temp = (Calendar) cal.clone();
+        Calendar temp = (Calendar) calendar.clone();
         CalendarUtils.startOfMonth(temp);
         // sanity
         assertEquals("sanity...", temp.getTimeInMillis(), monthView.getFirstDisplayedDate());
-        cal.add(Calendar.YEAR, 1);
-        Date nextYear = cal.getTime();
-        temp = (Calendar) cal.clone();
+        calendar.add(Calendar.YEAR, 1);
+        Date nextYear = calendar.getTime();
+        temp = (Calendar) calendar.clone();
         CalendarUtils.startOfMonth(temp);
         monthView.ensureDateVisible(nextYear);
         assertEquals("must be scrolled to next year", 
@@ -302,12 +366,12 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testEnsureDateVisibleDateParamNextMonth() {
         JXMonthView monthView = new JXMonthView();
-        Calendar temp = (Calendar) cal.clone();
+        Calendar temp = (Calendar) calendar.clone();
         CalendarUtils.startOfMonth(temp);
         assertEquals("sanity..", temp.getTimeInMillis(), monthView.getFirstDisplayedDate());
-        cal.add(Calendar.MONTH, 1);
-        Date nextMonth = cal.getTime();
-        temp = (Calendar) cal.clone();
+        calendar.add(Calendar.MONTH, 1);
+        Date nextMonth = calendar.getTime();
+        temp = (Calendar) calendar.clone();
         CalendarUtils.startOfMonth(temp);
         monthView.ensureDateVisible(nextMonth);
         assertEquals("must be scrolled to next month", 
@@ -319,12 +383,12 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testEnsureDateVisibleDateParamThisMonth() {
         JXMonthView monthView = new JXMonthView();
-        Calendar temp = (Calendar) cal.clone();
+        Calendar temp = (Calendar) calendar.clone();
         CalendarUtils.startOfMonth(temp);
         long first = monthView.getFirstDisplayedDate();
         assertEquals("sanity...", temp.getTimeInMillis(), first);
-        CalendarUtils.endOfMonth(cal);
-        Date thisMonth = cal.getTime();
+        CalendarUtils.endOfMonth(calendar);
+        Date thisMonth = calendar.getTime();
         monthView.ensureDateVisible(thisMonth);
         assertEquals("same month, nothing changed", 
                 first, monthView.getFirstDisplayedDate());
@@ -336,12 +400,12 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testEnsureDateVisibleNextYear() {
         JXMonthView monthView = new JXMonthView();
-        Calendar temp = (Calendar) cal.clone();
+        Calendar temp = (Calendar) calendar.clone();
         CalendarUtils.startOfMonth(temp);
         assertEquals("sanity...", temp.getTimeInMillis(), monthView.getFirstDisplayedDate());
-        cal.add(Calendar.YEAR, 1);
-        Date nextYear = cal.getTime();
-        temp = (Calendar) cal.clone();
+        calendar.add(Calendar.YEAR, 1);
+        Date nextYear = calendar.getTime();
+        temp = (Calendar) calendar.clone();
         CalendarUtils.startOfMonth(temp);
         monthView.ensureDateVisible(nextYear.getTime());
         assertEquals("must be scrolled to next year", temp.getTimeInMillis(), monthView.getFirstDisplayedDate());
@@ -352,12 +416,12 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testEnsureDateVisibleNextMonth() {
         JXMonthView monthView = new JXMonthView();
-        Calendar temp = (Calendar) cal.clone();
+        Calendar temp = (Calendar) calendar.clone();
         CalendarUtils.startOfMonth(temp);
         assertEquals("sanity ...", temp.getTimeInMillis(), monthView.getFirstDisplayedDate());
-        cal.add(Calendar.MONTH, 1);
-        Date nextMonth = cal.getTime();
-        temp = (Calendar) cal.clone();
+        calendar.add(Calendar.MONTH, 1);
+        Date nextMonth = calendar.getTime();
+        temp = (Calendar) calendar.clone();
         CalendarUtils.startOfMonth(temp);
         monthView.ensureDateVisible(nextMonth.getTime());
         assertEquals("must be scrolled to next month", temp.getTimeInMillis(), monthView.getFirstDisplayedDate());
@@ -368,12 +432,12 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testEnsureDateVisibleThisMonth() {
         JXMonthView monthView = new JXMonthView();
-        Calendar temp = (Calendar) cal.clone();
+        Calendar temp = (Calendar) calendar.clone();
         CalendarUtils.startOfMonth(temp);
         long first = monthView.getFirstDisplayedDate();
         assertEquals("sanity ...", temp.getTimeInMillis(), first);
-        CalendarUtils.endOfMonth(cal);
-        Date thisMonth = cal.getTime();
+        CalendarUtils.endOfMonth(calendar);
+        Date thisMonth = calendar.getTime();
         monthView.ensureDateVisible(thisMonth.getTime());
         assertEquals("same month, nothing changed", first, monthView.getFirstDisplayedDate());
     }
@@ -383,9 +447,9 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testLastDisplayedDateInitial() {
         JXMonthView monthView = new JXMonthView();
-        cal.setTimeInMillis(monthView.getFirstDisplayedDate());
-        CalendarUtils.endOfMonth(cal);
-        assertEquals(cal.getTime(), new Date(monthView.getLastDisplayedDate()));
+        calendar.setTimeInMillis(monthView.getFirstDisplayedDate());
+        CalendarUtils.endOfMonth(calendar);
+        assertEquals(calendar.getTime(), new Date(monthView.getLastDisplayedDate()));
     }
     
     /**
@@ -487,11 +551,11 @@ public class JXMonthViewTest extends MockObjectTestCase {
     public void testAnchorDateInitial() {
         JXMonthView monthView = new JXMonthView();
         // sometime next month
-        cal.add(Calendar.MONTH, 1);
-        monthView.setFirstDisplayedDate(cal.getTimeInMillis());
-        assertEquals(cal.getTime(), monthView.getAnchorDate());
-        CalendarUtils.startOfMonth(cal);
-        assertEquals(cal.getTimeInMillis(), monthView.getFirstDisplayedDate());
+        calendar.add(Calendar.MONTH, 1);
+        monthView.setFirstDisplayedDate(calendar.getTimeInMillis());
+        assertEquals(calendar.getTime(), monthView.getAnchorDate());
+        CalendarUtils.startOfMonth(calendar);
+        assertEquals(calendar.getTimeInMillis(), monthView.getFirstDisplayedDate());
     }
 
     /**
@@ -902,8 +966,8 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testUpperBound() {
         JXMonthView view = new JXMonthView();
-        Date full = cal.getTime();
-        Date cleaned = XTestUtils.getStartOfDay(cal);
+        Date full = calendar.getTime();
+        Date cleaned = XTestUtils.getStartOfDay(calendar);
         view.setUpperBound(full);
         assertEquals(cleaned, view.getUpperBound());
         // remove again
@@ -917,8 +981,8 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testLowerBound() {
         JXMonthView view = new JXMonthView();
-        Date full = cal.getTime();
-        Date cleaned = XTestUtils.getStartOfDay(cal);
+        Date full = calendar.getTime();
+        Date cleaned = XTestUtils.getStartOfDay(calendar);
         view.setLowerBound(full);
         assertEquals(cleaned, view.getLowerBound());
         // remove again
@@ -970,11 +1034,11 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testCleanupCopyDate() {
         JXMonthView monthView = new JXMonthView();
-        if (cal.get(Calendar.HOUR_OF_DAY) < 5) { 
+        if (calendar.get(Calendar.HOUR_OF_DAY) < 5) { 
             // sanity: has time elements
-            cal.set(Calendar.HOUR_OF_DAY, 5);
+            calendar.set(Calendar.HOUR_OF_DAY, 5);
         }
-        Date today = cal.getTime();
+        Date today = calendar.getTime();
         Date copy = new Date(today.getTime());
         monthView.setSelectionInterval(today, today);
         assertEquals("the date used for selection must be unchanged", copy, today);
@@ -1036,7 +1100,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JXMonthView monthView = new JXMonthView();
         Date selected = monthView.getSelectedDate();
         assertNull(selected);
-        Date today = cleanupDate(cal);
+        Date today = cleanupDate(calendar);
         monthView.setSelectionInterval(today, today);
         assertEquals("same day", today, monthView.getSelectedDate());
         // clear selection
@@ -1106,9 +1170,9 @@ public class JXMonthViewTest extends MockObjectTestCase {
         assertTrue(1 == selection.size());
         assertTrue(DateUtils.startOfDay(today).equals(selection.first()));
 
-        cal.setTime(today);
-        cal.add(Calendar.DAY_OF_MONTH, 1);
-        Date tomorrow = cleanupDate(cal);
+        calendar.setTime(today);
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        Date tomorrow = cleanupDate(calendar);
         monthView.setSelectionInterval(today, tomorrow);
         selection = monthView.getSelection();
         assertTrue(1 == selection.size());
@@ -1125,9 +1189,9 @@ public class JXMonthViewTest extends MockObjectTestCase {
         assertTrue(1 == selection.size());
         assertTrue(DateUtils.startOfDay(today).equals(selection.first()));
 
-        cal.setTime(today);
-        cal.add(Calendar.DAY_OF_MONTH, 1);
-        Date tomorrow = cleanupDate(cal);
+        calendar.setTime(today);
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        Date tomorrow = cleanupDate(calendar);
         monthView.setSelectionInterval(today, tomorrow);
         selection = monthView.getSelection();
         assertTrue(2 == selection.size());
@@ -1140,26 +1204,26 @@ public class JXMonthViewTest extends MockObjectTestCase {
         monthView.setSelectionMode(JXMonthView.SelectionMode.WEEK_INTERVAL_SELECTION);
 
         // Use a known date that falls on a Sunday, which just happens to be my birthday.
-        cal.set(Calendar.YEAR, 2006);
-        cal.set(Calendar.MONTH, Calendar.APRIL);
-        cal.set(Calendar.DAY_OF_MONTH, 9);
-        Date startDate = cleanupDate(cal);
+        calendar.set(Calendar.YEAR, 2006);
+        calendar.set(Calendar.MONTH, Calendar.APRIL);
+        calendar.set(Calendar.DAY_OF_MONTH, 9);
+        Date startDate = cleanupDate(calendar);
 
         Date endDate;
-        cal.set(Calendar.DAY_OF_MONTH, 13);
-        endDate = cal.getTime();
+        calendar.set(Calendar.DAY_OF_MONTH, 13);
+        endDate = calendar.getTime();
 
         monthView.setSelectionInterval(startDate, endDate);
         SortedSet<Date> selection = monthView.getSelection();
         assertTrue(startDate.equals(selection.first()));
         assertTrue(endDate.equals(selection.last()));
 
-        cal.set(Calendar.DAY_OF_MONTH, 20);
-        endDate = cal.getTime();
+        calendar.set(Calendar.DAY_OF_MONTH, 20);
+        endDate = calendar.getTime();
         monthView.setSelectionInterval(startDate, endDate);
 
-        cal.set(Calendar.DAY_OF_MONTH, 22);
-        endDate = cal.getTime();
+        calendar.set(Calendar.DAY_OF_MONTH, 22);
+        endDate = calendar.getTime();
         selection = monthView.getSelection();
 
         assertEquals(startDate, selection.first());
@@ -1170,11 +1234,11 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JXMonthView monthView = new JXMonthView();
         monthView.setSelectionMode(JXMonthView.SelectionMode.MULTIPLE_INTERVAL_SELECTION);
 
-        cal.setTimeInMillis(System.currentTimeMillis());
-        Date date1 = cleanupDate(cal);
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        Date date1 = cleanupDate(calendar);
 
-        cal.add(Calendar.DAY_OF_MONTH, 5);
-        Date date2 = cal.getTime();
+        calendar.add(Calendar.DAY_OF_MONTH, 5);
+        Date date2 = calendar.getTime();
 
         monthView.setSelectionInterval(date1, date1);
         monthView.addSelectionInterval(date2, date2);

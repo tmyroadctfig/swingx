@@ -123,6 +123,7 @@ import org.jdesktop.swingx.util.Contract;
  * 
  *  
  * @author Joshua Outwater
+ * @author Jeanette Winzenburg
  * @version  $Revision$
  */
 public class JXMonthView extends JComponent {
@@ -409,8 +410,6 @@ public class JXMonthView extends JComponent {
         // PENDING JW: respect current timezone!
         cal = Calendar.getInstance(locale);
         firstDayOfWeek = cal.getFirstDayOfWeek();
-        // next line is left-over from its time in constructor - let's see what happens if removed
-//        cal.setFirstDayOfWeek(firstDayOfWeek);
         cal.setMinimalDaysInFirstWeek(1);
         anchor = (Calendar) cal.clone();
     }
