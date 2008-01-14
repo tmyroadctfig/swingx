@@ -7,20 +7,31 @@
 package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Point;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
 import java.lang.reflect.Method;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.UIManager.LookAndFeelInfo;
 
 /**
  * Base class for supporting inclusion of interactive tests into a JUnit test case.
@@ -251,5 +262,78 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
            LOG.log(Level.FINE, "caused by ", e1);
       }
     }
+
+    private static class SetPlafAction extends AbstractAction {
+        private String plaf;
+        
+        public SetPlafAction(String name, String plaf) {
+            super(name);
+            this.plaf = plaf;
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        public void actionPerformed(ActionEvent e) {
+            try {
+                Component c = (Component) e.getSource();
+                Window w = null;
+                
+                for (Container p = c.getParent(); p != null; p = p instanceof JPopupMenu ? (Container) ((JPopupMenu) p)
+                        .getInvoker() : p.getParent()) {
+                    if (p instanceof Window) {
+                        w = (Window) p;
+                    }
+                }
+                
+                UIManager.setLookAndFeel(plaf);
+                updateAllComponentTrees(w, true);
+            } catch (ClassNotFoundException e1) {
+                e1.printStackTrace();
+            } catch (InstantiationException e1) {
+                e1.printStackTrace();
+            } catch (IllegalAccessException e1) {
+                e1.printStackTrace();
+            } catch (UnsupportedLookAndFeelException e1) {
+                e1.printStackTrace();
+            }
+        }
+
+        private void updateAllComponentTrees(Window owner, boolean pack) {
+            SwingUtilities.updateComponentTreeUI(owner);
+            if (pack) owner.pack();
+            for (Window window : owner.getOwnedWindows()) {
+                SwingUtilities.updateComponentTreeUI(window);
+                if (pack) window.pack();
+            }
+        }
+    }
+    
+    private JMenuBar createMenuBar() {
+        JMenuBar bar = new JMenuBar();
+        bar.add(createPlafMenu());
+        
+        return bar;
+    }
+
+    private JMenu createPlafMenu() {
+        LookAndFeelInfo[] plafs = UIManager.getInstalledLookAndFeels();
+        JMenu menu = new JMenu("Set L&F");
+        
+        for (LookAndFeelInfo info : plafs) {
+            menu.add(new SetPlafAction(info.getName(), info.getClassName()));
+        }
+        return menu;
+    }
+    
+    public JXFrame wrapInFrame(JComponent component, String title, boolean showMenu) {
+        JXFrame frame = wrapInFrame(component, title);
+        if (showMenu) {
+            frame.setJMenuBar(createMenuBar());
+        }
+        frame.pack();
+        return frame;
+    }
+    
 
 }

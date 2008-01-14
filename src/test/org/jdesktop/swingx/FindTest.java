@@ -21,12 +21,14 @@ import javax.swing.AbstractListModel;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JScrollPane;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.text.BadLocationException;
 
 import org.jdesktop.swingx.JXEditorPane.DocumentSearchable;
 import org.jdesktop.swingx.JXTable.TableSearchable;
 import org.jdesktop.swingx.treetable.FileSystemModel;
+import org.jdesktop.test.AncientSwingTeam;
 
 public class FindTest extends InteractiveTestCase {
     private static final Logger LOG = Logger
@@ -625,7 +627,24 @@ public class FindTest extends InteractiveTestCase {
 //    public void interactiveShowDialog() {
 //        SearchFactory.getInstance().showFindInput(null, new TestSearchable());
 //    }
-
+//--------------- interactive 
+    
+    /**
+     * Issue #718-swingx: finddialog not updated on LF switch.
+     * 
+     * Hmm .. shouldn't a lf-switcher update all windows? Like the
+     * setPlafAction in InteractiveTestCase does (since today <g>).
+     * 
+     * 
+     */
+    public void interactiveFindDialogUpdateLF() {
+        JXTable table = new JXTable(new AncientSwingTeam());
+        table.setColumnControlVisible(true);
+        JXFrame frame = wrapInFrame(new JScrollPane(table), "FindDialog on toggleLF", true);
+        frame.setVisible(true);
+    }
+    
+    
     public void interactiveShowTree() {
         JXTree tree = new JXTree(new FileSystemModel());
         showComponent(tree, "Search in XTree");
