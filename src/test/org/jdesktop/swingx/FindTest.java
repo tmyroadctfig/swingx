@@ -19,6 +19,8 @@ import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
 import javax.swing.Action;
+import javax.swing.Box;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
@@ -635,12 +637,21 @@ public class FindTest extends InteractiveTestCase {
      * Hmm .. shouldn't a lf-switcher update all windows? Like the
      * setPlafAction in InteractiveTestCase does (since today <g>).
      * 
-     * 
+     * Yeah, but the dialog is disposed and the findPanel unparented 
+     * if focus is moved somewhere "outside" of the target. Needed to add something
+     * focusable to reproduce here: 
+     * - open find in table
+     * - click button
+     * - toggle LF
+     * - open find in table: the panel is not changed to new LF
      */
     public void interactiveFindDialogUpdateLF() {
         JXTable table = new JXTable(new AncientSwingTeam());
         table.setColumnControlVisible(true);
-        JXFrame frame = wrapInFrame(new JScrollPane(table), "FindDialog on toggleLF", true);
+        JComponent comp = Box.createVerticalBox();
+        comp.add(new JScrollPane(table));
+        comp.add(new JButton("something to focus"));
+        JXFrame frame = wrapInFrame(comp, "FindDialog on toggleLF", true);
         frame.setVisible(true);
     }
     
