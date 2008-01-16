@@ -328,8 +328,7 @@ public class JXList extends JList {
          *         {@code false} otherwise
          */
         protected boolean hasMatch(SearchResult result) {
-            boolean noMatch =  (result.getFoundRow() < 0); //|| (result.getFoundColumn() < 0);
-            return !noMatch;
+            return result.getFoundRow() >= 0;
         }
         
         @Override
@@ -342,9 +341,7 @@ public class JXList extends JList {
                 return;
             }
             setSelectedIndex(lastSearchResult.foundRow);
-            if (lastSearchResult.foundRow >= 0) {
-                ensureIndexIsVisible(lastSearchResult.foundRow);
-            }
+            ensureIndexIsVisible(lastSearchResult.foundRow);
 
         }
 

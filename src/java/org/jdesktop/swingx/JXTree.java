@@ -472,8 +472,7 @@ public class JXTree extends JTree {
          *         {@code false} otherwise
          */
         protected boolean hasMatch(SearchResult result) {
-            boolean noMatch =  (result.getFoundRow() < 0); //|| (result.getFoundColumn() < 0);
-            return !noMatch;
+            return result.getFoundRow() >= 0;
         }
         
 
@@ -483,11 +482,8 @@ public class JXTree extends JTree {
             if (!hasMatch(lastSearchResult)) {
                 return;
             }
-            int row = lastSearchResult.foundRow;
-            setSelectionRow(row);
-            if (row >= 0) {
-                scrollRowToVisible(row);
-            }
+            setSelectionRow(lastSearchResult.foundRow);
+            scrollRowToVisible(lastSearchResult.foundRow);
 
         }
 
