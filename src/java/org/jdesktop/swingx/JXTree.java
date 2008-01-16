@@ -60,6 +60,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import org.jdesktop.swingx.AbstractSearchable.SearchResult;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.FilterPipeline;
@@ -465,7 +466,23 @@ public class JXTree extends JTree {
             return getRowCount();
         }
 
+        /**
+         * @param result
+         * @return {@code true} if the {@code result} contains a match;
+         *         {@code false} otherwise
+         */
+        protected boolean hasMatch(SearchResult result) {
+            boolean noMatch =  (result.getFoundRow() < 0); //|| (result.getFoundColumn() < 0);
+            return !noMatch;
+        }
+        
+
         protected void moveMatchMarker() {
+            // the common behaviour (JXList, JXTable) is to not
+            // move the selection if not found
+            if (!hasMatch(lastSearchResult)) {
+                return;
+            }
             int row = lastSearchResult.foundRow;
             setSelectionRow(row);
             if (row >= 0) {

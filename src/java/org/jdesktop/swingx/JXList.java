@@ -48,6 +48,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
+import org.jdesktop.swingx.AbstractSearchable.SearchResult;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.CompoundHighlighter;
 import org.jdesktop.swingx.decorator.DefaultSelectionMapper;
@@ -321,13 +322,30 @@ public class JXList extends JList {
             return getElementCount();
         }
 
+        /**
+         * @param result
+         * @return {@code true} if the {@code result} contains a match;
+         *         {@code false} otherwise
+         */
+        protected boolean hasMatch(SearchResult result) {
+            boolean noMatch =  (result.getFoundRow() < 0); //|| (result.getFoundColumn() < 0);
+            return !noMatch;
+        }
+        
         @Override
         protected void moveMatchMarker() {
-          setSelectedIndex(lastSearchResult.foundRow);
-          if (lastSearchResult.foundRow >= 0) {
-              ensureIndexIsVisible(lastSearchResult.foundRow);
-          }
-            
+            // PENDING JW: #718-swingx - don't move selection on not found
+            // complying here is accidental, defaultListSelectionModel doesn't
+            // clear on -1 but silently does nothing
+            // isn't doc'ed anywhere - so we back out
+            if (!hasMatch(lastSearchResult)) {
+                return;
+            }
+            setSelectedIndex(lastSearchResult.foundRow);
+            if (lastSearchResult.foundRow >= 0) {
+                ensureIndexIsVisible(lastSearchResult.foundRow);
+            }
+
         }
 
     }

@@ -61,6 +61,69 @@ public class FindTest extends InteractiveTestCase {
     }
 
     /**
+     * Issue #720: JXTree - selection lost on release the searchable.
+     * 
+     * assert JXList behaviour.
+     * Note: JXList not clearing the selection has been an accidental, undocumented
+     * side-effect of DefaultListSelectionModel.setSelectionInterval - it backs
+     * out silently on negative indices. 
+     */
+    public void testKeepSelectionOnNotFoundList() {
+        JXList list = new JXList(new TestListModel());
+        PatternModel model = new PatternModel();
+        model.setRawText("one9");
+        int row = list.getSearchable().search(model.getPattern());
+        // sanity: found at expected row
+        assertEquals(90, row);
+        // sanity: selection is match marker 
+        assertEquals(row, list.getSelectedIndex());
+        list.getSearchable().search((Pattern) null);
+        assertEquals("not found must not reset selection", row, list.getSelectedIndex());
+    }
+
+    /**
+     * Issue #720: JXTree - selection lost on release the searchable.
+     * 
+     * assert JXTable behaviour.
+     */
+    public void testKeepSelectionOnNotFoundTable() {
+        JXTable table = new JXTable(new TestTableModel());
+        PatternModel model = new PatternModel();
+        model.setRawText("one9");
+        int row = table.getSearchable().search(model.getPattern());
+        // sanity: found at expected row
+        assertEquals(9, row);
+        // sanity: selection is match marker 
+        assertEquals(row, table.getSelectedRow());
+        table.getSearchable().search((Pattern) null);
+        assertEquals("not found must not reset selection", row, table.getSelectedRow());
+    }
+
+    /**
+     * Issue #720: JXTree - selection lost on release the searchable.
+     * 
+     * Base problem was a slight difference in the tree- vs. ListSelectionModel 
+     * (not completely documented). The TreeSelection
+     * interprets a null path array as clearSelection, same for null path in 
+     * setSelectionPaths and setSelectionPath. A null element in the array is
+     * undocumented, but setPaths protects itself and interprets an array containing
+     * null paths only as clearSelection as well.
+     * 
+     */
+    public void testKeepSelectionOnNotFoundTree() {
+        JXTree tree = new JXTree();
+        PatternModel model = new PatternModel();
+        model.setRawText("foo");
+        int row = tree.getSearchable().search(model.getPattern());
+        // sanity: found at expected row
+        assertEquals(3, row);
+        // sanity: selection is match marker 
+        assertEquals(row, tree.getMinSelectionRow());
+        tree.getSearchable().search((Pattern) null);
+        assertEquals("not found must not reset selection", row, tree.getMinSelectionRow());
+    }
+    
+    /**
      * Issue #487-swingx: NPE if instantiating with not null Searchable
      */
     @SuppressWarnings("unused")
