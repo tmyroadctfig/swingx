@@ -394,6 +394,10 @@ public class SearchFactory {
         if (findPanel == null) {
             findPanel = createFindPanel();
             configureSharedFindPanel();
+        } else {
+            if (findPanel.getParent() == null) {
+                SwingUtilities.updateComponentTreeUI(findPanel);
+            }
         }
         return findPanel;
     }
@@ -433,6 +437,7 @@ public class SearchFactory {
         Window window = SwingUtilities.getWindowAncestor(findPanel);
         Point location = lastFindDialogLocation;
         if (window != null) {
+            // PENDING JW: can't remember why it it removed always?
             findPanel.getParent().remove(findPanel);
             if (window.isVisible()) {
                 location = window.getLocationOnScreen();
