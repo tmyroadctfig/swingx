@@ -281,7 +281,7 @@ public class SearchFactory {
 
     protected void stopSearching() {
         if (findPanel != null) {
-            lastFindDialogLocation = hideSharedFindPanel();
+            lastFindDialogLocation = hideSharedFindPanel(false);
             findPanel.setSearchable(null);
         }
         if (findBar != null) {
@@ -357,7 +357,7 @@ public class SearchFactory {
 //            findDialog.setTitle(getSharedFindPanel().getName());
             KeyboardFocusManager.getCurrentKeyboardFocusManager().focusNextComponent(findDialog);
         } else {
-            Point location = hideSharedFindPanel();
+            Point location = hideSharedFindPanel(true);
             if (frame instanceof Frame) {
                 findDialog = new JXDialog((Frame) frame, getSharedFindPanel());
             } else if (frame instanceof Dialog) {
@@ -395,9 +395,11 @@ public class SearchFactory {
             findPanel = createFindPanel();
             configureSharedFindPanel();
         } else {
-            if (findPanel.getParent() == null) {
-                SwingUtilities.updateComponentTreeUI(findPanel);
-            }
+            // JW: temporary hack around #718-swingx
+            // no longer needed with cleanup of hideSharedFindPanel
+//            if (findPanel.getParent() == null) {
+//                SwingUtilities.updateComponentTreeUI(findPanel);
+//            }
         }
         return findPanel;
     }
@@ -432,17 +434,41 @@ public class SearchFactory {
         return (window instanceof JXDialog) ? (JXDialog) window : null;
     }
 
+    /**
+     * Hides the findPanel's toplevel window and returns its location.
+     * 
+     * @return the location of the window if visible, or the last known
+     *   location.
+     * @deprecated use {@link #hideSharedFindPanel(boolean)} instead  
+     */
     protected Point hideSharedFindPanel() {
+        return hideSharedFindPanel(true);
+    }
+
+    /**
+     * Hides the findPanel's toplevel window and returns its location.
+     * If the dispose is true, the findPanel is removed from its parent
+     * and the toplevel window is disposed.
+     * 
+     * @param dispose boolean to indicate whether the findPanels toplevel
+     *   window should be disposed.
+     * @return the location of the window if visible, or the last known
+     *   location.
+     */
+    protected Point hideSharedFindPanel(boolean dispose) {
         if (findPanel == null) return null;
         Window window = SwingUtilities.getWindowAncestor(findPanel);
         Point location = lastFindDialogLocation;
         if (window != null) {
             // PENDING JW: can't remember why it it removed always?
-            findPanel.getParent().remove(findPanel);
             if (window.isVisible()) {
                 location = window.getLocationOnScreen();
+                window.setVisible(false);
             }
-            window.dispose();
+            if (dispose) {
+                findPanel.getParent().remove(findPanel);
+                window.dispose();
+            } 
         }
         return location;
     }

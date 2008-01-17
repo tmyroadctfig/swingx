@@ -9,13 +9,17 @@ package org.jdesktop.swingx;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.GraphicsEnvironment;
+import java.awt.Window;
 import java.net.URL;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractListModel;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.text.BadLocationException;
 
@@ -39,10 +43,116 @@ public class FindTest extends InteractiveTestCase {
       }
   }
    
-    public FindTest() {
-        super("Find Action Test");
+    
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        // sanity: new instance for each test
+        SearchFactory.setInstance(new SearchFactory());
     }
 
+
+    /**
+     * Issue #718-swingx: shared FindPanel not updated on LF change.
+     * 
+     * Here: check that containing dialog is disposed, old api (no boolean).
+     */
+    @SuppressWarnings("deprecation")
+    public void testFindDialogDisposeDeprecated() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        JXFrame frame = new JXFrame();
+        JXTable table = new JXTable();
+        frame.add(table);
+        JComponent findPanel = SearchFactory.getInstance().getSharedFindPanel();
+        SearchFactory.getInstance().showFindDialog(table, table.getSearchable());
+        Window window = SwingUtilities.getWindowAncestor(findPanel);
+        assertSame(frame, window.getOwner());
+        SearchFactory.getInstance().hideSharedFindPanel();
+        assertFalse("window must not be displayable", window.isDisplayable());
+        assertNull("findPanel must be unparented", findPanel.getParent());
+    }
+    
+    /**
+     * Issue #718-swingx: shared FindPanel not updated on LF change.
+     * 
+     * Here: check that containing dialog is disposed, new api with flag.
+     */
+    public void testFindDialogDispose() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        JXFrame frame = new JXFrame();
+        JXTable table = new JXTable();
+        frame.add(table);
+        JComponent findPanel = SearchFactory.getInstance().getSharedFindPanel();
+        SearchFactory.getInstance().showFindDialog(table, table.getSearchable());
+        Window window = SwingUtilities.getWindowAncestor(findPanel);
+        assertSame(frame, window.getOwner());
+        SearchFactory.getInstance().hideSharedFindPanel(true);
+        assertFalse("window must not be displayable", window.isDisplayable());
+        assertNull("findPanel must be unparented", findPanel.getParent());
+    }
+    /**
+     * Issue #718-swingx: shared FindPanel not updated on LF change.
+     * 
+     * Here: check that containing dialog is not disposed.
+     */
+    public void testFindDialogHide() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        JXFrame frame = new JXFrame();
+        JXTable table = new JXTable();
+        frame.add(table);
+        JComponent findPanel = SearchFactory.getInstance().getSharedFindPanel();
+        SearchFactory.getInstance().showFindDialog(table, table.getSearchable());
+        Container parent = findPanel.getParent();
+        Window window = SwingUtilities.getWindowAncestor(findPanel);
+        assertSame(frame, window.getOwner());
+        SearchFactory.getInstance().hideSharedFindPanel(false);
+        assertFalse("window must not be visible", window.isVisible());
+        assertSame("findPanel must parent must be unchanged", 
+                parent, findPanel.getParent());
+        assertTrue("window must be displayable", window.isDisplayable());
+    }
+    
+    /**
+     * Issue #718-swingx: shared FindPanel not updated on LF change.
+     * 
+     * Here: check that dialog is new for different owner and old has been disposed.
+     */
+    public void testFindDialogNew() {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        JXFrame frame = new JXFrame();
+        JXTable table = new JXTable();
+        frame.add(table);
+        JComponent findPanel = SearchFactory.getInstance().getSharedFindPanel();
+        // show search dialog for a searchable
+        SearchFactory.getInstance().showFindDialog(table, table.getSearchable());
+        Window window = SwingUtilities.getWindowAncestor(findPanel);
+        assertSame(frame, window.getOwner());
+        // setup of second searchable
+        JXFrame second = new JXFrame();
+        JXTree tree = new JXTree();
+        second.add(tree);
+        // show search dialog for a searchable
+        SearchFactory.getInstance().showFindDialog(tree, tree.getSearchable());
+        assertFalse("previous window must not be displayable", window.isDisplayable());
+        assertSame(second, SwingUtilities.getWindowAncestor(findPanel).getOwner());
+    }
+    
     /**
      * Issue #720: JXTree - selection lost on release the searchable.
      * 

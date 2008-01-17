@@ -93,7 +93,7 @@ public class FindVisualCheck extends InteractiveTestCase {
      * Hmm .. shouldn't a lf-switcher update all windows? Like the
      * setPlafAction in InteractiveTestCase does (since today <g>).
      * 
-     * Yeah, but the dialog is disposed and the findPanel unparented 
+     * Yeah, but the dialog had been disposed and the findPanel unparented 
      * if focus is moved somewhere "outside" of the target. Needed to add something
      * focusable to reproduce here: 
      * - open find in table
