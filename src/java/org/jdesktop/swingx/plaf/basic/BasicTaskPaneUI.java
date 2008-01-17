@@ -356,14 +356,12 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 						Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 			} else {
 				mouseOver = false;
-				group.repaint();
 			}
 		}
 
 		public void mouseExited(MouseEvent e) {
 			e.getComponent().setCursor(null);
 			mouseOver = false;
-			group.repaint();
 		}
 
 		public void mouseMoved(MouseEvent e) {
@@ -371,11 +369,9 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 				e.getComponent().setCursor(
 						Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 				mouseOver = true;
-				group.repaint();
 			} else {
 				e.getComponent().setCursor(null);
 				mouseOver = false;
-				group.repaint();
 			}
 		}
 
