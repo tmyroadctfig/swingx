@@ -22,19 +22,31 @@ package org.jdesktop.swingx;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Frame;
+import java.awt.Window;
 import java.util.Locale;
 
 import javax.swing.MenuElement;
+import javax.swing.SwingUtilities;
 
 /**
  * A collection of utility methods for Swing(X) classes.
  * 
+ * <ul>
+ * PENDING JW: think about location of this class and/or its methods, Options:
+ * 
+ *  <li> move this class to the swingx utils package which already has a bunch of xxUtils
+ *  <li> move methods between xxUtils classes as appropriate (one window/comp related util)
+ *  <li> keep here in swingx (consistent with swingutilities in core)
+ * </ul>
  * @author Karl George Schaefer
  */
 public final class SwingXUtilities {
     private SwingXUtilities() {
         //does nothing
     }
+    
+    
     
     private static Component[] getChildren(Component c) {
         Component[] children = null;
@@ -91,6 +103,36 @@ public final class SwingXUtilities {
             for(int i = 0; i < children.length; i++) {
                 setComponentTreeLocale(children[i], locale);
             }
+        }
+    }
+
+
+
+    /**
+     * Updates the componentTreeUI of all toplevel windows of the 
+     * current application.
+     * 
+     */
+    public static void updateAllComponentTreeUIs() {
+        for (Frame frame : Frame.getFrames()) {
+            updateAllComponentTreeUIs(frame);
+        }
+        
+    }
+
+
+
+    /**
+     * Updates the componentTreeUI of the given window and all its
+     * owned windows, recursively.
+     * 
+     * 
+     * @param window the window to update
+     */
+    public static void updateAllComponentTreeUIs(Window window) {
+        SwingUtilities.updateComponentTreeUI(window);
+        for (Window owned : window.getOwnedWindows()) {
+            updateAllComponentTreeUIs(owned);
         }
     }
 }

@@ -7,10 +7,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.Point;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.lang.reflect.Method;
 import java.util.logging.Level;
@@ -25,10 +22,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -263,6 +258,10 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
       }
     }
 
+    /**
+     * Action to toggle plaf and update all toplevel windows of the
+     * current application. Used to setup the plaf-menu.
+     */
     private static class SetPlafAction extends AbstractAction {
         private String plaf;
         
@@ -276,18 +275,19 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
          */
         public void actionPerformed(ActionEvent e) {
             try {
-                Component c = (Component) e.getSource();
-                Window w = null;
-                
-                for (Container p = c.getParent(); p != null; p = p instanceof JPopupMenu ? (Container) ((JPopupMenu) p)
-                        .getInvoker() : p.getParent()) {
-                    if (p instanceof Window) {
-                        w = (Window) p;
-                    }
-                }
+//                Component c = (Component) e.getSource();
+//                Window w = null;
+//                
+//                for (Container p = c.getParent(); p != null; p = p instanceof JPopupMenu ? (Container) ((JPopupMenu) p)
+//                        .getInvoker() : p.getParent()) {
+//                    if (p instanceof Window) {
+//                        w = (Window) p;
+//                    }
+//                }
                 
                 UIManager.setLookAndFeel(plaf);
-                updateAllComponentTrees(w, true);
+                SwingXUtilities.updateAllComponentTreeUIs();
+                
             } catch (ClassNotFoundException e1) {
                 e1.printStackTrace();
             } catch (InstantiationException e1) {
@@ -296,15 +296,6 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
                 e1.printStackTrace();
             } catch (UnsupportedLookAndFeelException e1) {
                 e1.printStackTrace();
-            }
-        }
-
-        private void updateAllComponentTrees(Window owner, boolean pack) {
-            SwingUtilities.updateComponentTreeUI(owner);
-            if (pack) owner.pack();
-            for (Window window : owner.getOwnedWindows()) {
-                SwingUtilities.updateComponentTreeUI(window);
-                if (pack) window.pack();
             }
         }
     }
@@ -316,6 +307,12 @@ public abstract class InteractiveTestCase extends junit.framework.TestCase {
         return bar;
     }
 
+    /**
+     * Creates a menu filled with one SetPlafAction for each of the currently
+     * installed LFs.
+     * 
+     * @return the menu to use for plaf switching.
+     */
     private JMenu createPlafMenu() {
         LookAndFeelInfo[] plafs = UIManager.getInstalledLookAndFeels();
         JMenu menu = new JMenu("Set L&F");
