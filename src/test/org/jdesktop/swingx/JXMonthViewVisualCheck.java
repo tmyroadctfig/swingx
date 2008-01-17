@@ -60,8 +60,9 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
 //      setSystemLF(true);
       JXMonthViewVisualCheck  test = new JXMonthViewVisualCheck();
       try {
-          test.runInteractiveTests();
+//          test.runInteractiveTests();
 //        test.runInteractiveTests(".*Locale.*");
+        test.runInteractiveTests(".*TimeZoneClear.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
           e.printStackTrace();
@@ -176,9 +177,12 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         panel.add(zoneSelector);
         showInFrame(panel, "TimeZone");
     }
+    
     /**
      * Issue #618-swingx: JXMonthView displays problems with non-default
      * timezones.
+     * Issue #658-swingx: JXDatePicker today is not updated on timezone.
+     * 
      * 
      */
     public void interactiveTimeZoneClearDateState() {

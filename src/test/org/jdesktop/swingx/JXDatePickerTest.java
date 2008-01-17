@@ -27,6 +27,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.text.Format;
+import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -75,6 +76,8 @@ public class JXDatePickerTest extends TestCase {
     public void tearDown() {
     }
 
+
+    
     /**
      * Issue #693-swingx: format of custom locale.
      * Here: test constructor with locale parameter.
@@ -671,29 +674,94 @@ public class JXDatePickerTest extends TestCase {
         picker.postActionEvent();
         assertEquals(picker.getActionCommand(), report.getLastActionCommand());
     }
+
+    
+
+    /**
+     * Issue #658-swingx: timezone in linkformat updated.
+     * 
+     * linkDate synced with monthView's today after setting.
+     */
+    public void testLinkDateSetToday() {
+        JXDatePicker picker = new JXDatePicker();
+        Calendar cal = picker.getMonthView().getCalendar();
+        cal.setTimeInMillis(picker.getMonthView().getTodayInMillis());
+        cal.add(Calendar.MONTH, 1);
+        CalendarUtils.endOfDay(cal);
+        // NOTE: no public api, testing to guarantee the synch in all cases
+        picker.getMonthView().setTodayInMillis(cal.getTimeInMillis());
+        assertEquals(new Date(picker.getMonthView().getTodayInMillis()), 
+                new Date(picker.getLinkDate()));
+    }
+
+    /**
+     * Issue #658-swingx: timezone in linkformat updated.
+     * 
+     * Initial linkDate synced with monthView's today.
+     */
+    public void testLinkDateInitial() {
+        JXDatePicker picker = new JXDatePicker();
+        assertEquals(picker.getMonthView().getTodayInMillis(), picker.getLinkDate());
+    }
+    
+    /**
+     * Issue #658-swingx: timezone in linkformat updated.
+     * 
+     * Here: set timezone in picker.
+     */
+    public void testSynchTimeZoneLinkFormatOnModified() {
+        JXDatePicker picker = new JXDatePicker();
+        TimeZone alternative = getSafeAlternativeTimeZone(picker.getTimeZone());
+        picker.setTimeZone(alternative);
+        assertTimeZoneLinkFormat(picker, alternative);
+    }
+
     /**
      * Issue #554-swingx: timezone of formats and picker must be synched.
+
+     * Here: set monthView with alternative timezone
+     */
+    public void testSynchTimeZoneLinkFormatOnSetMonthView() {
+        JXDatePicker picker = new JXDatePicker();
+        TimeZone defaultZone = picker.getTimeZone();
+        TimeZone alternative = getSafeAlternativeTimeZone(defaultZone);
+        JXMonthView monthView = new JXMonthView();
+        monthView.setTimeZone(alternative);
+        picker.setMonthView(monthView);
+        assertTimeZoneLinkFormat(picker, alternative);
+    }
+
+    /**
+     * Assert that all DateFormats in the picker's linkFormat have the same
+     * timezone as the picker.
      * 
+     * @param picker the JXDatePicker to test
+     * @param alternative the expected timeZone of the picker (for sanity only)
+     */
+    private void assertTimeZoneLinkFormat(JXDatePicker picker,
+            TimeZone alternative) {
+        // sanity: picker has timezone as expected
+        assertEquals("expected timezone in picker", alternative, picker.getTimeZone());
+        MessageFormat format = picker.getLinkFormat();
+        for (Format subFormat : format.getFormats()) {
+            if (subFormat instanceof DateFormat) {
+                assertEquals(picker.getTimeZone(), ((DateFormat) subFormat).getTimeZone());
+            }
+        }
+    }
+
+    /**
+     * Issue #554-swingx: timezone of formats and picker must be synched.
      * Here: set the timezone in the monthView.
      */
     public void testSynchTimeZoneModifiedInMonthView() {
         JXDatePicker picker = new JXDatePicker();
         TimeZone defaultZone = picker.getTimeZone();
-        TimeZone alternative = TimeZone.getTimeZone("GMT-6");
-        // sanity
-        assertNotNull(alternative);
-        if (alternative.equals(defaultZone)) {
-            alternative = TimeZone.getTimeZone("GMT-7");
-            // paranoid ... but shit happens
-            assertNotNull(alternative);
-            assertFalse(alternative.equals(defaultZone));
-        }
+        TimeZone alternative = getSafeAlternativeTimeZone(defaultZone);
         picker.getMonthView().setTimeZone(alternative);
-        assertEquals(alternative, picker.getTimeZone());
-        for (DateFormat format : picker.getFormats()) {
-            assertEquals("timezone must be synched", picker.getTimeZone(), format.getTimeZone());
-        }
+        assertTimeZoneDateFormats(picker, alternative);
     }
+
  
     /**
      * Issue #554-swingx: timezone of formats and picker must be synched.
@@ -703,46 +771,24 @@ public class JXDatePickerTest extends TestCase {
     public void testSynchTimeZoneModifiedInPicker() {
         JXDatePicker picker = new JXDatePicker();
         TimeZone defaultZone = picker.getTimeZone();
-        TimeZone alternative = TimeZone.getTimeZone("GMT-6");
-        // sanity
-        assertNotNull(alternative);
-        if (alternative.equals(defaultZone)) {
-            alternative = TimeZone.getTimeZone("GMT-7");
-            // paranoid ... but shit happens
-            assertNotNull(alternative);
-            assertFalse(alternative.equals(defaultZone));
-        }
+        TimeZone alternative = getSafeAlternativeTimeZone(defaultZone);
         picker.setTimeZone(alternative);
-        assertEquals(alternative, picker.getTimeZone());
-        for (DateFormat format : picker.getFormats()) {
-            assertEquals("timezone must be synched", picker.getTimeZone(), format.getTimeZone());
-        }
+        assertTimeZoneDateFormats(picker, alternative);
     }
 
     /**
      * Issue #554-swingx: timezone of formats and picker must be synched.
-     * 
+
      * Here: set the timezone in the picker.
      */
     public void testSynchTimeZoneOnSetMonthView() {
         JXDatePicker picker = new JXDatePicker();
         TimeZone defaultZone = picker.getTimeZone();
-        TimeZone alternative = TimeZone.getTimeZone("GMT-6");
-        // sanity
-        assertNotNull(alternative);
-        if (alternative.equals(defaultZone)) {
-            alternative = TimeZone.getTimeZone("GMT-7");
-            // paranoid ... but shit happens
-            assertNotNull(alternative);
-            assertFalse(alternative.equals(defaultZone));
-        }
+        TimeZone alternative = getSafeAlternativeTimeZone(defaultZone);
         JXMonthView monthView = new JXMonthView();
         monthView.setTimeZone(alternative);
         picker.setMonthView(monthView);
-        assertEquals(alternative, picker.getTimeZone());
-        for (DateFormat format : picker.getFormats()) {
-            assertEquals("timezone must be synched", picker.getTimeZone(), format.getTimeZone());
-        }
+        assertTimeZoneDateFormats(picker, alternative);
     }
 
     /**
@@ -753,18 +799,22 @@ public class JXDatePickerTest extends TestCase {
     public void testSynchTimeZoneOnSetFormats() {
         JXDatePicker picker = new JXDatePicker();
         TimeZone defaultZone = picker.getTimeZone();
-        TimeZone alternative = TimeZone.getTimeZone("GMT-6");
-        // sanity
-        assertNotNull(alternative);
-        if (alternative.equals(defaultZone)) {
-            alternative = TimeZone.getTimeZone("GMT-7");
-            // paranoid ... but shit happens
-            assertNotNull(alternative);
-            assertFalse(alternative.equals(defaultZone));
-        }
+        TimeZone alternative = getSafeAlternativeTimeZone(defaultZone);
         picker.setTimeZone(alternative);
-        assertEquals(alternative, picker.getTimeZone());
         picker.setFormats(DateFormat.getDateInstance());
+        assertTimeZoneDateFormats(picker, alternative);
+    }
+
+    /**
+     * Assert that all DateFormats in the picker's linkFormat have the same
+     * timezone as the picker.
+     * 
+     * @param picker the JXDatePicker to test
+     * @param alternative the expected timeZone of the picker (for sanity only)
+     */
+    private void assertTimeZoneDateFormats(JXDatePicker picker,
+            TimeZone alternative) {
+        assertEquals(alternative, picker.getTimeZone());
         for (DateFormat format : picker.getFormats()) {
             assertEquals("timezone must be synched", picker.getTimeZone(), format.getTimeZone());
         }
@@ -1332,6 +1382,26 @@ public class JXDatePickerTest extends TestCase {
         datePicker.setDate(null);
         assertTrue(null == datePicker.getDate());
         assertTrue(null == datePicker.getEditor().getValue());
+    }
+
+ //------------------ test helpers
+    
+    /**
+     * Returns a timezone different from the given.
+     * @param defaultZone
+     * @return
+     */
+    private TimeZone getSafeAlternativeTimeZone(TimeZone defaultZone) {
+        TimeZone alternative = TimeZone.getTimeZone("GMT-6");
+        // sanity
+        assertNotNull(alternative);
+        if (alternative.equals(defaultZone)) {
+            alternative = TimeZone.getTimeZone("GMT-7");
+            // paranoid ... but shit happens
+            assertNotNull(alternative);
+            assertFalse(alternative.equals(defaultZone));
+        }
+        return alternative;
     }
 
     private Date cleanupDate(Calendar cal) {

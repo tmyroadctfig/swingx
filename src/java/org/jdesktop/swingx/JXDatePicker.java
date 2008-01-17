@@ -33,9 +33,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyVetoException;
 import java.text.DateFormat;
+import java.text.Format;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.EventListener;
 import java.util.Locale;
@@ -335,7 +337,10 @@ public class JXDatePicker extends JComponent {
     /**
      * Replaces the currently installed formatter and factory used by the
      * editor. These string formats are defined by the
-     * <code>java.text.SimpleDateFormat</code> class.
+     * <code>java.text.SimpleDateFormat</code> class. <p>
+     * 
+     * Note: The given formats are internally synched to the picker's current
+     *    TimeZone. 
      * 
      * @param formats zero or more not null string formats to use. Note that a 
      *    null array is allowed and resets the formatter to use the 
@@ -359,8 +364,11 @@ public class JXDatePicker extends JComponent {
 
     /**
      * Replaces the currently installed formatter and factory used by the
-     * editor.
+     * editor.<p>
      *
+     * Note: The given formats are internally synched to the picker's current
+     *    TimeZone. 
+     * 
      * @param formats zero or more not null formats to use. Note that a 
      *    null array is allowed and resets the formatter to use the 
      *    localized default formats.
@@ -465,7 +473,7 @@ public class JXDatePicker extends JComponent {
      */
     public void setLinkDate(long linkDate, String linkFormatString) {
         _linkDate = linkDate;
-        _linkFormat = new MessageFormat(linkFormatString);
+        setLinkFormat(new MessageFormat(linkFormatString));
         setLinkPanel(new TodayPanel());
     }
     
@@ -475,7 +483,43 @@ public class JXDatePicker extends JComponent {
      */
     public void setLinkDate(long linkDate) {
         this._linkDate = linkDate;
+        Format[] formats = getLinkFormat().getFormatsByArgumentIndex();
+        for (Format format : formats) {
+            if (format instanceof DateFormat) {
+                ((DateFormat) format).setTimeZone(getTimeZone());
+            }
+        }
         setLinkPanel(new TodayPanel());
+    }
+
+    /**
+     * @param _linkFormat the _linkFormat to set
+     */
+    protected void setLinkFormat(MessageFormat _linkFormat) {
+        this._linkFormat = _linkFormat;
+    }
+
+    /**
+     * @return the _linkFormat
+     */
+    protected MessageFormat getLinkFormat() {
+        return _linkFormat;
+    }
+
+    /**
+     * Update text on the link panel.
+     * 
+     */
+    private void updateLinkFormat() {
+        // PENDING JW: move to ui
+        String linkFormat = UIManagerExt.getString(
+                "JXDatePicker.linkFormat", getLocale());
+        
+        if (linkFormat != null) {
+            setLinkFormat(new MessageFormat(linkFormat));
+        } else {
+            setLinkFormat(new MessageFormat("{0,date, dd MMMM yyyy}"));
+        }
     }
 
     /**
@@ -825,14 +869,17 @@ public class JXDatePicker extends JComponent {
              * and then delete following line
              */
             updateLinkFormat();
-            todayLink.setText(_linkFormat.format(new Object[]{new Date(_linkDate)}));
+            todayLink.setText(getLinkFormat().format(new Object[]{new Date(_linkDate)}));
 //            todayLink.setText(DateFormat.getDateInstance(DateFormat.MEDIUM, l).format(new Date(_linkDate)));
         }
         
         private final class TodayAction extends AbstractAction {
             boolean select;
             TodayAction() {
-                super(_linkFormat.format(new Object[]{new Date(_linkDate)}));
+                super(getLinkFormat().format(new Object[]{new Date(_linkDate)}));
+                Calendar cal = _monthView.getCalendar();
+                cal.setTimeInMillis(_linkDate);
+                putValue(NAME, getLinkFormat().format(new Object[] {cal.getTime()}));
             }
 
             public void actionPerformed(ActionEvent ae) {
@@ -855,25 +902,5 @@ public class JXDatePicker extends JComponent {
         }
     }
 
-    /**
-     * Update text on the link panel.
-     * 
-     */
-    private void updateLinkFormat() {
-        /* FIXME: PeS: Again, run into trouble with UIManagerExt as it seems to have 
-         * something installed as locale. I do not want to touch that as I am
-         * not sure I understand fully. Feel free to improve. Once done,
-         * uncomment code in TodayPanel setLocale method. Thanks.
-         */ 
-  
-        String linkFormat = UIManagerExt.getString(
-                "JXDatePicker.linkFormat", getLocale());
-        
-        if (linkFormat != null) {
-            _linkFormat = new MessageFormat(linkFormat);
-        } else {
-            _linkFormat = new MessageFormat("{0,date, dd MMMM yyyy}");
-        }
-    }
 }    
  

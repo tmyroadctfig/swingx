@@ -28,8 +28,8 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -44,12 +44,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.DatePickerFormatter;
 import org.jdesktop.swingx.calendar.DateUtils;
+import org.jdesktop.test.PropertyChangeReport;
+import org.jdesktop.test.TestUtils;
 
 /**
  * Known issues of <code>JXDatePicker</code> and picker related 
@@ -467,6 +468,21 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 //-------------------- unit tests
  
     /**
+     * Issue #??-swingx: picker must notify about timezone changes.
+     * Can it guarantee the notification? Not really, if changed in the
+     * underlying monthView? 
+     */
+    public void testTimeZoneChangeNotification() {
+        JXDatePicker picker = new JXDatePicker();
+        TimeZone timeZone = picker.getTimeZone();
+        TimeZone alternative = getSafeAlternativeTimeZone(timeZone);
+        PropertyChangeReport report = new PropertyChangeReport();
+        picker.addPropertyChangeListener(report);
+        picker.setTimeZone(alternative);
+        TestUtils.assertPropertyChangeEvent(report, "timeZone", timeZone, alternative, false);
+    }
+
+    /**
      * test that selectionListener is uninstalled.
      * 
      * Hmm ... missing api or overshooting?
@@ -483,6 +499,23 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     }
     
 
+    /**
+     * Returns a timezone different from the given.
+     * @param defaultZone
+     * @return
+     */
+    private TimeZone getSafeAlternativeTimeZone(TimeZone defaultZone) {
+        TimeZone alternative = TimeZone.getTimeZone("GMT-6");
+        // sanity
+        assertNotNull(alternative);
+        if (alternative.equals(defaultZone)) {
+            alternative = TimeZone.getTimeZone("GMT-7");
+            // paranoid ... but shit happens
+            assertNotNull(alternative);
+            assertFalse(alternative.equals(defaultZone));
+        }
+        return alternative;
+    }
 
 
 
