@@ -7,7 +7,6 @@
 package org.jdesktop.swingx;
 
 import java.awt.Color;
-import java.awt.Component;
 
 import javax.swing.AbstractListModel;
 
@@ -169,7 +168,7 @@ public class FindIssues extends FindTest {
     public void interactiveTableBatchWithCellSelectionIssue() {
         JXTable table = new JXTable(new TestTableModel());
         table.setCellSelectionEnabled(true);
-        showComponent(table, "batch find with cell selection");
+        showWithScrollingInFrame(table, "batch find with cell selection");
     }
 
 }
