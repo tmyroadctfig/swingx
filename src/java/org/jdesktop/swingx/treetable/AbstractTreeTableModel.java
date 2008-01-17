@@ -24,6 +24,8 @@ package org.jdesktop.swingx.treetable;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreePath;
 
+import org.jdesktop.swingx.tree.TreeModelSupport;
+
 // There is no javax.swing.tree.AbstractTreeModel; There ought to be one.
 
 /**

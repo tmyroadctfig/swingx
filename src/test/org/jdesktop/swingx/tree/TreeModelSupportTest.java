@@ -19,13 +19,16 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-package org.jdesktop.swingx.treetable;
+package org.jdesktop.swingx.tree;
 
 import javax.swing.event.TreeModelEvent;
 import javax.swing.tree.TreePath;
 
 import junit.framework.TestCase;
 
+import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
+import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
+import org.jdesktop.swingx.treetable.TreeTableModel;
 import org.jdesktop.test.TreeModelReport;
 
 /**

@@ -18,7 +18,7 @@
  * along with this library; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-package org.jdesktop.swingx.treetable;
+package org.jdesktop.swingx.tree;
 
 import javax.swing.event.EventListenerList;
 import javax.swing.event.TreeModelEvent;
@@ -41,7 +41,6 @@ import org.jdesktop.swingx.util.Contract;
  * 
  * @author JW
  */
-@Deprecated
 public final class TreeModelSupport {
     protected EventListenerList listeners;
 
