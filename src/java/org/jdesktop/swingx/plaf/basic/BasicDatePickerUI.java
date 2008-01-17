@@ -646,11 +646,14 @@ public class BasicDatePickerUI extends DatePickerUI {
     protected void updateFromMonthViewChanged(JXMonthView oldMonthView) {
         popup = null;
         updateMonthViewListeners(oldMonthView);
+        TimeZone oldTimeZone = null;
         if (oldMonthView != null) {
             oldMonthView.setComponentInputMapEnabled(false);
+            oldTimeZone = oldMonthView.getTimeZone();
         }
         datePicker.getMonthView().setComponentInputMapEnabled(true);
-        updateFormatTimeZone(datePicker.getTimeZone());
+        updateTimeZone(oldTimeZone);
+//        updateFormatsFromTimeZone(datePicker.getTimeZone());
         updateEditorValue();
     }
 
@@ -714,10 +717,32 @@ public class BasicDatePickerUI extends DatePickerUI {
      * Updates the picker's formats to the given TimeZone.
      * @param zone the timezone to set on the formats.
      */
-    protected void updateFormatTimeZone(TimeZone zone) {
+    protected void updateFormatsFromTimeZone(TimeZone zone) {
         for (DateFormat format : datePicker.getFormats()) {
             format.setTimeZone(zone);
         }
+    }
+    
+    /**
+     * Updates picker's timezone dependent properties on change notification
+     * from the associated monthView.
+     * 
+     * PENDING JW: DatePicker needs to send notification on timezone change? 
+     * 
+     * @param old the timezone before the change.
+     */
+    protected void updateTimeZone(TimeZone old) {
+        updateFormatsFromTimeZone(datePicker.getTimeZone());
+        updateLinkDate();
+        
+//        datePicker.firePropertyChange(propertyName, oldValue, newValue)
+    }
+
+    /**
+     * Updates the picker's linkDate to be in synch with monthView's today.
+     */
+    protected void updateLinkDate() {
+        datePicker.setLinkDate(datePicker.getMonthView().getTodayInMillis());
     }
 
     /**
@@ -1164,7 +1189,7 @@ public class BasicDatePickerUI extends DatePickerUI {
                 }
                 popup = null;
             } else if ("formats".equals(property)) {
-                updateFormatTimeZone(datePicker.getTimeZone());
+                updateFormatsFromTimeZone(datePicker.getTimeZone());
             }
             else if ("locale".equals(property)) {
                 updateLocale();
@@ -1181,7 +1206,10 @@ public class BasicDatePickerUI extends DatePickerUI {
             if ("selectionModel".equals(e.getPropertyName())) {
                 updateFromSelectionModelChanged((DateSelectionModel) e.getOldValue());
             } else if ("timeZone".equals(e.getPropertyName())) {
-                updateFormatTimeZone((TimeZone) e.getNewValue());
+//                updateFormatsFromTimeZone((TimeZone) e.getNewValue());
+                updateTimeZone((TimeZone) e.getOldValue());
+            } else if ("todayInMillis".equals(e.getPropertyName())) {
+                updateLinkDate();
             }
         }
 
