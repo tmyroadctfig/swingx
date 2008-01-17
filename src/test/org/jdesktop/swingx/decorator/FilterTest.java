@@ -21,6 +21,7 @@ import javax.swing.table.TableModel;
 import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.test.PipelineReport;
 import org.jdesktop.test.AncientSwingTeam;
 
@@ -765,6 +766,45 @@ public class FilterTest extends InteractiveTestCase {
         frame.setVisible(true);
     }
 
+    /**
+     * test if extending patternFilter (because of missing abstractFilter)
+     * is working.
+     */
+    public void interactiveFakePatternFilter() {
+        final int threshhold = 50;
+        final Filter filter = new PatternFilter(null, 0, 3) {
+
+            @Override
+            public boolean test(int row) {
+                Object value = getInputValue(row, getColumnIndex());
+                if (value instanceof Integer) {
+                    return ((Integer) value).intValue() > threshhold;
+                }
+                return false;
+            }
+
+        };
+        final FilterPipeline pipeline = new FilterPipeline(filter);
+        final JXTable table =  new JXTable(new AncientSwingTeam());
+        Action action = new AbstractActionExt("toggle filter") {
+            boolean filtered;
+            public void actionPerformed(ActionEvent e) {
+                if (filtered) {
+                    table.setFilters(null);
+                } else {
+                    table.setFilters(pipeline);
+                    
+                }
+                filtered = !filtered;
+            }
+            
+        };
+        JXFrame frame = wrapWithScrollingInFrame(table, "filter fake");
+        addAction(frame, action);
+        frame.pack();
+        frame.setVisible(true);
+    }
+    
     public static void main(String args[]) {
         setSystemLF(true);
         FilterTest test = new FilterTest();
