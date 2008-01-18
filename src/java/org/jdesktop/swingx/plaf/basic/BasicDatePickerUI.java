@@ -585,6 +585,9 @@ public class BasicDatePickerUI extends DatePickerUI {
      * Updates internals after picker's date property changed.
      */
     protected void updateFromDateChanged() {
+        long visibleHook = datePicker.getDate() != null ?
+                datePicker.getDate().getTime() : datePicker.getLinkDate();
+        datePicker.getMonthView().ensureDateVisible(visibleHook);        
         datePicker.getEditor().setValue(datePicker.getDate());
     }
 

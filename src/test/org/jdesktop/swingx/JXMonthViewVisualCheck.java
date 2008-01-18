@@ -37,9 +37,11 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 
 import org.jdesktop.swingx.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.test.XTestUtils;
@@ -68,6 +70,147 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
           e.printStackTrace();
       }
   }
+
+    /**
+     * Issue #711-swingx: fake properties.
+     * 
+     * visually testing today increment (it's not public api but can't
+     * think of a way to simulate the timer).
+     */
+    public void interactiveSetToday() {
+        final JXMonthView monthView = new JXMonthView(); 
+        monthView.setTraversable(true);
+        final JXFrame frame = showInFrame(monthView, "MonthView today");
+        Action action = new AbstractActionExt("increment today") {
+            public void actionPerformed(ActionEvent e) {
+                monthView.incrementToday();
+            }
+            
+        };
+        addAction(frame, action);
+        frame.pack();
+    };
+
+
+    /**
+     * Issue #706-swingx: picker doesn't update monthView.
+     * 
+     * Here: visualize weird side-effects of monthView.updateUI - year 
+     * incremented.
+     */
+    public void interactiveUpdateUIMonthView() {
+//        calendar.set(1955, 10, 9);
+        final JXMonthView monthView = new JXMonthView(); //calendar.getTimeInMillis());
+        monthView.setTraversable(true);
+        final JXFrame frame = showInFrame(monthView, "MonthView update ui - visible month kept");
+        Action action = new AbstractActionExt("toggleUI") {
+            public void actionPerformed(ActionEvent e) {
+                monthView.updateUI();
+            }
+            
+        };
+        addAction(frame, action);
+        frame.pack();
+    };
+
+    /**
+     * Issue #706-swingx: picker doesn't update monthView.
+     * 
+     * Show toggle of UI (selectin color)
+     */
+    public void interactiveUpdateUIMonthViewCustomUI() {
+        final JXMonthView monthView = new JXMonthView();
+        monthView.setSelectedDate(new Date());
+        final JXFrame frame = showInFrame(monthView, "MonthView custom ui (selection color)");
+        Action action = new AbstractActionExt("toggleUI") {
+            public void actionPerformed(ActionEvent e) {
+                String uiClass = (String) UIManager.get(JXMonthView.uiClassID);
+                boolean custom = uiClass.indexOf("Custom") > 0;
+                if (!custom) {
+                    UIManager.put(JXMonthView.uiClassID, "org.jdesktop.swingx.test.CustomMonthViewUI");
+                } else {
+                    UIManager.put(JXMonthView.uiClassID, null);
+                }
+                monthView.updateUI();
+                custom = !custom;
+            }
+            
+        };
+        addAction(frame, action);
+        frame.pack();
+    };
+    
+    /**
+     * #705-swingx: JXMonthview must not scroll on revalidate.
+     * 
+     * Misbehaviour here : multi-month spanning selection, travers two month into the future and
+     * resize the frame - jumps back to first. Auto-scroll in the delegates
+     * selection listener would have a similar effect.
+     * 
+     */
+    public void interactiveAutoScrollOnResize() {
+        final JXMonthView us = new JXMonthView();
+        us.setTraversable(true);
+        us.setSelectionMode(JXMonthView.SelectionMode.SINGLE_INTERVAL_SELECTION);
+        final Calendar today = Calendar.getInstance();
+        CalendarUtils.endOfMonth(today);
+        Date start = today.getTime();
+        today.add(Calendar.DAY_OF_MONTH, 60);
+        us.setSelectionInterval(start, today.getTime());
+        JXFrame frame = wrapInFrame(us, "resize");
+        // quick check if lastDisplayed is updated on resize
+        Action printLast = new AbstractActionExt("log last") {
+
+            public void actionPerformed(ActionEvent e) {
+                
+                LOG.info("last updated?" + new Date(us.getLastDisplayedDate()));
+            }
+            
+        };
+        addAction(frame, printLast);
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    /**
+     * #703-swingx: set date to first of next doesn't update the view.
+     * 
+     * Behaviour is consistent with core components. Except that it is doing 
+     * too much: revalidate most probably shouldn't change the scrolling state?
+     * 
+     * Simulated misbehaviour here: multi-month spanning selection, travers into the future and
+     * add selection at the end - jumps back to first. Auto-scroll in the delegates
+     * selection listener would have the effect.
+     * 
+     */
+    public void interactiveAutoScrollOnSelectionSim() {
+        final JXMonthView us = new JXMonthView();
+        us.setTraversable(true);
+        us.setSelectionMode(JXMonthView.SelectionMode.SINGLE_INTERVAL_SELECTION);
+        final Calendar today = Calendar.getInstance();
+        CalendarUtils.endOfMonth(today);
+        Date start = today.getTime();
+        today.add(Calendar.DAY_OF_MONTH, 60);
+        us.setSelectionInterval(start, today.getTime());
+        JXFrame frame = wrapInFrame(us, "Simulate autoscroll on selection");
+        Action nextMonthInterval = new AbstractActionExt("add selected") {
+
+            public void actionPerformed(ActionEvent e) {
+                if (us.isSelectionEmpty()) return;
+                Date start = us.getSelectedDate();
+                
+                today.setTime(us.getSelection().last());
+                today.add(Calendar.DAY_OF_MONTH, 5);
+                us.addSelectionInterval(start, today.getTime());
+                // here we simulate an auto-scroll
+                us.ensureDateVisible(start.getTime());
+            }
+            
+        };
+        addAction(frame, nextMonthInterval);
+        frame.pack();
+        frame.setVisible(true);
+    }
 
     /**
      * #681-swingx: first row overlaps days.
@@ -115,7 +258,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
      */
     public void interactiveFirstRowOfMonth() {
         JXMonthView monthView = new JXMonthView();
-        calendar.set(2008, 1, 1);
+        calendar.set(2008, 0, 1);
         monthView.setSelectedDate(calendar.getTime());
         showInFrame(monthView, "first row");
     }
@@ -131,10 +274,10 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         final JComboBox zoneSelector = new JComboBox(Locale.getAvailableLocales());
         final JXMonthView monthView = new JXMonthView();
         monthView.setTraversable(true);
-        // Synchronize the picker and selector's zones.
+        // Synchronize the monthView's and selector's zones.
         zoneSelector.setSelectedItem(monthView.getLocale());
 
-        // Set the picker's time zone based on the selected time zone.
+        // Set the monthView's time zone based on the selected time zone.
         zoneSelector.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 Locale zone = (Locale) zoneSelector.getSelectedItem();
@@ -410,7 +553,19 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         frame.getRootPaneExt().getActionMap().remove("esc-action");
 
     }
-    
+
+    /**
+     * Issue #426-swingx: NPE on traversing 
+     * 
+     * example from bug report
+     *
+     */
+    public void interactiveMonthViewTravers() {
+        JXMonthView monthView = new JXMonthView();
+        monthView.setTraversable(true);
+        showInFrame(monthView, "travers throws NPE");
+    }
+
 //----------------------
     @Override
     protected void setUp() throws Exception {

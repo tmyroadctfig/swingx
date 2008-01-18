@@ -21,9 +21,8 @@
  */
 package org.jdesktop.swingx;
 
-import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
-import java.lang.reflect.InvocationTargetException;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -33,10 +32,8 @@ import java.util.TimeZone;
 import java.util.logging.Logger;
 
 import javax.swing.Action;
-import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.JXMonthView.SelectionMode;
-import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
@@ -79,189 +76,95 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     @SuppressWarnings("unused")
     private Calendar calendar;
 
-
     /**
-     * Issue #711-swingx: fake properties.
+     * Issue #567-swingx: JXDatepicker - clicking on unselectable date clears
+     * picker's selection.
      * 
-     * visually testing today increment (it's not public api but can't
-     * think of a way to simulate the timer).
+     * Here: visualize JXMonthView's behaviour. It fires a commit ... probably the 
+     * wrong thing to do?. 
+     * PENDING: better control the bounds ... 
+     * PENDING: move into monthView after rename
      */
-    public void interactiveSetToday() {
-        final JXMonthView monthView = new JXMonthView(); 
-        monthView.setTraversable(true);
-        final JXFrame frame = showInFrame(monthView, "MonthView today");
-        Action action = new AbstractActionExt("increment today") {
+    public void interactiveBoundsMonthViewClickUnselectable() {
+        JXMonthView monthView = new JXMonthView();
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_MONTH, 7);
+        monthView.setLowerBound(calendar.getTime());
+        calendar.set(Calendar.DAY_OF_MONTH, 20);
+        monthView.setUpperBound(calendar.getTime());
+        ActionListener l = new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
-                monthView.incrementToday();
+                LOG.info("got action " + e);
+                
             }
             
         };
-        addAction(frame, action);
-        frame.pack();
-    };
-
-
-    /**
-     * Issue #706-swingx: picker doesn't update monthView.
-     * 
-     * Here: visualize weird side-effects of monthView.updateUI - year 
-     * incremented.
-     */
-    public void interactiveUpdateUIMonthView() {
-//        calendar.set(1955, 10, 9);
-        final JXMonthView monthView = new JXMonthView(); //calendar.getTimeInMillis());
-        monthView.setTraversable(true);
-        final JXFrame frame = showInFrame(monthView, "MonthView update ui");
-        Action action = new AbstractActionExt("toggleUI") {
-            public void actionPerformed(ActionEvent e) {
-                monthView.updateUI();
-//                SwingUtilities.updateComponentTreeUI(frame);
-            }
-            
-        };
-        addAction(frame, action);
-        frame.pack();
-    };
+        monthView.addActionListener(l);
+        showInFrame(monthView, "click unselectable fires ActionEvent");
+    }
 
     
     /**
-     * #703-swingx: set date to first of next doesn't update the view.
+     * Issue #657-swingx: JXMonthView - unintuitive week-wise navigation with bounds
      * 
-     * Behaviour is consistent with core components. Except that it is doing 
-     * too much: revalidate most probably shouldn't change the scrolling state?
+     * In a month, keyboard navigation beyond the upper/lower bound is prevented.
+     * There's a leak in the region of the leading/trailing dates 
+     * when navigating week-wise. 
      * 
-     * Misbehaviour here : multi-month spanning selection, travers two month into the future and
-     * resize the frame - jumps back to first. Auto-scroll in the delegates
-     * selection listener would have a similar effect.
-     * 
+     * PENDING: move into monthView after rename
      */
-    public void interactiveAutoScrollOnResize() {
-        final JXMonthView us = new JXMonthView();
-        us.setTraversable(true);
-        us.setSelectionMode(JXMonthView.SelectionMode.SINGLE_INTERVAL_SELECTION);
-        final Calendar today = Calendar.getInstance();
-        CalendarUtils.endOfMonth(today);
-        Date start = today.getTime();
-        today.add(Calendar.DAY_OF_MONTH, 60);
-        us.setSelectionInterval(start, today.getTime());
-        JXFrame frame = wrapInFrame(us, "resize");
-        // quick check if lastDisplayed is updated on resize
-        Action printLast = new AbstractActionExt("log last") {
+    public void interactiveBoundsNavigateBeyond() {
+        JXMonthView monthView = new JXMonthView();
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_MONTH, 2);
+        // access the model directly requires to "clean" the date
+        monthView.setLowerBound(calendar.getTime());
+        calendar.set(Calendar.DAY_OF_MONTH, 27);
+        monthView.setUpperBound(calendar.getTime());
+        ActionListener l = new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
+                LOG.info("got action " + e);
                 
-                LOG.info("last updated?" + new Date(us.getLastDisplayedDate()));
             }
             
         };
-        addAction(frame, printLast);
-        frame.pack();
-        frame.setVisible(true);
+        monthView.addActionListener(l);
+        showInFrame(monthView, "navigate beyond bounds");
     }
+
+    
 
     /**
-     * #703-swingx: set date to first of next doesn't update the view.
+     * Issue #657-swingx: JXMonthView - unintuitive week-wise navigation with bounds
      * 
-     * Behaviour is consistent with core components. Except that it is doing 
-     * too much: revalidate most probably shouldn't change the scrolling state?
-     * 
-     * Simulated misbehaviour here: multi-month spanning selection, travers into the future and
-     * add selection at the end - jumps back to first. Auto-scroll in the delegates
-     * selection listener would have the effect.
-     * 
+     * Can't navigate at all if today is beyound the bounds
+     * PENDING: move into monthView after rename
      */
-    public void interactiveAutoScrollOnSelectionSim() {
-        final JXMonthView us = new JXMonthView();
-        us.setTraversable(true);
-        us.setSelectionMode(JXMonthView.SelectionMode.SINGLE_INTERVAL_SELECTION);
-        final Calendar today = Calendar.getInstance();
-        CalendarUtils.endOfMonth(today);
-        Date start = today.getTime();
-        today.add(Calendar.DAY_OF_MONTH, 60);
-        us.setSelectionInterval(start, today.getTime());
-        JXFrame frame = wrapInFrame(us, "resize");
-        Action nextMonthInterval = new AbstractActionExt("add selected") {
+    public void interactiveBoundsNavigateLocked() {
+        JXMonthView monthView = new JXMonthView();
+        // same time as monthView's today
+        Calendar calendar = Calendar.getInstance();
+        // set upper bound a week before today, 
+        // to block navigation into all directions
+        calendar.add(Calendar.DAY_OF_MONTH, -8);
+        monthView.setUpperBound(calendar.getTime());
+        ActionListener l = new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                if (us.isSelectionEmpty()) return;
-                Date start = us.getSelectedDate();
+                LOG.info("got action " + e);
                 
-                today.setTime(us.getSelection().last());
-                today.add(Calendar.DAY_OF_MONTH, 5);
-                us.addSelectionInterval(start, today.getTime());
-                // here we simulate an auto-scroll
-                us.ensureDateVisible(start.getTime());
             }
             
         };
-        addAction(frame, nextMonthInterval);
-        frame.pack();
-        frame.setVisible(true);
+        monthView.addActionListener(l);
+        showInFrame(monthView, "navigate: locked for today beyond bounds");
     }
+
     
 //----------------------
     
-    /**
-     * #703-swingx: set date to first of next doesn't update the view.
-     * 
-     * Behaviour is consistent with core components. Except that it is doing 
-     * too much: revalidate most probably shouldn't change the scrolling state?
-     * 
-     */
-    public void testAutoScrollOnSelection() {
-        JXMonthView us = new JXMonthView();
-        final Calendar today = Calendar.getInstance();
-        CalendarUtils.endOfMonth(today);
-        us.setSelectedDate(today.getTime());
-        long first = us.getFirstDisplayedDate();
-        today.add(Calendar.DAY_OF_MONTH, 1);
-        us.setSelectedDate(today.getTime());
-        assertEquals(first, us.getFirstDisplayedDate());
-        fail("expected behaviour but test is unsafe as long as the revalidate doesn't fail");
-    }
-    
-    /**
-     * #703-swingx: set date to first of next doesn't update the view.
-     * 
-     * Behaviour is consistent with core components. Except that it is doing 
-     * too much: revalidate most probably shouldn't change the scrolling state?
-     * 
-     * Note: this test is inconclusive - expected to fail because the Handler.layoutContainer
-     * actually triggers a ensureVisible (which it shouldn't) which changes the 
-     * firstDisplayedDate, but the change has not yet happened in the invoke. Can be seen
-     * while debugging, though. 
-     * 
-     * 
-     * @throws InvocationTargetException 
-     * @throws InterruptedException 
-     * 
-     */
-    public void testAutoScrollOnSelectionRevalidate() throws InterruptedException, InvocationTargetException {
-        // This test will not work in a headless configuration.
-        if (GraphicsEnvironment.isHeadless()) {
-            LOG.info("cannot run test - headless environment");
-            return;
-        }
-        final JXMonthView us = new JXMonthView();
-        final Calendar today = Calendar.getInstance();
-        CalendarUtils.endOfMonth(today);
-        us.setSelectedDate(today.getTime());
-        final JXFrame frame = showInFrame(us, "");
-        final long first = us.getFirstDisplayedDate();
-        today.add(Calendar.DAY_OF_MONTH, 1);
-        us.setSelectedDate(today.getTime());
-        SwingUtilities.invokeAndWait(new Runnable() {
-            public void run() {
-                us.revalidate();
-                // need to validate frame - why?
-                frame.validate();
-                assertEquals("firstDisplayed must not be changed on revalidate", 
-                        new Date(first), new Date(us.getFirstDisplayedDate()));
-                assertEquals(first, us.getFirstDisplayedDate());
-//                fail("weird (threading issue?): the firstDisplayed is changed in layoutContainer - not testable here");
-            }
-        });
-    }
     
     /**
      * Issue #618-swingx: JXMonthView displays problems with non-default

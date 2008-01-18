@@ -21,6 +21,7 @@
 package org.jdesktop.swingx;
 
 import java.awt.GraphicsEnvironment;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -30,6 +31,7 @@ import java.util.logging.Logger;
 
 import javax.swing.Action;
 import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.calendar.CalendarUtils;
@@ -81,6 +83,56 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JComponent.setDefaultLocale(componentLocale);
     }
 
+    /**
+     * #703-swingx: set date to first of next doesn't update the view.
+     * 
+     * Behaviour is consistent with core components, must not update
+     * 
+     */
+    public void testAutoScrollOnSelection() {
+        JXMonthView us = new JXMonthView();
+        final Calendar today = Calendar.getInstance();
+        CalendarUtils.endOfMonth(today);
+        us.setSelectedDate(today.getTime());
+        long first = us.getFirstDisplayedDate();
+        today.add(Calendar.DAY_OF_MONTH, 2);
+        us.setSelectedDate(today.getTime());
+        assertEquals(first, us.getFirstDisplayedDate());
+    }
+
+    /**
+     * #705-swingx: revalidate must not reset first firstDisplayed.
+     * 
+     * 
+     */
+    public void testAutoScrollOnSelectionRevalidate() throws InterruptedException, InvocationTargetException {
+        // This test will not work in a headless configuration.
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run test - headless environment");
+            return;
+        }
+        final JXMonthView us = new JXMonthView();
+        final Calendar today = Calendar.getInstance();
+        CalendarUtils.endOfMonth(today);
+        us.setSelectedDate(today.getTime());
+        final JXFrame frame = new JXFrame();
+        frame.add(us);
+        final long first = us.getFirstDisplayedDate();
+        today.add(Calendar.DAY_OF_MONTH, 2);
+        us.setSelectedDate(today.getTime());
+        SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+                us.revalidate();
+                // need to validate frame - why?
+                frame.validate();
+                assertEquals("firstDisplayed must not be changed on revalidate", 
+                        new Date(first), new Date(us.getFirstDisplayedDate()));
+                assertEquals(first, us.getFirstDisplayedDate());
+//                fail("weird (threading issue?): the firstDisplayed is changed in layoutContainer - not testable here");
+            }
+        });
+    }
+    
     /**
      * Issue 711-swingx: today is notify-only property.
      * Today is start of day.

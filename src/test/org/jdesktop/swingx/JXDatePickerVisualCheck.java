@@ -34,7 +34,6 @@ import javax.swing.Action;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -47,6 +46,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.UIManager.LookAndFeelInfo;
 
 import org.jdesktop.swingx.JXMonthView.SelectionMode;
+import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.DateUtils;
 
 /**
@@ -84,6 +84,80 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
     }
 
     /**
+     * Issue #706-swingx: picker doesn't update monthView.
+     * 
+     */
+    public void interactiveUpdateUIPickerMonthView() {
+        final JXDatePicker picker = new JXDatePicker();
+        JXFrame frame = showInFrame(picker, "picker update ui");
+        Action action = new AbstractActionExt("toggleUI") {
+            public void actionPerformed(ActionEvent e) {
+                String uiClass = (String) UIManager.get(JXMonthView.uiClassID);
+                boolean custom = uiClass.indexOf("Custom") > 0;
+                if (!custom) {
+                    UIManager.put(JXMonthView.uiClassID, "org.jdesktop.swingx.test.CustomMonthViewUI");
+                } else {
+                    UIManager.put(JXMonthView.uiClassID, null);
+                }
+                picker.updateUI();
+                custom = !custom;
+            }
+            
+        };
+        addAction(frame, action);
+        frame.pack();
+    };
+    
+    
+    /**
+     * Issue #665-swingx: make JXDatePicker Locale-aware.
+     * 
+     * Here: instantiate the picker with a non-default locale. The 
+     * LinkPanel is okay, if the UK locale is used _before_
+     * the US locale (on a machine with default German). The other way 
+     * round the messageFormat for the 
+     * US linkPanel is German.
+     */
+    public void interactiveLocaleSet() {
+        JComponent comp = new JPanel();
+        comp.add(new JXDatePicker());
+        addDatePickerWithLocaleSet(comp, Locale.US);
+        addDatePickerWithLocaleSet(comp, Locale.UK);
+        addDatePickerWithLocaleSet(comp, Locale.GERMAN);
+        addDatePickerWithLocaleSet(comp, Locale.ITALIAN);
+        showInFrame(comp, "Localized DatePicker: setLocale");
+    }
+
+    private void addDatePickerWithLocaleSet(JComponent comp, Locale uk) {
+        JXDatePicker datePicker = new JXDatePicker();
+        datePicker.setLocale(uk);
+        comp.add(new JLabel(uk.getDisplayName()));
+        comp.add(datePicker);
+    }
+
+
+
+    /**
+     * Issue #665-swingx: make JXDatePicker Locale-aware.
+     * 
+     * Here: instantiate the picker with a non-default locale. 
+     */
+    public void interactiveLocaleConstructor() {
+        JComponent comp = new JPanel();
+        addDatePickerWithLocaleConstructor(comp, Locale.US);
+        addDatePickerWithLocaleConstructor(comp, Locale.UK);
+        addDatePickerWithLocaleConstructor(comp, Locale.GERMAN);
+        addDatePickerWithLocaleConstructor(comp, Locale.ITALIAN);
+        showInFrame(comp, "Localized DatePicker: constructor");
+    }
+
+    private void addDatePickerWithLocaleConstructor(JComponent comp, Locale uk) {
+        JXDatePicker datePicker = new JXDatePicker(uk);
+        comp.add(new JLabel(uk.getDisplayName()));
+        comp.add(datePicker);
+    }
+
+    /**
      * Issue #665-swingx: make JXDatePicker Locale-aware.
      * 
      * Tests reaction to default locales set via both JComponent.setDefault and
@@ -101,7 +175,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         addDatePickerWithLocale(comp, Locale.US);
         addDatePickerWithLocale(comp, Locale.GERMAN);
         addDatePickerWithLocale(comp, Locale.ITALIAN);
-        showInFrame(comp, "Localized DatePicker");
+        showInFrame(comp, "DatePicker takes default Locale");
         setLocale(old);
     }
 
@@ -145,7 +219,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
             }
             
         };
-        JXFrame frame = wrapInFrame(picker, "null selection and linkdate");
+        JXFrame frame = wrapInFrame(picker, "show linkdate if unselected");
         addAction(frame, action);
         addMessage(frame, "incr linkDate and open popup: must show new linkMonth");
         frame.pack();
@@ -203,7 +277,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         final JPanel panel = picker.getLinkPanel();
         // initial null okay
         JXFrame frame = showInFrame(picker, "null panel");
-        Action toggleLinkPanel = new AbstractAction("toggleLinkPanel") {
+        Action toggleLinkPanel = new AbstractAction("toggleLinkPanel <-> null") {
 
             public void actionPerformed(ActionEvent e) {
                 boolean hasLinkPanel = picker.getLinkPanel() != null;
@@ -215,24 +289,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         frame.pack();
     }
   
-    /**
-     * something weird's going on: the picker's date must be null
-     * after setting a monthView with null selection. It is, until
-     * shown?
-     * Looks fixed during synch control cleanup in datePicker.
-     */
-    public void interactiveShowPickerSetMonthNull() {
-        JXDatePicker picker = new JXDatePicker();
-        JXMonthView intervalForPicker = new JXMonthView();
-        intervalForPicker.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
-        picker.setMonthView(intervalForPicker);
-        LOG.info("picker date before showing " + picker.getDate());
-        assertNull(picker.getDate());
-        showInFrame(picker, "initial null date");
-        LOG.info("picker date after showing " + picker.getDate());
-        assertNull(picker.getDate());
-
-    }
+    
     /**
      * Issue #235-swingx: action events
      * 
@@ -286,7 +343,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         panel.add(picker);
         panel.add(box);
         
-        JXFrame frame = showInFrame(panel, "trace action events: keyboard/mouse");
+        JXFrame frame = showInFrame(panel, "Compare action events: keyboard/mouse");
         frame.pack();
     }
 
@@ -340,7 +397,7 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
         panel.add(picker);
         panel.add(box);
         
-        JXFrame frame = showInFrame(panel, "trace action events: programmatic change");
+        JXFrame frame = showInFrame(panel, "Compare action events: programmatic change");
         addAction(frame, action);
         frame.pack();
     }
@@ -355,31 +412,28 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
     public void interactiveNullDate() {
         JXDatePicker picker = new JXDatePicker();
         picker.setDate(null);
-        JPanel panel = new JPanel();
-        panel.add(picker);
-        showInFrame(panel, "null date");
+        showInFrame(picker, "null date in picker");
     }
 
     /**
-     * Issue #426-swingx: NPE on traversing 
-     * 
-     * example from bug report
-     *
+     * something weird's going on: the picker's date must be null
+     * after setting a monthView with null selection. It is, until
+     * shown?
+     * Looks fixed during synch control cleanup in datePicker.
      */
-    public void interactiveMonthViewTravers() {
-        JXMonthView monthView = new JXMonthView();
-        monthView.setTraversable(true);
-        JFrame frame = wrapInFrame(monthView, "show month view - travers");
-        frame.pack();
-        frame.setVisible(true);
-        
+    public void interactiveShowPickerSetMonthNull() {
+        JXDatePicker picker = new JXDatePicker();
+        JXMonthView intervalForPicker = new JXMonthView();
+        intervalForPicker.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
+        picker.setMonthView(intervalForPicker);
+        assertNull(picker.getDate());
+        showInFrame(picker, "empty selection in monthView");
+        assertNull(picker.getDate());
     }
     
     public void interactiveDatePickerDisplay() {
         JXDatePicker datePicker = new JXDatePicker();
-        JFrame frame = wrapInFrame(datePicker, "show date picker");
-        frame.pack();
-        frame.setVisible(true);
+        showInFrame(datePicker, "show date picker");
     }
     
 
