@@ -446,12 +446,24 @@ public class JXDatePicker extends JComponent {
 
     /**
      * Sets the time zone with the given time zone value.    This is a convenience
-     * method which returns the time zone of the JXMonthView being used.
+     * method which returns the time zone of the JXMonthView being used.<p>
+     * 
+     * NOTE: calling this method fires a property change, but that's inherently 
+     * unreliable, because the TimeZone could be changed in the underlying monthView.
+     * No (clean) way to repair. <p>
+     *  
+     * PENDING JW: currently this property is the only property of the monthView 
+     * which is exposed in this api. Not sure why it is here at all.
+     * It's asymetric (to the other properties) and as such should be either removed
+     * or the others which might be relevant to a datePicker exposed as well (probably 
+     * hiding the monthView itself as an implementation detail of the ui delegate). 
      *
      * @param tz The <code>TimeZone</code>.
      */
     public void setTimeZone(TimeZone tz) {
+        TimeZone old = getTimeZone();
         _monthView.setTimeZone(tz);
+        firePropertyChange("timeZone", old, getTimeZone());
 
     }
 

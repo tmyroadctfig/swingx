@@ -75,6 +75,20 @@ public class JXDatePickerTest extends TestCase {
     public void tearDown() {
     }
 
+    /**
+     * Issue #724-swingx: picker must notify about timezone changes.
+     * Here: change the timezon on the picker - can guarantee the notification.
+     */
+    public void testTimeZoneChangeNotification() {
+        JXDatePicker picker = new JXDatePicker();
+        TimeZone timeZone = picker.getTimeZone();
+        TimeZone alternative = getSafeAlternativeTimeZone(timeZone);
+        PropertyChangeReport report = new PropertyChangeReport();
+        picker.addPropertyChangeListener(report);
+        picker.setTimeZone(alternative);
+        TestUtils.assertPropertyChangeEvent(report, "timeZone", timeZone, alternative, false);
+    }
+
     
     /**
      * Issue #??-swingx: JXDatePicker must keep monthView's firstDisplayedDate

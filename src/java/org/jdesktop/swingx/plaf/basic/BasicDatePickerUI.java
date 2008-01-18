@@ -737,8 +737,10 @@ public class BasicDatePickerUI extends DatePickerUI {
     protected void updateTimeZone(TimeZone old) {
         updateFormatsFromTimeZone(datePicker.getTimeZone());
         updateLinkDate();
-        
-//        datePicker.firePropertyChange(propertyName, oldValue, newValue)
+        // JW: the fire isn't visible
+        // doing so is a bad idea anyway - but can't guard against 
+        // changes applied to the underlying monthView!
+//        datePicker.firePropertyChange("timeZone", old, datePicker.getTimeZone());
     }
 
     /**

@@ -351,20 +351,20 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     }
 
     /**
-     * Issue #??-swingx: picker must notify about timezone changes.
-     * Can it guarantee the notification? Not really, if changed in the
-     * underlying monthView? 
+     * Issue #724-swingx: picker must notify about timezone changes.
+     * Here: change the timezone on the monthView - can't guarantee the notification.
+     * At least not without hacks...
      */
-    public void testTimeZoneChangeNotification() {
+    public void testTimeZoneChangeNotificationChangeOnMonthView() {
         JXDatePicker picker = new JXDatePicker();
         TimeZone timeZone = picker.getTimeZone();
         TimeZone alternative = getSafeAlternativeTimeZone(timeZone);
         PropertyChangeReport report = new PropertyChangeReport();
         picker.addPropertyChangeListener(report);
-        picker.setTimeZone(alternative);
+        picker.getMonthView().setTimeZone(alternative);
         TestUtils.assertPropertyChangeEvent(report, "timeZone", timeZone, alternative, false);
     }
-
+    
     /**
      * test that selectionListener is uninstalled.
      * 
