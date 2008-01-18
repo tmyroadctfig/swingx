@@ -811,11 +811,13 @@ public class BasicDatePickerUI extends DatePickerUI {
         if (popup != null) {
             popup.updateLinkPanel(oldLinkPanel);
         }
-        // PENDING: datepicker installs a new todayPanel if 
+        // PENDING JW: datepicker installs a new todayPanel if 
         // any of the linkDate related properties changed.
         // should be less-rude - can set properties on the 
         // panel? Fire more atomic changes.
-        datePicker.getMonthView().setFirstDisplayedDate(datePicker.getLinkDate());
+        // JW: wrong assumption - the firstDisplayed is the first day of the 
+        // currently displayed month, linkDate is something like today
+//        datePicker.getMonthView().setFirstDisplayedDate(datePicker.getLinkDate());
     }
 
 

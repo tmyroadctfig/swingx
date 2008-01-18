@@ -22,12 +22,14 @@
 package org.jdesktop.swingx;
 
 import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.logging.Logger;
@@ -47,6 +49,7 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 
 import org.jdesktop.swingx.action.AbstractActionExt;
+import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DatePickerFormatter;
 import org.jdesktop.swingx.calendar.DateUtils;
 import org.jdesktop.test.PropertyChangeReport;
@@ -67,7 +70,8 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         JXDatePickerIssues  test = new JXDatePickerIssues();
         try {
 //            test.runInteractiveTests();
-          test.runInteractiveTests("interactive.*UpdateUI.*");
+//          test.runInteractiveTests("interactive.*UpdateUI.*");
+          test.runInteractiveTests("interactive.*Visible.*");
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
@@ -102,6 +106,24 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         addAction(frame, action);
         frame.pack();
     };
+    
+    /**
+     * Compare picker and combo behaviour on toggle lf.
+     * 
+     * Not really comparable: the combo has complete control over the popup, re-creates
+     * both popup and content on install.
+     * 
+     */
+    public void interactiveUpdateUIPickerCompareCombo() {
+        JXDatePicker picker = new JXDatePicker();
+        JComboBox box = new JComboBox(new Object[] {"one", "twooooooo", "threeeeeeeeeeee", "GOOO!"});
+        box.setEditable(true);
+        JComponent comp = new JPanel();
+        comp.add(picker);
+        comp.add(box);
+        JXFrame frame = wrapInFrame(comp, "compare combo <-> picker", true);
+        frame.setVisible(true);
+    }
     
     /**
      * Issue #706-swingx: picker doesn't update monthView.
@@ -465,8 +487,140 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         showInFrame(monthView, "navigate: locked for today beyond bounds");
     }
 
+    public void interactiveVisibleMonth() {
+        calendar.set(2008, Calendar.JULY, 15);
+        final JXDatePicker picker = new JXDatePicker();
+        picker.setDate(calendar.getTime());
+        JXFrame frame = wrapInFrame(picker, "sanity");
+        Action toggleWrapper = new AbstractAction("open popup") {
+
+            public void actionPerformed(ActionEvent e) {
+                Action togglePopup = picker.getActionMap().get("TOGGLE_POPUP");
+                togglePopup.actionPerformed(null);
+                CalendarUtils.startOfMonth(calendar);
+                assertEquals(calendar.getTime(), new Date(picker.getMonthView().getFirstDisplayedDate()));
+
+                
+            }
+            
+        };
+        addAction(frame, toggleWrapper);
+        frame.pack();
+        frame.setVisible(true);
+    }
 //-------------------- unit tests
- 
+    
+    /**
+     * Issue #572-swingx: monthView must show linkDate on empty selection.
+     *
+     */
+    public void testLinkDate() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.setDate(null);
+        long linkDate = picker.getLinkDate();
+        long firstDisplayedDate = picker.getMonthView().getFirstDisplayedDate();
+        assertSameMonth(linkDate, firstDisplayedDate);
+        long nextDate = DateUtils.getNextMonth(DateUtils.getNextMonth(linkDate));
+        picker.setLinkDate(nextDate);
+        assertFalse(firstDisplayedDate == picker.getMonthView().getFirstDisplayedDate());
+        assertSameMonth(nextDate, picker.getMonthView().getFirstDisplayedDate());
+    }
+    /**
+     * @param linkDate
+     * @param firstDisplayedDate
+     */
+    private void assertSameMonth(long linkDate, long firstDisplayedDate) {
+        calendar.setTimeInMillis(linkDate);
+        int linkMonth = calendar.get(Calendar.MONTH);
+        calendar.setTimeInMillis(firstDisplayedDate);
+        assertEquals(linkMonth, calendar.get(Calendar.MONTH));
+        
+    }
+
+    /**
+     * Issue #??-swingx: JXDatePicker must keep monthView's firstDisplayedDate
+     *   in synch with selection/today.
+     * Issue #705-swingx: JXMonthView must not scroll in layoutContainer.
+     * 
+     * The implication is that client code (such as JXDatePicker/UI) is 
+     * responsible to do the scrolling.
+     */
+    public void testVisibleMonthContainsSelectionOpenSet() {
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run testLinkPanelNull - headless");
+            return;
+        }
+        calendar.set(2008, Calendar.JULY, 15);
+        JXDatePicker picker = new JXDatePicker();
+        picker.setDate(calendar.getTime());
+        JXFrame frame = new JXFrame("showing", false);
+        frame.add(picker);
+        frame.pack();
+        frame.setVisible(true);
+        Action togglePopup = picker.getActionMap().get("TOGGLE_POPUP");
+        togglePopup.actionPerformed(null);
+        CalendarUtils.startOfMonth(calendar);
+        assertEquals(calendar.getTime(), new Date(picker.getMonthView().getFirstDisplayedDate()));
+        frame.dispose();
+    }
+
+    /**
+     * Issue #??-swingx: JXDatePicker must keep monthView's firstDisplayedDate
+     *   in synch with selection/today.
+     * Issue #705-swingx: JXMonthView must not scroll in layoutContainer.
+     * 
+     * The implication is that client code (such as JXDatePicker/UI) is 
+     * responsible to do the scrolling.
+     */
+    public void testVisibleMonthContainsSelectionOpenInitial() {
+        if (GraphicsEnvironment.isHeadless()) {
+            LOG.info("cannot run testLinkPanelNull - headless");
+            return;
+        }
+        calendar.set(2008, Calendar.JULY, 15);
+        JXDatePicker picker = new JXDatePicker(calendar.getTimeInMillis());
+        JXFrame frame = new JXFrame("showing", false);
+        frame.add(picker);
+        frame.setVisible(true);
+        Action togglePopup = picker.getActionMap().get("TOGGLE_POPUP");
+        togglePopup.actionPerformed(null);
+        CalendarUtils.startOfMonth(calendar);
+        assertEquals(calendar.getTime(), new Date(picker.getMonthView().getFirstDisplayedDate()));
+        frame.dispose();
+    }
+
+    /**
+     * Issue #??-swingx: JXDatePicker must keep monthView's firstDisplayedDate
+     *   in synch with selection/today.
+     * Issue #705-swingx: JXMonthView must not scroll in layoutContainer.
+     * 
+     * The implication is that client code (such as JXDatePicker/UI) is 
+     * responsible to do the scrolling.
+     */
+    public void testVisibleMonthContainsSelectionIinitial() {
+        calendar.set(2008, Calendar.JULY, 15);
+        JXDatePicker picker = new JXDatePicker(calendar.getTimeInMillis());
+        CalendarUtils.startOfMonth(calendar);
+        assertEquals(calendar.getTime(), new Date(picker.getMonthView().getFirstDisplayedDate()));
+    }
+    
+    /**
+     * Issue #??-swingx: JXDatePicker must keep monthView's firstDisplayedDate
+     *   in synch with selection/today.
+     * Issue #705-swingx: JXMonthView must not scroll in layoutContainer.
+     * 
+     * The implication is that client code (such as JXDatePicker/UI) is 
+     * responsible to do the scrolling.
+     */
+    public void testVisibleMonthContainsSelectionSet() {
+        JXDatePicker picker = new JXDatePicker();
+        calendar.set(2008, Calendar.JULY, 15);
+        picker.setDate(calendar.getTime());
+        CalendarUtils.startOfMonth(calendar);
+        assertEquals(calendar.getTime(), new Date(picker.getMonthView().getFirstDisplayedDate()));
+    }
+    
+
     /**
      * Issue #??-swingx: picker must notify about timezone changes.
      * Can it guarantee the notification? Not really, if changed in the

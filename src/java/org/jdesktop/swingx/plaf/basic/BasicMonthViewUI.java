@@ -354,7 +354,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         // PENDING JW: why? invalidate cached state?
         // has the side-effect that updateLocale must not be called before
         // the derived font is installed .... Cleanup!
-        getHandler().layoutContainer(null);
+//        getHandler().layoutContainer(null);
     }
 
 //---------------------- config
@@ -1824,16 +1824,17 @@ public class BasicMonthViewUI extends MonthViewUI {
             calculateStartPosition();
 
             // PENDING JW: remove - #705-swingx
-            if (!monthView.isSelectionEmpty()) {
-                long startDate = getSelection().first().getTime();
-                if (startDate > getLastDisplayedDate() ||
-                        startDate < getFirstDisplayedDate()) {
-                    // Already does the recalculation for the dirty rect.
-                    monthView.ensureDateVisible(startDate);
-                } else {
-                    calculateDirtyRectForSelection();
-                }
-            }
+//            if (!monthView.isSelectionEmpty()) {
+//                long startDate = getSelection().first().getTime();
+//                LOG.info("startDate/end " + new Date(startDate) + "/" + new Date(getLastDisplayedDate()));
+//                if (startDate > getLastDisplayedDate() ||
+//                        startDate < getFirstDisplayedDate()) {
+//                    // Already does the recalculation for the dirty rect.
+//                    monthView.ensureDateVisible(startDate);
+//                } else {
+//                    calculateDirtyRectForSelection();
+//                }
+//            }
         }
 
 

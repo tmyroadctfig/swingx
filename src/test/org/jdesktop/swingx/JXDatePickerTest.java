@@ -67,17 +67,15 @@ public class JXDatePickerTest extends TestCase {
     private static final Logger LOG = Logger.getLogger(JXDatePickerTest.class
             .getName());
     
-    private Calendar cal;
+    private Calendar calendar;
 
     public void setUp() {
-        cal = Calendar.getInstance();
+        calendar = Calendar.getInstance();
     }
 
     public void tearDown() {
     }
 
-
-    
     /**
      * Issue #693-swingx: format of custom locale.
      * Here: test constructor with locale parameter.
@@ -253,33 +251,7 @@ public class JXDatePickerTest extends TestCase {
 
 
 
-    /**
-     * Issue #572-swingx: monthView must show linkDate on empty selection.
-     *
-     */
-    public void testLinkDate() {
-        JXDatePicker picker = new JXDatePicker();
-        picker.setDate(null);
-        long linkDate = picker.getLinkDate();
-        long firstDisplayedDate = picker.getMonthView().getFirstDisplayedDate();
-        assertSameMonth(linkDate, firstDisplayedDate);
-        long nextDate = DateUtils.getNextMonth(DateUtils.getNextMonth(linkDate));
-        picker.setLinkDate(nextDate);
-        assertFalse(firstDisplayedDate == picker.getMonthView().getFirstDisplayedDate());
-        assertSameMonth(nextDate, picker.getMonthView().getFirstDisplayedDate());
-    }
     
-    /**
-     * @param linkDate
-     * @param firstDisplayedDate
-     */
-    private void assertSameMonth(long linkDate, long firstDisplayedDate) {
-        cal.setTimeInMillis(linkDate);
-        int linkMonth = cal.get(Calendar.MONTH);
-        cal.setTimeInMillis(firstDisplayedDate);
-        assertEquals(linkMonth, cal.get(Calendar.MONTH));
-        
-    }
 
     /**
      * Issue #565-swingx: popup not closed when focus moved to Combo
@@ -884,10 +856,10 @@ public class JXDatePickerTest extends TestCase {
     public void testSetDateCleansDate() {
         JXDatePicker picker = new JXDatePicker();
         picker.setDate(null);
-        Date date = cal.getTime();
+        Date date = calendar.getTime();
         picker.setDate(date);
-        CalendarUtils.startOfDay(cal);
-        assertEquals(cal.getTime(), picker.getDate());
+        CalendarUtils.startOfDay(calendar);
+        assertEquals(calendar.getTime(), picker.getDate());
     }
 
     /**
@@ -897,7 +869,7 @@ public class JXDatePickerTest extends TestCase {
     public void testSetDateDoesNotChangeOriginal() {
         JXDatePicker picker = new JXDatePicker();
         picker.setDate(null);
-        Date date = cal.getTime();
+        Date date = calendar.getTime();
         Date copy = new Date(date.getTime());
         picker.setDate(date);
         assertEquals(copy, date);
@@ -1104,6 +1076,17 @@ public class JXDatePickerTest extends TestCase {
         assertEquals(date, picker.getEditor().getValue());
         assertEquals(date, picker.getDate());
         assertEquals(date, picker.getMonthView().getSelectedDate());
+        // @KEEP JW - currently unused, not yet sure if it's the right place
+        // for checking against ripples produced by fixing #705-swingx
+//        Calendar cal = picker.getMonthView().getCalendar();
+//        if (date == null) {
+//            cal.setTimeInMillis(picker.getLinkDate());
+//            CalendarUtils.startOfMonth(cal);
+//        } else {
+//            cal.setTime(date);
+//            CalendarUtils.startOfMonth(cal);
+//        }
+//        assertEquals(cal.getTime(), new Date(picker.getMonthView().getFirstDisplayedDate()));
     } 
 
 
@@ -1348,17 +1331,17 @@ public class JXDatePickerTest extends TestCase {
     
     public void testDefaultConstructor() {
         JXDatePicker datePicker = new JXDatePicker();
-        cal.setTimeInMillis(System.currentTimeMillis());
-        Date today = cleanupDate(cal);
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        Date today = cleanupDate(calendar);
         assertTrue(today.equals(datePicker.getDate()));
         assertTrue(today.getTime() == datePicker.getDateInMillis());
     }
 
     public void testConstructor() {
-        cal.setTimeInMillis(System.currentTimeMillis());
-        cal.add(Calendar.DAY_OF_MONTH, 5);
-        Date expectedDate = cleanupDate(cal);
-        JXDatePicker datePicker = new JXDatePicker(cal.getTimeInMillis());
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.add(Calendar.DAY_OF_MONTH, 5);
+        Date expectedDate = cleanupDate(calendar);
+        JXDatePicker datePicker = new JXDatePicker(calendar.getTimeInMillis());
         assertTrue(expectedDate.equals(datePicker.getDate()));
         assertTrue(expectedDate.getTime() == datePicker.getDateInMillis());
     }
@@ -1371,11 +1354,11 @@ public class JXDatePickerTest extends TestCase {
     }
 
     public void testSetDate() {
-        cal.setTimeInMillis(System.currentTimeMillis());
-        cal.add(Calendar.DAY_OF_MONTH, 5);
-        Date expectedDate = cleanupDate(cal);
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.add(Calendar.DAY_OF_MONTH, 5);
+        Date expectedDate = cleanupDate(calendar);
         JXDatePicker datePicker = new JXDatePicker();
-        datePicker.setDate(cal.getTime());
+        datePicker.setDate(calendar.getTime());
         assertTrue(expectedDate.equals(datePicker.getDate()));
         assertTrue(expectedDate.equals(datePicker.getEditor().getValue()));
 
