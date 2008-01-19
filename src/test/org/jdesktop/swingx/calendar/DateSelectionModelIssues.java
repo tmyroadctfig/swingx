@@ -19,11 +19,12 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-package org.jdesktop.swingx;
+package org.jdesktop.swingx.calendar;
 
 import java.util.Calendar;
 import java.util.Date;
 
+import org.jdesktop.swingx.InteractiveTestCase;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DefaultDateSelectionModel;
 import org.jdesktop.swingx.event.DateSelectionEvent;
@@ -32,6 +33,8 @@ import org.jdesktop.swingx.test.DateSelectionReport;
 /**
  * Test to expose known Issues with <code>DateSelectionModel</code>
  *  and implementations.
+ * 
+ * Moved from swingx to calendar package as of version 1.8.
  * 
  * @author Jeanette Winzenburg
  */
