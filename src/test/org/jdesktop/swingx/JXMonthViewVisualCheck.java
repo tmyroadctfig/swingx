@@ -203,7 +203,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
                 today.add(Calendar.DAY_OF_MONTH, 5);
                 us.addSelectionInterval(start, today.getTime());
                 // here we simulate an auto-scroll
-                us.ensureDateVisible(start.getTime());
+                us.ensureDateVisible(start);
             }
             
         };
@@ -338,7 +338,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
         monthView.setLowerBound(XTestUtils.getStartOfToday(-10));
         monthView.setUpperBound(XTestUtils.getStartOfToday(10));
         monthView.setUnselectableDates(XTestUtils.getStartOfToday(2));
-        monthView.setFlaggedDates(new long[] {XTestUtils.getStartOfToday(4).getTime()});
+        monthView.setFlaggedDates(new Date[] {XTestUtils.getStartOfToday(4)});
         monthView.setTraversable(true);
         // Synchronize the picker and selector's zones.
         zoneSelector.setSelectedItem(picker.getTimeZone().getID());

@@ -159,7 +159,7 @@ public class JXMonthViewVisualTest extends InteractiveTestCase {
                 // sanity
                 int newLastMonth = calendar.get(Calendar.MONTH);
                 assertFalse(lastMonth == newLastMonth);
-                monthView.ensureDateVisible(calendar.getTimeInMillis());
+                monthView.ensureDateVisible(calendar.getTime());
                 CalendarUtils.endOfMonth(calendar);
                 long newUILast = monthView.getUI().getLastDisplayedDate();
                 assertEquals(newUILast, monthView.getLastDisplayedDate());

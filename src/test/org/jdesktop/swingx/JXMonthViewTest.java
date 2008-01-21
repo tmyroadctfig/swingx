@@ -37,8 +37,6 @@ import javax.swing.SwingUtilities;
 import org.jdesktop.swingx.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
-import org.jdesktop.swingx.calendar.DateUtils;
-import org.jdesktop.swingx.calendar.DaySelectionModel;
 import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
@@ -354,7 +352,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         calendar.add(Calendar.MONTH, -1);
         PropertyChangeReport report = new PropertyChangeReport();
         monthView.addPropertyChangeListener(report);
-        monthView.ensureDateVisible(calendar.getTimeInMillis());
+        monthView.ensureDateVisible(calendar.getTime());
         CalendarUtils.startOfMonth(calendar);
         TestUtils.assertPropertyChangeEvent(report, "firstDisplayedDate", firstDisplayedDate, calendar.getTimeInMillis());
     }
@@ -604,7 +602,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         Date nextYear = calendar.getTime();
         temp = (Calendar) calendar.clone();
         CalendarUtils.startOfMonth(temp);
-        monthView.ensureDateVisible(nextYear.getTime());
+        monthView.ensureDateVisible(nextYear);
         assertEquals("must be scrolled to next year", temp.getTimeInMillis(), monthView.getFirstDisplayedDate());
     }
     
@@ -620,7 +618,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         Date nextMonth = calendar.getTime();
         temp = (Calendar) calendar.clone();
         CalendarUtils.startOfMonth(temp);
-        monthView.ensureDateVisible(nextMonth.getTime());
+        monthView.ensureDateVisible(nextMonth);
         assertEquals("must be scrolled to next month", temp.getTimeInMillis(), monthView.getFirstDisplayedDate());
     }
 
@@ -635,7 +633,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         assertEquals("sanity ...", temp.getTimeInMillis(), first);
         CalendarUtils.endOfMonth(calendar);
         Date thisMonth = calendar.getTime();
-        monthView.ensureDateVisible(thisMonth.getTime());
+        monthView.ensureDateVisible(thisMonth);
         assertEquals("same month, nothing changed", first, monthView.getFirstDisplayedDate());
     }
 
@@ -710,8 +708,8 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testTimeZoneChangeResetFlaggedDates() {
         JXMonthView monthView = new JXMonthView();
-        long time = XTestUtils.getStartOfToday(-5).getTime();
-        monthView.setFlaggedDates(new long[] {time});
+        Date time = XTestUtils.getStartOfToday(-5);
+        monthView.setFlaggedDates(new Date[] {time});
         monthView.setTimeZone(getTimeZone(monthView.getTimeZone(), THREE_HOURS));
         // accidentally passes - because it is meaningful only in the timezone 
         // it was set ...
@@ -1440,6 +1438,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * test flagged dates (deprecated api with long).
      */
+    @SuppressWarnings("deprecation")
     public void testFlaggedDateMillis() {
         JXMonthView monthView = new JXMonthView();
         Date date = new Date();
@@ -1478,6 +1477,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * test unselectable: use methods with long.
      */
+    @SuppressWarnings("deprecation")
     public void testUnselectableDateLong() {
         JXMonthView monthView = new JXMonthView();
         Date date = new Date();

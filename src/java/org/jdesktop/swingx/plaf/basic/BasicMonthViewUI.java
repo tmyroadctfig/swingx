@@ -828,6 +828,8 @@ public class BasicMonthViewUI extends MonthViewUI {
      */
     @SuppressWarnings({"UnusedDeclaration"})
     private void paintMonth(Graphics g, int x, int y, int width, int height, Calendar cal) {
+        // PEINDING JW: remove usage of deprecated api
+        // use Date instead of millis
         int days = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
         Rectangle clip = g.getClipBounds();
         long day;
@@ -1962,7 +1964,7 @@ public class BasicMonthViewUI extends MonthViewUI {
             if (newStartDate != oldStart) {
                 final Date startDate = new Date(newStartDate);
                 monthView.setSelectionInterval(startDate, startDate);
-                monthView.ensureDateVisible(newStartDate);
+                monthView.ensureDateVisible(startDate);
             }
         }
 
@@ -1976,6 +1978,8 @@ public class BasicMonthViewUI extends MonthViewUI {
          * @param action action for adjusting selection
          */
         private void addToSelection(int action) {
+            // PENDING JW: remove use of deprecated
+            // use Date always!
             long newStartDate;
             long newEndDate;
             long selectionStart;
