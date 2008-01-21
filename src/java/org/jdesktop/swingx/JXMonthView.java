@@ -121,6 +121,16 @@ import org.jdesktop.swingx.util.Contract;
  *    });
  * </pre>
  * 
+ * NOTE (for users of earlier versions): as of version 1.19 control about selection 
+ * dates is moved completely into the model. The default model used is of type 
+ * DaySelectionModel, which handles dates in the same way the JXMonthView did earlier
+ * (that is, normalize all to the start of the day, which means zeroing all time
+ * fields).<p>
+ * 
+ * NOTE: all methods taking/returning millis are deprecated (or will be as soon as they
+ * have equivalents taking/returning Date) and typically less-maintained then the Date methods.
+ * We highlighly recommend to not use them, if there's an alternative - in SwingX, all
+ * deprecated API will be removed before final!
  *  
  * @author Joshua Outwater
  * @author Jeanette Winzenburg
@@ -353,7 +363,10 @@ public class JXMonthView extends JComponent {
 
     /**
      * Sets locale and resets text and format used to display months and days. 
-     * Also resets firstDayOfWeek.
+     * Also resets firstDayOfWeek. <p>
+     * 
+     * PENDING JW: the following warning should be obsolete (installCalendar
+     * should take care) - check if it really is!
      * 
      * <p>
      * <b>Warning:</b> Since this resets any string labels that are cached in UI
@@ -442,7 +455,7 @@ public class JXMonthView extends JComponent {
 
     /**
      * All dates are "cleaned" relative to the timezone they had been set.
-     * After changing the timezone, the need to be updated to the new.
+     * After changing the timezone, they need to be updated to the new.
      * 
      * Here: clear everything. 
      * 
@@ -452,7 +465,7 @@ public class JXMonthView extends JComponent {
         clearSelection();
         setLowerBound(null);
         setUpperBound(null);
-        setFlaggedDates(null);
+        setFlaggedDates((Date[])null);
         setUnselectableDates(new Date[0]);
     }
     
@@ -539,6 +552,8 @@ public class JXMonthView extends JComponent {
      * 
      * @param date millis representing the date to make visible.
      * @see #ensureDateVisible(Date)
+     * 
+     * @deprecated use {@link #ensureDateVisible(Date)}
      */
     @Deprecated
     public void ensureDateVisible(long date) {
@@ -776,9 +791,7 @@ public class JXMonthView extends JComponent {
     }
 
     /**
-     * Adds the selection interval to the selection model. <b>All dates are
-     * modified to remove their hour of day, minute, second, and millisecond
-     * before being added to the selection model</b>.
+     * Adds the selection interval to the selection model. 
      * 
      * @param startDate Start of date range to add to the selection
      * @param endDate End of date range to add to the selection
@@ -798,8 +811,7 @@ public class JXMonthView extends JComponent {
     }
 
     /**
-     * Sets the selection interval to the selection model.  <b>All dates are modified to remove their hour of
-     * day, minute, second, and millisecond before being added to the selection model</b>.
+     * Sets the selection interval to the selection model.  
      *
      * @param startDate Start of date range to set the selection to
      * @param endDate End of date range to set the selection to
@@ -818,9 +830,8 @@ public class JXMonthView extends JComponent {
     }
 
     /**
-     * Removes the selection interval from the selection model.  <b>All dates are modified to remove their hour of
-     * day, minute, second, and millisecond before being added to the selection model</b>.
-     *
+     * Removes the selection interval from the selection model.  
+     * 
      * @param startDate Start of the date range to remove from the selection
      * @param endDate End of the date range to remove from the selection
      */
@@ -883,8 +894,7 @@ public class JXMonthView extends JComponent {
 
     /**
      * Returns true if the specified date falls within the _startSelectedDate
-     * and _endSelectedDate range.  <b>All dates are modified to remove their hour of
-     * day, minute, second, and millisecond before being added to the selection model</b>.
+     * and _endSelectedDate range.  
      *
      * @param date The date to check
      * @return true if the date is selected, false otherwise
@@ -897,9 +907,6 @@ public class JXMonthView extends JComponent {
     /**
      * Set the lower bound date that is allowed to be selected. <p>
      * 
-     * <b>All dates are
-     * modified to remove their hour of day, minute, second, and millisecond
-     * before being added to the selection model</b>.
      * 
      * @param lowerBound the lower bound, null means none.
      */
@@ -911,10 +918,6 @@ public class JXMonthView extends JComponent {
     /**
      * Set the upper bound date that is allowed to be selected. <p>
      * 
-     * <b>All dates are
-     * modified to remove their hour of day, minute, second, and millisecond
-     * before being added to the selection model</b>.
-     * 
      * @param upperBound the upper bound, null means none.
      */
     public void setUpperBound(Date upperBound) {
@@ -925,7 +928,7 @@ public class JXMonthView extends JComponent {
 
     /**
      * Return the lower bound date that is allowed to be selected for this
-     * model
+     * model.
      *
      * @return lower bound date or null if not set
      */
@@ -935,7 +938,7 @@ public class JXMonthView extends JComponent {
 
     /**
      * Return the upper bound date that is allowed to be selected for this
-     * model
+     * model.
      *
      * @return upper bound date or null if not set
      */
@@ -946,9 +949,6 @@ public class JXMonthView extends JComponent {
     /**
      * Identifies whether or not the date passed is an unselectable date.
      * <p>
-     * 
-     * <b>All dates are modified to remove their hour of day, minute, second,
-     * and millisecond before being added to the selection model</b>.
      * 
      * @param date date which to test for unselectable status
      * @return true if the date is unselectable, false otherwise
@@ -965,9 +965,6 @@ public class JXMonthView extends JComponent {
      * <p>
      * 
      * NOTE: neither the given array nor any of its elements must be null.
-     * <p>
-     * <b>All dates are modified to remove their hour of day, minute, second,
-     * and millisecond before being added to the selection model</b>.
      * 
      * @param unselectableDates zero or more not-null dates that should be
      *        unselectable.
@@ -989,8 +986,7 @@ public class JXMonthView extends JComponent {
 //---------------------- delegates to model: long param    
     /**
      * Returns true if the specified date falls within the _startSelectedDate
-     * and _endSelectedDate range.  <b>All dates are modified to remove their hour of
-     * day, minute, second, and millisecond before being added to the selection model</b>.
+     * and _endSelectedDate range.  
      *
      * @param date The date to check
      * @return true if the date is selected, false otherwise
@@ -1003,9 +999,8 @@ public class JXMonthView extends JComponent {
     }
 
     /**
-     * Identifies whether or not the date passed is an unselectable date.  <b>All dates are modified to remove their
-     * hour of day, minute, second, and millisecond before being added to the selection model</b>.
-     *
+     * Identifies whether or not the date passed is an unselectable date.  
+     * 
      * @param date date which to test for unselectable status
      * @return true if the date is unselectable, false otherwise
      * 
@@ -1017,8 +1012,7 @@ public class JXMonthView extends JComponent {
     }
 
     /**
-     * An array of longs defining days that should be unselectable.  <b>All dates are modified to remove their hour of
-     * day, minute, second, and millisecond before being added to the selection model</b>.
+     * An array of longs defining days that should be unselectable.  
      *
      * @param unselectableDates the dates that should be unselectable
      * 
@@ -1036,7 +1030,36 @@ public class JXMonthView extends JComponent {
         repaint();
     }
 
+//--------------------- flagged dates
+    /**
+     * Identifies whether or not the date passed is a flagged date.  <b>All dates are modified to remove their hour of
+     * day, minute, second, and millisecond before being added to the selection model</b>
+     *
+     * @param date date which to test for flagged status 
+     * @return true if the date is flagged, false otherwise
+     */
+    public boolean isFlaggedDate(Date date) {
+        if (date == null) return false;
+        return isFlaggedDate(date.getTime());
+    }
     
+    /**
+     * An array of longs defining days that should be flagged.
+     *
+     * @param flaggedDates the dates to be flagged
+     */
+    public void setFlaggedDates(Date[] flaggedDates) {
+        long[] flagged = null;
+        if (flaggedDates != null) {
+            flagged = new long[flaggedDates.length];
+            for (int i = 0; i < flaggedDates.length; i++) {
+                flagged[i] = flaggedDates[i].getTime();
+            }
+        }
+        setFlaggedDates(flagged);
+    }
+    
+//--------------------- flagged dates (long) - deprecation pending!
 
     /**
      * Identifies whether or not the date passed is a flagged date.  <b>All dates are modified to remove their hour of
@@ -1044,6 +1067,8 @@ public class JXMonthView extends JComponent {
      *
      * @param date date which to test for flagged status
      * @return true if the date is flagged, false otherwise
+     * 
+     * @deprecated use {@link #isFlaggedDate(Date)}
      */
     public boolean isFlaggedDate(long date) {
         boolean result = false;
@@ -1057,6 +1082,8 @@ public class JXMonthView extends JComponent {
      * An array of longs defining days that should be flagged.
      *
      * @param flaggedDates the dates to be flagged
+     * 
+     * @deprecated use {@link #setFlaggedDates(Date[])}
      */
     public void setFlaggedDates(long[] flaggedDates) {
         if (flaggedDates == null) {
@@ -1074,6 +1101,7 @@ public class JXMonthView extends JComponent {
         repaint();
     }
 
+//------------------- visual properties    
     /**
      * Temporary api to allow testing of cleanup after setting TimeZone.
      * 

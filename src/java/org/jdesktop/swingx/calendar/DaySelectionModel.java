@@ -33,7 +33,7 @@ import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 /**
  * 
  * DaySelectionModel is a (temporary?) implementation of DateSelectionModel 
- * which normalizes all dates to the start of the day, that is "cleans" all 
+ * which normalizes all dates to the start of the day, that is zeroes all 
  * time fields. Responsibility extracted from JXMonthView (which must
  * obey rules of model instead of trying to be clever itself).
  * 

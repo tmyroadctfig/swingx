@@ -1437,13 +1437,28 @@ public class JXMonthViewTest extends MockObjectTestCase {
         monthView.setSelectionInterval(date, date);
     }
 
-    public void testFlaggedDate() {
+    /**
+     * test flagged dates (deprecated api with long).
+     */
+    public void testFlaggedDateMillis() {
         JXMonthView monthView = new JXMonthView();
         Date date = new Date();
 
         assertFalse(monthView.isFlaggedDate(date.getTime()));
         monthView.setFlaggedDates(new long[]{date.getTime()});
         assertTrue(monthView.isFlaggedDate(date.getTime()));
+    }
+
+    /**
+     * test setting/checking flagged dates (api with Date)
+     */
+    public void testFlaggedDate() {
+        JXMonthView monthView = new JXMonthView();
+        Date date = new Date();
+
+        assertFalse(monthView.isFlaggedDate(date));
+        monthView.setFlaggedDates(new Date[]{date});
+        assertTrue(monthView.isFlaggedDate(date));
     }
 
     public void testShowLeadingDates() {
