@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.SortedSet;
 import java.util.TimeZone;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import javax.swing.Action;
@@ -37,6 +38,7 @@ import org.jdesktop.swingx.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DateUtils;
+import org.jdesktop.swingx.calendar.DaySelectionModel;
 import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
@@ -60,8 +62,14 @@ import org.jmock.MockObjectTestCase;
 public class JXMonthViewTest extends MockObjectTestCase {
     private static final Logger LOG = Logger.getLogger(JXMonthViewTest.class
             .getName());
-    private Calendar calendar;
     private Locale componentLocale;
+    // pre-defined reference dates - all relative to current date at around 5 am
+    private Date today;
+    private Date tomorrow;
+    private Date afterTomorrow;
+    private Date yesterDay;
+    // calendar default instance init with today
+    private Calendar calendar;
     // Constants used internally; unit is milliseconds
     private static final int ONE_MINUTE = 60*1000;
     private static final int ONE_HOUR   = 60*ONE_MINUTE;
@@ -71,6 +79,19 @@ public class JXMonthViewTest extends MockObjectTestCase {
 
     public void setUp() {
         calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 5);
+        today = calendar.getTime();
+        
+        calendar.add(Calendar.DAY_OF_MONTH, -1);
+        yesterDay = calendar.getTime();
+        
+        calendar.add(Calendar.DAY_OF_MONTH, 2);
+        tomorrow = calendar.getTime();
+        
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        afterTomorrow = calendar.getTime();
+        
+        calendar.setTime(today);
 
         //the test is configured for a US defaulted system
         //the localization tests handle actual localization issues
@@ -82,6 +103,130 @@ public class JXMonthViewTest extends MockObjectTestCase {
     public void tearDown() {
         JComponent.setDefaultLocale(componentLocale);
     }
+
+    
+    /**
+     * Issue ??-swingx: selection related properties must be independent 
+     * of way-of setting.
+     * 
+     * View must delegate to model, so asking view or model with same 
+     * parameters must return the same result.
+     * 
+     * Here: isSelected
+     * 
+     */
+    public void testMonthViewSameAsSelectionModelIsSelected() {
+        JXMonthView monthView = new JXMonthView();
+        // guard against accidental startofday
+        calendar.set(Calendar.HOUR_OF_DAY, 5);
+        Date date = calendar.getTime();
+        monthView.setSelectedDate(date);
+        assertTrue(monthView.isSelectedDate(date));
+        assertTrue(monthView.getSelectionModel().isSelected(date));
+    }
+    
+    /**
+     * Issue ??-swingx: selection related properties must be independent 
+     * of way-of setting.
+     * 
+     * View must delegate to model, so asking view or model with same 
+     * parameters must return the same result.
+     * 
+     * Here: isSelected
+     * 
+     */
+    public void testMonthViewSameAsSelectionModelSelectedDate() {
+        JXMonthView monthView = new JXMonthView();
+        // guard against accidental startofday
+        calendar.set(Calendar.HOUR_OF_DAY, 5);
+        Date date = calendar.getTime();
+        monthView.setSelectedDate(date);
+        assertEquals(monthView.getSelectedDate(), 
+                monthView.getSelectionModel().getSelection().first());
+    }
+
+    /**
+     * Issue ??-swingx: selection related properties must be independent 
+     * of way-of setting.
+     * 
+     * View must delegate to model, so asking view or model with same 
+     * parameters must return the same result.
+     * 
+     * Here: isSelected
+     * 
+     */
+    public void testMonthViewSameAsSelectionModelIsUnselectable() {
+        JXMonthView monthView = new JXMonthView();
+        // guard against accidental startofday
+        calendar.set(Calendar.HOUR_OF_DAY, 5);
+        Date date = calendar.getTime();
+        monthView.setUnselectableDates(date);
+        assertTrue(monthView.isUnselectableDate(date));
+        assertTrue(monthView.getSelectionModel().isUnselectableDate(date));
+    }
+
+    /**
+     * Issue ??-swingx: selection related properties must be independent 
+     * of way-of setting.
+     * 
+     * View must delegate to model, so asking view or model with same 
+     * parameters must return the same result.
+     * 
+     * Here: set unselectables on model
+     * 
+     */
+    public void testSelectionModelSameAsMonthViewIsUnselectableDate() {
+        JXMonthView monthView = new JXMonthView();
+        // guard against accidental startofday
+        calendar.set(Calendar.HOUR_OF_DAY, 5);
+        Date date = calendar.getTime();
+        SortedSet<Date> unselectables = new TreeSet<Date>();
+        unselectables.add(date);
+        monthView.getSelectionModel().setUnselectableDates(unselectables);
+        assertTrue(monthView.getSelectionModel().isUnselectableDate(date));
+        assertTrue(monthView.isUnselectableDate(date));
+    }
+    
+    /**
+     * Issue ??-swingx: selection related properties must be independent 
+     * of way-of setting.
+     * 
+     * View must delegate to model, so asking view or model with same 
+     * parameters must return the same result.
+     * 
+     * Here: set selected on model
+     * 
+     */
+    public void testSelectionModelSameAsMonthViewIsSelected() {
+        JXMonthView monthView = new JXMonthView();
+        // guard against accidental startofday
+        calendar.set(Calendar.HOUR_OF_DAY, 5);
+        Date date = calendar.getTime();
+        monthView.getSelectionModel().setSelectionInterval(date, date);
+        assertTrue(monthView.getSelectionModel().isSelected(date));
+        assertTrue(monthView.isSelectedDate(date));
+    }
+    
+    /**
+     * Issue ??-swingx: selection related properties must be independent 
+     * of way-of setting.
+     * 
+     * View must delegate to model, so asking view or model with same 
+     * parameters must return the same result.
+     * 
+     * Here: set selected on model, ask for selected date
+     * 
+     */
+    public void testSelectionModelSameAsMonthViewSelectedDate() {
+        JXMonthView monthView = new JXMonthView();
+        // guard against accidental startofday
+        calendar.set(Calendar.HOUR_OF_DAY, 5);
+        Date date = calendar.getTime();
+        monthView.getSelectionModel().setSelectionInterval(date, date);
+        assertEquals(monthView.getSelectionModel().getSelection().first(), 
+                monthView.getSelectedDate());
+    }
+    
 
     /**
      * #703-swingx: set date to first of next doesn't update the view.
@@ -1018,10 +1163,8 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testUpperBound() {
         JXMonthView view = new JXMonthView();
-        Date full = calendar.getTime();
-        Date cleaned = XTestUtils.getStartOfDay(calendar);
-        view.setUpperBound(full);
-        assertEquals(cleaned, view.getUpperBound());
+        view.setUpperBound(today);
+        assertEquals(startOfDay(today), view.getUpperBound());
         // remove again
         view.setUpperBound(null);
         assertEquals(null, view.getUpperBound());
@@ -1033,10 +1176,8 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testLowerBound() {
         JXMonthView view = new JXMonthView();
-        Date full = calendar.getTime();
-        Date cleaned = XTestUtils.getStartOfDay(calendar);
-        view.setLowerBound(full);
-        assertEquals(cleaned, view.getLowerBound());
+        view.setLowerBound(today);
+        assertEquals(startOfDay(today), view.getLowerBound());
         // remove again
         view.setLowerBound(null);
         assertEquals(null, view.getLowerBound());
@@ -1048,13 +1189,20 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testUnselectableDate() {
         JXMonthView monthView = new JXMonthView();
-        Date date = XTestUtils.getStartOfToday();
-        assertFalse(monthView.isUnselectableDate(date));
-        monthView.setUnselectableDates(date);
-        assertTrue(monthView.isUnselectableDate(date));
-
+        // initial
+        assertFalse(monthView.isUnselectableDate(today));
+        // set unselectable today
+        monthView.setUnselectableDates(today);
+        assertTrue("raqw today must be unselectable", 
+                monthView.isUnselectableDate(today));
+        assertTrue("start of today must be unselectable", 
+                monthView.isUnselectableDate(startOfDay(today)));
+        assertTrue("end of today must be unselectable", 
+                monthView.isUnselectableDate(endOfDay(today)));
         monthView.setUnselectableDates();
-        assertFalse(monthView.isUnselectableDate(date));
+        assertFalse(monthView.isUnselectableDate(today));
+        assertFalse(monthView.isUnselectableDate(startOfDay(today)));
+        assertFalse(monthView.isUnselectableDate(endOfDay(today)));
     }
 
     /**
@@ -1086,11 +1234,6 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testCleanupCopyDate() {
         JXMonthView monthView = new JXMonthView();
-        if (calendar.get(Calendar.HOUR_OF_DAY) < 5) { 
-            // sanity: has time elements
-            calendar.set(Calendar.HOUR_OF_DAY, 5);
-        }
-        Date today = calendar.getTime();
         Date copy = new Date(today.getTime());
         monthView.setSelectionInterval(today, today);
         assertEquals("the date used for selection must be unchanged", copy, today);
@@ -1115,10 +1258,8 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testIsSelectedDate494() {
         JXMonthView monthView = new JXMonthView();
-        Date today = new Date();
         Date copy = new Date(today.getTime());
-        Date selected = XTestUtils.getStartOfToday();
-        monthView.setSelectedDate(selected);
+        monthView.setSelectedDate(today);
         // use today
         monthView.isSelectedDate(today);
         assertEquals("date must not be changed in isSelected", copy, today);
@@ -1130,15 +1271,13 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testSetSelectedDate() {
         JXMonthView monthView = new JXMonthView();
-        Date today = new Date();
         Date copy = new Date(today.getTime());
-        Date selected = XTestUtils.getStartOfToday();
         monthView.setSelectedDate(today);
         // sanity: date unchanged
         assertEquals(copy, today);
-        assertEquals(selected, monthView.getSelectedDate());
+        assertEquals(startOfDay(today), monthView.getSelectedDate());
         // sanity:
-        assertEquals(selected, monthView.getSelection().first());
+        assertEquals(startOfDay(today), monthView.getSelection().first());
         monthView.setSelectedDate(null);
         assertTrue(monthView.isSelectionEmpty());
     }
@@ -1150,11 +1289,9 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testGetSelected() {
         JXMonthView monthView = new JXMonthView();
-        Date selected = monthView.getSelectedDate();
-        assertNull(selected);
-        Date today = cleanupDate(calendar);
+        assertNull(monthView.getSelectedDate());
         monthView.setSelectionInterval(today, today);
-        assertEquals("same day", today, monthView.getSelectedDate());
+        assertEquals("same day", startOfDay(today), monthView.getSelectedDate());
         // clear selection
         monthView.clearSelection();
         assertNull(monthView.getSelectedDate());
@@ -1183,24 +1320,22 @@ public class JXMonthViewTest extends MockObjectTestCase {
         }
     }
 
-    public void testNullSelection() {
+    public void testEmptySelectionInitial() {
         JXMonthView monthView = new JXMonthView();
+        assertTrue(monthView.isSelectionEmpty());
         SortedSet<Date> selection = monthView.getSelection();
         assertTrue(selection.isEmpty());
-
-        Date date = new Date();
-        monthView.setSelectionInterval(date, date);
-        selection = monthView.getSelection();
-        assertTrue(1 == selection.size());
-
-        //NB JXMonthView removes the time component from its dates; oh and just in case it's tested at *exactly* midnight..
-        assertTrue(date.after(selection.first()) || (date != selection.first() && date.equals(selection.first())));    // our Date object shouldnt change
-        assertTrue(DateUtils.startOfDay(date).equals(selection.first()));
+    }
+    
+    public void testEmptySelectionClear() {
+        JXMonthView monthView = new JXMonthView();
+        monthView.setSelectionInterval(today, today);
+        // sanity
+        assertTrue(1 == monthView.getSelection().size());
 
         monthView.clearSelection();
         assertTrue(monthView.isSelectionEmpty());
-        selection = monthView.getSelection();
-        assertTrue(selection.isEmpty());
+        assertTrue(monthView.getSelection().isEmpty());
     }
 
     public void testNoSelectionMode() {
@@ -1216,98 +1351,50 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JXMonthView monthView = new JXMonthView();
         monthView.setSelectionMode(JXMonthView.SelectionMode.SINGLE_SELECTION);
 
-        Date today = new Date();
-        monthView.setSelectionInterval(today, today);
+        monthView.setSelectionInterval(yesterDay, yesterDay);
         SortedSet<Date> selection = monthView.getSelection();
         assertTrue(1 == selection.size());
-        assertTrue(DateUtils.startOfDay(today).equals(selection.first()));
+        assertEquals(startOfDay(yesterDay), selection.first());
 
-        calendar.setTime(today);
-        calendar.add(Calendar.DAY_OF_MONTH, 1);
-        Date tomorrow = cleanupDate(calendar);
-        monthView.setSelectionInterval(today, tomorrow);
+        monthView.setSelectionInterval(yesterDay, afterTomorrow);
         selection = monthView.getSelection();
         assertTrue(1 == selection.size());
-        assertTrue(DateUtils.startOfDay(today).equals(selection.first()));
+        assertEquals(startOfDay(yesterDay), selection.first());
     }
 
     public void testSingleIntervalSelection() {
         JXMonthView monthView = new JXMonthView();
         monthView.setSelectionMode(JXMonthView.SelectionMode.SINGLE_INTERVAL_SELECTION);
 
-        Date today = new Date();
-        monthView.setSelectionInterval(today, today);
+        monthView.setSelectionInterval(yesterDay, yesterDay);
         SortedSet<Date> selection = monthView.getSelection();
         assertTrue(1 == selection.size());
-        assertTrue(DateUtils.startOfDay(today).equals(selection.first()));
+        assertEquals(startOfDay(yesterDay), selection.first());
 
-        calendar.setTime(today);
-        calendar.add(Calendar.DAY_OF_MONTH, 1);
-        Date tomorrow = cleanupDate(calendar);
-        monthView.setSelectionInterval(today, tomorrow);
+        monthView.setSelectionInterval(yesterDay, tomorrow);
+        
         selection = monthView.getSelection();
-        assertTrue(2 == selection.size());
-        assertTrue(DateUtils.startOfDay(today).equals(selection.first()));
-        assertTrue(tomorrow.equals(selection.last()));
+        assertTrue(3 == selection.size());
+        assertEquals(startOfDay(yesterDay), selection.first());
+        assertEquals(startOfDay(tomorrow), selection.last());
+
     }
 
-    public void testWeekIntervalSelection() {
-        JXMonthView monthView = new JXMonthView(Locale.US);
-        monthView.setSelectionMode(JXMonthView.SelectionMode.WEEK_INTERVAL_SELECTION);
 
-        // Use a known date that falls on a Sunday, which just happens to be my birthday.
-        calendar.set(Calendar.YEAR, 2006);
-        calendar.set(Calendar.MONTH, Calendar.APRIL);
-        calendar.set(Calendar.DAY_OF_MONTH, 9);
-        Date startDate = cleanupDate(calendar);
-
-        Date endDate;
-        calendar.set(Calendar.DAY_OF_MONTH, 13);
-        endDate = calendar.getTime();
-
-        monthView.setSelectionInterval(startDate, endDate);
-        SortedSet<Date> selection = monthView.getSelection();
-        assertTrue(startDate.equals(selection.first()));
-        assertTrue(endDate.equals(selection.last()));
-
-        calendar.set(Calendar.DAY_OF_MONTH, 20);
-        endDate = calendar.getTime();
-        monthView.setSelectionInterval(startDate, endDate);
-
-        calendar.set(Calendar.DAY_OF_MONTH, 22);
-        endDate = calendar.getTime();
-        selection = monthView.getSelection();
-
-        assertEquals(startDate, selection.first());
-        assertTrue(endDate.equals((selection.last())));
-    }
 
     public void testMultipleIntervalSelection() {
         JXMonthView monthView = new JXMonthView();
         monthView.setSelectionMode(JXMonthView.SelectionMode.MULTIPLE_INTERVAL_SELECTION);
 
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        Date date1 = cleanupDate(calendar);
-
-        calendar.add(Calendar.DAY_OF_MONTH, 5);
-        Date date2 = calendar.getTime();
-
-        monthView.setSelectionInterval(date1, date1);
-        monthView.addSelectionInterval(date2, date2);
-
+        monthView.setSelectionInterval(yesterDay, yesterDay);
+        monthView.addSelectionInterval(afterTomorrow, afterTomorrow);
+        
         SortedSet<Date> selection = monthView.getSelection();
-        assertTrue(2 == selection.size());
-        assertTrue(date1.equals(selection.first()));
-        assertTrue(date2.equals(selection.last()));
+        assertEquals(2, selection.size());
+        assertEquals(startOfDay(yesterDay), selection.first());
+        assertEquals(startOfDay(afterTomorrow), selection.last());
     }
 
-    private Date cleanupDate(Calendar cal) {
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        return cal.getTime();
-    }
 
     public void testModelSelectionUpdate() {
         JXMonthView monthView = new JXMonthView();
@@ -1386,5 +1473,17 @@ public class JXMonthViewTest extends MockObjectTestCase {
         // undocumented
         monthView.setUnselectableDates((long[]) null);
         assertFalse(monthView.isUnselectableDate(date.getTime()));
+    }
+    
+    private Date startOfDay(Date date) {
+        calendar.setTime(date);
+        CalendarUtils.startOfDay(calendar);
+        return calendar.getTime();
+    }
+ 
+    private Date endOfDay(Date date) {
+        calendar.setTime(date);
+        CalendarUtils.endOfDay(calendar);
+        return calendar.getTime();
     }
 }

@@ -42,7 +42,7 @@ import javax.swing.UIManager;
 
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
-import org.jdesktop.swingx.calendar.DefaultDateSelectionModel;
+import org.jdesktop.swingx.calendar.DaySelectionModel;
 import org.jdesktop.swingx.event.EventListenerMap;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.MonthViewAddon;
@@ -327,7 +327,7 @@ public class JXMonthView extends JComponent {
 
         this.model = model;
         if (this.model == null) {
-            this.model = new DefaultDateSelectionModel();
+            this.model = new DaySelectionModel();
         }
 
         // JW: something fishy going on - see #702-swingx and related discussion
@@ -540,6 +540,7 @@ public class JXMonthView extends JComponent {
      * @param date millis representing the date to make visible.
      * @see #ensureDateVisible(Date)
      */
+    @Deprecated
     public void ensureDateVisible(long date) {
         if (date < firstDisplayedDate) {
             setFirstDisplayedDate(date);
@@ -614,6 +615,7 @@ public class JXMonthView extends JComponent {
     
 //----   internal date manipulation ("cleanup" == start of day in monthView's calendar)
     
+    @Deprecated
     private void cleanupWeekSelectionDates(Date startDate, Date endDate) {
         int count = 1;
         cal.setTime(startDate);
@@ -659,12 +661,14 @@ public class JXMonthView extends JComponent {
      * @param date the time as Date.
      * @return the date corresponding to the start of the given day, relative to this
      *    monthView's calendar.
+     *  
+     * @deprecated Model's task.   
      */
-    private Date startOfDay(Date date) {
-        cal.setTime(date);
-        CalendarUtils.startOfDay(cal);
-        return cal.getTime();
-    }
+//    private Date startOfDay(Date date) {
+//        cal.setTime(date);
+//        CalendarUtils.startOfDay(cal);
+//        return cal.getTime();
+//    }
 
     /**
      * Returns the start of the day of the given millis.
@@ -672,6 +676,8 @@ public class JXMonthView extends JComponent {
      * @param millis the time in millis.
      * @return start of the given day in millis, relative to this
      *    monthView's calendar.
+     *    
+     * @deprecated Model's task.   
      */
     private long startOfDay(long millis) {
         cal.setTimeInMillis(millis);
@@ -782,11 +788,12 @@ public class JXMonthView extends JComponent {
             modifiedStartDate = startDate;
             modifiedEndDate = endDate;
             if (selectionMode == SelectionMode.WEEK_INTERVAL_SELECTION) {
-                cleanupWeekSelectionDates(startDate, endDate);
+                throw new UnsupportedOperationException("week interval selection not yet implemented");
+//                cleanupWeekSelectionDates(startDate, endDate);
             }
-            getSelectionModel().addSelectionInterval(
-                    startOfDay(modifiedStartDate),
-                    startOfDay(modifiedEndDate));
+            getSelectionModel().addSelectionInterval(modifiedStartDate, modifiedEndDate);
+//                    startOfDay(modifiedStartDate),
+//                    startOfDay(modifiedEndDate));
         }
     }
 
@@ -802,9 +809,11 @@ public class JXMonthView extends JComponent {
             modifiedStartDate = startDate;
             modifiedEndDate = endDate;
             if (selectionMode == SelectionMode.WEEK_INTERVAL_SELECTION) {
-                cleanupWeekSelectionDates(startDate, endDate);
+                throw new UnsupportedOperationException("week interval selection not yet implemented");
+//              cleanupWeekSelectionDates(startDate, endDate);
             }
-            getSelectionModel().setSelectionInterval(startOfDay(modifiedStartDate), startOfDay(modifiedEndDate));
+            getSelectionModel().setSelectionInterval(modifiedStartDate, modifiedEndDate);
+//                    startOfDay(modifiedStartDate), startOfDay(modifiedEndDate));
         }
     }
 
@@ -816,7 +825,8 @@ public class JXMonthView extends JComponent {
      * @param endDate End of the date range to remove from the selection
      */
     public void removeSelectionInterval(final Date startDate, final Date endDate) {
-        getSelectionModel().removeSelectionInterval(startOfDay(startDate), startOfDay(endDate));
+        getSelectionModel().removeSelectionInterval(startDate, endDate);
+//                startOfDay(startDate), startOfDay(endDate));
     }
 
     /**
@@ -880,7 +890,8 @@ public class JXMonthView extends JComponent {
      * @return true if the date is selected, false otherwise
      */
     public boolean isSelectedDate(Date date) {
-        return getSelectionModel().isSelected(startOfDay(date));
+        return getSelectionModel().isSelected(date);
+//                startOfDay(date));
     }
 
     /**
@@ -893,8 +904,8 @@ public class JXMonthView extends JComponent {
      * @param lowerBound the lower bound, null means none.
      */
     public void setLowerBound(Date lowerBound) {
-        Date lower = lowerBound != null ? startOfDay(lowerBound) : null;
-        getSelectionModel().setLowerBound(lower);
+//        Date lower = lowerBound != null ? startOfDay(lowerBound) : null;
+        getSelectionModel().setLowerBound(lowerBound);
     }
 
     /**
@@ -907,8 +918,8 @@ public class JXMonthView extends JComponent {
      * @param upperBound the upper bound, null means none.
      */
     public void setUpperBound(Date upperBound) {
-        Date upper = upperBound != null ? startOfDay(upperBound) : null;
-        getSelectionModel().setUpperBound(upper);
+//        Date upper = upperBound != null ? startOfDay(upperBound) : null;
+        getSelectionModel().setUpperBound(upperBound);
     }
 
 
@@ -943,7 +954,8 @@ public class JXMonthView extends JComponent {
      * @return true if the date is unselectable, false otherwise
      */
     public boolean isUnselectableDate(Date date) {
-        return getSelectionModel().isUnselectableDate(startOfDay(date));
+        return getSelectionModel().isUnselectableDate(date);
+//                startOfDay(date));
     }
 
     /**
@@ -967,7 +979,8 @@ public class JXMonthView extends JComponent {
                 "unselectable dates must not be null");
         SortedSet<Date> unselectableSet = new TreeSet<Date>();
         for (Date unselectableDate : unselectableDates) {
-            unselectableSet.add(startOfDay(unselectableDate));
+            unselectableSet.add(unselectableDate);
+//                    startOfDay(unselectableDate));
         }
         getSelectionModel().setUnselectableDates(unselectableSet);
         repaint();
@@ -981,9 +994,12 @@ public class JXMonthView extends JComponent {
      *
      * @param date The date to check
      * @return true if the date is selected, false otherwise
+     * 
+     * @deprecated use {@link #setSelectedDate(Date)}
      */
     public boolean isSelectedDate(long date) {
-        return getSelectionModel().isSelected(new Date(startOfDay(date)));
+        return getSelectionModel().isSelected(new Date(date));
+//                new Date(startOfDay(date)));
     }
 
     /**
@@ -992,9 +1008,12 @@ public class JXMonthView extends JComponent {
      *
      * @param date date which to test for unselectable status
      * @return true if the date is unselectable, false otherwise
+     * 
+     * @deprecated use {@link #isUnselectableDate(Date)}
      */
     public boolean isUnselectableDate(long date) {
-        return getSelectionModel().isUnselectableDate(new Date(startOfDay(date)));
+        return getSelectionModel().isUnselectableDate(new Date(date));
+//                new Date(startOfDay(date)));
     }
 
     /**
@@ -1002,12 +1021,15 @@ public class JXMonthView extends JComponent {
      * day, minute, second, and millisecond before being added to the selection model</b>.
      *
      * @param unselectableDates the dates that should be unselectable
+     * 
+     * @deprecated use {@link #setUnselectableDates(Date...)}
      */
     public void setUnselectableDates(long[] unselectableDates) {
         SortedSet<Date> unselectableSet = new TreeSet<Date>();
         if (unselectableDates != null) {
             for (long unselectableDate : unselectableDates) {
-                unselectableSet.add(new Date(startOfDay(unselectableDate)));
+                unselectableSet.add(new Date(unselectableDate));
+//                        new Date(startOfDay(unselectableDate)));
             }
         }
         getSelectionModel().setUnselectableDates(unselectableSet);
@@ -1267,7 +1289,7 @@ public class JXMonthView extends JComponent {
 
         this.firstDayOfWeek = firstDayOfWeek;
         cal.setFirstDayOfWeek(this.firstDayOfWeek);
-        model.setFirstDayOfWeek(this.firstDayOfWeek);
+        getSelectionModel().setFirstDayOfWeek(this.firstDayOfWeek);
 
         firePropertyChange("firstDayOfWeek", oldFirstDayOfWeek, this.firstDayOfWeek);
 

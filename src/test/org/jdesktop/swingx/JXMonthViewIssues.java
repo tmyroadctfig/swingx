@@ -28,7 +28,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.SortedSet;
 import java.util.TimeZone;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import javax.swing.Action;
@@ -164,8 +166,45 @@ public class JXMonthViewIssues extends InteractiveTestCase {
 
     
 //----------------------
-    
-    
+
+    /**
+     * temporarily removed weekinterval selection.
+     * Need to review - why not in selectionModel?
+     */
+    public void testWeekIntervalSelection() {
+        // PENDING: simplify to use pre-defined dates
+        JXMonthView monthView = new JXMonthView(Locale.US);
+        monthView.setSelectionMode(JXMonthView.SelectionMode.WEEK_INTERVAL_SELECTION);
+
+        // Use a known date that falls on a Sunday, which just happens to be my birthday.
+        calendar.set(Calendar.YEAR, 2006);
+        calendar.set(Calendar.MONTH, Calendar.APRIL);
+        calendar.set(Calendar.DAY_OF_MONTH, 9);
+        CalendarUtils.startOfDay(calendar);
+        Date startDate = calendar.getTime();
+//        Date startDate = cleanupDate(calendar);
+
+        Date endDate;
+        calendar.set(Calendar.DAY_OF_MONTH, 13);
+        endDate = calendar.getTime();
+
+        monthView.setSelectionInterval(startDate, endDate);
+        SortedSet<Date> selection = monthView.getSelection();
+        assertTrue(startDate.equals(selection.first()));
+        assertTrue(endDate.equals(selection.last()));
+
+        calendar.set(Calendar.DAY_OF_MONTH, 20);
+        endDate = calendar.getTime();
+        monthView.setSelectionInterval(startDate, endDate);
+
+        calendar.set(Calendar.DAY_OF_MONTH, 22);
+        endDate = calendar.getTime();
+        selection = monthView.getSelection();
+
+        assertEquals(startDate, selection.first());
+        assertTrue(endDate.equals((selection.last())));
+    }
+
     /**
      * Issue #618-swingx: JXMonthView displays problems with non-default
      * timezones.
