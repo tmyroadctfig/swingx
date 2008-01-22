@@ -364,4 +364,13 @@ public class SingleDaySelectionModel implements DateSelectionModel {
         }
     }
 
+    /**
+     * {@inheritDoc}<p>
+     * 
+     * Implemented to return the date itself.
+     */
+    public Date getNormalizedDate(Date date) {
+        return date;
+    }
+
 }

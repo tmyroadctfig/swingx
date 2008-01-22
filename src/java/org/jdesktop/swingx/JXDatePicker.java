@@ -56,6 +56,7 @@ import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.text.DefaultFormatterFactory;
 
 import org.jdesktop.swingx.calendar.DatePickerFormatter;
+import org.jdesktop.swingx.calendar.SingleDaySelectionModel;
 import org.jdesktop.swingx.event.EventListenerMap;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.plaf.DatePickerAddon;
@@ -284,6 +285,7 @@ public class JXDatePicker extends JComponent {
     private void init() {
         listenerMap = new EventListenerMap();
         _monthView = new JXMonthView();
+//        _monthView.setSelectionModel(new SingleDaySelectionModel());
         _monthView.setTraversable(true);
 
 

@@ -27,6 +27,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
+import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -47,7 +48,9 @@ import javax.swing.KeyStroke;
 
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DatePickerFormatter;
+import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DateUtils;
+import org.jdesktop.swingx.calendar.SingleDaySelectionModel;
 import org.jdesktop.test.PropertyChangeReport;
 import org.jdesktop.test.TestUtils;
 
@@ -320,6 +323,22 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         frame.setVisible(true);
     }
 //-------------------- unit tests
+ 
+    DateFormat longFormat = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
+    /**
+     * Issue #568-swingx: picker must respect selection model (as of time fields) 
+     */
+    public void testSetDateKeepsTime() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.setDate(null);
+        DateSelectionModel selectionModel = picker.getMonthView().getSelectionModel();
+        assertTrue(selectionModel instanceof SingleDaySelectionModel);
+        Date date = new Date();
+        selectionModel.setSelectionInterval(date, date);
+        Date first = selectionModel.getSelection().first();
+        assertEquals("formats diff: " + (date.getTime() - first.getTime())
+                , date, first);
+    }
     
     /**
      * Issue #572-swingx: monthView must show linkDate on empty selection.

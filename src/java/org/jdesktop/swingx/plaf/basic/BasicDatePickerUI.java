@@ -569,6 +569,7 @@ public class BasicDatePickerUI extends DatePickerUI {
     @Override
     public Date getSelectableDate(Date date) throws PropertyVetoException {
         Date cleaned = date != null ? cleanupDate(date) : null;
+//        Date cleaned = date; // != null ? cleanupDate(date) : null;
         if (equalsDate(cleaned, datePicker.getDate())) { 
             // one place to interrupt the update spiral
             throw new PropertyVetoException("date not selectable", null);
@@ -1436,18 +1437,19 @@ public class BasicDatePickerUI extends DatePickerUI {
 //------------ utility methods
     // duplication!!
     private Date cleanupDate(Date date) {
+        return datePicker.getMonthView().getSelectionModel().getNormalizedDate(date);
         // only modify defensive copies
-        return new Date(cleanupDate(date.getTime(), datePicker.getMonthView().getCalendar()));
+//        return new Date(cleanupDate(date.getTime(), datePicker.getMonthView().getCalendar()));
     }
 
     // duplication!!
     // PENDING: move to CalendarUtils ?
-    private long cleanupDate(long date, Calendar cal) {
-        cal.setTimeInMillis(date);
-        // We only want to compare the day, month and year
-        CalendarUtils.startOfDay(cal);
-        return cal.getTimeInMillis();
-    }
+//    private long cleanupDate(long date, Calendar cal) {
+//        cal.setTimeInMillis(date);
+//        // We only want to compare the day, month and year
+//        CalendarUtils.startOfDay(cal);
+//        return cal.getTimeInMillis();
+//    }
 
     /**
      * Checks the given dates for being equal.

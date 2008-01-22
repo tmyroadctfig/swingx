@@ -357,4 +357,12 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
        fireValueChanged(adjusting ? EventType.ADJUSTING_STARTED : EventType.ADJUSTING_STOPPED);
         
     }
+
+    
+    /**
+     * {@inheritDoc}
+     */
+    public Date getNormalizedDate(Date date) {
+        return date;
+    }
 }

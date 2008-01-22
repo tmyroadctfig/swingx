@@ -219,5 +219,14 @@ public interface DateSelectionModel {
      */
     public boolean isAdjusting();
     
-    
+    /**
+     * Returns a normalized Date as used by the implementation, if any. F.i. 
+     * DaySelectionModel returns the start of the day in the model's
+     * calendar. If no normalization is applied, the Date itself is returned. 
+     * The given Date is never changed.
+     * 
+     * @return the date as it would be normalized before used in the model.
+     *   
+     */
+    public Date getNormalizedDate(Date date);
 }

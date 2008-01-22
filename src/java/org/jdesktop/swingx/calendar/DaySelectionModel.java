@@ -389,4 +389,14 @@ public class DaySelectionModel implements DateSelectionModel {
        fireValueChanged(adjusting ? EventType.ADJUSTING_STARTED : EventType.ADJUSTING_STOPPED);
         
     }
+
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * Implemented to return the start of the day which contains the date.
+     */
+    public Date getNormalizedDate(Date date) {
+        // TODO Auto-generated method stub
+        return startOfDay(date);
+    }
 }
