@@ -23,6 +23,7 @@ package org.jdesktop.swingx;
 
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -263,6 +264,28 @@ public class JXLabel extends JLabel {
         return textRotation;
     }
 
+    @Override
+    public Dimension getPreferredSize() {
+        Dimension size = super.getPreferredSize();
+        if (this.textRotation != NORMAL && !isPreferredSizeSet()) {
+            // #swingx-680 change the preferred size when rotation is set ... ideally this would be solved in the LabelUI rather then here
+            double theta = getTextRotation();
+            size.setSize(rotateWidth(size, theta), rotateHeight(size,
+            theta));
+        }
+        return size;
+    }
+
+    private static int rotateWidth(Dimension size, double theta) {
+        return (int)Math.round(size.width*Math.abs(Math.cos(theta)) +
+        size.height*Math.abs(Math.sin(theta)));
+    }
+
+    private static int rotateHeight(Dimension size, double theta) {
+        return (int)Math.round(size.width*Math.abs(Math.sin(theta)) +
+        size.height*Math.abs(Math.cos(theta)));
+    }
+
     /**
      * Sets new value for text rotation. The value can be anything in range <0,2PI>. Note that although property name
      * suggests only text rotation, the whole foreground painter is rotated in fact. Due to various reasons it is
@@ -309,9 +332,7 @@ public class JXLabel extends JLabel {
     public boolean isLineWrap() {
         return this.multiLine;
     }
-   
-    
-    
+
     private boolean paintBorderInsets = true;
 
 	private int maxLineSpan = -1;
