@@ -370,7 +370,7 @@ public class SingleDaySelectionModel implements DateSelectionModel {
      * Implemented to return the date itself.
      */
     public Date getNormalizedDate(Date date) {
-        return date;
+        return new Date(date.getTime());
     }
 
 }

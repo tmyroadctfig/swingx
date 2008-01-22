@@ -363,6 +363,6 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
      * {@inheritDoc}
      */
     public Date getNormalizedDate(Date date) {
-        return date;
+        return new Date(date.getTime());
     }
 }

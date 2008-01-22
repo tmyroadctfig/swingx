@@ -45,6 +45,15 @@ public class DefaultDateSelectionModelTest extends TestCase {
     private DateSelectionModel model;
     private Calendar calendar;
 
+    /**
+     * test that getNormalized always returns a clone of the given date.
+     */
+    public void testNormalizedDateCloned() {
+        Date date = calendar.getTime();
+        Date normalized = model.getNormalizedDate(date);
+        assertEquals(date, normalized);
+        assertNotSame(date, normalized);
+    }
     
 
     /**

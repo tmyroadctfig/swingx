@@ -214,6 +214,7 @@ public class HyperlinkProvider
      */
     @Override
     protected void configureState(CellContext context) {
+//        rendererComponent.setHorizontalAlignment(getHorizontalAlignment());
         if (context.getComponent() !=  null) {
             Point p = (Point) context.getComponent()
                     .getClientProperty(RolloverProducer.ROLLOVER_KEY);
