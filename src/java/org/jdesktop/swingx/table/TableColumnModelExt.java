@@ -45,8 +45,8 @@ import org.jdesktop.swingx.event.TableColumnModelExtListener;
  * model columns (not literally, obviously). Each view column belongs to exactly
  * one of the following (real) subsets:
  * <ul>
- * <li> visible columns: all view columns with the visiblility property enabled
- * <li> hidden columns: all view columns with the visibilitity property disabled
+ * <li> visible columns: all view columns with the visibility property enabled
+ * <li> hidden columns: all view columns with the visibility property disabled
  * </ul>
  * </ol>
  * 

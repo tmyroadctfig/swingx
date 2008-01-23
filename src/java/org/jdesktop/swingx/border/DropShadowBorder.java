@@ -83,7 +83,7 @@ public class DropShadowBorder implements Border, Serializable {
     }
     
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public void paintBorder(Component c, Graphics graphics, int x, int y, int width, int height) {
         /*
@@ -338,7 +338,7 @@ public class DropShadowBorder implements Border, Serializable {
     }
     
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public boolean isBorderOpaque() {
         return false;
