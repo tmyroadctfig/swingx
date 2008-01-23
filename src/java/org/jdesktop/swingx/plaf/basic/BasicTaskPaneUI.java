@@ -219,9 +219,10 @@ public class BasicTaskPaneUI extends TaskPaneUI {
          * @return Current title height.
          */
         protected int getTitleHeight(Component c) {
+            
                 return c == null || c.getFont() == null || c.getFont() instanceof FontUIResource ? titleHeight : c.getFontMetrics(c.getFont()).getHeight();
         }
-
+        
 	/**
 	 * Creates new border for task pane.
 	 * @return Fresh border on every call.
@@ -356,12 +357,14 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 						Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 			} else {
 				mouseOver = false;
+                                group.repaint(0, 0, group.getWidth(), getTitleHeight(group));
 			}
 		}
 
 		public void mouseExited(MouseEvent e) {
 			e.getComponent().setCursor(null);
 			mouseOver = false;
+                        group.repaint(0, 0, group.getWidth(), getTitleHeight(group));
 		}
 
 		public void mouseMoved(MouseEvent e) {
@@ -373,6 +376,8 @@ public class BasicTaskPaneUI extends TaskPaneUI {
 				e.getComponent().setCursor(null);
 				mouseOver = false;
 			}
+			
+                        group.repaint(0, 0, group.getWidth(), getTitleHeight(group));
 		}
 
 		public void mouseReleased(MouseEvent e) {
