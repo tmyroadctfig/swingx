@@ -24,6 +24,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Rectangle;
@@ -219,8 +220,25 @@ public class BasicTaskPaneUI extends TaskPaneUI {
          * @return Current title height.
          */
         protected int getTitleHeight(Component c) {
+            if (c instanceof JXTaskPane) {
+                JXTaskPane taskPane = (JXTaskPane) c;
+                Font font = taskPane.getFont();
+                int height = titleHeight;
+                
+                if (font != null && !(font instanceof FontUIResource)) {
+                    height = taskPane.getFontMetrics(font).getHeight();
+                }
+                
+                Icon icon = taskPane.getIcon();
+                
+                if (icon != null) {
+                    height = Math.max(height, icon.getIconHeight() + 4);
+                }
+                
+                return height;
+            }
             
-                return c == null || c.getFont() == null || c.getFont() instanceof FontUIResource ? titleHeight : c.getFontMetrics(c.getFont()).getHeight();
+            return titleHeight;
         }
         
 	/**
