@@ -35,4 +35,12 @@ public class JXLabel2VisualTest extends InteractiveTestCase {
     testFrame.setVisible(true);
     }
 
+    /**
+     * Do nothing, make the test runner happy
+     * (would output a warning without a test fixture).
+     *
+     */
+    public void testDummy() {
+        
     }
+}
