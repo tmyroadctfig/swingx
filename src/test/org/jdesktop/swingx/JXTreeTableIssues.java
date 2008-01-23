@@ -20,6 +20,7 @@
  */
 package org.jdesktop.swingx;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -32,13 +33,19 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.CellEditor;
 import javax.swing.JFrame;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.TableModelEvent;
+import javax.swing.plaf.basic.BasicLookAndFeel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -96,13 +103,52 @@ public class JXTreeTableIssues extends InteractiveTestCase {
 //            test.runInteractiveTests(".*AdapterDeleteUpdate.*");
 //            test.runInteractiveTests(".*Text.*");
 //            test.runInteractiveTests(".*TreeExpand.*");
-            test.runInteractiveTests("interactive.*ClipIssueD.*");
+//            test.runInteractiveTests("interactive.*ClipIssueD.*");
+          test.runInteractiveTests("interactive.*Editing.*");
+              
         } catch (Exception e) {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
     }
 
+    /**
+     * Issue #730-swingx: editor's stop not always called.
+     * 
+     *  - start edit a cell in the hierarchical column, 
+     *  - click into another cell of the hierarchical column
+     *  - edit sometimes canceled instead of stopped 
+     *  
+     *  seems to happen if click into text of cell, okay if outside
+     *  
+     */
+    public void interactiveEditingCanceledStopped() {
+        final JTextField field = new JTextField();
+        JXTreeTable xTable = new JXTreeTable(new ComponentTreeTableModel(new JXFrame()));
+        xTable.expandAll();
+        xTable.setVisibleColumnCount(10);
+        xTable.packColumn(0, -1);
+        CellEditor editor = xTable.getCellEditor(0, 0);
+        CellEditorListener l =  new CellEditorListener() {
+
+            public void editingCanceled(ChangeEvent e) {
+                field.setText("canceled");
+                LOG.info("canceled");
+            }
+
+            public void editingStopped(ChangeEvent e) {
+                field.setText("stopped");
+                LOG.info("stopped");
+                
+            }};
+        editor.addCellEditorListener(l);
+        JXFrame frame = wrapWithScrollingInFrame(xTable, "#730-swingx: click sometimes cancels");
+        frame.add(field, BorderLayout.SOUTH);
+        frame.setVisible(true);
+        BasicLookAndFeel f;
+    }
+
+    
     /**
      * Issue #493-swingx: incorrect table events fired.
      * Issue #592-swingx: (no structureChanged table events) is a special
