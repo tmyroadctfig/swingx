@@ -167,6 +167,57 @@ public class JXMonthViewIssues extends InteractiveTestCase {
 //----------------------
 
     /**
+     * Issue #733-swingx: TimeZone in model and monthView not synched.
+     *  
+     *  Test that the selected is normalized in the monthView's timezone. 
+     */
+    public void testTimeZoneFlaggedDate() {
+        JXMonthView monthView = new JXMonthView();
+        // config with a known timezone and date
+        TimeZone tz = TimeZone.getTimeZone("GMT+4");
+        monthView.setTimeZone(tz);
+        Date date = new Date();
+        monthView.setFlaggedDates(new Date[] {date});
+        assertTrue(monthView.isFlaggedDate(date));
+        fail("no way to test same normalization for flagged and selected dates");
+    }
+
+    /**
+     * Issue #733-swingx: TimeZone in model and monthView not synched.
+     *  
+     *  Test that the selected is normalized in the monthView's timezone. 
+     */
+    public void testTimeZoneNormalizedDate() {
+        JXMonthView monthView = new JXMonthView();
+        // config with a known timezone and date
+        TimeZone tz = TimeZone.getTimeZone("GMT+4");
+        monthView.setTimeZone(tz);
+        monthView.setSelectedDate(new Date());
+        Date selected = monthView.getSelectedDate();
+        Calendar calendar = monthView.getCalendar();
+        calendar.setTime(selected);
+        CalendarUtils.startOfDay(calendar);
+        assertEquals(selected, calendar.getTime());
+        assertTrue(CalendarUtils.isStartOfDay(calendar));
+    }
+    
+    /**
+     * Issue #733-swingx: TimeZone in model and monthView not synched.
+     * 
+     * Test selected - tells nothing, because it's normalized in the 
+     * model's (default) calendar.
+     */
+    public void testTimeZoneSelectedDate() {
+        JXMonthView monthView = new JXMonthView();
+        // config with a known timezone and date
+        TimeZone tz = TimeZone.getTimeZone("GMT+4");
+        monthView.setTimeZone(tz);
+        Date date = new Date();
+        monthView.setSelectedDate(date);
+        assertTrue(monthView.isSelectedDate(date));
+    }
+    
+    /**
      * temporarily removed weekinterval selection.
      * Need to review - why not in selectionModel?
      */

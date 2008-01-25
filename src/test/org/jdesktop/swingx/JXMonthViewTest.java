@@ -65,7 +65,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     private Date today;
     private Date tomorrow;
     private Date afterTomorrow;
-    private Date yesterDay;
+    private Date yesterday;
     // calendar default instance init with today
     private Calendar calendar;
     // Constants used internally; unit is milliseconds
@@ -81,7 +81,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         today = calendar.getTime();
         
         calendar.add(Calendar.DAY_OF_MONTH, -1);
-        yesterDay = calendar.getTime();
+        yesterday = calendar.getTime();
         
         calendar.add(Calendar.DAY_OF_MONTH, 2);
         tomorrow = calendar.getTime();
@@ -678,7 +678,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testTimeZoneChangeResetLowerBound() {
         JXMonthView monthView = new JXMonthView();
-        monthView.setLowerBound(XTestUtils.getStartOfToday(-5));
+        monthView.setLowerBound(yesterday);
         monthView.setTimeZone(getTimeZone(monthView.getTimeZone(), THREE_HOURS));
         assertEquals("lowerBound must have been reset", null, monthView.getLowerBound());
     }
@@ -693,7 +693,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testTimeZoneChangeResetUpperBound() {
         JXMonthView monthView = new JXMonthView();
-        monthView.setUpperBound(XTestUtils.getStartOfToday(-5));
+        monthView.setUpperBound(yesterday);
         monthView.setTimeZone(getTimeZone(monthView.getTimeZone(), THREE_HOURS));
         assertEquals("upperbound must have been reset", null, monthView.getUpperBound());
     }
@@ -708,12 +708,11 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testTimeZoneChangeResetFlaggedDates() {
         JXMonthView monthView = new JXMonthView();
-        Date time = XTestUtils.getStartOfToday(-5);
-        monthView.setFlaggedDates(new Date[] {time});
+        monthView.setFlaggedDates(new Date[] {yesterday});
         monthView.setTimeZone(getTimeZone(monthView.getTimeZone(), THREE_HOURS));
         // accidentally passes - because it is meaningful only in the timezone 
         // it was set ...
-        assertFalse(monthView.isFlaggedDate(time));
+        assertFalse(monthView.isFlaggedDate(yesterday));
         // missing api
         // assertEquals(0, monthView.getFlaggedDates().size());
         assertFalse("flagged dates must have been cleared", monthView.hasFlaggedDates());
@@ -729,12 +728,11 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testTimeZoneChangeResetUnselectableDates() {
         JXMonthView monthView = new JXMonthView();
-        Date date = XTestUtils.getStartOfToday(-5);
-        monthView.setUnselectableDates(date);
+        monthView.setUnselectableDates(yesterday);
         monthView.setTimeZone(getTimeZone(monthView.getTimeZone(), THREE_HOURS));
         // accidentally passes - because it is meaningful only in the timezone 
         // it was set ...
-        assertFalse(monthView.isUnselectableDate(date));
+        assertFalse(monthView.isUnselectableDate(yesterday));
         // missing api on JXMonthView
         assertEquals("unselectable dates must have been cleared", 
                 0, monthView.getSelectionModel().getUnselectableDates().size());
@@ -1242,11 +1240,9 @@ public class JXMonthViewTest extends MockObjectTestCase {
      */
     public void testIsSelectedDate() {
         JXMonthView monthView = new JXMonthView();
-        Date today = new Date();
-        Date selected = XTestUtils.getStartOfToday();
         monthView.setSelectedDate(today);
         assertTrue(monthView.isSelectedDate(today));
-        assertTrue(monthView.isSelectedDate(selected));
+        assertTrue(monthView.isSelectedDate(startOfDay(today)));
     }
     
     /**
@@ -1349,31 +1345,31 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JXMonthView monthView = new JXMonthView();
         monthView.setSelectionMode(JXMonthView.SelectionMode.SINGLE_SELECTION);
 
-        monthView.setSelectionInterval(yesterDay, yesterDay);
+        monthView.setSelectionInterval(yesterday, yesterday);
         SortedSet<Date> selection = monthView.getSelection();
         assertTrue(1 == selection.size());
-        assertEquals(startOfDay(yesterDay), selection.first());
+        assertEquals(startOfDay(yesterday), selection.first());
 
-        monthView.setSelectionInterval(yesterDay, afterTomorrow);
+        monthView.setSelectionInterval(yesterday, afterTomorrow);
         selection = monthView.getSelection();
         assertTrue(1 == selection.size());
-        assertEquals(startOfDay(yesterDay), selection.first());
+        assertEquals(startOfDay(yesterday), selection.first());
     }
 
     public void testSingleIntervalSelection() {
         JXMonthView monthView = new JXMonthView();
         monthView.setSelectionMode(JXMonthView.SelectionMode.SINGLE_INTERVAL_SELECTION);
 
-        monthView.setSelectionInterval(yesterDay, yesterDay);
+        monthView.setSelectionInterval(yesterday, yesterday);
         SortedSet<Date> selection = monthView.getSelection();
         assertTrue(1 == selection.size());
-        assertEquals(startOfDay(yesterDay), selection.first());
+        assertEquals(startOfDay(yesterday), selection.first());
 
-        monthView.setSelectionInterval(yesterDay, tomorrow);
+        monthView.setSelectionInterval(yesterday, tomorrow);
         
         selection = monthView.getSelection();
         assertTrue(3 == selection.size());
-        assertEquals(startOfDay(yesterDay), selection.first());
+        assertEquals(startOfDay(yesterday), selection.first());
         assertEquals(startOfDay(tomorrow), selection.last());
 
     }
@@ -1384,12 +1380,12 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JXMonthView monthView = new JXMonthView();
         monthView.setSelectionMode(JXMonthView.SelectionMode.MULTIPLE_INTERVAL_SELECTION);
 
-        monthView.setSelectionInterval(yesterDay, yesterDay);
+        monthView.setSelectionInterval(yesterday, yesterday);
         monthView.addSelectionInterval(afterTomorrow, afterTomorrow);
         
         SortedSet<Date> selection = monthView.getSelection();
         assertEquals(2, selection.size());
-        assertEquals(startOfDay(yesterDay), selection.first());
+        assertEquals(startOfDay(yesterday), selection.first());
         assertEquals(startOfDay(afterTomorrow), selection.last());
     }
 

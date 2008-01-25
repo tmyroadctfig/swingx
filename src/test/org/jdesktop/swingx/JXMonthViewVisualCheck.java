@@ -63,7 +63,7 @@ public class JXMonthViewVisualCheck extends InteractiveTestCase {
       JXMonthViewVisualCheck  test = new JXMonthViewVisualCheck();
       try {
 //          test.runInteractiveTests();
-        test.runInteractiveTests(".*Today.*");
+        test.runInteractiveTests(".*TimeZone.*");
 //        test.runInteractiveTests(".*TimeZoneClear.*");
       } catch (Exception e) {
           System.err.println("exception when executing interactive tests:");
