@@ -214,23 +214,17 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
     /**
      * {@inheritDoc}
      */
+    public Date getNormalizedDate(Date date) {
+        return new Date(date.getTime());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public boolean isSelectionEmpty() {
         return selectedDates.isEmpty();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void addDateSelectionListener(DateSelectionListener l) {
-        listenerMap.add(DateSelectionListener.class, l);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void removeDateSelectionListener(DateSelectionListener l) {
-        listenerMap.remove(DateSelectionListener.class, l);
-    }
 
     /**
      * {@inheritDoc}
@@ -310,22 +304,6 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
         }
     }
 
-    public List<DateSelectionListener> getDateSelectionListeners() {
-        return listenerMap.getListeners(DateSelectionListener.class);
-    }
-
-    protected void fireValueChanged(DateSelectionEvent.EventType eventType) {
-        List<DateSelectionListener> listeners = getDateSelectionListeners();
-        DateSelectionEvent e = null;
-
-        for (DateSelectionListener listener : listeners) {
-            if (e == null) {
-                e = new DateSelectionEvent(this, eventType, isAdjusting());
-            }
-            listener.valueChanged(e);
-        }
-    }
-
     private boolean addSelectionImpl(final Date startDate, final Date endDate) {
         boolean hasAdded = false;
         cal.setTime(startDate);
@@ -357,12 +335,36 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
        fireValueChanged(adjusting ? EventType.ADJUSTING_STARTED : EventType.ADJUSTING_STOPPED);
         
     }
-
     
+//--------------- listener
     /**
      * {@inheritDoc}
      */
-    public Date getNormalizedDate(Date date) {
-        return new Date(date.getTime());
+    public void addDateSelectionListener(DateSelectionListener l) {
+        listenerMap.add(DateSelectionListener.class, l);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void removeDateSelectionListener(DateSelectionListener l) {
+        listenerMap.remove(DateSelectionListener.class, l);
+    }
+    public List<DateSelectionListener> getDateSelectionListeners() {
+        return listenerMap.getListeners(DateSelectionListener.class);
+    }
+
+    protected void fireValueChanged(DateSelectionEvent.EventType eventType) {
+        List<DateSelectionListener> listeners = getDateSelectionListeners();
+        DateSelectionEvent e = null;
+
+        for (DateSelectionListener listener : listeners) {
+            if (e == null) {
+                e = new DateSelectionEvent(this, eventType, isAdjusting());
+            }
+            listener.valueChanged(e);
+        }
+    }
+
+    
 }

@@ -29,13 +29,14 @@ import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.event.EventListenerMap;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
+import org.jdesktop.swingx.util.Contract;
 
 /**
  * 
  * DaySelectionModel is a (temporary?) implementation of DateSelectionModel 
  * which normalizes all dates to the start of the day, that is zeroes all 
  * time fields. Responsibility extracted from JXMonthView (which must
- * obey rules of model instead of trying to be clever itself).
+ * respect rules of model instead of trying to be clever itself).
  * 
  * @author Joshua Outwater
  */
@@ -396,7 +397,7 @@ public class DaySelectionModel implements DateSelectionModel {
      * Implemented to return the start of the day which contains the date.
      */
     public Date getNormalizedDate(Date date) {
-        // TODO Auto-generated method stub
+        Contract.asNotNull(date, "date must not be null");
         return startOfDay(date);
     }
 }

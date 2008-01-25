@@ -103,15 +103,73 @@ public class SingleDaySelectionModel implements DateSelectionModel {
         setSelection(startDate);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void removeSelectionInterval(Date startDate, Date endDate) {
+        Contract.asNotNull(startDate, "date must not be null");
+        if (isSelectionEmpty()) return;
+        if (isSelectionInInterval(startDate, endDate)) {
+            selectedDates.clear();
+            fireValueChanged(EventType.DATES_REMOVED);
+        }
+    }
+    
+    /**
+     * Checks and returns whether the selected date is contained in the interval
+     * given by startDate/endDate. The selection must not be empty when 
+     * calling this method. <p>
+     * 
+     * This implementation interprets the interval between the start of the day
+     * of startDay to the end of the day of endDate. 
+     * 
+     * @param startDate the start of the interval, must not be null
+     * @param endDate  the end of the interval, must not be null
+     * @return true if the selected date is contained in the interval
+     */
+    protected boolean isSelectionInInterval(Date startDate, Date endDate) {
+        if (selectedDates.first().before(startOfDay(startDate)) 
+                || (selectedDates.first().after(endOfDay(endDate)))) return false;
+        return true;
+    }
+
+    /**
+     * Selects the given date if it is selectable and not yet selected. 
+     * Does nothing otherwise.
+     * If this operation changes the current selection, it will fire a 
+     * DateSelectionEvent of type DATES_SET.
+     * 
+     * @param date the Date to select, must not be null. 
+     */
     protected void setSelection(Date date) {
-        if (isSelected(date)) return;
+        Contract.asNotNull(date, "date must not be null");
+        if (isSelectedStrict(date)) return;
         if (isSelectable(date)) {
             selectedDates.clear();
+            // PENDING JW: use normalized
             selectedDates.add(date);
             fireValueChanged(EventType.DATES_SET);
         }
     }
     
+    /**
+     * Checks and returns whether the given date is contained in the selection.
+     * This differs from isSelected in that it tests for the exact (normalized)
+     * Date instead of for the same day.
+     * 
+     * @param date the Date to test.
+     * @return true if the given date is contained in the selection, 
+     *    false otherwise
+     * 
+     */
+    private boolean isSelectedStrict(Date date) {
+        if (!isSelectionEmpty()) {
+            // PENDING JW: use normalized
+            return selectedDates.first().equals(date);
+        }
+        return false;
+    }
+
     /**
      * Returns a boolean indicating whether the given date is selectable.
      * 
@@ -169,15 +227,6 @@ public class SingleDaySelectionModel implements DateSelectionModel {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void removeSelectionInterval(Date startDate, Date endDate) {
-        if (isSelected(startDate)) {
-            selectedDates.clear();
-            fireValueChanged(EventType.DATES_REMOVED);
-        }
-    }
 
     /**
      * {@inheritDoc}
@@ -204,6 +253,7 @@ public class SingleDaySelectionModel implements DateSelectionModel {
         return isSameDay(selectedDates.first(), date);
     }
 
+    
     /**
      * Returns a boolean indicating whether the given dates are on the same day in
      * the coordinates of the model's calendar.
@@ -214,6 +264,15 @@ public class SingleDaySelectionModel implements DateSelectionModel {
      */
     public boolean isSameDay(Date selected, Date compare) {
         return startOfDay(selected).equals(startOfDay(compare));
+    }
+
+    /**
+     * {@inheritDoc}<p>
+     * 
+     * Implemented to return the date itself.
+     */
+    public Date getNormalizedDate(Date date) {
+        return new Date(date.getTime());
     }
 
     private Date startOfDay(Date date) {
@@ -364,13 +423,5 @@ public class SingleDaySelectionModel implements DateSelectionModel {
         }
     }
 
-    /**
-     * {@inheritDoc}<p>
-     * 
-     * Implemented to return the date itself.
-     */
-    public Date getNormalizedDate(Date date) {
-        return new Date(date.getTime());
-    }
 
 }

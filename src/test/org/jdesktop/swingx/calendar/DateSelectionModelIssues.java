@@ -50,33 +50,6 @@ public class DateSelectionModelIssues extends InteractiveTestCase {
     }
     
     /**
-     * Issue ??-swingx: set/add/remove dates must cope with null or 
-     *   document not to.
-     * here: set, single selection
-     */
-    public void testNullDateSetSingle() {
-        model.setSelectionInterval(null, null);
-    }
-
-    /**
-     * Issue ??-swingx: set/add/remove dates must cope with null or 
-     *   document not to.
-     * here: set, single selection
-     */
-    public void testNullDateRemoveSingle() {
-        model.removeSelectionInterval(null, null);
-    }
-    
-    /**
-     * Issue ??-swingx: set/add/remove dates must cope with null or 
-     *   document not to.
-     * here: set, single selection
-     */
-    public void testNullDateAddSingle() {
-        model.addSelectionInterval(null, null);
-    }
-
-    /**
      * Event properties should be immutable.
      *
      */

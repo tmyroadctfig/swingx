@@ -44,14 +44,14 @@ public interface DateSelectionModel {
     }
 
     /**
-     * Get the selection mode
+     * Get the selection mode.
      *
      * @return return the current selection mode
      */
     public SelectionMode getSelectionMode();
 
     /**
-     * Set the selection mode
+     * Set the selection mode.
      *
      * @param mode new selection mode
      */
@@ -80,26 +80,28 @@ public interface DateSelectionModel {
     public void setFirstDayOfWeek(final int firstDayOfWeek);
 
     /**
-     * Add the specified selection interval to the selection model
+     * Add the specified selection interval to the selection model.
      *
-     * @param startDate interval start date
-     * @param endDate   interval end date
+     * @param startDate interval start date, must not be null
+     * @param endDate   interval end date, must not be null
      */
     public void addSelectionInterval(Date startDate, Date endDate);
 
     /**
-     * Set the specified selection interval to the selection model
+     * Set the specified selection interval to the selection model.
      *
-     * @param startDate interval start date
-     * @param endDate   interval end date
+     * @param startDate interval start date, must not be null
+     * @param endDate   interval end date, must not be null
      */
     public void setSelectionInterval(Date startDate, Date endDate);
 
     /**
-     * Remove the specifed selection interval from the selection model
+     * Remove the specifed selection interval from the selection model. If
+     * the selection is changed by this method, it fires a DateSelectionEvent
+     * of type DATES_REMOVED.
      *
-     * @param startDate interval start date
-     * @param endDate   interval end date
+     * @param startDate interval start date, must not be null
+     * @param endDate   interval end date, must not be null
      */
     public void removeSelectionInterval(Date startDate, Date endDate);
 
@@ -111,14 +113,20 @@ public interface DateSelectionModel {
     public void clearSelection();
 
     /**
-     * Get the current selection
+     * Get the current selection.
      *
-     * @return sorted set of selected dates
+     * @return sorted set of selected dates, guaranteed to be never null.
      */
     public SortedSet<Date> getSelection();
 
     /**
-     * Return true if the date specified is selected, false otherwise
+     * Return true if the date specified is selected, false otherwise. <p>
+     * 
+     * Note: it is up to implementations to define the exact notion of selected.
+     * It does not imply the exact date as given is contained the set returned from 
+     * getSelection().
+     * 
+     * PENDING JW: allow null? 
      *
      * @param date date to check for selection
      * @return true if the date is selected, false otherwise
@@ -126,58 +134,72 @@ public interface DateSelectionModel {
     public boolean isSelected(final Date date);
 
     /**
-     * Return true if the selection is empty, false otherwise
+     * Returns a normalized Date as used by the implementation, if any. F.i.
+     * DaySelectionModel returns the start of the day in the model's calendar.
+     * If no normalization is applied, a clone of the Date itself is returned.
+     * The given Date is never changed.
+     * <p>
+     * 
+     * The overall contract:
+     * 
+     * <pre><code>
+     * if ((date != null) &amp;&amp; isSelectable(date)) {
+     *     setSelectionInterval(date, date);
+     *     assertEquals(getNormalized(date), getSelection().first());
+     * }
+     * </code></pre>
+     * 
+     * PENDING JW: should we allow null here? All other methods don't (most
+     * are based on intervals which get whacky if one of boundaries is null),
+     * so technically, client code needs to check against null anyway. 
+     * 
+     * @return the date as it would be normalized before used in the model, 
+     *    must not be null.
+     * @throws NullPointerException if given date is null.
+     */
+    public Date getNormalizedDate(Date date);
+    
+    /**
+     * Return true if the selection is empty, false otherwise.
      *
      * @return true if the selection is empty, false otherwise
      */
     public boolean isSelectionEmpty();
 
-    /**
-     * Add the specified listener to this model
-     *
-     * @param listener listener to add to this model
-     */
-    public void addDateSelectionListener(DateSelectionListener listener);
 
     /**
-     * Remove the specified listener to this model
-     *
-     * @param listener listener to remove from this model
-     */
-    public void removeDateSelectionListener(DateSelectionListener listener);
-
-    /**
-     * Returns a <code>SortedSet</code> of <code>Date</codes>s that are unselectable
+     * Returns a <code>SortedSet</code> of <code>Date</codes>s that are unselectable.
      *
      * @return sorted set of dates
      */
     public SortedSet<Date> getUnselectableDates();
 
     /**
-     * Set which dates are unable to be selected
+     * Set which dates are unable to be selected.
      *
-     * @param unselectableDates dates that are unselectable, must not be null
+     * @param unselectableDates dates that are unselectable, must not be null and 
+     *   must not contain null dates.
      */
     public void setUnselectableDates(SortedSet<Date> unselectableDates);
 
     /**
-     * Return true is the specified date is unselectable
+     * Return true is the specified date is unselectable.
      *
-     * @param unselectableDate the date to check for unselectability
+     * @param unselectableDate the date to check for unselectability, must not be null.
      * @return true is the date is unselectable, false otherwise
      */
     public boolean isUnselectableDate(Date unselectableDate);
 
     /**
      * Return the upper bound date that is allowed to be selected for this
-     * model
+     * model.
      *
      * @return upper bound date or null if not set
      */
     public Date getUpperBound();
 
     /**
-     * Set the upper bound date that is allowed to be selected for this model
+     * Set the upper bound date that is allowed to be selected for this model.
      *
      * @param upperBound upper bound
      */
@@ -185,14 +207,14 @@ public interface DateSelectionModel {
 
     /**
      * Return the lower bound date that is allowed to be selected for this
-     * model
+     * model.
      *
      * @return lower bound date or null if not set
      */
     public Date getLowerBound();
 
     /**
-     * Set the lower bound date that is allowed to be selected for this model
+     * Set the lower bound date that is allowed to be selected for this model.
      *
      * @param lowerBound lower bound date or null if not set
      */
@@ -218,15 +240,19 @@ public interface DateSelectionModel {
      * @return the adjusting property.
      */
     public boolean isAdjusting();
-    
+
     /**
-     * Returns a normalized Date as used by the implementation, if any. F.i. 
-     * DaySelectionModel returns the start of the day in the model's
-     * calendar. If no normalization is applied, a clone of the Date itself is returned. 
-     * The given Date is never changed.
-     * 
-     * @return the date as it would be normalized before used in the model.
-     *   
+     * Add the specified listener to this model.
+     *
+     * @param listener listener to add to this model
      */
-    public Date getNormalizedDate(Date date);
+    public void addDateSelectionListener(DateSelectionListener listener);
+
+    /**
+     * Remove the specified listener to this model.
+     *
+     * @param listener listener to remove from this model
+     */
+    public void removeDateSelectionListener(DateSelectionListener listener);
+
 }

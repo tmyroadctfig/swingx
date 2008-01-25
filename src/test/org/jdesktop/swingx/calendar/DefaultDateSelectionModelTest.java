@@ -42,9 +42,37 @@ import org.jdesktop.swingx.test.XTestUtils;
 public class DefaultDateSelectionModelTest extends TestCase {
     private static final Logger LOG = Logger
             .getLogger(DefaultDateSelectionModelTest.class.getName());
+    // pre-defined reference dates - all relative to current date at around 5 am
+    private Date today;
+    private Date tomorrow;
+    private Date afterTomorrow;
+    private Date yesterDay;
     private DateSelectionModel model;
     private Calendar calendar;
 
+    
+    /**
+     * test the contract as doc'ed 
+     */
+    public void testNormalizedDateContract() {
+        model.setSelectionInterval(today, today);
+        assertEquals(model.getNormalizedDate(today), model.getSelection().first());
+    }
+
+    /**
+     * Normalized must throw NPE if given date is null
+     */
+    public void testNormalizedDateNull() {
+        try {
+            model.getNormalizedDate(null);
+            fail("normalizedDate must throw NPE if date is null");
+        } catch (NullPointerException e) {
+            // expected 
+        } catch (Exception e) {
+            fail("unexpected exception " + e);
+        }
+    }
+    
     /**
      * test that getNormalized always returns a clone of the given date.
      */
@@ -55,6 +83,50 @@ public class DefaultDateSelectionModelTest extends TestCase {
         assertNotSame(date, normalized);
     }
     
+
+    /**
+     * setSelectionInterval must throw NPE if given date is null
+     */
+    public void testSetIntervalNulls() {
+        try {
+            model.setSelectionInterval(null, null);
+            fail("normalizedDate must throw NPE if date is null");
+        } catch (NullPointerException e) {
+            // expected 
+        } catch (Exception e) {
+            fail("unexpected exception " + e);
+        }
+        
+    }
+    /**
+     * setSelectionInterval must throw NPE if given date is null
+     */
+    public void testAddIntervalNulls() {
+        try {
+            model.addSelectionInterval(null, null);
+            fail("normalizedDate must throw NPE if date is null");
+        } catch (NullPointerException e) {
+            // expected 
+        } catch (Exception e) {
+            fail("unexpected exception " + e);
+        }
+        
+    }
+    
+    /**
+     * removeSelectionInterval must throw NPE if given date is null
+     */
+    public void testRemoveIntervalNulls() {
+        try {
+            model.removeSelectionInterval(null, null);
+            fail("normalizedDate must throw NPE if date is null");
+        } catch (NullPointerException e) {
+            // expected 
+        } catch (Exception e) {
+            fail("unexpected exception " + e);
+        }
+        
+    }
 
     /**
      * Issue #625-swingx: DateSelectionModel must not fire if unchanged.
@@ -568,6 +640,19 @@ public class DefaultDateSelectionModelTest extends TestCase {
     public void setUp() {
         model = new DefaultDateSelectionModel();
         calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 5);
+        today = calendar.getTime();
+        
+        calendar.add(Calendar.DAY_OF_MONTH, -1);
+        yesterDay = calendar.getTime();
+        
+        calendar.add(Calendar.DAY_OF_MONTH, 2);
+        tomorrow = calendar.getTime();
+        
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        afterTomorrow = calendar.getTime();
+        
+        calendar.setTime(today);
     }
 
 }

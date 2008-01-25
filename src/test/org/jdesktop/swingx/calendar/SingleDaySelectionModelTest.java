@@ -43,12 +43,84 @@ public class SingleDaySelectionModelTest extends TestCase {
     private DateSelectionModel model;
     private Calendar calendar;
 
+    
+    /**
+     * test the contract as doc'ed 
+     */
+    public void testNormalizedDateContract() {
+        model.setSelectionInterval(today, today);
+        assertEquals(model.getNormalizedDate(today), model.getSelection().first());
+        Date start = startOfDay(today);
+        model.setSelectionInterval(start, start);
+        assertEquals(model.getNormalizedDate(start), model.getSelection().first());
+    }
+
+    /**
+     * Normalized must throw NPE if given date is null
+     */
+    public void testNormalizedDateNull() {
+        try {
+            model.getNormalizedDate(null);
+            fail("normalizedDate must throw NPE if date is null");
+        } catch (NullPointerException e) {
+            // expected 
+        } catch (Exception e) {
+            fail("unexpected exception " + e);
+        }
+    }
+
     public void testNormalizedDateCloned() {
         Date date = calendar.getTime();
         Date normalized = model.getNormalizedDate(date);
         assertEquals(date, normalized);
         assertNotSame(date, normalized);
     }
+
+
+    /**
+     * setSelectionInterval must throw NPE if given date is null
+     */
+    public void testSetIntervalNulls() {
+        try {
+            model.setSelectionInterval(null, null);
+            fail("normalizedDate must throw NPE if date is null");
+        } catch (NullPointerException e) {
+            // expected 
+        } catch (Exception e) {
+            fail("unexpected exception " + e);
+        }
+        
+    }
+    /**
+     * setSelectionInterval must throw NPE if given date is null
+     */
+    public void testAddIntervalNulls() {
+        try {
+            model.addSelectionInterval(null, null);
+            fail("normalizedDate must throw NPE if date is null");
+        } catch (NullPointerException e) {
+            // expected 
+        } catch (Exception e) {
+            fail("unexpected exception " + e);
+        }
+        
+    }
+    
+    /**
+     * removeSelectionInterval must throw NPE if given date is null
+     */
+    public void testRemoveIntervalNulls() {
+        try {
+            model.removeSelectionInterval(null, null);
+            fail("normalizedDate must throw NPE if date is null");
+        } catch (NullPointerException e) {
+            // expected 
+        } catch (Exception e) {
+            fail("unexpected exception " + e);
+        }
+        
+    }
+
     /**
      * Always single selection by definition of SingleDateSelectionModel.
      */
@@ -470,6 +542,16 @@ public class SingleDaySelectionModelTest extends TestCase {
             // expected
             LOG.info("got NPE as expected - how to test fail-fast?");
         }
+    }
+    
+    /**
+     * test removeInterval: any selection in the given date ranged must be removed.
+     */
+    public void testRemoveInterval() {
+        model.setSelectionInterval(today, today);
+        model.removeSelectionInterval(yesterday, tomorrow);
+        assertTrue("selection must be empty: selected today and removed interval [yesterday, tomorrow]", 
+                model.isSelectionEmpty());
     }
 
     /**

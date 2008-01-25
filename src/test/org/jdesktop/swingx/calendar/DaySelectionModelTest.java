@@ -27,7 +27,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.jdesktop.swingx.InteractiveTestCase;
-import org.jdesktop.swingx.JXMonthView;
 import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
 
 /**
@@ -44,19 +43,94 @@ public class DaySelectionModelTest extends InteractiveTestCase {
     private Date yesterDay;
     // calendar default instance init with today
     private Calendar calendar;
+    private DateSelectionModel model;
+    
+    
+    /**
+     * test the contract as doc'ed 
+     */
+    public void testNormalizedDateContract() {
+        model.setSelectionInterval(today, today);
+        assertEquals(model.getNormalizedDate(today), model.getSelection().first());
+    }
+    
+    /**
+     * Normalized must throw NPE if given date is null
+     */
+    public void testNormalizedDateNull() {
+        try {
+            model.getNormalizedDate(null);
+            fail("normalizedDate must throw NPE if date is null");
+        } catch (NullPointerException e) {
+            // expected 
+        } catch (Exception e) {
+            fail("unexpected exception " + e);
+        }
+    }
 
+    /**
+     * DaySelectionModel normalizes to start of day.
+     */
+    public void testNormalizedDateCloned() {
+        assertEquals(startOfDay(today), model.getNormalizedDate(today));
+        assertNotSame(startOfDay(today), model.getNormalizedDate(today));
+    }
+
+
+    /**
+     * setSelectionInterval must throw NPE if given date is null
+     */
+    public void testSetIntervalNulls() {
+        try {
+            model.setSelectionInterval(null, null);
+            fail("normalizedDate must throw NPE if date is null");
+        } catch (NullPointerException e) {
+            // expected 
+        } catch (Exception e) {
+            fail("unexpected exception " + e);
+        }
+        
+    }
+    /**
+     * setSelectionInterval must throw NPE if given date is null
+     */
+    public void testAddIntervalNulls() {
+        try {
+            model.addSelectionInterval(null, null);
+            fail("normalizedDate must throw NPE if date is null");
+        } catch (NullPointerException e) {
+            // expected 
+        } catch (Exception e) {
+            fail("unexpected exception " + e);
+        }
+        
+    }
+    
+    /**
+     * removeSelectionInterval must throw NPE if given date is null
+     */
+    public void testRemoveIntervalNulls() {
+        try {
+            model.removeSelectionInterval(null, null);
+            fail("normalizedDate must throw NPE if date is null");
+        } catch (NullPointerException e) {
+            // expected 
+        } catch (Exception e) {
+            fail("unexpected exception " + e);
+        }
+        
+    }
 
     /**
      * expose more selection constraint methods in JXMonthView
      *
      */
     public void testUpperBound() {
-        DateSelectionModel monthView = new DaySelectionModel();
-        monthView.setUpperBound(today);
-        assertEquals(startOfDay(today), monthView.getUpperBound());
+        model.setUpperBound(today);
+        assertEquals(startOfDay(today), model.getUpperBound());
         // remove again
-        monthView.setUpperBound(null);
-        assertEquals(null, monthView.getUpperBound());
+        model.setUpperBound(null);
+        assertEquals(null, model.getUpperBound());
     }
     
     /**
@@ -64,12 +138,11 @@ public class DaySelectionModelTest extends InteractiveTestCase {
      *
      */
     public void testLowerBound() {
-        DateSelectionModel monthView = new DaySelectionModel();
-        monthView.setLowerBound(today);
-        assertEquals(startOfDay(today), monthView.getLowerBound());
+        model.setLowerBound(today);
+        assertEquals(startOfDay(today), model.getLowerBound());
         // remove again
-        monthView.setLowerBound(null);
-        assertEquals(null, monthView.getLowerBound());
+        model.setLowerBound(null);
+        assertEquals(null, model.getLowerBound());
     }
 
     /**
@@ -77,23 +150,22 @@ public class DaySelectionModelTest extends InteractiveTestCase {
      *
      */
     public void testUnselectableDate() {
-        DateSelectionModel monthView = new DaySelectionModel();
         // initial
-        assertFalse(monthView.isUnselectableDate(today));
+        assertFalse(model.isUnselectableDate(today));
         // set unselectable today
         SortedSet<Date> unselectables = new TreeSet<Date>();
         unselectables.add(today);
-        monthView.setUnselectableDates(unselectables);
+        model.setUnselectableDates(unselectables);
         assertTrue("raqw today must be unselectable", 
-                monthView.isUnselectableDate(today));
+                model.isUnselectableDate(today));
         assertTrue("start of today must be unselectable", 
-                monthView.isUnselectableDate(startOfDay(today)));
+                model.isUnselectableDate(startOfDay(today)));
         assertTrue("end of today must be unselectable", 
-                monthView.isUnselectableDate(endOfDay(today)));
-        monthView.setUnselectableDates(new TreeSet<Date>());
-        assertFalse(monthView.isUnselectableDate(today));
-        assertFalse(monthView.isUnselectableDate(startOfDay(today)));
-        assertFalse(monthView.isUnselectableDate(endOfDay(today)));
+                model.isUnselectableDate(endOfDay(today)));
+        model.setUnselectableDates(new TreeSet<Date>());
+        assertFalse(model.isUnselectableDate(today));
+        assertFalse(model.isUnselectableDate(startOfDay(today)));
+        assertFalse(model.isUnselectableDate(endOfDay(today)));
     }
 
     /**
@@ -101,57 +173,52 @@ public class DaySelectionModelTest extends InteractiveTestCase {
      *
      */
     public void testCleanupCopyDate() {
-        DateSelectionModel monthView = new DaySelectionModel();
         Date copy = new Date(today.getTime());
-        monthView.setSelectionInterval(today, today);
+        model.setSelectionInterval(today, today);
         assertEquals("the date used for selection must be unchanged", copy, today);
     }
    
     public void testEmptySelectionInitial() {
-        DateSelectionModel monthView = new DaySelectionModel();
-        assertTrue(monthView.isSelectionEmpty());
-        SortedSet<Date> selection = monthView.getSelection();
+        assertTrue(model.isSelectionEmpty());
+        SortedSet<Date> selection = model.getSelection();
         assertTrue(selection.isEmpty());
     }
     
     public void testEmptySelectionClear() {
-        DateSelectionModel monthView = new DaySelectionModel();
-        monthView.setSelectionInterval(today, today);
+        model.setSelectionInterval(today, today);
         // sanity
-        assertTrue(1 == monthView.getSelection().size());
+        assertTrue(1 == model.getSelection().size());
 
-        monthView.clearSelection();
-        assertTrue(monthView.isSelectionEmpty());
-        assertTrue(monthView.getSelection().isEmpty());
+        model.clearSelection();
+        assertTrue(model.isSelectionEmpty());
+        assertTrue(model.getSelection().isEmpty());
     }
 
     public void testSingleSelection() {
-        DateSelectionModel monthView = new DaySelectionModel();
-        monthView.setSelectionMode(SelectionMode.SINGLE_SELECTION);
+        model.setSelectionMode(SelectionMode.SINGLE_SELECTION);
 
-        monthView.setSelectionInterval(today, today);
-        SortedSet<Date> selection = monthView.getSelection();
+        model.setSelectionInterval(today, today);
+        SortedSet<Date> selection = model.getSelection();
         assertTrue(1 == selection.size());
         assertEquals(startOfDay(today), selection.first());
 
-        monthView.setSelectionInterval(today, afterTomorrow);
-        selection = monthView.getSelection();
+        model.setSelectionInterval(today, afterTomorrow);
+        selection = model.getSelection();
         assertTrue(1 == selection.size());
         assertEquals(startOfDay(today), selection.first());
     }
     
     public void testSingleIntervalSelection() {
-        DateSelectionModel monthView = new DaySelectionModel();
-        monthView.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
+        model.setSelectionMode(SelectionMode.SINGLE_INTERVAL_SELECTION);
 
-        monthView.setSelectionInterval(today, today);
-        SortedSet<Date> selection = monthView.getSelection();
+        model.setSelectionInterval(today, today);
+        SortedSet<Date> selection = model.getSelection();
         assertTrue(1 == selection.size());
         assertEquals(startOfDay(today), selection.first());
 
-        monthView.setSelectionInterval(today, tomorrow);
+        model.setSelectionInterval(today, tomorrow);
         
-        selection = monthView.getSelection();
+        selection = model.getSelection();
         assertEquals(2, selection.size());
         assertEquals(startOfDay(today), selection.first());
         assertEquals(startOfDay(tomorrow), selection.last());
@@ -162,13 +229,12 @@ public class DaySelectionModelTest extends InteractiveTestCase {
     }
 
     public void testMultipleIntervalSelection() {
-        DaySelectionModel monthView = new DaySelectionModel();
-        monthView.setSelectionMode(SelectionMode.MULTIPLE_INTERVAL_SELECTION);
+        model.setSelectionMode(SelectionMode.MULTIPLE_INTERVAL_SELECTION);
 
-        monthView.setSelectionInterval(yesterDay, yesterDay);
-        monthView.addSelectionInterval(afterTomorrow, afterTomorrow);
+        model.setSelectionInterval(yesterDay, yesterDay);
+        model.addSelectionInterval(afterTomorrow, afterTomorrow);
         
-        SortedSet<Date> selection = monthView.getSelection();
+        SortedSet<Date> selection = model.getSelection();
         assertEquals(2, selection.size());
         assertEquals(startOfDay(yesterDay), selection.first());
         assertEquals(startOfDay(afterTomorrow), selection.last());
@@ -188,6 +254,7 @@ public class DaySelectionModelTest extends InteractiveTestCase {
 
     @Override
     protected void setUp() throws Exception {
+        model = new DaySelectionModel();
         calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 5);
         today = calendar.getTime();

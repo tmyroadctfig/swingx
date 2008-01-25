@@ -568,7 +568,9 @@ public class BasicDatePickerUI extends DatePickerUI {
      */
     @Override
     public Date getSelectableDate(Date date) throws PropertyVetoException {
-        Date cleaned = date != null ? cleanupDate(date) : null;
+        Date cleaned = date == null ? null :
+            datePicker.getMonthView().getSelectionModel().getNormalizedDate(date);
+//        Date cleaned = date != null ? cleanupDate(date) : null;
 //        Date cleaned = date; // != null ? cleanupDate(date) : null;
         if (equalsDate(cleaned, datePicker.getDate())) { 
             // one place to interrupt the update spiral
@@ -1436,11 +1438,12 @@ public class BasicDatePickerUI extends DatePickerUI {
     
 //------------ utility methods
     // duplication!!
-    private Date cleanupDate(Date date) {
-        return datePicker.getMonthView().getSelectionModel().getNormalizedDate(date);
-        // only modify defensive copies
-//        return new Date(cleanupDate(date.getTime(), datePicker.getMonthView().getCalendar()));
-    }
+//    private Date cleanupDate(Date date) {
+//        return date;
+////        return datePicker.getMonthView().getSelectionModel().getNormalizedDate(date);
+//        // only modify defensive copies
+////        return new Date(cleanupDate(date.getTime(), datePicker.getMonthView().getCalendar()));
+//    }
 
     // duplication!!
     // PENDING: move to CalendarUtils ?
