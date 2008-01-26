@@ -18,8 +18,10 @@
  */
 package org.jdesktop.swingx.calendar;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.SortedSet;
+import java.util.TimeZone;
 
 import org.jdesktop.swingx.event.DateSelectionListener;
 
@@ -43,6 +45,7 @@ public interface DateSelectionModel {
         MULTIPLE_INTERVAL_SELECTION
     }
 
+//---------------------- mode    
     /**
      * Get the selection mode.
      *
@@ -57,28 +60,91 @@ public interface DateSelectionModel {
      */
     public void setSelectionMode(final SelectionMode mode);
 
+    
+//-------------------- calendar    
+    /**
+     * Returns a clone of the calendar used by this model. It's date is unspecified.
+     * 
+     * @return a clone of the calendar used by this model.
+     */
+    public Calendar getCalendar();
+    
     /**
      * Gets what the first day of the week is; e.g.,
      * <code>Calendar.SUNDAY</code> in the U.S., <code>Calendar.MONDAY</code>
-     * in France.
-     *
-     * This is needed when the model selection mode is <code>WEEK_INTERVAL_SELECTION</code>.
-     * The default value is <code>Calendar.SUNDAY</code>
+     * in France.  This is needed when the model selection mode is 
+     * <code>WEEK_INTERVAL_SELECTION</code>.
+     * 
+     * PENDING JW: move week-interval selection from JXMonthView into the model.
      *
      * @return int The first day of the week.
+     * @see #setFirstDayOfWeek(int)
      */
     public int getFirstDayOfWeek();
 
     /**
-     * Sets what the first day of the week is; e.g.,
+     * Sets what the first day of the week is. E.g.,
      * <code>Calendar.SUNDAY</code> in US, <code>Calendar.MONDAY</code>
-     * in France.
+     * in France. Fires a DateSelectionEvent of type CALENDAR_CHANGED, if the
+     * value is different from the old. <p>
+     * 
+     * The default value depends on the Calendar's default.
+     * 
+     * PENDING JW: actually, it's a bound property. Use a propertyChangeListener?
      *
      * @param firstDayOfWeek The first day of the week.
+     * @see #getFirstDayOfWeek()
      * @see java.util.Calendar
      */
     public void setFirstDayOfWeek(final int firstDayOfWeek);
 
+    
+    /**
+     * Gets the minimal number of days in the first week of the year.
+     *
+     * @return int the minimal number of days in the first week of the year.
+     */
+    public int getMinimalDaysInFirstWeek();
+
+    /**
+     * Sets the minimal number of days in the first week of the year.
+     * Fires a DateSelectionEvent of type CALENDAR_CHANGED, if the
+     * value is different from the old.
+     * 
+     * The default value depends on the Calendar's default.
+     * 
+     * PENDING JW: actually, it's a bound property. Use a propertyChangeListener?
+     *
+     * @param minimalDays the minimal number of days in the first week of the year.
+     * @see #getMinimalDaysInFirstWeek()
+     * @see java.util.Calendar
+     */
+    public void setMinimalDaysInFirstWeek(final int minimalDays);
+
+    /**
+     * Returns the TimeZone of this model.
+     * 
+     * @return the TimeZone of this model.
+     * @see #setTimeZone(TimeZone)
+     */
+    public TimeZone getTimeZone();
+    
+
+    /**
+     * Sets the TimeZone of this model. Fires a DateSelectionEvent of type 
+     * CALENDAR_CHANGED if the new value is different from the old.
+     * 
+     * The default value depends on the Calendar's default.
+     * 
+     * PENDING JW: actually, it's a bound property. Use a propertyChangeListener?
+     * 
+     * @param timeZone the TimeZone to use in this model, must not be null.
+     * @see #getTimeZone()
+     */
+    public void setTimeZone(TimeZone timeZone);
+
+    //-------------------- selection 
+    
     /**
      * Add the specified selection interval to the selection model.
      *

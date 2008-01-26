@@ -23,6 +23,7 @@ package org.jdesktop.swingx.calendar;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.SortedSet;
+import java.util.TimeZone;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
@@ -31,6 +32,7 @@ import junit.framework.TestCase;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DefaultDateSelectionModel;
 import org.jdesktop.swingx.event.DateSelectionEvent;
+import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
 import org.jdesktop.swingx.test.XTestUtils;
 
@@ -50,6 +52,161 @@ public class DefaultDateSelectionModelTest extends TestCase {
     private DateSelectionModel model;
     private Calendar calendar;
 
+    /**
+     * test synch of model properties with its calendar's properties.
+     * Here: changed timeZone.
+     */
+    public void testCalendarTimeZoneNoChangeNoNotify() {
+        // config with a known timezone and date
+        TimeZone tz = model.getTimeZone();
+        DateSelectionReport report = new DateSelectionReport();
+        model.addDateSelectionListener(report);
+        model.setTimeZone(tz);
+        assertEquals(0, report.getEventCount());
+    }
+
+    /**
+     * test synch of model properties with its calendar's properties.
+     * Here: changed timeZone.
+     */
+    public void testCalendarTimeZoneChangedNotify() {
+        // config with a known timezone and date
+        TimeZone tz = TimeZone.getTimeZone("GMT+4");
+        if (model.getTimeZone().equals(tz)) {
+            tz = TimeZone.getTimeZone("GMT+5");
+        }
+        DateSelectionReport report = new DateSelectionReport();
+        model.addDateSelectionListener(report);
+        model.setTimeZone(tz);
+        assertEquals(1, report.getEventCount());
+        assertEquals(EventType.CALENDAR_CHANGED, report.getLastEventType());
+    }
+
+    /**
+     * test synch of model properties with its calendar's properties.
+     * Here: changed timeZone.
+     */
+    public void testCalendarTimeZoneChanged() {
+        // config with a known timezone and date
+        TimeZone tz = TimeZone.getTimeZone("GMT+4");
+        if (model.getTimeZone().equals(tz)) {
+            tz = TimeZone.getTimeZone("GMT+5");
+        }
+        model.setTimeZone(tz);
+        assertEquals(tz, model.getTimeZone());
+        assertEquals(tz, model.getCalendar().getTimeZone());
+    }
+    
+    /**
+     * test synch of model properties with its calendar's properties.
+     * Here: initial timeZone.
+     */
+    public void testCalendarTimeZoneInitial() {
+        assertEquals(calendar.getTimeZone(), model.getTimeZone());
+        assertEquals(model.getTimeZone(), model.getCalendar().getTimeZone());
+    }
+
+    
+    /**
+     * test synch of model properties with its calendar's properties.
+     * Here: no change notification if not changed minimalDaysInFirstWeek.
+     */
+    public void testCalendarMinimalDaysInFirstWeekNoChangeNoNotify() {
+        int first = model.getMinimalDaysInFirstWeek();
+        DateSelectionReport report = new DateSelectionReport();
+        model.addDateSelectionListener(report);
+        model.setMinimalDaysInFirstWeek(first);
+        assertEquals(0, report.getEventCount());
+    }
+
+    /**
+     * test synch of model properties with its calendar's properties.
+     * Here: change notification of minimalDaysInFirstWeek.
+     */
+    public void testCalendarMinimalDaysInFirstWeekNotify() {
+        int first = model.getMinimalDaysInFirstWeek() + 1;
+        //sanity
+        assertTrue(first <= Calendar.SATURDAY);
+        DateSelectionReport report = new DateSelectionReport();
+        model.addDateSelectionListener(report);
+        model.setMinimalDaysInFirstWeek(first);
+        assertEquals(1, report.getEventCount());
+        assertEquals(EventType.CALENDAR_CHANGED, report.getLastEventType());
+    }
+    /**
+     * test synch of model properties with its calendar's properties.
+     * Here: modified minimalDaysInFirstWeek.
+     */
+    public void testCalendarMinimalDaysInFirstWeekChanged() {
+        int first = model.getMinimalDaysInFirstWeek() + 1;
+        //sanity
+        assertTrue(first <= Calendar.SATURDAY);
+        model.setMinimalDaysInFirstWeek(first);
+        assertEquals(first, model.getMinimalDaysInFirstWeek());
+        assertEquals(model.getMinimalDaysInFirstWeek(), model.getCalendar().getMinimalDaysInFirstWeek());
+    }
+    
+    /**
+     * test synch of model properties with its calendar's properties.
+     * Here: initial minimalDaysInFirstWeek.
+     */
+    public void testCalendarMinimalDaysInFirstWeekInitial() {
+        assertEquals(calendar.getMinimalDaysInFirstWeek(), model.getMinimalDaysInFirstWeek());
+        assertEquals(model.getMinimalDaysInFirstWeek(), model.getCalendar().getMinimalDaysInFirstWeek());
+    }
+    
+
+    
+    /**
+     * test synch of model properties with its calendar's properties.
+     * Here: no change notification of if no change of firstDayOfWeek.
+     */
+    public void testCalendarFirstDayOfWeekNoChangeNoNotify() {
+        int first = model.getFirstDayOfWeek();
+        DateSelectionReport report = new DateSelectionReport();
+        model.addDateSelectionListener(report);
+        model.setFirstDayOfWeek(first);
+        assertEquals(0, report.getEventCount());
+    }
+
+    /**
+     * test synch of model properties with its calendar's properties.
+     * Here: change notification of firstDayOfWeek.
+     */
+    public void testCalendarFirstDayOfWeekNotify() {
+        int first = model.getFirstDayOfWeek() + 1;
+        //sanity
+        assertTrue(first <= Calendar.SATURDAY);
+        DateSelectionReport report = new DateSelectionReport();
+        model.addDateSelectionListener(report);
+        model.setFirstDayOfWeek(first);
+        assertEquals(1, report.getEventCount());
+        assertEquals(EventType.CALENDAR_CHANGED, report.getLastEventType());
+    }
+
+    /**
+     * test synch of model properties with its calendar's properties.
+     * Here: modified firstDayOfWeek.
+     */
+    public void testCalendarFirstDayOfWeekChanged() {
+        int first = model.getFirstDayOfWeek() + 1;
+        //sanity
+        assertTrue(first <= Calendar.SATURDAY);
+        model.setFirstDayOfWeek(first);
+        assertEquals(first, model.getFirstDayOfWeek());
+        assertEquals(model.getFirstDayOfWeek(), model.getCalendar().getFirstDayOfWeek());
+    }
+    
+    /**
+     * test synch of model properties with its calendar's properties.
+     * Here: initial firstDayOfWeek.
+     */
+    public void testCalendarFirstDayOfWeekInitial() {
+        assertEquals(calendar.getFirstDayOfWeek(), model.getFirstDayOfWeek());
+        assertEquals(model.getFirstDayOfWeek(), model.getCalendar().getFirstDayOfWeek());
+    }
+    
+    
     
     /**
      * test the contract as doc'ed 

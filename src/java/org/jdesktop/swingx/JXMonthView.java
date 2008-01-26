@@ -424,6 +424,7 @@ public class JXMonthView extends JComponent {
         cal = Calendar.getInstance(locale);
         firstDayOfWeek = cal.getFirstDayOfWeek();
         cal.setMinimalDaysInFirstWeek(1);
+        model.setMinimalDaysInFirstWeek(1);
         anchor = (Calendar) cal.clone();
     }
 

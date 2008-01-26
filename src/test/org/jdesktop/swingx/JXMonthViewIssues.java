@@ -167,11 +167,79 @@ public class JXMonthViewIssues extends InteractiveTestCase {
 //----------------------
 
     /**
+     * Issue #733-swingx: model and monthView cal not synched.
+     * 
+     * Here: first day of week.
+     */
+    public void testCalendarsFirstDayOfWeek() {
+        JXMonthView monthView = new JXMonthView();
+        int first = monthView.getFirstDayOfWeek() + 1;
+        // sanity
+        assertTrue(first <= Calendar.SATURDAY);
+        monthView.setFirstDayOfWeek(first);
+        assertEquals(first, monthView.getCalendar().getFirstDayOfWeek());
+        assertEquals(first, monthView.getSelectionModel().getFirstDayOfWeek());
+    }
+    
+    /**
+     * Issue #733-swingx: model and monthView cal not synched.
+     * 
+     * Here: first day of week.
+     */
+    public void testCalendarsFirstDayOfWeekInitial() {
+        JXMonthView monthView = new JXMonthView();
+        assertEquals(monthView.getFirstDayOfWeek(), 
+                monthView.getSelectionModel().getFirstDayOfWeek());
+    }
+    /**
+     * Issue #733-swingx: model and monthView cal not synched.
+     * 
+     * Here: minimal days of first week.
+     */
+    public void testCalendarsMinimalDaysOfFirstWeekInitial() {
+        JXMonthView monthView = new JXMonthView();
+        int first = monthView.getCalendar().getMinimalDaysInFirstWeek();
+        assertEquals(first, monthView.getSelectionModel().getMinimalDaysInFirstWeek());
+    }
+    
+    /**
+     * Issue #733-swingx: model and monthView cal not synched.
+     * 
+     * Here: minimal days of first week.
+     */
+    public void testCalendarsMinimalDaysOfFirstWeekModelChanged() {
+        JXMonthView monthView = new JXMonthView();
+        int first = monthView.getCalendar().getMinimalDaysInFirstWeek() + 1;
+        assertTrue(first <= Calendar.SATURDAY);
+        monthView.getSelectionModel().setMinimalDaysInFirstWeek(first);
+        assertEquals(first, monthView.getCalendar().getMinimalDaysInFirstWeek());
+    }
+    
+    /**
+     * Issue #733-swingx: model and monthView cal not synched.
+     * 
+     * Here: MinimalDaysInFirstWeek.
+     */
+    public void testCalendarsMinimalDaysInFirstWeek() {
+        
+    }
+    
+    
+    /**
+     * Issue #733-swingx: model and monthView cal not synched.
+     * 
+     * Here: MinimalDaysInFirstWeek.
+     */
+    public void testCalendarsLocale() {
+        
+    }
+    
+    /**
      * Issue #733-swingx: TimeZone in model and monthView not synched.
      *  
      *  Test that the selected is normalized in the monthView's timezone. 
      */
-    public void testTimeZoneFlaggedDate() {
+    public void testCalendarsTimeZoneFlaggedDate() {
         JXMonthView monthView = new JXMonthView();
         // config with a known timezone and date
         TimeZone tz = TimeZone.getTimeZone("GMT+4");
@@ -187,7 +255,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
      *  
      *  Test that the selected is normalized in the monthView's timezone. 
      */
-    public void testTimeZoneNormalizedDate() {
+    public void testCalendarsTimeZoneNormalizedDate() {
         JXMonthView monthView = new JXMonthView();
         // config with a known timezone and date
         TimeZone tz = TimeZone.getTimeZone("GMT+4");
@@ -207,7 +275,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
      * Test selected - tells nothing, because it's normalized in the 
      * model's (default) calendar.
      */
-    public void testTimeZoneSelectedDate() {
+    public void testCalendarsTimeZoneSelectedDate() {
         JXMonthView monthView = new JXMonthView();
         // config with a known timezone and date
         TimeZone tz = TimeZone.getTimeZone("GMT+4");

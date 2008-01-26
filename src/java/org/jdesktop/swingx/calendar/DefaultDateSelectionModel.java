@@ -23,6 +23,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.SortedSet;
+import java.util.TimeZone;
 import java.util.TreeSet;
 
 import org.jdesktop.swingx.event.DateSelectionEvent;
@@ -68,14 +69,66 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
         clearSelection();
     }
 
+//---------------------- calendar
+    
+    /**
+     * {@inheritDoc}
+     */
+    public Calendar getCalendar() {
+        return (Calendar) cal.clone();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public int getFirstDayOfWeek() {
-        return firstDayOfWeek;
+        return cal.getFirstDayOfWeek();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setFirstDayOfWeek(final int firstDayOfWeek) {
-        this.firstDayOfWeek = firstDayOfWeek;
+        if (firstDayOfWeek == getFirstDayOfWeek()) return;
+        cal.setFirstDayOfWeek(firstDayOfWeek);
+        fireValueChanged(EventType.CALENDAR_CHANGED);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public int getMinimalDaysInFirstWeek() {
+        return cal.getMinimalDaysInFirstWeek();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setMinimalDaysInFirstWeek(int minimalDays) {
+        if (minimalDays == getMinimalDaysInFirstWeek()) return;
+        cal.setMinimalDaysInFirstWeek(minimalDays);
+        fireValueChanged(EventType.CALENDAR_CHANGED);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public TimeZone getTimeZone() {
+        return cal.getTimeZone();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTimeZone(TimeZone timeZone) {
+        if (getTimeZone().equals(timeZone)) return;
+        cal.setTimeZone(timeZone);
+        fireValueChanged(EventType.CALENDAR_CHANGED);
+        
+    }
+
+    
+//------------------- selection ops    
     /**
      * {@inheritDoc}
      */

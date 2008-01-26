@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.SortedSet;
+import java.util.TimeZone;
 import java.util.TreeSet;
 
 import org.jdesktop.swingx.event.DateSelectionEvent;
@@ -45,7 +46,6 @@ public class SingleDaySelectionModel implements DateSelectionModel {
     private SortedSet<Date> selectedDates;
     private SortedSet<Date> unselectableDates;
     private Calendar cal;
-    private int firstDayOfWeek;
     private Date upperBound;
     private Date lowerBound;
     private boolean adjusting;
@@ -55,7 +55,6 @@ public class SingleDaySelectionModel implements DateSelectionModel {
         this.selectedDates = new TreeSet<Date>();
         this.unselectableDates = new TreeSet<Date>();
         cal = Calendar.getInstance();
-        this.firstDayOfWeek = cal.getFirstDayOfWeek();
     }
 
     /**
@@ -74,15 +73,64 @@ public class SingleDaySelectionModel implements DateSelectionModel {
     public void setSelectionMode(final SelectionMode selectionMode) {
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public Calendar getCalendar() {
+        return (Calendar) cal.clone();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public int getFirstDayOfWeek() {
-        return firstDayOfWeek;
+        return cal.getFirstDayOfWeek();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setFirstDayOfWeek(final int firstDayOfWeek) {
-        this.firstDayOfWeek = firstDayOfWeek;
+        if (firstDayOfWeek == getFirstDayOfWeek()) return;
         cal.setFirstDayOfWeek(firstDayOfWeek);
+        fireValueChanged(EventType.CALENDAR_CHANGED);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public int getMinimalDaysInFirstWeek() {
+        return cal.getMinimalDaysInFirstWeek();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setMinimalDaysInFirstWeek(int minimalDays) {
+        if (minimalDays == getMinimalDaysInFirstWeek()) return;
+        cal.setMinimalDaysInFirstWeek(minimalDays);
+        fireValueChanged(EventType.CALENDAR_CHANGED);
+    }
+
+    
+    /**
+     * {@inheritDoc}
+     */
+    public TimeZone getTimeZone() {
+        return cal.getTimeZone();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTimeZone(TimeZone timeZone) {
+        if (getTimeZone().equals(timeZone)) return;
+        cal.setTimeZone(timeZone);
+        fireValueChanged(EventType.CALENDAR_CHANGED);
+        
+    }
+
+    //---------------------- selection ops    
     /**
      * {@inheritDoc} <p>
      * 
@@ -422,6 +470,7 @@ public class SingleDaySelectionModel implements DateSelectionModel {
             listener.valueChanged(e);
         }
     }
+
 
 
 }
