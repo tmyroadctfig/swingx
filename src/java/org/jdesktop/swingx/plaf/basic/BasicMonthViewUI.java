@@ -827,7 +827,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      *  must not be null
      */
     @SuppressWarnings({"UnusedDeclaration"})
-    private void paintMonth(Graphics g, int x, int y, int width, int height, Calendar cal) {
+    protected void paintMonth(Graphics g, int x, int y, int width, int height, Calendar cal) {
         // PEINDING JW: remove usage of deprecated api
         // use Date instead of millis
         int days = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
@@ -839,7 +839,7 @@ public class BasicMonthViewUI extends MonthViewUI {
 
         // Paint month name background.
         paintMonthStringBackground(g, x, y,
-                width, boxPaddingY + monthBoxHeight + boxPaddingY);
+                width, boxPaddingY + monthBoxHeight + boxPaddingY, cal);
 
         paintMonthStringForeground(g, x, y,
                 width, boxPaddingY + monthBoxHeight + boxPaddingY, cal);
@@ -856,7 +856,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         int tmpX = isLeftToRight ? x + (showingWeekNumber ? fullBoxWidth : 0) : x;
         int tmpY = y + fullMonthBoxHeight;
         int tmpWidth = width - (showingWeekNumber ? fullBoxWidth : 0);
-        paintDayOfTheWeekBackground(g, tmpX, tmpY, tmpWidth, fullBoxHeight);
+        paintDayOfTheWeekBackground(g, tmpX, tmpY, tmpWidth, fullBoxHeight, cal);
 
         // Paint short representation of day of the week.
         int dayIndex = monthView.getFirstDayOfWeek() - 1;
@@ -890,7 +890,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         if (showingWeekNumber) {
             tmpX = isLeftToRight ? x : x + width - fullBoxWidth;
             paintWeekOfYearBackground(g, tmpX, y + fullMonthBoxHeight + fullBoxHeight, fullBoxWidth,
-                    calendarHeight - (fullMonthBoxHeight + fullBoxHeight));
+                    calendarHeight - (fullMonthBoxHeight + fullBoxHeight), cal);
         }
 
         if (monthView.isShowingLeadingDates()) {
@@ -921,7 +921,7 @@ public class BasicMonthViewUI extends MonthViewUI {
                 int weekOfYear = cal.get(Calendar.WEEK_OF_YEAR);
                 if (weekOfYear != oldWeek) {
                     tmpX = isLeftToRight ? x : x + width - fullBoxWidth;
-                    paintWeekOfYearForeground(g, tmpX, bounds.y, fullBoxWidth, fullBoxHeight, weekOfYear);
+                    paintWeekOfYearForeground(g, tmpX, bounds.y, fullBoxWidth, fullBoxHeight, weekOfYear, cal);
                     oldWeek = weekOfYear;
                 }
             }
@@ -993,12 +993,12 @@ public class BasicMonthViewUI extends MonthViewUI {
         }
     }
 
-    protected void paintDayOfTheWeekBackground(Graphics g, int x, int y, int width, int height) {
+    protected void paintDayOfTheWeekBackground(Graphics g, int x, int y, int width, int height, Calendar cal) {
         int boxPaddingX = monthView.getBoxPaddingX();
         g.drawLine(x + boxPaddingX, y + height - 1, x + width - boxPaddingX, y + height - 1);
     }
 
-    protected void paintWeekOfYearBackground(Graphics g, int x, int y, int width, int height) {
+    protected void paintWeekOfYearBackground(Graphics g, int x, int y, int width, int height, Calendar cal) {
         int boxPaddingY = monthView.getBoxPaddingY();
         x = isLeftToRight ? x + width - 1 : x;
         g.drawLine(x, y + boxPaddingY, x, y + height - boxPaddingY);
@@ -1015,7 +1015,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param weekOfYear week of the year
      */
     @SuppressWarnings({"UNUSED_SYMBOL", "UnusedDeclaration"})
-    protected void paintWeekOfYearForeground(Graphics g, int x, int y, int width, int height, int weekOfYear) {
+    protected void paintWeekOfYearForeground(Graphics g, int x, int y, int width, int height, int weekOfYear, Calendar cal) {
         String str = Integer.toString(weekOfYear);
         FontMetrics fm;
 
@@ -1053,7 +1053,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @see org.jdesktop.swingx.JXMonthView#setMonthStringInsets
      */
     protected void paintMonthStringBackground(Graphics g, int x, int y,
-                                              int width, int height) {
+                                              int width, int height, Calendar cal) {
         // Modify bounds by the month string insets.
         Insets monthStringInsets = monthView.getMonthStringInsets();
         x = isLeftToRight ? x + monthStringInsets.left : x + monthStringInsets.right;
@@ -1107,7 +1107,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         yearStringBounds[month].x = (monthStringBounds[month].x + monthStringBounds[month].width +
                 spaceWidth);
 
-        paintMonthStringForeground(g,monthName, monthStringBounds[month].x, tmpY, yearString, yearStringBounds[month].x, tmpY);
+        paintMonthStringForeground(g,monthName, monthStringBounds[month].x, tmpY, yearString, yearStringBounds[month].x, tmpY, cal);
         g.setFont(oldFont);
     }
 
@@ -1122,7 +1122,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param yearY Year string y coordinate.
      */
     protected void paintMonthStringForeground(Graphics g, String monthName, int monthX, int monthY, 
-            String yearName, int yearX, int yearY) {
+            String yearName, int yearX, int yearY, Calendar cal) {
         g.drawString(monthName, monthX, monthY);
         g.drawString(yearName, yearX, yearY);
     }
@@ -1175,7 +1175,7 @@ public class BasicMonthViewUI extends MonthViewUI {
         int boxPaddingY = monthView.getBoxPaddingY();
 
         paintDayForeground(g, numericDay, isLeftToRight ? x + boxPaddingX + boxWidth : x + boxPaddingX + boxWidth - 1,
-                y + boxPaddingY);
+                y + boxPaddingY, cal);
     }
 
     /**
@@ -1185,7 +1185,7 @@ public class BasicMonthViewUI extends MonthViewUI {
      * @param x X coordinate of the upper <b>right</b> corner.
      * @param y Y coordinate of the upper <b>right</b> corner.
      */
-    protected void paintDayForeground(Graphics g, String numericDay, int x, int y) {
+    protected void paintDayForeground(Graphics g, String numericDay, int x, int y, Calendar cal) {
         FontMetrics fm = g.getFontMetrics();
         g.drawString(numericDay, x - fm.stringWidth(numericDay), y + fm.getAscent());
     }
