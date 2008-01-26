@@ -38,7 +38,8 @@ public class DateSelectionEvent extends EventObject {
         UNSELECTED_DATES_CHANGED,
         LOWER_BOUND_CHANGED,
         UPPER_BOUND_CHANGED, 
-        ADJUSTING_STARTED, ADJUSTING_STOPPED
+        ADJUSTING_STARTED, ADJUSTING_STOPPED, 
+        CALENDAR_CHANGED,
     }
 
     private EventType eventType;
