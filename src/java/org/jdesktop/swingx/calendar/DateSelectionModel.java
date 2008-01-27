@@ -20,6 +20,7 @@ package org.jdesktop.swingx.calendar;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.SortedSet;
 import java.util.TimeZone;
 
@@ -142,7 +143,25 @@ public interface DateSelectionModel {
      * @see #getTimeZone()
      */
     public void setTimeZone(TimeZone timeZone);
+    
+    /**
+     * Returns the Locale of this model's calendar.
+     * @return
+     */
+    public Locale getLocale();
 
+    /**
+     * Sets the Locale of this model's calendar. Fires a DateSelectionEvent of type 
+     * CALENDAR_CHANGED if the new value is different from the old.
+     * 
+     * The default value is Locale.default().
+     * 
+     * PENDING JW: actually, it's a bound property. Use a propertyChangeListener?
+     * 
+     * @param locale the Locale to use. If null, the default Locale is used.
+     */
+    public void setLocale(Locale locale);
+    
     //-------------------- selection 
     
     /**

@@ -21,39 +21,35 @@ package org.jdesktop.swingx.calendar;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
+import java.util.Locale;
 import java.util.SortedSet;
-import java.util.TimeZone;
 import java.util.TreeSet;
 
-import org.jdesktop.swingx.event.DateSelectionEvent;
-import org.jdesktop.swingx.event.DateSelectionListener;
-import org.jdesktop.swingx.event.EventListenerMap;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 
 /**
  * @author Joshua Outwater
  */
-public class DefaultDateSelectionModel implements DateSelectionModel {
-    private EventListenerMap listenerMap;
+public class DefaultDateSelectionModel extends AbstractDateSelectionModel {
     private SelectionMode selectionMode;
     private SortedSet<Date> selectedDates;
     private SortedSet<Date> unselectableDates;
-    private Calendar cal;
-    private int firstDayOfWeek;
     private Date upperBound;
     private Date lowerBound;
-    private boolean adjusting;
 
     public DefaultDateSelectionModel() {
-        this.listenerMap = new EventListenerMap();
+        this(null);
+    }
+
+    public DefaultDateSelectionModel(Locale locale) {
+        super(locale);
         this.selectionMode = SelectionMode.SINGLE_SELECTION;
         this.selectedDates = new TreeSet<Date>();
         this.unselectableDates = new TreeSet<Date>();
-        this.firstDayOfWeek = Calendar.SUNDAY;
-        cal = Calendar.getInstance();
+        // JW: changed inital firstDayOfWeek
+        // had been hardcoded to Sunday!
+//        this.firstDayOfWeek = cal.getFirstDayOfWeek();
     }
-
     /**
      * {@inheritDoc}
      */
@@ -67,64 +63,6 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
     public void setSelectionMode(final SelectionMode selectionMode) {
         this.selectionMode = selectionMode;
         clearSelection();
-    }
-
-//---------------------- calendar
-    
-    /**
-     * {@inheritDoc}
-     */
-    public Calendar getCalendar() {
-        return (Calendar) cal.clone();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public int getFirstDayOfWeek() {
-        return cal.getFirstDayOfWeek();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setFirstDayOfWeek(final int firstDayOfWeek) {
-        if (firstDayOfWeek == getFirstDayOfWeek()) return;
-        cal.setFirstDayOfWeek(firstDayOfWeek);
-        fireValueChanged(EventType.CALENDAR_CHANGED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public int getMinimalDaysInFirstWeek() {
-        return cal.getMinimalDaysInFirstWeek();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setMinimalDaysInFirstWeek(int minimalDays) {
-        if (minimalDays == getMinimalDaysInFirstWeek()) return;
-        cal.setMinimalDaysInFirstWeek(minimalDays);
-        fireValueChanged(EventType.CALENDAR_CHANGED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public TimeZone getTimeZone() {
-        return cal.getTimeZone();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setTimeZone(TimeZone timeZone) {
-        if (getTimeZone().equals(timeZone)) return;
-        cal.setTimeZone(timeZone);
-        fireValueChanged(EventType.CALENDAR_CHANGED);
-        
     }
 
     
@@ -370,53 +308,6 @@ public class DefaultDateSelectionModel implements DateSelectionModel {
             date = cal.getTime();
         }
         return hasAdded;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isAdjusting() {
-        return adjusting;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setAdjusting(boolean adjusting) {
-        if (adjusting == isAdjusting()) return;
-        this.adjusting = adjusting;
-       fireValueChanged(adjusting ? EventType.ADJUSTING_STARTED : EventType.ADJUSTING_STOPPED);
-        
-    }
-    
-//--------------- listener
-    /**
-     * {@inheritDoc}
-     */
-    public void addDateSelectionListener(DateSelectionListener l) {
-        listenerMap.add(DateSelectionListener.class, l);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void removeDateSelectionListener(DateSelectionListener l) {
-        listenerMap.remove(DateSelectionListener.class, l);
-    }
-    public List<DateSelectionListener> getDateSelectionListeners() {
-        return listenerMap.getListeners(DateSelectionListener.class);
-    }
-
-    protected void fireValueChanged(DateSelectionEvent.EventType eventType) {
-        List<DateSelectionListener> listeners = getDateSelectionListeners();
-        DateSelectionEvent e = null;
-
-        for (DateSelectionListener listener : listeners) {
-            if (e == null) {
-                e = new DateSelectionEvent(this, eventType, isAdjusting());
-            }
-            listener.valueChanged(e);
-        }
     }
 
     

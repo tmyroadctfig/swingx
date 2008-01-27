@@ -18,17 +18,11 @@
  */
 package org.jdesktop.swingx.calendar;
 
-import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
+import java.util.Locale;
 import java.util.SortedSet;
-import java.util.TimeZone;
 import java.util.TreeSet;
 
-import org.jdesktop.swingx.event.DateSelectionEvent;
-import org.jdesktop.swingx.event.DateSelectionListener;
-import org.jdesktop.swingx.event.EventListenerMap;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.util.Contract;
 
@@ -40,21 +34,21 @@ import org.jdesktop.swingx.util.Contract;
  * 
  * @author Jeanette Winzenburg
  */
-public class SingleDaySelectionModel implements DateSelectionModel {
-    private static final SortedSet<Date> EMPTY_SET = Collections.unmodifiableSortedSet(new TreeSet<Date>());
-    private EventListenerMap listenerMap;
+public class SingleDaySelectionModel extends AbstractDateSelectionModel {
+//    private static final SortedSet<Date> EMPTY_SET = Collections.unmodifiableSortedSet(new TreeSet<Date>());
     private SortedSet<Date> selectedDates;
     private SortedSet<Date> unselectableDates;
-    private Calendar cal;
     private Date upperBound;
     private Date lowerBound;
-    private boolean adjusting;
 
     public SingleDaySelectionModel() {
-        this.listenerMap = new EventListenerMap();
+        this(null);
+    }
+
+    public SingleDaySelectionModel(Locale locale) {
+        super(locale);
         this.selectedDates = new TreeSet<Date>();
         this.unselectableDates = new TreeSet<Date>();
-        cal = Calendar.getInstance();
     }
 
     /**
@@ -73,62 +67,6 @@ public class SingleDaySelectionModel implements DateSelectionModel {
     public void setSelectionMode(final SelectionMode selectionMode) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public Calendar getCalendar() {
-        return (Calendar) cal.clone();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public int getFirstDayOfWeek() {
-        return cal.getFirstDayOfWeek();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setFirstDayOfWeek(final int firstDayOfWeek) {
-        if (firstDayOfWeek == getFirstDayOfWeek()) return;
-        cal.setFirstDayOfWeek(firstDayOfWeek);
-        fireValueChanged(EventType.CALENDAR_CHANGED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public int getMinimalDaysInFirstWeek() {
-        return cal.getMinimalDaysInFirstWeek();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setMinimalDaysInFirstWeek(int minimalDays) {
-        if (minimalDays == getMinimalDaysInFirstWeek()) return;
-        cal.setMinimalDaysInFirstWeek(minimalDays);
-        fireValueChanged(EventType.CALENDAR_CHANGED);
-    }
-
-    
-    /**
-     * {@inheritDoc}
-     */
-    public TimeZone getTimeZone() {
-        return cal.getTimeZone();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setTimeZone(TimeZone timeZone) {
-        if (getTimeZone().equals(timeZone)) return;
-        cal.setTimeZone(timeZone);
-        fireValueChanged(EventType.CALENDAR_CHANGED);
-        
-    }
 
     //---------------------- selection ops    
     /**
@@ -421,55 +359,6 @@ public class SingleDaySelectionModel implements DateSelectionModel {
         }
     }
 
-
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isAdjusting() {
-        return adjusting;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setAdjusting(boolean adjusting) {
-        if (adjusting == isAdjusting()) return;
-        this.adjusting = adjusting;
-       fireValueChanged(adjusting ? EventType.ADJUSTING_STARTED : EventType.ADJUSTING_STOPPED);
-        
-    }
-
-//----------------- notification    
-    /**
-     * {@inheritDoc}
-     */
-    public void addDateSelectionListener(DateSelectionListener l) {
-        listenerMap.add(DateSelectionListener.class, l);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void removeDateSelectionListener(DateSelectionListener l) {
-        listenerMap.remove(DateSelectionListener.class, l);
-    }
-
-    public List<DateSelectionListener> getDateSelectionListeners() {
-        return listenerMap.getListeners(DateSelectionListener.class);
-    }
-
-    protected void fireValueChanged(DateSelectionEvent.EventType eventType) {
-        List<DateSelectionListener> listeners = getDateSelectionListeners();
-        DateSelectionEvent e = null;
-
-        for (DateSelectionListener listener : listeners) {
-            if (e == null) {
-                e = new DateSelectionEvent(this, eventType, isAdjusting());
-            }
-            listener.valueChanged(e);
-        }
-    }
 
 
 
