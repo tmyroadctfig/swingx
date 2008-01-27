@@ -335,7 +335,10 @@ public class JXMonthView extends JComponent {
         listenerMap = new EventListenerMap();
         selectionMode = SelectionMode.SINGLE_SELECTION;
 
-        initModel(model, locale);
+        this.model = model;
+        if (this.model == null) {
+            this.model = new DaySelectionModel();
+        }
 
         // JW: something fishy going on - see #702-swingx and related discussion
         // installing the cal before or after the controller should no longer 
@@ -356,12 +359,6 @@ public class JXMonthView extends JComponent {
         setFocusable(true);
         todayBackgroundColor = getForeground();
 
-    }
-
-    private void initModel(DateSelectionModel model, Locale locale) {
-        if (model == null) {
-            model = new DaySelectionModel(locale);
-        }
     }
 
     /**
