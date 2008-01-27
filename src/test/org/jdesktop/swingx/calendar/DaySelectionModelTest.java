@@ -32,7 +32,7 @@ import org.jdesktop.swingx.calendar.DateSelectionModel.SelectionMode;
  * 
  * @author Jeanette Winzenburg
  */
-public class DaySelectionModelTest extends AbstractDateSelectionModelTest {
+public class DaySelectionModelTest extends AbstractTestDateSelectionModel {
 
     /**
      * test the contract as doc'ed 

@@ -35,7 +35,7 @@ import org.jdesktop.swingx.test.DateSelectionReport;
  * 
  * Moved from swingx to calendar package as of version 1.15
  */
-public class SingleDaySelectionModelTest extends AbstractDateSelectionModelTest {
+public class SingleDaySelectionModelTest extends AbstractTestDateSelectionModel {
     private static final Logger LOG = Logger
             .getLogger(SingleDaySelectionModelTest.class.getName());
     /**

@@ -39,7 +39,7 @@ import org.jdesktop.swingx.test.XTestUtils;
  * 
  * Moved from swingx to calendar package as of version 1.15
  */
-public class DefaultDateSelectionModelTest extends AbstractDateSelectionModelTest {
+public class DefaultDateSelectionModelTest extends AbstractTestDateSelectionModel {
     private static final Logger LOG = Logger
             .getLogger(DefaultDateSelectionModelTest.class.getName());
     /**

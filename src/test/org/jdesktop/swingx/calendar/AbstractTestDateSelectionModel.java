@@ -36,7 +36,7 @@ import org.jdesktop.swingx.test.DateSelectionReport;
  * 
  * @author Jeanette Winzenburg
  */
-public class AbstractDateSelectionModelTest extends TestCase {
+public class AbstractTestDateSelectionModel extends TestCase {
 
     protected DateSelectionModel model;
     protected Calendar calendar;
