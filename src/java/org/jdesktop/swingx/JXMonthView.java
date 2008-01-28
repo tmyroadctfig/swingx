@@ -471,13 +471,19 @@ public class JXMonthView extends JComponent {
        if (!getLocale().equals(model.getLocale())) {
            installCalendar();
            superSetLocale(model.getLocale());
-       } else if (!model.getTimeZone().equals(getTimeZone())) {
-           updateTimeZone();
-       } 
-       if (cal.getMinimalDaysInFirstWeek() != model.getMinimalDaysInFirstWeek()) {
-           cal.setMinimalDaysInFirstWeek(model.getMinimalDaysInFirstWeek());
+       } else {
+           if (!model.getTimeZone().equals(getTimeZone())) {
+               updateTimeZone();
+           }
+           if (cal.getMinimalDaysInFirstWeek() != model.getMinimalDaysInFirstWeek()) {
+               updateMinimalDaysOfFirstWeek();
+           }
+           if (cal.getFirstDayOfWeek() != model.getFirstDayOfWeek()) {
+              updateFirstDayOfWeek(); 
+           }
        }
     }
+
     /**
      * Gets the time zone.
      *
@@ -498,8 +504,12 @@ public class JXMonthView extends JComponent {
         model.setTimeZone(tz);
     }
 
+//---------------------- synch to model's calendar    
+    /**
+     * Callback from changing timezone in model.
+     */
     private void updateTimeZone() {
-        TimeZone old =getTimeZone();
+        TimeZone old = getTimeZone();
         TimeZone tz = model.getTimeZone();
         cal.setTimeZone(tz);
         anchor.setTimeZone(tz);
@@ -518,13 +528,57 @@ public class JXMonthView extends JComponent {
      * @param oldTimeZone the timezone before the change
      */
     protected void updateDatesAfterTimeZoneChange(TimeZone oldTimeZone) {
-        clearSelection();
-        setLowerBound(null);
-        setUpperBound(null);
         setFlaggedDates((Date[])null);
-        setUnselectableDates(new Date[0]);
+        // moved to model responsibility
+//        clearSelection();
+//        setLowerBound(null);
+//        setUpperBound(null);
+//        setUnselectableDates(new Date[0]);
     }
     
+    /**
+     * 
+     */
+    private void updateFirstDayOfWeek() {
+        int oldFirstDayOfWeek = this.firstDayOfWeek;
+
+        firstDayOfWeek = getSelectionModel().getFirstDayOfWeek();
+        cal.setFirstDayOfWeek(firstDayOfWeek);
+        anchor.setFirstDayOfWeek(firstDayOfWeek);
+        firePropertyChange("firstDayOfWeek", oldFirstDayOfWeek, firstDayOfWeek);
+
+        repaint();
+        
+    }
+
+    private void updateMinimalDaysOfFirstWeek() {
+        cal.setMinimalDaysInFirstWeek(model.getMinimalDaysInFirstWeek());
+        anchor.setMinimalDaysInFirstWeek(model.getMinimalDaysInFirstWeek());
+    }
+    
+    /**
+     * Gets what the first day of the week is; e.g.,
+     * <code>Calendar.SUNDAY</code> in the U.S., <code>Calendar.MONDAY</code>
+     * in France.
+     *
+     * @return int The first day of the week.
+     */
+    public int getFirstDayOfWeek() {
+        return firstDayOfWeek;
+    }
+
+    /**
+     * Sets what the first day of the week is; e.g.,
+     * <code>Calendar.SUNDAY</code> in US, <code>Calendar.MONDAY</code>
+     * in France.
+     *
+     * @param firstDayOfWeek The first day of the week.
+     * @see java.util.Calendar
+     */
+    public void setFirstDayOfWeek(int firstDayOfWeek) {
+        getSelectionModel().setFirstDayOfWeek(firstDayOfWeek);
+    }
+
 
     /**
      * Returns the first displayed date.
@@ -1343,41 +1397,6 @@ public class JXMonthView extends JComponent {
         String[] days = new String[DAYS_IN_WEEK];
         System.arraycopy(_daysOfTheWeek, 0, days, 0, DAYS_IN_WEEK);
         return days;
-    }
-
-    /**
-     * Gets what the first day of the week is; e.g.,
-     * <code>Calendar.SUNDAY</code> in the U.S., <code>Calendar.MONDAY</code>
-     * in France.
-     *
-     * @return int The first day of the week.
-     */
-    public int getFirstDayOfWeek() {
-        return firstDayOfWeek;
-    }
-
-    /**
-     * Sets what the first day of the week is; e.g.,
-     * <code>Calendar.SUNDAY</code> in US, <code>Calendar.MONDAY</code>
-     * in France.
-     *
-     * @param firstDayOfWeek The first day of the week.
-     * @see java.util.Calendar
-     */
-    public void setFirstDayOfWeek(int firstDayOfWeek) {
-        if (firstDayOfWeek == this.firstDayOfWeek) {
-            return;
-        }
-
-        int oldFirstDayOfWeek = this.firstDayOfWeek;
-
-        this.firstDayOfWeek = firstDayOfWeek;
-        cal.setFirstDayOfWeek(this.firstDayOfWeek);
-        getSelectionModel().setFirstDayOfWeek(this.firstDayOfWeek);
-
-        firePropertyChange("firstDayOfWeek", oldFirstDayOfWeek, this.firstDayOfWeek);
-
-        repaint();
     }
 
     /**

@@ -187,18 +187,34 @@ public class JXMonthViewTest extends MockObjectTestCase {
     /**
      * Issue #733-swingx: model and monthView cal not synched.
      * 
-     * Here: first day of week.
+     * Here: set first day of week in monthView.
      */
-    public void testCalendarsFirstDayOfWeek() {
+    public void testCalendarsFirstDayOfWeekMonthView() {
         JXMonthView monthView = new JXMonthView();
         int first = monthView.getFirstDayOfWeek() + 1;
         // sanity
         assertTrue(first <= Calendar.SATURDAY);
         monthView.setFirstDayOfWeek(first);
+        assertEquals(first, monthView.getFirstDayOfWeek());
         assertEquals(first, monthView.getCalendar().getFirstDayOfWeek());
         assertEquals(first, monthView.getSelectionModel().getFirstDayOfWeek());
     }
     
+    /**
+     * Issue #733-swingx: model and monthView cal not synched.
+     * 
+     * Here: set first day of week in model.
+     */
+    public void testCalendarsFirstDayOfWeekModel() {
+        JXMonthView monthView = new JXMonthView();
+        int first = monthView.getFirstDayOfWeek() + 1;
+        // sanity
+        assertTrue(first <= Calendar.SATURDAY);
+        monthView.getSelectionModel().setFirstDayOfWeek(first);
+        assertEquals(first, monthView.getFirstDayOfWeek());
+        assertEquals(first, monthView.getCalendar().getFirstDayOfWeek());
+        assertEquals(first, monthView.getSelectionModel().getFirstDayOfWeek());
+    }
     /**
      * Issue #733-swingx: model and monthView cal not synched.
      * 

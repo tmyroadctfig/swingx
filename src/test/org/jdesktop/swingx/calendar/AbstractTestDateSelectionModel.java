@@ -25,6 +25,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.TreeSet;
 
 import junit.framework.TestCase;
 
@@ -42,6 +43,94 @@ public class AbstractTestDateSelectionModel extends TestCase {
     protected Calendar calendar;
 
     /**
+     * Issue #618-swingx: JXMonthView displays problems with non-default
+     * timezones.
+     * 
+     * Unselectable dates are "start of day" in the timezone they had been 
+     * set. As such they make no sense in a new timezone: must
+     * either be adjusted or cleared. Currently we clear them. 
+     */
+    public void testTimeZoneChangeResetUnselectableDates() {
+        TimeZone tz = TimeZone.getTimeZone("GMT+4");
+        if (model.getTimeZone().equals(tz)) {
+            tz = TimeZone.getTimeZone("GMT+5");
+        }
+        TreeSet<Date> treeSet = new TreeSet<Date>();
+        treeSet.add(yesterday);
+        model.setUnselectableDates(treeSet);
+        model.setTimeZone(tz);
+        // accidentally passes - because it is meaningful only in the timezone 
+        // it was set ...
+        assertFalse(model.isUnselectableDate(yesterday));
+        // missing api on JXMonthView
+        assertEquals("unselectable dates must have been cleared", 
+                0, model.getUnselectableDates().size());
+    }
+    
+    /**
+     * Issue #618-swingx: JXMonthView displays problems with non-default
+     * timezones.
+     * 
+     * Selected dates are "start of day" in the timezone they had been 
+     * selected. As such they make no sense in a new timezone: must
+     * either be adjusted or cleared. Currently we clear the selection. 
+     */
+    public void testTimeZoneChangeClearSelection() {
+        TimeZone tz = TimeZone.getTimeZone("GMT+4");
+        if (model.getTimeZone().equals(tz)) {
+            tz = TimeZone.getTimeZone("GMT+5");
+        }
+        Date date = new Date();
+        model.setSelectionInterval(date, date);
+        // sanity
+        assertTrue(model.isSelected(date));
+        model.setTimeZone(tz);
+        // accidentally passes - because it is meaningful only in the timezone 
+        // it was set ...
+        assertFalse(model.isSelected(date));
+        assertTrue("selection must have been cleared", model.isSelectionEmpty());
+    }
+    
+    /**
+     * Issue #618-swingx: JXMonthView displays problems with non-default
+     * timezones.
+     * 
+     * Bound dates are "start of day" in the timezone they had been 
+     * set. As such they make no sense in a new timezone: must
+     * either be adjusted or cleared. Currently we clear the bound. 
+     */
+    public void testTimeZoneChangeResetLowerBound() {
+        TimeZone tz = TimeZone.getTimeZone("GMT+4");
+        if (model.getTimeZone().equals(tz)) {
+            tz = TimeZone.getTimeZone("GMT+5");
+        }
+        model.setLowerBound(yesterday);
+        model.setTimeZone(tz);
+        assertEquals("lowerBound must have been reset", null, model.getLowerBound());
+    }
+    
+    /**
+     * Issue #618-swingx: JXMonthView displays problems with non-default
+     * timezones.
+     * 
+     * Bound dates are "start of day" in the timezone they had been 
+     * set. As such they make no sense in a new timezone: must
+     * either be adjusted or cleared. Currently we clear the bound. 
+     */
+    public void testTimeZoneChangeResetUpperBound() {
+        TimeZone tz = TimeZone.getTimeZone("GMT+4");
+        if (model.getTimeZone().equals(tz)) {
+            tz = TimeZone.getTimeZone("GMT+5");
+        }
+        model.setUpperBound(yesterday);
+        model.setTimeZone(tz);
+        assertEquals("upperbound must have been reset", null, model.getUpperBound());
+    }
+    
+
+    /**
+     * Issue ??-swingx: setLocale must respect timezone.
+     * 
      * test that locale update respects timezone.
      */
     public void testCalendarTimeZoneLocale() {
@@ -162,8 +251,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
         DateSelectionReport report = new DateSelectionReport();
         model.addDateSelectionListener(report);
         model.setTimeZone(tz);
-        assertEquals(1, report.getEventCount());
-        assertEquals(EventType.CALENDAR_CHANGED, report.getLastEventType());
+        assertEquals(1, report.getEventCount(EventType.CALENDAR_CHANGED));
     }
 
     /**
@@ -322,5 +410,11 @@ public class AbstractTestDateSelectionModel extends TestCase {
         
         calendar.setTime(today);
     }
+    @Override
+    protected void setUp() throws Exception {
+        setUpCalendar();
+        model = new DaySelectionModel();
+    }
 
+    
 }

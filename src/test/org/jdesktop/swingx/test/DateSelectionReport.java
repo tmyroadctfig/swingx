@@ -57,4 +57,22 @@ public class DateSelectionReport implements DateSelectionListener {
         return hasEvents() ? getLastEvent().getEventType() : null;
     }
 
+    public boolean hasEvent(EventType type) {
+        for (DateSelectionEvent ev : events) {
+            if (ev.getEventType().equals(type)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public int getEventCount(EventType type) {
+        int count = 0;
+        for (DateSelectionEvent ev : events) {
+            if (ev.getEventType().equals(type)) {
+                count++;
+            }
+        }
+        return count;
+    }
 }

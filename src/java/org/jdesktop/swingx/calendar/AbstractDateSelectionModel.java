@@ -22,9 +22,13 @@
 package org.jdesktop.swingx.calendar;
 
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.SortedSet;
 import java.util.TimeZone;
+import java.util.TreeSet;
 
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.event.DateSelectionListener;
@@ -38,7 +42,8 @@ import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
  * @author Jeanette Winzenburg
  */
 public abstract class AbstractDateSelectionModel implements DateSelectionModel {
-
+    public static final SortedSet<Date> EMPTY_DATES = Collections.unmodifiableSortedSet(new TreeSet<Date>());
+    
     protected EventListenerMap listenerMap;
     protected boolean adjusting;
     protected Calendar cal;
@@ -104,11 +109,28 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
      */
     public void setTimeZone(TimeZone timeZone) {
         if (getTimeZone().equals(timeZone)) return;
+        TimeZone oldTimeZone = getTimeZone();
         cal.setTimeZone(timeZone);
+        adjustDatesToTimeZone(oldTimeZone);
         fireValueChanged(EventType.CALENDAR_CHANGED);
-        
     }
 
+    /**
+     * Adjusts all stored dates to a new time zone.
+     * This method is called after the change had been made. <p>
+     * 
+     * This implementation resets all dates to null, clears everything. 
+     * Subclasses may override to really map to the new time zone.
+     *
+     * @param oldTimeZone the old time zone
+     * 
+     */
+    protected void adjustDatesToTimeZone(TimeZone oldTimeZone) {
+        clearSelection();
+        setLowerBound(null);
+        setUpperBound(null);
+        setUnselectableDates(EMPTY_DATES);
+    }
     /**
      * {@inheritDoc}
      */
