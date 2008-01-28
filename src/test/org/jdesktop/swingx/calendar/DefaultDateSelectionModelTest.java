@@ -26,10 +26,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
-import junit.framework.TestCase;
-
-import org.jdesktop.swingx.calendar.DateSelectionModel;
-import org.jdesktop.swingx.calendar.DefaultDateSelectionModel;
 import org.jdesktop.swingx.event.DateSelectionEvent;
 import org.jdesktop.swingx.test.DateSelectionReport;
 import org.jdesktop.swingx.test.XTestUtils;

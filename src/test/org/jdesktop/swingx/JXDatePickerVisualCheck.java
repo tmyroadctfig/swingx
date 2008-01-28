@@ -23,6 +23,8 @@ import java.awt.Container;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -31,6 +33,7 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Box;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
@@ -48,6 +51,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import org.jdesktop.swingx.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.DateUtils;
+import org.jdesktop.swingx.calendar.SingleDaySelectionModel;
 
 /**
  * Simple tests to ensure that the {@code JXDatePicker} can be instantiated and
@@ -81,6 +85,52 @@ public class JXDatePickerVisualCheck extends InteractiveTestCase {
             System.err.println("exception when executing interactive tests:");
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Issue #568-swingx: DatePicker must not reset time fields.
+     * 
+     * Behaviour defined by selection model of monthView. While the default 
+     * (DaySelectionModel) normalizes the dates to the start of the day in the
+     * model's calendar coordinates, a SingleDaySelectionModel keeps the date as-is.
+     * For now, need to explicitly set. 
+     */
+    public void interactiveKeepTimeFields() {
+        final JXDatePicker picker = new JXDatePicker();
+        SingleDaySelectionModel selectionModel = new SingleDaySelectionModel();
+        picker.getMonthView().setSelectionModel(selectionModel);
+        picker.setDate(new Date());
+        DateFormat format = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.FULL);
+        picker.setFormats(format);
+        final JFormattedTextField field = new JFormattedTextField(format);
+        field.setValue(picker.getDate());
+        PropertyChangeListener l = new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ("date".equals(evt.getPropertyName())) {
+                    field.setValue(evt.getNewValue());
+                }
+                
+            }
+            
+        };
+        picker.addPropertyChangeListener(l);
+        Action setDate = new AbstractActionExt("set date") {
+
+            public void actionPerformed(ActionEvent e) {
+                picker.setDate(new Date());
+                
+            }
+            
+        };
+        JComponent box = Box.createHorizontalBox();
+        box.add(picker);
+        box.add(field);
+        JXFrame frame = wrapInFrame(box, "time fields");
+        addAction(frame, setDate);
+        frame.pack();
+        frame.setVisible(true);
+        
     }
 
     /**

@@ -33,13 +33,25 @@ import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
 
 /**
- * TODO add type doc
+ * Contains test for functionality implemeted on the AbstractDateXX level. <p>
+ * 
+ * NOTE: the "Test" name part must not be postFixed to not be included into
+ * the auto-run during a build. For local convenience, a default model 
+ * if created anyway, subclasses must be sure to instantiate the model they
+ * actually want to test.
  * 
  * @author Jeanette Winzenburg
  */
 public class AbstractTestDateSelectionModel extends TestCase {
 
     protected DateSelectionModel model;
+    // pre-defined dates - initialized in setUpCalendar
+    protected Date today;
+    protected Date tomorrow;
+    @SuppressWarnings("unused")
+    protected Date afterTomorrow;
+    protected Date yesterday;
+    // the calendar to use, its date is initialized with the today-field in setUpCalendar
     protected Calendar calendar;
 
     /**
@@ -129,7 +141,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
     
 
     /**
-     * Issue ??-swingx: setLocale must respect timezone.
+     * Issue #694-swingx: setLocale must respect timezone.
      * 
      * test that locale update respects timezone.
      */
@@ -161,6 +173,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
         model.setLocale(null);
         assertEquals(Locale.getDefault(), model.getLocale());
     }
+
     /**
      * test synch of model properties with its calendar's properties.
      * Here: null locale falls back to Locale.default, no fire if had.
@@ -171,6 +184,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
         model.setLocale(null);
         assertEquals(0, report.getEventCount());
     }
+
     /**
      * test synch of model properties with its calendar's properties.
      * Here: changed timeZone.
@@ -376,24 +390,38 @@ public class AbstractTestDateSelectionModel extends TestCase {
         assertEquals(model.getFirstDayOfWeek(), model.getCalendar().getFirstDayOfWeek());
     }
 
-    protected Date today;
-    protected Date tomorrow;
-    @SuppressWarnings("unused")
-    protected Date afterTomorrow;
-    protected Date yesterday;
-
+//------------------------ convenience and setup    
+    /**
+     * Convience to return the start of day relative to the calendar.
+     * 
+     * @param date
+     * @return
+     */
     protected Date startOfDay(Date date) {
         calendar.setTime(date);
         CalendarUtils.startOfDay(calendar);
         return calendar.getTime();
     }
 
+    /**
+     * Convience to return the end of day relative to the calendar.
+     * 
+     * @param date
+     * @return
+     */
     protected Date endOfDay(Date date) {
         calendar.setTime(date);
         CalendarUtils.endOfDay(calendar);
         return calendar.getTime();
     }
 
+    /**
+     * Initializes the calendar to the default instance and the predefined dates
+     * in the coordinate system of the calendar. Note that the hour is set
+     * to "about" in all dates, to be reasonably well into the day. The time
+     * fields of all dates are the same, the calendar is pre-set with the
+     * today field.
+     */
     protected void setUpCalendar() {
         calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 5);
@@ -410,6 +438,7 @@ public class AbstractTestDateSelectionModel extends TestCase {
         
         calendar.setTime(today);
     }
+    
     @Override
     protected void setUp() throws Exception {
         setUpCalendar();

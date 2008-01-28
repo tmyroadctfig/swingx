@@ -21,15 +21,11 @@
  */
 package org.jdesktop.swingx.calendar;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Locale;
 
 import junit.framework.TestCase;
 
 import org.jdesktop.swingx.JXDatePicker;
-import org.jdesktop.swingx.calendar.DatePickerFormatter.DatePickerFormatterUIResource;
-import org.jdesktop.swingx.plaf.UIManagerExt;
 
 /**
  * Unit tests for <code>DatePickerFormatter</code>.

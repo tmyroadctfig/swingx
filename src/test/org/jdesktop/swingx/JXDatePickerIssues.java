@@ -27,9 +27,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -48,14 +45,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
-import org.jdesktop.swingx.action.AbstractActionExt;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DatePickerFormatter;
-import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DateUtils;
-import org.jdesktop.swingx.calendar.SingleDaySelectionModel;
-import org.jdesktop.test.PropertyChangeReport;
-import org.jdesktop.test.TestUtils;
 
 /**
  * Known issues of <code>JXDatePicker</code> and picker related 
@@ -83,47 +75,6 @@ public class JXDatePickerIssues extends InteractiveTestCase {
 
     private Calendar calendar;
 
-    /**
-     * Issue #568-swingx: DatePicker must not reset time fields.
-     * 
-     */
-    public void interactiveKeepTimeFields() {
-        final JXDatePicker picker = new JXDatePicker();
-        SingleDaySelectionModel selectionModel = new SingleDaySelectionModel();
-        picker.getMonthView().setSelectionModel(selectionModel);
-        picker.setDate(new Date());
-        DateFormat format = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.FULL);
-        picker.setFormats(format);
-        final JFormattedTextField field = new JFormattedTextField(format);
-        field.setValue(picker.getDate());
-        PropertyChangeListener l = new PropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent evt) {
-                if ("date".equals(evt.getPropertyName())) {
-                    field.setValue(evt.getNewValue());
-                }
-                
-            }
-            
-        };
-        picker.addPropertyChangeListener(l);
-        Action setDate = new AbstractActionExt("set date") {
-
-            public void actionPerformed(ActionEvent e) {
-                picker.setDate(new Date());
-                
-            }
-            
-        };
-        JComponent box = Box.createHorizontalBox();
-        box.add(picker);
-        box.add(field);
-        JXFrame frame = wrapInFrame(box, "time fields");
-        addAction(frame, setDate);
-        frame.pack();
-        frame.setVisible(true);
-        
-    }
     /**
      * Compare picker and combo behaviour on toggle lf.
      * 
@@ -368,22 +319,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
     }
 //-------------------- unit tests
  
-    DateFormat longFormat = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
-    /**
-     * Issue #568-swingx: picker must respect selection model (as of time fields) 
-     */
-    public void testSetDateKeepsTime() {
-        JXDatePicker picker = new JXDatePicker();
-        picker.setDate(null);
-        DateSelectionModel selectionModel = picker.getMonthView().getSelectionModel();
-        assertTrue(selectionModel instanceof SingleDaySelectionModel);
-        Date date = new Date();
-        selectionModel.setSelectionInterval(date, date);
-        Date first = selectionModel.getSelection().first();
-        assertEquals("formats diff: " + (date.getTime() - first.getTime())
-                , date, first);
-    }
-    
+//    DateFormat longFormat = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
     /**
      * Issue #572-swingx: monthView must show linkDate on empty selection.
      *
@@ -413,20 +349,6 @@ public class JXDatePickerIssues extends InteractiveTestCase {
         
     }
 
-    /**
-     * Issue #724-swingx: picker must notify about timezone changes.
-     * Here: change the timezone on the monthView - can't guarantee the notification.
-     * At least not without hacks...
-     */
-    public void testTimeZoneChangeNotificationChangeOnMonthView() {
-        JXDatePicker picker = new JXDatePicker();
-        TimeZone timeZone = picker.getTimeZone();
-        TimeZone alternative = getSafeAlternativeTimeZone(timeZone);
-        PropertyChangeReport report = new PropertyChangeReport();
-        picker.addPropertyChangeListener(report);
-        picker.getMonthView().setTimeZone(alternative);
-        TestUtils.assertPropertyChangeEvent(report, "timeZone", timeZone, alternative, false);
-    }
     
     /**
      * test that selectionListener is uninstalled.
@@ -450,6 +372,7 @@ public class JXDatePickerIssues extends InteractiveTestCase {
      * @param defaultZone
      * @return
      */
+    @SuppressWarnings("unused")
     private TimeZone getSafeAlternativeTimeZone(TimeZone defaultZone) {
         TimeZone alternative = TimeZone.getTimeZone("GMT-6");
         // sanity

@@ -46,12 +46,11 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.text.DefaultFormatterFactory;
 
-import junit.framework.TestCase;
-
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DatePickerFormatter;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DefaultDateSelectionModel;
+import org.jdesktop.swingx.calendar.SingleDaySelectionModel;
 import org.jdesktop.swingx.plaf.UIManagerExt;
 import org.jdesktop.swingx.plaf.basic.BasicDatePickerUI.EditorCancelAction;
 import org.jdesktop.swingx.test.XTestUtils;
@@ -62,7 +61,7 @@ import org.jdesktop.test.TestUtils;
 /**
  * Unit tests for JXDatePicker.
  */
-public class JXDatePickerTest extends TestCase {
+public class JXDatePickerTest extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXDatePickerTest.class
             .getName());
     
@@ -73,6 +72,21 @@ public class JXDatePickerTest extends TestCase {
     }
 
     public void tearDown() {
+    }
+
+    /**
+     * Issue #724-swingx: picker must notify about timezone changes.
+     * Here: change the timezone on the monthView - can't guarantee the notification.
+     * At least not without hacks...
+     */
+    public void testTimeZoneChangeNotificationChangeOnMonthView() {
+        JXDatePicker picker = new JXDatePicker();
+        TimeZone timeZone = picker.getTimeZone();
+        TimeZone alternative = getSafeAlternativeTimeZone(timeZone);
+        PropertyChangeReport report = new PropertyChangeReport();
+        picker.addPropertyChangeListener(report);
+        picker.getMonthView().setTimeZone(alternative);
+        TestUtils.assertPropertyChangeEvent(report, "timeZone", timeZone, alternative, false);
     }
 
     /**
@@ -89,7 +103,50 @@ public class JXDatePickerTest extends TestCase {
         TestUtils.assertPropertyChangeEvent(report, "timeZone", timeZone, alternative, false);
     }
 
+    /**
+     * Issue #724-swingx: picker must notify about timezone changes.
+     * Here: setMonthView must update the picker's timezone if different and
+     *   fire a notification.
+     */
+    public void testTimeZoneSetMonthView() {
+        JXDatePicker picker = new JXDatePicker();
+        TimeZone timeZone = picker.getTimeZone();
+        TimeZone alternative = getSafeAlternativeTimeZone(timeZone);
+        // prepare a new monthView with different TimeZone
+        JXMonthView monthView = new JXMonthView();
+        monthView.setTimeZone(alternative);
+        PropertyChangeReport report = new PropertyChangeReport();
+        picker.addPropertyChangeListener(report);
+        picker.setMonthView(monthView);
+        TestUtils.assertPropertyChangeEvent(report, "timeZone", timeZone, alternative, false);
+        report.clear();
+        TimeZone another = getSafeAlternativeTimeZone(alternative);
+        monthView.setTimeZone(another);
+        TestUtils.assertPropertyChangeEvent(report, "timeZone", alternative, another, false);
+    }
+ 
     
+    /**
+     * Issue #568-swingx: picker must respect selection model (as of time fields).
+     * 
+     * Behaviour defined by selection model of monthView. While the default 
+     * (DaySelectionModel) normalizes the dates to the start of the day in the
+     * model's calendar coordinates, a SingleDaySelectionModel keeps the date as-is.
+     * For now, need to explicitly set. 
+     */
+    public void testSetDateKeepsTime() {
+        JXDatePicker picker = new JXDatePicker();
+        picker.setDate(null);
+        DateSelectionModel selectionModel = new SingleDaySelectionModel();
+        picker.getMonthView().setSelectionModel(selectionModel);
+        Date date = new Date();
+        selectionModel.setSelectionInterval(date, date);
+        Date first = selectionModel.getSelection().first();
+        assertEquals("formats diff: " + (date.getTime() - first.getTime())
+                , date, first);
+    }
+    
+
     /**
      * Issue #??-swingx: JXDatePicker must keep monthView's firstDisplayedDate
      *   in synch with selection/today.

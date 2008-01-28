@@ -31,6 +31,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.text.DateFormat;
 import java.text.Format;
@@ -56,7 +58,6 @@ import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.text.DefaultFormatterFactory;
 
 import org.jdesktop.swingx.calendar.DatePickerFormatter;
-import org.jdesktop.swingx.calendar.SingleDaySelectionModel;
 import org.jdesktop.swingx.event.EventListenerMap;
 import org.jdesktop.swingx.painter.MattePainter;
 import org.jdesktop.swingx.plaf.DatePickerAddon;
@@ -123,6 +124,8 @@ public class JXDatePicker extends JComponent {
     protected boolean lightWeightPopupEnabled = JPopupMenu.getDefaultLightWeightPopupEnabled();
 
     private Date date;
+
+    private PropertyChangeListener monthViewListener;
 
     /**
      * Create a new date picker using the current date as the initial
@@ -284,15 +287,55 @@ public class JXDatePicker extends JComponent {
      */
     private void init() {
         listenerMap = new EventListenerMap();
+        initMonthView();
+
+        updateLinkFormat();
+        _linkDate = System.currentTimeMillis();
+        _linkPanel = new TodayPanel();
+    }
+
+    private void initMonthView() {
         _monthView = new JXMonthView();
 //        _monthView.setSelectionModel(new SingleDaySelectionModel());
         _monthView.setTraversable(true);
+        _monthView.addPropertyChangeListener(getMonthViewListener());
+    }
 
+    /**
+     * Lazily creates and returns the PropertyChangeListener which listens
+     * for model's calendar properties.
+     * 
+     * @return a PropertyChangeListener for monthView's property change notification.
+     */
+    private PropertyChangeListener getMonthViewListener() {
+        if (monthViewListener == null) {
+            monthViewListener = new PropertyChangeListener() {
 
-        updateLinkFormat();
-        
-        _linkDate = System.currentTimeMillis();
-        _linkPanel = new TodayPanel();
+                public void propertyChange(PropertyChangeEvent evt) {
+                    if ("timeZone".equals(evt.getPropertyName())) {
+                        updateTimeZone((TimeZone) evt.getOldValue(), (TimeZone) evt.getNewValue());
+                    }
+                    
+                }
+                
+            };
+        }
+        return monthViewListener;
+    }
+
+    /**
+     * Callback from monthView timezone changes. <p>
+     * 
+     * NOTE: as timeZone is a bound property of this class we need to 
+     * guarantee the propertyChangeNotification. As this class doesn't 
+     * own this property it must listen to the owner (monthView) and 
+     * re-fire the change.
+     * 
+     * @param oldValue the old timezone.
+     * @param newValue the new timezone.
+     */
+    protected void updateTimeZone(TimeZone oldValue, TimeZone newValue) {
+        firePropertyChange("timeZone", oldValue, newValue);
     }
 
     /**
@@ -431,9 +474,13 @@ public class JXDatePicker extends JComponent {
      */
     public void setMonthView(JXMonthView monthView) {
         Contract.asNotNull(monthView, "monthView must not be null");
-        JXMonthView oldMonthView = _monthView;
+        JXMonthView oldMonthView = getMonthView();
+        TimeZone oldTZ = getTimeZone();
+        oldMonthView.removePropertyChangeListener(getMonthViewListener());
         _monthView = monthView;
-        firePropertyChange(MONTH_VIEW, oldMonthView, _monthView);
+        getMonthView().addPropertyChangeListener(getMonthViewListener());
+        firePropertyChange(MONTH_VIEW, oldMonthView, getMonthView());
+        firePropertyChange("timeZone", oldTZ, getTimeZone());
     }
 
     /**
@@ -450,10 +497,6 @@ public class JXDatePicker extends JComponent {
      * Sets the time zone with the given time zone value.    This is a convenience
      * method which returns the time zone of the JXMonthView being used.<p>
      * 
-     * NOTE: calling this method fires a property change, but that's inherently 
-     * unreliable, because the TimeZone could be changed in the underlying monthView.
-     * No (clean) way to repair. <p>
-     *  
      * PENDING JW: currently this property is the only property of the monthView 
      * which is exposed in this api. Not sure why it is here at all.
      * It's asymetric (to the other properties) and as such should be either removed
@@ -463,9 +506,9 @@ public class JXDatePicker extends JComponent {
      * @param tz The <code>TimeZone</code>.
      */
     public void setTimeZone(TimeZone tz) {
-        TimeZone old = getTimeZone();
+//        TimeZone old = getTimeZone();
         _monthView.setTimeZone(tz);
-        firePropertyChange("timeZone", old, getTimeZone());
+//        firePropertyChange("timeZone", old, getTimeZone());
 
     }
 
