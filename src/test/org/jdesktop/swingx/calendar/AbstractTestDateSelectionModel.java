@@ -42,6 +42,22 @@ public class AbstractTestDateSelectionModel extends TestCase {
     protected Calendar calendar;
 
     /**
+     * test that locale update respects timezone.
+     */
+    public void testCalendarTimeZoneLocale() {
+        TimeZone tz = TimeZone.getTimeZone("GMT+4");
+        if (model.getTimeZone().equals(tz)) {
+            tz = TimeZone.getTimeZone("GMT+5");
+        }
+        model.setTimeZone(tz);
+        Locale[] locales = Locale.getAvailableLocales();
+        for (Locale locale : locales) {
+            model.setLocale(locale);
+            assertEquals(tz, model.getTimeZone());
+        }
+        
+    }
+    /**
      * test synch of model properties with its calendar's properties.
      * Here: null locale falls back to Locale.default.
      */

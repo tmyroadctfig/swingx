@@ -33,6 +33,7 @@ import java.util.TimeZone;
 import java.util.logging.Logger;
 
 import javax.swing.Action;
+import javax.swing.JComponent;
 
 import org.jdesktop.swingx.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.calendar.CalendarUtils;
@@ -169,70 +170,12 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     /**
      * Issue #733-swingx: model and monthView cal not synched.
      * 
-     * Here: first day of week.
-     */
-    public void testCalendarsFirstDayOfWeek() {
-        JXMonthView monthView = new JXMonthView();
-        int first = monthView.getFirstDayOfWeek() + 1;
-        // sanity
-        assertTrue(first <= Calendar.SATURDAY);
-        monthView.setFirstDayOfWeek(first);
-        assertEquals(first, monthView.getCalendar().getFirstDayOfWeek());
-        assertEquals(first, monthView.getSelectionModel().getFirstDayOfWeek());
-    }
-    
-    /**
-     * Issue #733-swingx: model and monthView cal not synched.
-     * 
-     * Here: first day of week.
-     */
-    public void testCalendarsFirstDayOfWeekInitial() {
-        JXMonthView monthView = new JXMonthView();
-        assertEquals(monthView.getFirstDayOfWeek(), 
-                monthView.getSelectionModel().getFirstDayOfWeek());
-    }
-    /**
-     * Issue #733-swingx: model and monthView cal not synched.
-     * 
-     * Here: minimal days of first week.
-     */
-    public void testCalendarsMinimalDaysOfFirstWeekInitial() {
-        JXMonthView monthView = new JXMonthView();
-        int first = monthView.getCalendar().getMinimalDaysInFirstWeek();
-        assertEquals(first, monthView.getSelectionModel().getMinimalDaysInFirstWeek());
-    }
-    
-    /**
-     * Issue #733-swingx: model and monthView cal not synched.
-     * 
-     * Here: minimal days of first week.
-     */
-    public void testCalendarsMinimalDaysOfFirstWeekModelChanged() {
-        JXMonthView monthView = new JXMonthView();
-        int first = monthView.getCalendar().getMinimalDaysInFirstWeek() + 1;
-        assertTrue(first <= Calendar.SATURDAY);
-        monthView.getSelectionModel().setMinimalDaysInFirstWeek(first);
-        assertEquals(first, monthView.getCalendar().getMinimalDaysInFirstWeek());
-    }
-    
-    /**
-     * Issue #733-swingx: model and monthView cal not synched.
-     * 
      * Here: MinimalDaysInFirstWeek.
      */
     public void testCalendarsMinimalDaysInFirstWeek() {
-        
+        fail("test minimal days of first week not completely implemented");
     }
     
-    
-    /**
-     * Issue #733-swingx: model and monthView cal not synched.
-     * 
-     * Here: MinimalDaysInFirstWeek.
-     */
-    public void testCalendarsLocale() {
-        
-    }
     
     /**
      * Issue #733-swingx: TimeZone in model and monthView not synched.
@@ -252,25 +195,6 @@ public class JXMonthViewIssues extends InteractiveTestCase {
 
     /**
      * Issue #733-swingx: TimeZone in model and monthView not synched.
-     *  
-     *  Test that the selected is normalized in the monthView's timezone. 
-     */
-    public void testCalendarsTimeZoneNormalizedDate() {
-        JXMonthView monthView = new JXMonthView();
-        // config with a known timezone and date
-        TimeZone tz = TimeZone.getTimeZone("GMT+4");
-        monthView.setTimeZone(tz);
-        monthView.setSelectedDate(new Date());
-        Date selected = monthView.getSelectedDate();
-        Calendar calendar = monthView.getCalendar();
-        calendar.setTime(selected);
-        CalendarUtils.startOfDay(calendar);
-        assertEquals(selected, calendar.getTime());
-        assertTrue(CalendarUtils.isStartOfDay(calendar));
-    }
-    
-    /**
-     * Issue #733-swingx: TimeZone in model and monthView not synched.
      * 
      * Test selected - tells nothing, because it's normalized in the 
      * model's (default) calendar.
@@ -283,6 +207,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
         Date date = new Date();
         monthView.setSelectedDate(date);
         assertTrue(monthView.isSelectedDate(date));
+        fail("test passes - but tells nothing");
     }
     
     /**

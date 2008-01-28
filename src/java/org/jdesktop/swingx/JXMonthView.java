@@ -43,7 +43,10 @@ import javax.swing.UIManager;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
 import org.jdesktop.swingx.calendar.DaySelectionModel;
+import org.jdesktop.swingx.event.DateSelectionEvent;
+import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.event.EventListenerMap;
+import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.plaf.LookAndFeelAddons;
 import org.jdesktop.swingx.plaf.MonthViewAddon;
 import org.jdesktop.swingx.plaf.MonthViewUI;
@@ -273,6 +276,7 @@ public class JXMonthView extends JComponent {
     private Color flaggedDayForeground;
     private boolean showWeekNumber;
     private boolean componentInputMapEnabled;
+    private DateSelectionListener modelListener;
 
     /**
      * Create a new instance of the <code>JXMonthView</code> class using the
@@ -335,10 +339,7 @@ public class JXMonthView extends JComponent {
         listenerMap = new EventListenerMap();
         selectionMode = SelectionMode.SINGLE_SELECTION;
 
-        this.model = model;
-        if (this.model == null) {
-            this.model = new DaySelectionModel();
-        }
+        initModel(model, locale);
 
         // JW: something fishy going on - see #702-swingx and related discussion
         // installing the cal before or after the controller should no longer 
@@ -347,7 +348,7 @@ public class JXMonthView extends JComponent {
         // JW: problem might have been that the init was incomplete (#715-swingx)  
         // cal installed but not yet the firstDisplayedDate
         // so move both before intalling the ui 
-        setLocale(locale);
+        superSetLocale(locale);
         setFirstDisplayedDate(firstDisplayedDate);
         // Keep track of today
         updateTodayFromCurrentTime();
@@ -359,6 +360,37 @@ public class JXMonthView extends JComponent {
         setFocusable(true);
         todayBackgroundColor = getForeground();
 
+    }
+
+    private void initModel(DateSelectionModel model, Locale locale) {
+        if (locale == null) {
+            locale = JComponent.getDefaultLocale();
+        }
+        if (model == null) {
+            model = new DaySelectionModel(locale);
+        }
+        this.model = model;
+        installCalendar();
+        model.addDateSelectionListener(getDateSelectionListener());
+    }
+
+    /**
+     * @return
+     */
+    private DateSelectionListener getDateSelectionListener() {
+        if (modelListener == null) {
+            modelListener = new DateSelectionListener() {
+
+                public void valueChanged(DateSelectionEvent ev) {
+                    if (EventType.CALENDAR_CHANGED.equals(ev.getEventType())) {
+                        updateCalendar();
+                    }
+                    
+                }
+                
+            };
+        }
+        return modelListener;
     }
 
     /**
@@ -380,7 +412,15 @@ public class JXMonthView extends JComponent {
      */
     @Override
     public void setLocale(Locale locale) {
-        installCalendar(locale);
+        model.setLocale(locale);
+//        superSetLocale(locale);
+    }
+
+    /**
+     * 
+     * @param locale
+     */
+    private void superSetLocale(Locale locale) {
         // PENDING JW: formally, a null value is allowed and must be passed on to super
         // I suspect this is not done here to keep the logic out off the constructor?
         // 
@@ -411,23 +451,33 @@ public class JXMonthView extends JComponent {
     }
 
     /**
-     * Installs the internal calendars with the given locale. If null, JComponent.getDefaultLocale
-     * is used.
+     * Installs the internal calendars from the selection model.
      * 
-     * @param locale Lhe locale to use, defaults to JComponent.getDefaultLocale if null.
      */
-    private void installCalendar(Locale locale) {
-        if (locale == null) {
-            locale = JComponent.getDefaultLocale();
-        }
+    private void installCalendar() {
         // PENDING JW: respect current timezone!
-        cal = Calendar.getInstance(locale);
+        cal = model.getCalendar();
         firstDayOfWeek = cal.getFirstDayOfWeek();
+        // PENDING JW: why and who decides?
         cal.setMinimalDaysInFirstWeek(1);
         model.setMinimalDaysInFirstWeek(1);
         anchor = (Calendar) cal.clone();
     }
 
+    /**
+     * Callback from selection model calendar changes.
+     */
+    private void updateCalendar() {
+       if (!getLocale().equals(model.getLocale())) {
+           installCalendar();
+           superSetLocale(model.getLocale());
+       } else if (!model.getTimeZone().equals(getTimeZone())) {
+           updateTimeZone();
+       } 
+       if (cal.getMinimalDaysInFirstWeek() != model.getMinimalDaysInFirstWeek()) {
+           cal.setMinimalDaysInFirstWeek(model.getMinimalDaysInFirstWeek());
+       }
+    }
     /**
      * Gets the time zone.
      *
@@ -445,15 +495,20 @@ public class JXMonthView extends JComponent {
      * @param tz The <code>TimeZone</code>.
      */
     public void setTimeZone(TimeZone tz) {
+        model.setTimeZone(tz);
+    }
+
+    private void updateTimeZone() {
         TimeZone old =getTimeZone();
+        TimeZone tz = model.getTimeZone();
         cal.setTimeZone(tz);
         anchor.setTimeZone(tz);
         setFirstDisplayedDate(anchor.getTimeInMillis());
         updateTodayFromCurrentTime();
         updateDatesAfterTimeZoneChange(old);
         firePropertyChange("timeZone", old, getTimeZone());
+        
     }
-
     /**
      * All dates are "cleaned" relative to the timezone they had been set.
      * After changing the timezone, they need to be updated to the new.

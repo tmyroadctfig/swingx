@@ -125,7 +125,11 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
         }
         if (locale.equals(getLocale())) return;
         this.locale = locale;
-        cal = Calendar.getInstance(locale);
+        if (cal != null) {
+            cal = Calendar.getInstance(cal.getTimeZone(), locale);
+        } else {
+            cal = Calendar.getInstance(locale);
+        }
         fireValueChanged(EventType.CALENDAR_CHANGED);
     }
 
