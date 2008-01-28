@@ -46,12 +46,30 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
     
     protected EventListenerMap listenerMap;
     protected boolean adjusting;
-    protected Calendar cal;
+    protected Calendar calendar;
+    /** 
+     * the locale used by the calendar. <p>
+     * NOTE: need to keep separately as a Calendar has no getter.
+     */
     protected Locale locale;
 
+    /**
+     * Instantiates a DateSelectionModel with default locale.
+     */
     public AbstractDateSelectionModel() {
         this(null);
     }
+    
+    /**
+     * Instantiates a DateSelectionModel with the given locale. If the locale is
+     * null, the Locale's default is used.
+     * 
+     * PENDING JW: fall back to JComponent.getDefaultLocale instead? We use this
+     *   with components anyway?
+     * 
+     * @param locale the Locale to use with this model, defaults to Locale.default()
+     *    if null.
+     */
     public AbstractDateSelectionModel(Locale locale) {
         this.listenerMap = new EventListenerMap();
         setLocale(locale);
@@ -61,14 +79,14 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
      * {@inheritDoc}
      */
     public Calendar getCalendar() {
-        return (Calendar) cal.clone();
+        return (Calendar) calendar.clone();
     }
 
     /**
      * {@inheritDoc}
      */
     public int getFirstDayOfWeek() {
-        return cal.getFirstDayOfWeek();
+        return calendar.getFirstDayOfWeek();
     }
 
     /**
@@ -76,7 +94,7 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
      */
     public void setFirstDayOfWeek(final int firstDayOfWeek) {
         if (firstDayOfWeek == getFirstDayOfWeek()) return;
-        cal.setFirstDayOfWeek(firstDayOfWeek);
+        calendar.setFirstDayOfWeek(firstDayOfWeek);
         fireValueChanged(EventType.CALENDAR_CHANGED);
     }
 
@@ -84,7 +102,7 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
      * {@inheritDoc}
      */
     public int getMinimalDaysInFirstWeek() {
-        return cal.getMinimalDaysInFirstWeek();
+        return calendar.getMinimalDaysInFirstWeek();
     }
 
     /**
@@ -92,7 +110,7 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
      */
     public void setMinimalDaysInFirstWeek(int minimalDays) {
         if (minimalDays == getMinimalDaysInFirstWeek()) return;
-        cal.setMinimalDaysInFirstWeek(minimalDays);
+        calendar.setMinimalDaysInFirstWeek(minimalDays);
         fireValueChanged(EventType.CALENDAR_CHANGED);
     }
 
@@ -101,7 +119,7 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
      * {@inheritDoc}
      */
     public TimeZone getTimeZone() {
-        return cal.getTimeZone();
+        return calendar.getTimeZone();
     }
 
     /**
@@ -110,7 +128,7 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
     public void setTimeZone(TimeZone timeZone) {
         if (getTimeZone().equals(timeZone)) return;
         TimeZone oldTimeZone = getTimeZone();
-        cal.setTimeZone(timeZone);
+        calendar.setTimeZone(timeZone);
         adjustDatesToTimeZone(oldTimeZone);
         fireValueChanged(EventType.CALENDAR_CHANGED);
     }
@@ -131,6 +149,7 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
         setUpperBound(null);
         setUnselectableDates(EMPTY_DATES);
     }
+    
     /**
      * {@inheritDoc}
      */
@@ -147,10 +166,10 @@ public abstract class AbstractDateSelectionModel implements DateSelectionModel {
         }
         if (locale.equals(getLocale())) return;
         this.locale = locale;
-        if (cal != null) {
-            cal = Calendar.getInstance(cal.getTimeZone(), locale);
+        if (calendar != null) {
+            calendar = Calendar.getInstance(calendar.getTimeZone(), locale);
         } else {
-            cal = Calendar.getInstance(locale);
+            calendar = Calendar.getInstance(locale);
         }
         fireValueChanged(EventType.CALENDAR_CHANGED);
     }

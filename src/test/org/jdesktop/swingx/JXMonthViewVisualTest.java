@@ -44,15 +44,6 @@ public class JXMonthViewVisualTest extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXMonthViewVisualTest.class
             .getName());
 
-    // Constants used internally; unit is milliseconds
-    @SuppressWarnings("unused")
-    private static final int ONE_MINUTE = 60*1000;
-    @SuppressWarnings("unused")
-    private static final int ONE_HOUR   = 60*ONE_MINUTE;
-    @SuppressWarnings("unused")
-    private static final int THREE_HOURS = 3 * ONE_HOUR;
-    @SuppressWarnings("unused")
-    private static final int ONE_DAY    = 24*ONE_HOUR;
 
     @SuppressWarnings("unused")
     private Calendar calendar;

@@ -68,12 +68,6 @@ public class JXMonthViewTest extends MockObjectTestCase {
     private Date yesterday;
     // calendar default instance init with today
     private Calendar calendar;
-    // Constants used internally; unit is milliseconds
-    private static final int ONE_MINUTE = 60*1000;
-    private static final int ONE_HOUR   = 60*ONE_MINUTE;
-    private static final int THREE_HOURS = 3 * ONE_HOUR;
-    @SuppressWarnings("unused")
-    private static final int ONE_DAY    = 24*ONE_HOUR;
 
     public void setUp() {
         calendar = Calendar.getInstance();
@@ -645,7 +639,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JXMonthView monthView = new JXMonthView();
         TimeZone tz = monthView.getTimeZone();
         Calendar calendar = monthView.getCalendar();
-        calendar.setTimeZone(getTimeZone(tz, THREE_HOURS));
+        calendar.setTimeZone(getTimeZone(tz, CalendarUtils.THREE_HOURS));
         assertEquals("monthView must protect its calendar", tz, monthView.getTimeZone());
     }
 
@@ -849,7 +843,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         monthView.setSelectedDate(date);
         // sanity
         assertTrue(monthView.isSelectedDate(date));
-        monthView.setTimeZone(getTimeZone(monthView.getTimeZone(), THREE_HOURS));
+        monthView.setTimeZone(getTimeZone(monthView.getTimeZone(), CalendarUtils.THREE_HOURS));
         // accidentally passes - because it is meaningful only in the timezone 
         // it was set ...
         assertFalse(monthView.isSelectedDate(date));
@@ -867,7 +861,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     public void testTimeZoneChangeResetLowerBound() {
         JXMonthView monthView = new JXMonthView();
         monthView.setLowerBound(yesterday);
-        monthView.setTimeZone(getTimeZone(monthView.getTimeZone(), THREE_HOURS));
+        monthView.setTimeZone(getTimeZone(monthView.getTimeZone(), CalendarUtils.THREE_HOURS));
         assertEquals("lowerBound must have been reset", null, monthView.getLowerBound());
     }
     
@@ -882,7 +876,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     public void testTimeZoneChangeResetUpperBound() {
         JXMonthView monthView = new JXMonthView();
         monthView.setUpperBound(yesterday);
-        monthView.setTimeZone(getTimeZone(monthView.getTimeZone(), THREE_HOURS));
+        monthView.setTimeZone(getTimeZone(monthView.getTimeZone(), CalendarUtils.THREE_HOURS));
         assertEquals("upperbound must have been reset", null, monthView.getUpperBound());
     }
     
@@ -897,7 +891,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     public void testTimeZoneChangeResetFlaggedDates() {
         JXMonthView monthView = new JXMonthView();
         monthView.setFlaggedDates(new Date[] {yesterday});
-        monthView.setTimeZone(getTimeZone(monthView.getTimeZone(), THREE_HOURS));
+        monthView.setTimeZone(getTimeZone(monthView.getTimeZone(), CalendarUtils.THREE_HOURS));
         // accidentally passes - because it is meaningful only in the timezone 
         // it was set ...
         assertFalse(monthView.isFlaggedDate(yesterday));
@@ -917,7 +911,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
     public void testTimeZoneChangeResetUnselectableDates() {
         JXMonthView monthView = new JXMonthView();
         monthView.setUnselectableDates(yesterday);
-        monthView.setTimeZone(getTimeZone(monthView.getTimeZone(), THREE_HOURS));
+        monthView.setTimeZone(getTimeZone(monthView.getTimeZone(), CalendarUtils.THREE_HOURS));
         // accidentally passes - because it is meaningful only in the timezone 
         // it was set ...
         assertFalse(monthView.isUnselectableDate(yesterday));
@@ -950,7 +944,7 @@ public class JXMonthViewTest extends MockObjectTestCase {
         Date anchor = monthView.getAnchorDate();
         TimeZone timeZone = monthView.getTimeZone();
         // just interested in a different timezone, no quantification intended
-        monthView.setTimeZone(getTimeZone(timeZone, THREE_HOURS));
+        monthView.setTimeZone(getTimeZone(timeZone, CalendarUtils.THREE_HOURS));
         assertEquals("anchor must be invariant to timezone change", 
                 anchor, monthView.getAnchorDate());
     }

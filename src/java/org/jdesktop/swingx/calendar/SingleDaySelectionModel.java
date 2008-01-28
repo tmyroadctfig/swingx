@@ -35,16 +35,22 @@ import org.jdesktop.swingx.util.Contract;
  * @author Jeanette Winzenburg
  */
 public class SingleDaySelectionModel extends AbstractDateSelectionModel {
-//    private static final SortedSet<Date> EMPTY_SET = Collections.unmodifiableSortedSet(new TreeSet<Date>());
+
     private SortedSet<Date> selectedDates;
     private SortedSet<Date> unselectableDates;
     private Date upperBound;
     private Date lowerBound;
 
+    /**
+     * {@inheritDoc}
+     */
     public SingleDaySelectionModel() {
         this(null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public SingleDaySelectionModel(Locale locale) {
         super(locale);
         this.selectedDates = new TreeSet<Date>();
@@ -262,15 +268,15 @@ public class SingleDaySelectionModel extends AbstractDateSelectionModel {
     }
 
     private Date startOfDay(Date date) {
-        cal.setTime(date);
-        CalendarUtils.startOfDay(cal);
-        return cal.getTime();
+        calendar.setTime(date);
+        CalendarUtils.startOfDay(calendar);
+        return calendar.getTime();
     }
 
     private Date endOfDay(Date date) {
-        cal.setTime(date);
-        CalendarUtils.endOfDay(cal);
-        return cal.getTime();
+        calendar.setTime(date);
+        CalendarUtils.endOfDay(calendar);
+        return calendar.getTime();
     }
 
     /**

@@ -28,6 +28,9 @@ import org.jdesktop.swingx.event.DateSelectionListener;
 
 
 /**
+ * The Model used by calendar components. It controls the Calendar to use and 
+ * keeps selection-related state.
+ * 
  * @author Joshua Outwater
  */
 public interface DateSelectionModel {
@@ -152,10 +155,12 @@ public interface DateSelectionModel {
 
     /**
      * Sets the Locale of this model's calendar. Fires a DateSelectionEvent of type 
-     * CALENDAR_CHANGED if the new value is different from the old.
+     * CALENDAR_CHANGED if the new value is different from the old. <p>
      * 
-     * The default value is Locale.default().
+     * The default value is Locale.default(). <p>
      * 
+     * PENDING JW: fall back to JComponent.getDefaultLocale instead? We use this
+     *   with components anyway? <p>
      * PENDING JW: actually, it's a bound property. Use a propertyChangeListener?
      * 
      * @param locale the Locale to use. If null, the default Locale is used.

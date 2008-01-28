@@ -53,15 +53,6 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     private static final Logger LOG = Logger.getLogger(JXMonthViewIssues.class
             .getName());
 
-    // Constants used internally; unit is milliseconds
-    @SuppressWarnings("unused")
-    private static final int ONE_MINUTE = 60*1000;
-    @SuppressWarnings("unused")
-    private static final int ONE_HOUR   = 60*ONE_MINUTE;
-    @SuppressWarnings("unused")
-    private static final int THREE_HOURS = 3 * ONE_HOUR;
-    @SuppressWarnings("unused")
-    private static final int ONE_DAY    = 24*ONE_HOUR;
 
     public static void main(String[] args) {
       setSystemLF(true);
@@ -169,7 +160,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
 //----------------------
 
     /**
-     * Issue #733-swingx: model and monthView cal not synched.
+     * Issue #736-swingx: model and monthView cal not synched.
      * 
      * Here: test that model settings are respected in constructor - minimaldays.
      */
@@ -184,7 +175,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     }
 
     /**
-     * Issue #733-swingx: model and monthView cal not synched.
+     * Issue #736-swingx: model and monthView cal not synched.
      * 
      * Here: test that model settings are respected in setModel - minimaldays.
      * 
@@ -280,7 +271,7 @@ public class JXMonthViewIssues extends InteractiveTestCase {
      */
     public void testTimeZoneChangeTodayNotification() {
         JXMonthView monthView = new JXMonthView();
-        TimeZone other = getTimeZone(monthView.getTimeZone(), THREE_HOURS);
+        TimeZone other = getTimeZone(monthView.getTimeZone(), CalendarUtils.THREE_HOURS);
         PropertyChangeReport report = new PropertyChangeReport();
         monthView.addPropertyChangeListener(report);
         monthView.setTimeZone(other);

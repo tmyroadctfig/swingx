@@ -45,17 +45,22 @@ public class DaySelectionModel extends AbstractDateSelectionModel {
     private Date upperBound;
     private Date lowerBound;
 
+    /**
+     * {@inheritDoc}
+     */
     public DaySelectionModel() {
         this(null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public DaySelectionModel(Locale locale) {
         super(locale);
         this.listenerMap = new EventListenerMap();
         this.selectionMode = SelectionMode.SINGLE_SELECTION;
         this.selectedDates = new TreeSet<Date>();
         this.unselectableDates = new TreeSet<Date>();
-//        this.firstDayOfWeek = cal.getFirstDayOfWeek();
         
     }
     /**
@@ -123,29 +128,6 @@ public class DaySelectionModel extends AbstractDateSelectionModel {
         if (addSelectionImpl(startDate, endDate)) {
             fireValueChanged(EventType.DATES_SET);
         }
-//        boolean added = false;
-//        switch (selectionMode) {
-//            case SINGLE_SELECTION:
-//                if (isSelected(startDate)) return;
-//                clearSelectionImpl();
-//                added = addSelectionImpl(startDate, startDate);
-//                break;
-//            case SINGLE_INTERVAL_SELECTION:
-//                if (isIntervalSelected(startDate, endDate)) return;
-//                clearSelectionImpl();
-//                added = addSelectionImpl(startDate, endDate);
-//                break;
-//            case MULTIPLE_INTERVAL_SELECTION:
-//                if (isIntervalSelected(startDate, endDate)) return;
-//                clearSelectionImpl();
-//                added =addSelectionImpl(startDate, endDate);
-//                break;
-//            default:
-//                break;
-//        }
-//        if (added) {
-//            fireValueChanged(EventType.DATES_SET);
-//        }
     }
 
     /**
@@ -316,23 +298,23 @@ public class DaySelectionModel extends AbstractDateSelectionModel {
 
     private boolean addSelectionImpl(final Date startDate, final Date endDate) {
         boolean hasAdded = false;
-        cal.setTime(startDate);
-        Date date = cal.getTime();
+        calendar.setTime(startDate);
+        Date date = calendar.getTime();
         while (date.before(endDate) || date.equals(endDate)) {
             if (!isUnselectableDate(date)) {
                 hasAdded = true;
                 selectedDates.add(date);
             }
-            cal.add(Calendar.DATE, 1);
-            date = cal.getTime();
+            calendar.add(Calendar.DATE, 1);
+            date = calendar.getTime();
         }
         return hasAdded;
     }
 
     private Date startOfDay(Date date) {
-        cal.setTime(date);
-        CalendarUtils.startOfDay(cal);
-        return cal.getTime();
+        calendar.setTime(date);
+        CalendarUtils.startOfDay(calendar);
+        return calendar.getTime();
     }
 
     /**

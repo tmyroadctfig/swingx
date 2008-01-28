@@ -22,7 +22,6 @@
 package org.jdesktop.swingx.calendar;
 
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Calendar manipulation.
@@ -33,7 +32,17 @@ import java.util.Date;
  * @author Jeanette Winzenburg
  */
 public class CalendarUtils {
- 
+
+    // Constants used internally; unit is milliseconds
+    @SuppressWarnings("unused")
+    public static final int ONE_MINUTE = 60*1000;
+    @SuppressWarnings("unused")
+    public static final int ONE_HOUR   = 60*ONE_MINUTE;
+    @SuppressWarnings("unused")
+    public static final int THREE_HOURS = 3 * ONE_HOUR;
+    @SuppressWarnings("unused")
+    public static final int ONE_DAY    = 24*ONE_HOUR;
+
     /**
      * Returns a boolean indicating if the given calendar represents the 
      * start of a day (in the calendar's time zone). The calendar is unchanged.

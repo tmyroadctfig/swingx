@@ -24,9 +24,19 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
+ * Utility methods for Date manipulation. <p>
+ * 
+ * This utility class is replaced by CalendarUtils because day related manipulation
+ * are meaningfull relative to a Calendar only. Always doing so against the default
+ * calendar instance isn't enough.
+ * 
+ * PENDING JW: move the missing ops. Volunteers, please!
+ * 
  * @author Scott Violet
  * @version  $Revision$
+ * 
  */
+//*@deprecated use {@link CalendarUtils} instead. 
 public class DateUtils {
     private static Calendar CALENDAR = Calendar.getInstance();
 

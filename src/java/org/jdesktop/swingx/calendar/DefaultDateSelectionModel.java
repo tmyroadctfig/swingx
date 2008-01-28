@@ -28,6 +28,7 @@ import java.util.TreeSet;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 
 /**
+ * 
  * @author Joshua Outwater
  */
 public class DefaultDateSelectionModel extends AbstractDateSelectionModel {
@@ -37,18 +38,23 @@ public class DefaultDateSelectionModel extends AbstractDateSelectionModel {
     private Date upperBound;
     private Date lowerBound;
 
+    /**
+     * {@inheritDoc}
+     */
     public DefaultDateSelectionModel() {
         this(null);
     }
 
+    /**
+     * {@inheritDoc} <p>
+     * 
+     * The selection mode defaults to SINGLE_SELECTION.
+     */
     public DefaultDateSelectionModel(Locale locale) {
         super(locale);
         this.selectionMode = SelectionMode.SINGLE_SELECTION;
         this.selectedDates = new TreeSet<Date>();
         this.unselectableDates = new TreeSet<Date>();
-        // JW: changed inital firstDayOfWeek
-        // had been hardcoded to Sunday!
-//        this.firstDayOfWeek = cal.getFirstDayOfWeek();
     }
     /**
      * {@inheritDoc}
@@ -112,29 +118,6 @@ public class DefaultDateSelectionModel extends AbstractDateSelectionModel {
         if (addSelectionImpl(startDate, endDate)) {
             fireValueChanged(EventType.DATES_SET);
         }
-//        boolean added = false;
-//        switch (selectionMode) {
-//            case SINGLE_SELECTION:
-//                if (isSelected(startDate)) return;
-//                clearSelectionImpl();
-//                added = addSelectionImpl(startDate, startDate);
-//                break;
-//            case SINGLE_INTERVAL_SELECTION:
-//                if (isIntervalSelected(startDate, endDate)) return;
-//                clearSelectionImpl();
-//                added = addSelectionImpl(startDate, endDate);
-//                break;
-//            case MULTIPLE_INTERVAL_SELECTION:
-//                if (isIntervalSelected(startDate, endDate)) return;
-//                clearSelectionImpl();
-//                added =addSelectionImpl(startDate, endDate);
-//                break;
-//            default:
-//                break;
-//        }
-//        if (added) {
-//            fireValueChanged(EventType.DATES_SET);
-//        }
     }
 
     /**
@@ -255,15 +238,18 @@ public class DefaultDateSelectionModel extends AbstractDateSelectionModel {
      * {@inheritDoc}
      */
     public void setUpperBound(Date upperBound) {
-        if ((upperBound != null && !upperBound.equals(this.upperBound)) ||
-                (upperBound == null && upperBound != this.upperBound)) {
+        if ((upperBound != null && !upperBound.equals(this.upperBound))
+                || (upperBound == null && upperBound != this.upperBound)) {
             this.upperBound = upperBound;
-            if (!isSelectionEmpty() && selectedDates.last().after(this.upperBound)) {
+            if (!isSelectionEmpty()
+                    && selectedDates.last().after(this.upperBound)) {
                 if (this.upperBound != null) {
                     // Remove anything above the upper bound
                     long justAboveUpperBoundMs = this.upperBound.getTime() + 1;
-                    if (!selectedDates.isEmpty() && selectedDates.last().before(this.upperBound))
-                        removeSelectionInterval(this.upperBound, new Date(justAboveUpperBoundMs));
+                    if (!selectedDates.isEmpty()
+                            && selectedDates.last().before(this.upperBound))
+                        removeSelectionInterval(this.upperBound, new Date(
+                                justAboveUpperBoundMs));
                 }
             }
             fireValueChanged(EventType.UPPER_BOUND_CHANGED);
@@ -281,14 +267,16 @@ public class DefaultDateSelectionModel extends AbstractDateSelectionModel {
      * {@inheritDoc}
      */
     public void setLowerBound(Date lowerBound) {
-        if ((lowerBound != null && !lowerBound.equals(this.lowerBound)) ||
-                (lowerBound == null && lowerBound != this.lowerBound)) {
+        if ((lowerBound != null && !lowerBound.equals(this.lowerBound))
+                || (lowerBound == null && lowerBound != this.lowerBound)) {
             this.lowerBound = lowerBound;
             if (this.lowerBound != null) {
                 // Remove anything below the lower bound
                 long justBelowLowerBoundMs = this.lowerBound.getTime() - 1;
-                if (!isSelectionEmpty() && selectedDates.first().before(this.lowerBound)) {
-                    removeSelectionInterval(selectedDates.first(), new Date(justBelowLowerBoundMs));
+                if (!isSelectionEmpty()
+                        && selectedDates.first().before(this.lowerBound)) {
+                    removeSelectionInterval(selectedDates.first(), new Date(
+                            justBelowLowerBoundMs));
                 }
             }
             fireValueChanged(EventType.LOWER_BOUND_CHANGED);
@@ -297,15 +285,15 @@ public class DefaultDateSelectionModel extends AbstractDateSelectionModel {
 
     private boolean addSelectionImpl(final Date startDate, final Date endDate) {
         boolean hasAdded = false;
-        cal.setTime(startDate);
-        Date date = cal.getTime();
+        calendar.setTime(startDate);
+        Date date = calendar.getTime();
         while (date.before(endDate) || date.equals(endDate)) {
             if (!isUnselectableDate(date)) {
                 hasAdded = true;
                 selectedDates.add(date);
             }
-            cal.add(Calendar.DATE, 1);
-            date = cal.getTime();
+            calendar.add(Calendar.DATE, 1);
+            date = calendar.getTime();
         }
         return hasAdded;
     }

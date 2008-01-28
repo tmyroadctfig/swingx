@@ -219,6 +219,10 @@ public class JXMonthView extends JComponent {
      * the calendar to base all selections, flagging upon. 
      * NOTE: the time of this calendar is undefined - before using, internal
      * code must explicitly set it.
+     * PENDING JW: as of version 1.26 all calendar/properties are controlled by the model.
+     * We keep a clone of the model's calendar here for notification reasons: 
+     * model fires DateSelectionEvent of type CALENDAR_CHANGED which neiter carry the
+     * oldvalue nor the property name needed to map into propertyChange notification.
      */
     private Calendar cal;
     /** calendar to store the real input of firstDisplayedDate. */
@@ -340,14 +344,6 @@ public class JXMonthView extends JComponent {
         selectionMode = SelectionMode.SINGLE_SELECTION;
 
         initModel(model, locale);
-
-        // JW: something fishy going on - see #702-swingx and related discussion
-        // installing the cal before or after the controller should no longer 
-        // matter as the controller must not access the calendar before this is
-        // instantiation is complete (getCalender throws)
-        // JW: problem might have been that the init was incomplete (#715-swingx)  
-        // cal installed but not yet the firstDisplayedDate
-        // so move both before intalling the ui 
         superSetLocale(locale);
         setFirstDisplayedDate(firstDisplayedDate);
         // Keep track of today
@@ -362,37 +358,9 @@ public class JXMonthView extends JComponent {
 
     }
 
-    private void initModel(DateSelectionModel model, Locale locale) {
-        if (locale == null) {
-            locale = JComponent.getDefaultLocale();
-        }
-        if (model == null) {
-            model = new DaySelectionModel(locale);
-        }
-        this.model = model;
-        installCalendar();
-        model.addDateSelectionListener(getDateSelectionListener());
-    }
-
-    /**
-     * @return
-     */
-    private DateSelectionListener getDateSelectionListener() {
-        if (modelListener == null) {
-            modelListener = new DateSelectionListener() {
-
-                public void valueChanged(DateSelectionEvent ev) {
-                    if (EventType.CALENDAR_CHANGED.equals(ev.getEventType())) {
-                        updateCalendar();
-                    }
-                    
-                }
-                
-            };
-        }
-        return modelListener;
-    }
-
+    
+//------------------ Calendar related properties
+    
     /**
      * Sets locale and resets text and format used to display months and days. 
      * Also resets firstDayOfWeek. <p>
@@ -413,7 +381,6 @@ public class JXMonthView extends JComponent {
     @Override
     public void setLocale(Locale locale) {
         model.setLocale(locale);
-//        superSetLocale(locale);
     }
 
     /**
@@ -451,43 +418,6 @@ public class JXMonthView extends JComponent {
     }
 
     /**
-     * Installs the internal calendars from the selection model.
-     * 
-     */
-    private void installCalendar() {
-        // PENDING JW: respect current timezone!
-        cal = model.getCalendar();
-        firstDayOfWeek = cal.getFirstDayOfWeek();
-        // PENDING JW: why and who decides?
-        // without, we get the "days overlapping in header" issue
-        // for locales with min > 1
-        // need to fix somewhere else ... (instead of hacking here)
-        cal.setMinimalDaysInFirstWeek(1);
-        model.setMinimalDaysInFirstWeek(1);
-        anchor = (Calendar) cal.clone();
-    }
-
-    /**
-     * Callback from selection model calendar changes.
-     */
-    private void updateCalendar() {
-       if (!getLocale().equals(model.getLocale())) {
-           installCalendar();
-           superSetLocale(model.getLocale());
-       } else {
-           if (!model.getTimeZone().equals(getTimeZone())) {
-               updateTimeZone();
-           }
-           if (cal.getMinimalDaysInFirstWeek() != model.getMinimalDaysInFirstWeek()) {
-               updateMinimalDaysOfFirstWeek();
-           }
-           if (cal.getFirstDayOfWeek() != model.getFirstDayOfWeek()) {
-              updateFirstDayOfWeek(); 
-           }
-       }
-    }
-
-    /**
      * Gets the time zone.
      *
      * @return The <code>TimeZone</code> used by the <code>JXMonthView</code>.
@@ -507,58 +437,6 @@ public class JXMonthView extends JComponent {
         model.setTimeZone(tz);
     }
 
-//---------------------- synch to model's calendar    
-    /**
-     * Callback from changing timezone in model.
-     */
-    private void updateTimeZone() {
-        TimeZone old = getTimeZone();
-        TimeZone tz = model.getTimeZone();
-        cal.setTimeZone(tz);
-        anchor.setTimeZone(tz);
-        setFirstDisplayedDate(anchor.getTimeInMillis());
-        updateTodayFromCurrentTime();
-        updateDatesAfterTimeZoneChange(old);
-        firePropertyChange("timeZone", old, getTimeZone());
-        
-    }
-    /**
-     * All dates are "cleaned" relative to the timezone they had been set.
-     * After changing the timezone, they need to be updated to the new.
-     * 
-     * Here: clear everything. 
-     * 
-     * @param oldTimeZone the timezone before the change
-     */
-    protected void updateDatesAfterTimeZoneChange(TimeZone oldTimeZone) {
-        setFlaggedDates((Date[])null);
-        // moved to model responsibility
-//        clearSelection();
-//        setLowerBound(null);
-//        setUpperBound(null);
-//        setUnselectableDates(new Date[0]);
-    }
-    
-    /**
-     * 
-     */
-    private void updateFirstDayOfWeek() {
-        int oldFirstDayOfWeek = this.firstDayOfWeek;
-
-        firstDayOfWeek = getSelectionModel().getFirstDayOfWeek();
-        cal.setFirstDayOfWeek(firstDayOfWeek);
-        anchor.setFirstDayOfWeek(firstDayOfWeek);
-        firePropertyChange("firstDayOfWeek", oldFirstDayOfWeek, firstDayOfWeek);
-
-        repaint();
-        
-    }
-
-    private void updateMinimalDaysOfFirstWeek() {
-        cal.setMinimalDaysInFirstWeek(model.getMinimalDaysInFirstWeek());
-        anchor.setMinimalDaysInFirstWeek(model.getMinimalDaysInFirstWeek());
-    }
-    
     /**
      * Gets what the first day of the week is; e.g.,
      * <code>Calendar.SUNDAY</code> in the U.S., <code>Calendar.MONDAY</code>
@@ -583,6 +461,158 @@ public class JXMonthView extends JComponent {
     }
 
 
+
+//---------------------- synch to model's calendar    
+
+    /**
+     * Initializes selection model related internals. If the Locale is
+     * null, it falls back to JComponent.defaultLocale. If the model
+     * is null it creates a default model with the locale.
+     * 
+     * PENDING JW: leave default locale fallback to model?
+     * 
+     * @param model the DateSelectionModel which should drive the monthView. 
+     *    If null, a default model is created and initialized with the given locale.
+     * @param locale the Locale to use with the selectionModel. If null,
+     *   JComponent.getDefaultLocale is used.
+     */
+    private void initModel(DateSelectionModel model, Locale locale) {
+        if (locale == null) {
+            locale = JComponent.getDefaultLocale();
+        }
+        if (model == null) {
+            model = new DaySelectionModel(locale);
+        }
+        this.model = model;
+        installCalendar();
+        model.addDateSelectionListener(getDateSelectionListener());
+    }
+
+    /**
+     * Lazily creates and returns the DateSelectionListener which listens
+     * for model's calendar properties.
+     * 
+     * @return a DateSelectionListener for model's CALENDAR_CHANGED notification.
+     */
+    private DateSelectionListener getDateSelectionListener() {
+        if (modelListener == null) {
+            modelListener = new DateSelectionListener() {
+
+                public void valueChanged(DateSelectionEvent ev) {
+                    if (EventType.CALENDAR_CHANGED.equals(ev.getEventType())) {
+                        updateCalendar();
+                    }
+                    
+                }
+                
+            };
+        }
+        return modelListener;
+    }
+
+    /**
+     * Installs the internal calendars from the selection model.
+     * 
+     */
+    private void installCalendar() {
+        // PENDING JW: respect current timezone!
+        cal = model.getCalendar();
+        firstDayOfWeek = cal.getFirstDayOfWeek();
+        // PENDING JW: why and who decides?
+        // without, we get the "days overlapping in header" issue
+        // for locales with min > 1
+        // Keep until Issue #736-swingx is fixed.
+        cal.setMinimalDaysInFirstWeek(1);
+        model.setMinimalDaysInFirstWeek(1);
+        anchor = (Calendar) cal.clone();
+    }
+
+    /**
+     * Returns the anchor date. Currently, this is the "uncleaned" input date 
+     * of setFirstDisplayedDate. This is a quick hack for Issue #618-swingx, to
+     * have some invariant for testing. Do not use in client code, may change
+     * without notice!
+     * 
+     * @return the "uncleaned" first display date.
+     */
+    protected Date getAnchorDate() {
+        return anchor.getTime();
+    }
+
+    /**
+     * Callback from selection model calendar changes.
+     */
+    private void updateCalendar() {
+       if (!getLocale().equals(model.getLocale())) {
+           installCalendar();
+           superSetLocale(model.getLocale());
+       } else {
+           if (!model.getTimeZone().equals(getTimeZone())) {
+               updateTimeZone();
+           }
+           if (cal.getMinimalDaysInFirstWeek() != model.getMinimalDaysInFirstWeek()) {
+               updateMinimalDaysOfFirstWeek();
+           }
+           if (cal.getFirstDayOfWeek() != model.getFirstDayOfWeek()) {
+              updateFirstDayOfWeek(); 
+           }
+       }
+    }
+
+
+    /**
+     * Callback from changing timezone in model.
+     */
+    private void updateTimeZone() {
+        TimeZone old = getTimeZone();
+        TimeZone tz = model.getTimeZone();
+        cal.setTimeZone(tz);
+        anchor.setTimeZone(tz);
+        setFirstDisplayedDate(anchor.getTimeInMillis());
+        updateTodayFromCurrentTime();
+        updateDatesAfterTimeZoneChange(old);
+        firePropertyChange("timeZone", old, getTimeZone());
+        
+    }
+    
+    /**
+     * All dates are "cleaned" relative to the timezone they had been set.
+     * After changing the timezone, they need to be updated to the new.
+     * 
+     * Here: clear everything. 
+     * 
+     * @param oldTimeZone the timezone before the change
+     */
+    protected void updateDatesAfterTimeZoneChange(TimeZone oldTimeZone) {
+        setFlaggedDates((Date[])null);
+     }
+    
+    /**
+     * Call back from listening to model firstDayOfWeek change.
+     */
+    private void updateFirstDayOfWeek() {
+        int oldFirstDayOfWeek = this.firstDayOfWeek;
+
+        firstDayOfWeek = getSelectionModel().getFirstDayOfWeek();
+        cal.setFirstDayOfWeek(firstDayOfWeek);
+        anchor.setFirstDayOfWeek(firstDayOfWeek);
+        firePropertyChange("firstDayOfWeek", oldFirstDayOfWeek, firstDayOfWeek);
+
+        repaint();
+        
+    }
+
+    /**
+     * Call back from listening to model firstDayOfWeek change.
+     */
+    private void updateMinimalDaysOfFirstWeek() {
+        cal.setMinimalDaysInFirstWeek(model.getMinimalDaysInFirstWeek());
+        anchor.setMinimalDaysInFirstWeek(model.getMinimalDaysInFirstWeek());
+    }
+
+    
+//-------------------- scrolling
+    
     /**
      * Returns the first displayed date.
      *
@@ -614,17 +644,6 @@ public class JXMonthView extends JComponent {
         repaint();
     }
 
-    /**
-     * Returns the anchor date. Currently, this is the "uncleaned" input date 
-     * of setFirstDisplayedDate. This is a quick hack for Issue #618-swingx, to
-     * have some invariant for testing. Do not use in client code, may change
-     * without notice!
-     * 
-     * @return the "uncleaned" first display date.
-     */
-    protected Date getAnchorDate() {
-        return anchor.getTime();
-    }
     
     /**
      * Returns the last date able to be displayed.  For example, if the last
@@ -782,21 +801,6 @@ public class JXMonthView extends JComponent {
     }
 
 
-    /**
-     * Returns the start of the day of the given Date. The input date is 
-     * unchanged.
-     * 
-     * @param date the time as Date.
-     * @return the date corresponding to the start of the given day, relative to this
-     *    monthView's calendar.
-     *  
-     * @deprecated Model's task.   
-     */
-//    private Date startOfDay(Date date) {
-//        cal.setTime(date);
-//        CalendarUtils.startOfDay(cal);
-//        return cal.getTime();
-//    }
 
     /**
      * Returns the start of the day of the given millis.
@@ -921,11 +925,8 @@ public class JXMonthView extends JComponent {
             modifiedEndDate = endDate;
             if (selectionMode == SelectionMode.WEEK_INTERVAL_SELECTION) {
                 throw new UnsupportedOperationException("week interval selection not yet implemented");
-//                cleanupWeekSelectionDates(startDate, endDate);
             }
             getSelectionModel().addSelectionInterval(modifiedStartDate, modifiedEndDate);
-//                    startOfDay(modifiedStartDate),
-//                    startOfDay(modifiedEndDate));
         }
     }
 
@@ -941,10 +942,8 @@ public class JXMonthView extends JComponent {
             modifiedEndDate = endDate;
             if (selectionMode == SelectionMode.WEEK_INTERVAL_SELECTION) {
                 throw new UnsupportedOperationException("week interval selection not yet implemented");
-//              cleanupWeekSelectionDates(startDate, endDate);
             }
             getSelectionModel().setSelectionInterval(modifiedStartDate, modifiedEndDate);
-//                    startOfDay(modifiedStartDate), startOfDay(modifiedEndDate));
         }
     }
 
@@ -956,7 +955,6 @@ public class JXMonthView extends JComponent {
      */
     public void removeSelectionInterval(final Date startDate, final Date endDate) {
         getSelectionModel().removeSelectionInterval(startDate, endDate);
-//                startOfDay(startDate), startOfDay(endDate));
     }
 
     /**
@@ -1020,7 +1018,6 @@ public class JXMonthView extends JComponent {
      */
     public boolean isSelectedDate(Date date) {
         return getSelectionModel().isSelected(date);
-//                startOfDay(date));
     }
 
     /**
@@ -1030,7 +1027,6 @@ public class JXMonthView extends JComponent {
      * @param lowerBound the lower bound, null means none.
      */
     public void setLowerBound(Date lowerBound) {
-//        Date lower = lowerBound != null ? startOfDay(lowerBound) : null;
         getSelectionModel().setLowerBound(lowerBound);
     }
 
@@ -1040,7 +1036,6 @@ public class JXMonthView extends JComponent {
      * @param upperBound the upper bound, null means none.
      */
     public void setUpperBound(Date upperBound) {
-//        Date upper = upperBound != null ? startOfDay(upperBound) : null;
         getSelectionModel().setUpperBound(upperBound);
     }
 
@@ -1074,7 +1069,6 @@ public class JXMonthView extends JComponent {
      */
     public boolean isUnselectableDate(Date date) {
         return getSelectionModel().isUnselectableDate(date);
-//                startOfDay(date));
     }
 
     /**
@@ -1096,7 +1090,6 @@ public class JXMonthView extends JComponent {
         SortedSet<Date> unselectableSet = new TreeSet<Date>();
         for (Date unselectableDate : unselectableDates) {
             unselectableSet.add(unselectableDate);
-//                    startOfDay(unselectableDate));
         }
         getSelectionModel().setUnselectableDates(unselectableSet);
         repaint();
@@ -1114,7 +1107,6 @@ public class JXMonthView extends JComponent {
      */
     public boolean isSelectedDate(long date) {
         return getSelectionModel().isSelected(new Date(date));
-//                new Date(startOfDay(date)));
     }
 
     /**
@@ -1127,7 +1119,6 @@ public class JXMonthView extends JComponent {
      */
     public boolean isUnselectableDate(long date) {
         return getSelectionModel().isUnselectableDate(new Date(date));
-//                new Date(startOfDay(date)));
     }
 
     /**
@@ -1142,7 +1133,6 @@ public class JXMonthView extends JComponent {
         if (unselectableDates != null) {
             for (long unselectableDate : unselectableDates) {
                 unselectableSet.add(new Date(unselectableDate));
-//                        new Date(startOfDay(unselectableDate)));
             }
         }
         getSelectionModel().setUnselectableDates(unselectableSet);
