@@ -459,6 +459,9 @@ public class JXMonthView extends JComponent {
         cal = model.getCalendar();
         firstDayOfWeek = cal.getFirstDayOfWeek();
         // PENDING JW: why and who decides?
+        // without, we get the "days overlapping in header" issue
+        // for locales with min > 1
+        // need to fix somewhere else ... (instead of hacking here)
         cal.setMinimalDaysInFirstWeek(1);
         model.setMinimalDaysInFirstWeek(1);
         anchor = (Calendar) cal.clone();
@@ -869,7 +872,13 @@ public class JXMonthView extends JComponent {
     public void setSelectionModel(DateSelectionModel model) {
         Contract.asNotNull(model, "date selection model must not be null");
         DateSelectionModel oldModel = this.model;
+        model.removeDateSelectionListener(getDateSelectionListener());
         this.model = model;
+        installCalendar();
+        if (!model.getLocale().equals(getLocale())) {
+            super.setLocale(model.getLocale());
+        }
+        model.addDateSelectionListener(getDateSelectionListener());
         firePropertyChange(SELECTION_MODEL, oldModel, model);
     }
 

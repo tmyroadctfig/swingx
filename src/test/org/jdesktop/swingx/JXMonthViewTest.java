@@ -37,6 +37,7 @@ import javax.swing.SwingUtilities;
 import org.jdesktop.swingx.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.calendar.CalendarUtils;
 import org.jdesktop.swingx.calendar.DateSelectionModel;
+import org.jdesktop.swingx.calendar.DaySelectionModel;
 import org.jdesktop.swingx.event.DateSelectionListener;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
@@ -101,6 +102,59 @@ public class JXMonthViewTest extends MockObjectTestCase {
         JComponent.setDefaultLocale(componentLocale);
     }
 
+    
+    /**
+     * Issue #733-swingx: model and monthView cal not synched.
+     * 
+     * Here: test that model settings are respected in constructor - minimaldays.
+     */
+    public void testCalendarsContructorUnchangedFirstDayOfWeek() {
+        DateSelectionModel model = new DaySelectionModel();
+        int first = model.getFirstDayOfWeek() + 1;
+        model.setFirstDayOfWeek(first);
+        JXMonthView monthView = new JXMonthView(new Date().getTime(), model);
+        assertEquals("model's calendar properties must be unchanged: minimalDays", 
+                first, model.getFirstDayOfWeek());
+        // sanity: taken in monthView
+        assertEquals("monthView's calendar properties must be synched", 
+                first, monthView.getFirstDayOfWeek());
+    }
+    /**
+     * Issue #733-swingx: model and monthView cal not synched.
+     * 
+     * Here: test that monthView is updated to model after setSelectionModel.
+     */
+    public void testCalendarsSetModel() {
+        JXMonthView monthView = new JXMonthView();
+        int firstDayOfWeek = monthView.getFirstDayOfWeek();
+        Locale locale = Locale.UK;
+        if (locale.equals(monthView.getLocale())) {
+            locale = Locale.FRENCH;
+        }
+        TimeZone tz = TimeZone.getTimeZone("GMT+4");
+        if (monthView.getTimeZone().equals(tz)) {
+            tz = TimeZone.getTimeZone("GMT+5");
+        }
+        DateSelectionModel model = new DaySelectionModel(locale);
+        model.setTimeZone(tz);
+        int modelMinimal = model.getMinimalDaysInFirstWeek();
+        monthView.setSelectionModel(model);
+        assertEquals("timeZone must be updated from model", tz, monthView.getTimeZone());
+        assertEquals("Locale must be updated from model", locale, monthView.getLocale());
+        // be aware if it makes no sense to assert
+        if (firstDayOfWeek != model.getFirstDayOfWeek()) {
+            assertEquals("firstDayOfWeek must be updated from model", 
+                    model.getFirstDayOfWeek(), monthView.getFirstDayOfWeek());
+        } else {
+            LOG.info("cannot assert firstDayOfWeek - was same");
+        }
+        // @KEEP - this is an open issue: monthView must not change the
+        // model settings but minimalDaysInFirstWeek > 1 confuse the 
+        // BasicMonthViewUI - remove if passing in xIssues
+//        assertEquals("model minimals must not be changed", 
+//                modelMinimal, model.getMinimalDaysInFirstWeek());
+    }
+    
     /**
      * Issue #733-swingx: model and monthView cal not synched.
      * 

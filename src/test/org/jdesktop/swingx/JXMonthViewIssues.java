@@ -33,10 +33,11 @@ import java.util.TimeZone;
 import java.util.logging.Logger;
 
 import javax.swing.Action;
-import javax.swing.JComponent;
 
 import org.jdesktop.swingx.JXMonthView.SelectionMode;
 import org.jdesktop.swingx.calendar.CalendarUtils;
+import org.jdesktop.swingx.calendar.DateSelectionModel;
+import org.jdesktop.swingx.calendar.DaySelectionModel;
 import org.jdesktop.swingx.event.DateSelectionEvent.EventType;
 import org.jdesktop.swingx.test.DateSelectionReport;
 import org.jdesktop.test.PropertyChangeReport;
@@ -170,12 +171,35 @@ public class JXMonthViewIssues extends InteractiveTestCase {
     /**
      * Issue #733-swingx: model and monthView cal not synched.
      * 
-     * Here: MinimalDaysInFirstWeek.
+     * Here: test that model settings are respected in constructor - minimaldays.
      */
-    public void testCalendarsMinimalDaysInFirstWeek() {
-        fail("test minimal days of first week not completely implemented");
+    @SuppressWarnings("unused")
+    public void testCalendarsContructorUnchangedMinimalDaysOfModel() {
+        DateSelectionModel model = new DaySelectionModel();
+        int first = model.getMinimalDaysInFirstWeek() + 1;
+        model.setMinimalDaysInFirstWeek(first);
+        JXMonthView monthView = new JXMonthView(new Date().getTime(), model);
+        assertEquals("model's calendar properties must be unchanged: minimalDays", 
+                first, model.getMinimalDaysInFirstWeek());
     }
-    
+
+    /**
+     * Issue #733-swingx: model and monthView cal not synched.
+     * 
+     * Here: test that model settings are respected in setModel - minimaldays.
+     * 
+     * Model must not reset minimalDaysInfirstWeek, but Locales with values
+     * > 1 confuse the BasicDatePickerUI - need to track down and solve there.
+     */
+    public void testCalendarsSetModelUnchangedMinimalDaysInFirstWeek() {
+        JXMonthView monthView = new JXMonthView();
+        DateSelectionModel model = new DaySelectionModel();
+        int first = model.getMinimalDaysInFirstWeek() + 1;
+        model.setMinimalDaysInFirstWeek(first);
+        monthView.setSelectionModel(model);
+        assertEquals("model minimals must not be changed", 
+                first, model.getMinimalDaysInFirstWeek());
+    }
     
     /**
      * Issue #733-swingx: TimeZone in model and monthView not synched.
